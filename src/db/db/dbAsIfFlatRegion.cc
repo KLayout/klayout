@@ -1139,12 +1139,7 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
   db::RegionIterator polygons (needs_merged_primary ? begin_merged () : begin ());
   bool primary_is_merged = ! merged_semantics () || needs_merged_primary || is_merged ();
 
-  EdgeRelationFilter check (rel, d, options.metrics);
-  check.set_include_zero (false);
-  check.set_whole_edges (options.whole_edges);
-  check.set_ignore_angle (options.ignore_angle);
-  check.set_min_projection (options.min_projection);
-  check.set_max_projection (options.max_projection);
+  EdgeRelationFilter check (rel, d, options);
 
   std::vector<db::RegionIterator> others;
   std::vector<bool> foreign;
@@ -1217,12 +1212,7 @@ AsIfFlatRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord 
   std::unique_ptr<FlatEdgePairs> result (new FlatEdgePairs ());
   db::PropertyMapper pm (result->properties_repository (), properties_repository ());
 
-  EdgeRelationFilter check (rel, d, options.metrics);
-  check.set_include_zero (false);
-  check.set_whole_edges (options.whole_edges);
-  check.set_ignore_angle (options.ignore_angle);
-  check.set_min_projection (options.min_projection);
-  check.set_max_projection (options.max_projection);
+  EdgeRelationFilter check (rel, d, options);
 
   for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
 

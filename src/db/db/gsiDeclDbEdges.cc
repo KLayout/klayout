@@ -234,63 +234,69 @@ static db::Edges with_angle3 (const db::Edges *r, db::SpecialEdgeOrientationFilt
   return r->filtered (f);
 }
 
-static db::EdgePairs width2 (const db::Edges *r, db::Edges::coord_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection)
+static db::EdgePairs width2 (const db::Edges *r, db::Edges::coord_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, db::zero_distance_mode zd_mode)
 {
   return r->width_check (d, db::EdgesCheckOptions (whole_edges,
                                metrics,
                                ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
                                min_projection.is_nil () ? db::Edges::distance_type (0) : min_projection.to<db::Edges::distance_type> (),
-                               max_projection.is_nil () ? std::numeric_limits<db::Edges::distance_type>::max () : max_projection.to<db::Edges::distance_type> ())
+                               max_projection.is_nil () ? std::numeric_limits<db::Edges::distance_type>::max () : max_projection.to<db::Edges::distance_type> (),
+                               zd_mode)
                          );
 }
 
-static db::EdgePairs space2 (const db::Edges *r, db::Edges::coord_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection)
+static db::EdgePairs space2 (const db::Edges *r, db::Edges::coord_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, db::zero_distance_mode zd_mode)
 {
   return r->space_check (d, db::EdgesCheckOptions (whole_edges,
                                metrics,
                                ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
                                min_projection.is_nil () ? db::Edges::distance_type (0) : min_projection.to<db::Edges::distance_type> (),
-                               max_projection.is_nil () ? std::numeric_limits<db::Edges::distance_type>::max () : max_projection.to<db::Edges::distance_type> ())
+                               max_projection.is_nil () ? std::numeric_limits<db::Edges::distance_type>::max () : max_projection.to<db::Edges::distance_type> (),
+                               zd_mode)
                          );
 }
 
-static db::EdgePairs inside2 (const db::Edges *r, const db::Edges &other, db::Edges::coord_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection)
+static db::EdgePairs inside2 (const db::Edges *r, const db::Edges &other, db::Edges::coord_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, db::zero_distance_mode zd_mode)
 {
   return r->inside_check (other, d, db::EdgesCheckOptions (whole_edges,
                                         metrics,
                                         ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
                                         min_projection.is_nil () ? db::Edges::distance_type (0) : min_projection.to<db::Edges::distance_type> (),
-                                        max_projection.is_nil () ? std::numeric_limits<db::Edges::distance_type>::max () : max_projection.to<db::Edges::distance_type> ())
+                                        max_projection.is_nil () ? std::numeric_limits<db::Edges::distance_type>::max () : max_projection.to<db::Edges::distance_type> (),
+                                        zd_mode)
                          );
 }
 
-static db::EdgePairs overlap2 (const db::Edges *r, const db::Edges &other, db::Edges::coord_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection)
+static db::EdgePairs overlap2 (const db::Edges *r, const db::Edges &other, db::Edges::coord_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, db::zero_distance_mode zd_mode)
 {
   return r->overlap_check (other, d, db::EdgesCheckOptions (whole_edges,
                                          metrics,
                                          ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
                                          min_projection.is_nil () ? db::Edges::distance_type (0) : min_projection.to<db::Edges::distance_type> (),
-                                         max_projection.is_nil () ? std::numeric_limits<db::Edges::distance_type>::max () : max_projection.to<db::Edges::distance_type> ())
+                                         max_projection.is_nil () ? std::numeric_limits<db::Edges::distance_type>::max () : max_projection.to<db::Edges::distance_type> (),
+                                         zd_mode)
                           );
 }
 
-static db::EdgePairs enclosing2 (const db::Edges *r, const db::Edges &other, db::Edges::coord_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection)
+static db::EdgePairs enclosing2 (const db::Edges *r, const db::Edges &other, db::Edges::coord_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, db::zero_distance_mode zd_mode)
 {
   return r->enclosing_check (other, d, db::EdgesCheckOptions (whole_edges,
                                            metrics,
                                            ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
                                            min_projection.is_nil () ? db::Edges::distance_type (0) : min_projection.to<db::Edges::distance_type> (),
-                                           max_projection.is_nil () ? std::numeric_limits<db::Edges::distance_type>::max () : max_projection.to<db::Edges::distance_type> ())
+                                           max_projection.is_nil () ? std::numeric_limits<db::Edges::distance_type>::max () : max_projection.to<db::Edges::distance_type> (),
+                                           zd_mode)
                             );
 }
 
-static db::EdgePairs separation2 (const db::Edges *r, const db::Edges &other, db::Edges::coord_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection)
+static db::EdgePairs separation2 (const db::Edges *r, const db::Edges &other, db::Edges::coord_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, db::zero_distance_mode zd_mode)
 {
   return r->separation_check (other, d, db::EdgesCheckOptions (whole_edges,
                                            metrics,
                                            ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
                                            min_projection.is_nil () ? db::Edges::distance_type (0) : min_projection.to<db::Edges::distance_type> (),
-                                           max_projection.is_nil () ? std::numeric_limits<db::Edges::distance_type>::max () : max_projection.to<db::Edges::distance_type> ())
+                                           max_projection.is_nil () ? std::numeric_limits<db::Edges::distance_type>::max () : max_projection.to<db::Edges::distance_type> (),
+                                           zd_mode)
                              );
 }
 
@@ -1399,7 +1405,7 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "\n"
     "This variant has been introduced in version 0.27."
   ) +
-  method_ext ("width_check", &width2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"),
+  method_ext ("width_check", &width2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("zero_distance_mode", db::IncludeZeroDistanceWhenTouching, "IncludeZeroDistanceWhenTouching"),
     "@brief Performs a width check with options\n"
     "@param d The minimum width for which the edges are checked\n"
     "@param whole_edges If true, deliver the whole edges\n"
@@ -1407,6 +1413,7 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "@param ignore_angle The threshold angle above which no check is performed\n"
     "@param min_projection The lower threshold of the projected length of one edge onto another\n"
     "@param max_projection The upper threshold of the projected length of one edge onto another\n"
+    "@param zero_distance_mode Specifies how to handle edges with zero distance\n"
     "\n"
     "If \"whole_edges\" is true, the resulting \\EdgePairs collection will receive the whole "
     "edges which contribute in the width check.\n"
@@ -1424,8 +1431,10 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "It is sufficient if the projection of one edge on the other matches the specified condition. "
     "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
     "If you don't want to specify one threshold, pass nil to the respective value.\n"
+    "\n"
+    "'zero_distance_mode' has been added in version 0.29."
   ) +
-  method_ext ("space_check", &space2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"),
+  method_ext ("space_check", &space2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("zero_distance_mode", db::IncludeZeroDistanceWhenTouching, "IncludeZeroDistanceWhenTouching"),
     "@brief Performs a space check with options\n"
     "@param d The minimum distance for which the edges are checked\n"
     "@param whole_edges If true, deliver the whole edges\n"
@@ -1433,6 +1442,7 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "@param ignore_angle The threshold angle above which no check is performed\n"
     "@param min_projection The lower threshold of the projected length of one edge onto another\n"
     "@param max_projection The upper threshold of the projected length of one edge onto another\n"
+    "@param zero_distance_mode Specifies how to handle edges with zero distance\n"
     "\n"
     "If \"whole_edges\" is true, the resulting \\EdgePairs collection will receive the whole "
     "edges which contribute in the space check.\n"
@@ -1450,8 +1460,10 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "It is sufficient if the projection of one edge on the other matches the specified condition. "
     "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
     "If you don't want to specify one threshold, pass nil to the respective value.\n"
+    "\n"
+    "'zero_distance_mode' has been added in version 0.29."
   ) +
-  method_ext ("inside_check|enclosed_check", &inside2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"),
+  method_ext ("inside_check|enclosed_check", &inside2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("zero_distance_mode", db::IncludeZeroDistanceWhenTouching, "IncludeZeroDistanceWhenTouching"),
     "@brief Performs an inside check with options\n"
     "@param d The minimum distance for which the edges are checked\n"
     "@param other The other edge collection against which to check\n"
@@ -1460,6 +1472,7 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "@param ignore_angle The threshold angle above which no check is performed\n"
     "@param min_projection The lower threshold of the projected length of one edge onto another\n"
     "@param max_projection The upper threshold of the projected length of one edge onto another\n"
+    "@param zero_distance_mode Specifies how to handle edges with zero distance\n"
     "\n"
     "If \"whole_edges\" is true, the resulting \\EdgePairs collection will receive the whole "
     "edges which contribute in the width check.\n"
@@ -1479,8 +1492,9 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "If you don't want to specify one threshold, pass nil to the respective value.\n"
     "\n"
     "The 'enclosed_check' alias was introduced in version 0.27.5.\n"
+    "'zero_distance_mode' has been added in version 0.29."
   ) +
-  method_ext ("enclosing_check", &enclosing2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"),
+  method_ext ("enclosing_check", &enclosing2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("zero_distance_mode", db::IncludeZeroDistanceWhenTouching, "IncludeZeroDistanceWhenTouching"),
     "@brief Performs an enclosing check with options\n"
     "@param d The minimum distance for which the edges are checked\n"
     "@param other The other edge collection against which to check\n"
@@ -1489,6 +1503,7 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "@param ignore_angle The threshold angle above which no check is performed\n"
     "@param min_projection The lower threshold of the projected length of one edge onto another\n"
     "@param max_projection The upper threshold of the projected length of one edge onto another\n"
+    "@param zero_distance_mode Specifies how to handle edges with zero distance\n"
     "\n"
     "If \"whole_edges\" is true, the resulting \\EdgePairs collection will receive the whole "
     "edges which contribute in the width check.\n"
@@ -1506,8 +1521,10 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "It is sufficient if the projection of one edge on the other matches the specified condition. "
     "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
     "If you don't want to specify one threshold, pass nil to the respective value.\n"
+    "\n"
+    "'zero_distance_mode' has been added in version 0.29."
   ) +
-  method_ext ("overlap_check", &overlap2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"),
+  method_ext ("overlap_check", &overlap2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("zero_distance_mode", db::IncludeZeroDistanceWhenTouching, "IncludeZeroDistanceWhenTouching"),
     "@brief Performs an overlap check with options\n"
     "@param d The minimum distance for which the edges are checked\n"
     "@param other The other edge collection against which to check\n"
@@ -1516,6 +1533,7 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "@param ignore_angle The threshold angle above which no check is performed\n"
     "@param min_projection The lower threshold of the projected length of one edge onto another\n"
     "@param max_projection The upper threshold of the projected length of one edge onto another\n"
+    "@param zero_distance_mode Specifies how to handle edges with zero distance\n"
     "\n"
     "If \"whole_edges\" is true, the resulting \\EdgePairs collection will receive the whole "
     "edges which contribute in the width check.\n"
@@ -1533,8 +1551,10 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "It is sufficient if the projection of one edge on the other matches the specified condition. "
     "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
     "If you don't want to specify one threshold, pass nil to the respective value.\n"
+    "\n"
+    "'zero_distance_mode' has been added in version 0.29."
   ) +
-  method_ext ("separation_check", &separation2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"),
+  method_ext ("separation_check", &separation2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("zero_distance_mode", db::IncludeZeroDistanceWhenTouching, "IncludeZeroDistanceWhenTouching"),
     "@brief Performs an overlap check with options\n"
     "@param d The minimum distance for which the edges are checked\n"
     "@param other The other edge collection against which to check\n"
@@ -1543,6 +1563,7 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "@param ignore_angle The threshold angle above which no check is performed\n"
     "@param min_projection The lower threshold of the projected length of one edge onto another\n"
     "@param max_projection The upper threshold of the projected length of one edge onto another\n"
+    "@param zero_distance_mode Specifies how to handle edges with zero distance\n"
     "\n"
     "If \"whole_edges\" is true, the resulting \\EdgePairs collection will receive the whole "
     "edges which contribute in the width check.\n"
@@ -1560,6 +1581,8 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "It is sufficient if the projection of one edge on the other matches the specified condition. "
     "The projected length must be larger or equal to \"min_projection\" and less than \"max_projection\". "
     "If you don't want to specify one threshold, pass nil to the respective value.\n"
+    "\n"
+    "'zero_distance_mode' has been added in version 0.29."
   ) +
   method_ext ("extents", &extents0,
     "@brief Returns a region with the bounding boxes of the edges\n"

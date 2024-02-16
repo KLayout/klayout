@@ -103,6 +103,7 @@ public:
   PythonStackTraceProvider (PyFrameObject *frame, const std::string &scope)
     : m_scope (scope)
   {
+    PythonRef frame_object_ref;
     while (frame != NULL) {
 
 #if PY_VERSION_HEX >= 0x030A0000
@@ -123,6 +124,8 @@ public:
 
 #if PY_VERSION_HEX >= 0x030A0000
       frame = PyFrame_GetBack(frame);
+      //  PyFrame_GetBack returns a strong reference, hence we need to make sure it is released
+      frame_object_ref = (PyObject *) frame;
 #else
       frame = frame->f_back;
 #endif
@@ -182,7 +185,7 @@ PythonInterpreter::PythonInterpreter (bool embedded)
   : gsi::Interpreter (0, "pya"),
     mp_current_console (0), mp_current_exec_handler (0), m_current_exec_level (0),
     m_in_trace (false), m_block_exceptions (false), m_ignore_next_exception (false),
-    mp_current_frame (NULL), mp_py3_app_name (0), m_embedded (embedded)
+    mp_current_frame (NULL), m_embedded (embedded)
 {
   //  Don't attempt any additional initialization in the standalone module case
   if (! embedded) {
@@ -322,18 +325,15 @@ PythonInterpreter::PythonInterpreter (bool embedded)
 #else
 
   //  Python 3 requires a unicode string for the application name
-  PyObject *an = c2python (app_path);
-  tl_assert (an != NULL);
-  mp_py3_app_name = PyUnicode_AsWideCharString (an, NULL);
-  tl_assert (mp_py3_app_name != NULL);
-  Py_DECREF (an);
-  Py_SetProgramName (mp_py3_app_name);
+
+  mp_py3_app_name = tl::to_wstring (app_path);
+  Py_SetProgramName (const_cast<wchar_t *> (mp_py3_app_name.c_str ()));
 
   Py_InitializeEx (0 /*don't set signals*/);
 
   //  Set dummy argv[]
   //  TODO: more?
-  wchar_t *argv[1] = { mp_py3_app_name };
+  wchar_t *argv[1] = { const_cast<wchar_t *> (mp_py3_app_name.c_str()) };
   PySys_SetArgvEx (1, argv, 0);
 
 #endif
@@ -368,14 +368,7 @@ PythonInterpreter::~PythonInterpreter ()
   sp_interpreter = 0;
 
   if (m_embedded) {
-
     Py_Finalize ();
-
-    if (mp_py3_app_name) {
-      PyMem_Free (mp_py3_app_name);
-      mp_py3_app_name = 0;
-    }
-
   }
 }
 

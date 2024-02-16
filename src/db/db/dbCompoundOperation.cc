@@ -1625,19 +1625,13 @@ CompoundRegionEdgePairToEdgeProcessingOperationNode::do_compute_local (CompoundR
 // ---------------------------------------------------------------------------------------------
 
 CompoundRegionCheckOperationNode::CompoundRegionCheckOperationNode (db::edge_relation_type rel, bool different_polygons, db::Coord d, const db::RegionCheckOptions &options)
-  : CompoundRegionMultiInputOperationNode (), m_check (rel, d, options.metrics), m_different_polygons (different_polygons), m_options (options), m_has_other (false), m_is_other_merged (false)
+  : CompoundRegionMultiInputOperationNode (), m_check (rel, d, options), m_different_polygons (different_polygons), m_options (options), m_has_other (false), m_is_other_merged (false)
 {
   set_description ("check");
-
-  m_check.set_include_zero (false);
-  m_check.set_whole_edges (options.whole_edges);
-  m_check.set_ignore_angle (options.ignore_angle);
-  m_check.set_min_projection (options.min_projection);
-  m_check.set_max_projection (options.max_projection);
 }
 
 CompoundRegionCheckOperationNode::CompoundRegionCheckOperationNode (CompoundRegionOperationNode *input, db::edge_relation_type rel, bool different_polygons, db::Coord d, const db::RegionCheckOptions &options)
-  : CompoundRegionMultiInputOperationNode (input), m_check (rel, d, options.metrics), m_different_polygons (different_polygons), m_options (options), m_has_other (false), m_is_other_merged (false)
+  : CompoundRegionMultiInputOperationNode (input), m_check (rel, d, options), m_different_polygons (different_polygons), m_options (options), m_has_other (false), m_is_other_merged (false)
 {
   set_description ("check");
 
@@ -1645,16 +1639,10 @@ CompoundRegionCheckOperationNode::CompoundRegionCheckOperationNode (CompoundRegi
   if (pc_always_different (m_options.prop_constraint)) {
     m_different_polygons = true;
   }
-
-  m_check.set_include_zero (false);
-  m_check.set_whole_edges (options.whole_edges);
-  m_check.set_ignore_angle (options.ignore_angle);
-  m_check.set_min_projection (options.min_projection);
-  m_check.set_max_projection (options.max_projection);
 }
 
 CompoundRegionCheckOperationNode::CompoundRegionCheckOperationNode (CompoundRegionOperationNode *input, CompoundRegionOperationNode *other, db::edge_relation_type rel, bool different_polygons, db::Coord d, const db::RegionCheckOptions &options)
-  : CompoundRegionMultiInputOperationNode (other), m_check (rel, d, options.metrics), m_different_polygons (different_polygons), m_options (options)
+  : CompoundRegionMultiInputOperationNode (other), m_check (rel, d, options), m_different_polygons (different_polygons), m_options (options)
 {
   tl_assert (input == 0);  //  input is a dummy parameter
 
@@ -1663,12 +1651,6 @@ CompoundRegionCheckOperationNode::CompoundRegionCheckOperationNode (CompoundRegi
   m_is_other_merged = other->is_merged ();
 
   set_description ("check");
-
-  m_check.set_include_zero (false);
-  m_check.set_whole_edges (options.whole_edges);
-  m_check.set_ignore_angle (options.ignore_angle);
-  m_check.set_min_projection (options.min_projection);
-  m_check.set_max_projection (options.max_projection);
 }
 
 db::OnEmptyIntruderHint

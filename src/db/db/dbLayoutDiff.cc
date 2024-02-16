@@ -702,6 +702,29 @@ do_compare_layouts (const db::Layout &a, const db::Cell *top_a, const db::Layout
     r.dbu_differs (a.dbu (), b.dbu ());
   }
 
+  if ((flags & layout_diff::f_with_meta) != 0) {
+    std::map<std::string, std::pair<tl::Variant, tl::Variant> > mi;
+    for (auto i = a.begin_meta (); i != a.end_meta (); ++i) {
+      if (i->second.persisted) {
+        mi [a.meta_info_name (i->first)].first = i->second.value;
+      }
+    }
+    for (auto i = b.begin_meta (); i != b.end_meta (); ++i) {
+      if (i->second.persisted) {
+        mi [b.meta_info_name (i->first)].second = i->second.value;
+      }
+    }
+    for (auto i = mi.begin (); i != mi.end (); ++i) {
+      if (i->second.first != i->second.second) {
+        differs = true;
+        if (flags & layout_diff::f_silent) {
+          return false;
+        }
+        r.layout_meta_info_differs (i->first, i->second.first, i->second.second);
+      }
+    }
+  }
+
   bool verbose = (flags & layout_diff::f_verbose);
   bool no_duplicates = (flags & layout_diff::f_ignore_duplicates);
 
@@ -927,6 +950,33 @@ do_compare_layouts (const db::Layout &a, const db::Cell *top_a, const db::Layout
     }
 
     r.begin_cell (common_cells [cci], common_cells_a [cci], common_cells_b [cci]); 
+
+    if ((flags & layout_diff::f_with_meta) != 0) {
+      std::map<std::string, std::pair<tl::Variant, tl::Variant> > mi;
+      auto ib = a.begin_meta (common_cells_a [cci]);
+      auto ie = a.end_meta (common_cells_a [cci]);
+      for (auto i = ib; i != ie; ++i) {
+        if (i->second.persisted) {
+          mi [a.meta_info_name (i->first)].first = i->second.value;
+        }
+      }
+      ib = b.begin_meta (common_cells_b [cci]);
+      ie = b.end_meta (common_cells_b [cci]);
+      for (auto i = ib; i != ie; ++i) {
+        if (i->second.persisted) {
+          mi [b.meta_info_name (i->first)].second = i->second.value;
+        }
+      }
+      for (auto i = mi.begin (); i != mi.end (); ++i) {
+        if (i->second.first != i->second.second) {
+          differs = true;
+          if (flags & layout_diff::f_silent) {
+            return false;
+          }
+          r.cell_meta_info_differs (i->first, i->second.first, i->second.second);
+        }
+      }
+    }
 
     if (!verbose && cell_a->bbox () != cell_b->bbox ()) {
       differs = true;
@@ -1215,6 +1265,7 @@ public:
   }
 
   void dbu_differs (double dbu_a, double dbu_b);
+  void layout_meta_info_differs (const std::string &name, const tl::Variant &a, const tl::Variant &b);
   void layer_in_a_only (const db::LayerProperties &la);
   void layer_in_b_only (const db::LayerProperties &lb);
   void layer_name_differs (const db::LayerProperties &la, const db::LayerProperties &lb);
@@ -1222,6 +1273,7 @@ public:
   void cell_in_b_only (const std::string &cellname, db::cell_index_type ci);
   void cell_name_differs (const std::string &cellname_a, db::cell_index_type cia, const std::string &cellname_b, db::cell_index_type cib);
   void begin_cell (const std::string &cellname, db::cell_index_type cia, db::cell_index_type cib);
+  void cell_meta_info_differs (const std::string &name, const tl::Variant &a, const tl::Variant &b);
   void bbox_differs (const db::Box &ba, const db::Box &bb);
   void begin_inst_differences ();
   void instances_in_a (const std::vector <db::CellInstArrayWithProperties> &insts_a, const std::vector <std::string> &cell_names, const db::PropertiesRepository &props);
@@ -1384,6 +1436,16 @@ PrintingDifferenceReceiver::dbu_differs (double dbu_a, double dbu_b)
   }
 }
 
+void
+PrintingDifferenceReceiver::layout_meta_info_differs (const std::string &name, const tl::Variant &a, const tl::Variant &b)
+{
+  try {
+    enough (tl::error) << "Global meta info differs - [" << name << "]: " << a << " vs. " << b;
+  } catch (tl::CancelException &) {
+    //  ignore cancel exceptions
+  }
+}
+
 void 
 PrintingDifferenceReceiver::layer_in_a_only (const db::LayerProperties &la)
 {
@@ -1459,6 +1521,16 @@ void
 PrintingDifferenceReceiver::begin_cell (const std::string &cellname, db::cell_index_type /*cia*/, db::cell_index_type /*cib*/)
 {
   m_cellname = cellname;
+}
+
+void
+PrintingDifferenceReceiver::cell_meta_info_differs (const std::string &name, const tl::Variant &a, const tl::Variant &b)
+{
+  try {
+    enough (tl::error) << "Meta info differs in cell " << m_cellname << " - [" << name << "]: " << a << " vs. " << b;
+  } catch (tl::CancelException &) {
+    //  ignore cancel exceptions
+  }
 }
 
 void

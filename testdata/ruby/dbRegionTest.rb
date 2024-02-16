@@ -550,6 +550,44 @@ class DBRegion_TestClass < TestBase
     assert_equal((r1 | r2).merged.width_check(60, true, RBA::Region::Projection, nil, 50, nil).to_s, "(120,20;120,380)|(130,380;130,20)")
     assert_equal((r1 | r2).merged.width_check(60, true, RBA::Region::Projection, nil, nil, 50).to_s, "(50,200;50,220)|(100,400;100,0)")
 
+    # kissing corner/separation case
+
+    r1 = RBA::Region::new
+    r1.insert(RBA::Box::new(0, 0, 100, 200))
+
+    r2 = RBA::Region::new
+    r2.insert(RBA::Box::new(100, 200, 200, 400))
+
+    r3a = RBA::Region::new
+    r3a.insert(RBA::Box::new(-10, 0, 110, 100))
+
+    r3b = RBA::Region::new
+    r3b.insert(RBA::Box::new(10, 0, 90, 100))
+
+    assert_equal(csort((r2 | r1).width_check(60, false, RBA::Edges::Euclidian, nil, nil, nil).to_s), csort("(100,200;100,140)|(100,200;100,260);(40,200;100,200)|(160,200;100,200)"))
+    assert_equal(csort((r2 | r1).width_check(60, false, RBA::Edges::Euclidian, nil, nil, nil, true, false, RBA::Region::IgnoreProperties, RBA::Region::NeverIncludeZeroDistance).to_s), csort(""))
+    assert_equal(csort((r2 | r1).width_check(60, false, RBA::Edges::Euclidian, nil, nil, nil, true, false, RBA::Region::IgnoreProperties, RBA::Region::IncludeZeroDistanceWhenTouching).to_s), csort("(100,200;100,140)|(100,200;100,260);(40,200;100,200)|(160,200;100,200)"))
+
+    assert_equal(csort((r2 | r1).space_check(60, false, RBA::Edges::Euclidian, nil, nil, nil).to_s), csort("(100,200;100,140)|(100,200;100,260);(40,200;100,200)|(160,200;100,200)"))
+    assert_equal(csort((r2 | r1).space_check(60, false, RBA::Edges::Euclidian, nil, nil, nil, true, RBA::Region::NoOppositeFilter, RBA::Region::NoRectFilter, false, RBA::Region::IgnoreProperties, RBA::Region::NeverIncludeZeroDistance).to_s), csort(""))
+    assert_equal(csort((r2 | r1).space_check(60, false, RBA::Edges::Euclidian, nil, nil, nil, true, RBA::Region::NoOppositeFilter, RBA::Region::NoRectFilter, false, RBA::Region::IgnoreProperties, RBA::Region::IncludeZeroDistanceWhenTouching).to_s), csort("(100,200;100,140)|(100,200;100,260);(40,200;100,200)|(160,200;100,200)"))
+
+    assert_equal(csort(r1.separation_check(r2, 60, false, RBA::Edges::Euclidian, nil, nil, nil).to_s), csort("(100,200;100,140)/(100,200;100,260);(40,200;100,200)/(160,200;100,200)"))
+    assert_equal(csort(r1.separation_check(r2, 60, false, RBA::Edges::Euclidian, nil, nil, nil, true, RBA::Region::NoOppositeFilter, RBA::Region::NoRectFilter, false, RBA::Region::IgnoreProperties, RBA::Region::NeverIncludeZeroDistance).to_s), csort(""))
+    assert_equal(csort(r1.separation_check(r2, 60, false, RBA::Edges::Euclidian, nil, nil, nil, true, RBA::Region::NoOppositeFilter, RBA::Region::NoRectFilter, false, RBA::Region::IgnoreProperties, RBA::Region::IncludeZeroDistanceWhenTouching).to_s), csort("(100,200;100,140)/(100,200;100,260);(40,200;100,200)/(160,200;100,200)"))
+
+    assert_equal(csort(r1.inside_check(r3b, 60, false, RBA::Edges::Euclidian, nil, nil, nil).to_s), csort("(100,0;0,0)/(90,0;10,0)"))
+    assert_equal(csort(r1.inside_check(r3b, 60, false, RBA::Edges::Euclidian, nil, nil, nil, true, RBA::Region::NoOppositeFilter, RBA::Region::NoRectFilter, false, RBA::Region::IgnoreProperties, RBA::Region::NeverIncludeZeroDistance).to_s), csort(""))
+    assert_equal(csort(r1.inside_check(r3b, 60, false, RBA::Edges::Euclidian, nil, nil, nil, true, RBA::Region::NoOppositeFilter, RBA::Region::NoRectFilter, false, RBA::Region::IgnoreProperties, RBA::Region::IncludeZeroDistanceWhenTouching).to_s), csort("(100,0;0,0)/(90,0;10,0)"))
+
+    assert_equal(csort(r1.enclosing_check(r3a, 60, false, RBA::Edges::Euclidian, nil, nil, nil).to_s), csort("(100,0;0,0)/(110,0;-10,0)"))
+    assert_equal(csort(r1.enclosing_check(r3a, 60, false, RBA::Edges::Euclidian, nil, nil, nil, true, RBA::Region::NoOppositeFilter, RBA::Region::NoRectFilter, false, RBA::Region::IgnoreProperties, RBA::Region::NeverIncludeZeroDistance).to_s), csort(""))
+    assert_equal(csort(r1.enclosing_check(r3a, 60, false, RBA::Edges::Euclidian, nil, nil, nil, true, RBA::Region::NoOppositeFilter, RBA::Region::NoRectFilter, false, RBA::Region::IgnoreProperties, RBA::Region::IncludeZeroDistanceWhenTouching).to_s), csort("(100,0;0,0)/(110,0;-10,0)"))
+
+    assert_equal(csort(r1.overlap_check(r2, 60, false, RBA::Edges::Euclidian, nil, nil, nil).to_s), csort("(100,200;100,140)/(100,200;100,260);(40,200;100,200)/(160,200;100,200)"))
+    assert_equal(csort(r1.overlap_check(r2, 60, false, RBA::Edges::Euclidian, nil, nil, nil, true, RBA::Region::NoOppositeFilter, RBA::Region::NoRectFilter, false, RBA::Region::IgnoreProperties, RBA::Region::NeverIncludeZeroDistance).to_s), csort(""))
+    assert_equal(csort(r1.overlap_check(r2, 60, false, RBA::Edges::Euclidian, nil, nil, nil, true, RBA::Region::NoOppositeFilter, RBA::Region::NoRectFilter, false, RBA::Region::IgnoreProperties, RBA::Region::IncludeZeroDistanceWhenTouching).to_s), csort("(100,200;100,140)/(100,200;100,260);(40,200;100,200)/(160,200;100,200)"))
+
   end
 
   # Others

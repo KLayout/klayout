@@ -816,7 +816,9 @@ De Boor algorithm for NURBS
 static db::DPoint
 b_spline_point (double x, const std::vector<std::pair<db::DPoint, double> > &control_points, int p, const std::vector<double> &t, int &k)
 {
-  k = (int) (std::lower_bound (t.begin (), t.end (), x - 1e-6) - t.begin ());
+  double eps = 1e-12 * (fabs (t.back ()) + fabs (t.front ()));
+
+  k = (int) (std::lower_bound (t.begin (), t.end (), x - eps) - t.begin ());
   --k;
   if (k < p) {
     k = p;
@@ -1740,6 +1742,7 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
       std::string layer;
       unsigned int xy_flag = 0;
       int degree = 1;
+      int flags = 0;
 
       while ((g = read_group_code ()) != 0) {
         if (g == 8) {
@@ -1763,9 +1766,9 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
 
         } else if (g == 70) {
 
-          int flags = read_int32 ();
-          if (flags != 8 && flags != 12) {
-            warn ("Invalid SPLINE flag (code 70): " + tl::to_string (flags) + ". Only types 8 (non-rational) and 12 (rational) are supported currently.");
+          flags = read_int32 ();
+          if ((flags & 2) != 0) {
+            warn ("Invalid SPLINE flag (code 70): " + tl::to_string (flags) + ". Periodic splines not supported currently.");
           }
 
         } else if (g == 71) {
@@ -1813,6 +1816,13 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
               ++ii;
             }
           }
+
+        } else if ((flags & 1) && m_polyline_mode == 2) {
+
+          //  create a polygon for the spline
+          db::DSimplePolygon p;
+          p.assign_hull (new_points.begin (), new_points.end (), tt);
+          cell.shapes (ll.second).insert (safe_from_double (p));
 
         } else {
 

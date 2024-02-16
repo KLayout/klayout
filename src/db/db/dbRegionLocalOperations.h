@@ -113,6 +113,7 @@ enum OppositeFilter
  *  @brief A structure holding the options for the region checks (space, width, ...)
  */
 struct DB_PUBLIC RegionCheckOptions
+  : public EdgesCheckOptions
 {
   typedef db::coord_traits<db::Coord>::distance_type distance_type;
 
@@ -128,58 +129,15 @@ struct DB_PUBLIC RegionCheckOptions
                       OppositeFilter _opposite_filter = NoOppositeFilter,
                       RectFilter _rect_filter = NoRectFilter,
                       bool _negative = false,
-                      PropertyConstraint _prop_constraint = IgnoreProperties)
-    : whole_edges (_whole_edges),
-      metrics (_metrics),
-      ignore_angle (_ignore_angle),
-      min_projection (_min_projection),
-      max_projection (_max_projection),
+                      PropertyConstraint _prop_constraint = IgnoreProperties,
+                      zero_distance_mode _zd_mode = IncludeZeroDistanceWhenTouching)
+    : EdgesCheckOptions (_whole_edges, _metrics, _ignore_angle, _min_projection, _max_projection, _zd_mode),
       shielded (_shielded),
       opposite_filter (_opposite_filter),
       rect_filter (_rect_filter),
       negative (_negative),
       prop_constraint (_prop_constraint)
   { }
-
-  /**
-   *  @brief Specifies is whole edges are to be delivered
-   *
-   *  Without "whole_edges", the parts of
-   *  the edges are returned which violate the condition. If "whole_edges" is true, the
-   *  result will contain the complete edges participating in the result.
-   */
-  bool whole_edges;
-
-  /**
-   *  @brief Measurement metrics
-   *
-   *  The metrics parameter specifies which metrics to use. "Euclidian", "Square" and "Projected"
-   *  metrics are available.
-   */
-  metrics_type metrics;
-
-  /**
-   *  @brief Specifies the obtuse angle threshold
-   *
-   *  "ignore_angle" allows specification of a maximum angle that connected edges can have to not participate
-   *  in the check. By choosing 90 degree, edges with angles of 90 degree and larger are not checked,
-   *  but acute corners are for example.
-   */
-  double ignore_angle;
-
-  /**
-   *  @brief Specifies the projection limit's minimum value
-   *
-   *  With min_projection and max_projection it is possible to specify how edges must be related
-   *  to each other. If the length of the projection of either edge on the other is >= min_projection
-   *  or < max_projection, the edges are considered for the check.
-   */
-  distance_type min_projection;
-
-  /**
-   *  @brief Specifies the projection limit's maximum value
-   */
-  distance_type max_projection;
 
   /**
    *  @brief Specifies shielding

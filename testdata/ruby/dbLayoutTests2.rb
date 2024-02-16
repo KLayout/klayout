@@ -23,6 +23,10 @@ end
 
 load("test_prologue.rb")
 
+def mi2s(obj)
+  obj.each_meta_info.collect { |mi| mi.name + ":" + mi.value.to_s }.sort.join(";")
+end
+
 class DBLayoutTests2_TestClass < TestBase
 
   # LayerInfo
@@ -1250,6 +1254,175 @@ class DBLayoutTests2_TestClass < TestBase
     assert_equal(g.cells("*").collect(&:name).join(","), "A,B1,B2")
     assert_equal(g.cells("A").collect(&:name).join(","), "A")
     assert_equal(g.cells("X").collect(&:name).join(","), "")
+
+  end
+
+  # Cell#read and meta info (issue #1609)
+  def test_16
+
+    tmp = File::join($ut_testtmp, "test16.gds")
+
+    ly1 = RBA::Layout::new
+    a = ly1.create_cell("A")
+    b = ly1.create_cell("B")
+    a.insert(RBA::DCellInstArray::new(b, RBA::Trans::new))
+
+    a.add_meta_info(RBA::LayoutMetaInfo::new("am1", 42.0, "", true))
+    a.add_meta_info(RBA::LayoutMetaInfo::new("am2", "u", "", true))
+    assert_equal(mi2s(a), "am1:42.0;am2:u")
+
+    b.add_meta_info(RBA::LayoutMetaInfo::new("bm1", 17, "", true))
+    assert_equal(mi2s(b), "bm1:17")
+
+    ly1.add_meta_info(RBA::LayoutMetaInfo::new("lm1", -2.0, "", true))
+    ly1.add_meta_info(RBA::LayoutMetaInfo::new("lm2", "v", "", true))
+    assert_equal(mi2s(ly1), "lm1:-2.0;lm2:v")
+
+    ly1.write(tmp)
+
+    ly2 = RBA::Layout::new
+    top = ly2.create_cell("TOP")
+    a = ly2.create_cell("A")
+    c = ly2.create_cell("C")
+    top.insert(RBA::DCellInstArray::new(a, RBA::Trans::new))
+    a.insert(RBA::DCellInstArray::new(c, RBA::Trans::new))
+
+    top.add_meta_info(RBA::LayoutMetaInfo::new("topm1", "abc"))
+    assert_equal(mi2s(top), "topm1:abc")
+    a.add_meta_info(RBA::LayoutMetaInfo::new("am1", "a number"))
+    a.add_meta_info(RBA::LayoutMetaInfo::new("am3", 0))
+    assert_equal(mi2s(a), "am1:a number;am3:0")
+    c.add_meta_info(RBA::LayoutMetaInfo::new("cm1", 3))
+    assert_equal(mi2s(c), "cm1:3")
+
+    ly2.add_meta_info(RBA::LayoutMetaInfo::new("lm1", 5))
+    assert_equal(mi2s(ly2), "lm1:5")
+
+    a.read(tmp)
+    # not modified
+    assert_equal(mi2s(ly2), "lm1:5")
+    # merged
+    assert_equal(mi2s(a), "am1:42.0;am2:u;am3:0")
+    # not modified
+    assert_equal(mi2s(c), "cm1:3")
+
+    b2 = ly2.cell("B")
+    # imported
+    assert_equal(mi2s(b2), "bm1:17")
+
+    puts "done."
+
+  end
+
+  # Layout, meta info diverse
+  def test_17
+
+    manager = RBA::Manager::new
+
+    ly = RBA::Layout::new(manager)
+    a = ly.create_cell("A")
+
+    manager.transaction("trans")
+    ly.add_meta_info(RBA::LayoutMetaInfo::new("lm1", 17))
+    a.add_meta_info(RBA::LayoutMetaInfo::new("am1", "u"))
+    manager.commit
+
+    assert_equal(mi2s(ly), "lm1:17")
+    assert_equal(mi2s(a), "am1:u")
+
+    manager.undo
+    assert_equal(mi2s(ly), "")
+    assert_equal(mi2s(a), "")
+
+    manager.redo
+    assert_equal(mi2s(ly), "lm1:17")
+    assert_equal(mi2s(a), "am1:u")
+
+    manager.transaction("trans")
+    ly.add_meta_info(RBA::LayoutMetaInfo::new("lm1", 117))
+    a.add_meta_info(RBA::LayoutMetaInfo::new("am1", "v"))
+    manager.commit
+
+    assert_equal(mi2s(ly), "lm1:117")
+    assert_equal(mi2s(a), "am1:v")
+
+    manager.undo
+    assert_equal(mi2s(ly), "lm1:17")
+    assert_equal(mi2s(a), "am1:u")
+
+    manager.redo
+    assert_equal(mi2s(ly), "lm1:117")
+    assert_equal(mi2s(a), "am1:v")
+
+    manager.undo
+    assert_equal(mi2s(ly), "lm1:17")
+    assert_equal(mi2s(a), "am1:u")
+
+    manager.transaction("trans")
+    ly.remove_meta_info("lm1")
+    a.remove_meta_info("am1")
+    a.remove_meta_info("doesnotexist")
+    manager.commit
+
+    assert_equal(mi2s(ly), "")
+    assert_equal(mi2s(a), "")
+
+    manager.undo
+    assert_equal(mi2s(ly), "lm1:17")
+    assert_equal(mi2s(a), "am1:u")
+
+    manager.transaction("trans")
+    ly.clear_all_meta_info
+    manager.commit
+
+    assert_equal(mi2s(ly), "")
+    assert_equal(mi2s(a), "")
+
+    manager.undo
+    assert_equal(mi2s(ly), "lm1:17")
+    assert_equal(mi2s(a), "am1:u")
+
+    manager.redo
+    assert_equal(mi2s(ly), "")
+    assert_equal(mi2s(a), "")
+
+    ly2 = RBA::Layout::new
+    ly.add_meta_info(RBA::LayoutMetaInfo::new("lm1", 17))
+    ly2.add_meta_info(RBA::LayoutMetaInfo::new("lm2", 42))
+    assert_equal(mi2s(ly), "lm1:17")
+    ly.merge_meta_info(ly2)
+    assert_equal(mi2s(ly), "lm1:17;lm2:42")
+    ly.copy_meta_info(ly2)
+    assert_equal(mi2s(ly), "lm2:42")
+
+    a = ly.create_cell("A")
+    a.add_meta_info(RBA::LayoutMetaInfo::new("am1", "u"))
+    b = ly2.create_cell("B")
+    b.add_meta_info(RBA::LayoutMetaInfo::new("bm1", "v"))
+
+    assert_equal(mi2s(a), "am1:u")
+    a.merge_meta_info(b)
+    assert_equal(mi2s(a), "am1:u;bm1:v")
+    a.copy_meta_info(b)
+    assert_equal(mi2s(a), "bm1:v")
+
+    ly = RBA::Layout::new
+    ly2 = RBA::Layout::new
+
+    a = ly.create_cell("A")
+    a.add_meta_info(RBA::LayoutMetaInfo::new("am1", "u"))
+    ly2.create_cell("X") 
+    b = ly2.create_cell("B")
+    b.add_meta_info(RBA::LayoutMetaInfo::new("bm1", "v"))
+
+    cm = RBA::CellMapping::new
+    cm.map(b.cell_index, a.cell_index)
+
+    assert_equal(mi2s(a), "am1:u")
+    ly.merge_meta_info(ly2, cm)
+    assert_equal(mi2s(a), "am1:u;bm1:v")
+    ly.copy_meta_info(ly2, cm)
+    assert_equal(mi2s(a), "bm1:v")
 
   end
 

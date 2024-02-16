@@ -1491,7 +1491,11 @@ MainWindow::closeEvent (QCloseEvent *event)
     END_PROTECTED
   }
 
-  event->ignore ();
+  if (! m_exited) {
+    event->ignore ();
+  } else {
+    event->accept ();
+  }
 }
 
 void

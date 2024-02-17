@@ -52,6 +52,12 @@
 namespace lay
 {
 
+bool merge_before_bool ()
+{
+  //  $KLAYOUT_XOR_MERGE_BEFORE_BOOLEAN
+  return tl::app_flag ("xor-merge-before-boolean");
+}
+
 std::string cfg_xor_input_mode ("xor-input-mode");
 std::string cfg_xor_output_mode ("xor-output-mode");
 std::string cfg_xor_nworkers ("xor-num-workers");
@@ -864,106 +870,115 @@ XORWorker::do_perform_tiled (const XORTask *xor_task)
           if (! mp_job->has_tiles ()) {
 
             tl::SelfTimer timer (tl::verbosity () >= 21, "Boolean part");
-#if 0
-            //  Straightforward implementation
-            sp.boolean (mp_job->cva ()->layout (), mp_job->cva ()->layout ().cell (mp_job->cva ().cell_index ()), la,
-                        mp_job->cvb ()->layout (), mp_job->cvb ()->layout ().cell (mp_job->cvb ().cell_index ()), lb, 
-                        xor_results_cell.shapes (0), op, true, false, true);
-#else
-            //  This implementation is faster when a lot of overlapping shapes are involved
-            db::Layout merge_helper;
-            db::Cell &merge_helper_cell = merge_helper.cell (merge_helper.add_cell ());
-            merge_helper.insert_layer (0);
-            merge_helper.insert_layer (1);
 
-            if (!la.empty ()) {
-              sp.merge (mp_job->cva ()->layout (), mp_job->cva ()->layout ().cell (mp_job->cva ().cell_index ()), la,
-                        merge_helper_cell.shapes (0), true, 0, false, true);
+            if (! merge_before_bool ()) {
+#
+              //  Straightforward implementation
+              sp.boolean (mp_job->cva ()->layout (), mp_job->cva ()->layout ().cell (mp_job->cva ().cell_index ()), la,
+                          mp_job->cvb ()->layout (), mp_job->cvb ()->layout ().cell (mp_job->cvb ().cell_index ()), lb,
+                          xor_results_cell.shapes (0), mp_job->op (), true, false, true);
+
+            } else {
+
+              //  This implementation is faster when a lot of overlapping shapes are involved
+              db::Layout merge_helper;
+              db::Cell &merge_helper_cell = merge_helper.cell (merge_helper.add_cell ());
+              merge_helper.insert_layer (0);
+              merge_helper.insert_layer (1);
+
+              if (!la.empty ()) {
+                sp.merge (mp_job->cva ()->layout (), mp_job->cva ()->layout ().cell (mp_job->cva ().cell_index ()), la,
+                          merge_helper_cell.shapes (0), true, 0, false, true);
+              }
+              if (!lb.empty ()) {
+                sp.merge (mp_job->cvb ()->layout (), mp_job->cvb ()->layout ().cell (mp_job->cvb ().cell_index ()), lb,
+                          merge_helper_cell.shapes (1), true, 0, false, true);
+              }
+              sp.boolean (merge_helper, merge_helper_cell, 0,
+                          merge_helper, merge_helper_cell, 1,
+                          xor_results_cell.shapes (0), mp_job->op (), true, false, true);
+
             }
-            if (!lb.empty ()) {
-              sp.merge (mp_job->cvb ()->layout (), mp_job->cvb ()->layout ().cell (mp_job->cvb ().cell_index ()), lb,
-                        merge_helper_cell.shapes (1), true, 0, false, true);
-            }
-            sp.boolean (merge_helper, merge_helper_cell, 0, 
-                        merge_helper, merge_helper_cell, 1, 
-                        xor_results_cell.shapes (0), mp_job->op (), true, false, true);
-#endif
 
           } else {
 
             tl::SelfTimer timer (tl::verbosity () >= 31, "Boolean part");
             size_t n;
 
-#if 0
-            //  Straightforward implementation
-            sp.clear ();
+            if (! merge_before_bool ()) {
 
-            db::CplxTrans dbu_scale_a (mp_job->cva ()->layout ().dbu () / xor_results.dbu ());
-            db::CplxTrans dbu_scale_b (mp_job->cvb ()->layout ().dbu () / xor_results.dbu ());
-
-            n = 0;
-            for (db::RecursiveShapeIterator s (mp_job->cva ()->layout (), mp_job->cva ().cell (), la, region_a); ! s.at_end (); ++s, ++n) {
-              sp.insert (s.shape (), dbu_scale_a * s.trans (), n * 2);
-            }
-
-            n = 0;
-            for (db::RecursiveShapeIterator s (mp_job->cvb ()->layout (), mp_job->cvb ().cell (), lb, region_b); ! s.at_end (); ++s, ++n) {
-              sp.insert (s.shape (), dbu_scale_b * s.trans (), n * 2 + 1);
-            }
-
-            db::BooleanOp bool_op (mp_job->op ());
-            db::ShapeGenerator sg (xor_results_cell.shapes (0), true /*clear shapes*/);
-            db::PolygonGenerator out (sg, false /*don't resolve holes*/, false /*no min. coherence*/);
-            sp.process (out, mp_job->op ());
-#else
-            //  This implementation is faster when a lot of overlapping shapes are involved
-            db::Layout merge_helper;
-            merge_helper.dbu (mp_job->dbu ());
-            db::Cell &merge_helper_cell = merge_helper.cell (merge_helper.add_cell ());
-            merge_helper.insert_layer (0);
-            merge_helper.insert_layer (1);
-
-            //  This implementation is faster when a lot of overlapping shapes are involved
-            if (!la.empty ()) {
-
+              //  Straightforward implementation
               sp.clear ();
 
-              db::CplxTrans dbu_scale (mp_job->cva ()->layout ().dbu () / xor_results.dbu ());
+              db::CplxTrans dbu_scale_a (mp_job->cva ()->layout ().dbu () / xor_results.dbu ());
+              db::CplxTrans dbu_scale_b (mp_job->cvb ()->layout ().dbu () / xor_results.dbu ());
 
               n = 0;
               for (db::RecursiveShapeIterator s (mp_job->cva ()->layout (), *mp_job->cva ().cell (), la, xor_task->region_a ()); ! s.at_end (); ++s, ++n) {
-                sp.insert (s.shape (), dbu_scale * s.trans (), n);
+                sp.insert (s.shape (), dbu_scale_a * s.trans (), n * 2);
               }
-
-              db::MergeOp op (0);
-              db::ShapeGenerator sg (merge_helper_cell.shapes (0), true /*clear shapes*/);
-              db::PolygonGenerator out (sg, false /*don't resolve holes*/, false /*no min. coherence*/);
-              sp.process (out, op);
-
-            }
-
-            if (!lb.empty ()) {
-
-              sp.clear ();
-
-              db::CplxTrans dbu_scale (mp_job->cvb ()->layout ().dbu () / xor_results.dbu ());
 
               n = 0;
               for (db::RecursiveShapeIterator s (mp_job->cvb ()->layout (), *mp_job->cvb ().cell (), lb, xor_task->region_b ()); ! s.at_end (); ++s, ++n) {
-                sp.insert (s.shape (), dbu_scale * s.trans (), n);
+                sp.insert (s.shape (), dbu_scale_b * s.trans (), n * 2 + 1);
               }
 
-              db::MergeOp op (0);
-              db::ShapeGenerator sg (merge_helper_cell.shapes (1), true /*clear shapes*/);
+              db::BooleanOp bool_op (mp_job->op ());
+              db::ShapeGenerator sg (xor_results_cell.shapes (0), true /*clear shapes*/);
               db::PolygonGenerator out (sg, false /*don't resolve holes*/, false /*no min. coherence*/);
-              sp.process (out, op);
+              sp.process (out, bool_op);
+
+            } else {
+
+              //  This implementation is faster when a lot of overlapping shapes are involved
+              db::Layout merge_helper;
+              merge_helper.dbu (mp_job->dbu ());
+              db::Cell &merge_helper_cell = merge_helper.cell (merge_helper.add_cell ());
+              merge_helper.insert_layer (0);
+              merge_helper.insert_layer (1);
+
+              //  This implementation is faster when a lot of overlapping shapes are involved
+              if (!la.empty ()) {
+
+                sp.clear ();
+
+                db::CplxTrans dbu_scale (mp_job->cva ()->layout ().dbu () / xor_results.dbu ());
+
+                n = 0;
+                for (db::RecursiveShapeIterator s (mp_job->cva ()->layout (), *mp_job->cva ().cell (), la, xor_task->region_a ()); ! s.at_end (); ++s, ++n) {
+                  sp.insert (s.shape (), dbu_scale * s.trans (), n);
+                }
+
+                db::MergeOp op (0);
+                db::ShapeGenerator sg (merge_helper_cell.shapes (0), true /*clear shapes*/);
+                db::PolygonGenerator out (sg, false /*don't resolve holes*/, false /*no min. coherence*/);
+                sp.process (out, op);
+
+              }
+
+              if (!lb.empty ()) {
+
+                sp.clear ();
+
+                db::CplxTrans dbu_scale (mp_job->cvb ()->layout ().dbu () / xor_results.dbu ());
+
+                n = 0;
+                for (db::RecursiveShapeIterator s (mp_job->cvb ()->layout (), *mp_job->cvb ().cell (), lb, xor_task->region_b ()); ! s.at_end (); ++s, ++n) {
+                  sp.insert (s.shape (), dbu_scale * s.trans (), n);
+                }
+
+                db::MergeOp op (0);
+                db::ShapeGenerator sg (merge_helper_cell.shapes (1), true /*clear shapes*/);
+                db::PolygonGenerator out (sg, false /*don't resolve holes*/, false /*no min. coherence*/);
+                sp.process (out, op);
+
+              }
+
+              sp.boolean (merge_helper, merge_helper_cell, 0,
+                          merge_helper, merge_helper_cell, 1,
+                          xor_results_cell.shapes (0), mp_job->op (), true, false, true);
 
             }
-
-            sp.boolean (merge_helper, merge_helper_cell, 0, 
-                        merge_helper, merge_helper_cell, 1, 
-                        xor_results_cell.shapes (0), mp_job->op (), true, false, true);
-#endif
 
           }
 

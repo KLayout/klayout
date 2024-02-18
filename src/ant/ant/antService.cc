@@ -1056,8 +1056,18 @@ Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
     m_drawing (false), m_current (),
     m_move_mode (MoveNone),
     m_seg_index (0),
-    m_current_template (0)
-{ 
+    m_current_template (0),
+    m_hover (false),
+    m_hover_wait (false),
+    m_hover_buttons (0),
+    m_mouse_in_window (false)
+{
+#if defined(HAVE_QT)
+  m_timer.setInterval (100 /*hover time*/);
+  m_timer.setSingleShot (true);
+  connect (&m_timer, SIGNAL (timeout ()), this, SLOT (timeout ()));
+#endif
+
   mp_view->annotations_changed_event.add (this, &Service::annotations_changed);
 }
 
@@ -1809,9 +1819,36 @@ Service::mouse_double_click_event (const db::DPoint & /*p*/, unsigned int button
   return false;
 }
 
+lay::TwoPointSnapToObjectResult
+Service::auto_measure (const db::DPoint &p, lay::angle_constraint_type ac, const ant::Template &tpl)
+{
+  //  for auto-metric we need some cutline constraint - any or global won't do.
+  if (ac == lay::AC_Global) {
+    ac = tpl.angle_constraint ();
+  }
+  if (ac == lay::AC_Global) {
+    ac = m_snap_mode;
+  }
+  if (ac == lay::AC_Global) {
+    ac = lay::AC_Diagonal;
+  }
+
+  db::DVector g;
+  if (m_grid_snap) {
+    g = db::DVector (m_grid, m_grid);
+  }
+
+  double snap_range = ui ()->mouse_event_trans ().inverted ().ctrans (m_snap_range);
+  snap_range *= 0.5;
+
+  return lay::obj_snap2 (mp_view, p, g, ac, snap_range, snap_range * 1000.0);
+}
+
 bool
 Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio) 
 {
+  hover_reset ();
+
   if (prio && (buttons & lay::LeftButton) != 0) {
 
     const ant::Template &tpl = current_template ();
@@ -1852,27 +1889,7 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
 
       } else if (tpl.mode () == ant::Template::RulerAutoMetric) {
 
-        //  for auto-metric we need some cutline constraint - any or global won't do.
-        lay::angle_constraint_type ac = ac_from_buttons (buttons);
-        if (ac == lay::AC_Global) {
-          ac = tpl.angle_constraint ();
-        }
-        if (ac == lay::AC_Global) {
-          ac = m_snap_mode;
-        }
-        if (ac == lay::AC_Global) {
-          ac = lay::AC_Diagonal;
-        }
-
-        db::DVector g;
-        if (m_grid_snap) {
-          g = db::DVector (m_grid, m_grid);
-        }
-
-        double snap_range = ui ()->mouse_event_trans ().inverted ().ctrans (m_snap_range);
-        snap_range *= 0.5;
-
-        lay::TwoPointSnapToObjectResult ee = lay::obj_snap2 (mp_view, p, g, ac, snap_range, snap_range * 1000.0);
+        lay::TwoPointSnapToObjectResult ee = auto_measure (p, ac_from_buttons (buttons), tpl);
         if (ee.any) {
 
           //  begin the transaction
@@ -1882,6 +1899,29 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
           }
 
           m_current = ant::Object (ee.first, ee.second, 0, tpl);
+          show_message ();
+
+          insert_ruler (m_current, true);
+
+          //  end the transaction
+          if (manager ()) {
+            manager ()->commit ();
+          }
+
+        }
+
+      } else if (tpl.mode () == ant::Template::RulerAutoMetricEdge) {
+
+        lay::PointSnapToObjectResult snap_details = snap1_details (p, true);
+        if (snap_details.object_snap == lay::PointSnapToObjectResult::ObjectEdge) {
+
+          //  begin the transaction
+          if (manager ()) {
+            tl_assert (! manager ()->transacting ());
+            manager ()->transaction (tl::to_string (tr ("Create ruler")));
+          }
+
+          m_current = ant::Object (snap_details.object_ref.p1 (), snap_details.object_ref.p2 (), 0, tpl);
           show_message ();
 
           insert_ruler (m_current, true);
@@ -1968,21 +2008,33 @@ Service::create_measure_ruler (const db::DPoint &pt, lay::angle_constraint_type 
 bool
 Service::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio) 
 {
-  if (prio) {
+  if (! prio) {
+    return false;
+  }
 
-    lay::PointSnapToObjectResult snap_details;
-    if (m_drawing) {
-      snap_details = snap2_details (m_p1, p, mp_active_ruler->ruler (), ac_from_buttons (buttons));
-    } else {
-      const ant::Template &tpl = current_template ();
-      snap_details = snap1_details (p, m_obj_snap && tpl.snap ());
-    }
+  if (! m_drawing && m_mouse_in_window && view ()->transient_selection_mode ()) {
 
-    mouse_cursor_from_snap_details (snap_details);
+    //  Restart hover timer
+    m_hover_wait = true;
+#if defined(HAVE_QT)
+    m_timer.start ();
+#endif
+    m_hover_point = p;
+    m_hover_buttons = buttons;
 
   }
 
-  if (m_drawing && prio) {
+  lay::PointSnapToObjectResult snap_details;
+  if (m_drawing) {
+    snap_details = snap2_details (m_p1, p, mp_active_ruler->ruler (), ac_from_buttons (buttons));
+  } else {
+    const ant::Template &tpl = current_template ();
+    snap_details = snap1_details (p, m_obj_snap && tpl.snap () && (tpl.mode () != ant::Template::RulerAutoMetricEdge || ! view ()->transient_selection_mode ()));
+  }
+
+  mouse_cursor_from_snap_details (snap_details);
+
+  if (m_drawing) {
 
     set_cursor (lay::Cursor::cross);
 
@@ -2283,6 +2335,84 @@ Service::click_proximity (const db::DPoint &pos, lay::Editable::SelectionMode mo
     return lay::Editable::click_proximity (pos, mode); 
   } 
 }
+
+bool
+Service::enter_event (bool /*prio*/)
+{
+  m_mouse_in_window = true;
+  return false;
+}
+
+bool
+Service::leave_event (bool)
+{
+  m_mouse_in_window = false;
+  hover_reset ();
+  return false;
+}
+
+void
+Service::hover_reset ()
+{
+  if (m_hover_wait) {
+#if defined(HAVE_QT)
+    m_timer.stop ();
+#endif
+    m_hover_wait = false;
+  }
+  if (m_hover) {
+    //  as we use the transient selection for the hover ruler, we have to remove it here
+    clear_transient_selection ();
+    m_hover = false;
+  }
+}
+
+#if defined(HAVE_QT)
+void
+Service::timeout ()
+{
+  m_hover_wait = false;
+  m_hover = true;
+
+  //  as we use the transient selection for the hover ruler, we have to remove it here
+  clear_transient_selection ();
+
+  //  transiently create an auto-metric ruler if requested
+
+  ant::Object *ruler = 0;
+
+  const ant::Template &tpl = current_template ();
+  if (tpl.mode () == ant::Template::RulerAutoMetric) {
+
+    lay::TwoPointSnapToObjectResult ee = auto_measure (m_hover_point, ac_from_buttons (m_hover_buttons), tpl);
+    if (ee.any) {
+      m_current = ant::Object (ee.first, ee.second, 0, tpl);
+      ruler = &m_current;
+    }
+
+  } else if (tpl.mode () == ant::Template::RulerAutoMetricEdge) {
+
+    lay::PointSnapToObjectResult snap_details = snap1_details (m_hover_point, true);
+    if (snap_details.object_snap == lay::PointSnapToObjectResult::ObjectEdge) {
+      m_current = ant::Object (snap_details.object_ref.p1 (), snap_details.object_ref.p2 (), 0, tpl);
+      ruler = &m_current;
+    }
+
+  }
+
+  if (ruler) {
+
+    //  HINT: there is no special style for "transient selection on rulers"
+    mp_transient_ruler = new ant::View (this, ruler, true /*not selected*/);
+
+    if (! editables ()->has_selection ()) {
+      display_status (true);
+    }
+
+  }
+
+}
+#endif
 
 bool
 Service::transient_select (const db::DPoint &pos)

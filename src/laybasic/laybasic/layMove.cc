@@ -305,10 +305,7 @@ MoveService::handle_click (const db::DPoint &p, unsigned int buttons, bool drag_
 
     if (mp_editables->begin_move (p, ac_from_buttons (buttons))) {
 
-      lay::SelectionService *selector = mp_view->selection_service ();
-      if (selector) {
-        selector->hover_reset ();
-      }
+      ui ()->hover_reset ();
         
       mp_view->clear_transient_selection ();
 

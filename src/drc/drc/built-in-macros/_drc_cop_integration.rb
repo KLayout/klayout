@@ -555,7 +555,7 @@ module DRC
     # whose area is larger than 0.5 square micrometers:
     # 
     # @code
-    # out = in.drc(if_all(area > 0.5, rectangle))
+    # out = in.drc(if_all(area > 0.5, rectangles))
     # @/code
     #
     # The condition expressions may be of any type (edges, edge pairs and polygons).

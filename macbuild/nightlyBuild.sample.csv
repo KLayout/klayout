@@ -1,0 +1,25 @@
+#-------------------------------------------------------------------------------
+# File: 'nightlyBuild.csv'
+#
+# Descriptions:
+#   This file (located where "build.sh" exists) is to be passed to
+#   'nightlyBuild.py' via the --qttarget option.
+#
+# qtVer,target
+#   where
+#     qtVer  = 5 or 6
+#     target = [0='std', 1='ports', 2='brew', 3='brewHW', 4='ana3']
+#   note that
+#     (qtVer,target)=(6,4) will be omitted
+#-------------------------------------------------------------------------------
+qtVer,target
+5,0
+5,1
+5,2
+5,3
+5,4
+#6,0
+#6,1
+#6,2
+#6,3
+#6,4

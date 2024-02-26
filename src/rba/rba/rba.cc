@@ -2358,7 +2358,7 @@ RubyInterpreter::load_file (const std::string &filename_utf8)
 {
   std::string fl (rb_cstring_from_utf8 (filename_utf8));
 
-  rb_set_progname (rb_str_new (fl.c_str (), long (fl.size ())));
+  ruby_script (fl.c_str ());
 
   rb_set_errinfo (Qnil);
   int error = 0;

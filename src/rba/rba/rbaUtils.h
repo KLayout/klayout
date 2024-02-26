@@ -148,14 +148,6 @@ inline std::string rb_cstring_from_utf8 (const std::string &utf8)
 }
 
 /**
- *  @brief A setter for $0
- */
-inline void rb_set_progname (VALUE pn)
-{
-  rb_gv_set ("PROGRAM_NAME", pn);
-}
-
-/**
  *  @brief Sets up a block for protected evaluation
  *
  *  It was learned (by bitter experience), that in particular rb_protect cannot simply be

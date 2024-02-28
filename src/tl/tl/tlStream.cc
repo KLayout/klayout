@@ -1334,11 +1334,11 @@ OutputPipe::write (const char *b, size_t n)
 // ---------------------------------------------------------------
 //  InputPipe delegate implementation
 
-InputPipe::InputPipe (const std::string &path)
+InputPipe::InputPipe (const std::string &source)
   : m_file (NULL)
 {
-  m_source = path;
-  m_file = popen (tl::string_to_system (path).c_str (), "r");
+  m_source = source;
+  m_file = popen (tl::string_to_system (source).c_str (), "r");
   if (m_file == NULL) {
     throw FilePOpenErrorException (m_source, errno);
   }

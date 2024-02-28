@@ -313,7 +313,7 @@ public:
    *  @param cmd The command to execute
    *  @param read True, if the file should be read, false on write.
    */
-  InputPipe (const std::string &path);
+  InputPipe (const std::string &source);
 
   /**
    *  @brief Close the pipe
@@ -348,8 +348,7 @@ public:
    */
   virtual std::string source () const
   {
-    //  No source (in the sense of a file name) is available ..
-    return std::string ();
+    return m_source;
   }
 
   virtual std::string absolute_path () const

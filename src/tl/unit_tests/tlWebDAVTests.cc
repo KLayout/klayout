@@ -70,6 +70,7 @@ TEST(1)
     "[dir] dir1 http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/dir1/\n"
     "[dir] dir2 http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/dir2/\n"
     "text http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/text\n"
+    "text.gz http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/text.gz\n"
     "text2 http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/text2"
   );
 }

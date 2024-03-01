@@ -193,10 +193,10 @@ private:
   EdgePairsDelegate *run_check (db::edge_relation_type rel, const Edges *other, db::Coord d, const db::EdgesCheckOptions &options) const;
   virtual EdgesDelegate *pull_generic (const Edges &edges) const;
   virtual RegionDelegate *pull_generic (const Region &region) const;
-  virtual EdgesDelegate *selected_interacting_generic (const Edges &edges, EdgeInteractionMode mode, bool inverse) const;
-  virtual std::pair<EdgesDelegate *, EdgesDelegate *> selected_interacting_pair_generic (const Edges &edges, EdgeInteractionMode mode) const;
-  virtual EdgesDelegate *selected_interacting_generic (const Region &region, EdgeInteractionMode mode, bool inverse) const;
-  virtual std::pair<EdgesDelegate *, EdgesDelegate *> selected_interacting_pair_generic (const Region &region, EdgeInteractionMode mode) const;
+  virtual EdgesDelegate *selected_interacting_generic (const Edges &edges, EdgeInteractionMode mode, bool inverse, size_t min_count, size_t max_count) const;
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> selected_interacting_pair_generic (const Edges &edges, EdgeInteractionMode mode, size_t min_count, size_t max_count) const;
+  virtual EdgesDelegate *selected_interacting_generic (const Region &region, EdgeInteractionMode mode, bool inverse, size_t min_count, size_t max_count) const;
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> selected_interacting_pair_generic (const Region &region, EdgeInteractionMode mode, size_t min_count, size_t max_count) const;
   DeepEdges *apply_filter (const EdgeFilterBase &filter) const;
 
   template <class Result, class OutputContainer> OutputContainer *processed_impl (const edge_processor<Result> &filter) const;

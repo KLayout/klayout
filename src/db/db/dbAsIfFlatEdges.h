@@ -183,12 +183,12 @@ public:
 
   virtual EdgesDelegate *pull_interacting (const Edges &) const;
   virtual RegionDelegate *pull_interacting (const Region &) const;
-  virtual EdgesDelegate *selected_interacting (const Edges &) const;
-  virtual EdgesDelegate *selected_not_interacting (const Edges &) const;
-  virtual EdgesDelegate *selected_interacting (const Region &) const;
-  virtual EdgesDelegate *selected_not_interacting (const Region &) const;
-  virtual std::pair<EdgesDelegate *, EdgesDelegate *> selected_interacting_pair (const Region &other) const;
-  virtual std::pair<EdgesDelegate *, EdgesDelegate *> selected_interacting_pair (const Edges &other) const;
+  virtual EdgesDelegate *selected_interacting (const Edges &, size_t min_count, size_t max_count) const;
+  virtual EdgesDelegate *selected_not_interacting (const Edges &, size_t min_count, size_t max_count) const;
+  virtual EdgesDelegate *selected_interacting (const Region &, size_t min_count, size_t max_count) const;
+  virtual EdgesDelegate *selected_not_interacting (const Region &, size_t min_count, size_t max_count) const;
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> selected_interacting_pair (const Region &other, size_t min_count, size_t max_count) const;
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> selected_interacting_pair (const Edges &other, size_t min_count, size_t max_count) const;
 
   virtual EdgesDelegate *selected_outside (const Edges &other) const;
   virtual EdgesDelegate *selected_not_outside (const Edges &other) const;
@@ -217,10 +217,10 @@ protected:
   EdgePairsDelegate *run_check (db::edge_relation_type rel, const Edges *other, db::Coord d, const EdgesCheckOptions &options) const;
   virtual EdgesDelegate *pull_generic (const Edges &edges) const;
   virtual RegionDelegate *pull_generic (const Region &region) const;
-  virtual EdgesDelegate *selected_interacting_generic (const Edges &edges, EdgeInteractionMode mode, bool inverse) const;
-  virtual std::pair<EdgesDelegate *, EdgesDelegate *> selected_interacting_pair_generic (const Edges &edges, EdgeInteractionMode mode) const;
-  virtual EdgesDelegate *selected_interacting_generic (const Region &region, EdgeInteractionMode mode, bool inverse) const;
-  virtual std::pair<EdgesDelegate *, EdgesDelegate *> selected_interacting_pair_generic (const Region &region, EdgeInteractionMode mode) const;
+  virtual EdgesDelegate *selected_interacting_generic (const Edges &edges, EdgeInteractionMode mode, bool inverse, size_t min_count, size_t max_count) const;
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> selected_interacting_pair_generic (const Edges &edges, EdgeInteractionMode mode, size_t min_count, size_t max_count) const;
+  virtual EdgesDelegate *selected_interacting_generic (const Region &region, EdgeInteractionMode mode, bool inverse, size_t min_count, size_t max_count) const;
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> selected_interacting_pair_generic (const Region &region, EdgeInteractionMode mode, size_t min_count, size_t max_count) const;
   AsIfFlatEdges &operator= (const AsIfFlatEdges &other);
   AsIfFlatEdges (const AsIfFlatEdges &other);
 

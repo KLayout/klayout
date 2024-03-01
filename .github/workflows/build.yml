@@ -35,7 +35,7 @@ jobs:
           dotnet: true
           haskell: true
           large-packages: true
-      - uses: hmarr/debug-action@v2
+      - uses: hmarr/debug-action@v3
       - name: Cancel Workflow Action
         uses: styfle/cancel-workflow-action@0.12.1
       - uses: actions/checkout@v4

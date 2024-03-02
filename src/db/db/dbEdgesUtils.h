@@ -441,20 +441,38 @@ DB_PUBLIC bool edge_is_outside (const db::Edge &a, const db::Polygon &b);
  *  There is a special box converter which is able to sort that out as well.
  */
 template <class OutputContainer, class OutputType = typename OutputContainer::value_type>
-class edge_to_region_interaction_filter
+class edge_to_polygon_interaction_filter
   : public db::box_scanner_receiver2<db::Edge, size_t, db::Polygon, size_t>
 {
 public:
-  edge_to_region_interaction_filter (OutputContainer *output, EdgeInteractionMode mode)
-    : mp_output (output), m_mode (mode)
+  edge_to_polygon_interaction_filter (OutputContainer *output, EdgeInteractionMode mode, size_t min_count, size_t max_count)
+    : mp_output (output), m_mode (mode), m_min_count (min_count), m_max_count (max_count)
   {
-    //  .. nothing yet ..
+    //  NOTE: "counting" does not really make much sense in Outside mode ...
+    m_counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
   }
 
   void finish (const OutputType *o)
   {
-    if (m_mode == EdgesOutside && m_seen.find (o) == m_seen.end ()) {
-      mp_output->insert (*o);
+    if (m_counting) {
+
+      size_t count = 0;
+      auto i = m_counts.find (o);
+      if (i != m_counts.end ()) {
+        count = i->second;
+      }
+
+      bool match = (count >= m_min_count && count <= m_max_count);
+      if (match == (m_mode != EdgesOutside)) {
+        mp_output->insert (*o);
+      }
+
+    } else {
+
+      if (m_mode == EdgesOutside && m_seen.find (o) == m_seen.end ()) {
+        mp_output->insert (*o);
+      }
+
     }
   }
 
@@ -481,7 +499,18 @@ public:
     const OutputType *ep = 0;
     tl::select (ep, e, p);
 
-    if (m_seen.find (ep) == m_seen.end ()) {
+    if (m_counting) {
+
+      if ((m_mode == EdgesInteract && db::edge_interacts (*e, *p)) ||
+          (m_mode == EdgesInside && db::edge_is_inside (*e, *p)) ||
+          (m_mode == EdgesOutside && ! db::edge_is_outside (*e, *p))) {
+
+        //  we report the result on "finish" here.
+        m_counts[ep] += 1;
+
+      }
+
+    } else if (m_seen.find (ep) == m_seen.end ()) {
 
       if ((m_mode == EdgesInteract && db::edge_interacts (*e, *p)) ||
           (m_mode == EdgesInside && db::edge_is_inside (*e, *p))) {
@@ -501,8 +530,11 @@ public:
 
 private:
   OutputContainer *mp_output;
+  std::map<const OutputType *, size_t> m_counts;
   std::set<const OutputType *> m_seen;
   EdgeInteractionMode m_mode;
+  size_t m_min_count, m_max_count;
+  bool m_counting;
 };
 
 /**

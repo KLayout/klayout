@@ -137,6 +137,7 @@ public:
 private:
   EdgeInteractionMode m_mode;
   output_mode_t m_output_mode;
+  size_t m_min_count, m_max_count;
 };
 
 /**

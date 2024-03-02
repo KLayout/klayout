@@ -345,9 +345,8 @@ std::string Edge2EdgePullLocalOperation::description () const
 
 template <class TI>
 edge_to_polygon_interacting_local_operation<TI>::edge_to_polygon_interacting_local_operation (EdgeInteractionMode mode, output_mode_t output_mode, size_t min_count, size_t max_count)
-  : m_mode (mode), m_output_mode (output_mode)
+  : m_mode (mode), m_output_mode (output_mode), m_min_count (min_count), m_max_count (max_count)
 {
-  // @@@
   //  .. nothing yet ..
 }
 
@@ -403,7 +402,7 @@ void edge_to_polygon_interacting_local_operation<TI>::do_compute_local (db::Layo
   if (m_output_mode == Inverse || m_output_mode == Both) {
 
     std::unordered_set<db::Edge> interacting;
-    edge_to_region_interaction_filter<std::unordered_set<db::Edge> > filter (&interacting, m_mode);
+    edge_to_polygon_interaction_filter<std::unordered_set<db::Edge> > filter (&interacting, m_mode, m_min_count, m_max_count);
     scanner.process (filter, 1, db::box_convert<db::Edge> (), db::box_convert<db::Polygon> ());
 
     for (typename shape_interactions<db::Edge, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
@@ -424,7 +423,7 @@ void edge_to_polygon_interacting_local_operation<TI>::do_compute_local (db::Layo
 
   } else {
 
-    edge_to_region_interaction_filter<std::unordered_set<db::Edge> > filter (&result, m_mode);
+    edge_to_polygon_interaction_filter<std::unordered_set<db::Edge> > filter (&result, m_mode, m_min_count, m_max_count);
     scanner.process (filter, 1, db::box_convert<db::Edge> (), db::box_convert<db::Polygon> ());
 
   }
@@ -538,7 +537,7 @@ void Edge2PolygonPullLocalOperation::do_compute_local (db::Layout *layout, db::C
   }
 
   ResultInserter inserter (layout, result);
-  edge_to_region_interaction_filter<ResultInserter> filter (&inserter, EdgesInteract);
+  edge_to_polygon_interaction_filter<ResultInserter> filter (&inserter, EdgesInteract, size_t (1), std::numeric_limits<size_t>::max ());
   scanner.process (filter, 1, db::box_convert<db::Edge> (), db::box_convert<db::Polygon> ());
 }
 

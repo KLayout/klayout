@@ -310,7 +310,7 @@ AsIfFlatEdges::pull_generic (const Region &other) const
 
   std::unique_ptr<FlatRegion> output (new FlatRegion (true));
 
-  edge_to_region_interaction_filter<FlatRegion> filter (output.get (), EdgesInteract);
+  edge_to_polygon_interaction_filter<FlatRegion> filter (output.get (), EdgesInteract, size_t (1), std::numeric_limits<size_t>::max ());
   scanner.process (filter, 1, db::box_convert<db::Edge> (), db::box_convert<db::Polygon> ());
 
   return output.release ();

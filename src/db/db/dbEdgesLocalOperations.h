@@ -121,7 +121,7 @@ public:
  *  @brief Implements edge-to-polygon interactions
  */
 template<class TI>
-class DB_PUBLIC_TEMPLATE edge_to_polygon_interacting_local_operation
+class DB_PUBLIC edge_to_polygon_interacting_local_operation
   : public local_operation<db::Edge, TI, db::Edge>
 {
 public:

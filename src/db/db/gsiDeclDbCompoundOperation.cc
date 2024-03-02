@@ -561,13 +561,13 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
   gsi::constructor ("new_geometrical_boolean", &new_geometrical_boolean, gsi::arg ("op"), gsi::arg ("a"), gsi::arg ("b"),
     "@brief Creates a node representing a geometrical boolean operation between the inputs.\n"
   ) +
-  gsi::constructor ("new_interacting", &new_interacting, gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("inverse", false), gsi::arg ("min_count", size_t (0)), gsi::arg ("max_count", std::numeric_limits<size_t>::max (), "unlimited"),
+  gsi::constructor ("new_interacting", &new_interacting, gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("inverse", false), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", std::numeric_limits<size_t>::max (), "unlimited"),
     "@brief Creates a node representing an interacting selection operation between the inputs.\n"
   ) +
-  gsi::constructor ("new_overlapping", &new_overlapping, gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("inverse", false), gsi::arg ("min_count", size_t (0)), gsi::arg ("max_count", std::numeric_limits<size_t>::max (), "unlimited"),
+  gsi::constructor ("new_overlapping", &new_overlapping, gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("inverse", false), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", std::numeric_limits<size_t>::max (), "unlimited"),
     "@brief Creates a node representing an overlapping selection operation between the inputs.\n"
   ) +
-  gsi::constructor ("new_enclosing", &new_enclosing, gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("inverse", false), gsi::arg ("min_count", size_t (0)), gsi::arg ("max_count", std::numeric_limits<size_t>::max (), "unlimited"),
+  gsi::constructor ("new_enclosing", &new_enclosing, gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("inverse", false), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", std::numeric_limits<size_t>::max (), "unlimited"),
     "@brief Creates a node representing an inside selection operation between the inputs.\n"
   ) +
   gsi::constructor ("new_inside", &new_inside, gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("inverse", false),

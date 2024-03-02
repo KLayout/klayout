@@ -367,73 +367,73 @@ AsIfFlatEdges::selected_interacting_pair (const Edges &other, size_t min_count, 
 EdgesDelegate *
 AsIfFlatEdges::selected_outside (const Region &other) const
 {
-  return selected_interacting_generic (other, EdgesOutside, false, size_t (0), std::numeric_limits<size_t>::max ());
+  return selected_interacting_generic (other, EdgesOutside, false, size_t (1), std::numeric_limits<size_t>::max ());
 }
 
 EdgesDelegate *
 AsIfFlatEdges::selected_not_outside (const Region &other) const
 {
-  return selected_interacting_generic (other, EdgesOutside, true, size_t (0), std::numeric_limits<size_t>::max ());
+  return selected_interacting_generic (other, EdgesOutside, true, size_t (1), std::numeric_limits<size_t>::max ());
 }
 
 std::pair<EdgesDelegate *, EdgesDelegate *>
 AsIfFlatEdges::selected_outside_pair (const Region &other) const
 {
-  return selected_interacting_pair_generic (other, EdgesOutside, size_t (0), std::numeric_limits<size_t>::max ());
+  return selected_interacting_pair_generic (other, EdgesOutside, size_t (1), std::numeric_limits<size_t>::max ());
 }
 
 EdgesDelegate *
 AsIfFlatEdges::selected_inside (const Region &other) const
 {
-  return selected_interacting_generic (other, EdgesInside, false, size_t (0), std::numeric_limits<size_t>::max ());
+  return selected_interacting_generic (other, EdgesInside, false, size_t (1), std::numeric_limits<size_t>::max ());
 }
 
 EdgesDelegate *
 AsIfFlatEdges::selected_not_inside (const Region &other) const
 {
-  return selected_interacting_generic (other, EdgesInside, true, size_t (0), std::numeric_limits<size_t>::max ());
+  return selected_interacting_generic (other, EdgesInside, true, size_t (1), std::numeric_limits<size_t>::max ());
 }
 
 std::pair<EdgesDelegate *, EdgesDelegate *>
 AsIfFlatEdges::selected_inside_pair (const Region &other) const
 {
-  return selected_interacting_pair_generic (other, EdgesInside, size_t (0), std::numeric_limits<size_t>::max ());
+  return selected_interacting_pair_generic (other, EdgesInside, size_t (1), std::numeric_limits<size_t>::max ());
 }
 
 EdgesDelegate *
 AsIfFlatEdges::selected_outside (const Edges &other) const
 {
-  return selected_interacting_generic (other, EdgesOutside, false, size_t (0), std::numeric_limits<size_t>::max ());
+  return selected_interacting_generic (other, EdgesOutside, false, size_t (1), std::numeric_limits<size_t>::max ());
 }
 
 EdgesDelegate *
 AsIfFlatEdges::selected_not_outside (const Edges &other) const
 {
-  return selected_interacting_generic (other, EdgesOutside, true, size_t (0), std::numeric_limits<size_t>::max ());
+  return selected_interacting_generic (other, EdgesOutside, true, size_t (1), std::numeric_limits<size_t>::max ());
 }
 
 std::pair<EdgesDelegate *, EdgesDelegate *>
 AsIfFlatEdges::selected_outside_pair (const Edges &other) const
 {
-  return selected_interacting_pair_generic (other, EdgesOutside, size_t (0), std::numeric_limits<size_t>::max ());
+  return selected_interacting_pair_generic (other, EdgesOutside, size_t (1), std::numeric_limits<size_t>::max ());
 }
 
 EdgesDelegate *
 AsIfFlatEdges::selected_inside (const Edges &other) const
 {
-  return selected_interacting_generic (other, EdgesInside, false, size_t (0), std::numeric_limits<size_t>::max ());
+  return selected_interacting_generic (other, EdgesInside, false, size_t (1), std::numeric_limits<size_t>::max ());
 }
 
 EdgesDelegate *
 AsIfFlatEdges::selected_not_inside (const Edges &other) const
 {
-  return selected_interacting_generic (other, EdgesInside, true, size_t (0), std::numeric_limits<size_t>::max ());
+  return selected_interacting_generic (other, EdgesInside, true, size_t (1), std::numeric_limits<size_t>::max ());
 }
 
 std::pair<EdgesDelegate *, EdgesDelegate *>
 AsIfFlatEdges::selected_inside_pair (const Edges &other) const
 {
-  return selected_interacting_pair_generic (other, EdgesInside, size_t (0), std::numeric_limits<size_t>::max ());
+  return selected_interacting_pair_generic (other, EdgesInside, size_t (1), std::numeric_limits<size_t>::max ());
 }
 
 

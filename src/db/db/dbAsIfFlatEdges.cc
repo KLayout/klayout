@@ -141,7 +141,7 @@ AsIfFlatEdges::selected_interacting_generic (const Region &other, EdgeInteractio
 
   db::EdgesIterator edges (begin_merged ());
 
-  db::edge_to_polygon_interacting_local_operation<db::Polygon> op (mode, inverse ? db::edge_to_polygon_interacting_local_operation<db::Polygon>::Inverse : db::edge_to_polygon_interacting_local_operation<db::Polygon>::Normal);
+  db::edge_to_polygon_interacting_local_operation<db::Polygon> op (mode, inverse ? db::edge_to_polygon_interacting_local_operation<db::Polygon>::Inverse : db::edge_to_polygon_interacting_local_operation<db::Polygon>::Normal, min_count, max_count);
 
   db::local_processor<db::Edge, db::Polygon, db::Edge> proc;
   proc.set_base_verbosity (base_verbosity ());
@@ -173,7 +173,7 @@ AsIfFlatEdges::selected_interacting_generic (const Edges &other, EdgeInteraction
 
   db::EdgesIterator edges (begin_merged ());
 
-  db::Edge2EdgeInteractingLocalOperation op (mode, inverse ? db::Edge2EdgeInteractingLocalOperation::Inverse : db::Edge2EdgeInteractingLocalOperation::Normal);
+  db::Edge2EdgeInteractingLocalOperation op (mode, inverse ? db::Edge2EdgeInteractingLocalOperation::Inverse : db::Edge2EdgeInteractingLocalOperation::Normal, min_count, max_count);
 
   db::local_processor<db::Edge, db::Edge, db::Edge> proc;
   proc.set_base_verbosity (base_verbosity ());
@@ -209,7 +209,7 @@ AsIfFlatEdges::selected_interacting_pair_generic (const Region &other, EdgeInter
 
   db::EdgesIterator edges (begin_merged ());
 
-  db::edge_to_polygon_interacting_local_operation<db::Polygon> op (mode, db::edge_to_polygon_interacting_local_operation<db::Polygon>::Both);
+  db::edge_to_polygon_interacting_local_operation<db::Polygon> op (mode, db::edge_to_polygon_interacting_local_operation<db::Polygon>::Both, min_count, max_count);
 
   db::local_processor<db::Edge, db::Polygon, db::Edge> proc;
   proc.set_base_verbosity (base_verbosity ());
@@ -245,7 +245,7 @@ AsIfFlatEdges::selected_interacting_pair_generic (const Edges &other, EdgeIntera
 
   db::EdgesIterator edges (begin_merged ());
 
-  db::Edge2EdgeInteractingLocalOperation op (mode, db::Edge2EdgeInteractingLocalOperation::Both);
+  db::Edge2EdgeInteractingLocalOperation op (mode, db::Edge2EdgeInteractingLocalOperation::Both, min_count, max_count);
 
   db::local_processor<db::Edge, db::Edge, db::Edge> proc;
   proc.set_base_verbosity (base_verbosity ());
@@ -280,7 +280,7 @@ AsIfFlatEdges::pull_generic (const Edges &edges) const
   }
 
   std::unique_ptr<FlatEdges> output (new FlatEdges (true));
-  edge_interaction_filter<FlatEdges> filter (*output, EdgesInteract);
+  edge_interaction_filter<FlatEdges> filter (*output, EdgesInteract, size_t (1), std::numeric_limits<size_t>::max ());
   scanner.process (filter, 1, db::box_convert<db::Edge> ());
 
   return output.release ();

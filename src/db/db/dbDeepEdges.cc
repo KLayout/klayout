@@ -1370,7 +1370,7 @@ DeepEdges::selected_interacting_generic (const Region &other, EdgeInteractionMod
 
   DeepLayer dl_out (edges.derived ());
 
-  db::edge_to_polygon_interacting_local_operation<db::PolygonRef> op (mode, inverse ? db::edge_to_polygon_interacting_local_operation<db::PolygonRef>::Inverse : db::edge_to_polygon_interacting_local_operation<db::PolygonRef>::Normal);
+  db::edge_to_polygon_interacting_local_operation<db::PolygonRef> op (mode, inverse ? db::edge_to_polygon_interacting_local_operation<db::PolygonRef>::Inverse : db::edge_to_polygon_interacting_local_operation<db::PolygonRef>::Normal, min_count, max_count);
 
   db::local_processor<db::Edge, db::PolygonRef, db::Edge> proc (const_cast<db::Layout *> (&edges.layout ()), const_cast<db::Cell *> (&edges.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell (), edges.breakout_cells (), other_deep->deep_layer ().breakout_cells ());
   proc.set_base_verbosity (base_verbosity ());
@@ -1403,7 +1403,7 @@ DeepEdges::selected_interacting_pair_generic (const Region &other, EdgeInteracti
   output_layers.push_back (dl_out.layer ());
   output_layers.push_back (dl_out2.layer ());
 
-  db::edge_to_polygon_interacting_local_operation<db::PolygonRef> op (mode, db::edge_to_polygon_interacting_local_operation<db::PolygonRef>::Both);
+  db::edge_to_polygon_interacting_local_operation<db::PolygonRef> op (mode, db::edge_to_polygon_interacting_local_operation<db::PolygonRef>::Both, min_count, max_count);
 
   db::local_processor<db::Edge, db::PolygonRef, db::Edge> proc (const_cast<db::Layout *> (&edges.layout ()), const_cast<db::Cell *> (&edges.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell (), edges.breakout_cells (), other_deep->deep_layer ().breakout_cells ());
   proc.set_base_verbosity (base_verbosity ());
@@ -1430,7 +1430,7 @@ DeepEdges::selected_interacting_generic (const Edges &other, EdgeInteractionMode
 
   DeepLayer dl_out (edges.derived ());
 
-  db::Edge2EdgeInteractingLocalOperation op (mode, inverse ? db::Edge2EdgeInteractingLocalOperation::Inverse : db::Edge2EdgeInteractingLocalOperation::Normal);
+  db::Edge2EdgeInteractingLocalOperation op (mode, inverse ? db::Edge2EdgeInteractingLocalOperation::Inverse : db::Edge2EdgeInteractingLocalOperation::Normal, min_count, max_count);
 
   db::local_processor<db::Edge, db::Edge, db::Edge> proc (const_cast<db::Layout *> (&edges.layout ()), const_cast<db::Cell *> (&edges.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell (), edges.breakout_cells (), other_deep->deep_layer ().breakout_cells ());
   proc.set_base_verbosity (base_verbosity ());
@@ -1463,7 +1463,7 @@ DeepEdges::selected_interacting_pair_generic (const Edges &other, EdgeInteractio
   output_layers.push_back (dl_out.layer ());
   output_layers.push_back (dl_out2.layer ());
 
-  db::Edge2EdgeInteractingLocalOperation op (mode, db::Edge2EdgeInteractingLocalOperation::Both);
+  db::Edge2EdgeInteractingLocalOperation op (mode, db::Edge2EdgeInteractingLocalOperation::Both, min_count, max_count);
 
   db::local_processor<db::Edge, db::Edge, db::Edge> proc (const_cast<db::Layout *> (&edges.layout ()), const_cast<db::Cell *> (&edges.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell (), edges.breakout_cells (), other_deep->deep_layer ().breakout_cells ());
   proc.set_base_verbosity (base_verbosity ());

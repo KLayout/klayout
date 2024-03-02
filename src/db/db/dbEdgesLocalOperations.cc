@@ -202,8 +202,8 @@ EdgeToPolygonLocalOperation::do_compute_local (db::Layout * /*layout*/, db::Cell
 // ---------------------------------------------------------------------------------------------
 //  Edge2EdgeInteractingLocalOperation implementation
 
-Edge2EdgeInteractingLocalOperation::Edge2EdgeInteractingLocalOperation (EdgeInteractionMode mode, output_mode_t output_mode)
-  : m_mode (mode), m_output_mode (output_mode)
+Edge2EdgeInteractingLocalOperation::Edge2EdgeInteractingLocalOperation (EdgeInteractionMode mode, output_mode_t output_mode, size_t min_count, size_t max_count)
+  : m_mode (mode), m_output_mode (output_mode), m_min_count (min_count), m_max_count (max_count)
 {
   //  .. nothing yet ..
 }
@@ -246,7 +246,7 @@ void Edge2EdgeInteractingLocalOperation::do_compute_local (db::Layout * /*layout
   if (m_output_mode == Inverse || m_output_mode == Both) {
 
     std::unordered_set<db::Edge> interacting;
-    edge_interaction_filter<std::unordered_set<db::Edge> > filter (interacting, m_mode);
+    edge_interaction_filter<std::unordered_set<db::Edge> > filter (interacting, m_mode, m_min_count, m_max_count);
     scanner.process (filter, 1, db::box_convert<db::Edge> ());
 
     for (shape_interactions<db::Edge, db::Edge>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
@@ -266,7 +266,7 @@ void Edge2EdgeInteractingLocalOperation::do_compute_local (db::Layout * /*layout
 
   } else {
 
-    edge_interaction_filter<std::unordered_set<db::Edge> > filter (result, m_mode);
+    edge_interaction_filter<std::unordered_set<db::Edge> > filter (result, m_mode, m_min_count, m_max_count);
     scanner.process (filter, 1, db::box_convert<db::Edge> ());
 
   }
@@ -324,7 +324,7 @@ void Edge2EdgePullLocalOperation::do_compute_local (db::Layout * /*layout*/, db:
     scanner.insert (o.operator-> (), 0);
   }
 
-  edge_interaction_filter<std::unordered_set<db::Edge> > filter (result, EdgesInteract);
+  edge_interaction_filter<std::unordered_set<db::Edge> > filter (result, EdgesInteract, size_t (1), std::numeric_limits<size_t>::max ());
   scanner.process (filter, 1, db::box_convert<db::Edge> ());
 
 }
@@ -344,9 +344,10 @@ std::string Edge2EdgePullLocalOperation::description () const
 //  Edge2EdgePullLocalOperation implementation
 
 template <class TI>
-edge_to_polygon_interacting_local_operation<TI>::edge_to_polygon_interacting_local_operation (EdgeInteractionMode mode, output_mode_t output_mode)
+edge_to_polygon_interacting_local_operation<TI>::edge_to_polygon_interacting_local_operation (EdgeInteractionMode mode, output_mode_t output_mode, size_t min_count, size_t max_count)
   : m_mode (mode), m_output_mode (output_mode)
 {
+  // @@@
   //  .. nothing yet ..
 }
 

@@ -89,7 +89,7 @@ class DB_PUBLIC Edge2EdgeInteractingLocalOperation
 public:
   enum output_mode_t { Normal, Inverse, Both };
 
-  Edge2EdgeInteractingLocalOperation (EdgeInteractionMode mode, output_mode_t output_mode);
+  Edge2EdgeInteractingLocalOperation (EdgeInteractionMode mode, output_mode_t output_mode, size_t min_count, size_t max_count);
 
   virtual db::Coord dist () const;
   virtual void do_compute_local (db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<db::Edge, db::Edge> &interactions, std::vector<std::unordered_set<db::Edge> > &results, const db::LocalProcessorBase * /*proc*/) const;
@@ -99,6 +99,7 @@ public:
 private:
   EdgeInteractionMode m_mode;
   output_mode_t m_output_mode;
+  size_t m_min_count, m_max_count;
 };
 
 /**
@@ -126,7 +127,7 @@ class DB_PUBLIC_TEMPLATE edge_to_polygon_interacting_local_operation
 public:
   enum output_mode_t { Normal, Inverse, Both };
 
-  edge_to_polygon_interacting_local_operation (EdgeInteractionMode mode, output_mode_t output_mode);
+  edge_to_polygon_interacting_local_operation (EdgeInteractionMode mode, output_mode_t output_mode, size_t min_count, size_t max_count);
 
   virtual db::Coord dist () const;
   virtual void do_compute_local (db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<db::Edge, TI> &interactions, std::vector<std::unordered_set<db::Edge> > &results, const db::LocalProcessorBase * /*proc*/) const;

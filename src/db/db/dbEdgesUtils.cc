@@ -409,7 +409,7 @@ edge_is_inside_or_outside (bool outside, const db::Edge &a, const db::Polygon &b
   ep.insert (a, 1);
 
   DetectTagEdgeSink es (outside ? 1 : 2);   //  2 is the "outside" tag in "Both" mode -> this makes inside fail
-  db::EdgePolygonOp op (db::EdgePolygonOp::Both, true /*include borders*/);
+  db::EdgePolygonOp op (db::EdgePolygonOp::Both, !outside /*include borders in inside*/);
   ep.process (es, op);
 
   return es.result;

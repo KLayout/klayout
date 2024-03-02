@@ -1357,7 +1357,8 @@ RegionDelegate *DeepEdges::extended (coord_type ext_b, coord_type ext_e, coord_t
 EdgesDelegate *
 DeepEdges::selected_interacting_generic (const Region &other, EdgeInteractionMode mode, bool inverse, size_t min_count, size_t max_count) const
 {
-  // @@@
+  min_count = std::max (size_t (1), min_count);
+
   std::unique_ptr<db::DeepRegion> dr_holder;
   const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> (other.delegate ());
   if (! other_deep) {
@@ -1384,7 +1385,8 @@ DeepEdges::selected_interacting_generic (const Region &other, EdgeInteractionMod
 std::pair<EdgesDelegate *, EdgesDelegate *>
 DeepEdges::selected_interacting_pair_generic (const Region &other, EdgeInteractionMode mode, size_t min_count, size_t max_count) const
 {
-  // @@@
+  min_count = std::max (size_t (1), min_count);
+
   std::unique_ptr<db::DeepRegion> dr_holder;
   const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> (other.delegate ());
   if (! other_deep) {
@@ -1417,7 +1419,8 @@ DeepEdges::selected_interacting_pair_generic (const Region &other, EdgeInteracti
 EdgesDelegate *
 DeepEdges::selected_interacting_generic (const Edges &other, EdgeInteractionMode mode, bool inverse, size_t min_count, size_t max_count) const
 {
-  // @@@
+  min_count = std::max (size_t (1), min_count);
+
   std::unique_ptr<db::DeepEdges> dr_holder;
   const db::DeepEdges *other_deep = dynamic_cast<const db::DeepEdges *> (other.delegate ());
   if (! other_deep) {
@@ -1444,7 +1447,8 @@ DeepEdges::selected_interacting_generic (const Edges &other, EdgeInteractionMode
 std::pair<EdgesDelegate *, EdgesDelegate *>
 DeepEdges::selected_interacting_pair_generic (const Edges &other, EdgeInteractionMode mode, size_t min_count, size_t max_count) const
 {
-  // @@@
+  min_count = std::max (size_t (1), min_count);
+
   std::unique_ptr<db::DeepEdges> dr_holder;
   const db::DeepEdges *other_deep = dynamic_cast<const db::DeepEdges *> (other.delegate ());
   if (! other_deep) {

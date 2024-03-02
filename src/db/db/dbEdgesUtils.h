@@ -344,6 +344,7 @@ public:
   {
     //  NOTE: "counting" does not really make much sense in Outside mode ...
     m_counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
+    tl_assert (!m_counting || mode != EdgesOutside);
   }
 
   void finish (const db::Edge *o, size_t p)
@@ -450,6 +451,7 @@ public:
   {
     //  NOTE: "counting" does not really make much sense in Outside mode ...
     m_counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
+    tl_assert (!m_counting || mode != EdgesOutside);
   }
 
   void finish (const OutputType *o)

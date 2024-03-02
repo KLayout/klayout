@@ -150,7 +150,7 @@ AsIfFlatEdges::selected_interacting_generic (const Region &other, EdgeInteractio
 
   std::vector<generic_shape_iterator<db::Polygon> > others;
   //  NOTE: with counting the other region needs to be merged
-  others.push_back (counting ? other.begin_merged () : other.begin ());
+  others.push_back (counting || mode == EdgesInside ? other.begin_merged () : other.begin ());
 
   proc.run_flat (edges, others, std::vector<bool> (), &op, oph.results ());
 
@@ -162,7 +162,6 @@ AsIfFlatEdges::selected_interacting_generic (const Edges &other, EdgeInteraction
 {
   min_count = std::max (size_t (1), min_count);
 
-  // @@@
   //  shortcuts
   if (max_count < min_count || other.empty () || empty ()) {
     return ((mode == EdgesOutside) == inverse) ? new EmptyEdges () : clone ();
@@ -182,7 +181,7 @@ AsIfFlatEdges::selected_interacting_generic (const Edges &other, EdgeInteraction
 
   std::vector<generic_shape_iterator<db::Edge> > others;
   //  NOTE: with counting the other edge collection needs to be merged
-  others.push_back (counting ? other.begin_merged () : other.begin ());
+  others.push_back (counting || mode == EdgesInside ? other.begin_merged () : other.begin ());
 
   proc.run_flat (edges, others, std::vector<bool> (), &op, oph.results ());
 
@@ -194,7 +193,6 @@ AsIfFlatEdges::selected_interacting_pair_generic (const Region &other, EdgeInter
 {
   min_count = std::max (size_t (1), min_count);
 
-  // @@@
   //  shortcuts
   if (max_count < min_count || other.empty () || empty ()) {
     if (mode != EdgesOutside) {
@@ -218,7 +216,7 @@ AsIfFlatEdges::selected_interacting_pair_generic (const Region &other, EdgeInter
 
   std::vector<generic_shape_iterator<db::Polygon> > others;
   //  NOTE: with counting the other region needs to be merged
-  others.push_back (counting ? other.begin_merged () : other.begin ());
+  others.push_back (counting || mode == EdgesInside ? other.begin_merged () : other.begin ());
 
   proc.run_flat (edges, others, std::vector<bool> (), &op, oph.results ());
 
@@ -230,7 +228,6 @@ AsIfFlatEdges::selected_interacting_pair_generic (const Edges &other, EdgeIntera
 {
   min_count = std::max (size_t (1), min_count);
 
-  // @@@
   //  shortcuts
   if (max_count < min_count || other.empty () || empty ()) {
     if (mode != EdgesOutside) {
@@ -254,7 +251,7 @@ AsIfFlatEdges::selected_interacting_pair_generic (const Edges &other, EdgeIntera
 
   std::vector<generic_shape_iterator<db::Edge> > others;
   //  NOTE: with counting the other edge collection needs to be merged
-  others.push_back (counting ? other.begin_merged () : other.begin ());
+  others.push_back (counting || mode == EdgesInside ? other.begin_merged () : other.begin ());
 
   proc.run_flat (edges, others, std::vector<bool> (), &op, oph.results ());
 

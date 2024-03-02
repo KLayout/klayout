@@ -1358,6 +1358,7 @@ EdgesDelegate *
 DeepEdges::selected_interacting_generic (const Region &other, EdgeInteractionMode mode, bool inverse, size_t min_count, size_t max_count) const
 {
   min_count = std::max (size_t (1), min_count);
+  bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
 
   std::unique_ptr<db::DeepRegion> dr_holder;
   const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> (other.delegate ());
@@ -1377,7 +1378,8 @@ DeepEdges::selected_interacting_generic (const Region &other, EdgeInteractionMod
   proc.set_base_verbosity (base_verbosity ());
   proc.set_threads (edges.store ()->threads ());
 
-  proc.run (&op, edges.layer (), (mode == EdgesInside ? other_deep->merged_deep_layer () : other_deep->deep_layer ()).layer (), dl_out.layer ());
+  //  NOTE: with counting the other region needs to be merged
+  proc.run (&op, edges.layer (), (counting || mode != EdgesInteract ? other_deep->merged_deep_layer () : other_deep->deep_layer ()).layer (), dl_out.layer ());
 
   return new db::DeepEdges (dl_out);
 }
@@ -1386,6 +1388,7 @@ std::pair<EdgesDelegate *, EdgesDelegate *>
 DeepEdges::selected_interacting_pair_generic (const Region &other, EdgeInteractionMode mode, size_t min_count, size_t max_count) const
 {
   min_count = std::max (size_t (1), min_count);
+  bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
 
   std::unique_ptr<db::DeepRegion> dr_holder;
   const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> (other.delegate ());
@@ -1411,7 +1414,8 @@ DeepEdges::selected_interacting_pair_generic (const Region &other, EdgeInteracti
   proc.set_base_verbosity (base_verbosity ());
   proc.set_threads (edges.store ()->threads ());
 
-  proc.run (&op, edges.layer (), other_deep->merged_deep_layer ().layer (), output_layers);
+  //  NOTE: with counting the other region needs to be merged
+  proc.run (&op, edges.layer (), (counting || mode != EdgesInteract ? other_deep->merged_deep_layer () : other_deep->deep_layer ()).layer (), output_layers);
 
   return std::make_pair (new db::DeepEdges (dl_out), new db::DeepEdges (dl_out2));
 }
@@ -1420,6 +1424,7 @@ EdgesDelegate *
 DeepEdges::selected_interacting_generic (const Edges &other, EdgeInteractionMode mode, bool inverse, size_t min_count, size_t max_count) const
 {
   min_count = std::max (size_t (1), min_count);
+  bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
 
   std::unique_ptr<db::DeepEdges> dr_holder;
   const db::DeepEdges *other_deep = dynamic_cast<const db::DeepEdges *> (other.delegate ());
@@ -1439,7 +1444,8 @@ DeepEdges::selected_interacting_generic (const Edges &other, EdgeInteractionMode
   proc.set_base_verbosity (base_verbosity ());
   proc.set_threads (edges.store ()->threads ());
 
-  proc.run (&op, edges.layer (), (mode == EdgesInside ? other_deep->merged_deep_layer () : other_deep->deep_layer ()).layer (), dl_out.layer ());
+  //  NOTE: with counting the other region needs to be merged
+  proc.run (&op, edges.layer (), (counting || mode != EdgesInteract ? other_deep->merged_deep_layer () : other_deep->deep_layer ()).layer (), dl_out.layer ());
 
   return new db::DeepEdges (dl_out);
 }
@@ -1448,6 +1454,7 @@ std::pair<EdgesDelegate *, EdgesDelegate *>
 DeepEdges::selected_interacting_pair_generic (const Edges &other, EdgeInteractionMode mode, size_t min_count, size_t max_count) const
 {
   min_count = std::max (size_t (1), min_count);
+  bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
 
   std::unique_ptr<db::DeepEdges> dr_holder;
   const db::DeepEdges *other_deep = dynamic_cast<const db::DeepEdges *> (other.delegate ());
@@ -1473,7 +1480,8 @@ DeepEdges::selected_interacting_pair_generic (const Edges &other, EdgeInteractio
   proc.set_base_verbosity (base_verbosity ());
   proc.set_threads (edges.store ()->threads ());
 
-  proc.run (&op, edges.layer (), other_deep->merged_deep_layer ().layer (), output_layers);
+  //  NOTE: with counting the other region needs to be merged
+  proc.run (&op, edges.layer (), (counting || mode != EdgesInteract ? other_deep->merged_deep_layer () : other_deep->deep_layer ()).layer (), output_layers);
 
   return std::make_pair (new db::DeepEdges (dl_out), new db::DeepEdges (dl_out2));
 }

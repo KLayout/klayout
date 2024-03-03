@@ -606,7 +606,7 @@ private:
 
     for (std::list<std::pair<const db::Shapes *, db::ICplxTrans> >::const_iterator i = merged_child_clusters.begin (); i != merged_child_clusters.end (); ++i) {
       for (db::Shapes::shape_iterator s = i->first->begin (db::ShapeIterator::All); ! s.at_end (); ++s) {
-        if (s->is_edge ()) {
+        if (s->is_edge () && ! s->edge ().is_degenerate ()) {
           heap.push_back (s->edge ().transformed (i->second));
           m_scanner.insert (&heap.back (), 0);
         }
@@ -614,8 +614,10 @@ private:
     }
 
     for (db::local_cluster<db::Edge>::shape_iterator s = c.begin (m_layer); !s.at_end (); ++s) {
-      heap.push_back (*s);
-      m_scanner.insert (&heap.back (), 0);
+      if (! s->is_degenerate ()) {
+        heap.push_back (*s);
+        m_scanner.insert (&heap.back (), 0);
+      }
     }
 
     //  .. and run the merge operation

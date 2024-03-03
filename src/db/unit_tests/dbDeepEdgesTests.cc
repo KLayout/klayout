@@ -1328,11 +1328,11 @@ TEST(21_EdgeMergeWithDots)
   eee.insert_into (&ly, top_cell.cell_index (), l3);
   eee = db::Edges (db::RecursiveShapeIterator (ly, top_cell, l3), dss);
 
-  EXPECT_EQ (e.merged ().to_string (), "(0,0;100,0);(110,0;110,0)");
+  EXPECT_EQ (e.merged ().to_string (), "(0,0;100,0)");
   //  dots do not participate in merge
-  EXPECT_EQ (ee.merged ().to_string (), "(0,0;110,0);(110,0;110,0)");
+  EXPECT_EQ (ee.merged ().to_string (), "(0,0;110,0)");
   //  dots do not participate in merge
-  EXPECT_EQ (eee.merged ().to_string (), "(110,0;110,0);(110,0;110,0)");
+  EXPECT_EQ (eee.merged ().to_string (), "");
 }
 
 TEST(22_InteractingWithCount)
@@ -1348,8 +1348,10 @@ TEST(22_InteractingWithCount)
   e2.insert (db::Edge (db::Point (100, 0), db::Point (100, 10)));
   e2.insert (db::Edge (db::Point (100, 0), db::Point (100, 30)));
   e2.insert (db::Edge (db::Point (110, 10), db::Point (110, 30)));
+  e2.merge ();
   e2.insert (db::Edge (db::Point (120, 20), db::Point (120, 20)));
   e2.insert (db::Edge (db::Point (130, 30), db::Point (130, 30)));
+  e2.set_merged_semantics (false);
 
   db::Region r2;
   r2.insert (db::Box (db::Point (99, 0), db::Point (101, 10)));
@@ -1376,6 +1378,8 @@ TEST(22_InteractingWithCount)
 
   e2.insert_into (&ly, top_cell.cell_index (), l2);
   e2 = db::Edges (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
+  //  because it has dots
+  e2.set_merged_semantics (false);
 
   r2.insert_into (&ly, top_cell.cell_index (), l3);
   r2 = db::Region (db::RecursiveShapeIterator (ly, top_cell, l3), dss);

@@ -118,12 +118,25 @@ struct EdgeBooleanCluster
       return;
     }
 
-    db::Edge r = *begin ()->first;
+    //  search first non-degenerate, longest
+
+    iterator main = end ();
+    for (iterator i = begin (); i != end (); ++i) {
+      if (! i->first->is_degenerate () && (main == end () || main->first->length () < i->first->length ())) {
+        main = i;
+      }
+    }
+
+    if (main == end ()) {
+      return;
+    }
+
+    db::Edge r = *main->first;
     double l1 = 0.0, l2 = r.double_length ();
     double n = 1.0 / l2;
     db::Point p1 = r.p1 (), p2 = r.p2 ();
 
-    for (iterator o = begin () + 1; o != end (); ++o) {
+    for (iterator o = begin (); o != end (); ++o) {
       double ll1 = db::sprod (db::Vector (o->first->p1 () - r.p1 ()), r.d ()) * n;
       double ll2 = db::sprod (db::Vector (o->first->p2 () - r.p1 ()), r.d ()) * n;
       if (ll1 < l1) {
@@ -281,11 +294,13 @@ struct EdgeBooleanClusterCollector
 
       db::cluster_collector<db::Edge, size_t, EdgeBooleanCluster<OutputContainer> >::add (o1, p1, o2, p2);
 
-    } else if (mp_intersections && p1 != p2) {
+    } else {
 
-      std::pair<bool, db::Point> ip = o1->intersect_point (*o2);
-      if (ip.first) {
-        m_intersections.insert (ip.second);
+      if (mp_intersections && p1 != p2) {
+        std::pair<bool, db::Point> ip = o1->intersect_point (*o2);
+        if (ip.first) {
+          m_intersections.insert (ip.second);
+        }
       }
 
     }

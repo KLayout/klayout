@@ -895,16 +895,9 @@ TEST(22)
   ee.insert (db::Edge (4000,0,4000,-2000));
   ee.insert (db::Edge (4000,-2000,-2000,-2000));
 
-  db::Edges dots;
-  dots.insert (db::Edge (2000,0,2000,0));
-
   EXPECT_EQ (db::compare ((e & ee), "(400,0;-2000,0);(500,-173;400,0);(1000,0;900,-174);(4000,0;1000,0)"), true);
   EXPECT_EQ (db::compare (e.andnot(ee).first, "(400,0;-2000,0);(500,-173;400,0);(1000,0;900,-174);(4000,0;1000,0)"), true);
   EXPECT_EQ (db::compare (e.intersections (ee), "(400,0;-2000,0);(500,-173;400,0);(1000,0;900,-174);(4000,0;1000,0)"), true);
-
-  //  dots participate in intersections
-  EXPECT_EQ (db::compare (e.intersections (dots), "(2000,0;2000,0)"), true);
-  EXPECT_EQ (db::compare (dots.intersections (e), "(2000,0;2000,0)"), true);
 
   //  Edge/edge intersections
   ee.clear ();
@@ -1170,17 +1163,17 @@ TEST(29)
   db::Edges e;
   e.insert (db::Edge (db::Point(0, 0), db::Point (100, 0)));
   e.insert (db::Edge (db::Point(110, 0), db::Point (110, 0)));
-  EXPECT_EQ (e.merged ().to_string (), "(0,0;100,0);(110,0;110,0)");
+  EXPECT_EQ (e.merged ().to_string (), "(0,0;100,0)");
 
   e.insert (db::Edge (db::Point(100, 0), db::Point (110, 0)));
-  //  dots do not participate in merge, otherwise they would vanish
-  EXPECT_EQ (e.merged ().to_string (), "(110,0;110,0);(0,0;110,0)");
+  //  dots do not participate in merge
+  EXPECT_EQ (e.merged ().to_string (), "(0,0;110,0)");
 
   e.clear ();
   e.insert (db::Edge (db::Point(110, 0), db::Point (110, 0)));
   e.insert (db::Edge (db::Point(110, 0), db::Point (110, 0)));
-  //  dots do not participate in merge, otherwise they would vanish
-  EXPECT_EQ (e.merged ().to_string (), "(110,0;110,0);(110,0;110,0)");
+  //  dots do not participate in merge
+  EXPECT_EQ (e.merged ().to_string (), "");
 }
 
 //  interacting with count
@@ -1197,8 +1190,10 @@ TEST(30)
   e2.insert (db::Edge (db::Point (100, 0), db::Point (100, 10)));
   e2.insert (db::Edge (db::Point (100, 0), db::Point (100, 30)));
   e2.insert (db::Edge (db::Point (110, 10), db::Point (110, 30)));
+  e2.merge ();
   e2.insert (db::Edge (db::Point (120, 20), db::Point (120, 20)));
   e2.insert (db::Edge (db::Point (130, 30), db::Point (130, 30)));
+  e2.set_merged_semantics (false);
 
   db::Edges edup;
 

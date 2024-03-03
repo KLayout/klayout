@@ -895,9 +895,16 @@ TEST(22)
   ee.insert (db::Edge (4000,0,4000,-2000));
   ee.insert (db::Edge (4000,-2000,-2000,-2000));
 
-  EXPECT_EQ (db::compare ((e & ee), "(400,0;-2000,0);(500,-174;400,0);(1000,0;900,-173);(4000,0;1000,0)"), true);
-  EXPECT_EQ (db::compare (e.andnot(ee).first, "(400,0;-2000,0);(500,-174;400,0);(1000,0;900,-173);(4000,0;1000,0)"), true);
-  EXPECT_EQ (db::compare (e.intersections (ee), "(400,0;-2000,0);(500,-174;400,0);(1000,0;900,-173);(4000,0;1000,0)"), true);
+  db::Edges dots;
+  dots.insert (db::Edge (2000,0,2000,0));
+
+  EXPECT_EQ (db::compare ((e & ee), "(400,0;-2000,0);(500,-173;400,0);(1000,0;900,-174);(4000,0;1000,0)"), true);
+  EXPECT_EQ (db::compare (e.andnot(ee).first, "(400,0;-2000,0);(500,-173;400,0);(1000,0;900,-174);(4000,0;1000,0)"), true);
+  EXPECT_EQ (db::compare (e.intersections (ee), "(400,0;-2000,0);(500,-173;400,0);(1000,0;900,-174);(4000,0;1000,0)"), true);
+
+  //  dots participate in intersections
+  EXPECT_EQ (db::compare (e.intersections (dots), "(2000,0;2000,0)"), true);
+  EXPECT_EQ (db::compare (dots.intersections (e), "(2000,0;2000,0)"), true);
 
   //  Edge/edge intersections
   ee.clear ();
@@ -1155,6 +1162,102 @@ TEST(28)
   EXPECT_EQ (db::compare (e.in (ee), "(100,0;100,1000)"), true);
   EXPECT_EQ (db::compare (e.in (ee, true), "(0,0;0,1000);(0,1000;0,2000)"), true);
   EXPECT_EQ (db::compare (ee.in (e, true), "(0,0;0,2000);(100,1000;0,2000)"), true);
+}
+
+//  edge merge with dots -> dots are merged, but are retained
+TEST(29)
+{
+  db::Edges e;
+  e.insert (db::Edge (db::Point(0, 0), db::Point (100, 0)));
+  e.insert (db::Edge (db::Point(110, 0), db::Point (110, 0)));
+  EXPECT_EQ (e.merged ().to_string (), "(0,0;100,0);(110,0;110,0)");
+
+  e.insert (db::Edge (db::Point(100, 0), db::Point (110, 0)));
+  //  dots do not participate in merge, otherwise they would vanish
+  EXPECT_EQ (e.merged ().to_string (), "(110,0;110,0);(0,0;110,0)");
+
+  e.clear ();
+  e.insert (db::Edge (db::Point(110, 0), db::Point (110, 0)));
+  e.insert (db::Edge (db::Point(110, 0), db::Point (110, 0)));
+  //  dots do not participate in merge, otherwise they would vanish
+  EXPECT_EQ (e.merged ().to_string (), "(110,0;110,0);(110,0;110,0)");
+}
+
+//  interacting with count
+TEST(30)
+{
+  db::Edges e;
+  e.insert (db::Edge (db::Point (0, 0), db::Point (100, 0)));
+  e.insert (db::Edge (db::Point (100, 0), db::Point (200, 0)));
+  e.insert (db::Edge (db::Point (0, 10), db::Point (200, 10)));
+  e.insert (db::Edge (db::Point (0, 20), db::Point (200, 20)));
+  e.insert (db::Edge (db::Point (0, 30), db::Point (200, 30)));
+
+  db::Edges e2;
+  e2.insert (db::Edge (db::Point (100, 0), db::Point (100, 10)));
+  e2.insert (db::Edge (db::Point (100, 0), db::Point (100, 30)));
+  e2.insert (db::Edge (db::Point (110, 10), db::Point (110, 30)));
+  e2.insert (db::Edge (db::Point (120, 20), db::Point (120, 20)));
+  e2.insert (db::Edge (db::Point (130, 30), db::Point (130, 30)));
+
+  db::Edges edup;
+
+  EXPECT_EQ (e.selected_interacting (e2).to_string (), "(0,0;200,0);(0,10;200,10);(0,20;200,20);(0,30;200,30)");
+  EXPECT_EQ (e.selected_interacting (e2, size_t (2)).to_string (), "(0,10;200,10);(0,20;200,20);(0,30;200,30)");
+  EXPECT_EQ (e.selected_interacting (e2, size_t (2), size_t(2)).to_string (), "(0,10;200,10)");
+  EXPECT_EQ (e.selected_interacting (e2, size_t (2), size_t(3)).to_string (), "(0,10;200,10);(0,20;200,20);(0,30;200,30)");
+  EXPECT_EQ (e.selected_interacting (e2, size_t (3)).to_string (), "(0,20;200,20);(0,30;200,30)");
+  EXPECT_EQ (e.selected_interacting (e2, size_t (4)).to_string (), "");
+
+  edup = e;
+  edup.select_interacting (e2, size_t (2), size_t(3));
+  EXPECT_EQ (edup.to_string (), "(0,10;200,10);(0,20;200,20);(0,30;200,30)");
+
+  EXPECT_EQ (e.selected_not_interacting (e2).to_string (), "");
+  EXPECT_EQ (e.selected_not_interacting (e2, size_t (2)).to_string (), "(0,0;200,0)");
+  EXPECT_EQ (e.selected_not_interacting (e2, size_t (2), size_t(2)).to_string (), "(0,0;200,0);(0,20;200,20);(0,30;200,30)");
+  EXPECT_EQ (e.selected_not_interacting (e2, size_t (2), size_t(3)).to_string (), "(0,0;200,0)");
+  EXPECT_EQ (e.selected_not_interacting (e2, size_t (3)).to_string (), "(0,0;200,0);(0,10;200,10)");
+  EXPECT_EQ (e.selected_not_interacting (e2, size_t (4)).to_string (), "(0,0;200,0);(0,10;200,10);(0,20;200,20);(0,30;200,30)");
+
+  edup = e;
+  edup.select_not_interacting (e2, size_t (2), size_t(3));
+  EXPECT_EQ (edup.to_string (), "(0,0;200,0)");
+
+  EXPECT_EQ (e.selected_interacting_differential (e2, size_t (2), size_t(3)).first.to_string (), "(0,10;200,10);(0,20;200,20);(0,30;200,30)");
+  EXPECT_EQ (e.selected_interacting_differential (e2, size_t (2), size_t(3)).second.to_string (), "(0,0;200,0)");
+
+  db::Region r2;
+  r2.insert (db::Box (db::Point (99, 0), db::Point (101, 10)));
+  r2.insert (db::Box (db::Point (99, 0), db::Point (101, 30)));
+  r2.insert (db::Box (db::Point (109, 10), db::Point (111, 30)));
+  r2.insert (db::Box (db::Point (119, 19), db::Point (121, 21)));
+  r2.insert (db::Box (db::Point (129, 29), db::Point (131, 31)));
+
+  EXPECT_EQ (e.selected_interacting (r2).to_string (), "(0,0;200,0);(0,10;200,10);(0,20;200,20);(0,30;200,30)");
+  EXPECT_EQ (e.selected_interacting (r2, size_t (2)).to_string (), "(0,10;200,10);(0,20;200,20);(0,30;200,30)");
+  EXPECT_EQ (e.selected_interacting (r2, size_t (2), size_t(2)).to_string (), "(0,10;200,10)");
+  EXPECT_EQ (e.selected_interacting (r2, size_t (2), size_t(3)).to_string (), "(0,10;200,10);(0,20;200,20);(0,30;200,30)");
+  EXPECT_EQ (e.selected_interacting (r2, size_t (3)).to_string (), "(0,20;200,20);(0,30;200,30)");
+  EXPECT_EQ (e.selected_interacting (r2, size_t (4)).to_string (), "");
+
+  edup = e;
+  edup.select_interacting (r2, size_t (2), size_t(3));
+  EXPECT_EQ (edup.to_string (), "(0,10;200,10);(0,20;200,20);(0,30;200,30)");
+
+  EXPECT_EQ (e.selected_not_interacting (r2).to_string (), "");
+  EXPECT_EQ (e.selected_not_interacting (r2, size_t (2)).to_string (), "(0,0;200,0)");
+  EXPECT_EQ (e.selected_not_interacting (r2, size_t (2), size_t(2)).to_string (), "(0,0;200,0);(0,20;200,20);(0,30;200,30)");
+  EXPECT_EQ (e.selected_not_interacting (r2, size_t (2), size_t(3)).to_string (), "(0,0;200,0)");
+  EXPECT_EQ (e.selected_not_interacting (r2, size_t (3)).to_string (), "(0,0;200,0);(0,10;200,10)");
+  EXPECT_EQ (e.selected_not_interacting (r2, size_t (4)).to_string (), "(0,0;200,0);(0,10;200,10);(0,20;200,20);(0,30;200,30)");
+
+  edup = e;
+  edup.select_not_interacting (r2, size_t (2), size_t(3));
+  EXPECT_EQ (edup.to_string (), "(0,0;200,0)");
+
+  EXPECT_EQ (e.selected_interacting_differential (r2, size_t (2), size_t(3)).first.to_string (), "(0,10;200,10);(0,20;200,20);(0,30;200,30)");
+  EXPECT_EQ (e.selected_interacting_differential (r2, size_t (2), size_t(3)).second.to_string (), "(0,0;200,0)");
 }
 
 //  GitHub issue #72 (Edges/Region NOT issue)

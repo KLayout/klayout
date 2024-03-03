@@ -1293,6 +1293,148 @@ TEST(20_in_and_out)
   db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_edges_au20.gds");
 }
 
+TEST(21_EdgeMergeWithDots)
+{
+  db::Edges e;
+  e.insert (db::Edge (db::Point(0, 0), db::Point (100, 0)));
+  e.insert (db::Edge (db::Point(110, 0), db::Point (110, 0)));
+
+  db::Edges ee = e;
+  ee.insert (db::Edge (db::Point(100, 0), db::Point (110, 0)));
+
+  db::Edges eee;
+  eee.insert (db::Edge (db::Point(110, 0), db::Point (110, 0)));
+  eee.insert (db::Edge (db::Point(110, 0), db::Point (110, 0)));
+
+  //  make deep
+
+  db::DeepShapeStore dss;
+
+  db::Layout ly;
+  ly.add_cell ("TOP");
+  unsigned int l1 = ly.insert_layer ();
+  unsigned int l2 = ly.insert_layer ();
+  unsigned int l3 = ly.insert_layer ();
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  e.insert_into (&ly, top_cell.cell_index (), l1);
+  e = db::Edges (db::RecursiveShapeIterator (ly, top_cell, l1), dss);
+
+  ee.insert_into (&ly, top_cell.cell_index (), l2);
+  ee = db::Edges (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
+
+  eee.insert_into (&ly, top_cell.cell_index (), l3);
+  eee = db::Edges (db::RecursiveShapeIterator (ly, top_cell, l3), dss);
+
+  EXPECT_EQ (e.merged ().to_string (), "(0,0;100,0);(110,0;110,0)");
+  //  dots do not participate in merge
+  EXPECT_EQ (ee.merged ().to_string (), "(0,0;110,0);(110,0;110,0)");
+  //  dots do not participate in merge
+  EXPECT_EQ (eee.merged ().to_string (), "(110,0;110,0);(110,0;110,0)");
+}
+
+TEST(22_InteractingWithCount)
+{
+  db::Edges e;
+  e.insert (db::Edge (db::Point (0, 0), db::Point (100, 0)));
+  e.insert (db::Edge (db::Point (100, 0), db::Point (200, 0)));
+  e.insert (db::Edge (db::Point (0, 10), db::Point (200, 10)));
+  e.insert (db::Edge (db::Point (0, 20), db::Point (200, 20)));
+  e.insert (db::Edge (db::Point (0, 30), db::Point (200, 30)));
+
+  db::Edges e2;
+  e2.insert (db::Edge (db::Point (100, 0), db::Point (100, 10)));
+  e2.insert (db::Edge (db::Point (100, 0), db::Point (100, 30)));
+  e2.insert (db::Edge (db::Point (110, 10), db::Point (110, 30)));
+  e2.insert (db::Edge (db::Point (120, 20), db::Point (120, 20)));
+  e2.insert (db::Edge (db::Point (130, 30), db::Point (130, 30)));
+
+  db::Region r2;
+  r2.insert (db::Box (db::Point (99, 0), db::Point (101, 10)));
+  r2.insert (db::Box (db::Point (99, 0), db::Point (101, 30)));
+  r2.insert (db::Box (db::Point (109, 10), db::Point (111, 30)));
+  r2.insert (db::Box (db::Point (119, 19), db::Point (121, 21)));
+  r2.insert (db::Box (db::Point (129, 29), db::Point (131, 31)));
+
+  //  make deep
+
+  db::DeepShapeStore dss;
+
+  db::Layout ly;
+  ly.add_cell ("TOP");
+  unsigned int l1 = ly.insert_layer ();
+  unsigned int l2 = ly.insert_layer ();
+  unsigned int l3 = ly.insert_layer ();
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  e.insert_into (&ly, top_cell.cell_index (), l1);
+  e = db::Edges (db::RecursiveShapeIterator (ly, top_cell, l1), dss);
+
+  e2.insert_into (&ly, top_cell.cell_index (), l2);
+  e2 = db::Edges (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
+
+  r2.insert_into (&ly, top_cell.cell_index (), l3);
+  r2 = db::Region (db::RecursiveShapeIterator (ly, top_cell, l3), dss);
+
+
+  db::Edges edup;
+
+  EXPECT_EQ (e.selected_interacting (e2).to_string (), "(0,0;200,0);(0,10;200,10);(0,20;200,20);(0,30;200,30)");
+  EXPECT_EQ (e.selected_interacting (e2, size_t (2)).to_string (), "(0,10;200,10);(0,20;200,20);(0,30;200,30)");
+  EXPECT_EQ (e.selected_interacting (e2, size_t (2), size_t(2)).to_string (), "(0,10;200,10)");
+  EXPECT_EQ (e.selected_interacting (e2, size_t (2), size_t(3)).to_string (), "(0,10;200,10);(0,20;200,20);(0,30;200,30)");
+  EXPECT_EQ (e.selected_interacting (e2, size_t (3)).to_string (), "(0,20;200,20);(0,30;200,30)");
+  EXPECT_EQ (e.selected_interacting (e2, size_t (4)).to_string (), "");
+
+  edup = e;
+  edup.select_interacting (e2, size_t (2), size_t(3));
+  EXPECT_EQ (edup.to_string (), "(0,10;200,10);(0,20;200,20);(0,30;200,30)");
+
+  EXPECT_EQ (e.selected_not_interacting (e2).to_string (), "");
+  EXPECT_EQ (e.selected_not_interacting (e2, size_t (2)).to_string (), "(0,0;200,0)");
+  EXPECT_EQ (e.selected_not_interacting (e2, size_t (2), size_t(2)).to_string (), "(0,0;200,0);(0,20;200,20);(0,30;200,30)");
+  EXPECT_EQ (e.selected_not_interacting (e2, size_t (2), size_t(3)).to_string (), "(0,0;200,0)");
+  EXPECT_EQ (e.selected_not_interacting (e2, size_t (3)).to_string (), "(0,0;200,0);(0,10;200,10)");
+  EXPECT_EQ (e.selected_not_interacting (e2, size_t (4)).to_string (), "(0,0;200,0);(0,10;200,10);(0,20;200,20);(0,30;200,30)");
+
+  edup = e;
+  edup.select_not_interacting (e2, size_t (2), size_t(3));
+  EXPECT_EQ (edup.to_string (), "(0,0;200,0)");
+
+  EXPECT_EQ (e.selected_interacting_differential (e2, size_t (2), size_t(3)).first.to_string (), "(0,10;200,10);(0,20;200,20);(0,30;200,30)");
+  EXPECT_EQ (e.selected_interacting_differential (e2, size_t (2), size_t(3)).second.to_string (), "(0,0;200,0)");
+
+  EXPECT_EQ (e.selected_interacting (r2).to_string (), "(0,0;200,0);(0,10;200,10);(0,20;200,20);(0,30;200,30)");
+  EXPECT_EQ (e.selected_interacting (r2, size_t (2)).to_string (), "(0,10;200,10);(0,20;200,20);(0,30;200,30)");
+  EXPECT_EQ (e.selected_interacting (r2, size_t (2), size_t(2)).to_string (), "(0,10;200,10)");
+  EXPECT_EQ (e.selected_interacting (r2, size_t (2), size_t(3)).to_string (), "(0,10;200,10);(0,20;200,20);(0,30;200,30)");
+  EXPECT_EQ (e.selected_interacting (r2, size_t (3)).to_string (), "(0,20;200,20);(0,30;200,30)");
+  EXPECT_EQ (e.selected_interacting (r2, size_t (4)).to_string (), "");
+
+  edup = e;
+  edup.select_interacting (r2, size_t (2), size_t(3));
+  EXPECT_EQ (edup.to_string (), "(0,10;200,10);(0,20;200,20);(0,30;200,30)");
+
+  EXPECT_EQ (e.selected_not_interacting (r2).to_string (), "");
+  EXPECT_EQ (e.selected_not_interacting (r2, size_t (2)).to_string (), "(0,0;200,0)");
+  EXPECT_EQ (e.selected_not_interacting (r2, size_t (2), size_t(2)).to_string (), "(0,0;200,0);(0,20;200,20);(0,30;200,30)");
+  EXPECT_EQ (e.selected_not_interacting (r2, size_t (2), size_t(3)).to_string (), "(0,0;200,0)");
+  EXPECT_EQ (e.selected_not_interacting (r2, size_t (3)).to_string (), "(0,0;200,0);(0,10;200,10)");
+  EXPECT_EQ (e.selected_not_interacting (r2, size_t (4)).to_string (), "(0,0;200,0);(0,10;200,10);(0,20;200,20);(0,30;200,30)");
+
+  edup = e;
+  edup.select_not_interacting (r2, size_t (2), size_t(3));
+  EXPECT_EQ (edup.to_string (), "(0,0;200,0)");
+
+  EXPECT_EQ (e.selected_interacting_differential (r2, size_t (2), size_t(3)).first.to_string (), "(0,10;200,10);(0,20;200,20);(0,30;200,30)");
+  EXPECT_EQ (e.selected_interacting_differential (r2, size_t (2), size_t(3)).second.to_string (), "(0,0;200,0)");
+}
+
+
 TEST(deep_edges_and_cheats)
 {
   db::Layout ly;

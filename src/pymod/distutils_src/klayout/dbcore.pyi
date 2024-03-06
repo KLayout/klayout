@@ -36569,6 +36569,18 @@ class PCellParameterDeclaration:
     r"""
     @brief Type code: string data
     """
+    REJECT: ClassVar[int]
+    r"""
+    @brief Action type: reject violating parameter
+    """
+    ACCEPT: ClassVar[int]
+    r"""
+    @brief Action type: accept violating parameter
+    """
+    USE_DEFAULT: ClassVar[int]
+    r"""
+    @brief Action type: use default instead violating parameter (currently not supported)
+    """
     default: Any
     r"""
     Getter:

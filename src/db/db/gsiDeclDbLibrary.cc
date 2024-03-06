@@ -29,6 +29,7 @@
 #include "dbPCellDeclaration.h"
 #include "dbLibrary.h"
 #include "dbLibraryManager.h"
+#include "tlLog.h"
 
 namespace gsi
 {
@@ -719,12 +720,41 @@ void clear_choices (db::PCellParameterDeclaration *pd)
 
 void add_choice (db::PCellParameterDeclaration *pd, const std::string &d, const tl::Variant &v)
 {
-  std::vector<tl::Variant> vv = pd->get_choices ();
-  std::vector<std::string> dd = pd->get_choice_descriptions ();
-  vv.push_back (v);
-  dd.push_back (d);
-  pd->set_choice_descriptions (dd);
-  pd->set_choices (vv);
+  if (!pd->get_range().has_value())
+  {
+    std::vector<tl::Variant> vv = pd->get_choices ();
+    std::vector<std::string> dd = pd->get_choice_descriptions ();
+    vv.push_back (v);
+    dd.push_back (d);
+    pd->set_choice_descriptions (dd);
+    pd->set_choices (vv);
+  }
+  else
+  {
+    tl::warn
+        << "PCell parameter '" << pd->get_name() << "' has a range constraint, could not add choice '"
+        << v.to_string() << "'";
+  }
+}
+
+void set_range (db::PCellParameterDeclaration *pd, const tl::Variant& low, const tl::Variant& high, const tl::Variant& resolution, unsigned int action)
+{
+  if (pd->get_choices().empty() && pd->get_choice_descriptions().empty())
+  {
+    if ((pd->get_type() == db::PCellParameterDeclaration::t_int
+          || pd->get_type() == db::PCellParameterDeclaration::t_double) &&
+        !low.is_nil() && low.can_convert_to_double() &&
+        !high.is_nil() && high.can_convert_to_double())
+    {
+      pd->set_range(low, high, resolution, db::PCellParameterDeclaration::Action(action));
+    }
+  }
+  else
+  {
+    tl::warn
+        << "PCell parameter '" << pd->get_name() << "' has a choice constraint, could not add range '["
+        << low.to_string() << ", " << high.to_string() << "]'";
+  }
 }
 
 static unsigned int pd_type_int ()
@@ -770,6 +800,21 @@ static unsigned int pd_type_callback ()
 static unsigned int pd_type_none ()
 {
   return (unsigned int) db::PCellParameterDeclaration::t_none;
+}
+
+static unsigned int pd_action_reject ()
+{
+  return (unsigned int) db::PCellParameterDeclaration::t_Reject;
+}
+
+static unsigned int pd_action_accept ()
+{
+  return (unsigned int) db::PCellParameterDeclaration::t_Accept;
+}
+
+static unsigned int pd_action_use_default ()
+{
+  return (unsigned int) db::PCellParameterDeclaration::t_Use_Default;
 }
 
 db::PCellParameterDeclaration *ctor_pcell_parameter (const std::string &name, unsigned int type, const std::string &description)
@@ -874,6 +919,19 @@ Class<db::PCellParameterDeclaration> decl_PCellParameterDeclaration ("db", "PCel
     "This method will add the given value with the given description to the list of\n"
     "choices. If choices are defined, KLayout will show a drop-down box instead of an\n"
     "entry field in the parameter user interface.\n"
+    "If a range is already set for this parameter the choice will not be added and a warning message is showed.\n"
+  ) +
+  gsi::method_ext ("set_range", &set_range, gsi::arg ("low"), gsi::arg ("high"), gsi::arg ("resolution"), gsi::arg ("action"),
+    "@brief Set a range constraint\n"
+    "This method will set a range constraint to the parameter with 'low' and 'high' as minimum and maximum value.\n"
+    "This range constraint will only be set if the parameter-, the low- and the high-type are numeric.\n"
+    "If a choice is already set for this parameter the range will not be set and a warning message is showed.\n"
+    "The optional parameter 'resolution' will give a desired resolution value (currently not used).\n"
+    "The optional parameter 'action' determines the action to be invoked.\n"
+    "This action can be one of three values: REJECT, ACCEPT, USE_DEFAULT. If this failure action\n"
+    "parameter is not specified, then it will be REJECT by default.\n"
+    "If a range constraint is violated this parameter is marked wrong with violation hint in the\n"
+    "parameter user interface.\n"
   ) +
   gsi::method ("choice_values", &db::PCellParameterDeclaration::get_choices,
     "@brief Returns a list of choice values\n"
@@ -897,7 +955,10 @@ Class<db::PCellParameterDeclaration> decl_PCellParameterDeclaration ("db", "PCel
   gsi::method ("TypeLayer", &pd_type_layer, "@brief Type code: a layer (a \\LayerInfo object)") +
   gsi::method ("TypeShape", &pd_type_shape, "@brief Type code: a guiding shape (Box, Edge, Point, Polygon or Path)") +
   gsi::method ("TypeCallback", &pd_type_callback, "@brief Type code: a button triggering a callback\n\nThis code has been introduced in version 0.28.") +
-  gsi::method ("TypeNone", &pd_type_none, "@brief Type code: unspecific type")
+  gsi::method ("TypeNone", &pd_type_none, "@brief Type code: unspecific type") +
+  gsi::method ("REJECT", &pd_action_reject, "@brief Action type: reject violating parameter") +
+  gsi::method ("ACCEPT", &pd_action_accept, "@brief Action type: accept violating parameter") +
+  gsi::method ("USE_DEFAULT", &pd_action_use_default, "@brief Action type: use default instead violating parameter (currently not supported)")
   ,
   "@brief A PCell parameter declaration\n"
   "\n"

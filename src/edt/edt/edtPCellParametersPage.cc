@@ -398,6 +398,18 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
     inner_grid->addWidget (icon_label, row, 0);
     m_icon_widgets.push_back (icon_label);
     m_all_widgets.back ().push_back (icon_label);
+    std::string range;
+
+    if (p->get_range().has_value())
+    {
+      const tl::Variant& low(p->get_range().value().m_low);
+      const tl::Variant& high(p->get_range().value().m_high);
+
+      range = tl::sprintf(
+          " [%s, %s]" ,
+          low.is_nil() ?  "-\u221e" : low.to_string(),
+          high.is_nil() ?  "\u221e" : high.to_string());
+    }
 
     if (p->get_type () != db::PCellParameterDeclaration::t_callback) {
 
@@ -406,7 +418,8 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
         leader = tl::sprintf ("[%s] ", p->get_name ());
       }
 
-      QLabel *l = new QLabel (tl::to_qstring (leader + description), inner_frame);
+      QLabel *l = new QLabel (tl::to_qstring (leader + description + range), inner_frame); 
+
       inner_grid->addWidget (l, row, 1);
       m_all_widgets.back ().push_back (l);
 
@@ -762,6 +775,11 @@ PCellParametersPage::get_parameters_internal (db::ParameterStates &states, bool 
               ps.set_value (tl::Variant (v));
               lay::indicate_error (le, (tl::Exception *) 0);
 
+              if (p->get_range().has_value())
+              {
+                check_range(tl::Variant(v), p->get_range().value());
+              }
+
             } catch (tl::Exception &ex) {
 
               lay::indicate_error (le, &ex);
@@ -785,6 +803,11 @@ PCellParametersPage::get_parameters_internal (db::ParameterStates &states, bool 
 
               ps.set_value (tl::Variant (v));
               lay::indicate_error (le, (tl::Exception *) 0);
+
+              if (p->get_range().has_value())
+              {
+                check_range(tl::Variant(v), p->get_range().value());
+              }
 
             } catch (tl::Exception &ex) {
 
@@ -1081,6 +1104,23 @@ PCellParametersPage::states_from_parameters (db::ParameterStates &states, const 
       ps.set_value (parameters [r]);
     } else {
       ps.set_value (p->get_default ());
+    }
+  }
+}
+
+void
+PCellParametersPage::check_range(const tl::Variant& value, const db::PCellParameterDeclaration::Range& range)
+{
+  if (db::PCellParameterDeclaration::Action(range.m_action) == db::PCellParameterDeclaration::t_Reject)
+  {
+    if (!range.m_low.is_nil() && value < range.m_low)
+    {
+      throw tl::Exception(tl::to_string (tr("Range violation: value < low")));
+    }
+
+    if (!range.m_high.is_nil() && range.m_high < value)
+    {
+      throw tl::Exception(tl::to_string (tr("Range violation: value > high")));
     }
   }
 }

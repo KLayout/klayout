@@ -872,8 +872,6 @@ AsIfFlatEdges::intersections (const Edges &other) const
 EdgesDelegate * 
 AsIfFlatEdges::boolean (const Edges *other, EdgeBoolOp op) const
 {
-  std::set<db::Edge> dots, other_dots;
-
   std::unique_ptr<FlatEdges> output (new FlatEdges (true));
   EdgeBooleanClusterCollectorToShapes cluster_collector (&output->raw_edges (), op);
 
@@ -883,11 +881,7 @@ AsIfFlatEdges::boolean (const Edges *other, EdgeBoolOp op) const
   AddressableEdgeDelivery e (begin ());
 
   for ( ; ! e.at_end (); ++e) {
-    if (op == EdgeIntersections || ! e->is_degenerate ()) {
-      scanner.insert (e.operator-> (), 0);
-    } else if (op != EdgeOr) {
-      dots.insert (*e);
-    }
+    scanner.insert (e.operator-> (), 0);
   }
 
   AddressableEdgeDelivery ee;
@@ -895,49 +889,11 @@ AsIfFlatEdges::boolean (const Edges *other, EdgeBoolOp op) const
   if (other) {
     ee = other->addressable_edges ();
     for ( ; ! ee.at_end (); ++ee) {
-      if (op == EdgeIntersections || ! ee->is_degenerate ()) {
-        scanner.insert (ee.operator-> (), 1);
-      } else if (op != EdgeOr) {
-        other_dots.insert (*ee);
-      }
+      scanner.insert (ee.operator-> (), 1);
     }
   }
 
   scanner.process (cluster_collector, 1, db::box_convert<db::Edge> ());
-
-  //  process dots
-  //  NOTE: currently, dots vs. dots is supported, but not dots vs. edges
-  if (op == EdgeOr) {
-    for (auto i = dots.begin (); i != dots.end (); ++i) {
-      output->insert (*i);
-    }
-    for (auto i = other_dots.begin (); i != other_dots.end (); ++i) {
-      output->insert (*i);
-    }
-  } else if (op == EdgeNot) {
-    for (auto i = dots.begin (); i != dots.end (); ++i) {
-      if (other_dots.find (*i) == other_dots.end ()) {
-        output->insert (*i);
-      }
-    }
-  } else if (op == EdgeXor) {
-    for (auto i = dots.begin (); i != dots.end (); ++i) {
-      if (other_dots.find (*i) == other_dots.end ()) {
-        output->insert (*i);
-      }
-    }
-    for (auto i = other_dots.begin (); i != other_dots.end (); ++i) {
-      if (dots.find (*i) == dots.end ()) {
-        output->insert (*i);
-      }
-    }
-  } else if (op == EdgeAnd) {
-    for (auto i = dots.begin (); i != dots.end (); ++i) {
-      if (other_dots.find (*i) != other_dots.end ()) {
-        output->insert (*i);
-      }
-    }
-  }
 
   return output.release ();
 }
@@ -945,8 +901,6 @@ AsIfFlatEdges::boolean (const Edges *other, EdgeBoolOp op) const
 std::pair<EdgesDelegate *, EdgesDelegate *>
 AsIfFlatEdges::boolean_andnot (const Edges *other) const
 {
-  std::set<db::Edge> dots, other_dots;
-
   std::unique_ptr<FlatEdges> output (new FlatEdges (true));
   std::unique_ptr<FlatEdges> output2 (new FlatEdges (true));
   EdgeBooleanClusterCollectorToShapes cluster_collector (&output->raw_edges (), EdgeAndNot, &output2->raw_edges ());
@@ -957,11 +911,7 @@ AsIfFlatEdges::boolean_andnot (const Edges *other) const
   AddressableEdgeDelivery e (begin ());
 
   for ( ; ! e.at_end (); ++e) {
-    if (! e->is_degenerate ()) {
-      scanner.insert (e.operator-> (), 0);
-    } else {
-      dots.insert (*e);
-    }
+    scanner.insert (e.operator-> (), 0);
   }
 
   AddressableEdgeDelivery ee;
@@ -969,25 +919,11 @@ AsIfFlatEdges::boolean_andnot (const Edges *other) const
   if (other) {
     ee = other->addressable_edges ();
     for ( ; ! ee.at_end (); ++ee) {
-      if (! ee->is_degenerate ()) {
-        scanner.insert (ee.operator-> (), 1);
-      } else {
-        other_dots.insert (*ee);
-      }
+      scanner.insert (ee.operator-> (), 1);
     }
   }
 
   scanner.process (cluster_collector, 1, db::box_convert<db::Edge> ());
-
-  //  process dots
-  //  NOTE: currently, dots vs. dots is supported, but not dots vs. edges
-  for (auto i = dots.begin (); i != dots.end (); ++i) {
-    if (other_dots.find (*i) == other_dots.end ()) {
-      output2->insert (*i);
-    } else {
-      output->insert (*i);
-    }
-  }
 
   return std::make_pair (output.release (), output2.release ());
 }

@@ -1079,13 +1079,20 @@ public:
         m_cl.erase (cli);
       }
 
-    } else if (m_report_single) {
+    } else if (m_report_single && m_ignore_single.find (obj) == m_ignore_single.end ()) {
 
       //  single-object entry: create a cluster and feed it a single-object signature
       Cluster cl (m_cl_template);
       cl.add (obj, prop);
       cl.finish ();
 
+    }
+  }
+
+  void ignore_single (const Obj *o)
+  {
+    if (m_report_single) {
+      m_ignore_single.insert (o);
     }
   }
 
@@ -1166,6 +1173,7 @@ private:
   bool m_report_single;
   cl_type m_cl;
   om_type m_om;
+  std::set<const Obj *> m_ignore_single;
 };
 
 }

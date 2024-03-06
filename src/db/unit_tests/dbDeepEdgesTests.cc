@@ -133,7 +133,7 @@ TEST(3_Edge2EdgeBooleans)
   db::Layout ly;
   {
     std::string fn (tl::testdata ());
-    fn += "/algo/deep_region_l1.gds";
+    fn += "/algo/deep_edges_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (ly);
@@ -145,14 +145,17 @@ TEST(3_Edge2EdgeBooleans)
   db::DeepShapeStore dss;
 
   unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+  unsigned int l21 = ly.get_layer (db::LayerProperties (2, 1));
   unsigned int l3 = ly.get_layer (db::LayerProperties (3, 0));
   unsigned int lempty = ly.insert_layer ();
 
   db::Region r2 (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
+  db::Region r21 (db::RecursiveShapeIterator (ly, top_cell, l21), dss);
   db::Region r3 (db::RecursiveShapeIterator (ly, top_cell, l3), dss);
   db::Region r2and3 = r2 & r3;
 
   db::Edges e2 = r2.edges ();
+  db::Edges e21 = r21.edges ();
   db::Edges e3 = r3.edges ();
   db::Edges e3copy = r3.edges ();
   db::Edges e2and3 = r2and3.edges ();
@@ -177,6 +180,8 @@ TEST(3_Edge2EdgeBooleans)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (24, 0)), eempty & e2and3);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (25, 0)), edots & edotscopy);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (26, 0)), edots & e2);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (27, 0)), e21 & edots);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (28, 0)), edots & e21);
 
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (30, 0)), e3 - e2and3);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (31, 0)), e3 - edots);
@@ -185,6 +190,8 @@ TEST(3_Edge2EdgeBooleans)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (34, 0)), eempty - e2and3);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (35, 0)), edots - edotscopy);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (36, 0)), edots - e2);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (37, 0)), e21 - edots);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (38, 0)), edots - e21);
 
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (40, 0)), e3 ^ e2and3);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (41, 0)), e3 ^ edots);
@@ -193,6 +200,8 @@ TEST(3_Edge2EdgeBooleans)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (44, 0)), eempty ^ e2and3);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (45, 0)), edots ^ edotscopy);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (46, 0)), edots ^ e2);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (47, 0)), e21 ^ edots);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (48, 0)), edots ^ e21);
 
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (50, 0)), e3.andnot(e2and3).first);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (51, 0)), e3.andnot(edots).first);
@@ -201,6 +210,8 @@ TEST(3_Edge2EdgeBooleans)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (54, 0)), eempty.andnot(e2and3).first);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (55, 0)), edots.andnot(edotscopy).first);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (56, 0)), edots.andnot(e2).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (57, 0)), e21.andnot(edots).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (58, 0)), edots.andnot(e21).first);
 
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (60, 0)), e3.andnot(e2and3).second);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (61, 0)), e3.andnot(edots).second);
@@ -209,6 +220,8 @@ TEST(3_Edge2EdgeBooleans)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (64, 0)), eempty.andnot(e2and3).second);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (65, 0)), edots.andnot(edotscopy).second);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (66, 0)), edots.andnot(e2).second);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (67, 0)), e21.andnot(edots).second);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (68, 0)), edots.andnot(e21).second);
 
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (70, 0)), e3.intersections(e2and3));
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (71, 0)), e3.intersections(edots));
@@ -219,6 +232,8 @@ TEST(3_Edge2EdgeBooleans)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (76, 0)), edots.intersections(e2));
   //  test, whether dots are not merged
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (77, 0)), edots.intersections(e2).select_interacting(e2));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (78, 0)), e21.intersections(edots));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (79, 0)), edots.intersections(e21));
 
   CHECKPOINT();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_edges_au3.gds");

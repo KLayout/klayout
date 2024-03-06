@@ -757,9 +757,123 @@ AsIfFlatEdges::run_check (db::edge_relation_type rel, const Edges *other, db::Co
   return result.release ();
 }
 
+EdgesDelegate *
+AsIfFlatEdges::merged () const
+{
+  if (empty ()) {
+    return new db::EmptyEdges ();
+  } else {
+    return boolean (0, EdgeOr);
+  }
+}
+
+EdgesDelegate *
+AsIfFlatEdges::and_with (const Edges &other) const
+{
+  if (empty () || other.empty ()) {
+    return new db::EmptyEdges ();
+  } else {
+    return boolean (&other, EdgeAnd);
+  }
+}
+
+EdgesDelegate *
+AsIfFlatEdges::not_with (const Edges &other) const
+{
+  if (empty ()) {
+    return new db::EmptyEdges ();
+  } else if (other.empty ()) {
+    return clone ();
+  } else {
+    return boolean (&other, EdgeNot);
+  }
+}
+
+std::pair<EdgesDelegate *, EdgesDelegate *>
+AsIfFlatEdges::andnot_with (const Edges &other) const
+{
+  if (empty ()) {
+    return std::make_pair (new db::EmptyEdges (), new db::EmptyEdges ());
+  } else if (other.empty ()) {
+    return std::make_pair (new db::EmptyEdges (), clone ());
+  } else {
+    return boolean_andnot (&other);
+  }
+}
+
+EdgesDelegate *
+AsIfFlatEdges::and_with (const Region &other) const
+{
+  if (empty () || other.empty ()) {
+    return new db::EmptyEdges ();
+  } else {
+    return edge_region_op (other, db::EdgePolygonOp::Inside, true /*include borders*/).first;
+  }
+}
+
+EdgesDelegate *
+AsIfFlatEdges::not_with (const Region &other) const
+{
+  if (empty ()) {
+    return new db::EmptyEdges ();
+  } else if (other.empty ()) {
+    return clone ();
+  } else {
+    return edge_region_op (other, db::EdgePolygonOp::Outside, true /*include borders*/).first;
+  }
+}
+
+std::pair<EdgesDelegate *, EdgesDelegate *>
+AsIfFlatEdges::andnot_with (const Region &other) const
+{
+  if (empty ()) {
+    return std::make_pair (new db::EmptyEdges (), new db::EmptyEdges ());
+  } else if (other.empty ()) {
+    return std::make_pair (new db::EmptyEdges (), clone ());
+  } else {
+    return edge_region_op (other, db::EdgePolygonOp::Both, true /*include borders*/);
+  }
+}
+
+EdgesDelegate *
+AsIfFlatEdges::xor_with (const Edges &other) const
+{
+  if (empty ()) {
+    return other.delegate ()->clone ();
+  } else if (other.empty ()) {
+    return clone ();
+  } else {
+    return boolean (&other, EdgeXor);
+  }
+}
+
+EdgesDelegate *
+AsIfFlatEdges::or_with (const Edges &other) const
+{
+  if (empty ()) {
+    return other.delegate ()->clone ();
+  } else if (other.empty ()) {
+    return clone ();
+  } else {
+    return boolean (&other, EdgeOr);
+  }
+}
+
+EdgesDelegate *
+AsIfFlatEdges::intersections (const Edges &other) const
+{
+  if (empty () || other.empty ()) {
+    return new db::EmptyEdges ();
+  } else {
+    return boolean (&other, EdgeIntersections);
+  }
+}
+
 EdgesDelegate * 
 AsIfFlatEdges::boolean (const Edges *other, EdgeBoolOp op) const
 {
+  std::set<db::Edge> dots, other_dots;
+
   std::unique_ptr<FlatEdges> output (new FlatEdges (true));
   EdgeBooleanClusterCollectorToShapes cluster_collector (&output->raw_edges (), op);
 
@@ -769,8 +883,10 @@ AsIfFlatEdges::boolean (const Edges *other, EdgeBoolOp op) const
   AddressableEdgeDelivery e (begin ());
 
   for ( ; ! e.at_end (); ++e) {
-    if (! e->is_degenerate ()) {
+    if (op == EdgeIntersections || ! e->is_degenerate ()) {
       scanner.insert (e.operator-> (), 0);
+    } else if (op != EdgeOr) {
+      dots.insert (*e);
     }
   }
 
@@ -779,13 +895,49 @@ AsIfFlatEdges::boolean (const Edges *other, EdgeBoolOp op) const
   if (other) {
     ee = other->addressable_edges ();
     for ( ; ! ee.at_end (); ++ee) {
-      if (! ee->is_degenerate ()) {
+      if (op == EdgeIntersections || ! ee->is_degenerate ()) {
         scanner.insert (ee.operator-> (), 1);
+      } else if (op != EdgeOr) {
+        other_dots.insert (*ee);
       }
     }
   }
 
   scanner.process (cluster_collector, 1, db::box_convert<db::Edge> ());
+
+  //  process dots
+  //  NOTE: currently, dots vs. dots is supported, but not dots vs. edges
+  if (op == EdgeOr) {
+    for (auto i = dots.begin (); i != dots.end (); ++i) {
+      output->insert (*i);
+    }
+    for (auto i = other_dots.begin (); i != other_dots.end (); ++i) {
+      output->insert (*i);
+    }
+  } else if (op == EdgeNot) {
+    for (auto i = dots.begin (); i != dots.end (); ++i) {
+      if (other_dots.find (*i) == other_dots.end ()) {
+        output->insert (*i);
+      }
+    }
+  } else if (op == EdgeXor) {
+    for (auto i = dots.begin (); i != dots.end (); ++i) {
+      if (other_dots.find (*i) == other_dots.end ()) {
+        output->insert (*i);
+      }
+    }
+    for (auto i = other_dots.begin (); i != other_dots.end (); ++i) {
+      if (dots.find (*i) == dots.end ()) {
+        output->insert (*i);
+      }
+    }
+  } else if (op == EdgeAnd) {
+    for (auto i = dots.begin (); i != dots.end (); ++i) {
+      if (other_dots.find (*i) != other_dots.end ()) {
+        output->insert (*i);
+      }
+    }
+  }
 
   return output.release ();
 }
@@ -793,6 +945,8 @@ AsIfFlatEdges::boolean (const Edges *other, EdgeBoolOp op) const
 std::pair<EdgesDelegate *, EdgesDelegate *>
 AsIfFlatEdges::boolean_andnot (const Edges *other) const
 {
+  std::set<db::Edge> dots, other_dots;
+
   std::unique_ptr<FlatEdges> output (new FlatEdges (true));
   std::unique_ptr<FlatEdges> output2 (new FlatEdges (true));
   EdgeBooleanClusterCollectorToShapes cluster_collector (&output->raw_edges (), EdgeAndNot, &output2->raw_edges ());
@@ -805,6 +959,8 @@ AsIfFlatEdges::boolean_andnot (const Edges *other) const
   for ( ; ! e.at_end (); ++e) {
     if (! e->is_degenerate ()) {
       scanner.insert (e.operator-> (), 0);
+    } else {
+      dots.insert (*e);
     }
   }
 
@@ -815,11 +971,23 @@ AsIfFlatEdges::boolean_andnot (const Edges *other) const
     for ( ; ! ee.at_end (); ++ee) {
       if (! ee->is_degenerate ()) {
         scanner.insert (ee.operator-> (), 1);
+      } else {
+        other_dots.insert (*ee);
       }
     }
   }
 
   scanner.process (cluster_collector, 1, db::box_convert<db::Edge> ());
+
+  //  process dots
+  //  NOTE: currently, dots vs. dots is supported, but not dots vs. edges
+  for (auto i = dots.begin (); i != dots.end (); ++i) {
+    if (other_dots.find (*i) == other_dots.end ()) {
+      output2->insert (*i);
+    } else {
+      output->insert (*i);
+    }
+  }
 
   return std::make_pair (output.release (), output2.release ());
 }

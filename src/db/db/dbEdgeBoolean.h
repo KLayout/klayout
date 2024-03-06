@@ -272,13 +272,6 @@ struct EdgeBooleanClusterCollector
     //  .. nothing yet ..
   }
 
-  EdgeBooleanClusterCollector (OutputContainer *output, OutputContainer *intersections, EdgeBoolOp op)
-    : db::cluster_collector<db::Edge, size_t, EdgeBooleanCluster<OutputContainer> > (EdgeBooleanCluster<OutputContainer> (output, op), op != EdgeAnd /*report single*/),
-      mp_output (output), mp_intersections (intersections)
-  {
-    //  .. nothing yet ..
-  }
-
   void add (const db::Edge *o1, size_t p1, const db::Edge *o2, size_t p2)
   {
     //  Select edges which are:

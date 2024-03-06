@@ -107,55 +107,25 @@ public:
     return merged ();
   }
 
-  virtual EdgesDelegate *merged () const
-  {
-    return boolean (0, EdgeOr);
-  }
+  virtual EdgesDelegate *merged () const;
 
-  virtual EdgesDelegate *and_with (const Edges &other) const
-  {
-    return boolean (&other, EdgeAnd);
-  }
+  virtual EdgesDelegate *and_with (const Edges &other) const;
 
-  virtual EdgesDelegate *not_with (const Edges &other) const
-  {
-    return boolean (&other, EdgeNot);
-  }
+  virtual EdgesDelegate *not_with (const Edges &other) const;
 
-  virtual std::pair<EdgesDelegate *, EdgesDelegate *> andnot_with (const Edges &other) const
-  {
-    return boolean_andnot (&other);
-  }
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> andnot_with (const Edges &other) const;
 
-  virtual EdgesDelegate *and_with (const Region &other) const
-  {
-    return edge_region_op (other, db::EdgePolygonOp::Inside, true /*include borders*/).first;
-  }
+  virtual EdgesDelegate *and_with (const Region &other) const;
 
-  virtual EdgesDelegate *not_with (const Region &other) const
-  {
-    return edge_region_op (other, db::EdgePolygonOp::Outside, true /*include borders*/).first;
-  }
+  virtual EdgesDelegate *not_with (const Region &other) const;
 
-  virtual std::pair<EdgesDelegate *, EdgesDelegate *> andnot_with (const Region &other) const
-  {
-    return edge_region_op (other, db::EdgePolygonOp::Both, true /*include borders*/);
-  }
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> andnot_with (const Region &other) const;
 
-  virtual EdgesDelegate *xor_with (const Edges &other) const
-  {
-    return boolean (&other, EdgeXor);
-  }
+  virtual EdgesDelegate *xor_with (const Edges &other) const;
 
-  virtual EdgesDelegate *or_with (const Edges &other) const
-  {
-    return boolean (&other, EdgeOr);
-  }
+  virtual EdgesDelegate *or_with (const Edges &other) const;
 
-  virtual EdgesDelegate *intersections (const Edges &other) const
-  {
-    return boolean (&other, EdgeIntersections);
-  }
+  virtual EdgesDelegate *intersections (const Edges &other) const;
 
   virtual EdgesDelegate *add_in_place (const Edges &other)
   {

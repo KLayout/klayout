@@ -916,10 +916,19 @@ EdgesDelegate *DeepEdges::merged () const
   return res.release ();
 }
 
-DeepLayer
+std::pair<DeepLayer, DeepLayer>
 DeepEdges::and_or_not_with (const DeepEdges *other, EdgeBoolOp op) const
 {
+  std::vector<unsigned int> output_layers;
+
   DeepLayer dl_out (deep_layer ().derived ());
+  output_layers.push_back (dl_out.layer ());
+
+  DeepLayer dl_out2;
+  if (op == EdgeAndNot) {
+    dl_out2 = DeepLayer (deep_layer ().derived ());
+    output_layers.push_back (dl_out2.layer ());
+  }
 
   db::EdgeBoolAndOrNotLocalOperation local_op (op);
 
@@ -929,9 +938,9 @@ DeepEdges::and_or_not_with (const DeepEdges *other, EdgeBoolOp op) const
   proc.set_area_ratio (deep_layer ().store ()->max_area_ratio ());
   proc.set_max_vertex_count (deep_layer ().store ()->max_vertex_count ());
 
-  proc.run (&local_op, deep_layer ().layer (), other->deep_layer ().layer (), dl_out.layer ());
+  proc.run (&local_op, deep_layer ().layer (), other->deep_layer ().layer (), output_layers);
 
-  return dl_out;
+  return std::make_pair (dl_out, dl_out2);
 }
 
 std::pair<DeepLayer, DeepLayer>
@@ -965,9 +974,14 @@ EdgesDelegate *DeepEdges::intersections (const Edges &other) const
 {
   const DeepEdges *other_deep = dynamic_cast <const DeepEdges *> (other.delegate ());
 
-  if (empty () || other.empty ()) {
+  if (empty ()) {
 
     return clone ();
+
+  } else if (other.empty ()) {
+
+    //  NOTE: we do not use "EmptyEdges" as we want to maintain
+    return new DeepEdges (deep_layer ().derived ());
 
   } else if (! other_deep) {
 
@@ -975,7 +989,10 @@ EdgesDelegate *DeepEdges::intersections (const Edges &other) const
 
   } else {
 
-    return new DeepEdges (and_or_not_with (other_deep, EdgeIntersections));
+    db::DeepEdges *res = new DeepEdges (and_or_not_with (other_deep, EdgeIntersections).first);
+    //  this is to preserve dots in later steps
+    res->set_merged_semantics (false);
+    return res;
 
   }
 }
@@ -999,7 +1016,7 @@ EdgesDelegate *DeepEdges::and_with (const Edges &other) const
 
   } else {
 
-    return new DeepEdges (and_or_not_with (other_deep, EdgeAnd));
+    return new DeepEdges (and_or_not_with (other_deep, EdgeAnd).first);
 
   }
 }
@@ -1018,7 +1035,7 @@ EdgesDelegate *DeepEdges::not_with (const Edges &other) const
 
   } else {
 
-    return new DeepEdges (and_or_not_with (other_deep, EdgeNot));
+    return new DeepEdges (and_or_not_with (other_deep, EdgeNot).first);
 
   }
 }
@@ -1094,7 +1111,7 @@ EdgesDelegate *DeepEdges::not_with (const Region &other) const
 std::pair<EdgesDelegate *, EdgesDelegate *>
 DeepEdges::andnot_with (const Edges &other) const
 {
-  const DeepRegion *other_deep = dynamic_cast <const DeepRegion *> (other.delegate ());
+  const DeepEdges *other_deep = dynamic_cast <const DeepEdges *> (other.delegate ());
 
   if (empty ()) {
 
@@ -1111,7 +1128,7 @@ DeepEdges::andnot_with (const Edges &other) const
 
   } else {
 
-    auto res = edge_region_op (other_deep, EdgePolygonOp::Both, true /*include borders*/);
+    auto res = and_or_not_with (other_deep, EdgeAndNot);
     return std::make_pair (new DeepEdges (res.first), new DeepEdges (res.second));
 
   }
@@ -1137,8 +1154,8 @@ EdgesDelegate *DeepEdges::xor_with (const Edges &other) const
 
     //  Implement XOR as (A-B)+(B-A) - only this implementation
     //  is compatible with the local processor scheme
-    DeepLayer n1 (and_or_not_with (other_deep, EdgeNot));
-    DeepLayer n2 (other_deep->and_or_not_with (this, EdgeNot));
+    DeepLayer n1 (and_or_not_with (other_deep, EdgeNot).first);
+    DeepLayer n2 (other_deep->and_or_not_with (this, EdgeNot).first);
 
     n1.add_from (n2);
     return new DeepEdges (n1);

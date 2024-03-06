@@ -188,7 +188,7 @@ private:
 
   void init ();
   void ensure_merged_edges_valid () const;
-  DeepLayer and_or_not_with(const DeepEdges *other, EdgeBoolOp op) const;
+  std::pair<DeepLayer, DeepLayer> and_or_not_with (const DeepEdges *other, EdgeBoolOp op) const;
   std::pair<DeepLayer, DeepLayer> edge_region_op (const DeepRegion *other, EdgePolygonOp::mode_t op, bool include_borders) const;
   EdgePairsDelegate *run_check (db::edge_relation_type rel, const Edges *other, db::Coord d, const db::EdgesCheckOptions &options) const;
   virtual EdgesDelegate *pull_generic (const Edges &edges) const;

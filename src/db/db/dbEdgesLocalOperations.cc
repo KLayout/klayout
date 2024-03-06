@@ -94,6 +94,9 @@ EdgeBoolAndOrNotLocalOperation::do_compute_local (db::Layout * /*layout*/, db::C
       if (! is_and) {
         result.insert (subject);
       }
+      if (result2) {
+        result2->insert (subject);
+      }
     } else {
       scanner.insert (&subject, 0);
       any_subject = true;

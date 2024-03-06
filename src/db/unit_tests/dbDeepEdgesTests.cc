@@ -1395,11 +1395,11 @@ TEST(21_EdgeMergeWithDots)
   eee.insert_into (&ly, top_cell.cell_index (), l3);
   eee = db::Edges (db::RecursiveShapeIterator (ly, top_cell, l3), dss);
 
-  EXPECT_EQ (e.merged ().to_string (), "(0,0;100,0)");
+  EXPECT_EQ (e.merged ().to_string (), "(0,0;100,0);(110,0;110,0)");
   //  dots do not participate in merge
   EXPECT_EQ (ee.merged ().to_string (), "(0,0;110,0)");
   //  dots do not participate in merge
-  EXPECT_EQ (eee.merged ().to_string (), "");
+  EXPECT_EQ (eee.merged ().to_string (), "(110,0;110,0)");
 }
 
 TEST(22_InteractingWithCount)

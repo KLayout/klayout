@@ -1004,11 +1004,11 @@ CODE
   # @/code
   #
   # The "mode" argument allows selecting specific edges from polygons.
-  # Allows values are: "convex", "concave", "step", "step_in" and "step_out".
-  # "step" generates edges only that provide a step between two other
+  # Allowed values are: "convex", "concave", "step", "step_in" and "step_out".
+  # "step" generates edges only if they provide a step between two other
   # edges. "step_in" creates edges that make a step towards the inside of
   # the polygon and "step_out" creates edges that make a step towards the
-  # outside (hull contours in clockwise orientation, holes counterclockwise):
+  # outside:
   #
   # @code
   # out = in.drc(primary.edges(convex))

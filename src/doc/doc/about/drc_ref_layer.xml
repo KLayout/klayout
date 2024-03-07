@@ -783,6 +783,11 @@ apply to this method.
 </ul>
 <a name="edges"/><h2>"edges" - Decomposes the layer into single edges</h2>
 <keyword name="edges"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.edges</tt></li>
+<li><tt>layer.edges(mode)</tt></li>
+</ul>
 <p>
 Edge pair collections are decomposed into the individual edges that make up
 the edge pairs. Polygon layers are decomposed into the edges making up the 
@@ -791,6 +796,36 @@ is called on.
 </p><p>
 Merged semantics applies, i.e. the result reflects merged polygons rather than
 individual ones unless raw mode is chosen.
+</p><p>
+The "mode" argument allows selecting specific edges from polygons.
+Allowed values are: "convex", "concave", "step", "step_in" and "step_out".
+"step" generates edges only if they provide a step between two other
+edges. "step_in" creates edges that make a step towards the inside of
+the polygon and "step_out" creates edges that make a step towards the
+outside:
+</p><p>
+<pre>
+out = in.edges(convex)
+</pre>
+</p><p>
+This feature is only available for polygon layers.
+</p><p>
+The following images show the effect of the mode argument:
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_edge_modes1.png"/></td>
+<td><img src="/images/drc_edge_modes2.png"/></td>
+</tr>
+<tr>
+<td><img src="/images/drc_edge_modes3.png"/></td>
+<td><img src="/images/drc_edge_modes4.png"/></td>
+</tr>
+<tr>
+<td><img src="/images/drc_edge_modes5.png"/></td>
+<td><img src="/images/drc_edge_modes6.png"/></td>
+</tr>
+</table>
 </p>
 <a name="edges?"/><h2>"edges?" - Returns true, if the layer is an edge layer</h2>
 <keyword name="edges?"/>

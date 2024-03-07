@@ -3399,17 +3399,34 @@ CODE
     # individual ones unless raw mode is chosen.
     #
     # The "mode" argument allows selecting specific edges from polygons.
-    # Allows values are: "convex", "concave", "step", "step_in" and "step_out".
-    # "step" generates edges only that provide a step between two other
+    # Allowed values are: "convex", "concave", "step", "step_in" and "step_out".
+    # "step" generates edges only if they provide a step between two other
     # edges. "step_in" creates edges that make a step towards the inside of
     # the polygon and "step_out" creates edges that make a step towards the
-    # outside (hull contours in clockwise orientation, holes counterclockwise):
+    # outside:
     #
     # @code
     # out = in.edges(convex)
     # @/code
     #
     # This feature is only available for polygon layers.
+    #
+    # The following images show the effect of the mode argument:
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_edge_modes1.png) @/td
+    #     @td @img(/images/drc_edge_modes2.png) @/td
+    #   @/tr
+    #   @tr 
+    #     @td @img(/images/drc_edge_modes3.png) @/td
+    #     @td @img(/images/drc_edge_modes4.png) @/td
+    #   @/tr
+    #   @tr 
+    #     @td @img(/images/drc_edge_modes5.png) @/td
+    #     @td @img(/images/drc_edge_modes6.png) @/td
+    #   @/tr
+    # @/table
     
     %w(edges).each do |f| 
       eval <<"CODE"

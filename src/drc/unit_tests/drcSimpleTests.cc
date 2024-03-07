@@ -1617,3 +1617,12 @@ TEST(89_deep_with_mag_cop_size_aniso)
   run_test (_this, "89", true);
 }
 
+TEST(90_edge_interaction_with_count)
+{
+  run_test (_this, "90", false);
+}
+
+TEST(90d_edge_interaction_with_count)
+{
+  run_test (_this, "90", true);
+}

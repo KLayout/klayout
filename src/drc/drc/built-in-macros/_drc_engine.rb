@@ -259,20 +259,40 @@ module DRC
       DRCEdgeMode::new(RBA::EdgeMode::Convex)
     end
     
+    def not_convex
+      DRCEdgeMode::new(RBA::EdgeMode::NotConvex)
+    end
+    
     def concave
       DRCEdgeMode::new(RBA::EdgeMode::Concave)
+    end
+    
+    def not_concave
+      DRCEdgeMode::new(RBA::EdgeMode::NotConcave)
     end
     
     def step_in
       DRCEdgeMode::new(RBA::EdgeMode::StepIn)
     end
     
+    def not_step_in
+      DRCEdgeMode::new(RBA::EdgeMode::NotStepIn)
+    end
+    
     def step_out
       DRCEdgeMode::new(RBA::EdgeMode::StepOut)
     end
     
+    def not_step_out
+      DRCEdgeMode::new(RBA::EdgeMode::NotStepOut)
+    end
+    
     def step
       DRCEdgeMode::new(RBA::EdgeMode::Step)
+    end
+    
+    def not_step
+      DRCEdgeMode::new(RBA::EdgeMode::NotStep)
     end
     
     def padding_zero

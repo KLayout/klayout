@@ -170,12 +170,45 @@ contour_to_edges (const db::Polygon::contour_type &contour, PolygonToEdgeProcess
     int s1 = db::vprod_sign (*p0 - *pm1, *p1 - *p0);
     int s2 = db::vprod_sign (*p1 - *p0, *p2 - *p1);
 
-    if (mode == PolygonToEdgeProcessor::All ||
-        (mode == PolygonToEdgeProcessor::Convex && s1 < 0 && s2 < 0) ||
-        (mode == PolygonToEdgeProcessor::Concave && s1 > 0 && s2 > 0) ||
-        (mode == PolygonToEdgeProcessor::StepOut && s1 > 0 && s2 < 0) ||
-        (mode == PolygonToEdgeProcessor::StepIn && s1 < 0 && s2 > 0) ||
-        (mode == PolygonToEdgeProcessor::Step && s1 * s2 < 0)) {
+    bool take = true;
+
+    switch (mode) {
+    case PolygonToEdgeProcessor::All:
+    default:
+      break;
+    case PolygonToEdgeProcessor::Convex:
+      take = s1 < 0 && s2 < 0;
+      break;
+    case PolygonToEdgeProcessor::NotConvex:
+      take = ! (s1 < 0 && s2 < 0);
+      break;
+    case PolygonToEdgeProcessor::Concave:
+      take = s1 > 0 && s2 > 0;
+      break;
+    case PolygonToEdgeProcessor::NotConcave:
+      take = ! (s1 > 0 && s2 > 0);
+      break;
+    case PolygonToEdgeProcessor::StepOut:
+      take = s1 > 0 && s2 < 0;
+      break;
+    case PolygonToEdgeProcessor::NotStepOut:
+      take = ! (s1 > 0 && s2 < 0);
+      break;
+    case PolygonToEdgeProcessor::StepIn:
+      take = s1 < 0 && s2 > 0;
+      break;
+    case PolygonToEdgeProcessor::NotStepIn:
+      take = ! (s1 < 0 && s2 > 0);
+      break;
+    case PolygonToEdgeProcessor::Step:
+      take = s1 * s2 < 0;
+      break;
+    case PolygonToEdgeProcessor::NotStep:
+      take = ! (s1 * s2 < 0);
+      break;
+    }
+
+    if (take) {
       result.push_back (db::Edge (*p0, *p1));
     }
 

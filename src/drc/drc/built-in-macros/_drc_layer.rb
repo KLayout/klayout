@@ -3409,7 +3409,14 @@ CODE
     # out = in.edges(convex)
     # @/code
     #
-    # This feature is only available for polygon layers.
+    # In addition, "not_.." variants are available which selects edges
+    # not qualifying for the specific mode:
+    #
+    # @code
+    # out = in.edges(not_convex)
+    # @/code
+    #
+    # The mode argument is only available for polygon layers.
     #
     # The following images show the effect of the mode argument:
     #

@@ -293,7 +293,8 @@ class DB_PUBLIC PolygonToEdgeProcessor
   : public db::PolygonToEdgeProcessorBase
 {
 public:
-  enum EdgeMode { All = 0, Convex, Concave, StepIn, StepOut, Step };
+  enum EdgeMode { All = 0, Convex, Concave, StepIn, StepOut, Step,
+                           NotConvex, NotConcave, NotStepIn, NotStepOut, NotStep };
 
   PolygonToEdgeProcessor (EdgeMode mode = All);
 

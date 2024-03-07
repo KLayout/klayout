@@ -1014,6 +1014,13 @@ CODE
   # out = in.drc(primary.edges(convex))
   # @/code
   #
+  # In addition, "not_.." variants are available which selects edges
+  # not qualifying for the specific mode:
+  #
+  # @code
+  # out = in.drc(primary.edges(not_convex))
+  # @/code
+  #
   # The mode argument is ignored when translating other objects than
   # polygons.
   

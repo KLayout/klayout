@@ -3258,17 +3258,32 @@ gsi::Enum<db::PolygonToEdgeProcessor::EdgeMode> decl_EdgeMode ("db", "EdgeMode",
   gsi::enum_const ("Concave", db::PolygonToEdgeProcessor::Concave,
     "@brief Selects only concave edges\n"
   ) +
+  gsi::enum_const ("NotConcave", db::PolygonToEdgeProcessor::NotConcave,
+    "@brief Selects only edges which are not concave\n"
+  ) +
   gsi::enum_const ("Convex", db::PolygonToEdgeProcessor::Convex,
     "@brief Selects only convex edges\n"
+  ) +
+  gsi::enum_const ("NotConvex", db::PolygonToEdgeProcessor::NotConvex,
+    "@brief Selects only edges which are not convex\n"
   ) +
   gsi::enum_const ("Step", db::PolygonToEdgeProcessor::Step,
     "@brief Selects only step edges leading inside or outside\n"
   ) +
+  gsi::enum_const ("NotStep", db::PolygonToEdgeProcessor::NotStep,
+    "@brief Selects only edges which are not steps\n"
+  ) +
   gsi::enum_const ("StepIn", db::PolygonToEdgeProcessor::StepIn,
     "@brief Selects only step edges leading inside\n"
   ) +
+  gsi::enum_const ("NotStepIn", db::PolygonToEdgeProcessor::NotStepIn,
+    "@brief Selects only edges which are not steps leading inside\n"
+  ) +
   gsi::enum_const ("StepOut", db::PolygonToEdgeProcessor::StepOut,
     "@brief Selects only step edges leading outside\n"
+  ) +
+  gsi::enum_const ("NotStepOut", db::PolygonToEdgeProcessor::NotStepOut,
+    "@brief Selects only edges which are not steps leading outside\n"
   ),
   "@brief This class represents the edge mode type for \\Region#edges.\n"
   "\n"

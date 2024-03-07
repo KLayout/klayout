@@ -1636,3 +1636,13 @@ TEST(91d_edge_booleans_with_dots)
 {
   run_test (_this, "91", true);
 }
+
+TEST(92_edge_modes)
+{
+  run_test (_this, "92", false);
+}
+
+TEST(92d_edge_modes)
+{
+  run_test (_this, "92", true);
+}

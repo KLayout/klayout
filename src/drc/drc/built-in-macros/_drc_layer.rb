@@ -3387,6 +3387,8 @@ CODE
     # %DRC%
     # @name edges
     # @brief Decomposes the layer into single edges
+    # @synopsis layer.edges
+    # @synopsis layer.edges(mode)
     #
     # Edge pair collections are decomposed into the individual edges that make up
     # the edge pairs. Polygon layers are decomposed into the edges making up the 
@@ -3395,13 +3397,37 @@ CODE
     #
     # Merged semantics applies, i.e. the result reflects merged polygons rather than
     # individual ones unless raw mode is chosen.
+    #
+    # The "mode" argument allows selecting specific edges from polygons.
+    # Allows values are: "convex", "concave", "step", "step_in" and "step_out".
+    # "step" generates edges only that provide a step between two other
+    # edges. "step_in" creates edges that make a step towards the inside of
+    # the polygon and "step_out" creates edges that make a step towards the
+    # outside (hull contours in clockwise orientation, holes counterclockwise):
+    #
+    # @code
+    # out = in.edges(convex)
+    # @/code
+    #
+    # This feature is only available for polygon layers.
     
     %w(edges).each do |f| 
       eval <<"CODE"
-      def #{f}
+      def #{f}(mode = nil)
+        if mode 
+          if ! mode.is_a?(DRC::DRCEdgeMode)
+            raise "The mode argument needs to be a mode type (convex, concave, step, step_in or step_out)"
+          end
+          if ! self.data.is_a?(RBA::Region)
+            raise "The mode argument is only available for polygon layers"
+          end
+          mode = mode.value
+        else
+          mode = RBA::EdgeMode::All
+        end
         @engine._context("#{f}") do
           if self.data.is_a?(RBA::Region)
-            DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Edges, :#{f}))
+            DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Edges, :#{f}, mode))
           elsif self.data.is_a?(RBA::EdgePairs)
             DRCLayer::new(@engine, @engine._cmd(self.data, :#{f}))
           else

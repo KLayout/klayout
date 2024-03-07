@@ -989,6 +989,7 @@ CODE
   # @name edges
   # @brief Converts the input shapes into edges
   # @synopsis expression.edges
+  # @synopsis expression.edges(mode)
   #
   # Polygons will be separated into edges forming their contours. Edge pairs will be 
   # decomposed into individual edges.
@@ -1001,9 +1002,31 @@ CODE
   # @code
   # out = in.drc(primary.edges)
   # @/code
+  #
+  # The "mode" argument allows selecting specific edges from polygons.
+  # Allows values are: "convex", "concave", "step", "step_in" and "step_out".
+  # "step" generates edges only that provide a step between two other
+  # edges. "step_in" creates edges that make a step towards the inside of
+  # the polygon and "step_out" creates edges that make a step towards the
+  # outside (hull contours in clockwise orientation, holes counterclockwise):
+  #
+  # @code
+  # out = in.drc(primary.edges(convex))
+  # @/code
+  #
+  # The mode argument is ignored when translating other objects than
+  # polygons.
   
-  def edges
-    return DRCOpNodeFilter::new(@engine, self, :new_edges, "edges")
+  def edges(mode = nil)
+    if mode 
+      if ! mode.is_a?(DRC::DRCEdgeMode)
+        raise "The mode argument needs to be a mode type (convex, concave, step, step_in or step_out)"
+      end
+      mode = mode.value
+    else
+      mode = RBA::EdgeMode::All
+    end
+    return DRCOpNodeFilter::new(@engine, self, :new_edges, "edges", mode)
   end
   
   # %DRC%

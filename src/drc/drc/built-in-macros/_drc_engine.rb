@@ -255,6 +255,26 @@ module DRC
       DRCJoinFlag::new(true)
     end
     
+    def convex
+      DRCEdgeMode::new(RBA::EdgeMode::Convex)
+    end
+    
+    def concave
+      DRCEdgeMode::new(RBA::EdgeMode::Concave)
+    end
+    
+    def step_in
+      DRCEdgeMode::new(RBA::EdgeMode::StepIn)
+    end
+    
+    def step_out
+      DRCEdgeMode::new(RBA::EdgeMode::StepOut)
+    end
+    
+    def step
+      DRCEdgeMode::new(RBA::EdgeMode::Step)
+    end
+    
     def padding_zero
       DRCDensityPadding::new(:zero)
     end

@@ -770,7 +770,7 @@ public:
    */
   Edges edges () const
   {
-    return Edges (mp_delegate->edges (0));
+    return Edges (mp_delegate->edges (0, 0));
   }
 
   /**
@@ -783,7 +783,34 @@ public:
    */
   Edges edges (const EdgeFilterBase &filter) const
   {
-    return mp_delegate->edges (&filter);
+    return mp_delegate->edges (&filter, 0);
+  }
+
+  /**
+   *  @brief Returns an edge set containing all edges of the polygons in this region
+   *
+   *  Merged semantics applies. In merged semantics, only full, outer edges are delivered.
+   *  This version allows specifying a polygon to edge processor with additional features
+   *  like extraction of convex edges only.
+   */
+  Edges edges (const db::PolygonToEdgeProcessorBase &proc) const
+  {
+    return Edges (mp_delegate->edges (0, &proc));
+  }
+
+  /**
+   *  @brief Returns an edge set containing all edges of the polygons in this region
+   *
+   *  This version allows one to specify a filter by which the edges are filtered before they are
+   *  returned.
+   *
+   *  Merged semantics applies. In merged semantics, only full, outer edges are delivered.
+   *  This version allows specifying a polygon to edge processor with additional features
+   *  like extraction of convex edges only.
+   */
+  Edges edges (const EdgeFilterBase &filter, const db::PolygonToEdgeProcessorBase &proc) const
+  {
+    return mp_delegate->edges (&filter, &proc);
   }
 
   /**

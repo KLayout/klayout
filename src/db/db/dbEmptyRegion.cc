@@ -176,7 +176,7 @@ EmptyRegion::angle_check (double, double, bool) const
 }
 
 EdgesDelegate *
-EmptyRegion::edges (const EdgeFilterBase *) const
+EmptyRegion::edges (const EdgeFilterBase *, const PolygonToEdgeProcessorBase *) const
 {
   return new EmptyEdges ();
 }

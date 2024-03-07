@@ -119,7 +119,7 @@ public:
 
   virtual RegionDelegate *snapped (db::Coord gx, db::Coord gy);
 
-  virtual EdgesDelegate *edges (const EdgeFilterBase *) const;
+  virtual EdgesDelegate *edges (const EdgeFilterBase *filter, const db::PolygonToEdgeProcessorBase *proc) const;
 
   virtual RegionDelegate *process_in_place (const PolygonProcessorBase &filter);
   virtual RegionDelegate *processed (const PolygonProcessorBase &filter) const;

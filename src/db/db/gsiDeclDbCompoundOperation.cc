@@ -316,13 +316,13 @@ static db::CompoundRegionOperationNode *new_minkowski_sum_node4 (db::CompoundReg
   return new db::CompoundRegionProcessingOperationNode (new db::minkowski_sum_computation<std::vector<db::Point> > (p), input, true /*processor is owned*/);
 }
 
-static db::CompoundRegionOperationNode *new_edges (db::CompoundRegionOperationNode *input)
+static db::CompoundRegionOperationNode *new_edges (db::CompoundRegionOperationNode *input, db::PolygonToEdgeProcessor::EdgeMode edge_mode)
 {
   check_non_null (input, "input");
   if (input->result_type () == db::CompoundRegionOperationNode::EdgePairs) {
     return new db::CompoundRegionEdgePairToEdgeProcessingOperationNode (new db::EdgePairToEdgesProcessor (), input, true /*processor is owned*/);
   } else if (input->result_type () == db::CompoundRegionOperationNode::Region) {
-    return new db::CompoundRegionToEdgeProcessingOperationNode (new db::PolygonToEdgeProcessor (), input, true /*processor is owned*/);
+    return new db::CompoundRegionToEdgeProcessingOperationNode (new db::PolygonToEdgeProcessor (edge_mode), input, true /*processor is owned*/);
   } else {
     input->keep ();
     return input;
@@ -726,8 +726,12 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
     "@brief Creates a node filtering the input for rectangular or square shapes.\n"
     "If 'is_square' is true, only squares will be selected. If 'inverse' is true, the non-rectangle/non-square shapes are returned.\n"
   ) +
-  gsi::constructor ("new_edges", &new_edges, gsi::arg ("input"),
+  gsi::constructor ("new_edges", &new_edges, gsi::arg ("input"), gsi::arg ("mode", db::PolygonToEdgeProcessor::All, "All"),
     "@brief Creates a node converting polygons into its edges.\n"
+    "The 'mode' argument allows selecting specific edges when generating edges from a polygon. "
+    "See \\EdgeMode for the various options. By default, all edges are generated from polygons.\n"
+    "\n"
+    "The 'mode' argument has been added in version 0.29."
   ) +
   gsi::constructor ("new_edge_length_filter", &new_edge_length_filter, gsi::arg ("input"), gsi::arg ("inverse", false), gsi::arg ("lmin", 0), gsi::arg ("lmax", std::numeric_limits<db::Edge::distance_type>::max (), "max"),
     "@brief Creates a node filtering edges by their length.\n"

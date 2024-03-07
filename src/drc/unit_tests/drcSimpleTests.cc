@@ -1626,3 +1626,13 @@ TEST(90d_edge_interaction_with_count)
 {
   run_test (_this, "90", true);
 }
+
+TEST(91_edge_booleans_with_dots)
+{
+  run_test (_this, "91", false);
+}
+
+TEST(91d_edge_booleans_with_dots)
+{
+  run_test (_this, "91", true);
+}

@@ -133,9 +133,7 @@ FlatEdges::ensure_merged_edges_valid () const
       scanner.reserve (mp_edges->size ());
 
       for (EdgesIterator e (begin ()); ! e.at_end (); ++e) {
-        if (! e->is_degenerate ()) {
-          scanner.insert (&*e, 0);
-        }
+        scanner.insert (&*e, 0);
       }
 
       scanner.process (cluster_collector, 1, db::box_convert<db::Edge> ());
@@ -145,9 +143,7 @@ FlatEdges::ensure_merged_edges_valid () const
       std::map<db::properties_id_type, std::vector<const db::Edge *> > edges_by_props;
 
       for (EdgesIterator e (begin ()); ! e.at_end (); ++e) {
-        if (! e->is_degenerate ()) {
-          edges_by_props [e.prop_id ()].push_back (e.operator-> ());
-        }
+        edges_by_props [e.prop_id ()].push_back (e.operator-> ());
       }
 
       for (auto s2p = edges_by_props.begin (); s2p != edges_by_props.end (); ++s2p) {

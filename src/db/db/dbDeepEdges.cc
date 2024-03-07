@@ -944,6 +944,26 @@ DeepEdges::and_or_not_with (const DeepEdges *other, EdgeBoolOp op) const
 std::pair<DeepLayer, DeepLayer>
 DeepEdges::edge_region_op (const DeepRegion *other, EdgePolygonOp::mode_t mode, bool include_borders) const
 {
+  //  first, extract dots
+
+  DeepLayer dots (deep_layer ().derived ());
+  bool has_dots = false;
+
+  db::Layout &layout = const_cast<db::Layout &> (dots.layout ());
+
+  for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
+    const db::Shapes &s = c->shapes (deep_layer ().layer ());
+    db::Shapes &st = c->shapes (dots.layer ());
+    for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Edges); ! si.at_end (); ++si) {
+      if (si->edge ().is_degenerate ()) {
+        st.insert (*si);
+        has_dots = true;
+      }
+    }
+  }
+
+  //  normal processing (dots will vanish)
+
   std::vector<unsigned int> output_layers;
 
   DeepLayer dl_out (deep_layer ().derived ());
@@ -964,6 +984,29 @@ DeepEdges::edge_region_op (const DeepRegion *other, EdgePolygonOp::mode_t mode, 
   proc.set_max_vertex_count (deep_layer ().store ()->max_vertex_count ());
 
   proc.run (&op, deep_layer ().layer (), other->deep_layer ().layer (), output_layers);
+
+  if (has_dots) {
+
+    //  process dots
+
+    std::pair<EdgesDelegate *, EdgesDelegate *> res (0, 0);
+
+    if (mode == EdgePolygonOp::Both) {
+      res = db::DeepEdges (dots).selected_interacting_pair_generic_impl (other, include_borders ? EdgesInteract : EdgesInside, size_t (1), std::numeric_limits<size_t>::max ());
+    } else if (mode == EdgePolygonOp::Inside) {
+      res.first = db::DeepEdges (dots).selected_interacting_generic_impl (other, include_borders ? EdgesInteract : EdgesInside, false, size_t (1), std::numeric_limits<size_t>::max ());
+    } else if (mode == EdgePolygonOp::Outside) {
+      res.first = db::DeepEdges (dots).selected_interacting_generic_impl (other, include_borders ? EdgesInteract : EdgesOutside, include_borders, size_t (1), std::numeric_limits<size_t>::max ());
+    }
+
+    if (res.first) {
+      db::DeepEdges (dl_out).add_in_place (db::Edges (res.first));
+    }
+    if (res.second) {
+      db::DeepEdges (dl_out2).add_in_place (db::Edges (res.second));
+    }
+
+  }
 
   return std::make_pair (dl_out, dl_out2);
 }
@@ -1371,9 +1414,6 @@ RegionDelegate *DeepEdges::extended (coord_type ext_b, coord_type ext_e, coord_t
 EdgesDelegate *
 DeepEdges::selected_interacting_generic (const Region &other, EdgeInteractionMode mode, bool inverse, size_t min_count, size_t max_count) const
 {
-  min_count = std::max (size_t (1), min_count);
-  bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
-
   std::unique_ptr<db::DeepRegion> dr_holder;
   const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> (other.delegate ());
   if (! other_deep) {
@@ -1381,6 +1421,15 @@ DeepEdges::selected_interacting_generic (const Region &other, EdgeInteractionMod
     dr_holder.reset (new db::DeepRegion (other, const_cast<db::DeepShapeStore &> (*deep_layer ().store ())));
     other_deep = dr_holder.get ();
   }
+
+  return selected_interacting_generic_impl (other_deep, mode, inverse, min_count, max_count);
+}
+
+EdgesDelegate *
+DeepEdges::selected_interacting_generic_impl (const DeepRegion *other_deep, EdgeInteractionMode mode, bool inverse, size_t min_count, size_t max_count) const
+{
+  min_count = std::max (size_t (1), min_count);
+  bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
 
   const db::DeepLayer &edges = merged_deep_layer ();
 
@@ -1401,9 +1450,6 @@ DeepEdges::selected_interacting_generic (const Region &other, EdgeInteractionMod
 std::pair<EdgesDelegate *, EdgesDelegate *>
 DeepEdges::selected_interacting_pair_generic (const Region &other, EdgeInteractionMode mode, size_t min_count, size_t max_count) const
 {
-  min_count = std::max (size_t (1), min_count);
-  bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
-
   std::unique_ptr<db::DeepRegion> dr_holder;
   const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> (other.delegate ());
   if (! other_deep) {
@@ -1411,6 +1457,15 @@ DeepEdges::selected_interacting_pair_generic (const Region &other, EdgeInteracti
     dr_holder.reset (new db::DeepRegion (other, const_cast<db::DeepShapeStore &> (*deep_layer ().store ())));
     other_deep = dr_holder.get ();
   }
+
+  return selected_interacting_pair_generic_impl (other_deep, mode, min_count, max_count);
+}
+
+std::pair<EdgesDelegate *, EdgesDelegate *>
+DeepEdges::selected_interacting_pair_generic_impl (const db::DeepRegion *other_deep, EdgeInteractionMode mode, size_t min_count, size_t max_count) const
+{
+  min_count = std::max (size_t (1), min_count);
+  bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
 
   const db::DeepLayer &edges = merged_deep_layer ();
 

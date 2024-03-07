@@ -944,6 +944,8 @@ AsIfFlatEdges::edge_region_op (const Region &other, db::EdgePolygonOp::mode_t mo
 
   db::EdgeProcessor ep (report_progress (), progress_desc ());
 
+  bool has_dots = false;
+
   for (db::Region::const_iterator p = other.begin (); ! p.at_end (); ++p) {
     if (p->box ().touches (bbox ())) {
       ep.insert (*p, 0);
@@ -951,7 +953,11 @@ AsIfFlatEdges::edge_region_op (const Region &other, db::EdgePolygonOp::mode_t mo
   }
 
   for (EdgesIterator e (begin ()); ! e.at_end (); ++e) {
-    ep.insert (*e, 1);
+    if (e->is_degenerate ()) {
+      has_dots = true;
+    } else {
+      ep.insert (*e, 1);
+    }
   }
 
   std::unique_ptr<FlatEdges> output_second;
@@ -965,6 +971,36 @@ AsIfFlatEdges::edge_region_op (const Region &other, db::EdgePolygonOp::mode_t mo
   db::EdgeShapeGenerator cc (output->raw_edges (), true /*clear*/, 1 /*tag*/, cc_second.get ());
   db::EdgePolygonOp op (mode, include_borders);
   ep.process (cc, op);
+
+  //  process dots which are not captured by the booleans using the interaction function
+
+  if (has_dots) {
+
+    std::unique_ptr<FlatEdges> dots (new FlatEdges (false));
+    for (EdgesIterator e (begin ()); ! e.at_end (); ++e) {
+      if (e->is_degenerate ()) {
+        dots->insert (*e);
+      }
+    }
+
+    std::pair<EdgesDelegate *, EdgesDelegate *> res (0, 0);
+
+    if (mode == EdgePolygonOp::Both) {
+      res = dots->selected_interacting_pair_generic (other, include_borders ? EdgesInteract : EdgesInside, size_t (1), std::numeric_limits<size_t>::max ());
+    } else if (mode == EdgePolygonOp::Inside) {
+      res.first = dots->selected_interacting_generic (other, include_borders ? EdgesInteract : EdgesInside, false, size_t (1), std::numeric_limits<size_t>::max ());
+    } else if (mode == EdgePolygonOp::Outside) {
+      res.first = dots->selected_interacting_generic (other, include_borders ? EdgesInteract : EdgesOutside, include_borders, size_t (1), std::numeric_limits<size_t>::max ());
+    }
+
+    if (res.first) {
+      output->add_in_place (db::Edges (res.first));
+    }
+    if (res.second) {
+      output_second->add_in_place (db::Edges (res.second));
+    }
+
+  }
 
   return std::make_pair (output.release (), output_second.release ());
 }

@@ -197,6 +197,8 @@ private:
   virtual std::pair<EdgesDelegate *, EdgesDelegate *> selected_interacting_pair_generic (const Edges &edges, EdgeInteractionMode mode, size_t min_count, size_t max_count) const;
   virtual EdgesDelegate *selected_interacting_generic (const Region &region, EdgeInteractionMode mode, bool inverse, size_t min_count, size_t max_count) const;
   virtual std::pair<EdgesDelegate *, EdgesDelegate *> selected_interacting_pair_generic (const Region &region, EdgeInteractionMode mode, size_t min_count, size_t max_count) const;
+  EdgesDelegate *selected_interacting_generic_impl (const DeepRegion *other_deep, EdgeInteractionMode mode, bool inverse, size_t min_count, size_t max_count) const;
+  std::pair<EdgesDelegate *, EdgesDelegate *> selected_interacting_pair_generic_impl (const DeepRegion *other_deep, EdgeInteractionMode mode, size_t min_count, size_t max_count) const;
   DeepEdges *apply_filter (const EdgeFilterBase &filter) const;
 
   template <class Result, class OutputContainer> OutputContainer *processed_impl (const edge_processor<Result> &filter) const;

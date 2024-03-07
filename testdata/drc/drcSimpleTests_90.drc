@@ -74,3 +74,16 @@ e2.interacting(cm90, 2, 2).output(1101, 0)
 e2.interacting(c90, 1, 1).output(1102, 0)
 e2.interacting(cm90, 1, 1).output(1103, 0)
 
+c90.interacting(e1).output(1200, 0)
+c90.not_interacting(e1).output(1201, 0)
+c90.interacting(e2).output(1202, 0)
+c90.not_interacting(e2).output(1203, 0)
+
+c90.interacting(l1).output(1300, 0)
+c90.not_interacting(l1).output(1301, 0)
+c90.interacting(l2).output(1302, 0)
+c90.not_interacting(l2).output(1303, 0)
+
+c90.split_interacting(l1)[0].output(1310, 0)
+c90.split_interacting(l1)[1].output(1311, 0)
+

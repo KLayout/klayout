@@ -783,8 +783,13 @@ size_dvm (db::Region *region, const db::Vector &dv, unsigned int mode)
 static db::Edges
 edges (const db::Region *region, db::PolygonToEdgeProcessor::EdgeMode mode)
 {
-  db::PolygonToEdgeProcessor proc (mode);
-  return region->edges (proc);
+  if (mode != db::PolygonToEdgeProcessor::All) {
+    db::PolygonToEdgeProcessor proc (mode);
+    return region->edges (proc);
+  } else {
+    //  this version is more efficient in the hierarchical case
+    return region->edges ();
+  }
 }
 
 static db::Point default_origin;

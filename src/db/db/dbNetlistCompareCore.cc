@@ -1355,7 +1355,7 @@ static size_t distance3 (const NetGraphNode &a, const NetGraphNode &b1, const Ne
 static void
 analyze_nodes_for_close_matches (const std::multimap<size_t, const NetGraphNode *> &nodes_by_edges1, const std::multimap<size_t, const NetGraphNode *> &nodes_by_edges2, bool layout2ref, db::NetlistCompareLogger *logger, const db::NetGraph &g2)
 {
-  size_t max_search = 100;
+  size_t max_search = 100000;
   double max_fuzz_factor = 0.25;
   size_t max_fuzz_count = 3;
   size_t max_edges_split = 3;  //  by how many edges joining will reduce the edge count at max
@@ -1368,7 +1368,9 @@ analyze_nodes_for_close_matches (const std::multimap<size_t, const NetGraphNode 
     msg = tl::to_string (tr ("Connecting nets %s and %s is making a better match to net %s from reference netlist (fuzziness %d nodes)"));
   }
 
-  for (auto i = nodes_by_edges1.begin (); i != nodes_by_edges1.end (); ++i) {
+  size_t tries = max_search;
+
+  for (auto i = nodes_by_edges1.begin (); i != nodes_by_edges1.end () && tries > 0; ++i) {
 
     if (i->first < min_edges) {
       continue;
@@ -1376,7 +1378,7 @@ analyze_nodes_for_close_matches (const std::multimap<size_t, const NetGraphNode 
 
     std::set<const db::NetGraphNode *> seen;
 
-    for (auto j = nodes_by_edges2.begin (); j != nodes_by_edges2.end (); ++j) {
+    for (auto j = nodes_by_edges2.begin (); j != nodes_by_edges2.end () && tries > 0; ++j) {
 
       seen.insert (j->second);
 
@@ -1407,7 +1409,6 @@ analyze_nodes_for_close_matches (const std::multimap<size_t, const NetGraphNode 
 
       auto k = nodes_by_edges2.lower_bound (ne);
 
-      size_t tries = max_search;
       for ( ; k != nodes_by_edges2.end () && j->first + k->first < i->first + max_fuzz_count + max_edges_split && tries > 0; ++k) {
 
         if (seen.find (k->second) != seen.end ()) {
@@ -1436,6 +1437,8 @@ analyze_nodes_for_close_matches (const std::multimap<size_t, const NetGraphNode 
 void
 NetlistCompareCore::analyze_failed_matches () const
 {
+  tl::SelfTimer timer (tl::verbosity () >= 21, "Analyzing failed matches");
+
   //  Determine the range of nodes with same identity
 
   std::vector<NetGraphNode::edge_type> no_edges;

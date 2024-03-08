@@ -1041,6 +1041,7 @@ private:
   void join_nets_from_pattern (db::Circuit &c, const tl::GlobPattern &p);
   void join_nets_from_pattern (db::Circuit &c, const std::set<std::string> &p);
   void check_must_connect (const db::Circuit &c, const db::Net &a, const db::Net &b);
+  void check_must_connect_impl (const db::Circuit &c, const db::Net &a, const db::Net &b, const db::Circuit &c_org, const db::Net &a_org, const db::Net &b_org, std::vector<const db::SubCircuit *> &path);
 
   //  implementation of NetlistManipulationCallbacks
   virtual size_t link_net_to_parent_circuit (const Net *subcircuit_net, Circuit *parent_circuit, const DCplxTrans &trans);

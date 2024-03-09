@@ -257,6 +257,83 @@ private:
   bool m_insert;
 };
 
+struct SetLayoutMetaInfoOp
+  : public LayoutOp
+{
+  SetLayoutMetaInfoOp (db::Layout::meta_info_name_id_type name_id, const db::MetaInfo *f, const db::MetaInfo *t)
+    : m_name_id (name_id), m_has_from (f != 0), m_has_to (t != 0)
+  {
+    if (f) {
+      m_from = *f;
+    }
+    if (t) {
+      m_to = *t;
+    }
+  }
+
+  virtual void redo (db::Layout *layout) const
+  {
+    if (! m_has_to) {
+      layout->remove_meta_info (m_name_id);
+    } else {
+      layout->add_meta_info (m_name_id, m_to);
+    }
+  }
+
+  virtual void undo (db::Layout *layout) const
+  {
+    if (! m_has_from) {
+      layout->remove_meta_info (m_name_id);
+    } else {
+      layout->add_meta_info (m_name_id, m_from);
+    }
+  }
+
+private:
+  db::Layout::meta_info_name_id_type m_name_id;
+  bool m_has_from, m_has_to;
+  db::MetaInfo m_from, m_to;
+};
+
+struct SetCellMetaInfoOp
+  : public LayoutOp
+{
+  SetCellMetaInfoOp (db::cell_index_type ci, db::Layout::meta_info_name_id_type name_id, const db::MetaInfo *f, const db::MetaInfo *t)
+    : m_ci (ci), m_name_id (name_id), m_has_from (f != 0), m_has_to (t != 0)
+  {
+    if (f) {
+      m_from = *f;
+    }
+    if (t) {
+      m_to = *t;
+    }
+  }
+
+  virtual void redo (db::Layout *layout) const
+  {
+    if (! m_has_to) {
+      layout->remove_meta_info (m_ci, m_name_id);
+    } else {
+      layout->add_meta_info (m_ci, m_name_id, m_to);
+    }
+  }
+
+  virtual void undo (db::Layout *layout) const
+  {
+    if (! m_has_from) {
+      layout->remove_meta_info (m_ci, m_name_id);
+    } else {
+      layout->add_meta_info (m_ci, m_name_id, m_from);
+    }
+  }
+
+private:
+  db::cell_index_type m_ci;
+  db::Layout::meta_info_name_id_type m_name_id;
+  bool m_has_from, m_has_to;
+  db::MetaInfo m_from, m_to;
+};
+
 // -----------------------------------------------------------------
 //  Implementation of the ProxyContextInfo class
 
@@ -848,6 +925,9 @@ Layout::delete_cells (const std::set<cell_index_type> &cells_to_delete)
   //  cell child objects that must remain.
   for (std::set<cell_index_type>::const_iterator c = cells_to_delete.begin (); c != cells_to_delete.end (); ++c) {
 
+    //  supports undo
+    clear_meta (*c);
+
     if (manager () && manager ()->transacting ()) {
        
       //  note the "take" method - this takes out the cell
@@ -917,9 +997,12 @@ Layout::delete_cell (cell_index_type id)
   //  a backup container for the cell. This is necessary since the ID's within manager are given to
   //  cell child objects that must remain.
 
+  //  supports undo
+  clear_meta (id);
+
   if (manager () && manager ()->transacting ()) {
      
-    //  not the "take" method - this takes out the cell
+    //  note the "take" method - this takes out the cell
     std::string cn (cell_name (id));
     manager ()->queue (this, new NewRemoveCellOp (id, cn, true /*remove*/, take_cell (id)));
 
@@ -1869,18 +1952,36 @@ Layout::meta_info_name_id (const std::string &name) const
 void
 Layout::clear_meta ()
 {
+  if (manager () && manager ()->transacting ()) {
+    for (auto i = m_meta_info.begin (); i != m_meta_info.end (); ++i) {
+      manager ()->queue (this, new SetLayoutMetaInfoOp (i->first, &i->second, 0));
+    }
+  }
+
   m_meta_info.clear ();
 }
 
 void
 Layout::add_meta_info (meta_info_name_id_type name_id, const MetaInfo &i)
 {
+  if (manager () && manager ()->transacting ()) {
+    auto e = m_meta_info.find (name_id);
+    manager ()->queue (this, new SetLayoutMetaInfoOp (name_id, e != m_meta_info.end () ? &e->second : 0, &i));
+  }
+
   m_meta_info[name_id] = i;
 }
 
 void
 Layout::remove_meta_info (meta_info_name_id_type name_id)
 {
+  if (manager () && manager ()->transacting ()) {
+    auto e = m_meta_info.find (name_id);
+    if (e != m_meta_info.end ()) {
+      manager ()->queue (this, new SetLayoutMetaInfoOp (name_id, &e->second, 0));
+    }
+  }
+
   m_meta_info.erase (name_id);
 }
 
@@ -1901,12 +2002,41 @@ Layout::has_meta_info (meta_info_name_id_type name_id) const
 void
 Layout::clear_meta (db::cell_index_type ci)
 {
+  if (manager () && manager ()->transacting ()) {
+    auto ib = begin_meta (ci);
+    auto ie = end_meta (ci);
+    for (auto i = ib; i != ie; ++i) {
+      manager ()->queue (this, new SetCellMetaInfoOp (ci, i->first, &i->second, 0));
+    }
+  }
+
   m_meta_info_by_cell.erase (ci);
+}
+
+void
+Layout::clear_all_meta ()
+{
+  clear_meta ();
+  while (! m_meta_info_by_cell.empty ()) {
+    clear_meta (m_meta_info_by_cell.begin ()->first);
+  }
 }
 
 void
 Layout::add_meta_info (db::cell_index_type ci, meta_info_name_id_type name_id, const MetaInfo &i)
 {
+  if (manager () && manager ()->transacting ()) {
+    const MetaInfo *from = 0;
+    auto c = m_meta_info_by_cell.find (ci);
+    if (c != m_meta_info_by_cell.end ()) {
+      auto e = c->second.find (name_id);
+      if (e != c->second.end ()) {
+        from = &e->second;
+      }
+    }
+    manager ()->queue (this, new SetCellMetaInfoOp (ci, name_id, from, &i));
+  }
+
   m_meta_info_by_cell[ci][name_id] = i;
 }
 
@@ -1914,6 +2044,18 @@ void
 Layout::remove_meta_info (db::cell_index_type ci, meta_info_name_id_type name_id)
 {
   auto c = m_meta_info_by_cell.find (ci);
+
+  if (manager () && manager ()->transacting ()) {
+    const MetaInfo *from = 0;
+    if (c != m_meta_info_by_cell.end ()) {
+      auto e = c->second.find (name_id);
+      if (e != c->second.end ()) {
+        from = &e->second;
+      }
+    }
+    manager ()->queue (this, new SetCellMetaInfoOp (ci, name_id, from, 0));
+  }
+
   if (c != m_meta_info_by_cell.end ()) {
     c->second.erase (name_id);
   }
@@ -1942,6 +2084,40 @@ Layout::has_meta_info (db::cell_index_type ci, meta_info_name_id_type name_id) c
     return c->second.find (name_id) != c->second.end ();
   } else {
     return false;
+  }
+}
+
+void
+Layout::merge_meta_info (const db::Layout &other)
+{
+  for (auto mi = other.begin_meta (); mi != other.end_meta (); ++mi) {
+    add_meta_info (other.meta_info_name (mi->first), mi->second);
+  }
+}
+
+void
+Layout::merge_meta_info (db::cell_index_type into_cell, const db::Layout &other, db::cell_index_type other_cell)
+{
+  auto mi_begin = other.begin_meta (other_cell);
+  auto mi_end = other.end_meta (other_cell);
+  for (auto mi = mi_begin; mi != mi_end; ++mi) {
+    add_meta_info (into_cell, other.meta_info_name (mi->first), mi->second);
+  }
+}
+
+void
+Layout::merge_meta_info (const db::Layout &other, const db::CellMapping &cm)
+{
+  for (auto i = cm.begin (); i != cm.end (); ++i) {
+    merge_meta_info (i->second, other, i->first);
+  }
+}
+
+void
+Layout::copy_meta_info (const db::Layout &other, const db::CellMapping &cm)
+{
+  for (auto i = cm.begin (); i != cm.end (); ++i) {
+    copy_meta_info (i->second, other, i->first);
   }
 }
 

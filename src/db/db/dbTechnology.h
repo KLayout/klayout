@@ -468,6 +468,30 @@ public:
   }
 
   /**
+   *  @brief Gets the default grids
+   */
+  const std::string &default_grids () const
+  {
+    return m_default_grids;
+  }
+
+  /**
+   *  @brief Gets the default grids, parsed as a list of double values
+   */
+  std::vector<double> default_grid_list () const;
+
+  /**
+   *  @brief Sets the default default grids
+   */
+  void set_default_grids (const std::string &default_grids)
+  {
+    if (default_grids != m_default_grids) {
+      m_default_grids = default_grids;
+      technology_changed ();
+    }
+  }
+
+  /**
    *  @brief Gets the layer properties file path (empty if none is specified)
    */
   const std::string &layer_properties_file () const
@@ -650,6 +674,7 @@ private:
   std::string m_name, m_description, m_group;
   std::string m_grain_name;
   double m_dbu;
+  std::string m_default_grids;
   std::string m_explicit_base_path, m_default_base_path;
   db::LoadLayoutOptions m_load_layout_options;
   db::SaveLayoutOptions m_save_layout_options;

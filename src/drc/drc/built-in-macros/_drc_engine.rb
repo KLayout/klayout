@@ -322,6 +322,18 @@ module DRC
       end
     end
     
+    def without_touching_corners(f = true)
+      self._context("without_touching_corners") do
+        DRCZeroDistanceMode::new(f ? RBA::Region::IncludeZeroDistanceWhenOverlapping : RBA::Region::IncludeZeroDistanceWhenTouching)
+      end
+    end
+    
+    def without_touching_edges(f = true)
+      self._context("without_touching_edges") do
+        DRCZeroDistanceMode::new(f ? RBA::Region::NeverIncludeZeroDistance : RBA::Region::IncludeZeroDistanceWhenTouching)
+      end
+    end
+    
     def euclidian
       DRCMetrics::new(RBA::Region::Euclidian)
     end

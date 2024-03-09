@@ -487,7 +487,7 @@ SaltGrain::load (tl::InputStream &p)
 void
 SaltGrain::save () const
 {
-  save (tl::to_string (QDir (tl::to_qstring (path ())).filePath (tl::to_qstring (grain_filename))));
+  save (tl::to_string (QDir (tl::to_qstring (path ())).filePath (tl::to_qstring (SaltGrain::spec_file ()))));
 }
 
 void
@@ -503,7 +503,7 @@ SaltGrain::from_path (const std::string &path)
   QDir dir (tl::to_qstring (path));
 
   SaltGrain g;
-  g.load (tl::to_string (dir.filePath (tl::to_qstring (grain_filename))));
+  g.load (tl::to_string (dir.filePath (tl::to_qstring (SaltGrain::spec_file ()))));
   g.set_path (tl::to_string (dir.absolutePath ()));
   return g;
 }
@@ -552,7 +552,7 @@ SaltGrain::stream_from_url (std::string &generic_url, double timeout, tl::InputH
 
   } else {
 
-    return new tl::InputStream (url);
+    return new tl::InputStream (url + "/" + SaltGrain::spec_file ());
 
   }
 }
@@ -576,10 +576,10 @@ SaltGrain::is_grain (const std::string &path)
 
   if (path[0] != ':') {
     QDir dir (tl::to_qstring (path));
-    QString gf = dir.filePath (tl::to_qstring (grain_filename));
+    QString gf = dir.filePath (tl::to_qstring (SaltGrain::spec_file ()));
     return QFileInfo (gf).exists ();
   } else {
-    return QResource (tl::to_qstring (path + "/" + grain_filename)).isValid ();
+    return QResource (tl::to_qstring (path + "/" + SaltGrain::spec_file ())).isValid ();
   }
 }
 

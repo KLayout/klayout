@@ -493,55 +493,59 @@ bool DB_PUBLIC is_non_orientable_polygon (const db::Polygon &poly, std::vector<d
  *  It is used for example by the rasterize function to collect area values 
  *  on a per-pixel basis.
  */
-class DB_PUBLIC AreaMap
+template <class C>
+class DB_PUBLIC area_map
 {
 public:
-  typedef db::coord_traits<db::Coord>::area_type area_type;
+  typedef typename db::coord_traits<C>::area_type area_type;
+  typedef db::point<C> point_type;
+  typedef db::vector<C> vector_type;
+  typedef db::box<C> box_type;
 
   /**
    *  @brief Constructor
    */
-  AreaMap ();
+  area_map ();
 
   /**
    *  @brief Copy constructor
    */
-  AreaMap (const AreaMap &);
+  area_map (const area_map &);
 
   /**
    *  @brief Constructor
    */
-  AreaMap (const db::Point &p0, const db::Vector &d, size_t nx, size_t ny);
+  area_map (const point_type &p0, const vector_type &d, size_t nx, size_t ny);
 
   /**
    *  @brief Constructor with pixel size
    */
-  AreaMap (const db::Point &p0, const db::Vector &d, const db::Vector &p, size_t nx, size_t ny);
+  area_map (const point_type &p0, const vector_type &d, const vector_type &p, size_t nx, size_t ny);
 
   /**
    *  @brief Destructor
    */
-  ~AreaMap ();
+  ~area_map ();
 
   /**
    *  @brief Assignment
    */
-  AreaMap &operator= (const AreaMap &);
+  area_map &operator= (const area_map &);
 
   /**
    *  @brief Reinitialize
    */
-  void reinitialize (const db::Point &p0, const db::Vector &d, size_t nx, size_t ny);
+  void reinitialize (const point_type &p0, const vector_type &d, size_t nx, size_t ny);
 
   /**
    *  @brief Reinitialize with pixel size
    */
-  void reinitialize (const db::Point &p0, const db::Vector &d, const db::Vector &p, size_t nx, size_t ny);
+  void reinitialize (const point_type &p0, const vector_type &d, const vector_type &p, size_t nx, size_t ny);
 
   /**
    *  @brief Swap of two maps
    */
-  void swap (AreaMap &other);
+  void swap (area_map &other);
 
   /**
    *  @brief Get the area of one pixel
@@ -578,7 +582,7 @@ public:
   /**
    *  @brief The origin
    */
-  const db::Point &p0 () const
+  const point_type &p0 () const
   {
     return m_p0;
   }
@@ -586,7 +590,7 @@ public:
   /**
    *  @brief Move the origin
    */
-  void move (const db::Vector &d)
+  void move (const vector_type &d)
   {
     m_p0 += d;
   }
@@ -594,7 +598,7 @@ public:
   /**
    *  @brief The per-pixel displacement vector (pixel size)
    */
-  const db::Vector &d () const
+  const vector_type &d () const
   {
     return m_d;
   }
@@ -602,7 +606,7 @@ public:
   /**
    *  @brief The pixel size (must be less than d)
    */
-  const db::Vector &p () const
+  const vector_type &p () const
   {
     return m_p;
   }
@@ -610,7 +614,7 @@ public:
   /**
    *  @brief Compute the bounding box of the area map
    */
-  db::Box bbox () const;
+  box_type bbox () const;
 
   /**
    *  @brief Compute the total area
@@ -632,11 +636,14 @@ public:
 
 private:
   area_type *mp_av;
-  db::Point m_p0;
-  db::Vector m_d;
-  db::Vector m_p;
+  point_type m_p0;
+  vector_type m_d;
+  vector_type m_p;
   size_t m_nx, m_ny;
 };
+
+typedef area_map<db::Coord> AreaMap;
+typedef area_map<db::DCoord> DAreaMap;
 
 /**
  *  @brief Rasterize the polygon into the given area map
@@ -647,6 +654,16 @@ private:
  *  Returns a value indicating whether the map will be non-empty.
  */
 bool DB_PUBLIC rasterize (const db::Polygon &polygon, db::AreaMap &am);
+
+/**
+ *  @brief Rasterize the polygon into the given area map (double version)
+ *
+ *  This will decompose the polygon and produce per-pixel area values for the given
+ *  polygon. The area contributions will be added to the given area map.
+ *
+ *  Returns a value indicating whether the map will be non-empty.
+ */
+bool DB_PUBLIC rasterize (const db::DPolygon &polygon, db::DAreaMap &am);
 
 /**
  *  @brief Minkowski sum of an edge and a polygon

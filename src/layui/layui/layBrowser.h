@@ -138,6 +138,7 @@ private:
 
   void closeEvent (QCloseEvent *);
   void accept ();
+  void reject ();
 };
 
 }

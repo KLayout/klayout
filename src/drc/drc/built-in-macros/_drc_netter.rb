@@ -702,7 +702,8 @@ module DRC
         @l2n = RBA::LayoutToNetlist::new(@engine._dss)
       else
         layout = @engine.source.layout
-        @l2n = RBA::LayoutToNetlist::new(layout.top_cell.name, layout.dbu)
+        cell_name = @engine.source.cell_name
+        @l2n = RBA::LayoutToNetlist::new(cell_name, layout.dbu)
       end
 
       @l2n.name = "DRC"

@@ -95,6 +95,16 @@ Browser::accept ()
   }
 }
 
+void
+Browser::reject ()
+{
+  if (active ()) {
+    m_active = false;
+    deactivated ();
+    QDialog::reject ();
+  }
+}
+
 }
 
 #endif

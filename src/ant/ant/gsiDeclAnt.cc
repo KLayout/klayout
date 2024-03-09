@@ -434,6 +434,11 @@ static int ruler_mode_auto_metric ()
   return ant::Template::RulerAutoMetric;
 }
 
+static int ruler_mode_auto_metric_edge ()
+{
+  return ant::Template::RulerAutoMetricEdge;
+}
+
 static int ruler_mode_three_clicks ()
 {
   return ant::Template::RulerThreeClicks;
@@ -524,6 +529,12 @@ gsi::Class<AnnotationRef> decl_Annotation (decl_BasicAnnotation, "lay", "Annotat
     "In auto-metric mode, a ruler can be placed with a single click and p1/p2 will be determined from the neighborhood.\n"
     "\n"
     "This constant has been introduced in version 0.25"
+  ) +
+  gsi::method ("RulerModeAutoMetricEdge", &gsi::ruler_mode_auto_metric_edge,
+    "@brief Specifies edge-sensitive auto-metric ruler mode for the \\register_template method\n"
+    "In auto-metric mode, a ruler can be placed with a single click and p1/p2 will be determined from the edge it is placed on.\n"
+    "\n"
+    "This constant has been introduced in version 0.29"
   ) +
   gsi::method ("RulerThreeClicks", &gsi::ruler_mode_three_clicks,
     "@brief Specifies three-click ruler mode for the \\register_template method\n"

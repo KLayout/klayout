@@ -1,4 +1,4 @@
-#! /usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #========================================================================================
@@ -6,7 +6,7 @@
 #
 # Here are utility functions and classes ...
 #  for building KLayout (http://www.klayout.de/index.php)
-#  version 0.26.1 or later on different Apple Mac OSX platforms.
+#  version 0.28.17 or later on different Apple Mac OSX platforms.
 #
 # This file is imported by 'build4mac.py' script.
 #========================================================================================

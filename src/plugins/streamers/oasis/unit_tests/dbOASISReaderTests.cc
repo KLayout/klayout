@@ -602,3 +602,21 @@ TEST(Bug_1474)
     EXPECT_EQ (ex.msg (), "Cell named ADDHX2 with ID 4 was already given name SEDFFTRX2 (position=763169, cell=)");
   }
 }
+
+TEST(DuplicateCellname)
+{
+  db::Manager m (false);
+  db::Layout layout (&m);
+
+  try {
+    tl::InputStream file (tl::testdata () + "/oasis/duplicate_cellname.oas");
+    db::OASISReader reader (file);
+    reader.read (layout);
+    EXPECT_EQ (false, true);
+  } catch (tl::CancelException &ex) {
+    //  Seen when private test data is not installed
+    throw;
+  } catch (tl::Exception &ex) {
+    EXPECT_EQ (ex.msg (), "Same cell name TOP, but different IDs: 3 and 0 (position=1070, cell=)");
+  }
+}

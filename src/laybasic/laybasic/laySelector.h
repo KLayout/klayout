@@ -69,14 +69,7 @@ public:
   virtual bool mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio);
   virtual bool mouse_double_click_event (const db::DPoint &p, unsigned int buttons, bool prio);
   virtual bool wheel_event (int delta, bool horizontal, const db::DPoint &p, unsigned int buttons, bool prio);
-
-  /**
-   *  @brief Reset the hover timer for the transient selection
-   *
-   *  This method may be used by other services (in particular Move) to avoid the transient to
-   *  be triggered from a move operation.
-   */
-  void hover_reset ();
+  virtual void hover_reset ();
 
 #if defined (HAVE_QT)
 public slots:

@@ -1,0 +1,34 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+end
+
+l1 = input(1, 0)
+
+l1.output(1, 0)
+
+l1.space(600.nm).output(100, 0)
+l1.space(600.nm, without_touching_corners).output(101, 0)
+l1.space(600.nm, without_touching_edges).output(102, 0)
+l1.space(600.nm, DRCZeroDistanceMode::new(RBA::ZeroDistanceMode::IncludeZeroDistanceWhenCollinearAndTouching)).output(103, 0)
+
+l1.space(600.nm, projection).output(110, 0)
+l1.space(600.nm, projection, without_touching_corners).output(111, 0)
+l1.space(600.nm, projection, without_touching_edges).output(112, 0)
+l1.space(600.nm, projection, DRCZeroDistanceMode::new(RBA::ZeroDistanceMode::IncludeZeroDistanceWhenCollinearAndTouching)).output(113, 0)
+
+l1.space(600.nm, square).output(120, 0)
+l1.space(600.nm, square, without_touching_corners).output(121, 0)
+l1.space(600.nm, square, without_touching_edges).output(122, 0)
+l1.space(600.nm, square, DRCZeroDistanceMode::new(RBA::ZeroDistanceMode::IncludeZeroDistanceWhenCollinearAndTouching)).output(123, 0)
+
+l1.data.min_coherence = true
+
+l1.space(600.nm).output(200, 0)
+l1.space(600.nm, without_touching_corners).output(201, 0)
+l1.space(600.nm, without_touching_edges).output(202, 0)
+l1.space(600.nm, DRCZeroDistanceMode::new(RBA::ZeroDistanceMode::IncludeZeroDistanceWhenCollinearAndTouching)).output(203, 0)
+

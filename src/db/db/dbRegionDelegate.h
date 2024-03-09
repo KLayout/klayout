@@ -106,62 +106,6 @@ public:
   virtual bool wants_variants () const = 0;
 };
 
-/**
- *  @brief A template base class for polygon processors
- *
- *  A polygon processor can turn a polygon into something else.
- */
-template <class Result>
-class DB_PUBLIC polygon_processor
-{
-public:
-  /**
-   *  @brief Constructor
-   */
-  polygon_processor () { }
-
-  /**
-   *  @brief Destructor
-   */
-  virtual ~polygon_processor () { }
-
-  /**
-   *  @brief Performs the actual processing
-   *  This method will take the input polygon from "polygon" and puts the results into "res".
-   *  "res" can be empty - in this case, the polygon will be skipped.
-   */
-  virtual void process (const db::Polygon &polygon, std::vector<Result> &res) const = 0;
-
-  /**
-   *  @brief Returns the transformation reducer for building cell variants
-   *  This method may return 0. In this case, not cell variants are built.
-   */
-  virtual const TransformationReducer *vars () const = 0;
-
-  /**
-   *  @brief Returns true, if the result of this operation can be regarded "merged" always.
-   */
-  virtual bool result_is_merged () const = 0;
-
-  /**
-   *  @brief Returns true, if the result of this operation must not be merged.
-   *  This feature can be used, if the result represents "degenerated" objects such
-   *  as point-like edges. These must not be merged. Otherwise they disappear.
-   */
-  virtual bool result_must_not_be_merged () const = 0;
-
-  /**
-   *  @brief Returns true, if the processor wants raw (not merged) input
-   */
-  virtual bool requires_raw_input () const = 0;
-
-  /**
-   *  @brief Returns true, if the processor wants to build variants
-   *  If not true, the processor accepts shape propagation as variant resolution.
-   */
-  virtual bool wants_variants () const = 0;
-};
-
 typedef shape_collection_processor<db::Polygon, db::Polygon> PolygonProcessorBase;
 typedef shape_collection_processor<db::Polygon, db::Edge> PolygonToEdgeProcessorBase;
 typedef shape_collection_processor<db::Polygon, db::EdgePair> PolygonToEdgePairProcessorBase;

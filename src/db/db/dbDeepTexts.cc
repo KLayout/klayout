@@ -474,6 +474,18 @@ DeepTexts *DeepTexts::apply_filter (const TextFilterBase &filter) const
   return res.release ();
 }
 
+TextsDelegate *DeepTexts::process_in_place (const TextProcessorBase &filter)
+{
+  //  TODO: implement to be really in-place
+  return processed (filter);
+}
+
+TextsDelegate *
+DeepTexts::processed (const TextProcessorBase &filter) const
+{
+  return shape_collection_processed_impl<db::Text, db::Text, db::DeepTexts> (deep_layer (), filter);
+}
+
 RegionDelegate *
 DeepTexts::processed_to_polygons (const TextToPolygonProcessorBase &filter) const
 {

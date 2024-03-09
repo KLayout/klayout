@@ -30,6 +30,60 @@ def csort(s)
   s.split(/(?<=\));(?=\()/).sort.join(";")
 end
 
+class PerpendicularEdgesFilter < RBA::EdgePairFilter
+
+  # Constructor
+  def initialize
+    self.is_isotropic_and_scale_invariant   # orientation and scale do not matter
+  end
+  
+  # Select edge pairs where the edges are perpendicular
+  def selected(edge_pair)
+    return edge_pair.first.d.sprod_sign(edge_pair.second.d) == 0
+  end
+
+end
+
+class FlipEdgePair < RBA::EdgePairOperator
+
+  # Constructor
+  def initialize
+    self.is_isotropic_and_scale_invariant   # orientation and scale do not matter
+  end
+  
+  # Flips the edge pair
+  def process(edge_pair)
+    return [ RBA::EdgePair::new(edge_pair.second, edge_pair.first) ]
+  end
+
+end
+
+class SomeEdgePairToEdgeOperator < RBA::EdgePairToEdgeOperator
+
+  # Constructor
+  def initialize
+    self.is_isotropic_and_scale_invariant   # scale or orientation do not matter
+  end
+  
+  def process(ep)
+    return [ RBA::Edge::new(ep.first.p1, ep.second.p2) ]
+  end
+
+end
+
+class SomeEdgePairToPolygonOperator < RBA::EdgePairToPolygonOperator
+
+  # Constructor
+  def initialize
+    self.is_isotropic_and_scale_invariant   # scale or orientation do not matter
+  end
+  
+  def process(ep)
+    return [ RBA::Polygon::new(ep.bbox) ]
+  end
+
+end
+
 class DBEdgePairs_TestClass < TestBase
 
   # Basics
@@ -328,6 +382,90 @@ class DBEdgePairs_TestClass < TestBase
     assert_equal(r.with_angle_both(RBA::Edges::DiagonalEdges, true).to_s, "(0,0;0,10)/(10,0;20,0);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;15,10)")
     assert_equal(r.with_angle_both(RBA::Edges::OrthoDiagonalEdges, false).to_s, "(0,0;0,10)/(10,0;20,0);(0,0;0,10)/(10,0;20,10);(0,0;0,20)/(10,20;10,0)")
     assert_equal(r.with_angle_both(RBA::Edges::OrthoDiagonalEdges, true).to_s, "")
+
+  end
+
+  # Generic filters
+  def test_generic_filters
+
+    # Some basic tests for the filter class
+
+    f = PerpendicularEdgesFilter::new
+    assert_equal(f.wants_variants?, true)
+    f.wants_variants = false
+    assert_equal(f.wants_variants?, false)
+
+    # Smoke test
+    f.is_isotropic
+    f.is_scale_invariant
+
+    # Some application
+
+    f = PerpendicularEdgesFilter::new
+
+    edge_pairs = RBA::EdgePairs::new
+    edge_pairs.insert(RBA::EdgePair::new([0, 0, 100, 0], [0, 100, 0, 300 ]))
+    edge_pairs.insert(RBA::EdgePair::new([200, 0, 300, 0], [200, 100, 220, 300 ]))
+
+    assert_equal(edge_pairs.filtered(f).to_s, "(0,0;100,0)/(0,100;0,300)")
+    assert_equal(edge_pairs.to_s, "(0,0;100,0)/(0,100;0,300);(200,0;300,0)/(200,100;220,300)")
+    edge_pairs.filter(f)
+    assert_equal(edge_pairs.to_s, "(0,0;100,0)/(0,100;0,300)")
+
+  end
+
+  # Generic processors
+  def test_generic_processors_epep
+
+    # Some basic tests for the processor class
+
+    f = FlipEdgePair::new
+    assert_equal(f.wants_variants?, true)
+    f.wants_variants = false
+    assert_equal(f.wants_variants?, false)
+
+    # Smoke test
+    f.is_isotropic
+    f.is_scale_invariant
+
+    # Some application
+
+    edge_pairs = RBA::EdgePairs::new
+
+    edge_pairs.insert(RBA::EdgePair::new(RBA::Edge::new(0, 0, 100, 100), RBA::Edge::new(200, 300, 200, 500)))
+
+    assert_equal(edge_pairs.processed(FlipEdgePair::new).to_s, "(200,300;200,500)/(0,0;100,100)")
+    assert_equal(edge_pairs.to_s, "(0,0;100,100)/(200,300;200,500)")
+    edge_pairs.process(FlipEdgePair::new)
+    assert_equal(edge_pairs.to_s, "(200,300;200,500)/(0,0;100,100)")
+
+  end
+
+  # Generic processors
+  def test_generic_processors_epe
+
+    p = SomeEdgePairToEdgeOperator::new
+
+    edge_pairs = RBA::EdgePairs::new
+
+    edge_pairs.insert(RBA::EdgePair::new(RBA::Edge::new(0, 0, 100, 100), RBA::Edge::new(200, 300, 200, 500)))
+
+    assert_equal(edge_pairs.processed(p).to_s, "(0,0;200,500)")
+    assert_equal(edge_pairs.to_s, "(0,0;100,100)/(200,300;200,500)")
+
+  end
+
+  # Generic processors
+  def test_generic_processors_epp
+
+    p = SomeEdgePairToPolygonOperator::new
+
+    edge_pairs = RBA::EdgePairs::new
+
+    edge_pairs.insert(RBA::EdgePair::new(RBA::Edge::new(0, 0, 100, 100), RBA::Edge::new(200, 300, 200, 500)))
+
+    assert_equal(edge_pairs.processed(p).to_s, "(0,0;0,500;200,500;200,0)")
+    assert_equal(edge_pairs.to_s, "(0,0;100,100)/(200,300;200,500)")
 
   end
 

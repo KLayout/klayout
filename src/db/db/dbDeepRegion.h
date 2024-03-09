@@ -182,8 +182,6 @@ private:
   std::pair<DeepLayer, DeepLayer> and_and_not_with (const DeepRegion *other, PropertyConstraint property_constraint) const;
   DeepRegion *apply_filter (const PolygonFilterBase &filter) const;
 
-  template <class Result, class OutputContainer> OutputContainer *processed_impl (const polygon_processor<Result> &filter) const;
-
   template <class Proc>
   void configure_proc (Proc &proc) const
   {

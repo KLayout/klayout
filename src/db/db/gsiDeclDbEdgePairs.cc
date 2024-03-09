@@ -36,7 +36,182 @@
 namespace gsi
 {
 
-static db::EdgePairs *new_v () 
+// ---------------------------------------------------------------------------------
+//  EdgePairFilter binding
+
+class EdgePairFilterImpl
+  : public shape_filter_impl<db::EdgePairFilterBase>
+{
+public:
+  EdgePairFilterImpl () { }
+
+  bool issue_selected (const db::EdgePair &) const
+  {
+    return false;
+  }
+
+  virtual bool selected (const db::EdgePair &edge_pair) const
+  {
+    if (f_selected.can_issue ()) {
+      return f_selected.issue<EdgePairFilterImpl, bool, const db::EdgePair &> (&EdgePairFilterImpl::issue_selected, edge_pair);
+    } else {
+      return issue_selected (edge_pair);
+    }
+  }
+
+  gsi::Callback f_selected;
+
+private:
+  //  No copying
+  EdgePairFilterImpl &operator= (const EdgePairFilterImpl &);
+  EdgePairFilterImpl (const EdgePairFilterImpl &);
+};
+
+Class<gsi::EdgePairFilterImpl> decl_EdgePairFilterImpl ("db", "EdgePairFilter",
+  EdgePairFilterImpl::method_decls (false) +
+  callback ("selected", &EdgePairFilterImpl::issue_selected, &EdgePairFilterImpl::f_selected, gsi::arg ("text"),
+    "@brief Selects an edge pair\n"
+    "This method is the actual payload. It needs to be reimplemented in a derived class.\n"
+    "It needs to analyze the edge pair and return 'true' if it should be kept and 'false' if it should be discarded."
+  ),
+  "@brief A generic edge pair filter adaptor\n"
+  "\n"
+  "EdgePair filters are an efficient way to filter edge pairs from a EdgePairs collection. To apply a filter, derive your own "
+  "filter class and pass an instance to \\EdgePairs#filter or \\EdgePairs#filtered method.\n"
+  "\n"
+  "Conceptually, these methods take each edge pair from the collection and present it to the filter's 'selected' method.\n"
+  "Based on the result of this evaluation, the edge pair is kept or discarded.\n"
+  "\n"
+  "The magic happens when deep mode edge pair collections are involved. In that case, the filter will use as few calls as possible "
+  "and exploit the hierarchical compression if possible. It needs to know however, how the filter behaves. You "
+  "need to configure the filter by calling \\is_isotropic, \\is_scale_invariant or \\is_isotropic_and_scale_invariant "
+  "before using the filter.\n"
+  "\n"
+  "You can skip this step, but the filter algorithm will assume the worst case then. This usually leads to cell variant "
+  "formation which is not always desired and blows up the hierarchy.\n"
+  "\n"
+  "Here is some example that filters edge pairs where the edges are perpendicular:"
+  "\n"
+  "@code\n"
+  "class PerpendicularEdgesFilter < RBA::EdgePairFilter\n"
+  "\n"
+  "  # Constructor\n"
+  "  def initialize\n"
+  "    self.is_isotropic_and_scale_invariant   # orientation and scale do not matter\n"
+  "  end\n"
+  "  \n"
+  "  # Select edge pairs where the edges are perpendicular\n"
+  "  def selected(edge_pair)\n"
+  "    return edge_pair.first.d.sprod_sign(edge_pair.second.d) == 0\n"
+  "  end\n"
+  "\n"
+  "end\n"
+  "\n"
+  "edge_pairs = ... # some EdgePairs object\n"
+  "perpendicular_only = edge_pairs.filtered(PerpendicularEdgesFilter::new)\n"
+  "@/code\n"
+  "\n"
+  "This class has been introduced in version 0.29.\n"
+);
+
+// ---------------------------------------------------------------------------------
+//  EdgePairProcessor binding
+
+Class<shape_processor_impl<db::EdgePairProcessorBase> > decl_EdgePairProcessor ("db", "EdgePairOperator",
+  shape_processor_impl<db::EdgePairProcessorBase>::method_decls (false),
+  "@brief A generic edge-pair operator\n"
+  "\n"
+  "Edge pair processors are an efficient way to process edge pairs from an edge pair collection. To apply a processor, derive your own "
+  "operator class and pass an instance to the \\EdgePairs#processed or \\EdgePairs#process method.\n"
+  "\n"
+  "Conceptually, these methods take each edge pair from the edge pair collection and present it to the operator's 'process' method.\n"
+  "The result of this call is a list of zero to many output edge pairs derived from the input edge pair.\n"
+  "The output edge pair collection is the sum over all these individual results.\n"
+  "\n"
+  "The magic happens when deep mode edge pair collections are involved. In that case, the processor will use as few calls as possible "
+  "and exploit the hierarchical compression if possible. It needs to know however, how the operator behaves. You "
+  "need to configure the operator by calling \\is_isotropic, \\is_scale_invariant or \\is_isotropic_and_scale_invariant "
+  "before using it.\n"
+  "\n"
+  "You can skip this step, but the processor algorithm will assume the worst case then. This usually leads to cell variant "
+  "formation which is not always desired and blows up the hierarchy.\n"
+  "\n"
+  "Here is some example that flips the edge pairs (swaps first and second edge):"
+  "\n"
+  "@code\n"
+  "class FlipEdgePairs < RBA::EdgePairOperator\n"
+  "\n"
+  "  # Constructor\n"
+  "  def initialize\n"
+  "    self.is_isotropic_and_scale_invariant   # orientation and scale do not matter\n"
+  "  end\n"
+  "  \n"
+  "  # Flips the edge pair\n"
+  "  def process(edge_pair)\n"
+  "    return [ RBA::EdgePair::new(edge_pair.second, edge_pair.first) ]\n"
+  "  end\n"
+  "\n"
+  "end\n"
+  "\n"
+  "edge_pairs = ... # some EdgePairs object\n"
+  "flipped = edge_pairs.processed(FlipEdgePairs::new)\n"
+  "@/code\n"
+  "\n"
+  "This class has been introduced in version 0.29.\n"
+);
+
+Class<shape_processor_impl<db::EdgePairToPolygonProcessorBase> > decl_EdgePairToPolygonProcessor ("db", "EdgePairToPolygonOperator",
+  shape_processor_impl<db::EdgePairToPolygonProcessorBase>::method_decls (false),
+  "@brief A generic edge-pair-to-polygon operator\n"
+  "\n"
+  "Edge pair processors are an efficient way to process edge pairs from an edge pair collection. To apply a processor, derive your own "
+  "operator class and pass an instance to the \\EdgePairs#processed method.\n"
+  "\n"
+  "Conceptually, these methods take each edge pair from the edge pair collection and present it to the operator's 'process' method.\n"
+  "The result of this call is a list of zero to many output polygons derived from the input edge pair.\n"
+  "The output region is the sum over all these individual results.\n"
+  "\n"
+  "The magic happens when deep mode edge pair collections are involved. In that case, the processor will use as few calls as possible "
+  "and exploit the hierarchical compression if possible. It needs to know however, how the operator behaves. You "
+  "need to configure the operator by calling \\is_isotropic, \\is_scale_invariant or \\is_isotropic_and_scale_invariant "
+  "before using it.\n"
+  "\n"
+  "You can skip this step, but the processor algorithm will assume the worst case then. This usually leads to cell variant "
+  "formation which is not always desired and blows up the hierarchy.\n"
+  "\n"
+  "For a basic example see the \\EdgeToPolygonOperator class, with the exception that this incarnation receives edge pairs.\n"
+  "\n"
+  "This class has been introduced in version 0.29.\n"
+);
+
+Class<shape_processor_impl<db::EdgePairToEdgeProcessorBase> > decl_EdgePairToEdgeProcessor ("db", "EdgePairToEdgeOperator",
+  shape_processor_impl<db::EdgePairToEdgeProcessorBase>::method_decls (false),
+  "@brief A generic edge-pair-to-edge operator\n"
+  "\n"
+  "Edge processors are an efficient way to process edge pairs from an edge pair collection. To apply a processor, derive your own "
+  "operator class and pass an instance to \\EdgePairs#processed method.\n"
+  "\n"
+  "Conceptually, these methods take each edge from the edge collection and present it to the operator's 'process' method.\n"
+  "The result of this call is a list of zero to many output edges derived from the input edge pair.\n"
+  "The output edge pair collection is the sum over all these individual results.\n"
+  "\n"
+  "The magic happens when deep mode edge pair collections are involved. In that case, the processor will use as few calls as possible "
+  "and exploit the hierarchical compression if possible. It needs to know however, how the operator behaves. You "
+  "need to configure the operator by calling \\is_isotropic, \\is_scale_invariant or \\is_isotropic_and_scale_invariant "
+  "before using it.\n"
+  "\n"
+  "You can skip this step, but the processor algorithm will assume the worst case then. This usually leads to cell variant "
+  "formation which is not always desired and blows up the hierarchy.\n"
+  "\n"
+  "For a basic example see the \\EdgeToEdgePairOperator class, with the exception that this incarnation has to deliver edges and takes edge pairs.\n"
+  "\n"
+  "This class has been introduced in version 0.29.\n"
+);
+
+// ---------------------------------------------------------------------------------
+//  EdgePairs binding
+
+static db::EdgePairs *new_v ()
 {
   return new db::EdgePairs ();
 }
@@ -179,6 +354,40 @@ static bool is_deep (const db::EdgePairs *ep)
 static size_t id (const db::EdgePairs *ep)
 {
   return tl::id_of (ep->delegate ());
+}
+
+static db::EdgePairs filtered (const db::EdgePairs *r, const EdgePairFilterImpl *f)
+{
+  return r->filtered (*f);
+}
+
+static void filter (db::EdgePairs *r, const EdgePairFilterImpl *f)
+{
+  r->filter (*f);
+}
+
+static db::EdgePairs processed_epep (const db::EdgePairs *r, const shape_processor_impl<db::EdgePairProcessorBase> *f)
+{
+  return r->processed (*f);
+}
+
+static void process_epep (db::EdgePairs *r, const shape_processor_impl<db::EdgePairProcessorBase> *f)
+{
+  r->process (*f);
+}
+
+static db::Edges processed_epe (const db::EdgePairs *r, const shape_processor_impl<db::EdgePairToEdgeProcessorBase> *f)
+{
+  db::Edges out;
+  r->processed (out, *f);
+  return out;
+}
+
+static db::Region processed_epp (const db::EdgePairs *r, const shape_processor_impl<db::EdgePairToPolygonProcessorBase> *f)
+{
+  db::Region out;
+  r->processed (out, *f);
+  return out;
 }
 
 static db::EdgePairs with_distance1 (const db::EdgePairs *r, db::EdgePairs::distance_type length, bool inverse)
@@ -619,6 +828,42 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "The boxes will not be merged, so it is possible to determine overlaps "
     "of these boxes for example.\n"
   ) + 
+  method_ext ("filter", &filter, gsi::arg ("filter"),
+    "@brief Applies a generic filter in place (replacing the edge pairs from the EdgePair collection)\n"
+    "See \\EdgePairFilter for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.\n"
+  ) +
+  method_ext ("filtered", &filtered, gsi::arg ("filtered"),
+    "@brief Applies a generic filter and returns a filtered copy\n"
+    "See \\EdgePairFilter for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.\n"
+  ) +
+  method_ext ("process", &process_epep, gsi::arg ("process"),
+    "@brief Applies a generic edge pair processor in place (replacing the edge pairs from the EdgePairs collection)\n"
+    "See \\EdgePairProcessor for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.\n"
+  ) +
+  method_ext ("processed", &processed_epep, gsi::arg ("processed"),
+    "@brief Applies a generic edge pair processor and returns a processed copy\n"
+    "See \\EdgePairProcessor for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.\n"
+  ) +
+  method_ext ("processed", &processed_epe, gsi::arg ("processed"),
+    "@brief Applies a generic edge-pair-to-edge processor and returns an edge collection with the results\n"
+    "See \\EdgePairToEdgeProcessor for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.\n"
+  ) +
+  method_ext ("processed", &processed_epp, gsi::arg ("processed"),
+    "@brief Applies a generic edge-pair-to-polygon processor and returns an Region with the results\n"
+    "See \\EdgePairToPolygonProcessor for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.\n"
+  ) +
   method_ext ("with_length", with_length1, gsi::arg ("length"), gsi::arg ("inverse"),
     "@brief Filters the edge pairs by length of one of their edges\n"
     "Filters the edge pairs in the edge pair collection by length of at least one of their edges. If \"inverse\" is false, only "

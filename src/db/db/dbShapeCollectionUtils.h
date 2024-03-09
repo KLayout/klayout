@@ -48,6 +48,9 @@ class DB_PUBLIC_TEMPLATE shape_collection_processor
   : public tl::Object
 {
 public:
+  typedef Shape shape_type;
+  typedef Result result_type;
+
   /**
    *  @brief Constructor
    */

@@ -37,6 +37,196 @@
 namespace gsi
 {
 
+// ---------------------------------------------------------------------------------
+//  EdgeFilter binding
+
+class EdgeFilterImpl
+  : public shape_filter_impl<db::EdgeFilterBase>
+{
+public:
+  EdgeFilterImpl () { }
+
+  bool issue_selected (const db::Edge &) const
+  {
+    return false;
+  }
+
+  virtual bool selected (const db::Edge &edge) const
+  {
+    if (f_selected.can_issue ()) {
+      return f_selected.issue<EdgeFilterImpl, bool, const db::Edge &> (&EdgeFilterImpl::issue_selected, edge);
+    } else {
+      return issue_selected (edge);
+    }
+  }
+
+  //  Returns true if all edges match the criterion
+  virtual bool selected (const std::unordered_set<db::Edge> &edges) const
+  {
+    for (std::unordered_set<db::Edge>::const_iterator e = edges.begin (); e != edges.end (); ++e) {
+      if (! selected (*e)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  gsi::Callback f_selected;
+
+private:
+  //  No copying
+  EdgeFilterImpl &operator= (const EdgeFilterImpl &);
+  EdgeFilterImpl (const EdgeFilterImpl &);
+};
+
+Class<gsi::EdgeFilterImpl> decl_EdgeFilterImpl ("db", "EdgeFilter",
+  EdgeFilterImpl::method_decls (true) +
+  callback ("selected", &EdgeFilterImpl::issue_selected, &EdgeFilterImpl::f_selected, gsi::arg ("edge"),
+    "@brief Selects an edge\n"
+    "This method is the actual payload. It needs to be reimplemented in a derived class.\n"
+    "It needs to analyze the edge and return 'true' if it should be kept and 'false' if it should be discarded."
+  ),
+  "@brief A generic edge filter adaptor\n"
+  "\n"
+  "Edge filters are an efficient way to filter edge from a Edges collection. To apply a filter, derive your own "
+  "filter class and pass an instance to the \\Edges#filter or \\Edges#filtered method.\n"
+  "\n"
+  "Conceptually, these methods take each edge from the collection and present it to the filter's 'selected' method.\n"
+  "Based on the result of this evaluation, the edge is kept or discarded.\n"
+  "\n"
+  "The magic happens when deep mode edge collections are involved. In that case, the filter will use as few calls as possible "
+  "and exploit the hierarchical compression if possible. It needs to know however, how the filter behaves. You "
+  "need to configure the filter by calling \\is_isotropic, \\is_scale_invariant or \\is_isotropic_and_scale_invariant "
+  "before using the filter.\n"
+  "\n"
+  "You can skip this step, but the filter algorithm will assume the worst case then. This usually leads to cell variant "
+  "formation which is not always desired and blows up the hierarchy.\n"
+  "\n"
+  "Here is some example that filters edges parallel to a given one:"
+  "\n"
+  "@code\n"
+  "class ParallelFilter < RBA::EdgeFilter\n"
+  "\n"
+  "  # Constructor\n"
+  "  def initialize(ref_edge)\n"
+  "    self.is_scale_invariant   # orientation matters, but scale does not\n"
+  "    @ref_edge = ref_edge\n"
+  "  end\n"
+  "  \n"
+  "  # Select only parallel ones\n"
+  "  def selected(edge)\n"
+  "    return edge.is_parallel?(@ref_edge)\n"
+  "  end\n"
+  "\n"
+  "end\n"
+  "\n"
+  "edges = ... # some Edges object\n"
+  "ref_edge = ... # some Edge\n"
+  "parallel_only = edges.filtered(ParallelFilter::new(ref_edge))\n"
+  "@/code\n"
+  "\n"
+  "This class has been introduced in version 0.29.\n"
+);
+
+// ---------------------------------------------------------------------------------
+//  EdgeProcessor binding
+
+Class<shape_processor_impl<db::EdgeProcessorBase> > decl_EdgeProcessorBase ("db", "EdgeOperator",
+  shape_processor_impl<db::EdgeProcessorBase>::method_decls (true),
+  "@brief A generic edge-to-polygon operator\n"
+  "\n"
+  "Edge processors are an efficient way to process edges from an edge collection. To apply a processor, derive your own "
+  "operator class and pass an instance to the \\Edges#processed method.\n"
+  "\n"
+  "Conceptually, these methods take each edge from the edge collection and present it to the operator's 'process' method.\n"
+  "The result of this call is a list of zero to many output edges derived from the input edge.\n"
+  "The output edge collection is the sum over all these individual results.\n"
+  "\n"
+  "The magic happens when deep mode edge collections are involved. In that case, the processor will use as few calls as possible "
+  "and exploit the hierarchical compression if possible. It needs to know however, how the operator behaves. You "
+  "need to configure the operator by calling \\is_isotropic, \\is_scale_invariant or \\is_isotropic_and_scale_invariant "
+  "before using it.\n"
+  "\n"
+  "You can skip this step, but the processor algorithm will assume the worst case then. This usually leads to cell variant "
+  "formation which is not always desired and blows up the hierarchy.\n"
+  "\n"
+  "Here is some example that shrinks every edge to half of the size, but does not change the position.\n"
+  "In this example the 'position' is defined by the center of the edge:"
+  "\n"
+  "@code\n"
+  "class ShrinkToHalf < RBA::EdgeOperator\n"
+  "\n"
+  "  # Constructor\n"
+  "  def initialize\n"
+  "    self.is_isotropic_and_scale_invariant   # scale or orientation do not matter\n"
+  "  end\n"
+  "  \n"
+  "  # Shrink to half size\n"
+  "  def process(edge)\n"
+  "    shift = edge.bbox.center - RBA::Point::new   # shift vector\n"
+  "    return [ (edge.moved(-shift) * 0.5).moved(shift) ]\n"
+  "  end\n"
+  "\n"
+  "end\n"
+  "\n"
+  "edges = ... # some Edges collection\n"
+  "shrinked_to_half = edges.processed(ShrinkToHalf::new)\n"
+  "@/code\n"
+  "\n"
+  "This class has been introduced in version 0.29.\n"
+);
+
+Class<shape_processor_impl<db::EdgeToPolygonProcessorBase> > decl_EdgeToPolygonProcessor ("db", "EdgeToPolygonOperator",
+  shape_processor_impl<db::EdgeToPolygonProcessorBase>::method_decls (true),
+  "@brief A generic edge-to-polygon operator\n"
+  "\n"
+  "Edge processors are an efficient way to process edges from an edge collection. To apply a processor, derive your own "
+  "operator class and pass an instance to the \\Edges#processed method.\n"
+  "\n"
+  "Conceptually, these methods take each edge from the edge collection and present it to the operator's 'process' method.\n"
+  "The result of this call is a list of zero to many output polygons derived from the input edge.\n"
+  "The output region is the sum over all these individual results.\n"
+  "\n"
+  "The magic happens when deep mode edge collections are involved. In that case, the processor will use as few calls as possible "
+  "and exploit the hierarchical compression if possible. It needs to know however, how the operator behaves. You "
+  "need to configure the operator by calling \\is_isotropic, \\is_scale_invariant or \\is_isotropic_and_scale_invariant "
+  "before using it.\n"
+  "\n"
+  "You can skip this step, but the processor algorithm will assume the worst case then. This usually leads to cell variant "
+  "formation which is not always desired and blows up the hierarchy.\n"
+  "\n"
+  "For a basic example see the \\EdgeOperator class, with the exception that this incarnation has to deliver edges.\n"
+  "\n"
+  "This class has been introduced in version 0.29.\n"
+);
+
+Class<shape_processor_impl<db::EdgeToEdgePairProcessorBase> > decl_EdgeToEdgePairProcessor ("db", "EdgeToEdgePairOperator",
+  shape_processor_impl<db::EdgeToEdgePairProcessorBase>::method_decls (true),
+  "@brief A generic edge-to-edge-pair operator\n"
+  "\n"
+  "Edge processors are an efficient way to process edges from an edge collection. To apply a processor, derive your own "
+  "operator class and pass an instance to the \\Edges#processed method.\n"
+  "\n"
+  "Conceptually, these methods take each edge from the edge collection and present it to the operator's 'process' method.\n"
+  "The result of this call is a list of zero to many output edge pairs derived from the input edge.\n"
+  "The output edge pair collection is the sum over all these individual results.\n"
+  "\n"
+  "The magic happens when deep mode edge collections are involved. In that case, the processor will use as few calls as possible "
+  "and exploit the hierarchical compression if possible. It needs to know however, how the operator behaves. You "
+  "need to configure the operator by calling \\is_isotropic, \\is_scale_invariant or \\is_isotropic_and_scale_invariant "
+  "before using it.\n"
+  "\n"
+  "You can skip this step, but the processor algorithm will assume the worst case then. This usually leads to cell variant "
+  "formation which is not always desired and blows up the hierarchy.\n"
+  "\n"
+  "For a basic example see the \\EdgeOperator class, with the exception that this incarnation has to deliver edge pairs.\n"
+  "\n"
+  "This class has been introduced in version 0.29.\n"
+);
+
+// ---------------------------------------------------------------------------------
+//  Edges binding
+
 static inline std::vector<db::Edges> as_2edges_vector (const std::pair<db::Edges, db::Edges> &rp)
 {
   std::vector<db::Edges> res;
@@ -202,6 +392,38 @@ static db::Edges moved_p (const db::Edges *r, const db::Vector &p)
 static db::Edges moved_xy (const db::Edges *r, db::Coord x, db::Coord y)
 {
   return r->transformed (db::Disp (db::Vector (x, y)));
+}
+
+static db::Edges filtered (const db::Edges *r, const EdgeFilterImpl *f)
+{
+  return r->filtered (*f);
+}
+
+static void filter (db::Edges *r, const EdgeFilterImpl *f)
+{
+  r->filter (*f);
+}
+
+static db::Edges processed_ee (const db::Edges *r, const shape_processor_impl<db::EdgeProcessorBase> *f)
+{
+  return r->processed (*f);
+}
+
+static void process_ee (db::Edges *r, const shape_processor_impl<db::EdgeProcessorBase> *f)
+{
+  r->process (*f);
+}
+
+static db::EdgePairs processed_eep (const db::Edges *r, const shape_processor_impl<db::EdgeToEdgePairProcessorBase> *f)
+{
+  return r->processed (*f);
+}
+
+static db::Region processed_ep (const db::Edges *r, const shape_processor_impl<db::EdgeToPolygonProcessorBase> *f)
+{
+  db::Region out;
+  r->processed (out, *f);
+  return out;
 }
 
 static db::Edges with_length1 (const db::Edges *r, db::Edges::distance_type length, bool inverse)
@@ -626,6 +848,42 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "and existing hierarchy will be reused.\n"
     "\n"
     "This method has been introduced in version 0.26."
+  ) +
+  method_ext ("filter", &filter, gsi::arg ("filter"),
+    "@brief Applies a generic filter in place (replacing the edges from the Edges collection)\n"
+    "See \\EdgeFilter for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.\n"
+  ) +
+  method_ext ("filtered", &filtered, gsi::arg ("filtered"),
+    "@brief Applies a generic filter and returns a filtered copy\n"
+    "See \\EdgeFilter for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.\n"
+  ) +
+  method_ext ("process", &process_ee, gsi::arg ("process"),
+    "@brief Applies a generic edge processor in place (replacing the edges from the Edges collection)\n"
+    "See \\EdgeProcessor for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.\n"
+  ) +
+  method_ext ("processed", &processed_ee, gsi::arg ("processed"),
+    "@brief Applies a generic edge processor and returns a processed copy\n"
+    "See \\EdgeProcessor for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.\n"
+  ) +
+  method_ext ("processed", &processed_eep, gsi::arg ("processed"),
+    "@brief Applies a generic edge-to-edge-pair processor and returns an edge pair collection with the results\n"
+    "See \\EdgeToEdgePairProcessor for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.\n"
+  ) +
+  method_ext ("processed", &processed_ep, gsi::arg ("processed"),
+    "@brief Applies a generic edge-to-polygon processor and returns an edge collection with the results\n"
+    "See \\EdgeToPolygonProcessor for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.\n"
   ) +
   method_ext ("with_length", with_length1, gsi::arg ("length"), gsi::arg ("inverse"),
     "@brief Filters the edges by length\n"

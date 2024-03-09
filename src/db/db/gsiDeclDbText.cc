@@ -98,17 +98,17 @@ struct text_defs
     t->font (db::Font (f));
   }
 
-  static int get_font (C *t)
+  static int get_font (const C *t)
   {
     return t->font ();
   }
 
-  static point_type get_pos (C *t)
+  static point_type get_pos (const C *t)
   {
     return t->trans () * point_type ();
   }
 
-  static box_type get_bbox (C *t)
+  static box_type get_bbox (const C *t)
   {
     point_type p = get_pos (t);
     return box_type (p, p);
@@ -124,7 +124,7 @@ struct text_defs
     t->halign (db::HAlign (f));
   }
 
-  static db::HAlign get_halign (C *t)
+  static db::HAlign get_halign (const C *t)
   {
     return t->halign ();
   }
@@ -139,12 +139,12 @@ struct text_defs
     t->valign (db::VAlign (f));
   }
 
-  static db::VAlign get_valign (C *t)
+  static db::VAlign get_valign (const C *t)
   {
     return t->valign ();
   }
 
-  static C moved (C *c, const vector_type &p)
+  static C moved (const C *c, const vector_type &p)
   {
     return c->transformed (simple_trans_type (p));
   }
@@ -155,7 +155,7 @@ struct text_defs
     return *c;
   }
 
-  static C moved_xy (C *c, coord_type dx, coord_type dy)
+  static C moved_xy (const C *c, coord_type dx, coord_type dy)
   {
     return c->transformed (simple_trans_type (vector_type (dx, dy)));
   }

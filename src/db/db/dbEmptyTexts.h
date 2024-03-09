@@ -57,6 +57,8 @@ public:
   virtual TextsDelegate *filter_in_place (const TextFilterBase &) { return this; }
   virtual TextsDelegate *filtered (const TextFilterBase &) const { return new EmptyTexts (); }
 
+  virtual TextsDelegate *process_in_place (const TextProcessorBase &) { return this; }
+  virtual TextsDelegate *processed (const TextProcessorBase &) const { return new EmptyTexts (); }
   virtual RegionDelegate *processed_to_polygons (const TextToPolygonProcessorBase &) const;
 
   virtual RegionDelegate *polygons (db::Coord e) const;

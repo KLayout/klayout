@@ -451,6 +451,18 @@ DeepEdgePairs::apply_filter (const EdgePairFilterBase &filter) const
   return res.release ();
 }
 
+EdgePairsDelegate *DeepEdgePairs::process_in_place (const EdgePairProcessorBase &filter)
+{
+  //  TODO: implement to be really in-place
+  return processed (filter);
+}
+
+EdgePairsDelegate *
+DeepEdgePairs::processed (const EdgePairProcessorBase &filter) const
+{
+  return shape_collection_processed_impl<db::EdgePair, db::EdgePair, db::DeepEdgePairs> (deep_layer (), filter);
+}
+
 RegionDelegate *
 DeepEdgePairs::processed_to_polygons (const EdgePairToPolygonProcessorBase &filter) const
 {

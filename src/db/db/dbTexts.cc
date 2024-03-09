@@ -199,6 +199,11 @@ MutableTexts *Texts::mutable_texts ()
   return texts;
 }
 
+Texts Texts::processed (const TextProcessorBase &proc) const
+{
+  return Texts (mp_delegate->processed (proc));
+}
+
 void Texts::processed (Region &output, const TextToPolygonProcessorBase &filter) const
 {
   output = Region (mp_delegate->processed_to_polygons (filter));

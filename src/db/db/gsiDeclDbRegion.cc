@@ -47,6 +47,190 @@
 namespace gsi
 {
 
+// ---------------------------------------------------------------------------------
+//  PolygonFilter binding
+
+class PolygonFilterImpl
+  : public shape_filter_impl<db::AllMustMatchFilter>
+{
+public:
+  PolygonFilterImpl () { }
+
+  bool issue_selected (const db::Polygon &) const
+  {
+    return false;
+  }
+
+  virtual bool selected (const db::Polygon &polygon) const
+  {
+    if (f_selected.can_issue ()) {
+      return f_selected.issue<PolygonFilterImpl, bool, const db::Polygon &> (&PolygonFilterImpl::issue_selected, polygon);
+    } else {
+      return issue_selected (polygon);
+    }
+  }
+
+  virtual bool selected (const db::PolygonRef &polygon) const
+  {
+    db::Polygon p;
+    polygon.instantiate (p);
+    return selected (p);
+  }
+
+  gsi::Callback f_selected;
+
+private:
+  //  No copying
+  PolygonFilterImpl &operator= (const PolygonFilterImpl &);
+  PolygonFilterImpl (const PolygonFilterImpl &);
+};
+
+Class<gsi::PolygonFilterImpl> decl_PolygonFilterImpl ("db", "PolygonFilter",
+  PolygonFilterImpl::method_decls (true) +
+  callback ("selected", &PolygonFilterImpl::issue_selected, &PolygonFilterImpl::f_selected, gsi::arg ("polygon"),
+    "@brief Selects a polygon\n"
+    "This method is the actual payload. It needs to be reimplemented in a derived class.\n"
+    "It needs to analyze the polygon and return 'true' if it should be kept and 'false' if it should be discarded."
+  ),
+  "@brief A generic polygon filter adaptor\n"
+  "\n"
+  "Polygon filters are an efficient way to filter polygons from a Region. To apply a filter, derive your own "
+  "filter class and pass an instance to the \\Region#filter or \\Region#filtered method.\n"
+  "\n"
+  "Conceptually, these methods take each polygon from the region and present it to the filter's 'selected' method.\n"
+  "Based on the result of this evaluation, the polygon is kept or discarded.\n"
+  "\n"
+  "The magic happens when deep mode regions are involved. In that case, the filter will use as few calls as possible "
+  "and exploit the hierarchical compression if possible. It needs to know however, how the filter behaves. You "
+  "need to configure the filter by calling \\is_isotropic, \\is_scale_invariant or \\is_isotropic_and_scale_invariant "
+  "before using the filter.\n"
+  "\n"
+  "You can skip this step, but the filter algorithm will assume the worst case then. This usually leads to cell variant "
+  "formation which is not always desired and blows up the hierarchy.\n"
+  "\n"
+  "Here is some example that filters triangles:"
+  "\n"
+  "@code\n"
+  "class TriangleFilter < RBA::PolygonFilter\n"
+  "\n"
+  "  # Constructor\n"
+  "  def initialize\n"
+  "    self.is_isotropic_and_scale_invariant   # the triangle nature is not dependent on the scale or orientation\n"
+  "  end\n"
+  "  \n"
+  "  # Select only triangles\n"
+  "  def selected(polygon)\n"
+  "    return polygon.holes == 0 && polygon.num_points == 3\n"
+  "  end\n"
+  "\n"
+  "end\n"
+  "\n"
+  "region = ... # some Region\n"
+  "triangles_only = region.filtered(TriangleFilter::new)\n"
+  "@/code\n"
+  "\n"
+  "This class has been introduced in version 0.29.\n"
+);
+
+// ---------------------------------------------------------------------------------
+//  PolygonProcessor binding
+
+Class<shape_processor_impl<db::PolygonProcessorBase> > decl_PolygonOperator ("db", "PolygonOperator",
+  shape_processor_impl<db::PolygonProcessorBase>::method_decls (true),
+  "@brief A generic polygon operator\n"
+  "\n"
+  "Polygon processors are an efficient way to process polygons from a Region. To apply a processor, derive your own "
+  "operator class and pass an instance to the \\Region#process or \\Region#processed method.\n"
+  "\n"
+  "Conceptually, these methods take each polygon from the region and present it to the operators' 'process' method.\n"
+  "The result of this call is a list of zero to many output polygons derived from the input polygon.\n"
+  "The output region is the sum over all these individual results.\n"
+  "\n"
+  "The magic happens when deep mode regions are involved. In that case, the processor will use as few calls as possible "
+  "and exploit the hierarchical compression if possible. It needs to know however, how the operator behaves. You "
+  "need to configure the operator by calling \\is_isotropic, \\is_scale_invariant or \\is_isotropic_and_scale_invariant "
+  "before using it.\n"
+  "\n"
+  "You can skip this step, but the processor algorithm will assume the worst case then. This usually leads to cell variant "
+  "formation which is not always desired and blows up the hierarchy.\n"
+  "\n"
+  "Here is some example that shrinks every polygon to half of the size but does not change the position.\n"
+  "In this example the 'position' is defined by the center of the bounding box:"
+  "\n"
+  "@code\n"
+  "class ShrinkToHalf < RBA::PolygonOperator\n"
+  "\n"
+  "  # Constructor\n"
+  "  def initialize\n"
+  "    self.is_isotropic_and_scale_invariant   # scale or orientation do not matter\n"
+  "  end\n"
+  "  \n"
+  "  # Shrink to half size\n"
+  "  def process(polygon)\n"
+  "    shift = polygon.bbox.center - RBA::Point::new   # shift vector\n"
+  "    return [ (polygon.moved(-shift) * 0.5).moved(shift) ]\n"
+  "  end\n"
+  "\n"
+  "end\n"
+  "\n"
+  "region = ... # some Region\n"
+  "shrinked_to_half = region.processed(ShrinkToHalf::new)\n"
+  "@/code\n"
+  "\n"
+  "This class has been introduced in version 0.29.\n"
+);
+
+Class<shape_processor_impl<db::PolygonToEdgeProcessorBase> > decl_PolygonToEdgeProcessor ("db", "PolygonToEdgeOperator",
+  shape_processor_impl<db::PolygonToEdgeProcessorBase>::method_decls (true),
+  "@brief A generic polygon-to-edge operator\n"
+  "\n"
+  "Polygon processors are an efficient way to process polygons from a Region. To apply a processor, derive your own "
+  "operator class and pass an instance to the \\Region#processed method.\n"
+  "\n"
+  "Conceptually, these methods take each polygon from the region and present it to the operator's 'process' method.\n"
+  "The result of this call is a list of zero to many output edges derived from the input polygon.\n"
+  "The output edge collection is the sum over all these individual results.\n"
+  "\n"
+  "The magic happens when deep mode regions are involved. In that case, the processor will use as few calls as possible "
+  "and exploit the hierarchical compression if possible. It needs to know however, how the operator behaves. You "
+  "need to configure the operator by calling \\is_isotropic, \\is_scale_invariant or \\is_isotropic_and_scale_invariant "
+  "before using it.\n"
+  "\n"
+  "You can skip this step, but the processor algorithm will assume the worst case then. This usually leads to cell variant "
+  "formation which is not always desired and blows up the hierarchy.\n"
+  "\n"
+  "For a basic example see the \\PolygonOperator class, with the exception that this incarnation has to deliver edges.\n"
+  "\n"
+  "This class has been introduced in version 0.29.\n"
+);
+
+Class<shape_processor_impl<db::PolygonToEdgePairProcessorBase> > decl_PolygonToEdgePairProcessor ("db", "PolygonToEdgePairOperator",
+  shape_processor_impl<db::PolygonToEdgePairProcessorBase>::method_decls (true),
+  "@brief A generic polygon-to-edge-pair operator\n"
+  "\n"
+  "Polygon processors are an efficient way to process polygons from a Region. To apply a processor, derive your own "
+  "operator class and pass an instance to the \\Region#processed method.\n"
+  "\n"
+  "Conceptually, these methods take each polygon from the region and present it to the operator's 'process' method.\n"
+  "The result of this call is a list of zero to many output edge pairs derived from the input polygon.\n"
+  "The output edge pair collection is the sum over all these individual results.\n"
+  "\n"
+  "The magic happens when deep mode regions are involved. In that case, the processor will use as few calls as possible "
+  "and exploit the hierarchical compression if possible. It needs to know however, how the operator behaves. You "
+  "need to configure the operator by calling \\is_isotropic, \\is_scale_invariant or \\is_isotropic_and_scale_invariant "
+  "before using it.\n"
+  "\n"
+  "You can skip this step, but the processor algorithm will assume the worst case then. This usually leads to cell variant "
+  "formation which is not always desired and blows up the hierarchy.\n"
+  "\n"
+  "For a basic example see the \\PolygonOperator class, with the exception that this incarnation has to deliver edge pairs.\n"
+  "\n"
+  "This class has been introduced in version 0.29.\n"
+);
+
+// ---------------------------------------------------------------------------------
+//  Region binding
+
 static inline std::vector<db::Region> as_2region_vector (const std::pair<db::Region, db::Region> &rp)
 {
   std::vector<db::Region> res;
@@ -316,6 +500,36 @@ static db::Region extent_refs (const db::Region *r, double fx1, double fy1, doub
 static db::Edges extent_refs_edges (const db::Region *r, double fx1, double fy1, double fx2, double fy2)
 {
   return r->processed (db::RelativeExtentsAsEdges (fx1, fy1, fx2, fy2));
+}
+
+static db::Region filtered (const db::Region *r, const PolygonFilterImpl *f)
+{
+  return r->filtered (*f);
+}
+
+static void filter (db::Region *r, const PolygonFilterImpl *f)
+{
+  r->filter (*f);
+}
+
+static db::Region processed_pp (const db::Region *r, const shape_processor_impl<db::PolygonProcessorBase> *f)
+{
+  return r->processed (*f);
+}
+
+static void process_pp (db::Region *r, const shape_processor_impl<db::PolygonProcessorBase> *f)
+{
+  r->process (*f);
+}
+
+static db::EdgePairs processed_pep (const db::Region *r, const shape_processor_impl<db::PolygonToEdgePairProcessorBase> *f)
+{
+  return r->processed (*f);
+}
+
+static db::Edges processed_pe (const db::Region *r, const shape_processor_impl<db::PolygonToEdgeProcessorBase> *f)
+{
+  return r->processed (*f);
 }
 
 static db::Region with_perimeter1 (const db::Region *r, db::Region::perimeter_type perimeter, bool inverse)
@@ -2362,6 +2576,42 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "The first element returned is the \\members_of part, the second is the \\not_members_of part.\n"
     "\n"
     "This method has been introduced in version 0.28.\n"
+  ) +
+  method_ext ("filter", &filter, gsi::arg ("filter"),
+    "@brief Applies a generic filter in place (replacing the polygons from the Region)\n"
+    "See \\PolygonFilter for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.\n"
+  ) +
+  method_ext ("filtered", &filtered, gsi::arg ("filtered"),
+    "@brief Applies a generic filter and returns a filtered copy\n"
+    "See \\PolygonFilter for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.\n"
+  ) +
+  method_ext ("process", &process_pp, gsi::arg ("process"),
+    "@brief Applies a generic polygon processor in place (replacing the polygons from the Region)\n"
+    "See \\PolygonProcessor for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.\n"
+  ) +
+  method_ext ("processed", &processed_pp, gsi::arg ("processed"),
+    "@brief Applies a generic polygon processor and returns a processed copy\n"
+    "See \\PolygonProcessor for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.\n"
+  ) +
+  method_ext ("processed", &processed_pep, gsi::arg ("processed"),
+    "@brief Applies a generic polygon-to-edge-pair processor and returns an edge pair collection with the results\n"
+    "See \\PolygonToEdgePairProcessor for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.\n"
+  ) +
+  method_ext ("processed", &processed_pe, gsi::arg ("processed"),
+    "@brief Applies a generic polygon-to-edge processor and returns an edge collection with the results\n"
+    "See \\PolygonToEdgeProcessor for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.\n"
   ) +
   method_ext ("rectangles", &rectangles,
     "@brief Returns all polygons which are rectangles\n"

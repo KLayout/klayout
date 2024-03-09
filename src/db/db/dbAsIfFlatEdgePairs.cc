@@ -147,6 +147,24 @@ void AsIfFlatEdgePairs::invalidate_bbox ()
   m_bbox_valid = false;
 }
 
+EdgePairsDelegate *
+AsIfFlatEdgePairs::processed (const EdgePairProcessorBase &filter) const
+{
+  std::unique_ptr<FlatEdgePairs> edge_pairs (new FlatEdgePairs ());
+
+  std::vector<db::EdgePair> res_edge_pairs;
+
+  for (EdgePairsIterator e = begin (); ! e.at_end (); ++e) {
+    res_edge_pairs.clear ();
+    filter.process (*e, res_edge_pairs);
+    for (std::vector<db::EdgePair>::const_iterator er = res_edge_pairs.begin (); er != res_edge_pairs.end (); ++er) {
+      edge_pairs->insert (*er);
+    }
+  }
+
+  return edge_pairs.release ();
+}
+
 RegionDelegate *
 AsIfFlatEdgePairs::processed_to_polygons (const EdgePairToPolygonProcessorBase &filter) const
 {

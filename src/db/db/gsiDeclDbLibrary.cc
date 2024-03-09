@@ -773,26 +773,7 @@ static unsigned int pd_type_none ()
   return (unsigned int) db::PCellParameterDeclaration::t_none;
 }
 
-db::PCellParameterDeclaration *ctor_pcell_parameter (const std::string &name, unsigned int type, const std::string &description)
-{
-  db::PCellParameterDeclaration *pd = new db::PCellParameterDeclaration ();
-  pd->set_name (name);
-  pd->set_type (db::PCellParameterDeclaration::type (type));
-  pd->set_description (description);
-  return pd;
-}
-
-db::PCellParameterDeclaration *ctor_pcell_parameter_2 (const std::string &name, unsigned int type, const std::string &description, const tl::Variant &def)
-{
-  db::PCellParameterDeclaration *pd = new db::PCellParameterDeclaration ();
-  pd->set_name (name);
-  pd->set_type (db::PCellParameterDeclaration::type (type));
-  pd->set_description (description);
-  pd->set_default (def);
-  return pd;
-}
-
-db::PCellParameterDeclaration *ctor_pcell_parameter_3 (const std::string &name, unsigned int type, const std::string &description, const tl::Variant &def, const std::string &unit)
+db::PCellParameterDeclaration *ctor_pcell_parameter (const std::string &name, unsigned int type, const std::string &description, const tl::Variant &def, const std::string &unit)
 {
   db::PCellParameterDeclaration *pd = new db::PCellParameterDeclaration ();
   pd->set_name (name);
@@ -804,20 +785,7 @@ db::PCellParameterDeclaration *ctor_pcell_parameter_3 (const std::string &name, 
 }
 
 Class<db::PCellParameterDeclaration> decl_PCellParameterDeclaration ("db", "PCellParameterDeclaration",
-  gsi::constructor ("new", &ctor_pcell_parameter, gsi::arg ("name"), gsi::arg ("type"), gsi::arg ("description"),
-    "@brief Create a new parameter declaration with the given name and type\n"
-    "@param name The parameter name\n"
-    "@param type One of the Type... constants describing the type of the parameter\n"
-    "@param description The description text\n"
-  ) +
-  gsi::constructor ("new", &ctor_pcell_parameter_2, gsi::arg ("name"), gsi::arg ("type"), gsi::arg ("description"), gsi::arg ("default"),
-    "@brief Create a new parameter declaration with the given name, type and default value\n"
-    "@param name The parameter name\n"
-    "@param type One of the Type... constants describing the type of the parameter\n"
-    "@param description The description text\n"
-    "@param default The default (initial) value\n"
-  ) +
-  gsi::constructor ("new", &ctor_pcell_parameter_3, gsi::arg ("name"), gsi::arg ("type"), gsi::arg ("description"), gsi::arg ("default"), gsi::arg ("unit"),
+  gsi::constructor ("new", &ctor_pcell_parameter, gsi::arg ("name"), gsi::arg ("type"), gsi::arg ("description"), gsi::arg ("default", tl::Variant (), "nil"), gsi::arg ("unit", std::string ()),
     "@brief Create a new parameter declaration with the given name, type, default value and unit string\n"
     "@param name The parameter name\n"
     "@param type One of the Type... constants describing the type of the parameter\n"
@@ -877,6 +845,12 @@ Class<db::PCellParameterDeclaration> decl_PCellParameterDeclaration ("db", "PCel
     "entry field in the parameter user interface.\n"
     "If a range is already set for this parameter the choice will not be added and a warning message is showed.\n"
   ) +
+  gsi::method ("choice_values", &db::PCellParameterDeclaration::get_choices,
+    "@brief Returns a list of choice values\n"
+  ) +
+  gsi::method ("choice_descriptions", &db::PCellParameterDeclaration::get_choice_descriptions,
+    "@brief Returns a list of choice descriptions\n"
+  ) +
   gsi::method ("min_value", &db::PCellParameterDeclaration::min_value,
     "@brief Gets the minimum value allowed\n"
     "See \\min_value= for a description of this attribute.\n"
@@ -914,12 +888,6 @@ Class<db::PCellParameterDeclaration> decl_PCellParameterDeclaration ("db", "PCel
     "Setting this attribute to \"nil\" (the default) implies \"no limit\".\n"
     "\n"
     "This attribute has been added in version 0.29."
-  ) +
-  gsi::method ("choice_values", &db::PCellParameterDeclaration::get_choices,
-    "@brief Returns a list of choice values\n"
-  ) +
-  gsi::method ("choice_descriptions", &db::PCellParameterDeclaration::get_choice_descriptions,
-    "@brief Returns a list of choice descriptions\n"
   ) +
   gsi::method ("default", &db::PCellParameterDeclaration::get_default,
     "@brief Gets the default value\n"

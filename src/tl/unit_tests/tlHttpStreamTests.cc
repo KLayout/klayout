@@ -27,7 +27,7 @@
 #include "tlStream.h"
 
 static std::string test_url1 ("http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/text");
-static std::string test_url1_gz ("http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/text.gz");
+static std::string test_url1_gz ("http://www.klayout.org/svn-public/klayout-resources/trunk/testdata2/text.gz");
 static std::string test_url2 ("http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/dir1");
 
 TEST(1)

@@ -773,10 +773,7 @@ PCellParametersPage::get_parameters_internal (db::ParameterStates &states, bool 
               ps.set_value (tl::Variant (v));
               lay::indicate_error (le, (tl::Exception *) 0);
 
-              if (p->get_range().has_value())
-              {
-                check_range(tl::Variant(v), p->get_range().value());
-              }
+              check_range(tl::Variant (v), *p);
 
             } catch (tl::Exception &ex) {
 
@@ -802,10 +799,7 @@ PCellParametersPage::get_parameters_internal (db::ParameterStates &states, bool 
               ps.set_value (tl::Variant (v));
               lay::indicate_error (le, (tl::Exception *) 0);
 
-              if (p->get_range().has_value())
-              {
-                check_range(tl::Variant(v), p->get_range().value());
-              }
+              check_range(tl::Variant (v), *p);
 
             } catch (tl::Exception &ex) {
 
@@ -1110,11 +1104,11 @@ void
 PCellParametersPage::check_range (const tl::Variant &value, const db::PCellParameterDeclaration &decl)
 {
   if (! decl.min_value ().is_nil () && value < decl.min_value ()) {
-    throw tl::Exception (tl::sprintf (tl::to_string (tr ("The value is below the minimum allowed value: given value is %s, minimum value is %s")), value.to_string (), decl.min_value ().to_string ()));
+    throw tl::Exception (tl::sprintf (tl::to_string (tr ("The value is lower than the minimum allowed value: given value is %s, minimum value is %s")), value.to_string (), decl.min_value ().to_string ()));
   }
 
-  if (! decl.max_value ().is_nil () && value > decl.max_value ()) {
-    throw tl::Exception (tl::sprintf (tl::to_string (tr ("The value is above the maximum allowed value: given value is %s, maximum value is %s")), value.to_string (), decl.max_value ().to_string ()));
+  if (! decl.max_value ().is_nil () && ! (value < decl.max_value () || value == decl.max_value ())) {
+    throw tl::Exception (tl::sprintf (tl::to_string (tr ("The value is higher than the maximum allowed value: given value is %s, maximum value is %s")), value.to_string (), decl.max_value ().to_string ()));
   }
 }
 

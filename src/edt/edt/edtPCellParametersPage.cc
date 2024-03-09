@@ -398,17 +398,15 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
     inner_grid->addWidget (icon_label, row, 0);
     m_icon_widgets.push_back (icon_label);
     m_all_widgets.back ().push_back (icon_label);
+
     std::string range;
 
-    if (p->get_range().has_value())
-    {
-      const tl::Variant& low(p->get_range().value().m_low);
-      const tl::Variant& high(p->get_range().value().m_high);
-
-      range = tl::sprintf(
-          " [%s, %s]" ,
-          low.is_nil() ?  "-\u221e" : low.to_string(),
-          high.is_nil() ?  "\u221e" : high.to_string());
+    if (! p->min_value ().is_nil () || ! p->max_value ().is_nil ()) {
+      range = tl::sprintf (
+                " [%s, %s]" ,
+                p->min_value ().is_nil () ? "-\u221e" /*infinity*/ : p->min_value ().to_string (),
+                p->max_value ().is_nil () ? "\u221e"  /*infinity*/ : p->max_value ().to_string ()
+              );
     }
 
     if (p->get_type () != db::PCellParameterDeclaration::t_callback) {
@@ -1109,19 +1107,14 @@ PCellParametersPage::states_from_parameters (db::ParameterStates &states, const 
 }
 
 void
-PCellParametersPage::check_range(const tl::Variant& value, const db::PCellParameterDeclaration::Range& range)
+PCellParametersPage::check_range (const tl::Variant &value, const db::PCellParameterDeclaration &decl)
 {
-  if (db::PCellParameterDeclaration::Action(range.m_action) == db::PCellParameterDeclaration::t_Reject)
-  {
-    if (!range.m_low.is_nil() && value < range.m_low)
-    {
-      throw tl::Exception(tl::to_string (tr("Range violation: value < low")));
-    }
+  if (! decl.min_value ().is_nil () && value < decl.min_value ()) {
+    throw tl::Exception (tl::sprintf (tl::to_string (tr ("The value is below the minimum allowed value: given value is %s, minimum value is %s")), value.to_string (), decl.min_value ().to_string ()));
+  }
 
-    if (!range.m_high.is_nil() && range.m_high < value)
-    {
-      throw tl::Exception(tl::to_string (tr("Range violation: value > high")));
-    }
+  if (! decl.max_value ().is_nil () && value > decl.max_value ()) {
+    throw tl::Exception (tl::sprintf (tl::to_string (tr ("The value is above the maximum allowed value: given value is %s, maximum value is %s")), value.to_string (), decl.max_value ().to_string ()));
   }
 }
 

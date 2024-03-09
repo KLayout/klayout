@@ -70,7 +70,7 @@ public:
    *  @brief The default constructor
    */
   PCellParameterDeclaration ()
-    : m_hidden (false), m_readonly (false), m_type (t_none), m_range()
+    : m_hidden (false), m_readonly (false), m_type (t_none)
   {
     // .. nothing yet ..
   }
@@ -79,7 +79,7 @@ public:
    *  @brief The constructor with a name
    */
   PCellParameterDeclaration (const std::string &name)
-    : m_hidden (false), m_readonly (false), m_type (t_none), m_name (name), m_range()
+    : m_hidden (false), m_readonly (false), m_type (t_none), m_name (name)
   {
     // .. nothing yet ..
   }
@@ -88,7 +88,7 @@ public:
    *  @brief The constructor with a name, type and description
    */
   PCellParameterDeclaration (const std::string &name, type t, const std::string &description)
-    : m_hidden (false), m_readonly (false), m_type (t), m_name (name), m_description (description), m_range()
+    : m_hidden (false), m_readonly (false), m_type (t), m_name (name), m_description (description)
   {
     // .. nothing yet ..
   }
@@ -97,7 +97,7 @@ public:
    *  @brief The constructor with a name, type, description and default value
    */
   PCellParameterDeclaration (const std::string &name, type t, const std::string &description, const tl::Variant &def)
-    : m_default (def), m_hidden (false), m_readonly (false), m_type (t), m_name (name), m_description (description), m_range()
+    : m_default (def), m_hidden (false), m_readonly (false), m_type (t), m_name (name), m_description (description)
   {
     // .. nothing yet ..
   }
@@ -106,7 +106,7 @@ public:
    *  @brief The constructor with a name, type, description, default value and unit
    */
   PCellParameterDeclaration (const std::string &name, type t, const std::string &description, const tl::Variant &def, const std::string &unit)
-    : m_default (def), m_hidden (false), m_readonly (false), m_type (t), m_name (name), m_description (description), m_unit (unit), m_range()
+    : m_default (def), m_hidden (false), m_readonly (false), m_type (t), m_name (name), m_description (description), m_unit (unit)
   {
     // .. nothing yet ..
   }
@@ -115,7 +115,7 @@ public:
    *  @brief The constructor with a name, type and description and choice values / choice descriptions
    */
   PCellParameterDeclaration (const std::string &name, type t, const std::string &description, const std::vector<tl::Variant> &choices, const std::vector<std::string> &choice_descriptions)
-    : m_choices (choices), m_choice_descriptions (choice_descriptions), m_hidden (false), m_readonly (false), m_type (t), m_name (name), m_description (description), m_range()
+    : m_choices (choices), m_choice_descriptions (choice_descriptions), m_hidden (false), m_readonly (false), m_type (t), m_name (name), m_description (description)
   {
     // .. nothing yet ..
   }
@@ -249,53 +249,6 @@ public:
   }
 
   /**
-   *  @brief A enum describing the action of range violated
-   */
-  enum Action {
-    t_Reject = 1,   //  reject the parameter
-    t_Accept,       //  accept the parameter
-    t_Use_Default   //  use a default parameter (currently not supported)
-  };
-
-  void set_range (const tl::Variant& low, const tl::Variant& high, const tl::Variant& resolution, Action action = t_Reject)
-  {
-    m_range = Range(low, high, resolution, action);
-  }
-
-  typedef struct _Range {
-    _Range() :
-      m_low(),
-      m_high(),
-      m_resolution(),
-      m_action(t_Reject) {}
-
-    _Range(const tl::Variant& low, const tl::Variant& high, const tl::Variant& resolution, Action action = t_Reject) :
-      m_low(low),
-      m_high(high),
-      m_resolution(resolution),
-      m_action(action) {}
-
-    bool operator== (const _Range& other) const
-    {
-      return
-        m_low == other.m_low &&
-        m_high == other.m_high &&
-        m_resolution == other.m_resolution &&
-        m_action == other.m_action;
-    }
-
-    tl::Variant m_low;
-    tl::Variant m_high;
-    tl::Variant m_resolution;
-    Action m_action;
-  } Range;
-
-  const tl::optional<Range>& get_range() const
-  {
-    return m_range;
-  }
-
-   /**
    *  @brief Getter for the choice descriptions
    *
    *  The choice descriptions correspond to choice values. The descriptions
@@ -316,6 +269,56 @@ public:
   }
 
   /**
+   *  @brief Sets the minimum value
+   *
+   *  The minimum value is a visual feature and limits the allowed values for numerical
+   *  entry boxes. This applies to parameters of type int or double. The minimum value
+   *  is not effective if choices are present.
+   *
+   *  The minimum value is not enforced - for example there is no restriction implemented
+   *  when setting values programmatically.
+   *
+   *  Setting this attribute to "nil" (the default) implies "no limit".
+   */
+  void set_min_value (const tl::Variant &min)
+  {
+    m_min_value = min;
+  }
+
+  /**
+   *  @brief Gets the minimum value (see \set_min_value)
+   */
+  const tl::Variant &min_value () const
+  {
+    return m_min_value;
+  }
+
+  /**
+   *  @brief Sets the maximum value
+   *
+   *  The maximum value is a visual feature and limits the allowed values for numerical
+   *  entry boxes. This applies to parameters of type int or double. The maximum value
+   *  is not effective if choices are present.
+   *
+   *  The maximum value is not enforced - for example there is no restriction implemented
+   *  when setting values programmatically.
+   *
+   *  Setting this attribute to "nil" (the default) implies "no limit".
+   */
+  void set_max_value (const tl::Variant &max)
+  {
+    m_max_value = max;
+  }
+
+  /**
+   *  @brief Gets the maximum value (see \set_max_value)
+   */
+  const tl::Variant &max_value () const
+  {
+    return m_max_value;
+  }
+
+  /**
    *  @brief Equality
    */
   bool operator== (const db::PCellParameterDeclaration &d) const
@@ -329,7 +332,8 @@ public:
            m_name == d.m_name &&
            m_description == d.m_description &&
            m_unit == d.m_unit &&
-           m_range == d.m_range;
+           m_min_value == d.m_min_value &&
+           m_max_value == d.m_max_value;
   }
 
 private:
@@ -340,7 +344,7 @@ private:
   type m_type;
   std::string m_name;
   std::string m_description, m_unit;
-  tl::optional<Range> m_range;
+  tl::Variant m_min_value, m_max_value;
 };
 
 /**

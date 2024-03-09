@@ -921,17 +921,43 @@ Class<db::PCellParameterDeclaration> decl_PCellParameterDeclaration ("db", "PCel
     "entry field in the parameter user interface.\n"
     "If a range is already set for this parameter the choice will not be added and a warning message is showed.\n"
   ) +
-  gsi::method_ext ("set_range", &set_range, gsi::arg ("low"), gsi::arg ("high"), gsi::arg ("resolution"), gsi::arg ("action"),
-    "@brief Set a range constraint\n"
-    "This method will set a range constraint to the parameter with 'low' and 'high' as minimum and maximum value.\n"
-    "This range constraint will only be set if the parameter-, the low- and the high-type are numeric.\n"
-    "If a choice is already set for this parameter the range will not be set and a warning message is showed.\n"
-    "The optional parameter 'resolution' will give a desired resolution value (currently not used).\n"
-    "The optional parameter 'action' determines the action to be invoked.\n"
-    "This action can be one of three values: REJECT, ACCEPT, USE_DEFAULT. If this failure action\n"
-    "parameter is not specified, then it will be REJECT by default.\n"
-    "If a range constraint is violated this parameter is marked wrong with violation hint in the\n"
-    "parameter user interface.\n"
+  gsi::method ("min_value", &db::PCellParameterDeclaration::min_value,
+    "@brief Gets the minimum value allowed\n"
+    "See \\min_value= for a description of this attribute.\n"
+    "\n"
+    "This attribute has been added in version 0.29."
+  ) +
+  gsi::method ("min_value=", &db::PCellParameterDeclaration::set_min_value, gsi::arg ("value"),
+    "@brief Sets the minimum value allowed\n"
+    "The minimum value is a visual feature and limits the allowed values for numerical\n"
+    "entry boxes. This applies to parameters of type int or double. The minimum value\n"
+    "is not effective if choices are present.\n"
+    "\n"
+    "The minimum value is not enforced - for example there is no restriction implemented\n"
+    "when setting values programmatically.\n"
+    "\n"
+    "Setting this attribute to \"nil\" (the default) implies \"no limit\".\n"
+    "\n"
+    "This attribute has been added in version 0.29."
+  ) +
+  gsi::method ("max_value", &db::PCellParameterDeclaration::max_value,
+    "@brief Gets the maximum value allowed\n"
+    "See \\max_value= for a description of this attribute.\n"
+    "\n"
+    "This attribute has been added in version 0.29."
+  ) +
+  gsi::method ("max_value=", &db::PCellParameterDeclaration::set_max_value, gsi::arg ("value"),
+    "@brief Sets the maximum value allowed\n"
+    "The maximum value is a visual feature and limits the allowed values for numerical\n"
+    "entry boxes. This applies to parameters of type int or double. The maximum value\n"
+    "is not effective if choices are present.\n"
+    "\n"
+    "The maximum value is not enforced - for example there is no restriction implemented\n"
+    "when setting values programmatically.\n"
+    "\n"
+    "Setting this attribute to \"nil\" (the default) implies \"no limit\".\n"
+    "\n"
+    "This attribute has been added in version 0.29."
   ) +
   gsi::method ("choice_values", &db::PCellParameterDeclaration::get_choices,
     "@brief Returns a list of choice values\n"

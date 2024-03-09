@@ -24,136 +24,132 @@
 #define HDR_tlOptional
 
 #include "tlAssert.h"
+#include "tlString.h"
+#include "tlCommon.h"
 
 #include <iostream>
-#include <optional>
 
 namespace tl
 {
-
-#if __cplusplus >= 201703L
-
-template<typename T>
-class optional : public std::optional<T> {};
-
-#else
 
 struct nullopt_t {};
 
 extern const nullopt_t nullopt;
 
-/*
- * Poor man's partly implementation of C++17's std::optional
+/**
+ *  @brief Poor man's partial implementation of C++17's std::optional
  */
 template<typename T>
-class optional
+class TL_PUBLIC_TEMPLATE optional
 {
 public:
-    optional() :
-        a_value(),
-        a_isValid(false)
-    {}
+  optional () :
+    m_value (),
+    m_is_valid (false)
+  {}
 
-    optional(const nullopt_t&) :
-        a_value(),
-        a_isValid(false)
-    {}
+  optional (const nullopt_t &) :
+    m_value (),
+    m_is_valid (false)
+  {}
 
-    optional(const T &value) :
-        a_value(value),
-        a_isValid(true)
-    {}
+  optional (const T &value) :
+    m_value (value),
+    m_is_valid (true)
+  {}
 
-    void reset()
-    {
-        a_isValid = false;
-    }
+  void reset ()
+  {
+    m_is_valid = false;
+  }
 
-    bool has_value() const { return a_isValid; }
+  bool has_value() const { return m_is_valid; }
 
-    T &value()
-    {
-        tl_assert(a_isValid);
+  T &value ()
+  {
+    tl_assert (m_is_valid);
 
-        return a_value;
-    }
+    return m_value;
+  }
 
-    const T &value() const
-    {
-        tl_assert(a_isValid);
+  const T &value () const
+  {
+    tl_assert (m_is_valid);
 
-        return a_value;
-    }
+    return m_value;
+  }
 
-    T& operator* ()
-    {
-        return value();
-    }
+  T& operator* ()
+  {
+    return value ();
+  }
 
-    const T& operator* () const
-    {
-        return value();
-    }
+  const T& operator* () const
+  {
+    return value ();
+  }
 
-    T* operator-> ()
-    {
-        return &value();
-    }
+  T* operator-> ()
+  {
+    return m_is_valid ? &m_value : 0;
+  }
 
-    const T* operator-> () const
-    {
-        return &value();
-    }
+  const T* operator-> () const
+  {
+    return m_is_valid ? &m_value : 0;
+  }
 
 private:
-    T a_value;
-    bool a_isValid;
+  T m_value;
+  bool m_is_valid;
 };
 
 template<typename T>
-optional<T> make_optional(const T& value)
+optional<T> make_optional (const T &value)
 {
-    return optional<T>(value);
+  return optional<T> (value);
 }
 
 template<typename T>
-bool operator==(const optional<T> &lhs, const optional<T> &rhs)
+bool operator== (const optional<T> &lhs, const optional<T> &rhs)
 {
-    if (lhs.has_value() != rhs.has_value())
-    {
-        return false;
-    }
+  if (lhs.has_value () != rhs.has_value ()) {
+    return false;
+  }
+  if (!lhs.has_value ()) {
+    return true;
+  }
 
-    if (!lhs.has_value())
-    {
-        return true;
-    }
-
-    return lhs.value() == rhs.value();
+  return lhs.value() == rhs.value();
 }
 
 template<typename T>
-bool operator!=(const optional<T> &lhs, const optional<T> &rhs)
+bool operator!= (const optional<T> &lhs, const optional<T> &rhs)
 {
-    return !(lhs == rhs);
+  return !(lhs == rhs);
 }
 
 template<typename T>
-std::ostream &operator<<(std::ostream &ostr, const optional<T> &rhs)
+std::ostream &operator<< (std::ostream &ostr, const optional<T> &rhs)
 {
-    if (rhs.has_value())
-    {
-        ostr << rhs.value();
-    }
-    else
-    {
-        ostr << "<invalid>";
-    }
+  if (rhs.has_value()) {
+    ostr << rhs.value();
+  } else {
+    ostr << "<invalid>";
+  }
 
-    return ostr;
+  return ostr;
 }
 
-#endif /* __cplusplus >= 201703L */
+template <class T>
+std::string to_string (const optional<T> &opt)
+{
+  if (opt.has_value ()) {
+    return tl::to_string (*opt);
+  } else {
+    return std::string ();
+  }
+}
 
 } // namespace tl
 

@@ -25,8 +25,6 @@
 namespace tl
 {
 
-#if __cplusplus < 201703L
-extern const nullopt_t nullopt = nullopt_t();
-#endif
+extern const nullopt_t nullopt = nullopt_t ();
 
 } // namespace tl

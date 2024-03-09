@@ -154,6 +154,10 @@ CommonReaderBase::rename_cell (db::Layout &layout, size_t id, const std::string 
     common_reader_error (tl::sprintf (tl::to_string (tr ("Cell named %s with ID %ld was already given name %s")), cn, id, iid->second.first));
   }
 
+  if (iname != m_name_map.end () && iname->second.first != null_id && iname->second.first != id) {
+    common_reader_error (tl::sprintf (tl::to_string (tr ("Same cell name %s, but different IDs: %ld and %ld")), cn, id, iname->second.first));
+  }
+
   if (iid != m_id_map.end () && iname != m_name_map.end ()) {
 
     if (iname->second.second != iid->second.second) {

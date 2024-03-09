@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>668</width>
-    <height>410</height>
+    <width>745</width>
+    <height>438</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -845,7 +845,12 @@
            </item>
            <item>
             <property name="text">
-             <string>Angle measurement (three mouse clicks)</string>
+             <string>Auto measure along edge (points will be set automatically)</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Angle or radius measurement (three mouse clicks)</string>
             </property>
            </item>
            <item>

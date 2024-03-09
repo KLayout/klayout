@@ -1126,6 +1126,14 @@ class Cell:
 
         This method has been added in version 0.23.
         """
+    def copy_meta_info(self, other: Cell) -> None:
+        r"""
+        @brief Copies the meta information from the other cell into this cell
+        See \LayoutMetaInfo for details about cells and meta information.
+        The meta information from this cell will be replaced by the meta information from the other cell.
+
+        This method has been introduced in version 0.28.16.
+        """
     @overload
     def copy_shapes(self, source_cell: Cell) -> None:
         r"""
@@ -1770,6 +1778,15 @@ class Cell:
         are proxies to a pcell.
 
         This method has been introduced in version 0.22.
+        """
+    def merge_meta_info(self, other: Cell) -> None:
+        r"""
+        @brief Merges the meta information from the other cell into this cell
+        See \LayoutMetaInfo for details about cells and meta information.
+        Existing keys in this cell will be overwritten by the respective values from the other cell.
+        New keys will be added.
+
+        This method has been introduced in version 0.28.16.
         """
     def meta_info(self, name: str) -> LayoutMetaInfo:
         r"""
@@ -3885,9 +3902,7 @@ class CompoundRegionOperationNode:
 
     The search distance for intruder shapes is determined by the operation and computed from the operation's requirements.
 
-    NOTE: this feature is experimental and not deployed into the the DRC framework yet.
-
-    This class has been introduced in version 0.27.
+    This class has been introduced in version 0.27. The API is considered internal and will change without notice.
     """
     class GeometricalOp:
         r"""
@@ -3926,12 +3941,12 @@ class CompoundRegionOperationNode:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -4140,12 +4155,12 @@ class CompoundRegionOperationNode:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -4320,12 +4335,12 @@ class CompoundRegionOperationNode:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -4460,11 +4475,11 @@ class CompoundRegionOperationNode:
         @brief Creates a node delivering an empty result of the given type
         """
     @classmethod
-    def new_enclosed_check(cls, other: CompoundRegionOperationNode, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., shielded: Optional[bool] = ..., opposite_filter: Optional[Region.OppositeFilter] = ..., rect_filter: Optional[Region.RectFilter] = ..., negative: Optional[bool] = ...) -> CompoundRegionOperationNode:
+    def new_enclosed_check(cls, other: CompoundRegionOperationNode, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., shielded: Optional[bool] = ..., opposite_filter: Optional[Region.OppositeFilter] = ..., rect_filter: Optional[Region.RectFilter] = ..., zero_distance_mode: Optional[ZeroDistanceMode] = ..., negative: Optional[bool] = ...) -> CompoundRegionOperationNode:
         r"""
         @brief Creates a node providing an enclosed (secondary enclosing primary) check.
 
-        This method has been added in version 0.27.5.
+        This method has been added in version 0.27.5. The zero_distance_mode argument has been inserted in version 0.29.
         """
     @classmethod
     def new_enclosing(cls, a: CompoundRegionOperationNode, b: CompoundRegionOperationNode, inverse: Optional[bool] = ..., min_count: Optional[int] = ..., max_count: Optional[int] = ...) -> CompoundRegionOperationNode:
@@ -4472,9 +4487,11 @@ class CompoundRegionOperationNode:
         @brief Creates a node representing an inside selection operation between the inputs.
         """
     @classmethod
-    def new_enclosing_check(cls, other: CompoundRegionOperationNode, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., shielded: Optional[bool] = ..., opposite_filter: Optional[Region.OppositeFilter] = ..., rect_filter: Optional[Region.RectFilter] = ..., negative: Optional[bool] = ...) -> CompoundRegionOperationNode:
+    def new_enclosing_check(cls, other: CompoundRegionOperationNode, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., shielded: Optional[bool] = ..., opposite_filter: Optional[Region.OppositeFilter] = ..., rect_filter: Optional[Region.RectFilter] = ..., zero_distance_mode: Optional[ZeroDistanceMode] = ..., negative: Optional[bool] = ...) -> CompoundRegionOperationNode:
         r"""
         @brief Creates a node providing an inside (enclosure) check.
+
+        The zero_distance_mode argument has been inserted in version 0.29.
         """
     @classmethod
     def new_end_segments(cls, input: CompoundRegionOperationNode, length: int, fraction: float) -> CompoundRegionOperationNode:
@@ -4539,9 +4556,11 @@ class CompoundRegionOperationNode:
         @brief Creates a node representing an interacting selection operation between the inputs.
         """
     @classmethod
-    def new_isolated_check(cls, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., shielded: Optional[bool] = ..., opposite_filter: Optional[Region.OppositeFilter] = ..., rect_filter: Optional[Region.RectFilter] = ..., negative: Optional[bool] = ...) -> CompoundRegionOperationNode:
+    def new_isolated_check(cls, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., shielded: Optional[bool] = ..., opposite_filter: Optional[Region.OppositeFilter] = ..., rect_filter: Optional[Region.RectFilter] = ..., zero_distance_mode: Optional[ZeroDistanceMode] = ..., negative: Optional[bool] = ...) -> CompoundRegionOperationNode:
         r"""
         @brief Creates a node providing a isolated polygons (space between different polygons) check.
+
+        The zero_distance_mode argument has been inserted in version 0.29.
         """
     @classmethod
     def new_join(cls, inputs: Sequence[CompoundRegionOperationNode]) -> CompoundRegionOperationNode:
@@ -4609,9 +4628,11 @@ class CompoundRegionOperationNode:
         @brief Creates a node providing a Minkowski sum with a point sequence forming a contour.
         """
     @classmethod
-    def new_notch_check(cls, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., shielded: Optional[bool] = ..., negative: Optional[bool] = ...) -> CompoundRegionOperationNode:
+    def new_notch_check(cls, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., shielded: Optional[bool] = ..., zero_distance_mode: Optional[ZeroDistanceMode] = ..., negative: Optional[bool] = ...) -> CompoundRegionOperationNode:
         r"""
         @brief Creates a node providing a intra-polygon space check.
+
+        The zero_distance_mode argument has been inserted in version 0.29.
         """
     @classmethod
     def new_outside(cls, a: CompoundRegionOperationNode, b: CompoundRegionOperationNode, inverse: Optional[bool] = ...) -> CompoundRegionOperationNode:
@@ -4619,9 +4640,11 @@ class CompoundRegionOperationNode:
         @brief Creates a node representing an outside selection operation between the inputs.
         """
     @classmethod
-    def new_overlap_check(cls, other: CompoundRegionOperationNode, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., shielded: Optional[bool] = ..., opposite_filter: Optional[Region.OppositeFilter] = ..., rect_filter: Optional[Region.RectFilter] = ..., negative: Optional[bool] = ...) -> CompoundRegionOperationNode:
+    def new_overlap_check(cls, other: CompoundRegionOperationNode, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., shielded: Optional[bool] = ..., opposite_filter: Optional[Region.OppositeFilter] = ..., rect_filter: Optional[Region.RectFilter] = ..., zero_distance_mode: Optional[ZeroDistanceMode] = ..., negative: Optional[bool] = ...) -> CompoundRegionOperationNode:
         r"""
         @brief Creates a node providing an overlap check.
+
+        The zero_distance_mode argument has been inserted in version 0.29.
         """
     @classmethod
     def new_overlapping(cls, a: CompoundRegionOperationNode, b: CompoundRegionOperationNode, inverse: Optional[bool] = ..., min_count: Optional[int] = ..., max_count: Optional[int] = ...) -> CompoundRegionOperationNode:
@@ -4695,9 +4718,11 @@ class CompoundRegionOperationNode:
         @brief Creates a node object representing the secondary input from the given region
         """
     @classmethod
-    def new_separation_check(cls, other: CompoundRegionOperationNode, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., shielded: Optional[bool] = ..., opposite_filter: Optional[Region.OppositeFilter] = ..., rect_filter: Optional[Region.RectFilter] = ..., negative: Optional[bool] = ...) -> CompoundRegionOperationNode:
+    def new_separation_check(cls, other: CompoundRegionOperationNode, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., shielded: Optional[bool] = ..., opposite_filter: Optional[Region.OppositeFilter] = ..., rect_filter: Optional[Region.RectFilter] = ..., zero_distance_mode: Optional[ZeroDistanceMode] = ..., negative: Optional[bool] = ...) -> CompoundRegionOperationNode:
         r"""
         @brief Creates a node providing a separation check.
+
+        The zero_distance_mode argument has been inserted in version 0.29.
         """
     @classmethod
     def new_sized(cls, input: CompoundRegionOperationNode, dx: int, dy: int, mode: int) -> CompoundRegionOperationNode:
@@ -4712,9 +4737,11 @@ class CompoundRegionOperationNode:
         @param keep_hv If true, horizontal and vertical edges are maintained.
         """
     @classmethod
-    def new_space_check(cls, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., shielded: Optional[bool] = ..., opposite_filter: Optional[Region.OppositeFilter] = ..., rect_filter: Optional[Region.RectFilter] = ..., negative: Optional[bool] = ...) -> CompoundRegionOperationNode:
+    def new_space_check(cls, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., shielded: Optional[bool] = ..., opposite_filter: Optional[Region.OppositeFilter] = ..., rect_filter: Optional[Region.RectFilter] = ..., zero_distance_mode: Optional[ZeroDistanceMode] = ..., negative: Optional[bool] = ...) -> CompoundRegionOperationNode:
         r"""
         @brief Creates a node providing a space check.
+
+        The zero_distance_mode argument has been inserted in version 0.29.
         """
     @classmethod
     def new_start_segments(cls, input: CompoundRegionOperationNode, length: int, fraction: float) -> CompoundRegionOperationNode:
@@ -4733,9 +4760,11 @@ class CompoundRegionOperationNode:
         @brief Creates a node providing a composition into trapezoids.
         """
     @classmethod
-    def new_width_check(cls, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., shielded: Optional[bool] = ..., negative: Optional[bool] = ...) -> CompoundRegionOperationNode:
+    def new_width_check(cls, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., shielded: Optional[bool] = ..., zero_distance_mode: Optional[ZeroDistanceMode] = ..., negative: Optional[bool] = ...) -> CompoundRegionOperationNode:
         r"""
         @brief Creates a node providing a width check.
+
+        The zero_distance_mode argument has been inserted in version 0.29.
         """
     def __init__(self) -> None:
         r"""
@@ -11347,7 +11376,8 @@ class DText:
     Setter:
     @brief Sets the vertical alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     x: float
     r"""
@@ -19058,6 +19088,12 @@ class Edges(ShapeCollection):
             r"""
             @brief Gets the symbolic string from an enum
             """
+    AlwaysIncludeZeroDistance: ClassVar[ZeroDistanceMode]
+    r"""
+    @hide
+    @brief Specifies that check functions should always include edges with zero distance
+    This mode has little practical value.
+    """
     DiagonalEdges: ClassVar[Edges.EdgeType]
     r"""
     @brief Diagonal edges are selected (-45 and 45 degree)
@@ -19087,6 +19123,26 @@ class Edges(ShapeCollection):
     r"""
     @brief Specifies to ignore properties
     When using this constraint - for example on a boolean operation - properties are ignored and are not generated in the output.
+    """
+    IncludeZeroDistanceWhenCollinearAndTouching: ClassVar[ZeroDistanceMode]
+    r"""
+    @brief Specifies that check functions should include edges when they are collinear and touch
+    With this specification, the check functions will also check edges if they share at least one common point and are collinear. This is the mode that includes checking the 'kissing corner' cases when the kissing edges are collinear. This mode was default up to version 0.28. 
+    """
+    IncludeZeroDistanceWhenOverlapping: ClassVar[ZeroDistanceMode]
+    r"""
+    @brief Specifies that check functions should include edges when they overlap
+    With this specification, the check functions will also check edges which are collinear and share more than a single point. This is the mode that excludes the 'kissing corner' cases.
+    """
+    IncludeZeroDistanceWhenTouching: ClassVar[ZeroDistanceMode]
+    r"""
+    @brief Specifies that check functions should include edges when they touch
+    With this specification, the check functions will also check edges if they share at least one common point. This is the mode that includes checking the 'kissing corner' cases. This mode is default for version 0.29 and later. 
+    """
+    NeverIncludeZeroDistance: ClassVar[ZeroDistanceMode]
+    r"""
+    @brief Specifies that check functions should never include edges with zero distance.
+    With this specification, the check functions will ignore edges which are collinear or touch.
     """
     NoPropertyConstraint: ClassVar[PropertyConstraint]
     r"""
@@ -19960,7 +20016,7 @@ class Edges(ShapeCollection):
 
         This method has been introduced in version 0.28.4.
         """
-    def enclosed_check(self, other: Edges, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ...) -> EdgePairs:
+    def enclosed_check(self, other: Edges, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., zero_distance_mode: Optional[ZeroDistanceMode] = ...) -> EdgePairs:
         r"""
         @brief Performs an inside check with options
         @param d The minimum distance for which the edges are checked
@@ -19970,6 +20026,7 @@ class Edges(ShapeCollection):
         @param ignore_angle The threshold angle above which no check is performed
         @param min_projection The lower threshold of the projected length of one edge onto another
         @param max_projection The upper threshold of the projected length of one edge onto another
+        @param zero_distance_mode Specifies how to handle edges with zero distance
 
         If "whole_edges" is true, the resulting \EdgePairs collection will receive the whole edges which contribute in the width check.
 
@@ -19982,8 +20039,9 @@ class Edges(ShapeCollection):
         "min_projection" and "max_projection" allow selecting edges by their projected value upon each other. It is sufficient if the projection of one edge on the other matches the specified condition. The projected length must be larger or equal to "min_projection" and less than "max_projection". If you don't want to specify one threshold, pass nil to the respective value.
 
         The 'enclosed_check' alias was introduced in version 0.27.5.
+        'zero_distance_mode' has been added in version 0.29.
         """
-    def enclosing_check(self, other: Edges, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ...) -> EdgePairs:
+    def enclosing_check(self, other: Edges, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., zero_distance_mode: Optional[ZeroDistanceMode] = ...) -> EdgePairs:
         r"""
         @brief Performs an enclosing check with options
         @param d The minimum distance for which the edges are checked
@@ -19993,6 +20051,7 @@ class Edges(ShapeCollection):
         @param ignore_angle The threshold angle above which no check is performed
         @param min_projection The lower threshold of the projected length of one edge onto another
         @param max_projection The upper threshold of the projected length of one edge onto another
+        @param zero_distance_mode Specifies how to handle edges with zero distance
 
         If "whole_edges" is true, the resulting \EdgePairs collection will receive the whole edges which contribute in the width check.
 
@@ -20003,6 +20062,8 @@ class Edges(ShapeCollection):
         Use nil for this value to select the default.
 
         "min_projection" and "max_projection" allow selecting edges by their projected value upon each other. It is sufficient if the projection of one edge on the other matches the specified condition. The projected length must be larger or equal to "min_projection" and less than "max_projection". If you don't want to specify one threshold, pass nil to the respective value.
+
+        'zero_distance_mode' has been added in version 0.29.
         """
     def end_segments(self, length: int, fraction: float) -> Edges:
         r"""
@@ -20247,7 +20308,7 @@ class Edges(ShapeCollection):
 
         This method has been introduced in version 0.28.
         """
-    def inside_check(self, other: Edges, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ...) -> EdgePairs:
+    def inside_check(self, other: Edges, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., zero_distance_mode: Optional[ZeroDistanceMode] = ...) -> EdgePairs:
         r"""
         @brief Performs an inside check with options
         @param d The minimum distance for which the edges are checked
@@ -20257,6 +20318,7 @@ class Edges(ShapeCollection):
         @param ignore_angle The threshold angle above which no check is performed
         @param min_projection The lower threshold of the projected length of one edge onto another
         @param max_projection The upper threshold of the projected length of one edge onto another
+        @param zero_distance_mode Specifies how to handle edges with zero distance
 
         If "whole_edges" is true, the resulting \EdgePairs collection will receive the whole edges which contribute in the width check.
 
@@ -20269,6 +20331,7 @@ class Edges(ShapeCollection):
         "min_projection" and "max_projection" allow selecting edges by their projected value upon each other. It is sufficient if the projection of one edge on the other matches the specified condition. The projected length must be larger or equal to "min_projection" and less than "max_projection". If you don't want to specify one threshold, pass nil to the respective value.
 
         The 'enclosed_check' alias was introduced in version 0.27.5.
+        'zero_distance_mode' has been added in version 0.29.
         """
     def inside_outside_part(self, other: Region) -> List[Edges]:
         r"""
@@ -20625,7 +20688,7 @@ class Edges(ShapeCollection):
 
         This method has been introduced in version 0.24.
         """
-    def overlap_check(self, other: Edges, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ...) -> EdgePairs:
+    def overlap_check(self, other: Edges, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., zero_distance_mode: Optional[ZeroDistanceMode] = ...) -> EdgePairs:
         r"""
         @brief Performs an overlap check with options
         @param d The minimum distance for which the edges are checked
@@ -20635,6 +20698,7 @@ class Edges(ShapeCollection):
         @param ignore_angle The threshold angle above which no check is performed
         @param min_projection The lower threshold of the projected length of one edge onto another
         @param max_projection The upper threshold of the projected length of one edge onto another
+        @param zero_distance_mode Specifies how to handle edges with zero distance
 
         If "whole_edges" is true, the resulting \EdgePairs collection will receive the whole edges which contribute in the width check.
 
@@ -20645,6 +20709,8 @@ class Edges(ShapeCollection):
         Use nil for this value to select the default.
 
         "min_projection" and "max_projection" allow selecting edges by their projected value upon each other. It is sufficient if the projection of one edge on the other matches the specified condition. The projected length must be larger or equal to "min_projection" and less than "max_projection". If you don't want to specify one threshold, pass nil to the respective value.
+
+        'zero_distance_mode' has been added in version 0.29.
         """
     @overload
     def pull_interacting(self, other: Edges) -> Edges:
@@ -20803,7 +20869,7 @@ class Edges(ShapeCollection):
 
         This method has been introduced in version 0.24.
         """
-    def separation_check(self, other: Edges, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ...) -> EdgePairs:
+    def separation_check(self, other: Edges, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., zero_distance_mode: Optional[ZeroDistanceMode] = ...) -> EdgePairs:
         r"""
         @brief Performs an overlap check with options
         @param d The minimum distance for which the edges are checked
@@ -20813,6 +20879,7 @@ class Edges(ShapeCollection):
         @param ignore_angle The threshold angle above which no check is performed
         @param min_projection The lower threshold of the projected length of one edge onto another
         @param max_projection The upper threshold of the projected length of one edge onto another
+        @param zero_distance_mode Specifies how to handle edges with zero distance
 
         If "whole_edges" is true, the resulting \EdgePairs collection will receive the whole edges which contribute in the width check.
 
@@ -20823,6 +20890,8 @@ class Edges(ShapeCollection):
         Use nil for this value to select the default.
 
         "min_projection" and "max_projection" allow selecting edges by their projected value upon each other. It is sufficient if the projection of one edge on the other matches the specified condition. The projected length must be larger or equal to "min_projection" and less than "max_projection". If you don't want to specify one threshold, pass nil to the respective value.
+
+        'zero_distance_mode' has been added in version 0.29.
         """
     def size(self) -> int:
         r"""
@@ -20833,7 +20902,7 @@ class Edges(ShapeCollection):
 
         Starting with version 0.27, the method is called 'count' for consistency with \Region. 'size' is still provided as an alias.
         """
-    def space_check(self, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ...) -> EdgePairs:
+    def space_check(self, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., zero_distance_mode: Optional[ZeroDistanceMode] = ...) -> EdgePairs:
         r"""
         @brief Performs a space check with options
         @param d The minimum distance for which the edges are checked
@@ -20842,6 +20911,7 @@ class Edges(ShapeCollection):
         @param ignore_angle The threshold angle above which no check is performed
         @param min_projection The lower threshold of the projected length of one edge onto another
         @param max_projection The upper threshold of the projected length of one edge onto another
+        @param zero_distance_mode Specifies how to handle edges with zero distance
 
         If "whole_edges" is true, the resulting \EdgePairs collection will receive the whole edges which contribute in the space check.
 
@@ -20852,6 +20922,8 @@ class Edges(ShapeCollection):
         Use nil for this value to select the default.
 
         "min_projection" and "max_projection" allow selecting edges by their projected value upon each other. It is sufficient if the projection of one edge on the other matches the specified condition. The projected length must be larger or equal to "min_projection" and less than "max_projection". If you don't want to specify one threshold, pass nil to the respective value.
+
+        'zero_distance_mode' has been added in version 0.29.
         """
     @overload
     def split_inside(self, other: Edges) -> List[Edges]:
@@ -21066,7 +21138,7 @@ class Edges(ShapeCollection):
 
         @return The transformed edge collection.
         """
-    def width_check(self, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ...) -> EdgePairs:
+    def width_check(self, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., zero_distance_mode: Optional[ZeroDistanceMode] = ...) -> EdgePairs:
         r"""
         @brief Performs a width check with options
         @param d The minimum width for which the edges are checked
@@ -21075,6 +21147,7 @@ class Edges(ShapeCollection):
         @param ignore_angle The threshold angle above which no check is performed
         @param min_projection The lower threshold of the projected length of one edge onto another
         @param max_projection The upper threshold of the projected length of one edge onto another
+        @param zero_distance_mode Specifies how to handle edges with zero distance
 
         If "whole_edges" is true, the resulting \EdgePairs collection will receive the whole edges which contribute in the width check.
 
@@ -21085,6 +21158,8 @@ class Edges(ShapeCollection):
         Use nil for this value to select the default.
 
         "min_projection" and "max_projection" allow selecting edges by their projected value upon each other. It is sufficient if the projection of one edge on the other matches the specified condition. The projected length must be larger or equal to "min_projection" and less than "max_projection". If you don't want to specify one threshold, pass nil to the respective value.
+
+        'zero_distance_mode' has been added in version 0.29.
         """
     @overload
     def with_angle(self, angle: float, inverse: bool) -> Edges:
@@ -21777,12 +21852,12 @@ class HAlign:
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums
+        @brief Compares an enum with an integer value
         """
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer value
+        @brief Compares two enums
         """
     @overload
     def __init__(self, i: int) -> None:
@@ -21807,12 +21882,12 @@ class HAlign:
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums for inequality
+        @brief Compares an enum with an integer for inequality
         """
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer for inequality
+        @brief Compares two enums for inequality
         """
     def __repr__(self) -> str:
         r"""
@@ -24021,9 +24096,10 @@ class Instance:
     @brief Gets the transformation of the instance or the first instance in the array
     The transformation returned is only valid if the array does not represent a complex transformation array
     Setter:
-    @brief Sets the transformation of the instance or the first instance in the array
+    @brief Sets the transformation of the instance or the first instance in the array (in micrometer units)
+    This method sets the transformation the same way as \cplx_trans=, but the displacement of this transformation is given in micrometer units. It is internally translated into database units.
 
-    This method has been introduced in version 0.23.
+    This method has been introduced in version 0.25.
     """
     @classmethod
     def new(cls) -> Instance:
@@ -26798,6 +26874,12 @@ class Layout:
 
         Clears the layout completely.
         """
+    def clear_all_meta_info(self) -> None:
+        r"""
+        @brief Clears all meta information of the layout (cell specific and global)
+        See \LayoutMetaInfo for details about layouts and meta information.
+        This method has been introduced in version 0.28.16.
+        """
     @overload
     def clear_layer(self, layer_index: int) -> None:
         r"""
@@ -26949,6 +27031,26 @@ class Layout:
         @param flags A combination of the shape type flags from \Shapes, S... constants
 
         This method variant has been introduced in version 0.28.9.
+        """
+    @overload
+    def copy_meta_info(self, other: Layout) -> None:
+        r"""
+        @brief Copies the meta information from the other layout into this layout
+        See \LayoutMetaInfo for details about cells and meta information.
+        The meta information from this layout will be replaced by the meta information from the other layout.
+
+        This method has been introduced in version 0.28.16.
+        """
+    @overload
+    def copy_meta_info(self, other: Layout, cm: CellMapping) -> None:
+        r"""
+        @brief Copies the meta information from the other layout into this layout for the cells given by the cell mapping
+        See \LayoutMetaInfo for details about cells and meta information.
+        This method will use the source/target cell pairs from the cell mapping object and merge the meta information from each source cell from the 'other' layout into the mapped cell inside self.
+        This method can be used with '\copy_tree_shapes' and similar to copy meta information in addition to the shapes.
+        All cell-specific keys in this layout will be replaced by the respective values from the other layout.
+
+        This method has been introduced in version 0.28.16.
         """
     @overload
     def copy_tree_shapes(self, source_layout: Layout, cell_mapping: CellMapping) -> None:
@@ -27450,6 +27552,28 @@ class Layout:
         r"""
         @brief Gets the library this layout lives in or nil if the layout is not part of a library
         This attribute has been introduced in version 0.27.5.
+        """
+    @overload
+    def merge_meta_info(self, other: Layout) -> None:
+        r"""
+        @brief Merges the meta information from the other layout into this layout
+        See \LayoutMetaInfo for details about cells and meta information.
+        Existing keys in this layout will be overwritten by the respective values from the other layout.
+        New keys will be added.
+
+        This method has been introduced in version 0.28.16.
+        """
+    @overload
+    def merge_meta_info(self, other: Layout, cm: CellMapping) -> None:
+        r"""
+        @brief Merges the meta information from the other layout into this layout for the cells given by the cell mapping
+        See \LayoutMetaInfo for details about cells and meta information.
+        This method will use the source/target cell pairs from the cell mapping object and merge the meta information from each source cell from the 'other' layout into the mapped cell inside self.
+        This method can be used with '\copy_tree_shapes' and similar to copy meta information in addition to the shapes.
+        Existing cell-specific keys in this layout will be overwritten by the respective values from the other layout.
+        New keys will be added.
+
+        This method has been introduced in version 0.28.16.
         """
     def meta_info(self, name: str) -> LayoutMetaInfo:
         r"""
@@ -27963,19 +28087,19 @@ class LayoutDiff:
     BoxesAsPolygons: ClassVar[int]
     r"""
     @brief Compare boxes to polygons
-    This constant can be used for the flags parameter of \compare_layouts and \compare_cells. It can be compared with other constants to form a flag set.
+    This constant can be used for the flags parameter of \compare_layouts and \compare_cells. It can be combined with other constants to form a flag set.
     """
     DontSummarizeMissingLayers: ClassVar[int]
     r"""
     @brief Don't summarize missing layers
     If this mode is present, missing layers are treated as empty ones and every shape on the other layer will be reported as difference.
 
-    This constant can be used for the flags parameter of \compare_layouts and \compare_cells. It can be compared with other constants to form a flag set.
+    This constant can be used for the flags parameter of \compare_layouts and \compare_cells. It can be combined with other constants to form a flag set.
     """
     FlattenArrayInsts: ClassVar[int]
     r"""
     @brief Compare array instances instance by instance
-    This constant can be used for the flags parameter of \compare_layouts and \compare_cells. It can be compared with other constants to form a flag set.
+    This constant can be used for the flags parameter of \compare_layouts and \compare_cells. It can be combined with other constants to form a flag set.
     """
     IgnoreDuplicates: ClassVar[int]
     r"""
@@ -27987,41 +28111,41 @@ class LayoutDiff:
     NoLayerNames: ClassVar[int]
     r"""
     @brief Do not compare layer names
-    This constant can be used for the flags parameter of \compare_layouts and \compare_cells. It can be compared with other constants to form a flag set.
+    This constant can be used for the flags parameter of \compare_layouts and \compare_cells. It can be combined with other constants to form a flag set.
     """
     NoProperties: ClassVar[int]
     r"""
     @brief Ignore properties
-    This constant can be used for the flags parameter of \compare_layouts and \compare_cells. It can be compared with other constants to form a flag set.
+    This constant can be used for the flags parameter of \compare_layouts and \compare_cells. It can be combined with other constants to form a flag set.
     """
     NoTextDetails: ClassVar[int]
     r"""
     @brief Ignore text details (font, size, presentation)
-    This constant can be used for the flags parameter of \compare_layouts and \compare_cells. It can be compared with other constants to form a flag set.
+    This constant can be used for the flags parameter of \compare_layouts and \compare_cells. It can be combined with other constants to form a flag set.
     """
     NoTextOrientation: ClassVar[int]
     r"""
     @brief Ignore text orientation
-    This constant can be used for the flags parameter of \compare_layouts and \compare_cells. It can be compared with other constants to form a flag set.
+    This constant can be used for the flags parameter of \compare_layouts and \compare_cells. It can be combined with other constants to form a flag set.
     """
     PathsAsPolygons: ClassVar[int]
     r"""
     @brief Compare paths to polygons
-    This constant can be used for the flags parameter of \compare_layouts and \compare_cells. It can be compared with other constants to form a flag set.
+    This constant can be used for the flags parameter of \compare_layouts and \compare_cells. It can be combined with other constants to form a flag set.
     """
     Silent: ClassVar[int]
     r"""
     @brief Silent compare - just report whether the layouts are identical
     Silent mode will not issue any signals, but instead the return value of the \LayoutDiff#compare method will indicate whether the layouts are identical. In silent mode, the compare method will return immediately once a difference has been encountered so that mode may be much faster than the full compare.
 
-    This constant can be used for the flags parameter of \compare_layouts and \compare_cells. It can be compared with other constants to form a flag set.
+    This constant can be used for the flags parameter of \compare_layouts and \compare_cells. It can be combined with other constants to form a flag set.
     """
     SmartCellMapping: ClassVar[int]
     r"""
     @brief Derive smart cell mapping instead of name mapping (available only if top cells are specified)
     Smart cell mapping is only effective currently when cells are compared (with \LayoutDiff#compare with cells instead of layout objects).
 
-    This constant can be used for the flags parameter of \compare_layouts and \compare_cells. It can be compared with other constants to form a flag set.
+    This constant can be used for the flags parameter of \compare_layouts and \compare_cells. It can be combined with other constants to form a flag set.
     """
     Verbose: ClassVar[int]
     r"""
@@ -28029,7 +28153,14 @@ class LayoutDiff:
 
     See the event descriptions for details about the differences in verbose and non-verbose mode.
 
-    This constant can be used for the flags parameter of \compare_layouts and \compare_cells. It can be compared with other constants to form a flag set.
+    This constant can be used for the flags parameter of \compare_layouts and \compare_cells. It can be combined with other constants to form a flag set.
+    """
+    WithMetaInfo: ClassVar[int]
+    r"""
+    @brief Ignore meta info
+    This constant can be used for the flags parameter of \compare_layouts and \compare_cells. It can be combined with other constants to form a flag set. If present, this option tells the compare algorithm to include persisted meta info in the compare.
+
+    This flag has been introduced in version 0.28.16.
     """
     on_bbox_differs: None
     r"""
@@ -28053,10 +28184,10 @@ class LayoutDiff:
     on_begin_cell: None
     r"""
     Getter:
-    @brief This signal initiates the sequence of events for a cell pair
+    @brief This signal indicates the sequence of events for a cell pair
     All cell specific events happen between \begin_cell_event and \end_cell_event signals.
     Setter:
-    @brief This signal initiates the sequence of events for a cell pair
+    @brief This signal indicates the sequence of events for a cell pair
     All cell specific events happen between \begin_cell_event and \end_cell_event signals.
     """
     on_begin_edge_differences: None
@@ -28153,6 +28284,21 @@ class LayoutDiff:
 
     Setter:
     @brief This signal indicates that the given cell is only present in the second layout
+    """
+    on_cell_meta_info_differs: None
+    r"""
+    Getter:
+    @brief This signal indicates that meta info between the current cells differs
+    Meta information is only compared when \WithMetaInfo is added to the compare flags.
+    'a' and 'b' are the values for the first and second layout. 'nil' is passed to these values to indicate missing meta information on one side.
+
+    This event has been added in version 0.28.16.
+    Setter:
+    @brief This signal indicates that meta info between the current cells differs
+    Meta information is only compared when \WithMetaInfo is added to the compare flags.
+    'a' and 'b' are the values for the first and second layout. 'nil' is passed to these values to indicate missing meta information on one side.
+
+    This event has been added in version 0.28.16.
     """
     on_cell_name_differs: None
     r"""
@@ -28319,6 +28465,21 @@ class LayoutDiff:
 
     Setter:
     @brief This signal indicates a difference in the layer names
+    """
+    on_layout_meta_info_differs: None
+    r"""
+    Getter:
+    @brief This signal indicates that global meta info differs
+    Meta information is only compared when \WithMetaInfo is added to the compare flags.
+    'a' and 'b' are the values for the first and second layout. 'nil' is passed to these values to indicate missing meta information on one side.
+
+    This event has been added in version 0.28.16.
+    Setter:
+    @brief This signal indicates that global meta info differs
+    Meta information is only compared when \WithMetaInfo is added to the compare flags.
+    'a' and 'b' are the values for the first and second layout. 'nil' is passed to these values to indicate missing meta information on one side.
+
+    This event has been added in version 0.28.16.
     """
     on_path_in_a_only: None
     r"""
@@ -29074,12 +29235,12 @@ class LayoutToNetlist:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -30363,12 +30524,12 @@ class LoadLayoutOptions:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -30393,12 +30554,12 @@ class LoadLayoutOptions:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -33099,14 +33260,14 @@ class NetPinRef:
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this pin reference is attached to.
+        @brief Gets the net this pin reference is attached to (non-const version).
+
+        This constness variant has been introduced in version 0.26.8
         """
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this pin reference is attached to (non-const version).
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the net this pin reference is attached to.
         """
     def pin(self) -> Pin:
         r"""
@@ -34155,19 +34316,19 @@ class Netlist:
     @overload
     def circuits_by_name(self, name_pattern: str) -> List[Circuit]:
         r"""
-        @brief Gets the circuit objects for a given name filter.
-        The name filter is a glob pattern. This method will return all \Circuit objects matching the glob pattern.
-
-        This method has been introduced in version 0.26.4.
-        """
-    @overload
-    def circuits_by_name(self, name_pattern: str) -> List[Circuit]:
-        r"""
         @brief Gets the circuit objects for a given name filter (const version).
         The name filter is a glob pattern. This method will return all \Circuit objects matching the glob pattern.
 
 
         This constness variant has been introduced in version 0.26.8.
+        """
+    @overload
+    def circuits_by_name(self, name_pattern: str) -> List[Circuit]:
+        r"""
+        @brief Gets the circuit objects for a given name filter.
+        The name filter is a glob pattern. This method will return all \Circuit objects matching the glob pattern.
+
+        This method has been introduced in version 0.26.4.
         """
     def combine_devices(self) -> None:
         r"""
@@ -34195,16 +34356,16 @@ class Netlist:
     @overload
     def device_class_by_name(self, name: str) -> DeviceClass:
         r"""
-        @brief Gets the device class for a given name (const version).
+        @brief Gets the device class for a given name.
         If the name is not a valid device class name, nil is returned.
-
-        This constness variant has been introduced in version 0.26.8.
         """
     @overload
     def device_class_by_name(self, name: str) -> DeviceClass:
         r"""
-        @brief Gets the device class for a given name.
+        @brief Gets the device class for a given name (const version).
         If the name is not a valid device class name, nil is returned.
+
+        This constness variant has been introduced in version 0.26.8.
         """
     def dup(self) -> Netlist:
         r"""
@@ -34225,22 +34386,16 @@ class Netlist:
     @overload
     def each_circuit_bottom_up(self) -> Iterator[Circuit]:
         r"""
-        @brief Iterates over the circuits bottom-up
-        Iterating bottom-up means the parent circuits come after the child circuits. This is the basically the reverse order as delivered by \each_circuit_top_down.
-        """
-    @overload
-    def each_circuit_bottom_up(self) -> Iterator[Circuit]:
-        r"""
         @brief Iterates over the circuits bottom-up (const version)
         Iterating bottom-up means the parent circuits come after the child circuits. This is the basically the reverse order as delivered by \each_circuit_top_down.
 
         This constness variant has been introduced in version 0.26.8.
         """
     @overload
-    def each_circuit_top_down(self) -> Iterator[Circuit]:
+    def each_circuit_bottom_up(self) -> Iterator[Circuit]:
         r"""
-        @brief Iterates over the circuits top-down
-        Iterating top-down means the parent circuits come before the child circuits. The first \top_circuit_count circuits are top circuits - i.e. those which are not referenced by other circuits.
+        @brief Iterates over the circuits bottom-up
+        Iterating bottom-up means the parent circuits come after the child circuits. This is the basically the reverse order as delivered by \each_circuit_top_down.
         """
     @overload
     def each_circuit_top_down(self) -> Iterator[Circuit]:
@@ -34249,6 +34404,12 @@ class Netlist:
         Iterating top-down means the parent circuits come before the child circuits. The first \top_circuit_count circuits are top circuits - i.e. those which are not referenced by other circuits.
 
         This constness variant has been introduced in version 0.26.8.
+        """
+    @overload
+    def each_circuit_top_down(self) -> Iterator[Circuit]:
+        r"""
+        @brief Iterates over the circuits top-down
+        Iterating top-down means the parent circuits come before the child circuits. The first \top_circuit_count circuits are top circuits - i.e. those which are not referenced by other circuits.
         """
     @overload
     def each_device_class(self) -> Iterator[DeviceClass]:
@@ -36669,12 +36830,12 @@ class PCellParameterState:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -39291,12 +39452,12 @@ class PreferredOrientation:
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer value
+        @brief Compares two enums
         """
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums
+        @brief Compares an enum with an integer value
         """
     @overload
     def __init__(self, i: int) -> None:
@@ -39476,12 +39637,12 @@ class PropertyConstraint:
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer value
+        @brief Compares two enums
         """
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums
+        @brief Compares an enum with an integer value
         """
     @overload
     def __init__(self, i: int) -> None:
@@ -39506,12 +39667,12 @@ class PropertyConstraint:
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer for inequality
+        @brief Compares two enums for inequality
         """
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums for inequality
+        @brief Compares an enum with an integer for inequality
         """
     def __repr__(self) -> str:
         r"""
@@ -40974,12 +41135,12 @@ class Region(ShapeCollection):
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -41107,6 +41268,12 @@ class Region(ShapeCollection):
             r"""
             @brief Gets the symbolic string from an enum
             """
+    AlwaysIncludeZeroDistance: ClassVar[ZeroDistanceMode]
+    r"""
+    @hide
+    @brief Specifies that check functions should always include edges with zero distance
+    This mode has little practical value.
+    """
     DifferentPropertiesConstraint: ClassVar[PropertyConstraint]
     r"""
     @brief Specifies to consider shapes only if their user properties are different
@@ -41136,6 +41303,26 @@ class Region(ShapeCollection):
     r"""
     @brief Specifies to ignore properties
     When using this constraint - for example on a boolean operation - properties are ignored and are not generated in the output.
+    """
+    IncludeZeroDistanceWhenCollinearAndTouching: ClassVar[ZeroDistanceMode]
+    r"""
+    @brief Specifies that check functions should include edges when they are collinear and touch
+    With this specification, the check functions will also check edges if they share at least one common point and are collinear. This is the mode that includes checking the 'kissing corner' cases when the kissing edges are collinear. This mode was default up to version 0.28. 
+    """
+    IncludeZeroDistanceWhenOverlapping: ClassVar[ZeroDistanceMode]
+    r"""
+    @brief Specifies that check functions should include edges when they overlap
+    With this specification, the check functions will also check edges which are collinear and share more than a single point. This is the mode that excludes the 'kissing corner' cases.
+    """
+    IncludeZeroDistanceWhenTouching: ClassVar[ZeroDistanceMode]
+    r"""
+    @brief Specifies that check functions should include edges when they touch
+    With this specification, the check functions will also check edges if they share at least one common point. This is the mode that includes checking the 'kissing corner' cases. This mode is default for version 0.29 and later. 
+    """
+    NeverIncludeZeroDistance: ClassVar[ZeroDistanceMode]
+    r"""
+    @brief Specifies that check functions should never include edges with zero distance.
+    With this specification, the check functions will ignore edges which are collinear or touch.
     """
     NoOppositeFilter: ClassVar[Region.OppositeFilter]
     r"""
@@ -42011,7 +42198,7 @@ class Region(ShapeCollection):
 
         This method has been introduced in version 0.28.4.
         """
-    def enclosed_check(self, other: Region, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., shielded: Optional[bool] = ..., opposite_filter: Optional[Region.OppositeFilter] = ..., rect_filter: Optional[Region.RectFilter] = ..., negative: Optional[bool] = ..., property_constraint: Optional[PropertyConstraint] = ...) -> EdgePairs:
+    def enclosed_check(self, other: Region, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., shielded: Optional[bool] = ..., opposite_filter: Optional[Region.OppositeFilter] = ..., rect_filter: Optional[Region.RectFilter] = ..., negative: Optional[bool] = ..., property_constraint: Optional[PropertyConstraint] = ..., zero_distance_mode: Optional[ZeroDistanceMode] = ...) -> EdgePairs:
         r"""
         @brief Performs an inside check with options
         @param d The minimum distance for which the polygons are checked
@@ -42025,6 +42212,7 @@ class Region(ShapeCollection):
         @param rect_filter Specifies an error filter for rectangular input shapes
         @param negative Negative output from the first input
         @param property_constraint Specifies whether to consider only shapes with a certain property relation
+        @param zero_distance_mode Specifies how to handle edges with zero distance
 
         If "whole_edges" is true, the resulting \EdgePairs collection will receive the whole edges which contribute in the width check.
 
@@ -42047,8 +42235,9 @@ class Region(ShapeCollection):
         The 'shielded', 'negative', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27. The interpretation of the 'negative' flag has been restriced to first-layout only output in 0.27.1.
         The 'enclosed_check' alias was introduced in version 0.27.5.
         'property_constraint' has been added in version 0.28.4.
+        'zero_distance_mode' has been added in version 0.29.
         """
-    def enclosing_check(self, other: Region, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., shielded: Optional[bool] = ..., opposite_filter: Optional[Region.OppositeFilter] = ..., rect_filter: Optional[Region.RectFilter] = ..., negative: Optional[bool] = ..., property_constraint: Optional[PropertyConstraint] = ...) -> EdgePairs:
+    def enclosing_check(self, other: Region, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., shielded: Optional[bool] = ..., opposite_filter: Optional[Region.OppositeFilter] = ..., rect_filter: Optional[Region.RectFilter] = ..., negative: Optional[bool] = ..., property_constraint: Optional[PropertyConstraint] = ..., zero_distance_mode: Optional[ZeroDistanceMode] = ...) -> EdgePairs:
         r"""
         @brief Performs an enclosing check with options
         @param d The minimum enclosing distance for which the polygons are checked
@@ -42062,6 +42251,7 @@ class Region(ShapeCollection):
         @param rect_filter Specifies an error filter for rectangular input shapes
         @param negative Negative output from the first input
         @param property_constraint Specifies whether to consider only shapes with a certain property relation
+        @param zero_distance_mode Specifies how to handle edges with zero distance
 
         If "whole_edges" is true, the resulting \EdgePairs collection will receive the whole edges which contribute in the width check.
 
@@ -42083,6 +42273,7 @@ class Region(ShapeCollection):
 
         The 'shielded', 'negative', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27. The interpretation of the 'negative' flag has been restriced to first-layout only output in 0.27.1.
         'property_constraint' has been added in version 0.28.4.
+        'zero_distance_mode' has been added in version 0.29.
         """
     def extent_refs(self, arg0: float, arg1: float, arg2: float, arg3: float, arg4: int, arg5: int) -> Region:
         r"""
@@ -42313,7 +42504,7 @@ class Region(ShapeCollection):
 
         Merged semantics applies for this method (see \merged_semantics= for a description of this concept)
         """
-    def inside_check(self, other: Region, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., shielded: Optional[bool] = ..., opposite_filter: Optional[Region.OppositeFilter] = ..., rect_filter: Optional[Region.RectFilter] = ..., negative: Optional[bool] = ..., property_constraint: Optional[PropertyConstraint] = ...) -> EdgePairs:
+    def inside_check(self, other: Region, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., shielded: Optional[bool] = ..., opposite_filter: Optional[Region.OppositeFilter] = ..., rect_filter: Optional[Region.RectFilter] = ..., negative: Optional[bool] = ..., property_constraint: Optional[PropertyConstraint] = ..., zero_distance_mode: Optional[ZeroDistanceMode] = ...) -> EdgePairs:
         r"""
         @brief Performs an inside check with options
         @param d The minimum distance for which the polygons are checked
@@ -42327,6 +42518,7 @@ class Region(ShapeCollection):
         @param rect_filter Specifies an error filter for rectangular input shapes
         @param negative Negative output from the first input
         @param property_constraint Specifies whether to consider only shapes with a certain property relation
+        @param zero_distance_mode Specifies how to handle edges with zero distance
 
         If "whole_edges" is true, the resulting \EdgePairs collection will receive the whole edges which contribute in the width check.
 
@@ -42349,6 +42541,7 @@ class Region(ShapeCollection):
         The 'shielded', 'negative', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27. The interpretation of the 'negative' flag has been restriced to first-layout only output in 0.27.1.
         The 'enclosed_check' alias was introduced in version 0.27.5.
         'property_constraint' has been added in version 0.28.4.
+        'zero_distance_mode' has been added in version 0.29.
         """
     @overload
     def interacting(self, other: Edges, min_count: Optional[int] = ..., max_count: Optional[int] = ...) -> Region:
@@ -42421,7 +42614,7 @@ class Region(ShapeCollection):
         @brief Returns true if the region is merged
         If the region is merged, polygons will not touch or overlap. You can ensure merged state by calling \merge.
         """
-    def isolated_check(self, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., shielded: Optional[bool] = ..., opposite_filter: Optional[Region.OppositeFilter] = ..., rect_filter: Optional[Region.RectFilter] = ..., negative: Optional[bool] = ..., property_constraint: Optional[PropertyConstraint] = ...) -> EdgePairs:
+    def isolated_check(self, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., shielded: Optional[bool] = ..., opposite_filter: Optional[Region.OppositeFilter] = ..., rect_filter: Optional[Region.RectFilter] = ..., negative: Optional[bool] = ..., property_constraint: Optional[PropertyConstraint] = ..., zero_distance_mode: Optional[ZeroDistanceMode] = ...) -> EdgePairs:
         r"""
         @brief Performs a space check between edges of different polygons with options
         @param d The minimum space for which the polygons are checked
@@ -42434,6 +42627,7 @@ class Region(ShapeCollection):
         @param rect_filter Specifies an error filter for rectangular input shapes
         @param negative If true, edges not violation the condition will be output as pseudo-edge pairs
         @param property_constraint Specifies whether to consider only shapes with a certain property relation
+        @param zero_distance_mode Specifies how to handle edges with zero distance
 
         If "whole_edges" is true, the resulting \EdgePairs collection will receive the whole edges which contribute in the width check.
 
@@ -42453,6 +42647,7 @@ class Region(ShapeCollection):
 
         The 'shielded', 'negative', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27.
         'property_constraint' has been added in version 0.28.4.
+        'zero_distance_mode' has been added in version 0.29.
         """
     def join(self, other: Region) -> Region:
         r"""
@@ -42865,7 +43060,7 @@ class Region(ShapeCollection):
 
         This variant has been introduced in version 0.28.4.
         """
-    def notch_check(self, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., shielded: Optional[bool] = ..., negative: Optional[bool] = ..., property_constraint: Optional[PropertyConstraint] = ...) -> EdgePairs:
+    def notch_check(self, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., shielded: Optional[bool] = ..., negative: Optional[bool] = ..., property_constraint: Optional[PropertyConstraint] = ..., zero_distance_mode: Optional[ZeroDistanceMode] = ...) -> EdgePairs:
         r"""
         @brief Performs a space check between edges of the same polygon with options
         @param d The minimum space for which the polygons are checked
@@ -42877,7 +43072,8 @@ class Region(ShapeCollection):
         @param shielded Enables shielding
         @param negative If true, edges not violation the condition will be output as pseudo-edge pairs
         @param property_constraint Specifies whether to consider only shapes with a certain property relation
-        @param property_constraint Only \IgnoreProperties and \NoPropertyConstraint are allowed - in the last case, properties are copied from the original shapes to the output
+        @param property_constraint Only \IgnoreProperties and \NoPropertyConstraint are allowed - in the last case, properties are copied from the original shapes to the output@param zero_distance_mode Specifies how to handle edges with zero distance
+
         This version is similar to the simple version with one parameter. In addition, it allows to specify many more options.
 
         If "whole_edges" is true, the resulting \EdgePairs collection will receive the whole edges which contribute in the space check.
@@ -42896,6 +43092,7 @@ class Region(ShapeCollection):
 
         The 'shielded' and 'negative' options have been introduced in version 0.27.
         'property_constraint' has been added in version 0.28.4.
+        'zero_distance_mode' has been added in version 0.29.
         """
     def or_(self, other: Region) -> Region:
         r"""
@@ -42925,7 +43122,7 @@ class Region(ShapeCollection):
 
         Merged semantics applies for this method (see \merged_semantics= for a description of this concept)
         """
-    def overlap_check(self, other: Region, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., shielded: Optional[bool] = ..., opposite_filter: Optional[Region.OppositeFilter] = ..., rect_filter: Optional[Region.RectFilter] = ..., negative: Optional[bool] = ..., property_constraint: Optional[PropertyConstraint] = ...) -> EdgePairs:
+    def overlap_check(self, other: Region, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., shielded: Optional[bool] = ..., opposite_filter: Optional[Region.OppositeFilter] = ..., rect_filter: Optional[Region.RectFilter] = ..., negative: Optional[bool] = ..., property_constraint: Optional[PropertyConstraint] = ..., zero_distance_mode: Optional[ZeroDistanceMode] = ...) -> EdgePairs:
         r"""
         @brief Performs an overlap check with options
         @param d The minimum overlap for which the polygons are checked
@@ -42939,6 +43136,7 @@ class Region(ShapeCollection):
         @param rect_filter Specifies an error filter for rectangular input shapes
         @param negative Negative output from the first input
         @param property_constraint Specifies whether to consider only shapes with a certain property relation
+        @param zero_distance_mode Specifies how to handle edges with zero distance
 
         If "whole_edges" is true, the resulting \EdgePairs collection will receive the whole edges which contribute in the width check.
 
@@ -42960,6 +43158,7 @@ class Region(ShapeCollection):
 
         The 'shielded', 'negative', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27. The interpretation of the 'negative' flag has been restriced to first-layout only output in 0.27.1.
         'property_constraint' has been added in version 0.28.4.
+        'zero_distance_mode' has been added in version 0.29.
         """
     def overlapping(self, other: Region, min_count: Optional[int] = ..., max_count: Optional[int] = ...) -> Region:
         r"""
@@ -43258,7 +43457,7 @@ class Region(ShapeCollection):
 
         The count options have been introduced in version 0.27.
         """
-    def separation_check(self, other: Region, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., shielded: Optional[bool] = ..., opposite_filter: Optional[Region.OppositeFilter] = ..., rect_filter: Optional[Region.RectFilter] = ..., negative: Optional[bool] = ..., property_constraint: Optional[PropertyConstraint] = ...) -> EdgePairs:
+    def separation_check(self, other: Region, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., shielded: Optional[bool] = ..., opposite_filter: Optional[Region.OppositeFilter] = ..., rect_filter: Optional[Region.RectFilter] = ..., negative: Optional[bool] = ..., property_constraint: Optional[PropertyConstraint] = ..., zero_distance_mode: Optional[ZeroDistanceMode] = ...) -> EdgePairs:
         r"""
         @brief Performs a separation check with options
         @param d The minimum separation for which the polygons are checked
@@ -43272,6 +43471,7 @@ class Region(ShapeCollection):
         @param rect_filter Specifies an error filter for rectangular input shapes
         @param negative Negative output from the first input
         @param property_constraint Specifies whether to consider only shapes with a certain property relation
+        @param zero_distance_mode Specifies how to handle edges with zero distance
 
         If "whole_edges" is true, the resulting \EdgePairs collection will receive the whole edges which contribute in the width check.
 
@@ -43293,6 +43493,7 @@ class Region(ShapeCollection):
 
         The 'shielded', 'negative', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27. The interpretation of the 'negative' flag has been restriced to first-layout only output in 0.27.1.
         'property_constraint' has been added in version 0.28.4.
+        'zero_distance_mode' has been added in version 0.29.
         """
     @overload
     def size(self) -> int:
@@ -43427,7 +43628,7 @@ class Region(ShapeCollection):
         @brief Returns the snapped region
         This method will snap the region to the given grid and return the snapped region (see \snap). The original region is not modified.
         """
-    def space_check(self, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., shielded: Optional[bool] = ..., opposite_filter: Optional[Region.OppositeFilter] = ..., rect_filter: Optional[Region.RectFilter] = ..., negative: Optional[bool] = ..., property_constraint: Optional[PropertyConstraint] = ...) -> EdgePairs:
+    def space_check(self, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., shielded: Optional[bool] = ..., opposite_filter: Optional[Region.OppositeFilter] = ..., rect_filter: Optional[Region.RectFilter] = ..., negative: Optional[bool] = ..., property_constraint: Optional[PropertyConstraint] = ..., zero_distance_mode: Optional[ZeroDistanceMode] = ...) -> EdgePairs:
         r"""
         @brief Performs a space check with options
         @param d The minimum space for which the polygons are checked
@@ -43440,6 +43641,7 @@ class Region(ShapeCollection):
         @param rect_filter Specifies an error filter for rectangular input shapes
         @param negative If true, edges not violation the condition will be output as pseudo-edge pairs
         @param property_constraint Specifies whether to consider only shapes with a certain property relation
+        @param zero_distance_mode Specifies how to handle edges with zero distance
 
         If "whole_edges" is true, the resulting \EdgePairs collection will receive the whole edges which contribute in the width check.
 
@@ -43459,6 +43661,7 @@ class Region(ShapeCollection):
 
         The 'shielded', 'negative', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27.
         'property_constraint' has been added in version 0.28.4.
+        'zero_distance_mode' has been added in version 0.29.
         """
     def split_covering(self, other: Region, min_count: Optional[int] = ..., max_count: Optional[int] = ...) -> List[Region]:
         r"""
@@ -43721,7 +43924,7 @@ class Region(ShapeCollection):
 
         @return The transformed region.
         """
-    def width_check(self, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., shielded: Optional[bool] = ..., negative: Optional[bool] = ..., property_constraint: Optional[PropertyConstraint] = ...) -> EdgePairs:
+    def width_check(self, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., shielded: Optional[bool] = ..., negative: Optional[bool] = ..., property_constraint: Optional[PropertyConstraint] = ..., zero_distance_mode: Optional[ZeroDistanceMode] = ...) -> EdgePairs:
         r"""
         @brief Performs a width check with options
         @param d The minimum width for which the polygons are checked
@@ -43732,7 +43935,8 @@ class Region(ShapeCollection):
         @param max_projection The upper limit of the projected length of one edge onto another
         @param shielded Enables shielding
         @param negative If true, edges not violation the condition will be output as pseudo-edge pairs
-        @param property_constraint Only \IgnoreProperties and \NoPropertyConstraint are allowed - in the last case, properties are copied from the original shapes to the output. Other than 'width' allow more options here.
+        @param property_constraint Only \IgnoreProperties and \NoPropertyConstraint are allowed - in the last case, properties are copied from the original shapes to the output. @param zero_distance_mode Specifies how to handle edges with zero distance
+        Other than 'width' allow more options here.
 
         This version is similar to the simple version with one parameter. In addition, it allows to specify many more options.
 
@@ -43751,6 +43955,7 @@ class Region(ShapeCollection):
         Merged semantics applies for the input of this method (see \merged_semantics= for a description of this concept)
 
         The 'shielded' and 'negative' options have been introduced in version 0.27. 'property_constraint' has been added in version 0.28.4.
+        'zero_distance_mode' has been added in version 0.29.
         """
     @overload
     def with_angle(self, amin: float, amax: float, inverse: bool) -> EdgePairs:
@@ -45271,10 +45476,11 @@ class Shape:
 
     Starting with version 0.23, this method returns nil, if the shape does not represent a path.
     Setter:
-    @brief Replaces the shape by the given path (in micrometer units)
-    This method replaces the shape by the given path, like \path= with a \Path argument does. This version translates the path from micrometer units to database units internally.
+    @brief Replaces the shape by the given path object
+    This method replaces the shape by the given path object. This method can only be called for editable layouts. It does not change the user properties of the shape.
+    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.22.
     """
     path_bgnext: int
     r"""
@@ -49204,7 +49410,8 @@ class Text:
     Setter:
     @brief Sets the horizontal alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     size: int
     r"""
@@ -51995,12 +52202,12 @@ class TrapezoidDecompositionMode:
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums
+        @brief Compares an enum with an integer value
         """
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer value
+        @brief Compares two enums
         """
     @overload
     def __init__(self, i: int) -> None:
@@ -52334,12 +52541,12 @@ class VAlign:
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer for inequality
+        @brief Compares two enums for inequality
         """
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums for inequality
+        @brief Compares an enum with an integer for inequality
         """
     def __repr__(self) -> str:
         r"""
@@ -53690,5 +53897,186 @@ class Vector:
 
 
         @return 1 if the vector product is positive, 0 if it is zero and -1 if it is negative.
+        """
+
+class ZeroDistanceMode:
+    r"""
+    @brief This class represents the zero_distance_mode type for \Region#width and related checks.
+    This mode determines how edges with zero distance are treated in the DRC checks. Formally these edges do neither represent a space other other relation as they do not face each other. There are three modes available to treat this boundary case: Ignore such edges (\NeverIncludeZeroDistance) or only include them if they share at least one common point (\IncludeZeroDistanceWhenTouching). The latter mode allows activating checks for the 'kissing corner' case and is the default mode in most checks.
+    This enum has been introduced in version 0.29.
+    """
+    AlwaysIncludeZeroDistance: ClassVar[ZeroDistanceMode]
+    r"""
+    @hide
+    @brief Specifies that check functions should always include edges with zero distance
+    This mode has little practical value.
+    """
+    IncludeZeroDistanceWhenCollinearAndTouching: ClassVar[ZeroDistanceMode]
+    r"""
+    @brief Specifies that check functions should include edges when they are collinear and touch
+    With this specification, the check functions will also check edges if they share at least one common point and are collinear. This is the mode that includes checking the 'kissing corner' cases when the kissing edges are collinear. This mode was default up to version 0.28. 
+    """
+    IncludeZeroDistanceWhenOverlapping: ClassVar[ZeroDistanceMode]
+    r"""
+    @brief Specifies that check functions should include edges when they overlap
+    With this specification, the check functions will also check edges which are collinear and share more than a single point. This is the mode that excludes the 'kissing corner' cases.
+    """
+    IncludeZeroDistanceWhenTouching: ClassVar[ZeroDistanceMode]
+    r"""
+    @brief Specifies that check functions should include edges when they touch
+    With this specification, the check functions will also check edges if they share at least one common point. This is the mode that includes checking the 'kissing corner' cases. This mode is default for version 0.29 and later. 
+    """
+    NeverIncludeZeroDistance: ClassVar[ZeroDistanceMode]
+    r"""
+    @brief Specifies that check functions should never include edges with zero distance.
+    With this specification, the check functions will ignore edges which are collinear or touch.
+    """
+    @overload
+    @classmethod
+    def new(cls, i: int) -> ZeroDistanceMode:
+        r"""
+        @brief Creates an enum from an integer value
+        """
+    @overload
+    @classmethod
+    def new(cls, s: str) -> ZeroDistanceMode:
+        r"""
+        @brief Creates an enum from a string value
+        """
+    def __copy__(self) -> ZeroDistanceMode:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> ZeroDistanceMode:
+        r"""
+        @brief Creates a copy of self
+        """
+    @overload
+    def __eq__(self, other: object) -> bool:
+        r"""
+        @brief Compares two enums
+        """
+    @overload
+    def __eq__(self, other: object) -> bool:
+        r"""
+        @brief Compares an enum with an integer value
+        """
+    @overload
+    def __init__(self, i: int) -> None:
+        r"""
+        @brief Creates an enum from an integer value
+        """
+    @overload
+    def __init__(self, s: str) -> None:
+        r"""
+        @brief Creates an enum from a string value
+        """
+    @overload
+    def __lt__(self, other: ZeroDistanceMode) -> bool:
+        r"""
+        @brief Returns true if the first enum is less (in the enum symbol order) than the second
+        """
+    @overload
+    def __lt__(self, other: int) -> bool:
+        r"""
+        @brief Returns true if the enum is less (in the enum symbol order) than the integer value
+        """
+    @overload
+    def __ne__(self, other: object) -> bool:
+        r"""
+        @brief Compares an enum with an integer for inequality
+        """
+    @overload
+    def __ne__(self, other: object) -> bool:
+        r"""
+        @brief Compares two enums for inequality
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Converts an enum to a visual string
+        """
+    def __str__(self) -> str:
+        r"""
+        @brief Gets the symbolic string from an enum
+        """
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def assign(self, other: ZeroDistanceMode) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def dup(self) -> ZeroDistanceMode:
+        r"""
+        @brief Creates a copy of self
+        """
+    def inspect(self) -> str:
+        r"""
+        @brief Converts an enum to a visual string
+        """
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def to_i(self) -> int:
+        r"""
+        @brief Gets the integer value from the enum
+        """
+    def to_s(self) -> str:
+        r"""
+        @brief Gets the symbolic string from an enum
         """
 

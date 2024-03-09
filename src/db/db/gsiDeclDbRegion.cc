@@ -788,6 +788,40 @@ size_dvm (db::Region *region, const db::Vector &dv, unsigned int mode)
   return *region;
 }
 
+static std::vector<std::vector<double> >
+rasterize2 (const db::Region *region, const db::Point &origin, const db::Vector &pixel_distance, const db::Vector &pixel_size, unsigned int nx, unsigned int ny)
+{
+  db::DAreaMap am (db::DPoint (origin), db::DVector (pixel_distance), db::DVector (pixel_size), nx, ny);
+
+  auto pi = region->begin ();
+  pi = pi.confined (db::Box (am.bbox ()), false /*not overlapping*/);
+
+  while (! pi.at_end ()) {
+    db::DPolygon dp (*pi);
+    db::rasterize (dp, am);
+    ++pi;
+  }
+
+  std::vector<std::vector<double> > result;
+  result.reserve (ny);
+  for (unsigned int y = 0; y < ny; ++y) {
+    result.push_back (std::vector<double> ());
+    std::vector<double> &row = result.back ();
+    row.reserve (nx);
+    for (unsigned int x = 0; x < nx; ++x) {
+      row.push_back (am.get (x, y));
+    }
+  }
+
+  return result;
+}
+
+static std::vector<std::vector<double> >
+rasterize1 (const db::Region *region, const db::Point &origin, const db::Vector &pixel_size, unsigned int nx, unsigned int ny)
+{
+  return rasterize2 (region, origin, pixel_size, pixel_size, nx, ny);
+}
+
 static db::Point default_origin;
 
 //  provided by gsiDeclDbPolygon.cc:
@@ -3094,6 +3128,36 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   method_ext ("to_s", &to_string1, gsi::arg ("max_count"),
     "@brief Converts the region to a string\n"
     "This version allows specification of the maximum number of polygons contained in the string."
+  ) +
+  method_ext ("rasterize", &rasterize1, gsi::arg ("origin"), gsi::arg ("pixel_size"), gsi::arg ("nx"), gsi::arg ("ny"),
+    "@brief A grayscale rasterizer delivering the area covered per pixel\n"
+    "@param origin The lower-left corner of the lowest-left pixel\n"
+    "@param pixel_size The dimension of each pixel (the x component gives the width, the y component the height)\n"
+    "@param nx The number of pixels in horizontal direction\n"
+    "@param ny The number of pixels in vertical direction\n"
+    "The method will create a grayscale, high-resolution density map of a rectangular region.\n"
+    "The scan region is defined by the origin, the pixel size and the number of pixels in horizontal (nx) and\n"
+    "vertical (ny) direction. The resulting array will contain the area covered by polygons from the region\n"
+    "in square database units.\n"
+    "\n"
+    "For non-overlapping polygons, the maximum density value is px*py. Overlapping polygons are counted multiple\n"
+    "times, so the actual values may be larger. If you want overlaps removed, you have to\n"
+    "merge the region before. Merge semantics does not apply for the 'rasterize' method.\n"
+    "\n"
+    "The resulting area values are precise within the limits of double-precision floating point arithmetics.\n"
+    "\n"
+    "A second version exists that allows specifying an active pixel size which is smaller than the\n"
+    "pixel distance hence allowing pixels samples that do not cover the full area, but leave gaps between the pixels.\n"
+    "\n"
+    "This method has been added in version 0.29.\n"
+  ) +
+  method_ext ("rasterize", &rasterize2, gsi::arg ("origin"), gsi::arg ("pixel_distance"), gsi::arg ("pixel_size"), gsi::arg ("nx"), gsi::arg ("ny"),
+    "@brief A version of 'rasterize' that allows a pixel step distance which is larger than the pixel size\n"
+    "This version behaves like the first variant of 'rasterize', but the pixel distance (pixel-to-pixel step raster)\n"
+    "can be specified separately from the pixel size. Currently, the pixel size must be equal or smaller than the\n"
+    "pixel distance - i.e. the pixels must not overlap.\n"
+    "\n"
+    "This method has been added in version 0.29.\n"
   ) +
   method ("enable_progress", &db::Region::enable_progress, gsi::arg ("label"),
     "@brief Enable progress reporting\n"

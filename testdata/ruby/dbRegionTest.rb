@@ -1226,6 +1226,36 @@ class DBRegion_TestClass < TestBase
 
   end
 
+  # rasterize
+  def test_rasterize
+
+    r = RBA::Region::new()
+    r.insert(RBA::Polygon::new([[0, 0], [100, 100], [150, 0]]))
+    r.insert(RBA::Polygon::new(RBA::Box::new([0, 200], [100, 300])))
+
+    pd = RBA::Vector::new(50, 50)
+    ps = RBA::Vector::new(25, 25)
+
+    sum = 0
+    2.times do |ix|
+      2.times do |iy|
+        am = r.rasterize(RBA::Point::new(-50 + ix * ps.x, -20 + iy * ps.y), pd, ps, 7, 7)
+        sum += am.collect { |r| r.inject(:+) }.inject(:+)
+      end
+    end
+
+    assert_equal("%.12g" % sum, "%.12g" % (7.0 * pd.x * pd.y))
+
+    tot = 0.0
+    pd = RBA::Vector::new(50, 50)
+
+    am = r.rasterize(RBA::Point::new(-50, -20), pd, 7, 7)
+    sum = am.collect { |r| r.inject(:+) }.inject(:+)
+
+    assert_equal("%.12g" % sum, "%.12g" % (7.0 * pd.x * pd.y))
+
+  end
+
 end
 
 load("test_epilogue.rb")

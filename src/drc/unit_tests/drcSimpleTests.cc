@@ -1617,32 +1617,32 @@ TEST(89_deep_with_mag_cop_size_aniso)
   run_test (_this, "89", true);
 }
 
-TEST(90_edge_interaction_with_count)
+TEST(100_edge_interaction_with_count)
 {
-  run_test (_this, "90", false);
+  run_test (_this, "100", false);
 }
 
-TEST(90d_edge_interaction_with_count)
+TEST(100d_edge_interaction_with_count)
 {
-  run_test (_this, "90", true);
+  run_test (_this, "100", true);
 }
 
-TEST(91_edge_booleans_with_dots)
+TEST(101_edge_booleans_with_dots)
 {
-  run_test (_this, "91", false);
+  run_test (_this, "101", false);
 }
 
-TEST(91d_edge_booleans_with_dots)
+TEST(101d_edge_booleans_with_dots)
 {
-  run_test (_this, "91", true);
+  run_test (_this, "101", true);
 }
 
-TEST(92_edge_modes)
+TEST(102_edge_modes)
 {
-  run_test (_this, "92", false);
+  run_test (_this, "102", false);
 }
 
-TEST(92d_edge_modes)
+TEST(102d_edge_modes)
 {
-  run_test (_this, "92", true);
+  run_test (_this, "102", true);
 }

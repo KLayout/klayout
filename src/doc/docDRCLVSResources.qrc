@@ -4,6 +4,8 @@
   <file alias="drc_width2.png">doc/images/drc_width2.png</file>
   <file alias="drc_width3.png">doc/images/drc_width3.png</file>
   <file alias="drc_width4.png">doc/images/drc_width4.png</file>
+  <file alias="drc_width5.png">doc/images/drc_width5.png</file>
+  <file alias="drc_width6.png">doc/images/drc_width6.png</file>
   <file alias="drc_width1u.png">doc/images/drc_width1u.png</file>
   <file alias="drc_width2u.png">doc/images/drc_width2u.png</file>
   <file alias="drc_width3u.png">doc/images/drc_width3u.png</file>
@@ -29,6 +31,9 @@
   <file alias="drc_separation9.png">doc/images/drc_separation9.png</file>
   <file alias="drc_separation10.png">doc/images/drc_separation10.png</file>
   <file alias="drc_separation11.png">doc/images/drc_separation11.png</file>
+  <file alias="drc_separation12.png">doc/images/drc_separation12.png</file>
+  <file alias="drc_separation13.png">doc/images/drc_separation13.png</file>
+  <file alias="drc_separation14.png">doc/images/drc_separation14.png</file>
   <file alias="drc_raw1.png">doc/images/drc_raw1.png</file>
   <file alias="drc_raw2.png">doc/images/drc_raw2.png</file>
   <file alias="drc_raw3.png">doc/images/drc_raw3.png</file>

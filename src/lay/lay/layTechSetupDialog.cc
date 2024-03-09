@@ -114,6 +114,7 @@ TechBaseEditorPage::setup ()
   mp_ui->desc_le->setText (tl::to_qstring (tech ()->description ()));
   mp_ui->group_le->setText (tl::to_qstring (tech ()->group ()));
   mp_ui->dbu_le->setText (tl::to_qstring (tl::to_string (tech ()->dbu ())));
+  mp_ui->grids_le->setText (tl::to_qstring (tl::to_string (tech ()->default_grids ())));
   mp_ui->desc_le->setEnabled (! tech ()->name ().empty ());
   mp_ui->base_path_le->setText (tl::to_qstring (tech ()->explicit_base_path ()));
 #if QT_VERSION >= 0x040700
@@ -164,6 +165,7 @@ TechBaseEditorPage::commit ()
   tech ()->set_description (tl::to_string (mp_ui->desc_le->text ()));
   tech ()->set_group (tl::to_string (mp_ui->group_le->text ()));
   tech ()->set_explicit_base_path (tl::to_string (mp_ui->base_path_le->text ()));
+  tech ()->set_default_grids (tl::to_string (mp_ui->grids_le->text ()));
 
   double d = 0.001;
   tl::from_string_ext (tl::to_string (mp_ui->dbu_le->text ()), d);

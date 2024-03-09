@@ -283,6 +283,7 @@ Technology::~Technology ()
 Technology::Technology (const Technology &d)
   : tl::Object (),
     m_name (d.m_name), m_description (d.m_description), m_group (d.m_group), m_grain_name (d.m_grain_name), m_dbu (d.m_dbu),
+    m_default_grids (d.m_default_grids),
     m_explicit_base_path (d.m_explicit_base_path), m_default_base_path (d.m_default_base_path),
     m_load_layout_options (d.m_load_layout_options),
     m_save_layout_options (d.m_save_layout_options),
@@ -303,6 +304,7 @@ Technology &Technology::operator= (const Technology &d)
     m_group = d.m_group;
     m_grain_name = d.m_grain_name;
     m_dbu = d.m_dbu;
+    m_default_grids = d.m_default_grids;
     m_default_base_path = d.m_default_base_path;
     m_explicit_base_path = d.m_explicit_base_path;
     m_load_layout_options = d.m_load_layout_options;
@@ -345,6 +347,26 @@ Technology::get_display_string () const
   return d;
 }
 
+std::vector<double>
+Technology::default_grid_list () const
+{
+  tl::Extractor ex (m_default_grids.c_str ());
+
+  std::vector<double> grids;
+
+  //  convert the list of grids to a list of doubles
+  while (! ex.at_end ()) {
+    double g = 0.0;
+    if (! ex.try_read (g)) {
+      break;
+    }
+    grids.push_back (g);
+    ex.test (",");
+  }
+
+  return grids;
+}
+
 tl::XMLElementList 
 Technology::xml_elements () 
 {
@@ -353,6 +375,7 @@ Technology::xml_elements ()
          tl::make_member (&Technology::description, &Technology::set_description, "description") + 
          tl::make_member (&Technology::group, &Technology::set_group, "group") +
          tl::make_member (&Technology::dbu, &Technology::set_dbu, "dbu") +
+         tl::make_member (&Technology::default_grids, &Technology::set_default_grids, "default-grids") +
          tl::make_member (&Technology::explicit_base_path, &Technology::set_explicit_base_path, "base-path") +
          tl::make_member (&Technology::default_base_path, &Technology::set_default_base_path, "original-base-path") +
          tl::make_member (&Technology::layer_properties_file, &Technology::set_layer_properties_file, "layer-properties_file") +

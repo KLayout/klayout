@@ -26,7 +26,7 @@ class LAYObjectsTests(unittest.TestCase):
     class MyBrowserSource(pya.BrowserSource):
       def get(self, url):
         next_url = "int:" + str(int(url.split(":")[1]) + 1)
-        return f"This is {url}. <a href='{next_url}'>Goto next ({next_url})</a>"
+        return "This is " + url + ". <a href='" + next_url + "'>Goto next (" + next_url + ")</a>"
       
     dialog = pya.BrowserDialog()
     dialog.home = "int:0"

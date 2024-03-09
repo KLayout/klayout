@@ -40,7 +40,7 @@ namespace lay
 
 static const std::string cfg_tech_editor_window_state ("tech-editor-window-state");
 
-std::string tech_string_from_name (const std::string &tn)
+static std::string tech_string_from_name (const std::string &tn)
 {
   if (tn.empty ()) {
     return tl::to_string (QObject::tr ("(Default)"));
@@ -179,21 +179,12 @@ TechnologyController::update_active_technology ()
   }
 
 
-  mp_active_technology = active_tech;
-
-  if (mp_mw) {
-    if (active_tech) {
-      mp_mw->tech_message (tech_string_from_name (active_tech->name ()));
-    } else {
-      mp_mw->tech_message (std::string ());
-    }
-  }
-
   if (mp_active_technology != active_tech) {
+    mp_active_technology = active_tech;
     emit active_technology_changed ();
   }
 
-#if 0 
+#if 0
   //  Hint with this implementation, the current technology follows the current layout.
   //  Although that's a nice way to display the current technology, it's pretty confusing
   lay::Dispatcher *pr = mp_plugin_root;

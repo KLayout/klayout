@@ -166,7 +166,7 @@ ConfirmationDialog::finish ()
 
 SaltDownloadManager::SaltDownloadManager ()
 {
-  //  .. nothing yet ..
+  m_always_download_package_information = false;
 }
 
 void
@@ -344,7 +344,7 @@ SaltDownloadManager::fetch_missing (const lay::Salt &salt, const lay::Salt &salt
 
       }
 
-      if (! p->downloaded && salt_mine.download_package_information ()) {
+      if (! p->downloaded && (m_always_download_package_information || salt_mine.download_package_information ())) {
 
         //  If requested, download package information to complete information from index or dependencies
         if (tl::verbosity() >= 10) {
@@ -362,7 +362,7 @@ SaltDownloadManager::fetch_missing (const lay::Salt &salt, const lay::Salt &salt
       if (! p->downloaded) {
 
         if (p->name.empty ()) {
-          throw tl::Exception (tl::to_string (tr ("No name given package from '%s' (from dependencies or command line installation request)")), p->url);
+          throw tl::Exception (tl::to_string (tr ("No name given for package from '%s' (from dependencies or command line installation request)")), p->url);
         }
 
         if (tl::verbosity() >= 10) {

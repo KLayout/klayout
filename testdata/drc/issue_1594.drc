@@ -1,0 +1,15 @@
+source($drc_test_source, "TOP1")
+
+# This is just a smoke test without actual devices
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+l3 = input(3, 0)
+
+connect(l1, l2)
+connect(l2, l3)
+
+writer = RBA::NetlistSpiceWriter::new
+
+netlist.write($drc_test_target, writer, "netlist")
+

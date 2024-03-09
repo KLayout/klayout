@@ -29,10 +29,12 @@
 #include "tlDeferredExecution.h"
 
 #include <QFrame>
-#include <QScrollArea>
-#include <QLabel>
-#include <QToolButton>
-#include <QCheckBox>
+
+class QGroupBox;
+class QCheckBox;
+class QLabel;
+class QToolButton;
+class QScrollArea;
 
 namespace lay
 {
@@ -150,6 +152,8 @@ private slots:
 private:
   lay::Dispatcher *mp_dispatcher;
   QScrollArea *mp_parameters_area;
+  QFrame *mp_main_frame;
+  std::vector<QGroupBox *> mp_groups;
   QLabel *mp_error_label;
   QLabel *mp_error_icon;
   QLabel *mp_changed_label;

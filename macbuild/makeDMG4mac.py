@@ -1,4 +1,4 @@
-#! /usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #=============================================================================================
@@ -63,7 +63,7 @@ def SetGlobals():
     global LatestOSHomebrew   # True if 'LatestOS with Homebrew'  and targeting LW-*
     global LatestOSAnaconda3  # True if 'LatestOS with Anaconda3' and targeting LW-*
     global LatestOSHomebrewH  # True if 'LatestOS with Homebrew'  and targeting HW-*
-    global DicLightHeavyW     # dictionary for LW-* and HW-* packages
+    global DicStdLightHeavyW  # dictionary for LW-* and HW-* packages
     global Item3AppleScript   # ITEM_3 in the Apple script
     # auxiliary variables on platform
     global System             # 6-tuple from platform.uname()
@@ -77,13 +77,13 @@ def SetGlobals():
     Usage  = "\n"
     Usage += "---------------------------------------------------------------------------------------------------------\n"
     Usage += "<< Usage of 'makeDMG4mac.py' >>\n"
-    Usage += "       for making a DMG file of KLayout 0.28.13 or later on different Apple macOS platforms.\n"
+    Usage += "       for making a DMG file of KLayout 0.28.17 or later on different Apple macOS platforms.\n"
     Usage += "\n"
     Usage += "$ [python] ./makeDMG4mac.py\n"
     Usage += "   option & argument    : descriptions                                               | default value\n"
     Usage += "   ----------------------------------------------------------------------------------+-----------------\n"
     Usage += "   <-p|--pkg <dir>>     : package directory created by `build4mac.py` with [-y|-Y]   | ``\n"
-    Usage += "                        : like 'LW-qt5MP.pkg.macos-Monterey-release-Rmp32Pmp311'     | \n"
+    Usage += "                        : like 'LW-qt5MP.pkg.macos-Monterey-release-Rmp33Pmp311'     | \n"
     Usage += "   <-c|--clean>         : clean the work directory                                   | disabled\n"
     Usage += "   <-m|--make>          : make a compressed DMG file                                 | disabled\n"
     Usage += "                        :   <-c|--clean> and <-m|--make> are mutually exclusive      | \n"
@@ -158,51 +158,59 @@ def SetGlobals():
     LatestOSHomebrew  = False
     LatestOSAnaconda3 = False
     LatestOSHomebrewH = False
-    DicLightHeavyW    = dict()
+    DicStdLightHeavyW = dict()
     Item3AppleScript  = ""
 
-    # Populate DicLightHeavyW
-    DicLightHeavyW[ "ports" ]  = dict() # LW-*
-    DicLightHeavyW[ "brew" ]   = dict() # LW-*
-    DicLightHeavyW[ "ana3" ]   = dict() # LW-*
-    DicLightHeavyW[ "brewH" ]  = dict() # HW-*
+    # Populate DicStdLightHeavyW
+    DicStdLightHeavyW[ "std" ]   = dict() # ST-*
+    DicStdLightHeavyW[ "ports" ] = dict() # LW-*
+    DicStdLightHeavyW[ "brew" ]  = dict() # LW-*
+    DicStdLightHeavyW[ "ana3" ]  = dict() # LW-*
+    DicStdLightHeavyW[ "brewH" ] = dict() # HW-*
 
-    DicLightHeavyW[ "ports" ]["zip"]    = "macbuild/Resources/script-bundle-P.zip"
-    DicLightHeavyW[ "ports" ]["src"]    = "script-bundle-P"
-    DicLightHeavyW[ "ports" ]["des"]    = "MacPortsUser-ReadMeFirst"
-    DicLightHeavyW[ "ports" ]["item3"]  = 'set position of item "MacPortsUser-ReadMeFirst" to {700, 400}'
+    DicStdLightHeavyW[ "std" ]["zip"]     = "macbuild/Resources/script-bundle-S.zip"
+    DicStdLightHeavyW[ "std" ]["src"]     = "script-bundle-S"
+    DicStdLightHeavyW[ "std" ]["des"]     = "MacStdUser-ReadMeFirst"
+    DicStdLightHeavyW[ "std" ]["item3"]   = 'set position of item "MacStdUser-ReadMeFirst" to {700, 400}'
 
-    DicLightHeavyW[ "brew" ]["zip"]     = "macbuild/Resources/script-bundle-B.zip"
-    DicLightHeavyW[ "brew" ]["src"]     = "script-bundle-B"
-    DicLightHeavyW[ "brew" ]["des"]     = "HomebrewUser-ReadMeFirst"
-    DicLightHeavyW[ "brew" ]["item3"]   = 'set position of item "HomebrewUser-ReadMeFirst" to {700, 400}'
+    DicStdLightHeavyW[ "ports" ]["zip"]   = "macbuild/Resources/script-bundle-P.zip"
+    DicStdLightHeavyW[ "ports" ]["src"]   = "script-bundle-P"
+    DicStdLightHeavyW[ "ports" ]["des"]   = "MacPortsUser-ReadMeFirst"
+    DicStdLightHeavyW[ "ports" ]["item3"] = 'set position of item "MacPortsUser-ReadMeFirst" to {700, 400}'
 
-    DicLightHeavyW[ "ana3" ]["zip"]     = "macbuild/Resources/script-bundle-A.zip"
-    DicLightHeavyW[ "ana3" ]["src"]     = "script-bundle-A"
-    DicLightHeavyW[ "ana3" ]["des"]     = "Anaconda3User-ReadMeFirst"
-    DicLightHeavyW[ "ana3" ]["item3"]   = 'set position of item "Anaconda3User-ReadMeFirst" to {700, 400}'
+    DicStdLightHeavyW[ "brew" ]["zip"]    = "macbuild/Resources/script-bundle-B.zip"
+    DicStdLightHeavyW[ "brew" ]["src"]    = "script-bundle-B"
+    DicStdLightHeavyW[ "brew" ]["des"]    = "HomebrewUser-ReadMeFirst"
+    DicStdLightHeavyW[ "brew" ]["item3"]  = 'set position of item "HomebrewUser-ReadMeFirst" to {700, 400}'
 
-    DicLightHeavyW[ "brewH" ]["zip"]    = "macbuild/Resources/script-bundle-H.zip"
-    DicLightHeavyW[ "brewH" ]["src"]    = "script-bundle-H"
-    DicLightHeavyW[ "brewH" ]["des"]    = "Homebrew-HUser-ReadMeFirst"
-    DicLightHeavyW[ "brewH" ]["item3"]  = 'set position of item "Homebrew-HUser-ReadMeFirst" to {700, 400}'
+    DicStdLightHeavyW[ "ana3" ]["zip"]    = "macbuild/Resources/script-bundle-A.zip"
+    DicStdLightHeavyW[ "ana3" ]["src"]    = "script-bundle-A"
+    DicStdLightHeavyW[ "ana3" ]["des"]    = "Anaconda3User-ReadMeFirst"
+    DicStdLightHeavyW[ "ana3" ]["item3"]  = 'set position of item "Anaconda3User-ReadMeFirst" to {700, 400}'
+
+    DicStdLightHeavyW[ "brewH" ]["zip"]   = "macbuild/Resources/script-bundle-H.zip"
+    DicStdLightHeavyW[ "brewH" ]["src"]   = "script-bundle-H"
+    DicStdLightHeavyW[ "brewH" ]["des"]   = "Homebrew-HUser-ReadMeFirst"
+    DicStdLightHeavyW[ "brewH" ]["item3"] = 'set position of item "Homebrew-HUser-ReadMeFirst" to {700, 400}'
 
 #------------------------------------------------------------------------------
 ## To check the contents of the package directory
 #
 # The package directory name should look like:
+#     * ST-qt5MP.pkg.macos-Monterey-release-RsysPsys
 #     * LW-qt5Ana3.pkg.macos-Monterey-release-Rana3Pana3
-#     * LW-qt5Brew.pkg.macos-Monterey-release-Rhb32Phb311  --- (1)
-#     * LW-qt5MP.pkg.macos-Monterey-release-Rmp32Pmp311
+#     * LW-qt5Brew.pkg.macos-Monterey-release-Rhb33Phb311  --- (1)
+#     * LW-qt5MP.pkg.macos-Monterey-release-Rmp33Pmp311
 #     * HW-qt5Brew.pkg.macos-Monterey-release-RsysPhb311
 #
+#     * ST-qt6MP.pkg.macos-Monterey-release-RsysPsys
 #     * LW-qt6Ana3.pkg.macos-Monterey-release-Rana3Pana3
-#     * LW-qt6Brew.pkg.macos-Monterey-release-Rhb32Phb311
-#     * LW-qt6MP.pkg.macos-Monterey-release-Rmp32Pmp311
+#     * LW-qt6Brew.pkg.macos-Monterey-release-Rhb33Phb311
+#     * LW-qt6MP.pkg.macos-Monterey-release-Rmp33Pmp311
 #     * HW-qt6Brew.pkg.macos-Monterey-release-RsysPhb311
 #
 # Generated DMG will be, for example,
-#     (1) ---> LW-klayout-0.28.13-macOS-Monterey-1-qt5Brew-Rhb32Phb311.dmg
+#     (1) ---> LW-klayout-0.28.17-macOS-Monterey-1-qt5Brew-Rhb33Phb311.dmg
 #
 # @return on success, positive integer in [MB] that tells approx. occupied disc space;
 #         on failure, -1
@@ -223,7 +231,7 @@ def CheckPkgDirectory():
     global LatestOSHomebrew
     global LatestOSAnaconda3
     global LatestOSHomebrewH
-    global DicLightHeavyW
+    global DicStdLightHeavyW
     global Item3AppleScript
 
     #-----------------------------------------------------------------------------
@@ -241,18 +249,20 @@ def CheckPkgDirectory():
 
     #-----------------------------------------------------------------------------------------------
     # [2] Identify (Qt, Ruby, Python) from PkgDir
+    #     * ST-qt5MP.pkg.macos-Monterey-release-RsysPsys
     #     * LW-qt5Ana3.pkg.macos-Monterey-release-Rana3Pana3
-    #     * LW-qt5Brew.pkg.macos-Monterey-release-Rhb32Phb311
-    #     * LW-qt5MP.pkg.macos-Monterey-release-Rmp32Pmp311
+    #     * LW-qt5Brew.pkg.macos-Monterey-release-Rhb33Phb311
+    #     * LW-qt5MP.pkg.macos-Monterey-release-Rmp33Pmp311
     #     * HW-qt5Brew.pkg.macos-Monterey-release-RsysPhb311
-    #     * EX-qt5MP.pkg.macos-Monterey-release-Rhb32Pmp311
+    #     * EX-qt5MP.pkg.macos-Monterey-release-Rhb33Pmp311
     #
+    #     * ST-qt6MP.pkg.macos-Monterey-release-RsysPsys
     #     * LW-qt6Ana3.pkg.macos-Monterey-release-Rana3Pana3
-    #     * LW-qt6Brew.pkg.macos-Monterey-release-Rhb32Phb311
-    #     * LW-qt6MP.pkg.macos-Monterey-release-Rmp32Pmp311
+    #     * LW-qt6Brew.pkg.macos-Monterey-release-Rhb33Phb311
+    #     * LW-qt6MP.pkg.macos-Monterey-release-Rmp33Pmp311
     #     * HW-qt6Brew.pkg.macos-Monterey-release-RsysPhb311
     #-----------------------------------------------------------------------------------------------
-    patQRP = u'(LW|HW|EX)([-])([qt5|qt6][0-9A-Za-z]+)([.]pkg[.])([A-Za-z]+[-][A-Za-z]+[-]release[-])([0-9A-Za-z]+)'
+    patQRP = u'(ST|LW|HW|EX)([-])([qt5|qt6][0-9A-Za-z]+)([.]pkg[.])([A-Za-z]+[-][A-Za-z]+[-]release[-])([0-9A-Za-z]+)'
     regQRP = re.compile(patQRP)
     if not regQRP.match(PkgDir):
         print( "! Cannot identify (Qt, Ruby, Python) from the package directory name" )
@@ -277,15 +287,20 @@ def CheckPkgDirectory():
         #-----------------------------------------------------------------------------
         # [3] Check if the "LatestOS" with MacPorts / Homebrew / Anaconda3
         #-----------------------------------------------------------------------------
+        LatestOSSys        = Platform == LatestOS
+        LatestOSSys       &= PackagePrefix == "ST"
+        LatestOSSys       &= QtIdentification in [ "qt5MP", "qt6MP" ]
+        LatestOSSys       &= RubyPythonID in [ "RsysPsys" ]
+
         LatestOSMacPorts   = Platform == LatestOS
         LatestOSMacPorts  &= PackagePrefix == "LW"
         LatestOSMacPorts  &= QtIdentification in [ "qt5MP", "qt6MP" ]
-        LatestOSMacPorts  &= RubyPythonID in [ "Rmp32Pmp311", "Rmp32Pmp39" ]
+        LatestOSMacPorts  &= RubyPythonID in [ "Rmp33Pmp311", "Rmp33Pmp39" ]
 
         LatestOSHomebrew   = Platform == LatestOS
         LatestOSHomebrew  &= PackagePrefix == "LW"
         LatestOSHomebrew  &= QtIdentification in [ "qt5Brew", "qt6Brew" ]
-        LatestOSHomebrew  &= RubyPythonID in [ "Rhb32Phb311", "Rhb32Phb39", "Rhb32Phbauto" ]
+        LatestOSHomebrew  &= RubyPythonID in [ "Rhb33Phb311", "Rhb33Phb39", "Rhb33Phbauto" ]
 
         LatestOSAnaconda3  = Platform == LatestOS
         LatestOSAnaconda3 &= PackagePrefix == "LW"
@@ -297,8 +312,23 @@ def CheckPkgDirectory():
         LatestOSHomebrewH &= QtIdentification in [ "qt5Brew", "qt6Brew" ]
         LatestOSHomebrewH &= RubyPythonID in [ "RsysPhb311", "RsysPhb39", "RsysPhbauto" ] # Sys-Homebre hybrid
 
+        if LatestOSSys:
+            mydic  = DicStdLightHeavyW["std"]
+            srcDir = PkgDir + "/" + mydic["src"]
+            desDir = PkgDir + "/" + mydic["des"]
+            if OpMake:
+                with zipfile.ZipFile( mydic["zip"], 'r' ) as zip_ref:
+                    zip_ref.extractall(PkgDir)
+                os.rename( srcDir, desDir )
+            if OpClean:
+                if os.path.isdir(srcDir):
+                    shutil.rmtree(srcDir)
+                if os.path.isdir(desDir):
+                    shutil.rmtree(desDir)
+            Item3AppleScript = mydic["item3"]
+
         if LatestOSMacPorts:
-            mydic  = DicLightHeavyW["ports"]
+            mydic  = DicStdLightHeavyW["ports"]
             srcDir = PkgDir + "/" + mydic["src"]
             desDir = PkgDir + "/" + mydic["des"]
             if OpMake:
@@ -313,7 +343,7 @@ def CheckPkgDirectory():
             Item3AppleScript = mydic["item3"]
 
         if LatestOSHomebrew:
-            mydic  = DicLightHeavyW["brew"]
+            mydic  = DicStdLightHeavyW["brew"]
             srcDir = PkgDir + "/" + mydic["src"]
             desDir = PkgDir + "/" + mydic["des"]
             if OpMake:
@@ -328,7 +358,7 @@ def CheckPkgDirectory():
             Item3AppleScript = mydic["item3"]
 
         if LatestOSAnaconda3:
-            mydic  = DicLightHeavyW["ana3"]
+            mydic  = DicStdLightHeavyW["ana3"]
             srcDir = PkgDir + "/" + mydic["src"]
             desDir = PkgDir + "/" + mydic["des"]
             if OpMake:
@@ -343,7 +373,7 @@ def CheckPkgDirectory():
             Item3AppleScript = mydic["item3"]
 
         if LatestOSHomebrewH:
-            mydic  = DicLightHeavyW["brewH"]
+            mydic  = DicStdLightHeavyW["brewH"]
             srcDir = PkgDir + "/" + mydic["src"]
             desDir = PkgDir + "/" + mydic["des"]
             if OpMake:

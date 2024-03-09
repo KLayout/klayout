@@ -103,6 +103,7 @@ public:
   PythonStackTraceProvider (PyFrameObject *frame, const std::string &scope)
     : m_scope (scope)
   {
+    PythonRef frame_object_ref;
     while (frame != NULL) {
 
 #if PY_VERSION_HEX >= 0x030A0000
@@ -123,6 +124,8 @@ public:
 
 #if PY_VERSION_HEX >= 0x030A0000
       frame = PyFrame_GetBack(frame);
+      //  PyFrame_GetBack returns a strong reference, hence we need to make sure it is released
+      frame_object_ref = (PyObject *) frame;
 #else
       frame = frame->f_back;
 #endif
@@ -182,7 +185,7 @@ PythonInterpreter::PythonInterpreter (bool embedded)
   : gsi::Interpreter (0, "pya"),
     mp_current_console (0), mp_current_exec_handler (0), m_current_exec_level (0),
     m_in_trace (false), m_block_exceptions (false), m_ignore_next_exception (false),
-    mp_current_frame (NULL), mp_py3_app_name (0), m_embedded (embedded)
+    mp_current_frame (NULL), m_embedded (embedded)
 {
   //  Don't attempt any additional initialization in the standalone module case
   if (! embedded) {
@@ -222,6 +225,8 @@ PythonInterpreter::PythonInterpreter (bool embedded)
   //  If set, use $KLAYOUT_PYTHONHOME to initialize the path.
   //  Otherwise there may be some conflict between external installations and KLayout.
 
+  bool has_klayout_pythonhome = false;
+
   //  Python is not easily convinced to use an external path properly.
   //  So we simply redirect PYTHONHOME
   std::string pythonhome_name ("PYTHONHOME");
@@ -230,12 +235,30 @@ PythonInterpreter::PythonInterpreter (bool embedded)
     tl::unset_env (pythonhome_name);
   }
   if (tl::has_env (klayout_pythonhome_name)) {
+    has_klayout_pythonhome = true;
     tl::set_env (pythonhome_name, tl::get_env (klayout_pythonhome_name));
   }
 
 #if defined(_WIN32) && PY_MAJOR_VERSION >= 3
 
   tl_assert (sizeof (wchar_t) == 2);
+
+  std::string inst_dir;
+
+  wchar_t buffer[MAX_PATH];
+  int len;
+
+  if ((len = GetModuleFileNameW (NULL, buffer, MAX_PATH)) > 0) {
+    inst_dir = tl::absolute_path (tl::to_string (std::wstring (buffer, len)));
+  }
+
+  if (! has_klayout_pythonhome) {
+
+    //  Use our own installation path for PYTHONHOME unless given
+    //  (Our Windows installation comes with its own copy of the libraries)
+    tl::set_env (pythonhome_name, inst_dir);
+
+  }
 
   if (! has_klayout_pythonpath) {
 
@@ -247,39 +270,32 @@ PythonInterpreter::PythonInterpreter (bool embedded)
 
       std::string path;
 
-      wchar_t buffer[MAX_PATH];
-      int len;
-      if ((len = GetModuleFileNameW (NULL, buffer, MAX_PATH)) > 0) {
+      std::string path_file = tl::combine_path (inst_dir, ".python-paths.txt");
+      if (tl::file_exists (path_file)) {
 
-        std::string inst_dir = tl::absolute_path (tl::to_string (std::wstring (buffer, len)));
-        std::string path_file = tl::combine_path (inst_dir, ".python-paths.txt");
-        if (tl::file_exists (path_file)) {
+        tl::log << tl::to_string (tr ("Reading Python path from ")) << path_file;
 
-          tl::log << tl::to_string (tr ("Reading Python path from ")) << path_file;
+        tl::InputStream path_file_stream (path_file);
+        std::string path_file_text = path_file_stream.read_all ();
 
-          tl::InputStream path_file_stream (path_file);
-          std::string path_file_text = path_file_stream.read_all ();
+        tl::Eval eval;
+        eval.set_global_var ("inst_path", tl::Variant (inst_dir));
+        tl::Expression ex;
+        eval.parse (ex, path_file_text.c_str ());
+        tl::Variant v = ex.execute ();
 
-          tl::Eval eval;
-          eval.set_global_var ("inst_path", tl::Variant (inst_dir));
-          tl::Expression ex;
-          eval.parse (ex, path_file_text.c_str ());
-          tl::Variant v = ex.execute ();
-
-          if (v.is_list ()) {
-            for (tl::Variant::iterator i = v.begin (); i != v.end (); ++i) {
-              if (! path.empty ()) {
-                path += ";";
-              }
-              path += i->to_string ();
+        if (v.is_list ()) {
+          for (tl::Variant::iterator i = v.begin (); i != v.end (); ++i) {
+            if (! path.empty ()) {
+              path += ";";
             }
+            path += i->to_string ();
           }
-
         }
 
-      }
+        Py_SetPath (tl::to_wstring (path).c_str ());
 
-      Py_SetPath (tl::to_wstring (path).c_str ());
+      }
 
     } catch (tl::Exception &ex) {
       tl::error << tl::to_string (tr ("Evaluation of Python path expression failed")) << ": " << ex.msg ();
@@ -309,18 +325,15 @@ PythonInterpreter::PythonInterpreter (bool embedded)
 #else
 
   //  Python 3 requires a unicode string for the application name
-  PyObject *an = c2python (app_path);
-  tl_assert (an != NULL);
-  mp_py3_app_name = PyUnicode_AsWideCharString (an, NULL);
-  tl_assert (mp_py3_app_name != NULL);
-  Py_DECREF (an);
-  Py_SetProgramName (mp_py3_app_name);
+
+  mp_py3_app_name = tl::to_wstring (app_path);
+  Py_SetProgramName (const_cast<wchar_t *> (mp_py3_app_name.c_str ()));
 
   Py_InitializeEx (0 /*don't set signals*/);
 
   //  Set dummy argv[]
   //  TODO: more?
-  wchar_t *argv[1] = { mp_py3_app_name };
+  wchar_t *argv[1] = { const_cast<wchar_t *> (mp_py3_app_name.c_str()) };
   PySys_SetArgvEx (1, argv, 0);
 
 #endif
@@ -355,14 +368,7 @@ PythonInterpreter::~PythonInterpreter ()
   sp_interpreter = 0;
 
   if (m_embedded) {
-
     Py_Finalize ();
-
-    if (mp_py3_app_name) {
-      PyMem_Free (mp_py3_app_name);
-      mp_py3_app_name = 0;
-    }
-
   }
 }
 

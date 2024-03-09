@@ -49,6 +49,10 @@ class LAYMainWindow_TestClass < TestBase
 
     # smoke test
     
+    if !RBA.constants.member?(:Application)
+      return
+    end
+
     app = RBA::Application.instance
     mw = app.main_window
     s = mw.synchronous

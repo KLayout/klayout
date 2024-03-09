@@ -972,17 +972,31 @@ SimpleColorButton::set_color_internal (QColor c)
   m_color = c;
 
   QFontMetrics fm (font (), this);
-  QRect rt (fm.boundingRect (QObject::tr ("Auto"))); // dummy text to be compliant with the other color button
-  QPixmap pxmp (rt.width () + 24, rt.height ());
+  QRect rt (fm.boundingRect (QObject::tr ("XXXXXXX")));
+
+#if QT_VERSION >= 0x050000
+  double dpr = devicePixelRatio ();
+#else
+  double dpr = 1.0;
+#endif
+
+  QPixmap pxmp (rt.width () * dpr, rt.height () * dpr);
+#if QT_VERSION >= 0x050000
+  pxmp.setDevicePixelRatio (dpr);
+#endif
 
   QPainter pxpainter (&pxmp);
   QColor text_color = palette ().color (QPalette::Active, QPalette::Text);
-  pxpainter.setPen (QPen (text_color));
   pxpainter.setBrush (QBrush (c.isValid () ? c : QColor (128, 128, 128)));
-  QRect r (0, 0, pxmp.width () - 1, pxmp.height () - 1);
+  QPen frame_pen (text_color);
+  frame_pen.setWidthF (1.0);
+  frame_pen.setJoinStyle (Qt::MiterJoin);
+  pxpainter.setPen (frame_pen);
+  int dpri = int (dpr);
+  QRectF r ((dpri / 2) / dpr, (dpri / 2) / dpr, rt.width () - 1.0, rt.height () - 1.0);
   pxpainter.drawRect (r);
 
-  setIconSize (pxmp.size ());
+  setIconSize (QSize (rt.width (), rt.height ()));
   setIcon (QIcon (pxmp));
 }
 
@@ -1216,22 +1230,25 @@ ColorButton::set_color_internal (QColor c)
 #if QT_VERSION >= 0x50000
   pixmap.setDevicePixelRatio (dpr);
 #endif
-  pixmap.fill (QColor (0, 0, 0, 0));
 
   QColor text_color = palette ().color (QPalette::Active, QPalette::Text);
   QPainter pxpainter (&pixmap);
-  pxpainter.setPen (QPen (text_color));
+  QPen frame_pen (text_color);
+  frame_pen.setWidthF (1.0);
+  frame_pen.setJoinStyle (Qt::MiterJoin);
+  pxpainter.setPen (frame_pen);
+
+  int dpri = int (dpr);
+  QRectF r ((dpri / 2) / dpr, (dpri / 2) / dpr, rt.width () - 1.0, rt.height () - 1.0);
 
   if (! m_color.isValid ()) {
 
     pxpainter.setFont (font ());
-    QRectF r (0, 0, rt.width () - pxpainter.pen ().widthF (), rt.height () - pxpainter.pen ().widthF ());
     pxpainter.drawText (r, Qt::AlignHCenter | Qt::AlignVCenter | Qt::TextSingleLine, QObject::tr ("Auto"));
 
   } else {
 
     pxpainter.setBrush (QBrush (c));
-    QRectF r (0, 0, rt.width () - pxpainter.pen ().widthF (), rt.height () - pxpainter.pen ().widthF ());
     pxpainter.drawRect (r);
 
   }

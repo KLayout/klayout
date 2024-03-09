@@ -56,6 +56,9 @@ const unsigned int f_no_text_orientation = 0x02;
 //  Ignore properties
 const unsigned int f_no_properties = 0x04;
 
+//  With meta info
+const unsigned int f_with_meta = 0x08;
+
 //  Do not compare layer names
 const unsigned int f_no_layer_names = 0x10;
 
@@ -94,6 +97,7 @@ public:
   virtual ~DifferenceReceiver () { }
 
   virtual void dbu_differs (double /*dbu_a*/, double /*dbu_b*/) { }
+  virtual void layout_meta_info_differs (const std::string & /*name*/, const tl::Variant & /*value_a*/, const tl::Variant & /*value_b*/) { }
   virtual void layer_in_a_only (const db::LayerProperties & /*la*/) { }
   virtual void layer_in_b_only (const db::LayerProperties & /*lb*/) { }
   virtual void layer_name_differs (const db::LayerProperties & /*la*/, const db::LayerProperties & /*lb*/) { }
@@ -102,6 +106,7 @@ public:
   virtual void cell_in_b_only (const std::string & /*cellname*/, db::cell_index_type  /*ci*/) { }
   virtual void bbox_differs (const db::Box & /*ba*/, const db::Box & /*bb*/) { }
   virtual void begin_cell (const std::string & /*cellname*/, db::cell_index_type  /*cia*/, db::cell_index_type /*cib*/) { }
+  virtual void cell_meta_info_differs (const std::string & /*name*/, const tl::Variant & /*value_a*/, const tl::Variant & /*value_b*/) { }
   virtual void begin_inst_differences () { }
   virtual void instances_in_a (const std::vector <db::CellInstArrayWithProperties> & /*insts_a*/, const std::vector <std::string> & /*cell_names*/, const db::PropertiesRepository & /*props*/) { }
   virtual void instances_in_b (const std::vector <db::CellInstArrayWithProperties> & /*insts_b*/, const std::vector <std::string> & /*cell_names*/, const db::PropertiesRepository & /*props*/) { }

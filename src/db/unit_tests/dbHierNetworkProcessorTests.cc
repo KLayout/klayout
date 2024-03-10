@@ -39,6 +39,23 @@ static std::string l2s (db::Connectivity::layer_iterator b, db::Connectivity::la
     if (! s.empty ()) {
       s += ",";
     }
+    s += tl::to_string (i->first);
+    if (i->second < 0) {
+      s += "-S";
+    } else if (i->second > 0) {
+      s += "+S";
+    }
+  }
+  return s;
+}
+
+static std::string al2s (db::Connectivity::all_layer_iterator b, db::Connectivity::all_layer_iterator e)
+{
+  std::string s;
+  for (db::Connectivity::all_layer_iterator i = b; i != e; ++i) {
+    if (! s.empty ()) {
+      s += ",";
+    }
     s += tl::to_string (*i);
   }
   return s;
@@ -51,7 +68,12 @@ static std::string gn2s (db::Connectivity::global_nets_iterator b, db::Connectiv
     if (! s.empty ()) {
       s += ",";
     }
-    s += tl::to_string (*i);
+    s += tl::to_string (i->first);
+    if (i->second < 0) {
+      s += "-S";
+    } else if (i->second > 0) {
+      s += "+S";
+    }
   }
   return s;
 }
@@ -60,15 +82,15 @@ TEST(1_Connectivity)
 {
   db::Connectivity conn;
 
-  EXPECT_EQ (l2s (conn.begin_layers (), conn.end_layers ()), "");
+  EXPECT_EQ (al2s (conn.begin_layers (), conn.end_layers ()), "");
 
   conn.connect (0);
-  EXPECT_EQ (l2s (conn.begin_layers (), conn.end_layers ()), "0");
+  EXPECT_EQ (al2s (conn.begin_layers (), conn.end_layers ()), "0");
   EXPECT_EQ (l2s (conn.begin_connected (0), conn.end_connected (0)), "0");
   EXPECT_EQ (l2s (conn.begin_connected (1), conn.end_connected (1)), "");
 
   conn.connect (0, 1);
-  EXPECT_EQ (l2s (conn.begin_layers (), conn.end_layers ()), "0,1");
+  EXPECT_EQ (al2s (conn.begin_layers (), conn.end_layers ()), "0,1");
   EXPECT_EQ (l2s (conn.begin_connected (0), conn.end_connected (0)), "0,1");
   EXPECT_EQ (l2s (conn.begin_connected (1), conn.end_connected (1)), "0");
 
@@ -121,18 +143,19 @@ TEST(2_ShapeInteractions)
   db::ICplxTrans t3 (db::Trans (db::Vector (0, 2000)));
   db::PolygonRef ref3 (poly.transformed (t3), repo);
 
-  EXPECT_EQ (conn.interacts (ref1, 0, ref2, 0), true);
-  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 0, t2), true);  // t2*ref1 == ref2
-  EXPECT_EQ (conn.interacts (ref1, 0, ref2, 1), true);
-  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 1, t2), true);
-  EXPECT_EQ (conn.interacts (ref1, 1, ref2, 0), true);
-  EXPECT_EQ (conn.interacts (ref1, 1, ref1, 0, t2), true);
-  EXPECT_EQ (conn.interacts (ref1, 0, ref3, 0), false);
-  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 0, t3), false);  // t3*ref1 == ref3
-  EXPECT_EQ (conn.interacts (ref1, 0, ref3, 1), false);
-  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 1, t3), false);
-  EXPECT_EQ (conn.interacts (ref1, 1, ref2, 2), false);
-  EXPECT_EQ (conn.interacts (ref1, 1, ref1, 2, t2), false);
+  int soft = std::numeric_limits<int>::max ();
+  EXPECT_EQ (conn.interacts (ref1, 0, ref2, 0, soft), true);
+  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 0, t2, soft), true);  // t2*ref1 == ref2
+  EXPECT_EQ (conn.interacts (ref1, 0, ref2, 1, soft), true);
+  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 1, t2, soft), true);
+  EXPECT_EQ (conn.interacts (ref1, 1, ref2, 0, soft), true);
+  EXPECT_EQ (conn.interacts (ref1, 1, ref1, 0, t2, soft), true);
+  EXPECT_EQ (conn.interacts (ref1, 0, ref3, 0, soft), false);
+  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 0, t3, soft), false);  // t3*ref1 == ref3
+  EXPECT_EQ (conn.interacts (ref1, 0, ref3, 1, soft), false);
+  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 1, t3, soft), false);
+  EXPECT_EQ (conn.interacts (ref1, 1, ref2, 2, soft), false);
+  EXPECT_EQ (conn.interacts (ref1, 1, ref1, 2, t2, soft), false);
 }
 
 TEST(2_ShapeInteractionsRealPolygon)
@@ -154,20 +177,21 @@ TEST(2_ShapeInteractionsRealPolygon)
   db::ICplxTrans t4 (db::Trans (db::Vector (0, 1500)));
   db::PolygonRef ref4 (poly.transformed (t4), repo);
 
-  EXPECT_EQ (conn.interacts (ref1, 0, ref2, 0), true);
-  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 0, t2), true);  // t2*ref1 == ref2
-  EXPECT_EQ (conn.interacts (ref1, 0, ref2, 1), true);
-  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 1, t2), true);
-  EXPECT_EQ (conn.interacts (ref1, 1, ref2, 0), true);
-  EXPECT_EQ (conn.interacts (ref1, 1, ref1, 0, t2), true);
-  EXPECT_EQ (conn.interacts (ref1, 0, ref3, 0), false);
-  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 0, t3), false);
-  EXPECT_EQ (conn.interacts (ref1, 0, ref4, 0), true);
-  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 0, t4), true);
-  EXPECT_EQ (conn.interacts (ref1, 0, ref3, 1), false);
-  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 1, t3), false);
-  EXPECT_EQ (conn.interacts (ref1, 1, ref2, 2), false);
-  EXPECT_EQ (conn.interacts (ref1, 1, ref1, 2, t2), false);
+  int soft = std::numeric_limits<int>::max ();
+  EXPECT_EQ (conn.interacts (ref1, 0, ref2, 0, soft), true);
+  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 0, t2, soft), true);  // t2*ref1 == ref2
+  EXPECT_EQ (conn.interacts (ref1, 0, ref2, 1, soft), true);
+  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 1, t2, soft), true);
+  EXPECT_EQ (conn.interacts (ref1, 1, ref2, 0, soft), true);
+  EXPECT_EQ (conn.interacts (ref1, 1, ref1, 0, t2, soft), true);
+  EXPECT_EQ (conn.interacts (ref1, 0, ref3, 0, soft), false);
+  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 0, t3, soft), false);
+  EXPECT_EQ (conn.interacts (ref1, 0, ref4, 0, soft), true);
+  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 0, t4, soft), true);
+  EXPECT_EQ (conn.interacts (ref1, 0, ref3, 1, soft), false);
+  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 1, t3, soft), false);
+  EXPECT_EQ (conn.interacts (ref1, 1, ref2, 2, soft), false);
+  EXPECT_EQ (conn.interacts (ref1, 1, ref1, 2, t2, soft), false);
 }
 
 TEST(10_LocalClusterBasic)
@@ -286,7 +310,7 @@ template <class T>
 static std::string local_cluster_to_string (const db::local_cluster<T> &cluster, const db::Connectivity &conn)
 {
   std::string res;
-  for (db::Connectivity::layer_iterator l = conn.begin_layers (); l != conn.end_layers (); ++l) {
+  for (db::Connectivity::all_layer_iterator l = conn.begin_layers (); l != conn.end_layers (); ++l) {
     for (typename db::local_cluster<T>::shape_iterator s = cluster.begin (*l); ! s.at_end (); ++s) {
       if (! res.empty ()) {
         res += ";";
@@ -920,7 +944,7 @@ static void copy_cluster_shapes (const std::string *&attrs, db::Shapes &out, db:
   const db::local_cluster<db::PolygonRef> &lc = clusters.cluster_by_id (cluster_id);
 
   //  copy the shapes from this cell
-  for (db::Connectivity::layer_iterator l = conn.begin_layers (); l != conn.end_layers (); ++l) {
+  for (db::Connectivity::all_layer_iterator l = conn.begin_layers (); l != conn.end_layers (); ++l) {
     for (db::local_cluster<db::PolygonRef>::shape_iterator s = lc.begin (*l); ! s.at_end (); ++s) {
       db::Polygon poly = s->obj ().transformed (trans * db::ICplxTrans (s->trans ()));
       out.insert (db::PolygonWithProperties (poly, cell_and_attr_pid > 0 ? cell_and_attr_pid : cell_pid));

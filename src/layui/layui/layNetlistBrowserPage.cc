@@ -1421,7 +1421,7 @@ NetlistBrowserPage::adjust_view ()
       size_t cluster_id = net->cluster_id ();
 
       const db::Connectivity &conn = mp_database->connectivity ();
-      for (db::Connectivity::layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
+      for (db::Connectivity::all_layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
 
         db::Box layer_bbox;
         db::recursive_cluster_shape_iterator<db::NetShape> shapes (mp_database->net_clusters (), *layer, cell_index, cluster_id);
@@ -1580,7 +1580,7 @@ NetlistBrowserPage::produce_highlights_for_net (const db::Net *net, size_t &n_ma
   tl::Color fallback_color = make_valid_color (m_colorizer.marker_color ());
 
   const db::Connectivity &conn = mp_database->connectivity ();
-  for (db::Connectivity::layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
+  for (db::Connectivity::all_layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
 
     db::LayerProperties lp = layout->get_properties (*layer);
     std::map<db::LayerProperties, lay::LayerPropertiesConstIterator>::const_iterator display = display_by_lp.find (lp);

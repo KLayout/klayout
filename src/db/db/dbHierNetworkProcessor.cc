@@ -114,10 +114,19 @@ Connectivity::Connectivity (edge_connectivity_type ec)
 }
 
 void
+Connectivity::soft_connect (unsigned int la, unsigned int lb)
+{
+  m_connected [la][lb] = -1;
+  m_connected [lb][la] = 1;
+  m_all_layers.insert (la);
+  m_all_layers.insert (lb);
+}
+
+void
 Connectivity::connect (unsigned int la, unsigned int lb)
 {
-  m_connected [la].insert (lb);
-  m_connected [lb].insert (la);
+  m_connected [la][lb] = 0;
+  m_connected [lb][la] = 0;
   m_all_layers.insert (la);
   m_all_layers.insert (lb);
 }
@@ -125,7 +134,7 @@ Connectivity::connect (unsigned int la, unsigned int lb)
 void
 Connectivity::connect (unsigned int l)
 {
-  m_connected [l].insert (l);
+  m_connected [l][l] = 0;
   m_all_layers.insert (l);
 }
 
@@ -139,6 +148,12 @@ void
 Connectivity::connect (const db::DeepLayer &la, const db::DeepLayer &lb)
 {
   connect (la.layer (), lb.layer ());
+}
+
+void
+Connectivity::soft_connect (const db::DeepLayer &la, const db::DeepLayer &lb)
+{
+  soft_connect (la.layer (), lb.layer ());
 }
 
 Connectivity::global_nets_type s_empty_global_nets;
@@ -169,7 +184,16 @@ size_t
 Connectivity::connect_global (unsigned int l, const std::string &gn)
 {
   size_t id = global_net_id (gn);
-  m_global_connections [l].insert (id);
+  m_global_connections [l][id] = 0;
+  m_all_layers.insert (l);
+  return id;
+}
+
+size_t
+Connectivity::soft_connect_global (unsigned int l, const std::string &gn)
+{
+  size_t id = global_net_id (gn);
+  m_global_connections [l][id] = -1;
   m_all_layers.insert (l);
   return id;
 }
@@ -178,6 +202,12 @@ size_t
 Connectivity::connect_global (const db::DeepLayer &l, const std::string &gn)
 {
   return connect_global (l.layer (), gn);
+}
+
+size_t
+Connectivity::soft_connect_global (const db::DeepLayer &l, const std::string &gn)
+{
+  return soft_connect_global (l.layer (), gn);
 }
 
 const std::string &
@@ -208,13 +238,13 @@ Connectivity::global_nets () const
   return m_global_net_names.size ();
 }
 
-Connectivity::layer_iterator
+Connectivity::all_layer_iterator
 Connectivity::begin_layers () const
 {
   return m_all_layers.begin ();
 }
 
-Connectivity::layer_iterator
+Connectivity::all_layer_iterator
 Connectivity::end_layers () const
 {
   return m_all_layers.end ();
@@ -306,13 +336,19 @@ interaction_test (const db::Edge &a, const db::Edge &b, const db::unit_trans<C> 
 }
 
 template <class T, class Trans>
-bool Connectivity::interacts (const T &a, unsigned int la, const T &b, unsigned int lb, const Trans &trans) const
+bool Connectivity::interacts (const T &a, unsigned int la, const T &b, unsigned int lb, const Trans &trans, int &soft) const
 {
   std::map<unsigned int, layers_type>::const_iterator i = m_connected.find (la);
-  if (i == m_connected.end () || i->second.find (lb) == i->second.end ()) {
+  if (i == m_connected.end ()) {
     return false;
   } else {
-    return interaction_test (a, b, trans, m_ec);
+    auto t = i->second.find (lb);
+    if (t == i->second.end () || ! interaction_test (a, b, trans, m_ec)) {
+      return false;
+    } else {
+      soft = t->second;
+      return true;
+    }
   }
 }
 
@@ -321,7 +357,7 @@ bool Connectivity::interacts (const std::set<unsigned int> &la, const std::set<u
   for (std::set<unsigned int>::const_iterator i = la.begin (); i != la.end (); ++i) {
     db::Connectivity::layer_iterator je = end_connected (*i);
     for (db::Connectivity::layer_iterator j = begin_connected (*i); j != je; ++j) {
-      if (lb.find (*j) != lb.end ()) {
+      if (lb.find (j->first) != lb.end ()) {
         return true;
       }
     }
@@ -335,7 +371,7 @@ bool Connectivity::interact (const db::Cell &a, const db::Cell &b) const
   for (std::map<unsigned int, layers_type>::const_iterator i = m_connected.begin (); i != m_connected.end (); ++i) {
     if (! a.bbox (i->first).empty ()) {
       for (layers_type::const_iterator j = i->second.begin (); j != i->second.end (); ++j) {
-        if (! b.bbox (*j).empty ()) {
+        if (! b.bbox (j->first).empty ()) {
           return true;
         }
       }
@@ -353,7 +389,7 @@ bool Connectivity::interact (const db::Cell &a, const T &ta, const db::Cell &b, 
     if (! ba.empty ()) {
       ba.transform (ta);
       for (layers_type::const_iterator j = i->second.begin (); j != i->second.end (); ++j) {
-        db::Box bb = b.bbox (*j);
+        db::Box bb = b.bbox (j->first);
         if (! bb.empty () && bb.transformed (tb).touches (ba)) {
           return true;
         }
@@ -365,12 +401,12 @@ bool Connectivity::interact (const db::Cell &a, const T &ta, const db::Cell &b, 
 }
 
 //  explicit instantiations
-template DB_PUBLIC bool Connectivity::interacts<db::NetShape> (const db::NetShape &a, unsigned int la, const db::NetShape &b, unsigned int lb, const db::UnitTrans &trans) const;
-template DB_PUBLIC bool Connectivity::interacts<db::NetShape> (const db::NetShape &a, unsigned int la, const db::NetShape &b, unsigned int lb, const db::ICplxTrans &trans) const;
-template DB_PUBLIC bool Connectivity::interacts<db::PolygonRef> (const db::PolygonRef &a, unsigned int la, const db::PolygonRef &b, unsigned int lb, const db::UnitTrans &trans) const;
-template DB_PUBLIC bool Connectivity::interacts<db::PolygonRef> (const db::PolygonRef &a, unsigned int la, const db::PolygonRef &b, unsigned int lb, const db::ICplxTrans &trans) const;
-template DB_PUBLIC bool Connectivity::interacts<db::Edge> (const db::Edge &a, unsigned int la, const db::Edge &b, unsigned int lb, const db::UnitTrans &trans) const;
-template DB_PUBLIC bool Connectivity::interacts<db::Edge> (const db::Edge &a, unsigned int la, const db::Edge &b, unsigned int lb, const db::ICplxTrans &trans) const;
+template DB_PUBLIC bool Connectivity::interacts<db::NetShape> (const db::NetShape &a, unsigned int la, const db::NetShape &b, unsigned int lb, const db::UnitTrans &trans, int &soft) const;
+template DB_PUBLIC bool Connectivity::interacts<db::NetShape> (const db::NetShape &a, unsigned int la, const db::NetShape &b, unsigned int lb, const db::ICplxTrans &trans, int &soft) const;
+template DB_PUBLIC bool Connectivity::interacts<db::PolygonRef> (const db::PolygonRef &a, unsigned int la, const db::PolygonRef &b, unsigned int lb, const db::UnitTrans &trans, int &soft) const;
+template DB_PUBLIC bool Connectivity::interacts<db::PolygonRef> (const db::PolygonRef &a, unsigned int la, const db::PolygonRef &b, unsigned int lb, const db::ICplxTrans &trans, int &soft) const;
+template DB_PUBLIC bool Connectivity::interacts<db::Edge> (const db::Edge &a, unsigned int la, const db::Edge &b, unsigned int lb, const db::UnitTrans &trans, int &soft) const;
+template DB_PUBLIC bool Connectivity::interacts<db::Edge> (const db::Edge &a, unsigned int la, const db::Edge &b, unsigned int lb, const db::ICplxTrans &trans, int &soft) const;
 template DB_PUBLIC bool Connectivity::interact<db::ICplxTrans> (const db::Cell &a, const db::ICplxTrans &ta, const db::Cell &b, const db::ICplxTrans &tb) const;
 
 // ------------------------------------------------------------------------------
@@ -496,7 +532,8 @@ public:
 
   void add (const T *s1, unsigned int l1, const T *s2, unsigned int l2)
   {
-    if (mp_conn->interacts (*s1, l1, *s2, l2, m_trans)) {
+    int soft; // @@@
+    if (mp_conn->interacts (*s1, l1, *s2, l2, m_trans, soft)) {
       m_any = true;
     }
   }
@@ -559,7 +596,7 @@ local_cluster<T>::interacts (const db::Cell &cell, const db::ICplxTrans &trans, 
 
     Connectivity::layer_iterator le = conn.end_connected (s->first);
     for (Connectivity::layer_iterator l = conn.begin_connected (s->first); l != le; ++l) {
-      box += cell.bbox (*l);
+      box += cell.bbox (l->first); // @@@ soft connections?
     }
 
     if (! box.empty () && ! s->second.begin_touching (box.transformed (trans), bc).at_end ()) {
@@ -933,7 +970,8 @@ struct cluster_building_receiver
     if (m_separate_attributes && p1.second != p2.second) {
       return;
     }
-    if (! mp_conn->interacts (*s1, p1.first, *s2, p2.first)) {
+    int soft; // @@@
+    if (! mp_conn->interacts (*s1, p1.first, *s2, p2.first, soft)) {
       return;
     }
 
@@ -996,12 +1034,12 @@ struct cluster_building_receiver
     db::Connectivity::global_nets_iterator ge = mp_conn->end_global_connections (p.first);
     for (db::Connectivity::global_nets_iterator g = mp_conn->begin_global_connections (p.first); g != ge; ++g) {
 
-      typename std::map<size_t, typename std::list<cluster_value>::iterator>::iterator icg = m_global_to_clusters.find (*g);
+      typename std::map<size_t, typename std::list<cluster_value>::iterator>::iterator icg = m_global_to_clusters.find (g->first); // @@@ soft connections
 
       if (icg == m_global_to_clusters.end ()) {
 
-        ic->second->second.insert (*g);
-        m_global_to_clusters.insert (std::make_pair (*g, ic->second));
+        ic->second->second.insert (g->first);  // @@@ soft connections?
+        m_global_to_clusters.insert (std::make_pair (g->first, ic->second));  // @@@ soft connections?
 
       } else if (ic->second != icg->second) {
 
@@ -1110,7 +1148,7 @@ local_clusters<T>::build_clusters (const db::Cell &cell, const db::Connectivity 
   attr_accessor<T> attr;
   db::ShapeIterator::flags_type shape_flags = get_shape_flags<T> () ();
 
-  for (db::Connectivity::layer_iterator l = conn.begin_layers (); l != conn.end_layers (); ++l) {
+  for (db::Connectivity::all_layer_iterator l = conn.begin_layers (); l != conn.end_layers (); ++l) {
     const db::Shapes &shapes = cell.shapes (*l);
     for (db::Shapes::shape_iterator s = shapes.begin (shape_flags); ! s.at_end (); ++s) {
       bs.insert (heap (*s), std::make_pair (*l, attr (*s)));
@@ -1643,13 +1681,13 @@ private:
     //  reject the pair
 
     bool any = false;
-    for (db::Connectivity::layer_iterator la = mp_conn->begin_layers (); la != mp_conn->end_layers () && ! any; ++la) {
+    for (db::Connectivity::all_layer_iterator la = mp_conn->begin_layers (); la != mp_conn->end_layers () && ! any; ++la) {
       db::box_convert<db::CellInst, true> bca (*mp_layout, *la);
       box_type bb1 = i1.cell_inst ().bbox (bca).transformed (t1);
       if (! bb1.empty ()) {
         db::Connectivity::layer_iterator lbe = mp_conn->end_connected (*la);
         for (db::Connectivity::layer_iterator lb = mp_conn->begin_connected (*la); lb != lbe && ! any; ++lb) {
-          db::box_convert<db::CellInst, true> bcb (*mp_layout, *lb);
+          db::box_convert<db::CellInst, true> bcb (*mp_layout, lb->first); // @@@ soft connections?
           box_type bb2 = i2.cell_inst ().bbox (bcb).transformed (t2);
           any = bb1.touches (bb2);
         }
@@ -2186,6 +2224,10 @@ hier_clusters<T>::propagate_cluster_inst (const db::Layout &layout, const db::Ce
     if (child_cc.is_root (id)) {
 
       std::set<std::pair<db::cell_index_type, ClusterInstance> > seen;  //  to avoid duplicate connections
+      if (! with_self) {
+        //  don't include the instance we came up with initially
+        seen.insert (std::make_pair (cell.cell_index (), ci));
+      }
 
       const db::Cell &child_cell = layout.cell (ci.inst_cell_index ());
       for (db::Cell::parent_inst_iterator pi = child_cell.begin_parent_insts (); ! pi.at_end (); ++pi) {
@@ -2196,7 +2238,7 @@ hier_clusters<T>::propagate_cluster_inst (const db::Layout &layout, const db::Ce
         for (db::CellInstArray::iterator pii = child_inst.begin (); ! pii.at_end (); ++pii) {
 
           ClusterInstance ci2 (id, child_inst.cell_index (), child_inst.complex_trans (*pii), child_inst.prop_id ());
-          if ((with_self || cell.cell_index () != pi->parent_cell_index () || ci != ci2) && seen.find (std::make_pair (pi->parent_cell_index (), ci2)) == seen.end ()) {
+          if (seen.find (std::make_pair (pi->parent_cell_index (), ci2)) == seen.end ()) {
 
             size_t id_dummy;
 

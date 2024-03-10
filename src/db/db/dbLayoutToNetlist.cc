@@ -298,6 +298,26 @@ void LayoutToNetlist::connect_impl (const db::ShapeCollection &a, const db::Shap
   m_conn.connect (dla.layer (), dlb.layer ());
 }
 
+void LayoutToNetlist::soft_connect_impl (const db::ShapeCollection &a, const db::ShapeCollection &b)
+{
+  reset_extracted ();
+
+  if (! is_persisted (a)) {
+    register_layer (a);
+  }
+  if (! is_persisted (b)) {
+    register_layer (b);
+  }
+
+  //  we need to keep a reference, so we can safely delete the region
+  db::DeepLayer dla = deep_layer_of (a);
+  db::DeepLayer dlb = deep_layer_of (b);
+  m_dlrefs.insert (dla);
+  m_dlrefs.insert (dlb);
+
+  m_conn.soft_connect (dla.layer (), dlb.layer ());
+}
+
 size_t LayoutToNetlist::connect_global_impl (const db::ShapeCollection &l, const std::string &gn)
 {
   reset_extracted ();
@@ -311,6 +331,21 @@ size_t LayoutToNetlist::connect_global_impl (const db::ShapeCollection &l, const
   m_dlrefs.insert (dl);
 
   return m_conn.connect_global (dl.layer (), gn);
+}
+
+size_t LayoutToNetlist::soft_connect_global_impl (const db::ShapeCollection &l, const std::string &gn)
+{
+  reset_extracted ();
+
+  if (! is_persisted (l)) {
+    register_layer (l);
+  }
+
+  //  we need to keep a reference, so we can safely delete the region
+  db::DeepLayer dl = deep_layer_of (l);
+  m_dlrefs.insert (dl);
+
+  return m_conn.soft_connect_global (dl.layer (), gn);
 }
 
 const std::string &LayoutToNetlist::global_net_name (size_t id) const
@@ -360,6 +395,24 @@ void LayoutToNetlist::join_nets (const tl::GlobPattern &cell, const std::set<std
   m_joined_nets_per_cell.push_back (std::make_pair (cell, gp));
 }
 
+// @@@
+static bool check_many_pins (const db::Netlist *netlist)
+{
+  bool ok = true;
+  for (auto c = netlist->begin_circuits (); c != netlist->end_circuits (); ++c) {
+    const db::Circuit &circuit = *c;
+    for (auto n = circuit.begin_nets (); n != circuit.end_nets (); ++n) {
+      const db::Net &net = *n;
+      if (net.pin_count () > 1) {
+        ok = false;
+        tl::error << "Many pins on net " << net.expanded_name () << " in circuit " << circuit.name ();
+      }
+    }
+  }
+  return ok;
+}
+// @@@
+
 void LayoutToNetlist::extract_netlist ()
 {
   if (m_netlist_extracted) {
@@ -371,7 +424,10 @@ void LayoutToNetlist::extract_netlist ()
   netex.set_include_floating_subcircuits (m_include_floating_subcircuits);
   netex.extract_nets (dss (), m_layout_index, m_conn, *mp_netlist, m_net_clusters);
 
+  // @@@ NOTE: can we have multiple pins on a net? Will this happen later maybe?
+  // @@@ do_soft_connections ()
   do_join_nets ();
+  tl_assert (check_many_pins (mp_netlist.get ())); // @@@
 
   if (tl::verbosity () >= 41) {
     MemStatisticsCollector m (false);
@@ -870,7 +926,7 @@ LayoutToNetlist::create_layermap (db::Layout &target_layout, int ln) const
 
   std::set<unsigned int> layers_to_copy;
   const db::Connectivity &conn = connectivity ();
-  for (db::Connectivity::layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
+  for (db::Connectivity::all_layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
     layers_to_copy.insert (*layer);
   }
 

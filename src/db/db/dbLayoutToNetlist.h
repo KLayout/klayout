@@ -495,6 +495,39 @@ public:
   }
 
   /**
+   *  @brief Defines an inter-layer soft connection for the given layers.
+   *  The conditions mentioned with intra-layer "connect" apply for this method too.
+   *  The "a" layer is the "upper" and the "b" layer the "lower" layer of the
+   *  soft connection.
+   */
+  void soft_connect (const db::Region &a, const db::Region &b)
+  {
+    soft_connect_impl (a, b);
+  }
+
+  /**
+   *  @brief Defines an inter-layer connection for the given layers.
+   *  As one layer is a texts layer, this connection will basically add net labels.
+   *  The "a" layer is the "upper" and the "b" layer the "lower" layer of the
+   *  soft connection.
+   */
+  void soft_connect (const db::Region &a, const db::Texts &b)
+  {
+    soft_connect_impl (a, b);
+  }
+
+  /**
+   *  @brief Defines an inter-layer connection for the given layers.
+   *  As one layer is a texts layer, this connection will basically add net labels.
+   *  The "a" layer is the "upper" and the "b" layer the "lower" layer of the
+   *  soft connection.
+   */
+  void soft_connect (const db::Texts &a, const db::Region &b)
+  {
+    soft_connect_impl (b, a);
+  }
+
+  /**
    *  @brief Connects the given layer with a global net with the given name
    *  Returns the global net ID
    */
@@ -510,6 +543,26 @@ public:
   size_t connect_global (const db::Texts &l, const std::string &gn)
   {
     return connect_global_impl (l, gn);
+  }
+
+  /**
+   *  @brief Soft-connects the given layer with a global net with the given name
+   *  Returns the global net ID.
+   *  The global layer is the "lower" layer of the soft connection.
+   */
+  size_t soft_connect_global (const db::Region &l, const std::string &gn)
+  {
+    return soft_connect_global_impl (l, gn);
+  }
+
+  /**
+   *  @brief Soft-connects the given text layer with a global net with the given name
+   *  Returns the global net ID.
+   *  The global layer is the "lower" layer of the soft connection.
+   */
+  size_t soft_connect_global (const db::Texts &l, const std::string &gn)
+  {
+    return soft_connect_global_impl (l, gn);
   }
 
   /**
@@ -1035,6 +1088,8 @@ private:
   db::CellMapping make_cell_mapping_into (db::Layout &layout, db::Cell &cell, const std::vector<const db::Net *> *nets, bool with_device_cells);
   void connect_impl (const db::ShapeCollection &a, const db::ShapeCollection &b);
   size_t connect_global_impl (const db::ShapeCollection &l, const std::string &gn);
+  void soft_connect_impl (const db::ShapeCollection &a, const db::ShapeCollection &b);
+  size_t soft_connect_global_impl (const db::ShapeCollection &l, const std::string &gn);
   bool is_persisted_impl (const db::ShapeCollection &coll) const;
   void do_join_nets (db::Circuit &c, const std::vector<Net *> &nets);
   void do_join_nets ();

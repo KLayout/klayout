@@ -60,9 +60,11 @@ class DeepLayer;
 class DB_PUBLIC Connectivity
 {
 public:
-  typedef std::set<unsigned int> layers_type;
+  typedef std::set<unsigned int> all_layers_type;
+  typedef all_layers_type::const_iterator all_layer_iterator;
+  typedef std::map<unsigned int, int> layers_type;
   typedef layers_type::const_iterator layer_iterator;
-  typedef std::set<size_t> global_nets_type;
+  typedef std::map<unsigned int, int> global_nets_type;
   typedef global_nets_type::const_iterator global_nets_iterator;
 
   /**
@@ -102,9 +104,24 @@ public:
   void connect (unsigned int la, unsigned int lb);
 
   /**
+   *  @brief Adds inter-layer connectivity of the soft type
+   *
+   *  Soft connections are directed and are reported during "interacts"
+   *  by the "soft" output argument. "la" is the "upper" layer and "lb" is the lower layer.
+   */
+  void soft_connect (unsigned int la, unsigned int lb);
+
+  /**
    *  @brief Adds a connection to a global net
    */
   size_t connect_global (unsigned int l, const std::string &gn);
+
+  /**
+   *  @brief Adds a soft connection to a global net
+   *
+   *  The global net is always the "lower" layer.
+   */
+  size_t soft_connect_global (unsigned int l, const std::string &gn);
 
   /**
    *  @brief Adds intra-layer connectivity for layer l
@@ -121,9 +138,26 @@ public:
   void connect (const db::DeepLayer &la, const db::DeepLayer &lb);
 
   /**
+   *  @brief Adds inter-layer connectivity
+   *  This is a convenience method that takes a db::DeepLayer object.
+   *  It is assumed that all those layers originate from the same deep shape store.
+   *
+   *  Soft connections are directed and are reported during "interacts"
+   *  by the "soft" output argument. "la" is the "upper" layer and "lb" is the lower layer.
+   */
+  void soft_connect (const db::DeepLayer &la, const db::DeepLayer &lb);
+
+  /**
    *  @brief Adds a connection to a global net
    */
   size_t connect_global (const db::DeepLayer &la, const std::string &gn);
+
+  /**
+   *  @brief Adds a soft connection to a global net
+   *
+   *  The global net is always the "lower" layer.
+   */
+  size_t soft_connect_global (const db::DeepLayer &la, const std::string &gn);
 
   /**
    *  @brief Gets the global net name per ID
@@ -143,15 +177,19 @@ public:
   /**
    *  @brief Begin iterator for the layers involved
    */
-  layer_iterator begin_layers () const;
+  all_layer_iterator begin_layers () const;
 
   /**
    *  @brief End iterator for the layers involved
    */
-  layer_iterator end_layers () const;
+  all_layer_iterator end_layers () const;
 
   /**
    *  @brief Begin iterator for the layers connected to a specific layer
+   *
+   *  The iterator returned is over a map of target layers and soft mode
+   *  (an int, being 0 for a hard connection, +1 for an upward soft connection
+   *  and -1 for a downward soft connection).
    */
   layer_iterator begin_connected (unsigned int layer) const;
 
@@ -162,6 +200,10 @@ public:
 
   /**
    *  @brief Begin iterator for the global connections for a specific layer
+   *
+   *  The iterator returned is over a map of global net ID and soft mode
+   *  (an int, being 0 for a hard connection, +1 for an upward soft connection
+   *  and -1 for a downward soft connection).
    */
   global_nets_iterator begin_global_connections (unsigned int layer) const;
 
@@ -175,17 +217,21 @@ public:
    *
    *  This method accepts a transformation. This transformation is applied
    *  to the b shape before checking against a.
+   *
+   *  The "soft" output argument will deliver the soft mode that applies
+   *  to the connection - 0: hard connection, -1: a is the lower layer, +1: a is
+   *  the upper layer.
    */
   template <class T, class Trans>
-  bool interacts (const T &a, unsigned int la, const T &b, unsigned int lb, const Trans &trans) const;
+  bool interacts (const T &a, unsigned int la, const T &b, unsigned int lb, const Trans &trans, int &soft) const;
 
   /**
    *  @brief Returns true, if the given shapes on the given layers interact
    */
   template <class T>
-  bool interacts (const T &a, unsigned int la, const T &b, unsigned int lb) const
+  bool interacts (const T &a, unsigned int la, const T &b, unsigned int lb, int &soft) const
   {
-    return interacts (a, la, b, lb, UnitTrans ());
+    return interacts (a, la, b, lb, UnitTrans (), soft);
   }
 
   /**
@@ -195,17 +241,21 @@ public:
 
   /**
    *  @brief Returns true, if two cells basically (without considering transformation) interact
+   *
+   *  This is a pretty basic check based on the cell's bounding boxes
    */
   bool interact (const db::Cell &a, const db::Cell &b) const;
 
   /**
    *  @brief Returns true, if two cells with the given transformations interact
+   *
+   *  This is a pretty basic check based on the cell's bounding boxes
    */
   template <class T>
   bool interact (const db::Cell &a, const T &ta, const db::Cell &b, const T &tb) const;
 
 private:
-  layers_type m_all_layers;
+  all_layers_type m_all_layers;
   std::map<unsigned int, layers_type> m_connected;
   std::vector<std::string> m_global_net_names;
   std::map<unsigned int, global_nets_type> m_global_connections;

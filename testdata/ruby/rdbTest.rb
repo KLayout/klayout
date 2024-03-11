@@ -954,7 +954,7 @@ class RDB_TestClass < TestBase
 
     cell = rdb.cell_by_id(_cell.rdb_id)
     assert_equal(cell._is_const_object?, false)
-    assert_equal(rdb.each_cell.first._is_const_object?, false)
+    assert_equal(rdb.each_cell.to_a[0]._is_const_object?, false)
 
     cell = rdb.cell_by_qname("CELL")
     assert_equal(cell._is_const_object?, false)
@@ -966,7 +966,7 @@ class RDB_TestClass < TestBase
     assert_equal(cat._is_const_object?, false)
     subcat = rdb.category_by_path("cat.subcat")
 
-    assert_equal(rdb.each_category.first._is_const_object?, false)
+    assert_equal(rdb.each_category.to_a[0]._is_const_object?, false)
     assert_equal(rdb.each_category.collect { |c| c.name }.join(","), "cat,cat2")
     assert_equal(subcat._is_const_object?, false)
     assert_equal(subcat.database._is_const_object?, false)
@@ -979,7 +979,7 @@ class RDB_TestClass < TestBase
 
     assert_equal(rdb.each_item_per_category(subcat.rdb_id).collect { |item| item.each_value.collect { |v| v.to_s }.join("/") }.join(";"), "float: 17.5/text: string;text: b")
 
-    item1 = rdb.each_item_per_category(subcat.rdb_id).first
+    item1 = rdb.each_item_per_category(subcat.rdb_id).to_a[0]
     assert_equal(item1._is_const_object?, false)
     item1.clear_values
     assert_equal(rdb.each_item_per_category(subcat.rdb_id).collect { |item| item.each_value.collect { |v| v.to_s }.join("/") }.join(";"), ";text: b")
@@ -989,19 +989,19 @@ class RDB_TestClass < TestBase
     assert_equal(item1.has_tag?(17), true)
     assert_equal(item1.has_tag?(16), false)
 
-    item1 = rdb.each_item.first
+    item1 = rdb.each_item.to_a[0]
     assert_equal(item1._is_const_object?, false)
     assert_equal(item1.has_tag?(17), true)
 
-    item1 = rdb.each_item_per_cell(cell.rdb_id).first
+    item1 = rdb.each_item_per_cell(cell.rdb_id).to_a[0]
     assert_equal(item1._is_const_object?, false)
     assert_equal(item1.has_tag?(17), true)
 
-    item1 = rdb.each_item_per_cell_and_category(cell.rdb_id, subcat.rdb_id).first
+    item1 = rdb.each_item_per_cell_and_category(cell.rdb_id, subcat.rdb_id).to_a[0]
     assert_equal(item1._is_const_object?, false)
     assert_equal(item1.has_tag?(17), true)
 
-    item1 = cell.each_item.first
+    item1 = cell.each_item.to_a[0]
     assert_equal(item1._is_const_object?, false)
     assert_equal(item1.has_tag?(17), true)
 

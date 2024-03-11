@@ -126,6 +126,60 @@ TEST(1_Connectivity)
   EXPECT_EQ (conn2.global_net_name (1), "GLOBAL2");
 }
 
+TEST(1_ConnectivitySoft)
+{
+  db::Connectivity conn;
+
+  EXPECT_EQ (al2s (conn.begin_layers (), conn.end_layers ()), "");
+
+  conn.connect (0);
+  EXPECT_EQ (al2s (conn.begin_layers (), conn.end_layers ()), "0");
+  EXPECT_EQ (l2s (conn.begin_connected (0), conn.end_connected (0)), "0");
+  EXPECT_EQ (l2s (conn.begin_connected (1), conn.end_connected (1)), "");
+
+  conn.soft_connect (0, 1);
+  EXPECT_EQ (al2s (conn.begin_layers (), conn.end_layers ()), "0,1");
+  EXPECT_EQ (l2s (conn.begin_connected (0), conn.end_connected (0)), "0,1-S");
+  EXPECT_EQ (l2s (conn.begin_connected (1), conn.end_connected (1)), "0+S");
+
+  conn.connect (1);
+  EXPECT_EQ (l2s (conn.begin_connected (1), conn.end_connected (1)), "0+S,1");
+
+  conn.soft_connect (2, 0);
+  conn.connect (2);
+
+  EXPECT_EQ (l2s (conn.begin_connected (0), conn.end_connected (0)), "0,1-S,2+S");
+  EXPECT_EQ (l2s (conn.begin_connected (1), conn.end_connected (1)), "0+S,1");
+  EXPECT_EQ (l2s (conn.begin_connected (2), conn.end_connected (2)), "0-S,2");
+
+  conn.connect (2, 0);
+
+  EXPECT_EQ (l2s (conn.begin_connected (0), conn.end_connected (0)), "0,1-S,2");
+  EXPECT_EQ (l2s (conn.begin_connected (1), conn.end_connected (1)), "0+S,1");
+  EXPECT_EQ (l2s (conn.begin_connected (2), conn.end_connected (2)), "0,2");
+
+  EXPECT_EQ (conn.soft_connect_global (0, "GLOBAL"), size_t (0));
+  EXPECT_EQ (gn2s (conn.begin_global_connections (2), conn.end_global_connections (2)), "");
+  EXPECT_EQ (gn2s (conn.begin_global_connections (0), conn.end_global_connections (0)), "0-S");
+  EXPECT_EQ (conn.soft_connect_global (2, "GLOBAL2"), size_t (1));
+  EXPECT_EQ (gn2s (conn.begin_global_connections (2), conn.end_global_connections (2)), "1-S");
+  EXPECT_EQ (conn.connect_global (0, "GLOBAL2"), size_t (1));
+  EXPECT_EQ (gn2s (conn.begin_global_connections (0), conn.end_global_connections (0)), "0-S,1");
+
+  EXPECT_EQ (conn.global_net_name (0), "GLOBAL");
+  EXPECT_EQ (conn.global_net_name (1), "GLOBAL2");
+
+  db::Connectivity conn2 = conn;
+
+  EXPECT_EQ (l2s (conn2.begin_connected (0), conn2.end_connected (0)), "0,1-S,2");
+  EXPECT_EQ (l2s (conn2.begin_connected (1), conn2.end_connected (1)), "0+S,1");
+  EXPECT_EQ (l2s (conn2.begin_connected (2), conn2.end_connected (2)), "0,2");
+
+  EXPECT_EQ (gn2s (conn2.begin_global_connections (0), conn2.end_global_connections (0)), "0-S,1");
+  EXPECT_EQ (conn2.global_net_name (0), "GLOBAL");
+  EXPECT_EQ (conn2.global_net_name (1), "GLOBAL2");
+}
+
 TEST(2_ShapeInteractions)
 {
   db::Connectivity conn;

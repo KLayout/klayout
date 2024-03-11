@@ -103,8 +103,8 @@ connect(metal1,  via)
 connect(via,     metal2)
 
 # Make "must-connect" connections between NWELL and VDD and BULK and VSS
-connect_explicit("*", ["NWELL", "VDD"])
-connect_explicit("*", ["BULK", "VSS"])
+connect_explicit(["NWELL", "VDD"])
+connect_explicit(["BULK", "VSS"])
 
 # Global connections
 connect_global(ptie, "BULK")

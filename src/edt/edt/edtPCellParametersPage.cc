@@ -713,9 +713,11 @@ PCellParametersPage::do_parameter_changed ()
   bool ok = true;
   db::ParameterStates states = m_states;
   get_parameters (states, &ok);   //  includes coerce
-  update_widgets_from_states (states);
-  if (ok && ! lazy_evaluation ()) {
-    emit edited ();
+  if (ok) {
+    update_widgets_from_states (states);
+    if (! lazy_evaluation ()) {
+      emit edited ();
+    }
   }
 }
 

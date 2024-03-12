@@ -2245,10 +2245,34 @@ CODE
     # See \Netter#connect for a description of that function.
  
     # %DRC%
+    # @name soft_connect
+    # @brief Specifies a soft connection between two layers
+    # @synopsis soft_connect(a, b)
+    # A "soft connection" is made between two layers and
+    # is a directional connection (like an ideal diode).
+    # Soft connections allow detecting if nets are connected
+    # via a high-ohmic substrate or diffusion layer (the
+    # "lower" layer).
+    # "b" is the "lower" and "a" the upper layer.
+    #
+    # See \Netter#connect for a more detailed description of that function.
+ 
+    # %DRC%
     # @name connect_global
     # @brief Specifies a connection to a global net
     # @synopsis connect_global(l, name)
     # See \Netter#connect_global for a description of that function.
+ 
+    # %DRC%
+    # @name soft_connect_global
+    # @brief Specifies a soft connection to a global net
+    # @synopsis soft_connect_global(l, name)
+    # Like \soft_connect, a soft connection is made between 
+    # a layer and a global net (e.g. substrate). The global net
+    # is always the "lower" net of the soft connection.
+    #
+    # See \Netter#soft_connect_global for a more detailed 
+    # description of that function.
  
     # %DRC%
     # @name clear_connections
@@ -2320,6 +2344,8 @@ CODE
       clear_connections
       connect
       connect_global
+      soft_connect
+      soft_connect_global
       connect_implicit
       connect_explicit
       device_scaling

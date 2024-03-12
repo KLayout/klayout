@@ -293,21 +293,22 @@ TEST(11_LocalClusterInteractBasic)
 
   db::local_cluster<db::PolygonRef> cluster;
   db::local_cluster<db::PolygonRef> cluster2;
+  int soft;
 
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn), false);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn, soft), false);
 
   cluster.add (db::PolygonRef (poly, repo), 0);
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn), false);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn, soft), false);
 
   cluster2.add (db::PolygonRef (poly, repo), 0);
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn), true);
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (10, 20))), conn), true);
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (0, 1000))), conn), true);
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (0, 1001))), conn), false);
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (0, 2000))), conn), false);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn, soft), true);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (10, 20))), conn, soft), true);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (0, 1000))), conn, soft), true);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (0, 1001))), conn, soft), false);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (0, 2000))), conn, soft), false);
 
   cluster.clear ();
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn), false);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn, soft), false);
 }
 
 TEST(11_LocalClusterInteractDifferentLayers)
@@ -326,28 +327,29 @@ TEST(11_LocalClusterInteractDifferentLayers)
 
   db::local_cluster<db::PolygonRef> cluster;
   db::local_cluster<db::PolygonRef> cluster2;
+  int soft;
 
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn), false);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn, soft), false);
 
   cluster.add (db::PolygonRef (poly, repo), 0);
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn), false);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn, soft), false);
 
   cluster2.add (db::PolygonRef (poly, repo), 1);
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn), true);
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (10, 20))), conn), true);
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (0, 1000))), conn), true);
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (0, 1001))), conn), false);
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (0, 2000))), conn), false);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn, soft), true);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (10, 20))), conn, soft), true);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (0, 1000))), conn, soft), true);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (0, 1001))), conn, soft), false);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (0, 2000))), conn, soft), false);
 
   cluster.clear ();
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn), false);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn, soft), false);
   cluster.add (db::PolygonRef (poly, repo), 2);
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn), false); //  not connected
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn, soft), false); //  not connected
 
   cluster.clear ();
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn), false);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn, soft), false);
   cluster.add (db::PolygonRef (poly, repo), 1);
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn), true);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn, soft), true);
 }
 
 static std::string obj2string (const db::PolygonRef &ref)

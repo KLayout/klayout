@@ -327,7 +327,7 @@ public:
    *  "trans" is the transformation which is applied to the other cluster before
    *  the test.
    */
-  bool interacts (const local_cluster<T> &other, const db::ICplxTrans &trans, const Connectivity &conn) const;
+  bool interacts (const local_cluster<T> &other, const db::ICplxTrans &trans, const Connectivity &conn, int &soft) const;
 
   /**
    *  @brief Tests whether this cluster interacts with the given cell

@@ -525,16 +525,21 @@ public:
   typedef typename local_cluster<T>::box_type box_type;
 
   hnp_interaction_receiver (const Connectivity &conn, const db::ICplxTrans &trans)
-    : mp_conn (&conn), m_any (false), m_trans (trans)
+    : mp_conn (&conn), m_any (false), m_soft_mode (0), m_trans (trans)
   {
     //  .. nothing yet ..
   }
 
   void add (const T *s1, unsigned int l1, const T *s2, unsigned int l2)
   {
-    int soft; // @@@
+    int soft = 0;
     if (mp_conn->interacts (*s1, l1, *s2, l2, m_trans, soft)) {
-      m_any = true;
+      if (soft == 0 || (m_soft_mode != 0 && m_soft_mode != soft)) {
+        m_soft_mode = 0;
+        m_any = true;
+      } else {
+        m_soft_mode = soft;
+      }
     }
   }
 
@@ -543,9 +548,15 @@ public:
     return m_any;
   }
 
+  int soft_mode () const
+  {
+    return m_soft_mode;
+  }
+
 private:
   const Connectivity *mp_conn;
   bool m_any;
+  int m_soft_mode;
   db::ICplxTrans m_trans;
 };
 
@@ -596,7 +607,7 @@ local_cluster<T>::interacts (const db::Cell &cell, const db::ICplxTrans &trans, 
 
     Connectivity::layer_iterator le = conn.end_connected (s->first);
     for (Connectivity::layer_iterator l = conn.begin_connected (s->first); l != le; ++l) {
-      box += cell.bbox (l->first); // @@@ soft connections?
+      box += cell.bbox (l->first);
     }
 
     if (! box.empty () && ! s->second.begin_touching (box.transformed (trans), bc).at_end ()) {
@@ -610,7 +621,7 @@ local_cluster<T>::interacts (const db::Cell &cell, const db::ICplxTrans &trans, 
 
 template <class T>
 bool
-local_cluster<T>::interacts (const local_cluster<T> &other, const db::ICplxTrans &trans, const Connectivity &conn) const
+local_cluster<T>::interacts (const local_cluster<T> &other, const db::ICplxTrans &trans, const Connectivity &conn, int &soft) const
 {
   db::box_convert<T> bc;
 
@@ -669,7 +680,13 @@ local_cluster<T>::interacts (const local_cluster<T> &other, const db::ICplxTrans
   }
 
   hnp_interaction_receiver<T> rec (conn, trans);
-  return ! scanner.process (rec, 1 /*==touching*/, bc, bc_t);
+
+  if (! scanner.process (rec, 1 /*==touching*/, bc, bc_t) || rec.soft_mode () != 0) {
+    soft = rec.soft_mode ();
+    return true;
+  } else {
+    return false;
+  }
 }
 
 template <class T>
@@ -970,7 +987,7 @@ struct cluster_building_receiver
     if (m_separate_attributes && p1.second != p2.second) {
       return;
     }
-    int soft; // @@@
+    int soft = 0;
     if (! mp_conn->interacts (*s1, p1.first, *s2, p2.first, soft)) {
       return;
     }
@@ -982,34 +999,88 @@ struct cluster_building_receiver
 
       if (ic2 == m_shape_to_clusters.end ()) {
 
-        m_clusters.push_back (cluster_value ());
-        typename std::list<cluster_value>::iterator c = --m_clusters.end ();
-        c->first.push_back (std::make_pair (s1, p1));
-        c->first.push_back (std::make_pair (s2, p2));
+        if (soft != 0) {
 
-        m_shape_to_clusters.insert (std::make_pair (s1, c));
-        m_shape_to_clusters.insert (std::make_pair (s2, c));
+          m_clusters.push_back (cluster_value ());
+          typename std::list<cluster_value>::iterator c1 = --m_clusters.end ();
+          m_clusters.push_back (cluster_value ());
+          typename std::list<cluster_value>::iterator c2 = --m_clusters.end ();
+          c1->first.push_back (std::make_pair (s1, p1));
+          c2->first.push_back (std::make_pair (s2, p2));
+
+          m_shape_to_clusters.insert (std::make_pair (s1, c1));
+          m_shape_to_clusters.insert (std::make_pair (s2, c2));
+
+          register_soft_connection (c1, c2, soft);
+
+        } else {
+
+          m_clusters.push_back (cluster_value ());
+          typename std::list<cluster_value>::iterator c = --m_clusters.end ();
+          c->first.push_back (std::make_pair (s1, p1));
+          c->first.push_back (std::make_pair (s2, p2));
+
+          m_shape_to_clusters.insert (std::make_pair (s1, c));
+          m_shape_to_clusters.insert (std::make_pair (s2, c));
+
+        }
 
       } else {
 
-        ic2->second->first.push_back (std::make_pair (s1, p1));
-        m_shape_to_clusters.insert (std::make_pair (s1, ic2->second));
+        if (soft != 0) {
+
+          m_clusters.push_back (cluster_value ());
+          typename std::list<cluster_value>::iterator c1 = --m_clusters.end ();
+
+          c1->first.push_back (std::make_pair (s1, p1));
+          m_shape_to_clusters.insert (std::make_pair (s1, c1));
+
+          register_soft_connection (c1, ic2->second, soft);
+
+        } else {
+
+          ic2->second->first.push_back (std::make_pair (s1, p1));
+          m_shape_to_clusters.insert (std::make_pair (s1, ic2->second));
+
+        }
 
       }
 
     } else if (ic2 == m_shape_to_clusters.end ()) {
 
-      ic1->second->first.push_back (std::make_pair (s2, p2));
-      m_shape_to_clusters.insert (std::make_pair (s2, ic1->second));
+      if (soft != 0) {
+
+        m_clusters.push_back (cluster_value ());
+        typename std::list<cluster_value>::iterator c2 = --m_clusters.end ();
+
+        c2->first.push_back (std::make_pair (s2, p2));
+        m_shape_to_clusters.insert (std::make_pair (s2, c2));
+
+        register_soft_connection (ic1->second, c2, soft);
+
+      } else {
+
+        ic1->second->first.push_back (std::make_pair (s2, p2));
+        m_shape_to_clusters.insert (std::make_pair (s2, ic1->second));
+
+      }
 
     } else if (ic1->second != ic2->second) {
 
-      //  join clusters: use the larger one as the target
+      if (soft != 0) {
 
-      if (ic1->second->first.size () < ic2->second->first.size ()) {
-        join (ic2->second, ic1->second);
+        register_soft_connection (ic1->second, ic2->second, soft);
+
       } else {
-        join (ic1->second, ic2->second);
+
+        //  join clusters: use the larger one as the target
+
+        if (ic1->second->first.size () < ic2->second->first.size ()) {
+          join (ic2->second, ic1->second);
+        } else {
+          join (ic1->second, ic2->second);
+        }
+
       }
 
     }
@@ -1034,20 +1105,42 @@ struct cluster_building_receiver
     db::Connectivity::global_nets_iterator ge = mp_conn->end_global_connections (p.first);
     for (db::Connectivity::global_nets_iterator g = mp_conn->begin_global_connections (p.first); g != ge; ++g) {
 
-      typename std::map<size_t, typename std::list<cluster_value>::iterator>::iterator icg = m_global_to_clusters.find (g->first); // @@@ soft connections
+      typename std::map<size_t, typename std::list<cluster_value>::iterator>::iterator icg = m_global_to_clusters.find (g->first);
 
       if (icg == m_global_to_clusters.end ()) {
 
-        ic->second->second.insert (g->first);  // @@@ soft connections?
-        m_global_to_clusters.insert (std::make_pair (g->first, ic->second));  // @@@ soft connections?
+        if (g->second != 0) {
+
+          //  soft connection to a new global cluster
+          m_clusters.push_back (cluster_value ());
+          typename std::list<cluster_value>::iterator cg = --m_clusters.end ();
+
+          m_global_to_clusters.insert (std::make_pair (g->first, cg));
+
+          register_soft_connection (ic->second, cg, g->second);
+
+        } else {
+
+          ic->second->second.insert (g->first);
+          m_global_to_clusters.insert (std::make_pair (g->first, ic->second));
+
+        }
 
       } else if (ic->second != icg->second) {
 
-        //  join clusters
-        if (ic->second->first.size () < icg->second->first.size ()) {
-          join (icg->second, ic->second);
+        if (g->second != 0) {
+
+          register_soft_connection (ic->second, icg->second, g->second);
+
         } else {
-          join (ic->second, icg->second);
+
+          //  join clusters
+          if (ic->second->first.size () < icg->second->first.size ()) {
+            join (icg->second, ic->second);
+          } else {
+            join (ic->second, icg->second);
+          }
+
         }
 
       }
@@ -1077,6 +1170,13 @@ private:
     }
 
     m_clusters.erase (ic2);
+  }
+
+  void register_soft_connection (typename std::list<cluster_value>::iterator ic1, typename std::list<cluster_value>::iterator ic2, int soft)
+  {
+
+    //  @@@  TODO: implement
+
   }
 };
 
@@ -1687,7 +1787,7 @@ private:
       if (! bb1.empty ()) {
         db::Connectivity::layer_iterator lbe = mp_conn->end_connected (*la);
         for (db::Connectivity::layer_iterator lb = mp_conn->begin_connected (*la); lb != lbe && ! any; ++lb) {
-          db::box_convert<db::CellInst, true> bcb (*mp_layout, lb->first); // @@@ soft connections?
+          db::box_convert<db::CellInst, true> bcb (*mp_layout, lb->first);
           box_type bb2 = i2.cell_inst ().bbox (bcb).transformed (t2);
           any = bb1.touches (bb2);
         }
@@ -1860,7 +1960,9 @@ private:
         box_type bc2 = (common2 & i->bbox ().transformed (t12));
         for (typename db::local_clusters<T>::touching_iterator j = cl2.begin_touching (bc2); ! j.at_end (); ++j) {
 
-          if ((! m_separate_attributes || i->same_attrs (*j)) && i->interacts (*j, t21, *mp_conn)) {
+          int soft = 0;
+          if ((! m_separate_attributes || i->same_attrs (*j)) && i->interacts (*j, t21, *mp_conn, soft)) {
+            //  @@@ soft mode?
             new_interactions.push_back (std::make_pair (i->id (), j->id ()));
           }
 
@@ -2032,8 +2134,13 @@ private:
 
     for (typename db::local_clusters<T>::touching_iterator j = cl2.begin_touching (c1.bbox ().transformed (t2.inverted ())); ! j.at_end (); ++j) {
 
-      if ((! m_separate_attributes || c1.same_attrs (*j)) && c1.interacts (*j, t2, *mp_conn)) {
-        interactions.push_back (std::make_pair (c1.id (), j->id ()));
+      int soft = 0;
+      if ((! m_separate_attributes || c1.same_attrs (*j)) && c1.interacts (*j, t2, *mp_conn, soft)) {
+        if (soft != 0) {
+          //  @@@ TODO: soft mode
+        } else {
+          interactions.push_back (std::make_pair (c1.id (), j->id ()));
+        }
       }
 
     }

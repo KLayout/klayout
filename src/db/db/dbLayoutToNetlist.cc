@@ -1218,7 +1218,8 @@ size_t LayoutToNetlist::search_net (const db::ICplxTrans &trans, const db::Cell 
   const db::local_clusters<db::NetShape> &lcc = net_clusters ().clusters_per_cell (cell->cell_index ());
   for (db::local_clusters<db::NetShape>::touching_iterator i = lcc.begin_touching (local_box); ! i.at_end (); ++i) {
     const db::local_cluster<db::NetShape> &lc = *i;
-    if (lc.interacts (test_cluster, trans, m_conn)) {
+    int soft = 0;
+    if (lc.interacts (test_cluster, trans, m_conn, soft)) {
       return lc.id ();
     }
   }

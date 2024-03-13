@@ -623,6 +623,11 @@ public:
   }
 
   /**
+   *  @brief Makes a soft connection between clusters a and b (a: upper, b: lower)
+   */
+  void make_soft_connection (typename local_cluster<T>::id_type a, typename local_cluster<T>::id_type b);
+
+  /**
    *  @brief Gets the number of clusters
    */
   size_t size () const
@@ -844,7 +849,61 @@ private:
   size_t m_id;
 };
 
-typedef std::list<std::pair<ClusterInstance, ClusterInstance> > cluster_instance_pair_list_type;
+struct ClusterInstancePair
+{
+  ClusterInstancePair (const ClusterInstance &_a, const ClusterInstance &_b, int _soft)
+    : a (_a), b (_b), soft (_soft)
+  { }
+
+  bool operator== (const ClusterInstancePair &other) const
+  {
+    return a == other.a && b == other.b && soft == other.soft;
+  }
+
+  bool operator< (const ClusterInstancePair &other) const
+  {
+    if (!(a == other.a)) {
+      return a < other.a;
+    }
+    if (!(b == other.b)) {
+      return b < other.b;
+    }
+    return soft < other.soft;
+  }
+
+  ClusterInstance a, b;
+  int soft;
+};
+
+typedef std::list<ClusterInstancePair> cluster_instance_pair_list_type;
+
+struct ClusterIDPair
+{
+  typedef size_t id_type;
+
+  ClusterIDPair (id_type _a, id_type _b, int _soft)
+    : a (_a), b (_b), soft (_soft)
+  { }
+
+  bool operator== (const ClusterIDPair &other) const
+  {
+    return a == other.a && b == other.b && soft == other.soft;
+  }
+
+  bool operator< (const ClusterIDPair &other) const
+  {
+    if (!(a == other.a)) {
+      return a < other.a;
+    }
+    if (!(b == other.b)) {
+      return b < other.b;
+    }
+    return soft < other.soft;
+  }
+
+  id_type a, b;
+  int soft;
+};
 
 inline bool equal_array_delegates (const db::ArrayBase *a, const db::ArrayBase *b)
 {
@@ -1156,7 +1215,7 @@ public:
    *  The "with_id" cluster is removed. All connections of "with_id" are transferred to the
    *  first one. All shapes of "with_id" are transferred to "id".
    */
-  void join_cluster_with(typename local_cluster<T>::id_type id, typename local_cluster<T>::id_type with_id);
+  void join_cluster_with (typename local_cluster<T>::id_type id, typename local_cluster<T>::id_type with_id);
 
   /**
    *  @brief An iterator delivering all clusters (even the connectors)

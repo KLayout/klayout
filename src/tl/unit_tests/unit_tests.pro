@@ -31,6 +31,7 @@ SOURCES = \
   tlLongIntTests.cc \
   tlMathTests.cc \
   tlObjectTests.cc \
+  tlOptionalTests.cc \
   tlPixelBufferTests.cc \
   tlResourcesTests.cc \
   tlReuseVectorTests.cc \

@@ -128,6 +128,12 @@ Optional, named parameters are
     @bunit@/b: the unit string
   @/li
   @li 
+    @bmin_value@/b: the minimum value (effective for numerical types and if no choices are present)
+  @/li
+  @li 
+    @bmax_value@/b: the maximum value (effective for numerical types and if no choices are present)
+  @/li
+  @li 
     @bdefault@/b: the default value
   @/li
   @li 

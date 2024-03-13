@@ -181,6 +181,7 @@ private:
   void get_parameters_internal (db::ParameterStates &states, bool &edit_error);
   std::vector<tl::Variant> parameter_from_states (const db::ParameterStates &states) const;
   void states_from_parameters (db::ParameterStates &states, const std::vector<tl::Variant> &parameters);
+  void check_range (const tl::Variant& value, const db::PCellParameterDeclaration &decl);
 };
 
 }

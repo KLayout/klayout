@@ -628,6 +628,16 @@ public:
   void make_soft_connection (typename local_cluster<T>::id_type a, typename local_cluster<T>::id_type b);
 
   /**
+   *  @brief Get the downward soft connections for a given cluster
+   */
+  const std::set<size_t> &downward_soft_connections (typename local_cluster<T>::id_type id) const;
+
+  /**
+   *  @brief Get the upward soft connections for a given cluster
+   */
+  const std::set<size_t> &upward_soft_connections (typename local_cluster<T>::id_type id) const;
+
+  /**
    *  @brief Gets the number of clusters
    */
   size_t size () const
@@ -647,8 +657,12 @@ private:
   box_type m_bbox;
   tree_type m_clusters;
   size_t m_next_dummy_id;
+  std::map<size_t, std::set<size_t> > m_soft_connections;
+  std::map<size_t, std::set<size_t> > m_soft_connections_rev;
 
   void apply_attr_equivalences (const tl::equivalence_clusters<size_t> &attr_equivalence);
+  void remove_soft_connection_for (typename local_cluster<T>::id_type a, typename local_cluster<T>::id_type b);
+  void remove_soft_connection_for (typename local_cluster<T>::id_type id);
 };
 
 /**

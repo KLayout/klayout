@@ -809,6 +809,8 @@ void local_clusters<T>::clear ()
   m_clusters.clear ();
   m_bbox = box_type ();
   m_next_dummy_id = 0;
+  m_soft_connections.clear ();
+  m_soft_connections_rev.clear ();
 }
 
 template <class T>
@@ -846,6 +848,9 @@ local_clusters<T>::remove_cluster (typename local_cluster<T>::id_type id)
   local_cluster<T> *to_delete = const_cast<local_cluster<T> *> (& m_clusters.objects ().item (id - 1));
   to_delete->clear ();
   m_needs_update = true;
+
+  //  take care of soft connections
+  remove_soft_connection_for (id);
 }
 
 template <class T>
@@ -866,6 +871,10 @@ local_clusters<T>::join_cluster_with (typename local_cluster<T>::id_type id, typ
   //  we just clear them.
   with->clear ();
 
+  //  take care of soft connections
+  remove_soft_connection_for (id, with_id);
+  remove_soft_connection_for (with_id);
+
   m_needs_update = true;
 }
 
@@ -883,7 +892,81 @@ template <class T>
 void
 local_clusters<T>::make_soft_connection (typename local_cluster<T>::id_type a, typename local_cluster<T>::id_type b)
 {
-  //  @@@ TODO: implement
+  //  NOTE: antiparallel connections are allowed. We will eliminate them later
+
+  m_soft_connections [a].insert (b);
+  m_soft_connections_rev [b].insert (a);
+}
+
+template <class T>
+const std::set<size_t> &
+local_clusters<T>::downward_soft_connections (typename local_cluster<T>::id_type id) const
+{
+  static std::set<size_t> empty;
+
+  auto sc = m_soft_connections.find (id);
+  if (sc != m_soft_connections.end ()) {
+    return sc->second;
+  } else {
+    return empty;
+  }
+}
+
+template <class T>
+const std::set<size_t> &
+local_clusters<T>::upward_soft_connections (typename local_cluster<T>::id_type id) const
+{
+  static std::set<size_t> empty;
+
+  auto sc = m_soft_connections_rev.find (id);
+  if (sc != m_soft_connections_rev.end ()) {
+    return sc->second;
+  } else {
+    return empty;
+  }
+}
+
+template <class T>
+void
+local_clusters<T>::remove_soft_connection_for (typename local_cluster<T>::id_type a, typename local_cluster<T>::id_type b)
+{
+  auto sc = m_soft_connections.find (a);
+  if (sc != m_soft_connections.end ()) {
+    sc->second.erase (b);
+    if (sc->second.empty ()) {
+      m_soft_connections.erase (sc);
+    }
+  }
+
+  sc = m_soft_connections_rev.find (b);
+  if (sc != m_soft_connections_rev.end ()) {
+    sc->second.erase (a);
+    if (sc->second.empty ()) {
+      m_soft_connections_rev.erase (sc);
+    }
+  }
+}
+
+template <class T>
+void
+local_clusters<T>::remove_soft_connection_for (typename local_cluster<T>::id_type id)
+{
+  auto sc = m_soft_connections.find (id);
+  if (sc != m_soft_connections.end ()) {
+
+    for (auto i = sc->second.begin (); i != sc->second.end (); ++i) {
+      auto sc_rev = m_soft_connections_rev.find (*i);
+      tl_assert (sc_rev != m_soft_connections_rev.end ()) {
+        sc_rev->second.erase (id);
+        if (sc_rev->second.empty ()) {
+          m_soft_connections_rev.erase (*i);
+        }
+      }
+    }
+
+    m_soft_connections.erase (sc);
+
+  }
 }
 
 template <class T>

@@ -1093,6 +1093,7 @@ private:
   bool is_persisted_impl (const db::ShapeCollection &coll) const;
   void do_join_nets (db::Circuit &c, const std::vector<Net *> &nets);
   void do_join_nets ();
+  void do_soft_connections ();
   void join_nets_from_pattern (db::Circuit &c, const tl::GlobPattern &p);
   void join_nets_from_pattern (db::Circuit &c, const std::set<std::string> &p);
   void check_must_connect (const db::Circuit &c, const db::Net &a, const db::Net &b);

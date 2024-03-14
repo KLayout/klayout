@@ -338,7 +338,7 @@ public:
   bool interacts (const db::Cell &cell, const db::ICplxTrans &trans, const Connectivity &conn) const;
 
   /**
-   *  @brief Gets the bounding box of this cluster
+   *  @brief Gets the bounding box ofF this cluster
    */
   const box_type &bbox () const
   {

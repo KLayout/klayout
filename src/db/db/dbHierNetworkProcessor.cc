@@ -1001,6 +1001,8 @@ local_clusters<T>::mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpo
   db::mem_stat (stat, purpose, cat, m_bbox, true, (void *) this);
   db::mem_stat (stat, purpose, cat, m_clusters, true, (void *) this);
   db::mem_stat (stat, purpose, cat, m_next_dummy_id, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_soft_connections, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_soft_connections_rev, true, (void *) this);
 }
 
 namespace
@@ -1268,6 +1270,10 @@ private:
 
   void join (typename std::list<cluster_value>::iterator ic1, typename std::list<cluster_value>::iterator ic2)
   {
+    if (ic1 == ic2) {
+      return;
+    }
+
     ic1->first.insert (ic1->first.end (), ic2->first.begin (), ic2->first.end ());
     ic1->second.insert (ic2->second.begin (), ic2->second.end ());
 
@@ -1280,21 +1286,35 @@ private:
 
     m_clusters.erase (ic2);
 
-    auto i1 = m_soft_connections.find (std::make_pair (ic1.operator-> (), ic2.operator-> ()));
-    if (i1 != m_soft_connections.end ()) {
-      i1->second = 0;
+    //  remap soft connections: remove soft connections between ic1 and ic2 and
+    //  remap ic2 connections to ic1 as first
+
+    auto i2 = m_soft_connections.lower_bound (std::make_pair (ic2.operator-> (), (const cluster_value *) 0));
+    for (auto i = i2; i != m_soft_connections.end () && i->first.first == ic2.operator-> (); ++i) {
+      m_soft_connections.erase (std::make_pair (i->first.second, i->first.first));
     }
 
-    auto i2 = m_soft_connections.find (std::make_pair (ic2.operator-> (), ic1.operator-> ()));
-    if (i2 != m_soft_connections.end ()) {
-      i2->second = 0;
+    for (auto i = i2; i != m_soft_connections.end () && i->first.first == ic2.operator-> (); ++i) {
+      if (i->first.second != ic1.operator-> ()) {
+        register_soft_connection (ic1.operator-> (), i->first.second, i->second);
+      }
     }
+
+    auto i2_from = i2;
+    for ( ; i2 != m_soft_connections.end () && i2->first.first == ic2.operator-> (); ++i2)
+      ;
+    m_soft_connections.erase (i2_from, i2);
   }
 
   void register_soft_connection (typename std::list<cluster_value>::iterator ic1, typename std::list<cluster_value>::iterator ic2, int soft)
   {
-    auto i1 = m_soft_connections.find (std::make_pair (ic1.operator-> (), ic2.operator-> ()));
-    auto i2 = m_soft_connections.find (std::make_pair (ic2.operator-> (), ic1.operator-> ()));
+    register_soft_connection (ic1.operator-> (), ic2.operator-> (), soft);
+  }
+
+  void register_soft_connection (const cluster_value *c1, const cluster_value *c2, int soft)
+  {
+    auto i1 = m_soft_connections.find (std::make_pair (c1, c2));
+    auto i2 = m_soft_connections.find (std::make_pair (c2, c1));
 
     if (i1 != m_soft_connections.end () && i1->second != 0 && i1->second != soft) {
       i1->second = 0;
@@ -1305,8 +1325,8 @@ private:
 
     if (i1 == m_soft_connections.end ()) {
       tl_assert (i2 == m_soft_connections.end ());
-      m_soft_connections.insert (std::make_pair (std::make_pair (ic1.operator-> (), ic2.operator-> ()), soft));
-      m_soft_connections.insert (std::make_pair (std::make_pair (ic2.operator-> (), ic1.operator-> ()), -soft));
+      m_soft_connections.insert (std::make_pair (std::make_pair (c1, c2), soft));
+      m_soft_connections.insert (std::make_pair (std::make_pair (c2, c1), -soft));
     }
   }
 };

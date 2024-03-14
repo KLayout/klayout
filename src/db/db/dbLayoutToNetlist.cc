@@ -33,6 +33,7 @@
 #include "dbLayoutToNetlistFormatDefs.h"
 #include "dbLayoutVsSchematicFormatDefs.h"
 #include "dbShapeProcessor.h"
+#include "dbNetlistDeviceClasses.h"
 #include "dbLog.h"
 #include "tlGlobPattern.h"
 
@@ -425,7 +426,9 @@ void LayoutToNetlist::extract_netlist ()
   netex.extract_nets (dss (), m_layout_index, m_conn, *mp_netlist, m_net_clusters);
 
   // @@@ NOTE: can we have multiple pins on a net? Will this happen later maybe?
-  // @@@ do_soft_connections ()
+  tl_assert (check_many_pins (mp_netlist.get ())); // @@@
+  do_soft_connections ();
+  tl_assert (check_many_pins (mp_netlist.get ())); // @@@
   do_join_nets ();
   tl_assert (check_many_pins (mp_netlist.get ())); // @@@
 
@@ -633,6 +636,42 @@ void LayoutToNetlist::check_must_connect_impl (const db::Circuit &c, const db::N
         path.push_back (&sc);
         check_must_connect_impl (*sc.circuit (), *net_a, *net_b, c_org, a_org, b_org, path);
         path.pop_back ();
+      }
+
+    }
+
+  }
+}
+
+void LayoutToNetlist::do_soft_connections ()
+{
+
+// @@@ NetlistLocker locked_netlist (mp_netlist.get ());
+
+  db::DeviceClassDiode *soft_diode = new db::DeviceClassDiode ();
+  soft_diode->set_name ("SOFT");
+  mp_netlist->add_device_class (soft_diode);
+
+  for (auto c = mp_netlist->begin_bottom_up (); c != mp_netlist->end_bottom_up (); ++c) {
+
+    // @@@ create diodes as of now
+
+    auto clusters = net_clusters ().clusters_per_cell (c->cell_index ());
+
+    for (auto n = c->begin_nets (); n != c->end_nets (); ++n) {
+
+      auto soft_connections = clusters.upward_soft_connections (n->cluster_id ());
+      for (auto sc = soft_connections.begin (); sc != soft_connections.end (); ++sc) {
+
+        db::Device *sc_device = new db::Device (soft_diode);
+        c->add_device (sc_device);
+
+        auto nn = c->net_by_cluster_id (*sc);
+        if (nn) {
+          sc_device->connect_terminal (db::DeviceClassDiode::terminal_id_C, n.operator-> ());
+          sc_device->connect_terminal (db::DeviceClassDiode::terminal_id_A, nn);
+        }
+
       }
 
     }

@@ -1225,6 +1225,7 @@ struct cluster_building_receiver
           m_clusters.push_back (cluster_value ());
           typename std::list<cluster_value>::iterator cg = --m_clusters.end ();
 
+          cg->second.insert (g->first);
           m_global_to_clusters.insert (std::make_pair (g->first, cg));
 
           register_soft_connection (ic->second, cg, g->second);

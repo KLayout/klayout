@@ -645,12 +645,9 @@ void LayoutToNetlist::check_must_connect_impl (const db::Circuit &c, const db::N
 
 void LayoutToNetlist::do_soft_connections ()
 {
+  // @@@ NetlistLocker locked_netlist (mp_netlist.get ());
 
-// @@@ NetlistLocker locked_netlist (mp_netlist.get ());
-
-  db::DeviceClassDiode *soft_diode = new db::DeviceClassDiode ();
-  soft_diode->set_name ("SOFT");
-  mp_netlist->add_device_class (soft_diode);
+  db::DeviceClassDiode *soft_diode = 0;
 
   for (auto c = mp_netlist->begin_bottom_up (); c != mp_netlist->end_bottom_up (); ++c) {
 
@@ -662,6 +659,12 @@ void LayoutToNetlist::do_soft_connections ()
 
       auto soft_connections = clusters.upward_soft_connections (n->cluster_id ());
       for (auto sc = soft_connections.begin (); sc != soft_connections.end (); ++sc) {
+
+        if (! soft_diode) {
+          soft_diode = new db::DeviceClassDiode ();
+          soft_diode->set_name ("SOFT");
+          mp_netlist->add_device_class (soft_diode);
+        }
 
         db::Device *sc_device = new db::Device (soft_diode);
         c->add_device (sc_device);

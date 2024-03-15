@@ -393,6 +393,15 @@ static std::string local_clusters_to_string (const db::local_clusters<T> &cluste
     }
     s += "#" + tl::to_string (c->id ()) + ":" + local_cluster_to_string (*c, conn);
   }
+  for (typename db::local_clusters<T>::const_iterator c = clusters.begin (); c != clusters.end (); ++c) {
+    auto sc = clusters.upward_soft_connections (c->id ());
+    for (auto i = sc.begin (); i != sc.end (); ++i) {
+      if (! s.empty ()) {
+        s += "\n";
+      }
+      s += "(#" + tl::to_string (*i) + "->#" + tl::to_string (c->id ()) + ")";
+    }
+  }
   return s;
 }
 
@@ -667,6 +676,90 @@ TEST(23_LocalClustersWithEdges)
     db::local_clusters<db::Edge> clusters;
     clusters.build_clusters (cell, conn);
     EXPECT_EQ (local_clusters_to_string (clusters, conn), "#1:[0](0,0;0,500);[0](0,500;0,1000);[0](1500,375;0,0);[0](0,1000;2000,1000);[0](2000,1000;2000,500);[0](2000,500;1000,250)");
+  }
+}
+
+TEST(24_LocalClustersWithSoftConnections)
+{
+  db::Layout layout;
+  db::Cell &cell = layout.cell (layout.add_cell ("TOP"));
+  db::GenericRepository &repo = layout.shape_repository ();
+
+  auto dbu = db::CplxTrans (layout.dbu ()).inverted ();
+
+  unsigned int nwell = 0;
+  unsigned int ntie = 1;
+  unsigned int ptie = 2;
+  unsigned int contact = 3;
+  unsigned int metal1 = 4;
+
+  cell.shapes (nwell).insert (db::PolygonRef (dbu * db::DPolygon (db::DBox (0.0, 4.0, 2.0, 8.0)), repo));
+  cell.shapes (ntie).insert (db::PolygonRef (dbu * db::DPolygon (db::DBox (0.5, 5.0, 1.5, 7.0)), repo));
+  cell.shapes (contact).insert (db::PolygonRef (dbu * db::DPolygon (db::DBox (0.8, 6.0, 1.2, 6.5)), repo));
+  cell.shapes (metal1).insert (db::PolygonRef (dbu * db::DPolygon (db::DBox (0.0, 5.0, 2.0, 7.0)), repo));
+
+  cell.shapes (ptie).insert (db::PolygonRef (dbu * db::DPolygon (db::DBox (0.5, 1.0, 1.5, 3.0)), repo));
+  cell.shapes (contact).insert (db::PolygonRef (dbu * db::DPolygon (db::DBox (0.8, 2.0, 1.2, 2.5)), repo));
+  cell.shapes (metal1).insert (db::PolygonRef (dbu * db::DPolygon (db::DBox (0.0, 1.0, 2.0, 3.0)), repo));
+
+  db::Connectivity conn;
+  conn.connect (nwell);
+  conn.connect (ntie);
+  conn.connect (ptie);
+  conn.connect (contact);
+  conn.connect (metal1);
+  conn.soft_connect (ntie, nwell);
+  conn.soft_connect (contact, ntie);
+  conn.connect (metal1, contact);
+
+  {
+    db::local_clusters<db::PolygonRef> clusters;
+    clusters.build_clusters (cell, conn);
+    EXPECT_EQ (local_clusters_to_string (clusters, conn),
+      "#1:[0](0,4000;0,8000;2000,8000;2000,4000)\n"
+      "#2:[1](500,5000;500,7000;1500,7000;1500,5000)\n"
+      "#3:[3](800,6000;800,6500;1200,6500;1200,6000);[4](0,5000;0,7000;2000,7000;2000,5000)\n"
+      "#4:[3](800,2000;800,2500;1200,2500;1200,2000);[4](0,1000;0,3000;2000,3000;2000,1000)\n"
+      "#5:[2](500,1000;500,3000;1500,3000;1500,1000)\n"
+      "(#2->#1)\n"
+      "(#3->#2)"
+    );
+  }
+
+  conn.soft_connect (contact, ptie);
+
+  {
+    db::local_clusters<db::PolygonRef> clusters;
+    clusters.build_clusters (cell, conn);
+    EXPECT_EQ (local_clusters_to_string (clusters, conn),
+      "#1:[0](0,4000;0,8000;2000,8000;2000,4000)\n"
+      "#2:[1](500,5000;500,7000;1500,7000;1500,5000)\n"
+      "#3:[3](800,6000;800,6500;1200,6500;1200,6000);[4](0,5000;0,7000;2000,7000;2000,5000)\n"
+      "#4:[2](500,1000;500,3000;1500,3000;1500,1000)\n"
+      "#5:[3](800,2000;800,2500;1200,2500;1200,2000);[4](0,1000;0,3000;2000,3000;2000,1000)\n"
+      "(#2->#1)\n"
+      "(#3->#2)\n"
+      "(#5->#4)"
+    );
+  }
+
+  conn.soft_connect_global (ptie, "BULK");
+
+  {
+    db::local_clusters<db::PolygonRef> clusters;
+    clusters.build_clusters (cell, conn);
+    EXPECT_EQ (local_clusters_to_string (clusters, conn),
+      "#1:[0](0,4000;0,8000;2000,8000;2000,4000)\n"
+      "#2:[1](500,5000;500,7000;1500,7000;1500,5000)\n"
+      "#3:[3](800,6000;800,6500;1200,6500;1200,6000);[4](0,5000;0,7000;2000,7000;2000,5000)\n"
+      "#4:[2](500,1000;500,3000;1500,3000;1500,1000)\n"
+      "#5:[3](800,2000;800,2500;1200,2500;1200,2000);[4](0,1000;0,3000;2000,3000;2000,1000)\n"
+      "#6:+BULK\n"
+      "(#2->#1)\n"
+      "(#3->#2)\n"
+      "(#5->#4)\n"
+      "(#4->#6)"
+    );
   }
 }
 

@@ -661,8 +661,7 @@ private:
   std::map<size_t, std::set<size_t> > m_soft_connections_rev;
 
   void apply_attr_equivalences (const tl::equivalence_clusters<size_t> &attr_equivalence);
-  void remove_soft_connection_for (typename local_cluster<T>::id_type a, typename local_cluster<T>::id_type b);
-  void remove_soft_connection_for (typename local_cluster<T>::id_type id);
+  void remove_soft_connections_for (typename local_cluster<T>::id_type id);
 };
 
 /**

@@ -850,7 +850,7 @@ local_clusters<T>::remove_cluster (typename local_cluster<T>::id_type id)
   m_needs_update = true;
 
   //  take care of soft connections
-  remove_soft_connection_for (id);
+  remove_soft_connections_for (id);
 }
 
 template <class T>
@@ -872,8 +872,18 @@ local_clusters<T>::join_cluster_with (typename local_cluster<T>::id_type id, typ
   with->clear ();
 
   //  take care of soft connections
-  remove_soft_connection_for (id, with_id);
-  remove_soft_connection_for (with_id);
+
+  std::set<size_t> conn_down = downward_soft_connections (with_id);
+  std::set<size_t> conn_up = upward_soft_connections (with_id);
+
+  remove_soft_connections_for (with_id);
+
+  for (auto i = conn_down.begin (); i != conn_down.end (); ++i) {
+    make_soft_connection (id, *i);
+  }
+  for (auto i = conn_up.begin (); i != conn_up.end (); ++i) {
+    make_soft_connection (*i, id);
+  }
 
   m_needs_update = true;
 }
@@ -892,6 +902,10 @@ template <class T>
 void
 local_clusters<T>::make_soft_connection (typename local_cluster<T>::id_type a, typename local_cluster<T>::id_type b)
 {
+  if (a == b) {
+    return;
+  }
+
   //  NOTE: antiparallel connections are allowed. We will eliminate them later
 
   m_soft_connections [a].insert (b);
@@ -926,47 +940,33 @@ local_clusters<T>::upward_soft_connections (typename local_cluster<T>::id_type i
   }
 }
 
-template <class T>
-void
-local_clusters<T>::remove_soft_connection_for (typename local_cluster<T>::id_type a, typename local_cluster<T>::id_type b)
+static void
+remove_id_from_map (std::map<size_t, std::set<size_t> > &fwd, std::map<size_t, std::set<size_t> > &rev, size_t id)
 {
-  auto sc = m_soft_connections.find (a);
-  if (sc != m_soft_connections.end ()) {
-    sc->second.erase (b);
-    if (sc->second.empty ()) {
-      m_soft_connections.erase (sc);
-    }
-  }
+  auto sc = fwd.find (id);
+  if (sc != fwd.end ()) {
 
-  sc = m_soft_connections_rev.find (b);
-  if (sc != m_soft_connections_rev.end ()) {
-    sc->second.erase (a);
-    if (sc->second.empty ()) {
-      m_soft_connections_rev.erase (sc);
+    for (auto i = sc->second.begin (); i != sc->second.end (); ++i) {
+      auto sc_rev = rev.find (*i);
+      if (sc_rev != rev.end ()) {
+        sc_rev->second.erase (id);
+        if (sc_rev->second.empty ()) {
+          rev.erase (*i);
+        }
+      }
     }
+
+    fwd.erase (sc);
+
   }
 }
 
 template <class T>
 void
-local_clusters<T>::remove_soft_connection_for (typename local_cluster<T>::id_type id)
+local_clusters<T>::remove_soft_connections_for (typename local_cluster<T>::id_type id)
 {
-  auto sc = m_soft_connections.find (id);
-  if (sc != m_soft_connections.end ()) {
-
-    for (auto i = sc->second.begin (); i != sc->second.end (); ++i) {
-      auto sc_rev = m_soft_connections_rev.find (*i);
-      tl_assert (sc_rev != m_soft_connections_rev.end ()) {
-        sc_rev->second.erase (id);
-        if (sc_rev->second.empty ()) {
-          m_soft_connections_rev.erase (*i);
-        }
-      }
-    }
-
-    m_soft_connections.erase (sc);
-
-  }
+  remove_id_from_map (m_soft_connections, m_soft_connections_rev, id);
+  remove_id_from_map (m_soft_connections_rev, m_soft_connections, id);
 }
 
 template <class T>
@@ -1034,7 +1034,7 @@ struct cluster_building_receiver
 
   void generate_clusters (local_clusters<T> &clusters)
   {
-    std::map<const cluster_value *, local_cluster<T> *> in_to_out;
+    std::map<const cluster_value *, typename local_cluster<T>::id_type> in_to_out;
 
     //  build the resulting clusters
     for (typename std::list<cluster_value>::const_iterator c = m_clusters.begin (); c != m_clusters.end (); ++c) {
@@ -1046,7 +1046,7 @@ struct cluster_building_receiver
         cluster->add_attr (s->second.second);
       }
 
-      in_to_out.insert (std::make_pair (c.operator-> (), cluster));
+      in_to_out.insert (std::make_pair (c.operator-> (), cluster->id ()));
 
       std::set<size_t> global_nets = c->second;
 
@@ -1087,7 +1087,7 @@ struct cluster_building_receiver
       auto c2 = in_to_out.find (sc->first.second);
       tl_assert (c1 != in_to_out.end () && c2 != in_to_out.end ());
 
-      clusters.make_soft_connection (c1->second->id (), c2->second->id ());
+      clusters.make_soft_connection (c1->second, c2->second);
 
     }
   }
@@ -2957,7 +2957,7 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
         if (! i->has_instance ()) {
 
           local.join_cluster_with (gcid, i->id ());
-          local.remove_cluster (i->id ());
+          local.remove_cluster (i->id ()); // @@@ actually required?
 
         } else {
 
@@ -2968,7 +2968,7 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
             //  shouldn't happen, but duplicate instances may trigger this
           } else if (other_id) {
             local.join_cluster_with (gcid, other_id);
-            local.remove_cluster (other_id);
+            local.remove_cluster (other_id); // @@@ actually required?
           } else {
             local.add_connection (gcid, *i);
           }

@@ -1045,6 +1045,18 @@ public:
    */
   void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const;
 
+  //  for debugging and testing
+  bool make_soft_connection_diodes () const
+  {
+    return m_make_soft_connection_diodes;
+  }
+
+  //  for debugging and testing
+  void set_make_soft_connection_diodes (bool f)
+  {
+    m_make_soft_connection_diodes = f;
+  }
+
 private:
   //  no copying
   LayoutToNetlist (const db::LayoutToNetlist &other);
@@ -1074,6 +1086,7 @@ private:
   std::string m_generator;
   bool m_include_floating_subcircuits;
   bool m_top_level_mode;
+  bool m_make_soft_connection_diodes;
   std::list<tl::GlobPattern> m_joined_net_names;
   std::list<std::pair<tl::GlobPattern, tl::GlobPattern> > m_joined_net_names_per_cell;
   std::list<std::set<std::string> > m_joined_nets;
@@ -1098,6 +1111,9 @@ private:
   void join_nets_from_pattern (db::Circuit &c, const std::set<std::string> &p);
   void check_must_connect (const db::Circuit &c, const db::Net &a, const db::Net &b);
   void check_must_connect_impl (const db::Circuit &c, const db::Net &a, const db::Net &b, const db::Circuit &c_org, const db::Net &a_org, const db::Net &b_org, std::vector<const db::SubCircuit *> &path);
+
+  //  for debugging and testing
+  void make_soft_connection_diodes ();
 
   //  implementation of NetlistManipulationCallbacks
   virtual size_t link_net_to_parent_circuit (const Net *subcircuit_net, Circuit *parent_circuit, const DCplxTrans &trans);

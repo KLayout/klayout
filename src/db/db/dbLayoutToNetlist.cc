@@ -46,7 +46,7 @@ namespace db
 //  Note: the iterator provides the hierarchical selection (enabling/disabling cells etc.)
 
 LayoutToNetlist::LayoutToNetlist (const db::RecursiveShapeIterator &iter)
-  : m_iter (iter), m_layout_index (0), m_netlist_extracted (false), m_is_flat (false), m_device_scaling (1.0), m_include_floating_subcircuits (false), m_top_level_mode (false)
+  : m_iter (iter), m_layout_index (0), m_netlist_extracted (false), m_is_flat (false), m_device_scaling (1.0), m_include_floating_subcircuits (false), m_top_level_mode (false), m_make_soft_connection_diodes (false)
 {
   //  check the iterator
   if (iter.has_complex_region () || iter.region () != db::Box::world ()) {
@@ -66,7 +66,7 @@ LayoutToNetlist::LayoutToNetlist (const db::RecursiveShapeIterator &iter)
 }
 
 LayoutToNetlist::LayoutToNetlist (db::DeepShapeStore *dss, unsigned int layout_index)
-  : mp_dss (dss), m_layout_index (layout_index), m_netlist_extracted (false), m_is_flat (false), m_device_scaling (1.0), m_include_floating_subcircuits (false), m_top_level_mode (false)
+  : mp_dss (dss), m_layout_index (layout_index), m_netlist_extracted (false), m_is_flat (false), m_device_scaling (1.0), m_include_floating_subcircuits (false), m_top_level_mode (false), m_make_soft_connection_diodes (false)
 {
   if (dss->is_valid_layout_index (m_layout_index)) {
     m_iter = db::RecursiveShapeIterator (dss->layout (m_layout_index), dss->initial_cell (m_layout_index), std::set<unsigned int> ());
@@ -74,7 +74,7 @@ LayoutToNetlist::LayoutToNetlist (db::DeepShapeStore *dss, unsigned int layout_i
 }
 
 LayoutToNetlist::LayoutToNetlist (const std::string &topcell_name, double dbu)
-  : m_iter (), m_netlist_extracted (false), m_is_flat (true), m_device_scaling (1.0), m_include_floating_subcircuits (false), m_top_level_mode (false)
+  : m_iter (), m_netlist_extracted (false), m_is_flat (true), m_device_scaling (1.0), m_include_floating_subcircuits (false), m_top_level_mode (false), m_make_soft_connection_diodes (false)
 {
   mp_internal_dss.reset (new db::DeepShapeStore (topcell_name, dbu));
   mp_dss.reset (mp_internal_dss.get ());
@@ -85,7 +85,7 @@ LayoutToNetlist::LayoutToNetlist (const std::string &topcell_name, double dbu)
 
 LayoutToNetlist::LayoutToNetlist ()
   : m_iter (), mp_internal_dss (new db::DeepShapeStore ()), mp_dss (mp_internal_dss.get ()), m_layout_index (0),
-    m_netlist_extracted (false), m_is_flat (false), m_device_scaling (1.0), m_include_floating_subcircuits (false), m_top_level_mode (false)
+    m_netlist_extracted (false), m_is_flat (false), m_device_scaling (1.0), m_include_floating_subcircuits (false), m_top_level_mode (false), m_make_soft_connection_diodes (false)
 {
   init ();
 }
@@ -427,8 +427,16 @@ void LayoutToNetlist::extract_netlist ()
 
   // @@@ NOTE: can we have multiple pins on a net? Will this happen later maybe?
   tl_assert (check_many_pins (mp_netlist.get ())); // @@@
-  do_soft_connections ();
+
+  //  treat soft connections
+  if (m_make_soft_connection_diodes) {
+    make_soft_connection_diodes ();
+  } else {
+    do_soft_connections ();
+  }
+
   tl_assert (check_many_pins (mp_netlist.get ())); // @@@
+  //  implement the "join_nets" (aka "must connect") feature
   do_join_nets ();
   tl_assert (check_many_pins (mp_netlist.get ())); // @@@
 
@@ -643,15 +651,11 @@ void LayoutToNetlist::check_must_connect_impl (const db::Circuit &c, const db::N
   }
 }
 
-void LayoutToNetlist::do_soft_connections ()
+void LayoutToNetlist::make_soft_connection_diodes ()
 {
-  // @@@ NetlistLocker locked_netlist (mp_netlist.get ());
-
   db::DeviceClassDiode *soft_diode = 0;
 
   for (auto c = mp_netlist->begin_bottom_up (); c != mp_netlist->end_bottom_up (); ++c) {
-
-    // @@@ create diodes as of now
 
     auto clusters = net_clusters ().clusters_per_cell (c->cell_index ());
 
@@ -680,6 +684,358 @@ void LayoutToNetlist::do_soft_connections ()
     }
 
   }
+}
+
+namespace
+{
+
+  /**
+   *  @brief Describes a soft-connected cluster
+   *
+   *  Such a cluster is a collection of nets/shape clusters that are connected via
+   *  soft connections.
+   *  There is also some information about the count of "down-only" nets.
+   */
+  class SoftConnectionClusterInfo
+  {
+  public:
+    typedef std::set<size_t> pin_set;
+    typedef pin_set::const_iterator pin_iterator;
+    typedef std::map<size_t, int> dir_map;
+
+    SoftConnectionClusterInfo ()
+      : m_partial_net_count (0)
+    {
+      //  .. nothing yet ..
+    }
+
+    /**
+     *  @brief Enters information about a specific net
+     *
+     *  @param net The Net for which we are entering information
+     *  @param dir The direction code of the net (0: no soft connection or both directions, +1: up-only, -1: down-only)
+     *  @param pin A pin that might leading outside our current circuit from this net (0 if there is none)
+     *  @param partial_net_count The partial net count of nets attached to this net inside subcircuits
+     */
+    void add (const db::Net *net, int dir, const db::Pin *pin, size_t partial_net_count)
+    {
+      m_partial_net_count += partial_net_count;
+
+      //  this is where we make the decision about the partial nets ...
+      if (! pin && dir < 0 && ! net->is_floating ()) {
+        m_partial_net_count += 1;
+      }
+
+      if (pin) {
+        m_pin_ids.insert (pin->id ());
+      }
+
+      m_cluster_dir.insert (std::make_pair (net->cluster_id (), dir));
+    }
+
+    /**
+     *  @brief Gets the partial net count
+     *
+     *  The partial net count is the number of nets definitely isolated.
+     *  This is the count of "down-only" connected nets on the cluster.
+     *  This may also involve nets from subcircuits.
+     *  Only non-trivial (floating) nets are counted.
+     *
+     *  A partial net count of more than one indicates a soft connection
+     *  between nets.
+     */
+    size_t partial_net_count () const
+    {
+      return m_partial_net_count;
+    }
+
+    /**
+     *  @brief Gets the pins on the cluster (begin iterator)
+     *
+     *  The iterator delivers Pin IDs
+     */
+    pin_iterator begin_pins () const
+    {
+      return m_pin_ids.begin ();
+    }
+
+    /**
+     *  @brief Gets the pins on the cluster (end iterator)
+     */
+    pin_iterator end_pins () const
+    {
+      return m_pin_ids.end ();
+    }
+
+  private:
+    pin_set m_pin_ids;
+    size_t m_partial_net_count;
+    dir_map m_cluster_dir;
+  };
+
+  /**
+   *  @brief Provides temporary soft connection information for a circuit
+   *
+   *  Soft connection information is the soft-connected-clusters that are formed inside
+   *  the circuit and how these clusters connect to pins.
+   */
+  class SoftConnectionCircuitInfo
+  {
+  public:
+    /**
+     *  @brief Creates a new cluster info object
+     */
+    SoftConnectionClusterInfo &make_cluster ()
+    {
+      m_cluster_info.push_back (SoftConnectionClusterInfo ());
+      return m_cluster_info.back ();
+    }
+
+    /**
+     *  @brief Adds information about a pin
+     *
+     *  @param pin The pin
+     *  @param dir The nature of connections from the pin: 0 if no soft connections / both directions, +1 to "up only" and -1 for "down only"
+     *  @param sc_cluster_info The soft-connected net cluster info object
+     */
+    void add_pin_info (const db::Pin *pin, int dir, SoftConnectionClusterInfo *sc_cluster_info)
+    {
+      if (pin) {
+        m_pin_info.insert (std::make_pair (pin->id (), std::make_pair (dir, sc_cluster_info)));
+      }
+    }
+
+    /**
+     *  @brief Gets the direction attribute of the pin
+     */
+    int direction_per_pin (const db::Pin *pin) const
+    {
+      if (! pin) {
+        return 0;
+      }
+
+      auto p = m_pin_info.find (pin->id ());
+      return p != m_pin_info.end () ? p->second.first : 0;
+    }
+
+    /**
+     *  @brief Gets the soft-connected net cluster info object the pin connects to
+     */
+    const SoftConnectionClusterInfo *get_cluster_info_per_pin (const db::Pin *pin) const
+    {
+      if (! pin) {
+        return 0;
+      }
+
+      auto p = m_pin_info.find (pin->id ());
+      return p != m_pin_info.end () ? p->second.second : 0;
+    }
+
+  private:
+    std::list<SoftConnectionClusterInfo> m_cluster_info;
+    std::map<size_t, std::pair<int, const SoftConnectionClusterInfo *> > m_pin_info;
+  };
+
+  /**
+   *  @brief Provides temporary soft connection information for a netlist
+   */
+  class SoftConnectionInfo
+  {
+  public:
+    SoftConnectionInfo ()
+    {
+      //  .. nothing yet ..
+    }
+
+    /**
+     *  @brief Builds the soft connection information for the given netlist and net clusters
+     */
+    void build (const db::Netlist &netlist, const db::hier_clusters<db::NetShape> &net_clusters)
+    {
+      for (auto c = netlist.begin_bottom_up (); c != netlist.end_bottom_up (); ++c) {
+        build_clusters_for_circuit (c.operator-> (), net_clusters.clusters_per_cell (c->cell_index ()));
+      }
+
+    }
+
+  private:
+    /**
+     *  @brief Builds the per-circuit cluster information
+     *
+     *  First of all, this method creates a SoftConnectionCircuitInfo object for the circuit.
+     *
+     *  Inside this per-circuit object, it will create a number of SoftConnectionClusterInfo objects - each one
+     *  for a cluster of soft-connected nets.
+     *
+     *  Call this method bottom-up as it needs SoftConnectionCircuitInfo objects for called circuits.
+     */
+    void build_clusters_for_circuit (const db::Circuit *circuit, const db::connected_clusters<db::NetShape> &shape_clusters)
+    {
+      SoftConnectionCircuitInfo &sc_circuit_info = m_scc_per_circuit.insert (std::make_pair (circuit, SoftConnectionCircuitInfo ())).first->second;
+
+      std::set<size_t> seen;
+      for (auto c = shape_clusters.begin (); c != shape_clusters.end (); ++c) {
+
+        if (seen.find (c->id ()) != seen.end ()) {
+          continue;
+        }
+
+        //  incrementally collect further connected nets (shape clusters)
+
+        std::set<size_t> connected;
+        connected.insert (c->id ());
+        seen.insert (c->id ());
+
+        SoftConnectionClusterInfo *sc_cluster_info = 0;
+
+        while (! connected.empty ()) {
+
+          std::set<size_t> next_connected;
+
+          for (auto cc = connected.begin (); cc != connected.end (); ++cc) {
+
+              const db::Net *net = circuit->net_by_cluster_id (*cc);
+
+            //  the direction of a net is 0 for "no connections" or "both up and down"
+            //  and -1 for "down-only" connections and +1 for "up-only" connections:
+
+            int dir = 0;
+
+            //  direct soft connections to other nets
+
+            for (int up = 0; up < 2; ++up) {
+              std::set<size_t> next = up ? shape_clusters.upward_soft_connections (*cc) : shape_clusters.downward_soft_connections (*cc);
+              if (! next.empty () || net_has_up_or_down_subcircuit_connections (net, up)) {
+                dir += up ? 1 : -1;
+              }
+              for (auto i = next.begin (); i != next.end (); ++i) {
+                if (seen.insert (*i).second) {
+                  next_connected.insert (*i);
+                }
+              }
+            }
+
+            //  collect soft connections via subcircuits
+
+            size_t sc_partial_net_count = 0;
+            std::set<size_t> next = net_connections_through_subcircuits (net, sc_partial_net_count);
+
+            for (auto i = next.begin (); i != next.end (); ++i) {
+              if (seen.insert (*i).second) {
+                next_connected.insert (*i);
+              }
+            }
+
+            //  is this net associated with a pin?
+
+            const db::Pin *pin = 0;
+            if (net && net->begin_pins () != net->end_pins ()) {
+              //  TODO: multiple pins per net need to be supported?
+              tl_assert (net->pin_count () == 1);
+              pin = net->begin_pins ()->pin ();
+            }
+
+            if (! sc_cluster_info) {
+              sc_cluster_info = &sc_circuit_info.make_cluster ();
+            }
+
+            sc_cluster_info->add (net, dir, pin, sc_partial_net_count);
+
+            sc_circuit_info.add_pin_info (pin, dir, sc_cluster_info);
+
+          }
+
+          connected.swap (next_connected);
+
+        }
+
+      }
+
+    }
+
+    /**
+     *  @brief Gets a value indicating whether the given net connects to subcircuits with up or down connections inside
+     */
+    bool net_has_up_or_down_subcircuit_connections (const db::Net *net, bool up)
+    {
+      int look_for_dir = up ? 1 : -1;
+
+      for (auto sc = net->begin_subcircuit_pins (); sc != net->end_subcircuit_pins (); ++sc) {
+        const db::Pin *pin = sc->pin ();
+        const db::Circuit *ref = sc->subcircuit ()->circuit_ref ();
+        auto scc_ref = m_scc_per_circuit.find (ref);
+        if (scc_ref != m_scc_per_circuit.end ()) {
+          int dir = scc_ref->second.direction_per_pin (pin);
+          if (dir == look_for_dir) {
+            return true;
+          }
+        }
+      }
+
+      return false;
+    }
+
+    /**
+     *  @brief Gets connections to other nets / shape clusters through the given subcircuit from the given pin
+     *
+     *  As a side effect, this method will also collect the partial net count - that is the number
+     *  of defintively disconnected (down-only) nets.
+     *  More that one such a net will render an error.
+     */
+    void get_net_connections_through_subcircuit (const db::SubCircuit *subcircuit, const db::Pin *pin, std::set<size_t> &ids, size_t &partial_net_count)
+    {
+      auto scc = m_scc_per_circuit.find (subcircuit->circuit_ref ());
+      if (scc != m_scc_per_circuit.end ()) {
+
+        const SoftConnectionCircuitInfo &sci = scc->second;
+
+        const SoftConnectionClusterInfo *scci = sci.get_cluster_info_per_pin (pin);
+        if (scci) {
+
+          partial_net_count += scci->partial_net_count ();
+
+          for (auto p = scci->begin_pins (); p != scci->end_pins (); ++p) {
+            if (*p != pin->id ()) {
+              const NetSubcircuitPinRef *netref = subcircuit->netref_for_pin (*p);
+              if (netref && netref->net ()) {
+                ids.insert (netref->net ()->cluster_id ());
+              }
+            }
+          }
+
+        }
+
+      }
+    }
+
+    /**
+     *  @brief Gets connections to other nets / shape clusters through the subcircuits on the net
+     *
+     *  As a side effect, this method will also collect the partial net count - that is the number
+     *  of defintively disconnected (down-only) nets.
+     *  More that one such a net will render an error.
+     *
+     *  The return value is a set of nets  shape cluster IDs.
+     */
+    std::set<size_t> net_connections_through_subcircuits (const db::Net *net, size_t &partial_net_count)
+    {
+      std::set<size_t> ids;
+      for (auto sc = net->begin_subcircuit_pins (); sc != net->end_subcircuit_pins (); ++sc) {
+        get_net_connections_through_subcircuit (sc->subcircuit (), sc->pin (), ids, partial_net_count);
+      }
+      return ids;
+    }
+
+    std::map<const db::Circuit *, SoftConnectionCircuitInfo> m_scc_per_circuit;
+  };
+
+}
+
+void LayoutToNetlist::do_soft_connections ()
+{
+
+  // @@@
+
 }
 
 void LayoutToNetlist::do_join_nets ()

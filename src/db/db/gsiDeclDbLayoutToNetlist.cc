@@ -506,6 +506,12 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "\n"
     "This attribute has been introduced in version 0.27.\n"
   ) +
+  gsi::method ("make_soft_connection_diodes=", &db::LayoutToNetlist::set_make_soft_connection_diodes, gsi::arg ("flag"),
+    "@hide"
+  ) +
+  gsi::method ("make_soft_connection_diodes", &db::LayoutToNetlist::make_soft_connection_diodes,
+    "@hide"
+  ) +
   gsi::method ("top_level_mode=", &db::LayoutToNetlist::set_top_level_mode, gsi::arg ("flag"),
     "@brief Sets a flag indicating whether top level mode is enabled.\n"
     "\n"

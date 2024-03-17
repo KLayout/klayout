@@ -430,11 +430,7 @@ void LayoutToNetlist::extract_netlist ()
   tl_assert (check_many_pins (mp_netlist.get ())); // @@@
 
   //  treat soft connections
-  if (m_make_soft_connection_diodes) {
-    do_make_soft_connection_diodes ();
-  } else {
-    do_soft_connections ();
-  }
+  do_soft_connections ();
 
   tl_assert (check_many_pins (mp_netlist.get ())); // @@@
   //  implement the "join_nets" (aka "must connect") feature
@@ -650,7 +646,7 @@ void LayoutToNetlist::check_must_connect_impl (const db::Circuit &c, const db::N
   }
 }
 
-void LayoutToNetlist::do_make_soft_connection_diodes ()
+void LayoutToNetlist::place_soft_connection_diodes ()
 {
   db::DeviceClassDiode *soft_diode = 0;
 
@@ -690,7 +686,12 @@ void LayoutToNetlist::do_soft_connections ()
   SoftConnectionInfo sc_info;
   sc_info.build (*netlist (), net_clusters ());
   sc_info.report (*this);
-  sc_info.join_soft_connections (*netlist ());
+
+  if (m_make_soft_connection_diodes) {
+    place_soft_connection_diodes ();
+  } else {
+    sc_info.join_soft_connections (*netlist ());
+  }
 }
 
 void LayoutToNetlist::do_join_nets ()

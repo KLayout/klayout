@@ -753,6 +753,14 @@ module DRC
       @l2n && @l2n.is_extracted? && self.l2n_data
     end
 
+    def _l2n_object
+      @l2n
+    end
+
+    def _make_soft_connection_diodes(f)
+      @l2n.make_soft_connection_diodes = f
+    end
+
   private
 
     def cleanup

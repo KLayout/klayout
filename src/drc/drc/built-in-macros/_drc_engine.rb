@@ -2352,8 +2352,10 @@ CODE
       top_level
       ignore_extraction_errors
       extract_devices
-      l2n_data
       netlist
+      l2n_data
+      _l2n_object
+      _make_soft_connection_diodes
     ).each do |f|
       eval <<"CODE"
         def #{f}(*args)

@@ -24,11 +24,13 @@
 #define _HDR_dbLayoutToNetlistSoftConnections
 
 #include "dbCommon.h"
+#include "dbPolygon.h"
 
 #include <set>
 #include <map>
 #include <list>
 #include <cstddef>
+#include <string>
 
 namespace db
 {
@@ -38,6 +40,7 @@ class Pin;
 class Circuit;
 class Netlist;
 class SubCircuit;
+class LayoutToNetlist;
 
 template <class T> class hier_clusters;
 template <class T> class connected_clusters;
@@ -219,9 +222,9 @@ public:
   void join_soft_connections (db::Netlist &netlist);
 
   /**
-   *  @brief For debugging
+   *  @brief Create log entries
    */
-  void print_errors (const db::Netlist &netlist);
+  void report (db::LayoutToNetlist &l2n);
 
 private:
   std::map<const db::Circuit *, SoftConnectionCircuitInfo> m_scc_per_circuit;
@@ -262,6 +265,9 @@ private:
    *  The return value is a set of nets  shape cluster IDs.
    */
   std::set<size_t> net_connections_through_subcircuits (const db::Net *net, size_t &partial_net_count);
+
+  void report_partial_nets (const db::Circuit *circuit, const SoftConnectionClusterInfo &cluster_info, LayoutToNetlist &l2n, const std::string &path, const db::DCplxTrans &trans, const std::string &top_cell, int &index);
+  db::DPolygon representative_polygon (const db::Net *net, const db::LayoutToNetlist &l2n, const db::CplxTrans &trans);
 };
 
 }

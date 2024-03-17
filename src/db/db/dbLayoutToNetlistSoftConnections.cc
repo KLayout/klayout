@@ -24,6 +24,7 @@
 #include "dbCommon.h"
 #include "dbLayoutToNetlistSoftConnections.h"
 #include "dbLayoutToNetlist.h"
+#include "dbHierNetworkProcessor.h"
 #include "dbNetlist.h"
 
 namespace db
@@ -166,9 +167,79 @@ void SoftConnectionInfo::join_soft_connections (db::Netlist &netlist)
   m_scc_per_circuit.clear ();
 }
 
-void SoftConnectionInfo::print_errors (const db::Netlist &netlist)
+db::DPolygon
+SoftConnectionInfo::representative_polygon (const db::Net *net, const db::LayoutToNetlist &l2n, const db::CplxTrans &trans)
 {
-  for (auto c = netlist.begin_bottom_up (); c != netlist.end_bottom_up (); ++c) {
+  const db::Connectivity &conn = l2n.connectivity ();
+  const db::hier_clusters<db::NetShape> &net_clusters = l2n.net_clusters ();
+
+  db::DBox bbox;
+
+  for (auto l = conn.begin_layers (); l != conn.end_layers (); ++l) {
+    db::recursive_cluster_shape_iterator<db::NetShape> si (net_clusters, *l, net->circuit ()->cell_index (), net->cluster_id ());
+    while (! si.at_end ()) {
+      if (si->type () == db::NetShape::Polygon) {
+        bbox += trans * (si.trans () * si->polygon_ref ().box ());
+      }
+      ++si;
+    }
+  }
+
+  return db::DPolygon (bbox);
+}
+
+void SoftConnectionInfo::report_partial_nets (const db::Circuit *circuit, const SoftConnectionClusterInfo &cluster_info, db::LayoutToNetlist &l2n, const std::string &path, const db::DCplxTrans &trans, const std::string &top_cell, int &index)
+{
+  for (auto cc = cluster_info.begin_clusters (); cc != cluster_info.end_clusters (); ++cc) {
+
+    const db::Net *net = circuit->net_by_cluster_id (cc->first);
+
+    if (cc->second < 0 && ! net->is_floating ()) {
+
+      std::string msg = tl::sprintf (tl::to_string (tr ("Partial net #%d: %s - %s")), ++index, path, net->expanded_name ());
+
+      db::LogEntryData entry (l2n.top_level_mode () ? db::Error : db::Warning, top_cell, msg);
+      entry.set_geometry (representative_polygon (net, l2n, trans * db::CplxTrans (l2n.internal_layout ()->dbu ())));
+
+      l2n.log_entry (entry);
+
+    }
+
+    for (auto sc = net->begin_subcircuit_pins (); sc != net->end_subcircuit_pins (); ++sc) {
+
+      const db::SubCircuit *subcircuit = sc->subcircuit ();
+      const db::Circuit *circuit_ref = subcircuit->circuit_ref ();
+
+      auto scc = m_scc_per_circuit.find (circuit_ref);
+      if (scc == m_scc_per_circuit.end ()) {
+        continue;
+      }
+
+      const SoftConnectionCircuitInfo &sci = scc->second;
+
+      const SoftConnectionClusterInfo *scci = sci.get_cluster_info_per_pin (sc->pin ());
+      if (! scci || scci->partial_net_count () == 0) {
+        continue;
+      }
+
+      std::string p = path;
+      p += std::string ("/") + circuit_ref->name ();
+      p += std::string ("[") + subcircuit->trans ().to_string (true /*short*/) + "]:" + subcircuit->expanded_name ();
+      report_partial_nets (circuit_ref, *scci, l2n, p, trans * subcircuit->trans (), top_cell, index);
+
+    }
+
+  }
+}
+
+void SoftConnectionInfo::report (db::LayoutToNetlist &l2n)
+{
+  const db::Netlist *netlist = l2n.netlist ();
+  if (! netlist) {
+    return;
+  }
+
+  for (auto c = netlist->begin_bottom_up (); c != netlist->end_bottom_up (); ++c) {
 
     auto scc = m_scc_per_circuit.find (c.operator-> ());
     if (scc == m_scc_per_circuit.end ()) {
@@ -189,12 +260,10 @@ void SoftConnectionInfo::print_errors (const db::Netlist &netlist)
         first = false;
       }
 
-      tl::info << "  Partial nets on soft-connect cluster:";
-      for (auto cc = sc->begin_clusters (); cc != sc->end_clusters (); ++cc) {
-        if (cc->second < 0) {
-          tl::info << "    " << c->net_by_cluster_id (cc->first)->expanded_name ();
-        }
-      }
+      l2n.log_entry (db::LogEntryData (l2n.top_level_mode () ? db::Error : db::Warning, c->name (), tl::to_string (tr ("Net with incomplete wiring (soft-connected partial nets)"))));
+
+      int index = 0;
+      report_partial_nets (c.operator-> (), *sc, l2n, c->name (), db::DCplxTrans (), c->name (), index);
 
     }
 

@@ -545,7 +545,7 @@ void LayoutToNetlist::check_must_connect (const db::Circuit &c, const db::Net &a
   check_must_connect_impl (c, a, b, c, a, b, path);
 }
 
-static std::string path_msg (const std::vector<const db::SubCircuit *> &path, const db::Circuit &c_org)
+static std::string path_msg (const std::vector<const db::SubCircuit *> &path)
 {
   if (path.empty ()) {
     return std::string ();
@@ -553,15 +553,13 @@ static std::string path_msg (const std::vector<const db::SubCircuit *> &path, co
 
   std::string msg (".\n" + tl::to_string (tr ("Instance path: ")));
 
-  for (auto p = path.rbegin (); p != path.rend (); ++p) {
-    if (p != path.rbegin ()) {
-      msg += "/";
-    }
-    msg += (*p)->circuit ()->name () + ":" + (*p)->expanded_name () + "[" + (*p)->trans ().to_string () + "]";
-  }
+  auto p0 = path.rbegin ();
+  msg += (*p0)->circuit ()->name ();
 
-  msg += "/";
-  msg += c_org.name ();
+  for (auto p = p0; p != path.rend (); ++p) {
+    msg += "/";
+    msg += (*p)->circuit_ref ()->name () + "[" + (*p)->trans ().to_string (true /*short*/) + "]" + ":" + (*p)->expanded_name ();
+  }
 
   return msg;
 }
@@ -587,12 +585,12 @@ void LayoutToNetlist::check_must_connect_impl (const db::Circuit &c, const db::N
 
     if (a_org.expanded_name () == b_org.expanded_name ()) {
       if (path.empty ()) {
-        db::LogEntryData warn (m_top_level_mode ? db::Error : db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s must be connected further up in the hierarchy - this is an error at chip top level")), a_org.expanded_name ()) + path_msg (path, c_org));
+        db::LogEntryData warn (m_top_level_mode ? db::Error : db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s must be connected further up in the hierarchy - this is an error at chip top level")), a_org.expanded_name ()) + path_msg (path));
         warn.set_cell_name (c.name ());
         warn.set_category_name ("must-connect");
         log_entry (warn);
       } else {
-        db::LogEntryData warn (m_top_level_mode ? db::Error : db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s of circuit %s must be connected further up in the hierarchy - this is an error at chip top level")), a_org.expanded_name (), c_org.name ()) + path_msg (path, c_org));
+        db::LogEntryData warn (m_top_level_mode ? db::Error : db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s of circuit %s must be connected further up in the hierarchy - this is an error at chip top level")), a_org.expanded_name (), c_org.name ()) + path_msg (path));
         warn.set_cell_name (c.name ());
         warn.set_geometry (subcircuit_geometry (*path.back (), internal_layout ()));
         warn.set_category_name ("must-connect");
@@ -600,12 +598,12 @@ void LayoutToNetlist::check_must_connect_impl (const db::Circuit &c, const db::N
       }
     } else {
       if (path.empty ()) {
-        db::LogEntryData warn (m_top_level_mode ? db::Error : db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s and %s must be connected further up in the hierarchy - this is an error at chip top level")), a_org.expanded_name (), b_org.expanded_name ()) + path_msg (path, c_org));
+        db::LogEntryData warn (m_top_level_mode ? db::Error : db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s and %s must be connected further up in the hierarchy - this is an error at chip top level")), a_org.expanded_name (), b_org.expanded_name ()) + path_msg (path));
         warn.set_cell_name (c.name ());
         warn.set_category_name ("must-connect");
         log_entry (warn);
       } else {
-        db::LogEntryData warn (m_top_level_mode ? db::Error : db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s and %s of circuit %s must be connected further up in the hierarchy - this is an error at chip top level")), a_org.expanded_name (), b_org.expanded_name (), c_org.name ()) + path_msg (path, c_org));
+        db::LogEntryData warn (m_top_level_mode ? db::Error : db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s and %s of circuit %s must be connected further up in the hierarchy - this is an error at chip top level")), a_org.expanded_name (), b_org.expanded_name (), c_org.name ()) + path_msg (path));
         warn.set_cell_name (c.name ());
         warn.set_geometry (subcircuit_geometry (*path.back (), internal_layout ()));
         warn.set_category_name ("must-connect");
@@ -626,7 +624,7 @@ void LayoutToNetlist::check_must_connect_impl (const db::Circuit &c, const db::N
       const db::Net *net_b = sc.net_for_pin (b.begin_pins ()->pin_id ());
 
       if (net_a == 0) {
-        db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect net %s of circuit %s is not connected at all%s")), a_org.expanded_name (), c_org.name (), subcircuit_to_string (sc)) + path_msg (path, c_org));
+        db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect net %s of circuit %s is not connected at all%s")), a_org.expanded_name (), c_org.name (), subcircuit_to_string (sc)) + path_msg (path));
         error.set_cell_name (sc.circuit ()->name ());
         error.set_geometry (subcircuit_geometry (sc, internal_layout ()));
         error.set_category_name ("must-connect");
@@ -634,7 +632,7 @@ void LayoutToNetlist::check_must_connect_impl (const db::Circuit &c, const db::N
       }
 
       if (net_b == 0) {
-        db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect net %s of circuit %s is not connected at all%s")), b_org.expanded_name (), c_org.name (), subcircuit_to_string (sc)) + path_msg (path, c_org));
+        db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect net %s of circuit %s is not connected at all%s")), b_org.expanded_name (), c_org.name (), subcircuit_to_string (sc)) + path_msg (path));
         error.set_cell_name (sc.circuit ()->name ());
         error.set_geometry (subcircuit_geometry (sc, internal_layout ()));
         error.set_category_name ("must-connect");
@@ -691,11 +689,7 @@ void LayoutToNetlist::do_soft_connections ()
 {
   SoftConnectionInfo sc_info;
   sc_info.build (*netlist (), net_clusters ());
-
-  // @@@
-  sc_info.print_errors (*netlist ());
-  // @@@
-
+  sc_info.report (*this);
   sc_info.join_soft_connections (*netlist ());
 }
 

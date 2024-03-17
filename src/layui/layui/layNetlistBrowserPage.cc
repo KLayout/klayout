@@ -235,6 +235,8 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
   connect (actionExportAll, SIGNAL (triggered ()), this, SLOT (export_all ()));
   connect (actionExportSelected, SIGNAL (triggered ()), this, SLOT (export_selected ()));
 
+  connect (mode_tab, SIGNAL (currentChanged (int)), this, SLOT (mode_tab_changed (int)));
+
   forward->setEnabled (false);
   backward->setEnabled (false);
 }
@@ -328,6 +330,13 @@ NetlistBrowserPage::eventFilter (QObject *watched, QEvent *event)
   } else {
     return false;
   }
+}
+
+void
+NetlistBrowserPage::mode_tab_changed (int)
+{
+  clear_highlights ();
+  dm_update_highlights ();
 }
 
 void

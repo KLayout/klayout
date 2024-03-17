@@ -39,14 +39,14 @@ SoftConnectionClusterInfo::SoftConnectionClusterInfo ()
   //  .. nothing yet ..
 }
 
-void SoftConnectionClusterInfo::add (const db::Net *net, int dir, const db::Pin *pin, size_t partial_net_count)
+void SoftConnectionClusterInfo::add (const db::Net *net, SoftConnectionPinDir dir, const db::Pin *pin, size_t partial_net_count)
 {
   //  limiting the partial net count to 1 means we report errors only once in the
   //  hierarchy, not on every level
   m_partial_net_count += std::min (size_t (1), partial_net_count);
 
   //  this is where we make the decision about the partial nets ...
-  if (! pin && dir < 0) {
+  if (! pin && dir == SoftConnectionPinDir::down ()) {
     m_partial_net_count += 1;
   }
 
@@ -72,21 +72,21 @@ SoftConnectionClusterInfo &SoftConnectionCircuitInfo::make_cluster ()
   return m_cluster_info.back ();
 }
 
-void SoftConnectionCircuitInfo::add_pin_info (const db::Pin *pin, int dir, SoftConnectionClusterInfo *sc_cluster_info)
+void SoftConnectionCircuitInfo::add_pin_info (const db::Pin *pin, SoftConnectionPinDir dir, SoftConnectionClusterInfo *sc_cluster_info)
 {
   if (pin) {
     m_pin_info.insert (std::make_pair (pin->id (), std::make_pair (dir, sc_cluster_info)));
   }
 }
 
-int SoftConnectionCircuitInfo::direction_per_pin (const db::Pin *pin) const
+SoftConnectionPinDir SoftConnectionCircuitInfo::direction_per_pin (const db::Pin *pin) const
 {
   if (! pin) {
-    return 0;
+    return SoftConnectionPinDir ();
   }
 
   auto p = m_pin_info.find (pin->id ());
-  return p != m_pin_info.end () ? p->second.first : 0;
+  return p != m_pin_info.end () ? p->second.first : SoftConnectionPinDir ();
 }
 
 const SoftConnectionClusterInfo *SoftConnectionCircuitInfo::get_cluster_info_per_pin (const db::Pin *pin) const
@@ -188,17 +188,21 @@ SoftConnectionInfo::representative_polygon (const db::Net *net, const db::Layout
   return db::DPolygon (bbox);
 }
 
-void SoftConnectionInfo::report_partial_nets (const db::Circuit *circuit, const SoftConnectionClusterInfo &cluster_info, db::LayoutToNetlist &l2n, const std::string &path, const db::DCplxTrans &trans, const std::string &top_cell, int &index)
+void SoftConnectionInfo::report_partial_nets (const db::Circuit *circuit, const SoftConnectionClusterInfo &cluster_info, db::LayoutToNetlist &l2n, const std::string &path, const db::DCplxTrans &trans, const std::string &top_cell, int &index, std::set<const db::Net *> &seen)
 {
   for (auto cc = cluster_info.begin_clusters (); cc != cluster_info.end_clusters (); ++cc) {
 
     const db::Net *net = circuit->net_by_cluster_id (cc->first);
 
-    if (cc->second < 0 && ! net->is_floating ()) {
+    if (! seen.insert (net).second) {
+      continue;
+    }
 
-      std::string msg = tl::sprintf (tl::to_string (tr ("Partial net #%d: %s - %s")), ++index, path, net->expanded_name ());
+    if (cc->second == SoftConnectionPinDir::down () && ! net->is_floating () && net->begin_pins () == net->end_pins ()) {
 
-      db::LogEntryData entry (l2n.top_level_mode () ? db::Error : db::Warning, top_cell, msg);
+      std::string msg = tl::sprintf (tl::to_string (tr ("\tPartial net #%d: %s - %s")), ++index, path, net->expanded_name ());
+
+      db::LogEntryData entry (db::NoSeverity, top_cell, msg);
       entry.set_geometry (representative_polygon (net, l2n, trans * db::CplxTrans (l2n.internal_layout ()->dbu ())));
 
       l2n.log_entry (entry);
@@ -225,7 +229,7 @@ void SoftConnectionInfo::report_partial_nets (const db::Circuit *circuit, const 
       std::string p = path;
       p += std::string ("/") + circuit_ref->name ();
       p += std::string ("[") + subcircuit->trans ().to_string (true /*short*/) + "]:" + subcircuit->expanded_name ();
-      report_partial_nets (circuit_ref, *scci, l2n, p, trans * subcircuit->trans (), top_cell, index);
+      report_partial_nets (circuit_ref, *scci, l2n, p, trans * subcircuit->trans (), top_cell, index, seen);
 
     }
 
@@ -248,22 +252,19 @@ void SoftConnectionInfo::report (db::LayoutToNetlist &l2n)
 
     const SoftConnectionCircuitInfo &sc_info = scc->second;
 
-    bool first = true;
     for (auto sc = sc_info.begin (); sc != sc_info.end (); ++sc) {
 
       if (sc->partial_net_count () < 2) {
         continue;
       }
 
-      if (first) {
-        tl::info << "Circuit " << c->name () << ":";
-        first = false;
-      }
-
-      l2n.log_entry (db::LogEntryData (l2n.top_level_mode () ? db::Error : db::Warning, c->name (), tl::to_string (tr ("Net with incomplete wiring (soft-connected partial nets)"))));
+      db::LogEntryData log_entry (l2n.top_level_mode () ? db::Error : db::Warning, c->name (), tl::to_string (tr ("Net with incomplete wiring (soft-connected partial nets)")));
+      log_entry.set_category_name ("soft-connection-check");
+      l2n.log_entry (log_entry);
 
       int index = 0;
-      report_partial_nets (c.operator-> (), *sc, l2n, c->name (), db::DCplxTrans (), c->name (), index);
+      std::set<const db::Net *> seen;
+      report_partial_nets (c.operator-> (), *sc, l2n, c->name (), db::DCplxTrans (), c->name (), index, seen);
 
     }
 
@@ -303,14 +304,14 @@ void SoftConnectionInfo::build_clusters_for_circuit (const db::Circuit *circuit,
         //  the direction of a net is 0 for "no connections" or "both up and down"
         //  and -1 for "down-only" connections and +1 for "up-only" connections:
 
-        int dir = 0;
+        SoftConnectionPinDir dir;
 
         //  direct soft connections to other nets
 
         for (int up = 0; up < 2; ++up) {
           std::set<size_t> next = up ? shape_clusters.upward_soft_connections (*cc) : shape_clusters.downward_soft_connections (*cc);
           if (! next.empty () || net_has_up_or_down_subcircuit_connections (net, up)) {
-            dir += up ? 1 : -1;
+            dir |= up ? SoftConnectionPinDir::up () : SoftConnectionPinDir::down ();
           }
           for (auto i = next.begin (); i != next.end (); ++i) {
             if (seen.insert (*i).second) {
@@ -362,15 +363,15 @@ void SoftConnectionInfo::build_clusters_for_circuit (const db::Circuit *circuit,
 
 bool SoftConnectionInfo::net_has_up_or_down_subcircuit_connections (const db::Net *net, bool up)
 {
-  int look_for_dir = up ? 1 : -1;
+  SoftConnectionPinDir look_for_dir = up ? SoftConnectionPinDir::up () : SoftConnectionPinDir::down ();
 
   for (auto sc = net->begin_subcircuit_pins (); sc != net->end_subcircuit_pins (); ++sc) {
     const db::Pin *pin = sc->pin ();
     const db::Circuit *ref = sc->subcircuit ()->circuit_ref ();
     auto scc_ref = m_scc_per_circuit.find (ref);
     if (scc_ref != m_scc_per_circuit.end ()) {
-      int dir = scc_ref->second.direction_per_pin (pin);
-      if (dir == look_for_dir) {
+      SoftConnectionPinDir dir = scc_ref->second.direction_per_pin (pin);
+      if (dir & look_for_dir) {
         return true;
       }
     }

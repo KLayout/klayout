@@ -47,6 +47,80 @@ template <class T> class connected_clusters;
 class NetShape;
 
 /**
+ *  @brief A small struct representing a direction value for a pin
+ *
+ *  The pin can be upward, downward connected, connected in both ways or not connected at all.
+ */
+class SoftConnectionPinDir
+{
+public:
+  /**
+   *  @brief Constructs from a single direction (+1: up, -1: down)
+   */
+  explicit SoftConnectionPinDir (int dir = 0)
+    : m_flags (0)
+  {
+    if (dir > 0) {
+      m_flags = 1;
+    } else if (dir < 0) {
+      m_flags = 2;
+    }
+  }
+
+  /**
+   *  @brief Equality
+   */
+  bool operator== (SoftConnectionPinDir other) const
+  {
+    return m_flags == other.m_flags;
+  }
+
+  /**
+   *  @brief Inequality
+   */
+  bool operator!= (SoftConnectionPinDir other) const
+  {
+    return m_flags != other.m_flags;
+  }
+
+  /**
+   *  @brief Join two value
+   */
+  SoftConnectionPinDir operator| (SoftConnectionPinDir other) const
+  {
+    SoftConnectionPinDir res = *this;
+    res.m_flags |= other.m_flags;
+    return res;
+  }
+
+  SoftConnectionPinDir &operator|= (SoftConnectionPinDir other)
+  {
+    m_flags |= other.m_flags;
+    return *this;
+  }
+
+  /**
+   *  @brief Test for one direction
+   */
+  bool operator& (SoftConnectionPinDir other) const
+  {
+    return (m_flags & other.m_flags) != 0;
+  }
+
+  /**
+   *  @brief Static getters for the constants
+   */
+
+  inline static SoftConnectionPinDir none () { return SoftConnectionPinDir (0); }
+  inline static SoftConnectionPinDir up () { return SoftConnectionPinDir (1); }
+  inline static SoftConnectionPinDir down () { return SoftConnectionPinDir (-1); }
+  inline static SoftConnectionPinDir both () { return up () | down (); }
+
+private:
+  unsigned int m_flags;
+};
+
+/**
  *  @brief Describes a soft-connected cluster
  *
  *  Such a cluster is a collection of nets/shape clusters that are connected via
@@ -58,7 +132,7 @@ class DB_PUBLIC SoftConnectionClusterInfo
 public:
   typedef std::set<size_t> pin_set;
   typedef pin_set::const_iterator pin_iterator;
-  typedef std::map<size_t, int> dir_map;
+  typedef std::map<size_t, SoftConnectionPinDir> dir_map;
   typedef dir_map::const_iterator dir_map_iterator;
 
   SoftConnectionClusterInfo ();
@@ -67,11 +141,11 @@ public:
    *  @brief Enters information about a specific net
    *
    *  @param net The Net for which we are entering information
-   *  @param dir The direction code of the net (0: no soft connection or both directions, +1: up-only, -1: down-only)
+   *  @param dir The direction code of the net
    *  @param pin A pin that might leading outside our current circuit from this net (0 if there is none)
    *  @param partial_net_count The partial net count of nets attached to this net inside subcircuits
    */
-  void add (const db::Net *net, int dir, const db::Pin *pin, size_t partial_net_count);
+  void add (const db::Net *net, SoftConnectionPinDir dir, const db::Pin *pin, size_t partial_net_count);
 
   /**
    *  @brief Gets the partial net count
@@ -163,15 +237,15 @@ public:
    *  @brief Adds information about a pin
    *
    *  @param pin The pin
-   *  @param dir The nature of connections from the pin: 0 if no soft connections / both directions, +1 to "up only" and -1 for "down only"
+   *  @param dir The direction of connections from the pin
    *  @param sc_cluster_info The soft-connected net cluster info object
    */
-  void add_pin_info (const db::Pin *pin, int dir, SoftConnectionClusterInfo *sc_cluster_info);
+  void add_pin_info (const db::Pin *pin, SoftConnectionPinDir dir, SoftConnectionClusterInfo *sc_cluster_info);
 
   /**
    *  @brief Gets the direction attribute of the pin
    */
-  int direction_per_pin (const db::Pin *pin) const;
+  SoftConnectionPinDir direction_per_pin (const db::Pin *pin) const;
 
   /**
    *  @brief Gets the soft-connected net cluster info object the pin connects to
@@ -197,7 +271,7 @@ public:
 private:
   const db::Circuit *mp_circuit;
   cluster_list m_cluster_info;
-  std::map<size_t, std::pair<int, const SoftConnectionClusterInfo *> > m_pin_info;
+  std::map<size_t, std::pair<SoftConnectionPinDir, const SoftConnectionClusterInfo *> > m_pin_info;
 };
 
 /**
@@ -266,7 +340,7 @@ private:
    */
   std::set<size_t> net_connections_through_subcircuits (const db::Net *net, size_t &partial_net_count);
 
-  void report_partial_nets (const db::Circuit *circuit, const SoftConnectionClusterInfo &cluster_info, LayoutToNetlist &l2n, const std::string &path, const db::DCplxTrans &trans, const std::string &top_cell, int &index);
+  void report_partial_nets (const db::Circuit *circuit, const SoftConnectionClusterInfo &cluster_info, LayoutToNetlist &l2n, const std::string &path, const db::DCplxTrans &trans, const std::string &top_cell, int &index, std::set<const Net *> &seen);
   db::DPolygon representative_polygon (const db::Net *net, const db::LayoutToNetlist &l2n, const db::CplxTrans &trans);
 };
 

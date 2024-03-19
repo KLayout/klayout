@@ -1081,11 +1081,10 @@ NetlistBrowserPage::set_db (db::LayoutToNetlist *l2ndb)
   mode_tab->setTabEnabled (0, true);
   mode_tab->setTabEnabled (1, is_lvsdb);
   mode_tab->setTabEnabled (2, is_lvsdb);
-  mode_tab->setTabEnabled (3, is_lvsdb);
+  mode_tab->setTabEnabled (3, true);
 #if QT_VERSION >= 0x50F00
   mode_tab->setTabVisible (1, is_lvsdb);
   mode_tab->setTabVisible (2, is_lvsdb);
-  mode_tab->setTabVisible (3, is_lvsdb);
 #endif
 
   if (is_lvsdb) {

@@ -121,13 +121,17 @@ private:
 };
 
 /**
- *  @brief Describes a soft-connected cluster
+ *  @brief Describes a soft-connected net graph
  *
- *  Such a cluster is a collection of nets/shape clusters that are connected via
+ *  Such a graph is a collection of nets/shape clusters that are connected via
  *  soft connections.
- *  There is also some information about the count of "down-only" nets.
+ *  There is also some information about the count of "down-only" nets. With
+ *  this, this object can serve as a representative model for a circuit's
+ *  content as embedded into a larger graph through subcircuits.
+ *
+ *  A circuit in general can be made from a number of such net graphs.
  */
-class DB_PUBLIC SoftConnectionClusterInfo
+class DB_PUBLIC SoftConnectionNetGraph
 {
 public:
   typedef std::set<size_t> pin_set;
@@ -135,7 +139,7 @@ public:
   typedef std::map<size_t, SoftConnectionPinDir> dir_map;
   typedef dir_map::const_iterator dir_map_iterator;
 
-  SoftConnectionClusterInfo ();
+  SoftConnectionNetGraph ();
 
   /**
    *  @brief Enters information about a specific net
@@ -164,9 +168,9 @@ public:
   }
 
   /**
-   *  @brief Gets the pins on the cluster (begin iterator)
+   *  @brief Gets the outside pins on the net graph (begin iterator)
    *
-   *  The iterator delivers Pin IDs of pins leading outside the circuit this cluster lives in.
+   *  The iterator delivers Pin IDs of pins leading outside the circuit this graph lives in.
    */
   pin_iterator begin_pins () const
   {
@@ -174,7 +178,7 @@ public:
   }
 
   /**
-   *  @brief Gets the pins on the cluster (end iterator)
+   *  @brief Gets the pins on the net graph (end iterator)
    */
   pin_iterator end_pins () const
   {
@@ -206,14 +210,14 @@ private:
 /**
  *  @brief Provides temporary soft connection information for a circuit
  *
- *  Soft connection information is the soft-connected-clusters that are formed inside
- *  the circuit and how these clusters connect to pins.
+ *  Soft connection information is the soft-connected net graphs that are formed inside
+ *  the circuit and how these graphs connect to pins from the circuit leading outside.
  */
 class DB_PUBLIC SoftConnectionCircuitInfo
 {
 public:
-  typedef std::list<SoftConnectionClusterInfo> cluster_list;
-  typedef cluster_list::const_iterator cluster_list_iterator;
+  typedef std::list<SoftConnectionNetGraph> net_graph_list;
+  typedef net_graph_list::const_iterator net_graph_list_iterator;
 
   /**
    *  @brief Constructor
@@ -229,18 +233,18 @@ public:
   }
 
   /**
-   *  @brief Creates a new cluster info object
+   *  @brief Creates a new graph info object
    */
-  SoftConnectionClusterInfo &make_cluster ();
+  SoftConnectionNetGraph &make_net_graph ();
 
   /**
    *  @brief Adds information about a pin
    *
    *  @param pin The pin
    *  @param dir The direction of connections from the pin
-   *  @param sc_cluster_info The soft-connected net cluster info object
+   *  @param graph_info The soft-connected net graph info object
    */
-  void add_pin_info (const db::Pin *pin, SoftConnectionPinDir dir, SoftConnectionClusterInfo *sc_cluster_info);
+  void add_pin_info (const db::Pin *pin, SoftConnectionPinDir dir, SoftConnectionNetGraph *graph_info);
 
   /**
    *  @brief Gets the direction attribute of the pin
@@ -248,30 +252,30 @@ public:
   SoftConnectionPinDir direction_per_pin (const db::Pin *pin) const;
 
   /**
-   *  @brief Gets the soft-connected net cluster info object the pin connects to
+   *  @brief Gets the soft-connected net graph object the pin connects to
    */
-  const SoftConnectionClusterInfo *get_cluster_info_per_pin (const db::Pin *pin) const;
+  const SoftConnectionNetGraph *get_net_graph_per_pin (const db::Pin *pin) const;
 
   /**
-   *  @brief List of per-circui info objects, begin iterator
+   *  @brief List of per-circuit net graph objects, begin iterator
    */
-  cluster_list_iterator begin () const
+  net_graph_list_iterator begin () const
   {
-    return m_cluster_info.begin ();
+    return m_net_graphs.begin ();
   }
 
   /**
-   *  @brief List of per-circui info objects, end iterator
+   *  @brief List of per-circuit net graph objects, end iterator
    */
-  cluster_list_iterator end () const
+  net_graph_list_iterator end () const
   {
-    return m_cluster_info.end ();
+    return m_net_graphs.end ();
   }
 
 private:
   const db::Circuit *mp_circuit;
-  cluster_list m_cluster_info;
-  std::map<size_t, std::pair<SoftConnectionPinDir, const SoftConnectionClusterInfo *> > m_pin_info;
+  net_graph_list m_net_graphs;
+  std::map<size_t, std::pair<SoftConnectionPinDir, const SoftConnectionNetGraph *> > m_pin_info;
 };
 
 /**
@@ -283,9 +287,9 @@ public:
   SoftConnectionInfo ();
 
   /**
-   *  @brief Builds the soft connection information for the given netlist and net clusters
+   *  @brief Builds the soft connection information for the given netlist and shape clusters
    */
-  void build (const db::Netlist &netlist, const db::hier_clusters<db::NetShape> &net_clusters);
+  void build (const db::Netlist &netlist, const db::hier_clusters<db::NetShape> &shape_clusters);
 
   /**
    *  @brief Joins nets connected by soft connections
@@ -304,16 +308,16 @@ private:
   std::map<const db::Circuit *, SoftConnectionCircuitInfo> m_scc_per_circuit;
 
   /**
-   *  @brief Builds the per-circuit cluster information
+   *  @brief Builds the per-circuit net graphs
    *
    *  First of all, this method creates a SoftConnectionCircuitInfo object for the circuit.
    *
-   *  Inside this per-circuit object, it will create a number of SoftConnectionClusterInfo objects - each one
+   *  Inside this per-circuit object, it will create a number of SoftConnectionNetGraph objects - each one
    *  for a cluster of soft-connected nets.
    *
    *  Call this method bottom-up as it needs SoftConnectionCircuitInfo objects for called circuits.
    */
-  void build_clusters_for_circuit (const db::Circuit *circuit, const db::connected_clusters<db::NetShape> &shape_clusters);
+  void build_graphs_for_circuit (const db::Circuit *circuit, const db::connected_clusters<db::NetShape> &shape_clusters);
 
   /**
    *  @brief Gets a value indicating whether the given net connects to subcircuits with up or down connections inside
@@ -340,7 +344,7 @@ private:
    */
   std::set<size_t> net_connections_through_subcircuits (const db::Net *net, size_t &partial_net_count);
 
-  void report_partial_nets (const db::Circuit *circuit, const SoftConnectionClusterInfo &cluster_info, LayoutToNetlist &l2n, const std::string &path, const db::DCplxTrans &trans, const std::string &top_cell, int &index, std::set<const Net *> &seen);
+  void report_partial_nets (const db::Circuit *circuit, const SoftConnectionNetGraph &cluster_info, LayoutToNetlist &l2n, const std::string &path, const db::DCplxTrans &trans, const std::string &top_cell, int &index, std::set<const Net *> &seen);
   db::DPolygon representative_polygon (const db::Net *net, const db::LayoutToNetlist &l2n, const db::CplxTrans &trans);
 };
 

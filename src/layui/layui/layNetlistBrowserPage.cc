@@ -1175,7 +1175,7 @@ NetlistBrowserPage::setup_trees ()
 
   if ((lvsdb && lvsdb->cross_ref ()) || (l2ndb && ! l2ndb->log_entries ().empty ())) {
 
-    NetlistLogModel *new_model = new NetlistLogModel (log_view, lvsdb->cross_ref (), l2ndb);
+    NetlistLogModel *new_model = new NetlistLogModel (log_view, lvsdb ? lvsdb->cross_ref () : 0, l2ndb);
     delete log_view->model ();
     log_view->setModel (new_model);
 

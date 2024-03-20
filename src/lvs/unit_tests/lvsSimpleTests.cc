@@ -307,3 +307,9 @@ TEST(50_SoftConnection)
   run_test (_this, "soft_connect1", "soft_connect1.gds", true, false /*no LVS*/);
 }
 
+//  No errors
+TEST(51_SoftConnection)
+{
+  run_test (_this, "soft_connect2", "soft_connect2.gds", true, false /*no LVS*/);
+}
+

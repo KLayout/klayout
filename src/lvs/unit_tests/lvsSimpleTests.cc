@@ -313,3 +313,9 @@ TEST(51_SoftConnection)
   run_test (_this, "soft_connect2", "soft_connect2.gds", true, false /*no LVS*/);
 }
 
+//  Simple hierarchy
+TEST(52_SoftConnection)
+{
+  run_test (_this, "soft_connect3", "soft_connect3.gds", true, false /*no LVS*/);
+}
+

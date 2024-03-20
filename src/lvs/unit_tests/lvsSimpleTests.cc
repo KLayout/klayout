@@ -301,3 +301,9 @@ TEST(40_DeviceExtractorErrors)
   run_test (_this, "custom_resistors", "custom_resistors.gds", true, false /*no LVS*/);
 }
 
+//  Basic soft connection
+TEST(50_SoftConnection)
+{
+  run_test (_this, "soft_connect1", "soft_connect1.gds", true, false /*no LVS*/);
+}
+

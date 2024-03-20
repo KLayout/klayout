@@ -858,18 +858,19 @@ void
 local_clusters<T>::join_cluster_with (typename local_cluster<T>::id_type id, typename local_cluster<T>::id_type with_id)
 {
   tl_assert (id > 0);
-  if (with_id == 0 || with_id > m_clusters.size () || id > m_clusters.size ()) {
-    return;
+
+  if (with_id > 0 && with_id <= m_clusters.size () && id <= m_clusters.size ()) {
+
+    //  TODO: this const_cast is required. But we know what we're doing ...
+    local_cluster<T> *with = const_cast<local_cluster<T> *> (& m_clusters.objects ().item (with_id - 1));
+    local_cluster<T> *first = const_cast<local_cluster<T> *> (& m_clusters.objects ().item (id - 1));
+    first->join_with (*with);
+
+    //  NOTE: we cannot really delete a cluster as this would shift the indexes. So
+    //  we just clear them.
+    with->clear ();
+
   }
-
-  //  TODO: this const_cast is required. But we know what we're doing ...
-  local_cluster<T> *with = const_cast<local_cluster<T> *> (& m_clusters.objects ().item (with_id - 1));
-  local_cluster<T> *first = const_cast<local_cluster<T> *> (& m_clusters.objects ().item (id - 1));
-  first->join_with (*with);
-
-  //  NOTE: we cannot really delete a cluster as this would shift the indexes. So
-  //  we just clear them.
-  with->clear ();
 
   //  take care of soft connections
 
@@ -1821,22 +1822,6 @@ public:
 
     }
 
-    for (typename std::list<std::set<id_type> >::const_iterator sc = m_cm2join_sets.begin (); sc != m_cm2join_sets.end (); ++sc) {
-
-      if (sc->empty ()) {
-        //  dropped ones are empty
-        continue;
-      }
-
-      typename std::set<id_type>::const_iterator c = sc->begin ();
-      typename std::set<id_type>::const_iterator cc = c;
-      for (++cc; cc != sc->end (); ++cc) {
-        mp_cell_clusters->join_cluster_with (*c, *cc);
-        m_soft_connections.erase (std::make_pair (*c < *cc ? *c : *cc, *c < *cc ? *cc : *c));
-      }
-
-    }
-
     for (auto sc = m_soft_connections.begin (); sc != m_soft_connections.end (); ++sc) {
 
       if (sc->second == 0) {
@@ -1851,6 +1836,23 @@ public:
       }
 
     }
+
+    for (typename std::list<std::set<id_type> >::const_iterator sc = m_cm2join_sets.begin (); sc != m_cm2join_sets.end (); ++sc) {
+
+      if (sc->empty ()) {
+        //  dropped ones are empty
+        continue;
+      }
+
+      typename std::set<id_type>::const_iterator c = sc->begin ();
+      typename std::set<id_type>::const_iterator cc = c;
+      for (++cc; cc != sc->end (); ++cc) {
+        mp_cell_clusters->join_cluster_with (*c, *cc);
+        // @@@  m_soft_connections.erase (std::make_pair (*c < *cc ? *c : *cc, *c < *cc ? *cc : *c));
+      }
+
+    }
+
   }
 
   //  needs explicit implementation because we have two base classes:

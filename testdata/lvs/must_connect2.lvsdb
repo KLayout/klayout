@@ -29,7 +29,7 @@ J(
  G(l14 SUBSTRATE)
  H(W B('Must-connect nets VSSTOP must be connected further up in the hierarchy - this is an error at chip top level') C(TOP) X('must-connect'))
  H(W B('Must-connect nets VDD must be connected further up in the hierarchy - this is an error at chip top level') C(TOP) X('must-connect'))
- H(W B('Must-connect nets VSS of circuit INV2 must be connected further up in the hierarchy - this is an error at chip top level.\nInstance path: INVCHAIN:$2[r0 *1 0,0]/INV2') C(INVCHAIN) X('must-connect') Q('(0,0;0,9.2;3,9.2;3,0)'))
+ H(W B('Must-connect nets VSS of circuit INV2 must be connected further up in the hierarchy - this is an error at chip top level.\nInstance path: INVCHAIN/INV2[r0 0,0]:$2') C(INVCHAIN) X('must-connect') Q('(0,0;0,9.2;3,9.2;3,0)'))
  K(PMOS MOS3)
  K(NMOS MOS3)
  D(D$PMOS PMOS

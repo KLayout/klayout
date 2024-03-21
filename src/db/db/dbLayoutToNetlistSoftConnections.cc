@@ -41,9 +41,7 @@ SoftConnectionNetGraph::SoftConnectionNetGraph ()
 
 void SoftConnectionNetGraph::add (const db::Net *net, SoftConnectionPinDir dir, const db::Pin *pin, size_t partial_net_count)
 {
-  //  limiting the partial net count to 1 means we report errors only once in the
-  //  hierarchy, not on every level
-  m_partial_net_count += std::min (size_t (1), partial_net_count);
+  m_partial_net_count += partial_net_count;
 
   //  this is where we make the decision about the partial nets ...
   if (! pin && dir == SoftConnectionPinDir::down ()) {
@@ -188,13 +186,13 @@ SoftConnectionInfo::representative_polygon (const db::Net *net, const db::Layout
   return db::DPolygon (bbox);
 }
 
-void SoftConnectionInfo::report_partial_nets (const db::Circuit *circuit, const SoftConnectionNetGraph &net_graph, db::LayoutToNetlist &l2n, const std::string &path, const db::DCplxTrans &trans, const std::string &top_cell, int &index, std::set<const db::Net *> &seen)
+void SoftConnectionInfo::report_partial_nets (const db::Circuit *circuit, const SoftConnectionNetGraph &net_graph, db::LayoutToNetlist &l2n, const std::string &path, const db::DCplxTrans &trans, const std::string &top_cell, int &index, std::set<std::pair<const db::Net *, db::DCplxTrans> > &seen)
 {
   for (auto cc = net_graph.begin_clusters (); cc != net_graph.end_clusters (); ++cc) {
 
     const db::Net *net = circuit->net_by_cluster_id (cc->first);
 
-    if (! seen.insert (net).second) {
+    if (! seen.insert (std::make_pair (net, trans)).second) {
       continue;
     }
 
@@ -263,7 +261,7 @@ void SoftConnectionInfo::report (db::LayoutToNetlist &l2n)
       l2n.log_entry (log_entry);
 
       int index = 0;
-      std::set<const db::Net *> seen;
+      std::set<std::pair<const db::Net *, db::DCplxTrans> > seen;
       report_partial_nets (c.operator-> (), *sc, l2n, c->name (), db::DCplxTrans (), c->name (), index, seen);
 
     }
@@ -390,7 +388,13 @@ void SoftConnectionInfo::get_net_connections_through_subcircuit (const db::SubCi
     const SoftConnectionNetGraph *scci = sci.get_net_graph_per_pin (pin);
     if (scci) {
 
-      partial_net_count += scci->partial_net_count ();
+      //  NOTE: limiting the partial net count here means we do report a partially connected once in the
+      //  hierarchy, not on every level.
+      //  Say, if you have two subcircuits, one (A) having 2 partial nets and the other (B) none. Then
+      //  (A) would be reported to partial nets only and when combining (A) and (B) we just need to check
+      //  whether B would also have partial nets. By not taking 2 + 0, but 1 + 0 the combination of (A)
+      //  and (B) does not give an error (error = number of partial nets > 1).
+      partial_net_count += std::min (size_t (1), scci->partial_net_count ());
 
       for (auto p = scci->begin_pins (); p != scci->end_pins (); ++p) {
         if (*p != pin->id ()) {

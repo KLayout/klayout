@@ -407,7 +407,7 @@ connect(metal2, via1)
   With this definition, the netlist extractor is able to detect the fault
   and raise a warning or an error (in top level mode).
   The warning is shown on the log tab and indicates incomplete wiring plus
-  details about the disconnected subnets, formed by the soft connection.
+  details about the subnets, separated by the soft connections.
   </p>
 
   <p>
@@ -479,6 +479,24 @@ soft_connect(b, a)
   <b>NOTE:</b> It is therefore important to observe the direction of soft connections:
   upper and high-conductive / low-ohmic layer first, and lower and low-conductive / high-ohmic
   layer second.
+  </p>
+
+  <h3>Soft connections and "must connect" nets</h3>
+
+  <p>
+  Soft connections and must connect nets (aka "connect_explicit" and "connect_implicit")
+  serve the same purpose - to detect incomplete wiring. Typically they are used
+  together, such as doing "connect_implicit" on VDD nets and "connect_explicit" 
+  on VDD and NWELL nets if the schematic circuits do not feature an explicit 
+  NWELL pin.
+  </p>
+
+  <p>
+  Soft connections are checked before connect_explicit and connect_implicit
+  are executed. This means, that soft connection errors cannot be masked by
+  declaring them "must connect". On the other hand, that is not a real issue
+  as both checks would raise an warning or error (in the top-level case).
+  It would only be a different kind of warning.
   </p>
 
 </doc>

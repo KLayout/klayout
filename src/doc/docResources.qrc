@@ -244,6 +244,8 @@
         <file alias="drc_raw1.png">doc/images/drc_raw1.png</file>
         <file alias="drc_raw2.png">doc/images/drc_raw2.png</file>
         <file alias="drc_raw3.png">doc/images/drc_raw3.png</file>
+        <file alias="soft_connections.png">doc/manual/soft_connections.png</file>
+        <file alias="soft_connections2.png">doc/manual/soft_connections2.png</file>
     </qresource>
     <qresource prefix="/help/programming">
         <file alias="introduction.xml">doc/programming/introduction.xml</file>

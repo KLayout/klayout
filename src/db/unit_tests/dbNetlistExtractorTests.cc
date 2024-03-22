@@ -3356,7 +3356,6 @@ TEST(15_SoftConnections)
   conn.connect (rvia1, rmetal2);
 
   //  extract the nets
-#if 0 // @@@
   std::list<std::set<std::string> > jn;
 
   jn.push_back (std::set<std::string> ());
@@ -3373,7 +3372,6 @@ TEST(15_SoftConnections)
   gp.push_back (tl::GlobPattern ("NEXT"));
   gp.push_back (tl::GlobPattern ("FB"));
   net_ex.set_joined_net_names (gp);
-#endif
 
   net_ex.extract_nets (dss, 0, conn, nl, cl);
 

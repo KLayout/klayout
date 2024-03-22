@@ -397,7 +397,7 @@ void LayoutToNetlist::join_nets (const tl::GlobPattern &cell, const std::set<std
   m_joined_nets_per_cell.push_back (std::make_pair (cell, gp));
 }
 
-// @@@
+#if defined(_DEBUG)
 static bool check_many_pins (const db::Netlist *netlist)
 {
   bool ok = true;
@@ -413,7 +413,7 @@ static bool check_many_pins (const db::Netlist *netlist)
   }
   return ok;
 }
-// @@@
+#endif
 
 void LayoutToNetlist::extract_netlist ()
 {
@@ -426,16 +426,18 @@ void LayoutToNetlist::extract_netlist ()
   netex.set_include_floating_subcircuits (m_include_floating_subcircuits);
   netex.extract_nets (dss (), m_layout_index, m_conn, *mp_netlist, m_net_clusters);
 
-  // @@@ NOTE: can we have multiple pins on a net? Will this happen later maybe?
-  tl_assert (check_many_pins (mp_netlist.get ())); // @@@
-
   //  treat soft connections
   do_soft_connections ();
 
-  tl_assert (check_many_pins (mp_netlist.get ())); // @@@
   //  implement the "join_nets" (aka "must connect") feature
+#if defined(_DEBUG)
+  //  NOTE: the join_nets feature only works for "one pin per net" case
+  //  TODO: either fix that or make sure we do not get multiple pins per net.
+  //  Right now, there no known case that produces multiple pins on a net at
+  //  this stage.
+  tl_assert (check_many_pins (mp_netlist.get ()));
+#endif
   do_join_nets ();
-  tl_assert (check_many_pins (mp_netlist.get ())); // @@@
 
   if (tl::verbosity () >= 41) {
     MemStatisticsCollector m (false);

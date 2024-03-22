@@ -1848,7 +1848,6 @@ public:
       typename std::set<id_type>::const_iterator cc = c;
       for (++cc; cc != sc->end (); ++cc) {
         mp_cell_clusters->join_cluster_with (*c, *cc);
-        // @@@  m_soft_connections.erase (std::make_pair (*c < *cc ? *c : *cc, *c < *cc ? *cc : *c));
       }
 
     }
@@ -2959,7 +2958,7 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
         if (! i->has_instance ()) {
 
           local.join_cluster_with (gcid, i->id ());
-          local.remove_cluster (i->id ()); // @@@ actually required?
+          local.remove_cluster (i->id ()); //  TODO: actually required? Should work without too ...
 
         } else {
 
@@ -2970,7 +2969,7 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
             //  shouldn't happen, but duplicate instances may trigger this
           } else if (other_id) {
             local.join_cluster_with (gcid, other_id);
-            local.remove_cluster (other_id); // @@@ actually required?
+            local.remove_cluster (other_id); //  TODO: actually required? Should work without too ...
           } else {
             local.add_connection (gcid, *i);
           }

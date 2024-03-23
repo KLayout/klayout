@@ -838,6 +838,13 @@ class Annotation(BasicAnnotation):
 
     This constant has been introduced in version 0.25
     """
+    RulerModeAutoMetricEdge: ClassVar[int]
+    r"""
+    @brief Specifies edge-sensitive auto-metric ruler mode for the \register_template method
+    In auto-metric mode, a ruler can be placed with a single click and p1/p2 will be determined from the edge it is placed on.
+
+    This constant has been introduced in version 0.29
+    """
     RulerModeNormal: ClassVar[int]
     r"""
     @brief Specifies normal ruler mode for the \register_template method
@@ -4249,7 +4256,7 @@ class LayerProperties:
         This method has been introduced in version 0.22.
         """
     @overload
-    def lower_hier_level_mode(self, arg0: bool) -> int:
+    def lower_hier_level_mode(self, real: bool) -> int:
         r"""
         @brief Gets the mode for the lower hierarchy level.
         @param real If true, the computed value is returned, otherwise the local node value
@@ -4994,6 +5001,10 @@ class LayoutViewBase:
             r"""
             @brief Compares two enums
             """
+        def __hash__(self) -> int:
+            r"""
+            @brief Gets the hash value from the enum
+            """
         @overload
         def __init__(self, i: int) -> None:
             r"""
@@ -5003,6 +5014,10 @@ class LayoutViewBase:
         def __init__(self, s: str) -> None:
             r"""
             @brief Creates an enum from a string value
+            """
+        def __int__(self) -> int:
+            r"""
+            @brief Gets the integer value from the enum
             """
         @overload
         def __lt__(self, other: LayoutViewBase.SelectionMode) -> bool:
@@ -5031,6 +5046,10 @@ class LayoutViewBase:
         def __str__(self) -> str:
             r"""
             @brief Gets the symbolic string from an enum
+            """
+        def hash(self) -> int:
+            r"""
+            @brief Gets the hash value from the enum
             """
         def inspect(self) -> str:
             r"""
@@ -6364,6 +6383,13 @@ class LayoutViewBase:
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+    def is_dirty(self) -> bool:
+        r"""
+        @brief Gets a flag indicating whether one of the layouts displayed needs saving
+        A layout is 'dirty' if it is modified and needs saving. This method returns true if this is the case for at least one of the layouts shown in the view.
+
+        This method has been introduced in version 0.29.
+        """
     def is_editable(self) -> bool:
         r"""
         @brief Returns true if the view is in editable mode
@@ -6681,7 +6707,7 @@ class LayoutViewBase:
 
         See \set_title and \title for a description about how titles are handled.
         """
-    def resize(self, arg0: int, arg1: int) -> None:
+    def resize(self, w: int, h: int) -> None:
         r"""
         @brief Resizes the layout view to the given dimension
 
@@ -7062,7 +7088,7 @@ class LayoutViewBase:
 
         It is very important to stop the redraw thread before applying changes to the layout or the cell views and the LayoutView configuration. This is usually done automatically. For rare cases, where this is not the case, this method is provided.
         """
-    def switch_mode(self, arg0: str) -> None:
+    def switch_mode(self, mode: str) -> None:
         r"""
         @brief Switches the mode.
 
@@ -7204,12 +7230,16 @@ class Macro:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
+            """
+        def __hash__(self) -> int:
+            r"""
+            @brief Gets the hash value from the enum
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -7220,6 +7250,10 @@ class Macro:
         def __init__(self, s: str) -> None:
             r"""
             @brief Creates an enum from a string value
+            """
+        def __int__(self) -> int:
+            r"""
+            @brief Gets the integer value from the enum
             """
         @overload
         def __lt__(self, other: Macro.Format) -> bool:
@@ -7248,6 +7282,10 @@ class Macro:
         def __str__(self) -> str:
             r"""
             @brief Gets the symbolic string from an enum
+            """
+        def hash(self) -> int:
+            r"""
+            @brief Gets the hash value from the enum
             """
         def inspect(self) -> str:
             r"""
@@ -7308,6 +7346,10 @@ class Macro:
             r"""
             @brief Compares two enums
             """
+        def __hash__(self) -> int:
+            r"""
+            @brief Gets the hash value from the enum
+            """
         @overload
         def __init__(self, i: int) -> None:
             r"""
@@ -7317,6 +7359,10 @@ class Macro:
         def __init__(self, s: str) -> None:
             r"""
             @brief Creates an enum from a string value
+            """
+        def __int__(self) -> int:
+            r"""
+            @brief Gets the integer value from the enum
             """
         @overload
         def __lt__(self, other: Macro.Interpreter) -> bool:
@@ -7331,12 +7377,12 @@ class Macro:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -7345,6 +7391,10 @@ class Macro:
         def __str__(self) -> str:
             r"""
             @brief Gets the symbolic string from an enum
+            """
+        def hash(self) -> int:
+            r"""
+            @brief Gets the hash value from the enum
             """
         def inspect(self) -> str:
             r"""

@@ -308,7 +308,7 @@ class ArgType:
         r"""
         @brief Creates a copy of self
         """
-    def __eq__(self, arg0: object) -> bool:
+    def __eq__(self, other: object) -> bool:
         r"""
         @brief Equality of two types
         """
@@ -316,7 +316,7 @@ class ArgType:
         r"""
         @brief Creates a new object of this class
         """
-    def __ne__(self, arg0: object) -> bool:
+    def __ne__(self, other: object) -> bool:
         r"""
         @brief Inequality of two types
         """
@@ -1423,6 +1423,20 @@ class Method:
         r"""
         @brief Creates a new object of this class
         """
+    def __repr__(self) -> str:
+        r"""
+        @brief Describes the method
+        This attribute returns a string description of the method and its signature.
+
+        This method has been introduced in version 0.29.
+        """
+    def __str__(self) -> str:
+        r"""
+        @brief Describes the method
+        This attribute returns a string description of the method and its signature.
+
+        This method has been introduced in version 0.29.
+        """
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -1460,7 +1474,7 @@ class Method:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
-    def accepts_num_args(self, arg0: int) -> bool:
+    def accepts_num_args(self, n: int) -> bool:
         r"""
         @brief True, if this method is compatible with the given number of arguments
 
@@ -1568,6 +1582,13 @@ class Method:
     def ret_type(self) -> ArgType:
         r"""
         @brief The return type of this method
+        """
+    def to_s(self) -> str:
+        r"""
+        @brief Describes the method
+        This attribute returns a string description of the method and its signature.
+
+        This method has been introduced in version 0.29.
         """
 
 class MethodOverload:

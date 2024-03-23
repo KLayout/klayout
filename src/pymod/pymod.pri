@@ -84,6 +84,8 @@ INSTALLS = lib_target
     QMAKE_POST_LINK += && $(MKDIR) $$DESTDIR_PYMOD/$$REALMODULE && $(COPY) $$PWD/distutils_src/klayout/$$REALMODULE/*.py $$DESTDIR_PYMOD/$$REALMODULE
   }
 
+  POST_TARGETDEPS += $$files($$PWD/distutils_src/klayout/$$REALMODULE/*.py, false)
+
   # INSTALLS needs to be inside a lib or app templates.
   modsrc_target.path = $$PREFIX/pymod/klayout/$$REALMODULE
   # This would be nice:

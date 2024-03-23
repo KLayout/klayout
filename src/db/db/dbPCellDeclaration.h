@@ -30,6 +30,7 @@
 #include "dbLayout.h"
 #include "tlVariant.h"
 #include "tlObject.h"
+#include "tlOptional.h"
 
 namespace db
 {
@@ -268,6 +269,56 @@ public:
   }
 
   /**
+   *  @brief Sets the minimum value
+   *
+   *  The minimum value is a visual feature and limits the allowed values for numerical
+   *  entry boxes. This applies to parameters of type int or double. The minimum value
+   *  is not effective if choices are present.
+   *
+   *  The minimum value is not enforced - for example there is no restriction implemented
+   *  when setting values programmatically.
+   *
+   *  Setting this attribute to "nil" (the default) implies "no limit".
+   */
+  void set_min_value (const tl::Variant &min)
+  {
+    m_min_value = min;
+  }
+
+  /**
+   *  @brief Gets the minimum value (see \set_min_value)
+   */
+  const tl::Variant &min_value () const
+  {
+    return m_min_value;
+  }
+
+  /**
+   *  @brief Sets the maximum value
+   *
+   *  The maximum value is a visual feature and limits the allowed values for numerical
+   *  entry boxes. This applies to parameters of type int or double. The maximum value
+   *  is not effective if choices are present.
+   *
+   *  The maximum value is not enforced - for example there is no restriction implemented
+   *  when setting values programmatically.
+   *
+   *  Setting this attribute to "nil" (the default) implies "no limit".
+   */
+  void set_max_value (const tl::Variant &max)
+  {
+    m_max_value = max;
+  }
+
+  /**
+   *  @brief Gets the maximum value (see \set_max_value)
+   */
+  const tl::Variant &max_value () const
+  {
+    return m_max_value;
+  }
+
+  /**
    *  @brief Equality
    */
   bool operator== (const db::PCellParameterDeclaration &d) const
@@ -280,7 +331,9 @@ public:
            m_type == d.m_type &&
            m_name == d.m_name &&
            m_description == d.m_description &&
-           m_unit == d.m_unit;
+           m_unit == d.m_unit &&
+           m_min_value == d.m_min_value &&
+           m_max_value == d.m_max_value;
   }
 
 private:
@@ -291,6 +344,7 @@ private:
   type m_type;
   std::string m_name;
   std::string m_description, m_unit;
+  tl::Variant m_min_value, m_max_value;
 };
 
 /**

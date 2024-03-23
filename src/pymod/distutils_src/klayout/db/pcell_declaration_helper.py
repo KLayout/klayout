@@ -66,7 +66,7 @@ class _PCellDeclarationHelperMixin:
     self.layer = None
     self.cell = None
 
-  def param(self, name, value_type, description, hidden = False, readonly = False, unit = None, default = None, choices = None):
+  def param(self, name, value_type, description, hidden = False, readonly = False, unit = None, default = None, choices = None, min_value = None, max_value = None):
     """
     Defines a parameter
       name         -> the short name of the parameter
@@ -76,6 +76,8 @@ class _PCellDeclarationHelperMixin:
       hidden      -> (boolean) true, if the parameter is not shown in the dialog
       readonly    -> (boolean) true, if the parameter cannot be edited
       unit        -> the unit string
+      min_value   -> the minimum value (only effective for numerical types and if no choices are present)
+      max_value   -> the maximum value (only effective for numerical types and if no choices are present)
       default     -> the default value
       choices     -> ([ [ d, v ], ...) choice descriptions/value for choice type
     this method defines accessor methods for the parameters
@@ -102,6 +104,8 @@ class _PCellDeclarationHelperMixin:
     pdecl.readonly = readonly
     if not (default is None):
       pdecl.default = default
+    pdecl.min_value = min_value
+    pdecl.max_value = max_value
     if not (unit is None):
       pdecl.unit = unit
     if not (choices is None):

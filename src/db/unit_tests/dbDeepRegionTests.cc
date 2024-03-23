@@ -2649,6 +2649,35 @@ TEST(101_DeepFlatCollaboration)
   db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au101.gds");
 }
 
+TEST(102_SameInputs)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_l1.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+  unsigned int l3 = ly.get_layer (db::LayerProperties (3, 0));
+
+  db::Region r2 (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
+  db::Region r3 (db::RecursiveShapeIterator (ly, top_cell, l3), dss);
+
+  EXPECT_EQ ((r2 & r2).to_string (), "...");
+  EXPECT_EQ ((r2 - r2).to_string (), "...");
+  EXPECT_EQ ((r2 | r2).to_string (), "...");
+  EXPECT_EQ ((r2 ^ r2).to_string (), "...");
+  EXPECT_EQ ((r2 + r2).to_string (), "...");
+}
+
 TEST(issue_277)
 {
   db::Layout ly;

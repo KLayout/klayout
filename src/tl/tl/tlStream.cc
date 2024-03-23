@@ -47,6 +47,7 @@
 #include "tlException.h"
 #include "tlString.h"
 #include "tlUri.h"
+#include "tlHttpStream.h"
 
 #if defined(HAVE_QT)
 #  include <QByteArray>
@@ -258,6 +259,10 @@ inflating_input_stream<Base>::auto_detect_gz ()
 
   return true;
 }
+
+//  explicit instantiations
+template class inflating_input_stream<tl::InputPipe>;
+template class inflating_input_stream<tl::InputHttpStream>;
 
 // ---------------------------------------------------------------
 //  InputStream implementation

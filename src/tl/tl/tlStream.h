@@ -590,7 +590,7 @@ private:
  *  @brief A wrapper that adds generic .gz support
  */
 template <class Base>
-class TL_PUBLIC_TEMPLATE inflating_input_stream
+class TL_PUBLIC inflating_input_stream
   : public InputStreamBase
 {
 public:

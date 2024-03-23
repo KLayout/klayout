@@ -1117,7 +1117,7 @@ LEFDEFReaderState::read_single_map_file (const std::string &path, std::map<std::
       size_t max_purpose_str = 15;
 
       if (! ex.try_read_word (w1) || ! ex.try_read_word (w2, "._$,/:") || ! try_read_layers (ex, layers) || ! try_read_layers (ex, datatypes)) {
-        tl::warn << tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d not understood - skipped")), path, ts.line_number ());
+        common_reader_warn (tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d not understood - skipped")), path, ts.line_number ()));
         continue;
       }
 
@@ -1143,7 +1143,7 @@ LEFDEFReaderState::read_single_map_file (const std::string &path, std::map<std::
           name = "REGIONS_NONE";
           lp = RegionsNone;
         } else if (w2 != "ALL") {
-          tl::warn << tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d - ignoring unknowns REGION purpose %s (use FENCE, GUIDE or ALL)")), path, ts.line_number (), w2);
+          common_reader_warn (tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d - ignoring unknowns REGION purpose %s (use FENCE, GUIDE or ALL)")), path, ts.line_number (), w2));
         }
 
         for (std::vector<int>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
@@ -1176,7 +1176,7 @@ LEFDEFReaderState::read_single_map_file (const std::string &path, std::map<std::
 
           if (*p == "DIEAREA" || *p == "ALL" || *p == "COMP") {
 
-            tl::warn << tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d: NAME record ignored for entity: %s")), path, ts.line_number (), *p);
+            common_reader_warn (tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d: NAME record ignored for entity: %s")), path, ts.line_number (), *p));
 
           } else {
 
@@ -1193,7 +1193,7 @@ LEFDEFReaderState::read_single_map_file (const std::string &path, std::map<std::
               if (label_purpose == Pins || label_purpose == LEFPins) {
                 layer_defs.push_back (std::make_pair (lp.front (), label_purpose == Pins ? Label : LEFLabel));
               } else {
-                tl::warn << tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d: NAME record ignored for purpose: %s")), path, ts.line_number (), purpose_to_name (label_purpose));
+                common_reader_warn (tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d: NAME record ignored for purpose: %s")), path, ts.line_number (), purpose_to_name (label_purpose)));
               }
 
             } else {
@@ -1226,7 +1226,7 @@ LEFDEFReaderState::read_single_map_file (const std::string &path, std::map<std::
       } else if (w1 == "COMP") {
 
         //  ignore "COMP (ALL) ..."
-        tl::warn << tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d: COMP entry ignored")), path, ts.line_number ());
+        common_reader_warn (tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d: COMP entry ignored")), path, ts.line_number ()));
 
       } else {
 
@@ -1261,7 +1261,7 @@ LEFDEFReaderState::read_single_map_file (const std::string &path, std::map<std::
               if (ex.test (":VOLTAGE:")) {
                 double f = 0.0;
                 ex.read (f);
-                tl::warn << tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d: NET voltage constraint ignored for layer %s")), path, ts.line_number (), w1);
+                common_reader_warn (tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d: NET voltage constraint ignored for layer %s")), path, ts.line_number (), w1));
               }
 
             } else if (i->second == ViaGeometry) {
@@ -1284,7 +1284,7 @@ LEFDEFReaderState::read_single_map_file (const std::string &path, std::map<std::
 
           if (i == purpose_translation.end ()) {
 
-            tl::warn << tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d: purpose %s ignored for layer %s")), path, ts.line_number (), ps, w1);
+            common_reader_warn (tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d: purpose %s ignored for layer %s")), path, ts.line_number (), ps, w1));
 
           } else if (i->second == All) {
 
@@ -1364,21 +1364,22 @@ LEFDEFReaderState::open_layer (db::Layout &layout, const std::string &n, LayerPu
     m_layers.insert (std::make_pair (std::make_pair (n, LayerDetailsKey (purpose, mask)), ll));
 
     if (ll.empty () && ! has_fallback (purpose)) {
+      std::string msg;
       if (n.empty ()) {
-        tl::warn << tl::to_string (tr ("No mapping for purpose")) << " '" << purpose_to_name (purpose) << "'" << tl::noendl;
+        msg = tl::to_string (tr ("No mapping for purpose")) + " '" + purpose_to_name (purpose) + "'";
       } else {
-        tl::warn << tl::to_string (tr ("No mapping for layer")) << " '" << n << "', purpose '" << purpose_to_name (purpose) << "'" << tl::noendl;
+        msg = tl::to_string (tr ("No mapping for layer")) + " '" + n + "', purpose '" + purpose_to_name (purpose) + "'";
       }
       if (mask > 0) {
-        tl::warn << tl::to_string (tr (" Mask ")) << mask << tl::noendl;
+        msg += tl::to_string (tr (" Mask ")) + tl::to_string (mask);
       }
 //  not printing via size - too confusing?
 #if 0
       if (via_size != db::DVector ()) {
-        tl::warn << tl::to_string (tr (" Via size ")) << via_size.to_string () << tl::noendl;
+        msg += tl::to_string (tr (" Via size ")) + via_size.to_string ();
       }
 #endif
-      tl::warn << tl::to_string (tr (" - layer is ignored"));
+      common_reader_warn (msg + tl::to_string (tr (" - layer is ignored")));
     }
 
     return ll;

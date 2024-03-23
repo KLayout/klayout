@@ -1232,7 +1232,7 @@ CODE
     # This method produces markers on the corners of the polygons. An angle criterion can be given which
     # selects corners based on the angle of the connecting edges. Positive angles indicate a left turn
     # while negative angles indicate a right turn. Since polygons are oriented clockwise, positive angles
-    # indicate concave corners while negative ones indicate convex corners.
+    # indicate concave (inner) corners while negative ones indicate convex (outer) corners
     # 
     # The markers generated can be point-like edges or small 2x2 DBU boxes. The latter is the default.
     # 

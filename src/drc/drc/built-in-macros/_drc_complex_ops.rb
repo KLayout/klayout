@@ -756,15 +756,17 @@ CODE
   
   # %DRC%
   # @name corners
-  # @brief Applies smoothing
+  # @brief Selects corners of polygons
   # @synopsis expression.corners
   # @synopsis expression.corners(as_dots)
   # @synopsis expression.corners(as_boxes)
   #
   # This operation acts on polygons and selects the corners of the polygons.
   # It can be put into a condition to select corners by their angles. The angle of
-  # a corner is positive for a turn to the left if walking a polygon counterclockwise
-  # and negative for the turn to the right. Angles take values between -180 and 180 degree.
+  # a corner is positive for a turn to the left if walking a polygon clockwise
+  # and negative for the turn to the right. Hence positive angles indicate concave
+  # (inner) corners, negative ones indicate convex (outer) corners.
+  # Angles take values between -180 and 180 degree.
   #
   # When using "as_dots" for the argument, the operation will return single-point edges at
   # the selected corners. With "as_boxes" (the default), small (2x2 DBU) rectangles will be
@@ -780,8 +782,8 @@ CODE
   # The following example selects all inner corners:
   #
   # @code
-  # out = in.drc(corners < 0)
-  # out = in.drc(primary.corners < 0)    # equivalent
+  # out = in.drc(corners > 0)
+  # out = in.drc(primary.corners > 0)    # equivalent
   # @/code
   #
   # The "corners" method is available as a plain function or as a method on \DRC# expressions.

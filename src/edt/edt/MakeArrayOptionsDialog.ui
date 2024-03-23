@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>606</width>
-    <height>332</height>
+    <width>561</width>
+    <height>323</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -67,7 +67,7 @@
       <property name="spacing">
        <number>6</number>
       </property>
-      <item row="2" column="3">
+      <item row="3" column="3">
        <widget class="QLineEdit" name="row_x_le">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -77,14 +77,7 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>  Rows/Columns</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="2">
+      <item row="3" column="2">
        <widget class="QLabel" name="label_11">
         <property name="text">
          <string>x =</string>
@@ -95,43 +88,29 @@
        </widget>
       </item>
       <item row="2" column="5">
-       <widget class="QLineEdit" name="row_y_le">
+       <widget class="QLineEdit" name="column_y_le">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>1</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="3">
+       <widget class="QLabel" name="label_8">
+        <property name="text">
+         <string>Columns =</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
       <item row="0" column="4">
        <widget class="QLabel" name="label_6">
         <property name="text">
-         <string>rows =</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_9">
-        <property name="text">
-         <string>  Row vector (x,y)</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2">
-       <widget class="QLabel" name="label_8">
-        <property name="text">
-         <string>columns =</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="5">
-       <widget class="QLineEdit" name="rows_le">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>1</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
+         <string>Rows =</string>
         </property>
        </widget>
       </item>
@@ -145,18 +124,22 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="4">
-       <widget class="QLabel" name="label_10">
+      <item row="3" column="0" colspan="2">
+       <widget class="QLabel" name="label_9">
         <property name="text">
-         <string>y =</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         <string>  Row vector (x,y)</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="3">
-       <widget class="QLineEdit" name="column_x_le">
+      <item row="2" column="0" colspan="2">
+       <widget class="QLabel" name="label_16">
+        <property name="text">
+         <string>  Column vector (x,y)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="5">
+       <widget class="QLineEdit" name="row_y_le">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>1</horstretch>
@@ -165,7 +148,7 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="2">
+      <item row="2" column="2">
        <widget class="QLabel" name="label_14">
         <property name="text">
          <string>x =</string>
@@ -175,8 +158,8 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="5">
-       <widget class="QLineEdit" name="column_y_le">
+      <item row="2" column="3">
+       <widget class="QLineEdit" name="column_x_le">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>1</horstretch>
@@ -185,7 +168,17 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="4">
+      <item row="0" column="5">
+       <widget class="QLineEdit" name="rows_le">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="4">
        <widget class="QLabel" name="label_15">
         <property name="text">
          <string>y =</string>
@@ -195,12 +188,31 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_16">
+      <item row="3" column="4">
+       <widget class="QLabel" name="label_10">
         <property name="text">
-         <string>  Column vector (x,y)</string>
+         <string>y =</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
        </widget>
+      </item>
+      <item row="1" column="0" colspan="6">
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>5</height>
+         </size>
+        </property>
+       </spacer>
       </item>
      </layout>
     </widget>

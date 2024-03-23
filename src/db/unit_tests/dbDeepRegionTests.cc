@@ -2666,16 +2666,47 @@ TEST(102_SameInputs)
   db::DeepShapeStore dss;
 
   unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
-  unsigned int l3 = ly.get_layer (db::LayerProperties (3, 0));
-
   db::Region r2 (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
-  db::Region r3 (db::RecursiveShapeIterator (ly, top_cell, l3), dss);
 
-  EXPECT_EQ ((r2 & r2).to_string (), "...");
-  EXPECT_EQ ((r2 - r2).to_string (), "...");
-  EXPECT_EQ ((r2 | r2).to_string (), "...");
-  EXPECT_EQ ((r2 ^ r2).to_string (), "...");
-  EXPECT_EQ ((r2 + r2).to_string (), "...");
+  EXPECT_EQ ((r2 & r2).to_string (), r2.to_string ());
+  EXPECT_EQ ((r2 - r2).to_string (), "");
+  EXPECT_EQ (r2.andnot (r2).first.to_string (), r2.to_string ());
+  EXPECT_EQ (r2.andnot (r2).second.to_string (), "");
+  EXPECT_EQ ((r2 | r2).to_string (), r2.to_string ());
+  EXPECT_EQ ((r2 ^ r2).to_string (), "");
+  EXPECT_EQ (r2.in (r2).to_string (), r2.to_string ());
+  EXPECT_EQ (r2.in (r2, true).to_string (), "");
+  EXPECT_EQ (r2.in_and_out (r2).first.to_string (), r2.to_string ());
+  EXPECT_EQ (r2.in_and_out (r2).second.to_string (), "");
+  EXPECT_EQ (r2.selected_enclosing (r2).to_string (), r2.to_string ());
+  EXPECT_EQ (r2.selected_not_enclosing (r2).to_string (), "");
+  EXPECT_EQ (r2.selected_enclosing_differential (r2).first.to_string (), r2.to_string ());
+  EXPECT_EQ (r2.selected_enclosing_differential (r2).second.to_string (), "");
+  EXPECT_EQ (r2.selected_interacting (r2).to_string (), r2.to_string ());
+  EXPECT_EQ (r2.selected_not_interacting (r2).to_string (), "");
+  EXPECT_EQ (r2.selected_interacting_differential (r2).first.to_string (), r2.to_string ());
+  EXPECT_EQ (r2.selected_interacting_differential (r2).second.to_string (), "");
+  EXPECT_EQ (r2.selected_interacting (r2, (size_t) 1, (size_t) 2).to_string (), r2.merged ().to_string ());
+  EXPECT_EQ (r2.selected_interacting_differential (r2, (size_t) 1, (size_t) 2).first.to_string (), r2.merged ().to_string ());
+  EXPECT_EQ (r2.selected_interacting_differential (r2, (size_t) 1, (size_t) 2).second.to_string (), "");
+  EXPECT_EQ (r2.selected_interacting (r2, (size_t) 2).to_string (), "");
+  EXPECT_EQ (r2.selected_interacting_differential (r2, (size_t) 2).first.to_string (), "");
+  EXPECT_EQ (r2.selected_interacting_differential (r2, (size_t) 2).second.to_string (), r2.merged ().to_string ());
+  EXPECT_EQ (r2.selected_inside (r2).to_string (), r2.to_string ());
+  EXPECT_EQ (r2.selected_not_inside (r2).to_string (), "");
+  EXPECT_EQ (r2.selected_inside_differential (r2).first.to_string (), r2.to_string ());
+  EXPECT_EQ (r2.selected_inside_differential (r2).second.to_string (), "");
+  EXPECT_EQ (r2.selected_outside (r2).to_string (), "");
+  EXPECT_EQ (r2.selected_not_outside (r2).to_string (), r2.to_string ());
+  EXPECT_EQ (r2.selected_outside_differential (r2).first.to_string (), "");
+  EXPECT_EQ (r2.selected_outside_differential (r2).second.to_string (), r2.to_string ());
+  EXPECT_EQ (r2.selected_overlapping (r2).to_string (), r2.to_string ());
+  EXPECT_EQ (r2.selected_not_overlapping (r2).to_string (), "");
+  EXPECT_EQ (r2.selected_overlapping_differential (r2).first.to_string (), r2.to_string ());
+  EXPECT_EQ (r2.selected_overlapping_differential (r2).second.to_string (), "");
+  EXPECT_EQ (r2.pull_inside (r2).to_string (), r2.to_string ());
+  EXPECT_EQ (r2.pull_overlapping (r2).to_string (), r2.to_string ());
+  EXPECT_EQ (r2.pull_interacting (r2).to_string (), r2.to_string ());
 }
 
 TEST(issue_277)

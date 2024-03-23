@@ -1505,6 +1505,55 @@ TEST(22_InteractingWithCount)
   EXPECT_EQ (db::compare (e.selected_interacting_differential (r2, size_t (2), size_t(3)).second, "(0,0;200,0)"), true);
 }
 
+TEST(23_SameInputs)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_l1.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+  db::Edges e2 = db::Edges ((db::Region (db::RecursiveShapeIterator (ly, top_cell, l2), dss)).edges ());
+
+  EXPECT_EQ ((e2 & e2).to_string (), e2.to_string ());
+  EXPECT_EQ ((e2 - e2).to_string (), "");
+  EXPECT_EQ (e2.andnot (e2).first.to_string (), e2.to_string ());
+  EXPECT_EQ (e2.andnot (e2).second.to_string (), "");
+  EXPECT_EQ ((e2 | e2).to_string (), e2.to_string ());
+  EXPECT_EQ ((e2 ^ e2).to_string (), "");
+  EXPECT_EQ (e2.in (e2).to_string (), e2.to_string ());
+  EXPECT_EQ (e2.in (e2, true).to_string (), "");
+  EXPECT_EQ (e2.in_and_out (e2).first.to_string (), e2.to_string ());
+  EXPECT_EQ (e2.in_and_out (e2).second.to_string (), "");
+  EXPECT_EQ (e2.selected_interacting (e2).to_string (), e2.to_string ());
+  EXPECT_EQ (e2.selected_not_interacting (e2).to_string (), "");
+  EXPECT_EQ (e2.selected_interacting_differential (e2).first.to_string (), e2.to_string ());
+  EXPECT_EQ (e2.selected_interacting_differential (e2).second.to_string (), "");
+  EXPECT_EQ ((e2.selected_interacting (e2, (size_t) 1, (size_t) 3) ^ e2).to_string (), "");
+  EXPECT_EQ ((e2.selected_interacting_differential (e2, (size_t) 1, (size_t) 3).first ^ e2).to_string (), "");
+  EXPECT_EQ (e2.selected_interacting_differential (e2, (size_t) 1, (size_t) 3).second.to_string (), "");
+  EXPECT_EQ (e2.selected_interacting (e2, (size_t) 4).to_string (), "");
+  EXPECT_EQ (e2.selected_interacting_differential (e2, (size_t) 4).first.to_string (), "");
+  EXPECT_EQ ((e2.selected_interacting_differential (e2, (size_t) 4).second ^ e2).to_string (), "");
+  EXPECT_EQ (e2.selected_inside (e2).to_string (), e2.to_string ());
+  EXPECT_EQ (e2.selected_not_inside (e2).to_string (), "");
+  EXPECT_EQ (e2.selected_inside_differential (e2).first.to_string (), e2.to_string ());
+  EXPECT_EQ (e2.selected_inside_differential (e2).second.to_string (), "");
+  EXPECT_EQ (e2.selected_outside (e2).to_string (), "");
+  EXPECT_EQ (e2.selected_not_outside (e2).to_string (), e2.to_string ());
+  EXPECT_EQ (e2.selected_outside_differential (e2).first.to_string (), "");
+  EXPECT_EQ (e2.selected_outside_differential (e2).second.to_string (), e2.to_string ());
+  EXPECT_EQ (e2.pull_interacting (e2).to_string (), e2.to_string ());
+}
 
 TEST(deep_edges_and_cheats)
 {

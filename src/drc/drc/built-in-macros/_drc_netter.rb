@@ -379,7 +379,8 @@ module DRC
           arg1.is_a?(String) || raise("The first argument has to be a string")
           @pre_extract_config << lambda { |l2n| l2n.join_nets(arg1, arg2) }
         else
-          arg1.is_a?(String) || raise("The argument has to be a string")
+          arg1.is_a?(Array) || raise("The argument has to be an array of strings")
+          arg1.find { |a| !a.is_a?(String) } && raise("The argument has to be an array of strings")
           @pre_extract_config << lambda { |l2n| l2n.join_nets(arg1) }
         end
 

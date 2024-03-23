@@ -473,69 +473,114 @@ void LayoutToNetlist::check_must_connect (const db::Circuit &c, const db::Net &a
     return;
   }
 
-  if (c.begin_refs () != c.end_refs ()) {
+  std::vector<const db::SubCircuit *> path;
+  check_must_connect_impl (c, a, b, c, a, b, path);
+}
+
+static std::string path_msg (const std::vector<const db::SubCircuit *> &path, const db::Circuit &c_org)
+{
+  if (path.empty ()) {
+    return std::string ();
+  }
+
+  std::string msg (".\n" + tl::to_string (tr ("Instance path: ")));
+
+  for (auto p = path.rbegin (); p != path.rend (); ++p) {
+    if (p != path.rbegin ()) {
+      msg += "/";
+    }
+    msg += (*p)->circuit ()->name () + ":" + (*p)->expanded_name () + "[" + (*p)->trans ().to_string () + "]";
+  }
+
+  msg += "/";
+  msg += c_org.name ();
+
+  return msg;
+}
+
+void LayoutToNetlist::check_must_connect_impl (const db::Circuit &c, const db::Net &a, const db::Net &b, const db::Circuit &c_org, const db::Net &a_org, const db::Net &b_org, std::vector<const db::SubCircuit *> &path)
+{
+  if (c.begin_refs () != c.end_refs () && path.empty ()) {
+
     if (a.begin_pins () == a.end_pins ()) {
-      db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect net %s is not connected to outside")), a.expanded_name ()));
+      db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect net %s is not connected to outside")), a_org.expanded_name ()));
       error.set_cell_name (c.name ());
       error.set_category_name ("must-connect");
       log_entry (error);
     }
     if (b.begin_pins () == b.end_pins ()) {
-      db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect net %s is not connected to outside")), a.expanded_name ()));
+      db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect net %s is not connected to outside")), a_org.expanded_name ()));
       error.set_cell_name (c.name ());
       error.set_category_name ("must-connect");
       log_entry (error);
     }
-  } else {
-    if (a.expanded_name () == b.expanded_name ()) {
-      db::LogEntryData warn (m_top_level_mode ? db::Error : db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s must be connected further up in the hierarchy - this is an error at chip top level")), a.expanded_name ()));
-      warn.set_cell_name (c.name ());
-      warn.set_category_name ("must-connect");
-      log_entry (warn);
+
+  } else if (c.begin_refs () == c.end_refs () || a.begin_pins () == a.end_pins () || b.begin_pins () == b.end_pins ()) {
+
+    if (a_org.expanded_name () == b_org.expanded_name ()) {
+      if (path.empty ()) {
+        db::LogEntryData warn (m_top_level_mode ? db::Error : db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s must be connected further up in the hierarchy - this is an error at chip top level")), a_org.expanded_name ()) + path_msg (path, c_org));
+        warn.set_cell_name (c.name ());
+        warn.set_category_name ("must-connect");
+        log_entry (warn);
+      } else {
+        db::LogEntryData warn (m_top_level_mode ? db::Error : db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s of circuit %s must be connected further up in the hierarchy - this is an error at chip top level")), a_org.expanded_name (), c_org.name ()) + path_msg (path, c_org));
+        warn.set_cell_name (c.name ());
+        warn.set_geometry (subcircuit_geometry (*path.back (), internal_layout ()));
+        warn.set_category_name ("must-connect");
+        log_entry (warn);
+      }
     } else {
-      db::LogEntryData warn (m_top_level_mode ? db::Error : db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s and %s must be connected further up in the hierarchy - this is an error at chip top level")), a.expanded_name (), b.expanded_name ()));
-      warn.set_cell_name (c.name ());
-      warn.set_category_name ("must-connect");
-      log_entry (warn);
+      if (path.empty ()) {
+        db::LogEntryData warn (m_top_level_mode ? db::Error : db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s and %s must be connected further up in the hierarchy - this is an error at chip top level")), a_org.expanded_name (), b_org.expanded_name ()) + path_msg (path, c_org));
+        warn.set_cell_name (c.name ());
+        warn.set_category_name ("must-connect");
+        log_entry (warn);
+      } else {
+        db::LogEntryData warn (m_top_level_mode ? db::Error : db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s and %s of circuit %s must be connected further up in the hierarchy - this is an error at chip top level")), a_org.expanded_name (), b_org.expanded_name (), c_org.name ()) + path_msg (path, c_org));
+        warn.set_cell_name (c.name ());
+        warn.set_geometry (subcircuit_geometry (*path.back (), internal_layout ()));
+        warn.set_category_name ("must-connect");
+        log_entry (warn);
+      }
     }
+
   }
 
   if (a.begin_pins () != a.end_pins () && b.begin_pins () != b.end_pins ()) {
+
     for (auto ref = c.begin_refs (); ref != c.end_refs (); ++ref) {
+
       const db::SubCircuit &sc = *ref;
+
       //  TODO: consider the case of multiple pins on a net (rare)
       const db::Net *net_a = sc.net_for_pin (a.begin_pins ()->pin_id ());
       const db::Net *net_b = sc.net_for_pin (b.begin_pins ()->pin_id ());
+
       if (net_a == 0) {
-        db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect net %s of circuit %s is not connected at all%s")), a.expanded_name (), c.name (), subcircuit_to_string (sc)));
+        db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect net %s of circuit %s is not connected at all%s")), a_org.expanded_name (), c_org.name (), subcircuit_to_string (sc)) + path_msg (path, c_org));
         error.set_cell_name (sc.circuit ()->name ());
         error.set_geometry (subcircuit_geometry (sc, internal_layout ()));
         error.set_category_name ("must-connect");
         log_entry (error);
       }
+
       if (net_b == 0) {
-        db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect net %s of circuit %s is not connected at all%s")), b.expanded_name (), c.name (), subcircuit_to_string (sc)));
+        db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect net %s of circuit %s is not connected at all%s")), b_org.expanded_name (), c_org.name (), subcircuit_to_string (sc)) + path_msg (path, c_org));
         error.set_cell_name (sc.circuit ()->name ());
         error.set_geometry (subcircuit_geometry (sc, internal_layout ()));
         error.set_category_name ("must-connect");
         log_entry (error);
       }
+
       if (net_a && net_b && net_a != net_b) {
-        if (a.expanded_name () == b.expanded_name ()) {
-          db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect nets %s of circuit %s are not connected%s")), a.expanded_name (), c.name (), subcircuit_to_string (sc)));
-          error.set_cell_name (sc.circuit ()->name ());
-          error.set_geometry (subcircuit_geometry (sc, internal_layout ()));
-          error.set_category_name ("must-connect");
-          log_entry (error);
-        } else {
-          db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect nets %s and %s of circuit %s are not connected%s")), a.expanded_name (), b.expanded_name (), c.name (), subcircuit_to_string (sc)));
-          error.set_cell_name (sc.circuit ()->name ());
-          error.set_geometry (subcircuit_geometry (sc, internal_layout ()));
-          error.set_category_name ("must-connect");
-          log_entry (error);
-        }
+        path.push_back (&sc);
+        check_must_connect_impl (*sc.circuit (), *net_a, *net_b, c_org, a_org, b_org, path);
+        path.pop_back ();
       }
+
     }
+
   }
 }
 

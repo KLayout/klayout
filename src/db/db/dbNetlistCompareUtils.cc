@@ -125,9 +125,40 @@ const std::string &extended_net_name (const db::Net *n)
   }
 }
 
+static int net_name_compare (bool case_sensitive, const std::string &n1, const std::string &n2)
+{
+  const char *n1p = n1.c_str ();
+  const char *n2p = n2.c_str ();
+
+  while (*n1p && *n2p) {
+
+    uint32_t c1 = tl::utf32_from_utf8 (n1p);
+    uint32_t c2 = tl::utf32_from_utf8 (n2p);
+
+    if (! case_sensitive) {
+      c1 = tl::utf32_downcase (c1);
+      c2 = tl::utf32_downcase (c2);
+    }
+
+    if (c1 != c2) {
+      return c1 < c2 ? -1 : 1;
+    }
+
+  }
+
+  //  colon terminates net name, such that NET:I is identical to NET.
+  if (*n2p && *n2p != ':') {
+    return -1;
+  } else if (*n1p && *n1p != ':') {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
 int name_compare (const db::Net *a, const db::Net *b)
 {
-  return db::Netlist::name_compare (combined_case_sensitive (a->netlist (), b->netlist ()), extended_net_name (a), extended_net_name (b));
+  return net_name_compare (combined_case_sensitive (a->netlist (), b->netlist ()), extended_net_name (a), extended_net_name (b));
 }
 
 bool net_names_are_different (const db::Net *a, const db::Net *b)

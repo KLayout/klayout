@@ -797,9 +797,9 @@ DeepRegion::and_with (const Region &other, PropertyConstraint property_constrain
 
     return AsIfFlatRegion::and_with (other, property_constraint);
 
-  } else if (other_deep->deep_layer () == deep_layer ()) {
+  } else if (other_deep->deep_layer () == deep_layer () && pc_skip (property_constraint)) {
 
-    return clone ()->remove_properties (pc_remove (property_constraint));
+    return clone ();
 
   } else {
 
@@ -821,7 +821,7 @@ DeepRegion::not_with (const Region &other, PropertyConstraint property_constrain
 
     return AsIfFlatRegion::not_with (other, property_constraint);
 
-  } else if (other_deep->deep_layer () == deep_layer ()) {
+  } else if (other_deep->deep_layer () == deep_layer () && pc_skip (property_constraint)) {
 
     return new DeepRegion (deep_layer ().derived ());
 
@@ -833,10 +833,10 @@ DeepRegion::not_with (const Region &other, PropertyConstraint property_constrain
 }
 
 RegionDelegate *
-DeepRegion::or_with (const Region &other, db::PropertyConstraint /*property_constraint*/) const
+DeepRegion::or_with (const Region &other, db::PropertyConstraint property_constraint) const
 {
   const DeepRegion *other_deep = dynamic_cast <const DeepRegion *> (other.delegate ());
-  if (other_deep && other_deep->deep_layer () == deep_layer ()) {
+  if (other_deep && other_deep->deep_layer () == deep_layer () && pc_skip (property_constraint)) {
     return clone ();
   }
 
@@ -862,9 +862,9 @@ DeepRegion::andnot_with (const Region &other, PropertyConstraint property_constr
 
     return AsIfFlatRegion::andnot_with (other, property_constraint);
 
-  } else if (other_deep->deep_layer () == deep_layer ()) {
+  } else if (other_deep->deep_layer () == deep_layer () && pc_skip (property_constraint)) {
 
-    return std::make_pair (clone ()->remove_properties (pc_remove (property_constraint)), new DeepRegion (deep_layer ().derived ()));
+    return std::make_pair (clone (), new DeepRegion (deep_layer ().derived ()));
 
   } else {
 
@@ -979,7 +979,7 @@ DeepRegion::xor_with (const Region &other, db::PropertyConstraint property_const
 
     return AsIfFlatRegion::xor_with (other, property_constraint);
 
-  } else if (other_deep->deep_layer () == deep_layer ()) {
+  } else if (other_deep->deep_layer () == deep_layer () && pc_skip (property_constraint)) {
 
     return new DeepRegion (deep_layer ().derived ());
 

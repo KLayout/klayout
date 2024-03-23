@@ -100,7 +100,7 @@ size_t count_shapes (db::LayoutToNetlist *l2ndb, db::Net *net)
   size_t n = 0;
 
   const db::Connectivity &conn = l2ndb->connectivity ();
-  for (db::Connectivity::layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
+  for (db::Connectivity::all_layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
     n += count_shapes (l2ndb, net, *layer);
   }
 
@@ -276,7 +276,7 @@ void NetInfoDialog::update_info_text ()
       bool incomplete = false;
 
       const db::Connectivity &conn = mp_l2ndb->connectivity ();
-      for (db::Connectivity::layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
+      for (db::Connectivity::all_layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
 
         std::string l = layer_string (mp_l2ndb.get (), *layer);
 

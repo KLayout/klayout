@@ -39,7 +39,9 @@ namespace l2n_std_format
   DB_PUBLIC std::string LongKeys::layer_key ("layer");
   DB_PUBLIC std::string LongKeys::class_key ("class");
   DB_PUBLIC std::string LongKeys::connect_key ("connect");
+  DB_PUBLIC std::string LongKeys::softconnect_key ("softconnect");
   DB_PUBLIC std::string LongKeys::global_key ("global");
+  DB_PUBLIC std::string LongKeys::softglobal_key ("softglobal");
   DB_PUBLIC std::string LongKeys::circuit_key ("circuit");
   DB_PUBLIC std::string LongKeys::net_key ("net");
   DB_PUBLIC std::string LongKeys::name_key ("name");
@@ -72,7 +74,9 @@ namespace l2n_std_format
   DB_PUBLIC std::string ShortKeys::layer_key ("L");
   DB_PUBLIC std::string ShortKeys::class_key ("K");
   DB_PUBLIC std::string ShortKeys::connect_key ("C");
+  DB_PUBLIC std::string ShortKeys::softconnect_key ("CS");
   DB_PUBLIC std::string ShortKeys::global_key ("G");
+  DB_PUBLIC std::string ShortKeys::softglobal_key ("GS");
   DB_PUBLIC std::string ShortKeys::circuit_key ("X");
   DB_PUBLIC std::string ShortKeys::net_key ("N");
   DB_PUBLIC std::string ShortKeys::name_key ("I");

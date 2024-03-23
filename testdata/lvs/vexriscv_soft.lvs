@@ -1,0 +1,111 @@
+
+source($lvs_test_source)
+
+# will get pretty big:
+# report_lvs($lvs_test_target_lvsdb, true)
+
+target_netlist($lvs_test_target_cir, write_spice(true), "Extracted by KLayout")
+
+schematic("vexriscv_schematic.cir.gz")
+
+deep
+
+# Drawing layers
+
+nwell       = input(1,  0)
+pactive     = input(4,  0)
+nactive     = input(3,  0)
+ntie        = input(5,  0)
+ptie        = input(6,  0)
+
+poly        = input(7,  0)
+cont        = input(10, 0)
+metal1      = input(11, 0)
+via1        = input(14, 0)
+metal2      = input(16, 0)
+via2        = input(18, 0)
+metal3      = input(19, 0)
+via3        = input(21, 0)
+metal4      = input(22, 0)
+via4        = input(25, 0)
+metal5      = input(26, 0)
+
+# Bulk layer for terminal provisioning
+
+bulk        = polygon_layer
+
+# Computed layers
+
+poly_cont   = cont & poly 
+diff_cont   = cont - poly 
+
+pgate       = pactive & poly
+psd         = pactive - pgate
+
+ngate       = nactive & poly
+nsd         = nactive - ngate
+
+# Device extraction
+
+# PMOS transistor device extraction
+extract_devices(mos4("PMOS"), { "SD" => psd, "G" => pgate, "W" => nwell, 
+                                "tS" => psd, "tD" => psd, "tG" => poly, "tW" => nwell })
+
+# NMOS transistor device extraction
+extract_devices(mos4("NMOS"), { "SD" => nsd, "G" => ngate, "W" => bulk, 
+                                "tS" => nsd, "tD" => nsd, "tG" => poly, "tW" => bulk })
+
+# Define connectivity for netlist extraction
+
+# Inter-layer
+soft_connect(diff_cont, psd)
+soft_connect(diff_cont, nsd)
+soft_connect(poly_cont, poly)
+connect(poly_cont, metal1)
+connect(diff_cont, metal1)
+soft_connect(diff_cont, ntie)
+soft_connect(diff_cont, ptie)
+soft_connect(ntie,      nwell)
+connect(metal1,    via1)
+connect(via1,      metal2)
+connect(metal2,    via2)
+connect(via2,      metal3)
+connect(metal3,    via3)
+connect(via3,      metal4)
+connect(metal4,    via4)
+connect(via4,      metal5)
+
+# Global
+soft_connect_global(ptie, "BULK")
+connect_global(bulk, "BULK")
+
+# Implicit
+connect_implicit("VDD")
+connect_implicit("VSS")
+
+# Compare section
+
+same_device_classes("PMOS", "TP")
+same_device_classes("NMOS", "TN")
+
+# Ignore all caps from the schematic
+same_device_classes(nil, "CAP")
+
+# Increase the default complexity from 100 to 200
+# This is required because the clock tree is incorrect and exhibits manifold ambiguities
+# (the netlists are just samples, not necessarily functional).
+# The algorithm needs enough freedom to follow all these branches and different variants.
+max_branch_complexity(200)
+
+schematic.combine_devices
+
+netlist.combine_devices
+
+align 
+
+if ! compare 
+  raise "Netlists don't match"
+else
+  puts "Congratulations! Netlists match."
+end
+

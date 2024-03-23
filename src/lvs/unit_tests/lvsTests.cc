@@ -97,6 +97,12 @@ TEST(2_fullWithAlign)
   run_test (_this, "vexriscv_align.lvs", "vexriscv.cir.gz", "vexriscv.oas.gz");
 }
 
+TEST(3_fullSoft)
+{
+  test_is_long_runner ();
+  run_test (_this, "vexriscv_soft.lvs", "vexriscv.cir.gz", "vexriscv.oas.gz");
+}
+
 TEST(10_private)
 {
   // test_is_long_runner ();

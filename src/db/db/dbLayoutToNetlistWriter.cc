@@ -351,7 +351,7 @@ void std_writer_impl<Keys>::write (bool nested, TokenizedOutput &stream, std::ma
     if (! Keys::is_short ()) {
       stream << endl << "# Mask layers" << endl;
     }
-    for (db::Connectivity::layer_iterator l = mp_l2n->connectivity ().begin_layers (); l != mp_l2n->connectivity ().end_layers (); ++l) {
+    for (db::Connectivity::all_layer_iterator l = mp_l2n->connectivity ().begin_layers (); l != mp_l2n->connectivity ().end_layers (); ++l) {
       TokenizedOutput out (stream, Keys::layer_key);
       out << name_for_layer (mp_l2n, *l);
       db::LayerProperties lp = ly->get_properties (*l);
@@ -364,15 +364,32 @@ void std_writer_impl<Keys>::write (bool nested, TokenizedOutput &stream, std::ma
     if (! Keys::is_short ()) {
       stream << endl << "# Mask layer connectivity" << endl;
     }
-    for (db::Connectivity::layer_iterator l = mp_l2n->connectivity ().begin_layers (); l != mp_l2n->connectivity ().end_layers (); ++l) {
+    for (db::Connectivity::all_layer_iterator l = mp_l2n->connectivity ().begin_layers (); l != mp_l2n->connectivity ().end_layers (); ++l) {
 
       db::Connectivity::layer_iterator ce = mp_l2n->connectivity ().end_connected (*l);
       db::Connectivity::layer_iterator cb = mp_l2n->connectivity ().begin_connected (*l);
       if (cb != ce) {
-        TokenizedOutput out (stream, Keys::connect_key);
-        out << name_for_layer (mp_l2n, *l);
-        for (db::Connectivity::layer_iterator c = mp_l2n->connectivity ().begin_connected (*l); c != ce; ++c) {
-          out << name_for_layer (mp_l2n, *c);
+        bool any_soft = false;
+        {
+          TokenizedOutput out (stream, Keys::connect_key);
+          out << name_for_layer (mp_l2n, *l);
+          for (db::Connectivity::layer_iterator c = mp_l2n->connectivity ().begin_connected (*l); c != ce; ++c) {
+            if (c->second < 0) {
+              any_soft = true;
+            }
+            out << name_for_layer (mp_l2n, c->first);
+          }
+        }
+        //  add soft connections in addition and as overrides to stay backward compatible with older versions
+        //  (these will ignore these statements)
+        if (any_soft) {
+          TokenizedOutput out (stream, Keys::softconnect_key);
+          out << name_for_layer (mp_l2n, *l);
+          for (db::Connectivity::layer_iterator c = mp_l2n->connectivity ().begin_connected (*l); c != ce; ++c) {
+            if (c->second < 0) {
+              out << name_for_layer (mp_l2n, c->first);
+            }
+          }
         }
         m_progress.set (mp_stream->pos ());
       }
@@ -380,7 +397,7 @@ void std_writer_impl<Keys>::write (bool nested, TokenizedOutput &stream, std::ma
     }
 
     any = false;
-    for (db::Connectivity::layer_iterator l = mp_l2n->connectivity ().begin_layers (); l != mp_l2n->connectivity ().end_layers (); ++l) {
+    for (db::Connectivity::all_layer_iterator l = mp_l2n->connectivity ().begin_layers (); l != mp_l2n->connectivity ().end_layers (); ++l) {
 
       db::Connectivity::global_nets_iterator ge = mp_l2n->connectivity ().end_global_connections (*l);
       db::Connectivity::global_nets_iterator gb = mp_l2n->connectivity ().begin_global_connections (*l);
@@ -391,10 +408,27 @@ void std_writer_impl<Keys>::write (bool nested, TokenizedOutput &stream, std::ma
           }
           any = true;
         }
-        TokenizedOutput out (stream, Keys::global_key);
-        out << name_for_layer (mp_l2n, *l);
-        for (db::Connectivity::global_nets_iterator g = gb; g != ge; ++g) {
-          out << tl::to_word_or_quoted_string (mp_l2n->connectivity ().global_net_name (*g));
+        bool any_soft = false;
+        {
+          TokenizedOutput out (stream, Keys::global_key);
+          out << name_for_layer (mp_l2n, *l);
+          for (db::Connectivity::global_nets_iterator g = gb; g != ge; ++g) {
+            if (g->second < 0) {
+              any_soft = true;
+            }
+            out << tl::to_word_or_quoted_string (mp_l2n->connectivity ().global_net_name (g->first));
+          }
+        }
+        //  add soft connections in addition and as overrides to stay backward compatible with older versions
+        //  (these will ignore these statements)
+        if (any_soft) {
+          TokenizedOutput out (stream, Keys::softglobal_key);
+          out << name_for_layer (mp_l2n, *l);
+          for (db::Connectivity::global_nets_iterator g = gb; g != ge; ++g) {
+            if (g->second < 0) {
+              out << tl::to_word_or_quoted_string (mp_l2n->connectivity ().global_net_name (g->first));
+            }
+          }
         }
         m_progress.set (mp_stream->pos ());
       }
@@ -634,7 +668,7 @@ void std_writer_impl<Keys>::write (TokenizedOutput &stream, const db::Net &net, 
 
     reset_geometry_ref ();
 
-    for (db::Connectivity::layer_iterator l = conn.begin_layers (); l != conn.end_layers (); ++l) {
+    for (db::Connectivity::all_layer_iterator l = conn.begin_layers (); l != conn.end_layers (); ++l) {
 
       db::cell_index_type cci = circuit->cell_index ();
       db::cell_index_type prev_ci = cci;
@@ -757,7 +791,7 @@ void std_writer_impl<Keys>::write (TokenizedOutput &stream, const db::DeviceAbst
 
     bool any = false;
 
-    for (db::Connectivity::layer_iterator l = conn.begin_layers (); l != conn.end_layers (); ++l) {
+    for (db::Connectivity::all_layer_iterator l = conn.begin_layers (); l != conn.end_layers (); ++l) {
 
       size_t cid = device_abstract.cluster_id_for_terminal (t->id ());
       if (cid == 0) {

@@ -54,7 +54,7 @@ ResourceHelpProvider::get (lay::HelpSource * /*src*/, const std::string &path) c
   QString qpath = tl::to_qstring (path);
   QResource res (resource_url (qpath));
   if (res.size () == 0) {
-    throw tl::Exception (tl::to_string (QObject::tr ("ERROR: no data found for resource ")) + tl::to_string (res.fileName ()));
+    throw tl::Exception (tl::to_string (QObject::tr ("No data found for resource ")) + tl::to_string (res.fileName ()));
   }
 
   QByteArray data;

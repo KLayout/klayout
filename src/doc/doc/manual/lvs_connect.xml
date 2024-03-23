@@ -10,6 +10,7 @@
   <h2-index/>
 
   <h2>Intra- and inter-layer connections</h2>
+  <keyword name="connect"/>
 
   <p>
   The connectivity setup of a LVS script determines how the connections are made.
@@ -77,6 +78,7 @@ connect(metal2, metal2_labels)</pre>
   </p>
 
   <h2>Global connections</h2>
+  <keyword name="connect_global"/>
 
   <p>
   KLayout supports implicit connections made across all polygons on 
@@ -98,6 +100,7 @@ connect(metal2, metal2_labels)</pre>
   </p>
 
   <h2>Implicit connections</h2>
+  <keyword name="connect_implicit"/>
 
   <p>
   Implicit connections can be useful to supply preliminary connections
@@ -193,6 +196,7 @@ connect(metal2, metal2_labels)</pre>
   </p>
 
   <h2>Explicit connections</h2>
+  <keyword name="connect_explicit"/>
 
   <p>
   Explicit connections can be useful to enforce a connection in the layout 
@@ -278,6 +282,221 @@ connect_explicit("INV", [ "BULK", "VSS" ])
   Again, the "connect_explicit" statements must be given before the netlist is 
   extracted. Typically this happens before or shortly after "connect"
   statements.
+  </p>
+
+  <h2>Soft connections</h2>
+  <keyword name="soft_connect"/>
+  <keyword name="soft_connect_global"/>
+
+  <p>
+  Soft connections are a way to find wiring issues where signals
+  or even power is routed over high-ohmic paths.
+  High-ohmic paths can be established through connections via
+  poly silicon, implant, well or substrate areas. Such areas
+  can easily show resistance values which are a hundred times
+  higher than that of metal connections. We have to make sure 
+  that for routing power or critical signals, connections are
+  not made through such areas, but primarily through metal
+  connections.
+  </p>
+
+  <p>
+  Here is an example:
+  </p>
+
+  <p>
+  <img src="/manual/soft_connections.png"/>
+  </p>
+
+  <p>
+  In this case, we have a standard textbook planar CMOS technology with two PMOS devices 
+  sitting in a n-well. These could be the two PMOS of two inverter pairs for example.
+  Both PMOS need to be connected to VDD at their sources. In addition, the n-well 
+  area also needs to be tied to VDD in order to provide reverse bias for the p+ drain
+  areas and the body potential for the transistors, forming the opposite
+  electrode of the gate capacity.
+  </p>
+
+  <p>Such a technology stack can be described by the following connectivity:</p>
+
+  <pre># Input layers
+
+nwell = ...
+active = ...
+pplus = ...
+nplus = ...
+poly = ...
+contact = ...
+metal1 = ...
+via1 = ...
+metal2 = ...
+
+# computed layers 
+
+(nactive, pactive) = active.and_not(nwell)
+
+# PMOS and NMOS source/drain regions
+psd  = (nactive &amp; pplus) - poly
+nsd  = (pactive &amp; nplus) - poly
+
+# n tie and p tie (nwell and substrate contact)
+ntie = nactive &amp; nplus
+ptie = pactive &amp; pplus
+
+# connections
+
+# nwell connections
+connect(ntie, nwell) 
+connect(contact, ntie) 
+
+# substrate connections
+connect_global(ptie, "BULK")
+connect(contact, ptie)
+
+# device connections
+connect(contact, psd) 
+connect(contact, nsd) 
+connect(contact, poly)
+
+# metal connections
+connect(metal1, contact)
+connect(via1, metal1)
+connect(metal2, via1)
+</pre>
+
+  <p>
+  However, there is an issue:
+  As shown in the picture, the left PMOS source is properly connected to VDD. 
+  The right one however lacks the metal connection to VDD. From the perspective
+  of pure connectivity, this transistor's source is connected to VDD, but only
+  through a weak n-well connection. Such a device will not work - or at least, badly.
+  </p>
+
+  <p>
+  The solution is to introduce soft connections. Soft connections are made
+  by replacing "connect" with "soft_connect" and "connect_global" with "soft_connect_global"
+  (see <a href="/about/drc_ref_global.xml#soft_connect">soft_connect</a> and 
+  <a href="/about/drc_ref_global.xml#soft_connect_global">soft_connect_global</a>).
+  The first layer is the "upper" layer while the second layer is the "lower" layer.
+  The lower layer is the high-ohmic one. In global connections, the global net is 
+  always the high-ohmic one.
+  </p>
+
+  <p>
+  Soft connections can be visualized as directional connections: current can only flow from the
+  upper to the lower layer, but not the other way. So, a real connection is only made,
+  if both upper terminals of the soft connections are connected to the same physical net.
+  </p>
+
+  <p>
+  To solve the n-well issue we have to substitute the n-tie to n-well connection statement
+  by a "soft_connect" statement:
+  </p>
+
+  <pre>soft_connect(ntie, nwell)</pre>
+
+  <p>
+  The above picture now looks like this:
+  </p>
+
+  <p>
+  <img src="/manual/soft_connections2.png"/>
+  </p>
+
+  <p>
+  With this definition, the netlist extractor is able to detect the fault
+  and raise a warning or an error (in top level mode).
+  The warning is shown on the log tab and indicates incomplete wiring plus
+  details about the subnets, separated by the soft connections.
+  </p>
+
+  <p>
+  The complete the setup we also need to include other soft connections,
+  such as connections via substrate (a global soft connect to the BULK net),
+  via source/drain implants, via the tie implants and via poly:
+  </p>
+
+  <pre># Input layers
+
+nwell = ...
+active = ...
+pplus = ...
+nplus = ...
+poly = ...
+contact = ...
+metal1 = ...
+via1 = ...
+metal2 = ...
+
+# computed layers 
+
+(nactive, pactive) = active.and_not(nwell)
+
+# PMOS and NMOS source/drain regions
+psd  = (nactive &amp; pplus) - poly
+nsd  = (pactive &amp; nplus) - poly
+
+# n tie and p tie (nwell and substrate contact)
+ntie = nactive &amp; nplus
+ptie = pactive &amp; pplus
+
+# connections
+
+# nwell connections
+soft_connect(ntie, nwell) 
+soft_connect(contact, ntie) 
+
+# substrate connections
+soft_connect_global(ptie, "BULK")
+soft_connect(contact, ptie)
+
+# device connections
+soft_connect(contact, psd) 
+soft_connect(contact, nsd) 
+soft_connect(contact, poly)
+
+# metal connections
+connect(metal1, contact)
+connect(via1, metal1)
+connect(metal2, via1)
+</pre>
+
+  <p>
+  As this code demonstrates, multiple soft connections can be specified.
+  From the perspective of the check, all soft connections are of the same kind.
+  </p>
+
+  <p>
+  Note, that two opposite soft connections cancel, so this would eventually
+  make a hard connection:
+  </p>
+
+  <pre>soft_connect(a, b)
+soft_connect(b, a)
+</pre>
+
+  <p>
+  <b>NOTE:</b> It is therefore important to observe the direction of soft connections:
+  upper and high-conductive / low-ohmic layer first, and lower and low-conductive / high-ohmic
+  layer second.
+  </p>
+
+  <h3>Soft connections and "must connect" nets</h3>
+
+  <p>
+  Soft connections and must connect nets (aka "connect_explicit" and "connect_implicit")
+  serve the same purpose - to detect incomplete wiring. Typically they are used
+  together, such as doing "connect_implicit" on VDD nets and "connect_explicit" 
+  on VDD and NWELL nets if the schematic circuits do not feature an explicit 
+  NWELL pin.
+  </p>
+
+  <p>
+  Soft connections are checked before connect_explicit and connect_implicit
+  are executed. This means, that soft connection errors cannot be masked by
+  declaring them "must connect". On the other hand, that is not a real issue
+  as both checks would raise an warning or error (in the top-level case).
+  It would only be a different kind of warning.
   </p>
 
 </doc>

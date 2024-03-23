@@ -519,7 +519,7 @@ HelpSource::get_image (const std::string &u)
 {
   QResource res (resource_url (QUrl::fromEncoded (u.c_str ()).path ()));
   if (res.size () == 0) {
-    throw tl::Exception (tl::to_string (QObject::tr ("ERROR: no data found for resource ")) + u);
+    throw tl::Exception (tl::to_string (QObject::tr ("No data found for resource ")) + u);
   }
 
   QByteArray data;
@@ -552,7 +552,7 @@ HelpSource::get_css (const std::string &u)
 
   QResource res (resource_url (QUrl::fromEncoded (u.c_str ()).path ()));
   if (res.size () == 0) {
-    throw tl::Exception (tl::to_string (QObject::tr ("ERROR: no data found for resource ")) + u);
+    throw tl::Exception (tl::to_string (QObject::tr ("No data found for resource ")) + u);
   }
 
   QByteArray data;

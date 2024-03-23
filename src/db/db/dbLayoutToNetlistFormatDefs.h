@@ -66,11 +66,14 @@ namespace db
  *
  *  [connect]:
  *    connect(<layer1> <name> ...)  - connects layer1 with the following layers [short key: C]
+ *    softconnect(<upper> <lower> ...)
+ *                                  - specifies soft connection between lower and upper layer [short key: CS]
  *
  *  [global]:
  *    global(<layer> <net-name> ...)
- *                                  - connects the shapes of the layer with the given global
- *                                    nets [short key: G]
+ *                                  - connects the shapes of the layer with the given global nets [short key: G]
+ *    softglobal(<layer> <net-name> ...)
+ *                                  - soft-connects the shapes of the layer with the given global net [shoft key: GS]
  *
  *  [circuit]:
  *    circuit(<name> [circuit-def]) - circuit (cell) [short key: X]
@@ -222,7 +225,9 @@ namespace l2n_std_format
     static std::string layer_key;
     static std::string class_key;
     static std::string connect_key;
+    static std::string softconnect_key;
     static std::string global_key;
+    static std::string softglobal_key;
     static std::string circuit_key;
     static std::string net_key;
     static std::string name_key;
@@ -261,7 +266,9 @@ namespace l2n_std_format
     static std::string layer_key;
     static std::string class_key;
     static std::string connect_key;
+    static std::string softconnect_key;
     static std::string global_key;
+    static std::string softglobal_key;
     static std::string circuit_key;
     static std::string net_key;
     static std::string name_key;

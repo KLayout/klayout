@@ -433,6 +433,32 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "\n"
     "This variant has been introduced in version 0.27.\n"
   ) +
+  gsi::method ("soft_connect", (void (db::LayoutToNetlist::*) (const db::Region &, const db::Region &)) &db::LayoutToNetlist::soft_connect, gsi::arg ("a"), gsi::arg ("b"),
+    "@brief Defines an inter-layer connection for the given layers in soft mode.\n"
+    "Connects two layers through a soft connection.\n"
+    "Soft connections cannot make connections between two different nets.\n"
+    "These are directional connections where 'b' is the 'lower' layer (typically high-ohmic substrate or diffusion).\n"
+    "\n"
+    "Soft connections have been introduced in version 0.29.\n"
+  ) +
+  gsi::method ("soft_connect", (void (db::LayoutToNetlist::*) (const db::Region &, const db::Texts &)) &db::LayoutToNetlist::soft_connect, gsi::arg ("a"), gsi::arg ("b"),
+    "@brief Defines an inter-layer connection for the given layers in soft mode.\n"
+    "Connects two layers through a soft connection.\n"
+    "Soft connections cannot make connections between two different nets.\n"
+    "These are directional connections where 'b' is the 'lower' layer (typically high-ohmic substrate or diffusion).\n"
+    "As one argument is a (hierarchical) text collection, this method is used to attach net labels to polygons.\n"
+    "\n"
+    "Soft connections have been introduced in version 0.29.\n"
+  ) +
+  gsi::method ("soft_connect", (void (db::LayoutToNetlist::*) (const db::Texts &, const db::Region &)) &db::LayoutToNetlist::soft_connect, gsi::arg ("a"), gsi::arg ("b"),
+    "@brief Defines an inter-layer connection for the given layers in soft mode.\n"
+    "Connects two layers through a soft connection.\n"
+    "Soft connections cannot make connections between two different nets.\n"
+    "These are directional connections where 'b' is the 'lower' layer (typically high-ohmic substrate or diffusion).\n"
+    "As one argument is a (hierarchical) text collection, this method is used to attach net labels to polygons.\n"
+    "\n"
+    "Soft connections have been introduced in version 0.29.\n"
+  ) +
   gsi::method ("connect_global", (size_t (db::LayoutToNetlist::*) (const db::Region &, const std::string &)) &db::LayoutToNetlist::connect_global, gsi::arg ("l"), gsi::arg ("global_net_name"),
     "@brief Defines a connection of the given layer with a global net.\n"
     "This method returns the ID of the global net. Use \\global_net_name to get "
@@ -441,9 +467,25 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   gsi::method ("connect_global", (size_t (db::LayoutToNetlist::*) (const db::Texts &, const std::string &)) &db::LayoutToNetlist::connect_global, gsi::arg ("l"), gsi::arg ("global_net_name"),
     "@brief Defines a connection of the given text layer with a global net.\n"
     "This method returns the ID of the global net. Use \\global_net_name to get "
-    "the name back from the ID."
+    "the name back from the ID.\n"
     "\n"
     "This variant has been introduced in version 0.27.\n"
+  ) +
+  gsi::method ("soft_connect_global", (size_t (db::LayoutToNetlist::*) (const db::Region &, const std::string &)) &db::LayoutToNetlist::soft_connect_global, gsi::arg ("l"), gsi::arg ("global_net_name"),
+    "@brief Defines a connection of the given layer with a global net in soft mode.\n"
+    "This method returns the ID of the global net. Use \\global_net_name to get "
+    "the name back from the ID.\n"
+    "Soft connections are directional, where the global net is the 'lower' layer (typically high-ohmic substrate or diffusion).\n"
+    "\n"
+    "Soft connections have been introduced in version 0.29.\n"
+  ) +
+  gsi::method ("soft_connect_global", (size_t (db::LayoutToNetlist::*) (const db::Texts &, const std::string &)) &db::LayoutToNetlist::soft_connect_global, gsi::arg ("l"), gsi::arg ("global_net_name"),
+    "@brief Defines a connection of the given text layer with a global net in soft mode.\n"
+    "This method returns the ID of the global net. Use \\global_net_name to get "
+    "the name back from the ID.\n"
+    "Soft connections are directional, where the global net is the 'lower' layer (typically high-ohmic substrate or diffusion).\n"
+    "\n"
+    "Soft connections have been introduced in version 0.29.\n"
   ) +
   gsi::method ("global_net_name", &db::LayoutToNetlist::global_net_name, gsi::arg ("global_net_id"),
     "@brief Gets the global net name for the given global net ID."
@@ -463,6 +505,12 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "See \\include_floating_subcircuits= for details.\n"
     "\n"
     "This attribute has been introduced in version 0.27.\n"
+  ) +
+  gsi::method ("make_soft_connection_diodes=", &db::LayoutToNetlist::set_make_soft_connection_diodes, gsi::arg ("flag"),
+    "@hide"
+  ) +
+  gsi::method ("make_soft_connection_diodes", &db::LayoutToNetlist::make_soft_connection_diodes,
+    "@hide"
   ) +
   gsi::method ("top_level_mode=", &db::LayoutToNetlist::set_top_level_mode, gsi::arg ("flag"),
     "@brief Sets a flag indicating whether top level mode is enabled.\n"

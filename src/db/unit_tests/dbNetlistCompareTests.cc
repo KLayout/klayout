@@ -25,6 +25,7 @@
 #include "dbNetlistCompare.h"
 #include "dbNetlistCrossReference.h"
 #include "dbNetlistSpiceReader.h"
+#include "dbNetlistCompareUtils.h"
 
 class NetlistCompareTestLogger
   : public db::NetlistCompareLogger
@@ -435,6 +436,101 @@ TEST(0_EqualDeviceParameters)
   EXPECT_EQ (dc.equal (d2, d1), true);
   EXPECT_EQ (dc.less (d1, d2), false);
   EXPECT_EQ (dc.less (d2, d1), false);
+}
+
+TEST(0_NetNameEquivalence)
+{
+  db::Netlist a, b;
+  a.set_case_sensitive (true);
+  b.set_case_sensitive (false);
+
+  EXPECT_EQ (db::combined_case_sensitive (&a, &b), false);
+
+  b.set_case_sensitive (true);
+  EXPECT_EQ (db::combined_case_sensitive (&a, &b), true);
+
+  a.set_case_sensitive (false);
+  EXPECT_EQ (db::combined_case_sensitive (&a, &b), false);
+
+  db::Circuit *ca = new db::Circuit ();
+  ca->set_name ("C");
+  a.add_circuit (ca);
+
+  db::Circuit *cb = new db::Circuit ();
+  cb->set_name ("C");
+  b.add_circuit (cb);
+
+  db::Net *na = new db::Net ("net1");
+  ca->add_net (na);
+
+  db::Net *nb = new db::Net ("net1");
+  cb->add_net (nb);
+
+  EXPECT_EQ (db::name_compare (na, nb), 0);
+
+  nb->set_name ("NET1");
+  EXPECT_EQ (db::name_compare (na, nb), 0);
+
+  nb->set_name ("NET2");
+  EXPECT_EQ (db::name_compare (na, nb), -1);
+
+  nb->set_name ("NET11");
+  EXPECT_EQ (db::name_compare (na, nb), -1);
+
+  nb->set_name ("net11");
+  EXPECT_EQ (db::name_compare (na, nb), -1);
+
+  nb->set_name ("net0abc");
+  EXPECT_EQ (db::name_compare (na, nb), 1);
+
+  nb->set_name ("NET0");
+  EXPECT_EQ (db::name_compare (na, nb), 1);
+
+  a.set_case_sensitive (true);
+  b.set_case_sensitive (true);
+
+  nb->set_name ("net1");
+  EXPECT_EQ (db::name_compare (na, nb), 0);
+
+  nb->set_name ("net2");
+  EXPECT_EQ (db::name_compare (na, nb), -1);
+
+  nb->set_name ("net11");
+  EXPECT_EQ (db::name_compare (na, nb), -1);
+
+  nb->set_name ("net0");
+  EXPECT_EQ (db::name_compare (na, nb), 1);
+
+  nb->set_name ("NET1");
+  EXPECT_EQ (db::name_compare (na, nb), 1);
+
+  na->set_name ("NET1");
+  nb->set_name ("net1");
+  EXPECT_EQ (db::name_compare (na, nb), -1);
+
+  b.set_case_sensitive (false);
+
+  //  colon terminates the net name, so that NET:I and NET and identical
+
+  na->set_name ("NET1:I");
+  nb->set_name ("net1");
+  EXPECT_EQ (db::name_compare (na, nb), 0);
+
+  na->set_name ("NET1:I");
+  nb->set_name ("net1:O");
+  EXPECT_EQ (db::name_compare (na, nb), -1);
+
+  na->set_name ("NET1");
+  nb->set_name ("net1:O");
+  EXPECT_EQ (db::name_compare (na, nb), 0);
+
+  na->set_name ("NET2");
+  nb->set_name ("net1:O");
+  EXPECT_EQ (db::name_compare (na, nb), 1);
+
+  na->set_name ("NET1");
+  nb->set_name ("net1abc:O");
+  EXPECT_EQ (db::name_compare (na, nb), -1);
 }
 
 TEST(1_SimpleInverter)

@@ -235,6 +235,8 @@ NetlistBrowserPage::NetlistBrowserPage (QWidget * /*parent*/)
   connect (actionExportAll, SIGNAL (triggered ()), this, SLOT (export_all ()));
   connect (actionExportSelected, SIGNAL (triggered ()), this, SLOT (export_selected ()));
 
+  connect (mode_tab, SIGNAL (currentChanged (int)), this, SLOT (mode_tab_changed (int)));
+
   forward->setEnabled (false);
   backward->setEnabled (false);
 }
@@ -328,6 +330,13 @@ NetlistBrowserPage::eventFilter (QObject *watched, QEvent *event)
   } else {
     return false;
   }
+}
+
+void
+NetlistBrowserPage::mode_tab_changed (int)
+{
+  clear_highlights ();
+  dm_update_highlights ();
 }
 
 void
@@ -1072,11 +1081,10 @@ NetlistBrowserPage::set_db (db::LayoutToNetlist *l2ndb)
   mode_tab->setTabEnabled (0, true);
   mode_tab->setTabEnabled (1, is_lvsdb);
   mode_tab->setTabEnabled (2, is_lvsdb);
-  mode_tab->setTabEnabled (3, is_lvsdb);
+  mode_tab->setTabEnabled (3, true);
 #if QT_VERSION >= 0x50F00
   mode_tab->setTabVisible (1, is_lvsdb);
   mode_tab->setTabVisible (2, is_lvsdb);
-  mode_tab->setTabVisible (3, is_lvsdb);
 #endif
 
   if (is_lvsdb) {
@@ -1166,7 +1174,7 @@ NetlistBrowserPage::setup_trees ()
 
   if ((lvsdb && lvsdb->cross_ref ()) || (l2ndb && ! l2ndb->log_entries ().empty ())) {
 
-    NetlistLogModel *new_model = new NetlistLogModel (log_view, lvsdb->cross_ref (), l2ndb);
+    NetlistLogModel *new_model = new NetlistLogModel (log_view, lvsdb ? lvsdb->cross_ref () : 0, l2ndb);
     delete log_view->model ();
     log_view->setModel (new_model);
 
@@ -1421,7 +1429,7 @@ NetlistBrowserPage::adjust_view ()
       size_t cluster_id = net->cluster_id ();
 
       const db::Connectivity &conn = mp_database->connectivity ();
-      for (db::Connectivity::layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
+      for (db::Connectivity::all_layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
 
         db::Box layer_bbox;
         db::recursive_cluster_shape_iterator<db::NetShape> shapes (mp_database->net_clusters (), *layer, cell_index, cluster_id);
@@ -1580,7 +1588,7 @@ NetlistBrowserPage::produce_highlights_for_net (const db::Net *net, size_t &n_ma
   tl::Color fallback_color = make_valid_color (m_colorizer.marker_color ());
 
   const db::Connectivity &conn = mp_database->connectivity ();
-  for (db::Connectivity::layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
+  for (db::Connectivity::all_layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
 
     db::LayerProperties lp = layout->get_properties (*layer);
     std::map<db::LayerProperties, lay::LayerPropertiesConstIterator>::const_iterator display = display_by_lp.find (lp);

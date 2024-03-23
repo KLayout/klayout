@@ -134,7 +134,7 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset>
+            <iconset resource="../../icons/icons.qrc">
              <normaloff>:/run_16px.png</normaloff>:/run_16px.png</iconset>
            </property>
            <property name="shortcut">
@@ -575,6 +575,9 @@
            <widget class="QTreeView" name="log_view">
             <property name="contextMenuPolicy">
              <enum>Qt::ActionsContextMenu</enum>
+            </property>
+            <property name="selectionMode">
+             <enum>QAbstractItemView::ExtendedSelection</enum>
             </property>
             <property name="headerHidden">
              <bool>true</bool>

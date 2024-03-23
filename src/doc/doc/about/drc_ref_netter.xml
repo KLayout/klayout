@@ -434,6 +434,49 @@ layout analysis. Hence, all <a href="#connect">connect</a>, <a href="#connect_gl
 calls must have been made before this method is used. Further <a href="#connect">connect</a>
 statements will clear the netlist and re-extract it again.
 </p>
+<a name="soft_connect"/><h2>"soft_connect" - Specifies a soft connection between two layers</h2>
+<keyword name="soft_connect"/>
+<p>Usage:</p>
+<ul>
+<li><tt>soft_connect(a, b)</tt></li>
+</ul>
+<p>
+a and b must be polygon or text layers. After calling this function, the
+Netter considers shapes from layer a and b connected in "soft mode".
+Typically, b is a high-ohmic layer such as diffusion, implant for substate
+material, also called the "lower" layer. 
+</p><p>
+A soft connection between shapes from layer a and b forms a directional 
+connection like an ideal diode: current can flow down, but now up 
+(not meant in the physical sense, this is a concept). 
+</p><p>
+Hence, two nets are disconnected, if they both connect to the same lower layer, 
+but do not have a connection between them. 
+</p><p>
+The netlist extractor will use this scheme to identify nets that are 
+connected only via such a high-ohmic region. Such a case is typically
+bad for the functionality of a device and reported as an error.
+Once, the check has been made and no error is found, soft-connected
+nets are joined the same way than hard connections are made.
+</p><p>
+Beside this, soft connections follow the same rules than hard connections
+(see <a href="#connect">connect</a>).
+</p>
+<a name="soft_connect_global"/><h2>"soft_connect_global" - Soft-connects a layer with a global net</h2>
+<keyword name="soft_connect_global"/>
+<p>Usage:</p>
+<ul>
+<li><tt>soft-connect_global(l, name)</tt></li>
+</ul>
+<p>
+Connects the shapes from the given layer l to a global net with the given name
+in "soft mode".
+</p><p>
+See <a href="#connect_global">connect_global</a> for details about the concepts of global nets.
+See <a href="#soft_connect">soft_connect</a> for details about the concept of soft connections.
+In global net soft connections, the global net (typically a substrate)
+is always the "lower" layer.
+</p>
 <a name="top_level"/><h2>"top_level" - Specifies top level mode</h2>
 <keyword name="top_level"/>
 <p>Usage:</p>

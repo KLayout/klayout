@@ -101,6 +101,11 @@ static void dump_nets_to_layout (const db::Netlist &nl, const db::hier_clusters<
           for (db::Net::const_terminal_iterator t = n->begin_terminals (); t != n->end_terminals (); ++t) {
 
             const db::NetTerminalRef &tref = *t;
+
+            if (! tref.device ()->device_abstract ()) {
+              continue;
+            }
+
             db::cell_index_type dci = tref.device ()->device_abstract ()->cell_index ();
             db::DCplxTrans dtr = tref.device ()->trans ();
 
@@ -120,6 +125,10 @@ static void dump_nets_to_layout (const db::Netlist &nl, const db::hier_clusters<
     }
 
     for (db::Circuit::const_device_iterator d = c->begin_devices (); d != c->end_devices (); ++d) {
+
+      if (! d->device_abstract ()) {
+        continue;
+      }
 
       std::vector<db::cell_index_type> original_device_cells;
 
@@ -3172,6 +3181,334 @@ TEST(14_JoinNets)
   std::string au = tl::testdata ();
   au = tl::combine_path (au, "algo");
   au = tl::combine_path (au, "device_extract_au1_join_nets.gds");
+
+  db::compare_layouts (_this, ly, au);
+}
+
+static
+void annotate_soft_connections (db::Netlist &netlist, const db::hier_clusters<db::NetShape> &net_clusters)
+{
+  db::DeviceClassDiode *soft_diode = new db::DeviceClassDiode ();
+  soft_diode->set_name ("SOFT");
+  netlist.add_device_class (soft_diode);
+
+  for (auto c = netlist.begin_bottom_up (); c != netlist.end_bottom_up (); ++c) {
+
+    auto clusters = net_clusters.clusters_per_cell (c->cell_index ());
+
+    for (auto n = c->begin_nets (); n != c->end_nets (); ++n) {
+
+      auto soft_connections = clusters.upward_soft_connections (n->cluster_id ());
+      for (auto sc = soft_connections.begin (); sc != soft_connections.end (); ++sc) {
+
+        db::Device *sc_device = new db::Device (soft_diode);
+        c->add_device (sc_device);
+
+        auto nn = c->net_by_cluster_id (*sc);
+        if (nn) {
+          sc_device->connect_terminal (db::DeviceClassDiode::terminal_id_C, n.operator-> ());
+          sc_device->connect_terminal (db::DeviceClassDiode::terminal_id_A, nn);
+        }
+
+      }
+
+    }
+
+  }
+}
+
+TEST(15_SoftConnections)
+{
+  db::Layout ly;
+  db::LayerMap lmap;
+
+  unsigned int nwell      = define_layer (ly, lmap, 1);
+  unsigned int diff       = define_layer (ly, lmap, 2);
+  unsigned int pplus      = define_layer (ly, lmap, 3);
+  unsigned int nplus      = define_layer (ly, lmap, 4);
+  unsigned int poly       = define_layer (ly, lmap, 5);
+  unsigned int contact    = define_layer (ly, lmap, 8);
+  unsigned int metal1     = define_layer (ly, lmap, 9);
+  unsigned int via1       = define_layer (ly, lmap, 10);
+  unsigned int metal2     = define_layer (ly, lmap, 11);
+
+  {
+    db::LoadLayoutOptions options;
+    options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
+    options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
+
+    std::string fn (tl::testdata ());
+    fn = tl::combine_path (fn, "algo");
+    fn = tl::combine_path (fn, "soft_connections.gds");
+
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly, options);
+  }
+
+  db::Cell &tc = ly.cell (*ly.begin_top_down ());
+
+  db::DeepShapeStore dss;
+  dss.set_text_enlargement (1);
+  dss.set_text_property_name (tl::Variant ("LABEL"));
+
+  //  original layers
+  db::Region rnwell (db::RecursiveShapeIterator (ly, tc, nwell), dss);
+  db::Region rdiff (db::RecursiveShapeIterator (ly, tc, diff), dss);
+  db::Region rpplus (db::RecursiveShapeIterator (ly, tc, pplus), dss);
+  db::Region rnplus (db::RecursiveShapeIterator (ly, tc, nplus), dss);
+  db::Region rpoly (db::RecursiveShapeIterator (ly, tc, poly), dss);
+  db::Region rcontact (db::RecursiveShapeIterator (ly, tc, contact), dss);
+  db::Region rmetal1 (db::RecursiveShapeIterator (ly, tc, metal1), dss);
+  db::Region rvia1 (db::RecursiveShapeIterator (ly, tc, via1), dss);
+  db::Region rmetal2 (db::RecursiveShapeIterator (ly, tc, metal2), dss);
+
+  //  derived regions
+
+  db::Region rdiff_in_nwell = rdiff & rnwell;
+  db::Region rpdiff      = rdiff_in_nwell - rnplus;
+  db::Region rntie       = rdiff_in_nwell & rnplus;
+  db::Region rpgate      = rpdiff & rpoly;
+  db::Region rpsd        = rpdiff - rpgate;
+
+  db::Region rdiff_outside_nwell = rdiff - rnwell;
+  db::Region rndiff      = rdiff_outside_nwell - rpplus;
+  db::Region rptie       = rdiff_outside_nwell & rpplus;
+  db::Region rngate      = rndiff & rpoly;
+  db::Region rnsd        = rndiff - rngate;
+
+  //  Global
+
+  db::Region bulk (dss);
+
+  //  return the computed layers into the original layout and write it for debugging purposes
+
+  unsigned int lpgate = ly.insert_layer (db::LayerProperties (10, 0));      // 10/0 -> Gate (p)
+  unsigned int lngate = ly.insert_layer (db::LayerProperties (11, 0));      // 11/0 -> Gate (n)
+  unsigned int lpsd   = ly.insert_layer (db::LayerProperties (12, 0));      // 12/0 -> Source/Drain (p)
+  unsigned int lnsd   = ly.insert_layer (db::LayerProperties (13, 0));      // 13/0 -> Source/Drain (n)
+  unsigned int lpdiff = ly.insert_layer (db::LayerProperties (14, 0));      // 14/0 -> P Diffusion
+  unsigned int lndiff = ly.insert_layer (db::LayerProperties (15, 0));      // 15/0 -> N Diffusion
+  unsigned int lptie  = ly.insert_layer (db::LayerProperties (16, 0));      // 16/0 -> P Tie
+  unsigned int lntie  = ly.insert_layer (db::LayerProperties (17, 0));      // 17/0 -> N Tie
+
+  rpgate.insert_into (&ly, tc.cell_index (), lpgate);
+  rngate.insert_into (&ly, tc.cell_index (), lngate);
+  rpsd.insert_into (&ly, tc.cell_index (), lpsd);
+  rnsd.insert_into (&ly, tc.cell_index (), lnsd);
+  rpdiff.insert_into (&ly, tc.cell_index (), lpdiff);
+  rndiff.insert_into (&ly, tc.cell_index (), lndiff);
+  rptie.insert_into (&ly, tc.cell_index (), lptie);
+  rntie.insert_into (&ly, tc.cell_index (), lntie);
+
+  //  perform the extraction
+
+  db::Netlist nl;
+  db::hier_clusters<db::NetShape> cl;
+
+  db::NetlistDeviceExtractorMOS4Transistor pmos_ex ("PMOS");
+  db::NetlistDeviceExtractorMOS4Transistor nmos_ex ("NMOS");
+
+  db::NetlistDeviceExtractor::input_layers dl;
+
+  dl["SD"] = &rpsd;
+  dl["G"] = &rpgate;
+  dl["W"] = &rnwell;
+  dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
+  pmos_ex.extract (dss, 0, dl, nl, cl);
+
+  dl["SD"] = &rnsd;
+  dl["G"] = &rngate;
+  dl["W"] = &bulk;
+  dl["P"] = &rpoly;  //  not needed for extraction but to return terminal shapes
+  nmos_ex.extract (dss, 0, dl, nl, cl);
+
+  //  perform the net extraction
+
+  db::NetlistExtractor net_ex;
+
+  db::Connectivity conn;
+
+  //  Global nets
+  conn.connect_global (bulk, "BULK");
+  conn.soft_connect_global (rptie, "BULK");
+
+  //  Intra-layer
+  conn.connect (rpsd);
+  conn.connect (rnsd);
+  conn.connect (rptie);
+  conn.connect (rntie);
+  conn.connect (rnwell);
+  conn.connect (rpoly);
+  conn.connect (rcontact);
+  conn.connect (rmetal1);
+  conn.connect (rvia1);
+  conn.connect (rmetal2);
+  //  Inter-layer
+  conn.soft_connect (rcontact, rpsd);
+  conn.soft_connect (rcontact, rnsd);
+  conn.soft_connect (rntie, rnwell);
+  conn.soft_connect (rcontact, rptie);
+  conn.soft_connect (rcontact, rntie);
+  conn.soft_connect (rcontact, rpoly);
+  conn.connect (rcontact, rmetal1);
+  conn.connect (rvia1, rmetal1);
+  conn.connect (rvia1, rmetal2);
+
+  //  extract the nets
+  std::list<std::set<std::string> > jn;
+
+  jn.push_back (std::set<std::string> ());
+  jn.back ().insert ("BULK");
+  jn.back ().insert ("VSS");
+
+  jn.push_back (std::set<std::string> ());
+  jn.back ().insert ("NWELL");
+  jn.back ().insert ("VDD");
+
+  net_ex.set_joined_nets ("INV2", jn);
+
+  std::list<tl::GlobPattern> gp;
+  gp.push_back (tl::GlobPattern ("NEXT"));
+  gp.push_back (tl::GlobPattern ("FB"));
+  net_ex.set_joined_net_names (gp);
+
+  net_ex.extract_nets (dss, 0, conn, nl, cl);
+
+  annotate_soft_connections (nl, cl);
+
+  EXPECT_EQ (all_net_names_unique (nl), true);
+
+  //  debug layers produced for nets
+  std::map<unsigned int, unsigned int> dump_map;
+  dump_map [layer_of (bulk)      ] = ly.insert_layer (db::LayerProperties (200, 0));
+  dump_map [layer_of (rnwell)    ] = ly.insert_layer (db::LayerProperties (201, 0));
+  dump_map [layer_of (rpsd)      ] = ly.insert_layer (db::LayerProperties (202, 0));
+  dump_map [layer_of (rnsd)      ] = ly.insert_layer (db::LayerProperties (203, 0));
+  dump_map [layer_of (rpoly)     ] = ly.insert_layer (db::LayerProperties (204, 0));
+  dump_map [layer_of (rcontact)  ] = ly.insert_layer (db::LayerProperties (205, 0));
+  dump_map [layer_of (rmetal1)   ] = ly.insert_layer (db::LayerProperties (206, 0));
+  dump_map [layer_of (rvia1)     ] = ly.insert_layer (db::LayerProperties (207, 0));
+  dump_map [layer_of (rmetal2)   ] = ly.insert_layer (db::LayerProperties (208, 0));
+
+  //  write nets to layout
+  db::CellMapping cm = dss.cell_mapping_to_original (0, &ly, tc.cell_index ());
+  dump_nets_to_layout (nl, cl, ly, dump_map, cm, true);
+
+  //  compare netlist as string
+  CHECKPOINT ();
+  db::compare_netlist (_this, nl,
+    "circuit RINGO ();\n"
+    "  subcircuit ND2X1 $1 (NWELL=$4,B=FB,A=ENABLE,VDD=VDD,OUT=$5,VSS=VSS,BULK=BULK);\n"
+    "  subcircuit INVX1 $2 (NWELL=$4,IN=$14,VDD=VDD,OUT=FB,VSS=VSS,BULK=BULK);\n"
+    "  subcircuit INVX1 $3 (NWELL=$4,IN=FB,VDD=$I17,OUT=OUT,VSS=$I27,BULK=BULK);\n"
+    "  subcircuit TIE $4 (NWELL=$4,VSS=$I27,VDD=$I17,BULK=BULK);\n"
+    "  subcircuit EMPTY $5 ($1=$4,$2=$I27,$3=$I17);\n"
+    "  subcircuit TIE $6 (NWELL=$4,VSS=VSS,VDD=VDD,BULK=BULK);\n"
+    "  subcircuit INVX1 $7 (NWELL=$4,IN=$5,VDD=VDD,OUT=$6,VSS=VSS,BULK=BULK);\n"
+    "  subcircuit EMPTY $8 ($1=$4,$2=VSS,$3=VDD);\n"
+    "  subcircuit INVX1 $9 (NWELL=$4,IN=$6,VDD=VDD,OUT=$7,VSS=VSS,BULK=BULK);\n"
+    "  subcircuit INVX1 $10 (NWELL=$4,IN=$7,VDD=VDD,OUT=$8,VSS=VSS,BULK=BULK);\n"
+    "  subcircuit INVX1 $11 (NWELL=$4,IN=$8,VDD=VDD,OUT=$9,VSS=VSS,BULK=BULK);\n"
+    "  subcircuit INVX1 $12 (NWELL=$4,IN=$9,VDD=VDD,OUT=$10,VSS=VSS,BULK=BULK);\n"
+    "  subcircuit INVX1 $13 (NWELL=$4,IN=$10,VDD=VDD,OUT=$11,VSS=VSS,BULK=BULK);\n"
+    "  subcircuit INVX1 $14 (NWELL=$4,IN=$11,VDD=VDD,OUT=$12,VSS=VSS,BULK=BULK);\n"
+    "  subcircuit INVX1 $15 (NWELL=$4,IN=$12,VDD=VDD,OUT=$15,VSS=VSS,BULK=BULK);\n"
+    "  subcircuit INVX1 $16 (NWELL=$4,IN=$15,VDD=VDD,OUT=$14,VSS=VSS,BULK=BULK);\n"
+    "end;\n"
+    "circuit ND2X1 (NWELL=NWELL,B=B,A=A,VDD=VDD,OUT=OUT,VSS=VSS,BULK=BULK);\n"
+    "  device PMOS $1 (S=$7,G=$4,D=$9,B=NWELL) (L=0.25,W=1.5,AS=0.6375,AD=0.3375,PS=3.85,PD=1.95);\n"
+    "  device PMOS $2 (S=$9,G=$2,D=$6,B=NWELL) (L=0.25,W=1.5,AS=0.3375,AD=0.6375,PS=1.95,PD=3.85);\n"
+    "  device NMOS $3 (S=$13,G=$4,D=$14,B=BULK) (L=0.25,W=0.95,AS=0.40375,AD=0.21375,PS=2.75,PD=1.4);\n"
+    "  device NMOS $4 (S=$14,G=$2,D=$11,B=BULK) (L=0.25,W=0.95,AS=0.21375,AD=0.40375,PS=1.4,PD=2.75);\n"
+    "  device SOFT $5 (A=B,C=$2) (A=0,P=0);\n"
+    "  device SOFT $6 (A=A,C=$4) (A=0,P=0);\n"
+    "  device SOFT $7 (A=OUT,C=$6) (A=0,P=0);\n"
+    "  device SOFT $8 (A=OUT,C=$7) (A=0,P=0);\n"
+    "  device SOFT $9 (A=VDD,C=$9) (A=0,P=0);\n"
+    "  device SOFT $10 (A=OUT,C=$11) (A=0,P=0);\n"
+    "  device SOFT $11 (A=VSS,C=$13) (A=0,P=0);\n"
+    "end;\n"
+    "circuit TIE (NWELL=NWELL,VSS=VSS,VDD=VDD,BULK=BULK);\n"
+    "  device SOFT $1 (A=$2,C=NWELL) (A=0,P=0);\n"
+    "  device SOFT $2 (A=VDD,C=$2) (A=0,P=0);\n"
+    "  device SOFT $3 (A=VSS,C=$3) (A=0,P=0);\n"
+    "  device SOFT $4 (A=$3,C=BULK) (A=0,P=0);\n"
+    "end;\n"
+    "circuit EMPTY ($1=$1,$2=$2,$3=$3);\n"
+    "end;\n"
+    "circuit INVX1 (NWELL=NWELL,IN=IN,VDD=VDD,OUT=OUT,VSS=VSS,BULK=BULK);\n"
+    "  device PMOS $1 (S=$5,G=$2,D=$7,B=NWELL) (L=0.25,W=1.5,AS=0.6375,AD=0.6375,PS=3.85,PD=3.85);\n"
+    "  device NMOS $2 (S=$10,G=$2,D=$8,B=BULK) (L=0.25,W=0.95,AS=0.40375,AD=0.40375,PS=2.75,PD=2.75);\n"
+    "  device SOFT $3 (A=IN,C=$2) (A=0,P=0);\n"
+    "  device SOFT $4 (A=VDD,C=$5) (A=0,P=0);\n"
+    "  device SOFT $5 (A=OUT,C=$7) (A=0,P=0);\n"
+    "  device SOFT $6 (A=OUT,C=$8) (A=0,P=0);\n"
+    "  device SOFT $7 (A=VSS,C=$10) (A=0,P=0);\n"
+    "end;\n"
+  );
+
+  // doesn't do anything here, but we test that this does not destroy anything:
+  nl.combine_devices ();
+
+  //  make pins for named nets of top-level circuits - this way they are not purged
+  nl.make_top_level_pins ();
+  nl.purge ();
+
+  //  compare netlist as string
+  CHECKPOINT ();
+  db::compare_netlist (_this, nl,
+    "circuit RINGO (FB=FB,ENABLE=ENABLE,OUT=OUT,VDD=VDD,VSS=VSS,BULK=BULK);\n"
+    "  subcircuit ND2X1 $1 (NWELL=$4,B=FB,A=ENABLE,VDD=VDD,OUT=$5,VSS=VSS,BULK=BULK);\n"
+    "  subcircuit INVX1 $2 (NWELL=$4,IN=$14,VDD=VDD,OUT=FB,VSS=VSS,BULK=BULK);\n"
+    "  subcircuit INVX1 $3 (NWELL=$4,IN=FB,VDD=$I17,OUT=OUT,VSS=$I27,BULK=BULK);\n"
+    "  subcircuit TIE $4 (NWELL=$4,VSS=$I27,VDD=$I17,BULK=BULK);\n"
+    "  subcircuit TIE $5 (NWELL=$4,VSS=VSS,VDD=VDD,BULK=BULK);\n"
+    "  subcircuit INVX1 $6 (NWELL=$4,IN=$5,VDD=VDD,OUT=$6,VSS=VSS,BULK=BULK);\n"
+    "  subcircuit INVX1 $7 (NWELL=$4,IN=$6,VDD=VDD,OUT=$7,VSS=VSS,BULK=BULK);\n"
+    "  subcircuit INVX1 $8 (NWELL=$4,IN=$7,VDD=VDD,OUT=$8,VSS=VSS,BULK=BULK);\n"
+    "  subcircuit INVX1 $9 (NWELL=$4,IN=$8,VDD=VDD,OUT=$9,VSS=VSS,BULK=BULK);\n"
+    "  subcircuit INVX1 $10 (NWELL=$4,IN=$9,VDD=VDD,OUT=$10,VSS=VSS,BULK=BULK);\n"
+    "  subcircuit INVX1 $11 (NWELL=$4,IN=$10,VDD=VDD,OUT=$11,VSS=VSS,BULK=BULK);\n"
+    "  subcircuit INVX1 $12 (NWELL=$4,IN=$11,VDD=VDD,OUT=$12,VSS=VSS,BULK=BULK);\n"
+    "  subcircuit INVX1 $13 (NWELL=$4,IN=$12,VDD=VDD,OUT=$15,VSS=VSS,BULK=BULK);\n"
+    "  subcircuit INVX1 $14 (NWELL=$4,IN=$15,VDD=VDD,OUT=$14,VSS=VSS,BULK=BULK);\n"
+    "end;\n"
+    "circuit ND2X1 (NWELL=NWELL,B=B,A=A,VDD=VDD,OUT=OUT,VSS=VSS,BULK=BULK);\n"
+    "  device PMOS $1 (S=$7,G=$4,D=$9,B=NWELL) (L=0.25,W=1.5,AS=0.6375,AD=0.3375,PS=3.85,PD=1.95);\n"
+    "  device PMOS $2 (S=$9,G=$2,D=$6,B=NWELL) (L=0.25,W=1.5,AS=0.3375,AD=0.6375,PS=1.95,PD=3.85);\n"
+    "  device NMOS $3 (S=$13,G=$4,D=$14,B=BULK) (L=0.25,W=0.95,AS=0.40375,AD=0.21375,PS=2.75,PD=1.4);\n"
+    "  device NMOS $4 (S=$14,G=$2,D=$11,B=BULK) (L=0.25,W=0.95,AS=0.21375,AD=0.40375,PS=1.4,PD=2.75);\n"
+    "  device SOFT $5 (A=B,C=$2) (A=0,P=0);\n"
+    "  device SOFT $6 (A=A,C=$4) (A=0,P=0);\n"
+    "  device SOFT $7 (A=OUT,C=$6) (A=0,P=0);\n"
+    "  device SOFT $8 (A=OUT,C=$7) (A=0,P=0);\n"
+    "  device SOFT $9 (A=VDD,C=$9) (A=0,P=0);\n"
+    "  device SOFT $10 (A=OUT,C=$11) (A=0,P=0);\n"
+    "  device SOFT $11 (A=VSS,C=$13) (A=0,P=0);\n"
+    "end;\n"
+    "circuit TIE (NWELL=NWELL,VSS=VSS,VDD=VDD,BULK=BULK);\n"
+    "  device SOFT $1 (A=$2,C=NWELL) (A=0,P=0);\n"
+    "  device SOFT $2 (A=VDD,C=$2) (A=0,P=0);\n"
+    "  device SOFT $3 (A=VSS,C=$3) (A=0,P=0);\n"
+    "  device SOFT $4 (A=$3,C=BULK) (A=0,P=0);\n"
+    "end;\n"
+    "circuit INVX1 (NWELL=NWELL,IN=IN,VDD=VDD,OUT=OUT,VSS=VSS,BULK=BULK);\n"
+    "  device PMOS $1 (S=$5,G=$2,D=$7,B=NWELL) (L=0.25,W=1.5,AS=0.6375,AD=0.6375,PS=3.85,PD=3.85);\n"
+    "  device NMOS $2 (S=$10,G=$2,D=$8,B=BULK) (L=0.25,W=0.95,AS=0.40375,AD=0.40375,PS=2.75,PD=2.75);\n"
+    "  device SOFT $3 (A=IN,C=$2) (A=0,P=0);\n"
+    "  device SOFT $4 (A=VDD,C=$5) (A=0,P=0);\n"
+    "  device SOFT $5 (A=OUT,C=$7) (A=0,P=0);\n"
+    "  device SOFT $6 (A=OUT,C=$8) (A=0,P=0);\n"
+    "  device SOFT $7 (A=VSS,C=$10) (A=0,P=0);\n"
+    "end;\n"
+  );
+
+  //  compare the collected test data
+
+  std::string au = tl::testdata ();
+  au = tl::combine_path (au, "algo");
+  au = tl::combine_path (au, "soft_connections_au.gds");
 
   db::compare_layouts (_this, ly, au);
 }

@@ -126,20 +126,6 @@ void Netlist::set_case_sensitive (bool f)
   m_case_sensitive = f;
 }
 
-int Netlist::name_compare (bool case_sensitive, const std::string &n1, const std::string &n2)
-{
-  //  TODO: unicode support?
-  if (case_sensitive) {
-    return strcmp (n1.c_str (), n2.c_str ());
-  } else {
-#if defined(_WIN32)
-    return _stricmp (n1.c_str (), n2.c_str ());
-#else
-    return strcasecmp (n1.c_str (), n2.c_str ());
-#endif
-  }
-}
-
 std::string Netlist::normalize_name (bool case_sensitive, const std::string &n)
 {
   if (case_sensitive) {

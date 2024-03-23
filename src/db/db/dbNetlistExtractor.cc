@@ -288,7 +288,9 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
 
       const db::local_cluster<db::NetShape> &lc = clusters.cluster_by_id (*c);
       const connected_clusters_type::connections_type &cc = clusters.connections_for_cluster (*c);
-      if (cc.empty () && lc.empty ()) {
+      const std::set<size_t> &sc_up = clusters.upward_soft_connections (*c);
+      const std::set<size_t> &sc_down = clusters.downward_soft_connections (*c);
+      if (cc.empty () && sc_up.empty () && sc_down.empty () && lc.empty ()) {
         //  this is an entirely empty cluster so we skip it.
         //  Such clusters are left over when joining clusters.
         continue;

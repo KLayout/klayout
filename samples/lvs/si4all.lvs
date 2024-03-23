@@ -1,0 +1,128 @@
+
+# Hierarchical mode
+deep
+# Print details
+verbose
+
+# Output generation (dialog only)
+report_lvs
+
+# Enable this to produce a L2N database
+# report_netlist("extracted.l2n")
+
+# True to write the extracted netlist
+if false
+
+  # true: use net names instead of numbers
+  # false: use numbers for nets
+  spice_with_net_names = true
+  # true: put in comments with details
+  # false: no comments
+  spice_with_comments = false
+
+  # Extracted netlist
+  target_netlist(File.join(File.dirname(File.absolute_path(source.path || ".")), source.cell_name + "_extracted.cir"), write_spice(spice_with_net_names, spice_with_comments),  "Extracted by KLayout on : #{Time.now.strftime("%d/%m/%Y %H:%M")}")
+
+end
+
+# Specify the schematic netlist
+# (looks for a file called <cell name>.cir where <cell name>
+# is the current cell name). The file is looked up relative to
+# the layout file name.
+schematic(File.join(File.dirname(File.absolute_path(source.path || ".")), source.cell_name + ".cir"))
+
+# layers definitions
+########################
+nwell     = input(1, 0)
+diff      = input(2, 0)
+pplus     = input(3, 0)
+nplus     = input(4, 0)
+poly      = input(5, 0)
+thickox   = input(6, 0)
+polyres   = input(7, 0)
+contact   = input(8, 0)
+metal1    = input(9, 0)
+via       = input(10, 0)
+metal2    = input(11, 0)
+pad       = input(12, 0)
+border    = input(13, 0)
+
+# Special layer for bulk terminals
+
+bulk        = make_layer
+
+# Computed layers
+
+diff_in_nwell = diff & nwell
+pdiff       = diff_in_nwell - nplus
+ntie        = diff_in_nwell & nplus
+pgate       = pdiff & poly
+psd         = pdiff - pgate
+hv_pgate    = pgate & thickox
+lv_pgate    = pgate - hv_pgate
+hv_psd      = psd & thickox
+lv_psd      = psd - thickox
+
+diff_outside_nwell = diff - nwell
+ndiff      = diff_outside_nwell - pplus
+ptie       = diff_outside_nwell & pplus
+ngate      = ndiff & poly
+nsd        = ndiff - ngate
+hv_ngate   = ngate & thickox
+lv_ngate   = ngate - hv_ngate
+hv_nsd     = nsd & thickox
+lv_nsd     = nsd - thickox
+
+# PMOS transistor device extraction
+
+hvpmos_ex = RBA::DeviceExtractorMOS4Transistor::new("HVPMOS")
+extract_devices(hvpmos_ex, { "SD" => psd, "G" => hv_pgate, "P" => poly, "W" => nwell })
+
+lvpmos_ex = RBA::DeviceExtractorMOS4Transistor::new("LVPMOS")
+extract_devices(lvpmos_ex, { "SD" => psd, "G" => lv_pgate, "P" => poly, "W" => nwell })
+
+# NMOS transistor device extraction
+
+lvnmos_ex = RBA::DeviceExtractorMOS4Transistor::new("LVNMOS")
+extract_devices(lvnmos_ex, { "SD" => nsd, "G" => lv_ngate, "P" => poly, "W" => bulk })
+
+hvnmos_ex = RBA::DeviceExtractorMOS4Transistor::new("HVNMOS")
+extract_devices(hvnmos_ex, { "SD" => nsd, "G" => hv_ngate, "P" => poly, "W" => bulk })
+
+# Define connectivity for netlist extraction
+
+# Inter-layer
+connect(contact, ntie)
+connect(contact, ptie)
+connect(nwell,   ntie)
+connect(psd,     contact)
+connect(nsd,     contact)
+connect(poly,    contact)
+connect(contact, metal1)
+connect(metal1,  via)
+connect(via,     metal2)
+
+# Make "must-connect" connections between NWELL and VDD and BULK and VSS
+connect_explicit(["NWELL", "VDD"])
+connect_explicit(["BULK", "VSS"])
+
+# Global connections
+connect_global(ptie, "BULK")
+connect_global(bulk, "BULK")
+
+# Actually performs the extraction
+netlist
+
+# Flatten cells which are present in one netlist only
+align
+
+# Simplication of the netlist
+netlist.simplify
+
+# LVS compare
+if compare
+  puts "Congratulations! Netlists match."
+else
+  puts "LVS ERROR: netlists do not match!"
+end
+

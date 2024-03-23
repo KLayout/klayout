@@ -161,22 +161,33 @@ std::string
 LogEntryData::to_string (bool with_geometry) const
 {
   std::string res;
+  const std::string &msg = message ();
 
-  if (m_category_name != 0) {
-    if (m_category_description == 0) {
-      res += "[" + category_name () + "] ";
-    } else {
-      res += "[" + category_description () + "] ";
+  //  a message that starts with a tab is a continuation or detail entry
+  if (! msg.empty () && msg [0] == '\t') {
+
+    res = "   ";
+    res += std::string (msg, 1);
+
+  } else {
+
+    if (m_category_name != 0) {
+      if (m_category_description == 0) {
+        res += "[" + category_name () + "] ";
+      } else {
+        res += "[" + category_description () + "] ";
+      }
     }
-  }
 
-  if (m_cell_name != 0) {
-    res += tl::to_string (tr ("In cell "));
-    res += cell_name ();
-    res += ": ";
-  }
+    if (m_cell_name != 0) {
+      res += tl::to_string (tr ("In cell "));
+      res += cell_name ();
+      res += ": ";
+    }
 
-  res += message ();
+    res += msg;
+
+  }
 
   if (with_geometry && ! m_geometry.box ().empty ()) {
     res += tl::to_string (tr (", shape: ")) + m_geometry.to_string ();

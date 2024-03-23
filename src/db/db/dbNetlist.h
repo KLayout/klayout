@@ -516,11 +516,6 @@ public:
   void combine_devices ();
 
   /**
-   *  @brief Compares two names with the given case sensitivity
-   */
-  static int name_compare (bool case_sensitive, const std::string &n1, const std::string &n2);
-
-  /**
    *  @brief Normalizes a name with the given case sensitivity
    */
   static std::string normalize_name (bool case_sensitive, const std::string &n);

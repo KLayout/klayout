@@ -60,9 +60,11 @@ class DeepLayer;
 class DB_PUBLIC Connectivity
 {
 public:
-  typedef std::set<unsigned int> layers_type;
+  typedef std::set<unsigned int> all_layers_type;
+  typedef all_layers_type::const_iterator all_layer_iterator;
+  typedef std::map<unsigned int, int> layers_type;
   typedef layers_type::const_iterator layer_iterator;
-  typedef std::set<size_t> global_nets_type;
+  typedef std::map<unsigned int, int> global_nets_type;
   typedef global_nets_type::const_iterator global_nets_iterator;
 
   /**
@@ -102,9 +104,24 @@ public:
   void connect (unsigned int la, unsigned int lb);
 
   /**
+   *  @brief Adds inter-layer connectivity of the soft type
+   *
+   *  Soft connections are directed and are reported during "interacts"
+   *  by the "soft" output argument. "la" is the "upper" layer and "lb" is the lower layer.
+   */
+  void soft_connect (unsigned int la, unsigned int lb);
+
+  /**
    *  @brief Adds a connection to a global net
    */
   size_t connect_global (unsigned int l, const std::string &gn);
+
+  /**
+   *  @brief Adds a soft connection to a global net
+   *
+   *  The global net is always the "lower" layer.
+   */
+  size_t soft_connect_global (unsigned int l, const std::string &gn);
 
   /**
    *  @brief Adds intra-layer connectivity for layer l
@@ -121,9 +138,26 @@ public:
   void connect (const db::DeepLayer &la, const db::DeepLayer &lb);
 
   /**
+   *  @brief Adds inter-layer connectivity
+   *  This is a convenience method that takes a db::DeepLayer object.
+   *  It is assumed that all those layers originate from the same deep shape store.
+   *
+   *  Soft connections are directed and are reported during "interacts"
+   *  by the "soft" output argument. "la" is the "upper" layer and "lb" is the lower layer.
+   */
+  void soft_connect (const db::DeepLayer &la, const db::DeepLayer &lb);
+
+  /**
    *  @brief Adds a connection to a global net
    */
   size_t connect_global (const db::DeepLayer &la, const std::string &gn);
+
+  /**
+   *  @brief Adds a soft connection to a global net
+   *
+   *  The global net is always the "lower" layer.
+   */
+  size_t soft_connect_global (const db::DeepLayer &la, const std::string &gn);
 
   /**
    *  @brief Gets the global net name per ID
@@ -143,15 +177,19 @@ public:
   /**
    *  @brief Begin iterator for the layers involved
    */
-  layer_iterator begin_layers () const;
+  all_layer_iterator begin_layers () const;
 
   /**
    *  @brief End iterator for the layers involved
    */
-  layer_iterator end_layers () const;
+  all_layer_iterator end_layers () const;
 
   /**
    *  @brief Begin iterator for the layers connected to a specific layer
+   *
+   *  The iterator returned is over a map of target layers and soft mode
+   *  (an int, being 0 for a hard connection, +1 for an upward soft connection
+   *  and -1 for a downward soft connection).
    */
   layer_iterator begin_connected (unsigned int layer) const;
 
@@ -162,6 +200,10 @@ public:
 
   /**
    *  @brief Begin iterator for the global connections for a specific layer
+   *
+   *  The iterator returned is over a map of global net ID and soft mode
+   *  (an int, being 0 for a hard connection, +1 for an upward soft connection
+   *  and -1 for a downward soft connection).
    */
   global_nets_iterator begin_global_connections (unsigned int layer) const;
 
@@ -175,17 +217,21 @@ public:
    *
    *  This method accepts a transformation. This transformation is applied
    *  to the b shape before checking against a.
+   *
+   *  The "soft" output argument will deliver the soft mode that applies
+   *  to the connection - 0: hard connection, -1: a is the lower layer, +1: a is
+   *  the upper layer.
    */
   template <class T, class Trans>
-  bool interacts (const T &a, unsigned int la, const T &b, unsigned int lb, const Trans &trans) const;
+  bool interacts (const T &a, unsigned int la, const T &b, unsigned int lb, const Trans &trans, int &soft) const;
 
   /**
    *  @brief Returns true, if the given shapes on the given layers interact
    */
   template <class T>
-  bool interacts (const T &a, unsigned int la, const T &b, unsigned int lb) const
+  bool interacts (const T &a, unsigned int la, const T &b, unsigned int lb, int &soft) const
   {
-    return interacts (a, la, b, lb, UnitTrans ());
+    return interacts (a, la, b, lb, UnitTrans (), soft);
   }
 
   /**
@@ -195,17 +241,21 @@ public:
 
   /**
    *  @brief Returns true, if two cells basically (without considering transformation) interact
+   *
+   *  This is a pretty basic check based on the cell's bounding boxes
    */
   bool interact (const db::Cell &a, const db::Cell &b) const;
 
   /**
    *  @brief Returns true, if two cells with the given transformations interact
+   *
+   *  This is a pretty basic check based on the cell's bounding boxes
    */
   template <class T>
   bool interact (const db::Cell &a, const T &ta, const db::Cell &b, const T &tb) const;
 
 private:
-  layers_type m_all_layers;
+  all_layers_type m_all_layers;
   std::map<unsigned int, layers_type> m_connected;
   std::vector<std::string> m_global_net_names;
   std::map<unsigned int, global_nets_type> m_global_connections;
@@ -277,7 +327,7 @@ public:
    *  "trans" is the transformation which is applied to the other cluster before
    *  the test.
    */
-  bool interacts (const local_cluster<T> &other, const db::ICplxTrans &trans, const Connectivity &conn) const;
+  bool interacts (const local_cluster<T> &other, const db::ICplxTrans &trans, const Connectivity &conn, int &soft) const;
 
   /**
    *  @brief Tests whether this cluster interacts with the given cell
@@ -288,7 +338,7 @@ public:
   bool interacts (const db::Cell &cell, const db::ICplxTrans &trans, const Connectivity &conn) const;
 
   /**
-   *  @brief Gets the bounding box of this cluster
+   *  @brief Gets the bounding box ofF this cluster
    */
   const box_type &bbox () const
   {
@@ -573,6 +623,21 @@ public:
   }
 
   /**
+   *  @brief Makes a soft connection between clusters a and b (a: upper, b: lower)
+   */
+  void make_soft_connection (typename local_cluster<T>::id_type a, typename local_cluster<T>::id_type b);
+
+  /**
+   *  @brief Get the downward soft connections for a given cluster
+   */
+  const std::set<size_t> &downward_soft_connections (typename local_cluster<T>::id_type id) const;
+
+  /**
+   *  @brief Get the upward soft connections for a given cluster
+   */
+  const std::set<size_t> &upward_soft_connections (typename local_cluster<T>::id_type id) const;
+
+  /**
    *  @brief Gets the number of clusters
    */
   size_t size () const
@@ -592,8 +657,11 @@ private:
   box_type m_bbox;
   tree_type m_clusters;
   size_t m_next_dummy_id;
+  std::map<size_t, std::set<size_t> > m_soft_connections;
+  std::map<size_t, std::set<size_t> > m_soft_connections_rev;
 
   void apply_attr_equivalences (const tl::equivalence_clusters<size_t> &attr_equivalence);
+  void remove_soft_connections_for (typename local_cluster<T>::id_type id);
 };
 
 /**
@@ -794,7 +862,61 @@ private:
   size_t m_id;
 };
 
-typedef std::list<std::pair<ClusterInstance, ClusterInstance> > cluster_instance_pair_list_type;
+struct ClusterInstancePair
+{
+  ClusterInstancePair (const ClusterInstance &_a, const ClusterInstance &_b, int _soft)
+    : a (_a), b (_b), soft (_soft)
+  { }
+
+  bool operator== (const ClusterInstancePair &other) const
+  {
+    return a == other.a && b == other.b && soft == other.soft;
+  }
+
+  bool operator< (const ClusterInstancePair &other) const
+  {
+    if (!(a == other.a)) {
+      return a < other.a;
+    }
+    if (!(b == other.b)) {
+      return b < other.b;
+    }
+    return soft < other.soft;
+  }
+
+  ClusterInstance a, b;
+  int soft;
+};
+
+typedef std::list<ClusterInstancePair> cluster_instance_pair_list_type;
+
+struct ClusterIDPair
+{
+  typedef size_t id_type;
+
+  ClusterIDPair (id_type _a, id_type _b, int _soft)
+    : a (_a), b (_b), soft (_soft)
+  { }
+
+  bool operator== (const ClusterIDPair &other) const
+  {
+    return a == other.a && b == other.b && soft == other.soft;
+  }
+
+  bool operator< (const ClusterIDPair &other) const
+  {
+    if (!(a == other.a)) {
+      return a < other.a;
+    }
+    if (!(b == other.b)) {
+      return b < other.b;
+    }
+    return soft < other.soft;
+  }
+
+  id_type a, b;
+  int soft;
+};
 
 inline bool equal_array_delegates (const db::ArrayBase *a, const db::ArrayBase *b)
 {
@@ -1106,7 +1228,7 @@ public:
    *  The "with_id" cluster is removed. All connections of "with_id" are transferred to the
    *  first one. All shapes of "with_id" are transferred to "id".
    */
-  void join_cluster_with(typename local_cluster<T>::id_type id, typename local_cluster<T>::id_type with_id);
+  void join_cluster_with (typename local_cluster<T>::id_type id, typename local_cluster<T>::id_type with_id);
 
   /**
    *  @brief An iterator delivering all clusters (even the connectors)

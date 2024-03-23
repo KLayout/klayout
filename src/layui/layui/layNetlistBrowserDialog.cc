@@ -306,7 +306,7 @@ NetlistBrowserDialog::probe_net (const db::DPoint &p, bool trace_path)
       std::vector<db::Region *> regions;
 
       const db::Connectivity &conn = l2ndb->connectivity ();
-      for (db::Connectivity::layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
+      for (db::Connectivity::all_layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
         db::LayerProperties lp = l2ndb->internal_layout ()->get_properties (*layer);
         if (! lp.is_null ()) {
           db::Region *region = l2ndb->layer_by_index (*layer);

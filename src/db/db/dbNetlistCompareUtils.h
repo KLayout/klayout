@@ -92,30 +92,30 @@ std::string nets2string (const std::pair<const db::Net *, const db::Net *> &np);
 /**
  *  @brief Derives the common case sensitivity for two netlists
  */
-bool combined_case_sensitive (const db::Netlist *a, const db::Netlist *b);
+DB_PUBLIC bool combined_case_sensitive (const db::Netlist *a, const db::Netlist *b);
 
 /**
  *  @brief Gets the extended net name
  *  This name is used for comparing the net names and also employs the pin name if one is given
  */
-const std::string &extended_net_name (const db::Net *n);
+DB_PUBLIC const std::string &extended_net_name (const db::Net *n);
 
 /**
  *  @brief Compare two nets by name
  */
-int name_compare (const db::Net *a, const db::Net *b);
+DB_PUBLIC int name_compare (const db::Net *a, const db::Net *b);
 
 /**
  *  @brief Returns a value indicating whether two nets are different by name
  *  Two unnamed nets are never different.
  */
-bool net_names_are_different (const db::Net *a, const db::Net *b);
+DB_PUBLIC bool net_names_are_different (const db::Net *a, const db::Net *b);
 
 /**
  *  @brief Returns a value indicating whether two nets are equal by name
  *  Two unnamed nets are never equal.
  */
-bool net_names_are_equal (const db::Net *a, const db::Net *b);
+DB_PUBLIC bool net_names_are_equal (const db::Net *a, const db::Net *b);
 
 // --------------------------------------------------------------------------------------------------------------------
 //  DeviceCompare definition and implementation

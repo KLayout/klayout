@@ -1838,6 +1838,36 @@ is equivalent to "layer.smoothed" (see <a href="/about/drc_ref_layer.xml#smoothe
 argument, "smoothed" represents the polygon smoother on primary shapes within
 <a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_global.xml#smoothed">smoothed</a> for more details).
 </p>
+<a name="soft_connect"/><h2>"soft_connect" - Specifies a soft connection between two layers</h2>
+<keyword name="soft_connect"/>
+<p>Usage:</p>
+<ul>
+<li><tt>soft_connect(a, b)</tt></li>
+</ul>
+<p>
+A "soft connection" is made between two layers and
+is a directional connection (like an ideal diode).
+Soft connections allow detecting if nets are connected
+via a high-ohmic substrate or diffusion layer (the
+"lower" layer).
+"b" is the "lower" and "a" the upper layer.
+</p><p>
+See <a href="/about/drc_ref_netter.xml#connect">Netter#connect</a> for a more detailed description of that function.
+</p>
+<a name="soft_connect_global"/><h2>"soft_connect_global" - Specifies a soft connection to a global net</h2>
+<keyword name="soft_connect_global"/>
+<p>Usage:</p>
+<ul>
+<li><tt>soft_connect_global(l, name)</tt></li>
+</ul>
+<p>
+Like <a href="#soft_connect">soft_connect</a>, a soft connection is made between 
+a layer and a global net (e.g. substrate). The global net
+is always the "lower" net of the soft connection.
+</p><p>
+See <a href="/about/drc_ref_netter.xml#soft_connect_global">Netter#soft_connect_global</a> for a more detailed 
+description of that function.
+</p>
 <a name="source"/><h2>"source" - Specifies a source layout</h2>
 <keyword name="source"/>
 <p>Usage:</p>

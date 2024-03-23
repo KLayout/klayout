@@ -24,6 +24,7 @@
 
 #include <QDialog>
 #include <QApplication>
+#include <QCloseEvent>
 
 #include "layBrowser.h"
 #include "layLayoutViewBase.h"
@@ -81,7 +82,7 @@ Browser::closeEvent (QCloseEvent *event)
   if (active ()) {
     m_active = false;
     deactivated ();
-    QDialog::closeEvent (event);
+    event->accept ();
   }
 }
 

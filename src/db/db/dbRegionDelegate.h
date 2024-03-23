@@ -211,7 +211,7 @@ public:
   virtual RegionDelegate *scaled_and_snapped_in_place (db::Coord gx, db::Coord mx, db::Coord dx, db::Coord gy, db::Coord my, db::Coord dy) = 0;
   virtual RegionDelegate *scaled_and_snapped (db::Coord gx, db::Coord mx, db::Coord dx, db::Coord gy, db::Coord my, db::Coord dy) = 0;
 
-  virtual EdgesDelegate *edges (const EdgeFilterBase *filter) const = 0;
+  virtual EdgesDelegate *edges (const EdgeFilterBase *filter, const db::PolygonToEdgeProcessorBase *proc) const = 0;
   virtual RegionDelegate *filter_in_place (const PolygonFilterBase &filter) = 0;
   virtual RegionDelegate *filtered (const PolygonFilterBase &filter) const = 0;
   virtual RegionDelegate *process_in_place (const PolygonProcessorBase &filter) = 0;

@@ -293,12 +293,15 @@ class DB_PUBLIC PolygonToEdgeProcessor
   : public db::PolygonToEdgeProcessorBase
 {
 public:
-  PolygonToEdgeProcessor ()
-  {
-    //  .. nothing yet ..
-  }
+  enum EdgeMode { All = 0, Convex, Concave, StepIn, StepOut, Step,
+                           NotConvex, NotConcave, NotStepIn, NotStepOut, NotStep };
+
+  PolygonToEdgeProcessor (EdgeMode mode = All);
 
   void process (const db::Polygon &poly, std::vector<db::Edge> &result) const;
+
+private:
+  EdgeMode m_mode;
 };
 
 /**

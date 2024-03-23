@@ -656,14 +656,14 @@ static std::vector<db::Edges> split_outside_with_region (const db::Edges *r, con
   return as_2edges_vector (r->selected_outside_differential (other));
 }
 
-static std::vector<db::Edges> split_interacting_with_edges (const db::Edges *r, const db::Edges &other)
+static std::vector<db::Edges> split_interacting_with_edges (const db::Edges *r, const db::Edges &other, size_t min_count, size_t max_count)
 {
-  return as_2edges_vector (r->selected_interacting_differential (other));
+  return as_2edges_vector (r->selected_interacting_differential (other, min_count, max_count));
 }
 
-static std::vector<db::Edges> split_interacting_with_region (const db::Edges *r, const db::Region &other)
+static std::vector<db::Edges> split_interacting_with_region (const db::Edges *r, const db::Region &other, size_t min_count, size_t max_count)
 {
-  return as_2edges_vector (r->selected_interacting_differential (other));
+  return as_2edges_vector (r->selected_interacting_differential (other, min_count, max_count));
 }
 
 
@@ -1233,61 +1233,107 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "\n"
     "The 'join_with' alias has been introduced in version 0.28.12."
   ) +
-  method ("interacting", (db::Edges (db::Edges::*) (const db::Edges &) const)  &db::Edges::selected_interacting, gsi::arg ("other"),
+  method ("interacting", (db::Edges (db::Edges::*) (const db::Edges &, size_t, size_t) const)  &db::Edges::selected_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Returns the edges of this edge collection which overlap or touch edges from the other edge collection\n"
     "\n"
     "@return A new edge collection containing the edges overlapping or touching edges from the other edge collection\n"
+    "\n"
+    "'min_count' and 'max_count' impose a constraint on the number of times an edge of this collection "
+    "has to interact with (different) edges of the other collection to make the edge selected. An edge is "
+    "selected by this method if the number of edges interacting with an edge of this collection is between min_count and max_count "
+    "(including max_count).\n"
+    "\n"
+    "'min_count' and 'max_count' have been introduced in version 0.29."
   ) + 
-  method ("not_interacting", (db::Edges (db::Edges::*) (const db::Edges &) const)  &db::Edges::selected_not_interacting, gsi::arg ("other"),
+  method ("not_interacting", (db::Edges (db::Edges::*) (const db::Edges &, size_t, size_t) const)  &db::Edges::selected_not_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Returns the edges of this edge collection which do not overlap or touch edges from the other edge collection\n"
     "\n"
     "@return A new edge collection containing the edges not overlapping or touching edges from the other edge collection\n"
-  ) + 
-  method ("select_interacting", (db::Edges &(db::Edges::*) (const db::Edges &)) &db::Edges::select_interacting, gsi::arg ("other"),
+    "\n"
+    "'min_count' and 'max_count' impose a constraint on the number of times an edge of this collection "
+    "has to interact with (different) edges of the other collection to make the edge selected. An edge is "
+    "not selected by this method if the number of edges interacting with an edge of this collection is between min_count and max_count "
+    "(including max_count).\n"
+    "\n"
+    "'min_count' and 'max_count' have been introduced in version 0.29."
+  ) +
+  method ("select_interacting", (db::Edges &(db::Edges::*) (const db::Edges &, size_t, size_t)) &db::Edges::select_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Selects the edges from this edge collection which overlap or touch edges from the other edge collection\n"
     "\n"
     "@return The edge collection after the edges have been selected (self)\n"
-  ) + 
-  method ("select_not_interacting", (db::Edges &(db::Edges::*) (const db::Edges &)) &db::Edges::select_not_interacting, gsi::arg ("other"),
+    "\n"
+    "This is the in-place version of \\interacting - i.e. self is modified rather than a new collection is returned.\n"
+    "\n"
+    "'min_count' and 'max_count' have been introduced in version 0.29."
+  ) +
+  method ("select_not_interacting", (db::Edges &(db::Edges::*) (const db::Edges &, size_t, size_t)) &db::Edges::select_not_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Selects the edges from this edge collection which do not overlap or touch edges from the other edge collection\n"
     "\n"
     "@return The edge collection after the edges have been selected (self)\n"
-  ) + 
-  method_ext ("split_interacting", &split_interacting_with_edges, gsi::arg ("other"),
+    "\n"
+    "This is the in-place version of \\not_interacting - i.e. self is modified rather than a new collection is returned.\n"
+    "\n"
+    "'min_count' and 'max_count' have been introduced in version 0.29."
+  ) +
+  method_ext ("split_interacting", &split_interacting_with_edges, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Selects the edges from this edge collection which do and do not interact with edges from the other collection\n"
     "\n"
     "@return A two-element list of edge collections (first: interacting, second: non-interacting)\n"
     "\n"
     "This method provides a faster way to compute both interacting and non-interacting edges compared to using separate methods. "
-    "It has been introduced in version 0.28."
+    "It has been introduced in version 0.28.\n"
+    "'min_count' and 'max_count' have been introduced in version 0.29."
   ) +
-  method ("interacting", (db::Edges (db::Edges::*) (const db::Region &) const)  &db::Edges::selected_interacting, gsi::arg ("other"),
+  method ("interacting", (db::Edges (db::Edges::*) (const db::Region &, size_t, size_t) const)  &db::Edges::selected_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Returns the edges from this edge collection which overlap or touch polygons from the region\n"
     "\n"
     "@return A new edge collection containing the edges overlapping or touching polygons from the region\n"
-  ) + 
-  method ("not_interacting", (db::Edges (db::Edges::*) (const db::Region &) const)  &db::Edges::selected_not_interacting, gsi::arg ("other"),
+    "\n"
+    "'min_count' and 'max_count' impose a constraint on the number of times an edge of this collection "
+    "has to interact with (different) polygons of the other region to make the edge selected. An edge is "
+    "selected by this method if the number of polygons interacting with an edge of this collection is between min_count and max_count "
+    "(including max_count).\n"
+    "\n"
+    "'min_count' and 'max_count' have been introduced in version 0.29."
+  ) +
+  method ("not_interacting", (db::Edges (db::Edges::*) (const db::Region &, size_t, size_t) const)  &db::Edges::selected_not_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Returns the edges from this edge collection which do not overlap or touch polygons from the region\n"
     "\n"
     "@return A new edge collection containing the edges not overlapping or touching polygons from the region\n"
-  ) + 
-  method ("select_interacting", (db::Edges &(db::Edges::*) (const db::Region &)) &db::Edges::select_interacting, gsi::arg ("other"),
+    "\n"
+    "'min_count' and 'max_count' impose a constraint on the number of times an edge of this collection "
+    "has to interact with (different) polygons of the other region to make the edge selected. An edge is "
+    "not selected by this method if the number of polygons interacting with an edge of this collection is between min_count and max_count "
+    "(including max_count).\n"
+    "\n"
+    "'min_count' and 'max_count' have been introduced in version 0.29."
+  ) +
+  method ("select_interacting", (db::Edges &(db::Edges::*) (const db::Region &, size_t, size_t)) &db::Edges::select_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Selects the edges from this edge collection which overlap or touch polygons from the region\n"
     "\n"
     "@return The edge collection after the edges have been selected (self)\n"
-  ) + 
-  method ("select_not_interacting", (db::Edges &(db::Edges::*) (const db::Region &)) &db::Edges::select_not_interacting, gsi::arg ("other"),
+    "\n"
+    "This is the in-place version of \\interacting - i.e. self is modified rather than a new collection is returned.\n"
+    "\n"
+    "'min_count' and 'max_count' have been introduced in version 0.29."
+  ) +
+  method ("select_not_interacting", (db::Edges &(db::Edges::*) (const db::Region &, size_t, size_t)) &db::Edges::select_not_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Selects the edges from this edge collection which do not overlap or touch polygons from the region\n"
     "\n"
     "@return The edge collection after the edges have been selected (self)\n"
-  ) + 
-  method_ext ("split_interacting", &split_interacting_with_region, gsi::arg ("other"),
+    "\n"
+    "This is the in-place version of \\not_interacting - i.e. self is modified rather than a new collection is returned.\n"
+    "\n"
+    "'min_count' and 'max_count' have been introduced in version 0.29."
+  ) +
+  method_ext ("split_interacting", &split_interacting_with_region, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Selects the edges from this edge collection which do and do not interact with polygons from the other region\n"
     "\n"
     "@return A two-element list of edge collections (first: interacting, second: non-interacting)\n"
     "\n"
     "This method provides a faster way to compute both interacting and non-interacting edges compared to using separate methods. "
-    "It has been introduced in version 0.28."
+    "It has been introduced in version 0.28.\n"
+    "'min_count' and 'max_count' have been introduced in version 0.29."
   ) +
   method ("inside", (db::Edges (db::Edges::*) (const db::Edges &) const) &db::Edges::selected_inside, gsi::arg ("other"),
     "@brief Returns the edges of this edge collection which are inside (completely covered by) edges from the other edge collection\n"

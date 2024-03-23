@@ -1002,6 +1002,18 @@ size_dvm (db::Region *region, const db::Vector &dv, unsigned int mode)
   return *region;
 }
 
+static db::Edges
+edges (const db::Region *region, db::PolygonToEdgeProcessor::EdgeMode mode)
+{
+  if (mode != db::PolygonToEdgeProcessor::All) {
+    db::PolygonToEdgeProcessor proc (mode);
+    return region->edges (proc);
+  } else {
+    //  this version is more efficient in the hierarchical case
+    return region->edges ();
+  }
+}
+
 static std::vector<std::vector<double> >
 rasterize2 (const db::Region *region, const db::Point &origin, const db::Vector &pixel_distance, const db::Vector &pixel_size, unsigned int nx, unsigned int ny)
 {
@@ -2493,15 +2505,20 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "If the region is not merged, this method may return false even\n"
     "if the merged region would be a box.\n"
   ) +
-  method ("edges", (db::Edges (db::Region::*) () const) &db::Region::edges,
+  method_ext ("edges", &edges, gsi::arg ("mode", db::PolygonToEdgeProcessor::All, "All"),
     "@brief Returns an edge collection representing all edges of the polygons in this region\n"
     "This method will decompose the polygons into the individual edges. Edges making up the hulls "
     "of the polygons are oriented clockwise while edges making up the holes are oriented counterclockwise.\n"
     "\n"
+    "The 'mode' parameter allows selecting specific edges, such as convex or concave ones. By default, "
+    "all edges are selected.\n"
+    "\n"
     "The edge collection returned can be manipulated in various ways. See \\Edges for a description of the "
-    "possibilities of the edge collection.\n"
+    "features of the edge collection.\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
+    "\n"
+    "The mode argument has been added in version 0.29."
   ) +
   factory_ext ("decompose_convex", &decompose_convex<db::Shapes>, gsi::arg ("preferred_orientation", po_any (), "\\Polygon#PO_any"),
     "@brief Decomposes the region into convex pieces.\n"
@@ -2924,7 +2941,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "The 'shielded' and 'negative' options have been introduced in version 0.27. "
     "'property_constraint' has been added in version 0.28.4.\n"
-    "'zero_distance_mode' has been added in version 0.29."
+    "'zero_distance_mode' has been added in version 0.28.16."
   ) +
   method_ext ("space_check", &space2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoRectFilter, "NoRectFilter"), gsi::arg ("negative", false), gsi::arg ("property_constraint", db::IgnoreProperties, "IgnoreProperties"), gsi::arg ("zero_distance_mode", db::IncludeZeroDistanceWhenTouching, "IncludeZeroDistanceWhenTouching"),
     "@brief Performs a space check with options\n"
@@ -3577,6 +3594,48 @@ gsi::Enum<db::metrics_type> decl_Metrics ("db", "Metrics",
 gsi::ClassExt<db::Region> inject_Metrics_in_Region (decl_Metrics.defs ());
 gsi::ClassExt<db::Edges> inject_Metrics_in_Edges (decl_Metrics.defs ());
 
+gsi::Enum<db::PolygonToEdgeProcessor::EdgeMode> decl_EdgeMode ("db", "EdgeMode",
+  gsi::enum_const ("All", db::PolygonToEdgeProcessor::All,
+    "@brief Selects all edges\n"
+  ) +
+  gsi::enum_const ("Concave", db::PolygonToEdgeProcessor::Concave,
+    "@brief Selects only concave edges\n"
+  ) +
+  gsi::enum_const ("NotConcave", db::PolygonToEdgeProcessor::NotConcave,
+    "@brief Selects only edges which are not concave\n"
+  ) +
+  gsi::enum_const ("Convex", db::PolygonToEdgeProcessor::Convex,
+    "@brief Selects only convex edges\n"
+  ) +
+  gsi::enum_const ("NotConvex", db::PolygonToEdgeProcessor::NotConvex,
+    "@brief Selects only edges which are not convex\n"
+  ) +
+  gsi::enum_const ("Step", db::PolygonToEdgeProcessor::Step,
+    "@brief Selects only step edges leading inside or outside\n"
+  ) +
+  gsi::enum_const ("NotStep", db::PolygonToEdgeProcessor::NotStep,
+    "@brief Selects only edges which are not steps\n"
+  ) +
+  gsi::enum_const ("StepIn", db::PolygonToEdgeProcessor::StepIn,
+    "@brief Selects only step edges leading inside\n"
+  ) +
+  gsi::enum_const ("NotStepIn", db::PolygonToEdgeProcessor::NotStepIn,
+    "@brief Selects only edges which are not steps leading inside\n"
+  ) +
+  gsi::enum_const ("StepOut", db::PolygonToEdgeProcessor::StepOut,
+    "@brief Selects only step edges leading outside\n"
+  ) +
+  gsi::enum_const ("NotStepOut", db::PolygonToEdgeProcessor::NotStepOut,
+    "@brief Selects only edges which are not steps leading outside\n"
+  ),
+  "@brief This class represents the edge mode type for \\Region#edges.\n"
+  "\n"
+  "This enum has been introduced in version 0.29."
+);
+
+//  Inject the Region::EdgeMode declarations into Region:
+gsi::ClassExt<db::Region> inject_EdgeMode_in_Region (decl_EdgeMode.defs ());
+
 gsi::Enum<db::zero_distance_mode> decl_ZeroDistanceMode ("db", "ZeroDistanceMode",
   gsi::enum_const ("NeverIncludeZeroDistance", db::NeverIncludeZeroDistance,
     "@brief Specifies that check functions should never include edges with zero distance.\n"
@@ -3590,7 +3649,7 @@ gsi::Enum<db::zero_distance_mode> decl_ZeroDistanceMode ("db", "ZeroDistanceMode
   gsi::enum_const ("IncludeZeroDistanceWhenTouching", db::IncludeZeroDistanceWhenTouching,
     "@brief Specifies that check functions should include edges when they touch\n"
     "With this specification, the check functions will also check edges if they share at least one common point. "
-    "This is the mode that includes checking the 'kissing corner' cases. This mode is default for version 0.29 and later. "
+    "This is the mode that includes checking the 'kissing corner' cases. This mode is default for version 0.28.16 and later. "
   ) +
   gsi::enum_const ("IncludeZeroDistanceWhenCollinearAndTouching", db::IncludeZeroDistanceWhenCollinearAndTouching,
     "@brief Specifies that check functions should include edges when they are collinear and touch\n"
@@ -3609,7 +3668,7 @@ gsi::Enum<db::zero_distance_mode> decl_ZeroDistanceMode ("db", "ZeroDistanceMode
   "if they share at least one common point (\\IncludeZeroDistanceWhenTouching). The latter mode allows activating checks for "
   "the 'kissing corner' case and is the default mode in most checks."
   "\n"
-  "This enum has been introduced in version 0.29."
+  "This enum has been introduced in version 0.28.16."
 );
 
 //  Inject the Region::ZeroDistanceMode declarations into Region and Edges:

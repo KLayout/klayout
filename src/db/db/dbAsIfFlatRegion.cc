@@ -143,7 +143,7 @@ AsIfFlatRegion::to_string (size_t nmax) const
 }
 
 EdgesDelegate *
-AsIfFlatRegion::edges (const EdgeFilterBase *filter) const
+AsIfFlatRegion::edges (const EdgeFilterBase *filter, const PolygonToEdgeProcessorBase *proc) const
 {
   std::unique_ptr<FlatEdges> result (new FlatEdges ());
   db::PropertyMapper pm (result->properties_repository (), properties_repository ());
@@ -154,17 +154,41 @@ AsIfFlatRegion::edges (const EdgeFilterBase *filter) const
   }
   result->reserve (n);
 
+  std::vector<db::Edge> heap;
+
   for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
+
     db::properties_id_type prop_id = p.prop_id ();
-    for (db::Polygon::polygon_edge_iterator e = p->begin_edge (); ! e.at_end (); ++e) {
-      if (! filter || filter->selected (*e)) {
-        if (prop_id != 0) {
-          result->insert (db::EdgeWithProperties (*e, pm (prop_id)));
-        } else {
-          result->insert (*e);
+
+    if (proc) {
+
+      heap.clear ();
+      proc->process (*p, heap);
+
+      for (auto e = heap.begin (); e != heap.end (); ++e) {
+        if (! filter || filter->selected (*e)) {
+          if (prop_id != 0) {
+            result->insert (db::EdgeWithProperties (*e, pm (prop_id)));
+          } else {
+            result->insert (*e);
+          }
         }
       }
+
+    } else {
+
+      for (db::Polygon::polygon_edge_iterator e = p->begin_edge (); ! e.at_end (); ++e) {
+        if (! filter || filter->selected (*e)) {
+          if (prop_id != 0) {
+            result->insert (db::EdgeWithProperties (*e, pm (prop_id)));
+          } else {
+            result->insert (*e);
+          }
+        }
+      }
+
     }
+
   }
 
   return result.release ();

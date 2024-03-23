@@ -31,6 +31,7 @@
 #include "dbEdgeBoolean.h"
 #include "dbEdgeProcessor.h"
 #include "dbLocalOperation.h"
+#include "dbEdgesUtils.h"
 
 namespace db
 {
@@ -77,6 +78,81 @@ public:
 private:
   db::EdgePolygonOp::mode_t m_op;
   bool m_include_borders;
+};
+
+/**
+ *  @brief Implements edge-to-edge interactions
+ */
+class DB_PUBLIC Edge2EdgeInteractingLocalOperation
+  : public local_operation<db::Edge, db::Edge, db::Edge>
+{
+public:
+  enum output_mode_t { Normal, Inverse, Both };
+
+  Edge2EdgeInteractingLocalOperation (EdgeInteractionMode mode, output_mode_t output_mode, size_t min_count, size_t max_count);
+
+  virtual db::Coord dist () const;
+  virtual void do_compute_local (db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<db::Edge, db::Edge> &interactions, std::vector<std::unordered_set<db::Edge> > &results, const db::LocalProcessorBase * /*proc*/) const;
+  virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
+  virtual std::string description () const;
+
+private:
+  EdgeInteractionMode m_mode;
+  output_mode_t m_output_mode;
+  size_t m_min_count, m_max_count;
+};
+
+/**
+ *  @brief Implements edge-to-edge interactions (pull mode)
+ */
+class DB_PUBLIC Edge2EdgePullLocalOperation
+  : public local_operation<db::Edge, db::Edge, db::Edge>
+{
+public:
+  Edge2EdgePullLocalOperation ();
+
+  virtual db::Coord dist () const;
+  virtual void do_compute_local (db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<db::Edge, db::Edge> &interactions, std::vector<std::unordered_set<db::Edge> > &results, const db::LocalProcessorBase * /*proc*/) const;
+  virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
+  virtual std::string description () const;
+};
+
+/**
+ *  @brief Implements edge-to-polygon interactions
+ */
+template<class TI>
+class DB_PUBLIC edge_to_polygon_interacting_local_operation
+  : public local_operation<db::Edge, TI, db::Edge>
+{
+public:
+  enum output_mode_t { Normal, Inverse, Both };
+
+  edge_to_polygon_interacting_local_operation (EdgeInteractionMode mode, output_mode_t output_mode, size_t min_count, size_t max_count);
+
+  virtual db::Coord dist () const;
+  virtual void do_compute_local (db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<db::Edge, TI> &interactions, std::vector<std::unordered_set<db::Edge> > &results, const db::LocalProcessorBase * /*proc*/) const;
+  virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
+  virtual std::string description () const;
+
+private:
+  EdgeInteractionMode m_mode;
+  output_mode_t m_output_mode;
+  size_t m_min_count, m_max_count;
+};
+
+/**
+ *  @brief Implements edge-to-polygon interactions (pull mode)
+ */
+class DB_PUBLIC Edge2PolygonPullLocalOperation
+  : public local_operation<db::Edge, db::PolygonRef, db::PolygonRef>
+{
+public:
+  Edge2PolygonPullLocalOperation ();
+
+  virtual db::Coord dist () const;
+  virtual void do_compute_local (db::Layout *layout, db::Cell * /*cell*/, const shape_interactions<db::Edge, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, const db::LocalProcessorBase * /*proc*/) const;
+  virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
+  virtual std::string description () const;
 };
 
 }

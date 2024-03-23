@@ -455,6 +455,7 @@ out = in.drc(covering(other) &gt; 2)
 <p>Usage:</p>
 <ul>
 <li><tt>expression.edges</tt></li>
+<li><tt>expression.edges(mode)</tt></li>
 </ul>
 <p>
 Polygons will be separated into edges forming their contours. Edge pairs will be 
@@ -468,6 +469,20 @@ for the edges:
 <pre>
 out = in.drc(primary.edges)
 </pre>
+</p><p>
+The "mode" argument allows selecting specific edges from polygons.
+Allowed values are: "convex", "concave", "step", "step_in" and "step_out".
+"step" generates edges only if they provide a step between two other
+edges. "step_in" creates edges that make a step towards the inside of
+the polygon and "step_out" creates edges that make a step towards the
+outside:
+</p><p>
+<pre>
+out = in.drc(primary.edges(convex))
+</pre>
+</p><p>
+The mode argument is ignored when translating other objects than
+polygons.
 </p>
 <a name="end_segments"/><h2>"end_segments" - Returns the part at the end of each edge of the input</h2>
 <keyword name="end_segments"/>

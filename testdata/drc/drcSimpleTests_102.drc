@@ -1,0 +1,40 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+end
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+
+l1.output(1, 0)
+l2.output(2, 0)
+
+l2.edges.output(100, 0)
+l2.edges(convex).output(101, 0)
+l2.edges(concave).output(102, 0)
+l2.edges(step).output(103, 0)
+l2.edges(step_in).output(104, 0)
+l2.edges(step_out).output(105, 0)
+
+l2.edges(not_convex).output(111, 0)
+l2.edges(not_concave).output(112, 0)
+l2.edges(not_step).output(113, 0)
+l2.edges(not_step_in).output(114, 0)
+l2.edges(not_step_out).output(115, 0)
+
+l2.drc(primary.edges).output(200, 0)
+l2.drc(primary.edges(convex)).output(201, 0)
+l2.drc(primary.edges(concave)).output(202, 0)
+l2.drc(primary.edges(step)).output(203, 0)
+l2.drc(primary.edges(step_in)).output(204, 0)
+l2.drc(primary.edges(step_out)).output(205, 0)
+
+l2.drc(primary.edges(not_convex)).output(211, 0)
+l2.drc(primary.edges(not_concave)).output(212, 0)
+l2.drc(primary.edges(not_step)).output(213, 0)
+l2.drc(primary.edges(not_step_in)).output(214, 0)
+l2.drc(primary.edges(not_step_out)).output(215, 0)
+

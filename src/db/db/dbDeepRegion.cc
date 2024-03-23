@@ -1335,7 +1335,7 @@ DeepRegion::snapped (db::Coord gx, db::Coord gy)
 }
 
 EdgesDelegate *
-DeepRegion::edges (const EdgeFilterBase *filter) const
+DeepRegion::edges (const EdgeFilterBase *filter, const PolygonToEdgeProcessorBase *proc) const
 {
   std::unique_ptr<db::DeepEdges> res (new db::DeepEdges (deep_layer ().derived ()));
 
@@ -1343,7 +1343,7 @@ DeepRegion::edges (const EdgeFilterBase *filter) const
     return res.release ();
   }
 
-  if (! filter && merged_semantics () && ! merged_polygons_available ()) {
+  if (! proc && ! filter && merged_semantics () && ! merged_polygons_available ()) {
 
     //  Hierarchical edge detector - no pre-merge required
 
@@ -1388,15 +1388,32 @@ DeepRegion::edges (const EdgeFilterBase *filter) const
       const db::Shapes &s = c->shapes (polygons.layer ());
       db::Shapes &st = c->shapes (res->deep_layer ().layer ());
 
+      std::vector<db::Edge> heap;
+
       for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
 
         db::Polygon poly;
         si->polygon (poly);
 
-        for (db::Polygon::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end (); ++e) {
-          if (! filter || filter->selected ((*e).transformed (tr))) {
-            st.insert (db::EdgeWithProperties (*e, pm (si->prop_id ())));
+        if (proc) {
+
+          heap.clear ();
+          proc->process (poly, heap);
+
+          for (auto e = heap.begin (); e != heap.end (); ++e) {
+            if (! filter || filter->selected ((*e).transformed (tr))) {
+              st.insert (db::EdgeWithProperties (*e, pm (si->prop_id ())));
+            }
           }
+
+        } else {
+
+          for (db::Polygon::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end (); ++e) {
+            if (! filter || filter->selected ((*e).transformed (tr))) {
+              st.insert (db::EdgeWithProperties (*e, pm (si->prop_id ())));
+            }
+          }
+
         }
 
       }

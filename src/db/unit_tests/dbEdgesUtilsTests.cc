@@ -83,5 +83,25 @@ TEST(1)
   EXPECT_EQ (db::edge_is_outside (db::Edge (db::Point (0, 11), db::Point (10, 11)), db::Polygon (db::Box (0, 0, 10, 10))), true);
   EXPECT_EQ (db::edge_is_outside (db::Edge (db::Point (0, 5), db::Point (10, 5)), db::Polygon (db::Box (0, 0, 10, 10))), false);
   EXPECT_EQ (db::edge_is_outside (db::Edge (db::Point (-5, 5), db::Point (15, 5)), db::Polygon (db::Box (0, 0, 10, 10))), false);
+  EXPECT_EQ (db::edge_is_outside (db::Edge (db::Point (-10, 5), db::Point (0, 5)), db::Polygon (db::Box (0, 0, 10, 10))), true);
+  EXPECT_EQ (db::edge_is_outside (db::Edge (db::Point (-10, 0), db::Point (10, 0)), db::Polygon (db::Box (0, 0, 10, 10))), true);
+
+  db::Point pts[] = {
+    db::Point (0, 0),
+    db::Point (0, 10),
+    db::Point (20, 10),
+    db::Point (20, -10),
+    db::Point (10, -10),
+    db::Point (10, 0)
+  };
+
+  db::Polygon poly;
+  poly.assign_hull (pts + 0, pts + sizeof(pts) / sizeof(pts[0]));
+
+  EXPECT_EQ (db::edge_is_outside (db::Edge (db::Point (-10, 10), db::Point (20, 10)), poly), true);
+  EXPECT_EQ (db::edge_is_outside (db::Edge (db::Point (-10, -10), db::Point (20, -10)), poly), true);
+  EXPECT_EQ (db::edge_is_outside (db::Edge (db::Point (-10, 0), db::Point (11, 0)), poly), false);
+  EXPECT_EQ (db::edge_is_outside (db::Edge (db::Point (-10, 0), db::Point (10, 0)), poly), true);
+  EXPECT_EQ (db::edge_is_outside (db::Edge (db::Point (-10, 0), db::Point (9, 0)), poly), true);
 }
 

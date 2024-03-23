@@ -609,6 +609,35 @@ run_demo gen, "input.edges.with_length(2.0)\n   .extended(0.0, -0.5, 1.0, -0.5)"
 class Gen
   def produce(s1, s2)
     pts = [ 
+      RBA::Point::new(1000, 0),
+      RBA::Point::new(1000, 5000),
+      RBA::Point::new(2000, 5000),
+      RBA::Point::new(2000, 7000),
+      RBA::Point::new(4000, 7000),
+      RBA::Point::new(4000, 5000),
+      RBA::Point::new(5000, 5000),
+      RBA::Point::new(5000, 0),
+      RBA::Point::new(4000, 0),
+      RBA::Point::new(4000, 1000),
+      RBA::Point::new(2000, 1000),
+      RBA::Point::new(2000, 0)
+    ];
+    s1.insert(RBA::Polygon::new(pts))
+  end
+end
+
+gen = Gen::new
+
+run_demo gen, "input.edges", "drc_edge_modes1.png"
+run_demo gen, "input.edges(convex)", "drc_edge_modes2.png"
+run_demo gen, "input.edges(concave)", "drc_edge_modes3.png"
+run_demo gen, "input.edges(step)", "drc_edge_modes4.png"
+run_demo gen, "input.edges(step_in)", "drc_edge_modes5.png"
+run_demo gen, "input.edges(step_out)", "drc_edge_modes6.png"
+
+class Gen
+  def produce(s1, s2)
+    pts = [ 
       RBA::Point::new(2000, 0),
       RBA::Point::new(2000, 2000),
       RBA::Point::new(4000, 2000),

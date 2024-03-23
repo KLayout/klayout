@@ -94,12 +94,12 @@ public:
 
   virtual RegionDelegate *pull_interacting (const Region &) const;
   virtual EdgesDelegate *pull_interacting (const Edges &) const { return new EmptyEdges (); }
-  virtual EdgesDelegate *selected_interacting (const Edges &) const { return new EmptyEdges (); }
-  virtual EdgesDelegate *selected_not_interacting (const Edges &) const { return new EmptyEdges (); }
-  virtual EdgesDelegate *selected_interacting (const Region &) const { return new EmptyEdges (); }
-  virtual EdgesDelegate *selected_not_interacting (const Region &) const { return new EmptyEdges (); }
-  virtual std::pair<EdgesDelegate *, EdgesDelegate *> selected_interacting_pair (const Region &) const { return std::make_pair (new EmptyEdges (), new EmptyEdges ()); }
-  virtual std::pair<EdgesDelegate *, EdgesDelegate *> selected_interacting_pair (const Edges &) const { return std::make_pair (new EmptyEdges (), new EmptyEdges ()); }
+  virtual EdgesDelegate *selected_interacting (const Edges &, size_t, size_t) const { return new EmptyEdges (); }
+  virtual EdgesDelegate *selected_not_interacting (const Edges &, size_t, size_t) const { return new EmptyEdges (); }
+  virtual EdgesDelegate *selected_interacting (const Region &, size_t, size_t) const { return new EmptyEdges (); }
+  virtual EdgesDelegate *selected_not_interacting (const Region &, size_t, size_t) const { return new EmptyEdges (); }
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> selected_interacting_pair (const Region &, size_t, size_t) const { return std::make_pair (new EmptyEdges (), new EmptyEdges ()); }
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> selected_interacting_pair (const Edges &, size_t, size_t) const { return std::make_pair (new EmptyEdges (), new EmptyEdges ()); }
 
   virtual EdgesDelegate *selected_outside (const Region &) const { return new EmptyEdges (); }
   virtual EdgesDelegate *selected_not_outside (const Region &) const { return new EmptyEdges (); }

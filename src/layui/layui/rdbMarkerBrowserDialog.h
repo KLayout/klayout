@@ -36,8 +36,15 @@ namespace Ui
   class MarkerBrowserDialog;
 }
 
+namespace db
+{
+  class Layout;
+}
+
 namespace rdb
 {
+
+class Database;
 
 class LAYUI_PUBLIC MarkerBrowserDialog
   : public lay::Browser
@@ -101,6 +108,9 @@ private:
   void update_content ();
   void scan_layer ();
   void scan_layer_flat ();
+  void scan_layer_flat_or_hierarchical (bool flat);
+  void scan_layout (rdb::Database *db, const db::Layout &layout, db::cell_index_type cell_index, const std::vector<std::pair<unsigned int, std::string> > &layers_and_descriptions, bool flat);
+  void read_db_from_layout (rdb::Database *db, const std::string &filename);
 };
 
 }

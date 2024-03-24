@@ -1629,8 +1629,8 @@ Database::load (const std::string &fn)
 void
 Database::scan_layout (const db::Layout &layout, db::cell_index_type cell_index, const std::vector<std::pair<unsigned int, std::string> > &layers_and_descriptions, bool flat)
 {
-  tl::AbsoluteProgress progress (tl::to_string (QObject::tr ("Shapes To Markers")), 10000);
-  progress.set_format (tl::to_string (QObject::tr ("%.0f0000 markers")));
+  tl::AbsoluteProgress progress (tl::to_string (tr ("Shapes To Markers")), 10000);
+  progress.set_format (tl::to_string (tr ("%.0f0000 markers")));
   progress.set_unit (10000);
 
   set_name ("Shapes");

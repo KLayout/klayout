@@ -414,26 +414,6 @@ END_PROTECTED
 }
 
 void
-MarkerBrowserDialog::read_db_from_layout (rdb::Database *db, const std::string &filename)
-{
-  //  try reading a layout file
-  db::Layout layout;
-  tl::InputStream is (m_open_filename);
-  db::Reader reader (is);
-
-  reader.read (layout);
-
-  std::vector<std::pair<unsigned int, std::string> > layers;
-  for (auto l = layout.begin_layers (); l != layout.end_layers (); ++l) {
-    layers.push_back (std::make_pair ((*l).first, std::string ()));
-  }
-
-  if (layout.begin_top_down () != layout.end_top_down ()) {
-    scan_layout (db, layout, *layout.begin_top_down (), layers, false /*hierarchical*/);
-  }
-}
-
-void
 MarkerBrowserDialog::open_clicked ()
 {
 BEGIN_PROTECTED
@@ -455,20 +435,7 @@ BEGIN_PROTECTED
   if (open_dialog.get_open (m_open_filename)) {
 
     std::unique_ptr <rdb::Database> db (new rdb::Database ());
-
-    bool ok = false;
-    try {
-      //  try reading a stream file
-      read_db_from_layout (db.get (), m_open_filename);
-      ok = true;
-    } catch (tl::Exception &ex) {
-      //  continue
-    }
-
-    if (! ok) {
-      //  try reading database directly.
-      db->load (m_open_filename);
-    }
+    db->load (m_open_filename);
 
     int rdb_index = view ()->add_rdb (db.release ());
     mp_ui->rdb_cb->setCurrentIndex (rdb_index);
@@ -817,132 +784,10 @@ MarkerBrowserDialog::scan_layer_flat_or_hierarchical (bool flat)
 
   std::unique_ptr<rdb::Database> rdb (new rdb::Database ());
 
-  scan_layout (rdb.get (), layout, cv.cell_index (), layer_indexes, flat);
+  rdb->scan_layout (layout, cv.cell_index (), layer_indexes, flat);
 
   unsigned int rdb_index = view ()->add_rdb (rdb.release ());
   view ()->open_rdb_browser (rdb_index, cv_index);
-}
-
-void
-MarkerBrowserDialog::scan_layout (rdb::Database *rdb, const db::Layout &layout, db::cell_index_type cell_index, const std::vector<std::pair<unsigned int, std::string> > &layers_and_descriptions, bool flat)
-{
-  tl::AbsoluteProgress progress (tl::to_string (QObject::tr ("Shapes To Markers")), 10000);
-  progress.set_format (tl::to_string (QObject::tr ("%.0f0000 markers")));
-  progress.set_unit (10000);
-
-  rdb->set_name ("Shapes");
-  rdb->set_top_cell_name (layout.cell_name (cell_index));
-  rdb::Cell *rdb_top_cell = rdb->create_cell (rdb->top_cell_name ());
-
-  std::string desc;
-
-  if (layers_and_descriptions.size () == 1) {
-
-    if (flat) {
-      desc = tl::to_string (tr ("Flat shapes of layer "));
-    } else {
-      desc = tl::to_string (tr ("Hierarchical shapes of layer "));
-    }
-
-    desc += layout.get_properties (layers_and_descriptions.front ().first).to_string ();
-
-  } else if (layers_and_descriptions.size () < 4 && layers_and_descriptions.size () > 0) {
-
-    if (flat) {
-      desc = tl::to_string (tr ("Flat shapes of layers "));
-    } else {
-      desc = tl::to_string (tr ("Hierarchical shapes of layers "));
-    }
-
-    for (auto l = layers_and_descriptions.begin (); l != layers_and_descriptions.end (); ++l) {
-      if (l != layers_and_descriptions.begin ()) {
-        desc += ",";
-      }
-      desc += layout.get_properties (l->first).to_string ();
-    }
-
-  } else {
-
-    if (flat) {
-      desc = tl::sprintf (tl::to_string (tr ("Flat shapes of %d layers")), int (layers_and_descriptions.size ()));
-    } else {
-      desc = tl::sprintf (tl::to_string (tr ("Hierarchical shapes of %d layers")), int (layers_and_descriptions.size ()));
-    }
-
-  }
-
-  desc += " ";
-  desc += tl::to_string (tr ("from cell "));
-  desc += layout.cell_name (cell_index);
-  rdb->set_description (desc);
-
-  if (flat) {
-
-    for (auto l = layers_and_descriptions.begin (); l != layers_and_descriptions.end (); ++l) {
-
-      rdb::Category *cat = rdb->create_category (l->second.empty () ? layout.get_properties (l->first).to_string () : l->second);
-
-      db::RecursiveShapeIterator shape (layout, layout.cell (cell_index), l->first);
-      while (! shape.at_end ()) {
-
-        rdb::create_item_from_shape (rdb, rdb_top_cell->id (), cat->id (), db::CplxTrans (layout.dbu ()) * shape.trans (), *shape);
-
-        ++progress;
-        ++shape;
-
-      }
-
-    }
-
-  } else {
-
-    std::set<db::cell_index_type> called_cells;
-    called_cells.insert (cell_index);
-    layout.cell (cell_index).collect_called_cells (called_cells);
-
-    for (auto l = layers_and_descriptions.begin (); l != layers_and_descriptions.end (); ++l) {
-
-      rdb::Category *cat = rdb->create_category (l->second.empty () ? layout.get_properties (l->first).to_string () : l->second);
-
-      for (db::Layout::const_iterator cid = layout.begin (); cid != layout.end (); ++cid) {
-
-        if (called_cells.find (cid->cell_index ()) == called_cells.end ()) {
-          continue;
-        }
-
-        const db::Cell &cell = *cid;
-        if (! cell.shapes (l->first).empty ()) {
-
-          std::string cn = layout.cell_name (cell.cell_index ());
-          const rdb::Cell *rdb_cell = rdb->cell_by_qname (cn);
-          if (! rdb_cell) {
-
-            rdb::Cell *rdb_cell_nc = rdb->create_cell (cn);
-            rdb_cell = rdb_cell_nc;
-
-            std::pair<bool, db::ICplxTrans> ctx = db::find_layout_context (layout, cell.cell_index (), cell_index);
-            if (ctx.first) {
-              db::DCplxTrans t = db::DCplxTrans (layout.dbu ()) * db::DCplxTrans (ctx.second) * db::DCplxTrans (1.0 / layout.dbu ());
-              rdb_cell_nc->references ().insert (Reference (t, rdb_top_cell->id ()));
-            }
-
-          }
-
-          for (db::ShapeIterator shape = cell.shapes (l->first).begin (db::ShapeIterator::All); ! shape.at_end (); ++shape) {
-
-            rdb::create_item_from_shape (rdb, rdb_cell->id (), cat->id (), db::CplxTrans (layout.dbu ()), *shape);
-
-            ++progress;
-
-          }
-
-        }
-
-      }
-
-    }
-
-  }
 }
 
 void 

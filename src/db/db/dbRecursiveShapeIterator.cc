@@ -967,9 +967,9 @@ RecursiveShapeIterator::new_cell (RecursiveShapeReceiver *receiver) const
         //  NOTE: because we use "touching" for the instances below, we
         region_type new_complex_region;
         if (region == box_type::world ()) {
-          new_complex_region = region_type (cell ()->bbox ()) - shapes_region;
+          new_complex_region = region_type (cell ()->bbox (l)) - shapes_region;
         } else {
-          new_complex_region = region_type (cell ()->bbox () & region.enlarged (bias)) - shapes_region;
+          new_complex_region = region_type (cell ()->bbox (l) & region.enlarged (bias)) - shapes_region;
         }
 
         //  TODO: the current implementation does not touch the complex search region

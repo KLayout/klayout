@@ -821,6 +821,54 @@ class DBPolygon_TestClass < TestBase
 
   end
 
+  def test_breakPolygon
+
+    pts = []
+    pts << RBA::Point::new(0, 0)
+    pts << RBA::Point::new(0, 1000)
+    pts << RBA::Point::new(100, 1000)
+    pts << RBA::Point::new(100, 100)
+    pts << RBA::Point::new(1000, 100)
+    pts << RBA::Point::new(1000, 0)
+
+    split = RBA::Polygon::new(pts).break(4, 0)
+    assert_equal(split.collect { |p| p.to_s }.join(";"), "(0,0;0,100;1000,100;1000,0);(0,100;0,1000;100,1000;100,100)")
+    split = RBA::Polygon::new(pts).break(0, 2.0)
+    assert_equal(split.collect { |p| p.to_s }.join(";"), "(0,0;0,100;1000,100;1000,0);(0,100;0,1000;100,1000;100,100)")
+    split = RBA::Polygon::new(pts).break(0, 0)
+    assert_equal(split.collect { |p| p.to_s }.join(";"), "(0,0;0,1000;100,1000;100,100;1000,100;1000,0)")
+
+    split = RBA::SimplePolygon::new(pts).break(4, 0)
+    assert_equal(split.collect { |p| p.to_s }.join(";"), "(0,0;0,100;1000,100;1000,0);(0,100;0,1000;100,1000;100,100)")
+    split = RBA::SimplePolygon::new(pts).break(0, 2.0)
+    assert_equal(split.collect { |p| p.to_s }.join(";"), "(0,0;0,100;1000,100;1000,0);(0,100;0,1000;100,1000;100,100)")
+    split = RBA::SimplePolygon::new(pts).break(0, 0)
+    assert_equal(split.collect { |p| p.to_s }.join(";"), "(0,0;0,1000;100,1000;100,100;1000,100;1000,0)")
+
+    pts = []
+    pts << RBA::DPoint::new(0, 0)
+    pts << RBA::DPoint::new(0, 1000)
+    pts << RBA::DPoint::new(100, 1000)
+    pts << RBA::DPoint::new(100, 100)
+    pts << RBA::DPoint::new(1000, 100)
+    pts << RBA::DPoint::new(1000, 0)
+
+    split = RBA::DPolygon::new(pts).break(4, 0)
+    assert_equal(split.collect { |p| p.to_s }.join(";"), "(0,0;0,100;1000,100;1000,0);(0,100;0,1000;100,1000;100,100)")
+    split = RBA::DPolygon::new(pts).break(0, 2.0)
+    assert_equal(split.collect { |p| p.to_s }.join(";"), "(0,0;0,100;1000,100;1000,0);(0,100;0,1000;100,1000;100,100)")
+    split = RBA::DPolygon::new(pts).break(0, 0)
+    assert_equal(split.collect { |p| p.to_s }.join(";"), "(0,0;0,1000;100,1000;100,100;1000,100;1000,0)")
+
+    split = RBA::DSimplePolygon::new(pts).break(4, 0)
+    assert_equal(split.collect { |p| p.to_s }.join(";"), "(0,0;0,100;1000,100;1000,0);(0,100;0,1000;100,1000;100,100)")
+    split = RBA::DSimplePolygon::new(pts).break(0, 2.0)
+    assert_equal(split.collect { |p| p.to_s }.join(";"), "(0,0;0,100;1000,100;1000,0);(0,100;0,1000;100,1000;100,100)")
+    split = RBA::DSimplePolygon::new(pts).break(0, 0)
+    assert_equal(split.collect { |p| p.to_s }.join(";"), "(0,0;0,1000;100,1000;100,100;1000,100;1000,0)")
+
+  end
+
   def test_voidMethodsReturnSelf
 
     hull =  [ RBA::Point::new(0, 0),       RBA::Point::new(6000, 0), 

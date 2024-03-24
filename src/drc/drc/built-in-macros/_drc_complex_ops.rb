@@ -756,15 +756,17 @@ CODE
   
   # %DRC%
   # @name corners
-  # @brief Applies smoothing
+  # @brief Selects corners of polygons
   # @synopsis expression.corners
   # @synopsis expression.corners(as_dots)
   # @synopsis expression.corners(as_boxes)
   #
   # This operation acts on polygons and selects the corners of the polygons.
   # It can be put into a condition to select corners by their angles. The angle of
-  # a corner is positive for a turn to the left if walking a polygon counterclockwise
-  # and negative for the turn to the right. Angles take values between -180 and 180 degree.
+  # a corner is positive for a turn to the left if walking a polygon clockwise
+  # and negative for the turn to the right. Hence positive angles indicate concave
+  # (inner) corners, negative ones indicate convex (outer) corners.
+  # Angles take values between -180 and 180 degree.
   #
   # When using "as_dots" for the argument, the operation will return single-point edges at
   # the selected corners. With "as_boxes" (the default), small (2x2 DBU) rectangles will be
@@ -780,8 +782,8 @@ CODE
   # The following example selects all inner corners:
   #
   # @code
-  # out = in.drc(corners < 0)
-  # out = in.drc(primary.corners < 0)    # equivalent
+  # out = in.drc(corners > 0)
+  # out = in.drc(primary.corners > 0)    # equivalent
   # @/code
   #
   # The "corners" method is available as a plain function or as a method on \DRC# expressions.
@@ -989,6 +991,7 @@ CODE
   # @name edges
   # @brief Converts the input shapes into edges
   # @synopsis expression.edges
+  # @synopsis expression.edges(mode)
   #
   # Polygons will be separated into edges forming their contours. Edge pairs will be 
   # decomposed into individual edges.
@@ -1001,9 +1004,38 @@ CODE
   # @code
   # out = in.drc(primary.edges)
   # @/code
+  #
+  # The "mode" argument allows selecting specific edges from polygons.
+  # Allowed values are: "convex", "concave", "step", "step_in" and "step_out".
+  # "step" generates edges only if they provide a step between two other
+  # edges. "step_in" creates edges that make a step towards the inside of
+  # the polygon and "step_out" creates edges that make a step towards the
+  # outside:
+  #
+  # @code
+  # out = in.drc(primary.edges(convex))
+  # @/code
+  #
+  # In addition, "not_.." variants are available which selects edges
+  # not qualifying for the specific mode:
+  #
+  # @code
+  # out = in.drc(primary.edges(not_convex))
+  # @/code
+  #
+  # The mode argument is ignored when translating other objects than
+  # polygons.
   
-  def edges
-    return DRCOpNodeFilter::new(@engine, self, :new_edges, "edges")
+  def edges(mode = nil)
+    if mode 
+      if ! mode.is_a?(DRC::DRCEdgeMode)
+        raise "The mode argument needs to be a mode type (convex, concave, step, step_in or step_out)"
+      end
+      mode = mode.value
+    else
+      mode = RBA::EdgeMode::All
+    end
+    return DRCOpNodeFilter::new(@engine, self, :new_edges, "edges", mode)
   end
   
   # %DRC%

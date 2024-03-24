@@ -289,6 +289,12 @@ TEST(31_MustConnect2)
   run_test (_this, "must_connect2", "must_connect2.gds");
 }
 
+//  Intermediate cell propagates must-connect pins
+TEST(32_MustConnect3)
+{
+  run_test (_this, "must_connect3", "must_connect3.gds");
+}
+
 //  issue 1609
 TEST(40_DeviceExtractorErrors)
 {

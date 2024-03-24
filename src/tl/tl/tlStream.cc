@@ -47,6 +47,7 @@
 #include "tlException.h"
 #include "tlString.h"
 #include "tlUri.h"
+#include "tlHttpStream.h"
 
 #if defined(HAVE_QT)
 #  include <QByteArray>
@@ -141,6 +142,129 @@ public:
 };
 
 // ---------------------------------------------------------------
+//  inflating_input_stream implementation
+
+/**
+ *  @brief A wrapper that adds generic .gz support
+ */
+template <class Base>
+inflating_input_stream<Base>::inflating_input_stream (Base *delegate)
+  : m_inflating_stream (delegate), m_is_compressed (false), mp_delegate (delegate)
+{
+  enter_inflate ();
+}
+
+template <class Base>
+size_t
+inflating_input_stream<Base>::read (char *b, size_t n)
+{
+  //  TODO: this is somewhat inefficient, but we only use it for pipe and HTTP streams
+  size_t i = 0;
+  while (i < n) {
+
+    if (m_is_compressed || m_inflating_stream.blen () == 0) {
+
+      const char *read = m_inflating_stream.get (1);
+      if (! read) {
+        break;
+      }
+      *b++ = *read;
+      i += 1;
+
+    } else {
+
+      size_t nn = std::min (n - i, m_inflating_stream.blen ());
+      const char *read = m_inflating_stream.get (nn);
+      tl_assert (read != 0);
+      memcpy (b, read, nn);
+      b += nn;
+      i += nn;
+
+    }
+
+  }
+  return i;
+}
+
+template <class Base>
+void
+inflating_input_stream<Base>::enter_inflate ()
+{
+  //  identify and skip header for .gz file
+  if (auto_detect_gz ()) {
+    m_is_compressed = true;
+    m_inflating_stream.inflate (true /* stop after inflated block */);
+  } else {
+    m_inflating_stream.unget (m_inflating_stream.pos ());
+  }
+}
+
+template <class Base>
+bool
+inflating_input_stream<Base>::auto_detect_gz ()
+{
+  std::string header = m_inflating_stream.read_all (10);
+  if (header.size () < 10) {
+    return false;
+  }
+
+  const unsigned char *header_data = (const unsigned char *) header.c_str ();
+  unsigned char flags = header_data[3];
+  if (header_data[0] != 0x1f || header_data[1] != 0x8b || header_data[2] != 0x08 || (flags & 0xe0) != 0) {
+    return false;
+  }
+
+  //  .gz signature found
+
+  bool has_fhcrc = (flags & 0x02) != 0;
+  bool has_extra = (flags & 0x04) != 0;
+  bool has_fname = (flags & 0x08) != 0;
+  bool has_comment = (flags & 0x10) != 0;
+
+  if (has_extra) {
+    const unsigned char *xlen = (const unsigned char *) m_inflating_stream.get (2);
+    if (! xlen) {
+      throw tl::Exception (tl::to_string (tr ("Corrupt .gz header - missing XLEN field")));
+    }
+    const char *xdata = m_inflating_stream.get (size_t (xlen[0]) + (size_t (xlen[1]) << 8));
+    if (! xdata) {
+      throw tl::Exception (tl::to_string (tr ("Corrupt .gz header - missing EXTRA data")));
+    }
+  }
+
+  if (has_fname) {
+    const char *c;
+    while ((c = m_inflating_stream.get (1)) != 0 && *c)
+      ;
+    if (! c) {
+      throw tl::Exception (tl::to_string (tr ("Corrupt .gz header - missing FNAME data trailing zero byte")));
+    }
+  }
+
+  if (has_comment) {
+    const char *c;
+    while ((c = m_inflating_stream.get (1)) != 0 && *c)
+      ;
+    if (! c) {
+      throw tl::Exception (tl::to_string (tr ("Corrupt .gz header - missing COMMENT data trailing zero byte")));
+    }
+  }
+
+  if (has_fhcrc) {
+    const char *crc16 = m_inflating_stream.get (2);
+    if (! crc16) {
+      throw tl::Exception (tl::to_string (tr ("Corrupt .gz header - missing CRC16 data")));
+    }
+  }
+
+  return true;
+}
+
+//  explicit instantiations
+template class inflating_input_stream<tl::InputPipe>;
+template class inflating_input_stream<tl::InputHttpStream>;
+
+// ---------------------------------------------------------------
 //  InputStream implementation
 
 namespace {
@@ -175,7 +299,7 @@ public:
 }
 
 InputStream::InputStream (InputStreamBase &delegate)
-  : m_pos (0), mp_bptr (0), mp_delegate (&delegate), m_owns_delegate (false), mp_inflate (0), m_inflate_always (false)
+  : m_pos (0), mp_bptr (0), mp_delegate (&delegate), m_owns_delegate (false), mp_inflate (0), m_inflate_always (false), m_stop_after_inflate (false)
 { 
   m_bcap = 4096; // initial buffer capacity
   m_blen = 0;
@@ -183,7 +307,7 @@ InputStream::InputStream (InputStreamBase &delegate)
 }
 
 InputStream::InputStream (InputStreamBase *delegate)
-  : m_pos (0), mp_bptr (0), mp_delegate (delegate), m_owns_delegate (true), mp_inflate (0), m_inflate_always (false)
+  : m_pos (0), mp_bptr (0), mp_delegate (delegate), m_owns_delegate (true), mp_inflate (0), m_inflate_always (false), m_stop_after_inflate (false)
 {
   m_bcap = 4096; // initial buffer capacity
   m_blen = 0;
@@ -191,7 +315,7 @@ InputStream::InputStream (InputStreamBase *delegate)
 }
 
 InputStream::InputStream (const std::string &abstract_path)
-  : m_pos (0), mp_bptr (0), mp_delegate (0), m_owns_delegate (false), mp_inflate (0), m_inflate_always (false)
+  : m_pos (0), mp_bptr (0), mp_delegate (0), m_owns_delegate (false), mp_inflate (0), m_inflate_always (false), m_stop_after_inflate (false)
 { 
   m_bcap = 4096; // initial buffer capacity
   m_blen = 0;
@@ -252,7 +376,7 @@ InputStream::InputStream (const std::string &abstract_path)
 
   } else if (ex.test ("pipe:")) {
 
-    mp_delegate = new InputPipe (ex.get ());
+    mp_delegate = new InflatingInputPipe (ex.get ());
 
   } else {
 
@@ -260,7 +384,7 @@ InputStream::InputStream (const std::string &abstract_path)
 
     if (uri.scheme () == "http" || uri.scheme () == "https") {
 #if defined(HAVE_CURL) || defined(HAVE_QT)
-      mp_delegate = new InputHttpStream (abstract_path);
+      mp_delegate = new InflatingInputHttpStream (abstract_path);
 #else
       throw tl::Exception (tl::to_string (tr ("HTTP support not enabled - HTTP/HTTPS paths are not available")));
 #endif
@@ -337,9 +461,16 @@ InputStream::get (size_t n, bool bypass_inflate)
       tl_assert (r != 0);  //  since deflate did not report at_end()
       return r;
 
+    } else if (m_stop_after_inflate) {
+
+      //  report EOF after the inflator has finished
+      return 0;
+
     } else {
+
       delete mp_inflate;
       mp_inflate = 0;
+
     }
   }
 
@@ -384,9 +515,16 @@ InputStream::get (size_t n, bool bypass_inflate)
 void
 InputStream::unget (size_t n)
 {
+  if (n == 0) {
+    return;
+  }
+
   if (mp_inflate) {
+    //  TODO: this will not work if mp_inflate just got destroyed
+    //  (no unget into previous compressed block)
     mp_inflate->unget (n);
   } else {
+    tl_assert (mp_buffer + n <= mp_bptr);
     mp_bptr -= n;
     m_blen += n;
     m_pos -= n;
@@ -476,10 +614,11 @@ void InputStream::copy_to (tl::OutputStream &os)
 }
 
 void
-InputStream::inflate ()
+InputStream::inflate (bool stop_after)
 {
   tl_assert (mp_inflate == 0);
   mp_inflate = new tl::InflateFilter (*this);
+  m_stop_after_inflate = stop_after;
 }
 
 void
@@ -1334,11 +1473,11 @@ OutputPipe::write (const char *b, size_t n)
 // ---------------------------------------------------------------
 //  InputPipe delegate implementation
 
-InputPipe::InputPipe (const std::string &path)
+InputPipe::InputPipe (const std::string &source)
   : m_file (NULL)
 {
-  m_source = path;
-  m_file = popen (tl::string_to_system (path).c_str (), "r");
+  m_source = source;
+  m_file = popen (tl::string_to_system (source).c_str (), "r");
   if (m_file == NULL) {
     throw FilePOpenErrorException (m_source, errno);
   }

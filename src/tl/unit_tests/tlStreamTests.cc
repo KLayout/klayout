@@ -52,6 +52,13 @@ TEST(InputPipe2)
   EXPECT_NE (ret, 0);
 }
 
+TEST(InputPipe3)
+{
+  tl::InputStream str ("pipe:echo HELLOWORLD");
+  tl::TextInputStream tstr (str);
+  EXPECT_EQ (tstr.get_line (), "HELLOWORLD");
+}
+
 TEST(OutputPipe1)
 {
   std::string tf = tmp_file ("pipe_out");
@@ -454,4 +461,6 @@ TEST(Backups)
     EXPECT_EQ (is.read_all (), "2\n");
   }
 }
+
+
 

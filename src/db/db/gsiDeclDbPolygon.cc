@@ -31,6 +31,39 @@
 namespace gsi
 {
 
+template <class C>
+static std::vector<C> split_poly (const C *p)
+{
+  std::vector<C> parts;
+  db::split_polygon (*p, parts);
+  return parts;
+}
+
+template <class C>
+static void break_polygon (const C &poly, size_t max_vertex_count, double max_area_ratio, std::vector<C> &result)
+{
+  if ((max_vertex_count > 0 && poly.vertices () > max_vertex_count) ||
+      (max_area_ratio > 0 && poly.area_ratio () > max_area_ratio)) {
+
+    std::vector<C> split_polygons;
+    db::split_polygon (poly, split_polygons);
+    for (auto p = split_polygons.begin (); p != split_polygons.end (); ++p) {
+      break_polygon (*p, max_vertex_count, max_area_ratio, result);
+    }
+
+  } else {
+    result.push_back (poly);
+  }
+}
+
+template <class C>
+static std::vector<C> break_poly (const C *p, size_t max_vertex_count, double max_area_ratio)
+{
+  std::vector<C> parts;
+  break_polygon (*p, max_vertex_count, max_area_ratio, parts);
+  return parts;
+}
+
 // ---------------------------------------------------------------
 //  simple polygon binding
 
@@ -61,7 +94,7 @@ struct simple_polygon_defs
     }
   }
 
-  static point_type point (C *c, size_t p)
+  static point_type point (const C *c, size_t p)
   {
     if (c->hull ().size () > p) {
       return c->hull ()[p];
@@ -70,12 +103,12 @@ struct simple_polygon_defs
     }
   }
 
-  static size_t num_points (C *c)
+  static size_t num_points (const C *c)
   {
     return c->hull ().size ();
   }
 
-  static bool is_empty (C *c)
+  static bool is_empty (const C *c)
   {
     return c->hull ().size () == 0;
   }
@@ -243,13 +276,6 @@ struct simple_polygon_defs
   static bool touches_spoly (const C *p, const db::simple_polygon<coord_type> &spoly)
   {
     return db::interact (*p, spoly);
-  }
-
-  static std::vector<C> split_poly (const C *p)
-  {
-    std::vector<C> parts;
-    db::split_polygon (*p, parts);
-    return parts;
   }
 
   static gsi::Methods methods ()
@@ -508,7 +534,7 @@ struct simple_polygon_defs
       "\n"
       "This method was introduced in version 0.25.\n"
     ) +
-    method_ext ("split", &split_poly,
+    method_ext ("split", &split_poly<C>,
       "@brief Splits the polygon into two or more parts\n"
       "This method will break the polygon into parts. The exact breaking algorithm is unspecified, the "
       "result are smaller polygons of roughly equal number of points and 'less concave' nature. "
@@ -520,6 +546,20 @@ struct simple_polygon_defs
       "maximum number of points limit.\n"
       "\n"
       "This method has been introduced in version 0.25.3."
+    ) +
+    method_ext ("break", &break_poly<C>, gsi::arg ("max_vertex_count"), gsi::arg ("max_area_ratio"),
+      "@brief Splits the polygon into parts with a maximum vertex count and area ratio\n"
+      "The area ratio is the ratio between the bounding box area and the polygon area. Higher values "
+      "mean more 'skinny' polygons.\n"
+      "\n"
+      "This method will split the input polygon into pieces having a maximum of 'max_vertex_count' vertices "
+      "and an area ratio less than 'max_area_ratio'. 'max_vertex_count' can be zero. In this case the "
+      "limit is ignored. Also 'max_area_ratio' can be zero, in which case it is ignored as well.\n"
+      "\n"
+      "The method of splitting is unspecified. The algorithm will apply 'split' recursively until the "
+      "parts satisfy the limits.\n"
+      "\n"
+      "This method has been introduced in version 0.29."
     ) +
     method_ext ("area", &area,
       "@brief Gets the area of the polygon\n"
@@ -868,17 +908,17 @@ struct polygon_defs
     }
   }
 
-  static size_t num_points (C *c)
+  static size_t num_points (const C *c)
   {
     return c->vertices ();
   }
 
-  static bool is_empty (C *c)
+  static bool is_empty (const C *c)
   {
     return c->vertices () == 0;
   }
 
-  static point_type point_hull (C *c, size_t p)
+  static point_type point_hull (const C *c, size_t p)
   {
     if (c->hull ().size () > p) {
       return c->hull ()[p];
@@ -887,7 +927,7 @@ struct polygon_defs
     }
   }
 
-  static point_type point_hole (C *c, unsigned int n, size_t p)
+  static point_type point_hole (const C *c, unsigned int n, size_t p)
   {
     if (c->holes () > n && c->contour (n + 1).size () > p) {
       return c->contour (n + 1)[p];
@@ -896,12 +936,12 @@ struct polygon_defs
     }
   }
 
-  static size_t num_points_hull (C *c)
+  static size_t num_points_hull (const C *c)
   {
     return c->hull ().size ();
   }
 
-  static size_t num_points_hole (C *c, unsigned int n)
+  static size_t num_points_hole (const C *c, unsigned int n)
   {
     return c->contour (n + 1).size ();
   }
@@ -1096,13 +1136,6 @@ struct polygon_defs
   static bool touches_spoly (const C *p, const db::simple_polygon<coord_type> &spoly)
   {
     return db::interact (*p, spoly);
-  }
-
-  static std::vector<C> split_spoly (const C *p)
-  {
-    std::vector<C> parts;
-    db::split_polygon (*p, parts);
-    return parts;
   }
 
   static gsi::Methods methods ()
@@ -1520,7 +1553,7 @@ struct polygon_defs
       "\n"
       "This method was introduced in version 0.25.\n"
     ) +
-    method_ext ("split", &split_spoly,
+    method_ext ("split", &split_poly<C>,
       "@brief Splits the polygon into two or more parts\n"
       "This method will break the polygon into parts. The exact breaking algorithm is unspecified, the "
       "result are smaller polygons of roughly equal number of points and 'less concave' nature. "
@@ -1532,6 +1565,20 @@ struct polygon_defs
       "maximum number of points limit.\n"
       "\n"
       "This method has been introduced in version 0.25.3."
+    ) +
+    method_ext ("break", &break_poly<C>, gsi::arg ("max_vertex_count"), gsi::arg ("max_area_ratio"),
+      "@brief Splits the polygon into parts with a maximum vertex count and area ratio\n"
+      "The area ratio is the ratio between the bounding box area and the polygon area. Higher values "
+      "mean more 'skinny' polygons.\n"
+      "\n"
+      "This method will split the input polygon into pieces having a maximum of 'max_vertex_count' vertices "
+      "and an area ratio less than 'max_area_ratio'. 'max_vertex_count' can be zero. In this case the "
+      "limit is ignored. Also 'max_area_ratio' can be zero, in which case it is ignored as well.\n"
+      "\n"
+      "The method of splitting is unspecified. The algorithm will apply 'split' recursively until the "
+      "parts satisfy the limits.\n"
+      "\n"
+      "This method has been introduced in version 0.29."
     ) +
     method_ext ("area", &area,
       "@brief Gets the area of the polygon\n"

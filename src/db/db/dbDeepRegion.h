@@ -119,7 +119,7 @@ public:
 
   virtual RegionDelegate *snapped (db::Coord gx, db::Coord gy);
 
-  virtual EdgesDelegate *edges (const EdgeFilterBase *) const;
+  virtual EdgesDelegate *edges (const EdgeFilterBase *filter, const db::PolygonToEdgeProcessorBase *proc) const;
 
   virtual RegionDelegate *process_in_place (const PolygonProcessorBase &filter);
   virtual RegionDelegate *processed (const PolygonProcessorBase &filter) const;
@@ -181,8 +181,6 @@ private:
   DeepLayer and_or_not_with(const DeepRegion *other, bool and_op, PropertyConstraint property_constraint) const;
   std::pair<DeepLayer, DeepLayer> and_and_not_with (const DeepRegion *other, PropertyConstraint property_constraint) const;
   DeepRegion *apply_filter (const PolygonFilterBase &filter) const;
-
-  template <class Result, class OutputContainer> OutputContainer *processed_impl (const polygon_processor<Result> &filter) const;
 
   template <class Proc>
   void configure_proc (Proc &proc) const

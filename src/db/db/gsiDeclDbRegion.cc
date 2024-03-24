@@ -47,6 +47,190 @@
 namespace gsi
 {
 
+// ---------------------------------------------------------------------------------
+//  PolygonFilter binding
+
+class PolygonFilterImpl
+  : public shape_filter_impl<db::AllMustMatchFilter>
+{
+public:
+  PolygonFilterImpl () { }
+
+  bool issue_selected (const db::Polygon &) const
+  {
+    return false;
+  }
+
+  virtual bool selected (const db::Polygon &polygon) const
+  {
+    if (f_selected.can_issue ()) {
+      return f_selected.issue<PolygonFilterImpl, bool, const db::Polygon &> (&PolygonFilterImpl::issue_selected, polygon);
+    } else {
+      return issue_selected (polygon);
+    }
+  }
+
+  virtual bool selected (const db::PolygonRef &polygon) const
+  {
+    db::Polygon p;
+    polygon.instantiate (p);
+    return selected (p);
+  }
+
+  gsi::Callback f_selected;
+
+private:
+  //  No copying
+  PolygonFilterImpl &operator= (const PolygonFilterImpl &);
+  PolygonFilterImpl (const PolygonFilterImpl &);
+};
+
+Class<gsi::PolygonFilterImpl> decl_PolygonFilterImpl ("db", "PolygonFilter",
+  PolygonFilterImpl::method_decls (true) +
+  callback ("selected", &PolygonFilterImpl::issue_selected, &PolygonFilterImpl::f_selected, gsi::arg ("polygon"),
+    "@brief Selects a polygon\n"
+    "This method is the actual payload. It needs to be reimplemented in a derived class.\n"
+    "It needs to analyze the polygon and return 'true' if it should be kept and 'false' if it should be discarded."
+  ),
+  "@brief A generic polygon filter adaptor\n"
+  "\n"
+  "Polygon filters are an efficient way to filter polygons from a Region. To apply a filter, derive your own "
+  "filter class and pass an instance to the \\Region#filter or \\Region#filtered method.\n"
+  "\n"
+  "Conceptually, these methods take each polygon from the region and present it to the filter's 'selected' method.\n"
+  "Based on the result of this evaluation, the polygon is kept or discarded.\n"
+  "\n"
+  "The magic happens when deep mode regions are involved. In that case, the filter will use as few calls as possible "
+  "and exploit the hierarchical compression if possible. It needs to know however, how the filter behaves. You "
+  "need to configure the filter by calling \\is_isotropic, \\is_scale_invariant or \\is_isotropic_and_scale_invariant "
+  "before using the filter.\n"
+  "\n"
+  "You can skip this step, but the filter algorithm will assume the worst case then. This usually leads to cell variant "
+  "formation which is not always desired and blows up the hierarchy.\n"
+  "\n"
+  "Here is some example that filters triangles:"
+  "\n"
+  "@code\n"
+  "class TriangleFilter < RBA::PolygonFilter\n"
+  "\n"
+  "  # Constructor\n"
+  "  def initialize\n"
+  "    self.is_isotropic_and_scale_invariant   # the triangle nature is not dependent on the scale or orientation\n"
+  "  end\n"
+  "  \n"
+  "  # Select only triangles\n"
+  "  def selected(polygon)\n"
+  "    return polygon.holes == 0 && polygon.num_points == 3\n"
+  "  end\n"
+  "\n"
+  "end\n"
+  "\n"
+  "region = ... # some Region\n"
+  "triangles_only = region.filtered(TriangleFilter::new)\n"
+  "@/code\n"
+  "\n"
+  "This class has been introduced in version 0.29.\n"
+);
+
+// ---------------------------------------------------------------------------------
+//  PolygonProcessor binding
+
+Class<shape_processor_impl<db::PolygonProcessorBase> > decl_PolygonOperator ("db", "PolygonOperator",
+  shape_processor_impl<db::PolygonProcessorBase>::method_decls (true),
+  "@brief A generic polygon operator\n"
+  "\n"
+  "Polygon processors are an efficient way to process polygons from a Region. To apply a processor, derive your own "
+  "operator class and pass an instance to the \\Region#process or \\Region#processed method.\n"
+  "\n"
+  "Conceptually, these methods take each polygon from the region and present it to the operators' 'process' method.\n"
+  "The result of this call is a list of zero to many output polygons derived from the input polygon.\n"
+  "The output region is the sum over all these individual results.\n"
+  "\n"
+  "The magic happens when deep mode regions are involved. In that case, the processor will use as few calls as possible "
+  "and exploit the hierarchical compression if possible. It needs to know however, how the operator behaves. You "
+  "need to configure the operator by calling \\is_isotropic, \\is_scale_invariant or \\is_isotropic_and_scale_invariant "
+  "before using it.\n"
+  "\n"
+  "You can skip this step, but the processor algorithm will assume the worst case then. This usually leads to cell variant "
+  "formation which is not always desired and blows up the hierarchy.\n"
+  "\n"
+  "Here is some example that shrinks every polygon to half of the size but does not change the position.\n"
+  "In this example the 'position' is defined by the center of the bounding box:"
+  "\n"
+  "@code\n"
+  "class ShrinkToHalf < RBA::PolygonOperator\n"
+  "\n"
+  "  # Constructor\n"
+  "  def initialize\n"
+  "    self.is_isotropic_and_scale_invariant   # scale or orientation do not matter\n"
+  "  end\n"
+  "  \n"
+  "  # Shrink to half size\n"
+  "  def process(polygon)\n"
+  "    shift = polygon.bbox.center - RBA::Point::new   # shift vector\n"
+  "    return [ (polygon.moved(-shift) * 0.5).moved(shift) ]\n"
+  "  end\n"
+  "\n"
+  "end\n"
+  "\n"
+  "region = ... # some Region\n"
+  "shrinked_to_half = region.processed(ShrinkToHalf::new)\n"
+  "@/code\n"
+  "\n"
+  "This class has been introduced in version 0.29.\n"
+);
+
+Class<shape_processor_impl<db::PolygonToEdgeProcessorBase> > decl_PolygonToEdgeProcessor ("db", "PolygonToEdgeOperator",
+  shape_processor_impl<db::PolygonToEdgeProcessorBase>::method_decls (true),
+  "@brief A generic polygon-to-edge operator\n"
+  "\n"
+  "Polygon processors are an efficient way to process polygons from a Region. To apply a processor, derive your own "
+  "operator class and pass an instance to the \\Region#processed method.\n"
+  "\n"
+  "Conceptually, these methods take each polygon from the region and present it to the operator's 'process' method.\n"
+  "The result of this call is a list of zero to many output edges derived from the input polygon.\n"
+  "The output edge collection is the sum over all these individual results.\n"
+  "\n"
+  "The magic happens when deep mode regions are involved. In that case, the processor will use as few calls as possible "
+  "and exploit the hierarchical compression if possible. It needs to know however, how the operator behaves. You "
+  "need to configure the operator by calling \\is_isotropic, \\is_scale_invariant or \\is_isotropic_and_scale_invariant "
+  "before using it.\n"
+  "\n"
+  "You can skip this step, but the processor algorithm will assume the worst case then. This usually leads to cell variant "
+  "formation which is not always desired and blows up the hierarchy.\n"
+  "\n"
+  "For a basic example see the \\PolygonOperator class, with the exception that this incarnation has to deliver edges.\n"
+  "\n"
+  "This class has been introduced in version 0.29.\n"
+);
+
+Class<shape_processor_impl<db::PolygonToEdgePairProcessorBase> > decl_PolygonToEdgePairProcessor ("db", "PolygonToEdgePairOperator",
+  shape_processor_impl<db::PolygonToEdgePairProcessorBase>::method_decls (true),
+  "@brief A generic polygon-to-edge-pair operator\n"
+  "\n"
+  "Polygon processors are an efficient way to process polygons from a Region. To apply a processor, derive your own "
+  "operator class and pass an instance to the \\Region#processed method.\n"
+  "\n"
+  "Conceptually, these methods take each polygon from the region and present it to the operator's 'process' method.\n"
+  "The result of this call is a list of zero to many output edge pairs derived from the input polygon.\n"
+  "The output edge pair collection is the sum over all these individual results.\n"
+  "\n"
+  "The magic happens when deep mode regions are involved. In that case, the processor will use as few calls as possible "
+  "and exploit the hierarchical compression if possible. It needs to know however, how the operator behaves. You "
+  "need to configure the operator by calling \\is_isotropic, \\is_scale_invariant or \\is_isotropic_and_scale_invariant "
+  "before using it.\n"
+  "\n"
+  "You can skip this step, but the processor algorithm will assume the worst case then. This usually leads to cell variant "
+  "formation which is not always desired and blows up the hierarchy.\n"
+  "\n"
+  "For a basic example see the \\PolygonOperator class, with the exception that this incarnation has to deliver edge pairs.\n"
+  "\n"
+  "This class has been introduced in version 0.29.\n"
+);
+
+// ---------------------------------------------------------------------------------
+//  Region binding
+
 static inline std::vector<db::Region> as_2region_vector (const std::pair<db::Region, db::Region> &rp)
 {
   std::vector<db::Region> res;
@@ -316,6 +500,36 @@ static db::Region extent_refs (const db::Region *r, double fx1, double fy1, doub
 static db::Edges extent_refs_edges (const db::Region *r, double fx1, double fy1, double fx2, double fy2)
 {
   return r->processed (db::RelativeExtentsAsEdges (fx1, fy1, fx2, fy2));
+}
+
+static db::Region filtered (const db::Region *r, const PolygonFilterImpl *f)
+{
+  return r->filtered (*f);
+}
+
+static void filter (db::Region *r, const PolygonFilterImpl *f)
+{
+  r->filter (*f);
+}
+
+static db::Region processed_pp (const db::Region *r, const shape_processor_impl<db::PolygonProcessorBase> *f)
+{
+  return r->processed (*f);
+}
+
+static void process_pp (db::Region *r, const shape_processor_impl<db::PolygonProcessorBase> *f)
+{
+  r->process (*f);
+}
+
+static db::EdgePairs processed_pep (const db::Region *r, const shape_processor_impl<db::PolygonToEdgePairProcessorBase> *f)
+{
+  return r->processed (*f);
+}
+
+static db::Edges processed_pe (const db::Region *r, const shape_processor_impl<db::PolygonToEdgeProcessorBase> *f)
+{
+  return r->processed (*f);
 }
 
 static db::Region with_perimeter1 (const db::Region *r, db::Region::perimeter_type perimeter, bool inverse)
@@ -786,6 +1000,18 @@ size_dvm (db::Region *region, const db::Vector &dv, unsigned int mode)
 {
   region->size (dv.x (), dv.y (), mode);
   return *region;
+}
+
+static db::Edges
+edges (const db::Region *region, db::PolygonToEdgeProcessor::EdgeMode mode)
+{
+  if (mode != db::PolygonToEdgeProcessor::All) {
+    db::PolygonToEdgeProcessor proc (mode);
+    return region->edges (proc);
+  } else {
+    //  this version is more efficient in the hierarchical case
+    return region->edges ();
+  }
 }
 
 static std::vector<std::vector<double> >
@@ -2279,15 +2505,20 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "If the region is not merged, this method may return false even\n"
     "if the merged region would be a box.\n"
   ) +
-  method ("edges", (db::Edges (db::Region::*) () const) &db::Region::edges,
+  method_ext ("edges", &edges, gsi::arg ("mode", db::PolygonToEdgeProcessor::All, "All"),
     "@brief Returns an edge collection representing all edges of the polygons in this region\n"
     "This method will decompose the polygons into the individual edges. Edges making up the hulls "
     "of the polygons are oriented clockwise while edges making up the holes are oriented counterclockwise.\n"
     "\n"
+    "The 'mode' parameter allows selecting specific edges, such as convex or concave ones. By default, "
+    "all edges are selected.\n"
+    "\n"
     "The edge collection returned can be manipulated in various ways. See \\Edges for a description of the "
-    "possibilities of the edge collection.\n"
+    "features of the edge collection.\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
+    "\n"
+    "The mode argument has been added in version 0.29."
   ) +
   factory_ext ("decompose_convex", &decompose_convex<db::Shapes>, gsi::arg ("preferred_orientation", po_any (), "\\Polygon#PO_any"),
     "@brief Decomposes the region into convex pieces.\n"
@@ -2362,6 +2593,42 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "The first element returned is the \\members_of part, the second is the \\not_members_of part.\n"
     "\n"
     "This method has been introduced in version 0.28.\n"
+  ) +
+  method_ext ("filter", &filter, gsi::arg ("filter"),
+    "@brief Applies a generic filter in place (replacing the polygons from the Region)\n"
+    "See \\PolygonFilter for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.\n"
+  ) +
+  method_ext ("filtered", &filtered, gsi::arg ("filtered"),
+    "@brief Applies a generic filter and returns a filtered copy\n"
+    "See \\PolygonFilter for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.\n"
+  ) +
+  method_ext ("process", &process_pp, gsi::arg ("process"),
+    "@brief Applies a generic polygon processor in place (replacing the polygons from the Region)\n"
+    "See \\PolygonProcessor for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.\n"
+  ) +
+  method_ext ("processed", &processed_pp, gsi::arg ("processed"),
+    "@brief Applies a generic polygon processor and returns a processed copy\n"
+    "See \\PolygonProcessor for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.\n"
+  ) +
+  method_ext ("processed", &processed_pep, gsi::arg ("processed"),
+    "@brief Applies a generic polygon-to-edge-pair processor and returns an edge pair collection with the results\n"
+    "See \\PolygonToEdgePairProcessor for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.\n"
+  ) +
+  method_ext ("processed", &processed_pe, gsi::arg ("processed"),
+    "@brief Applies a generic polygon-to-edge processor and returns an edge collection with the results\n"
+    "See \\PolygonToEdgeProcessor for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.\n"
   ) +
   method_ext ("rectangles", &rectangles,
     "@brief Returns all polygons which are rectangles\n"
@@ -2674,7 +2941,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "The 'shielded' and 'negative' options have been introduced in version 0.27. "
     "'property_constraint' has been added in version 0.28.4.\n"
-    "'zero_distance_mode' has been added in version 0.29."
+    "'zero_distance_mode' has been added in version 0.28.16."
   ) +
   method_ext ("space_check", &space2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoRectFilter, "NoRectFilter"), gsi::arg ("negative", false), gsi::arg ("property_constraint", db::IgnoreProperties, "IgnoreProperties"), gsi::arg ("zero_distance_mode", db::IncludeZeroDistanceWhenTouching, "IncludeZeroDistanceWhenTouching"),
     "@brief Performs a space check with options\n"
@@ -3327,6 +3594,48 @@ gsi::Enum<db::metrics_type> decl_Metrics ("db", "Metrics",
 gsi::ClassExt<db::Region> inject_Metrics_in_Region (decl_Metrics.defs ());
 gsi::ClassExt<db::Edges> inject_Metrics_in_Edges (decl_Metrics.defs ());
 
+gsi::Enum<db::PolygonToEdgeProcessor::EdgeMode> decl_EdgeMode ("db", "EdgeMode",
+  gsi::enum_const ("All", db::PolygonToEdgeProcessor::All,
+    "@brief Selects all edges\n"
+  ) +
+  gsi::enum_const ("Concave", db::PolygonToEdgeProcessor::Concave,
+    "@brief Selects only concave edges\n"
+  ) +
+  gsi::enum_const ("NotConcave", db::PolygonToEdgeProcessor::NotConcave,
+    "@brief Selects only edges which are not concave\n"
+  ) +
+  gsi::enum_const ("Convex", db::PolygonToEdgeProcessor::Convex,
+    "@brief Selects only convex edges\n"
+  ) +
+  gsi::enum_const ("NotConvex", db::PolygonToEdgeProcessor::NotConvex,
+    "@brief Selects only edges which are not convex\n"
+  ) +
+  gsi::enum_const ("Step", db::PolygonToEdgeProcessor::Step,
+    "@brief Selects only step edges leading inside or outside\n"
+  ) +
+  gsi::enum_const ("NotStep", db::PolygonToEdgeProcessor::NotStep,
+    "@brief Selects only edges which are not steps\n"
+  ) +
+  gsi::enum_const ("StepIn", db::PolygonToEdgeProcessor::StepIn,
+    "@brief Selects only step edges leading inside\n"
+  ) +
+  gsi::enum_const ("NotStepIn", db::PolygonToEdgeProcessor::NotStepIn,
+    "@brief Selects only edges which are not steps leading inside\n"
+  ) +
+  gsi::enum_const ("StepOut", db::PolygonToEdgeProcessor::StepOut,
+    "@brief Selects only step edges leading outside\n"
+  ) +
+  gsi::enum_const ("NotStepOut", db::PolygonToEdgeProcessor::NotStepOut,
+    "@brief Selects only edges which are not steps leading outside\n"
+  ),
+  "@brief This class represents the edge mode type for \\Region#edges.\n"
+  "\n"
+  "This enum has been introduced in version 0.29."
+);
+
+//  Inject the Region::EdgeMode declarations into Region:
+gsi::ClassExt<db::Region> inject_EdgeMode_in_Region (decl_EdgeMode.defs ());
+
 gsi::Enum<db::zero_distance_mode> decl_ZeroDistanceMode ("db", "ZeroDistanceMode",
   gsi::enum_const ("NeverIncludeZeroDistance", db::NeverIncludeZeroDistance,
     "@brief Specifies that check functions should never include edges with zero distance.\n"
@@ -3340,7 +3649,7 @@ gsi::Enum<db::zero_distance_mode> decl_ZeroDistanceMode ("db", "ZeroDistanceMode
   gsi::enum_const ("IncludeZeroDistanceWhenTouching", db::IncludeZeroDistanceWhenTouching,
     "@brief Specifies that check functions should include edges when they touch\n"
     "With this specification, the check functions will also check edges if they share at least one common point. "
-    "This is the mode that includes checking the 'kissing corner' cases. This mode is default for version 0.29 and later. "
+    "This is the mode that includes checking the 'kissing corner' cases. This mode is default for version 0.28.16 and later. "
   ) +
   gsi::enum_const ("IncludeZeroDistanceWhenCollinearAndTouching", db::IncludeZeroDistanceWhenCollinearAndTouching,
     "@brief Specifies that check functions should include edges when they are collinear and touch\n"
@@ -3359,7 +3668,7 @@ gsi::Enum<db::zero_distance_mode> decl_ZeroDistanceMode ("db", "ZeroDistanceMode
   "if they share at least one common point (\\IncludeZeroDistanceWhenTouching). The latter mode allows activating checks for "
   "the 'kissing corner' case and is the default mode in most checks."
   "\n"
-  "This enum has been introduced in version 0.29."
+  "This enum has been introduced in version 0.28.16."
 );
 
 //  Inject the Region::ZeroDistanceMode declarations into Region and Edges:

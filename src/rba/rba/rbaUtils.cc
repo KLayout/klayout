@@ -530,10 +530,10 @@ VALUE rba_eval_string_in_context (const char *expr, const char *file, int line, 
   rb_set_errinfo (Qnil);
 
   if (file) {
-    rb_set_progname (rb_str_new (file, long (strlen (file))));
+    ruby_script (file);
   } else {
     const char *e = "<immediate>";
-    rb_set_progname (rb_str_new (e, long (strlen (e))));
+    ruby_script (e);
   }
 
   int argc;

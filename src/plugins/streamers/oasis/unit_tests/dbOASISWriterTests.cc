@@ -255,6 +255,13 @@ void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int com
     db::Reader reader (stream);
     reader.read (layout);
 
+    //  named layers create a mismatch between GDS and OASIS, so we unname them here
+    for (auto l = layout.begin_layers (); l != layout.end_layers (); ++l) {
+      db::LayerProperties lp = layout.get_properties ((*l).first);
+      lp.name.clear ();
+      layout.set_properties ((*l).first, lp);
+    }
+
     db::SaveLayoutOptions options;
     db::OASISWriterOptions oasis_options;
     oasis_options.compression_level = compr;

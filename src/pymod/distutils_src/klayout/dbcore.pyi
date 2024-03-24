@@ -3941,12 +3941,16 @@ class CompoundRegionOperationNode:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
+            """
+        def __hash__(self) -> int:
+            r"""
+            @brief Gets the hash value from the enum
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -3957,6 +3961,10 @@ class CompoundRegionOperationNode:
         def __init__(self, s: str) -> None:
             r"""
             @brief Creates an enum from a string value
+            """
+        def __int__(self) -> int:
+            r"""
+            @brief Gets the integer value from the enum
             """
         @overload
         def __lt__(self, other: CompoundRegionOperationNode.GeometricalOp) -> bool:
@@ -3985,6 +3993,10 @@ class CompoundRegionOperationNode:
         def __str__(self) -> str:
             r"""
             @brief Gets the symbolic string from an enum
+            """
+        def hash(self) -> int:
+            r"""
+            @brief Gets the hash value from the enum
             """
         def inspect(self) -> str:
             r"""
@@ -4034,6 +4046,10 @@ class CompoundRegionOperationNode:
             r"""
             @brief Compares two enums
             """
+        def __hash__(self) -> int:
+            r"""
+            @brief Gets the hash value from the enum
+            """
         @overload
         def __init__(self, i: int) -> None:
             r"""
@@ -4043,6 +4059,10 @@ class CompoundRegionOperationNode:
         def __init__(self, s: str) -> None:
             r"""
             @brief Creates an enum from a string value
+            """
+        def __int__(self) -> int:
+            r"""
+            @brief Gets the integer value from the enum
             """
         @overload
         def __lt__(self, other: CompoundRegionOperationNode.LogicalOp) -> bool:
@@ -4071,6 +4091,10 @@ class CompoundRegionOperationNode:
         def __str__(self) -> str:
             r"""
             @brief Gets the symbolic string from an enum
+            """
+        def hash(self) -> int:
+            r"""
+            @brief Gets the hash value from the enum
             """
         def inspect(self) -> str:
             r"""
@@ -4125,12 +4149,16 @@ class CompoundRegionOperationNode:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
+            """
+        def __hash__(self) -> int:
+            r"""
+            @brief Gets the hash value from the enum
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -4141,6 +4169,10 @@ class CompoundRegionOperationNode:
         def __init__(self, s: str) -> None:
             r"""
             @brief Creates an enum from a string value
+            """
+        def __int__(self) -> int:
+            r"""
+            @brief Gets the integer value from the enum
             """
         @overload
         def __lt__(self, other: CompoundRegionOperationNode.ParameterType) -> bool:
@@ -4169,6 +4201,10 @@ class CompoundRegionOperationNode:
         def __str__(self) -> str:
             r"""
             @brief Gets the symbolic string from an enum
+            """
+        def hash(self) -> int:
+            r"""
+            @brief Gets the hash value from the enum
             """
         def inspect(self) -> str:
             r"""
@@ -4215,12 +4251,16 @@ class CompoundRegionOperationNode:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
+            """
+        def __hash__(self) -> int:
+            r"""
+            @brief Gets the hash value from the enum
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -4231,6 +4271,10 @@ class CompoundRegionOperationNode:
         def __init__(self, s: str) -> None:
             r"""
             @brief Creates an enum from a string value
+            """
+        def __int__(self) -> int:
+            r"""
+            @brief Gets the integer value from the enum
             """
         @overload
         def __lt__(self, other: CompoundRegionOperationNode.RatioParameterType) -> bool:
@@ -4259,6 +4303,10 @@ class CompoundRegionOperationNode:
         def __str__(self) -> str:
             r"""
             @brief Gets the symbolic string from an enum
+            """
+        def hash(self) -> int:
+            r"""
+            @brief Gets the hash value from the enum
             """
         def inspect(self) -> str:
             r"""
@@ -4305,12 +4353,16 @@ class CompoundRegionOperationNode:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
+            """
+        def __hash__(self) -> int:
+            r"""
+            @brief Gets the hash value from the enum
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -4321,6 +4373,10 @@ class CompoundRegionOperationNode:
         def __init__(self, s: str) -> None:
             r"""
             @brief Creates an enum from a string value
+            """
+        def __int__(self) -> int:
+            r"""
+            @brief Gets the integer value from the enum
             """
         @overload
         def __lt__(self, other: CompoundRegionOperationNode.ResultType) -> bool:
@@ -4335,12 +4391,12 @@ class CompoundRegionOperationNode:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -4349,6 +4405,10 @@ class CompoundRegionOperationNode:
         def __str__(self) -> str:
             r"""
             @brief Gets the symbolic string from an enum
+            """
+        def hash(self) -> int:
+            r"""
+            @brief Gets the hash value from the enum
             """
         def inspect(self) -> str:
             r"""
@@ -5069,11 +5129,12 @@ class CplxTrans:
     "mirroring" describes a reflection at the x-axis which is included in the transformation prior to rotation.@param m The new mirror flag
     """
     @classmethod
-    def from_dtrans(cls, trans: DCplxTrans) -> CplxTrans:
+    def from_dtrans(cls, trans: DCplxTrans, dbu: Optional[float] = ...) -> CplxTrans:
         r"""
-        @brief Creates a floating-point coordinate transformation from another coordinate flavour
+        @brief Creates an integer-to-floating-point coordinate transformation from another coordinate flavour
+        The 'dbu' argument is used to transform the input space from floating-point units to integer units. Formally, the CplxTrans transformation is initialized with 'trans * from_dbu' where 'from_dbu' is the transformation into micrometer space, or more precisely 'CplxTrans(mag=dbu)'.
 
-        This constructor has been introduced in version 0.25 and replaces the previous static method 'from_dtrans'.
+        This constructor has been introduced in version 0.25. The 'dbu' argument has been added in version 0.29.
         """
     @classmethod
     def from_s(cls, s: str) -> CplxTrans:
@@ -5091,7 +5152,7 @@ class CplxTrans:
         """
     @overload
     @classmethod
-    def new(cls, c: CplxTrans, m: Optional[float] = ..., u: Optional[DVector] = ...) -> CplxTrans:
+    def new(cls, c: CplxTrans, mag: Optional[float] = ..., u: Optional[DVector] = ...) -> CplxTrans:
         r"""
         @brief Creates a transformation from another transformation plus a magnification and displacement
 
@@ -5104,7 +5165,7 @@ class CplxTrans:
         """
     @overload
     @classmethod
-    def new(cls, c: CplxTrans, m: float, x: int, y: int) -> CplxTrans:
+    def new(cls, c: CplxTrans, mag: Optional[float] = ..., x: Optional[float] = ..., y: Optional[float] = ...) -> CplxTrans:
         r"""
         @brief Creates a transformation from another transformation plus a magnification and displacement
 
@@ -5118,15 +5179,7 @@ class CplxTrans:
         """
     @overload
     @classmethod
-    def new(cls, m: float) -> CplxTrans:
-        r"""
-        @brief Creates a transformation from a magnification
-
-        Creates a magnifying transformation without displacement and rotation given the magnification m.
-        """
-    @overload
-    @classmethod
-    def new(cls, mag: float, rot: float, mirrx: bool, u: DVector) -> CplxTrans:
+    def new(cls, mag: Optional[float] = ..., rot: Optional[float] = ..., mirrx: Optional[bool] = ..., u: Optional[DVector] = ...) -> CplxTrans:
         r"""
         @brief Creates a transformation using magnification, angle, mirror flag and displacement
 
@@ -5140,7 +5193,7 @@ class CplxTrans:
         """
     @overload
     @classmethod
-    def new(cls, mag: float, rot: float, mirrx: bool, x: float, y: float) -> CplxTrans:
+    def new(cls, mag: Optional[float] = ..., rot: Optional[float] = ..., mirrx: Optional[bool] = ..., x: Optional[float] = ..., y: Optional[float] = ...) -> CplxTrans:
         r"""
         @brief Creates a transformation using magnification, angle, mirror flag and displacement
 
@@ -5155,15 +5208,7 @@ class CplxTrans:
         """
     @overload
     @classmethod
-    def new(cls, t: Trans) -> CplxTrans:
-        r"""
-        @brief Creates a transformation from a simple transformation alone
-
-        Creates a magnifying transformation from a simple transformation and a magnification of 1.0.
-        """
-    @overload
-    @classmethod
-    def new(cls, t: Trans, m: float) -> CplxTrans:
+    def new(cls, t: Trans, mag: Optional[float] = ...) -> CplxTrans:
         r"""
         @brief Creates a transformation from a simple transformation and a magnification
 
@@ -5171,27 +5216,30 @@ class CplxTrans:
         """
     @overload
     @classmethod
-    def new(cls, trans: DCplxTrans) -> CplxTrans:
+    def new(cls, trans: DCplxTrans, dbu: Optional[float] = ...) -> CplxTrans:
         r"""
-        @brief Creates a floating-point coordinate transformation from another coordinate flavour
+        @brief Creates an integer-to-floating-point coordinate transformation from another coordinate flavour
+        The 'dbu' argument is used to transform the input space from floating-point units to integer units. Formally, the CplxTrans transformation is initialized with 'trans * from_dbu' where 'from_dbu' is the transformation into micrometer space, or more precisely 'CplxTrans(mag=dbu)'.
 
-        This constructor has been introduced in version 0.25 and replaces the previous static method 'from_dtrans'.
+        This constructor has been introduced in version 0.25. The 'dbu' argument has been added in version 0.29.
         """
     @overload
     @classmethod
-    def new(cls, trans: ICplxTrans) -> CplxTrans:
+    def new(cls, trans: ICplxTrans, dbu: Optional[float] = ...) -> CplxTrans:
         r"""
-        @brief Creates a floating-point coordinate transformation from another coordinate flavour
+        @brief Creates an integer-to-floating-point coordinate transformation from another coordinate flavour
+        The 'dbu' argument is used to transform the output space from integer units to floating-point units. Formally, the CplxTrans transformation is initialized with 'from_dbu * trans' where 'from_dbu' is the transformation into micrometer space, or more precisely 'CplxTrans(mag=dbu)'.
 
-        This constructor has been introduced in version 0.25.
+        This constructor has been introduced in version 0.25. The 'dbu' argument has been added in version 0.29.
         """
     @overload
     @classmethod
-    def new(cls, trans: VCplxTrans) -> CplxTrans:
+    def new(cls, trans: VCplxTrans, dbu: Optional[float] = ...) -> CplxTrans:
         r"""
-        @brief Creates a floating-point coordinate transformation from another coordinate flavour
+        @brief Creates an integer-to-floating-point coordinate transformation from another coordinate flavour
+        The 'dbu' argument is used to transform the input and output space from integer units to floating-point units and vice versa. Formally, the DCplxTrans transformation is initialized with 'from_dbu * trans * from_dbu' where 'from_dbu' is the transformation into micrometer space, or more precisely 'CplxTrans(mag=dbu)'.
 
-        This constructor has been introduced in version 0.25.
+        This constructor has been introduced in version 0.25. The 'dbu' argument has been added in version 0.29.
         """
     @overload
     @classmethod
@@ -5240,7 +5288,7 @@ class CplxTrans:
         @brief Creates a unit transformation
         """
     @overload
-    def __init__(self, c: CplxTrans, m: Optional[float] = ..., u: Optional[DVector] = ...) -> None:
+    def __init__(self, c: CplxTrans, mag: Optional[float] = ..., u: Optional[DVector] = ...) -> None:
         r"""
         @brief Creates a transformation from another transformation plus a magnification and displacement
 
@@ -5252,7 +5300,7 @@ class CplxTrans:
         @param u The Additional displacement
         """
     @overload
-    def __init__(self, c: CplxTrans, m: float, x: int, y: int) -> None:
+    def __init__(self, c: CplxTrans, mag: Optional[float] = ..., x: Optional[float] = ..., y: Optional[float] = ...) -> None:
         r"""
         @brief Creates a transformation from another transformation plus a magnification and displacement
 
@@ -5265,14 +5313,7 @@ class CplxTrans:
         @param y The Additional displacement (y)
         """
     @overload
-    def __init__(self, m: float) -> None:
-        r"""
-        @brief Creates a transformation from a magnification
-
-        Creates a magnifying transformation without displacement and rotation given the magnification m.
-        """
-    @overload
-    def __init__(self, mag: float, rot: float, mirrx: bool, u: DVector) -> None:
+    def __init__(self, mag: Optional[float] = ..., rot: Optional[float] = ..., mirrx: Optional[bool] = ..., u: Optional[DVector] = ...) -> None:
         r"""
         @brief Creates a transformation using magnification, angle, mirror flag and displacement
 
@@ -5285,7 +5326,7 @@ class CplxTrans:
         @param u The displacement
         """
     @overload
-    def __init__(self, mag: float, rot: float, mirrx: bool, x: float, y: float) -> None:
+    def __init__(self, mag: Optional[float] = ..., rot: Optional[float] = ..., mirrx: Optional[bool] = ..., x: Optional[float] = ..., y: Optional[float] = ...) -> None:
         r"""
         @brief Creates a transformation using magnification, angle, mirror flag and displacement
 
@@ -5299,39 +5340,35 @@ class CplxTrans:
         @param y The y displacement
         """
     @overload
-    def __init__(self, t: Trans) -> None:
-        r"""
-        @brief Creates a transformation from a simple transformation alone
-
-        Creates a magnifying transformation from a simple transformation and a magnification of 1.0.
-        """
-    @overload
-    def __init__(self, t: Trans, m: float) -> None:
+    def __init__(self, t: Trans, mag: Optional[float] = ...) -> None:
         r"""
         @brief Creates a transformation from a simple transformation and a magnification
 
         Creates a magnifying transformation from a simple transformation and a magnification.
         """
     @overload
-    def __init__(self, trans: DCplxTrans) -> None:
+    def __init__(self, trans: DCplxTrans, dbu: Optional[float] = ...) -> None:
         r"""
-        @brief Creates a floating-point coordinate transformation from another coordinate flavour
+        @brief Creates an integer-to-floating-point coordinate transformation from another coordinate flavour
+        The 'dbu' argument is used to transform the input space from floating-point units to integer units. Formally, the CplxTrans transformation is initialized with 'trans * from_dbu' where 'from_dbu' is the transformation into micrometer space, or more precisely 'CplxTrans(mag=dbu)'.
 
-        This constructor has been introduced in version 0.25 and replaces the previous static method 'from_dtrans'.
+        This constructor has been introduced in version 0.25. The 'dbu' argument has been added in version 0.29.
         """
     @overload
-    def __init__(self, trans: ICplxTrans) -> None:
+    def __init__(self, trans: ICplxTrans, dbu: Optional[float] = ...) -> None:
         r"""
-        @brief Creates a floating-point coordinate transformation from another coordinate flavour
+        @brief Creates an integer-to-floating-point coordinate transformation from another coordinate flavour
+        The 'dbu' argument is used to transform the output space from integer units to floating-point units. Formally, the CplxTrans transformation is initialized with 'from_dbu * trans' where 'from_dbu' is the transformation into micrometer space, or more precisely 'CplxTrans(mag=dbu)'.
 
-        This constructor has been introduced in version 0.25.
+        This constructor has been introduced in version 0.25. The 'dbu' argument has been added in version 0.29.
         """
     @overload
-    def __init__(self, trans: VCplxTrans) -> None:
+    def __init__(self, trans: VCplxTrans, dbu: Optional[float] = ...) -> None:
         r"""
-        @brief Creates a floating-point coordinate transformation from another coordinate flavour
+        @brief Creates an integer-to-floating-point coordinate transformation from another coordinate flavour
+        The 'dbu' argument is used to transform the input and output space from integer units to floating-point units and vice versa. Formally, the DCplxTrans transformation is initialized with 'from_dbu * trans * from_dbu' where 'from_dbu' is the transformation into micrometer space, or more precisely 'CplxTrans(mag=dbu)'.
 
-        This constructor has been introduced in version 0.25.
+        This constructor has been introduced in version 0.25. The 'dbu' argument has been added in version 0.29.
         """
     @overload
     def __init__(self, u: DVector) -> None:
@@ -5769,9 +5806,13 @@ class CplxTrans:
         r"""
         @brief Converts the transformation to another transformation with integer input and output coordinates
 
-        The database unit can be specified to translate the floating-point coordinate displacement in micron units to an integer-coordinate displacement in database units. The displacement's' coordinates will be divided by the database unit.
+        This method is redundant with the conversion constructors. Instead of 'to_itrans' use the conversion constructor:
 
-        This method has been introduced in version 0.25.
+        @code
+        itrans = RBA::ICplxTrans::new(trans, dbu)
+        @/code
+
+        This method has been introduced in version 0.25 and was deprecated in version 0.29.
         """
     def to_s(self, lazy: Optional[bool] = ..., dbu: Optional[float] = ...) -> str:
         r"""
@@ -5781,19 +5822,29 @@ class CplxTrans:
 
         The lazy and DBU arguments have been added in version 0.27.6.
         """
-    def to_trans(self) -> DCplxTrans:
+    def to_trans(self, dbu: Optional[float] = ...) -> DCplxTrans:
         r"""
         @brief Converts the transformation to another transformation with floating-point input coordinates
 
-        This method has been introduced in version 0.25.
+        This method is redundant with the conversion constructors. Instead of 'to_trans' use the conversion constructor:
+
+        @code
+        dtrans = RBA::DCplxTrans::new(trans, dbu)
+        @/code
+
+        This method has been introduced in version 0.25 and was deprecated in version 0.29.
         """
     def to_vtrans(self, dbu: Optional[float] = ...) -> VCplxTrans:
         r"""
         @brief Converts the transformation to another transformation with integer output and floating-point input coordinates
 
-        The database unit can be specified to translate the floating-point coordinate displacement in micron units to an integer-coordinate displacement in database units. The displacement's' coordinates will be divided by the database unit.
+        This method is redundant with the conversion constructors. Instead of 'to_vtrans' use the conversion constructor:
 
-        This method has been introduced in version 0.25.
+        @code
+        vtrans = RBA::VCplxTrans::new(trans, dbu)
+        @/code
+
+        This method has been introduced in version 0.25 and was deprecated in version 0.29.
         """
     @overload
     def trans(self, box: Box) -> DBox:
@@ -7236,11 +7287,12 @@ class DCplxTrans:
     "mirroring" describes a reflection at the x-axis which is included in the transformation prior to rotation.@param m The new mirror flag
     """
     @classmethod
-    def from_itrans(cls, trans: CplxTrans) -> DCplxTrans:
+    def from_itrans(cls, trans: CplxTrans, dbu: Optional[float] = ...) -> DCplxTrans:
         r"""
         @brief Creates a floating-point coordinate transformation from another coordinate flavour
+        The 'dbu' argument is used to transform the input space from integer units to floating-point units. Formally, the DCplxTrans transformation is initialized with 'trans * to_dbu' where 'to_dbu' is the transformation into DBU space, or more precisely 'VCplxTrans(mag=1/dbu)'.
 
-        This constructor has been introduced in version 0.25 and replaces the previous static method 'from_itrans'.
+        This constructor has been introduced in version 0.25. The 'dbu' argument has been added in version 0.29.
         """
     @classmethod
     def from_s(cls, s: str) -> DCplxTrans:
@@ -7258,7 +7310,7 @@ class DCplxTrans:
         """
     @overload
     @classmethod
-    def new(cls, c: DCplxTrans, m: Optional[float] = ..., u: Optional[DVector] = ...) -> DCplxTrans:
+    def new(cls, c: DCplxTrans, mag: Optional[float] = ..., u: Optional[DVector] = ...) -> DCplxTrans:
         r"""
         @brief Creates a transformation from another transformation plus a magnification and displacement
 
@@ -7271,7 +7323,7 @@ class DCplxTrans:
         """
     @overload
     @classmethod
-    def new(cls, c: DCplxTrans, m: float, x: float, y: float) -> DCplxTrans:
+    def new(cls, c: DCplxTrans, mag: Optional[float] = ..., x: Optional[float] = ..., y: Optional[float] = ...) -> DCplxTrans:
         r"""
         @brief Creates a transformation from another transformation plus a magnification and displacement
 
@@ -7285,15 +7337,7 @@ class DCplxTrans:
         """
     @overload
     @classmethod
-    def new(cls, m: float) -> DCplxTrans:
-        r"""
-        @brief Creates a transformation from a magnification
-
-        Creates a magnifying transformation without displacement and rotation given the magnification m.
-        """
-    @overload
-    @classmethod
-    def new(cls, mag: float, rot: float, mirrx: bool, u: DVector) -> DCplxTrans:
+    def new(cls, mag: Optional[float] = ..., rot: Optional[float] = ..., mirrx: Optional[bool] = ..., u: Optional[DVector] = ...) -> DCplxTrans:
         r"""
         @brief Creates a transformation using magnification, angle, mirror flag and displacement
 
@@ -7307,7 +7351,7 @@ class DCplxTrans:
         """
     @overload
     @classmethod
-    def new(cls, mag: float, rot: float, mirrx: bool, x: float, y: float) -> DCplxTrans:
+    def new(cls, mag: Optional[float] = ..., rot: Optional[float] = ..., mirrx: Optional[bool] = ..., x: Optional[float] = ..., y: Optional[float] = ...) -> DCplxTrans:
         r"""
         @brief Creates a transformation using magnification, angle, mirror flag and displacement
 
@@ -7322,15 +7366,7 @@ class DCplxTrans:
         """
     @overload
     @classmethod
-    def new(cls, t: DTrans) -> DCplxTrans:
-        r"""
-        @brief Creates a transformation from a simple transformation alone
-
-        Creates a magnifying transformation from a simple transformation and a magnification of 1.0.
-        """
-    @overload
-    @classmethod
-    def new(cls, t: DTrans, m: float) -> DCplxTrans:
+    def new(cls, t: DTrans, mag: Optional[float] = ...) -> DCplxTrans:
         r"""
         @brief Creates a transformation from a simple transformation and a magnification
 
@@ -7338,27 +7374,30 @@ class DCplxTrans:
         """
     @overload
     @classmethod
-    def new(cls, trans: CplxTrans) -> DCplxTrans:
+    def new(cls, trans: CplxTrans, dbu: Optional[float] = ...) -> DCplxTrans:
         r"""
         @brief Creates a floating-point coordinate transformation from another coordinate flavour
+        The 'dbu' argument is used to transform the input space from integer units to floating-point units. Formally, the DCplxTrans transformation is initialized with 'trans * to_dbu' where 'to_dbu' is the transformation into DBU space, or more precisely 'VCplxTrans(mag=1/dbu)'.
 
-        This constructor has been introduced in version 0.25 and replaces the previous static method 'from_itrans'.
+        This constructor has been introduced in version 0.25. The 'dbu' argument has been added in version 0.29.
         """
     @overload
     @classmethod
-    def new(cls, trans: ICplxTrans) -> DCplxTrans:
+    def new(cls, trans: ICplxTrans, dbu: Optional[float] = ...) -> DCplxTrans:
         r"""
         @brief Creates a floating-point coordinate transformation from another coordinate flavour
+        The 'dbu' argument is used to transform the input and output space from integer units to floating-point units and vice versa. Formally, the DCplxTrans transformation is initialized with 'from_dbu * trans * to_dbu' where 'to_dbu' is the transformation into DBU space, or more precisely 'VCplxTrans(mag=1/dbu)'. 'from_dbu' is the transformation into micrometer space, or more precisely 'CplxTrans(mag=dbu)'.
 
-        This constructor has been introduced in version 0.25.
+        This constructor has been introduced in version 0.25. The 'dbu' argument has been added in version 0.29.
         """
     @overload
     @classmethod
-    def new(cls, trans: VCplxTrans) -> DCplxTrans:
+    def new(cls, trans: VCplxTrans, dbu: Optional[float] = ...) -> DCplxTrans:
         r"""
         @brief Creates a floating-point coordinate transformation from another coordinate flavour
+        The 'dbu' argument is used to transform the output space from integer units to floating-point units. Formally, the DCplxTrans transformation is initialized with 'from_dbu * trans' where 'from_dbu' is the transformation into micrometer space, or more precisely 'CplxTrans(mag=dbu)'.
 
-        This constructor has been introduced in version 0.25.
+        This constructor has been introduced in version 0.25. The 'dbu' argument has been added in version 0.29.
         """
     @overload
     @classmethod
@@ -7407,7 +7446,7 @@ class DCplxTrans:
         @brief Creates a unit transformation
         """
     @overload
-    def __init__(self, c: DCplxTrans, m: Optional[float] = ..., u: Optional[DVector] = ...) -> None:
+    def __init__(self, c: DCplxTrans, mag: Optional[float] = ..., u: Optional[DVector] = ...) -> None:
         r"""
         @brief Creates a transformation from another transformation plus a magnification and displacement
 
@@ -7419,7 +7458,7 @@ class DCplxTrans:
         @param u The Additional displacement
         """
     @overload
-    def __init__(self, c: DCplxTrans, m: float, x: float, y: float) -> None:
+    def __init__(self, c: DCplxTrans, mag: Optional[float] = ..., x: Optional[float] = ..., y: Optional[float] = ...) -> None:
         r"""
         @brief Creates a transformation from another transformation plus a magnification and displacement
 
@@ -7432,14 +7471,7 @@ class DCplxTrans:
         @param y The Additional displacement (y)
         """
     @overload
-    def __init__(self, m: float) -> None:
-        r"""
-        @brief Creates a transformation from a magnification
-
-        Creates a magnifying transformation without displacement and rotation given the magnification m.
-        """
-    @overload
-    def __init__(self, mag: float, rot: float, mirrx: bool, u: DVector) -> None:
+    def __init__(self, mag: Optional[float] = ..., rot: Optional[float] = ..., mirrx: Optional[bool] = ..., u: Optional[DVector] = ...) -> None:
         r"""
         @brief Creates a transformation using magnification, angle, mirror flag and displacement
 
@@ -7452,7 +7484,7 @@ class DCplxTrans:
         @param u The displacement
         """
     @overload
-    def __init__(self, mag: float, rot: float, mirrx: bool, x: float, y: float) -> None:
+    def __init__(self, mag: Optional[float] = ..., rot: Optional[float] = ..., mirrx: Optional[bool] = ..., x: Optional[float] = ..., y: Optional[float] = ...) -> None:
         r"""
         @brief Creates a transformation using magnification, angle, mirror flag and displacement
 
@@ -7466,39 +7498,35 @@ class DCplxTrans:
         @param y The y displacement
         """
     @overload
-    def __init__(self, t: DTrans) -> None:
-        r"""
-        @brief Creates a transformation from a simple transformation alone
-
-        Creates a magnifying transformation from a simple transformation and a magnification of 1.0.
-        """
-    @overload
-    def __init__(self, t: DTrans, m: float) -> None:
+    def __init__(self, t: DTrans, mag: Optional[float] = ...) -> None:
         r"""
         @brief Creates a transformation from a simple transformation and a magnification
 
         Creates a magnifying transformation from a simple transformation and a magnification.
         """
     @overload
-    def __init__(self, trans: CplxTrans) -> None:
+    def __init__(self, trans: CplxTrans, dbu: Optional[float] = ...) -> None:
         r"""
         @brief Creates a floating-point coordinate transformation from another coordinate flavour
+        The 'dbu' argument is used to transform the input space from integer units to floating-point units. Formally, the DCplxTrans transformation is initialized with 'trans * to_dbu' where 'to_dbu' is the transformation into DBU space, or more precisely 'VCplxTrans(mag=1/dbu)'.
 
-        This constructor has been introduced in version 0.25 and replaces the previous static method 'from_itrans'.
+        This constructor has been introduced in version 0.25. The 'dbu' argument has been added in version 0.29.
         """
     @overload
-    def __init__(self, trans: ICplxTrans) -> None:
+    def __init__(self, trans: ICplxTrans, dbu: Optional[float] = ...) -> None:
         r"""
         @brief Creates a floating-point coordinate transformation from another coordinate flavour
+        The 'dbu' argument is used to transform the input and output space from integer units to floating-point units and vice versa. Formally, the DCplxTrans transformation is initialized with 'from_dbu * trans * to_dbu' where 'to_dbu' is the transformation into DBU space, or more precisely 'VCplxTrans(mag=1/dbu)'. 'from_dbu' is the transformation into micrometer space, or more precisely 'CplxTrans(mag=dbu)'.
 
-        This constructor has been introduced in version 0.25.
+        This constructor has been introduced in version 0.25. The 'dbu' argument has been added in version 0.29.
         """
     @overload
-    def __init__(self, trans: VCplxTrans) -> None:
+    def __init__(self, trans: VCplxTrans, dbu: Optional[float] = ...) -> None:
         r"""
         @brief Creates a floating-point coordinate transformation from another coordinate flavour
+        The 'dbu' argument is used to transform the output space from integer units to floating-point units. Formally, the DCplxTrans transformation is initialized with 'from_dbu * trans' where 'from_dbu' is the transformation into micrometer space, or more precisely 'CplxTrans(mag=dbu)'.
 
-        This constructor has been introduced in version 0.25.
+        This constructor has been introduced in version 0.25. The 'dbu' argument has been added in version 0.29.
         """
     @overload
     def __init__(self, u: DVector) -> None:
@@ -7928,7 +7956,13 @@ class DCplxTrans:
 
         The database unit can be specified to translate the floating-point coordinate displacement in micron units to an integer-coordinate displacement in database units. The displacement's' coordinates will be divided by the database unit.
 
-        This method has been introduced in version 0.25.
+        This method is redundant with the conversion constructors. Instead of 'to_itrans' use the conversion constructor:
+
+        @code
+        itrans = RBA::ICplxTrans::new(dtrans, dbu)
+        @/code
+
+        This method has been introduced in version 0.25 and was deprecated in version 0.29.
         """
     def to_s(self, lazy: Optional[bool] = ..., dbu: Optional[float] = ...) -> str:
         r"""
@@ -7938,11 +7972,17 @@ class DCplxTrans:
 
         The lazy and DBU arguments have been added in version 0.27.6.
         """
-    def to_trans(self) -> CplxTrans:
+    def to_trans(self, dbu: Optional[float] = ...) -> CplxTrans:
         r"""
         @brief Converts the transformation to another transformation with integer input coordinates
 
-        This method has been introduced in version 0.25.
+        This method is redundant with the conversion constructors. Instead of 'to_trans' use the conversion constructor:
+
+        @code
+        trans = RBA::CplxTrans::new(dtrans, dbu)
+        @/code
+
+        This method has been introduced in version 0.25 and was deprecated in version 0.29.
         """
     def to_vtrans(self, dbu: Optional[float] = ...) -> VCplxTrans:
         r"""
@@ -7950,7 +7990,13 @@ class DCplxTrans:
 
         The database unit can be specified to translate the floating-point coordinate displacement in micron units to an integer-coordinate displacement in database units. The displacement's' coordinates will be divided by the database unit.
 
-        This method has been introduced in version 0.25.
+        This method is redundant with the conversion constructors. Instead of 'to_vtrans' use the conversion constructor:
+
+        @code
+        vtrans = RBA::VCplxTrans::new(dtrans, dbu)
+        @/code
+
+        This method has been introduced in version 0.25 and was deprecated in version 0.29.
         """
     @overload
     def trans(self, box: DBox) -> DBox:
@@ -11339,8 +11385,7 @@ class DText:
     Setter:
     @brief Sets the horizontal alignment
 
-    This property specifies how the text is aligned relative to the anchor point. 
-    This property has been introduced in version 0.22 and extended to enums in 0.28.
+    This is the version accepting integer values. It's provided for backward compatibility.
     """
     size: float
     r"""
@@ -11886,7 +11931,7 @@ class DTrans:
         """
     @overload
     @classmethod
-    def new(cls, c: DTrans, x: float, y: float) -> DTrans:
+    def new(cls, c: DTrans, x: Optional[float] = ..., y: Optional[float] = ...) -> DTrans:
         r"""
         @brief Creates a transformation from another transformation plus a displacement
 
@@ -11900,7 +11945,7 @@ class DTrans:
         """
     @overload
     @classmethod
-    def new(cls, rot: int, mirr: Optional[bool] = ..., u: Optional[DVector] = ...) -> DTrans:
+    def new(cls, rot: Optional[int] = ..., mirrx: Optional[bool] = ..., u: Optional[DVector] = ...) -> DTrans:
         r"""
         @brief Creates a transformation using angle and mirror flag
 
@@ -11913,7 +11958,7 @@ class DTrans:
         """
     @overload
     @classmethod
-    def new(cls, rot: int, mirr: bool, x: float, y: float) -> DTrans:
+    def new(cls, rot: Optional[int] = ..., mirrx: Optional[bool] = ..., x: Optional[float] = ..., y: Optional[float] = ...) -> DTrans:
         r"""
         @brief Creates a transformation using angle and mirror flag and two coordinate values for displacement
 
@@ -11987,7 +12032,7 @@ class DTrans:
         @param u The Additional displacement
         """
     @overload
-    def __init__(self, c: DTrans, x: float, y: float) -> None:
+    def __init__(self, c: DTrans, x: Optional[float] = ..., y: Optional[float] = ...) -> None:
         r"""
         @brief Creates a transformation from another transformation plus a displacement
 
@@ -12000,7 +12045,7 @@ class DTrans:
         @param y The Additional displacement (y)
         """
     @overload
-    def __init__(self, rot: int, mirr: Optional[bool] = ..., u: Optional[DVector] = ...) -> None:
+    def __init__(self, rot: Optional[int] = ..., mirrx: Optional[bool] = ..., u: Optional[DVector] = ...) -> None:
         r"""
         @brief Creates a transformation using angle and mirror flag
 
@@ -12012,7 +12057,7 @@ class DTrans:
         @param u The displacement
         """
     @overload
-    def __init__(self, rot: int, mirr: bool, x: float, y: float) -> None:
+    def __init__(self, rot: Optional[int] = ..., mirrx: Optional[bool] = ..., x: Optional[float] = ..., y: Optional[float] = ...) -> None:
         r"""
         @brief Creates a transformation using angle and mirror flag and two coordinate values for displacement
 
@@ -19038,6 +19083,10 @@ class Edges(ShapeCollection):
             r"""
             @brief Compares an enum with an integer value
             """
+        def __hash__(self) -> int:
+            r"""
+            @brief Gets the hash value from the enum
+            """
         @overload
         def __init__(self, i: int) -> None:
             r"""
@@ -19047,6 +19096,10 @@ class Edges(ShapeCollection):
         def __init__(self, s: str) -> None:
             r"""
             @brief Creates an enum from a string value
+            """
+        def __int__(self) -> int:
+            r"""
+            @brief Gets the integer value from the enum
             """
         @overload
         def __lt__(self, other: Edges.EdgeType) -> bool:
@@ -19075,6 +19128,10 @@ class Edges(ShapeCollection):
         def __str__(self) -> str:
             r"""
             @brief Gets the symbolic string from an enum
+            """
+        def hash(self) -> int:
+            r"""
+            @brief Gets the hash value from the enum
             """
         def inspect(self) -> str:
             r"""
@@ -21852,12 +21909,16 @@ class HAlign:
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer value
+        @brief Compares two enums
         """
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums
+        @brief Compares an enum with an integer value
+        """
+    def __hash__(self) -> int:
+        r"""
+        @brief Gets the hash value from the enum
         """
     @overload
     def __init__(self, i: int) -> None:
@@ -21868,6 +21929,10 @@ class HAlign:
     def __init__(self, s: str) -> None:
         r"""
         @brief Creates an enum from a string value
+        """
+    def __int__(self) -> int:
+        r"""
+        @brief Gets the integer value from the enum
         """
     @overload
     def __lt__(self, other: HAlign) -> bool:
@@ -21882,12 +21947,12 @@ class HAlign:
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer for inequality
+        @brief Compares two enums for inequality
         """
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums for inequality
+        @brief Compares an enum with an integer for inequality
         """
     def __repr__(self) -> str:
         r"""
@@ -21958,6 +22023,10 @@ class HAlign:
     def dup(self) -> HAlign:
         r"""
         @brief Creates a copy of self
+        """
+    def hash(self) -> int:
+        r"""
+        @brief Gets the hash value from the enum
         """
     def inspect(self) -> str:
         r"""
@@ -22090,11 +22159,13 @@ class ICplxTrans:
     "mirroring" describes a reflection at the x-axis which is included in the transformation prior to rotation.@param m The new mirror flag
     """
     @classmethod
-    def from_dtrans(cls, trans: DCplxTrans) -> ICplxTrans:
+    def from_dtrans(cls, trans: DCplxTrans, dbu: Optional[float] = ...) -> ICplxTrans:
         r"""
-        @brief Creates a floating-point coordinate transformation from another coordinate flavour
+        @brief Creates an integer coordinate transformation from another coordinate flavour
 
-        This constructor has been introduced in version 0.25 and replaces the previous static method 'from_dtrans'.
+        The 'dbu' argument is used to transform the input space and output space from floating-point units to integer units and vice versa. Formally, the ICplxTrans transformation is initialized with 'to_dbu * trans * from_dbu' where 'from_dbu' is the transformation into micrometer space, or more precisely 'CplxTrans(mag=dbu)' and 'to_dbu' is the transformation into DBU space, or more precisely 'VCplxTrans(mag=1/dbu)'.
+
+        This constructor has been introduced in version 0.25. The 'dbu' argument has been added in version 0.29.
         """
     @classmethod
     def from_s(cls, s: str) -> ICplxTrans:
@@ -22105,11 +22176,13 @@ class ICplxTrans:
         This method has been added in version 0.23.
         """
     @classmethod
-    def from_trans(cls, trans: CplxTrans) -> ICplxTrans:
+    def from_trans(cls, trans: CplxTrans, dbu: Optional[float] = ...) -> ICplxTrans:
         r"""
-        @brief Creates a floating-point coordinate transformation from another coordinate flavour
+        @brief Creates an integer coordinate transformation from another coordinate flavour
 
-        This constructor has been introduced in version 0.25 and replaces the previous static method 'from_trans'.
+        The 'dbu' argument is used to transform the output space from floating-point units to integer units. Formally, the CplxTrans transformation is initialized with 'to_dbu * trans' where 'to_dbu' is the transformation into DBU space, or more precisely 'VCplxTrans(mag=1/dbu)'.
+
+        This constructor has been introduced in version 0.25. The 'dbu' argument has been added in version 0.29.
         """
     @overload
     @classmethod
@@ -22119,7 +22192,7 @@ class ICplxTrans:
         """
     @overload
     @classmethod
-    def new(cls, c: ICplxTrans, m: Optional[float] = ..., u: Optional[Vector] = ...) -> ICplxTrans:
+    def new(cls, c: ICplxTrans, mag: Optional[float] = ..., u: Optional[Vector] = ...) -> ICplxTrans:
         r"""
         @brief Creates a transformation from another transformation plus a magnification and displacement
 
@@ -22132,7 +22205,7 @@ class ICplxTrans:
         """
     @overload
     @classmethod
-    def new(cls, c: ICplxTrans, m: float, x: int, y: int) -> ICplxTrans:
+    def new(cls, c: ICplxTrans, mag: Optional[float] = ..., x: Optional[int] = ..., y: Optional[int] = ...) -> ICplxTrans:
         r"""
         @brief Creates a transformation from another transformation plus a magnification and displacement
 
@@ -22146,15 +22219,7 @@ class ICplxTrans:
         """
     @overload
     @classmethod
-    def new(cls, m: float) -> ICplxTrans:
-        r"""
-        @brief Creates a transformation from a magnification
-
-        Creates a magnifying transformation without displacement and rotation given the magnification m.
-        """
-    @overload
-    @classmethod
-    def new(cls, mag: float, rot: float, mirrx: bool, u: Vector) -> ICplxTrans:
+    def new(cls, mag: Optional[float] = ..., rot: Optional[float] = ..., mirrx: Optional[bool] = ..., u: Optional[Vector] = ...) -> ICplxTrans:
         r"""
         @brief Creates a transformation using magnification, angle, mirror flag and displacement
 
@@ -22168,7 +22233,7 @@ class ICplxTrans:
         """
     @overload
     @classmethod
-    def new(cls, mag: float, rot: float, mirrx: bool, x: int, y: int) -> ICplxTrans:
+    def new(cls, mag: Optional[float] = ..., rot: Optional[float] = ..., mirrx: Optional[bool] = ..., x: Optional[int] = ..., y: Optional[int] = ...) -> ICplxTrans:
         r"""
         @brief Creates a transformation using magnification, angle, mirror flag and displacement
 
@@ -22183,15 +22248,7 @@ class ICplxTrans:
         """
     @overload
     @classmethod
-    def new(cls, t: Trans) -> ICplxTrans:
-        r"""
-        @brief Creates a transformation from a simple transformation alone
-
-        Creates a magnifying transformation from a simple transformation and a magnification of 1.0.
-        """
-    @overload
-    @classmethod
-    def new(cls, t: Trans, m: float) -> ICplxTrans:
+    def new(cls, t: Trans, mag: Optional[float] = ...) -> ICplxTrans:
         r"""
         @brief Creates a transformation from a simple transformation and a magnification
 
@@ -22199,27 +22256,33 @@ class ICplxTrans:
         """
     @overload
     @classmethod
-    def new(cls, trans: CplxTrans) -> ICplxTrans:
+    def new(cls, trans: CplxTrans, dbu: Optional[float] = ...) -> ICplxTrans:
         r"""
-        @brief Creates a floating-point coordinate transformation from another coordinate flavour
+        @brief Creates an integer coordinate transformation from another coordinate flavour
 
-        This constructor has been introduced in version 0.25 and replaces the previous static method 'from_trans'.
+        The 'dbu' argument is used to transform the output space from floating-point units to integer units. Formally, the CplxTrans transformation is initialized with 'to_dbu * trans' where 'to_dbu' is the transformation into DBU space, or more precisely 'VCplxTrans(mag=1/dbu)'.
+
+        This constructor has been introduced in version 0.25. The 'dbu' argument has been added in version 0.29.
         """
     @overload
     @classmethod
-    def new(cls, trans: DCplxTrans) -> ICplxTrans:
+    def new(cls, trans: DCplxTrans, dbu: Optional[float] = ...) -> ICplxTrans:
         r"""
-        @brief Creates a floating-point coordinate transformation from another coordinate flavour
+        @brief Creates an integer coordinate transformation from another coordinate flavour
 
-        This constructor has been introduced in version 0.25 and replaces the previous static method 'from_dtrans'.
+        The 'dbu' argument is used to transform the input space and output space from floating-point units to integer units and vice versa. Formally, the ICplxTrans transformation is initialized with 'to_dbu * trans * from_dbu' where 'from_dbu' is the transformation into micrometer space, or more precisely 'CplxTrans(mag=dbu)' and 'to_dbu' is the transformation into DBU space, or more precisely 'VCplxTrans(mag=1/dbu)'.
+
+        This constructor has been introduced in version 0.25. The 'dbu' argument has been added in version 0.29.
         """
     @overload
     @classmethod
-    def new(cls, trans: VCplxTrans) -> ICplxTrans:
+    def new(cls, trans: VCplxTrans, dbu: Optional[float] = ...) -> ICplxTrans:
         r"""
-        @brief Creates a floating-point coordinate transformation from another coordinate flavour
+        @brief Creates an integer coordinate transformation from another coordinate flavour
 
-        This constructor has been introduced in version 0.25.
+        The 'dbu' argument is used to transform the input space from floating-point units to integer units. Formally, the CplxTrans transformation is initialized with 'trans * from_dbu' where 'from_dbu' is the transformation into micrometer space, or more precisely 'CplxTrans(mag=dbu)'.
+
+        This constructor has been introduced in version 0.25. The 'dbu' argument has been added in version 0.29.
         """
     @overload
     @classmethod
@@ -22268,7 +22331,7 @@ class ICplxTrans:
         @brief Creates a unit transformation
         """
     @overload
-    def __init__(self, c: ICplxTrans, m: Optional[float] = ..., u: Optional[Vector] = ...) -> None:
+    def __init__(self, c: ICplxTrans, mag: Optional[float] = ..., u: Optional[Vector] = ...) -> None:
         r"""
         @brief Creates a transformation from another transformation plus a magnification and displacement
 
@@ -22280,7 +22343,7 @@ class ICplxTrans:
         @param u The Additional displacement
         """
     @overload
-    def __init__(self, c: ICplxTrans, m: float, x: int, y: int) -> None:
+    def __init__(self, c: ICplxTrans, mag: Optional[float] = ..., x: Optional[int] = ..., y: Optional[int] = ...) -> None:
         r"""
         @brief Creates a transformation from another transformation plus a magnification and displacement
 
@@ -22293,14 +22356,7 @@ class ICplxTrans:
         @param y The Additional displacement (y)
         """
     @overload
-    def __init__(self, m: float) -> None:
-        r"""
-        @brief Creates a transformation from a magnification
-
-        Creates a magnifying transformation without displacement and rotation given the magnification m.
-        """
-    @overload
-    def __init__(self, mag: float, rot: float, mirrx: bool, u: Vector) -> None:
+    def __init__(self, mag: Optional[float] = ..., rot: Optional[float] = ..., mirrx: Optional[bool] = ..., u: Optional[Vector] = ...) -> None:
         r"""
         @brief Creates a transformation using magnification, angle, mirror flag and displacement
 
@@ -22313,7 +22369,7 @@ class ICplxTrans:
         @param u The displacement
         """
     @overload
-    def __init__(self, mag: float, rot: float, mirrx: bool, x: int, y: int) -> None:
+    def __init__(self, mag: Optional[float] = ..., rot: Optional[float] = ..., mirrx: Optional[bool] = ..., x: Optional[int] = ..., y: Optional[int] = ...) -> None:
         r"""
         @brief Creates a transformation using magnification, angle, mirror flag and displacement
 
@@ -22327,39 +22383,38 @@ class ICplxTrans:
         @param y The y displacement
         """
     @overload
-    def __init__(self, t: Trans) -> None:
-        r"""
-        @brief Creates a transformation from a simple transformation alone
-
-        Creates a magnifying transformation from a simple transformation and a magnification of 1.0.
-        """
-    @overload
-    def __init__(self, t: Trans, m: float) -> None:
+    def __init__(self, t: Trans, mag: Optional[float] = ...) -> None:
         r"""
         @brief Creates a transformation from a simple transformation and a magnification
 
         Creates a magnifying transformation from a simple transformation and a magnification.
         """
     @overload
-    def __init__(self, trans: CplxTrans) -> None:
+    def __init__(self, trans: CplxTrans, dbu: Optional[float] = ...) -> None:
         r"""
-        @brief Creates a floating-point coordinate transformation from another coordinate flavour
+        @brief Creates an integer coordinate transformation from another coordinate flavour
 
-        This constructor has been introduced in version 0.25 and replaces the previous static method 'from_trans'.
+        The 'dbu' argument is used to transform the output space from floating-point units to integer units. Formally, the CplxTrans transformation is initialized with 'to_dbu * trans' where 'to_dbu' is the transformation into DBU space, or more precisely 'VCplxTrans(mag=1/dbu)'.
+
+        This constructor has been introduced in version 0.25. The 'dbu' argument has been added in version 0.29.
         """
     @overload
-    def __init__(self, trans: DCplxTrans) -> None:
+    def __init__(self, trans: DCplxTrans, dbu: Optional[float] = ...) -> None:
         r"""
-        @brief Creates a floating-point coordinate transformation from another coordinate flavour
+        @brief Creates an integer coordinate transformation from another coordinate flavour
 
-        This constructor has been introduced in version 0.25 and replaces the previous static method 'from_dtrans'.
+        The 'dbu' argument is used to transform the input space and output space from floating-point units to integer units and vice versa. Formally, the ICplxTrans transformation is initialized with 'to_dbu * trans * from_dbu' where 'from_dbu' is the transformation into micrometer space, or more precisely 'CplxTrans(mag=dbu)' and 'to_dbu' is the transformation into DBU space, or more precisely 'VCplxTrans(mag=1/dbu)'.
+
+        This constructor has been introduced in version 0.25. The 'dbu' argument has been added in version 0.29.
         """
     @overload
-    def __init__(self, trans: VCplxTrans) -> None:
+    def __init__(self, trans: VCplxTrans, dbu: Optional[float] = ...) -> None:
         r"""
-        @brief Creates a floating-point coordinate transformation from another coordinate flavour
+        @brief Creates an integer coordinate transformation from another coordinate flavour
 
-        This constructor has been introduced in version 0.25.
+        The 'dbu' argument is used to transform the input space from floating-point units to integer units. Formally, the CplxTrans transformation is initialized with 'trans * from_dbu' where 'from_dbu' is the transformation into micrometer space, or more precisely 'CplxTrans(mag=dbu)'.
+
+        This constructor has been introduced in version 0.25. The 'dbu' argument has been added in version 0.29.
         """
     @overload
     def __init__(self, u: Vector) -> None:
@@ -22789,7 +22844,13 @@ class ICplxTrans:
 
         The database unit can be specified to translate the integer coordinate displacement in database units to a floating-point displacement in micron units. The displacement's' coordinates will be multiplied with the database unit.
 
-        This method has been introduced in version 0.25.
+        This method is redundant with the conversion constructors and is ill-named. Instead of 'to_itrans' use the conversion constructor:
+
+        @code
+        dtrans = RBA::DCplxTrans::new(itrans, dbu)
+        @/code
+
+        This method has been introduced in version 0.25 and was deprecated in version 0.29.
         """
     def to_s(self, lazy: Optional[bool] = ..., dbu: Optional[float] = ...) -> str:
         r"""
@@ -22799,11 +22860,17 @@ class ICplxTrans:
 
         The lazy and DBU arguments have been added in version 0.27.6.
         """
-    def to_trans(self) -> VCplxTrans:
+    def to_trans(self, dbu: Optional[float] = ...) -> VCplxTrans:
         r"""
         @brief Converts the transformation to another transformation with floating-point input coordinates
 
-        This method has been introduced in version 0.25.
+        This method is redundant with the conversion constructors and is ill-named. Instead of 'to_trans' use the conversion constructor:
+
+        @code
+        vtrans = RBA::VCplxTrans::new(itrans, dbu)
+        @/code
+
+        This method has been introduced in version 0.25 and was deprecated in version 0.29.
         """
     def to_vtrans(self, dbu: Optional[float] = ...) -> CplxTrans:
         r"""
@@ -22811,7 +22878,13 @@ class ICplxTrans:
 
         The database unit can be specified to translate the integer coordinate displacement in database units to a floating-point displacement in micron units. The displacement's' coordinates will be multiplied with the database unit.
 
-        This method has been introduced in version 0.25.
+        This method is redundant with the conversion constructors and is ill-named. Instead of 'to_vtrans' use the conversion constructor:
+
+        @code
+        trans = RBA::CplxTrans::new(itrans, dbu)
+        @/code
+
+        This method has been introduced in version 0.25 and was deprecated in version 0.29.
         """
     @overload
     def trans(self, box: Box) -> Box:
@@ -23917,11 +23990,11 @@ class Instance:
 
     Starting with version 0.25 the displacement is of vector type.
     Setter:
-    @brief Sets the displacement vector for the 'b' axis
+    @brief Sets the displacement vector for the 'b' axis in micrometer units
 
-    If the instance was not an array instance before it is made one.
+    Like \b= with an integer displacement, this method will set the displacement vector but it accepts a vector in micrometer units that is of \DVector type. The vector will be translated to database units internally.
 
-    This method has been introduced in version 0.23. Starting with version 0.25 the displacement is of vector type.
+    This method has been introduced in version 0.25.
     """
     cell: Cell
     r"""
@@ -24096,10 +24169,9 @@ class Instance:
     @brief Gets the transformation of the instance or the first instance in the array
     The transformation returned is only valid if the array does not represent a complex transformation array
     Setter:
-    @brief Sets the transformation of the instance or the first instance in the array (in micrometer units)
-    This method sets the transformation the same way as \cplx_trans=, but the displacement of this transformation is given in micrometer units. It is internally translated into database units.
+    @brief Sets the transformation of the instance or the first instance in the array
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.23.
     """
     @classmethod
     def new(cls) -> Instance:
@@ -25906,7 +25978,7 @@ class LayerMap:
     The LayerMap class has been introduced in version 0.18. Target layer have been introduced in version 0.20. 1:n mapping and unmapping has been introduced in version 0.27.
     """
     @classmethod
-    def from_string(cls, arg0: str) -> LayerMap:
+    def from_string(cls, s: str) -> LayerMap:
         r"""
         @brief Creates a layer map from the given string
         The format of the string is that used in layer mapping files: one mapping entry per line, comments are allowed using '#' or '//'. The format of each line is that used in the 'map(string, index)' method.
@@ -29212,6 +29284,10 @@ class LayoutToNetlist:
             r"""
             @brief Compares an enum with an integer value
             """
+        def __hash__(self) -> int:
+            r"""
+            @brief Gets the hash value from the enum
+            """
         @overload
         def __init__(self, i: int) -> None:
             r"""
@@ -29221,6 +29297,10 @@ class LayoutToNetlist:
         def __init__(self, s: str) -> None:
             r"""
             @brief Creates an enum from a string value
+            """
+        def __int__(self) -> int:
+            r"""
+            @brief Gets the integer value from the enum
             """
         @overload
         def __lt__(self, other: LayoutToNetlist.BuildNetHierarchyMode) -> bool:
@@ -29235,12 +29315,12 @@ class LayoutToNetlist:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -29249,6 +29329,10 @@ class LayoutToNetlist:
         def __str__(self) -> str:
             r"""
             @brief Gets the symbolic string from an enum
+            """
+        def hash(self) -> int:
+            r"""
+            @brief Gets the hash value from the enum
             """
         def inspect(self) -> str:
             r"""
@@ -30524,12 +30608,16 @@ class LoadLayoutOptions:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
+            """
+        def __hash__(self) -> int:
+            r"""
+            @brief Gets the hash value from the enum
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -30540,6 +30628,10 @@ class LoadLayoutOptions:
         def __init__(self, s: str) -> None:
             r"""
             @brief Creates an enum from a string value
+            """
+        def __int__(self) -> int:
+            r"""
+            @brief Gets the integer value from the enum
             """
         @overload
         def __lt__(self, other: LoadLayoutOptions.CellConflictResolution) -> bool:
@@ -30568,6 +30660,10 @@ class LoadLayoutOptions:
         def __str__(self) -> str:
             r"""
             @brief Gets the symbolic string from an enum
+            """
+        def hash(self) -> int:
+            r"""
+            @brief Gets the hash value from the enum
             """
         def inspect(self) -> str:
             r"""
@@ -32740,6 +32836,10 @@ class Metrics:
         r"""
         @brief Compares an enum with an integer value
         """
+    def __hash__(self) -> int:
+        r"""
+        @brief Gets the hash value from the enum
+        """
     @overload
     def __init__(self, i: int) -> None:
         r"""
@@ -32749,6 +32849,10 @@ class Metrics:
     def __init__(self, s: str) -> None:
         r"""
         @brief Creates an enum from a string value
+        """
+    def __int__(self) -> int:
+        r"""
+        @brief Gets the integer value from the enum
         """
     @overload
     def __lt__(self, other: Metrics) -> bool:
@@ -32839,6 +32943,10 @@ class Metrics:
     def dup(self) -> Metrics:
         r"""
         @brief Creates a copy of self
+        """
+    def hash(self) -> int:
+        r"""
+        @brief Gets the hash value from the enum
         """
     def inspect(self) -> str:
         r"""
@@ -33260,14 +33368,14 @@ class NetPinRef:
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this pin reference is attached to (non-const version).
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the net this pin reference is attached to.
         """
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this pin reference is attached to.
+        @brief Gets the net this pin reference is attached to (non-const version).
+
+        This constness variant has been introduced in version 0.26.8
         """
     def pin(self) -> Pin:
         r"""
@@ -33490,16 +33598,16 @@ class NetTerminalRef:
     @overload
     def device(self) -> Device:
         r"""
-        @brief Gets the device reference.
-        Gets the device object that this connection is made to.
-        """
-    @overload
-    def device(self) -> Device:
-        r"""
         @brief Gets the device reference (non-const version).
         Gets the device object that this connection is made to.
 
         This constness variant has been introduced in version 0.26.8
+        """
+    @overload
+    def device(self) -> Device:
+        r"""
+        @brief Gets the device reference.
+        Gets the device object that this connection is made to.
         """
     def device_class(self) -> DeviceClass:
         r"""
@@ -33518,14 +33626,14 @@ class NetTerminalRef:
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this terminal reference is attached to.
+        @brief Gets the net this terminal reference is attached to (non-const version).
+
+        This constness variant has been introduced in version 0.26.8
         """
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this terminal reference is attached to (non-const version).
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the net this terminal reference is attached to.
         """
     def terminal_def(self) -> DeviceTerminalDefinition:
         r"""
@@ -34316,19 +34424,19 @@ class Netlist:
     @overload
     def circuits_by_name(self, name_pattern: str) -> List[Circuit]:
         r"""
+        @brief Gets the circuit objects for a given name filter.
+        The name filter is a glob pattern. This method will return all \Circuit objects matching the glob pattern.
+
+        This method has been introduced in version 0.26.4.
+        """
+    @overload
+    def circuits_by_name(self, name_pattern: str) -> List[Circuit]:
+        r"""
         @brief Gets the circuit objects for a given name filter (const version).
         The name filter is a glob pattern. This method will return all \Circuit objects matching the glob pattern.
 
 
         This constness variant has been introduced in version 0.26.8.
-        """
-    @overload
-    def circuits_by_name(self, name_pattern: str) -> List[Circuit]:
-        r"""
-        @brief Gets the circuit objects for a given name filter.
-        The name filter is a glob pattern. This method will return all \Circuit objects matching the glob pattern.
-
-        This method has been introduced in version 0.26.4.
         """
     def combine_devices(self) -> None:
         r"""
@@ -34386,22 +34494,14 @@ class Netlist:
     @overload
     def each_circuit_bottom_up(self) -> Iterator[Circuit]:
         r"""
-        @brief Iterates over the circuits bottom-up (const version)
-        Iterating bottom-up means the parent circuits come after the child circuits. This is the basically the reverse order as delivered by \each_circuit_top_down.
-
-        This constness variant has been introduced in version 0.26.8.
-        """
-    @overload
-    def each_circuit_bottom_up(self) -> Iterator[Circuit]:
-        r"""
         @brief Iterates over the circuits bottom-up
         Iterating bottom-up means the parent circuits come after the child circuits. This is the basically the reverse order as delivered by \each_circuit_top_down.
         """
     @overload
-    def each_circuit_top_down(self) -> Iterator[Circuit]:
+    def each_circuit_bottom_up(self) -> Iterator[Circuit]:
         r"""
-        @brief Iterates over the circuits top-down (const version)
-        Iterating top-down means the parent circuits come before the child circuits. The first \top_circuit_count circuits are top circuits - i.e. those which are not referenced by other circuits.
+        @brief Iterates over the circuits bottom-up (const version)
+        Iterating bottom-up means the parent circuits come after the child circuits. This is the basically the reverse order as delivered by \each_circuit_top_down.
 
         This constness variant has been introduced in version 0.26.8.
         """
@@ -34410,6 +34510,14 @@ class Netlist:
         r"""
         @brief Iterates over the circuits top-down
         Iterating top-down means the parent circuits come before the child circuits. The first \top_circuit_count circuits are top circuits - i.e. those which are not referenced by other circuits.
+        """
+    @overload
+    def each_circuit_top_down(self) -> Iterator[Circuit]:
+        r"""
+        @brief Iterates over the circuits top-down (const version)
+        Iterating top-down means the parent circuits come before the child circuits. The first \top_circuit_count circuits are top circuits - i.e. those which are not referenced by other circuits.
+
+        This constness variant has been introduced in version 0.26.8.
         """
     @overload
     def each_device_class(self) -> Iterator[DeviceClass]:
@@ -34440,7 +34548,7 @@ class Netlist:
         @brief Flattens circuits matching a certain pattern
         This method will substitute all instances (subcircuits) of all circuits with names matching the given name pattern. The name pattern is a glob expression. For example, 'flatten_circuit("np*")' will flatten all circuits with names starting with 'np'.
         """
-    def flatten_circuits(self, arg0: Sequence[Circuit]) -> None:
+    def flatten_circuits(self, circuits: Sequence[Circuit]) -> None:
         r"""
         @brief Flattens all given circuits of the netlist
         This method is equivalent to calling \flatten_circuit for all given circuits, but more efficient.
@@ -35084,6 +35192,10 @@ class NetlistCrossReference(NetlistCompareLogger):
             r"""
             @brief Compares two enums
             """
+        def __hash__(self) -> int:
+            r"""
+            @brief Gets the hash value from the enum
+            """
         @overload
         def __init__(self, i: int) -> None:
             r"""
@@ -35093,6 +35205,10 @@ class NetlistCrossReference(NetlistCompareLogger):
         def __init__(self, s: str) -> None:
             r"""
             @brief Creates an enum from a string value
+            """
+        def __int__(self) -> int:
+            r"""
+            @brief Gets the integer value from the enum
             """
         @overload
         def __lt__(self, other: NetlistCrossReference.Status) -> bool:
@@ -35121,6 +35237,10 @@ class NetlistCrossReference(NetlistCompareLogger):
         def __str__(self) -> str:
             r"""
             @brief Gets the symbolic string from an enum
+            """
+        def hash(self) -> int:
+            r"""
+            @brief Gets the hash value from the enum
             """
         def inspect(self) -> str:
             r"""
@@ -36013,7 +36133,7 @@ class NetlistSpiceWriter(NetlistWriter):
         """
     @overload
     @classmethod
-    def new(cls, arg0: NetlistSpiceWriterDelegate) -> NetlistSpiceWriter:
+    def new(cls, delegate: NetlistSpiceWriterDelegate) -> NetlistSpiceWriter:
         r"""
         @brief Creates a new writer with a delegate.
         """
@@ -36031,7 +36151,7 @@ class NetlistSpiceWriter(NetlistWriter):
         @brief Creates a new writer without delegate.
         """
     @overload
-    def __init__(self, arg0: NetlistSpiceWriterDelegate) -> None:
+    def __init__(self, delegate: NetlistSpiceWriterDelegate) -> None:
         r"""
         @brief Creates a new writer with a delegate.
         """
@@ -36597,6 +36717,46 @@ class PCellParameterDeclaration:
     Setter:
     @brief Makes the parameter hidden if this attribute is set to true
     """
+    max_value: Any
+    r"""
+    Getter:
+    @brief Gets the maximum value allowed
+    See \max_value= for a description of this attribute.
+
+    This attribute has been added in version 0.29.
+    Setter:
+    @brief Sets the maximum value allowed
+    The maximum value is a visual feature and limits the allowed values for numerical
+    entry boxes. This applies to parameters of type int or double. The maximum value
+    is not effective if choices are present.
+
+    The maximum value is not enforced - for example there is no restriction implemented
+    when setting values programmatically.
+
+    Setting this attribute to "nil" (the default) implies "no limit".
+
+    This attribute has been added in version 0.29.
+    """
+    min_value: Any
+    r"""
+    Getter:
+    @brief Gets the minimum value allowed
+    See \min_value= for a description of this attribute.
+
+    This attribute has been added in version 0.29.
+    Setter:
+    @brief Sets the minimum value allowed
+    The minimum value is a visual feature and limits the allowed values for numerical
+    entry boxes. This applies to parameters of type int or double. The minimum value
+    is not effective if choices are present.
+
+    The minimum value is not enforced - for example there is no restriction implemented
+    when setting values programmatically.
+
+    Setting this attribute to "nil" (the default) implies "no limit".
+
+    This attribute has been added in version 0.29.
+    """
     name: str
     r"""
     Getter:
@@ -36632,28 +36792,8 @@ class PCellParameterDeclaration:
     @brief Sets the unit string
     The unit string is shown right to the edit fields for numeric parameters.
     """
-    @overload
     @classmethod
-    def new(cls, name: str, type: int, description: str) -> PCellParameterDeclaration:
-        r"""
-        @brief Create a new parameter declaration with the given name and type
-        @param name The parameter name
-        @param type One of the Type... constants describing the type of the parameter
-        @param description The description text
-        """
-    @overload
-    @classmethod
-    def new(cls, name: str, type: int, description: str, default: Any) -> PCellParameterDeclaration:
-        r"""
-        @brief Create a new parameter declaration with the given name, type and default value
-        @param name The parameter name
-        @param type One of the Type... constants describing the type of the parameter
-        @param description The description text
-        @param default The default (initial) value
-        """
-    @overload
-    @classmethod
-    def new(cls, name: str, type: int, description: str, default: Any, unit: str) -> PCellParameterDeclaration:
+    def new(cls, name: str, type: int, description: str, default: Optional[Any] = ..., unit: Optional[str] = ...) -> PCellParameterDeclaration:
         r"""
         @brief Create a new parameter declaration with the given name, type, default value and unit string
         @param name The parameter name
@@ -36670,25 +36810,7 @@ class PCellParameterDeclaration:
         r"""
         @brief Creates a copy of self
         """
-    @overload
-    def __init__(self, name: str, type: int, description: str) -> None:
-        r"""
-        @brief Create a new parameter declaration with the given name and type
-        @param name The parameter name
-        @param type One of the Type... constants describing the type of the parameter
-        @param description The description text
-        """
-    @overload
-    def __init__(self, name: str, type: int, description: str, default: Any) -> None:
-        r"""
-        @brief Create a new parameter declaration with the given name, type and default value
-        @param name The parameter name
-        @param type One of the Type... constants describing the type of the parameter
-        @param description The description text
-        @param default The default (initial) value
-        """
-    @overload
-    def __init__(self, name: str, type: int, description: str, default: Any, unit: str) -> None:
+    def __init__(self, name: str, type: int, description: str, default: Optional[Any] = ..., unit: Optional[str] = ...) -> None:
         r"""
         @brief Create a new parameter declaration with the given name, type, default value and unit string
         @param name The parameter name
@@ -36740,6 +36862,7 @@ class PCellParameterDeclaration:
         This method will add the given value with the given description to the list of
         choices. If choices are defined, KLayout will show a drop-down box instead of an
         entry field in the parameter user interface.
+        If a range is already set for this parameter the choice will not be added and a warning message is showed.
         """
     def assign(self, other: PCellParameterDeclaration) -> None:
         r"""
@@ -36837,6 +36960,10 @@ class PCellParameterState:
             r"""
             @brief Compares two enums
             """
+        def __hash__(self) -> int:
+            r"""
+            @brief Gets the hash value from the enum
+            """
         @overload
         def __init__(self, i: int) -> None:
             r"""
@@ -36846,6 +36973,10 @@ class PCellParameterState:
         def __init__(self, s: str) -> None:
             r"""
             @brief Creates an enum from a string value
+            """
+        def __int__(self) -> int:
+            r"""
+            @brief Gets the integer value from the enum
             """
         @overload
         def __lt__(self, other: PCellParameterState.ParameterStateIcon) -> bool:
@@ -36860,12 +36991,12 @@ class PCellParameterState:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -36874,6 +37005,10 @@ class PCellParameterState:
         def __str__(self) -> str:
             r"""
             @brief Gets the symbolic string from an enum
+            """
+        def hash(self) -> int:
+            r"""
+            @brief Gets the hash value from the enum
             """
         def inspect(self) -> str:
             r"""
@@ -39459,6 +39594,10 @@ class PreferredOrientation:
         r"""
         @brief Compares an enum with an integer value
         """
+    def __hash__(self) -> int:
+        r"""
+        @brief Gets the hash value from the enum
+        """
     @overload
     def __init__(self, i: int) -> None:
         r"""
@@ -39468,6 +39607,10 @@ class PreferredOrientation:
     def __init__(self, s: str) -> None:
         r"""
         @brief Creates an enum from a string value
+        """
+    def __int__(self) -> int:
+        r"""
+        @brief Gets the integer value from the enum
         """
     @overload
     def __lt__(self, other: PreferredOrientation) -> bool:
@@ -39559,6 +39702,10 @@ class PreferredOrientation:
         r"""
         @brief Creates a copy of self
         """
+    def hash(self) -> int:
+        r"""
+        @brief Gets the hash value from the enum
+        """
     def inspect(self) -> str:
         r"""
         @brief Converts an enum to a visual string
@@ -39637,12 +39784,16 @@ class PropertyConstraint:
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums
+        @brief Compares an enum with an integer value
         """
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer value
+        @brief Compares two enums
+        """
+    def __hash__(self) -> int:
+        r"""
+        @brief Gets the hash value from the enum
         """
     @overload
     def __init__(self, i: int) -> None:
@@ -39653,6 +39804,10 @@ class PropertyConstraint:
     def __init__(self, s: str) -> None:
         r"""
         @brief Creates an enum from a string value
+        """
+    def __int__(self) -> int:
+        r"""
+        @brief Gets the integer value from the enum
         """
     @overload
     def __lt__(self, other: PropertyConstraint) -> bool:
@@ -39667,12 +39822,12 @@ class PropertyConstraint:
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums for inequality
+        @brief Compares an enum with an integer for inequality
         """
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer for inequality
+        @brief Compares two enums for inequality
         """
     def __repr__(self) -> str:
         r"""
@@ -39743,6 +39898,10 @@ class PropertyConstraint:
     def dup(self) -> PropertyConstraint:
         r"""
         @brief Creates a copy of self
+        """
+    def hash(self) -> int:
+        r"""
+        @brief Gets the hash value from the enum
         """
     def inspect(self) -> str:
         r"""
@@ -41112,6 +41271,10 @@ class Region(ShapeCollection):
             r"""
             @brief Compares two enums
             """
+        def __hash__(self) -> int:
+            r"""
+            @brief Gets the hash value from the enum
+            """
         @overload
         def __init__(self, i: int) -> None:
             r"""
@@ -41121,6 +41284,10 @@ class Region(ShapeCollection):
         def __init__(self, s: str) -> None:
             r"""
             @brief Creates an enum from a string value
+            """
+        def __int__(self) -> int:
+            r"""
+            @brief Gets the integer value from the enum
             """
         @overload
         def __lt__(self, other: Region.OppositeFilter) -> bool:
@@ -41135,12 +41302,12 @@ class Region(ShapeCollection):
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -41149,6 +41316,10 @@ class Region(ShapeCollection):
         def __str__(self) -> str:
             r"""
             @brief Gets the symbolic string from an enum
+            """
+        def hash(self) -> int:
+            r"""
+            @brief Gets the hash value from the enum
             """
         def inspect(self) -> str:
             r"""
@@ -41218,6 +41389,10 @@ class Region(ShapeCollection):
             r"""
             @brief Compares two enums
             """
+        def __hash__(self) -> int:
+            r"""
+            @brief Gets the hash value from the enum
+            """
         @overload
         def __init__(self, i: int) -> None:
             r"""
@@ -41227,6 +41402,10 @@ class Region(ShapeCollection):
         def __init__(self, s: str) -> None:
             r"""
             @brief Creates an enum from a string value
+            """
+        def __int__(self) -> int:
+            r"""
+            @brief Gets the integer value from the enum
             """
         @overload
         def __lt__(self, other: Region.RectFilter) -> bool:
@@ -41241,12 +41420,12 @@ class Region(ShapeCollection):
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -41255,6 +41434,10 @@ class Region(ShapeCollection):
         def __str__(self) -> str:
             r"""
             @brief Gets the symbolic string from an enum
+            """
+        def hash(self) -> int:
+            r"""
+            @brief Gets the hash value from the enum
             """
         def inspect(self) -> str:
             r"""
@@ -42141,6 +42324,32 @@ class Region(ShapeCollection):
         This method is identical to \decompose_trapezoids, but delivers a \Region object.
 
         This method has been introduced in version 0.25.
+        """
+    @overload
+    def delaunay(self) -> Region:
+        r"""
+        @brief Computes a constrained Delaunay triangulation from the given region
+
+        @return A new region holding the triangles of the constrained Delaunay triangulation.
+
+        Note that the result is a region in raw mode as otherwise the triangles are likely to get merged later on.
+
+        This method has been introduced in version 0.29.
+        """
+    @overload
+    def delaunay(self, max_area: float, min_b: Optional[float] = ...) -> Region:
+        r"""
+        @brief Computes a refined, constrained Delaunay triangulation from the given region
+
+        @return A new region holding the triangles of the refined, constrained Delaunay triangulation.
+
+        Refinement is implemented by Chew's second algorithm. A maximum area can be given. Triangles larger than this area will be split. In addition 'skinny' triangles will be resolved where possible. 'skinny' is defined in terms of shortest edge to circumcircle radius ratio (b). A minimum number for b can be given. The default of 1.0 corresponds to a minimum angle of 30 degree and is usually a good choice. The algorithm is stable up to roughly 1.2 which corresponds to a minimum angle of abouth 37 degree.
+
+        The area value is given in terms of DBU units. Picking a value of 0.0 for area and min b will make the implementation skip the refinement step. In that case, the results are identical to the standard constrained Delaunay triangulation.
+
+        Note that the result is a region in raw mode as otherwise the triangles are likely to get merged later on.
+
+        This method has been introduced in version 0.29.
         """
     def destroy(self) -> None:
         r"""
@@ -43245,6 +43454,40 @@ class Region(ShapeCollection):
         Merged semantics applies for this method (see \merged_semantics= for a description of this concept)
 
         This method has been introduced in version 0.26.1
+        """
+    @overload
+    def rasterize(self, origin: Point, pixel_distance: Vector, pixel_size: Vector, nx: int, ny: int) -> List[List[float]]:
+        r"""
+        @brief A version of 'rasterize' that allows a pixel step distance which is larger than the pixel size
+        This version behaves like the first variant of 'rasterize', but the pixel distance (pixel-to-pixel step raster)
+        can be specified separately from the pixel size. Currently, the pixel size must be equal or smaller than the
+        pixel distance - i.e. the pixels must not overlap.
+
+        This method has been added in version 0.29.
+        """
+    @overload
+    def rasterize(self, origin: Point, pixel_size: Vector, nx: int, ny: int) -> List[List[float]]:
+        r"""
+        @brief A grayscale rasterizer delivering the area covered per pixel
+        @param origin The lower-left corner of the lowest-left pixel
+        @param pixel_size The dimension of each pixel (the x component gives the width, the y component the height)
+        @param nx The number of pixels in horizontal direction
+        @param ny The number of pixels in vertical direction
+        The method will create a grayscale, high-resolution density map of a rectangular region.
+        The scan region is defined by the origin, the pixel size and the number of pixels in horizontal (nx) and
+        vertical (ny) direction. The resulting array will contain the area covered by polygons from the region
+        in square database units.
+
+        For non-overlapping polygons, the maximum density value is px*py. Overlapping polygons are counted multiple
+        times, so the actual values may be larger. If you want overlaps removed, you have to
+        merge the region before. Merge semantics does not apply for the 'rasterize' method.
+
+        The resulting area values are precise within the limits of double-precision floating point arithmetics.
+
+        A second version exists that allows specifying an active pixel size which is smaller than the
+        pixel distance hence allowing pixels samples that do not cover the full area, but leave gaps between the pixels.
+
+        This method has been added in version 0.29.
         """
     def rectangles(self) -> Region:
         r"""
@@ -44891,6 +45134,10 @@ class Severity:
         r"""
         @brief Compares two enums
         """
+    def __hash__(self) -> int:
+        r"""
+        @brief Gets the hash value from the enum
+        """
     @overload
     def __init__(self, i: int) -> None:
         r"""
@@ -44900,6 +45147,10 @@ class Severity:
     def __init__(self, s: str) -> None:
         r"""
         @brief Creates an enum from a string value
+        """
+    def __int__(self) -> int:
+        r"""
+        @brief Gets the integer value from the enum
         """
     @overload
     def __lt__(self, other: Severity) -> bool:
@@ -44990,6 +45241,10 @@ class Severity:
     def dup(self) -> Severity:
         r"""
         @brief Creates a copy of self
+        """
+    def hash(self) -> int:
+        r"""
+        @brief Gets the hash value from the enum
         """
     def inspect(self) -> str:
         r"""
@@ -45265,11 +45520,12 @@ class Shape:
     This method has been introduced in version 0.23.
 
     Setter:
-    @brief Sets the upper right point of the box
+    @brief Sets the upper right corner of the box with the point being given in micrometer units
 
     Applies to boxes only. Changes the upper right point of the box and throws an exception if the shape is not a box.
+    Translation from micrometer units to database units is done internally.
 
-    This method has been introduced in version 0.23.
+    This method has been introduced in version 0.25.
     """
     box_width: int
     r"""
@@ -45588,11 +45844,10 @@ class Shape:
     Starting with version 0.23, this method returns nil, if the shape does not represent a geometrical primitive that can be converted to a polygon.
 
     Setter:
-    @brief Replaces the shape by the given polygon object
-    This method replaces the shape by the given polygon object. This method can only be called for editable layouts. It does not change the user properties of the shape.
-    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
+    @brief Replaces the shape by the given polygon (in micrometer units)
+    This method replaces the shape by the given polygon, like \polygon= with a \Polygon argument does. This version translates the polygon from micrometer units to database units internally.
 
-    This method has been introduced in version 0.22.
+    This method has been introduced in version 0.25.
     """
     prop_id: int
     r"""
@@ -48841,16 +49096,16 @@ class SubCircuit(NetlistObject):
     @overload
     def circuit(self) -> Circuit:
         r"""
-        @brief Gets the circuit the subcircuit lives in.
-        This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
-        """
-    @overload
-    def circuit(self) -> Circuit:
-        r"""
         @brief Gets the circuit the subcircuit lives in (non-const version).
         This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
 
         This constness variant has been introduced in version 0.26.8
+        """
+    @overload
+    def circuit(self) -> Circuit:
+        r"""
+        @brief Gets the circuit the subcircuit lives in.
+        This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
         """
     @overload
     def circuit_ref(self) -> Circuit:
@@ -48957,6 +49212,20 @@ class Technology:
 
     Setter:
     @hide
+    """
+    default_grids: List[float]
+    r"""
+    Getter:
+    @brief Gets the default grids
+
+    See \default_grids for details.
+
+    This property has been introduced in version 0.28.17.
+    Setter:
+    @brief Sets the default grids
+    If not empty, this list replaces the global grid list for this technology.
+
+    This property has been introduced in version 0.28.17.
     """
     description: str
     r"""
@@ -49410,8 +49679,7 @@ class Text:
     Setter:
     @brief Sets the horizontal alignment
 
-    This property specifies how the text is aligned relative to the anchor point. 
-    This property has been introduced in version 0.22 and extended to enums in 0.28.
+    This is the version accepting integer values. It's provided for backward compatibility.
     """
     size: int
     r"""
@@ -49447,7 +49715,8 @@ class Text:
     Setter:
     @brief Sets the vertical alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     x: int
     r"""
@@ -49886,7 +50155,7 @@ class TextGenerator:
         @brief Creates a new object of this class
         """
     @classmethod
-    def set_font_paths(cls, arg0: Sequence[str]) -> None:
+    def set_font_paths(cls, paths: Sequence[str]) -> None:
         r"""
         @brief Sets the paths where to look for font files
         This function sets the paths where to look for font files. After setting such a path, each font found will render a specific generator. The generator can be found under the font file's name. As the text generator is also the basis for the Basic.TEXT PCell, using this function also allows configuring custom fonts for this library cell.
@@ -51267,6 +51536,14 @@ class TilingProcessor:
         @param edges The \Edges object to which the data is sent
         """
     @overload
+    def output(self, name: str, image: lay.BasicImage) -> None:
+        r"""
+        @brief Specifies output to an image
+        This method will establish an output channel which delivers float data to image data. The image is a monochrome image where each pixel corresponds to a single tile. This method for example is useful to collect density information into an image. The image is configured such that each pixel covers one tile.
+
+        The name is the name which must be used in the _output function of the scripts in order to address that channel.
+        """
+    @overload
     def output(self, name: str, layout: Layout, cell: int, layer_index: int) -> None:
         r"""
         @brief Specifies output to a layout layer
@@ -51291,6 +51568,14 @@ class TilingProcessor:
         @param layout The layout to which the data is sent
         @param cell The index of the cell to which the data is sent
         @param lp The layer specification where the output will be sent to
+        """
+    @overload
+    def output(self, name: str, rdb: rdb.ReportDatabase, cell_id: int, category_id: int) -> None:
+        r"""
+        @brief Specifies output to a report database
+        This method will establish an output channel for the processor. The output sent to that channel will be put into the report database given by the "rdb" parameter. "cell_id" specifies the cell and "category_id" the category to use.
+
+        The name is the name which must be used in the _output function of the scripts in order to address that channel.
         """
     @overload
     def output(self, name: str, rec: TileOutputReceiverBase) -> None:
@@ -51553,7 +51838,7 @@ class Trans:
         """
     @overload
     @classmethod
-    def new(cls, c: Trans, x: int, y: int) -> Trans:
+    def new(cls, c: Trans, x: Optional[int] = ..., y: Optional[int] = ...) -> Trans:
         r"""
         @brief Creates a transformation from another transformation plus a displacement
 
@@ -51575,7 +51860,7 @@ class Trans:
         """
     @overload
     @classmethod
-    def new(cls, rot: int, mirr: Optional[bool] = ..., u: Optional[Vector] = ...) -> Trans:
+    def new(cls, rot: Optional[int] = ..., mirrx: Optional[bool] = ..., u: Optional[Vector] = ...) -> Trans:
         r"""
         @brief Creates a transformation using angle and mirror flag
 
@@ -51588,7 +51873,7 @@ class Trans:
         """
     @overload
     @classmethod
-    def new(cls, rot: int, mirr: bool, x: int, y: int) -> Trans:
+    def new(cls, rot: Optional[int] = ..., mirrx: Optional[bool] = ..., x: Optional[int] = ..., y: Optional[int] = ...) -> Trans:
         r"""
         @brief Creates a transformation using angle and mirror flag and two coordinate values for displacement
 
@@ -51654,7 +51939,7 @@ class Trans:
         @param u The Additional displacement
         """
     @overload
-    def __init__(self, c: Trans, x: int, y: int) -> None:
+    def __init__(self, c: Trans, x: Optional[int] = ..., y: Optional[int] = ...) -> None:
         r"""
         @brief Creates a transformation from another transformation plus a displacement
 
@@ -51674,7 +51959,7 @@ class Trans:
         This constructor has been introduced in version 0.25 and replaces the previous static method 'from_dtrans'.
         """
     @overload
-    def __init__(self, rot: int, mirr: Optional[bool] = ..., u: Optional[Vector] = ...) -> None:
+    def __init__(self, rot: Optional[int] = ..., mirrx: Optional[bool] = ..., u: Optional[Vector] = ...) -> None:
         r"""
         @brief Creates a transformation using angle and mirror flag
 
@@ -51686,7 +51971,7 @@ class Trans:
         @param u The displacement
         """
     @overload
-    def __init__(self, rot: int, mirr: bool, x: int, y: int) -> None:
+    def __init__(self, rot: Optional[int] = ..., mirrx: Optional[bool] = ..., x: Optional[int] = ..., y: Optional[int] = ...) -> None:
         r"""
         @brief Creates a transformation using angle and mirror flag and two coordinate values for displacement
 
@@ -52202,12 +52487,16 @@ class TrapezoidDecompositionMode:
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer value
+        @brief Compares two enums
         """
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums
+        @brief Compares an enum with an integer value
+        """
+    def __hash__(self) -> int:
+        r"""
+        @brief Gets the hash value from the enum
         """
     @overload
     def __init__(self, i: int) -> None:
@@ -52218,6 +52507,10 @@ class TrapezoidDecompositionMode:
     def __init__(self, s: str) -> None:
         r"""
         @brief Creates an enum from a string value
+        """
+    def __int__(self) -> int:
+        r"""
+        @brief Gets the integer value from the enum
         """
     @overload
     def __lt__(self, other: TrapezoidDecompositionMode) -> bool:
@@ -52232,12 +52525,12 @@ class TrapezoidDecompositionMode:
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer for inequality
+        @brief Compares two enums for inequality
         """
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums for inequality
+        @brief Compares an enum with an integer for inequality
         """
     def __repr__(self) -> str:
         r"""
@@ -52308,6 +52601,10 @@ class TrapezoidDecompositionMode:
     def dup(self) -> TrapezoidDecompositionMode:
         r"""
         @brief Creates a copy of self
+        """
+    def hash(self) -> int:
+        r"""
+        @brief Gets the hash value from the enum
         """
     def inspect(self) -> str:
         r"""
@@ -52511,12 +52808,16 @@ class VAlign:
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums
+        @brief Compares an enum with an integer value
         """
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer value
+        @brief Compares two enums
+        """
+    def __hash__(self) -> int:
+        r"""
+        @brief Gets the hash value from the enum
         """
     @overload
     def __init__(self, i: int) -> None:
@@ -52527,6 +52828,10 @@ class VAlign:
     def __init__(self, s: str) -> None:
         r"""
         @brief Creates an enum from a string value
+        """
+    def __int__(self) -> int:
+        r"""
+        @brief Gets the integer value from the enum
         """
     @overload
     def __lt__(self, other: VAlign) -> bool:
@@ -52541,12 +52846,12 @@ class VAlign:
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums for inequality
+        @brief Compares an enum with an integer for inequality
         """
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer for inequality
+        @brief Compares two enums for inequality
         """
     def __repr__(self) -> str:
         r"""
@@ -52617,6 +52922,10 @@ class VAlign:
     def dup(self) -> VAlign:
         r"""
         @brief Creates a copy of self
+        """
+    def hash(self) -> int:
+        r"""
+        @brief Gets the hash value from the enum
         """
     def inspect(self) -> str:
         r"""
@@ -52766,7 +53075,7 @@ class VCplxTrans:
         """
     @overload
     @classmethod
-    def new(cls, c: VCplxTrans, m: Optional[float] = ..., u: Optional[Vector] = ...) -> VCplxTrans:
+    def new(cls, c: VCplxTrans, mag: Optional[float] = ..., u: Optional[Vector] = ...) -> VCplxTrans:
         r"""
         @brief Creates a transformation from another transformation plus a magnification and displacement
 
@@ -52779,7 +53088,7 @@ class VCplxTrans:
         """
     @overload
     @classmethod
-    def new(cls, c: VCplxTrans, m: float, x: float, y: float) -> VCplxTrans:
+    def new(cls, c: VCplxTrans, mag: Optional[float] = ..., x: Optional[int] = ..., y: Optional[int] = ...) -> VCplxTrans:
         r"""
         @brief Creates a transformation from another transformation plus a magnification and displacement
 
@@ -52793,15 +53102,7 @@ class VCplxTrans:
         """
     @overload
     @classmethod
-    def new(cls, m: float) -> VCplxTrans:
-        r"""
-        @brief Creates a transformation from a magnification
-
-        Creates a magnifying transformation without displacement and rotation given the magnification m.
-        """
-    @overload
-    @classmethod
-    def new(cls, mag: float, rot: float, mirrx: bool, u: Vector) -> VCplxTrans:
+    def new(cls, mag: Optional[float] = ..., rot: Optional[float] = ..., mirrx: Optional[bool] = ..., u: Optional[Vector] = ...) -> VCplxTrans:
         r"""
         @brief Creates a transformation using magnification, angle, mirror flag and displacement
 
@@ -52815,7 +53116,7 @@ class VCplxTrans:
         """
     @overload
     @classmethod
-    def new(cls, mag: float, rot: float, mirrx: bool, x: int, y: int) -> VCplxTrans:
+    def new(cls, mag: Optional[float] = ..., rot: Optional[float] = ..., mirrx: Optional[bool] = ..., x: Optional[int] = ..., y: Optional[int] = ...) -> VCplxTrans:
         r"""
         @brief Creates a transformation using magnification, angle, mirror flag and displacement
 
@@ -52830,15 +53131,7 @@ class VCplxTrans:
         """
     @overload
     @classmethod
-    def new(cls, t: DTrans) -> VCplxTrans:
-        r"""
-        @brief Creates a transformation from a simple transformation alone
-
-        Creates a magnifying transformation from a simple transformation and a magnification of 1.0.
-        """
-    @overload
-    @classmethod
-    def new(cls, t: DTrans, m: float) -> VCplxTrans:
+    def new(cls, t: DTrans, mag: Optional[float] = ...) -> VCplxTrans:
         r"""
         @brief Creates a transformation from a simple transformation and a magnification
 
@@ -52846,21 +53139,33 @@ class VCplxTrans:
         """
     @overload
     @classmethod
-    def new(cls, trans: CplxTrans) -> VCplxTrans:
+    def new(cls, trans: CplxTrans, dbu: Optional[float] = ...) -> VCplxTrans:
         r"""
-        @brief Creates a floating-point coordinate transformation from another coordinate flavour
+        @brief Creates a floating-point to integer coordinate transformation from another coordinate flavour
+
+        The 'dbu' argument is used to transform the input and output space from floating-point units to integer units and vice versa. Formally, the VCplxTrans transformation is initialized with 'to_dbu * trans * to_dbu' where 'to_dbu' is the transformation into DBU space, or more precisely 'VCplxTrans(mag=1/dbu)'.
+
+        The 'dbu' argument has been added in version 0.29.
         """
     @overload
     @classmethod
-    def new(cls, trans: DCplxTrans) -> VCplxTrans:
+    def new(cls, trans: DCplxTrans, dbu: Optional[float] = ...) -> VCplxTrans:
         r"""
-        @brief Creates a floating-point coordinate transformation from another coordinate flavour
+        @brief Creates a floating-point to integer coordinate transformation from another coordinate flavour
+
+        The 'dbu' argument is used to transform the output space from floating-point units to integer units. Formally, the VCplxTrans transformation is initialized with 'to_dbu * trans' where 'to_dbu' is the transformation into DBU space, or more precisely 'VCplxTrans(mag=1/dbu)'.
+
+        The 'dbu' argument has been added in version 0.29.
         """
     @overload
     @classmethod
-    def new(cls, trans: ICplxTrans) -> VCplxTrans:
+    def new(cls, trans: ICplxTrans, dbu: Optional[float] = ...) -> VCplxTrans:
         r"""
-        @brief Creates a floating-point coordinate transformation from another coordinate flavour
+        @brief Creates a floating-point to integer coordinate transformation from another coordinate flavour
+
+        The 'dbu' argument is used to transform the input and output space from floating-point units to integer units and vice versa. Formally, the VCplxTrans transformation is initialized with 'trans * to_dbu' where 'to_dbu' is the transformation into DBU space, or more precisely 'VCplxTrans(mag=1/dbu)'.
+
+        The 'dbu' argument has been added in version 0.29.
         """
     @overload
     @classmethod
@@ -52909,7 +53214,7 @@ class VCplxTrans:
         @brief Creates a unit transformation
         """
     @overload
-    def __init__(self, c: VCplxTrans, m: Optional[float] = ..., u: Optional[Vector] = ...) -> None:
+    def __init__(self, c: VCplxTrans, mag: Optional[float] = ..., u: Optional[Vector] = ...) -> None:
         r"""
         @brief Creates a transformation from another transformation plus a magnification and displacement
 
@@ -52921,7 +53226,7 @@ class VCplxTrans:
         @param u The Additional displacement
         """
     @overload
-    def __init__(self, c: VCplxTrans, m: float, x: float, y: float) -> None:
+    def __init__(self, c: VCplxTrans, mag: Optional[float] = ..., x: Optional[int] = ..., y: Optional[int] = ...) -> None:
         r"""
         @brief Creates a transformation from another transformation plus a magnification and displacement
 
@@ -52934,14 +53239,7 @@ class VCplxTrans:
         @param y The Additional displacement (y)
         """
     @overload
-    def __init__(self, m: float) -> None:
-        r"""
-        @brief Creates a transformation from a magnification
-
-        Creates a magnifying transformation without displacement and rotation given the magnification m.
-        """
-    @overload
-    def __init__(self, mag: float, rot: float, mirrx: bool, u: Vector) -> None:
+    def __init__(self, mag: Optional[float] = ..., rot: Optional[float] = ..., mirrx: Optional[bool] = ..., u: Optional[Vector] = ...) -> None:
         r"""
         @brief Creates a transformation using magnification, angle, mirror flag and displacement
 
@@ -52954,7 +53252,7 @@ class VCplxTrans:
         @param u The displacement
         """
     @overload
-    def __init__(self, mag: float, rot: float, mirrx: bool, x: int, y: int) -> None:
+    def __init__(self, mag: Optional[float] = ..., rot: Optional[float] = ..., mirrx: Optional[bool] = ..., x: Optional[int] = ..., y: Optional[int] = ...) -> None:
         r"""
         @brief Creates a transformation using magnification, angle, mirror flag and displacement
 
@@ -52968,33 +53266,38 @@ class VCplxTrans:
         @param y The y displacement
         """
     @overload
-    def __init__(self, t: DTrans) -> None:
-        r"""
-        @brief Creates a transformation from a simple transformation alone
-
-        Creates a magnifying transformation from a simple transformation and a magnification of 1.0.
-        """
-    @overload
-    def __init__(self, t: DTrans, m: float) -> None:
+    def __init__(self, t: DTrans, mag: Optional[float] = ...) -> None:
         r"""
         @brief Creates a transformation from a simple transformation and a magnification
 
         Creates a magnifying transformation from a simple transformation and a magnification.
         """
     @overload
-    def __init__(self, trans: CplxTrans) -> None:
+    def __init__(self, trans: CplxTrans, dbu: Optional[float] = ...) -> None:
         r"""
-        @brief Creates a floating-point coordinate transformation from another coordinate flavour
+        @brief Creates a floating-point to integer coordinate transformation from another coordinate flavour
+
+        The 'dbu' argument is used to transform the input and output space from floating-point units to integer units and vice versa. Formally, the VCplxTrans transformation is initialized with 'to_dbu * trans * to_dbu' where 'to_dbu' is the transformation into DBU space, or more precisely 'VCplxTrans(mag=1/dbu)'.
+
+        The 'dbu' argument has been added in version 0.29.
         """
     @overload
-    def __init__(self, trans: DCplxTrans) -> None:
+    def __init__(self, trans: DCplxTrans, dbu: Optional[float] = ...) -> None:
         r"""
-        @brief Creates a floating-point coordinate transformation from another coordinate flavour
+        @brief Creates a floating-point to integer coordinate transformation from another coordinate flavour
+
+        The 'dbu' argument is used to transform the output space from floating-point units to integer units. Formally, the VCplxTrans transformation is initialized with 'to_dbu * trans' where 'to_dbu' is the transformation into DBU space, or more precisely 'VCplxTrans(mag=1/dbu)'.
+
+        The 'dbu' argument has been added in version 0.29.
         """
     @overload
-    def __init__(self, trans: ICplxTrans) -> None:
+    def __init__(self, trans: ICplxTrans, dbu: Optional[float] = ...) -> None:
         r"""
-        @brief Creates a floating-point coordinate transformation from another coordinate flavour
+        @brief Creates a floating-point to integer coordinate transformation from another coordinate flavour
+
+        The 'dbu' argument is used to transform the input and output space from floating-point units to integer units and vice versa. Formally, the VCplxTrans transformation is initialized with 'trans * to_dbu' where 'to_dbu' is the transformation into DBU space, or more precisely 'VCplxTrans(mag=1/dbu)'.
+
+        The 'dbu' argument has been added in version 0.29.
         """
     @overload
     def __init__(self, u: Vector) -> None:
@@ -53434,7 +53737,13 @@ class VCplxTrans:
 
         The database unit can be specified to translate the integer coordinate displacement in database units to a floating-point displacement in micron units. The displacement's' coordinates will be multiplied with the database unit.
 
-        This method has been introduced in version 0.25.
+        This method is redundant with the conversion constructors and is ill-named. Instead of 'to_itrans' use the conversion constructor:
+
+        @code
+        dtrans = RBA::DCplxTrans::new(vtrans, dbu)
+        @/code
+
+        This method has been deprecated in version 0.29.
         """
     def to_s(self, lazy: Optional[bool] = ..., dbu: Optional[float] = ...) -> str:
         r"""
@@ -53444,11 +53753,17 @@ class VCplxTrans:
 
         The lazy and DBU arguments have been added in version 0.27.6.
         """
-    def to_trans(self) -> ICplxTrans:
+    def to_trans(self, arg0: float) -> ICplxTrans:
         r"""
         @brief Converts the transformation to another transformation with integer input coordinates
 
-        This method has been introduced in version 0.25.
+        This method is redundant with the conversion constructors and is ill-named. Instead of 'to_trans' use the conversion constructor:
+
+        @code
+        itrans = RBA::ICplxTrans::new(vtrans, dbu)
+        @/code
+
+        This method has been deprecated in version 0.29.
         """
     def to_vtrans(self, dbu: Optional[float] = ...) -> CplxTrans:
         r"""
@@ -53456,7 +53771,13 @@ class VCplxTrans:
 
         The database unit can be specified to translate the integer coordinate displacement in database units to an floating-point displacement in micron units. The displacement's' coordinates will be multiplied with the database unit.
 
-        This method has been introduced in version 0.25.
+        This method is redundant with the conversion constructors and is ill-named. Instead of 'to_vtrans' use the conversion constructor:
+
+        @code
+        trans = RBA::CplxTrans::new(vtrans, dbu)
+        @/code
+
+        This method has been deprecated in version 0.29.
         """
     @overload
     def trans(self, box: DBox) -> Box:
@@ -53961,6 +54282,10 @@ class ZeroDistanceMode:
         r"""
         @brief Compares an enum with an integer value
         """
+    def __hash__(self) -> int:
+        r"""
+        @brief Gets the hash value from the enum
+        """
     @overload
     def __init__(self, i: int) -> None:
         r"""
@@ -53970,6 +54295,10 @@ class ZeroDistanceMode:
     def __init__(self, s: str) -> None:
         r"""
         @brief Creates an enum from a string value
+        """
+    def __int__(self) -> int:
+        r"""
+        @brief Gets the integer value from the enum
         """
     @overload
     def __lt__(self, other: ZeroDistanceMode) -> bool:
@@ -54060,6 +54389,10 @@ class ZeroDistanceMode:
     def dup(self) -> ZeroDistanceMode:
         r"""
         @brief Creates a copy of self
+        """
+    def hash(self) -> int:
+        r"""
+        @brief Gets the hash value from the enum
         """
     def inspect(self) -> str:
         r"""

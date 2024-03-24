@@ -556,16 +556,23 @@ Region::texts_as_dots (const std::string &pat, bool pattern, db::DeepShapeStore 
 
     fill_texts (si.first, pat, pattern, dot_delivery<db::FlatEdges> (), res.get (), si.second, dr);
 
-    return Edges (res.release ());
+    Edges edges (res.release ());
+    edges.set_merged_semantics (false);
+    return edges;
 
   }
+
+  db::Edges edges;
 
   text_shape_receiver<dot_delivery<db::Shapes> > pipe = text_shape_receiver<dot_delivery<db::Shapes> > (dot_delivery<db::Shapes> (), pat, pattern, dr);
   if (dr && dr->deep_layer ().store () == &store) {
-    return Edges (new db::DeepEdges (store.create_copy (dr->deep_layer (), &pipe)));
+    edges = Edges (new db::DeepEdges (store.create_copy (dr->deep_layer (), &pipe)));
   } else {
-    return Edges (new db::DeepEdges (store.create_custom_layer (si.first, &pipe, si.second)));
+    edges = Edges (new db::DeepEdges (store.create_custom_layer (si.first, &pipe, si.second)));
   }
+
+  edges.set_merged_semantics (false);
+  return edges;
 }
 
 Region

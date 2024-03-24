@@ -316,7 +316,25 @@ public:
   }
 
   /**
-   *  @brief Processes the edges into polygons
+   *  @brief Processes the edge pairs in-place
+   *
+   *  This method will run the processor over all texts and replace the collection by the results.
+   */
+  Texts &process (const TextProcessorBase &proc)
+  {
+    set_delegate (mp_delegate->process_in_place (proc));
+    return *this;
+  }
+
+  /**
+   *  @brief Processes the texts
+   *
+   *  This method will run the processor over all texts and return a new text collection with the results.
+   */
+  Texts processed (const TextProcessorBase &proc) const;
+
+  /**
+   *  @brief Processes the texts into polygons
    *
    *  This method will run the processor over all edges and return a region
    *  with the outputs of the processor.

@@ -310,10 +310,9 @@ public:
    *  an error occurs - commonly if the command cannot be executed.
    *  This implementation is based on popen ().
    *
-   *  @param cmd The command to execute
-   *  @param read True, if the file should be read, false on write.
+   *  @param source The command to execute
    */
-  InputPipe (const std::string &path);
+  InputPipe (const std::string &source);
 
   /**
    *  @brief Close the pipe
@@ -348,8 +347,7 @@ public:
    */
   virtual std::string source () const
   {
-    //  No source (in the sense of a file name) is available ..
-    return std::string ();
+    return m_source;
   }
 
   virtual std::string absolute_path () const
@@ -474,8 +472,11 @@ public:
    *  the uncompressed data rather than the raw data, until the
    *  compressed block is finished.
    *  The stream must not be in inflate state yet.
+   *
+   *  If "stop_after" is true, the stream will stop after the inflated
+   *  block has finished.
    */
-  void inflate ();
+  void inflate (bool stop_after = false);
 
   /**
    *  @brief Enables "inflate" right from the beginning
@@ -578,10 +579,85 @@ private:
   //  inflate support 
   InflateFilter *mp_inflate;
   bool m_inflate_always;
+  bool m_stop_after_inflate;
 
   //  No copying currently
   InputStream (const InputStream &);
   InputStream &operator= (const InputStream &);
+};
+
+/**
+ *  @brief A wrapper that adds generic .gz support
+ */
+template <class Base>
+class TL_PUBLIC inflating_input_stream
+  : public InputStreamBase
+{
+public:
+  inflating_input_stream (Base *delegate);
+
+  Base *delegate ()
+  {
+    return mp_delegate;
+  }
+
+  virtual size_t read (char *b, size_t n);
+
+  virtual void reset ()
+  {
+    m_inflating_stream.reset ();
+    enter_inflate ();
+  }
+
+  virtual void close ()
+  {
+    m_inflating_stream.close ();
+  }
+
+  virtual std::string source () const
+  {
+    return m_inflating_stream.source ();
+  }
+
+  virtual std::string absolute_path () const
+  {
+    return m_inflating_stream.absolute_path ();
+  }
+
+  virtual std::string filename () const
+  {
+    return m_inflating_stream.filename ();
+  }
+
+private:
+  tl::InputStream m_inflating_stream;
+  bool m_is_compressed;
+  Base *mp_delegate;
+
+  void enter_inflate ();
+  bool auto_detect_gz ();
+};
+
+/**
+ *  @brief A pipe stream with .gz support
+ */
+class TL_PUBLIC InflatingInputPipe
+  : public inflating_input_stream<InputPipe>
+{
+public:
+  /**
+   *  @brief Open a stream by connecting with the stdout of a given command
+   *
+   *  Opening a pipe is a prerequisite for reading from the
+   *  object. open() will throw a FilePOpenErrorException if
+   *  an error occurs - commonly if the command cannot be executed.
+   *  This implementation is based on popen ().
+   *
+   *  @param source The command to execute
+   */
+  InflatingInputPipe (const std::string &source)
+    : inflating_input_stream<InputPipe> (new InputPipe (source))
+  { }
 };
 
 // ---------------------------------------------------------------------------------

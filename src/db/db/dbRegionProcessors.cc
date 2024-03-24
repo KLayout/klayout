@@ -136,10 +136,104 @@ bool RelativeExtentsAsEdges::result_must_not_be_merged () const
 // -----------------------------------------------------------------------------------
 //  PolygonToEdgeProcessor implementation
 
+PolygonToEdgeProcessor::PolygonToEdgeProcessor (PolygonToEdgeProcessor::EdgeMode mode)
+  : m_mode (mode)
+{
+  //  .. nothing yet ..
+}
+
+inline void
+next (db::Polygon::contour_type::simple_iterator &iter, const db::Polygon::contour_type &contour)
+{
+  if (++iter == contour.end ()) {
+    iter = contour.begin ();
+  }
+}
+
+static void
+contour_to_edges (const db::Polygon::contour_type &contour, PolygonToEdgeProcessor::EdgeMode mode, std::vector<db::Edge> &result)
+{
+  if (contour.size () < 3) {
+    return;
+  }
+
+  db::Polygon::contour_type::simple_iterator pm1 = contour.begin ();
+  db::Polygon::contour_type::simple_iterator p0 = pm1;
+  next (p0, contour);
+  db::Polygon::contour_type::simple_iterator p1 = p0;
+  next (p1, contour);
+  db::Polygon::contour_type::simple_iterator p2 = p1;
+  next (p2, contour);
+
+  while (pm1 != contour.end ()) {
+
+    int s1 = db::vprod_sign (*p0 - *pm1, *p1 - *p0);
+    int s2 = db::vprod_sign (*p1 - *p0, *p2 - *p1);
+
+    bool take = true;
+
+    switch (mode) {
+    case PolygonToEdgeProcessor::All:
+    default:
+      break;
+    case PolygonToEdgeProcessor::Convex:
+      take = s1 < 0 && s2 < 0;
+      break;
+    case PolygonToEdgeProcessor::NotConvex:
+      take = ! (s1 < 0 && s2 < 0);
+      break;
+    case PolygonToEdgeProcessor::Concave:
+      take = s1 > 0 && s2 > 0;
+      break;
+    case PolygonToEdgeProcessor::NotConcave:
+      take = ! (s1 > 0 && s2 > 0);
+      break;
+    case PolygonToEdgeProcessor::StepOut:
+      take = s1 > 0 && s2 < 0;
+      break;
+    case PolygonToEdgeProcessor::NotStepOut:
+      take = ! (s1 > 0 && s2 < 0);
+      break;
+    case PolygonToEdgeProcessor::StepIn:
+      take = s1 < 0 && s2 > 0;
+      break;
+    case PolygonToEdgeProcessor::NotStepIn:
+      take = ! (s1 < 0 && s2 > 0);
+      break;
+    case PolygonToEdgeProcessor::Step:
+      take = s1 * s2 < 0;
+      break;
+    case PolygonToEdgeProcessor::NotStep:
+      take = ! (s1 * s2 < 0);
+      break;
+    }
+
+    if (take) {
+      result.push_back (db::Edge (*p0, *p1));
+    }
+
+    ++pm1;
+    next (p0, contour);
+    next (p1, contour);
+    next (p2, contour);
+
+  }
+}
+
 void PolygonToEdgeProcessor::process (const db::Polygon &poly, std::vector<db::Edge> &result) const
 {
-  for (db::Polygon::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end (); ++e) {
-    result.push_back (*e);
+  if (m_mode == All) {
+
+    for (db::Polygon::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end (); ++e) {
+      result.push_back (*e);
+    }
+
+  } else {
+
+    for (unsigned int i = 0; i < poly.holes () + 1; ++i) {
+      contour_to_edges (poly.contour (i), m_mode, result);
+    }
+
   }
 }
 

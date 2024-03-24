@@ -190,6 +190,78 @@ def norm_hash(hash)
 end
     
 
+class DBPCellAPI_TestClass < TestBase
+
+  def test_1
+
+    # PCellParameterDeclaration
+
+    decl = RBA::PCellParameterDeclaration::new("name", RBA::PCellParameterDeclaration::TypeString, "description")
+
+    assert_equal(decl.name, "name")
+    assert_equal(decl.description, "description")
+    assert_equal(decl.default.inspect, "nil")
+    assert_equal(decl.unit, "")
+    assert_equal(decl.type, RBA::PCellParameterDeclaration::TypeString)
+
+    decl = RBA::PCellParameterDeclaration::new("name", RBA::PCellParameterDeclaration::TypeString, "description", "17")
+
+    assert_equal(decl.name, "name")
+    assert_equal(decl.description, "description")
+    assert_equal(decl.type, RBA::PCellParameterDeclaration::TypeString)
+    assert_equal(decl.default.to_s, "17")
+    assert_equal(decl.unit, "")
+
+    decl = RBA::PCellParameterDeclaration::new("name", RBA::PCellParameterDeclaration::TypeString, "description", "17", "unit")
+
+    assert_equal(decl.name, "name")
+    assert_equal(decl.description, "description")
+    assert_equal(decl.type, RBA::PCellParameterDeclaration::TypeString)
+    assert_equal(decl.default.to_s, "17")
+    assert_equal(decl.unit, "unit")
+
+    decl.name = "n"
+    assert_equal(decl.name, "n")
+    decl.description = "d"
+    assert_equal(decl.description, "d")
+    decl.unit = "u"
+    assert_equal(decl.unit, "u")
+    decl.type = RBA::PCellParameterDeclaration::TypeBoolean
+    assert_equal(decl.type, RBA::PCellParameterDeclaration::TypeBoolean)
+    decl.default = true
+    assert_equal(decl.default.to_s, "true")
+
+    decl.type = RBA::PCellParameterDeclaration::TypeInt
+    assert_equal(decl.min_value.inspect, "nil")
+    assert_equal(decl.max_value.inspect, "nil")
+    decl.min_value = "-1"
+    assert_equal(decl.min_value.to_s, "-1")
+    decl.max_value = "42"
+    assert_equal(decl.max_value.to_s, "42")
+    decl.min_value = nil
+    decl.max_value = nil
+    assert_equal(decl.min_value.inspect, "nil")
+    assert_equal(decl.max_value.inspect, "nil")
+
+    assert_equal(decl.hidden?, false)
+    decl.hidden = true
+    assert_equal(decl.hidden?, true)
+
+    assert_equal(decl.readonly?, false)
+    decl.readonly = true
+    assert_equal(decl.readonly?, true)
+
+    decl.add_choice("first", 42)
+    assert_equal(decl.choice_values, [42])
+    assert_equal(decl.choice_descriptions, ["first"])
+    decl.clear_choices
+    assert_equal(decl.choice_values, [])
+    assert_equal(decl.choice_descriptions, [])
+
+  end
+
+end
+
 class DBPCell_TestClass < TestBase
 
   def test_1

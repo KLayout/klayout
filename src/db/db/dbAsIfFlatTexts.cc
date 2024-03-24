@@ -164,6 +164,24 @@ AsIfFlatTexts::filtered (const TextFilterBase &filter) const
   return new_texts.release ();
 }
 
+TextsDelegate *
+AsIfFlatTexts::processed (const TextProcessorBase &filter) const
+{
+  std::unique_ptr<FlatTexts> texts (new FlatTexts ());
+
+  std::vector<db::Text> res_texts;
+
+  for (TextsIterator e = begin (); ! e.at_end (); ++e) {
+    res_texts.clear ();
+    filter.process (*e, res_texts);
+    for (std::vector<db::Text>::const_iterator er = res_texts.begin (); er != res_texts.end (); ++er) {
+      texts->insert (*er);
+    }
+  }
+
+  return texts.release ();
+}
+
 RegionDelegate *
 AsIfFlatTexts::processed_to_polygons (const TextToPolygonProcessorBase &filter) const
 {

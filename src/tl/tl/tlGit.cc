@@ -30,6 +30,9 @@
 #include "tlEnv.h"
 
 #include <git2.h>
+#if LIBGIT2_VER_MAJOR > 1 || (LIBGIT2_VER_MAJOR == 1 && LIBGIT2_VER_MINOR >= 8)
+    #include <git2/sys/errors.h>
+#endif
 #include <cstdio>
 
 namespace tl

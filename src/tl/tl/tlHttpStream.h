@@ -112,7 +112,6 @@ public:
    *  @brief Polling: call this function regularly to explicitly establish polling
    *  (in the Qt framework, this is done automatically within the event loop)
    *  May throw a tl::CancelException to stop.
-   *  Returns true if a message has arrived.
    */
   void tick ();
 
@@ -207,6 +206,21 @@ public:
 private:
   InputHttpStreamPrivateData *mp_data;
   InputHttpStreamCallback *mp_callback;
+};
+
+/**
+ *  @brief A HTTP stream with .gz support
+ */
+class TL_PUBLIC InflatingInputHttpStream
+  : public inflating_input_stream<InputHttpStream>
+{
+public:
+  /**
+   *  @brief Open a stream with the given URL
+   */
+  InflatingInputHttpStream (const std::string &url)
+    : inflating_input_stream<InputHttpStream> (new InputHttpStream (url))
+  { }
 };
 
 }

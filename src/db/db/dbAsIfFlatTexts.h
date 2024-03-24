@@ -55,6 +55,12 @@ public:
 
   virtual TextsDelegate *filtered (const TextFilterBase &) const;
 
+  virtual TextsDelegate *process_in_place (const TextProcessorBase &proc)
+  {
+    return processed (proc);
+  }
+
+  virtual TextsDelegate *processed (const TextProcessorBase &proc) const;
   virtual RegionDelegate *processed_to_polygons (const TextToPolygonProcessorBase &filter) const;
 
   virtual TextsDelegate *add_in_place (const Texts &other)

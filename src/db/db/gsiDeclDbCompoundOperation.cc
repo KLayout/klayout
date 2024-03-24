@@ -316,13 +316,13 @@ static db::CompoundRegionOperationNode *new_minkowski_sum_node4 (db::CompoundReg
   return new db::CompoundRegionProcessingOperationNode (new db::minkowski_sum_computation<std::vector<db::Point> > (p), input, true /*processor is owned*/);
 }
 
-static db::CompoundRegionOperationNode *new_edges (db::CompoundRegionOperationNode *input)
+static db::CompoundRegionOperationNode *new_edges (db::CompoundRegionOperationNode *input, db::PolygonToEdgeProcessor::EdgeMode edge_mode)
 {
   check_non_null (input, "input");
   if (input->result_type () == db::CompoundRegionOperationNode::EdgePairs) {
     return new db::CompoundRegionEdgePairToEdgeProcessingOperationNode (new db::EdgePairToEdgesProcessor (), input, true /*processor is owned*/);
   } else if (input->result_type () == db::CompoundRegionOperationNode::Region) {
-    return new db::CompoundRegionToEdgeProcessingOperationNode (new db::PolygonToEdgeProcessor (), input, true /*processor is owned*/);
+    return new db::CompoundRegionToEdgeProcessingOperationNode (new db::PolygonToEdgeProcessor (edge_mode), input, true /*processor is owned*/);
   } else {
     input->keep ();
     return input;
@@ -567,13 +567,13 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
   gsi::constructor ("new_geometrical_boolean", &new_geometrical_boolean, gsi::arg ("op"), gsi::arg ("a"), gsi::arg ("b"),
     "@brief Creates a node representing a geometrical boolean operation between the inputs.\n"
   ) +
-  gsi::constructor ("new_interacting", &new_interacting, gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("inverse", false), gsi::arg ("min_count", size_t (0)), gsi::arg ("max_count", std::numeric_limits<size_t>::max (), "unlimited"),
+  gsi::constructor ("new_interacting", &new_interacting, gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("inverse", false), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", std::numeric_limits<size_t>::max (), "unlimited"),
     "@brief Creates a node representing an interacting selection operation between the inputs.\n"
   ) +
-  gsi::constructor ("new_overlapping", &new_overlapping, gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("inverse", false), gsi::arg ("min_count", size_t (0)), gsi::arg ("max_count", std::numeric_limits<size_t>::max (), "unlimited"),
+  gsi::constructor ("new_overlapping", &new_overlapping, gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("inverse", false), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", std::numeric_limits<size_t>::max (), "unlimited"),
     "@brief Creates a node representing an overlapping selection operation between the inputs.\n"
   ) +
-  gsi::constructor ("new_enclosing", &new_enclosing, gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("inverse", false), gsi::arg ("min_count", size_t (0)), gsi::arg ("max_count", std::numeric_limits<size_t>::max (), "unlimited"),
+  gsi::constructor ("new_enclosing", &new_enclosing, gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("inverse", false), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", std::numeric_limits<size_t>::max (), "unlimited"),
     "@brief Creates a node representing an inside selection operation between the inputs.\n"
   ) +
   gsi::constructor ("new_inside", &new_inside, gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("inverse", false),
@@ -746,8 +746,12 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
     "@brief Creates a node filtering the input for rectangular or square shapes.\n"
     "If 'is_square' is true, only squares will be selected. If 'inverse' is true, the non-rectangle/non-square shapes are returned.\n"
   ) +
-  gsi::constructor ("new_edges", &new_edges, gsi::arg ("input"),
+  gsi::constructor ("new_edges", &new_edges, gsi::arg ("input"), gsi::arg ("mode", db::PolygonToEdgeProcessor::All, "All"),
     "@brief Creates a node converting polygons into its edges.\n"
+    "The 'mode' argument allows selecting specific edges when generating edges from a polygon. "
+    "See \\EdgeMode for the various options. By default, all edges are generated from polygons.\n"
+    "\n"
+    "The 'mode' argument has been added in version 0.29."
   ) +
   gsi::constructor ("new_edge_length_filter", &new_edge_length_filter, gsi::arg ("input"), gsi::arg ("inverse", false), gsi::arg ("lmin", 0), gsi::arg ("lmax", std::numeric_limits<db::Edge::distance_type>::max (), "max"),
     "@brief Creates a node filtering edges by their length.\n"

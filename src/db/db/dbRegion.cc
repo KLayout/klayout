@@ -74,14 +74,42 @@ Region &Region::operator= (const Region &other)
   return *this;
 }
 
-Region::Region (const RecursiveShapeIterator &si)
+Region::Region (const RecursiveShapeIterator &si, bool merged_semantics, bool is_merged)
 {
-  mp_delegate = new OriginalLayerRegion (si);
+  mp_delegate = new OriginalLayerRegion (si, db::ICplxTrans (), merged_semantics, is_merged);
 }
 
-Region::Region (const RecursiveShapeIterator &si, const db::ICplxTrans &trans, bool merged_semantics)
+Region::Region (const RecursiveShapeIterator &si, const db::ICplxTrans &trans, bool merged_semantics, bool is_merged)
 {
-  mp_delegate = new OriginalLayerRegion (si, trans, merged_semantics);
+  mp_delegate = new OriginalLayerRegion (si, trans, merged_semantics, is_merged);
+}
+
+Region::Region (const Shapes &shapes, bool merged_semantics, bool is_merged)
+{
+  db::FlatRegion *flat_region = new FlatRegion (is_merged);
+  flat_region->reserve (shapes.size (db::ShapeIterator::Regions));
+
+  //  NOTE: we need to normalize the shapes to polygons because this is what the flat region expects
+  for (auto s = shapes.begin (db::ShapeIterator::Regions); ! s.at_end (); ++s) {
+    flat_region->insert (*s);
+  }
+
+  mp_delegate = flat_region;
+  mp_delegate->set_merged_semantics (merged_semantics);
+}
+
+Region::Region (const Shapes &shapes, const db::ICplxTrans &trans, bool merged_semantics, bool is_merged)
+{
+  db::FlatRegion *flat_region = new FlatRegion (is_merged);
+  flat_region->reserve (shapes.size (db::ShapeIterator::Regions));
+
+  //  NOTE: we need to normalize the shapes to polygons because this is what the flat region expects
+  for (auto s = shapes.begin (db::ShapeIterator::Regions); ! s.at_end (); ++s) {
+    flat_region->insert (*s, trans);
+  }
+
+  mp_delegate = flat_region;
+  mp_delegate->set_merged_semantics (merged_semantics);
 }
 
 Region::Region (const RecursiveShapeIterator &si, DeepShapeStore &dss, double area_ratio, size_t max_vertex_count)

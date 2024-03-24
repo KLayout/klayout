@@ -2537,6 +2537,35 @@ TEST(55_PropertiesFilterFlat)
   EXPECT_EQ (s->to_string (), "(1,2;1,202;101,202;101,2)");
 }
 
+TEST(56_RegionsFromShapes)
+{
+  db::Shapes shapes;
+
+  shapes.insert (db::Box (0, 0, 100, 200));
+  shapes.insert (db::Box (50, 50, 150, 250));
+
+  EXPECT_EQ (db::Region (shapes).area (), 32500);
+  EXPECT_EQ (db::Region (shapes, false).area (), 40000);
+  EXPECT_EQ (db::Region (shapes, db::ICplxTrans (0.5)).area (), 8125);
+  EXPECT_EQ (db::Region (shapes, db::ICplxTrans (0.5), false).area (), 10000);
+
+  //  for cross-checking: same for RecursiveShapeIterator
+
+  db::Layout layout;
+  unsigned int l1 = layout.insert_layer ();
+  db::Cell &top = layout.cell (layout.add_cell ("TOP"));
+
+  top.shapes (l1).insert (db::Box (0, 0, 100, 200));
+  top.shapes (l1).insert (db::Box (50, 50, 150, 250));
+
+  db::RecursiveShapeIterator si (layout, top, l1);
+
+  EXPECT_EQ (db::Region (si).area (), 32500);
+  EXPECT_EQ (db::Region (si, false).area (), 40000);
+  EXPECT_EQ (db::Region (si, db::ICplxTrans (0.5)).area (), 8125);
+  EXPECT_EQ (db::Region (si, db::ICplxTrans (0.5), false).area (), 10000);
+}
+
 TEST(100_Processors)
 {
   db::Region r;

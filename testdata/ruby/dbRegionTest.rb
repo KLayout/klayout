@@ -1066,6 +1066,47 @@ class DBRegion_TestClass < TestBase
 
   end
 
+  # regions from Shapes
+  def test_regions_from_shapes
+
+    shapes = RBA::Shapes::new;
+
+    shapes.insert(RBA::Box::new(0, 0, 100, 200))
+    shapes.insert(RBA::Box::new(50, 50, 150, 250))
+
+    assert_equal(RBA::Region::new(shapes).area, 32500)
+    region = RBA::Region::new(shapes)
+    region.merged_semantics = false
+    assert_equal(region.area, 40000)
+
+    assert_equal(RBA::Region::new(shapes, RBA::ICplxTrans::new(0.5)).area, 8125)
+    region = RBA::Region::new(shapes, RBA::ICplxTrans::new(0.5))
+    region.merged_semantics = false
+    assert_equal(region.area, 10000)
+
+    #  for cross-checking: same for RecursiveShapeIterator
+
+    layout = RBA::Layout::new
+    l1 = layout.insert_layer(RBA::LayerInfo::new(1, 0))
+    top = layout.create_cell("TOP")
+
+    top.shapes(l1).insert (RBA::Box::new(0, 0, 100, 200))
+    top.shapes(l1).insert (RBA::Box::new(50, 50, 150, 250))
+
+    si = RBA::RecursiveShapeIterator::new(layout, top, l1)
+
+    assert_equal(RBA::Region::new(si).area, 32500)
+    region = RBA::Region::new(si)
+    region.merged_semantics = false
+    assert_equal(region.area, 40000)
+
+    assert_equal(RBA::Region::new(si, RBA::ICplxTrans::new(0.5)).area, 8125)
+    region = RBA::Region::new(si, RBA::ICplxTrans::new(0.5))
+    region.merged_semantics = false
+    assert_equal(region.area, 10000)
+
+  end
+
   # deep region tests
   def test_deep1
 

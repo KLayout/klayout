@@ -199,7 +199,7 @@ public:
    *  Creates a region from a recursive shape iterator. This allows feeding a region
    *  from a hierarchy of cells.
    */
-  explicit Region (const RecursiveShapeIterator &si);
+  explicit Region (const RecursiveShapeIterator &si, bool merged_semantics = true, bool is_merged = false);
 
   /**
    *  @brief Constructor from a RecursiveShapeIterator with a transformation
@@ -208,7 +208,23 @@ public:
    *  from a hierarchy of cells. The transformation is useful to scale to a specific
    *  DBU for example.
    */
-  explicit Region (const RecursiveShapeIterator &si, const db::ICplxTrans &trans, bool merged_semantics = true);
+  explicit Region (const RecursiveShapeIterator &si, const db::ICplxTrans &trans, bool merged_semantics = true, bool is_merged = false);
+
+  /**
+   *  @brief Constructor from a Shapes container
+   *
+   *  Creates a region from a shapes container.
+   */
+  explicit Region (const Shapes &si, bool merged_semantics = true, bool is_merged = false);
+
+  /**
+   *  @brief Constructor from a Shapes container with a transformation
+   *
+   *  Creates a region from a recursive shape iterator. This allows feeding a region
+   *  from a hierarchy of cells. The transformation is useful to scale to a specific
+   *  DBU for example.
+   */
+  explicit Region (const Shapes &si, const db::ICplxTrans &trans, bool merged_semantics = true, bool is_merged = false);
 
   /**
    *  @brief Constructor from a RecursiveShapeIterator providing a deep representation

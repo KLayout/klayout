@@ -1554,3 +1554,75 @@ TEST(11_LayoutIsWeakPointer)
   x = collect(i1, *g);
   EXPECT_EQ (x, "");
 }
+
+TEST(12_ForMerged)
+{
+  std::unique_ptr<db::Layout> g (new db::Layout ());
+  g->insert_layer (0);
+  g->insert_layer (1);
+  db::Cell &c0 (g->cell (g->add_cell ()));
+  db::Cell &c1 (g->cell (g->add_cell ()));
+  db::Cell &c2 (g->cell (g->add_cell ()));
+  db::Cell &c3 (g->cell (g->add_cell ()));
+
+  db::Box b (0, 100, 1000, 1200);
+  c0.shapes (0).insert (db::Box (0, 0, 3000, 2000));
+  c1.shapes (0).insert (b);
+  c2.shapes (0).insert (b);
+  c3.shapes (0).insert (b);
+
+  db::Trans tt;
+  c0.insert (db::CellInstArray (db::CellInst (c1.cell_index ()), tt));
+  c0.insert (db::CellInstArray (db::CellInst (c2.cell_index ()), db::Trans (db::Vector (100, -100))));
+  c0.insert (db::CellInstArray (db::CellInst (c3.cell_index ()), db::Trans (1)));
+  c2.insert (db::CellInstArray (db::CellInst (c3.cell_index ()), db::Trans (db::Vector (1100, 0))));
+
+  std::string x;
+
+  db::RecursiveShapeIterator i1 (*g, c0, 0);
+  x = collect(i1, *g);
+  EXPECT_EQ (x, "[$1](0,0;3000,2000)/[$2](0,100;1000,1200)/[$3](100,0;1100,1100)/[$4](1200,0;2200,1100)/[$4](-1200,0;-100,1000)");
+
+  i1.set_for_merged_input (true);
+  x = collect(i1, *g);
+  EXPECT_EQ (x, "[$1](0,0;3000,2000)/[$4](-1200,0;-100,1000)");
+
+  std::vector<unsigned int> lv;
+  lv.push_back (0);
+  i1 = db::RecursiveShapeIterator (*g, c0, lv);
+  x = collect(i1, *g);
+  EXPECT_EQ (x, "[$1](0,0;3000,2000)/[$2](0,100;1000,1200)/[$3](100,0;1100,1100)/[$4](1200,0;2200,1100)/[$4](-1200,0;-100,1000)");
+
+  i1.set_for_merged_input (true);
+  x = collect(i1, *g);
+  EXPECT_EQ (x, "[$1](0,0;3000,2000)/[$4](-1200,0;-100,1000)");
+
+  lv.push_back (1); //  empty, but kills "for merged" optimization
+  i1 = db::RecursiveShapeIterator (*g, c0, lv);
+  x = collect(i1, *g);
+  EXPECT_EQ (x, "[$1](0,0;3000,2000)/[$2](0,100;1000,1200)/[$3](100,0;1100,1100)/[$4](1200,0;2200,1100)/[$4](-1200,0;-100,1000)");
+
+  i1.set_for_merged_input (true);
+  x = collect(i1, *g);
+  //  no longer optimized
+  EXPECT_EQ (x, "[$1](0,0;3000,2000)/[$2](0,100;1000,1200)/[$3](100,0;1100,1100)/[$4](1200,0;2200,1100)/[$4](-1200,0;-100,1000)");
+
+  i1 = db::RecursiveShapeIterator (*g, c0, 0, db::Box (-100, 0, 100, 50));
+  x = collect(i1, *g);
+  EXPECT_EQ (x, "[$1](0,0;3000,2000)/[$3](100,0;1100,1100)/[$4](-1200,0;-100,1000)");
+
+  i1.set_for_merged_input (true);
+  x = collect(i1, *g);
+  EXPECT_EQ (x, "[$1](0,0;3000,2000)/[$4](-1200,0;-100,1000)");
+
+  i1 = db::RecursiveShapeIterator (*g, c0, 0, db::Box (-101, 0, 100, 50));
+  i1.set_overlapping (true);
+  x = collect(i1, *g);
+  EXPECT_EQ (x, "[$1](0,0;3000,2000)/[$4](-1200,0;-100,1000)");
+
+  i1.set_for_merged_input (true);
+  x = collect(i1, *g);
+  EXPECT_EQ (x, "[$1](0,0;3000,2000)/[$4](-1200,0;-100,1000)");
+
+  // ...
+}

@@ -918,6 +918,64 @@ RecursiveShapeIterator::new_layer () const
   }
 }
 
+static
+RecursiveShapeIterator::box_type
+shape_box (const RecursiveShapeIterator::shape_type &shape)
+{
+  if (shape.is_box ()) {
+    return shape.box ();
+  }
+
+  switch (shape.type ()) {
+  case db::Shape::Polygon:
+    return shape.polygon ().is_box () ? shape.polygon ().box () : RecursiveShapeIterator::box_type ();
+  case db::Shape::PolygonRef:
+  case db::Shape::PolygonPtrArrayMember:
+    return shape.polygon_ref ().is_box () ? shape.polygon_ref ().box () : RecursiveShapeIterator::box_type ();
+  case db::Shape::SimplePolygon:
+    return shape.simple_polygon ().is_box () ? shape.simple_polygon ().box () : RecursiveShapeIterator::box_type ();
+  case db::Shape::SimplePolygonRef:
+  case db::Shape::SimplePolygonPtrArrayMember:
+    return shape.simple_polygon_ref ().is_box () ? shape.simple_polygon_ref ().box () : RecursiveShapeIterator::box_type ();
+  default:
+    return RecursiveShapeIterator::box_type ();
+  }
+}
+
+static
+RecursiveShapeIterator::box_type
+subtract_box (const RecursiveShapeIterator::box_type &from, const RecursiveShapeIterator::box_type &box)
+{
+  RecursiveShapeIterator::box_type res (from);
+  if (box.empty ()) {
+    return res;
+  }
+
+  if (! res.empty ()) {
+    if (box.bottom () <= res.bottom () && box.top () >= res.top ()) {
+      if (box.left () <= res.left ()) {
+        res.set_left (std::max (box.right (), res.left ()));
+      }
+      if (box.right () >= res.right ()) {
+        res.set_right (std::min (box.left (), res.right ()));
+      }
+    }
+  }
+
+  if (! res.empty ()) {
+    if (box.left () <= res.left () && box.right () >= res.right ()) {
+      if (box.bottom () <= res.bottom ()) {
+        res.set_bottom (std::max (box.top (), res.bottom ()));
+      }
+      if (box.top () >= res.top ()) {
+        res.set_top (std::min (box.bottom (), res.top ()));
+      }
+    }
+  }
+
+  return res;
+}
+
 void 
 RecursiveShapeIterator::new_cell (RecursiveShapeReceiver *receiver) const
 {
@@ -935,47 +993,28 @@ RecursiveShapeIterator::new_cell (RecursiveShapeReceiver *receiver) const
 
   //  try some optimization - only consider optimizing by dropping the shape-covered area under certain circumstances:
   //  - single layer
-  //  - less than 32 shapes to consider
-  //  - total shape bbox in current region covers at least a third of it
-  //  - total area of shapes in current region is at least a third of it
+  //  - at least one shape to consider and it is a box
+  //  - that box clips the region entirely on one side
   //
   //  NOTE that this implementation can modify the search box on the box stack
   //  because we did "new_layer()" already and this function is not going to
   //  be called, because we do so only for single layers.
 
-  const box_type &region = m_local_region_stack.back ();
+  if (m_for_merged_input && (! m_has_layers || m_layers.size () == 1) && ! m_shape.at_end ()) {
 
-  if (m_for_merged_input && (! m_has_layers || m_layers.size () == 1) && ! region.empty ()) {
+    box_type box = shape_box (*m_shape);
+    if (! box.empty ()) {
 
-    unsigned int l = m_has_layers ? m_layers.front () : m_layer;
-    const shapes_type &shapes = cell ()->shapes (l);
-
-    if (! shapes.empty () && shapes.size () < 32 &&
-        3 * (shapes.bbox () & region).area () > region.area ()) {
-
-      region_type shapes_region (shapes);
-      if (3 * shapes_region.area (region) > region.area ()) {
-
-        //  Need to enlarge the empty area somewhat so we really exclude instances
-        //  entirely enclosed by the shape - also the ones at the border.
-        box_type::vector_type bias;
-        if (! m_overlapping) {
-          bias = box_type::vector_type (1, 1);
-        }
-
-        //  reduce the search region for less instances to look up
-        //  NOTE: because we use "touching" for the instances below, we
-        region_type new_complex_region;
-        if (region == box_type::world ()) {
-          new_complex_region = region_type (cell ()->bbox (l)) - shapes_region;
-        } else {
-          new_complex_region = region_type (cell ()->bbox (l) & region.enlarged (bias)) - shapes_region;
-        }
-
-        //  TODO: the current implementation does not touch the complex search region
-        m_local_region_stack.back () = new_complex_region.bbox ().enlarged (-bias);
-
+      //  Need to enlarge the empty area somewhat so we really exclude instances
+      //  entirely enclosed by the shape - also the ones at the border.
+      if (! m_overlapping) {
+        box.enlarge (box_type::vector_type (1, 1));
       }
+
+      const box_type &region = m_local_region_stack.back ();
+      unsigned int l = m_has_layers ? m_layers.front () : m_layer;
+      box = subtract_box (cell ()->bbox (l) & region, box);
+      m_local_region_stack.back () = box;
 
     }
 

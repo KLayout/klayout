@@ -1221,6 +1221,12 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method has been introduced in version 0.26."
   ) +
+  method ("write", &db::Region::write, gsi::arg ("filename"),
+    "@brief Writes the region to a file\n"
+    "This method is provided for debugging purposes. It writes the object to a flat layer 0/0 in a single top cell.\n"
+    "\n"
+    "This method has been introduced in version 0.29."
+  ) +
   factory_ext ("texts", &texts_as_boxes1, gsi::arg ("expr", std::string ("*")), gsi::arg ("as_pattern", true), gsi::arg ("enl", 1),
     "@hide\n"
     "This method is provided for DRC implementation only."

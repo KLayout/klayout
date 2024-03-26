@@ -249,6 +249,14 @@ public:
   explicit Region (DeepShapeStore &dss);
 
   /**
+   *  @brief Writes the region to a file
+   *
+   *  This method is provided for debugging purposes. A flat image of the
+   *  region is written to a layout file with a single top cell on layer 0/0.
+   */
+  void write (const std::string &fn) const;
+
+  /**
    *  @brief Implementation of the ShapeCollection interface
    */
   ShapeCollectionDelegateBase *get_delegate () const

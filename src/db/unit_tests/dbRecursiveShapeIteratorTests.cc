@@ -1630,20 +1630,6 @@ TEST(12_ForMerged)
 }
 
 
-static void write (const db::Region &region, const std::string &fn)
-{
-  db::Layout layout;
-  const db::Cell &top = layout.cell (layout.add_cell ("TOP"));
-  unsigned int li = layout.insert_layer (db::LayerProperties (0, 0));
-  region.insert_into (&layout, top.cell_index (), li);
-
-  tl::OutputStream os (fn);
-  db::SaveLayoutOptions opt;
-  opt.set_format_from_filename (fn);
-  db::Writer writer (opt);
-  writer.write (layout, os);
-}
-
 TEST(13_ForMergedPerformance)
 {
   test_is_long_runner ();

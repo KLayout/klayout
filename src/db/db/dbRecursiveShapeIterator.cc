@@ -918,64 +918,6 @@ RecursiveShapeIterator::new_layer () const
   }
 }
 
-static
-RecursiveShapeIterator::box_type
-shape_box (const RecursiveShapeIterator::shape_type &shape)
-{
-  if (shape.is_box ()) {
-    return shape.box ();
-  }
-
-  switch (shape.type ()) {
-  case db::Shape::Polygon:
-    return shape.polygon ().is_box () ? shape.polygon ().box () : RecursiveShapeIterator::box_type ();
-  case db::Shape::PolygonRef:
-  case db::Shape::PolygonPtrArrayMember:
-    return shape.polygon_ref ().is_box () ? shape.polygon_ref ().box () : RecursiveShapeIterator::box_type ();
-  case db::Shape::SimplePolygon:
-    return shape.simple_polygon ().is_box () ? shape.simple_polygon ().box () : RecursiveShapeIterator::box_type ();
-  case db::Shape::SimplePolygonRef:
-  case db::Shape::SimplePolygonPtrArrayMember:
-    return shape.simple_polygon_ref ().is_box () ? shape.simple_polygon_ref ().box () : RecursiveShapeIterator::box_type ();
-  default:
-    return RecursiveShapeIterator::box_type ();
-  }
-}
-
-static
-RecursiveShapeIterator::box_type
-subtract_box (const RecursiveShapeIterator::box_type &from, const RecursiveShapeIterator::box_type &box)
-{
-  RecursiveShapeIterator::box_type res (from);
-  if (box.empty ()) {
-    return res;
-  }
-
-  if (! res.empty ()) {
-    if (box.bottom () <= res.bottom () && box.top () >= res.top ()) {
-      if (box.left () <= res.left ()) {
-        res.set_left (std::max (box.right (), res.left ()));
-      }
-      if (box.right () >= res.right ()) {
-        res.set_right (std::min (box.left (), res.right ()));
-      }
-    }
-  }
-
-  if (! res.empty ()) {
-    if (box.left () <= res.left () && box.right () >= res.right ()) {
-      if (box.bottom () <= res.bottom ()) {
-        res.set_bottom (std::max (box.top (), res.bottom ()));
-      }
-      if (box.top () >= res.top ()) {
-        res.set_top (std::min (box.bottom (), res.top ()));
-      }
-    }
-  }
-
-  return res;
-}
-
 void 
 RecursiveShapeIterator::new_cell (RecursiveShapeReceiver *receiver) const
 {
@@ -1002,7 +944,7 @@ RecursiveShapeIterator::new_cell (RecursiveShapeReceiver *receiver) const
 
   if (m_for_merged_input && (! m_has_layers || m_layers.size () == 1) && ! m_shape.at_end ()) {
 
-    box_type box = shape_box (*m_shape);
+    box_type box = m_shape->rectangle ();
     if (! box.empty ()) {
 
       //  Need to enlarge the empty area somewhat so we really exclude instances
@@ -1013,7 +955,7 @@ RecursiveShapeIterator::new_cell (RecursiveShapeReceiver *receiver) const
 
       const box_type &region = m_local_region_stack.back ();
       unsigned int l = m_has_layers ? m_layers.front () : m_layer;
-      box = subtract_box (cell ()->bbox (l) & region, box);
+      box = (cell ()->bbox (l) & region) - box;
       m_local_region_stack.back () = box;
 
     }

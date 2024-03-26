@@ -2651,6 +2651,16 @@ public:
    */
   box_type bbox () const;
 
+  /**
+   *  @brief Returns the box if the object represents a rectangle or an empty box if not
+   *
+   *  This method returns the rectangle (aka box) the shape represents a polygon
+   *  that is a rectangle, a path with two points and no rounded ends or an actual box.
+   *
+   *  If not, an empty box is returned.
+   */
+  box_type rectangle () const;
+
   /** 
    *  @brief Compute the area of the shape
    */

@@ -26,6 +26,10 @@
 #include "dbLayoutDiff.h"
 #include "tlString.h"
 #include "tlUnitTest.h"
+#include "tlFileUtils.h"
+#include "tlStream.h"
+#include "dbReader.h"
+#include "dbWriter.h"
 
 #include <vector>
 
@@ -1623,6 +1627,164 @@ TEST(12_ForMerged)
   i1.set_for_merged_input (true);
   x = collect(i1, *g);
   EXPECT_EQ (x, "[$1](0,0;3000,2000)/[$4](-1200,0;-100,1000)");
-
-  // ...
 }
+
+
+static void write (const db::Region &region, const std::string &fn)
+{
+  db::Layout layout;
+  const db::Cell &top = layout.cell (layout.add_cell ("TOP"));
+  unsigned int li = layout.insert_layer (db::LayerProperties (0, 0));
+  region.insert_into (&layout, top.cell_index (), li);
+
+  tl::OutputStream os (fn);
+  db::SaveLayoutOptions opt;
+  opt.set_format_from_filename (fn);
+  db::Writer writer (opt);
+  writer.write (layout, os);
+}
+
+TEST(13_ForMergedPerformance)
+{
+  test_is_long_runner ();
+
+  std::string fn (tl::combine_path (tl::testdata_private (), "oasis/caravel.oas.gz"));
+
+  db::Layout ly;
+
+  {
+    tl::InputStream is (fn);
+    db::Reader reader (is);
+    reader.read (ly);
+  }
+
+  unsigned l1 = ly.get_layer (db::LayerProperties (66, 20));
+  unsigned l2 = ly.get_layer (db::LayerProperties (235, 4));
+
+  db::RecursiveShapeIterator si1 (ly, ly.cell (*ly.begin_top_down ()), l1);
+  db::RecursiveShapeIterator si2 (ly, ly.cell (*ly.begin_top_down ()), l2);
+
+  {
+    tl::SelfTimer timer ("Standard loop on 66/20");
+    size_t n = 0;
+    while (! si1.at_end ()) {
+      ++si1;
+      ++n;
+    }
+    tl::info << "Counted " << n << " shapes on 66/20";
+    EXPECT_EQ (n, size_t (1218378));
+  }
+
+  {
+    tl::SelfTimer timer ("Standard loop on 235/4");
+    size_t n = 0;
+    while (! si2.at_end ()) {
+      ++si2;
+      ++n;
+    }
+    tl::info << "Counted " << n << " shapes on 235/4";
+    EXPECT_EQ (n, size_t (57462));
+  }
+
+  si1.set_for_merged_input (true);
+  si2.set_for_merged_input (true);
+
+  {
+    tl::SelfTimer timer ("'for_merged' loop on 66/20");
+    size_t n = 0;
+    while (! si1.at_end ()) {
+      ++si1;
+      ++n;
+    }
+    tl::info << "Counted " << n << " shapes on 66/20";
+    EXPECT_EQ (n, size_t (1217072));
+  }
+
+  {
+    tl::SelfTimer timer ("'for_merged' loop on 235/4");
+    size_t n = 0;
+    while (! si2.at_end ()) {
+      ++si2;
+      ++n;
+    }
+    tl::info << "Counted " << n << " shapes on 235/4";
+    EXPECT_EQ (n, size_t (919));
+  }
+
+  si1.set_for_merged_input (false);
+  si1.set_region (db::Box (0, 0, 1000000, 1000000));
+  si2.set_for_merged_input (false);
+  si2.set_region (db::Box (0, 0, 1000000, 1000000));
+
+  {
+    tl::SelfTimer timer ("Standard loop on 66/20");
+    size_t n = 0;
+    while (! si1.at_end ()) {
+      ++si1;
+      ++n;
+    }
+    tl::info << "Counted " << n << " shapes on 66/20";
+    EXPECT_EQ (n, size_t (218823));
+  }
+
+  {
+    tl::SelfTimer timer ("Standard loop on 235/4");
+    size_t n = 0;
+    while (! si2.at_end ()) {
+      ++si2;
+      ++n;
+    }
+    tl::info << "Counted " << n << " shapes on 235/4";
+    EXPECT_EQ (n, size_t (2578));
+  }
+
+  si1.set_for_merged_input (true);
+  si2.set_for_merged_input (true);
+
+  {
+    tl::SelfTimer timer ("'for_merged' loop on 66/20");
+    size_t n = 0;
+    while (! si1.at_end ()) {
+      ++si1;
+      ++n;
+    }
+    tl::info << "Counted " << n << " shapes on 66/20";
+    EXPECT_EQ (n, size_t (218736));
+  }
+
+  {
+    tl::SelfTimer timer ("'for_merged' loop on 235/4");
+    size_t n = 0;
+    while (! si2.at_end ()) {
+      ++si2;
+      ++n;
+    }
+    tl::info << "Counted " << n << " shapes on 235/4";
+    EXPECT_EQ (n, size_t (1));
+  }
+
+  {
+    tl::SelfTimer timer ("XOR on tile of 66/20");
+    si1.set_for_merged_input (false);
+    db::Region r1 (si1);
+    si1.set_for_merged_input (true);
+    db::Region r2 (si1);
+
+    EXPECT_EQ (r1.count (), size_t (218823));
+    EXPECT_EQ (r2.count (), size_t (218736));
+    EXPECT_EQ ((r1 ^ r2).count (), size_t (0));
+  }
+
+  {
+    tl::SelfTimer timer ("XOR on tile of 235/4");
+    si2.set_for_merged_input (false);
+    db::Region r1 (si2);
+    si2.set_for_merged_input (true);
+    db::Region r2 (si2);
+
+    EXPECT_EQ (r1.count (), size_t (2578));
+    EXPECT_EQ (r2.count (), size_t (1));
+    EXPECT_EQ ((r1 ^ r2).count (), size_t (0));
+  }
+}
+

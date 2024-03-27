@@ -933,35 +933,6 @@ RecursiveShapeIterator::new_cell (RecursiveShapeReceiver *receiver) const
 
   new_layer ();
 
-  //  try some optimization - only consider optimizing by dropping the shape-covered area under certain circumstances:
-  //  - single layer
-  //  - at least one shape to consider and it is a box
-  //  - that box clips the region entirely on one side
-  //
-  //  NOTE that this implementation can modify the search box on the box stack
-  //  because we did "new_layer()" already and this function is not going to
-  //  be called, because we do so only for single layers.
-
-  if (m_for_merged_input && (! m_has_layers || m_layers.size () == 1) && ! m_shape.at_end ()) {
-
-    box_type box = m_shape->rectangle ();
-    if (! box.empty ()) {
-
-      //  Need to enlarge the empty area somewhat so we really exclude instances
-      //  entirely enclosed by the shape - also the ones at the border.
-      if (! m_overlapping) {
-        box.enlarge (box_type::vector_type (1, 1));
-      }
-
-      const box_type &region = m_local_region_stack.back ();
-      unsigned int l = m_has_layers ? m_layers.front () : m_layer;
-      box = (cell ()->bbox (l) & region) - box;
-      m_local_region_stack.back () = box;
-
-    }
-
-  }
-
   if (m_overlapping) {
     m_inst = cell ()->begin_touching (m_local_region_stack.back ().enlarged (box_type::vector_type (-1, -1)));
   } else {
@@ -992,6 +963,33 @@ RecursiveShapeIterator::new_inst (RecursiveShapeReceiver *receiver) const
       if (m_inst.at_end ()) {
         break;
       }
+    }
+
+    if (m_for_merged_input && (! m_has_layers || m_layers.size () == 1)) {
+
+      //  Try some optimization: if the instance we're looking at is entirely covered
+      //  by a rectangle (other objects are too expensive to check), then wil skip it
+      //
+      //  We check 10 shapes max.
+
+      unsigned int l = m_has_layers ? m_layers.front () : m_layer;
+      box_type inst_bx = m_inst->bbox (m_box_convert);
+      auto si = cell ()->shapes (l).begin_overlapping (inst_bx, m_shape_flags, mp_shape_prop_sel, m_shape_inv_prop_sel);
+      bool skip = false;
+      size_t nmax = 10;
+      while (! skip && ! si.at_end () && nmax-- > 0) {
+        if (inst_bx.inside (si->rectangle ())) {
+          skip = true;
+          break;
+        }
+        ++si;
+      }
+
+      if (skip) {
+        ++m_inst;
+        continue;
+      }
+
     }
 
     bool all_of_instance = false;

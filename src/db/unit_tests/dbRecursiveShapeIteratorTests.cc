@@ -1683,7 +1683,7 @@ TEST(13_ForMergedPerformance)
       ++n;
     }
     tl::info << "Counted " << n << " shapes on 66/20";
-    EXPECT_EQ (n, size_t (1217072));
+    EXPECT_EQ (n, size_t (1212844));
   }
 
   {
@@ -1694,7 +1694,7 @@ TEST(13_ForMergedPerformance)
       ++n;
     }
     tl::info << "Counted " << n << " shapes on 235/4";
-    EXPECT_EQ (n, size_t (919));
+    EXPECT_EQ (n, size_t (10));
   }
 
   si1.set_for_merged_input (false);
@@ -1735,7 +1735,7 @@ TEST(13_ForMergedPerformance)
       ++n;
     }
     tl::info << "Counted " << n << " shapes on 66/20";
-    EXPECT_EQ (n, size_t (218736));
+    EXPECT_EQ (n, size_t (218552));
   }
 
   {
@@ -1746,7 +1746,7 @@ TEST(13_ForMergedPerformance)
       ++n;
     }
     tl::info << "Counted " << n << " shapes on 235/4";
-    EXPECT_EQ (n, size_t (1));
+    EXPECT_EQ (n, size_t (2));
   }
 
   {
@@ -1757,7 +1757,7 @@ TEST(13_ForMergedPerformance)
     db::Region r2 (si1);
 
     EXPECT_EQ (r1.count (), size_t (218823));
-    EXPECT_EQ (r2.count (), size_t (218736));
+    EXPECT_EQ (r2.count (), size_t (218552));
     EXPECT_EQ ((r1 ^ r2).count (), size_t (0));
   }
 
@@ -1769,7 +1769,7 @@ TEST(13_ForMergedPerformance)
     db::Region r2 (si2);
 
     EXPECT_EQ (r1.count (), size_t (2578));
-    EXPECT_EQ (r2.count (), size_t (1));
+    EXPECT_EQ (r2.count (), size_t (2));
     EXPECT_EQ ((r1 ^ r2).count (), size_t (0));
   }
 }

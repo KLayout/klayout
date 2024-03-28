@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>625</width>
-    <height>587</height>
+    <height>616</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -331,6 +331,9 @@ properties</string>
      <property name="text">
       <string>The default database unit is used as database unit for freshly created layouts</string>
      </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
    <item row="12" column="0" colspan="4">
@@ -352,7 +355,10 @@ properties</string>
    <item row="11" column="1" colspan="3">
     <widget class="QLabel" name="label_15">
      <property name="text">
-      <string>These grids are available for selection from the &quot;View&quot; menu</string>
+      <string>These grids are available for selection from the &quot;View&quot; menu and will override the general ones. You can declare one grid as a strong default to enforce an editing grid from this list. To do so, add an exclamation mark to the grid - e.g. &quot;0.01!,0.02,0.05&quot;.</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
      </property>
     </widget>
    </item>

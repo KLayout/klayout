@@ -136,7 +136,7 @@ gsi::Class<db::TechnologyComponent> technology_component_decl ("db", "Technology
 DB_PUBLIC gsi::Class<db::TechnologyComponent> &decl_dbTechnologyComponent () { return technology_component_decl; }
 
 static void
-set_default_grid_list (db::Technology *tech, const std::vector<double> &grids)
+set_default_grid_list2 (db::Technology *tech, const std::vector<double> &grids, double default_grid)
 {
   std::string r;
   for (auto g = grids.begin (); g != grids.end (); ++g) {
@@ -144,8 +144,17 @@ set_default_grid_list (db::Technology *tech, const std::vector<double> &grids)
       r += ",";
     }
     r += tl::micron_to_string (*g);
+    if (db::coord_traits<db::DCoord>::equals (*g, default_grid)) {
+      r += "!";
+    }
   }
   tech->set_default_grids (r);
+}
+
+static void
+set_default_grid_list (db::Technology *tech, const std::vector<double> &grids)
+{
+  set_default_grid_list2 (tech, grids, 0.0);
 }
 
 gsi::Class<db::Technology> technology_decl ("db", "Technology",
@@ -238,11 +247,31 @@ gsi::Class<db::Technology> technology_decl ("db", "Technology",
     "\n"
     "This property has been introduced in version 0.28.17."
   ) +
+  gsi::method ("default_grid", &db::Technology::default_grid,
+    "@brief Gets the default grid\n"
+    "\n"
+    "The default grid is a specific one from the default grid list.\n"
+    "It indicates the one that is taken if the current grid is not matching one of "
+    "the default grids.\n"
+    "\n"
+    "To set the default grid, use \\set_default_grids.\n"
+    "\n"
+    "This property has been introduced in version 0.29."
+  ) +
   gsi::method_ext ("default_grids=", &set_default_grid_list, gsi::arg ("grids"),
     "@brief Sets the default grids\n"
     "If not empty, this list replaces the global grid list for this technology.\n"
+    "Note that this method will reset the default grid (see \\default_grid). Use "
+    "\\set_default_grids to set the default grids and the strong default one.\n"
     "\n"
     "This property has been introduced in version 0.28.17."
+  ) +
+  gsi::method_ext ("set_default_grids", &set_default_grid_list2, gsi::arg ("grids"), gsi::arg ("default_grid", 0.0),
+    "@brief Sets the default grids and the strong default one\n"
+    "See \\default_grids and \\default_grid for a description of this property.\n"
+    "Note that the default grid has to be a member of the 'grids' array to become active.\n"
+    "\n"
+    "This method has been introduced in version 0.29."
   ) +
   gsi::method ("layer_properties_file", &db::Technology::layer_properties_file,
     "@brief Gets the path of the layer properties file\n"

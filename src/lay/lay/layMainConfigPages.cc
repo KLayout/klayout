@@ -525,7 +525,7 @@ CustomizeMenuConfigPage::commit (lay::Dispatcher *dispatcher)
     std::map<std::string, std::string>::iterator cb = m_current_bindings.find (kb->first);
     if (cb != m_current_bindings.end ()) {
       lay::Action *a = dispatcher->menu ()->action (kb->first);
-      if (cb->second != a->get_default_shortcut ()) {
+      if (a && cb->second != a->get_default_shortcut ()) {
         if (cb->second.empty ()) {
           kb->second = lay::Action::no_shortcut ();
         } else {

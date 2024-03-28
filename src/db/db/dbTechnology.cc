@@ -347,12 +347,10 @@ Technology::get_display_string () const
   return d;
 }
 
-std::vector<double>
-Technology::default_grid_list () const
+static void
+parse_default_grids (const std::string &s, std::vector<double> &grids, double &default_grid)
 {
-  tl::Extractor ex (m_default_grids.c_str ());
-
-  std::vector<double> grids;
+  tl::Extractor ex (s.c_str ());
 
   //  convert the list of grids to a list of doubles
   while (! ex.at_end ()) {
@@ -361,11 +359,31 @@ Technology::default_grid_list () const
       break;
     }
     grids.push_back (g);
+    if (ex.test ("!")) {
+      default_grid = g;
+    }
     ex.test (",");
   }
+}
 
+std::vector<double>
+Technology::default_grid_list () const
+{
+  std::vector<double> grids;
+  double default_grid = 0.0;
+  parse_default_grids (m_default_grids, grids, default_grid);
   return grids;
 }
+
+double
+Technology::default_grid () const
+{
+  std::vector<double> grids;
+  double default_grid = 0.0;
+  parse_default_grids (m_default_grids, grids, default_grid);
+  return default_grid;
+}
+
 
 tl::XMLElementList 
 Technology::xml_elements () 

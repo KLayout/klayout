@@ -105,10 +105,29 @@ END
 
     tech.default_grids = []
     assert_equal(tech.default_grids.collect { |g| "%.12g" % g }.join(","), "")
+    assert_equal("%.12g" % tech.default_grid, "0")
     tech.default_grids = [0.001, 0.01, 0.2]
     assert_equal(tech.default_grids.collect { |g| "%.12g" % g }.join(","), "0.001,0.01,0.2")
     tech.default_grids = [1]
     assert_equal(tech.default_grids.collect { |g| "%.12g" % g }.join(","), "1")
+    assert_equal("%.12g" % tech.default_grid, "0")
+
+    # setting the default grid
+    tech.set_default_grids([0.01,0.02,0.05], 0.02)
+    assert_equal(tech.default_grids.collect { |g| "%.12g" % g }.join(","), "0.01,0.02,0.05")
+    assert_equal("%.12g" % tech.default_grid, "0.02")
+
+    # default grid must be a member of the default grid list
+    tech.set_default_grids([0.01,0.02,0.05], 0.2)
+    assert_equal(tech.default_grids.collect { |g| "%.12g" % g }.join(","), "0.01,0.02,0.05")
+    assert_equal("%.12g" % tech.default_grid, "0")
+
+    # "default_grids=" resets the default grid
+    tech.set_default_grids([0.01,0.02,0.05], 0.02)
+    assert_equal("%.12g" % tech.default_grid, "0.02")
+    tech.default_grids = [1]
+    assert_equal(tech.default_grids.collect { |g| "%.12g" % g }.join(","), "1")
+    assert_equal("%.12g" % tech.default_grid, "0")
 
     tech.default_base_path = "/default/path"
     assert_equal(tech.default_base_path, "/default/path")

@@ -481,6 +481,15 @@ public:
   std::vector<double> default_grid_list () const;
 
   /**
+   *  @brief Gets the default grid (strong grid), parsed from the list
+   *
+   *  The default grid is the one marked with an exclamation mark in the
+   *  grid list (e.g. "0.01!,0.02,0.05"). If there is not such default
+   *  grid, this method returns zero.
+   */
+  double default_grid () const;
+
+  /**
    *  @brief Sets the default default grids
    */
   void set_default_grids (const std::string &default_grids)

@@ -25,6 +25,6 @@
 namespace tl
 {
 
-extern const nullopt_t nullopt = nullopt_t ();
+const nullopt_t nullopt = nullopt_t ();
 
 } // namespace tl

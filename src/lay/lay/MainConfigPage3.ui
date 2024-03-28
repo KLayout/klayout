@@ -1,67 +1,75 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>MainConfigPage3</class>
- <widget class="QFrame" name="MainConfigPage3" >
-  <property name="geometry" >
+ <widget class="QFrame" name="MainConfigPage3">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>475</width>
-    <height>81</height>
+    <width>504</width>
+    <height>180</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Settings</string>
   </property>
-  <layout class="QVBoxLayout" >
-   <property name="margin" >
-    <number>9</number>
-   </property>
-   <property name="spacing" >
+  <layout class="QVBoxLayout">
+   <property name="spacing">
     <number>6</number>
    </property>
+   <property name="margin" stdset="0">
+    <number>9</number>
+   </property>
    <item>
-    <widget class="QGroupBox" name="groupBox" >
-     <property name="title" >
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
       <string>Default Grids</string>
      </property>
-     <layout class="QGridLayout" >
-      <property name="margin" >
+     <layout class="QGridLayout">
+      <property name="margin" stdset="0">
        <number>9</number>
       </property>
-      <property name="spacing" >
+      <property name="spacing">
        <number>6</number>
       </property>
-      <item row="0" column="2" >
-       <widget class="QLabel" name="textLabel1_4" >
-        <property name="text" >
+      <item row="0" column="0">
+       <widget class="QLabel" name="textLabel1">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Grids for &quot;View&quot; menu</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLabel" name="textLabel1_4">
+        <property name="text">
          <string>µm (g1,g2,...)</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" >
-       <widget class="QLineEdit" name="grids_edit" >
-        <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>7</hsizetype>
-          <vsizetype>0</vsizetype>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="grids_edit">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
        </widget>
       </item>
-      <item row="0" column="0" >
-       <widget class="QLabel" name="textLabel1" >
-        <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>5</hsizetype>
-          <vsizetype>5</vsizetype>
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
+      <item row="1" column="0" colspan="3">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>&lt;html&gt;You can declare one grid a strong default to enforce an editing grid from this list. To do so, add an exclamation mark - e.g. &quot;0.01!,0.02,0.05&quot;.
+&lt;br/&gt;&lt;b&gt;Note&lt;/b&gt;: the general default grids can be overridden by technology specific default grids.&lt;/html&gt;</string>
         </property>
-        <property name="text" >
-         <string>Grids for "View" menu</string>
+        <property name="wordWrap">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -70,7 +78,7 @@
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="6" margin="11" />
+ <layoutdefault spacing="6" margin="11"/>
  <resources/>
  <connections/>
 </ui>

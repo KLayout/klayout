@@ -867,6 +867,7 @@ private:
   mutable std::vector<const cell_type *> m_cells;
   mutable std::vector<box_tree_type> m_local_complex_region_stack;
   mutable std::vector<box_type> m_local_region_stack;
+  mutable std::vector<bool> m_skip_shapes_stack;
   mutable bool m_needs_reinit;
   mutable size_t m_inst_quad_id;
   mutable std::vector<size_t> m_inst_quad_id_stack;

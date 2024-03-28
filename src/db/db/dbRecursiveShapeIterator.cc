@@ -82,6 +82,7 @@ RecursiveShapeIterator &RecursiveShapeIterator::operator= (const RecursiveShapeI
     m_cells = d.m_cells;
     m_local_complex_region_stack = d.m_local_complex_region_stack;
     m_local_region_stack = d.m_local_region_stack;
+    m_skip_shapes_stack = d.m_skip_shapes_stack;
     m_needs_reinit = d.m_needs_reinit;
     m_inst_quad_id = d.m_inst_quad_id;
     m_inst_quad_id_stack = d.m_inst_quad_id_stack;
@@ -462,6 +463,8 @@ RecursiveShapeIterator::validate (RecursiveShapeReceiver *receiver) const
 
   m_local_region_stack.clear ();
   m_local_region_stack.push_back (m_global_trans.inverted () * m_region);
+  m_skip_shapes_stack.clear ();
+  m_skip_shapes_stack.push_back (false);
 
   m_local_complex_region_stack.clear ();
   if (mp_complex_region.get ()) {
@@ -736,9 +739,23 @@ RecursiveShapeIterator::next_shape (RecursiveShapeReceiver *receiver) const
 
         }
 
-        if (is_empty || !down (receiver)) {
+        if (is_empty) {
+
+          //  skip entire cell
           ++m_inst;
           new_inst (receiver);
+
+        } else if (!down (receiver)) {
+
+          //  skip this instance array member
+          ++m_inst_array;
+          new_inst_member (receiver);
+
+          if (m_inst_array.at_end ()) {
+            ++m_inst;
+            new_inst (receiver);
+          }
+
         }
 
       } else {
@@ -769,6 +786,39 @@ RecursiveShapeIterator::next_shape (RecursiveShapeReceiver *receiver) const
 bool
 RecursiveShapeIterator::down (RecursiveShapeReceiver *receiver) const
 {
+  bool skip_shapes = false;
+
+  if (m_for_merged_input && ! m_skip_shapes_stack.back () && (! m_has_layers || m_layers.size () == 1)) {
+
+    //  Try some optimization: if the instance we're looking at is entirely covered
+    //  by a rectangle (other objects are too expensive to check), then we skip it
+    //
+    //  We check 10 shapes max.
+
+    box_type inst_bx;
+    if (m_inst->size () == 1) {
+      inst_bx = m_inst->bbox (m_box_convert);
+    } else {
+      inst_bx = m_inst->complex_trans (*m_inst_array) * m_box_convert (m_inst->cell_inst ().object ());
+    }
+
+    unsigned int l = m_has_layers ? m_layers.front () : m_layer;
+    auto si = cell ()->shapes (l).begin_overlapping (inst_bx, m_shape_flags, mp_shape_prop_sel, m_shape_inv_prop_sel);
+    size_t nmax = 10;
+    while (! si.at_end () && nmax-- > 0) {
+      if (inst_bx.inside (si->rectangle ())) {
+        skip_shapes = true;
+        break;
+      }
+      ++si;
+    }
+
+  }
+
+  if (skip_shapes && (! receiver || ! receiver->wants_all_cells ())) {
+    return false;
+  }
+
   tl_assert (mp_layout);
 
   m_trans_stack.push_back (m_trans);
@@ -796,6 +846,7 @@ RecursiveShapeIterator::down (RecursiveShapeReceiver *receiver) const
   }
 
   m_local_region_stack.push_back (new_region);
+  m_skip_shapes_stack.push_back (m_skip_shapes_stack.back () || skip_shapes);
 
   if (! m_local_complex_region_stack.empty ()) {
 
@@ -878,6 +929,7 @@ RecursiveShapeIterator::pop () const
   mp_cell = m_cells.back ();
   m_cells.pop_back ();
   m_local_region_stack.pop_back ();
+  m_skip_shapes_stack.pop_back ();
   if (! m_local_complex_region_stack.empty ()) {
     m_local_complex_region_stack.pop_back ();
   }
@@ -902,7 +954,7 @@ RecursiveShapeIterator::start_shapes () const
 void
 RecursiveShapeIterator::new_layer () const
 {
-  if (int (m_trans_stack.size ()) < m_min_depth || int (m_trans_stack.size ()) > m_max_depth) {
+  if (m_skip_shapes_stack.back () || int (m_trans_stack.size ()) < m_min_depth || int (m_trans_stack.size ()) > m_max_depth) {
     m_shape = shape_iterator ();
   } else if (! m_overlapping) {
     m_shape = cell ()->shapes (m_layer).begin_touching (m_local_region_stack.back (), m_shape_flags, mp_shape_prop_sel, m_shape_inv_prop_sel);
@@ -942,7 +994,7 @@ RecursiveShapeIterator::new_cell (RecursiveShapeReceiver *receiver) const
   m_inst_quad_id = 0;
 
   //  skip instance quad if possible
-  if (! m_local_complex_region_stack.empty ()) {
+  if (! m_local_complex_region_stack.empty () && (! receiver || ! receiver->wants_all_cells ())) {
     skip_inst_iter_for_complex_region ();
   }
 
@@ -958,38 +1010,11 @@ RecursiveShapeIterator::new_inst (RecursiveShapeReceiver *receiver) const
   while (! m_inst.at_end ()) {
 
     //  skip instance quad if possible
-    if (! m_local_complex_region_stack.empty ()) {
+    if (! m_local_complex_region_stack.empty () && (! receiver || ! receiver->wants_all_cells ())) {
       skip_inst_iter_for_complex_region ();
       if (m_inst.at_end ()) {
         break;
       }
-    }
-
-    if (m_for_merged_input && (! m_has_layers || m_layers.size () == 1)) {
-
-      //  Try some optimization: if the instance we're looking at is entirely covered
-      //  by a rectangle (other objects are too expensive to check), then wil skip it
-      //
-      //  We check 10 shapes max.
-
-      unsigned int l = m_has_layers ? m_layers.front () : m_layer;
-      box_type inst_bx = m_inst->bbox (m_box_convert);
-      auto si = cell ()->shapes (l).begin_overlapping (inst_bx, m_shape_flags, mp_shape_prop_sel, m_shape_inv_prop_sel);
-      bool skip = false;
-      size_t nmax = 10;
-      while (! skip && ! si.at_end () && nmax-- > 0) {
-        if (inst_bx.inside (si->rectangle ())) {
-          skip = true;
-          break;
-        }
-        ++si;
-      }
-
-      if (skip) {
-        ++m_inst;
-        continue;
-      }
-
     }
 
     bool all_of_instance = false;

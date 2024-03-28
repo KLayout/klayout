@@ -136,6 +136,11 @@ public:
   {
     return 0;
   }
+
+  /**
+   *  @brief Returns a string for the file dialogs that describes all formats
+   */
+  static std::string all_formats_string ();
 };
 
 /**

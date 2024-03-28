@@ -36,8 +36,15 @@ namespace Ui
   class MarkerBrowserDialog;
 }
 
+namespace db
+{
+  class Layout;
+}
+
 namespace rdb
 {
+
+class Database;
 
 class LAYUI_PUBLIC MarkerBrowserDialog
   : public lay::Browser
@@ -101,6 +108,7 @@ private:
   void update_content ();
   void scan_layer ();
   void scan_layer_flat ();
+  void scan_layer_flat_or_hierarchical (bool flat);
 };
 
 }

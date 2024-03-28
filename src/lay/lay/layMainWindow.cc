@@ -498,34 +498,9 @@ MainWindow::~MainWindow ()
 std::string
 MainWindow::all_layout_file_formats () const
 {
-  std::string fmts = tl::to_string (QObject::tr ("All layout files ("));
-  for (tl::Registrar<db::StreamFormatDeclaration>::iterator rdr = tl::Registrar<db::StreamFormatDeclaration>::begin (); rdr != tl::Registrar<db::StreamFormatDeclaration>::end (); ++rdr) {
-    if (rdr != tl::Registrar<db::StreamFormatDeclaration>::begin ()) {
-      fmts += " ";
-    }
-    std::string f = rdr->file_format ();
-    if (!f.empty ()) {
-      const char *fp = f.c_str ();
-      while (*fp && *fp != '(') {
-        ++fp;
-      }
-      if (*fp) {
-        ++fp;
-      }
-      while (*fp && *fp != ')') {
-        fmts += *fp++;
-      }
-    }
-  }
-  fmts += ");;";
-  for (tl::Registrar<db::StreamFormatDeclaration>::iterator rdr = tl::Registrar<db::StreamFormatDeclaration>::begin (); rdr != tl::Registrar<db::StreamFormatDeclaration>::end (); ++rdr) {
-    if (!rdr->file_format ().empty ()) {
-      fmts += rdr->file_format ();
-      fmts += ";;";
-    }
-  }
-  fmts += tl::to_string (QObject::tr ("All files (*)"));
-
+  std::string fmts = db::StreamFormatDeclaration::all_formats_string ();
+  fmts += ";;";
+  fmts += tl::to_string (tr ("All files (*)"));
   return fmts;
 }
 

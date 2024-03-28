@@ -31,6 +31,42 @@ namespace db
 {
 
 // ------------------------------------------------------------------
+//  Implementation of StreamFormatDeclaration
+
+std::string StreamFormatDeclaration::all_formats_string ()
+{
+  std::string fmts = tl::to_string (tr ("All layout files ("));
+
+  for (tl::Registrar<db::StreamFormatDeclaration>::iterator rdr = tl::Registrar<db::StreamFormatDeclaration>::begin (); rdr != tl::Registrar<db::StreamFormatDeclaration>::end (); ++rdr) {
+    if (rdr != tl::Registrar<db::StreamFormatDeclaration>::begin ()) {
+      fmts += " ";
+    }
+    std::string f = rdr->file_format ();
+    if (!f.empty ()) {
+      const char *fp = f.c_str ();
+      while (*fp && *fp != '(') {
+        ++fp;
+      }
+      if (*fp) {
+        ++fp;
+      }
+      while (*fp && *fp != ')') {
+        fmts += *fp++;
+      }
+    }
+  }
+  fmts += ")";
+  for (tl::Registrar<db::StreamFormatDeclaration>::iterator rdr = tl::Registrar<db::StreamFormatDeclaration>::begin (); rdr != tl::Registrar<db::StreamFormatDeclaration>::end (); ++rdr) {
+    if (!rdr->file_format ().empty ()) {
+      fmts += ";;";
+      fmts += rdr->file_format ();
+    }
+  }
+
+  return fmts;
+}
+
+// ------------------------------------------------------------------
 //  Implementation of load_options_xml_element_list
 
 

@@ -15,6 +15,17 @@
 * Enhancement: Trigger ruler measurement on mouse hovering transiently
 * Enhancement: min and max value bounds for PCell parameters in editor
 * Bugfix: pixel garbage in color selector button with "Auto" color enabled
+* Bugfix: DRC/LVS - connect_explicit did not accept an array of nets as single argument
+* Bugfix: 'edge outside polygon' now consistently ignores the border of the polygon
+* Bugfix: Warning level was ignored for some warnings in LEF/DEF reader
+* Bugfix: Netlist reader: anonymous circuits are not checked for known parameters
+* Enhancement: LVS - Supporting remote must-connect connections
+  So far, must-connect connections had to be made one level up in the hierarchy 
+  or promoted further using labels and such. Now, must-connect connections
+  can be made at any point up in the hierarchy.
+* Bugfix: LVS - do not waste too much time analyzing failed matches
+* Enhancement: LVS - LVS: Consider net names identical that differ 
+  in signal type suffix only - e.g. 'NET:I' is identical to 'NET'
 * Enhancement: OASIS reader will produce layers that are listed in layer table
   but empty. Previously, empty layers were never created, even if listed in 
   the layer table.
@@ -43,6 +54,7 @@
   - Keyword arguments for Python, Ruby and Expressions
   - You can now also use "klayout" package inside the application (same code
     for Python module and application) - i.e. "import klayout.db"
+  - Synonyms: connect/disconnect for events to get closer to PyQt5
 
 0.28.17          (2024-02-16):
 * Enhancement: %GITHUB%/issues/1626 Technology specific grids

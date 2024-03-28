@@ -696,6 +696,11 @@ public:
   void reserve (size_t n);
 
   /**
+   *  @brief Reports the number of edges stored in the processor
+   */
+  size_t count () const;
+
+  /**
    *  @brief Insert an edge 
    */
   void insert (const db::Edge &e, property_type p = 0);

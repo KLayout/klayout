@@ -322,6 +322,38 @@ END
 
   end
 
+  def test_3
+
+    l = RBA::Layout.new
+    l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
+    l.insert_layer_at(1, RBA::LayerInfo.new(2, 0))
+    c0 = l.cell(l.add_cell("c0"))
+    c1 = l.cell(l.add_cell("c1"))
+    c2 = l.cell(l.add_cell("c2"))
+    c3 = l.cell(l.add_cell("c3"))
+
+    b = RBA::Box.new(0, 100, 1000, 1200)
+    c0.shapes(0).insert(RBA::Box.new(0, 0, 3000, 2000))
+    c1.shapes(0).insert(b)
+    c2.shapes(0).insert(b)
+    c3.shapes(0).insert(b)
+
+    tt = RBA::Trans.new
+    c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
+    c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Vector.new(100, -100))))
+    c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
+    c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Vector.new(1100, 0))))
+
+    ii = RBA::RecursiveShapeIterator.new(l, c0, 0)
+    assert_equal(ii.for_merged_input, false)
+    assert_equal(collect(ii, l), "[c0](0,0;3000,2000)/[c1](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)")
+
+    ii.for_merged_input = true
+    assert_equal(ii.for_merged_input, true)
+    assert_equal(collect(ii, l), "[c0](0,0;3000,2000)/[c3](-1200,0;-100,1000)")
+
+  end
+
 end
 
 load("test_epilogue.rb")

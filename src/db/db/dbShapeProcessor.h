@@ -197,6 +197,11 @@ public:
   void reserve (size_t n);
 
   /**
+   *  @brief Reports the number of edges stored in the processor
+   */
+  size_t count () const;
+
+  /**
    *  @brief Sets the base verbosity of the processor (see EdgeProcessor::set_base_verbosity for details)
    */
   void set_base_verbosity (int bv)

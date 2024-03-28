@@ -476,12 +476,28 @@ Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("db", "RecursiveS
     "\n"
     "This method has been introduced in version 0.23.\n"
   ) +
-  gsi::method ("overlapping=", &db::RecursiveShapeIterator::set_overlapping, gsi::arg ("region"),
+  gsi::method ("overlapping=", &db::RecursiveShapeIterator::set_overlapping, gsi::arg ("flag"),
     "@brief Sets a flag indicating whether overlapping shapes are selected when a region is used\n"
     "\n"
     "If this flag is false, shapes touching the search region are returned.\n"
     "\n"
     "This method has been introduced in version 0.23.\n"
+  ) +
+  gsi::method ("for_merged_input?", &db::RecursiveShapeIterator::for_merged_input,
+    "@brief Gets a flag indicating whether iterator optimizes for merged input\n"
+    "\n"
+    "see \\for_merged_input= for details of this attribute.\n"
+    "\n"
+    "This method has been introduced in version 0.29.\n"
+  ) +
+  gsi::method ("for_merged_input=", &db::RecursiveShapeIterator::set_for_merged_input, gsi::arg ("flag"),
+    "@brief Sets a flag indicating whether iterator optimizes for merged input\n"
+    "\n"
+    "If this flag is set to true, the iterator is allowed to skip shapes it deems irrelevant "
+    "because they are covered entirely by other shapes. This allows shortcutting hierarchy traversal in "
+    "some cases.\n"
+    "\n"
+    "This method has been introduced in version 0.29.\n"
   ) +
   gsi::method ("unselect_all_cells", &db::RecursiveShapeIterator::unselect_all_cells,
     "@brief Unselects all cells.\n"

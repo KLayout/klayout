@@ -251,6 +251,13 @@ struct CutPoints
 
     } 
 
+    //  do not insert points twice
+    for (auto c = cut_points.begin (); c != cut_points.end (); ++c) {
+      if (*c == p) {
+        return;
+      }
+    }
+
     cut_points.push_back (p);
 
   }
@@ -1055,6 +1062,12 @@ void
 EdgeProcessor::reserve (size_t n)
 {
   mp_work_edges->reserve (n);
+}
+
+size_t
+EdgeProcessor::count () const
+{
+  return mp_work_edges->size ();
 }
 
 void 

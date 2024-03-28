@@ -324,6 +324,21 @@ struct box_defs
       "\n"
       "@return The joined box\n"
     ) +
+    method ("-", &C::subtracted, gsi::arg ("box"),
+      "@brief Subtraction of boxes\n"
+      "\n"
+      "\n"
+      "The - operator subtracts the argument box from self.\n"
+      "This will return the bounding box of the are covered by self, but not by argument box. "
+      "Subtracting a box from itself will render an empty box. Subtracting another box from "
+      "self will modify the first box only if the argument box covers one side entirely.\n"
+      "\n"
+      "@param box The box to subtract from this box.\n"
+      "\n"
+      "@return The result box\n"
+      "\n"
+      "This feature has been introduced in version 0.29."
+    ) +
     method ("&", &C::intersection, gsi::arg ("box"),
       "@brief Returns the intersection of this box with another box\n"
       "\n"

@@ -53,6 +53,12 @@ ShapeProcessor::reserve (size_t n)
   m_processor.reserve (n);
 }
 
+size_t
+ShapeProcessor::count () const
+{
+  return m_processor.count ();
+}
+
 void 
 ShapeProcessor::process (db::EdgeSink &es, EdgeEvaluatorBase &op)
 {

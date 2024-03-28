@@ -34,7 +34,7 @@ namespace tl
 
 struct nullopt_t {};
 
-extern const nullopt_t nullopt;
+extern TL_PUBLIC const nullopt_t nullopt;
 
 /**
  *  @brief Poor man's partial implementation of C++17's std::optional

@@ -219,6 +219,8 @@ AsIfFlatRegion::area (const db::Box &box) const
   for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
     if (box.empty () || p->box ().inside (box)) {
       a += p->area ();
+    } else if (p->is_box ()) {
+      a += (p->box () & box).area ();
     } else {
       std::vector<db::Polygon> clipped;
       clip_poly (*p, box, clipped);

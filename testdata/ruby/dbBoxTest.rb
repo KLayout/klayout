@@ -146,6 +146,9 @@ class DBBox_TestClass < TestBase
     assert_equal( a + b, b )
     assert_equal( (b + c).to_s, "(1,-10;22,22)" )
 
+    assert_equal( b - a, b )
+    assert_equal( (b - c).to_s, "(1,-1;17,22)" )
+
     assert_equal( a + RBA::DPoint::new( 1, -5 ), RBA::DBox::new( 1, -5, 1, -5 ) )
     assert_equal( (b + RBA::DPoint::new( 1, -5 )).to_s, "(1,-5;17,22)" )
 

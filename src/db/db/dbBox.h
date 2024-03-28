@@ -255,6 +255,27 @@ struct DB_PUBLIC_TEMPLATE box
   box<C, R> &operator+= (const point<C> &p);
 
   /**
+   *  @brief Subtraction of boxes.
+   *
+   *  The -= operator subtracts the argument box from *this.
+   *  Subtraction leaves the bounding box of the region resulting
+   *  from the geometrical NOT of *this and the argument box.
+   *  Subtracting a box from itself gives an empty box.
+   *  Subtracting a box that does not cover a full side of
+   *  *this will not modify the box.
+   *
+   *  @param b The box to subtract from *this.
+   *
+   *  @return The result box.
+   */
+  box<C, R> &operator-= (const box<C, R> &b);
+
+  /**
+   *  @brief A method version for operator- (mainly for automation purposes)
+   */
+  box<C, R> subtracted (const box<C, R> &b) const;
+
+  /**
    *  @brief Intersection of boxes.
    *
    *  The intersection of two boxes is the largest
@@ -781,6 +802,50 @@ box<C, R>::operator+= (const point<C> &p)
     m_p1 = p1;
     m_p2 = p2;
   }
+  return *this;
+}
+
+template <class C, class R>
+inline box<C, R>
+box<C, R>::subtracted (const box<C, R> &b) const
+{
+  box<C, R> r (*this);
+  r -= b;
+  return r;
+}
+
+template <class C, class R>
+inline box<C, R> &
+box<C, R>::operator-= (const box<C, R> &bx)
+{
+  if (bx.empty () || empty ()) {
+    return *this;
+  }
+
+  coord_type l = m_p1.x (), r = m_p2.x ();
+  coord_type b = m_p1.y (), t = m_p2.y ();
+
+  if (bx.bottom () <= bottom () && bx.top () >= top ()) {
+    if (bx.left () <= left ()) {
+      l = std::max (bx.right (), left ());
+    }
+    if (bx.right () >= right ()) {
+      r = std::min (bx.left (), right ());
+    }
+  }
+
+  if (bx.left () <= left () && bx.right () >= right ()) {
+    if (bx.bottom () <= bottom ()) {
+      b = std::max (bx.top (), bottom ());
+    }
+    if (bx.top () >= top ()) {
+      t = std::min (bx.bottom (), top ());
+    }
+  }
+
+  m_p1 = point_type (l, b);
+  m_p2 = point_type (r, t);
+
   return *this;
 }
 
@@ -1360,6 +1425,23 @@ operator+ (const box<C> &b1, const box<C> &b2)
 {
   box<C> bb (b1);
   bb += b2;
+  return bb;
+}
+
+/**
+ *  @brief Box subtraction mapped on the - operator
+ *
+ *  @param b1 The first box
+ *  @param b2 The second box to subtract from the first
+ *
+ *  @return The bounding box of the region formed but subtracting b2 from b1
+ */
+template <class C>
+inline box<C>
+operator- (const box<C> &b1, const box<C> &b2)
+{
+  box<C> bb (b1);
+  bb -= b2;
   return bb;
 }
 

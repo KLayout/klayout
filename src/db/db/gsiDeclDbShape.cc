@@ -669,6 +669,26 @@ static tl::Variant get_dbox (const db::Shape *s)
   }
 }
 
+static tl::Variant get_rectangle (const db::Shape *s)
+{
+  db::Shape::box_type b = s->rectangle ();
+  if (! b.empty ()) {
+    return tl::Variant (b);
+  } else {
+    return tl::Variant ();
+  }
+}
+
+static tl::Variant get_drectangle (const db::Shape *s)
+{
+  db::Shape::box_type b = s->rectangle ();
+  if (! b.empty ()) {
+    return tl::Variant (db::CplxTrans (shape_dbu (s)) * b);
+  } else {
+    return tl::Variant ();
+  }
+}
+
 static tl::Variant get_edge (const db::Shape *s)
 {
   db::Shape::edge_type p;
@@ -1981,6 +2001,22 @@ Class<db::Shape> decl_Shape ("db", "Shape",
     "micrometer units.\n"
     "\n"
     "This method has been added in version 0.25.\n"
+  ) +
+  gsi::method_ext ("rectangle", &get_rectangle,
+    "@brief Gets the rectangle if the object represents one or nil if not\n"
+    "\n"
+    "If the shape represents a rectangle - i.e. a box or box polygon, a path with two points and no round ends - "
+    "this method returns the box. If not, nil is returned.\n"
+    "\n"
+    "This method has been introduced in version 0.29."
+  ) +
+  gsi::method_ext ("drectangle", &get_drectangle,
+    "@brief Gets the rectangle in micron units if the object represents one or nil if not\n"
+    "\n"
+    "If the shape represents a rectangle - i.e. a box or box polygon, a path with two points and no round ends - "
+    "this method returns the box. If not, nil is returned.\n"
+    "\n"
+    "This method has been introduced in version 0.29."
   ) +
   gsi::method ("is_user_object?", &db::Shape::is_user_object,
     "@brief Returns true if the shape is a user defined object\n"

@@ -270,15 +270,6 @@ static db::Region *new_path (const db::Path &o)
   return new db::Region (o);
 }
 
-static db::Region *new_shapes (const db::Shapes &s)
-{
-  db::Region *r = new db::Region ();
-  for (db::Shapes::shape_iterator i = s.begin (db::ShapeIterator::All); !i.at_end (); ++i) {
-    r->insert (*i);
-  }
-  return r;
-}
-
 static db::Region *new_texts_as_boxes1 (const db::RecursiveShapeIterator &si, const std::string &pat, bool pattern, db::Coord enl)
 {
   return new db::Region (db::Region (si).texts_as_boxes (pat, pattern, enl));
@@ -329,14 +320,24 @@ static db::Region *new_si (const db::RecursiveShapeIterator &si)
   return new db::Region (si);
 }
 
-static db::Region *new_sid (const db::RecursiveShapeIterator &si, db::DeepShapeStore &dss, double area_ratio, size_t max_vertex_count)
-{
-  return new db::Region (si, dss, area_ratio, max_vertex_count);
-}
-
 static db::Region *new_si2 (const db::RecursiveShapeIterator &si, const db::ICplxTrans &trans)
 {
   return new db::Region (si, trans);
+}
+
+static db::Region *new_sis (const db::Shapes &si)
+{
+  return new db::Region (si);
+}
+
+static db::Region *new_sis2 (const db::Shapes &si, const db::ICplxTrans &trans)
+{
+  return new db::Region (si, trans);
+}
+
+static db::Region *new_sid (const db::RecursiveShapeIterator &si, db::DeepShapeStore &dss, double area_ratio, size_t max_vertex_count)
+{
+  return new db::Region (si, dss, area_ratio, max_vertex_count);
 }
 
 static db::Region *new_sid2 (const db::RecursiveShapeIterator &si, db::DeepShapeStore &dss, const db::ICplxTrans &trans, double area_ratio, size_t max_vertex_count)
@@ -1088,13 +1089,6 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This constructor creates a region from a path.\n"
   ) +
-  constructor ("new", &new_shapes, gsi::arg ("shapes"),
-    "@brief Shapes constructor\n"
-    "\n"
-    "This constructor creates a region from a \\Shapes collection.\n"
-    "\n"
-    "This constructor has been introduced in version 0.25."
-  ) +
   constructor ("new", &new_si, gsi::arg ("shape_iterator"),
     "@brief Constructor from a hierarchical shape set\n"
     "\n"
@@ -1125,6 +1119,24 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "dbu    = 0.1 # the target database unit\n"
     "r = RBA::Region::new(layout.begin_shapes(cell, layer), RBA::ICplxTrans::new(layout.dbu / dbu))\n"
     "@/code\n"
+  ) +
+  constructor ("new", &new_sis, gsi::arg ("shapes"),
+    "@brief Constructor from a shapes container\n"
+    "\n"
+    "This constructor creates a region from the shapes container.\n"
+    "Text objects and edges are not inserted, because they cannot be converted to polygons.\n"
+    "This method allows feeding the shapes from a hierarchy of cells into the region.\n"
+    "\n"
+    "This constructor has been introduced in version 0.25 and extended in version 0.29."
+  ) +
+  constructor ("new", &new_sis2, gsi::arg ("shapes"), gsi::arg ("trans"),
+    "@brief Constructor from a shapes container with a transformation\n"
+    "\n"
+    "This constructor creates a region from the shapes container after applying the transformation.\n"
+    "Text objects and edges are not inserted, because they cannot be converted to polygons.\n"
+    "This method allows feeding the shapes from a hierarchy of cells into the region.\n"
+    "\n"
+    "This constructor variant has been introduced in version 0.29."
   ) +
   constructor ("new", &new_sid, gsi::arg ("shape_iterator"), gsi::arg ("deep_shape_store"), gsi::arg ("area_ratio", 0.0), gsi::arg ("max_vertex_count", size_t (0)),
     "@brief Constructor for a deep region from a hierarchical shape set\n"
@@ -1208,6 +1220,12 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "and existing hierarchy will be reused.\n"
     "\n"
     "This method has been introduced in version 0.26."
+  ) +
+  method ("write", &db::Region::write, gsi::arg ("filename"),
+    "@brief Writes the region to a file\n"
+    "This method is provided for debugging purposes. It writes the object to a flat layer 0/0 in a single top cell.\n"
+    "\n"
+    "This method has been introduced in version 0.29."
   ) +
   factory_ext ("texts", &texts_as_boxes1, gsi::arg ("expr", std::string ("*")), gsi::arg ("as_pattern", true), gsi::arg ("enl", 1),
     "@hide\n"

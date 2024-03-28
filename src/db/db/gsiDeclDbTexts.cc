@@ -436,6 +436,12 @@ Class<db::Texts> decl_Texts (decl_dbShapeCollection, "db", "Texts",
     "r = RBA::Texts::new(layout.begin_shapes(cell, layer), RBA::ICplxTrans::new(layout.dbu / dbu))\n"
     "@/code\n"
   ) +
+  method ("write", &db::Texts::write, gsi::arg ("filename"),
+    "@brief Writes the region to a file\n"
+    "This method is provided for debugging purposes. It writes the object to a flat layer 0/0 in a single top cell.\n"
+    "\n"
+    "This method has been introduced in version 0.29."
+  ) +
   method ("insert_into", &db::Texts::insert_into, gsi::arg ("layout"), gsi::arg ("cell_index"), gsi::arg ("layer"),
     "@brief Inserts this texts into the given layout, below the given cell and into the given layer.\n"
     "If the text collection is a hierarchical one, a suitable hierarchy will be built below the top cell or "

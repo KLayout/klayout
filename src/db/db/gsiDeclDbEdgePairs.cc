@@ -602,6 +602,12 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "\n"
     "This constructor has been introduced in version 0.26."
   ) +
+  method ("write", &db::EdgePairs::write, gsi::arg ("filename"),
+    "@brief Writes the region to a file\n"
+    "This method is provided for debugging purposes. It writes the object to a flat layer 0/0 in a single top cell.\n"
+    "\n"
+    "This method has been introduced in version 0.29."
+  ) +
   method ("insert_into", &db::EdgePairs::insert_into, gsi::arg ("layout"), gsi::arg ("cell_index"), gsi::arg ("layer"),
     "@brief Inserts this edge pairs into the given layout, below the given cell and into the given layer.\n"
     "If the edge pair collection is a hierarchical one, a suitable hierarchy will be built below the top cell or "

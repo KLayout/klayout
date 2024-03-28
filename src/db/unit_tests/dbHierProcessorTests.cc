@@ -23,6 +23,7 @@
 
 #include "tlUnitTest.h"
 #include "tlStream.h"
+#include "tlFileUtils.h"
 #include "dbHierProcessor.h"
 #include "dbTestSupport.h"
 #include "dbReader.h"
@@ -32,6 +33,9 @@
 #include "dbLocalOperationUtils.h"
 #include "dbRegionLocalOperations.h"
 #include "dbPolygon.h"
+#include "dbRecursiveInstanceIterator.h"
+#include "dbDeepShapeStore.h"
+#include "dbRegion.h"
 
 static std::string testdata (const std::string &fn)
 {
@@ -1284,3 +1288,87 @@ TEST(Arrays)
   run_test_bool2 (_this, "hlp18.oas", TMNot, 100);
 }
 
+TEST(XORTool)
+{
+  test_is_long_runner ();
+
+  std::string fna (tl::combine_path (tl::testdata_private (), "xor/a.gds.gz"));
+  std::string fnb (tl::combine_path (tl::testdata_private (), "xor/b.gds.gz"));
+  std::string fn_au (tl::combine_path (tl::testdata_private (), "xor/xor_au.oas.gz"));
+
+  db::Layout lya, lyb;
+
+  unsigned int l1, l2;
+
+  db::LayerMap lmap;
+
+  lmap.map (db::LDPair (1, 0), l1 = lya.insert_layer ());
+  lyb.insert_layer ();
+
+  lmap.map (db::LDPair (2, 0), l2 = lya.insert_layer ());
+  lyb.insert_layer ();
+
+  {
+    tl::InputStream stream (fna);
+    db::Reader reader (stream);
+    db::LoadLayoutOptions options;
+    options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
+    options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
+    reader.read (lya, options);
+  }
+
+  {
+    tl::InputStream stream (fnb);
+    db::Reader reader (stream);
+    db::LoadLayoutOptions options;
+    options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
+    options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
+    reader.read (lyb, options);
+  }
+
+  db::Layout ly_out;
+  db::cell_index_type top_out = ly_out.add_cell ("TOP");
+  unsigned int l1_out = ly_out.insert_layer (db::LayerProperties (1, 0));
+  unsigned int l2_out = ly_out.insert_layer (db::LayerProperties (2, 0));
+
+  db::DeepShapeStore dss;
+  dss.set_wants_all_cells (true);  //  saves time for less cell mapping operations
+
+  {
+    db::RecursiveShapeIterator ri_a, ri_b;
+
+    ri_a = db::RecursiveShapeIterator (lya, lya.cell (*lya.begin_top_down ()), l1);
+    ri_a.set_for_merged_input (true);
+
+    ri_b = db::RecursiveShapeIterator (lyb, lyb.cell (*lyb.begin_top_down ()), l1);
+    ri_b.set_for_merged_input (true);
+
+    db::Region in_a (ri_a, dss, db::ICplxTrans (1.0));
+    db::Region in_b (ri_b, dss, db::ICplxTrans (1.0));
+
+    db::Region xor_res = in_a ^ in_b;
+    EXPECT_EQ (xor_res.count (), size_t (12));
+
+    xor_res.insert_into (&ly_out, top_out, l1_out);
+  }
+
+  {
+    db::RecursiveShapeIterator ri_a, ri_b;
+
+    ri_a = db::RecursiveShapeIterator (lya, lya.cell (*lya.begin_top_down ()), l2);
+    ri_a.set_for_merged_input (true);
+
+    ri_b = db::RecursiveShapeIterator (lyb, lyb.cell (*lyb.begin_top_down ()), l2);
+    ri_b.set_for_merged_input (true);
+
+    db::Region in_a (ri_a, dss, db::ICplxTrans (1.0));
+    db::Region in_b (ri_b, dss, db::ICplxTrans (1.0));
+
+    db::Region xor_res = in_a ^ in_b;
+    EXPECT_EQ (xor_res.count (), size_t (15984));
+
+    xor_res.insert_into (&ly_out, top_out, l2_out);
+  }
+
+  db::compare_layouts (_this, ly_out, fn_au, db::WriteOAS);
+}

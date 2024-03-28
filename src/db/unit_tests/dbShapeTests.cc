@@ -948,3 +948,89 @@ TEST(9)
   EXPECT_EQ (si.at_end (), true);
 }
 
+//  Rectangle
+TEST(10)
+{
+  db::Manager m (true);
+  db::Shapes s (&m, 0, db::default_editable_mode ());
+  db::ShapeIterator si;
+
+  s.insert (db::Point (100, 200));
+  si = s.begin (db::ShapeIterator::All);
+  EXPECT_EQ (si->rectangle ().empty (), true);
+
+  s.clear ();
+  s.insert (db::Edge (db::Point (100, 200), db::Point (200, 400)));
+  si = s.begin (db::ShapeIterator::All);
+  EXPECT_EQ (si->rectangle ().empty (), true);
+
+  s.clear ();
+  s.insert (db::EdgePair (db::Edge (db::Point (100, 200), db::Point (200, 400)), db::Edge (db::Point (0, 300), db::Point (100, 500))));
+  si = s.begin (db::ShapeIterator::All);
+  EXPECT_EQ (si->rectangle ().empty (), true);
+
+  s.clear ();
+  s.insert (db::Box (0, 0, 1000, 2000));
+  si = s.begin (db::ShapeIterator::All);
+  EXPECT_EQ (si->rectangle (), db::Box (0, 0, 1000, 2000));
+
+  s.clear ();
+  s.insert (db::ShortBox (0, 0, 1000, 2000));
+  si = s.begin (db::ShapeIterator::All);
+  EXPECT_EQ (si->rectangle (), db::Box (0, 0, 1000, 2000));
+
+  s.clear ();
+  s.insert (db::Polygon (db::Box (0, 0, 1000, 2000)));
+  si = s.begin (db::ShapeIterator::All);
+  EXPECT_EQ (si->rectangle (), db::Box (0, 0, 1000, 2000));
+
+  s.clear ();
+  s.insert (db::Polygon ());
+  si = s.begin (db::ShapeIterator::All);
+  EXPECT_EQ (si->rectangle ().empty (), true);
+
+  s.clear ();
+  s.insert (db::SimplePolygon (db::Box (0, 0, 1000, 2000)));
+  si = s.begin (db::ShapeIterator::All);
+  EXPECT_EQ (si->rectangle (), db::Box (0, 0, 1000, 2000));
+
+  s.clear ();
+  s.insert (db::SimplePolygon ());
+  si = s.begin (db::ShapeIterator::All);
+  EXPECT_EQ (si->rectangle ().empty (), true);
+
+  s.clear ();
+  s.insert (db::Path ());
+  si = s.begin (db::ShapeIterator::All);
+  EXPECT_EQ (si->rectangle ().empty (), true);
+
+  db::Point pts1 [1] = { db::Point (0, 0) };
+  db::Point pts2 [2] = { db::Point (0, 0), db::Point (1000, 0) };
+  db::Point pts2b [2] = { db::Point (0, 0), db::Point (1000, 1000) };
+  db::Point pts3 [3] = { db::Point (0, 0), db::Point (1000, 0), db::Point (1000, 1000) };
+
+  s.clear ();
+  s.insert (db::Path (pts1 + 0, pts1 + 1, 1000, 500, 500));
+  si = s.begin (db::ShapeIterator::All);
+  EXPECT_EQ (si->rectangle (), db::Box (-500, -500, 500, 500));
+
+  s.clear ();
+  s.insert (db::Path (pts2 + 0, pts2 + 2, 1000, 500, 500));
+  si = s.begin (db::ShapeIterator::All);
+  EXPECT_EQ (si->rectangle (), db::Box (-500, -500, 1500, 500));
+
+  s.clear ();
+  s.insert (db::Path (pts2 + 0, pts2 + 2, 1000, 500, 500, true));
+  si = s.begin (db::ShapeIterator::All);
+  EXPECT_EQ (si->rectangle ().empty (), true);
+
+  s.clear ();
+  s.insert (db::Path (pts2b + 0, pts2b + 2, 1000, 500, 500));
+  si = s.begin (db::ShapeIterator::All);
+  EXPECT_EQ (si->rectangle ().empty (), true);
+
+  s.clear ();
+  s.insert (db::Path (pts3 + 0, pts3 + 3, 1000, 500, 500));
+  si = s.begin (db::ShapeIterator::All);
+  EXPECT_EQ (si->rectangle ().empty (), true);
+}

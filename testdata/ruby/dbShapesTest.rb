@@ -178,6 +178,7 @@ class DBShapes_TestClass < TestBase
     assert_equal( arr[0].is_polygon?, false )
     assert_equal( arr[0].is_box?, true )
     assert_equal( arr[0].box.to_s, "(10,-10;50,40)" )
+    assert_equal( arr[0].rectangle.to_s, "(10,-10;50,40)" )
     assert_equal( arr[0].bbox.to_s, "(10,-10;50,40)" )
 
     # edges
@@ -198,6 +199,7 @@ class DBShapes_TestClass < TestBase
     assert_equal( arr[0].edge.to_s, "(-1,2;5,2)" )
     assert_equal( arr[0].edge_pair.inspect, "nil" )
     assert_equal( arr[0].box.inspect, "nil" )
+    assert_equal( arr[0].rectangle.inspect, "nil" )
     assert_equal( arr[0].path.inspect, "nil" )
     assert_equal( arr[0].text.inspect, "nil" )
     assert_equal( arr[0].edge == a, true )
@@ -533,6 +535,7 @@ class DBShapes_TestClass < TestBase
     assert_equal( arr[0].dedge.inspect, "nil" )
     assert_equal( arr[0].dedge_pair.inspect, "nil" )
     assert_equal( arr[0].dbox.to_s, "(0.01,-0.01;0.05,0.04)" )
+    assert_equal( arr[0].drectangle.to_s, "(0.01,-0.01;0.05,0.04)" )
     assert_equal( arr[0].dpath.inspect, "nil" )
     assert_equal( arr[0].dtext.inspect, "nil" )
     assert_equal( arr[0].is_polygon?, false )
@@ -557,6 +560,7 @@ class DBShapes_TestClass < TestBase
     assert_equal( arr[0].dedge.to_s, "(-0.001,0.002;0.005,0.002)" )
     assert_equal( arr[0].dedge_pair.inspect, "nil" )
     assert_equal( arr[0].dbox.inspect, "nil" )
+    assert_equal( arr[0].drectangle.inspect, "nil" )
     assert_equal( arr[0].dpath.inspect, "nil" )
     assert_equal( arr[0].dtext.inspect, "nil" )
     assert_equal( arr[0].dbbox.to_s, "(-0.001,0.002;0.005,0.002)" )

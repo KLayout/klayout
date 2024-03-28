@@ -6,6 +6,7 @@
 * Bugfix: %GITHUB%/issues/1643 DRC: Feeding the same layer to two-layer operations in deep mode does not render the desired result
 * Enhancement: %GITHUB%/issues/1638 let klayout marker browser read strmxor .. xor.gds.gz, xor.oas result files
 * Enhancement: %GITHUB%/issues/1637 XOR optimization for prBoundary layer
+* Bugfix: %GITHUB%/issues/1632 rdb python/ruby module: modifing items not possible as they are const
 * Enhancement: %GITHUB%/issues/1598 Support for Soft Connections
 * Bugfix: %GITHUB%/issues/1586 Refactoring transformation conversion functions for complex transformation
 * Enhancement: %GITHUB%/issues/1583 Add possibility to customize main window title

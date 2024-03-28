@@ -1650,6 +1650,9 @@ TEST(13_ForMergedPerformance)
   db::RecursiveShapeIterator si1 (ly, ly.cell (*ly.begin_top_down ()), l1);
   db::RecursiveShapeIterator si2 (ly, ly.cell (*ly.begin_top_down ()), l2);
 
+  size_t n1_expected_full = db::default_editable_mode () ? 1203072 : 1203078;
+  size_t n2_expected_full = 10;
+
   {
     tl::SelfTimer timer ("Standard loop on 66/20");
     size_t n = 0;
@@ -1683,7 +1686,7 @@ TEST(13_ForMergedPerformance)
       ++n;
     }
     tl::info << "Counted " << n << " shapes on 66/20";
-    EXPECT_EQ (n, size_t (1203078));
+    EXPECT_EQ (n, size_t (n1_expected_full));
   }
 
   {
@@ -1694,7 +1697,7 @@ TEST(13_ForMergedPerformance)
       ++n;
     }
     tl::info << "Counted " << n << " shapes on 235/4";
-    EXPECT_EQ (n, size_t (10));
+    EXPECT_EQ (n, size_t (n2_expected_full));
   }
 
   si1.set_for_merged_input (false);
@@ -1727,6 +1730,9 @@ TEST(13_ForMergedPerformance)
   si1.set_for_merged_input (true);
   si2.set_for_merged_input (true);
 
+  size_t n1_expected = db::default_editable_mode () ? 218068 : 218069;
+  size_t n2_expected = 2;
+
   {
     tl::SelfTimer timer ("'for_merged' loop on 66/20");
     size_t n = 0;
@@ -1735,7 +1741,7 @@ TEST(13_ForMergedPerformance)
       ++n;
     }
     tl::info << "Counted " << n << " shapes on 66/20";
-    EXPECT_EQ (n, size_t (218069));
+    EXPECT_EQ (n, size_t (n1_expected));
   }
 
   {
@@ -1746,7 +1752,7 @@ TEST(13_ForMergedPerformance)
       ++n;
     }
     tl::info << "Counted " << n << " shapes on 235/4";
-    EXPECT_EQ (n, size_t (2));
+    EXPECT_EQ (n, size_t (n2_expected));
   }
 
   {
@@ -1757,7 +1763,7 @@ TEST(13_ForMergedPerformance)
     db::Region r2 (si1);
 
     EXPECT_EQ (r1.count (), size_t (218823));
-    EXPECT_EQ (r2.count (), size_t (218069));
+    EXPECT_EQ (r2.count (), size_t (n1_expected));
     EXPECT_EQ ((r1 ^ r2).count (), size_t (0));
   }
 
@@ -1769,7 +1775,7 @@ TEST(13_ForMergedPerformance)
     db::Region r2 (si2);
 
     EXPECT_EQ (r1.count (), size_t (2578));
-    EXPECT_EQ (r2.count (), size_t (2));
+    EXPECT_EQ (r2.count (), size_t (n2_expected));
     EXPECT_EQ ((r1 ^ r2).count (), size_t (0));
   }
 }

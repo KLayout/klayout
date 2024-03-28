@@ -69,7 +69,7 @@ PythonRef pull_arg (const gsi::ArgType &atype, gsi::SerialArgs &aserial, PYAObje
  *  @return True, if the type match
  */
 bool
-test_arg (const gsi::ArgType &atype, PyObject *arg, bool loose);
+test_arg (const gsi::ArgType &atype, PyObject *arg, bool loose, bool object_substitution);
 
 /**
  *  @brief Correct constness if a reference is const and a non-const reference is required

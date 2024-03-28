@@ -350,9 +350,9 @@ match_method (int mid, PyObject *self, PyObject *args, PyObject *kwargs, bool st
           PythonPtr arg (i >= argc ? get_kwarg (*a, kwargs) : (is_tuple ? PyTuple_GetItem (args, i) : PyList_GetItem (args, i)));
           if (! arg) {
             is_valid = a->spec ()->has_default ();
-          } else if (test_arg (*a, arg.get (), false /*strict*/)) {
+          } else if (test_arg (*a, arg.get (), false /*strict*/, false /*object substitution*/)) {
             ++sc;
-          } else if (test_arg (*a, arg.get (), true /*loose*/)) {
+          } else if (test_arg (*a, arg.get (), true /*loose*/, true /*object substitution*/)) {
             //  non-scoring match
           } else {
             is_valid = false;
@@ -405,7 +405,7 @@ match_method (int mid, PyObject *self, PyObject *args, PyObject *kwargs, bool st
     int i = 0;
     for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments (); ++a, ++i) {
       PythonPtr arg (i >= argc ? get_kwarg (*a, kwargs) : (is_tuple ? PyTuple_GetItem (args, i) : PyList_GetItem (args, i)));
-      if (arg && ! test_arg (*a, arg.get (), true /*loose*/)) {
+      if (arg && ! test_arg (*a, arg.get (), true /*loose*/, true /*object substitution*/)) {
         return 0;
       }
     }
@@ -1116,7 +1116,8 @@ property_setter_impl (int mid, PyObject *self, PyObject *value)
 
         //  check arguments (count and type)
         bool is_valid = (*m)->compatible_with_num_args (1);
-        if (is_valid && ! test_arg (*(*m)->begin_arguments (), value, pass != 0 /*loose in the second pass*/)) {
+        bool loose = (pass != 0);  //  loose in the second pass
+        if (is_valid && ! test_arg (*(*m)->begin_arguments (), value, loose, loose)) {
           is_valid = false;
         }
 

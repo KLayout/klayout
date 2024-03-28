@@ -1053,7 +1053,7 @@ pull_arg (const gsi::ArgType &atype, Proxy *self, gsi::SerialArgs &aserial, tl::
 template <class R>
 struct test_arg_func
 {
-  void operator () (bool *ret, VALUE arg, const gsi::ArgType &atype, bool loose)
+  void operator () (bool *ret, VALUE arg, const gsi::ArgType &atype, bool loose, bool /*object_substitution*/)
   {
     if ((atype.is_cptr () || atype.is_ptr ()) && arg == Qnil) {
 
@@ -1101,7 +1101,7 @@ struct test_vector
     unsigned int len = RARRAY_LEN(arr);
     VALUE *el = RARRAY_PTR(arr);
     while (len-- > 0) {
-      if (! test_arg (ainner, *el++, loose)) {
+      if (! test_arg (ainner, *el++, loose, true /*issue-1651*/)) {
         *ret = false;
         break;
       }
@@ -1112,7 +1112,7 @@ struct test_vector
 template <>
 struct test_arg_func<gsi::VectorType>
 {
-  void operator () (bool *ret, VALUE arg, const gsi::ArgType &atype, bool loose)
+  void operator () (bool *ret, VALUE arg, const gsi::ArgType &atype, bool loose, bool /*object_substitution*/)
   {
     if ((atype.is_cptr () || atype.is_ptr ()) && arg == Qnil) {
       //  for pointers to vectors, nil is a valid value
@@ -1141,11 +1141,11 @@ struct HashTestKeyValueData
 static int hash_test_value_key (VALUE key, VALUE value, VALUE a)
 {
   HashTestKeyValueData *args = (HashTestKeyValueData *)a;
-  if (! test_arg (*args->ainner_k, key, args->loose)) {
+  if (! test_arg (*args->ainner_k, key, args->loose, true /*issue-1651*/)) {
     *(args->ret) = false;
     return ST_STOP;
   }
-  if (! test_arg (*args->ainner, value, args->loose)) {
+  if (! test_arg (*args->ainner, value, args->loose, true /*issue-1651*/)) {
     *(args->ret) = false;
     return ST_STOP;
   }
@@ -1155,7 +1155,7 @@ static int hash_test_value_key (VALUE key, VALUE value, VALUE a)
 template <>
 struct test_arg_func<gsi::MapType>
 {
-  void operator () (bool *ret, VALUE arg, const gsi::ArgType &atype, bool loose)
+  void operator () (bool *ret, VALUE arg, const gsi::ArgType &atype, bool loose, bool /*object_substitution*/)
   {
     if ((atype.is_cptr () || atype.is_ptr ()) && arg == Qnil) {
       //  for pointers to maps, nil is a valid value
@@ -1183,14 +1183,14 @@ struct test_arg_func<gsi::MapType>
 template <>
 struct test_arg_func<gsi::ObjectType>
 {
-  void operator () (bool *ret, VALUE arg, const gsi::ArgType &atype, bool loose)
+  void operator () (bool *ret, VALUE arg, const gsi::ArgType &atype, bool loose, bool object_substitution)
   {
     if ((atype.is_cptr () || atype.is_ptr ()) && arg == Qnil) {
 
       //  for const X * or X *, nil is an allowed value
       *ret = true;
 
-    } else if (loose && TYPE (arg) == T_ARRAY) {
+    } else if (object_substitution && TYPE (arg) == T_ARRAY) {
 
       //  we may implicitly convert an array into a constructor call of a target object -
       //  for now we only check whether the number of arguments is compatible with the array given.
@@ -1234,10 +1234,10 @@ struct test_arg_func<gsi::ObjectType>
 };
 
 bool
-test_arg (const gsi::ArgType &atype, VALUE arg, bool loose)
+test_arg (const gsi::ArgType &atype, VALUE arg, bool loose, bool object_substitution)
 {
   bool ret = false;
-  gsi::do_on_type<test_arg_func> () (atype.type (), &ret, arg, atype, loose);
+  gsi::do_on_type<test_arg_func> () (atype.type (), &ret, arg, atype, loose, object_substitution);
   return ret;
 }
 

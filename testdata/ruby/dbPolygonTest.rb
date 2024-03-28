@@ -882,6 +882,18 @@ class DBPolygon_TestClass < TestBase
 
   end
 
+  def test_argumentShortcuts
+
+    # implicit conversion to a Point array:
+    poly = RBA::Polygon.new([ [0,0], [0,1000], [1000,1000] ])
+    assert_equal(poly.to_s, "(0,0;0,1000;1000,1000)")
+
+    # issue 1651 - no binding to Box constructor
+    poly = RBA::Polygon.new([ [0,0], [0,1000], [1000,1000], [1000,0] ])
+    assert_equal(poly.to_s, "(0,0;0,1000;1000,1000;1000,0)")
+
+  end
+
 end
 
 load("test_epilogue.rb")

@@ -797,6 +797,10 @@ DeepRegion::and_with (const Region &other, PropertyConstraint property_constrain
 
     return AsIfFlatRegion::and_with (other, property_constraint);
 
+  } else if (other_deep->deep_layer () == deep_layer () && pc_skip (property_constraint)) {
+
+    return clone ();
+
   } else {
 
     return new DeepRegion (and_or_not_with (other_deep, true, property_constraint));
@@ -817,6 +821,10 @@ DeepRegion::not_with (const Region &other, PropertyConstraint property_constrain
 
     return AsIfFlatRegion::not_with (other, property_constraint);
 
+  } else if (other_deep->deep_layer () == deep_layer () && pc_skip (property_constraint)) {
+
+    return new DeepRegion (deep_layer ().derived ());
+
   } else {
 
     return new DeepRegion (and_or_not_with (other_deep, false, property_constraint));
@@ -825,8 +833,13 @@ DeepRegion::not_with (const Region &other, PropertyConstraint property_constrain
 }
 
 RegionDelegate *
-DeepRegion::or_with (const Region &other, db::PropertyConstraint /*property_constraint*/) const
+DeepRegion::or_with (const Region &other, db::PropertyConstraint property_constraint) const
 {
+  const DeepRegion *other_deep = dynamic_cast <const DeepRegion *> (other.delegate ());
+  if (other_deep && other_deep->deep_layer () == deep_layer () && pc_skip (property_constraint)) {
+    return clone ();
+  }
+
   //  TODO: implement property_constraint
   RegionDelegate *res = add (other);
   return res->merged_in_place ();
@@ -848,6 +861,10 @@ DeepRegion::andnot_with (const Region &other, PropertyConstraint property_constr
   } else if (! other_deep) {
 
     return AsIfFlatRegion::andnot_with (other, property_constraint);
+
+  } else if (other_deep->deep_layer () == deep_layer () && pc_skip (property_constraint)) {
+
+    return std::make_pair (clone (), new DeepRegion (deep_layer ().derived ()));
 
   } else {
 
@@ -961,6 +978,10 @@ DeepRegion::xor_with (const Region &other, db::PropertyConstraint property_const
   } else if (! other_deep) {
 
     return AsIfFlatRegion::xor_with (other, property_constraint);
+
+  } else if (other_deep->deep_layer () == deep_layer () && pc_skip (property_constraint)) {
+
+    return new DeepRegion (deep_layer ().derived ());
 
   } else {
 
@@ -2127,6 +2148,16 @@ DeepRegion::in_and_out_generic (const Region &other, InteractingOutputMode outpu
     other_deep = dr_holder.get ();
   }
 
+  if (deep_layer () == other_deep->deep_layer ()) {
+    if (output_mode == PositiveAndNegative) {
+      return std::make_pair (clone (), new DeepRegion (deep_layer ().derived ()));
+    } else if (output_mode == Negative) {
+      return std::make_pair (new DeepRegion (deep_layer ().derived ()), (RegionDelegate *) 0);
+    } else {
+      return std::make_pair (clone (), (RegionDelegate *) 0);
+    }
+  }
+
   const db::DeepLayer &polygons = merged_deep_layer ();
   const db::DeepLayer &other_polygons = other_deep->merged_deep_layer ();
 
@@ -2188,6 +2219,26 @@ DeepRegion::selected_interacting_generic (const Region &other, int mode, bool to
     other_deep = dr_holder.get ();
   }
 
+  if (deep_layer () == other_deep->deep_layer () && !counting) {
+    if (mode <= 0 /*inside or interacting*/) {
+      if (output_mode == PositiveAndNegative) {
+        return std::make_pair (clone (), new DeepRegion (deep_layer ().derived ()));
+      } else if (output_mode == Negative) {
+        return std::make_pair (new DeepRegion (deep_layer ().derived ()), (RegionDelegate *) 0);
+      } else {
+        return std::make_pair (clone (), (RegionDelegate *) 0);
+      }
+    } else {
+      if (output_mode == PositiveAndNegative) {
+        return std::make_pair (new DeepRegion (deep_layer ().derived ()), clone ());
+      } else if (output_mode == Negative) {
+        return std::make_pair (clone (), (RegionDelegate *) 0);
+      } else {
+        return std::make_pair (new DeepRegion (deep_layer ().derived ()), (RegionDelegate *) 0);
+      }
+    }
+  }
+
   const db::DeepLayer &polygons = merged_deep_layer ();
   //  NOTE: with counting, the other polygons must be merged
   const db::DeepLayer &other_polygons = counting ? other_deep->merged_deep_layer () : other_deep->deep_layer ();
@@ -2205,7 +2256,13 @@ DeepRegion::selected_interacting_generic (const Region &other, int mode, bool to
   bool result_is_merged = (! split_after && (merged_semantics () || is_merged ()));
   InteractingResultHolder orh (output_mode, result_is_merged, polygons);
 
-  proc.run (&op, polygons.layer (), other_polygons.layer (), orh.layers ());
+  if (polygons == other_polygons) {
+    //  with counting and two identical inputs we need to create a layer copy
+    db::DeepLayer other_copy (other_polygons.copy ());
+    proc.run (&op, polygons.layer (), other_copy.layer (), orh.layers ());
+  } else {
+    proc.run (&op, polygons.layer (), other_polygons.layer (), orh.layers ());
+  }
 
   return orh.result_pair ();
 }
@@ -2283,6 +2340,10 @@ DeepRegion::pull_generic (const Region &other, int mode, bool touching) const
     //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchization
     dr_holder.reset (new db::DeepRegion (other, const_cast<db::DeepShapeStore &> (*deep_layer ().store ())));
     other_deep = dr_holder.get ();
+  }
+
+  if (deep_layer () == other_deep->deep_layer ()) {
+    return clone ();
   }
 
   //  in "inside" mode, the first argument needs to be merged too

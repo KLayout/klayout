@@ -1052,6 +1052,10 @@ EdgesDelegate *DeepEdges::and_with (const Edges &other) const
 
     return AsIfFlatEdges::and_with (other);
 
+  } else if (deep_layer () == other_deep->deep_layer ()) {
+
+    return clone ();
+
   } else {
 
     return new DeepEdges (and_or_not_with (other_deep, EdgeAnd).first);
@@ -1070,6 +1074,10 @@ EdgesDelegate *DeepEdges::not_with (const Edges &other) const
   } else if (! other_deep) {
 
     return AsIfFlatEdges::not_with (other);
+
+  } else if (deep_layer () == other_deep->deep_layer ()) {
+
+    return new DeepEdges (deep_layer ().derived ());
 
   } else {
 
@@ -1164,6 +1172,10 @@ DeepEdges::andnot_with (const Edges &other) const
 
     return AsIfFlatEdges::andnot_with (other);
 
+  } else if (deep_layer () == other_deep->deep_layer ()) {
+
+    return std::make_pair (clone (), new DeepEdges (deep_layer ().derived ()));
+
   } else {
 
     auto res = and_or_not_with (other_deep, EdgeAndNot);
@@ -1188,6 +1200,10 @@ EdgesDelegate *DeepEdges::xor_with (const Edges &other) const
 
     return AsIfFlatEdges::xor_with (other);
 
+  } else if (deep_layer () == other_deep->deep_layer ()) {
+
+    return new DeepEdges (deep_layer ().derived ());
+
   } else {
 
     //  Implement XOR as (A-B)+(B-A) - only this implementation
@@ -1203,6 +1219,11 @@ EdgesDelegate *DeepEdges::xor_with (const Edges &other) const
 
 EdgesDelegate *DeepEdges::or_with (const Edges &other) const
 {
+  const DeepEdges *other_deep = dynamic_cast <const DeepEdges *> (other.delegate ());
+  if (other_deep && other_deep->deep_layer () == deep_layer ()) {
+    return clone ();
+  }
+
   //  NOTE: in the hierarchical case we don't do a merge on "or": just map to add
   return add (other);
 }
@@ -1503,7 +1524,18 @@ DeepEdges::selected_interacting_generic (const Edges &other, EdgeInteractionMode
     other_deep = dr_holder.get ();
   }
 
+  if (deep_layer () == other_deep->deep_layer () && !counting) {
+    if ((mode == EdgesOutside) == inverse) {
+      return clone ();
+    } else {
+      return new DeepEdges (deep_layer ().derived ());
+    }
+  }
+
   const db::DeepLayer &edges = merged_deep_layer ();
+
+  //  NOTE: with counting the other region needs to be merged
+  const db::DeepLayer &other_edges = (counting || mode != EdgesInteract ? other_deep->merged_deep_layer () : other_deep->deep_layer ());
 
   DeepLayer dl_out (edges.derived ());
 
@@ -1513,8 +1545,13 @@ DeepEdges::selected_interacting_generic (const Edges &other, EdgeInteractionMode
   proc.set_base_verbosity (base_verbosity ());
   proc.set_threads (edges.store ()->threads ());
 
-  //  NOTE: with counting the other region needs to be merged
-  proc.run (&op, edges.layer (), (counting || mode != EdgesInteract ? other_deep->merged_deep_layer () : other_deep->deep_layer ()).layer (), dl_out.layer ());
+  if (edges == other_edges) {
+    //  with counting and two identical inputs, a copy needs to be made
+    db::DeepLayer copy (other_edges.copy ());
+    proc.run (&op, edges.layer (), copy.layer (), dl_out.layer ());
+  } else {
+    proc.run (&op, edges.layer (), other_edges.layer (), dl_out.layer ());
+  }
 
   return new db::DeepEdges (dl_out);
 }
@@ -1533,7 +1570,18 @@ DeepEdges::selected_interacting_pair_generic (const Edges &other, EdgeInteractio
     other_deep = dr_holder.get ();
   }
 
+  if (deep_layer () == other_deep->deep_layer () && !counting) {
+    if (mode != EdgesOutside) {
+      return std::make_pair (clone (), new DeepEdges (deep_layer ().derived ()));
+    } else {
+      return std::make_pair (new DeepEdges (deep_layer ().derived ()), clone ());
+    }
+  }
+
   const db::DeepLayer &edges = merged_deep_layer ();
+
+  //  NOTE: with counting the other region needs to be merged
+  const db::DeepLayer &other_edges = (counting || mode != EdgesInteract ? other_deep->merged_deep_layer () : other_deep->deep_layer ());
 
   DeepLayer dl_out (edges.derived ());
   DeepLayer dl_out2 (edges.derived ());
@@ -1550,7 +1598,13 @@ DeepEdges::selected_interacting_pair_generic (const Edges &other, EdgeInteractio
   proc.set_threads (edges.store ()->threads ());
 
   //  NOTE: with counting the other region needs to be merged
-  proc.run (&op, edges.layer (), (counting || mode != EdgesInteract ? other_deep->merged_deep_layer () : other_deep->deep_layer ()).layer (), output_layers);
+  if (edges == other_edges) {
+    //  with counting and two identical inputs, a copy needs to be made
+    db::DeepLayer copy (other_edges.copy ());
+    proc.run (&op, edges.layer (), copy.layer (), output_layers);
+  } else {
+    proc.run (&op, edges.layer (), other_edges.layer (), output_layers);
+  }
 
   return std::make_pair (new db::DeepEdges (dl_out), new db::DeepEdges (dl_out2));
 }
@@ -1591,6 +1645,10 @@ EdgesDelegate *DeepEdges::pull_generic (const Edges &other) const
     other_deep = dr_holder.get ();
   }
 
+  if (deep_layer () == other_deep->deep_layer ()) {
+    return clone ();
+  }
+
   const db::DeepLayer &edges = deep_layer ();
   const db::DeepLayer &other_edges = other_deep->merged_deep_layer ();
 
@@ -1615,6 +1673,10 @@ EdgesDelegate *DeepEdges::in (const Edges &other, bool invert) const
     //  if the other edge collection isn't deep, turn into a top-level only deep edge collection to facilitate re-hierarchization
     dr_holder.reset (new db::DeepEdges (other, const_cast<db::DeepShapeStore &> (*deep_layer ().store ())));
     other_deep = dr_holder.get ();
+  }
+
+  if (deep_layer () == other_deep->deep_layer ()) {
+    return invert ? new db::DeepEdges (deep_layer ().derived ()) : clone ();
   }
 
   const db::DeepLayer &edges = merged_deep_layer ();
@@ -1644,6 +1706,10 @@ std::pair<EdgesDelegate *, EdgesDelegate *> DeepEdges::in_and_out (const Edges &
     //  if the other edge collection isn't deep, turn into a top-level only deep edge collection to facilitate re-hierarchization
     dr_holder.reset (new db::DeepEdges (other, const_cast<db::DeepShapeStore &> (*deep_layer ().store ())));
     other_deep = dr_holder.get ();
+  }
+
+  if (deep_layer () == other_deep->deep_layer ()) {
+    return std::make_pair (clone (), new db::DeepEdges (deep_layer ().derived ()));
   }
 
   const db::DeepLayer &edges = merged_deep_layer ();

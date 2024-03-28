@@ -305,6 +305,25 @@ TEST(6)
   EXPECT_EQ (x3.test (":"), true);
 }
 
+TEST(6_double)
+{
+  Extractor x ("  5.5 -2.5 \n+0.125  (no number)");
+
+  EXPECT_EQ (x.at_end (), false);
+
+  double d = 0.0;
+
+  EXPECT_EQ (x.try_read (d), true);
+  EXPECT_EQ (d, 5.5);
+
+  x.read (d);
+  EXPECT_EQ (d, -2.5);
+  x.read (d);
+  EXPECT_EQ (d, 0.125);
+
+  x.expect ("(");
+}
+
 TEST(7)
 {
   EXPECT_EQ (tl::to_quoted_string ("a_word!"), "'a_word!'");

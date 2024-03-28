@@ -353,9 +353,9 @@ TEST(11)
   EXPECT_EQ (x.try_read (tt2), true);
   EXPECT_EQ (x.test ("a"), true);
   EXPECT_EQ (tt2.to_string (), t2.to_string ());
-  x = tl::Extractor ("m22.5 *0.55 12.4,-17 ++");
+  x = tl::Extractor ("m22.5 *0.55 12.4,-17 ##");
   EXPECT_EQ (x.try_read (tt2), true);
-  EXPECT_EQ (x.test ("++"), true);
+  EXPECT_EQ (x.test ("##"), true);
   EXPECT_EQ (tt2.to_string (), "m22.5 *0.55 12.4,-17");
   EXPECT_EQ (tt2.to_string (), t3.to_string ());
 }

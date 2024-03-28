@@ -935,6 +935,78 @@ class RDB_TestClass < TestBase
 
   end
 
+  def test_13
+
+    # manipulations
+    rdb = RBA::ReportDatabase::new("")
+
+    _cell = rdb.create_cell("CELL")
+    _cat = rdb.create_category("cat")
+    _subcat = rdb.create_category(_cat, "subcat")
+    _subcat.description = "subcat_d"
+    _item1 = rdb.create_item(_cell.rdb_id, _subcat.rdb_id)
+    _item1.add_value(17.5)
+    _item1.add_value("string")
+    _item2 = rdb.create_item(_cell.rdb_id, _subcat.rdb_id)
+    _item2.add_value("b")
+    _subsubcat = rdb.create_category(_subcat, "subsubcat")
+    _cat2 = rdb.create_category("cat2")
+
+    cell = rdb.cell_by_id(_cell.rdb_id)
+    assert_equal(cell._is_const_object?, false)
+    assert_equal(rdb.each_cell.to_a[0]._is_const_object?, false)
+
+    cell = rdb.cell_by_qname("CELL")
+    assert_equal(cell._is_const_object?, false)
+
+    cat = rdb.category_by_id(_cat.rdb_id)
+    assert_equal(cat._is_const_object?, false)
+
+    cat = rdb.category_by_path("cat")
+    assert_equal(cat._is_const_object?, false)
+    subcat = rdb.category_by_path("cat.subcat")
+
+    assert_equal(rdb.each_category.to_a[0]._is_const_object?, false)
+    assert_equal(rdb.each_category.collect { |c| c.name }.join(","), "cat,cat2")
+    assert_equal(subcat._is_const_object?, false)
+    assert_equal(subcat.database._is_const_object?, false)
+    assert_equal(subcat.name, "subcat")
+    assert_equal(subcat.parent.name, "cat")
+
+    assert_equal(subcat.description, "subcat_d")
+    subcat.description = "changed"
+    assert_equal(subcat.description, "changed")
+
+    assert_equal(rdb.each_item_per_category(subcat.rdb_id).collect { |item| item.each_value.collect { |v| v.to_s }.join("/") }.join(";"), "float: 17.5/text: string;text: b")
+
+    item1 = rdb.each_item_per_category(subcat.rdb_id).to_a[0]
+    assert_equal(item1._is_const_object?, false)
+    item1.clear_values
+    assert_equal(rdb.each_item_per_category(subcat.rdb_id).collect { |item| item.each_value.collect { |v| v.to_s }.join("/") }.join(";"), ";text: b")
+    item1.add_value("x")
+    assert_equal(rdb.each_item_per_category(subcat.rdb_id).collect { |item| item.each_value.collect { |v| v.to_s }.join("/") }.join(";"), "text: x;text: b")
+    item1.add_tag(17)
+    assert_equal(item1.has_tag?(17), true)
+    assert_equal(item1.has_tag?(16), false)
+
+    item1 = rdb.each_item.to_a[0]
+    assert_equal(item1._is_const_object?, false)
+    assert_equal(item1.has_tag?(17), true)
+
+    item1 = rdb.each_item_per_cell(cell.rdb_id).to_a[0]
+    assert_equal(item1._is_const_object?, false)
+    assert_equal(item1.has_tag?(17), true)
+
+    item1 = rdb.each_item_per_cell_and_category(cell.rdb_id, subcat.rdb_id).to_a[0]
+    assert_equal(item1._is_const_object?, false)
+    assert_equal(item1.has_tag?(17), true)
+
+    item1 = cell.each_item.to_a[0]
+    assert_equal(item1._is_const_object?, false)
+    assert_equal(item1.has_tag?(17), true)
+
+  end
+
 end
 
 load("test_epilogue.rb")

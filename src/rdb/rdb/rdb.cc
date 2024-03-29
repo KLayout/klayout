@@ -1488,7 +1488,18 @@ Database::items_by_cell_and_category (id_type cell_id, id_type category_id) cons
   }
 }
 
-std::pair<Database::const_item_ref_iterator, Database::const_item_ref_iterator> 
+std::pair<Database::item_ref_iterator, Database::item_ref_iterator>
+Database::items_by_cell_and_category (id_type cell_id, id_type category_id)
+{
+  std::map <std::pair <id_type, id_type>, std::list<ItemRef> >::iterator i = m_items_by_cell_and_category_id.find (std::make_pair (cell_id, category_id));
+  if (i != m_items_by_cell_and_category_id.end ()) {
+    return std::make_pair (i->second.begin (), i->second.end ());
+  } else {
+    return std::make_pair (empty_list.begin (), empty_list.end ());
+  }
+}
+
+std::pair<Database::const_item_ref_iterator, Database::const_item_ref_iterator>
 Database::items_by_cell (id_type cell_id) const
 {
   std::map <id_type, std::list<ItemRef> >::const_iterator i = m_items_by_cell_id.find (cell_id);
@@ -1499,7 +1510,18 @@ Database::items_by_cell (id_type cell_id) const
   }
 }
 
-std::pair<Database::const_item_ref_iterator, Database::const_item_ref_iterator> 
+std::pair<Database::item_ref_iterator, Database::item_ref_iterator>
+Database::items_by_cell (id_type cell_id)
+{
+  std::map <id_type, std::list<ItemRef> >::iterator i = m_items_by_cell_id.find (cell_id);
+  if (i != m_items_by_cell_id.end ()) {
+    return std::make_pair (i->second.begin (), i->second.end ());
+  } else {
+    return std::make_pair (empty_list.begin (), empty_list.end ());
+  }
+}
+
+std::pair<Database::const_item_ref_iterator, Database::const_item_ref_iterator>
 Database::items_by_category (id_type category_id) const
 {
   std::map <id_type, std::list<ItemRef> >::const_iterator i = m_items_by_category_id.find (category_id);
@@ -1510,7 +1532,18 @@ Database::items_by_category (id_type category_id) const
   }
 }
 
-size_t 
+std::pair<Database::item_ref_iterator, Database::item_ref_iterator>
+Database::items_by_category (id_type category_id)
+{
+  std::map <id_type, std::list<ItemRef> >::iterator i = m_items_by_category_id.find (category_id);
+  if (i != m_items_by_category_id.end ()) {
+    return std::make_pair (i->second.begin (), i->second.end ());
+  } else {
+    return std::make_pair (empty_list.begin (), empty_list.end ());
+  }
+}
+
+size_t
 Database::num_items (id_type cell_id, id_type category_id) const
 {
   std::map <std::pair <id_type, id_type>, size_t>::const_iterator n = m_num_items_by_cell_and_category.find (std::make_pair (cell_id, category_id));

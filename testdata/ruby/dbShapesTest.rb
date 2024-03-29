@@ -1627,6 +1627,35 @@ class DBShapes_TestClass < TestBase
 
   end
 
+  # Shape objects as hashes
+  def test_12
+
+    s = RBA::Shapes::new
+    s1 = s.insert(RBA::Box::new(1, 2, 3, 4))
+    s2 = s.insert(RBA::Polygon::new(RBA::Box::new(1, 2, 3, 4)))
+    s3 = s.insert(RBA::SimplePolygon::new(RBA::Box::new(1, 2, 3, 4)))
+
+    assert_equal(s1.hash != s2.hash, true)   # let's hope so ...
+    assert_equal(s1.hash != s3.hash, true)
+    assert_equal(s2.hash != s3.hash, true)
+
+    assert_equal(s1 < s2 || s2 < s1, true)
+    assert_equal(s1 < s3 || s3 < s1, true)
+    assert_equal(s2 < s3 || s3 < s2, true)
+
+    h = {}
+    h[s1] = 1
+    h[s2] = 2
+    h[s3] = 3
+    
+    assert_equal(h.size, 3)
+    
+    assert_equal(h[s1], 1)
+    assert_equal(h[s2], 2)
+    assert_equal(h[s3], 3)
+
+  end
+
 end
 
 load("test_epilogue.rb")

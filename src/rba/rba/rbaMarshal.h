@@ -62,7 +62,7 @@ void push_arg (const gsi::ArgType &atype, gsi::SerialArgs &aserial, VALUE arg, t
  *  otherwise:
  *      argument must be of the requested type
  */
-bool test_arg (const gsi::ArgType &atype, VALUE arg, bool loose);
+bool test_arg (const gsi::ArgType &atype, VALUE arg, bool loose, bool object_substitution);
 
 }
 

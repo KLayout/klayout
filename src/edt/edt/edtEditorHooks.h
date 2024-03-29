@@ -29,6 +29,7 @@
 #include "dbTrans.h"
 #include "gsiObject.h"
 #include "tlExceptions.h"
+#include "tlObjectCollection.h"
 
 #include <set>
 #include <string>
@@ -152,7 +153,7 @@ public:
    *
    *  The order of the hooks is determined by the registration order.
    */
-  static std::vector<EditorHooks *> get_editor_hooks (const std::string &for_technology);
+  static tl::weak_collection<EditorHooks> get_editor_hooks (const std::string &for_technology);
 
 private:
   std::set<std::string> m_technologies;
@@ -167,12 +168,14 @@ private:
  */
 
 inline
-void call_editor_hooks (const std::vector<EditorHooks *> &hooks, void (EditorHooks::*meth) ())
+void call_editor_hooks (const tl::weak_collection<EditorHooks> &hooks, void (EditorHooks::*meth) ())
 {
   for (auto h = hooks.begin (); h != hooks.end (); ++h) {
 BEGIN_PROTECTED
     try {
-      ((*h)->*meth) ();
+      if (h.operator-> ()) {
+        (const_cast<EditorHooks *> (h.operator-> ())->*meth) ();
+      }
     } catch (tl::CancelException &) {
       return;
     }
@@ -188,12 +191,14 @@ END_PROTECTED
 
 template <class A1>
 inline
-void call_editor_hooks (const std::vector<EditorHooks *> &hooks, void (EditorHooks::*meth) (A1), A1 a1)
+void call_editor_hooks (const tl::weak_collection<EditorHooks> &hooks, void (EditorHooks::*meth) (A1), A1 a1)
 {
   for (auto h = hooks.begin (); h != hooks.end (); ++h) {
 BEGIN_PROTECTED
     try {
-      ((*h)->*meth) (a1);
+      if (h.operator-> ()) {
+        (const_cast<EditorHooks *> (h.operator-> ())->*meth) (a1);
+      }
     } catch (tl::CancelException &) {
       return;
     }
@@ -209,12 +214,14 @@ END_PROTECTED
 
 template <class A1, class A2>
 inline
-void call_editor_hooks (const std::vector<EditorHooks *> &hooks, void (EditorHooks::*meth) (A1, A2), A1 a1, A2 a2)
+void call_editor_hooks (const tl::weak_collection<EditorHooks> &hooks, void (EditorHooks::*meth) (A1, A2), A1 a1, A2 a2)
 {
   for (auto h = hooks.begin (); h != hooks.end (); ++h) {
 BEGIN_PROTECTED
     try {
-      ((*h)->*meth) (a1, a2);
+      if (h.operator-> ()) {
+        (const_cast<EditorHooks *> (h.operator-> ())->*meth) (a1, a2);
+      }
     } catch (tl::CancelException &) {
       return;
     }
@@ -230,12 +237,14 @@ END_PROTECTED
 
 template <class A1, class A2, class A3>
 inline
-void call_editor_hooks (const std::vector<EditorHooks *> &hooks, void (EditorHooks::*meth) (A1, A2), A1 a1, A2 a2, A3 a3)
+void call_editor_hooks (const tl::weak_collection<EditorHooks> &hooks, void (EditorHooks::*meth) (A1, A2), A1 a1, A2 a2, A3 a3)
 {
   for (auto h = hooks.begin (); h != hooks.end (); ++h) {
 BEGIN_PROTECTED
     try {
-      ((*h)->*meth) (a1, a2, a3);
+      if (h.operator-> ()) {
+        (const_cast<EditorHooks *> (h.operator-> ())->*meth) (a1, a2, a3);
+      }
     } catch (tl::CancelException &) {
       return;
     }

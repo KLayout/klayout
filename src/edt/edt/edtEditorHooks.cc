@@ -64,9 +64,10 @@ public:
     m_hooks.push_back (hook);
   }
 
-  std::vector<EditorHooks *> get_editor_hooks (const std::string &for_technology)
+  tl::weak_collection<EditorHooks>
+  get_editor_hooks (const std::string &for_technology)
   {
-    std::vector<EditorHooks *> res;
+    tl::weak_collection<EditorHooks> res;
     for (auto h = m_hooks.begin (); h != m_hooks.end (); ++h) {
       if (! h->for_technologies () || h->is_for_technology (for_technology)) {
         res.push_back (h.operator-> ());
@@ -135,13 +136,13 @@ EditorHooks::register_editor_hook (EditorHooks *hook)
   }
 }
 
-std::vector<EditorHooks *>
+tl::weak_collection<EditorHooks>
 EditorHooks::get_editor_hooks (const std::string &for_technology)
 {
   if (EditorHooksManager::instance ()) {
     return EditorHooksManager::instance ()->get_editor_hooks (for_technology);
   } else {
-    return std::vector<EditorHooks *> ();
+    return tl::weak_collection<EditorHooks> ();
   }
 }
 

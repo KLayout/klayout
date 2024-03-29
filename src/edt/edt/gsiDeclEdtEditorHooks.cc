@@ -140,6 +140,11 @@ gsi::Class<edt::EditorHooks> decl_EditorHooksBase ("lay", "EditorHooksBase",
   ) +
   gsi::method ("technologies", &edt::EditorHooks::get_technologies,
     "@brief Gets the list of technologies these hooks are associated with.\n"
+  ) +
+  gsi::method ("register", &edt::EditorHooks::register_editor_hook, gsi::arg ("hooks"),
+    "@brief Registers the hooks in the system.\n"
+    "The hooks will not be active before they are registered in the system. Registration will "
+    "also transfer object ownership to the system."
   ),
   "@brief The base class for editor hooks\n"
   "Editor hooks allow implementing technology-specific callbacks into the editor "

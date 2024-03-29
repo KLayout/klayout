@@ -23,6 +23,7 @@
 
 #include "edtEditorHooks.h"
 #include "tlObjectCollection.h"
+#include "tlStaticObjects.h"
 
 namespace edt
 {
@@ -30,16 +31,28 @@ namespace edt
 // ---------------------------------------------------------------
 //  EditorHooksManager definition and implementation
 
+static EditorHooksManager *sp_instance = 0;
+static bool sp_instance_initialized = false;
+
 class EditorHooksManager
 {
 public:
-  EditorHooksManager () { }
+  EditorHooksManager ()
+  {
+    //  .. nothing yet ..
+  }
+
+  ~EditorHooksManager ()
+  {
+    sp_instance = 0;
+  }
 
   static EditorHooksManager *instance ()
   {
-    static EditorHooksManager *sp_instance = 0;
-    if (! sp_instance) {
+    if (! sp_instance && ! sp_instance_initialized) {
       sp_instance = new EditorHooksManager ();
+      sp_instance_initialized = true;
+      tl::StaticObjects::reg (&sp_instance);
     }
     return sp_instance;
   }

@@ -36,6 +36,7 @@ DEFINES += MAKE_EDT_LIBRARY
 
 HEADERS = \
     edtDialogs.h \
+    edtEditorHooks.h \
     edtEditorOptionsPages.h \
     edtInstPropertiesPage.h \
     edtPCellParametersPage.h \
@@ -45,6 +46,7 @@ HEADERS = \
 
 SOURCES = \
     edtDialogs.cc \
+    edtEditorHooks.cc \
     edtEditorOptionsPages.cc \
     edtInstPropertiesPage.cc \
     edtPCellParametersPage.cc \

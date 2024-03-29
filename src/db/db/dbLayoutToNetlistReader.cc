@@ -462,12 +462,17 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
       }
       br.done ();
 
-    } else if (l2n && (test (skeys::message_key) || test (lkeys::message_key))) {
+    } else if (l2n && (test (skeys::softconnect_key) || test (lkeys::softconnect_key))) {
 
-      db::LogEntryData data;
-      read_message_entry (data);
-
-      l2n->log_entry (data);
+      Brace br (this);
+      std::string l1;
+      read_word_or_quoted (l1);
+      while (br) {
+        std::string l2;
+        read_word_or_quoted (l2);
+        l2n->soft_connect (layer_by_name (l2n, l1), layer_by_name (l2n, l2));
+      }
+      br.done ();
 
     } else if (l2n && (test (skeys::global_key) || test (lkeys::global_key))) {
 
@@ -480,6 +485,25 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
         l2n->connect_global (layer_by_name (l2n, l1), g);
       }
       br.done ();
+
+    } else if (l2n && (test (skeys::softglobal_key) || test (lkeys::softglobal_key))) {
+
+      Brace br (this);
+      std::string l1;
+      read_word_or_quoted (l1);
+      while (br) {
+        std::string g;
+        read_word_or_quoted (g);
+        l2n->soft_connect_global (layer_by_name (l2n, l1), g);
+      }
+      br.done ();
+
+    } else if (l2n && (test (skeys::message_key) || test (lkeys::message_key))) {
+
+      db::LogEntryData data;
+      read_message_entry (data);
+
+      l2n->log_entry (data);
 
     } else if (test (skeys::circuit_key) || test (lkeys::circuit_key)) {
 

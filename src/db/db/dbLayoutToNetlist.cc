@@ -32,7 +32,9 @@
 #include "dbLayoutVsSchematic.h"
 #include "dbLayoutToNetlistFormatDefs.h"
 #include "dbLayoutVsSchematicFormatDefs.h"
+#include "dbLayoutToNetlistSoftConnections.h"
 #include "dbShapeProcessor.h"
+#include "dbNetlistDeviceClasses.h"
 #include "dbLog.h"
 #include "tlGlobPattern.h"
 
@@ -45,7 +47,7 @@ namespace db
 //  Note: the iterator provides the hierarchical selection (enabling/disabling cells etc.)
 
 LayoutToNetlist::LayoutToNetlist (const db::RecursiveShapeIterator &iter)
-  : m_iter (iter), m_layout_index (0), m_netlist_extracted (false), m_is_flat (false), m_device_scaling (1.0), m_include_floating_subcircuits (false), m_top_level_mode (false)
+  : m_iter (iter), m_layout_index (0), m_netlist_extracted (false), m_is_flat (false), m_device_scaling (1.0), m_include_floating_subcircuits (false), m_top_level_mode (false), m_make_soft_connection_diodes (false)
 {
   //  check the iterator
   if (iter.has_complex_region () || iter.region () != db::Box::world ()) {
@@ -65,7 +67,7 @@ LayoutToNetlist::LayoutToNetlist (const db::RecursiveShapeIterator &iter)
 }
 
 LayoutToNetlist::LayoutToNetlist (db::DeepShapeStore *dss, unsigned int layout_index)
-  : mp_dss (dss), m_layout_index (layout_index), m_netlist_extracted (false), m_is_flat (false), m_device_scaling (1.0), m_include_floating_subcircuits (false), m_top_level_mode (false)
+  : mp_dss (dss), m_layout_index (layout_index), m_netlist_extracted (false), m_is_flat (false), m_device_scaling (1.0), m_include_floating_subcircuits (false), m_top_level_mode (false), m_make_soft_connection_diodes (false)
 {
   if (dss->is_valid_layout_index (m_layout_index)) {
     m_iter = db::RecursiveShapeIterator (dss->layout (m_layout_index), dss->initial_cell (m_layout_index), std::set<unsigned int> ());
@@ -73,7 +75,7 @@ LayoutToNetlist::LayoutToNetlist (db::DeepShapeStore *dss, unsigned int layout_i
 }
 
 LayoutToNetlist::LayoutToNetlist (const std::string &topcell_name, double dbu)
-  : m_iter (), m_netlist_extracted (false), m_is_flat (true), m_device_scaling (1.0), m_include_floating_subcircuits (false), m_top_level_mode (false)
+  : m_iter (), m_netlist_extracted (false), m_is_flat (true), m_device_scaling (1.0), m_include_floating_subcircuits (false), m_top_level_mode (false), m_make_soft_connection_diodes (false)
 {
   mp_internal_dss.reset (new db::DeepShapeStore (topcell_name, dbu));
   mp_dss.reset (mp_internal_dss.get ());
@@ -84,7 +86,7 @@ LayoutToNetlist::LayoutToNetlist (const std::string &topcell_name, double dbu)
 
 LayoutToNetlist::LayoutToNetlist ()
   : m_iter (), mp_internal_dss (new db::DeepShapeStore ()), mp_dss (mp_internal_dss.get ()), m_layout_index (0),
-    m_netlist_extracted (false), m_is_flat (false), m_device_scaling (1.0), m_include_floating_subcircuits (false), m_top_level_mode (false)
+    m_netlist_extracted (false), m_is_flat (false), m_device_scaling (1.0), m_include_floating_subcircuits (false), m_top_level_mode (false), m_make_soft_connection_diodes (false)
 {
   init ();
 }
@@ -298,6 +300,26 @@ void LayoutToNetlist::connect_impl (const db::ShapeCollection &a, const db::Shap
   m_conn.connect (dla.layer (), dlb.layer ());
 }
 
+void LayoutToNetlist::soft_connect_impl (const db::ShapeCollection &a, const db::ShapeCollection &b)
+{
+  reset_extracted ();
+
+  if (! is_persisted (a)) {
+    register_layer (a);
+  }
+  if (! is_persisted (b)) {
+    register_layer (b);
+  }
+
+  //  we need to keep a reference, so we can safely delete the region
+  db::DeepLayer dla = deep_layer_of (a);
+  db::DeepLayer dlb = deep_layer_of (b);
+  m_dlrefs.insert (dla);
+  m_dlrefs.insert (dlb);
+
+  m_conn.soft_connect (dla.layer (), dlb.layer ());
+}
+
 size_t LayoutToNetlist::connect_global_impl (const db::ShapeCollection &l, const std::string &gn)
 {
   reset_extracted ();
@@ -311,6 +333,21 @@ size_t LayoutToNetlist::connect_global_impl (const db::ShapeCollection &l, const
   m_dlrefs.insert (dl);
 
   return m_conn.connect_global (dl.layer (), gn);
+}
+
+size_t LayoutToNetlist::soft_connect_global_impl (const db::ShapeCollection &l, const std::string &gn)
+{
+  reset_extracted ();
+
+  if (! is_persisted (l)) {
+    register_layer (l);
+  }
+
+  //  we need to keep a reference, so we can safely delete the region
+  db::DeepLayer dl = deep_layer_of (l);
+  m_dlrefs.insert (dl);
+
+  return m_conn.soft_connect_global (dl.layer (), gn);
 }
 
 const std::string &LayoutToNetlist::global_net_name (size_t id) const
@@ -360,6 +397,24 @@ void LayoutToNetlist::join_nets (const tl::GlobPattern &cell, const std::set<std
   m_joined_nets_per_cell.push_back (std::make_pair (cell, gp));
 }
 
+#if defined(_DEBUG)
+static bool check_many_pins (const db::Netlist *netlist)
+{
+  bool ok = true;
+  for (auto c = netlist->begin_circuits (); c != netlist->end_circuits (); ++c) {
+    const db::Circuit &circuit = *c;
+    for (auto n = circuit.begin_nets (); n != circuit.end_nets (); ++n) {
+      const db::Net &net = *n;
+      if (net.pin_count () > 1) {
+        ok = false;
+        tl::error << "Many pins on net " << net.expanded_name () << " in circuit " << circuit.name ();
+      }
+    }
+  }
+  return ok;
+}
+#endif
+
 void LayoutToNetlist::extract_netlist ()
 {
   if (m_netlist_extracted) {
@@ -371,6 +426,17 @@ void LayoutToNetlist::extract_netlist ()
   netex.set_include_floating_subcircuits (m_include_floating_subcircuits);
   netex.extract_nets (dss (), m_layout_index, m_conn, *mp_netlist, m_net_clusters);
 
+  //  treat soft connections
+  do_soft_connections ();
+
+  //  implement the "join_nets" (aka "must connect") feature
+#if defined(_DEBUG)
+  //  NOTE: the join_nets feature only works for "one pin per net" case
+  //  TODO: either fix that or make sure we do not get multiple pins per net.
+  //  Right now, there no known case that produces multiple pins on a net at
+  //  this stage.
+  tl_assert (check_many_pins (mp_netlist.get ()));
+#endif
   do_join_nets ();
 
   if (tl::verbosity () >= 41) {
@@ -477,7 +543,7 @@ void LayoutToNetlist::check_must_connect (const db::Circuit &c, const db::Net &a
   check_must_connect_impl (c, a, b, c, a, b, path);
 }
 
-static std::string path_msg (const std::vector<const db::SubCircuit *> &path, const db::Circuit &c_org)
+static std::string path_msg (const std::vector<const db::SubCircuit *> &path)
 {
   if (path.empty ()) {
     return std::string ();
@@ -485,15 +551,13 @@ static std::string path_msg (const std::vector<const db::SubCircuit *> &path, co
 
   std::string msg (".\n" + tl::to_string (tr ("Instance path: ")));
 
-  for (auto p = path.rbegin (); p != path.rend (); ++p) {
-    if (p != path.rbegin ()) {
-      msg += "/";
-    }
-    msg += (*p)->circuit ()->name () + ":" + (*p)->expanded_name () + "[" + (*p)->trans ().to_string () + "]";
-  }
+  auto p0 = path.rbegin ();
+  msg += (*p0)->circuit ()->name ();
 
-  msg += "/";
-  msg += c_org.name ();
+  for (auto p = p0; p != path.rend (); ++p) {
+    msg += "/";
+    msg += (*p)->circuit_ref ()->name () + "[" + (*p)->trans ().to_string (true /*short*/) + "]" + ":" + (*p)->expanded_name ();
+  }
 
   return msg;
 }
@@ -519,12 +583,12 @@ void LayoutToNetlist::check_must_connect_impl (const db::Circuit &c, const db::N
 
     if (a_org.expanded_name () == b_org.expanded_name ()) {
       if (path.empty ()) {
-        db::LogEntryData warn (m_top_level_mode ? db::Error : db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s must be connected further up in the hierarchy - this is an error at chip top level")), a_org.expanded_name ()) + path_msg (path, c_org));
+        db::LogEntryData warn (m_top_level_mode ? db::Error : db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s must be connected further up in the hierarchy - this is an error at chip top level")), a_org.expanded_name ()) + path_msg (path));
         warn.set_cell_name (c.name ());
         warn.set_category_name ("must-connect");
         log_entry (warn);
       } else {
-        db::LogEntryData warn (m_top_level_mode ? db::Error : db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s of circuit %s must be connected further up in the hierarchy - this is an error at chip top level")), a_org.expanded_name (), c_org.name ()) + path_msg (path, c_org));
+        db::LogEntryData warn (m_top_level_mode ? db::Error : db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s of circuit %s must be connected further up in the hierarchy - this is an error at chip top level")), a_org.expanded_name (), c_org.name ()) + path_msg (path));
         warn.set_cell_name (c.name ());
         warn.set_geometry (subcircuit_geometry (*path.back (), internal_layout ()));
         warn.set_category_name ("must-connect");
@@ -532,12 +596,12 @@ void LayoutToNetlist::check_must_connect_impl (const db::Circuit &c, const db::N
       }
     } else {
       if (path.empty ()) {
-        db::LogEntryData warn (m_top_level_mode ? db::Error : db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s and %s must be connected further up in the hierarchy - this is an error at chip top level")), a_org.expanded_name (), b_org.expanded_name ()) + path_msg (path, c_org));
+        db::LogEntryData warn (m_top_level_mode ? db::Error : db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s and %s must be connected further up in the hierarchy - this is an error at chip top level")), a_org.expanded_name (), b_org.expanded_name ()) + path_msg (path));
         warn.set_cell_name (c.name ());
         warn.set_category_name ("must-connect");
         log_entry (warn);
       } else {
-        db::LogEntryData warn (m_top_level_mode ? db::Error : db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s and %s of circuit %s must be connected further up in the hierarchy - this is an error at chip top level")), a_org.expanded_name (), b_org.expanded_name (), c_org.name ()) + path_msg (path, c_org));
+        db::LogEntryData warn (m_top_level_mode ? db::Error : db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s and %s of circuit %s must be connected further up in the hierarchy - this is an error at chip top level")), a_org.expanded_name (), b_org.expanded_name (), c_org.name ()) + path_msg (path));
         warn.set_cell_name (c.name ());
         warn.set_geometry (subcircuit_geometry (*path.back (), internal_layout ()));
         warn.set_category_name ("must-connect");
@@ -558,7 +622,7 @@ void LayoutToNetlist::check_must_connect_impl (const db::Circuit &c, const db::N
       const db::Net *net_b = sc.net_for_pin (b.begin_pins ()->pin_id ());
 
       if (net_a == 0) {
-        db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect net %s of circuit %s is not connected at all%s")), a_org.expanded_name (), c_org.name (), subcircuit_to_string (sc)) + path_msg (path, c_org));
+        db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect net %s of circuit %s is not connected at all%s")), a_org.expanded_name (), c_org.name (), subcircuit_to_string (sc)) + path_msg (path));
         error.set_cell_name (sc.circuit ()->name ());
         error.set_geometry (subcircuit_geometry (sc, internal_layout ()));
         error.set_category_name ("must-connect");
@@ -566,7 +630,7 @@ void LayoutToNetlist::check_must_connect_impl (const db::Circuit &c, const db::N
       }
 
       if (net_b == 0) {
-        db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect net %s of circuit %s is not connected at all%s")), b_org.expanded_name (), c_org.name (), subcircuit_to_string (sc)) + path_msg (path, c_org));
+        db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect net %s of circuit %s is not connected at all%s")), b_org.expanded_name (), c_org.name (), subcircuit_to_string (sc)) + path_msg (path));
         error.set_cell_name (sc.circuit ()->name ());
         error.set_geometry (subcircuit_geometry (sc, internal_layout ()));
         error.set_category_name ("must-connect");
@@ -581,6 +645,54 @@ void LayoutToNetlist::check_must_connect_impl (const db::Circuit &c, const db::N
 
     }
 
+  }
+}
+
+void LayoutToNetlist::place_soft_connection_diodes ()
+{
+  db::DeviceClassDiode *soft_diode = 0;
+
+  for (auto c = mp_netlist->begin_bottom_up (); c != mp_netlist->end_bottom_up (); ++c) {
+
+    auto clusters = net_clusters ().clusters_per_cell (c->cell_index ());
+
+    for (auto n = c->begin_nets (); n != c->end_nets (); ++n) {
+
+      auto soft_connections = clusters.upward_soft_connections (n->cluster_id ());
+      for (auto sc = soft_connections.begin (); sc != soft_connections.end (); ++sc) {
+
+        if (! soft_diode) {
+          soft_diode = new db::DeviceClassDiode ();
+          soft_diode->set_name ("SOFT");
+          mp_netlist->add_device_class (soft_diode);
+        }
+
+        db::Device *sc_device = new db::Device (soft_diode);
+        c->add_device (sc_device);
+
+        auto nn = c->net_by_cluster_id (*sc);
+        if (nn) {
+          sc_device->connect_terminal (db::DeviceClassDiode::terminal_id_C, n.operator-> ());
+          sc_device->connect_terminal (db::DeviceClassDiode::terminal_id_A, nn);
+        }
+
+      }
+
+    }
+
+  }
+}
+
+void LayoutToNetlist::do_soft_connections ()
+{
+  SoftConnectionInfo sc_info;
+  sc_info.build (*netlist (), net_clusters ());
+  sc_info.report (*this);
+
+  if (m_make_soft_connection_diodes) {
+    place_soft_connection_diodes ();
+  } else {
+    sc_info.join_soft_connections (*netlist ());
   }
 }
 
@@ -915,7 +1027,7 @@ LayoutToNetlist::create_layermap (db::Layout &target_layout, int ln) const
 
   std::set<unsigned int> layers_to_copy;
   const db::Connectivity &conn = connectivity ();
-  for (db::Connectivity::layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
+  for (db::Connectivity::all_layer_iterator layer = conn.begin_layers (); layer != conn.end_layers (); ++layer) {
     layers_to_copy.insert (*layer);
   }
 
@@ -1162,7 +1274,8 @@ size_t LayoutToNetlist::search_net (const db::ICplxTrans &trans, const db::Cell 
   const db::local_clusters<db::NetShape> &lcc = net_clusters ().clusters_per_cell (cell->cell_index ());
   for (db::local_clusters<db::NetShape>::touching_iterator i = lcc.begin_touching (local_box); ! i.at_end (); ++i) {
     const db::local_cluster<db::NetShape> &lc = *i;
-    if (lc.interacts (test_cluster, trans, m_conn)) {
+    int soft = 0;
+    if (lc.interacts (test_cluster, trans, m_conn, soft)) {
       return lc.id ();
     }
   }

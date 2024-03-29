@@ -214,6 +214,7 @@ private slots:
   void log_selection_changed ();
   void browse_color_for_net ();
   void select_color_for_net ();
+  void mode_tab_changed (int);
 
 protected:
   bool eventFilter (QObject *watched, QEvent *event);

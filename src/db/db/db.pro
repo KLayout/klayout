@@ -45,6 +45,7 @@ SOURCES = \
   dbLayoutDiff.cc \
   dbLayoutQuery.cc \
   dbLayoutStateModel.cc \
+  dbLayoutToNetlistSoftConnections.cc \
   dbLayoutUtils.cc \
   dbLibrary.cc \
   dbLibraryManager.cc \
@@ -270,6 +271,7 @@ HEADERS = \
   dbLayoutQuery.h \
   dbLayoutStateModel.h \
   dbLayoutToNetlistEnums.h \
+  dbLayoutToNetlistSoftConnections.h \
   dbLayoutUtils.h \
   dbLibrary.h \
   dbLibraryManager.h \

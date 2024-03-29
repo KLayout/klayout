@@ -117,6 +117,51 @@ module DRC
     end
 
     # %DRC%
+    # @name soft_connect
+    # @brief Specifies a soft connection between two layers
+    # @synopsis soft_connect(a, b)
+    # a and b must be polygon or text layers. After calling this function, the
+    # Netter considers shapes from layer a and b connected in "soft mode".
+    # Typically, b is a high-ohmic layer such as diffusion, implant for substate
+    # material, also called the "lower" layer. 
+    #
+    # A soft connection between shapes from layer a and b forms a directional 
+    # connection like an ideal diode: current can flow down, but now up 
+    # (not meant in the physical sense, this is a concept). 
+    # 
+    # Hence, two nets are disconnected, if they both connect to the same lower layer, 
+    # but do not have a connection between them. 
+    #
+    # The netlist extractor will use this scheme to identify nets that are 
+    # connected only via such a high-ohmic region. Such a case is typically
+    # bad for the functionality of a device and reported as an error.
+    # Once, the check has been made and no error is found, soft-connected
+    # nets are joined the same way than hard connections are made.
+    #
+    # Beside this, soft connections follow the same rules than hard connections
+    # (see \connect).
+
+    def soft_connect(a, b)
+
+      @engine._context("soft_connect") do
+
+        a.is_a?(DRC::DRCLayer) || raise("First argument must be a layer")
+        b.is_a?(DRC::DRCLayer) || raise("Second argument must be a layer")
+        a.requires_texts_or_region
+        b.requires_texts_or_region
+
+        register_layer(a.data)
+        register_layer(b.data)
+        # soft connections imply hard intra-layer connections
+        a.data.is_a?(RBA::Region) && @l2n.connect(a.data)
+        b.data.is_a?(RBA::Region) && @l2n.connect(b.data)
+        @l2n.soft_connect(a.data, b.data)
+
+      end
+
+    end
+
+    # %DRC%
     # @name connect_global
     # @brief Connects a layer with a global net
     # @synopsis connect_global(l, name)
@@ -135,6 +180,33 @@ module DRC
         register_layer(l.data)
         l.data.is_a?(RBA::Region) && @l2n.connect(l.data)
         @l2n.connect_global(l.data, name)
+
+      end
+
+    end
+    
+    # %DRC%
+    # @name soft_connect_global
+    # @brief Soft-connects a layer with a global net
+    # @synopsis soft-connect_global(l, name)
+    # Connects the shapes from the given layer l to a global net with the given name
+    # in "soft mode".
+    #
+    # See \connect_global for details about the concepts of global nets.
+    # See \soft_connect for details about the concept of soft connections.
+    # In global net soft connections, the global net (typically a substrate)
+    # is always the "lower" layer.
+    
+    def soft_connect_global(l, name)
+
+      @engine._context("soft_connect_global") do
+
+        l.is_a?(DRC::DRCLayer) || raise("Layer argument must be a layer")
+        l.requires_texts_or_region
+
+        register_layer(l.data)
+        l.data.is_a?(RBA::Region) && @l2n.connect(l.data)
+        @l2n.soft_connect_global(l.data, name)
 
       end
 
@@ -679,6 +751,14 @@ module DRC
 
     def _l2n_data
       @l2n && @l2n.is_extracted? && self.l2n_data
+    end
+
+    def _l2n_object
+      @l2n
+    end
+
+    def _make_soft_connection_diodes(f)
+      @l2n.make_soft_connection_diodes = f
     end
 
   private

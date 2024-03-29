@@ -52,7 +52,8 @@ SOURCES = \
     edtPCellParametersPage.cc \
     edtPropertiesPages.cc \
     edtPropertiesPageUtils.cc \
-    edtRecentConfigurationPage.cc
+    edtRecentConfigurationPage.cc \
+    gsiDeclEdtEditorHooks.cc
 
 # Enabled without Qt:
 

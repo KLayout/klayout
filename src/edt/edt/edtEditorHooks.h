@@ -91,7 +91,7 @@ public:
   virtual void begin_modifications () { }
   virtual void modified (const lay::ObjectInstPath & /*object*/, double /*dbu*/) { }
   virtual void end_modifications () { }
-  virtual void commit_modfiy () { }
+  virtual void commit_modify () { }
   virtual void end_modify () { }
 
   //  editing protocol

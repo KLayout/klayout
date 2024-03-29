@@ -122,12 +122,13 @@ public:
    *  @param layer The layer from which to deliver the shapes
    *  @param region The region from which to select the shapes
    *  @param overlapping Specify overlapping mode
+   *  @param for_merged_input Optimize for merged input - drop shapes that are completely covered by others
    *
    *  By default the iterator operates in touching mode - i.e. shapes that touch the given region
    *  are returned. By specifying the "overlapping" flag with a true value, the iterator delivers shapes that
    *  overlap the given region by at least one database unit.
    */
-  RecursiveShapeIterator (const layout_type &layout, const cell_type &cell, unsigned int layer, const box_type &region, bool overlapping = false);
+  RecursiveShapeIterator (const layout_type &layout, const cell_type &cell, unsigned int layer, const box_type &region, bool overlapping = false, bool for_merged_input = false);
 
   /**
    *  @brief Standard constructor
@@ -137,13 +138,14 @@ public:
    *  @param layer The layer from which to deliver the shapes
    *  @param region The complex region from which to select the shapes
    *  @param overlapping Specify overlapping mode
+   *  @param for_merged_input Optimize for merged input - drop shapes that are completely covered by others
    *
    *  By default the iterator operates in touching mode - i.e. shapes that touch the given region
    *  are returned. By specifying the "overlapping" flag with a true value, the iterator delivers shapes that
    *  overlap the given region by at least one database unit. It allows specification of a complex
    *  search region.
    */
-  RecursiveShapeIterator (const layout_type &layout, const cell_type &cell, unsigned int layer, const region_type &region, bool overlapping = false);
+  RecursiveShapeIterator (const layout_type &layout, const cell_type &cell, unsigned int layer, const region_type &region, bool overlapping = false, bool for_merged_input = false);
 
   /**
    *  @brief Standard constructor for "world" iteration
@@ -153,8 +155,9 @@ public:
    *  @param layout The layout from which to get the cell hierarchy
    *  @param cell The starting cell
    *  @param layer The layer from which to deliver the shapes
+   *  @param for_merged_input Optimize for merged input - drop shapes that are completely covered by others
    */
-  RecursiveShapeIterator (const layout_type &layout, const cell_type &cell, unsigned int layer);
+  RecursiveShapeIterator (const layout_type &layout, const cell_type &cell, unsigned int layer, bool for_merged_input = false);
 
   /**
    *  @brief Standard constructor with a layer selection
@@ -164,12 +167,13 @@ public:
    *  @param layers The layers from which to deliver the shapes
    *  @param region The region from which to select the shapes
    *  @param overlapping Specify overlapping mode
+   *  @param for_merged_input Optimize for merged input - drop shapes that are completely covered by others
    *
    *  By default the iterator operates in touching mode - i.e. shapes that touch the given region
    *  are returned. By specifying the "overlapping" flag with a true value, the iterator delivers shapes that
    *  overlap the given region by at least one database unit.
    */
-  RecursiveShapeIterator (const layout_type &layout, const cell_type &cell, const std::vector<unsigned int> &layers, const box_type &region, bool overlapping = false);
+  RecursiveShapeIterator (const layout_type &layout, const cell_type &cell, const std::vector<unsigned int> &layers, const box_type &region, bool overlapping = false, bool for_merged_input = false);
 
   /**
    *  @brief Standard constructor with a layer selection
@@ -179,13 +183,14 @@ public:
    *  @param layers The layers from which to deliver the shapes
    *  @param region The complex region from which to select the shapes
    *  @param overlapping Specify overlapping mode
+   *  @param for_merged_input Optimize for merged input - drop shapes that are completely covered by others
    *
    *  By default the iterator operates in touching mode - i.e. shapes that touch the given region
    *  are returned. By specifying the "overlapping" flag with a true value, the iterator delivers shapes that
    *  overlap the given region by at least one database unit. It allows specification of a complex
    *  search region.
    */
-  RecursiveShapeIterator (const layout_type &layout, const cell_type &cell, const std::vector<unsigned int> &layers, const region_type &region, bool overlapping = false);
+  RecursiveShapeIterator (const layout_type &layout, const cell_type &cell, const std::vector<unsigned int> &layers, const region_type &region, bool overlapping = false, bool for_merged_input = false);
 
   /**
    *  @brief Standard constructor with a layer selection
@@ -195,12 +200,13 @@ public:
    *  @param layers The layers from which to deliver the shapes
    *  @param region The region from which to select the shapes
    *  @param overlapping Specify overlapping mode
+   *  @param for_merged_input Optimize for merged input - drop shapes that are completely covered by others
    *
    *  By default the iterator operates in touching mode - i.e. shapes that touch the given region
    *  are returned. By specifying the "overlapping" flag with a true value, the iterator delivers shapes that
    *  overlap the given region by at least one database unit.
    */
-  RecursiveShapeIterator (const layout_type &layout, const cell_type &cell, const std::set<unsigned int> &layers, const box_type &region, bool overlapping = false);
+  RecursiveShapeIterator (const layout_type &layout, const cell_type &cell, const std::set<unsigned int> &layers, const box_type &region, bool overlapping = false, bool for_merged_input = false);
 
   /**
    *  @brief Standard constructor with a layer selection
@@ -210,13 +216,14 @@ public:
    *  @param layers The layers from which to deliver the shapes
    *  @param region The complex region from which to select the shapes
    *  @param overlapping Specify overlapping mode
+   *  @param for_merged_input Optimize for merged input - drop shapes that are completely covered by others
    *
    *  By default the iterator operates in touching mode - i.e. shapes that touch the given region
    *  are returned. By specifying the "overlapping" flag with a true value, the iterator delivers shapes that
    *  overlap the given region by at least one database unit. It allows specification of a complex
    *  search region.
    */
-  RecursiveShapeIterator (const layout_type &layout, const cell_type &cell, const std::set<unsigned int> &layers, const region_type &region, bool overlapping = false);
+  RecursiveShapeIterator (const layout_type &layout, const cell_type &cell, const std::set<unsigned int> &layers, const region_type &region, bool overlapping = false, bool for_merged_input = false);
 
   /**
    *  @brief Standard constructor for "world" iteration with a layer set
@@ -226,8 +233,9 @@ public:
    *  @param layout The layout from which to get the cell hierarchy
    *  @param cell The starting cell
    *  @param layers The layers from which to deliver the shapes
+   *  @param for_merged_input Optimize for merged input - drop shapes that are completely covered by others
    */
-  RecursiveShapeIterator (const layout_type &layout, const cell_type &cell, const std::vector<unsigned int> &layers);
+  RecursiveShapeIterator (const layout_type &layout, const cell_type &cell, const std::vector<unsigned int> &layers, bool for_merged_input = false);
 
   /**
    *  @brief Standard constructor for "world" iteration with a layer set
@@ -237,8 +245,9 @@ public:
    *  @param layout The layout from which to get the cell hierarchy
    *  @param cell The starting cell
    *  @param layers The layers from which to deliver the shapes
+   *  @param for_merged_input Optimize for merged input - drop shapes that are completely covered by others
    */
-  RecursiveShapeIterator (const layout_type &layout, const cell_type &cell, const std::set<unsigned int> &layers);
+  RecursiveShapeIterator (const layout_type &layout, const cell_type &cell, const std::set<unsigned int> &layers, bool for_merged_input = false);
 
   /**
    *  @brief Destructor
@@ -423,6 +432,25 @@ public:
   {
     if (m_overlapping != f) {
       m_overlapping = f;
+      m_needs_reinit = true;
+    }
+  }
+
+  /**
+   *  @brief Gets a flag indicating whether optimizing for merged input
+   */
+  bool for_merged_input () const
+  {
+    return m_for_merged_input;
+  }
+
+  /**
+   *  @brief Sets a flag indicating whether optimizing for merged input
+   */
+  void set_for_merged_input (bool f)
+  {
+    if (m_for_merged_input != f) {
+      m_for_merged_input = f;
       m_needs_reinit = true;
     }
   }
@@ -812,7 +840,7 @@ private:
   unsigned int m_shape_flags;
   const shape_iterator::property_selector *mp_shape_prop_sel;
   bool m_shape_inv_prop_sel;
-  bool m_overlapping;
+  bool m_overlapping, m_for_merged_input;
   std::set<db::cell_index_type> m_start, m_stop;
   cplx_trans_type m_global_trans;
   db::PropertiesTranslator m_property_translator;
@@ -839,6 +867,7 @@ private:
   mutable std::vector<const cell_type *> m_cells;
   mutable std::vector<box_tree_type> m_local_complex_region_stack;
   mutable std::vector<box_type> m_local_region_stack;
+  mutable std::vector<bool> m_skip_shapes_stack;
   mutable bool m_needs_reinit;
   mutable size_t m_inst_quad_id;
   mutable std::vector<size_t> m_inst_quad_id_stack;
@@ -858,7 +887,8 @@ private:
   void new_cell (RecursiveShapeReceiver *receiver) const;
   void new_layer () const;
   void up (RecursiveShapeReceiver *receiver) const;
-  void down (RecursiveShapeReceiver *receiver) const;
+  bool down (RecursiveShapeReceiver *receiver) const;
+  void pop () const;
 
   bool is_outside_complex_region (const db::Box &box) const;
 

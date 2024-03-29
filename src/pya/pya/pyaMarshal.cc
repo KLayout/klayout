@@ -1046,7 +1046,7 @@ size_t PythonBasedMapAdaptor::serial_size () const
 template <class R>
 struct test_arg_func
 {
-  void operator() (bool *ret, PyObject *arg, const gsi::ArgType &atype, bool loose)
+  void operator() (bool *ret, PyObject *arg, const gsi::ArgType &atype, bool loose, bool /*object_substitution*/)
   {
     if ((atype.is_cptr () || atype.is_ptr ()) && arg == Py_None) {
 
@@ -1083,7 +1083,7 @@ struct test_arg_func
 template <>
 struct test_arg_func<gsi::VariantType>
 {
-  void operator() (bool *ret, PyObject *, const gsi::ArgType &, bool)
+  void operator() (bool *ret, PyObject *, const gsi::ArgType &, bool, bool)
   {
     //  we assume we can convert everything into a variant
     *ret = true;
@@ -1093,7 +1093,7 @@ struct test_arg_func<gsi::VariantType>
 template <>
 struct test_arg_func<gsi::StringType>
 {
-  void operator() (bool *ret, PyObject *arg, const gsi::ArgType &, bool)
+  void operator() (bool *ret, PyObject *arg, const gsi::ArgType &, bool, bool)
   {
 #if PY_MAJOR_VERSION < 3
     if (PyString_Check (arg)) {
@@ -1117,7 +1117,7 @@ struct test_arg_func<gsi::StringType>
 template <>
 struct test_arg_func<gsi::VectorType>
 {
-  void operator() (bool *ret, PyObject *arg, const gsi::ArgType &atype, bool loose)
+  void operator() (bool *ret, PyObject *arg, const gsi::ArgType &atype, bool loose, bool /*object_substitution*/)
   {
     if ((atype.is_cptr () || atype.is_ptr ()) && arg == Py_None) {
       //  for ptr or cptr, null is an allowed value
@@ -1138,7 +1138,7 @@ struct test_arg_func<gsi::VectorType>
 
       size_t n = PyTuple_Size (arg);
       for (size_t i = 0; i < n && *ret; ++i) {
-        if (! test_arg (ainner, PyTuple_GetItem (arg, i), loose)) {
+        if (! test_arg (ainner, PyTuple_GetItem (arg, i), loose, true /*issue-1651*/)) {
           *ret = false;
         }
       }
@@ -1147,7 +1147,7 @@ struct test_arg_func<gsi::VectorType>
 
       size_t n = PyList_Size (arg);
       for (size_t i = 0; i < n && *ret; ++i) {
-        if (! test_arg (ainner, PyList_GetItem (arg, i), loose)) {
+        if (! test_arg (ainner, PyList_GetItem (arg, i), loose, true /*issue-1651*/)) {
           *ret = false;
         }
       }
@@ -1159,7 +1159,7 @@ struct test_arg_func<gsi::VectorType>
 template <>
 struct test_arg_func<gsi::MapType>
 {
-  void operator () (bool *ret, PyObject *arg, const gsi::ArgType &atype, bool loose)
+  void operator () (bool *ret, PyObject *arg, const gsi::ArgType &atype, bool loose, bool /*object_substitution*/)
   {
     if ((atype.is_cptr () || atype.is_ptr ()) && arg == Py_None) {
       //  for ptr or cptr, null is an allowed value
@@ -1184,11 +1184,11 @@ struct test_arg_func<gsi::MapType>
     PyObject *key, *value;
     Py_ssize_t pos = 0;
     while (PyDict_Next(arg, &pos, &key, &value)) {
-      if (! test_arg (ainner_k, key, loose)) {
+      if (! test_arg (ainner_k, key, loose, true /*issue-1651*/)) {
         *ret = false;
         break;
       }
-      if (! test_arg (ainner, value, loose)) {
+      if (! test_arg (ainner, value, loose, true /*issue-1651*/)) {
         *ret = false;
         break;
       }
@@ -1199,7 +1199,7 @@ struct test_arg_func<gsi::MapType>
 template <>
 struct test_arg_func<gsi::ObjectType>
 {
-  void operator() (bool *ret, PyObject *arg, const gsi::ArgType &atype, bool loose)
+  void operator() (bool *ret, PyObject *arg, const gsi::ArgType &atype, bool loose, bool object_substitution)
   {
     const gsi::ClassBase *acls = atype.cls ();
 
@@ -1209,7 +1209,7 @@ struct test_arg_func<gsi::ObjectType>
       return;
     }
 
-    if (loose && (PyTuple_Check (arg) || PyList_Check (arg))) {
+    if (object_substitution && (PyTuple_Check (arg) || PyList_Check (arg))) {
 
       //  we may implicitly convert a tuple into a constructor call of a target object -
       //  for now we only check whether the number of arguments is compatible with the list given.
@@ -1247,10 +1247,10 @@ struct test_arg_func<gsi::ObjectType>
 };
 
 bool
-test_arg (const gsi::ArgType &atype, PyObject *arg, bool loose)
+test_arg (const gsi::ArgType &atype, PyObject *arg, bool loose, bool object_substitution)
 {
   bool ret = false;
-  gsi::do_on_type<test_arg_func> () (atype.type (), &ret, arg, atype, loose);
+  gsi::do_on_type<test_arg_func> () (atype.type (), &ret, arg, atype, loose, object_substitution);
   return ret;
 }
 

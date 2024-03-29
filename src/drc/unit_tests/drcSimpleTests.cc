@@ -1672,3 +1672,33 @@ TEST(92_issue1594_dual_top)
   CHECKPOINT ();
   compare_netlists (_this, output, au);
 }
+
+TEST(100_edge_interaction_with_count)
+{
+  run_test (_this, "100", false);
+}
+
+TEST(100d_edge_interaction_with_count)
+{
+  run_test (_this, "100", true);
+}
+
+TEST(101_edge_booleans_with_dots)
+{
+  run_test (_this, "101", false);
+}
+
+TEST(101d_edge_booleans_with_dots)
+{
+  run_test (_this, "101", true);
+}
+
+TEST(102_edge_modes)
+{
+  run_test (_this, "102", false);
+}
+
+TEST(102d_edge_modes)
+{
+  run_test (_this, "102", true);
+}

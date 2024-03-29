@@ -59,6 +59,12 @@
   <file alias="drc_extended2.png">doc/images/drc_extended2.png</file>
   <file alias="drc_extended3.png">doc/images/drc_extended3.png</file>
   <file alias="drc_extended4.png">doc/images/drc_extended4.png</file>
+  <file alias="drc_edge_modes1.png">doc/images/drc_edge_modes1.png</file>
+  <file alias="drc_edge_modes2.png">doc/images/drc_edge_modes2.png</file>
+  <file alias="drc_edge_modes3.png">doc/images/drc_edge_modes3.png</file>
+  <file alias="drc_edge_modes4.png">doc/images/drc_edge_modes4.png</file>
+  <file alias="drc_edge_modes5.png">doc/images/drc_edge_modes5.png</file>
+  <file alias="drc_edge_modes6.png">doc/images/drc_edge_modes6.png</file>
   <file alias="drc_extents1.png">doc/images/drc_extents1.png</file>
   <file alias="drc_extents2.png">doc/images/drc_extents2.png</file>
   <file alias="drc_inside.png">doc/images/drc_inside.png</file>

@@ -55,7 +55,8 @@ SOURCES = \
     tlEquivalenceClusters.cc \
     tlUniqueName.cc \
     tlRecipe.cc \
-    tlEnv.cc
+    tlEnv.cc \
+    tlOptional.cc
 
 HEADERS = \
     tlAlgorithm.h \
@@ -121,7 +122,8 @@ HEADERS = \
     tlUniqueName.h \
     tlRecipe.h \
     tlSelect.h \
-    tlEnv.h 
+    tlEnv.h \
+    tlOptional.h
 
 equals(HAVE_GIT2, "1") {
 

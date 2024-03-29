@@ -82,7 +82,7 @@ public:
   virtual RegionDelegate *scaled_and_snapped_in_place (db::Coord, db::Coord, db::Coord, db::Coord, db::Coord, db::Coord) { return this; }
   virtual RegionDelegate *scaled_and_snapped (db::Coord, db::Coord, db::Coord, db::Coord, db::Coord, db::Coord) { return new EmptyRegion (); }
 
-  virtual EdgesDelegate *edges (const EdgeFilterBase *) const;
+  virtual EdgesDelegate *edges (const EdgeFilterBase *, const PolygonToEdgeProcessorBase *) const;
   virtual RegionDelegate *filter_in_place (const PolygonFilterBase &) { return this; }
   virtual RegionDelegate *filtered (const PolygonFilterBase &) const { return new EmptyRegion (); }
   virtual RegionDelegate *process_in_place (const PolygonProcessorBase &) { return this; }

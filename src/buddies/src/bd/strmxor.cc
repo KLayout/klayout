@@ -680,13 +680,17 @@ bool run_tiled_xor (const XORData &xor_data)
       if (ll->second.first < 0) {
         proc.input (in_a, db::RecursiveShapeIterator ());
       } else {
-        proc.input (in_a, db::RecursiveShapeIterator (*xor_data.layout_a, xor_data.layout_a->cell (xor_data.cell_a), ll->second.first));
+        db::RecursiveShapeIterator si (*xor_data.layout_a, xor_data.layout_a->cell (xor_data.cell_a), ll->second.first);
+        si.set_for_merged_input (true);
+        proc.input (in_a, si);
       }
 
       if (ll->second.second < 0) {
         proc.input (in_b, db::RecursiveShapeIterator ());
       } else {
-        proc.input (in_b, db::RecursiveShapeIterator (*xor_data.layout_b, xor_data.layout_b->cell (xor_data.cell_b), ll->second.second));
+        db::RecursiveShapeIterator si (*xor_data.layout_b, xor_data.layout_b->cell (xor_data.cell_b), ll->second.second);
+        si.set_for_merged_input (true);
+        proc.input (in_b, si);
       }
 
       std::string expr = "var x=" + in_a + "^" + in_b + "; ";
@@ -805,10 +809,12 @@ bool run_deep_xor (const XORData &xor_data)
 
       if (ll->second.first >= 0) {
         ri_a = db::RecursiveShapeIterator (*xor_data.layout_a, xor_data.layout_a->cell (xor_data.cell_a), ll->second.first);
+        ri_a.set_for_merged_input (true);
       }
 
       if (ll->second.second >= 0) {
         ri_b = db::RecursiveShapeIterator (*xor_data.layout_b, xor_data.layout_b->cell (xor_data.cell_b), ll->second.second);
+        ri_b.set_for_merged_input (true);
       }
 
       db::Region in_a (ri_a, dss, db::ICplxTrans (xor_data.layout_a->dbu () / dbu));

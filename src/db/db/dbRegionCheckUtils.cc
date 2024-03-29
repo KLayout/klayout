@@ -133,7 +133,7 @@ Edge2EdgeCheckBase::finish (const Edge *o, size_t p)
 
       std::set<db::Edge> partial_edges;
 
-      db::EdgeBooleanCluster<std::set<db::Edge> > ec (&partial_edges, db::EdgeNot);
+      db::EdgeBooleanCluster<std::set<db::Edge> > ec (&partial_edges, 0, db::EdgeNot);
       ec.add (o, 0);
 
       for (std::multimap<std::pair<db::Edge, size_t>, size_t>::const_iterator i = i0; i != m_e2ep.end () && i->first == k; ++i) {

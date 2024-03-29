@@ -84,7 +84,7 @@ public:
 
   virtual RegionDelegate *scaled_and_snapped (db::Coord gx, db::Coord mx, db::Coord dx, db::Coord gy, db::Coord my, db::Coord dy);
 
-  virtual EdgesDelegate *edges (const EdgeFilterBase *) const;
+  virtual EdgesDelegate *edges (const EdgeFilterBase *filter, const db::PolygonToEdgeProcessorBase *proc) const;
 
   virtual RegionDelegate *process_in_place (const PolygonProcessorBase &filter)
   {
@@ -137,32 +137,32 @@ public:
 
   virtual RegionDelegate *selected_outside (const Region &other) const
   {
-    return selected_interacting_generic (other, 1, false, Positive, size_t (0), std::numeric_limits<size_t>::max ()).first;
+    return selected_interacting_generic (other, 1, false, Positive, size_t (1), std::numeric_limits<size_t>::max ()).first;
   }
 
   virtual RegionDelegate *selected_not_outside (const Region &other) const
   {
-    return selected_interacting_generic (other, 1, false, Negative, size_t (0), std::numeric_limits<size_t>::max ()).first;
+    return selected_interacting_generic (other, 1, false, Negative, size_t (1), std::numeric_limits<size_t>::max ()).first;
   }
 
   virtual std::pair<RegionDelegate *, RegionDelegate *> selected_outside_pair (const Region &other) const
   {
-    return selected_interacting_generic (other, 1, false, PositiveAndNegative, size_t (0), std::numeric_limits<size_t>::max ());
+    return selected_interacting_generic (other, 1, false, PositiveAndNegative, size_t (1), std::numeric_limits<size_t>::max ());
   }
 
   virtual RegionDelegate *selected_inside (const Region &other) const
   {
-    return selected_interacting_generic (other, -1, true, Positive, size_t (0), std::numeric_limits<size_t>::max ()).first;
+    return selected_interacting_generic (other, -1, true, Positive, size_t (1), std::numeric_limits<size_t>::max ()).first;
   }
 
   virtual RegionDelegate *selected_not_inside (const Region &other) const
   {
-    return selected_interacting_generic (other, -1, true, Negative, size_t (0), std::numeric_limits<size_t>::max ()).first;
+    return selected_interacting_generic (other, -1, true, Negative, size_t (1), std::numeric_limits<size_t>::max ()).first;
   }
 
   virtual std::pair<RegionDelegate *, RegionDelegate *> selected_inside_pair (const Region &other) const
   {
-    return selected_interacting_generic (other, -1, true, PositiveAndNegative, size_t (0), std::numeric_limits<size_t>::max ());
+    return selected_interacting_generic (other, -1, true, PositiveAndNegative, size_t (1), std::numeric_limits<size_t>::max ());
   }
 
   virtual RegionDelegate *selected_enclosing (const Region &other, size_t min_count, size_t max_count) const

@@ -189,17 +189,22 @@ EdgeSegmentSelector::process (const db::Edge &edge, std::vector<db::Edge> &res) 
 {
   double l = std::max (edge.double_length () * m_fraction, double (m_length));
 
+  db::DVector ds;
+  if (! edge.is_degenerate ()) {
+    ds = db::DVector (edge.d ()) * (l / edge.double_length ());
+  }
+
   if (m_mode < 0) {
 
-    res.push_back (db::Edge (edge.p1 (), db::Point (db::DPoint (edge.p1 ()) + db::DVector (edge.d ()) * (l / edge.double_length ()))));
+    res.push_back (db::Edge (edge.p1 (), db::Point (db::DPoint (edge.p1 ()) + ds)));
 
   } else if (m_mode > 0) {
 
-    res.push_back (db::Edge (db::Point (db::DPoint (edge.p2 ()) - db::DVector (edge.d ()) * (l / edge.double_length ())), edge.p2 ()));
+    res.push_back (db::Edge (db::Point (db::DPoint (edge.p2 ()) - ds), edge.p2 ()));
 
   } else {
 
-    db::DVector dl = db::DVector (edge.d ()) * (0.5 * l / edge.double_length ());
+    db::DVector dl = ds * 0.5;
     db::DPoint center = db::DPoint (edge.p1 ()) + db::DVector (edge.p2 () - edge.p1 ()) * 0.5;
 
     res.push_back (db::Edge (db::Point (center - dl), db::Point (center + dl)));
@@ -403,16 +408,24 @@ struct DetectTagEdgeSink
 static bool
 edge_is_inside_or_outside (bool outside, const db::Edge &a, const db::Polygon &b)
 {
-  db::EdgeProcessor ep;
-  ep.insert (b, 0);
+  if (a.is_degenerate ()) {
 
-  ep.insert (a, 1);
+    return ((db::inside_poly (b.begin_edge (), a.p1 ()) <= 0) == outside);
 
-  DetectTagEdgeSink es (outside ? 1 : 2);   //  2 is the "outside" tag in "Both" mode -> this makes inside fail
-  db::EdgePolygonOp op (db::EdgePolygonOp::Both, true /*include borders*/);
-  ep.process (es, op);
+  } else {
 
-  return es.result;
+    db::EdgeProcessor ep;
+    ep.insert (b, 0);
+
+    ep.insert (a, 1);
+
+    DetectTagEdgeSink es (outside ? 1 : 2);   //  2 is the "outside" tag in "Both" mode -> this makes inside fail
+    db::EdgePolygonOp op (db::EdgePolygonOp::Both, !outside /*include borders in inside*/);
+    ep.process (es, op);
+
+    return es.result;
+
+  }
 }
 
 bool edge_is_inside (const db::Edge &a, const db::Polygon &b)

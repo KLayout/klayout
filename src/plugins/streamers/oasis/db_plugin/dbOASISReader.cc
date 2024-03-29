@@ -1080,6 +1080,12 @@ OASISReader::do_read (db::Layout &layout)
       LNameJoinOp2 op2;
       layer_names ().add (l1, l2 + 1, dt_map, op2);
 
+      //  for singular layers, force a layer entry:
+      //  this way we can have empty, but existing layers.
+      if (l1 == l2 && dt1 == dt2) {
+        open_dl (layout, db::LDPair (l1, dt1));
+      }
+
       reset_modal_variables ();
 
       //  ignore properties attached to this name item

@@ -52,7 +52,8 @@ public:
   typedef polygon_layer_wp_type::iterator polygon_iterator_wp_type;
 
   FlatRegion ();
-  FlatRegion (const db::Shapes &polygons, bool is_merged);
+  FlatRegion (const db::Shapes &polygons, bool is_merged = false);
+  FlatRegion (const db::Shapes &polygons, const db::ICplxTrans &trans, bool merged_semantics, bool is_merged = false);
   FlatRegion (bool is_merged);
 
   FlatRegion (const FlatRegion &other);

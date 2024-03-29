@@ -49,6 +49,17 @@ TEST(2)
   EXPECT_EQ (b & db::Box (110, 220, 120, 250), empty);
   EXPECT_EQ (b & db::Box (50, 100, 120, 250), db::Box (50, 100, 100, 200));
   EXPECT_EQ (b & db::Box (50, 100, 60, 120), db::Box (50, 100, 60, 120));
+  EXPECT_EQ (b - b, db::Box ());
+  EXPECT_EQ (b - db::Box (), b);
+  EXPECT_EQ (db::Box () - b, db::Box ());
+  EXPECT_EQ (db::Box () - db::Box (), db::Box ());
+  EXPECT_EQ (b - db::Box (0, 0, 50, 50), b);
+  EXPECT_EQ (b - db::Box (0, 0, 50, 200), db::Box (50, 0, 100, 200));
+  EXPECT_EQ (b - db::Box (50, 0, 100, 200), db::Box (0, 0, 50, 200));
+  EXPECT_EQ (b - db::Box (0, 0, 100, 100), db::Box (0, 100, 100, 200));
+  EXPECT_EQ (b - db::Box (0, 100, 100, 200), db::Box (0, 0, 100, 100));
+  EXPECT_EQ (db::Box::world () - b, db::Box::world ());
+  EXPECT_EQ (b - db::Box::world (), db::Box ());
 
   empty.move (db::Vector (10, 20));
   EXPECT_EQ (empty == db::Box (), true);

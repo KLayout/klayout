@@ -23,11 +23,13 @@
 
 #include "rdb.h"
 #include "rdbReader.h"
+#include "rdbUtils.h"
 #include "tlString.h"
 #include "tlAssert.h"
 #include "tlStream.h"
 #include "tlLog.h"
 #include "tlBase64.h"
+#include "tlProgress.h"
 #include "dbPolygon.h"
 #include "dbBox.h"
 #include "dbEdge.h"
@@ -35,6 +37,10 @@
 #include "dbPath.h"
 #include "dbText.h"
 #include "dbShape.h"
+#include "dbLayout.h"
+#include "dbLayoutUtils.h"
+#include "dbReader.h"
+#include "dbRecursiveShapeIterator.h"
 
 #if defined(HAVE_QT)
 #  include <QByteArray>
@@ -1488,7 +1494,18 @@ Database::items_by_cell_and_category (id_type cell_id, id_type category_id) cons
   }
 }
 
-std::pair<Database::const_item_ref_iterator, Database::const_item_ref_iterator> 
+std::pair<Database::item_ref_iterator, Database::item_ref_iterator>
+Database::items_by_cell_and_category (id_type cell_id, id_type category_id)
+{
+  std::map <std::pair <id_type, id_type>, std::list<ItemRef> >::iterator i = m_items_by_cell_and_category_id.find (std::make_pair (cell_id, category_id));
+  if (i != m_items_by_cell_and_category_id.end ()) {
+    return std::make_pair (i->second.begin (), i->second.end ());
+  } else {
+    return std::make_pair (empty_list.begin (), empty_list.end ());
+  }
+}
+
+std::pair<Database::const_item_ref_iterator, Database::const_item_ref_iterator>
 Database::items_by_cell (id_type cell_id) const
 {
   std::map <id_type, std::list<ItemRef> >::const_iterator i = m_items_by_cell_id.find (cell_id);
@@ -1499,7 +1516,18 @@ Database::items_by_cell (id_type cell_id) const
   }
 }
 
-std::pair<Database::const_item_ref_iterator, Database::const_item_ref_iterator> 
+std::pair<Database::item_ref_iterator, Database::item_ref_iterator>
+Database::items_by_cell (id_type cell_id)
+{
+  std::map <id_type, std::list<ItemRef> >::iterator i = m_items_by_cell_id.find (cell_id);
+  if (i != m_items_by_cell_id.end ()) {
+    return std::make_pair (i->second.begin (), i->second.end ());
+  } else {
+    return std::make_pair (empty_list.begin (), empty_list.end ());
+  }
+}
+
+std::pair<Database::const_item_ref_iterator, Database::const_item_ref_iterator>
 Database::items_by_category (id_type category_id) const
 {
   std::map <id_type, std::list<ItemRef> >::const_iterator i = m_items_by_category_id.find (category_id);
@@ -1510,7 +1538,18 @@ Database::items_by_category (id_type category_id) const
   }
 }
 
-size_t 
+std::pair<Database::item_ref_iterator, Database::item_ref_iterator>
+Database::items_by_category (id_type category_id)
+{
+  std::map <id_type, std::list<ItemRef> >::iterator i = m_items_by_category_id.find (category_id);
+  if (i != m_items_by_category_id.end ()) {
+    return std::make_pair (i->second.begin (), i->second.end ());
+  } else {
+    return std::make_pair (empty_list.begin (), empty_list.end ());
+  }
+}
+
+size_t
 Database::num_items (id_type cell_id, id_type category_id) const
 {
   std::map <std::pair <id_type, id_type>, size_t>::const_iterator n = m_num_items_by_cell_and_category.find (std::make_pair (cell_id, category_id));
@@ -1566,16 +1605,49 @@ Database::clear ()
   mp_categories->set_database (this);
 }
 
+static void
+read_db_from_layout (rdb::Database *db, tl::InputStream &is)
+{
+  //  try reading a layout file
+  db::Layout layout;
+  db::Reader reader (is);
+
+  reader.read (layout);
+
+  std::vector<std::pair<unsigned int, std::string> > layers;
+  for (auto l = layout.begin_layers (); l != layout.end_layers (); ++l) {
+    layers.push_back (std::make_pair ((*l).first, std::string ()));
+  }
+
+  if (layout.begin_top_down () != layout.end_top_down ()) {
+    db->scan_layout (layout, *layout.begin_top_down (), layers, false /*hierarchical*/);
+  }
+}
+
 void
 Database::load (const std::string &fn)
 {
   tl::log << "Loading RDB from " << fn;
 
-  tl::InputStream stream (fn);
-  rdb::Reader reader (stream);
-
   clear ();
-  reader.read (*this);
+
+  tl::InputStream stream (fn);
+
+  bool ok = false;
+  try {
+    //  try reading a stream file
+    read_db_from_layout (this, stream);
+    ok = true;
+  } catch (tl::Exception &) {
+    stream.reset ();
+  }
+
+  if (! ok) {
+    //  try reading a DB file
+    clear ();
+    rdb::Reader reader (stream);
+    reader.read (*this);
+  }
 
   set_filename (stream.absolute_path ());
   set_name (stream.filename ());
@@ -1586,6 +1658,129 @@ Database::load (const std::string &fn)
     tl::info << "Loaded RDB from " << fn;
   }
 }
+
+void
+Database::scan_layout (const db::Layout &layout, db::cell_index_type cell_index, const std::vector<std::pair<unsigned int, std::string> > &layers_and_descriptions, bool flat)
+{
+  tl::AbsoluteProgress progress (tl::to_string (tr ("Shapes To Markers")), 10000);
+  progress.set_format (tl::to_string (tr ("%.0f0000 markers")));
+  progress.set_unit (10000);
+
+  set_name ("Shapes");
+  set_top_cell_name (layout.cell_name (cell_index));
+  rdb::Cell *rdb_top_cell = create_cell (top_cell_name ());
+
+  std::string desc;
+
+  if (layers_and_descriptions.size () == 1) {
+
+    if (flat) {
+      desc = tl::to_string (tr ("Flat shapes of layer "));
+    } else {
+      desc = tl::to_string (tr ("Hierarchical shapes of layer "));
+    }
+
+    desc += layout.get_properties (layers_and_descriptions.front ().first).to_string ();
+
+  } else if (layers_and_descriptions.size () < 4 && layers_and_descriptions.size () > 0) {
+
+    if (flat) {
+      desc = tl::to_string (tr ("Flat shapes of layers "));
+    } else {
+      desc = tl::to_string (tr ("Hierarchical shapes of layers "));
+    }
+
+    for (auto l = layers_and_descriptions.begin (); l != layers_and_descriptions.end (); ++l) {
+      if (l != layers_and_descriptions.begin ()) {
+        desc += ",";
+      }
+      desc += layout.get_properties (l->first).to_string ();
+    }
+
+  } else {
+
+    if (flat) {
+      desc = tl::sprintf (tl::to_string (tr ("Flat shapes of %d layers")), int (layers_and_descriptions.size ()));
+    } else {
+      desc = tl::sprintf (tl::to_string (tr ("Hierarchical shapes of %d layers")), int (layers_and_descriptions.size ()));
+    }
+
+  }
+
+  desc += " ";
+  desc += tl::to_string (tr ("from cell "));
+  desc += layout.cell_name (cell_index);
+  set_description (desc);
+
+  if (flat) {
+
+    for (auto l = layers_and_descriptions.begin (); l != layers_and_descriptions.end (); ++l) {
+
+      rdb::Category *cat = create_category (l->second.empty () ? layout.get_properties (l->first).to_string () : l->second);
+
+      db::RecursiveShapeIterator shape (layout, layout.cell (cell_index), l->first);
+      while (! shape.at_end ()) {
+
+        rdb::create_item_from_shape (this, rdb_top_cell->id (), cat->id (), db::CplxTrans (layout.dbu ()) * shape.trans (), *shape);
+
+        ++progress;
+        ++shape;
+
+      }
+
+    }
+
+  } else {
+
+    std::set<db::cell_index_type> called_cells;
+    called_cells.insert (cell_index);
+    layout.cell (cell_index).collect_called_cells (called_cells);
+
+    for (auto l = layers_and_descriptions.begin (); l != layers_and_descriptions.end (); ++l) {
+
+      rdb::Category *cat = create_category (l->second.empty () ? layout.get_properties (l->first).to_string () : l->second);
+
+      for (db::Layout::const_iterator cid = layout.begin (); cid != layout.end (); ++cid) {
+
+        if (called_cells.find (cid->cell_index ()) == called_cells.end ()) {
+          continue;
+        }
+
+        const db::Cell &cell = *cid;
+        if (! cell.shapes (l->first).empty ()) {
+
+          std::string cn = layout.cell_name (cell.cell_index ());
+          const rdb::Cell *rdb_cell = cell_by_qname (cn);
+          if (! rdb_cell) {
+
+            rdb::Cell *rdb_cell_nc = create_cell (cn);
+            rdb_cell = rdb_cell_nc;
+
+            std::pair<bool, db::ICplxTrans> ctx = db::find_layout_context (layout, cell.cell_index (), cell_index);
+            if (ctx.first) {
+              db::DCplxTrans t = db::DCplxTrans (layout.dbu ()) * db::DCplxTrans (ctx.second) * db::DCplxTrans (1.0 / layout.dbu ());
+              rdb_cell_nc->references ().insert (Reference (t, rdb_top_cell->id ()));
+            }
+
+          }
+
+          for (db::ShapeIterator shape = cell.shapes (l->first).begin (db::ShapeIterator::All); ! shape.at_end (); ++shape) {
+
+            rdb::create_item_from_shape (this, rdb_cell->id (), cat->id (), db::CplxTrans (layout.dbu ()), *shape);
+
+            ++progress;
+
+          }
+
+        }
+
+      }
+
+    }
+
+  }
+}
+
 
 } // namespace rdb
 

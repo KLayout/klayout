@@ -834,6 +834,14 @@ public:
   }
 
   /**
+   *  @brief Writes the edge collection to a file
+   *
+   *  This method is provided for debugging purposes. A flat image of the
+   *  region is written to a layout file with a single top cell on layer 0/0.
+   */
+  void write (const std::string &fn) const;
+
+  /**
    *  @brief Intersections with other edges
    *  Intersections are similar to "AND", but will also report
    *  non-parallel intersections between crossing edges.
@@ -991,9 +999,9 @@ public:
    *  Merged semantics applies. If merged semantics is chosen, the connected edge parts will be 
    *  selected as a whole.
    */
-  Edges &select_interacting (const Region &other)
+  Edges &select_interacting (const Region &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ())
   {
-    set_delegate (mp_delegate->selected_interacting (other));
+    set_delegate (mp_delegate->selected_interacting (other, min_count, max_count));
     return *this;
   }
 
@@ -1002,9 +1010,9 @@ public:
    *
    *  This method is an out-of-place version of select_interacting.
    */
-  Edges selected_interacting (const Region &other) const
+  Edges selected_interacting (const Region &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const
   {
-    return Edges (mp_delegate->selected_interacting (other));
+    return Edges (mp_delegate->selected_interacting (other, min_count, max_count));
   }
 
   /**
@@ -1013,9 +1021,9 @@ public:
    *  Merged semantics applies. If merged semantics is chosen, the connected edge parts will be 
    *  selected as a whole.
    */
-  Edges &select_not_interacting (const Region &other)
+  Edges &select_not_interacting (const Region &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ())
   {
-    set_delegate (mp_delegate->selected_not_interacting (other));
+    set_delegate (mp_delegate->selected_not_interacting (other, min_count, max_count));
     return *this;
   }
 
@@ -1024,17 +1032,17 @@ public:
    *
    *  This method is an out-of-place version of select_not_interacting.
    */
-  Edges selected_not_interacting (const Region &other) const
+  Edges selected_not_interacting (const Region &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const
   {
-    return Edges (mp_delegate->selected_not_interacting (other));
+    return Edges (mp_delegate->selected_not_interacting (other, min_count, max_count));
   }
 
   /**
    *  @brief Returns all edges of this edge set which do not overlap or touch with polygons from the region together with the ones that do not
    */
-  std::pair<Edges, Edges> selected_interacting_differential (const Region &other) const
+  std::pair<Edges, Edges> selected_interacting_differential (const Region &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const
   {
-    std::pair<db::EdgesDelegate *, db::EdgesDelegate *> p = mp_delegate->selected_interacting_pair (other);
+    std::pair<db::EdgesDelegate *, db::EdgesDelegate *> p = mp_delegate->selected_interacting_pair (other, min_count, max_count);
     return std::pair<Edges, Edges> (Edges (p.first), Edges (p.second));
   }
 
@@ -1280,9 +1288,9 @@ public:
    *  Merged semantics applies. If merged semantics is chosen, the connected edge parts will be 
    *  selected as a whole.
    */
-  Edges &select_interacting (const Edges &other)
+  Edges &select_interacting (const Edges &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ())
   {
-    set_delegate (mp_delegate->selected_interacting (other));
+    set_delegate (mp_delegate->selected_interacting (other, min_count, max_count));
     return *this;
   }
 
@@ -1291,17 +1299,17 @@ public:
    *
    *  This method is an out-of-place version of select_interacting.
    */
-  Edges selected_interacting (const Edges &other) const
+  Edges selected_interacting (const Edges &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const
   {
-    return Edges (mp_delegate->selected_interacting (other));
+    return Edges (mp_delegate->selected_interacting (other, min_count, max_count));
   }
 
   /**
    *  @brief Returns all edges of this edge set which do not overlap or touch with edges from the other edge set together with the ones that do not
    */
-  std::pair<Edges, Edges> selected_interacting_differential (const Edges &other) const
+  std::pair<Edges, Edges> selected_interacting_differential (const Edges &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const
   {
-    std::pair<db::EdgesDelegate *, db::EdgesDelegate *> p = mp_delegate->selected_interacting_pair (other);
+    std::pair<db::EdgesDelegate *, db::EdgesDelegate *> p = mp_delegate->selected_interacting_pair (other, min_count, max_count);
     return std::pair<Edges, Edges> (Edges (p.first), Edges (p.second));
   }
 
@@ -1311,9 +1319,9 @@ public:
    *  Merged semantics applies. If merged semantics is chosen, the connected edge parts will be 
    *  selected as a whole.
    */
-  Edges &select_not_interacting (const Edges &other)
+  Edges &select_not_interacting (const Edges &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ())
   {
-    set_delegate (mp_delegate->selected_not_interacting (other));
+    set_delegate (mp_delegate->selected_not_interacting (other, min_count, max_count));
     return *this;
   }
 
@@ -1322,9 +1330,9 @@ public:
    *
    *  This method is an out-of-place version of select_not_interacting.
    */
-  Edges selected_not_interacting (const Edges &other) const
+  Edges selected_not_interacting (const Edges &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const
   {
-    return Edges (mp_delegate->selected_not_interacting (other));
+    return Edges (mp_delegate->selected_not_interacting (other, min_count, max_count));
   }
 
   /**

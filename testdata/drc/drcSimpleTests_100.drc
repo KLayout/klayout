@@ -1,0 +1,89 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+end
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+
+l1.output(1, 0)
+l2.output(2, 0)
+
+e1 = l1.edges
+e2 = l2.edges
+
+e1.output(10, 0)
+e2.output(11, 0)
+
+e1.interacting(l2).output(100, 0)
+e1.interacting(l2, 2).output(101, 0)
+e1.interacting(l2, 2, 2).output(102, 0)
+e1.interacting(l2, 3).output(103, 0)
+
+e1.split_interacting(l2)[0].output(110, 0)
+e1.split_interacting(l2, 2)[0].output(111, 0)
+e1.split_interacting(l2, 2, 2)[0].output(112, 0)
+e1.split_interacting(l2, 3)[0].output(113, 0)
+
+e1.interacting(e2).output(200, 0)
+e1.interacting(e2, 2).output(201, 0)
+e1.interacting(e2, 2, 2).output(202, 0)
+e1.interacting(e2, 3).output(203, 0)
+e1.interacting(e2, 3..4).output(204, 0)
+
+e1.split_interacting(e2)[0].output(210, 0)
+e1.split_interacting(e2, 2)[0].output(211, 0)
+e1.split_interacting(e2, 2, 2)[0].output(212, 0)
+e1.split_interacting(e2, 3)[0].output(213, 0)
+e1.split_interacting(e2, 3..4)[0].output(214, 0)
+
+e1.not_interacting(l2).output(300, 0)
+e1.not_interacting(l2, 2).output(301, 0)
+e1.not_interacting(l2, 2, 2).output(302, 0)
+e1.not_interacting(l2, 3).output(303, 0)
+
+e1.split_interacting(l2)[1].output(310, 0)
+e1.split_interacting(l2, 2)[1].output(311, 0)
+e1.split_interacting(l2, 2, 2)[1].output(312, 0)
+e1.split_interacting(l2, 3)[1].output(313, 0)
+
+e1.not_interacting(e2).output(400, 0)
+e1.not_interacting(e2, 2).output(401, 0)
+e1.not_interacting(e2, 2, 2).output(402, 0)
+e1.not_interacting(e2, 3).output(403, 0)
+e1.not_interacting(e2, 3..4).output(404, 0)
+
+e1.split_interacting(e2)[1].output(410, 0)
+e1.split_interacting(e2, 2)[1].output(411, 0)
+e1.split_interacting(e2, 2, 2)[1].output(412, 0)
+e1.split_interacting(e2, 3)[1].output(413, 0)
+e1.split_interacting(e2, 3..4)[1].output(414, 0)
+
+# convex detection (the initial problem)
+
+c90 = l2.corners(as_dots, 90)
+cm90 = l2.corners(as_dots, -90)
+c90.output(1000, 0)
+cm90.output(1001, 0)
+
+e2.interacting(c90, 2, 2).output(1100, 0)
+e2.interacting(cm90, 2, 2).output(1101, 0)
+e2.interacting(c90, 1, 1).output(1102, 0)
+e2.interacting(cm90, 1, 1).output(1103, 0)
+
+c90.interacting(e1).output(1200, 0)
+c90.not_interacting(e1).output(1201, 0)
+c90.interacting(e2).output(1202, 0)
+c90.not_interacting(e2).output(1203, 0)
+
+c90.interacting(l1).output(1300, 0)
+c90.not_interacting(l1).output(1301, 0)
+c90.interacting(l2).output(1302, 0)
+c90.not_interacting(l2).output(1303, 0)
+
+c90.split_interacting(l1)[0].output(1310, 0)
+c90.split_interacting(l1)[1].output(1311, 0)
+

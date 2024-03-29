@@ -88,6 +88,49 @@ private:
   rdb::Database::const_item_ref_iterator m_iter;
 };
 
+class ItemRefUnwrappingNonConstIterator
+{
+public:
+  typedef rdb::Database::const_item_ref_iterator::iterator_category iterator_category;
+  typedef rdb::Database::const_item_ref_iterator::difference_type difference_type;
+  typedef rdb::Item value_type;
+  typedef rdb::Item &reference;
+  typedef rdb::Item *pointer;
+
+  ItemRefUnwrappingNonConstIterator (rdb::Database::item_ref_iterator i)
+    : m_iter (i)
+  { }
+
+  bool operator== (const ItemRefUnwrappingNonConstIterator &d) const
+  {
+    return m_iter == d.m_iter;
+  }
+
+  bool operator!= (const ItemRefUnwrappingNonConstIterator &d) const
+  {
+    return m_iter != d.m_iter;
+  }
+
+  ItemRefUnwrappingNonConstIterator &operator++ ()
+  {
+    ++m_iter;
+    return *this;
+  }
+
+  rdb::Item &operator* () const
+  {
+    return (*m_iter).operator* ();
+  }
+
+  rdb::Item *operator-> () const
+  {
+    return (*m_iter).operator-> ();
+  }
+
+private:
+  rdb::Database::item_ref_iterator m_iter;
+};
+
 // ---------------------------------------------------------------
 //  rdb::Reference binding
 
@@ -105,7 +148,12 @@ Class<rdb::Reference> decl_RdbReference ("rdb", "RdbReference",
     "\n"
     "This method has been introduced in version 0.23."
   ) +
-  gsi::method ("trans", &rdb::Reference::trans, 
+  gsi::method ("database", (rdb::Database *(rdb::Reference::*)()) &rdb::Reference::database,
+    "@brief Gets the database object that category is associated with (non-const version)\n"
+    "\n"
+    "This method has been introduced in version 0.29."
+  ) +
+  gsi::method ("trans", &rdb::Reference::trans,
     "@brief Gets the transformation for this reference\n"
     "The transformation describes the transformation of the child cell into the parent cell. In that sense that is the "
     "usual transformation of a cell reference.\n"
@@ -141,6 +189,16 @@ static rdb::References::const_iterator end_references (const rdb::Cell *cell)
   return cell->references ().end ();
 }
 
+static rdb::References::iterator begin_references_nc (rdb::Cell *cell)
+{
+  return cell->references ().begin ();
+}
+
+static rdb::References::iterator end_references_nc (rdb::Cell *cell)
+{
+  return cell->references ().end ();
+}
+
 static void add_reference (rdb::Cell *cell, const rdb::Reference &ref)
 {
   cell->references ().insert (ref);
@@ -163,6 +221,18 @@ ItemRefUnwrappingIterator cell_items_end (const rdb::Cell *cell)
   return cell->database ()->items_by_cell (cell->id ()).second;
 }
 
+ItemRefUnwrappingNonConstIterator cell_items_begin_non_const (rdb::Cell *cell)
+{
+  tl_assert (cell->database ());
+  return cell->database ()->items_by_cell (cell->id ()).first;
+}
+
+ItemRefUnwrappingNonConstIterator cell_items_end_non_const (rdb::Cell *cell)
+{
+  tl_assert (cell->database ());
+  return cell->database ()->items_by_cell (cell->id ()).second;
+}
+
 Class<rdb::Cell> decl_RdbCell ("rdb", "RdbCell",
   gsi::method ("rdb_id", &rdb::Cell::id, 
     "@brief Gets the cell ID\n"
@@ -175,12 +245,22 @@ Class<rdb::Cell> decl_RdbCell ("rdb", "RdbCell",
     "\n"
     "This method has been introduced in version 0.23."
   ) +
+  gsi::method ("database", (rdb::Database *(rdb::Cell::*)()) &rdb::Cell::database,
+    "@brief Gets the database object that category is associated with (non-const version)\n"
+    "\n"
+    "This method has been introduced in version 0.29."
+  ) +
   gsi::iterator_ext ("each_item", &cell_items_begin, &cell_items_end,
     "@brief Iterates over all items inside the database which are associated with this cell\n"
     "\n"
     "This method has been introduced in version 0.23."
   ) +
-  gsi::method ("name", &rdb::Cell::name, 
+  gsi::iterator_ext ("each_item", &cell_items_begin_non_const, &cell_items_end_non_const,
+    "@brief Iterates over all items inside the database which are associated with this cell (non-const version)\n"
+    "\n"
+    "This method has been introduced in version 0.29."
+  ) +
+  gsi::method ("name", &rdb::Cell::name,
     "@brief Gets the cell name\n"
     "The cell name is an string that identifies the category in the database. "
     "Additionally, a cell may carry a variant identifier which is a string that uniquely identifies a cell "
@@ -215,6 +295,11 @@ Class<rdb::Cell> decl_RdbCell ("rdb", "RdbCell",
   ) +
   gsi::iterator_ext ("each_reference", &begin_references, &end_references,
     "@brief Iterates over all references\n"
+  ) +
+  gsi::iterator_ext ("each_reference", &begin_references_nc, &end_references_nc,
+    "@brief Iterates over all references (non-const version)\n"
+    "\n"
+    "This method has been introduced in version 0.23."
   ),
   "@brief A cell inside the report database\n"
   "This class represents a cell in the report database. There is not necessarily a 1:1 correspondence of RDB cells "
@@ -226,12 +311,22 @@ Class<rdb::Cell> decl_RdbCell ("rdb", "RdbCell",
 // ---------------------------------------------------------------
 //  rdb::Category binding
 
-static rdb::Categories::iterator begin_sub_categories (rdb::Category *cat)
+static rdb::Categories::const_iterator begin_sub_categories (const rdb::Category *cat)
 {
   return cat->sub_categories ().begin ();
 }
 
-static rdb::Categories::iterator end_sub_categories (rdb::Category *cat)
+static rdb::Categories::const_iterator end_sub_categories (const rdb::Category *cat)
+{
+  return cat->sub_categories ().end ();
+}
+
+static rdb::Categories::iterator begin_sub_categories_non_const (rdb::Category *cat)
+{
+  return cat->sub_categories ().begin ();
+}
+
+static rdb::Categories::iterator end_sub_categories_non_const (rdb::Category *cat)
 {
   return cat->sub_categories ().end ();
 }
@@ -243,6 +338,18 @@ ItemRefUnwrappingIterator category_items_begin (const rdb::Category *cat)
 }
 
 ItemRefUnwrappingIterator category_items_end (const rdb::Category *cat)
+{
+  tl_assert (cat->database ());
+  return cat->database ()->items_by_category (cat->id ()).second;
+}
+
+ItemRefUnwrappingNonConstIterator category_items_begin_non_const (rdb::Category *cat)
+{
+  tl_assert (cat->database ());
+  return cat->database ()->items_by_category (cat->id ()).first;
+}
+
+ItemRefUnwrappingNonConstIterator category_items_end_non_const (rdb::Category *cat)
 {
   tl_assert (cat->database ());
   return cat->database ()->items_by_category (cat->id ()).second;
@@ -298,6 +405,11 @@ Class<rdb::Category> decl_RdbCategory ("rdb", "RdbCategory",
     "@brief Iterates over all items inside the database which are associated with this category\n"
     "\n"
     "This method has been introduced in version 0.23."
+  ) +
+  gsi::iterator_ext ("each_item", &category_items_begin_non_const, &category_items_end_non_const,
+    "@brief Iterates over all items inside the database which are associated with this category (non-const version)\n"
+    "\n"
+    "This method has been introduced in version 0.29."
   ) +
   gsi::method_ext ("scan_shapes", &scan_shapes, gsi::arg ("iter"), gsi::arg ("flat", false), gsi::arg ("with_properties", true),
     "@brief Scans the polygon or edge shapes from the shape iterator into the category\n"
@@ -379,12 +491,23 @@ Class<rdb::Category> decl_RdbCategory ("rdb", "RdbCategory",
   ) +
   gsi::iterator_ext ("each_sub_category", &begin_sub_categories, &end_sub_categories,
     "@brief Iterates over all sub-categories\n"
+    "\n"
+    "The const version has been added in version 0.29."
   ) +
-  gsi::method ("parent", (rdb::Category *(rdb::Category::*) ()) &rdb::Category::parent, 
+  gsi::iterator_ext ("each_sub_category", &begin_sub_categories_non_const, &end_sub_categories_non_const,
+    "@brief Iterates over all sub-categories (non-const version)\n"
+  ) +
+  gsi::method ("parent", (const rdb::Category *(rdb::Category::*) () const) &rdb::Category::parent,
     "@brief Gets the parent category of this category\n"
     "@return The parent category or nil if this category is a top-level category\n"
+    "\n"
+    "The const version has been added in version 0.29."
   ) +
-  gsi::method ("num_items", &rdb::Category::num_items, 
+  gsi::method ("parent", (rdb::Category *(rdb::Category::*) ()) &rdb::Category::parent,
+    "@brief Gets the parent category of this category (non-const version)\n"
+    "@return The parent category or nil if this category is a top-level category\n"
+  ) +
+  gsi::method ("num_items", &rdb::Category::num_items,
     "@brief Gets the number of items in this category\n"
     "The number of items includes the items in sub-categories of this category.\n"
   ) +
@@ -923,12 +1046,32 @@ rdb::Items::const_iterator database_items_end (const rdb::Database *db)
   return db->items ().end ();
 }
 
+rdb::Items::iterator database_items_begin_nc (rdb::Database *db)
+{
+  return db->items_non_const ().begin ();
+}
+
+rdb::Items::iterator database_items_end_nc (rdb::Database *db)
+{
+  return db->items_non_const ().end ();
+}
+
 ItemRefUnwrappingIterator database_items_begin_cell (const rdb::Database *db, rdb::id_type cell_id)
 {
   return db->items_by_cell (cell_id).first;
 }
 
 ItemRefUnwrappingIterator database_items_end_cell (const rdb::Database *db, rdb::id_type cell_id)
+{
+  return db->items_by_cell (cell_id).second;
+}
+
+ItemRefUnwrappingNonConstIterator database_items_begin_cell_nc (rdb::Database *db, rdb::id_type cell_id)
+{
+  return db->items_by_cell (cell_id).first;
+}
+
+ItemRefUnwrappingNonConstIterator database_items_end_cell_nc (rdb::Database *db, rdb::id_type cell_id)
 {
   return db->items_by_cell (cell_id).second;
 }
@@ -943,12 +1086,32 @@ ItemRefUnwrappingIterator database_items_end_cat (const rdb::Database *db, rdb::
   return db->items_by_category (cat_id).second;
 }
 
+ItemRefUnwrappingNonConstIterator database_items_begin_cat_nc (rdb::Database *db, rdb::id_type cat_id)
+{
+  return db->items_by_category (cat_id).first;
+}
+
+ItemRefUnwrappingNonConstIterator database_items_end_cat_nc (rdb::Database *db, rdb::id_type cat_id)
+{
+  return db->items_by_category (cat_id).second;
+}
+
 ItemRefUnwrappingIterator database_items_begin_cc (const rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id)
 {
   return db->items_by_cell_and_category (cell_id, cat_id).first;
 }
 
 ItemRefUnwrappingIterator database_items_end_cc (const rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id)
+{
+  return db->items_by_cell_and_category (cell_id, cat_id).second;
+}
+
+ItemRefUnwrappingNonConstIterator database_items_begin_cc_nc (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id)
+{
+  return db->items_by_cell_and_category (cell_id, cat_id).first;
+}
+
+ItemRefUnwrappingNonConstIterator database_items_end_cc_nc (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id)
 {
   return db->items_by_cell_and_category (cell_id, cat_id).second;
 }
@@ -963,6 +1126,16 @@ rdb::Categories::const_iterator database_end_categories (const rdb::Database *db
   return db->categories ().end ();
 }
 
+rdb::Categories::iterator database_end_categories_nc (rdb::Database *db)
+{
+  return db->categories_non_const ().end ();
+}
+
+rdb::Categories::iterator database_begin_categories_nc (rdb::Database *db)
+{
+  return db->categories_non_const ().begin ();
+}
+
 rdb::Cells::const_iterator database_begin_cells (const rdb::Database *db)
 {
   return db->cells ().begin ();
@@ -971,6 +1144,16 @@ rdb::Cells::const_iterator database_begin_cells (const rdb::Database *db)
 rdb::Cells::const_iterator database_end_cells (const rdb::Database *db)
 {
   return db->cells ().end ();
+}
+
+rdb::Cells::iterator database_begin_cells_nc (rdb::Database *db)
+{
+  return db->cells_non_const ().begin ();
+}
+
+rdb::Cells::iterator database_end_cells_nc (rdb::Database *db)
+{
+  return db->cells_non_const ().end ();
 }
 
 const std::string &database_tag_name (const rdb::Database *db, rdb::id_type tag)
@@ -1121,6 +1304,11 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
   gsi::iterator_ext ("each_category", &database_begin_categories, &database_end_categories,
     "@brief Iterates over all top-level categories\n"
   ) +
+  gsi::iterator_ext ("each_category", &database_begin_categories_nc, &database_end_categories_nc,
+    "@brief Iterates over all top-level categories (non-const version)\n"
+    "\n"
+    "The non-const variant has been added in version 0.29."
+  ) +
   gsi::method ("create_category", (rdb::Category *(rdb::Database::*) (const std::string &)) &rdb::Database::create_category, gsi::arg ("name"),
     "@brief Creates a new top level category\n"
     "@param name The name of the category\n"
@@ -1135,9 +1323,22 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
     "@param path The full path to the category starting from the top level (subcategories separated by dots)\n"
     "@return The (const) category object or nil if the name is not valid\n"
   ) +
+  gsi::method ("category_by_path", &rdb::Database::category_by_name_non_const, gsi::arg ("path"),
+    "@brief Gets a category by path (non-const version)\n"
+    "@param path The full path to the category starting from the top level (subcategories separated by dots)\n"
+    "@return The (const) category object or nil if the name is not valid\n"
+    "\n"
+    "This non-const variant has been introduced in version 0.29."
+  ) +
   gsi::method ("category_by_id", &rdb::Database::category_by_id, gsi::arg ("id"),
     "@brief Gets a category by ID\n"
     "@return The (const) category object or nil if the ID is not valid\n"
+  ) +
+  gsi::method ("category_by_id", &rdb::Database::category_by_id_non_const, gsi::arg ("id"),
+    "@brief Gets a category by ID (non-const version)\n"
+    "@return The (const) category object or nil if the ID is not valid\n"
+    "\n"
+    "This non-const variant has been introduced in version 0.29."
   ) +
   gsi::method ("create_cell", (rdb::Cell *(rdb::Database::*) (const std::string &)) &rdb::Database::create_cell, gsi::arg ("name"),
     "@brief Creates a new cell\n"
@@ -1158,13 +1359,32 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
     "@param qname The qualified name of the cell (name plus variant name optionally)\n"
     "@return The cell object or nil if no such cell exists\n"
   ) +
+  gsi::method ("cell_by_qname", &rdb::Database::cell_by_qname_non_const, gsi::arg ("qname"),
+    "@brief Returns the cell for a given qualified name (non-const version)\n"
+    "@param qname The qualified name of the cell (name plus variant name optionally)\n"
+    "@return The cell object or nil if no such cell exists\n"
+    "\n"
+    "This non-const variant has been added version 0.29."
+  ) +
   gsi::method ("cell_by_id", &rdb::Database::cell_by_id, gsi::arg ("id"),
     "@brief Returns the cell for a given ID\n"
     "@param id The ID of the cell\n"
     "@return The cell object or nil if no cell with that ID exists\n"
   ) +
+  gsi::method ("cell_by_id", &rdb::Database::cell_by_id_non_const, gsi::arg ("id"),
+    "@brief Returns the cell for a given ID (non-const version)\n"
+    "@param id The ID of the cell\n"
+    "@return The cell object or nil if no cell with that ID exists\n"
+    "\n"
+    "This non-const variant has been added version 0.29."
+  ) +
   gsi::iterator_ext ("each_cell", &database_begin_cells, &database_end_cells,
     "@brief Iterates over all cells\n"
+  ) +
+  gsi::iterator_ext ("each_cell", &database_begin_cells_nc, &database_end_cells_nc,
+    "@brief Iterates over all cells (non-const version)\n"
+    "\n"
+    "This non-const variant has been added version 0.29."
   ) +
   gsi::method ("num_items", (size_t (rdb::Database::*) () const) &rdb::Database::num_items,
     "@brief Returns the number of items inside the database\n"
@@ -1351,18 +1571,42 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
   gsi::iterator_ext ("each_item", &database_items_begin, &database_items_end,
     "@brief Iterates over all items inside the database\n"
   ) +
+  gsi::iterator_ext ("each_item", &database_items_begin_nc, &database_items_end_nc,
+    "@brief Iterates over all items inside the database (non-const version)\n"
+    "\n"
+    "This non-const variant has been added in version 0.29."
+  ) +
   gsi::iterator_ext ("each_item_per_cell", &database_items_begin_cell, &database_items_end_cell, gsi::arg ("cell_id"),
     "@brief Iterates over all items inside the database which are associated with the given cell\n"
     "@param cell_id The ID of the cell for which all associated items should be retrieved\n"
+  ) +
+  gsi::iterator_ext ("each_item_per_cell", &database_items_begin_cell_nc, &database_items_end_cell_nc, gsi::arg ("cell_id"),
+    "@brief Iterates over all items inside the database which are associated with the given cell (non-const version)\n"
+    "@param cell_id The ID of the cell for which all associated items should be retrieved\n"
+    "\n"
+    "This non-const variant has been added in version 0.29."
   ) +
   gsi::iterator_ext ("each_item_per_category", &database_items_begin_cat, &database_items_end_cat, gsi::arg ("category_id"),
     "@brief Iterates over all items inside the database which are associated with the given category\n"
     "@param category_id The ID of the category for which all associated items should be retrieved\n"
   ) +
+  gsi::iterator_ext ("each_item_per_category", &database_items_begin_cat_nc, &database_items_end_cat_nc, gsi::arg ("category_id"),
+    "@brief Iterates over all items inside the database which are associated with the given category (non-const version)\n"
+    "@param category_id The ID of the category for which all associated items should be retrieved\n"
+    "\n"
+    "This non-const variant has been added in version 0.29."
+  ) +
   gsi::iterator_ext ("each_item_per_cell_and_category", &database_items_begin_cc, &database_items_end_cc, gsi::arg ("cell_id"), gsi::arg ("category_id"),
     "@brief Iterates over all items inside the database which are associated with the given cell and category\n"
     "@param cell_id The ID of the cell for which all associated items should be retrieved\n"
     "@param category_id The ID of the category for which all associated items should be retrieved\n"
+  ) +
+  gsi::iterator_ext ("each_item_per_cell_and_category", &database_items_begin_cc_nc, &database_items_end_cc_nc, gsi::arg ("cell_id"), gsi::arg ("category_id"),
+    "@brief Iterates over all items inside the database which are associated with the given cell and category\n"
+    "@param cell_id The ID of the cell for which all associated items should be retrieved\n"
+    "@param category_id The ID of the category for which all associated items should be retrieved\n"
+    "\n"
+    "This non-const variant has been added in version 0.29."
   ) +
   gsi::method ("set_item_visited", &rdb::Database::set_item_visited, gsi::arg ("item"), gsi::arg ("visited"),
     "@brief Modifies the visited state of an item\n"

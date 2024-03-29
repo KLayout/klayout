@@ -24,8 +24,10 @@
 #include "tlHttpStream.h"
 #include "tlUnitTest.h"
 #include "tlTimer.h"
+#include "tlStream.h"
 
 static std::string test_url1 ("http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/text");
+static std::string test_url1_gz ("http://www.klayout.org/svn-public/klayout-resources/trunk/testdata2/text.gz");
 static std::string test_url2 ("http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/dir1");
 
 TEST(1)
@@ -122,6 +124,32 @@ TEST(3)
   char b[100];
   size_t n = stream.read (b, sizeof (b));
   std::string res (b, n);
+  EXPECT_EQ (res, "hello, world.\n");
+}
+
+//  tl::Stream embedding
+TEST(4)
+{
+  if (! tl::InputHttpStream::is_available ()) {
+    throw tl::CancelException ();
+  }
+
+  tl::InputStream stream (test_url1);
+
+  std::string res = stream.read_all ();
+  EXPECT_EQ (res, "hello, world.\n");
+}
+
+//  tl::Stream embedding with automatic unzip
+TEST(5)
+{
+  if (! tl::InputHttpStream::is_available ()) {
+    throw tl::CancelException ();
+  }
+
+  tl::InputStream stream (test_url1_gz);
+
+  std::string res = stream.read_all ();
   EXPECT_EQ (res, "hello, world.\n");
 }
 

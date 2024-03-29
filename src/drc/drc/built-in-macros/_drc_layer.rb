@@ -1232,7 +1232,7 @@ CODE
     # This method produces markers on the corners of the polygons. An angle criterion can be given which
     # selects corners based on the angle of the connecting edges. Positive angles indicate a left turn
     # while negative angles indicate a right turn. Since polygons are oriented clockwise, positive angles
-    # indicate concave corners while negative ones indicate convex corners.
+    # indicate concave (inner) corners while negative ones indicate convex (outer) corners
     # 
     # The markers generated can be point-like edges or small 2x2 DBU boxes. The latter is the default.
     # 
@@ -3387,6 +3387,8 @@ CODE
     # %DRC%
     # @name edges
     # @brief Decomposes the layer into single edges
+    # @synopsis layer.edges
+    # @synopsis layer.edges(mode)
     #
     # Edge pair collections are decomposed into the individual edges that make up
     # the edge pairs. Polygon layers are decomposed into the edges making up the 
@@ -3395,13 +3397,61 @@ CODE
     #
     # Merged semantics applies, i.e. the result reflects merged polygons rather than
     # individual ones unless raw mode is chosen.
+    #
+    # The "mode" argument allows selecting specific edges from polygons.
+    # Allowed values are: "convex", "concave", "step", "step_in" and "step_out".
+    # "step" generates edges only if they provide a step between two other
+    # edges. "step_in" creates edges that make a step towards the inside of
+    # the polygon and "step_out" creates edges that make a step towards the
+    # outside:
+    #
+    # @code
+    # out = in.edges(convex)
+    # @/code
+    #
+    # In addition, "not_.." variants are available which selects edges
+    # not qualifying for the specific mode:
+    #
+    # @code
+    # out = in.edges(not_convex)
+    # @/code
+    #
+    # The mode argument is only available for polygon layers.
+    #
+    # The following images show the effect of the mode argument:
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_edge_modes1.png) @/td
+    #     @td @img(/images/drc_edge_modes2.png) @/td
+    #   @/tr
+    #   @tr 
+    #     @td @img(/images/drc_edge_modes3.png) @/td
+    #     @td @img(/images/drc_edge_modes4.png) @/td
+    #   @/tr
+    #   @tr 
+    #     @td @img(/images/drc_edge_modes5.png) @/td
+    #     @td @img(/images/drc_edge_modes6.png) @/td
+    #   @/tr
+    # @/table
     
     %w(edges).each do |f| 
       eval <<"CODE"
-      def #{f}
+      def #{f}(mode = nil)
+        if mode 
+          if ! mode.is_a?(DRC::DRCEdgeMode)
+            raise "The mode argument needs to be a mode type (convex, concave, step, step_in or step_out)"
+          end
+          if ! self.data.is_a?(RBA::Region)
+            raise "The mode argument is only available for polygon layers"
+          end
+          mode = mode.value
+        else
+          mode = RBA::EdgeMode::All
+        end
         @engine._context("#{f}") do
           if self.data.is_a?(RBA::Region)
-            DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Edges, :#{f}))
+            DRCLayer::new(@engine, @engine._tcmd(self.data, 0, RBA::Edges, :#{f}, mode))
           elsif self.data.is_a?(RBA::EdgePairs)
             DRCLayer::new(@engine, @engine._cmd(self.data, :#{f}))
           else

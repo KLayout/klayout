@@ -101,6 +101,7 @@ template class DB_PUBLIC local_operation<db::Polygon, db::Polygon, db::EdgePair>
 template class DB_PUBLIC local_operation<db::Polygon, db::TextRef, db::TextRef>;
 template class DB_PUBLIC local_operation<db::Edge, db::Edge, db::Edge>;
 template class DB_PUBLIC local_operation<db::Edge, db::PolygonRef, db::Edge>;
+template class DB_PUBLIC local_operation<db::Edge, db::Polygon, db::Edge>;
 template class DB_PUBLIC local_operation<db::Edge, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC local_operation<db::Edge, db::Edge, db::EdgePair>;
 template class DB_PUBLIC local_operation<db::TextRef, db::PolygonRef, db::PolygonRef>;

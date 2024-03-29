@@ -399,6 +399,16 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
     m_icon_widgets.push_back (icon_label);
     m_all_widgets.back ().push_back (icon_label);
 
+    std::string range;
+
+    if (! p->min_value ().is_nil () || ! p->max_value ().is_nil ()) {
+      range = tl::sprintf (
+                " [%s, %s]" ,
+                p->min_value ().is_nil () ? "-\u221e" /*infinity*/ : p->min_value ().to_string (),
+                p->max_value ().is_nil () ? "\u221e"  /*infinity*/ : p->max_value ().to_string ()
+              );
+    }
+
     if (p->get_type () != db::PCellParameterDeclaration::t_callback) {
 
       std::string leader;
@@ -406,7 +416,8 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
         leader = tl::sprintf ("[%s] ", p->get_name ());
       }
 
-      QLabel *l = new QLabel (tl::to_qstring (leader + description), inner_frame);
+      QLabel *l = new QLabel (tl::to_qstring (leader + description + range), inner_frame); 
+
       inner_grid->addWidget (l, row, 1);
       m_all_widgets.back ().push_back (l);
 
@@ -702,9 +713,11 @@ PCellParametersPage::do_parameter_changed ()
   bool ok = true;
   db::ParameterStates states = m_states;
   get_parameters (states, &ok);   //  includes coerce
-  update_widgets_from_states (states);
-  if (ok && ! lazy_evaluation ()) {
-    emit edited ();
+  if (ok) {
+    update_widgets_from_states (states);
+    if (! lazy_evaluation ()) {
+      emit edited ();
+    }
   }
 }
 
@@ -762,6 +775,8 @@ PCellParametersPage::get_parameters_internal (db::ParameterStates &states, bool 
               ps.set_value (tl::Variant (v));
               lay::indicate_error (le, (tl::Exception *) 0);
 
+              check_range(tl::Variant (v), *p);
+
             } catch (tl::Exception &ex) {
 
               lay::indicate_error (le, &ex);
@@ -785,6 +800,8 @@ PCellParametersPage::get_parameters_internal (db::ParameterStates &states, bool 
 
               ps.set_value (tl::Variant (v));
               lay::indicate_error (le, (tl::Exception *) 0);
+
+              check_range(tl::Variant (v), *p);
 
             } catch (tl::Exception &ex) {
 
@@ -1082,6 +1099,18 @@ PCellParametersPage::states_from_parameters (db::ParameterStates &states, const 
     } else {
       ps.set_value (p->get_default ());
     }
+  }
+}
+
+void
+PCellParametersPage::check_range (const tl::Variant &value, const db::PCellParameterDeclaration &decl)
+{
+  if (! decl.min_value ().is_nil () && value < decl.min_value ()) {
+    throw tl::Exception (tl::sprintf (tl::to_string (tr ("The value is lower than the minimum allowed value: given value is %s, minimum value is %s")), value.to_string (), decl.min_value ().to_string ()));
+  }
+
+  if (! decl.max_value ().is_nil () && ! (value < decl.max_value () || value == decl.max_value ())) {
+    throw tl::Exception (tl::sprintf (tl::to_string (tr ("The value is higher than the maximum allowed value: given value is %s, maximum value is %s")), value.to_string (), decl.max_value ().to_string ()));
   }
 }
 

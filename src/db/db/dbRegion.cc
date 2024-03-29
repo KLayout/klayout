@@ -31,6 +31,9 @@
 #include "dbFlatEdges.h"
 #include "dbPolygonTools.h"
 #include "dbCompoundOperation.h"
+#include "dbLayout.h"
+#include "dbWriter.h"
+#include "tlStream.h"
 #include "tlGlobPattern.h"
 
 //  NOTE: include this to provide the symbols for "make_variant"
@@ -74,14 +77,42 @@ Region &Region::operator= (const Region &other)
   return *this;
 }
 
-Region::Region (const RecursiveShapeIterator &si)
+Region::Region (const RecursiveShapeIterator &si, bool merged_semantics, bool is_merged)
 {
-  mp_delegate = new OriginalLayerRegion (si);
+  mp_delegate = new OriginalLayerRegion (si, db::ICplxTrans (), merged_semantics, is_merged);
 }
 
-Region::Region (const RecursiveShapeIterator &si, const db::ICplxTrans &trans, bool merged_semantics)
+Region::Region (const RecursiveShapeIterator &si, const db::ICplxTrans &trans, bool merged_semantics, bool is_merged)
 {
-  mp_delegate = new OriginalLayerRegion (si, trans, merged_semantics);
+  mp_delegate = new OriginalLayerRegion (si, trans, merged_semantics, is_merged);
+}
+
+Region::Region (const Shapes &shapes, bool merged_semantics, bool is_merged)
+{
+  db::FlatRegion *flat_region = new FlatRegion (is_merged);
+  flat_region->reserve (shapes.size (db::ShapeIterator::Regions));
+
+  //  NOTE: we need to normalize the shapes to polygons because this is what the flat region expects
+  for (auto s = shapes.begin (db::ShapeIterator::Regions); ! s.at_end (); ++s) {
+    flat_region->insert (*s);
+  }
+
+  mp_delegate = flat_region;
+  mp_delegate->set_merged_semantics (merged_semantics);
+}
+
+Region::Region (const Shapes &shapes, const db::ICplxTrans &trans, bool merged_semantics, bool is_merged)
+{
+  db::FlatRegion *flat_region = new FlatRegion (is_merged);
+  flat_region->reserve (shapes.size (db::ShapeIterator::Regions));
+
+  //  NOTE: we need to normalize the shapes to polygons because this is what the flat region expects
+  for (auto s = shapes.begin (db::ShapeIterator::Regions); ! s.at_end (); ++s) {
+    flat_region->insert (*s, trans);
+  }
+
+  mp_delegate = flat_region;
+  mp_delegate->set_merged_semantics (merged_semantics);
 }
 
 Region::Region (const RecursiveShapeIterator &si, DeepShapeStore &dss, double area_ratio, size_t max_vertex_count)
@@ -99,6 +130,23 @@ Region::Region (DeepShapeStore &dss)
   tl_assert (dss.is_singular ());
   unsigned int layout_index = 0; // singular layout index
   mp_delegate = new db::DeepRegion (db::DeepLayer (&dss, layout_index, dss.layout (layout_index).insert_layer ()));
+}
+
+void
+Region::write (const std::string &fn) const
+{
+  //  method provided for debugging purposes
+
+  db::Layout layout;
+  const db::Cell &top = layout.cell (layout.add_cell ("REGION"));
+  unsigned int li = layout.insert_layer (db::LayerProperties (0, 0));
+  insert_into (&layout, top.cell_index (), li);
+
+  tl::OutputStream os (fn);
+  db::SaveLayoutOptions opt;
+  opt.set_format_from_filename (fn);
+  db::Writer writer (opt);
+  writer.write (layout, os);
 }
 
 const db::RecursiveShapeIterator &
@@ -556,16 +604,23 @@ Region::texts_as_dots (const std::string &pat, bool pattern, db::DeepShapeStore 
 
     fill_texts (si.first, pat, pattern, dot_delivery<db::FlatEdges> (), res.get (), si.second, dr);
 
-    return Edges (res.release ());
+    Edges edges (res.release ());
+    edges.set_merged_semantics (false);
+    return edges;
 
   }
+
+  db::Edges edges;
 
   text_shape_receiver<dot_delivery<db::Shapes> > pipe = text_shape_receiver<dot_delivery<db::Shapes> > (dot_delivery<db::Shapes> (), pat, pattern, dr);
   if (dr && dr->deep_layer ().store () == &store) {
-    return Edges (new db::DeepEdges (store.create_copy (dr->deep_layer (), &pipe)));
+    edges = Edges (new db::DeepEdges (store.create_copy (dr->deep_layer (), &pipe)));
   } else {
-    return Edges (new db::DeepEdges (store.create_custom_layer (si.first, &pipe, si.second)));
+    edges = Edges (new db::DeepEdges (store.create_custom_layer (si.first, &pipe, si.second)));
   }
+
+  edges.set_merged_semantics (false);
+  return edges;
 }
 
 Region

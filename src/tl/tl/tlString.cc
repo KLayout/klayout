@@ -322,10 +322,8 @@ static double local_strtod (const char *cp, const char *&cp_new)
   if (*cp == '-') {
     s = -1.0;
     ++cp;
-  /*
   } else if (*cp == '+') {
     ++cp;
-  */
   }
 
   //  Extract upper digits

@@ -419,12 +419,6 @@ LineStyleSelectionButton::update_menu ()
       unsigned int n = palette.style_by_index (i);
       if (int (n) < std::distance (patterns.begin (), patterns.end ())) {
 
-#if QT_VERSION > 0x050000
-        double dpr = devicePixelRatio ();
-#else
-        double dpr = 1.0;
-#endif
-
         lay::LineStyleInfo info = patterns.begin () [n];
 
         std::string name (info.name ());
@@ -1226,13 +1220,14 @@ ColorButton::set_color_internal (QColor c)
   double dpr = 1.0;
 #endif
 
-  QPixmap pixmap (rt.width () * dpr, rt.height () * dpr);
+  QImage image (rt.width () * dpr, rt.height () * dpr, QImage::Format_ARGB32);
 #if QT_VERSION >= 0x50000
-  pixmap.setDevicePixelRatio (dpr);
+  image.setDevicePixelRatio (dpr);
 #endif
+  image.fill (Qt::transparent);
 
   QColor text_color = palette ().color (QPalette::Active, QPalette::Text);
-  QPainter pxpainter (&pixmap);
+  QPainter pxpainter (&image);
   QPen frame_pen (text_color);
   frame_pen.setWidthF (1.0);
   frame_pen.setJoinStyle (Qt::MiterJoin);
@@ -1253,7 +1248,7 @@ ColorButton::set_color_internal (QColor c)
 
   }
 
-  QPushButton::setIcon (QIcon (pixmap));
+  QPushButton::setIcon (QIcon (QPixmap::fromImage (image)));
 }
 
 QColor 

@@ -175,9 +175,11 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
       m_disable_tab_selected (false),
       m_exited (false),
       dm_do_update_menu (this, &MainWindow::do_update_menu),
+      dm_do_update_grids (this, &MainWindow::do_update_grids),
       dm_do_update_mru_menus (this, &MainWindow::do_update_mru_menus),
       dm_exit (this, &MainWindow::exit),
       m_grid_micron (0.001),
+      m_default_grid (0.0),
       m_default_grids_updated (true),
       m_new_layout_current_panel (false),
       m_synchronized_views (false),
@@ -498,34 +500,9 @@ MainWindow::~MainWindow ()
 std::string
 MainWindow::all_layout_file_formats () const
 {
-  std::string fmts = tl::to_string (QObject::tr ("All layout files ("));
-  for (tl::Registrar<db::StreamFormatDeclaration>::iterator rdr = tl::Registrar<db::StreamFormatDeclaration>::begin (); rdr != tl::Registrar<db::StreamFormatDeclaration>::end (); ++rdr) {
-    if (rdr != tl::Registrar<db::StreamFormatDeclaration>::begin ()) {
-      fmts += " ";
-    }
-    std::string f = rdr->file_format ();
-    if (!f.empty ()) {
-      const char *fp = f.c_str ();
-      while (*fp && *fp != '(') {
-        ++fp;
-      }
-      if (*fp) {
-        ++fp;
-      }
-      while (*fp && *fp != ')') {
-        fmts += *fp++;
-      }
-    }
-  }
-  fmts += ");;";
-  for (tl::Registrar<db::StreamFormatDeclaration>::iterator rdr = tl::Registrar<db::StreamFormatDeclaration>::begin (); rdr != tl::Registrar<db::StreamFormatDeclaration>::end (); ++rdr) {
-    if (!rdr->file_format ().empty ()) {
-      fmts += rdr->file_format ();
-      fmts += ";;";
-    }
-  }
-  fmts += tl::to_string (QObject::tr ("All files (*)"));
-
+  std::string fmts = db::StreamFormatDeclaration::all_formats_string ();
+  fmts += ";;";
+  fmts += tl::to_string (tr ("All files (*)"));
   return fmts;
 }
 
@@ -583,7 +560,7 @@ MainWindow::technology_changed ()
   }
 
   m_default_grids_updated = true;  //  potentially ...
-  dm_do_update_menu ();
+  dm_do_update_grids ();
 }
 
 void
@@ -939,7 +916,7 @@ MainWindow::config_finalize ()
 
   // Update the default grids menu if necessary
   if (m_default_grids_updated) {
-    dm_do_update_menu ();
+    dm_do_update_grids ();
   }
 
   //  make the changes visible in the setup form if the form is visible
@@ -972,6 +949,7 @@ MainWindow::configure (const std::string &name, const std::string &value)
 
     tl::Extractor ex (value.c_str ());
     m_default_grids.clear ();
+    m_default_grid = 0.0;
     m_default_grids_updated = true;
 
     //  convert the list of grids to a list of doubles
@@ -979,6 +957,9 @@ MainWindow::configure (const std::string &name, const std::string &value)
       double g = 0.0;
       if (! ex.try_read (g)) {
         break;
+      }
+      if (ex.test ("!")) {
+        m_default_grid = g;
       }
       m_default_grids.push_back (g);
       ex.test (",");
@@ -4042,6 +4023,38 @@ MainWindow::menu_changed ()
 }
 
 void
+MainWindow::do_update_grids ()
+{
+  const std::vector<double> *grids = &m_default_grids;
+  double default_grid = m_default_grid;
+
+  std::vector<double> tech_grids;
+  lay::TechnologyController *tc = lay::TechnologyController::instance ();
+  if (tc && tc->active_technology ()) {
+    tech_grids = tc->active_technology ()->default_grid_list ();
+    if (! tech_grids.empty ()) {
+      grids = &tech_grids;
+      default_grid = tc->active_technology ()->default_grid ();
+    }
+  }
+
+  if (default_grid > db::epsilon) {
+    for (auto g = grids->begin (); g != grids->end (); ++g) {
+      if (db::coord_traits<db::DCoord>::equals (*g, m_grid_micron)) {
+        default_grid = 0.0;
+        break;
+      }
+    }
+  }
+
+  if (default_grid > db::epsilon) {
+    dispatcher ()->config_set (cfg_grid, default_grid);
+  }
+
+  do_update_menu ();
+}
+
+void
 MainWindow::do_update_menu ()
 {
   if (m_default_grids_updated) {
@@ -4082,7 +4095,7 @@ MainWindow::do_update_menu ()
 
       lay::Action *ga = new lay::ConfigureAction (gs, cfg_grid, tl::to_string (*g));
       ga->set_checkable (true);
-      ga->set_checked (fabs (*g - m_grid_micron) < 1e-10);
+      ga->set_checked (db::coord_traits<db::DCoord>::equals (*g, m_grid_micron));
 
       for (std::vector<std::string>::const_iterator t = group.begin (); t != group.end (); ++t) {
         menu ()->insert_item (*t + ".end", name, ga);

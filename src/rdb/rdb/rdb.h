@@ -50,6 +50,7 @@ namespace tl
 namespace db
 {
   class Shape;
+  class Layout;
 }
 
 namespace rdb
@@ -2083,6 +2084,14 @@ public:
   }
 
   /**
+   *  @brief Get the reference to the categories collection (non-const version)
+   */
+  Categories &categories_non_const ()
+  {
+    return *mp_categories;
+  }
+
+  /**
    *  @brief Import categories
    *
    *  This method is provided for persistency application only. It should not be used otherwise.
@@ -2130,9 +2139,31 @@ public:
   }
 
   /**
+   *  @brief Get the category pointer for a category name (non-const version)
+   *
+   *  This method returns 0 if the category name is invalid.
+   */
+  Category *category_by_name_non_const (const std::string &name);
+
+  /**
+   *  @brief Get the category pointer for a category id (non-const version)
+   *
+   *  This method returns 0 if the category is invalid.
+   */
+  Category *category_by_id_non_const (id_type id);
+
+  /**
    *  @brief Access to the cell collection (const)
    */
   const Cells &cells () const
+  {
+    return m_cells;
+  }
+
+  /**
+   *  @brief Access to the cell collection
+   */
+  Cells &cells_non_const ()
   {
     return m_cells;
   }
@@ -2189,6 +2220,20 @@ public:
   {
     return const_cast<Database *> (this)->cell_by_id_non_const (id);
   }
+
+  /**
+   *  @brief Get the cell pointer for a cell name or name:variant combination (non-const version)
+   *
+   *  This method returns 0 if the cell name or name:variant combination is invalid.
+   */
+  Cell *cell_by_qname_non_const (const std::string &qname);
+
+  /**
+   *  @brief Get the cell pointer for a cell id (non-const version)
+   *
+   *  This method returns 0 if the cell id is invalid.
+   */
+  Cell *cell_by_id_non_const (id_type id);
 
   /**
    *  @brief Report the number of items in total
@@ -2267,6 +2312,14 @@ public:
   }
 
   /**
+   *  @brief Get the items collection (non-const version)
+   */
+  Items &items_non_const ()
+  {
+    return *mp_items;
+  }
+
+  /**
    *  @brief Set the items collection
    *
    *  This method is provided for persistency application only. It should not be used otherwise.
@@ -2280,14 +2333,29 @@ public:
   std::pair<const_item_ref_iterator, const_item_ref_iterator> items_by_cell (id_type cell_id) const; 
 
   /**
+   *  @brief Get an iterator pair that delivers the non-const items (ItemRef) for a given cell
+   */
+  std::pair<item_ref_iterator, item_ref_iterator> items_by_cell (id_type cell_id);
+
+  /**
    *  @brief Get an iterator that delivers the const items (ItemRef) for a given category
    */
   std::pair<const_item_ref_iterator, const_item_ref_iterator> items_by_category (id_type category_id) const; 
 
   /**
+   *  @brief Get an iterator that delivers the non-const items (ItemRef) for a given category
+   */
+  std::pair<item_ref_iterator, item_ref_iterator> items_by_category (id_type category_id);
+
+  /**
    *  @brief Get an iterator that delivers the const items (ItemRef) for a given cell and category
    */
   std::pair<const_item_ref_iterator, const_item_ref_iterator> items_by_cell_and_category (id_type cell_id, id_type category_id) const; 
+
+  /**
+   *  @brief Get an iterator that delivers the non-const items (ItemRef) for a given cell and category
+   */
+  std::pair<item_ref_iterator, item_ref_iterator> items_by_cell_and_category (id_type cell_id, id_type category_id);
 
   /**
    *  @brief Returns true, if the database was modified
@@ -2316,6 +2384,16 @@ public:
    *  @brief This clears the existing database.
    */
   void load (const std::string &filename);
+
+  /**
+   *  @brief Scans a layout into this RDB
+   *
+   *  @param layout The layout to scan
+   *  @param cell_index The top cell to scan
+   *  @param layers_and_descriptions The layers and (optional) descriptions/names of the layer to scan
+   *  @param flat True, to perform a flat scan
+   */
+  void scan_layout (const db::Layout &layout, db::cell_index_type cell_index, const std::vector<std::pair<unsigned int, std::string> > &layers_and_descriptions, bool flat);
 
 private:
   std::string m_generator;
@@ -2350,64 +2428,12 @@ private:
   }
 
   /**
-   *  @brief Get the items collection (non-const version)
-   */
-  Items &items_non_const () 
-  {
-    return *mp_items;
-  }
-
-  /**
    *  @brief Get the reference to the tags collection (non-const version)
    */
   Tags &tags_non_const ()
   {
     return m_tags;
   }
-
-  /**
-   *  @brief Get the reference to the categories collection (non-const version)
-   */
-  Categories &categories_non_const ()
-  {
-    return *mp_categories;
-  }
-
-  /**
-   *  @brief Get the category pointer for a category name
-   *
-   *  This method returns 0 if the category name is invalid.
-   */
-  Category *category_by_name_non_const (const std::string &name);
-
-  /**
-   *  @brief Get the category pointer for a category id
-   *
-   *  This method returns 0 if the category is invalid.
-   */
-  Category *category_by_id_non_const (id_type id);
-
-  /**
-   *  @brief Access to the cell collection
-   */
-  Cells &cells_non_const ()
-  {
-    return m_cells;
-  }
-
-  /**
-   *  @brief Get the cell pointer for a cell name or name:variant combination (non-const version)
-   *
-   *  This method returns 0 if the cell name or name:variant combination is invalid.
-   */
-  Cell *cell_by_qname_non_const (const std::string &qname);
-
-  /**
-   *  @brief Get the cell pointer for a cell id (non-const version)
-   *
-   *  This method returns 0 if the cell id is invalid.
-   */
-  Cell *cell_by_id_non_const (id_type id);
 };
 
 }

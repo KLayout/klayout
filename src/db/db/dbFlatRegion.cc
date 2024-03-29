@@ -43,7 +43,6 @@ FlatRegion::FlatRegion (const FlatRegion &other)
   : MutableRegion (other), mp_polygons (other.mp_polygons), mp_merged_polygons (other.mp_merged_polygons), mp_properties_repository (other.mp_properties_repository)
 {
   init ();
-
   m_is_merged = other.m_is_merged;
   m_merged_polygons_valid = other.m_merged_polygons_valid;
 }
@@ -52,15 +51,22 @@ FlatRegion::FlatRegion (const db::Shapes &polygons, bool is_merged)
   : MutableRegion (), mp_polygons (new db::Shapes (polygons)), mp_merged_polygons (new db::Shapes (false)), mp_properties_repository (new db::PropertiesRepository ())
 {
   init ();
-
   m_is_merged = is_merged;
+}
+
+FlatRegion::FlatRegion (const db::Shapes &polygons, const db::ICplxTrans &trans, bool merged_semantics, bool is_merged)
+  : MutableRegion (), mp_polygons (new db::Shapes (polygons)), mp_merged_polygons (new db::Shapes (false)), mp_properties_repository (new db::PropertiesRepository ())
+{
+  init ();
+  m_is_merged = is_merged;
+  transform_generic (trans);
+  set_merged_semantics (merged_semantics);
 }
 
 FlatRegion::FlatRegion (bool is_merged)
   : MutableRegion (), mp_polygons (new db::Shapes (false)), mp_merged_polygons (new db::Shapes (false)), mp_properties_repository (new db::PropertiesRepository ())
 {
   init ();
-
   m_is_merged = is_merged;
 }
 

@@ -30,6 +30,9 @@
 #include "dbOriginalLayerEdgePairs.h"
 #include "dbEdges.h"
 #include "dbRegion.h"
+#include "dbLayout.h"
+#include "dbWriter.h"
+#include "tlStream.h"
 
 #include "tlVariant.h"
 
@@ -91,6 +94,23 @@ EdgePairs::EdgePairs (const RecursiveShapeIterator &si, DeepShapeStore &dss)
 EdgePairs::EdgePairs (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans)
 {
   mp_delegate = new DeepEdgePairs (si, dss, trans);
+}
+
+void
+EdgePairs::write (const std::string &fn) const
+{
+  //  method provided for debugging purposes
+
+  db::Layout layout;
+  const db::Cell &top = layout.cell (layout.add_cell ("EDGE_PAIRS"));
+  unsigned int li = layout.insert_layer (db::LayerProperties (0, 0));
+  insert_into (&layout, top.cell_index (), li);
+
+  tl::OutputStream os (fn);
+  db::SaveLayoutOptions opt;
+  opt.set_format_from_filename (fn);
+  db::Writer writer (opt);
+  writer.write (layout, os);
 }
 
 template <class Sh>

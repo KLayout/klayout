@@ -1567,6 +1567,12 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "\n"
     "This method has been added in version 0.28.\n"
   ) +
+  method ("write", &db::Edges::write, gsi::arg ("filename"),
+    "@brief Writes the region to a file\n"
+    "This method is provided for debugging purposes. It writes the object to a flat layer 0/0 in a single top cell.\n"
+    "\n"
+    "This method has been introduced in version 0.29."
+  ) +
   method ("clear", &db::Edges::clear,
     "@brief Clears the edge collection\n"
   ) +

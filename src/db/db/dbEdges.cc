@@ -28,6 +28,9 @@
 #include "dbFlatEdges.h"
 #include "dbEdgesUtils.h"
 #include "dbRegion.h"
+#include "dbLayout.h"
+#include "dbWriter.h"
+#include "tlStream.h"
 
 namespace db
 {
@@ -139,6 +142,23 @@ Edges::set_delegate (EdgesDelegate *delegate, bool keep_attributes)
     delete mp_delegate;
     mp_delegate = delegate;
   }
+}
+
+void
+Edges::write (const std::string &fn) const
+{
+  //  method provided for debugging purposes
+
+  db::Layout layout;
+  const db::Cell &top = layout.cell (layout.add_cell ("EDGES"));
+  unsigned int li = layout.insert_layer (db::LayerProperties (0, 0));
+  insert_into (&layout, top.cell_index (), li);
+
+  tl::OutputStream os (fn);
+  db::SaveLayoutOptions opt;
+  opt.set_format_from_filename (fn);
+  db::Writer writer (opt);
+  writer.write (layout, os);
 }
 
 void

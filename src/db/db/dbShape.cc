@@ -807,6 +807,61 @@ Shape::box_type Shape::bbox () const
   }
 }
 
+Shape::box_type Shape::rectangle () const
+{
+  if (is_box ()) {
+    return box ();
+  }
+
+  switch (m_type) {
+  case db::Shape::Polygon:
+    return polygon ().is_box () ? polygon ().box () : box_type ();
+  case db::Shape::PolygonRef:
+  case db::Shape::PolygonPtrArrayMember:
+    return polygon_ref ().is_box () ? polygon_ref ().box () : box_type ();
+  case db::Shape::SimplePolygon:
+    return simple_polygon ().is_box () ? simple_polygon ().box () : box_type ();
+  case db::Shape::SimplePolygonRef:
+  case db::Shape::SimplePolygonPtrArrayMember:
+    return simple_polygon_ref ().is_box () ? simple_polygon_ref ().box () : box_type ();
+  case db::Shape::Path:
+    {
+      const path_type &p = path ();
+      if (! p.round () && p.points () <= 2 && p.points () > 0) {
+        point_type p1 = *p.begin ();
+        point_type p2 = p1;
+        if (p.points () == 2) {
+          p2 = *++p.begin ();
+        }
+        if (p1.x () == p2.x () || p1.y () == p2.y ()) {
+          return p.box ();
+        }
+      }
+    }
+    break;
+  case db::Shape::PathRef:
+  case db::Shape::PathPtrArrayMember:
+    {
+      const path_ref_type &p = path_ref ();
+      if (! p.ptr ()->round () && p.ptr ()->points () <= 2 && p.ptr ()->points () > 0) {
+        point_type p1 = *p.begin ();
+        point_type p2 = p1;
+        if (p.ptr ()->points () == 2) {
+          p2 = *++p.begin ();
+        }
+        if (p1.x () == p2.x () || p1.y () == p2.y ()) {
+          return p.box ();
+        }
+      }
+    }
+    break;
+  default:
+    break;
+  }
+
+  return box_type ();
+}
+
 std::string
 Shape::to_string () const
 {

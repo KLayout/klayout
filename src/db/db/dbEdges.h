@@ -834,6 +834,14 @@ public:
   }
 
   /**
+   *  @brief Writes the edge collection to a file
+   *
+   *  This method is provided for debugging purposes. A flat image of the
+   *  region is written to a layout file with a single top cell on layer 0/0.
+   */
+  void write (const std::string &fn) const;
+
+  /**
    *  @brief Intersections with other edges
    *  Intersections are similar to "AND", but will also report
    *  non-parallel intersections between crossing edges.

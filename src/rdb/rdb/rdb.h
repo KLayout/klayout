@@ -50,6 +50,7 @@ namespace tl
 namespace db
 {
   class Shape;
+  class Layout;
 }
 
 namespace rdb
@@ -2383,6 +2384,16 @@ public:
    *  @brief This clears the existing database.
    */
   void load (const std::string &filename);
+
+  /**
+   *  @brief Scans a layout into this RDB
+   *
+   *  @param layout The layout to scan
+   *  @param cell_index The top cell to scan
+   *  @param layers_and_descriptions The layers and (optional) descriptions/names of the layer to scan
+   *  @param flat True, to perform a flat scan
+   */
+  void scan_layout (const db::Layout &layout, db::cell_index_type cell_index, const std::vector<std::pair<unsigned int, std::string> > &layers_and_descriptions, bool flat);
 
 private:
   std::string m_generator;

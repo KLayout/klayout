@@ -7,15 +7,18 @@
 * Enhancement: %GITHUB%/issues/1638 let klayout marker browser read strmxor .. xor.gds.gz, xor.oas result files
 * Enhancement: %GITHUB%/issues/1637 XOR optimization for prBoundary layer
 * Bugfix: %GITHUB%/issues/1632 rdb python/ruby module: modifing items not possible as they are const
-* Enhancement: %GITHUB%/issues/1598 Support for Soft Connections
+* Enhancement: %GITHUB%/issues/1598 LVS - Support for Soft Connections
 * Bugfix: %GITHUB%/issues/1586 Refactoring transformation conversion functions for complex transformation
 * Enhancement: %GITHUB%/issues/1583 Add possibility to customize main window title
 * Enhancement: %GITHUB%/issues/1513 Update Qt version for Qt bindings to 5.12.12 and 6.2.1
 * Bugfix: %GITHUB%/issues/1356 Instance Property form: Array Instance col/row would be more intuitive then the current row/col
 * Enhancement: New ruler type "auto measure along edge"
 * Enhancement: Trigger ruler measurement on mouse hovering transiently
-* Enhancement: min and max value bounds for PCell parameters in editor
-* Bugfix: pixel garbage in color selector button with "Auto" color enabled
+* Enhancement: Min and max value bounds for PCell parameters in editor
+  The condition is not strictly enforced - for example it is not checked when
+  changing parameters programmatically. For that, use "coerce_parameters".
+  Still, this feature is an editing aid.
+* Bugfix: Pixel garbage in color selector button with "Auto" color selected
 * Bugfix: DRC/LVS - connect_explicit did not accept an array of nets as single argument
 * Bugfix: 'edge outside polygon' now consistently ignores the border of the polygon
 * Bugfix: Warning level was ignored for some warnings in LEF/DEF reader
@@ -55,7 +58,7 @@
   - Keyword arguments for Python, Ruby and Expressions
   - You can now also use "klayout" package inside the application (same code
     for Python module and application) - i.e. "import klayout.db"
-  - Synonyms: connect/disconnect for events to get closer to PyQt5
+  - Synonyms: connect/disconnect for events for better compatibility with PyQt5
 
 0.28.17          (2024-02-16):
 * Enhancement: %GITHUB%/issues/1626 Technology specific grids

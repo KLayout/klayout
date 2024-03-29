@@ -28,6 +28,7 @@
 #include "edtCommon.h"
 #include "dbTrans.h"
 #include "gsiObject.h"
+#include "tlExceptions.h"
 
 #include <set>
 #include <string>
@@ -160,6 +161,87 @@ private:
   EditorHooks &operator= (const EditorHooks &);
   EditorHooks (const EditorHooks &);
 };
+
+/**
+ *  @brief A helper function to call editor hooks in the right sequence and with error handling
+ */
+
+inline
+void call_editor_hooks (const std::vector<EditorHooks *> &hooks, void (EditorHooks::*meth) ())
+{
+  for (auto h = hooks.begin (); h != hooks.end (); ++h) {
+BEGIN_PROTECTED
+    try {
+      ((*h)->*meth) ();
+    } catch (tl::CancelException &) {
+      return;
+    }
+END_PROTECTED
+  }
+}
+
+/**
+ *  @brief A helper function to call editor hooks in the right sequence and with error handling
+ *
+ *  This version provides one argument
+ */
+
+template <class A1>
+inline
+void call_editor_hooks (const std::vector<EditorHooks *> &hooks, void (EditorHooks::*meth) (A1), A1 a1)
+{
+  for (auto h = hooks.begin (); h != hooks.end (); ++h) {
+BEGIN_PROTECTED
+    try {
+      ((*h)->*meth) (a1);
+    } catch (tl::CancelException &) {
+      return;
+    }
+END_PROTECTED
+  }
+}
+
+/**
+ *  @brief A helper function to call editor hooks in the right sequence and with error handling
+ *
+ *  This version provides two arguments
+ */
+
+template <class A1, class A2>
+inline
+void call_editor_hooks (const std::vector<EditorHooks *> &hooks, void (EditorHooks::*meth) (A1, A2), A1 a1, A2 a2)
+{
+  for (auto h = hooks.begin (); h != hooks.end (); ++h) {
+BEGIN_PROTECTED
+    try {
+      ((*h)->*meth) (a1, a2);
+    } catch (tl::CancelException &) {
+      return;
+    }
+END_PROTECTED
+  }
+}
+
+/**
+ *  @brief A helper function to call editor hooks in the right sequence and with error handling
+ *
+ *  This version provides three arguments
+ */
+
+template <class A1, class A2, class A3>
+inline
+void call_editor_hooks (const std::vector<EditorHooks *> &hooks, void (EditorHooks::*meth) (A1, A2), A1 a1, A2 a2, A3 a3)
+{
+  for (auto h = hooks.begin (); h != hooks.end (); ++h) {
+BEGIN_PROTECTED
+    try {
+      ((*h)->*meth) (a1, a2, a3);
+    } catch (tl::CancelException &) {
+      return;
+    }
+END_PROTECTED
+  }
+}
 
 }
 

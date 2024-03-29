@@ -31,6 +31,8 @@ namespace edt
 // ---------------------------------------------------------------
 //  EditorHooksManager definition and implementation
 
+class EditorHooksManager;
+
 static EditorHooksManager *sp_instance = 0;
 static bool sp_instance_initialized = false;
 

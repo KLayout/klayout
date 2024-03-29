@@ -706,6 +706,7 @@ protected slots:
 protected:
   void update_content ();
   void do_update_menu ();
+  void do_update_grids ();
   void do_update_mru_menus ();
   bool eventFilter (QObject *watched, QEvent *event);
 
@@ -753,6 +754,7 @@ private:
   bool m_disable_tab_selected;
   bool m_exited;
   tl::DeferredMethod<MainWindow> dm_do_update_menu;
+  tl::DeferredMethod<MainWindow> dm_do_update_grids;
   tl::DeferredMethod<MainWindow> dm_do_update_mru_menus;
   tl::DeferredMethod<MainWindow> dm_exit;
   QTimer m_message_timer;
@@ -765,6 +767,7 @@ private:
   std::string m_initial_technology;
   double m_grid_micron;
   std::vector<double> m_default_grids;
+  double m_default_grid;
   bool m_default_grids_updated;
   std::vector<std::pair<std::string, std::string> > m_key_bindings;
   bool m_new_layout_current_panel;

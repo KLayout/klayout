@@ -552,11 +552,11 @@ PolygonService::do_finish_edit ()
 }
 
 db::Polygon
-PolygonService::get_polygon (bool all_points) const
+PolygonService::get_polygon (bool editing) const
 {
   db::Polygon poly;
 
-  if (m_points.size () + (m_closure_set ? 1 : 0) < (all_points ? 3 : 4)) {
+  if (! editing && m_points.size () + (m_closure_set ? 1 : 0) < 4) {
     throw tl::Exception (tl::to_string (tr ("A polygon must have at least 3 points")));
   }
 
@@ -567,16 +567,16 @@ PolygonService::get_polygon (bool all_points) const
   for (std::vector<db::DPoint>::const_iterator p = m_points.begin (); p + 1 != m_points.end (); ++p) {
     points_dbu.push_back (trans () * *p);
   }
-  if (all_points) {
+  if (editing) {
     points_dbu.push_back (trans () * m_points.back ());
   }
   if (m_closure_set) {
     points_dbu.push_back (trans () * m_closure);
   }
 
-  poly.assign_hull (points_dbu.begin (), points_dbu.end (), true, true /*remove reflected*/);
+  poly.assign_hull (points_dbu.begin (), points_dbu.end (), !editing /*compress*/, !editing /*remove reflected*/);
 
-  if (poly.hull ().size () < 3) {
+  if (! editing && poly.hull ().size () < 3) {
     throw tl::Exception (tl::to_string (tr ("A polygon must have at least 3 effective points")));
   }
 

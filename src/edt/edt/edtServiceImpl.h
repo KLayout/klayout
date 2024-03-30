@@ -121,7 +121,7 @@ private:
   db::DPoint m_last;
 
   void update_marker ();
-  db::Polygon get_polygon (bool all_points) const;
+  db::Polygon get_polygon (bool editing) const;
   void add_closure ();
   void set_last_point (const db::DPoint &p);
 };

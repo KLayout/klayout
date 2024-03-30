@@ -435,16 +435,17 @@ static void create_edge_segment (std::vector<db::Point> &points, db::metrics_typ
 void
 DRCHullProcessor::process (const db::Polygon &poly, std::vector<db::Polygon> &result) const
 {
-  result.push_back (db::Polygon ());
+  db::EdgeProcessor ep;
+  std::vector<db::Point> points;
 
   for (unsigned int i = 0; i < poly.holes () + 1; ++i) {
+
+    points.clear ();
 
     auto c = poly.contour (i);
     if (c.size () < 2) {
       continue;
     }
-
-    std::vector<db::Point> points;
 
     for (auto p = c.begin (); p != c.end (); ++p) {
 
@@ -458,13 +459,24 @@ DRCHullProcessor::process (const db::Polygon &poly, std::vector<db::Polygon> &re
 
     }
 
-    if (i == 0) {
-      result.back ().assign_hull (points.begin (), points.end ());
-    } else {
-      result.back ().insert_hole (points.begin (), points.end ());
+    for (auto p = points.begin (); p != points.end (); ++p) {
+
+      auto pp = p;
+      ++pp;
+      if (pp == points.end ()) {
+        pp = points.begin ();
+      }
+
+      ep.insert (db::Edge (*p, *pp));
+
     }
 
   }
+
+  db::SimpleMerge op;
+  db::PolygonContainer psink (result);
+  db::PolygonGenerator pg (psink, false);
+  ep.process (pg, op);
 }
 
 }

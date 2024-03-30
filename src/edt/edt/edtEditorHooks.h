@@ -29,6 +29,7 @@
 #include "dbTrans.h"
 #include "gsiObject.h"
 #include "tlExceptions.h"
+#include "tlLog.h"
 #include "tlObjectCollection.h"
 
 #include <set>
@@ -36,7 +37,7 @@
 
 namespace lay
 {
-  class LayoutView;
+  class LayoutViewBase;
   class ObjectInstPath;
 }
 
@@ -72,6 +73,10 @@ class EDT_PUBLIC EditorHooks
 public:
   /**
    *  @brief Constructor
+   *
+   *  The name is arbitrary, but should be unique, as hooks with the
+   *  same name replace each other. This is a debugging aid for GSI as we can
+   *  re-register hooks while we keep them in the system.
    */
   EditorHooks ();
 
@@ -81,28 +86,44 @@ public:
   virtual ~EditorHooks ();
 
   //  creation protocol
-  virtual void begin_create (lay::LayoutView * /*view*/) { }
+  virtual void begin_create (lay::LayoutViewBase * /*view*/) { }
   virtual void begin_new_objects () { }
-  virtual void create (const lay::ObjectInstPath & /*object*/, double /*dbu*/) { }
+  virtual void create (const lay::ObjectInstPath & /*object*/, const db::CplxTrans & /*view_trans*/) { }
   virtual void end_new_objects () { }
   virtual void commit_create () { }
   virtual void end_create () { }
 
   //  modification protocol
-  virtual void begin_modify (lay::LayoutView * /*view*/) { }
+  virtual void begin_modify (lay::LayoutViewBase * /*view*/) { }
   virtual void begin_modifications () { }
-  virtual void modified (const lay::ObjectInstPath & /*object*/, double /*dbu*/) { }
+  virtual void modified (const lay::ObjectInstPath & /*object*/, const db::CplxTrans & /*view_trans*/) { }
   virtual void end_modifications () { }
   virtual void commit_modify () { }
   virtual void end_modify () { }
 
   //  editing protocol
-  virtual void begin_edit (lay::LayoutView * /*view*/) { }
+  virtual void begin_edit (lay::LayoutViewBase * /*view*/) { }
   virtual void begin_edits () { }
-  virtual void transformed (const lay::ObjectInstPath & /*object*/, const db::DCplxTrans & /*trans*/, double /*dbu*/) { }
+  virtual void transformed (const lay::ObjectInstPath & /*object*/, const db::ICplxTrans & /*applied*/, const db::CplxTrans & /*view_trans*/) { }
   virtual void end_edits () { }
   virtual void commit_edit () { }
   virtual void end_edit () { }
+
+  /**
+   *  @brief Gets the name
+   */
+  const std::string &name () const
+  {
+    return m_name;
+  }
+
+  /**
+   *  @brief Sets the name
+   */
+  void set_name (const std::string &name)
+  {
+    m_name = name;
+  }
 
   /**
    *  @brief Gets the technology name this hook is associated with
@@ -146,7 +167,7 @@ public:
   /**
    *  @brief Registers the editor hook
    */
-  static void register_editor_hook (EditorHooks *hook);
+  static void register_editor_hooks (EditorHooks *hooks, const std::string &name);
 
   /**
    *  @brief Gets the editor hooks for a given technology
@@ -157,6 +178,7 @@ public:
 
 private:
   std::set<std::string> m_technologies;
+  std::string m_name;
 
   // no copying.
   EditorHooks &operator= (const EditorHooks &);
@@ -171,15 +193,17 @@ inline
 void call_editor_hooks (const tl::weak_collection<EditorHooks> &hooks, void (EditorHooks::*meth) ())
 {
   for (auto h = hooks.begin (); h != hooks.end (); ++h) {
-BEGIN_PROTECTED
     try {
       if (h.operator-> ()) {
         (const_cast<EditorHooks *> (h.operator-> ())->*meth) ();
       }
     } catch (tl::CancelException &) {
       return;
+    } catch (tl::Exception &ex) {
+      tl::error << ex.msg ();
+    } catch (std::exception &ex) {
+      tl::error << ex.what ();
     }
-END_PROTECTED
   }
 }
 
@@ -194,15 +218,17 @@ inline
 void call_editor_hooks (const tl::weak_collection<EditorHooks> &hooks, void (EditorHooks::*meth) (A1), A1 a1)
 {
   for (auto h = hooks.begin (); h != hooks.end (); ++h) {
-BEGIN_PROTECTED
     try {
       if (h.operator-> ()) {
         (const_cast<EditorHooks *> (h.operator-> ())->*meth) (a1);
       }
     } catch (tl::CancelException &) {
       return;
+    } catch (tl::Exception &ex) {
+      tl::error << ex.msg ();
+    } catch (std::exception &ex) {
+      tl::error << ex.what ();
     }
-END_PROTECTED
   }
 }
 
@@ -217,15 +243,17 @@ inline
 void call_editor_hooks (const tl::weak_collection<EditorHooks> &hooks, void (EditorHooks::*meth) (A1, A2), A1 a1, A2 a2)
 {
   for (auto h = hooks.begin (); h != hooks.end (); ++h) {
-BEGIN_PROTECTED
     try {
       if (h.operator-> ()) {
         (const_cast<EditorHooks *> (h.operator-> ())->*meth) (a1, a2);
       }
     } catch (tl::CancelException &) {
       return;
+    } catch (tl::Exception &ex) {
+      tl::error << ex.msg ();
+    } catch (std::exception &ex) {
+      tl::error << ex.what ();
     }
-END_PROTECTED
   }
 }
 
@@ -240,15 +268,17 @@ inline
 void call_editor_hooks (const tl::weak_collection<EditorHooks> &hooks, void (EditorHooks::*meth) (A1, A2), A1 a1, A2 a2, A3 a3)
 {
   for (auto h = hooks.begin (); h != hooks.end (); ++h) {
-BEGIN_PROTECTED
     try {
       if (h.operator-> ()) {
         (const_cast<EditorHooks *> (h.operator-> ())->*meth) (a1, a2, a3);
       }
     } catch (tl::CancelException &) {
       return;
+    } catch (tl::Exception &ex) {
+      tl::error << ex.msg ();
+    } catch (std::exception &ex) {
+      tl::error << ex.what ();
     }
-END_PROTECTED
   }
 }
 

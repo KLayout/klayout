@@ -28,143 +28,21 @@
 
 namespace gsi
 {
-gsi::Class<edt::EditorHooks> decl_EditorHooksBase ("lay", "EditorHooksBase",
-  gsi::method ("begin_create", &edt::EditorHooks::begin_create, gsi::arg ("view"),
-    "@brief Creation protocol - begin session\n"
-    "This method is called to initiate an object creation session. The session is ended with "
-    "\\end_create. Between these calls, new objects are announced with \\begin_new_objects, "
-    "\\create and \\end_new_objects calls. These calls are repeated to indicate changes in the objects "
-    "created.\n"
-    "\n"
-    "\\commit_create is called once before \\end_create to indicate that the last set of "
-    "objects are committed to the database."
-  ) +
-  gsi::method ("begin_new_objects", &edt::EditorHooks::begin_new_objects,
-    "@brief Creation protocol - begin new objects\n"
-    "See \\begin_create for a description of the protocol."
-  ) +
-  gsi::method ("create", &edt::EditorHooks::create, gsi::arg ("object"), gsi::arg ("dbu"),
-    "@brief Creation protocol - indicate a new object\n"
-    "See \\begin_create for a description of the protocol."
-  ) +
-  gsi::method ("end_new_objects", &edt::EditorHooks::end_new_objects,
-    "@brief Creation protocol - finish list of new objects\n"
-    "See \\begin_create for a description of the protocol."
-  ) +
-  gsi::method ("commit_create", &edt::EditorHooks::commit_create,
-    "@brief Creation protocol - commit new objects\n"
-    "See \\begin_create for a description of the protocol."
-  ) +
-  gsi::method ("end_create", &edt::EditorHooks::end_create,
-    "@brief Creation protocol - finish session\n"
-    "See \\begin_create for a description of the protocol."
-  ) +
-  gsi::method ("begin_modify", &edt::EditorHooks::begin_modify, gsi::arg ("view"),
-    "@brief Modification protocol - begin session\n"
-    "This method is called to initiate an object modification session. The session is ended with "
-    "\\end_modify. Between these calls, modified objects are announced with \\begin_modifications, "
-    "\\modified and \\end_modifications calls. These calls are repeated to indicate changes in the objects "
-    "modified while moving the mouse for example.\n"
-    "\n"
-    "\\commit_modify is called once before \\end_modify to indicate that the last set of "
-    "objects are committed to the database."
-  ) +
-  gsi::method ("begin_modifications", &edt::EditorHooks::begin_modifications,
-    "@brief Modification protocol - begin modifications\n"
-    "See \\begin_modify for a description of the protocol."
-  ) +
-  gsi::method ("modified", &edt::EditorHooks::modified, gsi::arg ("object"), gsi::arg ("dbu"),
-    "@brief Modification protocol - indicate a modified object\n"
-    "See \\begin_modify for a description of the protocol."
-  ) +
-  gsi::method ("end_modifications", &edt::EditorHooks::end_modifications,
-    "@brief Modification protocol - finish list of modifications\n"
-    "See \\begin_modify for a description of the protocol."
-  ) +
-  gsi::method ("commit_modify", &edt::EditorHooks::commit_modify,
-    "@brief Modification protocol - commit new objects\n"
-    "See \\begin_modify for a description of the protocol."
-  ) +
-  gsi::method ("end_modify", &edt::EditorHooks::end_modify,
-    "@brief Modification protocol - finish session\n"
-    "See \\begin_modify for a description of the protocol."
-  ) +
-  gsi::method ("begin_edit", &edt::EditorHooks::begin_edit, gsi::arg ("view"),
-    "@brief Editing protocol - begin session\n"
-    "This method is called to initiate an object editing session. The session is ended with "
-    "\\end_edit. Between these calls, edits are announced with \\begin_edits, "
-    "\\transformed and \\end_edits calls. These calls are repeated to indicate changes in the objects "
-    "modified while moving the mouse for example.\n"
-    "\n"
-    "\\commit_edit is called once before \\end_edit to indicate that the last set of "
-    "objects are committed to the database."
-  ) +
-  gsi::method ("begin_edits", &edt::EditorHooks::begin_edits,
-    "@brief Editing protocol - begin edits\n"
-    "See \\begin_edit for a description of the protocol."
-  ) +
-  gsi::method ("transformed", &edt::EditorHooks::transformed, gsi::arg ("object"), gsi::arg ("trans"), gsi::arg ("dbu"),
-    "@brief Editing protocol - indicate an object transformation\n"
-    "See \\begin_edit for a description of the protocol."
-  ) +
-  gsi::method ("end_edits", &edt::EditorHooks::end_edits,
-    "@brief Editing protocol - finish list of edits\n"
-    "See \\begin_edit for a description of the protocol."
-  ) +
-  gsi::method ("commit_edit", &edt::EditorHooks::commit_edit,
-    "@brief Editing protocol - commit new objects\n"
-    "See \\begin_edit for a description of the protocol."
-  ) +
-  gsi::method ("end_edit", &edt::EditorHooks::end_edit,
-    "@brief Editing protocol - finish session\n"
-    "See \\begin_edit for a description of the protocol."
-  ) +
-  gsi::method ("technology=", &edt::EditorHooks::set_technology, gsi::arg ("technology"),
-    "@brief sets the name of the technology the hooks are associated with\n"
-    "This will clear all technology associations and associate the hooks with that technology only.\n"
-  ) +
-  gsi::method ("clear_technologies", &edt::EditorHooks::clear_technologies,
-    "@brief Clears the list of technologies the hooks are associated with.\n"
-    "See also \\add_technology.\n"
-  ) +
-  gsi::method ("add_technology", &edt::EditorHooks::add_technology, gsi::arg ("tech"),
-    "@brief Additionally associates the hooks with the given technology.\n"
-    "See also \\clear_technologies.\n"
-  ) +
-  gsi::method ("is_for_technology", &edt::EditorHooks::is_for_technology, gsi::arg ("tech"),
-    "@brief Returns a value indicating whether the hooks are associated with the given technology.\n"
-  ) +
-  gsi::method ("for_technologies", &edt::EditorHooks::for_technologies,
-    "@brief Returns a value indicating whether the hooks are associated with any technology.\n"
-    "The method is equivalent to checking whether the \\technologies list is empty.\n"
-  ) +
-  gsi::method ("technologies", &edt::EditorHooks::get_technologies,
-    "@brief Gets the list of technologies these hooks are associated with.\n"
-  ) +
-  gsi::method ("register", &edt::EditorHooks::register_editor_hook, gsi::arg ("hooks"),
-    "@brief Registers the hooks in the system.\n"
-    "The hooks will not be active before they are registered in the system. Registration will "
-    "also transfer object ownership to the system."
-  ),
-  "@brief The base class for editor hooks\n"
-  "Editor hooks allow implementing technology-specific callbacks into the editor "
-  "for example to implement visual feedback about DRC rules.\n"
-  "\n"
-  "This class provides the basic interface. To implement callbacks, use the \\EditorHooks class."
-  "\n"
-  "The EditorHooksBase class has been introduced in version 0.29."
-);
 
 class EditorHooksImpl
   : public edt::EditorHooks
 {
 public:
-  EditorHooksImpl () { }
+  EditorHooksImpl ()
+    : edt::EditorHooks ()
+  {
+    //  .. nothing yet ..
+  }
 
-  virtual void begin_create (lay::LayoutView *view)
+  virtual void begin_create (lay::LayoutViewBase *view)
   {
     if (f_begin_create.can_issue ()) {
-      f_begin_create.issue<edt::EditorHooks, lay::LayoutView *> (&edt::EditorHooks::begin_create, view);
+      f_begin_create.issue<edt::EditorHooks, lay::LayoutViewBase *> (&edt::EditorHooks::begin_create, view);
     } else {
       edt::EditorHooks::begin_create (view);
     }
@@ -179,12 +57,12 @@ public:
     }
   }
 
-  virtual void create (const lay::ObjectInstPath &object, double dbu)
+  virtual void create (const lay::ObjectInstPath &object, const db::CplxTrans &view_trans)
   {
     if (f_create.can_issue ()) {
-      f_create.issue<edt::EditorHooks, const lay::ObjectInstPath &, double> (&edt::EditorHooks::create, object, dbu);
+      f_create.issue<edt::EditorHooks, const lay::ObjectInstPath &, const db::CplxTrans &> (&edt::EditorHooks::create, object, view_trans);
     } else {
-      edt::EditorHooks::create (object, dbu);
+      edt::EditorHooks::create (object, view_trans);
     }
   }
 
@@ -215,10 +93,10 @@ public:
     }
   }
 
-  virtual void begin_modify (lay::LayoutView *view)
+  virtual void begin_modify (lay::LayoutViewBase *view)
   {
     if (f_begin_modify.can_issue ()) {
-      f_begin_modify.issue<edt::EditorHooks, lay::LayoutView *> (&edt::EditorHooks::begin_modify, view);
+      f_begin_modify.issue<edt::EditorHooks, lay::LayoutViewBase *> (&edt::EditorHooks::begin_modify, view);
     } else {
       edt::EditorHooks::begin_modify (view);
     }
@@ -233,12 +111,12 @@ public:
     }
   }
 
-  virtual void modified (const lay::ObjectInstPath &object, double dbu)
+  virtual void modified (const lay::ObjectInstPath &object, const db::CplxTrans &view_trans)
   {
     if (f_modified.can_issue ()) {
-      f_modified.issue<edt::EditorHooks, const lay::ObjectInstPath &, double> (&edt::EditorHooks::modified, object, dbu);
+      f_modified.issue<edt::EditorHooks, const lay::ObjectInstPath &, const db::CplxTrans &> (&edt::EditorHooks::modified, object, view_trans);
     } else {
-      edt::EditorHooks::modified (object, dbu);
+      edt::EditorHooks::modified (object, view_trans);
     }
   }
 
@@ -269,10 +147,10 @@ public:
     }
   }
 
-  virtual void begin_edit (lay::LayoutView *view)
+  virtual void begin_edit (lay::LayoutViewBase *view)
   {
     if (f_begin_edit.can_issue ()) {
-      f_begin_edit.issue<edt::EditorHooks, lay::LayoutView *> (&edt::EditorHooks::begin_edit, view);
+      f_begin_edit.issue<edt::EditorHooks, lay::LayoutViewBase *> (&edt::EditorHooks::begin_edit, view);
     } else {
       edt::EditorHooks::begin_edit (view);
     }
@@ -287,12 +165,12 @@ public:
     }
   }
 
-  virtual void transformed (const lay::ObjectInstPath &object, const db::DCplxTrans &trans, double dbu)
+  virtual void transformed (const lay::ObjectInstPath &object, const db::ICplxTrans &applied_trans, const db::CplxTrans &view_trans)
   {
     if (f_transformed.can_issue ()) {
-      f_transformed.issue<edt::EditorHooks, const lay::ObjectInstPath &, const db::DCplxTrans &, double> (&edt::EditorHooks::transformed, object, trans, dbu);
+      f_transformed.issue<edt::EditorHooks, const lay::ObjectInstPath &, const db::ICplxTrans &, const db::CplxTrans &> (&edt::EditorHooks::transformed, object, applied_trans, view_trans);
     } else {
-      edt::EditorHooks::transformed (object, trans, dbu);
+      edt::EditorHooks::transformed (object, applied_trans, view_trans);
     }
   }
 
@@ -345,12 +223,149 @@ public:
   gsi::Callback f_end_edit;
 };
 
+static void register_editor_hooks (EditorHooksImpl *hooks, const std::string &name)
+{
+  edt::EditorHooks::register_editor_hooks (hooks, name);
+}
+
 gsi::Class<EditorHooksImpl> decl_EditorHooks ("lay", "EditorHooks",
-  callback ("begin_create", &EditorHooksImpl::begin_create, &EditorHooksImpl::f_begin_create,
+  gsi::callback ("begin_create", &EditorHooksImpl::begin_create, &EditorHooksImpl::f_begin_create,
     "@brief Creation protocol - begin session\n"
-    "See \\EditorHooksBase for a description of the protocol"
+    "This method is called to initiate an object creation session. The session is ended with "
+    "\\end_create. Between these calls, new objects are announced with \\begin_new_objects, "
+    "\\create and \\end_new_objects calls. These calls are repeated to indicate changes in the objects "
+    "created.\n"
+    "\n"
+    "\\commit_create is called once before \\end_create to indicate that the last set of "
+    "objects are committed to the database."
+  ) +
+  gsi::callback ("begin_new_objects", &EditorHooksImpl::begin_new_objects, &EditorHooksImpl::f_begin_new_objects,
+    "@brief Creation protocol - begin new objects\n"
+    "See \\begin_create for a description of the protocol."
+  ) +
+  gsi::callback ("create", &EditorHooksImpl::create, &EditorHooksImpl::f_create, gsi::arg ("object"), gsi::arg ("view_trans"),
+    "@brief Creation protocol - indicate a new object\n"
+    "See \\begin_create for a description of the protocol."
+  ) +
+  gsi::callback ("end_new_objects", &EditorHooksImpl::end_new_objects, &EditorHooksImpl::f_end_new_objects,
+    "@brief Creation protocol - finish list of new objects\n"
+    "See \\begin_create for a description of the protocol."
+  ) +
+  gsi::callback ("commit_create", &EditorHooksImpl::commit_create, &EditorHooksImpl::f_commit_create,
+    "@brief Creation protocol - commit new objects\n"
+    "See \\begin_create for a description of the protocol."
+  ) +
+  gsi::callback ("end_create", &EditorHooksImpl::end_create, &EditorHooksImpl::f_end_create,
+    "@brief Creation protocol - finish session\n"
+    "See \\begin_create for a description of the protocol."
+  ) +
+  gsi::callback ("begin_modify", &EditorHooksImpl::begin_modify, &EditorHooksImpl::f_begin_modify, gsi::arg ("view"),
+    "@brief Modification protocol - begin session\n"
+    "This method is called to initiate an object modification session. The session is ended with "
+    "\\end_modify. Between these calls, modified objects are announced with \\begin_modifications, "
+    "\\modified and \\end_modifications calls. These calls are repeated to indicate changes in the objects "
+    "modified while moving the mouse for example.\n"
+    "\n"
+    "\\commit_modify is called once before \\end_modify to indicate that the last set of "
+    "objects are committed to the database."
+  ) +
+  gsi::callback ("begin_modifications", &EditorHooksImpl::begin_modifications, &EditorHooksImpl::f_begin_modifications,
+    "@brief Modification protocol - begin modifications\n"
+    "See \\begin_modify for a description of the protocol."
+  ) +
+  gsi::callback ("modified", &EditorHooksImpl::modified, &EditorHooksImpl::f_modified, gsi::arg ("object"), gsi::arg ("view_trans"),
+    "@brief Modification protocol - indicate a modified object\n"
+    "See \\begin_modify for a description of the protocol."
+  ) +
+  gsi::callback ("end_modifications", &EditorHooksImpl::end_modifications, &EditorHooksImpl::f_end_modifications,
+    "@brief Modification protocol - finish list of modifications\n"
+    "See \\begin_modify for a description of the protocol."
+  ) +
+  gsi::callback ("commit_modify", &EditorHooksImpl::commit_modify, &EditorHooksImpl::f_commit_modify,
+    "@brief Modification protocol - commit new objects\n"
+    "See \\begin_modify for a description of the protocol."
+  ) +
+  gsi::callback ("end_modify", &EditorHooksImpl::end_modify, &EditorHooksImpl::f_end_modify,
+    "@brief Modification protocol - finish session\n"
+    "See \\begin_modify for a description of the protocol."
+  ) +
+  gsi::callback ("begin_edit", &EditorHooksImpl::begin_edit, &EditorHooksImpl::f_begin_edit, gsi::arg ("view"),
+    "@brief Editing protocol - begin session\n"
+    "This method is called to initiate an object editing session. The session is ended with "
+    "\\end_edit. Between these calls, edits are announced with \\begin_edits, "
+    "\\transformed and \\end_edits calls. These calls are repeated to indicate changes in the objects "
+    "modified while moving the mouse for example.\n"
+    "\n"
+    "\\commit_edit is called once before \\end_edit to indicate that the last set of "
+    "objects are committed to the database."
+  ) +
+  gsi::callback ("begin_edits", &EditorHooksImpl::begin_edits, &EditorHooksImpl::f_begin_edits,
+    "@brief Editing protocol - begin edits\n"
+    "See \\begin_edit for a description of the protocol."
+  ) +
+  gsi::callback ("transformed", &EditorHooksImpl::transformed, &EditorHooksImpl::f_transformed, gsi::arg ("object"), gsi::arg ("applied_trans"), gsi::arg ("view_trans"),
+    "@brief Editing protocol - indicate an object transformation\n"
+    "See \\begin_edit for a description of the protocol.\n"
+    "\n"
+    "@param object A path to the modified object\n"
+    "@param applied_trans The DBU-space of the transformation applied to the object\n"
+    "@param view_trans The combined transformation of DBU space to view space\n"
+  ) +
+  gsi::callback ("end_edits", &EditorHooksImpl::end_edits, &EditorHooksImpl::f_end_edits,
+    "@brief Editing protocol - finish list of edits\n"
+    "See \\begin_edit for a description of the protocol."
+  ) +
+  gsi::callback ("commit_edit", &EditorHooksImpl::commit_edit, &EditorHooksImpl::f_commit_edit,
+    "@brief Editing protocol - commit new objects\n"
+    "See \\begin_edit for a description of the protocol."
+  ) +
+  gsi::callback ("end_edit", &EditorHooksImpl::end_edit, &EditorHooksImpl::f_end_edit,
+    "@brief Editing protocol - finish session\n"
+    "See \\begin_edit for a description of the protocol."
+  ) +
+  gsi::method ("technology=", &EditorHooksImpl::set_technology, gsi::arg ("technology"),
+    "@brief sets the name of the technology the hooks are associated with\n"
+    "This will clear all technology associations and associate the hooks with that technology only.\n"
+  ) +
+  gsi::method ("clear_technologies", &EditorHooksImpl::clear_technologies,
+    "@brief Clears the list of technologies the hooks are associated with.\n"
+    "See also \\add_technology.\n"
+  ) +
+  gsi::method ("add_technology", &EditorHooksImpl::add_technology, gsi::arg ("tech"),
+    "@brief Additionally associates the hooks with the given technology.\n"
+    "See also \\clear_technologies.\n"
+  ) +
+  gsi::method ("is_for_technology", &EditorHooksImpl::is_for_technology, gsi::arg ("tech"),
+    "@brief Returns a value indicating whether the hooks are associated with the given technology.\n"
+  ) +
+  gsi::method ("for_technologies", &EditorHooksImpl::for_technologies,
+    "@brief Returns a value indicating whether the hooks are associated with any technology.\n"
+    "The method is equivalent to checking whether the \\technologies list is empty.\n"
+  ) +
+  gsi::method ("technologies", &EditorHooksImpl::get_technologies,
+    "@brief Gets the list of technologies these hooks are associated with.\n"
+  ) +
+  gsi::method ("name", &EditorHooksImpl::name,
+    "@brief Gets the name of the hooks object.\n"
+    "This is the name, the object was registered under in the system."
+  ) +
+  gsi::method_ext ("register", &register_editor_hooks, gsi::arg ("name"),
+    "@brief Registers the hooks in the system.\n"
+    "The hooks will not be active before they are registered in the system. Registration will "
+    "also transfer object ownership to the system.\n"
+    "\n"
+    "The name is arbitary, but should be unique. Upon registration, this hooks object will "
+    "replace others with the same name already registered in the system. This will simplify "
+    "debugging as you can re-run the same code, without accumulating hooks.\n"
   ),
   "@brief An implementation base class for editor hooks\n"
+  "\n"
+  "Editor hooks allow implementing technology-specific callbacks into the editor "
+  "for example to implement visual feedback about DRC rules.\n"
+  "\n"
+  "This class provides the basic interface. To implement callbacks, use the \\EditorHooks class. "
+  "You should not need to instantiate this class.\n"
+  "\n"
   // @@@
   "\n"
   "The EditorHooks class has been introduced in version 0.29."

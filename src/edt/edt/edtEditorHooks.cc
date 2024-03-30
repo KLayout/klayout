@@ -59,9 +59,21 @@ public:
     return sp_instance;
   }
 
-  void register_editor_hook (EditorHooks *hook)
+  void register_editor_hooks (EditorHooks *hooks, const std::string &name)
   {
-    m_hooks.push_back (hook);
+    //  needed, so we do not loose the object in case we erase it:
+    tl::shared_ptr<EditorHooks> tmp (hooks);
+
+    //  remove other hooks with the same name or with an identical address
+    for (auto h = m_hooks.begin (); h != m_hooks.end (); ) {
+      auto hh = h++;
+      if (hh.operator-> () && (hh.operator-> () == hooks || hh->name () == name)) {
+        m_hooks.erase (hh);
+      }
+    }
+
+    hooks->set_name (name);
+    m_hooks.push_back (hooks);
   }
 
   tl::weak_collection<EditorHooks>
@@ -69,7 +81,7 @@ public:
   {
     tl::weak_collection<EditorHooks> res;
     for (auto h = m_hooks.begin (); h != m_hooks.end (); ++h) {
-      if (! h->for_technologies () || h->is_for_technology (for_technology)) {
+      if (h.operator-> () && (! h->for_technologies () || h->is_for_technology (for_technology))) {
         res.push_back (h.operator-> ());
       }
     }
@@ -128,11 +140,11 @@ EditorHooks::add_technology (const std::string &tech)
 }
 
 void
-EditorHooks::register_editor_hook (EditorHooks *hook)
+EditorHooks::register_editor_hooks (EditorHooks *hooks, const std::string &name)
 {
   if (EditorHooksManager::instance ()) {
-    hook->keep ();
-    EditorHooksManager::instance ()->register_editor_hook (hook);
+    hooks->keep ();
+    EditorHooksManager::instance ()->register_editor_hooks (hooks, name);
   }
 }
 

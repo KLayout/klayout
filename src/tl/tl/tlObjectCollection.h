@@ -116,12 +116,10 @@ public:
   /**
    *  @brief Post-decrement
    */
-  weak_or_shared_collection_iterator<T, Holder, Shared> operator-- (int n)
+  weak_or_shared_collection_iterator<T, Holder, Shared> operator-- (int)
   {
     weak_or_shared_collection_iterator<T, Holder, Shared> ret = *this;
-    while (n-- > 0) {
-      operator-- ();
-    }
+    operator-- ();
     return ret;
   }
 
@@ -138,12 +136,10 @@ public:
   /**
    *  @brief Post-increment
    */
-  weak_or_shared_collection_iterator<T, Holder, Shared> operator++ (int n)
+  weak_or_shared_collection_iterator<T, Holder, Shared> operator++ (int)
   {
     weak_or_shared_collection_iterator<T, Holder, Shared> ret = *this;
-    while (n-- > 0) {
-      operator++ ();
-    }
+    operator++ ();
     return ret;
   }
 

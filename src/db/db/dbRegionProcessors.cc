@@ -346,4 +346,125 @@ TriangulationProcessor::process (const db::Polygon &poly, std::vector<db::Polygo
   }
 }
 
+// -----------------------------------------------------------------------------------
+//  DRCHullProcessor implementation
+
+DRCHullProcessor::DRCHullProcessor (db::Coord d, db::metrics_type metrics, size_t n_circle)
+  : m_d (d), m_metrics (metrics), m_n_circle (n_circle)
+{
+  //  .. nothing yet ..
+}
+
+static void create_edge_segment_euclidian (std::vector<db::Point> &points, const db::Edge &e, db::Coord dist, size_t n_circle)
+{
+  db::Vector d (e.d ());
+  db::Vector n (-d.y (), d.x ());
+
+  if (d.x () == 0 && d.y () == 0) {
+    return;
+  }
+
+  double da = M_PI * 2.0 / n_circle;
+  double f = dist / n.double_length ();
+  double f2 = f / cos (0.5 * da);
+
+  points.push_back (e.p1 ());
+  points.push_back (e.p1 () + db::Vector (d * -f));
+
+  for (size_t i = 0; i < n_circle / 4; ++i) {
+    double a = (i + 0.5) * da;
+    points.push_back (e.p1 () + db::Vector (d * (-f2 * cos (a)) + n * (f2 * sin (a))));
+  }
+
+  points.push_back (e.p1 () + db::Vector (n * f));
+  points.push_back (e.p2 () + db::Vector (n * f));
+
+  for (size_t i = 0; i < n_circle / 4; ++i) {
+    double a = (i + 0.5) * da;
+    points.push_back (e.p2 () + db::Vector (d * (f2 * sin (a)) + n * (f2 * cos (a))));
+  }
+
+  points.push_back (e.p2 () + db::Vector (d * f));
+}
+
+static void create_edge_segment_square (std::vector<db::Point> &points, const db::Edge &e, db::Coord dist)
+{
+  db::Vector d (e.d ());
+  db::Vector n (-d.y (), d.x ());
+
+  if (d.x () == 0 && d.y () == 0) {
+    return;
+  }
+
+  double f = dist / n.double_length ();
+
+  points.push_back (e.p1 ());
+  points.push_back (e.p1 () + db::Vector (d * -f));
+  points.push_back (e.p1 () + db::Vector (d * -f + n * f));
+  points.push_back (e.p2 () + db::Vector (d * f + n * f));
+  points.push_back (e.p2 () + db::Vector (d * f));
+}
+
+static void create_edge_segment_projection (std::vector<db::Point> &points, const db::Edge &e, db::Coord dist)
+{
+  db::Vector d (e.d ());
+  db::Vector n (-d.y (), d.x ());
+
+  if (d.x () == 0 && d.y () == 0) {
+    return;
+  }
+
+  double f = dist / n.double_length ();
+
+  points.push_back (e.p1 ());
+  points.push_back (e.p1 () + db::Vector (n * f));
+  points.push_back (e.p2 () + db::Vector (n * f));
+}
+
+static void create_edge_segment (std::vector<db::Point> &points, db::metrics_type metrics, const db::Edge &e, db::Coord d, size_t n_circle)
+{
+  if (metrics == db::Euclidian) {
+    create_edge_segment_euclidian (points, e, d, n_circle);
+  } else if (metrics == db::Square) {
+    create_edge_segment_square (points, e, d);
+  } else if (metrics == db::Projection) {
+    create_edge_segment_projection (points, e, d);
+  }
+}
+
+void
+DRCHullProcessor::process (const db::Polygon &poly, std::vector<db::Polygon> &result) const
+{
+  result.push_back (db::Polygon ());
+
+  for (unsigned int i = 0; i < poly.holes () + 1; ++i) {
+
+    auto c = poly.contour (i);
+    if (c.size () < 2) {
+      continue;
+    }
+
+    std::vector<db::Point> points;
+
+    for (auto p = c.begin (); p != c.end (); ++p) {
+
+      auto pp = p;
+      ++pp;
+      if (pp == c.end ()) {
+        pp = c.begin ();
+      }
+
+      create_edge_segment (points, m_metrics, db::Edge (*p, *pp), m_d, m_n_circle);
+
+    }
+
+    if (i == 0) {
+      result.back ().assign_hull (points.begin (), points.end ());
+    } else {
+      result.back ().insert_hole (points.begin (), points.end ());
+    }
+
+  }
+}
+
 }

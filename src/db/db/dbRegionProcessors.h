@@ -29,6 +29,7 @@
 #include "dbPolygonTools.h"
 #include "dbEdgesUtils.h"
 #include "dbTriangles.h"
+#include "dbEdgePairRelations.h"
 
 namespace db
 {
@@ -463,6 +464,24 @@ private:
   K m_q;
   db::MagnificationAndOrientationReducer m_vars;
 };
+
+/**
+ *  @brief Computes DRC hulls for DRC space visualization
+ */
+class DB_PUBLIC_TEMPLATE DRCHullProcessor
+  : public db::PolygonProcessorBase
+{
+public:
+  DRCHullProcessor (db::Coord d, db::metrics_type metrics, size_t n_circle = 64);
+
+  void process (const db::Polygon &poly, std::vector<db::Polygon> &result) const;
+
+private:
+  db::Coord m_d;
+  db::metrics_type m_metrics;
+  size_t m_n_circle;
+};
+
 
 }
 

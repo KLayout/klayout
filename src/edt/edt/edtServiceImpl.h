@@ -89,7 +89,6 @@ private:
   db::Layout *mp_layout;
   combine_mode_type m_combine_mode;
   tl::weak_collection<edt::EditorHooks> m_editor_hooks;
-  std::unique_ptr<db::Shapes> m_tmp_shapes;
 
   void update_edit_layer (const lay::LayerPropertiesConstIterator &iter);
 };

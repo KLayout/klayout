@@ -37,8 +37,16 @@
 
 namespace lay
 {
+  class CellViewRef;
   class LayoutViewBase;
+  class LayerProperties;
   class ObjectInstPath;
+}
+
+namespace db
+{
+  class Instance;
+  class Shape;
 }
 
 namespace edt
@@ -54,7 +62,8 @@ namespace edt
  *
  *  1. Object Creation
  *
- *    begin_create { begin_new_objects { create } end_new_objects } [ commit_create ] end_create
+ *    begin_create_shapes { begin_new_shapes { create_shape } end_new_shapes } [ commit_shapes ] end_create_shapes
+ *    begin_create_instances { begin_new_instances { create_instance } end_new_instances } [ commit_instances ] end_create_instances
  *
  *  2. Modification (i.e. partial edit)
  *
@@ -85,13 +94,21 @@ public:
    */
   virtual ~EditorHooks ();
 
-  //  creation protocol
-  virtual void begin_create (lay::LayoutViewBase * /*view*/) { }
-  virtual void begin_new_objects () { }
-  virtual void create (const lay::ObjectInstPath & /*object*/, const db::CplxTrans & /*view_trans*/) { }
-  virtual void end_new_objects () { }
-  virtual void commit_create () { }
-  virtual void end_create () { }
+  //  shape creation protocol
+  virtual void begin_create_shapes (lay::CellViewRef & /*cv*/, const lay::LayerProperties & /*layer*/) { }
+  virtual void begin_new_shapes () { }
+  virtual void create_shape (const db::Shape & /*shape*/, const db::CplxTrans & /*view_trans*/) { }
+  virtual void end_new_shapes () { }
+  virtual void commit_shapes () { }
+  virtual void end_create_shapes () { }
+
+  //  instance creation protocol
+  virtual void begin_create_instances (lay::CellViewRef & /*cv*/) { }
+  virtual void begin_new_instances () { }
+  virtual void create_instance (const db::Instance & /*instance*/, const db::CplxTrans & /*view_trans*/) { }
+  virtual void end_new_instances () { }
+  virtual void commit_instances () { }
+  virtual void end_create_instances () { }
 
   //  modification protocol
   virtual void begin_modify (lay::LayoutViewBase * /*view*/) { }
@@ -265,7 +282,7 @@ void call_editor_hooks (const tl::weak_collection<EditorHooks> &hooks, void (Edi
 
 template <class A1, class A2, class A3>
 inline
-void call_editor_hooks (const tl::weak_collection<EditorHooks> &hooks, void (EditorHooks::*meth) (A1, A2), A1 a1, A2 a2, A3 a3)
+void call_editor_hooks (const tl::weak_collection<EditorHooks> &hooks, void (EditorHooks::*meth) (A1, A2, A3), A1 a1, A2 a2, A3 a3)
 {
   for (auto h = hooks.begin (); h != hooks.end (); ++h) {
     try {

@@ -408,45 +408,30 @@ ShapeEditService::open_editor_hooks ()
     technology = mp_layout->technology ()->name ();
   }
 
-  //  NOTE: this is a kind of hack - as we want to present the new shape in some
-  //  natural habitat (aka Shapes), we create an artificial Shapes container for holding the
-  //  temporary object.
-  m_tmp_shapes.reset (new db::Shapes (0, mp_cell, true));
-
   m_editor_hooks = edt::EditorHooks::get_editor_hooks (technology);
-  call_editor_hooks (m_editor_hooks, &edt::EditorHooks::begin_create, view ());
+
+  lay::CellViewRef cv_ref (view ()->cellview_ref (m_cv_index));
+  call_editor_hooks<lay::CellViewRef &, const lay::LayerProperties &> (m_editor_hooks, &edt::EditorHooks::begin_create_shapes, cv_ref, *view ()->current_layer ());
 }
 
 void
 ShapeEditService::close_editor_hooks (bool with_commit)
 {
   if (with_commit) {
-    call_editor_hooks (m_editor_hooks, &edt::EditorHooks::commit_create);
+    call_editor_hooks (m_editor_hooks, &edt::EditorHooks::commit_shapes);
   }
-  call_editor_hooks (m_editor_hooks, &edt::EditorHooks::end_create);
+  call_editor_hooks (m_editor_hooks, &edt::EditorHooks::end_create_shapes);
 
   m_editor_hooks.clear ();
-  m_tmp_shapes.reset (0);
 }
 
 template <class Shape>
 void
 ShapeEditService::deliver_shape_to_hooks (const Shape &shape)
 {
-  if (! mp_cell || ! m_tmp_shapes.get ()) {
-    return;
-  }
-
-  m_tmp_shapes->clear ();
-  db::Shape s = m_tmp_shapes->insert (shape);
-
-  lay::ObjectInstPath path;
-  path.set_cv_index (m_cv_index);
-  path.set_layer (m_layer);
-  path.set_topcell (mp_cell->cell_index ());
-  path.set_shape (s);
-
-  call_editor_hooks<const lay::ObjectInstPath &, const db::CplxTrans &> (m_editor_hooks, &edt::EditorHooks::create, path, trans ().inverted ());
+  db::Shapes tmp (true);
+  db::Shape s = tmp.insert (shape);
+  call_editor_hooks<const db::Shape &, const db::CplxTrans &> (m_editor_hooks, &edt::EditorHooks::create_shape, s, trans ().inverted ());
 }
 
 //  explicit instantiations
@@ -797,13 +782,13 @@ PolygonService::update_marker ()
 
   //  call hooks with new shape
   if (! editor_hooks ().empty ()) {
-    call_editor_hooks (editor_hooks (), &edt::EditorHooks::begin_new_objects);
+    call_editor_hooks (editor_hooks (), &edt::EditorHooks::begin_new_shapes);
     try {
       deliver_shape_to_hooks (get_polygon (true));
     } catch (...) {
       //  ignore exceptions
     }
-    call_editor_hooks (editor_hooks (), &edt::EditorHooks::end_new_objects);
+    call_editor_hooks (editor_hooks (), &edt::EditorHooks::end_new_shapes);
   }
 }
 
@@ -863,13 +848,13 @@ BoxService::update_marker ()
 
   //  call hooks with new shape
   if (! editor_hooks ().empty ()) {
-    call_editor_hooks (editor_hooks (), &edt::EditorHooks::begin_new_objects);
+    call_editor_hooks (editor_hooks (), &edt::EditorHooks::begin_new_shapes);
     try {
       deliver_shape_to_hooks (get_box ());
     } catch (...) {
       //  ignore exceptions
     }
-    call_editor_hooks (editor_hooks (), &edt::EditorHooks::end_new_objects);
+    call_editor_hooks (editor_hooks (), &edt::EditorHooks::end_new_shapes);
   }
 }
 
@@ -974,13 +959,13 @@ PointService::update_marker ()
 
   //  call hooks with new shape
   if (! editor_hooks ().empty ()) {
-    call_editor_hooks (editor_hooks (), &edt::EditorHooks::begin_new_objects);
+    call_editor_hooks (editor_hooks (), &edt::EditorHooks::begin_new_shapes);
     try {
       deliver_shape_to_hooks (get_point ());
     } catch (...) {
       //  ignore exceptions
     }
-    call_editor_hooks (editor_hooks (), &edt::EditorHooks::end_new_objects);
+    call_editor_hooks (editor_hooks (), &edt::EditorHooks::end_new_shapes);
   }
 }
 
@@ -1091,13 +1076,13 @@ TextService::update_marker ()
 
   //  call hooks with new shape
   if (! editor_hooks ().empty ()) {
-    call_editor_hooks (editor_hooks (), &edt::EditorHooks::begin_new_objects);
+    call_editor_hooks (editor_hooks (), &edt::EditorHooks::begin_new_shapes);
     try {
       deliver_shape_to_hooks (get_text ());
     } catch (...) {
       //  ignore exceptions
     }
-    call_editor_hooks (editor_hooks (), &edt::EditorHooks::end_new_objects);
+    call_editor_hooks (editor_hooks (), &edt::EditorHooks::end_new_shapes);
   }
 }
 
@@ -1394,13 +1379,13 @@ PathService::update_marker ()
 
   //  call hooks with new shape
   if (! editor_hooks ().empty ()) {
-    call_editor_hooks (editor_hooks (), &edt::EditorHooks::begin_new_objects);
+    call_editor_hooks (editor_hooks (), &edt::EditorHooks::begin_new_shapes);
     try {
       deliver_shape_to_hooks (get_path ());
     } catch (...) {
       //  ignore exceptions
     }
-    call_editor_hooks (editor_hooks (), &edt::EditorHooks::end_new_objects);
+    call_editor_hooks (editor_hooks (), &edt::EditorHooks::end_new_shapes);
   }
 }
 
@@ -2269,7 +2254,7 @@ InstService::update_marker ()
   //  call hooks with new shape
   if (! editor_hooks ().empty ()) {
 
-    call_editor_hooks (editor_hooks (), &edt::EditorHooks::begin_new_objects);
+    call_editor_hooks (editor_hooks (), &edt::EditorHooks::begin_new_instances);
 
     try {
 
@@ -2278,18 +2263,12 @@ InstService::update_marker ()
       db::CellInstArray inst;
       if (cv.is_valid () && get_inst (inst)) {
 
-        //  Note: we create a temporary instance collection and a temporary
-        //  ObjectInstPath object there, so
+        //  Note: the instance collection is temporary
         db::Instances instances (cv.cell ());
-
-        lay::ObjectInstPath path;
-        path.set_cv_index (m_cv_index);
-        path.set_topcell (cv.cell_index ());
-        path.add_path (db::InstElement (instances.insert (inst)));
+        db::Instance i = instances.insert (inst);
 
         db::CplxTrans view_trans = db::CplxTrans (cv->layout ().dbu ()) * m_trans;
-
-        call_editor_hooks<const lay::ObjectInstPath &, const db::CplxTrans &> (m_editor_hooks, &edt::EditorHooks::create, path, view_trans);
+        call_editor_hooks<const db::Instance &, const db::CplxTrans &> (m_editor_hooks, &edt::EditorHooks::create_instance, i, view_trans);
 
       }
 
@@ -2297,7 +2276,7 @@ InstService::update_marker ()
       //  ignore exceptions
     }
 
-    call_editor_hooks (editor_hooks (), &edt::EditorHooks::end_new_objects);
+    call_editor_hooks (editor_hooks (), &edt::EditorHooks::end_new_instances);
 
   }
 }
@@ -2345,16 +2324,18 @@ InstService::open_editor_hooks ()
   }
 
   m_editor_hooks = edt::EditorHooks::get_editor_hooks (technology);
-  call_editor_hooks (m_editor_hooks, &edt::EditorHooks::begin_create, view ());
+
+  lay::CellViewRef cv_ref (view ()->cellview_ref (m_cv_index));
+  call_editor_hooks<lay::CellViewRef &> (m_editor_hooks, &edt::EditorHooks::begin_create_instances, cv_ref);
 }
 
 void
 InstService::close_editor_hooks (bool with_commit)
 {
   if (with_commit) {
-    call_editor_hooks (m_editor_hooks, &edt::EditorHooks::commit_create);
+    call_editor_hooks (m_editor_hooks, &edt::EditorHooks::commit_instances);
   }
-  call_editor_hooks (m_editor_hooks, &edt::EditorHooks::end_create);
+  call_editor_hooks (m_editor_hooks, &edt::EditorHooks::end_create_instances);
 
   m_editor_hooks.clear ();
 }

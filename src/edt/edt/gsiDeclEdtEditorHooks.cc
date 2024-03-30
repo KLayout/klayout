@@ -39,57 +39,111 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual void begin_create (lay::LayoutViewBase *view)
+  virtual void begin_create_shapes (lay::CellViewRef &cv, const lay::LayerProperties &layer)
   {
-    if (f_begin_create.can_issue ()) {
-      f_begin_create.issue<edt::EditorHooks, lay::LayoutViewBase *> (&edt::EditorHooks::begin_create, view);
+    if (f_begin_create_shapes.can_issue ()) {
+      f_begin_create_shapes.issue<edt::EditorHooks, lay::CellViewRef &, const lay::LayerProperties &> (&edt::EditorHooks::begin_create_shapes, cv, layer);
     } else {
-      edt::EditorHooks::begin_create (view);
+      edt::EditorHooks::begin_create_shapes (cv, layer);
     }
   }
 
-  virtual void begin_new_objects ()
+  virtual void begin_new_shapes ()
   {
-    if (f_begin_new_objects.can_issue ()) {
-      f_begin_new_objects.issue<edt::EditorHooks> (&edt::EditorHooks::begin_new_objects);
+    if (f_begin_new_shapes.can_issue ()) {
+      f_begin_new_shapes.issue<edt::EditorHooks> (&edt::EditorHooks::begin_new_shapes);
     } else {
-      edt::EditorHooks::begin_new_objects ();
+      edt::EditorHooks::begin_new_shapes ();
     }
   }
 
-  virtual void create (const lay::ObjectInstPath &object, const db::CplxTrans &view_trans)
+  virtual void create_shape (const db::Shape &shape, const db::CplxTrans &view_trans)
   {
-    if (f_create.can_issue ()) {
-      f_create.issue<edt::EditorHooks, const lay::ObjectInstPath &, const db::CplxTrans &> (&edt::EditorHooks::create, object, view_trans);
+    if (f_create_shape.can_issue ()) {
+      f_create_shape.issue<edt::EditorHooks, const db::Shape &, const db::CplxTrans &> (&edt::EditorHooks::create_shape, shape, view_trans);
     } else {
-      edt::EditorHooks::create (object, view_trans);
+      edt::EditorHooks::create_shape (shape, view_trans);
     }
   }
 
-  virtual void end_new_objects ()
+  virtual void end_new_shapes ()
   {
-    if (f_end_new_objects.can_issue ()) {
-      f_end_new_objects.issue<edt::EditorHooks> (&edt::EditorHooks::end_new_objects);
+    if (f_end_new_shapes.can_issue ()) {
+      f_end_new_shapes.issue<edt::EditorHooks> (&edt::EditorHooks::end_new_shapes);
     } else {
-      edt::EditorHooks::end_new_objects ();
+      edt::EditorHooks::end_new_shapes ();
     }
   }
 
-  virtual void commit_create ()
+  virtual void commit_shapes ()
   {
-    if (f_commit_create.can_issue ()) {
-      f_commit_create.issue<edt::EditorHooks> (&edt::EditorHooks::commit_create);
+    if (f_commit_shapes.can_issue ()) {
+      f_commit_shapes.issue<edt::EditorHooks> (&edt::EditorHooks::commit_shapes);
     } else {
-      edt::EditorHooks::commit_create ();
+      edt::EditorHooks::commit_shapes ();
     }
   }
 
-  virtual void end_create ()
+  virtual void end_create_shapes ()
   {
-    if (f_end_create.can_issue ()) {
-      f_end_create.issue<edt::EditorHooks> (&edt::EditorHooks::end_create);
+    if (f_end_create_shapes.can_issue ()) {
+      f_end_create_shapes.issue<edt::EditorHooks> (&edt::EditorHooks::end_create_shapes);
     } else {
-      edt::EditorHooks::end_create ();
+      edt::EditorHooks::end_create_shapes ();
+    }
+  }
+
+  virtual void begin_create_instances (lay::CellViewRef &cv)
+  {
+    if (f_begin_create_instances.can_issue ()) {
+      f_begin_create_instances.issue<edt::EditorHooks, lay::CellViewRef &> (&edt::EditorHooks::begin_create_instances, cv);
+    } else {
+      edt::EditorHooks::begin_create_instances (cv);
+    }
+  }
+
+  virtual void begin_new_instances ()
+  {
+    if (f_begin_new_instances.can_issue ()) {
+      f_begin_new_instances.issue<edt::EditorHooks> (&edt::EditorHooks::begin_new_instances);
+    } else {
+      edt::EditorHooks::begin_new_instances ();
+    }
+  }
+
+  virtual void create_instance (const db::Instance &object, const db::CplxTrans &view_trans)
+  {
+    if (f_create_instance.can_issue ()) {
+      f_create_instance.issue<edt::EditorHooks, const db::Instance &, const db::CplxTrans &> (&edt::EditorHooks::create_instance, object, view_trans);
+    } else {
+      edt::EditorHooks::create_instance (object, view_trans);
+    }
+  }
+
+  virtual void end_new_instances ()
+  {
+    if (f_end_new_instances.can_issue ()) {
+      f_end_new_instances.issue<edt::EditorHooks> (&edt::EditorHooks::end_new_instances);
+    } else {
+      edt::EditorHooks::end_new_instances ();
+    }
+  }
+
+  virtual void commit_instances ()
+  {
+    if (f_commit_instances.can_issue ()) {
+      f_commit_instances.issue<edt::EditorHooks> (&edt::EditorHooks::commit_instances);
+    } else {
+      edt::EditorHooks::commit_instances ();
+    }
+  }
+
+  virtual void end_create_instances ()
+  {
+    if (f_end_create_instances.can_issue ()) {
+      f_end_create_instances.issue<edt::EditorHooks> (&edt::EditorHooks::end_create_instances);
+    } else {
+      edt::EditorHooks::end_create_instances ();
     }
   }
 
@@ -201,12 +255,19 @@ public:
     }
   }
 
-  gsi::Callback f_begin_create;
-  gsi::Callback f_begin_new_objects;
-  gsi::Callback f_create;
-  gsi::Callback f_end_new_objects;
-  gsi::Callback f_commit_create;
-  gsi::Callback f_end_create;
+  gsi::Callback f_begin_create_shapes;
+  gsi::Callback f_begin_new_shapes;
+  gsi::Callback f_create_shape;
+  gsi::Callback f_end_new_shapes;
+  gsi::Callback f_commit_shapes;
+  gsi::Callback f_end_create_shapes;
+
+  gsi::Callback f_begin_create_instances;
+  gsi::Callback f_begin_new_instances;
+  gsi::Callback f_create_instance;
+  gsi::Callback f_end_new_instances;
+  gsi::Callback f_commit_instances;
+  gsi::Callback f_end_create_instances;
 
   gsi::Callback f_begin_modify;
   gsi::Callback f_begin_modifications;
@@ -229,34 +290,64 @@ static void register_editor_hooks (EditorHooksImpl *hooks, const std::string &na
 }
 
 gsi::Class<EditorHooksImpl> decl_EditorHooks ("lay", "EditorHooks",
-  gsi::callback ("begin_create", &EditorHooksImpl::begin_create, &EditorHooksImpl::f_begin_create,
-    "@brief Creation protocol - begin session\n"
-    "This method is called to initiate an object creation session. The session is ended with "
-    "\\end_create. Between these calls, new objects are announced with \\begin_new_objects, "
-    "\\create and \\end_new_objects calls. These calls are repeated to indicate changes in the objects "
+  gsi::callback ("begin_create_shapes", &EditorHooksImpl::begin_create_shapes, &EditorHooksImpl::f_begin_create_shapes, gsi::arg ("cellview"), gsi::arg ("layer"),
+    "@brief Shape creation protocol - begin session\n"
+    "This method is called to initiate a shape creation session. The session is ended with "
+    "\\end_create_shapes. Between these calls, new objects are announced with \\begin_new_shapes, "
+    "\\create_shape and \\end_new_shapes calls. These calls are repeated to indicate changes in the objects "
     "created.\n"
     "\n"
-    "\\commit_create is called once before \\end_create to indicate that the last set of "
-    "objects are committed to the database."
+    "\\commit_shapes is called once before \\end_create_shapes to indicate that the last set of "
+    "objects is committed to the database."
   ) +
-  gsi::callback ("begin_new_objects", &EditorHooksImpl::begin_new_objects, &EditorHooksImpl::f_begin_new_objects,
-    "@brief Creation protocol - begin new objects\n"
+  gsi::callback ("begin_new_shapes", &EditorHooksImpl::begin_new_shapes, &EditorHooksImpl::f_begin_new_shapes,
+    "@brief Shape creation protocol - begin new shapes\n"
+    "See \\begin_create_shapes for a description of the protocol."
+  ) +
+  gsi::callback ("create_shape", &EditorHooksImpl::create_shape, &EditorHooksImpl::f_create_shape, gsi::arg ("shape"), gsi::arg ("view_trans"),
+    "@brief Shape creation protocol - indicate a new object\n"
+    "See \\begin_create_shapes for a description of the protocol."
+  ) +
+  gsi::callback ("end_new_shapes", &EditorHooksImpl::end_new_shapes, &EditorHooksImpl::f_end_new_shapes,
+    "@brief Shape creation protocol - finish list of new shapes\n"
+    "See \\begin_create_shapes for a description of the protocol."
+  ) +
+  gsi::callback ("commit_shapes", &EditorHooksImpl::commit_shapes, &EditorHooksImpl::f_commit_shapes,
+    "@brief Shape creation protocol - commit new objects\n"
+    "See \\begin_create_shapes for a description of the protocol."
+  ) +
+  gsi::callback ("end_create_shapes", &EditorHooksImpl::end_create_shapes, &EditorHooksImpl::f_end_create_shapes,
+    "@brief Shape creation protocol - finish session\n"
     "See \\begin_create for a description of the protocol."
   ) +
-  gsi::callback ("create", &EditorHooksImpl::create, &EditorHooksImpl::f_create, gsi::arg ("object"), gsi::arg ("view_trans"),
-    "@brief Creation protocol - indicate a new object\n"
-    "See \\begin_create for a description of the protocol."
+  gsi::callback ("begin_create_instances", &EditorHooksImpl::begin_create_instances, &EditorHooksImpl::f_begin_create_instances, gsi::arg ("cellview"),
+    "@brief Instance creation protocol - begin session\n"
+    "This method is called to initiate an instance creation session. The session is ended with "
+    "\\end_create_instances. Between these calls, new objects are announced with \\begin_new_instances, "
+    "\\create_instance and \\end_new_instances calls. These calls are repeated to indicate changes in the objects "
+    "created.\n"
+    "\n"
+    "\\commit_instances is called once before \\end_create_instances to indicate that the last set of "
+    "objects is committed to the database."
   ) +
-  gsi::callback ("end_new_objects", &EditorHooksImpl::end_new_objects, &EditorHooksImpl::f_end_new_objects,
-    "@brief Creation protocol - finish list of new objects\n"
-    "See \\begin_create for a description of the protocol."
+  gsi::callback ("begin_new_instances", &EditorHooksImpl::begin_new_instances, &EditorHooksImpl::f_begin_new_instances,
+    "@brief Instance creation protocol - begin new instances\n"
+    "See \\begin_create_instances for a description of the protocol."
   ) +
-  gsi::callback ("commit_create", &EditorHooksImpl::commit_create, &EditorHooksImpl::f_commit_create,
-    "@brief Creation protocol - commit new objects\n"
-    "See \\begin_create for a description of the protocol."
+  gsi::callback ("create_instance", &EditorHooksImpl::create_instance, &EditorHooksImpl::f_create_instance, gsi::arg ("instance"), gsi::arg ("view_trans"),
+    "@brief Instance creation protocol - indicate a new object\n"
+    "See \\begin_create_instances for a description of the protocol."
   ) +
-  gsi::callback ("end_create", &EditorHooksImpl::end_create, &EditorHooksImpl::f_end_create,
-    "@brief Creation protocol - finish session\n"
+  gsi::callback ("end_new_instances", &EditorHooksImpl::end_new_instances, &EditorHooksImpl::f_end_new_instances,
+    "@brief Instance creation protocol - finish list of new instances\n"
+    "See \\begin_create_instances for a description of the protocol."
+  ) +
+  gsi::callback ("commit_instances", &EditorHooksImpl::commit_instances, &EditorHooksImpl::f_commit_instances,
+    "@brief Instance creation protocol - commit new objects\n"
+    "See \\begin_create_instances for a description of the protocol."
+  ) +
+  gsi::callback ("end_create_instances", &EditorHooksImpl::end_create_instances, &EditorHooksImpl::f_end_create_instances,
+    "@brief Instance creation protocol - finish session\n"
     "See \\begin_create for a description of the protocol."
   ) +
   gsi::callback ("begin_modify", &EditorHooksImpl::begin_modify, &EditorHooksImpl::f_begin_modify, gsi::arg ("view"),

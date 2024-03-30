@@ -399,6 +399,9 @@ TEST(22)
     EXPECT_EQ (sc.empty (), false);
     EXPECT_EQ (sc.front ()->attr (), 1);
     EXPECT_EQ ((++sc.begin ())->attr (), 1);
+    auto i = sc.begin ();
+    i++;
+    EXPECT_EQ (i->attr (), 1);
 
     sc.pop_back ();
     EXPECT_EQ (int (sc.size ()), 1);
@@ -418,6 +421,9 @@ TEST(22)
     EXPECT_EQ (sc.empty (), false);
     EXPECT_EQ (sc.front ()->attr (), 2);
     EXPECT_EQ ((++sc.begin ())->attr (), 2);
+    i = sc.begin ();
+    i++;
+    EXPECT_EQ (i->attr (), 2);
   }
 
   EXPECT_EQ (MyClass::instances (), 0);

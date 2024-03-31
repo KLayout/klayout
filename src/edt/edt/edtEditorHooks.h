@@ -65,13 +65,9 @@ namespace edt
  *    begin_create_shapes { begin_new_shapes { create_shape } end_new_shapes } [ commit_shapes ] end_create_shapes
  *    begin_create_instances { begin_new_instances { create_instance } end_new_instances } [ commit_instances ] end_create_instances
  *
- *  2. Modification (i.e. partial edit)
+ *  2. Interactive edit (move, transform, interactive clone)
  *
- *    begin_modify { begin_modifications { modified } end_modifications } [ commit_modify ] end_modify
- *
- *  3. Interactive edit (move, transform, interactive clone)
- *
- *    begin_edit { begin_edits { transformed } end_edits } [ commit_edit ] end_edit
+ *    begin_edit { begin_edits { transformed | modified } end_edits } [ commit_edit ] end_edit
  *
  *  Notation: { ... } means the sequence can be repeated, [ ... ] means the call is optional.
  */
@@ -110,18 +106,11 @@ public:
   virtual void commit_instances () { }
   virtual void end_create_instances () { }
 
-  //  modification protocol
-  virtual void begin_modify (lay::LayoutViewBase * /*view*/) { }
-  virtual void begin_modifications () { }
-  virtual void modified (const lay::ObjectInstPath & /*object*/, const db::CplxTrans & /*view_trans*/) { }
-  virtual void end_modifications () { }
-  virtual void commit_modify () { }
-  virtual void end_modify () { }
-
   //  editing protocol
   virtual void begin_edit (lay::CellViewRef & /*cv*/) { }
   virtual void begin_edits () { }
   virtual void transformed (const lay::ObjectInstPath & /*object*/, const db::ICplxTrans & /*applied*/, const db::CplxTrans & /*view_trans*/) { }
+  virtual void modified (const lay::ObjectInstPath & /*object*/, const db::Shape & /*shape*/, const db::CplxTrans & /*view_trans*/) { }
   virtual void end_edits () { }
   virtual void commit_edit () { }
   virtual void end_edit () { }

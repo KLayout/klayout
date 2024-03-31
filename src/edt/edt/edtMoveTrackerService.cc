@@ -23,6 +23,7 @@
 #include "layLayoutViewBase.h"
 #include "edtMoveTrackerService.h"
 #include "edtService.h"
+#include "edtPartialService.h"
 
 namespace edt
 {
@@ -80,11 +81,6 @@ MoveTrackerService::issue_edit_events ()
       double dbu = cv->layout ().dbu ();
       db::CplxTrans gt = db::CplxTrans (dbu) * cv.context_trans () * r->trans ();
 
-      //  compute the move transformation in local object space
-      db::ICplxTrans applied = gt.inverted () * db::DCplxTrans (svc->move_trans ()) * gt;
-
-      db::DCplxTrans tvt;
-
       //  get one representative global transformation
       const std::vector<db::DCplxTrans> *tv_list = 0;
       if (r->is_cell_inst ()) {
@@ -93,13 +89,24 @@ MoveTrackerService::issue_edit_events ()
         tv_list = tv.per_cv_and_layer (r->cv_index (), r->layer ());
       }
       if (tv_list && ! tv_list->empty ()) {
-        tvt = tv_list->front ();
+        gt = tv_list->front () * gt;
       }
 
-      call_editor_hooks<const lay::ObjectInstPath &, const db::ICplxTrans &, const db::CplxTrans &> (m_editor_hooks, &edt::EditorHooks::transformed, *r, applied, tvt * gt);
+      //  compute the move transformation in local object space
+      db::ICplxTrans applied = gt.inverted () * db::DCplxTrans (svc->move_trans ()) * gt;
+
+      call_editor_hooks<const lay::ObjectInstPath &, const db::ICplxTrans &, const db::CplxTrans &> (m_editor_hooks, &edt::EditorHooks::transformed, *r, applied, gt);
 
     }
 
+  }
+
+  //  make the Partial Edit Service issue "modify" events
+
+  std::vector<edt::PartialService *> partial_services = view ()->get_plugins<edt::PartialService> ();
+
+  for (auto s = partial_services.begin (); s != partial_services.end (); ++s) {
+    (*s)->issue_editor_hook_calls (m_editor_hooks);
   }
 
   call_editor_hooks (m_editor_hooks, &edt::EditorHooks::end_edits);

@@ -1416,7 +1416,216 @@ PartialService::transform (const db::DCplxTrans &tr)
   selection_to_view ();
 }
 
-void  
+void
+PartialService::open_editor_hooks ()
+{
+  lay::CellViewRef cv_ref (view ()->cellview_ref (view ()->active_cellview_index ()));
+  if (! cv_ref.is_valid ()) {
+    return;
+  }
+
+  std::string technology;
+  if (cv_ref->layout ().technology ()) {
+    technology = cv_ref->layout ().technology ()->name ();
+  }
+
+  m_editor_hooks = edt::EditorHooks::get_editor_hooks (technology);
+  call_editor_hooks<lay::CellViewRef &> (m_editor_hooks, &edt::EditorHooks::begin_edit, (lay::CellViewRef &) cv_ref);
+}
+
+void
+PartialService::close_editor_hooks (bool commit)
+{
+  if (commit) {
+    call_editor_hooks (m_editor_hooks, &edt::EditorHooks::commit_edit);
+  }
+  call_editor_hooks (m_editor_hooks, &edt::EditorHooks::end_edit);
+
+  m_editor_hooks.clear ();
+}
+
+void
+PartialService::issue_editor_hook_calls (const tl::weak_collection<edt::EditorHooks> &hooks)
+{
+  if (hooks.empty ()) {
+    return;
+  }
+
+  //  NOTE: needs to be called during move operations
+  db::DTrans move_trans = db::DTrans (m_current - m_start);
+
+  //  build the transformation variants cache
+  TransformationVariants tv (view ());
+
+  //  Issue editor hook calls for the shape modification events
+
+  //  since a shape reference may become invalid while moving it and
+  //  because it creates ambiguities, we treat each shape separately:
+  //  collect the valid selected items in a selection-per-shape map.
+  std::map <db::Shape, std::vector<partial_objects::iterator> > sel_per_shape;
+
+  for (partial_objects::iterator r = m_selection.begin (); r != m_selection.end (); ++r) {
+    if (! r->first.is_cell_inst ()) {
+      const std::vector<db::DCplxTrans> *tv_list = tv.per_cv_and_layer (r->first.cv_index (), r->first.layer ());
+      if (tv_list && ! tv_list->empty ()) {
+        sel_per_shape.insert (std::make_pair (r->first.shape (), std::vector<partial_objects::iterator> ())).first->second.push_back (r);
+      }
+    }
+  }
+
+  db::Shapes tmp_shapes;
+
+  for (std::map <db::Shape, std::vector<partial_objects::iterator> >::iterator sps = sel_per_shape.begin (); sps != sel_per_shape.end (); ++sps) {
+
+    db::Shape shape = tmp_shapes.insert (sps->first);
+    for (std::vector<partial_objects::iterator>::const_iterator rr = sps->second.begin (); rr != sps->second.end (); ++rr) {
+
+      std::map <EdgeWithIndex, db::Edge> new_edges;
+      std::map <PointWithIndex, db::Point> new_points;
+
+      shape = modify_shape (tv, shape, (*rr)->first, (*rr)->second, move_trans, new_edges, new_points);
+
+    }
+
+    for (std::vector<partial_objects::iterator>::const_iterator rr = sps->second.begin (); rr != sps->second.end (); ++rr) {
+
+      const lay::ObjectInstPath &sel = (*rr)->first;
+
+      const lay::CellView &cv = view ()->cellview (sel.cv_index ());
+
+      //  compute the transformation into context cell's micron space
+      double dbu = cv->layout ().dbu ();
+      db::CplxTrans gt = db::CplxTrans (dbu) * cv.context_trans () * sel.trans ();
+
+      //  get one representative global transformation
+      const std::vector<db::DCplxTrans> *tv_list = tv.per_cv_and_layer (sel.cv_index (), sel.layer ());
+      if (tv_list && ! tv_list->empty ()) {
+        gt = tv_list->front () * gt;
+      }
+
+      call_editor_hooks<const lay::ObjectInstPath &, const db::Shape &, const db::CplxTrans &> (hooks, &edt::EditorHooks::modified, (*rr)->first, shape, gt);
+
+    }
+
+  }
+
+  //  Issue editor hook calls for the instance transformation events
+
+  //  sort the selected objects (the instances) by the cell they are in
+  //  The key is a pair: cell_index, cv_index
+  std::map <std::pair <db::cell_index_type, unsigned int>, std::vector <partial_objects::const_iterator> > insts_by_cell;
+  for (partial_objects::const_iterator r = m_selection.begin (); r != m_selection.end (); ++r) {
+    if (r->first.is_cell_inst ()) {
+      insts_by_cell.insert (std::make_pair (std::make_pair (r->first.cell_index (), r->first.cv_index ()), std::vector <partial_objects::const_iterator> ())).first->second.push_back (r);
+    }
+  }
+
+  for (std::map <std::pair <db::cell_index_type, unsigned int>, std::vector <partial_objects::const_iterator> >::const_iterator ibc = insts_by_cell.begin (); ibc != insts_by_cell.end (); ++ibc) {
+
+    const lay::CellView &cv = view ()->cellview (ibc->first.second);
+    if (cv.is_valid ()) {
+
+      const std::vector<db::DCplxTrans> *tv_list = tv.per_cv (ibc->first.second);
+      db::DCplxTrans tvt;
+      if (tv_list && ! tv_list->empty ()) {
+        tvt = tv_list->front ();
+      }
+
+      for (auto inst = ibc->second.begin (); inst != ibc->second.end (); ++inst) {
+
+        db::CplxTrans gt = tvt * db::CplxTrans (cv->layout ().dbu ()) * cv.context_trans () * (*inst)->first.trans ();
+        db::ICplxTrans applied = gt.inverted () * db::DCplxTrans (move_trans) * gt;
+
+        call_editor_hooks<const lay::ObjectInstPath &, const db::ICplxTrans &, const db::CplxTrans &> (hooks, &edt::EditorHooks::transformed, (*inst)->first, applied, gt);
+
+      }
+
+    }
+
+  }
+}
+
+db::Shape
+PartialService::modify_shape (TransformationVariants &tv, const db::Shape &shape_in, const lay::ObjectInstPath &path, const std::set <EdgeWithIndex> &sel, const db::DTrans &move_trans, std::map <EdgeWithIndex, db::Edge> &new_edges, std::map <PointWithIndex, db::Point> &new_points)
+{
+  tl_assert (shape_in.shapes () != 0);
+  db::Shape shape = shape_in;
+  db::Shapes &shapes = *shape_in.shapes ();
+
+  const lay::CellView &cv = view ()->cellview (path.cv_index ());
+
+  //  use only the first one of the explicit transformations
+  //  TODO: clarify how this can be implemented in a more generic form or leave it thus.
+
+  db::ICplxTrans gt (cv.context_trans () * path.trans ());
+  const std::vector<db::DCplxTrans> *tv_list = tv.per_cv_and_layer (path.cv_index (), path.layer ());
+  db::CplxTrans tt = (*tv_list) [0] * db::CplxTrans (cv->layout ().dbu ()) * gt;
+  db::Vector move_vector = db::Vector ((tt.inverted () * db::DCplxTrans (move_trans) * tt).disp ());
+
+  create_shift_sets (shape, sel, new_points, new_edges, move_vector);
+
+  //  modify the shapes and insert
+
+  if (shape.is_polygon ()) {
+
+    db::Polygon poly;
+    shape.polygon (poly);
+
+    //  warning: poly is modified:
+    modify_polygon (poly, new_points, new_edges, true /*compress*/);
+
+    shape = shapes.replace (shape, poly);
+
+  } else if (shape.is_path ()) {
+
+    db::Path path;
+    shape.path (path);
+
+    //  warning: path is modified:
+    modify_path (path, new_points, new_edges, true /*compress*/);
+
+    shape = shapes.replace (shape, path);
+
+  } else if (shape.is_box ()) {
+
+    db::Polygon poly;
+    shape.polygon (poly);
+
+    //  warning: poly is modified:
+    modify_polygon (poly, new_points, new_edges, true /*compress*/);
+
+    shape = shapes.replace (shape, poly.box ());
+
+  } else if (shape.is_text ()) {
+
+    db::Text t;
+    shape.text (t);
+
+    db::Point tp (shape.text_trans () * db::Point ());
+    std::map <PointWithIndex, db::Point>::const_iterator np = new_points.find (PointWithIndex (tp, 0, 0));
+
+    if (np != new_points.end ()) {
+      t.transform (db::Trans (np->second - tp));
+      shape = shapes.replace (shape, t);
+    }
+
+  } else if (shape.is_point ()) {
+
+    db::Point p;
+    shape.point (p);
+
+    std::map <PointWithIndex, db::Point>::const_iterator np = new_points.find (PointWithIndex (p, 0, 0));
+
+    if (np != new_points.end ()) {
+      shape = shapes.replace (shape, np->second);
+    }
+
+  }
+
+  return shape;
+}
+
+void
 PartialService::transform_selection (const db::DTrans &move_trans)
 {
   //  build the transformation variants cache
@@ -1444,79 +1653,9 @@ PartialService::transform_selection (const db::DTrans &move_trans)
 
       partial_objects::iterator r = *rr;
 
-      const lay::CellView &cv = view ()->cellview (r->first.cv_index ());
-
-      //  use only the first one of the explicit transformations 
-      //  TODO: clarify how this can be implemented in a more generic form or leave it thus.
-
-      db::ICplxTrans gt (cv.context_trans () * r->first.trans ());
-      const std::vector<db::DCplxTrans> *tv_list = tv.per_cv_and_layer (r->first.cv_index (), r->first.layer ());
-      db::CplxTrans tt = (*tv_list) [0] * db::CplxTrans (cv->layout ().dbu ()) * gt;
-      db::Vector move_vector = db::Vector ((tt.inverted () * db::DCplxTrans (move_trans) * tt).disp ());
-
       std::map <EdgeWithIndex, db::Edge> new_edges;
       std::map <PointWithIndex, db::Point> new_points;
-      create_shift_sets (shape, r->second, new_points, new_edges, move_vector);
-
-      //  modify the shapes and insert
-
-      db::Shapes &shapes = cv->layout ().cell (r->first.cell_index ()).shapes (r->first.layer ());
-
-      if (shape.is_polygon ()) {
-
-        db::Polygon poly;
-        shape.polygon (poly);
-
-        //  warning: poly is modified:
-        modify_polygon (poly, new_points, new_edges, true /*compress*/);
-
-        shape = shapes.replace (shape, poly);
-
-      } else if (shape.is_path ()) {
-
-        db::Path path;
-        shape.path (path);
-
-        //  warning: path is modified:
-        modify_path (path, new_points, new_edges, true /*compress*/);
-
-        shape = shapes.replace (shape, path);
-
-      } else if (shape.is_box ()) {
-
-        db::Polygon poly;
-        shape.polygon (poly);
-
-        //  warning: poly is modified:
-        modify_polygon (poly, new_points, new_edges, true /*compress*/);
-
-        shape = shapes.replace (shape, poly.box ());
-
-      } else if (shape.is_text ()) {
-
-        db::Text t;
-        shape.text (t);
-
-        db::Point tp (shape.text_trans () * db::Point ());
-        std::map <PointWithIndex, db::Point>::const_iterator np = new_points.find (PointWithIndex (tp, 0, 0));
-
-        if (np != new_points.end ()) {
-          t.transform (db::Trans (np->second - tp));
-          shape = shapes.replace (shape, t);
-        }
-
-      } else if (shape.is_point ()) {
-
-        db::Point p;
-        shape.point (p);
-
-        std::map <PointWithIndex, db::Point>::const_iterator np = new_points.find (PointWithIndex (p, 0, 0));
-
-        if (np != new_points.end ()) {
-          shape = shapes.replace (shape, np->second);
-        }
-
-      }
+      shape = modify_shape (tv, shape, r->first, r->second, move_trans, new_edges, new_points);
 
       //  transform the selection 
       
@@ -1625,6 +1764,8 @@ PartialService::edit_cancel ()
 
   ui ()->ungrab_mouse (this);
 
+  close_editor_hooks (false);
+
   selection_to_view ();
 }
 
@@ -1670,6 +1811,10 @@ PartialService::mouse_move_event (const db::DPoint &p, unsigned int buttons, boo
     }
 
     selection_to_view ();
+
+    call_editor_hooks (m_editor_hooks, &edt::EditorHooks::begin_edits);
+    issue_editor_hook_calls (m_editor_hooks);
+    call_editor_hooks (m_editor_hooks, &edt::EditorHooks::end_edits);
 
     m_alt_ac = lay::AC_Global;
 
@@ -1796,6 +1941,8 @@ PartialService::mouse_press_event (const db::DPoint &p, unsigned int buttons, bo
 
       ui ()->grab_mouse (this, true);
 
+      open_editor_hooks ();
+
     }
 
     m_alt_ac = lay::AC_Global;
@@ -1857,6 +2004,8 @@ PartialService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bo
 
     m_dragging = false;
     selection_to_view ();
+
+    close_editor_hooks (true);
 
     m_alt_ac = lay::AC_Global;
 
@@ -1991,6 +2140,8 @@ PartialService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bo
           m_current = m_start = p;
         }
 
+        open_editor_hooks ();
+
       }
 
       selection_to_view ();
@@ -2022,6 +2173,8 @@ PartialService::mouse_double_click_event (const db::DPoint &p, unsigned int butt
   if ((buttons & lay::LeftButton) != 0 && prio) {
 
     m_alt_ac = ac_from_buttons (buttons);
+
+    close_editor_hooks (false);
 
     //  stop dragging
     ui ()->ungrab_mouse (this);
@@ -2353,6 +2506,8 @@ PartialService::end_move (const db::DPoint & /*p*/, lay::angle_constraint_type a
 
   clear_mouse_cursors ();
 
+  close_editor_hooks (false);
+
   m_alt_ac = lay::AC_Global;
 }
 
@@ -2529,6 +2684,8 @@ PartialService::del ()
   m_selection.clear ();
   m_dragging = false;
   selection_to_view ();
+
+  close_editor_hooks (false);
 
   //  clean up the layouts that need to do so.
   for (std::set<db::Layout *>::const_iterator l = needs_cleanup.begin (); l != needs_cleanup.end (); ++l) {

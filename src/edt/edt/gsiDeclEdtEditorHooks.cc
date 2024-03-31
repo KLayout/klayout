@@ -147,60 +147,6 @@ public:
     }
   }
 
-  virtual void begin_modify (lay::LayoutViewBase *view)
-  {
-    if (f_begin_modify.can_issue ()) {
-      f_begin_modify.issue<edt::EditorHooks, lay::LayoutViewBase *> (&edt::EditorHooks::begin_modify, view);
-    } else {
-      edt::EditorHooks::begin_modify (view);
-    }
-  }
-
-  virtual void begin_modifications ()
-  {
-    if (f_begin_modifications.can_issue ()) {
-      f_begin_modifications.issue<edt::EditorHooks> (&edt::EditorHooks::begin_modifications);
-    } else {
-      edt::EditorHooks::begin_modifications ();
-    }
-  }
-
-  virtual void modified (const lay::ObjectInstPath &object, const db::CplxTrans &view_trans)
-  {
-    if (f_modified.can_issue ()) {
-      f_modified.issue<edt::EditorHooks, const lay::ObjectInstPath &, const db::CplxTrans &> (&edt::EditorHooks::modified, object, view_trans);
-    } else {
-      edt::EditorHooks::modified (object, view_trans);
-    }
-  }
-
-  virtual void end_modifications ()
-  {
-    if (f_end_modifications.can_issue ()) {
-      f_end_modifications.issue<edt::EditorHooks> (&edt::EditorHooks::end_modifications);
-    } else {
-      edt::EditorHooks::end_modifications ();
-    }
-  }
-
-  virtual void commit_modify ()
-  {
-    if (f_commit_modify.can_issue ()) {
-      f_commit_modify.issue<edt::EditorHooks> (&edt::EditorHooks::commit_modify);
-    } else {
-      edt::EditorHooks::commit_modify ();
-    }
-  }
-
-  virtual void end_modify ()
-  {
-    if (f_end_modify.can_issue ()) {
-      f_end_modify.issue<edt::EditorHooks> (&edt::EditorHooks::end_modify);
-    } else {
-      edt::EditorHooks::end_modify ();
-    }
-  }
-
   virtual void begin_edit (lay::CellViewRef &cv_ref)
   {
     if (f_begin_edit.can_issue ()) {
@@ -225,6 +171,15 @@ public:
       f_transformed.issue<edt::EditorHooks, const lay::ObjectInstPath &, const db::ICplxTrans &, const db::CplxTrans &> (&edt::EditorHooks::transformed, object, applied_trans, view_trans);
     } else {
       edt::EditorHooks::transformed (object, applied_trans, view_trans);
+    }
+  }
+
+  virtual void modified (const lay::ObjectInstPath &object, const db::Shape &shape, const db::CplxTrans &view_trans)
+  {
+    if (f_modified.can_issue ()) {
+      f_modified.issue<edt::EditorHooks, const lay::ObjectInstPath &, const db::Shape &, const db::CplxTrans &> (&edt::EditorHooks::modified, object, shape, view_trans);
+    } else {
+      edt::EditorHooks::modified (object, shape, view_trans);
     }
   }
 
@@ -269,16 +224,10 @@ public:
   gsi::Callback f_commit_instances;
   gsi::Callback f_end_create_instances;
 
-  gsi::Callback f_begin_modify;
-  gsi::Callback f_begin_modifications;
-  gsi::Callback f_modified;
-  gsi::Callback f_end_modifications;
-  gsi::Callback f_commit_modify;
-  gsi::Callback f_end_modify;
-
   gsi::Callback f_begin_edit;
   gsi::Callback f_begin_edits;
   gsi::Callback f_transformed;
+  gsi::Callback f_modified;
   gsi::Callback f_end_edits;
   gsi::Callback f_commit_edit;
   gsi::Callback f_end_edit;
@@ -350,41 +299,11 @@ gsi::Class<EditorHooksImpl> decl_EditorHooks ("lay", "EditorHooks",
     "@brief Instance creation protocol - finish session\n"
     "See \\begin_create for a description of the protocol."
   ) +
-  gsi::callback ("begin_modify", &EditorHooksImpl::begin_modify, &EditorHooksImpl::f_begin_modify, gsi::arg ("view"),
-    "@brief Modification protocol - begin session\n"
-    "This method is called to initiate an object modification session. The session is ended with "
-    "\\end_modify. Between these calls, modified objects are announced with \\begin_modifications, "
-    "\\modified and \\end_modifications calls. These calls are repeated to indicate changes in the objects "
-    "modified while moving the mouse for example.\n"
-    "\n"
-    "\\commit_modify is called once before \\end_modify to indicate that the last set of "
-    "objects are committed to the database."
-  ) +
-  gsi::callback ("begin_modifications", &EditorHooksImpl::begin_modifications, &EditorHooksImpl::f_begin_modifications,
-    "@brief Modification protocol - begin modifications\n"
-    "See \\begin_modify for a description of the protocol."
-  ) +
-  gsi::callback ("modified", &EditorHooksImpl::modified, &EditorHooksImpl::f_modified, gsi::arg ("object"), gsi::arg ("view_trans"),
-    "@brief Modification protocol - indicate a modified object\n"
-    "See \\begin_modify for a description of the protocol."
-  ) +
-  gsi::callback ("end_modifications", &EditorHooksImpl::end_modifications, &EditorHooksImpl::f_end_modifications,
-    "@brief Modification protocol - finish list of modifications\n"
-    "See \\begin_modify for a description of the protocol."
-  ) +
-  gsi::callback ("commit_modify", &EditorHooksImpl::commit_modify, &EditorHooksImpl::f_commit_modify,
-    "@brief Modification protocol - commit new objects\n"
-    "See \\begin_modify for a description of the protocol."
-  ) +
-  gsi::callback ("end_modify", &EditorHooksImpl::end_modify, &EditorHooksImpl::f_end_modify,
-    "@brief Modification protocol - finish session\n"
-    "See \\begin_modify for a description of the protocol."
-  ) +
   gsi::callback ("begin_edit", &EditorHooksImpl::begin_edit, &EditorHooksImpl::f_begin_edit, gsi::arg ("cellview"),
     "@brief Editing protocol - begin session\n"
     "This method is called to initiate an object editing session. The session is ended with "
     "\\end_edit. Between these calls, edits are announced with \\begin_edits, "
-    "\\transformed and \\end_edits calls. These calls are repeated to indicate changes in the objects "
+    "\\transformed or \\modified and \\end_edits calls. These calls are repeated to indicate changes in the objects "
     "modified while moving the mouse for example.\n"
     "\n"
     "\\commit_edit is called once before \\end_edit to indicate that the last set of "
@@ -401,6 +320,19 @@ gsi::Class<EditorHooksImpl> decl_EditorHooks ("lay", "EditorHooks",
     "@param object A path to the modified object\n"
     "@param applied_trans The DBU-space of the transformation applied to the object\n"
     "@param view_trans The combined transformation of DBU space to view space\n"
+    "\n"
+    "Note that 'object' is the original, unmodified objects to which 'applied_trans' will be applied upon commit."
+  ) +
+  gsi::callback ("modified", &EditorHooksImpl::modified, &EditorHooksImpl::f_modified, gsi::arg ("object"), gsi::arg ("shape"), gsi::arg ("view_trans"),
+    "@brief Modification protocol - indicate a modified object\n"
+    "See \\begin_edit for a description of the protocol."
+    "\n"
+    "@param object A path to the modified object\n"
+    "@param shape The new, modified shape\n"
+    "@param view_trans The combined transformation of DBU space to view space\n"
+    "\n"
+    "Note that 'object' is the original, unmodified objects while 'shape' is the modified shape. This shape object is a synthetic reference "
+    "and does not exist in the database yet.\n"
   ) +
   gsi::callback ("end_edits", &EditorHooksImpl::end_edits, &EditorHooksImpl::f_end_edits,
     "@brief Editing protocol - finish list of edits\n"

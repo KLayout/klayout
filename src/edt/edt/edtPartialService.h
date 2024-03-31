@@ -34,6 +34,7 @@
 #include "tlDeferredExecution.h"
 #include "edtUtils.h"
 #include "edtConfig.h"
+#include "edtEditorHooks.h"
 
 #if defined(HAVE_QT)
 #  include <QObject>
@@ -316,6 +317,11 @@ public:
    */
   virtual void edit_cancel ();
 
+  /**
+   *  @brief Issues editor hook calls ("modified") for the current selection and the given move transformation
+   */
+  void issue_editor_hook_calls (const tl::weak_collection<edt::EditorHooks> &hooks);
+
 #if defined(HAVE_QT)
 public slots:
   void timeout ();
@@ -361,6 +367,8 @@ private:
   bool m_hover_wait;
   db::DPoint m_hover_point;
 
+  tl::weak_collection<edt::EditorHooks> m_editor_hooks;
+
   //  Deferred method to update the selection
   tl::DeferredMethod<edt::PartialService> dm_selection_to_view;
 
@@ -392,6 +400,10 @@ private:
   db::DEdge single_selected_edge () const;
   bool handle_guiding_shape_changes ();
   void transform_selection (const db::DTrans &move_trans);
+  db::Shape modify_shape (TransformationVariants &tv, const db::Shape &shape_in, const lay::ObjectInstPath &path, const std::set<EdgeWithIndex> &sel, const db::DTrans &move_trans, std::map <EdgeWithIndex, db::Edge> &new_edges, std::map <PointWithIndex, db::Point> &new_points);
+
+  void open_editor_hooks ();
+  void close_editor_hooks (bool commit);
 };
 
 }

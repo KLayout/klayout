@@ -39,6 +39,7 @@ HEADERS = \
     edtEditorHooks.h \
     edtEditorOptionsPages.h \
     edtInstPropertiesPage.h \
+    edtMoveTrackerService.h \
     edtPCellParametersPage.h \
     edtPropertiesPages.h \
     edtPropertiesPageUtils.h \
@@ -49,6 +50,7 @@ SOURCES = \
     edtEditorHooks.cc \
     edtEditorOptionsPages.cc \
     edtInstPropertiesPage.cc \
+    edtMoveTrackerService.cc \
     edtPCellParametersPage.cc \
     edtPropertiesPages.cc \
     edtPropertiesPageUtils.cc \

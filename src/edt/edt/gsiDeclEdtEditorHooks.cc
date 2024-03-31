@@ -201,12 +201,12 @@ public:
     }
   }
 
-  virtual void begin_edit (lay::LayoutViewBase *view)
+  virtual void begin_edit (lay::CellViewRef &cv_ref)
   {
     if (f_begin_edit.can_issue ()) {
-      f_begin_edit.issue<edt::EditorHooks, lay::LayoutViewBase *> (&edt::EditorHooks::begin_edit, view);
+      f_begin_edit.issue<edt::EditorHooks, lay::CellViewRef &> (&edt::EditorHooks::begin_edit, cv_ref);
     } else {
-      edt::EditorHooks::begin_edit (view);
+      edt::EditorHooks::begin_edit (cv_ref);
     }
   }
 
@@ -380,7 +380,7 @@ gsi::Class<EditorHooksImpl> decl_EditorHooks ("lay", "EditorHooks",
     "@brief Modification protocol - finish session\n"
     "See \\begin_modify for a description of the protocol."
   ) +
-  gsi::callback ("begin_edit", &EditorHooksImpl::begin_edit, &EditorHooksImpl::f_begin_edit, gsi::arg ("view"),
+  gsi::callback ("begin_edit", &EditorHooksImpl::begin_edit, &EditorHooksImpl::f_begin_edit, gsi::arg ("cellview"),
     "@brief Editing protocol - begin session\n"
     "This method is called to initiate an object editing session. The session is ended with "
     "\\end_edit. Between these calls, edits are announced with \\begin_edits, "

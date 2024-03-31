@@ -34,6 +34,7 @@
 #include "edtServiceImpl.h"
 #include "edtMainService.h"
 #include "edtPartialService.h"
+#include "edtMoveTrackerService.h"
 #if defined(HAVE_QT)
 #  include "edtEditorOptionsPages.h"
 #  include "edtRecentConfigurationPage.h"
@@ -563,6 +564,27 @@ static tl::RegisteredClass<lay::PluginDeclaration> config_decl30 (
   new edt::PartialPluginDeclaration (tl::to_string (tr ("Partial shapes")), "partial:edit_mode\t" + tl::to_string (tr ("Partial{Edit points and edges of shapes}")) + "<:partial_24px.png>"),
   4030, 
   "edt::PartialService"
+);
+
+class MoveTrackerPluginDeclaration
+  : public lay::PluginDeclaration
+{
+public:
+  MoveTrackerPluginDeclaration ()
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual lay::Plugin *create_plugin (db::Manager * /*manager*/, lay::Dispatcher * /*root*/, lay::LayoutViewBase *view) const
+  {
+    return new edt::MoveTrackerService (view);
+  }
+};
+
+static tl::RegisteredClass<lay::PluginDeclaration> config_decl40 (
+  new MoveTrackerPluginDeclaration (),
+  4100,
+  "edt::MoveTrackerService"
 );
 
 }

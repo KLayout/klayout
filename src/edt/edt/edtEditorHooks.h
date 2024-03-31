@@ -119,7 +119,7 @@ public:
   virtual void end_modify () { }
 
   //  editing protocol
-  virtual void begin_edit (lay::LayoutViewBase * /*view*/) { }
+  virtual void begin_edit (lay::CellViewRef & /*cv*/) { }
   virtual void begin_edits () { }
   virtual void transformed (const lay::ObjectInstPath & /*object*/, const db::ICplxTrans & /*applied*/, const db::CplxTrans & /*view_trans*/) { }
   virtual void end_edits () { }

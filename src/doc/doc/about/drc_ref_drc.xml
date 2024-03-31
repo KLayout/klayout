@@ -481,6 +481,13 @@ outside:
 out = in.drc(primary.edges(convex))
 </pre>
 </p><p>
+In addition, "not_.." variants are available which selects edges
+not qualifying for the specific mode:
+</p><p>
+<pre>
+out = in.drc(primary.edges(not_convex))
+</pre>
+</p><p>
 The mode argument is ignored when translating other objects than
 polygons.
 </p>

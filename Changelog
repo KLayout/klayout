@@ -1,5 +1,64 @@
 0.29.0           (2024-04-01):
-* TODO
+* Enhancement: %GITHUB%/issues/1662 Strong default grids
+* Enhancement: %GITHUB%/issues/1656 Display-->Goto Position dialog should accept + as well as - for number prefixes
+* Bugfix: %GITHUB%/issues/1651 Errors when adding polygons with 4 points
+* Bugfix: %GITHUB%/issues/1644 DRC: some issues with edge layers
+* Bugfix: %GITHUB%/issues/1643 DRC: Feeding the same layer to two-layer operations in deep mode does not render the desired result
+* Enhancement: %GITHUB%/issues/1638 let klayout marker browser read strmxor .. xor.gds.gz, xor.oas result files
+* Enhancement: %GITHUB%/issues/1637 XOR optimization for prBoundary layer
+* Bugfix: %GITHUB%/issues/1632 rdb python/ruby module: modifing items not possible as they are const
+* Enhancement: %GITHUB%/issues/1598 LVS - Support for Soft Connections
+* Bugfix: %GITHUB%/issues/1586 Refactoring transformation conversion functions for complex transformation
+* Enhancement: %GITHUB%/issues/1583 Add possibility to customize main window title
+* Enhancement: %GITHUB%/issues/1513 Update Qt version for Qt bindings to 5.12.12 and 6.2.1
+* Bugfix: %GITHUB%/issues/1356 Instance Property form: Array Instance col/row would be more intuitive then the current row/col
+* Enhancement: New ruler type "auto measure along edge"
+* Enhancement: Trigger ruler measurement on mouse hovering transiently
+* Enhancement: Min and max value bounds for PCell parameters in editor
+  The condition is not strictly enforced - for example it is not checked when
+  changing parameters programmatically. For that, use "coerce_parameters".
+  Still, this feature is an editing aid.
+* Bugfix: Pixel garbage in color selector button with "Auto" color selected
+* Bugfix: DRC/LVS - connect_explicit did not accept an array of nets as single argument
+* Bugfix: 'edge outside polygon' now consistently ignores the border of the polygon
+* Bugfix: Warning level was ignored for some warnings in LEF/DEF reader
+* Bugfix: Netlist reader: anonymous circuits are not checked for known parameters
+* Enhancement: LVS - Supporting remote must-connect connections
+  So far, must-connect connections had to be made one level up in the hierarchy 
+  or promoted further using labels and such. Now, must-connect connections
+  can be made at any point up in the hierarchy.
+* Bugfix: LVS - do not waste too much time analyzing failed matches
+* Enhancement: LVS - LVS: Consider net names identical that differ 
+  in signal type suffix only - e.g. 'NET:I' is identical to 'NET'
+* Enhancement: OASIS reader will produce layers that are listed in layer table
+  but empty. Previously, empty layers were never created, even if listed in 
+  the layer table.
+* Enhancement: Reading from HTTP streams and pipes now supports automatic .gz uncompression
+* Enhancement: New DRC Features
+  - "edges" method allows selecting convext/concave/step edges
+  - Interaction count for edge/edge edge/polygon "interacting"
+  - Improved handling of dots (degenerated edges) - these are now
+    passed through the edge/edge and edge/polygon booleans and
+    participate in "interact". This enables selecting corners and
+    using them to select edges.
+* Enhancement: New RBA/pya Features
+  - Main window title: MainWindow#title (property)
+  - LayoutView#is_dirty?
+  - Triangulation: Region#delaunay
+  - Quality rasterizer: Region#rasterize
+  - Generic edge and polygon filters and operators support hierarchical processing 
+    with Python or Ruby callbacks: classes EdgePairFilter, EdgePairOperator, 
+    EdgePairToPolygonOperator, EdgePairToEdgeOperator, EdgeFilter, EdgeOperator,
+    EdgeToPolygonOperator, EdgeToEdgePairOperator, PolygonFilter, PolygonOperator
+    PolygonToEdgeOperator, PolygonToEdgePairOperator, TextFilter, TextOperator,
+    TextToPolygonOperator
+    Methods: EdgePairs#filter, EdgePairs#filtered, EdgePairs#process, EdgePairs#processed,
+    same for Edges, Regions and Texts
+  - Polygon#split, Polygon#break, same for DPolygon, SimplePolygon, DSimplePolygon
+  - Keyword arguments for Python, Ruby and Expressions
+  - You can now also use "klayout" package inside the application (same code
+    for Python module and application) - i.e. "import klayout.db"
+  - Synonyms: connect/disconnect for events for better compatibility with PyQt5
 
 0.28.17          (2024-02-16):
 * Enhancement: %GITHUB%/issues/1626 Technology specific grids

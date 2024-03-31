@@ -843,7 +843,6 @@ Class<db::PCellParameterDeclaration> decl_PCellParameterDeclaration ("db", "PCel
     "This method will add the given value with the given description to the list of\n"
     "choices. If choices are defined, KLayout will show a drop-down box instead of an\n"
     "entry field in the parameter user interface.\n"
-    "If a range is already set for this parameter the choice will not be added and a warning message is showed.\n"
   ) +
   gsi::method ("choice_values", &db::PCellParameterDeclaration::get_choices,
     "@brief Returns a list of choice values\n"

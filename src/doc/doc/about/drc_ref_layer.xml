@@ -808,7 +808,14 @@ outside:
 out = in.edges(convex)
 </pre>
 </p><p>
-This feature is only available for polygon layers.
+In addition, "not_.." variants are available which selects edges
+not qualifying for the specific mode:
+</p><p>
+<pre>
+out = in.edges(not_convex)
+</pre>
+</p><p>
+The mode argument is only available for polygon layers.
 </p><p>
 The following images show the effect of the mode argument:
 </p><p>

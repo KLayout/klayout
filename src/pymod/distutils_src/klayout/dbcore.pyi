@@ -3941,12 +3941,12 @@ class CompoundRegionOperationNode:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         def __hash__(self) -> int:
             r"""
@@ -4149,12 +4149,12 @@ class CompoundRegionOperationNode:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         def __hash__(self) -> int:
             r"""
@@ -4187,12 +4187,12 @@ class CompoundRegionOperationNode:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -4251,12 +4251,12 @@ class CompoundRegionOperationNode:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         def __hash__(self) -> int:
             r"""
@@ -4289,12 +4289,12 @@ class CompoundRegionOperationNode:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -4353,12 +4353,12 @@ class CompoundRegionOperationNode:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         def __hash__(self) -> int:
             r"""
@@ -4525,9 +4525,12 @@ class CompoundRegionOperationNode:
         @brief Creates a node delivering the second edge of each edges pair.
         """
     @classmethod
-    def new_edges(cls, input: CompoundRegionOperationNode) -> CompoundRegionOperationNode:
+    def new_edges(cls, input: CompoundRegionOperationNode, mode: Optional[EdgeMode] = ...) -> CompoundRegionOperationNode:
         r"""
         @brief Creates a node converting polygons into its edges.
+        The 'mode' argument allows selecting specific edges when generating edges from a polygon. See \EdgeMode for the various options. By default, all edges are generated from polygons.
+
+        The 'mode' argument has been added in version 0.29.
         """
     @classmethod
     def new_empty(cls, type: CompoundRegionOperationNode.ResultType) -> CompoundRegionOperationNode:
@@ -10287,6 +10290,17 @@ class DPolygon:
         @brief Returns the bounding box of the polygon
         The bounding box is the box enclosing all points of the polygon.
         """
+    def break_(self, max_vertex_count: int, max_area_ratio: float) -> List[DPolygon]:
+        r"""
+        @brief Splits the polygon into parts with a maximum vertex count and area ratio
+        The area ratio is the ratio between the bounding box area and the polygon area. Higher values mean more 'skinny' polygons.
+
+        This method will split the input polygon into pieces having a maximum of 'max_vertex_count' vertices and an area ratio less than 'max_area_ratio'. 'max_vertex_count' can be zero. In this case the limit is ignored. Also 'max_area_ratio' can be zero, in which case it is ignored as well.
+
+        The method of splitting is unspecified. The algorithm will apply 'split' recursively until the parts satisfy the limits.
+
+        This method has been introduced in version 0.29.
+        """
     def compress(self, remove_reflected: bool) -> None:
         r"""
         @brief Compresses the polygon.
@@ -10995,6 +11009,17 @@ class DSimplePolygon:
     def bbox(self) -> DBox:
         r"""
         @brief Returns the bounding box of the simple polygon
+        """
+    def break_(self, max_vertex_count: int, max_area_ratio: float) -> List[DSimplePolygon]:
+        r"""
+        @brief Splits the polygon into parts with a maximum vertex count and area ratio
+        The area ratio is the ratio between the bounding box area and the polygon area. Higher values mean more 'skinny' polygons.
+
+        This method will split the input polygon into pieces having a maximum of 'max_vertex_count' vertices and an area ratio less than 'max_area_ratio'. 'max_vertex_count' can be zero. In this case the limit is ignored. Also 'max_area_ratio' can be zero, in which case it is ignored as well.
+
+        The method of splitting is unspecified. The algorithm will apply 'split' recursively until the parts satisfy the limits.
+
+        This method has been introduced in version 0.29.
         """
     def compress(self, remove_reflected: bool) -> None:
         r"""
@@ -16778,6 +16803,560 @@ class Edge:
         @return The transformed edge.
         """
 
+class EdgeFilter:
+    r"""
+    @brief A generic edge filter adaptor
+
+    Edge filters are an efficient way to filter edge from a Edges collection. To apply a filter, derive your own filter class and pass an instance to the \Edges#filter or \Edges#filtered method.
+
+    Conceptually, these methods take each edge from the collection and present it to the filter's 'selected' method.
+    Based on the result of this evaluation, the edge is kept or discarded.
+
+    The magic happens when deep mode edge collections are involved. In that case, the filter will use as few calls as possible and exploit the hierarchical compression if possible. It needs to know however, how the filter behaves. You need to configure the filter by calling \is_isotropic, \is_scale_invariant or \is_isotropic_and_scale_invariant before using the filter.
+
+    You can skip this step, but the filter algorithm will assume the worst case then. This usually leads to cell variant formation which is not always desired and blows up the hierarchy.
+
+    Here is some example that filters edges parallel to a given one:
+    @code
+    class ParallelFilter < RBA::EdgeFilter
+
+      # Constructor
+      def initialize(ref_edge)
+        self.is_scale_invariant   # orientation matters, but scale does not
+        @ref_edge = ref_edge
+      end
+  
+      # Select only parallel ones
+      def selected(edge)
+        return edge.is_parallel?(@ref_edge)
+      end
+
+    end
+
+    edges = ... # some Edges object
+    ref_edge = ... # some Edge
+    parallel_only = edges.filtered(ParallelFilter::new(ref_edge))
+    @/code
+
+    This class has been introduced in version 0.29.
+    """
+    requires_raw_input: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the filter needs raw (unmerged) input
+    See \requires_raw_input= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the filter needs raw (unmerged) input
+    This flag must be set before using this filter. It tells the filter implementation whether the filter wants to have raw input (unmerged). The default value is 'false', meaning that
+    the filter will receive merged polygons ('merged semantics').
+
+    Setting this value to false potentially saves some CPU time needed for merging the polygons.
+    Also, raw input means that strange shapes such as dot-like edges, self-overlapping polygons, empty or degenerated polygons are preserved.
+    """
+    wants_variants: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the filter prefers cell variants
+    See \wants_variants= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the filter prefers cell variants
+    This flag must be set before using this filter for hierarchical applications (deep mode). It tells the filter implementation whether cell variants should be created (true, the default) or shape propagation will be applied (false).
+
+    This decision needs to be made, if the filter indicates that it will deliver different results
+    for scaled or rotated versions of the shape (see \is_isotropic and the other hints). If a cell
+    is present with different qualities - as seen from the top cell - the respective instances
+    need to be differentiated. Cell variant formation is one way, shape propagation the other way.
+    Typically, cell variant formation is less expensive, but the hierarchy will be modified.
+    """
+    @classmethod
+    def new(cls) -> EdgeFilter:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def is_isotropic(self) -> None:
+        r"""
+        @brief Indicates that the filter has isotropic properties
+        Call this method before using the filter to indicate that the selection is independent of the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        Examples for isotropic (polygon) filters are area or perimeter filters. The area or perimeter of a polygon depends on the scale, but not on the orientation of the polygon.
+        """
+    def is_isotropic_and_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is isotropic and scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for such a (polygon) filter is the square selector. Whether a polygon is a square or not does not depend on the polygon's orientation nor scale.
+        """
+    def is_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for a scale invariant (polygon) filter is the bounding box aspect ratio (height/width) filter. The definition of heigh and width depends on the orientation, but the ratio is independent on scale.
+        """
+
+class EdgeMode:
+    r"""
+    @brief This class represents the edge mode type for \Region#edges.
+
+    This enum has been introduced in version 0.29.
+    """
+    All: ClassVar[EdgeMode]
+    r"""
+    @brief Selects all edges
+    """
+    Concave: ClassVar[EdgeMode]
+    r"""
+    @brief Selects only concave edges
+    """
+    Convex: ClassVar[EdgeMode]
+    r"""
+    @brief Selects only convex edges
+    """
+    NotConcave: ClassVar[EdgeMode]
+    r"""
+    @brief Selects only edges which are not concave
+    """
+    NotConvex: ClassVar[EdgeMode]
+    r"""
+    @brief Selects only edges which are not convex
+    """
+    NotStep: ClassVar[EdgeMode]
+    r"""
+    @brief Selects only edges which are not steps
+    """
+    NotStepIn: ClassVar[EdgeMode]
+    r"""
+    @brief Selects only edges which are not steps leading inside
+    """
+    NotStepOut: ClassVar[EdgeMode]
+    r"""
+    @brief Selects only edges which are not steps leading outside
+    """
+    Step: ClassVar[EdgeMode]
+    r"""
+    @brief Selects only step edges leading inside or outside
+    """
+    StepIn: ClassVar[EdgeMode]
+    r"""
+    @brief Selects only step edges leading inside
+    """
+    StepOut: ClassVar[EdgeMode]
+    r"""
+    @brief Selects only step edges leading outside
+    """
+    @overload
+    @classmethod
+    def new(cls, i: int) -> EdgeMode:
+        r"""
+        @brief Creates an enum from an integer value
+        """
+    @overload
+    @classmethod
+    def new(cls, s: str) -> EdgeMode:
+        r"""
+        @brief Creates an enum from a string value
+        """
+    def __copy__(self) -> EdgeMode:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> EdgeMode:
+        r"""
+        @brief Creates a copy of self
+        """
+    @overload
+    def __eq__(self, other: object) -> bool:
+        r"""
+        @brief Compares an enum with an integer value
+        """
+    @overload
+    def __eq__(self, other: object) -> bool:
+        r"""
+        @brief Compares two enums
+        """
+    def __hash__(self) -> int:
+        r"""
+        @brief Gets the hash value from the enum
+        """
+    @overload
+    def __init__(self, i: int) -> None:
+        r"""
+        @brief Creates an enum from an integer value
+        """
+    @overload
+    def __init__(self, s: str) -> None:
+        r"""
+        @brief Creates an enum from a string value
+        """
+    def __int__(self) -> int:
+        r"""
+        @brief Gets the integer value from the enum
+        """
+    @overload
+    def __lt__(self, other: EdgeMode) -> bool:
+        r"""
+        @brief Returns true if the first enum is less (in the enum symbol order) than the second
+        """
+    @overload
+    def __lt__(self, other: int) -> bool:
+        r"""
+        @brief Returns true if the enum is less (in the enum symbol order) than the integer value
+        """
+    @overload
+    def __ne__(self, other: object) -> bool:
+        r"""
+        @brief Compares an enum with an integer for inequality
+        """
+    @overload
+    def __ne__(self, other: object) -> bool:
+        r"""
+        @brief Compares two enums for inequality
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Converts an enum to a visual string
+        """
+    def __str__(self) -> str:
+        r"""
+        @brief Gets the symbolic string from an enum
+        """
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def assign(self, other: EdgeMode) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def dup(self) -> EdgeMode:
+        r"""
+        @brief Creates a copy of self
+        """
+    def hash(self) -> int:
+        r"""
+        @brief Gets the hash value from the enum
+        """
+    def inspect(self) -> str:
+        r"""
+        @brief Converts an enum to a visual string
+        """
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def to_i(self) -> int:
+        r"""
+        @brief Gets the integer value from the enum
+        """
+    def to_s(self) -> str:
+        r"""
+        @brief Gets the symbolic string from an enum
+        """
+
+class EdgeOperator:
+    r"""
+    @brief A generic edge-to-polygon operator
+
+    Edge processors are an efficient way to process edges from an edge collection. To apply a processor, derive your own operator class and pass an instance to the \Edges#processed method.
+
+    Conceptually, these methods take each edge from the edge collection and present it to the operator's 'process' method.
+    The result of this call is a list of zero to many output edges derived from the input edge.
+    The output edge collection is the sum over all these individual results.
+
+    The magic happens when deep mode edge collections are involved. In that case, the processor will use as few calls as possible and exploit the hierarchical compression if possible. It needs to know however, how the operator behaves. You need to configure the operator by calling \is_isotropic, \is_scale_invariant or \is_isotropic_and_scale_invariant before using it.
+
+    You can skip this step, but the processor algorithm will assume the worst case then. This usually leads to cell variant formation which is not always desired and blows up the hierarchy.
+
+    Here is some example that shrinks every edge to half of the size, but does not change the position.
+    In this example the 'position' is defined by the center of the edge:
+    @code
+    class ShrinkToHalf < RBA::EdgeOperator
+
+      # Constructor
+      def initialize
+        self.is_isotropic_and_scale_invariant   # scale or orientation do not matter
+      end
+  
+      # Shrink to half size
+      def process(edge)
+        shift = edge.bbox.center - RBA::Point::new   # shift vector
+        return [ (edge.moved(-shift) * 0.5).moved(shift) ]
+      end
+
+    end
+
+    edges = ... # some Edges collection
+    shrinked_to_half = edges.processed(ShrinkToHalf::new)
+    @/code
+
+    This class has been introduced in version 0.29.
+    """
+    requires_raw_input: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the processor needs raw (unmerged) input
+    See \requires_raw_input= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the processor needs raw (unmerged) input
+    This flag must be set before using this processor. It tells the processor implementation whether the processor wants to have raw input (unmerged). The default value is 'false', meaning that
+    the processor will receive merged polygons ('merged semantics').
+
+    Setting this value to false potentially saves some CPU time needed for merging the polygons.
+    Also, raw input means that strange shapes such as dot-like edges, self-overlapping polygons, empty or degenerated polygons are preserved.
+    """
+    result_is_merged: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the processor delivers merged output
+    See \result_is_merged= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the processor delivers merged output
+    This flag must be set before using this processor. If the processor maintains the merged condition
+    by design (output is merged if input is), it is a good idea to set this predicate to 'true'.
+    This will avoid additional merge steps when the resulting collection is used in further operations
+    that need merged input
+    .
+    """
+    result_must_not_be_merged: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the processor's output must not be merged
+    See \result_must_not_be_merged= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the processor's output must not be merged
+    This flag must be set before using this processor. The processor can set this flag if it wants to
+    deliver shapes that must not be merged - e.g. point-like edges or strange or degenerated polygons.
+    .
+    """
+    wants_variants: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the filter prefers cell variants
+    See \wants_variants= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the filter prefers cell variants
+    This flag must be set before using this filter for hierarchical applications (deep mode). It tells the filter implementation whether cell variants should be created (true, the default) or shape propagation will be applied (false).
+
+    This decision needs to be made, if the filter indicates that it will deliver different results
+    for scaled or rotated versions of the shape (see \is_isotropic and the other hints). If a cell
+    is present with different qualities - as seen from the top cell - the respective instances
+    need to be differentiated. Cell variant formation is one way, shape propagation the other way.
+    Typically, cell variant formation is less expensive, but the hierarchy will be modified.
+    """
+    @classmethod
+    def new(cls) -> EdgeOperator:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def is_isotropic(self) -> None:
+        r"""
+        @brief Indicates that the filter has isotropic properties
+        Call this method before using the filter to indicate that the selection is independent of the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        Examples for isotropic (polygon) processors are size or shrink operators. Size or shrink is not dependent on orientation unless size or shrink needs to be different in x and y direction.
+        """
+    def is_isotropic_and_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is isotropic and scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for such a (polygon) processor is the convex decomposition operator. The decomposition of a polygon into convex parts is an operation that is not depending on scale nor orientation.
+        """
+    def is_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for a scale invariant (polygon) processor is the rotation operator. Rotation is not depending on scale, but on the original orientation as mirrored versions need to be rotated differently.
+        """
+
 class EdgePair:
     r"""
     @brief An edge pair (a pair of two edges)
@@ -17113,6 +17692,541 @@ class EdgePair:
         @param t The transformation to apply.
 
         @return The transformed edge pair
+        """
+
+class EdgePairFilter:
+    r"""
+    @brief A generic edge pair filter adaptor
+
+    EdgePair filters are an efficient way to filter edge pairs from a EdgePairs collection. To apply a filter, derive your own filter class and pass an instance to \EdgePairs#filter or \EdgePairs#filtered method.
+
+    Conceptually, these methods take each edge pair from the collection and present it to the filter's 'selected' method.
+    Based on the result of this evaluation, the edge pair is kept or discarded.
+
+    The magic happens when deep mode edge pair collections are involved. In that case, the filter will use as few calls as possible and exploit the hierarchical compression if possible. It needs to know however, how the filter behaves. You need to configure the filter by calling \is_isotropic, \is_scale_invariant or \is_isotropic_and_scale_invariant before using the filter.
+
+    You can skip this step, but the filter algorithm will assume the worst case then. This usually leads to cell variant formation which is not always desired and blows up the hierarchy.
+
+    Here is some example that filters edge pairs where the edges are perpendicular:
+    @code
+    class PerpendicularEdgesFilter < RBA::EdgePairFilter
+
+      # Constructor
+      def initialize
+        self.is_isotropic_and_scale_invariant   # orientation and scale do not matter
+      end
+  
+      # Select edge pairs where the edges are perpendicular
+      def selected(edge_pair)
+        return edge_pair.first.d.sprod_sign(edge_pair.second.d) == 0
+      end
+
+    end
+
+    edge_pairs = ... # some EdgePairs object
+    perpendicular_only = edge_pairs.filtered(PerpendicularEdgesFilter::new)
+    @/code
+
+    This class has been introduced in version 0.29.
+    """
+    wants_variants: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the filter prefers cell variants
+    See \wants_variants= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the filter prefers cell variants
+    This flag must be set before using this filter for hierarchical applications (deep mode). It tells the filter implementation whether cell variants should be created (true, the default) or shape propagation will be applied (false).
+
+    This decision needs to be made, if the filter indicates that it will deliver different results
+    for scaled or rotated versions of the shape (see \is_isotropic and the other hints). If a cell
+    is present with different qualities - as seen from the top cell - the respective instances
+    need to be differentiated. Cell variant formation is one way, shape propagation the other way.
+    Typically, cell variant formation is less expensive, but the hierarchy will be modified.
+    """
+    @classmethod
+    def new(cls) -> EdgePairFilter:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def is_isotropic(self) -> None:
+        r"""
+        @brief Indicates that the filter has isotropic properties
+        Call this method before using the filter to indicate that the selection is independent of the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        Examples for isotropic (polygon) filters are area or perimeter filters. The area or perimeter of a polygon depends on the scale, but not on the orientation of the polygon.
+        """
+    def is_isotropic_and_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is isotropic and scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for such a (polygon) filter is the square selector. Whether a polygon is a square or not does not depend on the polygon's orientation nor scale.
+        """
+    def is_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for a scale invariant (polygon) filter is the bounding box aspect ratio (height/width) filter. The definition of heigh and width depends on the orientation, but the ratio is independent on scale.
+        """
+
+class EdgePairOperator:
+    r"""
+    @brief A generic edge-pair operator
+
+    Edge pair processors are an efficient way to process edge pairs from an edge pair collection. To apply a processor, derive your own operator class and pass an instance to the \EdgePairs#processed or \EdgePairs#process method.
+
+    Conceptually, these methods take each edge pair from the edge pair collection and present it to the operator's 'process' method.
+    The result of this call is a list of zero to many output edge pairs derived from the input edge pair.
+    The output edge pair collection is the sum over all these individual results.
+
+    The magic happens when deep mode edge pair collections are involved. In that case, the processor will use as few calls as possible and exploit the hierarchical compression if possible. It needs to know however, how the operator behaves. You need to configure the operator by calling \is_isotropic, \is_scale_invariant or \is_isotropic_and_scale_invariant before using it.
+
+    You can skip this step, but the processor algorithm will assume the worst case then. This usually leads to cell variant formation which is not always desired and blows up the hierarchy.
+
+    Here is some example that flips the edge pairs (swaps first and second edge):
+    @code
+    class FlipEdgePairs < RBA::EdgePairOperator
+
+      # Constructor
+      def initialize
+        self.is_isotropic_and_scale_invariant   # orientation and scale do not matter
+      end
+  
+      # Flips the edge pair
+      def process(edge_pair)
+        return [ RBA::EdgePair::new(edge_pair.second, edge_pair.first) ]
+      end
+
+    end
+
+    edge_pairs = ... # some EdgePairs object
+    flipped = edge_pairs.processed(FlipEdgePairs::new)
+    @/code
+
+    This class has been introduced in version 0.29.
+    """
+    wants_variants: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the filter prefers cell variants
+    See \wants_variants= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the filter prefers cell variants
+    This flag must be set before using this filter for hierarchical applications (deep mode). It tells the filter implementation whether cell variants should be created (true, the default) or shape propagation will be applied (false).
+
+    This decision needs to be made, if the filter indicates that it will deliver different results
+    for scaled or rotated versions of the shape (see \is_isotropic and the other hints). If a cell
+    is present with different qualities - as seen from the top cell - the respective instances
+    need to be differentiated. Cell variant formation is one way, shape propagation the other way.
+    Typically, cell variant formation is less expensive, but the hierarchy will be modified.
+    """
+    @classmethod
+    def new(cls) -> EdgePairOperator:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def is_isotropic(self) -> None:
+        r"""
+        @brief Indicates that the filter has isotropic properties
+        Call this method before using the filter to indicate that the selection is independent of the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        Examples for isotropic (polygon) processors are size or shrink operators. Size or shrink is not dependent on orientation unless size or shrink needs to be different in x and y direction.
+        """
+    def is_isotropic_and_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is isotropic and scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for such a (polygon) processor is the convex decomposition operator. The decomposition of a polygon into convex parts is an operation that is not depending on scale nor orientation.
+        """
+    def is_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for a scale invariant (polygon) processor is the rotation operator. Rotation is not depending on scale, but on the original orientation as mirrored versions need to be rotated differently.
+        """
+
+class EdgePairToEdgeOperator:
+    r"""
+    @brief A generic edge-pair-to-edge operator
+
+    Edge processors are an efficient way to process edge pairs from an edge pair collection. To apply a processor, derive your own operator class and pass an instance to \EdgePairs#processed method.
+
+    Conceptually, these methods take each edge from the edge collection and present it to the operator's 'process' method.
+    The result of this call is a list of zero to many output edges derived from the input edge pair.
+    The output edge pair collection is the sum over all these individual results.
+
+    The magic happens when deep mode edge pair collections are involved. In that case, the processor will use as few calls as possible and exploit the hierarchical compression if possible. It needs to know however, how the operator behaves. You need to configure the operator by calling \is_isotropic, \is_scale_invariant or \is_isotropic_and_scale_invariant before using it.
+
+    You can skip this step, but the processor algorithm will assume the worst case then. This usually leads to cell variant formation which is not always desired and blows up the hierarchy.
+
+    For a basic example see the \EdgeToEdgePairOperator class, with the exception that this incarnation has to deliver edges and takes edge pairs.
+
+    This class has been introduced in version 0.29.
+    """
+    wants_variants: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the filter prefers cell variants
+    See \wants_variants= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the filter prefers cell variants
+    This flag must be set before using this filter for hierarchical applications (deep mode). It tells the filter implementation whether cell variants should be created (true, the default) or shape propagation will be applied (false).
+
+    This decision needs to be made, if the filter indicates that it will deliver different results
+    for scaled or rotated versions of the shape (see \is_isotropic and the other hints). If a cell
+    is present with different qualities - as seen from the top cell - the respective instances
+    need to be differentiated. Cell variant formation is one way, shape propagation the other way.
+    Typically, cell variant formation is less expensive, but the hierarchy will be modified.
+    """
+    @classmethod
+    def new(cls) -> EdgePairToEdgeOperator:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def is_isotropic(self) -> None:
+        r"""
+        @brief Indicates that the filter has isotropic properties
+        Call this method before using the filter to indicate that the selection is independent of the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        Examples for isotropic (polygon) processors are size or shrink operators. Size or shrink is not dependent on orientation unless size or shrink needs to be different in x and y direction.
+        """
+    def is_isotropic_and_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is isotropic and scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for such a (polygon) processor is the convex decomposition operator. The decomposition of a polygon into convex parts is an operation that is not depending on scale nor orientation.
+        """
+    def is_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for a scale invariant (polygon) processor is the rotation operator. Rotation is not depending on scale, but on the original orientation as mirrored versions need to be rotated differently.
+        """
+
+class EdgePairToPolygonOperator:
+    r"""
+    @brief A generic edge-pair-to-polygon operator
+
+    Edge pair processors are an efficient way to process edge pairs from an edge pair collection. To apply a processor, derive your own operator class and pass an instance to the \EdgePairs#processed method.
+
+    Conceptually, these methods take each edge pair from the edge pair collection and present it to the operator's 'process' method.
+    The result of this call is a list of zero to many output polygons derived from the input edge pair.
+    The output region is the sum over all these individual results.
+
+    The magic happens when deep mode edge pair collections are involved. In that case, the processor will use as few calls as possible and exploit the hierarchical compression if possible. It needs to know however, how the operator behaves. You need to configure the operator by calling \is_isotropic, \is_scale_invariant or \is_isotropic_and_scale_invariant before using it.
+
+    You can skip this step, but the processor algorithm will assume the worst case then. This usually leads to cell variant formation which is not always desired and blows up the hierarchy.
+
+    For a basic example see the \EdgeToPolygonOperator class, with the exception that this incarnation receives edge pairs.
+
+    This class has been introduced in version 0.29.
+    """
+    wants_variants: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the filter prefers cell variants
+    See \wants_variants= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the filter prefers cell variants
+    This flag must be set before using this filter for hierarchical applications (deep mode). It tells the filter implementation whether cell variants should be created (true, the default) or shape propagation will be applied (false).
+
+    This decision needs to be made, if the filter indicates that it will deliver different results
+    for scaled or rotated versions of the shape (see \is_isotropic and the other hints). If a cell
+    is present with different qualities - as seen from the top cell - the respective instances
+    need to be differentiated. Cell variant formation is one way, shape propagation the other way.
+    Typically, cell variant formation is less expensive, but the hierarchy will be modified.
+    """
+    @classmethod
+    def new(cls) -> EdgePairToPolygonOperator:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def is_isotropic(self) -> None:
+        r"""
+        @brief Indicates that the filter has isotropic properties
+        Call this method before using the filter to indicate that the selection is independent of the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        Examples for isotropic (polygon) processors are size or shrink operators. Size or shrink is not dependent on orientation unless size or shrink needs to be different in x and y direction.
+        """
+    def is_isotropic_and_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is isotropic and scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for such a (polygon) processor is the convex decomposition operator. The decomposition of a polygon into convex parts is an operation that is not depending on scale nor orientation.
+        """
+    def is_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for a scale invariant (polygon) processor is the rotation operator. Rotation is not depending on scale, but on the original orientation as mirrored versions need to be rotated differently.
         """
 
 class EdgePairs(ShapeCollection):
@@ -17560,6 +18674,13 @@ class EdgePairs(ShapeCollection):
         The enlargement is specified per edge, i.e the width will be increased by 2*dx.
         The boxes will not be merged, so it is possible to determine overlaps of these boxes for example.
         """
+    def filter(self, filter: EdgePairFilter) -> None:
+        r"""
+        @brief Applies a generic filter in place (replacing the edge pairs from the EdgePair collection)
+        See \EdgePairFilter for a description of this feature.
+
+        This method has been introduced in version 0.29.
+        """
     def filter_properties(self, keys: Sequence[Any]) -> None:
         r"""
         @brief Filters properties by certain keys.
@@ -17567,6 +18688,13 @@ class EdgePairs(ShapeCollection):
         As a side effect, this method enables properties on original layers.
 
         This method has been introduced in version 0.28.4.
+        """
+    def filtered(self, filtered: EdgePairFilter) -> EdgePairs:
+        r"""
+        @brief Applies a generic filter and returns a filtered copy
+        See \EdgePairFilter for a description of this feature.
+
+        This method has been introduced in version 0.29.
         """
     def first_edges(self) -> Edges:
         r"""
@@ -17741,6 +18869,37 @@ class EdgePairs(ShapeCollection):
         r"""
         @brief Converts the edge pairs to polygons
         This method creates polygons from the edge pairs. Each polygon will be a triangle or quadrangle which connects the start and end points of the edges forming the edge pair. This version allows one to specify an enlargement which is applied to the edges. The length of the edges is modified by applying the enlargement and the edges are shifted by the enlargement. By specifying an enlargement it is possible to give edge pairs an area which otherwise would not have one (coincident edges, two point-like edges).
+        """
+    def process(self, process: EdgePairOperator) -> None:
+        r"""
+        @brief Applies a generic edge pair processor in place (replacing the edge pairs from the EdgePairs collection)
+        See \EdgePairProcessor for a description of this feature.
+
+        This method has been introduced in version 0.29.
+        """
+    @overload
+    def processed(self, processed: EdgePairOperator) -> EdgePairs:
+        r"""
+        @brief Applies a generic edge pair processor and returns a processed copy
+        See \EdgePairProcessor for a description of this feature.
+
+        This method has been introduced in version 0.29.
+        """
+    @overload
+    def processed(self, processed: EdgePairToEdgeOperator) -> Edges:
+        r"""
+        @brief Applies a generic edge-pair-to-edge processor and returns an edge collection with the results
+        See \EdgePairToEdgeProcessor for a description of this feature.
+
+        This method has been introduced in version 0.29.
+        """
+    @overload
+    def processed(self, processed: EdgePairToPolygonOperator) -> Region:
+        r"""
+        @brief Applies a generic edge-pair-to-polygon processor and returns an Region with the results
+        See \EdgePairToPolygonProcessor for a description of this feature.
+
+        This method has been introduced in version 0.29.
         """
     def remove_properties(self) -> None:
         r"""
@@ -19024,6 +20183,336 @@ class EdgeProcessor:
         @return The output polygons
         """
 
+class EdgeToEdgePairOperator:
+    r"""
+    @brief A generic edge-to-edge-pair operator
+
+    Edge processors are an efficient way to process edges from an edge collection. To apply a processor, derive your own operator class and pass an instance to the \Edges#processed method.
+
+    Conceptually, these methods take each edge from the edge collection and present it to the operator's 'process' method.
+    The result of this call is a list of zero to many output edge pairs derived from the input edge.
+    The output edge pair collection is the sum over all these individual results.
+
+    The magic happens when deep mode edge collections are involved. In that case, the processor will use as few calls as possible and exploit the hierarchical compression if possible. It needs to know however, how the operator behaves. You need to configure the operator by calling \is_isotropic, \is_scale_invariant or \is_isotropic_and_scale_invariant before using it.
+
+    You can skip this step, but the processor algorithm will assume the worst case then. This usually leads to cell variant formation which is not always desired and blows up the hierarchy.
+
+    For a basic example see the \EdgeOperator class, with the exception that this incarnation has to deliver edge pairs.
+
+    This class has been introduced in version 0.29.
+    """
+    requires_raw_input: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the processor needs raw (unmerged) input
+    See \requires_raw_input= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the processor needs raw (unmerged) input
+    This flag must be set before using this processor. It tells the processor implementation whether the processor wants to have raw input (unmerged). The default value is 'false', meaning that
+    the processor will receive merged polygons ('merged semantics').
+
+    Setting this value to false potentially saves some CPU time needed for merging the polygons.
+    Also, raw input means that strange shapes such as dot-like edges, self-overlapping polygons, empty or degenerated polygons are preserved.
+    """
+    result_is_merged: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the processor delivers merged output
+    See \result_is_merged= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the processor delivers merged output
+    This flag must be set before using this processor. If the processor maintains the merged condition
+    by design (output is merged if input is), it is a good idea to set this predicate to 'true'.
+    This will avoid additional merge steps when the resulting collection is used in further operations
+    that need merged input
+    .
+    """
+    result_must_not_be_merged: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the processor's output must not be merged
+    See \result_must_not_be_merged= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the processor's output must not be merged
+    This flag must be set before using this processor. The processor can set this flag if it wants to
+    deliver shapes that must not be merged - e.g. point-like edges or strange or degenerated polygons.
+    .
+    """
+    wants_variants: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the filter prefers cell variants
+    See \wants_variants= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the filter prefers cell variants
+    This flag must be set before using this filter for hierarchical applications (deep mode). It tells the filter implementation whether cell variants should be created (true, the default) or shape propagation will be applied (false).
+
+    This decision needs to be made, if the filter indicates that it will deliver different results
+    for scaled or rotated versions of the shape (see \is_isotropic and the other hints). If a cell
+    is present with different qualities - as seen from the top cell - the respective instances
+    need to be differentiated. Cell variant formation is one way, shape propagation the other way.
+    Typically, cell variant formation is less expensive, but the hierarchy will be modified.
+    """
+    @classmethod
+    def new(cls) -> EdgeToEdgePairOperator:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def is_isotropic(self) -> None:
+        r"""
+        @brief Indicates that the filter has isotropic properties
+        Call this method before using the filter to indicate that the selection is independent of the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        Examples for isotropic (polygon) processors are size or shrink operators. Size or shrink is not dependent on orientation unless size or shrink needs to be different in x and y direction.
+        """
+    def is_isotropic_and_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is isotropic and scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for such a (polygon) processor is the convex decomposition operator. The decomposition of a polygon into convex parts is an operation that is not depending on scale nor orientation.
+        """
+    def is_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for a scale invariant (polygon) processor is the rotation operator. Rotation is not depending on scale, but on the original orientation as mirrored versions need to be rotated differently.
+        """
+
+class EdgeToPolygonOperator:
+    r"""
+    @brief A generic edge-to-polygon operator
+
+    Edge processors are an efficient way to process edges from an edge collection. To apply a processor, derive your own operator class and pass an instance to the \Edges#processed method.
+
+    Conceptually, these methods take each edge from the edge collection and present it to the operator's 'process' method.
+    The result of this call is a list of zero to many output polygons derived from the input edge.
+    The output region is the sum over all these individual results.
+
+    The magic happens when deep mode edge collections are involved. In that case, the processor will use as few calls as possible and exploit the hierarchical compression if possible. It needs to know however, how the operator behaves. You need to configure the operator by calling \is_isotropic, \is_scale_invariant or \is_isotropic_and_scale_invariant before using it.
+
+    You can skip this step, but the processor algorithm will assume the worst case then. This usually leads to cell variant formation which is not always desired and blows up the hierarchy.
+
+    For a basic example see the \EdgeOperator class, with the exception that this incarnation has to deliver edges.
+
+    This class has been introduced in version 0.29.
+    """
+    requires_raw_input: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the processor needs raw (unmerged) input
+    See \requires_raw_input= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the processor needs raw (unmerged) input
+    This flag must be set before using this processor. It tells the processor implementation whether the processor wants to have raw input (unmerged). The default value is 'false', meaning that
+    the processor will receive merged polygons ('merged semantics').
+
+    Setting this value to false potentially saves some CPU time needed for merging the polygons.
+    Also, raw input means that strange shapes such as dot-like edges, self-overlapping polygons, empty or degenerated polygons are preserved.
+    """
+    result_is_merged: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the processor delivers merged output
+    See \result_is_merged= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the processor delivers merged output
+    This flag must be set before using this processor. If the processor maintains the merged condition
+    by design (output is merged if input is), it is a good idea to set this predicate to 'true'.
+    This will avoid additional merge steps when the resulting collection is used in further operations
+    that need merged input
+    .
+    """
+    result_must_not_be_merged: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the processor's output must not be merged
+    See \result_must_not_be_merged= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the processor's output must not be merged
+    This flag must be set before using this processor. The processor can set this flag if it wants to
+    deliver shapes that must not be merged - e.g. point-like edges or strange or degenerated polygons.
+    .
+    """
+    wants_variants: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the filter prefers cell variants
+    See \wants_variants= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the filter prefers cell variants
+    This flag must be set before using this filter for hierarchical applications (deep mode). It tells the filter implementation whether cell variants should be created (true, the default) or shape propagation will be applied (false).
+
+    This decision needs to be made, if the filter indicates that it will deliver different results
+    for scaled or rotated versions of the shape (see \is_isotropic and the other hints). If a cell
+    is present with different qualities - as seen from the top cell - the respective instances
+    need to be differentiated. Cell variant formation is one way, shape propagation the other way.
+    Typically, cell variant formation is less expensive, but the hierarchy will be modified.
+    """
+    @classmethod
+    def new(cls) -> EdgeToPolygonOperator:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def is_isotropic(self) -> None:
+        r"""
+        @brief Indicates that the filter has isotropic properties
+        Call this method before using the filter to indicate that the selection is independent of the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        Examples for isotropic (polygon) processors are size or shrink operators. Size or shrink is not dependent on orientation unless size or shrink needs to be different in x and y direction.
+        """
+    def is_isotropic_and_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is isotropic and scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for such a (polygon) processor is the convex decomposition operator. The decomposition of a polygon into convex parts is an operation that is not depending on scale nor orientation.
+        """
+    def is_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for a scale invariant (polygon) processor is the rotation operator. Rotation is not depending on scale, but on the original orientation as mirrored versions need to be rotated differently.
+        """
+
 class Edges(ShapeCollection):
     r"""
     @brief A collection of edges (Not necessarily describing closed contours)
@@ -19076,12 +20565,12 @@ class Edges(ShapeCollection):
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         def __hash__(self) -> int:
             r"""
@@ -19194,7 +20683,7 @@ class Edges(ShapeCollection):
     IncludeZeroDistanceWhenTouching: ClassVar[ZeroDistanceMode]
     r"""
     @brief Specifies that check functions should include edges when they touch
-    With this specification, the check functions will also check edges if they share at least one common point. This is the mode that includes checking the 'kissing corner' cases. This mode is default for version 0.29 and later. 
+    With this specification, the check functions will also check edges if they share at least one common point. This is the mode that includes checking the 'kissing corner' cases. This mode is default for version 0.28.16 and later. 
     """
     NeverIncludeZeroDistance: ClassVar[ZeroDistanceMode]
     r"""
@@ -20194,6 +21683,13 @@ class Edges(ShapeCollection):
         The enlargement is specified per edge, i.e the width will be increased by 2*dx.
         The boxes will not be merged, so it is possible to determine overlaps of these boxes for example.
         """
+    def filter(self, filter: EdgeFilter) -> None:
+        r"""
+        @brief Applies a generic filter in place (replacing the edges from the Edges collection)
+        See \EdgeFilter for a description of this feature.
+
+        This method has been introduced in version 0.29.
+        """
     def filter_properties(self, keys: Sequence[Any]) -> None:
         r"""
         @brief Filters properties by certain keys.
@@ -20201,6 +21697,13 @@ class Edges(ShapeCollection):
         As a side effect, this method enables properties on original layers.
 
         This method has been introduced in version 0.28.4.
+        """
+    def filtered(self, filtered: EdgeFilter) -> Edges:
+        r"""
+        @brief Applies a generic filter and returns a filtered copy
+        See \EdgeFilter for a description of this feature.
+
+        This method has been introduced in version 0.29.
         """
     def flatten(self) -> None:
         r"""
@@ -20414,18 +21917,26 @@ class Edges(ShapeCollection):
         This method has been introduced in version 0.24.
         """
     @overload
-    def interacting(self, other: Edges) -> Edges:
+    def interacting(self, other: Edges, min_count: Optional[int] = ..., max_count: Optional[int] = ...) -> Edges:
         r"""
         @brief Returns the edges of this edge collection which overlap or touch edges from the other edge collection
 
         @return A new edge collection containing the edges overlapping or touching edges from the other edge collection
+
+        'min_count' and 'max_count' impose a constraint on the number of times an edge of this collection has to interact with (different) edges of the other collection to make the edge selected. An edge is selected by this method if the number of edges interacting with an edge of this collection is between min_count and max_count (including max_count).
+
+        'min_count' and 'max_count' have been introduced in version 0.29.
         """
     @overload
-    def interacting(self, other: Region) -> Edges:
+    def interacting(self, other: Region, min_count: Optional[int] = ..., max_count: Optional[int] = ...) -> Edges:
         r"""
         @brief Returns the edges from this edge collection which overlap or touch polygons from the region
 
         @return A new edge collection containing the edges overlapping or touching polygons from the region
+
+        'min_count' and 'max_count' impose a constraint on the number of times an edge of this collection has to interact with (different) polygons of the other region to make the edge selected. An edge is selected by this method if the number of polygons interacting with an edge of this collection is between min_count and max_count (including max_count).
+
+        'min_count' and 'max_count' have been introduced in version 0.29.
         """
     def intersections(self, other: Edges) -> Edges:
         r"""
@@ -20629,18 +22140,26 @@ class Edges(ShapeCollection):
         This method has been introduced in version 0.28.
         """
     @overload
-    def not_interacting(self, other: Edges) -> Edges:
+    def not_interacting(self, other: Edges, min_count: Optional[int] = ..., max_count: Optional[int] = ...) -> Edges:
         r"""
         @brief Returns the edges of this edge collection which do not overlap or touch edges from the other edge collection
 
         @return A new edge collection containing the edges not overlapping or touching edges from the other edge collection
+
+        'min_count' and 'max_count' impose a constraint on the number of times an edge of this collection has to interact with (different) edges of the other collection to make the edge selected. An edge is not selected by this method if the number of edges interacting with an edge of this collection is between min_count and max_count (including max_count).
+
+        'min_count' and 'max_count' have been introduced in version 0.29.
         """
     @overload
-    def not_interacting(self, other: Region) -> Edges:
+    def not_interacting(self, other: Region, min_count: Optional[int] = ..., max_count: Optional[int] = ...) -> Edges:
         r"""
         @brief Returns the edges from this edge collection which do not overlap or touch polygons from the region
 
         @return A new edge collection containing the edges not overlapping or touching polygons from the region
+
+        'min_count' and 'max_count' impose a constraint on the number of times an edge of this collection has to interact with (different) polygons of the other region to make the edge selected. An edge is not selected by this method if the number of polygons interacting with an edge of this collection is between min_count and max_count (including max_count).
+
+        'min_count' and 'max_count' have been introduced in version 0.29.
         """
     def not_members_of(self, other: Edges) -> Edges:
         r"""
@@ -20769,6 +22288,37 @@ class Edges(ShapeCollection):
 
         'zero_distance_mode' has been added in version 0.29.
         """
+    def process(self, process: EdgeOperator) -> None:
+        r"""
+        @brief Applies a generic edge processor in place (replacing the edges from the Edges collection)
+        See \EdgeProcessor for a description of this feature.
+
+        This method has been introduced in version 0.29.
+        """
+    @overload
+    def processed(self, processed: EdgeOperator) -> Edges:
+        r"""
+        @brief Applies a generic edge processor and returns a processed copy
+        See \EdgeProcessor for a description of this feature.
+
+        This method has been introduced in version 0.29.
+        """
+    @overload
+    def processed(self, processed: EdgeToEdgePairOperator) -> EdgePairs:
+        r"""
+        @brief Applies a generic edge-to-edge-pair processor and returns an edge pair collection with the results
+        See \EdgeToEdgePairProcessor for a description of this feature.
+
+        This method has been introduced in version 0.29.
+        """
+    @overload
+    def processed(self, processed: EdgeToPolygonOperator) -> Region:
+        r"""
+        @brief Applies a generic edge-to-polygon processor and returns an edge collection with the results
+        See \EdgeToPolygonProcessor for a description of this feature.
+
+        This method has been introduced in version 0.29.
+        """
     @overload
     def pull_interacting(self, other: Edges) -> Edges:
         r"""
@@ -20832,18 +22382,26 @@ class Edges(ShapeCollection):
         This method has been introduced in version 0.24.
         """
     @overload
-    def select_interacting(self, other: Edges) -> Edges:
+    def select_interacting(self, other: Edges, min_count: Optional[int] = ..., max_count: Optional[int] = ...) -> Edges:
         r"""
         @brief Selects the edges from this edge collection which overlap or touch edges from the other edge collection
 
         @return The edge collection after the edges have been selected (self)
+
+        This is the in-place version of \interacting - i.e. self is modified rather than a new collection is returned.
+
+        'min_count' and 'max_count' have been introduced in version 0.29.
         """
     @overload
-    def select_interacting(self, other: Region) -> Edges:
+    def select_interacting(self, other: Region, min_count: Optional[int] = ..., max_count: Optional[int] = ...) -> Edges:
         r"""
         @brief Selects the edges from this edge collection which overlap or touch polygons from the region
 
         @return The edge collection after the edges have been selected (self)
+
+        This is the in-place version of \interacting - i.e. self is modified rather than a new collection is returned.
+
+        'min_count' and 'max_count' have been introduced in version 0.29.
         """
     @overload
     def select_not_inside(self, other: Edges) -> Edges:
@@ -20864,18 +22422,26 @@ class Edges(ShapeCollection):
         This method has been introduced in version 0.28.
         """
     @overload
-    def select_not_interacting(self, other: Edges) -> Edges:
+    def select_not_interacting(self, other: Edges, min_count: Optional[int] = ..., max_count: Optional[int] = ...) -> Edges:
         r"""
         @brief Selects the edges from this edge collection which do not overlap or touch edges from the other edge collection
 
         @return The edge collection after the edges have been selected (self)
+
+        This is the in-place version of \not_interacting - i.e. self is modified rather than a new collection is returned.
+
+        'min_count' and 'max_count' have been introduced in version 0.29.
         """
     @overload
-    def select_not_interacting(self, other: Region) -> Edges:
+    def select_not_interacting(self, other: Region, min_count: Optional[int] = ..., max_count: Optional[int] = ...) -> Edges:
         r"""
         @brief Selects the edges from this edge collection which do not overlap or touch polygons from the region
 
         @return The edge collection after the edges have been selected (self)
+
+        This is the in-place version of \not_interacting - i.e. self is modified rather than a new collection is returned.
+
+        'min_count' and 'max_count' have been introduced in version 0.29.
         """
     @overload
     def select_not_outside(self, other: Edges) -> Edges:
@@ -21001,22 +22567,24 @@ class Edges(ShapeCollection):
         This method provides a faster way to compute both inside and non-inside edges compared to using separate methods. It has been introduced in version 0.28.
         """
     @overload
-    def split_interacting(self, other: Edges) -> List[Edges]:
+    def split_interacting(self, other: Edges, min_count: Optional[int] = ..., max_count: Optional[int] = ...) -> List[Edges]:
         r"""
         @brief Selects the edges from this edge collection which do and do not interact with edges from the other collection
 
         @return A two-element list of edge collections (first: interacting, second: non-interacting)
 
         This method provides a faster way to compute both interacting and non-interacting edges compared to using separate methods. It has been introduced in version 0.28.
+        'min_count' and 'max_count' have been introduced in version 0.29.
         """
     @overload
-    def split_interacting(self, other: Region) -> List[Edges]:
+    def split_interacting(self, other: Region, min_count: Optional[int] = ..., max_count: Optional[int] = ...) -> List[Edges]:
         r"""
         @brief Selects the edges from this edge collection which do and do not interact with polygons from the other region
 
         @return A two-element list of edge collections (first: interacting, second: non-interacting)
 
         This method provides a faster way to compute both interacting and non-interacting edges compared to using separate methods. It has been introduced in version 0.28.
+        'min_count' and 'max_count' have been introduced in version 0.29.
         """
     @overload
     def split_outside(self, other: Edges) -> List[Edges]:
@@ -21909,12 +23477,12 @@ class HAlign:
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums
+        @brief Compares an enum with an integer value
         """
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer value
+        @brief Compares two enums
         """
     def __hash__(self) -> int:
         r"""
@@ -29315,12 +30883,12 @@ class LayoutToNetlist:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -32829,12 +34397,12 @@ class Metrics:
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums
+        @brief Compares an enum with an integer value
         """
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer value
+        @brief Compares two enums
         """
     def __hash__(self) -> int:
         r"""
@@ -32867,12 +34435,12 @@ class Metrics:
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums for inequality
+        @brief Compares an enum with an integer for inequality
         """
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer for inequality
+        @brief Compares two enums for inequality
         """
     def __repr__(self) -> str:
         r"""
@@ -33368,14 +34936,14 @@ class NetPinRef:
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this pin reference is attached to.
+        @brief Gets the net this pin reference is attached to (non-const version).
+
+        This constness variant has been introduced in version 0.26.8
         """
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this pin reference is attached to (non-const version).
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the net this pin reference is attached to.
         """
     def pin(self) -> Pin:
         r"""
@@ -33598,16 +35166,16 @@ class NetTerminalRef:
     @overload
     def device(self) -> Device:
         r"""
-        @brief Gets the device reference (non-const version).
+        @brief Gets the device reference.
         Gets the device object that this connection is made to.
-
-        This constness variant has been introduced in version 0.26.8
         """
     @overload
     def device(self) -> Device:
         r"""
-        @brief Gets the device reference.
+        @brief Gets the device reference (non-const version).
         Gets the device object that this connection is made to.
+
+        This constness variant has been introduced in version 0.26.8
         """
     def device_class(self) -> DeviceClass:
         r"""
@@ -33626,14 +35194,14 @@ class NetTerminalRef:
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this terminal reference is attached to (non-const version).
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the net this terminal reference is attached to.
         """
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this terminal reference is attached to.
+        @brief Gets the net this terminal reference is attached to (non-const version).
+
+        This constness variant has been introduced in version 0.26.8
         """
     def terminal_def(self) -> DeviceTerminalDefinition:
         r"""
@@ -34396,22 +35964,16 @@ class Netlist:
     @overload
     def circuit_by_cell_index(self, cell_index: int) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given cell index (const version).
-        If the cell index is not valid or no circuit is registered with this index, nil is returned.
-
-        This constness variant has been introduced in version 0.26.8.
-        """
-    @overload
-    def circuit_by_cell_index(self, cell_index: int) -> Circuit:
-        r"""
         @brief Gets the circuit object for a given cell index.
         If the cell index is not valid or no circuit is registered with this index, nil is returned.
         """
     @overload
-    def circuit_by_name(self, name: str) -> Circuit:
+    def circuit_by_cell_index(self, cell_index: int) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given name.
-        If the name is not a valid circuit name, nil is returned.
+        @brief Gets the circuit object for a given cell index (const version).
+        If the cell index is not valid or no circuit is registered with this index, nil is returned.
+
+        This constness variant has been introduced in version 0.26.8.
         """
     @overload
     def circuit_by_name(self, name: str) -> Circuit:
@@ -34420,6 +35982,12 @@ class Netlist:
         If the name is not a valid circuit name, nil is returned.
 
         This constness variant has been introduced in version 0.26.8.
+        """
+    @overload
+    def circuit_by_name(self, name: str) -> Circuit:
+        r"""
+        @brief Gets the circuit object for a given name.
+        If the name is not a valid circuit name, nil is returned.
         """
     @overload
     def circuits_by_name(self, name_pattern: str) -> List[Circuit]:
@@ -34494,16 +36062,16 @@ class Netlist:
     @overload
     def each_circuit_bottom_up(self) -> Iterator[Circuit]:
         r"""
-        @brief Iterates over the circuits bottom-up
-        Iterating bottom-up means the parent circuits come after the child circuits. This is the basically the reverse order as delivered by \each_circuit_top_down.
-        """
-    @overload
-    def each_circuit_bottom_up(self) -> Iterator[Circuit]:
-        r"""
         @brief Iterates over the circuits bottom-up (const version)
         Iterating bottom-up means the parent circuits come after the child circuits. This is the basically the reverse order as delivered by \each_circuit_top_down.
 
         This constness variant has been introduced in version 0.26.8.
+        """
+    @overload
+    def each_circuit_bottom_up(self) -> Iterator[Circuit]:
+        r"""
+        @brief Iterates over the circuits bottom-up
+        Iterating bottom-up means the parent circuits come after the child circuits. This is the basically the reverse order as delivered by \each_circuit_top_down.
         """
     @overload
     def each_circuit_top_down(self) -> Iterator[Circuit]:
@@ -36862,7 +38430,6 @@ class PCellParameterDeclaration:
         This method will add the given value with the given description to the list of
         choices. If choices are defined, KLayout will show a drop-down box instead of an
         entry field in the parameter user interface.
-        If a range is already set for this parameter the choice will not be added and a warning message is showed.
         """
     def assign(self, other: PCellParameterDeclaration) -> None:
         r"""
@@ -36953,12 +38520,12 @@ class PCellParameterState:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         def __hash__(self) -> int:
             r"""
@@ -38884,6 +40451,17 @@ class Polygon:
         @brief Returns the bounding box of the polygon
         The bounding box is the box enclosing all points of the polygon.
         """
+    def break_(self, max_vertex_count: int, max_area_ratio: float) -> List[Polygon]:
+        r"""
+        @brief Splits the polygon into parts with a maximum vertex count and area ratio
+        The area ratio is the ratio between the bounding box area and the polygon area. Higher values mean more 'skinny' polygons.
+
+        This method will split the input polygon into pieces having a maximum of 'max_vertex_count' vertices and an area ratio less than 'max_area_ratio'. 'max_vertex_count' can be zero. In this case the limit is ignored. Also 'max_area_ratio' can be zero, in which case it is ignored as well.
+
+        The method of splitting is unspecified. The algorithm will apply 'split' recursively until the parts satisfy the limits.
+
+        This method has been introduced in version 0.29.
+        """
     def compress(self, remove_reflected: bool) -> None:
         r"""
         @brief Compresses the polygon.
@@ -39536,6 +41114,677 @@ class Polygon:
         @return The transformed polygon.
 
         With version 0.25, the original 'transformed_cplx' method is deprecated and 'transformed' takes both simple and complex transformations.
+        """
+
+class PolygonFilter:
+    r"""
+    @brief A generic polygon filter adaptor
+
+    Polygon filters are an efficient way to filter polygons from a Region. To apply a filter, derive your own filter class and pass an instance to the \Region#filter or \Region#filtered method.
+
+    Conceptually, these methods take each polygon from the region and present it to the filter's 'selected' method.
+    Based on the result of this evaluation, the polygon is kept or discarded.
+
+    The magic happens when deep mode regions are involved. In that case, the filter will use as few calls as possible and exploit the hierarchical compression if possible. It needs to know however, how the filter behaves. You need to configure the filter by calling \is_isotropic, \is_scale_invariant or \is_isotropic_and_scale_invariant before using the filter.
+
+    You can skip this step, but the filter algorithm will assume the worst case then. This usually leads to cell variant formation which is not always desired and blows up the hierarchy.
+
+    Here is some example that filters triangles:
+    @code
+    class TriangleFilter < RBA::PolygonFilter
+
+      # Constructor
+      def initialize
+        self.is_isotropic_and_scale_invariant   # the triangle nature is not dependent on the scale or orientation
+      end
+  
+      # Select only triangles
+      def selected(polygon)
+        return polygon.holes == 0 && polygon.num_points == 3
+      end
+
+    end
+
+    region = ... # some Region
+    triangles_only = region.filtered(TriangleFilter::new)
+    @/code
+
+    This class has been introduced in version 0.29.
+    """
+    requires_raw_input: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the filter needs raw (unmerged) input
+    See \requires_raw_input= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the filter needs raw (unmerged) input
+    This flag must be set before using this filter. It tells the filter implementation whether the filter wants to have raw input (unmerged). The default value is 'false', meaning that
+    the filter will receive merged polygons ('merged semantics').
+
+    Setting this value to false potentially saves some CPU time needed for merging the polygons.
+    Also, raw input means that strange shapes such as dot-like edges, self-overlapping polygons, empty or degenerated polygons are preserved.
+    """
+    wants_variants: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the filter prefers cell variants
+    See \wants_variants= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the filter prefers cell variants
+    This flag must be set before using this filter for hierarchical applications (deep mode). It tells the filter implementation whether cell variants should be created (true, the default) or shape propagation will be applied (false).
+
+    This decision needs to be made, if the filter indicates that it will deliver different results
+    for scaled or rotated versions of the shape (see \is_isotropic and the other hints). If a cell
+    is present with different qualities - as seen from the top cell - the respective instances
+    need to be differentiated. Cell variant formation is one way, shape propagation the other way.
+    Typically, cell variant formation is less expensive, but the hierarchy will be modified.
+    """
+    @classmethod
+    def new(cls) -> PolygonFilter:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def is_isotropic(self) -> None:
+        r"""
+        @brief Indicates that the filter has isotropic properties
+        Call this method before using the filter to indicate that the selection is independent of the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        Examples for isotropic (polygon) filters are area or perimeter filters. The area or perimeter of a polygon depends on the scale, but not on the orientation of the polygon.
+        """
+    def is_isotropic_and_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is isotropic and scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for such a (polygon) filter is the square selector. Whether a polygon is a square or not does not depend on the polygon's orientation nor scale.
+        """
+    def is_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for a scale invariant (polygon) filter is the bounding box aspect ratio (height/width) filter. The definition of heigh and width depends on the orientation, but the ratio is independent on scale.
+        """
+
+class PolygonOperator:
+    r"""
+    @brief A generic polygon operator
+
+    Polygon processors are an efficient way to process polygons from a Region. To apply a processor, derive your own operator class and pass an instance to the \Region#process or \Region#processed method.
+
+    Conceptually, these methods take each polygon from the region and present it to the operators' 'process' method.
+    The result of this call is a list of zero to many output polygons derived from the input polygon.
+    The output region is the sum over all these individual results.
+
+    The magic happens when deep mode regions are involved. In that case, the processor will use as few calls as possible and exploit the hierarchical compression if possible. It needs to know however, how the operator behaves. You need to configure the operator by calling \is_isotropic, \is_scale_invariant or \is_isotropic_and_scale_invariant before using it.
+
+    You can skip this step, but the processor algorithm will assume the worst case then. This usually leads to cell variant formation which is not always desired and blows up the hierarchy.
+
+    Here is some example that shrinks every polygon to half of the size but does not change the position.
+    In this example the 'position' is defined by the center of the bounding box:
+    @code
+    class ShrinkToHalf < RBA::PolygonOperator
+
+      # Constructor
+      def initialize
+        self.is_isotropic_and_scale_invariant   # scale or orientation do not matter
+      end
+  
+      # Shrink to half size
+      def process(polygon)
+        shift = polygon.bbox.center - RBA::Point::new   # shift vector
+        return [ (polygon.moved(-shift) * 0.5).moved(shift) ]
+      end
+
+    end
+
+    region = ... # some Region
+    shrinked_to_half = region.processed(ShrinkToHalf::new)
+    @/code
+
+    This class has been introduced in version 0.29.
+    """
+    requires_raw_input: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the processor needs raw (unmerged) input
+    See \requires_raw_input= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the processor needs raw (unmerged) input
+    This flag must be set before using this processor. It tells the processor implementation whether the processor wants to have raw input (unmerged). The default value is 'false', meaning that
+    the processor will receive merged polygons ('merged semantics').
+
+    Setting this value to false potentially saves some CPU time needed for merging the polygons.
+    Also, raw input means that strange shapes such as dot-like edges, self-overlapping polygons, empty or degenerated polygons are preserved.
+    """
+    result_is_merged: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the processor delivers merged output
+    See \result_is_merged= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the processor delivers merged output
+    This flag must be set before using this processor. If the processor maintains the merged condition
+    by design (output is merged if input is), it is a good idea to set this predicate to 'true'.
+    This will avoid additional merge steps when the resulting collection is used in further operations
+    that need merged input
+    .
+    """
+    result_must_not_be_merged: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the processor's output must not be merged
+    See \result_must_not_be_merged= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the processor's output must not be merged
+    This flag must be set before using this processor. The processor can set this flag if it wants to
+    deliver shapes that must not be merged - e.g. point-like edges or strange or degenerated polygons.
+    .
+    """
+    wants_variants: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the filter prefers cell variants
+    See \wants_variants= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the filter prefers cell variants
+    This flag must be set before using this filter for hierarchical applications (deep mode). It tells the filter implementation whether cell variants should be created (true, the default) or shape propagation will be applied (false).
+
+    This decision needs to be made, if the filter indicates that it will deliver different results
+    for scaled or rotated versions of the shape (see \is_isotropic and the other hints). If a cell
+    is present with different qualities - as seen from the top cell - the respective instances
+    need to be differentiated. Cell variant formation is one way, shape propagation the other way.
+    Typically, cell variant formation is less expensive, but the hierarchy will be modified.
+    """
+    @classmethod
+    def new(cls) -> PolygonOperator:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def is_isotropic(self) -> None:
+        r"""
+        @brief Indicates that the filter has isotropic properties
+        Call this method before using the filter to indicate that the selection is independent of the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        Examples for isotropic (polygon) processors are size or shrink operators. Size or shrink is not dependent on orientation unless size or shrink needs to be different in x and y direction.
+        """
+    def is_isotropic_and_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is isotropic and scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for such a (polygon) processor is the convex decomposition operator. The decomposition of a polygon into convex parts is an operation that is not depending on scale nor orientation.
+        """
+    def is_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for a scale invariant (polygon) processor is the rotation operator. Rotation is not depending on scale, but on the original orientation as mirrored versions need to be rotated differently.
+        """
+
+class PolygonToEdgeOperator:
+    r"""
+    @brief A generic polygon-to-edge operator
+
+    Polygon processors are an efficient way to process polygons from a Region. To apply a processor, derive your own operator class and pass an instance to the \Region#processed method.
+
+    Conceptually, these methods take each polygon from the region and present it to the operator's 'process' method.
+    The result of this call is a list of zero to many output edges derived from the input polygon.
+    The output edge collection is the sum over all these individual results.
+
+    The magic happens when deep mode regions are involved. In that case, the processor will use as few calls as possible and exploit the hierarchical compression if possible. It needs to know however, how the operator behaves. You need to configure the operator by calling \is_isotropic, \is_scale_invariant or \is_isotropic_and_scale_invariant before using it.
+
+    You can skip this step, but the processor algorithm will assume the worst case then. This usually leads to cell variant formation which is not always desired and blows up the hierarchy.
+
+    For a basic example see the \PolygonOperator class, with the exception that this incarnation has to deliver edges.
+
+    This class has been introduced in version 0.29.
+    """
+    requires_raw_input: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the processor needs raw (unmerged) input
+    See \requires_raw_input= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the processor needs raw (unmerged) input
+    This flag must be set before using this processor. It tells the processor implementation whether the processor wants to have raw input (unmerged). The default value is 'false', meaning that
+    the processor will receive merged polygons ('merged semantics').
+
+    Setting this value to false potentially saves some CPU time needed for merging the polygons.
+    Also, raw input means that strange shapes such as dot-like edges, self-overlapping polygons, empty or degenerated polygons are preserved.
+    """
+    result_is_merged: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the processor delivers merged output
+    See \result_is_merged= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the processor delivers merged output
+    This flag must be set before using this processor. If the processor maintains the merged condition
+    by design (output is merged if input is), it is a good idea to set this predicate to 'true'.
+    This will avoid additional merge steps when the resulting collection is used in further operations
+    that need merged input
+    .
+    """
+    result_must_not_be_merged: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the processor's output must not be merged
+    See \result_must_not_be_merged= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the processor's output must not be merged
+    This flag must be set before using this processor. The processor can set this flag if it wants to
+    deliver shapes that must not be merged - e.g. point-like edges or strange or degenerated polygons.
+    .
+    """
+    wants_variants: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the filter prefers cell variants
+    See \wants_variants= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the filter prefers cell variants
+    This flag must be set before using this filter for hierarchical applications (deep mode). It tells the filter implementation whether cell variants should be created (true, the default) or shape propagation will be applied (false).
+
+    This decision needs to be made, if the filter indicates that it will deliver different results
+    for scaled or rotated versions of the shape (see \is_isotropic and the other hints). If a cell
+    is present with different qualities - as seen from the top cell - the respective instances
+    need to be differentiated. Cell variant formation is one way, shape propagation the other way.
+    Typically, cell variant formation is less expensive, but the hierarchy will be modified.
+    """
+    @classmethod
+    def new(cls) -> PolygonToEdgeOperator:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def is_isotropic(self) -> None:
+        r"""
+        @brief Indicates that the filter has isotropic properties
+        Call this method before using the filter to indicate that the selection is independent of the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        Examples for isotropic (polygon) processors are size or shrink operators. Size or shrink is not dependent on orientation unless size or shrink needs to be different in x and y direction.
+        """
+    def is_isotropic_and_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is isotropic and scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for such a (polygon) processor is the convex decomposition operator. The decomposition of a polygon into convex parts is an operation that is not depending on scale nor orientation.
+        """
+    def is_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for a scale invariant (polygon) processor is the rotation operator. Rotation is not depending on scale, but on the original orientation as mirrored versions need to be rotated differently.
+        """
+
+class PolygonToEdgePairOperator:
+    r"""
+    @brief A generic polygon-to-edge-pair operator
+
+    Polygon processors are an efficient way to process polygons from a Region. To apply a processor, derive your own operator class and pass an instance to the \Region#processed method.
+
+    Conceptually, these methods take each polygon from the region and present it to the operator's 'process' method.
+    The result of this call is a list of zero to many output edge pairs derived from the input polygon.
+    The output edge pair collection is the sum over all these individual results.
+
+    The magic happens when deep mode regions are involved. In that case, the processor will use as few calls as possible and exploit the hierarchical compression if possible. It needs to know however, how the operator behaves. You need to configure the operator by calling \is_isotropic, \is_scale_invariant or \is_isotropic_and_scale_invariant before using it.
+
+    You can skip this step, but the processor algorithm will assume the worst case then. This usually leads to cell variant formation which is not always desired and blows up the hierarchy.
+
+    For a basic example see the \PolygonOperator class, with the exception that this incarnation has to deliver edge pairs.
+
+    This class has been introduced in version 0.29.
+    """
+    requires_raw_input: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the processor needs raw (unmerged) input
+    See \requires_raw_input= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the processor needs raw (unmerged) input
+    This flag must be set before using this processor. It tells the processor implementation whether the processor wants to have raw input (unmerged). The default value is 'false', meaning that
+    the processor will receive merged polygons ('merged semantics').
+
+    Setting this value to false potentially saves some CPU time needed for merging the polygons.
+    Also, raw input means that strange shapes such as dot-like edges, self-overlapping polygons, empty or degenerated polygons are preserved.
+    """
+    result_is_merged: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the processor delivers merged output
+    See \result_is_merged= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the processor delivers merged output
+    This flag must be set before using this processor. If the processor maintains the merged condition
+    by design (output is merged if input is), it is a good idea to set this predicate to 'true'.
+    This will avoid additional merge steps when the resulting collection is used in further operations
+    that need merged input
+    .
+    """
+    result_must_not_be_merged: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the processor's output must not be merged
+    See \result_must_not_be_merged= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the processor's output must not be merged
+    This flag must be set before using this processor. The processor can set this flag if it wants to
+    deliver shapes that must not be merged - e.g. point-like edges or strange or degenerated polygons.
+    .
+    """
+    wants_variants: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the filter prefers cell variants
+    See \wants_variants= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the filter prefers cell variants
+    This flag must be set before using this filter for hierarchical applications (deep mode). It tells the filter implementation whether cell variants should be created (true, the default) or shape propagation will be applied (false).
+
+    This decision needs to be made, if the filter indicates that it will deliver different results
+    for scaled or rotated versions of the shape (see \is_isotropic and the other hints). If a cell
+    is present with different qualities - as seen from the top cell - the respective instances
+    need to be differentiated. Cell variant formation is one way, shape propagation the other way.
+    Typically, cell variant formation is less expensive, but the hierarchy will be modified.
+    """
+    @classmethod
+    def new(cls) -> PolygonToEdgePairOperator:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def is_isotropic(self) -> None:
+        r"""
+        @brief Indicates that the filter has isotropic properties
+        Call this method before using the filter to indicate that the selection is independent of the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        Examples for isotropic (polygon) processors are size or shrink operators. Size or shrink is not dependent on orientation unless size or shrink needs to be different in x and y direction.
+        """
+    def is_isotropic_and_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is isotropic and scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for such a (polygon) processor is the convex decomposition operator. The decomposition of a polygon into convex parts is an operation that is not depending on scale nor orientation.
+        """
+    def is_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for a scale invariant (polygon) processor is the rotation operator. Rotation is not depending on scale, but on the original orientation as mirrored versions need to be rotated differently.
         """
 
 class PreferredOrientation:
@@ -41302,12 +43551,12 @@ class Region(ShapeCollection):
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -41382,12 +43631,12 @@ class Region(ShapeCollection):
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         def __hash__(self) -> int:
             r"""
@@ -41420,12 +43669,12 @@ class Region(ShapeCollection):
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -41451,11 +43700,23 @@ class Region(ShapeCollection):
             r"""
             @brief Gets the symbolic string from an enum
             """
+    All: ClassVar[EdgeMode]
+    r"""
+    @brief Selects all edges
+    """
     AlwaysIncludeZeroDistance: ClassVar[ZeroDistanceMode]
     r"""
     @hide
     @brief Specifies that check functions should always include edges with zero distance
     This mode has little practical value.
+    """
+    Concave: ClassVar[EdgeMode]
+    r"""
+    @brief Selects only concave edges
+    """
+    Convex: ClassVar[EdgeMode]
+    r"""
+    @brief Selects only convex edges
     """
     DifferentPropertiesConstraint: ClassVar[PropertyConstraint]
     r"""
@@ -41500,7 +43761,7 @@ class Region(ShapeCollection):
     IncludeZeroDistanceWhenTouching: ClassVar[ZeroDistanceMode]
     r"""
     @brief Specifies that check functions should include edges when they touch
-    With this specification, the check functions will also check edges if they share at least one common point. This is the mode that includes checking the 'kissing corner' cases. This mode is default for version 0.29 and later. 
+    With this specification, the check functions will also check edges if they share at least one common point. This is the mode that includes checking the 'kissing corner' cases. This mode is default for version 0.28.16 and later. 
     """
     NeverIncludeZeroDistance: ClassVar[ZeroDistanceMode]
     r"""
@@ -41520,9 +43781,29 @@ class Region(ShapeCollection):
     r"""
     @brief Specifies no filtering
     """
+    NotConcave: ClassVar[EdgeMode]
+    r"""
+    @brief Selects only edges which are not concave
+    """
+    NotConvex: ClassVar[EdgeMode]
+    r"""
+    @brief Selects only edges which are not convex
+    """
     NotOpposite: ClassVar[Region.OppositeFilter]
     r"""
     @brief Only errors NOT appearing on opposite sides of a figure will be reported
+    """
+    NotStep: ClassVar[EdgeMode]
+    r"""
+    @brief Selects only edges which are not steps
+    """
+    NotStepIn: ClassVar[EdgeMode]
+    r"""
+    @brief Selects only edges which are not steps leading inside
+    """
+    NotStepOut: ClassVar[EdgeMode]
+    r"""
+    @brief Selects only edges which are not steps leading outside
     """
     OneSideAllowed: ClassVar[Region.RectFilter]
     r"""
@@ -41557,6 +43838,18 @@ class Region(ShapeCollection):
     @/code
 
     All points within a square with length 2*d around one point are considered to have a smaller distance than d in this metrics.
+    """
+    Step: ClassVar[EdgeMode]
+    r"""
+    @brief Selects only step edges leading inside or outside
+    """
+    StepIn: ClassVar[EdgeMode]
+    r"""
+    @brief Selects only step edges leading inside
+    """
+    StepOut: ClassVar[EdgeMode]
+    r"""
+    @brief Selects only step edges leading outside
     """
     ThreeSidesAllowed: ClassVar[Region.RectFilter]
     r"""
@@ -42384,14 +44677,18 @@ class Region(ShapeCollection):
 
         This returns the raw polygons if merged semantics is disabled or the merged ones if merged semantics is enabled.
         """
-    def edges(self) -> Edges:
+    def edges(self, mode: Optional[EdgeMode] = ...) -> Edges:
         r"""
         @brief Returns an edge collection representing all edges of the polygons in this region
         This method will decompose the polygons into the individual edges. Edges making up the hulls of the polygons are oriented clockwise while edges making up the holes are oriented counterclockwise.
 
-        The edge collection returned can be manipulated in various ways. See \Edges for a description of the possibilities of the edge collection.
+        The 'mode' parameter allows selecting specific edges, such as convex or concave ones. By default, all edges are selected.
+
+        The edge collection returned can be manipulated in various ways. See \Edges for a description of the features of the edge collection.
 
         Merged semantics applies for this method (see \merged_semantics= for a description of this concept)
+
+        The mode argument has been added in version 0.29.
         """
     def enable_progress(self, label: str) -> None:
         r"""
@@ -42549,6 +44846,13 @@ class Region(ShapeCollection):
 
         This method has been introduced in version 0.27.
         """
+    def filter(self, filter: PolygonFilter) -> None:
+        r"""
+        @brief Applies a generic filter in place (replacing the polygons from the Region)
+        See \PolygonFilter for a description of this feature.
+
+        This method has been introduced in version 0.29.
+        """
     def filter_properties(self, keys: Sequence[Any]) -> None:
         r"""
         @brief Filters properties by certain keys.
@@ -42556,6 +44860,13 @@ class Region(ShapeCollection):
         As a side effect, this method enables properties on original layers.
 
         This method has been introduced in version 0.28.4.
+        """
+    def filtered(self, filtered: PolygonFilter) -> Region:
+        r"""
+        @brief Applies a generic filter and returns a filtered copy
+        See \PolygonFilter for a description of this feature.
+
+        This method has been introduced in version 0.29.
         """
     def flatten(self) -> Region:
         r"""
@@ -43397,6 +45708,37 @@ class Region(ShapeCollection):
         Merged semantics applies for this method (see \merged_semantics= for a description of this concept)
         If merged semantics is not enabled, internal edges are counted as well.
         """
+    def process(self, process: PolygonOperator) -> None:
+        r"""
+        @brief Applies a generic polygon processor in place (replacing the polygons from the Region)
+        See \PolygonProcessor for a description of this feature.
+
+        This method has been introduced in version 0.29.
+        """
+    @overload
+    def processed(self, processed: PolygonOperator) -> Region:
+        r"""
+        @brief Applies a generic polygon processor and returns a processed copy
+        See \PolygonProcessor for a description of this feature.
+
+        This method has been introduced in version 0.29.
+        """
+    @overload
+    def processed(self, processed: PolygonToEdgeOperator) -> Edges:
+        r"""
+        @brief Applies a generic polygon-to-edge processor and returns an edge collection with the results
+        See \PolygonToEdgeProcessor for a description of this feature.
+
+        This method has been introduced in version 0.29.
+        """
+    @overload
+    def processed(self, processed: PolygonToEdgePairOperator) -> EdgePairs:
+        r"""
+        @brief Applies a generic polygon-to-edge-pair processor and returns an edge pair collection with the results
+        See \PolygonToEdgePairProcessor for a description of this feature.
+
+        This method has been introduced in version 0.29.
+        """
     def pull_inside(self, other: Region) -> Region:
         r"""
         @brief Returns all polygons of "other" which are inside polygons of this region
@@ -44198,7 +46540,7 @@ class Region(ShapeCollection):
         Merged semantics applies for the input of this method (see \merged_semantics= for a description of this concept)
 
         The 'shielded' and 'negative' options have been introduced in version 0.27. 'property_constraint' has been added in version 0.28.4.
-        'zero_distance_mode' has been added in version 0.29.
+        'zero_distance_mode' has been added in version 0.28.16.
         """
     @overload
     def with_angle(self, amin: float, amax: float, inverse: bool) -> EdgePairs:
@@ -45165,12 +47507,12 @@ class Severity:
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer for inequality
+        @brief Compares two enums for inequality
         """
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums for inequality
+        @brief Compares an enum with an integer for inequality
         """
     def __repr__(self) -> str:
         r"""
@@ -45520,12 +47862,11 @@ class Shape:
     This method has been introduced in version 0.23.
 
     Setter:
-    @brief Sets the upper right corner of the box with the point being given in micrometer units
+    @brief Sets the upper right point of the box
 
     Applies to boxes only. Changes the upper right point of the box and throws an exception if the shape is not a box.
-    Translation from micrometer units to database units is done internally.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.23.
     """
     box_width: int
     r"""
@@ -45844,10 +48185,11 @@ class Shape:
     Starting with version 0.23, this method returns nil, if the shape does not represent a geometrical primitive that can be converted to a polygon.
 
     Setter:
-    @brief Replaces the shape by the given polygon (in micrometer units)
-    This method replaces the shape by the given polygon, like \polygon= with a \Polygon argument does. This version translates the polygon from micrometer units to database units internally.
+    @brief Replaces the shape by the given polygon object
+    This method replaces the shape by the given polygon object. This method can only be called for editable layouts. It does not change the user properties of the shape.
+    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.22.
     """
     prop_id: int
     r"""
@@ -45899,11 +48241,10 @@ class Shape:
 
     Starting with version 0.23, this method returns nil, if the shape does not represent a text.
     Setter:
-    @brief Replaces the shape by the given text object
-    This method replaces the shape by the given text object. This method can only be called for editable layouts. It does not change the user properties of the shape.
-    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
+    @brief Replaces the shape by the given text (in micrometer units)
+    This method replaces the shape by the given text, like \text= with a \Text argument does. This version translates the text from micrometer units to database units internally.
 
-    This method has been introduced in version 0.22.
+    This method has been introduced in version 0.25.
     """
     text_dpos: DVector
     r"""
@@ -48587,6 +50928,17 @@ class SimplePolygon:
         r"""
         @brief Returns the bounding box of the simple polygon
         """
+    def break_(self, max_vertex_count: int, max_area_ratio: float) -> List[SimplePolygon]:
+        r"""
+        @brief Splits the polygon into parts with a maximum vertex count and area ratio
+        The area ratio is the ratio between the bounding box area and the polygon area. Higher values mean more 'skinny' polygons.
+
+        This method will split the input polygon into pieces having a maximum of 'max_vertex_count' vertices and an area ratio less than 'max_area_ratio'. 'max_vertex_count' can be zero. In this case the limit is ignored. Also 'max_area_ratio' can be zero, in which case it is ignored as well.
+
+        The method of splitting is unspecified. The algorithm will apply 'split' recursively until the parts satisfy the limits.
+
+        This method has been introduced in version 0.29.
+        """
     def compress(self, remove_reflected: bool) -> None:
         r"""
         @brief Compressed the simple polygon.
@@ -49096,16 +51448,21 @@ class SubCircuit(NetlistObject):
     @overload
     def circuit(self) -> Circuit:
         r"""
+        @brief Gets the circuit the subcircuit lives in.
+        This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
+        """
+    @overload
+    def circuit(self) -> Circuit:
+        r"""
         @brief Gets the circuit the subcircuit lives in (non-const version).
         This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
 
         This constness variant has been introduced in version 0.26.8
         """
     @overload
-    def circuit(self) -> Circuit:
+    def circuit_ref(self) -> Circuit:
         r"""
-        @brief Gets the circuit the subcircuit lives in.
-        This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
+        @brief Gets the circuit referenced by the subcircuit.
         """
     @overload
     def circuit_ref(self) -> Circuit:
@@ -49114,11 +51471,6 @@ class SubCircuit(NetlistObject):
 
 
         This constness variant has been introduced in version 0.26.8
-        """
-    @overload
-    def circuit_ref(self) -> Circuit:
-        r"""
-        @brief Gets the circuit referenced by the subcircuit.
         """
     @overload
     def connect_pin(self, pin: Pin, net: Net) -> None:
@@ -49679,7 +52031,8 @@ class Text:
     Setter:
     @brief Sets the horizontal alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     size: int
     r"""
@@ -49715,8 +52068,7 @@ class Text:
     Setter:
     @brief Sets the vertical alignment
 
-    This property specifies how the text is aligned relative to the anchor point. 
-    This property has been introduced in version 0.22 and extended to enums in 0.28.
+    This is the version accepting integer values. It's provided for backward compatibility.
     """
     x: int
     r"""
@@ -50074,6 +52426,149 @@ class Text:
         @return The transformed text
         """
 
+class TextFilter:
+    r"""
+    @brief A generic text filter adaptor
+
+    Text filters are an efficient way to filter texts from a Texts collection. To apply a filter, derive your own filter class and pass an instance to \Texts#filter or \Texts#filtered method.
+
+    Conceptually, these methods take each text from the collection and present it to the filter's 'selected' method.
+    Based on the result of this evaluation, the text is kept or discarded.
+
+    The magic happens when deep mode text collections are involved. In that case, the filter will use as few calls as possible and exploit the hierarchical compression if possible. It needs to know however, how the filter behaves. You need to configure the filter by calling \is_isotropic, \is_scale_invariant or \is_isotropic_and_scale_invariant before using the filter.
+
+    You can skip this step, but the filter algorithm will assume the worst case then. This usually leads to cell variant formation which is not always desired and blows up the hierarchy.
+
+    Here is some example that filters texts with a given string length:
+    @code
+    class TextStringLengthFilter < RBA::TextFilter
+
+      # Constructor
+      def initialize(string_length)
+        self.is_isotropic_and_scale_invariant   # orientation and scale do not matter
+        @string_length = string_length
+      end
+  
+      # Select texts with given string length
+      def selected(text)
+        return text.string.size == @string_length
+      end
+
+    end
+
+    texts = ... # some Texts object
+    with_length_3 = edges.filtered(TextStringLengthFilter::new(3))
+    @/code
+
+    This class has been introduced in version 0.29.
+    """
+    wants_variants: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the filter prefers cell variants
+    See \wants_variants= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the filter prefers cell variants
+    This flag must be set before using this filter for hierarchical applications (deep mode). It tells the filter implementation whether cell variants should be created (true, the default) or shape propagation will be applied (false).
+
+    This decision needs to be made, if the filter indicates that it will deliver different results
+    for scaled or rotated versions of the shape (see \is_isotropic and the other hints). If a cell
+    is present with different qualities - as seen from the top cell - the respective instances
+    need to be differentiated. Cell variant formation is one way, shape propagation the other way.
+    Typically, cell variant formation is less expensive, but the hierarchy will be modified.
+    """
+    @classmethod
+    def new(cls) -> TextFilter:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def is_isotropic(self) -> None:
+        r"""
+        @brief Indicates that the filter has isotropic properties
+        Call this method before using the filter to indicate that the selection is independent of the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        Examples for isotropic (polygon) filters are area or perimeter filters. The area or perimeter of a polygon depends on the scale, but not on the orientation of the polygon.
+        """
+    def is_isotropic_and_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is isotropic and scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for such a (polygon) filter is the square selector. Whether a polygon is a square or not does not depend on the polygon's orientation nor scale.
+        """
+    def is_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for a scale invariant (polygon) filter is the bounding box aspect ratio (height/width) filter. The definition of heigh and width depends on the orientation, but the ratio is independent on scale.
+        """
+
 class TextGenerator:
     r"""
     @brief A text generator class
@@ -50333,6 +52828,276 @@ class TextGenerator:
         r"""
         @brief Gets the design height of the glyphs in the generator's database units
         The width is the width of the rectangle occupied by each character. A version that delivers this value in micrometer units is \dwidth.
+        """
+
+class TextOperator:
+    r"""
+    @brief A generic text operator
+
+    Text processors are an efficient way to process texts from an text collection. To apply a processor, derive your own operator class and pass an instance to the \Texts#processed or \Texts#process method.
+
+    Conceptually, these methods take each text from the edge pair collection and present it to the operator's 'process' method.
+    The result of this call is a list of zero to many output texts derived from the input text.
+    The output text collection is the sum over all these individual results.
+
+    The magic happens when deep mode text collections are involved. In that case, the processor will use as few calls as possible and exploit the hierarchical compression if possible. It needs to know however, how the operator behaves. You need to configure the operator by calling \is_isotropic, \is_scale_invariant or \is_isotropic_and_scale_invariant before using it.
+
+    You can skip this step, but the processor algorithm will assume the worst case then. This usually leads to cell variant formation which is not always desired and blows up the hierarchy.
+
+    Here is some example that replaces the text string:
+    @code
+    class ReplaceTextString < RBA::TextOperator
+
+      # Constructor
+      def initialize
+        self.is_isotropic_and_scale_invariant   # orientation and scale do not matter
+      end
+  
+      # Replaces the string by a number representing the string length
+      def process(text)
+        new_text = text.dup   # need a copy as we cannot modify the text passed
+        new_text.string = text.string.size.to_s
+        return [ new_text ]
+      end
+
+    end
+
+    texts = ... # some Texts object
+    modified = texts.processed(ReplaceTextString::new)
+    @/code
+
+    This class has been introduced in version 0.29.
+    """
+    wants_variants: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the filter prefers cell variants
+    See \wants_variants= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the filter prefers cell variants
+    This flag must be set before using this filter for hierarchical applications (deep mode). It tells the filter implementation whether cell variants should be created (true, the default) or shape propagation will be applied (false).
+
+    This decision needs to be made, if the filter indicates that it will deliver different results
+    for scaled or rotated versions of the shape (see \is_isotropic and the other hints). If a cell
+    is present with different qualities - as seen from the top cell - the respective instances
+    need to be differentiated. Cell variant formation is one way, shape propagation the other way.
+    Typically, cell variant formation is less expensive, but the hierarchy will be modified.
+    """
+    @classmethod
+    def new(cls) -> TextOperator:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def is_isotropic(self) -> None:
+        r"""
+        @brief Indicates that the filter has isotropic properties
+        Call this method before using the filter to indicate that the selection is independent of the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        Examples for isotropic (polygon) processors are size or shrink operators. Size or shrink is not dependent on orientation unless size or shrink needs to be different in x and y direction.
+        """
+    def is_isotropic_and_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is isotropic and scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for such a (polygon) processor is the convex decomposition operator. The decomposition of a polygon into convex parts is an operation that is not depending on scale nor orientation.
+        """
+    def is_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for a scale invariant (polygon) processor is the rotation operator. Rotation is not depending on scale, but on the original orientation as mirrored versions need to be rotated differently.
+        """
+
+class TextToPolygonOperator:
+    r"""
+    @brief A generic text-to-polygon operator
+
+    Text processors are an efficient way to process texts from an text collection. To apply a processor, derive your own operator class and pass an instance to the \Texts#processed method.
+
+    Conceptually, these methods take each text from the text collection and present it to the operator's 'process' method.
+    The result of this call is a list of zero to many output polygons derived from the input text.
+    The output region is the sum over all these individual results.
+
+    The magic happens when deep mode text collections are involved. In that case, the processor will use as few calls as possible and exploit the hierarchical compression if possible. It needs to know however, how the operator behaves. You need to configure the operator by calling \is_isotropic, \is_scale_invariant or \is_isotropic_and_scale_invariant before using it.
+
+    You can skip this step, but the processor algorithm will assume the worst case then. This usually leads to cell variant formation which is not always desired and blows up the hierarchy.
+
+    For a basic example see the \TextOperator class, with the exception that this incarnation delivers polygons.
+
+    This class has been introduced in version 0.29.
+    """
+    wants_variants: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the filter prefers cell variants
+    See \wants_variants= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the filter prefers cell variants
+    This flag must be set before using this filter for hierarchical applications (deep mode). It tells the filter implementation whether cell variants should be created (true, the default) or shape propagation will be applied (false).
+
+    This decision needs to be made, if the filter indicates that it will deliver different results
+    for scaled or rotated versions of the shape (see \is_isotropic and the other hints). If a cell
+    is present with different qualities - as seen from the top cell - the respective instances
+    need to be differentiated. Cell variant formation is one way, shape propagation the other way.
+    Typically, cell variant formation is less expensive, but the hierarchy will be modified.
+    """
+    @classmethod
+    def new(cls) -> TextToPolygonOperator:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def is_isotropic(self) -> None:
+        r"""
+        @brief Indicates that the filter has isotropic properties
+        Call this method before using the filter to indicate that the selection is independent of the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        Examples for isotropic (polygon) processors are size or shrink operators. Size or shrink is not dependent on orientation unless size or shrink needs to be different in x and y direction.
+        """
+    def is_isotropic_and_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is isotropic and scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for such a (polygon) processor is the convex decomposition operator. The decomposition of a polygon into convex parts is an operation that is not depending on scale nor orientation.
+        """
+    def is_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for a scale invariant (polygon) processor is the rotation operator. Rotation is not depending on scale, but on the original orientation as mirrored versions need to be rotated differently.
         """
 
 class Texts(ShapeCollection):
@@ -50731,6 +53496,13 @@ class Texts(ShapeCollection):
         @brief Returns a region with the enlarged bounding boxes of the texts
         This method acts like the other version of \extents, but allows giving different enlargements for x and y direction.
         """
+    def filter(self, filter: TextFilter) -> None:
+        r"""
+        @brief Applies a generic filter in place (replacing the texts from the Texts collection)
+        See \TextFilter for a description of this feature.
+
+        This method has been introduced in version 0.29.
+        """
     def filter_properties(self, keys: Sequence[Any]) -> None:
         r"""
         @brief Filters properties by certain keys.
@@ -50738,6 +53510,13 @@ class Texts(ShapeCollection):
         As a side effect, this method enables properties on original layers.
 
         This method has been introduced in version 0.28.4.
+        """
+    def filtered(self, filtered: TextFilter) -> Texts:
+        r"""
+        @brief Applies a generic filter and returns a filtered copy
+        See \TextFilter for a description of this feature.
+
+        This method has been introduced in version 0.29.
         """
     def flatten(self) -> None:
         r"""
@@ -50883,6 +53662,29 @@ class Texts(ShapeCollection):
         r"""
         @brief Converts the edge pairs to polygons
         This method creates polygons from the texts. This is equivalent to calling \extents.
+        """
+    def process(self, process: TextOperator) -> None:
+        r"""
+        @brief Applies a generic text processor in place (replacing the texts from the text collection)
+        See \TextProcessor for a description of this feature.
+
+        This method has been introduced in version 0.29.
+        """
+    @overload
+    def processed(self, processed: TextOperator) -> Texts:
+        r"""
+        @brief Applies a generic text processor and returns a processed copy
+        See \TextProcessor for a description of this feature.
+
+        This method has been introduced in version 0.29.
+        """
+    @overload
+    def processed(self, processed: TextToPolygonOperator) -> Region:
+        r"""
+        @brief Applies a generic text-to-polygon processor and returns a region with the results
+        See \TextToPolygonProcessor for a description of this feature.
+
+        This method has been introduced in version 0.29.
         """
     def pull_interacting(self, other: Region) -> Region:
         r"""
@@ -52525,12 +55327,12 @@ class TrapezoidDecompositionMode:
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums for inequality
+        @brief Compares an enum with an integer for inequality
         """
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer for inequality
+        @brief Compares two enums for inequality
         """
     def __repr__(self) -> str:
         r"""
@@ -52808,12 +55610,12 @@ class VAlign:
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer value
+        @brief Compares two enums
         """
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums
+        @brief Compares an enum with an integer value
         """
     def __hash__(self) -> int:
         r"""
@@ -52846,12 +55648,12 @@ class VAlign:
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer for inequality
+        @brief Compares two enums for inequality
         """
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums for inequality
+        @brief Compares an enum with an integer for inequality
         """
     def __repr__(self) -> str:
         r"""
@@ -54224,7 +57026,7 @@ class ZeroDistanceMode:
     r"""
     @brief This class represents the zero_distance_mode type for \Region#width and related checks.
     This mode determines how edges with zero distance are treated in the DRC checks. Formally these edges do neither represent a space other other relation as they do not face each other. There are three modes available to treat this boundary case: Ignore such edges (\NeverIncludeZeroDistance) or only include them if they share at least one common point (\IncludeZeroDistanceWhenTouching). The latter mode allows activating checks for the 'kissing corner' case and is the default mode in most checks.
-    This enum has been introduced in version 0.29.
+    This enum has been introduced in version 0.28.16.
     """
     AlwaysIncludeZeroDistance: ClassVar[ZeroDistanceMode]
     r"""
@@ -54245,7 +57047,7 @@ class ZeroDistanceMode:
     IncludeZeroDistanceWhenTouching: ClassVar[ZeroDistanceMode]
     r"""
     @brief Specifies that check functions should include edges when they touch
-    With this specification, the check functions will also check edges if they share at least one common point. This is the mode that includes checking the 'kissing corner' cases. This mode is default for version 0.29 and later. 
+    With this specification, the check functions will also check edges if they share at least one common point. This is the mode that includes checking the 'kissing corner' cases. This mode is default for version 0.28.16 and later. 
     """
     NeverIncludeZeroDistance: ClassVar[ZeroDistanceMode]
     r"""
@@ -54275,12 +57077,12 @@ class ZeroDistanceMode:
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums
+        @brief Compares an enum with an integer value
         """
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer value
+        @brief Compares two enums
         """
     def __hash__(self) -> int:
         r"""

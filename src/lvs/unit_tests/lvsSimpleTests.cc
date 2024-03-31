@@ -301,3 +301,38 @@ TEST(40_DeviceExtractorErrors)
   run_test (_this, "custom_resistors", "custom_resistors.gds", true, false /*no LVS*/);
 }
 
+//  Basic soft connection
+TEST(50_BasicSoftConnection)
+{
+  run_test (_this, "soft_connect1", "soft_connect1.gds", true, false /*no LVS*/);
+}
+
+//  No errors
+TEST(51_SoftConnectionNoErrors)
+{
+  run_test (_this, "soft_connect2", "soft_connect2.gds", true, false /*no LVS*/);
+}
+
+//  Simple hierarchy
+TEST(52_SoftConnectionSimpleHierarchy)
+{
+  run_test (_this, "soft_connect3", "soft_connect3.gds", true, false /*no LVS*/);
+}
+
+//  Soft connected nets from different subcircuits
+TEST(53_SoftConnectionFromSubcircuits)
+{
+  run_test (_this, "soft_connect4", "soft_connect4.gds", true, false /*no LVS*/);
+}
+
+//  Soft connected nets from different subcircuits (propagated)
+TEST(54_SoftConnectionFromSubcircuits2)
+{
+  run_test (_this, "soft_connect5", "soft_connect5.gds", true, false /*no LVS*/);
+}
+
+//  Level 2 soft connection
+TEST(55_SoftConnectionSecondLevel)
+{
+  run_test (_this, "soft_connect6", "soft_connect6.gds", true, false /*no LVS*/);
+}

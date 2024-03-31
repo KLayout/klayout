@@ -495,6 +495,39 @@ public:
   }
 
   /**
+   *  @brief Defines an inter-layer soft connection for the given layers.
+   *  The conditions mentioned with intra-layer "connect" apply for this method too.
+   *  The "a" layer is the "upper" and the "b" layer the "lower" layer of the
+   *  soft connection.
+   */
+  void soft_connect (const db::Region &a, const db::Region &b)
+  {
+    soft_connect_impl (a, b);
+  }
+
+  /**
+   *  @brief Defines an inter-layer connection for the given layers.
+   *  As one layer is a texts layer, this connection will basically add net labels.
+   *  The "a" layer is the "upper" and the "b" layer the "lower" layer of the
+   *  soft connection.
+   */
+  void soft_connect (const db::Region &a, const db::Texts &b)
+  {
+    soft_connect_impl (a, b);
+  }
+
+  /**
+   *  @brief Defines an inter-layer connection for the given layers.
+   *  As one layer is a texts layer, this connection will basically add net labels.
+   *  The "a" layer is the "upper" and the "b" layer the "lower" layer of the
+   *  soft connection.
+   */
+  void soft_connect (const db::Texts &a, const db::Region &b)
+  {
+    soft_connect_impl (b, a);
+  }
+
+  /**
    *  @brief Connects the given layer with a global net with the given name
    *  Returns the global net ID
    */
@@ -510,6 +543,26 @@ public:
   size_t connect_global (const db::Texts &l, const std::string &gn)
   {
     return connect_global_impl (l, gn);
+  }
+
+  /**
+   *  @brief Soft-connects the given layer with a global net with the given name
+   *  Returns the global net ID.
+   *  The global layer is the "lower" layer of the soft connection.
+   */
+  size_t soft_connect_global (const db::Region &l, const std::string &gn)
+  {
+    return soft_connect_global_impl (l, gn);
+  }
+
+  /**
+   *  @brief Soft-connects the given text layer with a global net with the given name
+   *  Returns the global net ID.
+   *  The global layer is the "lower" layer of the soft connection.
+   */
+  size_t soft_connect_global (const db::Texts &l, const std::string &gn)
+  {
+    return soft_connect_global_impl (l, gn);
   }
 
   /**
@@ -992,6 +1045,18 @@ public:
    */
   void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const;
 
+  //  for debugging and testing
+  bool make_soft_connection_diodes () const
+  {
+    return m_make_soft_connection_diodes;
+  }
+
+  //  for debugging and testing
+  void set_make_soft_connection_diodes (bool f)
+  {
+    m_make_soft_connection_diodes = f;
+  }
+
 private:
   //  no copying
   LayoutToNetlist (const db::LayoutToNetlist &other);
@@ -1021,6 +1086,7 @@ private:
   std::string m_generator;
   bool m_include_floating_subcircuits;
   bool m_top_level_mode;
+  bool m_make_soft_connection_diodes;
   std::list<tl::GlobPattern> m_joined_net_names;
   std::list<std::pair<tl::GlobPattern, tl::GlobPattern> > m_joined_net_names_per_cell;
   std::list<std::set<std::string> > m_joined_nets;
@@ -1035,13 +1101,19 @@ private:
   db::CellMapping make_cell_mapping_into (db::Layout &layout, db::Cell &cell, const std::vector<const db::Net *> *nets, bool with_device_cells);
   void connect_impl (const db::ShapeCollection &a, const db::ShapeCollection &b);
   size_t connect_global_impl (const db::ShapeCollection &l, const std::string &gn);
+  void soft_connect_impl (const db::ShapeCollection &a, const db::ShapeCollection &b);
+  size_t soft_connect_global_impl (const db::ShapeCollection &l, const std::string &gn);
   bool is_persisted_impl (const db::ShapeCollection &coll) const;
   void do_join_nets (db::Circuit &c, const std::vector<Net *> &nets);
   void do_join_nets ();
+  void do_soft_connections ();
   void join_nets_from_pattern (db::Circuit &c, const tl::GlobPattern &p);
   void join_nets_from_pattern (db::Circuit &c, const std::set<std::string> &p);
   void check_must_connect (const db::Circuit &c, const db::Net &a, const db::Net &b);
   void check_must_connect_impl (const db::Circuit &c, const db::Net &a, const db::Net &b, const db::Circuit &c_org, const db::Net &a_org, const db::Net &b_org, std::vector<const db::SubCircuit *> &path);
+
+  //  for debugging and testing
+  void place_soft_connection_diodes ();
 
   //  implementation of NetlistManipulationCallbacks
   virtual size_t link_net_to_parent_circuit (const Net *subcircuit_net, Circuit *parent_circuit, const DCplxTrans &trans);

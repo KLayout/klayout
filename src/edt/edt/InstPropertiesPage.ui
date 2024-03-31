@@ -748,7 +748,7 @@
           <item row="0" column="0" colspan="6">
            <widget class="QLabel" name="inst_lbl">
             <property name="text">
-             <string>This is instance [r,c] of array with</string>
+             <string>This is instance [c,r] of array with</string>
             </property>
            </widget>
           </item>

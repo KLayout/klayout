@@ -39,6 +39,23 @@ static std::string l2s (db::Connectivity::layer_iterator b, db::Connectivity::la
     if (! s.empty ()) {
       s += ",";
     }
+    s += tl::to_string (i->first);
+    if (i->second < 0) {
+      s += "-S";
+    } else if (i->second > 0) {
+      s += "+S";
+    }
+  }
+  return s;
+}
+
+static std::string al2s (db::Connectivity::all_layer_iterator b, db::Connectivity::all_layer_iterator e)
+{
+  std::string s;
+  for (db::Connectivity::all_layer_iterator i = b; i != e; ++i) {
+    if (! s.empty ()) {
+      s += ",";
+    }
     s += tl::to_string (*i);
   }
   return s;
@@ -51,7 +68,12 @@ static std::string gn2s (db::Connectivity::global_nets_iterator b, db::Connectiv
     if (! s.empty ()) {
       s += ",";
     }
-    s += tl::to_string (*i);
+    s += tl::to_string (i->first);
+    if (i->second < 0) {
+      s += "-S";
+    } else if (i->second > 0) {
+      s += "+S";
+    }
   }
   return s;
 }
@@ -60,15 +82,15 @@ TEST(1_Connectivity)
 {
   db::Connectivity conn;
 
-  EXPECT_EQ (l2s (conn.begin_layers (), conn.end_layers ()), "");
+  EXPECT_EQ (al2s (conn.begin_layers (), conn.end_layers ()), "");
 
   conn.connect (0);
-  EXPECT_EQ (l2s (conn.begin_layers (), conn.end_layers ()), "0");
+  EXPECT_EQ (al2s (conn.begin_layers (), conn.end_layers ()), "0");
   EXPECT_EQ (l2s (conn.begin_connected (0), conn.end_connected (0)), "0");
   EXPECT_EQ (l2s (conn.begin_connected (1), conn.end_connected (1)), "");
 
   conn.connect (0, 1);
-  EXPECT_EQ (l2s (conn.begin_layers (), conn.end_layers ()), "0,1");
+  EXPECT_EQ (al2s (conn.begin_layers (), conn.end_layers ()), "0,1");
   EXPECT_EQ (l2s (conn.begin_connected (0), conn.end_connected (0)), "0,1");
   EXPECT_EQ (l2s (conn.begin_connected (1), conn.end_connected (1)), "0");
 
@@ -104,6 +126,60 @@ TEST(1_Connectivity)
   EXPECT_EQ (conn2.global_net_name (1), "GLOBAL2");
 }
 
+TEST(1_ConnectivitySoft)
+{
+  db::Connectivity conn;
+
+  EXPECT_EQ (al2s (conn.begin_layers (), conn.end_layers ()), "");
+
+  conn.connect (0);
+  EXPECT_EQ (al2s (conn.begin_layers (), conn.end_layers ()), "0");
+  EXPECT_EQ (l2s (conn.begin_connected (0), conn.end_connected (0)), "0");
+  EXPECT_EQ (l2s (conn.begin_connected (1), conn.end_connected (1)), "");
+
+  conn.soft_connect (0, 1);
+  EXPECT_EQ (al2s (conn.begin_layers (), conn.end_layers ()), "0,1");
+  EXPECT_EQ (l2s (conn.begin_connected (0), conn.end_connected (0)), "0,1-S");
+  EXPECT_EQ (l2s (conn.begin_connected (1), conn.end_connected (1)), "0+S");
+
+  conn.connect (1);
+  EXPECT_EQ (l2s (conn.begin_connected (1), conn.end_connected (1)), "0+S,1");
+
+  conn.soft_connect (2, 0);
+  conn.connect (2);
+
+  EXPECT_EQ (l2s (conn.begin_connected (0), conn.end_connected (0)), "0,1-S,2+S");
+  EXPECT_EQ (l2s (conn.begin_connected (1), conn.end_connected (1)), "0+S,1");
+  EXPECT_EQ (l2s (conn.begin_connected (2), conn.end_connected (2)), "0-S,2");
+
+  conn.connect (2, 0);
+
+  EXPECT_EQ (l2s (conn.begin_connected (0), conn.end_connected (0)), "0,1-S,2");
+  EXPECT_EQ (l2s (conn.begin_connected (1), conn.end_connected (1)), "0+S,1");
+  EXPECT_EQ (l2s (conn.begin_connected (2), conn.end_connected (2)), "0,2");
+
+  EXPECT_EQ (conn.soft_connect_global (0, "GLOBAL"), size_t (0));
+  EXPECT_EQ (gn2s (conn.begin_global_connections (2), conn.end_global_connections (2)), "");
+  EXPECT_EQ (gn2s (conn.begin_global_connections (0), conn.end_global_connections (0)), "0-S");
+  EXPECT_EQ (conn.soft_connect_global (2, "GLOBAL2"), size_t (1));
+  EXPECT_EQ (gn2s (conn.begin_global_connections (2), conn.end_global_connections (2)), "1-S");
+  EXPECT_EQ (conn.connect_global (0, "GLOBAL2"), size_t (1));
+  EXPECT_EQ (gn2s (conn.begin_global_connections (0), conn.end_global_connections (0)), "0-S,1");
+
+  EXPECT_EQ (conn.global_net_name (0), "GLOBAL");
+  EXPECT_EQ (conn.global_net_name (1), "GLOBAL2");
+
+  db::Connectivity conn2 = conn;
+
+  EXPECT_EQ (l2s (conn2.begin_connected (0), conn2.end_connected (0)), "0,1-S,2");
+  EXPECT_EQ (l2s (conn2.begin_connected (1), conn2.end_connected (1)), "0+S,1");
+  EXPECT_EQ (l2s (conn2.begin_connected (2), conn2.end_connected (2)), "0,2");
+
+  EXPECT_EQ (gn2s (conn2.begin_global_connections (0), conn2.end_global_connections (0)), "0-S,1");
+  EXPECT_EQ (conn2.global_net_name (0), "GLOBAL");
+  EXPECT_EQ (conn2.global_net_name (1), "GLOBAL2");
+}
+
 TEST(2_ShapeInteractions)
 {
   db::Connectivity conn;
@@ -121,18 +197,19 @@ TEST(2_ShapeInteractions)
   db::ICplxTrans t3 (db::Trans (db::Vector (0, 2000)));
   db::PolygonRef ref3 (poly.transformed (t3), repo);
 
-  EXPECT_EQ (conn.interacts (ref1, 0, ref2, 0), true);
-  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 0, t2), true);  // t2*ref1 == ref2
-  EXPECT_EQ (conn.interacts (ref1, 0, ref2, 1), true);
-  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 1, t2), true);
-  EXPECT_EQ (conn.interacts (ref1, 1, ref2, 0), true);
-  EXPECT_EQ (conn.interacts (ref1, 1, ref1, 0, t2), true);
-  EXPECT_EQ (conn.interacts (ref1, 0, ref3, 0), false);
-  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 0, t3), false);  // t3*ref1 == ref3
-  EXPECT_EQ (conn.interacts (ref1, 0, ref3, 1), false);
-  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 1, t3), false);
-  EXPECT_EQ (conn.interacts (ref1, 1, ref2, 2), false);
-  EXPECT_EQ (conn.interacts (ref1, 1, ref1, 2, t2), false);
+  int soft = std::numeric_limits<int>::max ();
+  EXPECT_EQ (conn.interacts (ref1, 0, ref2, 0, soft), true);
+  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 0, t2, soft), true);  // t2*ref1 == ref2
+  EXPECT_EQ (conn.interacts (ref1, 0, ref2, 1, soft), true);
+  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 1, t2, soft), true);
+  EXPECT_EQ (conn.interacts (ref1, 1, ref2, 0, soft), true);
+  EXPECT_EQ (conn.interacts (ref1, 1, ref1, 0, t2, soft), true);
+  EXPECT_EQ (conn.interacts (ref1, 0, ref3, 0, soft), false);
+  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 0, t3, soft), false);  // t3*ref1 == ref3
+  EXPECT_EQ (conn.interacts (ref1, 0, ref3, 1, soft), false);
+  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 1, t3, soft), false);
+  EXPECT_EQ (conn.interacts (ref1, 1, ref2, 2, soft), false);
+  EXPECT_EQ (conn.interacts (ref1, 1, ref1, 2, t2, soft), false);
 }
 
 TEST(2_ShapeInteractionsRealPolygon)
@@ -154,20 +231,21 @@ TEST(2_ShapeInteractionsRealPolygon)
   db::ICplxTrans t4 (db::Trans (db::Vector (0, 1500)));
   db::PolygonRef ref4 (poly.transformed (t4), repo);
 
-  EXPECT_EQ (conn.interacts (ref1, 0, ref2, 0), true);
-  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 0, t2), true);  // t2*ref1 == ref2
-  EXPECT_EQ (conn.interacts (ref1, 0, ref2, 1), true);
-  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 1, t2), true);
-  EXPECT_EQ (conn.interacts (ref1, 1, ref2, 0), true);
-  EXPECT_EQ (conn.interacts (ref1, 1, ref1, 0, t2), true);
-  EXPECT_EQ (conn.interacts (ref1, 0, ref3, 0), false);
-  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 0, t3), false);
-  EXPECT_EQ (conn.interacts (ref1, 0, ref4, 0), true);
-  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 0, t4), true);
-  EXPECT_EQ (conn.interacts (ref1, 0, ref3, 1), false);
-  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 1, t3), false);
-  EXPECT_EQ (conn.interacts (ref1, 1, ref2, 2), false);
-  EXPECT_EQ (conn.interacts (ref1, 1, ref1, 2, t2), false);
+  int soft = std::numeric_limits<int>::max ();
+  EXPECT_EQ (conn.interacts (ref1, 0, ref2, 0, soft), true);
+  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 0, t2, soft), true);  // t2*ref1 == ref2
+  EXPECT_EQ (conn.interacts (ref1, 0, ref2, 1, soft), true);
+  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 1, t2, soft), true);
+  EXPECT_EQ (conn.interacts (ref1, 1, ref2, 0, soft), true);
+  EXPECT_EQ (conn.interacts (ref1, 1, ref1, 0, t2, soft), true);
+  EXPECT_EQ (conn.interacts (ref1, 0, ref3, 0, soft), false);
+  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 0, t3, soft), false);
+  EXPECT_EQ (conn.interacts (ref1, 0, ref4, 0, soft), true);
+  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 0, t4, soft), true);
+  EXPECT_EQ (conn.interacts (ref1, 0, ref3, 1, soft), false);
+  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 1, t3, soft), false);
+  EXPECT_EQ (conn.interacts (ref1, 1, ref2, 2, soft), false);
+  EXPECT_EQ (conn.interacts (ref1, 1, ref1, 2, t2, soft), false);
 }
 
 TEST(10_LocalClusterBasic)
@@ -215,21 +293,22 @@ TEST(11_LocalClusterInteractBasic)
 
   db::local_cluster<db::PolygonRef> cluster;
   db::local_cluster<db::PolygonRef> cluster2;
+  int soft;
 
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn), false);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn, soft), false);
 
   cluster.add (db::PolygonRef (poly, repo), 0);
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn), false);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn, soft), false);
 
   cluster2.add (db::PolygonRef (poly, repo), 0);
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn), true);
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (10, 20))), conn), true);
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (0, 1000))), conn), true);
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (0, 1001))), conn), false);
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (0, 2000))), conn), false);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn, soft), true);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (10, 20))), conn, soft), true);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (0, 1000))), conn, soft), true);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (0, 1001))), conn, soft), false);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (0, 2000))), conn, soft), false);
 
   cluster.clear ();
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn), false);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn, soft), false);
 }
 
 TEST(11_LocalClusterInteractDifferentLayers)
@@ -248,28 +327,29 @@ TEST(11_LocalClusterInteractDifferentLayers)
 
   db::local_cluster<db::PolygonRef> cluster;
   db::local_cluster<db::PolygonRef> cluster2;
+  int soft;
 
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn), false);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn, soft), false);
 
   cluster.add (db::PolygonRef (poly, repo), 0);
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn), false);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn, soft), false);
 
   cluster2.add (db::PolygonRef (poly, repo), 1);
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn), true);
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (10, 20))), conn), true);
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (0, 1000))), conn), true);
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (0, 1001))), conn), false);
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (0, 2000))), conn), false);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn, soft), true);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (10, 20))), conn, soft), true);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (0, 1000))), conn, soft), true);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (0, 1001))), conn, soft), false);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (0, 2000))), conn, soft), false);
 
   cluster.clear ();
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn), false);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn, soft), false);
   cluster.add (db::PolygonRef (poly, repo), 2);
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn), false); //  not connected
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn, soft), false); //  not connected
 
   cluster.clear ();
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn), false);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn, soft), false);
   cluster.add (db::PolygonRef (poly, repo), 1);
-  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn), true);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn, soft), true);
 }
 
 static std::string obj2string (const db::PolygonRef &ref)
@@ -286,7 +366,7 @@ template <class T>
 static std::string local_cluster_to_string (const db::local_cluster<T> &cluster, const db::Connectivity &conn)
 {
   std::string res;
-  for (db::Connectivity::layer_iterator l = conn.begin_layers (); l != conn.end_layers (); ++l) {
+  for (db::Connectivity::all_layer_iterator l = conn.begin_layers (); l != conn.end_layers (); ++l) {
     for (typename db::local_cluster<T>::shape_iterator s = cluster.begin (*l); ! s.at_end (); ++s) {
       if (! res.empty ()) {
         res += ";";
@@ -312,6 +392,15 @@ static std::string local_clusters_to_string (const db::local_clusters<T> &cluste
       s += "\n";
     }
     s += "#" + tl::to_string (c->id ()) + ":" + local_cluster_to_string (*c, conn);
+  }
+  for (typename db::local_clusters<T>::const_iterator c = clusters.begin (); c != clusters.end (); ++c) {
+    auto sc = clusters.upward_soft_connections (c->id ());
+    for (auto i = sc.begin (); i != sc.end (); ++i) {
+      if (! s.empty ()) {
+        s += "\n";
+      }
+      s += "(#" + tl::to_string (*i) + "->#" + tl::to_string (c->id ()) + ")";
+    }
   }
   return s;
 }
@@ -587,6 +676,90 @@ TEST(23_LocalClustersWithEdges)
     db::local_clusters<db::Edge> clusters;
     clusters.build_clusters (cell, conn);
     EXPECT_EQ (local_clusters_to_string (clusters, conn), "#1:[0](0,0;0,500);[0](0,500;0,1000);[0](1500,375;0,0);[0](0,1000;2000,1000);[0](2000,1000;2000,500);[0](2000,500;1000,250)");
+  }
+}
+
+TEST(24_LocalClustersWithSoftConnections)
+{
+  db::Layout layout;
+  db::Cell &cell = layout.cell (layout.add_cell ("TOP"));
+  db::GenericRepository &repo = layout.shape_repository ();
+
+  auto dbu = db::CplxTrans (layout.dbu ()).inverted ();
+
+  unsigned int nwell = 0;
+  unsigned int ntie = 1;
+  unsigned int ptie = 2;
+  unsigned int contact = 3;
+  unsigned int metal1 = 4;
+
+  cell.shapes (nwell).insert (db::PolygonRef (dbu * db::DPolygon (db::DBox (0.0, 4.0, 2.0, 8.0)), repo));
+  cell.shapes (ntie).insert (db::PolygonRef (dbu * db::DPolygon (db::DBox (0.5, 5.0, 1.5, 7.0)), repo));
+  cell.shapes (contact).insert (db::PolygonRef (dbu * db::DPolygon (db::DBox (0.8, 6.0, 1.2, 6.5)), repo));
+  cell.shapes (metal1).insert (db::PolygonRef (dbu * db::DPolygon (db::DBox (0.0, 5.0, 2.0, 7.0)), repo));
+
+  cell.shapes (ptie).insert (db::PolygonRef (dbu * db::DPolygon (db::DBox (0.5, 1.0, 1.5, 3.0)), repo));
+  cell.shapes (contact).insert (db::PolygonRef (dbu * db::DPolygon (db::DBox (0.8, 2.0, 1.2, 2.5)), repo));
+  cell.shapes (metal1).insert (db::PolygonRef (dbu * db::DPolygon (db::DBox (0.0, 1.0, 2.0, 3.0)), repo));
+
+  db::Connectivity conn;
+  conn.connect (nwell);
+  conn.connect (ntie);
+  conn.connect (ptie);
+  conn.connect (contact);
+  conn.connect (metal1);
+  conn.soft_connect (ntie, nwell);
+  conn.soft_connect (contact, ntie);
+  conn.connect (metal1, contact);
+
+  {
+    db::local_clusters<db::PolygonRef> clusters;
+    clusters.build_clusters (cell, conn);
+    EXPECT_EQ (local_clusters_to_string (clusters, conn),
+      "#1:[0](0,4000;0,8000;2000,8000;2000,4000)\n"
+      "#2:[1](500,5000;500,7000;1500,7000;1500,5000)\n"
+      "#3:[3](800,6000;800,6500;1200,6500;1200,6000);[4](0,5000;0,7000;2000,7000;2000,5000)\n"
+      "#4:[3](800,2000;800,2500;1200,2500;1200,2000);[4](0,1000;0,3000;2000,3000;2000,1000)\n"
+      "#5:[2](500,1000;500,3000;1500,3000;1500,1000)\n"
+      "(#2->#1)\n"
+      "(#3->#2)"
+    );
+  }
+
+  conn.soft_connect (contact, ptie);
+
+  {
+    db::local_clusters<db::PolygonRef> clusters;
+    clusters.build_clusters (cell, conn);
+    EXPECT_EQ (local_clusters_to_string (clusters, conn),
+      "#1:[0](0,4000;0,8000;2000,8000;2000,4000)\n"
+      "#2:[1](500,5000;500,7000;1500,7000;1500,5000)\n"
+      "#3:[3](800,6000;800,6500;1200,6500;1200,6000);[4](0,5000;0,7000;2000,7000;2000,5000)\n"
+      "#4:[2](500,1000;500,3000;1500,3000;1500,1000)\n"
+      "#5:[3](800,2000;800,2500;1200,2500;1200,2000);[4](0,1000;0,3000;2000,3000;2000,1000)\n"
+      "(#2->#1)\n"
+      "(#3->#2)\n"
+      "(#5->#4)"
+    );
+  }
+
+  conn.soft_connect_global (ptie, "BULK");
+
+  {
+    db::local_clusters<db::PolygonRef> clusters;
+    clusters.build_clusters (cell, conn);
+    EXPECT_EQ (local_clusters_to_string (clusters, conn),
+      "#1:[0](0,4000;0,8000;2000,8000;2000,4000)\n"
+      "#2:[1](500,5000;500,7000;1500,7000;1500,5000)\n"
+      "#3:[3](800,6000;800,6500;1200,6500;1200,6000);[4](0,5000;0,7000;2000,7000;2000,5000)\n"
+      "#4:[2](500,1000;500,3000;1500,3000;1500,1000)\n"
+      "#5:[3](800,2000;800,2500;1200,2500;1200,2000);[4](0,1000;0,3000;2000,3000;2000,1000)\n"
+      "#6:+BULK\n"
+      "(#2->#1)\n"
+      "(#3->#2)\n"
+      "(#5->#4)\n"
+      "(#4->#6)"
+    );
   }
 }
 
@@ -920,7 +1093,7 @@ static void copy_cluster_shapes (const std::string *&attrs, db::Shapes &out, db:
   const db::local_cluster<db::PolygonRef> &lc = clusters.cluster_by_id (cluster_id);
 
   //  copy the shapes from this cell
-  for (db::Connectivity::layer_iterator l = conn.begin_layers (); l != conn.end_layers (); ++l) {
+  for (db::Connectivity::all_layer_iterator l = conn.begin_layers (); l != conn.end_layers (); ++l) {
     for (db::local_cluster<db::PolygonRef>::shape_iterator s = lc.begin (*l); ! s.at_end (); ++s) {
       db::Polygon poly = s->obj ().transformed (trans * db::ICplxTrans (s->trans ()));
       out.insert (db::PolygonWithProperties (poly, cell_and_attr_pid > 0 ? cell_and_attr_pid : cell_pid));

@@ -2796,7 +2796,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "@return The new polygons representing the forbidden region.\n"
     "\n"
-    "This method has been introduced in version 0.29.\n"
+    "This method has been introduced in version 0.29.1.\n"
   ) +
   method_ext ("move", &move_p, gsi::arg ("v"),
     "@brief Moves the region\n"

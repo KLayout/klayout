@@ -77,7 +77,7 @@ def SetGlobals():
     Usage  = "\n"
     Usage += "---------------------------------------------------------------------------------------------------------\n"
     Usage += "<< Usage of 'makeDMG4mac.py' >>\n"
-    Usage += "       for making a DMG file of KLayout 0.28.17 or later on different Apple macOS platforms.\n"
+    Usage += "       for making a DMG file of KLayout 0.29.0 or later on different Apple macOS platforms.\n"
     Usage += "\n"
     Usage += "$ [python] ./makeDMG4mac.py\n"
     Usage += "   option & argument    : descriptions                                               | default value\n"
@@ -162,36 +162,50 @@ def SetGlobals():
     Item3AppleScript  = ""
 
     # Populate DicStdLightHeavyW
-    DicStdLightHeavyW[ "std" ]   = dict() # ST-*
-    DicStdLightHeavyW[ "ports" ] = dict() # LW-*
-    DicStdLightHeavyW[ "brew" ]  = dict() # LW-*
-    DicStdLightHeavyW[ "ana3" ]  = dict() # LW-*
-    DicStdLightHeavyW[ "brewH" ] = dict() # HW-*
+    DicStdLightHeavyW[ "std" ]     = dict() # ST-*
+    DicStdLightHeavyW[ "ports" ]   = dict() # LW-*
+    DicStdLightHeavyW[ "brew" ]    = dict() # LW-*
+    DicStdLightHeavyW[ "ana3" ]    = dict() # LW-*
+    DicStdLightHeavyW[ "brewH" ]   = dict() # HW-*
+    # "pbrew"   is the alternative of "brew"  using MacPorts' Qt and Homebrew's (Ruby, Python)
+    # "pbrewHW" is the alternative of "brewH" using MacPorts' Qt and Homebrew's Python
+    DicStdLightHeavyW[ "pbrew" ]   = dict() # LW-*
+    DicStdLightHeavyW[ "pbrewHW" ] = dict() # HW-*
 
-    DicStdLightHeavyW[ "std" ]["zip"]     = "macbuild/Resources/script-bundle-S.zip"
-    DicStdLightHeavyW[ "std" ]["src"]     = "script-bundle-S"
-    DicStdLightHeavyW[ "std" ]["des"]     = "MacStdUser-ReadMeFirst"
-    DicStdLightHeavyW[ "std" ]["item3"]   = 'set position of item "MacStdUser-ReadMeFirst" to {700, 400}'
+    DicStdLightHeavyW[ "std" ]["zip"]       = "macbuild/Resources/script-bundle-S.zip"
+    DicStdLightHeavyW[ "std" ]["src"]       = "script-bundle-S"
+    DicStdLightHeavyW[ "std" ]["des"]       = "MacStdUser-ReadMeFirst"
+    DicStdLightHeavyW[ "std" ]["item3"]     = 'set position of item "MacStdUser-ReadMeFirst" to {700, 400}'
 
-    DicStdLightHeavyW[ "ports" ]["zip"]   = "macbuild/Resources/script-bundle-P.zip"
-    DicStdLightHeavyW[ "ports" ]["src"]   = "script-bundle-P"
-    DicStdLightHeavyW[ "ports" ]["des"]   = "MacPortsUser-ReadMeFirst"
-    DicStdLightHeavyW[ "ports" ]["item3"] = 'set position of item "MacPortsUser-ReadMeFirst" to {700, 400}'
+    DicStdLightHeavyW[ "ports" ]["zip"]     = "macbuild/Resources/script-bundle-P.zip"
+    DicStdLightHeavyW[ "ports" ]["src"]     = "script-bundle-P"
+    DicStdLightHeavyW[ "ports" ]["des"]     = "MacPortsUser-ReadMeFirst"
+    DicStdLightHeavyW[ "ports" ]["item3"]   = 'set position of item "MacPortsUser-ReadMeFirst" to {700, 400}'
 
-    DicStdLightHeavyW[ "brew" ]["zip"]    = "macbuild/Resources/script-bundle-B.zip"
-    DicStdLightHeavyW[ "brew" ]["src"]    = "script-bundle-B"
-    DicStdLightHeavyW[ "brew" ]["des"]    = "HomebrewUser-ReadMeFirst"
-    DicStdLightHeavyW[ "brew" ]["item3"]  = 'set position of item "HomebrewUser-ReadMeFirst" to {700, 400}'
+    DicStdLightHeavyW[ "brew" ]["zip"]      = "macbuild/Resources/script-bundle-B.zip"
+    DicStdLightHeavyW[ "brew" ]["src"]      = "script-bundle-B"
+    DicStdLightHeavyW[ "brew" ]["des"]      = "HomebrewUser-ReadMeFirst"
+    DicStdLightHeavyW[ "brew" ]["item3"]    = 'set position of item "HomebrewUser-ReadMeFirst" to {700, 400}'
 
-    DicStdLightHeavyW[ "ana3" ]["zip"]    = "macbuild/Resources/script-bundle-A.zip"
-    DicStdLightHeavyW[ "ana3" ]["src"]    = "script-bundle-A"
-    DicStdLightHeavyW[ "ana3" ]["des"]    = "Anaconda3User-ReadMeFirst"
-    DicStdLightHeavyW[ "ana3" ]["item3"]  = 'set position of item "Anaconda3User-ReadMeFirst" to {700, 400}'
+    DicStdLightHeavyW[ "ana3" ]["zip"]      = "macbuild/Resources/script-bundle-A.zip"
+    DicStdLightHeavyW[ "ana3" ]["src"]      = "script-bundle-A"
+    DicStdLightHeavyW[ "ana3" ]["des"]      = "Anaconda3User-ReadMeFirst"
+    DicStdLightHeavyW[ "ana3" ]["item3"]    = 'set position of item "Anaconda3User-ReadMeFirst" to {700, 400}'
 
-    DicStdLightHeavyW[ "brewH" ]["zip"]   = "macbuild/Resources/script-bundle-H.zip"
-    DicStdLightHeavyW[ "brewH" ]["src"]   = "script-bundle-H"
-    DicStdLightHeavyW[ "brewH" ]["des"]   = "Homebrew-HUser-ReadMeFirst"
-    DicStdLightHeavyW[ "brewH" ]["item3"] = 'set position of item "Homebrew-HUser-ReadMeFirst" to {700, 400}'
+    DicStdLightHeavyW[ "brewH" ]["zip"]     = "macbuild/Resources/script-bundle-H.zip"
+    DicStdLightHeavyW[ "brewH" ]["src"]     = "script-bundle-H"
+    DicStdLightHeavyW[ "brewH" ]["des"]     = "Homebrew-HUser-ReadMeFirst"
+    DicStdLightHeavyW[ "brewH" ]["item3"]   = 'set position of item "Homebrew-HUser-ReadMeFirst" to {700, 400}'
+
+    DicStdLightHeavyW[ "pbrew" ]["zip"]     = "macbuild/Resources/script-bundle-B.zip"
+    DicStdLightHeavyW[ "pbrew" ]["src"]     = "script-bundle-B"
+    DicStdLightHeavyW[ "pbrew" ]["des"]     = "HomebrewUser-ReadMeFirst"
+    DicStdLightHeavyW[ "pbrew" ]["item3"]   = 'set position of item "HomebrewUser-ReadMeFirst" to {700, 400}'
+
+    DicStdLightHeavyW[ "pbrewHW" ]["zip"]   = "macbuild/Resources/script-bundle-H.zip"
+    DicStdLightHeavyW[ "pbrewHW" ]["src"]   = "script-bundle-H"
+    DicStdLightHeavyW[ "pbrewHW" ]["des"]   = "Homebrew-HUser-ReadMeFirst"
+    DicStdLightHeavyW[ "pbrewHW" ]["item3"] = 'set position of item "Homebrew-HUser-ReadMeFirst" to {700, 400}'
 
 #------------------------------------------------------------------------------
 ## To check the contents of the package directory
@@ -199,18 +213,15 @@ def SetGlobals():
 # The package directory name should look like:
 #     * ST-qt5MP.pkg.macos-Monterey-release-RsysPsys
 #     * LW-qt5Ana3.pkg.macos-Monterey-release-Rana3Pana3
-#     * LW-qt5Brew.pkg.macos-Monterey-release-Rhb33Phb311  --- (1)
+#     * LW-qt6Brew.pkg.macos-Monterey-release-Rhb33Phb311  --- (1)
 #     * LW-qt5MP.pkg.macos-Monterey-release-Rmp33Pmp311
-#     * HW-qt5Brew.pkg.macos-Monterey-release-RsysPhb311
-#
-#     * ST-qt6MP.pkg.macos-Monterey-release-RsysPsys
-#     * LW-qt6Ana3.pkg.macos-Monterey-release-Rana3Pana3
-#     * LW-qt6Brew.pkg.macos-Monterey-release-Rhb33Phb311
-#     * LW-qt6MP.pkg.macos-Monterey-release-Rmp33Pmp311
 #     * HW-qt6Brew.pkg.macos-Monterey-release-RsysPhb311
 #
+#     * ST-qt6MP.pkg.macos-Monterey-release-RsysPsys
+#     * LW-qt6MP.pkg.macos-Monterey-release-Rmp33Pmp311
+#
 # Generated DMG will be, for example,
-#     (1) ---> LW-klayout-0.28.17-macOS-Monterey-1-qt5Brew-Rhb33Phb311.dmg
+#     (1) ---> LW-klayout-0.29.0-macOS-Monterey-1-qt6Brew-Rhb33Phb311.dmg
 #
 # @return on success, positive integer in [MB] that tells approx. occupied disc space;
 #         on failure, -1
@@ -251,16 +262,13 @@ def CheckPkgDirectory():
     # [2] Identify (Qt, Ruby, Python) from PkgDir
     #     * ST-qt5MP.pkg.macos-Monterey-release-RsysPsys
     #     * LW-qt5Ana3.pkg.macos-Monterey-release-Rana3Pana3
-    #     * LW-qt5Brew.pkg.macos-Monterey-release-Rhb33Phb311
+    #     * LW-qt6Brew.pkg.macos-Monterey-release-Rhb33Phb311
     #     * LW-qt5MP.pkg.macos-Monterey-release-Rmp33Pmp311
-    #     * HW-qt5Brew.pkg.macos-Monterey-release-RsysPhb311
+    #     * HW-qt6Brew.pkg.macos-Monterey-release-RsysPhb311
     #     * EX-qt5MP.pkg.macos-Monterey-release-Rhb33Pmp311
     #
     #     * ST-qt6MP.pkg.macos-Monterey-release-RsysPsys
-    #     * LW-qt6Ana3.pkg.macos-Monterey-release-Rana3Pana3
-    #     * LW-qt6Brew.pkg.macos-Monterey-release-Rhb33Phb311
     #     * LW-qt6MP.pkg.macos-Monterey-release-Rmp33Pmp311
-    #     * HW-qt6Brew.pkg.macos-Monterey-release-RsysPhb311
     #-----------------------------------------------------------------------------------------------
     patQRP = u'(ST|LW|HW|EX)([-])([qt5|qt6][0-9A-Za-z]+)([.]pkg[.])([A-Za-z]+[-][A-Za-z]+[-]release[-])([0-9A-Za-z]+)'
     regQRP = re.compile(patQRP)
@@ -299,7 +307,7 @@ def CheckPkgDirectory():
 
         LatestOSHomebrew   = Platform == LatestOS
         LatestOSHomebrew  &= PackagePrefix == "LW"
-        LatestOSHomebrew  &= QtIdentification in [ "qt5Brew", "qt6Brew" ]
+        LatestOSHomebrew  &= QtIdentification in [ "qt5Brew", "qt6Brew", "qt5MP", "qt6MP" ] # "qt[5|6]MP" are the alternatives
         LatestOSHomebrew  &= RubyPythonID in [ "Rhb33Phb311", "Rhb33Phb39", "Rhb33Phbauto" ]
 
         LatestOSAnaconda3  = Platform == LatestOS
@@ -309,8 +317,8 @@ def CheckPkgDirectory():
 
         LatestOSHomebrewH  = Platform == LatestOS
         LatestOSHomebrewH &= PackagePrefix == "HW"
-        LatestOSHomebrewH &= QtIdentification in [ "qt5Brew", "qt6Brew" ]
-        LatestOSHomebrewH &= RubyPythonID in [ "RsysPhb311", "RsysPhb39", "RsysPhbauto" ] # Sys-Homebre hybrid
+        LatestOSHomebrewH &= QtIdentification in [ "qt5Brew", "qt6Brew", "qt5MP", "qt6MP" ] # "qt[5|6]MP" are the alternatives
+        LatestOSHomebrewH &= RubyPythonID in [ "RsysPhb311", "RsysPhb39", "RsysPhbauto" ] # Sys-Homebrew hybrid
 
         if LatestOSSys:
             mydic  = DicStdLightHeavyW["std"]

@@ -27,17 +27,17 @@ def SetGlobals():
     del System, Node, Release, MacVersion, Machine, Processor
 
     Usage  = "\n"
-    Usage += "-------------------------------------------------------------------------------------\n"
+    Usage += "----------------------------------------------------------------------------------------\n"
     Usage += "<< Usage of 'python3HB.py' >>\n"
     Usage += "   to setup the standardized directory structures for Homebrew's Python 3.x on Mac\n"
     Usage += "\n"
     Usage += "   option & argument      : descriptions                              | default value\n"
-    Usage += "   -------------------------------------------------------------------+----------\n"
+    Usage += "   -------------------------------------------------------------------+---------------\n"
     Usage += "   <-v|--version <number>>: in ['3.8', '3.9', '3.10', '3.11', '3.12', | ''\n"
-    Usage += "                                '3.13']                               | ''\n"
+    Usage += "                                '3.13']                               |\n"
     Usage += "   [-u|-unlink]           : unlink only                               | disabled\n"
     Usage += "   [-?|--?]               : print this usage and exit                 | disabled\n"
-    Usage += "----------------------------------------------------------------------+--------------\n"
+    Usage += "----------------------------------------------------------------------+-----------------\n"
 
 #------------------------------------------------------------------------------
 # Parse the command line arguments

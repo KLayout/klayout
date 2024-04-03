@@ -801,20 +801,24 @@ def Build_pymod_wheel(parameters):
         addBinPath = "/opt/local/bin"
         addIncPath = "/opt/local/include"
         addLibPath = "/opt/local/lib"
+        whlTarget  = "MP3"
     # Using Homebrew
     elif PymodDistDir[ModulePython].find('dist-HB3') >= 0:
         addBinPath = "%s/bin"     % DefaultHomebrewRoot  # defined in "build4mac_env.py"
         addIncPath = "%s/include" % DefaultHomebrewRoot  # -- ditto --
         addLibPath = "%s/lib"     % DefaultHomebrewRoot  # -- ditto --
+        whlTarget  = "HB3"
     # Using Anaconda3
     elif  PymodDistDir[ModulePython].find('dist-ana3') >= 0:
         addBinPath = "/Applications/anaconda3/bin"
         addIncPath = "/Applications/anaconda3/include"
         addLibPath = "/Applications/anaconda3/lib"
+        whlTarget  = "ana3"
     else:
         addBinPath = ""
         addIncPath = ""
         addLibPath = ""
+        whlTarget  = ""
 
     if not addBinPath == "":
         try:
@@ -898,7 +902,7 @@ def Build_pymod_wheel(parameters):
         return 0
 
     #-----------------------------------------------------
-    # [5] Invoke the main Python scripts; takes time:-)
+    # [5-A] Invoke the main Python scripts; takes time:-)
     #-----------------------------------------------------
     myscript = os.path.basename(__file__)
     ret = subprocess.call( command1, shell=True )
@@ -920,12 +924,12 @@ def Build_pymod_wheel(parameters):
         return 1
 
     #---------------------------------------------------------------------------------------------------------
-    # Copy and relink library dependencies for wheel.
-    #     In this step, the "delocate-wheel" command using the desired Python must be found in the PATH.
-    #     Refer to: https://github.com/Kazzz-S/klayout/issues/49#issuecomment-1432154118
-    #               https://pypi.org/project/delocate/
+    # [5-B] Copy and relink library dependencies for wheel.
+    #       In this step, the "delocate-wheel" command using the desired Python must be found in the PATH.
+    #       Refer to: https://github.com/Kazzz-S/klayout/issues/49#issuecomment-1432154118
+    #                 https://pypi.org/project/delocate/
     #---------------------------------------------------------------------------------------------------------
-    cmd3_args = glob.glob( "dist/*.whl" )  # like ['dist/klayout-0.28.6-cp39-cp39-macosx_12_0_x86_64.whl']
+    cmd3_args = glob.glob( "dist/*.whl" )  # like ['dist/klayout-0.29.0-cp311-cp311-macosx_12_0_x86_64.whl']
     if len(cmd3_args) == 1:
         command3  = "time"
         command3 += " \\\n   %s \\\n" % deloc_cmd
@@ -951,6 +955,42 @@ def Build_pymod_wheel(parameters):
         print( "-------------------------------------------------------------", file=sys.stderr )
         print( "", file=sys.stderr )
         return 1
+
+    #------------------------------------------------------------------------
+    # [5-C] Forcibly change the wheel file name for anaconda3
+    #       Ref. https://github.com/Kazzz-S/klayout/issues/53
+    #         original: klayout-0.29.0-cp311-cp311-macosx_12_0_x86_64.whl
+    #               |
+    #               V
+    #              new: klayout-0.29.0-cp311-cp311-macosx_10_9_x86_64.whl
+    #------------------------------------------------------------------------
+    if whlTarget == "ana3":
+        wheels = glob.glob( "dist/*.whl" )  # like ['dist/klayout-0.29.0-cp311-cp311-macosx_12_0_x86_64.whl']
+        if not len(wheels) == 1:
+            print( "", file=sys.stderr )
+            print( "-------------------------------------------------------------", file=sys.stderr )
+            print( "!!! <%s>: failed to <find wheel for anaconda3>" % myscript, file=sys.stderr )
+            print( "-------------------------------------------------------------", file=sys.stderr )
+            print( "", file=sys.stderr )
+            return 1
+        else:
+            pass
+
+        original = wheels[0]
+        #                0             1     2     3      4     5         6           *7            8         9
+        patwhl = r"(^dist/klayout-)([0-9.]+)(-)(cp[0-9]+)(-)(cp[0-9]+)(-macosx_)([0-9]+_[0-9]+)([a-z0-9_]+)(\.whl)"
+        regwhl = re.compile(patwhl)
+        if not regwhl.match(original):
+            print( "", file=sys.stderr )
+            print( "-------------------------------------------------------------", file=sys.stderr )
+            print( "!!! <%s>: failed to <rename wheel for anaconda3>" % myscript, file=sys.stderr )
+            print( "-------------------------------------------------------------", file=sys.stderr )
+            print( "", file=sys.stderr )
+            return 1
+        else:
+            ver = regwhl.match(original).groups()[7]
+            new = original.replace( ver, "10_9" )
+            os.rename( original, new )
 
     #-----------------------------------------------------
     # [6] Rename the "dist/" directory

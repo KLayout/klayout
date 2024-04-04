@@ -30,6 +30,8 @@
 #include "dbPCellDeclaration.h"
 #include "dbLibrary.h"
 #include "dbLibraryManager.h"
+#include "dbReader.h"
+#include "tlStream.h"
 
 
 static std::string q2s_var (db::Layout &g, const std::string &query, const std::string &pname, const char *sep = ",")
@@ -1011,7 +1013,40 @@ void init_layout (db::Layout &g)
   c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), tt));
 }
 
-TEST(4) 
+void init_layout2 (db::Layout &g)
+{
+  g = db::Layout ();
+
+  tl::InputStream stream (tl::testdata () + "/gds/issue-1671.gds");
+  db::Reader reader (stream);
+  reader.read (g, db::LoadLayoutOptions ());
+  return; // @@@
+
+  g.insert_layer (0, db::LayerProperties ("l0"));
+  g.insert_layer (1, db::LayerProperties ("l1"));
+  g.insert_layer (2, db::LayerProperties ("l2"));
+  db::Cell &c1 (g.cell (g.add_cell ("c1")));
+  db::Cell &c2 (g.cell (g.add_cell ("c2")));
+  db::Cell &c3 (g.cell (g.add_cell ("c3")));
+  c2.shapes (0).insert (db::Box (0, 1, 2, 3));
+  c2.shapes (1).insert (db::Polygon (db::Box (0, 1, 2, 3)));
+  c2.shapes (1).insert (db::Edge (db::Point (0, 1), db::Point (2, 3)));
+  c2.shapes (2).insert (db::Text ("hallo", db::Trans (db::Vector (10, 11))));
+  c1.shapes (1).insert (db::Box (0, 10, 10, 30));
+
+  db::FTrans f (1, true);
+  db::Vector p (-10, 20);
+  db::Trans t (f.rot (), p);
+  db::Vector pp (10, -20);
+  db::Trans tt (0, pp);
+
+  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c2.cell_index ()), t));
+  c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c2.cell_index ()), tt));
+
+  c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+}
+
+TEST(4)
 {
   db::Layout g;
   init_layout (g);
@@ -1203,7 +1238,8 @@ TEST(53)
 {
   if (! db::default_editable_mode ()) { return; }
 
-  db::Layout g;
+  db::Manager m;
+  db::Layout g (&m);
   init_layout (g);
 
   {
@@ -1251,6 +1287,18 @@ TEST(53)
     db::LayoutQuery ("delete instances of *").execute (g);
     s = q2s_var (iq, "path_names", ";");
     EXPECT_EQ (s, "c1;c2x;c3;c4;c5x");
+  }
+
+  init_layout (g);
+
+  {
+    //  triggers issue-1671 (with transaction)
+    db::Transaction trans (&m, "test 53");
+    std::string s;
+    db::LayoutQuery q ("delete instances of ...c1 pass");
+    db::LayoutQueryIterator iq (q, &g);
+    s = q2s_var (iq, "path_names", ";");
+    EXPECT_EQ (s, "c2x,c1;c2x,c1;c2x,c4,c1;c2x,c4,c1;c2x,c4,c3,c5x,c1");
   }
 }
 

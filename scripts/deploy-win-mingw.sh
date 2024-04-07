@@ -30,6 +30,7 @@ enable32bit=1
 enable64bit=1
 args=""
 suffix=""
+qt="qt5"
 
 while [ "$1" != "" ]; do
   if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
@@ -43,6 +44,8 @@ while [ "$1" != "" ]; do
     echo "Options:"
     echo "  -32          Run 32 bit build only"
     echo "  -64          Run 64 bit build only"
+    echo "  -qt5         Builds on qt5 (default)"
+    echo "  -qt6         Builds on qt6"
     echo "  -s <suffix>  Binary suffix"
     echo ""
     echo "By default, both 32 and 64 bit builds are performed"
@@ -53,6 +56,11 @@ while [ "$1" != "" ]; do
   elif [ "$1" = "-64" ]; then
     enable64bit=1
     enable32bit=0
+  elif [ "$1" = "-qt5" ]; then
+    qt="qt5"
+  elif [ "$1" = "-qt6" ]; then
+    qt="qt6"
+    args="$qrgs -qmake qmake-qt6"
   elif [ "$1" = "-s" ]; then
     shift
     suffix="-$1"
@@ -146,7 +154,7 @@ cp $mingw_inst/etc/ssl/cert.pem $target
 
 echo "Installing plugins .."
 for p in $plugins; do
-  cp -R $mingw_inst/share/qt5/plugins/$p $target
+  cp -R $mingw_inst/share/${qt}/plugins/$p $target
   # remove the debug versions - otherwise they pull in the debug Qt libs
   shopt -s nullglob
   rm -f $target/$p/*d.dll $target/$p/*.dll.debug

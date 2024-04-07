@@ -5,7 +5,7 @@
 # File: "macbuild/macQAT.py"
 #
 #  The top Python script to run "ut_runner" after building KLayout
-#  (http://www.klayout.de/index.php) version 0.28.17 or later on different Apple
+#  (http://www.klayout.de/index.php) version 0.29.0 or later on different Apple
 #  ßMac OSX platforms.
 #
 #  This script must be copied to a "*.macQAT/" directory to run.
@@ -25,6 +25,7 @@ import subprocess
 def SetGlobals():
     global ProjectDir         # project directory where "ut_runner" exists
     global RunnerUsage        # True to print the usage of 'ut_runner'
+    global StartKLayout       # True to start the KLayout main GUI window
     global Run                # True to run this script
     global ContinueOnError    # True to continue after an error
     global TestsExcluded      # list of tests to exclude
@@ -54,6 +55,7 @@ def SetGlobals():
     Usage += "   -----------------------------------------------------------------+---------------\n"
     Usage += "   [-u|--usage]           : print usage of 'ut_runner'and exit      | disabled\n"
     Usage += "                                                                    |\n"
+    Usage += "   [-k|--klayout]         : just start the KLayout main GUI window  | disabled\n"
     Usage += "   <-r|--run>             : run this script                         | disabled\n"
     Usage += "   [-s|--stop]            : stop on error                           | disabled\n"
     Usage += "   [-x|--exclude <tests>] : exclude test(s) such as 'pymod,pya'     | ''\n"
@@ -66,6 +68,7 @@ def SetGlobals():
 
     ProjectDir      = os.getcwd()
     RunnerUsage     = False
+    StartKLayout    = False
     Run             = False
     ContinueOnError = True
     TestsExcluded   = list()
@@ -104,6 +107,7 @@ def GetTimeStamp():
 def ParseCommandLineArguments():
     global Usage
     global RunnerUsage
+    global StartKLayout 
     global Run
     global ContinueOnError
     global TestsExcluded
@@ -116,6 +120,12 @@ def ParseCommandLineArguments():
                     dest='runner_usage',
                     default=False,
                     help="print usage of 'ut_runner' and exit (false)" )
+
+    p.add_option( '-k', '--klayout',
+                    action='store_true',
+                    dest='start_KLayout',
+                    default=False,
+                    help='just start the KLayout main GUI window (false)' )
 
     p.add_option( '-r', '--run',
                     action='store_true',
@@ -152,6 +162,7 @@ def ParseCommandLineArguments():
                     help='check usage (false)' )
 
     p.set_defaults( runner_usage  = False,
+                    start_KLayout = False,
                     runme         = False,
                     stop_on_error = False,
                     exclude_tests = list(),
@@ -165,6 +176,7 @@ def ParseCommandLineArguments():
         quit()
 
     RunnerUsage     = opt.runner_usage
+    StartKLayout    = opt.start_KLayout
     Run             = opt.runme
     ContinueOnError = not opt.stop_on_error
     if not len(opt.exclude_tests) == 0:
@@ -212,6 +224,18 @@ def ExportEnvVariables():
             os.environ[env] = MyEnviron[env]
 
 #-------------------------------------------------------------------------------
+## Start the KLayout main GUI window
+#
+#-------------------------------------------------------------------------------
+def StartKLatyouGUIWindow():
+    if System == "Darwin":
+        command = "./klayout.app/Contents/MacOS/klayout"
+    else:
+        command = "./klayout"
+
+    subprocess.call( command, shell=False )
+
+#-------------------------------------------------------------------------------
 ## Run the tester
 #
 # @param[in] command  command string to run
@@ -255,35 +279,43 @@ def Main():
         quit()
 
     #-------------------------------------------------------
-    # [3] Run the unit tester
+    # [3] Start the KLayout main GUI window
     #-------------------------------------------------------
-    if not Run:
-        print( "! pass <-r|--run> option to run" )
+    if StartKLayout:
+        StartKLatyouGUIWindow()
+    
+    #-------------------------------------------------------
+    # [4] Run the unit tester
+    #-------------------------------------------------------
+    if not Run and not StartKLayout:
+        print( "! pass <-r|--run> option to run the QA tests" )
+        print( "! pass <-k|--klayout> option to start the KLayout main GUI window" )
         print(Usage)
         quit()
 
-    command = './ut_runner'
-    if ContinueOnError:
-        command += " -c"
-    for item in TestsExcluded:
-        command += ' -x %s' % item
-    if not len(Arguments) == 0:
-        for arg in Arguments:
-            command += " %s" % arg
+    if Run:
+        command = './ut_runner'
+        if ContinueOnError:
+            command += " -c"
+        for item in TestsExcluded:
+            command += ' -x %s' % item
+        if not len(Arguments) == 0:
+            for arg in Arguments:
+                command += " %s" % arg
 
-    print( "" )
-    print( "### Dumping the log to <%s>" % LogFile )
-    print( "------------------------------------------------------------------------" )
-    print( "  Git SHA1     = %s" % GitSHA1 )
-    print( "  Time stamp   = %s" % TimeStamp )
-    print( "  Command line = %s" % command )
-    print( "------------------------------------------------------------------------" )
-    if DryRun:
-        quit()
-    sleep(1.0)
-    HidePrivateDir()
-    RunTester( command, logfile=LogFile )
-    ShowPrivateDir()
+        print( "" )
+        print( "### Dumping the log to <%s>" % LogFile )
+        print( "------------------------------------------------------------------------" )
+        print( "  Git SHA1     = %s" % GitSHA1 )
+        print( "  Time stamp   = %s" % TimeStamp )
+        print( "  Command line = %s" % command )
+        print( "------------------------------------------------------------------------" )
+        if DryRun:
+            quit()
+        sleep(1.0)
+        HidePrivateDir()
+        RunTester( command, logfile=LogFile )
+        ShowPrivateDir()
 
 #===================================================================================
 if __name__ == "__main__":

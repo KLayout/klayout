@@ -60,7 +60,7 @@ while [ "$1" != "" ]; do
     qt="qt5"
   elif [ "$1" = "-qt6" ]; then
     qt="qt6"
-    args="$qrgs -qmake qmake-qt6"
+    args="$args -qmake qmake-qt6"
   elif [ "$1" = "-s" ]; then
     shift
     suffix="-$1"
@@ -154,6 +154,7 @@ cp $mingw_inst/etc/ssl/cert.pem $target
 
 echo "Installing plugins .."
 for p in $plugins; do
+  echo "  $mingw_inst/share/${qt}/plugins/$p .."
   cp -R $mingw_inst/share/${qt}/plugins/$p $target
   # remove the debug versions - otherwise they pull in the debug Qt libs
   shopt -s nullglob

@@ -81,6 +81,7 @@ if [ "$KLAYOUT_BUILD_IN_PROGRESS" == "" ]; then
   export KLAYOUT_BUILD_IN_PROGRESS=1
   export KLAYOUT_BUILD_ARGS="$args"
   export KLAYOUT_BUILD_SUFFIX="$suffix"
+  export KLAYOUT_BUILD_QT="$qt"
 
   # Run ourself in MINGW32 system for the win32 build
   if [ "$enable32bit" != "0" ]; then
@@ -113,6 +114,7 @@ target=$pwd/bin-release-$arch$KLAYOUT_BUILD_SUFFIX
 build=$pwd/build-release-$arch$KLAYOUT_BUILD_SUFFIX
 src=$pwd/src
 scripts=$pwd/scripts
+
 # Update in NSIS script too:
 plugins="audio generic iconengines imageformats platforms printsupport sqldrivers styles"
 
@@ -127,6 +129,7 @@ echo "  build      = $build"
 echo "  version    = $KLAYOUT_VERSION"
 echo "  build args = $KLAYOUT_BUILD_ARGS"
 echo "  suffix     = $KLAYOUT_BUILD_SUFFIX"
+echo "  qt         = $KLAYOUT_BUILD_QT"
 echo ""
 
 rm -rf $target
@@ -154,8 +157,8 @@ cp $mingw_inst/etc/ssl/cert.pem $target
 
 echo "Installing plugins .."
 for p in $plugins; do
-  echo "  $mingw_inst/share/${qt}/plugins/$p .."
-  cp -R $mingw_inst/share/${qt}/plugins/$p $target
+  echo "  $mingw_inst/share/$KLAYOUT_BUILD_QT/plugins/$p .."
+  cp -R $mingw_inst/share/$KLAYOUT_BUILD_QT/plugins/$p $target
   # remove the debug versions - otherwise they pull in the debug Qt libs
   shopt -s nullglob
   rm -f $target/$p/*d.dll $target/$p/*.dll.debug

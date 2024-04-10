@@ -17,7 +17,7 @@ import types
 
 ui_file = pya.QFile(":/macro-templates/qt_designer.ui")
 ui_file.open(pya.QIODevice.ReadOnly)
-form = pya.QFormBuilder().load(ui_file, pya.Application.instance().main_window())
+form = pya.QUiLoader().load(ui_file, pya.Application.instance().main_window())
 ui_file.close()
 
 # Install an event handler for the button clicked event

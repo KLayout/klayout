@@ -20,7 +20,7 @@
   # Initially we use the sample file provided as resource
   ui_file = QFile::new(":/macro-templates/qt_designer.ui")
   ui_file.open(QIODevice::ReadOnly)
-  dialog = QFormBuilder::new.load(ui_file, Application::instance.main_window)
+  dialog = QUiLoader::new.load(ui_file, Application::instance.main_window)
   ui_file.close
   
   def dialog.setup

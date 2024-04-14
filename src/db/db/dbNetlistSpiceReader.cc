@@ -1203,7 +1203,10 @@ SpiceNetlistBuilder::process_element (tl::Extractor &ex, const std::string &pref
         cc_nc->set_anonymous (true);
         cc = cc_nc;
         std::vector<std::string> pins;
-        pins.resize (nn.size ());
+        pins.reserve (nn.size ());
+        for (size_t i = 0; i < nn.size (); ++i) {
+          pins.push_back (tl::to_string (i + 1));
+        }
         cc_nc->set_pins (pins);
       }
     }
@@ -1218,7 +1221,7 @@ SpiceNetlistBuilder::process_element (tl::Extractor &ex, const std::string &pref
     }
 
     if (cc->pin_count () != nn.size ()) {
-      error (tl::sprintf (tl::to_string (tr ("Pin count mismatch between circuit definition and circuit call: %d expected, got %d")), int (cc->pin_count ()), int (nets.size ())));
+      error (tl::sprintf (tl::to_string (tr ("Pin count mismatch between circuit definition and circuit call: %d expected, got %d (definition maybe implicit somewhere before)")), int (cc->pin_count ()), int (nets.size ())));
     }
 
     db::Circuit *c = build_circuit (cc, pv);

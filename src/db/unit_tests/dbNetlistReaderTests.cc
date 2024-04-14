@@ -858,6 +858,28 @@ TEST(22_endl)
   );
 }
 
+//  issue #1683
+TEST(23_endl)
+{
+  db::Netlist nl;
+
+  std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader23.cir");
+
+  db::NetlistSpiceReader reader;
+  tl::InputStream is (path);
+  reader.read (is, nl);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit .TOP ();\n"
+    "  device PFET M1 (S=VDD,G=I,D=O,B=VDD) (L=100,W=100,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NFET M2 (S=VSS,G=I,D=O,B=VSS) (L=100,W=100,AS=0,AD=0,PS=0,PD=0);\n"
+    "  subcircuit DOESNOTEXIST DUMMY ('1'=O,'2'=I);\n"
+    "end;\n"
+    "circuit DOESNOTEXIST ('1'='1','2'='2');\n"
+    "end;\n"
+  );
+}
+
 TEST(100_ExpressionParser)
 {
   std::map<std::string, tl::Variant> vars;

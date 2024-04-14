@@ -633,6 +633,13 @@ SpiceCircuitDict::get_line ()
 
       } else if (ex.test_without_case (".endl")) {
 
+        std::string name;
+        if (ex.try_read_name (name)) {
+          if (! m_in_lib.empty () && mp_netlist->normalize_name (name) != m_in_lib.back ()) {
+            warn (tl::sprintf (tl::to_string (tr (".endl has wrong name: %s given, %s expected")), mp_netlist->normalize_name (name), m_in_lib.back ()));
+          }
+        }
+
         if (! m_in_lib.empty ()) {
           m_in_lib.pop_back ();
         } else {

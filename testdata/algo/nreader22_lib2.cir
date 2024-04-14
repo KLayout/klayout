@@ -1,0 +1,11 @@
+
+.lib lib3
+C10 1 2 1p
+.endl lib3
+
+C11 1 2 1.5p
+
+.lib lib4
+C12 1 2 42p
+.endl lib4
+

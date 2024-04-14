@@ -88,14 +88,14 @@ D25View::D25View (Dispatcher *root, LayoutViewBase *view)
 
   mp_ui->material_list->addAction (mp_ui->select_all_action);
   mp_ui->material_list->addAction (mp_ui->unselect_all_action);
-  mp_ui->material_list->addAction (mp_ui->show_all_action);
-  mp_ui->material_list->addAction (mp_ui->show_selected_action);
-  mp_ui->material_list->addAction (mp_ui->hide_all_action);
-  mp_ui->material_list->addAction (mp_ui->hide_selected_action);
   QAction *sep = new QAction (this);
   sep->setSeparator (true);
   mp_ui->material_list->addAction (sep);
   mp_ui->material_list->addAction (mp_ui->visibility_follows_selection_action);
+  mp_ui->material_list->addAction (mp_ui->hide_all_action);
+  mp_ui->material_list->addAction (mp_ui->hide_selected_action);
+  mp_ui->material_list->addAction (mp_ui->show_all_action);
+  mp_ui->material_list->addAction (mp_ui->show_selected_action);
   mp_ui->material_list->setContextMenuPolicy (Qt::ActionsContextMenu);
 
   connect (mp_ui->material_list, SIGNAL (itemChanged(QListWidgetItem *)), this, SLOT (material_item_changed(QListWidgetItem *)));

@@ -274,7 +274,7 @@ HelpSource::initialize_index ()
 
     bool ok = false;
 
-    QString help_index_cache_file = QString::fromUtf8 (tl::sprintf ("help-index-%s-qt%d.xml.gz", lay::Version::version (), int (QT_VERSION_MAJOR)));
+    QString help_index_cache_file = tl::to_qstring (tl::sprintf ("help-index-%s-qt%d.xml.gz", lay::Version::version (), int (QT_VERSION_MAJOR)));
 
     std::string per_user_cache_file;
     if (! lay::ApplicationBase::instance ()->appdata_path ().empty ()) {

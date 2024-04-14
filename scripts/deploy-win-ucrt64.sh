@@ -99,7 +99,7 @@ build=$pwd/build-release-$arch$KLAYOUT_BUILD_SUFFIX
 src=$pwd/src
 scripts=$pwd/scripts
 # Update in NSIS script too:
-plugins="audio generic iconengines imageformats platforms printsupport sqldrivers styles"
+plugins="audio generic iconengines imageformats multimedia networkinformation platforms printsupport sqldrivers styles tls"
 
 # read the current version
 . ./version.sh
@@ -141,11 +141,13 @@ cp $ucrt_inst/etc/ssl/cert.pem $target
 
 echo "Installing plugins .."
 for p in $plugins; do
-  cp -R $ucrt_inst/share/qt5/plugins/$p $target
-  # remove the debug versions - otherwise they pull in the debug Qt libs
-  shopt -s nullglob
-  rm -f $target/$p/*d.dll $target/$p/*.dll.debug
-  shopt -u nullglob
+  if [ -e $ucrt_inst/share/qt5/plugins/$p ]; then
+    cp -R $ucrt_inst/share/qt5/plugins/$p $target
+    # remove the debug versions - otherwise they pull in the debug Qt libs
+    shopt -s nullglob
+    rm -f $target/$p/*d.dll $target/$p/*.dll.debug
+    shopt -u nullglob
+  fi
 done
 
 # ----------------------------------------------------------
@@ -264,7 +266,7 @@ while [ "$new_libs" != "" ]; do
       cp $ucrt_inst/bin/$l $l
       new_libs="$new_libs $l"
     elif [ -e "${ucrt_vssdk}/$l" ] && ! [ -e $l ]; then
-      echo "Copying binary installation partial $ucrt_inst/bin/$l -> $l"
+      echo "Copying binary installation partial ${ucrt_vssdk}/${l} -> $l"
       cp "${ucrt_vssdk}/${l}" "$l"
       new_libs="$new_libs $l"
     fi  

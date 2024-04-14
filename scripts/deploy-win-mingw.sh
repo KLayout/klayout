@@ -116,7 +116,7 @@ src=$pwd/src
 scripts=$pwd/scripts
 
 # Update in NSIS script too:
-plugins="audio generic iconengines imageformats platforms printsupport sqldrivers styles"
+plugins="audio generic iconengines imageformats multimedia networkinformation platforms printsupport sqldrivers styles tls"
 
 # read the current version
 . ./version.sh
@@ -157,12 +157,14 @@ cp $mingw_inst/etc/ssl/cert.pem $target
 
 echo "Installing plugins .."
 for p in $plugins; do
-  echo "  $mingw_inst/share/$KLAYOUT_BUILD_QT/plugins/$p .."
-  cp -R $mingw_inst/share/$KLAYOUT_BUILD_QT/plugins/$p $target
-  # remove the debug versions - otherwise they pull in the debug Qt libs
-  shopt -s nullglob
-  rm -f $target/$p/*d.dll $target/$p/*.dll.debug
-  shopt -u nullglob
+  if [ -e $mingw_inst/share/$KLAYOUT_BUILD_QT/plugins/$p ]; then
+    echo "  $mingw_inst/share/$KLAYOUT_BUILD_QT/plugins/$p .."
+    cp -R $mingw_inst/share/$KLAYOUT_BUILD_QT/plugins/$p $target
+    # remove the debug versions - otherwise they pull in the debug Qt libs
+    shopt -s nullglob
+    rm -f $target/$p/*d.dll $target/$p/*.dll.debug
+    shopt -u nullglob
+  fi
 done
 
 # ----------------------------------------------------------

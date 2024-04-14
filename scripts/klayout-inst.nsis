@@ -76,10 +76,13 @@ section
   file /r generic
   file /r iconengines
   file /r imageformats
+  file /r multimedia
+  file /r networkinformation
   file /r platforms
   file /r printsupport
   file /r sqldrivers
   file /r styles
+  file /r tls
   file /r lib
   file /oname=${EXENAME}.exe ${EXEBASE}.exe
   file /oname=${EXENAME_VO}.exe ${EXEBASE}.exe

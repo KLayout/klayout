@@ -72,17 +72,17 @@ section
   file /r db_plugins
   file /r lay_plugins
   file /r pymod
-  file /r audio
-  file /r generic
-  file /r iconengines
-  file /r imageformats
-  file /r multimedia
-  file /r networkinformation
-  file /r platforms
-  file /r printsupport
-  file /r sqldrivers
-  file /r styles
-  file /r tls
+  file /nonfatal /r audio
+  file /nonfatal /r generic
+  file /nonfatal /r iconengines
+  file /nonfatal /r imageformats
+  file /nonfatal /r multimedia
+  file /nonfatal /r networkinformation
+  file /nonfatal /r platforms
+  file /nonfatal /r printsupport
+  file /nonfatal /r sqldrivers
+  file /nonfatal /r styles
+  file /nonfatal /r tls
   file /r lib
   file /oname=${EXENAME}.exe ${EXEBASE}.exe
   file /oname=${EXENAME_VO}.exe ${EXEBASE}.exe

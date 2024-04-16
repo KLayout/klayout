@@ -28,6 +28,7 @@ pwd=$(pwd)
 
 enable32bit=1
 enable64bit=1
+ucrt=0
 args=""
 suffix=""
 qt="qt5"
@@ -42,20 +43,27 @@ while [ "$1" != "" ]; do
     echo "  scripts/deploy-win-mingw.sh <options>"
     echo ""
     echo "Options:"
-    echo "  -32          Run 32 bit build only"
-    echo "  -64          Run 64 bit build only"
+    echo "  -32          Run 32 bit build only (default: both)"
+    echo "  -64          Run 64 bit build only (default: both)"
+    echo "  -ucrt        Builds with UCRT runtime only (not enabled by default)"
     echo "  -qt5         Builds on qt5 (default)"
     echo "  -qt6         Builds on qt6"
     echo "  -s <suffix>  Binary suffix"
     echo ""
     echo "By default, both 32 and 64 bit builds are performed"
     exit 0
+  elif [ "$1" = "-ucrt" ]; then
+    enable64bit=0
+    enable32bit=0
+    ucrt=1
   elif [ "$1" = "-32" ]; then
     enable64bit=0
     enable32bit=1
+    ucrt=0
   elif [ "$1" = "-64" ]; then
     enable64bit=1
     enable32bit=0
+    ucrt=0
   elif [ "$1" = "-qt5" ]; then
     qt="qt5"
   elif [ "$1" = "-qt6" ]; then
@@ -93,6 +101,11 @@ if [ "$KLAYOUT_BUILD_IN_PROGRESS" == "" ]; then
     MSYSTEM=MINGW64 bash --login -c "cd $pwd ; $self"
   fi
 
+  # Run ourself in UCRT64 system for the ucrt build
+  if [ "$ucrt" != "0" ]; then
+    MSYSTEM=UCRT64 bash --login -c "cd $pwd ; $self"
+  fi
+
   exit 0
 
 fi
@@ -100,14 +113,29 @@ fi
 # ---------------------------------------------------
 # Actual build branch
 
-if [ "$MSYSTEM" == "MINGW32" ]; then
+if [ "$MSYSTEM" == "UCRT64" ]; then
+
+  arch=win64-ucrt
+  mingw_inst=/ucrt64
+
+  shopt -s nullglob
+  ucrt_vssdk=(/c/Program\ Files\ \(x86\)/Windows\ Kits/10/Redist/10.0.*)
+  shopt -u nullglob
+  ucrt_vssdk=${ucrt_vssdk[0]}
+  if [ "$ucrt_vssdk" = "" ]; then
+    echo "ERROR: ucrt64 DLLs not found"
+    exit 1
+  fi
+  ucrt_vssdk=$(cygpath -w "$ucrt_vssdk")
+
+elif [ "$MSYSTEM" == "MINGW32" ]; then
   arch=win32
   mingw_inst=/mingw32
 elif [ "$MSYSTEM" == "MINGW64" ]; then
   arch=win64
   mingw_inst=/mingw64
 else
-  echo "ERROR: not in mingw32 or mingw64 system."
+  echo "ERROR: not in ucrt64, mingw32 or mingw64 system."
 fi
 
 target=$pwd/bin-release-$arch$KLAYOUT_BUILD_SUFFIX
@@ -130,6 +158,8 @@ echo "  version    = $KLAYOUT_VERSION"
 echo "  build args = $KLAYOUT_BUILD_ARGS"
 echo "  suffix     = $KLAYOUT_BUILD_SUFFIX"
 echo "  qt         = $KLAYOUT_BUILD_QT"
+echo ""
+echo "  UCRT libs  = $ucrt_vssdk"
 echo ""
 
 rm -rf $target
@@ -170,7 +200,7 @@ done
 # ----------------------------------------------------------
 # Ruby dependencies
 
-rubys=$($ruby -e 'puts $:' | sort)
+rubys=$($ruby -e 'puts $:' | sort | awk '{print $1}')
 
 rm -rf $target/.ruby-paths.txt
 echo '# Builds the Ruby paths.' >$target/.ruby-paths.txt
@@ -265,13 +295,26 @@ while [ "$new_libs" != "" ]; do
   echo "Analyzing dependencies of $new_libs .."
 
   # Analyze the dependencies of our components and add the corresponding libraries from $mingw_inst/bin
-  libs=$(objdump -p $new_libs | grep "DLL Name:" | sort -u | sed 's/.*DLL Name: *//')
+  tmp_libs=.tmp-libs.txt
+  rm -f $tmp_libs
+  echo "" >$tmp_libs
+  for l in $new_libs; do
+    echo -n "."
+    objdump -p $l | grep "DLL Name:" | sed 's/.*DLL Name: *//' >>$tmp_libs
+  done
+  echo ""
+  libs=$(cat $tmp_libs | sort -u)
+  rm -f $tmp_libs
   new_libs=""
 
   for l in $libs; do
     if [ -e $mingw_inst/bin/$l ] && ! [ -e $l ]; then
       echo "Copying binary installation partial $mingw_inst/bin/$l -> $l .."
       cp $mingw_inst/bin/$l $l
+      new_libs="$new_libs $l"
+    elif [ -e "${ucrt_vssdk}/$l" ] && ! [ -e $l ]; then
+      echo "Copying binary installation partial ${ucrt_vssdk}/${l} -> $l .."
+      cp "${ucrt_vssdk}/${l}" "$l"
       new_libs="$new_libs $l"
     fi  
   done

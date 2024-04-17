@@ -43,7 +43,8 @@ const double initial_elevation = 15.0;
 D25View::D25View (Dispatcher *root, LayoutViewBase *view)
   : lay::Browser (root, view, "d25_view"),
     dm_rerun_macro (this, &D25View::rerun_macro),
-    dm_fit (this, &D25View::fit)
+    dm_fit (this, &D25View::fit),
+    m_visibility_follows_selection (false)
 {
   mp_ui = new Ui::D25View ();
   mp_ui->setupUi (this);
@@ -69,6 +70,8 @@ D25View::D25View (Dispatcher *root, LayoutViewBase *view)
   connect (mp_ui->hide_selected_action, SIGNAL (triggered()), this, SLOT (hide_selected_triggered()));
   connect (mp_ui->show_all_action, SIGNAL (triggered()), this, SLOT (show_all_triggered()));
   connect (mp_ui->show_selected_action, SIGNAL (triggered()), this, SLOT (show_selected_triggered()));
+  connect (mp_ui->visibility_follows_selection_action, SIGNAL (toggled(bool)), this, SLOT (visibility_follows_selection_changed(bool)));
+  connect (mp_ui->material_list, SIGNAL (itemSelectionChanged()), this, SLOT (update_visibility()));
 
   mp_ui->gl_stack->setCurrentIndex (2);
   mp_ui->rerun_button->setEnabled (false);
@@ -85,10 +88,14 @@ D25View::D25View (Dispatcher *root, LayoutViewBase *view)
 
   mp_ui->material_list->addAction (mp_ui->select_all_action);
   mp_ui->material_list->addAction (mp_ui->unselect_all_action);
-  mp_ui->material_list->addAction (mp_ui->show_all_action);
-  mp_ui->material_list->addAction (mp_ui->show_selected_action);
+  QAction *sep = new QAction (this);
+  sep->setSeparator (true);
+  mp_ui->material_list->addAction (sep);
+  mp_ui->material_list->addAction (mp_ui->visibility_follows_selection_action);
   mp_ui->material_list->addAction (mp_ui->hide_all_action);
   mp_ui->material_list->addAction (mp_ui->hide_selected_action);
+  mp_ui->material_list->addAction (mp_ui->show_all_action);
+  mp_ui->material_list->addAction (mp_ui->show_selected_action);
   mp_ui->material_list->setContextMenuPolicy (Qt::ActionsContextMenu);
 
   connect (mp_ui->material_list, SIGNAL (itemChanged(QListWidgetItem *)), this, SLOT (material_item_changed(QListWidgetItem *)));
@@ -512,6 +519,26 @@ D25View::show_selected_triggered ()
     if (mp_ui->material_list->item (i)->isSelected ()) {
       mp_ui->material_list->item (i)->setCheckState (Qt::Checked);
     }
+  }
+}
+
+void
+D25View::visibility_follows_selection_changed (bool checked)
+{
+  m_visibility_follows_selection = checked;
+  update_visibility ();
+}
+
+void
+D25View::update_visibility ()
+{
+  if (! m_visibility_follows_selection) {
+    return;
+  }
+
+  for (int i = 0; i < mp_ui->material_list->count (); ++i) {
+    QListWidgetItem *item = mp_ui->material_list->item (i);
+    item->setCheckState (item->isSelected () ? Qt::Checked : Qt::Unchecked);
   }
 }
 

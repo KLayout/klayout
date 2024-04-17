@@ -619,6 +619,14 @@ See here for more information: &lt;a href=&quot;int:/about/25d_view.xml&quot;&gt
     <string>Hide Selected</string>
    </property>
   </action>
+  <action name="visibility_follows_selection_action">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Visibility Follows Selection</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>

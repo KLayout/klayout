@@ -95,12 +95,15 @@ private slots:
   void hide_selected_triggered ();
   void show_all_triggered ();
   void show_selected_triggered ();
+  void visibility_follows_selection_changed (bool checked);
+  void update_visibility ();
 
 private:
   Ui::D25View *mp_ui;
   tl::DeferredMethod<D25View> dm_rerun_macro;
   tl::DeferredMethod<D25View> dm_fit;
   std::string m_generator;
+  bool m_visibility_follows_selection;
 
   void cellviews_changed ();
   void layer_properties_changed (int);

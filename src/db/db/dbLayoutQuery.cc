@@ -663,7 +663,27 @@ public:
     }
   }
 
-  virtual void reset (FilterStateBase *previous) 
+  db::Instance instance () const
+  {
+    return mp_parent->sorted_inst_ptr (std::distance (mp_parent->begin_sorted_insts (), m_inst));
+  }
+
+  void validate_instance ()
+  {
+    //  during modification or delete, instances may vanish while iterating,
+    //  hence we need to check during iteration
+    while (m_inst != m_inst_end && !mp_parent->is_valid (instance ())) {
+      ++m_inst;
+    }
+  }
+
+  void next_valid_instance ()
+  {
+    ++m_inst;
+    validate_instance ();
+  }
+
+  virtual void reset (FilterStateBase *previous)
   {
     FilterStateBase::reset (previous);
 
@@ -707,6 +727,8 @@ public:
         m_inst = mp_parent->begin_sorted_insts ();
         m_inst_end = mp_parent->end_sorted_insts ();
 
+        validate_instance ();
+
         while (m_inst != m_inst_end) {
 
           db::cell_index_type cid = (*m_inst)->object ().cell_index ();
@@ -714,9 +736,9 @@ public:
             break;
           }
 
-          ++m_inst;
+          next_valid_instance ();
           while (m_inst != m_inst_end && (*m_inst)->object ().cell_index () == cid) {
-            ++m_inst;
+            next_valid_instance ();
           }
 
         }
@@ -760,14 +782,14 @@ public:
 
         if (m_instance_mode != ExplodedInstances || m_array_iter.at_end ()) {
 
-          if (! m_reading && m_i != mp_parent->sorted_inst_ptr (std::distance (mp_parent->begin_sorted_insts (), m_inst))) {
+          if (! m_reading && m_i != instance ()) {
             m_ignored.insert (m_i);
           }
 
           do {
 
             db::cell_index_type cid = (*m_inst)->object ().cell_index ();
-            ++m_inst;
+            next_valid_instance ();
 
             if (m_inst != m_inst_end && (*m_inst)->object ().cell_index () != cid) {
 
@@ -778,9 +800,9 @@ public:
                   break;
                 }
 
-                ++m_inst;
+                next_valid_instance ();
                 while (m_inst != m_inst_end && (*m_inst)->object ().cell_index () == cid) {
-                  ++m_inst;
+                  next_valid_instance ();
                 }
 
               }
@@ -788,7 +810,7 @@ public:
             }
 
             if (! m_reading && m_inst != m_inst_end) {
-              m_i = mp_parent->sorted_inst_ptr (std::distance (mp_parent->begin_sorted_insts (), m_inst));
+              m_i = instance ();
             } else {
               break;
             }

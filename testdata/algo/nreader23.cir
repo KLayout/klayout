@@ -1,0 +1,8 @@
+* Test
+
+MM1 O I VDD VDD pfet
+MM2 O I VSS VSS nfet
+XDUMMY O I doesnotexist
+
+.end
+

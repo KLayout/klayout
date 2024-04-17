@@ -1,0 +1,10 @@
+
+.lib lib1
+.lib nreader22_lib2.cir lib3
+C1 1 2 100p
+.endl lib1
+
+.lib lib2
+.include nreader22_inc.cir
+.endl lib2
+

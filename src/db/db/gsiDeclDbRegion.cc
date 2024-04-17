@@ -436,6 +436,11 @@ static db::Region refined_delaunay (const db::Region *r, double max_area, double
   return res;
 }
 
+static db::Region drc_hull (const db::Region *r, db::metrics_type metrics, db::Coord space, size_t n_circle)
+{
+  return r->processed (db::DRCHullProcessor (space, metrics, n_circle));
+}
+
 static db::Region minkowski_sum_pe (const db::Region *r, const db::Edge &e)
 {
   return r->processed (db::minkowski_sum_computation<db::Edge> (e));
@@ -2781,6 +2786,17 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "The resulting polygons are not merged. In order to remove overlaps, use the \\merge or \\merged method."
     "Merged semantics applies for the input of this method (see \\merged_semantics= for a description of this concept)\n"
+  ) +
+  method_ext ("drc_hull", &drc_hull, gsi::arg ("metrics"), gsi::arg ("space"), gsi::arg ("n_circle", size_t (64)),
+    "@brief Computes a visualization of the forbidden region for a DRC space check\n"
+    "\n"
+    "@param metrics The metrics to apply\n"
+    "@param space The space value to apply\n"
+    "@param n_circle The full-circle number of points for the Euclidian space visualization\n"
+    "\n"
+    "@return The new polygons representing the forbidden region.\n"
+    "\n"
+    "This method has been introduced in version 0.29.1.\n"
   ) +
   method_ext ("move", &move_p, gsi::arg ("v"),
     "@brief Moves the region\n"

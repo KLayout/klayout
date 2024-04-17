@@ -346,4 +346,156 @@ TriangulationProcessor::process (const db::Polygon &poly, std::vector<db::Polygo
   }
 }
 
+// -----------------------------------------------------------------------------------
+//  DRCHullProcessor implementation
+
+DRCHullProcessor::DRCHullProcessor (db::Coord d, db::metrics_type metrics, size_t n_circle)
+  : m_d (d), m_metrics (metrics), m_n_circle (n_circle)
+{
+  //  .. nothing yet ..
+}
+
+static void create_edge_segment_euclidian (std::vector<db::Point> &points, const db::Edge &e, const db::Edge &ee, db::Coord dist, size_t n_circle)
+{
+  db::Vector d (e.d ());
+  db::Vector n (-d.y (), d.x ());
+
+  db::Vector dd (ee.d ());
+  db::Vector nn (-dd.y (), dd.x ());
+
+  if ((d.x () == 0 && d.y () == 0) || (dd.x () == 0 && dd.y () == 0)) {
+    //  should not happen
+    return;
+  }
+
+  double f = dist / n.double_length ();
+  double ff = dist / nn.double_length ();
+
+  points.push_back (e.p1 () + db::Vector (n * f));
+  points.push_back (e.p2 () + db::Vector (n * f));
+
+  if (db::vprod_sign (nn, n) < 0) {
+
+    //  concave corner
+    points.push_back (e.p2 ());
+    points.push_back (e.p2 () + db::Vector (nn * ff));
+
+  } else {
+
+    double amax;
+    if (db::vprod_sign (nn, n) == 0) {
+      amax = db::sprod_sign (nn, n) < 0 ? M_PI : 0.0;
+    } else {
+      amax = atan2 (db::vprod (nn, n), db::sprod (nn, n));
+    }
+
+    double da = M_PI * 2.0 / n_circle;
+    double f2 = f / cos (0.5 * da);
+
+    int na = int (floor (amax / da + db::epsilon));
+    double a0 = 0.5 * (amax - da * (na - 1));
+
+    for (int i = 0; i < na; ++i) {
+      double a = i * da + a0;
+      points.push_back (e.p2 () + db::Vector (d * (f2 * sin (a)) + n * (f2 * cos (a))));
+    }
+
+  }
+}
+
+static void create_edge_segment_square (std::vector<db::Point> &points, const db::Edge &e, db::Coord dist)
+{
+  db::Vector d (e.d ());
+  db::Vector n (-d.y (), d.x ());
+
+  if (d.x () == 0 && d.y () == 0) {
+    return;
+  }
+
+  double f = dist / n.double_length ();
+
+  points.push_back (e.p1 ());
+  points.push_back (e.p1 () + db::Vector (d * -f));
+  points.push_back (e.p1 () + db::Vector (d * -f + n * f));
+  points.push_back (e.p2 () + db::Vector (d * f + n * f));
+  points.push_back (e.p2 () + db::Vector (d * f));
+}
+
+static void create_edge_segment_projection (std::vector<db::Point> &points, const db::Edge &e, db::Coord dist)
+{
+  db::Vector d (e.d ());
+  db::Vector n (-d.y (), d.x ());
+
+  if (d.x () == 0 && d.y () == 0) {
+    return;
+  }
+
+  double f = dist / n.double_length ();
+
+  points.push_back (e.p1 ());
+  points.push_back (e.p1 () + db::Vector (n * f));
+  points.push_back (e.p2 () + db::Vector (n * f));
+}
+
+static void create_edge_segment (std::vector<db::Point> &points, db::metrics_type metrics, const db::Edge &e, const db::Edge &ee, db::Coord d, size_t n_circle)
+{
+  if (metrics == db::Euclidian) {
+    create_edge_segment_euclidian (points, e, ee, d, n_circle);
+  } else if (metrics == db::Square) {
+    create_edge_segment_square (points, e, d);
+  } else if (metrics == db::Projection) {
+    create_edge_segment_projection (points, e, d);
+  }
+}
+
+void
+DRCHullProcessor::process (const db::Polygon &poly, std::vector<db::Polygon> &result) const
+{
+  db::EdgeProcessor ep;
+  std::vector<db::Point> points;
+
+  for (unsigned int i = 0; i < poly.holes () + 1; ++i) {
+
+    points.clear ();
+
+    auto c = poly.contour (i);
+    if (c.size () < 2) {
+      continue;
+    }
+
+    for (auto p = c.begin (); p != c.end (); ++p) {
+
+      auto pp = p;
+      if (++pp == c.end ()) {
+        pp = c.begin ();
+      }
+
+      auto ppp = pp;
+      if (++ppp == c.end ()) {
+        ppp = c.begin ();
+      }
+
+      create_edge_segment (points, m_metrics, db::Edge (*p, *pp), db::Edge (*pp, *ppp), m_d, m_n_circle);
+
+    }
+
+    for (auto p = points.begin (); p != points.end (); ++p) {
+
+      auto pp = p;
+      if (++ pp == points.end ()) {
+        pp = points.begin ();
+      }
+
+      ep.insert (db::Edge (*p, *pp));
+
+    }
+
+  }
+
+  db::SimpleMerge op;
+  db::PolygonContainer psink (result);
+  db::PolygonGenerator pg (psink, false);
+  ep.process (pg, op);
+}
+
 }

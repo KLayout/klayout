@@ -131,7 +131,7 @@ ShapeEditService::get_edit_layer ()
   m_cv_index = (unsigned int) cv_index;
   m_trans = (cl->trans ().front () * db::CplxTrans (cv->layout ().dbu ()) * cv.context_trans ()).inverted ();
   mp_layout = &(cv->layout ());
-  mp_cell = &(mp_layout->cell (cv.cell_index ()));
+  mp_cell = cv.cell ();
 
   if (mp_cell->is_proxy ()) {
     throw tl::Exception (tl::to_string (tr ("Cannot put a shape into a PCell or library cell")));
@@ -157,7 +157,7 @@ ShapeEditService::update_edit_layer (const lay::LayerPropertiesConstIterator &cl
     return;
   }
 
-  if (cv->layout ().cell (cv.cell_index ()).is_proxy ()) {
+  if (cv.cell ()->is_proxy ()) {
     return;
   }
 
@@ -198,7 +198,7 @@ ShapeEditService::update_edit_layer (const lay::LayerPropertiesConstIterator &cl
   m_cv_index = (unsigned int) cv_index;
   m_trans = (cl->trans ().front () * db::CplxTrans (cv->layout ().dbu ()) * cv.context_trans ()).inverted ();
   mp_layout = &(cv->layout ());
-  mp_cell = &(mp_layout->cell (cv.cell_index ()));
+  mp_cell = cv.cell ();
 
   current_layer_changed ();
 }
@@ -400,6 +400,47 @@ ShapeEditService::deliver_shape (const db::Point &point)
   }
 }
 
+void
+ShapeEditService::open_editor_hooks ()
+{
+  std::string technology;
+  if (mp_layout && mp_layout->technology ()) {
+    technology = mp_layout->technology ()->name ();
+  }
+
+  m_editor_hooks = edt::EditorHooks::get_editor_hooks (technology);
+
+  lay::CellViewRef cv_ref (view ()->cellview_ref (m_cv_index));
+  call_editor_hooks<lay::CellViewRef &, const lay::LayerProperties &> (m_editor_hooks, &edt::EditorHooks::begin_create_shapes, cv_ref, *view ()->current_layer ());
+}
+
+void
+ShapeEditService::close_editor_hooks (bool with_commit)
+{
+  if (with_commit) {
+    call_editor_hooks (m_editor_hooks, &edt::EditorHooks::commit_shapes);
+  }
+  call_editor_hooks (m_editor_hooks, &edt::EditorHooks::end_create_shapes);
+
+  m_editor_hooks.clear ();
+}
+
+template <class Shape>
+void
+ShapeEditService::deliver_shape_to_hooks (const Shape &shape)
+{
+  db::Shapes tmp (true);
+  db::Shape s = tmp.insert (shape);
+  call_editor_hooks<const db::Shape &, const db::CplxTrans &> (m_editor_hooks, &edt::EditorHooks::create_shape, s, trans ().inverted ());
+}
+
+//  explicit instantiations
+template void ShapeEditService::deliver_shape_to_hooks<db::Polygon> (const db::Polygon &);
+template void ShapeEditService::deliver_shape_to_hooks<db::Path> (const db::Path &);
+template void ShapeEditService::deliver_shape_to_hooks<db::Box> (const db::Box &);
+template void ShapeEditService::deliver_shape_to_hooks<db::Point> (const db::Point &);
+template void ShapeEditService::deliver_shape_to_hooks<db::Text> (const db::Text &);
+
 // -----------------------------------------------------------------------------
 //  PolygonService implementation
 
@@ -432,6 +473,8 @@ PolygonService::do_begin_edit (const db::DPoint &p)
   m_points.push_back (pp);
   m_points.push_back (pp);
   m_closure_set = false;
+
+  open_editor_hooks ();
 
   update_marker ();
 }
@@ -503,33 +546,37 @@ PolygonService::do_mouse_click (const db::DPoint &p)
 void 
 PolygonService::do_finish_edit ()
 {
-  deliver_shape (get_polygon ());
+  deliver_shape (get_polygon (false));
   commit_recent (view ());
+  close_editor_hooks (true);
 }
 
 db::Polygon
-PolygonService::get_polygon () const
+PolygonService::get_polygon (bool editing) const
 {
   db::Polygon poly;
 
-  if (m_points.size () < 4) {
+  if (! editing && m_points.size () + (m_closure_set ? 1 : 0) < 4) {
     throw tl::Exception (tl::to_string (tr ("A polygon must have at least 3 points")));
   }
 
   std::vector<db::Point> points_dbu;
-  points_dbu.reserve (m_points.size ());
+  points_dbu.reserve (m_points.size () + 1);
 
   //  one point is reserved for the current one
   for (std::vector<db::DPoint>::const_iterator p = m_points.begin (); p + 1 != m_points.end (); ++p) {
     points_dbu.push_back (trans () * *p);
   }
+  if (editing) {
+    points_dbu.push_back (trans () * m_points.back ());
+  }
   if (m_closure_set) {
     points_dbu.push_back (trans () * m_closure);
   }
 
-  poly.assign_hull (points_dbu.begin (), points_dbu.end (), true, true /*remove reflected*/);
+  poly.assign_hull (points_dbu.begin (), points_dbu.end (), !editing /*compress*/, !editing /*remove reflected*/);
 
-  if (poly.hull ().size () < 3) {
+  if (! editing && poly.hull ().size () < 3) {
     throw tl::Exception (tl::to_string (tr ("A polygon must have at least 3 effective points")));
   }
 
@@ -539,7 +586,7 @@ PolygonService::get_polygon () const
 void 
 PolygonService::do_cancel_edit ()
 {
-  //  .. nothing yet ..
+  close_editor_hooks (false);
 }
 
 bool 
@@ -732,6 +779,17 @@ PolygonService::update_marker ()
                       std::string ("  l: ") +
                       tl::micron_to_string (m_points.back ().distance (m_points.end () [-2])));
   }
+
+  //  call hooks with new shape
+  if (! editor_hooks ().empty ()) {
+    call_editor_hooks (editor_hooks (), &edt::EditorHooks::begin_new_shapes);
+    try {
+      deliver_shape_to_hooks (get_polygon (true));
+    } catch (...) {
+      //  ignore exceptions
+    }
+    call_editor_hooks (editor_hooks (), &edt::EditorHooks::end_new_shapes);
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -761,6 +819,8 @@ BoxService::do_begin_edit (const db::DPoint &p)
   db::DPoint pp = snap2 (p);
   m_p1 = m_p2 = pp;
 
+  open_editor_hooks ();
+
   set_edit_marker (new lay::Marker (view (), cv_index ()));
   update_marker ();
 }
@@ -784,6 +844,17 @@ BoxService::update_marker ()
                       std::string ("  ly: ") +
                       tl::micron_to_string (m_p2.y () - m_p1.y ()));
 
+  }
+
+  //  call hooks with new shape
+  if (! editor_hooks ().empty ()) {
+    call_editor_hooks (editor_hooks (), &edt::EditorHooks::begin_new_shapes);
+    try {
+      deliver_shape_to_hooks (get_box ());
+    } catch (...) {
+      //  ignore exceptions
+    }
+    call_editor_hooks (editor_hooks (), &edt::EditorHooks::end_new_shapes);
   }
 }
 
@@ -816,12 +887,13 @@ BoxService::do_finish_edit ()
 {
   deliver_shape (get_box ());
   commit_recent (view ());
+  close_editor_hooks (true);
 }
 
 void 
 BoxService::do_cancel_edit ()
 {
-  //  .. nothing yet ..
+  close_editor_hooks (false);
 }
 
 bool 
@@ -857,6 +929,8 @@ PointService::do_begin_edit (const db::DPoint &p)
   db::DPoint pp = snap2 (p);
   m_p = pp;
 
+  open_editor_hooks ();
+
   set_edit_marker (new lay::Marker (view (), cv_index ()));
   update_marker ();
 }
@@ -881,6 +955,17 @@ PointService::update_marker ()
                       std::string ("  y: ") +
                       tl::micron_to_string (m_p.y ()));
 
+  }
+
+  //  call hooks with new shape
+  if (! editor_hooks ().empty ()) {
+    call_editor_hooks (editor_hooks (), &edt::EditorHooks::begin_new_shapes);
+    try {
+      deliver_shape_to_hooks (get_point ());
+    } catch (...) {
+      //  ignore exceptions
+    }
+    call_editor_hooks (editor_hooks (), &edt::EditorHooks::end_new_shapes);
   }
 }
 
@@ -913,12 +998,13 @@ PointService::do_finish_edit ()
 {
   deliver_shape (get_point ());
   commit_recent (view ());
+  close_editor_hooks (true);
 }
 
 void
 PointService::do_cancel_edit ()
 {
-  //  .. nothing yet ..
+  close_editor_hooks (false);
 }
 
 bool
@@ -959,6 +1045,8 @@ TextService::do_begin_edit (const db::DPoint &p)
 
   m_text.trans (db::DTrans (m_rot, snap2 (p) - db::DPoint ()));
 
+  open_editor_hooks ();
+
   lay::DMarker *marker = new lay::DMarker (view ());
   marker->set_vertex_shape (lay::ViewOp::Cross);
   marker->set_vertex_size (9 /*cross vertex size*/);
@@ -984,6 +1072,17 @@ TextService::update_marker ()
 
     view ()->message (pos);
 
+  }
+
+  //  call hooks with new shape
+  if (! editor_hooks ().empty ()) {
+    call_editor_hooks (editor_hooks (), &edt::EditorHooks::begin_new_shapes);
+    try {
+      deliver_shape_to_hooks (get_text ());
+    } catch (...) {
+      //  ignore exceptions
+    }
+    call_editor_hooks (editor_hooks (), &edt::EditorHooks::end_new_shapes);
   }
 }
 
@@ -1065,12 +1164,14 @@ TextService::do_finish_edit ()
 
   }
 #endif
+
+  close_editor_hooks (true);
 }
 
 void 
 TextService::do_cancel_edit ()
 {
-  //  .. nothing yet ..
+  close_editor_hooks (false);
 }
 
 bool 
@@ -1166,6 +1267,8 @@ PathService::do_begin_edit (const db::DPoint &p)
   m_points.push_back (pp);
   m_points.push_back (pp);
 
+  open_editor_hooks ();
+
   set_edit_marker (new lay::Marker (view (), cv_index ()));
   update_marker ();
 }
@@ -1250,6 +1353,8 @@ PathService::do_finish_edit ()
   deliver_shape (get_path ());
 
   commit_recent (view ());
+
+  close_editor_hooks (true);
 }
 
 void
@@ -1270,6 +1375,17 @@ PathService::update_marker ()
                         tl::micron_to_string (m_points.back ().distance (m_points.end () [-2])));
     }
 
+  }
+
+  //  call hooks with new shape
+  if (! editor_hooks ().empty ()) {
+    call_editor_hooks (editor_hooks (), &edt::EditorHooks::begin_new_shapes);
+    try {
+      deliver_shape_to_hooks (get_path ());
+    } catch (...) {
+      //  ignore exceptions
+    }
+    call_editor_hooks (editor_hooks (), &edt::EditorHooks::end_new_shapes);
   }
 }
 
@@ -1305,7 +1421,7 @@ PathService::get_path () const
 void 
 PathService::do_cancel_edit ()
 {
-  //  .. nothing yet ..
+  close_editor_hooks (false);
 }
 
 bool 
@@ -1582,6 +1698,8 @@ InstService::do_begin_edit (const db::DPoint &p)
     m_trans = db::VCplxTrans (1.0 / cv->layout ().dbu ()) * tv [0] * db::CplxTrans (cv->layout ().dbu ()) * cv.context_trans ();
   }
 
+  open_editor_hooks ();
+
   update_marker ();
 }
 
@@ -1756,7 +1874,7 @@ InstService::do_finish_edit ()
 
       cv->layout ().cell (inst.object ().cell_index ()).collect_called_cells (called);
       called.insert (inst.object ().cell_index ());
-      cv->layout ().cell (cv.cell_index ()).collect_caller_cells (callers);
+      cv.cell ()->collect_caller_cells (callers);
       callers.insert (cv.cell_index ());
 
       std::vector <db::cell_index_type> intersection;
@@ -1769,7 +1887,7 @@ InstService::do_finish_edit ()
         manager ()->transaction (tl::to_string (tr ("Create instance")), m_reference_transaction_id);
       }
       m_reference_transaction_id = 0;
-      db::Instance i = cv->layout ().cell (cv.cell_index ()).insert (inst);
+      db::Instance i = cv.cell ()->insert (inst);
       cv->layout ().cleanup ();
       if (manager ()) {
         manager ()->commit ();
@@ -1792,10 +1910,12 @@ InstService::do_finish_edit ()
 
     m_has_valid_cell = false;
     m_in_drag_drop = false;
+    close_editor_hooks (true);
 
   } catch (...) {
     m_has_valid_cell = false;
     m_in_drag_drop = false;
+    close_editor_hooks (false);
     throw;
   }
 }
@@ -1819,6 +1939,8 @@ InstService::do_cancel_edit ()
   if (cv.is_valid ()) {
     cv->layout ().cleanup ();
   }
+
+  close_editor_hooks (false);
 }
 
 void
@@ -2128,6 +2250,35 @@ InstService::update_marker ()
   } else {
     set_edit_marker (0);
   }
+
+  //  call hooks with new shape
+  if (! editor_hooks ().empty ()) {
+
+    call_editor_hooks (editor_hooks (), &edt::EditorHooks::begin_new_instances);
+
+    try {
+
+      const lay::CellView &cv = view ()->cellview (m_cv_index);
+
+      db::CellInstArray inst;
+      if (cv.is_valid () && get_inst (inst)) {
+
+        //  Note: the instance collection is temporary
+        db::Instances instances (cv.cell ());
+        db::Instance i = instances.insert (inst);
+
+        db::CplxTrans view_trans = db::CplxTrans (cv->layout ().dbu ()) * m_trans;
+        call_editor_hooks<const db::Instance &, const db::CplxTrans &> (m_editor_hooks, &edt::EditorHooks::create_instance, i, view_trans);
+
+      }
+
+    } catch (...) {
+      //  ignore exceptions
+    }
+
+    call_editor_hooks (editor_hooks (), &edt::EditorHooks::end_new_instances);
+
+  }
 }
 
 bool
@@ -2157,6 +2308,36 @@ InstService::get_inst (db::CellInstArray &inst)
 
   }
   return false;
+}
+
+void
+InstService::open_editor_hooks ()
+{
+  const lay::CellView &cv = view ()->cellview (m_cv_index);
+  if (! cv.is_valid ()) {
+    return;
+  }
+
+  std::string technology;
+  if (cv->layout ().technology ()) {
+    technology = cv->layout ().technology ()->name ();
+  }
+
+  m_editor_hooks = edt::EditorHooks::get_editor_hooks (technology);
+
+  lay::CellViewRef cv_ref (view ()->cellview_ref (m_cv_index));
+  call_editor_hooks<lay::CellViewRef &> (m_editor_hooks, &edt::EditorHooks::begin_create_instances, cv_ref);
+}
+
+void
+InstService::close_editor_hooks (bool with_commit)
+{
+  if (with_commit) {
+    call_editor_hooks (m_editor_hooks, &edt::EditorHooks::commit_instances);
+  }
+  call_editor_hooks (m_editor_hooks, &edt::EditorHooks::end_create_instances);
+
+  m_editor_hooks.clear ();
 }
 
 } // namespace edt

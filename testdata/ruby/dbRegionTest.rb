@@ -1452,6 +1452,25 @@ class DBRegion_TestClass < TestBase
 
   end
 
+  # DRC hull
+  def test_drc_hull
+
+    r = RBA::Region::new()
+    r.insert(RBA::Polygon::new([[0, 0], [1000, 1000], [1500, 0]]))
+
+    assert_equal(r.drc_hull(RBA::Region::Euclidian, 200, 8).merged.to_s, "(-83,-200;-200,-83;-200,83;-141,141;859,1141;950,1211;1114,1184;1179,1089;1679,89;1714,-35;1627,-176;1500,-200)")
+    assert_equal(r.drc_hull(RBA::Region::Square, 200).merged.to_s, "(-200,-200;-200,-82;-283,0;1000,1283;1039,1243;1089,1268;1768,-89;1700,-123;1700,-200)")
+    assert_equal(r.drc_hull(RBA::Region::Projection, 200).merged.to_s, "(0,-200;0,0;-141,141;859,1141;1000,1000;1179,1089;1679,89;1500,0;1500,-200)")
+
+    r = RBA::Region::new()
+    r.merged_semantics = false
+    r.insert(RBA::Polygon::new([[0, 0], [1000, 1000]], true))
+    assert_equal(r.drc_hull(RBA::Region::Euclidian, 200, 8).merged.to_s, "(-83,-200;-200,-83;-200,83;-141,141;859,1141;917,1200;1083,1200;1200,1083;1200,917;1141,859;141,-141;83,-200)")
+    assert_equal(r.drc_hull(RBA::Region::Square, 200, 8).merged.to_s, "(0,-283;-141,-141;-283,0;1000,1283;1141,1141;1283,1000)")
+    assert_equal(r.drc_hull(RBA::Region::Projection, 200, 8).merged.to_s, "(141,-141;-141,141;859,1141;1141,859)")
+
+  end
+
 end
 
 load("test_epilogue.rb")

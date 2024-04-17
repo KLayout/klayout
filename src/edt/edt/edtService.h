@@ -381,6 +381,22 @@ public:
    */
   std::pair<bool, lay::ObjectInstPath> handle_guiding_shape_changes (const lay::ObjectInstPath &obj) const;
 
+  /**
+   *  @brief Gets a value indicating whether a move operation is ongoing
+   */
+  bool is_moving () const
+  {
+    return m_moving;
+  }
+
+  /**
+   *  @brief Gets the current move transformation (in DBU space on context cell level)
+   */
+  const db::DTrans &move_trans () const
+  {
+    return m_move_trans;
+  }
+
 protected:
   /**
    *  @brief Update m_markers to reflect the selection

@@ -36,8 +36,10 @@ DEFINES += MAKE_EDT_LIBRARY
 
 HEADERS = \
     edtDialogs.h \
+    edtEditorHooks.h \
     edtEditorOptionsPages.h \
     edtInstPropertiesPage.h \
+    edtMoveTrackerService.h \
     edtPCellParametersPage.h \
     edtPropertiesPages.h \
     edtPropertiesPageUtils.h \
@@ -45,12 +47,15 @@ HEADERS = \
 
 SOURCES = \
     edtDialogs.cc \
+    edtEditorHooks.cc \
     edtEditorOptionsPages.cc \
     edtInstPropertiesPage.cc \
+    edtMoveTrackerService.cc \
     edtPCellParametersPage.cc \
     edtPropertiesPages.cc \
     edtPropertiesPageUtils.cc \
-    edtRecentConfigurationPage.cc
+    edtRecentConfigurationPage.cc \
+    gsiDeclEdtEditorHooks.cc
 
 # Enabled without Qt:
 

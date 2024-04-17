@@ -2131,6 +2131,21 @@ Class<db::Shape> decl_Shape ("db", "Shape",
     "Equality of shapes is not specified by the identity of the objects but by the\n"
     "identity of the pointers - both shapes must refer to the same object.\n"
   ) +
+  gsi::method ("<", &db::Shape::operator<, gsi::arg ("other"),
+    "@brief Less operator\n"
+    "\n"
+    "The less operator implementation is based on pointers and not strictly reproducible."
+    "However, it is good enough so Shape objects can serve as keys in hashes (see also \\hash).\n"
+    "\n"
+    "This method has been introduced in version 0.29.1."
+  ) +
+  gsi::method ("hash", &db::Shape::hash_value,
+    "@brief Hash function\n"
+    "\n"
+    "The hash function enables Shape objects as keys in hashes.\n"
+    "\n"
+    "This method has been introduced in version 0.29.1."
+  ) +
   gsi::method ("to_s", &db::Shape::to_string,
     "@brief Create a string showing the contents of the reference\n"
     "\n"

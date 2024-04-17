@@ -26,6 +26,7 @@
 
 #include "edtService.h"
 #include "edtConfig.h"
+#include "edtEditorHooks.h"
 
 #include <memory>
 
@@ -68,6 +69,16 @@ protected:
   void deliver_shape (const db::Path &path);
   void deliver_shape (const db::Box &box);
   void deliver_shape (const db::Point &point);
+  void open_editor_hooks ();
+  template <class Shape>
+  void deliver_shape_to_hooks (const Shape &shape);
+  void close_editor_hooks (bool with_commit);
+
+  const tl::weak_collection<edt::EditorHooks> &editor_hooks ()
+  {
+    return m_editor_hooks;
+  }
+
   virtual void current_layer_changed () { }
 
 private:
@@ -77,6 +88,7 @@ private:
   db::Cell *mp_cell;
   db::Layout *mp_layout;
   combine_mode_type m_combine_mode;
+  tl::weak_collection<edt::EditorHooks> m_editor_hooks;
 
   void update_edit_layer (const lay::LayerPropertiesConstIterator &iter);
 };
@@ -109,7 +121,7 @@ private:
   db::DPoint m_last;
 
   void update_marker ();
-  db::Polygon get_polygon () const;
+  db::Polygon get_polygon (bool editing) const;
   void add_closure ();
   void set_last_point (const db::DPoint &p);
 };
@@ -298,6 +310,7 @@ private:
   const db::PCellDeclaration *mp_pcell_decl;
   int m_cv_index;
   db::ICplxTrans m_trans;
+  tl::weak_collection<edt::EditorHooks> m_editor_hooks;
 
   void update_marker ();
   bool get_inst (db::CellInstArray &inst);
@@ -305,6 +318,13 @@ private:
   tl::Variant get_default_layer_for_pcell ();
   void sync_to_config ();
   void switch_cell_or_pcell (bool switch_parameters);
+  void open_editor_hooks ();
+  void close_editor_hooks (bool with_commit);
+
+  const tl::weak_collection<edt::EditorHooks> &editor_hooks ()
+  {
+    return m_editor_hooks;
+  }
 };
 
 }

@@ -399,6 +399,9 @@ TEST(22)
     EXPECT_EQ (sc.empty (), false);
     EXPECT_EQ (sc.front ()->attr (), 1);
     EXPECT_EQ ((++sc.begin ())->attr (), 1);
+    auto i = sc.begin ();
+    i++;
+    EXPECT_EQ (i->attr (), 1);
 
     sc.pop_back ();
     EXPECT_EQ (int (sc.size ()), 1);
@@ -418,6 +421,9 @@ TEST(22)
     EXPECT_EQ (sc.empty (), false);
     EXPECT_EQ (sc.front ()->attr (), 2);
     EXPECT_EQ ((++sc.begin ())->attr (), 2);
+    i = sc.begin ();
+    i++;
+    EXPECT_EQ (i->attr (), 2);
   }
 
   EXPECT_EQ (MyClass::instances (), 0);
@@ -512,6 +518,48 @@ TEST(24)
     EXPECT_EQ (sc1.front ()->attr (), 2);
     EXPECT_EQ (MyClass::instances (), 1);
   }
+
+  EXPECT_EQ (MyClass::instances (), 0);
+}
+
+TEST(25)
+{
+  MyClass::reset_instance_counter ();
+  MyClass *o1 = new MyClass (1);
+  MyClass *o2 = new MyClass (2);
+  EXPECT_EQ (MyClass::instances (), 2);
+
+  tl::shared_collection<MyClass> sc1, sc2;
+  sc1.push_back (o1);
+  sc1.push_back (o2);
+  EXPECT_EQ (sc1.size (), size_t (2));
+  EXPECT_EQ (sc2.size (), size_t (0));
+  EXPECT_EQ (sc1.front () == o1, true);
+
+  sc1.swap (sc2);
+  EXPECT_EQ (sc1.size (), size_t (0));
+  EXPECT_EQ (sc2.size (), size_t (2));
+  EXPECT_EQ (sc2.front () == o1, true);
+  EXPECT_EQ (MyClass::instances (), 2);
+
+  sc1 = sc2;
+  EXPECT_EQ (sc1.size (), size_t (2));
+  EXPECT_EQ (sc2.size (), size_t (2));
+  EXPECT_EQ (sc1.front () == o1, true);
+  EXPECT_EQ (sc2.front () == o1, true);
+  EXPECT_EQ (MyClass::instances (), 2);
+
+  delete o1;
+  EXPECT_EQ (sc1.size (), size_t (1));
+  EXPECT_EQ (sc2.size (), size_t (1));
+  EXPECT_EQ (sc1.front () == o2, true);
+  EXPECT_EQ (sc2.front () == o2, true);
+  EXPECT_EQ (MyClass::instances (), 1);
+
+  sc1.clear ();
+  sc2.clear ();
+  EXPECT_EQ (sc1.size (), size_t (0));
+  EXPECT_EQ (sc2.size (), size_t (0));
 
   EXPECT_EQ (MyClass::instances (), 0);
 }

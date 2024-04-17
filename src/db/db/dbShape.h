@@ -2769,6 +2769,11 @@ public:
     return m_trans < d.m_trans;
   }
 
+  /**
+   *  @brief Hash value
+   */
+  size_t hash_value () const;
+
   /** 
    *  @brief Convert to a string
    */
@@ -2837,6 +2842,21 @@ public:
 };
 
 }  // namespace db
+
+namespace std
+{
+
+  //  provide a template specialization for std::hash<T>
+  template <>
+  struct hash <db::Shape>
+  {
+    size_t operator() (const db::Shape &s) const
+    {
+      return s.hash_value ();
+    }
+  };
+
+}  // namespace std
   
 #endif
 

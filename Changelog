@@ -43,6 +43,7 @@
     using them to select edges.
 * Enhancement: New RBA/pya Features
   - Main window title: MainWindow#title (property)
+  - MainWindow#synchronous (getter added)
   - LayoutView#is_dirty?
   - Triangulation: Region#delaunay
   - Quality rasterizer: Region#rasterize

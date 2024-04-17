@@ -29,7 +29,6 @@
     <li>QtXmlPatterns (Qt5): XML schema and queries</li>
     <li>QtSql: database support</li>
     <li>QtNetwork: various network protocols and supporting classes</li>
-    <li>QtDesigner: dynamically load designer files (.ui)</li>
     <li>QtUiTools: dynamically load designer files (.ui)</li>
     <li>QtMultimedia (Qt5): multimedia support</li>
     <li>QtPrintSupport (Qt5): print support</li>
@@ -244,7 +243,7 @@ end</pre>
 
   ui_file = QFile::new(QFileInfo::new($0).dir.filePath("MyDialog.ui"))
   ui_file.open(QIODevice::ReadOnly)
-  dialog = QFormBuilder::new.load(ui_file, Application::instance.main_window)
+  dialog = QUiLoader::new.load(ui_file, Application::instance.main_window)
   ui_file.close
   
   def dialog.setup
@@ -260,11 +259,11 @@ end</pre>
 
   <p>
   This sample tries to locate a designer file called "<tt>MyDialog.ui</tt>" relative to the 
-  macro's path (in <tt>$0</tt>). It uses the <class_doc href="QFormBuilder"/> class to load and 
+  macro's path (in <tt>$0</tt>). It uses the <class_doc href="QUiLoader"/> class to load and 
   create the dialog. In that sample, "<tt>MyDialog</tt>" defines a dialog with two widgets: a <tt>QPushButton</tt>
   ("button") and a <tt>QSlider</tt> ("slider").
   Because of the dynamic binding in Ruby, "dialog" will already have the correct class and
-  we don't have to cast the pointer delivered by <tt>QFormBuilder::load</tt> before we can call "exec".
+  we don't have to cast the pointer delivered by <tt>QUiLoader::load</tt> before we can call "exec".
   </p>
 
   <p>
@@ -312,7 +311,7 @@ end</pre>
   </p>
 
   <pre>b = dialog.button
-# this will not render true, if the button was created by QFormBuilder for example
+# this will not render true, if the button was created by QUiLoader for example
 b.is_a?(QPushButton)
 # this is correct:
 b.is_a?(QPushButton_Native)</pre>

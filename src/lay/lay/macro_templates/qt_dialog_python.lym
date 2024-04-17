@@ -49,7 +49,7 @@ class ScreenshotDialog(pya.QDialog):
     layout.addWidget(self.image)
 
     button = pya.QPushButton('Screenshot', self)
-    button.setFont(pya.QFont('Times', 18, pya.QFont.Bold))
+    button.setFont(pya.QFont('Times', 18, int(pya.QFont.Bold)))
     layout.addWidget(button)
     
     # attach the event handler

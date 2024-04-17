@@ -27,6 +27,7 @@
 #include "tlDeferredExecution.h"
 #include "tlObject.h"
 #include "tlTimer.h"
+#include "tlSleep.h"
 
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -447,9 +448,18 @@ InputHttpStreamPrivateData::read (char *b, size_t n)
     issue_request (QUrl (tl::to_qstring (m_url)));
   }
 
-  tl::Clock start_time = tl::Clock::current ();
-  while (mp_reply == 0 && (m_timeout <= 0.0 || (tl::Clock::current() - start_time).seconds () < m_timeout)) {
+  const unsigned long tick_ms = 10;
+  double time_waited = 0.0;
+
+  while (mp_reply == 0 && (m_timeout <= 0.0 || time_waited < m_timeout)) {
+
     mp_stream->tick ();
+
+    //  NOTE: as tick() includes waiting for the password dialog, we must not include
+    //  the time spent there.
+    tl::msleep (tick_ms);
+    time_waited += tick_ms * 1e-3;
+
   }
 
   if (! mp_reply) {

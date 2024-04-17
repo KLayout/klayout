@@ -23,6 +23,7 @@
 
 #include "layHelpSource.h"
 #include "layApplication.h"
+#include "layVersion.h"
 
 #include "tlLog.h"
 #include "tlTimer.h"
@@ -273,7 +274,9 @@ HelpSource::initialize_index ()
 
     bool ok = false;
 
-    const QString help_index_cache_file = QString::fromUtf8 ("help-index.xml");
+    int qt = int (QT_VERSION >> 16);
+    QString help_index_cache_file = tl::to_qstring (tl::sprintf ("help-index-%s-qt%d.xml.gz", lay::Version::version (), qt));
+
     std::string per_user_cache_file;
     if (! lay::ApplicationBase::instance ()->appdata_path ().empty ()) {
       per_user_cache_file = tl::to_string (QDir (tl::to_qstring (lay::ApplicationBase::instance ()->appdata_path ())).absoluteFilePath (help_index_cache_file));
@@ -341,7 +344,7 @@ HelpSource::produce_index_file (const std::string &path)
 
   try {
 
-    tl::OutputStream os (path, tl::OutputStream::OM_Plain);
+    tl::OutputStream os (path, tl::OutputStream::OM_Zlib);
     help_index_structure.write (os, *this);
 
   } catch (tl::Exception &ex) {

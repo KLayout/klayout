@@ -382,11 +382,13 @@ static void create_edge_segment_euclidian (std::vector<db::Point> &points, const
 
   } else {
 
+    db::DVector dnn (nn);
+    db::DVector dn (n);
     double amax;
-    if (db::vprod_sign (nn, n) == 0) {
-      amax = db::sprod_sign (nn, n) < 0 ? M_PI : 0.0;
+    if (db::vprod_sign (dnn, dn) == 0) {
+      amax = db::sprod_sign (dnn, dn) < 0 ? M_PI : 0.0;
     } else {
-      amax = atan2 (db::vprod (nn, n), db::sprod (nn, n));
+      amax = atan2 (db::vprod (dnn, dn), db::sprod (dnn, dn));
     }
 
     double da = M_PI * 2.0 / n_circle;

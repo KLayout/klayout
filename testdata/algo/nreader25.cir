@@ -1,0 +1,11 @@
+* Test: dismiss empty top level circuit
+
+.subckt top a b 
+m1 a b a b nmos
+.ends
+
+* this triggered generation of a top level circuit
+.param p1 17
+
+.end
+

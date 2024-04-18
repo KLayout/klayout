@@ -1,0 +1,14 @@
+* Testing recursive call detection
+
+.subckt c1 a b
+x1 a b c2
+.end
+
+.subckt c2 a b
+x1 a b c1
+.ends
+
+xtop vdd vss c2
+
+.end
+

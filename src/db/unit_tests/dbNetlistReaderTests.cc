@@ -893,7 +893,7 @@ TEST(24_recursive_calls)
     reader.read (is, nl);
     EXPECT_EQ (false, true);
   } catch (tl::Exception &ex) {
-    EXPECT_EQ (ex.msg (), "Subcircuit 'C1' called recursively in /home/matthias/klayout/master/testdata/algo/nreader24.cir, line 8");
+    EXPECT_EQ (ex.msg ().find ("Subcircuit 'C1' called recursively in"), size_t (0));
   }
 }
 

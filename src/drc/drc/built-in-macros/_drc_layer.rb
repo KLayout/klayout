@@ -1007,15 +1007,15 @@ CODE
 
           self.data.is_a?(RBA::Region) || self.data.is_a?(RBA::Edges) || self.data.is_a?(RBA::EdgePairs) || raise("Requires an edge, edge pair or polygon layer")
 
-          f = :with_angle
-          absolute = self.data.is_a?(RBA::Region) ? nil : false
+          absolute = false
+          both = false
 
           args = args.select do |a|
             if a.is_a?(DRCBothEdges)
               if !self.data.is_a?(RBA::EdgePairs)
                 raise("'both' keyword is only available for edge pair layers")
               end
-              f = :with_angle_both
+              both = true
               false
             elsif a.is_a?(DRCAbsoluteMode)
               if self.data.is_a?(RBA::Region)
@@ -1028,33 +1028,27 @@ CODE
             end
           end
 
+          if both
+            f = absolute ? :with_abs_angle_both : :with_angle_both
+          else
+            f = absolute ? :with_abs_angle : :with_angle
+          end
+
           result_class = self.data.is_a?(RBA::Edges) ? RBA::Edges : RBA::EdgePairs
           if args.size == 1
             a = args[0]
             if a.is_a?(Range)
-              args = [ a.begin, a.end, #{inv.inspect} ]
-              if absolute != nil
-                args += [ true, false, absolute ]
-              end
-              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, f, *args))
+              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, f, a.begin, a.end, #{inv.inspect}))
             elsif a.is_a?(DRCOrthoEdges) || a.is_a?(DRCDiagonalOnlyEdges) || a.is_a?(DRCDiagonalEdges)
               if self.data.is_a?(RBA::Region)
                 raise("'ortho', 'diagonal' or 'diagonal_only' keyword is only available for edge or edge pair layers")
               end
               DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, f, a.value, #{inv.inspect}))
             else
-              args = [ @engine._make_numeric_value(a), #{inv.inspect} ]
-              if absolute != nil
-                args += [ absolute ]
-              end
-              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, f, *args))
+              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, f, @engine._make_numeric_value(a), #{inv.inspect}))
             end
           elsif args.size == 2
-            args = [ @engine._make_numeric_value(args[0]), @engine._make_numeric_value(args[1]), #{inv.inspect} ]
-            if absolute != nil
-              args += [ true, false, absolute ]
-            end
-            DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, f, *args))
+            DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, f, @engine._make_numeric_value(args[0]), @engine._make_numeric_value(args[1]), #{inv.inspect}))
           else
             raise("Invalid number of range arguments (1 or 2 expected)")
           end

@@ -166,6 +166,7 @@ TEST(5_InternalAngleFilter)
 {
   db::EdgePair ep0 (db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, 0), db::Point (0, 0)));
   db::EdgePair ep45 (db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 0), db::Point (100, 100)));
+  db::EdgePair ep45inv (db::Edge (db::Point (0, 0), db::Point (100, 100)), db::Edge (db::Point (0, 0), db::Point (100, 0)));
   db::EdgePair ep180 (db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 0), db::Point (100, 0)));
   db::EdgePair ep90 (db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 0), db::Point (0, 100)));
   db::EdgePair epm90 (db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 100), db::Point (0, 0)));
@@ -187,6 +188,7 @@ TEST(5_InternalAngleFilter)
   EXPECT_EQ (db::InternalAngleEdgePairFilter (45.0, false).selected (ep90), false);
   EXPECT_EQ (db::InternalAngleEdgePairFilter (45.0, false).selected (epm90), false);
   EXPECT_EQ (db::InternalAngleEdgePairFilter (45.0, false).selected (ep45), true);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (45.0, false).selected (ep45inv), true);
 
   EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true).selected (ep0), false);
   EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true).selected (ep180), false);
@@ -199,4 +201,12 @@ TEST(5_InternalAngleFilter)
   EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, false).selected (ep90), false);
   EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, false).selected (epm90), false);
   EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, false).selected (ep45), true);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, false).selected (ep45inv), true);
+
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, true).selected (ep0), false);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, true).selected (ep180), false);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, true).selected (ep90), true);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, true).selected (epm90), true);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, true).selected (ep45), false);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, true).selected (ep45inv), false);
 }

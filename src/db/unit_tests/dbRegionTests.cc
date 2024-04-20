@@ -2574,17 +2574,17 @@ TEST(100_Processors)
   r.insert (db::Box (db::Point (0, 300), db::Point (200, 400)));
   r.insert (db::Box (db::Point (100, 300), db::Point (200, 500)));
 
-  EXPECT_EQ (db::compare (r.processed (db::CornersAsDots (-180.0, true, 180.0, true)), "(100,0;100,0);(0,0;0,0);(0,200;0,200);(100,200;100,200);(200,300;200,300);(0,300;0,300);(0,400;0,400);(100,400;100,400);(100,500;100,500);(200,500;200,500)"), true);
-  EXPECT_EQ (r.processed (db::CornersAsDots (0.0, true, 180.0, true)).to_string (), "(100,400;100,400)");
-  EXPECT_EQ (db::compare (r.processed (db::CornersAsDots (-90.0, true, 90.0, true)), "(100,0;100,0);(0,0;0,0);(0,200;0,200);(100,200;100,200);(200,300;200,300);(0,300;0,300);(0,400;0,400);(100,400;100,400);(100,500;100,500);(200,500;200,500)"), true);
-  EXPECT_EQ (r.processed (db::CornersAsDots (-90.0, false, 90.0, true)).to_string (), "(100,400;100,400)");
-  EXPECT_EQ (db::compare (r.processed (db::CornersAsDots (-90.0, true, 90.0, false)), "(100,0;100,0);(0,0;0,0);(0,200;0,200);(100,200;100,200);(200,300;200,300);(0,300;0,300);(0,400;0,400);(100,500;100,500);(200,500;200,500)"), true);
-  EXPECT_EQ (r.processed (db::CornersAsDots (-90.0, false, 90.0, false)).to_string (), "");
+  EXPECT_EQ (db::compare (r.processed (db::CornersAsDots (-180.0, true, 180.0, true, false, false)), "(100,0;100,0);(0,0;0,0);(0,200;0,200);(100,200;100,200);(200,300;200,300);(0,300;0,300);(0,400;0,400);(100,400;100,400);(100,500;100,500);(200,500;200,500)"), true);
+  EXPECT_EQ (r.processed (db::CornersAsDots (0.0, true, 180.0, true, false, false)).to_string (), "(100,400;100,400)");
+  EXPECT_EQ (db::compare (r.processed (db::CornersAsDots (-90.0, true, 90.0, true, false, false)), "(100,0;100,0);(0,0;0,0);(0,200;0,200);(100,200;100,200);(200,300;200,300);(0,300;0,300);(0,400;0,400);(100,400;100,400);(100,500;100,500);(200,500;200,500)"), true);
+  EXPECT_EQ (r.processed (db::CornersAsDots (-90.0, false, 90.0, true, false, false)).to_string (), "(100,400;100,400)");
+  EXPECT_EQ (db::compare (r.processed (db::CornersAsDots (-90.0, true, 90.0, false, false, false)), "(100,0;100,0);(0,0;0,0);(0,200;0,200);(100,200;100,200);(200,300;200,300);(0,300;0,300);(0,400;0,400);(100,500;100,500);(200,500;200,500)"), true);
+  EXPECT_EQ (r.processed (db::CornersAsDots (-90.0, false, 90.0, false, false, false)).to_string (), "");
   db::Region ext;
-  r.processed (db::CornersAsDots (0.0, true, 180.0, true)).extended (ext, 10, 10, 20, 20);
+  r.processed (db::CornersAsDots (0.0, true, 180.0, true, false, false)).extended (ext, 10, 10, 20, 20);
   EXPECT_EQ (ext.to_string (), "(90,380;90,420;110,420;110,380)");
-  EXPECT_EQ (db::compare (r.processed (db::CornersAsRectangles (-180.0, true, 180.0, true, 2)), "(98,-2;98,2;102,2;102,-2);(-2,-2;-2,2;2,2;2,-2);(-2,198;-2,202;2,202;2,198);(98,198;98,202;102,202;102,198);(198,298;198,302;202,302;202,298);(-2,298;-2,302;2,302;2,298);(-2,398;-2,402;2,402;2,398);(98,398;98,402;102,402;102,398);(98,498;98,502;102,502;102,498);(198,498;198,502;202,502;202,498)"), true);
-  EXPECT_EQ (r.processed (db::CornersAsRectangles (0.0, true, 180.0, true, 2)).to_string (), "(98,398;98,402;102,402;102,398)");
+  EXPECT_EQ (db::compare (r.processed (db::CornersAsRectangles (-180.0, true, 180.0, true, false, false, 2)), "(98,-2;98,2;102,2;102,-2);(-2,-2;-2,2;2,2;2,-2);(-2,198;-2,202;2,202;2,198);(98,198;98,202;102,202;102,198);(198,298;198,302;202,302;202,298);(-2,298;-2,302;2,302;2,298);(-2,398;-2,402;2,402;2,398);(98,398;98,402;102,402;102,398);(98,498;98,502;102,502;102,498);(198,498;198,502;202,502;202,498)"), true);
+  EXPECT_EQ (r.processed (db::CornersAsRectangles (0.0, true, 180.0, true, false, false, 2)).to_string (), "(98,398;98,402;102,402;102,398)");
 
   EXPECT_EQ (db::compare (r.processed (db::extents_processor<db::Polygon> (0, 0)), "(0,0;0,200;100,200;100,0);(0,300;0,500;200,500;200,300)"), true);
   EXPECT_EQ (db::compare (r.processed (db::extents_processor<db::Polygon> (10, 20)), "(-10,-20;-10,220;110,220;110,-20);(-10,280;-10,520;210,520;210,280)"), true);

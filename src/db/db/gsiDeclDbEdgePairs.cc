@@ -430,16 +430,16 @@ static db::EdgePairs with_length_both2 (const db::EdgePairs *r, const tl::Varian
   return r->filtered (ef);
 }
 
-static db::EdgePairs with_angle1 (const db::EdgePairs *r, double a, bool inverse)
+static db::EdgePairs with_angle1 (const db::EdgePairs *r, double a, bool inverse, bool absolute)
 {
-  db::EdgeOrientationFilter f (a, inverse);
+  db::EdgeOrientationFilter f (a, inverse, absolute);
   db::EdgeFilterBasedEdgePairFilter ef (&f, true /*one must match*/);
   return r->filtered (ef);
 }
 
-static db::EdgePairs with_angle2 (const db::EdgePairs *r, double amin, double amax, bool inverse, bool include_amin, bool include_amax)
+static db::EdgePairs with_angle2 (const db::EdgePairs *r, double amin, double amax, bool inverse, bool include_amin, bool include_amax, bool absolute)
 {
-  db::EdgeOrientationFilter f (amin, include_amin, amax, include_amax, inverse);
+  db::EdgeOrientationFilter f (amin, include_amin, amax, include_amax, inverse, absolute);
   db::EdgeFilterBasedEdgePairFilter ef (&f, true /*one must match*/);
   return r->filtered (ef);
 }
@@ -451,16 +451,16 @@ static db::EdgePairs with_angle3 (const db::EdgePairs *r, db::SpecialEdgeOrienta
   return r->filtered (ef);
 }
 
-static db::EdgePairs with_angle_both1 (const db::EdgePairs *r, double a, bool inverse)
+static db::EdgePairs with_angle_both1 (const db::EdgePairs *r, double a, bool inverse, bool absolute)
 {
-  db::EdgeOrientationFilter f (a, inverse);
+  db::EdgeOrientationFilter f (a, inverse, absolute);
   db::EdgeFilterBasedEdgePairFilter ef (&f, false /*both must match*/);
   return r->filtered (ef);
 }
 
-static db::EdgePairs with_angle_both2 (const db::EdgePairs *r, double amin, double amax, bool inverse, bool include_amin, bool include_amax)
+static db::EdgePairs with_angle_both2 (const db::EdgePairs *r, double amin, double amax, bool inverse, bool include_amin, bool include_amax, bool absolute)
 {
-  db::EdgeOrientationFilter f (amin, include_amin, amax, include_amax, inverse);
+  db::EdgeOrientationFilter f (amin, include_amin, amax, include_amax, inverse, absolute);
   db::EdgeFilterBasedEdgePairFilter ef (&f, false /*both must match*/);
   return r->filtered (ef);
 }
@@ -926,11 +926,15 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "\n"
     "This method has been added in version 0.27.1.\n"
   ) +
-  method_ext ("with_angle", with_angle1, gsi::arg ("angle"), gsi::arg ("inverse"),
+  method_ext ("with_angle", with_angle1, gsi::arg ("angle"), gsi::arg ("inverse"), gsi::arg ("absolute_angle", false),
     "@brief Filter the edge pairs by orientation of their edges\n"
     "Filters the edge pairs in the edge pair collection by orientation. If \"inverse\" is false, only "
     "edge pairs with at least one edge having the given angle to the x-axis are returned. If \"inverse\" is true, "
     "edge pairs not fulfilling this criterion are returned.\n"
+    "\n"
+    "With 'absolute_angle' set to false (the default), the angle against the x axis can be negative or positive. "
+    "Edges pointing 'down' make negative angles while edges pointing 'up' make positive angles. With "
+    "'absolute_angle' set to true, the angles are always positive.\n"
     "\n"
     "This will filter edge pairs with at least one horizontal edge:\n"
     "\n"
@@ -946,9 +950,9 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "others = edge_pairs.with_angle_both(0, true)\n"
     "@/code\n"
     "\n"
-    "This method has been added in version 0.27.1.\n"
+    "This method has been added in version 0.27.1. 'absolute_angle' has been introduced in version 0.29.1.\n"
   ) +
-  method_ext ("with_angle", with_angle2, gsi::arg ("min_angle"), gsi::arg ("max_angle"), gsi::arg ("inverse"), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", false),
+  method_ext ("with_angle", with_angle2, gsi::arg ("min_angle"), gsi::arg ("max_angle"), gsi::arg ("inverse"), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", false), gsi::arg ("absolute_angle", false),
     "@brief Filter the edge pairs by orientation of their edges\n"
     "Filters the edge pairs in the edge pair collection by orientation. If \"inverse\" is false, only "
     "edge pairs with at least one edge having an angle between min_angle and max_angle are returned. If \"inverse\" is true, "
@@ -956,6 +960,10 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "\n"
     "With \"include_min_angle\" set to true (the default), the minimum angle is included in the criterion while with false, the "
     "minimum angle itself is not included. Same for \"include_max_angle\" where the default is false, meaning the maximum angle is not included in the range.\n"
+    "\n"
+    "With 'absolute_angle' set to false (the default), the angle against the x axis can be negative or positive. "
+    "Edges pointing 'down' make negative angles while edges pointing 'up' make positive angles. With "
+    "'absolute_angle' set to true, the angles are always positive.\n"
     "\n"
     "Note that the inverse @b result @/b of \\with_angle is delivered by \\with_angle_both with the inverse flag set as edge pairs are unselected when both edges fail to meet the criterion.\n"
     "I.e\n"
@@ -965,7 +973,7 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "others = edge_pairs.with_angle_both(0, 45, true)\n"
     "@/code\n"
     "\n"
-    "This method has been added in version 0.27.1.\n"
+    "This method has been added in version 0.27.1. 'absolute_angle' has been introduced in version 0.29.1.\n"
   ) +
   method_ext ("with_angle", with_angle3, gsi::arg ("type"), gsi::arg ("inverse"),
     "@brief Filter the edge pairs by orientation of their edges\n"
@@ -986,7 +994,7 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "\n"
     "This method has been added in version 0.28.\n"
   ) +
-  method_ext ("with_angle_both", with_angle_both1, gsi::arg ("angle"), gsi::arg ("inverse"),
+  method_ext ("with_angle_both", with_angle_both1, gsi::arg ("angle"), gsi::arg ("inverse"), gsi::arg ("absolute_angle", false),
     "@brief Filter the edge pairs by orientation of both of their edges\n"
     "Filters the edge pairs in the edge pair collection by orientation. If \"inverse\" is false, only "
     "edge pairs with both edges having the given angle to the x-axis are returned. If \"inverse\" is true, "
@@ -1008,7 +1016,7 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "\n"
     "This method has been added in version 0.27.1.\n"
   ) +
-  method_ext ("with_angle_both", with_angle_both2, gsi::arg ("min_angle"), gsi::arg ("max_angle"), gsi::arg ("inverse"), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", false),
+  method_ext ("with_angle_both", with_angle_both2, gsi::arg ("min_angle"), gsi::arg ("max_angle"), gsi::arg ("inverse"), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", false), gsi::arg ("absolute_angle", false),
     "@brief Filter the edge pairs by orientation of both of their edges\n"
     "Filters the edge pairs in the edge pair collection by orientation. If \"inverse\" is false, only "
     "edge pairs with both edges having an angle between min_angle and max_angle are returned. If \"inverse\" is true, "
@@ -1016,6 +1024,10 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "\n"
     "With \"include_min_angle\" set to true (the default), the minimum angle is included in the criterion while with false, the "
     "minimum angle itself is not included. Same for \"include_max_angle\" where the default is false, meaning the maximum angle is not included in the range.\n"
+    "\n"
+    "With 'absolute_angle' set to false (the default), the angle against the x axis can be negative or positive. "
+    "Edges pointing 'down' make negative angles while edges pointing 'up' make positive angles. With "
+    "'absolute_angle' set to true, the angles are always positive.\n"
     "\n"
     "Note that the inverse @b result @/b of \\with_angle_both is delivered by \\with_angle with the inverse flag set as edge pairs are unselected when one edge fails to meet the criterion.\n"
     "I.e\n"
@@ -1025,7 +1037,7 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "others = edge_pairs.with_angle(0, 45, true)\n"
     "@/code\n"
     "\n"
-    "This method has been added in version 0.27.1.\n"
+    "This method has been added in version 0.27.1. 'absolute_angle' has been introduced in version 0.29.1.\n"
   ) +
   method_ext ("with_angle_both", with_angle_both3, gsi::arg ("type"), gsi::arg ("inverse"),
     "@brief Filter the edge pairs by orientation of their edges\n"

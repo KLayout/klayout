@@ -438,15 +438,15 @@ static db::Edges with_length2 (const db::Edges *r, const tl::Variant &min, const
   return r->filtered (f);
 }
 
-static db::Edges with_angle1 (const db::Edges *r, double a, bool inverse)
+static db::Edges with_angle1 (const db::Edges *r, double a, bool inverse, bool absolute)
 {
-  db::EdgeOrientationFilter f (a, inverse);
+  db::EdgeOrientationFilter f (a, inverse, absolute);
   return r->filtered (f);
 }
 
-static db::Edges with_angle2 (const db::Edges *r, double amin, double amax, bool inverse, bool include_amin, bool include_amax)
+static db::Edges with_angle2 (const db::Edges *r, double amin, double amax, bool inverse, bool include_amin, bool include_amax, bool absolute)
 {
-  db::EdgeOrientationFilter f (amin, include_amin, amax, include_amax, inverse);
+  db::EdgeOrientationFilter f (amin, include_amin, amax, include_amax, inverse, absolute);
   return r->filtered (f);
 }
 
@@ -901,19 +901,25 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "\n"
     "If you don't want to specify a lower or upper limit, pass nil to that parameter.\n"
   ) +
-  method_ext ("with_angle", with_angle1, gsi::arg ("angle"), gsi::arg ("inverse"),
+  method_ext ("with_angle", with_angle1, gsi::arg ("angle"), gsi::arg ("inverse"), gsi::arg ("absolute_angle", false),
     "@brief Filters the edges by orientation\n"
     "Filters the edges in the edge collection by orientation. If \"inverse\" is false, only "
     "edges which have the given angle to the x-axis are returned. If \"inverse\" is true, "
     "edges not having the given angle are returned.\n"
+    "\n"
+    "With 'absolute_angle' set to false (the default), the angle against the x axis can be negative or positive. "
+    "Edges pointing 'down' make negative angles while edges pointing 'up' make positive angles. With "
+    "'absolute_angle' set to true, the angles are always positive.\n"
     "\n"
     "This will select horizontal edges:\n"
     "\n"
     "@code\n"
     "horizontal = edges.with_angle(0, false)\n"
     "@/code\n"
+    "\n"
+    "'absolute_angle' has been introduced in version 0.29.1."
   ) +
-  method_ext ("with_angle", with_angle2, gsi::arg ("min_angle"), gsi::arg ("max_angle"), gsi::arg ("inverse"), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", false),
+  method_ext ("with_angle", with_angle2, gsi::arg ("min_angle"), gsi::arg ("max_angle"), gsi::arg ("inverse"), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", false), gsi::arg ("absolute_angle", false),
     "@brief Filters the edges by orientation\n"
     "Filters the edges in the edge collection by orientation. If \"inverse\" is false, only "
     "edges which have an angle to the x-axis larger or equal to \"min_angle\" (depending on \"include_min_angle\") and equal or less than \"max_angle\" (depending on \"include_max_angle\") are "
@@ -923,7 +929,12 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "With \"include_min_angle\" set to true (the default), the minimum angle is included in the criterion while with false, the "
     "minimum angle itself is not included. Same for \"include_max_angle\" where the default is false, meaning the maximum angle is not included in the range.\n"
     "\n"
-    "The two \"include..\" arguments have been added in version 0.27."
+    "With 'absolute_angle' set to false (the default), the angle against the x axis can be negative or positive. "
+    "Edges pointing 'down' make negative angles while edges pointing 'up' make positive angles. With "
+    "'absolute_angle' set to true, the angles are always positive.\n"
+    "\n"
+    "The two \"include..\" arguments have been added in version 0.27. "
+    "'absolute_angle' has been introduced in version 0.29.1."
   ) +
   method_ext ("with_angle", with_angle3, gsi::arg ("type"), gsi::arg ("inverse"),
     "@brief Filters the edges by orientation type\n"

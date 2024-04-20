@@ -27,4 +27,6 @@ l1.drc(angle < 0.0).output(111, 0)
 l1.drc(primary.angle > 0.0).output(112, 0)
 l1.drc(primary.edges.angle == 90).output(113, 0)
 l1.drc((angle == 0.0) + (angle == 90)).output(114, 0)
+l1.drc(angle == 45).output(115, 0)
+l1.drc(angle(absolute) == 45).output(116, 0)
 

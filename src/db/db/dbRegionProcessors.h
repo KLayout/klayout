@@ -114,7 +114,7 @@ private:
 class DB_PUBLIC CornerDetectorCore
 {
 public:
-  CornerDetectorCore (double angle_start, bool include_angle_start, double angle_end, bool include_angle_end);
+  CornerDetectorCore (double angle_start, bool include_angle_start, double angle_end, bool include_angle_end, bool inverse, bool absolute);
   virtual ~CornerDetectorCore () { }
 
   void detect_corners (const db::Polygon &poly, const CornerPointDelivery &delivery) const;
@@ -130,8 +130,8 @@ class DB_PUBLIC CornersAsRectangles
   : public db::PolygonProcessorBase, private CornerDetectorCore
 {
 public:
-  CornersAsRectangles (double angle_start, bool include_angle_start, double angle_end, bool include_angle_end, db::Coord dim = 1)
-    : CornerDetectorCore (angle_start, include_angle_start, angle_end, include_angle_end), m_dim (dim)
+  CornersAsRectangles (double angle_start, bool include_angle_start, double angle_end, bool include_angle_end, bool inverse, bool absolute, db::Coord dim = 1)
+    : CornerDetectorCore (angle_start, include_angle_start, angle_end, include_angle_end, inverse, absolute), m_dim (dim)
   {
     //  .. nothing yet ..
   }
@@ -159,8 +159,8 @@ class DB_PUBLIC CornersAsDots
   : public db::PolygonToEdgeProcessorBase, private CornerDetectorCore
 {
 public:
-  CornersAsDots (double angle_start, bool include_angle_start, double angle_end, bool include_angle_end)
-    : CornerDetectorCore (angle_start, include_angle_start, angle_end, include_angle_end)
+  CornersAsDots (double angle_start, bool include_angle_start, double angle_end, bool include_angle_end, bool inverse, bool absolute)
+    : CornerDetectorCore (angle_start, include_angle_start, angle_end, include_angle_end, inverse, absolute)
   {
     //  .. nothing yet ..
   }
@@ -184,8 +184,8 @@ class DB_PUBLIC CornersAsEdgePairs
   : public db::PolygonToEdgePairProcessorBase, private CornerDetectorCore
 {
 public:
-  CornersAsEdgePairs (double angle_start, bool include_angle_start, double angle_end, bool include_angle_end)
-    : CornerDetectorCore (angle_start, include_angle_start, angle_end, include_angle_end)
+  CornersAsEdgePairs (double angle_start, bool include_angle_start, double angle_end, bool include_angle_end, bool inverse, bool absolute)
+    : CornerDetectorCore (angle_start, include_angle_start, angle_end, include_angle_end, inverse, absolute)
   {
     //  .. nothing yet ..
   }

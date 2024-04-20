@@ -691,7 +691,7 @@ CODE
   # This operation selects edges by their angle, measured against the horizontal 
   # axis in the mathematical sense. 
   #
-  # For this measurement edges are considered without their direction and straight lines. 
+  # For this measurement edges are considered without their direction.
   # A horizontal edge has an angle of zero degree. A vertical one has
   # an angle of 90 degrees. The angle range is from -90 (exclusive) to 90 degree (inclusive).
   #
@@ -699,23 +699,43 @@ CODE
   # before the angle test is made.
   # 
   # For example, the following code selects all edges from the primary shape which are 45 degree
-  # (up) or 135 degree (down). The "+" will join the results:
+  # (up) or -45 degree (down). The "+" operator will join the results:
   #
   # @code
-  # out = in.drc((angle == 45) + (angle == 135)) 
-  # out = in.drc((primary.angle == 45) + (primary.angle == 135))    # equivalent
+  # out = in.drc((angle == 45) + (angle == -45)) 
+  # out = in.drc((primary.angle == 45) + (primary.angle == -45))    # equivalent
   # @/code
   #
-  # Note that angle checks usually imply the need to rotation variant formation as cells which
+  # You can avoid using both 45 and -45 degree checks with the 'absolute' option.
+  # With this option, angles are not signed and the value is the absolute angle 
+  # the edge encloses with the x axis:
+  #
+  # @code
+  # out = in.drc(angle(absolute) == 45)
+  # @/code
+  #
+  # Note that angle checks usually imply the need for rotation variant formation as cells which
   # are placed non-rotated and rotated by 90 degree cannot be considered identical. This imposes
   # a performance penalty in hierarchical mode. If possible, consider using \DRC#rectilinear for
   # example to detect shapes with non-manhattan geometry instead of using angle checks.
   #
   # The "angle" method is available as a plain function or as a method on \DRC# expressions.
-  # The plain function is equivalent to "primary.angle".
+  # The plain function is equivalent to the method call "primary.angle".
 
-  def angle
-    DRCOpNodeEdgeOrientationFilter::new(@engine, self)
+  def angle(*args)
+
+    filter = DRCOpNodeEdgeOrientationFilter::new(@engine, self)
+
+    args.each do |a|
+      if a.is_a?(DRCAbsoluteMode)
+        filter.absolute = a.value
+      else
+        raise("Invalid argument (#{a.inspect}) for 'angle' method")
+      end
+    end
+    
+    filter
+    
   end
   
   # %DRC%
@@ -758,8 +778,7 @@ CODE
   # @name corners
   # @brief Selects corners of polygons
   # @synopsis expression.corners
-  # @synopsis expression.corners(as_dots)
-  # @synopsis expression.corners(as_boxes)
+  # @synopsis expression.corners([ options ])
   #
   # This operation acts on polygons and selects the corners of the polygons.
   # It can be put into a condition to select corners by their angles. The angle of
@@ -768,9 +787,19 @@ CODE
   # (inner) corners, negative ones indicate convex (outer) corners.
   # Angles take values between -180 and 180 degree.
   #
-  # When using "as_dots" for the argument, the operation will return single-point edges at
+  # When using "as_dots" for an option, the operation will return single-point edges at
   # the selected corners. With "as_boxes" (the default), small (2x2 DBU) rectangles will be
   # produced at each selected corner.
+  # 
+  # Another option is "absolute" which selects the corners by absolute angle - i.e left
+  # and right turns will both be considered positive angles.
+  #
+  # Examples for use of the options are:
+  #
+  # @code
+  # corners(as_dots)
+  # corners(as_boxes, absolute)
+  # @/code
   #
   # The following example selects all corners:
   #
@@ -789,14 +818,20 @@ CODE
   # The "corners" method is available as a plain function or as a method on \DRC# expressions.
   # The plain function is equivalent to "primary.corners".
 
-  def corners(output_mode = DRCOutputMode::new(:dots))
+  def corners(*args)
     @engine._context("corners") do
-      if output_mode.is_a?(DRCOutputMode)
-        output_mode = output_mode.value
-      else
-        raise("Invalid argument (#{as_dots.inspect}) for 'corners' method")
+      output_mode = :as_boxes
+      absolute = false
+      args.each do |a|
+        if a.is_a?(DRCOutputMode)
+          output_mode = a.value
+        elsif a.is_a?(DRCAbsoluteMode)
+          absolute = a.value
+        else
+          raise("Invalid argument (#{a.inspect}) for 'corners' method")
+        end
       end
-      DRCOpNodeCornersFilter::new(@engine, output_mode, self)
+      DRCOpNodeCornersFilter::new(@engine, output_mode, absolute, self)
     end
   end
   
@@ -1721,6 +1756,7 @@ class DRCOpNodeEdgeOrientationFilter < DRCOpNodeWithCompare
 
   attr_accessor :input
   attr_accessor :inverse
+  attr_accessor :absolute
   
   def initialize(engine, input)
     super(engine)
@@ -1748,6 +1784,7 @@ class DRCOpNodeEdgeOrientationFilter < DRCOpNodeWithCompare
     args << (self.gt ? false : true)
     args << (self.lt ? self.lt : (self.le ? self.le + angle_delta : 180.0))
     args << (self.lt ? false : true)
+    args << self.absolute
 
     RBA::CompoundRegionOperationNode::new_edge_orientation_filter(*args)
 
@@ -2037,12 +2074,16 @@ class DRCOpNodeCornersFilter < DRCOpNodeWithCompare
 
   attr_accessor :input
   attr_accessor :output_mode
+  attr_accessor :inverse
+  attr_accessor :absolute
   
-  def initialize(engine, output_mode, input)
+  def initialize(engine, output_mode, absolute, input)
     super(engine)
     self.output_mode = output_mode
     self.input = input
     self.description = "corners"
+    self.inverse = false
+    self.absolute = absolute
   end
   
   def do_create_node(cache)
@@ -2052,13 +2093,25 @@ class DRCOpNodeCornersFilter < DRCOpNodeWithCompare
     args << (self.lt ? self.lt : (self.le ? self.le : 180.0))
     args << (self.lt ? false : true)
     if self.output_mode == :dots || self.output_mode == :edges
+      args << self.inverse
+      args << self.absolute
       RBA::CompoundRegionOperationNode::new_corners_as_dots(*args)
     elsif self.output_mode == :edge_pairs
+      args << self.inverse
+      args << self.absolute
       RBA::CompoundRegionOperationNode::new_corners_as_edge_pairs(*args)
     else
       args << 2 # dimension is 2x2 DBU
+      args << self.inverse
+      args << self.absolute
       RBA::CompoundRegionOperationNode::new_corners_as_rectangles(*args)
     end
+  end
+  
+  def inverted
+    res = self.dup
+    res.inverse = !res.inverse
+    return res
   end
 
 end

@@ -2198,13 +2198,27 @@ Service::paste ()
       }
     }
 
+    std::vector<const db::DUserObject *> new_objects;
+
     for (db::Clipboard::iterator c = db::Clipboard::instance ().begin (); c != db::Clipboard::instance ().end (); ++c) {
       const db::ClipboardValue<ant::Object> *value = dynamic_cast<const db::ClipboardValue<ant::Object> *> (*c);
       if (value) {
         ant::Object *ruler = new ant::Object (value->get ());
         ruler->id (++idmax);
-        mp_view->annotation_shapes ().insert (db::DUserObject (ruler));
+        new_objects.push_back (&mp_view->annotation_shapes ().insert (db::DUserObject (ruler)));
       }
+    }
+
+    //  make new objects selected
+
+    if (! new_objects.empty ()) {
+
+      for (auto r = new_objects.begin (); r != new_objects.end (); ++r) {
+        m_selected.insert (std::make_pair (mp_view->annotation_shapes ().iterator_from_pointer (*r), 0));
+      }
+
+      selection_to_view ();
+
     }
 
   }

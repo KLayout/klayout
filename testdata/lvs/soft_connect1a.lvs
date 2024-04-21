@@ -1,0 +1,92 @@
+
+$lvs_test_source && source($lvs_test_source)
+
+if $lvs_test_target_l2n
+  report_netlist($lvs_test_target_l2n)
+else
+  report_netlist
+end
+
+writer = write_spice(true, false)
+$lvs_test_target_cir && target_netlist($lvs_test_target_cir, writer, "Extracted by KLayout")
+
+deep
+
+# Drawing layers
+
+nwell       = input(1, 0)
+active      = input(2, 0)
+nplus       = input(2, 1)
+pplus       = input(2, 2)
+poly        = input(3, 0)
+poly_lbl    = input(3, 1)
+diff_cont   = input(4, 0)
+poly_cont   = input(5, 0)
+metal1      = input(6, 0)
+metal1_lbl  = input(6, 1)
+via1        = input(7, 0)
+metal2      = input(8, 0)
+metal2_lbl  = input(8, 1)
+
+# Bulk layer for terminal provisioning
+
+bulk        = polygon_layer
+
+psd = nil
+nsd = nil
+
+# Computed layers
+
+active_in_nwell       = active & nwell
+pactive               = active_in_nwell & pplus
+ntie                  = active_in_nwell & nplus
+pgate                 = pactive & poly
+psd                   = pactive - pgate
+
+active_outside_nwell  = active - nwell
+nactive               = active_outside_nwell & nplus
+ptie                  = active_outside_nwell & pplus
+ngate                 = nactive & poly
+nsd                   = nactive - ngate
+
+# Device extraction
+
+# PMOS transistor device extraction
+extract_devices(mos4("PMOS"), { "SD" => psd, "G" => pgate, "W" => nwell,
+                                "tS" => psd, "tD" => psd, "tG" => poly })
+
+# NMOS transistor device extraction
+extract_devices(mos4("NMOS"), { "SD" => nsd, "G" => ngate, "W" => bulk,
+                                "tS" => nsd, "tD" => nsd, "tG" => poly })
+
+# Define connectivity for netlist extraction
+
+# Inter-layer
+
+soft_connect(diff_cont, psd)
+soft_connect(diff_cont, nsd)
+soft_connect(diff_cont, ptie)
+soft_connect(diff_cont, ntie)
+soft_connect(ntie, nwell)
+soft_connect(poly_cont, poly)
+
+connect(diff_cont, metal1)
+connect(poly_cont, metal1)
+connect(metal1, via1)
+connect(via1, metal2)
+
+# attach labels
+connect(poly, poly_lbl)
+connect(metal1, metal1_lbl)
+connect(metal2, metal2_lbl)
+
+# Global
+soft_connect_global(bulk, "SUBSTRATE")
+soft_connect_global(ptie, "SUBSTRATE")
+
+# Netlist section (NOTE: we only check log here)
+netlist
+
+netlist.simplify
+
+

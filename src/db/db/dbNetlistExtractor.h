@@ -233,7 +233,7 @@ private:
   /**
    *  @brief Makes the terminal to cluster ID connections of the device abstract
    */
-  void make_device_abstract_connections (db::DeviceAbstract *dm, const connected_clusters_type &clusters);
+  void make_device_abstract_connections (db::DeviceAbstract *dm, connected_clusters_type &clusters);
 
 };
 

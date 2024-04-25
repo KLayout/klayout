@@ -403,6 +403,55 @@ Values::operator= (const Values &d)
   return *this;
 }
 
+bool
+Values::compare (const Values &other, const std::map<id_type, id_type> &tag_map, const std::map<id_type, id_type> &rev_tag_map) const
+{
+  Values::const_iterator a = begin (), b = other.begin ();
+  while (a != end () && b != other.end ()) {
+
+    id_type t12 = 0;
+    while (a != end () && a->tag_id () != 0) {
+      auto j = tag_map.find (a->tag_id ());
+      if (j != tag_map.end ()) {
+        t12 = j->second;
+        break;
+      }
+      ++a;
+    }
+
+    id_type t2 = 0;
+    while (b != end () && b->tag_id () != 0) {
+      auto j = rev_tag_map.find (b->tag_id ());
+      if (j != rev_tag_map.end ()) {
+        t2 = j->first;
+        break;
+      }
+      ++b;
+    }
+
+    if (a == end () || b == other.end ()) {
+      return b != other.end ();
+    }
+
+    if (t12 != t2) {
+      return t12 < t2;
+    }
+
+    if (a->get () && b->get ()) {
+      if (a->get ()->compare (b->get ())) {
+        return true;
+      } else if (b->get ()->compare (a->get ())) {
+        return false;
+      }
+    } else if ((a->get () != 0) != (b->get () != 0)) {
+      return (a->get () != 0) < (b->get () != 0);
+    }
+
+  }
+
+  return false;
+}
+
 std::string 
 Values::to_string (const Database *rdb) const
 {
@@ -1656,6 +1705,151 @@ Database::load (const std::string &fn)
 
   if (tl::verbosity () >= 10) {
     tl::info << "Loaded RDB from " << fn;
+  }
+}
+
+namespace
+{
+  class ValueMapEntryCompare
+  {
+  public:
+    ValueMapEntryCompare (const std::map<id_type, id_type> &tag2tag, const std::map<id_type, id_type> &rev_tag2tag)
+    {
+      mp_tag2tag = &tag2tag;
+      mp_rev_tag2tag = &rev_tag2tag;
+    }
+
+    bool operator() (const Item *a, const Item *b) const
+    {
+      return a->values ().compare (b->values (), *mp_tag2tag, *mp_rev_tag2tag);
+    }
+
+  private:
+    const std::map<id_type, id_type> *mp_tag2tag;
+    const std::map<id_type, id_type> *mp_rev_tag2tag;
+  };
+
+  class ValueMapEntry
+  {
+  public:
+    ValueMapEntry ()
+      : mp_tag2tag (0), mp_rev_tag2tag (0)
+    { }
+
+    void build (const rdb::Database &rdb, id_type cell_id, id_type cat_id, const std::map<id_type, id_type> &tag2tag, const std::map<id_type, id_type> &rev_tag2tag)
+    {
+      mp_tag2tag = &tag2tag;
+      mp_rev_tag2tag = &rev_tag2tag;
+
+      auto i2i = rdb.items_by_cell_and_category (cell_id, cat_id);
+
+      size_t n = 0;
+      for (auto i = i2i.first; i != i2i.second; ++i) {
+        ++n;
+      }
+      m_items.reserve (n);
+
+      for (auto i = i2i.first; i != i2i.second; ++i) {
+        m_items.push_back ((*i).operator-> ());
+      }
+
+      ValueMapEntryCompare cmp (*mp_tag2tag, *mp_rev_tag2tag);
+      std::sort (m_items.begin (), m_items.end (), cmp);
+    }
+
+    const Item *find (const rdb::Item &item) const
+    {
+      ValueMapEntryCompare cmp (*mp_tag2tag, *mp_rev_tag2tag);
+
+      auto i = std::lower_bound (m_items.begin (), m_items.end (), &item, cmp);
+      if (i == m_items.end ()) {
+        return 0;
+      }
+
+      if (cmp (&item, *i) || cmp (*i, &item)) {
+        return 0;
+      } else {
+        return *i;
+      }
+    }
+
+  public:
+    std::vector<const Item *> m_items;
+    const std::map<id_type, id_type> *mp_tag2tag;
+    const std::map<id_type, id_type> *mp_rev_tag2tag;
+  };
+}
+
+void
+Database::apply (const rdb::Database &other)
+{
+  std::map<id_type, id_type> cell2cell;
+  std::map<id_type, id_type> cat2cat;
+  std::map<id_type, id_type> tag2tag;
+  std::map<id_type, id_type> rev_tag2tag;
+
+  for (auto c = other.cells ().begin (); c != other.cells ().end (); ++c) {
+    //  TODO: do we have a consistent scheme of naming variants? What requirements
+    //  exist towards detecting variant specific waivers
+    const rdb::Cell *this_cell = cell_by_qname (c->qname ());
+    if (this_cell) {
+      cell2cell.insert (std::make_pair (this_cell->id (), c->id ()));
+    }
+  }
+
+  for (auto c = other.categories ().begin (); c != other.categories ().end (); ++c) {
+    const rdb::Category *this_cat = category_by_name (c->name ());
+    if (this_cat) {
+      cat2cat.insert (std::make_pair (this_cat->id (), c->id ()));
+    }
+  }
+
+  std::map<std::string, id_type> tags_by_name;
+  for (auto c = tags ().begin_tags (); c != tags ().end_tags (); ++c) {
+    tags_by_name.insert (std::make_pair (c->name (), c->id ()));
+  }
+
+  for (auto c = other.tags ().begin_tags (); c != other.tags ().end_tags (); ++c) {
+    auto t = tags_by_name.find (c->name ());
+    if (t != tags_by_name.end ()) {
+      tag2tag.insert (std::make_pair (t->second, c->id ()));
+      rev_tag2tag.insert (std::make_pair (c->id (), t->second));
+    }
+  }
+
+  std::map<std::pair<id_type, id_type>, ValueMapEntry> value_map;
+
+  for (Items::iterator i = items_non_const ().begin (); i != items_non_const ().end (); ++i) {
+
+    auto icell = cell2cell.find (i->cell_id ());
+    if (icell == cell2cell.end ()) {
+      continue;
+    }
+
+    auto icat = cat2cat.find (i->category_id ());
+    if (icat == cat2cat.end ()) {
+      continue;
+    }
+
+    //  build a cache of value vs. value
+    auto vmap = value_map.find (std::make_pair (icell->second, icat->second));
+    if (vmap == value_map.end ()) {
+      vmap = value_map.insert (std::make_pair (std::make_pair (icell->second, icat->second), ValueMapEntry ())).first;
+      vmap->second.build (other, icell->second, icat->second, tag2tag, rev_tag2tag);
+    }
+
+    //  find a value in the reference DB
+    const rdb::Item *other = vmap->second.find (*i);
+    if (other) {
+
+      //  actually transfer the attributes here
+
+      //  TODO: this has some optimization potential in terms of performance ...
+      i->set_image_str (other->image_str ());
+      i->set_tag_str (other->tag_str ());
+
+    }
+
   }
 }
 

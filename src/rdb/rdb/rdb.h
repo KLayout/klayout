@@ -680,6 +680,19 @@ public:
   Values &operator= (const Values &d);
 
   /**
+   *  @brief Compare two value sets (less operator)
+   *
+   *  This compare function will use the tag mapping provided by tag map ("this" tag id to "other" tag id).
+   *  Values with tags not listed in the tag map will not be compared.
+   *  Untagged values (tag_id 0) will be compared always.
+   *
+   *  "rev_tag_map" needs to be the reverse of "tag_map".
+   *
+   *  The order of the values matters.
+   */
+  bool compare (const Values &other, const std::map<id_type, id_type> &tag_map, const std::map<id_type, id_type> &rev_tag_map) const;
+
+  /**
    *  @brief The const iterator (begin)
    */
   const_iterator begin () const
@@ -2381,9 +2394,17 @@ public:
   /**
    *  @brief Load the database from a file
    *
-   *  @brief This clears the existing database.
+   *  Note: This clears the existing database.
    */
   void load (const std::string &filename);
+
+  /**
+   *  @brief Applies the attributes from a different database
+   *
+   *  Attributes are waived flags, images etc.
+   *  The attributes are applied to markers with identical value(s), category and cell context.
+   */
+  void apply (const rdb::Database &other);
 
   /**
    *  @brief Scans a layout into this RDB

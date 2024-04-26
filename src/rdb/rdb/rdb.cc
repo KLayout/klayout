@@ -60,16 +60,18 @@ namespace rdb
 //  type index specializations
 
 template <> RDB_PUBLIC int type_index_of<double> ()        { return 0; }
-template <> RDB_PUBLIC int type_index_of<std::string> ()   { return 1; }
-template <> RDB_PUBLIC int type_index_of<db::DPolygon> ()  { return 2; }
-template <> RDB_PUBLIC int type_index_of<db::DEdge> ()     { return 3; }
-template <> RDB_PUBLIC int type_index_of<db::DEdgePair> () { return 4; }
-template <> RDB_PUBLIC int type_index_of<db::DBox> ()      { return 5; }
-template <> RDB_PUBLIC int type_index_of<db::DPath> ()     { return 6; }
-template <> RDB_PUBLIC int type_index_of<db::DText> ()     { return 7; }
+template <> RDB_PUBLIC int type_index_of<int> ()           { return 1; }
+template <> RDB_PUBLIC int type_index_of<std::string> ()   { return 2; }
+template <> RDB_PUBLIC int type_index_of<db::DPolygon> ()  { return 3; }
+template <> RDB_PUBLIC int type_index_of<db::DEdge> ()     { return 4; }
+template <> RDB_PUBLIC int type_index_of<db::DEdgePair> () { return 5; }
+template <> RDB_PUBLIC int type_index_of<db::DBox> ()      { return 6; }
+template <> RDB_PUBLIC int type_index_of<db::DPath> ()     { return 7; }
+template <> RDB_PUBLIC int type_index_of<db::DText> ()     { return 8; }
 
 //  Explicit instantiations to make VC++ happy in debug mode
 template class RDB_PUBLIC Value<double>;
+template class RDB_PUBLIC Value<int>;
 template class RDB_PUBLIC Value<std::string>;
 template class RDB_PUBLIC Value<db::DPolygon>;
 template class RDB_PUBLIC Value<db::DEdge>;
@@ -83,6 +85,11 @@ template class RDB_PUBLIC Value<db::DText>;
 template <> RDB_PUBLIC std::string Value<double>::to_string () const
 {
   return "float: " + tl::to_string (m_value);
+}
+
+template <> RDB_PUBLIC std::string Value<int>::to_string () const
+{
+  return "int: " + tl::to_string (m_value);
 }
 
 template <> RDB_PUBLIC std::string Value<std::string>::to_string () const
@@ -127,6 +134,11 @@ template <> RDB_PUBLIC std::string Value<double>::to_display_string () const
   return tl::to_string (m_value);
 }
 
+template <> RDB_PUBLIC std::string Value<int>::to_display_string () const
+{
+  return tl::to_string (m_value);
+}
+
 template <> RDB_PUBLIC std::string Value<std::string>::to_display_string () const
 {
   return m_value;
@@ -165,6 +177,11 @@ template <> RDB_PUBLIC std::string Value<db::DText>::to_display_string () const
 //  is_shape implementations
 
 template <> RDB_PUBLIC bool Value<double>::is_shape () const
+{
+  return false;
+}
+
+template <> RDB_PUBLIC bool Value<int>::is_shape () const
 {
   return false;
 }
@@ -420,7 +437,7 @@ Values::compare (const Values &other, const std::map<id_type, id_type> &tag_map,
     }
 
     id_type t2 = 0;
-    while (b != end () && b->tag_id () != 0) {
+    while (b != other.end () && b->tag_id () != 0) {
       auto j = rev_tag_map.find (b->tag_id ());
       if (j != rev_tag_map.end ()) {
         t2 = j->first;
@@ -438,18 +455,21 @@ Values::compare (const Values &other, const std::map<id_type, id_type> &tag_map,
     }
 
     if (a->get () && b->get ()) {
-      if (a->get ()->compare (b->get ())) {
+      if (rdb::ValueBase::compare (a->get (), b->get ())) {
         return true;
-      } else if (b->get ()->compare (a->get ())) {
+      } else if (rdb::ValueBase::compare (b->get (), a->get ())) {
         return false;
       }
     } else if ((a->get () != 0) != (b->get () != 0)) {
       return (a->get () != 0) < (b->get () != 0);
     }
 
+    ++a;
+    ++b;
+
   }
 
-  return false;
+  return b != other.end ();
 }
 
 std::string 

@@ -753,6 +753,14 @@ public:
   }
 
   /**
+   *  @brief Clears the values
+   */
+  void clear ()
+  {
+    m_values.clear ();
+  }
+
+  /**
    *  @brief Convert the values collection to a string 
    */
   std::string to_string (const Database *rdb) const;

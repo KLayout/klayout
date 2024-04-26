@@ -473,13 +473,14 @@ public:
     return true;
   }
 
-  bool no_errors (const QModelIndex &index) const
+  bool no_errors (const QModelIndex &index, bool include_waived = false) const
   {
     MarkerBrowserTreeViewModelCacheEntry *node = (MarkerBrowserTreeViewModelCacheEntry *)(index.internalPointer ());
     if (node && mp_database) {
 
       rdb::id_type id = node->id ();
       bool none = false;
+      size_t thr = include_waived ? node->waived_count () : 0;
 
       const rdb::Cell *cell = mp_database->cell_by_id (id);
       const rdb::Category *category = mp_database->category_by_id (id);
@@ -501,13 +502,13 @@ public:
       }
 
       if (cell == 0 && category == 0) {
-        none = (mp_database->num_items () == 0);
+        none = (mp_database->num_items () <= thr);
       } else if (category == 0) {
-        none = (cell->num_items () == 0);
+        none = (cell->num_items () <= thr);
       } else if (cell == 0) {
-        none = (category->num_items () == 0);
+        none = (category->num_items () <= thr);
       } else {
-        none = (mp_database->num_items (cell->id (), category->id ()) == 0);
+        none = (mp_database->num_items (cell->id (), category->id ()) <= thr);
       } 
 
       return none;
@@ -531,20 +532,30 @@ public:
 
         if (index.column () == 1) {
 
+          std::string s;
+
           if (node->count () > 0) {
+
             size_t visited = node->visited_count (mp_database);
             size_t waived = node->waived_count ();
-// @@@
-return QVariant (tl::to_qstring (tl::sprintf (tl::to_string (tr ("%lu (%lu) - %lu")), node->count (), node->count () - visited, waived)));
-// @@@
+
             if (visited < node->count ()) {
-              return QVariant (tl::to_qstring (tl::sprintf (tl::to_string (tr ("%lu (%lu)")), node->count (), node->count () - visited)));
+              s = tl::sprintf (tl::to_string (tr ("%lu (%lu)")), node->count (), node->count () - visited);
             } else {
-              return QVariant ((unsigned int) node->count ());
+              s = tl::sprintf (tl::to_string (tr ("%lu")), node->count ());
             }
-          } else {
-            return QVariant (QString::fromUtf8 (""));
+
+            if (waived > 0) {
+              if (waived == node->count ()) {
+                s += tl::to_string (tr (" - all waived"));
+              } else {
+                s += tl::sprintf (tl::to_string (tr (" - %lu")), waived);
+              }
+            }
+
           }
+
+          return QVariant (tl::to_qstring (s));
 
         } else if (index.column () == 0) {
 
@@ -608,7 +619,7 @@ return QVariant (tl::to_qstring (tl::sprintf (tl::to_string (tr ("%lu (%lu) - %l
       }
 
       //  Green color if no errors are present
-      if (no_errors (index)) {
+      if (no_errors (index, true)) {
         return QVariant (QColor (0, 192, 0));
       }
 

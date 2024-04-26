@@ -911,6 +911,10 @@ Class<rdb::Item> decl_RdbItem ("rdb", "RdbItem",
     "@brief Remove the tag with the given id from the item\n"
     "If a tag with that ID does not exists on this item, this method does nothing."
   ) +
+  gsi::method ("remove_tags", &rdb::Item::remove_tags,
+    "@brief Removes all tags from the item\n"
+    "This method has been introduced in version 0.29.1."
+  ) +
   gsi::method ("has_tag?", &rdb::Item::has_tag, gsi::arg ("tag_id"),
     "@brief Returns a value indicating whether the item has a tag with the given ID\n"
     "@return True, if the item has a tag with the given ID\n"
@@ -1561,6 +1565,36 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
     "@param category_id The ID of the category to which the item is associated\n"
     "@param trans The transformation to apply\n"
     "@param edge_pairs The list of edge_pairs for which the items are created\n"
+  ) +
+  gsi::method ("apply", &rdb::Database::apply, gsi::arg ("other"),
+    "@brief Transfers item attributes from one database to another for identical items\n"
+    "This method will identify items that are identical between the two databases and transfer "
+    "item attributes from the 'other' database to this database. Transferable attributes are:\n"
+    "\n"
+    "@ul\n"
+    "@li Images @/li\n"
+    "@li Item tags @/li\n"
+    "@/ul\n"
+    "\n"
+    "Existing attributes in this database are overwritten.\n"
+    "\n"
+    "Items are identical if\n"
+    "\n"
+    "@ul\n"
+    "@li They belong to the same cell (by qname) @/li\n"
+    "@li They belong to the same category (by name) @/li\n"
+    "@li Their values are identical @/li\n"
+    "@/ul\n"
+    "\n"
+    "Values are identical if their individual values and (optional) value tags are identical. "
+    "Values tagged with a tag unknown to the other database are ignored. "
+    "The order of values matters during the compare. So the value pair (17.0, 'abc') is different from ('abc', 17.0).\n"
+    "\n"
+    "The intended application for this method is use for error waiving: as the waived attribute is a transferable "
+    "attribute, it is possible to apply the waived flag from from a waiver database (the 'other' database) using this "
+    "method.\n"
+    "\n"
+    "This method has been added in version 0.29.1."
   ) +
   gsi::method ("is_modified?", &rdb::Database::is_modified,
     "@brief Returns a value indicating whether the database has been modified\n"

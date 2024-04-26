@@ -103,13 +103,13 @@ class MarkerBrowserTreeViewModelCacheEntry
 {
 public:
   MarkerBrowserTreeViewModelCacheEntry ()
-    : mp_parent (0), m_id (0), m_row (0), m_count (0)
+    : mp_parent (0), m_id (0), m_row (0), m_count (0), m_waived_count (0)
   {
     // .. nothing yet ..
   }
 
   MarkerBrowserTreeViewModelCacheEntry (rdb::id_type id, unsigned int branch)
-    : mp_parent (0), m_id ((id << 3) + (branch << 1)), m_row (0), m_count (0)
+    : mp_parent (0), m_id ((id << 3) + (branch << 1)), m_row (0), m_count (0), m_waived_count (0)
   {
     // .. nothing yet ..
   }
@@ -233,6 +233,25 @@ public:
     m_count = c;
   }
 
+  size_t waived_count () const
+  {
+    return m_waived_count;
+  }
+
+  void set_waived_count (size_t c)
+  {
+    m_waived_count = c;
+  }
+
+  void waive_or_unwaive (bool w)
+  {
+    if (w) {
+      ++m_waived_count;
+    } else {
+      --m_waived_count;
+    }
+  }
+
   void sort_by_key_name (bool ascending, const rdb::Database *database)
   {
     std::sort (m_ids.begin (), m_ids.end (), SortByKeyCompareFunc (ascending, database));
@@ -257,7 +276,7 @@ private:
   MarkerBrowserTreeViewModelCacheEntry *mp_parent;
   rdb::id_type m_id;
   unsigned int m_row;
-  size_t m_count;
+  size_t m_count, m_waived_count;
   std::vector<MarkerBrowserTreeViewModelCacheEntry *> m_ids;
 };
 
@@ -338,14 +357,15 @@ public:
   };
 
   MarkerBrowserTreeViewModel ()
-    : mp_database (0), m_show_empty_ones (true)
+    : mp_database (0), m_show_empty_ones (true), m_waived_tag_id (0)
   {
-    // .. nothing yet ..
+    //  .. nothing yet ..
   }
 
   void set_database (const rdb::Database *db)
   {
     mp_database = db;
+    m_waived_tag_id = mp_database ? mp_database->tags ().tag ("waived").id () : 0;
     invalidate ();
   }
 
@@ -381,6 +401,23 @@ public:
 
       changePersistentIndexList (pi, new_pi);
 
+    }
+  }
+
+  void waived_changed (const rdb::Item *item, bool waived)
+  {
+    const rdb::Category *cat = mp_database->category_by_id (item->category_id ());
+    while (cat) {
+      waive_or_unwaive (0, cat->id (), waived);
+      if (item->cell_id () != 0) {
+        waive_or_unwaive (item->cell_id (), cat->id (), waived);
+      }
+      cat = cat->parent ();
+    }
+
+    waive_or_unwaive (0, 0, waived);
+    if (item->cell_id () != 0) {
+      waive_or_unwaive (item->cell_id (), 0, waived);
     }
   }
 
@@ -496,8 +533,12 @@ public:
 
           if (node->count () > 0) {
             size_t visited = node->visited_count (mp_database);
+            size_t waived = node->waived_count ();
+// @@@
+return QVariant (tl::to_qstring (tl::sprintf (tl::to_string (tr ("%lu (%lu) - %lu")), node->count (), node->count () - visited, waived)));
+// @@@
             if (visited < node->count ()) {
-              return QVariant (tl::to_qstring (tl::sprintf (tl::to_string (QObject::tr ("%lu (%lu)")), node->count (), node->count () - visited)));
+              return QVariant (tl::to_qstring (tl::sprintf (tl::to_string (tr ("%lu (%lu)")), node->count (), node->count () - visited)));
             } else {
               return QVariant ((unsigned int) node->count ());
             }
@@ -725,22 +766,85 @@ public:
 private:
   const rdb::Database *mp_database;
   mutable MarkerBrowserTreeViewModelCacheEntry m_cache;
+  mutable std::multimap<std::pair<rdb::id_type, rdb::id_type>, MarkerBrowserTreeViewModelCacheEntry *> m_cache_by_ids;
   bool m_show_empty_ones;
+  id_type m_waived_tag_id;
+
+  void waive_or_unwaive (rdb::id_type cell_id, rdb::id_type cat_id, bool waived)
+  {
+    auto k = std::make_pair (cell_id, cat_id);
+    auto c = m_cache_by_ids.find (k);
+    while (c != m_cache_by_ids.end () && c->first == k) {
+      c->second->waive_or_unwaive (waived);
+      ++c;
+    }
+  }
+
+  size_t num_waived () const
+  {
+    size_t n = 0;
+    for (auto i = mp_database->items ().begin (); i != mp_database->items ().end (); ++i) {
+      if (i->has_tag (m_waived_tag_id)) {
+        ++n;
+      }
+    }
+    return n;
+  }
+
+  size_t num_waived_per_cat (id_type cat_id) const
+  {
+    auto ii = mp_database->items_by_category (cat_id);
+    size_t n = 0;
+    for (auto i = ii.first; i != ii.second; ++i) {
+      if ((*i)->has_tag (m_waived_tag_id)) {
+        ++n;
+      }
+    }
+    return n;
+  }
+
+  size_t num_waived_per_cell_and_cat (id_type cell_id, id_type cat_id) const
+  {
+    auto ii = mp_database->items_by_cell_and_category (cell_id, cat_id);
+    size_t n = 0;
+    for (auto i = ii.first; i != ii.second; ++i) {
+      if ((*i)->has_tag (m_waived_tag_id)) {
+        ++n;
+      }
+    }
+    return n;
+  }
+
+  size_t num_waived_per_cell (id_type cell_id) const
+  {
+    auto ii = mp_database->items_by_cell (cell_id);
+    size_t n = 0;
+    for (auto i = ii.first; i != ii.second; ++i) {
+      if ((*i)->has_tag (m_waived_tag_id)) {
+        ++n;
+      }
+    }
+    return n;
+  }
 
   void invalidate ()
   {
     beginResetModel ();
 
     m_cache.clear ();
+    m_cache_by_ids.clear ();
     
     MarkerBrowserTreeViewModelCacheEntry *by_cell_node = new MarkerBrowserTreeViewModelCacheEntry(0, 0);
     m_cache.add_child (by_cell_node);
+    m_cache_by_ids.insert (std::make_pair (std::make_pair (rdb::id_type (0), rdb::id_type (0)), by_cell_node));
 
     MarkerBrowserTreeViewModelCacheEntry *by_category_node = new MarkerBrowserTreeViewModelCacheEntry(0, 1);
     m_cache.add_child (by_category_node);
+    m_cache_by_ids.insert (std::make_pair (std::make_pair (rdb::id_type (0), rdb::id_type (0)), by_category_node));
 
     MarkerBrowserTreeViewModelCacheEntry *all_node = new MarkerBrowserTreeViewModelCacheEntry(0, 2);
     m_cache.add_child (all_node);
+    m_cache_by_ids.insert (std::make_pair (std::make_pair (rdb::id_type (0), rdb::id_type (0)), all_node));
 
     m_cache.set_cache_valid (true);
 
@@ -760,18 +864,22 @@ private:
   {
     const rdb::Category *category = mp_database->category_by_id (node->id ());
     if (category) {
+
       for (rdb::Categories::const_iterator c = category->sub_categories ().begin (); c != category->sub_categories ().end (); ++c) {
 
         node->set_cache_valid (true);
 
         MarkerBrowserTreeViewModelCacheEntry *child = new MarkerBrowserTreeViewModelCacheEntry (c->id (), node->branch ());
+        m_cache_by_ids.insert (std::make_pair (std::make_pair (rdb::id_type (0), c->id ()), child));
         node->add_child (child);
 
         child->set_count (mp_database->category_by_id (c->id ())->num_items ());
+        child->set_waived_count (num_waived_per_cat (c->id ()));
 
         add_sub_categories (child);
 
       }
+
     }
   }
 
@@ -781,19 +889,24 @@ private:
 
     const rdb::Category *category = mp_database->category_by_id (node->id ());
     if (category) {
+
       for (rdb::Categories::const_iterator c = category->sub_categories ().begin (); c != category->sub_categories ().end (); ++c) {
+
         if (partial_tree.find (c->id ()) != partial_tree.end ()) {
 
           MarkerBrowserTreeViewModelCacheEntry *child = new MarkerBrowserTreeViewModelCacheEntry (c->id (), node->branch ());
+          m_cache_by_ids.insert (std::make_pair (std::make_pair (cell_id, c->id ()), child));
           node->add_child (child);
 
-          size_t n = mp_database->num_items (cell_id, c->id ());
-          child->set_count (n);
+          child->set_count (mp_database->num_items (cell_id, c->id ()));
+          child->set_waived_count (num_waived_per_cell_and_cat (cell_id, c->id ()));
 
           add_sub_categories (cell_id, child, partial_tree);
 
         }
+
       }
+
     }
   }
 
@@ -813,27 +926,44 @@ private:
       if (branch == 0) {
 
         for (rdb::Database::const_cell_iterator c = mp_database->cells ().begin (); c != mp_database->cells ().end (); ++c) {
+
           if (mp_database->cell_by_id (c->id ()) && (m_show_empty_ones || mp_database->cell_by_id (c->id ())->num_items () != 0)) {
+
             MarkerBrowserTreeViewModelCacheEntry *child = new MarkerBrowserTreeViewModelCacheEntry (c->id (), branch);
+            m_cache_by_ids.insert (std::make_pair (std::make_pair (c->id (), rdb::id_type (0)), child));
+
             child->set_count (mp_database->cell_by_id (c->id ())->num_items ());
+            child->set_waived_count (num_waived_per_cell (c->id ()));
+
             node->add_child (child);
+
           }
+
         }
 
       } else if (branch == 1) {
 
         for (rdb::Categories::const_iterator c = mp_database->categories ().begin (); c != mp_database->categories ().end (); ++c) {
+
           if (mp_database->category_by_id (c->id ()) && (m_show_empty_ones || mp_database->category_by_id (c->id ())->num_items () != 0)) {
+
             MarkerBrowserTreeViewModelCacheEntry *child = new MarkerBrowserTreeViewModelCacheEntry (c->id (), branch);
+            m_cache_by_ids.insert (std::make_pair (std::make_pair (rdb::id_type (0), c->id ()), child));
+
             child->set_count (mp_database->category_by_id (c->id ())->num_items ());
+            child->set_waived_count (num_waived_per_cat (c->id ()));
+
             node->add_child (child);
             add_sub_categories (child);
+
           }
+
         }
 
       }
 
       node->set_count (mp_database->num_items ());
+      node->set_waived_count (num_waived ());
 
     } else if (branch == 0) {
 
@@ -869,9 +999,14 @@ private:
             MarkerBrowserTreeViewModelCacheEntry *child = new MarkerBrowserTreeViewModelCacheEntry (c->id (), branch);
 
             size_t n = mp_database->num_items (id, c->id ());
+
             if (m_show_empty_ones || n != 0) {
 
+              m_cache_by_ids.insert (std::make_pair (std::make_pair (id, c->id ()), child));
+
               child->set_count (n);
+              child->set_waived_count (num_waived_per_cell_and_cat (id, c->id ()));
+
               node->add_child (child);
 
               add_sub_categories (id, child, category_ids);
@@ -903,8 +1038,14 @@ private:
           size_t n = mp_database->num_items (*c, id);
 
           if (m_show_empty_ones || n != 0) {
+
+            m_cache_by_ids.insert (std::make_pair (std::make_pair (*c, id), child));
+
             child->set_count (n);
+            child->set_waived_count (num_waived_per_cell_and_cat (*c, id));
+
             node->add_child (child);
+
           } else {
             delete child;
           }
@@ -3099,32 +3240,17 @@ MarkerBrowserPage::mark_visited (bool f)
 void  
 MarkerBrowserPage::waive ()
 {
-  if (! mp_database) {
-    return;
-  }
-
-  MarkerBrowserListViewModel *list_model = dynamic_cast<MarkerBrowserListViewModel *> (markers_list->model ());
-  if (! list_model) {
-    return;
-  }
-
-  id_type waived_tag_id = mp_database->tags ().tag ("waived").id ();
-
-  QModelIndexList selected = markers_list->selectionModel ()->selectedIndexes ();
-  for (QModelIndexList::const_iterator selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
-    if (selected_item->column () == 0) {
-      const rdb::Item *i = list_model->item (selected_item->row ());
-      if (i) {
-        mp_database->add_item_tag (i, waived_tag_id);
-      }
-    }
-  }
-
-  list_model->mark_data_changed ();
+  waive_or_unwaive (true);
 }
 
-void  
+void
 MarkerBrowserPage::unwaive ()
+{
+  waive_or_unwaive (false);
+}
+
+void
+MarkerBrowserPage::waive_or_unwaive (bool w)
 {
   if (! mp_database) {
     return;
@@ -3135,6 +3261,11 @@ MarkerBrowserPage::unwaive ()
     return;
   }
 
+  MarkerBrowserTreeViewModel *tree_model = dynamic_cast<MarkerBrowserTreeViewModel *> (directory_tree->model ());
+  if (! tree_model) {
+    return;
+  }
+
   id_type waived_tag_id = mp_database->tags ().tag ("waived").id ();
 
   QModelIndexList selected = markers_list->selectionModel ()->selectedIndexes ();
@@ -3142,12 +3273,21 @@ MarkerBrowserPage::unwaive ()
     if (selected_item->column () == 0) {
       const rdb::Item *i = list_model->item (selected_item->row ());
       if (i) {
-        mp_database->remove_item_tag (i, waived_tag_id);
+        bool was_waived = i->has_tag (waived_tag_id);
+        if (w != was_waived) {
+          if (w) {
+            mp_database->add_item_tag (i, waived_tag_id);
+          } else {
+            mp_database->remove_item_tag (i, waived_tag_id);
+          }
+          tree_model->waived_changed (i, w);
+        }
       }
     }
   }
 
   list_model->mark_data_changed ();
+  tree_model->mark_data_changed ();
 }
 
 void

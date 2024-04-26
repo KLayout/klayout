@@ -238,6 +238,7 @@ private:
   void do_update_markers ();
   void update_info_text ();
   void rerun_macro ();
+  void waive_or_unwaive (bool w);
 };
 
 } // namespace rdb

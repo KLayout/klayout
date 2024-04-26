@@ -1976,11 +1976,11 @@ MarkerBrowserPage::update_info_text ()
     info += "<h3>";
 
     if (category && n_category == 1) {
-      info += category->name ();
+      tl::escape_to_html (info, category->name ());
     }
 
     if (cell && n_cell == 1 && ! cell->name ().empty ()) {
-      info += " [" + cell->name () + "]";
+      tl::escape_to_html (info, std::string (" [") + cell->name () + "]");
     }
 
     info += "</h3>";

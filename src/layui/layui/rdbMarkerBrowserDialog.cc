@@ -33,6 +33,7 @@
 #include "layConverters.h"
 #include "layQtTools.h"
 #include "layConfigurationDialog.h"
+#include "layBrowserDialog.h"
 #include "dbLayoutUtils.h"
 #include "dbRecursiveShapeIterator.h"
 #include "dbStream.h"
@@ -89,6 +90,7 @@ MarkerBrowserDialog::MarkerBrowserDialog (lay::Dispatcher *root, lay::LayoutView
   connect (mp_ui->saveas_action, SIGNAL (triggered ()), this, SLOT (saveas_clicked ()));
   connect (mp_ui->export_action, SIGNAL (triggered ()), this, SLOT (export_clicked ()));
   connect (mp_ui->reload_action, SIGNAL (triggered ()), this, SLOT (reload_clicked ()));
+  connect (mp_ui->info_action, SIGNAL (triggered ()), this, SLOT (info_clicked ()));
   connect (mp_ui->unload_action, SIGNAL (triggered ()), this, SLOT (unload_clicked ()));
   connect (mp_ui->unload_all_action, SIGNAL (triggered ()), this, SLOT (unload_all_clicked ()));
 
@@ -102,6 +104,7 @@ MarkerBrowserDialog::MarkerBrowserDialog (lay::Dispatcher *root, lay::LayoutView
   sep1->setSeparator (true);
   mp_ui->file_menu->addAction (sep1);
   mp_ui->file_menu->addAction (mp_ui->reload_action);
+  mp_ui->file_menu->addAction (mp_ui->info_action);
   QAction *sep2 = new QAction (mp_ui->file_menu);
   sep2->setSeparator (true);
   mp_ui->file_menu->addAction (sep2);
@@ -421,6 +424,42 @@ END_PROTECTED
 }
 
 void
+MarkerBrowserDialog::info_clicked ()
+{
+  rdb::Database *rdb = 0;
+  if (m_rdb_index < int (view ()->num_rdbs ()) && m_rdb_index >= 0) {
+    rdb = view ()->get_rdb (m_rdb_index);
+  }
+  if (! rdb) {
+    return;
+  }
+
+  std::string html;
+  html = "<html><body>\n";
+  html += "<h2>" + tl::escaped_to_html (rdb->name ()) + "</h2>\n";
+  if (! rdb->description ().empty ()) {
+    html += "<b>" + tl::to_string (tr ("Description: ")) + "</b>" + tl::escaped_to_html (tl::escape_string (rdb->description ())) + "<br/>\n";
+  }
+  if (! rdb->filename ().empty ()) {
+    html += "<b>" + tl::to_string (tr ("File: ")) + "</b>" + tl::escaped_to_html (rdb->filename ()) + "<br/>\n";
+  }
+  if (! rdb->original_file ().empty ()) {
+    html += "<b>" + tl::to_string (tr ("Original File: ")) + "</b>" + tl::escaped_to_html (rdb->original_file ()) + "<br/>\n";
+  }
+  if (! rdb->top_cell_name ().empty ()) {
+    html += "<b>" + tl::to_string (tr ("Top Cell: ")) + "</b>" + tl::escaped_to_html (rdb->top_cell_name ()) + "<br/>\n";
+  }
+  if (! rdb->generator ().empty ()) {
+    html += "<b>" + tl::to_string (tr ("Generator: ")) + "</b>" + tl::escaped_to_html (rdb->generator ()) + "<br/>\n";
+  }
+  html += "</body></html>";
+
+  std::unique_ptr<lay::BrowserDialog> info_dialog (new lay::BrowserDialog (this, html));
+  info_dialog->setWindowTitle (QObject::tr ("Marker Database Info"));
+  info_dialog->exec ();
+}
+
+void
 MarkerBrowserDialog::reload_clicked ()
 {
 BEGIN_PROTECTED
@@ -619,7 +658,7 @@ MarkerBrowserDialog::rdbs_changed ()
     std::string text = rdb->name ();
     if (! rdb->description ().empty ()) {
       text += " (";
-      text += rdb->description ();
+      text += tl::escape_string (rdb->description ());
       text += ")";
     }
     if (! rdb->filename ().empty () && rdb->name () != rdb->filename ()) {
@@ -725,6 +764,7 @@ MarkerBrowserDialog::update_content ()
   mp_ui->unload_action->setEnabled (rdb != 0);
   mp_ui->unload_all_action->setEnabled (rdb != 0);
   mp_ui->reload_action->setEnabled (rdb != 0);
+  mp_ui->info_action->setEnabled (rdb != 0);
 
   mp_ui->browser_frame->enable_updates (false);  //  Avoid building the internal lists several times ...
   mp_ui->browser_frame->set_rdb (0);    //  force update

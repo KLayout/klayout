@@ -74,6 +74,7 @@ private:
 public slots:
   void cv_index_changed (int);
   void rdb_index_changed (int);
+  void info_clicked ();
   void save_clicked ();
   void saveas_clicked ();
   void export_clicked ();

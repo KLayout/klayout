@@ -360,6 +360,14 @@ to load a marker database</string>
     <enum>QAction::NoRole</enum>
    </property>
   </action>
+  <action name="info_action">
+   <property name="text">
+    <string>Info</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::NoRole</enum>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>

@@ -39,6 +39,7 @@
 #include <QMessageBox>
 #include <QHeaderView>
 #include <QKeyEvent>
+#include <QInputDialog>
 
 namespace rdb
 {
@@ -1690,6 +1691,7 @@ MarkerBrowserPage::MarkerBrowserPage (QWidget * /*parent*/)
   connect (list_down_pb, SIGNAL (clicked ()), this, SLOT (list_down_clicked ()));
   connect (flags_pb, SIGNAL (clicked ()), this, SLOT (flag_button_clicked ()));
   connect (important_pb, SIGNAL (clicked ()), this, SLOT (important_button_clicked ()));
+  connect (edit_pb, SIGNAL (clicked ()), this, SLOT (edit_button_clicked ()));
   connect (waive_pb, SIGNAL (clicked ()), this, SLOT (waived_button_clicked ()));
   connect (photo_pb, SIGNAL (clicked ()), this, SLOT (snapshot_button_clicked ()));
   connect (nophoto_pb, SIGNAL (clicked ()), this, SLOT (remove_snapshot_button_clicked ()));
@@ -2104,6 +2106,8 @@ MarkerBrowserPage::update_info_text ()
     size_t n_category = 0;
     const rdb::Item *item = 0;
     size_t n_item = 0;
+    std::string comment;
+    size_t n_comment = 0;
 
     for (QModelIndexList::const_iterator selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
 
@@ -2114,6 +2118,11 @@ MarkerBrowserPage::update_info_text ()
 
           item = i;
           ++n_item;
+
+          if (! item->comment ().empty () && item->comment () != comment) {
+            comment = item->comment ();
+            ++n_comment;
+          }
 
           const rdb::Cell *c = mp_database->cell_by_id (item->cell_id ());
           if (c && c != cell) {
@@ -2159,6 +2168,12 @@ MarkerBrowserPage::update_info_text ()
     if (! m_error_text.empty ()) {
       info += "<p style=\"color:red; font-weight: bold\">";
       tl::escape_to_html (info, m_error_text);
+      info += "</p>";
+    }
+
+    if (! comment.empty () && n_comment == 1) {
+      info += "<p style=\"color:gray\">";
+      tl::escape_to_html (info, comment);
       info += "</p>";
     }
 
@@ -2901,7 +2916,61 @@ MarkerBrowserPage::flag_menu_selected ()
   }
 }
 
-void  
+void
+MarkerBrowserPage::edit_button_clicked ()
+{
+  if (! mp_database) {
+    return;
+  }
+
+  MarkerBrowserListViewModel *list_model = dynamic_cast<MarkerBrowserListViewModel *> (markers_list->model ());
+  if (! list_model) {
+    return;
+  }
+
+  std::string str;
+
+  QModelIndexList selected = markers_list->selectionModel ()->selectedIndexes ();
+  for (QModelIndexList::const_iterator selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
+    if (selected_item->column () == 0) {
+      const rdb::Item *i = list_model->item (selected_item->row ());
+      if (! i->comment ().empty ()) {
+        if (str.empty ()) {
+          str = i->comment ();
+        } else if (str != i->comment ()) {
+          str.clear ();
+          break;
+        }
+      }
+    }
+  }
+
+  bool ok = false;
+
+#if QT_VERSION >= 0x50200
+  QString new_text = QInputDialog::getMultiLineText (this, QObject::tr ("Edit Marker Comment"), QObject::tr ("Comment"), tl::to_qstring (str), &ok);
+  str = tl::to_string (new_text);
+#else
+  QString new_text = QInputDialog::getText (this, QObject::tr ("Edit Marker Comment"), QObject::tr ("Comment"), QLineEdit::Normal, tl::to_qstring (tl::escape_string (str)), &ok);
+  str = tl::unescape_string (tl::to_string (new_text));
+#endif
+
+  if (ok) {
+
+    QModelIndexList selected = markers_list->selectionModel ()->selectedIndexes ();
+    for (QModelIndexList::const_iterator selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
+      if (selected_item->column () == 0) {
+        const rdb::Item *i = list_model->item (selected_item->row ());
+        mp_database->set_item_comment (i, str);
+      }
+    }
+
+    update_info_text ();
+
+  }
+}
+
+void
 MarkerBrowserPage::waived_button_clicked ()
 {
   if (! mp_database) {

@@ -1275,6 +1275,10 @@ Database::import_cells (const Cells &cells)
 Category *
 Database::create_category (Category *parent, const std::string &name)
 {
+  if (! parent) {
+    return create_category (name);
+  }
+
   set_modified ();
 
   Category *cat = create_category (&parent->sub_categories (), name);

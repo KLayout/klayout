@@ -3226,7 +3226,23 @@ CODE
         output_rdb = channel.rdb
         output_cell = channel.cell
 
-        cat = output_rdb.create_category(args[0].to_s)
+        categories = args[0]
+        if !categories.is_a?(Array)
+          categories = [ categories.to_s ]
+        end
+
+        cat = nil
+        categories.each do |c|
+          ccat = nil
+          if cat
+            ccat = cat.each_sub_category.find { |i| i.name == c }
+          else
+            ccat = output_rdb.each_category.find { |i| i.name == c }
+          end
+          cat = ccat ? ccat : output_rdb.create_category(cat, c)
+        end
+        cat ||= output_rdb.create_category("default")
+
         args[1] && cat.description = args[1]
 
         cat.scan_collection(output_cell, RBA::CplxTrans::new(self.dbu), data)

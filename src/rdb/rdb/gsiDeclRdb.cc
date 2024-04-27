@@ -1342,6 +1342,7 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
     "@brief Creates a new sub-category\n"
     "@param parent The category under which the category should be created\n"
     "@param name The name of the category\n"
+    "Since version 0.29.1, 'parent' can be nil. In that case, a top-level category is created."
   ) +
   gsi::method ("category_by_path", &rdb::Database::category_by_name, gsi::arg ("path"),
     "@brief Gets a category by path\n"

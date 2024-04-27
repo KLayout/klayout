@@ -432,7 +432,7 @@ public:
       if (section == 0) {
         return QVariant (QObject::tr ("Cell / Category"));
       } else if (section == 1) {
-        return QVariant (QObject::tr ("Count (Not Visited)"));
+        return QVariant (QObject::tr ("Count (Not Visited) - Waived"));
       }
     }
 
@@ -1146,6 +1146,16 @@ public:
   {
     m_sorting = sorting;
     m_sorting_order = sorting_order;
+  }
+
+  int sorting () const
+  {
+    return m_sorting;
+  }
+
+  bool sorting_order () const
+  {
+    return m_sorting_order;
   }
 
   template <class Iter>
@@ -1897,6 +1907,9 @@ MarkerBrowserPage::set_rdb (rdb::Database *database)
     QAbstractItemModel *list_model = markers_list->model ();
 
     MarkerBrowserListViewModel *new_list_model = new MarkerBrowserListViewModel ();
+    //  default sorting is by waived flag
+    new_list_model->set_sorting (2, true);
+    markers_list->header ()->setSortIndicator (new_list_model->sorting (), new_list_model->sorting_order () ? Qt::AscendingOrder : Qt::DescendingOrder);
     new_list_model->set_database (database);
     markers_list->setModel (new_list_model);
     connect (markers_list->selectionModel (), SIGNAL (selectionChanged (const QItemSelection &, const QItemSelection &)), this, SLOT (markers_selection_changed (const QItemSelection &, const QItemSelection &)));
@@ -3055,7 +3068,12 @@ MarkerBrowserPage::unwaive_all ()
     return;
   }
 
-  QMessageBox msgbox (QMessageBox::Question, 
+  MarkerBrowserTreeViewModel *tree_model = dynamic_cast<MarkerBrowserTreeViewModel *> (directory_tree->model ());
+  if (! tree_model) {
+    return;
+  }
+
+  QMessageBox msgbox (QMessageBox::Question,
                       QObject::tr ("Remove All Waived"),
                       QObject::tr ("Are you sure to remove the waived flags from all markers?"),
                       QMessageBox::Yes | QMessageBox::No);
@@ -3064,7 +3082,10 @@ MarkerBrowserPage::unwaive_all ()
     id_type waived_tag_id = mp_database->tags ().tag ("waived").id ();
 
     for (Items::const_iterator i = mp_database->items ().begin (); i != mp_database->items ().end (); ++i) {
-      mp_database->remove_item_tag (&*i, waived_tag_id);
+      if (i->has_tag (waived_tag_id)) {
+        mp_database->remove_item_tag (i.operator-> (), waived_tag_id);
+        tree_model->waived_changed (i.operator-> (), false);
+      }
     }
 
     list_model->mark_data_changed ();
@@ -3085,7 +3106,7 @@ MarkerBrowserPage::revisit_all ()
   }
 
   for (Items::const_iterator i = mp_database->items ().begin (); i != mp_database->items ().end (); ++i) {
-    mp_database->set_item_visited (&*i, false);
+    mp_database->set_item_visited (i.operator-> (), false);
   }
 
   list_model->mark_data_changed ();
@@ -3112,7 +3133,7 @@ MarkerBrowserPage::revisit_non_waived ()
 
   for (Items::const_iterator i = mp_database->items ().begin (); i != mp_database->items ().end (); ++i) {
     if (! i->has_tag (waived_tag_id)) {
-      mp_database->set_item_visited (&*i, false);
+      mp_database->set_item_visited (i.operator-> (), false);
     }
   }
 
@@ -3140,7 +3161,7 @@ MarkerBrowserPage::revisit_important ()
 
   for (Items::const_iterator i = mp_database->items ().begin (); i != mp_database->items ().end (); ++i) {
     if (i->has_tag (important_tag_id)) {
-      mp_database->set_item_visited (&*i, false);
+      mp_database->set_item_visited (i.operator-> (), false);
     }
   }
 
@@ -3290,6 +3311,11 @@ MarkerBrowserPage::waive_or_unwaive (bool w)
             mp_database->add_item_tag (i, waived_tag_id);
           } else {
             mp_database->remove_item_tag (i, waived_tag_id);
+          }
+          if (w) {
+            //  waiving an item makes it visited (rationale: once waived, an item is no
+            //  longer of interest)
+            mp_database->set_item_visited (i, true);
           }
           tree_model->waived_changed (i, w);
         }

@@ -84,34 +84,29 @@ MarkerBrowserDialog::MarkerBrowserDialog (lay::Dispatcher *root, lay::LayoutView
     view ()->rdb_list_changed_event.add (this, &MarkerBrowserDialog::rdbs_changed);
   }
 
-  m_open_action = new QAction (QObject::tr ("Open"), mp_ui->file_menu);
-  m_saveas_action = new QAction (QObject::tr ("Save As"), mp_ui->file_menu);
-  m_export_action = new QAction (QObject::tr ("Export To Layout"), mp_ui->file_menu);
-  m_reload_action = new QAction (QObject::tr ("Reload"), mp_ui->file_menu);
-  m_unload_action = new QAction (QObject::tr ("Unload"), mp_ui->file_menu);
-  m_unload_all_action = new QAction (QObject::tr ("Unload All"), mp_ui->file_menu);
+  connect (mp_ui->open_action, SIGNAL (triggered ()), this, SLOT (open_clicked ()));
+  connect (mp_ui->save_action, SIGNAL (triggered ()), this, SLOT (save_clicked ()));
+  connect (mp_ui->saveas_action, SIGNAL (triggered ()), this, SLOT (saveas_clicked ()));
+  connect (mp_ui->export_action, SIGNAL (triggered ()), this, SLOT (export_clicked ()));
+  connect (mp_ui->reload_action, SIGNAL (triggered ()), this, SLOT (reload_clicked ()));
+  connect (mp_ui->unload_action, SIGNAL (triggered ()), this, SLOT (unload_clicked ()));
+  connect (mp_ui->unload_all_action, SIGNAL (triggered ()), this, SLOT (unload_all_clicked ()));
 
-  connect (m_open_action, SIGNAL (triggered ()), this, SLOT (open_clicked ()));
-  connect (m_saveas_action, SIGNAL (triggered ()), this, SLOT (saveas_clicked ()));
-  connect (m_export_action, SIGNAL (triggered ()), this, SLOT (export_clicked ()));
-  connect (m_reload_action, SIGNAL (triggered ()), this, SLOT (reload_clicked ()));
-  connect (m_unload_action, SIGNAL (triggered ()), this, SLOT (unload_clicked ()));
-  connect (m_unload_all_action, SIGNAL (triggered ()), this, SLOT (unload_all_clicked ()));
-
-  mp_ui->file_menu->addAction (m_open_action);
-  mp_ui->file_menu->addAction (m_saveas_action);
+  mp_ui->file_menu->addAction (mp_ui->open_action);
+  mp_ui->file_menu->addAction (mp_ui->save_action);
+  mp_ui->file_menu->addAction (mp_ui->saveas_action);
   QAction *sep0 = new QAction (mp_ui->file_menu);
   sep0->setSeparator (true);
-  mp_ui->file_menu->addAction (m_export_action);
+  mp_ui->file_menu->addAction (mp_ui->export_action);
   QAction *sep1 = new QAction (mp_ui->file_menu);
   sep1->setSeparator (true);
   mp_ui->file_menu->addAction (sep1);
-  mp_ui->file_menu->addAction (m_reload_action);
+  mp_ui->file_menu->addAction (mp_ui->reload_action);
   QAction *sep2 = new QAction (mp_ui->file_menu);
   sep2->setSeparator (true);
   mp_ui->file_menu->addAction (sep2);
-  mp_ui->file_menu->addAction (m_unload_action);
-  mp_ui->file_menu->addAction (m_unload_all_action);
+  mp_ui->file_menu->addAction (mp_ui->unload_action);
+  mp_ui->file_menu->addAction (mp_ui->unload_all_action);
 
   connect (mp_ui->layout_cb, SIGNAL (activated (int)), this, SLOT (cv_index_changed (int)));
   connect (mp_ui->rdb_cb, SIGNAL (activated (int)), this, SLOT (rdb_index_changed (int)));
@@ -368,6 +363,34 @@ END_PROTECTED
 }
 
 void
+MarkerBrowserDialog::save_clicked ()
+{
+BEGIN_PROTECTED
+
+  if (m_rdb_index < int (view ()->num_rdbs ()) && m_rdb_index >= 0) {
+
+    rdb::Database *rdb = view ()->get_rdb (m_rdb_index);
+    if (rdb) {
+
+      if (rdb->filename ().empty ()) {
+
+        saveas_clicked ();
+
+      } else {
+
+        rdb->save (rdb->filename ());
+        rdb->reset_modified ();
+
+      }
+
+    }
+
+  }
+
+END_PROTECTED
+}
+
+void
 MarkerBrowserDialog::saveas_clicked ()
 {
 BEGIN_PROTECTED
@@ -384,6 +407,9 @@ BEGIN_PROTECTED
 
         rdb->save (fn);
         rdb->reset_modified ();
+
+        //  update the RDB title strings
+        rdbs_changed ();
 
       }
 
@@ -439,6 +465,7 @@ BEGIN_PROTECTED
 
     int rdb_index = view ()->add_rdb (db.release ());
     mp_ui->rdb_cb->setCurrentIndex (rdb_index);
+
     //  it looks like the setCurrentIndex does not issue this signal:
     rdb_index_changed (rdb_index);
 
@@ -595,6 +622,10 @@ MarkerBrowserDialog::rdbs_changed ()
       text += rdb->description ();
       text += ")";
     }
+    if (! rdb->filename ().empty () && rdb->name () != rdb->filename ()) {
+      text += " - ";
+      text += rdb->filename ();
+    }
     mp_ui->rdb_cb->addItem (tl::to_qstring (text));
     if (rdb->name () == m_rdb_name) {
       rdb_index = i;
@@ -688,11 +719,12 @@ MarkerBrowserDialog::update_content ()
     mp_ui->central_stack->setCurrentIndex (1);
   }
 
-  m_saveas_action->setEnabled (rdb != 0);
-  m_export_action->setEnabled (rdb != 0);
-  m_unload_action->setEnabled (rdb != 0);
-  m_unload_all_action->setEnabled (rdb != 0);
-  m_reload_action->setEnabled (rdb != 0);
+  mp_ui->save_action->setEnabled (rdb != 0);
+  mp_ui->saveas_action->setEnabled (rdb != 0);
+  mp_ui->export_action->setEnabled (rdb != 0);
+  mp_ui->unload_action->setEnabled (rdb != 0);
+  mp_ui->unload_all_action->setEnabled (rdb != 0);
+  mp_ui->reload_action->setEnabled (rdb != 0);
 
   mp_ui->browser_frame->enable_updates (false);  //  Avoid building the internal lists several times ...
   mp_ui->browser_frame->set_rdb (0);    //  force update

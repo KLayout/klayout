@@ -2265,8 +2265,6 @@ MarkerBrowserPage::do_update_markers ()
           item_index = size_t (selected_item->row ());
           ++n_item;
 
-          std::string info;
-
           const rdb::Cell *c = mp_database->cell_by_id (item->cell_id ());
           if (c && c != cell) {
             cell = c;
@@ -2931,7 +2929,7 @@ MarkerBrowserPage::edit_button_clicked ()
   std::string str;
 
   QModelIndexList selected = markers_list->selectionModel ()->selectedIndexes ();
-  for (QModelIndexList::const_iterator selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
+  for (auto selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
     if (selected_item->column () == 0) {
       const rdb::Item *i = list_model->item (selected_item->row ());
       if (! i->comment ().empty ()) {
@@ -2958,7 +2956,7 @@ MarkerBrowserPage::edit_button_clicked ()
   if (ok) {
 
     QModelIndexList selected = markers_list->selectionModel ()->selectedIndexes ();
-    for (QModelIndexList::const_iterator selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
+    for (auto selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
       if (selected_item->column () == 0) {
         const rdb::Item *i = list_model->item (selected_item->row ());
         mp_database->set_item_comment (i, str);
@@ -2988,7 +2986,7 @@ MarkerBrowserPage::waived_button_clicked ()
   size_t nno = 0;
 
   QModelIndexList selected = markers_list->selectionModel ()->selectedIndexes ();
-  for (QModelIndexList::const_iterator selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
+  for (auto selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
     if (selected_item->column () == 0) {
       const rdb::Item *i = list_model->item (selected_item->row ());
       if (i) {
@@ -3026,7 +3024,7 @@ MarkerBrowserPage::important_button_clicked ()
   size_t nno = 0;
 
   QModelIndexList selected = markers_list->selectionModel ()->selectedIndexes ();
-  for (QModelIndexList::const_iterator selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
+  for (auto selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
     if (selected_item->column () == 0) {
       const rdb::Item *i = list_model->item (selected_item->row ());
       if (i) {
@@ -3065,7 +3063,7 @@ MarkerBrowserPage::remove_snapshot_button_clicked ()
   if (msgbox.exec () == QMessageBox::Yes) {
 
     QModelIndexList selected = markers_list->selectionModel ()->selectedIndexes ();
-    for (QModelIndexList::const_iterator selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
+    for (auto selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
       if (selected_item->column () == 0) {
         const rdb::Item *i = list_model->item (selected_item->row ());
         if (i) {
@@ -3092,7 +3090,7 @@ MarkerBrowserPage::snapshot_button_clicked ()
   }
 
   QModelIndexList selected = markers_list->selectionModel ()->selectedIndexes ();
-  for (QModelIndexList::const_iterator selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
+  for (auto selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
 
     const rdb::Item *i = list_model->item (selected_item->row ());
     if (i) {
@@ -3257,7 +3255,7 @@ MarkerBrowserPage::mark_important ()
   id_type important_tag_id = mp_database->tags ().tag ("important").id ();
 
   QModelIndexList selected = markers_list->selectionModel ()->selectedIndexes ();
-  for (QModelIndexList::const_iterator selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
+  for (auto selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
     if (selected_item->column () == 0) {
       const rdb::Item *i = list_model->item (selected_item->row ());
       if (i) {
@@ -3284,7 +3282,7 @@ MarkerBrowserPage::mark_unimportant ()
   id_type important_tag_id = mp_database->tags ().tag ("important").id ();
 
   QModelIndexList selected = markers_list->selectionModel ()->selectedIndexes ();
-  for (QModelIndexList::const_iterator selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
+  for (auto selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
     if (selected_item->column () == 0) {
       const rdb::Item *i = list_model->item (selected_item->row ());
       if (i) {
@@ -3321,7 +3319,7 @@ MarkerBrowserPage::mark_visited (bool f)
   }
 
   QModelIndexList selected = markers_list->selectionModel ()->selectedIndexes ();
-  for (QModelIndexList::const_iterator selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
+  for (auto selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
     if (selected_item->column () == 0) {
       const rdb::Item *i = list_model->item (selected_item->row ());
       if (i) {
@@ -3370,7 +3368,7 @@ MarkerBrowserPage::waive_or_unwaive (bool w)
   id_type waived_tag_id = mp_database->tags ().tag ("waived").id ();
 
   QModelIndexList selected = markers_list->selectionModel ()->selectedIndexes ();
-  for (QModelIndexList::const_iterator selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
+  for (auto selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
     if (selected_item->column () == 0) {
       const rdb::Item *i = list_model->item (selected_item->row ());
       if (i) {

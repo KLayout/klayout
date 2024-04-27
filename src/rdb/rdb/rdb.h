@@ -1015,6 +1015,26 @@ public:
   void set_image_str (const std::string &s);
 
   /**
+   *  @brief Gets the item comment
+   *
+   *  The comment string is an arbitrary string attached to the item.
+   */
+  const std::string &comment () const
+  {
+    return m_comment;
+  }
+
+  /**
+   *  @brief Sets the item comment
+   *
+   *  The comment string is an arbitrary string attached to the item.
+   */
+  void set_comment (const std::string &s)
+  {
+    m_comment = s;
+  }
+
+  /**
    *  @brief Get the database reference
    */
   Database *database ()
@@ -1038,6 +1058,7 @@ private:
   id_type m_cell_id;
   id_type m_category_id;
   size_t m_multiplicity;
+  std::string m_comment;
   bool m_visited;
   std::vector <bool> m_tag_ids;
   Database *mp_database;
@@ -1462,7 +1483,7 @@ public:
    *
    *  This method is provided for persistency application only. It should not be used otherwise.
    */
-  Cell (id_type id, const std::string &name, const std::string &variant);
+  Cell (id_type id, const std::string &name, const std::string &variant, const std::string &layout_name);
 
   /**
    *  @brief Cell destructor
@@ -1488,7 +1509,7 @@ public:
   }
 
   /**
-   *  @brief Get the cell name
+   *  @brief Gets the cell name
    */
   const std::string &name () const
   {
@@ -1496,7 +1517,7 @@ public:
   }
 
   /**
-   *  @brief Set the name string (setter)
+   *  @brief Sets the name string
    *
    *  This method must not be used for items in the database to keep the database consistent.
    */
@@ -1506,7 +1527,7 @@ public:
   }
 
   /**
-   *  @brief Get the variant id
+   *  @brief Gets the variant id
    */
   const std::string &variant () const
   {
@@ -1514,13 +1535,31 @@ public:
   }
 
   /**
-   *  @brief Set the variant string (setter)
+   *  @brief Sets the variant string
    *
    *  This method must not be used for items in the database to keep the database consistent.
    */
   void set_variant (const std::string &v) 
   {
     m_variant = v;
+  }
+
+  /**
+   *  @brief Gets the layout cell name
+   */
+  const std::string &layout_name () const
+  {
+    return m_layout_name;
+  }
+
+  /**
+   *  @brief Sets the layout cell string
+   *
+   *  This method must not be used for items in the database to keep the database consistent.
+   */
+  void set_layout_name (const std::string &s)
+  {
+    m_layout_name = s;
   }
 
   /**
@@ -1600,6 +1639,7 @@ private:
   id_type m_id;
   std::string m_name;
   std::string m_variant;
+  std::string m_layout_name;
   size_t m_num_items;
   size_t m_num_items_visited;
   References m_references;
@@ -2203,7 +2243,7 @@ public:
    */
   Cell *create_cell (const std::string &name)
   {
-    return create_cell (name, std::string ());
+    return create_cell (name, std::string (), std::string ());
   }
 
   /**
@@ -2212,8 +2252,11 @@ public:
    *  A cell with name name/variant combination must not exist already.
    *  If the variant string is empty, this method behaves the same as the 
    *  method without variant.
+   *
+   *  "layout_name" is the name of the cell in the layout. If empty, the layout
+   *  cell is assumed to be identical to "name".
    */
-  Cell *create_cell (const std::string &name, const std::string &variant);
+  Cell *create_cell (const std::string &name, const std::string &variant, const std::string &layout_name);
 
   /**
    *  @brief Get all variants registered for a given cell name (not qname!)
@@ -2306,6 +2349,11 @@ public:
    *  @brief Remove a tag from the given item
    */
   void remove_item_tag (const Item *item, id_type tag);
+
+  /**
+   *  @brief Sets the comment string of the item
+   */
+  void set_item_comment (const Item *item, const std::string &comment);
 
 #if defined(HAVE_QT)
   /**

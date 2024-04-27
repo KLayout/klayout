@@ -521,11 +521,11 @@ TEST(6)
   EXPECT_EQ (db.variants ("c1")[0], c1->id ());
   EXPECT_EQ (db.variants ("c1")[1], c1a->id ());
 
-  rdb::Cell *c1b = db.create_cell ("c1", "var");
+  rdb::Cell *c1b = db.create_cell ("c1", "var", std::string ());
   EXPECT_EQ (c1b->qname (), "c1:var")
   EXPECT_EQ (db.variants ("c1").size (), size_t (3));
 
-  rdb::Cell *c2 = db.create_cell ("c2", "1027");
+  rdb::Cell *c2 = db.create_cell ("c2", "1027", std::string ());
   EXPECT_EQ (c2->qname (), "c2:1027");
   EXPECT_EQ (db.variants ("c2").size (), size_t (1));
 
@@ -534,8 +534,9 @@ TEST(6)
   EXPECT_EQ (c2->qname (), "c2:1027")
   EXPECT_EQ (db.variants ("c2").size (), size_t (2));
 
-  rdb::Cell *c2b = db.create_cell ("c2", "var");
+  rdb::Cell *c2b = db.create_cell ("c2", "var", "c2$1");
   EXPECT_EQ (c2b->qname (), "c2:var")
+  EXPECT_EQ (c2b->layout_name (), "c2$1")
 
   rdb::Cell *c2c = db.create_cell ("c2");
   EXPECT_EQ (c2c->qname (), "c2:2");

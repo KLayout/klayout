@@ -516,7 +516,7 @@ Cells::import_cell (const Cell &c)
 {
   Cell *cell;
   if (mp_database) {
-    cell = mp_database->create_cell (c.name (), c.variant ());
+    cell = mp_database->create_cell (c.name (), c.variant (), c.layout_name ());
   } else {
     cell = new Cell (0, c.name ());
     add_cell (cell);
@@ -548,8 +548,8 @@ Cell::Cell (id_type id, const std::string &name)
   //  .. nothing yet ..
 }
 
-Cell::Cell (id_type id, const std::string &name, const std::string &variant)
-  : m_id (id), m_name (name), m_variant (variant), m_num_items (0), m_num_items_visited (0), mp_database (0)
+Cell::Cell (id_type id, const std::string &name, const std::string &variant, const std::string &layout_name = std::string ())
+  : m_id (id), m_name (name), m_variant (variant), m_layout_name (layout_name), m_num_items (0), m_num_items_visited (0), mp_database (0)
 {
   //  .. nothing yet ..
 }
@@ -939,6 +939,7 @@ Item &Item::operator= (const Item &d)
     m_category_id = d.m_category_id;
     m_visited = d.m_visited;
     m_multiplicity = d.m_multiplicity;
+    m_comment = d.m_comment;
     m_tag_ids = d.m_tag_ids;
     m_image_str = d.m_image_str;
   }
@@ -1321,7 +1322,7 @@ Database::category_by_id_non_const (id_type id)
 }
 
 Cell *
-Database::create_cell (const std::string &name, const std::string &variant)
+Database::create_cell (const std::string &name, const std::string &variant, const std::string &layout_name)
 {
   set_modified ();
 
@@ -1358,13 +1359,13 @@ Database::create_cell (const std::string &name, const std::string &variant)
         }
       }
 
-      new_cell = new Cell (++m_next_id, name, tl::to_string (variant_index + 1));
+      new_cell = new Cell (++m_next_id, name, tl::to_string (variant_index + 1), layout_name);
 
       variant->second.push_back (new_cell->id ());
 
     } else {
 
-      new_cell = new Cell (++m_next_id, name);
+      new_cell = new Cell (++m_next_id, name, std::string (), layout_name);
       
     }
 
@@ -1374,7 +1375,7 @@ Database::create_cell (const std::string &name, const std::string &variant)
 
   } else {
       
-    new_cell = new Cell (++m_next_id, name, variant);
+    new_cell = new Cell (++m_next_id, name, variant, layout_name);
     m_cells.add_cell (new_cell);
     m_cells_by_id.insert (std::make_pair (new_cell->id (), new_cell));
     m_cells_by_qname.insert (std::make_pair (new_cell->qname (), new_cell));
@@ -1466,6 +1467,13 @@ Database::remove_item_tag (const Item *item, id_type tag)
 {
   set_modified ();
   const_cast <Item *> (item)->remove_tag (tag);
+}
+
+void
+Database::set_item_comment (const Item *item, const std::string &comment)
+{
+  set_modified ();
+  const_cast <Item *> (item)->set_comment (comment);
 }
 
 #if defined(HAVE_QT)

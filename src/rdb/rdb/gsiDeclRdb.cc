@@ -265,17 +265,25 @@ Class<rdb::Cell> decl_RdbCell ("rdb", "RdbCell",
     "The cell name is an string that identifies the category in the database. "
     "Additionally, a cell may carry a variant identifier which is a string that uniquely identifies a cell "
     "in the context of its variants. The \"qualified name\" contains both the cell name and the variant name. "
-    "Cell names are also used to identify report database cell's with layout cells. "
+    "Cell names are also used to identify report database cells with layout cells. For variants, the layout cell name "
+    "can be specified explicitly with the \\layout_name attribute (see \\RdbDatabase#create_cell). The latter is available "
+    "since version 0.29.1.\n"
     "@return The cell name\n"
   ) +
   gsi::method ("variant", &rdb::Cell::variant, 
     "@brief Gets the cell variant name\n"
     "A variant name additionally identifies the cell when multiple cells with the same name are present. "
-    "A variant name is either assigned automatically or set when creating a cell. "
+    "A variant name is either assigned automatically or set when creating a cell.\n"
     "@return The cell variant name\n"
   ) +
-  gsi::method ("qname", &rdb::Cell::qname, 
-    "@brief Gets the cell's qualified name\n"
+  gsi::method ("layout_name", &rdb::Cell::layout_name,
+    "@brief Gets the name of the layout cell\n"
+    "For variants, this string is the name of the actual layout cell. If empty, the cell is assume to be called 'name'.\n"
+    "@return The layout cell name\n"
+    "This read-only attribute has been added in version 0.29.1.\n"
+  ) +
+  gsi::method ("qname", &rdb::Cell::qname,
+    "@brief Gets the qualified name of the cell\n"
     "The qualified name is a combination of the cell name and optionally the variant name. "
     "It is used to identify the cell by name in a unique way.\n"
     "@return The qualified name\n"
@@ -932,6 +940,19 @@ Class<rdb::Item> decl_RdbItem ("rdb", "RdbItem",
     "See \\image_str how to obtain the image.\n\n"
     "This method has been introduced in version 0.28.\n"
   ) +
+  gsi::method ("comment", &rdb::Item::comment,
+    "@brief Gets the common associated with this item as a string\n"
+    "@return The comment string\n"
+    "The comment string is an arbitrary string added by the user to the item.\n"
+    "\n"
+    "This attribute has been added in version 0.29.1.\n"
+  ) +
+  gsi::method ("comment=", &rdb::Item::set_comment, gsi::arg ("comment"),
+    "@brief Sets the common associated with this item as a string\n"
+    "See \\comment for a description of that attribute.\n"
+    "\n"
+    "This attribute has been added in version 0.29.1.\n"
+  ) +
   gsi::method ("image_str", &rdb::Item::image_str,
     "@brief Gets the image associated with this item as a string\n"
     "@return A base64-encoded image file (in PNG format)\n"
@@ -1348,10 +1369,12 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
     "@brief Creates a new cell\n"
     "@param name The name of the cell\n"
   ) +
-  gsi::method ("create_cell", (rdb::Cell *(rdb::Database::*) (const std::string &, const std::string &)) &rdb::Database::create_cell, gsi::arg ("name"), gsi::arg ("variant"),
+  gsi::method ("create_cell", (rdb::Cell *(rdb::Database::*) (const std::string &, const std::string &, const std::string &)) &rdb::Database::create_cell, gsi::arg ("name"), gsi::arg ("variant"), gsi::arg ("layout_name", std::string ()),
     "@brief Creates a new cell, potentially as a variant for a cell with the same name\n"
     "@param name The name of the cell\n"
     "@param variant The variant name of the cell\n"
+    "@param layout_name For variants, this is the name of the layout cell. If empty, 'name' is used for the layout cell name.\n"
+    "The 'layout_name' argument has been added in version 0.29.1.\n"
   ) +
   gsi::method ("variants", &rdb::Database::variants, gsi::arg ("name"),
     "@brief Gets the variants for a given cell name\n"

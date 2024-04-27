@@ -3349,7 +3349,7 @@ CODE
       else
         output_rdb = RBA::ReportDatabase::new(name)
       end
-      
+
       cn = cellname && cellname.to_s
       cn ||= @def_cell && @def_cell.name
       cn ||= @def_source && @def_source.cell_obj && @def_source.cell_obj.name
@@ -3359,7 +3359,8 @@ CODE
       output_rdb.generator = self._generator
       output_rdb.top_cell_name = cn
       output_rdb.description = description
-
+      output_rdb.original_file = @def_path
+      
       RDBOutputChannel::new(self, output_rdb, output_rdb_index, cn, output_rdb_file)
       
     end

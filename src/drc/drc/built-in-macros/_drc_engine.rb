@@ -3253,9 +3253,19 @@ CODE
         categories.each do |c|
           ccat = nil
           if cat
-            ccat = cat.each_sub_category.find { |i| i.name == c }
+            cat.each_sub_category do |i|
+              if i.name == c
+                ccat = i
+                break
+              end
+            end
           else
-            ccat = output_rdb.each_category.find { |i| i.name == c }
+            output_rdb.each_category do |i|
+              if i.name == c
+                ccat = i
+                break
+              end
+            end
           end
           cat = ccat ? ccat : output_rdb.create_category(cat, c)
         end

@@ -287,7 +287,7 @@ SortByKeyCompareFunc::operator() (MarkerBrowserTreeViewModelCacheEntry *a, Marke
   const rdb::Cell *ca = mp_rdb->cell_by_id (a->id ());
   const rdb::Cell *cb = mp_rdb->cell_by_id (b->id ());
   if (ca && cb) {
-    return m_ascending ? ca->name () < cb->name () : cb->name () < ca->name ();
+    return m_ascending ? ca->qname () < cb->qname () : cb->qname () < ca->qname ();
   }
 
   const rdb::Category *xa = mp_rdb->category_by_id (a->id ());
@@ -582,7 +582,7 @@ public:
               if (cell->name ().empty ()) {
                 return QObject::tr ("All Cells");
               } else {
-                return QVariant (QString::fromUtf8 ("[") + tl::to_qstring (cell->name ()) + QString::fromUtf8 ("]"));
+                return QVariant (QString::fromUtf8 ("[") + tl::to_qstring (cell->qname ()) + QString::fromUtf8 ("]"));
               }
             }
 

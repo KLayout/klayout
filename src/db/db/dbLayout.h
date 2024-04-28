@@ -72,6 +72,7 @@ class Technology;
 class CellMapping;
 class LayerMapping;
 class VariantsCollectorBase;
+class HierarchyBuilder;
 
 template <class Coord> class generic_repository;
 typedef generic_repository<db::Coord> GenericRepository;
@@ -2114,6 +2115,24 @@ public:
   const MetaInfo &meta_info (db::cell_index_type ci, meta_info_name_id_type name_id) const;
 
   /**
+   *  @brief Sets the hierarchy builder reference
+   *  Used internally
+   */
+  void set_hierarchy_builder (db::HierarchyBuilder *builder)
+  {
+    mp_builder = builder;
+  }
+
+  /**
+   *  @brief Gets the hierarchy builder
+   *  Used internally
+   */
+  db::HierarchyBuilder *builder () const
+  {
+    return mp_builder;
+  }
+
+  /**
    *  @brief This event is triggered when the technology changes
    */
   tl::Event technology_changed_event;
@@ -2138,6 +2157,7 @@ protected:
 
 private:
   db::Library *mp_library;
+  db::HierarchyBuilder *mp_builder;
   cell_list m_cells;
   size_t m_cells_size;
   cell_ptr_vector m_cell_ptrs;

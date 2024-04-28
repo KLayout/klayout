@@ -25,6 +25,7 @@
 #include "dbTestSupport.h"
 #include "dbNetlist.h"
 #include "dbNetlistSpiceReader.h"
+#include "rdb.h"
 #include "lymMacro.h"
 #include "tlFileUtils.h"
 
@@ -1764,6 +1765,49 @@ TEST(111_RDBCategoryHierarchy)
     );
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);
+  }
+
+  lym::Macro drc;
+  drc.load_from (rs);
+  EXPECT_EQ (drc.run (), 0);
+
+  compare_text_files (report, au_report);
+}
+
+TEST(112_Waiving)
+{
+  std::string rs = tl::testdata ();
+  rs += "/drc/drcSimpleTests_112.drc";
+
+  //  apart from that it's a variant of 14b ...
+
+  std::string input = tl::testdata ();
+  input += "/drc/drcSimpleTests_112.gds";
+
+  std::string au_report = tl::testdata ();
+  au_report += "/drc/drcSimpleTests_au112.lyrdb";
+
+  std::string report = this->tmp_file ("tmp.lydrc");
+
+  {
+    //  Set some variables
+    lym::Macro config;
+    config.set_text (tl::sprintf (
+        "$drc_force_gc = true\n"
+        "$drc_test_source = '%s'\n"
+        "$drc_test_report = '%s'\n"
+      , input, report)
+    );
+    config.set_interpreter (lym::Macro::Ruby);
+    EXPECT_EQ (config.run (), 0);
+  }
+
+  //  prepare a waiver db
+  {
+    std::string report_w = this->tmp_file ("tmp.lydrc.w");
+    rdb::Database rdb_w;
+    rdb_w.load (au_report + ".w");
+    rdb_w.write (report_w);
   }
 
   lym::Macro drc;

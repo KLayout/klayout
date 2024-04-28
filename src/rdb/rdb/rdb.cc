@@ -1876,6 +1876,7 @@ Database::apply (const rdb::Database &other)
 
       //  actually transfer the attributes here
 
+      i->set_comment (other->comment ());
       //  TODO: this has some optimization potential in terms of performance ...
       i->set_image_str (other->image_str ());
       i->set_tag_str (other->tag_str ());

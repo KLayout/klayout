@@ -506,10 +506,7 @@ public:
     return type_index_of<C> (); 
   }
 
-  bool compare (const ValueBase *other) const 
-  {
-    return m_value < static_cast<const Value<C> *> (other)->m_value;
-  }
+  bool compare (const ValueBase *other) const;
 
   bool is_shape () const;
 

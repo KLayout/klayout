@@ -174,6 +174,62 @@ template <> RDB_PUBLIC std::string Value<db::DText>::to_display_string () const
   return to_string ();
 }
 
+//  compare implementations
+
+template <> RDB_PUBLIC bool Value<double>::compare (const ValueBase *o) const
+{
+  const Value<double> *other = static_cast<const Value<double> *> (o);
+  return m_value < other->m_value - db::epsilon;
+}
+
+template <> RDB_PUBLIC bool Value<int>::compare (const ValueBase *o) const
+{
+  const Value<int> *other = static_cast<const Value<int> *> (o);
+  return m_value < other->m_value;
+}
+
+template <> RDB_PUBLIC bool Value<std::string>::compare (const ValueBase *o) const
+{
+  const Value<std::string> *other = static_cast<const Value<std::string> *> (o);
+  return m_value < other->m_value;
+}
+
+template <> RDB_PUBLIC bool Value<db::DPolygon>::compare (const ValueBase *o) const
+{
+  const Value<db::DPolygon> *other = static_cast<const Value<db::DPolygon> *> (o);
+  return m_value.less (other->m_value);
+}
+
+template <> RDB_PUBLIC bool Value<db::DEdge>::compare (const ValueBase *o) const
+{
+  const Value<db::DEdge> *other = static_cast<const Value<db::DEdge> *> (o);
+  return m_value.less (other->m_value);
+}
+
+template <> RDB_PUBLIC bool Value<db::DEdgePair>::compare (const ValueBase *o) const
+{
+  const Value<db::DEdgePair> *other = static_cast<const Value<db::DEdgePair> *> (o);
+  return m_value.less (other->m_value);
+}
+
+template <> RDB_PUBLIC bool Value<db::DBox>::compare (const ValueBase *o) const
+{
+  const Value<db::DBox> *other = static_cast<const Value<db::DBox> *> (o);
+  return m_value.less (other->m_value);
+}
+
+template <> RDB_PUBLIC bool Value<db::DPath>::compare (const ValueBase *o) const
+{
+  const Value<db::DPath> *other = static_cast<const Value<db::DPath> *> (o);
+  return m_value.less (other->m_value);
+}
+
+template <> RDB_PUBLIC bool Value<db::DText>::compare (const ValueBase *o) const
+{
+  const Value<db::DText> *other = static_cast<const Value<db::DText> *> (o);
+  return m_value.less (other->m_value);
+}
+
 //  is_shape implementations
 
 template <> RDB_PUBLIC bool Value<double>::is_shape () const
@@ -881,14 +937,14 @@ Tags::tag (const std::string &name, bool user_tag)
 const Tag &
 Tags::tag (id_type id) const
 {
-  tl_assert (id - 1 < m_tags.size () && id > 0);
+  tl_assert (id < m_tags.size () + 1 && id > 0);
   return m_tags [id - 1];
 }
 
 Tag &
 Tags::tag (id_type id)
 {
-  tl_assert (id - 1 < m_tags.size () && id > 0);
+  tl_assert (id < m_tags.size () + 1 && id > 0);
   return m_tags [id - 1];
 }
 
@@ -1830,7 +1886,7 @@ Database::apply (const rdb::Database &other)
   }
 
   for (auto c = other.categories ().begin (); c != other.categories ().end (); ++c) {
-    const rdb::Category *this_cat = category_by_name (c->name ());
+    const rdb::Category *this_cat = category_by_name (c->path ());
     if (this_cat) {
       cat2cat.insert (std::make_pair (this_cat->id (), c->id ()));
     }

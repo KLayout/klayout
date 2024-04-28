@@ -88,6 +88,7 @@ MarkerBrowserDialog::MarkerBrowserDialog (lay::Dispatcher *root, lay::LayoutView
   connect (mp_ui->open_action, SIGNAL (triggered ()), this, SLOT (open_clicked ()));
   connect (mp_ui->save_action, SIGNAL (triggered ()), this, SLOT (save_clicked ()));
   connect (mp_ui->saveas_action, SIGNAL (triggered ()), this, SLOT (saveas_clicked ()));
+  connect (mp_ui->saveas_waiver_db_action, SIGNAL (triggered ()), this, SLOT (saveas_waiver_db_clicked ()));
   connect (mp_ui->export_action, SIGNAL (triggered ()), this, SLOT (export_clicked ()));
   connect (mp_ui->reload_action, SIGNAL (triggered ()), this, SLOT (reload_clicked ()));
   connect (mp_ui->info_action, SIGNAL (triggered ()), this, SLOT (info_clicked ()));
@@ -97,6 +98,7 @@ MarkerBrowserDialog::MarkerBrowserDialog (lay::Dispatcher *root, lay::LayoutView
   mp_ui->file_menu->addAction (mp_ui->open_action);
   mp_ui->file_menu->addAction (mp_ui->save_action);
   mp_ui->file_menu->addAction (mp_ui->saveas_action);
+  mp_ui->file_menu->addAction (mp_ui->saveas_waiver_db_action);
   QAction *sep0 = new QAction (mp_ui->file_menu);
   sep0->setSeparator (true);
   mp_ui->file_menu->addAction (mp_ui->export_action);
@@ -389,6 +391,28 @@ BEGIN_PROTECTED
     }
 
   }
+
+END_PROTECTED
+}
+
+void
+MarkerBrowserDialog::saveas_waiver_db_clicked ()
+{
+BEGIN_PROTECTED
+
+  rdb::Database *rdb = 0;
+  if (m_rdb_index < int (view ()->num_rdbs ()) && m_rdb_index >= 0) {
+    rdb = view ()->get_rdb (m_rdb_index);
+  }
+  if (! rdb) {
+    return;
+  }
+
+  if (rdb->filename ().empty ()) {
+    throw tl::Exception (tl::to_string (tr ("The current report database is not saved.\nSave it to some file with 'Save As', before saving it as waiver DB.")));
+  }
+
+  rdb->write (rdb->filename () + ".w");
 
 END_PROTECTED
 }
@@ -760,6 +784,7 @@ MarkerBrowserDialog::update_content ()
 
   mp_ui->save_action->setEnabled (rdb != 0);
   mp_ui->saveas_action->setEnabled (rdb != 0);
+  mp_ui->saveas_waiver_db_action->setEnabled (rdb != 0);
   mp_ui->export_action->setEnabled (rdb != 0);
   mp_ui->unload_action->setEnabled (rdb != 0);
   mp_ui->unload_all_action->setEnabled (rdb != 0);

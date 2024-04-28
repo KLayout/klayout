@@ -77,6 +77,7 @@ public slots:
   void info_clicked ();
   void save_clicked ();
   void saveas_clicked ();
+  void saveas_waiver_db_clicked ();
   void export_clicked ();
   void reload_clicked ();
   void open_clicked ();

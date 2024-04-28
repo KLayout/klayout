@@ -2445,6 +2445,13 @@ public:
   void save (const std::string &filename);
 
   /**
+   *  @brief Write the database to a file
+   *
+   *  This function is like "save", but does not update the file name attribute.
+   */
+  void write (const std::string &filename);
+
+  /**
    *  @brief Load the database from a file
    *
    *  Note: This clears the existing database.

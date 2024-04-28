@@ -118,17 +118,25 @@ make_rdb_structure (rdb::Database *rdb)
 }
 
 // -------------------------------------------------------------
-//  Implementation of rdb::Database::save
+//  Implementation of rdb::Database::save and write
 //  TODO: move this somewhere else - with generalized functionality
 
 void
 rdb::Database::save (const std::string &fn)
 {
-  tl::OutputStream os (fn, tl::OutputStream::OM_Auto);
-  make_rdb_structure (this).write (os, *this); 
+  write (fn);
   set_filename (fn);
+}
 
-  tl::log << "Saved RDB to " << fn;
+void
+rdb::Database::write (const std::string &fn)
+{
+  tl::OutputStream os (fn, tl::OutputStream::OM_Auto);
+  make_rdb_structure (this).write (os, *this);
+
+  if (tl::verbosity () >= 10) {
+    tl::log << "Saved RDB to " << fn;
+  }
 }
 
 // -------------------------------------------------------------

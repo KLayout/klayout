@@ -368,6 +368,14 @@ to load a marker database</string>
     <enum>QAction::NoRole</enum>
    </property>
   </action>
+  <action name="saveas_waiver_db_action">
+   <property name="text">
+    <string>Save As Waiver DB</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::NoRole</enum>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>

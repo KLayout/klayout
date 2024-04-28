@@ -367,6 +367,7 @@ public:
   {
     mp_database = db;
     m_waived_tag_id = mp_database ? mp_database->tags ().tag ("waived").id () : 0;
+
     invalidate ();
   }
 
@@ -1886,6 +1887,16 @@ MarkerBrowserPage::set_rdb (rdb::Database *database)
       rerun_button->setToolTip (tl::to_qstring (tl::to_string (tr ("Run ")) + mp_database->generator ()) + shortcut);
     } else {
       rerun_button->setToolTip (QString ());
+    }
+
+    //  mark items visited that carry the waived flag
+    if (mp_database) {
+      id_type waived_tag_id = mp_database->tags ().tag ("waived").id ();
+      for (auto i = mp_database->items ().begin (); i != mp_database->items ().end (); ++i) {
+        if (i->has_tag (waived_tag_id)) {
+          mp_database->set_item_visited (i.operator-> (), true);
+        }
+      }
     }
 
     QAbstractItemModel *tree_model = directory_tree->model ();

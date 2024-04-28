@@ -806,25 +806,43 @@ private:
 
   size_t num_waived_per_cat (id_type cat_id) const
   {
-    auto ii = mp_database->items_by_category (cat_id);
     size_t n = 0;
+
+    auto ii = mp_database->items_by_category (cat_id);
     for (auto i = ii.first; i != ii.second; ++i) {
       if ((*i)->has_tag (m_waived_tag_id)) {
         ++n;
       }
     }
+
+    //  include sub-categories
+    const rdb::Category *cat = mp_database->category_by_id (cat_id);
+    tl_assert (cat != 0);
+    for (auto c = cat->sub_categories ().begin (); c != cat->sub_categories ().end (); ++c) {
+      n += num_waived_per_cat (c->id ());
+    }
+
     return n;
   }
 
   size_t num_waived_per_cell_and_cat (id_type cell_id, id_type cat_id) const
   {
-    auto ii = mp_database->items_by_cell_and_category (cell_id, cat_id);
     size_t n = 0;
+
+    auto ii = mp_database->items_by_cell_and_category (cell_id, cat_id);
     for (auto i = ii.first; i != ii.second; ++i) {
       if ((*i)->has_tag (m_waived_tag_id)) {
         ++n;
       }
     }
+
+    //  include sub-categories
+    const rdb::Category *cat = mp_database->category_by_id (cat_id);
+    tl_assert (cat != 0);
+    for (auto c = cat->sub_categories ().begin (); c != cat->sub_categories ().end (); ++c) {
+      n += num_waived_per_cell_and_cat (cell_id, c->id ());
+    }
+
     return n;
   }
 

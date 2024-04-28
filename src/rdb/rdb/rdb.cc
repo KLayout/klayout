@@ -1868,6 +1868,18 @@ namespace
   };
 }
 
+static void map_category (const rdb::Category &cat, const rdb::Database &db, std::map<id_type, id_type> &cat2cat)
+{
+  const rdb::Category *this_cat = db.category_by_name (cat.path ());
+  if (this_cat) {
+    cat2cat.insert (std::make_pair (this_cat->id (), cat.id ()));
+  }
+
+  for (auto c = cat.sub_categories ().begin (); c != cat.sub_categories ().end (); ++c) {
+    map_category (*c, db, cat2cat);
+  }
+}
+
 void
 Database::apply (const rdb::Database &other)
 {
@@ -1886,10 +1898,7 @@ Database::apply (const rdb::Database &other)
   }
 
   for (auto c = other.categories ().begin (); c != other.categories ().end (); ++c) {
-    const rdb::Category *this_cat = category_by_name (c->path ());
-    if (this_cat) {
-      cat2cat.insert (std::make_pair (this_cat->id (), c->id ()));
-    }
+    map_category (*c, *this, cat2cat);
   }
 
   std::map<std::string, id_type> tags_by_name;

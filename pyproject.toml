@@ -29,7 +29,7 @@ environment-pass = ["HOST_CCACHE_DIR"]
 [tool.cibuildwheel.macos]
 before-all = [
   "brew install libpng",
-  "brew deps --tree --installed",
+  "arch -x86_64 brew install libpng",
 ]
 
 # TEMP while Github Actions does not provide an Apple Silicon runner

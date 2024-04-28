@@ -10,5 +10,5 @@ l1s = l1.sized(0.1, 0.0)
 l1.output([ "input", "L1" ], "Original layer")
 l1s.output([ "input", "L1S" ], "Sized original layer")
 
-l1s.drc(width < 1.0.um).output("w1um", "w < 1µm\nFrom sized input")
+l1s.width(1.0.um).output("w1um", "w < 1µm\nFrom sized input")
 

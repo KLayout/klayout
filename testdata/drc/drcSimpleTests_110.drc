@@ -8,9 +8,9 @@ l1 = input(1, 0)
 l1 = l1.sized(0.1, 0.0)
 
 l1.output("l1", "L1 (1/0 sized by x=100nm,y=0)")
-l1.drc(width < 1.0.um).output("w1um", "w < 1µm\nFrom sized input")
+l1.width(1.0.um).output("w1um", "w < 1µm\nFrom sized input")
 
 l1s = l1.snapped(200.nm)
 l1s.output("l1_snapped", "L1 snapped to 200nm")
-l1s.drc(width < 1.0.um).output("w1um_snapped", "w < 1µm\nFrom snapped input")
+l1s.width(1.0.um).output("w1um_snapped", "w < 1µm\nFrom snapped input")
 

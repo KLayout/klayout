@@ -171,43 +171,7 @@ From sized input</description>
    <comment/>
    <image/>
    <values>
-    <value>edge-pair: (3.9,3.9;3.7,3.9)|(3.804,4.285;3.9,3.9)</value>
-   </values>
-  </item>
-  <item>
-   <tags/>
-   <category>w1um</category>
-   <cell>TOP</cell>
-   <visited>false</visited>
-   <multiplicity>1</multiplicity>
-   <comment/>
-   <image/>
-   <values>
-    <value>edge-pair: (5.2,4.2;5,4.2)|(4.138,4.708;5.1,4.9)</value>
-   </values>
-  </item>
-  <item>
-   <tags/>
-   <category>w1um</category>
-   <cell>TOP</cell>
-   <visited>false</visited>
-   <multiplicity>1</multiplicity>
-   <comment/>
-   <image/>
-   <values>
     <value>edge-pair: (3.7,3.9;3.3,4)|(3.3,4;3.6,4.6)</value>
-   </values>
-  </item>
-  <item>
-   <tags/>
-   <category>w1um</category>
-   <cell>TOP</cell>
-   <visited>false</visited>
-   <multiplicity>1</multiplicity>
-   <comment/>
-   <image/>
-   <values>
-    <value>edge-pair: (3.3,4;3.6,4.6)|(3.804,4.285;3.9,3.9)</value>
    </values>
   </item>
   <item>
@@ -231,7 +195,43 @@ From sized input</description>
    <comment/>
    <image/>
    <values>
+    <value>edge-pair: (3.7,3.9;3.3,4)|(3.804,4.285;3.9,3.9)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>w1um</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
     <value>edge-pair: (4.53,4.233;3.804,4.285)|(3.455,4.31;3.6,4.6)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>w1um</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (3.3,4;3.6,4.6)|(3.804,4.285;3.9,3.9)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>w1um</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (3.9,3.9;3.7,3.9)|(3.3,4;3.6,4.6)</value>
    </values>
   </item>
   <item>
@@ -255,7 +255,7 @@ From sized input</description>
    <comment/>
    <image/>
    <values>
-    <value>edge-pair: (5,4.2;3.804,4.285)|(3.6,4.6;5.1,4.9)</value>
+    <value>edge-pair: (5.2,4.2;5,4.2)|(4.138,4.708;5.1,4.9)</value>
    </values>
   </item>
   <item>
@@ -267,7 +267,7 @@ From sized input</description>
    <comment/>
    <image/>
    <values>
-    <value>edge-pair: (3.9,3.9;3.7,3.9)|(3.3,4;3.6,4.6)</value>
+    <value>edge-pair: (5,4.2;3.804,4.285)|(3.6,4.6;5.1,4.9)</value>
    </values>
   </item>
   <item>
@@ -303,7 +303,7 @@ From sized input</description>
    <comment/>
    <image/>
    <values>
-    <value>edge-pair: (3.7,3.9;3.3,4)|(3.804,4.285;3.9,3.9)</value>
+    <value>edge-pair: (5.2,4.2;5,4.2)|(5.1,4.9;5.3,4.9)</value>
    </values>
   </item>
   <item>
@@ -327,7 +327,7 @@ From sized input</description>
    <comment/>
    <image/>
    <values>
-    <value>edge-pair: (5.2,4.2;5,4.2)|(5.1,4.9;5.3,4.9)</value>
+    <value>edge-pair: (3.9,3.9;3.7,3.9)|(3.804,4.285;3.9,3.9)</value>
    </values>
   </item>
   <item>

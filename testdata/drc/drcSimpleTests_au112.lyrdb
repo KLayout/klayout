@@ -6,24 +6,34 @@ another line</description>
  <generator>drc: script='.drc'</generator>
  <top-cell>TOP</top-cell>
  <tags>
+  <tag>
+   <name>waived</name>
+   <description/>
+  </tag>
  </tags>
  <categories>
   <category>
-   <name>l1</name>
-   <description>L1 (1/0 sized by x=100nm,y=0)</description>
+   <name>inputs</name>
+   <description/>
    <categories>
+    <category>
+     <name>l1</name>
+     <description>L1 (1/0 sized by x=100nm,y=0)</description>
+     <categories>
+     </categories>
+    </category>
+    <category>
+     <name>l1_snapped</name>
+     <description>L1 snapped to 200nm</description>
+     <categories>
+     </categories>
+    </category>
    </categories>
   </category>
   <category>
    <name>w1um</name>
    <description>w &lt; 1µm
-From sized input</description>
-   <categories>
-   </categories>
-  </category>
-  <category>
-   <name>l1_snapped</name>
-   <description>L1 snapped to 200nm</description>
+Another line</description>
    <categories>
    </categories>
   </category>
@@ -91,7 +101,7 @@ From snapped input</description>
  <items>
   <item>
    <tags/>
-   <category>l1</category>
+   <category>inputs.l1</category>
    <cell>TOP</cell>
    <visited>false</visited>
    <multiplicity>1</multiplicity>
@@ -103,7 +113,7 @@ From snapped input</description>
   </item>
   <item>
    <tags/>
-   <category>l1</category>
+   <category>inputs.l1</category>
    <cell>TOP</cell>
    <visited>false</visited>
    <multiplicity>1</multiplicity>
@@ -115,7 +125,7 @@ From snapped input</description>
   </item>
   <item>
    <tags/>
-   <category>l1</category>
+   <category>inputs.l1</category>
    <cell>A:r0</cell>
    <visited>false</visited>
    <multiplicity>1</multiplicity>
@@ -127,7 +137,7 @@ From snapped input</description>
   </item>
   <item>
    <tags/>
-   <category>l1</category>
+   <category>inputs.l1</category>
    <cell>A:r90</cell>
    <visited>false</visited>
    <multiplicity>1</multiplicity>
@@ -138,31 +148,7 @@ From snapped input</description>
    </values>
   </item>
   <item>
-   <tags/>
-   <category>w1um</category>
-   <cell>TOP</cell>
-   <visited>false</visited>
-   <multiplicity>1</multiplicity>
-   <comment/>
-   <image/>
-   <values>
-    <value>edge-pair: (3.9,3.9;3.7,3.9)|(3.804,4.285;3.9,3.9)</value>
-   </values>
-  </item>
-  <item>
-   <tags/>
-   <category>w1um</category>
-   <cell>TOP</cell>
-   <visited>false</visited>
-   <multiplicity>1</multiplicity>
-   <comment/>
-   <image/>
-   <values>
-    <value>edge-pair: (5.2,4.2;5,4.2)|(4.138,4.708;5.1,4.9)</value>
-   </values>
-  </item>
-  <item>
-   <tags/>
+   <tags>waived</tags>
    <category>w1um</category>
    <cell>TOP</cell>
    <visited>false</visited>
@@ -174,19 +160,7 @@ From snapped input</description>
    </values>
   </item>
   <item>
-   <tags/>
-   <category>w1um</category>
-   <cell>TOP</cell>
-   <visited>false</visited>
-   <multiplicity>1</multiplicity>
-   <comment/>
-   <image/>
-   <values>
-    <value>edge-pair: (3.3,4;3.6,4.6)|(3.804,4.285;3.9,3.9)</value>
-   </values>
-  </item>
-  <item>
-   <tags/>
+   <tags>waived</tags>
    <category>w1um</category>
    <cell>TOP</cell>
    <visited>false</visited>
@@ -198,79 +172,7 @@ From snapped input</description>
    </values>
   </item>
   <item>
-   <tags/>
-   <category>w1um</category>
-   <cell>TOP</cell>
-   <visited>false</visited>
-   <multiplicity>1</multiplicity>
-   <comment/>
-   <image/>
-   <values>
-    <value>edge-pair: (4.53,4.233;3.804,4.285)|(3.455,4.31;3.6,4.6)</value>
-   </values>
-  </item>
-  <item>
-   <tags/>
-   <category>w1um</category>
-   <cell>TOP</cell>
-   <visited>false</visited>
-   <multiplicity>1</multiplicity>
-   <comment/>
-   <image/>
-   <values>
-    <value>edge-pair: (4.266,4.733;5.1,4.9)|(5.3,4.9;5.2,4.2)</value>
-   </values>
-  </item>
-  <item>
-   <tags/>
-   <category>w1um</category>
-   <cell>TOP</cell>
-   <visited>false</visited>
-   <multiplicity>1</multiplicity>
-   <comment/>
-   <image/>
-   <values>
-    <value>edge-pair: (5,4.2;3.804,4.285)|(3.6,4.6;5.1,4.9)</value>
-   </values>
-  </item>
-  <item>
-   <tags/>
-   <category>w1um</category>
-   <cell>TOP</cell>
-   <visited>false</visited>
-   <multiplicity>1</multiplicity>
-   <comment/>
-   <image/>
-   <values>
-    <value>edge-pair: (3.9,3.9;3.7,3.9)|(3.3,4;3.6,4.6)</value>
-   </values>
-  </item>
-  <item>
-   <tags/>
-   <category>w1um</category>
-   <cell>TOP</cell>
-   <visited>false</visited>
-   <multiplicity>1</multiplicity>
-   <comment/>
-   <image/>
-   <values>
-    <value>edge-pair: (3.9,3.9;3.7,3.9)|(3.6,4.6;4.408,4.762)</value>
-   </values>
-  </item>
-  <item>
-   <tags/>
-   <category>w1um</category>
-   <cell>TOP</cell>
-   <visited>false</visited>
-   <multiplicity>1</multiplicity>
-   <comment/>
-   <image/>
-   <values>
-    <value>edge-pair: (5.1,4.9;5.3,4.9)|(5.3,4.9;5.2,4.2)</value>
-   </values>
-  </item>
-  <item>
-   <tags/>
+   <tags>waived</tags>
    <category>w1um</category>
    <cell>TOP</cell>
    <visited>false</visited>
@@ -282,7 +184,7 @@ From snapped input</description>
    </values>
   </item>
   <item>
-   <tags/>
+   <tags>waived</tags>
    <category>w1um</category>
    <cell>TOP</cell>
    <visited>false</visited>
@@ -290,11 +192,95 @@ From snapped input</description>
    <comment/>
    <image/>
    <values>
-    <value>edge-pair: (5,4.2;4.343,4.247)|(5.1,4.9;5.3,4.9)</value>
+    <value>edge-pair: (4.53,4.233;3.804,4.285)|(3.455,4.31;3.6,4.6)</value>
    </values>
   </item>
   <item>
-   <tags/>
+   <tags>waived</tags>
+   <category>w1um</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (3.3,4;3.6,4.6)|(3.804,4.285;3.9,3.9)</value>
+   </values>
+  </item>
+  <item>
+   <tags>waived</tags>
+   <category>w1um</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (3.9,3.9;3.7,3.9)|(3.3,4;3.6,4.6)</value>
+   </values>
+  </item>
+  <item>
+   <tags>waived</tags>
+   <category>w1um</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (4.266,4.733;5.1,4.9)|(5.3,4.9;5.2,4.2)</value>
+   </values>
+  </item>
+  <item>
+   <tags>waived</tags>
+   <category>w1um</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (5.2,4.2;5,4.2)|(4.138,4.708;5.1,4.9)</value>
+   </values>
+  </item>
+  <item>
+   <tags>waived</tags>
+   <category>w1um</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (5,4.2;3.804,4.285)|(3.6,4.6;5.1,4.9)</value>
+   </values>
+  </item>
+  <item>
+   <tags>waived</tags>
+   <category>w1um</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (3.9,3.9;3.7,3.9)|(3.6,4.6;4.408,4.762)</value>
+   </values>
+  </item>
+  <item>
+   <tags>waived</tags>
+   <category>w1um</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment>First item von w1um</comment>
+   <image/>
+   <values>
+    <value>edge-pair: (5.1,4.9;5.3,4.9)|(5.3,4.9;5.2,4.2)</value>
+   </values>
+  </item>
+  <item>
+   <tags>waived</tags>
    <category>w1um</category>
    <cell>TOP</cell>
    <visited>false</visited>
@@ -306,7 +292,31 @@ From snapped input</description>
    </values>
   </item>
   <item>
-   <tags/>
+   <tags>waived</tags>
+   <category>w1um</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (5,4.2;4.343,4.247)|(5.1,4.9;5.3,4.9)</value>
+   </values>
+  </item>
+  <item>
+   <tags>waived</tags>
+   <category>w1um</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (3.9,3.9;3.7,3.9)|(3.804,4.285;3.9,3.9)</value>
+   </values>
+  </item>
+  <item>
+   <tags>waived</tags>
    <category>w1um</category>
    <cell>TOP</cell>
    <visited>false</visited>
@@ -318,7 +328,7 @@ From snapped input</description>
    </values>
   </item>
   <item>
-   <tags/>
+   <tags>waived</tags>
    <category>w1um</category>
    <cell>TOP</cell>
    <visited>false</visited>
@@ -330,7 +340,7 @@ From snapped input</description>
    </values>
   </item>
   <item>
-   <tags/>
+   <tags>waived</tags>
    <category>w1um</category>
    <cell>A:r0</cell>
    <visited>false</visited>
@@ -342,7 +352,7 @@ From snapped input</description>
    </values>
   </item>
   <item>
-   <tags/>
+   <tags>waived</tags>
    <category>w1um</category>
    <cell>A:r90</cell>
    <visited>false</visited>
@@ -355,7 +365,7 @@ From snapped input</description>
   </item>
   <item>
    <tags/>
-   <category>l1_snapped</category>
+   <category>inputs.l1_snapped</category>
    <cell>TOP</cell>
    <visited>false</visited>
    <multiplicity>1</multiplicity>
@@ -367,7 +377,7 @@ From snapped input</description>
   </item>
   <item>
    <tags/>
-   <category>l1_snapped</category>
+   <category>inputs.l1_snapped</category>
    <cell>TOP</cell>
    <visited>false</visited>
    <multiplicity>1</multiplicity>
@@ -378,12 +388,12 @@ From snapped input</description>
    </values>
   </item>
   <item>
-   <tags/>
-   <category>l1_snapped</category>
+   <tags>waived</tags>
+   <category>inputs.l1_snapped</category>
    <cell>A:r0;r0(-0.1,0)</cell>
    <visited>false</visited>
    <multiplicity>1</multiplicity>
-   <comment/>
+   <comment>A comment on the only waived input shape</comment>
    <image/>
    <values>
     <value>polygon: (-0.1,0;-0.1,1.6;0.3,1.6;0.3,0)</value>
@@ -391,7 +401,7 @@ From snapped input</description>
   </item>
   <item>
    <tags/>
-   <category>l1_snapped</category>
+   <category>inputs.l1_snapped</category>
    <cell>A:r90</cell>
    <visited>false</visited>
    <multiplicity>1</multiplicity>
@@ -403,7 +413,7 @@ From snapped input</description>
   </item>
   <item>
    <tags/>
-   <category>l1_snapped</category>
+   <category>inputs.l1_snapped</category>
    <cell>A:r0;r0</cell>
    <visited>false</visited>
    <multiplicity>1</multiplicity>
@@ -411,6 +421,90 @@ From snapped input</description>
    <image/>
    <values>
     <value>polygon: (0,0;0,1.6;0.4,1.6;0.4,0)</value>
+   </values>
+  </item>
+  <item>
+   <tags>waived</tags>
+   <category>w1um_snapped</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (3.467,4.2;3.6,4.6)|(4.521,4.2;3.8,4.2)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>w1um_snapped</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (3.4,4;3.55,4.45)|(3.8,4.2;4,4)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>w1um_snapped</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (3.4,4;3.6,4.6)|(4,4;3.4,4)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>w1um_snapped</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (4.314,4.778;5.2,5)|(5.4,5;5.2,4.2)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>w1um_snapped</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (5.2,4.2;3.8,4.2)|(3.6,4.6;5.2,5)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>w1um_snapped</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (4,4;3.4,4)|(3.6,4.6;4.547,4.837)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>w1um_snapped</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (5.2,5;5.4,5)|(5.4,5;5.2,4.2)</value>
    </values>
   </item>
   <item>
@@ -446,83 +540,11 @@ From snapped input</description>
    <comment/>
    <image/>
    <values>
-    <value>edge-pair: (5.2,5;5.4,5)|(5.4,5;5.2,4.2)</value>
+    <value>edge-pair: (2.2,3;2.2,3.6)|(3,3.6;3,3)</value>
    </values>
   </item>
   <item>
-   <tags/>
-   <category>w1um_snapped</category>
-   <cell>TOP</cell>
-   <visited>false</visited>
-   <multiplicity>1</multiplicity>
-   <comment/>
-   <image/>
-   <values>
-    <value>edge-pair: (4,4;3.4,4)|(3.6,4.6;4.547,4.837)</value>
-   </values>
-  </item>
-  <item>
-   <tags/>
-   <category>w1um_snapped</category>
-   <cell>TOP</cell>
-   <visited>false</visited>
-   <multiplicity>1</multiplicity>
-   <comment/>
-   <image/>
-   <values>
-    <value>edge-pair: (5.2,4.2;3.8,4.2)|(3.6,4.6;5.2,5)</value>
-   </values>
-  </item>
-  <item>
-   <tags/>
-   <category>w1um_snapped</category>
-   <cell>TOP</cell>
-   <visited>false</visited>
-   <multiplicity>1</multiplicity>
-   <comment/>
-   <image/>
-   <values>
-    <value>edge-pair: (4.314,4.778;5.2,5)|(5.4,5;5.2,4.2)</value>
-   </values>
-  </item>
-  <item>
-   <tags/>
-   <category>w1um_snapped</category>
-   <cell>TOP</cell>
-   <visited>false</visited>
-   <multiplicity>1</multiplicity>
-   <comment/>
-   <image/>
-   <values>
-    <value>edge-pair: (3.4,4;3.6,4.6)|(4,4;3.4,4)</value>
-   </values>
-  </item>
-  <item>
-   <tags/>
-   <category>w1um_snapped</category>
-   <cell>TOP</cell>
-   <visited>false</visited>
-   <multiplicity>1</multiplicity>
-   <comment/>
-   <image/>
-   <values>
-    <value>edge-pair: (3.4,4;3.55,4.45)|(3.8,4.2;4,4)</value>
-   </values>
-  </item>
-  <item>
-   <tags/>
-   <category>w1um_snapped</category>
-   <cell>TOP</cell>
-   <visited>false</visited>
-   <multiplicity>1</multiplicity>
-   <comment/>
-   <image/>
-   <values>
-    <value>edge-pair: (3.467,4.2;3.6,4.6)|(4.521,4.2;3.8,4.2)</value>
-   </values>
-  </item>
-  <item>
-   <tags/>
+   <tags>waived</tags>
    <category>w1um_snapped</category>
    <cell>TOP</cell>
    <visited>false</visited>
@@ -531,18 +553,6 @@ From snapped input</description>
    <image/>
    <values>
     <value>edge-pair: (3,3;2.2,3)|(2.2,3.6;3,3.6)</value>
-   </values>
-  </item>
-  <item>
-   <tags/>
-   <category>w1um_snapped</category>
-   <cell>TOP</cell>
-   <visited>false</visited>
-   <multiplicity>1</multiplicity>
-   <comment/>
-   <image/>
-   <values>
-    <value>edge-pair: (2.2,3;2.2,3.6)|(3,3.6;3,3)</value>
    </values>
   </item>
   <item>
@@ -558,7 +568,7 @@ From snapped input</description>
    </values>
   </item>
   <item>
-   <tags/>
+   <tags>waived</tags>
    <category>w1um_snapped</category>
    <cell>A:r90</cell>
    <visited>false</visited>
@@ -575,7 +585,8 @@ From snapped input</description>
    <cell>A:r0;r0</cell>
    <visited>false</visited>
    <multiplicity>1</multiplicity>
-   <comment/>
+   <comment>A comment
+With two lines</comment>
    <image/>
    <values>
     <value>edge-pair: (0,0;0,1.6)|(0.4,1.6;0.4,0)</value>

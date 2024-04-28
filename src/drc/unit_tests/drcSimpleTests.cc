@@ -1702,3 +1702,74 @@ TEST(102d_edge_modes)
 {
   run_test (_this, "102", true);
 }
+
+TEST(110_RDBVariantAssignment)
+{
+  std::string rs = tl::testdata ();
+  rs += "/drc/drcSimpleTests_110.drc";
+
+  //  apart from that it's a variant of 14b ...
+
+  std::string input = tl::testdata ();
+  input += "/drc/drcSimpleTests_110.gds";
+
+  std::string au_report = tl::testdata ();
+  au_report += "/drc/drcSimpleTests_au110.lyrdb";
+
+  std::string report = this->tmp_file ("tmp.lydrc");
+
+  {
+    //  Set some variables
+    lym::Macro config;
+    config.set_text (tl::sprintf (
+        "$drc_force_gc = true\n"
+        "$drc_test_source = '%s'\n"
+        "$drc_test_report = '%s'\n"
+      , input, report)
+    );
+    config.set_interpreter (lym::Macro::Ruby);
+    EXPECT_EQ (config.run (), 0);
+  }
+
+  lym::Macro drc;
+  drc.load_from (rs);
+  EXPECT_EQ (drc.run (), 0);
+
+  compare_text_files (report, au_report);
+}
+
+TEST(111_RDBCategoryHierarchy)
+{
+  std::string rs = tl::testdata ();
+  rs += "/drc/drcSimpleTests_111.drc";
+
+  //  apart from that it's a variant of 14b ...
+
+  std::string input = tl::testdata ();
+  input += "/drc/drcSimpleTests_111.gds";
+
+  std::string au_report = tl::testdata ();
+  au_report += "/drc/drcSimpleTests_au111.lyrdb";
+
+  std::string report = this->tmp_file ("tmp.lydrc");
+
+  {
+    //  Set some variables
+    lym::Macro config;
+    config.set_text (tl::sprintf (
+        "$drc_force_gc = true\n"
+        "$drc_test_source = '%s'\n"
+        "$drc_test_report = '%s'\n"
+      , input, report)
+    );
+    config.set_interpreter (lym::Macro::Ruby);
+    EXPECT_EQ (config.run (), 0);
+  }
+
+  lym::Macro drc;
+  drc.load_from (rs);
+  EXPECT_EQ (drc.run (), 0);
+
+  compare_text_files (report, au_report);
+}
+

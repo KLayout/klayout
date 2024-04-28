@@ -115,11 +115,29 @@ module DRC
     end
 
     def write
+
       if @file_name
+      
         rdb_file = @engine._make_path(@file_name)
+
+        #  Apply waive DB if possible
+        wdb_file = rdb_file + ".w"
+        if File.exists?(wdb_file)
+          begin
+            wdb = RBA::ReportDatabase::new
+            wdb.load(wdb_file)
+            @engine.info("Applying waive database: #{wdb_file} ..")
+            @rdb.apply(wdb)
+            wdb._destroy
+          rescue
+          end
+        end
+
         @engine.info("Writing report database: #{rdb_file} ..")
         @rdb.save(rdb_file)
+
       end
+
     end
 
     def rdb

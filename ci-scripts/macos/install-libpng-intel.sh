@@ -9,3 +9,7 @@ eval "$(/usr/local/homebrew/bin/brew shellenv)"
 which brew
 arch -x86_64 brew install -v libpng
 
+echo "@@@@@@@@@@@@@@"
+which libpng-config
+libpng-config --cflags
+

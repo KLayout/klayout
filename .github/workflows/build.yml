@@ -22,10 +22,10 @@ jobs:
         include:
           - os: "macos-latest"
             cibuild: "*macosx*"
-          - os: "ubuntu-latest"
-            cibuild: "*manylinux*"
-          - os: "ubuntu-latest"
-            cibuild: "*musllinux*"
+#- os: "ubuntu-latest"
+#cibuild: "*manylinux*"
+#- os: "ubuntu-latest"
+#cibuild: "*musllinux*"
     steps:
       - name: Free Disk Space (Ubuntu)
         if: matrix.os == 'ubuntu-latest'

@@ -28,16 +28,15 @@ environment-pass = ["HOST_CCACHE_DIR"]
 
 [tool.cibuildwheel.macos]
 before-all = [
-  "bash {project}/ci-scripts/macos/install-libpng-intel.sh",
+#"bash {project}/ci-scripts/macos/install-libpng-intel.sh",
 #"arch -x86_64 /bin/bash -c '$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)'",
 #"eval '$(/usr/local/homebrew/bin/brew shellenv)'; arch -x86_64 brew install libpng",
 ]
 
 # TEMP while Github Actions does not provide an Apple Silicon runner
-archs = ["x86_64"]
 before-build = [
-  "ccache -s",
-  'eval "$(/usr/local/homebrew/bin/brew shellenv)"'
+#"ccache -s",
+#'eval "$(/usr/local/homebrew/bin/brew shellenv)"'
 #"bash {project}/ci-scripts/macos/libpng-patch.sh",
 ]
 # Repair macOS wheels (include libpng with the wheel, for example)

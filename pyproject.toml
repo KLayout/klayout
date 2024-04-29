@@ -28,8 +28,8 @@ environment-pass = ["HOST_CCACHE_DIR"]
 
 [tool.cibuildwheel.macos]
 before-all = [
-  "arch -x86_64 /bin/bash -c '$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)'",
-  "eval '$(/usr/local/homebrew/bin/brew shellenv)'; arch -x86_64 brew install libpng",
+#"arch -x86_64 /bin/bash -c '$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)'",
+#"eval '$(/usr/local/homebrew/bin/brew shellenv)'; arch -x86_64 brew install libpng",
 ]
 
 # TEMP while Github Actions does not provide an Apple Silicon runner

@@ -58,6 +58,7 @@ jobs:
         #   CIBW_SOME_OPTION: value
         env:
           CIBW_BUILD: ${{ matrix.cibuild }}
+          CIBW_ARCHS_MACOS: x86_64
 
       - name: Download Cache from Docker (linux only)
         if: ${{ runner.os == 'Linux' }}

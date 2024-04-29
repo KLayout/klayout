@@ -2455,8 +2455,10 @@ public:
    *  @brief Load the database from a file
    *
    *  Note: This clears the existing database.
+   *  The argument intentionally is a copy, so we can call
+   *  "load (this->filename ())" for reloading.
    */
-  void load (const std::string &filename);
+  void load (std::string filename);
 
   /**
    *  @brief Applies the attributes from a different database

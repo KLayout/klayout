@@ -1762,7 +1762,7 @@ read_db_from_layout (rdb::Database *db, tl::InputStream &is)
 }
 
 void
-Database::load (const std::string &fn)
+Database::load (std::string fn)
 {
   tl::log << "Loading RDB from " << fn;
 

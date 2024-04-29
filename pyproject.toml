@@ -37,6 +37,7 @@ before-all = [
 archs = ["x86_64"]
 before-build = [
   "ccache -s",
+  'eval "$(/usr/local/homebrew/bin/brew shellenv)"'
 #"bash {project}/ci-scripts/macos/libpng-patch.sh",
 ]
 # Repair macOS wheels (include libpng with the wheel, for example)

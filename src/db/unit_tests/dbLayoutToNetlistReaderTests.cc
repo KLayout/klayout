@@ -539,3 +539,27 @@ TEST(6_ReaderLog)
   compare_text_files (path, au_path);
 }
 
+//  issue #1696
+TEST(7_CustomDevice)
+{
+  db::LayoutToNetlist l2n;
+
+  std::string in_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "l2n_reader_7.l2n");
+  tl::InputStream is_in (in_path);
+
+  db::LayoutToNetlistStandardReader reader (is_in);
+  reader.read (&l2n);
+
+  //  verify against the input
+
+  std::string path = tmp_file ("tmp.txt");
+  {
+    tl::OutputStream stream (path);
+    db::LayoutToNetlistStandardWriter writer (stream, false);
+    writer.write (&l2n);
+  }
+
+  std::string au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "l2n_reader_au_7.l2n");
+
+  compare_text_files (path, au_path);
+}

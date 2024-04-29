@@ -28,7 +28,7 @@ environment-pass = ["HOST_CCACHE_DIR"]
 
 [tool.cibuildwheel.macos]
 before-all = [
-  "brew uninstall libpng",
+  "brew uninstall --ignore-dependencies libpng",
   "arch -x86_64 brew install libpng",
 ]
 

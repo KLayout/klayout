@@ -1,3 +1,49 @@
+0.29.1           (2024-05-04):
+* Bugfix: %GITHUB%/issues/1696 Cannot read LVS or L2N report with generic devices
+* Bugfix: %GITHUB%/issues/1691 LVS soft connections: making a soft connection to a device terminal disconnects the device
+* Bugfix: %GITHUB%/issues/1683 Spice reader accepts circuits without definition but pins get shorted
+* Bugfix: %GITHUB%/issues/1681 Spice reader ".endl" should accept lib name
+* Bugfix: %GITHUB%/issues/1679 Update sample macros for migration to Qt6
+* Enhancement: %GITHUB%/issues/1678 Qt major version-wise Assistant
+* Bugfix: %GITHUB%/issues/1671 Search and replace: Delete instances crashes KLayout
+* Enhancement: %GITHUB%/issues/1666 'Visibility Follows Selection' option for the 2.5d view
+* Bugfix: HTTPS timeout included time to enter password
+  So you had 10 seconds max. to enter your password :(
+* Bugfix: marker and net browser windows did not get closed when clicking on close icon
+* Bugfix: "duplicate interactive" now also working for rulers
+* Enhancement: "upcase", "downcase" functions for expressions
+* Enhancement: DRC features to reduce coding effort for certain rules
+  - New options for "corners": 'absolute' and 'negative' options
+  - New options for with/without_angle: 'absolute' option.
+* Bugfixes: SPICE reader
+  - now detects recursive circuit calls
+  - skips empty top level circuit now, which did not happen when 
+    control statements were present at top level
+* Enhancements: DRC report category formation:
+  - "output" will add shapes to a category is the category name was
+    used before
+  - "output" accepts an array of names for the category name, creating
+    a sub-category hierarchy
+* Enhancement: Enhanced handling of cell variants in DRC reports
+  Now, cell variants are listed with the original cell name and
+  a description of the variant formation.
+* Enhancement: Marker browser enhancements and RDB API
+  - items can be added comment strings now.
+  - "info" and "save" function in marker database browser File menu
+  - file name shown in RDB selection drop-down
+* Enhancement: DRC waiver concept
+  KLayout now includes a way to store waive flags along with RDB databases.
+  A waiver DB is nothing else than a report database file annotated with 
+  waive flags and other attributes like comments, images etc.
+  For details see documentation under "DRC Basics".
+  New functions in marker browser:
+  - apply waiver DB
+  - save as waiver DB
+* Enhancement: Editor hooks
+  This feature allows dynamically annotating shapes while
+  they are edited. This feature is somewhat experimental as of now.
+  See "EditorHooks" class for an example.
+  
 0.29.0           (2024-04-01):
 * Enhancement: %GITHUB%/issues/1662 Strong default grids
 * Enhancement: %GITHUB%/issues/1656 Display-->Goto Position dialog should accept + as well as - for number prefixes

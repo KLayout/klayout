@@ -1495,6 +1495,11 @@ MarkerBrowserPage::MarkerBrowserPage (QWidget * /*parent*/)
 #endif
 
   directory_tree->header ()->setStretchLastSection (true);
+#if QT_VERSION >= 0x050000
+  directory_tree->header ()->setSectionResizeMode (QHeaderView::Interactive);
+#else
+  directory_tree->header ()->setResizeMode (QHeaderView::Interactive);
+#endif
   directory_tree->header ()->setSortIndicatorShown (true);
   
   markers_list->header ()->setStretchLastSection (true);

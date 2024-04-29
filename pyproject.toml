@@ -33,8 +33,7 @@ before-all = [
 ]
 
 # TEMP while Github Actions does not provide an Apple Silicon runner
-# TODO Simply remove it when it's available
-archs = ["x86_64", "arm64"]
+archs = ["x86_64"]
 before-build = [
   "ccache -s",
   "bash {project}/ci-scripts/macos/libpng-patch.sh",

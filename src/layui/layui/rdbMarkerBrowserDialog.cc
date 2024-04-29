@@ -37,6 +37,7 @@
 #include "dbLayoutUtils.h"
 #include "dbRecursiveShapeIterator.h"
 #include "dbStream.h"
+#include "tlFileUtils.h"
 
 #include "ui_MarkerBrowserDialog.h"
 
@@ -89,6 +90,7 @@ MarkerBrowserDialog::MarkerBrowserDialog (lay::Dispatcher *root, lay::LayoutView
   connect (mp_ui->save_action, SIGNAL (triggered ()), this, SLOT (save_clicked ()));
   connect (mp_ui->saveas_action, SIGNAL (triggered ()), this, SLOT (saveas_clicked ()));
   connect (mp_ui->saveas_waiver_db_action, SIGNAL (triggered ()), this, SLOT (saveas_waiver_db_clicked ()));
+  connect (mp_ui->apply_waiver_db_action, SIGNAL (triggered ()), this, SLOT (apply_waiver_db_clicked ()));
   connect (mp_ui->export_action, SIGNAL (triggered ()), this, SLOT (export_clicked ()));
   connect (mp_ui->reload_action, SIGNAL (triggered ()), this, SLOT (reload_clicked ()));
   connect (mp_ui->info_action, SIGNAL (triggered ()), this, SLOT (info_clicked ()));
@@ -99,6 +101,7 @@ MarkerBrowserDialog::MarkerBrowserDialog (lay::Dispatcher *root, lay::LayoutView
   mp_ui->file_menu->addAction (mp_ui->save_action);
   mp_ui->file_menu->addAction (mp_ui->saveas_action);
   mp_ui->file_menu->addAction (mp_ui->saveas_waiver_db_action);
+  mp_ui->file_menu->addAction (mp_ui->apply_waiver_db_action);
   QAction *sep0 = new QAction (mp_ui->file_menu);
   sep0->setSeparator (true);
   mp_ui->file_menu->addAction (mp_ui->export_action);
@@ -391,6 +394,49 @@ BEGIN_PROTECTED
     }
 
   }
+
+END_PROTECTED
+}
+
+void
+MarkerBrowserDialog::apply_waiver_db_clicked ()
+{
+BEGIN_PROTECTED
+
+  rdb::Database *rdb = 0;
+  if (m_rdb_index < int (view ()->num_rdbs ()) && m_rdb_index >= 0) {
+    rdb = view ()->get_rdb (m_rdb_index);
+  }
+  if (! rdb) {
+    return;
+  }
+
+  std::string wdb_filename;
+  if (! rdb->filename ().empty () && tl::file_exists (rdb->filename () + ".w")) {
+
+    wdb_filename = rdb->filename () + ".w";
+
+  } else {
+
+    //  prepare and open the file dialog
+    lay::FileDialog open_dialog (this, tl::to_string (QObject::tr ("Apply Waiver DB File")), "Waiver DB files (*.w)");
+
+    if (! rdb->filename ().empty ()) {
+      wdb_filename = rdb->filename () + ".w";
+    }
+
+    if (! open_dialog.get_open (wdb_filename)) {
+      return;
+    }
+
+  }
+
+  rdb::Database wdb;
+  wdb.load (wdb_filename);
+
+  mp_ui->browser_frame->set_rdb (0);
+  rdb->apply (wdb);
+  mp_ui->browser_frame->set_rdb (rdb);
 
 END_PROTECTED
 }
@@ -785,6 +831,7 @@ MarkerBrowserDialog::update_content ()
   mp_ui->save_action->setEnabled (rdb != 0);
   mp_ui->saveas_action->setEnabled (rdb != 0);
   mp_ui->saveas_waiver_db_action->setEnabled (rdb != 0);
+  mp_ui->apply_waiver_db_action->setEnabled (rdb != 0);
   mp_ui->export_action->setEnabled (rdb != 0);
   mp_ui->unload_action->setEnabled (rdb != 0);
   mp_ui->unload_all_action->setEnabled (rdb != 0);

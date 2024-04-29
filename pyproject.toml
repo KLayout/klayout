@@ -28,7 +28,7 @@ environment-pass = ["HOST_CCACHE_DIR"]
 
 [tool.cibuildwheel.macos]
 before-all = [
-  "bash {project}/ci-scripts/macos/libpng-patch.sh",
+  "bash {project}/ci-scripts/macos/install-libpng-intel.sh",
 #"arch -x86_64 /bin/bash -c '$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)'",
 #"eval '$(/usr/local/homebrew/bin/brew shellenv)'; arch -x86_64 brew install libpng",
 ]

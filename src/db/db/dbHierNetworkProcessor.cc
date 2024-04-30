@@ -1216,11 +1216,13 @@ struct cluster_building_receiver
     db::Connectivity::global_nets_iterator ge = mp_conn->end_global_connections (p.first);
     for (db::Connectivity::global_nets_iterator g = mp_conn->begin_global_connections (p.first); g != ge; ++g) {
 
+      bool soft = (g->second != 0);
+
       typename std::map<size_t, typename std::list<cluster_value>::iterator>::iterator icg = m_global_to_clusters.find (g->first);
 
       if (icg == m_global_to_clusters.end ()) {
 
-        if (g->second != 0) {
+        if (soft) {
 
           //  soft connection to a new global cluster
           m_clusters.push_back (cluster_value ());
@@ -1240,7 +1242,7 @@ struct cluster_building_receiver
 
       } else if (ic->second != icg->second) {
 
-        if (g->second != 0) {
+        if (soft) {
 
           register_soft_connection (ic->second, icg->second, g->second);
 

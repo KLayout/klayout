@@ -513,6 +513,7 @@ public:
   typedef db::box_tree<box_type, local_cluster<T>, local_cluster_box_convert<T> > tree_type;
   typedef typename tree_type::touching_iterator touching_iterator;
   typedef typename tree_type::const_iterator const_iterator;
+  typedef typename tree_type::iterator iterator;
 
   /**
    *  @brief Creates an empty collection
@@ -562,6 +563,22 @@ public:
    *  @brief Gets the clusters (end iterator)
    */
   const_iterator end () const
+  {
+    return m_clusters.end ();
+  }
+
+  /**
+   *  @brief Gets the clusters (begin iterator)
+   */
+  iterator begin ()
+  {
+    return m_clusters.begin ();
+  }
+
+  /**
+   *  @brief Gets the clusters (end iterator)
+   */
+  iterator end ()
   {
     return m_clusters.end ();
   }

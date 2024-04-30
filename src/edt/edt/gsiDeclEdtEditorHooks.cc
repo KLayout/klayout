@@ -360,10 +360,10 @@ gsi::Class<EditorHooksImpl> decl_EditorHooks ("lay", "EditorHooks",
   ) +
   gsi::method ("is_for_technology", &EditorHooksImpl::is_for_technology, gsi::arg ("tech"),
     "@brief Returns a value indicating whether the hooks are associated with the given technology.\n"
+    "The method is equivalent to checking whether the \\technologies list is empty.\n"
   ) +
   gsi::method ("for_technologies", &EditorHooksImpl::for_technologies,
     "@brief Returns a value indicating whether the hooks are associated with any technology.\n"
-    "The method is equivalent to checking whether the \\technologies list is empty.\n"
   ) +
   gsi::method ("technologies", &EditorHooksImpl::get_technologies,
     "@brief Gets the list of technologies these hooks are associated with.\n"

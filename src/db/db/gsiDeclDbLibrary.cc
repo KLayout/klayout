@@ -218,12 +218,12 @@ LibraryClass decl_Library ("db", "Library",
   ) +
   gsi::method ("is_for_technology", &db::Library::is_for_technology, gsi::arg ("tech"),
     "@brief Returns a value indicating whether the library is associated with the given technology.\n"
+    "The method is equivalent to checking whether the \\technologies list is empty.\n"
+    "\n"
     "This method has been introduced in version 0.27"
   ) +
   gsi::method ("for_technologies", &db::Library::for_technologies,
     "@brief Returns a value indicating whether the library is associated with any technology.\n"
-    "The method is equivalent to checking whether the \\technologies list is empty.\n"
-    "\n"
     "This method has been introduced in version 0.27"
   ) +
   gsi::method ("technologies", &db::Library::get_technologies,

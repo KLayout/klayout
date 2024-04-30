@@ -440,13 +440,25 @@ static db::Edges with_length2 (const db::Edges *r, const tl::Variant &min, const
 
 static db::Edges with_angle1 (const db::Edges *r, double a, bool inverse)
 {
-  db::EdgeOrientationFilter f (a, inverse);
+  db::EdgeOrientationFilter f (a, inverse, false);
   return r->filtered (f);
 }
 
 static db::Edges with_angle2 (const db::Edges *r, double amin, double amax, bool inverse, bool include_amin, bool include_amax)
 {
-  db::EdgeOrientationFilter f (amin, include_amin, amax, include_amax, inverse);
+  db::EdgeOrientationFilter f (amin, include_amin, amax, include_amax, inverse, false);
+  return r->filtered (f);
+}
+
+static db::Edges with_abs_angle1 (const db::Edges *r, double a, bool inverse)
+{
+  db::EdgeOrientationFilter f (a, inverse, true);
+  return r->filtered (f);
+}
+
+static db::Edges with_abs_angle2 (const db::Edges *r, double amin, double amax, bool inverse, bool include_amin, bool include_amax)
+{
+  db::EdgeOrientationFilter f (amin, include_amin, amax, include_amax, inverse, true);
   return r->filtered (f);
 }
 
@@ -923,7 +935,23 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "With \"include_min_angle\" set to true (the default), the minimum angle is included in the criterion while with false, the "
     "minimum angle itself is not included. Same for \"include_max_angle\" where the default is false, meaning the maximum angle is not included in the range.\n"
     "\n"
-    "The two \"include..\" arguments have been added in version 0.27."
+    "The two \"include..\" arguments have been added in version 0.27.\n"
+  ) +
+  method_ext ("with_abs_angle", with_abs_angle1, gsi::arg ("angle"), gsi::arg ("inverse"),
+    "@brief Filter the edges by orientation\n"
+    "\n"
+    "This method behaves like \\with_angle, but angles are always positive - i.e. there is no "
+    "differentiation between edges sloping 'down' vs. edges sloping 'up.\n"
+    "\n"
+    "This method has been added in version 0.29.1.\n"
+  ) +
+  method_ext ("with_abs_angle", with_abs_angle2, gsi::arg ("min_angle"), gsi::arg ("max_angle"), gsi::arg ("inverse"), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", false),
+    "@brief Filter the edges by orientation\n"
+    "\n"
+    "This method behaves like \\with_angle, but angles are always positive - i.e. there is no "
+    "differentiation between edges sloping 'down' vs. edges sloping 'up.\n"
+    "\n"
+    "This method has been added in version 0.29.1.\n"
   ) +
   method_ext ("with_angle", with_angle3, gsi::arg ("type"), gsi::arg ("inverse"),
     "@brief Filters the edges by orientation type\n"

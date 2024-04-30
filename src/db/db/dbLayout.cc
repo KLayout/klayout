@@ -439,6 +439,7 @@ LayoutOrCellContextInfo::has_meta_info () const
 Layout::Layout (db::Manager *manager)
   : db::Object (manager),
     mp_library (0),
+    mp_builder (0),
     m_cells_size (0),
     m_invalid (0),
     m_top_cells (0),
@@ -454,6 +455,7 @@ Layout::Layout (db::Manager *manager)
 Layout::Layout (bool editable, db::Manager *manager)
   : db::Object (manager),
     mp_library (0),
+    mp_builder (0),
     m_cells_size (0),
     m_invalid (0),
     m_top_cells (0),
@@ -473,6 +475,7 @@ Layout::Layout (const db::Layout &layout)
     tl::Object (),
     tl::UniqueId (),
     mp_library (0),
+    mp_builder (0),
     m_cells_size (0),
     m_invalid (0),
     m_top_cells (0),

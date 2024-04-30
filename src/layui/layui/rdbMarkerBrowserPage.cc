@@ -39,6 +39,7 @@
 #include <QMessageBox>
 #include <QHeaderView>
 #include <QKeyEvent>
+#include <QInputDialog>
 
 namespace rdb
 {
@@ -103,13 +104,13 @@ class MarkerBrowserTreeViewModelCacheEntry
 {
 public:
   MarkerBrowserTreeViewModelCacheEntry ()
-    : mp_parent (0), m_id (0), m_row (0), m_count (0)
+    : mp_parent (0), m_id (0), m_row (0), m_count (0), m_waived_count (0)
   {
     // .. nothing yet ..
   }
 
   MarkerBrowserTreeViewModelCacheEntry (rdb::id_type id, unsigned int branch)
-    : mp_parent (0), m_id ((id << 3) + (branch << 1)), m_row (0), m_count (0)
+    : mp_parent (0), m_id ((id << 3) + (branch << 1)), m_row (0), m_count (0), m_waived_count (0)
   {
     // .. nothing yet ..
   }
@@ -233,6 +234,25 @@ public:
     m_count = c;
   }
 
+  size_t waived_count () const
+  {
+    return m_waived_count;
+  }
+
+  void set_waived_count (size_t c)
+  {
+    m_waived_count = c;
+  }
+
+  void waive_or_unwaive (bool w)
+  {
+    if (w) {
+      ++m_waived_count;
+    } else {
+      --m_waived_count;
+    }
+  }
+
   void sort_by_key_name (bool ascending, const rdb::Database *database)
   {
     std::sort (m_ids.begin (), m_ids.end (), SortByKeyCompareFunc (ascending, database));
@@ -257,7 +277,7 @@ private:
   MarkerBrowserTreeViewModelCacheEntry *mp_parent;
   rdb::id_type m_id;
   unsigned int m_row;
-  size_t m_count;
+  size_t m_count, m_waived_count;
   std::vector<MarkerBrowserTreeViewModelCacheEntry *> m_ids;
 };
 
@@ -267,7 +287,7 @@ SortByKeyCompareFunc::operator() (MarkerBrowserTreeViewModelCacheEntry *a, Marke
   const rdb::Cell *ca = mp_rdb->cell_by_id (a->id ());
   const rdb::Cell *cb = mp_rdb->cell_by_id (b->id ());
   if (ca && cb) {
-    return m_ascending ? ca->name () < cb->name () : cb->name () < ca->name ();
+    return m_ascending ? ca->qname () < cb->qname () : cb->qname () < ca->qname ();
   }
 
   const rdb::Category *xa = mp_rdb->category_by_id (a->id ());
@@ -338,14 +358,16 @@ public:
   };
 
   MarkerBrowserTreeViewModel ()
-    : mp_database (0), m_show_empty_ones (true)
+    : mp_database (0), m_show_empty_ones (true), m_waived_tag_id (0)
   {
-    // .. nothing yet ..
+    //  .. nothing yet ..
   }
 
   void set_database (const rdb::Database *db)
   {
     mp_database = db;
+    m_waived_tag_id = mp_database ? mp_database->tags ().tag ("waived").id () : 0;
+
     invalidate ();
   }
 
@@ -384,6 +406,23 @@ public:
     }
   }
 
+  void waived_changed (const rdb::Item *item, bool waived)
+  {
+    const rdb::Category *cat = mp_database->category_by_id (item->category_id ());
+    while (cat) {
+      waive_or_unwaive (0, cat->id (), waived);
+      if (item->cell_id () != 0) {
+        waive_or_unwaive (item->cell_id (), cat->id (), waived);
+      }
+      cat = cat->parent ();
+    }
+
+    waive_or_unwaive (0, 0, waived);
+    if (item->cell_id () != 0) {
+      waive_or_unwaive (item->cell_id (), 0, waived);
+    }
+  }
+
   int columnCount (const QModelIndex & /*parent*/) const
   {
     return 2;
@@ -395,7 +434,7 @@ public:
       if (section == 0) {
         return QVariant (QObject::tr ("Cell / Category"));
       } else if (section == 1) {
-        return QVariant (QObject::tr ("Count (Not Visited)"));
+        return QVariant (QObject::tr ("Count (Not Visited) - Waived"));
       }
     }
 
@@ -436,13 +475,14 @@ public:
     return true;
   }
 
-  bool no_errors (const QModelIndex &index) const
+  bool no_errors (const QModelIndex &index, bool include_waived = false) const
   {
     MarkerBrowserTreeViewModelCacheEntry *node = (MarkerBrowserTreeViewModelCacheEntry *)(index.internalPointer ());
     if (node && mp_database) {
 
       rdb::id_type id = node->id ();
       bool none = false;
+      size_t thr = include_waived ? node->waived_count () : 0;
 
       const rdb::Cell *cell = mp_database->cell_by_id (id);
       const rdb::Category *category = mp_database->category_by_id (id);
@@ -464,13 +504,13 @@ public:
       }
 
       if (cell == 0 && category == 0) {
-        none = (mp_database->num_items () == 0);
+        none = (mp_database->num_items () <= thr);
       } else if (category == 0) {
-        none = (cell->num_items () == 0);
+        none = (cell->num_items () <= thr);
       } else if (cell == 0) {
-        none = (category->num_items () == 0);
+        none = (category->num_items () <= thr);
       } else {
-        none = (mp_database->num_items (cell->id (), category->id ()) == 0);
+        none = (mp_database->num_items (cell->id (), category->id ()) <= thr);
       } 
 
       return none;
@@ -494,16 +534,30 @@ public:
 
         if (index.column () == 1) {
 
+          std::string s;
+
           if (node->count () > 0) {
+
             size_t visited = node->visited_count (mp_database);
+            size_t waived = node->waived_count ();
+
             if (visited < node->count ()) {
-              return QVariant (tl::to_qstring (tl::sprintf (tl::to_string (QObject::tr ("%lu (%lu)")), node->count (), node->count () - visited)));
+              s = tl::sprintf (tl::to_string (tr ("%lu (%lu)")), node->count (), node->count () - visited);
             } else {
-              return QVariant ((unsigned int) node->count ());
+              s = tl::sprintf (tl::to_string (tr ("%lu")), node->count ());
             }
-          } else {
-            return QVariant (QString::fromUtf8 (""));
+
+            if (waived > 0) {
+              if (waived == node->count ()) {
+                s += tl::to_string (tr (" - all waived"));
+              } else {
+                s += tl::sprintf (tl::to_string (tr (" - %lu")), waived);
+              }
+            }
+
           }
+
+          return QVariant (tl::to_qstring (s));
 
         } else if (index.column () == 0) {
 
@@ -529,7 +583,7 @@ public:
               if (cell->name ().empty ()) {
                 return QObject::tr ("All Cells");
               } else {
-                return QVariant (QString::fromUtf8 ("[") + tl::to_qstring (cell->name ()) + QString::fromUtf8 ("]"));
+                return QVariant (QString::fromUtf8 ("[") + tl::to_qstring (cell->qname ()) + QString::fromUtf8 ("]"));
               }
             }
 
@@ -567,7 +621,7 @@ public:
       }
 
       //  Green color if no errors are present
-      if (no_errors (index)) {
+      if (no_errors (index, true)) {
         return QVariant (QColor (0, 192, 0));
       }
 
@@ -725,22 +779,103 @@ public:
 private:
   const rdb::Database *mp_database;
   mutable MarkerBrowserTreeViewModelCacheEntry m_cache;
+  mutable std::multimap<std::pair<rdb::id_type, rdb::id_type>, MarkerBrowserTreeViewModelCacheEntry *> m_cache_by_ids;
   bool m_show_empty_ones;
+  id_type m_waived_tag_id;
+
+  void waive_or_unwaive (rdb::id_type cell_id, rdb::id_type cat_id, bool waived)
+  {
+    auto k = std::make_pair (cell_id, cat_id);
+    auto c = m_cache_by_ids.find (k);
+    while (c != m_cache_by_ids.end () && c->first == k) {
+      c->second->waive_or_unwaive (waived);
+      ++c;
+    }
+  }
+
+  size_t num_waived () const
+  {
+    size_t n = 0;
+    for (auto i = mp_database->items ().begin (); i != mp_database->items ().end (); ++i) {
+      if (i->has_tag (m_waived_tag_id)) {
+        ++n;
+      }
+    }
+    return n;
+  }
+
+  size_t num_waived_per_cat (id_type cat_id) const
+  {
+    size_t n = 0;
+
+    auto ii = mp_database->items_by_category (cat_id);
+    for (auto i = ii.first; i != ii.second; ++i) {
+      if ((*i)->has_tag (m_waived_tag_id)) {
+        ++n;
+      }
+    }
+
+    //  include sub-categories
+    const rdb::Category *cat = mp_database->category_by_id (cat_id);
+    tl_assert (cat != 0);
+    for (auto c = cat->sub_categories ().begin (); c != cat->sub_categories ().end (); ++c) {
+      n += num_waived_per_cat (c->id ());
+    }
+
+    return n;
+  }
+
+  size_t num_waived_per_cell_and_cat (id_type cell_id, id_type cat_id) const
+  {
+    size_t n = 0;
+
+    auto ii = mp_database->items_by_cell_and_category (cell_id, cat_id);
+    for (auto i = ii.first; i != ii.second; ++i) {
+      if ((*i)->has_tag (m_waived_tag_id)) {
+        ++n;
+      }
+    }
+
+    //  include sub-categories
+    const rdb::Category *cat = mp_database->category_by_id (cat_id);
+    tl_assert (cat != 0);
+    for (auto c = cat->sub_categories ().begin (); c != cat->sub_categories ().end (); ++c) {
+      n += num_waived_per_cell_and_cat (cell_id, c->id ());
+    }
+
+    return n;
+  }
+
+  size_t num_waived_per_cell (id_type cell_id) const
+  {
+    auto ii = mp_database->items_by_cell (cell_id);
+    size_t n = 0;
+    for (auto i = ii.first; i != ii.second; ++i) {
+      if ((*i)->has_tag (m_waived_tag_id)) {
+        ++n;
+      }
+    }
+    return n;
+  }
 
   void invalidate ()
   {
     beginResetModel ();
 
     m_cache.clear ();
+    m_cache_by_ids.clear ();
     
     MarkerBrowserTreeViewModelCacheEntry *by_cell_node = new MarkerBrowserTreeViewModelCacheEntry(0, 0);
     m_cache.add_child (by_cell_node);
+    m_cache_by_ids.insert (std::make_pair (std::make_pair (rdb::id_type (0), rdb::id_type (0)), by_cell_node));
 
     MarkerBrowserTreeViewModelCacheEntry *by_category_node = new MarkerBrowserTreeViewModelCacheEntry(0, 1);
     m_cache.add_child (by_category_node);
+    m_cache_by_ids.insert (std::make_pair (std::make_pair (rdb::id_type (0), rdb::id_type (0)), by_category_node));
 
     MarkerBrowserTreeViewModelCacheEntry *all_node = new MarkerBrowserTreeViewModelCacheEntry(0, 2);
     m_cache.add_child (all_node);
+    m_cache_by_ids.insert (std::make_pair (std::make_pair (rdb::id_type (0), rdb::id_type (0)), all_node));
 
     m_cache.set_cache_valid (true);
 
@@ -760,18 +895,22 @@ private:
   {
     const rdb::Category *category = mp_database->category_by_id (node->id ());
     if (category) {
+
       for (rdb::Categories::const_iterator c = category->sub_categories ().begin (); c != category->sub_categories ().end (); ++c) {
 
         node->set_cache_valid (true);
 
         MarkerBrowserTreeViewModelCacheEntry *child = new MarkerBrowserTreeViewModelCacheEntry (c->id (), node->branch ());
+        m_cache_by_ids.insert (std::make_pair (std::make_pair (rdb::id_type (0), c->id ()), child));
         node->add_child (child);
 
         child->set_count (mp_database->category_by_id (c->id ())->num_items ());
+        child->set_waived_count (num_waived_per_cat (c->id ()));
 
         add_sub_categories (child);
 
       }
+
     }
   }
 
@@ -781,19 +920,24 @@ private:
 
     const rdb::Category *category = mp_database->category_by_id (node->id ());
     if (category) {
+
       for (rdb::Categories::const_iterator c = category->sub_categories ().begin (); c != category->sub_categories ().end (); ++c) {
+
         if (partial_tree.find (c->id ()) != partial_tree.end ()) {
 
           MarkerBrowserTreeViewModelCacheEntry *child = new MarkerBrowserTreeViewModelCacheEntry (c->id (), node->branch ());
+          m_cache_by_ids.insert (std::make_pair (std::make_pair (cell_id, c->id ()), child));
           node->add_child (child);
 
-          size_t n = mp_database->num_items (cell_id, c->id ());
-          child->set_count (n);
+          child->set_count (mp_database->num_items (cell_id, c->id ()));
+          child->set_waived_count (num_waived_per_cell_and_cat (cell_id, c->id ()));
 
           add_sub_categories (cell_id, child, partial_tree);
 
         }
+
       }
+
     }
   }
 
@@ -813,27 +957,44 @@ private:
       if (branch == 0) {
 
         for (rdb::Database::const_cell_iterator c = mp_database->cells ().begin (); c != mp_database->cells ().end (); ++c) {
+
           if (mp_database->cell_by_id (c->id ()) && (m_show_empty_ones || mp_database->cell_by_id (c->id ())->num_items () != 0)) {
+
             MarkerBrowserTreeViewModelCacheEntry *child = new MarkerBrowserTreeViewModelCacheEntry (c->id (), branch);
+            m_cache_by_ids.insert (std::make_pair (std::make_pair (c->id (), rdb::id_type (0)), child));
+
             child->set_count (mp_database->cell_by_id (c->id ())->num_items ());
+            child->set_waived_count (num_waived_per_cell (c->id ()));
+
             node->add_child (child);
+
           }
+
         }
 
       } else if (branch == 1) {
 
         for (rdb::Categories::const_iterator c = mp_database->categories ().begin (); c != mp_database->categories ().end (); ++c) {
+
           if (mp_database->category_by_id (c->id ()) && (m_show_empty_ones || mp_database->category_by_id (c->id ())->num_items () != 0)) {
+
             MarkerBrowserTreeViewModelCacheEntry *child = new MarkerBrowserTreeViewModelCacheEntry (c->id (), branch);
+            m_cache_by_ids.insert (std::make_pair (std::make_pair (rdb::id_type (0), c->id ()), child));
+
             child->set_count (mp_database->category_by_id (c->id ())->num_items ());
+            child->set_waived_count (num_waived_per_cat (c->id ()));
+
             node->add_child (child);
             add_sub_categories (child);
+
           }
+
         }
 
       }
 
       node->set_count (mp_database->num_items ());
+      node->set_waived_count (num_waived ());
 
     } else if (branch == 0) {
 
@@ -869,9 +1030,14 @@ private:
             MarkerBrowserTreeViewModelCacheEntry *child = new MarkerBrowserTreeViewModelCacheEntry (c->id (), branch);
 
             size_t n = mp_database->num_items (id, c->id ());
+
             if (m_show_empty_ones || n != 0) {
 
+              m_cache_by_ids.insert (std::make_pair (std::make_pair (id, c->id ()), child));
+
               child->set_count (n);
+              child->set_waived_count (num_waived_per_cell_and_cat (id, c->id ()));
+
               node->add_child (child);
 
               add_sub_categories (id, child, category_ids);
@@ -903,8 +1069,14 @@ private:
           size_t n = mp_database->num_items (*c, id);
 
           if (m_show_empty_ones || n != 0) {
+
+            m_cache_by_ids.insert (std::make_pair (std::make_pair (*c, id), child));
+
             child->set_count (n);
+            child->set_waived_count (num_waived_per_cell_and_cat (*c, id));
+
             node->add_child (child);
+
           } else {
             delete child;
           }
@@ -994,6 +1166,16 @@ public:
   {
     m_sorting = sorting;
     m_sorting_order = sorting_order;
+  }
+
+  int sorting () const
+  {
+    return m_sorting;
+  }
+
+  bool sorting_order () const
+  {
+    return m_sorting_order;
   }
 
   template <class Iter>
@@ -1528,6 +1710,7 @@ MarkerBrowserPage::MarkerBrowserPage (QWidget * /*parent*/)
   connect (list_down_pb, SIGNAL (clicked ()), this, SLOT (list_down_clicked ()));
   connect (flags_pb, SIGNAL (clicked ()), this, SLOT (flag_button_clicked ()));
   connect (important_pb, SIGNAL (clicked ()), this, SLOT (important_button_clicked ()));
+  connect (edit_pb, SIGNAL (clicked ()), this, SLOT (edit_button_clicked ()));
   connect (waive_pb, SIGNAL (clicked ()), this, SLOT (waived_button_clicked ()));
   connect (photo_pb, SIGNAL (clicked ()), this, SLOT (snapshot_button_clicked ()));
   connect (nophoto_pb, SIGNAL (clicked ()), this, SLOT (remove_snapshot_button_clicked ()));
@@ -1724,6 +1907,16 @@ MarkerBrowserPage::set_rdb (rdb::Database *database)
       rerun_button->setToolTip (QString ());
     }
 
+    //  mark items visited that carry the waived flag
+    if (mp_database) {
+      id_type waived_tag_id = mp_database->tags ().tag ("waived").id ();
+      for (auto i = mp_database->items ().begin (); i != mp_database->items ().end (); ++i) {
+        if (i->has_tag (waived_tag_id)) {
+          mp_database->set_item_visited (i.operator-> (), true);
+        }
+      }
+    }
+
     QAbstractItemModel *tree_model = directory_tree->model ();
 
     MarkerBrowserTreeViewModel *new_model = new MarkerBrowserTreeViewModel ();
@@ -1745,6 +1938,9 @@ MarkerBrowserPage::set_rdb (rdb::Database *database)
     QAbstractItemModel *list_model = markers_list->model ();
 
     MarkerBrowserListViewModel *new_list_model = new MarkerBrowserListViewModel ();
+    //  default sorting is by waived flag
+    new_list_model->set_sorting (2, true);
+    markers_list->header ()->setSortIndicator (new_list_model->sorting (), new_list_model->sorting_order () ? Qt::AscendingOrder : Qt::DescendingOrder);
     new_list_model->set_database (database);
     markers_list->setModel (new_list_model);
     connect (markers_list->selectionModel (), SIGNAL (selectionChanged (const QItemSelection &, const QItemSelection &)), this, SLOT (markers_selection_changed (const QItemSelection &, const QItemSelection &)));
@@ -1939,6 +2135,8 @@ MarkerBrowserPage::update_info_text ()
     size_t n_category = 0;
     const rdb::Item *item = 0;
     size_t n_item = 0;
+    std::string comment;
+    size_t n_comment = 0;
 
     for (QModelIndexList::const_iterator selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
 
@@ -1949,6 +2147,11 @@ MarkerBrowserPage::update_info_text ()
 
           item = i;
           ++n_item;
+
+          if (! item->comment ().empty () && item->comment () != comment) {
+            comment = item->comment ();
+            ++n_comment;
+          }
 
           const rdb::Cell *c = mp_database->cell_by_id (item->cell_id ());
           if (c && c != cell) {
@@ -1976,11 +2179,11 @@ MarkerBrowserPage::update_info_text ()
     info += "<h3>";
 
     if (category && n_category == 1) {
-      info += category->name ();
+      tl::escape_to_html (info, category->name ());
     }
 
     if (cell && n_cell == 1 && ! cell->name ().empty ()) {
-      info += " [" + cell->name () + "]";
+      tl::escape_to_html (info, std::string (" [") + cell->name () + "]");
     }
 
     info += "</h3>";
@@ -1994,6 +2197,12 @@ MarkerBrowserPage::update_info_text ()
     if (! m_error_text.empty ()) {
       info += "<p style=\"color:red; font-weight: bold\">";
       tl::escape_to_html (info, m_error_text);
+      info += "</p>";
+    }
+
+    if (! comment.empty () && n_comment == 1) {
+      info += "<p style=\"color:gray\">";
+      tl::escape_to_html (info, comment);
       info += "</p>";
     }
 
@@ -2084,8 +2293,6 @@ MarkerBrowserPage::do_update_markers ()
           item = i;
           item_index = size_t (selected_item->row ());
           ++n_item;
-
-          std::string info;
 
           const rdb::Cell *c = mp_database->cell_by_id (item->cell_id ());
           if (c && c != cell) {
@@ -2736,7 +2943,61 @@ MarkerBrowserPage::flag_menu_selected ()
   }
 }
 
-void  
+void
+MarkerBrowserPage::edit_button_clicked ()
+{
+  if (! mp_database) {
+    return;
+  }
+
+  MarkerBrowserListViewModel *list_model = dynamic_cast<MarkerBrowserListViewModel *> (markers_list->model ());
+  if (! list_model) {
+    return;
+  }
+
+  std::string str;
+
+  QModelIndexList selected = markers_list->selectionModel ()->selectedIndexes ();
+  for (auto selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
+    if (selected_item->column () == 0) {
+      const rdb::Item *i = list_model->item (selected_item->row ());
+      if (! i->comment ().empty ()) {
+        if (str.empty ()) {
+          str = i->comment ();
+        } else if (str != i->comment ()) {
+          str.clear ();
+          break;
+        }
+      }
+    }
+  }
+
+  bool ok = false;
+
+#if QT_VERSION >= 0x50200
+  QString new_text = QInputDialog::getMultiLineText (this, QObject::tr ("Edit Marker Comment"), QObject::tr ("Comment"), tl::to_qstring (str), &ok);
+  str = tl::to_string (new_text);
+#else
+  QString new_text = QInputDialog::getText (this, QObject::tr ("Edit Marker Comment"), QObject::tr ("Comment"), QLineEdit::Normal, tl::to_qstring (tl::escape_string (str)), &ok);
+  str = tl::unescape_string (tl::to_string (new_text));
+#endif
+
+  if (ok) {
+
+    QModelIndexList selected = markers_list->selectionModel ()->selectedIndexes ();
+    for (auto selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
+      if (selected_item->column () == 0) {
+        const rdb::Item *i = list_model->item (selected_item->row ());
+        mp_database->set_item_comment (i, str);
+      }
+    }
+
+    update_info_text ();
+
+  }
+}
+
+void
 MarkerBrowserPage::waived_button_clicked ()
 {
   if (! mp_database) {
@@ -2754,7 +3015,7 @@ MarkerBrowserPage::waived_button_clicked ()
   size_t nno = 0;
 
   QModelIndexList selected = markers_list->selectionModel ()->selectedIndexes ();
-  for (QModelIndexList::const_iterator selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
+  for (auto selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
     if (selected_item->column () == 0) {
       const rdb::Item *i = list_model->item (selected_item->row ());
       if (i) {
@@ -2792,7 +3053,7 @@ MarkerBrowserPage::important_button_clicked ()
   size_t nno = 0;
 
   QModelIndexList selected = markers_list->selectionModel ()->selectedIndexes ();
-  for (QModelIndexList::const_iterator selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
+  for (auto selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
     if (selected_item->column () == 0) {
       const rdb::Item *i = list_model->item (selected_item->row ());
       if (i) {
@@ -2831,7 +3092,7 @@ MarkerBrowserPage::remove_snapshot_button_clicked ()
   if (msgbox.exec () == QMessageBox::Yes) {
 
     QModelIndexList selected = markers_list->selectionModel ()->selectedIndexes ();
-    for (QModelIndexList::const_iterator selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
+    for (auto selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
       if (selected_item->column () == 0) {
         const rdb::Item *i = list_model->item (selected_item->row ());
         if (i) {
@@ -2858,7 +3119,7 @@ MarkerBrowserPage::snapshot_button_clicked ()
   }
 
   QModelIndexList selected = markers_list->selectionModel ()->selectedIndexes ();
-  for (QModelIndexList::const_iterator selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
+  for (auto selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
 
     const rdb::Item *i = list_model->item (selected_item->row ());
     if (i) {
@@ -2903,7 +3164,12 @@ MarkerBrowserPage::unwaive_all ()
     return;
   }
 
-  QMessageBox msgbox (QMessageBox::Question, 
+  MarkerBrowserTreeViewModel *tree_model = dynamic_cast<MarkerBrowserTreeViewModel *> (directory_tree->model ());
+  if (! tree_model) {
+    return;
+  }
+
+  QMessageBox msgbox (QMessageBox::Question,
                       QObject::tr ("Remove All Waived"),
                       QObject::tr ("Are you sure to remove the waived flags from all markers?"),
                       QMessageBox::Yes | QMessageBox::No);
@@ -2912,7 +3178,10 @@ MarkerBrowserPage::unwaive_all ()
     id_type waived_tag_id = mp_database->tags ().tag ("waived").id ();
 
     for (Items::const_iterator i = mp_database->items ().begin (); i != mp_database->items ().end (); ++i) {
-      mp_database->remove_item_tag (&*i, waived_tag_id);
+      if (i->has_tag (waived_tag_id)) {
+        mp_database->remove_item_tag (i.operator-> (), waived_tag_id);
+        tree_model->waived_changed (i.operator-> (), false);
+      }
     }
 
     list_model->mark_data_changed ();
@@ -2933,7 +3202,7 @@ MarkerBrowserPage::revisit_all ()
   }
 
   for (Items::const_iterator i = mp_database->items ().begin (); i != mp_database->items ().end (); ++i) {
-    mp_database->set_item_visited (&*i, false);
+    mp_database->set_item_visited (i.operator-> (), false);
   }
 
   list_model->mark_data_changed ();
@@ -2960,7 +3229,7 @@ MarkerBrowserPage::revisit_non_waived ()
 
   for (Items::const_iterator i = mp_database->items ().begin (); i != mp_database->items ().end (); ++i) {
     if (! i->has_tag (waived_tag_id)) {
-      mp_database->set_item_visited (&*i, false);
+      mp_database->set_item_visited (i.operator-> (), false);
     }
   }
 
@@ -2988,7 +3257,7 @@ MarkerBrowserPage::revisit_important ()
 
   for (Items::const_iterator i = mp_database->items ().begin (); i != mp_database->items ().end (); ++i) {
     if (i->has_tag (important_tag_id)) {
-      mp_database->set_item_visited (&*i, false);
+      mp_database->set_item_visited (i.operator-> (), false);
     }
   }
 
@@ -3015,7 +3284,7 @@ MarkerBrowserPage::mark_important ()
   id_type important_tag_id = mp_database->tags ().tag ("important").id ();
 
   QModelIndexList selected = markers_list->selectionModel ()->selectedIndexes ();
-  for (QModelIndexList::const_iterator selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
+  for (auto selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
     if (selected_item->column () == 0) {
       const rdb::Item *i = list_model->item (selected_item->row ());
       if (i) {
@@ -3042,7 +3311,7 @@ MarkerBrowserPage::mark_unimportant ()
   id_type important_tag_id = mp_database->tags ().tag ("important").id ();
 
   QModelIndexList selected = markers_list->selectionModel ()->selectedIndexes ();
-  for (QModelIndexList::const_iterator selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
+  for (auto selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
     if (selected_item->column () == 0) {
       const rdb::Item *i = list_model->item (selected_item->row ());
       if (i) {
@@ -3079,7 +3348,7 @@ MarkerBrowserPage::mark_visited (bool f)
   }
 
   QModelIndexList selected = markers_list->selectionModel ()->selectedIndexes ();
-  for (QModelIndexList::const_iterator selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
+  for (auto selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
     if (selected_item->column () == 0) {
       const rdb::Item *i = list_model->item (selected_item->row ());
       if (i) {
@@ -3099,32 +3368,17 @@ MarkerBrowserPage::mark_visited (bool f)
 void  
 MarkerBrowserPage::waive ()
 {
-  if (! mp_database) {
-    return;
-  }
-
-  MarkerBrowserListViewModel *list_model = dynamic_cast<MarkerBrowserListViewModel *> (markers_list->model ());
-  if (! list_model) {
-    return;
-  }
-
-  id_type waived_tag_id = mp_database->tags ().tag ("waived").id ();
-
-  QModelIndexList selected = markers_list->selectionModel ()->selectedIndexes ();
-  for (QModelIndexList::const_iterator selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
-    if (selected_item->column () == 0) {
-      const rdb::Item *i = list_model->item (selected_item->row ());
-      if (i) {
-        mp_database->add_item_tag (i, waived_tag_id);
-      }
-    }
-  }
-
-  list_model->mark_data_changed ();
+  waive_or_unwaive (true);
 }
 
-void  
+void
 MarkerBrowserPage::unwaive ()
+{
+  waive_or_unwaive (false);
+}
+
+void
+MarkerBrowserPage::waive_or_unwaive (bool w)
 {
   if (! mp_database) {
     return;
@@ -3135,19 +3389,38 @@ MarkerBrowserPage::unwaive ()
     return;
   }
 
+  MarkerBrowserTreeViewModel *tree_model = dynamic_cast<MarkerBrowserTreeViewModel *> (directory_tree->model ());
+  if (! tree_model) {
+    return;
+  }
+
   id_type waived_tag_id = mp_database->tags ().tag ("waived").id ();
 
   QModelIndexList selected = markers_list->selectionModel ()->selectedIndexes ();
-  for (QModelIndexList::const_iterator selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
+  for (auto selected_item = selected.begin (); selected_item != selected.end (); ++selected_item) {
     if (selected_item->column () == 0) {
       const rdb::Item *i = list_model->item (selected_item->row ());
       if (i) {
-        mp_database->remove_item_tag (i, waived_tag_id);
+        bool was_waived = i->has_tag (waived_tag_id);
+        if (w != was_waived) {
+          if (w) {
+            mp_database->add_item_tag (i, waived_tag_id);
+          } else {
+            mp_database->remove_item_tag (i, waived_tag_id);
+          }
+          if (w) {
+            //  waiving an item makes it visited (rationale: once waived, an item is no
+            //  longer of interest)
+            mp_database->set_item_visited (i, true);
+          }
+          tree_model->waived_changed (i, w);
+        }
       }
     }
   }
 
   list_model->mark_data_changed ();
+  tree_model->mark_data_changed ();
 }
 
 void

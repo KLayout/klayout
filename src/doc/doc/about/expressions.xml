@@ -282,6 +282,7 @@ var x = 3; x = x + 1; x
   <tr><td><tt>combine(</tt>x<tt>,</tt>y<tt>)</tt></td><td>String</td><td>String</td><td>Combines the path components x and y using the system specific separator</td></tr>
   <tr><td><tt>cosh(</tt>x<tt>)</tt></td><td>Numeric</td><td>Numeric</td><td>Hyperbolic cosine function</td></tr>
   <tr><td><tt>cos(</tt>x<tt>)</tt></td><td>Numeric</td><td>Numeric</td><td>Cosine function</td></tr>
+  <tr><td><tt>downcase(</tt>x<tt>)</tt></td><td>String</td><td>String</td><td>Converts the given string to lower case</td></tr>
   <tr><td><tt>env(</tt>x<tt>)</tt></td><td>String</td><td>String</td><td>Access an environment variable</td></tr>
   <tr><td><tt>error(</tt>x<tt>)</tt></td><td>String</td><td></td><td>Raise an error</td></tr>
   <tr><td><tt>exp(</tt>x<tt>)</tt></td><td>Numeric</td><td>Numeric</td><td>Exponential function</td></tr>
@@ -318,6 +319,7 @@ var x = 3; x = x + 1; x
   <tr><td><tt>to_f(</tt>x<tt>)</tt></td><td>Any</td><td>Numeric</td><td>Convert argument to numeric if possible</td></tr>
   <tr><td><tt>to_i(</tt>x<tt>)</tt></td><td>Any</td><td>Numeric (integer)</td><td>Convert argument to numeric (32 bit integer)</td></tr>
   <tr><td><tt>to_s(</tt>x<tt>)</tt></td><td>Any</td><td>String</td><td>Convert argument to string</td></tr>
+  <tr><td><tt>upcase(</tt>x<tt>)</tt></td><td>String</td><td>String</td><td>Converts the given string to upper case</td></tr>
   </table>
 
 </doc>

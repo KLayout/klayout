@@ -836,10 +836,10 @@ void run_test15 (tl::TestBase *_this, bool deep)
 
   db::CompoundRegionOperationPrimaryNode *primary = new db::CompoundRegionOperationPrimaryNode ();
 
-  db::CompoundRegionProcessingOperationNode *corners1 = new db::CompoundRegionProcessingOperationNode (new db::CornersAsRectangles (-180.0, true, 180.0, true, 1), primary, true /*processor is owned*/);
+  db::CompoundRegionProcessingOperationNode *corners1 = new db::CompoundRegionProcessingOperationNode (new db::CornersAsRectangles (-180.0, true, 180.0, true, false, false, 1), primary, true /*processor is owned*/);
   db::CompoundRegionCountFilterNode count1 (corners1, false, 5, 10000);
 
-  db::CompoundRegionToEdgeProcessingOperationNode *corners2 = new db::CompoundRegionToEdgeProcessingOperationNode (new db::CornersAsDots (-180.0, true, 180.0, true), primary, true /*processor is owned*/);
+  db::CompoundRegionToEdgeProcessingOperationNode *corners2 = new db::CompoundRegionToEdgeProcessingOperationNode (new db::CornersAsDots (-180.0, true, 180.0, true, false, false), primary, true /*processor is owned*/);
   db::CompoundRegionCountFilterNode count2 (corners2, true, 5, 10000);
 
   EXPECT_EQ (count1.result_type () == db::CompoundRegionJoinOperationNode::Region, true);

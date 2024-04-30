@@ -861,13 +861,13 @@ CODE
     # %DRC%
     # @name with_angle
     # @brief Selects edges by their angle
-    # @synopsis layer.with_angle(min .. max)
-    # @synopsis layer.with_angle(value)
-    # @synopsis layer.with_angle(min, max)
+    # @synopsis layer.with_angle(min .. max [, absolute])
+    # @synopsis layer.with_angle(value [, absolute])
+    # @synopsis layer.with_angle(min, max [, absolute])
     # @synopsis layer.with_angle(ortho)
     # @synopsis layer.with_angle(diagonal)
     # @synopsis layer.with_angle(diagonal_only)
-    # @synopsis edge_pair_layer.with_angle(... [, both])
+    # @synopsis edge_pair_layer.with_angle(... [, both] [, absolute])
     #
     # When called on an edge layer, the method selects edges by their angle, 
     # measured against the horizontal axis in the mathematical sense. 
@@ -886,6 +886,11 @@ CODE
     # either "both" (plain word) to indicate that both edges have to be within the given interval.
     # Without this argument, it is sufficient for one edge to meet the criterion.
     #
+    # The "absolute" option is available for edge or edge pair layers.
+    # Without the "absolute" option, edges sloping down are assigned a negative angle while edges sloping up are assigned
+    # a positive angle (vertical edges are always 90 degree). With the "absolute" option,
+    # edges sloping down also have a positive angle which is the one enclosed with the horizontal axis.
+    # 
     # Here are examples for "with_angle" on edge pair layers:
     #
     # @code
@@ -931,21 +936,25 @@ CODE
     # %DRC%
     # @name without_angle
     # @brief Selects edges by the their angle
-    # @synopsis layer.without_angle(min .. max)
-    # @synopsis layer.without_angle(value)
-    # @synopsis layer.without_angle(min, max)
+    # @synopsis layer.without_angle(min .. max [, absolute])
+    # @synopsis layer.without_angle(value [, absolute])
+    # @synopsis layer.without_angle(min, max [, absolute])
     # @synopsis layer.without_angle(ortho)
     # @synopsis layer.without_angle(diagonal)
     # @synopsis layer.without_angle(diagonal_only)
-    # @synopsis edge_pair_layer.without_angle(... [, both])
+    # @synopsis edge_pair_layer.without_angle(... [, both] [, absolute])
     #
     # The method basically is the inverse of \with_angle. It selects all edges
     # of the edge layer or corners of the polygons which do not have the given angle (second form) or whose angle
     # is not inside the given interval (first and third form) or of the given type (other forms).
     # 
-    # When called on edge pairs, it selects
-    # edge pairs by the angles of their edges.
+    # When called on edge pairs, it selects edge pairs by the angles of their edges.
     #
+    # The "absolute" option is available for edge or edge pair layers. Without the "absolute" option,
+    # edges sloping down are assigned a negative angle while edges sloping up are assigned
+    # a positive angle (vertical edges are always 90 degree). With the "absolute" option,
+    # edges sloping down also have a positive angle which is the one enclosed with the horizontal axis.
+    # 
     # A note on the "both" modifier (without_angle called on edge pairs): "both" means that
     # both edges need to be "without_angle". For example
     #
@@ -989,57 +998,101 @@ CODE
     # The method basically is the inverse of \with_internal_angle. It selects all 
     # edge pairs by the angle enclosed by their edges, applying the opposite criterion than \with_internal_angle.
     
-    %w(angle internal_angle).each do |f|
-      [true, false].each do |inv|
-        mn = (inv ? "without" : "with") + "_" + f
-        eval <<"CODE"
-        def #{mn}(*args)
+    [true, false].each do |inv|
+      mn = (inv ? "without" : "with") + "_angle"
+      eval <<"CODE"
+      def #{mn}(*args)
 
-          @engine._context("#{mn}") do
+        @engine._context("#{mn}") do
 
-            f = :with_#{f}
+          self.data.is_a?(RBA::Region) || self.data.is_a?(RBA::Edges) || self.data.is_a?(RBA::EdgePairs) || raise("Requires an edge, edge pair or polygon layer")
 
-            if "#{f}" == "angle"
-              self.data.is_a?(RBA::Region) || self.data.is_a?(RBA::Edges) || self.data.is_a?(RBA::EdgePairs) || raise("Requires an edge, edge pair or polygon layer")
-              args = args.select do |a|
-                if a.is_a?(DRCBothEdges)
-                  if !self.data.is_a?(RBA::EdgePairs)
-                    raise("'both' keyword is only available for edge pair layers")
-                  end
-                  f = :with_#{f}_both
-                  false
-                else
-                  true
-                end
+          absolute = false
+          both = false
+
+          args = args.select do |a|
+            if a.is_a?(DRCBothEdges)
+              if !self.data.is_a?(RBA::EdgePairs)
+                raise("'both' keyword is only available for edge pair layers")
               end
-            else
-              requires_edge_pairs
-            end
-
-            result_class = self.data.is_a?(RBA::Edges) ? RBA::Edges : RBA::EdgePairs
-            if args.size == 1
-              a = args[0]
-              if a.is_a?(Range)
-                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, f, a.begin, a.end, #{inv.inspect}))
-              elsif a.is_a?(DRCOrthoEdges) || a.is_a?(DRCDiagonalOnlyEdges) || a.is_a?(DRCDiagonalEdges)
-                if self.data.is_a?(RBA::Region)
-                  raise("'ortho', 'diagonal' or 'diagonal_only' keyword is only available for edge or edge pair layers")
-                end
-                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, f, a.value, #{inv.inspect}))
-              else
-                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, f, a, #{inv.inspect}))
+              both = true
+              false
+            elsif a.is_a?(DRCAbsoluteMode)
+              if self.data.is_a?(RBA::Region)
+                raise("'absolute' keyword is only available for edge or edge pair layers")
               end
-            elsif args.size == 2
-              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, f, args[0], args[1], #{inv.inspect}))
+              absolute = a.value
+              false
             else
-              raise("Invalid number of range arguments (1 or 2 expected)")
+              true
             end
+          end
 
+          if both
+            f = absolute ? :with_abs_angle_both : :with_angle_both
+          else
+            f = absolute ? :with_abs_angle : :with_angle
+          end
+
+          result_class = self.data.is_a?(RBA::Edges) ? RBA::Edges : RBA::EdgePairs
+          if args.size == 1
+            a = args[0]
+            if a.is_a?(Range)
+              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, f, a.begin, a.end, #{inv.inspect}))
+            elsif a.is_a?(DRCOrthoEdges) || a.is_a?(DRCDiagonalOnlyEdges) || a.is_a?(DRCDiagonalEdges)
+              if self.data.is_a?(RBA::Region)
+                raise("'ortho', 'diagonal' or 'diagonal_only' keyword is only available for edge or edge pair layers")
+              end
+              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, f, a.value, #{inv.inspect}))
+            else
+              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, f, @engine._make_numeric_value(a), #{inv.inspect}))
+            end
+          elsif args.size == 2
+            DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, f, @engine._make_numeric_value(args[0]), @engine._make_numeric_value(args[1]), #{inv.inspect}))
+          else
+            raise("Invalid number of range arguments (1 or 2 expected)")
           end
 
         end
-CODE
+
       end
+CODE
+    end
+
+    [true, false].each do |inv|
+      mn = (inv ? "without" : "with") + "_internal_angle"
+      eval <<"CODE"
+      def #{mn}(*args)
+
+        @engine._context("#{mn}") do
+
+          f = :with_internal_angle
+
+          requires_edge_pairs
+
+          result_class = self.data.is_a?(RBA::Edges) ? RBA::Edges : RBA::EdgePairs
+          if args.size == 1
+            a = args[0]
+            if a.is_a?(Range)
+              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, f, a.begin, a.end, #{inv.inspect}))
+            elsif a.is_a?(DRCOrthoEdges) || a.is_a?(DRCDiagonalOnlyEdges) || a.is_a?(DRCDiagonalEdges)
+              if self.data.is_a?(RBA::Region)
+                raise("'ortho', 'diagonal' or 'diagonal_only' keyword is only available for edge or edge pair layers")
+              end
+              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, f, a.value, #{inv.inspect}))
+            else
+              DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, f, @engine._make_numeric_value(a), #{inv.inspect}))
+            end
+          elsif args.size == 2
+            DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, f, @engine._make_numeric_value(args[0]), @engine._make_numeric_value(args[1]), #{inv.inspect}))
+          else
+            raise("Invalid number of range arguments (1 or 2 expected)")
+          end
+
+        end
+
+      end
+CODE
     end
     
     # %DRC%
@@ -1231,8 +1284,11 @@ CODE
     #
     # This method produces markers on the corners of the polygons. An angle criterion can be given which
     # selects corners based on the angle of the connecting edges. Positive angles indicate a left turn
-    # while negative angles indicate a right turn. Since polygons are oriented clockwise, positive angles
+    # while negative angles indicate a right turn. 
+    # Since polygons are oriented clockwise, positive angles
     # indicate concave (inner) corners while negative ones indicate convex (outer) corners
+    # The 'absolute' option allows turning this off and considering both left and right turns 
+    # positive angles.
     # 
     # The markers generated can be point-like edges or small 2x2 DBU boxes. The latter is the default.
     # 
@@ -1243,6 +1299,8 @@ CODE
     #   @li @b as_dots @/b: with this option, point-like edges will be produced instead of small boxes @/li  
     #   @li @b as_edge_pairs @/b: with this option, an edge pair is produced for each corner selected. The first edge 
     #                             is the incoming edge to the corner, the second edge the outgoing edge. @/li  
+    #   @li @b absolute @/b: with this option, left and right turns will both be considered positive angles @/li  
+    #   @li @b negative @/b: with this option, all corners @b not @/b matching the angle criterion are selected @/li
     # @/ul
     #
     # The following images show the effect of this method:
@@ -1264,6 +1322,8 @@ CODE
         output_mode = :boxes
         amin = -180.0
         amax = 180.0
+        absolute = false
+        inverse = false
 
         args.each do |a|
           if a.is_a?(Range)
@@ -1277,21 +1337,35 @@ CODE
             amax = a.to_f
           elsif a.is_a?(DRCOutputMode)
             output_mode = a.value
+          elsif a.is_a?(DRCAbsoluteMode)
+            absolute = a.value
+          elsif a.is_a?(DRCNegative)
+            inverse = true
           else
             raise("Invalid argument #{a.inspect}")
           end
         end
 
-        f = :corners
-        cls = RBA::Region
+        args = [ amin, amax ]
+
         if output_mode == :edges || output_mode == :dots
           f = :corners_dots
           cls = RBA::Edges
         elsif output_mode == :edge_pairs
           f = :corners_edge_pairs
           cls = RBA::EdgePairs
+        else
+          f = :corners
+          cls = RBA::Region
+          args << 1  # 2x2 DBU boxes
         end
-        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, cls, f, amin, amax))
+
+        args << true  # include amin
+        args << true  # include amax
+        args << inverse
+        args << absolute
+
+        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, cls, f, *args))
 
       end
 
@@ -5111,7 +5185,11 @@ CODE
     # This method will copy the content of the layer to the specified output.
     #
     # If a report database is selected for the output, the specification has to include a 
-    # category name and optionally a category description.
+    # category name and optionally a category description. The category name can be an 
+    # array of strings - in that case, a hierarchy of categories is created
+    # with the first array item being the top level category name.
+    # Shapes are added to an existing category, if a category with the given
+    # name already exists.
     #
     # If the layout is selected for the output, the specification can consist of
     # one to three parameters: a layer number, a data type (optional, default is 0)

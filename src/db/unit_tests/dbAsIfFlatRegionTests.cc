@@ -1043,13 +1043,13 @@ TEST(21_Processors)
 
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (1, 0)), r1);
 
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r1.processed (db::CornersAsDots (-180.0, true, 180.0, true)));
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r1.processed (db::CornersAsDots (0.0, true, 180.0, true)));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r1.processed (db::CornersAsDots (-180.0, true, 180.0, true, false, false)));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r1.processed (db::CornersAsDots (0.0, true, 180.0, true, false, false)));
   db::Region ext;
-  r1.processed (db::CornersAsDots (0.0, true, 180.0, true)).extended (ext, 1000, 1000, 2000, 2000);
+  r1.processed (db::CornersAsDots (0.0, true, 180.0, true, false, false)).extended (ext, 1000, 1000, 2000, 2000);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), ext);
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (13, 0)), r1.processed (db::CornersAsRectangles (-180.0, true, 180.0, true, 2000)));
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (14, 0)), r1.processed (db::CornersAsRectangles (0.0, true, 180.0, true, 2000)));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (13, 0)), r1.processed (db::CornersAsRectangles (-180.0, true, 180.0, true, false, false, 2000)));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (14, 0)), r1.processed (db::CornersAsRectangles (0.0, true, 180.0, true, false, false, 2000)));
 
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), r1.processed (db::extents_processor<db::Polygon> (0, 0)));
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (21, 0)), r1.processed (db::extents_processor<db::Polygon> (1000, 2000)));

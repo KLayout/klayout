@@ -234,6 +234,49 @@ gate.width(min_width).output("gate_width", "Gate width violations")</pre>
   Hence such files can only be run from the macro IDE.
   </p>
   
+  <h2>DRC waiving flow</h2>
+
+  <p>
+  DRC waiving is a process of signing off DRC violations that cannot be avoided.
+  Usually DRC waiving is not encouraged, as manufacturability of the device cannot
+  be guaranteed if DRC violations are present. Even worse, giving a non-clean layout
+  into manufacturing may create a contamination risk that manufacturers will try 
+  to avoid. Hence, non-DRC-clean layouts are usually rejected.
+  </p>
+
+  <p>
+  Still there are some legit reasons for DRC waiving. Sometimes DRC rules do not apply 
+  because a specific technology option is not used by the device and corresponding 
+  DRC rules do not apply. Or, a certain DRC rule may be a recommended rule, and violating
+  it is not forbidden. In that case, a DRC violation can be waived at your own risk.
+  Waiving is not a formal process. Usually, the manufacturer will ask for a confirmation
+  if DRC violations are present. KLayout can help documenting violations and copying
+  the waivers from one DRC run to the next.
+  </p>
+
+  <p>
+  The DRC waiving flow of KLayout is the following:
+  </p>
+
+  <ul>
+    <li>In the initial step, a RDB database is created by the DRC run, using the "report" command with a destination file.</li>
+    <li>This report is inspected in the marker browser. You can add comments, set flags and add screenshots. This is 
+        also the time to waive DRC violations that you deem necessary to be waived. The marker browser has a "waive" 
+        button which sets or resets the waived flag of the selected markers.</li>
+    <li>When finished, save the edited database to a 'waiver DB' using the marker browser's 'Save As Waiver DB' feature from
+        the File menu. Technically, this will write the report database to a second file. This second file is named
+        like the original one, with a ".w" added to the file name.</li>
+    <li>When you run the DRC again, KLayout will find this waiver DB file and apply attributes from the waiver DB 
+        to the current report database. These attributes include the flags, images and comments.
+        This will - among the other annotations - apply the waived flag to the report database items.</li>
+  </ul>
+
+  <p>
+  In the waiving step, KLayout will apply attributes to items with the same value (i.e. shape), category and cell.
+  This specifically means, that when you rename a cell, waivers will no longer be applied, or - in the worst case - 
+  be applied to the wrong cell. Hence, waiving should be done late in the process, when cell names are unlikely to change.
+  </p>
+
   <h2>Using KLayout as a standalone DRC engine</h2>
 
   <p>

@@ -288,6 +288,7 @@ VariantsCollectorBase::separate_variants (std::map<db::cell_index_type, std::map
   if (! var_table) {
     var_table = &var_table_intern;
   }
+  tl_assert (var_table->empty ());
 
   for (db::Layout::bottom_up_const_iterator c = mp_layout->begin_bottom_up (); c != mp_layout->end_bottom_up (); ++c) {
 
@@ -311,6 +312,9 @@ VariantsCollectorBase::separate_variants (std::map<db::cell_index_type, std::map
 
       cell.clear_insts ();
 
+      bool original_cell_is_variant = false;
+      db::ICplxTrans original_cell_variant;
+
       int index = 0;
       for (auto v = vc->second.begin (); v != vc->second.end (); ++v, ++index) {
 
@@ -333,6 +337,8 @@ VariantsCollectorBase::separate_variants (std::map<db::cell_index_type, std::map
 
         } else {
           ci_var = *c;
+          original_cell_is_variant = true;
+          original_cell_variant = *v;
         }
 
         vt.insert (std::make_pair (*v, ci_var));
@@ -341,12 +347,14 @@ VariantsCollectorBase::separate_variants (std::map<db::cell_index_type, std::map
       }
 
       //  correct the first (remaining) entry
-      if (! vt.begin ()->first.is_unity ()) {
-        std::set<db::ICplxTrans> &tv = m_variants [*c];
-        tv.clear ();
-        tv.insert (vt.begin ()->first);
-      } else {
-        m_variants.erase (*c);
+      if (original_cell_is_variant) {
+        if (! original_cell_variant.is_unity ()) {
+          std::set<db::ICplxTrans> &tv = m_variants [*c];
+          tv.clear ();
+          tv.insert (original_cell_variant);
+        } else {
+          m_variants.erase (*c);
+        }
       }
 
     } else {

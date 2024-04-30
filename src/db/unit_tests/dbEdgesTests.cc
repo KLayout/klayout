@@ -202,55 +202,63 @@ TEST(4)
     EXPECT_EQ (db::compare (rr, "(0,0;0,200);(0,200;100,200);(100,200;100,0);(100,0;0,0);(300,0;200,0)"), true);
   }
   {
-    db::EdgeOrientationFilter f1 (0.0, false);
+    db::EdgeOrientationFilter f1 (0.0, false, false);
     EXPECT_EQ (db::compare (r.filtered (f1), "(0,200;100,200);(100,0;0,0);(300,0;200,0)"), true);
   }
   {
-    db::EdgeOrientationFilter f1 (50.0, true, 80.0, false, false);
+    db::EdgeOrientationFilter f1 (50.0, true, 80.0, false, false, false);
     EXPECT_EQ (db::compare (r.filtered (f1), "(200,0;250,200);(250,-200;300,0)"), true);
   }
   {
-    db::EdgeOrientationFilter f1 (50.0, true, 80.0, false, true);
+    db::EdgeOrientationFilter f1 (-80.0, true, -50.0, false, false, false);
+    EXPECT_EQ (db::compare (r.filtered (f1), "(250,200;300,0);(200,0;250,-200)"), true);
+  }
+  {
+    db::EdgeOrientationFilter f1 (50.0, true, 80.0, false, false, true);
+    EXPECT_EQ (db::compare (r.filtered (f1), "(200,0;250,200);(250,200;300,0);(200,0;250,-200);(250,-200;300,0)"), true);
+  }
+  {
+    db::EdgeOrientationFilter f1 (50.0, true, 80.0, false, true, false);
     EXPECT_EQ (db::compare (r.filtered (f1), "(0,0;0,200);(0,200;100,200);(100,200;100,0);(100,0;0,0);(250,200;300,0);(300,0;200,0);(200,0;250,-200)"), true);
   }
   {
-    db::EdgeOrientationFilter f1 (0.0, true, 1.0, false, false);
+    db::EdgeOrientationFilter f1 (0.0, true, 1.0, false, false, false);
     EXPECT_EQ (db::compare (r.filtered (f1), "(0,200;100,200);(100,0;0,0);(300,0;200,0)"), true);
   }
   {
-    db::EdgeOrientationFilter f1 (-1.0, true, 1.0, false, false);
+    db::EdgeOrientationFilter f1 (-1.0, true, 1.0, false, false, false);
     EXPECT_EQ (db::compare (r.filtered (f1), "(0,200;100,200);(100,0;0,0);(300,0;200,0)"), true);
   }
   {
-    db::EdgeOrientationFilter f1 (-1.0, true, 0.0, false, false);
+    db::EdgeOrientationFilter f1 (-1.0, true, 0.0, false, false, false);
     EXPECT_EQ (r.filtered (f1).to_string (), "");
   }
   {
-    db::EdgeOrientationFilter f1 (-1.0, true, 0.0, true, false);
+    db::EdgeOrientationFilter f1 (-1.0, true, 0.0, true, false, false);
     EXPECT_EQ (db::compare (r.filtered (f1), "(0,200;100,200);(100,0;0,0);(300,0;200,0)"), true);
   }
   {
-    db::EdgeOrientationFilter f1 (0.0, true, 1.0, true, false);
+    db::EdgeOrientationFilter f1 (0.0, true, 1.0, true, false, false);
     EXPECT_EQ (db::compare (r.filtered (f1), "(0,200;100,200);(100,0;0,0);(300,0;200,0)"), true);
   }
   {
-    db::EdgeOrientationFilter f1 (0.0, false, 1.0, true, false);
+    db::EdgeOrientationFilter f1 (0.0, false, 1.0, true, false, false);
     EXPECT_EQ (r.filtered (f1).to_string (), "");
   }
   {
-    db::EdgeOrientationFilter f1 (90.0, false);
+    db::EdgeOrientationFilter f1 (90.0, false, false);
     EXPECT_EQ (db::compare (r.filtered (f1), "(0,0;0,200);(100,200;100,0)"), true);
   }
   {
-    db::EdgeOrientationFilter f1 (90.0, true, 91.0, false, false);
+    db::EdgeOrientationFilter f1 (90.0, true, 91.0, false, false, false);
     EXPECT_EQ (db::compare (r.filtered (f1), "(0,0;0,200);(100,200;100,0)"), true);
   }
   {
-    db::EdgeOrientationFilter f1 (89.0, true, 91.0, false, false);
+    db::EdgeOrientationFilter f1 (89.0, true, 91.0, false, false, false);
     EXPECT_EQ (db::compare (r.filtered (f1), "(0,0;0,200);(100,200;100,0)"), true);
   }
   {
-    db::EdgeOrientationFilter f1 (89.0, true, 90.0, false, false);
+    db::EdgeOrientationFilter f1 (89.0, true, 90.0, false, false, false);
     EXPECT_EQ (r.filtered (f1).to_string (), "");
   }
 }

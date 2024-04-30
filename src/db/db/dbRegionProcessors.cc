@@ -30,8 +30,8 @@ namespace db
 // -----------------------------------------------------------------------------------
 //  CornerDetectorCore implementation
 
-CornerDetectorCore::CornerDetectorCore (double angle_start, bool include_angle_start, double angle_end, bool include_angle_end)
-  : m_checker (angle_start, include_angle_start, angle_end, include_angle_end)
+CornerDetectorCore::CornerDetectorCore (double angle_start, bool include_angle_start, double angle_end, bool include_angle_end, bool inverse, bool absolute)
+  : m_checker (angle_start, include_angle_start, angle_end, include_angle_end, inverse, absolute)
 {
   //  .. nothing yet ..
 }

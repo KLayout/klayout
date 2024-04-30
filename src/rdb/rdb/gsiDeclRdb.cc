@@ -265,17 +265,25 @@ Class<rdb::Cell> decl_RdbCell ("rdb", "RdbCell",
     "The cell name is an string that identifies the category in the database. "
     "Additionally, a cell may carry a variant identifier which is a string that uniquely identifies a cell "
     "in the context of its variants. The \"qualified name\" contains both the cell name and the variant name. "
-    "Cell names are also used to identify report database cell's with layout cells. "
+    "Cell names are also used to identify report database cells with layout cells. For variants, the layout cell name "
+    "can be specified explicitly with the \\layout_name attribute (see \\RdbDatabase#create_cell). The latter is available "
+    "since version 0.29.1.\n"
     "@return The cell name\n"
   ) +
   gsi::method ("variant", &rdb::Cell::variant, 
     "@brief Gets the cell variant name\n"
     "A variant name additionally identifies the cell when multiple cells with the same name are present. "
-    "A variant name is either assigned automatically or set when creating a cell. "
+    "A variant name is either assigned automatically or set when creating a cell.\n"
     "@return The cell variant name\n"
   ) +
-  gsi::method ("qname", &rdb::Cell::qname, 
-    "@brief Gets the cell's qualified name\n"
+  gsi::method ("layout_name", &rdb::Cell::layout_name,
+    "@brief Gets the name of the layout cell\n"
+    "For variants, this string is the name of the actual layout cell. If empty, the cell is assume to be called 'name'.\n"
+    "@return The layout cell name\n"
+    "This read-only attribute has been added in version 0.29.1.\n"
+  ) +
+  gsi::method ("qname", &rdb::Cell::qname,
+    "@brief Gets the qualified name of the cell\n"
     "The qualified name is a combination of the cell name and optionally the variant name. "
     "It is used to identify the cell by name in a unique way.\n"
     "@return The qualified name\n"
@@ -911,6 +919,10 @@ Class<rdb::Item> decl_RdbItem ("rdb", "RdbItem",
     "@brief Remove the tag with the given id from the item\n"
     "If a tag with that ID does not exists on this item, this method does nothing."
   ) +
+  gsi::method ("remove_tags", &rdb::Item::remove_tags,
+    "@brief Removes all tags from the item\n"
+    "This method has been introduced in version 0.29.1."
+  ) +
   gsi::method ("has_tag?", &rdb::Item::has_tag, gsi::arg ("tag_id"),
     "@brief Returns a value indicating whether the item has a tag with the given ID\n"
     "@return True, if the item has a tag with the given ID\n"
@@ -927,6 +939,19 @@ Class<rdb::Item> decl_RdbItem ("rdb", "RdbItem",
     "@brief Gets a value indicating that the item has an image attached\n"
     "See \\image_str how to obtain the image.\n\n"
     "This method has been introduced in version 0.28.\n"
+  ) +
+  gsi::method ("comment", &rdb::Item::comment,
+    "@brief Gets the common associated with this item as a string\n"
+    "@return The comment string\n"
+    "The comment string is an arbitrary string added by the user to the item.\n"
+    "\n"
+    "This attribute has been added in version 0.29.1.\n"
+  ) +
+  gsi::method ("comment=", &rdb::Item::set_comment, gsi::arg ("comment"),
+    "@brief Sets the common associated with this item as a string\n"
+    "See \\comment for a description of that attribute.\n"
+    "\n"
+    "This attribute has been added in version 0.29.1.\n"
   ) +
   gsi::method ("image_str", &rdb::Item::image_str,
     "@brief Gets the image associated with this item as a string\n"
@@ -1317,6 +1342,7 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
     "@brief Creates a new sub-category\n"
     "@param parent The category under which the category should be created\n"
     "@param name The name of the category\n"
+    "Since version 0.29.1, 'parent' can be nil. In that case, a top-level category is created."
   ) +
   gsi::method ("category_by_path", &rdb::Database::category_by_name, gsi::arg ("path"),
     "@brief Gets a category by path\n"
@@ -1344,10 +1370,12 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
     "@brief Creates a new cell\n"
     "@param name The name of the cell\n"
   ) +
-  gsi::method ("create_cell", (rdb::Cell *(rdb::Database::*) (const std::string &, const std::string &)) &rdb::Database::create_cell, gsi::arg ("name"), gsi::arg ("variant"),
+  gsi::method ("create_cell", (rdb::Cell *(rdb::Database::*) (const std::string &, const std::string &, const std::string &)) &rdb::Database::create_cell, gsi::arg ("name"), gsi::arg ("variant"), gsi::arg ("layout_name", std::string ()),
     "@brief Creates a new cell, potentially as a variant for a cell with the same name\n"
     "@param name The name of the cell\n"
     "@param variant The variant name of the cell\n"
+    "@param layout_name For variants, this is the name of the layout cell. If empty, 'name' is used for the layout cell name.\n"
+    "The 'layout_name' argument has been added in version 0.29.1.\n"
   ) +
   gsi::method ("variants", &rdb::Database::variants, gsi::arg ("name"),
     "@brief Gets the variants for a given cell name\n"
@@ -1561,6 +1589,36 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
     "@param category_id The ID of the category to which the item is associated\n"
     "@param trans The transformation to apply\n"
     "@param edge_pairs The list of edge_pairs for which the items are created\n"
+  ) +
+  gsi::method ("apply", &rdb::Database::apply, gsi::arg ("other"),
+    "@brief Transfers item attributes from one database to another for identical items\n"
+    "This method will identify items that are identical between the two databases and transfer "
+    "item attributes from the 'other' database to this database. Transferable attributes are:\n"
+    "\n"
+    "@ul\n"
+    "@li Images @/li\n"
+    "@li Item tags @/li\n"
+    "@/ul\n"
+    "\n"
+    "Existing attributes in this database are overwritten.\n"
+    "\n"
+    "Items are identical if\n"
+    "\n"
+    "@ul\n"
+    "@li They belong to the same cell (by qname) @/li\n"
+    "@li They belong to the same category (by name) @/li\n"
+    "@li Their values are identical @/li\n"
+    "@/ul\n"
+    "\n"
+    "Values are identical if their individual values and (optional) value tags are identical. "
+    "Values tagged with a tag unknown to the other database are ignored. "
+    "The order of values matters during the compare. So the value pair (17.0, 'abc') is different from ('abc', 17.0).\n"
+    "\n"
+    "The intended application for this method is use for error waiving: as the waived attribute is a transferable "
+    "attribute, it is possible to apply the waived flag from from a waiver database (the 'other' database) using this "
+    "method.\n"
+    "\n"
+    "This method has been added in version 0.29.1."
   ) +
   gsi::method ("is_modified?", &rdb::Database::is_modified,
     "@brief Returns a value indicating whether the database has been modified\n"

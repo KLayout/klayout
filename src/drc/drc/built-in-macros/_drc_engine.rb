@@ -115,11 +115,29 @@ module DRC
     end
 
     def write
+
       if @file_name
+      
         rdb_file = @engine._make_path(@file_name)
+
+        #  Apply waive DB if possible
+        wdb_file = rdb_file + ".w"
+        if File.exists?(wdb_file)
+          begin
+            wdb = RBA::ReportDatabase::new
+            wdb.load(wdb_file)
+            @engine.info("Applying waive database: #{wdb_file} ..")
+            @rdb.apply(wdb)
+            wdb._destroy
+          rescue
+          end
+        end
+
         @engine.info("Writing report database: #{rdb_file} ..")
         @rdb.save(rdb_file)
+
       end
+
     end
 
     def rdb
@@ -551,6 +569,10 @@ module DRC
       end
     end
 
+    def absolute
+      DRCAbsoluteMode::new(true)
+    end
+    
     def as_dots
       DRCOutputMode::new(:dots)
     end
@@ -3226,7 +3248,33 @@ CODE
         output_rdb = channel.rdb
         output_cell = channel.cell
 
-        cat = output_rdb.create_category(args[0].to_s)
+        categories = args[0]
+        if !categories.is_a?(Array)
+          categories = [ categories.to_s ]
+        end
+
+        cat = nil
+        categories.each do |c|
+          ccat = nil
+          if cat
+            cat.each_sub_category do |i|
+              if i.name == c
+                ccat = i
+                break
+              end
+            end
+          else
+            output_rdb.each_category do |i|
+              if i.name == c
+                ccat = i
+                break
+              end
+            end
+          end
+          cat = ccat ? ccat : output_rdb.create_category(cat, c)
+        end
+        cat ||= output_rdb.create_category("default")
+
         args[1] && cat.description = args[1]
 
         cat.scan_collection(output_cell, RBA::CplxTrans::new(self.dbu), data)
@@ -3333,7 +3381,7 @@ CODE
       else
         output_rdb = RBA::ReportDatabase::new(name)
       end
-      
+
       cn = cellname && cellname.to_s
       cn ||= @def_cell && @def_cell.name
       cn ||= @def_source && @def_source.cell_obj && @def_source.cell_obj.name
@@ -3343,7 +3391,8 @@ CODE
       output_rdb.generator = self._generator
       output_rdb.top_cell_name = cn
       output_rdb.description = description
-
+      output_rdb.original_file = @def_path
+      
       RDBOutputChannel::new(self, output_rdb, output_rdb_index, cn, output_rdb_file)
       
     end

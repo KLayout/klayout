@@ -784,6 +784,10 @@ TEST(6)
   EXPECT_EQ (v.to_string (), std::string ("0"));
   v = e.parse ("rfind('abcabc','x')").execute ();
   EXPECT_EQ (v.to_string (), std::string ("nil"));
+  v = e.parse ("upcase('abcABC')").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("ABCABC"));
+  v = e.parse ("downcase('abcABC')").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("abcabc"));
   v = e.parse ("len('abcabc')").execute ();
   EXPECT_EQ (v.to_string (), std::string ("6"));
   v = e.parse ("len([])").execute ();
@@ -859,6 +863,14 @@ TEST(6)
     msg = ex.msg();
   }
   EXPECT_EQ (msg, std::string ("My error"));
+  //  argument index in error messages
+  msg.clear ();
+  try {
+    v = e.parse ("substr('abcabc',2,'xyz')").execute ();
+  } catch (tl::Exception &ex) {
+    msg = ex.msg();
+  }
+  EXPECT_EQ (msg, std::string ("Integer value expected for argument #3 at position 0 (substr('abcabc',2,'x..)"));
 }
 
 //  compare ops

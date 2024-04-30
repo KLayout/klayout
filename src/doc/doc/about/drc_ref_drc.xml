@@ -164,7 +164,7 @@ out = in.drc((width &lt; 0.3).edges - secondary(waive))
 This operation selects edges by their angle, measured against the horizontal 
 axis in the mathematical sense. 
 </p><p>
-For this measurement edges are considered without their direction and straight lines. 
+For this measurement edges are considered without their direction.
 A horizontal edge has an angle of zero degree. A vertical one has
 an angle of 90 degrees. The angle range is from -90 (exclusive) to 90 degree (inclusive).
 </p><p>
@@ -172,20 +172,28 @@ If the input shapes are not polygons or edge pairs, they are converted to edges
 before the angle test is made.
 </p><p>
 For example, the following code selects all edges from the primary shape which are 45 degree
-(up) or 135 degree (down). The "+" will join the results:
+(up) or -45 degree (down). The "+" operator will join the results:
 </p><p>
 <pre>
-out = in.drc((angle == 45) + (angle == 135)) 
-out = in.drc((primary.angle == 45) + (primary.angle == 135))    # equivalent
+out = in.drc((angle == 45) + (angle == -45)) 
+out = in.drc((primary.angle == 45) + (primary.angle == -45))    # equivalent
 </pre>
 </p><p>
-Note that angle checks usually imply the need to rotation variant formation as cells which
+You can avoid using both 45 and -45 degree checks with the 'absolute' option.
+With this option, angles are not signed and the value is the absolute angle 
+the edge encloses with the x axis:
+</p><p>
+<pre>
+out = in.drc(angle(absolute) == 45)
+</pre>
+</p><p>
+Note that angle checks usually imply the need for rotation variant formation as cells which
 are placed non-rotated and rotated by 90 degree cannot be considered identical. This imposes
 a performance penalty in hierarchical mode. If possible, consider using <a href="/about/drc_ref_drc.xml#rectilinear">DRC#rectilinear</a> for
 example to detect shapes with non-manhattan geometry instead of using angle checks.
 </p><p>
 The "angle" method is available as a plain function or as a method on <a href="/about/drc_ref_drc.xml">DRC</a> expressions.
-The plain function is equivalent to "primary.angle".
+The plain function is equivalent to the method call "primary.angle".
 </p>
 <a name="area"/><h2>"area" - Selects the primary shape if the area is meeting the condition</h2>
 <keyword name="area"/>
@@ -363,8 +371,7 @@ See <a href="/about/drc_ref_layer.xml#centers">layer#centers</a> for details abo
 <p>Usage:</p>
 <ul>
 <li><tt>expression.corners</tt></li>
-<li><tt>expression.corners(as_dots)</tt></li>
-<li><tt>expression.corners(as_boxes)</tt></li>
+<li><tt>expression.corners([ options ])</tt></li>
 </ul>
 <p>
 This operation acts on polygons and selects the corners of the polygons.
@@ -374,9 +381,19 @@ and negative for the turn to the right. Hence positive angles indicate concave
 (inner) corners, negative ones indicate convex (outer) corners.
 Angles take values between -180 and 180 degree.
 </p><p>
-When using "as_dots" for the argument, the operation will return single-point edges at
+When using "as_dots" for an option, the operation will return single-point edges at
 the selected corners. With "as_boxes" (the default), small (2x2 DBU) rectangles will be
 produced at each selected corner.
+</p><p>
+Another option is "absolute" which selects the corners by absolute angle - i.e left
+and right turns will both be considered positive angles.
+</p><p>
+Examples for use of the options are:
+</p><p>
+<pre>
+corners(as_dots)
+corners(as_boxes, absolute)
+</pre>
 </p><p>
 The following example selects all corners:
 </p><p>

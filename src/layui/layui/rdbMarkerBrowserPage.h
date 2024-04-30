@@ -179,6 +179,7 @@ public slots:
   void flag_menu_selected ();
   void important_button_clicked ();
   void waived_button_clicked ();
+  void edit_button_clicked ();
   void snapshot_button_clicked ();
   void remove_snapshot_button_clicked ();
   void revisit_non_waived ();
@@ -238,6 +239,7 @@ private:
   void do_update_markers ();
   void update_info_text ();
   void rerun_macro ();
+  void waive_or_unwaive (bool w);
 };
 
 } // namespace rdb

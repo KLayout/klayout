@@ -521,11 +521,11 @@ TEST(6)
   EXPECT_EQ (db.variants ("c1")[0], c1->id ());
   EXPECT_EQ (db.variants ("c1")[1], c1a->id ());
 
-  rdb::Cell *c1b = db.create_cell ("c1", "var");
+  rdb::Cell *c1b = db.create_cell ("c1", "var", std::string ());
   EXPECT_EQ (c1b->qname (), "c1:var")
   EXPECT_EQ (db.variants ("c1").size (), size_t (3));
 
-  rdb::Cell *c2 = db.create_cell ("c2", "1027");
+  rdb::Cell *c2 = db.create_cell ("c2", "1027", std::string ());
   EXPECT_EQ (c2->qname (), "c2:1027");
   EXPECT_EQ (db.variants ("c2").size (), size_t (1));
 
@@ -534,8 +534,9 @@ TEST(6)
   EXPECT_EQ (c2->qname (), "c2:1027")
   EXPECT_EQ (db.variants ("c2").size (), size_t (2));
 
-  rdb::Cell *c2b = db.create_cell ("c2", "var");
+  rdb::Cell *c2b = db.create_cell ("c2", "var", "c2$1");
   EXPECT_EQ (c2b->qname (), "c2:var")
+  EXPECT_EQ (c2b->layout_name (), "c2$1")
 
   rdb::Cell *c2c = db.create_cell ("c2");
   EXPECT_EQ (c2c->qname (), "c2:2");
@@ -598,3 +599,226 @@ TEST(7)
 
 #endif
 }
+
+
+TEST(8_ApplyBasicEmptyValue)
+{
+  rdb::Database db1;
+  rdb::Category *cat1 = db1.create_category ("cat_name");
+  rdb::Cell *c1 = db1.create_cell ("cell");
+  rdb::Item *i1 = db1.create_item (c1->id (), cat1->id ());
+
+  rdb::Database db2;
+  db2.create_category ("dummy_cat");
+  rdb::Category *cat2 = db2.create_category ("cat_name");
+  db2.create_cell ("dummy_cell");
+  rdb::Cell *c2 = db2.create_cell ("cell");
+  rdb::Item *i2 = db2.create_item (c2->id (), cat2->id ());
+
+  rdb::id_type tag2 = db2.tags ().tag ("tag2").id ();
+  i2->add_tag (tag2);
+
+  EXPECT_EQ (i2->tag_str (), "tag2");
+  EXPECT_EQ (i1->tag_str (), "");
+
+  //  empty value apply
+  db1.apply (db2);
+
+  EXPECT_EQ (i1->tag_str (), "tag2");
+}
+
+TEST(9_ApplyBasicSomeValue)
+{
+  rdb::Database db1;
+  rdb::Category *cat1 = db1.create_category ("cat_name");
+  rdb::Cell *c1 = db1.create_cell ("cell");
+  rdb::Item *i1 = db1.create_item (c1->id (), cat1->id ());
+  i1->add_value (std::string ("abc"));
+
+  rdb::Database db2;
+  db2.create_category ("dummy_cat");
+  rdb::Category *cat2 = db2.create_category ("cat_name");
+  db2.create_cell ("dummy_cell");
+  rdb::Cell *c2 = db2.create_cell ("cell");
+  rdb::Item *i2 = db2.create_item (c2->id (), cat2->id ());
+
+  db2.tags ().tag ("dummy_tag");
+  rdb::id_type tag2 = db2.tags ().tag ("tag2").id ();
+  i2->add_tag (tag2);
+
+  EXPECT_EQ (i2->tag_str (), "tag2");
+  EXPECT_EQ (i1->tag_str (), "");
+
+  //  empty value apply
+  db1.apply (db2);
+
+  //  not applied (different value)
+  EXPECT_EQ (i1->tag_str (), "");
+
+  //  incorrect value
+  i2->add_value (17);
+
+  db1.apply (db2);
+
+  //  still not applied
+  EXPECT_EQ (i1->tag_str (), "");
+
+  //  correct value
+  i2->values ().clear ();
+  i2->add_value (std::string ("abc"));
+
+  db1.apply (db2);
+
+  //  now, the tag is applied
+  EXPECT_EQ (i1->tag_str (), "tag2");
+
+  //  too many values
+  i1->remove_tags ();
+  i2->add_value (17);
+
+  db1.apply (db2);
+
+  // not applied
+  EXPECT_EQ (i1->tag_str (), "");
+}
+
+TEST(10_ApplyTaggedValue)
+{
+  rdb::Database db1;
+  rdb::Category *cat1 = db1.create_category ("cat_name");
+  rdb::Cell *c1 = db1.create_cell ("cell");
+  rdb::Item *i1 = db1.create_item (c1->id (), cat1->id ());
+  rdb::id_type vtag11 = db1.tags ().tag ("vtag1").id ();
+  rdb::id_type vtag12 = db1.tags ().tag ("vtag2").id ();
+  i1->add_value (std::string ("abc"));
+
+  rdb::Database db2;
+  db2.create_category ("dummy_cat");
+  rdb::Category *cat2 = db2.create_category ("cat_name");
+  db2.create_cell ("dummy_cell");
+  rdb::Cell *c2 = db2.create_cell ("cell");
+  rdb::Item *i2 = db2.create_item (c2->id (), cat2->id ());
+  db2.tags ().tag ("dummy_tag");
+
+  rdb::id_type tag2 = db2.tags ().tag ("tag2").id ();
+  rdb::id_type vtag21 = db2.tags ().tag ("vtag1").id ();
+  i2->add_tag (tag2);
+  i2->add_value (std::string ("abc"), vtag21);
+
+  //  empty tag vs. vtag1
+  db1.apply (db2);
+
+  //  not applied (empty tag vs. tagged)
+  EXPECT_EQ (i1->tag_str (), "");
+
+  //  vtag2 vs. vtag1
+  i1->values ().clear ();
+  i1->add_value (std::string ("abc"), vtag12);
+
+  db1.apply (db2);
+
+  //  not applied (different tags)
+  EXPECT_EQ (i1->tag_str (), "");
+
+  //  vtag1 vs. vtag1
+  i1->values ().clear ();
+  i1->add_value (std::string ("abc"), vtag11);
+
+  db1.apply (db2);
+
+  //  this time it is applied (same tag)
+  EXPECT_EQ (i1->tag_str (), "tag2");
+}
+
+TEST(11_ApplyWrongCat)
+{
+  rdb::Database db1;
+  rdb::Category *cat1 = db1.create_category ("cat_name");
+  rdb::Cell *c1 = db1.create_cell ("cell");
+  rdb::Item *i1 = db1.create_item (c1->id (), cat1->id ());
+
+  rdb::Database db2;
+  db2.create_category ("dummy_cat");
+  rdb::Category *cat2 = db2.create_category ("xcat_name");
+  db2.create_cell ("dummy_cell");
+  rdb::Cell *c2 = db2.create_cell ("cell");
+  rdb::Item *i2 = db2.create_item (c2->id (), cat2->id ());
+
+  rdb::id_type tag2 = db2.tags ().tag ("tag2").id ();
+  i2->add_tag (tag2);
+
+  EXPECT_EQ (i2->tag_str (), "tag2");
+  EXPECT_EQ (i1->tag_str (), "");
+
+  //  empty value apply
+  db1.apply (db2);
+
+  EXPECT_EQ (i1->tag_str (), "");
+}
+
+TEST(12_ApplyWrongCell)
+{
+  rdb::Database db1;
+  rdb::Category *cat1 = db1.create_category ("cat_name");
+  rdb::Cell *c1 = db1.create_cell ("cell");
+  rdb::Item *i1 = db1.create_item (c1->id (), cat1->id ());
+
+  rdb::Database db2;
+  db2.create_category ("dummy_cat");
+  rdb::Category *cat2 = db2.create_category ("cat_name");
+  db2.create_cell ("dummy_cell");
+  rdb::Cell *c2 = db2.create_cell ("xcell");
+  rdb::Item *i2 = db2.create_item (c2->id (), cat2->id ());
+
+  rdb::id_type tag2 = db2.tags ().tag ("tag2").id ();
+  i2->add_tag (tag2);
+
+  EXPECT_EQ (i2->tag_str (), "tag2");
+  EXPECT_EQ (i1->tag_str (), "");
+
+  //  empty value apply
+  db1.apply (db2);
+
+  EXPECT_EQ (i1->tag_str (), "");
+}
+
+TEST(13_ApplyIgnoreUnknownTag)
+{
+  rdb::Database db1;
+  rdb::Category *cat1 = db1.create_category ("cat_name");
+  rdb::Cell *c1 = db1.create_cell ("cell");
+  rdb::Item *i1 = db1.create_item (c1->id (), cat1->id ());
+  rdb::id_type vtag11 = db1.tags ().tag ("vtag1").id ();
+  i1->add_value (std::string ("abc"), vtag11);
+
+  rdb::Database db2;
+  db2.create_category ("dummy_cat");
+  rdb::Category *cat2 = db2.create_category ("cat_name");
+  db2.create_cell ("dummy_cell");
+  rdb::Cell *c2 = db2.create_cell ("cell");
+  rdb::Item *i2 = db2.create_item (c2->id (), cat2->id ());
+  db2.tags ().tag ("dummy_tag");
+
+  rdb::id_type tag2 = db2.tags ().tag ("tag2").id ();
+  rdb::id_type vtag21 = db2.tags ().tag ("vtag1").id ();
+  rdb::id_type vtag22 = db2.tags ().tag ("vtag2").id ();
+  i2->add_tag (tag2);
+
+  //  same tags, different values
+  i2->add_value (std::string ("xyz"), vtag21);
+
+  db1.apply (db2);
+
+  //  not applied
+  EXPECT_EQ (i1->tag_str (), "");
+
+  //  different tags without mapping
+  i2->values ().clear ();
+  i2->add_value (std::string ("xyz"), vtag22);
+
+  //  values with incompatible tags are ignored -> tag2 is applied
+  db1.apply (db2);
+
+  EXPECT_EQ (i1->tag_str (), "tag2");
+}
+

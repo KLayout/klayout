@@ -506,10 +506,7 @@ public:
     return type_index_of<C> (); 
   }
 
-  bool compare (const ValueBase *other) const 
-  {
-    return m_value < static_cast<const Value<C> *> (other)->m_value;
-  }
+  bool compare (const ValueBase *other) const;
 
   bool is_shape () const;
 
@@ -680,6 +677,19 @@ public:
   Values &operator= (const Values &d);
 
   /**
+   *  @brief Compare two value sets (less operator)
+   *
+   *  This compare function will use the tag mapping provided by tag map ("this" tag id to "other" tag id).
+   *  Values with tags not listed in the tag map will not be compared.
+   *  Untagged values (tag_id 0) will be compared always.
+   *
+   *  "rev_tag_map" needs to be the reverse of "tag_map".
+   *
+   *  The order of the values matters.
+   */
+  bool compare (const Values &other, const std::map<id_type, id_type> &tag_map, const std::map<id_type, id_type> &rev_tag_map) const;
+
+  /**
    *  @brief The const iterator (begin)
    */
   const_iterator begin () const
@@ -737,6 +747,14 @@ public:
   void swap (Values &other)
   {
     m_values.swap (other.m_values);
+  }
+
+  /**
+   *  @brief Clears the values
+   */
+  void clear ()
+  {
+    m_values.clear ();
   }
 
   /**
@@ -994,6 +1012,26 @@ public:
   void set_image_str (const std::string &s);
 
   /**
+   *  @brief Gets the item comment
+   *
+   *  The comment string is an arbitrary string attached to the item.
+   */
+  const std::string &comment () const
+  {
+    return m_comment;
+  }
+
+  /**
+   *  @brief Sets the item comment
+   *
+   *  The comment string is an arbitrary string attached to the item.
+   */
+  void set_comment (const std::string &s)
+  {
+    m_comment = s;
+  }
+
+  /**
    *  @brief Get the database reference
    */
   Database *database ()
@@ -1017,6 +1055,7 @@ private:
   id_type m_cell_id;
   id_type m_category_id;
   size_t m_multiplicity;
+  std::string m_comment;
   bool m_visited;
   std::vector <bool> m_tag_ids;
   Database *mp_database;
@@ -1441,7 +1480,7 @@ public:
    *
    *  This method is provided for persistency application only. It should not be used otherwise.
    */
-  Cell (id_type id, const std::string &name, const std::string &variant);
+  Cell (id_type id, const std::string &name, const std::string &variant, const std::string &layout_name);
 
   /**
    *  @brief Cell destructor
@@ -1467,7 +1506,7 @@ public:
   }
 
   /**
-   *  @brief Get the cell name
+   *  @brief Gets the cell name
    */
   const std::string &name () const
   {
@@ -1475,7 +1514,7 @@ public:
   }
 
   /**
-   *  @brief Set the name string (setter)
+   *  @brief Sets the name string
    *
    *  This method must not be used for items in the database to keep the database consistent.
    */
@@ -1485,7 +1524,7 @@ public:
   }
 
   /**
-   *  @brief Get the variant id
+   *  @brief Gets the variant id
    */
   const std::string &variant () const
   {
@@ -1493,13 +1532,31 @@ public:
   }
 
   /**
-   *  @brief Set the variant string (setter)
+   *  @brief Sets the variant string
    *
    *  This method must not be used for items in the database to keep the database consistent.
    */
   void set_variant (const std::string &v) 
   {
     m_variant = v;
+  }
+
+  /**
+   *  @brief Gets the layout cell name
+   */
+  const std::string &layout_name () const
+  {
+    return m_layout_name;
+  }
+
+  /**
+   *  @brief Sets the layout cell string
+   *
+   *  This method must not be used for items in the database to keep the database consistent.
+   */
+  void set_layout_name (const std::string &s)
+  {
+    m_layout_name = s;
   }
 
   /**
@@ -1579,6 +1636,7 @@ private:
   id_type m_id;
   std::string m_name;
   std::string m_variant;
+  std::string m_layout_name;
   size_t m_num_items;
   size_t m_num_items_visited;
   References m_references;
@@ -2182,7 +2240,7 @@ public:
    */
   Cell *create_cell (const std::string &name)
   {
-    return create_cell (name, std::string ());
+    return create_cell (name, std::string (), std::string ());
   }
 
   /**
@@ -2191,8 +2249,11 @@ public:
    *  A cell with name name/variant combination must not exist already.
    *  If the variant string is empty, this method behaves the same as the 
    *  method without variant.
+   *
+   *  "layout_name" is the name of the cell in the layout. If empty, the layout
+   *  cell is assumed to be identical to "name".
    */
-  Cell *create_cell (const std::string &name, const std::string &variant);
+  Cell *create_cell (const std::string &name, const std::string &variant, const std::string &layout_name);
 
   /**
    *  @brief Get all variants registered for a given cell name (not qname!)
@@ -2285,6 +2346,11 @@ public:
    *  @brief Remove a tag from the given item
    */
   void remove_item_tag (const Item *item, id_type tag);
+
+  /**
+   *  @brief Sets the comment string of the item
+   */
+  void set_item_comment (const Item *item, const std::string &comment);
 
 #if defined(HAVE_QT)
   /**
@@ -2379,11 +2445,28 @@ public:
   void save (const std::string &filename);
 
   /**
+   *  @brief Write the database to a file
+   *
+   *  This function is like "save", but does not update the file name attribute.
+   */
+  void write (const std::string &filename);
+
+  /**
    *  @brief Load the database from a file
    *
-   *  @brief This clears the existing database.
+   *  Note: This clears the existing database.
+   *  The argument intentionally is a copy, so we can call
+   *  "load (this->filename ())" for reloading.
    */
-  void load (const std::string &filename);
+  void load (std::string filename);
+
+  /**
+   *  @brief Applies the attributes from a different database
+   *
+   *  Attributes are waived flags, images etc.
+   *  The attributes are applied to markers with identical value(s), category and cell context.
+   */
+  void apply (const rdb::Database &other);
 
   /**
    *  @brief Scans a layout into this RDB

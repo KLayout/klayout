@@ -145,14 +145,14 @@ ExpressionParserContext::where () const
 // ----------------------------------------------------------------------------
 //  Utilities for evaluation
 
-static double to_double (const ExpressionParserContext &context, const tl::Variant &v)
+static double to_double (const ExpressionParserContext &context, const tl::Variant &v, unsigned int narg)
 {
   if (v.can_convert_to_double ()) {
     return v.to_double ();
   } else if (v.is_list ()) {
     return v.get_list ().size ();
   } else {
-    throw EvalError (tl::to_string (tr ("Double precision floating point value expected")), context);
+    throw EvalError (tl::to_string (tr ("Double precision floating point value expected for argument #")) + tl::to_string (narg + 1), context);
   }
 }
 
@@ -162,50 +162,50 @@ static double to_double (const ExpressionParserContext &context, const std::vect
     throw EvalError (tl::to_string (tr ("Function expects a single numeric argument")), context);
   }
 
-  return to_double (context, v [0]);
+  return to_double (context, v [0], 0);
 }
 
-static long to_long (const ExpressionParserContext &context, const tl::Variant &v)
+static long to_long (const ExpressionParserContext &context, const tl::Variant &v, int narg)
 {
   if (v.can_convert_to_long ()) {
     return v.to_long ();
   } else if (v.is_list ()) {
     return long (v.get_list ().size ());
   } else {
-    throw EvalError (tl::to_string (tr ("Integer value expected")), context);
+    throw EvalError (tl::to_string (tr ("Integer value expected for argument #")) + tl::to_string (narg + 1), context);
   }
 }
 
-static unsigned long to_ulong (const ExpressionParserContext &context, const tl::Variant &v)
+static unsigned long to_ulong (const ExpressionParserContext &context, const tl::Variant &v, int narg)
 {
   if (v.can_convert_to_ulong ()) {
     return v.to_ulong ();
   } else if (v.is_list ()) {
     return (unsigned long) (v.get_list ().size ());
   } else {
-    throw EvalError (tl::to_string (tr ("Unsigned integer value expected")), context);
+    throw EvalError (tl::to_string (tr ("Unsigned integer value expected for argument #")) + tl::to_string (narg + 1), context);
   }
 }
 
-static long long to_longlong (const ExpressionParserContext &context, const tl::Variant &v)
+static long long to_longlong (const ExpressionParserContext &context, const tl::Variant &v, int narg)
 {
   if (v.can_convert_to_longlong ()) {
     return v.to_longlong ();
   } else if (v.is_list ()) {
     return long (v.get_list ().size ());
   } else {
-    throw EvalError (tl::to_string (tr ("Integer value expected")), context);
+    throw EvalError (tl::to_string (tr ("Integer value expected for argument #")) + tl::to_string (narg + 1), context);
   }
 }
 
-static unsigned long long to_ulonglong (const ExpressionParserContext &context, const tl::Variant &v)
+static unsigned long long to_ulonglong (const ExpressionParserContext &context, const tl::Variant &v, int narg)
 {
   if (v.can_convert_to_ulonglong ()) {
     return v.to_ulong ();
   } else if (v.is_list ()) {
     return (unsigned long long) (v.get_list ().size ());
   } else {
-    throw EvalError (tl::to_string (tr ("Unsigned integer value expected")), context);
+    throw EvalError (tl::to_string (tr ("Unsigned integer value expected for argument #")) + tl::to_string (narg + 1), context);
   }
 }
 
@@ -1089,13 +1089,13 @@ public:
       v.swap (o);
 
     } else if (v->is_longlong ()) {
-      v.set (tl::Variant (v->to_longlong () << to_longlong (m_context, *b)));
+      v.set (tl::Variant (v->to_longlong () << to_longlong (m_context, *b, 1)));
     } else if (v->is_ulonglong ()) {
-      v.set (tl::Variant (v->to_ulonglong () << to_ulonglong (m_context, *b)));
+      v.set (tl::Variant (v->to_ulonglong () << to_ulonglong (m_context, *b, 1)));
     } else if (v->is_ulong ()) {
-      v.set (tl::Variant (v->to_ulong () << to_ulong (m_context, *b)));
+      v.set (tl::Variant (v->to_ulong () << to_ulong (m_context, *b, 1)));
     } else {
-      v.set (tl::Variant (to_long (m_context, *v) << to_long (m_context, *b)));
+      v.set (tl::Variant (to_long (m_context, *v, 0) << to_long (m_context, *b, 1)));
     }
   }
 };
@@ -1145,13 +1145,13 @@ public:
       v.swap (o);
 
     } else if (v->is_longlong ()) {
-      v.set (tl::Variant (v->to_longlong () >> to_longlong (m_context, *b)));
+      v.set (tl::Variant (v->to_longlong () >> to_longlong (m_context, *b, 1)));
     } else if (v->is_ulonglong ()) {
-      v.set (tl::Variant (v->to_ulonglong () >> to_ulonglong (m_context, *b)));
+      v.set (tl::Variant (v->to_ulonglong () >> to_ulonglong (m_context, *b, 1)));
     } else if (v->is_ulong ()) {
-      v.set (tl::Variant (v->to_ulong () >> to_ulong (m_context, *b)));
+      v.set (tl::Variant (v->to_ulong () >> to_ulong (m_context, *b, 1)));
     } else {
-      v.set (tl::Variant (to_long (m_context, *v) >> to_long (m_context, *b)));
+      v.set (tl::Variant (to_long (m_context, *v, 0) >> to_long (m_context, *b, 1)));
     }
   }
 };
@@ -1203,17 +1203,17 @@ public:
     } else if (v->is_a_string () || b->is_a_string ()) {
       v.set (tl::Variant (std::string (v->to_string ()) + b->to_string ()));
     } else if (v->is_double () || b->is_double ()) {
-      v.set (tl::Variant (to_double (m_context, *v) + to_double (m_context, *b)));
+      v.set (tl::Variant (to_double (m_context, *v, 0) + to_double (m_context, *b, 1)));
     } else if (v->is_ulonglong () || b->is_ulonglong ()) {
-      v.set (tl::Variant (to_ulonglong (m_context, *v) + to_ulonglong (m_context, *b)));
+      v.set (tl::Variant (to_ulonglong (m_context, *v, 0) + to_ulonglong (m_context, *b, 1)));
     } else if (v->is_longlong () || b->is_longlong ()) {
-      v.set (tl::Variant (to_longlong (m_context, *v) + to_longlong (m_context, *b)));
+      v.set (tl::Variant (to_longlong (m_context, *v, 0) + to_longlong (m_context, *b, 1)));
     } else if (v->is_ulong () || b->is_ulong ()) {
-      v.set (tl::Variant (to_ulong (m_context, *v) + to_ulong (m_context, *b)));
+      v.set (tl::Variant (to_ulong (m_context, *v, 0) + to_ulong (m_context, *b, 1)));
     } else if (v->is_long () || b->is_long ()) {
-      v.set (tl::Variant (to_long (m_context, *v) + to_long (m_context, *b)));
+      v.set (tl::Variant (to_long (m_context, *v, 0) + to_long (m_context, *b, 1)));
     } else {
-      v.set (tl::Variant (to_double (m_context, *v) + to_double (m_context, *b)));
+      v.set (tl::Variant (to_double (m_context, *v, 0) + to_double (m_context, *b, 1)));
     }
   }
 };
@@ -1263,17 +1263,17 @@ public:
       v.swap (o);
 
     } else if (v->is_double () || b->is_double ()) {
-      v.set (tl::Variant (to_double (m_context, *v) - to_double (m_context, *b)));
+      v.set (tl::Variant (to_double (m_context, *v, 0) - to_double (m_context, *b, 1)));
     } else if (v->is_ulonglong () || b->is_ulonglong ()) {
-      v.set (tl::Variant (to_ulonglong (m_context, *v) - to_ulonglong (m_context, *b)));
+      v.set (tl::Variant (to_ulonglong (m_context, *v, 0) - to_ulonglong (m_context, *b, 1)));
     } else if (v->is_longlong () || b->is_longlong ()) {
-      v.set (tl::Variant (to_longlong (m_context, *v) - to_longlong (m_context, *b)));
+      v.set (tl::Variant (to_longlong (m_context, *v, 0) - to_longlong (m_context, *b, 1)));
     } else if (v->is_ulong () || b->is_ulong ()) {
-      v.set (tl::Variant (to_ulong (m_context, *v) - to_ulong (m_context, *b)));
+      v.set (tl::Variant (to_ulong (m_context, *v, 0) - to_ulong (m_context, *b, 1)));
     } else if (v->is_long () || b->is_long ()) {
-      v.set (tl::Variant (to_long (m_context, *v) - to_long (m_context, *b)));
+      v.set (tl::Variant (to_long (m_context, *v, 0) - to_long (m_context, *b, 1)));
     } else {
-      v.set (tl::Variant (to_double (m_context, *v) - to_double (m_context, *b)));
+      v.set (tl::Variant (to_double (m_context, *v, 0) - to_double (m_context, *b, 1)));
     }
   }
 };
@@ -1324,7 +1324,7 @@ public:
 
     } else if (v->is_a_string ()) {
 
-      long x = to_long (m_context, *b);
+      long x = to_long (m_context, *b, 1);
       if (x < 0) {
         throw EvalError (tl::to_string (tr ("Numeric argument of '*' operator with string must be positive")), m_context);
       }
@@ -1339,7 +1339,7 @@ public:
 
     } else if (b->is_a_string ()) {
 
-      long x = to_long (m_context, *v);
+      long x = to_long (m_context, *v, 0);
       if (x < 0) {
         throw EvalError (tl::to_string (tr ("Numeric argument of '*' operator with string must be positive")), m_context);
       }
@@ -1353,17 +1353,17 @@ public:
       v.set (tl::Variant (s));
 
     } else if (v->is_double () || b->is_double ()) {
-      v.set (tl::Variant (to_double (m_context, *v) * to_double (m_context, *b)));
+      v.set (tl::Variant (to_double (m_context, *v, 0) * to_double (m_context, *b, 1)));
     } else if (v->is_ulonglong () || b->is_ulonglong ()) {
-      v.set (tl::Variant (to_ulonglong (m_context, *v) * to_ulonglong (m_context, *b)));
+      v.set (tl::Variant (to_ulonglong (m_context, *v, 0) * to_ulonglong (m_context, *b, 1)));
     } else if (v->is_longlong () || b->is_longlong ()) {
-      v.set (tl::Variant (to_longlong (m_context, *v) * to_longlong (m_context, *b)));
+      v.set (tl::Variant (to_longlong (m_context, *v, 0) * to_longlong (m_context, *b, 1)));
     } else if (v->is_ulong () || b->is_ulong ()) {
-      v.set (tl::Variant (to_ulong (m_context, *v) * to_ulong (m_context, *b)));
+      v.set (tl::Variant (to_ulong (m_context, *v, 0) * to_ulong (m_context, *b, 1)));
     } else if (v->is_long () || b->is_long ()) {
-      v.set (tl::Variant (to_long (m_context, *v) * to_long (m_context, *b)));
+      v.set (tl::Variant (to_long (m_context, *v, 0) * to_long (m_context, *b, 1)));
     } else {
-      v.set (tl::Variant (to_double (m_context, *v) * to_double (m_context, *b)));
+      v.set (tl::Variant (to_double (m_context, *v, 0) * to_double (m_context, *b, 1)));
     }
   }
 };
@@ -1413,41 +1413,41 @@ public:
       v.swap (o);
 
     } else if (v->is_double () || b->is_double ()) {
-      double d = to_double (m_context, *b);
+      double d = to_double (m_context, *b, 1);
       if (d == 0) {
         throw EvalError (tl::to_string (tr ("Division by zero")), m_context);
       }
-      v.set (tl::Variant (to_double (m_context, *v) / d));
+      v.set (tl::Variant (to_double (m_context, *v, 0) / d));
     } else if (v->is_ulonglong () || b->is_ulonglong ()) {
-      unsigned long long d = to_ulonglong (m_context, *b);
+      unsigned long long d = to_ulonglong (m_context, *b, 1);
       if (d == 0) {
         throw EvalError (tl::to_string (tr ("Division by zero")), m_context);
       }
-      v.set (tl::Variant (to_ulonglong (m_context, *v) / d));
+      v.set (tl::Variant (to_ulonglong (m_context, *v, 0) / d));
     } else if (v->is_longlong () || b->is_longlong ()) {
-      long long d = to_longlong (m_context, *b);
+      long long d = to_longlong (m_context, *b, 1);
       if (d == 0) {
         throw EvalError (tl::to_string (tr ("Division by zero")), m_context);
       }
-      v.set (tl::Variant (to_longlong (m_context, *v) / d));
+      v.set (tl::Variant (to_longlong (m_context, *v, 0) / d));
     } else if (v->is_ulong () || b->is_ulong ()) {
-      unsigned long d = to_ulong (m_context, *b);
+      unsigned long d = to_ulong (m_context, *b, 1);
       if (d == 0) {
         throw EvalError (tl::to_string (tr ("Division by zero")), m_context);
       }
-      v.set (tl::Variant (to_ulong (m_context, *v) / d));
+      v.set (tl::Variant (to_ulong (m_context, *v, 0) / d));
     } else if (v->is_long () || b->is_long ()) {
-      long d = to_long (m_context, *b);
+      long d = to_long (m_context, *b, 1);
       if (d == 0) {
         throw EvalError (tl::to_string (tr ("Division by zero")), m_context);
       }
-      v.set (tl::Variant (to_long (m_context, *v) / d));
+      v.set (tl::Variant (to_long (m_context, *v, 0) / d));
     } else {
-      double d = to_double (m_context, *b);
+      double d = to_double (m_context, *b, 1);
       if (d == 0) {
         throw EvalError (tl::to_string (tr ("Division by zero")), m_context);
       }
-      v.set (tl::Variant (to_double (m_context, *v) / d));
+      v.set (tl::Variant (to_double (m_context, *v, 0) / d));
     }
   }
 };
@@ -1497,29 +1497,29 @@ public:
       v.swap (o);
 
     } else if (v->is_ulonglong () || b->is_ulonglong ()) {
-      unsigned long long d = to_ulonglong (m_context, *b);
+      unsigned long long d = to_ulonglong (m_context, *b, 1);
       if (d == 0) {
         throw EvalError (tl::to_string (tr ("Modulo by zero")), m_context);
       }
-      v.set (tl::Variant (to_ulonglong (m_context, *v) % d));
+      v.set (tl::Variant (to_ulonglong (m_context, *v, 0) % d));
     } else if (v->is_longlong () || b->is_longlong ()) {
-      long long d = to_longlong (m_context, *b);
+      long long d = to_longlong (m_context, *b, 1);
       if (d == 0) {
         throw EvalError (tl::to_string (tr ("Modulo by zero")), m_context);
       }
-      v.set (tl::Variant (to_longlong (m_context, *v) % d));
+      v.set (tl::Variant (to_longlong (m_context, *v, 0) % d));
     } else if (v->is_ulong () || b->is_ulong ()) {
-      unsigned long d = to_ulong (m_context, *b);
+      unsigned long d = to_ulong (m_context, *b, 1);
       if (d == 0) {
         throw EvalError (tl::to_string (tr ("Modulo by zero")), m_context);
       }
-      v.set (tl::Variant (to_ulong (m_context, *v) % d));
+      v.set (tl::Variant (to_ulong (m_context, *v, 0) % d));
     } else {
-      long d = to_long (m_context, *b);
+      long d = to_long (m_context, *b, 1);
       if (d == 0) {
         throw EvalError (tl::to_string (tr ("Modulo by zero")), m_context);
       }
-      v.set (tl::Variant (to_long (m_context, *v) % d));
+      v.set (tl::Variant (to_long (m_context, *v, 0) % d));
     }
   }
 };
@@ -1569,13 +1569,13 @@ public:
       v.swap (o);
 
     } else if (v->is_ulonglong () || b->is_ulonglong ()) {
-      v.set (tl::Variant (to_ulonglong (m_context, *v) & to_ulonglong (m_context, *b)));
+      v.set (tl::Variant (to_ulonglong (m_context, *v, 0) & to_ulonglong (m_context, *b, 1)));
     } else if (v->is_longlong () || b->is_longlong ()) {
-      v.set (tl::Variant (to_longlong (m_context, *v) & to_longlong (m_context, *b)));
+      v.set (tl::Variant (to_longlong (m_context, *v, 0) & to_longlong (m_context, *b, 1)));
     } else if (v->is_ulong () || b->is_ulong ()) {
-      v.set (tl::Variant (to_ulong (m_context, *v) & to_ulong (m_context, *b)));
+      v.set (tl::Variant (to_ulong (m_context, *v, 0) & to_ulong (m_context, *b, 1)));
     } else {
-      v.set (tl::Variant (to_long (m_context, *v) & to_long (m_context, *b)));
+      v.set (tl::Variant (to_long (m_context, *v, 0) & to_long (m_context, *b, 1)));
     }
   }
 };
@@ -1625,13 +1625,13 @@ public:
       v.swap (o);
 
     } else if (v->is_ulonglong () || b->is_ulonglong ()) {
-      v.set (tl::Variant (to_ulonglong (m_context, *v) | to_ulonglong (m_context, *b)));
+      v.set (tl::Variant (to_ulonglong (m_context, *v, 0) | to_ulonglong (m_context, *b, 1)));
     } else if (v->is_longlong () || b->is_longlong ()) {
-      v.set (tl::Variant (to_longlong (m_context, *v) | to_longlong (m_context, *b)));
+      v.set (tl::Variant (to_longlong (m_context, *v, 0) | to_longlong (m_context, *b, 1)));
     } else if (v->is_ulong () || b->is_ulong ()) {
-      v.set (tl::Variant (to_ulong (m_context, *v) | to_ulong (m_context, *b)));
+      v.set (tl::Variant (to_ulong (m_context, *v, 0) | to_ulong (m_context, *b, 1)));
     } else {
-      v.set (tl::Variant (to_long (m_context, *v) | to_long (m_context, *b)));
+      v.set (tl::Variant (to_long (m_context, *v, 0) | to_long (m_context, *b, 1)));
     }
   }
 };
@@ -1681,13 +1681,13 @@ public:
       v.swap (o);
 
     } else if (v->is_ulonglong () || b->is_ulonglong ()) {
-      v.set (tl::Variant (to_ulonglong (m_context, *v) ^ to_ulonglong (m_context, *b)));
+      v.set (tl::Variant (to_ulonglong (m_context, *v, 0) ^ to_ulonglong (m_context, *b, 1)));
     } else if (v->is_longlong () || b->is_longlong ()) {
-      v.set (tl::Variant (to_longlong (m_context, *v) ^ to_longlong (m_context, *b)));
+      v.set (tl::Variant (to_longlong (m_context, *v, 0) ^ to_longlong (m_context, *b, 1)));
     } else if (v->is_ulong () || b->is_ulong ()) {
-      v.set (tl::Variant (to_ulong (m_context, *v) ^ to_ulong (m_context, *b)));
+      v.set (tl::Variant (to_ulong (m_context, *v, 0) ^ to_ulong (m_context, *b, 1)));
     } else {
-      v.set (tl::Variant (to_long (m_context, *v) ^ to_long (m_context, *b)));
+      v.set (tl::Variant (to_long (m_context, *v, 0) ^ to_long (m_context, *b, 1)));
     }
   }
 };
@@ -1826,7 +1826,7 @@ public:
     } else if (v->is_ulonglong ()) {
       v.set (-(long long)(v->to_ulonglong ()));
     } else {
-      v.set (-to_double (m_context, *v));
+      v.set (-to_double (m_context, *v, 0));
     }
   }
 };
@@ -1881,7 +1881,7 @@ public:
     } else if (v->is_ulonglong ()) {
       v.set (~v->to_ulonglong ());
     } else {
-      v.set (~to_long (m_context, *v));
+      v.set (~to_long (m_context, *v, 0));
     }
   }
 };
@@ -2388,7 +2388,7 @@ abs_f (const ExpressionParserContext &context, tl::Variant &out, const std::vect
   } else if (v[0].is_double ()) {
     out = fabs (v[0].to_double ());
   } else {
-    out = labs (to_long (context, v[0]));
+    out = labs (to_long (context, v[0], 0));
   }
 }
 
@@ -2463,7 +2463,7 @@ pow_f (const ExpressionParserContext &context, tl::Variant &out, const std::vect
     throw EvalError (tl::to_string (tr ("'pow' function expects exactly two arguments")), context);
   }
 
-  out = pow (to_double (context, vv [0]), to_double (context, vv [1]));
+  out = pow (to_double (context, vv [0], 0), to_double (context, vv [1], 1));
 }
 
 static void
@@ -2473,7 +2473,7 @@ atan2_f (const ExpressionParserContext &context, tl::Variant &out, const std::ve
     throw EvalError (tl::to_string (tr ("'atan2' function expects exactly two arguments")), context);
   }
 
-  out = atan2 (to_double (context, vv [0]), to_double (context, vv [1]));
+  out = atan2 (to_double (context, vv [0], 0), to_double (context, vv [1], 1));
 }
 
 static void
@@ -2690,10 +2690,10 @@ substr_f (const ExpressionParserContext &context, tl::Variant &out, const std::v
 
   long len = -1;
   if (vv.size () > 2) {
-    len = std::max (long (0), to_long (context, vv [2]));
+    len = std::max (long (0), to_long (context, vv [2], 2));
   }
 
-  long l = to_long (context, vv [1]);
+  long l = to_long (context, vv [1], 1);
   if (l < 0) {
     l = long (s.size ()) + l;
     if (l < 0) {
@@ -2711,6 +2711,26 @@ substr_f (const ExpressionParserContext &context, tl::Variant &out, const std::v
   } else {
     out = std::string (s, from, len);
   }
+}
+
+static void
+upcase_f (const ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv)
+{
+  if (vv.size () != 1) {
+    throw EvalError (tl::to_string (tr ("'upcase' function expects one argument")), context);
+  }
+
+  out = tl::to_upper_case (vv [0].to_string ());
+}
+
+static void
+downcase_f (const ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv)
+{
+  if (vv.size () != 1) {
+    throw EvalError (tl::to_string (tr ("'upcase' function expects one argument")), context);
+  }
+
+  out = tl::to_lower_case (vv [0].to_string ());
 }
 
 static void
@@ -2752,7 +2772,7 @@ item_f (const ExpressionParserContext &context, tl::Variant &out, const std::vec
     throw EvalError (tl::to_string (tr ("First argument of 'item' function must be a list")), context);
   }
 
-  long index = to_long (context, vv [1]);
+  long index = to_long (context, vv [1], 1);
   if (index < 0 || index >= long (vv [0].end () - vv [0].begin ())) {
     out = tl::Variant ();
   } else {
@@ -3042,6 +3062,8 @@ static EvalStaticFunction f55 ("file_exists", &file_exists_f);
 static EvalStaticFunction f56 ("is_dir", &is_dir_f);
 static EvalStaticFunction f57 ("combine", &combine_f);
 static EvalStaticFunction f58 ("abs", &abs_f);
+static EvalStaticFunction f59 ("upcase", &upcase_f);
+static EvalStaticFunction f60 ("downcase", &downcase_f);
 
 // ----------------------------------------------------------------------------
 //  Implementation of a constant wrapper

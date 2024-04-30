@@ -880,6 +880,40 @@ TEST(23_endl)
   );
 }
 
+TEST(24_recursive_calls)
+{
+  db::Netlist nl;
+
+  std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader24.cir");
+
+  db::NetlistSpiceReader reader;
+  tl::InputStream is (path);
+
+  try {
+    reader.read (is, nl);
+    EXPECT_EQ (false, true);
+  } catch (tl::Exception &ex) {
+    EXPECT_EQ (ex.msg ().find ("Subcircuit 'C1' called recursively in"), size_t (0));
+  }
+}
+
+TEST(25_dismiss_top_level)
+{
+  db::Netlist nl;
+
+  std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader25.cir");
+
+  db::NetlistSpiceReader reader;
+  tl::InputStream is (path);
+  reader.read (is, nl);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit TOP (A=A,B=B);\n"
+    "  device NMOS '1' (S=A,G=B,D=A,B=B) (L=100,W=100,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+}
+
 TEST(100_ExpressionParser)
 {
   std::map<std::string, tl::Variant> vars;

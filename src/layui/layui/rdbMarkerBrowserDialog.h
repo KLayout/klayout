@@ -74,7 +74,11 @@ private:
 public slots:
   void cv_index_changed (int);
   void rdb_index_changed (int);
+  void info_clicked ();
+  void save_clicked ();
   void saveas_clicked ();
+  void saveas_waiver_db_clicked ();
+  void apply_waiver_db_clicked ();
   void export_clicked ();
   void reload_clicked ();
   void open_clicked ();
@@ -98,12 +102,6 @@ private:
   std::string m_rdb_name;
   int m_rdb_index;
   std::string m_open_filename;
-  QAction *m_open_action;
-  QAction *m_saveas_action;
-  QAction *m_export_action;
-  QAction *m_unload_action;
-  QAction *m_unload_all_action;
-  QAction *m_reload_action;
 
   void update_content ();
   void scan_layer ();

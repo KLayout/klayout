@@ -1,0 +1,596 @@
+<?xml version="1.0" encoding="utf-8"?>
+<report-database>
+ <description>Report comment with
+another line</description>
+ <original-file/>
+ <generator>drc: script='.drc'</generator>
+ <top-cell>TOP</top-cell>
+ <tags>
+  <tag>
+   <name>waived</name>
+   <description/>
+  </tag>
+ </tags>
+ <categories>
+  <category>
+   <name>inputs</name>
+   <description/>
+   <categories>
+    <category>
+     <name>l1</name>
+     <description>L1 (1/0 sized by x=100nm,y=0)</description>
+     <categories>
+     </categories>
+    </category>
+    <category>
+     <name>l1_snapped</name>
+     <description>L1 snapped to 200nm</description>
+     <categories>
+     </categories>
+    </category>
+   </categories>
+  </category>
+  <category>
+   <name>w1um</name>
+   <description>w &lt; 1µm
+Another line</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>w1um_snapped</name>
+   <description>w &lt; 1µm
+From snapped input</description>
+   <categories>
+   </categories>
+  </category>
+ </categories>
+ <cells>
+  <cell>
+   <name>TOP</name>
+   <variant/>
+   <layout-name/>
+   <references>
+   </references>
+  </cell>
+  <cell>
+   <name>A</name>
+   <variant>r0</variant>
+   <layout-name>A</layout-name>
+   <references>
+    <ref>
+     <parent>TOP</parent>
+     <trans>r0 *1 0.5,1.2</trans>
+    </ref>
+   </references>
+  </cell>
+  <cell>
+   <name>A</name>
+   <variant>r90</variant>
+   <layout-name>A$VAR1</layout-name>
+   <references>
+    <ref>
+     <parent>TOP</parent>
+     <trans>r270 *1 2,2</trans>
+    </ref>
+   </references>
+  </cell>
+  <cell>
+   <name>A</name>
+   <variant>r0;r0(-0.1,0)</variant>
+   <layout-name>A</layout-name>
+   <references>
+    <ref>
+     <parent>TOP</parent>
+     <trans>r0 *1 0.5,1.2</trans>
+    </ref>
+   </references>
+  </cell>
+  <cell>
+   <name>A</name>
+   <variant>r0;r0</variant>
+   <layout-name>A$VAR1$1</layout-name>
+   <references>
+    <ref>
+     <parent>TOP</parent>
+     <trans>r0 *1 1.2,1.2</trans>
+    </ref>
+   </references>
+  </cell>
+ </cells>
+ <items>
+  <item>
+   <tags/>
+   <category>inputs.l1</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (3.7,3.9;3.3,4;3.6,4.6;5.1,4.9;5.3,4.9;5.2,4.2;5,4.2;3.804,4.285;3.9,3.9)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>inputs.l1</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (2.1,3;2.1,3.6;2.9,3.6;2.9,3)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>inputs.l1</category>
+   <cell>A:r0</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (-0.1,0;-0.1,1.6;0.3,1.6;0.3,0)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>inputs.l1</category>
+   <cell>A:r90</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (0,-0.1;0,1.7;0.2,1.7;0.2,-0.1)</value>
+   </values>
+  </item>
+  <item>
+   <tags>waived</tags>
+   <category>w1um</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (3.7,3.9;3.3,4)|(3.3,4;3.6,4.6)</value>
+   </values>
+  </item>
+  <item>
+   <tags>waived</tags>
+   <category>w1um</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (3.7,3.9;3.3,4)|(3.6,4.6;4.256,4.731)</value>
+   </values>
+  </item>
+  <item>
+   <tags>waived</tags>
+   <category>w1um</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (3.7,3.9;3.3,4)|(3.804,4.285;3.9,3.9)</value>
+   </values>
+  </item>
+  <item>
+   <tags>waived</tags>
+   <category>w1um</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (4.53,4.233;3.804,4.285)|(3.455,4.31;3.6,4.6)</value>
+   </values>
+  </item>
+  <item>
+   <tags>waived</tags>
+   <category>w1um</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (3.3,4;3.6,4.6)|(3.804,4.285;3.9,3.9)</value>
+   </values>
+  </item>
+  <item>
+   <tags>waived</tags>
+   <category>w1um</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (3.9,3.9;3.7,3.9)|(3.3,4;3.6,4.6)</value>
+   </values>
+  </item>
+  <item>
+   <tags>waived</tags>
+   <category>w1um</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (4.266,4.733;5.1,4.9)|(5.3,4.9;5.2,4.2)</value>
+   </values>
+  </item>
+  <item>
+   <tags>waived</tags>
+   <category>w1um</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (5.2,4.2;5,4.2)|(4.138,4.708;5.1,4.9)</value>
+   </values>
+  </item>
+  <item>
+   <tags>waived</tags>
+   <category>w1um</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (5,4.2;3.804,4.285)|(3.6,4.6;5.1,4.9)</value>
+   </values>
+  </item>
+  <item>
+   <tags>waived</tags>
+   <category>w1um</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (3.9,3.9;3.7,3.9)|(3.6,4.6;4.408,4.762)</value>
+   </values>
+  </item>
+  <item>
+   <tags>waived</tags>
+   <category>w1um</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment>First item von w1um</comment>
+   <image/>
+   <values>
+    <value>edge-pair: (5.1,4.9;5.3,4.9)|(5.3,4.9;5.2,4.2)</value>
+   </values>
+  </item>
+  <item>
+   <tags>waived</tags>
+   <category>w1um</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (5.2,4.2;5,4.2)|(5.1,4.9;5.3,4.9)</value>
+   </values>
+  </item>
+  <item>
+   <tags>waived</tags>
+   <category>w1um</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (5,4.2;4.343,4.247)|(5.1,4.9;5.3,4.9)</value>
+   </values>
+  </item>
+  <item>
+   <tags>waived</tags>
+   <category>w1um</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (3.9,3.9;3.7,3.9)|(3.804,4.285;3.9,3.9)</value>
+   </values>
+  </item>
+  <item>
+   <tags>waived</tags>
+   <category>w1um</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (2.1,3;2.1,3.6)|(2.9,3.6;2.9,3)</value>
+   </values>
+  </item>
+  <item>
+   <tags>waived</tags>
+   <category>w1um</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (2.9,3;2.1,3)|(2.1,3.6;2.9,3.6)</value>
+   </values>
+  </item>
+  <item>
+   <tags>waived</tags>
+   <category>w1um</category>
+   <cell>A:r0</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (-0.1,0;-0.1,1.6)|(0.3,1.6;0.3,0)</value>
+   </values>
+  </item>
+  <item>
+   <tags>waived</tags>
+   <category>w1um</category>
+   <cell>A:r90</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (0,-0.1;0,1.7)|(0.2,1.7;0.2,-0.1)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>inputs.l1_snapped</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (3.4,4;3.6,4.6;5.2,5;5.4,5;5.2,4.2;3.8,4.2;4,4)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>inputs.l1_snapped</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (2.2,3;2.2,3.6;3,3.6;3,3)</value>
+   </values>
+  </item>
+  <item>
+   <tags>waived</tags>
+   <category>inputs.l1_snapped</category>
+   <cell>A:r0;r0(-0.1,0)</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment>A comment on the only waived input shape</comment>
+   <image/>
+   <values>
+    <value>polygon: (-0.1,0;-0.1,1.6;0.3,1.6;0.3,0)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>inputs.l1_snapped</category>
+   <cell>A:r90</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (0,0;0,1.8;0.2,1.8;0.2,0)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>inputs.l1_snapped</category>
+   <cell>A:r0;r0</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (0,0;0,1.6;0.4,1.6;0.4,0)</value>
+   </values>
+  </item>
+  <item>
+   <tags>waived</tags>
+   <category>w1um_snapped</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (3.467,4.2;3.6,4.6)|(4.521,4.2;3.8,4.2)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>w1um_snapped</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (3.4,4;3.55,4.45)|(3.8,4.2;4,4)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>w1um_snapped</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (3.4,4;3.6,4.6)|(4,4;3.4,4)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>w1um_snapped</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (4.314,4.778;5.2,5)|(5.4,5;5.2,4.2)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>w1um_snapped</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (5.2,4.2;3.8,4.2)|(3.6,4.6;5.2,5)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>w1um_snapped</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (4,4;3.4,4)|(3.6,4.6;4.547,4.837)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>w1um_snapped</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (5.2,5;5.4,5)|(5.4,5;5.2,4.2)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>w1um_snapped</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (5.2,4.2;4.6,4.2)|(5.2,5;5.4,5)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>w1um_snapped</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (4,4;3.4,4)|(3.8,4.2;4,4)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>w1um_snapped</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (2.2,3;2.2,3.6)|(3,3.6;3,3)</value>
+   </values>
+  </item>
+  <item>
+   <tags>waived</tags>
+   <category>w1um_snapped</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (3,3;2.2,3)|(2.2,3.6;3,3.6)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>w1um_snapped</category>
+   <cell>A:r0;r0(-0.1,0)</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (-0.1,0;-0.1,1.6)|(0.3,1.6;0.3,0)</value>
+   </values>
+  </item>
+  <item>
+   <tags>waived</tags>
+   <category>w1um_snapped</category>
+   <cell>A:r90</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (0,0;0,1.8)|(0.2,1.8;0.2,0)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>w1um_snapped</category>
+   <cell>A:r0;r0</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment>A comment
+With two lines</comment>
+   <image/>
+   <values>
+    <value>edge-pair: (0,0;0,1.6)|(0.4,1.6;0.4,0)</value>
+   </values>
+  </item>
+ </items>
+</report-database>

@@ -298,28 +298,57 @@ struct DeepShapeStore::LayoutHolder
   {
   public:
     VariantsCreatedListener (DeepShapeStore::LayoutHolder *lh, db::Layout *ly)
-      : mp_lh (lh)
+      : mp_lh (lh), m_dbu (ly->dbu ())
     {
       ly->variants_created_event.add (this, &VariantsCreatedListener::variants_created);
     }
 
   private:
+    std::string var_desc (const db::ICplxTrans &t)
+    {
+      std::string s;
+      if (t.is_mirror ()) {
+        s += "m";
+        s += tl::to_string (t.angle () * 0.5);
+      } else {
+        s += "r";
+        s += tl::to_string (t.angle ());
+      }
+      if (t.is_mag ()) {
+        s += tl::sprintf ("*%.9g", t.mag ());
+      }
+      if (t.disp () != db::Vector ()) {
+        s += tl::sprintf ("(%.12g,%.12g)", t.disp ().x () * m_dbu, t.disp ().y () * m_dbu);
+      }
+      return s;
+    }
+
     void variants_created (const std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > *var_map)
     {
       for (std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> >::const_iterator i = var_map->begin (); i != var_map->end (); ++i) {
         for (std::map<db::ICplxTrans, db::cell_index_type>::const_iterator j = i->second.begin (); j != i->second.end (); ++j) {
-          mp_lh->builder.register_variant (i->first, j->second);
+          if (i->first != j->second) {
+            mp_lh->builder.register_variant (i->first, j->second, var_desc (j->first));
+          }
+        }
+        //  NOTE: variant conversion events are registered after variant formation events, so we can
+        //  base the formed variants (first pass) on the originals.
+        for (std::map<db::ICplxTrans, db::cell_index_type>::const_iterator j = i->second.begin (); j != i->second.end (); ++j) {
+          if (i->first == j->second) {
+            mp_lh->builder.register_variant (i->first, j->second, var_desc (j->first));
+          }
         }
       }
     }
 
     DeepShapeStore::LayoutHolder *mp_lh;
+    double m_dbu;
   };
 
   LayoutHolder (const db::ICplxTrans &trans)
     : refs (0), layout (false), builder (&layout, trans), variants_created (this, &layout)
   {
-    //  .. nothing yet ..
+    layout.set_hierarchy_builder (&builder);
   }
 
   void add_layer_ref (unsigned int layer)

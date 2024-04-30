@@ -1153,6 +1153,7 @@ D25ViewWidget::paintGL ()
         tl_assert (v->size () == n->size ());
         glVertexAttribPointer (positions, 3, gl_type2enum<GLfloat> () (), GL_FALSE, 0, v->front ());
         glVertexAttribPointer (normals, 3, gl_type2enum<GLfloat> () (), GL_FALSE, 0, n->front ());
+        //  TODO: use glDrawElements to draw indexed buffers for better memory usage
         glDrawArrays (GL_TRIANGLES, 0, GLsizei (v->size () / 3));
         ++v;
         ++n;
@@ -1162,6 +1163,7 @@ D25ViewWidget::paintGL ()
   }
 
   glDisableVertexAttribArray (positions);
+  glDisableVertexAttribArray (normals);
 
   m_shapes_program->release ();
 
@@ -1186,6 +1188,7 @@ D25ViewWidget::paintGL ()
   for (std::vector<LayerInfo>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
     if (l->visible && l->frame_color [3] > 0.5) {
       m_lines_program->setUniformValue ("color", l->frame_color [0], l->frame_color [1], l->frame_color [2], l->frame_color [3]);
+      //  TODO: use glDrawElements to draw indexed buffers for better memory usage
       l->line_chunk->draw_to (this, positions, GL_LINES);
     }
   }

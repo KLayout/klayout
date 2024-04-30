@@ -88,6 +88,7 @@ public:
   struct LayerInfo
   {
     triangle_chunks_type *vertex_chunk;
+    triangle_chunks_type *normals_chunk;
     line_chunks_type *line_chunk;
     GLfloat fill_color [4];
     GLfloat frame_color [4];
@@ -194,6 +195,7 @@ private:
   bool m_display_open;
 
   std::list<triangle_chunks_type> m_vertex_chunks;
+  std::list<triangle_chunks_type> m_normals_chunks;
   std::list<line_chunks_type> m_line_chunks;
 
   std::vector<LayerInfo> m_layers;
@@ -203,11 +205,11 @@ private:
   void resizeGL (int w, int h);
 
   void do_initialize_gl ();
-  void render_region (tl::AbsoluteProgress &progress, D25ViewWidget::triangle_chunks_type &vertex_chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::Region &region, double dbu, const db::Box &clip_box, double zstart, double zstop);
-  void render_edges (tl::AbsoluteProgress &progress, D25ViewWidget::triangle_chunks_type &vertex_chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::Edges &region, double dbu, const db::Box &clip_box, double zstart, double zstop);
-  void render_edge_pairs (tl::AbsoluteProgress &progress, D25ViewWidget::triangle_chunks_type &vertex_chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::EdgePairs &region, double dbu, const db::Box &clip_box, double zstart, double zstop);
-  void render_polygon (D25ViewWidget::triangle_chunks_type &vertex_chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::Polygon &poly, double dbu, double zstart, double zstop);
-  void render_wall (D25ViewWidget::triangle_chunks_type &vertex_chunks, D25ViewWidget::line_chunks_type &line_chunks, const db::Edge &poly, double dbu, double zstart, double zstop);
+  void render_region (tl::AbsoluteProgress &progress, D25ViewWidget::triangle_chunks_type &vertex_chunks, triangle_chunks_type &normals, D25ViewWidget::line_chunks_type &line_chunks, const db::Region &region, double dbu, const db::Box &clip_box, double zstart, double zstop);
+  void render_edges (tl::AbsoluteProgress &progress, D25ViewWidget::triangle_chunks_type &vertex_chunks, triangle_chunks_type &normals, D25ViewWidget::line_chunks_type &line_chunks, const db::Edges &region, double dbu, const db::Box &clip_box, double zstart, double zstop);
+  void render_edge_pairs (tl::AbsoluteProgress &progress, D25ViewWidget::triangle_chunks_type &vertex_chunks, triangle_chunks_type &normals, D25ViewWidget::line_chunks_type &line_chunks, const db::EdgePairs &region, double dbu, const db::Box &clip_box, double zstart, double zstop);
+  void render_polygon (D25ViewWidget::triangle_chunks_type &vertex_chunks, triangle_chunks_type &normals, D25ViewWidget::line_chunks_type &line_chunks, const db::Polygon &poly, double dbu, double zstart, double zstop);
+  void render_wall (D25ViewWidget::triangle_chunks_type &vertex_chunks, triangle_chunks_type &normals, D25ViewWidget::line_chunks_type &line_chunks, const db::Edge &poly, double dbu, double zstart, double zstop);
   void reset_viewport ();
   void enter (const db::RecursiveShapeIterator *iter, double zstart, double zstop);
 };

@@ -395,12 +395,18 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
         throw tl::Exception (tl::to_string (tr ("Duplicate definition of device class: ")) + class_name);
       }
 
-      db::DeviceClassTemplateBase *dct = db::DeviceClassTemplateBase::template_by_name (templ_name);
-      if (! dct) {
-        throw tl::Exception (tl::to_string (tr ("Invalid device class template: ")) + templ_name);
+      db::DeviceClass *dc;
+      if (templ_name.empty ()) {
+        //  generic device class (issue #1696)
+        dc = new db::DeviceClass ();
+      } else {
+        db::DeviceClassTemplateBase *dct = db::DeviceClassTemplateBase::template_by_name (templ_name);
+        if (! dct) {
+          throw tl::Exception (tl::to_string (tr ("Invalid device class template: ")) + templ_name);
+        }
+        dc = dct->create ();
       }
 
-      db::DeviceClass *dc = dct->create ();
       dc->set_name (class_name);
       netlist->add_device_class (dc);
 

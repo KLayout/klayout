@@ -2512,6 +2512,266 @@ class Dispatcher:
         is returned but no exception is thrown.
         """
 
+class EditorHooks:
+    r"""
+    @brief An implementation base class for editor hooks
+
+    Editor hooks allow implementing technology-specific callbacks into the editor for example to implement visual feedback about DRC rules.
+
+    This class provides the basic interface. To implement callbacks, use the \EditorHooks class. You should not need to instantiate this class.
+
+    The following is an excample for editor hooks that add DRC space indicators for polygon-alike shapes,
+    It implements the shape creation protocol to capture new shapes and the modification protocol to capture shape manipulations. It displays a halo following hard-coded DRC rules to indicate the forbidden zones around the shapes:
+
+    @code
+    class MyEditorHooks < RBA::EditorHooks
+
+      def initialize()
+  
+        register("editor_hooks_demo")
+
+        cleanup    
+
+        # some demo values    
+        @spaces = {
+          RBA::LayerInfo::new(1, 0) => [ 0.2, RBA::Region::Euclidian ],
+          RBA::LayerInfo::new(2, 0) => [ 0.5, RBA::Region::Projection ]
+        }
+    
+      end
+
+      # Utilities
+  
+      # pick the space value from layer or set to nil
+      def set_space_from_layer(layer_index)
+        lp = @layout.get_info(layer_index)
+        if @spaces[lp]
+          (s, m) = @spaces[lp]
+          @space = s / @layout.dbu
+          @metrics = m
+        else
+          @space = nil
+        end
+      end
+      
+      def add_marker_from_shape(shape, trans)
+  
+        if !@space
+          return   # no space value set
+        end
+    
+        p = shape.polygon
+        if !p
+          return   # not a polygon-like object
+        end
+    
+        r = RBA::Region::new
+        # maintain 2-point polygons for the first edge drawn
+        r.merged_semantics = (p.num_points != 2)
+        r.insert(p)
+    
+        # compute DRC hull and prepare markers
+        r.drc_hull(@metrics, @space).each do |pp|
+          m = RBA::Marker::new(@view)
+          m.line_style = 2
+          m.vertex_size = 0
+          m.set_polygon(trans * pp)
+          @markers.append(m)
+        end
+    
+      end
+  
+      # setup session
+      def start(cv)
+        cleanup
+        @view = cv.view
+        @layout = cv.layout
+      end
+  
+      # end session
+      def cleanup
+        @space = nil
+        @view = nil
+        @layout = nil
+        clear_markers
+      end
+  
+      def clear_markers
+        @markers && @markers.each do |m|
+          # this is how a marker gets removed in Ruby:
+          m._destroy
+        end
+        @markers = []
+      end
+        
+      # Shape creation protocol
+  
+      def begin_create_shapes(cv, layer)
+        start(cv)
+        set_space_from_layer(layer.layer_index)
+      end
+
+      def begin_new_shapes
+        clear_markers
+      end
+
+      def create_shape(shape, trans)
+        add_marker_from_shape(shape, trans)
+      end
+      
+      def end_create_shapes
+        cleanup
+      end
+    
+      # Modification protocol
+  
+      def begin_edit(cv)
+        start(cv)
+      end
+
+      def begin_edits
+        # create new markers
+        clear_markers
+      end
+
+      # transformation of a shape or instance
+      def transformed(path, applied, trans)
+        if path.shape
+          set_space_from_layer(path.layer)
+          add_marker_from_shape(path.shape, trans * applied)
+        end
+      end
+
+      # modification of a shape
+      def modified(path, shape, trans)
+        set_space_from_layer(path.layer)
+        add_marker_from_shape(shape, trans)
+      end
+
+      def end_edit
+        cleanup
+      end
+  
+    end
+
+    # instantiation of the hooks object
+    MyEditorHooks::new
+    @/code
+
+    The EditorHooks class has been introduced in version 0.29.1.
+    """
+    @property
+    def technology(self) -> None:
+        r"""
+        WARNING: This variable can only be set, not retrieved.
+        @brief sets the name of the technology the hooks are associated with
+        This will clear all technology associations and associate the hooks with that technology only.
+        """
+    @classmethod
+    def new(cls) -> EditorHooks:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def add_technology(self, tech: str) -> None:
+        r"""
+        @brief Additionally associates the hooks with the given technology.
+        See also \clear_technologies.
+        """
+    def clear_technologies(self) -> None:
+        r"""
+        @brief Clears the list of technologies the hooks are associated with.
+        See also \add_technology.
+        """
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def for_technologies(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the hooks are associated with any technology.
+        """
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def is_for_technology(self, tech: str) -> bool:
+        r"""
+        @brief Returns a value indicating whether the hooks are associated with the given technology.
+        The method is equivalent to checking whether the \technologies list is empty.
+        """
+    def name(self) -> str:
+        r"""
+        @brief Gets the name of the hooks object.
+        This is the name, the object was registered under in the system.
+        """
+    def register(self, name: str) -> None:
+        r"""
+        @brief Registers the hooks in the system.
+        The hooks will not be active before they are registered in the system. Registration will also transfer object ownership to the system.
+
+        The name is arbitary, but should be unique. Upon registration, this hooks object will replace others with the same name already registered in the system. This will simplify debugging as you can re-run the same code, without accumulating hooks.
+        """
+    def technologies(self) -> List[str]:
+        r"""
+        @brief Gets the list of technologies these hooks are associated with.
+        """
+
 class Image(BasicImage):
     r"""
     @brief An image to be stored as a layout annotation
@@ -9157,6 +9417,14 @@ class PluginFactory:
         r"""
         @brief Creates a new object of this class
         """
+    def __copy__(self) -> PluginFactory:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> PluginFactory:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -9256,6 +9524,10 @@ class PluginFactory:
 
         This method has been introduced in version 0.27.
         """
+    def assign(self, other: PluginFactory) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -9272,6 +9544,10 @@ class PluginFactory:
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def dup(self) -> PluginFactory:
+        r"""
+        @brief Creates a copy of self
         """
     def is_const_object(self) -> bool:
         r"""

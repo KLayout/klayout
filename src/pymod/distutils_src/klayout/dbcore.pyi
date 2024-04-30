@@ -354,6 +354,20 @@ class Box:
 
         The DBU argument has been added in version 0.27.6.
         """
+    def __sub__(self, box: Box) -> Box:
+        r"""
+        @brief Subtraction of boxes
+
+
+        The - operator subtracts the argument box from self.
+        This will return the bounding box of the are covered by self, but not by argument box. Subtracting a box from itself will render an empty box. Subtracting another box from self will modify the first box only if the argument box covers one side entirely.
+
+        @param box The box to subtract from this box.
+
+        @return The result box
+
+        This feature has been introduced in version 0.29.
+        """
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -3941,12 +3955,12 @@ class CompoundRegionOperationNode:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         def __hash__(self) -> int:
             r"""
@@ -3979,12 +3993,12 @@ class CompoundRegionOperationNode:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -4149,12 +4163,12 @@ class CompoundRegionOperationNode:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         def __hash__(self) -> int:
             r"""
@@ -4391,12 +4405,12 @@ class CompoundRegionOperationNode:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -4477,22 +4491,26 @@ class CompoundRegionOperationNode:
         @brief Creates a node providing a composition into convex pieces.
         """
     @classmethod
-    def new_corners_as_dots(cls, input: CompoundRegionOperationNode, angle_min: float, include_angle_min: bool, angle_max: float, include_angle_max: bool) -> CompoundRegionOperationNode:
+    def new_corners_as_dots(cls, input: CompoundRegionOperationNode, angle_min: float, include_angle_min: bool, angle_max: float, include_angle_max: bool, inverse: Optional[bool] = ..., absolute: Optional[bool] = ...) -> CompoundRegionOperationNode:
         r"""
         @brief Creates a node turning corners into dots (single-point edges).
+
+        'absolute' and 'inverse' arguments have been added in version 0.29.1.
         """
     @classmethod
-    def new_corners_as_edge_pairs(cls, input: CompoundRegionOperationNode, angle_min: float, include_angle_min: bool, angle_max: float, include_angle_max: bool) -> CompoundRegionOperationNode:
+    def new_corners_as_edge_pairs(cls, input: CompoundRegionOperationNode, angle_min: float, include_angle_min: bool, angle_max: float, include_angle_max: bool, inverse: Optional[bool] = ..., absolute: Optional[bool] = ...) -> CompoundRegionOperationNode:
         r"""
         @brief Creates a node turning corners into edge pairs containing the two edges adjacent to the corner.
         The first edge will be the incoming edge and the second one the outgoing edge.
 
-        This feature has been introduced in version 0.27.1.
+        This feature has been introduced in version 0.27.1. 'absolute' and 'inverse' arguments have been added in version 0.29.1.
         """
     @classmethod
-    def new_corners_as_rectangles(cls, input: CompoundRegionOperationNode, angle_min: float, include_angle_min: bool, angle_max: float, include_angle_max: bool, dim: int) -> CompoundRegionOperationNode:
+    def new_corners_as_rectangles(cls, input: CompoundRegionOperationNode, angle_min: float, include_angle_min: bool, angle_max: float, include_angle_max: bool, dim: int, inverse: Optional[bool] = ..., absolute: Optional[bool] = ...) -> CompoundRegionOperationNode:
         r"""
         @brief Creates a node turning corners into rectangles.
+
+        'absolute' and 'inverse' arguments have been added in version 0.29.1.
         """
     @classmethod
     def new_count_filter(cls, inputs: CompoundRegionOperationNode, invert: Optional[bool] = ..., min_count: Optional[int] = ..., max_count: Optional[int] = ...) -> CompoundRegionOperationNode:
@@ -4510,9 +4528,11 @@ class CompoundRegionOperationNode:
         @brief Creates a node filtering edges by their length sum (over the local set).
         """
     @classmethod
-    def new_edge_orientation_filter(cls, input: CompoundRegionOperationNode, inverse: bool, amin: float, include_amin: bool, amax: float, include_amax: bool) -> CompoundRegionOperationNode:
+    def new_edge_orientation_filter(cls, input: CompoundRegionOperationNode, inverse: bool, amin: float, include_amin: bool, amax: float, include_amax: bool, absolute_angle: Optional[bool] = ...) -> CompoundRegionOperationNode:
         r"""
         @brief Creates a node filtering edges by their orientation.
+
+        'absolute_angle' has been introduced in version 0.29.1.
         """
     @classmethod
     def new_edge_pair_to_first_edges(cls, input: CompoundRegionOperationNode) -> CompoundRegionOperationNode:
@@ -4910,6 +4930,8 @@ class Connectivity:
     All layers are specified in terms of layer indexes. Layer indexes are layout layer indexes (see \Layout class).
 
     The connectivity object also manages the global nets. Global nets are substrate for example and they are propagated automatically from subcircuits to circuits. Global nets are defined by name and are managed through IDs. To get the name for a given ID, use \global_net_name.
+    Starting with version 0.29, soft connections are supported. Soft connections attach to high-ohmic substrate or diffusion layers (the 'lower' layer) are upon netlist extraction it will be checked that no wiring is routed over such connections. See \soft_connect and \soft_global_connect for details.
+
     This class has been introduced in version 0.26.
     """
     @classmethod
@@ -4928,6 +4950,14 @@ class Connectivity:
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
+        """
+    def __repr__(self) -> str:
+        r"""
+        @hide
+        """
+    def __str__(self) -> str:
+        r"""
+        @hide
         """
     def _create(self) -> None:
         r"""
@@ -4974,11 +5004,13 @@ class Connectivity:
     def connect(self, layer: int) -> None:
         r"""
         @brief Specifies intra-layer connectivity.
+        This method specifies a hard connection between shapes on the given layer. Without specifying such a connection, shapes on that layer do not form connection regions.
         """
     @overload
     def connect(self, layer_a: int, layer_b: int) -> None:
         r"""
         @brief Specifies inter-layer connectivity.
+        This method specifies a hard connection between shapes on layer_a and layer_b.
         """
     def connect_global(self, layer: int, global_net_name: str) -> int:
         r"""
@@ -5019,6 +5051,27 @@ class Connectivity:
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
+        """
+    def soft_connect(self, layer_a: int, layer_b: int) -> None:
+        r"""
+        @brief Specifies a soft connection between layer_a and layer_b.
+        @param layer_a The 'upper' layer
+        @param layer_b The 'lower' layer
+        Soft connections are made between a lower and an upper layer. The lower layer conceptually is a high-ohmic (i.e. substrate, diffusion) region that is not intended for signal wiring. The netlist extraction will check that no routing happens over such regions.
+
+        Soft connections have in introduced in version 0.29.
+        """
+    def soft_connect_global(self, layer: int, global_net_name: str) -> int:
+        r"""
+        @brief Soft-connects the given layer to the global net given by name.
+        Returns the ID of the global net.
+        See \soft_connect for a description of the soft connection feature. The global net is always the 'lower' (i.e. high-ohmic, substrate) part of the soft connection.
+
+        Soft connections have in introduced in version 0.29.
+        """
+    def to_s(self) -> str:
+        r"""
+        @hide
         """
 
 class CplxTrans:
@@ -6288,6 +6341,20 @@ class DBox:
         . If a DBU is given, the output units will be micrometers.
 
         The DBU argument has been added in version 0.27.6.
+        """
+    def __sub__(self, box: DBox) -> DBox:
+        r"""
+        @brief Subtraction of boxes
+
+
+        The - operator subtracts the argument box from self.
+        This will return the bounding box of the are covered by self, but not by argument box. Subtracting a box from itself will render an empty box. Subtracting another box from self will modify the first box only if the argument box covers one side entirely.
+
+        @param box The box to subtract from this box.
+
+        @return The result box
+
+        This feature has been introduced in version 0.29.
         """
     def _create(self) -> None:
         r"""
@@ -11446,8 +11513,7 @@ class DText:
     Setter:
     @brief Sets the vertical alignment
 
-    This property specifies how the text is aligned relative to the anchor point. 
-    This property has been introduced in version 0.22 and extended to enums in 0.28.
+    This is the version accepting integer values. It's provided for backward compatibility.
     """
     x: float
     r"""
@@ -17034,12 +17100,12 @@ class EdgeMode:
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer value
+        @brief Compares two enums
         """
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums
+        @brief Compares an enum with an integer value
         """
     def __hash__(self) -> int:
         r"""
@@ -19065,6 +19131,41 @@ class EdgePairs(ShapeCollection):
         @return The transformed edge pairs.
         """
     @overload
+    def with_abs_angle(self, angle: float, inverse: bool) -> EdgePairs:
+        r"""
+        @brief Filter the edge pairs by orientation of their edges
+
+        This method behaves like \with_angle, but angles are always positive - i.e. there is no differentiation between edges sloping 'down' vs. edges sloping 'up.
+
+        This method has been added in version 0.29.1.
+        """
+    @overload
+    def with_abs_angle(self, min_angle: float, max_angle: float, inverse: bool, include_min_angle: Optional[bool] = ..., include_max_angle: Optional[bool] = ...) -> EdgePairs:
+        r"""
+        @brief Filter the edge pairs by orientation of their edges
+
+        This method behaves like \with_angle, but angles are always positive - i.e. there is no differentiation between edges sloping 'down' vs. edges sloping 'up.
+
+        This method has been added in version 0.29.1.
+        """
+    @overload
+    def with_abs_angle_both(self, angle: float, inverse: bool) -> EdgePairs:
+        r"""
+        @brief Filter the edge pairs by orientation of both of their edges
+
+        This method behaves like \with_angle_both, but angles are always positive - i.e. there is no differentiation between edges sloping 'down' vs. edges sloping 'up.
+
+        This method has been added in version 0.29.1.
+        """
+    @overload
+    def with_abs_angle_both(self, min_angle: float, max_angle: float, inverse: bool, include_min_angle: Optional[bool] = ..., include_max_angle: Optional[bool] = ...) -> EdgePairs:
+        r"""
+
+        This method behaves like \with_angle_both, but angles are always positive - i.e. there is no differentiation between edges sloping 'down' vs. edges sloping 'up.
+
+        This method has been added in version 0.29.1.
+        """
+    @overload
     def with_angle(self, angle: float, inverse: bool) -> EdgePairs:
         r"""
         @brief Filter the edge pairs by orientation of their edges
@@ -19273,6 +19374,13 @@ class EdgePairs(ShapeCollection):
         If you don't want to specify a lower or upper limit, pass nil to that parameter.
 
         This method has been added in version 0.27.1.
+        """
+    def write(self, filename: str) -> None:
+        r"""
+        @brief Writes the region to a file
+        This method is provided for debugging purposes. It writes the object to a flat layer 0/0 in a single top cell.
+
+        This method has been introduced in version 0.29.
         """
 
 class EdgeProcessor:
@@ -20565,12 +20673,12 @@ class Edges(ShapeCollection):
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         def __hash__(self) -> int:
             r"""
@@ -22787,6 +22895,24 @@ class Edges(ShapeCollection):
         'zero_distance_mode' has been added in version 0.29.
         """
     @overload
+    def with_abs_angle(self, angle: float, inverse: bool) -> Edges:
+        r"""
+        @brief Filter the edges by orientation
+
+        This method behaves like \with_angle, but angles are always positive - i.e. there is no differentiation between edges sloping 'down' vs. edges sloping 'up.
+
+        This method has been added in version 0.29.1.
+        """
+    @overload
+    def with_abs_angle(self, min_angle: float, max_angle: float, inverse: bool, include_min_angle: Optional[bool] = ..., include_max_angle: Optional[bool] = ...) -> Edges:
+        r"""
+        @brief Filter the edges by orientation
+
+        This method behaves like \with_angle, but angles are always positive - i.e. there is no differentiation between edges sloping 'down' vs. edges sloping 'up.
+
+        This method has been added in version 0.29.1.
+        """
+    @overload
     def with_angle(self, angle: float, inverse: bool) -> Edges:
         r"""
         @brief Filters the edges by orientation
@@ -22831,6 +22957,13 @@ class Edges(ShapeCollection):
         Filters the edges in the edge collection by length. If "inverse" is false, only edges which have a length larger or equal to "min_length" and less than "max_length" are returned. If "inverse" is true, edges not having a length less than "min_length" or larger or equal than "max_length" are returned.
 
         If you don't want to specify a lower or upper limit, pass nil to that parameter.
+        """
+    def write(self, filename: str) -> None:
+        r"""
+        @brief Writes the region to a file
+        This method is provided for debugging purposes. It writes the object to a flat layer 0/0 in a single top cell.
+
+        This method has been introduced in version 0.29.
         """
     def xor(self, other: Edges) -> Edges:
         r"""
@@ -25545,11 +25678,11 @@ class Instance:
 
     Starting with version 0.25 the displacement is of vector type.
     Setter:
-    @brief Sets the displacement vector for the 'a' axis in micrometer units
+    @brief Sets the displacement vector for the 'a' axis
 
-    Like \a= with an integer displacement, this method will set the displacement vector but it accepts a vector in micrometer units that is of \DVector type. The vector will be translated to database units internally.
+    If the instance was not an array instance before it is made one.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.23. Starting with version 0.25 the displacement is of vector type.
     """
     b: Vector
     r"""
@@ -25558,11 +25691,11 @@ class Instance:
 
     Starting with version 0.25 the displacement is of vector type.
     Setter:
-    @brief Sets the displacement vector for the 'b' axis in micrometer units
+    @brief Sets the displacement vector for the 'b' axis
 
-    Like \b= with an integer displacement, this method will set the displacement vector but it accepts a vector in micrometer units that is of \DVector type. The vector will be translated to database units internally.
+    If the instance was not an array instance before it is made one.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.23. Starting with version 0.25 the displacement is of vector type.
     """
     cell: Cell
     r"""
@@ -25605,10 +25738,9 @@ class Instance:
     @brief Gets the complex transformation of the instance or the first instance in the array
     This method is always valid compared to \trans, since simple transformations can be expressed as complex transformations as well.
     Setter:
-    @brief Sets the complex transformation of the instance or the first instance in the array (in micrometer units)
-    This method sets the transformation the same way as \cplx_trans=, but the displacement of this transformation is given in micrometer units. It is internally translated into database units.
+    @brief Sets the complex transformation of the instance or the first instance in the array
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.23.
     """
     da: DVector
     r"""
@@ -25737,9 +25869,10 @@ class Instance:
     @brief Gets the transformation of the instance or the first instance in the array
     The transformation returned is only valid if the array does not represent a complex transformation array
     Setter:
-    @brief Sets the transformation of the instance or the first instance in the array
+    @brief Sets the transformation of the instance or the first instance in the array (in micrometer units)
+    This method sets the transformation the same way as \cplx_trans=, but the displacement of this transformation is given in micrometer units. It is internally translated into database units.
 
-    This method has been introduced in version 0.23.
+    This method has been introduced in version 0.25.
     """
     @classmethod
     def new(cls) -> Instance:
@@ -30883,12 +31016,12 @@ class LayoutToNetlist:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -30977,6 +31110,13 @@ class LayoutToNetlist:
     With 'include_floating_subcircuits' set to true, subcircuits with no connection to their parent circuit are still included in the circuit as floating subcircuits. Specifically on flattening this means that these subcircuits are properly propagated to their parent instead of appearing as additional top circuits.
 
     This attribute has been introduced in version 0.27 and replaces the arguments of \extract_netlist.
+    """
+    make_soft_connection_diodes: bool
+    r"""
+    Getter:
+    @hide
+    Setter:
+    @hide
     """
     max_vertex_count: int
     r"""
@@ -31381,6 +31521,7 @@ class LayoutToNetlist:
         r"""
         @brief Defines a connection of the given text layer with a global net.
         This method returns the ID of the global net. Use \global_net_name to get the name back from the ID.
+
         This variant has been introduced in version 0.27.
         """
     def const_cell_mapping_into(self, layout: Layout, cell: Cell) -> CellMapping:
@@ -31719,6 +31860,56 @@ class LayoutToNetlist:
         all subcircuits too.
         "prop_id" is an optional properties ID. If given, this property set will be attached to the shapes.
         The optional 'trans' parameter allows applying a transformation to all shapes. It has been introduced in version 0.28.4.
+        """
+    @overload
+    def soft_connect(self, a: Region, b: Region) -> None:
+        r"""
+        @brief Defines an inter-layer connection for the given layers in soft mode.
+        Connects two layers through a soft connection.
+        Soft connections cannot make connections between two different nets.
+        These are directional connections where 'b' is the 'lower' layer (typically high-ohmic substrate or diffusion).
+
+        Soft connections have been introduced in version 0.29.
+        """
+    @overload
+    def soft_connect(self, a: Region, b: Texts) -> None:
+        r"""
+        @brief Defines an inter-layer connection for the given layers in soft mode.
+        Connects two layers through a soft connection.
+        Soft connections cannot make connections between two different nets.
+        These are directional connections where 'b' is the 'lower' layer (typically high-ohmic substrate or diffusion).
+        As one argument is a (hierarchical) text collection, this method is used to attach net labels to polygons.
+
+        Soft connections have been introduced in version 0.29.
+        """
+    @overload
+    def soft_connect(self, a: Texts, b: Region) -> None:
+        r"""
+        @brief Defines an inter-layer connection for the given layers in soft mode.
+        Connects two layers through a soft connection.
+        Soft connections cannot make connections between two different nets.
+        These are directional connections where 'b' is the 'lower' layer (typically high-ohmic substrate or diffusion).
+        As one argument is a (hierarchical) text collection, this method is used to attach net labels to polygons.
+
+        Soft connections have been introduced in version 0.29.
+        """
+    @overload
+    def soft_connect_global(self, l: Region, global_net_name: str) -> int:
+        r"""
+        @brief Defines a connection of the given layer with a global net in soft mode.
+        This method returns the ID of the global net. Use \global_net_name to get the name back from the ID.
+        Soft connections are directional, where the global net is the 'lower' layer (typically high-ohmic substrate or diffusion).
+
+        Soft connections have been introduced in version 0.29.
+        """
+    @overload
+    def soft_connect_global(self, l: Texts, global_net_name: str) -> int:
+        r"""
+        @brief Defines a connection of the given text layer with a global net in soft mode.
+        This method returns the ID of the global net. Use \global_net_name to get the name back from the ID.
+        Soft connections are directional, where the global net is the 'lower' layer (typically high-ohmic substrate or diffusion).
+
+        Soft connections have been introduced in version 0.29.
         """
     def write(self, path: str, short_format: Optional[bool] = ...) -> None:
         r"""
@@ -32067,8 +32258,6 @@ class Library:
     def for_technologies(self) -> bool:
         r"""
         @brief Returns a value indicating whether the library is associated with any technology.
-        The method is equivalent to checking whether the \technologies list is empty.
-
         This method has been introduced in version 0.27
         """
     def id(self) -> int:
@@ -32085,6 +32274,8 @@ class Library:
     def is_for_technology(self, tech: str) -> bool:
         r"""
         @brief Returns a value indicating whether the library is associated with the given technology.
+        The method is equivalent to checking whether the \technologies list is empty.
+
         This method has been introduced in version 0.27
         """
     def layout(self) -> Layout:
@@ -32176,12 +32367,12 @@ class LoadLayoutOptions:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         def __hash__(self) -> int:
             r"""
@@ -35166,16 +35357,16 @@ class NetTerminalRef:
     @overload
     def device(self) -> Device:
         r"""
-        @brief Gets the device reference.
-        Gets the device object that this connection is made to.
-        """
-    @overload
-    def device(self) -> Device:
-        r"""
         @brief Gets the device reference (non-const version).
         Gets the device object that this connection is made to.
 
         This constness variant has been introduced in version 0.26.8
+        """
+    @overload
+    def device(self) -> Device:
+        r"""
+        @brief Gets the device reference.
+        Gets the device object that this connection is made to.
         """
     def device_class(self) -> DeviceClass:
         r"""
@@ -35194,14 +35385,14 @@ class NetTerminalRef:
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this terminal reference is attached to.
+        @brief Gets the net this terminal reference is attached to (non-const version).
+
+        This constness variant has been introduced in version 0.26.8
         """
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this terminal reference is attached to (non-const version).
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the net this terminal reference is attached to.
         """
     def terminal_def(self) -> DeviceTerminalDefinition:
         r"""
@@ -35964,16 +36155,16 @@ class Netlist:
     @overload
     def circuit_by_cell_index(self, cell_index: int) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given cell index.
-        If the cell index is not valid or no circuit is registered with this index, nil is returned.
-        """
-    @overload
-    def circuit_by_cell_index(self, cell_index: int) -> Circuit:
-        r"""
         @brief Gets the circuit object for a given cell index (const version).
         If the cell index is not valid or no circuit is registered with this index, nil is returned.
 
         This constness variant has been introduced in version 0.26.8.
+        """
+    @overload
+    def circuit_by_cell_index(self, cell_index: int) -> Circuit:
+        r"""
+        @brief Gets the circuit object for a given cell index.
+        If the cell index is not valid or no circuit is registered with this index, nil is returned.
         """
     @overload
     def circuit_by_name(self, name: str) -> Circuit:
@@ -36062,22 +36253,16 @@ class Netlist:
     @overload
     def each_circuit_bottom_up(self) -> Iterator[Circuit]:
         r"""
-        @brief Iterates over the circuits bottom-up (const version)
-        Iterating bottom-up means the parent circuits come after the child circuits. This is the basically the reverse order as delivered by \each_circuit_top_down.
-
-        This constness variant has been introduced in version 0.26.8.
-        """
-    @overload
-    def each_circuit_bottom_up(self) -> Iterator[Circuit]:
-        r"""
         @brief Iterates over the circuits bottom-up
         Iterating bottom-up means the parent circuits come after the child circuits. This is the basically the reverse order as delivered by \each_circuit_top_down.
         """
     @overload
-    def each_circuit_top_down(self) -> Iterator[Circuit]:
+    def each_circuit_bottom_up(self) -> Iterator[Circuit]:
         r"""
-        @brief Iterates over the circuits top-down
-        Iterating top-down means the parent circuits come before the child circuits. The first \top_circuit_count circuits are top circuits - i.e. those which are not referenced by other circuits.
+        @brief Iterates over the circuits bottom-up (const version)
+        Iterating bottom-up means the parent circuits come after the child circuits. This is the basically the reverse order as delivered by \each_circuit_top_down.
+
+        This constness variant has been introduced in version 0.26.8.
         """
     @overload
     def each_circuit_top_down(self) -> Iterator[Circuit]:
@@ -36086,6 +36271,12 @@ class Netlist:
         Iterating top-down means the parent circuits come before the child circuits. The first \top_circuit_count circuits are top circuits - i.e. those which are not referenced by other circuits.
 
         This constness variant has been introduced in version 0.26.8.
+        """
+    @overload
+    def each_circuit_top_down(self) -> Iterator[Circuit]:
+        r"""
+        @brief Iterates over the circuits top-down
+        Iterating top-down means the parent circuits come before the child circuits. The first \top_circuit_count circuits are top circuits - i.e. those which are not referenced by other circuits.
         """
     @overload
     def each_device_class(self) -> Iterator[DeviceClass]:
@@ -38520,12 +38711,12 @@ class PCellParameterState:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         def __hash__(self) -> int:
             r"""
@@ -41836,12 +42027,12 @@ class PreferredOrientation:
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums
+        @brief Compares an enum with an integer value
         """
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer value
+        @brief Compares two enums
         """
     def __hash__(self) -> int:
         r"""
@@ -41874,12 +42065,12 @@ class PreferredOrientation:
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums for inequality
+        @brief Compares an enum with an integer for inequality
         """
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer for inequality
+        @brief Compares two enums for inequality
         """
     def __repr__(self) -> str:
         r"""
@@ -42033,12 +42224,12 @@ class PropertyConstraint:
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer value
+        @brief Compares two enums
         """
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums
+        @brief Compares an enum with an integer value
         """
     def __hash__(self) -> int:
         r"""
@@ -42071,12 +42262,12 @@ class PropertyConstraint:
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer for inequality
+        @brief Compares two enums for inequality
         """
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums for inequality
+        @brief Compares an enum with an integer for inequality
         """
     def __repr__(self) -> str:
         r"""
@@ -42766,6 +42957,22 @@ class RecursiveShapeIterator:
     Cell selection is done using cell indexes or glob pattern. Glob pattern are equivalent to the usual file name wildcards used on various command line shells. For example "A*" matches all cells starting with an "A". The curly brace notation and character classes are supported as well. For example "C{125,512}" matches "C125" and "C512" and "[ABC]*" matches all cells starting with an "A", a "B" or "C". "[^ABC]*" matches all cells not starting with one of that letters.
 
     The RecursiveShapeIterator class has been introduced in version 0.18 and has been extended substantially in 0.23.
+    """
+    for_merged_input: bool
+    r"""
+    Getter:
+    @brief Gets a flag indicating whether iterator optimizes for merged input
+
+    see \for_merged_input= for details of this attribute.
+
+    This method has been introduced in version 0.29.
+
+    Setter:
+    @brief Sets a flag indicating whether iterator optimizes for merged input
+
+    If this flag is set to true, the iterator is allowed to skip shapes it deems irrelevant because they are covered entirely by other shapes. This allows shortcutting hierarchy traversal in some cases.
+
+    This method has been introduced in version 0.29.
     """
     global_dtrans: DCplxTrans
     r"""
@@ -43513,12 +43720,12 @@ class Region(ShapeCollection):
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         def __hash__(self) -> int:
             r"""
@@ -43551,12 +43758,12 @@ class Region(ShapeCollection):
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -44097,11 +44304,25 @@ class Region(ShapeCollection):
     @classmethod
     def new(cls, shapes: Shapes) -> Region:
         r"""
-        @brief Shapes constructor
+        @brief Constructor from a shapes container
 
-        This constructor creates a region from a \Shapes collection.
+        This constructor creates a region from the shapes container.
+        Text objects and edges are not inserted, because they cannot be converted to polygons.
+        This method allows feeding the shapes from a hierarchy of cells into the region.
 
-        This constructor has been introduced in version 0.25.
+        This constructor has been introduced in version 0.25 and extended in version 0.29.
+        """
+    @overload
+    @classmethod
+    def new(cls, shapes: Shapes, trans: ICplxTrans) -> Region:
+        r"""
+        @brief Constructor from a shapes container with a transformation
+
+        This constructor creates a region from the shapes container after applying the transformation.
+        Text objects and edges are not inserted, because they cannot be converted to polygons.
+        This method allows feeding the shapes from a hierarchy of cells into the region.
+
+        This constructor variant has been introduced in version 0.29.
         """
     def __add__(self, other: Region) -> Region:
         r"""
@@ -44314,11 +44535,24 @@ class Region(ShapeCollection):
     @overload
     def __init__(self, shapes: Shapes) -> None:
         r"""
-        @brief Shapes constructor
+        @brief Constructor from a shapes container
 
-        This constructor creates a region from a \Shapes collection.
+        This constructor creates a region from the shapes container.
+        Text objects and edges are not inserted, because they cannot be converted to polygons.
+        This method allows feeding the shapes from a hierarchy of cells into the region.
 
-        This constructor has been introduced in version 0.25.
+        This constructor has been introduced in version 0.25 and extended in version 0.29.
+        """
+    @overload
+    def __init__(self, shapes: Shapes, trans: ICplxTrans) -> None:
+        r"""
+        @brief Constructor from a shapes container with a transformation
+
+        This constructor creates a region from the shapes container after applying the transformation.
+        Text objects and edges are not inserted, because they cannot be converted to polygons.
+        This method allows feeding the shapes from a hierarchy of cells into the region.
+
+        This constructor variant has been introduced in version 0.29.
         """
     def __ior__(self, other: Region) -> Region:
         r"""
@@ -44521,7 +44755,7 @@ class Region(ShapeCollection):
         This method has been introduced in version 0.27.
         The 'property_constraint' parameter controls whether properties are considered: with 'SamePropertiesConstraint' the operation is only applied between shapes with identical properties. With 'DifferentPropertiesConstraint' only between shapes with different properties. This option has been introduced in version 0.28.4.
         """
-    def corners(self, angle_min: Optional[float] = ..., angle_max: Optional[float] = ..., dim: Optional[int] = ..., include_min_angle: Optional[bool] = ..., include_max_angle: Optional[bool] = ...) -> Region:
+    def corners(self, angle_min: Optional[float] = ..., angle_max: Optional[float] = ..., dim: Optional[int] = ..., include_min_angle: Optional[bool] = ..., include_max_angle: Optional[bool] = ..., inverse: Optional[bool] = ..., absolute: Optional[bool] = ...) -> Region:
         r"""
         @brief This method will select all corners whose attached edges satisfy the angle condition.
 
@@ -44529,28 +44763,31 @@ class Region(ShapeCollection):
 
         If 'include_angle_min' is true, the angle condition is >= min. angle, otherwise it is > min. angle. Same for 'include_angle_,ax' and the max. angle.
 
-        The angle is measured between the incoming and the outcoming edge in mathematical sense: a positive value is a turn left while a negative value is a turn right. Since polygon contours are oriented clockwise, positive angles will report concave corners while negative ones report convex ones.
+        With 'absolute' set to false (the default), the angle is measured between the incoming and the outcoming edge in mathematical sense: a positive value is a turn left while a negative value is a turn right. Since polygon contours are oriented clockwise, positive angles will report concave corners while negative ones report convex ones.
+        With the 'absolute' option set to true, there is no such distinction and angle values are always positive.
+
+        With 'inverse' set to true, the method will select corners not meeting the angle criterion.
 
         A similar function that reports corners as point-like edges is \corners_dots.
 
-        This method has been introduced in version 0.25. 'include_min_angle' and 'include_max_angle' have been added in version 0.27.
+        This method has been introduced in version 0.25. 'include_min_angle' and 'include_max_angle' have been added in version 0.27. 'inverse' and 'absolute' have been added in version 0.29.1.
         """
-    def corners_dots(self, angle_start: Optional[float] = ..., angle_end: Optional[float] = ..., include_min_angle: Optional[bool] = ..., include_max_angle: Optional[bool] = ...) -> Edges:
+    def corners_dots(self, angle_start: Optional[float] = ..., angle_end: Optional[float] = ..., include_min_angle: Optional[bool] = ..., include_max_angle: Optional[bool] = ..., inverse: Optional[bool] = ..., absolute: Optional[bool] = ...) -> Edges:
         r"""
         @brief This method will select all corners whose attached edges satisfy the angle condition.
 
         This method is similar to \corners, but delivers an \Edges collection with dot-like edges for each corner.
 
-        This method has been introduced in version 0.25. 'include_min_angle' and 'include_max_angle' have been added in version 0.27.
+        This method has been introduced in version 0.25. 'include_min_angle' and 'include_max_angle' have been added in version 0.27. 'inverse' and 'absolute' have been added in version 0.29.1.
         """
-    def corners_edge_pairs(self, angle_start: Optional[float] = ..., angle_end: Optional[float] = ..., include_min_angle: Optional[bool] = ..., include_max_angle: Optional[bool] = ...) -> EdgePairs:
+    def corners_edge_pairs(self, angle_start: Optional[float] = ..., angle_end: Optional[float] = ..., include_min_angle: Optional[bool] = ..., include_max_angle: Optional[bool] = ..., inverse: Optional[bool] = ..., absolute: Optional[bool] = ...) -> EdgePairs:
         r"""
         @brief This method will select all corners whose attached edges satisfy the angle condition.
 
         This method is similar to \corners, but delivers an \EdgePairs collection with an edge pairs for each corner.
         The first edge is the incoming edge of the corner, the second one the outgoing edge.
 
-        This method has been introduced in version 0.27.1.
+        This method has been introduced in version 0.27.1. 'inverse' and 'absolute' have been added in version 0.29.1.
         """
     def count(self) -> int:
         r"""
@@ -44660,6 +44897,18 @@ class Region(ShapeCollection):
         r"""
         @brief Disable progress reporting
         Calling this method will disable progress reporting. See \enable_progress.
+        """
+    def drc_hull(self, metrics: Metrics, space: int, n_circle: Optional[int] = ...) -> Region:
+        r"""
+        @brief Computes a visualization of the forbidden region for a DRC space check
+
+        @param metrics The metrics to apply
+        @param space The space value to apply
+        @param n_circle The full-circle number of points for the Euclidian space visualization
+
+        @return The new polygons representing the forbidden region.
+
+        This method has been introduced in version 0.29.1.
         """
     def dup(self) -> Region:
         r"""
@@ -46768,6 +47017,13 @@ class Region(ShapeCollection):
 
         This method has been introduced in version 0.27.
         """
+    def write(self, filename: str) -> None:
+        r"""
+        @brief Writes the region to a file
+        This method is provided for debugging purposes. It writes the object to a flat layer 0/0 in a single top cell.
+
+        This method has been introduced in version 0.29.
+        """
     def xor(self, other: Region) -> Region:
         r"""
         @brief Returns the boolean XOR between self and the other region
@@ -47507,12 +47763,12 @@ class Severity:
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums for inequality
+        @brief Compares an enum with an integer for inequality
         """
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer for inequality
+        @brief Compares two enums for inequality
         """
     def __repr__(self) -> str:
         r"""
@@ -48241,10 +48497,11 @@ class Shape:
 
     Starting with version 0.23, this method returns nil, if the shape does not represent a text.
     Setter:
-    @brief Replaces the shape by the given text (in micrometer units)
-    This method replaces the shape by the given text, like \text= with a \Text argument does. This version translates the text from micrometer units to database units internally.
+    @brief Replaces the shape by the given text object
+    This method replaces the shape by the given text object. This method can only be called for editable layouts. It does not change the user properties of the shape.
+    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.22.
     """
     text_dpos: DVector
     r"""
@@ -48533,9 +48790,25 @@ class Shape:
         Equality of shapes is not specified by the identity of the objects but by the
         identity of the pointers - both shapes must refer to the same object.
         """
+    def __hash__(self) -> int:
+        r"""
+        @brief Hash function
+
+        The hash function enables Shape objects as keys in hashes.
+
+        This method has been introduced in version 0.29.1.
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
+        """
+    def __lt__(self, other: Shape) -> bool:
+        r"""
+        @brief Less operator
+
+        The less operator implementation is based on pointers and not strictly reproducible.However, it is good enough so Shape objects can serve as keys in hashes (see also \hash).
+
+        This method has been introduced in version 0.29.1.
         """
     def __ne__(self, other: object) -> bool:
         r"""
@@ -48672,6 +48945,14 @@ class Shape:
 
         This method has been added in version 0.25.
         """
+    def drectangle(self) -> Any:
+        r"""
+        @brief Gets the rectangle in micron units if the object represents one or nil if not
+
+        If the shape represents a rectangle - i.e. a box or box polygon, a path with two points and no round ends - this method returns the box. If not, nil is returned.
+
+        This method has been introduced in version 0.29.
+        """
     def dup(self) -> Shape:
         r"""
         @brief Creates a copy of self
@@ -48767,6 +49048,14 @@ class Shape:
     def has_prop_id(self) -> bool:
         r"""
         @brief Returns true, if the shape has properties, i.e. has a properties ID
+        """
+    def hash(self) -> int:
+        r"""
+        @brief Hash function
+
+        The hash function enables Shape objects as keys in hashes.
+
+        This method has been introduced in version 0.29.1.
         """
     def holes(self) -> int:
         r"""
@@ -48881,6 +49170,14 @@ class Shape:
         @brief Gets the user property with the given key
         This method is a convenience method that gets the property with the given key. If no property with that key does not exist, it will return nil. Using that method is more convenient than using the layout object and the properties ID to retrieve the property value. 
         This method has been introduced in version 0.22.
+        """
+    def rectangle(self) -> Any:
+        r"""
+        @brief Gets the rectangle if the object represents one or nil if not
+
+        If the shape represents a rectangle - i.e. a box or box polygon, a path with two points and no round ends - this method returns the box. If not, nil is returned.
+
+        This method has been introduced in version 0.29.
         """
     def set_property(self, key: Any, value: Any) -> None:
         r"""
@@ -51448,21 +51745,16 @@ class SubCircuit(NetlistObject):
     @overload
     def circuit(self) -> Circuit:
         r"""
-        @brief Gets the circuit the subcircuit lives in.
-        This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
-        """
-    @overload
-    def circuit(self) -> Circuit:
-        r"""
         @brief Gets the circuit the subcircuit lives in (non-const version).
         This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
 
         This constness variant has been introduced in version 0.26.8
         """
     @overload
-    def circuit_ref(self) -> Circuit:
+    def circuit(self) -> Circuit:
         r"""
-        @brief Gets the circuit referenced by the subcircuit.
+        @brief Gets the circuit the subcircuit lives in.
+        This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
         """
     @overload
     def circuit_ref(self) -> Circuit:
@@ -51471,6 +51763,11 @@ class SubCircuit(NetlistObject):
 
 
         This constness variant has been introduced in version 0.26.8
+        """
+    @overload
+    def circuit_ref(self) -> Circuit:
+        r"""
+        @brief Gets the circuit referenced by the subcircuit.
         """
     @overload
     def connect_pin(self, pin: Pin, net: Net) -> None:
@@ -51576,6 +51873,7 @@ class Technology:
     Setter:
     @brief Sets the default grids
     If not empty, this list replaces the global grid list for this technology.
+    Note that this method will reset the default grid (see \default_grid). Use \set_default_grids to set the default grids and the strong default one.
 
     This property has been introduced in version 0.28.17.
     """
@@ -51830,6 +52128,17 @@ class Technology:
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+    def default_grid(self) -> float:
+        r"""
+        @brief Gets the default grid
+
+        The default grid is a specific one from the default grid list.
+        It indicates the one that is taken if the current grid is not matching one of the default grids.
+
+        To set the default grid, use \set_default_grids.
+
+        This property has been introduced in version 0.29.
+        """
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
@@ -51871,6 +52180,14 @@ class Technology:
     def save(self, file: str) -> None:
         r"""
         @brief Saves the technology definition to a file
+        """
+    def set_default_grids(self, grids: Sequence[float], default_grid: Optional[float] = ...) -> None:
+        r"""
+        @brief Sets the default grids and the strong default one
+        See \default_grids and \default_grid for a description of this property.
+        Note that the default grid has to be a member of the 'grids' array to become active.
+
+        This method has been introduced in version 0.29.
         """
     def to_xml(self) -> str:
         r"""
@@ -52068,7 +52385,8 @@ class Text:
     Setter:
     @brief Sets the vertical alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     x: int
     r"""
@@ -53826,6 +54144,13 @@ class Texts(ShapeCollection):
         If "inverse" is false, this method returns the texts with the given string.
         If "inverse" is true, this method returns the texts not having the given string.
         """
+    def write(self, filename: str) -> None:
+        r"""
+        @brief Writes the region to a file
+        This method is provided for debugging purposes. It writes the object to a flat layer 0/0 in a single top cell.
+
+        This method has been introduced in version 0.29.
+        """
 
 class TileOutputReceiver(TileOutputReceiverBase):
     r"""
@@ -55327,12 +55652,12 @@ class TrapezoidDecompositionMode:
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer for inequality
+        @brief Compares two enums for inequality
         """
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums for inequality
+        @brief Compares an enum with an integer for inequality
         """
     def __repr__(self) -> str:
         r"""
@@ -55610,12 +55935,12 @@ class VAlign:
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums
+        @brief Compares an enum with an integer value
         """
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer value
+        @brief Compares two enums
         """
     def __hash__(self) -> int:
         r"""
@@ -57077,12 +57402,12 @@ class ZeroDistanceMode:
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer value
+        @brief Compares two enums
         """
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums
+        @brief Compares an enum with an integer value
         """
     def __hash__(self) -> int:
         r"""

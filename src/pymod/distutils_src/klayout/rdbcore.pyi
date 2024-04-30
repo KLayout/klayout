@@ -86,15 +86,31 @@ class RdbCategory:
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+    @overload
     def each_item(self) -> Iterator[RdbItem]:
         r"""
         @brief Iterates over all items inside the database which are associated with this category
 
         This method has been introduced in version 0.23.
         """
+    @overload
+    def each_item(self) -> Iterator[RdbItem]:
+        r"""
+        @brief Iterates over all items inside the database which are associated with this category (non-const version)
+
+        This method has been introduced in version 0.29.
+        """
+    @overload
     def each_sub_category(self) -> Iterator[RdbCategory]:
         r"""
         @brief Iterates over all sub-categories
+
+        The const version has been added in version 0.29.
+        """
+    @overload
+    def each_sub_category(self) -> Iterator[RdbCategory]:
+        r"""
+        @brief Iterates over all sub-categories (non-const version)
         """
     def is_const_object(self) -> bool:
         r"""
@@ -118,9 +134,18 @@ class RdbCategory:
         @brief Gets the number of visited items in this category
         The number of items includes the items in sub-categories of this category.
         """
+    @overload
     def parent(self) -> RdbCategory:
         r"""
         @brief Gets the parent category of this category
+        @return The parent category or nil if this category is a top-level category
+
+        The const version has been added in version 0.29.
+        """
+    @overload
+    def parent(self) -> RdbCategory:
+        r"""
+        @brief Gets the parent category of this category (non-const version)
         @return The parent category or nil if this category is a top-level category
         """
     def path(self) -> str:
@@ -262,11 +287,19 @@ class RdbCell:
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+    @overload
     def database(self) -> ReportDatabase:
         r"""
         @brief Gets the database object that category is associated with
 
         This method has been introduced in version 0.23.
+        """
+    @overload
+    def database(self) -> ReportDatabase:
+        r"""
+        @brief Gets the database object that category is associated with (non-const version)
+
+        This method has been introduced in version 0.29.
         """
     def destroy(self) -> None:
         r"""
@@ -280,15 +313,31 @@ class RdbCell:
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+    @overload
     def each_item(self) -> Iterator[RdbItem]:
         r"""
         @brief Iterates over all items inside the database which are associated with this cell
 
         This method has been introduced in version 0.23.
         """
+    @overload
+    def each_item(self) -> Iterator[RdbItem]:
+        r"""
+        @brief Iterates over all items inside the database which are associated with this cell (non-const version)
+
+        This method has been introduced in version 0.29.
+        """
+    @overload
     def each_reference(self) -> Iterator[RdbReference]:
         r"""
         @brief Iterates over all references
+        """
+    @overload
+    def each_reference(self) -> Iterator[RdbReference]:
+        r"""
+        @brief Iterates over all references (non-const version)
+
+        This method has been introduced in version 0.23.
         """
     def is_const_object(self) -> bool:
         r"""
@@ -296,10 +345,18 @@ class RdbCell:
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+    def layout_name(self) -> str:
+        r"""
+        @brief Gets the name of the layout cell
+        For variants, this string is the name of the actual layout cell. If empty, the cell is assume to be called 'name'.
+        @return The layout cell name
+        This read-only attribute has been added in version 0.29.1.
+        """
     def name(self) -> str:
         r"""
         @brief Gets the cell name
-        The cell name is an string that identifies the category in the database. Additionally, a cell may carry a variant identifier which is a string that uniquely identifies a cell in the context of its variants. The "qualified name" contains both the cell name and the variant name. Cell names are also used to identify report database cell's with layout cells. @return The cell name
+        The cell name is an string that identifies the category in the database. Additionally, a cell may carry a variant identifier which is a string that uniquely identifies a cell in the context of its variants. The "qualified name" contains both the cell name and the variant name. Cell names are also used to identify report database cells with layout cells. For variants, the layout cell name can be specified explicitly with the \layout_name attribute (see \RdbDatabase#create_cell). The latter is available since version 0.29.1.
+        @return The cell name
         """
     def num_items(self) -> int:
         r"""
@@ -311,7 +368,7 @@ class RdbCell:
         """
     def qname(self) -> str:
         r"""
-        @brief Gets the cell's qualified name
+        @brief Gets the qualified name of the cell
         The qualified name is a combination of the cell name and optionally the variant name. It is used to identify the cell by name in a unique way.
         @return The qualified name
         """
@@ -324,13 +381,29 @@ class RdbCell:
     def variant(self) -> str:
         r"""
         @brief Gets the cell variant name
-        A variant name additionally identifies the cell when multiple cells with the same name are present. A variant name is either assigned automatically or set when creating a cell. @return The cell variant name
+        A variant name additionally identifies the cell when multiple cells with the same name are present. A variant name is either assigned automatically or set when creating a cell.
+        @return The cell variant name
         """
 
 class RdbItem:
     r"""
     @brief An item inside the report database
     An item is the basic information entity in the RDB. It is associated with a cell and a category. It can be assigned values which encapsulate other objects such as strings and geometrical objects. In addition, items can be assigned an image (i.e. a screenshot image) and tags which are basically boolean flags that can be defined freely.
+    """
+    comment: str
+    r"""
+    Getter:
+    @brief Gets the common associated with this item as a string
+    @return The comment string
+    The comment string is an arbitrary string added by the user to the item.
+
+    This attribute has been added in version 0.29.1.
+
+    Setter:
+    @brief Sets the common associated with this item as a string
+    See \comment for a description of that attribute.
+
+    This attribute has been added in version 0.29.1.
     """
     @property
     def image(self) -> None:
@@ -562,6 +635,11 @@ class RdbItem:
         r"""
         @brief Remove the tag with the given id from the item
         If a tag with that ID does not exists on this item, this method does nothing.
+        """
+    def remove_tags(self) -> None:
+        r"""
+        @brief Removes all tags from the item
+        This method has been introduced in version 0.29.1.
         """
 
 class RdbItemValue:
@@ -955,6 +1033,14 @@ class RdbReference:
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+    @overload
+    def database(self) -> ReportDatabase:
+        r"""
+        @brief Gets the database object that category is associated with (non-const version)
+
+        This method has been introduced in version 0.29.
+        """
+    @overload
     def database(self) -> ReportDatabase:
         r"""
         @brief Gets the database object that category is associated with
@@ -1041,6 +1127,14 @@ class ReportDatabase:
         @param name The name of the database
         The name of the database will be used in the user interface to refer to a certain database.
         """
+    def __copy__(self) -> ReportDatabase:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> ReportDatabase:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self, name: str) -> None:
         r"""
         @brief Creates a report database
@@ -1084,28 +1178,97 @@ class ReportDatabase:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+    def apply(self, other: ReportDatabase) -> None:
+        r"""
+        @brief Transfers item attributes from one database to another for identical items
+        This method will identify items that are identical between the two databases and transfer item attributes from the 'other' database to this database. Transferable attributes are:
+
+        @ul
+        @li Images @/li
+        @li Item tags @/li
+        @/ul
+
+        Existing attributes in this database are overwritten.
+
+        Items are identical if
+
+        @ul
+        @li They belong to the same cell (by qname) @/li
+        @li They belong to the same category (by name) @/li
+        @li Their values are identical @/li
+        @/ul
+
+        Values are identical if their individual values and (optional) value tags are identical. Values tagged with a tag unknown to the other database are ignored. The order of values matters during the compare. So the value pair (17.0, 'abc') is different from ('abc', 17.0).
+
+        The intended application for this method is use for error waiving: as the waived attribute is a transferable attribute, it is possible to apply the waived flag from from a waiver database (the 'other' database) using this method.
+
+        This method has been added in version 0.29.1.
+        """
+    def assign(self, other: ReportDatabase) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+    @overload
     def category_by_id(self, id: int) -> RdbCategory:
         r"""
         @brief Gets a category by ID
         @return The (const) category object or nil if the ID is not valid
         """
+    @overload
+    def category_by_id(self, id: int) -> RdbCategory:
+        r"""
+        @brief Gets a category by ID (non-const version)
+        @return The (const) category object or nil if the ID is not valid
+
+        This non-const variant has been introduced in version 0.29.
+        """
+    @overload
     def category_by_path(self, path: str) -> RdbCategory:
         r"""
         @brief Gets a category by path
         @param path The full path to the category starting from the top level (subcategories separated by dots)
         @return The (const) category object or nil if the name is not valid
         """
+    @overload
+    def category_by_path(self, path: str) -> RdbCategory:
+        r"""
+        @brief Gets a category by path (non-const version)
+        @param path The full path to the category starting from the top level (subcategories separated by dots)
+        @return The (const) category object or nil if the name is not valid
+
+        This non-const variant has been introduced in version 0.29.
+        """
+    @overload
     def cell_by_id(self, id: int) -> RdbCell:
         r"""
         @brief Returns the cell for a given ID
         @param id The ID of the cell
         @return The cell object or nil if no cell with that ID exists
         """
+    @overload
+    def cell_by_id(self, id: int) -> RdbCell:
+        r"""
+        @brief Returns the cell for a given ID (non-const version)
+        @param id The ID of the cell
+        @return The cell object or nil if no cell with that ID exists
+
+        This non-const variant has been added version 0.29.
+        """
+    @overload
     def cell_by_qname(self, qname: str) -> RdbCell:
         r"""
         @brief Returns the cell for a given qualified name
         @param qname The qualified name of the cell (name plus variant name optionally)
         @return The cell object or nil if no such cell exists
+        """
+    @overload
+    def cell_by_qname(self, qname: str) -> RdbCell:
+        r"""
+        @brief Returns the cell for a given qualified name (non-const version)
+        @param qname The qualified name of the cell (name plus variant name optionally)
+        @return The cell object or nil if no such cell exists
+
+        This non-const variant has been added version 0.29.
         """
     def create(self) -> None:
         r"""
@@ -1124,6 +1287,7 @@ class ReportDatabase:
         @brief Creates a new sub-category
         @param parent The category under which the category should be created
         @param name The name of the category
+        Since version 0.29.1, 'parent' can be nil. In that case, a top-level category is created.
         """
     @overload
     def create_cell(self, name: str) -> RdbCell:
@@ -1132,11 +1296,13 @@ class ReportDatabase:
         @param name The name of the cell
         """
     @overload
-    def create_cell(self, name: str, variant: str) -> RdbCell:
+    def create_cell(self, name: str, variant: str, layout_name: Optional[str] = ...) -> RdbCell:
         r"""
         @brief Creates a new cell, potentially as a variant for a cell with the same name
         @param name The name of the cell
         @param variant The variant name of the cell
+        @param layout_name For variants, this is the name of the layout cell. If empty, 'name' is used for the layout cell name.
+        The 'layout_name' argument has been added in version 0.29.1.
         """
     @overload
     def create_item(self, cell: RdbCell, category: RdbCategory) -> RdbItem:
@@ -1302,33 +1468,89 @@ class ReportDatabase:
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+    def dup(self) -> ReportDatabase:
+        r"""
+        @brief Creates a copy of self
+        """
+    @overload
     def each_category(self) -> Iterator[RdbCategory]:
         r"""
         @brief Iterates over all top-level categories
         """
+    @overload
+    def each_category(self) -> Iterator[RdbCategory]:
+        r"""
+        @brief Iterates over all top-level categories (non-const version)
+
+        The non-const variant has been added in version 0.29.
+        """
+    @overload
     def each_cell(self) -> Iterator[RdbCell]:
         r"""
         @brief Iterates over all cells
         """
+    @overload
+    def each_cell(self) -> Iterator[RdbCell]:
+        r"""
+        @brief Iterates over all cells (non-const version)
+
+        This non-const variant has been added version 0.29.
+        """
+    @overload
     def each_item(self) -> Iterator[RdbItem]:
         r"""
         @brief Iterates over all items inside the database
         """
+    @overload
+    def each_item(self) -> Iterator[RdbItem]:
+        r"""
+        @brief Iterates over all items inside the database (non-const version)
+
+        This non-const variant has been added in version 0.29.
+        """
+    @overload
     def each_item_per_category(self, category_id: int) -> Iterator[RdbItem]:
         r"""
         @brief Iterates over all items inside the database which are associated with the given category
         @param category_id The ID of the category for which all associated items should be retrieved
         """
+    @overload
+    def each_item_per_category(self, category_id: int) -> Iterator[RdbItem]:
+        r"""
+        @brief Iterates over all items inside the database which are associated with the given category (non-const version)
+        @param category_id The ID of the category for which all associated items should be retrieved
+
+        This non-const variant has been added in version 0.29.
+        """
+    @overload
     def each_item_per_cell(self, cell_id: int) -> Iterator[RdbItem]:
         r"""
         @brief Iterates over all items inside the database which are associated with the given cell
         @param cell_id The ID of the cell for which all associated items should be retrieved
         """
+    @overload
+    def each_item_per_cell(self, cell_id: int) -> Iterator[RdbItem]:
+        r"""
+        @brief Iterates over all items inside the database which are associated with the given cell (non-const version)
+        @param cell_id The ID of the cell for which all associated items should be retrieved
+
+        This non-const variant has been added in version 0.29.
+        """
+    @overload
     def each_item_per_cell_and_category(self, cell_id: int, category_id: int) -> Iterator[RdbItem]:
         r"""
         @brief Iterates over all items inside the database which are associated with the given cell and category
         @param cell_id The ID of the cell for which all associated items should be retrieved
         @param category_id The ID of the category for which all associated items should be retrieved
+        """
+    @overload
+    def each_item_per_cell_and_category(self, cell_id: int, category_id: int) -> Iterator[RdbItem]:
+        r"""
+        @brief Iterates over all items inside the database which are associated with the given cell and category
+        @param cell_id The ID of the cell for which all associated items should be retrieved
+        @param category_id The ID of the category for which all associated items should be retrieved
+
+        This non-const variant has been added in version 0.29.
         """
     def filename(self) -> str:
         r"""

@@ -760,6 +760,11 @@ public:
   void blank ();
 
   /**
+   *  @brief Gets a value indicating whether the circuit is empty
+   */
+  bool is_empty () const;
+
+  /**
    *  @brief Generate memory statistics
    */
   void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const

@@ -943,6 +943,12 @@ SpiceNetlistBuilder::circuit_for (const SpiceCachedCircuit *cc, const parameters
   if (cp == c->second.end ()) {
     return 0;
   }
+
+  //  a null pointer indicates that we are currently defining this circuit
+  if (cp->second == 0) {
+    error (tl::sprintf (tl::to_string (tr ("Subcircuit '%s' called recursively")), cc->name ()));
+  }
+
   return cp->second;
 }
 
@@ -1055,7 +1061,8 @@ SpiceNetlistBuilder::build_circuit (const SpiceCachedCircuit *cc, const paramete
     c->set_name (make_circuit_name (cc->name (), pv));
   }
 
-  register_circuit_for (cc, pv, c, anonymous_top_level);
+  //  pre-register the circuit - allows detecting recursive calls
+  register_circuit_for (cc, pv, 0, false);
 
   std::unique_ptr<std::map<std::string, db::Net *> > n2n (mp_nets_by_name.release ());
   mp_nets_by_name.reset (0);
@@ -1094,6 +1101,14 @@ SpiceNetlistBuilder::build_circuit (const SpiceCachedCircuit *cc, const paramete
   std::swap (cc, mp_circuit);
   std::swap (c, mp_netlist_circuit);
   std::swap (vars, m_variables);
+
+  //  final registration if required
+  if (! anonymous_top_level || ! c->is_empty ()) {
+    register_circuit_for (cc, pv, c, anonymous_top_level);
+  } else {
+    mp_netlist->remove_circuit (c);
+    c = 0;
+  }
 
   return c;
 }

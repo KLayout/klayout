@@ -551,6 +551,10 @@ module DRC
       end
     end
 
+    def absolute
+      DRCAbsoluteMode::new(true)
+    end
+    
     def as_dots
       DRCOutputMode::new(:dots)
     end

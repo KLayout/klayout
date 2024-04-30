@@ -1673,6 +1673,16 @@ TEST(92_issue1594_dual_top)
   compare_netlists (_this, output, au);
 }
 
+TEST(93_withAngle)
+{
+  run_test (_this, "93", false);
+}
+
+TEST(93d_withAngle)
+{
+  run_test (_this, "93", true);
+}
+
 TEST(100_edge_interaction_with_count)
 {
   run_test (_this, "100", false);

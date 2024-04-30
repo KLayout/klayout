@@ -264,8 +264,11 @@ deliver objects that can be converted into polygons. Such objects are of class <
 <p>
 This method produces markers on the corners of the polygons. An angle criterion can be given which
 selects corners based on the angle of the connecting edges. Positive angles indicate a left turn
-while negative angles indicate a right turn. Since polygons are oriented clockwise, positive angles
+while negative angles indicate a right turn. 
+Since polygons are oriented clockwise, positive angles
 indicate concave (inner) corners while negative ones indicate convex (outer) corners
+The 'absolute' option allows turning this off and considering both left and right turns 
+positive angles.
 </p><p>
 The markers generated can be point-like edges or small 2x2 DBU boxes. The latter is the default.
 </p><p>
@@ -276,6 +279,8 @@ The options available are:
 <li><b>as_dots </b>: with this option, point-like edges will be produced instead of small boxes </li>
 <li><b>as_edge_pairs </b>: with this option, an edge pair is produced for each corner selected. The first edge 
 is the incoming edge to the corner, the second edge the outgoing edge. </li>
+<li><b>absolute </b>: with this option, left and right turns will both be considered positive angles </li>
+<li><b>negative </b>: with this option, all corners <b>not </b>matching the angle criterion are selected </li>
 </ul>
 </p><p>
 The following images show the effect of this method:
@@ -3615,13 +3620,13 @@ The following images illustrate the effect of the "without_touching_corners" opt
 <keyword name="with_angle"/>
 <p>Usage:</p>
 <ul>
-<li><tt>layer.with_angle(min .. max)</tt></li>
-<li><tt>layer.with_angle(value)</tt></li>
-<li><tt>layer.with_angle(min, max)</tt></li>
+<li><tt>layer.with_angle(min .. max [, absolute])</tt></li>
+<li><tt>layer.with_angle(value [, absolute])</tt></li>
+<li><tt>layer.with_angle(min, max [, absolute])</tt></li>
 <li><tt>layer.with_angle(ortho)</tt></li>
 <li><tt>layer.with_angle(diagonal)</tt></li>
 <li><tt>layer.with_angle(diagonal_only)</tt></li>
-<li><tt>edge_pair_layer.with_angle(... [, both])</tt></li>
+<li><tt>edge_pair_layer.with_angle(... [, both] [, absolute])</tt></li>
 </ul>
 <p>
 When called on an edge layer, the method selects edges by their angle, 
@@ -3640,6 +3645,11 @@ When called on an edge pair layer, this method selects edge pairs with one or bo
 meeting the angle criterion. In this case an additional argument is accepted which can be
 either "both" (plain word) to indicate that both edges have to be within the given interval.
 Without this argument, it is sufficient for one edge to meet the criterion.
+</p><p>
+The "absolute" option is available for edge or edge pair layers.
+Without the "absolute" option, edges sloping down are assigned a negative angle while edges sloping up are assigned
+a positive angle (vertical edges are always 90 degree). With the "absolute" option,
+edges sloping down also have a positive angle which is the one enclosed with the horizontal axis.
 </p><p>
 Here are examples for "with_angle" on edge pair layers:
 </p><p>
@@ -4006,21 +4016,25 @@ This method is available for polygon layers only.
 <keyword name="without_angle"/>
 <p>Usage:</p>
 <ul>
-<li><tt>layer.without_angle(min .. max)</tt></li>
-<li><tt>layer.without_angle(value)</tt></li>
-<li><tt>layer.without_angle(min, max)</tt></li>
+<li><tt>layer.without_angle(min .. max [, absolute])</tt></li>
+<li><tt>layer.without_angle(value [, absolute])</tt></li>
+<li><tt>layer.without_angle(min, max [, absolute])</tt></li>
 <li><tt>layer.without_angle(ortho)</tt></li>
 <li><tt>layer.without_angle(diagonal)</tt></li>
 <li><tt>layer.without_angle(diagonal_only)</tt></li>
-<li><tt>edge_pair_layer.without_angle(... [, both])</tt></li>
+<li><tt>edge_pair_layer.without_angle(... [, both] [, absolute])</tt></li>
 </ul>
 <p>
 The method basically is the inverse of <a href="#with_angle">with_angle</a>. It selects all edges
 of the edge layer or corners of the polygons which do not have the given angle (second form) or whose angle
 is not inside the given interval (first and third form) or of the given type (other forms).
 </p><p>
-When called on edge pairs, it selects
-edge pairs by the angles of their edges.
+When called on edge pairs, it selects edge pairs by the angles of their edges.
+</p><p>
+The "absolute" option is available for edge or edge pair layers. Without the "absolute" option,
+edges sloping down are assigned a negative angle while edges sloping up are assigned
+a positive angle (vertical edges are always 90 degree). With the "absolute" option,
+edges sloping down also have a positive angle which is the one enclosed with the horizontal axis.
 </p><p>
 A note on the "both" modifier (without_angle called on edge pairs): "both" means that
 both edges need to be "without_angle". For example

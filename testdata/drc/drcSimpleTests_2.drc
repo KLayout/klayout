@@ -14,10 +14,12 @@ end
 a1 = input(1)
 b1 = input(2)
 c1 = input(3)
+e1 = input(5)
 
 a1.output(1, 0)
 b1.output(2, 0)
 c1.output(3, 0)
+e1.output(5, 0)
   
 c1.rounded_corners(0.5, 0.5, 16).output(1010, 0)
 c1.smoothed(1.5).output(1011, 0)
@@ -69,6 +71,11 @@ a1.corners(-90.0, as_dots).extended(0.05, 0.05, 0.05, 0.05).output(1062, 0)
 a1.corners(-90.0, as_edge_pairs).polygons(0).output(1063, 0)
 a1.corners(-90.0, as_edge_pairs).first_edges.start_segments(0.1).extended(0.05, 0.05, 0.05, 0.05).output(1064, 0)
 a1.corners(-90.0, as_edge_pairs).second_edges.start_segments(0.1).extended(0.05, 0.05, 0.05, 0.05).output(1065, 0)
+
+e1.corners(90.0, as_boxes).sized(0.05).output(1066, 0)
+e1.corners(90.0, absolute, as_boxes).sized(0.05).output(1067, 0)
+e1.corners(90.0, negative, as_boxes).sized(0.05).output(1068, 0)
+e1.corners(44.0 .. 46.0, absolute, as_boxes).sized(0.05).output(1069, 0)
 
 a1.select { |p| p.bbox.width < 0.8 }.output(1100, 0)
 a1.collect { |p| p.is_box? && p.bbox.enlarged(0.1, 0.1) }.output(1101, 0)

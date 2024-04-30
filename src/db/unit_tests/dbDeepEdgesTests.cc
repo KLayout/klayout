@@ -327,8 +327,8 @@ TEST(5_Filters)
 
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (2, 0)), r2);
 
-    db::EdgeOrientationFilter eof1 (0, true, 1, true, false);
-    db::EdgeOrientationFilter eof2 (0, true, 1, true, true);
+    db::EdgeOrientationFilter eof1 (0, true, 1, true, false, false);
+    db::EdgeOrientationFilter eof2 (0, true, 1, true, true, false);
 
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), e2.filtered (eof1));
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), e2.filtered (eof2));

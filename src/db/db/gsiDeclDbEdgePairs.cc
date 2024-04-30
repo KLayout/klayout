@@ -432,14 +432,28 @@ static db::EdgePairs with_length_both2 (const db::EdgePairs *r, const tl::Varian
 
 static db::EdgePairs with_angle1 (const db::EdgePairs *r, double a, bool inverse)
 {
-  db::EdgeOrientationFilter f (a, inverse);
+  db::EdgeOrientationFilter f (a, inverse, false);
   db::EdgeFilterBasedEdgePairFilter ef (&f, true /*one must match*/);
   return r->filtered (ef);
 }
 
 static db::EdgePairs with_angle2 (const db::EdgePairs *r, double amin, double amax, bool inverse, bool include_amin, bool include_amax)
 {
-  db::EdgeOrientationFilter f (amin, include_amin, amax, include_amax, inverse);
+  db::EdgeOrientationFilter f (amin, include_amin, amax, include_amax, inverse, false);
+  db::EdgeFilterBasedEdgePairFilter ef (&f, true /*one must match*/);
+  return r->filtered (ef);
+}
+
+static db::EdgePairs with_abs_angle1 (const db::EdgePairs *r, double a, bool inverse)
+{
+  db::EdgeOrientationFilter f (a, inverse, true);
+  db::EdgeFilterBasedEdgePairFilter ef (&f, true /*one must match*/);
+  return r->filtered (ef);
+}
+
+static db::EdgePairs with_abs_angle2 (const db::EdgePairs *r, double amin, double amax, bool inverse, bool include_amin, bool include_amax)
+{
+  db::EdgeOrientationFilter f (amin, include_amin, amax, include_amax, inverse, true);
   db::EdgeFilterBasedEdgePairFilter ef (&f, true /*one must match*/);
   return r->filtered (ef);
 }
@@ -453,14 +467,28 @@ static db::EdgePairs with_angle3 (const db::EdgePairs *r, db::SpecialEdgeOrienta
 
 static db::EdgePairs with_angle_both1 (const db::EdgePairs *r, double a, bool inverse)
 {
-  db::EdgeOrientationFilter f (a, inverse);
+  db::EdgeOrientationFilter f (a, inverse, false);
   db::EdgeFilterBasedEdgePairFilter ef (&f, false /*both must match*/);
   return r->filtered (ef);
 }
 
 static db::EdgePairs with_angle_both2 (const db::EdgePairs *r, double amin, double amax, bool inverse, bool include_amin, bool include_amax)
 {
-  db::EdgeOrientationFilter f (amin, include_amin, amax, include_amax, inverse);
+  db::EdgeOrientationFilter f (amin, include_amin, amax, include_amax, inverse, false);
+  db::EdgeFilterBasedEdgePairFilter ef (&f, false /*both must match*/);
+  return r->filtered (ef);
+}
+
+static db::EdgePairs with_abs_angle_both1 (const db::EdgePairs *r, double a, bool inverse)
+{
+  db::EdgeOrientationFilter f (a, inverse, true);
+  db::EdgeFilterBasedEdgePairFilter ef (&f, false /*both must match*/);
+  return r->filtered (ef);
+}
+
+static db::EdgePairs with_abs_angle_both2 (const db::EdgePairs *r, double amin, double amax, bool inverse, bool include_amin, bool include_amax)
+{
+  db::EdgeOrientationFilter f (amin, include_amin, amax, include_amax, inverse, true);
   db::EdgeFilterBasedEdgePairFilter ef (&f, false /*both must match*/);
   return r->filtered (ef);
 }
@@ -967,6 +995,22 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "\n"
     "This method has been added in version 0.27.1.\n"
   ) +
+  method_ext ("with_abs_angle", with_abs_angle1, gsi::arg ("angle"), gsi::arg ("inverse"),
+    "@brief Filter the edge pairs by orientation of their edges\n"
+    "\n"
+    "This method behaves like \\with_angle, but angles are always positive - i.e. there is no "
+    "differentiation between edges sloping 'down' vs. edges sloping 'up.\n"
+    "\n"
+    "This method has been added in version 0.29.1.\n"
+  ) +
+  method_ext ("with_abs_angle", with_abs_angle2, gsi::arg ("min_angle"), gsi::arg ("max_angle"), gsi::arg ("inverse"), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", false),
+    "@brief Filter the edge pairs by orientation of their edges\n"
+    "\n"
+    "This method behaves like \\with_angle, but angles are always positive - i.e. there is no "
+    "differentiation between edges sloping 'down' vs. edges sloping 'up.\n"
+    "\n"
+    "This method has been added in version 0.29.1.\n"
+  ) +
   method_ext ("with_angle", with_angle3, gsi::arg ("type"), gsi::arg ("inverse"),
     "@brief Filter the edge pairs by orientation of their edges\n"
     "Filters the edge pairs in the edge pair collection by orientation. If \"inverse\" is false, only "
@@ -1026,6 +1070,21 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "@/code\n"
     "\n"
     "This method has been added in version 0.27.1.\n"
+  ) +
+  method_ext ("with_abs_angle_both", with_abs_angle_both1, gsi::arg ("angle"), gsi::arg ("inverse"),
+    "@brief Filter the edge pairs by orientation of both of their edges\n"
+    "\n"
+    "This method behaves like \\with_angle_both, but angles are always positive - i.e. there is no "
+    "differentiation between edges sloping 'down' vs. edges sloping 'up.\n"
+    "\n"
+    "This method has been added in version 0.29.1.\n"
+  ) +
+  method_ext ("with_abs_angle_both", with_abs_angle_both2, gsi::arg ("min_angle"), gsi::arg ("max_angle"), gsi::arg ("inverse"), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", false),
+    "\n"
+    "This method behaves like \\with_angle_both, but angles are always positive - i.e. there is no "
+    "differentiation between edges sloping 'down' vs. edges sloping 'up.\n"
+    "\n"
+    "This method has been added in version 0.29.1.\n"
   ) +
   method_ext ("with_angle_both", with_angle_both3, gsi::arg ("type"), gsi::arg ("inverse"),
     "@brief Filter the edge pairs by orientation of their edges\n"

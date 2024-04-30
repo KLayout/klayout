@@ -770,17 +770,7 @@ CODE
     # \DRC# expressions (see \Layer#drc and \DRC#length for more details). In this context,
     # the operation acts similar to \Layer#with_length.
 
-    # %DRC%
-    # @name angle
-    # @brief In universal DRC context: selects edges based on their orientation
-    # @synopsis angle (in condition)
-    #
-    # "angle" represents the edge orientation filter on the primary shape edges in
-    # \DRC# expressions (see \Layer#drc and \DRC#angle for more details). In this context,
-    # the operation acts similar to \Layer#with_angle.
-
     %w(
-      angle
       area
       holes
       hulls
@@ -798,6 +788,15 @@ CODE
 CODE
     end
     
+    # %DRC%
+    # @name angle
+    # @brief In universal DRC context: selects edges based on their orientation
+    # @synopsis angle (in condition)
+    #
+    # "angle" represents the edge orientation filter on the primary shape edges in
+    # \DRC# expressions (see \Layer#drc and \DRC#angle for more details). In this context,
+    # the operation acts similar to \Layer#with_angle.
+
     # %DRC%
     # @name corners
     # @brief Selects corners of polygons
@@ -817,11 +816,6 @@ CODE
     # The "corners" operator can be put into a condition which means it's
     # applied to corners meeting a particular angle constraint.
 
-    def _cop_corners(output_mode = DRCOutputMode::new(:boxes))
-      # NOTE: this method is a fallback for the respective global ones which route to DRCLayer or here.
-      return primary.corners(output_mode)
-    end
-    
     # %DRC%
     # @name extent_refs
     # @brief Returns partial references to the boundings boxes of the polygons
@@ -897,6 +891,8 @@ CODE
       rounded_corners
       sized
       smoothed
+      corners
+      angle
     ).each do |f|
       # NOTE: these methods are fallback for the respective global ones which route to DRCLayer or here.
       eval <<"CODE"

@@ -142,22 +142,23 @@ private:
 class DB_PUBLIC EdgeAngleChecker
 {
 public:
-  EdgeAngleChecker (double angle_start, bool include_angle_start, double angle_end, bool include_angle_end);
+  EdgeAngleChecker (double angle_start, bool include_angle_start, double angle_end, bool include_angle_end, bool inverse, bool absolute);
 
   bool operator() (const db::Edge &a, const db::Edge &b) const
   {
-    return m_all || check (a.d (), b.d ());
+    return (m_all || check (a.d (), b.d ()) || (m_absolute && check (b.d (), a.d ()))) != m_inverse;
   }
 
   bool operator() (const db::Vector &a, const db::Vector &b) const
   {
-    return m_all || check (a, b);
+    return (m_all || check (a, b) || (m_absolute && check (b, a))) != m_inverse;
   }
 
 private:
   db::CplxTrans m_t_start, m_t_end;
   bool m_include_start, m_include_end;
   bool m_big_angle, m_all;
+  bool m_inverse, m_absolute;
 
   bool check (const db::Vector &a, const db::Vector &b) const;
 };
@@ -181,22 +182,24 @@ struct DB_PUBLIC EdgeOrientationFilter
    *  @param amin The minimum angle (measured against the x axis)
    *  @param amax The maximum angle (measured against the x axis)
    *  @param inverse If set to true, only edges not matching this criterion will be filtered
+   *  @param absolute Angles are always positive
    *
    *  This filter will filter out all edges whose angle against x axis
    *  is larger or equal to amin and less than amax.
    */
-  EdgeOrientationFilter (double amin, bool include_amin, double amax, bool include_amax, bool inverse);
+  EdgeOrientationFilter (double amin, bool include_amin, double amax, bool include_amax, bool inverse, bool absolute);
 
   /**
    *  @brief Constructor
    *
    *  @param a The angle (measured against the x axis)
    *  @param inverse If set to true, only edges not matching this criterion will be filtered
+   *  @param absolute Angles are always positive
    *
    *  This filter will filter out all edges whose angle against x axis
    *  is equal to a.
    */
-  EdgeOrientationFilter (double a, bool inverse);
+  EdgeOrientationFilter (double a, bool inverse, bool absolute);
 
   /**
    *  @brief Returns true if the edge orientation matches the criterion

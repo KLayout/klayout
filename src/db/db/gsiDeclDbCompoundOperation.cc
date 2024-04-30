@@ -214,22 +214,22 @@ static db::CompoundRegionOperationNode *new_count_filter (db::CompoundRegionOper
   return new db::CompoundRegionCountFilterNode (input, invert, min_count, max_count);
 }
 
-static db::CompoundRegionOperationNode *new_corners_as_rectangles (db::CompoundRegionOperationNode *input, double angle_start, bool include_angle_start, double angle_end, bool include_angle_end, db::Coord dim = 1)
+static db::CompoundRegionOperationNode *new_corners_as_rectangles (db::CompoundRegionOperationNode *input, double angle_start, bool include_angle_start, double angle_end, bool include_angle_end, db::Coord dim, bool inverse, bool absolute)
 {
   check_non_null (input, "input");
-  return new db::CompoundRegionProcessingOperationNode (new db::CornersAsRectangles (angle_start, include_angle_start, angle_end, include_angle_end, dim), input, true /*processor is owned*/, dim /*dist adder*/);
+  return new db::CompoundRegionProcessingOperationNode (new db::CornersAsRectangles (angle_start, include_angle_start, angle_end, include_angle_end, inverse, absolute, dim), input, true /*processor is owned*/, dim /*dist adder*/);
 }
 
-static db::CompoundRegionOperationNode *new_corners_as_dots (db::CompoundRegionOperationNode *input, double angle_start, bool include_angle_start, double angle_end, bool include_angle_end)
+static db::CompoundRegionOperationNode *new_corners_as_dots (db::CompoundRegionOperationNode *input, double angle_start, bool include_angle_start, double angle_end, bool include_angle_end, bool inverse, bool absolute)
 {
   check_non_null (input, "input");
-  return new db::CompoundRegionToEdgeProcessingOperationNode (new db::CornersAsDots (angle_start, include_angle_start, angle_end, include_angle_end), input, true /*processor is owned*/);
+  return new db::CompoundRegionToEdgeProcessingOperationNode (new db::CornersAsDots (angle_start, include_angle_start, angle_end, include_angle_end, inverse, absolute), input, true /*processor is owned*/);
 }
 
-static db::CompoundRegionOperationNode *new_corners_as_edge_pairs (db::CompoundRegionOperationNode *input, double angle_start, bool include_angle_start, double angle_end, bool include_angle_end)
+static db::CompoundRegionOperationNode *new_corners_as_edge_pairs (db::CompoundRegionOperationNode *input, double angle_start, bool include_angle_start, double angle_end, bool include_angle_end, bool inverse, bool absolute)
 {
   check_non_null (input, "input");
-  return new db::CompoundRegionToEdgePairProcessingOperationNode (new db::CornersAsEdgePairs (angle_start, include_angle_start, angle_end, include_angle_end), input, true /*processor is owned*/);
+  return new db::CompoundRegionToEdgePairProcessingOperationNode (new db::CornersAsEdgePairs (angle_start, include_angle_start, angle_end, include_angle_end, inverse, absolute), input, true /*processor is owned*/);
 }
 
 static db::CompoundRegionOperationNode *new_extents (db::CompoundRegionOperationNode *input, db::Coord e)
@@ -341,10 +341,10 @@ static db::CompoundRegionOperationNode *new_edge_length_sum_filter (db::Compound
   return new db::CompoundRegionEdgeFilterOperationNode (new db::EdgeLengthFilter (lmin, lmax, inverse), input, true /*processor is owned*/, true /*sum*/);
 }
 
-static db::CompoundRegionOperationNode *new_edge_orientation_filter (db::CompoundRegionOperationNode *input, bool inverse, double amin, bool include_amin, double amax, bool include_amax)
+static db::CompoundRegionOperationNode *new_edge_orientation_filter (db::CompoundRegionOperationNode *input, bool inverse, double amin, bool include_amin, double amax, bool include_amax, bool absolute_angle)
 {
   check_non_null (input, "input");
-  return new db::CompoundRegionEdgeFilterOperationNode (new db::EdgeOrientationFilter (amin, include_amin, amax, include_amax, inverse), input, true /*processor is owned*/);
+  return new db::CompoundRegionEdgeFilterOperationNode (new db::EdgeOrientationFilter (amin, include_amin, amax, include_amax, inverse, absolute_angle), input, true /*processor is owned*/);
 }
 
 static db::CompoundRegionOperationNode *new_polygons (db::CompoundRegionOperationNode *input, db::Coord e)
@@ -617,17 +617,21 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
   gsi::constructor ("new_count_filter", &new_count_filter, gsi::arg ("inputs"), gsi::arg ("invert", false), gsi::arg ("min_count", size_t (0)), gsi::arg ("max_count", std::numeric_limits<size_t>::max ()),
     "@brief Creates a node selecting results but their shape count.\n"
   ) +
-  gsi::constructor ("new_corners_as_rectangles", &new_corners_as_rectangles, gsi::arg ("input"), gsi::arg ("angle_min"), gsi::arg ("include_angle_min"), gsi::arg ("angle_max"), gsi::arg ("include_angle_max"), gsi::arg ("dim"),
+  gsi::constructor ("new_corners_as_rectangles", &new_corners_as_rectangles, gsi::arg ("input"), gsi::arg ("angle_min"), gsi::arg ("include_angle_min"), gsi::arg ("angle_max"), gsi::arg ("include_angle_max"), gsi::arg ("dim"), gsi::arg ("inverse", false), gsi::arg ("absolute", false),
     "@brief Creates a node turning corners into rectangles.\n"
+    "\n"
+    "'absolute' and 'inverse' arguments have been added in version 0.29.1.\n"
   ) +
-  gsi::constructor ("new_corners_as_dots", &new_corners_as_dots, gsi::arg ("input"), gsi::arg ("angle_min"), gsi::arg ("include_angle_min"), gsi::arg ("angle_max"), gsi::arg ("include_angle_max"),
+  gsi::constructor ("new_corners_as_dots", &new_corners_as_dots, gsi::arg ("input"), gsi::arg ("angle_min"), gsi::arg ("include_angle_min"), gsi::arg ("angle_max"), gsi::arg ("include_angle_max"), gsi::arg ("inverse", false), gsi::arg ("absolute", false),
     "@brief Creates a node turning corners into dots (single-point edges).\n"
+    "\n"
+    "'absolute' and 'inverse' arguments have been added in version 0.29.1.\n"
   ) +
-  gsi::constructor ("new_corners_as_edge_pairs", &new_corners_as_edge_pairs, gsi::arg ("input"), gsi::arg ("angle_min"), gsi::arg ("include_angle_min"), gsi::arg ("angle_max"), gsi::arg ("include_angle_max"),
+  gsi::constructor ("new_corners_as_edge_pairs", &new_corners_as_edge_pairs, gsi::arg ("input"), gsi::arg ("angle_min"), gsi::arg ("include_angle_min"), gsi::arg ("angle_max"), gsi::arg ("include_angle_max"), gsi::arg ("inverse", false), gsi::arg ("absolute", false),
     "@brief Creates a node turning corners into edge pairs containing the two edges adjacent to the corner.\n"
     "The first edge will be the incoming edge and the second one the outgoing edge.\n"
     "\n"
-    "This feature has been introduced in version 0.27.1.\n"
+    "This feature has been introduced in version 0.27.1. 'absolute' and 'inverse' arguments have been added in version 0.29.1.\n"
   ) +
   gsi::constructor ("new_extents", &new_extents, gsi::arg ("input"), gsi::arg ("e", 0),
     "@brief Creates a node returning the extents of the objects.\n"
@@ -759,8 +763,10 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
   gsi::constructor ("new_edge_length_sum_filter", &new_edge_length_sum_filter, gsi::arg ("input"), gsi::arg ("inverse", false), gsi::arg ("lmin", 0), gsi::arg ("lmax", std::numeric_limits<db::Edge::distance_type>::max (), "max"),
     "@brief Creates a node filtering edges by their length sum (over the local set).\n"
   ) +
-  gsi::constructor ("new_edge_orientation_filter", &new_edge_orientation_filter, gsi::arg ("input"), gsi::arg ("inverse"), gsi::arg ("amin"), gsi::arg ("include_amin"), gsi::arg ("amax"), gsi::arg ("include_amax"),
+  gsi::constructor ("new_edge_orientation_filter", &new_edge_orientation_filter, gsi::arg ("input"), gsi::arg ("inverse"), gsi::arg ("amin"), gsi::arg ("include_amin"), gsi::arg ("amax"), gsi::arg ("include_amax"), gsi::arg ("absolute_angle", false),
     "@brief Creates a node filtering edges by their orientation.\n"
+    "\n"
+    "'absolute_angle' has been introduced in version 0.29.1."
   ) +
   gsi::constructor ("new_polygons", &new_polygons, gsi::arg ("input"), gsi::arg ("e", 0),
     "@brief Creates a node converting the input to polygons.\n"

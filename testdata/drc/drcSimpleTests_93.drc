@@ -1,0 +1,35 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+end
+
+r = input(1, 0)
+e = r.edges
+
+r.output(1, 0)
+
+r.with_angle(45.0).polygons(0).output(100, 0)
+r.with_angle(90.0).polygons(0).output(101, 0)
+r.with_angle(91.0..100.0).polygons(0).output(102, 0)
+
+r.without_angle(45.0).polygons(0).output(120, 0)
+r.without_angle(90.0).polygons(0).output(121, 0)
+r.without_angle(45.0..100.0).polygons(0).output(122, 0)
+
+e.with_angle(45.0).output(200, 0)
+e.with_angle(0.0).output(201, 0)
+e.with_angle(45.0..91.0).output(202, 0)
+e.with_angle(45.0, absolute).output(203, 0)
+e.with_angle(45.0..91.0, absolute).output(204, 0)
+e.with_angle(45.0, 91.0, absolute).output(205, 0)
+
+e.without_angle(45.0).output(220, 0)
+e.without_angle(0.0).output(221, 0)
+e.without_angle(45.0..91.0).output(222, 0)
+e.without_angle(45.0, absolute).output(223, 0)
+e.without_angle(45.0..91.0, absolute).output(224, 0)
+e.without_angle(45.0, 91.0, absolute).output(225, 0)
+

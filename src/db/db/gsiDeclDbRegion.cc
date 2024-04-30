@@ -300,19 +300,19 @@ static db::Region *texts_as_boxes2 (const db::Region *r, db::DeepShapeStore &dss
   return new db::Region (r->texts_as_boxes (pat, pattern, enl, dss));
 }
 
-static db::Edges corners_to_dots (const db::Region *r, double angle_start, double angle_end, bool include_angle_start, bool include_angle_end)
+static db::Edges corners_to_dots (const db::Region *r, double angle_start, double angle_end, bool include_angle_start, bool include_angle_end, bool inverse, bool absolute)
 {
-  return r->processed (db::CornersAsDots (angle_start, include_angle_start, angle_end, include_angle_end));
+  return r->processed (db::CornersAsDots (angle_start, include_angle_start, angle_end, include_angle_end, inverse, absolute));
 }
 
-static db::Region corners_to_boxes (const db::Region *r, double angle_start, double angle_end, db::Coord dim, bool include_angle_start, bool include_angle_end)
+static db::Region corners_to_boxes (const db::Region *r, double angle_start, double angle_end, db::Coord dim, bool include_angle_start, bool include_angle_end, bool inverse, bool absolute)
 {
-  return r->processed (db::CornersAsRectangles (angle_start, include_angle_start, angle_end, include_angle_end, dim));
+  return r->processed (db::CornersAsRectangles (angle_start, include_angle_start, angle_end, include_angle_end, inverse, absolute, dim));
 }
 
-static db::EdgePairs corners_to_edge_pairs (const db::Region *r, double angle_start, double angle_end, bool include_angle_start, bool include_angle_end)
+static db::EdgePairs corners_to_edge_pairs (const db::Region *r, double angle_start, double angle_end, bool include_angle_start, bool include_angle_end, bool inverse, bool absolute)
 {
-  return r->processed (db::CornersAsEdgePairs (angle_start, include_angle_start, angle_end, include_angle_end));
+  return r->processed (db::CornersAsEdgePairs (angle_start, include_angle_start, angle_end, include_angle_end, inverse, absolute));
 }
 
 static db::Region *new_si (const db::RecursiveShapeIterator &si)
@@ -1697,7 +1697,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@hide\n"
     "This method is provided for DRC implementation.\n"
   ) +
-  method_ext ("corners", &corners_to_boxes, gsi::arg ("angle_min", -180.0), gsi::arg ("angle_max", 180.0), gsi::arg ("dim", 1), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", true),
+  method_ext ("corners", &corners_to_boxes, gsi::arg ("angle_min", -180.0), gsi::arg ("angle_max", 180.0), gsi::arg ("dim", 1), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", true), gsi::arg ("inverse", false), gsi::arg ("absolute", false),
     "@brief This method will select all corners whose attached edges satisfy the angle condition.\n"
     "\n"
     "The angle values specify a range of angles: all corners whose attached edges form an angle "
@@ -1706,29 +1706,35 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "If 'include_angle_min' is true, the angle condition is >= min. angle, otherwise it is > min. angle. "
     "Same for 'include_angle_,ax' and the max. angle.\n"
     "\n"
-    "The angle is measured "
+    "With 'absolute' set to false (the default), the angle is measured "
     "between the incoming and the outcoming edge in mathematical sense: a positive value is a turn left "
     "while a negative value is a turn right. Since polygon contours are oriented clockwise, positive "
     "angles will report concave corners while negative ones report convex ones.\n"
+    "With the 'absolute' option set to true, there is no such distinction and angle values are always positive.\n"
+    "\n"
+    "With 'inverse' set to true, the method will select corners not meeting the angle criterion.\n"
     "\n"
     "A similar function that reports corners as point-like edges is \\corners_dots.\n"
     "\n"
-    "This method has been introduced in version 0.25. 'include_min_angle' and 'include_max_angle' have been added in version 0.27.\n"
+    "This method has been introduced in version 0.25. 'include_min_angle' and 'include_max_angle' have been added in version 0.27. "
+    "'inverse' and 'absolute' have been added in version 0.29.1.\n"
   ) +
-  method_ext ("corners_dots", &corners_to_dots, gsi::arg ("angle_start", -180.0), gsi::arg ("angle_end", 180.0), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", true),
+  method_ext ("corners_dots", &corners_to_dots, gsi::arg ("angle_start", -180.0), gsi::arg ("angle_end", 180.0), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", true), gsi::arg ("inverse", false), gsi::arg ("absolute", false),
     "@brief This method will select all corners whose attached edges satisfy the angle condition.\n"
     "\n"
     "This method is similar to \\corners, but delivers an \\Edges collection with dot-like edges for each corner.\n"
     "\n"
-    "This method has been introduced in version 0.25. 'include_min_angle' and 'include_max_angle' have been added in version 0.27.\n"
+    "This method has been introduced in version 0.25. 'include_min_angle' and 'include_max_angle' have been added in version 0.27. "
+    "'inverse' and 'absolute' have been added in version 0.29.1.\n"
   ) +
-  method_ext ("corners_edge_pairs", &corners_to_edge_pairs, gsi::arg ("angle_start", -180.0), gsi::arg ("angle_end", 180.0), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", true),
+  method_ext ("corners_edge_pairs", &corners_to_edge_pairs, gsi::arg ("angle_start", -180.0), gsi::arg ("angle_end", 180.0), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", true), gsi::arg ("inverse", false), gsi::arg ("absolute", false),
     "@brief This method will select all corners whose attached edges satisfy the angle condition.\n"
     "\n"
     "This method is similar to \\corners, but delivers an \\EdgePairs collection with an edge pairs for each corner.\n"
     "The first edge is the incoming edge of the corner, the second one the outgoing edge.\n"
     "\n"
-    "This method has been introduced in version 0.27.1.\n"
+    "This method has been introduced in version 0.27.1. "
+    "'inverse' and 'absolute' have been added in version 0.29.1.\n"
   ) +
   method ("merge", (db::Region &(db::Region::*) ()) &db::Region::merge,
     "@brief Merge the region\n"

@@ -98,13 +98,13 @@ bool EdgePairFilterByArea::selected (const db::EdgePair &edge_pair) const
 //  EdgePairFilterByArea implementation
 
 InternalAngleEdgePairFilter::InternalAngleEdgePairFilter (double a, bool inverted)
-  : m_inverted (inverted), m_checker (a, true, a, true)
+  : m_checker (a, true, a, true, inverted, false)
 {
   //  .. nothing yet ..
 }
 
 InternalAngleEdgePairFilter::InternalAngleEdgePairFilter (double amin, bool include_amin, double amax, bool include_amax, bool inverted)
-  : m_inverted (inverted), m_checker (amin, include_amin, amax, include_amax)
+  : m_checker (amin, include_amin, amax, include_amax, inverted, false)
 {
   //  .. nothing yet ..
 }
@@ -122,7 +122,7 @@ InternalAngleEdgePairFilter::selected (const db::EdgePair &edge_pair) const
     std::swap (d1, d2);
   }
 
-  return m_checker (d1, d2) != m_inverted;
+  return m_checker (d1, d2);
 }
 
 }

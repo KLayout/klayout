@@ -644,6 +644,11 @@ void Circuit::set_pin_ref_for_pin (size_t pin_id, Net::pin_iterator iter)
   m_pin_refs [pin_id] = iter;
 }
 
+bool Circuit::is_empty () const
+{
+  return m_nets.empty () && m_pins.empty () && m_devices.empty () && m_subcircuits.empty ();
+}
+
 void Circuit::blank ()
 {
   tl_assert (netlist () != 0);

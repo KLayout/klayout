@@ -123,6 +123,16 @@ module DRC
     end
   end
   
+  # A wrapper for the "absolute" flag for
+  # some DRC functions. The purpose of this class
+  # is to identify the value by the class.
+  class DRCAbsoluteMode
+    attr_accessor :value
+    def initialize(v)
+      self.value = v
+    end
+  end
+  
   # A wrapper for a rectangle error filter mode 
   # The purpose of this wrapper is to identify the error filter mode
   class DRCRectangleErrorFilter

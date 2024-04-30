@@ -5185,7 +5185,11 @@ CODE
     # This method will copy the content of the layer to the specified output.
     #
     # If a report database is selected for the output, the specification has to include a 
-    # category name and optionally a category description.
+    # category name and optionally a category description. The category name can be an 
+    # array of strings - in that case, a hierarchy of categories is created
+    # with the first array item being the top level category name.
+    # Shapes are added to an existing category, if a category with the given
+    # name already exists.
     #
     # If the layout is selected for the output, the specification can consist of
     # one to three parameters: a layer number, a data type (optional, default is 0)

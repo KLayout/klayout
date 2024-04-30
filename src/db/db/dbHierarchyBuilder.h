@@ -389,7 +389,7 @@ public:
    *  The first cell is either the original, non-variant target cell or itself a variant.
    *  The second cell will be registered as a variant of the first one.
    */
-  void register_variant (db::cell_index_type non_var, db::cell_index_type var);
+  void register_variant (db::cell_index_type non_var, db::cell_index_type var, const std::string &description);
 
   /**
    *  @brief Unregisters a cell as a variant
@@ -405,7 +405,22 @@ public:
   }
 
   /**
+   *  @brief Gets the information about the target/source + variant relationship
+   *
+   *  For a target cell, returns a pointer to a pair with the cell index of the source cell and
+   *  a string describing the variant this cell forms of the source cell.
+   *
+   *  The description string is empty if the cell is not a variant.
+   */
+  const std::pair<db::cell_index_type, std::string> &variant_of_source (db::cell_index_type target) const;
+
+  /**
    *  @brief Gets the original target for a variant cell
+   *
+   *  The original cell is the first-generation target-space cell that variants have been created for.
+   *  This still can mean that the original cell is a clip variant of a source cell.
+   *
+   *  Target-to-source variants can be derived with "variant_of_source".
    */
   db::cell_index_type original_target_for_variant (db::cell_index_type ci) const;
 
@@ -419,6 +434,7 @@ private:
   cell_map_type m_cell_map;
   original_target_to_variants_map_type m_original_targets_to_variants_map;
   variant_to_original_target_map_type m_variants_to_original_target_map;
+  std::map<db::cell_index_type, std::pair<db::cell_index_type, std::string> > m_variants_of_sources_map;
 
   std::set<cell_map_type::key_type> m_cells_seen;
   std::set<db::cell_index_type> m_cells_to_be_filled;

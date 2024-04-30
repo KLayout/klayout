@@ -174,10 +174,28 @@ public:
   const rdb::Cell *cell_for_id (const db::Layout *layout, db::cell_index_type ci)
   {
     tl_assert (layout != 0);
+
     std::string cn = layout->cell_name (ci);
-    const rdb::Cell *rdb_cell = mp_rdb->cell_by_qname (cn);
+    std::string layout_cn = cn;
+    std::string qname = cn;
+    std::string var;
+
+    //  resolve references to original cells in deep mode and determine variant
+    if (layout->builder ()) {
+      const db::Layout *source = layout->builder ()->source ().layout ();
+      if (source) {
+        const std::pair<db::cell_index_type, std::string> &vs = layout->builder ()->variant_of_source (ci);
+        if (! vs.second.empty () && source->is_valid_cell_index (vs.first)) {
+          var = vs.second;
+          cn = source->cell_name (vs.first);
+          qname = cn + ":" + var;
+        }
+      }
+    }
+
+    const rdb::Cell *rdb_cell = mp_rdb->cell_by_qname (qname);
     if (! rdb_cell) {
-      return mp_rdb->create_cell (cn);
+      return mp_rdb->create_cell (cn, var, layout_cn);
     } else {
       return rdb_cell;
     }

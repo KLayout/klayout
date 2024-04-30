@@ -24,6 +24,7 @@
   <cell>
    <name>TOP</name>
    <variant/>
+   <layout-name/>
    <references>
    </references>
   </cell>
@@ -35,6 +36,7 @@
    <cell>TOP</cell>
    <visited>false</visited>
    <multiplicity>1</multiplicity>
+   <comment/>
    <image/>
    <values>
     <value>edge-pair: (-0.2,0.7;1,0.7)|(1,1.1;-0.2,1.1)</value>
@@ -46,6 +48,7 @@
    <cell>TOP</cell>
    <visited>false</visited>
    <multiplicity>1</multiplicity>
+   <comment/>
    <image/>
    <values>
     <value>edge-pair: (0,0;0,0.9)|(0.3,0.9;0.3,0)</value>
@@ -57,6 +60,7 @@
    <cell>TOP</cell>
    <visited>false</visited>
    <multiplicity>1</multiplicity>
+   <comment/>
    <image/>
    <values>
     <value>edge-pair: (0.3,0;0,0)|(0,0.9;0.3,0.9)</value>
@@ -68,6 +72,7 @@
    <cell>TOP</cell>
    <visited>false</visited>
    <multiplicity>1</multiplicity>
+   <comment/>
    <image/>
    <values>
     <value>edge-pair: (0.5,0;0.5,0.9)|(0.8,0.9;0.8,0)</value>
@@ -79,6 +84,7 @@
    <cell>TOP</cell>
    <visited>false</visited>
    <multiplicity>1</multiplicity>
+   <comment/>
    <image/>
    <values>
     <value>edge-pair: (0.8,0;0.5,0)|(0.5,0.9;0.8,0.9)</value>

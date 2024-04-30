@@ -69,15 +69,15 @@ void run_rve_test (tl::TestBase *_this, const std::string &fn_rve, const std::st
 
 TEST(1)
 {
-  run_rve_test (_this, "rve1.db", "rve1_au.txt");
+  run_rve_test (_this, "rve1.db", "rve1_au_2.txt");
 }
 
 TEST(2)
 {
-  run_rve_test (_this, "rve2.db", "rve2_au.txt");
+  run_rve_test (_this, "rve2.db", "rve2_au_2.txt");
 }
 
 TEST(3)
 {
-  run_rve_test (_this, "rve3.db", "rve3_au.txt");
+  run_rve_test (_this, "rve3.db", "rve3_au_2.txt");
 }

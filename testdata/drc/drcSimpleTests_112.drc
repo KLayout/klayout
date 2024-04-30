@@ -1,0 +1,16 @@
+
+source($drc_test_source)
+report("Report comment with\nanother line", $drc_test_report)
+
+deep
+
+l1 = input(1, 0)
+l1 = l1.sized(0.1, 0.0)
+
+l1.output(["inputs", "l1"], "L1 (1/0 sized by x=100nm,y=0)")
+l1.width(1.0.um).output("w1um", "w < 1µm\nAnother line")
+
+l1s = l1.snapped(200.nm)
+l1s.output([ "inputs", "l1_snapped" ], "L1 snapped to 200nm")
+l1s.width(1.0.um).output("w1um_snapped", "w < 1µm\nFrom snapped input")
+

@@ -33,9 +33,11 @@
 #include "layConverters.h"
 #include "layQtTools.h"
 #include "layConfigurationDialog.h"
+#include "layBrowserDialog.h"
 #include "dbLayoutUtils.h"
 #include "dbRecursiveShapeIterator.h"
 #include "dbStream.h"
+#include "tlFileUtils.h"
 
 #include "ui_MarkerBrowserDialog.h"
 
@@ -84,34 +86,35 @@ MarkerBrowserDialog::MarkerBrowserDialog (lay::Dispatcher *root, lay::LayoutView
     view ()->rdb_list_changed_event.add (this, &MarkerBrowserDialog::rdbs_changed);
   }
 
-  m_open_action = new QAction (QObject::tr ("Open"), mp_ui->file_menu);
-  m_saveas_action = new QAction (QObject::tr ("Save As"), mp_ui->file_menu);
-  m_export_action = new QAction (QObject::tr ("Export To Layout"), mp_ui->file_menu);
-  m_reload_action = new QAction (QObject::tr ("Reload"), mp_ui->file_menu);
-  m_unload_action = new QAction (QObject::tr ("Unload"), mp_ui->file_menu);
-  m_unload_all_action = new QAction (QObject::tr ("Unload All"), mp_ui->file_menu);
+  connect (mp_ui->open_action, SIGNAL (triggered ()), this, SLOT (open_clicked ()));
+  connect (mp_ui->save_action, SIGNAL (triggered ()), this, SLOT (save_clicked ()));
+  connect (mp_ui->saveas_action, SIGNAL (triggered ()), this, SLOT (saveas_clicked ()));
+  connect (mp_ui->saveas_waiver_db_action, SIGNAL (triggered ()), this, SLOT (saveas_waiver_db_clicked ()));
+  connect (mp_ui->apply_waiver_db_action, SIGNAL (triggered ()), this, SLOT (apply_waiver_db_clicked ()));
+  connect (mp_ui->export_action, SIGNAL (triggered ()), this, SLOT (export_clicked ()));
+  connect (mp_ui->reload_action, SIGNAL (triggered ()), this, SLOT (reload_clicked ()));
+  connect (mp_ui->info_action, SIGNAL (triggered ()), this, SLOT (info_clicked ()));
+  connect (mp_ui->unload_action, SIGNAL (triggered ()), this, SLOT (unload_clicked ()));
+  connect (mp_ui->unload_all_action, SIGNAL (triggered ()), this, SLOT (unload_all_clicked ()));
 
-  connect (m_open_action, SIGNAL (triggered ()), this, SLOT (open_clicked ()));
-  connect (m_saveas_action, SIGNAL (triggered ()), this, SLOT (saveas_clicked ()));
-  connect (m_export_action, SIGNAL (triggered ()), this, SLOT (export_clicked ()));
-  connect (m_reload_action, SIGNAL (triggered ()), this, SLOT (reload_clicked ()));
-  connect (m_unload_action, SIGNAL (triggered ()), this, SLOT (unload_clicked ()));
-  connect (m_unload_all_action, SIGNAL (triggered ()), this, SLOT (unload_all_clicked ()));
-
-  mp_ui->file_menu->addAction (m_open_action);
-  mp_ui->file_menu->addAction (m_saveas_action);
+  mp_ui->file_menu->addAction (mp_ui->open_action);
+  mp_ui->file_menu->addAction (mp_ui->save_action);
+  mp_ui->file_menu->addAction (mp_ui->saveas_action);
+  mp_ui->file_menu->addAction (mp_ui->saveas_waiver_db_action);
+  mp_ui->file_menu->addAction (mp_ui->apply_waiver_db_action);
   QAction *sep0 = new QAction (mp_ui->file_menu);
   sep0->setSeparator (true);
-  mp_ui->file_menu->addAction (m_export_action);
+  mp_ui->file_menu->addAction (mp_ui->export_action);
   QAction *sep1 = new QAction (mp_ui->file_menu);
   sep1->setSeparator (true);
   mp_ui->file_menu->addAction (sep1);
-  mp_ui->file_menu->addAction (m_reload_action);
+  mp_ui->file_menu->addAction (mp_ui->reload_action);
+  mp_ui->file_menu->addAction (mp_ui->info_action);
   QAction *sep2 = new QAction (mp_ui->file_menu);
   sep2->setSeparator (true);
   mp_ui->file_menu->addAction (sep2);
-  mp_ui->file_menu->addAction (m_unload_action);
-  mp_ui->file_menu->addAction (m_unload_all_action);
+  mp_ui->file_menu->addAction (mp_ui->unload_action);
+  mp_ui->file_menu->addAction (mp_ui->unload_all_action);
 
   connect (mp_ui->layout_cb, SIGNAL (activated (int)), this, SLOT (cv_index_changed (int)));
   connect (mp_ui->rdb_cb, SIGNAL (activated (int)), this, SLOT (rdb_index_changed (int)));
@@ -368,6 +371,99 @@ END_PROTECTED
 }
 
 void
+MarkerBrowserDialog::save_clicked ()
+{
+BEGIN_PROTECTED
+
+  if (m_rdb_index < int (view ()->num_rdbs ()) && m_rdb_index >= 0) {
+
+    rdb::Database *rdb = view ()->get_rdb (m_rdb_index);
+    if (rdb) {
+
+      if (rdb->filename ().empty ()) {
+
+        saveas_clicked ();
+
+      } else {
+
+        rdb->save (rdb->filename ());
+        rdb->reset_modified ();
+
+      }
+
+    }
+
+  }
+
+END_PROTECTED
+}
+
+void
+MarkerBrowserDialog::apply_waiver_db_clicked ()
+{
+BEGIN_PROTECTED
+
+  rdb::Database *rdb = 0;
+  if (m_rdb_index < int (view ()->num_rdbs ()) && m_rdb_index >= 0) {
+    rdb = view ()->get_rdb (m_rdb_index);
+  }
+  if (! rdb) {
+    return;
+  }
+
+  std::string wdb_filename;
+  if (! rdb->filename ().empty () && tl::file_exists (rdb->filename () + ".w")) {
+
+    wdb_filename = rdb->filename () + ".w";
+
+  } else {
+
+    //  prepare and open the file dialog
+    lay::FileDialog open_dialog (this, tl::to_string (QObject::tr ("Apply Waiver DB File")), "Waiver DB files (*.w)");
+
+    if (! rdb->filename ().empty ()) {
+      wdb_filename = rdb->filename () + ".w";
+    }
+
+    if (! open_dialog.get_open (wdb_filename)) {
+      return;
+    }
+
+  }
+
+  rdb::Database wdb;
+  wdb.load (wdb_filename);
+
+  mp_ui->browser_frame->set_rdb (0);
+  rdb->apply (wdb);
+  mp_ui->browser_frame->set_rdb (rdb);
+
+END_PROTECTED
+}
+
+void
+MarkerBrowserDialog::saveas_waiver_db_clicked ()
+{
+BEGIN_PROTECTED
+
+  rdb::Database *rdb = 0;
+  if (m_rdb_index < int (view ()->num_rdbs ()) && m_rdb_index >= 0) {
+    rdb = view ()->get_rdb (m_rdb_index);
+  }
+  if (! rdb) {
+    return;
+  }
+
+  if (rdb->filename ().empty ()) {
+    throw tl::Exception (tl::to_string (tr ("The current report database is not saved.\nSave it to some file with 'Save As', before saving it as waiver DB.")));
+  }
+
+  rdb->write (rdb->filename () + ".w");
+
+END_PROTECTED
+}
+
+void
 MarkerBrowserDialog::saveas_clicked ()
 {
 BEGIN_PROTECTED
@@ -385,6 +481,9 @@ BEGIN_PROTECTED
         rdb->save (fn);
         rdb->reset_modified ();
 
+        //  update the RDB title strings
+        rdbs_changed ();
+
       }
 
     }
@@ -392,6 +491,42 @@ BEGIN_PROTECTED
   }
 
 END_PROTECTED
+}
+
+void
+MarkerBrowserDialog::info_clicked ()
+{
+  rdb::Database *rdb = 0;
+  if (m_rdb_index < int (view ()->num_rdbs ()) && m_rdb_index >= 0) {
+    rdb = view ()->get_rdb (m_rdb_index);
+  }
+  if (! rdb) {
+    return;
+  }
+
+  std::string html;
+  html = "<html><body>\n";
+  html += "<h2>" + tl::escaped_to_html (rdb->name ()) + "</h2>\n";
+  if (! rdb->description ().empty ()) {
+    html += "<b>" + tl::to_string (tr ("Description: ")) + "</b>" + tl::escaped_to_html (tl::escape_string (rdb->description ())) + "<br/>\n";
+  }
+  if (! rdb->filename ().empty ()) {
+    html += "<b>" + tl::to_string (tr ("File: ")) + "</b>" + tl::escaped_to_html (rdb->filename ()) + "<br/>\n";
+  }
+  if (! rdb->original_file ().empty ()) {
+    html += "<b>" + tl::to_string (tr ("Original File: ")) + "</b>" + tl::escaped_to_html (rdb->original_file ()) + "<br/>\n";
+  }
+  if (! rdb->top_cell_name ().empty ()) {
+    html += "<b>" + tl::to_string (tr ("Top Cell: ")) + "</b>" + tl::escaped_to_html (rdb->top_cell_name ()) + "<br/>\n";
+  }
+  if (! rdb->generator ().empty ()) {
+    html += "<b>" + tl::to_string (tr ("Generator: ")) + "</b>" + tl::escaped_to_html (rdb->generator ()) + "<br/>\n";
+  }
+  html += "</body></html>";
+
+  std::unique_ptr<lay::BrowserDialog> info_dialog (new lay::BrowserDialog (this, html));
+  info_dialog->setWindowTitle (QObject::tr ("Marker Database Info"));
+  info_dialog->exec ();
 }
 
 void
@@ -439,6 +574,7 @@ BEGIN_PROTECTED
 
     int rdb_index = view ()->add_rdb (db.release ());
     mp_ui->rdb_cb->setCurrentIndex (rdb_index);
+
     //  it looks like the setCurrentIndex does not issue this signal:
     rdb_index_changed (rdb_index);
 
@@ -592,8 +728,12 @@ MarkerBrowserDialog::rdbs_changed ()
     std::string text = rdb->name ();
     if (! rdb->description ().empty ()) {
       text += " (";
-      text += rdb->description ();
+      text += tl::escape_string (rdb->description ());
       text += ")";
+    }
+    if (! rdb->filename ().empty () && rdb->name () != rdb->filename ()) {
+      text += " - ";
+      text += rdb->filename ();
     }
     mp_ui->rdb_cb->addItem (tl::to_qstring (text));
     if (rdb->name () == m_rdb_name) {
@@ -688,11 +828,15 @@ MarkerBrowserDialog::update_content ()
     mp_ui->central_stack->setCurrentIndex (1);
   }
 
-  m_saveas_action->setEnabled (rdb != 0);
-  m_export_action->setEnabled (rdb != 0);
-  m_unload_action->setEnabled (rdb != 0);
-  m_unload_all_action->setEnabled (rdb != 0);
-  m_reload_action->setEnabled (rdb != 0);
+  mp_ui->save_action->setEnabled (rdb != 0);
+  mp_ui->saveas_action->setEnabled (rdb != 0);
+  mp_ui->saveas_waiver_db_action->setEnabled (rdb != 0);
+  mp_ui->apply_waiver_db_action->setEnabled (rdb != 0);
+  mp_ui->export_action->setEnabled (rdb != 0);
+  mp_ui->unload_action->setEnabled (rdb != 0);
+  mp_ui->unload_all_action->setEnabled (rdb != 0);
+  mp_ui->reload_action->setEnabled (rdb != 0);
+  mp_ui->info_action->setEnabled (rdb != 0);
 
   mp_ui->browser_frame->enable_updates (false);  //  Avoid building the internal lists several times ...
   mp_ui->browser_frame->set_rdb (0);    //  force update

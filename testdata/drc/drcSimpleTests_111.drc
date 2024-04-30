@@ -1,0 +1,14 @@
+
+source($drc_test_source)
+report("Report comment with\nanother line", $drc_test_report)
+
+deep
+
+l1 = input(1, 0)
+l1s = l1.sized(0.1, 0.0)
+
+l1.output([ "input", "L1" ], "Original layer")
+l1s.output([ "input", "L1S" ], "Sized original layer")
+
+l1s.width(1.0.um).output("w1um", "w < 1µm\nFrom sized input")
+

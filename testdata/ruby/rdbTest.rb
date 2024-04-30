@@ -76,16 +76,22 @@ class RDB_TestClass < TestBase
     assert_equal(cell.name, "cell_name")
     assert_equal(cell.rdb_id, 1)
 
-    cell2 = db.create_cell("cell_name", "var1")
+    cell2 = db.create_cell("new_cell", "var1")
+    assert_equal(cell2.name, "new_cell")
+    assert_equal(cell2.layout_name, "")
+    assert_equal(cell2.qname, "new_cell:var1")
+
+    cell2 = db.create_cell("cell_name", "var1", "cell_name$1")
     assert_equal(cell.name, "cell_name")
     assert_equal(cell.qname, "cell_name:1")
     assert_equal(db.cell_by_qname("cell_name:1").rdb_id, cell.rdb_id)
     assert_equal(db.cell_by_id(cell.rdb_id).rdb_id, cell.rdb_id)
     assert_equal(cell2.name, "cell_name")
+    assert_equal(cell2.layout_name, "cell_name$1")
     assert_equal(cell2.qname, "cell_name:var1")
     assert_equal(db.cell_by_qname("cell_name:var1").rdb_id, cell2.rdb_id)
     assert_equal(db.cell_by_id(cell2.rdb_id).rdb_id, cell2.rdb_id)
-    assert_equal(cell2.rdb_id, 2)
+    assert_equal(cell2.rdb_id, 3)
     assert_equal(cell.num_items, 0)
     assert_equal(cell2.num_items, 0)
     assert_equal(cell.num_items_visited, 0)
@@ -98,19 +104,19 @@ class RDB_TestClass < TestBase
     
     cc = []
     db.each_cell { |c| cc.push(c) }
-    assert_equal(cc.size, 2)
+    assert_equal(cc.size, 3)
     assert_equal(cc[0].rdb_id, cell.rdb_id)
-    assert_equal(cc[1].rdb_id, cell2.rdb_id)
+    assert_equal(cc[2].rdb_id, cell2.rdb_id)
 
     cat = db.create_category("cat")
     assert_equal(cat.database.inspect, db.inspect)
     assert_equal(cat.name, "cat")
-    assert_equal(cat.rdb_id, 3)
+    assert_equal(cat.rdb_id, 4)
     assert_equal(cat.path, "cat")
 
     cats = db.create_category(cat, "subcat")
     assert_equal(cats.name, "subcat")
-    assert_equal(cats.rdb_id, 4)
+    assert_equal(cats.rdb_id, 5)
     assert_equal(cats.path, "cat.subcat")
     assert_equal(cats.parent.rdb_id, cat.rdb_id)
 
@@ -424,6 +430,10 @@ class RDB_TestClass < TestBase
     
     assert_equal(item.image_str, "")
     assert_equal(item.has_image?, false)
+
+    assert_equal(item.comment, "")
+    item.comment = "abc"
+    assert_equal(item.comment, "abc")
 
     # can actually by any string, but only base64-encoded PNG images make sense
     is="iVBORw0KGgoAAAANSUhEUgAAACoAAAA0CAIAAABzfT3nAAAAA3NCSVQICAjb4U/gAAAACXBIWXMAAA0SAAANOgHo3ZneAAAA3UlEQVRYhe2WwQ3DIAxFoco8XaGZIaeO43FyYgZYgYXcQ6SWuDGgBhWq/qccIvGCEd9SbAwAAPSGaW2lFR2rfWDpXrPpSe2SP10fvnn/PZHZH9IwbKFVZZ/Z6wMtZcjW02Bn2FVpZYdWdkr2nvh23S2FyDNJuVITpwmRjTGbNr0v20U5byNtJuuJt/fO2f93+UlbEJl5UjVPr3Y71EQ/PoPPlU+lDJtWlCt3GwCMG33BuJGAcWMEMG6c1jBudCyf/nzV8nbZPRohclFLHdGbZ8eNSjN1fmf0AACA1jwA4hKxu4C6P7EAAAAASUVORK5CYII="

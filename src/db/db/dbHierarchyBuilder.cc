@@ -182,14 +182,24 @@ HierarchyBuilder::reset ()
 
   m_cells_to_be_filled.clear ();
   m_cell_map.clear ();
+  m_variants_of_sources_map.clear ();
   m_cells_seen.clear ();
   m_cell_stack.clear ();
   m_cm_entry = null_iterator;
   m_cm_new_entry = false;
 }
 
+const std::pair<db::cell_index_type, std::string> &
+HierarchyBuilder::variant_of_source (db::cell_index_type target) const
+{
+  static std::pair<db::cell_index_type, std::string> def (std::numeric_limits<db::cell_index_type>::max (), std::string ());
+
+  auto vs = m_variants_of_sources_map.find (target);
+  return vs != m_variants_of_sources_map.end () ? vs->second : def;
+}
+
 void
-HierarchyBuilder::register_variant (db::cell_index_type non_var, db::cell_index_type var)
+HierarchyBuilder::register_variant (db::cell_index_type non_var, db::cell_index_type var, const std::string &description)
 {
   //  non_var (despite its name) may be a variant created previously.
   variant_to_original_target_map_type::const_iterator v = m_variants_to_original_target_map.find (non_var);
@@ -199,11 +209,23 @@ HierarchyBuilder::register_variant (db::cell_index_type non_var, db::cell_index_
 
   m_original_targets_to_variants_map [non_var].push_back (var);
   m_variants_to_original_target_map.insert (std::make_pair (var, non_var));
+
+  auto vs = m_variants_of_sources_map.find (non_var);
+  if (vs != m_variants_of_sources_map.end ()) {
+    std::string new_description = vs->second.second;
+    if (! new_description.empty ()) {
+      new_description += ";";
+    }
+    new_description += description;
+    m_variants_of_sources_map [var] = std::make_pair (vs->second.first, new_description);
+  }
 }
 
 void
 HierarchyBuilder::unregister_variant (db::cell_index_type var)
 {
+  m_variants_of_sources_map.erase (var);
+
   variant_to_original_target_map_type::iterator v = m_variants_to_original_target_map.find (var);
   if (v == m_variants_to_original_target_map.end ()) {
     return;
@@ -257,6 +279,7 @@ HierarchyBuilder::begin (const RecursiveShapeIterator *iter)
   if (m_cm_entry == m_cell_map.end ()) {
     db::cell_index_type new_top_index = mp_target->add_cell (iter->layout ()->cell_name (key.original_cell));
     m_cm_entry = m_cell_map.insert (std::make_pair (key, new_top_index)).first;
+    m_variants_of_sources_map.insert (std::make_pair (new_top_index, std::make_pair (key.original_cell, std::string ())));
   }
 
   db::Cell &new_top = mp_target->cell (m_cm_entry->second);
@@ -324,16 +347,33 @@ HierarchyBuilder::make_cell_variant (const HierarchyBuilder::CellMapKey &key, co
   if (m_cm_entry == m_cell_map.end ()) {
 
     std::string cn = cell_name;
+    std::string description;
     if (! key.clip_region.empty ()) {
       cn += "$CLIP_VAR";
+      description += "CLIP";
+
     }
     if (key.inactive) {
       cn += "$DIS";
+      if (! description.empty ()) {
+        description += "/";
+      }
+      description += "DISABLED";
     }
+
     new_cell = mp_target->add_cell (cn.c_str ());
+
+    std::string new_name = mp_target->cell_name (new_cell);
+    if (new_name.size () > cn.size ()) {
+      //  use cell name extension to uniquify the description
+      description += new_name.c_str () + cn.size ();
+    }
+
     m_cm_entry = m_cell_map.insert (std::make_pair (key, new_cell)).first;
     m_cm_new_entry = true;
     m_cells_to_be_filled.insert (new_cell);
+
+    m_variants_of_sources_map.insert (std::make_pair (new_cell, std::make_pair (key.original_cell, description)));
 
   } else {
     new_cell = m_cm_entry->second;

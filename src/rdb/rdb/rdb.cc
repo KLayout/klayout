@@ -60,16 +60,18 @@ namespace rdb
 //  type index specializations
 
 template <> RDB_PUBLIC int type_index_of<double> ()        { return 0; }
-template <> RDB_PUBLIC int type_index_of<std::string> ()   { return 1; }
-template <> RDB_PUBLIC int type_index_of<db::DPolygon> ()  { return 2; }
-template <> RDB_PUBLIC int type_index_of<db::DEdge> ()     { return 3; }
-template <> RDB_PUBLIC int type_index_of<db::DEdgePair> () { return 4; }
-template <> RDB_PUBLIC int type_index_of<db::DBox> ()      { return 5; }
-template <> RDB_PUBLIC int type_index_of<db::DPath> ()     { return 6; }
-template <> RDB_PUBLIC int type_index_of<db::DText> ()     { return 7; }
+template <> RDB_PUBLIC int type_index_of<int> ()           { return 1; }
+template <> RDB_PUBLIC int type_index_of<std::string> ()   { return 2; }
+template <> RDB_PUBLIC int type_index_of<db::DPolygon> ()  { return 3; }
+template <> RDB_PUBLIC int type_index_of<db::DEdge> ()     { return 4; }
+template <> RDB_PUBLIC int type_index_of<db::DEdgePair> () { return 5; }
+template <> RDB_PUBLIC int type_index_of<db::DBox> ()      { return 6; }
+template <> RDB_PUBLIC int type_index_of<db::DPath> ()     { return 7; }
+template <> RDB_PUBLIC int type_index_of<db::DText> ()     { return 8; }
 
 //  Explicit instantiations to make VC++ happy in debug mode
 template class RDB_PUBLIC Value<double>;
+template class RDB_PUBLIC Value<int>;
 template class RDB_PUBLIC Value<std::string>;
 template class RDB_PUBLIC Value<db::DPolygon>;
 template class RDB_PUBLIC Value<db::DEdge>;
@@ -83,6 +85,11 @@ template class RDB_PUBLIC Value<db::DText>;
 template <> RDB_PUBLIC std::string Value<double>::to_string () const
 {
   return "float: " + tl::to_string (m_value);
+}
+
+template <> RDB_PUBLIC std::string Value<int>::to_string () const
+{
+  return "int: " + tl::to_string (m_value);
 }
 
 template <> RDB_PUBLIC std::string Value<std::string>::to_string () const
@@ -127,6 +134,11 @@ template <> RDB_PUBLIC std::string Value<double>::to_display_string () const
   return tl::to_string (m_value);
 }
 
+template <> RDB_PUBLIC std::string Value<int>::to_display_string () const
+{
+  return tl::to_string (m_value);
+}
+
 template <> RDB_PUBLIC std::string Value<std::string>::to_display_string () const
 {
   return m_value;
@@ -162,9 +174,70 @@ template <> RDB_PUBLIC std::string Value<db::DText>::to_display_string () const
   return to_string ();
 }
 
+//  compare implementations
+
+template <> RDB_PUBLIC bool Value<double>::compare (const ValueBase *o) const
+{
+  const Value<double> *other = static_cast<const Value<double> *> (o);
+  return m_value < other->m_value - db::epsilon;
+}
+
+template <> RDB_PUBLIC bool Value<int>::compare (const ValueBase *o) const
+{
+  const Value<int> *other = static_cast<const Value<int> *> (o);
+  return m_value < other->m_value;
+}
+
+template <> RDB_PUBLIC bool Value<std::string>::compare (const ValueBase *o) const
+{
+  const Value<std::string> *other = static_cast<const Value<std::string> *> (o);
+  return m_value < other->m_value;
+}
+
+template <> RDB_PUBLIC bool Value<db::DPolygon>::compare (const ValueBase *o) const
+{
+  const Value<db::DPolygon> *other = static_cast<const Value<db::DPolygon> *> (o);
+  return m_value.less (other->m_value);
+}
+
+template <> RDB_PUBLIC bool Value<db::DEdge>::compare (const ValueBase *o) const
+{
+  const Value<db::DEdge> *other = static_cast<const Value<db::DEdge> *> (o);
+  return m_value.less (other->m_value);
+}
+
+template <> RDB_PUBLIC bool Value<db::DEdgePair>::compare (const ValueBase *o) const
+{
+  const Value<db::DEdgePair> *other = static_cast<const Value<db::DEdgePair> *> (o);
+  return m_value.less (other->m_value);
+}
+
+template <> RDB_PUBLIC bool Value<db::DBox>::compare (const ValueBase *o) const
+{
+  const Value<db::DBox> *other = static_cast<const Value<db::DBox> *> (o);
+  return m_value.less (other->m_value);
+}
+
+template <> RDB_PUBLIC bool Value<db::DPath>::compare (const ValueBase *o) const
+{
+  const Value<db::DPath> *other = static_cast<const Value<db::DPath> *> (o);
+  return m_value.less (other->m_value);
+}
+
+template <> RDB_PUBLIC bool Value<db::DText>::compare (const ValueBase *o) const
+{
+  const Value<db::DText> *other = static_cast<const Value<db::DText> *> (o);
+  return m_value.less (other->m_value);
+}
+
 //  is_shape implementations
 
 template <> RDB_PUBLIC bool Value<double>::is_shape () const
+{
+  return false;
+}
+
+template <> RDB_PUBLIC bool Value<int>::is_shape () const
 {
   return false;
 }
@@ -403,6 +476,58 @@ Values::operator= (const Values &d)
   return *this;
 }
 
+bool
+Values::compare (const Values &other, const std::map<id_type, id_type> &tag_map, const std::map<id_type, id_type> &rev_tag_map) const
+{
+  Values::const_iterator a = begin (), b = other.begin ();
+  while (a != end () && b != other.end ()) {
+
+    id_type t12 = 0;
+    while (a != end () && a->tag_id () != 0) {
+      auto j = tag_map.find (a->tag_id ());
+      if (j != tag_map.end ()) {
+        t12 = j->second;
+        break;
+      }
+      ++a;
+    }
+
+    id_type t2 = 0;
+    while (b != other.end () && b->tag_id () != 0) {
+      auto j = rev_tag_map.find (b->tag_id ());
+      if (j != rev_tag_map.end ()) {
+        t2 = j->first;
+        break;
+      }
+      ++b;
+    }
+
+    if (a == end () || b == other.end ()) {
+      return b != other.end ();
+    }
+
+    if (t12 != t2) {
+      return t12 < t2;
+    }
+
+    if (a->get () && b->get ()) {
+      if (rdb::ValueBase::compare (a->get (), b->get ())) {
+        return true;
+      } else if (rdb::ValueBase::compare (b->get (), a->get ())) {
+        return false;
+      }
+    } else if ((a->get () != 0) != (b->get () != 0)) {
+      return (a->get () != 0) < (b->get () != 0);
+    }
+
+    ++a;
+    ++b;
+
+  }
+
+  return b != other.end ();
+}
+
 std::string 
 Values::to_string (const Database *rdb) const
 {
@@ -447,7 +572,7 @@ Cells::import_cell (const Cell &c)
 {
   Cell *cell;
   if (mp_database) {
-    cell = mp_database->create_cell (c.name (), c.variant ());
+    cell = mp_database->create_cell (c.name (), c.variant (), c.layout_name ());
   } else {
     cell = new Cell (0, c.name ());
     add_cell (cell);
@@ -479,8 +604,8 @@ Cell::Cell (id_type id, const std::string &name)
   //  .. nothing yet ..
 }
 
-Cell::Cell (id_type id, const std::string &name, const std::string &variant)
-  : m_id (id), m_name (name), m_variant (variant), m_num_items (0), m_num_items_visited (0), mp_database (0)
+Cell::Cell (id_type id, const std::string &name, const std::string &variant, const std::string &layout_name = std::string ())
+  : m_id (id), m_name (name), m_variant (variant), m_layout_name (layout_name), m_num_items (0), m_num_items_visited (0), mp_database (0)
 {
   //  .. nothing yet ..
 }
@@ -812,14 +937,14 @@ Tags::tag (const std::string &name, bool user_tag)
 const Tag &
 Tags::tag (id_type id) const
 {
-  tl_assert (id - 1 < m_tags.size () && id > 0);
+  tl_assert (id < m_tags.size () + 1 && id > 0);
   return m_tags [id - 1];
 }
 
 Tag &
 Tags::tag (id_type id)
 {
-  tl_assert (id - 1 < m_tags.size () && id > 0);
+  tl_assert (id < m_tags.size () + 1 && id > 0);
   return m_tags [id - 1];
 }
 
@@ -870,6 +995,7 @@ Item &Item::operator= (const Item &d)
     m_category_id = d.m_category_id;
     m_visited = d.m_visited;
     m_multiplicity = d.m_multiplicity;
+    m_comment = d.m_comment;
     m_tag_ids = d.m_tag_ids;
     m_image_str = d.m_image_str;
   }
@@ -1205,6 +1331,10 @@ Database::import_cells (const Cells &cells)
 Category *
 Database::create_category (Category *parent, const std::string &name)
 {
+  if (! parent) {
+    return create_category (name);
+  }
+
   set_modified ();
 
   Category *cat = create_category (&parent->sub_categories (), name);
@@ -1252,7 +1382,7 @@ Database::category_by_id_non_const (id_type id)
 }
 
 Cell *
-Database::create_cell (const std::string &name, const std::string &variant)
+Database::create_cell (const std::string &name, const std::string &variant, const std::string &layout_name)
 {
   set_modified ();
 
@@ -1289,13 +1419,13 @@ Database::create_cell (const std::string &name, const std::string &variant)
         }
       }
 
-      new_cell = new Cell (++m_next_id, name, tl::to_string (variant_index + 1));
+      new_cell = new Cell (++m_next_id, name, tl::to_string (variant_index + 1), layout_name);
 
       variant->second.push_back (new_cell->id ());
 
     } else {
 
-      new_cell = new Cell (++m_next_id, name);
+      new_cell = new Cell (++m_next_id, name, std::string (), layout_name);
       
     }
 
@@ -1305,7 +1435,7 @@ Database::create_cell (const std::string &name, const std::string &variant)
 
   } else {
       
-    new_cell = new Cell (++m_next_id, name, variant);
+    new_cell = new Cell (++m_next_id, name, variant, layout_name);
     m_cells.add_cell (new_cell);
     m_cells_by_id.insert (std::make_pair (new_cell->id (), new_cell));
     m_cells_by_qname.insert (std::make_pair (new_cell->qname (), new_cell));
@@ -1397,6 +1527,13 @@ Database::remove_item_tag (const Item *item, id_type tag)
 {
   set_modified ();
   const_cast <Item *> (item)->remove_tag (tag);
+}
+
+void
+Database::set_item_comment (const Item *item, const std::string &comment)
+{
+  set_modified ();
+  const_cast <Item *> (item)->set_comment (comment);
 }
 
 #if defined(HAVE_QT)
@@ -1625,7 +1762,7 @@ read_db_from_layout (rdb::Database *db, tl::InputStream &is)
 }
 
 void
-Database::load (const std::string &fn)
+Database::load (std::string fn)
 {
   tl::log << "Loading RDB from " << fn;
 
@@ -1656,6 +1793,161 @@ Database::load (const std::string &fn)
 
   if (tl::verbosity () >= 10) {
     tl::info << "Loaded RDB from " << fn;
+  }
+}
+
+namespace
+{
+  class ValueMapEntryCompare
+  {
+  public:
+    ValueMapEntryCompare (const std::map<id_type, id_type> &tag2tag, const std::map<id_type, id_type> &rev_tag2tag)
+    {
+      mp_tag2tag = &tag2tag;
+      mp_rev_tag2tag = &rev_tag2tag;
+    }
+
+    bool operator() (const Item *a, const Item *b) const
+    {
+      return a->values ().compare (b->values (), *mp_tag2tag, *mp_rev_tag2tag);
+    }
+
+  private:
+    const std::map<id_type, id_type> *mp_tag2tag;
+    const std::map<id_type, id_type> *mp_rev_tag2tag;
+  };
+
+  class ValueMapEntry
+  {
+  public:
+    ValueMapEntry ()
+      : mp_tag2tag (0), mp_rev_tag2tag (0)
+    { }
+
+    void build (const rdb::Database &rdb, id_type cell_id, id_type cat_id, const std::map<id_type, id_type> &tag2tag, const std::map<id_type, id_type> &rev_tag2tag)
+    {
+      mp_tag2tag = &tag2tag;
+      mp_rev_tag2tag = &rev_tag2tag;
+
+      auto i2i = rdb.items_by_cell_and_category (cell_id, cat_id);
+
+      size_t n = 0;
+      for (auto i = i2i.first; i != i2i.second; ++i) {
+        ++n;
+      }
+      m_items.reserve (n);
+
+      for (auto i = i2i.first; i != i2i.second; ++i) {
+        m_items.push_back ((*i).operator-> ());
+      }
+
+      ValueMapEntryCompare cmp (*mp_tag2tag, *mp_rev_tag2tag);
+      std::sort (m_items.begin (), m_items.end (), cmp);
+    }
+
+    const Item *find (const rdb::Item &item) const
+    {
+      ValueMapEntryCompare cmp (*mp_tag2tag, *mp_rev_tag2tag);
+
+      auto i = std::lower_bound (m_items.begin (), m_items.end (), &item, cmp);
+      if (i == m_items.end ()) {
+        return 0;
+      }
+
+      if (cmp (&item, *i) || cmp (*i, &item)) {
+        return 0;
+      } else {
+        return *i;
+      }
+    }
+
+  public:
+    std::vector<const Item *> m_items;
+    const std::map<id_type, id_type> *mp_tag2tag;
+    const std::map<id_type, id_type> *mp_rev_tag2tag;
+  };
+}
+
+static void map_category (const rdb::Category &cat, const rdb::Database &db, std::map<id_type, id_type> &cat2cat)
+{
+  const rdb::Category *this_cat = db.category_by_name (cat.path ());
+  if (this_cat) {
+    cat2cat.insert (std::make_pair (this_cat->id (), cat.id ()));
+  }
+
+  for (auto c = cat.sub_categories ().begin (); c != cat.sub_categories ().end (); ++c) {
+    map_category (*c, db, cat2cat);
+  }
+}
+
+void
+Database::apply (const rdb::Database &other)
+{
+  std::map<id_type, id_type> cell2cell;
+  std::map<id_type, id_type> cat2cat;
+  std::map<id_type, id_type> tag2tag;
+  std::map<id_type, id_type> rev_tag2tag;
+
+  for (auto c = other.cells ().begin (); c != other.cells ().end (); ++c) {
+    //  TODO: do we have a consistent scheme of naming variants? What requirements
+    //  exist towards detecting variant specific waivers
+    const rdb::Cell *this_cell = cell_by_qname (c->qname ());
+    if (this_cell) {
+      cell2cell.insert (std::make_pair (this_cell->id (), c->id ()));
+    }
+  }
+
+  for (auto c = other.categories ().begin (); c != other.categories ().end (); ++c) {
+    map_category (*c, *this, cat2cat);
+  }
+
+  std::map<std::string, id_type> tags_by_name;
+  for (auto c = tags ().begin_tags (); c != tags ().end_tags (); ++c) {
+    tags_by_name.insert (std::make_pair (c->name (), c->id ()));
+  }
+
+  for (auto c = other.tags ().begin_tags (); c != other.tags ().end_tags (); ++c) {
+    auto t = tags_by_name.find (c->name ());
+    if (t != tags_by_name.end ()) {
+      tag2tag.insert (std::make_pair (t->second, c->id ()));
+      rev_tag2tag.insert (std::make_pair (c->id (), t->second));
+    }
+  }
+
+  std::map<std::pair<id_type, id_type>, ValueMapEntry> value_map;
+
+  for (Items::iterator i = items_non_const ().begin (); i != items_non_const ().end (); ++i) {
+
+    auto icell = cell2cell.find (i->cell_id ());
+    if (icell == cell2cell.end ()) {
+      continue;
+    }
+
+    auto icat = cat2cat.find (i->category_id ());
+    if (icat == cat2cat.end ()) {
+      continue;
+    }
+
+    //  build a cache of value vs. value
+    auto vmap = value_map.find (std::make_pair (icell->second, icat->second));
+    if (vmap == value_map.end ()) {
+      vmap = value_map.insert (std::make_pair (std::make_pair (icell->second, icat->second), ValueMapEntry ())).first;
+      vmap->second.build (other, icell->second, icat->second, tag2tag, rev_tag2tag);
+    }
+
+    //  find a value in the reference DB
+    const rdb::Item *other = vmap->second.find (*i);
+    if (other) {
+
+      //  actually transfer the attributes here
+
+      i->set_comment (other->comment ());
+      //  TODO: this has some optimization potential in terms of performance ...
+      i->set_image_str (other->image_str ());
+      i->set_tag_str (other->tag_str ());
+
+    }
+
   }
 }
 

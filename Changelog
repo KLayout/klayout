@@ -1,4 +1,6 @@
 0.29.1           (2024-05-04):
+* Enhancement: %GITHUB%/issues/1700 Porting 2.5d view for compatibility with OpenGL 3.0 for better support on other platforms
+  This however comes with a larger memory footprint during rendering. Something to fix later.
 * Bugfix: %GITHUB%/issues/1696 Cannot read LVS or L2N report with generic devices
 * Bugfix: %GITHUB%/issues/1691 LVS soft connections: making a soft connection to a device terminal disconnects the device
 * Bugfix: %GITHUB%/issues/1683 Spice reader accepts circuits without definition but pins get shorted

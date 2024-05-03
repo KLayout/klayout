@@ -972,7 +972,7 @@ D25ViewWidget::do_initialize_gl ()
   static const char *shapes_fragment_shader_source =
       "#version 120\n"
       "\n"
-      "in float dp;\n"
+      "varying float dp;\n"
       "uniform highp float mist_factor;\n"
       "uniform highp float mist_add;\n"
       "uniform vec4 color;\n"

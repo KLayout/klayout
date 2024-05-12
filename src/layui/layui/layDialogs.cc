@@ -1209,7 +1209,8 @@ UserPropertiesForm::set_meta_info (db::Layout::meta_info_iterator begin_meta, db
 bool
 UserPropertiesForm::show (LayoutViewBase *view, unsigned int cv_index, db::properties_id_type &prop_id)
 {
-  return show (view, cv_index, prop_id, db::Layout::meta_info_iterator (), db::Layout::meta_info_iterator ());
+  db::Layout::meta_info_map no_meta;
+  return show (view, cv_index, prop_id, no_meta.begin (), no_meta.end ());
 }
 
 bool

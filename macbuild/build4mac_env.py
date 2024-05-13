@@ -182,7 +182,7 @@ RubySonoma      = { 'exe':  '/System/Library/Frameworks/Ruby.framework/Versions/
 #  install with 'sudo port install ruby33'
 # [Key Type Name] = 'MP33'
 Ruby33MacPorts  = { 'exe': '/opt/local/bin/ruby3.3',
-                    'inc': '/opt/local/include/ruby-3.3.0',
+                    'inc': '/opt/local/include/ruby-3.3.1',
                     'lib': '/opt/local/lib/libruby.3.3.dylib'
                   }
 

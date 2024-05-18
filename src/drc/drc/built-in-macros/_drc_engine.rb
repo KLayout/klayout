@@ -122,7 +122,7 @@ module DRC
 
         #  Apply waive DB if possible
         wdb_file = rdb_file + ".w"
-        if File.exists?(wdb_file)
+        if File.exist?(wdb_file)
           begin
             wdb = RBA::ReportDatabase::new
             wdb.load(wdb_file)

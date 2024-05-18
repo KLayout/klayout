@@ -189,8 +189,6 @@ private:
   std::string m_lefdef_map_file;
   int m_lefdef_macro_resolution_mode;
   std::vector<std::string> m_lefdef_lef_layout_files;
-
-  tl::shared_collection<db::Layout> m_lef_layouts;
 };
 
 /**

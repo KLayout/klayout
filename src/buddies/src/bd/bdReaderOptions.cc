@@ -805,29 +805,11 @@ GenericReaderOptions::configure (db::LoadLayoutOptions &load_options)
   load_options.set_option_by_name ("lefdef_config.macro_resolution_mode", m_lefdef_macro_resolution_mode);
   load_options.set_option_by_name ("lefdef_config.paths_relative_to_cwd", true);
 
-  m_lef_layouts.clear ();
-  tl::Variant lef_layout_ptrs = tl::Variant::empty_list ();
+  tl::Variant lef_layout_files = tl::Variant::empty_list ();
   for (std::vector<std::string>::const_iterator l = m_lefdef_lef_layout_files.begin (); l != m_lefdef_lef_layout_files.end (); ++l) {
-
-    try {
-
-      std::unique_ptr<db::Layout> ly (new db::Layout ());
-
-      tl::InputStream stream (*l);
-      db::Reader reader (stream);
-      db::LoadLayoutOptions load_options;
-      reader.read (*ly, load_options);
-
-      lef_layout_ptrs.push (tl::Variant::make_variant_ref (ly.get ()));
-      m_lef_layouts.push_back (ly.release ());
-
-    } catch (tl::Exception &ex) {
-      tl::warn << ex.msg ();
-    }
-
+    lef_layout_files.push (*l);
   }
-
-  load_options.set_option_by_name ("lefdef_config.macro_layouts", lef_layout_ptrs);
+  load_options.set_option_by_name ("lefdef_config.macro_layout_files", lef_layout_files);
 }
 
 static std::string::size_type find_file_sep (const std::string &s, std::string::size_type from)

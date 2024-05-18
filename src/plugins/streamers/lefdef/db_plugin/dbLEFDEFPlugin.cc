@@ -228,6 +228,11 @@ LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &opti
       db::Reader reader (macro_layout_stream);
       reader.read (*new_layout, options);
 
+      if (fabs (new_layout->dbu () / layout.dbu () - 1.0) > db::epsilon) {
+        importer.warn (tl::sprintf (tl::to_string (tr ("DBU of macro layout file '%s' is not compatible with reader DBU (layout DBU is %.12g, reader DBU is %.12g)")),
+                                    lp, new_layout->dbu (), layout.dbu ()));
+      }
+
     }
 
     for (std::vector<db::Layout *>::const_iterator m = macro_layouts.begin (); m != macro_layouts.end (); ++m) {

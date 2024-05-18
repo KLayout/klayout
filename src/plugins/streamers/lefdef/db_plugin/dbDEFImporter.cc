@@ -1704,6 +1704,10 @@ DEFImporter::do_read (db::Layout &layout)
       double units = get_double ();
       if (fabs (units) > 1e-6) {
         scale = 1.0 / (units * layout.dbu ());
+        if (fabs (scale - 1.0) > db::epsilon) {
+          warn (tl::sprintf (tl::to_string (tr ("DEF UNITS not matching reader DBU (DEF UNITS is %.12g and corresponds to a DBU of %.12g, but reader unit is %.12g)")),
+                             units, 1.0 / units, layout.dbu ()));
+        }
       }
       expect (";");
 

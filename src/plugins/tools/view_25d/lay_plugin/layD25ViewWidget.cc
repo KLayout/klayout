@@ -1095,23 +1095,24 @@ D25ViewWidget::paintGL ()
     return;
   }
 
+  if (! m_shapes_program || ! m_shapes_program_uniform_normals || ! m_lines_program || ! m_gridplane_program) {
+    return;
+  }
+
   const qreal retina_scale = devicePixelRatio ();
   glViewport (0, 0, width () * retina_scale, height () * retina_scale);
 
   tl::Color c = mp_view->background_color ();
   float foreground_rgb = (c.to_mono () ? 0.0f : 1.0f);
   float ambient = (c.to_mono () ? 0.8f : 0.25f);
+  QVector4D ambient_vec4 (ambient, ambient, ambient, 1.0);
   float mist_factor = (c.to_mono () ? 0.2f : 0.4f);
   float mist_add = (c.to_mono () ? 0.8f : 0.2f);
+  //  NOTE: z axis of illum points towards the scene because we include the z inversion in the scene transformation matrix
+  QVector3D illum_vec3 = QVector3D (-3.0, -4.0, 2.0).normalized ();
+
   glClearColor (float (c.red ()) / 255.0f, float (c.green ()) / 255.0f, float (c.blue ()) / 255.0f, 1.0);
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-  if (! m_shapes_program || ! m_shapes_program_uniform_normals || ! m_lines_program || ! m_gridplane_program) {
-    return;
-  }
-
-  int positions = m_shapes_program->attributeLocation ("posAttr");
-  int normals = m_shapes_program->attributeLocation ("normalsAttr");
 
   QMatrix4x4 scene_trans, scene_trans_wo_y;
 
@@ -1124,383 +1125,403 @@ D25ViewWidget::paintGL ()
   scene_trans_wo_y = scene_trans;
   scene_trans_wo_y.translate (QVector3D (0.0, -m_displacement.y (), 0.0));
 
-  m_shapes_program->bind ();
+  //  draw walls (triangles with normals)
 
-  //  draw the actual layout
+  {
+    QOpenGLShaderProgram *program = m_shapes_program;
 
-  m_shapes_program->setUniformValue ("matrix", cam_perspective () * cam_trans () * scene_trans);
+    int positions = program->attributeLocation ("posAttr");
+    int normals = program->attributeLocation ("normalsAttr");
 
-  //  NOTE: z axis of illum points towards the scene because we include the z inversion in the scene transformation matrix
-  m_shapes_program->setUniformValue ("illum", QVector3D (-3.0, -4.0, 2.0).normalized ());
+    program->bind ();
 
-  m_shapes_program->setUniformValue ("ambient", QVector4D (ambient, ambient, ambient, 1.0));
-  m_shapes_program->setUniformValue ("mist_factor", mist_factor);
-  m_shapes_program->setUniformValue ("mist_add", mist_add);
+    //  draw the actual layout
 
-  glEnable (GL_DEPTH_TEST);
-  glEnableVertexAttribArray (positions);
-  glEnableVertexAttribArray (normals);
+    program->setUniformValue ("matrix", cam_perspective () * cam_trans () * scene_trans);
+    program->setUniformValue ("illum", illum_vec3);
+    program->setUniformValue ("ambient", ambient_vec4);
+    program->setUniformValue ("mist_factor", mist_factor);
+    program->setUniformValue ("mist_add", mist_add);
 
-  for (std::vector<LayerInfo>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
+    glEnable (GL_DEPTH_TEST);
+    glEnableVertexAttribArray (positions);
+    glEnableVertexAttribArray (normals);
 
-    if (l->visible && l->fill_color [3] > 0.5) {
+    for (std::vector<LayerInfo>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
 
-      m_shapes_program->setUniformValue ("color", l->fill_color [0], l->fill_color [1], l->fill_color [2], l->fill_color [3]);
+      if (l->visible && l->fill_color [3] > 0.5) {
 
-      triangle_chunks_type::iterator v = l->vertex_chunk->begin ();
-      triangle_chunks_type::iterator n = l->normals_chunk->begin ();
+        program->setUniformValue ("color", l->fill_color [0], l->fill_color [1], l->fill_color [2], l->fill_color [3]);
 
-      while (v != l->vertex_chunk->end () && n != l->vertex_chunk->end ()) {
-        tl_assert (v->size () == n->size ());
-        glVertexAttribPointer (positions, 3, gl_type2enum<GLfloat> () (), GL_FALSE, 0, v->front ());
-        glVertexAttribPointer (normals, 3, gl_type2enum<GLfloat> () (), GL_FALSE, 0, n->front ());
-        //  TODO: use glDrawElements to draw indexed buffers for better memory usage
-        glDrawArrays (GL_TRIANGLES, 0, GLsizei (v->size () / 3));
-        ++v;
-        ++n;
-      }
+        triangle_chunks_type::iterator v = l->vertex_chunk->begin ();
+        triangle_chunks_type::iterator n = l->normals_chunk->begin ();
 
-    }
-  }
-
-  glDisableVertexAttribArray (positions);
-  glDisableVertexAttribArray (normals);
-
-  m_shapes_program->release ();
-
-  m_shapes_program_uniform_normals->bind ();
-
-  //  NOTE: z axis of illum points towards the scene because we include the z inversion in the scene transformation matrix
-  m_shapes_program_uniform_normals->setUniformValue ("illum", QVector3D (-3.0, -4.0, 2.0).normalized ());
-
-  m_shapes_program_uniform_normals->setUniformValue ("ambient", QVector4D (ambient, ambient, ambient, 1.0));
-  m_shapes_program_uniform_normals->setUniformValue ("mist_factor", mist_factor);
-  m_shapes_program_uniform_normals->setUniformValue ("mist_add", mist_add);
-
-  glEnable (GL_DEPTH_TEST);
-  glEnableVertexAttribArray (positions);
-
-  for (std::vector<LayerInfo>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
-
-    if (l->visible && l->fill_color [3] > 0.5) {
-
-      const LayerInfo &li = *l;
-      for (auto z = li.flat_vertex_chunks.begin (); z != li.flat_vertex_chunks.end (); ++z) {
-
-        QMatrix4x4 ytop;
-        ytop.translate (QVector3D (0.0, z->first.second, 0.0));
-
-        m_shapes_program_uniform_normals->setUniformValue ("matrix", cam_perspective () * cam_trans () * scene_trans * ytop);
-
-        m_shapes_program_uniform_normals->setUniformValue ("normal", QVector4D (0.0, -1.0, 0.0, 1.0));
-        m_shapes_program_uniform_normals->setUniformValue ("color", l->fill_color [0], l->fill_color [1], l->fill_color [2], l->fill_color [3]);
-
-        triangle_chunks_type::iterator v = z->second->begin ();
-
-        while (v != z->second->end ()) {
+        while (v != l->vertex_chunk->end () && n != l->vertex_chunk->end ()) {
+          tl_assert (v->size () == n->size ());
           glVertexAttribPointer (positions, 3, gl_type2enum<GLfloat> () (), GL_FALSE, 0, v->front ());
+          glVertexAttribPointer (normals, 3, gl_type2enum<GLfloat> () (), GL_FALSE, 0, n->front ());
           //  TODO: use glDrawElements to draw indexed buffers for better memory usage
           glDrawArrays (GL_TRIANGLES, 0, GLsizei (v->size () / 3));
           ++v;
+          ++n;
         }
 
-        QMatrix4x4 ybottom;
-        ybottom.translate (QVector3D (0.0, z->first.first, 0.0));
+      }
+    }
 
-        m_shapes_program_uniform_normals->setUniformValue ("matrix", cam_perspective () * cam_trans () * scene_trans * ybottom);
+    glDisableVertexAttribArray (positions);
+    glDisableVertexAttribArray (normals);
 
-        m_shapes_program_uniform_normals->setUniformValue ("normal", QVector4D (0.0, 1.0, 0.0, 1.0));
-        m_shapes_program_uniform_normals->setUniformValue ("color", l->fill_color [0], l->fill_color [1], l->fill_color [2], l->fill_color [3]);
+    program->release ();
+  }
 
-        v = z->second->begin ();
+  //  draw flat surfaces
 
-        while (v != z->second->end ()) {
-          glVertexAttribPointer (positions, 3, gl_type2enum<GLfloat> () (), GL_FALSE, 0, v->front ());
-          //  TODO: use glDrawElements to draw indexed buffers for better memory usage
-          glDrawArrays (GL_TRIANGLES, 0, GLsizei (v->size () / 3));
-          ++v;
+  {
+    QOpenGLShaderProgram *program = m_shapes_program_uniform_normals;
+
+    int positions = program->attributeLocation ("posAttr");
+
+    program->bind ();
+
+    program->setUniformValue ("illum", illum_vec3);
+    program->setUniformValue ("ambient", ambient_vec4);
+    program->setUniformValue ("mist_factor", mist_factor);
+    program->setUniformValue ("mist_add", mist_add);
+
+    glEnable (GL_DEPTH_TEST);
+    glEnableVertexAttribArray (positions);
+
+    for (std::vector<LayerInfo>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
+
+      if (l->visible && l->fill_color [3] > 0.5) {
+
+        const LayerInfo &li = *l;
+        for (auto z = li.flat_vertex_chunks.begin (); z != li.flat_vertex_chunks.end (); ++z) {
+
+          QMatrix4x4 ytop;
+          ytop.translate (QVector3D (0.0, z->first.second, 0.0));
+
+          program->setUniformValue ("matrix", cam_perspective () * cam_trans () * scene_trans * ytop);
+
+          program->setUniformValue ("normal", QVector4D (0.0, -1.0, 0.0, 1.0));
+          program->setUniformValue ("color", l->fill_color [0], l->fill_color [1], l->fill_color [2], l->fill_color [3]);
+
+          triangle_chunks_type::iterator v = z->second->begin ();
+
+          while (v != z->second->end ()) {
+            glVertexAttribPointer (positions, 3, gl_type2enum<GLfloat> () (), GL_FALSE, 0, v->front ());
+            //  TODO: use glDrawElements to draw indexed buffers for better memory usage
+            glDrawArrays (GL_TRIANGLES, 0, GLsizei (v->size () / 3));
+            ++v;
+          }
+
+          QMatrix4x4 ybottom;
+          ybottom.translate (QVector3D (0.0, z->first.first, 0.0));
+
+          program->setUniformValue ("matrix", cam_perspective () * cam_trans () * scene_trans * ybottom);
+
+          program->setUniformValue ("normal", QVector4D (0.0, 1.0, 0.0, 1.0));
+          program->setUniformValue ("color", l->fill_color [0], l->fill_color [1], l->fill_color [2], l->fill_color [3]);
+
+          v = z->second->begin ();
+
+          while (v != z->second->end ()) {
+            glVertexAttribPointer (positions, 3, gl_type2enum<GLfloat> () (), GL_FALSE, 0, v->front ());
+            //  TODO: use glDrawElements to draw indexed buffers for better memory usage
+            glDrawArrays (GL_TRIANGLES, 0, GLsizei (v->size () / 3));
+            ++v;
+          }
+
         }
 
       }
 
     }
+
+    glDisableVertexAttribArray (positions);
+
+    program->release ();
+
   }
-
-  glDisableVertexAttribArray (positions);
-  glDisableVertexAttribArray (normals);
-
-  m_shapes_program_uniform_normals->release ();
 
 
   //  wire lines
 
-  m_lines_program->bind ();
+  {
+    QOpenGLShaderProgram *program = m_lines_program;
 
-  m_lines_program->setUniformValue ("matrix", cam_perspective () * cam_trans () * scene_trans);
+    int positions = program->attributeLocation ("posAttr");
 
-  //  NOTE: z axis of illum points towards the scene because we include the z inversion in the scene transformation matrix
-  m_lines_program->setUniformValue ("illum", QVector3D (-3.0, -4.0, 2.0).normalized ());
+    program->bind ();
 
-  m_lines_program->setUniformValue ("ambient", QVector4D (ambient, ambient, ambient, 1.0));
-  m_lines_program->setUniformValue ("mist_factor", mist_factor);
-  m_lines_program->setUniformValue ("mist_add", mist_add);
+    program->setUniformValue ("matrix", cam_perspective () * cam_trans () * scene_trans);
+    program->setUniformValue ("illum", illum_vec3);
+    program->setUniformValue ("ambient", ambient_vec4);
+    program->setUniformValue ("mist_factor", mist_factor);
+    program->setUniformValue ("mist_add", mist_add);
 
-  glEnable (GL_DEPTH_TEST);
-  glEnableVertexAttribArray (positions);
-  glLineWidth (1.0);
+    glEnable (GL_DEPTH_TEST);
+    glEnableVertexAttribArray (positions);
+    glLineWidth (1.0);
 
-  for (std::vector<LayerInfo>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
-    if (l->visible && l->frame_color [3] > 0.5) {
-      m_lines_program->setUniformValue ("color", l->frame_color [0], l->frame_color [1], l->frame_color [2], l->frame_color [3]);
-      //  TODO: use glDrawElements to draw indexed buffers for better memory usage
-      l->line_chunk->draw_to (this, positions, GL_LINES);
+    for (std::vector<LayerInfo>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
+      if (l->visible && l->frame_color [3] > 0.5) {
+        program->setUniformValue ("color", l->frame_color [0], l->frame_color [1], l->frame_color [2], l->frame_color [3]);
+        //  TODO: use glDrawElements to draw indexed buffers for better memory usage
+        l->line_chunk->draw_to (this, positions, GL_LINES);
+      }
     }
+
+    glDisableVertexAttribArray (positions);
+
+    program->release ();
   }
-
-  glDisableVertexAttribArray (positions);
-
-  m_lines_program->release ();
 
 
   //  decoration
 
-  positions = m_gridplane_program->attributeLocation ("posAttr");
+  {
+    QOpenGLShaderProgram *program = m_gridplane_program;
 
-  //  a vertex buffer for the decoration
-  lay::mem_chunks<float, 1024 * 18> vertexes;
+    int positions = program->attributeLocation ("posAttr");
 
-  m_gridplane_program->bind ();
+    //  a vertex buffer for the decoration
+    lay::mem_chunks<float, 1024 * 18> vertexes;
 
-  glEnable (GL_DEPTH_TEST);
-  glEnableVertexAttribArray (positions);
+    program->bind ();
 
-  //  draw pivot compass
+    glEnable (GL_DEPTH_TEST);
+    glEnableVertexAttribArray (positions);
 
-  m_gridplane_program->setUniformValue ("matrix", cam_perspective () * cam_trans ());
+    //  draw pivot compass
 
-  double compass_rad = 0.3;
-  double compass_bars = 0.4;
+    program->setUniformValue ("matrix", cam_perspective () * cam_trans ());
 
-  vertexes.add (-compass_bars, 0.0, 0.0);
-  vertexes.add (compass_bars, 0.0, 0.0);
+    double compass_rad = 0.3;
+    double compass_bars = 0.4;
 
-  vertexes.add (0.0, 0.0, -compass_bars);
-  vertexes.add (0.0, 0.0, compass_bars);
+    vertexes.add (-compass_bars, 0.0, 0.0);
+    vertexes.add (compass_bars, 0.0, 0.0);
 
-  int ncircle = 64;
-  double x = compass_rad, z = 0.0;
-  double da = 1.0 / double (ncircle) * M_PI * 2.0;
+    vertexes.add (0.0, 0.0, -compass_bars);
+    vertexes.add (0.0, 0.0, compass_bars);
 
-  for (int i = 0; i < ncircle; ++i) {
+    int ncircle = 64;
+    double x = compass_rad, z = 0.0;
+    double da = 1.0 / double (ncircle) * M_PI * 2.0;
 
-    double a = double (i + 1) * da;
-    double xx = compass_rad * cos (a);
-    double zz = compass_rad * sin (a);
+    for (int i = 0; i < ncircle; ++i) {
 
-    vertexes.add (x, 0.0, z);
-    vertexes.add (xx, 0.0, zz);
+      double a = double (i + 1) * da;
+      double xx = compass_rad * cos (a);
+      double zz = compass_rad * sin (a);
 
-    x = xx;
-    z = zz;
+      vertexes.add (x, 0.0, z);
+      vertexes.add (xx, 0.0, zz);
 
-  }
+      x = xx;
+      z = zz;
 
-  m_gridplane_program->setUniformValue ("color", foreground_rgb, foreground_rgb, foreground_rgb, 0.25f);
-
-  glLineWidth (2.0);
-  vertexes.draw_to (this, positions, GL_LINES);
-
-  //  arrow
-
-  vertexes.clear ();
-
-  vertexes.add (-0.25 * compass_rad, 0.0, 0.6 * compass_rad);
-  vertexes.add (0.0, 0.0, -0.8 * compass_rad);
-  vertexes.add (0.0, 0.0, -0.8 * compass_rad);
-  vertexes.add (0.25 * compass_rad, 0.0, 0.6 * compass_rad);
-  vertexes.add (0.25 * compass_rad, 0.0, 0.6 * compass_rad);
-  vertexes.add (-0.25 * compass_rad, 0.0, 0.6 * compass_rad);
-
-  vertexes.draw_to (this, positions, GL_LINES);
-
-  //  draw base plane
-
-  m_gridplane_program->setUniformValue ("matrix", cam_perspective () * cam_trans () * scene_trans_wo_y);
-
-  std::pair<double, double> gg = find_grid (std::max (m_bbox.width (), m_bbox.height ()));
-  double gminor = gg.second, gmajor = gg.first;
-
-  double margin = std::max (m_bbox.width (), m_bbox.height ()) * 0.02;
-
-  double l = m_bbox.left ();
-  double r = m_bbox.right ();
-  double b = m_bbox.bottom ();
-  double t = m_bbox.top ();
-
-  //  major and minor grid lines
-
-  vertexes.clear ();
-
-  const double epsilon = 1e-6;
-
-  for (int major = 0; major < 2; ++major) {
-
-    m_gridplane_program->setUniformValue ("color", foreground_rgb, foreground_rgb, foreground_rgb, major ? 0.25f : 0.15f);
-
-    double x, y;
-    double step = (major ? gmajor : gminor);
-
-    x = ceil (l / step) * step;
-    for ( ; x < r - step * epsilon; x += step) {
-      if ((fabs (floor (x / gmajor + 0.5) * gmajor - x) < epsilon) == (major != 0)) {
-        vertexes.add (x, 0.0, b - margin);
-        vertexes.add (x, 0.0, t + margin);
-      }
     }
 
-    y = ceil (b / step) * step;
-    for ( ; y < t - step * epsilon; y += step) {
-      if ((fabs (floor (y / gmajor + 0.5) * gmajor - y) < epsilon) == (major != 0)) {
-        vertexes.add (l - margin, 0.0, y);
-        vertexes.add (r + margin, 0.0, y);
-      }
-    }
+    program->setUniformValue ("color", foreground_rgb, foreground_rgb, foreground_rgb, 0.25f);
 
     glLineWidth (2.0);
     vertexes.draw_to (this, positions, GL_LINES);
 
-  }
-
-  //  the plane itself
-
-  vertexes.clear ();
-
-  vertexes.add (l, 0.0, b);
-  vertexes.add (l, 0.0, t);
-  vertexes.add (r, 0.0, t);
-
-  vertexes.add (l, 0.0, b);
-  vertexes.add (r, 0.0, b);
-  vertexes.add (r, 0.0, t);
-
-  m_gridplane_program->setUniformValue ("color", foreground_rgb, foreground_rgb, foreground_rgb, 0.1f);
-
-  vertexes.draw_to (this, positions, GL_TRIANGLES);
-
-  //  the orientation cube
-
-  if (! top_view ()) {
-
-    glDisable (GL_DEPTH_TEST);
-
-    int cube_size = 32;
-    int cube_margin = 40;
-
-    QMatrix4x4 into_top_right_corner;
-    into_top_right_corner.translate (1.0 - 2.0 / width () * (cube_margin + cube_size / 2), 1.0 - 2.0 / height () * (cube_margin + cube_size / 2));
-    // into_top_right_corner.translate (0.5, 0.5, 0.0);
-    into_top_right_corner.scale (2.0 * cube_size / double (height ()), 2.0 * cube_size / double (height ()), 1.0);
-
-    m_gridplane_program->setUniformValue ("matrix", into_top_right_corner * cam_perspective () * cam_trans ());
+    //  arrow
 
     vertexes.clear ();
 
-    vertexes.add (-1.0, -1.0, 1.0);
-    vertexes.add (-1.0, -1.0, -1.0);
-
-    vertexes.add (-1.0, 1.0, 1.0);
-    vertexes.add (-1.0, 1.0, -1.0);
-
-    vertexes.add (1.0, -1.0, 1.0);
-    vertexes.add (1.0, -1.0, -1.0);
-
-    vertexes.add (1.0, 1.0, 1.0);
-    vertexes.add (1.0, 1.0, -1.0);
-
-    vertexes.add (-1.0, -1.0, 1.0);
-    vertexes.add (-1.0, 1.0, 1.0);
-
-    vertexes.add (1.0, -1.0, 1.0);
-    vertexes.add (1.0, 1.0, 1.0);
-
-    vertexes.add (-1.0, -1.0, 1.0);
-    vertexes.add (1.0, -1.0, 1.0);
-
-    vertexes.add (-1.0, 1.0, 1.0);
-    vertexes.add (1.0, 1.0, 1.0);
-
-    vertexes.add (-1.0, -1.0, -1.0);
-    vertexes.add (-1.0, 1.0, -1.0);
-
-    vertexes.add (1.0, -1.0, -1.0);
-    vertexes.add (1.0, 1.0, -1.0);
-
-    vertexes.add (-1.0, -1.0, -1.0);
-    vertexes.add (1.0, -1.0, -1.0);
-
-    vertexes.add (-1.0, 1.0, -1.0);
-    vertexes.add (1.0, 1.0, -1.0);
-
-    m_gridplane_program->setUniformValue ("color", foreground_rgb, foreground_rgb, foreground_rgb, 0.2f);
+    vertexes.add (-0.25 * compass_rad, 0.0, 0.6 * compass_rad);
+    vertexes.add (0.0, 0.0, -0.8 * compass_rad);
+    vertexes.add (0.0, 0.0, -0.8 * compass_rad);
+    vertexes.add (0.25 * compass_rad, 0.0, 0.6 * compass_rad);
+    vertexes.add (0.25 * compass_rad, 0.0, 0.6 * compass_rad);
+    vertexes.add (-0.25 * compass_rad, 0.0, 0.6 * compass_rad);
 
     vertexes.draw_to (this, positions, GL_LINES);
 
+    //  draw base plane
+
+    program->setUniformValue ("matrix", cam_perspective () * cam_trans () * scene_trans_wo_y);
+
+    std::pair<double, double> gg = find_grid (std::max (m_bbox.width (), m_bbox.height ()));
+    double gminor = gg.second, gmajor = gg.first;
+
+    double margin = std::max (m_bbox.width (), m_bbox.height ()) * 0.02;
+
+    double l = m_bbox.left ();
+    double r = m_bbox.right ();
+    double b = m_bbox.bottom ();
+    double t = m_bbox.top ();
+
+    //  major and minor grid lines
+
     vertexes.clear ();
 
-    //  A "K" at the front
-    vertexes.add (-0.8f, -0.8f, 1.0f);
-    vertexes.add (-0.8f, 0.8f, 1.0f);
-    vertexes.add (-0.2f, 0.8f, 1.0f);
+    const double epsilon = 1e-6;
 
-    vertexes.add (-0.8f, -0.8f, 1.0f);
-    vertexes.add (-0.2f, -0.8f, 1.0f);
-    vertexes.add (-0.2f, 0.8f, 1.0f);
+    for (int major = 0; major < 2; ++major) {
 
-    vertexes.add (0.2f, 0.8f, 1.0f);
-    vertexes.add (0.8f, 0.8f, 1.0f);
-    vertexes.add (0.8f, 0.6f, 1.0f);
+      program->setUniformValue ("color", foreground_rgb, foreground_rgb, foreground_rgb, major ? 0.25f : 0.15f);
 
-    vertexes.add (0.2f, 0.8f, 1.0f);
-    vertexes.add (0.8f, 0.6f, 1.0f);
-    vertexes.add (0.6f, 0.4f, 1.0f);
+      double x, y;
+      double step = (major ? gmajor : gminor);
 
-    vertexes.add (-0.2f, 0.4f, 1.0f);
-    vertexes.add (0.2f, 0.8f, 1.0f);
-    vertexes.add (0.6f, 0.4f, 1.0f);
+      x = ceil (l / step) * step;
+      for ( ; x < r - step * epsilon; x += step) {
+        if ((fabs (floor (x / gmajor + 0.5) * gmajor - x) < epsilon) == (major != 0)) {
+          vertexes.add (x, 0.0, b - margin);
+          vertexes.add (x, 0.0, t + margin);
+        }
+      }
 
-    vertexes.add (-0.2f, 0.4f, 1.0f);
-    vertexes.add (0.6f, 0.4f, 1.0f);
-    vertexes.add (0.2f, 0.0f, 1.0f);
+      y = ceil (b / step) * step;
+      for ( ; y < t - step * epsilon; y += step) {
+        if ((fabs (floor (y / gmajor + 0.5) * gmajor - y) < epsilon) == (major != 0)) {
+          vertexes.add (l - margin, 0.0, y);
+          vertexes.add (r + margin, 0.0, y);
+        }
+      }
 
-    vertexes.add (-0.2f, 0.4f, 1.0f);
-    vertexes.add (0.2f, 0.0f, 1.0f);
-    vertexes.add (-0.2f, -0.4f, 1.0f);
+      glLineWidth (2.0);
+      vertexes.draw_to (this, positions, GL_LINES);
 
-    vertexes.add (-0.2f, -0.4f, 1.0f);
-    vertexes.add (0.6f, -0.4f, 1.0f);
-    vertexes.add (0.2f, -0.0f, 1.0f);
+    }
 
-    vertexes.add (-0.2f, -0.4f, 1.0f);
-    vertexes.add (0.2f, -0.8f, 1.0f);
-    vertexes.add (0.6f, -0.4f, 1.0f);
+    //  the plane itself
 
-    vertexes.add (0.2f, -0.8f, 1.0f);
-    vertexes.add (0.8f, -0.6f, 1.0f);
-    vertexes.add (0.6f, -0.4f, 1.0f);
+    vertexes.clear ();
 
-    vertexes.add (0.2f, -0.8f, 1.0f);
-    vertexes.add (0.8f, -0.8f, 1.0f);
-    vertexes.add (0.8f, -0.6f, 1.0f);
+    vertexes.add (l, 0.0, b);
+    vertexes.add (l, 0.0, t);
+    vertexes.add (r, 0.0, t);
 
-    m_gridplane_program->setUniformValue ("color", foreground_rgb, foreground_rgb, foreground_rgb, 0.3f);
+    vertexes.add (l, 0.0, b);
+    vertexes.add (r, 0.0, b);
+    vertexes.add (r, 0.0, t);
+
+    program->setUniformValue ("color", foreground_rgb, foreground_rgb, foreground_rgb, 0.1f);
 
     vertexes.draw_to (this, positions, GL_TRIANGLES);
 
+    //  the orientation cube
+
+    if (! top_view ()) {
+
+      glDisable (GL_DEPTH_TEST);
+
+      int cube_size = 32;
+      int cube_margin = 40;
+
+      QMatrix4x4 into_top_right_corner;
+      into_top_right_corner.translate (1.0 - 2.0 / width () * (cube_margin + cube_size / 2), 1.0 - 2.0 / height () * (cube_margin + cube_size / 2));
+      // into_top_right_corner.translate (0.5, 0.5, 0.0);
+      into_top_right_corner.scale (2.0 * cube_size / double (height ()), 2.0 * cube_size / double (height ()), 1.0);
+
+      program->setUniformValue ("matrix", into_top_right_corner * cam_perspective () * cam_trans ());
+
+      vertexes.clear ();
+
+      vertexes.add (-1.0, -1.0, 1.0);
+      vertexes.add (-1.0, -1.0, -1.0);
+
+      vertexes.add (-1.0, 1.0, 1.0);
+      vertexes.add (-1.0, 1.0, -1.0);
+
+      vertexes.add (1.0, -1.0, 1.0);
+      vertexes.add (1.0, -1.0, -1.0);
+
+      vertexes.add (1.0, 1.0, 1.0);
+      vertexes.add (1.0, 1.0, -1.0);
+
+      vertexes.add (-1.0, -1.0, 1.0);
+      vertexes.add (-1.0, 1.0, 1.0);
+
+      vertexes.add (1.0, -1.0, 1.0);
+      vertexes.add (1.0, 1.0, 1.0);
+
+      vertexes.add (-1.0, -1.0, 1.0);
+      vertexes.add (1.0, -1.0, 1.0);
+
+      vertexes.add (-1.0, 1.0, 1.0);
+      vertexes.add (1.0, 1.0, 1.0);
+
+      vertexes.add (-1.0, -1.0, -1.0);
+      vertexes.add (-1.0, 1.0, -1.0);
+
+      vertexes.add (1.0, -1.0, -1.0);
+      vertexes.add (1.0, 1.0, -1.0);
+
+      vertexes.add (-1.0, -1.0, -1.0);
+      vertexes.add (1.0, -1.0, -1.0);
+
+      vertexes.add (-1.0, 1.0, -1.0);
+      vertexes.add (1.0, 1.0, -1.0);
+
+      program->setUniformValue ("color", foreground_rgb, foreground_rgb, foreground_rgb, 0.2f);
+
+      vertexes.draw_to (this, positions, GL_LINES);
+
+      vertexes.clear ();
+
+      //  A "K" at the front
+      vertexes.add (-0.8f, -0.8f, 1.0f);
+      vertexes.add (-0.8f, 0.8f, 1.0f);
+      vertexes.add (-0.2f, 0.8f, 1.0f);
+
+      vertexes.add (-0.8f, -0.8f, 1.0f);
+      vertexes.add (-0.2f, -0.8f, 1.0f);
+      vertexes.add (-0.2f, 0.8f, 1.0f);
+
+      vertexes.add (0.2f, 0.8f, 1.0f);
+      vertexes.add (0.8f, 0.8f, 1.0f);
+      vertexes.add (0.8f, 0.6f, 1.0f);
+
+      vertexes.add (0.2f, 0.8f, 1.0f);
+      vertexes.add (0.8f, 0.6f, 1.0f);
+      vertexes.add (0.6f, 0.4f, 1.0f);
+
+      vertexes.add (-0.2f, 0.4f, 1.0f);
+      vertexes.add (0.2f, 0.8f, 1.0f);
+      vertexes.add (0.6f, 0.4f, 1.0f);
+
+      vertexes.add (-0.2f, 0.4f, 1.0f);
+      vertexes.add (0.6f, 0.4f, 1.0f);
+      vertexes.add (0.2f, 0.0f, 1.0f);
+
+      vertexes.add (-0.2f, 0.4f, 1.0f);
+      vertexes.add (0.2f, 0.0f, 1.0f);
+      vertexes.add (-0.2f, -0.4f, 1.0f);
+
+      vertexes.add (-0.2f, -0.4f, 1.0f);
+      vertexes.add (0.6f, -0.4f, 1.0f);
+      vertexes.add (0.2f, -0.0f, 1.0f);
+
+      vertexes.add (-0.2f, -0.4f, 1.0f);
+      vertexes.add (0.2f, -0.8f, 1.0f);
+      vertexes.add (0.6f, -0.4f, 1.0f);
+
+      vertexes.add (0.2f, -0.8f, 1.0f);
+      vertexes.add (0.8f, -0.6f, 1.0f);
+      vertexes.add (0.6f, -0.4f, 1.0f);
+
+      vertexes.add (0.2f, -0.8f, 1.0f);
+      vertexes.add (0.8f, -0.8f, 1.0f);
+      vertexes.add (0.8f, -0.6f, 1.0f);
+
+      program->setUniformValue ("color", foreground_rgb, foreground_rgb, foreground_rgb, 0.3f);
+
+      vertexes.draw_to (this, positions, GL_TRIANGLES);
+
+    }
+
+    glDisableVertexAttribArray (positions);
+
+    program->release ();
   }
-
-  glDisableVertexAttribArray (positions);
-
-  m_shapes_program->release ();
 }
 
 void

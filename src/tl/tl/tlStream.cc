@@ -474,32 +474,30 @@ InputStream::get (size_t n, bool bypass_inflate)
     }
   }
 
-  if (m_blen < n) {
+    if (m_blen < n) {
+        //  to keep move activity low, allocate twice as much as required
+        if (m_bcap < n * 4) {
+            while (m_bcap < n) {
+                m_bcap *= 4;
+            }
+            char *buffer = new char[m_bcap];
+            if (m_blen > 0) {
+                memcpy(buffer, mp_bptr, m_blen);
+            }
+            delete[] mp_buffer; // change
+            mp_buffer = buffer;
+            mp_bptr = mp_buffer;
+        }
 
-    //  to keep move activity low, allocate twice as much as required
-    if (m_bcap < n * 2) {
-
-      while (m_bcap < n) {
-        m_bcap *= 2;
-      }
-
-      char *buffer = new char [m_bcap];
-      if (m_blen > 0) {
-        memcpy (buffer, mp_bptr, m_blen);
-      }
-      delete [] mp_buffer;
-      mp_buffer = buffer;
-
-    } else if (m_blen > 0) {
-      memmove (mp_buffer, mp_bptr, m_blen);
+        if (mp_delegate) {
+            if (m_blen == 0) {
+                m_blen = mp_delegate->read(mp_buffer, m_bcap / 2);
+                mp_bptr = mp_buffer;
+            } else {
+                m_blen += mp_delegate->read(mp_bptr + m_blen, n - m_blen);
+            }
+        }
     }
-
-    if (mp_delegate) {
-      m_blen += mp_delegate->read (mp_buffer + m_blen, m_bcap - m_blen);
-    }
-    mp_bptr = mp_buffer;
-
-  }
 
   if (m_blen >= n) {
     const char *r = mp_bptr;

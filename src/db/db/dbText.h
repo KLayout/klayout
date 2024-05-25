@@ -61,21 +61,12 @@ public:
   /**
    *  @brief Increment the reference counter
    */
-  void add_ref () 
-  {
-     ++m_ref_count;
-  }
+  void add_ref ();
  
   /**
    *  @brief Decrement the reference counter and remove the object when it reaches 0
    */
-  void remove_ref ()
-  {
-     --m_ref_count;
-     if (m_ref_count == 0) {
-       delete this;
-     }
-  }
+  void remove_ref ();
 
   /**
    *  @brief Assignment of a std::string object
@@ -102,14 +93,6 @@ public:
     return m_value;
   }
 
-  /**
-   *  @brief Access to the repository the strings are in
-   */
-  const StringRepository *rep () const
-  {
-    return mp_rep;
-  }
-
   void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const
   {
     if (! no_self) {
@@ -120,15 +103,15 @@ public:
 
 private:
   friend class StringRepository;
-  StringRepository *mp_rep;
+
   std::string m_value;
   size_t m_ref_count;
 
   /**
    *  @brief Hidden constructor attaching the reference to a repository
    */
-  StringRef (StringRepository *rep)
-    : mp_rep (rep), m_ref_count (0)
+  StringRef ()
+    : m_ref_count (0)
   {
     //  .. nothing yet ..
   }
@@ -165,22 +148,12 @@ public:
   /**
    *  @brief Constructor
    */
-  StringRepository ()
-  {
-    //  .. nothing yet ..
-  }
+  StringRepository ();
 
   /**
    *  @brief Destructor
    */
-  ~StringRepository ()
-  {
-    std::set<StringRef *> st;
-    m_string_refs.swap (st);
-    for (std::set<StringRef *>::const_iterator s = st.begin (); s != st.end (); ++s) {
-      delete *s;
-    }
-  }
+  ~StringRepository ();
 
   /** 
    *  @brief Create a string reference object.
@@ -196,54 +169,27 @@ public:
    *  A string reference's text can be set by using the change_string_ref
    *  method.
    */
-  const StringRef *create_string_ref ()
-  {
-    StringRef *ref = new StringRef (this);
-    m_string_refs.insert (ref);
-    return ref;
-  }
+  const StringRef *create_string_ref ();
 
   /**
    *  @brief Change the string associated with a StringRef
    */
-  void change_string_ref (const StringRef *ref, const std::string &s)
+  static void change_string_ref (const StringRef *ref, const std::string &s)
   {
     *(const_cast<StringRef *> (ref)) = s;
   }
 
   /**
-   *  @brief For debugging purposes: get the number of entries
+   *  @brief The singleton instance of the string repository
    */
-  size_t size () const
+  static StringRepository *instance ();
+
+  /**
+   *  @brief For testing purposes: size of the repository
+   */
+  size_t size ()
   {
     return m_string_refs.size ();
-  }
-
-  /**
-   *  @brief Iterates over the string refs (begin)
-   */
-  iterator begin () const
-  {
-    return m_string_refs.begin ();
-  }
-
-  /**
-   *  @brief Iterates over the string refs (end)
-   */
-  iterator end () const
-  {
-    return m_string_refs.end ();
-  }
-
-  void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const
-  {
-    if (! no_self) {
-      stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
-    }
-    db::mem_stat (stat, purpose, cat, &m_string_refs, true, (void *) this);
-    for (std::set<StringRef *>::const_iterator r = m_string_refs.begin (); r != m_string_refs.end (); ++r) {
-      db::mem_stat (stat, purpose, cat, **r, true, parent);
-    }
   }
 
 private:
@@ -251,21 +197,8 @@ private:
 
   std::set<StringRef *> m_string_refs;
 
-  void unregister_ref (StringRef *ref)
-  {
-    if (! m_string_refs.empty ()) {
-      m_string_refs.erase (ref);
-    }
-  }
+  void unregister_ref (StringRef *ref);
 };
-
-/**
- *  @brief Collect memory statistics
- */
-inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const StringRepository &x, bool no_self = false, void *parent = 0)
-{
-  x.mem_stat (stat, purpose, cat, no_self, parent);
-}
 
 /**
  *  @brief A text object
@@ -457,14 +390,7 @@ public:
    */
   void translate (const text<C> &d, db::generic_repository<C> &, db::ArrayRepository &)
   {
-    //  don't use StringRef's on translate - since those live in the source layout, we must not copy them
-    m_trans = d.m_trans;
-    m_size = d.m_size;
-    m_font = d.m_font;
-    m_halign = d.m_halign;
-    m_valign = d.m_valign;
-
-    string (d.string ());
+    *this = d;
   }
 
   /**
@@ -473,7 +399,7 @@ public:
   template <class T>
   void translate (const text<C> &d, const T &t, db::generic_repository<C> &r, db::ArrayRepository &a)
   {
-    translate (d, r, a);
+    *this = d;
     transform (t);
   }
 
@@ -854,24 +780,11 @@ private:
       if (c != 0) {
         return c < 0;
       }
-    } else {
-      if (mp_ptr != b.mp_ptr) {
-        //  if references are present, use their pointers rather than the strings
-        //  if they belong to the same collection
-        const StringRef *r1 = reinterpret_cast<const StringRef *> (mp_ptr - 1);
-        const StringRef *r2 = reinterpret_cast<const StringRef *> (b.mp_ptr - 1);
-        if (r1->rep () != r2->rep ()) {
-          int c = strcmp (r1->value ().c_str (), r2->value ().c_str ());
-          if (c != 0) {
-            return c < 0;
-          }
-        } else {
-          return mp_ptr < b.mp_ptr;
-        }
-      }
+    } else if (mp_ptr != b.mp_ptr) {
+      //  if references are present, use their pointers rather than the strings
+      return mp_ptr < b.mp_ptr;
     }
 
-#if 1
     //  Compare size and presentation flags - without that, the text repository does not work properly.
     if (m_size != b.m_size) {
       return m_size < b.m_size;
@@ -885,7 +798,6 @@ private:
     if (m_valign != b.m_valign) {
       return m_valign < b.m_valign;
     }
-#endif
 
     return false;
   }
@@ -900,33 +812,16 @@ private:
       if (c != 0) {
         return false;
       }
-    } else {
-      if (mp_ptr != b.mp_ptr) {
-        //  if references are present, use their pointers rather than the strings
-        //  if they belong to the same collection
-        const StringRef *r1 = reinterpret_cast<const StringRef *> (mp_ptr - 1);
-        const StringRef *r2 = reinterpret_cast<const StringRef *> (b.mp_ptr - 1);
-        if (r1->rep () != r2->rep ()) {
-          int c = strcmp (r1->value ().c_str (), r2->value ().c_str ());
-          if (c != 0) {
-            return false;
-          }
-        } else {
-          return false;
-        }
-      }
+    } else if (mp_ptr != b.mp_ptr) {
+      //  if references are present, use their pointers rather than the strings
+      return false;
     }
 
-#if 1
     //  Compare size and presentation flags - without that, the text repository does not work properly.
     if (m_size != b.m_size) {
       return false;
     }
     return m_font == b.m_font && m_halign == b.m_halign && m_valign == b.m_valign;
-#else
-    //  Don't compare size, font and alignment
-    return true;
-#endif
   }
 };
 

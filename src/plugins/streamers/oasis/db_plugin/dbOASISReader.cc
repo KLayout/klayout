@@ -1229,7 +1229,7 @@ OASISReader::do_read (db::Layout &layout)
     if (ts == m_textstrings.end ()) {
       error (tl::sprintf (tl::to_string (tr ("No text string defined for text string id %ld")), fw->first));
     } else {
-      layout.string_repository ().change_string_ref (fw->second, ts->second);
+      StringRepository::change_string_ref (fw->second, ts->second);
     }
   }
 
@@ -2017,7 +2017,7 @@ OASISReader::do_read_text (bool xy_absolute,
           mm_text_string.reset ();
           mm_text_string_id = id;
 
-          const db::StringRef *string_ref = layout.string_repository ().create_string_ref ();
+          const db::StringRef *string_ref = db::StringRepository::instance ()->create_string_ref ();
           m_text_forward_references.insert (std::make_pair (id, string_ref));
 
         } else {

@@ -816,7 +816,6 @@ Layout::mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat
   db::mem_stat (stat, purpose, cat, m_pcell_ids, true, (void *) this);
   db::mem_stat (stat, purpose, cat, m_lib_proxy_map, true, (void *) this);
   db::mem_stat (stat, purpose, cat, m_meta_info, true, (void *) this);
-  db::mem_stat (stat, purpose, cat, m_string_repository, true, (void *) this);
   db::mem_stat (stat, purpose, cat, m_shape_repository, true, (void *) this);
   db::mem_stat (stat, purpose, cat, m_properties_repository, true, (void *) this);
   db::mem_stat (stat, purpose, cat, m_array_repository, true, (void *) this);

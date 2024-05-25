@@ -48,6 +48,36 @@ static const char *s_bounding_box_name                = "S_BOUNDING_BOX";
 // ---------------------------------------------------------------------------------
 
 /**
+ *  @brief Compare operator for points, distinct x clustered (with same y)
+ */
+struct vector_cmp_x
+{
+  bool operator() (const db::Vector &a, const db::Vector &b) const
+  {
+    if (a.y () != b.y ()) {
+      return a.y () < b.y ();
+    } else {
+      return a.x () < b.x ();
+    }
+  }
+};
+
+/**
+ *  @brief Compare operator for points, distinct y clustered (with same x)
+ */
+struct vector_cmp_y
+{
+  bool operator() (const db::Vector &a, const db::Vector &b) const
+  {
+    if (a.x () != b.x ()) {
+      return a.x () < b.x ();
+    } else {
+      return a.y () < b.y ();
+    }
+  }
+};
+
+/**
  *  @brief Determines whether a property shall be produced as S_GDS_PROPERTY
  */
 static bool 
@@ -224,6 +254,7 @@ template <class Tag> void create_repetition_by_type (const db::Shape &array_shap
       *pw++ = *p - po;
     }
     pts.erase (pw, pts.end ());
+    std::sort (pts.begin (), pts.end (), vector_cmp_x ());
 
     db::IrregularRepetition *rep_base = new db::IrregularRepetition ();
     rep_base->points ().swap (pts);
@@ -268,36 +299,6 @@ void create_repetition (const db::Shape &array, db::Repetition &rep)
     break;
   }
 }
-
-/**
- *  @brief Compare operator for points, distinct x clustered (with same y)
- */
-struct vector_cmp_x
-{
-  bool operator() (const db::Vector &a, const db::Vector &b) const
-  {
-    if (a.y () != b.y ()) {
-      return a.y () < b.y ();
-    } else {
-      return a.x () < b.x ();
-    }
-  }
-};
-
-/**
- *  @brief Compare operator for points, distinct y clustered (with same x)
- */
-struct vector_cmp_y
-{
-  bool operator() (const db::Vector &a, const db::Vector &b) const
-  {
-    if (a.x () != b.x ()) {
-      return a.x () < b.x ();
-    } else {
-      return a.y () < b.y ();
-    }
-  }
-};
 
 /**
  *  @brief Compare operator for points/abstract repetition pair with configurable point compare operator
@@ -2030,6 +2031,7 @@ OASISWriter::write (const db::CellInstArray &inst, db::properties_id_type prop_i
       *pw++ = *p - po;
     }
     pts.erase (pw, pts.end ());
+    std::sort (pts.begin (), pts.end (), vector_cmp_x ());
 
     db::IrregularRepetition *rep_base = new db::IrregularRepetition ();
     rep_base->points ().swap (pts);

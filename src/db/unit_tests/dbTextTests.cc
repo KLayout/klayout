@@ -113,7 +113,9 @@ TEST(3)
 
   db::StringRepository::change_string_ref (ref1, "U");
   EXPECT_EQ (std::string (s1.text_string ()), "U");
-  EXPECT_EQ (std::string (s1dup.text_string ()), "X");
+  //  NOTE: as we have a global string repo, modfiying the string reference
+  //  also changes the copy:
+  EXPECT_EQ (std::string (s1dup.text_string ()), "U");
 
   db::Shape s2a = c2->shapes (l2).insert (s1);
 

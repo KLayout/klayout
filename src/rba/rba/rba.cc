@@ -1066,8 +1066,10 @@ push_args (gsi::SerialArgs &arglist, const gsi::MethodBase *meth, VALUE *argv, i
             //  leave it to the consumer to establish the default values (that is faster)
             break;
           }
-          tl::Variant def_value = a->spec ()->default_value ();
-          gsi::push_arg (arglist, *a, def_value, &heap);
+          const tl::Variant &def_value = a->spec ()->default_value ();
+          //  NOTE: this const_cast means we need to take care that we do not use default values on "out" parameters.
+          //  Otherwise there is a chance we will modify the default value.
+          gsi::push_arg (arglist, *a, const_cast<tl::Variant &> (def_value), &heap);
         } else {
           throw tl::Exception (tl::to_string (tr ("No argument provided (positional or keyword) and no default value available")));
         }

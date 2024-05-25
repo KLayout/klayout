@@ -194,18 +194,29 @@ num_args (const gsi::MethodBase *m)
 }
 
 static bool
-compatible_with_args (const gsi::MethodBase *m, int argc, PyObject *kwargs)
+compatible_with_args (const gsi::MethodBase *m, int argc, PyObject *kwargs, std::string *why_not = 0)
 {
   int nargs = num_args (m);
 
-  if (argc >= nargs) {
+  if (argc > nargs) {
+    if (why_not) {
+      *why_not = tl::sprintf (tl::to_string (tr ("%d argument(s) expected, but %d given")), nargs, argc);
+    }
+    return false;
+  } else if (argc == nargs) {
     //  no more arguments to consider
-    return argc == nargs && (kwargs == NULL || PyDict_Size (kwargs) == 0);
+    if (kwargs != NULL && PyDict_Size (kwargs) > 0) {
+      if (why_not) {
+        *why_not = tl::to_string (tr ("all arguments given, but additional keyword arguments specified"));
+      }
+      return false;
+    } else {
+      return true;
+    }
   }
 
   if (kwargs != NULL) {
 
-    int nkwargs = int (PyDict_Size (kwargs));
     int kwargs_taken = 0;
 
     while (argc < nargs) {
@@ -213,6 +224,9 @@ compatible_with_args (const gsi::MethodBase *m, int argc, PyObject *kwargs)
       pya::PythonPtr py_arg = PyDict_GetItemString (kwargs, atype.spec ()->name ().c_str ());
       if (! py_arg) {
         if (! atype.spec ()->has_default ()) {
+          if (why_not) {
+            *why_not = tl::sprintf (tl::to_string (tr ("no argument specified for '%s' (neither positional or keyword)")), atype.spec ()->name ());
+          }
           return false;
         }
       } else {
@@ -221,14 +235,20 @@ compatible_with_args (const gsi::MethodBase *m, int argc, PyObject *kwargs)
       ++argc;
     }
 
-    //  matches if all keyword arguments are taken
-    return kwargs_taken == nkwargs;
+    return true;
 
   } else {
 
     while (argc < nargs) {
       const gsi::ArgType &atype = m->begin_arguments () [argc];
       if (! atype.spec ()->has_default ()) {
+        if (why_not) {
+          if (argc < nargs - 1 && ! m->begin_arguments () [argc + 1].spec ()->has_default ()) {
+            *why_not = tl::sprintf (tl::to_string (tr ("no value given for argument #%d and following")), argc + 1);
+          } else {
+            *why_not = tl::sprintf (tl::to_string (tr ("no value given for argument #%d")), argc + 1);
+          }
+        }
         return false;
       }
       ++argc;
@@ -243,8 +263,11 @@ static std::string
 describe_overload (const gsi::MethodBase *m, int argc, PyObject *kwargs)
 {
   std::string res = m->to_string ();
-  if (compatible_with_args (m, argc, kwargs)) {
+  std::string why_not;
+  if (compatible_with_args (m, argc, kwargs, &why_not)) {
     res += " " + tl::to_string (tr ("[match candidate]"));
+  } else if (! why_not.empty ()) {
+    res += " [" + why_not + "]";
   }
   return res;
 }
@@ -705,8 +728,10 @@ push_args (gsi::SerialArgs &arglist, const gsi::MethodBase *meth, PyObject *args
             //  leave it to the consumer to establish the default values (that is faster)
             break;
           }
-          tl::Variant def_value = a->spec ()->default_value ();
-          gsi::push_arg (arglist, *a, def_value, &heap);
+          const tl::Variant &def_value = a->spec ()->default_value ();
+          //  NOTE: this const_cast means we need to take care that we do not use default values on "out" parameters.
+          //  Otherwise there is a chance we will modify the default value.
+          gsi::push_arg (arglist, *a, const_cast<tl::Variant &> (def_value), &heap);
         } else {
           throw tl::Exception (tl::to_string (tr ("No argument provided (positional or keyword) and no default value available")));
         }

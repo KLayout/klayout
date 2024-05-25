@@ -445,7 +445,9 @@ struct NoAdaptorTag { };
 template <class X, class Adapted>
 struct adaptor_type_info
 {
-  static const std::type_info *type_info () 
+  typedef Adapted final_type;
+
+  static const std::type_info *type_info ()
   {
     return &typeid (Adapted);
   }
@@ -476,6 +478,8 @@ struct adaptor_type_info
 template <class X>
 struct adaptor_type_info<X, NoAdaptorTag>
 {
+  typedef X final_type;
+
   static const std::type_info *type_info () 
   {
     return 0;
@@ -517,6 +521,8 @@ class GSI_PUBLIC_TEMPLATE Class
   : public ClassBase
 {
 public:
+  typedef typename adaptor_type_info<X, Adapted>::final_type final_type;
+
   Class (const std::string &module, const std::string &name, const Methods &mm, const std::string &doc = std::string (), bool do_register = true)
     : ClassBase (doc, mm, do_register)
   {
@@ -681,9 +687,9 @@ public:
   }
 
 private:
-  gsi::VariantUserClass<X> m_var_cls;
-  gsi::VariantUserClass<X> m_var_cls_c;
-  gsi::VariantUserClass<X> m_var_cls_cls;
+  gsi::VariantUserClass<final_type> m_var_cls;
+  gsi::VariantUserClass<final_type> m_var_cls_c;
+  gsi::VariantUserClass<final_type> m_var_cls_cls;
   std::unique_ptr<SubClassTesterBase> m_subclass_tester;
 };
 

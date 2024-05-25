@@ -1020,7 +1020,6 @@ void init_layout2 (db::Layout &g)
   tl::InputStream stream (tl::testdata () + "/gds/issue-1671.gds");
   db::Reader reader (stream);
   reader.read (g, db::LoadLayoutOptions ());
-  return; // @@@
 
   g.insert_layer (0, db::LayerProperties ("l0"));
   g.insert_layer (1, db::LayerProperties ("l1"));

@@ -193,10 +193,33 @@ num_args (const gsi::MethodBase *m)
   return int (m->end_arguments () - m->begin_arguments ());
 }
 
+std::set<std::string>
+invalid_kwnames (const gsi::MethodBase *meth, PyObject *kwargs)
+{
+  pya::PythonRef keys (PyDict_Keys (kwargs));
+
+  std::set<std::string> valid_names;
+  for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments (); ++a) {
+    valid_names.insert (a->spec ()->name ());
+  }
+
+  std::set<std::string> invalid_names;
+  for (int i = int (PyList_Size (keys.get ())); i > 0; ) {
+    --i;
+    std::string k = python2c<std::string> (PyList_GetItem (keys.get (), i));
+    if (valid_names.find (k) == valid_names.end ()) {
+      invalid_names.insert (k);
+    }
+  }
+
+  return invalid_names;
+}
+
 static bool
 compatible_with_args (const gsi::MethodBase *m, int argc, PyObject *kwargs, std::string *why_not = 0)
 {
   int nargs = num_args (m);
+  int nkwargs = kwargs == NULL ? 0 : int (PyDict_Size (kwargs));
 
   if (argc > nargs) {
     if (why_not) {
@@ -205,7 +228,7 @@ compatible_with_args (const gsi::MethodBase *m, int argc, PyObject *kwargs, std:
     return false;
   } else if (argc == nargs) {
     //  no more arguments to consider
-    if (kwargs != NULL && PyDict_Size (kwargs) > 0) {
+    if (nkwargs > 0) {
       if (why_not) {
         *why_not = tl::to_string (tr ("all arguments given, but additional keyword arguments specified"));
       }
@@ -235,7 +258,20 @@ compatible_with_args (const gsi::MethodBase *m, int argc, PyObject *kwargs, std:
       ++argc;
     }
 
-    return true;
+    if (kwargs_taken != nkwargs) {
+      if (why_not) {
+        std::set<std::string> invalid_names = invalid_kwnames (m, kwargs);
+        if (invalid_names.size () > 1) {
+          std::string names_str = tl::join (invalid_names.begin (), invalid_names.end (), ", ");
+          *why_not = tl::to_string (tr ("unknown keyword parameters: ")) + names_str;
+        } else if (invalid_names.size () == 1) {
+          *why_not = tl::to_string (tr ("unknown keyword parameter: ")) + *invalid_names.begin ();
+        }
+      }
+      return false;
+    } else {
+      return true;
+    }
 
   } else {
 
@@ -746,23 +782,7 @@ push_args (gsi::SerialArgs &arglist, const gsi::MethodBase *meth, PyObject *args
     if (kwargs_taken != nkwargs) {
 
       //  check if there are any left-over keyword parameters with unknown names
-
-      pya::PythonRef keys (PyDict_Keys (kwargs));
-
-      std::set<std::string> valid_names;
-      for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments (); ++a) {
-        valid_names.insert (a->spec ()->name ());
-      }
-
-      std::set<std::string> invalid_names;
-      for (int i = int (PyList_Size (keys.get ())); i > 0; ) {
-        --i;
-        std::string k = python2c<std::string> (PyList_GetItem (keys.get (), i));
-        if (valid_names.find (k) == valid_names.end ()) {
-          invalid_names.insert (k);
-        }
-      }
-
+      std::set<std::string> invalid_names = invalid_kwnames (meth, kwargs);
       if (invalid_names.size () > 1) {
         std::string names_str = tl::join (invalid_names.begin (), invalid_names.end (), ", ");
         throw tl::Exception (tl::to_string (tr ("Unknown keyword parameters: ")) + names_str);

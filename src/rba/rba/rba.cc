@@ -182,6 +182,27 @@ get_kwarg (const gsi::ArgType &atype, VALUE kwargs)
   }
 }
 
+static int get_kwargs_keys (VALUE key, VALUE, VALUE arg)
+{
+  std::set<std::string> *names = reinterpret_cast<std::set<std::string> *> (arg);
+  names->insert (ruby2c<std::string> (rba_safe_obj_as_string (key)));
+
+  return ST_CONTINUE;
+}
+
+static std::set<std::string>
+invalid_kwnames (const gsi::MethodBase *meth, VALUE kwargs)
+{
+  std::set<std::string> invalid_names;
+  rb_hash_foreach (kwargs, (int (*)(...)) &get_kwargs_keys, (VALUE) &invalid_names);
+
+  for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments (); ++a) {
+    invalid_names.erase (a->spec ()->name ());
+  }
+
+  return invalid_names;
+}
+
 // -------------------------------------------------------------------
 //  The lookup table for the method overload resolution
 
@@ -325,10 +346,12 @@ public:
   }
 
 private:
+
   static bool
   compatible_with_args (const gsi::MethodBase *m, int argc, VALUE kwargs, std::string *why_not = 0)
   {
     int nargs = num_args (m);
+    int nkwargs = kwargs == Qnil ? 0 : RHASH_SIZE (kwargs);
 
     if (argc > nargs) {
       if (why_not) {
@@ -337,7 +360,7 @@ private:
       return false;
     } else if (argc == nargs) {
       //  no more arguments to consider
-      if (kwargs != Qnil && RHASH_SIZE (kwargs) > 0) {
+      if (nkwargs > 0) {
         if (why_not) {
           *why_not = tl::to_string (tr ("all arguments given, but additional keyword arguments specified"));
         }
@@ -367,7 +390,20 @@ private:
         ++argc;
       }
 
-      return true;
+      if (kwargs_taken != nkwargs) {
+        if (why_not) {
+          std::set<std::string> invalid_names = invalid_kwnames (m, kwargs);
+          if (invalid_names.size () > 1) {
+            std::string names_str = tl::join (invalid_names.begin (), invalid_names.end (), ", ");
+            *why_not = tl::to_string (tr ("unknown keyword parameters: ")) + names_str;
+          } else if (invalid_names.size () == 1) {
+            *why_not = tl::to_string (tr ("unknown keyword parameter: ")) + *invalid_names.begin ();
+          }
+        }
+        return false;
+      } else {
+        return true;
+      }
 
     } else {
 
@@ -1062,14 +1098,6 @@ static gsi::ArgType create_void_type ()
 }
 
 static gsi::ArgType s_void_type = create_void_type ();
-
-static int get_kwargs_keys (VALUE key, VALUE, VALUE arg)
-{
-  std::set<std::string> *names = reinterpret_cast<std::set<std::string> *> (arg);
-  names->insert (ruby2c<std::string> (rba_safe_obj_as_string (key)));
-
-  return ST_CONTINUE;
-}
 
 void
 push_args (gsi::SerialArgs &arglist, const gsi::MethodBase *meth, VALUE *argv, int argc, VALUE kwargs, tl::Heap &heap)

@@ -3181,7 +3181,7 @@ class Basic_TestClass < TestBase
     rescue => ex
       m = ex.to_s
     end
-    assert_equal(m, "Unknown keyword parameter: xxx in BB::d4")
+    assert_equal(m, "Can't match arguments. Variants are:\n  string d4(int a, string b, double c, B3::E d = E3A, variant e = nil) [unknown keyword parameter: xxx]\n in BB::d4")
 
     m = ""
     begin
@@ -3189,7 +3189,7 @@ class Basic_TestClass < TestBase
     rescue => ex
       m = ex.to_s
     end
-    assert_equal(m, "Unknown keyword parameter: xxx in BB::d4")
+    assert_equal(m, "Can't match arguments. Variants are:\n  string d4(int a, string b, double c, B3::E d = E3A, variant e = nil) [unknown keyword parameter: xxx]\n in BB::d4")
 
     assert_equal(bb.d4(1, "a", 2.0), "1,a,2,100,nil")
     assert_equal(bb.d4(1, "a", 2.0, e: 42), "1,a,2,100,42")

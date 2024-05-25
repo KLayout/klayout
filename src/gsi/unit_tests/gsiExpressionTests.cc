@@ -772,3 +772,60 @@ TEST(14)
     EXPECT_EQ (ex.msg ().find ("No overload with matching arguments. Variants are:"), 0);
   }
 }
+
+TEST(15)
+{
+  //  Keyword arguments, enums and errors
+
+  tl::Eval e;
+  tl::Variant v;
+
+  try {
+    v = e.parse("var bb = BB.new; bb.d4()").execute();
+    EXPECT_EQ (true, false);
+  } catch (tl::Exception &ex) {
+    EXPECT_EQ (ex.msg (), "Can't match arguments. Variants are:\n  string d4(int a, string b, double c, B3::E d = E3A, variant e = nil) [no value given for argument #1 and following]\n at position 19 (...d4())");
+  }
+
+  try {
+    v = e.parse("var bb = BB.new; bb.d4(1, 'a')").execute();
+    EXPECT_EQ (true, false);
+  } catch (tl::Exception &ex) {
+    EXPECT_EQ (ex.msg (), "Can't match arguments. Variants are:\n  string d4(int a, string b, double c, B3::E d = E3A, variant e = nil) [no value given for argument #3]\n at position 19 (...d4(1, 'a'))");
+  }
+
+  try {
+    v = e.parse("var bb = BB.new; bb.d4(1, 'a', 2.0, xxx=17)").execute();
+    EXPECT_EQ (true, false);
+  } catch (tl::Exception &ex) {
+    EXPECT_EQ (ex.msg (), "Can't match arguments. Variants are:\n  string d4(int a, string b, double c, B3::E d = E3A, variant e = nil) [unknown keyword parameter: xxx]\n at position 19 (...d4(1, 'a', 2.0, xxx..)");
+  }
+
+  try {
+    v = e.parse("var bb = BB.new; bb.d4(a=1, b='a', c=2.0, xxx=17)").execute();
+    EXPECT_EQ (true, false);
+  } catch (tl::Exception &ex) {
+    EXPECT_EQ (ex.msg (), "Can't match arguments. Variants are:\n  string d4(int a, string b, double c, B3::E d = E3A, variant e = nil) [unknown keyword parameter: xxx]\n at position 19 (...d4(a=1, b='a', c=2...)");
+  }
+
+  v = e.parse("var bb = BB.new; bb.d4(1, 'a', 2.0)").execute();
+  EXPECT_EQ (v.to_string (), "1,a,2,100,nil");
+
+  v = e.parse("var bb = BB.new; bb.d4(1, 'a', 2.0, e=42)").execute();
+  EXPECT_EQ (v.to_string (), "1,a,2,100,42");
+
+  v = e.parse("var bb = BB.new; bb.d4(1, 'a', c=2.0, e=42)").execute();
+  EXPECT_EQ (v.to_string (), "1,a,2,100,42");
+
+  v = e.parse("var bb = BB.new; bb.d4(c=2.0, a=1, b='a', e=42)").execute();
+  EXPECT_EQ (v.to_string (), "1,a,2,100,42");
+
+  v = e.parse("var bb = BB.new; bb.d4(1, 'a', 2.0, d=BB.E.E3B)").execute();
+  EXPECT_EQ (v.to_string (), "1,a,2,101,nil");
+
+  v = e.parse("var bb = BB.new; bb.d4(1, 'a', d=BB.E.E3B, c=2.0)").execute();
+  EXPECT_EQ (v.to_string (), "1,a,2,101,nil");
+
+  v = e.parse("var bb = BB.new; bb.d4(1, 'a', 2.0, BB.E.E3B, 42)").execute();
+  EXPECT_EQ (v.to_string (), "1,a,2,101,42");
+}

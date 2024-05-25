@@ -3165,7 +3165,7 @@ class Basic_TestClass < TestBase
     rescue => ex
       m = ex.to_s
     end
-    assert_equal(m, "Can't match arguments. Variants are:\n  string d4(int a, string b, double c, B3::E d = E3A, variant e = nil) [no value given for argument #1 and following]\n in BB.d4")
+    assert_equal(m, "Can't match arguments. Variants are:\n  string d4(int a, string b, double c, B3::E d = E3A, variant e = nil) [no value given for argument #1 and following]\n in BB::d4")
 
     m = ""
     begin
@@ -3173,30 +3173,30 @@ class Basic_TestClass < TestBase
     rescue => ex
       m = ex.to_s
     end
-    assert_equal(m, "Can't match arguments. Variants are:\n  string d4(int a, string b, double c, B3::E d = E3A, variant e = nil) [no value given for argument #3]\n in BB.d4")
+    assert_equal(m, "Can't match arguments. Variants are:\n  string d4(int a, string b, double c, B3::E d = E3A, variant e = nil) [no value given for argument #3]\n in BB::d4")
 
     m = ""
     begin
-      bb.d4(1, "a", 2.0, xxx=17)
+      bb.d4(1, "a", 2.0, xxx: 17)
     rescue => ex
       m = ex.to_s
     end
-    assert_equal(m, "Unknown keyword parameter: xxx in BB.d4")
+    assert_equal(m, "Unknown keyword parameter: xxx in BB::d4")
 
     m = ""
     begin
-      bb.d4(a=1, b="a", c=2.0, xxx=17)
+      bb.d4(a: 1, b: "a", c: 2.0, xxx: 17)
     rescue => ex
       m = ex.to_s
     end
-    assert_equal(m, "Unknown keyword parameter: xxx in BB.d4")
+    assert_equal(m, "Unknown keyword parameter: xxx in BB::d4")
 
     assert_equal(bb.d4(1, "a", 2.0), "1,a,2,100,nil")
-    assert_equal(bb.d4(1, "a", 2.0, e=42), "1,a,2,100,42")
-    assert_equal(bb.d4(1, "a", c=2.0, e=42), "1,a,2,100,42")
-    assert_equal(bb.d4(c=2.0, a=1, b="a", e=42), "1,a,2,100,42")
-    assert_equal(bb.d4(1, "a", 2.0, d=RBA::BB::E::E3B), "1,a,2,101,nil")
-    assert_equal(bb.d4(1, "a", d=RBA::BB::E::E3B, c=2.5), "1,a,2.5,101,nil")
+    assert_equal(bb.d4(1, "a", 2.0, e: 42), "1,a,2,100,42")
+    assert_equal(bb.d4(1, "a", c=2.0, e: 42), "1,a,2,100,42")
+    assert_equal(bb.d4(c: 2.0, a: 1, b: "a", e: 42), "1,a,2,100,42")
+    assert_equal(bb.d4(1, "a", 2.0, d: RBA::BB::E::E3B), "1,a,2,101,nil")
+    assert_equal(bb.d4(1, "a", d: RBA::BB::E::E3B, c: 2.5), "1,a,2.5,101,nil")
     assert_equal(bb.d4(1, "a", 2.0, RBA::BB::E::E3B, 42), "1,a,2,101,42")
 
   end

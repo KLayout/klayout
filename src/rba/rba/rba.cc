@@ -326,18 +326,29 @@ public:
 
 private:
   static bool
-  compatible_with_args (const gsi::MethodBase *m, int argc, VALUE kwargs)
+  compatible_with_args (const gsi::MethodBase *m, int argc, VALUE kwargs, std::string *why_not = 0)
   {
     int nargs = num_args (m);
 
-    if (argc >= nargs) {
+    if (argc > nargs) {
+      if (why_not) {
+        *why_not = tl::sprintf (tl::to_string (tr ("%d argument(s) expected, but %d given")), nargs, argc);
+      }
+      return false;
+    } else if (argc == nargs) {
       //  no more arguments to consider
-      return argc == nargs && (kwargs == Qnil || RHASH_SIZE (kwargs) == 0);
+      if (kwargs != Qnil && RHASH_SIZE (kwargs) > 0) {
+        if (why_not) {
+          *why_not = tl::to_string (tr ("all arguments given, but additional keyword arguments specified"));
+        }
+        return false;
+      } else {
+        return true;
+      }
     }
 
     if (kwargs != Qnil) {
 
-      int nkwargs = int (RHASH_SIZE (kwargs));
       int kwargs_taken = 0;
 
       while (argc < nargs) {
@@ -345,6 +356,9 @@ private:
         VALUE rb_arg = rb_hash_lookup2 (kwargs, ID2SYM (rb_intern (atype.spec ()->name ().c_str ())), Qnil);
         if (rb_arg == Qnil) {
           if (! atype.spec ()->has_default ()) {
+            if (why_not) {
+              *why_not = tl::sprintf (tl::to_string (tr ("no argument specified for '%s' (neither positional or keyword)")), atype.spec ()->name ());
+            }
             return false;
           }
         } else {
@@ -353,14 +367,20 @@ private:
         ++argc;
       }
 
-      //  matches if all keyword arguments are taken
-      return kwargs_taken == nkwargs;
+      return true;
 
     } else {
 
       while (argc < nargs) {
         const gsi::ArgType &atype = m->begin_arguments () [argc];
         if (! atype.spec ()->has_default ()) {
+          if (why_not) {
+            if (argc < nargs - 1 && ! m->begin_arguments () [argc + 1].spec ()->has_default ()) {
+              *why_not = tl::sprintf (tl::to_string (tr ("no value given for argument #%d and following")), argc + 1);
+            } else {
+              *why_not = tl::sprintf (tl::to_string (tr ("no value given for argument #%d")), argc + 1);
+            }
+          }
           return false;
         }
         ++argc;
@@ -375,8 +395,11 @@ private:
   describe_overload (const gsi::MethodBase *m, int argc, VALUE kwargs)
   {
     std::string res = m->to_string ();
-    if (compatible_with_args (m, argc, kwargs)) {
+    std::string why_not;
+    if (compatible_with_args (m, argc, kwargs, &why_not)) {
       res += " " + tl::to_string (tr ("[match candidate]"));
+    } else if (! why_not.empty ()) {
+      res += " [" + why_not + "]";
     }
     return res;
   }
@@ -1043,7 +1066,7 @@ static gsi::ArgType s_void_type = create_void_type ();
 static int get_kwargs_keys (VALUE key, VALUE, VALUE arg)
 {
   std::set<std::string> *names = reinterpret_cast<std::set<std::string> *> (arg);
-  names->insert (ruby2c<std::string> (key));
+  names->insert (ruby2c<std::string> (rba_safe_obj_as_string (key)));
 
   return ST_CONTINUE;
 }

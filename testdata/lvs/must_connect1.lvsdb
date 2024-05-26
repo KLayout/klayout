@@ -27,7 +27,7 @@ J(
  C(l2 l6 l2)
  C(l5 l6 l5)
  G(l14 SUBSTRATE)
- H(W B('Must-connect nets VSSTOP must be connected further up in the hierarchy - this is an error at chip top level') C(TOP) X('must-connect'))
+ H(W B('Must-connect subnets of VSSTOP must be connected further up in the hierarchy - this is an error at chip top level') C(TOP) X('must-connect') Q('(3.61,0.7;3.61,8.89;11.365,8.89;11.365,0.7)'))
  K(PMOS MOS3)
  K(NMOS MOS3)
  D(D$PMOS PMOS

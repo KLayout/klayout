@@ -2917,7 +2917,7 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
     std::vector<typename local_cluster<T>::id_type> to_delete;
     for (typename connected_clusters<T>::const_iterator c = local.begin (); c != local.end (); ++c) {
       box_type bbox = c->bbox ();
-      if ((bbox.empty () || (bbox.width () == 0 && bbox.height () == 0)) && local.connections_for_cluster (c->id ()).empty ()) {
+      if ((bbox.empty () || (bbox.width () == 0 && bbox.height () == 0)) && c->get_global_nets ().empty () && local.connections_for_cluster (c->id ()).empty ()) {
         to_delete.push_back (c->id ());
       }
     }

@@ -938,8 +938,16 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
       if (mp_logger) {
         if (p->second && ! exact_match) {
           if (m_with_log) {
-            mp_logger->log_entry (db::Error,
-                                  tl::sprintf (tl::to_string (tr ("Nets %s are paired explicitly, but are not identical topologically")), nets2string (p->first)));
+            if (! p->first.first) {
+              mp_logger->log_entry (db::Error,
+                                    tl::sprintf (tl::to_string (tr ("Right-side net %s is paired explicitly with a left-side one, but no net is present there")), expanded_name (p->first.second)));
+            } else if (! p->first.second) {
+              mp_logger->log_entry (db::Error,
+                                    tl::sprintf (tl::to_string (tr ("Left-side net %s is paired explicitly with a right-side one, but no net is present there")), expanded_name (p->first.first)));
+            } else {
+              mp_logger->log_entry (db::Error,
+                                    tl::sprintf (tl::to_string (tr ("Nets %s are paired explicitly, but are not identical topologically")), nets2string (p->first)));
+            }
           }
           mp_logger->net_mismatch (p->first.first, p->first.second);
         } else {
@@ -950,7 +958,11 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
     } else if (p->second && g1.has_node_index_for_net (p->first.first)) {
 
       if (mp_logger) {
-        mp_logger->net_mismatch (p->first.first, 0);
+        mp_logger->net_mismatch (p->first.first, p->first.second);
+        if (m_with_log && p->first.second) {
+          mp_logger->log_entry (db::Error,
+                                tl::sprintf (tl::to_string (tr ("Nets %s are paired explicitly, but are not identical topologically")), nets2string (p->first)));
+        }
       }
 
       size_t ni1 = g1.node_index_for_net (p->first.first);
@@ -959,7 +971,11 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
     } else if (p->second && g2.has_node_index_for_net (p->first.second)) {
 
       if (mp_logger) {
-        mp_logger->net_mismatch (0, p->first.second);
+        mp_logger->net_mismatch (p->first.first, p->first.second);
+        if (m_with_log && p->first.first) {
+          mp_logger->log_entry (db::Error,
+                                tl::sprintf (tl::to_string (tr ("Nets %s are paired explicitly, but are not identical topologically")), nets2string (p->first)));
+        }
       }
 
       size_t ni2 = g2.node_index_for_net (p->first.second);

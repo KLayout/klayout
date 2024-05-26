@@ -83,6 +83,7 @@ const size_t unknown_id = std::numeric_limits<size_t>::max () - 1;
 //  Some utilities
 
 std::string nl_compare_debug_indent (size_t depth);
+std::string expanded_name (const db::Net *a);
 std::string nets2string (const db::Net *a, const db::Net *b);
 std::string nets2string (const std::pair<const db::Net *, const db::Net *> &np);
 

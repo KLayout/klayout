@@ -86,14 +86,17 @@ NetlistComparer::exclude_resistors (double threshold)
 void
 NetlistComparer::same_nets (const db::Net *na, const db::Net *nb, bool must_match)
 {
-  tl_assert (na && na);
-  m_same_nets [std::make_pair (na->circuit (), nb->circuit ())].push_back (std::make_pair (std::make_pair (na, nb), must_match));
+  if (na || nb) {
+    m_same_nets [std::make_pair (na->circuit (), nb->circuit ())].push_back (std::make_pair (std::make_pair (na, nb), must_match));
+  }
 }
 
 void
 NetlistComparer::same_nets (const db::Circuit *ca, const db::Circuit *cb, const db::Net *na, const db::Net *nb, bool must_match)
 {
-  m_same_nets [std::make_pair (ca, cb)].push_back (std::make_pair (std::make_pair (na, nb), must_match));
+  if (na || nb) {
+    m_same_nets [std::make_pair (ca, cb)].push_back (std::make_pair (std::make_pair (na, nb), must_match));
+  }
 }
 
 void
@@ -205,6 +208,49 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
   }
 
   return res;
+}
+
+/**
+ *  @brief Returns a consolidated list of identical nets for a circuit pair (aka "same_nets")
+ *
+ *  The list is reduced by duplicates of the first net such, that the
+ *  last "same_nets" entry wins.
+ *
+ *  The return value is a list of net pairs and a flag indicating "must_match" mode.
+ *  The second net can be null if "must_match" is true, indicating that no schematic
+ *  net with the same name was found - hence a mismatch exists.
+ */
+std::vector<std::pair<std::pair<const Net *, const Net *>, bool> >
+NetlistComparer::get_net_identity (const db::Circuit *ca, const db::Circuit *cb) const
+{
+  std::vector<std::pair<std::pair<const Net *, const Net *>, bool> > net_identity;
+
+  std::map<std::pair<const db::Circuit *, const db::Circuit *>, std::vector<std::pair<std::pair<const Net *, const Net *>, bool> > >::const_iterator sn = m_same_nets.find (std::make_pair (ca, cb));
+  if (sn != m_same_nets.end ()) {
+
+    const std::vector<std::pair<std::pair<const Net *, const Net *>, bool> > &ni = sn->second;
+
+    //  take last definition for a given first net
+    net_identity.reserve (ni.size ());
+    std::set<const Net *> seen;
+    for (auto i = ni.end (); i != ni.begin (); ) {
+      --i;
+      const Net *main_net = i->first.first ? i->first.first : i->first.second;
+      const Net *other_net = i->first.first ? i->first.second : i->first.first;
+      if (seen.find (main_net) == seen.end () && (! other_net || seen.find (other_net) == seen.end ())) {
+        net_identity.push_back (*i);
+        seen.insert (main_net);
+        if (other_net) {
+          seen.insert (other_net);
+        }
+      }
+    }
+
+    std::reverse (net_identity.begin (), net_identity.end ());
+
+  }
+
+  return net_identity;
 }
 
 bool
@@ -344,13 +390,6 @@ NetlistComparer::compare_impl (const db::Netlist *a, const db::Netlist *b) const
     tl_assert (i->second.second.size () == size_t (1));
     const db::Circuit *cb = i->second.second.front ();
 
-    std::vector<std::pair<std::pair<const Net *, const Net *>, bool> > empty;
-    const std::vector<std::pair<std::pair<const Net *, const Net *>, bool> > *net_identity = &empty;
-    std::map<std::pair<const db::Circuit *, const db::Circuit *>, std::vector<std::pair<std::pair<const Net *, const Net *>, bool> > >::const_iterator sn = m_same_nets.find (std::make_pair (ca, cb));
-    if (sn != m_same_nets.end ()) {
-      net_identity = &sn->second;
-    }
-
     if (all_subcircuits_verified (ca, verified_circuits_a) && all_subcircuits_verified (cb, verified_circuits_b)) {
 
       if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
@@ -362,7 +401,7 @@ NetlistComparer::compare_impl (const db::Netlist *a, const db::Netlist *b) const
       }
 
       bool pin_mismatch = false;
-      bool g = compare_circuits (ca, cb, device_categorizer, circuit_categorizer, circuit_pin_mapper, *net_identity, pin_mismatch, c12_pin_mapping, c22_pin_mapping);
+      bool g = compare_circuits (ca, cb, device_categorizer, circuit_categorizer, circuit_pin_mapper, get_net_identity (ca, cb), pin_mismatch, c12_pin_mapping, c22_pin_mapping);
       if (! g) {
         good = false;
       }

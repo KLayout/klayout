@@ -1451,7 +1451,7 @@ nets_by_name_const (const db::Circuit *circuit, const std::string &name_pattern)
   }
   for (db::Circuit::const_net_iterator n = circuit->begin_nets (); n != circuit->end_nets (); ++n) {
     const db::Net *net = n.operator-> ();
-    if (glob.match (net->name ())) {
+    if (!net->name ().empty () && glob.match (net->name ())) {
       res.push_back (net);
     }
   }
@@ -1480,7 +1480,7 @@ nets_by_name_const_from_netlist (const db::Netlist *netlist, const std::string &
     for (auto n = c->begin_nets (); n != c->end_nets (); ++n) {
       const db::Net *net = n.operator-> ();
       //  NOTE: we only pick root nets (pin_count == 0 or in top cell)
-      if ((is_top || net->pin_count () == 0) && glob.match (net->name ())) {
+      if ((is_top || net->pin_count () == 0) && !net->name ().empty () && glob.match (net->name ())) {
         res.push_back (net);
       }
     }

@@ -552,6 +552,9 @@ CODE
     # same_nets("INV*", "A*")
     # @/code
     #
+    # A plain "*" for the net pattern forces all (named) nets to be equivalent between layout and schematic. 
+    # Unnamed nets from the extracted netlist are not considered - i.e. nets without a label.
+    #
     # After using this function, the compare algorithm will consider these nets equivalent.
     # Use this method to provide hints for the comparer in cases which are difficult to
     # resolve otherwise.
@@ -560,6 +563,16 @@ CODE
     # Names are case sensitive for layout-derived netlists and case-insensitive for SPICE schematic netlists.
     #
     # Use this method andwhere in the script before the \compare call.
+    #
+    # Multiple calls of "same_nets" can be used. The calls are effective in the order
+    # the are given. For example, the following sequence specifies equivalence of all
+    # equally named nets, with the exception of "A" and "B" which are equivalent to each other
+    # inside cell "ND2", despite their different name:
+    #
+    # @code
+    # same_nets("*", "*")
+    # same_nets("ND2", "A", "B")
+    # @/code
 
     def same_nets(*args)
       _same_nets_impl(false, *args)
@@ -573,6 +586,22 @@ CODE
     # @synopsis same_nets!(circuit_a, net_a, circuit_b, net_b)
     # This method is equivalent to \same_nets, but requires identity of the given nets.
     # If the specified nets do not match, an error is reported.
+    #
+    # For example, this global specification requires all named nets from the
+    # layout to have an equivalent net in the schematic and those nets need to be 
+    # identical for all circuits:
+    #
+    # @code
+    # same_nets!("*", "*")
+    # @/code
+    #
+    # The following specification requires "A" and "B" to be identical in
+    # circuit "ND2". It is not an error if either "A" does not exist in the
+    # layout or "B" does not exist in the schematic:
+    #
+    # @code
+    # same_nets!("ND2", "A", "B")
+    # @/code
     
     def same_nets!(*args)
       _same_nets_impl(true, *args)
@@ -655,7 +684,7 @@ CODE
 
           nets = []
           n2n.keys.sort.each do |n|
-            if force || (n2n[n][0] && n2n[n][1])
+            if n2n[n][0] && (force || n2n[n][1])
               nets << n2n[n]
             end
           end

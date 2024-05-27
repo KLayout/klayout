@@ -1018,7 +1018,7 @@ void LayoutToNetlist::register_layer (const ShapeCollection &collection, const s
     throw tl::Exception (tl::to_string (tr ("Layer name is already used: ")) + n_in);
   }
 
-  //  Caution: this make create names which clash with future explicit names. Hopefully, the generated names are unique enough.
+  //  Caution: this may create names which clash with future explicit names. Hopefully, the generated names are unique enough.
   std::string n = n_in.empty () ? make_new_name () : n_in;
 
   db::DeepLayer dl;

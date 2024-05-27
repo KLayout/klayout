@@ -447,7 +447,7 @@ name(poly_wiring, "poly_wiring")
 </p><p>
 Names must be assigned before the layers are used for the first time
 in <a href="#connect">connect</a>, <a href="#soft_connect">soft_connect</a>, <a href="#connect_global">connect_global</a>, <a href="#soft_connect_global">soft_connect_global</a> and 
-extract_devices statements. 
+<a href="#extract_devices">extract_devices</a> statements. 
 </p><p>
 If layers are not named, they will be given a name made from the 
 <a href="#name_prefix">name_prefix</a> and an incremental number when the layer is used for the

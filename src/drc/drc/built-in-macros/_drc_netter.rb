@@ -317,7 +317,7 @@ module DRC
     #
     # Names must be assigned before the layers are used for the first time
     # in \connect, \soft_connect, \connect_global, \soft_connect_global and 
-    # extract_devices statements. 
+    # \extract_devices statements. 
     # 
     # If layers are not named, they will be given a name made from the 
     # \name_prefix and an incremental number when the layer is used for the

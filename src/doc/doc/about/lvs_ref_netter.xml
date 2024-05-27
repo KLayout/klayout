@@ -396,6 +396,9 @@ the schematic netlist for all circuits starting with "INV":
 same_nets("INV*", "A*")
 </pre>
 </p><p>
+A plain "*" for the net pattern forces all (named) nets to be equivalent between layout and schematic. 
+Unnamed nets from the extracted netlist are not considered - i.e. nets without a label.
+</p><p>
 After using this function, the compare algorithm will consider these nets equivalent.
 Use this method to provide hints for the comparer in cases which are difficult to
 resolve otherwise.
@@ -404,6 +407,16 @@ circuit_a and net_a are for the layout netlist, circuit_b and net_b for the sche
 Names are case sensitive for layout-derived netlists and case-insensitive for SPICE schematic netlists.
 </p><p>
 Use this method andwhere in the script before the <a href="#compare">compare</a> call.
+</p><p>
+Multiple calls of "same_nets" can be used. The calls are effective in the order
+the are given. For example, the following sequence specifies equivalence of all
+equally named nets, with the exception of "A" and "B" which are equivalent to each other
+inside cell "ND2", despite their different name:
+</p><p>
+<pre>
+same_nets("*", "*")
+same_nets("ND2", "A", "B")
+</pre>
 </p>
 <a name="same_nets!"/><h2>"same_nets!" - Establishes an equivalence between the nets with matching requirement</h2>
 <keyword name="same_nets!"/>
@@ -416,6 +429,22 @@ Use this method andwhere in the script before the <a href="#compare">compare</a>
 <p>
 This method is equivalent to <a href="#same_nets">same_nets</a>, but requires identity of the given nets.
 If the specified nets do not match, an error is reported.
+</p><p>
+For example, this global specification requires all named nets from the
+layout to have an equivalent net in the schematic and those nets need to be 
+identical for all circuits:
+</p><p>
+<pre>
+same_nets!("*", "*")
+</pre>
+</p><p>
+The following specification requires "A" and "B" to be identical in
+circuit "ND2". It is not an error if either "A" does not exist in the
+layout or "B" does not exist in the schematic:
+</p><p>
+<pre>
+same_nets!("ND2", "A", "B")
+</pre>
 </p>
 <a name="schematic"/><h2>"schematic" - Gets, sets or reads the reference netlist</h2>
 <keyword name="schematic"/>

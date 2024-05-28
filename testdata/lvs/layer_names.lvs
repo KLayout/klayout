@@ -1,0 +1,105 @@
+
+source($lvs_test_source, $lvs_test_top)
+
+report_lvs($lvs_test_target_lvsdb, true)
+
+target_netlist($lvs_test_target_cir, write_spice, "Extracted by KLayout")
+
+schematic("floating_ref.cir")
+
+deep
+
+# Drawing layers
+
+nwell       = input(1, 0)
+active      = input(2, 0)
+pplus       = input(3, 0)
+nplus       = input(4, 0)
+poly        = input(5, 0)
+contact     = input(8, 0)
+metal1      = input(9, 0)
+via1        = input(10, 0)
+metal2      = input(11, 0)
+
+# try layer names with nwell
+name(nwell, "nwell")
+
+# same name - not an error
+name(nwell, "nwell")
+
+ok = true
+begin
+  name(nwell, "nwell2")
+  ok = false
+rescue => ex
+end
+ok || raise("nwell layer is already named - this is an error")
+
+# Bulk layer for terminal provisioning
+
+bulk        = polygon_layer
+
+# Computed layers
+
+active_in_nwell       = active & nwell
+pactive               = active_in_nwell & pplus
+pgate                 = pactive & poly
+psd                   = pactive - pgate
+ntie                  = active_in_nwell & nplus
+
+active_outside_nwell  = active - nwell
+nactive               = active_outside_nwell & nplus
+ngate                 = nactive & poly
+nsd                   = nactive - ngate
+ptie                  = active_outside_nwell & pplus
+
+# Layer names for all other layers
+
+%w(bulk pactive pgate psd ntie nactive ngate nsd poly contact metal1 via1 metal2).each do |v|
+  name(eval(v), v)
+end
+
+# Device extraction
+
+# PMOS transistor device extraction
+extract_devices(mos4("PMOS"), { "SD" => psd, "G" => pgate, "W" => nwell, 
+                                "tS" => psd, "tD" => psd, "tG" => poly, "tW" => nwell })
+
+# NMOS transistor device extraction
+extract_devices(mos4("NMOS"), { "SD" => nsd, "G" => ngate, "W" => bulk, 
+                                "tS" => nsd, "tD" => nsd, "tG" => poly, "tW" => bulk })
+
+# Define connectivity for netlist extraction
+
+# Inter-layer
+connect(psd,        contact)
+connect(nsd,        contact)
+connect(poly,       contact)
+connect(ntie,       contact)
+connect(nwell,      ntie)
+connect(ptie,       contact)
+connect(contact,    metal1)
+connect(metal1,     via1)
+connect(via1,       metal2)
+
+# Global
+connect_global(bulk, "SUBSTRATE")
+connect_global(ptie, "SUBSTRATE")
+
+ok = true
+begin
+  name(ptie, "ptie")
+  ok = false
+rescue => ex
+end
+ok || raise("ptie layer already used - this is an error")
+
+# Compare section
+
+netlist.simplify
+align
+
+consider_net_names(false)
+
+compare
+

@@ -245,10 +245,16 @@ CommonReaderBase::merge_cell (db::Layout &layout, db::cell_index_type target_cel
   db::Cell &target_cell = layout.cell (target_cell_index);
   target_cell.set_ghost_cell (src_cell.is_ghost_cell () && target_cell.is_ghost_cell ());
 
+  //  avoid generating duplicates
+  std::set<db::Instance, db::InstanceCompareFunction> current;
+  for (db::Cell::const_iterator i = target_cell.begin (); ! i.at_end (); ++i) {
+    current.insert (*i);
+  }
+
   //  copy over the instances
   for (db::Cell::const_iterator i = src_cell.begin (); ! i.at_end (); ++i) {
     //  NOTE: cell indexed may be invalid because we delete subcells without update()
-    if (layout.is_valid_cell_index (i->cell_index ())) {
+    if (layout.is_valid_cell_index (i->cell_index ()) && current.find (*i) == current.end ()) {
       target_cell.insert (*i);
     }
   }

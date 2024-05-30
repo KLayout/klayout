@@ -464,9 +464,19 @@ signals:
   void changed ();
 
   /**
+   *  @brief This signal is sent by collection when a child collection is about to be deleted in this collection
+   */
+  void child_about_to_be_deleted (lym::MacroCollection *);
+
+  /**
    *  @brief This signal is sent by collection when a child collection is deleted in this collection
    */
   void child_deleted (lym::MacroCollection *);
+
+  /**
+   *  @brief This signal is sent by the root object when a macro collection is about to be deleted
+   */
+  void macro_collection_about_to_be_deleted (lym::MacroCollection *);
 
   /**
    *  @brief This signal is sent by the root object when a macro collection is deleted
@@ -474,9 +484,19 @@ signals:
   void macro_collection_deleted (lym::MacroCollection *);
 
   /**
+   *  @brief This signal is sent by collection when a macro is about to be deleted in this collection
+   */
+  void macro_about_to_be_deleted_here (lym::Macro *);
+
+  /**
    *  @brief This signal is sent by collection when a macro is deleted in this collection
    */
   void macro_deleted_here (lym::Macro *);
+
+  /**
+   *  @brief This signal is sent by the root object when a macro is about to be deleted
+   */
+  void macro_about_to_be_deleted (lym::Macro *);
 
   /**
    *  @brief This signal is sent by the root object when a macro is deleted
@@ -522,9 +542,13 @@ private:
   int m_virtual_mode;
   bool m_readonly;
 
+  void on_child_about_to_be_deleted (MacroCollection *mc);
   void on_child_deleted (MacroCollection *mc);
+  void on_macro_collection_about_to_be_deleted (MacroCollection *mc);
   void on_macro_collection_deleted (MacroCollection *mc);
+  void on_macro_about_to_be_deleted_here (Macro *macro);
   void on_macro_deleted_here (Macro *macro);
+  void on_macro_about_to_be_deleted (Macro *macro);
   void on_macro_deleted (Macro *macro);
   void on_macro_changed (Macro *macro);
   void on_macro_collection_changed (MacroCollection *mc);
@@ -535,6 +559,7 @@ private:
   void create_entry (const std::string &path);
 
   void rename_macro (Macro *macro, const std::string &new_name);
+  void folder_renamed (MacroCollection *mc);
 
   void begin_changes ();
 

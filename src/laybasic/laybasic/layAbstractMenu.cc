@@ -65,7 +65,7 @@ static const bool s_can_move_menu = false;
 
 #else
 
-static const bool s_can_move_menu = false; // @@@ true;
+static const bool s_can_move_menu = true;
 
 #endif
 

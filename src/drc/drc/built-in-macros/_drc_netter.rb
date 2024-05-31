@@ -826,36 +826,7 @@ module DRC
       @l2n.make_soft_connection_diodes = f
     end
 
-  private
-
-    def cleanup
-      @l2n && @l2n.is_extracted? && clear_connections
-    end
-    
-    def ensure_data
-      if !@l2n
-        @layers = {}
-        _make_data
-        @l2n.device_scaling = @device_scaling
-        @l2n.top_level_mode = @top_level
-      end
-    end
-
-    def _make_data
-
-      if @engine._dss
-        @engine._dss.is_singular? || raise("The DRC script features more than one or no layout source - network extraction cannot be performed in such configurations")
-        @l2n = RBA::LayoutToNetlist::new(@engine._dss)
-      else
-        layout = @engine.source.layout
-        cell_name = @engine.source.cell_name
-        @l2n = RBA::LayoutToNetlist::new(cell_name, layout.dbu)
-      end
-
-      @l2n.name = "DRC"
-      @l2n.generator = @engine._generator
-
-    end
+  protected
 
     def _register_layer(data, context, name = nil)
 
@@ -879,6 +850,37 @@ module DRC
 
     end
     
+    def _make_data
+
+      if @engine._dss
+        @engine._dss.is_singular? || raise("The DRC script features more than one or no layout source - network extraction cannot be performed in such configurations")
+        @l2n = RBA::LayoutToNetlist::new(@engine._dss)
+      else
+        layout = @engine.source.layout
+        cell_name = @engine.source.cell_name
+        @l2n = RBA::LayoutToNetlist::new(cell_name, layout.dbu)
+      end
+
+      @l2n.name = "DRC"
+      @l2n.generator = @engine._generator
+
+    end
+
+  private
+
+    def cleanup
+      @l2n && @l2n.is_extracted? && clear_connections
+    end
+    
+    def ensure_data
+      if !@l2n
+        @layers = {}
+        _make_data
+        @l2n.device_scaling = @device_scaling
+        @l2n.top_level_mode = @top_level
+      end
+    end
+
   end
 
 end

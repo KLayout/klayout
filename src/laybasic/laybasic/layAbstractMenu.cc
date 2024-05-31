@@ -65,7 +65,7 @@ static const bool s_can_move_menu = false;
 
 #else
 
-static const bool s_can_move_menu = true;
+static const bool s_can_move_menu = false; // @@@ true;
 
 #endif
 
@@ -1328,7 +1328,6 @@ AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
           //  MacOS does not like generating top-level menus dynamically, so
           //  we put them into the "_extra" top level one.
           if (menu_frozen) {
-            QMenu *extras_menu = find_extras_menu (mbar);
             if (extras_menu) {
               extras_menu->addMenu (menu);
             }
@@ -1348,7 +1347,6 @@ AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
             prev_action = a->second;
             present_actions.erase (*a);
           } else if (menu_frozen) {
-            QMenu *extras_menu = find_extras_menu (mbar);
             if (extras_menu) {
               extras_menu->addMenu (c->menu ());
             }
@@ -1358,7 +1356,10 @@ AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
 
         }
 
-        build (c->menu (), c->children);
+        //  NOTE: the "extras" menu is built implicitly. You cannot put anything there.
+        if (c->menu () != extras_menu) {
+          build (c->menu (), c->children);
+        }
 
       }
 

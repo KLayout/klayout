@@ -123,7 +123,9 @@ MacroTreeModel::MacroTreeModel (QObject *parent, lay::MacroEditorDialog *dialog,
   : QAbstractItemModel (parent), mp_dialog (dialog), mp_parent (dialog), mp_root (root), m_category (cat)
 {
   connect (root, SIGNAL (macro_changed (lym::Macro *)), this, SLOT (macro_changed ()));
+  connect (root, SIGNAL (macro_about_to_be_deleted (lym::Macro *)), this, SLOT (macro_about_to_be_deleted (lym::Macro *)));
   connect (root, SIGNAL (macro_deleted (lym::Macro *)), this, SLOT (macro_deleted (lym::Macro *)));
+  connect (root, SIGNAL (macro_collection_about_to_be_deleted (lym::MacroCollection *)), this, SLOT (macro_collection_about_to_be_deleted (lym::MacroCollection *)));
   connect (root, SIGNAL (macro_collection_deleted (lym::MacroCollection *)), this, SLOT (macro_collection_deleted (lym::MacroCollection *)));
   connect (root, SIGNAL (macro_collection_changed (lym::MacroCollection *)), this, SLOT (macro_collection_changed ()));
   connect (root, SIGNAL (about_to_change ()), this, SLOT (about_to_change ()));
@@ -133,7 +135,9 @@ MacroTreeModel::MacroTreeModel (QWidget *parent, lym::MacroCollection *root, con
   : QAbstractItemModel (parent), mp_dialog (0), mp_parent (parent), mp_root (root), m_category (cat)
 {
   connect (root, SIGNAL (macro_changed (lym::Macro *)), this, SLOT (macro_changed ()));
+  connect (root, SIGNAL (macro_about_to_be_deleted (lym::Macro *)), this, SLOT (macro_about_to_be_deleted (lym::Macro *)));
   connect (root, SIGNAL (macro_deleted (lym::Macro *)), this, SLOT (macro_deleted (lym::Macro *)));
+  connect (root, SIGNAL (macro_collection_about_to_be_deleted (lym::MacroCollection *)), this, SLOT (macro_collection_about_to_be_deleted (lym::MacroCollection *)));
   connect (root, SIGNAL (macro_collection_deleted (lym::MacroCollection *)), this, SLOT (macro_collection_deleted (lym::MacroCollection *)));
   connect (root, SIGNAL (macro_collection_changed (lym::MacroCollection *)), this, SLOT (macro_collection_changed ()));
   connect (root, SIGNAL (about_to_change ()), this, SLOT (about_to_change ()));
@@ -144,9 +148,25 @@ Qt::DropActions MacroTreeModel::supportedDropActions() const
   return Qt::MoveAction;
 }
 
+void MacroTreeModel::macro_about_to_be_deleted (lym::Macro *macro)
+{
+  QModelIndex index = index_for (macro);
+  if (index.isValid ()) {
+    changePersistentIndex (index, QModelIndex ());
+  }
+}
+
 void MacroTreeModel::macro_deleted (lym::Macro *)
 {
   //  .. nothing yet ..
+}
+
+void MacroTreeModel::macro_collection_about_to_be_deleted (lym::MacroCollection *mc)
+{
+  QModelIndex index = index_for (mc);
+  if (index.isValid ()) {
+    changePersistentIndex (index, QModelIndex ());
+  }
 }
 
 void MacroTreeModel::macro_collection_deleted (lym::MacroCollection *)

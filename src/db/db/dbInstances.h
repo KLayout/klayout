@@ -1977,7 +1977,20 @@ OverlappingInstanceIteratorTraits::instance_from_stable_iter (const Iter &iter) 
   //  box tree iterators deliver pointers, not iterators. Use instance_from_pointer to do this conversion.
   return mp_insts->instance_from_pointer (&*iter);
 }
- 
+
+/**
+ *  @brief A compare function for db::Instance that uses "less" for value compare
+ *
+ *  In contrast, "operator<" will compare the instance reference, not value.
+ */
+struct InstanceCompareFunction
+{
+  bool operator() (const db::Instance &a, const db::Instance &b) const
+  {
+    return a.less (b);
+  }
+};
+
 }
 
 #endif

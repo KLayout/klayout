@@ -69,7 +69,9 @@ signals:
 
 private slots:
   void macro_changed ();
+  void macro_about_to_be_deleted (lym::Macro *macro);
   void macro_deleted (lym::Macro *macro);
+  void macro_collection_about_to_be_deleted (lym::MacroCollection *mc);
   void macro_collection_deleted (lym::MacroCollection *mc);
   void macro_collection_changed ();
   void about_to_change ();

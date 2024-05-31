@@ -721,19 +721,49 @@ num_args (const gsi::MethodBase *m)
   return int (m->end_arguments () - m->begin_arguments ());
 }
 
+std::set<std::string>
+invalid_kwnames (const gsi::MethodBase *meth, const std::map<std::string, tl::Variant> *kwargs)
+{
+  std::set<std::string> valid_names;
+  for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments (); ++a) {
+    valid_names.insert (a->spec ()->name ());
+  }
+
+  std::set<std::string> invalid_names;
+  for (auto i = kwargs->begin (); i != kwargs->end (); ++i) {
+    if (valid_names.find (i->first) == valid_names.end ()) {
+      invalid_names.insert (i->first);
+    }
+  }
+
+  return invalid_names;
+}
+
 static bool
-compatible_with_args (const gsi::MethodBase *m, int argc, const std::map<std::string, tl::Variant> *kwargs)
+compatible_with_args (const gsi::MethodBase *m, int argc, const std::map<std::string, tl::Variant> *kwargs, std::string *why_not = 0)
 {
   int nargs = num_args (m);
+  int nkwargs = kwargs ? int (kwargs->size ()) : 0;
 
-  if (argc >= nargs) {
+  if (argc > nargs) {
+    if (why_not) {
+      *why_not = tl::sprintf (tl::to_string (tr ("%d argument(s) expected, but %d given")), nargs, argc);
+    }
+    return false;
+  } else if (argc == nargs) {
     //  no more arguments to consider
-    return argc == nargs && (! kwargs || kwargs->empty ());
+    if (nkwargs > 0) {
+      if (why_not) {
+        *why_not = tl::to_string (tr ("all arguments given, but additional keyword arguments specified"));
+      }
+      return false;
+    } else {
+      return true;
+    }
   }
 
   if (kwargs) {
 
-    int nkwargs = int (kwargs->size ());
     int kwargs_taken = 0;
 
     while (argc < nargs) {
@@ -741,6 +771,9 @@ compatible_with_args (const gsi::MethodBase *m, int argc, const std::map<std::st
       auto i = kwargs->find (atype.spec ()->name ());
       if (i == kwargs->end ()) {
         if (! atype.spec ()->has_default ()) {
+          if (why_not) {
+            *why_not = tl::sprintf (tl::to_string (tr ("no argument specified for '%s' (neither positional or keyword)")), atype.spec ()->name ());
+          }
           return false;
         }
       } else {
@@ -750,13 +783,33 @@ compatible_with_args (const gsi::MethodBase *m, int argc, const std::map<std::st
     }
 
     //  matches if all keyword arguments are taken
-    return kwargs_taken == nkwargs;
+    if (kwargs_taken != nkwargs) {
+      if (why_not) {
+        std::set<std::string> invalid_names = invalid_kwnames (m, kwargs);
+        if (invalid_names.size () > 1) {
+          std::string names_str = tl::join (invalid_names.begin (), invalid_names.end (), ", ");
+          *why_not = tl::to_string (tr ("unknown keyword parameters: ")) + names_str;
+        } else if (invalid_names.size () == 1) {
+          *why_not = tl::to_string (tr ("unknown keyword parameter: ")) + *invalid_names.begin ();
+        }
+      }
+      return false;
+    } else {
+      return true;
+    }
 
   } else {
 
     while (argc < nargs) {
       const gsi::ArgType &atype = m->begin_arguments () [argc];
       if (! atype.spec ()->has_default ()) {
+        if (why_not) {
+          if (argc < nargs - 1 && ! m->begin_arguments () [argc + 1].spec ()->has_default ()) {
+            *why_not = tl::sprintf (tl::to_string (tr ("no value given for argument #%d and following")), argc + 1);
+          } else {
+            *why_not = tl::sprintf (tl::to_string (tr ("no value given for argument #%d")), argc + 1);
+          }
+        }
         return false;
       }
       ++argc;
@@ -771,8 +824,11 @@ static std::string
 describe_overload (const gsi::MethodBase *m, int argc, const std::map<std::string, tl::Variant> *kwargs)
 {
   std::string res = m->to_string ();
-  if (compatible_with_args (m, argc, kwargs)) {
+  std::string why_not;
+  if (compatible_with_args (m, argc, kwargs, &why_not)) {
     res += " " + tl::to_string (tr ("[match candidate]"));
+  } else if (! why_not.empty ()) {
+    res += " [" + why_not + "]";
   }
   return res;
 }
@@ -980,8 +1036,10 @@ VariantUserClassImpl::execute_gsi (const tl::ExpressionParserContext & /*context
               //  leave it to the consumer to establish the default values (that is faster)
               break;
             }
-            tl::Variant def_value = a->spec ()->default_value ();
-            gsi::push_arg (arglist, *a, def_value, &heap);
+            const tl::Variant &def_value = a->spec ()->default_value ();
+            //  NOTE: this const_cast means we need to take care that we do not use default values on "out" parameters.
+            //  Otherwise there is a chance we will modify the default value.
+            gsi::push_arg (arglist, *a, const_cast<tl::Variant &> (def_value), &heap);
           } else {
             throw tl::Exception (tl::to_string ("No argument provided (positional or keyword) and no default value available"));
           }
@@ -1004,19 +1062,7 @@ VariantUserClassImpl::execute_gsi (const tl::ExpressionParserContext & /*context
     if (kwargs_taken != nkwargs) {
 
       //  check if there are any left-over keyword parameters with unknown names
-
-      std::set<std::string> valid_names;
-      for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments (); ++a) {
-        valid_names.insert (a->spec ()->name ());
-      }
-
-      std::set<std::string> invalid_names;
-      for (auto i = kwargs->begin (); i != kwargs->end (); ++i) {
-        if (valid_names.find (i->first) == valid_names.end ()) {
-          invalid_names.insert (i->first);
-        }
-      }
-
+      std::set<std::string> invalid_names = invalid_kwnames (meth, kwargs);
       if (invalid_names.size () > 1) {
         std::string names_str = tl::join (invalid_names.begin (), invalid_names.end (), ", ");
         throw tl::Exception (tl::to_string (tr ("Unknown keyword parameters: ")) + names_str);

@@ -197,10 +197,13 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
                     "--" + m_long_prefix + "blend-mode=mode", &m_cell_conflict_resolution, "Specifies how cell conflicts are resolved when using file concatenation",
                     "When concatenating files with '+', the reader will handle cells with identical names according to this mode:\n"
                     "\n"
-                    "* 0: joins everything (unsafe)\n"
+                    "* 0: joins everything (usually unsafe)\n"
                     "* 1: overwrite\n"
                     "* 2: skip new cell\n"
-                    "* 3: rename cell (safe, default)"
+                    "* 3: rename cell (safe, default)\n"
+                    "\n"
+                    "Mode 0 is a safe solution for the 'same hierarchy, different layers' case. Mode 3 is a safe solution for "
+                    "joining multiple files into one and combining the hierarchy tree of all files as distinct separate trees.\n"
                    )
       ;
   }

@@ -998,6 +998,10 @@ TEST(6)
   //  Note: iterating and replace does not work in non-editable mode
   if (db::default_editable_mode ()) {
 
+    std::vector<db::Instance> insts;
+    for (db::Cell::const_iterator i = cc.begin (); ! i.at_end (); ++i) {
+      insts.push_back (*i);
+    }
     for (db::Cell::const_iterator i = cc.begin (); ! i.at_end (); ++i) {
       cc.replace_prop_id (*i, i->prop_id () + 1);
     }

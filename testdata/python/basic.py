@@ -3236,6 +3236,48 @@ class BasicTest(unittest.TestCase):
     self.assertEqual(pc.x, 3)
     self.assertEqual(pdc.x, 4)
 
+  # keyword arguments, enums and error messages
+
+  def test_92(self):
+
+    bb = pya.BB()
+    
+    m = ""
+    try:
+      bb.d4()
+    except Exception as ex:
+      m = str(ex)
+    self.assertEqual(m, "Can't match arguments. Variants are:\n  string d4(int a, string b, double c, B3::E d = E3A, variant e = nil) [no value given for argument #1 and following]\n in BB.d4")
+
+    m = ""
+    try:
+      bb.d4(1, "a")
+    except Exception as ex:
+      m = str(ex)
+    self.assertEqual(m, "Can't match arguments. Variants are:\n  string d4(int a, string b, double c, B3::E d = E3A, variant e = nil) [no value given for argument #3]\n in BB.d4")
+
+    m = ""
+    try:
+      bb.d4(1, "a", 2.0, xxx=17)
+    except Exception as ex:
+      m = str(ex)
+    self.assertEqual(m, "Can't match arguments. Variants are:\n  string d4(int a, string b, double c, B3::E d = E3A, variant e = nil) [unknown keyword parameter: xxx]\n in BB.d4")
+
+    m = ""
+    try:
+      bb.d4(a=1, b="a", c=2.0, xxx=17)
+    except Exception as ex:
+      m = str(ex)
+    self.assertEqual(m, "Can't match arguments. Variants are:\n  string d4(int a, string b, double c, B3::E d = E3A, variant e = nil) [unknown keyword parameter: xxx]\n in BB.d4")
+
+    self.assertEqual(bb.d4(1, "a", 2.0), "1,a,2,100,nil")
+    self.assertEqual(bb.d4(1, "a", 2.0, e=42), "1,a,2,100,42")
+    self.assertEqual(bb.d4(1, "a", c=2.0, e=42), "1,a,2,100,42")
+    self.assertEqual(bb.d4(c=2.0, a=1, b="a", e=42), "1,a,2,100,42")
+    self.assertEqual(bb.d4(1, "a", 2.0, d=pya.BB.E.E3B), "1,a,2,101,nil")
+    self.assertEqual(bb.d4(1, "a", d=pya.BB.E.E3B, c=2.5), "1,a,2.5,101,nil")
+    self.assertEqual(bb.d4(1, "a", 2.0, pya.BB.E.E3B, 42), "1,a,2,101,42")
+
 # run unit tests
 if __name__ == '__main__':
   suite = unittest.TestSuite()

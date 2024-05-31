@@ -1715,9 +1715,15 @@ gsi::EnumIn<B3, B3::E> enum_in_b3 ("", "E",
   gsi::enum_const ("E3C", B3::E3C)
 );
 
-//  3 base classes
+static std::string d4 (BB *, int a, std::string b, double c, B3::E d, tl::Variant e)
+{
+  return tl::sprintf ("%d,%s,%.12g,%d,%s", a, b, c, int (d), e.to_string ());
+}
+
+//  3 base classes and enums
 static gsi::Class<BB> decl_bb (decl_b1, "", "BB",
-  gsi::method ("d3", &BB::d3)
+  gsi::method ("d3", &BB::d3) +
+  gsi::method_ext ("d4", &d4, gsi::arg ("a"), gsi::arg ("b"), gsi::arg ("c"), gsi::arg ("d", B3::E3A, "E3A"), gsi::arg ("e", tl::Variant (), "nil"), "")
 );
 gsi::ClassExt<BB> b2_in_bb (decl_b2);
 gsi::ClassExt<BB> b3_in_bb (decl_b3);

@@ -271,6 +271,7 @@ private:
   void close_many (int which_relative_to_current);
   void ensure_writeable_collection_selected ();
   void update_console_text ();
+  void do_current_tab_changed ();
   void start_exec (gsi::Interpreter *interpreter);
   void end_exec (gsi::Interpreter *interpreter);
   size_t id_for_path (gsi::Interpreter *interpreter, const std::string &path);
@@ -360,6 +361,7 @@ private:
   std::vector<QString> m_changed_files, m_removed_files;
   tl::DeferredMethod<MacroEditorDialog> dm_refresh_file_watcher;
   tl::DeferredMethod<MacroEditorDialog> dm_update_ui_to_run_mode;
+  tl::DeferredMethod<MacroEditorDialog> dm_current_tab_changed;
   QMenu *mp_tabs_menu;
 };
 

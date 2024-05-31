@@ -164,7 +164,7 @@ CommonReaderBase::rename_cell (db::Layout &layout, size_t id, const std::string 
 
       //  Both cells already exist and are not identical: merge ID-declared cell into the name-declared one
       layout.force_update ();
-      merge_cell (layout, iname->second.second, iid->second.second, true);
+      merge_cell (layout, iname->second.second, iid->second.second, true, false);
       iid->second.second = iname->second.second;
 
     }
@@ -239,18 +239,44 @@ CommonReaderBase::cell_for_instance (db::Layout &layout, const std::string &cn)
 }
 
 void
-CommonReaderBase::merge_cell (db::Layout &layout, db::cell_index_type target_cell_index, db::cell_index_type src_cell_index, bool with_meta) const
+CommonReaderBase::merge_cell (db::Layout &layout, db::cell_index_type target_cell_index, db::cell_index_type src_cell_index, bool with_meta, bool no_duplicate_instances) const
 {
   const db::Cell &src_cell = layout.cell (src_cell_index);
   db::Cell &target_cell = layout.cell (target_cell_index);
   target_cell.set_ghost_cell (src_cell.is_ghost_cell () && target_cell.is_ghost_cell ());
 
-  //  copy over the instances
-  for (db::Cell::const_iterator i = src_cell.begin (); ! i.at_end (); ++i) {
-    //  NOTE: cell indexed may be invalid because we delete subcells without update()
-    if (layout.is_valid_cell_index (i->cell_index ())) {
-      target_cell.insert (*i);
+  if (no_duplicate_instances) {
+
+    //  avoid generating duplicates
+    std::set<db::Instance, db::InstanceCompareFunction> current;
+    for (db::Cell::const_iterator i = target_cell.begin (); ! i.at_end (); ++i) {
+      current.insert (*i);
     }
+
+    //  copy over the instances
+    //  NOTE: need to do that in a two-step fashion as inserting instances may invalidate
+    //  the existing ones.
+    std::vector<bool> selected;
+    for (db::Cell::const_iterator i = src_cell.begin (); ! i.at_end (); ++i) {
+      //  NOTE: cell indexed may be invalid because we delete subcells without update()
+      selected.push_back (layout.is_valid_cell_index (i->cell_index ()) && current.find (*i) == current.end ());
+    }
+    auto s = selected.begin ();
+    for (db::Cell::const_iterator i = src_cell.begin (); ! i.at_end (); ++i, ++s) {
+      if (*s) {
+        target_cell.insert (*i);
+      }
+    }
+
+  } else {
+
+    for (db::Cell::const_iterator i = src_cell.begin (); ! i.at_end (); ++i) {
+      //  NOTE: cell indexed may be invalid because we delete subcells without update()
+      if (layout.is_valid_cell_index (i->cell_index ())) {
+        target_cell.insert (*i);
+      }
+    }
+
   }
 
   merge_cell_without_instances (layout, target_cell_index, src_cell_index, with_meta);
@@ -385,7 +411,7 @@ CommonReaderBase::finish (db::Layout &layout)
 
         layout.cell (ci_org).clear_shapes ();
 
-        merge_cell (layout, ci_org, ci_new, true);
+        merge_cell (layout, ci_org, ci_new, true, false);
 
       } else if (m_cc_resolution == SkipNewCell && ! layout.cell (ci_org).is_ghost_cell ()) {
 
@@ -397,7 +423,7 @@ CommonReaderBase::finish (db::Layout &layout)
 
       } else {
 
-        merge_cell (layout, ci_org, ci_new, m_cc_resolution != SkipNewCell);
+        merge_cell (layout, ci_org, ci_new, m_cc_resolution != SkipNewCell, m_cc_resolution == AddToCell);
 
       }
 

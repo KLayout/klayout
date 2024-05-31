@@ -124,12 +124,31 @@ void MacroCollection::on_macro_collection_changed (MacroCollection *mc)
   }
 }
 
+void MacroCollection::on_child_about_to_be_deleted (MacroCollection *mc)
+{
+#if defined(HAVE_QT)
+  emit child_about_to_be_deleted (mc);
+#endif
+  on_macro_collection_about_to_be_deleted (mc);
+}
+
 void MacroCollection::on_child_deleted (MacroCollection *mc)
 {
 #if defined(HAVE_QT)
   emit child_deleted (mc);
 #endif
   on_macro_collection_deleted (mc);
+}
+
+void MacroCollection::on_macro_collection_about_to_be_deleted (MacroCollection *mc)
+{
+  if (mp_parent) {
+    mp_parent->on_macro_collection_about_to_be_deleted (mc);
+  } else {
+#if defined(HAVE_QT)
+    emit macro_collection_about_to_be_deleted (mc);
+#endif
+  }
 }
 
 void MacroCollection::on_macro_collection_deleted (MacroCollection *mc)
@@ -143,12 +162,31 @@ void MacroCollection::on_macro_collection_deleted (MacroCollection *mc)
   }
 }
 
+void MacroCollection::on_macro_about_to_be_deleted_here (Macro *macro)
+{
+#if defined(HAVE_QT)
+  emit macro_about_to_be_deleted_here (macro);
+#endif
+  on_macro_about_to_be_deleted (macro);
+}
+
 void MacroCollection::on_macro_deleted_here (Macro *macro)
 {
 #if defined(HAVE_QT)
   emit macro_deleted_here (macro);
 #endif
   on_macro_deleted (macro);
+}
+
+void MacroCollection::on_macro_about_to_be_deleted (Macro *macro)
+{
+  if (mp_parent) {
+    mp_parent->on_macro_about_to_be_deleted (macro);
+  } else {
+#if defined(HAVE_QT)
+    emit macro_about_to_be_deleted (macro);
+#endif
+  }
 }
 
 void MacroCollection::on_macro_deleted (Macro *macro)
@@ -539,8 +577,9 @@ void MacroCollection::erase (lym::Macro *mp)
   for (iterator m = m_macros.begin (); m != m_macros.end (); ++m) {
     if (m->second == mp) {
       begin_changes ();
-      on_macro_deleted_here (mp);
+      on_macro_about_to_be_deleted_here (mp);
       m_macros.erase (m);
+      on_macro_deleted_here (mp);
       delete mp;
       on_changed ();
       return;
@@ -553,8 +592,9 @@ void MacroCollection::erase (lym::MacroCollection *mp)
   for (child_iterator f = m_folders.begin (); f != m_folders.end (); ++f) {
     if (f->second == mp) {
       begin_changes ();
-      on_child_deleted (mp);
+      on_child_about_to_be_deleted (mp);
       m_folders.erase (f);
+      on_child_deleted (mp);
       delete mp;
       on_changed ();
       return;
@@ -608,8 +648,22 @@ bool MacroCollection::rename (const std::string &n)
     return false;
   } else {
     m_path = n;
+    if (parent ()) {
+      parent ()->folder_renamed (this);
+    }
     on_changed ();
     return true;
+  }
+}
+
+void MacroCollection::folder_renamed (MacroCollection *mc)
+{
+  for (auto f = m_folders.begin (); f != m_folders.end (); ++f) {
+    if (f->second == mc) {
+      m_folders.erase (f);
+      m_folders.insert (std::make_pair (mc->name (), mc));
+      return;
+    }
   }
 }
 

@@ -278,7 +278,8 @@ MacroEditorDialog::MacroEditorDialog (lay::Dispatcher *pr, lym::MacroCollection 
     m_edit_trace_index (-1),
     m_add_edit_trace_enabled (true),
     dm_refresh_file_watcher (this, &MacroEditorDialog::do_refresh_file_watcher),
-    dm_update_ui_to_run_mode (this, &MacroEditorDialog::do_update_ui_to_run_mode)
+    dm_update_ui_to_run_mode (this, &MacroEditorDialog::do_update_ui_to_run_mode),
+    dm_current_tab_changed (this, &MacroEditorDialog::do_current_tab_changed)
 {
   //  Makes this dialog receive events while progress bars are on - this way we can set breakpoints
   //  during execution of a macro even if anything lengthy is running.
@@ -1759,13 +1760,12 @@ MacroEditorDialog::macro_deleted (lym::Macro *macro)
 
   std::map <lym::Macro *, MacroEditorPage *>::iterator page = m_tab_widgets.find (macro);
   if (page != m_tab_widgets.end ()) {
-    //  disable the macro on the page - we'll ask for updates when the file
-    //  watcher becomes active. So long, the macro is "zombie".
-    page->second->connect_macro (0);
-    m_tab_widgets.erase (page);
+    int index = tabWidget->indexOf (page->second);
+    if (index >= 0) {
+      tab_close_requested (index);
+    }
   }
 
-  refresh_file_watcher ();
   update_ui_to_run_mode ();
 }
 
@@ -1792,12 +1792,10 @@ MacroEditorDialog::macro_changed (lym::Macro *macro)
   }
 }
 
-void 
-MacroEditorDialog::current_tab_changed (int index)
+void
+MacroEditorDialog::do_current_tab_changed ()
 {
-  add_edit_trace (false);
-
-  MacroEditorPage *page = dynamic_cast<MacroEditorPage *> (tabWidget->widget (index));
+  MacroEditorPage *page = dynamic_cast<MacroEditorPage *> (tabWidget->currentWidget ());
   if (page) {
     int tab_index = 0;
     for (std::vector<lay::MacroEditorTree *>::const_iterator mt = m_macro_trees.begin (); mt != m_macro_trees.end (); ++mt, ++tab_index) {
@@ -1807,9 +1805,19 @@ MacroEditorDialog::current_tab_changed (int index)
       }
     }
   }
+}
 
+void 
+MacroEditorDialog::current_tab_changed (int index)
+{
+  //  select the current macro - done in a delayed fashion so there is
+  //  no interacting during erase of macros
+  dm_current_tab_changed ();
+
+  add_edit_trace (false);
+
+  MacroEditorPage *page = dynamic_cast<MacroEditorPage *> (tabWidget->widget (index));
   replaceFrame->setEnabled (page && page->macro () && !page->macro ()->is_readonly ());
-
   apply_search ();
 
   do_update_ui_to_run_mode ();
@@ -2500,6 +2508,7 @@ BEGIN_PROTECTED
     if (m->is_readonly ()) {
       throw tl::Exception ("Can't delete this macro - it is readonly");
     }
+
     if (collection) {
 
       if (QMessageBox::question (this, QObject::tr ("Delete Macro File"), 
@@ -2512,11 +2521,10 @@ BEGIN_PROTECTED
         throw tl::Exception ("Can't delete this macro");
       }
 
+      ct->set_current (collection);
       collection->erase (m);
 
     }
-
-    ct->set_current (collection);
 
   }
 

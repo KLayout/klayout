@@ -171,7 +171,7 @@ TEST(20_private)
 
 TEST(21_private)
 {
-  run_test (_this, "test_21.lylvs", "test_21.cir.gz", "test_21.gds.gz", true, "test_21_4.lvsdb");
+  run_test (_this, "test_21.lylvs", "test_21.cir.gz", "test_21.gds.gz", true, "test_21_5.lvsdb");
 }
 
 //  issue #1021

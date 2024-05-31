@@ -2817,6 +2817,18 @@ private:
   std::map<size_t, entry_list::iterator> m_global_net_to_entries;
 };
 
+template <class T>
+struct is_for_nets
+{
+  static bool value () { return false; }
+};
+
+template <>
+struct is_for_nets<db::NetShape>
+{
+  static bool value () { return true; }
+};
+
 }
 
 template <class T>
@@ -2903,10 +2915,33 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
     }
 
     bs2.process (*rec, 1 /*touching*/, local_cluster_box_convert<T> (), cibc);
+
   }
 
   //  join local clusters which got connected by child clusters
   rec->finish_cluster_to_instance_interactions ();
+
+  if (is_for_nets<T>::value ()) {
+
+    //  remove empty or point-like clusters which do not make a downward connection - i.e. from stray texts.
+    //  This implies, we cannot connect from upward down to such nets too. In other words: to force a pin,
+    //  inside a cell we need more than a text.
+    //  (issue #1719, part 2)
+    std::vector<typename local_cluster<T>::id_type> to_delete;
+    for (typename connected_clusters<T>::const_iterator c = local.begin (); c != local.end (); ++c) {
+      box_type bbox = c->bbox ();
+      if ((bbox.empty () || (bbox.width () == 0 && bbox.height () == 0)) && c->get_global_nets ().empty () && local.connections_for_cluster (c->id ()).empty ()) {
+        to_delete.push_back (c->id ());
+      }
+    }
+    for (auto i = to_delete.begin (); i != to_delete.end (); ++i) {
+      local.remove_cluster (*i);
+    }
+    if (tl::verbosity () >= m_base_verbosity + 20) {
+      tl::info << "Removed " << to_delete.size () << " clusters because they are point-like or empty and do not have connections downward (stray texts)";
+    }
+
+  }
 
   if (tl::verbosity () >= m_base_verbosity + 20) {
     tl::info << "Cluster build cache statistics (instance to shape cache): size=" << rec->cluster_cache_size () << ", hits=" << rec->cluster_cache_hits () << ", misses=" << rec->cluster_cache_misses ();

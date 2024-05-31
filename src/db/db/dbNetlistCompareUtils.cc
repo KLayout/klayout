@@ -73,7 +73,7 @@ nl_compare_debug_indent (size_t depth)
 
 const std::string var_sep = tl::to_string (tr (" vs. "));
 
-static std::string
+std::string
 expanded_name (const db::Net *a)
 {
   if (a == 0) {

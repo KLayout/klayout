@@ -1109,8 +1109,8 @@ private:
   void do_soft_connections ();
   void join_nets_from_pattern (db::Circuit &c, const tl::GlobPattern &p);
   void join_nets_from_pattern (db::Circuit &c, const std::set<std::string> &p);
-  void check_must_connect (const db::Circuit &c, const db::Net &a, const db::Net &b);
-  void check_must_connect_impl (const db::Circuit &c, const db::Net &a, const db::Net &b, const db::Circuit &c_org, const db::Net &a_org, const db::Net &b_org, std::vector<const db::SubCircuit *> &path);
+  void check_must_connect (const db::Circuit &c, const std::vector<Net *> &nets);
+  void check_must_connect_impl (const db::Circuit &c, const std::vector<const Net *> &nets, const db::Circuit &c_org, const std::vector<const Net *> &nets_org, std::vector<const db::SubCircuit *> &path, bool same_names);
 
   //  for debugging and testing
   void place_soft_connection_diodes ();

@@ -338,3 +338,22 @@ TEST(55_SoftConnectionSecondLevel)
 {
   run_test (_this, "soft_connect6", "soft_connect6.gds", true, false /*no LVS*/);
 }
+
+//  Issue #1719, part 2 (ignore stray texts)
+TEST(60_StrayTextsDoNotMakeNets)
+{
+  run_test (_this, "stray_texts1", "stray_texts.gds", true, false /*no LVS*/);
+}
+
+//  Issue #1719, part 2 (ignore stray texts)
+TEST(61_StrayTextsDoNotMakeNets)
+{
+  run_test (_this, "stray_texts2", "stray_texts.gds", true, false /*no LVS*/);
+}
+
+//  Issue #1719, part 3 (layer naming)
+TEST(62_LayerNames)
+{
+  run_test (_this, "layer_names", "layer_names.gds", false, true, "TOP");
+}
+

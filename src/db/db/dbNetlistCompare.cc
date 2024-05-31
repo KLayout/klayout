@@ -86,14 +86,17 @@ NetlistComparer::exclude_resistors (double threshold)
 void
 NetlistComparer::same_nets (const db::Net *na, const db::Net *nb, bool must_match)
 {
-  tl_assert (na && na);
-  m_same_nets [std::make_pair (na->circuit (), nb->circuit ())].push_back (std::make_pair (std::make_pair (na, nb), must_match));
+  if (na || nb) {
+    m_same_nets [std::make_pair (na->circuit (), nb->circuit ())].push_back (std::make_pair (std::make_pair (na, nb), must_match));
+  }
 }
 
 void
 NetlistComparer::same_nets (const db::Circuit *ca, const db::Circuit *cb, const db::Net *na, const db::Net *nb, bool must_match)
 {
-  m_same_nets [std::make_pair (ca, cb)].push_back (std::make_pair (std::make_pair (na, nb), must_match));
+  if (na || nb) {
+    m_same_nets [std::make_pair (ca, cb)].push_back (std::make_pair (std::make_pair (na, nb), must_match));
+  }
 }
 
 void
@@ -205,6 +208,49 @@ NetlistComparer::compare (const db::Netlist *a, const db::Netlist *b) const
   }
 
   return res;
+}
+
+/**
+ *  @brief Returns a consolidated list of identical nets for a circuit pair (aka "same_nets")
+ *
+ *  The list is reduced by duplicates of the first net such, that the
+ *  last "same_nets" entry wins.
+ *
+ *  The return value is a list of net pairs and a flag indicating "must_match" mode.
+ *  The second net can be null if "must_match" is true, indicating that no schematic
+ *  net with the same name was found - hence a mismatch exists.
+ */
+std::vector<std::pair<std::pair<const Net *, const Net *>, bool> >
+NetlistComparer::get_net_identity (const db::Circuit *ca, const db::Circuit *cb) const
+{
+  std::vector<std::pair<std::pair<const Net *, const Net *>, bool> > net_identity;
+
+  std::map<std::pair<const db::Circuit *, const db::Circuit *>, std::vector<std::pair<std::pair<const Net *, const Net *>, bool> > >::const_iterator sn = m_same_nets.find (std::make_pair (ca, cb));
+  if (sn != m_same_nets.end ()) {
+
+    const std::vector<std::pair<std::pair<const Net *, const Net *>, bool> > &ni = sn->second;
+
+    //  take last definition for a given first net
+    net_identity.reserve (ni.size ());
+    std::set<const Net *> seen;
+    for (auto i = ni.end (); i != ni.begin (); ) {
+      --i;
+      const Net *main_net = i->first.first ? i->first.first : i->first.second;
+      const Net *other_net = i->first.first ? i->first.second : i->first.first;
+      if (seen.find (main_net) == seen.end () && (! other_net || seen.find (other_net) == seen.end ())) {
+        net_identity.push_back (*i);
+        seen.insert (main_net);
+        if (other_net) {
+          seen.insert (other_net);
+        }
+      }
+    }
+
+    std::reverse (net_identity.begin (), net_identity.end ());
+
+  }
+
+  return net_identity;
 }
 
 bool
@@ -344,13 +390,6 @@ NetlistComparer::compare_impl (const db::Netlist *a, const db::Netlist *b) const
     tl_assert (i->second.second.size () == size_t (1));
     const db::Circuit *cb = i->second.second.front ();
 
-    std::vector<std::pair<std::pair<const Net *, const Net *>, bool> > empty;
-    const std::vector<std::pair<std::pair<const Net *, const Net *>, bool> > *net_identity = &empty;
-    std::map<std::pair<const db::Circuit *, const db::Circuit *>, std::vector<std::pair<std::pair<const Net *, const Net *>, bool> > >::const_iterator sn = m_same_nets.find (std::make_pair (ca, cb));
-    if (sn != m_same_nets.end ()) {
-      net_identity = &sn->second;
-    }
-
     if (all_subcircuits_verified (ca, verified_circuits_a) && all_subcircuits_verified (cb, verified_circuits_b)) {
 
       if (db::NetlistCompareGlobalOptions::options ()->debug_netcompare) {
@@ -362,7 +401,7 @@ NetlistComparer::compare_impl (const db::Netlist *a, const db::Netlist *b) const
       }
 
       bool pin_mismatch = false;
-      bool g = compare_circuits (ca, cb, device_categorizer, circuit_categorizer, circuit_pin_mapper, *net_identity, pin_mismatch, c12_pin_mapping, c22_pin_mapping);
+      bool g = compare_circuits (ca, cb, device_categorizer, circuit_categorizer, circuit_pin_mapper, get_net_identity (ca, cb), pin_mismatch, c12_pin_mapping, c22_pin_mapping);
       if (! g) {
         good = false;
       }
@@ -899,8 +938,16 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
       if (mp_logger) {
         if (p->second && ! exact_match) {
           if (m_with_log) {
-            mp_logger->log_entry (db::Error,
-                                  tl::sprintf (tl::to_string (tr ("Nets %s are paired explicitly, but are not identical topologically")), nets2string (p->first)));
+            if (! p->first.first) {
+              mp_logger->log_entry (db::Error,
+                                    tl::sprintf (tl::to_string (tr ("Right-side net %s is paired explicitly with a left-side one, but no net is present there")), expanded_name (p->first.second)));
+            } else if (! p->first.second) {
+              mp_logger->log_entry (db::Error,
+                                    tl::sprintf (tl::to_string (tr ("Left-side net %s is paired explicitly with a right-side one, but no net is present there")), expanded_name (p->first.first)));
+            } else {
+              mp_logger->log_entry (db::Error,
+                                    tl::sprintf (tl::to_string (tr ("Nets %s are paired explicitly, but are not identical topologically")), nets2string (p->first)));
+            }
           }
           mp_logger->net_mismatch (p->first.first, p->first.second);
         } else {
@@ -911,7 +958,11 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
     } else if (p->second && g1.has_node_index_for_net (p->first.first)) {
 
       if (mp_logger) {
-        mp_logger->net_mismatch (p->first.first, 0);
+        mp_logger->net_mismatch (p->first.first, p->first.second);
+        if (m_with_log && p->first.second) {
+          mp_logger->log_entry (db::Error,
+                                tl::sprintf (tl::to_string (tr ("Nets %s are paired explicitly, but are not identical topologically")), nets2string (p->first)));
+        }
       }
 
       size_t ni1 = g1.node_index_for_net (p->first.first);
@@ -920,7 +971,11 @@ NetlistComparer::compare_circuits (const db::Circuit *c1, const db::Circuit *c2,
     } else if (p->second && g2.has_node_index_for_net (p->first.second)) {
 
       if (mp_logger) {
-        mp_logger->net_mismatch (0, p->first.second);
+        mp_logger->net_mismatch (p->first.first, p->first.second);
+        if (m_with_log && p->first.first) {
+          mp_logger->log_entry (db::Error,
+                                tl::sprintf (tl::to_string (tr ("Nets %s are paired explicitly, but are not identical topologically")), nets2string (p->first)));
+        }
       }
 
       size_t ni2 = g2.node_index_for_net (p->first.second);

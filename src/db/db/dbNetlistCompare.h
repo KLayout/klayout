@@ -387,6 +387,7 @@ protected:
   void do_device_assignment (const db::Circuit *c1, const db::NetGraph &g1, const db::Circuit *c2, const db::NetGraph &g2, const db::DeviceFilter &device_filter, DeviceCategorizer &device_categorizer, db::DeviceEquivalenceTracker &device_eq, bool &good) const;
   void do_subcircuit_assignment (const db::Circuit *c1, const db::NetGraph &g1, const db::Circuit *c2, const db::NetGraph &g2, CircuitCategorizer &circuit_categorizer, const db::CircuitPinCategorizer &circuit_pin_mapper, std::map<const db::Circuit *, CircuitMapper> &c12_circuit_and_pin_mapping, std::map<const db::Circuit *, CircuitMapper> &c22_circuit_and_pin_mapping, db::SubCircuitEquivalenceTracker &subcircuit_eq, bool &good) const;
   bool handle_pin_mismatch (const NetGraph &g1, const db::Circuit *c1, const db::Pin *pin1, const NetGraph &g2, const db::Circuit *c2, const db::Pin *p2) const;
+  std::vector<std::pair<std::pair<const Net *, const Net *>, bool> > get_net_identity (const db::Circuit *ca, const db::Circuit *cb) const;
 
   mutable NetlistCompareLogger *mp_logger;
   bool m_with_log;

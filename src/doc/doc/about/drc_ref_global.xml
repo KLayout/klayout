@@ -1175,6 +1175,24 @@ four-terminal MOS transistor.
 See <class_doc href="DeviceExtractorMOS4Transistor">DeviceExtractorMOS4Transistor</class_doc> for more details
 about this extractor (non-strict mode applies for 'mos4').
 </p>
+<a name="name"/><h2>"name" - Assigns a name to a layer for reference in the LVS database</h2>
+<keyword name="name"/>
+<p>Usage:</p>
+<ul>
+<li><tt>name(layer, name)</tt></li>
+</ul>
+<p>
+See <a href="/about/drc_ref_netter.xml#name">Netter#name</a> for a description of that function.
+</p>
+<a name="name_prefix"/><h2>"name_prefix" - Specifies the layer name prefix for auto-generated layer names</h2>
+<keyword name="name_prefix"/>
+<p>Usage:</p>
+<ul>
+<li><tt>name_prefix(prefix)</tt></li>
+</ul>
+<p>
+See <a href="/about/drc_ref_netter.xml#name_prefix">Netter#name_prefix</a> for a description of that function.
+</p>
 <a name="netlist"/><h2>"netlist" - Obtains the extracted netlist from the default <a href="/about/drc_ref_netter.xml">Netter</a></h2>
 <keyword name="netlist"/>
 <p>

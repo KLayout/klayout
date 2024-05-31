@@ -508,10 +508,35 @@ void LayoutToNetlist::do_join_nets (db::Circuit &c, const std::vector<db::Net *>
     return;
   }
 
+  check_must_connect (c, nets);
+
   for (auto n = nets.begin () + 1; n != nets.end (); ++n) {
-    check_must_connect (c, *nets [0], **n);
     c.join_nets (nets [0], *n);
   }
+}
+
+void LayoutToNetlist::check_must_connect (const db::Circuit &c, const std::vector<db::Net *> &nets)
+{
+  std::vector<const db::Net *> unique_nets;
+  unique_nets.reserve (nets.size ());
+  std::set<const db::Net *> seen;
+  for (auto n = nets.begin (); n != nets.end (); ++n) {
+    if (seen.find (*n) == seen.end ()) {
+      seen.insert (*n);
+      unique_nets.push_back (*n);
+    }
+  }
+  if (unique_nets.size () < size_t (2)) {
+    return;
+  }
+
+  bool same_names = true;
+  for (auto n = unique_nets.begin () + 1; n != unique_nets.end () && same_names; ++n) {
+    same_names = (unique_nets.front ()->expanded_name () == (*n)->expanded_name ());
+  }
+
+  std::vector<const db::SubCircuit *> path;
+  check_must_connect_impl (c, unique_nets, c, unique_nets, path, same_names);
 }
 
 static std::string subcircuit_to_string (const db::SubCircuit &sc)
@@ -533,14 +558,31 @@ static db::DPolygon subcircuit_geometry (const db::SubCircuit &sc, const db::Lay
   return db::DPolygon (sc.trans () * dbox);
 }
 
-void LayoutToNetlist::check_must_connect (const db::Circuit &c, const db::Net &a, const db::Net &b)
+static db::DBox net_geometry_box (const db::Circuit &c, const db::Net *net, const db::Layout *layout, const db::hier_clusters<db::NetShape> &net_clusters)
 {
-  if (&a == &b) {
-    return;
+  if (! layout || ! net) {
+    return db::DBox ();
   }
 
-  std::vector<const db::SubCircuit *> path;
-  check_must_connect_impl (c, a, b, c, a, b, path);
+  auto nc = net_clusters.clusters_per_cell (c.cell_index ());
+  auto lc = nc.cluster_by_id (net->cluster_id ());
+
+  return db::CplxTrans (layout->dbu ()) * lc.bbox ();
+}
+
+static db::DPolygon net_geometry (const db::Circuit &c, const db::Net *net, const db::Layout *layout, const db::hier_clusters<db::NetShape> &net_clusters)
+{
+  auto box = net_geometry_box (c, net, layout, net_clusters);
+  return box.empty () ? db::DPolygon () : db::DPolygon (box);
+}
+
+static db::DPolygon net_geometry (const db::Circuit &c, const std::vector<const db::Net *> &nets, const db::Layout *layout, const db::hier_clusters<db::NetShape> &net_clusters)
+{
+  db::DBox box;
+  for (auto n = nets.begin (); n != nets.end (); ++n) {
+    box += net_geometry_box (c, *n, layout, net_clusters);
+  }
+  return box.empty () ? db::DPolygon () : db::DPolygon (box);
 }
 
 static std::string path_msg (const std::vector<const db::SubCircuit *> &path)
@@ -562,46 +604,98 @@ static std::string path_msg (const std::vector<const db::SubCircuit *> &path)
   return msg;
 }
 
-void LayoutToNetlist::check_must_connect_impl (const db::Circuit &c, const db::Net &a, const db::Net &b, const db::Circuit &c_org, const db::Net &a_org, const db::Net &b_org, std::vector<const db::SubCircuit *> &path)
+static bool all_nets_are_same (const std::vector<const db::Net *> &nets)
+{
+  for (auto n = nets.begin () + 1; n != nets.end (); ++n) {
+    if (*n != nets.front ()) {
+      return false;
+    }
+  }
+  return true;
+}
+
+static bool no_pins_on_any_net (const std::vector<const db::Net *> &nets)
+{
+  for (auto n = nets.begin (); n != nets.end (); ++n) {
+    if ((*n)->begin_pins () == (*n)->end_pins ()) {
+      return true;
+    }
+  }
+  return false;
+}
+
+static std::string net_names_msg (const std::vector<const db::Net *> &nets)
+{
+  std::set<std::string> names;
+  for (auto n = nets.begin (); n != nets.end (); ++n) {
+    names.insert ((*n)->expanded_name ());
+  }
+
+  std::string msg;
+  size_t num = names.size ();
+  size_t i = 0;
+  for (auto n = names.begin (); n != names.end (); ++n, ++i) {
+    if (i > 0) {
+      if (i + 1 < num) {
+        msg += ", ";
+      } else {
+        msg += tl::to_string (tr (" and "));
+      }
+    }
+    msg += *n;
+  }
+
+  return msg;
+}
+
+void LayoutToNetlist::check_must_connect_impl (const db::Circuit &c, const std::vector<const db::Net *> &nets, const db::Circuit &c_org, const std::vector<const db::Net *> &nets_org, std::vector<const db::SubCircuit *> &path, bool same_names)
 {
   if (c.begin_refs () != c.end_refs () && path.empty ()) {
 
-    if (a.begin_pins () == a.end_pins ()) {
-      db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect net %s is not connected to outside")), a_org.expanded_name ()));
-      error.set_cell_name (c.name ());
-      error.set_category_name ("must-connect");
-      log_entry (error);
-    }
-    if (b.begin_pins () == b.end_pins ()) {
-      db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect net %s is not connected to outside")), a_org.expanded_name ()));
-      error.set_cell_name (c.name ());
-      error.set_category_name ("must-connect");
-      log_entry (error);
+    for (auto n = nets.begin (); n != nets.end (); ++n) {
+
+      if ((*n)->begin_pins () == (*n)->end_pins ()) {
+        std::string msg;
+        if (same_names) {
+          msg = tl::sprintf (tl::to_string (tr ("Must-connect subnet of %s does not have any pin at all")), (*n)->expanded_name ());
+        } else {
+          msg = tl::sprintf (tl::to_string (tr ("Must-connect net %s does not have any pin at all")), (*n)->expanded_name ());
+        }
+        db::LogEntryData error (db::Error, msg);
+        error.set_cell_name (c.name ());
+        error.set_geometry (net_geometry (c, *n, internal_layout (), net_clusters ()));
+        error.set_category_name ("must-connect");
+        log_entry (error);
+      }
+
     }
 
-  } else if (c.begin_refs () == c.end_refs () || a.begin_pins () == a.end_pins () || b.begin_pins () == b.end_pins ()) {
+  } else if (c.begin_refs () == c.end_refs () || no_pins_on_any_net (nets)) {
 
-    if (a_org.expanded_name () == b_org.expanded_name ()) {
+    if (same_names) {
       if (path.empty ()) {
-        db::LogEntryData warn (m_top_level_mode ? db::Error : db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s must be connected further up in the hierarchy - this is an error at chip top level")), a_org.expanded_name ()) + path_msg (path));
+        db::LogEntryData warn (m_top_level_mode ? db::Error : db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect subnets of %s must be connected further up in the hierarchy - this is an error at chip top level")), nets_org.front ()->expanded_name ()) + path_msg (path));
         warn.set_cell_name (c.name ());
+        warn.set_geometry (net_geometry (c, nets, internal_layout (), net_clusters ()));
         warn.set_category_name ("must-connect");
         log_entry (warn);
       } else {
-        db::LogEntryData warn (m_top_level_mode ? db::Error : db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s of circuit %s must be connected further up in the hierarchy - this is an error at chip top level")), a_org.expanded_name (), c_org.name ()) + path_msg (path));
+        db::LogEntryData warn (m_top_level_mode ? db::Error : db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect subnets of %s of circuit %s must be connected further up in the hierarchy - this is an error at chip top level")), nets_org.front ()->expanded_name (), c_org.name ()) + path_msg (path));
         warn.set_cell_name (c.name ());
         warn.set_geometry (subcircuit_geometry (*path.back (), internal_layout ()));
         warn.set_category_name ("must-connect");
         log_entry (warn);
       }
     } else {
+      std::string net_names = net_names_msg (nets_org);
       if (path.empty ()) {
-        db::LogEntryData warn (m_top_level_mode ? db::Error : db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s and %s must be connected further up in the hierarchy - this is an error at chip top level")), a_org.expanded_name (), b_org.expanded_name ()) + path_msg (path));
+        db::LogEntryData warn (m_top_level_mode ? db::Error : db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s must be connected further up in the hierarchy - this is an error at chip top level")), net_names) + path_msg (path));
         warn.set_cell_name (c.name ());
+        warn.set_geometry (net_geometry (c, nets, internal_layout (), net_clusters ()));
         warn.set_category_name ("must-connect");
         log_entry (warn);
       } else {
-        db::LogEntryData warn (m_top_level_mode ? db::Error : db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s and %s of circuit %s must be connected further up in the hierarchy - this is an error at chip top level")), a_org.expanded_name (), b_org.expanded_name (), c_org.name ()) + path_msg (path));
+        db::LogEntryData warn (m_top_level_mode ? db::Error : db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s of circuit %s must be connected further up in the hierarchy - this is an error at chip top level")), net_names, c_org.name ()) + path_msg (path));
         warn.set_cell_name (c.name ());
         warn.set_geometry (subcircuit_geometry (*path.back (), internal_layout ()));
         warn.set_category_name ("must-connect");
@@ -611,35 +705,49 @@ void LayoutToNetlist::check_must_connect_impl (const db::Circuit &c, const db::N
 
   }
 
-  if (a.begin_pins () != a.end_pins () && b.begin_pins () != b.end_pins ()) {
+  if (! no_pins_on_any_net (nets)) {
 
     for (auto ref = c.begin_refs (); ref != c.end_refs (); ++ref) {
 
       const db::SubCircuit &sc = *ref;
 
       //  TODO: consider the case of multiple pins on a net (rare)
-      const db::Net *net_a = sc.net_for_pin (a.begin_pins ()->pin_id ());
-      const db::Net *net_b = sc.net_for_pin (b.begin_pins ()->pin_id ());
+      std::vector<const db::Net *> new_nets;
+      new_nets.reserve (nets.size ());
 
-      if (net_a == 0) {
-        db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect net %s of circuit %s is not connected at all%s")), a_org.expanded_name (), c_org.name (), subcircuit_to_string (sc)) + path_msg (path));
-        error.set_cell_name (sc.circuit ()->name ());
-        error.set_geometry (subcircuit_geometry (sc, internal_layout ()));
-        error.set_category_name ("must-connect");
-        log_entry (error);
+      bool failed = false;
+      std::set<const db::Net *> seen;
+      size_t i = 0;
+      for (auto n = nets.begin (); n != nets.end (); ++n, ++i) {
+
+        if (seen.find (*n) != seen.end ()) {
+          continue;
+        }
+        seen.insert (*n);
+
+        const db::Net *new_net = sc.net_for_pin ((*n)->begin_pins ()->pin_id ());
+        new_nets.push_back (new_net);
+
+        if (new_net == 0) {
+          failed = true;
+          std::string msg;
+          if (same_names) {
+            msg = tl::sprintf (tl::to_string (tr ("Must-connect subnet of %s of circuit %s has no outside connection at all%s")), nets_org[i]->expanded_name (), c_org.name (), subcircuit_to_string (sc)) + path_msg (path);
+          } else {
+            msg = tl::sprintf (tl::to_string (tr ("Must-connect net %s of circuit %s has no outside connection at all%s")), nets_org[i]->expanded_name (), c_org.name (), subcircuit_to_string (sc)) + path_msg (path);
+          }
+          db::LogEntryData error (db::Error, msg);
+          error.set_cell_name (sc.circuit ()->name ());
+          error.set_geometry (subcircuit_geometry (sc, internal_layout ()));
+          error.set_category_name ("must-connect");
+          log_entry (error);
+        }
+
       }
 
-      if (net_b == 0) {
-        db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect net %s of circuit %s is not connected at all%s")), b_org.expanded_name (), c_org.name (), subcircuit_to_string (sc)) + path_msg (path));
-        error.set_cell_name (sc.circuit ()->name ());
-        error.set_geometry (subcircuit_geometry (sc, internal_layout ()));
-        error.set_category_name ("must-connect");
-        log_entry (error);
-      }
-
-      if (net_a && net_b && net_a != net_b) {
+      if (! failed && ! all_nets_are_same (new_nets)) {
         path.push_back (&sc);
-        check_must_connect_impl (*sc.circuit (), *net_a, *net_b, c_org, a_org, b_org, path);
+        check_must_connect_impl (*sc.circuit (), new_nets, c_org, nets_org, path, same_names);
         path.pop_back ();
       }
 
@@ -910,7 +1018,7 @@ void LayoutToNetlist::register_layer (const ShapeCollection &collection, const s
     throw tl::Exception (tl::to_string (tr ("Layer name is already used: ")) + n_in);
   }
 
-  //  Caution: this make create names which clash with future explicit names. Hopefully, the generated names are unique enough.
+  //  Caution: this may create names which clash with future explicit names. Hopefully, the generated names are unique enough.
   std::string n = n_in.empty () ? make_new_name () : n_in;
 
   db::DeepLayer dl;

@@ -1,0 +1,25 @@
+
+$lvs_test_source && source($lvs_test_source)
+
+if $lvs_test_target_l2n
+  report_netlist($lvs_test_target_l2n)
+else
+  report_netlist
+end
+
+writer = write_spice(true, false)
+$lvs_test_target_cir && target_netlist($lvs_test_target_cir, writer, "Extracted by KLayout")
+
+deep
+
+# polygons and labels on same layer
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+  
+connect(l1, l2)
+
+connect_implicit("*", "*")
+
+netlist
+

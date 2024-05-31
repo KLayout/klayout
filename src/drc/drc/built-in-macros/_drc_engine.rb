@@ -2395,6 +2395,18 @@ CODE
     # See \Netter#extract_devices for a description of that function.
  
     # %DRC%
+    # @name name
+    # @brief Assigns a name to a layer for reference in the LVS database
+    # @synopsis name(layer, name)
+    # See \Netter#name for a description of that function.
+ 
+    # %DRC%
+    # @name name_prefix
+    # @brief Specifies the layer name prefix for auto-generated layer names
+    # @synopsis name_prefix(prefix)
+    # See \Netter#name_prefix for a description of that function.
+ 
+    # %DRC%
     # @name netlist
     # @brief Obtains the extracted netlist from the default \Netter
     # The netlist is a RBA::Netlist object. If no netlist is extracted 
@@ -2408,6 +2420,8 @@ CODE
       connect_global
       soft_connect
       soft_connect_global
+      name_prefix
+      name
       connect_implicit
       connect_explicit
       device_scaling

@@ -68,6 +68,7 @@ module DRC
       @post_extract_config = []
       @l2n = nil
       @lnum = 0
+      @name_prefix = "l"
       @device_scaling = 1.0
       @ignore_extraction_errors = false
       @top_level = false
@@ -106,8 +107,8 @@ module DRC
         a.requires_texts_or_region
         b.requires_texts_or_region
 
-        register_layer(a.data)
-        register_layer(b.data)
+        _register_layer(a.data, "connect")
+        _register_layer(b.data, "connect")
         a.data.is_a?(RBA::Region) && @l2n.connect(a.data)
         b.data.is_a?(RBA::Region) && @l2n.connect(b.data)
         @l2n.connect(a.data, b.data)
@@ -150,8 +151,8 @@ module DRC
         a.requires_texts_or_region
         b.requires_texts_or_region
 
-        register_layer(a.data)
-        register_layer(b.data)
+        _register_layer(a.data, "soft_connect")
+        _register_layer(b.data, "soft_connect")
         # soft connections imply hard intra-layer connections
         a.data.is_a?(RBA::Region) && @l2n.connect(a.data)
         b.data.is_a?(RBA::Region) && @l2n.connect(b.data)
@@ -177,7 +178,7 @@ module DRC
         l.is_a?(DRC::DRCLayer) || raise("Layer argument must be a layer")
         l.requires_texts_or_region
 
-        register_layer(l.data)
+        _register_layer(l.data, "connect_global")
         l.data.is_a?(RBA::Region) && @l2n.connect(l.data)
         @l2n.connect_global(l.data, name)
 
@@ -204,7 +205,7 @@ module DRC
         l.is_a?(DRC::DRCLayer) || raise("Layer argument must be a layer")
         l.requires_texts_or_region
 
-        register_layer(l.data)
+        _register_layer(l.data, "soft_connect_global")
         l.data.is_a?(RBA::Region) && @l2n.connect(l.data)
         @l2n.soft_connect_global(l.data, name)
 
@@ -282,7 +283,7 @@ module DRC
         layer_selection.keys.sort.each do |n|
           l = layer_selection[n]
           l.requires_texts_or_region
-          register_layer(l.data)
+          _register_layer(l.data, "extract_devices")
           ls[n.to_s] = l.data
         end
 
@@ -292,6 +293,70 @@ module DRC
 
       devex.device_class
 
+    end
+
+    # %DRC%
+    # @name name
+    # @brief Assigns a name to a layer
+    # @synopsis name(layer, name)
+    # Layer names are listed in the LayoutToNetlist (L2N) or LVS database. They
+    # are used to identify the layers, the net or device terminal geometries are
+    # on. It is usual to have computed layers, so it is necessary to indicate the
+    # purpose of the layer for later reuse of the geometries.
+    #
+    # It is a good practice to assign names to computed and original layers, 
+    # for example:
+    #
+    # @code
+    # poly = input(...)
+    # poly_resistor = input(...)
+    #
+    # poly_wiring = poly - poly_resistor
+    # name(poly_wiring, "poly_wiring")
+    # @/code
+    #
+    # Names must be assigned before the layers are used for the first time
+    # in \connect, \soft_connect, \connect_global, \soft_connect_global and 
+    # \extract_devices statements. 
+    # 
+    # If layers are not named, they will be given a name made from the 
+    # \name_prefix and an incremental number when the layer is used for the
+    # first time. 
+    #
+    # \name can only be used once on a layer and the layer names must be 
+    # unique (not taken by another layer).
+
+    # %DRC%
+    # @name name_prefix
+    # @brief Specifies the name prefix for auto-generated layer names
+    # @synopsis name_prefix(prefix)
+    # See \\name for details. The default prefix is "l".
+
+    def name(l, name)
+
+      @engine._context("name") do
+
+        l.is_a?(DRC::DRCLayer) || raise("First argument must be a layer")
+        (name.is_a?(String) && name != "") || raise("Second argument must be a non-empty string")
+
+        id = l.data.data_id 
+
+        if @layers && @layers[id]
+          # already registered
+          if @layers[id][1] != name
+            raise("Layer already registered with name #{@layers[id][1]} in context: #{@layers[id][2]}")
+          end
+          return
+        end
+        
+        self._register_layer(l.data, "name", name)
+
+      end
+
+    end
+
+    def name_prefix(prefix)
+      @name_prefix = prefix.to_s
     end
 
     # %DRC%
@@ -761,21 +826,30 @@ module DRC
       @l2n.make_soft_connection_diodes = f
     end
 
-  private
+  protected
 
-    def cleanup
-      @l2n && @l2n.is_extracted? && clear_connections
+    def _register_layer(data, context, name = nil)
+
+      id = data.data_id 
+      ensure_data
+
+      if @layers && @layers[id]
+        # already registered
+        return
+      end
+
+      if !name
+        @lnum += 1
+        name = @name_prefix + @lnum.to_s
+      end
+
+      @layers[id] = [ data, name, context ]
+
+      # every layer gets registered and intra-layer connections are made
+      @l2n.register(data, name)
+
     end
     
-    def ensure_data
-      if !@l2n
-        @layers = {}
-        _make_data
-        @l2n.device_scaling = @device_scaling
-        @l2n.top_level_mode = @top_level
-      end
-    end
-
     def _make_data
 
       if @engine._dss
@@ -792,24 +866,21 @@ module DRC
 
     end
 
-    def register_layer(data)
+  private
 
-      id = data.data_id 
-      ensure_data
-
-      if @layers && @layers[id]
-        # already registered
-        return
-      end
-
-      @layers[id] = data
-      @lnum += 1
-
-      # every layer gets registered and intra-layer connections are made
-      @l2n.register(data, "l" + @lnum.to_s)
-
+    def cleanup
+      @l2n && @l2n.is_extracted? && clear_connections
     end
     
+    def ensure_data
+      if !@l2n
+        @layers = {}
+        _make_data
+        @l2n.device_scaling = @device_scaling
+        @l2n.top_level_mode = @top_level
+      end
+    end
+
   end
 
 end

@@ -422,6 +422,49 @@ but no error is raised.
 The <class_doc href="LayoutToNetlist">LayoutToNetlist</class_doc> object provides access to the internal details of
 the netter object.
 </p>
+<a name="name"/><h2>"name" - Assigns a name to a layer</h2>
+<keyword name="name"/>
+<p>Usage:</p>
+<ul>
+<li><tt>name(layer, name)</tt></li>
+</ul>
+<p>
+Layer names are listed in the LayoutToNetlist (L2N) or LVS database. They
+are used to identify the layers, the net or device terminal geometries are
+on. It is usual to have computed layers, so it is necessary to indicate the
+purpose of the layer for later reuse of the geometries.
+</p><p>
+It is a good practice to assign names to computed and original layers, 
+for example:
+</p><p>
+<pre>
+poly = input(...)
+poly_resistor = input(...)
+
+poly_wiring = poly - poly_resistor
+name(poly_wiring, "poly_wiring")
+</pre>
+</p><p>
+Names must be assigned before the layers are used for the first time
+in <a href="#connect">connect</a>, <a href="#soft_connect">soft_connect</a>, <a href="#connect_global">connect_global</a>, <a href="#soft_connect_global">soft_connect_global</a> and 
+<a href="#extract_devices">extract_devices</a> statements. 
+</p><p>
+If layers are not named, they will be given a name made from the 
+<a href="#name_prefix">name_prefix</a> and an incremental number when the layer is used for the
+first time. 
+</p><p>
+<a href="#name">name</a> can only be used once on a layer and the layer names must be 
+unique (not taken by another layer).
+</p>
+<a name="name_prefix"/><h2>"name_prefix" - Specifies the name prefix for auto-generated layer names</h2>
+<keyword name="name_prefix"/>
+<p>Usage:</p>
+<ul>
+<li><tt>name_prefix(prefix)</tt></li>
+</ul>
+<p>
+See <link href="#name"/> for details. The default prefix is "l".
+</p>
 <a name="netlist"/><h2>"netlist" - Gets the extracted netlist or triggers extraction if not done yet</h2>
 <keyword name="netlist"/>
 <p>Usage:</p>

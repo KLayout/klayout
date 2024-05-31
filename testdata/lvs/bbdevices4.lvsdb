@@ -60,9 +60,6 @@ layout(
    rect(l3 (572500 432500) (74500 73500))
    rect(l3 (-37250 -36750) (0 0))
   )
-  net(3 name(FWBTEST)
-   rect(l3 (798000 565500) (0 0))
-  )
 
   # Outgoing pins and their connections to nets
   pin(2 name(A))
@@ -82,9 +79,6 @@ layout(
    rect(l3 (-449500 422500) (146000 144500))
    rect(l3 (-71000 -71250) (0 0))
   )
-  net(3 name(FBGATEST)
-   rect(l3 (-417000 610500) (0 0))
-  )
 
   # Outgoing pins and their connections to nets
   pin(1 name(B))
@@ -103,9 +97,6 @@ layout(
   net(2 name(A)
    rect(l15 (-218500 -290000) (193000 203000))
    rect(l15 (-94000 -101500) (0 0))
-  )
-  net(3 name(BBGATEST)
-   rect(l15 (-422000 -313000) (0 0))
   )
 
   # Outgoing pins and their connections to nets
@@ -185,9 +176,6 @@ layout(
   net(2 name(A)
    rect(l15 (576500 -249000) (105500 81500))
    rect(l15 (-52750 -40750) (0 0))
-  )
-  net(3 name(BWBTEST)
-   rect(l15 (754500 -114000) (0 0))
   )
 
  )

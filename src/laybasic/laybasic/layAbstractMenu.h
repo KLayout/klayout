@@ -692,6 +692,16 @@ public:
    */
   ~AbstractMenu ();
 
+  /**
+   *  @brief Returns a value indicating that a special "extras" menu is needed
+   */
+  static bool wants_extra_menu ();
+
+  /**
+   *  @brief Returns the name of the special "extras" menu
+   */
+  static const std::string &extra_menu_name ();
+
 #if defined(HAVE_QT)
   /**
    *  @brief Rebuild the QMenu's and refill the QMenuBar object

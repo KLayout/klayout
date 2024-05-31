@@ -822,7 +822,7 @@ DEFImporter::read_nets (db::Layout &layout, db::Cell &design, double scale, bool
     std::string net = get ();
     std::string nondefaultrule;
     std::string stored_netname, stored_nondefaultrule;
-    db::properties_id_type stored_prop_id;
+    db::properties_id_type stored_prop_id = 0;
     bool in_subnet = false;
 
     db::properties_id_type prop_id = 0;
@@ -1421,10 +1421,26 @@ DEFImporter::read_pins (db::Layout &layout, db::Cell &design, double scale)
   }
 }
 
+db::Cell &
+DEFImporter::ensure_fill_cell (db::Layout &layout, db::Cell &design, db::Cell *&fill_cell)
+{
+  if (! fill_cell) {
+
+    std::string fill_cell_name = m_design_name + "_DEF_FILL";
+    fill_cell = &layout.cell (reader_state ()->make_cell (layout, fill_cell_name));
+
+    design.insert (db::CellInstArray (fill_cell->cell_index (), db::Trans ()));
+
+  }
+
+  return *fill_cell;
+}
+
 void
 DEFImporter::read_fills (db::Layout &layout, db::Cell &design, double scale)
 {
   std::map <std::pair<std::string, unsigned int>, std::vector <db::Polygon> > geometry;
+  db::Cell *fill_cell = 0;
 
   while (test ("-")) {
 
@@ -1495,7 +1511,7 @@ DEFImporter::read_fills (db::Layout &layout, db::Cell &design, double scale)
       if (! dl.empty ()) {
         for (std::vector<db::Polygon>::const_iterator p = polygons.begin (); p != polygons.end (); ++p) {
           for (std::set<unsigned int>::const_iterator l = dl.begin (); l != dl.end (); ++l) {
-            design.shapes (*l).insert (*p);
+            ensure_fill_cell (layout, design, fill_cell).shapes (*l).insert (*p);
           }
         }
       }
@@ -1535,7 +1551,7 @@ DEFImporter::read_fills (db::Layout &layout, db::Cell &design, double scale)
           std::string nondefaultrule;
           db::Cell *cell = reader_state ()->via_cell (vn, nondefaultrule, layout, mask_bottom, mask_cut, mask_top, &m_lef_importer);
           if (cell) {
-            design.insert (db::CellInstArray (db::CellInst (cell->cell_index ()), db::Trans (pt)));
+            ensure_fill_cell (layout, design, fill_cell).insert (db::CellInstArray (db::CellInst (cell->cell_index ()), db::Trans (pt)));
           }
         } else {
           warn (tl::to_string (tr ("Invalid via name: ")) + vn);
@@ -1670,6 +1686,7 @@ DEFImporter::do_read (db::Layout &layout)
 
   m_via_desc = m_lef_importer.vias ();
   m_styles.clear ();
+  m_design_name.clear ();
 
   db::Cell &design = layout.cell (reader_state ()->make_cell (layout, top_id));
 
@@ -1685,8 +1702,8 @@ DEFImporter::do_read (db::Layout &layout)
 
     } else if (test ("DESIGN")) {
 
-      std::string cn = get ();
-      reader_state ()->rename_cell (layout, top_id, cn);
+      m_design_name = get ();
+      reader_state ()->rename_cell (layout, top_id, m_design_name);
 
       expect (";");
 

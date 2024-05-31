@@ -22,9 +22,11 @@
 
 
 #include "dbText.h"
+#include "tlThreads.h"
 
 namespace db
 {
+
 
 static char halign2code (db::HAlign ha)
 {
@@ -79,12 +81,78 @@ static db::VAlign extract_valign (tl::Extractor &ex)
 }
 
 // ----------------------------------------------------------------------------
+//  StringRepository implementation
+
+static StringRepository s_repository;
+static StringRepository *sp_repository = 0;
+static tl::Mutex s_repository_lock;
+
+StringRepository *
+StringRepository::instance ()
+{
+  return sp_repository;
+}
+
+StringRepository::StringRepository ()
+{
+  sp_repository = this;
+}
+
+StringRepository::~StringRepository ()
+{
+  if (sp_repository == this) {
+    sp_repository = 0;
+  }
+
+  for (std::set<StringRef *>::const_iterator s = m_string_refs.begin (); s != m_string_refs.end (); ++s) {
+    delete *s;
+  }
+}
+
+const StringRef *
+StringRepository::create_string_ref ()
+{
+  tl::MutexLocker locker (&s_repository_lock);
+  StringRef *ref = new StringRef ();
+  m_string_refs.insert (ref);
+  return ref;
+}
+
+void
+StringRepository::unregister_ref (StringRef *ref)
+{
+  tl::MutexLocker locker (&s_repository_lock);
+  if (! m_string_refs.empty ()) {
+    m_string_refs.erase (ref);
+  }
+}
+
+// ----------------------------------------------------------------------------
 //  StringRef implementation
+
+static tl::Mutex s_ref_lock;
 
 StringRef::~StringRef ()
 {
-  if (mp_rep) {
-    mp_rep->unregister_ref (this);
+  if (StringRepository::instance ()) {
+    StringRepository::instance ()->unregister_ref (this);
+  }
+}
+
+void
+StringRef::add_ref ()
+{
+  tl::MutexLocker locker (&s_ref_lock);
+  ++m_ref_count;
+}
+
+void
+StringRef::remove_ref ()
+{
+  tl::MutexLocker locker (&s_ref_lock);
+  --m_ref_count;
+  if (m_ref_count == 0) {
+    delete this;
   }
 }
 

@@ -2068,7 +2068,9 @@ LEFDEFImporter::read (tl::InputStream &stream, db::Layout &layout, LEFDEFReaderS
 void 
 LEFDEFImporter::error (const std::string &msg)
 {
-  if (m_sections.empty ()) {
+  if (! mp_stream) {
+    throw LEFDEFReaderException (msg, -1, std::string (), m_fn);
+  } else if (m_sections.empty ()) {
     throw LEFDEFReaderException (msg, int (mp_stream->line_number ()), m_cellname, m_fn);
   } else {
     throw LEFDEFReaderException (msg + tl::sprintf (tl::to_string (tr (" (inside %s)")), tl::join (m_sections, "/")), int (mp_stream->line_number ()), m_cellname, m_fn);
@@ -2082,11 +2084,17 @@ LEFDEFImporter::warn (const std::string &msg, int wl)
     return;
   }
 
-  tl::warn << msg 
-           << tl::to_string (tr (" (line=")) << mp_stream->line_number ()
-           << tl::to_string (tr (", cell=")) << m_cellname
-           << tl::to_string (tr (", file=")) << m_fn
-           << ")";
+  if (! mp_stream) {
+    tl::warn << msg
+             << tl::to_string (tr (" (file=")) << m_fn
+             << ")";
+  } else {
+    tl::warn << msg
+             << tl::to_string (tr (" (line=")) << mp_stream->line_number ()
+             << tl::to_string (tr (", cell=")) << m_cellname
+             << tl::to_string (tr (", file=")) << m_fn
+             << ")";
+  }
 }
 
 bool

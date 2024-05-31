@@ -589,22 +589,6 @@ public:
   }
 
   /**
-   *  @brief Accessor to the string repository
-   */
-  StringRepository &string_repository ()
-  {
-    return m_string_repository;
-  }
-
-  /**
-   *  @brief Accessor to the string repository (const version)
-   */
-  const StringRepository &string_repository () const
-  {
-    return m_string_repository;
-  }
-
-  /**
    *  @brief Accessor to the shape repository
    */
   GenericRepository &shape_repository ()
@@ -2170,7 +2154,6 @@ private:
   cell_map_type m_cell_map;
   double m_dbu;
   db::properties_id_type m_prop_id;
-  StringRepository m_string_repository;
   GenericRepository m_shape_repository;
   PropertiesRepository m_properties_repository;
   ArrayRepository m_array_repository;

@@ -67,7 +67,8 @@ class DB_PLUGIN_PUBLIC LEFDEFReaderException
 {
 public:
   LEFDEFReaderException (const std::string &msg, int line, const std::string &cell, const std::string &fn)
-    : db::ReaderException (tl::sprintf (tl::to_string (tr ("%s (line=%d, cell=%s, file=%s)")), msg.c_str (), line, cell, fn))
+    : db::ReaderException (line >= 0 ? tl::sprintf (tl::to_string (tr ("%s (line=%d, cell=%s, file=%s)")), msg.c_str (), line, cell, fn) :
+                                       tl::sprintf (tl::to_string (tr ("%s (file=%s)")), msg.c_str (), fn))
   { }
 };
 
@@ -1517,14 +1518,6 @@ public:
    */
   void read (tl::InputStream &stream, db::Layout &layout, LEFDEFReaderState &state);
 
-protected:
-  /**
-   *  @brief Actually does the reading
-   *
-   *  Reimplement that method for the LEF and DEF implementation
-   */
-  virtual void do_read (db::Layout &layout) = 0;
-
   /**
    *  @brief Issue an error at the current location
    */
@@ -1534,6 +1527,14 @@ protected:
    *  @brief Issue a warning at the current location
    */
   void warn (const std::string &msg, int wl = 1);
+
+protected:
+  /**
+   *  @brief Actually does the reading
+   *
+   *  Reimplement that method for the LEF and DEF implementation
+   */
+  virtual void do_read (db::Layout &layout) = 0;
 
   /**
    *  @brief Returns true if the reader is at the end of the file

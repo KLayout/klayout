@@ -55,10 +55,10 @@ TEST(1)
 
 TEST(2)
 {
-  db::StringRepository rep;
+  size_t n = db::StringRepository::instance ()->size ();
 
-  const db::StringRef *ref = rep.create_string_ref ();
-  rep.change_string_ref (ref, "ABER");
+  const db::StringRef *ref = db::StringRepository::instance ()->create_string_ref ();
+  db::StringRepository::change_string_ref (ref, "ABER");
   db::Text t (ref, db::Trans ());
   db::Text tt (t);
 
@@ -69,9 +69,9 @@ TEST(2)
   EXPECT_EQ (t < tt, false);
   EXPECT_EQ (tt < t, false);
 
-  EXPECT_EQ (rep.size (), size_t (1));
+  EXPECT_EQ (db::StringRepository::instance ()->size (), n + size_t (1));
 
-  rep.change_string_ref (ref, "NOCHWAS");
+  db::StringRepository::change_string_ref (ref, "NOCHWAS");
   EXPECT_EQ (std::string (t.string ()), "NOCHWAS");
   EXPECT_EQ (std::string (tt.string ()), "NOCHWAS");
 
@@ -80,12 +80,12 @@ TEST(2)
   EXPECT_EQ (t < tt, false);
   EXPECT_EQ (tt < t, false);
 
-  EXPECT_EQ (rep.size (), size_t (1));
+  EXPECT_EQ (db::StringRepository::instance ()->size (), n + size_t (1));
 
   t = db::Text ();
   tt = db::Text ();
 
-  EXPECT_EQ (rep.size (), size_t (0));
+  EXPECT_EQ (db::StringRepository::instance ()->size (), n);
 }
 
 TEST(3)
@@ -98,8 +98,8 @@ TEST(3)
   unsigned int l2 = ly2.insert_layer ();
   db::Cell *c2 = &ly2.cell (ly2.add_cell ("TOP"));
 
-  const db::StringRef *ref1 = ly1.string_repository ().create_string_ref ();
-  ly1.string_repository ().change_string_ref (ref1, "X");
+  const db::StringRef *ref1 = db::StringRepository::instance ()->create_string_ref ();
+  db::StringRepository::change_string_ref (ref1, "X");
 
   db::Text t (ref1, db::Trans ());
   db::Shape s1 = c1->shapes (l1).insert (t);
@@ -111,9 +111,11 @@ TEST(3)
   db::Shape s1dup = *c1dup->shapes (l1dup).begin (db::ShapeIterator::All);
   EXPECT_EQ (std::string (s1dup.text_string ()), "X");
 
-  ly1.string_repository ().change_string_ref (ref1, "U");
+  db::StringRepository::change_string_ref (ref1, "U");
   EXPECT_EQ (std::string (s1.text_string ()), "U");
-  EXPECT_EQ (std::string (s1dup.text_string ()), "X");
+  //  NOTE: as we have a global string repo, modfiying the string reference
+  //  also changes the copy:
+  EXPECT_EQ (std::string (s1dup.text_string ()), "U");
 
   db::Shape s2a = c2->shapes (l2).insert (s1);
 
@@ -125,7 +127,7 @@ TEST(3)
   EXPECT_EQ (std::string (s2a.text_string ()), "U");
   EXPECT_EQ (std::string (s2b.text_string ()), "U");
 
-  ly1.string_repository ().change_string_ref (ref1, "A");
+  db::StringRepository::change_string_ref (ref1, "A");
   EXPECT_EQ (std::string (tt.string ()), "U");
   EXPECT_EQ (std::string (s1.text_string ()), "A");
 

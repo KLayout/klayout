@@ -26,6 +26,7 @@
 #include "dbColdProxy.h"
 #include "dbLibraryProxy.h"
 #include "dbTextWriter.h"
+#include "dbCellMapping.h"
 #include "tlString.h"
 #include "tlUnitTest.h"
 
@@ -807,4 +808,40 @@ TEST(9_ErrorLayer)
   EXPECT_EQ (l.error_layer (), (unsigned int) 1);
   EXPECT_EQ (l.is_special_layer (1), true);
   EXPECT_EQ (int (l.layers ()), 2);
+}
+
+TEST(10_TranslateStringRefs)
+{
+  db::Manager m;
+  db::Layout l (&m);
+  db::Cell &top = l.cell (l.add_cell ("TOP"));
+  l.insert_layer (db::LayerProperties (1, 0));
+
+  {
+    std::unique_ptr<db::Layout> t (new db::Layout ());
+    db::Cell &ttop = t->cell (t->add_cell ("TOP"));
+    unsigned int tl1 = t->insert_layer (db::LayerProperties (1, 0));
+
+    const db::StringRef *string_ref = db::StringRepository::instance ()->create_string_ref ();
+    db::StringRepository::change_string_ref (string_ref, "TEXT");
+    db::Text txt (string_ref, db::Trans ());
+    ttop.shapes (tl1).insert (db::TextRef (txt, t->shape_repository ()));
+    ttop.shapes (tl1).insert (txt);
+
+    EXPECT_EQ (l2s (*t), "begin_lib 0.001\nbegin_cell {TOP}\ntext 1 0 0 0 {0 0} {TEXT}\ntext 1 0 0 0 {0 0} {TEXT}\nend_cell\nend_lib\n");
+
+    db::CellMapping cm;
+    cm.create_single_mapping (l, top.cell_index (), *t, ttop.cell_index ());
+    l.copy_tree_shapes (*t, cm);
+    EXPECT_EQ (l2s (l), "begin_lib 0.001\nbegin_cell {TOP}\ntext 1 0 0 0 {0 0} {TEXT}\ntext 1 0 0 0 {0 0} {TEXT}\nend_cell\nend_lib\n");
+
+    db::StringRepository::change_string_ref (string_ref, "TEXT_NEW");
+
+    EXPECT_EQ (l2s (*t), "begin_lib 0.001\nbegin_cell {TOP}\ntext 1 0 0 0 {0 0} {TEXT_NEW}\ntext 1 0 0 0 {0 0} {TEXT_NEW}\nend_cell\nend_lib\n");
+    //  also the copy changes:
+    EXPECT_EQ (l2s (l), "begin_lib 0.001\nbegin_cell {TOP}\ntext 1 0 0 0 {0 0} {TEXT_NEW}\ntext 1 0 0 0 {0 0} {TEXT_NEW}\nend_cell\nend_lib\n");
+  }
+
+  //  after deleting the tmp layout, l is still valid
+  EXPECT_EQ (l2s (l), "begin_lib 0.001\nbegin_cell {TOP}\ntext 1 0 0 0 {0 0} {TEXT_NEW}\ntext 1 0 0 0 {0 0} {TEXT_NEW}\nend_cell\nend_lib\n");
 }

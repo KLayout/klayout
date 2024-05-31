@@ -539,7 +539,7 @@ template class instance_iterator<OverlappingInstanceIteratorTraits>;
 // -------------------------------------------------------------------------------------
 //  NormalInstanceIteratorTraits implementation
 
-//  TOOD: this class could use standard iterators instead of flat
+//  TODO: this class could use standard iterators instead of flat
 //  box tree ones. This potentially saves a sorting step when
 //  no box trees are needed and order will remain more stable in
 //  that case.

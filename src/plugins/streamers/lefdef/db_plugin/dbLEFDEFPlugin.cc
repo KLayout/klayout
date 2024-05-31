@@ -160,9 +160,12 @@ LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &opti
 
     DEFImporter importer (warn_level ());
 
+    std::set<std::string> lef_files_read;
+
     for (std::vector<std::string>::const_iterator l = effective_options.begin_lef_files (); l != effective_options.end_lef_files (); ++l) {
 
       std::string lp = correct_path (*l, layout, base_path);
+      lef_files_read.insert (tl::normalize_path (lp));
 
       tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading LEF file: ")) + lp);
 
@@ -187,11 +190,16 @@ LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &opti
 
             std::string lp = tl::combine_path (input_dir, *e);
 
-            tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading LEF file: ")) + lp);
+            //  skip if already read (issue-1724)
+            if (lef_files_read.find (tl::normalize_path (lp)) == lef_files_read.end ()) {
 
-            tl::InputStream lef_stream (lp);
-            tl::log << tl::to_string (tr ("Reading")) << " " << lp;
-            importer.read_lef (lef_stream, layout, state);
+              tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading LEF file: ")) + lp);
+
+              tl::InputStream lef_stream (lp);
+              tl::log << tl::to_string (tr ("Reading")) << " " << lp;
+              importer.read_lef (lef_stream, layout, state);
+
+            }
 
           }
 

@@ -32,6 +32,8 @@
 #include "dbLayout.h"
 #include "dbShape.h"
 #include "dbInstances.h"
+#include "dbInstElement.h"
+#include "tlOptional.h"
 
 #include <QAbstractItemModel>
 
@@ -67,6 +69,7 @@ public:
     db::ICplxTrans trans;
     db::cell_index_type cell_index;
     db::cell_index_type initial_cell_index;
+    tl::optional<std::vector<db::InstElement> > inst_elements;
   };
 
   struct QueryInstResult
@@ -79,6 +82,7 @@ public:
     db::ICplxTrans trans;
     db::cell_index_type cell_index;
     db::cell_index_type initial_cell_index;
+    tl::optional<std::vector<db::InstElement> > inst_elements;
   };
 
   struct QueryCellResult
@@ -106,7 +110,17 @@ public:
     return m_data_result;
   }
 
+  std::vector<tl::Variant> &data ()
+  {
+    return m_data_result;
+  }
+
   const std::vector<QueryShapeResult> &shapes () const
+  {
+    return m_shape_result;
+  }
+
+  std::vector<QueryShapeResult> &shapes ()
   {
     return m_shape_result;
   }
@@ -116,7 +130,17 @@ public:
     return m_inst_result;
   }
 
+  std::vector<QueryInstResult> &instances ()
+  {
+    return m_inst_result;
+  }
+
   const std::vector<QueryCellResult> &cells () const
+  {
+    return m_cell_result;
+  }
+
+  std::vector<QueryCellResult> &cells ()
   {
     return m_cell_result;
   }
@@ -135,6 +159,7 @@ public:
   void export_csv (const std::string &file);
   void export_layout (db::Layout &layout);
   void export_rdb (rdb::Database &rdb, double dbu);
+  void select_items (LayoutViewBase *view, int cv_index);
 
 private:
   std::vector<tl::Variant> m_data_result;
@@ -212,6 +237,7 @@ private slots:
   void header_columns_changed (int from, int to);
   void cancel ();
   void cancel_exec ();
+  void select_items ();
   void export_csv ();
   void export_rdb ();
   void export_layout ();
@@ -227,8 +253,8 @@ private:
   void issue_query (const std::string &q, const std::set<size_t> *selected_items, bool with_results);
   void update_results (const std::string &q);
   void remove_markers ();
-  bool fill_model (const db::LayoutQuery &lq, db::LayoutQueryIterator &iq, const db::Layout *layout, bool all);
-  bool query_to_model (SearchReplaceResults &model, const db::LayoutQuery &lq, db::LayoutQueryIterator &iq, size_t max_item_count, bool all);
+  bool fill_model (const db::LayoutQuery &lq, db::LayoutQueryIterator &iq, const db::Layout *layout, bool all, bool with_paths);
+  bool query_to_model (SearchReplaceResults &model, const db::LayoutQuery &lq, db::LayoutQueryIterator &iq, size_t max_item_count, bool all, bool with_path = false);
   void attach_layout (db::Layout *layout);
   void layout_changed ();
 

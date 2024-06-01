@@ -39,6 +39,7 @@
 #include "tlProgress.h"
 #include "tlTimer.h"
 #include "rdbUtils.h"
+#include "edtService.h"
 
 #include <QInputDialog>
 #include <QHeaderView>
@@ -457,6 +458,73 @@ escape_csv (const std::string &s)
   }
 }
 
+void
+SearchReplaceResults::select_items (lay::LayoutViewBase *view, int cv_index)
+{
+  const lay::CellView &cv = view->cellview (cv_index);
+  const db::Layout &layout = cv->layout ();
+
+  std::vector<edt::Service::objects::value_type> sel;
+
+  int n_rows = int (size ());
+  for (int r = 0; r < n_rows; ++r) {
+
+    if (r < int (shapes ().size ())) {
+
+      const SearchReplaceResults::QueryShapeResult &sr = shapes () [r];
+      if (! sr.shape.is_null () && layout.is_valid_cell_index (sr.initial_cell_index) && layout.is_valid_cell_index (sr.cell_index)) {
+
+        sel.push_back (edt::Service::objects::value_type ());
+        sel.back ().set_cv_index (cv_index);
+        sel.back ().set_layer (sr.layer_index);
+        sel.back ().set_shape (sr.shape);
+        sel.back ().set_topcell (sr.initial_cell_index);
+
+        if (sr.inst_elements.has_value ()) {
+          sel.back ().assign_path (sr.inst_elements->begin (), sr.inst_elements->end ());
+        } else {
+          std::vector<db::InstElement> path;
+          if (db::find_path (layout, sr.cell_index, sr.initial_cell_index, path)) {
+            sel.back ().assign_path (path.begin (), path.end ());
+          } else {
+            sel.pop_back ();
+          }
+        }
+
+      }
+
+    } else if (r < int (instances ().size ())) {
+
+      const SearchReplaceResults::QueryInstResult &ir = instances () [r];
+      if (! ir.inst.is_null () && layout.is_valid_cell_index (ir.initial_cell_index) && layout.is_valid_cell_index (ir.cell_index)) {
+
+        sel.push_back (edt::Service::objects::value_type ());
+        sel.back ().set_cv_index (cv_index);
+        sel.back ().set_topcell (ir.initial_cell_index);
+
+        if (ir.inst_elements.has_value ()) {
+          sel.back ().assign_path (ir.inst_elements->begin (), ir.inst_elements->end ());
+          sel.back ().add_path (db::InstElement (ir.inst));
+        } else {
+          std::vector<db::InstElement> path;
+          if (db::find_path (layout, ir.cell_index, ir.initial_cell_index, path)) {
+            sel.back ().assign_path (path.begin (), path.end ());
+            //  TODO: specific array instance?
+            sel.back ().add_path (db::InstElement (ir.inst));
+          } else {
+            sel.pop_back ();
+          }
+        }
+
+      }
+
+    }
+
+  }
+
+  edt::set_object_selection (view, sel);
+}
+
 void  
 SearchReplaceResults::export_csv (const std::string &file)
 {
@@ -751,6 +819,7 @@ SearchReplaceDialog::SearchReplaceDialog (lay::Dispatcher *root, LayoutViewBase 
   menu->addAction (QObject::tr ("To CSV file"), this, SLOT (export_csv ()));
   menu->addAction (QObject::tr ("To report database"), this, SLOT (export_rdb ()));
   menu->addAction (QObject::tr ("To layout"), this, SLOT (export_layout ()));
+  menu->addAction (QObject::tr ("Select items"), this, SLOT (select_items ()));
   export_b->setMenu (menu);
 
   bool editable = view->is_editable ();
@@ -931,6 +1000,38 @@ SearchReplaceDialog::save_state ()
   if (m >= 0 && m < int (sizeof (mode_values) / sizeof (mode_values [0]))) {
     config_root->config_set (cfg_sr_mode, mode_values [m]);
   }
+}
+
+void
+SearchReplaceDialog::select_items ()
+{
+BEGIN_PROTECTED
+
+  int cv_index = m_last_query_cv_index;
+  const lay::CellView &cv = mp_view->cellview (cv_index);
+  if (! cv.is_valid ()) {
+    return;
+  }
+
+  db::LayoutQuery lq (m_last_query);
+
+  tl::AbsoluteProgress progress (tl::to_string (QObject::tr ("Running query")));
+  progress.set_unit (100000);
+  progress.set_format ("Processing ..");
+
+  db::LayoutQueryIterator iq (lq, &cv->layout (), 0, &progress);
+
+  if (tl::verbosity () >= 10) {
+    tl::log << tl::to_string (QObject::tr ("Running query: ")) << m_last_query;
+  }
+
+  SearchReplaceResults model;
+  model.begin_changes (& cv->layout ());
+  query_to_model (model, lq, iq, std::numeric_limits<size_t>::max (), true, true /*with paths*/);
+  model.end_changes ();
+  model.select_items (view (), cv_index);
+
+END_PROTECTED
 }
 
 void
@@ -1434,7 +1535,7 @@ SearchReplaceDialog::update_results (const std::string &q)
     }
 
     try {
-      fill_model (lq, iq, &cv->layout (), true);
+      fill_model (lq, iq, &cv->layout (), true, false);
       attach_layout (&cv->layout ());
     } catch (...) {
       attach_layout (&cv->layout ());
@@ -1445,7 +1546,7 @@ SearchReplaceDialog::update_results (const std::string &q)
 }
 
 bool
-SearchReplaceDialog::query_to_model (SearchReplaceResults &model, const db::LayoutQuery &lq, db::LayoutQueryIterator &iq, size_t max_item_count, bool all)
+SearchReplaceDialog::query_to_model (SearchReplaceResults &model, const db::LayoutQuery &lq, db::LayoutQueryIterator &iq, size_t max_item_count, bool all, bool with_path)
 {
   tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (QObject::tr ("Query run")));
 
@@ -1456,6 +1557,7 @@ SearchReplaceDialog::query_to_model (SearchReplaceResults &model, const db::Layo
   int shape_prop_id = lq.has_property ("shape") ? int (lq.property_by_name ("shape")) : -1;
   int layer_index_prop_id = lq.has_property ("layer_index") ? int (lq.property_by_name ("layer_index")) : -1;
   int instance_prop_id = lq.has_property ("inst") ? int (lq.property_by_name ("inst")) : -1;
+  int inst_elements_prop_id = with_path && lq.has_property ("inst_elements") ? int (lq.property_by_name ("inst_elements")) : -1;
   int path_trans_prop_id = lq.has_property ("path_trans") ? int (lq.property_by_name ("path_trans")) : -1;
   int trans_prop_id = lq.has_property ("trans") ? int (lq.property_by_name ("trans")) : -1;
   int cell_index_prop_id = lq.has_property ("cell_index") ? int (lq.property_by_name ("cell_index")) : -1;
@@ -1503,6 +1605,18 @@ SearchReplaceDialog::query_to_model (SearchReplaceResults &model, const db::Layo
 
       model.push_back (SearchReplaceResults::QueryShapeResult (shape, layer_index, trans, cell_index, initial_cell_index));
 
+      if (inst_elements_prop_id >= 0 && iq.get (inst_elements_prop_id, v) && v.is_list ()) {
+        try {
+          std::vector<db::InstElement> inst_elements;
+          for (auto i = v.begin (); i != v.end (); ++i) {
+            inst_elements.push_back (i->to_user<db::InstElement> ());
+          }
+          model.shapes ().back ().inst_elements = std::move (inst_elements);
+        } catch (...) {
+          //  ignore conversion errors
+        }
+      }
+
     } else if (instance_prop_id >= 0) {
 
       db::Instance instance;
@@ -1528,6 +1642,18 @@ SearchReplaceDialog::query_to_model (SearchReplaceResults &model, const db::Layo
       }
 
       model.push_back (SearchReplaceResults::QueryInstResult (instance, trans, cell_index, initial_cell_index));
+
+      if (inst_elements_prop_id >= 0 && iq.get (inst_elements_prop_id, v) && v.is_list ()) {
+        try {
+          std::vector<db::InstElement> inst_elements;
+          for (auto i = v.begin (); i != v.end (); ++i) {
+            inst_elements.push_back (i->to_user<db::InstElement> ());
+          }
+          model.instances ().back ().inst_elements = std::move (inst_elements);
+        } catch (...) {
+          //  ignore conversion errors
+        }
+      }
 
     } else if (cell_index_prop_id >= 0) {
 
@@ -1559,7 +1685,7 @@ SearchReplaceDialog::query_to_model (SearchReplaceResults &model, const db::Layo
 }
 
 bool
-SearchReplaceDialog::fill_model (const db::LayoutQuery &lq, db::LayoutQueryIterator &iq, const db::Layout *layout, bool all)
+SearchReplaceDialog::fill_model (const db::LayoutQuery &lq, db::LayoutQueryIterator &iq, const db::Layout *layout, bool all, bool with_paths)
 {
   bool res = false;
 
@@ -1568,7 +1694,7 @@ SearchReplaceDialog::fill_model (const db::LayoutQuery &lq, db::LayoutQueryItera
     m_model.begin_changes (layout);
     m_model.clear ();
 
-    res = query_to_model (m_model, lq, iq, m_max_item_count, all);
+    res = query_to_model (m_model, lq, iq, m_max_item_count, all, with_paths);
 
     m_model.end_changes ();
     results_stack->setCurrentIndex (0);

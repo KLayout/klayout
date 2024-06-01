@@ -53,10 +53,29 @@ public:
     m_is_valid (false)
   {}
 
-  optional (const T &value) :
+  explicit optional (const T &value) :
     m_value (value),
     m_is_valid (true)
   {}
+
+  explicit optional (T &&value) :
+    m_value (value),
+    m_is_valid (true)
+  {}
+
+  optional &operator= (const T &value)
+  {
+    m_value = value;
+    m_is_valid = true;
+    return *this;
+  }
+
+  optional &operator= (T &&value)
+  {
+    m_value = value;
+    m_is_valid = true;
+    return *this;
+  }
 
   void reset ()
   {

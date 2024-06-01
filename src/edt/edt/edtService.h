@@ -688,6 +688,80 @@ private:
   void update_vector_snapped_marker (const lay::InstanceMarker *sm, const db::DTrans &trans, db::DVector &vr, bool &result_set, size_t &count) const;
 };
 
+/**
+ *  @brief A utility class to implement a selection iterator across all editor services
+ */
+class EditableSelectionIterator
+{
+public:
+  typedef edt::Service::objects::value_type value_type;
+  typedef edt::Service::objects::const_iterator iterator_type;
+  typedef void pointer;
+  typedef const value_type &reference;
+  typedef std::forward_iterator_tag iterator_category;
+  typedef void difference_type;
+
+  EditableSelectionIterator (const std::vector<edt::Service *> &services, bool transient);
+
+  bool at_end () const;
+
+  EditableSelectionIterator &operator++ ();
+  const value_type &operator* () const;
+
+private:
+  std::vector<edt::Service *> m_services;
+  unsigned int m_service;
+  bool m_transient_selection;
+  iterator_type m_iter, m_end;
+
+  void next ();
+};
+
+/**
+ *  @brief Gets the combined selections over all editor services in the layout view
+ */
+EDT_PUBLIC std::vector<edt::Service::objects::value_type> object_selection (const lay::LayoutViewBase *view);
+
+/**
+ *  @brief Distributes the combined selection over all editor services in the layout view
+ */
+EDT_PUBLIC void set_object_selection (const lay::LayoutViewBase *view, const std::vector<edt::Service::objects::value_type> &all_selected);
+
+/**
+ *  @brief Gets a value indicating whether any editor service in the view has a selection
+ */
+EDT_PUBLIC bool has_object_selection (const lay::LayoutViewBase *view);
+
+/**
+ *  @brief Clears the selection of all editor services in the view
+ */
+EDT_PUBLIC void clear_object_selection (const lay::LayoutViewBase *view);
+
+/**
+ *  @brief Selects a specific object in the appropriate editor service of the view
+ */
+EDT_PUBLIC void select_object (const lay::LayoutViewBase *view, const edt::Service::objects::value_type &object);
+
+/**
+ *  @brief Unselects a specific object in the appropriate editor service of the view
+ */
+EDT_PUBLIC void unselect_object (const lay::LayoutViewBase *view, const edt::Service::objects::value_type &object);
+
+/**
+ *  @brief Gets a value indicating whether any editor service in the view has a transient selection
+ */
+EDT_PUBLIC bool has_transient_object_selection (const lay::LayoutViewBase *view);
+
+/**
+ *  @brief Iterates over all selected object of all editor services
+ */
+EDT_PUBLIC EditableSelectionIterator begin_objects_selected (const lay::LayoutViewBase *view);
+
+/**
+ *  @brief Iterates over all transiently selected object of all editor services
+ */
+EDT_PUBLIC EditableSelectionIterator begin_objects_selected_transient (const lay::LayoutViewBase *view);
+
 }
 
 #endif

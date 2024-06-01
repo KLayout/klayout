@@ -24,6 +24,7 @@
 #include "dbLayoutQuery.h"
 #include "dbCellGraphUtils.h"
 #include "dbStreamLayers.h"
+#include "dbInstElement.h"
 #include "tlAssert.h"
 #include "tlString.h"
 #include "tlGlobPattern.h"
@@ -476,6 +477,7 @@ struct ChildCellFilterPropertyIDs
   {
     path               = q->register_property ("path", LQ_variant);
     path_names         = q->register_property ("path_names", LQ_variant);
+    inst_elements      = q->register_property ("inst_elements", LQ_variant);
     initial_cell       = q->register_property ("initial_cell", LQ_cell);
     initial_cell_index = q->register_property ("initial_cell_index", LQ_variant);
     initial_cell_name  = q->register_property ("initial_cell_name", LQ_variant);
@@ -573,6 +575,7 @@ struct ChildCellFilterPropertyIDs
   unsigned int inst_bbox;           // inst_bbox            -> The instance bounding box in the top cell
   unsigned int inst_dbbox;          // inst_dbbox           -> The instance bounding box in the top cell in micrometer units
   unsigned int inst;                // inst                 -> The instance object
+  unsigned int inst_elements;       // inst_elements        -> Variant array with the db::InstElement objects for the path
   unsigned int array_a;             // array_a              -> The a vector for an array instance
   unsigned int array_da;            // array_da             -> The a vector for an array instance in micrometer units
   unsigned int array_na;            // array_na             -> The a axis array dimension
@@ -988,6 +991,31 @@ public:
       }
 
       v.push (tl::Variant (cell_index ()));
+      return true;
+
+    } else if (id == m_pids.inst_elements) {
+
+      if (! v.is_list ()) {
+        std::vector<tl::Variant> vd;
+        v = tl::Variant (vd.begin (), vd.end ());
+      }
+
+      if (mp_parent) {
+        FilterStateBase::get_property (id, v);
+      }
+
+      db::Instance inst;
+      if (m_reading) {
+        inst = mp_parent->sorted_inst_ptr (std::distance (mp_parent->begin_sorted_insts (), m_inst));
+      } else {
+        inst = m_i;
+      }
+
+      if (m_instance_mode == ArrayInstances) {
+        v.push (tl::Variant (db::InstElement (inst)));
+      } else {
+        v.push (tl::Variant (db::InstElement (inst, m_array_iter)));
+      }
       return true;
 
     } else if (id == m_pids.path_names) {

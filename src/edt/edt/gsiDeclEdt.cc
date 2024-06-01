@@ -185,7 +185,7 @@ gsi::Class<lay::ObjectInstPath> decl_ObjectInstPath ("lay", "ObjectInstPath",
     "\n"
     "The top cell is identical to the current cell provided by the cell view.\n"
     "It is the cell from which is instantiation path originates and the container cell "
-    "if not instantiation path is set.\n"
+    "if no instantiation path is set.\n"
     "\n"
     "This method has been introduced in version 0.24."
   ) + 
@@ -425,175 +425,12 @@ gsi::Class<lay::ObjectInstPath> decl_ObjectInstPath ("lay", "ObjectInstPath",
   "in the way shown above will help avoiding this issue.\n"
 );
 
-class EditableSelectionIterator 
-{
-public:
-  typedef edt::Service::objects::value_type value_type;
-  typedef edt::Service::objects::const_iterator iterator_type;
-  typedef void pointer; 
-  typedef const value_type &reference;
-  typedef std::forward_iterator_tag iterator_category;
-  typedef void difference_type;
-
-  EditableSelectionIterator (const std::vector<edt::Service *> &services, bool transient) 
-    : m_services (services), m_service (0), m_transient_selection (transient)
-  {
-    if (! m_services.empty ()) {
-      if (m_transient_selection) {
-        m_iter = m_services [m_service]->transient_selection ().begin ();
-        m_end = m_services [m_service]->transient_selection ().end ();
-      } else {
-        m_iter = m_services [m_service]->selection ().begin ();
-        m_end = m_services [m_service]->selection ().end ();
-      }
-      next ();
-    }
-  }
-
-  bool at_end () const
-  {
-    return (m_service >= m_services.size ());
-  }
-
-  EditableSelectionIterator &operator++ ()
-  {
-    ++m_iter;
-    next ();
-    return *this;
-  }
-
-  const value_type &operator* () const
-  {
-    return *m_iter;
-  }
-
-private:
-  std::vector<edt::Service *> m_services;
-  unsigned int m_service;
-  bool m_transient_selection;
-  iterator_type m_iter, m_end;
-
-  void next ()
-  {
-    while (m_iter == m_end) {
-      ++m_service;
-      if (m_service < m_services.size ()) {
-        if (m_transient_selection) {
-          m_iter = m_services [m_service]->transient_selection ().begin ();
-          m_end = m_services [m_service]->transient_selection ().end ();
-        } else {
-          m_iter = m_services [m_service]->selection ().begin ();
-          m_end = m_services [m_service]->selection ().end ();
-        }
-      } else {
-        break;
-      }
-    }
-  }
-};
-
-//  extend the layout view by "edtService" specific methods 
-
-static std::vector<edt::Service::objects::value_type> object_selection (const lay::LayoutViewBase *view)
-{
-  std::vector<edt::Service::objects::value_type> result;
-  std::vector<edt::Service *> edt_services = view->get_plugins <edt::Service> ();
-  for (std::vector<edt::Service *>::const_iterator s = edt_services.begin (); s != edt_services.end (); ++s) {
-    std::vector<edt::Service::objects::value_type> sel;
-    (*s)->get_selection (sel);
-    result.insert (result.end (), sel.begin (), sel.end ());
-  }
-  return result;
-}
-
-static void set_object_selection (const lay::LayoutViewBase *view, const std::vector<edt::Service::objects::value_type> &all_selected)
-{
-  std::vector<edt::Service::objects::value_type> sel;
-
-  std::vector<edt::Service *> edt_services = view->get_plugins <edt::Service> ();
-  for (std::vector<edt::Service *>::const_iterator s = edt_services.begin (); s != edt_services.end (); ++s) {
-
-    sel.clear ();
-
-    for (std::vector<edt::Service::objects::value_type>::const_iterator o = all_selected.begin (); o != all_selected.end (); ++o) {
-      if ((*s)->selection_applies (*o)) {
-        sel.push_back (*o);
-      }
-    }
-
-    (*s)->set_selection (sel.begin (), sel.end ());
-
-  }
-}
-
-static bool has_object_selection (const lay::LayoutViewBase *view)
-{
-  std::vector<edt::Service *> edt_services = view->get_plugins <edt::Service> ();
-  for (std::vector<edt::Service *>::const_iterator s = edt_services.begin (); s != edt_services.end (); ++s) {
-    if ((*s)->has_selection ()) {
-      return true;
-    }
-  }
-  return false;
-}
-
-static void clear_object_selection (const lay::LayoutViewBase *view)
-{
-  std::vector<edt::Service *> edt_services = view->get_plugins <edt::Service> ();
-  for (std::vector<edt::Service *>::const_iterator s = edt_services.begin (); s != edt_services.end (); ++s) {
-    (*s)->clear_selection ();
-  }
-}
-
-static void select_object (const lay::LayoutViewBase *view, const edt::Service::objects::value_type &object)
-{
-  std::vector<edt::Service *> edt_services = view->get_plugins <edt::Service> ();
-  for (std::vector<edt::Service *>::const_iterator s = edt_services.begin (); s != edt_services.end (); ++s) {
-    if ((*s)->selection_applies (object)) {
-      (*s)->add_selection (object);
-      break;
-    }
-  }
-}
-
-static void unselect_object (const lay::LayoutViewBase *view, const edt::Service::objects::value_type &object)
-{
-  std::vector<edt::Service *> edt_services = view->get_plugins <edt::Service> ();
-  for (std::vector<edt::Service *>::const_iterator s = edt_services.begin (); s != edt_services.end (); ++s) {
-    if ((*s)->selection_applies (object)) {
-      (*s)->remove_selection (object);
-      break;
-    }
-  }
-}
-
-static bool has_transient_object_selection (const lay::LayoutViewBase *view)
-{
-  std::vector<edt::Service *> edt_services = view->get_plugins <edt::Service> ();
-  for (std::vector<edt::Service *>::const_iterator s = edt_services.begin (); s != edt_services.end (); ++s) {
-    if ((*s)->has_transient_selection ()) {
-      return true;
-    }
-  }
-  return false;
-}
-
-static EditableSelectionIterator begin_objects_selected (const lay::LayoutViewBase *view)
-{
-  return EditableSelectionIterator (view->get_plugins <edt::Service> (), false);
-}
-
-static EditableSelectionIterator begin_objects_selected_transient (const lay::LayoutViewBase *view)
-{
-  return EditableSelectionIterator (view->get_plugins <edt::Service> (), true);
-}
-
 static
 gsi::ClassExt<lay::LayoutViewBase> layout_view_decl (
-  gsi::method_ext ("has_object_selection?", &has_object_selection, 
+  gsi::method_ext ("has_object_selection?", &edt::has_object_selection,
     "@brief Returns true, if geometrical objects (shapes or cell instances) are selected in this view"
   ) +
-  gsi::method_ext ("object_selection", &object_selection, 
+  gsi::method_ext ("object_selection", &edt::object_selection,
     "@brief Returns a list of selected objects\n"
     "This method will deliver an array of \\ObjectInstPath objects listing the selected geometrical "
     "objects. Other selected objects such as annotations and images will not be contained in that "
@@ -607,7 +444,7 @@ gsi::ClassExt<lay::LayoutViewBase> layout_view_decl (
     "\n"
     "This method has been introduced in version 0.24.\n"
   ) +
-  gsi::method_ext ("object_selection=", &set_object_selection, gsi::arg ("sel"),
+  gsi::method_ext ("object_selection=", &edt::set_object_selection, gsi::arg ("sel"),
     "@brief Sets the list of selected objects\n"
     "\n"
     "This method will set the selection of geometrical objects such as shapes and instances. "
@@ -617,13 +454,13 @@ gsi::ClassExt<lay::LayoutViewBase> layout_view_decl (
     "\n"
     "This method has been introduced in version 0.24.\n"
   ) +
-  gsi::method_ext ("clear_object_selection", &clear_object_selection,
+  gsi::method_ext ("clear_object_selection", &edt::clear_object_selection,
     "@brief Clears the selection of geometrical objects (shapes or cell instances)\n"
     "The selection of other objects (such as annotations and images) will not be affected.\n"
     "\n"
     "This method has been introduced in version 0.24\n"
   ) +
-  gsi::method_ext ("select_object", &select_object, gsi::arg ("obj"),
+  gsi::method_ext ("select_object", &edt::select_object, gsi::arg ("obj"),
     "@brief Adds the given selection to the list of selected objects\n"
     "\n"
     "The selection provided by the \\ObjectInstPath descriptor is added to the list of selected objects.\n"
@@ -635,7 +472,7 @@ gsi::ClassExt<lay::LayoutViewBase> layout_view_decl (
     "\n"
     "This method has been introduced in version 0.24\n"
   ) +
-  gsi::method_ext ("unselect_object", &unselect_object, gsi::arg ("obj"),
+  gsi::method_ext ("unselect_object", &edt::unselect_object, gsi::arg ("obj"),
     "@brief Removes the given selection from the list of selected objects\n"
     "\n"
     "The selection provided by the \\ObjectInstPath descriptor is removed from the list of selected objects.\n"
@@ -644,7 +481,7 @@ gsi::ClassExt<lay::LayoutViewBase> layout_view_decl (
     "\n"
     "This method has been introduced in version 0.24\n"
   ) +
-  gsi::iterator_ext ("each_object_selected", &begin_objects_selected,
+  gsi::iterator_ext ("each_object_selected", &edt::begin_objects_selected,
     "@brief Iterates over each selected geometrical object, yielding a \\ObjectInstPath object for each of them\n"
     "\n"
     "This iterator will deliver const objects - they cannot be modified. In order to modify the selection, "
@@ -653,7 +490,7 @@ gsi::ClassExt<lay::LayoutViewBase> layout_view_decl (
     "\n"
     "Another way of obtaining the selection is \\object_selection, which returns an array of \\ObjectInstPath objects.\n"
   ) +
-  gsi::method_ext ("has_transient_object_selection?", &has_transient_object_selection,  
+  gsi::method_ext ("has_transient_object_selection?", &edt::has_transient_object_selection,
     "@brief Returns true, if geometrical objects (shapes or cell instances) are selected in this view in the transient selection\n"
     "\n"
     "The transient selection represents the objects selected when the mouse hovers over the "
@@ -662,7 +499,7 @@ gsi::ClassExt<lay::LayoutViewBase> layout_view_decl (
     "\n"
     "This method was introduced in version 0.18."
   ) +
-  gsi::iterator_ext ("each_object_selected_transient", &begin_objects_selected_transient,
+  gsi::iterator_ext ("each_object_selected_transient", &edt::begin_objects_selected_transient,
     "@brief Iterates over each geometrical objects in the transient selection, yielding a \\ObjectInstPath object for each of them\n"
     "\n"
     "This method was introduced in version 0.18."

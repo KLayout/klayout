@@ -78,5 +78,20 @@
   not defined. 
   </p>
 
+  <h2>A Note for MacOS Users</h2>
+
+  <p>
+  The Qt/MacOS combination does not allow for dynamically configuring 
+  the main menu. On MacOS the behavior is as follows:
+  </p>
+
+  <p>
+  Every top-level menu entry that is generated either by code or by configuring
+  a macro correspondingly, will be shown in a separate entry in the main toolbar.
+  This entry is labelled "..." and is shown only when it is populated. All
+  non-standard main menu entries are placed there in the same order they would
+  appear in the main menu.
+  </p>
+
 </doc>
 

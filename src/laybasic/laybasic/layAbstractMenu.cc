@@ -1322,7 +1322,7 @@ AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
 
           QMenu *menu = new QMenu (mp_dispatcher->menu_parent_widget ());
           menu->setTitle (tl::to_qstring (c->action ()->get_title ()));
-          c->set_action (new Action (menu), true);
+          c->set_action (new Action (menu), false);
 
           //  This case happens when we dynamically create menus.
           //  MacOS does not like generating top-level menus dynamically, so
@@ -1397,6 +1397,7 @@ AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
   if (mbar && s_can_move_menu) {
     for (std::set<std::pair<size_t, QAction *> >::iterator a = present_actions.begin (); a != present_actions.end (); ++a) {
       mbar->removeAction (a->second);
+      delete a->second;
     }
   }
 }
@@ -1614,12 +1615,6 @@ AbstractMenu::insert_separator (const std::string &p, const std::string &name)
 void
 AbstractMenu::insert_menu (const std::string &p, const std::string &name, Action *action)
 {
-#if defined(HAVE_QT)
-  if (! action->menu () && mp_dispatcher && mp_dispatcher->menu_parent_widget ()) {
-    action->set_menu (new QMenu (), true);
-  }
-#endif
-
   typedef std::vector<std::pair<AbstractMenuItem *, std::list<AbstractMenuItem>::iterator > > path_type;
   tl::Extractor extr (p.c_str ());
   path_type path = find_item (extr);

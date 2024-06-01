@@ -1320,9 +1320,12 @@ AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
 
         if (c->menu () == 0) {
 
+          //  NOTE: we intentionally do not make the item owner of the menu action
+          //  as implicitly deleting it might cause trouble on MacOS. Instead we
+          //  explicitly delete below or keep the action.
           QMenu *menu = new QMenu (mp_dispatcher->menu_parent_widget ());
           menu->setTitle (tl::to_qstring (c->action ()->get_title ()));
-          c->set_action (new Action (menu), false);
+          c->set_action (new Action (menu, false), true);
 
           //  This case happens when we dynamically create menus.
           //  MacOS does not like generating top-level menus dynamically, so
@@ -1394,10 +1397,17 @@ AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
   }
 
   //  Remove all actions that have vanished
-  if (mbar && s_can_move_menu) {
+  if (mbar) {
     for (std::set<std::pair<size_t, QAction *> >::iterator a = present_actions.begin (); a != present_actions.end (); ++a) {
-      mbar->removeAction (a->second);
-      delete a->second;
+      if (s_can_move_menu) {
+        mbar->removeAction (a->second);
+        delete a->second;
+      } else {
+        if (a->second->menu ()) {
+          a->second->menu ()->clear ();
+        }
+        a->second->setEnabled (false);
+      }
     }
   }
 }

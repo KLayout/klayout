@@ -1664,7 +1664,7 @@ SearchReplaceDialog::update_results (const std::string &q)
     }
 
     try {
-      fill_model (lq, iq, &cv->layout (), true, false);
+      fill_model (lq, iq, &cv->layout (), true, true);
       attach_layout (&cv->layout ());
     } catch (...) {
       attach_layout (&cv->layout ());

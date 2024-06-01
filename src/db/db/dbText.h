@@ -397,7 +397,7 @@ public:
    *  @brief The (dummy) translation operator with transformation
    */
   template <class T>
-  void translate (const text<C> &d, const T &t, db::generic_repository<C> &r, db::ArrayRepository &a)
+  void translate (const text<C> &d, const T &t, db::generic_repository<C> &, db::ArrayRepository &)
   {
     *this = d;
     transform (t);

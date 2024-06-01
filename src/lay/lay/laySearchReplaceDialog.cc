@@ -849,10 +849,24 @@ SearchReplaceDialog::SearchReplaceDialog (lay::Dispatcher *root, LayoutViewBase 
   menu->addAction (QObject::tr ("To selection"), this, SLOT (select_items ()));
   export_b->setMenu (menu);
 
-  results->addAction (QObject::tr ("Export to CSV file"), this, SLOT (sel_export_csv ()));
-  results->addAction (QObject::tr ("Export to report database"), this, SLOT (sel_export_rdb ()));
-  results->addAction (QObject::tr ("Export to layout"), this, SLOT (sel_export_layout ()));
-  results->addAction (QObject::tr ("Export to selection"), this, SLOT (sel_select_items ()));
+  QAction *action;
+
+  action = new QAction (QObject::tr ("Export to CSV file"), results);
+  connect (action, SIGNAL (triggered ()), this, SLOT (sel_export_csv ()));
+  results->addAction (action);
+
+  action = new QAction (QObject::tr ("Export to report database"), results);
+  connect (action, SIGNAL (triggered ()), this, SLOT (sel_export_rdb ()));
+  results->addAction (action);
+
+  action = new QAction (QObject::tr ("Export to layout"), results);
+  connect (action, SIGNAL (triggered ()), this, SLOT (sel_export_layout ()));
+  results->addAction (action);
+
+  action = new QAction (QObject::tr ("Export to selection"), results);
+  connect (action, SIGNAL (triggered ()), this, SLOT (sel_select_items ()));
+  results->addAction (action);
+
   results->setContextMenuPolicy (Qt::ActionsContextMenu);
 
   bool editable = view->is_editable ();

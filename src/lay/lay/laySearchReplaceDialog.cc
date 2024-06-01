@@ -504,13 +504,10 @@ SearchReplaceResults::select_items (lay::LayoutViewBase *view, int cv_index)
 
         if (ir.inst_elements.has_value ()) {
           sel.back ().assign_path (ir.inst_elements->begin (), ir.inst_elements->end ());
-          sel.back ().add_path (db::InstElement (ir.inst));
         } else {
           std::vector<db::InstElement> path;
           if (db::find_path (layout, ir.cell_index, ir.initial_cell_index, path)) {
             sel.back ().assign_path (path.begin (), path.end ());
-            //  TODO: specific array instance?
-            sel.back ().add_path (db::InstElement (ir.inst));
           } else {
             sel.pop_back ();
           }

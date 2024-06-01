@@ -156,10 +156,10 @@ public:
   int rowCount (const QModelIndex &parent) const;
   void has_more (bool hm);
 
-  void export_csv (const std::string &file);
-  void export_layout (db::Layout &layout);
-  void export_rdb (rdb::Database &rdb, double dbu);
-  void select_items (LayoutViewBase *view, int cv_index);
+  void export_csv (const std::string &file, const std::set<int> *rows = 0);
+  void export_layout (db::Layout &layout, const std::set<int> *rows = 0);
+  void export_rdb (rdb::Database &rdb, double dbu, const std::set<int> *rows = 0);
+  void select_items (LayoutViewBase *view, int cv_index, const std::set<int> *rows = 0);
 
 private:
   std::vector<tl::Variant> m_data_result;
@@ -241,6 +241,10 @@ private slots:
   void export_csv ();
   void export_rdb ();
   void export_layout ();
+  void sel_select_items ();
+  void sel_export_csv ();
+  void sel_export_rdb ();
+  void sel_export_layout ();
 
 private:
   std::string build_find_expression (QStackedWidget *prop_page, QComboBox *context);

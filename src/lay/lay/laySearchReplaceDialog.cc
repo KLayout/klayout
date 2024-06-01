@@ -459,7 +459,7 @@ escape_csv (const std::string &s)
 }
 
 void
-SearchReplaceResults::select_items (lay::LayoutViewBase *view, int cv_index)
+SearchReplaceResults::select_items (lay::LayoutViewBase *view, int cv_index, const std::set<int> *rows)
 {
   const lay::CellView &cv = view->cellview (cv_index);
   const db::Layout &layout = cv->layout ();
@@ -468,6 +468,10 @@ SearchReplaceResults::select_items (lay::LayoutViewBase *view, int cv_index)
 
   int n_rows = int (size ());
   for (int r = 0; r < n_rows; ++r) {
+
+    if (rows && rows->find (r) == rows->end ()) {
+      continue;
+    }
 
     if (r < int (shapes ().size ())) {
 
@@ -519,7 +523,7 @@ SearchReplaceResults::select_items (lay::LayoutViewBase *view, int cv_index)
 }
 
 void  
-SearchReplaceResults::export_csv (const std::string &file)
+SearchReplaceResults::export_csv (const std::string &file, const std::set<int> *rows)
 {
   std::ofstream output (file.c_str ());
 
@@ -538,21 +542,25 @@ SearchReplaceResults::export_csv (const std::string &file)
 
   for (size_t r = 0; r < n_rows; ++r) {
 
-    for (size_t c = 0; c < n_columns; ++c) {
-      if (c) {
-        output << ",";
-      }
-      //  TODO: optimize
-      output << escape_csv (tl::to_string (data (index (int (r), int (c), parent), Qt::DisplayRole).toString ()));
-    }
+    if (! rows || rows->find (r) != rows->end ()) {
 
-    output << std::endl;
+      for (size_t c = 0; c < n_columns; ++c) {
+        if (c) {
+          output << ",";
+        }
+        //  TODO: optimize
+        output << escape_csv (tl::to_string (data (index (int (r), int (c), parent), Qt::DisplayRole).toString ()));
+      }
+
+      output << std::endl;
+
+    }
 
   }
 }
 
 void  
-SearchReplaceResults::export_layout (db::Layout &layout)
+SearchReplaceResults::export_layout (db::Layout &layout, const std::set<int> *rows)
 {
   if (! m_data_result.empty () || ! m_cell_result.empty () || ! m_inst_result.empty ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("Query produces something other than shapes - such results cannot be converted to layout currently.")));
@@ -561,7 +569,12 @@ SearchReplaceResults::export_layout (db::Layout &layout)
   db::Cell &top_cell = layout.cell (layout.add_cell ("RESULTS"));
   db::LayerMap insert_lm;
 
-  for (std::vector<QueryShapeResult>::const_iterator s = m_shape_result.begin (); s != m_shape_result.end (); ++s) {
+  int r = 0;
+  for (std::vector<QueryShapeResult>::const_iterator s = m_shape_result.begin (); s != m_shape_result.end (); ++s, ++r) {
+
+    if (rows && rows->find (r) == rows->end ()) {
+      continue;
+    }
 
     unsigned int layer = s->layer_index;
     std::map<unsigned int, db::LayerProperties>::const_iterator lm = m_lp_map.find (layer);
@@ -584,7 +597,7 @@ SearchReplaceResults::export_layout (db::Layout &layout)
 }
 
 void  
-SearchReplaceResults::export_rdb (rdb::Database &rdb, double dbu)
+SearchReplaceResults::export_rdb (rdb::Database &rdb, double dbu, const std::set<int> *rows)
 {
   if (! m_cell_result.empty ()) {
 
@@ -595,7 +608,12 @@ SearchReplaceResults::export_rdb (rdb::Database &rdb, double dbu)
     rdb::Category *cat = rdb.create_category ("data");
     rdb::Cell *cell = rdb.create_cell (rdb.top_cell_name ());
 
-    for (std::vector<tl::Variant>::const_iterator v = m_data_result.begin (); v != m_data_result.end (); ++v) {
+    int r = 0;
+    for (std::vector<tl::Variant>::const_iterator v = m_data_result.begin (); v != m_data_result.end (); ++v, ++r) {
+
+      if (rows && rows->find (r) == rows->end ()) {
+        continue;
+      }
 
       rdb::Item *item = rdb.create_item (cell->id (), cat->id ());
 
@@ -621,7 +639,12 @@ SearchReplaceResults::export_rdb (rdb::Database &rdb, double dbu)
       }
     }
 
-    for (std::vector<QueryInstResult>::const_iterator i = m_inst_result.begin (); i != m_inst_result.end (); ++i) {
+    int r = 0;
+    for (std::vector<QueryInstResult>::const_iterator i = m_inst_result.begin (); i != m_inst_result.end (); ++i, ++r) {
+
+      if (rows && rows->find (r) == rows->end ()) {
+        continue;
+      }
 
       std::map<std::pair<db::cell_index_type, db::CplxTrans>, rdb::Cell *>::const_iterator v = cells_by_variant.find (std::make_pair (i->cell_index, db::CplxTrans (i->trans)));
       if (v == cells_by_variant.end ()) {
@@ -649,7 +672,13 @@ SearchReplaceResults::export_rdb (rdb::Database &rdb, double dbu)
 
     //  create categories
     std::map<unsigned int, rdb::Category *> categories;
-    for (std::vector<QueryShapeResult>::const_iterator s = m_shape_result.begin (); s != m_shape_result.end (); ++s) {
+
+    int r = 0;
+    for (std::vector<QueryShapeResult>::const_iterator s = m_shape_result.begin (); s != m_shape_result.end (); ++s, ++r) {
+
+      if (rows && rows->find (r) == rows->end ()) {
+        continue;
+      }
 
       unsigned int layer = s->layer_index;
       std::map<unsigned int, db::LayerProperties>::const_iterator lm = m_lp_map.find (layer);
@@ -670,7 +699,12 @@ SearchReplaceResults::export_rdb (rdb::Database &rdb, double dbu)
       }
     }
 
-    for (std::vector<QueryShapeResult>::const_iterator s = m_shape_result.begin (); s != m_shape_result.end (); ++s) {
+    r = 0;
+    for (std::vector<QueryShapeResult>::const_iterator s = m_shape_result.begin (); s != m_shape_result.end (); ++s, ++r) {
+
+      if (rows && rows->find (r) == rows->end ()) {
+        continue;
+      }
 
       unsigned int layer = s->layer_index;
       std::map<unsigned int, rdb::Category *>::const_iterator cm = categories.find (layer);
@@ -812,8 +846,14 @@ SearchReplaceDialog::SearchReplaceDialog (lay::Dispatcher *root, LayoutViewBase 
   menu->addAction (QObject::tr ("To CSV file"), this, SLOT (export_csv ()));
   menu->addAction (QObject::tr ("To report database"), this, SLOT (export_rdb ()));
   menu->addAction (QObject::tr ("To layout"), this, SLOT (export_layout ()));
-  menu->addAction (QObject::tr ("Select items"), this, SLOT (select_items ()));
+  menu->addAction (QObject::tr ("To selection"), this, SLOT (select_items ()));
   export_b->setMenu (menu);
+
+  results->addAction (QObject::tr ("Export to CSV file"), this, SLOT (sel_export_csv ()));
+  results->addAction (QObject::tr ("Export to report database"), this, SLOT (sel_export_rdb ()));
+  results->addAction (QObject::tr ("Export to layout"), this, SLOT (sel_export_layout ()));
+  results->addAction (QObject::tr ("Export to selection"), this, SLOT (sel_select_items ()));
+  results->setContextMenuPolicy (Qt::ActionsContextMenu);
 
   bool editable = view->is_editable ();
   mode_tab->setTabEnabled (replace_mode_index, editable);
@@ -996,6 +1036,28 @@ SearchReplaceDialog::save_state ()
 }
 
 void
+SearchReplaceDialog::sel_select_items ()
+{
+BEGIN_PROTECTED
+
+  int cv_index = m_last_query_cv_index;
+  const lay::CellView &cv = mp_view->cellview (cv_index);
+  if (! cv.is_valid ()) {
+    return;
+  }
+
+  std::set<int> rows;
+  QModelIndexList sel = results->selectionModel ()->selectedRows (0);
+  for (auto s = sel.begin (); s != sel.end (); ++s) {
+    rows.insert (s->row ());
+  }
+
+  m_model.select_items (view (), cv_index, &rows);
+
+END_PROTECTED
+}
+
+void
 SearchReplaceDialog::select_items ()
 {
 BEGIN_PROTECTED
@@ -1023,6 +1085,29 @@ BEGIN_PROTECTED
   query_to_model (model, lq, iq, std::numeric_limits<size_t>::max (), true, true /*with paths*/);
   model.end_changes ();
   model.select_items (view (), cv_index);
+
+END_PROTECTED
+}
+
+void
+SearchReplaceDialog::sel_export_csv ()
+{
+BEGIN_PROTECTED
+
+  std::set<int> rows;
+  QModelIndexList sel = results->selectionModel ()->selectedRows (0);
+  for (auto s = sel.begin (); s != sel.end (); ++s) {
+    rows.insert (s->row ());
+  }
+
+  std::string fn;
+
+  lay::FileDialog file_dialog (this, tl::to_string (QObject::tr ("Export CSV")), tl::to_string (QObject::tr ("CSV Files (*.csv);;All Files (*)")), "csv");
+  if (! file_dialog.get_save (fn)) {
+    return;
+  }
+
+  m_model.export_csv (fn, &rows);
 
 END_PROTECTED
 }
@@ -1067,6 +1152,38 @@ END_PROTECTED
 }
 
 void
+SearchReplaceDialog::sel_export_rdb ()
+{
+BEGIN_PROTECTED
+
+  int cv_index = m_last_query_cv_index;
+  const lay::CellView &cv = mp_view->cellview (cv_index);
+  if (! cv.is_valid ()) {
+    return;
+  }
+
+  std::set<int> rows;
+  QModelIndexList sel = results->selectionModel ()->selectedRows (0);
+  for (auto s = sel.begin (); s != sel.end (); ++s) {
+    rows.insert (s->row ());
+  }
+
+  std::unique_ptr<rdb::Database> rdb (new rdb::Database ());
+
+  rdb->set_description (tl::to_string (QObject::tr ("Query results: ")) + m_last_query);
+  rdb->set_name ("query_results");
+  rdb->set_generator ("query: " + m_last_query);
+  rdb->set_top_cell_name (cv->layout ().cell_name (cv.cell_index ()));
+
+  m_model.export_rdb (*rdb, cv->layout ().dbu (), &rows);
+
+  int rdb_index = mp_view->add_rdb (rdb.release ());
+  mp_view->open_rdb_browser (rdb_index, cv_index);
+
+END_PROTECTED
+}
+
+void
 SearchReplaceDialog::export_rdb ()
 {
 BEGIN_PROTECTED
@@ -1104,6 +1221,25 @@ BEGIN_PROTECTED
 
   int rdb_index = mp_view->add_rdb (rdb.release ());
   mp_view->open_rdb_browser (rdb_index, cv_index);
+
+END_PROTECTED
+}
+
+void
+SearchReplaceDialog::sel_export_layout ()
+{
+BEGIN_PROTECTED
+
+  std::set<int> rows;
+  QModelIndexList sel = results->selectionModel ()->selectedRows (0);
+  for (auto s = sel.begin (); s != sel.end (); ++s) {
+    rows.insert (s->row ());
+  }
+
+  std::unique_ptr <lay::LayoutHandle> handle (new lay::LayoutHandle (new db::Layout (mp_view->manager ()), std::string ()));
+  handle->rename ("query_results");
+  m_model.export_layout (handle->layout (), &rows);
+  mp_view->add_layout (handle.release (), true);
 
 END_PROTECTED
 }

@@ -472,23 +472,21 @@ SearchReplaceResults::select_items (lay::LayoutViewBase *view, int cv_index)
     if (r < int (shapes ().size ())) {
 
       const SearchReplaceResults::QueryShapeResult &sr = shapes () [r];
-      if (! sr.shape.is_null () && layout.is_valid_cell_index (sr.initial_cell_index) && layout.is_valid_cell_index (sr.cell_index)) {
+      if (! sr.shape.is_null () && layout.is_valid_cell_index (sr.initial_cell_index)) {
 
-        sel.push_back (edt::Service::objects::value_type ());
-        sel.back ().set_cv_index (cv_index);
-        sel.back ().set_layer (sr.layer_index);
-        sel.back ().set_shape (sr.shape);
-        sel.back ().set_topcell (sr.initial_cell_index);
+        std::vector<db::InstElement> path;
+        if (db::find_path (layout, sr.initial_cell_index, cv.cell_index (), path)) {
 
-        if (sr.inst_elements.has_value ()) {
-          sel.back ().assign_path (sr.inst_elements->begin (), sr.inst_elements->end ());
-        } else {
-          std::vector<db::InstElement> path;
-          if (db::find_path (layout, sr.cell_index, sr.initial_cell_index, path)) {
-            sel.back ().assign_path (path.begin (), path.end ());
-          } else {
-            sel.pop_back ();
+          sel.push_back (edt::Service::objects::value_type ());
+          sel.back ().set_cv_index (cv_index);
+          sel.back ().set_layer (sr.layer_index);
+          sel.back ().set_shape (sr.shape);
+          sel.back ().set_topcell (cv.cell_index ());
+          sel.back ().assign_path (path.begin (), path.end ());
+          if (sr.inst_elements.has_value ()) {
+            sel.back ().add_path (sr.inst_elements->begin (), sr.inst_elements->end ());
           }
+
         }
 
       }
@@ -496,21 +494,19 @@ SearchReplaceResults::select_items (lay::LayoutViewBase *view, int cv_index)
     } else if (r < int (instances ().size ())) {
 
       const SearchReplaceResults::QueryInstResult &ir = instances () [r];
-      if (! ir.inst.is_null () && layout.is_valid_cell_index (ir.initial_cell_index) && layout.is_valid_cell_index (ir.cell_index)) {
+      if (! ir.inst.is_null () && layout.is_valid_cell_index (ir.initial_cell_index)) {
 
-        sel.push_back (edt::Service::objects::value_type ());
-        sel.back ().set_cv_index (cv_index);
-        sel.back ().set_topcell (ir.initial_cell_index);
+        std::vector<db::InstElement> path;
+        if (db::find_path (layout, ir.initial_cell_index, cv.cell_index (), path)) {
 
-        if (ir.inst_elements.has_value ()) {
-          sel.back ().assign_path (ir.inst_elements->begin (), ir.inst_elements->end ());
-        } else {
-          std::vector<db::InstElement> path;
-          if (db::find_path (layout, ir.cell_index, ir.initial_cell_index, path)) {
-            sel.back ().assign_path (path.begin (), path.end ());
-          } else {
-            sel.pop_back ();
+          sel.push_back (edt::Service::objects::value_type ());
+          sel.back ().set_cv_index (cv_index);
+          sel.back ().set_topcell (cv.cell_index ());
+          sel.back ().assign_path (path.begin (), path.end ());
+          if (ir.inst_elements.has_value ()) {
+            sel.back ().add_path (ir.inst_elements->begin (), ir.inst_elements->end ());
           }
+
         }
 
       }

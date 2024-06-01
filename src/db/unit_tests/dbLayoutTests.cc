@@ -27,6 +27,7 @@
 #include "dbLibraryProxy.h"
 #include "dbTextWriter.h"
 #include "dbCellMapping.h"
+#include "dbInstElement.h"
 #include "tlString.h"
 #include "tlUnitTest.h"
 
@@ -467,17 +468,15 @@ TEST(4)
   g.rename_cell (top, "TAP");
   EXPECT_EQ (el.cell_name_dirty, true);  //  but this is
 
-  db::properties_id_type prop_id;
-
   db::PropertiesRepository::properties_set ps;
   ps.insert (std::make_pair (g.properties_repository ().prop_name_id (tl::Variant (1)), tl::Variant ("XYZ")));
-  prop_id = g.properties_repository ().properties_id (ps);
+  g.properties_repository ().properties_id (ps);
   EXPECT_EQ (el.property_ids_dirty, true);
   el.reset ();
 
   ps.clear ();
   ps.insert (std::make_pair (g.properties_repository ().prop_name_id (tl::Variant (1)), tl::Variant ("XXX")));
-  prop_id = g.properties_repository ().properties_id (ps);
+  g.properties_repository ().properties_id (ps);
   EXPECT_EQ (el.property_ids_dirty, true);
 
   el.layer_properties_dirty = false;
@@ -844,4 +843,31 @@ TEST(10_TranslateStringRefs)
 
   //  after deleting the tmp layout, l is still valid
   EXPECT_EQ (l2s (l), "begin_lib 0.001\nbegin_cell {TOP}\ntext 1 0 0 0 {0 0} {TEXT_NEW}\ntext 1 0 0 0 {0 0} {TEXT_NEW}\nend_cell\nend_lib\n");
+}
+
+TEST(11_FindPath)
+{
+  db::Manager m;
+  db::Layout l (&m);
+  db::Cell &top = l.cell (l.add_cell ("TOP"));
+  db::Cell &a = l.cell (l.add_cell ("A"));
+  db::Cell &b = l.cell (l.add_cell ("B"));
+  db::Cell &c = l.cell (l.add_cell ("C"));
+  l.insert_layer (db::LayerProperties (1, 0));
+
+  top.insert (db::CellInstArray (a.cell_index (), db::Trans (1, db::Vector ())));
+  a.insert (db::CellInstArray (b.cell_index (), db::Trans (0, db::Vector (100, 200))));
+
+  std::vector<db::InstElement> path;
+  EXPECT_EQ (db::find_path (l, c.cell_index (), top.cell_index (), path), false);
+  EXPECT_EQ (path.size (), size_t (0));
+
+  EXPECT_EQ (db::find_path (l, top.cell_index (), top.cell_index (), path), true);
+  EXPECT_EQ (path.size (), size_t (0));
+
+  EXPECT_EQ (db::find_path (l, b.cell_index (), top.cell_index (), path), true);
+  EXPECT_EQ (path.size (), size_t (2));
+
+  std::string d = tl::join (path.begin (), path.end (), ";");
+  EXPECT_EQ (d, "cell_index=1 r90 *1 0,0;cell_index=2 r0 *1 100,200");
 }

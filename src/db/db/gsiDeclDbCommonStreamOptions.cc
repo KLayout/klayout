@@ -191,16 +191,22 @@ gsi::ClassExt<db::LoadLayoutOptions> common_reader_options (
 gsi::EnumIn<db::LoadLayoutOptions, db::CellConflictResolution> decl_dbCommonReader_CellConflictResolution ("db", "CellConflictResolution",
   gsi::enum_const ("AddToCell", db::AddToCell,
     "@brief Add content to existing cell\n"
-    "This is the mode use in before version 0.27. Content of new cells is simply added to existing cells with the same name."
+    "This is the mode use in before version 0.27. Content of new cells is simply added to existing cells with the same name.\n"
+    "Before version 0.29.2, this mode also merged instances, rendering it difficult to merge two identical cell hierarchies.\n"
+    "Since version 0.29.2, no instance duplicates are generated. Instead only new instances are added to existing cells.\n"
+    "With this feature in place, it is safe to merge two identical cell hierarchies stored in different files using AddToCell mode.\n"
+    "In that application, the shapes and layers of the layouts are combined, but the cell hierarchy stays identical."
   ) +
   gsi::enum_const ("OverwriteCell", db::OverwriteCell,
-    "@brief The old cell is overwritten entirely (including child cells which are not used otherwise)\n"
+    "@brief The old cell is overwritten entirely (including child cells which are not used otherwise).\n"
   ) +
   gsi::enum_const ("SkipNewCell", db::SkipNewCell,
-    "@brief The new cell is skipped entirely (including child cells which are not used otherwise)\n"
+    "@brief The new cell is skipped entirely (including child cells which are not used otherwise).\n"
   ) +
   gsi::enum_const ("RenameCell", db::RenameCell,
-    "@brief The new cell will be renamed to become unique\n"
+    "@brief The new cell will be renamed to become unique.\n"
+    "In this mode, two files are are combined rendering independent cell hierarchies coming from the original files.\n"
+    "Cells may be renamed however. Also, new top cells will appear after merging a file into the layout using RenameCell mode.\n"
   ),
   "@brief This enum specifies how cell conflicts are handled if a layout read into another layout and a cell name conflict arises.\n"
   "Until version 0.26.8 and before, the mode was always 'AddToCell'. On reading, a cell was 'reopened' when encountering a cell name "

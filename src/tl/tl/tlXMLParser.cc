@@ -403,9 +403,15 @@ public:
 
   void setDocumentLocator (QXmlLocator *locator);
 
+  const tl::XMLLocatedException *exception () const
+  {
+    return m_error.get ();
+  }
+
 private:
   QXmlLocator *mp_locator;
   XMLStructureHandler *mp_struct_handler;
+  std::unique_ptr<tl::XMLLocatedException> m_error;
 };
 
 // --------------------------------------------------------------------------------------------------------
@@ -479,13 +485,17 @@ SAXHandler::characters (const QString &t)
 bool
 SAXHandler::error (const QXmlParseException &ex)
 {
-  throw tl::XMLLocatedException (tl::to_string (ex.message ()), ex.lineNumber (), ex.columnNumber ());
+  m_error.reset (new tl::XMLLocatedException (tl::to_string (ex.message ()), ex.lineNumber (), ex.columnNumber ()));
+  //  stop reading
+  return false;
 }
 
 bool
 SAXHandler::fatalError (const QXmlParseException &ex)
 {
-  throw tl::XMLLocatedException (tl::to_string (ex.message ()), ex.lineNumber (), ex.columnNumber ());
+  m_error.reset (new tl::XMLLocatedException (tl::to_string (ex.message ()), ex.lineNumber (), ex.columnNumber ()));
+  //  stop reading
+  return false;
 }
 
 bool
@@ -765,7 +775,10 @@ XMLParser::parse (XMLSource &source, XMLStructureHandler &struct_handler)
   mp_data->setContentHandler (&handler);
   mp_data->setErrorHandler (&handler);
 
-  mp_data->parse (source.source (), false /*=not incremental*/);
+  bool result = mp_data->parse (source.source (), false /*=not incremental*/);
+  if (! result && handler.exception ()) {
+    throw tl::XMLLocatedException (*handler.exception ());
+  }
 }
 
 bool

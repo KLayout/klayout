@@ -394,12 +394,13 @@ class SAXHandler
 public:
   SAXHandler (XMLStructureHandler *sh);
 
-  bool characters (const QString &ch);
-  bool endElement (const QString &namespaceURI, const QString &localName, const QString &qName);
-  bool startElement (const QString &namespaceURI, const QString &localName, const QString &qName, const QXmlAttributes &atts);
-  bool error (const QXmlParseException &exception);
-  bool fatalError (const QXmlParseException &exception);
-  bool warning (const QXmlParseException &exception);
+  virtual bool characters (const QString &ch);
+  virtual bool endElement (const QString &namespaceURI, const QString &localName, const QString &qName);
+  virtual bool startElement (const QString &namespaceURI, const QString &localName, const QString &qName, const QXmlAttributes &atts);
+  virtual bool error (const QXmlParseException &exception);
+  virtual bool fatalError (const QXmlParseException &exception);
+  virtual bool warning (const QXmlParseException &exception);
+  virtual QString errorString () const;
 
   void setDocumentLocator (QXmlLocator *locator);
 
@@ -412,6 +413,7 @@ private:
   QXmlLocator *mp_locator;
   XMLStructureHandler *mp_struct_handler;
   std::unique_ptr<tl::XMLLocatedException> m_error;
+  std::string m_error_string;
 };
 
 // --------------------------------------------------------------------------------------------------------
@@ -439,9 +441,11 @@ SAXHandler::startElement (const QString &qs_uri, const QString &qs_lname, const 
   try {
     mp_struct_handler->start_element (uri, lname, qname);
   } catch (tl::XMLException &ex) {
-    throw tl::XMLLocatedException (ex.raw_msg (), mp_locator->lineNumber (), mp_locator->columnNumber ());
+    m_error_string = ex.raw_msg ();
+    return false;
   } catch (tl::Exception &ex) {
-    throw tl::XMLLocatedException (ex.msg (), mp_locator->lineNumber (), mp_locator->columnNumber ());
+    m_error_string = ex.msg ();
+    return false;
   }
 
   //  successful
@@ -458,9 +462,11 @@ SAXHandler::endElement (const QString &qs_uri, const QString &qs_lname, const QS
   try {
     mp_struct_handler->end_element (uri, lname, qname);
   } catch (tl::XMLException &ex) {
-    throw tl::XMLLocatedException (ex.raw_msg (), mp_locator->lineNumber (), mp_locator->columnNumber ());
+    m_error_string = ex.raw_msg ();
+    return false;
   } catch (tl::Exception &ex) {
-    throw tl::XMLLocatedException (ex.msg (), mp_locator->lineNumber (), mp_locator->columnNumber ());
+    m_error_string = ex.msg ();
+    return false;
   }
 
   //  successful
@@ -473,14 +479,23 @@ SAXHandler::characters (const QString &t)
   try {
     mp_struct_handler->characters (tl::to_string (t));
   } catch (tl::XMLException &ex) {
-    throw tl::XMLLocatedException (ex.raw_msg (), mp_locator->lineNumber (), mp_locator->columnNumber ());
+    m_error_string = ex.raw_msg ();
+    return false;
   } catch (tl::Exception &ex) {
-    throw tl::XMLLocatedException (ex.msg (), mp_locator->lineNumber (), mp_locator->columnNumber ());
+    m_error_string = ex.msg ();
+    return false;
   }
 
   //  successful
   return true;
 }
+
+QString
+SAXHandler::errorString () const
+{
+  return tl::to_qstring (m_error_string);
+}
+
 
 bool
 SAXHandler::error (const QXmlParseException &ex)

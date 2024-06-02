@@ -678,6 +678,22 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   gsi::method ("netlist", &db::LayoutToNetlist::netlist,
     "@brief gets the netlist extracted (0 if no extraction happened yet)\n"
   ) +
+  gsi::method ("shapes_of_pin", &db::LayoutToNetlist::shapes_of_pin, gsi::arg ("pin"), gsi::arg ("trans", db::ICplxTrans (), "unity"),
+    "@brief Returns all shapes of the given subcircuit pin.\n"
+    "This will return all shapes from the subcircuit attached by the given pin that interact with the net.\n"
+    "This method returns a \Region object with the shapes per layer where interactions are found.\n"
+    "The layers are given as layer indexes.\n"
+    "\n"
+    "The returned shapes are already transformed into the coordinate system of the net (see \\shapes_of_net for example).\n"
+    "An additional transformation can be applied using the optional \\trans argument.\n"
+    "\n"
+    "Note, that this method only considers interations between net shapes and subcircuits, not between subcircuits.\n"
+    "It can be used for example for digital nets connecting gate cells. In the general case however, nets may be formed\n"
+    "also by touching subcircuits. In that case, the nets do not have shapes of their own and this function cannot detect\n"
+    "the pin shapes.\n"
+    "\n"
+    "This method has been introduced in version 0.29.2."
+  ) +
   gsi::factory ("shapes_of_net", (db::Region *(db::LayoutToNetlist::*) (const db::Net &, const db::Region &, bool, const db::ICplxTrans &) const) &db::LayoutToNetlist::shapes_of_net, gsi::arg ("net"), gsi::arg ("of_layer"), gsi::arg ("recursive", true), gsi::arg ("trans", db::ICplxTrans (), "unity"),
     "@brief Returns all shapes of a specific net and layer.\n"
     "If 'recursive'' is true, the returned region will contain the shapes of\n"

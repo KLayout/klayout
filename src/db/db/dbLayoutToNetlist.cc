@@ -1308,6 +1308,14 @@ static bool deliver_shapes_of_net (bool recursive, const db::Netlist *nl, const 
   return true;
 }
 
+std::map<unsigned int, db::Region>
+LayoutToNetlist::shapes_of_pin (const db::NetSubcircuitPinRef &pin, const db::ICplxTrans &trans) const
+{
+
+  // @@@
+
+}
+
 void LayoutToNetlist::shapes_of_net (const db::Net &net, const db::Region &of_layer, bool recursive, db::Shapes &to, db::properties_id_type propid, const ICplxTrans &trans) const
 {
   unsigned int lid = layer_of (of_layer);

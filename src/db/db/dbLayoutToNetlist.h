@@ -829,6 +829,19 @@ public:
   }
 
   /**
+   *  @brief Gets the shapes that make the subcircuit pin
+   *
+   *  This method looks up all shapes from the subcircuit that interact with the shapes of the net
+   *  the subcircuit pin lives in. It will return a map of layer index vs. Region with these
+   *  shapes, transformed into the coordinate space of the net.
+   *
+   *  Note that this method only considers top-down interactions between the shapes of the net
+   *  and subcircuits, not between subcircuits. It is useful only for certain topologies - i.e.
+   *  digital nets connecting gate cells.
+   */
+  std::map<unsigned int, db::Region> shapes_of_pin (const db::NetSubcircuitPinRef &pin, const db::ICplxTrans &trans = db::ICplxTrans ()) const;
+
+  /**
    *  @brief Returns all shapes of a specific net and layer.
    *
    *  If "recursive" is true, the returned region will contain the shapes of

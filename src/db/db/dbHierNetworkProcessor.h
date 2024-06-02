@@ -326,8 +326,10 @@ public:
    *
    *  "trans" is the transformation which is applied to the other cluster before
    *  the test.
+   *  If non-null "interacting_this" will receive all interacting shapes from *this in case of success.
+   *  If non-null "interacting_other" will receive all interacting shapes from other in case of success.
    */
-  bool interacts (const local_cluster<T> &other, const db::ICplxTrans &trans, const Connectivity &conn, int &soft) const;
+  bool interacts (const local_cluster<T> &other, const db::ICplxTrans &trans, const Connectivity &conn, int &soft, std::map<unsigned int, std::vector<const T *> > *interacting_this = 0, std::map<unsigned int, std::vector<const T *> > *interacting_other = 0) const;
 
   /**
    *  @brief Tests whether this cluster interacts with the given cell

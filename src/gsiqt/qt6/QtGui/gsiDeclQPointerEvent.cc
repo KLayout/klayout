@@ -27,11 +27,7 @@
 *  This file has been created automatically
 */
 
-#include <QPointerEvent>
-#include <QEventPoint>
-#include <QInputDevice>
-#include <QObject>
-#include <QPointingDevice>
+#include <QPointer>
 #include "gsiQt.h"
 #include "gsiQtGuiCommon.h"
 #include <memory>

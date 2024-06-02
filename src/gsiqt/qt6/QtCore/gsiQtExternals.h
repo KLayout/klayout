@@ -153,10 +153,6 @@ class QDebugStateSaver;
 
 namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QDebugStateSaver> &qtdecl_QDebugStateSaver (); }
 
-class QDeferredDeleteEvent;
-
-namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QDeferredDeleteEvent> &qtdecl_QDeferredDeleteEvent (); }
-
 class QDir;
 
 namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QDir> &qtdecl_QDir (); }

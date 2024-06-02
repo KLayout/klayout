@@ -40,7 +40,6 @@ SOURCES += \
   $$PWD/gsiDeclQDeadlineTimer.cc \
   $$PWD/gsiDeclQDebug.cc \
   $$PWD/gsiDeclQDebugStateSaver.cc \
-  $$PWD/gsiDeclQDeferredDeleteEvent.cc \
   $$PWD/gsiDeclQDir.cc \
   $$PWD/gsiDeclQDirIterator.cc \
   $$PWD/gsiDeclQDynamicPropertyChangeEvent.cc \

@@ -397,25 +397,6 @@ static void _call_f_offsetFromUtc_c2175 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// bool QTimeZone::operator!=(const QTimeZone &other)
-
-
-static void _init_f_operator_excl__eq__c2205 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("other");
-  decl->add_arg<const QTimeZone & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_excl__eq__c2205 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QTimeZone &arg1 = gsi::arg_reader<const QTimeZone & >() (args, heap);
-  ret.write<bool > ((bool)((QTimeZone *)cls)->operator!= (arg1));
-}
-
-
 // QTimeZone &QTimeZone::operator=(const QTimeZone &other)
 
 
@@ -432,25 +413,6 @@ static void _call_f_operator_eq__2205 (const qt_gsi::GenericMethod * /*decl*/, v
   tl::Heap heap;
   const QTimeZone &arg1 = gsi::arg_reader<const QTimeZone & >() (args, heap);
   ret.write<QTimeZone & > ((QTimeZone &)((QTimeZone *)cls)->operator= (arg1));
-}
-
-
-// bool QTimeZone::operator==(const QTimeZone &other)
-
-
-static void _init_f_operator_eq__eq__c2205 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("other");
-  decl->add_arg<const QTimeZone & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_eq__eq__c2205 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QTimeZone &arg1 = gsi::arg_reader<const QTimeZone & >() (args, heap);
-  ret.write<bool > ((bool)((QTimeZone *)cls)->operator== (arg1));
 }
 
 
@@ -792,9 +754,7 @@ static gsi::Methods methods_QTimeZone () {
   methods += new qt_gsi::GenericMethod ("nextTransition", "@brief Method QTimeZone::OffsetData QTimeZone::nextTransition(const QDateTime &afterDateTime)\n", true, &_init_f_nextTransition_c2175, &_call_f_nextTransition_c2175);
   methods += new qt_gsi::GenericMethod ("offsetData", "@brief Method QTimeZone::OffsetData QTimeZone::offsetData(const QDateTime &forDateTime)\n", true, &_init_f_offsetData_c2175, &_call_f_offsetData_c2175);
   methods += new qt_gsi::GenericMethod ("offsetFromUtc", "@brief Method int QTimeZone::offsetFromUtc(const QDateTime &atDateTime)\n", true, &_init_f_offsetFromUtc_c2175, &_call_f_offsetFromUtc_c2175);
-  methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QTimeZone::operator!=(const QTimeZone &other)\n", true, &_init_f_operator_excl__eq__c2205, &_call_f_operator_excl__eq__c2205);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QTimeZone &QTimeZone::operator=(const QTimeZone &other)\n", false, &_init_f_operator_eq__2205, &_call_f_operator_eq__2205);
-  methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QTimeZone::operator==(const QTimeZone &other)\n", true, &_init_f_operator_eq__eq__c2205, &_call_f_operator_eq__eq__c2205);
   methods += new qt_gsi::GenericMethod ("previousTransition", "@brief Method QTimeZone::OffsetData QTimeZone::previousTransition(const QDateTime &beforeDateTime)\n", true, &_init_f_previousTransition_c2175, &_call_f_previousTransition_c2175);
   methods += new qt_gsi::GenericMethod ("standardTimeOffset", "@brief Method int QTimeZone::standardTimeOffset(const QDateTime &atDateTime)\n", true, &_init_f_standardTimeOffset_c2175, &_call_f_standardTimeOffset_c2175);
   methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QTimeZone::swap(QTimeZone &other)\n", false, &_init_f_swap_1510, &_call_f_swap_1510);

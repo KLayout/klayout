@@ -1225,6 +1225,36 @@ static QAction *insert_action_after (QWidget *widget, QAction *after, QAction *a
   return action;
 }
 
+static const std::string s_extras_menu_name ("_extras_menu");
+
+static QMenu *find_extras_menu (QMenuBar *mbar)
+{
+  if (! mbar) {
+    return 0;
+  }
+
+  QList<QAction *> a = mbar->actions ();
+  for (QList<QAction *>::const_iterator i = a.begin (); i != a.end (); ++i) {
+    if (tl::to_string ((*i)->objectName ()) == s_extras_menu_name) {
+      return (*i)->menu ();
+    }
+  }
+
+  return 0;
+}
+
+bool
+AbstractMenu::wants_extra_menu ()
+{
+  return !s_can_move_menu;
+}
+
+const std::string &
+AbstractMenu::extra_menu_name ()
+{
+  return s_extras_menu_name;
+}
+
 void
 AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
 {
@@ -1234,10 +1264,22 @@ AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
 
   std::set<std::pair<size_t, QAction *> > present_actions;
   if (mbar) {
+
     QList<QAction *> a = mbar->actions ();
     for (QList<QAction *>::const_iterator i = a.begin (); i != a.end (); ++i) {
       present_actions.insert (std::make_pair (id_from_action (*i), *i));
     }
+
+  }
+
+  //  NOTE: on MacOS, once the top level menu is created, we should not
+  //  modify it and place menu items into the "Extras" menu instead.
+  bool menu_frozen = ! s_can_move_menu && ! present_actions.empty ();
+
+  //  NOTE: the "extras" menu is relevant on MacOS only
+  QMenu *extras_menu = find_extras_menu (mbar);
+  if (extras_menu) {
+    extras_menu->clear ();
   }
 
   QAction *prev_action = 0;
@@ -1277,11 +1319,27 @@ AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
       } else if (mbar) {
 
         if (c->menu () == 0) {
+
+          //  NOTE: we intentionally do not make the item owner of the menu action
+          //  as implicitly deleting it might cause trouble on MacOS. Instead we
+          //  explicitly delete below or keep the action.
           QMenu *menu = new QMenu (mp_dispatcher->menu_parent_widget ());
           menu->setTitle (tl::to_qstring (c->action ()->get_title ()));
-          c->set_action (new Action (menu), true);
-          prev_action = insert_action_after (mbar, prev_action, menu->menuAction ());
+          c->set_action (new Action (menu, false), true);
+
+          //  This case happens when we dynamically create menus.
+          //  MacOS does not like generating top-level menus dynamically, so
+          //  we put them into the "_extra" top level one.
+          if (menu_frozen) {
+            if (extras_menu) {
+              extras_menu->addMenu (menu);
+            }
+          } else {
+            prev_action = insert_action_after (mbar, prev_action, menu->menuAction ());
+          }
+
         } else {
+
           //  Move the action to the end if present in the menu already
           std::set<std::pair<size_t, QAction *> >::iterator a = present_actions.find (std::make_pair (id_from_action (c->menu ()->menuAction ()), c->menu ()->menuAction ()));
           if (a != present_actions.end ()) {
@@ -1291,12 +1349,20 @@ AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
             }
             prev_action = a->second;
             present_actions.erase (*a);
+          } else if (menu_frozen) {
+            if (extras_menu) {
+              extras_menu->addMenu (c->menu ());
+            }
           } else {
             prev_action = insert_action_after (mbar, prev_action, c->menu ()->menuAction ());
           }
+
         }
 
-        build (c->menu (), c->children);
+        //  NOTE: the "extras" menu is built implicitly. You cannot put anything there.
+        if (c->menu () != extras_menu) {
+          build (c->menu (), c->children);
+        }
 
       }
 
@@ -1311,6 +1377,11 @@ AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
         }
         prev_action = a->second;
         present_actions.erase (*a);
+      } else if (menu_frozen) {
+        QMenu *extras_menu = find_extras_menu (mbar);
+        if (extras_menu) {
+          extras_menu->addAction (c->action ()->qaction ());
+        }
       } else {
         prev_action = insert_action_after (mbar, prev_action, c->action ()->qaction ());
       }
@@ -1319,10 +1390,24 @@ AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
 
   }
 
+  //  Disable the (maybe new) "extras" menu if empty
+  extras_menu = find_extras_menu (mbar);
+  if (extras_menu) {
+    extras_menu->setEnabled (! extras_menu->isEmpty ());
+  }
+
   //  Remove all actions that have vanished
   if (mbar) {
     for (std::set<std::pair<size_t, QAction *> >::iterator a = present_actions.begin (); a != present_actions.end (); ++a) {
-      mbar->removeAction (a->second);
+      if (s_can_move_menu) {
+        mbar->removeAction (a->second);
+        delete a->second;
+      } else {
+        if (a->second->menu ()) {
+          a->second->menu ()->clear ();
+        }
+        a->second->setEnabled (false);
+      }
     }
   }
 }
@@ -1540,12 +1625,6 @@ AbstractMenu::insert_separator (const std::string &p, const std::string &name)
 void
 AbstractMenu::insert_menu (const std::string &p, const std::string &name, Action *action)
 {
-#if defined(HAVE_QT)
-  if (! action->menu () && mp_dispatcher && mp_dispatcher->menu_parent_widget ()) {
-    action->set_menu (new QMenu (), true);
-  }
-#endif
-
   typedef std::vector<std::pair<AbstractMenuItem *, std::list<AbstractMenuItem>::iterator > > path_type;
   tl::Extractor extr (p.c_str ());
   path_type path = find_item (extr);

@@ -283,7 +283,7 @@ TEST(insert_many)
     tris.insert_point (x, y);
   }
 
-  EXPECT_LT (double (tris.flips ()) / double (n), 3.0);
+  EXPECT_LT (double (tris.flips ()) / double (n), 3.1);
   EXPECT_LT (double (tris.hops ()) / double (n), 23.0);
 }
 

@@ -4350,6 +4350,10 @@ public:
     menu_entries.push_back (lay::submenu ("zoom_menu", at, tl::to_string (QObject::tr ("&Display"))));
     menu_entries.push_back (lay::submenu ("tools_menu", at, tl::to_string (QObject::tr ("&Tools"))));
     menu_entries.push_back (lay::submenu ("macros_menu", at, tl::to_string (QObject::tr ("&Macros"))));
+    if (lay::AbstractMenu::wants_extra_menu ()) {
+      //  for MacOS
+      menu_entries.push_back (lay::submenu (lay::AbstractMenu::extra_menu_name (), at, "..."));
+    }
     menu_entries.push_back (lay::separator ("help_group", at));
     menu_entries.push_back (lay::submenu ("help_menu", at, tl::to_string (QObject::tr ("&Help"))));
     menu_entries.push_back (lay::submenu ("@secrets", at, tl::to_string (QObject::tr ("Secret Features"))));

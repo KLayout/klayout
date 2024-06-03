@@ -1,0 +1,196 @@
+#%lvsdb-klayout
+
+# Layout
+layout(
+ top(Res2)
+ unit(0.001)
+
+ # Layer section
+ # This section lists the mask layers (drawing or derived) and their connections.
+
+ # Mask layers
+ layer(l4 '15/0')
+ layer(l3 '16/0')
+ layer(l1)
+
+ # Mask layer connectivity
+ connect(l4 l4 l3 l1)
+ connect(l3 l4 l3)
+ connect(l1 l4 l1)
+
+ # Device class section
+ class(RPP1 RES)
+
+ # Device abstracts section
+ # Device abstracts list the pin shapes of the devices.
+ device(D$RPP1 RPP1
+  terminal(A
+   rect(l1 (10540 0) (540 2000))
+  )
+  terminal(B
+   rect(l1 (0 0) (540 2000))
+  )
+ )
+
+ # Circuit section
+ # Circuits are the hierarchical building blocks of the netlist.
+ circuit(Res2
+
+  # Circuit boundary
+  rect((8285 720) (117975 57350))
+
+  # Nets with their geometries
+  net(1
+   rect(l4 (120580 32490) (220 220))
+   rect(l4 (-220 -745) (220 220))
+   rect(l4 (-220 -745) (220 220))
+   rect(l4 (-220 -750) (220 220))
+   rect(l4 (-22355 1390) (220 220))
+   rect(l4 (-220 -745) (220 220))
+   rect(l4 (-220 -745) (220 220))
+   rect(l4 (-220 -750) (220 220))
+   rect(l4 (-21520 1755) (220 220))
+   rect(l4 (-220 -745) (220 220))
+   rect(l4 (-220 -745) (220 220))
+   rect(l4 (-220 -750) (220 220))
+   rect(l3 (0 -4795) (1065 5850))
+   rect(l3 (-5155 -6930) (52985 1475))
+   rect(l3 (-27585 -395) (1065 5850))
+   rect(l3 (20990 -5850) (1065 5850))
+   rect(l3 (-1275 -1760) (340 1920))
+   rect(l3 (-22475 -1890) (340 1920))
+   rect(l3 (-21640 -1525) (340 1920))
+   rect(l1 (42935 -2385) (540 2000))
+   rect(l1 (-22675 -1970) (540 2000))
+   rect(l1 (-21840 -1605) (540 2000))
+  )
+  net(2
+   rect(l4 (19795 5575) (220 220))
+   rect(l4 (-220 -745) (220 220))
+   rect(l4 (-220 -745) (220 220))
+   rect(l4 (-220 -750) (220 220))
+   rect(l3 (-195 -995) (2395 2500))
+   rect(l3 (-2480 -1785) (340 1920))
+   rect(l1 (-500 -1960) (540 2000))
+  )
+
+  # Devices and their connections
+  device(1 D$RPP1
+   device(D$RPP1 location(-65 -8175))
+   device(D$RPP1 location(-205 -12595))
+   device(D$RPP1 location(-320 -20985))
+   device(D$RPP1 location(-225 -16825))
+   device(D$RPP1 location(30 -3970))
+   device(D$RPP1 location(-22135 30))
+   device(D$RPP1 location(-22200 -8145))
+   device(D$RPP1 location(-22340 -12565))
+   device(D$RPP1 location(-22455 -20955))
+   device(D$RPP1 location(-22360 -16795))
+   device(D$RPP1 location(-22105 -3940))
+   device(D$RPP1 location(-43435 425))
+   device(D$RPP1 location(-43500 -7750))
+   device(D$RPP1 location(-43640 -12170))
+   device(D$RPP1 location(-43755 -20560))
+   device(D$RPP1 location(-43660 -16400))
+   device(D$RPP1 location(-43405 -3545))
+   device(D$RPP1 location(-100465 855))
+   device(D$RPP1 location(-81950 425))
+   device(D$RPP1 location(-100530 -7320))
+   device(D$RPP1 location(-100670 -11740))
+   device(D$RPP1 location(-100785 -20130))
+   device(D$RPP1 location(-100785 -26915))
+   device(D$RPP1 location(-100690 -15970))
+   device(D$RPP1 location(-100435 -3115))
+   device(D$RPP1 location(-82015 -7750))
+   device(D$RPP1 location(-82155 -12170))
+   device(D$RPP1 location(-82175 -16400))
+   device(D$RPP1 location(-63435 640))
+   device(D$RPP1 location(-63500 -7535))
+   device(D$RPP1 location(-63640 -11955))
+   device(D$RPP1 location(-63755 -20345))
+   device(D$RPP1 location(-63865 -26810))
+   device(D$RPP1 location(-63660 -16185))
+   device(D$RPP1 location(-63405 -3330))
+   device(D$RPP1 location(-63930 -34985))
+   device(D$RPP1 location(-64070 -39405))
+   device(D$RPP1 location(-64090 -43635))
+   device(D$RPP1 location(-82380 -26810))
+   device(D$RPP1 location(-82270 -20560))
+   device(D$RPP1 location(-82445 -34985))
+   device(D$RPP1 location(-82585 -39405))
+   device(D$RPP1 location(-82700 -47795))
+   device(D$RPP1 location(-64185 -47795))
+   device(D$RPP1 location(-82605 -43635))
+   device(D$RPP1 location(-82350 -30780))
+   device(D$RPP1 location(-63835 -30780))
+   device(D$RPP1 location(-81920 -3545))
+   device(D$RPP1 location(-100850 -35090))
+   device(D$RPP1 location(-100990 -39510))
+   device(D$RPP1 location(-101105 -47900))
+   device(D$RPP1 location(-101010 -43740))
+   device(D$RPP1 location(-100755 -30885))
+   connect(51 A A)
+   connect(3 B A)
+   connect(9 B A)
+   connect(15 B A)
+   location(110140 51795)
+   param(R 95)
+   param(L 420)
+   param(W 2.21052631579)
+   param(A 1080)
+   param(P 1296)
+   terminal(A 2)
+   terminal(B 1)
+  )
+
+ )
+)
+
+# Reference netlist
+reference(
+
+ # Device class section
+ class(RPP1 RES)
+
+ # Circuit section
+ # Circuits are the hierarchical building blocks of the netlist.
+ circuit(RES2
+
+  # Nets
+  net(1 name(GND))
+  net(2 name(VDD))
+
+  # Outgoing pins and their connections to nets
+  pin(1 name(GND))
+  pin(2 name(VDD))
+
+  # Devices and their connections
+  device(1 RPP1
+   name(I0.I106.R0)
+   param(R 59475.7)
+   param(L 420)
+   param(W 2.21052631579)
+   param(A 0)
+   param(P 0)
+   terminal(A 2)
+   terminal(B 1)
+  )
+
+ )
+)
+
+# Cross reference
+xref(
+ circuit(Res2 RES2 nomatch
+  xref(
+   net(() 1 mismatch)
+   net(() 2 mismatch)
+   net(1 () mismatch)
+   net(2 () mismatch)
+   pin(() 0 match)
+   pin(() 1 match)
+   device(() 1 mismatch)
+   device(1 () mismatch)
+  )
+ )
+)

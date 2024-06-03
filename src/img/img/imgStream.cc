@@ -233,14 +233,14 @@ ImageProxy::get_image () const
   if (! m_byte_data.empty ()) {
 
     std::list<std::string>::const_iterator s = m_byte_data.begin ();
-    for (size_t i = 0; i < m_height; ++i) {
+    for (size_t i = 0; i < m_height && s != m_byte_data.end (); ++i) {
       string_to_pixels<unsigned char, unsigned char> (img.get (), *s++, i, m_width, m_color);
     }
 
   } else {
 
     std::list<std::string>::const_iterator s = m_data.begin ();
-    for (size_t i = 0; i < m_height; ++i) {
+    for (size_t i = 0; i < m_height && s != m_data.end (); ++i) {
       string_to_pixels<float, unsigned char> (img.get (), *s++, i, m_width, m_color);
     }
 

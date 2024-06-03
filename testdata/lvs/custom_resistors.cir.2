@@ -1,0 +1,18 @@
+
+* cell TOP
+.SUBCKT TOP
+* cell instance $1 r180 *1 2,2.6
+X$1 6 1 A
+* cell instance $2 r0 *1 2.2,1
+X$2 6 5 A
+* device instance $1 r0 *1 0.8,0.75 RPP1
+R$1 1 2 0.555555555556 RPP1
+.ENDS TOP
+
+* cell A
+* pin 
+* pin 
+.SUBCKT A 1 2
+* device instance $1 r0 *1 -0.2,0.4 RPP1
+R$1 2 1 1.25 RPP1
+.ENDS A

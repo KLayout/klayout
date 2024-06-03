@@ -1913,9 +1913,185 @@ Service::handle_guiding_shape_changes ()
   }
 }
 
+// -------------------------------------------------------------
+//  Implementation of EditableSelectionIterator
+
+EditableSelectionIterator::EditableSelectionIterator (const std::vector<edt::Service *> &services, bool transient)
+  : m_services (services), m_service (0), m_transient_selection (transient)
+{
+  if (! m_services.empty ()) {
+    if (m_transient_selection) {
+      m_iter = m_services [m_service]->transient_selection ().begin ();
+      m_end = m_services [m_service]->transient_selection ().end ();
+    } else {
+      m_iter = m_services [m_service]->selection ().begin ();
+      m_end = m_services [m_service]->selection ().end ();
+    }
+    next ();
+  }
+}
+
+bool
+EditableSelectionIterator::at_end () const
+{
+  return (m_service >= m_services.size ());
+}
+
+EditableSelectionIterator &
+EditableSelectionIterator::operator++ ()
+{
+  ++m_iter;
+  next ();
+  return *this;
+}
+
+const EditableSelectionIterator::value_type &
+EditableSelectionIterator::operator* () const
+{
+  return *m_iter;
+}
+
+void
+EditableSelectionIterator::next ()
+{
+  while (m_iter == m_end) {
+    ++m_service;
+    if (m_service < m_services.size ()) {
+      if (m_transient_selection) {
+        m_iter = m_services [m_service]->transient_selection ().begin ();
+        m_end = m_services [m_service]->transient_selection ().end ();
+      } else {
+        m_iter = m_services [m_service]->selection ().begin ();
+        m_end = m_services [m_service]->selection ().end ();
+      }
+    } else {
+      break;
+    }
+  }
+}
 
 // -------------------------------------------------------------
+//  Selection utilities implementation
+
+/**
+ *  @brief Gets the combined selections over all editor services in the layout view
+ */
+std::vector<edt::Service::objects::value_type> object_selection (const lay::LayoutViewBase *view)
+{
+  std::vector<edt::Service::objects::value_type> result;
+  std::vector<edt::Service *> edt_services = view->get_plugins <edt::Service> ();
+  for (std::vector<edt::Service *>::const_iterator s = edt_services.begin (); s != edt_services.end (); ++s) {
+    std::vector<edt::Service::objects::value_type> sel;
+    (*s)->get_selection (sel);
+    result.insert (result.end (), sel.begin (), sel.end ());
+  }
+  return result;
+}
+
+/**
+ *  @brief Distributes the combined selection over all editor services in the layout view
+ */
+void set_object_selection (const lay::LayoutViewBase *view, const std::vector<edt::Service::objects::value_type> &all_selected)
+{
+  std::vector<edt::Service::objects::value_type> sel;
+
+  std::vector<edt::Service *> edt_services = view->get_plugins <edt::Service> ();
+  for (std::vector<edt::Service *>::const_iterator s = edt_services.begin (); s != edt_services.end (); ++s) {
+
+    sel.clear ();
+
+    for (std::vector<edt::Service::objects::value_type>::const_iterator o = all_selected.begin (); o != all_selected.end (); ++o) {
+      if ((*s)->selection_applies (*o)) {
+        sel.push_back (*o);
+      }
+    }
+
+    (*s)->set_selection (sel.begin (), sel.end ());
+
+  }
+}
+
+/**
+ *  @brief Gets a value indicating whether any editor service in the view has a selection
+ */
+bool has_object_selection (const lay::LayoutViewBase *view)
+{
+  std::vector<edt::Service *> edt_services = view->get_plugins <edt::Service> ();
+  for (std::vector<edt::Service *>::const_iterator s = edt_services.begin (); s != edt_services.end (); ++s) {
+    if ((*s)->has_selection ()) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ *  @brief Clears the selection of all editor services in the view
+ */
+void clear_object_selection (const lay::LayoutViewBase *view)
+{
+  std::vector<edt::Service *> edt_services = view->get_plugins <edt::Service> ();
+  for (std::vector<edt::Service *>::const_iterator s = edt_services.begin (); s != edt_services.end (); ++s) {
+    (*s)->clear_selection ();
+  }
+}
+
+/**
+ *  @brief Selects a specific object in the appropriate editor service of the view
+ */
+void select_object (const lay::LayoutViewBase *view, const edt::Service::objects::value_type &object)
+{
+  std::vector<edt::Service *> edt_services = view->get_plugins <edt::Service> ();
+  for (std::vector<edt::Service *>::const_iterator s = edt_services.begin (); s != edt_services.end (); ++s) {
+    if ((*s)->selection_applies (object)) {
+      (*s)->add_selection (object);
+      break;
+    }
+  }
+}
+
+/**
+ *  @brief Unselects a specific object in the appropriate editor service of the view
+ */
+void unselect_object (const lay::LayoutViewBase *view, const edt::Service::objects::value_type &object)
+{
+  std::vector<edt::Service *> edt_services = view->get_plugins <edt::Service> ();
+  for (std::vector<edt::Service *>::const_iterator s = edt_services.begin (); s != edt_services.end (); ++s) {
+    if ((*s)->selection_applies (object)) {
+      (*s)->remove_selection (object);
+      break;
+    }
+  }
+}
+
+/**
+ *  @brief Gets a value indicating whether any editor service in the view has a transient selection
+ */
+bool has_transient_object_selection (const lay::LayoutViewBase *view)
+{
+  std::vector<edt::Service *> edt_services = view->get_plugins <edt::Service> ();
+  for (std::vector<edt::Service *>::const_iterator s = edt_services.begin (); s != edt_services.end (); ++s) {
+    if ((*s)->has_transient_selection ()) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ *  @brief Iterates over all selected object of all editor services
+ */
+EditableSelectionIterator begin_objects_selected (const lay::LayoutViewBase *view)
+{
+  return EditableSelectionIterator (view->get_plugins <edt::Service> (), false);
+}
+
+/**
+ *  @brief Iterates over all transiently selected object of all editor services
+ */
+EditableSelectionIterator begin_objects_selected_transient (const lay::LayoutViewBase *view)
+{
+  return EditableSelectionIterator (view->get_plugins <edt::Service> (), true);
+}
 
 } // namespace edt
-
-

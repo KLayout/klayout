@@ -150,7 +150,22 @@ struct DB_PUBLIC InstElement
   {
     return inst_ptr.cell_inst ().complex_trans (*array_inst);
   }
+
+  /**
+   *  @brief Returns a string representation of the element
+   */
+  std::string to_string (bool resolve_cell_name = false) const;
 };
+
+/**
+ *  @brief Finds a path from the "from" to the "to" cell
+ *
+ *  This function will determine one representative instantiation path leading
+ *  from the "from" cell to the "to" cell. If such a path exists, it is stored
+ *  in "path" and true is returned. If no such path exists, false is returned.
+ */
+DB_PUBLIC bool
+find_path (const db::Layout &layout, db::cell_index_type from, db::cell_index_type to, std::vector<db::InstElement> &path);
 
 } // namespace db
 

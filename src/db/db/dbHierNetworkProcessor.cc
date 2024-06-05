@@ -538,22 +538,25 @@ public:
         (*mp_interacting_this) [l1].insert (s1);
       }
       if (mp_interacting_other) {
-        (*mp_interacting_this) [l2].insert (s2);
+        (*mp_interacting_other) [l2].insert (s2);
       }
       if (soft == 0 || (m_soft_mode != 0 && m_soft_mode != soft)) {
         m_soft_mode = 0;
-        if (! mp_interacting_other && ! mp_interacting_this) {
-          m_any = true;
-        }
+        m_any = true;
       } else {
         m_soft_mode = soft;
       }
     }
   }
 
+  bool any () const
+  {
+    return m_any || m_soft_mode != 0;
+  }
+
   bool stop () const
   {
-    return m_any;
+    return m_any && ! mp_interacting_other && ! mp_interacting_this;
   }
 
   int soft_mode () const
@@ -715,8 +718,9 @@ local_cluster<T>::interacts (const local_cluster<T> &other, const db::ICplxTrans
   std::map<unsigned int, std::set<const T *> > *p_is_other = interacting_other ? &is_other : 0;
 
   hnp_interaction_receiver<T> rec (conn, trans, p_is_this, p_is_other);
+  scanner.process (rec, 1 /*==touching*/, bc, bc_t);
 
-  if (! scanner.process (rec, 1 /*==touching*/, bc, bc_t) || rec.soft_mode () != 0) {
+  if (rec.any ()) {
 
     if (p_is_this) {
       collect_interactions_in_original_order (m_shapes, *p_is_this, *interacting_this);

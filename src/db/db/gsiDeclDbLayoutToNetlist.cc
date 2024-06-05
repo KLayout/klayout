@@ -692,6 +692,8 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "also by touching subcircuits. In that case, the nets do not have shapes of their own and this function cannot detect\n"
     "the pin shapes.\n"
     "\n"
+    "The call of this method is not cheap, specificially if large nets are involved.\n"
+    "\n"
     "This method has been introduced in version 0.29.2."
   ) +
   gsi::factory ("shapes_of_net", (db::Region *(db::LayoutToNetlist::*) (const db::Net &, const db::Region &, bool, const db::ICplxTrans &) const) &db::LayoutToNetlist::shapes_of_net, gsi::arg ("net"), gsi::arg ("of_layer"), gsi::arg ("recursive", true), gsi::arg ("trans", db::ICplxTrans (), "unity"),

@@ -33,7 +33,7 @@ output_layers = {
   if net
   
     net.each_subcircuit_pin do |pin|
-      shapes = l2n_data.shapes_of_pin(pin)
+      shapes = l2n_data.shapes_of_pin(pin, RBA::Trans::new(RBA::Vector::new(100, 200)))
       shapes.keys.each do |li|
         output_layers[l2n_data.layer_name(li)].data.insert(shapes[li])
       end

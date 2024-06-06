@@ -59,7 +59,7 @@ output_layers = {
   if net
   
     net.each_terminal do |terminal|
-      shapes = l2n_data.shapes_of_terminal(terminal)
+      shapes = l2n_data.shapes_of_terminal(terminal, RBA::Trans::new(RBA::Vector::new(100, 200)))
       shapes.keys.each do |li|
         output_layers[l2n_data.layer_name(li)].data.insert(shapes[li])
       end

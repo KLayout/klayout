@@ -1,3 +1,20 @@
+0.29.2           (2024-06-06):
+* Enhancement: %GITHUB%/issues/1724 Don't read duplicate LEF files
+* Bug: %GITHUB%/issues/1722 [macOS] Crash when opening layout having Custom Macro Menus
+* Enhancement: %GITHUB%/issues/1721 Feature request: send results from a query to selection
+* Enhancement: %GITHUB%/issues/1719 Small LVS issues
+* Enhancement: %GITHUB%/issues/1710 Feature request: create separate cell for def FILL
+* Bug: %GITHUB%/issues/1709 Problem displaying multiple text labels with same x value
+* Bug: %GITHUB%/issues/1706 [macOS] User Properties Dialog Crashes
+* Enhancement: %GITHUB%/issues/1701 Feature request: strm2oas should report input unit differences
+* Enhancement: Methods to obtain representative shapes of subcircuit pin and terminals, i.e.
+  LayoutToNetlist#shapes_of_pin, LayoutToNetlist#shapes_of_terminal.
+* Enhancement: Some enhancements in the Ruby/Python area like better messages in case
+  of argument mismatch errors and better handling of default values for enum arguments.
+* Enhancement: LayoutToNetlist#layer_indexes, LayoutToNetlist#layer_info (convenience)
+* Enhancement: blend-mode 0 (aka AddToCell) now does not generate instance duplicates
+* Bugfix: Some bug fixes on macro IDE: deleted macros do not become "zombie tabs" for example
+  
 0.29.1           (2024-05-04):
 * Enhancement: %GITHUB%/issues/1700 Porting 2.5d view for compatibility with OpenGL 3.0 for better support on other platforms
   This however comes with a larger memory footprint during rendering. Something to fix later.

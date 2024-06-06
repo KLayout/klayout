@@ -1341,7 +1341,7 @@ RedrawThreadWorker::draw_text_layer (bool drawing_context, db::cell_index_type c
 
       } else {
 
-        bool text_simplified = m_text_lazy_rendering && (dbbox_tot.width () <= 8.0 || dbbox_tot.height () <= 8.0);
+        bool text_simplified = m_text_lazy_rendering && dbbox_tot.width () <= 8.0 && dbbox_tot.height () <= 8.0;
             
         const db::Shapes &shapes = cell.shapes (m_layer);
 

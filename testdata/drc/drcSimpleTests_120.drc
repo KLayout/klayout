@@ -1,0 +1,52 @@
+
+source $drc_test_source
+target $drc_test_target
+
+deep
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+l3 = input(3, 0)
+
+name(l1, "l1")
+name(l2, "l2")
+name(l3, "l3")
+
+connect(l1, l2)
+connect(l2, l3)
+
+netlist 
+
+l1_out = polygons
+l2_out = polygons
+l3_out = polygons
+
+output_layers = {
+  "l1" => l1_out,
+  "l2" => l2_out,
+  "l3" => l3_out
+}
+
+[ "A", "B", "C" ].each do |n|
+
+  net = l2n_data.netlist.circuit_by_name("TOP").net_by_name(n)
+  if net
+  
+    net.each_subcircuit_pin do |pin|
+      shapes = l2n_data.shapes_of_pin(pin, RBA::Trans::new(RBA::Vector::new(100, 200)))
+      shapes.keys.each do |li|
+        output_layers[l2n_data.layer_name(li)].data.insert(shapes[li])
+      end
+    end
+    
+  end
+
+end
+
+l1.output(1, 0)
+l2.output(2, 0)
+l3.output(3, 0)
+l1_out.output(101, 0)
+l2_out.output(102, 0)
+l3_out.output(103, 0)
+

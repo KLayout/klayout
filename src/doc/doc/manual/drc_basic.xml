@@ -305,7 +305,7 @@ input(1, 0).sized(200.nm).output(10, 0)</pre>
 
   <pre>
 source("input.gds")
-report("out.lyrdb")
+report("Output Database", "out.lyrdb")
 input(1, 0).sized(200.nm).output("sized")</pre>
 
   <p>

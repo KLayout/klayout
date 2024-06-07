@@ -1308,6 +1308,102 @@ static bool deliver_shapes_of_net (bool recursive, const db::Netlist *nl, const 
   return true;
 }
 
+void
+LayoutToNetlist::collect_shapes_of_pin (const local_cluster<db::NetShape> &c, const db::Net *other_net, const db::ICplxTrans &sc_trans, const db::ICplxTrans &trans, std::map<unsigned int, db::Region> &result) const
+{
+  if (! other_net || ! other_net->circuit ()) {
+    return;
+  }
+
+  auto cc_other = m_net_clusters.clusters_per_cell (other_net->circuit ()->cell_index ());
+  auto c_other = cc_other.cluster_by_id (other_net->cluster_id ());
+
+  std::map<unsigned int, std::vector<const db::NetShape *> > interacting;
+  int soft = 0;
+  if (c.interacts (c_other, sc_trans, m_conn, soft, 0, &interacting)) {
+
+    auto t = trans * sc_trans;
+
+    for (auto i = interacting.begin (); i != interacting.end (); ++i) {
+      db::Region &r = result [i->first];
+      for (auto s = i->second.begin (); s != i->second.end (); ++s) {
+        deliver_shape (**s, r, t, 0);
+      }
+    }
+
+  }
+
+  double dbu = internal_layout ()->dbu ();
+
+  for (auto p = other_net->begin_subcircuit_pins (); p != other_net->end_subcircuit_pins (); ++p) {
+
+    db::ICplxTrans sc_trans2 = sc_trans * db::CplxTrans (dbu).inverted () * p->subcircuit ()->trans () * db::CplxTrans (dbu);
+    const db::Net *other_net2 = p->subcircuit ()->circuit_ref ()->net_for_pin (p->pin_id ());
+
+    collect_shapes_of_pin (c, other_net2, sc_trans2, trans, result);
+
+  }
+}
+
+std::map<unsigned int, db::Region>
+LayoutToNetlist::shapes_of_pin (const db::NetSubcircuitPinRef &pin, const db::ICplxTrans &trans) const
+{
+  std::map<unsigned int, db::Region> result;
+
+  const db::Net *net = pin.net ();
+  if (! net || ! net->circuit () || ! pin.subcircuit () || ! pin.subcircuit ()->circuit_ref ()) {
+    return result;
+  }
+
+  auto cc = m_net_clusters.clusters_per_cell (net->circuit ()->cell_index ());
+  auto c = cc.cluster_by_id (net->cluster_id ());
+
+  double dbu = internal_layout ()->dbu ();
+  db::ICplxTrans sc_trans = db::CplxTrans (dbu).inverted () * pin.subcircuit ()->trans () * db::CplxTrans (dbu);
+  const db::Net *other_net = pin.subcircuit ()->circuit_ref ()->net_for_pin (pin.pin_id ());
+
+  collect_shapes_of_pin (c, other_net, sc_trans, trans, result);
+
+  return result;
+}
+
+std::map<unsigned int, db::Region>
+LayoutToNetlist::shapes_of_terminal (const db::NetTerminalRef &terminal, const db::ICplxTrans &trans) const
+{
+  std::map<unsigned int, db::Region> result;
+
+  const db::Net *net = terminal.net ();
+  if (! net || ! net->circuit () || ! terminal.device () || ! terminal.device ()->device_abstract ()) {
+    return result;
+  }
+
+  auto cc = m_net_clusters.clusters_per_cell (net->circuit ()->cell_index ());
+  auto c = cc.cluster_by_id (net->cluster_id ());
+
+  double dbu = internal_layout ()->dbu ();
+  db::ICplxTrans d_trans = db::CplxTrans (dbu).inverted () * terminal.device ()->trans () * db::CplxTrans (dbu);
+
+  auto cc_other = m_net_clusters.clusters_per_cell (terminal.device ()->device_abstract ()->cell_index ());
+  auto c_other = cc_other.cluster_by_id (terminal.device ()->device_abstract ()->cluster_id_for_terminal (terminal.terminal_id ()));
+
+  std::map<unsigned int, std::vector<const db::NetShape *> > interacting;
+  int soft = 0;
+  if (c.interacts (c_other, d_trans, m_conn, soft, 0, &interacting)) {
+
+    auto t = trans * d_trans;
+
+    for (auto i = interacting.begin (); i != interacting.end (); ++i) {
+      db::Region &r = result [i->first];
+      for (auto s = i->second.begin (); s != i->second.end (); ++s) {
+        deliver_shape (**s, r, t, 0);
+      }
+    }
+
+  }
+
+  return result;
+}
+
 void LayoutToNetlist::shapes_of_net (const db::Net &net, const db::Region &of_layer, bool recursive, db::Shapes &to, db::properties_id_type propid, const ICplxTrans &trans) const
 {
   unsigned int lid = layer_of (of_layer);

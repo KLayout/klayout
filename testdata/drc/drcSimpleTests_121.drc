@@ -1,0 +1,89 @@
+
+source $drc_test_source
+target $drc_test_target
+
+# only works flat:
+# deep
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+l3 = input(3, 0)
+
+active = input(10, 0)
+poly = input(11, 0)
+contact = input(12, 0)
+
+sd = active - poly
+gate = active & poly
+
+name(l1, "l1")
+name(l2, "l2")
+name(l3, "l3")
+name(sd, "sd")
+name(poly, "poly")
+name(gate, "gate")
+name(contact, "contact")
+
+mos_ex = RBA::DeviceExtractorMOS3Transistor::new("MOS")
+extract_devices(mos_ex, { "SD" => sd, "G" => gate, "P" => poly })
+
+connect(contact, poly)
+connect(contact, sd)
+connect(l1, contact)
+connect(l1, l2)
+connect(l2, l3)
+
+netlist 
+
+l1_out = polygons
+l2_out = polygons
+l3_out = polygons
+contact_out = polygons
+sd_out = polygons
+gate_out = polygons
+poly_out = polygons
+
+output_layers = {
+  "l1" => l1_out,
+  "l2" => l2_out,
+  "l3" => l3_out,
+  "contact" => contact_out,
+  "poly" => poly_out,
+  "gate" => gate_out,
+  "sd" => sd_out
+}
+
+[ "A", "B", "C" ].each do |n|
+
+  net = l2n_data.netlist.circuit_by_name("TOP").net_by_name(n)
+  if net
+  
+    net.each_terminal do |terminal|
+      shapes = l2n_data.shapes_of_terminal(terminal, RBA::Trans::new(RBA::Vector::new(100, 200)))
+      shapes.keys.each do |li|
+        output_layers[l2n_data.layer_name(li)].data.insert(shapes[li])
+      end
+    end
+    
+  end
+
+end
+
+l1.output(1, 0)
+l2.output(2, 0)
+l3.output(3, 0)
+
+sd.output(10, 0)
+poly.output(11, 0)
+contact.output(12, 0)
+gate.output(13, 0)
+
+l1_out.output(101, 0)
+l2_out.output(102, 0)
+l3_out.output(103, 0)
+
+sd_out.output(110, 0)
+poly_out.output(111, 0)
+contact_out.output(112, 0)
+gate_out.output(113, 0)
+

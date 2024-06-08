@@ -5254,12 +5254,12 @@ class LayoutViewBase:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         def __hash__(self) -> int:
             r"""
@@ -7490,12 +7490,12 @@ class Macro:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         def __hash__(self) -> int:
             r"""
@@ -7637,12 +7637,12 @@ class Macro:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -8806,7 +8806,7 @@ class ObjectInstPath:
     @brief Gets the cell index of the top cell the selection applies to
 
     The top cell is identical to the current cell provided by the cell view.
-    It is the cell from which is instantiation path originates and the container cell if not instantiation path is set.
+    It is the cell from which is instantiation path originates and the container cell if no instantiation path is set.
 
     This method has been introduced in version 0.24.
     Setter:

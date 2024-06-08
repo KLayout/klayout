@@ -3955,12 +3955,12 @@ class CompoundRegionOperationNode:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         def __hash__(self) -> int:
             r"""
@@ -3993,12 +3993,12 @@ class CompoundRegionOperationNode:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -4163,12 +4163,12 @@ class CompoundRegionOperationNode:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         def __hash__(self) -> int:
             r"""
@@ -4265,12 +4265,12 @@ class CompoundRegionOperationNode:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         def __hash__(self) -> int:
             r"""
@@ -4303,12 +4303,12 @@ class CompoundRegionOperationNode:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -4405,12 +4405,12 @@ class CompoundRegionOperationNode:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -13611,14 +13611,14 @@ class DeviceAbstract:
     @overload
     def netlist(self) -> Netlist:
         r"""
-        @brief Gets the netlist the device abstract lives in (non-const version).
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the netlist the device abstract lives in.
         """
     @overload
     def netlist(self) -> Netlist:
         r"""
-        @brief Gets the netlist the device abstract lives in.
+        @brief Gets the netlist the device abstract lives in (non-const version).
+
+        This constness variant has been introduced in version 0.26.8
         """
 
 class DeviceAbstractRef:
@@ -23610,12 +23610,12 @@ class HAlign:
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer value
+        @brief Compares two enums
         """
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums
+        @brief Compares an enum with an integer value
         """
     def __hash__(self) -> int:
         r"""
@@ -30944,6 +30944,22 @@ class LayoutToNetlist:
     You can also use the extractor with an existing \DeepShapeStore object or even flat data. In this case, preparation means importing existing regions with the \register method.
     If you want to use the \LayoutToNetlist object with flat data, use the 'LayoutToNetlist(topcell, dbu)' constructor. If you want to use it with hierarchical data and an existing DeepShapeStore object, use the 'LayoutToNetlist(dss)' constructor.
 
+    Once the extraction is done, you can persist the \LayoutToNetlist object using \write and restore it using \read. You can use the query API (see below) to analyze the LayoutToNetlist database.
+
+    The query API of the \LayoutToNetlist object consists of the following parts:
+
+    @ul
+    @li Net shape retrieval: \build_all_nets, \build_nets, \build_net and \shapes_per_net @/li
+    @li Layers: \layer_by_index, \layer_by_name, \layer_indexes, \layer_names, \layer_info, \layer_name @/li
+    @li Log entries: \each_log_entry @/li
+    @li Probing (get net from position): \probe_net @/li
+    @li Netlist: \netlist @/li
+    @li Internal shape storage: \internal_layout, \internal_top_cell @/li
+    @li Helper functions: \cell_mapping_into, \const_cell_mapping_into @/li
+    @/ul
+
+    The \LayoutToNetlist object is also the entry point for connectivity-aware DRC checks, such as antenna checks.
+
     This class has been introduced in version 0.26.
     """
     class BuildNetHierarchyMode:
@@ -30978,12 +30994,12 @@ class LayoutToNetlist:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         def __hash__(self) -> int:
             r"""
@@ -31368,6 +31384,10 @@ class LayoutToNetlist:
         object to determine the target cell (create it with "cell_mapping_into" or "const_cell_mapping_into").
         If no mapping is provided for a specific circuit cell, the nets are copied into the next mapped parent as many times as the circuit cell appears there (circuit flattening).
 
+        If 'netname_prop' is not nil, a property with the given name is created and attached to shapes. The value of the property is the net name.
+
+        'lmap' defines which layers are to be produced. It is map, where the keys are layer indexes in the target layout and the values are Region objects indicating the layer where shapes are to be taken from. Use \layer_by_name or \layer_by_index to get the Region object corresponding to a layer stored inside the LayoutToNetlist database.
+
         The method has three net annotation modes:
         @ul
          @li No annotation (net_cell_name_prefix == nil and netname_prop == nil): the shapes will be put
@@ -31409,8 +31429,9 @@ class LayoutToNetlist:
         This method puts the shapes of a net into the given target cell using a variety of options
         to represent the net name and the hierarchy of the net.
 
-        If the netname_prop name is not nil, a property with the given name is created and assigned
-        the net name.
+        If 'netname_prop' is not nil, a property with the given name is created and attached to shapes. The value of the property is the net name.
+
+        'lmap' defines which layers are to be produced. It is map, where the keys are layer indexes in the target layout and the values are Region objects indicating the layer where shapes are to be taken from. Use \layer_by_name or \layer_by_index to get the Region object corresponding to a layer stored inside the LayoutToNetlist database.
 
         Net hierarchy is covered in three ways:
         @ul
@@ -31610,8 +31631,7 @@ class LayoutToNetlist:
     def internal_layout(self) -> Layout:
         r"""
         @brief Gets the internal layout
-        Usually it should not be required to obtain the internal layout. If you need to do so, make sure not to modify the layout as
-        the functionality of the netlist extractor depends on it.
+        The internal layout is where the LayoutToNetlist database stores the shapes for the nets. Usually you do not need to access this object - you must use \build_net or \shapes_of_net to retrieve the per-net shape information. If you access the internal layout, make sure you do not modify it.
         """
     def internal_top_cell(self) -> Cell:
         r"""
@@ -31711,6 +31731,20 @@ class LayoutToNetlist:
         @brief Gets a layer object for the given name.
         The returned object is a copy which represents the named layer.
         """
+    def layer_indexes(self) -> List[int]:
+        r"""
+        @brief Returns a list of indexes of the layers kept inside the LayoutToNetlist object.
+        You can use \layer_name to get the name from a layer index. You can use \layer_info to get the \LayerInfo object attached to a layer - if the layer is an original layer.
+
+        This method has been introduced in version 0.29.2.
+        """
+    def layer_info(self, index: int) -> LayerInfo:
+        r"""
+        @brief Returns the LayerInfo object attached to a layer (by index).
+        If the layer is an original layer and not a derived one, this method will return the stream layer information where the original layer was taken from. Otherwise an empty \LayerInfo object is returned.
+
+        This method has been introduced in version 0.29.2.
+        """
     @overload
     def layer_name(self, l: ShapeCollection) -> str:
         r"""
@@ -31723,7 +31757,7 @@ class LayoutToNetlist:
         """
     def layer_names(self) -> List[str]:
         r"""
-        @brief Returns a list of names of the layer kept inside the LayoutToNetlist object.
+        @brief Returns a list of names of the layers kept inside the LayoutToNetlist object.
         """
     @overload
     def layer_of(self, l: Region) -> int:
@@ -31860,6 +31894,44 @@ class LayoutToNetlist:
         all subcircuits too.
         "prop_id" is an optional properties ID. If given, this property set will be attached to the shapes.
         The optional 'trans' parameter allows applying a transformation to all shapes. It has been introduced in version 0.28.4.
+        """
+    def shapes_of_pin(self, pin: NetSubcircuitPinRef, trans: Optional[ICplxTrans] = ...) -> Dict[int, Region]:
+        r"""
+        @brief Returns all shapes of the given subcircuit pin that make a connection to the net the pin lives in.
+        This will return all shapes from the subcircuit attached by the given pin that interact with the net the pin lives in.
+        This method returns a \Region object with the shapes per layer where interactions are found.
+        The layers are given as layer indexes.
+
+        The returned shapes are already transformed into the coordinate system of the net (see \shapes_of_net for example).
+        An additional transformation can be applied using the optional \trans argument.
+
+        Note, that this method only considers interations between net shapes and subcircuits on every level below, but not between subcircuits.
+        It can be used for example for digital nets connecting gate cells. In the general case however, nets may be formed
+        also by touching subcircuits. In that case, the nets do not have shapes of their own and this function cannot detect
+        the pin shapes.
+
+        The call of this method may not be cheap, specificially if large nets are involved.
+
+        This method has been introduced in version 0.29.2.
+        """
+    def shapes_of_terminal(self, terminal: NetTerminalRef, trans: Optional[ICplxTrans] = ...) -> Dict[int, Region]:
+        r"""
+        @brief Returns all shapes of the given device terminal that make a connection to the net the terminal lives in.
+        This will return all shapes from the device attached by the given terminal that interact with the net the terminal lives in.
+        This method returns a \Region object with the shapes per layer where interactions are found.
+        The layers are given as layer indexes.
+
+        The returned shapes are already transformed into the coordinate system of the net (see \shapes_of_net for example).
+        An additional transformation can be applied using the optional \trans argument.
+
+        Note, that this method only considers interations between net shapes and the device connected by the terminal, but not between subcircuits on the net and the device.
+        It can be used for example for flat-extracted, transistor-level netlists. In the general case however, nets may be formed
+        also by subcircuits touching devices. In that case, the nets do not have shapes of their own and this function cannot detect
+        the terminal shapes.
+
+        The call of this method may not be cheap, specificially if large nets are involved.
+
+        This method has been introduced in version 0.29.2.
         """
     @overload
     def soft_connect(self, a: Region, b: Region) -> None:
@@ -32339,18 +32411,24 @@ class LoadLayoutOptions:
         r"""
         @brief Add content to existing cell
         This is the mode use in before version 0.27. Content of new cells is simply added to existing cells with the same name.
+        Before version 0.29.2, this mode also merged instances, rendering it difficult to merge two identical cell hierarchies.
+        Since version 0.29.2, no instance duplicates are generated. Instead only new instances are added to existing cells.
+        With this feature in place, it is safe to merge two identical cell hierarchies stored in different files using AddToCell mode.
+        In that application, the shapes and layers of the layouts are combined, but the cell hierarchy stays identical.
         """
         OverwriteCell: ClassVar[LoadLayoutOptions.CellConflictResolution]
         r"""
-        @brief The old cell is overwritten entirely (including child cells which are not used otherwise)
+        @brief The old cell is overwritten entirely (including child cells which are not used otherwise).
         """
         RenameCell: ClassVar[LoadLayoutOptions.CellConflictResolution]
         r"""
-        @brief The new cell will be renamed to become unique
+        @brief The new cell will be renamed to become unique.
+        In this mode, two files are are combined rendering independent cell hierarchies coming from the original files.
+        Cells may be renamed however. Also, new top cells will appear after merging a file into the layout using RenameCell mode.
         """
         SkipNewCell: ClassVar[LoadLayoutOptions.CellConflictResolution]
         r"""
-        @brief The new cell is skipped entirely (including child cells which are not used otherwise)
+        @brief The new cell is skipped entirely (including child cells which are not used otherwise).
         """
         @overload
         @classmethod
@@ -32367,12 +32445,12 @@ class LoadLayoutOptions:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         def __hash__(self) -> int:
             r"""
@@ -32405,12 +32483,12 @@ class LoadLayoutOptions:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -32440,18 +32518,24 @@ class LoadLayoutOptions:
     r"""
     @brief Add content to existing cell
     This is the mode use in before version 0.27. Content of new cells is simply added to existing cells with the same name.
+    Before version 0.29.2, this mode also merged instances, rendering it difficult to merge two identical cell hierarchies.
+    Since version 0.29.2, no instance duplicates are generated. Instead only new instances are added to existing cells.
+    With this feature in place, it is safe to merge two identical cell hierarchies stored in different files using AddToCell mode.
+    In that application, the shapes and layers of the layouts are combined, but the cell hierarchy stays identical.
     """
     OverwriteCell: ClassVar[LoadLayoutOptions.CellConflictResolution]
     r"""
-    @brief The old cell is overwritten entirely (including child cells which are not used otherwise)
+    @brief The old cell is overwritten entirely (including child cells which are not used otherwise).
     """
     RenameCell: ClassVar[LoadLayoutOptions.CellConflictResolution]
     r"""
-    @brief The new cell will be renamed to become unique
+    @brief The new cell will be renamed to become unique.
+    In this mode, two files are are combined rendering independent cell hierarchies coming from the original files.
+    Cells may be renamed however. Also, new top cells will appear after merging a file into the layout using RenameCell mode.
     """
     SkipNewCell: ClassVar[LoadLayoutOptions.CellConflictResolution]
     r"""
-    @brief The new cell is skipped entirely (including child cells which are not used otherwise)
+    @brief The new cell is skipped entirely (including child cells which are not used otherwise).
     """
     cell_conflict_resolution: LoadLayoutOptions.CellConflictResolution
     r"""
@@ -35357,16 +35441,16 @@ class NetTerminalRef:
     @overload
     def device(self) -> Device:
         r"""
-        @brief Gets the device reference (non-const version).
+        @brief Gets the device reference.
         Gets the device object that this connection is made to.
-
-        This constness variant has been introduced in version 0.26.8
         """
     @overload
     def device(self) -> Device:
         r"""
-        @brief Gets the device reference.
+        @brief Gets the device reference (non-const version).
         Gets the device object that this connection is made to.
+
+        This constness variant has been introduced in version 0.26.8
         """
     def device_class(self) -> DeviceClass:
         r"""
@@ -36155,22 +36239,14 @@ class Netlist:
     @overload
     def circuit_by_cell_index(self, cell_index: int) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given cell index (const version).
-        If the cell index is not valid or no circuit is registered with this index, nil is returned.
-
-        This constness variant has been introduced in version 0.26.8.
-        """
-    @overload
-    def circuit_by_cell_index(self, cell_index: int) -> Circuit:
-        r"""
         @brief Gets the circuit object for a given cell index.
         If the cell index is not valid or no circuit is registered with this index, nil is returned.
         """
     @overload
-    def circuit_by_name(self, name: str) -> Circuit:
+    def circuit_by_cell_index(self, cell_index: int) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given name (const version).
-        If the name is not a valid circuit name, nil is returned.
+        @brief Gets the circuit object for a given cell index (const version).
+        If the cell index is not valid or no circuit is registered with this index, nil is returned.
 
         This constness variant has been introduced in version 0.26.8.
         """
@@ -36179,6 +36255,14 @@ class Netlist:
         r"""
         @brief Gets the circuit object for a given name.
         If the name is not a valid circuit name, nil is returned.
+        """
+    @overload
+    def circuit_by_name(self, name: str) -> Circuit:
+        r"""
+        @brief Gets the circuit object for a given name (const version).
+        If the name is not a valid circuit name, nil is returned.
+
+        This constness variant has been introduced in version 0.26.8.
         """
     @overload
     def circuits_by_name(self, name_pattern: str) -> List[Circuit]:
@@ -36267,21 +36351,16 @@ class Netlist:
     @overload
     def each_circuit_top_down(self) -> Iterator[Circuit]:
         r"""
-        @brief Iterates over the circuits top-down (const version)
-        Iterating top-down means the parent circuits come before the child circuits. The first \top_circuit_count circuits are top circuits - i.e. those which are not referenced by other circuits.
-
-        This constness variant has been introduced in version 0.26.8.
-        """
-    @overload
-    def each_circuit_top_down(self) -> Iterator[Circuit]:
-        r"""
         @brief Iterates over the circuits top-down
         Iterating top-down means the parent circuits come before the child circuits. The first \top_circuit_count circuits are top circuits - i.e. those which are not referenced by other circuits.
         """
     @overload
-    def each_device_class(self) -> Iterator[DeviceClass]:
+    def each_circuit_top_down(self) -> Iterator[Circuit]:
         r"""
-        @brief Iterates over the device classes of the netlist
+        @brief Iterates over the circuits top-down (const version)
+        Iterating top-down means the parent circuits come before the child circuits. The first \top_circuit_count circuits are top circuits - i.e. those which are not referenced by other circuits.
+
+        This constness variant has been introduced in version 0.26.8.
         """
     @overload
     def each_device_class(self) -> Iterator[DeviceClass]:
@@ -36289,6 +36368,11 @@ class Netlist:
         @brief Iterates over the device classes of the netlist (const version)
 
         This constness variant has been introduced in version 0.26.8.
+        """
+    @overload
+    def each_device_class(self) -> Iterator[DeviceClass]:
+        r"""
+        @brief Iterates over the device classes of the netlist
         """
     def flatten(self) -> None:
         r"""
@@ -38749,12 +38833,12 @@ class PCellParameterState:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -42065,12 +42149,12 @@ class PreferredOrientation:
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer for inequality
+        @brief Compares two enums for inequality
         """
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums for inequality
+        @brief Compares an enum with an integer for inequality
         """
     def __repr__(self) -> str:
         r"""
@@ -43758,12 +43842,12 @@ class Region(ShapeCollection):
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -43838,12 +43922,12 @@ class Region(ShapeCollection):
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         def __hash__(self) -> int:
             r"""
@@ -47763,12 +47847,12 @@ class Severity:
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer for inequality
+        @brief Compares two enums for inequality
         """
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums for inequality
+        @brief Compares an enum with an integer for inequality
         """
     def __repr__(self) -> str:
         r"""
@@ -48329,11 +48413,10 @@ class Shape:
 
     Starting with version 0.23, this method returns nil, if the shape does not represent a path.
     Setter:
-    @brief Replaces the shape by the given path object
-    This method replaces the shape by the given path object. This method can only be called for editable layouts. It does not change the user properties of the shape.
-    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
+    @brief Replaces the shape by the given path (in micrometer units)
+    This method replaces the shape by the given path, like \path= with a \Path argument does. This version translates the path from micrometer units to database units internally.
 
-    This method has been introduced in version 0.22.
+    This method has been introduced in version 0.25.
     """
     path_bgnext: int
     r"""
@@ -51759,15 +51842,15 @@ class SubCircuit(NetlistObject):
     @overload
     def circuit_ref(self) -> Circuit:
         r"""
-        @brief Gets the circuit referenced by the subcircuit (non-const version).
-
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the circuit referenced by the subcircuit.
         """
     @overload
     def circuit_ref(self) -> Circuit:
         r"""
-        @brief Gets the circuit referenced by the subcircuit.
+        @brief Gets the circuit referenced by the subcircuit (non-const version).
+
+
+        This constness variant has been introduced in version 0.26.8
         """
     @overload
     def connect_pin(self, pin: Pin, net: Net) -> None:
@@ -52385,8 +52468,7 @@ class Text:
     Setter:
     @brief Sets the vertical alignment
 
-    This property specifies how the text is aligned relative to the anchor point. 
-    This property has been introduced in version 0.22 and extended to enums in 0.28.
+    This is the version accepting integer values. It's provided for backward compatibility.
     """
     x: int
     r"""
@@ -55614,12 +55696,12 @@ class TrapezoidDecompositionMode:
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums
+        @brief Compares an enum with an integer value
         """
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer value
+        @brief Compares two enums
         """
     def __hash__(self) -> int:
         r"""
@@ -55652,12 +55734,12 @@ class TrapezoidDecompositionMode:
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums for inequality
+        @brief Compares an enum with an integer for inequality
         """
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer for inequality
+        @brief Compares two enums for inequality
         """
     def __repr__(self) -> str:
         r"""
@@ -55935,12 +56017,12 @@ class VAlign:
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer value
+        @brief Compares two enums
         """
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums
+        @brief Compares an enum with an integer value
         """
     def __hash__(self) -> int:
         r"""
@@ -55973,12 +56055,12 @@ class VAlign:
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums for inequality
+        @brief Compares an enum with an integer for inequality
         """
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer for inequality
+        @brief Compares two enums for inequality
         """
     def __repr__(self) -> str:
         r"""
@@ -57402,12 +57484,12 @@ class ZeroDistanceMode:
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums
+        @brief Compares an enum with an integer value
         """
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer value
+        @brief Compares two enums
         """
     def __hash__(self) -> int:
         r"""
@@ -57440,12 +57522,12 @@ class ZeroDistanceMode:
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer for inequality
+        @brief Compares two enums for inequality
         """
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums for inequality
+        @brief Compares an enum with an integer for inequality
         """
     def __repr__(self) -> str:
         r"""

@@ -188,7 +188,11 @@ END_PROTECTED
 void 
 ShapePropertiesPage::update ()
 {
-  mp_service->highlight (m_indexes);
+  std::set<const lay::ObjectInstPath *> highlights;
+  for (auto i = m_indexes.begin (); i != m_indexes.end (); ++i) {
+    highlights.insert (m_selection_ptrs [*i].operator-> ());
+  }
+  mp_service->highlight (highlights);
 
   update_shape ();
 }

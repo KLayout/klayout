@@ -1,6 +1,6 @@
-Relevant KLayout version: 0.29.1<br>
+Relevant KLayout version: 0.29.2<br>
 Author: Kazzz-S<br>
-Last modified: 2024-05-01<br>
+Last modified: 2024-06-09<br>
 
 # 1. Introduction
 This directory **`macbuild`** contains various files required for building KLayout (http://www.klayout.de/) version 0.29.0 or later for different 64-bit macOS, including:
@@ -55,6 +55,7 @@ You need to have the followings:
   * https://developer.apple.com/xcode/resources/
   * https://mac.install.guide/commandlinetools/4
 * Qt5 package from MacPorts or Anaconda3. Qt6, from Homebrew.
+* libgit2 form MacPorts, Homebrew,or Anaconda3.
 * Optionally, Ruby and Python packages from MacPorts, Homebrew, or Anaconda3
 #### For matching versions of Ruby and Python, please also refer to `build4mac_env.py`.
 

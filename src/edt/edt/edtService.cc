@@ -68,7 +68,7 @@ Service::Service (db::Manager *manager, lay::LayoutViewBase *view, db::ShapeIter
     mp_view (view),
     mp_transient_marker (0), 
     m_editing (false), m_immediate (false), 
-    m_selection_maybe_invalid (true), m_transient_selection_maybe_invalid (true),
+    m_selection_maybe_invalid (false),
     m_cell_inst_service (false),
     m_flags (flags),
     m_move_sel (false), m_moving (false),
@@ -82,7 +82,7 @@ Service::Service (db::Manager *manager, lay::LayoutViewBase *view, db::ShapeIter
     m_highlights_selected (false),
     dm_selection_to_view (this, &edt::Service::do_selection_to_view)
 { 
-  mp_view->geom_changed_event.add (this, &edt::Service::selection_to_view);
+  mp_view->geom_changed_event.add (this, &edt::Service::geometry_changing);
 }
 
 Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
@@ -91,7 +91,7 @@ Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
     mp_view (view),
     mp_transient_marker (0), 
     m_editing (false), m_immediate (false), 
-    m_selection_maybe_invalid (true), m_transient_selection_maybe_invalid (true),
+    m_selection_maybe_invalid (false),
     m_cell_inst_service (true),
     m_flags (db::ShapeIterator::Nothing),
     m_move_sel (false), m_moving (false),
@@ -105,7 +105,7 @@ Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
     m_highlights_selected (false),
     dm_selection_to_view (this, &edt::Service::do_selection_to_view)
 { 
-  mp_view->geom_changed_event.add (this, &edt::Service::selection_to_view);
+  mp_view->geom_changed_event.add (this, &edt::Service::geometry_changing);
 }
 
 Service::~Service ()
@@ -1446,6 +1446,7 @@ Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
   if (mode == lay::Editable::Replace) {
     if (! m_selection.empty ()) {
       m_selection.clear ();
+      m_selection_maybe_invalid = false;
       needs_update = true;
     }
   }
@@ -1467,6 +1468,7 @@ Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
     if (mode == lay::Editable::Reset) {
       if (! m_selection.empty ()) {
         m_selection.clear ();
+        m_selection_maybe_invalid = false;
         needs_update = true;
       }
     } else {
@@ -1510,6 +1512,7 @@ Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
     if (box.is_point () && f0 != finder.end () && f0->layer () == view ()->cellview (f0->cv_index ())->layout ().guiding_shape_layer ()) {
 
       m_selection.clear ();
+      m_selection_maybe_invalid = false;
       select (*f0, mode);
       m_previous_selection.insert (*f0);
       needs_update = true;
@@ -1521,6 +1524,7 @@ Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
       objects::const_iterator s0 = m_selection.begin (); 
       if (s0 != m_selection.end () && s0->is_valid (view ()) && s0->layer () == view ()->cellview (s0->cv_index ())->layout ().guiding_shape_layer ()) {
         m_selection.clear ();
+        m_selection_maybe_invalid = false;
       }
 
       //  collect the founds from the finder
@@ -1555,10 +1559,24 @@ const std::set<lay::ObjectInstPath> &
 Service::selection () const
 {
   if (m_selection_maybe_invalid) {
-    std::vector<lay::ObjectInstPath> valid_sel;
-    get_selection (valid_sel);
-    m_selection = std::set<lay::ObjectInstPath> (valid_sel.begin (), valid_sel.end ());
+
+    bool any_invalid = false;
+    for (auto r = m_selection.begin (); r != m_selection.end () && ! any_invalid; ++r) {
+      any_invalid = ! r->is_valid (view ());
+    }
+
+    if (any_invalid) {
+      std::set<lay::ObjectInstPath> valid_sel;
+      for (auto r = m_selection.begin (); r != m_selection.end (); ++r) {
+        if (r->is_valid (view ())) {
+          valid_sel.insert (*r);
+        }
+      }
+      m_selection.swap (valid_sel);
+    }
+
     m_selection_maybe_invalid = false;
+
   }
 
   return m_selection;
@@ -1569,40 +1587,15 @@ Service::get_selection (std::vector <lay::ObjectInstPath> &sel) const
 {
   sel.clear ();
   sel.reserve (m_selection.size ());
-
-  //  positions will hold a set of iterators that are to be erased
   for (std::set<lay::ObjectInstPath>::const_iterator r = m_selection.begin (); r != m_selection.end (); ++r) {
-    if (r->is_valid (view ())) {
-      sel.push_back (*r);
-    }
+    sel.push_back (*r);
   }
 }
 
 const std::set<lay::ObjectInstPath> &
 Service::transient_selection () const
 {
-  if (m_transient_selection_maybe_invalid) {
-    std::vector<lay::ObjectInstPath> valid_sel;
-    get_transient_selection (valid_sel);
-    m_transient_selection = std::set<lay::ObjectInstPath> (valid_sel.begin (), valid_sel.end ());
-    m_transient_selection_maybe_invalid = false;
-  }
-
   return m_transient_selection;
-}
-
-void
-Service::get_transient_selection (std::vector <lay::ObjectInstPath> &sel) const
-{
-  sel.clear ();
-  sel.reserve (m_transient_selection.size ());
-
-  //  positions will hold a set of iterators that are to be erased
-  for (std::set<lay::ObjectInstPath>::const_iterator r = m_transient_selection.begin (); r != m_transient_selection.end (); ++r) {
-    if (r->is_valid (view ())) {
-      sel.push_back (*r);
-    }
-  }
 }
 
 bool
@@ -1698,22 +1691,31 @@ Service::tap (const db::DPoint & /*initial*/)
   //  .. nothing here ..
 }
 
+void
+Service::geometry_changing ()
+{
+  //  selection may become invalid (issue-1145)
+  m_selection_maybe_invalid = true;
+
+  //  clear the previous selection for safety
+  clear_previous_selection ();
+
+  selection_to_view ();
+}
+
 void 
 Service::selection_to_view ()
 {
   //  we don't handle the transient selection properly, so clear it for safety reasons
   clear_transient_selection ();
 
-  //  the selection objects need to be recreated since we destroyed the old markers
+  //  clear markers
   for (auto r = m_markers.begin (); r != m_markers.end (); ++r) {
     delete r->second;
   }
   m_markers.clear ();
 
-  //  selection may become invalid (issue-1145)
-  m_selection_maybe_invalid = true;
-  m_transient_selection_maybe_invalid = true;
-
+  //  postpone the actual work to collect multiple calls
   dm_selection_to_view ();
 }
 
@@ -1818,6 +1820,7 @@ Service::set_selection (std::vector <lay::ObjectInstPath>::const_iterator s1, st
 {
   m_selection.clear ();
   m_selection.insert (s1, s2);
+  m_selection_maybe_invalid = false;
   selection_to_view ();
 }
 

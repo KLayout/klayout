@@ -200,14 +200,9 @@ public:
   virtual bool selection_applies (const lay::ObjectInstPath &sel) const;
 
   /**
-   *  @brief Get the (cleaned) selection for the properties page
+   *  @brief Get the selection for the properties page
    */
   void get_selection (std::vector <lay::ObjectInstPath> &selection) const;
-
-  /**
-   *  @brief Get the (cleaned) transient selection
-   */
-  void get_transient_selection (std::vector <lay::ObjectInstPath> &selection) const;
 
   /**
    *  @brief "transform" operation with a transformation vector
@@ -401,6 +396,13 @@ protected:
    *  @brief Update m_markers to reflect the selection
    */
   void selection_to_view ();
+
+  /**
+   *  @brief Callback when any geometry is changing in the layout
+   *
+   *  Will call selection_to_view() and invalidate the selection.
+   */
+  void geometry_changing ();
 
   /**
    *  @brief starts editing at the given point.
@@ -610,11 +612,8 @@ private:
   //  The previous selection (used for cycling through different selections for single clicks)
   objects m_previous_selection;
 
-  //  A flag indicating that the transient selection may need cleanup
-  mutable bool m_transient_selection_maybe_invalid;
-
-  //  The transient selection (mutable because we clean it on the fly)
-  mutable objects m_transient_selection;
+  //  The transient selection
+  objects m_transient_selection;
 
   //  True, if this service deals with cell instances
   bool m_cell_inst_service;

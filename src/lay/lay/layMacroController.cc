@@ -516,7 +516,7 @@ MacroController::sync_macro_sources ()
     if (! t->base_path ().empty ()) {
       QDir base_dir (tl::to_qstring (t->base_path ()));
       if (base_dir.exists ()) {
-        std::string path = tl::to_string (base_dir.absolutePath ());
+        std::string path = tl::to_string (base_dir.canonicalPath ());
         tech_names_by_path [path].push_back (t->name ());
         if (t->is_readonly ()) {
           readonly_paths.insert (path);
@@ -559,7 +559,7 @@ MacroController::sync_macro_sources ()
             description += " - " + tl::to_string (tr ("%1 branch").arg (tl::to_qstring (*f)));
           }
 
-          external_paths.push_back (ExternalPathDescriptor (tl::to_string (macro_dir.path ()), description, macro_categories () [c].name, lym::MacroCollection::TechFolder, readonly_paths.find (t->first) != readonly_paths.end ()));
+          external_paths.push_back (ExternalPathDescriptor (tl::to_string (macro_dir.canonicalPath ()), description, macro_categories () [c].name, lym::MacroCollection::TechFolder, readonly_paths.find (t->first) != readonly_paths.end ()));
 
         }
 
@@ -591,7 +591,7 @@ MacroController::sync_macro_sources ()
             if (*f != macro_categories () [c].name) {
               description += " - " + tl::to_string (tr ("%1 branch").arg (tl::to_qstring (*f)));
             }
-            external_paths.push_back (ExternalPathDescriptor (tl::to_string (macro_dir.path ()), description, macro_categories () [c].name, lym::MacroCollection::SaltFolder, g->is_readonly (), g->version ()));
+            external_paths.push_back (ExternalPathDescriptor (tl::to_string (macro_dir.canonicalPath ()), description, macro_categories () [c].name, lym::MacroCollection::SaltFolder, g->is_readonly (), g->version ()));
 
           }
 

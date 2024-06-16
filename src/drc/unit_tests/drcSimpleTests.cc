@@ -1911,3 +1911,35 @@ TEST(121_ShapesOfTerminal)
 
   db::compare_layouts (_this, layout, au, db::NoNormalization);
 }
+
+TEST(122_NamedLayers)
+{
+  std::string rs = tl::testdata ();
+  rs += "/drc/drcSimpleTests_122.drc";
+
+  std::string input = tl::testdata ();
+  input += "/drc/drcSimpleTests_122.gds";
+
+  std::string au_output = tl::testdata ();
+  au_output += "/drc/drcSimpleTests_au122.l2n";
+
+  std::string output = this->tmp_file ("tmp.l2n");
+
+  {
+    //  Set some variables
+    lym::Macro config;
+    config.set_text (tl::sprintf (
+        "$drc_test_source = '%s'\n"
+        "$drc_test_target = '%s'\n"
+      , input, output)
+    );
+    config.set_interpreter (lym::Macro::Ruby);
+    EXPECT_EQ (config.run (), 0);
+  }
+
+  lym::Macro drc;
+  drc.load_from (rs);
+  EXPECT_EQ (drc.run (), 0);
+
+  compare_text_files (output, au_output);
+}

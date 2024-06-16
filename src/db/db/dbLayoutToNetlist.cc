@@ -1008,7 +1008,7 @@ std::string LayoutToNetlist::name (const ShapeCollection &coll) const
   }
 }
 
-void LayoutToNetlist::register_layer (const ShapeCollection &collection, const std::string &n_in)
+unsigned int LayoutToNetlist::register_layer (const ShapeCollection &collection, const std::string &n_in)
 {
   if (m_region_by_original.find (tl::id_of (collection.get_delegate ())) != m_region_by_original.end ()) {
     throw tl::Exception (tl::to_string (tr ("The layer is already registered")));
@@ -1042,10 +1042,14 @@ void LayoutToNetlist::register_layer (const ShapeCollection &collection, const s
 
   }
 
+  unsigned int layer = dl.layer ();
+
   m_region_by_original [tl::id_of (collection.get_delegate ())] = dl;
-  m_region_of_layer [dl.layer ()] = dl;
+  m_region_of_layer [layer] = dl;
   m_named_regions [n] = dl;
-  m_name_of_layer [dl.layer ()] = n;
+  m_name_of_layer [layer] = n;
+
+  return layer;
 }
 
 db::DeepLayer LayoutToNetlist::deep_layer_of (const db::ShapeCollection &coll) const

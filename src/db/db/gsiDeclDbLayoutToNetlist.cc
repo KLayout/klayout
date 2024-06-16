@@ -330,11 +330,16 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   gsi::method ("layer_name", (std::string (db::LayoutToNetlist::*) (const db::ShapeCollection &region) const) &db::LayoutToNetlist::name, gsi::arg ("l"),
     "@brief Gets the name of the given layer\n"
   ) +
+  gsi::method ("layer_index", (unsigned int (db::LayoutToNetlist::*) (const db::ShapeCollection &region) const) &db::LayoutToNetlist::layer_of<db::ShapeCollection>, gsi::arg ("l"),
+    "@brief Gets the layer index for the given data object\n"
+    "This method has been introduced in version 0.29.3.\n"
+  ) +
   gsi::method ("layer_name", (std::string (db::LayoutToNetlist::*) (unsigned int) const) &db::LayoutToNetlist::name, gsi::arg ("l"),
     "@brief Gets the name of the given layer (by index)\n"
   ) +
-  gsi::method ("register", (void (db::LayoutToNetlist::*) (const db::ShapeCollection &collection, const std::string &)) &db::LayoutToNetlist::register_layer, gsi::arg ("l"), gsi::arg ("n", std::string ()),
+  gsi::method ("register", (unsigned int (db::LayoutToNetlist::*) (const db::ShapeCollection &collection, const std::string &)) &db::LayoutToNetlist::register_layer, gsi::arg ("l"), gsi::arg ("n", std::string ()),
     "@brief Names the given layer\n"
+    "@return The index of the layer registered\n"
     "'l' must be a \\Region or \\Texts object.\n"
     "Flat regions or text collections must be registered with this function, before they can be used in \\connect. "
     "Registering will copy the shapes into the LayoutToNetlist object in this step to enable "
@@ -346,7 +351,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "\n"
     "If required, the system will assign a name automatically."
     "\n"
-    "This method has been generalized in version 0.27.\n"
+    "This method has been generalized in version 0.27. Starting with version 0.29.3, the index of the layer is returned.\n"
   ) +
   gsi::method_ext ("layer_names", &l2n_layer_names,
     "@brief Returns a list of names of the layers kept inside the LayoutToNetlist object."

@@ -19,9 +19,9 @@ gate = active & poly
 name(l1, "l1")
 name(l2, "l2")
 name(l3, "l3")
-name(sd, "sd")
+name(sd, "sd", 17, 0)
 name(poly, "poly")
-name(gate, "gate")
+name(gate, "gate", RBA::LayerInfo::new(18, 0))
 name(contact, "contact")
 
 mos_ex = RBA::DeviceExtractorMOS3Transistor::new("MOS")

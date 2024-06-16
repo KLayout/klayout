@@ -81,3 +81,13 @@ TEST(3)
 {
   run_rve_test (_this, "rve3.db", "rve3_au_2.txt");
 }
+
+TEST(4)
+{
+  run_rve_test (_this, "rve4.db", "rve4_au.txt");
+}
+
+TEST(5)
+{
+  run_rve_test (_this, "rve5.db", "rve5_au.txt");
+}

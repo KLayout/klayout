@@ -911,6 +911,7 @@ DeepRegion::and_with_impl (const DeepRegion *other, db::PropertyConstraint prope
 DeepLayer
 DeepRegion::not_with_impl (const DeepRegion *other, db::PropertyConstraint property_constraint) const
 {
+  DeepLayer dl_out (deep_layer ().derived ());
   DeepLayer dl_prep;
 
   //  first run a local-only task, which is trivial if the layouts are the same
@@ -980,8 +981,6 @@ DeepRegion::not_with_impl (const DeepRegion *other, db::PropertyConstraint prope
   } else {
     dl_prep = deep_layer ();
   }
-
-  DeepLayer dl_out (deep_layer ().derived ());
 
   if (pc_skip (property_constraint)) {
 

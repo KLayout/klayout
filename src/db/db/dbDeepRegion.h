@@ -178,7 +178,8 @@ private:
 
   void init ();
   void ensure_merged_polygons_valid () const;
-  DeepLayer and_or_not_with(const DeepRegion *other, bool and_op, PropertyConstraint property_constraint) const;
+  DeepLayer not_with_impl (const DeepRegion *other, PropertyConstraint property_constraint) const;
+  DeepLayer and_with_impl (const DeepRegion *other, PropertyConstraint property_constraint) const;
   std::pair<DeepLayer, DeepLayer> and_and_not_with (const DeepRegion *other, PropertyConstraint property_constraint) const;
   DeepRegion *apply_filter (const PolygonFilterBase &filter) const;
 

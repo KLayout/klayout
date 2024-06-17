@@ -1737,12 +1737,14 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
   CRONOLOGY_COLLECTION_BRACKET(event_compute_contexts_unlocked)
   std::map<unsigned int, const db::Shapes *> intruder_shapes;
   if (intruder_cell) {
+
     for (std::vector<unsigned int>::const_iterator l = contexts.intruder_layers ().begin (); l != contexts.intruder_layers ().end (); ++l) {
       const db::Shapes *s = &intruder_cell->shapes (contexts.actual_intruder_layer (*l));
       if (! s->empty ()) {
         intruder_shapes.insert (std::make_pair (*l, s));
       }
     }
+
   }
 
   db::box_convert <db::CellInstArray, true> inst_bcs (*mp_subject_layout, contexts.subject_layer ());
@@ -1824,8 +1826,8 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
 
     }
 
-    //  TODO: can we shortcut this if interactions is empty?
-    {
+    if (! intruders.second.empty () || ! intruder_shapes.empty ()) {
+
       db::box_scanner2<db::CellInstArray, int, TI, int> scanner;
       db::addressable_object_from_shape<TI> heap;
       interaction_registration_inst2shape<TS, TI, TR> rec (mp_subject_layout, contexts.subject_layer (), dist, &interactions);
@@ -1849,6 +1851,7 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
       }
 
       scanner.process (rec, dist, inst_bcs, db::box_convert<TI> ());
+
     }
 
     //  produce the tasks for computing the next-level interactions

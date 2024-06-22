@@ -75,7 +75,7 @@ public:
     mp_progress->set_unit (1024 * 1024);
   }
 
-  size_t read (char *data, size_t n)
+  ssize_t read (char *data, size_t n)
   {
     try {
 
@@ -88,11 +88,7 @@ public:
         *data++ = *rd;
       }
 
-      if (n0 == n) {
-        return -1;
-      } else {
-        return n0 - n;
-      }
+      return n0 - n;
 
     } catch (tl::Exception &ex) {
       m_error = ex.msg ();
@@ -282,24 +278,21 @@ public:
     const size_t chunk = 65536;
     char buffer [chunk];
 
-    size_t n;
+    ssize_t n;
 
     do {
 
-      try {
+      n = source.source ()->read (buffer, chunk);
+      if (n < 0) {
+        break;
+      }
 
-        n = source.source ()->read (buffer, chunk);
-
-        XML_Status status = XML_Parse (mp_parser, buffer, int (n), n < chunk /*is final*/);
-        if (status == XML_STATUS_ERROR) {
-          m_has_error = true;
-          m_error = XML_ErrorString (XML_GetErrorCode (mp_parser));
-          m_error_line = XML_GetErrorLineNumber (mp_parser);
-          m_error_column = XML_GetErrorColumnNumber (mp_parser);
-        }
-
-      } catch (tl::Exception &ex) {
-        error (ex);
+      XML_Status status = XML_Parse (mp_parser, buffer, int (n), n < ssize_t (chunk) /*is final*/);
+      if (status == XML_STATUS_ERROR) {
+        m_has_error = true;
+        m_error = XML_ErrorString (XML_GetErrorCode (mp_parser));
+        m_error_line = XML_GetErrorLineNumber (mp_parser);
+        m_error_column = XML_GetErrorColumnNumber (mp_parser);
       }
 
     } while (n == chunk && !m_has_error);
@@ -343,7 +336,7 @@ void end_element_handler (void *user_data, const XML_Char *name)
 void cdata_handler (void *user_data, const XML_Char *s, int len)
 {
   XMLParserPrivateData *d = reinterpret_cast<XMLParserPrivateData *> (user_data);
-  d->cdata (std::string (s, 0, size_t (len)));
+  d->cdata (std::string (s, size_t (len)));
 }
 
 

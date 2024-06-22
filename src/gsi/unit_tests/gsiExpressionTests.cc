@@ -748,28 +748,28 @@ TEST(14)
     v = e.parse("var t = CplxTrans.new(1.5, 2.5); var tt = CplxTrans.new(); t.assign(other=t)").execute();
     EXPECT_EQ (true, false);
   } catch (tl::Exception &ex) {
-    EXPECT_EQ (ex.msg ().find ("Keyword arguments not permitted at position 60 (...assign(other=t))"), 0);
+    EXPECT_EQ (ex.msg ().find ("Keyword arguments not permitted at position 60 (...assign(other=t))"), size_t (0));
   }
 
   try {
     v = e.parse("var t = CplxTrans.new('abc');").execute();
     EXPECT_EQ (true, false);
   } catch (tl::Exception &ex) {
-    EXPECT_EQ (ex.msg ().find ("No overload with matching arguments. Variants are:"), 0);
+    EXPECT_EQ (ex.msg ().find ("No overload with matching arguments. Variants are:"), size_t (0));
   }
 
   try {
     v = e.parse("var t = CplxTrans.new(uu=17);").execute();
     EXPECT_EQ (true, false);
   } catch (tl::Exception &ex) {
-    EXPECT_EQ (ex.msg ().find ("Can't match arguments. Variants are:"), 0);
+    EXPECT_EQ (ex.msg ().find ("Can't match arguments. Variants are:"), size_t (0));
   }
 
   try {
     v = e.parse("var t = CplxTrans.new(u='17');").execute();
     EXPECT_EQ (true, false);
   } catch (tl::Exception &ex) {
-    EXPECT_EQ (ex.msg ().find ("No overload with matching arguments. Variants are:"), 0);
+    EXPECT_EQ (ex.msg ().find ("No overload with matching arguments. Variants are:"), size_t (0));
   }
 }
 

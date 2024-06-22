@@ -34,6 +34,43 @@ namespace gsi
 {
 
 // ---------------------------------------------------------------
+//  A helper for the single-coordinate/distance transformation
+
+namespace
+{
+
+template <class C> struct long_coord;
+
+template<> struct long_coord<int32_t>
+{
+  typedef int64_t type;
+  static type rounded (double v)
+  {
+    return type (v > 0 ? v + 0.5 : v - 0.5);
+  }
+};
+
+template<> struct long_coord<int64_t>
+{
+  typedef int64_t type;
+  static type rounded (double v)
+  {
+    return type (v > 0 ? v + 0.5 : v - 0.5);
+  }
+};
+
+template<> struct long_coord<double>
+{
+  typedef double type;
+  static type rounded (double v)
+  {
+    return v;
+  }
+};
+
+}
+
+// ---------------------------------------------------------------
 //  simple_trans binding
 
 template <class C>
@@ -109,6 +146,11 @@ struct trans_defs
   static void set_mirror (C *trans, bool mirror)
   {
     *trans = C (trans->angle (), mirror, trans->disp ());
+  }
+
+  static typename long_coord<coord_type>::type trans_coord (const C * /*t*/, typename long_coord<coord_type>::type c)
+  {
+    return long_coord<coord_type>::rounded (double (c));
   }
 
   static db::edge<coord_type> trans_edge (const C *t, const db::edge<coord_type> &edge)
@@ -219,18 +261,18 @@ struct trans_defs
       "\n"
       "@return The inverted transformation\n"
     ) +
-    method ("ctrans|*", &C::ctrans, arg ("d"),
-      "@brief Transforms a distance\n"
+    method_ext ("ctrans|*", &trans_coord, arg ("d"),
+      "@brief Transforms a single distance\n"
       "\n"
       "The \"ctrans\" method transforms the given distance.\n"
-      "e = t(d). For the simple transformations, there\n"
-      "is no magnification and no modification of the distance\n"
-      "therefore.\n"
+      "This is equivalent to multiplying with the magnification. For the simple transformations, there\n"
+      "is no magnification and no modification of the distance.\n"
       "\n"
       "@param d The distance to transform\n"
       "@return The transformed distance\n"
       "\n"
-      "The product '*' has been added as a synonym in version 0.28."
+      "The product '*' has been added as a synonym in version 0.28. "
+      "The distance can be signed since version 0.29.3."
     ) +
     method ("trans|*", (point_type (C::*) (const point_type &) const) &C::trans, arg ("p"),
       "@brief Transforms a point\n"
@@ -604,6 +646,11 @@ struct cplx_trans_defs
     return new C (mag, r, mirrx, displacement_type (x, y));
   }
 
+  static typename long_coord<target_coord_type>::type trans_coord (const C *t, typename long_coord<coord_type>::type c)
+  {
+    return long_coord<target_coord_type>::rounded (t->mag () * double (c));
+  }
+
   static simple_trans_type s_trans (const C *cplx_trans)
   {
     return simple_trans_type (db::complex_trans<coord_type, coord_type> (*cplx_trans));
@@ -729,18 +776,18 @@ struct cplx_trans_defs
       "\n"
       "@return The inverted transformation\n"
     ) +
-    method ("ctrans|*", &C::ctrans, arg ("d"),
-      "@brief Transforms a distance\n"
+    method_ext ("ctrans|*", &trans_coord, arg ("d"),
+      "@brief Transforms a single distance\n"
       "\n"
       "The \"ctrans\" method transforms the given distance.\n"
-      "e = t(d). For the simple transformations, there\n"
-      "is no magnification and no modification of the distance\n"
-      "therefore.\n"
+      "This is equivalent to multiplying with the magnification. For the simple transformations, there\n"
+      "is no magnification and no modification of the distance.\n"
       "\n"
       "@param d The distance to transform\n"
       "@return The transformed distance\n"
       "\n"
-      "The product '*' has been added as a synonym in version 0.28."
+      "The product '*' has been added as a synonym in version 0.28. "
+      "The distance can be signed since version 0.29.3."
     ) +
     method ("trans|*", (target_point_type (C::*) (const point_type &) const) &C::trans, arg ("p"),
       "@brief Transforms a point\n"

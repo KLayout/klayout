@@ -75,7 +75,7 @@ public:
     mp_progress->set_unit (1024 * 1024);
   }
 
-  ssize_t read (char *data, size_t n)
+  int read (char *data, size_t n)
   {
     try {
 
@@ -88,7 +88,7 @@ public:
         *data++ = *rd;
       }
 
-      return n0 - n;
+      return int (n0 - n);
 
     } catch (tl::Exception &ex) {
       m_error = ex.msg ();
@@ -275,10 +275,10 @@ public:
     XML_SetElementHandler (mp_parser, start_element_handler, end_element_handler);
     XML_SetCharacterDataHandler (mp_parser, cdata_handler);
 
-    const size_t chunk = 65536;
+    const int chunk = 65536;
     char buffer [chunk];
 
-    ssize_t n;
+    int n;
 
     do {
 
@@ -287,7 +287,7 @@ public:
         break;
       }
 
-      XML_Status status = XML_Parse (mp_parser, buffer, int (n), n < ssize_t (chunk) /*is final*/);
+      XML_Status status = XML_Parse (mp_parser, buffer, n, n < chunk /*is final*/);
       if (status == XML_STATUS_ERROR) {
         m_has_error = true;
         m_error = XML_ErrorString (XML_GetErrorCode (mp_parser));

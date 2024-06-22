@@ -121,6 +121,8 @@ public:
 
   virtual RegionDelegate *sized (coord_type d, unsigned int mode) const;
   virtual RegionDelegate *sized (coord_type dx, coord_type dy, unsigned int mode) const;
+  virtual RegionDelegate *sized_inside (const Region *inside, coord_type d, int steps, unsigned int mode, const Region *stop_at) const;
+  virtual RegionDelegate *sized_inside (const Region *inside, coord_type dx, coord_type dy, int steps, unsigned int mode, const Region *stop_at) const;
 
   virtual RegionDelegate *and_with (const Region &other, PropertyConstraint property_constraint) const;
   virtual RegionDelegate *not_with (const Region &other, PropertyConstraint property_constraint) const;

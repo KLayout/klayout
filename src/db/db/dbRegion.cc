@@ -309,6 +309,32 @@ Region::sized (coord_type dx, coord_type dy, unsigned int mode) const
   return Region (mp_delegate->sized (dx, dy, mode));
 }
 
+Region &
+Region::size_inside (const db::Region *inside, coord_type d, int steps, unsigned int mode, const db::Region *stop_at)
+{
+  set_delegate (mp_delegate->sized_inside (inside, d, steps, mode, stop_at));
+  return *this;
+}
+
+Region &
+Region::size_inside (const db::Region *inside, coord_type dx, coord_type dy, int steps, unsigned int mode, const db::Region *stop_at)
+{
+  set_delegate (mp_delegate->sized_inside (inside, dx, dy, steps, mode, stop_at));
+  return *this;
+}
+
+Region
+Region::sized_inside (const db::Region *inside, coord_type d, int steps, unsigned int mode, const db::Region *stop_at) const
+{
+  return Region (mp_delegate->sized_inside (inside, d, steps, mode, stop_at));
+}
+
+Region
+Region::sized_inside (const db::Region *inside, coord_type dx, coord_type dy, int steps, unsigned int mode, const db::Region *stop_at) const
+{
+  return Region (mp_delegate->sized_inside (inside, dx, dy, steps, mode, stop_at));
+}
+
 void
 Region::round_corners (double rinner, double router, unsigned int n)
 {

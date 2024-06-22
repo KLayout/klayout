@@ -1781,6 +1781,36 @@ DeepRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
   return res.release ();
 }
 
+RegionDelegate *
+DeepRegion::sized_inside (const Region *inside, coord_type d, int steps, unsigned int mode, const Region *stop_at) const
+{
+  if (steps <= 0) {
+    return clone ();
+  }
+
+
+  return 0; // @@@
+
+}
+
+RegionDelegate *
+DeepRegion::sized_inside (const Region *inside, coord_type dx, coord_type dy, int steps, unsigned int mode, const Region *stop_at) const
+{
+  if (steps <= 0 || empty ()) {
+    //  Nothing to do - NOTE: don't return EmptyRegion because we want to
+    //  maintain "deepness"
+    return clone ();
+  }
+
+  if (dx == dy) {
+    return sized_inside (inside, dx, steps, mode, stop_at);
+  }
+
+
+  return 0; // @@@
+
+}
+
 template <class TR, class Output>
 static
 Output *region_cop_impl (DeepRegion *region, db::CompoundRegionOperationNode &node)

@@ -321,6 +321,10 @@ module DRC
       DRCSizingInside::new(arg)
     end
     
+    def outside(arg)
+      DRCSizingOutside::new(arg)
+    end
+    
     def padding_zero
       DRCDensityPadding::new(:zero)
     end

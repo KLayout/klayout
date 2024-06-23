@@ -1378,14 +1378,16 @@ AsIfFlatRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
 }
 
 RegionDelegate *
-AsIfFlatRegion::sized_inside (const Region &inside, coord_type d, int steps, unsigned int mode) const
+AsIfFlatRegion::sized_inside (const Region &inside, bool outside, coord_type d, int steps, unsigned int mode) const
 {
-  return sized_inside (inside, d, d, steps, mode);
+  return sized_inside (inside, outside, d, d, steps, mode);
 }
 
 RegionDelegate *
-AsIfFlatRegion::sized_inside (const Region &inside, coord_type dx, coord_type dy, int steps, unsigned int mode) const
+AsIfFlatRegion::sized_inside (const Region &inside, bool outside, coord_type dx, coord_type dy, int steps, unsigned int mode) const
 {
+  // @@@ TODO: restrict max. number of steps in "outside" mode like for DeepRegion
+
   if (steps <= 0 || empty ()) {
     //  Nothing to do - NOTE: don't return EmptyRegion because we want to
     //  maintain "deepness"
@@ -1400,7 +1402,10 @@ AsIfFlatRegion::sized_inside (const Region &inside, coord_type dx, coord_type dy
   std::vector<db::Shapes *> results;
   results.push_back (&output->raw_polygons ());
 
-  db::sized_inside_local_operation<db::Polygon, db::Polygon, db::Polygon> op (dx, dy, steps, mode, true /*inside layer is merged*/);
+  //  NOTE: as we merge the inside region in the inside case, we can use distance 0
+  db::Coord dist = outside ? std::max (dx, dy) : 0;
+  bool inside_is_merged = outside ? inside.is_merged () : true;
+  db::sized_inside_local_operation<db::Polygon, db::Polygon, db::Polygon> op (dx, dy, steps, mode, dist, outside, inside_is_merged, true /*split after*/);
 
   db::local_processor<db::Polygon, db::Polygon, db::Polygon> proc;
   proc.set_base_verbosity (base_verbosity ());
@@ -1408,7 +1413,8 @@ AsIfFlatRegion::sized_inside (const Region &inside, coord_type dx, coord_type dy
   proc.set_report_progress (report_progress ());
 
   std::vector<db::generic_shape_iterator<db::Polygon> > others;
-  others.push_back (inside.begin_merged ());
+  //  NOTE: it does not provide benefits to merge the outside region, so just don't
+  others.push_back (outside ? inside.begin () : inside.begin_merged ());
 
   proc.run_flat (begin_merged (), others, std::vector<bool> (), &op, results);
 

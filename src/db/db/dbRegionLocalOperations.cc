@@ -1948,13 +1948,10 @@ template class DB_PUBLIC two_bool_and_not_local_operation_with_properties<db::Po
 // sized_inside_local_operation implementation
 
 template <class TS, class TI, class TR>
-sized_inside_local_operation<TS, TI, TR>::sized_inside_local_operation (db::Coord dx, db::Coord dy, int steps, unsigned int mode, bool inside_is_merged)
-  : m_dx (dx), m_dy (dy), m_steps (steps), m_mode (mode), m_dist (0)
+sized_inside_local_operation<TS, TI, TR>::sized_inside_local_operation (db::Coord dx, db::Coord dy, int steps, unsigned int mode, db::Coord dist, bool outside, bool inside_is_merged, bool split_after)
+  : m_dx (dx), m_dy (dy), m_dist (dist), m_steps (steps), m_mode (mode), m_outside (outside), m_inside_is_merged (inside_is_merged), m_split_after (split_after)
 {
-  m_dist = 0;
-  if (! inside_is_merged) {
-    m_dist = std::max (0, std::max (m_dx, m_dy));
-  }
+  //  .. nothing yet ..
 }
 
 template <class TS, class TI, class TR>
@@ -2011,6 +2008,24 @@ sized_inside_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, 
     }
   }
 
+  //  Merge the inside region shapes as we are going to use them multiple times
+  std::vector<db::Edge> inside_merged;
+  if (inside.size () > 1 && ! m_inside_is_merged && m_steps > 1) {
+
+    db::EdgeProcessor ep;
+    db::SimpleMerge op;
+    db::EdgeContainer ec (inside_merged);
+
+    db::EdgeProcessor::property_type p = 0;
+    for (auto i = inside.begin (); i != inside.end (); ++i, ++p) {
+      ep.insert (**i, p);
+    }
+    ep.process (ec, op);
+
+    inside.clear ();
+
+  }
+
   for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
     subjects.push_back (db::Polygon ());
     interactions.subject_shape (i->first).instantiate (subjects.back ());
@@ -2020,9 +2035,6 @@ sized_inside_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, 
 
   db::EdgeProcessor ep_and;
   ep_and.set_base_verbosity (50);
-
-  db::EdgeProcessor ep_interact;
-  ep_interact.set_base_verbosity (50);
 
   //  the main sizing loop
 
@@ -2050,10 +2062,15 @@ sized_inside_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, 
       ep_and.insert (**i, p);
       p += 2;
     }
+    for (auto i = inside_merged.begin (); i != inside_merged.end (); ++i) {
+      ep_and.insert (*i, p);
+    }
 
     db::PolygonContainer pc (subjects, true /*clear*/);
-    db::PolygonGenerator pg (pc, false /*don't resolve holes*/, false /*min. coherence*/);
-    db::BooleanOp op (db::BooleanOp::And);
+    db::PolygonSplitter splitter (pc, proc->area_ratio (), proc->max_vertex_count ());
+    //  NOTE: we split in the last step if requested
+    db::PolygonGenerator pg ((! m_split_after || step + 1 < m_steps) ? (PolygonSink &) pc : (PolygonSink &) splitter, false /*don't resolve holes*/, false /*min. coherence*/);
+    db::BooleanOp op (m_outside ? db::BooleanOp::ANotB : db::BooleanOp::And);
     ep_and.process (pg, op);
 
   }

@@ -4333,7 +4333,7 @@ CODE
               value && raise("Value already specified")
               value = @engine._make_value(a)
             else
-              raise("Parameter #" + n.to_s + " does not have an expected type")
+              raise("Parameter #" + n.to_s + " if of unexpected type")
             end
             n += 1
           end
@@ -4518,7 +4518,7 @@ CODE
           limits = [ @engine._make_numeric_value_with_nil(a.begin), @engine._make_numeric_value_with_nil(a.end) ]
           nlimits = 2
         else
-          raise("Parameter #" + n.to_s + " does not have an expected type")
+          raise("Parameter #" + n.to_s + " is of unexpected type")
         end
         n += 1
       end
@@ -4679,7 +4679,11 @@ TP_SCRIPT
     # @name sized
     # @brief Polygon sizing (per-edge biasing)
     # @synopsis layer.sized(d [, mode] [, inside(l) [, steps(n)]])
-    # @synopsis layer.sized(dx, dy [, mode] [, inside(l) [, steps(n)]]))
+    # @synopsis layer.sized(d, inside(l) [, steps(n)] [, mode])
+    # @synopsis layer.sized(d, outside(l) [, steps(n)] [, mode])
+    # @synopsis layer.sized(dx, dy [, mode])
+    # @synopsis layer.sized(dx, dy, inside(l) [, steps(n)] [, mode])
+    # @synopsis layer.sized(dx, dy, outside(l) [, steps(n)] [, mode])
     #
     # This method requires a polygon layer. It will apply a bias per edge of the polygons 
     # and return the biased layer. The layer that this method is called on is not modified.
@@ -4725,6 +4729,10 @@ TP_SCRIPT
     #
     # "inside" and "steps" can be used with positive sizing values only.
     #
+    # "outside" acts like "inside", but instead of confining the sized region to the
+    # inside of the given layer, it is confined to be outside of that layer. Technically,
+    # a boolean "NOT" is performed instead of a boolean "AND".
+    #
     # An example for the "inside" option is this:
     #
     # @code
@@ -4753,8 +4761,12 @@ TP_SCRIPT
     # %DRC%
     # @name size
     # @brief Polygon sizing (per-edge biasing, modifies the layer)
-    # @synopsis layer.size(d [, mode] [, inside(l) [, steps(n)]])
-    # @synopsis layer.size(dx, dy [, mode] [, inside(l) [, steps(n)]]))
+    # @synopsis layer.size(d [, mode])
+    # @synopsis layer.size(d, inside(l) [, steps(n)] [, mode])
+    # @synopsis layer.size(d, outside(l) [, steps(n)] [, mode])
+    # @synopsis layer.size(dx, dy [, mode])
+    # @synopsis layer.size(dx, dy, inside(l) [, steps(n)] [, mode])
+    # @synopsis layer.size(dx, dy, outside(l) [, steps(n)] [, mode])
     #
     # See \sized for a description of the options.
     # The size method basically does the same but modifies the layer
@@ -4772,8 +4784,11 @@ TP_SCRIPT
           
           steps = nil
           inside = nil
+          outside = nil
           mode = 2
           values = []
+
+          n = 1
           args.each do |a|
             if a.is_a?(1.class) || a.is_a?(Float)
               v = @engine._make_value(a)
@@ -4785,7 +4800,12 @@ TP_SCRIPT
               steps = a.value
             elsif a.is_a?(DRCSizingInside)
               inside = a.value
+            elsif a.is_a?(DRCSizingOutside)
+              outside = a.value
+            else
+              raise("Parameter #" + n.to_s + " is of unexpected type")
             end
+            n += 1
           end
           
           aa = []
@@ -4793,8 +4813,12 @@ TP_SCRIPT
           f_size = :size
           f_sized = :sized
 
+          if inside && outside
+            raise "Cannot use 'inside' and 'outside' together"
+          end
+
           if steps 
-            if !inside
+            if !inside && !outside
               raise "'steps' is only allowed with 'inside'"
             end
             if !steps.is_a?(1.class)
@@ -4802,16 +4826,29 @@ TP_SCRIPT
             end
           end
 
-          if inside
+          if inside || outside
 
-            inside.is_a?(DRCLayer) || raise("'inside' argument needs to be a DRC layer")
-            inside.data.is_a?(RBA::Region) || raise("'inside' requires a polygon layer")
-            aa.push(inside.data)
+            if inside
+
+              inside.is_a?(DRCLayer) || raise("'inside' argument needs to be a DRC layer")
+              inside.data.is_a?(RBA::Region) || raise("'inside' requires a polygon layer")
+              aa.push(inside.data)
+
+              f_size = :size_inside
+              f_sized = :sized_inside
+
+            else
+
+              outside.is_a?(DRCLayer) || raise("'outside' argument needs to be a DRC layer")
+              outside.data.is_a?(RBA::Region) || raise("'outside' requires a polygon layer")
+              aa.push(outside.data)
+
+              f_size = :size_outside
+              f_sized = :sized_outside
+
+            end
 
             steps ||= 1
-
-            f_size = :size_inside
-            f_sized = :sized_inside
 
           end
             
@@ -4824,7 +4861,7 @@ TP_SCRIPT
             aa.push(values[-1])
           end
           
-          if inside
+          if inside || outside
             aa.push(steps)
           end
 

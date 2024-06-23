@@ -1035,12 +1035,13 @@ public:
    *  Only positive or zero sizing values are supported.
    *
    *  @param inside The confinement region
+   *  @param outside If true, "inside" is negative - i.e. sizing is performed outside the "inside" region
    *  @param d The (isotropic) sizing value
    *  @param steps The number of steps to take
    *  @param mode The sizing mode (see EdgeProcessor) for a description of the sizing mode which controls the miter distance.
    *  @return A reference to self
    */
-  Region &size_inside (const db::Region &inside, coord_type d, int steps, unsigned int mode = 2);
+  Region &size_inside (const db::Region &inside, bool outside, coord_type d, int steps, unsigned int mode = 2);
 
   /**
    *  @brief Size the region incrementally and anisotropically
@@ -1050,13 +1051,14 @@ public:
    *  Only positive or zero sizing values are supported.
    *
    *  @param inside The confinement region
+   *  @param outside If true, "inside" is negative - i.e. sizing is performed outside the "inside" region
    *  @param dx The x sizing value
    *  @param dy The y sizing value
    *  @param steps The number of steps to take
    *  @param mode The sizing mode (see EdgeProcessor) for a description of the sizing mode which controls the miter distance.
    *  @return A reference to self
    */
-  Region &size_inside (const db::Region &inside, coord_type dx, coord_type dy, int steps, unsigned int mode = 2);
+  Region &size_inside (const db::Region &inside, bool outside, coord_type dx, coord_type dy, int steps, unsigned int mode = 2);
 
   /**
    *  @brief Returns the sized region
@@ -1066,7 +1068,7 @@ public:
    *
    *  Merged semantics applies.
    */
-  Region sized_inside (const db::Region &inside, coord_type d, int steps, unsigned int mode = 2) const;
+  Region sized_inside (const db::Region &inside, bool outside, coord_type d, int steps, unsigned int mode = 2) const;
 
   /**
    *  @brief Returns the sized region
@@ -1076,7 +1078,7 @@ public:
    *
    *  Merged semantics applies.
    */
-  Region sized_inside (const db::Region &inside, coord_type dx, coord_type dy, int steps, unsigned int mode = 2) const;
+  Region sized_inside (const db::Region &inside, bool outside, coord_type dx, coord_type dy, int steps, unsigned int mode = 2) const;
 
   /**
    *  @brief Boolean AND operator

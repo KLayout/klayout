@@ -1009,15 +1009,15 @@ size_dvm (db::Region *region, const db::Vector &dv, unsigned int mode)
 }
 
 static db::Region
-sized_inside_dvm (const db::Region *region, const db::Region &inside, const db::Vector &dv, int steps, unsigned int mode, const db::Region *stop_at)
+sized_inside_dvm (const db::Region *region, const db::Region &inside, const db::Vector &dv, int steps, unsigned int mode)
 {
-  return region->sized_inside (inside, dv.x (), dv.y (), steps, mode, stop_at);
+  return region->sized_inside (inside, dv.x (), dv.y (), steps, mode);
 }
 
 static db::Region &
-size_inside_dvm (db::Region *region, const db::Region &inside, const db::Vector &dv, int steps, unsigned int mode, const db::Region *stop_at)
+size_inside_dvm (db::Region *region, const db::Region &inside, const db::Vector &dv, int steps, unsigned int mode)
 {
-  region->sized_inside (inside, dv.x (), dv.y (), steps, mode, stop_at);
+  region->sized_inside (inside, dv.x (), dv.y (), steps, mode);
   return *region;
 }
 
@@ -1942,7 +1942,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
-  method ("size_inside", (db::Region & (db::Region::*) (const db::Region &, db::Coord, db::Coord, int, unsigned int, const db::Region *)) &db::Region::size_inside, gsi::arg ("inside"), gsi::arg ("dx"), gsi::arg ("dy"), gsi::arg ("steps"), gsi::arg ("mode"), gsi::arg ("stop_at", (db::Region *) 0, "nil"),
+  method ("size_inside", (db::Region & (db::Region::*) (const db::Region &, db::Coord, db::Coord, int, unsigned int)) &db::Region::size_inside, gsi::arg ("inside"), gsi::arg ("dx"), gsi::arg ("dy"), gsi::arg ("steps"), gsi::arg ("mode"),
     "@brief Incremental, anisotropic sizing inside of another region\n"
     "\n"
     "@param inside The region the incremental sizing will stay inside.\n"
@@ -1950,51 +1950,46 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@param dy The y sizing value\n"
     "@param steps The number of steps to take\n"
     "@param mode The sizing mode (see \\size)\n"
-    "@param stop_at The optional stop layer\n"
     "\n"
     "@return The region after the sizing has been applied (self)\n"
     "\n"
     "Sizes the region, keeping inside another region and performing the size in discrete steps.\n"
     "\n"
-    "Using this method is equivalent to applying a single-step size and consecutively doing a boolean AND with the 'inside' regiuon. "
+    "Using this method is equivalent to applying a single-step size and consecutively doing a boolean AND with the 'inside' region. "
     "This is repeated until the full sizing value is applied.\n"
     "\n"
-    "This operaton is employed to implement latch-up rules where a device needs to be close to a well tap within the "
-    "same well. For this, the incremental size of the device active region with the well as the 'inside' region is applied. The step is chosen as "
-    "somewhat less than the minimum well space, so sizing the active region results in a growing footprint that "
-    "follows the well contours.\n"
-    "\n"
-    "A stop region can be specified, meaning that the sizing propagation will stop if the sized shape "
-    "touches a shape from the stop region. If that happens, the sized shape is discarded. "
-    "In case of the latch-up rule application, the stop region will be the well tap layer.\n"
+    "This operation is employed to implement latch-up rules, where a device needs to be close to a well tap within the "
+    "same well. For this, the tap footprint is incrementally sized, with the well as the 'inside' region. The steps is chosen so "
+    "the per-step sizing is somewhat less than the minimum well space. Sizing the tap shape results in a growing footprint that "
+    "follows the well contours and a small enough per-step sizing value ensures the sized contour does not cross well gaps.\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "This method has been introduced in version 0.29.3."
   ) +
-  method_ext ("size_inside", &size_inside_dvm, gsi::arg ("inside"), gsi::arg ("dv"), gsi::arg ("steps"), gsi::arg ("mode", (unsigned int) 2), gsi::arg ("stop_at", (db::Region *) 0, "nil"),
+  method_ext ("size_inside", &size_inside_dvm, gsi::arg ("inside"), gsi::arg ("dv"), gsi::arg ("steps"), gsi::arg ("mode", (unsigned int) 2),
     "@brief Incremental, anisotropic sizing inside of another region\n"
     "\n"
     "@return The region after the sizing has applied (self)\n"
     "\n"
-    "This method is equivalent to \"size_inside(dv.x, dv.y, steps, mode, stop_at)\".\n"
+    "This method is equivalent to \"size_inside(dv.x, dv.y, steps, mode)\".\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "This method has been introduced in version 0.29.3."
   ) +
-  method ("size_inside", (db::Region & (db::Region::*) (const db::Region &, db::Coord, int, unsigned int, const db::Region *)) &db::Region::size_inside, gsi::arg ("inside"), gsi::arg ("d"), gsi::arg ("steps"), gsi::arg ("mode", (unsigned int) 2), gsi::arg ("stop_at", (db::Region *) 0, "nil"),
+  method ("size_inside", (db::Region & (db::Region::*) (const db::Region &, db::Coord, int, unsigned int)) &db::Region::size_inside, gsi::arg ("inside"), gsi::arg ("d"), gsi::arg ("steps"), gsi::arg ("mode", (unsigned int) 2),
     "@brief Incremental, isotropic sizing inside of another region\n"
     "\n"
     "@return The region after the sizing has applied (self)\n"
     "\n"
-    "This method is equivalent to \"size_inside(d, d, steps, mode, stop_at)\".\n"
+    "This method is equivalent to \"size_inside(d, d, steps, mode)\".\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "This method has been introduced in version 0.29.3."
   ) +
-  method ("sized_inside", (db::Region (db::Region::*) (const db::Region &, db::Coord, db::Coord, int, unsigned int, const db::Region *) const) &db::Region::sized_inside, gsi::arg ("inside"), gsi::arg ("dx"), gsi::arg ("dy"), gsi::arg ("steps"), gsi::arg ("mode"), gsi::arg ("stop_at", (db::Region *) 0, "nil"),
+  method ("sized_inside", (db::Region (db::Region::*) (const db::Region &, db::Coord, db::Coord, int, unsigned int) const) &db::Region::sized_inside, gsi::arg ("inside"), gsi::arg ("dx"), gsi::arg ("dy"), gsi::arg ("steps"), gsi::arg ("mode"),
     "@brief Returns the incrementally and anisotropically sized region\n"
     "\n"
     "@return The sized region\n"
@@ -2003,7 +1998,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
-  method_ext ("sized_inside", &sized_inside_dvm, gsi::arg ("inside"), gsi::arg ("dv"), gsi::arg ("steps"), gsi::arg ("mode", (unsigned int) 2), gsi::arg ("stop_at", (db::Region *) 0, "nil"),
+  method_ext ("sized_inside", &sized_inside_dvm, gsi::arg ("inside"), gsi::arg ("dv"), gsi::arg ("steps"), gsi::arg ("mode", (unsigned int) 2),
     "@brief Returns the incrementally and anisotropically sized region\n"
     "\n"
     "@return The sized region\n"
@@ -2014,7 +2009,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This variant has been introduced in version 0.28."
   ) +
-  method ("sized_inside", (db::Region (db::Region::*) (const db::Region &, db::Coord, int, unsigned int, const db::Region *) const) &db::Region::sized_inside, gsi::arg ("inside"), gsi::arg ("d"), gsi::arg ("steps"), gsi::arg ("mode", (unsigned int) 2), gsi::arg ("stop_at", (db::Region *) 0, "nil"),
+  method ("sized_inside", (db::Region (db::Region::*) (const db::Region &, db::Coord, int, unsigned int) const) &db::Region::sized_inside, gsi::arg ("inside"), gsi::arg ("d"), gsi::arg ("steps"), gsi::arg ("mode", (unsigned int) 2),
     "@brief Returns the incrementally sized region\n"
     "\n"
     "@return The sized region\n"

@@ -1378,13 +1378,13 @@ AsIfFlatRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
 }
 
 RegionDelegate *
-AsIfFlatRegion::sized_inside (const Region &inside, coord_type d, int steps, unsigned int mode, const Region *stop_at) const
+AsIfFlatRegion::sized_inside (const Region &inside, coord_type d, int steps, unsigned int mode) const
 {
-  return sized_inside (inside, d, d, steps, mode, stop_at);
+  return sized_inside (inside, d, d, steps, mode);
 }
 
 RegionDelegate *
-AsIfFlatRegion::sized_inside (const Region &inside, coord_type dx, coord_type dy, int steps, unsigned int mode, const Region *stop_at) const
+AsIfFlatRegion::sized_inside (const Region &inside, coord_type dx, coord_type dy, int steps, unsigned int mode) const
 {
   if (steps <= 0 || empty ()) {
     //  Nothing to do - NOTE: don't return EmptyRegion because we want to
@@ -1409,9 +1409,6 @@ AsIfFlatRegion::sized_inside (const Region &inside, coord_type dx, coord_type dy
 
   std::vector<db::generic_shape_iterator<db::Polygon> > others;
   others.push_back (inside.begin_merged ());
-  if (stop_at) {
-    others.push_back (stop_at->begin ());
-  }
 
   proc.run_flat (begin_merged (), others, std::vector<bool> (), &op, results);
 

@@ -1782,13 +1782,13 @@ DeepRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
 }
 
 RegionDelegate *
-DeepRegion::sized_inside (const Region &inside, coord_type d, int steps, unsigned int mode, const Region *stop_at) const
+DeepRegion::sized_inside (const Region &inside, coord_type d, int steps, unsigned int mode) const
 {
-  return sized_inside (inside, d, d, steps, mode, stop_at);
+  return sized_inside (inside, d, d, steps, mode);
 }
 
 RegionDelegate *
-DeepRegion::sized_inside (const Region &inside, coord_type dx, coord_type dy, int steps, unsigned int mode, const Region *stop_at) const
+DeepRegion::sized_inside (const Region &inside, coord_type dx, coord_type dy, int steps, unsigned int mode) const
 {
   if (steps <= 0 || empty ()) {
     //  Nothing to do - NOTE: don't return EmptyRegion because we want to
@@ -1802,23 +1802,7 @@ DeepRegion::sized_inside (const Region &inside, coord_type dx, coord_type dy, in
 
   const db::DeepRegion *inside_deep = dynamic_cast<const db::DeepRegion *> (inside.delegate ());
   if (! inside_deep) {
-    return db::AsIfFlatRegion::sized_inside (inside, dx, dy, steps, mode, stop_at);
-  }
-
-  const db::DeepRegion *stop_at_deep = 0;
-  if (stop_at) {
-
-    stop_at_deep = dynamic_cast<const db::DeepRegion *> (stop_at->delegate ());
-    if (! stop_at_deep) {
-      return db::AsIfFlatRegion::sized_inside (inside, dx, dy, steps, mode, stop_at);
-    }
-
-    if (&inside_deep->deep_layer ().layout () != &stop_at_deep->deep_layer ().layout ()
-        || &inside_deep->deep_layer ().initial_cell () != &stop_at_deep->deep_layer ().initial_cell ()) {
-      throw tl::Exception (tl::to_string (tr ("'sized_inside' operation needs to use the same layout and top cell "
-                                              "for 'inside' and 'stop_at' arguments")));
-    }
-
+    return db::AsIfFlatRegion::sized_inside (inside, dx, dy, steps, mode);
   }
 
   const db::DeepLayer &polygons = merged_deep_layer ();
@@ -1834,13 +1818,7 @@ DeepRegion::sized_inside (const Region &inside, coord_type dx, coord_type dy, in
 
   std::unique_ptr<db::DeepRegion> res (new db::DeepRegion (polygons.derived ()));
 
-  std::vector<unsigned int> other_layers;
-  other_layers.push_back (inside_polygons.layer ());
-  if (stop_at_deep) {
-    other_layers.push_back (stop_at_deep->deep_layer ().layer ());
-  }
-
-  proc.run (&op, polygons.layer (), other_layers, res->deep_layer ().layer ());
+  proc.run (&op, polygons.layer (), inside_polygons.layer (), res->deep_layer ().layer ());
 
   return res.release ();
 }

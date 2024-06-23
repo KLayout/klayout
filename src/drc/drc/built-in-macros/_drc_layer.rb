@@ -4678,8 +4678,8 @@ TP_SCRIPT
     # %DRC%
     # @name sized
     # @brief Polygon sizing (per-edge biasing)
-    # @synopsis layer.sized(d [, mode])
-    # @synopsis layer.sized(dx, dy [, mode]))
+    # @synopsis layer.sized(d [, mode] [, inside(l) [, steps(n)]])
+    # @synopsis layer.sized(dx, dy [, mode] [, inside(l) [, steps(n)]]))
     #
     # This method requires a polygon layer. It will apply a bias per edge of the polygons 
     # and return the biased layer. The layer that this method is called on is not modified.
@@ -4711,6 +4711,26 @@ TP_SCRIPT
     # Bias values can be given as floating-point values (in micron) or integer values (in
     # database units). To explicitly specify the unit, use the unit denominators.
     #
+    # The "inside" option and the "steps" option implement incremental size. Incremental
+    # size means that the sizing value is applied in n steps. Between the steps, the sized
+    # shape is confined to the "inside" layer by means of a boolean "AND" operation.
+    # 
+    # This scheme is used to implement latch-up rules where a device active region has to 
+    # be close to a well tap. By using the well layer as the "inside" layer, the size function
+    # follows the well contours. The steps have to selected such that the per-step size value
+    # is smaller than the minimum space of the well shapes. With that, the sized shapes will
+    # not cross over to neighbor well regions. Specifically, the per-step size has to be less
+    # than about 70% of the minimum space to account for the minimum corner-to-corner case
+    # with Euclidian space measurements.
+    #
+    # "inside" and "steps" can be used with positive sizing values only.
+    #
+    # An example for the "inside" option is this:
+    #
+    # @code
+    #  ntap.sized(30.um, inside(nwell), steps(100))
+    # @/code
+    #
     # \size is working like \sized but modifies the layer it is called on.
     #
     # The following images show the effect of various forms of the "sized" method:
@@ -4733,10 +4753,11 @@ TP_SCRIPT
     # %DRC%
     # @name size
     # @brief Polygon sizing (per-edge biasing, modifies the layer)
-    # @synopsis layer.size(d [, mode])
-    # @synopsis layer.size(dx, dy [, mode]))
+    # @synopsis layer.size(d [, mode] [, inside(l) [, steps(n)]])
+    # @synopsis layer.size(dx, dy [, mode] [, inside(l) [, steps(n)]]))
     #
-    # See \sized. The size method basically does the same but modifies the layer
+    # See \sized for a description of the options.
+    # The size method basically does the same but modifies the layer
     # it is called on. The input layer is returned and available for further processing.
     
     %w(size sized).each do |f|
@@ -4749,6 +4770,8 @@ TP_SCRIPT
           
           dist = 0
           
+          steps = nil
+          inside = nil
           mode = 2
           values = []
           args.each do |a|
@@ -4758,10 +4781,40 @@ TP_SCRIPT
               values.push(v)
             elsif a.is_a?(DRCSizingMode)
               mode = a.value
+            elsif a.is_a?(DRCSizingSteps)
+              steps = a.value
+            elsif a.is_a?(DRCSizingInside)
+              inside = a.value
             end
           end
           
           aa = []
+
+          f_size = :size
+          f_sized = :sized
+
+          if steps 
+            if !inside
+              raise "'steps' is only allowed with 'inside'"
+            end
+            if !steps.is_a?(1.class)
+              raise "'steps' must be an integer value"
+            end
+          end
+
+          if inside
+
+            inside.is_a?(DRCLayer) || raise("'inside' argument needs to be a DRC layer")
+            inside.data.is_a?(RBA::Region) || raise("'inside' requires a polygon layer")
+            aa.push(inside.data)
+
+            steps ||= 1
+
+            f_size = :size_inside
+            f_sized = :sized_inside
+
+          end
+            
           if values.size < 1
             raise "Method requires one or two sizing values"
           elsif values.size > 2
@@ -4771,17 +4824,21 @@ TP_SCRIPT
             aa.push(values[-1])
           end
           
+          if inside
+            aa.push(steps)
+          end
+
           aa.push(mode)
-          
+
           if :#{f} == :size && @engine.is_tiled?
             # in tiled mode, no modifying versions are available
-            self.data = @engine._tcmd(self.data, dist, RBA::Region, :sized, *aa)
+            self.data = @engine._tcmd(self.data, dist, RBA::Region, f_sized, *aa)
             self
           elsif :#{f} == :size 
-            @engine._tcmd(self.data, dist, RBA::Region, :#{f}, *aa)
+            @engine._tcmd(self.data, dist, RBA::Region, f_size, *aa)
             self
           else 
-            DRCLayer::new(@engine, @engine._tcmd(self.data, dist, RBA::Region, :#{f}, *aa))
+            DRCLayer::new(@engine, @engine._tcmd(self.data, dist, RBA::Region, f_sized, *aa))
           end
           
         end

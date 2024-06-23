@@ -313,6 +313,14 @@ module DRC
       DRCEdgeMode::new(RBA::EdgeMode::NotStep)
     end
     
+    def steps(arg)
+      DRCSizingSteps::new(arg)
+    end
+    
+    def inside(arg)
+      DRCSizingInside::new(arg)
+    end
+    
     def padding_zero
       DRCDensityPadding::new(:zero)
     end

@@ -2004,16 +2004,10 @@ sized_inside_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, 
 
   std::vector<db::Polygon> subjects;
   std::set<const TI *> inside;
-  std::set<const TI *> stop_at;
 
   for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
     for (typename shape_interactions<TS, TI>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-      const std::pair<unsigned int, TI> &is = interactions.intruder_shape (*j);
-      if (is.first == 0) {
-        inside.insert (&is.second);
-      } else if (is.first == 1) {
-        stop_at.insert (&is.second);
-      }
+      inside.insert (&interactions.intruder_shape (*j).second);
     }
   }
 
@@ -2061,50 +2055,6 @@ sized_inside_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, 
     db::PolygonGenerator pg (pc, false /*don't resolve holes*/, false /*min. coherence*/);
     db::BooleanOp op (db::BooleanOp::And);
     ep_and.process (pg, op);
-
-    if (! subjects.empty () && ! stop_at.empty ()) {
-
-      //  compute interations with "stop_at"
-
-      ep_interact.clear ();
-
-      db::EdgeProcessor::property_type p = 0;
-      for (auto i = subjects.begin (); i != subjects.end (); ++i, ++p) {
-        ep_interact.insert (*i, p);
-      }
-
-      db::EdgeProcessor::property_type nstart = p;
-      for (auto i = stop_at.begin (); i != stop_at.end (); ++i, ++p) {
-        ep_interact.insert (**i, p);
-      }
-
-      db::InteractionDetector id (0 /*interacting*/, nstart - 1);
-      id.set_include_touching (true);
-      db::EdgeSink es;
-      ep_interact.process (es, id);
-      id.finish ();
-
-      std::set<size_t> interacting;
-      for (db::InteractionDetector::iterator i = id.begin (); i != id.end (); ++i) {
-        interacting.insert (i->first);
-      }
-
-      //  drop interacting subjects
-
-      if (! interacting.empty ()) {
-        std::vector<db::Polygon>::iterator iw = subjects.begin ();
-        for (auto i = subjects.begin (); i != subjects.end (); ++i) {
-          if (interacting.find (i - subjects.begin ()) == interacting.end ()) {
-            if (iw != i) {
-              iw->swap (*i);
-            }
-            ++iw;
-          }
-        }
-        subjects.erase (iw, subjects.end ());
-      }
-
-    }
 
   }
 

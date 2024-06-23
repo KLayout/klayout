@@ -1982,9 +1982,13 @@ sized_inside_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, 
   tl_assert (results.size () == 1);
   std::unordered_set<TR> &result = results.front ();
 
-  const db::ICplxTrans &tr = proc->vars ()->single_variant_transformation (subject_cell->cell_index ());
-  double mag = tr.mag ();
-  double angle = tr.angle ();
+  double mag = 1.0;
+  double angle = 1.0;
+  if (proc->vars ()) {
+    const db::ICplxTrans &tr = proc->vars ()->single_variant_transformation (subject_cell->cell_index ());
+    mag = tr.mag ();
+    angle = tr.angle ();
+  }
 
   double dx_with_mag = m_dx / mag;
   double dy_with_mag = m_dy / mag;

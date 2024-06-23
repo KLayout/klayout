@@ -1390,8 +1390,26 @@ AsIfFlatRegion::sized_inside (const Region &inside, coord_type dx, coord_type dy
     return clone ();
   }
 
-  return 0; // @@@
+  std::unique_ptr<FlatRegion> output (new FlatRegion ());
+  std::vector<db::Shapes *> results;
+  results.push_back (&output->raw_polygons ());
 
+  db::sized_inside_local_operation<db::Polygon, db::Polygon, db::Polygon> op (dx, dy, steps, mode);
+
+  db::local_processor<db::Polygon, db::Polygon, db::Polygon> proc;
+  proc.set_base_verbosity (base_verbosity ());
+  proc.set_description (progress_desc ());
+  proc.set_report_progress (report_progress ());
+
+  std::vector<db::generic_shape_iterator<db::Polygon> > others;
+  others.push_back (inside.begin ());
+  if (stop_at) {
+    others.push_back (stop_at->begin ());
+  }
+
+  proc.run_flat (begin_merged (), others, std::vector<bool> (), &op, results);
+
+  return output.release ();
 }
 
 RegionDelegate *

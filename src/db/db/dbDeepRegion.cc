@@ -1796,6 +1796,10 @@ DeepRegion::sized_inside (const Region &inside, coord_type dx, coord_type dy, in
     return clone ();
   }
 
+  if (dx < 0 || dy < 0) {
+    throw tl::Exception (tl::to_string (tr ("'sized_inside' operation does not make sense with negative sizing")));
+  }
+
   const db::DeepRegion *inside_deep = dynamic_cast<const db::DeepRegion *> (inside.delegate ());
   if (! inside_deep) {
     return db::AsIfFlatRegion::sized_inside (inside, dx, dy, steps, mode, stop_at);
@@ -1818,9 +1822,9 @@ DeepRegion::sized_inside (const Region &inside, coord_type dx, coord_type dy, in
   }
 
   const db::DeepLayer &polygons = merged_deep_layer ();
-  const db::DeepLayer &inside_polygons = inside_deep->deep_layer ();
+  const db::DeepLayer &inside_polygons = inside_deep->merged_deep_layer ();
 
-  db::sized_inside_local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef> op (dx, dy, steps, mode);
+  db::sized_inside_local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef> op (dx, dy, steps, mode, true /*inside layer is merged*/);
 
   db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &inside_polygons.layout (), &inside_polygons.initial_cell (), polygons.breakout_cells (), inside_polygons.breakout_cells ());
   configure_proc (proc);

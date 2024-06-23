@@ -1386,15 +1386,21 @@ AsIfFlatRegion::sized_inside (const Region &inside, coord_type d, int steps, uns
 RegionDelegate *
 AsIfFlatRegion::sized_inside (const Region &inside, coord_type dx, coord_type dy, int steps, unsigned int mode, const Region *stop_at) const
 {
-  if (steps <= 0) {
+  if (steps <= 0 || empty ()) {
+    //  Nothing to do - NOTE: don't return EmptyRegion because we want to
+    //  maintain "deepness"
     return clone ();
+  }
+
+  if (dx < 0 || dy < 0) {
+    throw tl::Exception (tl::to_string (tr ("'sized_inside' operation does not make sense with negative sizing")));
   }
 
   std::unique_ptr<FlatRegion> output (new FlatRegion ());
   std::vector<db::Shapes *> results;
   results.push_back (&output->raw_polygons ());
 
-  db::sized_inside_local_operation<db::Polygon, db::Polygon, db::Polygon> op (dx, dy, steps, mode);
+  db::sized_inside_local_operation<db::Polygon, db::Polygon, db::Polygon> op (dx, dy, steps, mode, true /*inside layer is merged*/);
 
   db::local_processor<db::Polygon, db::Polygon, db::Polygon> proc;
   proc.set_base_verbosity (base_verbosity ());
@@ -1402,7 +1408,7 @@ AsIfFlatRegion::sized_inside (const Region &inside, coord_type dx, coord_type dy
   proc.set_report_progress (report_progress ());
 
   std::vector<db::generic_shape_iterator<db::Polygon> > others;
-  others.push_back (inside.begin ());
+  others.push_back (inside.begin_merged ());
   if (stop_at) {
     others.push_back (stop_at->begin ());
   }

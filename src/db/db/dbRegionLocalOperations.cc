@@ -1948,17 +1948,20 @@ template class DB_PUBLIC two_bool_and_not_local_operation_with_properties<db::Po
 // sized_inside_local_operation implementation
 
 template <class TS, class TI, class TR>
-sized_inside_local_operation<TS, TI, TR>::sized_inside_local_operation (db::Coord dx, db::Coord dy, int steps, unsigned int mode)
-  : m_dx (dx), m_dy (dy), m_steps (steps), m_mode (mode)
+sized_inside_local_operation<TS, TI, TR>::sized_inside_local_operation (db::Coord dx, db::Coord dy, int steps, unsigned int mode, bool inside_is_merged)
+  : m_dx (dx), m_dy (dy), m_steps (steps), m_mode (mode), m_dist (0)
 {
-  //  .. nothing yet ..
+  m_dist = 0;
+  if (! inside_is_merged) {
+    m_dist = std::max (0, std::max (m_dx, m_dy));
+  }
 }
 
 template <class TS, class TI, class TR>
 db::Coord
 sized_inside_local_operation<TS, TI, TR>::dist () const
 {
-  return std::max (0, std::max (m_dx, m_dy));
+  return m_dist;
 }
 
 template <class TS, class TI, class TR>

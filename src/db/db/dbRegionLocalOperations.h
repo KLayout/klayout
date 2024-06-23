@@ -471,7 +471,7 @@ class DB_PUBLIC sized_inside_local_operation
   : public local_operation<TS, TI, TR>
 {
 public:
-  sized_inside_local_operation (db::Coord dx, db::Coord dy, int steps, unsigned int mode);
+  sized_inside_local_operation (db::Coord dx, db::Coord dy, int steps, unsigned int mode, bool inside_is_merged);
 
   virtual db::Coord dist () const;
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
@@ -486,6 +486,7 @@ public:
 
 private:
   db::Coord m_dx, m_dy;
+  db::Coord m_dist;
   int m_steps;
   unsigned int m_mode;
   db::MagnificationAndOrientationReducer m_vars_anisotropic;

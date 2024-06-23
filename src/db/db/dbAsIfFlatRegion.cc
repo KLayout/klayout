@@ -1378,13 +1378,13 @@ AsIfFlatRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
 }
 
 RegionDelegate *
-AsIfFlatRegion::sized_inside (const Region *inside, coord_type d, int steps, unsigned int mode, const Region *stop_at) const
+AsIfFlatRegion::sized_inside (const Region &inside, coord_type d, int steps, unsigned int mode, const Region *stop_at) const
 {
   return sized_inside (inside, d, d, steps, mode, stop_at);
 }
 
 RegionDelegate *
-AsIfFlatRegion::sized_inside (const Region *inside, coord_type dx, coord_type dy, int steps, unsigned int mode, const Region *stop_at) const
+AsIfFlatRegion::sized_inside (const Region &inside, coord_type dx, coord_type dy, int steps, unsigned int mode, const Region *stop_at) const
 {
   if (steps <= 0) {
     return clone ();

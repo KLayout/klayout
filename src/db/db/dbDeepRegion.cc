@@ -1782,19 +1782,13 @@ DeepRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
 }
 
 RegionDelegate *
-DeepRegion::sized_inside (const Region *inside, coord_type d, int steps, unsigned int mode, const Region *stop_at) const
+DeepRegion::sized_inside (const Region &inside, coord_type d, int steps, unsigned int mode, const Region *stop_at) const
 {
-  if (steps <= 0) {
-    return clone ();
-  }
-
-
-  return 0; // @@@
-
+  return sized_inside (inside, d, d, steps, mode, stop_at);
 }
 
 RegionDelegate *
-DeepRegion::sized_inside (const Region *inside, coord_type dx, coord_type dy, int steps, unsigned int mode, const Region *stop_at) const
+DeepRegion::sized_inside (const Region &inside, coord_type dx, coord_type dy, int steps, unsigned int mode, const Region *stop_at) const
 {
   if (steps <= 0 || empty ()) {
     //  Nothing to do - NOTE: don't return EmptyRegion because we want to
@@ -1802,13 +1796,49 @@ DeepRegion::sized_inside (const Region *inside, coord_type dx, coord_type dy, in
     return clone ();
   }
 
-  if (dx == dy) {
-    return sized_inside (inside, dx, steps, mode, stop_at);
+  const db::DeepRegion *inside_deep = dynamic_cast<const db::DeepRegion *> (inside.delegate ());
+  if (! inside_deep) {
+    return db::AsIfFlatRegion::sized_inside (inside, dx, dy, steps, mode, stop_at);
   }
 
+  const db::DeepRegion *stop_at_deep = 0;
+  if (stop_at) {
 
-  return 0; // @@@
+    stop_at_deep = dynamic_cast<const db::DeepRegion *> (stop_at->delegate ());
+    if (! stop_at_deep) {
+      return db::AsIfFlatRegion::sized_inside (inside, dx, dy, steps, mode, stop_at);
+    }
 
+    if (&inside_deep->deep_layer ().layout () != &stop_at_deep->deep_layer ().layout ()
+        || &inside_deep->deep_layer ().initial_cell () != &stop_at_deep->deep_layer ().initial_cell ()) {
+      throw tl::Exception (tl::to_string (tr ("'sized_inside' operation needs to use the same layout and top cell "
+                                              "for 'inside' and 'stop_at' arguments")));
+    }
+
+  }
+
+  const db::DeepLayer &polygons = merged_deep_layer ();
+  const db::DeepLayer &inside_polygons = inside_deep->deep_layer ();
+
+  db::sized_inside_local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef> op (dx, dy, steps, mode);
+
+  db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &inside_polygons.layout (), &inside_polygons.initial_cell (), polygons.breakout_cells (), inside_polygons.breakout_cells ());
+  configure_proc (proc);
+  proc.set_threads (polygons.store ()->threads ());
+  proc.set_area_ratio (polygons.store ()->max_area_ratio ());
+  proc.set_max_vertex_count (polygons.store ()->max_vertex_count ());
+
+  std::unique_ptr<db::DeepRegion> res (new db::DeepRegion (polygons.derived ()));
+
+  std::vector<unsigned int> other_layers;
+  other_layers.push_back (inside_polygons.layer ());
+  if (stop_at_deep) {
+    other_layers.push_back (stop_at_deep->deep_layer ().layer ());
+  }
+
+  proc.run (&op, polygons.layer (), other_layers, res->deep_layer ().layer ());
+
+  return res.release ();
 }
 
 template <class TR, class Output>

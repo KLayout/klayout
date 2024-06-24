@@ -1824,9 +1824,10 @@ DeepRegion::sized_inside (const Region &inside, bool outside, coord_type dx, coo
     db::Coord dx_chunk = dx, dy_chunk = dy;
     int steps_chunk = steps;
 
-    //  In outside mode, we perform at most max_steps in one chunk.
-    //  This is supposed to limit the search range.
-    if (outside && steps > max_steps) {
+    //  We perform at most max_steps in one chunk.
+    //  This is supposed to limit the search range and merge shapes instead of creating
+    //  heavily overlapping ones.
+    if (steps > max_steps) {
       steps_chunk = max_steps;
       dx_chunk = db::coord_traits<db::Coord>::rounded (dx * max_steps / double (steps));
       dy_chunk = db::coord_traits<db::Coord>::rounded (dy * max_steps / double (steps));
@@ -1852,11 +1853,15 @@ DeepRegion::sized_inside (const Region &inside, bool outside, coord_type dx, coo
 
     proc.run (&op, prev.get () ? prev->deep_layer ().layer () : polygons.layer (), inside_polygons.layer (), res->deep_layer ().layer ());
 
-    // @@@ TODO: should we also merge in the last step and consider splitting?
+    //  NOTE: in the last step we apply a polygon breaker in addition to "merge" so the
+    //  result is granular for better deep mode performance
     if (steps > 0) {
       prev.reset (dynamic_cast<db::DeepRegion *> (res->merged ()));
       tl_assert (prev.get () != 0);
       res.reset (new db::DeepRegion (polygons.derived ()));
+    } else {
+      res.reset (dynamic_cast<db::DeepRegion *> (res->processed (db::PolygonBreaker (proc.max_vertex_count (), proc.area_ratio ()))));
+      tl_assert (res.get () != 0);
     }
 
   }

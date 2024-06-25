@@ -2591,6 +2591,17 @@ TEST(60_sized_inside)
   EXPECT_EQ (r.sized_inside (inside, false, 1, 2, 0).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
   EXPECT_EQ (r.sized_inside (inside, false, 10, 20, 10).to_string (), "(-10,10;-10,80;40,80;40,10)");
 
+  db::Region d;
+  d = r;
+  d.size_inside (inside, false, 0, 20, 10);
+  EXPECT_EQ (d.to_string (), "(-10,10;-10,80;30,80;30,10)");
+  d = r;
+  d.size_inside (inside, false, 1, 2, 0);
+  EXPECT_EQ (d.to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  d = r;
+  d.size_inside (inside, false, 10, 20, 10);
+  EXPECT_EQ (d.to_string (), "(-10,10;-10,80;40,80;40,10)");
+
   EXPECT_EQ (r.sized_inside (db::Region (), false, 0, 40).to_string (), "");
   EXPECT_EQ (r.sized_inside (db::Region (), false, 1, 0).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
   EXPECT_EQ (r.sized_inside (db::Region (), false, 1, -1).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");

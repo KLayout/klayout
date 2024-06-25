@@ -1911,3 +1911,14 @@ TEST(121_ShapesOfTerminal)
 
   db::compare_layouts (_this, layout, au, db::NoNormalization);
 }
+
+TEST(130_size_inside_outside)
+{
+  run_test (_this, "130", false);
+}
+
+TEST(130d_size_inside_outside)
+{
+  run_test (_this, "130", true);
+}
+

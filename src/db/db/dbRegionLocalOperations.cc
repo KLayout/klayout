@@ -1965,7 +1965,7 @@ template <class TS, class TI, class TR>
 OnEmptyIntruderHint
 sized_inside_local_operation<TS, TI, TR>::on_empty_intruder_hint () const
 {
-  return Drop;
+  return m_outside ? Ignore : Drop;
 }
 
 template <class TS, class TI, class TR>

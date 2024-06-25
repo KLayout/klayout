@@ -1803,9 +1803,13 @@ DeepRegion::sized_inside (const Region &inside, bool outside, coord_type dx, coo
     throw tl::Exception (tl::to_string (tr ("'sized_inside' operation does not make sense with negative sizing")));
   }
 
+  if (dx == 0 && dy == 0) {
+    steps = 1;
+  }
+
   const db::DeepRegion *inside_deep = dynamic_cast<const db::DeepRegion *> (inside.delegate ());
   if (! inside_deep) {
-    return db::AsIfFlatRegion::sized_inside (inside, dx, dy, steps, mode);
+    return db::AsIfFlatRegion::sized_inside (inside, outside, dx, dy, steps, mode);
   }
 
   //  NOTE: it does not provide benefits to merge the outside region, so just don't

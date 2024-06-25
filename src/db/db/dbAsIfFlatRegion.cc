@@ -1399,14 +1399,18 @@ AsIfFlatRegion::sized_inside (const Region &inside, bool outside, coord_type dx,
     throw tl::Exception (tl::to_string (tr ("'sized_inside' operation does not make sense with negative sizing")));
   }
 
+  if (dx == 0 && dy == 0) {
+    steps = 1;
+  }
+
   //  NOTE: it does not provide benefits to merge the outside region, so just don't
   auto inside_polygons = outside ? inside.begin () : inside.begin_merged ();
   bool inside_polygons_is_merged = outside ? inside.is_merged () : true;
 
   auto polygons = begin_merged ();
 
-  std::unique_ptr<FlatRegion> res (new FlatRegion ());
-  std::unique_ptr<FlatRegion> prev;
+  std::unique_ptr<RegionDelegate> res (new FlatRegion ());
+  std::unique_ptr<RegionDelegate> prev;
 
   int steps_from = 0;
 
@@ -1444,18 +1448,18 @@ AsIfFlatRegion::sized_inside (const Region &inside, bool outside, coord_type dx,
     others.push_back (inside_polygons);
 
     std::vector<db::Shapes *> results;
-    results.push_back (&res->raw_polygons ());
+    db::FlatRegion *res_flat = dynamic_cast<db::FlatRegion *> (res.get ());
+    tl_assert (res_flat != 0);
+    results.push_back (&res_flat->raw_polygons ());
     proc.run_flat (prev.get () ? prev->begin () : polygons, others, std::vector<bool> (), &op, results);
 
     //  NOTE: in the last step we apply a polygon breaker in addition to "merge" so the
     //  result is granular for better deep mode performance
     if (steps > 0) {
-      prev.reset (dynamic_cast<db::FlatRegion *> (res->merged ()));
-      tl_assert (prev.get () != 0);
+      prev.reset (res->merged ());
       res.reset (new db::FlatRegion ());
     } else {
-      res.reset (dynamic_cast<db::FlatRegion *> (res->processed (db::PolygonBreaker (proc.max_vertex_count (), proc.area_ratio ()))));
-      tl_assert (res.get () != 0);
+      res.reset (res->processed (db::PolygonBreaker (proc.max_vertex_count (), proc.area_ratio ())));
     }
 
   }

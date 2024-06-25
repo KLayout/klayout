@@ -2008,6 +2008,11 @@ sized_inside_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, 
     }
   }
 
+  //  For empty intruders we can optimize the size sequence to a single step
+  //  (NOTE: this is not strictly true as it ignores effects due to corner clipping
+  //  which can be accumulative)
+  int steps = inside.empty () ? 1 : m_steps;
+
   //  Merge the inside region shapes as we are going to use them multiple times
   std::vector<db::Edge> inside_merged;
   if (inside.size () > 1 && ! m_inside_is_merged && m_steps > 1) {
@@ -2040,36 +2045,52 @@ sized_inside_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, 
 
   db::Coord sx_last = 0, sy_last = 0;
 
-  for (int step = 0; step < m_steps && ! subjects.empty (); ++step) {
+  for (int step = 0; step < steps && ! subjects.empty (); ++step) {
 
-    db::Coord sx = db::coord_traits<db::Coord>::rounded (dx_with_mag * (step + 1) / double (m_steps));
-    db::Coord sy = db::coord_traits<db::Coord>::rounded (dy_with_mag * (step + 1) / double (m_steps));
+    db::Coord sx = db::coord_traits<db::Coord>::rounded (dx_with_mag * (step + 1) / double (steps));
+    db::Coord sy = db::coord_traits<db::Coord>::rounded (dy_with_mag * (step + 1) / double (steps));
     db::Coord dx = sx - sx_last;
     db::Coord dy = sy - sy_last;
     sx_last = sx;
     sy_last = sy;
 
-    ep_and.clear ();
+    if (! inside.empty () || ! inside_merged.empty ()) {
 
-    db::EdgesToEdgeProcessor e2ep (ep_and, 0);
-    db::SizingPolygonFilter siz (e2ep, dx, dy, m_mode);
-    for (auto i = subjects.begin (); i != subjects.end (); ++i) {
-      siz.put (*i);
-    }
+      ep_and.clear ();
 
-    db::EdgeProcessor::property_type p = 1;
-    for (auto i = inside.begin (); i != inside.end (); ++i) {
-      ep_and.insert (**i, p);
-      p += 2;
-    }
-    for (auto i = inside_merged.begin (); i != inside_merged.end (); ++i) {
-      ep_and.insert (*i, p);
-    }
+      db::EdgesToEdgeProcessor e2ep (ep_and, 0);
+      db::SizingPolygonFilter siz (e2ep, dx, dy, m_mode);
+      for (auto i = subjects.begin (); i != subjects.end (); ++i) {
+        siz.put (*i);
+      }
 
-    db::PolygonContainer pc (subjects, true /*clear*/);
-    db::PolygonGenerator pg (pc, false /*don't resolve holes*/, false /*min. coherence*/);
-    db::BooleanOp op (m_outside ? db::BooleanOp::ANotB : db::BooleanOp::And);
-    ep_and.process (pg, op);
+      db::EdgeProcessor::property_type p = 1;
+      for (auto i = inside.begin (); i != inside.end (); ++i) {
+        ep_and.insert (**i, p);
+        p += 2;
+      }
+      for (auto i = inside_merged.begin (); i != inside_merged.end (); ++i) {
+        ep_and.insert (*i, p);
+      }
+
+      db::PolygonContainer pc (subjects, true /*clear*/);
+      db::PolygonGenerator pg (pc, false /*don't resolve holes*/, false /*min. coherence*/);
+      db::BooleanOp op (m_outside ? db::BooleanOp::ANotB : db::BooleanOp::And);
+      ep_and.process (pg, op);
+
+    } else {
+
+      std::vector<db::Polygon> sized_subjects;
+      db::PolygonContainer pc (sized_subjects, true /*clear*/);
+      db::PolygonGenerator pg (pc, false /*don't resolve holes*/, false /*min. coherence*/);
+      db::SizingPolygonFilter siz (pg, dx, dy, m_mode);
+      for (auto i = subjects.begin (); i != subjects.end (); ++i) {
+        siz.put (*i);
+      }
+
+      sized_subjects.swap (subjects);
+
+    }
 
   }
 

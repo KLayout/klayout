@@ -1443,6 +1443,7 @@ AsIfFlatRegion::sized_inside (const Region &inside, bool outside, coord_type dx,
 
     //  indicate chunk in the progress description
     proc.set_description (proc.description (&op) + tl::sprintf (tl::to_string (tr (" (steps %d..%d)")), steps_from + 1, steps_from + steps_chunk + 1));
+    steps_from += steps_chunk;
 
     std::vector<db::generic_shape_iterator<db::Polygon> > others;
     others.push_back (inside_polygons);

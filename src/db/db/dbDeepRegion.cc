@@ -1853,6 +1853,7 @@ DeepRegion::sized_inside (const Region &inside, bool outside, coord_type dx, coo
 
     //  indicate chunk in the progress description
     proc.set_description (proc.description (&op) + tl::sprintf (tl::to_string (tr (" (steps %d..%d)")), steps_from + 1, steps_from + steps_chunk + 1));
+    steps_from += steps_chunk;
 
     proc.run (&op, prev.get () ? prev->deep_layer ().layer () : polygons.layer (), inside_polygons.layer (), res->deep_layer ().layer ());
 

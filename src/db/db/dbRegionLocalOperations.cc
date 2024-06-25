@@ -1948,8 +1948,8 @@ template class DB_PUBLIC two_bool_and_not_local_operation_with_properties<db::Po
 // sized_inside_local_operation implementation
 
 template <class TS, class TI, class TR>
-sized_inside_local_operation<TS, TI, TR>::sized_inside_local_operation (db::Coord dx, db::Coord dy, int steps, unsigned int mode, db::Coord dist, bool outside, bool inside_is_merged, bool split_after)
-  : m_dx (dx), m_dy (dy), m_dist (dist), m_steps (steps), m_mode (mode), m_outside (outside), m_inside_is_merged (inside_is_merged), m_split_after (split_after)
+sized_inside_local_operation<TS, TI, TR>::sized_inside_local_operation (db::Coord dx, db::Coord dy, int steps, unsigned int mode, db::Coord dist, bool outside, bool inside_is_merged)
+  : m_dx (dx), m_dy (dy), m_dist (dist), m_steps (steps), m_mode (mode), m_outside (outside), m_inside_is_merged (inside_is_merged)
 {
   //  .. nothing yet ..
 }
@@ -2067,9 +2067,7 @@ sized_inside_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, 
     }
 
     db::PolygonContainer pc (subjects, true /*clear*/);
-    db::PolygonSplitter splitter (pc, proc->area_ratio (), proc->max_vertex_count ());
-    //  NOTE: we split in the last step if requested
-    db::PolygonGenerator pg ((! m_split_after || step + 1 < m_steps) ? (PolygonSink &) pc : (PolygonSink &) splitter, false /*don't resolve holes*/, false /*min. coherence*/);
+    db::PolygonGenerator pg (pc, false /*don't resolve holes*/, false /*min. coherence*/);
     db::BooleanOp op (m_outside ? db::BooleanOp::ANotB : db::BooleanOp::And);
     ep_and.process (pg, op);
 

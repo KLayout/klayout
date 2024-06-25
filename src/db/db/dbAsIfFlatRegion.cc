@@ -1386,7 +1386,8 @@ AsIfFlatRegion::sized_inside (const Region &inside, bool outside, coord_type d, 
 RegionDelegate *
 AsIfFlatRegion::sized_inside (const Region &inside, bool outside, coord_type dx, coord_type dy, int steps, unsigned int mode) const
 {
-  // @@@ TODO: restrict max. number of steps in "outside" mode like for DeepRegion
+  //  empirical value
+  const int max_steps = 25;
 
   if (steps <= 0 || empty ()) {
     //  Nothing to do - NOTE: don't return EmptyRegion because we want to
@@ -1398,27 +1399,68 @@ AsIfFlatRegion::sized_inside (const Region &inside, bool outside, coord_type dx,
     throw tl::Exception (tl::to_string (tr ("'sized_inside' operation does not make sense with negative sizing")));
   }
 
-  std::unique_ptr<FlatRegion> output (new FlatRegion ());
-  std::vector<db::Shapes *> results;
-  results.push_back (&output->raw_polygons ());
-
-  //  NOTE: as we merge the inside region in the inside case, we can use distance 0
-  db::Coord dist = outside ? std::max (dx, dy) : 0;
-  bool inside_is_merged = outside ? inside.is_merged () : true;
-  db::sized_inside_local_operation<db::Polygon, db::Polygon, db::Polygon> op (dx, dy, steps, mode, dist, outside, inside_is_merged, true /*split after*/);
-
-  db::local_processor<db::Polygon, db::Polygon, db::Polygon> proc;
-  proc.set_base_verbosity (base_verbosity ());
-  proc.set_description (progress_desc ());
-  proc.set_report_progress (report_progress ());
-
-  std::vector<db::generic_shape_iterator<db::Polygon> > others;
   //  NOTE: it does not provide benefits to merge the outside region, so just don't
-  others.push_back (outside ? inside.begin () : inside.begin_merged ());
+  auto inside_polygons = outside ? inside.begin () : inside.begin_merged ();
+  bool inside_polygons_is_merged = outside ? inside.is_merged () : true;
 
-  proc.run_flat (begin_merged (), others, std::vector<bool> (), &op, results);
+  auto polygons = begin_merged ();
 
-  return output.release ();
+  std::unique_ptr<FlatRegion> res (new FlatRegion ());
+  std::unique_ptr<FlatRegion> prev;
+
+  int steps_from = 0;
+
+  while (steps > 0) {
+
+    db::Coord dx_chunk = dx, dy_chunk = dy;
+    int steps_chunk = steps;
+
+    //  We perform at most max_steps in one chunk.
+    //  This is supposed to limit the search range and merge shapes instead of creating
+    //  heavily overlapping ones.
+    if (steps > max_steps) {
+      steps_chunk = max_steps;
+      dx_chunk = db::coord_traits<db::Coord>::rounded (dx * max_steps / double (steps));
+      dy_chunk = db::coord_traits<db::Coord>::rounded (dy * max_steps / double (steps));
+    }
+
+    steps -= steps_chunk;
+    dx -= dx_chunk;
+    dy -= dy_chunk;
+
+    //  NOTE: as we merge the inside region in the inside case, we can use distance 0
+    db::Coord dist = outside ? std::max (dx_chunk, dy_chunk) : 0;
+    db::sized_inside_local_operation<db::Polygon, db::Polygon, db::Polygon> op (dx_chunk, dy_chunk, steps_chunk, mode, dist, outside, inside_polygons_is_merged);
+
+    db::local_processor<db::Polygon, db::Polygon, db::Polygon> proc;
+    proc.set_base_verbosity (base_verbosity ());
+    proc.set_description (progress_desc ());
+    proc.set_report_progress (report_progress ());
+
+    //  indicate chunk in the progress description
+    proc.set_description (proc.description (&op) + tl::sprintf (tl::to_string (tr (" (steps %d..%d)")), steps_from + 1, steps_from + steps_chunk + 1));
+
+    std::vector<db::generic_shape_iterator<db::Polygon> > others;
+    others.push_back (inside_polygons);
+
+    std::vector<db::Shapes *> results;
+    results.push_back (&res->raw_polygons ());
+    proc.run_flat (prev.get () ? prev->begin () : polygons, others, std::vector<bool> (), &op, results);
+
+    //  NOTE: in the last step we apply a polygon breaker in addition to "merge" so the
+    //  result is granular for better deep mode performance
+    if (steps > 0) {
+      prev.reset (dynamic_cast<db::FlatRegion *> (res->merged ()));
+      tl_assert (prev.get () != 0);
+      res.reset (new db::FlatRegion ());
+    } else {
+      res.reset (dynamic_cast<db::FlatRegion *> (res->processed (db::PolygonBreaker (proc.max_vertex_count (), proc.area_ratio ()))));
+      tl_assert (res.get () != 0);
+    }
+
+  }
+
+  return res.release ();
 }
 
 RegionDelegate *

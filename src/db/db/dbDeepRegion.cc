@@ -1839,8 +1839,7 @@ DeepRegion::sized_inside (const Region &inside, bool outside, coord_type dx, coo
 
     //  NOTE: as we merge the inside region in the inside case, we can use distance 0
     db::Coord dist = outside ? std::max (dx_chunk, dy_chunk) : 0;
-    bool split_after = (steps == 0);
-    db::sized_inside_local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef> op (dx_chunk, dy_chunk, steps_chunk, mode, dist, outside, inside_polygons_is_merged, split_after);
+    db::sized_inside_local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef> op (dx_chunk, dy_chunk, steps_chunk, mode, dist, outside, inside_polygons_is_merged);
 
     db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &inside_polygons.layout (), &inside_polygons.initial_cell (), polygons.breakout_cells (), inside_polygons.breakout_cells ());
     configure_proc (proc);

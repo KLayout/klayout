@@ -3056,18 +3056,27 @@ The following images shows the effect of some rectangle filter modes:
 <p>Usage:</p>
 <ul>
 <li><tt>layer.size(d [, mode])</tt></li>
-<li><tt>layer.size(dx, dy [, mode]))</tt></li>
+<li><tt>layer.size(d, inside(l) [, steps(n)] [, mode])</tt></li>
+<li><tt>layer.size(d, outside(l) [, steps(n)] [, mode])</tt></li>
+<li><tt>layer.size(dx, dy [, mode])</tt></li>
+<li><tt>layer.size(dx, dy, inside(l) [, steps(n)] [, mode])</tt></li>
+<li><tt>layer.size(dx, dy, outside(l) [, steps(n)] [, mode])</tt></li>
 </ul>
 <p>
-See <a href="#sized">sized</a>. The size method basically does the same but modifies the layer
+See <a href="#sized">sized</a> for a description of the options.
+The size method basically does the same but modifies the layer
 it is called on. The input layer is returned and available for further processing.
 </p>
 <a name="sized"/><h2>"sized" - Polygon sizing (per-edge biasing)</h2>
 <keyword name="sized"/>
 <p>Usage:</p>
 <ul>
-<li><tt>layer.sized(d [, mode])</tt></li>
-<li><tt>layer.sized(dx, dy [, mode]))</tt></li>
+<li><tt>layer.sized(d [, mode] [, inside(l) [, steps(n)]])</tt></li>
+<li><tt>layer.sized(d, inside(l) [, steps(n)] [, mode])</tt></li>
+<li><tt>layer.sized(d, outside(l) [, steps(n)] [, mode])</tt></li>
+<li><tt>layer.sized(dx, dy [, mode])</tt></li>
+<li><tt>layer.sized(dx, dy, inside(l) [, steps(n)] [, mode])</tt></li>
+<li><tt>layer.sized(dx, dy, outside(l) [, steps(n)] [, mode])</tt></li>
 </ul>
 <p>
 This method requires a polygon layer. It will apply a bias per edge of the polygons 
@@ -3100,6 +3109,30 @@ layer.sized(300.nm).raw.merged(2)
 Bias values can be given as floating-point values (in micron) or integer values (in
 database units). To explicitly specify the unit, use the unit denominators.
 </p><p>
+The "inside" option and the "steps" option implement incremental size. Incremental
+size means that the sizing value is applied in n steps. Between the steps, the sized
+shape is confined to the "inside" layer by means of a boolean "AND" operation.
+</p><p>
+This scheme is used to implement latch-up rules where a device active region has to 
+be close to a well tap. By using the well layer as the "inside" layer, the size function
+follows the well contours. The steps have to selected such that the per-step size value
+is smaller than the minimum space of the well shapes. With that, the sized shapes will
+not cross over to neighbor well regions. Specifically, the per-step size has to be less
+than about 70% of the minimum space to account for the minimum corner-to-corner case
+with Euclidian space measurements.
+</p><p>
+"inside" and "steps" can be used with positive sizing values only.
+</p><p>
+"outside" acts like "inside", but instead of confining the sized region to the
+inside of the given layer, it is confined to be outside of that layer. Technically,
+a boolean "NOT" is performed instead of a boolean "AND".
+</p><p>
+An example for the "inside" option is this:
+</p><p>
+<pre>
+ntap.sized(30.um, inside(nwell), steps(100))
+</pre>
+</p><p>
 <a href="#size">size</a> is working like <a href="#sized">sized</a> but modifies the layer it is called on.
 </p><p>
 The following images show the effect of various forms of the "sized" method:
@@ -3116,6 +3149,19 @@ The following images show the effect of various forms of the "sized" method:
 <tr>
 <td><img src="/images/drc_sized5.png"/></td>
 <td><img src="/images/drc_sized6.png"/></td>
+</tr>
+</table>
+</p><p>
+The effect of the "inside" option is shown here:
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_sized_inside1.png"/></td>
+<td><img src="/images/drc_sized_inside2.png"/></td>
+</tr>
+<tr>
+<td><img src="/images/drc_sized_inside3.png"/></td>
+<td><img src="/images/drc_sized_inside4.png"/></td>
 </tr>
 </table>
 </p>

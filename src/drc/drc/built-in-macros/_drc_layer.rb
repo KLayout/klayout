@@ -4688,6 +4688,8 @@ TP_SCRIPT
     # This method requires a polygon layer. It will apply a bias per edge of the polygons 
     # and return the biased layer. The layer that this method is called on is not modified.
     # 
+    # The alternative method \size works like \sized but modifies the layer it is called on.
+    #
     # In the single-value form, that bias is applied both in horizontal or vertical direction.
     # In the two-value form, the horizontal and vertical bias can be specified separately.
     # 
@@ -4715,32 +4717,6 @@ TP_SCRIPT
     # Bias values can be given as floating-point values (in micron) or integer values (in
     # database units). To explicitly specify the unit, use the unit denominators.
     #
-    # The "inside" option and the "steps" option implement incremental size. Incremental
-    # size means that the sizing value is applied in n steps. Between the steps, the sized
-    # shape is confined to the "inside" layer by means of a boolean "AND" operation.
-    # 
-    # This scheme is used to implement latch-up rules where a device active region has to 
-    # be close to a well tap. By using the well layer as the "inside" layer, the size function
-    # follows the well contours. The steps have to selected such that the per-step size value
-    # is smaller than the minimum space of the well shapes. With that, the sized shapes will
-    # not cross over to neighbor well regions. Specifically, the per-step size has to be less
-    # than about 70% of the minimum space to account for the minimum corner-to-corner case
-    # with Euclidian space measurements.
-    #
-    # "inside" and "steps" can be used with positive sizing values only.
-    #
-    # "outside" acts like "inside", but instead of confining the sized region to the
-    # inside of the given layer, it is confined to be outside of that layer. Technically,
-    # a boolean "NOT" is performed instead of a boolean "AND".
-    #
-    # An example for the "inside" option is this:
-    #
-    # @code
-    #  ntap.sized(30.um, inside(nwell), steps(100))
-    # @/code
-    #
-    # \size is working like \sized but modifies the layer it is called on.
-    #
     # The following images show the effect of various forms of the "sized" method:
     #
     # @table
@@ -4757,6 +4733,45 @@ TP_SCRIPT
     #     @td @img(/images/drc_sized6.png) @/td
     #   @/tr
     # @/table
+    #
+    # The "inside" option and the "steps" option implement incremental size. Incremental
+    # size means that the sizing value is applied in n steps. Between the steps, the sized
+    # shape is confined to the "inside" layer by means of a boolean "AND" operation.
+    # 
+    # This scheme is used to implement latch-up rules where a device active region has to 
+    # be close to a well tap. By using the well layer as the "inside" layer, the size function
+    # follows the well contours. The steps have to selected such that the per-step size value
+    # is smaller than the minimum space of the well shapes. With that, the sized shapes will
+    # not cross over to neighbor well regions. Specifically, the per-step size has to be less
+    # than about 70% of the minimum space to account for the minimum corner-to-corner case
+    # with Euclidian space measurements.
+    #
+    # "inside" and "steps" can be used with positive sizing values only.
+    # A steps value of 0 will not execute any sizing at all.
+    #
+    # "outside" acts like "inside", but instead of confining the sized region to the
+    # inside of the given layer, it is confined to be outside of that layer. Technically,
+    # a boolean "NOT" is performed instead of a boolean "AND".
+    #
+    # An example for the "inside" option is this:
+    #
+    # @code
+    #  ntap.sized(30.um, inside(nwell), steps(100))
+    # @/code
+    #
+    # The effect of the "inside" option is shown here:
+    # 
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_sized_inside1.png) @/td
+    #     @td @img(/images/drc_sized_inside2.png) @/td
+    #   @/tr
+    #   @tr 
+    #     @td @img(/images/drc_sized_inside3.png) @/td
+    #     @td @img(/images/drc_sized_inside4.png) @/td
+    #   @/tr
+    # @/table
+    #
     
     # %DRC%
     # @name size

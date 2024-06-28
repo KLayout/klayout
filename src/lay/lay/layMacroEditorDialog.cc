@@ -3694,7 +3694,7 @@ MacroEditorDialog::stop_button_clicked ()
 {
   if (QApplication::activeModalWidget () == this) {
     //  close this window if it was shown in modal mode
-    accept ();
+    QDialog::accept ();
   }
 
   m_in_exec = false;
@@ -3760,11 +3760,8 @@ MacroEditorDialog::run (int stop_stack_depth, lym::Macro *macro)
 
     if (QApplication::activeModalWidget () == this) {
       //  close this window if it was shown in modal mode
-      accept ();
+      QDialog::accept ();
     }
-
-    //  in a breakpoint
-    m_in_breakpoint = false;
 
   } else {
 

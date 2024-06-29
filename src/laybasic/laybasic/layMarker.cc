@@ -197,7 +197,7 @@ void render_cell_inst (const db::Layout &layout, const db::CellInstArray &inst, 
 // ------------------------------------------------------------------------
 
 MarkerBase::MarkerBase (lay::LayoutViewBase *view)
-  : lay::ViewObject (view->canvas ()),
+  : lay::ViewObject (view ? view->canvas () : 0),
     m_line_width (-1), m_vertex_size (-1), m_halo (-1), m_text_enabled (true), m_vertex_shape (lay::ViewOp::Rect), m_line_style (-1), m_dither_pattern (-1), m_frame_pattern (0), mp_view (view)
 { 
   // .. nothing yet ..

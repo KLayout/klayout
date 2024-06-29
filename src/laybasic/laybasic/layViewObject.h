@@ -440,6 +440,13 @@ public:
   virtual ~ViewObject ();
 
   /**
+   *  @brief Attaches a view object to a widget
+   *
+   *  This will register the object at the widget, but not transfer ownership.
+   */
+  void set_widget (ViewObjectUI *widget);
+
+  /**
    *  @brief Render the object on the planes provided by the canvas.
    *
    *  This method is supposed to repaint the object on the plane
@@ -785,6 +792,16 @@ public:
     return m_objects.end ();
   }
 
+  /**
+   *  @brief Adds an object, transferring ownership to the view
+   */
+  void add_object (lay::ViewObject *object);
+
+  /**
+   *  @brief Clears all objects owned by the view
+   */
+  void clear_objects ();
+
   /** 
    *  @brief Remaining leave event handler
    *
@@ -1073,6 +1090,7 @@ private:
   QWidget *mp_widget;
 #endif
   tl::weak_collection<lay::ViewObject> m_objects;
+  tl::shared_collection<lay::ViewObject> m_owned_objects;
   tl::weak_collection<lay::BackgroundViewObject> m_background_objects;
   std::list<lay::ViewService *> m_services;
   std::list<ViewService *> m_grabbed;

@@ -469,6 +469,20 @@ static LayerPropertiesConstIteratorWrapper each_layer2 (lay::LayoutViewBase *vie
   return LayerPropertiesConstIteratorWrapper (view->begin_layers (list_index));
 }
 
+static void add_object (lay::LayoutViewBase *view, lay::ViewObject *object)
+{
+  if (view->canvas ()) {
+    view->canvas ()->add_object (object);
+  }
+}
+
+static void clear_objects (lay::LayoutViewBase *view)
+{
+  if (view->canvas ()) {
+    view->canvas ()->clear_objects ();
+  }
+}
+
 static lay::AbstractMenu *menu (lay::LayoutViewBase *view)
 {
   return view->menu ();
@@ -679,6 +693,30 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase ("lay", "LayoutVi
     "\n"
     "In 0.25, this method has been moved from MainWindow to LayoutView.\n"
   ) +
+  gsi::method_ext ("add_marker", &add_object, gsi::arg ("marker"),
+    "@brief Adds a persistent marker to the view (transferring ownership)\n"
+    "\n"
+    "This method allows creating markers and transferring ownership to the view, hence making them persistent. "
+    "This means, when the variable with the marker object goes out of scope, the marker will still exists in the view.\n"
+    "\n"
+    "To create a persistent marker, use the following code:\n"
+    "\n"
+    "@code\n"
+    "marker = RBA::Marker::new\n"
+    "# ... configure marker ...\n"
+    "view.add_marker(marker)\n"
+    "@/code\n"
+    "\n"
+    "To remove all persistent markers owned by the view, use \\clear_markers.\n"
+    "\n"
+    "Persistent markers have been introduced in version 0.29.3\n"
+  ) +
+  gsi::method_ext ("clear_markers", &clear_objects,
+    "@brief Clears all persistent markers from the view\n"
+    "See \\add_marker for details about persistent markers.\n"
+    "\n"
+    "Persistent markers have been introduced in version 0.29.3\n"
+  ) +
   gsi::method ("is_editable?", static_cast<bool (lay::LayoutViewBase::*) () const> (&lay::LayoutViewBase::is_editable),
     "@brief Returns true if the view is in editable mode\n"
     "\n"
@@ -836,7 +874,7 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase ("lay", "LayoutVi
   gsi::method ("active_cellview_index", static_cast<int (lay::LayoutViewBase::*) () const> (&lay::LayoutViewBase::active_cellview_index),
     "@brief Gets the index of the active cellview (shown in hierarchy browser)\n"
   ) +
-  gsi::method ("active_setview_index=|#set_active_cellview_index", &lay::LayoutViewBase::set_active_cellview_index, gsi::arg ("index"),
+  gsi::method ("active_cellview_index=|#active_setview_index=|#set_active_cellview_index", &lay::LayoutViewBase::set_active_cellview_index, gsi::arg ("index"),
     "@brief Makes the cellview with the given index the active one (shown in hierarchy browser)\n"
     "See \\active_cellview_index.\n"
     "\n"

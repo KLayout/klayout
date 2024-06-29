@@ -63,6 +63,11 @@ public:
   MarkerBase (lay::LayoutViewBase *view);
 
   /**
+   *  @brief Attaches to a new view
+   */
+  void set_view (lay::LayoutViewBase *view);
+
+  /**
    *  @brief Get the color by which the marker is drawn
    *
    *  If the color is invalid, the marker is drawn with the canvases foreground color.
@@ -232,6 +237,11 @@ protected:
     return mp_view;
   }
 
+  const lay::LayoutViewBase *view () const
+  {
+    return mp_view;
+  }
+
 private:
   tl::Color m_color;
   tl::Color m_frame_color;
@@ -326,14 +336,6 @@ public:
   }
 
   /**
-   *  @brief Gets the view object
-   */
-  lay::LayoutViewBase *view () const
-  {
-    return mp_view;
-  }
-
-  /**
    *  @brief Gets the bounding box
    */
   db::DBox bbox () const;
@@ -351,7 +353,6 @@ public:
 private:
   db::CplxTrans m_trans;
   std::vector<db::DCplxTrans> *mp_trans_vector;
-  lay::LayoutViewBase *mp_view;
   unsigned int m_cv_index;
 
   /**
@@ -828,8 +829,6 @@ private:
     db::DText *text;
     void *any;
   } m_object;
-
-  lay::LayoutViewBase *mp_view;
 };
 
 /**

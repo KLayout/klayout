@@ -474,6 +474,8 @@ static void add_marker (lay::LayoutViewBase *view, lay::ManagedDMarker *object)
 {
   if (view->canvas ()) {
     view->canvas ()->add_object (object);
+    object->keep ();
+    object->set_view (view);
   }
 }
 

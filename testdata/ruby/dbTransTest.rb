@@ -81,7 +81,9 @@ class DBTrans_TestClass < TestBase
     assert_equal( RBA::Trans::new(RBA::Trans::R180).to_s, "r180 0,0" )
 
     assert_equal( e.ctrans( 2.0 ), 2.0 )
+    assert_equal( e.ctrans( -2.0 ), -2.0 )
     assert_equal( e * 2.0, 2.0 )
+    assert_equal( e * -2.0, -2.0 )
     assert_equal( e.trans( RBA::Edge::new(0, 1, 2, 3) ).to_s, "(-3,-2;-1,0)" )
     assert_equal( ( e * RBA::Edge::new(0, 1, 2, 3) ).to_s, "(-3,-2;-1,0)" )
     assert_equal( e.trans( RBA::Box::new(0, 1, 2, 3) ).to_s, "(-3,-2;-1,0)" )
@@ -142,9 +144,13 @@ class DBTrans_TestClass < TestBase
 
     assert_equal( mb.trans( RBA::DPoint::new( 1, 0 )).to_s, "17,3" )
     assert_equal( mb.ctrans(2).to_s, "4.0" )
+    assert_equal( mb.ctrans(-2).to_s, "-4.0" )
     assert_equal( (mb * 2).to_s, "4.0" )
+    assert_equal( (mb * -2).to_s, "-4.0" )
     assert_equal( i.ctrans(2).to_s, "1.0" )
+    assert_equal( i.ctrans(-2).to_s, "-1.0" )
     assert_equal( (i * 2).to_s, "1.0" )
+    assert_equal( (i * -2).to_s, "-1.0" )
 
   end
 
@@ -203,7 +209,9 @@ class DBTrans_TestClass < TestBase
     assert_equal( (c.angle - 45).abs < 1e-10, true )
 
     assert_equal( c.ctrans( 5 ).to_s, "3.75" )
+    assert_equal( c.ctrans( -5 ).to_s, "-3.75" )
     assert_equal( (c * 5).to_s, "3.75" )
+    assert_equal( (c * -5).to_s, "-3.75" )
     assert_equal( c.trans( RBA::DPoint::new( 12, 16 ) ).to_s, "17.3492424049,-14.6213203436" )
 
     assert_equal( RBA::DCplxTrans::new.to_s, "r0 *1 0,0" )
@@ -270,6 +278,11 @@ class DBTrans_TestClass < TestBase
     c.mirror = true
     assert_equal( c.to_s, "m135 1,7" )
 
+    assert_equal( e.ctrans( 2 ), 2 )
+    assert_equal( e.ctrans( -2 ), -2 )
+    assert_equal( e * 2, 2 )
+    assert_equal( e * -2, -2 )
+
     assert_equal( e.trans( RBA::Edge::new(0, 1, 2, 3) ).to_s, "(-3,-2;-1,0)" )
     assert_equal( ( e * RBA::Edge::new(0, 1, 2, 3) ).to_s, "(-3,-2;-1,0)" )
     assert_equal( e.trans( RBA::Box::new(0, 1, 2, 3) ).to_s, "(-3,-2;-1,0)" )
@@ -311,9 +324,13 @@ class DBTrans_TestClass < TestBase
 
     assert_equal( mb.trans( RBA::Point::new( 1, 0 )).to_s, "17,3" )
     assert_equal( mb.ctrans(2).to_s, "4.0" )
+    assert_equal( mb.ctrans(-2).to_s, "-4.0" )
     assert_equal( (mb * 2).to_s, "4.0" )
+    assert_equal( (mb * -2).to_s, "-4.0" )
     assert_equal( i.ctrans(2).to_s, "1.0" )
+    assert_equal( i.ctrans(-2).to_s, "-1.0" )
     assert_equal( (i * 2).to_s, "1.0" )
+    assert_equal( (i * -2).to_s, "-1.0" )
 
   end
 
@@ -360,7 +377,9 @@ class DBTrans_TestClass < TestBase
     assert_equal( (c.angle - 45).abs < 1e-10, true )
 
     assert_equal( c.ctrans( 5 ).to_s, "3.75" )
+    assert_equal( c.ctrans( -5 ).to_s, "-3.75" )
     assert_equal( (c * 5).to_s, "3.75" )
+    assert_equal( (c * -5).to_s, "-3.75" )
     assert_equal( c.trans( RBA::Point::new( 12, 16 ) ).to_s, "17.3492424049,-14.6213203436" )
 
     assert_equal( RBA::CplxTrans::new.to_s, "r0 *1 0,0" )

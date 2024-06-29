@@ -169,6 +169,22 @@ public:
   }
 
   /**
+   *  @brief Getter for the tooltip property
+   */
+  const std::string &get_tooltip () const
+  {
+    return m_tooltip;
+  }
+
+  /**
+   *  @brief Setter for the tooltip property
+   */
+  void set_tooltip (const std::string &tooltip)
+  {
+    m_tooltip = tooltip;
+  }
+
+  /**
    *  @brief Getter for the type property
    */
   type get_type () const
@@ -331,6 +347,7 @@ public:
            m_type == d.m_type &&
            m_name == d.m_name &&
            m_description == d.m_description &&
+           m_tooltip == d.m_tooltip &&
            m_unit == d.m_unit &&
            m_min_value == d.m_min_value &&
            m_max_value == d.m_max_value;
@@ -343,7 +360,7 @@ private:
   bool m_hidden, m_readonly;
   type m_type;
   std::string m_name;
-  std::string m_description, m_unit;
+  std::string m_description, m_tooltip, m_unit;
   tl::Variant m_min_value, m_max_value;
 };
 

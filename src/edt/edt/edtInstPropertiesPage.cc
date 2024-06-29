@@ -345,7 +345,11 @@ InstPropertiesPage::update ()
   edt::Service::obj_iterator pos = m_selection_ptrs [m_indexes.front ()];
   tl_assert (pos->is_cell_inst ());
 
-  mp_service->highlight (m_indexes);
+  std::set<const lay::ObjectInstPath *> highlights;
+  for (auto i = m_indexes.begin (); i != m_indexes.end (); ++i) {
+    highlights.insert (m_selection_ptrs [*i].operator-> ());
+  }
+  mp_service->highlight (highlights);
 
   m_enable_cb_callback = false;
   dbu_cb->setChecked (mp_service->view ()->dbu_coordinates ());

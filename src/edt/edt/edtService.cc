@@ -68,6 +68,7 @@ Service::Service (db::Manager *manager, lay::LayoutViewBase *view, db::ShapeIter
     mp_view (view),
     mp_transient_marker (0), 
     m_editing (false), m_immediate (false), 
+    m_selection_maybe_invalid (false),
     m_cell_inst_service (false),
     m_flags (flags),
     m_move_sel (false), m_moving (false),
@@ -81,7 +82,7 @@ Service::Service (db::Manager *manager, lay::LayoutViewBase *view, db::ShapeIter
     m_highlights_selected (false),
     dm_selection_to_view (this, &edt::Service::do_selection_to_view)
 { 
-  mp_view->geom_changed_event.add (this, &edt::Service::selection_to_view);
+  mp_view->geom_changed_event.add (this, &edt::Service::geometry_changing);
 }
 
 Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
@@ -90,6 +91,7 @@ Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
     mp_view (view),
     mp_transient_marker (0), 
     m_editing (false), m_immediate (false), 
+    m_selection_maybe_invalid (false),
     m_cell_inst_service (true),
     m_flags (db::ShapeIterator::Nothing),
     m_move_sel (false), m_moving (false),
@@ -103,17 +105,17 @@ Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
     m_highlights_selected (false),
     dm_selection_to_view (this, &edt::Service::do_selection_to_view)
 { 
-  mp_view->geom_changed_event.add (this, &edt::Service::selection_to_view);
+  mp_view->geom_changed_event.add (this, &edt::Service::geometry_changing);
 }
 
 Service::~Service ()
 {
-  for (std::vector<lay::ViewObject *>::iterator r = m_markers.begin (); r != m_markers.end (); ++r) {
-    delete *r;
+  for (auto r = m_markers.begin (); r != m_markers.end (); ++r) {
+    delete r->second;
   }
   m_markers.clear ();
 
-  for (std::vector<lay::ViewObject *>::iterator r = m_edit_markers.begin (); r != m_edit_markers.end (); ++r) {
+  for (auto r = m_edit_markers.begin (); r != m_edit_markers.end (); ++r) {
     delete *r;
   }
   m_edit_markers.clear ();
@@ -249,8 +251,8 @@ Service::snap_marker_to_grid (const db::DVector &v, bool &snapped) const
 
   for (auto m = m_markers.begin (); m != m_markers.end () && count > 0; ++m) {
 
-    const lay::ShapeMarker *sm = dynamic_cast<const lay::ShapeMarker *> (*m);
-    const lay::InstanceMarker *im = dynamic_cast<const lay::InstanceMarker *> (*m);
+    const lay::ShapeMarker *sm = dynamic_cast<const lay::ShapeMarker *> (m->second);
+    const lay::InstanceMarker *im = dynamic_cast<const lay::InstanceMarker *> (m->second);
     if (sm) {
       update_vector_snapped_marker (sm, tt, vr, snapped, count);
     } else if (im) {
@@ -413,18 +415,18 @@ Service::restore_highlights ()
 }
 
 void
-Service::highlight (const std::vector<size_t> &n)
+Service::highlight (const std::set<const lay::ObjectInstPath *> &highlights)
 {
   m_highlights_selected = true;
-  m_selected_highlights = std::set<size_t> (n.begin (), n.end ());
+  m_selected_highlights = highlights;
   apply_highlights ();
 }
 
 void
 Service::apply_highlights ()
 {
-  for (std::vector<lay::ViewObject *>::iterator r = m_markers.begin (); r != m_markers.end (); ++r) {
-    (*r)->visible (! m_highlights_selected || m_selected_highlights.find (r - m_markers.begin ()) != m_selected_highlights.end ());
+  for (auto r = m_markers.begin (); r != m_markers.end (); ++r) {
+    r->second->visible (! m_highlights_selected || m_selected_highlights.find (r->first) != m_selected_highlights.end ());
   }
 }
 
@@ -457,7 +459,7 @@ Service::copy_selected ()
   unsigned int inst_mode = 0;
 
   if (m_hier_copy_mode < 0) {
-    for (objects::const_iterator r = m_selection.begin (); r != m_selection.end () && ! need_to_ask_for_copy_mode; ++r) {
+    for (objects::const_iterator r = selection ().begin (); r != selection ().end () && ! need_to_ask_for_copy_mode; ++r) {
       if (r->is_cell_inst ()) {
         const db::Cell &cell = view ()->cellview (r->cv_index ())->layout ().cell (r->back ().inst_ptr.cell_index ());
         if (! cell.is_proxy ()) {
@@ -500,7 +502,7 @@ Service::copy_selected (unsigned int inst_mode)
   //  create one ClipboardData object per cv_index because, this one assumes that there is
   //  only one source layout object.
   std::set <unsigned int> cv_indices;
-  for (objects::const_iterator r = m_selection.begin (); r != m_selection.end (); ++r) {
+  for (objects::const_iterator r = selection ().begin (); r != selection ().end (); ++r) {
     cv_indices.insert (r->cv_index ());
   }
 
@@ -510,7 +512,7 @@ Service::copy_selected (unsigned int inst_mode)
 
     //  add the selected objects to the clipboard data objects.
     const lay::CellView &cv = view ()->cellview (*cvi);
-    for (objects::const_iterator r = m_selection.begin (); r != m_selection.end (); ++r) {
+    for (objects::const_iterator r = selection ().begin (); r != selection ().end (); ++r) {
       if (r->cv_index () == *cvi) {
         if (! r->is_cell_inst ()) {
           cd->get ().add (cv->layout (), r->layer (), r->shape (), cv.context_trans () * r->trans ());
@@ -538,12 +540,12 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
     m_move_sel = true; // TODO: there is no "false". Remove this.
     m_moving = true;
 
-    for (std::vector<lay::ViewObject *>::iterator r = m_markers.begin (); r != m_markers.end (); ++r) {
+    for (auto r = m_markers.begin (); r != m_markers.end (); ++r) {
 
-      (*r)->thaw ();
+      r->second->thaw ();
 
       //  Show the inner structure of the instances
-      lay::InstanceMarker *inst_marker = dynamic_cast<lay::InstanceMarker *> (*r);
+      lay::InstanceMarker *inst_marker = dynamic_cast<lay::InstanceMarker *> (r->second);
       if (inst_marker) {
         inst_marker->set_draw_outline (! m_show_shapes_of_instances);
         inst_marker->set_max_shapes (m_show_shapes_of_instances ? m_max_shapes_of_instances : 0);
@@ -612,7 +614,7 @@ Service::selection_bbox ()
   lay::TextInfo text_info (view ());
 
   db::DBox box;
-  for (objects::const_iterator r = m_selection.begin (); r != m_selection.end (); ++r) {
+  for (objects::const_iterator r = selection ().begin (); r != selection ().end (); ++r) {
 
     const lay::CellView &cv = view ()->cellview (r->cv_index ());
     const db::Layout &layout = cv->layout ();
@@ -694,9 +696,8 @@ Service::transform (const db::DCplxTrans &trans, const std::vector<db::DCplxTran
 
   //  build a list of object references corresponding to the p_trv vector 
   std::vector <objects::iterator> obj_ptrs;
-  obj_ptrs.reserve (m_selection.size ());
-  n = 0;
-  for (objects::iterator r = m_selection.begin (); r != m_selection.end (); ++r, ++n) {
+  obj_ptrs.reserve (selection ().size ());
+  for (objects::iterator r = selection ().begin (); r != selection ().end (); ++r) {
     obj_ptrs.push_back (r);
   }
 
@@ -709,7 +710,7 @@ Service::transform (const db::DCplxTrans &trans, const std::vector<db::DCplxTran
   //  The key is a triple: cell_index, cv_index, layer
   std::map <std::pair <db::cell_index_type, std::pair <unsigned int, unsigned int> >, std::vector <size_t> > shapes_by_cell;
   n = 0;
-  for (objects::iterator r = m_selection.begin (); r != m_selection.end (); ++r, ++n) {
+  for (objects::iterator r = selection ().begin (); r != selection ().end (); ++r, ++n) {
     if (! r->is_cell_inst ()) {
       shapes_by_cell.insert (std::make_pair (std::make_pair (r->cell_index (), std::make_pair (r->cv_index (), r->layer ())), std::vector <size_t> ())).first->second.push_back (n);
     }
@@ -779,7 +780,7 @@ Service::transform (const db::DCplxTrans &trans, const std::vector<db::DCplxTran
   //  The key is a pair: cell_index, cv_index
   std::map <std::pair <db::cell_index_type, unsigned int>, std::vector <size_t> > insts_by_cell;
   n = 0;
-  for (objects::iterator r = m_selection.begin (); r != m_selection.end (); ++r, ++n) {
+  for (objects::iterator r = selection ().begin (); r != selection ().end (); ++r, ++n) {
     if (r->is_cell_inst ()) {
       insts_by_cell.insert (std::make_pair (std::make_pair (r->cell_index (), r->cv_index ()), std::vector <size_t> ())).first->second.push_back (n);
     }
@@ -854,8 +855,8 @@ Service::move_cancel ()
 {
   if (m_move_trans != db::DTrans () && m_moving) {
 
-    for (std::vector<lay::ViewObject *>::iterator r = m_markers.begin (); r != m_markers.end (); ++r) {
-      (*r)->freeze ();
+    for (auto r = m_markers.begin (); r != m_markers.end (); ++r) {
+      r->second->freeze ();
     }
 
     m_move_trans = db::DTrans ();
@@ -1031,7 +1032,7 @@ Service::del_selected ()
   std::set<db::Layout *> needs_cleanup;
 
   //  delete all shapes and instances.
-  for (objects::const_iterator r = m_selection.begin (); r != m_selection.end (); ++r) {
+  for (objects::const_iterator r = selection ().begin (); r != selection ().end (); ++r) {
     const lay::CellView &cv = view ()->cellview (r->cv_index ());
     if (cv.is_valid ()) {
       db::Cell &cell = cv->layout ().cell (r->cell_index ());
@@ -1059,13 +1060,13 @@ Service::del_selected ()
 bool
 Service::has_selection ()
 {
-  return ! m_selection.empty ();
+  return ! selection ().empty ();
 }
 
 size_t
 Service::selection_size ()
 {
-  return m_selection.size ();
+  return selection ().size ();
 }
 
 bool
@@ -1317,11 +1318,11 @@ static std::string path_to_string (const db::Layout &layout, const lay::ObjectIn
 void 
 Service::display_status (bool transient)
 {
-  const objects *selection = transient ? &m_transient_selection : &m_selection;
+  const objects *sel = transient ? &transient_selection () : &selection ();
 
-  if (selection->size () == 1) {
+  if (sel->size () == 1) {
 
-    objects::const_iterator r = selection->begin (); 
+    objects::const_iterator r = sel->begin ();
     const db::Layout &layout = view ()->cellview (r->cv_index ())->layout ();
 
     if (m_cell_inst_service) {
@@ -1445,6 +1446,7 @@ Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
   if (mode == lay::Editable::Replace) {
     if (! m_selection.empty ()) {
       m_selection.clear ();
+      m_selection_maybe_invalid = false;
       needs_update = true;
     }
   }
@@ -1466,6 +1468,7 @@ Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
     if (mode == lay::Editable::Reset) {
       if (! m_selection.empty ()) {
         m_selection.clear ();
+        m_selection_maybe_invalid = false;
         needs_update = true;
       }
     } else {
@@ -1509,6 +1512,7 @@ Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
     if (box.is_point () && f0 != finder.end () && f0->layer () == view ()->cellview (f0->cv_index ())->layout ().guiding_shape_layer ()) {
 
       m_selection.clear ();
+      m_selection_maybe_invalid = false;
       select (*f0, mode);
       m_previous_selection.insert (*f0);
       needs_update = true;
@@ -1518,8 +1522,9 @@ Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
 
       //  clear the selection if it was consisting of a guiding shape before
       objects::const_iterator s0 = m_selection.begin (); 
-      if (s0 != m_selection.end () && s0->layer () == view ()->cellview (s0->cv_index ())->layout ().guiding_shape_layer ()) {
+      if (s0 != m_selection.end () && s0->is_valid (view ()) && s0->layer () == view ()->cellview (s0->cv_index ())->layout ().guiding_shape_layer ()) {
         m_selection.clear ();
+        m_selection_maybe_invalid = false;
       }
 
       //  collect the founds from the finder
@@ -1550,19 +1555,50 @@ Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
   return any_selected;
 }
 
+const std::set<lay::ObjectInstPath> &
+Service::selection () const
+{
+  if (m_selection_maybe_invalid) {
+
+    bool any_invalid = false;
+    for (auto r = m_selection.begin (); r != m_selection.end () && ! any_invalid; ++r) {
+      any_invalid = ! r->is_valid (view ());
+    }
+
+    if (any_invalid) {
+      std::set<lay::ObjectInstPath> valid_sel;
+      for (auto r = m_selection.begin (); r != m_selection.end (); ++r) {
+        if (r->is_valid (view ())) {
+          valid_sel.insert (*r);
+        }
+      }
+      m_selection.swap (valid_sel);
+    }
+
+    m_selection_maybe_invalid = false;
+
+  }
+
+  return m_selection;
+}
+
 void 
 Service::get_selection (std::vector <lay::ObjectInstPath> &sel) const
 {
   sel.clear ();
   sel.reserve (m_selection.size ());
-
-  //  positions will hold a set of iterators that are to be erased
   for (std::set<lay::ObjectInstPath>::const_iterator r = m_selection.begin (); r != m_selection.end (); ++r) {
     sel.push_back (*r);
   }
 }
 
-bool 
+const std::set<lay::ObjectInstPath> &
+Service::transient_selection () const
+{
+  return m_transient_selection;
+}
+
+bool
 Service::select (const lay::ObjectInstPath &obj, lay::Editable::SelectionMode mode)
 {
   //  allocate next sequence number
@@ -1627,9 +1663,9 @@ Service::move_markers (const db::DTrans &t)
       view ()->message (pos);
     }
 
-    for (std::vector<lay::ViewObject *>::iterator r = m_markers.begin (); r != m_markers.end (); ++r) {
+    for (auto r = m_markers.begin (); r != m_markers.end (); ++r) {
 
-      lay::GenericMarkerBase *marker = dynamic_cast<lay::GenericMarkerBase *> (*r);
+      lay::GenericMarkerBase *marker = dynamic_cast<lay::GenericMarkerBase *> (r->second);
       if (marker) {
         db::DCplxTrans dt = db::DCplxTrans (t) * db::DCplxTrans (m_move_trans).inverted ();
         marker->set_trans (dt * marker->trans ());
@@ -1655,18 +1691,31 @@ Service::tap (const db::DPoint & /*initial*/)
   //  .. nothing here ..
 }
 
+void
+Service::geometry_changing ()
+{
+  //  selection may become invalid (issue-1145)
+  m_selection_maybe_invalid = true;
+
+  //  clear the previous selection for safety
+  clear_previous_selection ();
+
+  selection_to_view ();
+}
+
 void 
 Service::selection_to_view ()
 {
   //  we don't handle the transient selection properly, so clear it for safety reasons
   clear_transient_selection ();
 
-  //  the selection objects need to be recreated since we destroyed the old markers
-  for (std::vector<lay::ViewObject *>::iterator r = m_markers.begin (); r != m_markers.end (); ++r) {
-    delete *r;
+  //  clear markers
+  for (auto r = m_markers.begin (); r != m_markers.end (); ++r) {
+    delete r->second;
   }
   m_markers.clear ();
 
+  //  postpone the actual work to collect multiple calls
   dm_selection_to_view ();
 }
 
@@ -1674,25 +1723,14 @@ void
 Service::do_selection_to_view ()
 {
   //  Hint: this is a lower bound:
-  m_markers.reserve (m_selection.size ());
+  m_markers.reserve (selection ().size ());
 
   //  build the transformation variants cache
   TransformationVariants tv (view ());
 
-  //  Reduce the selection to valid paths (issue-1145)
-  std::vector<std::set<lay::ObjectInstPath>::iterator> invalid_objects;
-  for (std::set<lay::ObjectInstPath>::iterator r = m_selection.begin (); r != m_selection.end (); ++r) {
-    if (! r->is_valid (view ())) {
-      invalid_objects.push_back (r);
-    }
-  }
-  for (auto i = invalid_objects.begin (); i != invalid_objects.end (); ++i) {
-    m_selection.erase (*i);
-  }
-
   //  Build markers
 
-  for (std::set<lay::ObjectInstPath>::iterator r = m_selection.begin (); r != m_selection.end (); ++r) {
+  for (std::set<lay::ObjectInstPath>::iterator r = selection ().begin (); r != selection ().end (); ++r) {
 
     const lay::CellView &cv = view ()->cellview (r->cv_index ());
 
@@ -1722,7 +1760,7 @@ Service::do_selection_to_view ()
             marker->set_dither_pattern (3); 
           } 
           marker->set (r->back ().inst_ptr, gt, *tv_list);
-          m_markers.push_back (marker);
+          m_markers.push_back (std::make_pair (r.operator-> (), marker));
 
         } else {
 
@@ -1735,7 +1773,7 @@ Service::do_selection_to_view ()
           } 
           db::box_convert<db::CellInst> bc (cv->layout ());
           marker->set (bc (r->back ().inst_ptr.cell_inst ().object ()), gt * r->back ().inst_ptr.cell_inst ().complex_trans (*r->back ().array_inst), *tv_list);
-          m_markers.push_back (marker);
+          m_markers.push_back (std::make_pair (r.operator-> (), marker));
 
         }
 
@@ -1766,7 +1804,7 @@ Service::do_selection_to_view ()
           marker->set_vertex_size (9 /*cross vertex size*/);
         }
 
-        m_markers.push_back (marker);
+        m_markers.push_back (std::make_pair (r.operator-> (), marker));
 
       }
 
@@ -1782,6 +1820,7 @@ Service::set_selection (std::vector <lay::ObjectInstPath>::const_iterator s1, st
 {
   m_selection.clear ();
   m_selection.insert (s1, s2);
+  m_selection_maybe_invalid = false;
   selection_to_view ();
 }
 
@@ -1891,11 +1930,11 @@ bool
 Service::handle_guiding_shape_changes ()
 {
   //  just allow one guiding shape to be selected
-  if (m_selection.empty ()) {
+  if (selection ().empty ()) {
     return false;
   }
 
-  std::pair<bool, lay::ObjectInstPath> gs = handle_guiding_shape_changes (*m_selection.begin ());
+  std::pair<bool, lay::ObjectInstPath> gs = handle_guiding_shape_changes (*selection ().begin ());
   if (gs.first) {
 
     //  remove superfluous proxies

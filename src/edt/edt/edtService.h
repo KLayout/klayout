@@ -109,7 +109,7 @@ public:
   /**
    *  @brief Highlights a group of objects
    */
-  void highlight (const std::vector<size_t> &n);
+  void highlight (const std::set<const lay::ObjectInstPath *> &highlights);
 
   /** 
    *  @brief "delete" operation
@@ -204,7 +204,7 @@ public:
    */
   void get_selection (std::vector <lay::ObjectInstPath> &selection) const;
 
-  /** 
+  /**
    *  @brief "transform" operation with a transformation vector
    *
    *  This version of the transformation operation allows one to specify a transformation per selected object.
@@ -229,18 +229,12 @@ public:
   /**
    *  @brief Get the selection container
    */
-  const objects &selection () const
-  {
-    return m_selection;
-  }
+  const objects &selection () const;
 
   /**
    *  @brief Get the transient selection container
    */
-  const objects &transient_selection () const
-  {
-    return m_transient_selection;
-  }
+  const objects &transient_selection () const;
 
   /**
    *  @brief Access to the view object
@@ -402,6 +396,13 @@ protected:
    *  @brief Update m_markers to reflect the selection
    */
   void selection_to_view ();
+
+  /**
+   *  @brief Callback when any geometry is changing in the layout
+   *
+   *  Will call selection_to_view() and invalidate the selection.
+   */
+  void geometry_changing ();
 
   /**
    *  @brief starts editing at the given point.
@@ -588,7 +589,7 @@ private:
   lay::LayoutViewBase *mp_view;
 
   //  The marker objects representing the selection
-  std::vector<lay::ViewObject *> m_markers;
+  std::vector<std::pair<const lay::ObjectInstPath *, lay::ViewObject *> > m_markers;
 
   //  Marker for the transient selection
   lay::ViewObject *mp_transient_marker;
@@ -602,8 +603,11 @@ private:
   //  True, if on the first mouse move an immediate do_begin_edit should be issued.
   bool m_immediate;
 
-  //  The selection
-  objects m_selection;
+  //  The selection (mutable because we clean it on the fly)
+  mutable objects m_selection;
+
+  //  A flag indicating that the selection may need cleanup
+  mutable bool m_selection_maybe_invalid;
 
   //  The previous selection (used for cycling through different selections for single clicks)
   objects m_previous_selection;
@@ -644,7 +648,7 @@ private:
 
   //  selective highlights
   bool m_highlights_selected;
-  std::set<size_t> m_selected_highlights;
+  std::set<const lay::ObjectInstPath *> m_selected_highlights;
 
   //  Deferred method to update the selection
   tl::DeferredMethod<edt::Service> dm_selection_to_view;

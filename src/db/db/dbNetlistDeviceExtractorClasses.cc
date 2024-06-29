@@ -144,7 +144,7 @@ void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db
           continue;
         }
 
-        //  normalize the diffusion polygons so that the S/D assignment is more predicable
+        //  normalize the diffusion polygons so that the S/D assignment is more predictable
         std::vector<db::Polygon> diffpoly;
         diffpoly.reserve (2);
         for (db::Region::const_iterator d2g = rdiff2gate.begin (); ! d2g.at_end (); ++d2g) {

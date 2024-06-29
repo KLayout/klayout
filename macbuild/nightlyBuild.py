@@ -537,9 +537,9 @@ def Build_Deploy():
 #------------------------------------------------------------------------------
 ## To run the QA tests
 #
-# @param[in] exclude     test to exclude such as 'pymod,pya'
+# @param[in] excludeList    list of tests to exclude such as ['pymod', 'pya']
 #------------------------------------------------------------------------------
-def Run_QATest( exclude ):
+def Run_QATest( excludeList ):
     pyRunnerQAT = "./macQAT.py"
     myPlatform  = Test_My_Platform()
     dirQAT      = Get_QAT_Directory( Get_Build_Target_Dict(), myPlatform )
@@ -548,7 +548,13 @@ def Run_QATest( exclude ):
         if key == "ana3" and qttype == 6: # anaconda3 does not provide Qt6 so far
             continue
 
-        command1 = [ pyRunnerQAT ] + [ '--run', '--exclude', '%s' % exclude ]
+        if key == "ana3":
+            excludeList += ['pymod']
+        exclude = ",".join( sorted( set(excludeList) ) )
+
+        command1 = [ pyRunnerQAT ] + [ '--run' ]
+        if not exclude == "":
+            command1 += [ '--exclude', '%s' % exclude ]
         print( dirQAT[(qttype, key)], command1 )
         #continue
         os.chdir( dirQAT[(qttype, key)] )
@@ -707,7 +713,7 @@ def Main():
     if Build:
         Build_Deploy()
     if QATest:
-        Run_QATest( 'pymod,pya' )
+        Run_QATest( [] ) # ex. ['pymod', 'pya']
     if QACheck:
         Check_QATest_Results( 20 )
     elif MakeDMG:

@@ -35,6 +35,9 @@
 #include <set>
 #include <stdexcept>
 #include <cstdint>
+#if __cplusplus >= 201703L
+#include <optional>
+#endif
 
 #if defined(HAVE_QT)
 #include <QString>

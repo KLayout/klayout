@@ -208,6 +208,7 @@ MarkerBase::set_view (LayoutViewBase *view)
 {
   if (mp_view != view) {
     mp_view = view;
+    mp_view->canvas ()->add_object (this);
     redraw ();
   }
 }

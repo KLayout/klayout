@@ -473,7 +473,6 @@ static LayerPropertiesConstIteratorWrapper each_layer2 (lay::LayoutViewBase *vie
 static void add_marker (lay::LayoutViewBase *view, lay::ManagedDMarker *object)
 {
   if (view->canvas ()) {
-    view->canvas ()->add_object (object);
     object->keep ();
     object->set_view (view);
   }
@@ -701,7 +700,7 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase ("lay", "LayoutVi
     "@brief Adds a persistent marker to the view (transferring ownership)\n"
     "\n"
     "This method allows creating markers and transferring ownership to the view, hence making them persistent. "
-    "This means, when the variable with the marker object goes out of scope, the marker will still exists in the view.\n"
+    "This means, when the variable with the marker object goes out of scope, the marker will still exist in the view.\n"
     "\n"
     "To create a persistent marker, use the following code:\n"
     "\n"

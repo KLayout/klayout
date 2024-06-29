@@ -28,6 +28,7 @@
 #include "layLayoutViewBase.h"
 #include "layDitherPattern.h"
 #include "layLineStyles.h"
+#include "layMarker.h"
 #include "dbSaveLayoutOptions.h"
 #include "dbLayoutToNetlist.h"
 #include "dbLayoutVsSchematic.h"
@@ -469,15 +470,16 @@ static LayerPropertiesConstIteratorWrapper each_layer2 (lay::LayoutViewBase *vie
   return LayerPropertiesConstIteratorWrapper (view->begin_layers (list_index));
 }
 
-static void add_object (lay::LayoutViewBase *view, lay::ViewObject *object)
+static void add_marker (lay::LayoutViewBase *view, lay::ManagedDMarker *object)
 {
   if (view->canvas ()) {
     view->canvas ()->add_object (object);
   }
 }
 
-static void clear_objects (lay::LayoutViewBase *view)
+static void clear_markers (lay::LayoutViewBase *view)
 {
+  //  NOTE: this will clear *all* persistent objects, not just our markers
   if (view->canvas ()) {
     view->canvas ()->clear_objects ();
   }
@@ -693,7 +695,7 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase ("lay", "LayoutVi
     "\n"
     "In 0.25, this method has been moved from MainWindow to LayoutView.\n"
   ) +
-  gsi::method_ext ("add_marker", &add_object, gsi::arg ("marker"),
+  gsi::method_ext ("add_marker", &add_marker, gsi::arg ("marker"),
     "@brief Adds a persistent marker to the view (transferring ownership)\n"
     "\n"
     "This method allows creating markers and transferring ownership to the view, hence making them persistent. "
@@ -711,7 +713,7 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase ("lay", "LayoutVi
     "\n"
     "Persistent markers have been introduced in version 0.29.3\n"
   ) +
-  gsi::method_ext ("clear_markers", &clear_objects,
+  gsi::method_ext ("clear_markers", &clear_markers,
     "@brief Clears all persistent markers from the view\n"
     "See \\add_marker for details about persistent markers.\n"
     "\n"

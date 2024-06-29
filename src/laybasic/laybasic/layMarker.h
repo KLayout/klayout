@@ -40,6 +40,7 @@
 #include "dbEdgePair.h"
 #include "dbArray.h"
 #include "gsi.h"
+#include "gsiObject.h"
 
 namespace lay
 {
@@ -829,6 +830,21 @@ private:
   } m_object;
 
   lay::LayoutViewBase *mp_view;
+};
+
+/**
+ *  @brief A managed version of the marker class
+ *
+ *  It uses gsi::ObjectBase as a base class and serves as
+ *  proxy for GSI binding.
+ */
+class ManagedDMarker
+  : public lay::DMarker, public gsi::ObjectBase
+{
+public:
+  ManagedDMarker (lay::LayoutViewBase *view)
+    : lay::DMarker (view)
+  { }
 };
 
 }

@@ -407,7 +407,7 @@ DeepRegion::begin_iter () const
   } else {
 
     const db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
-    db::RecursiveShapeIterator iter (deep_layer ().layout (), top_cell, deep_layer ().layer ());
+    db::RecursiveShapeIterator iter (layout, top_cell, deep_layer ().layer ());
     return std::make_pair (iter, db::ICplxTrans ());
 
   }
@@ -803,7 +803,7 @@ DeepRegion::and_with (const Region &other, PropertyConstraint property_constrain
 
   } else {
 
-    return new DeepRegion (and_or_not_with (other_deep, true, property_constraint));
+    return new DeepRegion (and_with_impl (other_deep, property_constraint));
 
   }
 }
@@ -827,7 +827,7 @@ DeepRegion::not_with (const Region &other, PropertyConstraint property_constrain
 
   } else {
 
-    return new DeepRegion (and_or_not_with (other_deep, false, property_constraint));
+    return new DeepRegion (not_with_impl (other_deep, property_constraint));
 
   }
 }
@@ -875,13 +875,13 @@ DeepRegion::andnot_with (const Region &other, PropertyConstraint property_constr
 }
 
 DeepLayer
-DeepRegion::and_or_not_with (const DeepRegion *other, bool and_op, db::PropertyConstraint property_constraint) const
+DeepRegion::and_with_impl (const DeepRegion *other, db::PropertyConstraint property_constraint) const
 {
   DeepLayer dl_out (deep_layer ().derived ());
 
   if (pc_skip (property_constraint)) {
 
-    db::BoolAndOrNotLocalOperation op (and_op);
+    db::BoolAndOrNotLocalOperation op (true);
 
     db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&deep_layer ().layout ()), const_cast<db::Cell *> (&deep_layer ().initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell (), deep_layer ().breakout_cells (), other->deep_layer ().breakout_cells ());
     configure_proc (proc);
@@ -893,7 +893,7 @@ DeepRegion::and_or_not_with (const DeepRegion *other, bool and_op, db::PropertyC
 
   } else {
 
-    db::BoolAndOrNotLocalOperationWithProperties op (and_op, &dl_out.layout ().properties_repository (), &deep_layer ().layout ().properties_repository (), &other->deep_layer ().layout ().properties_repository (), property_constraint);
+    db::BoolAndOrNotLocalOperationWithProperties op (true, &dl_out.layout ().properties_repository (), &deep_layer ().layout ().properties_repository (), &other->deep_layer ().layout ().properties_repository (), property_constraint);
 
     db::local_processor<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties> proc (const_cast<db::Layout *> (&deep_layer ().layout ()), const_cast<db::Cell *> (&deep_layer ().initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell (), deep_layer ().breakout_cells (), other->deep_layer ().breakout_cells ());
     configure_proc (proc);
@@ -902,6 +902,109 @@ DeepRegion::and_or_not_with (const DeepRegion *other, bool and_op, db::PropertyC
     proc.set_max_vertex_count (deep_layer ().store ()->max_vertex_count ());
 
     proc.run (&op, deep_layer ().layer (), other->deep_layer ().layer (), dl_out.layer ());
+
+  }
+
+  return dl_out;
+}
+
+DeepLayer
+DeepRegion::not_with_impl (const DeepRegion *other, db::PropertyConstraint property_constraint) const
+{
+  DeepLayer dl_out (deep_layer ().derived ());
+  DeepLayer dl_prep;
+
+  //  first run a local-only task, which is trivial if the layouts are the same
+  //  TODO: consider property constraints too.
+
+  if (deep_layer ().layout_index () == other->deep_layer ().layout_index () && pc_skip (property_constraint)) {
+
+    dl_prep = deep_layer ().derived ();
+
+    unsigned int layer_this = deep_layer ().layer ();
+    unsigned int layer_other = other->deep_layer ().layer ();
+    unsigned int layer_out = dl_prep.layer ();
+
+    db::Layout &layout = dl_prep.layout ();
+
+    bool any = false;
+
+    if (layer_this != layer_other) {
+
+      std::set<db::cell_index_type> called;
+      deep_layer ().initial_cell ().collect_called_cells (called);
+      called.insert (deep_layer ().initial_cell ().cell_index ());
+
+      for (auto ci = called.begin (); ci != called.end (); ++ci) {
+
+        db::Cell &cell = layout.cell (*ci);
+        db::Shapes &shapes_out = cell.shapes (layer_out);
+        const db::Shapes &shapes_this = cell.shapes (layer_this);
+        const db::Shapes &shapes_other = cell.shapes (layer_other);
+
+        db::Box overlap = (shapes_this.bbox () & shapes_other.bbox ());
+
+        if (! overlap.empty ()) {
+
+          std::set<db::PolygonRef> others;
+          for (auto si = shapes_other.begin (db::ShapeIterator::Polygons); ! si.at_end (); ++si) {
+            if (si->type () == db::Shape::PolygonRef) {
+              others.insert (si->polygon_ref ());
+            }
+          }
+
+          for (auto si = shapes_this.begin (db::ShapeIterator::Polygons); ! si.at_end (); ++si) {
+            if (si->type () == db::Shape::PolygonRef && others.find (si->polygon_ref ()) != others.end ()) {
+              //  drop duplicate
+            } else {
+              any = true;
+              shapes_out.insert (*si);
+            }
+          }
+
+        } else if (! shapes_this.empty ()) {
+
+          any = true;
+          shapes_out = shapes_this;
+
+        }
+
+      }
+
+    }
+
+    //  stop if empty
+    if (! any) {
+      return dl_prep;
+    }
+
+  } else {
+    dl_prep = deep_layer ();
+  }
+
+  if (pc_skip (property_constraint)) {
+
+    db::BoolAndOrNotLocalOperation op (false);
+
+    db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&deep_layer ().layout ()), const_cast<db::Cell *> (&deep_layer ().initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell (), deep_layer ().breakout_cells (), other->deep_layer ().breakout_cells ());
+    configure_proc (proc);
+    proc.set_threads (deep_layer ().store ()->threads ());
+    proc.set_area_ratio (deep_layer ().store ()->max_area_ratio ());
+    proc.set_max_vertex_count (deep_layer ().store ()->max_vertex_count ());
+
+    proc.run (&op, dl_prep.layer (), other->deep_layer ().layer (), dl_out.layer ());
+
+  } else {
+
+    db::BoolAndOrNotLocalOperationWithProperties op (false, &dl_out.layout ().properties_repository (), &deep_layer ().layout ().properties_repository (), &other->deep_layer ().layout ().properties_repository (), property_constraint);
+
+    db::local_processor<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties> proc (const_cast<db::Layout *> (&deep_layer ().layout ()), const_cast<db::Cell *> (&deep_layer ().initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell (), deep_layer ().breakout_cells (), other->deep_layer ().breakout_cells ());
+    configure_proc (proc);
+    proc.set_threads (deep_layer ().store ()->threads ());
+    proc.set_area_ratio (deep_layer ().store ()->max_area_ratio ());
+    proc.set_max_vertex_count (deep_layer ().store ()->max_vertex_count ());
+
+    proc.run (&op, dl_prep.layer (), other->deep_layer ().layer (), dl_out.layer ());
 
   }
 
@@ -1008,8 +1111,8 @@ DeepRegion::xor_with (const Region &other, db::PropertyConstraint property_const
       other_deep_mapped->disable_progress ();
     }
 
-    DeepLayer n1 (and_or_not_with (other_deep_mapped.get (), false, property_constraint));
-    DeepLayer n2 (other_deep_mapped->and_or_not_with (this, false, property_constraint));
+    DeepLayer n1 (not_with_impl (other_deep_mapped.get (), property_constraint));
+    DeepLayer n2 (other_deep_mapped->not_with_impl (this, property_constraint));
     n1.add_from (n2);
 
     return new DeepRegion (n1);

@@ -51,6 +51,7 @@ class RecursiveShapeReceiver;
  *  shape classes and shape properties. 
  */
 class DB_PUBLIC RecursiveShapeIterator
+  : public gsi::ObjectBase
 {
 public:
   typedef db::Layout layout_type;

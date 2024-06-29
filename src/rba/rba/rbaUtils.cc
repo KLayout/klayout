@@ -127,26 +127,23 @@ exceptions_blocked ()
 }
 
 void
-rba_check_error ()
+rba_check_error (int state)
 {
   VALUE lasterr = rb_errinfo ();
 
-  //  NOTE: this seems to be required to avoid segfaults on Ruby 2.3.1 after
-  //  a break was encountered.
-  rb_set_errinfo (Qnil);
-
-  //  Ruby employs this pseudo-exception to indicate a "break" of a loop
+  //  Ruby employs this pseudo-exception to indicate a "break" or "return" of a loop.
+  //  As this is an opaque condition, we continue Ruby execution later through a "RubyContinueException".
 #if HAVE_RUBY_VERSION_CODE < 10900
   if (lasterr == Qnil) {
-    throw tl::CancelException ();
+    throw RubyContinueException (state);
   }
 #elif HAVE_RUBY_VERSION_CODE < 20300
   if (TYPE (lasterr) == T_NODE) {
-    throw tl::CancelException ();
+    throw RubyContinueException (state);
   }
 #else
   if (TYPE (lasterr) == T_IMEMO) {
-    throw tl::CancelException ();
+    throw RubyContinueException (state);
   }
 #endif
 
@@ -405,7 +402,7 @@ rba_class_new_instance_checked (int argc, VALUE *argv, VALUE klass)
   RUBY_END_EXEC
 
   if (error) {
-    rba_check_error ();
+    rba_check_error (error);
   }
   return ret;
 }
@@ -458,7 +455,7 @@ VALUE rba_funcall2_checked (VALUE obj, ID id, int argc, VALUE *args)
   RUBY_END_EXEC
 
   if (error) {
-    rba_check_error ();
+    rba_check_error (error);
   }
   return ret;
 }
@@ -497,7 +494,7 @@ rba_f_eval_checked (int argc, VALUE *argv, VALUE self)
   RUBY_END_EXEC
 
   if (error) {
-    rba_check_error ();
+    rba_check_error (error);
   }
   return ret;
 }
@@ -513,7 +510,7 @@ rba_yield_checked (VALUE value)
   RUBY_END_EXEC
 
   if (error) {
-    rba_check_error ();
+    rba_check_error (error);
   }
 }
 

@@ -1,0 +1,36 @@
+
+source $drc_test_source
+report_netlist $drc_test_target
+
+deep
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+l3 = input(3, 0)
+
+active = input(10, 0)
+poly = input(11, 0)
+contact = input(12, 0)
+
+sd = active - poly
+gate = active & poly
+
+name(l1, "l1")
+name(l2, "l2")
+name(l3, "l3", RBA::LayerInfo::new(3, 0, "l3"))
+name(sd, "sd", 17, 0)
+name(poly, "poly", 11)
+name(gate, "gate")
+name(contact, "contact")
+
+mos_ex = RBA::DeviceExtractorMOS3Transistor::new("MOS")
+extract_devices(mos_ex, { "SD" => sd, "G" => gate, "P" => poly })
+
+connect(contact, poly)
+connect(contact, sd)
+connect(l1, contact)
+connect(l1, l2)
+connect(l2, l3)
+
+netlist 
+

@@ -665,7 +665,7 @@ class Basic_TestClass < TestBase
     if !$leak_check 
 
       begin
-        b.b10 { |a| arr.push(a.get_n) }  # b10 is a const iterator - cannot call a1 on it
+        b.each_a_be { |a| arr.push(a.get_n) }  # b10 is a const iterator - cannot call a1 on it
       rescue 
         err_caught = true
       end
@@ -679,7 +679,7 @@ class Basic_TestClass < TestBase
     if !$leak_check 
 
       begin
-        b.b10p { |a| arr.push(a.get_n) }  # b10p is a const iterator - cannot call a1 on it
+        b.each_a_be_pp { |a| arr.push(a.get_n) }  # b10p is a const iterator - cannot call a1 on it
       rescue 
         err_caught = true
       end
@@ -689,85 +689,85 @@ class Basic_TestClass < TestBase
     end
    
     arr = []
-    b.b10 { |a| arr.push(a.dup.get_n) } 
+    b.each_a_be { |a| arr.push(a.dup.get_n) } 
     assert_equal(arr, [100, 121, 144])
 
     arr = []
-    b.dup.b10 { |a| arr.push(a.dup.get_n) } 
+    b.dup.each_a_be { |a| arr.push(a.dup.get_n) } 
     assert_equal(arr, [100, 121, 144])
 
     arr = []
-    b.b10 { |a| arr.push(a.get_n_const) } 
+    b.each_a_be { |a| arr.push(a.get_n_const) } 
     assert_equal(arr, [100, 121, 144])
 
     arr = []
-    b.b10p { |a| arr.push(a.dup.get_n) } 
+    b.each_a_be_pp { |a| arr.push(a.dup.get_n) } 
     assert_equal(arr, [100, 121, 144])
 
     arr = []
-    b.dup.b10p { |a| arr.push(a.dup.get_n) } 
+    b.dup.each_a_be_pp { |a| arr.push(a.dup.get_n) } 
     assert_equal(arr, [100, 121, 144])
 
     arr = []
-    b.b10p { |a| arr.push(a.get_n_const) } 
+    b.each_a_be_pp { |a| arr.push(a.get_n_const) } 
     assert_equal(arr, [100, 121, 144])
 
     arr = []
-    b.b11 { |a| arr.push(a.get_n) } 
+    b.each_a_be_v { |a| arr.push(a.get_n) } 
     assert_equal(arr, [100, 121, 144])
 
     arr = []
-    b.dup.b11 { |a| arr.push(a.get_n) } 
+    b.dup.each_a_be_v { |a| arr.push(a.get_n) } 
     assert_equal(arr, [100, 121, 144])
 
     arr = []
-    b.b12 { |a| arr.push(a.get_n) } 
+    b.each_a_be_p { |a| arr.push(a.get_n) } 
     assert_equal(arr, [7100, 7121, 7144, 7169])
 
     arr = []
-    b.dup.b12 { |a| arr.push(a.get_n) } 
+    b.dup.each_a_be_p { |a| arr.push(a.get_n) } 
     assert_equal(arr, [7100, 7121, 7144, 7169])
 
-    aarr = b.b16a 
+    aarr = b.av
     arr = []
     aarr.each { |a| arr.push(a.get_n) } 
     assert_equal(arr, [100, 121, 144])
 
-    aarr = b.b16b 
+    aarr = b.av_cref
     arr = []
     aarr.each { |a| arr.push(a.get_n) } 
     assert_equal(arr, [100, 121, 144])
 
-    aarr = b.b16c 
+    aarr = b.av_ref
     arr = []
     aarr.each { |a| arr.push(a.get_n) } 
     assert_equal(arr, [100, 121, 144])
 
-    b.b17a( [ RBA::A.new_a( 101 ), RBA::A.new_a( -122 ) ] )
+    b.av_cref = [ RBA::A.new_a( 101 ), RBA::A.new_a( -122 ) ]
     arr = []
-    b.b11 { |a| arr.push(a.get_n) } 
+    b.each_a_be_v { |a| arr.push(a.get_n) } 
     assert_equal(arr, [101, -122])
 
-    b.b17a( [] )
+    b.av_cref = []
     arr = []
-    b.b11 { |a| arr.push(a.get_n) } 
+    b.each_a_be_v { |a| arr.push(a.get_n) } 
     assert_equal(arr, [])
 
-    b.b17b( [ RBA::A.new_a( 102 ), RBA::A.new_a( -123 ) ] )
+    b.av_ref = [ RBA::A.new_a( 102 ), RBA::A.new_a( -123 ) ]
     arr = []
-    b.b11 { |a| arr.push(a.get_n) } 
+    b.each_a_be_v { |a| arr.push(a.get_n) } 
     assert_equal(arr, [102, -123])
 
-    b.b17c( [ RBA::A.new_a( 100 ), RBA::A.new_a( 121 ), RBA::A.new_a( 144 ) ] )
+    b.av = [ RBA::A.new_a( 100 ), RBA::A.new_a( 121 ), RBA::A.new_a( 144 ) ]
     arr = []
-    b.b11 { |a| arr.push(a.get_n) } 
+    b.each_a_be_v { |a| arr.push(a.get_n) } 
     assert_equal(arr, [100, 121, 144])
 
     if !$leak_check 
 
       arr = []
       begin
-        b.b13 { |a| arr.push(a.get_n) } 
+        b.each_a_be_cp { |a| arr.push(a.get_n) } 
       rescue 
         err_caught = true
       end
@@ -777,11 +777,11 @@ class Basic_TestClass < TestBase
     end
 
     arr = []
-    b.b13 { |a| arr.push(a.get_n_const) } 
+    b.each_a_be_cp { |a| arr.push(a.get_n_const) } 
     assert_equal(arr, [-3100, -3121])
 
     arr = []
-    b.dup.b13 { |a| arr.push(a.get_n_const) } 
+    b.dup.each_a_be_cp { |a| arr.push(a.get_n_const) } 
     assert_equal(arr, [-3100, -3121])
 
     arr = []
@@ -935,6 +935,38 @@ class Basic_TestClass < TestBase
     arr = []
     b.each_b_ptr { |bb| arr.push(bb.str) } 
     assert_equal(arr, ["axx", "yxx", "uuxx"])
+
+  end
+
+  def _iter_find(b, find)
+    b.each_a_be do |a| 
+      if a.get_n_const == find
+        return true
+      end
+    end
+    return false
+  end
+
+  # Iterator break, return, continue
+  def test_13c
+
+    b = RBA::B.new
+
+    arr = []
+    b.each_a_be { |a| arr.push(a.get_n_const) } 
+    assert_equal(arr, [100, 121, 144])
+
+    arr = []
+    b.each_a_be do |a| 
+      if a.get_n_const == 121
+        next
+      end
+      arr.push(a.get_n_const) 
+    end
+    assert_equal(arr, [100, 144])
+
+    assert_equal(_iter_find(b, 121), true)
+    assert_equal(_iter_find(b, 122), false)
 
   end
 

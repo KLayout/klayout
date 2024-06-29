@@ -42,7 +42,6 @@ namespace db
 OASISReader::OASISReader (tl::InputStream &s)
   : m_stream (s),
     m_progress (tl::to_string (tr ("Reading OASIS file")), 10000),
-    m_dbu (0.001),
     m_expect_strict_mode (-1),
     mm_repetition (this, "repetition"),
     mm_placement_cell (this, "placement-cell"),
@@ -648,8 +647,7 @@ OASISReader::do_read (db::Layout &layout)
   }
 
   //  compute database unit in pixel per meter
-  m_dbu = 1.0e-6 / res;
-  layout.dbu (m_dbu * 1e6);
+  layout.dbu (1.0 / res);
 
   //  read over table offsets if required
   bool table_offsets_at_end = get_uint ();

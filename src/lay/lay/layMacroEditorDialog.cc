@@ -1507,29 +1507,39 @@ MacroEditorDialog::eventFilter (QObject *obj, QEvent *event)
     return false;
   }
 
-  if (lay::BusySection::is_busy () && (m_in_breakpoint || m_in_exec) && (dynamic_cast <QInputEvent *> (event) != 0 || dynamic_cast <QPaintEvent *> (event) != 0)) {
+  if (m_in_exec) {
 
-    //  In breakpoint or execution mode and while processing the events from the debugger, 
-    //  ignore all input or paint events targeted to widgets which are not children of this or the assistant dialog.
-    //  Ignoring the paint event is required because otherwise a repaint action would be triggered on a layout which 
-    //  is potentially unstable or inconsistent.
-    //  We nevertheless allow events send to a HelpDialog or ProgressWidget since those are vital for the application's
-    //  functionality and are known not to cause any interference.
-    QObject *rec = obj;
-    while (rec && (rec != this && !dynamic_cast<lay::HelpDialog *> (rec) && !dynamic_cast<lay::ProgressWidget *> (rec))) {
-      rec = rec->parent ();
+    if (lay::BusySection::is_busy ()) {
+
+#if 0
+      if (dynamic_cast <QInputEvent *> (event) != 0 || dynamic_cast <QPaintEvent *> (event) != 0) {
+
+        //  In breakpoint or execution mode and while processing the events inside the debugger,
+        //  ignore all input or paint events targeted to widgets which are not children of this or the assistant dialog.
+        //  Ignoring the paint event is required because otherwise a repaint action would be triggered on a layout which
+        //  is potentially unstable or inconsistent.
+        //  We nevertheless allow events send to a HelpDialog or ProgressWidget since those are vital for the application's
+        //  functionality and are known not to cause any interference.
+        QObject *rec = obj;
+        while (rec && (rec != this && !dynamic_cast<lay::HelpDialog *> (rec) && !dynamic_cast<lay::ProgressWidget *> (rec))) {
+          rec = rec->parent ();
+        }
+        if (! rec) {
+          //  TODO: reschedule the paint events (?)
+          return true;
+        }
+
+      }
+#endif
+
+    } else {
+
+      //  While no explicit event processing is in progress and we are executing, this is an indication that
+      //  "real" events are processed. In that case, we can postpone excplit processing. This avoids interference
+      //  with GUI code run in the debugger.
+      m_last_process_events = tl::Clock::current ();
+
     }
-    if (! rec) {
-      //  TODO: reschedule the paint events (?)
-      return true;
-    }
-
-  } else if (! lay::BusySection::is_busy ()  && m_in_exec) {
-
-    //  While no explicit event processing is in progress and we are executing, this is an indication that
-    //  "real" events are processed. In that case, we can postpone excplit processing. This avoids interference
-    //  with GUI code run in the debugger.
-    m_last_process_events = tl::Clock::current ();
 
   }
 
@@ -3054,6 +3064,8 @@ MacroEditorDialog::start_exec (gsi::Interpreter *ec)
     return;
   } else if (m_ignore_exec_events) {
     return;
+  } else if (lay::BusySection::is_busy () || m_in_breakpoint) {
+    return;
   }
 
   //  prevents recursion
@@ -3215,7 +3227,7 @@ MacroEditorDialog::exception_thrown (gsi::Interpreter *interpreter, size_t file_
   exit_if_needed ();
 
   //  avoid recursive breakpoints and exception catches from the console while in a breakpoint or exception stop
-  if (lay::BusySection::is_busy ()) {
+  if (lay::BusySection::is_busy () || m_in_breakpoint) {
     return;
   }
 
@@ -3317,7 +3329,7 @@ MacroEditorDialog::trace (gsi::Interpreter *interpreter, size_t file_id, int lin
   exit_if_needed ();
 
   //  avoid recursive breakpoints and exception catches from the console while in a breakpoint or exception stop
-  if (lay::BusySection::is_busy ()) {
+  if (lay::BusySection::is_busy () || m_in_breakpoint) {
     return;
   }
 
@@ -3682,7 +3694,7 @@ MacroEditorDialog::stop_button_clicked ()
 {
   if (QApplication::activeModalWidget () == this) {
     //  close this window if it was shown in modal mode
-    accept ();
+    QDialog::accept ();
   }
 
   m_in_exec = false;
@@ -3748,11 +3760,8 @@ MacroEditorDialog::run (int stop_stack_depth, lym::Macro *macro)
 
     if (QApplication::activeModalWidget () == this) {
       //  close this window if it was shown in modal mode
-      accept ();
+      QDialog::accept ();
     }
-
-    //  in a breakpoint
-    m_in_breakpoint = false;
 
   } else {
 

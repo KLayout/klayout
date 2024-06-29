@@ -299,6 +299,8 @@ module DRC
     # @name name
     # @brief Assigns a name to a layer
     # @synopsis name(layer, name)
+    # @synopsis name(layer, name, layer_number, datatype_number)
+    # @synopsis name(layer, name, layer_info)
     # Layer names are listed in the LayoutToNetlist (L2N) or LVS database. They
     # are used to identify the layers, the net or device terminal geometries are
     # on. It is usual to have computed layers, so it is necessary to indicate the
@@ -325,6 +327,12 @@ module DRC
     #
     # \name can only be used once on a layer and the layer names must be 
     # unique (not taken by another layer).
+    #
+    # The layer/datatype or LayerInfo specification is optional and will
+    # be used to configure the internal layout. This information is also
+    # persisted inside database files. Specifying a layer/datatype information
+    # is useful, if a layer is not an original layer, but is to be restored
+    # to an actual layout layer later.
 
     # %DRC%
     # @name name_prefix
@@ -332,12 +340,32 @@ module DRC
     # @synopsis name_prefix(prefix)
     # See \\name for details. The default prefix is "l".
 
-    def name(l, name)
+    def name(*args)
 
       @engine._context("name") do
 
+        if args.size < 2 || args.size > 4
+          raise("Two to four arguments expected (layer, name, [layer, datatype / layer properties])")
+        end
+
+        l = args[0]
         l.is_a?(DRC::DRCLayer) || raise("First argument must be a layer")
+
+        name = args[1]
         (name.is_a?(String) && name != "") || raise("Second argument must be a non-empty string")
+
+        lp = args[2]
+        if lp
+          if !lp.is_a?(RBA::LayerInfo)
+            lnum = args[2]
+            dnum = args[3] || 0
+            lnum.is_a?(1.class) || raise("Layer argument needs to be a RBA::LayerInfo object or a layer number")
+            dnum.is_a?(1.class) || raise("Datatype argument needs to be an integer")
+            lp = RBA::LayerInfo::new(lnum, dnum)
+          elsif args[3]
+            raise("Three arguments are enough with RBA::LayerInfo")
+          end
+        end
 
         id = l.data.data_id 
 
@@ -349,7 +377,7 @@ module DRC
           return
         end
         
-        self._register_layer(l.data, "name", name)
+        self._register_layer(l.data, "name", name, lp)
 
       end
 
@@ -828,7 +856,7 @@ module DRC
 
   protected
 
-    def _register_layer(data, context, name = nil)
+    def _register_layer(data, context, name = nil, lp = nil)
 
       id = data.data_id 
       ensure_data
@@ -846,7 +874,12 @@ module DRC
       @layers[id] = [ data, name, context ]
 
       # every layer gets registered and intra-layer connections are made
-      @l2n.register(data, name)
+      index = @l2n.register(data, name)
+
+      # set the layer properties if requested
+      if lp
+        @l2n.internal_layout.set_info(index, lp)
+      end
 
     end
     

@@ -66,6 +66,26 @@ private:
 };
 
 /**
+ *  @brief A class responsible for forwarding exceptions raised from "break", "return" and other flow control functions
+ */
+class RubyContinueException
+  : public tl::CancelException
+{
+public:
+  RubyContinueException (int state)
+    : tl::CancelException (), m_state (state)
+  { }
+
+  int state () const
+  {
+    return m_state;
+  }
+
+private:
+  int m_state;
+};
+
+/**
  *  @brief The proxy object that represents the C++ object on the Ruby side
  */
 class Proxy

@@ -124,7 +124,6 @@ private:
   tl::InputStream &m_stream;
   tl::AbsoluteProgress m_progress;
   std::string m_cellname;
-  double m_dbu;
   int m_expect_strict_mode;
   size_t m_first_cellname;
   size_t m_first_propname;

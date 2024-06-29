@@ -870,6 +870,12 @@ handle_exception (const std::string & /*where*/, rba::RubyError &ex)
 }
 
 static void
+handle_exception (rba::RubyContinueException &ex)
+{
+  rb_jump_tag (ex.state ());
+}
+
+static void
 handle_exception (const std::string &where, tl::Exception &ex)
 {
   VALUE error_msg = rb_str_new2 ((ex.msg () + tl::to_string (tr (" in ")) + where).c_str ()); \
@@ -897,6 +903,8 @@ handle_exception (const std::string &where)
     handle_exception ((where), ex); \
   } catch (tl::ExitException &ex) { \
     handle_exception ((where), ex); \
+  } catch (rba::RubyContinueException &ex) { \
+    handle_exception (ex); \
   } catch (rba::RubyError &ex) { \
     handle_exception ((where), ex); \
   } catch (tl::Exception &ex) { \
@@ -1381,23 +1389,17 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
         std::unique_ptr<gsi::IterAdaptorAbstractBase> iter ((gsi::IterAdaptorAbstractBase *) retlist.read<void *> (heap));
         if (iter.get ()) {
 
-          try {
+          gsi::SerialArgs rr (iter->serial_size ());
+          while (! iter->at_end ()) {
 
-            gsi::SerialArgs rr (iter->serial_size ());
-            while (! iter->at_end ()) {
+            rr.reset ();
+            iter->get (rr);
 
-              rr.reset ();
-              iter->get (rr);
+            VALUE value = pull_arg (meth->ret_type (), p, rr, heap);
+            rba_yield_checked (value);
 
-              VALUE value = pull_arg (meth->ret_type (), p, rr, heap);
-              rba_yield_checked (value);
+            iter->inc ();
 
-              iter->inc ();
-
-            }
-
-          } catch (tl::CancelException &) {
-            //  break encountered
           }
 
         }
@@ -2402,7 +2404,7 @@ RubyInterpreter::require (const std::string &filename_utf8)
   RUBY_END_EXEC
 
   if (error) {
-    rba_check_error ();
+    rba_check_error (error);
   }
 }
 
@@ -2423,7 +2425,7 @@ RubyInterpreter::load_file (const std::string &filename_utf8)
   RUBY_END_EXEC
 
   if (error) {
-    rba_check_error ();
+    rba_check_error (error);
   }
 }
 

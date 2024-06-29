@@ -62,9 +62,31 @@ public:
   virtual void read (Database &db) 
   {
     try {
+      //  TODO: do not allow waivers here?
+      //  (otherwise, description lines like "WE0 ..." would be read as waivers)
       do_read (db);
     } catch (tl::Exception &ex) {
       error (ex.msg ()); 
+    }
+
+    try {
+
+      //  try to find a waiver database and apply it if possible
+      std::string waived_source = m_input_stream.source () + ".waived";
+
+      tl::InputStream is_waived (waived_source);
+
+      try {
+        Database db_waived;
+        RVEReader reader_waived (is_waived);
+        reader_waived.do_read (db_waived);
+        db.apply (db_waived);
+      } catch (tl::Exception &ex) {
+        warn (ex.msg ());
+      }
+
+    } catch (...) {
+      //  ignore stream errors
     }
   }
 
@@ -157,7 +179,16 @@ public:
           while (*cp && isspace (*cp)) {
             ++cp;
           }
-          waivers.insert (std::make_pair (n, std::string ())).first->second = cp;
+
+          auto wi = waivers.insert (std::make_pair (n, std::string ()));
+          //  NOTE: first line is skipped (author, time)
+          if (! wi.second) {
+            std::string &s = wi.first->second;
+            if (! s.empty ()) {
+              s += "\n";
+            }
+            s += cp;
+          }
 
         } else {
 
@@ -176,7 +207,6 @@ public:
 
         std::map<size_t, std::string>::const_iterator w = waivers.find (shape);
         bool waived = (w != waivers.end ());
-        //  TODO: add waiver string somehow ...
 
         if (at_end ()) {
           warn (tl::to_string (tr ("Unexpected end of file before the specified number of shapes was read - stopping.")));
@@ -406,6 +436,7 @@ public:
         Item *item = db.create_item (cell->id (), cath->id ());
         if (waived) {
           db.add_item_tag (item, waived_tag_id);
+          item->set_comment (w->second);
         }
 
         item->values ().swap (values);

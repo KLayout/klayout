@@ -317,7 +317,7 @@ public:
    *  In addition to regions, text collections can be registered too.
    *  Including texts in "connect" makes net names begin assigned from the text strings.
    */
-  void register_layer (const ShapeCollection &collection, const std::string &name = std::string ());
+  unsigned int register_layer (const ShapeCollection &collection, const std::string &name = std::string ());
 
   /**
    *  @brief Gets the name of the given collection

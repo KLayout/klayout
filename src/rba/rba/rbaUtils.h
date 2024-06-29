@@ -190,7 +190,7 @@ namespace rba
 
 tl::BacktraceElement rba_split_bt_information (const char *m, size_t l);
 void rba_get_backtrace_from_array (VALUE backtrace, std::vector<tl::BacktraceElement> &bt, unsigned int skip);
-void rba_check_error ();
+void rba_check_error (int state);
 VALUE rba_string_value_f (VALUE obj);
 VALUE rba_safe_string_value (VALUE obj);
 VALUE rba_safe_obj_as_string (VALUE obj);
@@ -265,7 +265,7 @@ R rba_safe_func (R (*f) (A), A arg)
   RUBY_END_EXEC
 
   if (error) {
-    rba_check_error ();
+    rba_check_error (error);
   }
   return cp.r;
 }

@@ -1297,10 +1297,10 @@ static gsi::Class<B> decl_b ("", "B",
   gsi::method ("an_cref", &B::an_cref) +
   //  implemented by extension below:
   // gsi::iterator_ext ("b10", &b10b_ext, &b10e_ext) +
-  gsi::iterator ("b10_nc", &B::b10b_nc, &B::b10e_nc) +
-  gsi::iterator ("b11", &B::b11b, &B::b11e) +
-  gsi::iterator ("b12", &B::b12b, &B::b12e) +
-  gsi::iterator ("b13", &B::b13b, &B::b13e) +
+  gsi::iterator ("b10_nc|each_a_be_nc", &B::b10b_nc, &B::b10e_nc) +
+  gsi::iterator ("b11|each_a_be_v", &B::b11b, &B::b11e) +
+  gsi::iterator ("b12|each_a_be_p", &B::b12b, &B::b12e) +
+  gsi::iterator ("b13|each_a_be_cp", &B::b13b, &B::b13e) +
   gsi::method ("amember_or_nil_alt|amember_or_nil", &B::amember_or_nil) +
   gsi::method ("amember_ptr_alt|amember_ptr", &B::amember_ptr) +
   gsi::method ("xxx|amember_cptr", &B::amember_cptr) +
@@ -1444,8 +1444,8 @@ static gsi::Class<B> decl_b ("", "B",
 
 //  extending B
 static gsi::ClassExt<B> b_ext ( 
-  gsi::iterator_ext ("b10", &b10b_ext, &b10e_ext) +
-  gsi::iterator_ext ("b10p", &b10bp_ext, &b10ep_ext) 
+  gsi::iterator_ext ("b10|each_a_be", &b10b_ext, &b10e_ext) +
+  gsi::iterator_ext ("b10p|each_a_be_pp", &b10bp_ext, &b10ep_ext)
 );
 
 CopyDetector *new_cd (int x)

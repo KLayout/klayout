@@ -55,7 +55,7 @@ echo "Generating stubs for tl .."
 $python $inst/stubgen.py tl >$pyi_srcdir/tlcore.pyi
 
 echo "Generating stubs for db .."
-$python $inst/stubgen.py db tl >$pyi_srcdir/dbcore.pyi
+$python $inst/stubgen.py db tl,lay,rdb >$pyi_srcdir/dbcore.pyi
 
 echo "Generating stubs for rdb .."
 $python $inst/stubgen.py rdb tl,db >$pyi_srcdir/rdbcore.pyi

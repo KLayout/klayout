@@ -1,5 +1,6 @@
 from typing import Any, ClassVar, Dict, Sequence, List, Iterator, Optional
 from typing import overload
+from __future__ import annotations
 import klayout.tl as tl
 import klayout.db as db
 import klayout.rdb as rdb
@@ -39,6 +40,7 @@ class AbstractMenu:
         r"""
         @hide
         """
+        ...
     @classmethod
     def pack_key_binding(cls, path_to_keys: Dict[str, str]) -> str:
         r"""
@@ -47,6 +49,7 @@ class AbstractMenu:
 
         This method has been introduced in version 0.26.
         """
+        ...
     @classmethod
     def pack_menu_items_hidden(cls, path_to_visibility: Dict[str, bool]) -> str:
         r"""
@@ -55,6 +58,7 @@ class AbstractMenu:
 
         This method has been introduced in version 0.26.
         """
+        ...
     @classmethod
     def unpack_key_binding(cls, s: str) -> Dict[str, str]:
         r"""
@@ -63,6 +67,7 @@ class AbstractMenu:
 
         This method has been introduced in version 0.26.
         """
+        ...
     @classmethod
     def unpack_menu_items_hidden(cls, s: str) -> Dict[str, bool]:
         r"""
@@ -71,41 +76,39 @@ class AbstractMenu:
 
         This method has been introduced in version 0.26.
         """
-    def __copy__(self) -> AbstractMenu:
-        r"""
-        @brief Creates a copy of self
-        """
-    def __deepcopy__(self) -> AbstractMenu:
-        r"""
-        @brief Creates a copy of self
-        """
+        ...
     def __init__(self) -> None:
         r"""
         @hide
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -113,6 +116,7 @@ class AbstractMenu:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -120,6 +124,7 @@ class AbstractMenu:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def action(self, path: str) -> ActionBase:
         r"""
         @brief Gets the reference to a Action object associated with the given path
@@ -127,10 +132,7 @@ class AbstractMenu:
         @param path The path to the item.
         @return A reference to a Action object associated with this path or nil if the path is not valid
         """
-    def assign(self, other: AbstractMenu) -> None:
-        r"""
-        @brief Assigns another object to self
-        """
+        ...
     def clear_menu(self, path: str) -> None:
         r"""
         @brief Deletes the children of the item given by the path
@@ -139,11 +141,13 @@ class AbstractMenu:
 
         This method has been introduced in version 0.28.
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def delete_item(self, path: str) -> None:
         r"""
         @brief Deletes the item given by the path
@@ -152,22 +156,21 @@ class AbstractMenu:
 
         This method will also delete all children of the given item. To clear the children only, use \clear_menu.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
-    def dup(self) -> AbstractMenu:
-        r"""
-        @brief Creates a copy of self
-        """
+        ...
     def group(self, group: str) -> List[str]:
         r"""
         @brief Gets the group members
@@ -175,6 +178,7 @@ class AbstractMenu:
         @param group The group name
         @param A vector of all members (by path) of the group
         """
+        ...
     def insert_item(self, path: str, name: str, action: ActionBase) -> None:
         r"""
         @brief Inserts a new item before the one given by the path
@@ -185,6 +189,7 @@ class AbstractMenu:
         @param name The name of the item to insert 
         @param action The Action object to insert
         """
+        ...
     @overload
     def insert_menu(self, path: str, name: str, action: ActionBase) -> None:
         r"""
@@ -196,6 +201,7 @@ class AbstractMenu:
 
         This method variant has been added in version 0.28.
         """
+        ...
     @overload
     def insert_menu(self, path: str, name: str, title: str) -> None:
         r"""
@@ -208,6 +214,7 @@ class AbstractMenu:
         @param name The name of the submenu to insert 
         @param title The title of the submenu to insert
         """
+        ...
     def insert_separator(self, path: str, name: str) -> None:
         r"""
         @brief Inserts a new separator before the item given by the path
@@ -215,12 +222,14 @@ class AbstractMenu:
         @param path The path to the item before which to insert the separator
         @param name The name of the separator to insert 
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def is_menu(self, path: str) -> bool:
         r"""
         @brief Returns true if the item is a menu
@@ -228,6 +237,7 @@ class AbstractMenu:
         @param path The path to the item
         @return false if the path is not valid or is not a menu
         """
+        ...
     def is_separator(self, path: str) -> bool:
         r"""
         @brief Returns true if the item is a separator
@@ -237,6 +247,7 @@ class AbstractMenu:
 
         This method has been introduced in version 0.19.
         """
+        ...
     def is_valid(self, path: str) -> bool:
         r"""
         @brief Returns true if the path is a valid one
@@ -244,6 +255,7 @@ class AbstractMenu:
         @param path The path to check
         @return false if the path is not a valid path to an item
         """
+        ...
     def items(self, path: str) -> List[str]:
         r"""
         @brief Gets the subitems for a given submenu
@@ -251,6 +263,8 @@ class AbstractMenu:
         @param path The path to the submenu
         @return A vector or path strings for the child items or an empty vector if the path is not valid or the item does not have children
         """
+        ...
+    ...
 
 class Action(ActionBase):
     r"""
@@ -286,24 +300,28 @@ class Action(ActionBase):
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -311,6 +329,7 @@ class Action(ActionBase):
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -318,6 +337,8 @@ class Action(ActionBase):
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
+    ...
 
 class ActionBase:
     r"""
@@ -359,6 +380,7 @@ class ActionBase:
 
         Passing an empty string will reset the icon.
         """
+        ...
     default_shortcut: str
     r"""
     Getter:
@@ -504,33 +526,39 @@ class ActionBase:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -538,6 +566,7 @@ class ActionBase:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -545,23 +574,27 @@ class ActionBase:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def effective_shortcut(self) -> str:
         r"""
         @brief Gets the effective keyboard shortcut
@@ -571,56 +604,77 @@ class ActionBase:
 
         This attribute has been introduced in version 0.25.
         """
+        ...
     def is_checkable(self) -> bool:
         r"""
         @brief Gets a value indicating whether the item is checkable
         """
+        ...
     def is_checked(self) -> bool:
         r"""
         @brief Gets a value indicating whether the item is checked
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def is_effective_enabled(self) -> bool:
         r"""
         @brief Gets a value indicating whether the item is really enabled
         This is the combined value from \is_enabled? and dynamic value (\wants_enabled).
         This attribute has been introduced in version 0.28.
         """
+        ...
     def is_effective_visible(self) -> bool:
         r"""
         @brief Gets a value indicating whether the item is really visible
         This is the combined visibility from \is_visible? and \is_hidden? and dynamic visibility (\wants_visible).
         This attribute has been introduced in version 0.25.
         """
+        ...
     def is_enabled(self) -> bool:
         r"""
         @brief Gets a value indicating whether the item is enabled
         """
+        ...
     def is_hidden(self) -> bool:
         r"""
         @brief Gets a value indicating whether the item is hidden
         If an item is hidden, it's always hidden and \is_visible? does not have an effect.
         This attribute has been introduced in version 0.25.
         """
+        ...
     def is_separator(self) -> bool:
         r"""
         @brief Gets a value indicating whether the item is a separator
         This method has been introduced in version 0.25.
         """
+        ...
     def is_visible(self) -> bool:
         r"""
         @brief Gets a value indicating whether the item is visible
         The visibility combines with \is_hidden?. To get the true visiblity, use \is_effective_visible?.
         """
+        ...
+    def macro(self) -> Macro:
+        r"""
+        @brief Gets the macro associated with the action
+        If the action is associated with a macro, this method returns a reference to the \Macro object. Otherwise, this method returns nil.
+
+
+        This method has been added in version 0.25.
+        """
+        ...
     def trigger(self) -> None:
         r"""
         @brief Triggers the action programmatically
         """
+        ...
+    ...
 
 class Annotation(BasicAnnotation):
     r"""
@@ -1146,6 +1200,7 @@ class Annotation(BasicAnnotation):
 
         This method was introduced in version 0.28.
         """
+        ...
     @classmethod
     def register_template(cls, annotation: BasicAnnotation, title: str, mode: Optional[int] = ...) -> None:
         r"""
@@ -1162,6 +1217,7 @@ class Annotation(BasicAnnotation):
 
         This method has been added in version 0.25.
         """
+        ...
     @classmethod
     def unregister_templates(cls, category: str) -> None:
         r"""
@@ -1173,55 +1229,60 @@ class Annotation(BasicAnnotation):
 
         This method has been added in version 0.28.
         """
+        ...
     def __eq__(self, other: object) -> bool:
         r"""
         @brief Equality operator
         """
+        ...
     def __ne__(self, other: object) -> bool:
         r"""
         @brief Inequality operator
         """
-    def __repr__(self) -> str:
-        r"""
-        @brief Returns the string representation of the ruler
-        This method was introduced in version 0.19.
-        """
+        ...
     def __str__(self) -> str:
         r"""
         @brief Returns the string representation of the ruler
         This method was introduced in version 0.19.
         """
+        ...
     def _assign(self, other: BasicAnnotation) -> None:
         r"""
         @brief Assigns another object to self
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _dup(self) -> Annotation:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -1229,6 +1290,7 @@ class Annotation(BasicAnnotation):
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -1236,17 +1298,20 @@ class Annotation(BasicAnnotation):
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def box(self) -> db.DBox:
         r"""
         @brief Gets the bounding box of the object (not including text)
         @return The bounding box
         """
+        ...
     def delete(self) -> None:
         r"""
         @brief Deletes this annotation from the view
         If the annotation is an "active" one, this method will remove it from the view. This object will become detached and can still be manipulated, but without having an effect on the view.
         This method has been introduced in version 0.25.
         """
+        ...
     def detach(self) -> None:
         r"""
         @brief Detaches the annotation object from the view
@@ -1254,6 +1319,7 @@ class Annotation(BasicAnnotation):
 
         This method has been introduced in version 0.25.
         """
+        ...
     def id(self) -> int:
         r"""
         @brief Returns the annotation's ID
@@ -1262,6 +1328,7 @@ class Annotation(BasicAnnotation):
 
         This method was introduced in version 0.24.
         """
+        ...
     def is_valid(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object is a valid reference.
@@ -1269,6 +1336,7 @@ class Annotation(BasicAnnotation):
 
         This method was introduced in version 0.25.
         """
+        ...
     def seg_p1(self, segment_index: int) -> db.DPoint:
         r"""
         @brief Gets the first point of the given segment.
@@ -1276,6 +1344,7 @@ class Annotation(BasicAnnotation):
 
         This method has been introduced in version 0.28.
         """
+        ...
     def seg_p2(self, segment_index: int) -> db.DPoint:
         r"""
         @brief Gets the second point of the given segment.
@@ -1284,6 +1353,7 @@ class Annotation(BasicAnnotation):
 
         This method has been introduced in version 0.28.
         """
+        ...
     def segments(self) -> int:
         r"""
         @brief Gets the number of segments.
@@ -1291,26 +1361,31 @@ class Annotation(BasicAnnotation):
 
         This method has been introduced in version 0.28.
         """
+        ...
     def text(self, index: Optional[int] = ...) -> str:
         r"""
         @brief Returns the formatted text for the main label
         The index parameter indicates which segment to use (0 is the first one). It has been added in version 0.28.
         """
+        ...
     def text_x(self, index: Optional[int] = ...) -> str:
         r"""
         @brief Returns the formatted text for the x-axis label
         The index parameter indicates which segment to use (0 is the first one). It has been added in version 0.28.
         """
+        ...
     def text_y(self, index: Optional[int] = ...) -> str:
         r"""
         @brief Returns the formatted text for the y-axis label
         The index parameter indicates which segment to use (0 is the first one). It has been added in version 0.28.
         """
+        ...
     def to_s(self) -> str:
         r"""
         @brief Returns the string representation of the ruler
         This method was introduced in version 0.19.
         """
+        ...
     @overload
     def transformed(self, t: db.DCplxTrans) -> Annotation:
         r"""
@@ -1320,6 +1395,7 @@ class Annotation(BasicAnnotation):
 
         Starting with version 0.25, all overloads all available as 'transform'.
         """
+        ...
     @overload
     def transformed(self, t: db.DTrans) -> Annotation:
         r"""
@@ -1327,6 +1403,7 @@ class Annotation(BasicAnnotation):
         @param t The transformation to apply
         @return The transformed object
         """
+        ...
     @overload
     def transformed(self, t: db.ICplxTrans) -> Annotation:
         r"""
@@ -1338,6 +1415,7 @@ class Annotation(BasicAnnotation):
 
         Starting with version 0.25, all overloads all available as 'transform'.
         """
+        ...
     @overload
     def transformed_cplx(self, t: db.DCplxTrans) -> Annotation:
         r"""
@@ -1347,6 +1425,7 @@ class Annotation(BasicAnnotation):
 
         Starting with version 0.25, all overloads all available as 'transform'.
         """
+        ...
     @overload
     def transformed_cplx(self, t: db.ICplxTrans) -> Annotation:
         r"""
@@ -1358,6 +1437,8 @@ class Annotation(BasicAnnotation):
 
         Starting with version 0.25, all overloads all available as 'transform'.
         """
+        ...
+    ...
 
 class BasicAnnotation:
     r"""
@@ -1369,41 +1450,49 @@ class BasicAnnotation:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def __copy__(self) -> BasicAnnotation:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __deepcopy__(self) -> BasicAnnotation:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -1411,6 +1500,7 @@ class BasicAnnotation:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -1418,37 +1508,45 @@ class BasicAnnotation:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def assign(self, other: BasicAnnotation) -> None:
         r"""
         @brief Assigns another object to self
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def dup(self) -> BasicAnnotation:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
+    ...
 
 class BasicImage:
     r"""
@@ -1460,41 +1558,49 @@ class BasicImage:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def __copy__(self) -> BasicImage:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __deepcopy__(self) -> BasicImage:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -1502,6 +1608,7 @@ class BasicImage:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -1509,37 +1616,45 @@ class BasicImage:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def assign(self, other: BasicImage) -> None:
         r"""
         @brief Assigns another object to self
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def dup(self) -> BasicImage:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
+    ...
 
 class BitmapBuffer:
     r"""
@@ -1558,6 +1673,13 @@ class BitmapBuffer:
         @brief Reads the pixel buffer from a PNG byte stream
         This method may not be available if PNG support is not compiled into KLayout.
         """
+        ...
+    @classmethod
+    def from_qimage(cls, qimage: QtGui.QImage_Native) -> BitmapBuffer:
+        r"""
+        @brief Creates a pixel buffer object from a QImage object
+        """
+        ...
     @classmethod
     def new(cls, width: int, height: int) -> BitmapBuffer:
         r"""
@@ -1568,24 +1690,29 @@ class BitmapBuffer:
 
         The pixels are basically uninitialized. You will need to use \fill to initialize them to a certain value.
         """
+        ...
     @classmethod
     def read_png(cls, file: str) -> BitmapBuffer:
         r"""
         @brief Reads the pixel buffer from a PNG file
         This method may not be available if PNG support is not compiled into KLayout.
         """
+        ...
     def __copy__(self) -> BitmapBuffer:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __deepcopy__(self) -> BitmapBuffer:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __eq__(self, other: object) -> bool:
         r"""
         @brief Returns a value indicating whether self is identical to the other image
         """
+        ...
     def __init__(self, width: int, height: int) -> None:
         r"""
         @brief Creates a pixel buffer object
@@ -1595,33 +1722,39 @@ class BitmapBuffer:
 
         The pixels are basically uninitialized. You will need to use \fill to initialize them to a certain value.
         """
+        ...
     def __ne__(self, other: object) -> bool:
         r"""
         @brief Returns a value indicating whether self is not identical to the other image
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -1629,6 +1762,7 @@ class BitmapBuffer:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -1636,71 +1770,740 @@ class BitmapBuffer:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def assign(self, other: BitmapBuffer) -> None:
         r"""
         @brief Assigns another object to self
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def dup(self) -> BitmapBuffer:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def fill(self, color: bool) -> None:
         r"""
         @brief Fills the pixel buffer with the given pixel value
         """
+        ...
     def height(self) -> int:
         r"""
         @brief Gets the height of the pixel buffer in pixels
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def pixel(self, x: int, y: int) -> bool:
         r"""
         @brief Gets the value of the pixel at position x, y
         """
+        ...
     def set_pixel(self, x: int, y: int, c: bool) -> None:
         r"""
         @brief Sets the value of the pixel at position x, y
         """
+        ...
     def swap(self, other: BitmapBuffer) -> None:
         r"""
         @brief Swaps data with another BitmapBuffer object
         """
+        ...
     def to_png_data(self) -> bytes:
         r"""
         @brief Converts the pixel buffer to a PNG byte stream
         This method may not be available if PNG support is not compiled into KLayout.
         """
+        ...
+    def to_qimage(self) -> QtGui.QImage_Native:
+        r"""
+        @brief Converts the pixel buffer to a \QImage object
+        """
+        ...
     def width(self) -> int:
         r"""
         @brief Gets the width of the pixel buffer in pixels
         """
+        ...
     def write_png(self, file: str) -> None:
         r"""
         @brief Writes the pixel buffer to a PNG file
         This method may not be available if PNG support is not compiled into KLayout.
         """
+        ...
+    ...
+
+class BrowserDialog(QDialog_Native):
+    r"""
+    @brief A HTML display and browser dialog
+
+    The browser dialog displays HTML code in a browser panel. The HTML code is delivered through a separate object of class \BrowserSource which acts as a "server" for a specific kind of URL scheme. Whenever the browser sees a URL starting with "int:" it will ask the connected BrowserSource object for the HTML code of that page using its 'get' method. The task of the BrowserSource object is to format the data requested in HTML and deliver it.
+
+    One use case for that class is the implementation of rich data browsers for structured information. In a simple scenario, the browser dialog can be instantiated with a static HTML page. In that case, only the content of that page is shown.
+
+    Here's a simple example:
+
+    @code
+    html = "<html><body>Hello, world!</body></html>"
+    RBA::BrowserDialog::new(html).exec
+    @/code
+
+    And that is an example for the use case with a \BrowserSource as the "server":
+
+    @code
+    class MySource < RBA::BrowserSource
+      def get(url)
+        if (url =~ /b.html$/)
+          return "<html><body>The second page</body></html>"
+        else
+          return "<html><body>The first page with a <a href='int:b.html'>link</a></body></html>"
+        end
+      end
+    end
+
+    source = MySource::new
+    RBA::BrowserDialog::new(source).exec
+    @/code
+    """
+    @property
+    def caption(self) -> None:
+        r"""
+        WARNING: This variable can only be set, not retrieved.
+        @brief Sets the caption of the window
+        """
+        ...
+    @property
+    def home(self) -> None:
+        r"""
+        WARNING: This variable can only be set, not retrieved.
+        @brief Sets the browser's initial and current URL which is selected if the "home" location is chosen
+        The home URL is the one shown initially and the one which is selected when the "home" button is pressed. The default location is "int:/index.html".
+        """
+        ...
+    @property
+    def label(self) -> None:
+        r"""
+        WARNING: This variable can only be set, not retrieved.
+        @brief Sets the label text
+
+        The label is shown left of the navigation buttons.
+        By default, no label is specified.
+
+        This method has been introduced in version 0.23.
+        """
+        ...
+    @property
+    def source(self) -> None:
+        r"""
+        WARNING: This variable can only be set, not retrieved.
+        @brief Connects to a source object
+
+        Setting the source should be the first thing done after the BrowserDialog object is created. It will not have any effect after the browser has loaded the first page. In particular, \home= should be called after the source was set.
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, html: str) -> BrowserDialog:
+        r"""
+        @brief Creates a HTML browser window with a static HTML content
+        This method has been introduced in version 0.23.
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, parent: QtWidgets.QWidget_Native, html: str) -> BrowserDialog:
+        r"""
+        @brief Creates a HTML browser window with a static HTML content
+        This method variant with a parent argument has been introduced in version 0.24.2.
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, parent: QtWidgets.QWidget_Native, source: BrowserSource) -> BrowserDialog:
+        r"""
+        @brief Creates a HTML browser window with a \BrowserSource as the source of HTML code
+        This method variant with a parent argument has been introduced in version 0.24.2.
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, source: BrowserSource) -> BrowserDialog:
+        r"""
+        @brief Creates a HTML browser window with a \BrowserSource as the source of HTML code
+        This method has been introduced in version 0.23.
+        """
+        ...
+    @overload
+    def __init__(self, html: str) -> None:
+        r"""
+        @brief Creates a HTML browser window with a static HTML content
+        This method has been introduced in version 0.23.
+        """
+        ...
+    @overload
+    def __init__(self, parent: QtWidgets.QWidget_Native, html: str) -> None:
+        r"""
+        @brief Creates a HTML browser window with a static HTML content
+        This method variant with a parent argument has been introduced in version 0.24.2.
+        """
+        ...
+    @overload
+    def __init__(self, parent: QtWidgets.QWidget_Native, source: BrowserSource) -> None:
+        r"""
+        @brief Creates a HTML browser window with a \BrowserSource as the source of HTML code
+        This method variant with a parent argument has been introduced in version 0.24.2.
+        """
+        ...
+    @overload
+    def __init__(self, source: BrowserSource) -> None:
+        r"""
+        @brief Creates a HTML browser window with a \BrowserSource as the source of HTML code
+        This method has been introduced in version 0.23.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def exec_(self) -> int:
+        r"""
+        @brief Executes the HTML browser dialog as a modal window
+        """
+        ...
+    def execute(self) -> int:
+        r"""
+        @brief Executes the HTML browser dialog as a modal window
+        """
+        ...
+    def load(self, url: str) -> None:
+        r"""
+        @brief Loads the given URL into the browser dialog
+        Typically the URL has the "int:" scheme so the HTML code is taken from the \BrowserSource object.
+        """
+        ...
+    def reload(self) -> None:
+        r"""
+        @brief Reloads the current page
+        """
+        ...
+    def resize(self, width: int, height: int) -> None:
+        r"""
+        @brief Sets the size of the dialog window
+        """
+        ...
+    def search(self, search_item: str) -> None:
+        r"""
+        @brief Issues a search request using the given search item and the search URL specified with \set_search_url
+
+        See \set_search_url for a description of the search mechanism.
+        """
+        ...
+    def set_caption(self, caption: str) -> None:
+        r"""
+        @brief Sets the caption of the window
+        """
+        ...
+    def set_home(self, home_url: str) -> None:
+        r"""
+        @brief Sets the browser's initial and current URL which is selected if the "home" location is chosen
+        The home URL is the one shown initially and the one which is selected when the "home" button is pressed. The default location is "int:/index.html".
+        """
+        ...
+    def set_search_url(self, url: str, query_item: str) -> None:
+        r"""
+        @brief Enables the search field and specifies the search URL generated for a search
+
+        If a search URL is set, the search box right to the navigation bar will be enabled. When a text is entered into the search box, the browser will navigate to an URL composed of the search URL, the search item and the search text, i.e. "myurl?item=search_text".
+
+        This method has been introduced in version 0.23.
+        """
+        ...
+    def set_size(self, width: int, height: int) -> None:
+        r"""
+        @brief Sets the size of the dialog window
+        """
+        ...
+    def set_source(self, source: BrowserSource) -> None:
+        r"""
+        @brief Connects to a source object
+
+        Setting the source should be the first thing done after the BrowserDialog object is created. It will not have any effect after the browser has loaded the first page. In particular, \home= should be called after the source was set.
+        """
+        ...
+    ...
+
+class BrowserPanel(QWidget_Native):
+    r"""
+    @brief A HTML display and browser widget
+
+    This widget provides the functionality of \BrowserDialog within a widget. It can be embedded into other dialogs. For details about the use model of this class see \BrowserDialog.
+
+    This class has been introduced in version 0.25.
+    """
+    @property
+    def home(self) -> None:
+        r"""
+        WARNING: This variable can only be set, not retrieved.
+        @brief Sets the browser widget's initial and current URL which is selected if the "home" location is chosen
+        The home URL is the one shown initially and the one which is selected when the "home" button is pressed. The default location is "int:/index.html".
+        """
+        ...
+    @property
+    def label(self) -> None:
+        r"""
+        WARNING: This variable can only be set, not retrieved.
+        @brief Sets the label text
+
+        The label is shown left of the navigation buttons.
+        By default, no label is specified.
+        """
+        ...
+    @property
+    def source(self) -> None:
+        r"""
+        WARNING: This variable can only be set, not retrieved.
+        @brief Connects to a source object
+
+        Setting the source should be the first thing done after the BrowserDialog object is created. It will not have any effect after the browser has loaded the first page. In particular, \home= should be called after the source was set.
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, parent: QtWidgets.QWidget_Native) -> BrowserPanel:
+        r"""
+        @brief Creates a HTML browser widget
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, parent: QtWidgets.QWidget_Native, source: BrowserSource_Native) -> BrowserPanel:
+        r"""
+        @brief Creates a HTML browser widget with a \BrowserSource as the source of HTML code
+        """
+        ...
+    @overload
+    def __init__(self, parent: QtWidgets.QWidget_Native) -> None:
+        r"""
+        @brief Creates a HTML browser widget
+        """
+        ...
+    @overload
+    def __init__(self, parent: QtWidgets.QWidget_Native, source: BrowserSource_Native) -> None:
+        r"""
+        @brief Creates a HTML browser widget with a \BrowserSource as the source of HTML code
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def load(self, url: str) -> None:
+        r"""
+        @brief Loads the given URL into the browser widget
+        Typically the URL has the "int:" scheme so the HTML code is taken from the \BrowserSource object.
+        """
+        ...
+    def reload(self) -> None:
+        r"""
+        @brief Reloads the current page
+        """
+        ...
+    def search(self, search_item: str) -> None:
+        r"""
+        @brief Issues a search request using the given search item and the search URL specified with \set_search_url
+
+        See \search_url= for a description of the search mechanism.
+        """
+        ...
+    def set_search_url(self, url: str, query_item: str) -> None:
+        r"""
+        @brief Enables the search field and specifies the search URL generated for a search
+
+        If a search URL is set, the search box right to the navigation bar will be enabled. When a text is entered into the search box, the browser will navigate to an URL composed of the search URL, the search item and the search text, i.e. "myurl?item=search_text".
+        """
+        ...
+    def url(self) -> str:
+        r"""
+        @brief Gets the URL currently shown
+        """
+        ...
+    ...
+
+class BrowserSource:
+    r"""
+    @brief The BrowserDialog's source for "int" URL's
+
+    The source object basically acts as a "server" for special URL's using "int" as the scheme.
+    Classes that want to implement such functionality must derive from BrowserSource and reimplement
+    the \get method. This method is supposed to deliver a HTML page for the given URL.
+
+    Alternatively to implementing this functionality, a source object may be instantiated using the
+    constructor with a HTML code string. This will create a source object that simply displays the given string
+    as the initial and only page.
+    """
+    @classmethod
+    def new(cls, html: str) -> BrowserSource:
+        r"""
+        @brief Constructs a BrowserSource object with a default HTML string
+
+        The default HTML string is sent when no specific implementation is provided.
+        """
+        ...
+    @classmethod
+    def new_html(cls, html: str) -> BrowserSource:
+        r"""
+        @brief Constructs a BrowserSource object with a default HTML string
+
+        The default HTML string is sent when no specific implementation is provided.
+        """
+        ...
+    def __copy__(self) -> BrowserSource:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def __deepcopy__(self) -> BrowserSource:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def __init__(self, html: str) -> None:
+        r"""
+        @brief Constructs a BrowserSource object with a default HTML string
+
+        The default HTML string is sent when no specific implementation is provided.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def assign(self, other: BrowserSource) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+        ...
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def dup(self) -> BrowserSource:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def get_image(self, url: str) -> QtGui.QImage_Native:
+        r"""
+        @brief Gets the image object for a specific URL
+
+        This method has been introduced in version 0.28.
+        """
+        ...
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def next_topic(self, url: str) -> str:
+        r"""
+        @brief Gets the next topic URL from a given URL
+        An empty string will be returned if no next topic is available.
+
+        This method has been introduced in version 0.28.
+        """
+        ...
+    def prev_topic(self, url: str) -> str:
+        r"""
+        @brief Gets the previous topic URL from a given URL
+        An empty string will be returned if no previous topic is available.
+
+        This method has been introduced in version 0.28.
+        """
+        ...
+    ...
+
+class BrowserSource_Native:
+    r"""
+    @hide
+    @alias BrowserSource
+    """
+    @classmethod
+    def new(cls) -> BrowserSource_Native:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def __copy__(self) -> BrowserSource_Native:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def __deepcopy__(self) -> BrowserSource_Native:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def assign(self, other: BrowserSource_Native) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+        ...
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def dup(self) -> BrowserSource_Native:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def get(self, url: str) -> str:
+        r"""
+        """
+        ...
+    def get_image(self, url: str) -> QtGui.QImage_Native:
+        r"""
+        """
+        ...
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def next_topic(self, url: str) -> str:
+        r"""
+        """
+        ...
+    def prev_topic(self, url: str) -> str:
+        r"""
+        """
+        ...
+    ...
 
 class ButtonState:
     r"""
@@ -1743,41 +2546,49 @@ class ButtonState:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def __copy__(self) -> ButtonState:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __deepcopy__(self) -> ButtonState:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -1785,6 +2596,7 @@ class ButtonState:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -1792,37 +2604,45 @@ class ButtonState:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def assign(self, other: ButtonState) -> None:
         r"""
         @brief Assigns another object to self
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def dup(self) -> ButtonState:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
+    ...
 
 class CellView:
     r"""
@@ -1967,51 +2787,61 @@ class CellView:
 
         This method has been introduced in version 0.23.
         """
+        ...
     @classmethod
     def new(cls) -> CellView:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def __copy__(self) -> CellView:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __deepcopy__(self) -> CellView:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __eq__(self, other: object) -> bool:
         r"""
         @brief Equality: indicates whether the cellviews refer to the same one
         In version 0.25, the definition of the equality operator has been changed to reflect identity of the cellview. Before that version, identity of the cell shown was implied.
         """
+        ...
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -2019,6 +2849,7 @@ class CellView:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -2026,16 +2857,19 @@ class CellView:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def ascend(self) -> None:
         r"""
         @brief Ascends upwards in the hierarchy.
         Removes one element from the specific path of the cellview with the given index. Returns the element removed.
         This method has been added in version 0.25.
         """
+        ...
     def assign(self, other: CellView) -> None:
         r"""
         @brief Assigns another object to self
         """
+        ...
     def close(self) -> None:
         r"""
         @brief Closes this cell view
@@ -2044,6 +2878,7 @@ class CellView:
 
         This method was introduced in version 0.25.
         """
+        ...
     def context_dtrans(self) -> db.DCplxTrans:
         r"""
         @brief Gets the accumulated transformation of the context path in micron unit space
@@ -2053,6 +2888,7 @@ class CellView:
 
         This method has been introduced in version 0.27.3.
         """
+        ...
     def context_trans(self) -> db.ICplxTrans:
         r"""
         @brief Gets the accumulated transformation of the context path
@@ -2062,19 +2898,23 @@ class CellView:
 
         This method has been introduced in version 0.27.3.
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def ctx_cell(self) -> db.Cell:
         r"""
         @brief Gets the reference to the context cell currently addressed
         """
+        ...
     def ctx_cell_index(self) -> int:
         r"""
         @brief Gets the context cell's index
         """
+        ...
     def descend(self, path: Sequence[db.InstElement]) -> None:
         r"""
         @brief Descends further into the hierarchy.
@@ -2082,50 +2922,59 @@ class CellView:
         The path is assumed to originate from the current cell and contain specific instances sorted from top to bottom.
         This method has been added in version 0.25.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def dup(self) -> CellView:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def filename(self) -> str:
         r"""
         @brief Gets filename associated with the layout behind the cellview
         """
+        ...
     def hide_cell(self, cell: db.Cell) -> None:
         r"""
         @brief Hides the given cell
 
         This method has been added in version 0.25.
         """
+        ...
     def index(self) -> int:
         r"""
         @brief Gets the index of this cellview in the layout view
         The index will be negative if the cellview is not a valid one.
         This method has been added in version 0.25.
         """
+        ...
     def is_cell_hidden(self, cell: db.Cell) -> bool:
         r"""
         @brief Returns true, if the given cell is hidden
 
         This method has been added in version 0.25.
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def is_dirty(self) -> bool:
         r"""
         @brief Gets a flag indicating whether the layout needs saving
@@ -2133,15 +2982,18 @@ class CellView:
 
         This method has been introduced in version 0.24.10.
         """
+        ...
     def is_valid(self) -> bool:
         r"""
         @brief Returns true, if the cellview is valid
         A cellview may become invalid if the corresponding tab is closed for example.
         """
+        ...
     def layout(self) -> db.Layout:
         r"""
         @brief Gets the reference to the layout object addressed by this view
         """
+        ...
     def reset_cell(self) -> None:
         r"""
         @brief Resets the cell 
@@ -2149,6 +3001,7 @@ class CellView:
         The cellview will become invalid. The layout object will
         still be attached to the cellview, but no cell will be selected.
         """
+        ...
     def set_cell(self, cell_index: int) -> None:
         r"""
         @brief Sets the path to the given cell
@@ -2157,6 +3010,7 @@ class CellView:
         particular one. It will clear the context path
         and update the context and target cell. Note that the cell is specified by its index.
         """
+        ...
     def set_cell_name(self, cell_name: str) -> None:
         r"""
         @brief Sets the cell by name
@@ -2167,6 +3021,7 @@ class CellView:
         particular one. It will clear the context path
         and update the context and target cell.
         """
+        ...
     def set_context_path(self, path: Sequence[db.InstElement]) -> None:
         r"""
         @brief Sets the context path explicitly
@@ -2175,6 +3030,7 @@ class CellView:
         is established already and that the context path starts
         from the context cell.
         """
+        ...
     def set_path(self, path: Sequence[int]) -> None:
         r"""
         @brief Sets the unspecific part of the path explicitly
@@ -2182,24 +3038,29 @@ class CellView:
         Setting the unspecific part of the path will clear the context path component and
         update the context and target cell.
         """
+        ...
     def show_all_cells(self) -> None:
         r"""
         @brief Makes all cells shown (cancel effects of \hide_cell) for the specified cell view
 
         This method has been added in version 0.25.
         """
+        ...
     def show_cell(self, cell: db.Cell) -> None:
         r"""
         @brief Shows the given cell (cancels the effect of \hide_cell)
 
         This method has been added in version 0.25.
         """
+        ...
     def view(self) -> LayoutView:
         r"""
         @brief Gets the view the cellview resides in
         This reference will be nil if the cellview is not a valid one.
         This method has been added in version 0.25.
         """
+        ...
+    ...
 
 class Cursor:
     r"""
@@ -2292,41 +3153,49 @@ class Cursor:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def __copy__(self) -> Cursor:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __deepcopy__(self) -> Cursor:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -2334,6 +3203,7 @@ class Cursor:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -2341,37 +3211,45 @@ class Cursor:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def assign(self, other: Cursor) -> None:
         r"""
         @brief Assigns another object to self
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def dup(self) -> Cursor:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
+    ...
 
 class Dispatcher:
     r"""
@@ -2390,38 +3268,45 @@ class Dispatcher:
 
         @return The instance
         """
+        ...
     @classmethod
     def new(cls) -> Dispatcher:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -2429,6 +3314,7 @@ class Dispatcher:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -2436,33 +3322,39 @@ class Dispatcher:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def clear_config(self) -> None:
         r"""
         @brief Clears the configuration parameters
         """
+        ...
     def commit_config(self) -> None:
         r"""
         @brief Commits the configuration settings
 
         Some configuration options are queued for performance reasons and become active only after 'commit_config' has been called. After a sequence of \set_config calls, this method should be called to activate the settings made by these calls.
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def get_config(self, name: str) -> Any:
         r"""
         @brief Gets the value of a local configuration parameter
@@ -2471,6 +3363,7 @@ class Dispatcher:
 
         @return The value of the parameter or nil if there is no such parameter
         """
+        ...
     def get_config_names(self) -> List[str]:
         r"""
         @brief Gets the configuration parameter names
@@ -2479,12 +3372,14 @@ class Dispatcher:
 
         This method returns the names of all known configuration parameters. These names can be used to get and set configuration parameter values.
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def read_config(self, file_name: str) -> bool:
         r"""
         @brief Reads the configuration from a file
@@ -2494,6 +3389,7 @@ class Dispatcher:
         exist. If it does and an error occurred, the error message is printed
         on stderr. In both cases, false is returned.
         """
+        ...
     def set_config(self, name: str, value: str) -> None:
         r"""
         @brief Set a local configuration parameter with the given name to the given value
@@ -2503,6 +3399,7 @@ class Dispatcher:
 
         This method sets a configuration parameter with the given name to the given value. Values can only be strings. Numerical values have to be converted into strings first. Local configuration parameters override global configurations for this specific view. This allows for example to override global settings of background colors. Any local settings are not written to the configuration file. 
         """
+        ...
     def write_config(self, file_name: str) -> bool:
         r"""
         @brief Writes configuration to a file
@@ -2511,6 +3408,140 @@ class Dispatcher:
         If the configuration file cannot be written, false 
         is returned but no exception is thrown.
         """
+        ...
+    ...
+
+class DoubleValue:
+    r"""
+    @brief Encapsulate a floating point value
+    @hide
+    This class is provided as a return value of \InputDialog::get_double.
+    By using an object rather than a pure value, an object with \has_value? = false can be returned indicating that
+    the "Cancel" button was pressed. Starting with version 0.22, the InputDialog class offers new method which do no
+    longer requires to use this class.
+    """
+    @classmethod
+    def new(cls) -> DoubleValue:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def __copy__(self) -> DoubleValue:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def __deepcopy__(self) -> DoubleValue:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def __float__(self) -> float:
+        r"""
+        @brief Get the actual value (a synonym for \value)
+        """
+        ...
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def assign(self, other: DoubleValue) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+        ...
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def dup(self) -> DoubleValue:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def has_value(self) -> bool:
+        r"""
+        @brief True, if a value is present
+        """
+        ...
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def to_f(self) -> float:
+        r"""
+        @brief Get the actual value (a synonym for \value)
+        """
+        ...
+    def value(self) -> float:
+        r"""
+        @brief Get the actual value
+        """
+        ...
+    ...
 
 class EditorHooks:
     r"""
@@ -2667,38 +3698,45 @@ class EditorHooks:
         @brief sets the name of the technology the hooks are associated with
         This will clear all technology associations and associate the hooks with that technology only.
         """
+        ...
     @classmethod
     def new(cls) -> EditorHooks:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -2706,6 +3744,7 @@ class EditorHooks:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -2713,53 +3752,63 @@ class EditorHooks:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def add_technology(self, tech: str) -> None:
         r"""
         @brief Additionally associates the hooks with the given technology.
         See also \clear_technologies.
         """
+        ...
     def clear_technologies(self) -> None:
         r"""
         @brief Clears the list of technologies the hooks are associated with.
         See also \add_technology.
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def for_technologies(self) -> bool:
         r"""
         @brief Returns a value indicating whether the hooks are associated with any technology.
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def is_for_technology(self, tech: str) -> bool:
         r"""
         @brief Returns a value indicating whether the hooks are associated with the given technology.
         The method is equivalent to checking whether the \technologies list is empty.
         """
+        ...
     def name(self) -> str:
         r"""
         @brief Gets the name of the hooks object.
         This is the name, the object was registered under in the system.
         """
+        ...
     def register(self, name: str) -> None:
         r"""
         @brief Registers the hooks in the system.
@@ -2767,10 +3816,444 @@ class EditorHooks:
 
         The name is arbitary, but should be unique. Upon registration, this hooks object will replace others with the same name already registered in the system. This will simplify debugging as you can re-run the same code, without accumulating hooks.
         """
+        ...
     def technologies(self) -> List[str]:
         r"""
         @brief Gets the list of technologies these hooks are associated with.
         """
+        ...
+    ...
+
+class FileDialog:
+    r"""
+    @brief Various methods to request a file name
+
+    This class provides some basic dialogs to select a file or directory. This functionality is provided through the static (class) methods ask_...
+
+    Here are some examples:
+
+    @code
+    # get an existing directory:
+    v = RBA::FileDialog::ask_existing_dir("Dialog Title", ".")
+    # get multiple files:
+    v = RBA::FileDialog::ask_open_file_names("Title", ".", "All files (*)")
+    # ask for one file name to save a file:
+    v = RBA::FileDialog::ask_save_file_name("Title", ".", "All files (*)")
+    @/code
+
+    All these examples return the "nil" value if "Cancel" is pressed.
+
+    If you have enabled the Qt binding, you can use \QFileDialog directly.
+    """
+    @classmethod
+    def ask_existing_dir(cls, title: str, dir: str) -> Any:
+        r"""
+        @brief Open a dialog to select a directory
+
+        @param title The title of the dialog
+        @param dir The directory selected initially
+        @return The directory path selected or "nil" if "Cancel" was pressed
+
+        This method has been introduced in version 0.23. It is somewhat easier to use than the get_... equivalent.
+        """
+        ...
+    @classmethod
+    def ask_open_file_name(cls, title: str, dir: str, filter: str) -> Any:
+        r"""
+        @brief Select one file for opening
+
+        @param title The title of the dialog
+        @param dir The directory selected initially
+        @param filter The filters available, for example "Images (*.png *.xpm *.jpg);;Text files (*.txt);;XML files (*.xml)"
+        @return The path of the file selected or "nil" if "Cancel" was pressed
+
+        This method has been introduced in version 0.23. It is somewhat easier to use than the get_... equivalent.
+        """
+        ...
+    @classmethod
+    def ask_open_file_names(cls, title: str, dir: str, filter: str) -> Any:
+        r"""
+        @brief Select one or multiple files for opening
+
+        @param title The title of the dialog
+        @param dir The directory selected initially
+        @param filter The filters available, for example "Images (*.png *.xpm *.jpg);;Text files (*.txt);;XML files (*.xml)"
+        @return An array with the file paths selected or "nil" if "Cancel" was pressed
+
+        This method has been introduced in version 0.23. It is somewhat easier to use than the get_... equivalent.
+        """
+        ...
+    @classmethod
+    def ask_save_file_name(cls, title: str, dir: str, filter: str) -> Any:
+        r"""
+        @brief Select one file for writing
+
+        @param title The title of the dialog
+        @param dir The directory selected initially
+        @param filter The filters available, for example "Images (*.png *.xpm *.jpg);;Text files (*.txt);;XML files (*.xml)"
+        @return The path of the file chosen or "nil" if "Cancel" was pressed
+
+        This method has been introduced in version 0.23. It is somewhat easier to use than the get_... equivalent.
+        """
+        ...
+    @classmethod
+    def ask_save_file_name_with_filter(cls, title: str, dir: str, filter: str) -> Any:
+        r"""
+        @brief Select one file for writing
+
+        @param title The title of the dialog
+        @param dir The directory selected initially
+        @param filter The filters available, for example "Images (*.png *.xpm *.jpg);;Text files (*.txt);;XML files (*.xml)"
+        @return "nil" if "Cancel" was pressed, otherwise a pair: The path of the file chosen and the index selected file type (-1 if no specific type was selected)
+
+        This method has been introduced in version 0.28.11.
+        """
+        ...
+    @classmethod
+    def get_existing_dir(cls, title: str, dir: str) -> StringValue:
+        r"""
+        @brief Open a dialog to select a directory
+
+        @param title The title of the dialog
+        @param dir The directory selected initially
+        @return A \StringValue object that contains the directory path selected or with has_value? = false if "Cancel" was pressed
+
+        Starting with version 0.23 this method is deprecated. Use \ask_existing_dir instead.
+        """
+        ...
+    @classmethod
+    def get_open_file_name(cls, title: str, dir: str, filter: str) -> StringValue:
+        r"""
+        @brief Select one file for opening
+
+        @param title The title of the dialog
+        @param dir The directory selected initially
+        @param filter The filters available, for example "Images (*.png *.xpm *.jpg);;Text files (*.txt);;XML files (*.xml)"
+        @return A \StringValue object that contains the files selected or with has_value? = false if "Cancel" was pressed
+
+        Starting with version 0.23 this method is deprecated. Use \ask_open_file_name instead.
+        """
+        ...
+    @classmethod
+    def get_open_file_names(cls, title: str, dir: str, filter: str) -> StringListValue:
+        r"""
+        @brief Select one or multiple files for opening
+
+        @param title The title of the dialog
+        @param dir The directory selected initially
+        @param filter The filters available, for example "Images (*.png *.xpm *.jpg);;Text files (*.txt);;XML files (*.xml)"
+        @return A \StringListValue object that contains the files selected or with has_value? = false if "Cancel" was pressed
+
+        Starting with version 0.23 this method is deprecated. Use \ask_open_file_names instead.
+        """
+        ...
+    @classmethod
+    def get_save_file_name(cls, title: str, dir: str, filter: str) -> StringValue:
+        r"""
+        @brief Select one file for writing
+
+        @param title The title of the dialog
+        @param dir The directory selected initially
+        @param filter The filters available, for example "Images (*.png *.xpm *.jpg);;Text files (*.txt);;XML files (*.xml)"
+        @return A \StringValue object that contains the files selected or with has_value? = false if "Cancel" was pressed
+
+        Starting with version 0.23 this method is deprecated. Use \ask_save_file_name instead.
+        """
+        ...
+    @classmethod
+    def new(cls) -> FileDialog:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def __copy__(self) -> FileDialog:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def __deepcopy__(self) -> FileDialog:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def assign(self, other: FileDialog) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+        ...
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def dup(self) -> FileDialog:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    ...
+
+class HelpDialog(QDialog_Native):
+    r"""
+    @brief The help dialog
+
+    This class makes the help dialog available as an individual object.
+
+    This class has been added in version 0.25.
+    """
+    @overload
+    @classmethod
+    def new(cls, modal: bool) -> HelpDialog:
+        r"""
+        @brief Creates a new help dialog
+        If the modal flag is true, the dialog will be shown as a modal window.
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, parent: QtWidgets.QWidget_Native, modal: bool) -> HelpDialog:
+        r"""
+        @brief Creates a new help dialog
+        If the modal flag is true, the dialog will be shown as a modal window.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def load(self, url: str) -> None:
+        r"""
+        @brief Loads the specified URL
+        This method will call the page with the given URL.
+        """
+        ...
+    def search(self, topic: str) -> None:
+        r"""
+        @brief Issues a search on the specified topic
+        This method will call the search page with the given topic.
+        """
+        ...
+    ...
+
+class HelpSource(BrowserSource_Native):
+    r"""
+    @brief A BrowserSource implementation delivering the help text for the help dialog
+    This class can be used together with a \BrowserPanel or \BrowserDialog object to implement custom help systems.
+
+    The basic URL's served by this class are: "int:/index.xml" for the index page and "int:/search.xml?string=..." for the search topic retrieval.
+
+    This class has been added in version 0.25.
+    """
+    @classmethod
+    def create_index_file(cls, path: str) -> None:
+        r"""
+        @brief Reserved internal use
+        """
+        ...
+    @classmethod
+    def plain(cls) -> HelpSource:
+        r"""
+        @brief Reserved for internal use
+        """
+        ...
+    def _assign(self, other: BrowserSource_Native) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _dup(self) -> HelpSource:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def get_dom(self, path: str) -> QtXml.QDomDocument:
+        r"""
+        @brief Reserved for internal use
+        """
+        ...
+    def get_option(self, key: str) -> Any:
+        r"""
+        @brief Reserved for internal use
+        """
+        ...
+    def parent_of(self, path: str) -> str:
+        r"""
+        @brief Reserved internal use
+        """
+        ...
+    def scan(self) -> None:
+        r"""
+        @brief Reserved internal use
+        """
+        ...
+    def set_option(self, key: str, value: Any) -> None:
+        r"""
+        @brief Reserved for internal use
+        """
+        ...
+    def title_for(self, path: str) -> str:
+        r"""
+        @brief Reserved internal use
+        """
+        ...
+    def urls(self) -> List[str]:
+        r"""
+        @brief Reserved for internal use
+        """
+        ...
+    ...
 
 class Image(BasicImage):
     r"""
@@ -2955,6 +4438,7 @@ class Image(BasicImage):
         @brief Creates an image from the string returned by \to_s.
         This method has been introduced in version 0.27.
         """
+        ...
     @overload
     @classmethod
     def new(cls) -> Image:
@@ -2963,6 +4447,7 @@ class Image(BasicImage):
         This will create an empty image without data and no particular pixel width or related.
         Use the \read_file or \set_data methods to set image properties and pixel values.
         """
+        ...
     @overload
     @classmethod
     def new(cls, filename: str, trans: Optional[db.DCplxTrans] = ...) -> Image:
@@ -2976,6 +4461,22 @@ class Image(BasicImage):
         @param filename The path to the image file to load.
         @param trans The transformation to apply to the image when displaying it.
         """
+        ...
+    @overload
+    @classmethod
+    def new(cls, image: QtGui.QImage_Native, trans: Optional[db.DCplxTrans] = ...) -> Image:
+        r"""
+        @brief Constructor from a image pixel buffer
+
+        This constructor creates an image object from a pixel QImage object and uses RGB or mono image data to generate the image.
+
+        The image will originally be put to position 0,0 (lower left corner) and each pixel
+        will have a size of 1. The transformation describes how to transform this image into micron space.
+
+        @param filename The path to the image file to load.
+        @param trans The transformation to apply to the image when displaying it.
+        """
+        ...
     @overload
     @classmethod
     def new(cls, pixels: PixelBuffer, trans: Optional[db.DCplxTrans] = ...) -> Image:
@@ -2990,6 +4491,7 @@ class Image(BasicImage):
         @param filename The path to the image file to load.
         @param trans The transformation to apply to the image when displaying it.
         """
+        ...
     @overload
     @classmethod
     def new(cls, w: int, h: int, data: Sequence[float]) -> Image:
@@ -3007,6 +4509,7 @@ class Image(BasicImage):
         @param h The height of the image
         @param d The data (see method description)
         """
+        ...
     @overload
     @classmethod
     def new(cls, w: int, h: int, red: Sequence[float], green: Sequence[float], blue: Sequence[float]) -> Image:
@@ -3026,6 +4529,7 @@ class Image(BasicImage):
         @param green The green channel data set which will become owned by the image
         @param blue The blue channel data set which will become owned by the image
         """
+        ...
     @overload
     @classmethod
     def new(cls, w: int, h: int, trans: db.DCplxTrans, data: Sequence[float]) -> Image:
@@ -3044,6 +4548,7 @@ class Image(BasicImage):
         @param trans The transformation from pixel space to micron space
         @param d The data (see method description)
         """
+        ...
     @overload
     @classmethod
     def new(cls, w: int, h: int, trans: db.DCplxTrans, red: Sequence[float], green: Sequence[float], blue: Sequence[float]) -> Image:
@@ -3064,6 +4569,7 @@ class Image(BasicImage):
         @param green The green channel data set which will become owned by the image
         @param blue The blue channel data set which will become owned by the image
         """
+        ...
     @classmethod
     def read(cls, path: str) -> Image:
         r"""
@@ -3073,6 +4579,7 @@ class Image(BasicImage):
 
         This method has been introduced in version 0.27.
         """
+        ...
     @overload
     def __init__(self) -> None:
         r"""
@@ -3080,6 +4587,7 @@ class Image(BasicImage):
         This will create an empty image without data and no particular pixel width or related.
         Use the \read_file or \set_data methods to set image properties and pixel values.
         """
+        ...
     @overload
     def __init__(self, filename: str, trans: Optional[db.DCplxTrans] = ...) -> None:
         r"""
@@ -3092,6 +4600,21 @@ class Image(BasicImage):
         @param filename The path to the image file to load.
         @param trans The transformation to apply to the image when displaying it.
         """
+        ...
+    @overload
+    def __init__(self, image: QtGui.QImage_Native, trans: Optional[db.DCplxTrans] = ...) -> None:
+        r"""
+        @brief Constructor from a image pixel buffer
+
+        This constructor creates an image object from a pixel QImage object and uses RGB or mono image data to generate the image.
+
+        The image will originally be put to position 0,0 (lower left corner) and each pixel
+        will have a size of 1. The transformation describes how to transform this image into micron space.
+
+        @param filename The path to the image file to load.
+        @param trans The transformation to apply to the image when displaying it.
+        """
+        ...
     @overload
     def __init__(self, pixels: PixelBuffer, trans: Optional[db.DCplxTrans] = ...) -> None:
         r"""
@@ -3105,6 +4628,7 @@ class Image(BasicImage):
         @param filename The path to the image file to load.
         @param trans The transformation to apply to the image when displaying it.
         """
+        ...
     @overload
     def __init__(self, w: int, h: int, data: Sequence[float]) -> None:
         r"""
@@ -3121,6 +4645,7 @@ class Image(BasicImage):
         @param h The height of the image
         @param d The data (see method description)
         """
+        ...
     @overload
     def __init__(self, w: int, h: int, red: Sequence[float], green: Sequence[float], blue: Sequence[float]) -> None:
         r"""
@@ -3139,6 +4664,7 @@ class Image(BasicImage):
         @param green The green channel data set which will become owned by the image
         @param blue The blue channel data set which will become owned by the image
         """
+        ...
     @overload
     def __init__(self, w: int, h: int, trans: db.DCplxTrans, data: Sequence[float]) -> None:
         r"""
@@ -3156,6 +4682,7 @@ class Image(BasicImage):
         @param trans The transformation from pixel space to micron space
         @param d The data (see method description)
         """
+        ...
     @overload
     def __init__(self, w: int, h: int, trans: db.DCplxTrans, red: Sequence[float], green: Sequence[float], blue: Sequence[float]) -> None:
         r"""
@@ -3175,49 +4702,51 @@ class Image(BasicImage):
         @param green The green channel data set which will become owned by the image
         @param blue The blue channel data set which will become owned by the image
         """
-    def __repr__(self) -> str:
-        r"""
-        @brief Converts the image to a string
-        The string returned can be used to create an image object using \from_s.
-        @return The string
-        """
+        ...
     def __str__(self) -> str:
         r"""
         @brief Converts the image to a string
         The string returned can be used to create an image object using \from_s.
         @return The string
         """
+        ...
     def _assign(self, other: BasicImage) -> None:
         r"""
         @brief Assigns another object to self
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _dup(self) -> Image:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -3225,6 +4754,7 @@ class Image(BasicImage):
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -3232,16 +4762,19 @@ class Image(BasicImage):
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def box(self) -> db.DBox:
         r"""
         @brief Gets the bounding box of the image
         @return The bounding box
         """
+        ...
     def clear(self) -> None:
         r"""
         @brief Clears the image data (sets to 0 or black).
         This method has been introduced in version 0.27.
         """
+        ...
     def data(self, channel: Optional[int] = ...) -> List[float]:
         r"""
         @brief Gets the data array for a specific color channel
@@ -3251,12 +4784,14 @@ class Image(BasicImage):
 
         This method has been introduced in version 0.27.
         """
+        ...
     def delete(self) -> None:
         r"""
         @brief Deletes this image from the view
         If the image is an "active" one, this method will remove it from the view. This object will become detached and can still be manipulated, but without having an effect on the view.
         This method has been introduced in version 0.25.
         """
+        ...
     def detach(self) -> None:
         r"""
         @brief Detaches the image object from the view
@@ -3264,11 +4799,13 @@ class Image(BasicImage):
 
         This method has been introduced in version 0.25.
         """
+        ...
     def filename(self) -> str:
         r"""
         @brief Gets the name of the file loaded of an empty string if not file is loaded
         @return The file name (path)
         """
+        ...
     @overload
     def get_pixel(self, x: int, y: int) -> float:
         r"""
@@ -3281,6 +4818,7 @@ class Image(BasicImage):
         returns 0.0. This method is valid for monochrome images only. For color images it will return 0.0 always.
         Use \is_color? to decide whether the image is a color image or monochrome one.
         """
+        ...
     @overload
     def get_pixel(self, x: int, y: int, component: int) -> float:
         r"""
@@ -3293,11 +4831,13 @@ class Image(BasicImage):
         If the component index, x or y value exceeds the image bounds, this method 
         returns 0.0. For monochrome images, the component index is ignored.
         """
+        ...
     def height(self) -> int:
         r"""
         @brief Gets the height of the image in pixels
         @return The height in pixels
         """
+        ...
     def id(self) -> int:
         r"""
         @brief Gets the Id
@@ -3306,16 +4846,19 @@ class Image(BasicImage):
         image object. The Id is not changed when the object is edited.
         On initialization, a unique Id is given to the object. The Id cannot be changed. This behaviour has been modified in version 0.20.
         """
+        ...
     def is_color(self) -> bool:
         r"""
         @brief Returns true, if the image is a color image
         @return True, if the image is a color image
         """
+        ...
     def is_empty(self) -> bool:
         r"""
         @brief Returns true, if the image does not contain any data (i.e. is default constructed)
         @return True, if the image is empty
         """
+        ...
     def is_valid(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object is a valid reference.
@@ -3323,6 +4866,7 @@ class Image(BasicImage):
 
         This method was introduced in version 0.25.
         """
+        ...
     def is_visible(self) -> bool:
         r"""
         @brief Gets a flag indicating whether the image object is visible
@@ -3331,6 +4875,7 @@ class Image(BasicImage):
 
         This method has been introduced in version 0.20.
         """
+        ...
     def mask(self, x: int, y: int) -> bool:
         r"""
         @brief Gets the mask for one pixel
@@ -3343,6 +4888,7 @@ class Image(BasicImage):
 
         This method has been introduced in version 0.23.
         """
+        ...
     @overload
     def set_data(self, w: int, h: int, d: Sequence[float]) -> None:
         r"""
@@ -3353,6 +4899,7 @@ class Image(BasicImage):
 
         See the constructor description for the data organisation in that field.
         """
+        ...
     @overload
     def set_data(self, w: int, h: int, r: Sequence[float], g: Sequence[float], b: Sequence[float]) -> None:
         r"""
@@ -3365,6 +4912,7 @@ class Image(BasicImage):
 
         See the constructor description for the data organisation in that field.
         """
+        ...
     def set_mask(self, x: int, y: int, m: bool) -> None:
         r"""
         @brief Sets the mask for a pixel
@@ -3377,6 +4925,7 @@ class Image(BasicImage):
 
         This method has been introduced in version 0.23.
         """
+        ...
     @overload
     def set_pixel(self, x: int, y: int, r: float, g: float, b: float) -> None:
         r"""
@@ -3391,6 +4940,7 @@ class Image(BasicImage):
         If the component index, x or y value exceeds the image bounds of the image is not a color image,
         this method does nothing.
         """
+        ...
     @overload
     def set_pixel(self, x: int, y: int, v: float) -> None:
         r"""
@@ -3403,12 +4953,14 @@ class Image(BasicImage):
         If the component index, x or y value exceeds the image bounds of the image is a color image,
         this method does nothing.
         """
+        ...
     def to_s(self) -> str:
         r"""
         @brief Converts the image to a string
         The string returned can be used to create an image object using \from_s.
         @return The string
         """
+        ...
     @overload
     def transformed(self, t: db.DCplxTrans) -> Image:
         r"""
@@ -3416,6 +4968,7 @@ class Image(BasicImage):
         @param t The magnifying transformation to apply
         @return The transformed object
         """
+        ...
     @overload
     def transformed(self, t: db.DTrans) -> Image:
         r"""
@@ -3423,6 +4976,7 @@ class Image(BasicImage):
         @param t The transformation to apply
         @return The transformed object
         """
+        ...
     @overload
     def transformed(self, t: db.Matrix3d) -> Image:
         r"""
@@ -3431,12 +4985,14 @@ class Image(BasicImage):
         @return The transformed object
         This method has been introduced in version 0.22.
         """
+        ...
     def transformed_cplx(self, t: db.DCplxTrans) -> Image:
         r"""
         @brief Transforms the image with the given complex transformation
         @param t The magnifying transformation to apply
         @return The transformed object
         """
+        ...
     def transformed_matrix(self, t: db.Matrix3d) -> Image:
         r"""
         @brief Transforms the image with the given matrix transformation
@@ -3444,6 +5000,7 @@ class Image(BasicImage):
         @return The transformed object
         This method has been introduced in version 0.22.
         """
+        ...
     def update(self) -> None:
         r"""
         @brief Forces an update of the view
@@ -3451,16 +5008,20 @@ class Image(BasicImage):
 
         This method has been introduced in version 0.25.
         """
+        ...
     def width(self) -> int:
         r"""
         @brief Gets the width of the image in pixels
         @return The width in pixels
         """
+        ...
     def write(self, path: str) -> None:
         r"""
         @brief Saves the image to KLayout's image format (.lyimg)
         This method has been introduced in version 0.27.
         """
+        ...
+    ...
 
 class ImageDataMapping:
     r"""
@@ -3559,41 +5120,49 @@ class ImageDataMapping:
         r"""
         @brief Create a new data mapping object with default settings
         """
+        ...
     def __copy__(self) -> ImageDataMapping:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __deepcopy__(self) -> ImageDataMapping:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __init__(self) -> None:
         r"""
         @brief Create a new data mapping object with default settings
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -3601,6 +5170,7 @@ class ImageDataMapping:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -3608,6 +5178,7 @@ class ImageDataMapping:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     @overload
     def add_colormap_entry(self, value: float, color: int) -> None:
         r"""
@@ -3617,6 +5188,7 @@ class ImageDataMapping:
 
         This settings establishes a color mapping for a given value in the monochrome channel. The color must be given as a 32 bit integer, where the lowest order byte describes the blue component (0 to 255), the second byte the green component and the third byte the red component, i.e. 0xff0000 is red and 0x0000ff is blue. 
         """
+        ...
     @overload
     def add_colormap_entry(self, value: float, lcolor: int, rcolor: int) -> None:
         r"""
@@ -3631,14 +5203,17 @@ class ImageDataMapping:
 
         This variant has been introduced in version 0.27.
         """
+        ...
     def assign(self, other: ImageDataMapping) -> None:
         r"""
         @brief Assigns another object to self
         """
+        ...
     def clear_colormap(self) -> None:
         r"""
         @brief The the color map of this data mapping object.
         """
+        ...
     def colormap_color(self, n: int) -> int:
         r"""
         @brief Returns the color for a given color map entry.
@@ -3647,6 +5222,7 @@ class ImageDataMapping:
 
         NOTE: this version is deprecated and provided for backward compatibility. For discontinuous nodes this method delivers the left-sided color.
         """
+        ...
     def colormap_lcolor(self, n: int) -> int:
         r"""
         @brief Returns the left-side color for a given color map entry.
@@ -3655,6 +5231,7 @@ class ImageDataMapping:
 
         This method has been introduced in version 0.27.
         """
+        ...
     def colormap_rcolor(self, n: int) -> int:
         r"""
         @brief Returns the right-side color for a given color map entry.
@@ -3663,44 +5240,477 @@ class ImageDataMapping:
 
         This method has been introduced in version 0.27.
         """
+        ...
     def colormap_value(self, n: int) -> float:
         r"""
         @brief Returns the value for a given color map entry.
         @param n The index of the entry (0..\num_colormap_entries-1)
         @return The value (see \add_colormap_entry for a description).
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def dup(self) -> ImageDataMapping:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def num_colormap_entries(self) -> int:
         r"""
         @brief Returns the current number of color map entries.
         @return The number of entries.
         """
+        ...
+    ...
+
+class InputDialog:
+    r"""
+    @brief Various methods to open a dialog requesting data entry
+    This class provides some basic dialogs to enter a single value. Values can be strings floating-point values, integer values or an item from a list.
+    This functionality is provided through the static (class) methods ask_...
+
+    Here are some examples:
+
+    @code
+    # get a double value between -10 and 10 (initial value is 0):
+    v = RBA::InputDialog::ask_double_ex("Dialog Title", "Enter the value here:", 0, -10, 10, 1)
+    # get an item from a list:
+    v = RBA::InputDialog::ask_item("Dialog Title", "Select one:", [ "item 1", "item 2", "item 3" ], 1)
+    @/code
+
+    All these examples return the "nil" value if "Cancel" is pressed.
+
+    If you have enabled the Qt binding, you can use \QInputDialog directly.
+    """
+    @classmethod
+    def ask_double(cls, title: str, label: str, value: float, digits: int) -> Any:
+        r"""
+        @brief Open an input dialog requesting a floating-point value
+        @param title The title to display for the dialog
+        @param label The label text to display for the dialog
+        @param value The initial value for the input field
+        @param digits The number of digits allowed
+        @return The value entered if "Ok" was pressed or nil if "Cancel" was pressed
+        This method has been introduced in 0.22 and is somewhat easier to use than the get_.. equivalent.
+        """
+        ...
+    @classmethod
+    def ask_double_ex(cls, title: str, label: str, value: float, min: float, max: float, digits: int) -> Any:
+        r"""
+        @brief Open an input dialog requesting a floating-point value with enhanced capabilities
+        @param title The title to display for the dialog
+        @param label The label text to display for the dialog
+        @param value The initial value for the input field
+        @param min The minimum value allowed
+        @param max The maximum value allowed
+        @param digits The number of digits allowed
+        @return The value entered if "Ok" was pressed or nil if "Cancel" was pressed
+        This method has been introduced in 0.22 and is somewhat easier to use than the get_.. equivalent.
+        """
+        ...
+    @classmethod
+    def ask_int(cls, title: str, label: str, value: int) -> Any:
+        r"""
+        @brief Open an input dialog requesting an integer value
+        @param title The title to display for the dialog
+        @param label The label text to display for the dialog
+        @param value The initial value for the input field
+        @return The value entered if "Ok" was pressed or nil if "Cancel" was pressed
+        This method has been introduced in 0.22 and is somewhat easier to use than the get_.. equivalent.
+        """
+        ...
+    @classmethod
+    def ask_int_ex(cls, title: str, label: str, value: int, min: int, max: int, step: int) -> Any:
+        r"""
+        @brief Open an input dialog requesting an integer value with enhanced capabilities
+        @param title The title to display for the dialog
+        @param label The label text to display for the dialog
+        @param value The initial value for the input field
+        @param min The minimum value allowed
+        @param max The maximum value allowed
+        @param step The step size for the spin buttons
+        @return The value entered if "Ok" was pressed or nil if "Cancel" was pressed
+        This method has been introduced in 0.22 and is somewhat easier to use than the get_.. equivalent.
+        """
+        ...
+    @classmethod
+    def ask_item(cls, title: str, label: str, items: Sequence[str], value: int) -> Any:
+        r"""
+        @brief Open an input dialog requesting an item from a list
+        @param title The title to display for the dialog
+        @param label The label text to display for the dialog
+        @param items The list of items to show in the selection element
+        @param selection The initial selection (index of the element selected initially)
+        @return The string of the item selected if "Ok" was pressed or nil if "Cancel" was pressed
+        This method has been introduced in 0.22 and is somewhat easier to use than the get_.. equivalent.
+        """
+        ...
+    @classmethod
+    def ask_string(cls, title: str, label: str, value: str) -> Any:
+        r"""
+        @brief Open an input dialog requesting a string
+        @param title The title to display for the dialog
+        @param label The label text to display for the dialog
+        @param value The initial value for the input field
+        @return The string entered if "Ok" was pressed or nil if "Cancel" was pressed
+        This method has been introduced in 0.22 and is somewhat easier to use than the get_.. equivalent.
+        """
+        ...
+    @classmethod
+    def ask_string_password(cls, title: str, label: str, value: str) -> Any:
+        r"""
+        @brief Open an input dialog requesting a string without showing the actual characters entered
+        @param title The title to display for the dialog
+        @param label The label text to display for the dialog
+        @param value The initial value for the input field
+        @return The string entered if "Ok" was pressed or nil if "Cancel" was pressed
+        This method has been introduced in 0.22 and is somewhat easier to use than the get_.. equivalent.
+        """
+        ...
+    @classmethod
+    def get_double(cls, title: str, label: str, value: float, digits: int) -> DoubleValue:
+        r"""
+        @brief Open an input dialog requesting a floating-point value
+        @param title The title to display for the dialog
+        @param label The label text to display for the dialog
+        @param value The initial value for the input field
+        @param digits The number of digits allowed
+        @return A \DoubleValue object with has_value? set to true, if "Ok" was pressed and the value given in its value attribute
+        Starting from 0.22, this method is deprecated and it is recommended to use the ask_... equivalent.
+        """
+        ...
+    @classmethod
+    def get_double_ex(cls, title: str, label: str, value: float, min: float, max: float, digits: int) -> DoubleValue:
+        r"""
+        @brief Open an input dialog requesting a floating-point value with enhanced capabilities
+        @param title The title to display for the dialog
+        @param label The label text to display for the dialog
+        @param value The initial value for the input field
+        @param min The minimum value allowed
+        @param max The maximum value allowed
+        @param digits The number of digits allowed
+        @return A \DoubleValue object with has_value? set to true, if "Ok" was pressed and the value given in its value attribute
+        Starting from 0.22, this method is deprecated and it is recommended to use the ask_... equivalent.
+        """
+        ...
+    @classmethod
+    def get_int(cls, title: str, label: str, value: int) -> IntValue:
+        r"""
+        @brief Open an input dialog requesting an integer value
+        @param title The title to display for the dialog
+        @param label The label text to display for the dialog
+        @param value The initial value for the input field
+        @return A \IntValue object with has_value? set to true, if "Ok" was pressed and the value given in its value attribute
+        Starting from 0.22, this method is deprecated and it is recommended to use the ask_... equivalent.
+        """
+        ...
+    @classmethod
+    def get_int_ex(cls, title: str, label: str, value: int, min: int, max: int, step: int) -> IntValue:
+        r"""
+        @brief Open an input dialog requesting an integer value with enhanced capabilities
+        @param title The title to display for the dialog
+        @param label The label text to display for the dialog
+        @param value The initial value for the input field
+        @param min The minimum value allowed
+        @param max The maximum value allowed
+        @param step The step size for the spin buttons
+        @return A \IntValue object with has_value? set to true, if "Ok" was pressed and the value given in its value attribute
+        Starting from 0.22, this method is deprecated and it is recommended to use the ask_... equivalent.
+        """
+        ...
+    @classmethod
+    def get_item(cls, title: str, label: str, items: Sequence[str], value: int) -> StringValue:
+        r"""
+        @brief Open an input dialog requesting an item from a list
+        @param title The title to display for the dialog
+        @param label The label text to display for the dialog
+        @param items The list of items to show in the selection element
+        @param selection The initial selection (index of the element selected initially)
+        @return A \StringValue object with has_value? set to true, if "Ok" was pressed and the value given in its value attribute
+        Starting from 0.22, this method is deprecated and it is recommended to use the ask_... equivalent.
+        """
+        ...
+    @classmethod
+    def get_string(cls, title: str, label: str, value: str) -> StringValue:
+        r"""
+        @brief Open an input dialog requesting a string
+        @param title The title to display for the dialog
+        @param label The label text to display for the dialog
+        @param value The initial value for the input field
+        @return A \StringValue object with has_value? set to true, if "Ok" was pressed and the value given in its value attribute
+        Starting from 0.22, this method is deprecated and it is recommended to use the ask_... equivalent.
+        """
+        ...
+    @classmethod
+    def get_string_password(cls, title: str, label: str, value: str) -> StringValue:
+        r"""
+        @brief Open an input dialog requesting a string without showing the actual characters entered
+        @param title The title to display for the dialog
+        @param label The label text to display for the dialog
+        @param value The initial value for the input field
+        @return A \StringValue object with has_value? set to true, if "Ok" was pressed and the value given in its value attribute
+        Starting from 0.22, this method is deprecated and it is recommended to use the ask_... equivalent.
+        """
+        ...
+    @classmethod
+    def new(cls) -> InputDialog:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def __copy__(self) -> InputDialog:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def __deepcopy__(self) -> InputDialog:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def assign(self, other: InputDialog) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+        ...
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def dup(self) -> InputDialog:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    ...
+
+class IntValue:
+    r"""
+    @brief Encapsulate an integer value
+    @hide
+    This class is provided as a return value of \InputDialog::get_int.
+    By using an object rather than a pure value, an object with \has_value? = false can be returned indicating that
+    the "Cancel" button was pressed. Starting with version 0.22, the InputDialog class offers new method which do no
+    longer requires to use this class.
+    """
+    @classmethod
+    def new(cls) -> IntValue:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def __copy__(self) -> IntValue:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def __deepcopy__(self) -> IntValue:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def __int__(self) -> int:
+        r"""
+        @brief Get the actual value (a synonym for \value)
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def assign(self, other: IntValue) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+        ...
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def dup(self) -> IntValue:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def has_value(self) -> bool:
+        r"""
+        @brief True, if a value is present
+        """
+        ...
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def to_i(self) -> int:
+        r"""
+        @brief Get the actual value (a synonym for \value)
+        """
+        ...
+    def value(self) -> int:
+        r"""
+        @brief Get the actual value
+        """
+        ...
+    ...
 
 class KeyCode:
     r"""
@@ -3779,41 +5789,49 @@ class KeyCode:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def __copy__(self) -> KeyCode:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __deepcopy__(self) -> KeyCode:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -3821,6 +5839,7 @@ class KeyCode:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -3828,37 +5847,45 @@ class KeyCode:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def assign(self, other: KeyCode) -> None:
         r"""
         @brief Assigns another object to self
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def dup(self) -> KeyCode:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
+    ...
 
 class LayerProperties:
     r"""
@@ -4179,53 +6206,63 @@ class LayerProperties:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def __copy__(self) -> LayerProperties:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __deepcopy__(self) -> LayerProperties:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __eq__(self, other: object) -> bool:
         r"""
         @brief Equality 
 
         @param other The other object to compare against
         """
+        ...
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def __ne__(self, other: object) -> bool:
         r"""
         @brief Inequality 
 
         @param other The other object to compare against
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -4233,6 +6270,7 @@ class LayerProperties:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -4240,71 +6278,85 @@ class LayerProperties:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def assign(self, other: LayerProperties) -> None:
         r"""
         @brief Assigns another object to self
         """
+        ...
     def cellview(self) -> int:
         r"""
         @brief Gets the the cellview index
 
         This is the index of the actual cellview to use. Basically, this method returns \source_cellview in "real" mode. The result may be different, if the cellview is not valid for example. In this case, a negative value is returned. 
         """
+        ...
     def clear_dither_pattern(self) -> None:
         r"""
         @brief Clears the dither pattern
         """
+        ...
     def clear_fill_color(self) -> None:
         r"""
         @brief Resets the fill color
         """
+        ...
     def clear_frame_color(self) -> None:
         r"""
         @brief Resets the frame color 
         """
+        ...
     def clear_line_style(self) -> None:
         r"""
         @brief Clears the line style
 
         This method has been introduced in version 0.25.
         """
+        ...
     def clear_lower_hier_level(self) -> None:
         r"""
         @brief Clears the lower hierarchy level specification
 
         See \has_lower_hier_level for a description of this property
         """
+        ...
     def clear_source_name(self) -> None:
         r"""
         @brief Removes any stream layer name specification from this layer
         """
+        ...
     def clear_upper_hier_level(self) -> None:
         r"""
         @brief Clears the upper hierarchy level specification
 
         See \has_upper_hier_level for a description of this property
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def dup(self) -> LayerProperties:
         r"""
         @brief Creates a copy of self
         """
+        ...
     @overload
     def eff_dither_pattern(self) -> int:
         r"""
@@ -4314,6 +6366,7 @@ class LayerProperties:
 
         This method has been introduced in version 0.22.
         """
+        ...
     @overload
     def eff_dither_pattern(self, real: bool) -> int:
         r"""
@@ -4322,6 +6375,7 @@ class LayerProperties:
         The effective dither pattern index is always a valid index, even if no dither pattern is set.
         @param real Set to true to return the real instead of local value
         """
+        ...
     @overload
     def eff_fill_color(self) -> int:
         r"""
@@ -4331,6 +6385,7 @@ class LayerProperties:
 
         This method has been introduced in version 0.22.
         """
+        ...
     @overload
     def eff_fill_color(self, real: bool) -> int:
         r"""
@@ -4341,6 +6396,7 @@ class LayerProperties:
 
         @param real Set to true to return the real instead of local value
         """
+        ...
     @overload
     def eff_frame_color(self) -> int:
         r"""
@@ -4350,6 +6406,7 @@ class LayerProperties:
 
         This method has been introduced in version 0.22.
         """
+        ...
     @overload
     def eff_frame_color(self, real: bool) -> int:
         r"""
@@ -4360,6 +6417,7 @@ class LayerProperties:
 
         @param real Set to true to return the real instead of local value
         """
+        ...
     @overload
     def eff_line_style(self) -> int:
         r"""
@@ -4369,6 +6427,7 @@ class LayerProperties:
 
         This method has been introduced in version 0.25.
         """
+        ...
     @overload
     def eff_line_style(self, real: bool) -> int:
         r"""
@@ -4380,6 +6439,7 @@ class LayerProperties:
 
         This method has been introduced in version 0.25.
         """
+        ...
     def flat(self) -> LayerProperties:
         r"""
         @brief Returns the "flattened" (effective) layer properties entry for this node
@@ -4388,6 +6448,7 @@ class LayerProperties:
         This object represents the effective layer properties for the given node. In particular, all 'local' properties are identical to the 'real' properties. Such an object can be used as a basis for manipulations.
         This method has been introduced in version 0.22.
         """
+        ...
     @overload
     def has_dither_pattern(self) -> bool:
         r"""
@@ -4397,11 +6458,13 @@ class LayerProperties:
 
         This method has been introduced in version 0.22.
         """
+        ...
     @overload
     def has_dither_pattern(self, real: bool) -> bool:
         r"""
         @brief True, if the dither pattern is set
         """
+        ...
     @overload
     def has_fill_color(self) -> bool:
         r"""
@@ -4411,11 +6474,13 @@ class LayerProperties:
 
         This method has been introduced in version 0.22.
         """
+        ...
     @overload
     def has_fill_color(self, real: bool) -> bool:
         r"""
         @brief True, if the fill color is set
         """
+        ...
     @overload
     def has_frame_color(self) -> bool:
         r"""
@@ -4425,11 +6490,13 @@ class LayerProperties:
 
         This method has been introduced in version 0.22.
         """
+        ...
     @overload
     def has_frame_color(self, real: bool) -> bool:
         r"""
         @brief True, if the frame color is set
         """
+        ...
     @overload
     def has_line_style(self) -> bool:
         r"""
@@ -4439,6 +6506,7 @@ class LayerProperties:
 
         This method has been introduced in version 0.25.
         """
+        ...
     @overload
     def has_line_style(self, real: bool) -> bool:
         r"""
@@ -4446,6 +6514,7 @@ class LayerProperties:
 
         This method has been introduced in version 0.25.
         """
+        ...
     @overload
     def has_lower_hier_level(self) -> bool:
         r"""
@@ -4455,6 +6524,7 @@ class LayerProperties:
 
         This method has been introduced in version 0.22.
         """
+        ...
     @overload
     def has_lower_hier_level(self, real: bool) -> bool:
         r"""
@@ -4462,6 +6532,7 @@ class LayerProperties:
 
         If "real" is true, the effective value is returned.
         """
+        ...
     @overload
     def has_source_name(self) -> bool:
         r"""
@@ -4471,6 +6542,7 @@ class LayerProperties:
 
         This method has been introduced in version 0.22.
         """
+        ...
     @overload
     def has_source_name(self, real: bool) -> bool:
         r"""
@@ -4478,6 +6550,7 @@ class LayerProperties:
 
         If "real" is true, the effective value is returned.
         """
+        ...
     @overload
     def has_upper_hier_level(self) -> bool:
         r"""
@@ -4487,6 +6560,7 @@ class LayerProperties:
 
         This method has been introduced in version 0.22.
         """
+        ...
     @overload
     def has_upper_hier_level(self, real: bool) -> bool:
         r"""
@@ -4494,18 +6568,21 @@ class LayerProperties:
 
         If "real" is true, the effective value is returned.
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def layer_index(self) -> int:
         r"""
         @brief Gets the the layer index
 
         This is the index of the actual layer used. The source specification given by \source_layer, \source_datatype, \source_name is evaluated and the corresponding layer is looked up in the layout object. If a \source_layer_index is specified, this layer index is taken as the layer index to use.
         """
+        ...
     @overload
     def lower_hier_level_mode(self) -> int:
         r"""
@@ -4515,6 +6592,7 @@ class LayerProperties:
 
         This method has been introduced in version 0.22.
         """
+        ...
     @overload
     def lower_hier_level_mode(self, real: bool) -> int:
         r"""
@@ -4525,6 +6603,7 @@ class LayerProperties:
 
         This method has been introduced in version 0.20.
         """
+        ...
     @overload
     def lower_hier_level_relative(self) -> bool:
         r"""
@@ -4534,6 +6613,7 @@ class LayerProperties:
 
         This method has been introduced in version 0.22.
         """
+        ...
     @overload
     def lower_hier_level_relative(self, real: bool) -> bool:
         r"""
@@ -4543,6 +6623,7 @@ class LayerProperties:
 
         This method has been introduced in version 0.19.
         """
+        ...
     @overload
     def set_lower_hier_level(self, level: int, relative: bool) -> None:
         r"""
@@ -4552,6 +6633,7 @@ class LayerProperties:
 
         This method has been introduced in version 0.19.
         """
+        ...
     @overload
     def set_lower_hier_level(self, level: int, relative: bool, mode: int) -> None:
         r"""
@@ -4561,6 +6643,7 @@ class LayerProperties:
 
         This method has been introduced in version 0.20.
         """
+        ...
     @overload
     def set_upper_hier_level(self, level: int, relative: bool) -> None:
         r"""
@@ -4570,6 +6653,7 @@ class LayerProperties:
 
         This method has been introduced in version 0.19.
         """
+        ...
     @overload
     def set_upper_hier_level(self, level: int, relative: bool, mode: int) -> None:
         r"""
@@ -4579,6 +6663,7 @@ class LayerProperties:
 
         This method has been introduced in version 0.20.
         """
+        ...
     @overload
     def upper_hier_level_mode(self) -> int:
         r"""
@@ -4588,6 +6673,7 @@ class LayerProperties:
 
         This method has been introduced in version 0.22.
         """
+        ...
     @overload
     def upper_hier_level_mode(self, real: bool) -> int:
         r"""
@@ -4598,6 +6684,7 @@ class LayerProperties:
 
         This method has been introduced in version 0.20.
         """
+        ...
     @overload
     def upper_hier_level_relative(self) -> bool:
         r"""
@@ -4607,6 +6694,7 @@ class LayerProperties:
 
         This method has been introduced in version 0.22.
         """
+        ...
     @overload
     def upper_hier_level_relative(self, real: bool) -> bool:
         r"""
@@ -4616,6 +6704,8 @@ class LayerProperties:
 
         This method has been introduced in version 0.19.
         """
+        ...
+    ...
 
 class LayerPropertiesIterator:
     r"""
@@ -4632,14 +6722,17 @@ class LayerPropertiesIterator:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def __copy__(self) -> LayerPropertiesIterator:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __deepcopy__(self) -> LayerPropertiesIterator:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __eq__(self, other: object) -> bool:
         r"""
         @brief Equality
@@ -4647,10 +6740,12 @@ class LayerPropertiesIterator:
         @param other The other object to compare against
         Returns true, if self and other point to the same layer properties node. Caution: this does not imply that both layer properties nodes sit in the same tab. Just their position in the tree is compared.
         """
+        ...
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def __lt__(self, other: LayerPropertiesIterator) -> bool:
         r"""
         @brief Comparison
@@ -4659,35 +6754,41 @@ class LayerPropertiesIterator:
 
         @return true, if self points to an object that comes before other
         """
+        ...
     def __ne__(self, other: object) -> bool:
         r"""
         @brief Inequality
 
         @param other The other object to compare against
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -4695,6 +6796,7 @@ class LayerPropertiesIterator:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -4702,10 +6804,12 @@ class LayerPropertiesIterator:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def assign(self, other: LayerPropertiesIterator) -> None:
         r"""
         @brief Assigns another object to self
         """
+        ...
     def at_end(self) -> bool:
         r"""
         @brief At-the-end property
@@ -4713,12 +6817,14 @@ class LayerPropertiesIterator:
         This predicate is true if the iterator is at the end of either all elements or
         at the end of the child list (if \down_last_child or \down_first_child is used to iterate).
         """
+        ...
     def at_top(self) -> bool:
         r"""
         @brief At-the-top property
 
         This predicate is true if there is no parent node above the node addressed by self.
         """
+        ...
     def child_index(self) -> int:
         r"""
         @brief Returns the index of the child within the parent
@@ -4727,29 +6833,34 @@ class LayerPropertiesIterator:
         of children of its parent. If the element does not have a parent, the 
         index of the element in the global list is returned.
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def current(self) -> LayerPropertiesNodeRef:
         r"""
         @brief Returns a reference to the layer properties node that the iterator points to
 
         Starting with version 0.25, the returned object can be manipulated and the changes will be reflected in the view immediately.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def down_first_child(self) -> LayerPropertiesIterator:
         r"""
         @brief Move to the first child
@@ -4758,6 +6869,7 @@ class LayerPropertiesIterator:
         no child, \at_end? will be true. Even then, the iterator is sitting at the 
         the child level and \up can be used to move back.
         """
+        ...
     def down_last_child(self) -> LayerPropertiesIterator:
         r"""
         @brief Move to the last child
@@ -4768,10 +6880,12 @@ class LayerPropertiesIterator:
 
         Despite the name, the iterator does not address the last child, but the position after that child. To actually get the iterator for the last child, use down_last_child and next_sibling(-1).
         """
+        ...
     def dup(self) -> LayerPropertiesIterator:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def first_child(self) -> LayerPropertiesIterator:
         r"""
         @brief Returns the iterator pointing to the first child
@@ -4779,12 +6893,14 @@ class LayerPropertiesIterator:
         If there is no children, the iterator will be a valid insert point but not
         point to any valid element. It will report \at_end? = true.
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def is_null(self) -> bool:
         r"""
         @brief "is null" predicate
@@ -4792,6 +6908,7 @@ class LayerPropertiesIterator:
         This predicate is true if the iterator is "null". Such an iterator can be
         created with the default constructor or by moving a top-level iterator up.
         """
+        ...
     def last_child(self) -> LayerPropertiesIterator:
         r"""
         @brief Returns the iterator pointing behind the last child
@@ -4801,12 +6918,14 @@ class LayerPropertiesIterator:
 
         Despite the name, the iterator does not address the last child, but the position after that child. To actually get the iterator for the last child, use last_child and call next_sibling(-1) on that iterator.
         """
+        ...
     def next(self) -> LayerPropertiesIterator:
         r"""
         @brief Increment operator
 
         The iterator will be incremented to point to the next layer entry. It will descend into the hierarchy to address child nodes if there are any.
         """
+        ...
     def next_sibling(self, n: int) -> LayerPropertiesIterator:
         r"""
         @brief Move to the next sibling by a given distance
@@ -4814,12 +6933,14 @@ class LayerPropertiesIterator:
 
         The iterator is moved to the nth next sibling of the current element. Use negative distances to move backward.
         """
+        ...
     def num_siblings(self) -> int:
         r"""
         @brief Return the number of siblings
 
         The count includes the current element. More precisely, this property delivers the number of children of the current node's parent.
         """
+        ...
     def parent(self) -> LayerPropertiesIterator:
         r"""
         @brief Returns the iterator pointing to the parent node
@@ -4827,6 +6948,7 @@ class LayerPropertiesIterator:
         This method will return an iterator pointing to the parent element.
         If there is no parent, the returned iterator will be a null iterator.
         """
+        ...
     def to_sibling(self, n: int) -> LayerPropertiesIterator:
         r"""
         @brief Move to the sibling with the given index
@@ -4834,6 +6956,7 @@ class LayerPropertiesIterator:
 
         The iterator is moved to the nth sibling by selecting the nth child in the current node's parent.
         """
+        ...
     def up(self) -> LayerPropertiesIterator:
         r"""
         @brief Move up
@@ -4842,6 +6965,8 @@ class LayerPropertiesIterator:
         If the current element does not have a parent, the iterator will
         become a null iterator.
         """
+        ...
+    ...
 
 class LayerPropertiesNode(LayerProperties):
     r"""
@@ -4868,43 +6993,51 @@ class LayerPropertiesNode(LayerProperties):
 
         @param other The other object to compare against
         """
+        ...
     def __ne__(self, other: object) -> bool:
         r"""
         @brief Inequality 
 
         @param other The other object to compare against
         """
+        ...
     def _assign(self, other: LayerProperties) -> None:
         r"""
         @brief Assigns another object to self
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _dup(self) -> LayerPropertiesNode:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -4912,6 +7045,7 @@ class LayerPropertiesNode(LayerProperties):
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -4919,6 +7053,7 @@ class LayerPropertiesNode(LayerProperties):
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     @overload
     def add_child(self) -> LayerPropertiesNodeRef:
         r"""
@@ -4928,6 +7063,7 @@ class LayerPropertiesNode(LayerProperties):
 
         The parameterless version of this method was introduced in version 0.25.
         """
+        ...
     @overload
     def add_child(self, child: LayerProperties) -> LayerPropertiesNodeRef:
         r"""
@@ -4937,6 +7073,7 @@ class LayerPropertiesNode(LayerProperties):
 
         This method was introduced in version 0.22.
         """
+        ...
     def bbox(self) -> db.DBox:
         r"""
         @brief Compute the bbox of this layer
@@ -4948,11 +7085,13 @@ class LayerPropertiesNode(LayerProperties):
 
         @return A bbox in micron units
         """
+        ...
     def clear_children(self) -> None:
         r"""
         @brief Clears all children
         This method was introduced in version 0.22.
         """
+        ...
     def flat(self) -> LayerPropertiesNode:
         r"""
         @brief return the "flattened" (effective) layer properties node for this node
@@ -4962,10 +7101,12 @@ class LayerPropertiesNode(LayerProperties):
 
         Unlike the name suggests, this node will still contain a hierarchy of nodes below if the original node did so.
         """
+        ...
     def has_children(self) -> bool:
         r"""
         @brief Test, if there are children
         """
+        ...
     def id(self) -> int:
         r"""
         @brief Obtain the unique ID
@@ -4975,21 +7116,26 @@ class LayerPropertiesNode(LayerProperties):
         copied when the object is copied. The ID can be used to identify the
         object irregardless of its content.
         """
+        ...
     def is_expanded(self) -> bool:
         r"""
         @brief Gets a value indicating whether the layer tree node is expanded.
         This predicate has been introduced in version 0.28.6.
         """
+        ...
     def list_index(self) -> int:
         r"""
         @brief Gets the index of the layer properties list that the node lives in
         """
+        ...
     def view(self) -> LayoutView:
         r"""
         @brief Gets the view this node lives in
 
         This reference can be nil if the node is a orphan node that lives outside a view.
         """
+        ...
+    ...
 
 class LayerPropertiesNodeRef(LayerPropertiesNode):
     r"""
@@ -5015,42 +7161,50 @@ class LayerPropertiesNodeRef(LayerPropertiesNode):
         @brief Creates a \LayerPropertiesNode object as a copy of the content of this node.
         This method is mainly provided for backward compatibility with 0.24 and before.
         """
+        ...
     def __deepcopy__(self) -> LayerPropertiesNode:
         r"""
         @brief Creates a \LayerPropertiesNode object as a copy of the content of this node.
         This method is mainly provided for backward compatibility with 0.24 and before.
         """
+        ...
     def _assign(self, other: LayerProperties) -> None:
         r"""
         @brief Assigns another object to self
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _dup(self) -> LayerPropertiesNodeRef:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -5058,6 +7212,7 @@ class LayerPropertiesNodeRef(LayerPropertiesNode):
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -5065,6 +7220,7 @@ class LayerPropertiesNodeRef(LayerPropertiesNode):
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     @overload
     def assign(self, other: LayerProperties) -> None:
         r"""
@@ -5072,6 +7228,7 @@ class LayerPropertiesNodeRef(LayerPropertiesNode):
 
         This version accepts a \LayerProperties object. Assignment will change the properties of the layer in the view.
         """
+        ...
     @overload
     def assign(self, other: LayerProperties) -> None:
         r"""
@@ -5079,23 +7236,28 @@ class LayerPropertiesNodeRef(LayerPropertiesNode):
 
         This version accepts a \LayerPropertiesNode object and allows modification of the layer node's hierarchy. Assignment will reconfigure the layer node in the view.
         """
+        ...
     def delete(self) -> None:
         r"""
         @brief Erases the current node and all child nodes
 
         After erasing the node, the reference will become invalid.
         """
+        ...
     def dup(self) -> LayerPropertiesNode:
         r"""
         @brief Creates a \LayerPropertiesNode object as a copy of the content of this node.
         This method is mainly provided for backward compatibility with 0.24 and before.
         """
+        ...
     def is_valid(self) -> bool:
         r"""
         @brief Returns true, if the reference points to a valid layer properties node
 
         Invalid references behave like ordinary \LayerPropertiesNode objects but without the ability to update the view upon changes of attributes.
         """
+        ...
+    ...
 
 class LayoutView(LayoutViewBase):
     r"""
@@ -5103,41 +7265,52 @@ class LayoutView(LayoutViewBase):
 
     The visual part of the view is the tab panel in the main window. The non-visual part are the redraw thread, the layout handles, cell lists, layer view lists etc. This object controls these aspects of the view and controls the appearance of the data. 
     """
-    current: ClassVar[LayoutView]
-    r"""
-    @brief Returns the current view
-    The current view is the one that is made current by using \current=.
-
-    This variation has been introduced for the non-Qt case in version 0.28.
-    """
-    on_drawing_finished_event: None
+    on_close: None
     r"""
     Getter:
-    @brief An event indicating that the image is fully drawn
+    @brief A event indicating that the view is about to close
 
-    This event is triggered when calling \timer. Before this event is issue, a final \on_image_updated_event may be issued.
+    This event is triggered when the view is going to be closed entirely.
 
-    This event has been introduced in version 0.28.
+    It has been added in version 0.25.
     Setter:
-    @brief An event indicating that the image is fully drawn
+    @brief A event indicating that the view is about to close
 
-    This event is triggered when calling \timer. Before this event is issue, a final \on_image_updated_event may be issued.
+    This event is triggered when the view is going to be closed entirely.
 
-    This event has been introduced in version 0.28.
+    It has been added in version 0.25.
     """
-    on_image_updated_event: None
+    on_hide: None
     r"""
     Getter:
-    @brief An event indicating that the image ("screenshot") was updated
+    @brief A event indicating that the view is going to become invisible
 
-    This event is triggered when calling \timer.
-    This event has been introduced in version 0.28.
+    It has been added in version 0.25.
     Setter:
-    @brief An event indicating that the image ("screenshot") was updated
+    @brief A event indicating that the view is going to become invisible
 
-    This event is triggered when calling \timer.
-    This event has been introduced in version 0.28.
+    It has been added in version 0.25.
     """
+    on_show: None
+    r"""
+    Getter:
+    @brief A event indicating that the view is going to become visible
+
+    It has been added in version 0.25.
+    Setter:
+    @brief A event indicating that the view is going to become visible
+
+    It has been added in version 0.25.
+    """
+    @classmethod
+    def current(cls) -> LayoutView:
+        r"""
+        @brief Returns the current view
+        The current view is the one that is shown in the current tab. Returns nil if no layout is loaded.
+
+        This method has been introduced in version 0.23.
+        """
+        ...
     @classmethod
     def new(cls, editable: Optional[bool] = ..., manager: Optional[db.Manager] = ..., options: Optional[int] = ...) -> LayoutView:
         r"""
@@ -5147,11 +7320,12 @@ class LayoutView(LayoutViewBase):
 
         @param editable True to make the view editable
         @param manager The \Manager object to enable undo/redo
-        @param options A combination of the values in the LV_... constants
+        @param options A combination of the values in the LV_... constants from \LayoutViewBase
 
         This constructor has been introduced in version 0.25.
         It has been enhanced with the arguments in version 0.27.
         """
+        ...
     def __init__(self, editable: Optional[bool] = ..., manager: Optional[db.Manager] = ..., options: Optional[int] = ...) -> None:
         r"""
         @brief Creates a standalone view
@@ -5160,34 +7334,39 @@ class LayoutView(LayoutViewBase):
 
         @param editable True to make the view editable
         @param manager The \Manager object to enable undo/redo
-        @param options A combination of the values in the LV_... constants
+        @param options A combination of the values in the LV_... constants from \LayoutViewBase
 
         This constructor has been introduced in version 0.25.
         It has been enhanced with the arguments in version 0.27.
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -5195,6 +7374,7 @@ class LayoutView(LayoutViewBase):
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -5202,15 +7382,47 @@ class LayoutView(LayoutViewBase):
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
-    def timer(self) -> None:
+        ...
+    def bookmark_view(self, name: str) -> None:
         r"""
-        @brief A callback required to be called regularily in the non-Qt case.
+        @brief Bookmarks the current view under the given name
 
-        This callback eventually implements the event loop in the non-Qt case. The main task is to indicate new versions of the layout image while it is drawn. When a new image has arrived, this method will issue an \on_image_updated_event. In the implementation of the latter, "screenshot" may be called to retrieve the current image.
-        When drawing has finished, the \on_drawing_finished_event will be triggered.
-
-        This method has been introduced in version 0.28.
+        @param name The name under which to bookmark the current state
         """
+        ...
+    def close(self) -> None:
+        r"""
+        @brief Closes the view
+
+        This method has been added in version 0.27.
+        """
+        ...
+    def show_l2ndb(self, l2ndb_index: int, cv_index: int) -> None:
+        r"""
+        @brief Shows a netlist database in the marker browser on a certain layout
+        The netlist browser is opened showing the netlist database with the index given by "l2ndb_index".
+        It will be attached (i.e. navigate to) the layout with the given cellview index in "cv_index".
+
+        This method has been added in version 0.26.
+        """
+        ...
+    def show_lvsdb(self, lvsdb_index: int, cv_index: int) -> None:
+        r"""
+        @brief Shows a netlist database in the marker browser on a certain layout
+        The netlist browser is opened showing the netlist database with the index given by "lvsdb_index".
+        It will be attached (i.e. navigate to) the layout with the given cellview index in "cv_index".
+
+        This method has been added in version 0.26.
+        """
+        ...
+    def show_rdb(self, rdb_index: int, cv_index: int) -> None:
+        r"""
+        @brief Shows a report database in the marker browser on a certain layout
+        The marker browser is opened showing the report database with the index given by "rdb_index".
+        It will be attached (i.e. navigate to) the layout with the given cellview index in "cv_index".
+        """
+        ...
+    ...
 
 class LayoutViewBase:
     r"""
@@ -5245,84 +7457,103 @@ class LayoutViewBase:
             r"""
             @brief Creates an enum from an integer value
             """
+            ...
         @overload
         @classmethod
         def new(cls, s: str) -> LayoutViewBase.SelectionMode:
             r"""
             @brief Creates an enum from a string value
             """
+            ...
         @overload
-        def __eq__(self, other: object) -> bool:
+        def __eq__(self, other: int) -> bool:
             r"""
             @brief Compares an enum with an integer value
             """
+            ...
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
             @brief Compares two enums
             """
+            ...
         def __hash__(self) -> int:
             r"""
             @brief Gets the hash value from the enum
             """
+            ...
         @overload
         def __init__(self, i: int) -> None:
             r"""
             @brief Creates an enum from an integer value
             """
+            ...
         @overload
         def __init__(self, s: str) -> None:
             r"""
             @brief Creates an enum from a string value
             """
+            ...
         def __int__(self) -> int:
             r"""
             @brief Gets the integer value from the enum
             """
+            ...
         @overload
         def __lt__(self, other: LayoutViewBase.SelectionMode) -> bool:
             r"""
             @brief Returns true if the first enum is less (in the enum symbol order) than the second
             """
+            ...
         @overload
         def __lt__(self, other: int) -> bool:
             r"""
             @brief Returns true if the enum is less (in the enum symbol order) than the integer value
             """
+            ...
+        @overload
+        def __ne__(self, other: int) -> bool:
+            r"""
+            @brief Compares an enum with an integer for inequality
+            """
+            ...
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
             @brief Compares two enums for inequality
             """
-        @overload
-        def __ne__(self, other: object) -> bool:
-            r"""
-            @brief Compares an enum with an integer for inequality
-            """
+            ...
         def __repr__(self) -> str:
             r"""
             @brief Converts an enum to a visual string
             """
+            ...
         def __str__(self) -> str:
             r"""
             @brief Gets the symbolic string from an enum
             """
+            ...
         def hash(self) -> int:
             r"""
             @brief Gets the hash value from the enum
             """
+            ...
         def inspect(self) -> str:
             r"""
             @brief Converts an enum to a visual string
             """
+            ...
         def to_i(self) -> int:
             r"""
             @brief Gets the integer value from the enum
             """
+            ...
         def to_s(self) -> str:
             r"""
             @brief Gets the symbolic string from an enum
             """
+            ...
+        ...
     Add: ClassVar[LayoutViewBase.SelectionMode]
     r"""
     @brief Adds to any existing selection
@@ -5474,6 +7705,7 @@ class LayoutViewBase:
 
         This method has been renamed from set_active_cellview_index to active_cellview_index= in version 0.25. The original name is still available, but is deprecated.
         """
+        ...
     max_hier_levels: int
     r"""
     Getter:
@@ -5864,38 +8096,45 @@ class LayoutViewBase:
 
         This method has been introduced in version 0.27.
         """
+        ...
     @classmethod
     def new(cls) -> LayoutViewBase:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -5903,6 +8142,7 @@ class LayoutViewBase:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -5910,6 +8150,7 @@ class LayoutViewBase:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def active_cellview(self) -> CellView:
         r"""
         @brief Gets the active cellview (shown in hierarchy browser)
@@ -5919,10 +8160,12 @@ class LayoutViewBase:
         This method has been introduced in version 0.19.
         Starting from version 0.25, the returned object can be manipulated which will have an immediate effect on the display.
         """
+        ...
     def active_cellview_index(self) -> int:
         r"""
         @brief Gets the index of the active cellview (shown in hierarchy browser)
         """
+        ...
     def add_l2ndb(self, db: db.LayoutToNetlist) -> int:
         r"""
         @brief Adds the given netlist database to the view
@@ -5934,6 +8177,7 @@ class LayoutViewBase:
 
         This method has been added in version 0.26.
         """
+        ...
     @overload
     def add_line_style(self, name: str, data: int, bits: int) -> int:
         r"""
@@ -5945,6 +8189,7 @@ class LayoutViewBase:
         @return The index of the newly created style, which can be used as the line style index of \LayerProperties.
         This method has been introduced in version 0.25.
         """
+        ...
     @overload
     def add_line_style(self, name: str, string: str) -> int:
         r"""
@@ -5955,6 +8200,7 @@ class LayoutViewBase:
         @return The index of the newly created style, which can be used as the line style index of \LayerProperties.
         This method has been introduced in version 0.25.
         """
+        ...
     def add_lvsdb(self, db: db.LayoutVsSchematic) -> int:
         r"""
         @brief Adds the given database to the view
@@ -5966,11 +8212,13 @@ class LayoutViewBase:
 
         This method has been added in version 0.26.
         """
+        ...
     def add_missing_layers(self) -> None:
         r"""
         @brief Adds new layers to layer list
         This method was introduced in version 0.19.
         """
+        ...
     def add_rdb(self, db: rdb.ReportDatabase) -> int:
         r"""
         @brief Adds the given report database to the view
@@ -5982,6 +8230,7 @@ class LayoutViewBase:
 
         This method has been added in version 0.26.
         """
+        ...
     @overload
     def add_stipple(self, name: str, data: Sequence[int], bits: int) -> int:
         r"""
@@ -5994,6 +8243,7 @@ class LayoutViewBase:
         @param bits See above
         @return The index of the newly created stipple pattern, which can be used as the dither pattern index of \LayerProperties.
         """
+        ...
     @overload
     def add_stipple(self, name: str, string: str) -> int:
         r"""
@@ -6006,6 +8256,7 @@ class LayoutViewBase:
         @return The index of the newly created stipple pattern, which can be used as the dither pattern index of \LayerProperties.
         This method has been introduced in version 0.25.
         """
+        ...
     def annotation(self, id: int) -> Annotation:
         r"""
         @brief Gets the annotation given by an ID
@@ -6016,6 +8267,7 @@ class LayoutViewBase:
 
         This method has been introduced in version 0.25.
         """
+        ...
     def annotation_templates(self) -> List[List[Any]]:
         r"""
         @brief Gets a list of \Annotation objects representing the annotation templates.
@@ -6026,12 +8278,14 @@ class LayoutViewBase:
 
         This method has been introduced in version 0.28.
         """
+        ...
     def ascend(self, index: int) -> db.InstElement:
         r"""
         @brief Ascends upwards in the hierarchy.
 
         Removes one element from the specific path of the cellview with the given index. Returns the element removed.
         """
+        ...
     @overload
     def begin_layers(self) -> LayerPropertiesIterator:
         r"""
@@ -6044,6 +8298,7 @@ class LayoutViewBase:
 
         Starting from version 0.25, an alternative solution is provided with 'each_layer' which is based on the \LayerPropertiesNodeRef class.
         """
+        ...
     @overload
     def begin_layers(self, index: int) -> LayerPropertiesIterator:
         r"""
@@ -6055,10 +8310,12 @@ class LayoutViewBase:
         against a current iterator to check, if there are no further elements.
         This version addresses a specific list in a multi-tab layer properties arrangement with the "index" parameter. This method has been introduced in version 0.21.
         """
+        ...
     def box(self) -> db.DBox:
         r"""
         @brief Returns the displayed box in micron space
         """
+        ...
     def call_menu(self, symbol: str) -> None:
         r"""
         @brief Calls the menu item with the provided symbol.
@@ -6066,12 +8323,14 @@ class LayoutViewBase:
 
         This method has been introduced in version 0.27.
         """
+        ...
     def cancel(self) -> None:
         r"""
         @brief Cancels all edit operations
 
         This method will stop all pending edit operations (i.e. drag and drop) and cancel the current selection. Calling this method is useful to ensure there are no potential interactions with the script's functionality.
         """
+        ...
     def cellview(self, cv_index: int) -> CellView:
         r"""
         @brief Gets the cellview object for a given index
@@ -6080,41 +8339,49 @@ class LayoutViewBase:
 
         Starting with version 0.25, this method returns a \CellView object that can be manipulated to directly reflect any changes in the display.
         """
+        ...
     def cellviews(self) -> int:
         r"""
         @brief Gets the number of cellviews
         """
+        ...
     def clear_annotations(self) -> None:
         r"""
         @brief Clears all annotations on this view
         """
+        ...
     def clear_config(self) -> None:
         r"""
         @brief Clears the local configuration parameters
 
         See \set_config for a description of the local configuration parameters.
         """
+        ...
     def clear_images(self) -> None:
         r"""
         @brief Clear all images on this view
         """
+        ...
     @overload
     def clear_layers(self) -> None:
         r"""
         @brief Clears all layers
         """
+        ...
     @overload
     def clear_layers(self, index: int) -> None:
         r"""
         @brief Clears all layers for the given layer properties list
         This version addresses a specific list in a multi-tab layer properties arrangement with the "index" parameter. This method has been introduced in version 0.21.
         """
+        ...
     def clear_line_styles(self) -> None:
         r"""
         @brief Removes all custom line styles
         All line styles except the fixed ones are removed. If any of the custom styles is still used by the layers displayed, the results will be undefined.
         This method has been introduced in version 0.25.
         """
+        ...
     def clear_object_selection(self) -> None:
         r"""
         @brief Clears the selection of geometrical objects (shapes or cell instances)
@@ -6122,17 +8389,20 @@ class LayoutViewBase:
 
         This method has been introduced in version 0.24
         """
+        ...
     def clear_selection(self) -> None:
         r"""
         @brief Clears the selection of all objects (shapes, annotations, images ...)
 
         This method has been introduced in version 0.26.2
         """
+        ...
     def clear_stipples(self) -> None:
         r"""
         @brief Removes all custom line styles
         All stipple pattern except the fixed ones are removed. If any of the custom stipple pattern is still used by the layers displayed, the results will be undefined.
         """
+        ...
     def clear_transactions(self) -> None:
         r"""
         @brief Clears all transactions
@@ -6140,12 +8410,14 @@ class LayoutViewBase:
         Discard all actions in the undo buffer. After clearing that buffer, no undo is available. It is important to clear the buffer when making database modifications outside transactions, i.e after that modifications have been done. If failing to do so, 'undo' operations are likely to produce invalid results.
         This method was introduced in version 0.16.
         """
+        ...
     def clear_transient_selection(self) -> None:
         r"""
         @brief Clears the transient selection (mouse-over hightlights) of all objects (shapes, annotations, images ...)
 
         This method has been introduced in version 0.26.2
         """
+        ...
     def commit(self) -> None:
         r"""
         @brief Ends a transaction
@@ -6153,6 +8425,7 @@ class LayoutViewBase:
         See \transaction for a detailed description of transactions. 
         This method was introduced in version 0.16.
         """
+        ...
     def commit_config(self) -> None:
         r"""
         @brief Commits the configuration settings
@@ -6161,11 +8434,13 @@ class LayoutViewBase:
 
         This method has been introduced in version 0.25.
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def create_l2ndb(self, name: str) -> int:
         r"""
         @brief Creates a new netlist database and returns the index of the new database
@@ -6176,6 +8451,7 @@ class LayoutViewBase:
 
         This method has been added in version 0.26.
         """
+        ...
     @overload
     def create_layout(self, add_cellview: bool) -> int:
         r"""
@@ -6188,6 +8464,7 @@ class LayoutViewBase:
 
         @return The index of the cellview created.
         """
+        ...
     @overload
     def create_layout(self, tech: str, add_cellview: bool) -> int:
         r"""
@@ -6200,6 +8477,7 @@ class LayoutViewBase:
 
         This variant has been introduced in version 0.22.
         """
+        ...
     @overload
     def create_layout(self, tech: str, add_cellview: bool, init_layers: bool) -> int:
         r"""
@@ -6213,6 +8491,7 @@ class LayoutViewBase:
 
         This variant has been introduced in version 0.22.
         """
+        ...
     def create_lvsdb(self, name: str) -> int:
         r"""
         @brief Creates a new netlist database and returns the index of the new database
@@ -6223,6 +8502,7 @@ class LayoutViewBase:
 
         This method has been added in version 0.26.
         """
+        ...
     def create_measure_ruler(self, point: db.DPoint, ac: Optional[int] = ...) -> Annotation:
         r"""
         @brief Createas an auto-measure ruler at the given point.
@@ -6242,6 +8522,7 @@ class LayoutViewBase:
 
         This method was introduced in version 0.26.
         """
+        ...
     def create_rdb(self, name: str) -> int:
         r"""
         @brief Creates a new report database and returns the index of the new database
@@ -6250,6 +8531,7 @@ class LayoutViewBase:
         This method returns an index of the new report database. Use \rdb to get the actual object. If a report database with the given name already exists, a unique name will be created.
         The name will be replaced by the file name when a file is loaded into the report database.
         """
+        ...
     @overload
     def delete_layer(self, index: int, iter: LayerPropertiesIterator) -> None:
         r"""
@@ -6259,6 +8541,7 @@ class LayoutViewBase:
         the iterator since the object that the iterator points to is no longer valid.
         This version addresses a specific list in a multi-tab layer properties arrangement with the "index" parameter. This method has been introduced in version 0.21.
         """
+        ...
     @overload
     def delete_layer(self, iter: LayerPropertiesIterator) -> None:
         r"""
@@ -6267,12 +8550,14 @@ class LayoutViewBase:
         This method deletes the object that the iterator points to and invalidates
         the iterator since the object that the iterator points to is no longer valid.
         """
+        ...
     def delete_layer_list(self, index: int) -> None:
         r"""
         @brief Deletes the given properties list
         At least one layer properties list must remain. This method may change the current properties list.
         This method has been introduced in version 0.21.
         """
+        ...
     @overload
     def delete_layers(self, index: int, iterators: Sequence[LayerPropertiesIterator]) -> None:
         r"""
@@ -6281,6 +8566,7 @@ class LayoutViewBase:
         This method deletes the nodes specifies by the iterators. This method is the most convenient way to delete multiple entries.
         This version addresses a specific list in a multi-tab layer properties arrangement with the "index" parameter. This method has been introduced in version 0.22.
         """
+        ...
     @overload
     def delete_layers(self, iterators: Sequence[LayerPropertiesIterator]) -> None:
         r"""
@@ -6290,6 +8576,7 @@ class LayoutViewBase:
 
         This method has been added in version 0.22.
         """
+        ...
     def descend(self, path: Sequence[db.InstElement], index: int) -> None:
         r"""
         @brief Descends further into the hierarchy.
@@ -6297,38 +8584,45 @@ class LayoutViewBase:
         Adds the given path (given as an array of InstElement objects) to the specific path of the cellview with the given index. In effect, the cell addressed by the terminal of the new path components can be shown in the context of the upper cells, if the minimum hierarchy level is set to a negative value.
         The path is assumed to originate from the current cell and contain specific instances sorted from top to bottom.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def each_annotation(self) -> Iterator[Annotation]:
         r"""
         @brief Iterates over all annotations attached to this view
         """
+        ...
     def each_annotation_selected(self) -> Iterator[Annotation]:
         r"""
         @brief Iterate over each selected annotation objects, yielding a \Annotation object for each of them
         This method was introduced in version 0.19.
         """
+        ...
     def each_image(self) -> Iterator[Image]:
         r"""
         @brief Iterate over all images attached to this view
 
         With version 0.25, the objects returned by the iterator are references and can be manipulated to change their appearance.
         """
+        ...
     def each_image_selected(self) -> Iterator[Image]:
         r"""
         @brief Iterate over each selected image object, yielding a \Image object for each of them
         This method was introduced in version 0.19.
         """
+        ...
     @overload
     def each_layer(self) -> Iterator[LayerPropertiesNodeRef]:
         r"""
@@ -6345,6 +8639,7 @@ class LayoutViewBase:
 
         This method was introduced in version 0.25.
         """
+        ...
     @overload
     def each_layer(self, layer_list: int) -> Iterator[LayerPropertiesNodeRef]:
         r"""
@@ -6354,6 +8649,7 @@ class LayoutViewBase:
 
         This method was introduced in version 0.25.
         """
+        ...
     def each_object_selected(self) -> Iterator[ObjectInstPath]:
         r"""
         @brief Iterates over each selected geometrical object, yielding a \ObjectInstPath object for each of them
@@ -6362,12 +8658,14 @@ class LayoutViewBase:
 
         Another way of obtaining the selection is \object_selection, which returns an array of \ObjectInstPath objects.
         """
+        ...
     def each_object_selected_transient(self) -> Iterator[ObjectInstPath]:
         r"""
         @brief Iterates over each geometrical objects in the transient selection, yielding a \ObjectInstPath object for each of them
 
         This method was introduced in version 0.18.
         """
+        ...
     def enable_edits(self, enable: bool) -> None:
         r"""
         @brief Enables or disables edits
@@ -6377,12 +8675,14 @@ class LayoutViewBase:
         This method allows putting the view into read-only mode by disabling all edit functions. For doing so, this method has to be called with a 'false' argument. Calling it with a 'true' parameter enables all edits again. This method must not be confused with the edit/viewer mode. The LayoutView's enable_edits method is intended to temporarily disable all menu entries and functions which could allow the user to alter the database.
         In 0.25, this method has been moved from MainWindow to LayoutView.
         """
+        ...
     @overload
     def end_layers(self) -> LayerPropertiesIterator:
         r"""
         @brief End iterator for the layers
         See \begin_layers for a description about this iterator
         """
+        ...
     @overload
     def end_layers(self, index: int) -> LayerPropertiesIterator:
         r"""
@@ -6390,6 +8690,7 @@ class LayoutViewBase:
         See \begin_layers for a description about this iterator
         This version addresses a specific list in a multi-tab layer properties arrangement with the "index" parameter. This method has been introduced in version 0.21.
         """
+        ...
     def erase_annotation(self, id: int) -> None:
         r"""
         @brief Erases the annotation given by the id
@@ -6398,12 +8699,14 @@ class LayoutViewBase:
         This method has been introduced in version 0.24.
         Starting with version 0.25, the annotation's \Annotation#delete method can also be used to delete an annotation.
         """
+        ...
     def erase_cellview(self, index: int) -> None:
         r"""
         @brief Erases the cellview with the given index
 
         This closes the given cellview and unloads the layout associated with it, unless referred to by another cellview.
         """
+        ...
     def erase_image(self, id: int) -> None:
         r"""
         @brief Erase the given image
@@ -6415,6 +8718,7 @@ class LayoutViewBase:
 
         With version 0.25, \Image#delete can be used to achieve the same results.
         """
+        ...
     @overload
     def expand_layer_properties(self) -> None:
         r"""
@@ -6424,6 +8728,7 @@ class LayoutViewBase:
 
         This method was introduced in version 0.21.
         """
+        ...
     @overload
     def expand_layer_properties(self, index: int) -> None:
         r"""
@@ -6433,6 +8738,7 @@ class LayoutViewBase:
 
         This method was introduced in version 0.21.
         """
+        ...
     def get_config(self, name: str) -> str:
         r"""
         @brief Gets the value of a local configuration parameter
@@ -6443,6 +8749,7 @@ class LayoutViewBase:
 
         See \set_config for a description of the local configuration parameters.
         """
+        ...
     def get_config_names(self) -> List[str]:
         r"""
         @brief Gets the configuration parameter names
@@ -6453,6 +8760,7 @@ class LayoutViewBase:
 
         This method was introduced in version 0.25.
         """
+        ...
     def get_current_cell_path(self, cv_index: int) -> List[int]:
         r"""
         @brief Gets the cell path of the current cell
@@ -6464,6 +8772,36 @@ class LayoutViewBase:
         @param cv_index The cellview index for which to get the current path from (usually this will be the active cellview index)
         This method is was deprecated in version 0.25 since from then, the \CellView object can be used to obtain an manipulate the selected cell.
         """
+        ...
+    def get_image(self, width: int, height: int) -> QtGui.QImage_Native:
+        r"""
+        @brief Gets the layout image as a \QImage
+
+        @param width The width of the image to render in pixel.
+        @param height The height of the image to render in pixel.
+
+        The image contains the current scene (layout, annotations etc.).
+        The image is drawn synchronously with the given width and height. Drawing may take some time. 
+        """
+        ...
+    def get_image_with_options(self, width: int, height: int, linewidth: Optional[int] = ..., oversampling: Optional[int] = ..., resolution: Optional[float] = ..., target: Optional[db.DBox] = ..., monochrome: Optional[bool] = ...) -> QtGui.QImage_Native:
+        r"""
+        @brief Gets the layout image as a \QImage (with options)
+
+        @param width The width of the image to render in pixel.
+        @param height The height of the image to render in pixel.
+        @param linewidth The width of a line in pixels (usually 1) or 0 for default.
+        @param oversampling The oversampling factor (1..3) or 0 for default.
+        @param resolution The resolution (pixel size compared to a screen pixel size, i.e 1/oversampling) or 0 for default.
+        @param target_box The box to draw or an empty box for default.
+        @param monochrome If true, monochrome images will be produced.
+
+        The image contains the current scene (layout, annotations etc.).
+        The image is drawn synchronously with the given width and height. Drawing may take some time. Monochrome images don't have background or annotation objects currently.
+
+        This method has been introduced in version 0.23.10.
+        """
+        ...
     def get_line_style(self, index: int) -> str:
         r"""
         @brief Gets the line style string for the style with the given index
@@ -6474,6 +8812,7 @@ class LayoutViewBase:
 
         This method has been introduced in version 0.25.
         """
+        ...
     def get_pixels(self, width: int, height: int) -> PixelBuffer:
         r"""
         @brief Gets the layout image as a \PixelBuffer
@@ -6485,6 +8824,7 @@ class LayoutViewBase:
         The image is drawn synchronously with the given width and height. Drawing may take some time. 
         This method has been introduced in 0.28.
         """
+        ...
     def get_pixels_with_options(self, width: int, height: int, linewidth: Optional[int] = ..., oversampling: Optional[int] = ..., resolution: Optional[float] = ..., target: Optional[db.DBox] = ...) -> PixelBuffer:
         r"""
         @brief Gets the layout image as a \PixelBuffer (with options)
@@ -6500,6 +8840,7 @@ class LayoutViewBase:
         The image is drawn synchronously with the given width and height. Drawing may take some time. 
         This method has been introduced in 0.28.
         """
+        ...
     def get_pixels_with_options_mono(self, width: int, height: int, linewidth: Optional[int] = ..., target: Optional[db.DBox] = ...) -> BitmapBuffer:
         r"""
         @brief Gets the layout image as a \PixelBuffer (with options)
@@ -6514,6 +8855,14 @@ class LayoutViewBase:
 
         This method has been introduced in 0.28.
         """
+        ...
+    def get_screenshot(self) -> QtGui.QImage_Native:
+        r"""
+        @brief Gets a screenshot as a \QImage
+
+        Getting the image requires the drawing to be complete. Ideally, synchronous mode is switched on for the application to guarantee this condition. The image will have the size of the viewport showing the current layout.
+        """
+        ...
     def get_screenshot_pixels(self) -> PixelBuffer:
         r"""
         @brief Gets a screenshot as a \PixelBuffer
@@ -6521,6 +8870,7 @@ class LayoutViewBase:
         Getting the image requires the drawing to be complete. Ideally, synchronous mode is switched on for the application to guarantee this condition. The image will have the size of the viewport showing the current layout.
         This method has been introduced in 0.28.
         """
+        ...
     def get_stipple(self, index: int) -> str:
         r"""
         @brief Gets the stipple pattern string for the pattern with the given index
@@ -6530,26 +8880,31 @@ class LayoutViewBase:
 
         This method has been introduced in version 0.25.
         """
+        ...
     def has_annotation_selection(self) -> bool:
         r"""
         @brief Returns true, if annotations (rulers) are selected in this view
         This method was introduced in version 0.19.
         """
+        ...
     def has_image_selection(self) -> bool:
         r"""
         @brief Returns true, if images are selected in this view
         This method was introduced in version 0.19.
         """
+        ...
     def has_object_selection(self) -> bool:
         r"""
         @brief Returns true, if geometrical objects (shapes or cell instances) are selected in this view
         """
+        ...
     def has_selection(self) -> bool:
         r"""
         @brief Indicates whether any objects are selected
 
         This method has been introduced in version 0.27
         """
+        ...
     def has_transient_object_selection(self) -> bool:
         r"""
         @brief Returns true, if geometrical objects (shapes or cell instances) are selected in this view in the transient selection
@@ -6558,10 +8913,12 @@ class LayoutViewBase:
 
         This method was introduced in version 0.18.
         """
+        ...
     def hide_cell(self, cell_index: int, cv_index: int) -> None:
         r"""
         @brief Hides the given cell for the given cellview
         """
+        ...
     def icon_for_layer(self, iter: LayerPropertiesIterator, w: int, h: int, dpr: float, di_off: Optional[int] = ..., no_state: Optional[bool] = ...) -> PixelBuffer:
         r"""
         @brief Creates an icon pixmap for the given layer.
@@ -6572,6 +8929,7 @@ class LayoutViewBase:
 
         This method has been introduced in version 0.28.
         """
+        ...
     def image(self, id: int) -> Image:
         r"""
         @brief Gets the image given by an ID
@@ -6582,6 +8940,7 @@ class LayoutViewBase:
 
         This method has been introduced in version 0.25.
         """
+        ...
     def init_layer_properties(self, props: LayerProperties) -> None:
         r"""
         @brief Fills the layer properties for a new layer
@@ -6592,12 +8951,14 @@ class LayoutViewBase:
 
         @param props The layer properties object to initialize.
         """
+        ...
     def insert_annotation(self, obj: Annotation) -> None:
         r"""
         @brief Inserts an annotation object into the given view
         Inserts a new annotation into the view. Existing annotation will remain. Use \clear_annotations to delete them before inserting new ones. Use \replace_annotation to replace an existing one with a new one. 
         Starting with version 0.25 this method modifies self's ID to reflect the ID of the ruler created. After an annotation is inserted into the view, it can be modified and the changes of properties will become reflected immediately in the view.
         """
+        ...
     def insert_image(self, obj: Image) -> None:
         r"""
         @brief Insert an image object into the given view
@@ -6605,6 +8966,7 @@ class LayoutViewBase:
 
         With version 0.25, this method will attach the image object to the view and the image object will become a 'live' object - i.e. changes to the object will change the appearance of the image on the screen.
         """
+        ...
     @overload
     def insert_layer(self, index: int, iter: LayerPropertiesIterator, node: Optional[LayerProperties] = ...) -> LayerPropertiesNodeRef:
         r"""
@@ -6615,6 +8977,7 @@ class LayoutViewBase:
         Since version 0.22, this method accepts LayerProperties and LayerPropertiesNode objects. A LayerPropertiesNode object can contain a hierarchy of further nodes.
         Since version 0.26 the node parameter is optional and the reference returned by this method can be used to set the properties of the new node.
         """
+        ...
     @overload
     def insert_layer(self, iter: LayerPropertiesIterator, node: Optional[LayerProperties] = ...) -> LayerPropertiesNodeRef:
         r"""
@@ -6625,24 +8988,28 @@ class LayoutViewBase:
         Since version 0.22, this method accepts LayerProperties and LayerPropertiesNode objects. A LayerPropertiesNode object can contain a hierarchy of further nodes.
         Since version 0.26 the node parameter is optional and the reference returned by this method can be used to set the properties of the new node.
         """
+        ...
     def insert_layer_list(self, index: int) -> None:
         r"""
         @brief Inserts a new layer properties list at the given index
         This method inserts a new tab at the given position. The current layer properties list will be changed to the new list.
         This method has been introduced in version 0.21.
         """
+        ...
     def is_cell_hidden(self, cell_index: int, cv_index: int) -> bool:
         r"""
         @brief Returns true, if the cell is hidden
 
         @return True, if the cell with "cell_index" is hidden for the cellview "cv_index"
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def is_dirty(self) -> bool:
         r"""
         @brief Gets a flag indicating whether one of the layouts displayed needs saving
@@ -6650,12 +9017,14 @@ class LayoutViewBase:
 
         This method has been introduced in version 0.29.
         """
+        ...
     def is_editable(self) -> bool:
         r"""
         @brief Returns true if the view is in editable mode
 
         This read-only attribute has been added in version 0.27.5.
         """
+        ...
     def is_transacting(self) -> bool:
         r"""
         @brief Indicates if a transaction is ongoing
@@ -6663,12 +9032,14 @@ class LayoutViewBase:
         See \transaction for a detailed description of transactions. 
         This method was introduced in version 0.16.
         """
+        ...
     def l2ndb(self, index: int) -> db.LayoutToNetlist:
         r"""
         @brief Gets the netlist database with the given index
         @return The \LayoutToNetlist object or nil if the index is not valid
         This method has been added in version 0.26.
         """
+        ...
     @overload
     def load_layer_props(self, fn: str) -> None:
         r"""
@@ -6678,6 +9049,7 @@ class LayoutViewBase:
 
         Load the layer properties from the file given in "fn"
         """
+        ...
     @overload
     def load_layer_props(self, fn: str, add_default: bool) -> None:
         r"""
@@ -6691,6 +9063,7 @@ class LayoutViewBase:
 
         This variant has been added on version 0.21.
         """
+        ...
     @overload
     def load_layer_props(self, fn: str, cv_index: int, add_default: bool) -> None:
         r"""
@@ -6707,6 +9080,7 @@ class LayoutViewBase:
 
         This variant has been added on version 0.21.
         """
+        ...
     @overload
     def load_layout(self, filename: str, add_cellview: Optional[bool] = ...) -> int:
         r"""
@@ -6718,6 +9092,7 @@ class LayoutViewBase:
 
         @return The index of the cellview loaded. The 'add_cellview' argument has been made optional in version 0.28.
         """
+        ...
     @overload
     def load_layout(self, filename: str, options: db.LoadLayoutOptions, add_cellview: Optional[bool] = ...) -> int:
         r"""
@@ -6732,6 +9107,7 @@ class LayoutViewBase:
 
         This method has been introduced in version 0.18. The 'add_cellview' argument has been made optional in version 0.28.
         """
+        ...
     @overload
     def load_layout(self, filename: str, options: db.LoadLayoutOptions, technology: str, add_cellview: Optional[bool] = ...) -> int:
         r"""
@@ -6746,6 +9122,7 @@ class LayoutViewBase:
 
         This version has been introduced in version 0.22. The 'add_cellview' argument has been made optional in version 0.28.
         """
+        ...
     @overload
     def load_layout(self, filename: str, technology: str, add_cellview: Optional[bool] = ...) -> int:
         r"""
@@ -6759,18 +9136,21 @@ class LayoutViewBase:
 
         This version has been introduced in version 0.22. The 'add_cellview' argument has been made optional in version 0.28.
         """
+        ...
     def lvsdb(self, index: int) -> db.LayoutVsSchematic:
         r"""
         @brief Gets the netlist database with the given index
         @return The \LayoutVsSchematic object or nil if the index is not valid
         This method has been added in version 0.26.
         """
+        ...
     def max_hier(self) -> None:
         r"""
         @brief Selects all hierarchy levels available
 
         Show the layout in full depth down to the deepest level of hierarchy. This method may cause a redraw.
         """
+        ...
     def menu(self) -> AbstractMenu:
         r"""
         @brief Gets the \AbstractMenu associated with this view.
@@ -6779,6 +9159,7 @@ class LayoutViewBase:
 
         This method has been introduced in version 0.28.
         """
+        ...
     def mode_name(self) -> str:
         r"""
         @brief Gets the name of the current mode.
@@ -6787,6 +9168,7 @@ class LayoutViewBase:
 
         This method has been introduced in version 0.28.
         """
+        ...
     def mode_names(self) -> List[str]:
         r"""
         @brief Gets the names of the available modes.
@@ -6795,6 +9177,15 @@ class LayoutViewBase:
 
         This method has been introduced in version 0.28.
         """
+        ...
+    def netlist_browser(self) -> NetlistBrowserDialog:
+        r"""
+        @brief Gets the netlist browser object for the given layout view
+
+
+        This method has been added in version 0.27.
+        """
+        ...
     def num_l2ndbs(self) -> int:
         r"""
         @brief Gets the number of netlist databases loaded into this view
@@ -6802,43 +9193,52 @@ class LayoutViewBase:
 
         This method has been added in version 0.26.
         """
+        ...
     def num_layer_lists(self) -> int:
         r"""
         @brief Gets the number of layer properties tabs present
         This method has been introduced in version 0.23.
         """
+        ...
     def num_rdbs(self) -> int:
         r"""
         @brief Gets the number of report databases loaded into this view
         @return The number of \ReportDatabase objects present in this view
         """
+        ...
     def pan_center(self, p: db.DPoint) -> None:
         r"""
         @brief Pans to the given point
 
         The window is positioned such that "p" becomes the new center
         """
+        ...
     def pan_down(self) -> None:
         r"""
         @brief Pans down
         """
+        ...
     def pan_left(self) -> None:
         r"""
         @brief Pans to the left
         """
+        ...
     def pan_right(self) -> None:
         r"""
         @brief Pans to the right
         """
+        ...
     def pan_up(self) -> None:
         r"""
         @brief Pans upward
         """
+        ...
     def rdb(self, index: int) -> rdb.ReportDatabase:
         r"""
         @brief Gets the report database with the given index
         @return The \ReportDatabase object or nil if the index is not valid
         """
+        ...
     def register_annotation_template(self, annotation: BasicAnnotation, title: str, mode: Optional[int] = ...) -> None:
         r"""
         @brief Registers the given annotation as a template for this particular view
@@ -6850,18 +9250,21 @@ class LayoutViewBase:
 
         This method has been added in version 0.28.
         """
+        ...
     def reload_layout(self, cv: int) -> None:
         r"""
         @brief Reloads the given cellview
 
         @param cv The index of the cellview to reload
         """
+        ...
     def remove_l2ndb(self, index: int) -> None:
         r"""
         @brief Removes a netlist database with the given index
         @param The index of the netlist database to remove from this view
         This method has been added in version 0.26.
         """
+        ...
     def remove_line_style(self, index: int) -> None:
         r"""
         @brief Removes the line style with the given index
@@ -6869,21 +9272,25 @@ class LayoutViewBase:
 
         This method has been introduced in version 0.25.
         """
+        ...
     def remove_rdb(self, index: int) -> None:
         r"""
         @brief Removes a report database with the given index
         @param The index of the report database to remove from this view
         """
+        ...
     def remove_stipple(self, index: int) -> None:
         r"""
         @brief Removes the stipple pattern with the given index
         The pattern with an index less than the first custom pattern cannot be removed. If a stipple pattern is removed that is still used, the results are undefined. 
         """
+        ...
     def remove_unused_layers(self) -> None:
         r"""
         @brief Removes unused layers from layer list
         This method was introduced in version 0.19.
         """
+        ...
     def rename_cellview(self, name: str, index: int) -> None:
         r"""
         @brief Renames the cellview with the given index
@@ -6893,11 +9300,13 @@ class LayoutViewBase:
         If a layout is shared between multiple cellviews (which may happen due to a clone of the layout view
         for example), all cellviews are renamed.
         """
+        ...
     def rename_layer_list(self, index: int, name: str) -> None:
         r"""
         @brief Sets the title of the given layer properties tab
         This method has been introduced in version 0.21.
         """
+        ...
     def replace_annotation(self, id: int, obj: Annotation) -> None:
         r"""
         @brief Replaces the annotation given by the id with the new one
@@ -6905,6 +9314,7 @@ class LayoutViewBase:
 
         This method has been introduced in version 0.24.
         """
+        ...
     def replace_image(self, id: int, new_obj: Image) -> None:
         r"""
         @brief Replace an image object with the new image
@@ -6916,6 +9326,7 @@ class LayoutViewBase:
 
         This method has been introduced in version 0.20.
         """
+        ...
     def replace_l2ndb(self, db_index: int, db: db.LayoutToNetlist) -> int:
         r"""
         @brief Replaces the netlist database with the given index
@@ -6926,6 +9337,7 @@ class LayoutViewBase:
 
         This method has been added in version 0.26.
         """
+        ...
     @overload
     def replace_layer_node(self, index: int, iter: LayerPropertiesIterator, node: LayerProperties) -> None:
         r"""
@@ -6934,6 +9346,7 @@ class LayoutViewBase:
         This method has been introduced in version 0.21.
         Since version 0.22, this method accepts LayerProperties and LayerPropertiesNode objects. A LayerPropertiesNode object can contain a hierarchy of further nodes.
         """
+        ...
     @overload
     def replace_layer_node(self, iter: LayerPropertiesIterator, node: LayerProperties) -> None:
         r"""
@@ -6941,6 +9354,7 @@ class LayoutViewBase:
 
         Since version 0.22, this method accepts LayerProperties and LayerPropertiesNode objects. A LayerPropertiesNode object can contain a hierarchy of further nodes.
         """
+        ...
     def replace_lvsdb(self, db_index: int, db: db.LayoutVsSchematic) -> int:
         r"""
         @brief Replaces the database with the given index
@@ -6951,6 +9365,7 @@ class LayoutViewBase:
 
         This method has been added in version 0.26.
         """
+        ...
     def replace_rdb(self, db_index: int, db: rdb.ReportDatabase) -> int:
         r"""
         @brief Replaces the report database with the given index
@@ -6961,18 +9376,21 @@ class LayoutViewBase:
 
         This method has been added in version 0.26.
         """
+        ...
     def reset_title(self) -> None:
         r"""
         @brief Resets the title to the standard title
 
         See \set_title and \title for a description about how titles are handled.
         """
+        ...
     def resize(self, w: int, h: int) -> None:
         r"""
         @brief Resizes the layout view to the given dimension
 
         This method has been made available in all builds in 0.28.
         """
+        ...
     @overload
     def save_as(self, index: int, filename: str, gzip: bool, options: db.SaveLayoutOptions) -> None:
         r"""
@@ -6988,6 +9406,7 @@ class LayoutViewBase:
 
         This method is deprecated starting from version 0.23. The compression mode is determined from the file name automatically and the \gzip parameter is ignored.
         """
+        ...
     @overload
     def save_as(self, index: int, filename: str, options: db.SaveLayoutOptions) -> None:
         r"""
@@ -7002,6 +9421,7 @@ class LayoutViewBase:
 
         If the file name ends with a suffix ".gz" or ".gzip", the file is compressed with the zlib algorithm.
         """
+        ...
     def save_image(self, filename: str, width: int, height: int) -> None:
         r"""
         @brief Saves the layout as an image to the given file
@@ -7013,6 +9433,7 @@ class LayoutViewBase:
         The image contains the current scene (layout, annotations etc.).
         The image is written as a PNG file to the given file. The image is drawn synchronously with the given width and height. Drawing may take some time. 
         """
+        ...
     def save_image_with_options(self, filename: str, width: int, height: int, linewidth: Optional[int] = ..., oversampling: Optional[int] = ..., resolution: Optional[float] = ..., target: Optional[db.DBox] = ..., monochrome: Optional[bool] = ...) -> None:
         r"""
         @brief Saves the layout as an image to the given file (with options)
@@ -7050,12 +9471,14 @@ class LayoutViewBase:
 
         This method has been introduced in 0.23.10.
         """
+        ...
     def save_layer_props(self, fn: str) -> None:
         r"""
         @brief Saves the layer properties
 
         Save the layer properties to the file given in "fn"
         """
+        ...
     def save_screenshot(self, filename: str) -> None:
         r"""
         @brief Saves a screenshot to the given file
@@ -7064,12 +9487,14 @@ class LayoutViewBase:
 
         The screenshot is written as a PNG file to the given file. This requires the drawing to be complete. Ideally, synchronous mode is switched on for the application to guarantee this condition. The image will have the size of the viewport showing the current layout.
         """
+        ...
     def select_all(self) -> None:
         r"""
         @brief Selects all objects from the view
 
         This method has been introduced in version 0.27
         """
+        ...
     def select_cell(self, cell_index: int, cv_index: int) -> None:
         r"""
         @brief Selects a cell by index for a certain cell view
@@ -7078,6 +9503,7 @@ class LayoutViewBase:
         This method selects the cell to be drawn. In constrast, the \set_current_cell_path method selects the cell that is highlighted in the cell tree (but not necessarily drawn).
         This method is was deprecated in version 0.25 since from then, the \CellView object can be used to obtain an manipulate the selected cell.
         """
+        ...
     def select_cell_path(self, cell_index: Sequence[int], cv_index: int) -> None:
         r"""
         @brief Selects a cell by cell index for a certain cell view
@@ -7086,6 +9512,7 @@ class LayoutViewBase:
         This method selects the cell to be drawn. In constrast, the \set_current_cell_path method selects the cell that is highlighted in the cell tree (but not necessarily drawn).
         This method is was deprecated in version 0.25 since from then, the \CellView object can be used to obtain an manipulate the selected cell.
         """
+        ...
     @overload
     def select_from(self, box: db.DBox, mode: Optional[LayoutViewBase.SelectionMode] = ...) -> None:
         r"""
@@ -7095,6 +9522,7 @@ class LayoutViewBase:
 
         This method has been introduced in version 0.27
         """
+        ...
     @overload
     def select_from(self, point: db.DPoint, mode: Optional[LayoutViewBase.SelectionMode] = ...) -> None:
         r"""
@@ -7104,6 +9532,7 @@ class LayoutViewBase:
 
         This method has been introduced in version 0.27
         """
+        ...
     def select_object(self, obj: ObjectInstPath) -> None:
         r"""
         @brief Adds the given selection to the list of selected objects
@@ -7117,6 +9546,7 @@ class LayoutViewBase:
 
         This method has been introduced in version 0.24
         """
+        ...
     def selected_cells_paths(self, cv_index: int) -> List[List[int]]:
         r"""
         @brief Gets the paths of the selected cells
@@ -7127,24 +9557,28 @@ class LayoutViewBase:
 
         This method has be introduced in version 0.25.
         """
+        ...
     def selected_layers(self) -> List[LayerPropertiesIterator]:
         r"""
         @brief Gets the selected layers
 
         Returns an array of \LayerPropertiesIterator objects pointing to the currently selected layers. If no layer view is selected currently, an empty array is returned.
         """
+        ...
     def selection_bbox(self) -> db.DBox:
         r"""
         @brief Returns the bounding box of the current selection
 
         This method has been introduced in version 0.26.2
         """
+        ...
     def selection_size(self) -> int:
         r"""
         @brief Returns the number of selected objects
 
         This method has been introduced in version 0.27
         """
+        ...
     def send_enter_event(self) -> None:
         r"""
         @brief Sends a mouse window leave event
@@ -7152,6 +9586,7 @@ class LayoutViewBase:
         This method is intended to emulate the mouse mouse window leave events sent by Qt normally in environments where Qt is not present. 
         This method was introduced in version 0.28.
         """
+        ...
     def send_key_press_event(self, key: int, buttons: int) -> None:
         r"""
         @brief Sends a key press event
@@ -7160,6 +9595,7 @@ class LayoutViewBase:
 
         This method was introduced in version 0.28.
         """
+        ...
     def send_leave_event(self) -> None:
         r"""
         @brief Sends a mouse window leave event
@@ -7167,6 +9603,7 @@ class LayoutViewBase:
         This method is intended to emulate the mouse mouse window leave events sent by Qt normally in environments where Qt is not present. 
         This method was introduced in version 0.28.
         """
+        ...
     def send_mouse_double_clicked_event(self, pt: db.DPoint, buttons: int) -> None:
         r"""
         @brief Sends a mouse button double-click event
@@ -7175,6 +9612,7 @@ class LayoutViewBase:
 
         This method was introduced in version 0.28.
         """
+        ...
     def send_mouse_move_event(self, pt: db.DPoint, buttons: int) -> None:
         r"""
         @brief Sends a mouse move event
@@ -7183,6 +9621,7 @@ class LayoutViewBase:
 
         This method was introduced in version 0.28.
         """
+        ...
     def send_mouse_press_event(self, pt: db.DPoint, buttons: int) -> None:
         r"""
         @brief Sends a mouse button press event
@@ -7191,6 +9630,7 @@ class LayoutViewBase:
 
         This method was introduced in version 0.28.
         """
+        ...
     def send_mouse_release_event(self, pt: db.DPoint, buttons: int) -> None:
         r"""
         @brief Sends a mouse button release event
@@ -7199,6 +9639,7 @@ class LayoutViewBase:
 
         This method was introduced in version 0.28.
         """
+        ...
     def send_wheel_event(self, delta: int, horizontal: bool, pt: db.DPoint, buttons: int) -> None:
         r"""
         @brief Sends a mouse wheel event
@@ -7207,6 +9648,7 @@ class LayoutViewBase:
 
         This method was introduced in version 0.28.
         """
+        ...
     def set_active_cellview_index(self, index: int) -> None:
         r"""
         @brief Makes the cellview with the given index the active one (shown in hierarchy browser)
@@ -7214,6 +9656,7 @@ class LayoutViewBase:
 
         This method has been renamed from set_active_cellview_index to active_cellview_index= in version 0.25. The original name is still available, but is deprecated.
         """
+        ...
     def set_config(self, name: str, value: str) -> None:
         r"""
         @brief Sets a local configuration parameter with the given name to the given value
@@ -7223,6 +9666,7 @@ class LayoutViewBase:
 
         This method sets a local configuration parameter with the given name to the given value. Values can only be strings. Numerical values have to be converted into strings first. Local configuration parameters override global configurations for this specific view. This allows for example to override global settings of background colors. Any local settings are not written to the configuration file. 
         """
+        ...
     def set_current_cell_path(self, cv_index: int, cell_path: Sequence[int]) -> None:
         r"""
         @brief Sets the path to the current cell
@@ -7236,11 +9680,13 @@ class LayoutViewBase:
 
         This method is was deprecated in version 0.25 since from then, the \CellView object can be used to obtain an manipulate the selected cell.
         """
+        ...
     def set_current_layer_list(self, index: int) -> None:
         r"""
         @brief Sets the index of the currently selected layer properties tab
         This method has been introduced in version 0.21.
         """
+        ...
     @overload
     def set_layer_properties(self, index: int, iter: LayerPropertiesIterator, props: LayerProperties) -> None:
         r"""
@@ -7248,6 +9694,7 @@ class LayoutViewBase:
 
         This method replaces the layer properties of the element pointed to by "iter" by the properties given by "props" in the tab given by "index". It will not change the hierarchy but just the properties of the given node.This version addresses a specific list in a multi-tab layer properties arrangement with the "index" parameter. This method has been introduced in version 0.21.
         """
+        ...
     @overload
     def set_layer_properties(self, iter: LayerPropertiesIterator, props: LayerProperties) -> None:
         r"""
@@ -7255,6 +9702,7 @@ class LayoutViewBase:
 
         This method replaces the layer properties of the element pointed to by "iter" by the properties given by "props". It will not change the hierarchy but just the properties of the given node.
         """
+        ...
     def set_title(self, title: str) -> None:
         r"""
         @brief Sets the title of the view
@@ -7263,11 +9711,13 @@ class LayoutViewBase:
 
         Override the standard title of the view indicating the file names loaded by the specified title string. The title string can be reset with \reset_title to the standard title again.
         """
+        ...
     @overload
     def show_all_cells(self) -> None:
         r"""
         @brief Makes all cells shown (cancel effects of \hide_cell)
         """
+        ...
     @overload
     def show_all_cells(self, cv_index: int) -> None:
         r"""
@@ -7276,10 +9726,12 @@ class LayoutViewBase:
 
         This variant has been added in version 0.25.
         """
+        ...
     def show_cell(self, cell_index: int, cv_index: int) -> None:
         r"""
         @brief Shows the given cell for the given cellview (cancel effect of \hide_cell)
         """
+        ...
     def show_image(self, id: int, visible: bool) -> None:
         r"""
         @brief Shows or hides the given image
@@ -7292,6 +9744,7 @@ class LayoutViewBase:
 
         With version 0.25, \Image#visible= can be used to achieve the same results.
         """
+        ...
     @overload
     def show_layout(self, layout: db.Layout, add_cellview: bool) -> int:
         r"""
@@ -7305,6 +9758,7 @@ class LayoutViewBase:
 
         This method has been introduced in version 0.22.
         """
+        ...
     @overload
     def show_layout(self, layout: db.Layout, tech: str, add_cellview: bool) -> int:
         r"""
@@ -7320,6 +9774,7 @@ class LayoutViewBase:
 
         This method has been introduced in version 0.22.
         """
+        ...
     @overload
     def show_layout(self, layout: db.Layout, tech: str, add_cellview: bool, init_layers: bool) -> int:
         r"""
@@ -7337,17 +9792,20 @@ class LayoutViewBase:
 
         This method has been introduced in version 0.22.
         """
+        ...
     def stop(self) -> None:
         r"""
         @brief Stops redraw thread and close any browsers
         This method usually does not need to be called explicitly. The redraw thread is stopped automatically.
         """
+        ...
     def stop_redraw(self) -> None:
         r"""
         @brief Stops the redraw thread
 
         It is very important to stop the redraw thread before applying changes to the layout or the cell views and the LayoutView configuration. This is usually done automatically. For rare cases, where this is not the case, this method is provided.
         """
+        ...
     def switch_mode(self, mode: str) -> None:
         r"""
         @brief Switches the mode.
@@ -7356,6 +9814,7 @@ class LayoutViewBase:
 
         This method has been introduced in version 0.28.
         """
+        ...
     def transaction(self, description: str) -> None:
         r"""
         @brief Begins a transaction
@@ -7367,6 +9826,7 @@ class LayoutViewBase:
 
         This method was introduced in version 0.16.
         """
+        ...
     def transient_to_selection(self) -> None:
         r"""
         @brief Turns the transient selection into the actual selection
@@ -7375,6 +9835,7 @@ class LayoutViewBase:
 
         This method has been introduced in version 0.26.2
         """
+        ...
     def unregister_annotation_templates(self, category: str) -> None:
         r"""
         @brief Unregisters the template or templates with the given category string on this particular view
@@ -7383,6 +9844,7 @@ class LayoutViewBase:
 
         This method has been added in version 0.28.
         """
+        ...
     def unselect_object(self, obj: ObjectInstPath) -> None:
         r"""
         @brief Removes the given selection from the list of selected objects
@@ -7393,6 +9855,7 @@ class LayoutViewBase:
 
         This method has been introduced in version 0.24
         """
+        ...
     def update_content(self) -> None:
         r"""
         @brief Updates the layout view to the current state
@@ -7401,46 +9864,191 @@ class LayoutViewBase:
 
         Currently, this method should be called however, after the layer view tree has been changed by the \insert_layer, \replace_layer_node or \delete_layer methods.
         """
+        ...
     def viewport_height(self) -> int:
         r"""
         @brief Return the viewport height in pixels
         This method was introduced in version 0.18.
         """
+        ...
     def viewport_trans(self) -> db.DCplxTrans:
         r"""
         @brief Returns the transformation that converts micron coordinates to pixels
         Hint: the transformation returned will convert any point in micron coordinate space into a pixel coordinate. Contrary to usual convention, the y pixel coordinate is given in a mathematically oriented space - which means the bottom coordinate is 0.
         This method was introduced in version 0.18.
         """
+        ...
     def viewport_width(self) -> int:
         r"""
         @brief Returns the viewport width in pixels
         This method was introduced in version 0.18.
         """
+        ...
+    def widget(self) -> QtWidgets.QWidget_Native:
+        r"""
+        @brief Gets the QWidget object of the view
+
+        This method has been introduced in version 0.28.7.
+        """
+        ...
     def zoom_box(self, box: db.DBox) -> None:
         r"""
         @brief Sets the viewport to the given box
 
         @param box The box to which to set the view in micron coordinates
         """
+        ...
     def zoom_fit(self) -> None:
         r"""
         @brief Fits the contents of the current view into the window
         """
+        ...
     def zoom_fit_sel(self) -> None:
         r"""
         @brief Fits the contents of the current selection into the window
 
         This method has been introduced in version 0.25.
         """
+        ...
     def zoom_in(self) -> None:
         r"""
         @brief Zooms in somewhat
         """
+        ...
     def zoom_out(self) -> None:
         r"""
         @brief Zooms out somewhat
         """
+        ...
+    ...
+
+class LayoutViewWidget(QFrame_Native):
+    r"""
+    This object produces a widget which embeds a LayoutView. This widget can be used inside Qt widget hierarchies.
+    To access the \LayoutView object within, use \view.
+
+    This class has been introduced in version 0.28.
+    """
+    @classmethod
+    def new(cls, parent: QtWidgets.QWidget_Native, editable: Optional[bool] = ..., manager: Optional[db.Manager] = ..., options: Optional[int] = ...) -> LayoutViewWidget:
+        r"""
+        @brief Creates a standalone view widget
+
+        @param parent The parent widget in which to embed the view
+        @param editable True to make the view editable
+        @param manager The \Manager object to enable undo/redo
+        @param options A combination of the values in the LV_... constants from \LayoutViewBase
+
+        This constructor has been introduced in version 0.25.
+        It has been enhanced with the arguments in version 0.27.
+        """
+        ...
+    def __init__(self, parent: QtWidgets.QWidget_Native, editable: Optional[bool] = ..., manager: Optional[db.Manager] = ..., options: Optional[int] = ...) -> None:
+        r"""
+        @brief Creates a standalone view widget
+
+        @param parent The parent widget in which to embed the view
+        @param editable True to make the view editable
+        @param manager The \Manager object to enable undo/redo
+        @param options A combination of the values in the LV_... constants from \LayoutViewBase
+
+        This constructor has been introduced in version 0.25.
+        It has been enhanced with the arguments in version 0.27.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def bookmarks_frame(self) -> QtWidgets.QWidget_Native:
+        r"""
+        @brief Gets the bookmarks side widget
+        For details about side widgets see \layer_control_frame.
+
+        This method has been introduced in version 0.27
+        """
+        ...
+    def hierarchy_control_frame(self) -> QtWidgets.QWidget_Native:
+        r"""
+        @brief Gets the cell view (hierarchy view) side widget
+        For details about side widgets see \layer_control_frame.
+
+        This method has been introduced in version 0.27
+        """
+        ...
+    def layer_control_frame(self) -> QtWidgets.QWidget_Native:
+        r"""
+        @brief Gets the layer control side widget
+        A 'side widget' is a widget attached to the view. It does not have a parent, so you can embed it into a different context. Please note that with embedding through 'setParent' it will be destroyed when your parent widget gets destroyed. It will be lost then to the view.
+
+        The side widget can be configured through the views configuration interface.
+
+        This method has been introduced in version 0.27
+        """
+        ...
+    def layer_toolbox_frame(self) -> QtWidgets.QWidget_Native:
+        r"""
+        @brief Gets the layer toolbox side widget
+        A 'side widget' is a widget attached to the view. It does not have a parent, so you can embed it into a different context. Please note that with embedding through 'setParent' it will be destroyed when your parent widget gets destroyed. It will be lost then to the view.
+
+        The side widget can be configured through the views configuration interface.
+
+        This method has been introduced in version 0.28
+        """
+        ...
+    def libraries_frame(self) -> QtWidgets.QWidget_Native:
+        r"""
+        @brief Gets the library view side widget
+        For details about side widgets see \layer_control_frame.
+
+        This method has been introduced in version 0.27
+        """
+        ...
+    def view(self) -> LayoutView:
+        r"""
+        @brief Gets the embedded view object.
+        """
+        ...
+    ...
 
 class Macro:
     r"""
@@ -7481,84 +10089,103 @@ class Macro:
             r"""
             @brief Creates an enum from an integer value
             """
+            ...
         @overload
         @classmethod
         def new(cls, s: str) -> Macro.Format:
             r"""
             @brief Creates an enum from a string value
             """
+            ...
         @overload
-        def __eq__(self, other: object) -> bool:
+        def __eq__(self, other: int) -> bool:
             r"""
             @brief Compares an enum with an integer value
             """
+            ...
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
             @brief Compares two enums
             """
+            ...
         def __hash__(self) -> int:
             r"""
             @brief Gets the hash value from the enum
             """
+            ...
         @overload
         def __init__(self, i: int) -> None:
             r"""
             @brief Creates an enum from an integer value
             """
+            ...
         @overload
         def __init__(self, s: str) -> None:
             r"""
             @brief Creates an enum from a string value
             """
+            ...
         def __int__(self) -> int:
             r"""
             @brief Gets the integer value from the enum
             """
+            ...
         @overload
         def __lt__(self, other: Macro.Format) -> bool:
             r"""
             @brief Returns true if the first enum is less (in the enum symbol order) than the second
             """
+            ...
         @overload
         def __lt__(self, other: int) -> bool:
             r"""
             @brief Returns true if the enum is less (in the enum symbol order) than the integer value
             """
+            ...
         @overload
-        def __ne__(self, other: object) -> bool:
+        def __ne__(self, other: int) -> bool:
             r"""
             @brief Compares an enum with an integer for inequality
             """
+            ...
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
             @brief Compares two enums for inequality
             """
+            ...
         def __repr__(self) -> str:
             r"""
             @brief Converts an enum to a visual string
             """
+            ...
         def __str__(self) -> str:
             r"""
             @brief Gets the symbolic string from an enum
             """
+            ...
         def hash(self) -> int:
             r"""
             @brief Gets the hash value from the enum
             """
+            ...
         def inspect(self) -> str:
             r"""
             @brief Converts an enum to a visual string
             """
+            ...
         def to_i(self) -> int:
             r"""
             @brief Gets the integer value from the enum
             """
+            ...
         def to_s(self) -> str:
             r"""
             @brief Gets the symbolic string from an enum
             """
+            ...
+        ...
     class Interpreter:
         r"""
         @brief Specifies the interpreter used for executing a macro
@@ -7590,84 +10217,103 @@ class Macro:
             r"""
             @brief Creates an enum from an integer value
             """
+            ...
         @overload
         @classmethod
         def new(cls, s: str) -> Macro.Interpreter:
             r"""
             @brief Creates an enum from a string value
             """
+            ...
         @overload
-        def __eq__(self, other: object) -> bool:
+        def __eq__(self, other: int) -> bool:
             r"""
             @brief Compares an enum with an integer value
             """
+            ...
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
             @brief Compares two enums
             """
+            ...
         def __hash__(self) -> int:
             r"""
             @brief Gets the hash value from the enum
             """
+            ...
         @overload
         def __init__(self, i: int) -> None:
             r"""
             @brief Creates an enum from an integer value
             """
+            ...
         @overload
         def __init__(self, s: str) -> None:
             r"""
             @brief Creates an enum from a string value
             """
+            ...
         def __int__(self) -> int:
             r"""
             @brief Gets the integer value from the enum
             """
+            ...
         @overload
         def __lt__(self, other: Macro.Interpreter) -> bool:
             r"""
             @brief Returns true if the first enum is less (in the enum symbol order) than the second
             """
+            ...
         @overload
         def __lt__(self, other: int) -> bool:
             r"""
             @brief Returns true if the enum is less (in the enum symbol order) than the integer value
             """
+            ...
+        @overload
+        def __ne__(self, other: int) -> bool:
+            r"""
+            @brief Compares an enum with an integer for inequality
+            """
+            ...
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
             @brief Compares two enums for inequality
             """
-        @overload
-        def __ne__(self, other: object) -> bool:
-            r"""
-            @brief Compares an enum with an integer for inequality
-            """
+            ...
         def __repr__(self) -> str:
             r"""
             @brief Converts an enum to a visual string
             """
+            ...
         def __str__(self) -> str:
             r"""
             @brief Gets the symbolic string from an enum
             """
+            ...
         def hash(self) -> int:
             r"""
             @brief Gets the hash value from the enum
             """
+            ...
         def inspect(self) -> str:
             r"""
             @brief Converts an enum to a visual string
             """
+            ...
         def to_i(self) -> int:
             r"""
             @brief Gets the integer value from the enum
             """
+            ...
         def to_s(self) -> str:
             r"""
             @brief Gets the symbolic string from an enum
             """
+            ...
+        ...
     DSLInterpreter: ClassVar[Macro.Interpreter]
     r"""
     @brief A domain-specific interpreter (DSL)
@@ -7884,6 +10530,7 @@ class Macro:
 
         This method has been added in version 0.26.
         """
+        ...
     @classmethod
     def new(cls, path: str) -> Macro:
         r"""
@@ -7891,6 +10538,7 @@ class Macro:
 
         This constructor has been introduced in version 0.27.5.
         """
+        ...
     @classmethod
     def real_line(cls, path: str, line: int) -> int:
         r"""
@@ -7917,6 +10565,7 @@ class Macro:
 
         This feature has been introduced in version 0.27.
         """
+        ...
     @classmethod
     def real_path(cls, path: str, line: int) -> str:
         r"""
@@ -7940,35 +10589,41 @@ class Macro:
 
         This feature has been introduced in version 0.27.
         """
+        ...
     def __init__(self, path: str) -> None:
         r"""
         @brief Loads the macro from the given file path
 
         This constructor has been introduced in version 0.27.5.
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -7976,6 +10631,7 @@ class Macro:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -7983,23 +10639,27 @@ class Macro:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def interpreter_name(self) -> str:
         r"""
         @brief Gets the macro interpreter name
@@ -8007,36 +10667,42 @@ class Macro:
 
         This method has been introduced in version 0.27.5.
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def name(self) -> str:
         r"""
         @brief Gets the name of the macro
 
         This attribute has been added in version 0.25.
         """
+        ...
     def path(self) -> str:
         r"""
         @brief Gets the path of the macro
 
         The path is the path where the macro is stored, starting with an abstract group identifier. The path is used to identify the macro in the debugger for example.
         """
+        ...
     def run(self) -> int:
         r"""
         @brief Executes the macro
 
         This method has been introduced in version 0.27.5.
         """
+        ...
     def save_to(self, path: str) -> None:
         r"""
         @brief Saves the macro to the given file
 
         This method has been introduced in version 0.27.5.
         """
+        ...
     def sync_properties_with_text(self) -> None:
         r"""
         @brief Synchronizes the macro properties with the text
@@ -8045,6 +10711,7 @@ class Macro:
 
         This method has been introduced in version 0.27.5.
         """
+        ...
     def sync_text_with_properties(self) -> None:
         r"""
         @brief Synchronizes the macro text with the properties
@@ -8053,6 +10720,8 @@ class Macro:
 
         This method has been introduced in version 0.27.5.
         """
+        ...
+    ...
 
 class MacroExecutionContext:
     r"""
@@ -8066,57 +10735,68 @@ class MacroExecutionContext:
         @brief Ignores the next exception in the debugger
         The next exception thrown will be ignored in the debugger. That feature is useful when re-raising exceptions if those new exception shall not appear in the debugger.
         """
+        ...
     @classmethod
     def new(cls) -> MacroExecutionContext:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     @classmethod
     def remove_debugger_scope(cls) -> None:
         r"""
         @brief Removes a debugger scope previously set with \set_debugger_scope
         """
+        ...
     @classmethod
     def set_debugger_scope(cls, filename: str) -> None:
         r"""
         @brief Sets a debugger scope (file level which shall appear in the debugger)
         If a debugger scope is set, back traces will be produced starting from that scope. Setting a scope is useful for implementing DSL interpreters and giving a proper hint about the original location of an error.
         """
+        ...
     def __copy__(self) -> MacroExecutionContext:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __deepcopy__(self) -> MacroExecutionContext:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -8124,6 +10804,7 @@ class MacroExecutionContext:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -8131,37 +10812,45 @@ class MacroExecutionContext:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def assign(self, other: MacroExecutionContext) -> None:
         r"""
         @brief Assigns another object to self
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def dup(self) -> MacroExecutionContext:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
+    ...
 
 class MacroInterpreter:
     r"""
@@ -8265,6 +10954,7 @@ class MacroInterpreter:
 
         Before version 0.25 this attribute was a re-implementable method. It has been turned into an attribute for performance reasons in version 0.25.
         """
+        ...
     @property
     def description(self) -> None:
         r"""
@@ -8276,6 +10966,7 @@ class MacroInterpreter:
 
         Before version 0.25 this attribute was a re-implementable method. It has been turned into an attribute for performance reasons in version 0.25.
         """
+        ...
     @property
     def storage_scheme(self) -> None:
         r"""
@@ -8288,6 +10979,7 @@ class MacroInterpreter:
 
         Before version 0.25 this attribute was a re-implementable method. It has been turned into an attribute for performance reasons in version 0.25.
         """
+        ...
     @property
     def suffix(self) -> None:
         r"""
@@ -8299,6 +10991,7 @@ class MacroInterpreter:
 
         Before version 0.25 this attribute was a re-implementable method. It has been turned into an attribute for performance reasons in version 0.25.
         """
+        ...
     @property
     def supports_include_expansion(self) -> None:
         r"""
@@ -8309,6 +11002,7 @@ class MacroInterpreter:
 
         This attribute has been introduced in version 0.27.
         """
+        ...
     @property
     def syntax_scheme(self) -> None:
         r"""
@@ -8321,46 +11015,55 @@ class MacroInterpreter:
 
         Before version 0.25 this attribute was a re-implementable method. It has been turned into an attribute for performance reasons in version 0.25.
         """
+        ...
     @classmethod
     def new(cls) -> MacroInterpreter:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def __copy__(self) -> MacroInterpreter:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __deepcopy__(self) -> MacroInterpreter:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -8368,6 +11071,7 @@ class MacroInterpreter:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -8375,15 +11079,18 @@ class MacroInterpreter:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def assign(self, other: MacroInterpreter) -> None:
         r"""
         @brief Assigns another object to self
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def create_template(self, url: str) -> Macro:
         r"""
         @brief Creates a new macro template
@@ -8393,22 +11100,26 @@ class MacroInterpreter:
 
         This method must be called after \register has called.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def dup(self) -> MacroInterpreter:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def include_expansion(self, macro: Macro) -> List[str]:
         r"""
         @brief Provides include expansion as defined by the interpreter
@@ -8416,12 +11127,14 @@ class MacroInterpreter:
 
         This method has been introduced in version 0.28.12.
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def register(self, name: str) -> None:
         r"""
         @brief Registers the macro interpreter
@@ -8429,6 +11142,1484 @@ class MacroInterpreter:
 
         Registration of the interpreter makes the object known to the system. After registration, macros whose interpreter is set to 'dsl' can use this object to run the script. For executing a script, the system will call the interpreter's \execute method.
         """
+        ...
+    ...
+
+class MainWindow(QMainWindow_Native):
+    r"""
+    @brief The main application window and central controller object
+
+    This object first is the main window but also the main controller. The main controller is the port by which access can be gained to all the data objects, view and other aspects of the program.
+    """
+    current_view_index: int
+    r"""
+    Getter:
+    @brief Returns the current view's index
+
+    @return The index of the current view
+
+    This method will return the index of the current view.
+    Setter:
+    @brief Selects the view with the given index
+
+    @param index The index of the view to select (0 is the first)
+
+    This method will make the view with the given index the current (front) view.
+
+    This method was renamed from select_view to current_view_index= in version 0.25. The old name is still available, but deprecated.
+    """
+    initial_technology: str
+    r"""
+    Getter:
+    @brief Gets the technology used for creating or loading layouts (unless explicitly specified)
+
+    @return The current initial technology
+    This method was added in version 0.22.
+    Setter:
+    @brief Sets the technology used for creating or loading layouts (unless explicitly specified)
+
+    Setting the technology will have an effect on the next load_layout or create_layout operation which does not explicitly specify the technology but might not be reflected correctly in the reader options dialog and changes will be reset when the application is restarted.
+    @param tech The new initial technology
+
+    This method was added in version 0.22.
+    """
+    on_current_view_changed: None
+    r"""
+    Getter:
+    @brief An event indicating that the current view has changed
+
+    This event is triggered after the current view has changed. This happens, if the user switches the layout tab.
+
+    Before version 0.25 this event was based on the observer pattern obsolete now. The corresponding methods (add_current_view_observer/remove_current_view_observer) have been removed in 0.25.
+
+    Setter:
+    @brief An event indicating that the current view has changed
+
+    This event is triggered after the current view has changed. This happens, if the user switches the layout tab.
+
+    Before version 0.25 this event was based on the observer pattern obsolete now. The corresponding methods (add_current_view_observer/remove_current_view_observer) have been removed in 0.25.
+    """
+    on_session_about_to_be_restored: None
+    r"""
+    Getter:
+    @brief An event indicating that a session is about to be restored
+
+    This event has been added in version 0.28.8.
+
+    Setter:
+    @brief An event indicating that a session is about to be restored
+
+    This event has been added in version 0.28.8.
+    """
+    on_session_restored: None
+    r"""
+    Getter:
+    @brief An event indicating that a session was restored
+
+    This event has been added in version 0.28.8.
+
+    Setter:
+    @brief An event indicating that a session was restored
+
+    This event has been added in version 0.28.8.
+    """
+    on_view_closed: None
+    r"""
+    Getter:
+    @brief An event indicating that a view was closed
+    @param index The index of the view that was closed
+
+    This event is triggered after a view was closed. For example, because the tab was closed.
+
+    This event has been added in version 0.25.
+
+    Setter:
+    @brief An event indicating that a view was closed
+    @param index The index of the view that was closed
+
+    This event is triggered after a view was closed. For example, because the tab was closed.
+
+    This event has been added in version 0.25.
+    """
+    on_view_created: None
+    r"""
+    Getter:
+    @brief An event indicating that a new view was created
+    @param index The index of the view that was created
+
+    This event is triggered after a new view was created. For example, if a layout is loaded into a new panel.
+
+    Before version 0.25 this event was based on the observer pattern obsolete now. The corresponding methods (add_new_view_observer/remove_new_view_observer) have been removed in 0.25.
+
+    Setter:
+    @brief An event indicating that a new view was created
+    @param index The index of the view that was created
+
+    This event is triggered after a new view was created. For example, if a layout is loaded into a new panel.
+
+    Before version 0.25 this event was based on the observer pattern obsolete now. The corresponding methods (add_new_view_observer/remove_new_view_observer) have been removed in 0.25.
+    """
+    synchronous: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether synchronous mode is activated
+    See \synchronous= for details about this attribute
+
+    This property getter was introduced in version 0.29.
+    Setter:
+    @brief Puts the main window into synchronous mode
+
+    @param sync_mode 'true' if the application should behave synchronously
+
+    In synchronous mode, an application is allowed to block on redraw. While redrawing, no user interactions are possible. Although this is not desirable for smooth operation, it can be beneficial for test or automation purposes, i.e. if a screenshot needs to be produced once the application has finished drawing.
+    """
+    title: str
+    r"""
+    Getter:
+    @brief Gets the window title
+    See \title= for a description of this property.
+    This property was introduced in version 0.29.
+    Setter:
+    @brief Sets the window title
+    If the window title is not empty, it will be used for the application window's title. Otherwise the default title is used. The title string is subject to expression interpolation. So it is possible to implement the default scheme of adding the current view using the following code:
+
+    @code
+    add_view_info = "$(var view=LayoutView.current; view ? ' - ' + (view.is_dirty ? '[+] ' : '') + view.title : '')"
+    RBA::MainWindow.instance.title = "Custom Title" + add_view_info
+    @/code
+
+    This property was introduced in version 0.29.
+    """
+    @classmethod
+    def instance(cls) -> MainWindow:
+        r"""
+        @brief Gets application's main window instance
+
+        This method has been added in version 0.24.
+        """
+        ...
+    @classmethod
+    def menu_symbols(cls) -> List[str]:
+        r"""
+        @brief Gets all available menu symbols (see \call_menu).
+        NOTE: currently this method delivers a superset of all available symbols. Depending on the context, no all symbols may trigger actual functionality.
+
+        This method has been introduced in version 0.27.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def call_menu(self, symbol: str) -> None:
+        r"""
+        @brief Calls the menu item with the provided symbol.
+        To obtain all symbols, use menu_symbols.
+
+        This method has been introduced in version 0.27 and replaces the previous cm_... methods. Instead of calling a specific cm_... method, use LayoutView#call_menu with 'cm_...' as the symbol.
+        """
+        ...
+    def cancel(self) -> None:
+        r"""
+        @brief Cancels current editing operations
+
+        This method call cancels all current editing operations and restores normal mouse mode.
+        """
+        ...
+    def clear_config(self) -> None:
+        r"""
+        @brief Clears the configuration parameters
+        This method is provided for using MainWindow without an Application object. It's a convience method which is equivalent to 'dispatcher().clear_config()'. See \Dispatcher#clear_config for details.
+
+        This method has been introduced in version 0.27.
+        """
+        ...
+    def clone_current_view(self) -> None:
+        r"""
+        @brief Clones the current view and make it current
+        """
+        ...
+    def close_all(self) -> None:
+        r"""
+        @brief Closes all views
+
+        This method unconditionally closes all views. No dialog will be opened if unsaved edits exist.
+
+        This method was added in version 0.18.
+        """
+        ...
+    def close_current_view(self) -> None:
+        r"""
+        @brief Closes the current view
+
+        This method does not open a dialog to ask which cell view to close if multiple cells are opened in the view, but rather closes all cells.
+        """
+        ...
+    def cm_adjust_origin(self) -> None:
+        r"""
+        @brief 'cm_adjust_origin' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_adjust_origin')" instead.
+        """
+        ...
+    def cm_bookmark_view(self) -> None:
+        r"""
+        @brief 'cm_bookmark_view' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_bookmark_view')" instead.
+        """
+        ...
+    def cm_cancel(self) -> None:
+        r"""
+        @brief 'cm_cancel' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_cancel')" instead.
+        """
+        ...
+    def cm_cell_copy(self) -> None:
+        r"""
+        @brief 'cm_cell_copy' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_cell_copy')" instead.
+        """
+        ...
+    def cm_cell_cut(self) -> None:
+        r"""
+        @brief 'cm_cell_cut' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_cell_cut')" instead.
+        """
+        ...
+    def cm_cell_delete(self) -> None:
+        r"""
+        @brief 'cm_cell_delete' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_cell_delete')" instead.
+        """
+        ...
+    def cm_cell_flatten(self) -> None:
+        r"""
+        @brief 'cm_cell_flatten' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_cell_flatten')" instead.
+        """
+        ...
+    def cm_cell_hide(self) -> None:
+        r"""
+        @brief 'cm_cell_hide' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_cell_hide')" instead.
+        """
+        ...
+    def cm_cell_paste(self) -> None:
+        r"""
+        @brief 'cm_cell_paste' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_cell_paste')" instead.
+        """
+        ...
+    def cm_cell_rename(self) -> None:
+        r"""
+        @brief 'cm_cell_rename' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_cell_rename')" instead.
+        """
+        ...
+    def cm_cell_select(self) -> None:
+        r"""
+        @brief 'cm_cell_select' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_cell_select')" instead.
+        """
+        ...
+    def cm_cell_show(self) -> None:
+        r"""
+        @brief 'cm_cell_show' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_cell_show')" instead.
+        """
+        ...
+    def cm_cell_show_all(self) -> None:
+        r"""
+        @brief 'cm_cell_show_all' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_cell_show_all')" instead.
+        """
+        ...
+    def cm_clear_layer(self) -> None:
+        r"""
+        @brief 'cm_clear_layer' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_clear_layer')" instead.
+        """
+        ...
+    def cm_clone(self) -> None:
+        r"""
+        @brief 'cm_clone' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_clone')" instead.
+        """
+        ...
+    def cm_close(self) -> None:
+        r"""
+        @brief 'cm_close' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_close')" instead.
+        """
+        ...
+    def cm_close_all(self) -> None:
+        r"""
+        @brief 'cm_close_all' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_close_all')" instead.
+        """
+        ...
+    def cm_copy(self) -> None:
+        r"""
+        @brief 'cm_copy' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_copy')" instead.
+        """
+        ...
+    def cm_copy_layer(self) -> None:
+        r"""
+        @brief 'cm_copy_layer' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_copy_layer')" instead.
+        """
+        ...
+    def cm_cut(self) -> None:
+        r"""
+        @brief 'cm_cut' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_cut')" instead.
+        """
+        ...
+    def cm_dec_max_hier(self) -> None:
+        r"""
+        @brief 'cm_dec_max_hier' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_dec_max_hier')" instead.
+        """
+        ...
+    def cm_delete(self) -> None:
+        r"""
+        @brief 'cm_delete' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_delete')" instead.
+        """
+        ...
+    def cm_delete_layer(self) -> None:
+        r"""
+        @brief 'cm_delete_layer' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_delete_layer')" instead.
+        """
+        ...
+    def cm_edit_layer(self) -> None:
+        r"""
+        @brief 'cm_edit_layer' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_edit_layer')" instead.
+        """
+        ...
+    def cm_exit(self) -> None:
+        r"""
+        @brief 'cm_exit' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_exit')" instead.
+        """
+        ...
+    def cm_goto_position(self) -> None:
+        r"""
+        @brief 'cm_goto_position' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_goto_position')" instead.
+        """
+        ...
+    def cm_help_about(self) -> None:
+        r"""
+        @brief 'cm_help_about' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_help_about')" instead.
+        """
+        ...
+    def cm_inc_max_hier(self) -> None:
+        r"""
+        @brief 'cm_inc_max_hier' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_inc_max_hier')" instead.
+        """
+        ...
+    def cm_last_display_state(self) -> None:
+        r"""
+        @brief 'cm_prev_display_state|#cm_last_display_state' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_prev_display_state|#cm_last_display_state')" instead.
+        """
+        ...
+    def cm_layout_props(self) -> None:
+        r"""
+        @brief 'cm_layout_props' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_layout_props')" instead.
+        """
+        ...
+    def cm_load_bookmarks(self) -> None:
+        r"""
+        @brief 'cm_load_bookmarks' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_load_bookmarks')" instead.
+        """
+        ...
+    def cm_load_layer_props(self) -> None:
+        r"""
+        @brief 'cm_load_layer_props' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_load_layer_props')" instead.
+        """
+        ...
+    def cm_lv_add_missing(self) -> None:
+        r"""
+        @brief 'cm_lv_add_missing' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_lv_add_missing')" instead.
+        """
+        ...
+    def cm_lv_delete(self) -> None:
+        r"""
+        @brief 'cm_lv_delete' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_lv_delete')" instead.
+        """
+        ...
+    def cm_lv_expand_all(self) -> None:
+        r"""
+        @brief 'cm_lv_expand_all' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_lv_expand_all')" instead.
+        """
+        ...
+    def cm_lv_group(self) -> None:
+        r"""
+        @brief 'cm_lv_group' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_lv_group')" instead.
+        """
+        ...
+    def cm_lv_hide(self) -> None:
+        r"""
+        @brief 'cm_lv_hide' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_lv_hide')" instead.
+        """
+        ...
+    def cm_lv_hide_all(self) -> None:
+        r"""
+        @brief 'cm_lv_hide_all' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_lv_hide_all')" instead.
+        """
+        ...
+    def cm_lv_insert(self) -> None:
+        r"""
+        @brief 'cm_lv_insert' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_lv_insert')" instead.
+        """
+        ...
+    def cm_lv_new_tab(self) -> None:
+        r"""
+        @brief 'cm_lv_new_tab' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_lv_new_tab')" instead.
+        """
+        ...
+    def cm_lv_regroup_by_datatype(self) -> None:
+        r"""
+        @brief 'cm_lv_regroup_by_datatype' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_lv_regroup_by_datatype')" instead.
+        """
+        ...
+    def cm_lv_regroup_by_index(self) -> None:
+        r"""
+        @brief 'cm_lv_regroup_by_index' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_lv_regroup_by_index')" instead.
+        """
+        ...
+    def cm_lv_regroup_by_layer(self) -> None:
+        r"""
+        @brief 'cm_lv_regroup_by_layer' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_lv_regroup_by_layer')" instead.
+        """
+        ...
+    def cm_lv_regroup_flatten(self) -> None:
+        r"""
+        @brief 'cm_lv_regroup_flatten' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_lv_regroup_flatten')" instead.
+        """
+        ...
+    def cm_lv_remove_tab(self) -> None:
+        r"""
+        @brief 'cm_lv_remove_tab' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_lv_remove_tab')" instead.
+        """
+        ...
+    def cm_lv_remove_unused(self) -> None:
+        r"""
+        @brief 'cm_lv_remove_unused' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_lv_remove_unused')" instead.
+        """
+        ...
+    def cm_lv_rename(self) -> None:
+        r"""
+        @brief 'cm_lv_rename' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_lv_rename')" instead.
+        """
+        ...
+    def cm_lv_rename_tab(self) -> None:
+        r"""
+        @brief 'cm_lv_rename_tab' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_lv_rename_tab')" instead.
+        """
+        ...
+    def cm_lv_select_all(self) -> None:
+        r"""
+        @brief 'cm_lv_select_all' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_lv_select_all')" instead.
+        """
+        ...
+    def cm_lv_show(self) -> None:
+        r"""
+        @brief 'cm_lv_show' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_lv_show')" instead.
+        """
+        ...
+    def cm_lv_show_all(self) -> None:
+        r"""
+        @brief 'cm_lv_show_all' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_lv_show_all')" instead.
+        """
+        ...
+    def cm_lv_show_only(self) -> None:
+        r"""
+        @brief 'cm_lv_show_only' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_lv_show_only')" instead.
+        """
+        ...
+    def cm_lv_sort_by_dli(self) -> None:
+        r"""
+        @brief 'cm_lv_sort_by_dli' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_lv_sort_by_dli')" instead.
+        """
+        ...
+    def cm_lv_sort_by_idl(self) -> None:
+        r"""
+        @brief 'cm_lv_sort_by_idl' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_lv_sort_by_idl')" instead.
+        """
+        ...
+    def cm_lv_sort_by_ild(self) -> None:
+        r"""
+        @brief 'cm_lv_sort_by_ild' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_lv_sort_by_ild')" instead.
+        """
+        ...
+    def cm_lv_sort_by_ldi(self) -> None:
+        r"""
+        @brief 'cm_lv_sort_by_ldi' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_lv_sort_by_ldi')" instead.
+        """
+        ...
+    def cm_lv_sort_by_name(self) -> None:
+        r"""
+        @brief 'cm_lv_sort_by_name' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_lv_sort_by_name')" instead.
+        """
+        ...
+    def cm_lv_source(self) -> None:
+        r"""
+        @brief 'cm_lv_source' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_lv_source')" instead.
+        """
+        ...
+    def cm_lv_ungroup(self) -> None:
+        r"""
+        @brief 'cm_lv_ungroup' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_lv_ungroup')" instead.
+        """
+        ...
+    def cm_macro_editor(self) -> None:
+        r"""
+        @brief 'cm_macro_editor' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_macro_editor')" instead.
+        """
+        ...
+    def cm_manage_bookmarks(self) -> None:
+        r"""
+        @brief 'cm_manage_bookmarks' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_manage_bookmarks')" instead.
+        """
+        ...
+    def cm_max_hier(self) -> None:
+        r"""
+        @brief 'cm_max_hier' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_max_hier')" instead.
+        """
+        ...
+    def cm_max_hier_0(self) -> None:
+        r"""
+        @brief 'cm_max_hier_0' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_max_hier_0')" instead.
+        """
+        ...
+    def cm_max_hier_1(self) -> None:
+        r"""
+        @brief 'cm_max_hier_1' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_max_hier_1')" instead.
+        """
+        ...
+    def cm_navigator_close(self) -> None:
+        r"""
+        @brief 'cm_navigator_close' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_navigator_close')" instead.
+        """
+        ...
+    def cm_new_cell(self) -> None:
+        r"""
+        @brief 'cm_new_cell' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_new_cell')" instead.
+        """
+        ...
+    def cm_new_layer(self) -> None:
+        r"""
+        @brief 'cm_new_layer' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_new_layer')" instead.
+        """
+        ...
+    def cm_new_layout(self) -> None:
+        r"""
+        @brief 'cm_new_layout' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_new_layout')" instead.
+        """
+        ...
+    def cm_new_panel(self) -> None:
+        r"""
+        @brief 'cm_new_panel' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_new_panel')" instead.
+        """
+        ...
+    def cm_next_display_state(self) -> None:
+        r"""
+        @brief 'cm_next_display_state' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_next_display_state')" instead.
+        """
+        ...
+    def cm_open(self) -> None:
+        r"""
+        @brief 'cm_open' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_open')" instead.
+        """
+        ...
+    def cm_open_current_cell(self) -> None:
+        r"""
+        @brief 'cm_open_current_cell' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_open_current_cell')" instead.
+        """
+        ...
+    def cm_open_new_view(self) -> None:
+        r"""
+        @brief 'cm_open_new_view' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_open_new_view')" instead.
+        """
+        ...
+    def cm_open_too(self) -> None:
+        r"""
+        @brief 'cm_open_too' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_open_too')" instead.
+        """
+        ...
+    def cm_packages(self) -> None:
+        r"""
+        @brief 'cm_packages' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_packages')" instead.
+        """
+        ...
+    def cm_pan_down(self) -> None:
+        r"""
+        @brief 'cm_pan_down' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_pan_down')" instead.
+        """
+        ...
+    def cm_pan_left(self) -> None:
+        r"""
+        @brief 'cm_pan_left' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_pan_left')" instead.
+        """
+        ...
+    def cm_pan_right(self) -> None:
+        r"""
+        @brief 'cm_pan_right' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_pan_right')" instead.
+        """
+        ...
+    def cm_pan_up(self) -> None:
+        r"""
+        @brief 'cm_pan_up' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_pan_up')" instead.
+        """
+        ...
+    def cm_paste(self) -> None:
+        r"""
+        @brief 'cm_paste' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_paste')" instead.
+        """
+        ...
+    def cm_prev_display_state(self) -> None:
+        r"""
+        @brief 'cm_prev_display_state|#cm_last_display_state' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_prev_display_state|#cm_last_display_state')" instead.
+        """
+        ...
+    def cm_print(self) -> None:
+        r"""
+        @brief 'cm_print' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_print')" instead.
+        """
+        ...
+    def cm_pull_in(self) -> None:
+        r"""
+        @brief 'cm_pull_in' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_pull_in')" instead.
+        """
+        ...
+    def cm_reader_options(self) -> None:
+        r"""
+        @brief 'cm_reader_options' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_reader_options')" instead.
+        """
+        ...
+    def cm_redo(self) -> None:
+        r"""
+        @brief 'cm_redo' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_redo')" instead.
+        """
+        ...
+    def cm_redraw(self) -> None:
+        r"""
+        @brief 'cm_redraw' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_redraw')" instead.
+        """
+        ...
+    def cm_reload(self) -> None:
+        r"""
+        @brief 'cm_reload' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_reload')" instead.
+        """
+        ...
+    def cm_reset_window_state(self) -> None:
+        r"""
+        @brief 'cm_reset_window_state' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_reset_window_state')" instead.
+        """
+        ...
+    def cm_restore_session(self) -> None:
+        r"""
+        @brief 'cm_restore_session' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_restore_session')" instead.
+        """
+        ...
+    def cm_save(self) -> None:
+        r"""
+        @brief 'cm_save' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_save')" instead.
+        """
+        ...
+    def cm_save_all(self) -> None:
+        r"""
+        @brief 'cm_save_all' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_save_all')" instead.
+        """
+        ...
+    def cm_save_as(self) -> None:
+        r"""
+        @brief 'cm_save_as' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_save_as')" instead.
+        """
+        ...
+    def cm_save_bookmarks(self) -> None:
+        r"""
+        @brief 'cm_save_bookmarks' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_save_bookmarks')" instead.
+        """
+        ...
+    def cm_save_current_cell_as(self) -> None:
+        r"""
+        @brief 'cm_save_current_cell_as' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_save_current_cell_as')" instead.
+        """
+        ...
+    def cm_save_layer_props(self) -> None:
+        r"""
+        @brief 'cm_save_layer_props' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_save_layer_props')" instead.
+        """
+        ...
+    def cm_save_session(self) -> None:
+        r"""
+        @brief 'cm_save_session' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_save_session')" instead.
+        """
+        ...
+    def cm_screenshot(self) -> None:
+        r"""
+        @brief 'cm_screenshot' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_screenshot')" instead.
+        """
+        ...
+    def cm_screenshot_to_clipboard(self) -> None:
+        r"""
+        @brief 'cm_screenshot_to_clipboard' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_screenshot_to_clipboard')" instead.
+        """
+        ...
+    def cm_sel_flip_x(self) -> None:
+        r"""
+        @brief 'cm_sel_flip_x' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_sel_flip_x')" instead.
+        """
+        ...
+    def cm_sel_flip_y(self) -> None:
+        r"""
+        @brief 'cm_sel_flip_y' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_sel_flip_y')" instead.
+        """
+        ...
+    def cm_sel_free_rot(self) -> None:
+        r"""
+        @brief 'cm_sel_free_rot' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_sel_free_rot')" instead.
+        """
+        ...
+    def cm_sel_move(self) -> None:
+        r"""
+        @brief 'cm_sel_move' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_sel_move')" instead.
+        """
+        ...
+    def cm_sel_move_to(self) -> None:
+        r"""
+        @brief 'cm_sel_move_to' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_sel_move_to')" instead.
+        """
+        ...
+    def cm_sel_rot_ccw(self) -> None:
+        r"""
+        @brief 'cm_sel_rot_ccw' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_sel_rot_ccw')" instead.
+        """
+        ...
+    def cm_sel_rot_cw(self) -> None:
+        r"""
+        @brief 'cm_sel_rot_cw' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_sel_rot_cw')" instead.
+        """
+        ...
+    def cm_sel_scale(self) -> None:
+        r"""
+        @brief 'cm_sel_scale' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_sel_scale')" instead.
+        """
+        ...
+    def cm_select_all(self) -> None:
+        r"""
+        @brief 'cm_select_all' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_select_all')" instead.
+        """
+        ...
+    def cm_select_cell(self) -> None:
+        r"""
+        @brief 'cm_select_cell' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_select_cell')" instead.
+        """
+        ...
+    def cm_select_current_cell(self) -> None:
+        r"""
+        @brief 'cm_select_current_cell' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_select_current_cell')" instead.
+        """
+        ...
+    def cm_setup(self) -> None:
+        r"""
+        @brief 'cm_setup' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_setup')" instead.
+        """
+        ...
+    def cm_show_properties(self) -> None:
+        r"""
+        @brief 'cm_show_properties' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_show_properties')" instead.
+        """
+        ...
+    def cm_technologies(self) -> None:
+        r"""
+        @brief 'cm_technologies' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_technologies')" instead.
+        """
+        ...
+    def cm_undo(self) -> None:
+        r"""
+        @brief 'cm_undo' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_undo')" instead.
+        """
+        ...
+    def cm_unselect_all(self) -> None:
+        r"""
+        @brief 'cm_unselect_all' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_unselect_all')" instead.
+        """
+        ...
+    def cm_view_log(self) -> None:
+        r"""
+        @brief 'cm_view_log' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_view_log')" instead.
+        """
+        ...
+    def cm_zoom_fit(self) -> None:
+        r"""
+        @brief 'cm_zoom_fit' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_zoom_fit')" instead.
+        """
+        ...
+    def cm_zoom_fit_sel(self) -> None:
+        r"""
+        @brief 'cm_zoom_fit_sel' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_zoom_fit_sel')" instead.
+        """
+        ...
+    def cm_zoom_in(self) -> None:
+        r"""
+        @brief 'cm_zoom_in' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_zoom_in')" instead.
+        """
+        ...
+    def cm_zoom_out(self) -> None:
+        r"""
+        @brief 'cm_zoom_out' action.
+        This method is deprecated in version 0.27.
+        Use "call_menu('cm_zoom_out')" instead.
+        """
+        ...
+    def commit_config(self) -> None:
+        r"""
+        @brief Commits the configuration settings
+        This method is provided for using MainWindow without an Application object. It's a convience method which is equivalent to 'dispatcher().commit_config(...)'. See \Dispatcher#commit_config for details.
+
+        This method has been introduced in version 0.27.
+        """
+        ...
+    @overload
+    def create_layout(self, mode: int) -> CellView:
+        r"""
+        @brief Creates a new, empty layout
+
+        @param mode An integer value of 0, 1 or 2 that determines how the layout is created
+        @return The cellview of the layout that was created
+
+        Create the layout in the current view, replacing the current layouts (mode 0), in a new view (mode 1) or adding it to the current view (mode 2).
+        In mode 1, the new view is made the current one.
+
+        This version uses the initial technology and associates it with the new layout.
+
+        Starting with version 0.25, this method returns a cellview object that can be modified to configure the cellview.
+        """
+        ...
+    @overload
+    def create_layout(self, tech: str, mode: int) -> CellView:
+        r"""
+        @brief Creates a new, empty layout with the given technology
+
+        @param mode An integer value of 0, 1 or 2 that determines how the layout is created
+        @param tech The name of the technology to use for that layout.
+        @return The cellview of the layout that was created
+
+        Create the layout in the current view, replacing the current layouts (mode 0), in a new view (mode 1) or adding it to the current view (mode 2).
+        In mode 1, the new view is made the current one.
+
+        If the technology name is not a valid technology name, the default technology will be used.
+
+        This version was introduced in version 0.22.
+        Starting with version 0.25, this method returns a cellview object that can be modified to configure the cellview.
+        """
+        ...
+    def create_view(self) -> int:
+        r"""
+        @brief Creates a new, empty view
+
+        @return The index of the view that was created
+
+        Creates an empty view that can be filled with layouts using the load_layout and create_layout methods on the view object. Use the \view method to obtain the view object from the view index.
+        This method has been added in version 0.22.
+        """
+        ...
+    def current_view(self) -> LayoutView:
+        r"""
+        @brief Returns a reference to the current view's object
+
+        @return A reference to a \LayoutView object representing the current view.
+        """
+        ...
+    def dispatcher(self) -> Dispatcher:
+        r"""
+        @brief Gets the dispatcher interface (the plugin root configuration space)
+        This method has been introduced in version 0.27.
+        """
+        ...
+    def enable_edits(self, enable: bool) -> None:
+        r"""
+        @brief Enables or disables editing
+
+        @param enable Enable edits if set to true
+
+        Starting from version 0.25, this method enables/disables edits on the current view only. 
+        Use LayoutView#enable_edits instead.
+        """
+        ...
+    def exit(self) -> None:
+        r"""
+        @brief Schedules an exit for the application
+
+        This method does not immediately exit the application but sends an exit request to the application which will cause a clean shutdown of the GUI. 
+        """
+        ...
+    def get_config(self, name: str) -> Any:
+        r"""
+        @brief Gets the value of a local configuration parameter
+        This method is provided for using MainWindow without an Application object. It's a convience method which is equivalent to 'dispatcher().get_config(...)'. See \Dispatcher#get_config for details.
+
+        This method has been introduced in version 0.27.
+        """
+        ...
+    def get_config_names(self) -> List[str]:
+        r"""
+        @brief Gets the configuration parameter names
+        This method is provided for using MainWindow without an Application object. It's a convience method which is equivalent to 'dispatcher().get_config_names(...)'. See \Dispatcher#get_config_names for details.
+
+        This method has been introduced in version 0.27.
+        """
+        ...
+    def get_default_key_bindings(self) -> Dict[str, str]:
+        r"""
+        @brief Gets the default key bindings
+        This method returns a hash with the default key binding vs. menu item path.
+        You can use this hash with \set_key_bindings to reset all key bindings to the default ones.
+
+        This method has been introduced in version 0.27.
+        """
+        ...
+    def get_default_menu_items_hidden(self) -> Dict[str, bool]:
+        r"""
+        @brief Gets the flags indicating whether menu items are hidden by default
+        You can use this hash with \set_menu_items_hidden to restore the visibility of all menu items.
+
+        This method has been introduced in version 0.27.
+        """
+        ...
+    def get_key_bindings(self) -> Dict[str, str]:
+        r"""
+        @brief Gets the current key bindings
+        This method returns a hash with the key binding vs. menu item path.
+
+        This method has been introduced in version 0.27.
+        """
+        ...
+    def get_menu_items_hidden(self) -> Dict[str, bool]:
+        r"""
+        @brief Gets the flags indicating whether menu items are hidden
+        This method returns a hash with the hidden flag vs. menu item path.
+        You can use this hash with \set_menu_items_hidden.
+
+        This method has been introduced in version 0.27.
+        """
+        ...
+    def grid_micron(self) -> float:
+        r"""
+        @brief Gets the global grid in micron
+
+        @return The global grid in micron
+
+        The global grid is used at various places, i.e. for ruler snapping, for grid display etc.
+        """
+        ...
+    def index_of(self, view: LayoutView) -> int:
+        r"""
+        @brief Gets the index of the given view
+
+        @return The index of the view that was given
+
+        If the given view is not a view object within the main window, a negative value will be returned.
+
+        This method has been added in version 0.25.
+        """
+        ...
+    @overload
+    def load_layout(self, filename: str, mode: Optional[int] = ...) -> CellView:
+        r"""
+        @brief Loads a new layout
+
+        @param filename The name of the file to load
+        @param mode An integer value of 0, 1 or 2 that determines how the file is loaded
+        @return The cellview into which the layout was loaded
+
+        Loads the given file into the current view, replacing the current layouts (mode 0), into a new view (mode 1) or adding the layout to the current view (mode 2).
+        In mode 1, the new view is made the current one.
+
+        This version will use the initial technology and the default reader options. Others versions are provided which allow specification of technology and reader options explicitly.
+
+        Starting with version 0.25, this method returns a cellview object that can be modified to configure the cellview. The 'mode' argument has been made optional in version 0.28.
+        """
+        ...
+    @overload
+    def load_layout(self, filename: str, options: db.LoadLayoutOptions, mode: Optional[int] = ...) -> CellView:
+        r"""
+        @brief Loads a new layout with the given options
+
+        @param filename The name of the file to load
+        @param options The reader options to use.
+        @param mode An integer value of 0, 1 or 2 that determines how the file is loaded
+        @return The cellview into which the layout was loaded
+
+        Loads the given file into the current view, replacing the current layouts (mode 0), into a new view (mode 1) or adding the layout to the current view (mode 2).
+        In mode 1, the new view is made the current one.
+
+        This version was introduced in version 0.22.
+        Starting with version 0.25, this method returns a cellview object that can be modified to configure the cellview. The 'mode' argument has been made optional in version 0.28.
+        """
+        ...
+    @overload
+    def load_layout(self, filename: str, options: db.LoadLayoutOptions, tech: str, mode: Optional[int] = ...) -> CellView:
+        r"""
+        @brief Loads a new layout with the given options and associate it with the given technology
+
+        @param filename The name of the file to load
+        @param options The reader options to use.
+        @param tech The name of the technology to use for that layout.
+        @param mode An integer value of 0, 1 or 2 that determines how the file is loaded
+        @return The cellview into which the layout was loaded
+
+        Loads the given file into the current view, replacing the current layouts (mode 0), into a new view (mode 1) or adding the layout to the current view (mode 2).
+        In mode 1, the new view is made the current one.
+
+        If the technology name is not a valid technology name, the default technology will be used.
+
+        This version was introduced in version 0.22.
+        Starting with version 0.25, this method returns a cellview object that can be modified to configure the cellview. The 'mode' argument has been made optional in version 0.28.
+        """
+        ...
+    @overload
+    def load_layout(self, filename: str, tech: str, mode: Optional[int] = ...) -> CellView:
+        r"""
+        @brief Loads a new layout and associate it with the given technology
+
+        @param filename The name of the file to load
+        @param tech The name of the technology to use for that layout.
+        @param mode An integer value of 0, 1 or 2 that determines how the file is loaded
+        @return The cellview into which the layout was loaded
+
+        Loads the given file into the current view, replacing the current layouts (mode 0), into a new view (mode 1) or adding the layout to the current view (mode 2).
+        In mode 1, the new view is made the current one.
+
+        If the technology name is not a valid technology name, the default technology will be used. The 'mode' argument has been made optional in version 0.28.
+
+        This version was introduced in version 0.22.
+        Starting with version 0.25, this method returns a cellview object that can be modified to configure the cellview.
+        """
+        ...
+    def manager(self) -> db.Manager:
+        r"""
+        @brief Gets the \Manager object of this window
+
+        The manager object is responsible to managing the undo/redo stack. Usually this object is not required. It's more convenient and safer to use the related methods provided by \LayoutView (\LayoutView#transaction, \LayoutView#commit) and \MainWindow (such as \MainWindow#cm_undo and \MainWindow#cm_redo).
+
+        This method has been added in version 0.24.
+        """
+        ...
+    def menu(self) -> AbstractMenu:
+        r"""
+        @brief Returns a reference to the abstract menu
+
+        @return A reference to an \AbstractMenu object representing the menu system
+        """
+        ...
+    def message(self, message: str, time: Optional[int] = ...) -> None:
+        r"""
+        @brief Displays a message in the status bar
+
+        @param message The message to display
+        @param time The time how long to display the message in ms. A negative value means 'infinitely'.
+
+        This given message is shown in the status bar for the given time.
+
+        This method has been added in version 0.18. The 'time' parameter was made optional in version 0.28.10.
+        """
+        ...
+    def read_config(self, file_name: str) -> bool:
+        r"""
+        @brief Reads the configuration from a file
+        This method is provided for using MainWindow without an Application object. It's a convience method which is equivalent to 'dispatcher().read_config(...)'. See \Dispatcher#read_config for details.
+
+        This method has been introduced in version 0.27.
+        """
+        ...
+    def redraw(self) -> None:
+        r"""
+        @brief Redraws the current view
+
+        Issues a redraw request to the current view. This usually happens automatically, so this method does not need to be called in most relevant cases. 
+        """
+        ...
+    def resize(self, width: int, height: int) -> None:
+        r"""
+        @brief Resizes the window
+
+        @param width The new width of the window
+        @param height The new width of the window
+
+        This method resizes the window to the given target size including decoration such as menu bar and control panels
+        """
+        ...
+    def restore_session(self, fn: str) -> None:
+        r"""
+        @brief Restores a session from the given file
+
+        @param fn The path to the session file
+
+        The session stored in the given session file is restored. All existing views are closed and all layout edits are discarded without notification.
+
+        This method was added in version 0.18.
+        """
+        ...
+    def save_session(self, fn: str) -> None:
+        r"""
+        @brief Saves the session to the given file
+
+        @param fn The path to the session file
+
+        The session is saved to the given session file. Any existing layout edits are not automatically saved together with the session. The session just holds display settings and annotation objects. If layout edits exist, they have to be saved explicitly in a separate step.
+
+        This method was added in version 0.18.
+        """
+        ...
+    def select_view(self, index: int) -> None:
+        r"""
+        @brief Selects the view with the given index
+
+        @param index The index of the view to select (0 is the first)
+
+        This method will make the view with the given index the current (front) view.
+
+        This method was renamed from select_view to current_view_index= in version 0.25. The old name is still available, but deprecated.
+        """
+        ...
+    def set_config(self, name: str, value: str) -> None:
+        r"""
+        @brief Set a local configuration parameter with the given name to the given value
+        This method is provided for using MainWindow without an Application object. It's a convience method which is equivalent to 'dispatcher().set_config(...)'. See \Dispatcher#set_config for details.
+
+        This method has been introduced in version 0.27.
+        """
+        ...
+    def set_key_bindings(self, bindings: Dict[str, str]) -> None:
+        r"""
+        @brief Sets key bindings.
+        Sets the given key bindings. Pass a hash listing the key bindings per menu item paths. Key strings follow the usual notation, e.g. 'Ctrl+A', 'Shift+X' or just 'F2'.
+        Use an empty value to remove a key binding from a menu entry.
+
+        \get_key_bindings will give you the current key bindings, \get_default_key_bindings will give you the default ones.
+
+        Examples:
+
+        @code
+        # reset all key bindings to default:
+        mw = RBA::MainWindow.instance()
+        mw.set_key_bindings(mw.get_default_key_bindings())
+
+        # disable key binding for 'copy':
+        RBA::MainWindow.instance.set_key_bindings({ "edit_menu.copy" => "" })
+
+        # configure 'copy' to use Shift+K and 'cut' to use Ctrl+K:
+        RBA::MainWindow.instance.set_key_bindings({ "edit_menu.copy" => "Shift+K", "edit_menu.cut" => "Ctrl+K" })
+        @/code
+
+        This method has been introduced in version 0.27.
+        """
+        ...
+    def set_menu_items_hidden(self, flags: Dict[str, bool]) -> None:
+        r"""
+        @brief sets the flags indicating whether menu items are hidden
+        This method allows hiding certain menu items. It takes a hash with hidden flags vs. menu item paths. 
+        Examples:
+
+        @code
+        # show all menu items:
+        mw = RBA::MainWindow.instance()
+        mw.set_menu_items_hidden(mw.get_default_menu_items_hidden())
+
+        # hide the 'copy' entry from the 'Edit' menu:
+        RBA::MainWindow.instance().set_menu_items_hidden({ "edit_menu.copy" => true })
+        @/code
+
+        This method has been introduced in version 0.27.
+        """
+        ...
+    def show_macro_editor(self, cat: Optional[str] = ..., add: Optional[bool] = ...) -> None:
+        r"""
+        @brief Shows the macro editor
+        If 'cat' is given, this category will be selected in the category tab. If 'add' is true, the 'new macro' dialog will be opened.
+
+        This method has been introduced in version 0.26.
+        """
+        ...
+    def view(self, n: int) -> LayoutView:
+        r"""
+        @brief Returns a reference to a view object by index
+
+        @return The view object's reference for the view with the given index.
+        """
+        ...
+    def views(self) -> int:
+        r"""
+        @brief Returns the number of views
+
+        @return The number of views available so far.
+        """
+        ...
+    def write_config(self, file_name: str) -> bool:
+        r"""
+        @brief Writes configuration to a file
+        This method is provided for using MainWindow without an Application object. It's a convience method which is equivalent to 'dispatcher().write_config(...)'. See \Dispatcher#write_config for details.
+
+        This method has been introduced in version 0.27.
+        """
+        ...
+    ...
 
 class Marker:
     r"""
@@ -8523,35 +12714,41 @@ class Marker:
 
         A marker is always associated with a view, in which it is shown. The view this marker is associated with must be passed to the constructor.
         """
+        ...
     def __init__(self, view: LayoutViewBase) -> None:
         r"""
         @brief Creates a marker
 
         A marker is always associated with a view, in which it is shown. The view this marker is associated with must be passed to the constructor.
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -8559,6 +12756,7 @@ class Marker:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -8566,48 +12764,57 @@ class Marker:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def has_color(self) -> bool:
         r"""
         @brief Returns a value indicating whether the marker has a specific color
         """
+        ...
     def has_frame_color(self) -> bool:
         r"""
         @brief Returns a value indicating whether the marker has a specific frame color
         The set method has been added in version 0.20.
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def reset_color(self) -> None:
         r"""
         @brief Resets the color of the marker
         See \set_color for a description of the color property of the marker.
         """
+        ...
     def reset_frame_color(self) -> None:
         r"""
         @brief Resets the frame color of the marker
         See \set_frame_color for a description of the frame color property of the marker.The set method has been added in version 0.20.
         """
+        ...
     @overload
     def set(self, box: db.DBox) -> None:
         r"""
@@ -8617,6 +12824,7 @@ class Marker:
         If the box is empty, no marker is drawn.
         The set method has been added in version 0.20.
         """
+        ...
     @overload
     def set(self, edge: db.DEdge) -> None:
         r"""
@@ -8625,6 +12833,7 @@ class Marker:
         Makes the marker show a edge. The edge must be given in micron units.
         The set method has been added in version 0.20.
         """
+        ...
     @overload
     def set(self, path: db.DPath) -> None:
         r"""
@@ -8633,6 +12842,7 @@ class Marker:
         Makes the marker show a path. The path must be given in micron units.
         The set method has been added in version 0.20.
         """
+        ...
     @overload
     def set(self, polygon: db.DPolygon) -> None:
         r"""
@@ -8641,6 +12851,7 @@ class Marker:
         Makes the marker show a polygon. The polygon must be given in micron units.
         The set method has been added in version 0.20.
         """
+        ...
     @overload
     def set(self, text: db.DText) -> None:
         r"""
@@ -8649,6 +12860,7 @@ class Marker:
         Makes the marker show a text. The text must be given in micron units.
         The set method has been added in version 0.20.
         """
+        ...
     def set_box(self, box: db.DBox) -> None:
         r"""
         @brief Sets the box the marker is to display
@@ -8657,6 +12869,7 @@ class Marker:
         If the box is empty, no marker is drawn.
         The set method has been added in version 0.20.
         """
+        ...
     def set_edge(self, edge: db.DEdge) -> None:
         r"""
         @brief Sets the edge the marker is to display
@@ -8664,6 +12877,7 @@ class Marker:
         Makes the marker show a edge. The edge must be given in micron units.
         The set method has been added in version 0.20.
         """
+        ...
     def set_path(self, path: db.DPath) -> None:
         r"""
         @brief Sets the path the marker is to display
@@ -8671,6 +12885,7 @@ class Marker:
         Makes the marker show a path. The path must be given in micron units.
         The set method has been added in version 0.20.
         """
+        ...
     def set_polygon(self, polygon: db.DPolygon) -> None:
         r"""
         @brief Sets the polygon the marker is to display
@@ -8678,6 +12893,7 @@ class Marker:
         Makes the marker show a polygon. The polygon must be given in micron units.
         The set method has been added in version 0.20.
         """
+        ...
     def set_text(self, text: db.DText) -> None:
         r"""
         @brief Sets the text the marker is to display
@@ -8685,6 +12901,626 @@ class Marker:
         Makes the marker show a text. The text must be given in micron units.
         The set method has been added in version 0.20.
         """
+        ...
+    ...
+
+class MessageBox(QMainWindow_Native):
+    r"""
+    @brief Various methods to display message boxes
+    This class provides some basic message boxes. This functionality is provided through the static (class) methods \warning, \question and so on.
+
+    Here is some example:
+
+    @code
+    # issue a warning and ask whether to continue:
+    v = RBA::MessageBox::warning("Dialog Title", "Something happened. Continue?", RBA::MessageBox::Yes + RBA::MessageBox::No)
+    if v == RBA::MessageBox::Yes
+      ... continue ...
+    end
+    @/code
+
+    If you have enabled the Qt binding, you can use \QMessageBox directly.
+    """
+    Abort: ClassVar[int]
+    r"""
+    @brief A constant describing the 'Abort' button
+    """
+    Cancel: ClassVar[int]
+    r"""
+    @brief A constant describing the 'Cancel' button
+    """
+    Ignore: ClassVar[int]
+    r"""
+    @brief A constant describing the 'Ignore' button
+    """
+    No: ClassVar[int]
+    r"""
+    @brief A constant describing the 'No' button
+    """
+    Ok: ClassVar[int]
+    r"""
+    @brief A constant describing the 'Ok' button
+    """
+    Retry: ClassVar[int]
+    r"""
+    @brief A constant describing the 'Retry' button
+    """
+    Yes: ClassVar[int]
+    r"""
+    @brief A constant describing the 'Yes' button
+    """
+    @classmethod
+    def b_abort(cls) -> int:
+        r"""
+        @brief A constant describing the 'Abort' button
+        """
+        ...
+    @classmethod
+    def b_cancel(cls) -> int:
+        r"""
+        @brief A constant describing the 'Cancel' button
+        """
+        ...
+    @classmethod
+    def b_ignore(cls) -> int:
+        r"""
+        @brief A constant describing the 'Ignore' button
+        """
+        ...
+    @classmethod
+    def b_no(cls) -> int:
+        r"""
+        @brief A constant describing the 'No' button
+        """
+        ...
+    @classmethod
+    def b_ok(cls) -> int:
+        r"""
+        @brief A constant describing the 'Ok' button
+        """
+        ...
+    @classmethod
+    def b_retry(cls) -> int:
+        r"""
+        @brief A constant describing the 'Retry' button
+        """
+        ...
+    @classmethod
+    def b_yes(cls) -> int:
+        r"""
+        @brief A constant describing the 'Yes' button
+        """
+        ...
+    @classmethod
+    def critical(cls, title: str, text: str, buttons: int) -> int:
+        r"""
+        @brief Open a critical (error) message box
+        @param title The title of the window
+        @param text The text to show
+        @param buttons A combination (+) of button constants (\Ok and so on) describing the buttons to show for the message box
+        @return The button constant describing the button that was pressed
+        """
+        ...
+    @classmethod
+    def info(cls, title: str, text: str, buttons: int) -> int:
+        r"""
+        @brief Open a information message box
+        @param title The title of the window
+        @param text The text to show
+        @param buttons A combination (+) of button constants (\Ok and so on) describing the buttons to show for the message box
+        @return The button constant describing the button that was pressed
+        """
+        ...
+    @classmethod
+    def question(cls, title: str, text: str, buttons: int) -> int:
+        r"""
+        @brief Open a question message box
+        @param title The title of the window
+        @param text The text to show
+        @param buttons A combination (+) of button constants (\Ok and so on) describing the buttons to show for the message box
+        @return The button constant describing the button that was pressed
+        """
+        ...
+    @classmethod
+    def warning(cls, title: str, text: str, buttons: int) -> int:
+        r"""
+        @brief Open a warning message box
+        @param title The title of the window
+        @param text The text to show
+        @param buttons A combination (+) of button constants (\Ok and so on) describing the buttons to show for the message box
+        @return The button constant describing the button that was pressed
+        """
+        ...
+    def __copy__(self) -> MessageBox:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def __deepcopy__(self) -> MessageBox:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def assign(self, other: QObject_Native) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+        ...
+    def dup(self) -> MessageBox:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    ...
+
+class NetlistBrowserDialog:
+    r"""
+    @brief Represents the netlist browser dialog.
+    This dialog is a part of the \LayoutView class and can be obtained through \LayoutView#netlist_browser.
+    This interface allows to interact with the browser - mainly to get information about state changes.
+
+    This class has been introduced in version 0.27.
+    """
+    on_current_db_changed: None
+    r"""
+    Getter:
+    @brief This event is triggered when the current database is changed.
+    The current database can be obtained with \db.
+    Setter:
+    @brief This event is triggered when the current database is changed.
+    The current database can be obtained with \db.
+    """
+    on_probe: None
+    r"""
+    Getter:
+    @brief This event is triggered when a net is probed.
+    The first path will indicate the location of the probed net in terms of two paths: one describing the instantiation of the net in layout space and one in schematic space. Both objects are \NetlistObjectPath objects which hold the root circuit, the chain of subcircuits leading to the circuit containing the net and the net itself.
+    Setter:
+    @brief This event is triggered when a net is probed.
+    The first path will indicate the location of the probed net in terms of two paths: one describing the instantiation of the net in layout space and one in schematic space. Both objects are \NetlistObjectPath objects which hold the root circuit, the chain of subcircuits leading to the circuit containing the net and the net itself.
+    """
+    on_selection_changed: None
+    r"""
+    Getter:
+    @brief This event is triggered when the selection changed.
+    The selection can be obtained with \current_path_first, \current_path_second, \selected_nets, \selected_devices, \selected_subcircuits and \selected_circuits.
+    Setter:
+    @brief This event is triggered when the selection changed.
+    The selection can be obtained with \current_path_first, \current_path_second, \selected_nets, \selected_devices, \selected_subcircuits and \selected_circuits.
+    """
+    @classmethod
+    def new(cls) -> NetlistBrowserDialog:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def current_path(self) -> NetlistObjectsPath:
+        r"""
+        @brief Gets the path of the current object as a path pair (combines layout and schematic object paths in case of a LVS database view).
+        """
+        ...
+    def current_path_first(self) -> NetlistObjectPath:
+        r"""
+        @brief Gets the path of the current object on the first (layout in case of LVS database) side.
+        """
+        ...
+    def current_path_second(self) -> NetlistObjectPath:
+        r"""
+        @brief Gets the path of the current object on the second (schematic in case of LVS database) side.
+        """
+        ...
+    def db(self) -> db.LayoutToNetlist:
+        r"""
+        @brief Gets the database the browser is connected to.
+        """
+        ...
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def selected_paths(self) -> List[NetlistObjectsPath]:
+        r"""
+        @brief Gets the nets currently selected objects (paths) in the netlist database browser.
+        The result is an array of path pairs. See \NetlistObjectsPath for details about these pairs.
+        """
+        ...
+    ...
+
+class NetlistObjectPath:
+    r"""
+    @brief An object describing the instantiation of a netlist object.
+    This class describes the instantiation of a net or a device or a circuit in terms of a root circuit and a subcircuit chain leading to the indicated object.
+
+    See \net= or \device= for the indicated object, \path= for the subcircuit chain.
+
+    This class has been introduced in version 0.27.
+    """
+    device: db.Device
+    r"""
+    Getter:
+    @brief Gets the device the path points to.
+
+    Setter:
+    @brief Sets the device the path points to.
+    If the path describes the location of a device, this member will indicate it.
+    The other way to describe a final object is \net=. If neither a device nor net is given, the path describes a circuit and how it is referenced from the root.
+    """
+    net: db.Net
+    r"""
+    Getter:
+    @brief Gets the net the path points to.
+
+    Setter:
+    @brief Sets the net the path points to.
+    If the path describes the location of a net, this member will indicate it.
+    The other way to describe a final object is \device=. If neither a device nor net is given, the path describes a circuit and how it is referenced from the root.
+    """
+    path: List[db.SubCircuit]
+    r"""
+    Getter:
+    @brief Gets the path.
+
+    Setter:
+    @brief Sets the path.
+    The path is a list of subcircuits leading from the root to the final object. The final (net, device) object is located in the circuit called by the last subcircuit of the subcircuit chain. If the subcircuit list is empty, the final object is located inside the root object.
+    """
+    root: db.Circuit
+    r"""
+    Getter:
+    @brief Gets the root circuit of the path.
+
+    Setter:
+    @brief Sets the root circuit of the path.
+    The root circuit is the circuit from which the path starts.
+    """
+    @classmethod
+    def new(cls) -> NetlistObjectPath:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def __copy__(self) -> NetlistObjectPath:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def __deepcopy__(self) -> NetlistObjectPath:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def assign(self, other: NetlistObjectPath) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+        ...
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def dup(self) -> NetlistObjectPath:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def is_null(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the path is an empty one.
+        """
+        ...
+    ...
+
+class NetlistObjectsPath:
+    r"""
+    @brief An object describing the instantiation of a single netlist object or a pair of those.
+    This class is basically a pair of netlist object paths (see \NetlistObjectPath). When derived from a single netlist view, only the first path is valid and will point to the selected object (a net, a device or a circuit). The second path is null.
+
+    If the path is derived from a paired netlist view (a LVS report view), the first path corresponds to the object in the layout netlist, the second one to the object in the schematic netlist.
+    If the selected object isn't a matched one, either the first or second path may be a null or a partial path without a final net or device object or a partial path.
+
+    This class has been introduced in version 0.27.
+    """
+    @classmethod
+    def new(cls) -> NetlistObjectsPath:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def __copy__(self) -> NetlistObjectsPath:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def __deepcopy__(self) -> NetlistObjectsPath:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def assign(self, other: NetlistObjectsPath) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+        ...
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def dup(self) -> NetlistObjectsPath:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def first(self) -> NetlistObjectPath:
+        r"""
+        @brief Gets the first object's path.
+        In cases of paired netlists (LVS database), the first path points to the layout netlist object.
+        For the single netlist, the first path is the only path supplied.
+        """
+        ...
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def second(self) -> NetlistObjectPath:
+        r"""
+        @brief Gets the second object's path.
+        In cases of paired netlists (LVS database), the first path points to the schematic netlist object.
+        For the single netlist, the second path is always a null path.
+        """
+        ...
+    ...
 
 class ObjectInstPath:
     r"""
@@ -8822,14 +13658,17 @@ class ObjectInstPath:
         @brief Creates a new path object from a \RecursiveShapeIterator
         Use this constructor to quickly turn a recursive shape iterator delivery into a shape selection.
         """
+        ...
     def __copy__(self) -> ObjectInstPath:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __deepcopy__(self) -> ObjectInstPath:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __eq__(self, b: object) -> bool:
         r"""
         @brief Equality of two ObjectInstPath objects
@@ -8837,11 +13676,13 @@ class ObjectInstPath:
 
         This method has been introduced with version 0.24.
         """
+        ...
     def __init__(self, si: db.RecursiveShapeIterator, cv_index: int) -> None:
         r"""
         @brief Creates a new path object from a \RecursiveShapeIterator
         Use this constructor to quickly turn a recursive shape iterator delivery into a shape selection.
         """
+        ...
     def __lt__(self, b: ObjectInstPath) -> bool:
         r"""
         @brief Provides an order criterion for two ObjectInstPath objects
@@ -8849,6 +13690,7 @@ class ObjectInstPath:
 
         This method has been introduced with version 0.24.
         """
+        ...
     def __ne__(self, b: object) -> bool:
         r"""
         @brief Inequality of two ObjectInstPath objects
@@ -8856,29 +13698,34 @@ class ObjectInstPath:
 
         This method has been introduced with version 0.24.
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -8886,6 +13733,7 @@ class ObjectInstPath:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -8893,6 +13741,7 @@ class ObjectInstPath:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def append_path(self, element: db.InstElement) -> None:
         r"""
         @brief Appends an element to the instantiation path
@@ -8903,10 +13752,12 @@ class ObjectInstPath:
 
         This method was introduced in version 0.24.
         """
+        ...
     def assign(self, other: ObjectInstPath) -> None:
         r"""
         @brief Assigns another object to self
         """
+        ...
     def cell_index(self) -> int:
         r"""
         @brief Gets the cell index of the cell that the selection applies to.
@@ -8914,29 +13765,34 @@ class ObjectInstPath:
         This property is set implicitly by setting the top cell and adding elements to the instantiation path.
         To obtain the index of the container cell, use \source.
         """
+        ...
     def clear_path(self) -> None:
         r"""
         @brief Clears the instantiation path
 
         This method was introduced in version 0.24.
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def dtrans(self) -> db.DCplxTrans:
         r"""
         @brief Gets the transformation applicable for the shape in micron space.
@@ -8952,10 +13808,12 @@ class ObjectInstPath:
 
         The method has been introduced in version 0.25.
         """
+        ...
     def dup(self) -> ObjectInstPath:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def each_inst(self) -> Iterator[db.InstElement]:
         r"""
         @brief Yields the instantiation path
@@ -8964,6 +13822,7 @@ class ObjectInstPath:
         If this object represents an instance, the path will contain the selected instance as the last element.
         The elements are delivered top down.
         """
+        ...
     def inst(self) -> db.Instance:
         r"""
         @brief Deliver the instance represented by this selection
@@ -8975,24 +13834,28 @@ class ObjectInstPath:
 
         This method has been added in version 0.16.
         """
+        ...
     def is_cell_inst(self) -> bool:
         r"""
         @brief True, if this selection represents a cell instance
 
         If this attribute is true, the shape reference and layer are not valid.
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def is_valid(self, view: LayoutViewBase) -> bool:
         r"""
         @brief Gets a value indicating whether the instance path refers to a valid object in the context of the given view
 
         This predicate has been introduced in version 0.27.12.
         """
+        ...
     def layout(self) -> db.Layout:
         r"""
         @brief Gets the Layout object the selected object lives in.
@@ -9001,12 +13864,14 @@ class ObjectInstPath:
 
         This method has been introduced in version 0.25.
         """
+        ...
     def path_length(self) -> int:
         r"""
         @brief Returns the length of the path (number of elements delivered by \each_inst)
 
         This method has been added in version 0.16.
         """
+        ...
     def path_nth(self, n: int) -> db.InstElement:
         r"""
         @brief Returns the nth element of the path (similar to \each_inst but with direct access through the index)
@@ -9014,6 +13879,7 @@ class ObjectInstPath:
         @param n The index of the element to retrieve (0..\path_length-1)
         This method has been added in version 0.16.
         """
+        ...
     def source(self) -> int:
         r"""
         @brief Returns to the cell index of the cell that the selected element resides inside.
@@ -9024,6 +13890,7 @@ class ObjectInstPath:
 
         This method has been added in version 0.16.
         """
+        ...
     def source_dtrans(self) -> db.DCplxTrans:
         r"""
         @brief Gets the transformation applicable for an instance and shape in micron space.
@@ -9037,6 +13904,7 @@ class ObjectInstPath:
 
         The method has been introduced in version 0.25.
         """
+        ...
     def source_trans(self) -> db.ICplxTrans:
         r"""
         @brief Gets the transformation applicable for an instance and shape.
@@ -9049,6 +13917,7 @@ class ObjectInstPath:
 
         This method has been added in version 0.16.
         """
+        ...
     def trans(self) -> db.ICplxTrans:
         r"""
         @brief Gets the transformation applicable for the shape.
@@ -9059,6 +13928,8 @@ class ObjectInstPath:
         This property is set implicitly by setting the top cell and adding elements to the instantiation path.
         This method is not applicable for instance selections. A more generic attribute is \source_trans.
         """
+        ...
+    ...
 
 class PixelBuffer:
     r"""
@@ -9087,6 +13958,13 @@ class PixelBuffer:
         @brief Reads the pixel buffer from a PNG byte stream
         This method may not be available if PNG support is not compiled into KLayout.
         """
+        ...
+    @classmethod
+    def from_qimage(cls, qimage: QtGui.QImage_Native) -> PixelBuffer:
+        r"""
+        @brief Creates a pixel buffer object from a QImage object
+        """
+        ...
     @classmethod
     def new(cls, width: int, height: int) -> PixelBuffer:
         r"""
@@ -9097,24 +13975,29 @@ class PixelBuffer:
 
         The pixels are basically uninitialized. You will need to use \fill to initialize them to a certain value.
         """
+        ...
     @classmethod
     def read_png(cls, file: str) -> PixelBuffer:
         r"""
         @brief Reads the pixel buffer from a PNG file
         This method may not be available if PNG support is not compiled into KLayout.
         """
+        ...
     def __copy__(self) -> PixelBuffer:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __deepcopy__(self) -> PixelBuffer:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __eq__(self, other: object) -> bool:
         r"""
         @brief Returns a value indicating whether self is identical to the other image
         """
+        ...
     def __init__(self, width: int, height: int) -> None:
         r"""
         @brief Creates a pixel buffer object
@@ -9124,33 +14007,39 @@ class PixelBuffer:
 
         The pixels are basically uninitialized. You will need to use \fill to initialize them to a certain value.
         """
+        ...
     def __ne__(self, other: object) -> bool:
         r"""
         @brief Returns a value indicating whether self is not identical to the other image
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -9158,6 +14047,7 @@ class PixelBuffer:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -9165,83 +14055,113 @@ class PixelBuffer:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def assign(self, other: PixelBuffer) -> None:
         r"""
         @brief Assigns another object to self
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def diff(self, other: PixelBuffer) -> PixelBuffer:
         r"""
         @brief Creates a difference image
 
         This method is provided to support transfer of image differences - i.e. small updates instead of full images. It works for non-transparent images only and generates an image with transpareny enabled and with the new pixel values for pixels that have changed. The alpha value will be 0 for identical images and 255 for pixels with different values. This way, the difference image can be painted over the original image to generate the new image.
         """
+        ...
     def dup(self) -> PixelBuffer:
         r"""
         @brief Creates a copy of self
         """
+        ...
+    @overload
+    def fill(self, color: QtGui.QColor) -> None:
+        r"""
+        @brief Fills the pixel buffer with the given QColor
+        """
+        ...
+    @overload
     def fill(self, color: int) -> None:
         r"""
         @brief Fills the pixel buffer with the given pixel value
         """
+        ...
     def height(self) -> int:
         r"""
         @brief Gets the height of the pixel buffer in pixels
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def patch(self, other: PixelBuffer) -> None:
         r"""
         @brief Patches another pixel buffer into this one
 
         This method is the inverse of \diff - it will patch the difference image created by diff into this pixel buffer. Note that this method will not do true alpha blending and requires the other pixel buffer to have the same format than self. Self will be modified by this operation.
         """
+        ...
     def pixel(self, x: int, y: int) -> int:
         r"""
         @brief Gets the value of the pixel at position x, y
         """
+        ...
     def set_pixel(self, x: int, y: int, c: int) -> None:
         r"""
         @brief Sets the value of the pixel at position x, y
         """
+        ...
     def swap(self, other: PixelBuffer) -> None:
         r"""
         @brief Swaps data with another PixelBuffer object
         """
+        ...
     def to_png_data(self) -> bytes:
         r"""
         @brief Converts the pixel buffer to a PNG byte stream
         This method may not be available if PNG support is not compiled into KLayout.
         """
+        ...
+    def to_qimage(self) -> QtGui.QImage_Native:
+        r"""
+        @brief Converts the pixel buffer to a \QImage object
+        """
+        ...
     def width(self) -> int:
         r"""
         @brief Gets the width of the pixel buffer in pixels
         """
+        ...
     def write_png(self, file: str) -> None:
         r"""
         @brief Writes the pixel buffer to a PNG file
         This method may not be available if PNG support is not compiled into KLayout.
         """
+        ...
+    ...
 
 class Plugin:
     r"""
@@ -9256,33 +14176,39 @@ class Plugin:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -9290,6 +14216,7 @@ class Plugin:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -9297,33 +14224,39 @@ class Plugin:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def grab_mouse(self) -> None:
         r"""
         @brief Redirects mouse events to this plugin, even if the plugin is not active.
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def set_cursor(self, cursor_type: int) -> None:
         r"""
         @brief Sets the cursor in the view area to the given type
@@ -9331,10 +14264,13 @@ class Plugin:
 
         The cursor type is one of the cursor constants in the \Cursor class, i.e. 'CursorArrow' for the normal cursor.
         """
+        ...
     def ungrab_mouse(self) -> None:
         r"""
         @brief Removes a mouse grab registered with \grab_mouse.
         """
+        ...
+    ...
 
 class PluginFactory:
     r"""
@@ -9412,46 +14348,45 @@ class PluginFactory:
         @brief Enables or disables the tool bar entry
         Initially this property is set to true. This means that the plugin will have a visible entry in the toolbar. This property can be set to false to disable this feature. In that case, the title and icon given on registration will be ignored. 
         """
+        ...
     @classmethod
     def new(cls) -> PluginFactory:
         r"""
         @brief Creates a new object of this class
         """
-    def __copy__(self) -> PluginFactory:
-        r"""
-        @brief Creates a copy of self
-        """
-    def __deepcopy__(self) -> PluginFactory:
-        r"""
-        @brief Creates a copy of self
-        """
+        ...
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -9459,6 +14394,7 @@ class PluginFactory:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -9466,6 +14402,7 @@ class PluginFactory:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def add_config_menu_item(self, menu_name: str, insert_pos: str, title: str, cname: str, cvalue: str) -> None:
         r"""
         @brief Adds a configuration menu item
@@ -9474,6 +14411,7 @@ class PluginFactory:
 
         This method has been introduced in version 0.27.
         """
+        ...
     @overload
     def add_menu_entry(self, menu_name: str, insert_pos: str) -> None:
         r"""
@@ -9481,6 +14419,7 @@ class PluginFactory:
         Call this method in the factory constructor to build the menu items that this plugin shall create.
         This specific call inserts a separator at the given position (insert_pos). The position uses abstract menu item paths and "menu_name" names the component that will be created. See \AbstractMenu for a description of the path.
         """
+        ...
     @overload
     def add_menu_entry(self, symbol: str, menu_name: str, insert_pos: str, title: str) -> None:
         r"""
@@ -9494,6 +14433,7 @@ class PluginFactory:
         @param insert_pos The position where to create the entry
         @param title The title string for the item. The title can contain a keyboard shortcut in round braces after the title text, i.e. "My Menu Item(F12)"
         """
+        ...
     @overload
     def add_menu_entry(self, symbol: str, menu_name: str, insert_pos: str, title: str, sub_menu: bool) -> None:
         r"""
@@ -9502,6 +14442,7 @@ class PluginFactory:
 
         With version 0.27 it's more convenient to use \add_submenu.
         """
+        ...
     def add_menu_item_clone(self, symbol: str, menu_name: str, insert_pos: str, copy_from: str) -> None:
         r"""
         @brief Specifies a menu item as a clone of another one
@@ -9510,6 +14451,7 @@ class PluginFactory:
 
         This method has been introduced in version 0.27.
         """
+        ...
     def add_option(self, name: str, default_value: str) -> None:
         r"""
         @brief Specifies configuration variables.
@@ -9518,43 +14460,41 @@ class PluginFactory:
         Once the configuration variables are known, they can be retrieved on demand using "get_config" from \MainWindow or listening to \configure callbacks (either in the factory or the plugin instance). Configuration variables can be set using "set_config" from \MainWindow. This scheme also works without registering the configuration options, but doing so has the advantage that it is guaranteed that a variable with this keys exists and has the given default value initially.
 
         """
+        ...
     def add_submenu(self, menu_name: str, insert_pos: str, title: str) -> None:
         r"""
         @brief Specifies a menu item or sub-menu
 
         This method has been introduced in version 0.27.
         """
-    def assign(self, other: PluginFactory) -> None:
-        r"""
-        @brief Assigns another object to self
-        """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
-    def dup(self) -> PluginFactory:
-        r"""
-        @brief Creates a copy of self
-        """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     @overload
     def register(self, position: int, name: str, title: str) -> None:
         r"""
@@ -9565,6 +14505,7 @@ class PluginFactory:
 
         Registration of the plugin factory makes the object known to the system. Registration requires that the menu items have been set already. Hence it is recommended to put the registration at the end of the initialization method of the factory class.
         """
+        ...
     @overload
     def register(self, position: int, name: str, title: str, icon: str) -> None:
         r"""
@@ -9578,4 +14519,260 @@ class PluginFactory:
 
         Registration of the plugin factory makes the object known to the system. Registration requires that the menu items have been set already. Hence it is recommended to put the registration at the end of the initialization method of the factory class.
         """
+        ...
+    ...
+
+class StringListValue:
+    r"""
+    @brief Encapsulate a string list
+    @hide
+    This class is provided as a return value of \FileDialog.
+    By using an object rather than a pure string list, an object with \has_value? = false can be returned indicating that
+    the "Cancel" button was pressed. Starting with version 0.22, the InputDialog class offers new method which do no
+    longer requires to use this class.
+    """
+    @classmethod
+    def new(cls) -> StringListValue:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def __copy__(self) -> StringListValue:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def __deepcopy__(self) -> StringListValue:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def assign(self, other: StringListValue) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+        ...
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def dup(self) -> StringListValue:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def has_value(self) -> bool:
+        r"""
+        @brief True, if a value is present
+        """
+        ...
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def value(self) -> List[str]:
+        r"""
+        @brief Get the actual value (a list of strings)
+        """
+        ...
+    ...
+
+class StringValue:
+    r"""
+    @brief Encapsulate a string value
+    @hide
+    This class is provided as a return value of \InputDialog::get_string, \InputDialog::get_item and \FileDialog.
+    By using an object rather than a pure value, an object with \has_value? = false can be returned indicating that
+    the "Cancel" button was pressed. Starting with version 0.22, the InputDialog class offers new method which do no
+    longer requires to use this class.
+    """
+    @classmethod
+    def new(cls) -> StringValue:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def __copy__(self) -> StringValue:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def __deepcopy__(self) -> StringValue:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def __str__(self) -> str:
+        r"""
+        @brief Get the actual value (a synonym for \value)
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def assign(self, other: StringValue) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+        ...
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def dup(self) -> StringValue:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def has_value(self) -> bool:
+        r"""
+        @brief True, if a value is present
+        """
+        ...
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def to_s(self) -> str:
+        r"""
+        @brief Get the actual value (a synonym for \value)
+        """
+        ...
+    def value(self) -> str:
+        r"""
+        @brief Get the actual value
+        """
+        ...
+    ...
 

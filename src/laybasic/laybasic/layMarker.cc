@@ -197,13 +197,23 @@ void render_cell_inst (const db::Layout &layout, const db::CellInstArray &inst, 
 // ------------------------------------------------------------------------
 
 MarkerBase::MarkerBase (lay::LayoutViewBase *view)
-  : lay::ViewObject (view->canvas ()),
+  : lay::ViewObject (view ? view->canvas () : 0),
     m_line_width (-1), m_vertex_size (-1), m_halo (-1), m_text_enabled (true), m_vertex_shape (lay::ViewOp::Rect), m_line_style (-1), m_dither_pattern (-1), m_frame_pattern (0), mp_view (view)
 { 
   // .. nothing yet ..
 }
 
-void 
+void
+MarkerBase::set_view (LayoutViewBase *view)
+{
+  if (mp_view != view) {
+    mp_view = view;
+    mp_view->canvas ()->add_object (this);
+    redraw ();
+  }
+}
+
+void
 MarkerBase::set_frame_color (tl::Color color)
 {
   if (color != m_frame_color) {
@@ -381,7 +391,7 @@ MarkerBase::get_bitmaps (const Viewport & /*vp*/, ViewObjectCanvas &canvas, lay:
 // ------------------------------------------------------------------------
 
 GenericMarkerBase::GenericMarkerBase (lay::LayoutViewBase *view, unsigned int cv_index)
-  : MarkerBase (view), mp_trans_vector (0), mp_view (view), m_cv_index (cv_index)
+  : MarkerBase (view), mp_trans_vector (0), m_cv_index (cv_index)
 { 
   // .. nothing yet ..
 }
@@ -463,7 +473,7 @@ GenericMarkerBase::set (const db::DCplxTrans &t1, const std::vector<db::DCplxTra
 db::DBox
 GenericMarkerBase::bbox () const
 {
-  const lay::CellView &cv = mp_view->cellview (m_cv_index);
+  const lay::CellView &cv = view ()->cellview (m_cv_index);
   if (! cv.is_valid ()) {
     return db::DBox ();
   }
@@ -483,11 +493,11 @@ GenericMarkerBase::bbox () const
 const db::Layout *
 GenericMarkerBase::layout () const
 {
-  if (m_cv_index >= (unsigned int) (mp_view->cellviews ())) {
+  if (m_cv_index >= (unsigned int) (view ()->cellviews ())) {
     return 0;
   }
 
-  const lay::CellView &cv = mp_view->cellview (m_cv_index);
+  const lay::CellView &cv = view ()->cellview (m_cv_index);
   if (! cv.is_valid ()) {
     return 0;
   } else {
@@ -1175,7 +1185,7 @@ Marker::render (const Viewport &vp, ViewObjectCanvas &canvas)
 // ------------------------------------------------------------------------
 
 DMarker::DMarker (LayoutViewBase *view)
-  : MarkerBase (view), mp_view (view)
+  : MarkerBase (view)
 { 
   m_type = None;
   m_object.any = 0;
@@ -1304,9 +1314,9 @@ DMarker::render (const Viewport &vp, ViewObjectCanvas &canvas)
 
   lay::Renderer &r = canvas.renderer ();
 
-  r.set_font (db::Font (mp_view->text_font ()));
-  r.apply_text_trans (mp_view->apply_text_trans ());
-  r.default_text_size (mp_view->default_text_size ());
+  r.set_font (db::Font (view ()->text_font ()));
+  r.apply_text_trans (view ()->apply_text_trans ());
+  r.default_text_size (view ()->default_text_size ());
   r.set_precise (true);
 
   db::DCplxTrans t = vp.trans ();

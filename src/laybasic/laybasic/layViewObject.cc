@@ -118,17 +118,27 @@ BackgroundViewObject::z_order (int z)
 //  ViewObject implementation
 
 ViewObject::ViewObject (ViewObjectUI *widget, bool _static)
-  : mp_widget (widget), m_static (_static), m_visible (true), m_dismissable (false)
+  : mp_widget (0), m_static (_static), m_visible (true), m_dismissable (false)
 {
-  if (widget) {
-    widget->m_objects.push_back (this);
-    redraw ();
-  }
+  set_widget (widget);
 }
 
 ViewObject::~ViewObject ()
 {
   redraw ();
+}
+
+void
+ViewObject::set_widget (ViewObjectUI *widget)
+{
+  if (mp_widget) {
+    mp_widget->m_objects.erase (this);
+  }
+  mp_widget = widget;
+  if (widget) {
+    widget->m_objects.push_back (this);
+    redraw ();
+  }
 }
 
 void
@@ -534,6 +544,20 @@ ViewObjectUI::init_ui (QWidget *parent)
   mp_widget->setAcceptDrops (true);
 }
 #endif
+
+void
+ViewObjectUI::add_object (lay::ViewObject *object)
+{
+  object->set_widget (this);
+  m_owned_objects.push_back (object);
+  m_objects.push_back (object);
+}
+
+void
+ViewObjectUI::clear_objects ()
+{
+  m_owned_objects.clear ();
+}
 
 void
 ViewObjectUI::register_service (lay::ViewService *svc)

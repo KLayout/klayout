@@ -226,6 +226,8 @@ public:
 
   virtual RegionDelegate *sized (coord_type d, unsigned int mode) const = 0;
   virtual RegionDelegate *sized (coord_type dx, coord_type dy, unsigned int mode) const = 0;
+  virtual RegionDelegate *sized_inside (const Region &inside, bool outside, coord_type d, int steps, unsigned int mode) const = 0;
+  virtual RegionDelegate *sized_inside (const Region &inside, bool outside, coord_type dx, coord_type dy, int steps, unsigned int mode) const = 0;
 
   virtual RegionDelegate *and_with (const Region &other, PropertyConstraint prop_constraint) const = 0;
   virtual RegionDelegate *not_with (const Region &other, PropertyConstraint prop_constraint) const = 0;

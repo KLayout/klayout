@@ -97,6 +97,8 @@ public:
 
   virtual RegionDelegate *sized (coord_type, unsigned int) const { return new EmptyRegion (); }
   virtual RegionDelegate *sized (coord_type, coord_type, unsigned int) const { return new EmptyRegion (); }
+  virtual RegionDelegate *sized_inside (const Region &, bool, coord_type, int, unsigned int) const { return new EmptyRegion (); }
+  virtual RegionDelegate *sized_inside (const Region &, bool, coord_type, coord_type, int, unsigned int) const { return new EmptyRegion (); }
 
   virtual RegionDelegate *and_with (const Region &, db::PropertyConstraint) const { return new EmptyRegion (); }
   virtual RegionDelegate *not_with (const Region &, db::PropertyConstraint) const { return new EmptyRegion (); }

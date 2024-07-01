@@ -531,6 +531,30 @@ private:
   unsigned int m_mode;
 };
 
+/**
+ *  @brief A polygon sink feeding into an EdgeProcessor
+ */
+class DB_PUBLIC PolygonsToEdgeProcessor
+  : public PolygonSink
+{
+public:
+  PolygonsToEdgeProcessor (db::EdgeProcessor &ep, db::EdgeProcessor::property_type prop, db::EdgeProcessor::property_type prop_step)
+    : mp_ep (&ep), m_prop (prop), m_prop_step (prop_step)
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual void put (const db::Polygon &polygon)
+  {
+    mp_ep->insert (polygon, m_prop);
+    m_prop += m_prop_step;
+  }
+
+private:
+  db::EdgeProcessor *mp_ep;
+  db::EdgeProcessor::property_type m_prop, m_prop_step;
+};
+
 }
 
 #endif

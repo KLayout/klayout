@@ -63,6 +63,13 @@ TEST(basic)
   EXPECT_EQ (tris.to_string (), "((1, 0), (1, 4), (5, 0)), ((1, 4), (5, 4), (5, 0))");
 
   EXPECT_EQ (tris.check (), true);
+
+  tris.clear ();
+
+  EXPECT_EQ (tris.bbox ().to_string (), "()");
+  EXPECT_EQ (tris.to_string (), "");
+
+  EXPECT_EQ (tris.check (), true);
 }
 
 TEST(flip)

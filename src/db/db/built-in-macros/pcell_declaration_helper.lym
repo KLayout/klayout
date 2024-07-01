@@ -119,6 +119,9 @@ Optional, named parameters are
     @b:unit@/b: the unit string
   @/li
   @li 
+    @btooltip@/b: the tool tip text displayed on the edit fields and labels
+  @/li
+  @li 
     @b:min_value@/b: the minimum value (effective for numerical types and if no choices are present)
   @/li
   @li 
@@ -378,6 +381,7 @@ module RBA
       
       # set additional attributes of the parameters
       args[:default] &amp;&amp; pdecl.default = args[:default]
+      args[:tooltip] &amp;&amp; pdecl.tooltip = args[:tooltip]
       args[:hidden] &amp;&amp; pdecl.hidden = args[:hidden]
       args[:readonly] &amp;&amp; pdecl.readonly = args[:readonly]
       args[:unit] &amp;&amp; pdecl.unit = args[:unit]

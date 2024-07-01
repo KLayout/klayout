@@ -416,8 +416,7 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
         leader = tl::sprintf ("[%s] ", p->get_name ());
       }
 
-      QLabel *l = new QLabel (tl::to_qstring (leader + description + range), inner_frame); 
-
+      QLabel *l = new QLabel (tl::to_qstring (leader + description + range), inner_frame);
       inner_grid->addWidget (l, row, 1);
       m_all_widgets.back ().push_back (l);
 
@@ -975,6 +974,7 @@ PCellParametersPage::update_widgets_from_states (const db::ParameterStates &stat
   for (std::vector<db::PCellParameterDeclaration>::const_iterator p = pcp.begin (); p != pcp.end () && i < m_widgets.size (); ++p, ++i) {
 
     const std::string &name = p->get_name ();
+    const std::string &static_tooltip = p->get_tooltip ();
     const db::ParameterState &ps = states.parameter (name);
 
     if (m_widgets [i]) {
@@ -994,7 +994,11 @@ PCellParametersPage::update_widgets_from_states (const db::ParameterStates &stat
       if (*w != m_icon_widgets [i]) {
         (*w)->setVisible (ps.is_visible ());
       }
-      (*w)->setToolTip (tl::to_qstring (ps.tooltip ()));
+      if (ps.tooltip ().empty ()) {
+        (*w)->setToolTip (tl::to_qstring (static_tooltip));
+      } else {
+        (*w)->setToolTip (tl::to_qstring (ps.tooltip ()));
+      }
     }
 
     if (m_icon_widgets [i]) {

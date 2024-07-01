@@ -33,6 +33,7 @@
 #include "tlProgress.h"
 #include "tlFileUtils.h"
 #include "tlUri.h"
+#include "tlString.h"
 
 #if !defined(_MSC_VER)
 # include <sys/time.h>
@@ -1282,7 +1283,7 @@ void CurlNetworkManager::tick ()
 //  InputHttpStreamPrivateData implementation
 
 InputHttpStreamPrivateData::InputHttpStreamPrivateData (InputHttpStream *stream, const std::string &url)
-  : m_timeout (10.0), mp_stream (stream)
+  : m_timeout (InputHttpStream::get_default_timeout ()), mp_stream (stream)
 {
   m_sent = false;
   m_ready = false;
@@ -1391,7 +1392,13 @@ InputHttpStreamPrivateData::read (char *b, size_t n)
     }
 
     tl::Clock start_time = tl::Clock::current ();
-    while (n > m_connection->read_available () && ! m_connection->finished () && (m_timeout <= 0.0 || (tl::Clock::current() - start_time).seconds () < m_timeout) && ! tl::CurlNetworkManager::instance ()->has_reply ()) {
+    while (n > m_connection->read_available () && ! m_connection->finished () && ! tl::CurlNetworkManager::instance ()->has_reply ()) {
+
+      //  Check for timeout
+      if (m_timeout > 0.0 && (tl::Clock::current() - start_time).seconds () >= m_timeout) {
+        throw tl::HttpErrorException (tl::sprintf (tl::to_string (tr ("Connection timed out (timeout is %.1fs)")), m_timeout), 0, m_connection->url ());
+      }
+
       mp_stream->tick ();
       if (m_progress.get ()) {  //  might have been reset by tick()
         ++*m_progress;

@@ -25,6 +25,7 @@
 #include "tlUnitTest.h"
 #include "tlTimer.h"
 #include "tlStream.h"
+#include "tlEnv.h"
 
 static std::string test_url1 ("http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/text");
 static std::string test_url1_gz ("http://www.klayout.org/svn-public/klayout-resources/trunk/testdata2/text.gz");
@@ -151,5 +152,42 @@ TEST(5)
 
   std::string res = stream.read_all ();
   EXPECT_EQ (res, "hello, world.\n");
+}
+
+//  tl::InputHttpStream timeout
+TEST(6)
+{
+  if (! tl::InputHttpStream::is_available ()) {
+    throw tl::CancelException ();
+  }
+
+  {
+    tl::set_env ("KLAYOUT_HTTP_TIMEOUT", "");
+    tl::InputHttpStream stream (test_url1);
+    stream.set_timeout (0.001); //  probably too fast :)
+
+    try {
+      char b[100];
+      stream.read (b, sizeof (b));
+      EXPECT_EQ (true, false);
+    } catch (tl::HttpErrorException &ex) {
+      tl::info << "Got exception (expected): " << ex.msg ();
+    }
+  }
+
+  {
+    tl::set_env ("KLAYOUT_HTTP_TIMEOUT", "0.001");
+    tl::InputHttpStream stream (test_url1);
+
+    try {
+      char b[100];
+      stream.read (b, sizeof (b));
+      EXPECT_EQ (true, false);
+    } catch (tl::HttpErrorException &ex) {
+      tl::info << "Got exception (expected): " << ex.msg ();
+    }
+  }
+
+  tl::unset_env ("KLAYOUT_HTTP_TIMEOUT");
 }
 

@@ -28,6 +28,7 @@
 #include "tlObject.h"
 #include "tlTimer.h"
 #include "tlSleep.h"
+#include "tlString.h"
 
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -256,7 +257,7 @@ static QNetworkAccessManager *s_network_manager (0);
 static AuthenticationHandler *s_auth_handler (0);
 
 InputHttpStreamPrivateData::InputHttpStreamPrivateData (InputHttpStream *stream, const std::string &url)
-  : m_url (url), mp_reply (0), m_request ("GET"), mp_buffer (0), mp_resend_timer (new QTimer (this)), m_timeout (10.0), mp_stream (stream)
+  : m_url (url), mp_reply (0), m_request ("GET"), mp_buffer (0), mp_resend_timer (new QTimer (this)), m_timeout (InputHttpStream::get_default_timeout ()), mp_stream (stream)
 {
   if (! s_network_manager) {
 
@@ -466,7 +467,7 @@ InputHttpStreamPrivateData::read (char *b, size_t n)
 
     //  Reason for this may be HTTPS initialization failure (OpenSSL)
 
-    std::string em = tl::to_string (QObject::tr ("Request creation failed"));
+    std::string em = tl::sprintf (tl::to_string (QObject::tr ("Request creation failed (timeout is %.1fs)")), m_timeout);
     if (tl::verbosity() >= 30) {
       tl::info << "HTTP request creation failed";
     }

@@ -99,6 +99,11 @@ public:
   virtual ~InputHttpStream ();
 
   /**
+   *  @brief Gets the timeout value (in seconds)
+   */
+  static double get_default_timeout ();
+
+  /**
    *  @brief Sets the credential provider
    */
   static void set_credential_provider (HttpCredentialProvider *cp);

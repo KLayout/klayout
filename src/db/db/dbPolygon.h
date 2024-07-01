@@ -1668,6 +1668,22 @@ public:
   }
 
   /**
+   *  @brief Compatibility with polygon_ref
+   */
+  polygon<C> instantiate () const
+  {
+    return *this;
+  }
+
+  /**
+   *  @brief Compatibility with polygon_ref
+   */
+  void instantiate (polygon<C> &poly) const
+  {
+    poly = *this;
+  }
+
+  /**
    *  @brief Returns true, if the polygon is a simple box
    */
   bool is_box () const
@@ -2506,6 +2522,22 @@ public:
     //  create an entry for the hull contour
     m_bbox = box_type (tr (p.box ().p1 ()), tr (p.box ().p2 ()));
     m_hull.assign (p.begin_hull (), p.end_hull (), tr, false, compress, true /*normalize*/, remove_reflected);
+  }
+
+  /**
+   *  @brief Compatibility with polygon_ref
+   */
+  simple_polygon<C> instantiate () const
+  {
+    return *this;
+  }
+
+  /**
+   *  @brief Compatibility with polygon_ref
+   */
+  void instantiate (simple_polygon<C> &poly) const
+  {
+    poly = *this;
   }
 
   /**

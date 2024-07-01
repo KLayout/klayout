@@ -1943,3 +1943,13 @@ TEST(122_NamedLayers)
 
   compare_text_files (output, au_output);
 }
+
+TEST(130_size_inside_outside)
+{
+  run_test (_this, "130", false);
+}
+
+TEST(130d_size_inside_outside)
+{
+  run_test (_this, "130", true);
+}

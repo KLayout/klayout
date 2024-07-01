@@ -125,6 +125,10 @@
   <file alias="drc_sized4.png">doc/images/drc_sized4.png</file>
   <file alias="drc_sized5.png">doc/images/drc_sized5.png</file>
   <file alias="drc_sized6.png">doc/images/drc_sized6.png</file>
+  <file alias="drc_sized_inside1.png">doc/images/drc_sized_inside1.png</file>
+  <file alias="drc_sized_inside2.png">doc/images/drc_sized_inside2.png</file>
+  <file alias="drc_sized_inside3.png">doc/images/drc_sized_inside3.png</file>
+  <file alias="drc_sized_inside4.png">doc/images/drc_sized_inside4.png</file>
   <file alias="drc_with_angle1.png">doc/images/drc_with_angle1.png</file>
   <file alias="drc_with_angle2.png">doc/images/drc_with_angle2.png</file>
   <file alias="drc_with_angle3.png">doc/images/drc_with_angle3.png</file>

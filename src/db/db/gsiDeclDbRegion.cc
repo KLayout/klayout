@@ -1008,6 +1008,84 @@ size_dvm (db::Region *region, const db::Vector &dv, unsigned int mode)
   return *region;
 }
 
+static db::Region
+sized_inside_ddm (const db::Region *region, const db::Region &inside, db::Coord dx, db::Coord dy, int steps, unsigned int mode)
+{
+  return region->sized_inside (inside, false, dx, dy, steps, mode);
+}
+
+static db::Region
+sized_inside_dvm (const db::Region *region, const db::Region &inside, const db::Vector &dv, int steps, unsigned int mode)
+{
+  return region->sized_inside (inside, false, dv.x (), dv.y (), steps, mode);
+}
+
+static db::Region
+sized_inside_dm (const db::Region *region, const db::Region &inside, db::Coord d, int steps, unsigned int mode)
+{
+  return region->sized_inside (inside, false, d, steps, mode);
+}
+
+static db::Region &
+size_inside_ddm (db::Region *region, const db::Region &inside, db::Coord dx, db::Coord dy, int steps, unsigned int mode)
+{
+  region->size_inside (inside, false, dx, dy, steps, mode);
+  return *region;
+}
+
+static db::Region &
+size_inside_dvm (db::Region *region, const db::Region &inside, const db::Vector &dv, int steps, unsigned int mode)
+{
+  region->size_inside (inside, false, dv.x (), dv.y (), steps, mode);
+  return *region;
+}
+
+static db::Region &
+size_inside_dm (db::Region *region, const db::Region &inside, db::Coord d, int steps, unsigned int mode)
+{
+  region->size_inside (inside, false, d, steps, mode);
+  return *region;
+}
+
+static db::Region
+sized_outside_ddm (const db::Region *region, const db::Region &inside, db::Coord dx, db::Coord dy, int steps, unsigned int mode)
+{
+  return region->sized_inside (inside, true, dx, dy, steps, mode);
+}
+
+static db::Region
+sized_outside_dvm (const db::Region *region, const db::Region &inside, const db::Vector &dv, int steps, unsigned int mode)
+{
+  return region->sized_inside (inside, true, dv.x (), dv.y (), steps, mode);
+}
+
+static db::Region
+sized_outside_dm (const db::Region *region, const db::Region &inside, db::Coord d, int steps, unsigned int mode)
+{
+  return region->sized_inside (inside, true, d, steps, mode);
+}
+
+static db::Region &
+size_outside_ddm (db::Region *region, const db::Region &inside, db::Coord dx, db::Coord dy, int steps, unsigned int mode)
+{
+  region->size_inside (inside, true, dx, dy, steps, mode);
+  return *region;
+}
+
+static db::Region &
+size_outside_dvm (db::Region *region, const db::Region &inside, const db::Vector &dv, int steps, unsigned int mode)
+{
+  region->size_inside (inside, true, dv.x (), dv.y (), steps, mode);
+  return *region;
+}
+
+static db::Region &
+size_outside_dm (db::Region *region, const db::Region &inside, db::Coord d, int steps, unsigned int mode)
+{
+  region->size_inside (inside, true, d, steps, mode);
+  return *region;
+}
+
 static db::Edges
 edges (const db::Region *region, db::PolygonToEdgeProcessor::EdgeMode mode)
 {
@@ -1928,6 +2006,130 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "This method returns the sized region (see \\size), but does not modify self.\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
+  ) +
+  method_ext ("size_inside", &size_inside_ddm, gsi::arg ("inside"), gsi::arg ("dx"), gsi::arg ("dy"), gsi::arg ("steps"), gsi::arg ("mode"),
+    "@brief Incremental, anisotropic sizing inside of another region\n"
+    "\n"
+    "@param inside The region the incremental sizing will stay inside.\n"
+    "@param dx The x sizing value\n"
+    "@param dy The y sizing value\n"
+    "@param steps The number of steps to take\n"
+    "@param mode The sizing mode (see \\size)\n"
+    "\n"
+    "@return The region after the sizing has been applied (self)\n"
+    "\n"
+    "Sizes the region, keeping inside another region and performing the size in discrete steps.\n"
+    "\n"
+    "Using this method is equivalent to applying a single-step size and consecutively doing a boolean AND with the 'inside' region. "
+    "This is repeated until the full sizing value is applied.\n"
+    "\n"
+    "This operation is employed to implement latch-up rules, where a device needs to be close to a well tap within the "
+    "same well. For this, the tap footprint is incrementally sized, with the well as the 'inside' region. The steps is chosen so "
+    "the per-step sizing is somewhat less than the minimum well space. Sizing the tap shape results in a growing footprint that "
+    "follows the well contours and a small enough per-step sizing value ensures the sized contour does not cross well gaps.\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
+    "\n"
+    "This method has been introduced in version 0.29.3."
+  ) +
+  method_ext ("size_outside", &size_outside_ddm, gsi::arg ("outside"), gsi::arg ("dx"), gsi::arg ("dy"), gsi::arg ("steps"), gsi::arg ("mode"),
+    "@brief Incremental, anisotropic sizing outside of another region\n"
+    "\n"
+    "This method is equivalent to \\size_inside, except that sizing is performed outside the given 'outside' region. "
+    "Technically this corresponds to a boolean 'NOT' operation instead of a boolean 'AND'.\n"
+    "\n"
+    "This method has been introduced in version 0.29.3."
+  ) +
+  method_ext ("size_inside", &size_inside_dvm, gsi::arg ("inside"), gsi::arg ("dv"), gsi::arg ("steps"), gsi::arg ("mode", (unsigned int) 2),
+    "@brief Incremental, anisotropic sizing inside of another region\n"
+    "\n"
+    "@return The region after the sizing has applied (self)\n"
+    "\n"
+    "This method is equivalent to \"size_inside(dv.x, dv.y, steps, mode)\".\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
+    "\n"
+    "This method has been introduced in version 0.29.3."
+  ) +
+  method_ext ("size_outside", &size_outside_dvm, gsi::arg ("outside"), gsi::arg ("dv"), gsi::arg ("steps"), gsi::arg ("mode", (unsigned int) 2),
+    "@brief Incremental, anisotropic sizing outside of another region\n"
+    "\n"
+    "This method is equivalent to \\size_inside, except that sizing is performed outside the given 'outside' region. "
+    "Technically this corresponds to a boolean 'NOT' operation instead of a boolean 'AND'.\n"
+    "\n"
+    "This method has been introduced in version 0.29.3."
+  ) +
+  method_ext ("size_inside", &size_inside_dm, gsi::arg ("inside"), gsi::arg ("d"), gsi::arg ("steps"), gsi::arg ("mode", (unsigned int) 2),
+    "@brief Incremental, isotropic sizing inside of another region\n"
+    "\n"
+    "@return The region after the sizing has applied (self)\n"
+    "\n"
+    "This method is equivalent to \"size_inside(d, d, steps, mode)\".\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
+    "\n"
+    "This method has been introduced in version 0.29.3."
+  ) +
+  method_ext ("size_outside", &size_outside_dm, gsi::arg ("outside"), gsi::arg ("d"), gsi::arg ("steps"), gsi::arg ("mode", (unsigned int) 2),
+    "@brief Incremental, anisotropic sizing outside of another region\n"
+    "\n"
+    "This method is equivalent to \\size_inside, except that sizing is performed outside the given 'outside' region. "
+    "Technically this corresponds to a boolean 'NOT' operation instead of a boolean 'AND'.\n"
+    "\n"
+    "This method has been introduced in version 0.29.3."
+  ) +
+  method_ext ("sized_inside", &sized_inside_ddm, gsi::arg ("inside"), gsi::arg ("dx"), gsi::arg ("dy"), gsi::arg ("steps"), gsi::arg ("mode"),
+    "@brief Returns the incrementally and anisotropically sized region\n"
+    "\n"
+    "@return The sized region\n"
+    "\n"
+    "This method returns the incrementally sized region (see \\size_inside), but does not modify self.\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
+  ) +
+  method_ext ("sized_outside", &sized_outside_ddm, gsi::arg ("outside"), gsi::arg ("dx"), gsi::arg ("dy"), gsi::arg ("steps"), gsi::arg ("mode"),
+    "@brief Incremental, anisotropic sizing outside of another region\n"
+    "\n"
+    "This method is equivalent to \\size_inside, except that sizing is performed outside the given 'outside' region. "
+    "Technically this corresponds to a boolean 'NOT' operation instead of a boolean 'AND'.\n"
+    "\n"
+    "This method has been introduced in version 0.29.3."
+  ) +
+  method_ext ("sized_inside", &sized_inside_dvm, gsi::arg ("inside"), gsi::arg ("dv"), gsi::arg ("steps"), gsi::arg ("mode", (unsigned int) 2),
+    "@brief Returns the incrementally and anisotropically sized region\n"
+    "\n"
+    "@return The sized region\n"
+    "\n"
+    "This method returns the incrementally sized region (see \\size_inside), but does not modify self.\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
+    "\n"
+    "This variant has been introduced in version 0.28."
+  ) +
+  method_ext ("sized_outside", &sized_outside_dvm, gsi::arg ("outside"), gsi::arg ("dv"), gsi::arg ("steps"), gsi::arg ("mode", (unsigned int) 2),
+    "@brief Incremental, anisotropic sizing outside of another region\n"
+    "\n"
+    "This method is equivalent to \\size_inside, except that sizing is performed outside the given 'outside' region. "
+    "Technically this corresponds to a boolean 'NOT' operation instead of a boolean 'AND'.\n"
+    "\n"
+    "This method has been introduced in version 0.29.3."
+  ) +
+  method_ext ("sized_inside", &sized_inside_dm, gsi::arg ("inside"), gsi::arg ("d"), gsi::arg ("steps"), gsi::arg ("mode", (unsigned int) 2),
+    "@brief Returns the incrementally sized region\n"
+    "\n"
+    "@return The sized region\n"
+    "\n"
+    "This method returns the incrementally sized region (see \\size_inside), but does not modify self.\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
+  ) +
+  method_ext ("sized_outside", &sized_outside_dm, gsi::arg ("outside"), gsi::arg ("d"), gsi::arg ("steps"), gsi::arg ("mode", (unsigned int) 2),
+    "@brief Incremental, anisotropic sizing outside of another region\n"
+    "\n"
+    "This method is equivalent to \\size_inside, except that sizing is performed outside the given 'outside' region. "
+    "Technically this corresponds to a boolean 'NOT' operation instead of a boolean 'AND'.\n"
+    "\n"
+    "This method has been introduced in version 0.29.3."
   ) +
   method_ext ("andnot", &andnot, gsi::arg ("other"), gsi::arg ("property_constraint", db::IgnoreProperties, "IgnoreProperties"),
     "@brief Returns the boolean AND and NOT between self and the other region\n"

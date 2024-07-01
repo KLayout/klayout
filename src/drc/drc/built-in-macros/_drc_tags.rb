@@ -57,6 +57,30 @@ module DRC
     end
   end
  
+  # A wrapper for the sizing steps value
+  class DRCSizingSteps
+    attr_accessor :value
+    def initialize(v)
+      self.value = v
+    end
+  end
+ 
+  # A wrapper for the sizing "inside" value
+  class DRCSizingInside
+    attr_accessor :value
+    def initialize(v)
+      self.value = v
+    end
+  end
+ 
+  # A wrapper for the sizing "outside" value
+  class DRCSizingOutside
+    attr_accessor :value
+    def initialize(v)
+      self.value = v
+    end
+  end
+ 
   # A wrapper for the edge mode value for Region#edges
   class DRCEdgeMode
     attr_accessor :value

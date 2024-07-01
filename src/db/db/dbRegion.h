@@ -1028,6 +1028,59 @@ public:
   Region sized (coord_type dx, coord_type dy, unsigned int mode = 2) const;
 
   /**
+   *  @brief Size the region incrementally
+   *
+   *  This method applies an incremental sizing to the region. Before the sizing is done, the
+   *  region is merged if this is not the case already. Incremental sizing is confined to be inside a certain region.
+   *  Only positive or zero sizing values are supported.
+   *
+   *  @param inside The confinement region
+   *  @param outside If true, "inside" is negative - i.e. sizing is performed outside the "inside" region
+   *  @param d The (isotropic) sizing value
+   *  @param steps The number of steps to take
+   *  @param mode The sizing mode (see EdgeProcessor) for a description of the sizing mode which controls the miter distance.
+   *  @return A reference to self
+   */
+  Region &size_inside (const db::Region &inside, bool outside, coord_type d, int steps, unsigned int mode = 2);
+
+  /**
+   *  @brief Size the region incrementally and anisotropically
+   *
+   *  This method applies an incremental sizing to the region. Before the sizing is done, the
+   *  region is merged if this is not the case already. Incremental sizing is confined to be inside a certain region.
+   *  Only positive or zero sizing values are supported.
+   *
+   *  @param inside The confinement region
+   *  @param outside If true, "inside" is negative - i.e. sizing is performed outside the "inside" region
+   *  @param dx The x sizing value
+   *  @param dy The y sizing value
+   *  @param steps The number of steps to take
+   *  @param mode The sizing mode (see EdgeProcessor) for a description of the sizing mode which controls the miter distance.
+   *  @return A reference to self
+   */
+  Region &size_inside (const db::Region &inside, bool outside, coord_type dx, coord_type dy, int steps, unsigned int mode = 2);
+
+  /**
+   *  @brief Returns the sized region
+   *
+   *  This is an out-of-place version of the size method with isotropic sizing
+   *  "merged polygon" semantics applies if merged_polygon_semantics is true (see set_auto_merge).
+   *
+   *  Merged semantics applies.
+   */
+  Region sized_inside (const db::Region &inside, bool outside, coord_type d, int steps, unsigned int mode = 2) const;
+
+  /**
+   *  @brief Returns the sized region
+   *
+   *  This is an out-of-place version of the size method with anisotropic sizing
+   *  "merged polygon" semantics applies if merged_polygon_semantics is true (see set_auto_merge).
+   *
+   *  Merged semantics applies.
+   */
+  Region sized_inside (const db::Region &inside, bool outside, coord_type dx, coord_type dy, int steps, unsigned int mode = 2) const;
+
+  /**
    *  @brief Boolean AND operator
    */
   Region operator& (const Region &other) const

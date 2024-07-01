@@ -61,7 +61,7 @@ public:
   /** 
    *  @brief Destructor
    */
-  virtual ~EdgeSink () { };
+  virtual ~EdgeSink () { }
 
   /**
    *  @brief Start event
@@ -1093,6 +1093,34 @@ private:
   }
 
   void redo_or_process (const std::vector<std::pair<db::EdgeSink *, db::EdgeEvaluatorBase *> > &gen, bool redo);
+};
+
+/**
+ *  @brief An edge sink feeding into an EdgeProcessor
+ */
+class DB_PUBLIC EdgesToEdgeProcessor
+  : public EdgeSink
+{
+public:
+  EdgesToEdgeProcessor (db::EdgeProcessor &ep, db::EdgeProcessor::property_type prop)
+    : mp_ep (&ep), m_prop (prop)
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual void put (const db::Edge &edge)
+  {
+    mp_ep->insert (edge, m_prop);
+  }
+
+  virtual void put (const db::Edge &edge, int /*tag*/)
+  {
+    mp_ep->insert (edge, m_prop);
+  }
+
+private:
+  db::EdgeProcessor *mp_ep;
+  db::EdgeProcessor::property_type m_prop;
 };
 
 }

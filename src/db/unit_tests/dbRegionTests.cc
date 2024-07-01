@@ -2566,6 +2566,292 @@ TEST(56_RegionsFromShapes)
   EXPECT_EQ (db::Region (si, db::ICplxTrans (0.5), false).area (), 10000);
 }
 
+TEST(60_sized_inside)
+{
+  db::Region r, inside;
+  r.insert (db::Box (-10, 20, 20, 60));
+  r.insert (db::Box (20, 20, 30, 60));
+  inside.insert (db::Box (-10, 10, 100, 100));
+
+  EXPECT_EQ (db::Region ().sized_inside (db::Region (), false, 0, 40).to_string (), "");
+  EXPECT_EQ (db::Region ().sized_inside (db::Region (), false, 40, 40).to_string (), "");
+  EXPECT_EQ (db::Region ().sized_inside (inside, false, 0, 40).to_string (), "");
+  EXPECT_EQ (db::Region ().sized_inside (inside, false, 40, 40).to_string (), "");
+
+  EXPECT_EQ (r.sized_inside (inside, false, 0, 40).to_string (), "(-10,20;-10,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (inside, false, 1, 0).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (inside, false, 1, -1).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (inside, false, 40, 40).to_string (), "(-10,10;-10,100;70,100;70,10)");
+
+  EXPECT_EQ (r.sized_inside (inside, false, 0, 0, 40).to_string (), "(-10,20;-10,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (inside, false, 1, 1, 0).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (inside, false, 40, 40, 40).to_string (), "(-10,10;-10,100;70,100;70,10)");
+
+  EXPECT_EQ (r.sized_inside (inside, false, 0, 20, 10).to_string (), "(-10,10;-10,80;30,80;30,10)");
+  EXPECT_EQ (r.sized_inside (inside, false, 1, 2, 0).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (inside, false, 10, 20, 10).to_string (), "(-10,10;-10,80;40,80;40,10)");
+
+  db::Region d;
+  d = r;
+  d.size_inside (inside, false, 0, 20, 10);
+  EXPECT_EQ (d.to_string (), "(-10,10;-10,80;30,80;30,10)");
+  d = r;
+  d.size_inside (inside, false, 1, 2, 0);
+  EXPECT_EQ (d.to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  d = r;
+  d.size_inside (inside, false, 10, 20, 10);
+  EXPECT_EQ (d.to_string (), "(-10,10;-10,80;40,80;40,10)");
+
+  EXPECT_EQ (r.sized_inside (db::Region (), false, 0, 40).to_string (), "");
+  EXPECT_EQ (r.sized_inside (db::Region (), false, 1, 0).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (db::Region (), false, 1, -1).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (db::Region (), false, 40, 40).to_string (), "");
+
+  EXPECT_EQ (r.sized_inside (db::Region (), false, 0, 0, 40).to_string (), "");
+  EXPECT_EQ (r.sized_inside (db::Region (), false, 1, 1, 0).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (db::Region (), false, 40, 40, 40).to_string (), "");
+
+  EXPECT_EQ (r.sized_inside (db::Region (), false, 0, 20, 10).to_string (), "");
+  EXPECT_EQ (r.sized_inside (db::Region (), false, 1, 2, 0).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (db::Region (), false, 10, 20, 10).to_string (), "");
+
+  try {
+    //  no negative sizing
+    r.sized_inside (inside, false, -1, 1);
+    EXPECT_EQ (true, false);
+  } catch (...) {
+  }
+  try {
+    //  no negative sizing
+    r.sized_inside (inside, false, -1, 1, 1);
+    EXPECT_EQ (true, false);
+  } catch (...) {
+  }
+  try {
+    //  no negative sizing
+    r.sized_inside (inside, false, 1, -1, 1);
+    EXPECT_EQ (true, false);
+  } catch (...) {
+  }
+}
+
+TEST(61_sized_outside)
+{
+  db::Region r, outside;
+  r.insert (db::Box (-10, 20, 20, 60));
+  r.insert (db::Box (20, 20, 30, 60));
+  outside.insert (db::Box (-20, 0, -10, 110));
+  outside.insert (db::Box (100, 0, 110, 110));
+  outside.insert (db::Box (-20, 0, 110, 10));
+  outside.insert (db::Box (-20, 100, 110, 110));
+
+  EXPECT_EQ (db::Region ().sized_inside (db::Region (), true, 0, 40).to_string (), "");
+  EXPECT_EQ (db::Region ().sized_inside (db::Region (), true, 40, 40).to_string (), "");
+  EXPECT_EQ (db::Region ().sized_inside (outside, true, 0, 40).to_string (), "");
+  EXPECT_EQ (db::Region ().sized_inside (outside, true, 40, 40).to_string (), "");
+
+  EXPECT_EQ (r.sized_inside (outside, true, 0, 40).to_string (), "(-10,20;-10,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (outside, true, 1, 0).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (outside, true, 1, -1).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (outside, true, 40, 40).to_string (), "(-10,10;-10,100;70,100;70,10)");
+
+  EXPECT_EQ (r.sized_inside (outside, true, 0, 0, 40).to_string (), "(-10,20;-10,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (outside, true, 1, 1, 0).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (outside, true, 40, 40, 40).to_string (), "(-10,10;-10,100;70,100;70,10)");
+
+  EXPECT_EQ (r.sized_inside (outside, true, 0, 20, 10).to_string (), "(-10,10;-10,80;30,80;30,10)");
+  EXPECT_EQ (r.sized_inside (outside, true, 1, 2, 0).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (outside, true, 10, 20, 10).to_string (), "(-10,10;-10,80;40,80;40,10)");
+
+  EXPECT_EQ (r.sized_inside (db::Region (), true, 0, 40).to_string (), "(-10,20;-10,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (db::Region (), true, 1, 0).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (db::Region (), true, 40, 40).to_string (), "(-50,-20;-50,100;70,100;70,-20)");
+
+  EXPECT_EQ (r.sized_inside (db::Region (), true, 0, 0, 40).to_string (), "(-10,20;-10,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (db::Region (), true, 1, 1, 0).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (db::Region (), true, 40, 40, 40).to_string (), "(-50,-20;-50,100;70,100;70,-20)");
+
+  EXPECT_EQ (r.sized_inside (db::Region (), true, 0, 20, 10).to_string (), "(-10,0;-10,80;30,80;30,0)");
+  EXPECT_EQ (r.sized_inside (db::Region (), true, 1, 2, 0).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (db::Region (), true, 10, 20, 10).to_string (), "(-20,0;-20,80;40,80;40,0)");
+
+  try {
+    //  no negative sizing
+    r.sized_inside (outside, true, -1, 1);
+    EXPECT_EQ (true, false);
+  } catch (...) {
+  }
+  try {
+    //  no negative sizing
+    r.sized_inside (outside, true, -1, 1, 1);
+    EXPECT_EQ (true, false);
+  } catch (...) {
+  }
+  try {
+    //  no negative sizing
+    r.sized_inside (outside, true, 1, -1, 1);
+    EXPECT_EQ (true, false);
+  } catch (...) {
+  }
+}
+
+TEST(62_sized_inside_deep)
+{
+  db::DeepShapeStore dss ("TOP", 0.001);
+  db::Region r (dss), inside (dss), empty (dss);
+
+  r.insert (db::Box (-10, 20, 20, 60));
+  r.insert (db::Box (20, 20, 30, 60));
+  inside.insert (db::Box (-10, 10, 100, 100));
+
+  EXPECT_EQ (db::Region ().sized_inside (db::Region (), false, 0, 40).to_string (), "");
+  EXPECT_EQ (db::Region ().sized_inside (db::Region (), false, 40, 40).to_string (), "");
+  EXPECT_EQ (db::Region ().sized_inside (inside, false, 0, 40).to_string (), "");
+  EXPECT_EQ (db::Region ().sized_inside (inside, false, 40, 40).to_string (), "");
+
+  EXPECT_EQ (empty.sized_inside (empty, false, 0, 40).to_string (), "");
+  EXPECT_EQ (empty.sized_inside (empty, false, 40, 40).to_string (), "");
+  EXPECT_EQ (empty.sized_inside (inside, false, 0, 40).to_string (), "");
+  EXPECT_EQ (empty.sized_inside (inside, false, 40, 40).to_string (), "");
+
+  EXPECT_EQ (r.sized_inside (inside, false, 0, 40).to_string (), "(-10,20;-10,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (inside, false, 1, 0).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (inside, false, 1, -1).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (inside, false, 40, 40).to_string (), "(-10,10;-10,100;70,100;70,10)");
+
+  EXPECT_EQ (r.sized_inside (inside, false, 0, 0, 40).to_string (), "(-10,20;-10,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (inside, false, 1, 1, 0).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (inside, false, 40, 40, 40).to_string (), "(-10,10;-10,100;70,100;70,10)");
+
+  EXPECT_EQ (r.sized_inside (inside, false, 0, 20, 10).to_string (), "(-10,10;-10,80;30,80;30,10)");
+  EXPECT_EQ (r.sized_inside (inside, false, 1, 2, 0).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (inside, false, 10, 20, 10).to_string (), "(-10,10;-10,80;40,80;40,10)");
+
+  EXPECT_EQ (r.sized_inside (db::Region (), false, 0, 40).to_string (), "");
+  EXPECT_EQ (r.sized_inside (db::Region (), false, 1, 0).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (db::Region (), false, 1, -1).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (db::Region (), false, 40, 40).to_string (), "");
+
+  EXPECT_EQ (r.sized_inside (db::Region (), false, 0, 0, 40).to_string (), "");
+  EXPECT_EQ (r.sized_inside (db::Region (), false, 1, 1, 0).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (db::Region (), false, 40, 40, 40).to_string (), "");
+
+  EXPECT_EQ (r.sized_inside (db::Region (), false, 0, 20, 10).to_string (), "");
+  EXPECT_EQ (r.sized_inside (db::Region (), false, 1, 2, 0).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (db::Region (), false, 10, 20, 10).to_string (), "");
+
+  EXPECT_EQ (r.sized_inside (empty, false, 0, 40).to_string (), "");
+  EXPECT_EQ (r.sized_inside (empty, false, 1, 0).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (empty, false, 1, -1).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (empty, false, 40, 40).to_string (), "");
+
+  EXPECT_EQ (r.sized_inside (empty, false, 0, 0, 40).to_string (), "");
+  EXPECT_EQ (r.sized_inside (empty, false, 1, 1, 0).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (empty, false, 40, 40, 40).to_string (), "");
+
+  EXPECT_EQ (r.sized_inside (empty, false, 0, 20, 10).to_string (), "");
+  EXPECT_EQ (r.sized_inside (empty, false, 1, 2, 0).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (empty, false, 10, 20, 10).to_string (), "");
+
+  try {
+    //  no negative sizing
+    r.sized_inside (inside, false, -1, 1);
+    EXPECT_EQ (true, false);
+  } catch (...) {
+  }
+  try {
+    //  no negative sizing
+    r.sized_inside (inside, false, -1, 1, 1);
+    EXPECT_EQ (true, false);
+  } catch (...) {
+  }
+  try {
+    //  no negative sizing
+    r.sized_inside (inside, false, 1, -1, 1);
+    EXPECT_EQ (true, false);
+  } catch (...) {
+  }
+}
+
+TEST(63_sized_outside_deep)
+{
+  db::DeepShapeStore dss ("TOP", 0.001);
+  db::Region r (dss), outside (dss), empty (dss);
+
+  r.insert (db::Box (-10, 20, 20, 60));
+  r.insert (db::Box (20, 20, 30, 60));
+  outside.insert (db::Box (-20, 0, -10, 110));
+  outside.insert (db::Box (100, 0, 110, 110));
+  outside.insert (db::Box (-20, 0, 110, 10));
+  outside.insert (db::Box (-20, 100, 110, 110));
+
+  EXPECT_EQ (db::Region ().sized_inside (db::Region (), true, 0, 40).to_string (), "");
+  EXPECT_EQ (db::Region ().sized_inside (db::Region (), true, 40, 40).to_string (), "");
+  EXPECT_EQ (db::Region ().sized_inside (outside, true, 0, 40).to_string (), "");
+  EXPECT_EQ (db::Region ().sized_inside (outside, true, 40, 40).to_string (), "");
+
+  EXPECT_EQ (empty.sized_inside (empty, true, 0, 40).to_string (), "");
+  EXPECT_EQ (empty.sized_inside (empty, true, 40, 40).to_string (), "");
+  EXPECT_EQ (empty.sized_inside (outside, true, 0, 40).to_string (), "");
+  EXPECT_EQ (empty.sized_inside (outside, true, 40, 40).to_string (), "");
+
+  EXPECT_EQ (r.sized_inside (outside, true, 0, 40).to_string (), "(-10,20;-10,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (outside, true, 1, 0).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (outside, true, 1, -1).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (outside, true, 40, 40).to_string (), "(-10,10;-10,100;70,100;70,10)");
+
+  EXPECT_EQ (r.sized_inside (outside, true, 0, 0, 40).to_string (), "(-10,20;-10,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (outside, true, 1, 1, 0).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (outside, true, 40, 40, 40).to_string (), "(-10,10;-10,100;70,100;70,10)");
+
+  EXPECT_EQ (r.sized_inside (outside, true, 0, 20, 10).to_string (), "(-10,10;-10,80;30,80;30,10)");
+  EXPECT_EQ (r.sized_inside (outside, true, 1, 2, 0).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (outside, true, 10, 20, 10).to_string (), "(-10,10;-10,80;40,80;40,10)");
+
+  EXPECT_EQ (r.sized_inside (db::Region (), true, 0, 40).to_string (), "(-10,20;-10,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (db::Region (), true, 1, 0).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (db::Region (), true, 40, 40).to_string (), "(-50,-20;-50,100;70,100;70,-20)");
+
+  EXPECT_EQ (r.sized_inside (db::Region (), true, 0, 0, 40).to_string (), "(-10,20;-10,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (db::Region (), true, 1, 1, 0).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (db::Region (), true, 40, 40, 40).to_string (), "(-50,-20;-50,100;70,100;70,-20)");
+
+  EXPECT_EQ (r.sized_inside (db::Region (), true, 0, 20, 10).to_string (), "(-10,0;-10,80;30,80;30,0)");
+  EXPECT_EQ (r.sized_inside (db::Region (), true, 1, 2, 0).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (db::Region (), true, 10, 20, 10).to_string (), "(-20,0;-20,80;40,80;40,0)");
+
+  EXPECT_EQ (r.sized_inside (empty, true, 0, 40).to_string (), "(-10,20;-10,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (empty, true, 1, 0).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (empty, true, 40, 40).to_string (), "(-50,-20;-50,100;70,100;70,-20)");
+
+  EXPECT_EQ (r.sized_inside (empty, true, 0, 0, 40).to_string (), "(-10,20;-10,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (empty, true, 1, 1, 0).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (empty, true, 40, 40, 40).to_string (), "(-50,-20;-50,100;70,100;70,-20)");
+
+  EXPECT_EQ (r.sized_inside (empty, true, 0, 20, 10).to_string (), "(-10,0;-10,80;30,80;30,0)");
+  EXPECT_EQ (r.sized_inside (empty, true, 1, 2, 0).to_string (), "(-10,20;-10,60;20,60;20,20);(20,20;20,60;30,60;30,20)");
+  EXPECT_EQ (r.sized_inside (empty, true, 10, 20, 10).to_string (), "(-20,0;-20,80;40,80;40,0)");
+
+  try {
+    //  no negative sizing
+    r.sized_inside (outside, true, -1, 1);
+    EXPECT_EQ (true, false);
+  } catch (...) {
+  }
+  try {
+    //  no negative sizing
+    r.sized_inside (outside, true, -1, 1, 1);
+    EXPECT_EQ (true, false);
+  } catch (...) {
+  }
+  try {
+    //  no negative sizing
+    r.sized_inside (outside, true, 1, -1, 1);
+    EXPECT_EQ (true, false);
+  } catch (...) {
+  }
+}
+
 TEST(100_Processors)
 {
   db::Region r;

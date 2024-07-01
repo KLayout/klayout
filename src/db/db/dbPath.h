@@ -295,6 +295,22 @@ public:
   }
 
   /**
+   *  @brief Compatibility with path_ref
+   */
+  path<C> instantiate () const
+  {
+    return *this;
+  }
+
+  /**
+   *  @brief Compatibility with path_ref
+   */
+  void instantiate (path<C> &p) const
+  {
+    p = *this;
+  }
+
+  /**
    *  @brief The (dummy) translation operator
    */
   void translate (const path<C> &d, db::generic_repository<C> &, db::ArrayRepository &)

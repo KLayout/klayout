@@ -40,6 +40,7 @@
 #include "dbEdgePair.h"
 #include "dbArray.h"
 #include "gsi.h"
+#include "gsiObject.h"
 
 namespace lay
 {
@@ -60,6 +61,11 @@ public:
    *  @brief The constructor 
    */ 
   MarkerBase (lay::LayoutViewBase *view);
+
+  /**
+   *  @brief Attaches to a new view
+   */
+  void set_view (lay::LayoutViewBase *view);
 
   /**
    *  @brief Get the color by which the marker is drawn
@@ -231,6 +237,11 @@ protected:
     return mp_view;
   }
 
+  const lay::LayoutViewBase *view () const
+  {
+    return mp_view;
+  }
+
 private:
   tl::Color m_color;
   tl::Color m_frame_color;
@@ -325,14 +336,6 @@ public:
   }
 
   /**
-   *  @brief Gets the view object
-   */
-  lay::LayoutViewBase *view () const
-  {
-    return mp_view;
-  }
-
-  /**
    *  @brief Gets the bounding box
    */
   db::DBox bbox () const;
@@ -350,7 +353,6 @@ public:
 private:
   db::CplxTrans m_trans;
   std::vector<db::DCplxTrans> *mp_trans_vector;
-  lay::LayoutViewBase *mp_view;
   unsigned int m_cv_index;
 
   /**
@@ -827,8 +829,21 @@ private:
     db::DText *text;
     void *any;
   } m_object;
+};
 
-  lay::LayoutViewBase *mp_view;
+/**
+ *  @brief A managed version of the marker class
+ *
+ *  It uses gsi::ObjectBase as a base class and serves as
+ *  proxy for GSI binding.
+ */
+class ManagedDMarker
+  : public lay::DMarker, public gsi::ObjectBase
+{
+public:
+  ManagedDMarker (lay::LayoutViewBase *view)
+    : lay::DMarker (view)
+  { }
 };
 
 }

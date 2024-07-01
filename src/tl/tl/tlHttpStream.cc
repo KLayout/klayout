@@ -22,6 +22,7 @@
 
 
 #include "tlHttpStream.h"
+#include "tlEnv.h"
 
 namespace tl
 {
@@ -50,6 +51,24 @@ HttpErrorException::format_error (const std::string &em, int ec, const std::stri
   }
 
   return msg;
+}
+
+// ---------------------------------------------------------------
+//  Common implementation
+
+double
+InputHttpStream::get_default_timeout ()
+{
+  //  default timeout
+  double timeout_value = 10.0;
+
+  std::string timeout = tl::get_env ("KLAYOUT_HTTP_TIMEOUT");
+  if (! timeout.empty ()) {
+    tl::Extractor ex (timeout.c_str ());
+    ex.try_read (timeout_value);
+  }
+
+  return timeout_value;
 }
 
 }

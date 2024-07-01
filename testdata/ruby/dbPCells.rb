@@ -226,6 +226,8 @@ class DBPCellAPI_TestClass < TestBase
     assert_equal(decl.description, "d")
     decl.unit = "u"
     assert_equal(decl.unit, "u")
+    decl.tooltip = "ttt"
+    assert_equal(decl.tooltip, "ttt")
     decl.type = RBA::PCellParameterDeclaration::TypeBoolean
     assert_equal(decl.type, RBA::PCellParameterDeclaration::TypeBoolean)
     decl.default = true

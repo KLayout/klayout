@@ -37,7 +37,7 @@ namespace db
 {
 
 Triangles::Triangles ()
-  : m_is_constrained (false), m_level (0), m_flips (0), m_hops (0)
+  : m_is_constrained (false), m_level (0), m_id (0), m_flips (0), m_hops (0)
 {
   //  .. nothing yet ..
 }
@@ -1414,8 +1414,8 @@ Triangles::remove_outside_triangles ()
 void
 Triangles::clear ()
 {
-  m_edges_heap.clear ();
   mp_triangles.clear ();
+  m_edges_heap.clear ();
   m_vertex_heap.clear ();
   m_returned_edges.clear ();
   m_is_constrained = false;

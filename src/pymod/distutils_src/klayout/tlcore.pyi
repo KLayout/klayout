@@ -1,5 +1,6 @@
 from typing import Any, ClassVar, Dict, Sequence, List, Iterator, Optional
 from typing import overload
+from __future__ import annotations
 class AbsoluteProgress(Progress):
     r"""
     @brief A progress reporter counting progress in absolute units
@@ -37,6 +38,7 @@ class AbsoluteProgress(Progress):
         WARNING: This variable can only be set, not retrieved.
         @brief sets the output format (sprintf notation) for the progress text
         """
+        ...
     @property
     def format_unit(self) -> None:
         r"""
@@ -47,6 +49,7 @@ class AbsoluteProgress(Progress):
         The current count is divided by the format unit to render
         the value passed to the format string.
         """
+        ...
     @property
     def unit(self) -> None:
         r"""
@@ -55,18 +58,21 @@ class AbsoluteProgress(Progress):
 
         Specifies the count value corresponding to 1 percent on the progress bar. By default, the current value divided by the unit is used to create the formatted value from the output string. Another attribute is provided (\format_unit=) to specify a separate unit for that purpose.
         """
+        ...
     @property
     def value(self) -> None:
         r"""
         WARNING: This variable can only be set, not retrieved.
         @brief Sets the progress value
         """
+        ...
     @overload
     @classmethod
     def new(cls, desc: str) -> AbsoluteProgress:
         r"""
         @brief Creates an absolute progress reporter with the given description
         """
+        ...
     @overload
     @classmethod
     def new(cls, desc: str, yield_interval: int) -> AbsoluteProgress:
@@ -75,19 +81,23 @@ class AbsoluteProgress(Progress):
 
         The yield interval specifies, how often the event loop will be triggered. When the yield interval is 10 for example, the event loop will be executed every tenth call of \inc or \set.
         """
+        ...
     def __copy__(self) -> AbsoluteProgress:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __deepcopy__(self) -> AbsoluteProgress:
         r"""
         @brief Creates a copy of self
         """
+        ...
     @overload
     def __init__(self, desc: str) -> None:
         r"""
         @brief Creates an absolute progress reporter with the given description
         """
+        ...
     @overload
     def __init__(self, desc: str, yield_interval: int) -> None:
         r"""
@@ -95,29 +105,34 @@ class AbsoluteProgress(Progress):
 
         The yield interval specifies, how often the event loop will be triggered. When the yield interval is 10 for example, the event loop will be executed every tenth call of \inc or \set.
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -125,6 +140,7 @@ class AbsoluteProgress(Progress):
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -132,18 +148,22 @@ class AbsoluteProgress(Progress):
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def assign(self, other: Progress) -> None:
         r"""
         @brief Assigns another object to self
         """
+        ...
     def dup(self) -> AbsoluteProgress:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def inc(self) -> AbsoluteProgress:
         r"""
         @brief Increments the progress value
         """
+        ...
     def set(self, value: int, force_yield: bool) -> None:
         r"""
         @brief Sets the progress value
@@ -151,6 +171,8 @@ class AbsoluteProgress(Progress):
         This method is equivalent to \value=, but it allows forcing the event loop to be triggered.
         If "force_yield" is true, the event loop will be triggered always, irregardless of the yield interval specified in the constructor.
         """
+        ...
+    ...
 
 class AbstractProgress(Progress):
     r"""
@@ -167,41 +189,49 @@ class AbstractProgress(Progress):
         r"""
         @brief Creates an abstract progress reporter with the given description
         """
+        ...
     def __copy__(self) -> AbstractProgress:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __deepcopy__(self) -> AbstractProgress:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __init__(self, desc: str) -> None:
         r"""
         @brief Creates an abstract progress reporter with the given description
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -209,6 +239,7 @@ class AbstractProgress(Progress):
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -216,14 +247,18 @@ class AbstractProgress(Progress):
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def assign(self, other: Progress) -> None:
         r"""
         @brief Assigns another object to self
         """
+        ...
     def dup(self) -> AbstractProgress:
         r"""
         @brief Creates a copy of self
         """
+        ...
+    ...
 
 class ArgType:
     r"""
@@ -300,57 +335,64 @@ class ArgType:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def __copy__(self) -> ArgType:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __deepcopy__(self) -> ArgType:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __eq__(self, other: object) -> bool:
         r"""
         @brief Equality of two types
         """
+        ...
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def __ne__(self, other: object) -> bool:
         r"""
         @brief Inequality of two types
         """
-    def __repr__(self) -> str:
-        r"""
-        @brief Convert to a string
-        """
+        ...
     def __str__(self) -> str:
         r"""
         @brief Convert to a string
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -358,6 +400,7 @@ class ArgType:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -365,90 +408,108 @@ class ArgType:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def assign(self, other: ArgType) -> None:
         r"""
         @brief Assigns another object to self
         """
+        ...
     def cls(self) -> Class:
         r"""
         @brief Specifies the class for t_object.. types
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def default(self) -> Any:
         r"""
         @brief Returns the default value or nil is there is no default value
         Applies to arguments only. This method has been introduced in version 0.24.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def dup(self) -> ArgType:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def has_default(self) -> bool:
         r"""
         @brief Returns true, if a default value is specified for this argument
         Applies to arguments only. This method has been introduced in version 0.24.
         """
+        ...
     def inner(self) -> ArgType:
         r"""
         @brief Returns the inner ArgType object (i.e. value of a vector/map)
         Starting with version 0.22, this method replaces the is_vector method.
         """
+        ...
     def inner_k(self) -> ArgType:
         r"""
         @brief Returns the inner ArgType object (i.e. key of a map)
         This method has been introduced in version 0.27.
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def is_cptr(self) -> bool:
         r"""
         @brief True, if the type is a const pointer to the given type
         This property indicates that the argument is a const pointer (in C++: 'const X *').
         """
+        ...
     def is_cref(self) -> bool:
         r"""
         @brief True, if the type is a const reference to the given type
         This property indicates that the argument is a const reference (in C++: 'const X &').
         """
+        ...
     def is_iter(self) -> bool:
         r"""
         @brief (Return value only) True, if the return value is an iterator rendering the given type
         """
+        ...
     def is_ptr(self) -> bool:
         r"""
         @brief True, if the type is a non-const pointer to the given type
         This property indicates that the argument is a non-const pointer (in C++: 'X *').
         """
+        ...
     def is_ref(self) -> bool:
         r"""
         @brief True, if the type is a reference to the given type
         Starting with version 0.22 there are more methods that describe the type of reference and is_ref? only applies to non-const reference (in C++: 'X &').
         """
+        ...
     def name(self) -> str:
         r"""
         @brief Returns the name for this argument or an empty string if the argument is not named
         Applies to arguments only. This method has been introduced in version 0.24.
         """
+        ...
     def pass_obj(self) -> bool:
         r"""
         @brief True, if the ownership over an object represented by this type is passed to the receiver
@@ -456,14 +517,18 @@ class ArgType:
 
         This method has been introduced in version 0.24.
         """
+        ...
     def to_s(self) -> str:
         r"""
         @brief Convert to a string
         """
+        ...
     def type(self) -> int:
         r"""
         @brief Return the basic type (see t_.. constants)
         """
+        ...
+    ...
 
 class Class:
     r"""
@@ -474,38 +539,45 @@ class Class:
         r"""
         @brief Iterate over all classes
         """
+        ...
     @classmethod
     def new(cls) -> Class:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -513,6 +585,7 @@ class Class:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -520,78 +593,95 @@ class Class:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def base(self) -> Class:
         r"""
         @brief The base class or nil if the class does not have a base class
 
         This method has been introduced in version 0.22.
         """
+        ...
     def can_copy(self) -> bool:
         r"""
         @brief True if the class offers assignment
         """
+        ...
     def can_destroy(self) -> bool:
         r"""
         @brief True if the class offers a destroy method
 
         This method has been introduced in version 0.22.
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def doc(self) -> str:
         r"""
         @brief The documentation string for this class
         """
+        ...
     def each_child_class(self) -> Iterator[Class]:
         r"""
         @brief Iterate over all child classes defined within this class
         """
+        ...
     def each_method(self) -> Iterator[Method]:
         r"""
         @brief Iterate over all methods of this class
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def module(self) -> str:
         r"""
         @brief The name of module where the class lives
         """
+        ...
     def name(self) -> str:
         r"""
         @brief The name of the class
         """
+        ...
     def parent(self) -> Class:
         r"""
         @brief The parent of the class
         """
+        ...
     def python_methods(self, static: bool) -> List[PythonFunction]:
         r"""
         @brief Gets the Python methods (static or non-static)
         """
+        ...
     def python_properties(self, static: bool) -> List[PythonGetterSetterPair]:
         r"""
         @brief Gets the Python properties (static or non-static) as a list of getter/setter pairs
         Note that if a getter or setter is not available the list of Python functions for this part is empty.
         """
+        ...
+    ...
 
 class EmptyClass:
     r"""
@@ -601,41 +691,49 @@ class EmptyClass:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def __copy__(self) -> EmptyClass:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __deepcopy__(self) -> EmptyClass:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -643,6 +741,7 @@ class EmptyClass:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -650,37 +749,45 @@ class EmptyClass:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def assign(self, other: EmptyClass) -> None:
         r"""
         @brief Assigns another object to self
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def dup(self) -> EmptyClass:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
+    ...
 
 class Executable(ExecutableBase):
     r"""
@@ -695,33 +802,39 @@ class Executable(ExecutableBase):
         r"""
         @brief Assigns another object to self
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _dup(self) -> Executable:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -729,6 +842,7 @@ class Executable(ExecutableBase):
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -736,6 +850,8 @@ class Executable(ExecutableBase):
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
+    ...
 
 class ExecutableBase:
     r"""
@@ -747,41 +863,49 @@ class ExecutableBase:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def __copy__(self) -> ExecutableBase:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __deepcopy__(self) -> ExecutableBase:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -789,6 +913,7 @@ class ExecutableBase:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -796,37 +921,45 @@ class ExecutableBase:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def assign(self, other: ExecutableBase) -> None:
         r"""
         @brief Assigns another object to self
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def dup(self) -> ExecutableBase:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
+    ...
 
 class Expression(ExpressionContext):
     r"""
@@ -844,24 +977,28 @@ class Expression(ExpressionContext):
         WARNING: This variable can only be set, not retrieved.
         @brief Sets the given text as the expression.
         """
+        ...
     @classmethod
     def _class_eval(cls, expr: str) -> Any:
         r"""
         @brief A convience function to evaluate the given expression and directly return the result
         This is a static method that does not require instantiation of the expression object first.
         """
+        ...
     @classmethod
     def eval(cls, expr: str) -> Any:
         r"""
         @brief A convience function to evaluate the given expression and directly return the result
         This is a static method that does not require instantiation of the expression object first.
         """
+        ...
     @overload
     @classmethod
     def new(cls, expr: str) -> Expression:
         r"""
         @brief Creates an expression evaluator
         """
+        ...
     @overload
     @classmethod
     def new(cls, expr: str, variables: Dict[str, Any]) -> Expression:
@@ -869,44 +1006,52 @@ class Expression(ExpressionContext):
         @brief Creates an expression evaluator
         This version of the constructor takes a hash of variables available to the expressions.
         """
+        ...
     @overload
     def __init__(self, expr: str) -> None:
         r"""
         @brief Creates an expression evaluator
         """
+        ...
     @overload
     def __init__(self, expr: str, variables: Dict[str, Any]) -> None:
         r"""
         @brief Creates an expression evaluator
         This version of the constructor takes a hash of variables available to the expressions.
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _inst_eval(self) -> Any:
         r"""
         @brief Evaluates the current expression and returns the result
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -914,6 +1059,7 @@ class Expression(ExpressionContext):
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -921,10 +1067,13 @@ class Expression(ExpressionContext):
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def eval(self) -> Any:
         r"""
         @brief Evaluates the current expression and returns the result
         """
+        ...
+    ...
 
 class ExpressionContext:
     r"""
@@ -939,46 +1088,55 @@ class ExpressionContext:
         r"""
         @brief Defines a global variable with the given name and value
         """
+        ...
     @classmethod
     def new(cls) -> ExpressionContext:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def __copy__(self) -> ExpressionContext:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __deepcopy__(self) -> ExpressionContext:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -986,6 +1144,7 @@ class ExpressionContext:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -993,46 +1152,56 @@ class ExpressionContext:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def assign(self, other: ExpressionContext) -> None:
         r"""
         @brief Assigns another object to self
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def dup(self) -> ExpressionContext:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def eval(self, expr: str) -> Any:
         r"""
         @brief Compiles and evaluates the given expression in this context
         This method has been introduced in version 0.26.
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def var(self, name: str, value: Any) -> None:
         r"""
         @brief Defines a variable with the given name and value
         """
+        ...
+    ...
 
 class GlobPattern:
     r"""
@@ -1062,41 +1231,49 @@ class GlobPattern:
         r"""
         @brief Creates a new glob pattern match object
         """
+        ...
     def __copy__(self) -> GlobPattern:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __deepcopy__(self) -> GlobPattern:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __init__(self, pattern: str) -> None:
         r"""
         @brief Creates a new glob pattern match object
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -1104,6 +1281,7 @@ class GlobPattern:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -1111,42 +1289,51 @@ class GlobPattern:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def assign(self, other: GlobPattern) -> None:
         r"""
         @brief Assigns another object to self
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def dup(self) -> GlobPattern:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def match(self, subject: str) -> Any:
         r"""
         @brief Matches the subject string against the pattern.
         Returns nil if the subject string does not match the pattern. Otherwise returns a list with the substrings captured in round brackets.
         """
+        ...
+    ...
 
 class Interpreter:
     r"""
@@ -1172,43 +1359,51 @@ class Interpreter:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     @classmethod
     def python_interpreter(cls) -> Interpreter:
         r"""
         @brief Gets the instance of the Python interpreter
         """
+        ...
     @classmethod
     def ruby_interpreter(cls) -> Interpreter:
         r"""
         @brief Gets the instance of the Ruby interpreter
         """
+        ...
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -1216,6 +1411,7 @@ class Interpreter:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -1223,49 +1419,59 @@ class Interpreter:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def define_variable(self, name: str, value: Any) -> None:
         r"""
         @brief Defines a (global) variable with the given name and value
         You can use the \Value class to provide 'out' or 'inout' parameters which can be modified by code executed inside the interpreter and read back by the caller.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def eval_expr(self, string: str, filename: Optional[str] = ..., line: Optional[int] = ...) -> Any:
         r"""
         @brief Executes the expression inside the given string and returns the result value
         Use 'filename' and 'line' to indicate the original source for the error messages.
         """
+        ...
     def eval_string(self, string: str, filename: Optional[str] = ..., line: Optional[int] = ...) -> None:
         r"""
         @brief Executes the code inside the given string
         Use 'filename' and 'line' to indicate the original source for the error messages.
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def load_file(self, path: str) -> None:
         r"""
         @brief Loads the given file into the interpreter
         This will execute the code inside the file.
         """
+        ...
+    ...
 
 class Logger:
     r"""
@@ -1295,6 +1501,7 @@ class Logger:
 
         The error channel is formatted as an error (i.e. red in the logger window) and output unconditionally.
         """
+        ...
     @classmethod
     def info(cls, msg: str) -> None:
         r"""
@@ -1302,6 +1509,7 @@ class Logger:
 
         The info channel is printed as neutral messages unconditionally.
         """
+        ...
     @classmethod
     def log(cls, msg: str) -> None:
         r"""
@@ -1309,11 +1517,13 @@ class Logger:
 
         Log messages are printed as neutral messages and are output only if the verbosity is above 0.
         """
+        ...
     @classmethod
     def new(cls) -> Logger:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     @classmethod
     def warn(cls, msg: str) -> None:
         r"""
@@ -1321,41 +1531,49 @@ class Logger:
 
         The warning channel is formatted as a warning (i.e. blue in the logger window) and output unconditionally.
         """
+        ...
     def __copy__(self) -> Logger:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __deepcopy__(self) -> Logger:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -1363,6 +1581,7 @@ class Logger:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -1370,37 +1589,45 @@ class Logger:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def assign(self, other: Logger) -> None:
         r"""
         @brief Assigns another object to self
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def dup(self) -> Logger:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
+    ...
 
 class Method:
     r"""
@@ -1411,25 +1638,22 @@ class Method:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def __copy__(self) -> Method:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __deepcopy__(self) -> Method:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
         """
-    def __repr__(self) -> str:
-        r"""
-        @brief Describes the method
-        This attribute returns a string description of the method and its signature.
-
-        This method has been introduced in version 0.29.
-        """
+        ...
     def __str__(self) -> str:
         r"""
         @brief Describes the method
@@ -1437,29 +1661,34 @@ class Method:
 
         This method has been introduced in version 0.29.
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -1467,6 +1696,7 @@ class Method:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -1474,83 +1704,99 @@ class Method:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def accepts_num_args(self, n: int) -> bool:
         r"""
         @brief True, if this method is compatible with the given number of arguments
 
         This method has been introduced in version 0.24.
         """
+        ...
     def assign(self, other: Method) -> None:
         r"""
         @brief Assigns another object to self
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def doc(self) -> str:
         r"""
         @brief The documentation string for this method
         """
+        ...
     def dup(self) -> Method:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def each_argument(self) -> Iterator[ArgType]:
         r"""
         @brief Iterate over all arguments of this method
         """
+        ...
     def each_overload(self) -> Iterator[MethodOverload]:
         r"""
         @brief This iterator delivers the synonyms (overloads).
 
         This method has been introduced in version 0.24.
         """
+        ...
     def is_const(self) -> bool:
         r"""
         @brief True, if this method does not alter the object
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def is_constructor(self) -> bool:
         r"""
         @brief True, if this method is a constructor
         Static methods that return new objects are constructors.
         This method has been introduced in version 0.25.
         """
+        ...
     def is_protected(self) -> bool:
         r"""
         @brief True, if this method is protected
 
         This method has been introduced in version 0.24.
         """
+        ...
     def is_signal(self) -> bool:
         r"""
         @brief True, if this method is a signal
 
         Signals replace events for version 0.25. is_event? is no longer available.
         """
+        ...
     def is_static(self) -> bool:
         r"""
         @brief True, if this method is static (a class method)
         """
+        ...
     def name(self) -> str:
         r"""
         @brief The name string of the method
@@ -1568,6 +1814,7 @@ class Method:
 
         The preferred method of deriving the overload is to iterate then using \each_overload.
         """
+        ...
     def primary_name(self) -> str:
         r"""
         @brief The primary name of the method
@@ -1575,14 +1822,17 @@ class Method:
 
         This method has been introduced in version 0.24.
         """
+        ...
     def python_methods(self) -> str:
         r"""
         @brief Gets the Python specific documentation
         """
+        ...
     def ret_type(self) -> ArgType:
         r"""
         @brief The return type of this method
         """
+        ...
     def to_s(self) -> str:
         r"""
         @brief Describes the method
@@ -1590,6 +1840,8 @@ class Method:
 
         This method has been introduced in version 0.29.
         """
+        ...
+    ...
 
 class MethodOverload:
     r"""
@@ -1600,41 +1852,49 @@ class MethodOverload:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def __copy__(self) -> MethodOverload:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __deepcopy__(self) -> MethodOverload:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -1642,6 +1902,7 @@ class MethodOverload:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -1649,58 +1910,71 @@ class MethodOverload:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def assign(self, other: MethodOverload) -> None:
         r"""
         @brief Assigns another object to self
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def deprecated(self) -> bool:
         r"""
         @brief A value indicating that this overload is deprecated
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def dup(self) -> MethodOverload:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def is_getter(self) -> bool:
         r"""
         @brief A value indicating that this overload is a property getter
         """
+        ...
     def is_predicate(self) -> bool:
         r"""
         @brief A value indicating that this overload is a predicate
         """
+        ...
     def is_setter(self) -> bool:
         r"""
         @brief A value indicating that this overload is a property setter
         """
+        ...
     def name(self) -> str:
         r"""
         @brief The name of this overload
         This is the raw, unadorned name. I.e. no question mark suffix for predicates, no equal character suffix for setters etc.
         """
+        ...
+    ...
 
 class Progress:
     r"""
@@ -1720,6 +1994,7 @@ class Progress:
 
         Initially the title is equal to the description.
         """
+        ...
     desc: str
     r"""
     Getter:
@@ -1733,33 +2008,39 @@ class Progress:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -1767,6 +2048,7 @@ class Progress:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -1774,29 +2056,35 @@ class Progress:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
+    ...
 
 class PythonFunction:
     r"""
@@ -1807,41 +2095,49 @@ class PythonFunction:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def __copy__(self) -> PythonFunction:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __deepcopy__(self) -> PythonFunction:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -1849,6 +2145,7 @@ class PythonFunction:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -1856,53 +2153,65 @@ class PythonFunction:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def assign(self, other: PythonFunction) -> None:
         r"""
         @brief Assigns another object to self
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def dup(self) -> PythonFunction:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def is_protected(self) -> bool:
         r"""
         @brief Gets a value indicating whether this function is protected
         """
+        ...
     def is_static(self) -> bool:
         r"""
         @brief Gets the value indicating whether this Python function is 'static' (class function)
         """
+        ...
     def methods(self) -> List[Method]:
         r"""
         @brief Gets the list of methods bound to this Python function
         """
+        ...
     def name(self) -> str:
         r"""
         @brief Gets the name of this Python function
         """
+        ...
+    ...
 
 class PythonGetterSetterPair:
     r"""
@@ -1913,41 +2222,49 @@ class PythonGetterSetterPair:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def __copy__(self) -> PythonGetterSetterPair:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __deepcopy__(self) -> PythonGetterSetterPair:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -1955,6 +2272,7 @@ class PythonGetterSetterPair:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -1962,45 +2280,55 @@ class PythonGetterSetterPair:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def assign(self, other: PythonGetterSetterPair) -> None:
         r"""
         @brief Assigns another object to self
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def dup(self) -> PythonGetterSetterPair:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def getter(self) -> PythonFunction:
         r"""
         @brief Gets the getter function
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def setter(self) -> PythonFunction:
         r"""
         @brief Gets the setter function
         """
+        ...
+    ...
 
 class Recipe:
     r"""
@@ -2029,38 +2357,45 @@ class Recipe:
         The generator string is the one delivered with \generator.
         Additional parameters can be passed in "add_params". They have lower priority than the parameters kept inside the generator string.
         """
+        ...
     @classmethod
     def new(cls, name: str, description: Optional[str] = ...) -> Recipe:
         r"""
         @brief Creates a new recipe object with the given name and (optional) description
         """
+        ...
     def __init__(self, name: str, description: Optional[str] = ...) -> None:
         r"""
         @brief Creates a new recipe object with the given name and (optional) description
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -2068,6 +2403,7 @@ class Recipe:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -2075,42 +2411,51 @@ class Recipe:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def description(self) -> str:
         r"""
         @brief Gets the description of the recipe.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def generator(self, params: Dict[str, Any]) -> str:
         r"""
         @brief Delivers the generator string from the given parameters.
         The generator string can be used with \make to re-run the recipe.
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def name(self) -> str:
         r"""
         @brief Gets the name of the recipe.
         """
+        ...
+    ...
 
 class RelativeProgress(Progress):
     r"""
@@ -2142,12 +2487,14 @@ class RelativeProgress(Progress):
         WARNING: This variable can only be set, not retrieved.
         @brief sets the output format (sprintf notation) for the progress text
         """
+        ...
     @property
     def value(self) -> None:
         r"""
         WARNING: This variable can only be set, not retrieved.
         @brief Sets the progress value
         """
+        ...
     @overload
     @classmethod
     def new(cls, desc: str, max_value: int) -> RelativeProgress:
@@ -2157,6 +2504,7 @@ class RelativeProgress(Progress):
         The reported progress will be 0 to 100% for values between 0 and the maximum value.
         The values are always integers. Double values cannot be used property.
         """
+        ...
     @overload
     @classmethod
     def new(cls, desc: str, max_value: int, yield_interval: int) -> RelativeProgress:
@@ -2168,14 +2516,17 @@ class RelativeProgress(Progress):
 
         The yield interval specifies, how often the event loop will be triggered. When the yield interval is 10 for example, the event loop will be executed every tenth call of \inc or \set.
         """
+        ...
     def __copy__(self) -> RelativeProgress:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __deepcopy__(self) -> RelativeProgress:
         r"""
         @brief Creates a copy of self
         """
+        ...
     @overload
     def __init__(self, desc: str, max_value: int) -> None:
         r"""
@@ -2184,6 +2535,7 @@ class RelativeProgress(Progress):
         The reported progress will be 0 to 100% for values between 0 and the maximum value.
         The values are always integers. Double values cannot be used property.
         """
+        ...
     @overload
     def __init__(self, desc: str, max_value: int, yield_interval: int) -> None:
         r"""
@@ -2194,29 +2546,34 @@ class RelativeProgress(Progress):
 
         The yield interval specifies, how often the event loop will be triggered. When the yield interval is 10 for example, the event loop will be executed every tenth call of \inc or \set.
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -2224,6 +2581,7 @@ class RelativeProgress(Progress):
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -2231,18 +2589,22 @@ class RelativeProgress(Progress):
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def assign(self, other: Progress) -> None:
         r"""
         @brief Assigns another object to self
         """
+        ...
     def dup(self) -> RelativeProgress:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def inc(self) -> RelativeProgress:
         r"""
         @brief Increments the progress value
         """
+        ...
     def set(self, value: int, force_yield: bool) -> None:
         r"""
         @brief Sets the progress value
@@ -2250,6 +2612,8 @@ class RelativeProgress(Progress):
         This method is equivalent to \value=, but it allows forcing the event loop to be triggered.
         If "force_yield" is true, the event loop will be triggered always, irregardless of the yield interval specified in the constructor.
         """
+        ...
+    ...
 
 class Timer:
     r"""
@@ -2276,54 +2640,60 @@ class Timer:
 
         This method has been introduced in version 0.27.
         """
+        ...
     @classmethod
     def new(cls) -> Timer:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def __copy__(self) -> Timer:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __deepcopy__(self) -> Timer:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
         """
-    def __repr__(self) -> str:
-        r"""
-        @brief Produces a string with the currently elapsed times
-        """
+        ...
     def __str__(self) -> str:
         r"""
         @brief Produces a string with the currently elapsed times
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -2331,6 +2701,7 @@ class Timer:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -2338,62 +2709,76 @@ class Timer:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def assign(self, other: Timer) -> None:
         r"""
         @brief Assigns another object to self
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def dup(self) -> Timer:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def start(self) -> None:
         r"""
         @brief Starts the timer
         """
+        ...
     def stop(self) -> None:
         r"""
         @brief Stops the timer
         """
+        ...
     def sys(self) -> float:
         r"""
         @brief Returns the elapsed CPU time in kernel mode from start to stop in seconds
         """
+        ...
     def to_s(self) -> str:
         r"""
         @brief Produces a string with the currently elapsed times
         """
+        ...
     def user(self) -> float:
         r"""
         @brief Returns the elapsed CPU time in user mode from start to stop in seconds
         """
+        ...
     def wall(self) -> float:
         r"""
         @brief Returns the elapsed real time from start to stop in seconds
         This method has been introduced in version 0.26.
         """
+        ...
+    ...
 
 class Value:
     r"""
@@ -2415,6 +2800,7 @@ class Value:
         r"""
         @brief Constructs a nil object.
         """
+        ...
     @overload
     @classmethod
     def new(cls, value: Any) -> Value:
@@ -2422,56 +2808,62 @@ class Value:
         @brief Constructs a non-nil object with the given value.
         This constructor has been introduced in version 0.22.
         """
+        ...
     def __copy__(self) -> Value:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __deepcopy__(self) -> Value:
         r"""
         @brief Creates a copy of self
         """
+        ...
     @overload
     def __init__(self) -> None:
         r"""
         @brief Constructs a nil object.
         """
+        ...
     @overload
     def __init__(self, value: Any) -> None:
         r"""
         @brief Constructs a non-nil object with the given value.
         This constructor has been introduced in version 0.22.
         """
-    def __repr__(self) -> str:
-        r"""
-        @brief Convert this object to a string
-        """
+        ...
     def __str__(self) -> str:
         r"""
         @brief Convert this object to a string
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -2479,6 +2871,7 @@ class Value:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -2486,39 +2879,48 @@ class Value:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def assign(self, other: Value) -> None:
         r"""
         @brief Assigns another object to self
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def dup(self) -> Value:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def to_s(self) -> str:
         r"""
         @brief Convert this object to a string
         """
+        ...
+    ...
 

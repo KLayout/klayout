@@ -1440,7 +1440,8 @@ XORToolDialog::run_xor ()
     }
     XORJob job (nworkers, output_mode, op, el_handling, dbu, cva, cvb, tolerances, sub_categories, layer_categories, sub_cells, sub_output_layers, rdb, rdb_cell);
 
-    double common_dbu = tl::lcm (cva->layout ().dbu (), cvb->layout ().dbu ());
+    //  NOTE: uses min of both DBUs (see issue #1743)
+    double common_dbu = std::min (cva->layout ().dbu (), cvb->layout ().dbu ());
 
     for (std::vector<db::DBox>::const_iterator b = boxes.begin (); b != boxes.end (); ++b) {
 

@@ -819,6 +819,14 @@ Class<db::PCellParameterDeclaration> decl_PCellParameterDeclaration ("db", "PCel
   gsi::method ("description=", &db::PCellParameterDeclaration::set_description, gsi::arg ("description"),
     "@brief Sets the description\n"
   ) +
+  gsi::method ("tooltip", &db::PCellParameterDeclaration::get_tooltip,
+    "@brief Gets the tool tip text\n"
+    "This attribute has been introduced in version 0.29.3."
+  ) +
+  gsi::method ("tooltip=", &db::PCellParameterDeclaration::set_tooltip, gsi::arg ("tooltip"),
+    "@brief Sets the tool tip text\n"
+    "This attribute has been introduced in version 0.29.3."
+  ) +
   gsi::method ("hidden?", &db::PCellParameterDeclaration::is_hidden,
     "@brief Returns true, if the parameter is a hidden parameter that should not be shown in the user interface\n"
     "By making a parameter hidden, it is possible to create internal parameters which cannot be\n"

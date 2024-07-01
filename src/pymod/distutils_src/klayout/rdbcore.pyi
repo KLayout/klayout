@@ -1,5 +1,6 @@
 from typing import Any, ClassVar, Dict, Sequence, List, Iterator, Optional
 from typing import overload
+from __future__ import annotations
 import klayout.tl as tl
 import klayout.db as db
 class RdbCategory:
@@ -22,33 +23,39 @@ class RdbCategory:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -56,6 +63,7 @@ class RdbCategory:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -63,36 +71,34 @@ class RdbCategory:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def database(self) -> ReportDatabase:
         r"""
         @brief Gets the database object that category is associated with
 
         This method has been introduced in version 0.23.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
-    @overload
-    def each_item(self) -> Iterator[RdbItem]:
-        r"""
-        @brief Iterates over all items inside the database which are associated with this category
-
-        This method has been introduced in version 0.23.
-        """
+        ...
     @overload
     def each_item(self) -> Iterator[RdbItem]:
         r"""
@@ -100,6 +106,21 @@ class RdbCategory:
 
         This method has been introduced in version 0.29.
         """
+        ...
+    @overload
+    def each_item(self) -> Iterator[RdbItem]:
+        r"""
+        @brief Iterates over all items inside the database which are associated with this category
+
+        This method has been introduced in version 0.23.
+        """
+        ...
+    @overload
+    def each_sub_category(self) -> Iterator[RdbCategory]:
+        r"""
+        @brief Iterates over all sub-categories (non-const version)
+        """
+        ...
     @overload
     def each_sub_category(self) -> Iterator[RdbCategory]:
         r"""
@@ -107,33 +128,33 @@ class RdbCategory:
 
         The const version has been added in version 0.29.
         """
-    @overload
-    def each_sub_category(self) -> Iterator[RdbCategory]:
-        r"""
-        @brief Iterates over all sub-categories (non-const version)
-        """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def name(self) -> str:
         r"""
         @brief Gets the category name
         The category name is an string that identifies the category in the context of a parent category or inside the database when it is a top level category. The name is not the path name which is a path to a child category and incorporates all names of parent categories.
         @return The category name
         """
+        ...
     def num_items(self) -> int:
         r"""
         @brief Gets the number of items in this category
         The number of items includes the items in sub-categories of this category.
         """
+        ...
     def num_items_visited(self) -> int:
         r"""
         @brief Gets the number of visited items in this category
         The number of items includes the items in sub-categories of this category.
         """
+        ...
     @overload
     def parent(self) -> RdbCategory:
         r"""
@@ -142,24 +163,28 @@ class RdbCategory:
 
         The const version has been added in version 0.29.
         """
+        ...
     @overload
     def parent(self) -> RdbCategory:
         r"""
         @brief Gets the parent category of this category (non-const version)
         @return The parent category or nil if this category is a top-level category
         """
+        ...
     def path(self) -> str:
         r"""
         @brief Gets the category path
         The category path is the category name for top level categories. For child categories, the path contains the names of all parent categories separated by a dot.
         @return The path for this category
         """
+        ...
     def rdb_id(self) -> int:
         r"""
         @brief Gets the category ID
         The category ID is an integer that uniquely identifies the category. It is used for referring to a category in \RdbItem for example.
         @return The category ID
         """
+        ...
     @overload
     def scan_collection(self, cell: RdbCell, trans: db.CplxTrans, edge_pairs: db.EdgePairs, flat: Optional[bool] = ..., with_properties: Optional[bool] = ...) -> None:
         r"""
@@ -168,6 +193,7 @@ class RdbCategory:
 
         This method has been introduced in version 0.26. The 'with_properties' argument has been added in version 0.28.
         """
+        ...
     @overload
     def scan_collection(self, cell: RdbCell, trans: db.CplxTrans, edges: db.Edges, flat: Optional[bool] = ..., with_properties: Optional[bool] = ...) -> None:
         r"""
@@ -176,6 +202,7 @@ class RdbCategory:
 
         This method has been introduced in version 0.26. The 'with_properties' argument has been added in version 0.28.
         """
+        ...
     @overload
     def scan_collection(self, cell: RdbCell, trans: db.CplxTrans, region: db.Region, flat: Optional[bool] = ..., with_properties: Optional[bool] = ...) -> None:
         r"""
@@ -190,6 +217,7 @@ class RdbCategory:
 
         This method has been introduced in version 0.26. The 'with_properties' argument has been added in version 0.28.
         """
+        ...
     @overload
     def scan_collection(self, cell: RdbCell, trans: db.CplxTrans, texts: db.Texts, flat: Optional[bool] = ..., with_properties: Optional[bool] = ...) -> None:
         r"""
@@ -198,6 +226,7 @@ class RdbCategory:
 
         This method has been introduced in version 0.28.
         """
+        ...
     def scan_layer(self, layout: db.Layout, layer: int, cell: Optional[db.Cell] = ..., levels: Optional[int] = ..., with_properties: Optional[bool] = ...) -> None:
         r"""
         @brief Scans a layer from a layout into this category, starting with a given cell and a depth specification
@@ -210,6 +239,7 @@ class RdbCategory:
 
         This method has been introduced in version 0.23. The 'with_properties' argument has been added in version 0.28.
         """
+        ...
     def scan_shapes(self, iter: db.RecursiveShapeIterator, flat: Optional[bool] = ..., with_properties: Optional[bool] = ...) -> None:
         r"""
         @brief Scans the polygon or edge shapes from the shape iterator into the category
@@ -221,6 +251,8 @@ class RdbCategory:
 
         This method has been introduced in version 0.23. The flat mode argument has been added in version 0.26. The 'with_properties' argument has been added in version 0.28.
         """
+        ...
+    ...
 
 class RdbCell:
     r"""
@@ -232,33 +264,39 @@ class RdbCell:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -266,6 +304,7 @@ class RdbCell:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -273,27 +312,24 @@ class RdbCell:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def add_reference(self, ref: RdbReference) -> None:
         r"""
         @brief Adds a reference to the references of this cell
         @param ref The reference to add.
         """
+        ...
     def clear_references(self) -> None:
         r"""
         @brief Removes all references from this cell
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
-    @overload
-    def database(self) -> ReportDatabase:
-        r"""
-        @brief Gets the database object that category is associated with (non-const version)
-
-        This method has been introduced in version 0.29.
-        """
+        ...
     @overload
     def database(self) -> ReportDatabase:
         r"""
@@ -301,18 +337,29 @@ class RdbCell:
 
         This method has been introduced in version 0.23.
         """
+        ...
+    @overload
+    def database(self) -> ReportDatabase:
+        r"""
+        @brief Gets the database object that category is associated with (non-const version)
+
+        This method has been introduced in version 0.29.
+        """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     @overload
     def each_item(self) -> Iterator[RdbItem]:
         r"""
@@ -320,6 +367,7 @@ class RdbCell:
 
         This method has been introduced in version 0.23.
         """
+        ...
     @overload
     def each_item(self) -> Iterator[RdbItem]:
         r"""
@@ -327,11 +375,13 @@ class RdbCell:
 
         This method has been introduced in version 0.29.
         """
+        ...
     @overload
     def each_reference(self) -> Iterator[RdbReference]:
         r"""
         @brief Iterates over all references
         """
+        ...
     @overload
     def each_reference(self) -> Iterator[RdbReference]:
         r"""
@@ -339,12 +389,14 @@ class RdbCell:
 
         This method has been introduced in version 0.23.
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def layout_name(self) -> str:
         r"""
         @brief Gets the name of the layout cell
@@ -352,38 +404,46 @@ class RdbCell:
         @return The layout cell name
         This read-only attribute has been added in version 0.29.1.
         """
+        ...
     def name(self) -> str:
         r"""
         @brief Gets the cell name
         The cell name is an string that identifies the category in the database. Additionally, a cell may carry a variant identifier which is a string that uniquely identifies a cell in the context of its variants. The "qualified name" contains both the cell name and the variant name. Cell names are also used to identify report database cells with layout cells. For variants, the layout cell name can be specified explicitly with the \layout_name attribute (see \RdbDatabase#create_cell). The latter is available since version 0.29.1.
         @return The cell name
         """
+        ...
     def num_items(self) -> int:
         r"""
         @brief Gets the number of items for this cell
         """
+        ...
     def num_items_visited(self) -> int:
         r"""
         @brief Gets the number of visited items for this cell
         """
+        ...
     def qname(self) -> str:
         r"""
         @brief Gets the qualified name of the cell
         The qualified name is a combination of the cell name and optionally the variant name. It is used to identify the cell by name in a unique way.
         @return The qualified name
         """
+        ...
     def rdb_id(self) -> int:
         r"""
         @brief Gets the cell ID
         The cell ID is an integer that uniquely identifies the cell. It is used for referring to a cell in \RdbItem for example.
         @return The cell ID
         """
+        ...
     def variant(self) -> str:
         r"""
         @brief Gets the cell variant name
         A variant name additionally identifies the cell when multiple cells with the same name are present. A variant name is either assigned automatically or set when creating a cell.
         @return The cell variant name
         """
+        ...
+    ...
 
 class RdbItem:
     r"""
@@ -405,14 +465,17 @@ class RdbItem:
 
     This attribute has been added in version 0.29.1.
     """
-    @property
-    def image(self) -> None:
-        r"""
-        WARNING: This variable can only be set, not retrieved.
-        @brief Sets the attached image from a PixelBuffer object
+    image: QtGui.QImage_Native
+    r"""
+    Getter:
+    @brief Gets the attached image as a QImage object
 
-        This method has been added in version 0.28.
-        """
+    This method has been added in version 0.28.
+    Setter:
+    @brief Sets the attached image from a PixelBuffer object
+
+    This method has been added in version 0.28.
+    """
     image_str: str
     r"""
     Getter:
@@ -438,41 +501,49 @@ class RdbItem:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def __copy__(self) -> RdbItem:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __deepcopy__(self) -> RdbItem:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -480,6 +551,7 @@ class RdbItem:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -487,11 +559,13 @@ class RdbItem:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def add_tag(self, tag_id: int) -> None:
         r"""
         @brief Adds a tag with the given id to the item
         Each tag can be added once to the item. The tags of an item thus form a set. If a tag with that ID already exists, this method does nothing.
         """
+        ...
     @overload
     def add_value(self, shape: db.Shape, trans: db.CplxTrans) -> None:
         r"""
@@ -503,12 +577,14 @@ class RdbItem:
 
         This method has been introduced in version 0.25.3.
         """
+        ...
     @overload
     def add_value(self, value: RdbItemValue) -> None:
         r"""
         @brief Adds a value object to the values of this item
         @param value The value to add.
         """
+        ...
     @overload
     def add_value(self, value: db.DBox) -> None:
         r"""
@@ -516,6 +592,7 @@ class RdbItem:
         @param value The box to add.
         This method has been introduced in version 0.25 as a convenience method.
         """
+        ...
     @overload
     def add_value(self, value: db.DEdge) -> None:
         r"""
@@ -523,6 +600,7 @@ class RdbItem:
         @param value The edge to add.
         This method has been introduced in version 0.25 as a convenience method.
         """
+        ...
     @overload
     def add_value(self, value: db.DEdgePair) -> None:
         r"""
@@ -530,6 +608,7 @@ class RdbItem:
         @param value The edge pair to add.
         This method has been introduced in version 0.25 as a convenience method.
         """
+        ...
     @overload
     def add_value(self, value: db.DPolygon) -> None:
         r"""
@@ -537,6 +616,7 @@ class RdbItem:
         @param value The polygon to add.
         This method has been introduced in version 0.25 as a convenience method.
         """
+        ...
     @overload
     def add_value(self, value: float) -> None:
         r"""
@@ -544,6 +624,7 @@ class RdbItem:
         @param value The value to add.
         This method has been introduced in version 0.25 as a convenience method.
         """
+        ...
     @overload
     def add_value(self, value: str) -> None:
         r"""
@@ -551,57 +632,68 @@ class RdbItem:
         @param value The string to add.
         This method has been introduced in version 0.25 as a convenience method.
         """
+        ...
     def assign(self, other: RdbItem) -> None:
         r"""
         @brief Assigns another object to self
         """
+        ...
     def category_id(self) -> int:
         r"""
         @brief Gets the category ID
         Returns the ID of the category that this item is associated with.
         @return The category ID
         """
+        ...
     def cell_id(self) -> int:
         r"""
         @brief Gets the cell ID
         Returns the ID of the cell that this item is associated with.
         @return The cell ID
         """
+        ...
     def clear_values(self) -> None:
         r"""
         @brief Removes all values from this item
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def database(self) -> ReportDatabase:
         r"""
         @brief Gets the database object that item is associated with
 
         This method has been introduced in version 0.23.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def dup(self) -> RdbItem:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def each_value(self) -> Iterator[RdbItemValue]:
         r"""
         @brief Iterates over all values
         """
+        ...
     def has_image(self) -> bool:
         r"""
         @brief Gets a value indicating that the item has an image attached
@@ -609,38 +701,46 @@ class RdbItem:
 
         This method has been introduced in version 0.28.
         """
+        ...
     def has_tag(self, tag_id: int) -> bool:
         r"""
         @brief Returns a value indicating whether the item has a tag with the given ID
         @return True, if the item has a tag with the given ID
         """
+        ...
     def image_pixels(self) -> lay.PixelBuffer:
         r"""
         @brief Gets the attached image as a PixelBuffer object
 
         This method has been added in version 0.28.
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def is_visited(self) -> bool:
         r"""
         @brief Gets a value indicating whether the item was already visited
         @return True, if the item has been visited already
         """
+        ...
     def remove_tag(self, tag_id: int) -> None:
         r"""
         @brief Remove the tag with the given id from the item
         If a tag with that ID does not exists on this item, this method does nothing.
         """
+        ...
     def remove_tags(self) -> None:
         r"""
         @brief Removes all tags from the item
         This method has been introduced in version 0.29.1.
         """
+        ...
+    ...
 
 class RdbItemValue:
     r"""
@@ -671,24 +771,28 @@ class RdbItemValue:
         @brief Creates a value object from a string
         The string format is the same than obtained by the to_s method.
         """
+        ...
     @overload
     @classmethod
     def new(cls, b: db.DBox) -> RdbItemValue:
         r"""
         @brief Creates a value representing a DBox object
         """
+        ...
     @overload
     @classmethod
     def new(cls, e: db.DEdge) -> RdbItemValue:
         r"""
         @brief Creates a value representing a DEdge object
         """
+        ...
     @overload
     @classmethod
     def new(cls, ee: db.DEdgePair) -> RdbItemValue:
         r"""
         @brief Creates a value representing a DEdgePair object
         """
+        ...
     @overload
     @classmethod
     def new(cls, f: float) -> RdbItemValue:
@@ -697,6 +801,7 @@ class RdbItemValue:
 
         This variant has been introduced in version 0.24
         """
+        ...
     @overload
     @classmethod
     def new(cls, p: db.DPath) -> RdbItemValue:
@@ -705,18 +810,21 @@ class RdbItemValue:
 
         This method has been introduced in version 0.22.
         """
+        ...
     @overload
     @classmethod
     def new(cls, p: db.DPolygon) -> RdbItemValue:
         r"""
         @brief Creates a value representing a DPolygon object
         """
+        ...
     @overload
     @classmethod
     def new(cls, s: str) -> RdbItemValue:
         r"""
         @brief Creates a value representing a string
         """
+        ...
     @overload
     @classmethod
     def new(cls, t: db.DText) -> RdbItemValue:
@@ -725,29 +833,35 @@ class RdbItemValue:
 
         This method has been introduced in version 0.22.
         """
+        ...
     def __copy__(self) -> RdbItemValue:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __deepcopy__(self) -> RdbItemValue:
         r"""
         @brief Creates a copy of self
         """
+        ...
     @overload
     def __init__(self, b: db.DBox) -> None:
         r"""
         @brief Creates a value representing a DBox object
         """
+        ...
     @overload
     def __init__(self, e: db.DEdge) -> None:
         r"""
         @brief Creates a value representing a DEdge object
         """
+        ...
     @overload
     def __init__(self, ee: db.DEdgePair) -> None:
         r"""
         @brief Creates a value representing a DEdgePair object
         """
+        ...
     @overload
     def __init__(self, f: float) -> None:
         r"""
@@ -755,6 +869,7 @@ class RdbItemValue:
 
         This variant has been introduced in version 0.24
         """
+        ...
     @overload
     def __init__(self, p: db.DPath) -> None:
         r"""
@@ -762,16 +877,19 @@ class RdbItemValue:
 
         This method has been introduced in version 0.22.
         """
+        ...
     @overload
     def __init__(self, p: db.DPolygon) -> None:
         r"""
         @brief Creates a value representing a DPolygon object
         """
+        ...
     @overload
     def __init__(self, s: str) -> None:
         r"""
         @brief Creates a value representing a string
         """
+        ...
     @overload
     def __init__(self, t: db.DText) -> None:
         r"""
@@ -779,41 +897,41 @@ class RdbItemValue:
 
         This method has been introduced in version 0.22.
         """
-    def __repr__(self) -> str:
-        r"""
-        @brief Converts a value to a string
-        The string can be used by the string constructor to create another object from it.
-        @return The string
-        """
+        ...
     def __str__(self) -> str:
         r"""
         @brief Converts a value to a string
         The string can be used by the string constructor to create another object from it.
         @return The string
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -821,6 +939,7 @@ class RdbItemValue:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -828,123 +947,148 @@ class RdbItemValue:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def assign(self, other: RdbItemValue) -> None:
         r"""
         @brief Assigns another object to self
         """
+        ...
     def box(self) -> db.DBox:
         r"""
         @brief Gets the box if the value represents one.
         @return The \DBox object or nil
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def dup(self) -> RdbItemValue:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def edge(self) -> db.DEdge:
         r"""
         @brief Gets the edge if the value represents one.
         @return The \DEdge object or nil
         """
+        ...
     def edge_pair(self) -> db.DEdgePair:
         r"""
         @brief Gets the edge pair if the value represents one.
         @return The \DEdgePair object or nil
         """
+        ...
     def float(self) -> float:
         r"""
         @brief Gets the numeric value.
         @return The numeric value or 0
         This method has been introduced in version 0.24.
         """
+        ...
     def is_box(self) -> bool:
         r"""
         @brief Returns true if the value object represents a box
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def is_edge(self) -> bool:
         r"""
         @brief Returns true if the value object represents an edge
         """
+        ...
     def is_edge_pair(self) -> bool:
         r"""
         @brief Returns true if the value object represents an edge pair
         """
+        ...
     def is_float(self) -> bool:
         r"""
         @brief Returns true if the value object represents a numeric value
         This method has been introduced in version 0.24.
         """
+        ...
     def is_path(self) -> bool:
         r"""
         @brief Returns true if the value object represents a path
 
         This method has been introduced in version 0.22.
         """
+        ...
     def is_polygon(self) -> bool:
         r"""
         @brief Returns true if the value object represents a polygon
         """
+        ...
     def is_string(self) -> bool:
         r"""
         @brief Returns true if the object represents a string value
         """
+        ...
     def is_text(self) -> bool:
         r"""
         @brief Returns true if the value object represents a text
 
         This method has been introduced in version 0.22.
         """
+        ...
     def path(self) -> db.DPath:
         r"""
         @brief Gets the path if the value represents one.
         @return The \DPath object
         This method has been introduced in version 0.22.
         """
+        ...
     def polygon(self) -> db.DPolygon:
         r"""
         @brief Gets the polygon if the value represents one.
         @return The \DPolygon object
         """
+        ...
     def string(self) -> str:
         r"""
         @brief Gets the string representation of the value.
         @return The stringThis method will always deliver a valid string, even if \is_string? is false. The objects stored in the value are converted to a string accordingly.
         """
+        ...
     def text(self) -> db.DText:
         r"""
         @brief Gets the text if the value represents one.
         @return The \DText object
         This method has been introduced in version 0.22.
         """
+        ...
     def to_s(self) -> str:
         r"""
         @brief Converts a value to a string
         The string can be used by the string constructor to create another object from it.
         @return The string
         """
+        ...
+    ...
 
 class RdbReference:
     r"""
@@ -975,41 +1119,49 @@ class RdbReference:
         r"""
         @brief Creates a reference with a given transformation and parent cell ID
         """
+        ...
     def __copy__(self) -> RdbReference:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __deepcopy__(self) -> RdbReference:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __init__(self, trans: db.DCplxTrans, parent_cell_id: int) -> None:
         r"""
         @brief Creates a reference with a given transformation and parent cell ID
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -1017,6 +1169,7 @@ class RdbReference:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -1024,15 +1177,18 @@ class RdbReference:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def assign(self, other: RdbReference) -> None:
         r"""
         @brief Assigns another object to self
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     @overload
     def database(self) -> ReportDatabase:
         r"""
@@ -1040,6 +1196,7 @@ class RdbReference:
 
         This method has been introduced in version 0.29.
         """
+        ...
     @overload
     def database(self) -> ReportDatabase:
         r"""
@@ -1047,28 +1204,34 @@ class RdbReference:
 
         This method has been introduced in version 0.23.
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def dup(self) -> RdbReference:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
+    ...
 
 class ReportDatabase:
     r"""
@@ -1127,43 +1290,51 @@ class ReportDatabase:
         @param name The name of the database
         The name of the database will be used in the user interface to refer to a certain database.
         """
+        ...
     def __copy__(self) -> ReportDatabase:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __deepcopy__(self) -> ReportDatabase:
         r"""
         @brief Creates a copy of self
         """
+        ...
     def __init__(self, name: str) -> None:
         r"""
         @brief Creates a report database
         @param name The name of the database
         The name of the database will be used in the user interface to refer to a certain database.
         """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     def _destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def _destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def _is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def _manage(self) -> None:
         r"""
         @brief Marks the object as managed by the script side.
@@ -1171,6 +1342,7 @@ class ReportDatabase:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -1178,6 +1350,7 @@ class ReportDatabase:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+        ...
     def apply(self, other: ReportDatabase) -> None:
         r"""
         @brief Transfers item attributes from one database to another for identical items
@@ -1204,16 +1377,19 @@ class ReportDatabase:
 
         This method has been added in version 0.29.1.
         """
+        ...
     def assign(self, other: ReportDatabase) -> None:
         r"""
         @brief Assigns another object to self
         """
+        ...
     @overload
     def category_by_id(self, id: int) -> RdbCategory:
         r"""
         @brief Gets a category by ID
         @return The (const) category object or nil if the ID is not valid
         """
+        ...
     @overload
     def category_by_id(self, id: int) -> RdbCategory:
         r"""
@@ -1222,6 +1398,7 @@ class ReportDatabase:
 
         This non-const variant has been introduced in version 0.29.
         """
+        ...
     @overload
     def category_by_path(self, path: str) -> RdbCategory:
         r"""
@@ -1229,6 +1406,7 @@ class ReportDatabase:
         @param path The full path to the category starting from the top level (subcategories separated by dots)
         @return The (const) category object or nil if the name is not valid
         """
+        ...
     @overload
     def category_by_path(self, path: str) -> RdbCategory:
         r"""
@@ -1238,6 +1416,7 @@ class ReportDatabase:
 
         This non-const variant has been introduced in version 0.29.
         """
+        ...
     @overload
     def cell_by_id(self, id: int) -> RdbCell:
         r"""
@@ -1245,6 +1424,7 @@ class ReportDatabase:
         @param id The ID of the cell
         @return The cell object or nil if no cell with that ID exists
         """
+        ...
     @overload
     def cell_by_id(self, id: int) -> RdbCell:
         r"""
@@ -1254,6 +1434,7 @@ class ReportDatabase:
 
         This non-const variant has been added version 0.29.
         """
+        ...
     @overload
     def cell_by_qname(self, qname: str) -> RdbCell:
         r"""
@@ -1261,6 +1442,7 @@ class ReportDatabase:
         @param qname The qualified name of the cell (name plus variant name optionally)
         @return The cell object or nil if no such cell exists
         """
+        ...
     @overload
     def cell_by_qname(self, qname: str) -> RdbCell:
         r"""
@@ -1270,17 +1452,20 @@ class ReportDatabase:
 
         This non-const variant has been added version 0.29.
         """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
+        ...
     @overload
     def create_category(self, name: str) -> RdbCategory:
         r"""
         @brief Creates a new top level category
         @param name The name of the category
         """
+        ...
     @overload
     def create_category(self, parent: RdbCategory, name: str) -> RdbCategory:
         r"""
@@ -1289,12 +1474,14 @@ class ReportDatabase:
         @param name The name of the category
         Since version 0.29.1, 'parent' can be nil. In that case, a top-level category is created.
         """
+        ...
     @overload
     def create_cell(self, name: str) -> RdbCell:
         r"""
         @brief Creates a new cell
         @param name The name of the cell
         """
+        ...
     @overload
     def create_cell(self, name: str, variant: str, layout_name: Optional[str] = ...) -> RdbCell:
         r"""
@@ -1304,6 +1491,7 @@ class ReportDatabase:
         @param layout_name For variants, this is the name of the layout cell. If empty, 'name' is used for the layout cell name.
         The 'layout_name' argument has been added in version 0.29.1.
         """
+        ...
     @overload
     def create_item(self, cell: RdbCell, category: RdbCategory) -> RdbItem:
         r"""
@@ -1313,6 +1501,7 @@ class ReportDatabase:
 
         This convenience method has been added in version 0.25.
         """
+        ...
     @overload
     def create_item(self, cell_id: int, category_id: int) -> RdbItem:
         r"""
@@ -1322,6 +1511,7 @@ class ReportDatabase:
 
         A more convenient method that takes cell and category objects instead of ID's is the other version of \create_item.
         """
+        ...
     @overload
     def create_item(self, cell_id: int, category_id: int, trans: db.CplxTrans, shape: db.Shape, with_properties: Optional[bool] = ...) -> None:
         r"""
@@ -1337,6 +1527,7 @@ class ReportDatabase:
         @param trans The transformation to apply
         @param with_properties If true, user properties will be turned into tagged values as well
         """
+        ...
     @overload
     def create_items(self, cell_id: int, category_id: int, iter: db.RecursiveShapeIterator, with_properties: Optional[bool] = ...) -> None:
         r"""
@@ -1351,6 +1542,7 @@ class ReportDatabase:
         @param iter The iterator (a \RecursiveShapeIterator object) from which to take the items
         @param with_properties If true, user properties will be turned into tagged values as well
         """
+        ...
     @overload
     def create_items(self, cell_id: int, category_id: int, trans: db.CplxTrans, array: Sequence[db.EdgePair]) -> None:
         r"""
@@ -1365,6 +1557,7 @@ class ReportDatabase:
         @param trans The transformation to apply
         @param edge_pairs The list of edge_pairs for which the items are created
         """
+        ...
     @overload
     def create_items(self, cell_id: int, category_id: int, trans: db.CplxTrans, array: Sequence[db.Edge]) -> None:
         r"""
@@ -1379,6 +1572,7 @@ class ReportDatabase:
         @param trans The transformation to apply
         @param edges The list of edges for which the items are created
         """
+        ...
     @overload
     def create_items(self, cell_id: int, category_id: int, trans: db.CplxTrans, array: Sequence[db.Polygon]) -> None:
         r"""
@@ -1393,6 +1587,7 @@ class ReportDatabase:
         @param trans The transformation to apply
         @param polygons The list of polygons for which the items are created
         """
+        ...
     @overload
     def create_items(self, cell_id: int, category_id: int, trans: db.CplxTrans, edge_pairs: db.EdgePairs) -> None:
         r"""
@@ -1409,6 +1604,7 @@ class ReportDatabase:
         @param trans The transformation to apply
         @param edges The list of edge pairs (an \EdgePairs object) for which the items are created
         """
+        ...
     @overload
     def create_items(self, cell_id: int, category_id: int, trans: db.CplxTrans, edges: db.Edges) -> None:
         r"""
@@ -1425,6 +1621,7 @@ class ReportDatabase:
         @param trans The transformation to apply
         @param edges The list of edges (an \Edges object) for which the items are created
         """
+        ...
     @overload
     def create_items(self, cell_id: int, category_id: int, trans: db.CplxTrans, region: db.Region) -> None:
         r"""
@@ -1441,6 +1638,7 @@ class ReportDatabase:
         @param trans The transformation to apply
         @param region The region (a \Region object) containing the polygons for which to create items
         """
+        ...
     @overload
     def create_items(self, cell_id: int, category_id: int, trans: db.CplxTrans, shapes: db.Shapes, with_properties: Optional[bool] = ...) -> None:
         r"""
@@ -1456,27 +1654,32 @@ class ReportDatabase:
         @param trans The transformation to apply
         @param with_properties If true, user properties will be turned into tagged values as well
         """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
         Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
         If the object is not owned by the script, this method will do nothing.
         """
+        ...
     def destroyed(self) -> bool:
         r"""
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
+        ...
     def dup(self) -> ReportDatabase:
         r"""
         @brief Creates a copy of self
         """
+        ...
     @overload
     def each_category(self) -> Iterator[RdbCategory]:
         r"""
         @brief Iterates over all top-level categories
         """
+        ...
     @overload
     def each_category(self) -> Iterator[RdbCategory]:
         r"""
@@ -1484,11 +1687,13 @@ class ReportDatabase:
 
         The non-const variant has been added in version 0.29.
         """
+        ...
     @overload
     def each_cell(self) -> Iterator[RdbCell]:
         r"""
         @brief Iterates over all cells
         """
+        ...
     @overload
     def each_cell(self) -> Iterator[RdbCell]:
         r"""
@@ -1496,11 +1701,13 @@ class ReportDatabase:
 
         This non-const variant has been added version 0.29.
         """
+        ...
     @overload
     def each_item(self) -> Iterator[RdbItem]:
         r"""
         @brief Iterates over all items inside the database
         """
+        ...
     @overload
     def each_item(self) -> Iterator[RdbItem]:
         r"""
@@ -1508,12 +1715,14 @@ class ReportDatabase:
 
         This non-const variant has been added in version 0.29.
         """
+        ...
     @overload
     def each_item_per_category(self, category_id: int) -> Iterator[RdbItem]:
         r"""
         @brief Iterates over all items inside the database which are associated with the given category
         @param category_id The ID of the category for which all associated items should be retrieved
         """
+        ...
     @overload
     def each_item_per_category(self, category_id: int) -> Iterator[RdbItem]:
         r"""
@@ -1522,12 +1731,14 @@ class ReportDatabase:
 
         This non-const variant has been added in version 0.29.
         """
+        ...
     @overload
     def each_item_per_cell(self, cell_id: int) -> Iterator[RdbItem]:
         r"""
         @brief Iterates over all items inside the database which are associated with the given cell
         @param cell_id The ID of the cell for which all associated items should be retrieved
         """
+        ...
     @overload
     def each_item_per_cell(self, cell_id: int) -> Iterator[RdbItem]:
         r"""
@@ -1536,6 +1747,7 @@ class ReportDatabase:
 
         This non-const variant has been added in version 0.29.
         """
+        ...
     @overload
     def each_item_per_cell_and_category(self, cell_id: int, category_id: int) -> Iterator[RdbItem]:
         r"""
@@ -1543,6 +1755,7 @@ class ReportDatabase:
         @param cell_id The ID of the cell for which all associated items should be retrieved
         @param category_id The ID of the category for which all associated items should be retrieved
         """
+        ...
     @overload
     def each_item_per_cell_and_category(self, cell_id: int, category_id: int) -> Iterator[RdbItem]:
         r"""
@@ -1552,39 +1765,46 @@ class ReportDatabase:
 
         This non-const variant has been added in version 0.29.
         """
+        ...
     def filename(self) -> str:
         r"""
         @brief Gets the file name and path where the report database is stored
         This property is set when a database is saved or loaded. It cannot be set manually.
         @return The file name and path
         """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
+        ...
     def is_modified(self) -> bool:
         r"""
         @brief Returns a value indicating whether the database has been modified
         """
+        ...
     def load(self, filename: str) -> None:
         r"""
         @brief Loads the database from the given file
         @param filename The file from which to load the database
         The reader recognizes the format automatically and will choose the appropriate decoder. 'gzip' compressed files are uncompressed automatically.
         """
+        ...
     def name(self) -> str:
         r"""
         @brief Gets the database name
         The name of the database is supposed to identify the database within a layout view context. The name is modified to be unique when a database is entered into a layout view. @return The database name
         """
+        ...
     @overload
     def num_items(self) -> int:
         r"""
         @brief Returns the number of items inside the database
         @return The total number of items
         """
+        ...
     @overload
     def num_items(self, cell_id: int, category_id: int) -> int:
         r"""
@@ -1593,12 +1813,14 @@ class ReportDatabase:
         @param category_id The ID of the category for which to retrieve the number
         @return The total number of items for the given cell and the given category
         """
+        ...
     @overload
     def num_items_visited(self) -> int:
         r"""
         @brief Returns the number of items already visited inside the database
         @return The total number of items already visited
         """
+        ...
     @overload
     def num_items_visited(self, cell_id: int, category_id: int) -> int:
         r"""
@@ -1607,22 +1829,26 @@ class ReportDatabase:
         @param category_id The ID of the category for which to retrieve the number
         @return The total number of items visited for the given cell and the given category
         """
+        ...
     def reset_modified(self) -> None:
         r"""
         @brief Reset the modified flag
         """
+        ...
     def save(self, filename: str) -> None:
         r"""
         @brief Saves the database to the given file
         @param filename The file to which to save the database
         The database is always saved in KLayout's XML-based format.
         """
+        ...
     def set_item_visited(self, item: RdbItem, visited: bool) -> None:
         r"""
         @brief Modifies the visited state of an item
         @param item The item to modify
         @param visited True to set the item to visited state, false otherwise
         """
+        ...
     def set_tag_description(self, tag_id: int, description: str) -> None:
         r"""
         @brief Sets the tag description for the given tag ID
@@ -1630,6 +1856,7 @@ class ReportDatabase:
         @param description The description string
         See \tag_id for a details about tags.
         """
+        ...
     def tag_description(self, tag_id: int) -> str:
         r"""
         @brief Gets the tag description for the given tag ID
@@ -1637,6 +1864,7 @@ class ReportDatabase:
         @return The description string
         See \tag_id for a details about tags.
         """
+        ...
     def tag_id(self, name: str) -> int:
         r"""
         @brief Gets the tag ID for a given tag name
@@ -1646,6 +1874,7 @@ class ReportDatabase:
 
         \tag_id handles system tags while \user_tag_id handles user tags.
         """
+        ...
     def tag_name(self, tag_id: int) -> str:
         r"""
         @brief Gets the tag name for the given tag ID
@@ -1655,6 +1884,7 @@ class ReportDatabase:
 
         This method has been introduced in version 0.24.10.
         """
+        ...
     def user_tag_id(self, name: str) -> int:
         r"""
         @brief Gets the tag ID for a given user tag name
@@ -1664,10 +1894,13 @@ class ReportDatabase:
 
         This method has been added in version 0.24.
         """
+        ...
     def variants(self, name: str) -> List[int]:
         r"""
         @brief Gets the variants for a given cell name
         @param name The basic name of the cell
         @return An array of ID's representing cells that are variants for the given base name
         """
+        ...
+    ...
 

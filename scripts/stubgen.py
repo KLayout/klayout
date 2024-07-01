@@ -192,6 +192,10 @@ class Stub:
                 stub.format_stub(include_docstring=include_docstring), " " * 4
             )
 
+        if self.indent_docstring and (include_docstring or len(self.child_stubs)):
+            stub_str += "\n"
+            stub_str += indent("...", " " * 4)
+
         return stub_str
 
 
@@ -369,7 +373,8 @@ def get_py_methods(
             # Exceptions:
             # For X.__eq__(self, a:X), treat second argument as type object instead of X
             if name in ("__eq__", "__ne__"):
-                arg_list[1] = arg_list[1][0], "object"
+                if arg_list[1][1].cls() is not None and arg_list[1][1].cls().__gsi_id__ == c.__gsi_id__:
+                    arg_list[1] = arg_list[1][0], "object"
             # X._assign(self, other:X), mypy complains if _assign is defined at base class.
             # We can't specialize other in this case.
             elif name in ("_assign", "assign"):
@@ -454,6 +459,7 @@ def get_module_stubs(module: str) -> List[ClassStub]:
 def print_mod(module, dependencies):
     print("from typing import Any, ClassVar, Dict, Sequence, List, Iterator, Optional")
     print("from typing import overload")
+    print("from __future__ import annotations")
     for dep in dependencies:
       print(f"import klayout.{dep} as {dep}")
     for stub in get_module_stubs(module):

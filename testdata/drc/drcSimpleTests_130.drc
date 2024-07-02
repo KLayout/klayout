@@ -1,0 +1,54 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+end
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+
+l1.output(1, 0)
+l2.output(2, 0)
+
+l1.sized(0.0, steps(50), size_inside(l2)).output(100, 0)
+l1.sized(20.0, steps(0), size_inside(l2)).output(101, 0)
+
+l1.sized(20.0, steps(50), size_inside(l2)).output(110, 0)
+l1.sized(50.0, steps(50), size_outside(l2)).output(111, 0)
+
+l1d = l1.dup
+l1d.size(20.0, steps(50), size_inside(l2))
+l1d.output(120, 0)
+
+l1d = l1.dup
+l1d.size(50.0, steps(50), size_outside(l2))
+l1d.output(121, 0)
+
+l1.sized(10.0, 20.0, steps(50), size_inside(l2)).output(130, 0)
+l1.sized(25.0, 50.0, steps(50), size_outside(l2)).output(131, 0)
+
+error = nil
+begin
+  l2.sized(-1.0, steps(50), size_outside(l2))
+rescue
+  error = true
+end
+if !error
+  raise "error expected!"
+end
+
+error = nil
+begin
+  l2.sized(-1.0, 2.0, steps(50), size_outside(l2))
+rescue
+  error = true
+end
+if !error
+  raise "error expected!"
+end
+
+
+
+

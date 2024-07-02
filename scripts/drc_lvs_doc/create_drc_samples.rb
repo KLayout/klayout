@@ -917,6 +917,36 @@ run_demo gen, "input.sized(1.um, acute_limit)", "drc_sized6.png"
 class Gen
   def produce(s1, s2)
     pts = [ 
+      RBA::Point::new(1000, 1000),
+      RBA::Point::new(1000, 2000),
+      RBA::Point::new(2000, 2000),
+      RBA::Point::new(2000, 1000)
+    ];
+    s1.insert(RBA::Polygon::new(pts))
+    pts = [ 
+      RBA::Point::new(1000, 1000),
+      RBA::Point::new(1000, 7000),
+      RBA::Point::new(6000, 7000),
+      RBA::Point::new(6000, 1000),
+      RBA::Point::new(5000, 1000),
+      RBA::Point::new(5000, 6000),
+      RBA::Point::new(2000, 6000),
+      RBA::Point::new(2000, 1000)
+    ];
+    s2.insert(RBA::Polygon::new(pts))
+  end
+end
+
+gen = Gen::new
+
+run_demo gen, "input1.sized(1.um, steps(1), size_inside(input2))", "drc_sized_inside1.png"
+run_demo gen, "input1.sized(2.um, steps(2), size_inside(input2))", "drc_sized_inside2.png"
+run_demo gen, "input1.sized(3.um, steps(3), size_inside(input2))", "drc_sized_inside3.png"
+run_demo gen, "input1.sized(10.um, steps(10), size_inside(input2))", "drc_sized_inside4.png"
+
+class Gen
+  def produce(s1, s2)
+    pts = [ 
       RBA::Point::new(0, 0),
       RBA::Point::new(0, 1000),
       RBA::Point::new(4000, 5000),

@@ -1378,6 +1378,97 @@ AsIfFlatRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
 }
 
 RegionDelegate *
+AsIfFlatRegion::sized_inside (const Region &inside, bool outside, coord_type d, int steps, unsigned int mode) const
+{
+  return sized_inside (inside, outside, d, d, steps, mode);
+}
+
+RegionDelegate *
+AsIfFlatRegion::sized_inside (const Region &inside, bool outside, coord_type dx, coord_type dy, int steps, unsigned int mode) const
+{
+  //  empirical value
+  const int max_steps = 25;
+
+  if (steps <= 0 || empty ()) {
+    //  Nothing to do - NOTE: don't return EmptyRegion because we want to
+    //  maintain "deepness"
+    return clone ();
+  }
+
+  if (dx < 0 || dy < 0) {
+    throw tl::Exception (tl::to_string (tr ("'sized_inside' operation does not make sense with negative sizing")));
+  }
+
+  if (dx == 0 && dy == 0) {
+    steps = 1;
+  }
+
+  //  NOTE: it does not provide benefits to merge the outside region, so just don't
+  auto inside_polygons = outside ? inside.begin () : inside.begin_merged ();
+  bool inside_polygons_is_merged = outside ? inside.is_merged () : true;
+
+  auto polygons = begin_merged ();
+
+  std::unique_ptr<RegionDelegate> res (new FlatRegion ());
+  std::unique_ptr<RegionDelegate> prev;
+
+  int steps_from = 0;
+
+  while (steps > 0) {
+
+    db::Coord dx_chunk = dx, dy_chunk = dy;
+    int steps_chunk = steps;
+
+    //  We perform at most max_steps in one chunk.
+    //  This is supposed to limit the search range and merge shapes instead of creating
+    //  heavily overlapping ones.
+    if (steps > max_steps) {
+      steps_chunk = max_steps;
+      dx_chunk = db::coord_traits<db::Coord>::rounded (dx * max_steps / double (steps));
+      dy_chunk = db::coord_traits<db::Coord>::rounded (dy * max_steps / double (steps));
+    }
+
+    steps -= steps_chunk;
+    dx -= dx_chunk;
+    dy -= dy_chunk;
+
+    //  NOTE: as we merge the inside region in the inside case, we can use distance 0
+    db::Coord dist = outside ? std::max (dx_chunk, dy_chunk) : 0;
+    db::sized_inside_local_operation<db::Polygon, db::Polygon, db::Polygon> op (dx_chunk, dy_chunk, steps_chunk, mode, dist, outside, inside_polygons_is_merged);
+
+    db::local_processor<db::Polygon, db::Polygon, db::Polygon> proc;
+    proc.set_base_verbosity (base_verbosity ());
+    proc.set_description (progress_desc ());
+    proc.set_report_progress (report_progress ());
+
+    //  indicate chunk in the progress description
+    proc.set_description (proc.description (&op) + tl::sprintf (tl::to_string (tr (" (steps %d..%d)")), steps_from + 1, steps_from + steps_chunk + 1));
+    steps_from += steps_chunk;
+
+    std::vector<db::generic_shape_iterator<db::Polygon> > others;
+    others.push_back (inside_polygons);
+
+    std::vector<db::Shapes *> results;
+    db::FlatRegion *res_flat = dynamic_cast<db::FlatRegion *> (res.get ());
+    tl_assert (res_flat != 0);
+    results.push_back (&res_flat->raw_polygons ());
+    proc.run_flat (prev.get () ? prev->begin () : polygons, others, std::vector<bool> (), &op, results);
+
+    //  NOTE: in the last step we apply a polygon breaker in addition to "merge" so the
+    //  result is granular for better deep mode performance
+    if (steps > 0) {
+      prev.reset (res->merged ());
+      res.reset (new db::FlatRegion ());
+    } else {
+      res.reset (res->processed (db::PolygonBreaker (proc.max_vertex_count (), proc.area_ratio ())));
+    }
+
+  }
+
+  return res.release ();
+}
+
+RegionDelegate *
 AsIfFlatRegion::and_with (const Region &other, PropertyConstraint property_constraint) const
 {
   if (empty () || other.empty ()) {

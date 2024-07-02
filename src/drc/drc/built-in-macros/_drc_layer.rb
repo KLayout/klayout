@@ -4333,7 +4333,7 @@ CODE
               value && raise("Value already specified")
               value = @engine._make_value(a)
             else
-              raise("Parameter #" + n.to_s + " does not have an expected type")
+              raise("Parameter #" + n.to_s + " if of unexpected type")
             end
             n += 1
           end
@@ -4518,7 +4518,7 @@ CODE
           limits = [ @engine._make_numeric_value_with_nil(a.begin), @engine._make_numeric_value_with_nil(a.end) ]
           nlimits = 2
         else
-          raise("Parameter #" + n.to_s + " does not have an expected type")
+          raise("Parameter #" + n.to_s + " is of unexpected type")
         end
         n += 1
       end
@@ -4678,12 +4678,18 @@ TP_SCRIPT
     # %DRC%
     # @name sized
     # @brief Polygon sizing (per-edge biasing)
-    # @synopsis layer.sized(d [, mode])
-    # @synopsis layer.sized(dx, dy [, mode]))
+    # @synopsis layer.sized(d [, mode] [, size_inside(l) [, steps(n)]])
+    # @synopsis layer.sized(d, size_inside(l) [, steps(n)] [, mode])
+    # @synopsis layer.sized(d, size_outside(l) [, steps(n)] [, mode])
+    # @synopsis layer.sized(dx, dy [, mode])
+    # @synopsis layer.sized(dx, dy, size_inside(l) [, steps(n)] [, mode])
+    # @synopsis layer.sized(dx, dy, size_outside(l) [, steps(n)] [, mode])
     #
     # This method requires a polygon layer. It will apply a bias per edge of the polygons 
     # and return the biased layer. The layer that this method is called on is not modified.
     # 
+    # The alternative method \size works like \sized but modifies the layer it is called on.
+    #
     # In the single-value form, that bias is applied both in horizontal or vertical direction.
     # In the two-value form, the horizontal and vertical bias can be specified separately.
     # 
@@ -4711,8 +4717,6 @@ TP_SCRIPT
     # Bias values can be given as floating-point values (in micron) or integer values (in
     # database units). To explicitly specify the unit, use the unit denominators.
     #
-    # \size is working like \sized but modifies the layer it is called on.
-    #
     # The following images show the effect of various forms of the "sized" method:
     #
     # @table
@@ -4729,14 +4733,58 @@ TP_SCRIPT
     #     @td @img(/images/drc_sized6.png) @/td
     #   @/tr
     # @/table
+    #
+    # The "size_inside" option and the "steps" option implement incremental size. Incremental
+    # size means that the sizing value is applied in n steps. Between the steps, the sized
+    # shape is confined to the "size_inside" layer by means of a boolean "AND" operation.
+    # 
+    # This scheme is used to implement latch-up rules where a device active region has to 
+    # be close to a well tap. By using the well layer as the "size_inside" layer, the size function
+    # follows the well contours. The steps have to selected such that the per-step size value
+    # is smaller than the minimum space of the well shapes. With that, the sized shapes will
+    # not cross over to neighbor well regions. Specifically, the per-step size has to be less
+    # than about 70% of the minimum space to account for the minimum corner-to-corner case
+    # with Euclidian space measurements.
+    #
+    # "size_inside" and "steps" can be used with positive sizing values only.
+    # A steps value of 0 will not execute any sizing at all.
+    #
+    # "size_outside" acts like "size_inside", but instead of confining the sized region to the
+    # inside of the given layer, it is confined to be outside of that layer. Technically,
+    # a boolean "NOT" is performed instead of a boolean "AND".
+    #
+    # An example for the "size_inside" option is this:
+    #
+    # @code
+    #  ntap.sized(30.um, size_inside(nwell), steps(100))
+    # @/code
+    #
+    # The effect of the "size_inside" option is shown here:
+    # 
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_sized_inside1.png) @/td
+    #     @td @img(/images/drc_sized_inside2.png) @/td
+    #   @/tr
+    #   @tr 
+    #     @td @img(/images/drc_sized_inside3.png) @/td
+    #     @td @img(/images/drc_sized_inside4.png) @/td
+    #   @/tr
+    # @/table
+    #
     
     # %DRC%
     # @name size
     # @brief Polygon sizing (per-edge biasing, modifies the layer)
     # @synopsis layer.size(d [, mode])
-    # @synopsis layer.size(dx, dy [, mode]))
+    # @synopsis layer.size(d, size_inside(l) [, steps(n)] [, mode])
+    # @synopsis layer.size(d, size_outside(l) [, steps(n)] [, mode])
+    # @synopsis layer.size(dx, dy [, mode])
+    # @synopsis layer.size(dx, dy, size_inside(l) [, steps(n)] [, mode])
+    # @synopsis layer.size(dx, dy, size_outside(l) [, steps(n)] [, mode])
     #
-    # See \sized. The size method basically does the same but modifies the layer
+    # See \sized for a description of the options.
+    # The size method basically does the same but modifies the layer
     # it is called on. The input layer is returned and available for further processing.
     
     %w(size sized).each do |f|
@@ -4749,8 +4797,13 @@ TP_SCRIPT
           
           dist = 0
           
+          steps = nil
+          inside = nil
+          outside = nil
           mode = 2
           values = []
+
+          n = 1
           args.each do |a|
             if a.is_a?(1.class) || a.is_a?(Float)
               v = @engine._make_value(a)
@@ -4758,10 +4811,62 @@ TP_SCRIPT
               values.push(v)
             elsif a.is_a?(DRCSizingMode)
               mode = a.value
+            elsif a.is_a?(DRCSizingSteps)
+              steps = a.value
+            elsif a.is_a?(DRCSizingInside)
+              inside = a.value
+            elsif a.is_a?(DRCSizingOutside)
+              outside = a.value
+            else
+              raise("Parameter #" + n.to_s + " is of unexpected type")
             end
+            n += 1
           end
           
           aa = []
+
+          f_size = :size
+          f_sized = :sized
+
+          if inside && outside
+            raise "Cannot use 'inside' and 'outside' together"
+          end
+
+          if steps 
+            if !inside && !outside
+              raise "'steps' is only allowed with 'inside'"
+            end
+            if !steps.is_a?(1.class)
+              raise "'steps' must be an integer value"
+            end
+          end
+
+          if inside || outside
+
+            if inside
+
+              inside.is_a?(DRCLayer) || raise("'inside' argument needs to be a DRC layer")
+              inside.data.is_a?(RBA::Region) || raise("'inside' requires a polygon layer")
+              aa.push(inside.data)
+
+              f_size = :size_inside
+              f_sized = :sized_inside
+
+            else
+
+              outside.is_a?(DRCLayer) || raise("'outside' argument needs to be a DRC layer")
+              outside.data.is_a?(RBA::Region) || raise("'outside' requires a polygon layer")
+              aa.push(outside.data)
+
+              f_size = :size_outside
+              f_sized = :sized_outside
+
+            end
+
+            steps ||= 1
+
+          end
+            
           if values.size < 1
             raise "Method requires one or two sizing values"
           elsif values.size > 2
@@ -4771,17 +4876,21 @@ TP_SCRIPT
             aa.push(values[-1])
           end
           
+          if inside || outside
+            aa.push(steps)
+          end
+
           aa.push(mode)
-          
+
           if :#{f} == :size && @engine.is_tiled?
             # in tiled mode, no modifying versions are available
-            self.data = @engine._tcmd(self.data, dist, RBA::Region, :sized, *aa)
+            self.data = @engine._tcmd(self.data, dist, RBA::Region, f_sized, *aa)
             self
           elsif :#{f} == :size 
-            @engine._tcmd(self.data, dist, RBA::Region, :#{f}, *aa)
+            @engine._tcmd(self.data, dist, RBA::Region, f_size, *aa)
             self
           else 
-            DRCLayer::new(@engine, @engine._tcmd(self.data, dist, RBA::Region, :#{f}, *aa))
+            DRCLayer::new(@engine, @engine._tcmd(self.data, dist, RBA::Region, f_sized, *aa))
           end
           
         end

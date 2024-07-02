@@ -464,6 +464,38 @@ private:
 typedef two_bool_and_not_local_operation_with_properties<db::PolygonRef, db::PolygonRef, db::PolygonRef> TwoBoolAndNotLocalOperationWithProperties;
 
 /**
+ *  @brief Implements "sized_inside"
+ */
+template <class TS, class TI, class TR>
+class DB_PUBLIC sized_inside_local_operation
+  : public local_operation<TS, TI, TR>
+{
+public:
+  sized_inside_local_operation (db::Coord dx, db::Coord dy, int steps, unsigned int mode, db::Coord dist, bool outside, bool inside_is_merged);
+
+  virtual db::Coord dist () const;
+  virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
+  virtual std::string description () const;
+
+  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, const db::LocalProcessorBase * /*proc*/) const;
+
+  virtual const db::TransformationReducer *vars () const
+  {
+    return m_dx != m_dy ? (const db::TransformationReducer *) &m_vars_anisotropic : (const db::TransformationReducer *) &m_vars_isotropic;
+  }
+
+private:
+  db::Coord m_dx, m_dy;
+  db::Coord m_dist;
+  int m_steps;
+  unsigned int m_mode;
+  bool m_outside;
+  bool m_inside_is_merged;
+  db::MagnificationAndOrientationReducer m_vars_anisotropic;
+  db::MagnificationReducer m_vars_isotropic;
+};
+
+/**
  *  @brief Implements a merge operation with an overlap count
  *  With a given wrap_count, the result will only contains shapes where
  *  the original shapes overlap at least "wrap_count" times.

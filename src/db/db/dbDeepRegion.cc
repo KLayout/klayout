@@ -1884,6 +1884,98 @@ DeepRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
   return res.release ();
 }
 
+RegionDelegate *
+DeepRegion::sized_inside (const Region &inside, bool outside, coord_type d, int steps, unsigned int mode) const
+{
+  return sized_inside (inside, outside, d, d, steps, mode);
+}
+
+RegionDelegate *
+DeepRegion::sized_inside (const Region &inside, bool outside, coord_type dx, coord_type dy, int steps, unsigned int mode) const
+{
+  //  empirical value
+  const int max_steps = 25;
+
+  if (steps <= 0 || empty ()) {
+    //  Nothing to do - NOTE: don't return EmptyRegion because we want to
+    //  maintain "deepness"
+    return clone ();
+  }
+
+  if (dx < 0 || dy < 0) {
+    throw tl::Exception (tl::to_string (tr ("'sized_inside' operation does not make sense with negative sizing")));
+  }
+
+  if (dx == 0 && dy == 0) {
+    steps = 1;
+  }
+
+  const db::DeepRegion *inside_deep = dynamic_cast<const db::DeepRegion *> (inside.delegate ());
+  if (! inside_deep) {
+    return db::AsIfFlatRegion::sized_inside (inside, outside, dx, dy, steps, mode);
+  }
+
+  //  NOTE: it does not provide benefits to merge the outside region, so just don't
+  const db::DeepLayer &inside_polygons = outside ? inside_deep->deep_layer () : inside_deep->merged_deep_layer ();
+  bool inside_polygons_is_merged = outside ? inside_deep->is_merged () : true;
+
+  const db::DeepLayer &polygons = merged_deep_layer ();
+
+  std::unique_ptr<db::DeepRegion> res (new db::DeepRegion (polygons.derived ()));
+  std::unique_ptr<db::DeepRegion> prev;
+
+  int steps_from = 0;
+
+  while (steps > 0) {
+
+    db::Coord dx_chunk = dx, dy_chunk = dy;
+    int steps_chunk = steps;
+
+    //  We perform at most max_steps in one chunk.
+    //  This is supposed to limit the search range and merge shapes instead of creating
+    //  heavily overlapping ones.
+    if (steps > max_steps) {
+      steps_chunk = max_steps;
+      dx_chunk = db::coord_traits<db::Coord>::rounded (dx * max_steps / double (steps));
+      dy_chunk = db::coord_traits<db::Coord>::rounded (dy * max_steps / double (steps));
+    }
+
+    steps -= steps_chunk;
+    dx -= dx_chunk;
+    dy -= dy_chunk;
+
+    //  NOTE: as we merge the inside region in the inside case, we can use distance 0
+    db::Coord dist = outside ? std::max (dx_chunk, dy_chunk) : 0;
+    db::sized_inside_local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef> op (dx_chunk, dy_chunk, steps_chunk, mode, dist, outside, inside_polygons_is_merged);
+
+    db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &inside_polygons.layout (), &inside_polygons.initial_cell (), polygons.breakout_cells (), inside_polygons.breakout_cells ());
+    configure_proc (proc);
+    proc.set_threads (polygons.store ()->threads ());
+    proc.set_area_ratio (polygons.store ()->max_area_ratio ());
+    proc.set_max_vertex_count (polygons.store ()->max_vertex_count ());
+
+    //  indicate chunk in the progress description
+    proc.set_description (proc.description (&op) + tl::sprintf (tl::to_string (tr (" (steps %d..%d)")), steps_from + 1, steps_from + steps_chunk + 1));
+    steps_from += steps_chunk;
+
+    proc.run (&op, prev.get () ? prev->deep_layer ().layer () : polygons.layer (), inside_polygons.layer (), res->deep_layer ().layer ());
+
+    //  NOTE: in the last step we apply a polygon breaker in addition to "merge" so the
+    //  result is granular for better deep mode performance
+    if (steps > 0) {
+      prev.reset (dynamic_cast<db::DeepRegion *> (res->merged ()));
+      tl_assert (prev.get () != 0);
+      res.reset (new db::DeepRegion (polygons.derived ()));
+    } else {
+      res.reset (dynamic_cast<db::DeepRegion *> (res->processed (db::PolygonBreaker (proc.max_vertex_count (), proc.area_ratio ()))));
+      tl_assert (res.get () != 0);
+    }
+
+  }
+
+  return res.release ();
+}
+
 template <class TR, class Output>
 static
 Output *region_cop_impl (DeepRegion *region, db::CompoundRegionOperationNode &node)

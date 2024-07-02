@@ -1,3 +1,31 @@
+0.29.3           (2024-07-02):
+* Enhancement: %GITHUB%/issues/1655 Marker object lifetime management
+* Bug: %GITHUB%/issues/1743 strmxor shows no difference, klayout xor shows 85
+* Bug: %GITHUB%/issues/1757 Fixed memory issue
+* Enhancement: %GITHUB%/issues/1741 Tooltip strings for PCell parameters
+* Enhancement: %GITHUB%/issues/1747 Transformations on negative floats/ints
+* Bug: %GITHUB%/issues/1751 Code sanity issue fixed
+* Bug: %GITHUB%/issues/1750 Code sanity issue fixed
+* Bug: %GITHUB%/issues/1733 Instance selecion in object properties does not match with view port object highlight
+* Enhancement: DRC - step-wise size with "inside" and "outside" constraint
+  This feature is handy for implementing latch-up rules more efficiently.
+* Bugfix: OASIS reader - avoiding slight rounding of DBU In python read/write cycle (discussion-2526)
+* Bugfix: Proper tracking of references of RecursiveShapeIterator.
+  Related to issue #1742, but not directly.
+* Bugfix: Symlinks in the salt paths might have lead to macro duplication
+* Bugfix: Ruby binding - "return" inside block was behaving like "break".
+  Now, "return" will leave the current function.
+* Enhancement: LVS layer naming now also accepts an optional layer/datatype information.
+* Enhancement: XOR performance enhanced in deep mode for "almost same"
+  inputs.
+* Bugfix: Macro debugger now does not prevent paint events and 
+  screen refresh should work while debugging. In addition, the debugger
+  does not deadlock the desktop when using the help browser's search
+  function. Side effects are yet unknown - maybe debugging Qt event
+  handlers now becomes less stable.
+* Bugfix: During modal dialogs, the debugger's run/stop and step buttons
+  were not working.
+  
 0.29.2           (2024-06-06):
 * Enhancement: %GITHUB%/issues/1724 Don't read duplicate LEF files
 * Bug: %GITHUB%/issues/1722 [macOS] Crash when opening layout having Custom Macro Menus

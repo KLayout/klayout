@@ -1945,6 +1945,165 @@ template class DB_PUBLIC two_bool_and_not_local_operation_with_properties<db::Po
 template class DB_PUBLIC two_bool_and_not_local_operation_with_properties<db::Polygon, db::Polygon, db::Polygon>;
 
 // ---------------------------------------------------------------------------------------------
+// sized_inside_local_operation implementation
+
+template <class TS, class TI, class TR>
+sized_inside_local_operation<TS, TI, TR>::sized_inside_local_operation (db::Coord dx, db::Coord dy, int steps, unsigned int mode, db::Coord dist, bool outside, bool inside_is_merged)
+  : m_dx (dx), m_dy (dy), m_dist (dist), m_steps (steps), m_mode (mode), m_outside (outside), m_inside_is_merged (inside_is_merged)
+{
+  //  .. nothing yet ..
+}
+
+template <class TS, class TI, class TR>
+db::Coord
+sized_inside_local_operation<TS, TI, TR>::dist () const
+{
+  return m_dist;
+}
+
+template <class TS, class TI, class TR>
+OnEmptyIntruderHint
+sized_inside_local_operation<TS, TI, TR>::on_empty_intruder_hint () const
+{
+  return m_outside ? Ignore : Drop;
+}
+
+template <class TS, class TI, class TR>
+std::string
+sized_inside_local_operation<TS, TI, TR>::description () const
+{
+  return tl::to_string (tr ("Sized inside"));
+}
+
+template <class TS, class TI, class TR>
+void
+sized_inside_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, const db::LocalProcessorBase *proc) const
+{
+  tl_assert (results.size () == 1);
+  std::unordered_set<TR> &result = results.front ();
+
+  double mag = 1.0;
+  double angle = 1.0;
+  if (proc->vars ()) {
+    const db::ICplxTrans &tr = proc->vars ()->single_variant_transformation (subject_cell->cell_index ());
+    mag = tr.mag ();
+    angle = tr.angle ();
+  }
+
+  double dx_with_mag = m_dx / mag;
+  double dy_with_mag = m_dy / mag;
+  if (fabs (angle - 90.0) < 45.0) {
+    //  TODO: how to handle x/y swapping on arbitrary angles?
+    std::swap (dx_with_mag, dy_with_mag);
+  }
+
+  //  collect subjects and intruder shapes
+
+  std::vector<db::Polygon> subjects;
+  std::set<const TI *> inside;
+
+  for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+    for (typename shape_interactions<TS, TI>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+      inside.insert (&interactions.intruder_shape (*j).second);
+    }
+  }
+
+  //  For empty intruders we can optimize the size sequence to a single step
+  //  (NOTE: this is not strictly true as it ignores effects due to corner clipping
+  //  which can be accumulative)
+  int steps = inside.empty () ? 1 : m_steps;
+
+  //  Merge the inside region shapes as we are going to use them multiple times
+  std::vector<db::Edge> inside_merged;
+  if (inside.size () > 1 && ! m_inside_is_merged && m_steps > 1) {
+
+    db::EdgeProcessor ep;
+    db::SimpleMerge op;
+    db::EdgeContainer ec (inside_merged);
+
+    db::EdgeProcessor::property_type p = 0;
+    for (auto i = inside.begin (); i != inside.end (); ++i, ++p) {
+      ep.insert (**i, p);
+    }
+    ep.process (ec, op);
+
+    inside.clear ();
+
+  }
+
+  for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+    subjects.push_back (db::Polygon ());
+    interactions.subject_shape (i->first).instantiate (subjects.back ());
+  }
+
+  //  prepare the edge processors involved
+
+  db::EdgeProcessor ep_and;
+  ep_and.set_base_verbosity (50);
+
+  //  the main sizing loop
+
+  db::Coord sx_last = 0, sy_last = 0;
+
+  for (int step = 0; step < steps && ! subjects.empty (); ++step) {
+
+    db::Coord sx = db::coord_traits<db::Coord>::rounded (dx_with_mag * (step + 1) / double (steps));
+    db::Coord sy = db::coord_traits<db::Coord>::rounded (dy_with_mag * (step + 1) / double (steps));
+    db::Coord dx = sx - sx_last;
+    db::Coord dy = sy - sy_last;
+    sx_last = sx;
+    sy_last = sy;
+
+    if (! inside.empty () || ! inside_merged.empty ()) {
+
+      ep_and.clear ();
+
+      db::EdgesToEdgeProcessor e2ep (ep_and, 0);
+      db::SizingPolygonFilter siz (e2ep, dx, dy, m_mode);
+      for (auto i = subjects.begin (); i != subjects.end (); ++i) {
+        siz.put (*i);
+      }
+
+      db::EdgeProcessor::property_type p = 1;
+      for (auto i = inside.begin (); i != inside.end (); ++i) {
+        ep_and.insert (**i, p);
+        p += 2;
+      }
+      for (auto i = inside_merged.begin (); i != inside_merged.end (); ++i) {
+        ep_and.insert (*i, p);
+      }
+
+      db::PolygonContainer pc (subjects, true /*clear*/);
+      db::PolygonGenerator pg (pc, false /*don't resolve holes*/, false /*min. coherence*/);
+      db::BooleanOp op (m_outside ? db::BooleanOp::ANotB : db::BooleanOp::And);
+      ep_and.process (pg, op);
+
+    } else {
+
+      std::vector<db::Polygon> sized_subjects;
+      db::PolygonContainer pc (sized_subjects, true /*clear*/);
+      db::PolygonGenerator pg (pc, false /*don't resolve holes*/, false /*min. coherence*/);
+      db::SizingPolygonFilter siz (pg, dx, dy, m_mode);
+      for (auto i = subjects.begin (); i != subjects.end (); ++i) {
+        siz.put (*i);
+      }
+
+      sized_subjects.swap (subjects);
+
+    }
+
+  }
+
+  db::polygon_ref_generator<TR> gen (layout, result);
+  for (auto i = subjects.begin (); i != subjects.end (); ++i) {
+    gen.put (*i);
+  }
+}
+
+template class DB_PUBLIC sized_inside_local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC sized_inside_local_operation<db::Polygon, db::Polygon, db::Polygon>;
+
+// ---------------------------------------------------------------------------------------------
 
 SelfOverlapMergeLocalOperation::SelfOverlapMergeLocalOperation (unsigned int wrap_count)
   : m_wrap_count (wrap_count)

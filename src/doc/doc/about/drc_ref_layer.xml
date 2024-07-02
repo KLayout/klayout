@@ -3056,22 +3056,33 @@ The following images shows the effect of some rectangle filter modes:
 <p>Usage:</p>
 <ul>
 <li><tt>layer.size(d [, mode])</tt></li>
-<li><tt>layer.size(dx, dy [, mode]))</tt></li>
+<li><tt>layer.size(d, size_inside(l) [, steps(n)] [, mode])</tt></li>
+<li><tt>layer.size(d, size_outside(l) [, steps(n)] [, mode])</tt></li>
+<li><tt>layer.size(dx, dy [, mode])</tt></li>
+<li><tt>layer.size(dx, dy, size_inside(l) [, steps(n)] [, mode])</tt></li>
+<li><tt>layer.size(dx, dy, size_outside(l) [, steps(n)] [, mode])</tt></li>
 </ul>
 <p>
-See <a href="#sized">sized</a>. The size method basically does the same but modifies the layer
+See <a href="#sized">sized</a> for a description of the options.
+The size method basically does the same but modifies the layer
 it is called on. The input layer is returned and available for further processing.
 </p>
 <a name="sized"/><h2>"sized" - Polygon sizing (per-edge biasing)</h2>
 <keyword name="sized"/>
 <p>Usage:</p>
 <ul>
-<li><tt>layer.sized(d [, mode])</tt></li>
-<li><tt>layer.sized(dx, dy [, mode]))</tt></li>
+<li><tt>layer.sized(d [, mode] [, size_inside(l) [, steps(n)]])</tt></li>
+<li><tt>layer.sized(d, size_inside(l) [, steps(n)] [, mode])</tt></li>
+<li><tt>layer.sized(d, size_outside(l) [, steps(n)] [, mode])</tt></li>
+<li><tt>layer.sized(dx, dy [, mode])</tt></li>
+<li><tt>layer.sized(dx, dy, size_inside(l) [, steps(n)] [, mode])</tt></li>
+<li><tt>layer.sized(dx, dy, size_outside(l) [, steps(n)] [, mode])</tt></li>
 </ul>
 <p>
 This method requires a polygon layer. It will apply a bias per edge of the polygons 
 and return the biased layer. The layer that this method is called on is not modified.
+</p><p>
+The alternative method <a href="#size">size</a> works like <a href="#sized">sized</a> but modifies the layer it is called on.
 </p><p>
 In the single-value form, that bias is applied both in horizontal or vertical direction.
 In the two-value form, the horizontal and vertical bias can be specified separately.
@@ -3100,8 +3111,6 @@ layer.sized(300.nm).raw.merged(2)
 Bias values can be given as floating-point values (in micron) or integer values (in
 database units). To explicitly specify the unit, use the unit denominators.
 </p><p>
-<a href="#size">size</a> is working like <a href="#sized">sized</a> but modifies the layer it is called on.
-</p><p>
 The following images show the effect of various forms of the "sized" method:
 </p><p>
 <table>
@@ -3116,6 +3125,44 @@ The following images show the effect of various forms of the "sized" method:
 <tr>
 <td><img src="/images/drc_sized5.png"/></td>
 <td><img src="/images/drc_sized6.png"/></td>
+</tr>
+</table>
+</p><p>
+The "size_inside" option and the "steps" option implement incremental size. Incremental
+size means that the sizing value is applied in n steps. Between the steps, the sized
+shape is confined to the "size_inside" layer by means of a boolean "AND" operation.
+</p><p>
+This scheme is used to implement latch-up rules where a device active region has to 
+be close to a well tap. By using the well layer as the "size_inside" layer, the size function
+follows the well contours. The steps have to selected such that the per-step size value
+is smaller than the minimum space of the well shapes. With that, the sized shapes will
+not cross over to neighbor well regions. Specifically, the per-step size has to be less
+than about 70% of the minimum space to account for the minimum corner-to-corner case
+with Euclidian space measurements.
+</p><p>
+"size_inside" and "steps" can be used with positive sizing values only.
+A steps value of 0 will not execute any sizing at all.
+</p><p>
+"size_outside" acts like "size_inside", but instead of confining the sized region to the
+inside of the given layer, it is confined to be outside of that layer. Technically,
+a boolean "NOT" is performed instead of a boolean "AND".
+</p><p>
+An example for the "size_inside" option is this:
+</p><p>
+<pre>
+ntap.sized(30.um, size_inside(nwell), steps(100))
+</pre>
+</p><p>
+The effect of the "size_inside" option is shown here:
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_sized_inside1.png"/></td>
+<td><img src="/images/drc_sized_inside2.png"/></td>
+</tr>
+<tr>
+<td><img src="/images/drc_sized_inside3.png"/></td>
+<td><img src="/images/drc_sized_inside4.png"/></td>
 </tr>
 </table>
 </p>

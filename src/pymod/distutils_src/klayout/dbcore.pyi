@@ -335,6 +335,16 @@ class Box:
         Returns true, if this box and the given box are not equal 
         """
         ...
+    def __repr__(self, dbu: Optional[float] = ...) -> str:
+        r"""
+        @brief Returns a string representing this box
+
+        This string can be turned into a box again by using \from_s
+        . If a DBU is given, the output units will be micrometers.
+
+        The DBU argument has been added in version 0.27.6.
+        """
+        ...
     @overload
     def __rmul__(self, box: Box) -> Box:
         r"""
@@ -3082,6 +3092,13 @@ class CellInstArray:
         @brief Compares two arrays for inequality
         """
         ...
+    def __repr__(self) -> str:
+        r"""
+        @brief Converts the array to a string
+
+        This method was introduced in version 0.22.
+        """
+        ...
     def __str__(self) -> str:
         r"""
         @brief Converts the array to a string
@@ -5525,6 +5542,11 @@ class Connectivity:
         @brief Creates a new object of this class
         """
         ...
+    def __repr__(self) -> str:
+        r"""
+        @hide
+        """
+        ...
     def __str__(self) -> str:
         r"""
         @hide
@@ -6216,6 +6238,15 @@ class CplxTrans:
     def __ne__(self, other: object) -> bool:
         r"""
         @brief Tests for inequality
+        """
+        ...
+    def __repr__(self, lazy: Optional[bool] = ..., dbu: Optional[float] = ...) -> str:
+        r"""
+        @brief String conversion
+        If 'lazy' is true, some parts are omitted when not required.
+        If a DBU is given, the output units will be micrometers.
+
+        The lazy and DBU arguments have been added in version 0.27.6.
         """
         ...
     @overload
@@ -6984,6 +7015,16 @@ class DBox:
         r"""
         @brief Returns true if this box is not equal to the other box
         Returns true, if this box and the given box are not equal 
+        """
+        ...
+    def __repr__(self, dbu: Optional[float] = ...) -> str:
+        r"""
+        @brief Returns a string representing this box
+
+        This string can be turned into a box again by using \from_s
+        . If a DBU is given, the output units will be micrometers.
+
+        The DBU argument has been added in version 0.27.6.
         """
         ...
     @overload
@@ -7842,6 +7883,11 @@ class DCellInstArray:
         @brief Compares two arrays for inequality
         """
         ...
+    def __repr__(self) -> str:
+        r"""
+        @brief Converts the array to a string
+        """
+        ...
     def __str__(self) -> str:
         r"""
         @brief Converts the array to a string
@@ -8575,6 +8621,15 @@ class DCplxTrans:
         @brief Tests for inequality
         """
         ...
+    def __repr__(self, lazy: Optional[bool] = ..., dbu: Optional[float] = ...) -> str:
+        r"""
+        @brief String conversion
+        If 'lazy' is true, some parts are omitted when not required.
+        If a DBU is given, the output units will be micrometers.
+
+        The lazy and DBU arguments have been added in version 0.27.6.
+        """
+        ...
     @overload
     def __rmul__(self, box: DBox) -> DBox:
         r"""
@@ -9225,6 +9280,14 @@ class DEdge:
         r"""
         @brief Inequality test
         @param e The object to compare against
+        """
+        ...
+    def __repr__(self, dbu: Optional[float] = ...) -> str:
+        r"""
+        @brief Returns a string representing the edge
+         If a DBU is given, the output units will be micrometers.
+
+        The DBU argument has been added in version 0.27.6.
         """
         ...
     def __rmul__(self, scale_factor: float) -> DEdge:
@@ -9975,6 +10038,14 @@ class DEdgePair:
         This method has been introduced in version 0.25.
         """
         ...
+    def __repr__(self, dbu: Optional[float] = ...) -> str:
+        r"""
+        @brief Returns a string representing the edge pair
+         If a DBU is given, the output units will be micrometers.
+
+        The DBU argument has been added in version 0.27.6.
+        """
+        ...
     def __str__(self, dbu: Optional[float] = ...) -> str:
         r"""
         @brief Returns a string representing the edge pair
@@ -10454,6 +10525,11 @@ class DPath:
         @param p The object to compare against
         """
         ...
+    def __repr__(self) -> str:
+        r"""
+        @brief Convert to a string
+        """
+        ...
     def __rmul__(self, f: float) -> DPath:
         r"""
         @brief Scaling by some factor
@@ -10931,6 +11007,14 @@ class DPoint:
         This method has been added in version 0.23.
         """
         ...
+    def __repr__(self, dbu: Optional[float] = ...) -> str:
+        r"""
+        @brief String conversion.
+        If a DBU is given, the output units will be micrometers.
+
+        The DBU argument has been added in version 0.27.6.
+        """
+        ...
     def __rmul__(self, f: float) -> DPoint:
         r"""
         @brief Scaling by some factor
@@ -11331,6 +11415,11 @@ class DPolygon:
         r"""
         @brief Returns a value indicating whether the polygons are not equal
         @param p The object to compare against
+        """
+        ...
+    def __repr__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
         """
         ...
     def __rmul__(self, f: float) -> DPolygon:
@@ -12172,6 +12261,11 @@ class DSimplePolygon:
         @param p The object to compare against
         """
         ...
+    def __repr__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
     def __rmul__(self, f: float) -> DSimplePolygon:
         r"""
         @brief Scales the polygon by some factor
@@ -12726,8 +12820,7 @@ class DText:
     Setter:
     @brief Sets the vertical alignment
 
-    This property specifies how the text is aligned relative to the anchor point. 
-    This property has been introduced in version 0.22 and extended to enums in 0.28.
+    This is the version accepting integer values. It's provided for backward compatibility.
     """
     x: float
     r"""
@@ -12896,6 +12989,14 @@ class DText:
 
 
         Return true, if this text object and the given text are not equal 
+        """
+        ...
+    def __repr__(self, dbu: Optional[float] = ...) -> str:
+        r"""
+        @brief Converts the object to a string.
+        If a DBU is given, the output units will be micrometers.
+
+        The DBU argument has been added in version 0.27.6.
         """
         ...
     def __str__(self, dbu: Optional[float] = ...) -> str:
@@ -13584,6 +13685,14 @@ class DTrans:
         @brief Tests for inequality
         """
         ...
+    def __repr__(self, dbu: Optional[float] = ...) -> str:
+        r"""
+        @brief String conversion
+        If a DBU is given, the output units will be micrometers.
+
+        The DBU argument has been added in version 0.27.6.
+        """
+        ...
     @overload
     def __rmul__(self, box: DBox) -> DBox:
         r"""
@@ -14127,6 +14236,14 @@ class DVector:
 
 
         Returns a new vector with -x,-y.
+        """
+        ...
+    def __repr__(self, dbu: Optional[float] = ...) -> str:
+        r"""
+        @brief String conversion
+        If a DBU is given, the output units will be micrometers.
+
+        The DBU argument has been added in version 0.27.6.
         """
         ...
     @overload
@@ -18084,6 +18201,14 @@ class Edge:
         @param e The object to compare against
         """
         ...
+    def __repr__(self, dbu: Optional[float] = ...) -> str:
+        r"""
+        @brief Returns a string representing the edge
+         If a DBU is given, the output units will be micrometers.
+
+        The DBU argument has been added in version 0.27.6.
+        """
+        ...
     def __rmul__(self, scale_factor: float) -> Edge:
         r"""
         @brief Scale edge
@@ -19455,6 +19580,14 @@ class EdgePair:
         This method has been introduced in version 0.25.
         """
         ...
+    def __repr__(self, dbu: Optional[float] = ...) -> str:
+        r"""
+        @brief Returns a string representing the edge pair
+         If a DBU is given, the output units will be micrometers.
+
+        The DBU argument has been added in version 0.27.6.
+        """
+        ...
     def __str__(self, dbu: Optional[float] = ...) -> str:
         r"""
         @brief Returns a string representing the edge pair
@@ -20603,6 +20736,12 @@ class EdgePairs(ShapeCollection):
         The count is computed 'as if flat', i.e. edge pairs inside a cell are multiplied by the number of times a cell is instantiated.
 
         Starting with version 0.27, the method is called 'count' for consistency with \Region. 'size' is still provided as an alias.
+        """
+        ...
+    def __repr__(self) -> str:
+        r"""
+        @brief Converts the edge pair collection to a string
+        The length of the output is limited to 20 edge pairs to avoid giant strings on large regions. For full output use "to_s" with a maximum count parameter.
         """
         ...
     def __str__(self) -> str:
@@ -23665,6 +23804,12 @@ class Edges(ShapeCollection):
 
         The boolean OR is implemented by merging the edges of both edge sets. To simply join the edge collections without merging, the + operator is more efficient.
         The 'or' alias has been introduced in version 0.28.12.
+        """
+        ...
+    def __repr__(self) -> str:
+        r"""
+        @brief Converts the edge collection to a string
+        The length of the output is limited to 20 edges to avoid giant strings on large regions. For full output use "to_s" with a maximum count parameter.
         """
         ...
     def __str__(self) -> str:
@@ -26834,6 +26979,15 @@ class ICplxTrans:
         @brief Tests for inequality
         """
         ...
+    def __repr__(self, lazy: Optional[bool] = ..., dbu: Optional[float] = ...) -> str:
+        r"""
+        @brief String conversion
+        If 'lazy' is true, some parts are omitted when not required.
+        If a DBU is given, the output units will be micrometers.
+
+        The lazy and DBU arguments have been added in version 0.27.6.
+        """
+        ...
     @overload
     def __rmul__(self, box: Box) -> Box:
         r"""
@@ -27458,6 +27612,12 @@ class IMatrix2d:
         @return The transformed vector
         """
         ...
+    def __repr__(self) -> str:
+        r"""
+        @brief Convert the matrix to a string.
+        @return The string representing this matrix
+        """
+        ...
     @overload
     def __rmul__(self, box: Box) -> Box:
         r"""
@@ -27926,6 +28086,12 @@ class IMatrix3d:
         @brief Transforms a vector with this matrix.
         @param v The vector to transform.
         @return The transformed vector
+        """
+        ...
+    def __repr__(self) -> str:
+        r"""
+        @brief Convert the matrix to a string.
+        @return The string representing this matrix
         """
         ...
     @overload
@@ -28420,11 +28586,11 @@ class Instance:
 
     Starting with version 0.25 the displacement is of vector type.
     Setter:
-    @brief Sets the displacement vector for the 'a' axis in micrometer units
+    @brief Sets the displacement vector for the 'a' axis
 
-    Like \a= with an integer displacement, this method will set the displacement vector but it accepts a vector in micrometer units that is of \DVector type. The vector will be translated to database units internally.
+    If the instance was not an array instance before it is made one.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.23. Starting with version 0.25 the displacement is of vector type.
     """
     b: Vector
     r"""
@@ -28480,9 +28646,10 @@ class Instance:
     @brief Gets the complex transformation of the instance or the first instance in the array
     This method is always valid compared to \trans, since simple transformations can be expressed as complex transformations as well.
     Setter:
-    @brief Sets the complex transformation of the instance or the first instance in the array
+    @brief Sets the complex transformation of the instance or the first instance in the array (in micrometer units)
+    This method sets the transformation the same way as \cplx_trans=, but the displacement of this transformation is given in micrometer units. It is internally translated into database units.
 
-    This method has been introduced in version 0.23.
+    This method has been introduced in version 0.25.
     """
     da: DVector
     r"""
@@ -28666,6 +28833,13 @@ class Instance:
         r"""
         @brief Tests for inequality of two Instance objects
         Warning: this operator returns true if both objects refer to the same instance, not just identical ones.
+        """
+        ...
+    def __repr__(self) -> str:
+        r"""
+        @brief Creates a string showing the contents of the reference
+
+        This method has been introduced with version 0.16.
         """
         ...
     def __setitem__(self, key: Any, value: Any) -> None:
@@ -28948,7 +29122,7 @@ class Instance:
         r"""
         @brief Gets the layout this instance is contained in
 
-        This const version of the method has been introduced in version 0.25.
+        This method has been introduced in version 0.22.
         """
         ...
     @overload
@@ -28956,7 +29130,7 @@ class Instance:
         r"""
         @brief Gets the layout this instance is contained in
 
-        This method has been introduced in version 0.22.
+        This const version of the method has been introduced in version 0.25.
         """
         ...
     def pcell_declaration(self) -> PCellDeclaration_Native:
@@ -30342,6 +30516,17 @@ class LayerInfo:
         @return True, if both are not equal
 
         This method was added in version 0.18.
+        """
+        ...
+    def __repr__(self, as_target: Optional[bool] = ...) -> str:
+        r"""
+        @brief Convert the layer info object to a string
+        @return The string
+
+        If 'as_target' is true, wildcard and relative specifications are formatted such such.
+
+        This method was added in version 0.18.
+        The 'as_target' argument has been added in version 0.26.5.
         """
         ...
     def __str__(self, as_target: Optional[bool] = ...) -> str:
@@ -36639,16 +36824,6 @@ class LoadLayoutOptions:
     This attribute has been added in version 0.28.
     """
     @classmethod
-    def from_technology(cls, technology: str) -> LoadLayoutOptions:
-        r"""
-        @brief Gets the reader options of a given technology
-        @param technology The name of the technology to apply
-        Returns the reader options of a specific technology. If the technology name is not valid or an empty string, the reader options of the default technology are returned.
-
-        This method has been introduced in version 0.25
-        """
-        ...
-    @classmethod
     def new(cls) -> LoadLayoutOptions:
         r"""
         @brief Creates a new object of this class
@@ -36959,6 +37134,12 @@ class LogEntryData:
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
+        """
+        ...
+    def __repr__(self, with_geometry: Optional[bool] = ...) -> str:
+        r"""
+        @brief Gets the string representation of this error or warning.
+        This method has been introduced in version 0.28.13.
         """
         ...
     def __str__(self, with_geometry: Optional[bool] = ...) -> str:
@@ -37432,6 +37613,12 @@ class Matrix2d:
         @brief Transforms a vector with this matrix.
         @param v The vector to transform.
         @return The transformed vector
+        """
+        ...
+    def __repr__(self) -> str:
+        r"""
+        @brief Convert the matrix to a string.
+        @return The string representing this matrix
         """
         ...
     @overload
@@ -37934,6 +38121,12 @@ class Matrix3d:
         @brief Transforms a vector with this matrix.
         @param v The vector to transform.
         @return The transformed vector
+        """
+        ...
+    def __repr__(self) -> str:
+        r"""
+        @brief Convert the matrix to a string.
+        @return The string representing this matrix
         """
         ...
     @overload
@@ -38442,6 +38635,13 @@ class Net(NetlistObject):
     @brief Sets the name of the net.
     The name of the net is used for naming the net in schematic files for example. The name of the net has to be unique.
     """
+    def __repr__(self) -> str:
+        r"""
+        @brief Gets the qualified name.
+        The qualified name is like the expanded name, but the circuit's name is preceded
+        (i.e. 'CIRCUIT:NET') if available.
+        """
+        ...
     def __str__(self) -> str:
         r"""
         @brief Gets the qualified name.
@@ -39145,17 +39345,17 @@ class NetTerminalRef:
     @overload
     def device(self) -> Device:
         r"""
-        @brief Gets the device reference (non-const version).
+        @brief Gets the device reference.
         Gets the device object that this connection is made to.
-
-        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def device(self) -> Device:
         r"""
-        @brief Gets the device reference.
+        @brief Gets the device reference (non-const version).
         Gets the device object that this connection is made to.
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     def device_class(self) -> DeviceClass:
@@ -39987,6 +40187,12 @@ class Netlist:
         @brief Creates a new object of this class
         """
         ...
+    def __repr__(self) -> str:
+        r"""
+        @brief Converts the netlist to a string representation.
+        This method is intended for test purposes mainly.
+        """
+        ...
     def __str__(self) -> str:
         r"""
         @brief Converts the netlist to a string representation.
@@ -40067,17 +40273,17 @@ class Netlist:
     @overload
     def circuit_by_cell_index(self, cell_index: int) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given cell index (const version).
+        @brief Gets the circuit object for a given cell index.
         If the cell index is not valid or no circuit is registered with this index, nil is returned.
-
-        This constness variant has been introduced in version 0.26.8.
         """
         ...
     @overload
     def circuit_by_cell_index(self, cell_index: int) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given cell index.
+        @brief Gets the circuit object for a given cell index (const version).
         If the cell index is not valid or no circuit is registered with this index, nil is returned.
+
+        This constness variant has been introduced in version 0.26.8.
         """
         ...
     @overload
@@ -40099,20 +40305,20 @@ class Netlist:
     @overload
     def circuits_by_name(self, name_pattern: str) -> List[Circuit]:
         r"""
-        @brief Gets the circuit objects for a given name filter.
-        The name filter is a glob pattern. This method will return all \Circuit objects matching the glob pattern.
-
-        This method has been introduced in version 0.26.4.
-        """
-        ...
-    @overload
-    def circuits_by_name(self, name_pattern: str) -> List[Circuit]:
-        r"""
         @brief Gets the circuit objects for a given name filter (const version).
         The name filter is a glob pattern. This method will return all \Circuit objects matching the glob pattern.
 
 
         This constness variant has been introduced in version 0.26.8.
+        """
+        ...
+    @overload
+    def circuits_by_name(self, name_pattern: str) -> List[Circuit]:
+        r"""
+        @brief Gets the circuit objects for a given name filter.
+        The name filter is a glob pattern. This method will return all \Circuit objects matching the glob pattern.
+
+        This method has been introduced in version 0.26.4.
         """
         ...
     def combine_devices(self) -> None:
@@ -40166,15 +40372,15 @@ class Netlist:
     @overload
     def each_circuit(self) -> Iterator[Circuit]:
         r"""
-        @brief Iterates over the circuits of the netlist
+        @brief Iterates over the circuits of the netlist (const version)
+
+        This constness variant has been introduced in version 0.26.8.
         """
         ...
     @overload
     def each_circuit(self) -> Iterator[Circuit]:
         r"""
-        @brief Iterates over the circuits of the netlist (const version)
-
-        This constness variant has been introduced in version 0.26.8.
+        @brief Iterates over the circuits of the netlist
         """
         ...
     @overload
@@ -42795,6 +43001,15 @@ class PCellParameterDeclaration:
     Setter:
     @brief Makes the parameter read-only if this attribute is set to true
     """
+    tooltip: str
+    r"""
+    Getter:
+    @brief Gets the tool tip text
+    This attribute has been introduced in version 0.29.3.
+    Setter:
+    @brief Sets the tool tip text
+    This attribute has been introduced in version 0.29.3.
+    """
     type: int
     r"""
     Getter:
@@ -44054,6 +44269,11 @@ class Path:
         @param p The object to compare against
         """
         ...
+    def __repr__(self) -> str:
+        r"""
+        @brief Convert to a string
+        """
+        ...
     def __rmul__(self, f: float) -> Path:
         r"""
         @brief Scaling by some factor
@@ -44609,6 +44829,14 @@ class Point:
         This method has been added in version 0.23.
         """
         ...
+    def __repr__(self, dbu: Optional[float] = ...) -> str:
+        r"""
+        @brief String conversion.
+        If a DBU is given, the output units will be micrometers.
+
+        The DBU argument has been added in version 0.27.6.
+        """
+        ...
     def __rmul__(self, f: float) -> Point:
         r"""
         @brief Scaling by some factor
@@ -45056,6 +45284,11 @@ class Polygon:
         r"""
         @brief Returns a value indicating whether the polygons are not equal
         @param p The object to compare against
+        """
+        ...
+    def __repr__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
         """
         ...
     def __rmul__(self, f: float) -> Polygon:
@@ -49534,6 +49767,12 @@ class Region(ShapeCollection):
         The 'or' alias has been introduced in version 0.28.12.
         """
         ...
+    def __repr__(self) -> str:
+        r"""
+        @brief Converts the region to a string
+        The length of the output is limited to 20 polygons to avoid giant strings on large regions. For full output use "to_s" with a maximum count parameter.
+        """
+        ...
     def __str__(self) -> str:
         r"""
         @brief Converts the region to a string
@@ -51481,6 +51720,88 @@ class Region(ShapeCollection):
         """
         ...
     @overload
+    def size_inside(self, inside: Region, d: int, steps: int, mode: Optional[int] = ...) -> Region:
+        r"""
+        @brief Incremental, isotropic sizing inside of another region
+
+        @return The region after the sizing has applied (self)
+
+        This method is equivalent to "size_inside(d, d, steps, mode)".
+
+        Merged semantics applies for this method (see \merged_semantics= for a description of this concept)
+
+        This method has been introduced in version 0.29.3.
+        """
+        ...
+    @overload
+    def size_inside(self, inside: Region, dv: Vector, steps: int, mode: Optional[int] = ...) -> Region:
+        r"""
+        @brief Incremental, anisotropic sizing inside of another region
+
+        @return The region after the sizing has applied (self)
+
+        This method is equivalent to "size_inside(dv.x, dv.y, steps, mode)".
+
+        Merged semantics applies for this method (see \merged_semantics= for a description of this concept)
+
+        This method has been introduced in version 0.29.3.
+        """
+        ...
+    @overload
+    def size_inside(self, inside: Region, dx: int, dy: int, steps: int, mode: int) -> Region:
+        r"""
+        @brief Incremental, anisotropic sizing inside of another region
+
+        @param inside The region the incremental sizing will stay inside.
+        @param dx The x sizing value
+        @param dy The y sizing value
+        @param steps The number of steps to take
+        @param mode The sizing mode (see \size)
+
+        @return The region after the sizing has been applied (self)
+
+        Sizes the region, keeping inside another region and performing the size in discrete steps.
+
+        Using this method is equivalent to applying a single-step size and consecutively doing a boolean AND with the 'inside' region. This is repeated until the full sizing value is applied.
+
+        This operation is employed to implement latch-up rules, where a device needs to be close to a well tap within the same well. For this, the tap footprint is incrementally sized, with the well as the 'inside' region. The steps is chosen so the per-step sizing is somewhat less than the minimum well space. Sizing the tap shape results in a growing footprint that follows the well contours and a small enough per-step sizing value ensures the sized contour does not cross well gaps.
+
+        Merged semantics applies for this method (see \merged_semantics= for a description of this concept)
+
+        This method has been introduced in version 0.29.3.
+        """
+        ...
+    @overload
+    def size_outside(self, outside: Region, d: int, steps: int, mode: Optional[int] = ...) -> Region:
+        r"""
+        @brief Incremental, anisotropic sizing outside of another region
+
+        This method is equivalent to \size_inside, except that sizing is performed outside the given 'outside' region. Technically this corresponds to a boolean 'NOT' operation instead of a boolean 'AND'.
+
+        This method has been introduced in version 0.29.3.
+        """
+        ...
+    @overload
+    def size_outside(self, outside: Region, dv: Vector, steps: int, mode: Optional[int] = ...) -> Region:
+        r"""
+        @brief Incremental, anisotropic sizing outside of another region
+
+        This method is equivalent to \size_inside, except that sizing is performed outside the given 'outside' region. Technically this corresponds to a boolean 'NOT' operation instead of a boolean 'AND'.
+
+        This method has been introduced in version 0.29.3.
+        """
+        ...
+    @overload
+    def size_outside(self, outside: Region, dx: int, dy: int, steps: int, mode: int) -> Region:
+        r"""
+        @brief Incremental, anisotropic sizing outside of another region
+
+        This method is equivalent to \size_inside, except that sizing is performed outside the given 'outside' region. Technically this corresponds to a boolean 'NOT' operation instead of a boolean 'AND'.
+
+        This method has been introduced in version 0.29.3.
+        """
+        ...
+    @overload
     def sized(self, d: int, mode: Optional[int] = ...) -> Region:
         r"""
         @brief Returns the isotropically sized region
@@ -51518,6 +51839,74 @@ class Region(ShapeCollection):
         This method returns the sized region (see \size), but does not modify self.
 
         Merged semantics applies for this method (see \merged_semantics= for a description of this concept)
+        """
+        ...
+    @overload
+    def sized_inside(self, inside: Region, d: int, steps: int, mode: Optional[int] = ...) -> Region:
+        r"""
+        @brief Returns the incrementally sized region
+
+        @return The sized region
+
+        This method returns the incrementally sized region (see \size_inside), but does not modify self.
+
+        Merged semantics applies for this method (see \merged_semantics= for a description of this concept)
+        """
+        ...
+    @overload
+    def sized_inside(self, inside: Region, dv: Vector, steps: int, mode: Optional[int] = ...) -> Region:
+        r"""
+        @brief Returns the incrementally and anisotropically sized region
+
+        @return The sized region
+
+        This method returns the incrementally sized region (see \size_inside), but does not modify self.
+
+        Merged semantics applies for this method (see \merged_semantics= for a description of this concept)
+
+        This variant has been introduced in version 0.28.
+        """
+        ...
+    @overload
+    def sized_inside(self, inside: Region, dx: int, dy: int, steps: int, mode: int) -> Region:
+        r"""
+        @brief Returns the incrementally and anisotropically sized region
+
+        @return The sized region
+
+        This method returns the incrementally sized region (see \size_inside), but does not modify self.
+
+        Merged semantics applies for this method (see \merged_semantics= for a description of this concept)
+        """
+        ...
+    @overload
+    def sized_outside(self, outside: Region, d: int, steps: int, mode: Optional[int] = ...) -> Region:
+        r"""
+        @brief Incremental, anisotropic sizing outside of another region
+
+        This method is equivalent to \size_inside, except that sizing is performed outside the given 'outside' region. Technically this corresponds to a boolean 'NOT' operation instead of a boolean 'AND'.
+
+        This method has been introduced in version 0.29.3.
+        """
+        ...
+    @overload
+    def sized_outside(self, outside: Region, dv: Vector, steps: int, mode: Optional[int] = ...) -> Region:
+        r"""
+        @brief Incremental, anisotropic sizing outside of another region
+
+        This method is equivalent to \size_inside, except that sizing is performed outside the given 'outside' region. Technically this corresponds to a boolean 'NOT' operation instead of a boolean 'AND'.
+
+        This method has been introduced in version 0.29.3.
+        """
+        ...
+    @overload
+    def sized_outside(self, outside: Region, dx: int, dy: int, steps: int, mode: int) -> Region:
+        r"""
+        @brief Incremental, anisotropic sizing outside of another region
+
+        This method is equivalent to \size_inside, except that sizing is performed outside the given 'outside' region. Technically this corresponds to a boolean 'NOT' operation instead of a boolean 'AND'.
+
+        This method has been introduced in version 0.29.3.
         """
         ...
     def smooth(self, d: int, keep_hv: Optional[bool] = ...) -> None:
@@ -54053,6 +54442,13 @@ class Shape:
     def __ne__(self, other: object) -> bool:
         r"""
         @brief Inequality operator
+        """
+        ...
+    def __repr__(self) -> str:
+        r"""
+        @brief Create a string showing the contents of the reference
+
+        This method has been introduced with version 0.16.
         """
         ...
     def __str__(self) -> str:
@@ -56670,6 +57066,11 @@ class SimplePolygon:
         @param p The object to compare against
         """
         ...
+    def __repr__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
     def __rmul__(self, f: float) -> SimplePolygon:
         r"""
         @brief Scales the polygon by some factor
@@ -57340,16 +57741,16 @@ class SubCircuit(NetlistObject):
     @overload
     def circuit_ref(self) -> Circuit:
         r"""
-        @brief Gets the circuit referenced by the subcircuit (non-const version).
-
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the circuit referenced by the subcircuit.
         """
         ...
     @overload
     def circuit_ref(self) -> Circuit:
         r"""
-        @brief Gets the circuit referenced by the subcircuit.
+        @brief Gets the circuit referenced by the subcircuit (non-const version).
+
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
@@ -57395,17 +57796,17 @@ class SubCircuit(NetlistObject):
     @overload
     def net_for_pin(self, pin_id: int) -> Net:
         r"""
-        @brief Gets the net connected to the specified pin of the subcircuit (non-const version).
+        @brief Gets the net connected to the specified pin of the subcircuit.
         If the pin is not connected, nil is returned for the net.
-
-        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def net_for_pin(self, pin_id: int) -> Net:
         r"""
-        @brief Gets the net connected to the specified pin of the subcircuit.
+        @brief Gets the net connected to the specified pin of the subcircuit (non-const version).
         If the pin is not connected, nil is returned for the net.
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     ...
@@ -57993,7 +58394,8 @@ class Text:
     Setter:
     @brief Sets the horizontal alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     size: int
     r"""
@@ -58029,8 +58431,7 @@ class Text:
     Setter:
     @brief Sets the vertical alignment
 
-    This property specifies how the text is aligned relative to the anchor point. 
-    This property has been introduced in version 0.22 and extended to enums in 0.28.
+    This is the version accepting integer values. It's provided for backward compatibility.
     """
     x: int
     r"""
@@ -58197,6 +58598,14 @@ class Text:
 
 
         Return true, if this text object and the given text are not equal 
+        """
+        ...
+    def __repr__(self, dbu: Optional[float] = ...) -> str:
+        r"""
+        @brief Converts the object to a string.
+        If a DBU is given, the output units will be micrometers.
+
+        The DBU argument has been added in version 0.27.6.
         """
         ...
     def __str__(self, dbu: Optional[float] = ...) -> str:
@@ -59481,6 +59890,12 @@ class Texts(ShapeCollection):
         Starting with version 0.27, the method is called 'count' for consistency with \Region. 'size' is still provided as an alias.
         """
         ...
+    def __repr__(self) -> str:
+        r"""
+        @brief Converts the text collection to a string
+        The length of the output is limited to 20 texts to avoid giant strings on large collections. For full output use "to_s" with a maximum count parameter.
+        """
+        ...
     def __str__(self) -> str:
         r"""
         @brief Converts the text collection to a string
@@ -59562,29 +59977,9 @@ class Texts(ShapeCollection):
         Starting with version 0.27, the method is called 'count' for consistency with \Region. 'size' is still provided as an alias.
         """
         ...
-    def create(self) -> None:
-        r"""
-        @brief Ensures the C++ object is created
-        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
-        """
-        ...
     def data_id(self) -> int:
         r"""
         @brief Returns the data ID (a unique identifier for the underlying data storage)
-        """
-        ...
-    def destroy(self) -> None:
-        r"""
-        @brief Explicitly destroys the object
-        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
-        If the object is not owned by the script, this method will do nothing.
-        """
-        ...
-    def destroyed(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the object was already destroyed
-        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
-        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
         ...
     def disable_progress(self) -> None:
@@ -59718,13 +60113,6 @@ class Texts(ShapeCollection):
         @brief Returns the texts from this text collection which are inside or on the edge of polygons from the given region
 
         @return A new text collection containing the texts inside or on the edge of polygons from the region
-        """
-        ...
-    def is_const_object(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the reference is a const reference
-        This method returns true, if self is a const reference.
-        In that case, only const methods may be called on self.
         """
         ...
     def is_deep(self) -> bool:
@@ -61230,6 +61618,14 @@ class Trans:
         @brief Tests for inequality
         """
         ...
+    def __repr__(self, dbu: Optional[float] = ...) -> str:
+        r"""
+        @brief String conversion
+        If a DBU is given, the output units will be micrometers.
+
+        The DBU argument has been added in version 0.27.6.
+        """
+        ...
     @overload
     def __rmul__(self, box: Box) -> Box:
         r"""
@@ -62724,6 +63120,15 @@ class VCplxTrans:
         @brief Tests for inequality
         """
         ...
+    def __repr__(self, lazy: Optional[bool] = ..., dbu: Optional[float] = ...) -> str:
+        r"""
+        @brief String conversion
+        If 'lazy' is true, some parts are omitted when not required.
+        If a DBU is given, the output units will be micrometers.
+
+        The lazy and DBU arguments have been added in version 0.27.6.
+        """
+        ...
     @overload
     def __rmul__(self, box: DBox) -> Box:
         r"""
@@ -63353,6 +63758,14 @@ class Vector:
 
 
         Returns a new vector with -x,-y.
+        """
+        ...
+    def __repr__(self, dbu: Optional[float] = ...) -> str:
+        r"""
+        @brief String conversion
+        If a DBU is given, the output units will be micrometers.
+
+        The DBU argument has been added in version 0.27.6.
         """
         ...
     @overload

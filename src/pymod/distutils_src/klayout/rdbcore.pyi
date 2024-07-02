@@ -102,23 +102,17 @@ class RdbCategory:
     @overload
     def each_item(self) -> Iterator[RdbItem]:
         r"""
-        @brief Iterates over all items inside the database which are associated with this category (non-const version)
-
-        This method has been introduced in version 0.29.
-        """
-        ...
-    @overload
-    def each_item(self) -> Iterator[RdbItem]:
-        r"""
         @brief Iterates over all items inside the database which are associated with this category
 
         This method has been introduced in version 0.23.
         """
         ...
     @overload
-    def each_sub_category(self) -> Iterator[RdbCategory]:
+    def each_item(self) -> Iterator[RdbItem]:
         r"""
-        @brief Iterates over all sub-categories (non-const version)
+        @brief Iterates over all items inside the database which are associated with this category (non-const version)
+
+        This method has been introduced in version 0.29.
         """
         ...
     @overload
@@ -127,6 +121,12 @@ class RdbCategory:
         @brief Iterates over all sub-categories
 
         The const version has been added in version 0.29.
+        """
+        ...
+    @overload
+    def each_sub_category(self) -> Iterator[RdbCategory]:
+        r"""
+        @brief Iterates over all sub-categories (non-const version)
         """
         ...
     def is_const_object(self) -> bool:
@@ -465,17 +465,15 @@ class RdbItem:
 
     This attribute has been added in version 0.29.1.
     """
-    image: QtGui.QImage_Native
-    r"""
-    Getter:
-    @brief Gets the attached image as a QImage object
+    @property
+    def image(self) -> None:
+        r"""
+        WARNING: This variable can only be set, not retrieved.
+        @brief Sets the attached image from a PixelBuffer object
 
-    This method has been added in version 0.28.
-    Setter:
-    @brief Sets the attached image from a PixelBuffer object
-
-    This method has been added in version 0.28.
-    """
+        This method has been added in version 0.28.
+        """
+        ...
     image_str: str
     r"""
     Getter:
@@ -896,6 +894,13 @@ class RdbItemValue:
         @brief Creates a value representing a DText object
 
         This method has been introduced in version 0.22.
+        """
+        ...
+    def __repr__(self) -> str:
+        r"""
+        @brief Converts a value to a string
+        The string can be used by the string constructor to create another object from it.
+        @return The string
         """
         ...
     def __str__(self) -> str:

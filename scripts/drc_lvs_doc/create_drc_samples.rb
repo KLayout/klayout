@@ -939,10 +939,10 @@ end
 
 gen = Gen::new
 
-run_demo gen, "input1.sized(1.um, steps(1), inside(input2))", "drc_sized_inside1.png"
-run_demo gen, "input1.sized(2.um, steps(2), inside(input2))", "drc_sized_inside2.png"
-run_demo gen, "input1.sized(3.um, steps(3), inside(input2))", "drc_sized_inside3.png"
-run_demo gen, "input1.sized(10.um, steps(10), inside(input2))", "drc_sized_inside4.png"
+run_demo gen, "input1.sized(1.um, steps(1), size_inside(input2))", "drc_sized_inside1.png"
+run_demo gen, "input1.sized(2.um, steps(2), size_inside(input2))", "drc_sized_inside2.png"
+run_demo gen, "input1.sized(3.um, steps(3), size_inside(input2))", "drc_sized_inside3.png"
+run_demo gen, "input1.sized(10.um, steps(10), size_inside(input2))", "drc_sized_inside4.png"
 
 class Gen
   def produce(s1, s2)

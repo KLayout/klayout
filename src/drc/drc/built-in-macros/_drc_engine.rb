@@ -317,11 +317,11 @@ module DRC
       DRCSizingSteps::new(arg)
     end
     
-    def inside(arg)
+    def size_inside(arg)
       DRCSizingInside::new(arg)
     end
     
-    def outside(arg)
+    def size_outside(arg)
       DRCSizingOutside::new(arg)
     end
     

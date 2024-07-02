@@ -427,6 +427,8 @@ the netter object.
 <p>Usage:</p>
 <ul>
 <li><tt>name(layer, name)</tt></li>
+<li><tt>name(layer, name, layer_number, datatype_number)</tt></li>
+<li><tt>name(layer, name, layer_info)</tt></li>
 </ul>
 <p>
 Layer names are listed in the LayoutToNetlist (L2N) or LVS database. They
@@ -455,6 +457,12 @@ first time.
 </p><p>
 <a href="#name">name</a> can only be used once on a layer and the layer names must be 
 unique (not taken by another layer).
+</p><p>
+The layer/datatype or LayerInfo specification is optional and will
+be used to configure the internal layout. This information is also
+persisted inside database files. Specifying a layer/datatype information
+is useful, if a layer is not an original layer, but is to be restored
+to an actual layout layer later.
 </p>
 <a name="name_prefix"/><h2>"name_prefix" - Specifies the name prefix for auto-generated layer names</h2>
 <keyword name="name_prefix"/>

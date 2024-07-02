@@ -4678,12 +4678,12 @@ TP_SCRIPT
     # %DRC%
     # @name sized
     # @brief Polygon sizing (per-edge biasing)
-    # @synopsis layer.sized(d [, mode] [, inside(l) [, steps(n)]])
-    # @synopsis layer.sized(d, inside(l) [, steps(n)] [, mode])
-    # @synopsis layer.sized(d, outside(l) [, steps(n)] [, mode])
+    # @synopsis layer.sized(d [, mode] [, size_inside(l) [, steps(n)]])
+    # @synopsis layer.sized(d, size_inside(l) [, steps(n)] [, mode])
+    # @synopsis layer.sized(d, size_outside(l) [, steps(n)] [, mode])
     # @synopsis layer.sized(dx, dy [, mode])
-    # @synopsis layer.sized(dx, dy, inside(l) [, steps(n)] [, mode])
-    # @synopsis layer.sized(dx, dy, outside(l) [, steps(n)] [, mode])
+    # @synopsis layer.sized(dx, dy, size_inside(l) [, steps(n)] [, mode])
+    # @synopsis layer.sized(dx, dy, size_outside(l) [, steps(n)] [, mode])
     #
     # This method requires a polygon layer. It will apply a bias per edge of the polygons 
     # and return the biased layer. The layer that this method is called on is not modified.
@@ -4734,32 +4734,32 @@ TP_SCRIPT
     #   @/tr
     # @/table
     #
-    # The "inside" option and the "steps" option implement incremental size. Incremental
+    # The "size_inside" option and the "steps" option implement incremental size. Incremental
     # size means that the sizing value is applied in n steps. Between the steps, the sized
-    # shape is confined to the "inside" layer by means of a boolean "AND" operation.
+    # shape is confined to the "size_inside" layer by means of a boolean "AND" operation.
     # 
     # This scheme is used to implement latch-up rules where a device active region has to 
-    # be close to a well tap. By using the well layer as the "inside" layer, the size function
+    # be close to a well tap. By using the well layer as the "size_inside" layer, the size function
     # follows the well contours. The steps have to selected such that the per-step size value
     # is smaller than the minimum space of the well shapes. With that, the sized shapes will
     # not cross over to neighbor well regions. Specifically, the per-step size has to be less
     # than about 70% of the minimum space to account for the minimum corner-to-corner case
     # with Euclidian space measurements.
     #
-    # "inside" and "steps" can be used with positive sizing values only.
+    # "size_inside" and "steps" can be used with positive sizing values only.
     # A steps value of 0 will not execute any sizing at all.
     #
-    # "outside" acts like "inside", but instead of confining the sized region to the
+    # "size_outside" acts like "size_inside", but instead of confining the sized region to the
     # inside of the given layer, it is confined to be outside of that layer. Technically,
     # a boolean "NOT" is performed instead of a boolean "AND".
     #
-    # An example for the "inside" option is this:
+    # An example for the "size_inside" option is this:
     #
     # @code
-    #  ntap.sized(30.um, inside(nwell), steps(100))
+    #  ntap.sized(30.um, size_inside(nwell), steps(100))
     # @/code
     #
-    # The effect of the "inside" option is shown here:
+    # The effect of the "size_inside" option is shown here:
     # 
     # @table
     #   @tr 
@@ -4777,11 +4777,11 @@ TP_SCRIPT
     # @name size
     # @brief Polygon sizing (per-edge biasing, modifies the layer)
     # @synopsis layer.size(d [, mode])
-    # @synopsis layer.size(d, inside(l) [, steps(n)] [, mode])
-    # @synopsis layer.size(d, outside(l) [, steps(n)] [, mode])
+    # @synopsis layer.size(d, size_inside(l) [, steps(n)] [, mode])
+    # @synopsis layer.size(d, size_outside(l) [, steps(n)] [, mode])
     # @synopsis layer.size(dx, dy [, mode])
-    # @synopsis layer.size(dx, dy, inside(l) [, steps(n)] [, mode])
-    # @synopsis layer.size(dx, dy, outside(l) [, steps(n)] [, mode])
+    # @synopsis layer.size(dx, dy, size_inside(l) [, steps(n)] [, mode])
+    # @synopsis layer.size(dx, dy, size_outside(l) [, steps(n)] [, mode])
     #
     # See \sized for a description of the options.
     # The size method basically does the same but modifies the layer

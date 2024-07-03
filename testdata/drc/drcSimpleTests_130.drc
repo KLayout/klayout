@@ -8,9 +8,11 @@ end
 
 l1 = input(1, 0)
 l2 = input(2, 0)
+l3 = input(3, 0)
 
 l1.output(1, 0)
 l2.output(2, 0)
+l3.output(3, 0)
 
 l1.sized(0.0, steps(50), size_inside(l2)).output(100, 0)
 l1.sized(20.0, steps(0), size_inside(l2)).output(101, 0)
@@ -49,6 +51,11 @@ if !error
   raise "error expected!"
 end
 
-
-
+# syntax variations
+l3.sized(1.0).output(200, 0)
+l3.sized(1.0, 0.5).output(201, 0)
+l3.sized(1.0, diamond_limit).output(202, 0)
+l3.sized(1.0, 0.5, diamond_limit).output(203, 0)
+l3.sized(diamond_limit, 1.0, 0.5).output(204, 0)
+l3.sized(1.0, diamond_limit, size_outside(l2), steps(2)).output(205, 0)
 

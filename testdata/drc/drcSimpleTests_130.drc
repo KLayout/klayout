@@ -58,4 +58,5 @@ l3.sized(1.0, diamond_limit).output(202, 0)
 l3.sized(1.0, 0.5, diamond_limit).output(203, 0)
 l3.sized(diamond_limit, 1.0, 0.5).output(204, 0)
 l3.sized(1.0, diamond_limit, size_outside(l2), steps(2)).output(205, 0)
+l3.sized(1.0, 'diamond_limit').output(206, 0)
 

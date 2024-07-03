@@ -4805,6 +4805,10 @@ TP_SCRIPT
 
           n = 1
           args.each do |a|
+            # accept DRCSizingMode as string as well, i.e. "size(l1, 'square_limit')"
+            if a.is_a?(String) && @engine.respond_to?(a.to_sym)
+              a = @engine.send(a.to_sym)
+            end
             if a.is_a?(1.class) || a.is_a?(Float)
               v = @engine._make_value(a)
               v.abs > dist && dist = v.abs 

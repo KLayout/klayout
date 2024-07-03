@@ -20,15 +20,16 @@
 * Bugfix: Ruby binding - "return" inside block was behaving like "break".
   Now, "return" will leave the current function.
 * Enhancement: LVS layer naming now also accepts an optional layer/datatype information.
-* Enhancement: XOR performance enhanced in deep mode for "almost same"
-  inputs.
+* Enhancement: XOR performance enhanced in deep mode for "almost same" inputs.
 * Bugfix: Macro debugger now does not prevent paint events and 
   screen refresh should work while debugging. In addition, the debugger
   does not deadlock the desktop when using the help browser's search
   function. Side effects are yet unknown - maybe debugging Qt event
   handlers now becomes less stable.
-* Bugfix: During modal dialogs, the debugger's run/stop and step buttons
-  were not working.
+* Bugfix: During modal dialogs, the debugger's run/stop and step buttons were not working.
+* Enhancement: DRC size/sized now also accepts sizing mode as string.
+  For example "layer.sized(1.um, 'square_limit')" will work now.
+  Previously, this argument has been ignored. This will make the GF180 DRC deck work properly.
   
 0.29.2           (2024-06-06):
 * Enhancement: %GITHUB%/issues/1724 Don't read duplicate LEF files

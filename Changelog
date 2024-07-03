@@ -1,12 +1,16 @@
-0.29.3           (2024-07-02):
-* Enhancement: %GITHUB%/issues/1655 Marker object lifetime management
-* Bug: %GITHUB%/issues/1743 strmxor shows no difference, klayout xor shows 85
+0.29.3           (2024-07-03):
 * Bug: %GITHUB%/issues/1757 Fixed memory issue
-* Enhancement: %GITHUB%/issues/1741 Tooltip strings for PCell parameters
-* Enhancement: %GITHUB%/issues/1747 Transformations on negative floats/ints
+* Enhancement: %GITHUB%/issues/1756 Configure timeout for HTTP(S) requests
+  A new environment variable has been introduced to configure the
+  HTTP(S) timeout: KLAYOUT_HTTP_TIMEOUT (timeout value in seconds,
+  default is 10s)
 * Bug: %GITHUB%/issues/1751 Code sanity issue fixed
 * Bug: %GITHUB%/issues/1750 Code sanity issue fixed
+* Enhancement: %GITHUB%/issues/1747 Transformations on negative floats/ints
+* Bug: %GITHUB%/issues/1743 strmxor shows no difference, klayout xor shows 85
+* Enhancement: %GITHUB%/issues/1741 Tooltip strings for PCell parameters
 * Bug: %GITHUB%/issues/1733 Instance selecion in object properties does not match with view port object highlight
+* Enhancement: %GITHUB%/issues/1655 Marker object lifetime management
 * Enhancement: DRC - step-wise size with "inside" and "outside" constraint
   This feature is handy for implementing latch-up rules more efficiently.
 * Bugfix: OASIS reader - avoiding slight rounding of DBU In python read/write cycle (discussion-2526)

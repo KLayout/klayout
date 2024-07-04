@@ -61,7 +61,7 @@ same but without clipping is <a href="#touching">touching</a> or <a href="#overl
 <li><tt>source.edge_pairs</tt></li>
 <li><tt>source.edge_pairs(layer)</tt></li>
 <li><tt>source.edge_pairs(layer, datatype)</tt></li>
-<li><tt>source.edge_pairs(layer_into)</tt></li>
+<li><tt>source.edge_pairs(layer_info)</tt></li>
 <li><tt>source.edge_pairs(filter, ...)</tt></li>
 </ul>
 <p>
@@ -85,7 +85,7 @@ This method has been introduced in version 0.27.
 <li><tt>source.edges</tt></li>
 <li><tt>source.edges(layer)</tt></li>
 <li><tt>source.edges(layer, datatype)</tt></li>
-<li><tt>source.edges(layer_into)</tt></li>
+<li><tt>source.edges(layer_info)</tt></li>
 <li><tt>source.edges(filter, ...)</tt></li>
 </ul>
 <p>
@@ -169,7 +169,7 @@ source.global_transform(shift(0, 100.um), rotate(90.0))
 <li><tt>source.input</tt></li>
 <li><tt>source.input(layer)</tt></li>
 <li><tt>source.input(layer, datatype)</tt></li>
-<li><tt>source.input(layer_into)</tt></li>
+<li><tt>source.input(layer_info)</tt></li>
 <li><tt>source.input(filter, ...)</tt></li>
 <li><tt>source.input(props_spec, ...)</tt></li>
 </ul>
@@ -234,7 +234,7 @@ Use the global version of "input" without a source object to address the default
 <li><tt>source.labels</tt></li>
 <li><tt>source.labels(layer)</tt></li>
 <li><tt>source.labels(layer, datatype)</tt></li>
-<li><tt>source.labels(layer_into)</tt></li>
+<li><tt>source.labels(layer_info)</tt></li>
 <li><tt>source.labels(filter, ...)</tt></li>
 </ul>
 <p>
@@ -318,7 +318,7 @@ the search region with their bounding box (without the requirement to overlap)
 <li><tt>source.polygons</tt></li>
 <li><tt>source.polygons(layer)</tt></li>
 <li><tt>source.polygons(layer, datatype)</tt></li>
-<li><tt>source.polygons(layer_into)</tt></li>
+<li><tt>source.polygons(layer_info)</tt></li>
 <li><tt>source.polygons(filter, ...)</tt></li>
 </ul>
 <p>

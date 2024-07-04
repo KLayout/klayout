@@ -4,6 +4,7 @@
   A new environment variable has been introduced to configure the
   HTTP(S) timeout: KLAYOUT_HTTP_TIMEOUT (timeout value in seconds,
   default is 10s)
+* Bug: %GITHUB%/issues/1769 Typo fixed
 * Bug: %GITHUB%/issues/1751 Code sanity issue fixed
 * Bug: %GITHUB%/issues/1750 Code sanity issue fixed
 * Enhancement: %GITHUB%/issues/1747 Transformations on negative floats/ints
@@ -26,6 +27,8 @@
   does not deadlock the desktop when using the help browser's search
   function. Side effects are yet unknown - maybe debugging Qt event
   handlers now becomes less stable.
+  Issue #1770 addresses a problem introduced during this effort and also
+  fixed in this release.
 * Bugfix: During modal dialogs, the debugger's run/stop and step buttons were not working.
 * Enhancement: DRC size/sized now also accepts sizing mode as string.
   For example "layer.sized(1.um, 'square_limit')" will work now.

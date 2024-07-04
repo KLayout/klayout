@@ -373,7 +373,7 @@ CODE
     # @synopsis source.input
     # @synopsis source.input(layer)
     # @synopsis source.input(layer, datatype)
-    # @synopsis source.input(layer_into)
+    # @synopsis source.input(layer_info)
     # @synopsis source.input(filter, ...)
     # @synopsis source.input(props_spec, ...)
     # Creates a layer with the shapes from the given layer of the source.
@@ -442,7 +442,7 @@ CODE
     # @synopsis source.labels
     # @synopsis source.labels(layer)
     # @synopsis source.labels(layer, datatype)
-    # @synopsis source.labels(layer_into)
+    # @synopsis source.labels(layer_info)
     # @synopsis source.labels(filter, ...)
     #
     # Creates a true text layer with the labels from the given layer of the source.
@@ -469,7 +469,7 @@ CODE
     # @synopsis source.polygons
     # @synopsis source.polygons(layer)
     # @synopsis source.polygons(layer, datatype)
-    # @synopsis source.polygons(layer_into)
+    # @synopsis source.polygons(layer_info)
     # @synopsis source.polygons(filter, ...)
     #
     # Creates a layer with the polygon shapes from the given layer of the source.
@@ -495,7 +495,7 @@ CODE
     # @synopsis source.edges
     # @synopsis source.edges(layer)
     # @synopsis source.edges(layer, datatype)
-    # @synopsis source.edges(layer_into)
+    # @synopsis source.edges(layer_info)
     # @synopsis source.edges(filter, ...)
     #
     # Creates a layer with the edges from the given layer of the source.
@@ -524,7 +524,7 @@ CODE
     # @synopsis source.edge_pairs
     # @synopsis source.edge_pairs(layer)
     # @synopsis source.edge_pairs(layer, datatype)
-    # @synopsis source.edge_pairs(layer_into)
+    # @synopsis source.edge_pairs(layer_info)
     # @synopsis source.edge_pairs(filter, ...)
     #
     # Creates a layer with the edge_pairs from the given layer of the source.

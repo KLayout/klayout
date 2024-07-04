@@ -3763,6 +3763,9 @@ MacroEditorDialog::run (int stop_stack_depth, lym::Macro *macro)
       QDialog::accept ();
     }
 
+    //  in a breakpoint
+    m_in_breakpoint = false;
+
   } else {
 
     if (! macro) {

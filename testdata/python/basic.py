@@ -2241,6 +2241,8 @@ class BasicTest(unittest.TestCase):
 
   def test_38(self):
 
+    pya.E.reset_inst()
+
     # mixed const / non-const reference and events
     ec = pya.E.ic()
     self.assertEqual(ec.is_const_object(), True)

@@ -97,6 +97,7 @@ void run_pythontest (tl::TestBase *_this, const std::string &fn)
   TEST(n) { run_pythontest(_this, file); }
 
 PYTHONTEST (kwargs, "kwargs.py")
+PYTHONTEST (modTests, "modTests.py")
 PYTHONTEST (dbLayoutTest, "dbLayoutTest.py")
 PYTHONTEST (dbRegionTest, "dbRegionTest.py")
 PYTHONTEST (dbShapesTest, "dbShapesTest.py")

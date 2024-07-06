@@ -177,6 +177,17 @@ END
     macro.run
     assert_equal(context.value, "x42")
 
+    begin
+      pya.eval_string("\n1/0")
+    rescue => ex
+      puts "Got exception (expected): " + ex.to_s
+      assert_equal(ex.to_s.index("ZeroDivisionError") != nil, true)
+      assert_equal(ex.to_s.index("division by zero") != nil, true)
+      # bug #1771
+      assert_equal(ex.to_s.index("(eval)") != nil, true)
+      assert_equal(ex.to_s.index(":2") != nil, true)
+    end
+
   end
 
 end

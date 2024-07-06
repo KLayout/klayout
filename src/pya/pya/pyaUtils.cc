@@ -64,10 +64,15 @@ void check_error ()
     if (exc_traceback) {
       PyTracebackObject *traceback = (PyTracebackObject*) exc_traceback.get ();
       for (PyTracebackObject *t = traceback; t; t = t->tb_next) {
+        int lineno = t->tb_lineno;
 #if PY_VERSION_HEX >= 0x030B0000
-        backtrace.push_back (tl::BacktraceElement (python2c<std::string> (PyFrame_GetCode(t->tb_frame)->co_filename), t->tb_lineno));
+        //  since version 3.11.7, lineno may be -1 and indicates that the frame has to be inspected
+        if (lineno < 0) {
+          lineno = PyFrame_GetLineNumber(t->tb_frame);
+        }
+        backtrace.push_back (tl::BacktraceElement (python2c<std::string> (PyFrame_GetCode(t->tb_frame)->co_filename), lineno));
 #else
-        backtrace.push_back (tl::BacktraceElement (python2c<std::string> (t->tb_frame->f_code->co_filename), t->tb_lineno));
+        backtrace.push_back (tl::BacktraceElement (python2c<std::string> (t->tb_frame->f_code->co_filename), lineno));
 #endif
       }
       std::reverse (backtrace.begin (), backtrace.end ());

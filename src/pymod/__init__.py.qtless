@@ -1,4 +1,5 @@
 # klayout library definition file
 
+from .tl import __version__
 __all__ = [ "tl", "db", "lib", "rdb", "lay" ]
 

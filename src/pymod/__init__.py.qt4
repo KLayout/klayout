@@ -1,5 +1,5 @@
-
 # klayout library definition file
 
+from .tl import __version__
 __all__ = [ "tl", "db", "lib", "rdb", "QtCore", "QtGui", "QtXml", "QtSql", "QtNetwork", "QtDesigner", "QtUiTools", "lay" ]
 

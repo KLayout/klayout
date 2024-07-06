@@ -1,4 +1,6 @@
-0.29.3           (2024-07-03):
+0.29.3           (2024-07-06):
+* Bug: %GITHUB%/issues/1774 ImportError: cannot import name '__version__' from 'klayout'
+* Bug: %GITHUB%/issues/1771 Python exception formatting: backtrace missing for Python >=3.11.7
 * Bug: %GITHUB%/issues/1757 Fixed memory issue
 * Enhancement: %GITHUB%/issues/1756 Configure timeout for HTTP(S) requests
   A new environment variable has been introduced to configure the

@@ -23,11 +23,9 @@ jobs:
           - os: "macos-13"  # intel runner
             cibuild: "*macosx*"
             macos-arch: "x86_64"
-            macos-target: "13.0"
           - os: "macos-14"  # M1 runner
             cibuild: "*macosx*"
             macos-arch: "arm64"
-            macos-target: "14.0"
           - os: "ubuntu-latest"
             cibuild: "*manylinux*"
           - os: "ubuntu-latest"
@@ -64,7 +62,6 @@ jobs:
         #   CIBW_SOME_OPTION: value
         env:
           CIBW_BUILD: ${{ matrix.cibuild }}
-          CIBW_MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos-target }}
           CIBW_ARCHS_MACOS: ${{ matrix.macos-arch }}
 
       - name: Download Cache from Docker (linux only)

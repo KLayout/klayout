@@ -104,8 +104,9 @@ static bool is_orthogonal (const db::DVector &rv, const db::DVector &cv)
 InstPropertiesPage::InstPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent)
   : lay::PropertiesPage (parent, manager, service), mp_service (service), m_enable_cb_callback (true), mp_pcell_parameters (0)
 {
-  m_selection_ptrs.reserve (service->selection ().size ());
-  for (edt::Service::obj_iterator s = service->selection ().begin (); s != service->selection ().end (); ++s) {
+  const edt::Service::objects &selection = service->selection ();
+  m_selection_ptrs.reserve (selection.size ());
+  for (edt::Service::obj_iterator s = selection.begin (); s != selection.end (); ++s) {
     m_selection_ptrs.push_back (s);
   }
 
@@ -787,7 +788,8 @@ InstPropertiesPage::recompute_selection_ptrs (const std::vector<lay::ObjectInstP
 {
   std::map<lay::ObjectInstPath, edt::Service::obj_iterator> ptrs;
 
-  for (edt::Service::obj_iterator pos = mp_service->selection ().begin (); pos != mp_service->selection ().end (); ++pos) {
+  const edt::Service::objects &selection = mp_service->selection ();
+  for (edt::Service::obj_iterator pos = selection.begin (); pos != selection.end (); ++pos) {
     ptrs.insert (std::make_pair (*pos, pos));
   }
 

@@ -700,7 +700,7 @@ class EditableSelectionIterator
 public:
   typedef edt::Service::objects::value_type value_type;
   typedef edt::Service::objects::const_iterator iterator_type;
-  typedef void pointer;
+  typedef const value_type *pointer;
   typedef const value_type &reference;
   typedef std::forward_iterator_tag iterator_category;
   typedef void difference_type;
@@ -710,7 +710,8 @@ public:
   bool at_end () const;
 
   EditableSelectionIterator &operator++ ();
-  const value_type &operator* () const;
+  reference operator* () const;
+  pointer operator-> () const;
 
 private:
   std::vector<edt::Service *> m_services;

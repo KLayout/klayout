@@ -310,7 +310,8 @@ MainService::cm_descend ()
 
   std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end () && common_inst.valid (); ++es) {
-    for (edt::Service::objects::const_iterator sel = (*es)->selection ().begin (); sel != (*es)->selection ().end () && common_inst.valid (); ++sel) {
+    const edt::Service::objects &selection = (*es)->selection ();
+    for (edt::Service::objects::const_iterator sel = selection.begin (); sel != selection.end () && common_inst.valid (); ++sel) {
       common_inst.add (*sel, 1);
     }
   }
@@ -334,10 +335,12 @@ MainService::cm_descend ()
 
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
 
-    new_selections.push_back (std::vector<lay::ObjectInstPath> ());
-    new_selections.back ().reserve ((*es)->selection ().size ());
+    const edt::Service::objects &selection = (*es)->selection ();
 
-    for (edt::Service::objects::const_iterator sel = (*es)->selection ().begin (); sel != (*es)->selection ().end (); ++sel) {
+    new_selections.push_back (std::vector<lay::ObjectInstPath> ());
+    new_selections.back ().reserve (selection.size ());
+
+    for (edt::Service::objects::const_iterator sel = selection.begin (); sel != selection.end (); ++sel) {
 
       new_selections.back ().push_back (*sel);
       lay::ObjectInstPath &new_sel = new_selections.back ().back ();
@@ -436,7 +439,8 @@ MainService::cm_flatten_insts ()
   std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
 
-    for (edt::Service::objects::const_iterator r = (*es)->selection ().begin (); r != (*es)->selection ().end (); ++r) {
+    const edt::Service::objects &sel = (*es)->selection ();
+    for (edt::Service::objects::const_iterator r = sel.begin (); r != sel.end (); ++r) {
 
       const lay::CellView &cv = view ()->cellview (r->cv_index ());
       if (cv.is_valid ()) {
@@ -490,10 +494,12 @@ MainService::cm_move_hier_up ()
   std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
 
-    std::vector<lay::ObjectInstPath> new_selection;
-    new_selection.reserve ((*es)->selection ().size ());
+    const edt::Service::objects &selection = (*es)->selection ();
 
-    for (edt::Service::objects::const_iterator r = (*es)->selection ().begin (); r != (*es)->selection ().end (); ++r) {
+    std::vector<lay::ObjectInstPath> new_selection;
+    new_selection.reserve (selection.size ());
+
+    for (edt::Service::objects::const_iterator r = selection.begin (); r != selection.end (); ++r) {
 
       const lay::CellView &cv = view ()->cellview (r->cv_index ());
       if (cv.is_valid ()) {
@@ -725,7 +731,8 @@ MainService::cm_make_cell_variants ()
   //  TODO: this limitation is not really necessary, but makes the code somewhat simpler
   int cv_index = -1;
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
-    for (edt::Service::objects::const_iterator r = (*es)->selection ().begin (); r != (*es)->selection ().end (); ++r) {
+    const edt::Service::objects &selection = (*es)->selection ();
+    for (edt::Service::objects::const_iterator r = selection.begin (); r != selection.end (); ++r) {
       if (cv_index < 0) {
         cv_index = r->cv_index ();
       } else if (cv_index != int (r->cv_index ())) {
@@ -937,7 +944,8 @@ MainService::cm_resolve_arefs ()
 
   int cv_index = -1;
 
-  for (edt::Service::objects::const_iterator r = inst_service->selection ().begin (); r != inst_service->selection ().end (); ++r) {
+  const edt::Service::objects &selection = inst_service->selection ();
+  for (edt::Service::objects::const_iterator r = selection.begin (); r != selection.end (); ++r) {
     if (r->is_cell_inst () && r->back ().inst_ptr.size () > 1) {
       if (cv_index < 0) {
         cv_index = r->cv_index ();
@@ -1018,7 +1026,8 @@ MainService::cm_make_cell ()
   int cv_index = -1;
   std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
-    for (edt::Service::objects::const_iterator r = (*es)->selection ().begin (); r != (*es)->selection ().end (); ++r) {
+    const edt::Service::objects &selection = (*es)->selection () ;
+    for (edt::Service::objects::const_iterator r = selection.begin (); r != selection.end (); ++r) {
       if (cv_index < 0) {
         cv_index = r->cv_index ();
       } else if (cv_index != int (r->cv_index ())) {
@@ -1042,7 +1051,8 @@ MainService::cm_make_cell ()
     db::Box selection_bbox;
     db::box_convert<db::CellInst> bc (cv->layout ());
     for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
-      for (edt::Service::objects::const_iterator r = (*es)->selection ().begin (); r != (*es)->selection ().end (); ++r) {
+      const edt::Service::objects &selection = (*es)->selection () ;
+      for (edt::Service::objects::const_iterator r = selection.begin (); r != selection.end (); ++r) {
         if (r->is_cell_inst ()) {
           selection_bbox += db::ICplxTrans (r->trans ()) * r->back ().bbox (bc);
         } else {
@@ -1076,7 +1086,8 @@ MainService::cm_make_cell ()
 
     for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
 
-      for (edt::Service::objects::const_iterator r = (*es)->selection ().begin (); r != (*es)->selection ().end (); ++r) {
+      const edt::Service::objects &selection = (*es)->selection () ;
+      for (edt::Service::objects::const_iterator r = selection.begin (); r != selection.end (); ++r) {
 
         if (r->is_cell_inst ()) {
 
@@ -1137,7 +1148,8 @@ MainService::cm_convert_to_cell ()
     //  Do the conversion
     for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
 
-      for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
+      const edt::Service::objects &selection = (*es)->selection () ;
+      for (edt::Service::obj_iterator s = selection.begin (); s != selection.end (); ++s) {
 
         const lay::CellView &cv = view ()->cellview (s->cv_index ());
         db::cell_index_type ci = s->cell_index_tot ();
@@ -1207,8 +1219,9 @@ MainService::cm_convert_to_pcell ()
   //  check whether the selection contains instances and reject it in that case
   size_t num_selected = 0;
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
-    num_selected += (*es)->selection ().size ();
-    for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
+    const edt::Service::objects &selection = (*es)->selection ();
+    num_selected += selection.size ();
+    for (edt::Service::obj_iterator s = selection.begin (); s != selection.end (); ++s) {
       if (s->is_cell_inst ()) {
         throw tl::Exception (tl::to_string (tr ("Selection contains instances - they cannot be converted to PCells.")));
       }
@@ -1230,7 +1243,8 @@ MainService::cm_convert_to_pcell ()
         const db::PCellDeclaration *pc_decl = lib->layout ().pcell_declaration (pc->second);
         size_t n = 1000; // 1000 tries max.
         for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); n > 0 && pc_decl && es != edt_services.end (); ++es) {
-          for (edt::Service::obj_iterator s = (*es)->selection ().begin (); n > 0 && pc_decl && s != (*es)->selection ().end (); ++s) {
+          const edt::Service::objects &selection = (*es)->selection ();
+          for (edt::Service::obj_iterator s = selection.begin (); n > 0 && pc_decl && s != selection.end (); ++s) {
             const lay::CellView &cv = view ()->cellview (s->cv_index ());
             if (pc_decl->can_create_from_shape (cv->layout (), s->shape (), s->layer ())) {
               --n;
@@ -1307,7 +1321,8 @@ MainService::cm_convert_to_pcell ()
       //  convert the shapes which can be converted
       for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
 
-        for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
+        const edt::Service::objects &selection = (*es)->selection ();
+        for (edt::Service::obj_iterator s = selection.begin (); s != selection.end (); ++s) {
 
           const lay::CellView &cv = view ()->cellview (s->cv_index ());
 
@@ -1406,7 +1421,8 @@ void MainService::cm_area_perimeter ()
   //  get (common) cellview index of the primary selection
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
 
-    for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
+    const edt::Service::objects &selection = (*es)->selection ();
+    for (edt::Service::obj_iterator s = selection.begin (); s != selection.end (); ++s) {
 
       if (s->is_cell_inst ()) {
         continue;
@@ -1511,7 +1527,9 @@ MainService::cm_round_corners ()
 
   //  get (common) cellview index of the primary selection
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
-    for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
+
+    const edt::Service::objects &selection = (*es)->selection ();
+    for (edt::Service::obj_iterator s = selection.begin (); s != selection.end (); ++s) {
 
       if (! s->is_cell_inst () && (s->shape ().is_polygon () || s->shape ().is_path () || s->shape ().is_box ())) {
 
@@ -1532,6 +1550,7 @@ MainService::cm_round_corners ()
       }
 
     }
+
   }
 
   if (cv_index < 0 || layer_index < 0) {
@@ -1584,7 +1603,8 @@ MainService::cm_round_corners ()
 
   //  Delete the current selection
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
-    for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
+    const edt::Service::objects &selection = (*es)->selection ();
+    for (edt::Service::obj_iterator s = selection.begin (); s != selection.end (); ++s) {
       if (! s->is_cell_inst () && (s->shape ().is_polygon () || s->shape ().is_path () || s->shape ().is_box ())) {
         db::Cell &cell = view ()->cellview (s->cv_index ())->layout ().cell (s->cell_index ());
         if (cell.shapes (s->layer ()).is_valid (s->shape ())) {
@@ -1644,7 +1664,8 @@ MainService::cm_size ()
 
   //  get (common) cellview index of the primary selection
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
-    for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
+    const edt::Service::objects &selection = (*es)->selection ();
+    for (edt::Service::obj_iterator s = selection.begin (); s != selection.end (); ++s) {
 
       if (! s->is_cell_inst () && (s->shape ().is_polygon () || s->shape ().is_path () || s->shape ().is_box ())) {
 
@@ -1714,7 +1735,8 @@ MainService::cm_size ()
 
   //  Delete the current selection
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
-    for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
+    const edt::Service::objects &selection = (*es)->selection ();
+    for (edt::Service::obj_iterator s = selection.begin (); s != selection.end (); ++s) {
       if (! s->is_cell_inst () && (s->shape ().is_polygon () || s->shape ().is_path () || s->shape ().is_box ())) {
         db::Cell &cell = view ()->cellview (s->cv_index ())->layout ().cell (s->cell_index ());
         if (cell.shapes (s->layer ()).is_valid (s->shape ())) {
@@ -1770,7 +1792,8 @@ MainService::boolean_op (int mode)
 
   //  get (common) cellview index of the primary selection
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
-    for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
+    const edt::Service::objects &selection = (*es)->selection ();
+    for (edt::Service::obj_iterator s = selection.begin (); s != selection.end (); ++s) {
 
       if (s->seq () == 0 && ! s->is_cell_inst () && (s->shape ().is_polygon () || s->shape ().is_path () || s->shape ().is_box ())) {
 
@@ -1804,7 +1827,8 @@ MainService::boolean_op (int mode)
 
   //  get the secondary selection
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
-    for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
+    const edt::Service::objects &selection = (*es)->selection ();
+    for (edt::Service::obj_iterator s = selection.begin (); s != selection.end (); ++s) {
 
       if (s->seq () > 0 && ! s->is_cell_inst () && (s->shape ().is_polygon () || s->shape ().is_path () || s->shape ().is_box ())) {
 
@@ -1841,7 +1865,8 @@ MainService::boolean_op (int mode)
   //  Let's see whether this heuristics is more accepted.
 
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
-    for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
+    const edt::Service::objects &selection = (*es)->selection ();
+    for (edt::Service::obj_iterator s = selection.begin (); s != selection.end (); ++s) {
       if (! s->is_cell_inst () && int (s->layer ()) == layer_index && (s->shape ().is_polygon () || s->shape ().is_path () || s->shape ().is_box ())) {
         db::Cell &cell = view ()->cellview (s->cv_index ())->layout ().cell (s->cell_index ());
         if (cell.shapes (s->layer ()).is_valid (s->shape ())) {
@@ -1976,7 +2001,8 @@ MainService::cm_align ()
 
   //  get (common) bbox index of the primary selection
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
-    for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
+    const edt::Service::objects &selection = (*es)->selection ();
+    for (edt::Service::obj_iterator s = selection.begin (); s != selection.end (); ++s) {
 
       if (s->seq () == 0) {
 
@@ -2006,11 +2032,13 @@ MainService::cm_align ()
     //  do the alignment
     for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
 
+      const edt::Service::objects &selection = (*es)->selection ();
+
       //  create a transformation vector that describes each shape's transformation
       std::vector <db::DCplxTrans> tv;
-      tv.reserve ((*es)->selection ().size ());
+      tv.reserve (selection.size ());
 
-      for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
+      for (edt::Service::obj_iterator s = selection.begin (); s != selection.end (); ++s) {
 
         db::DVector v;
 
@@ -2077,7 +2105,8 @@ MainService::cm_distribute ()
   //  count the items
   size_t n = 0;
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
-    for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
+    const edt::Service::objects &selection = (*es)->selection ();
+    for (edt::Service::obj_iterator s = selection.begin (); s != selection.end (); ++s) {
       ++n;
     }
   }
@@ -2099,7 +2128,8 @@ MainService::cm_distribute ()
 
       objects_for_service.push_back (std::make_pair (i, i));
 
-      for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
+      const edt::Service::objects &selection = (*es)->selection ();
+      for (edt::Service::obj_iterator s = selection.begin (); s != selection.end (); ++s) {
 
         const db::Layout &layout = view ()->cellview (s->cv_index ())->layout ();
         db::CplxTrans tr = db::CplxTrans (layout.dbu ()) * s->trans ();
@@ -2181,7 +2211,8 @@ MainService::cm_make_array ()
   std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
 
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
-    for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
+    const edt::Service::objects &selection = (*es)->selection ();
+    for (edt::Service::obj_iterator s = selection.begin (); s != selection.end (); ++s) {
       ++n;
     }
   }
@@ -2215,7 +2246,8 @@ MainService::cm_make_array ()
 
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
 
-    for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
+    const edt::Service::objects &selection = (*es)->selection ();
+    for (edt::Service::obj_iterator s = selection.begin (); s != selection.end (); ++s) {
 
       const lay::CellView &cv = view ()->cellview (s->cv_index ());
       if (! cv.is_valid ()) {
@@ -2377,7 +2409,7 @@ MainService::cm_change_layer ()
   int cv_index = -1;
 
   //  get (common) cellview index of the selected shapes
-  for (SelectionIterator s (view ()); ! s.at_end (); ++s) {
+  for (EditableSelectionIterator s = begin_objects_selected (view ()); ! s.at_end (); ++s) {
     if (cv_index >= 0 && cv_index != int (s->cv_index ())) {
       throw tl::Exception (tl::to_string (tr ("Selections originate from different layouts - cannot switch layer in this case.")));
     }
@@ -2445,7 +2477,7 @@ MainService::cm_change_layer ()
 
     //  Insert and delete the shape. This exploits the fact, that a shape can be erased multiple times -
     //  this is important since the selection potentially contains the same shape multiple times.
-    for (SelectionIterator s (view ()); ! s.at_end (); ++s) {
+    for (EditableSelectionIterator s = begin_objects_selected (view ()); ! s.at_end (); ++s) {
 
       if (!s->is_cell_inst () && int (s->layer ()) != layer) {
 
@@ -2512,7 +2544,8 @@ MainService::check_no_guiding_shapes ()
 {
   std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
-    for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
+    const edt::Service::objects &selection = (*es)->selection ();
+    for (edt::Service::obj_iterator s = selection.begin (); s != selection.end (); ++s) {
       if (! s->is_cell_inst ()) {
         if (s->layer () == view ()->cellview (s->cv_index ())->layout ().guiding_shape_layer ()) {
           throw tl::Exception (tl::to_string (tr ("This function cannot be applied to PCell guiding shapes")));

@@ -68,7 +68,7 @@ CombinedChangeApplicator::~CombinedChangeApplicator ()
 bool CombinedChangeApplicator::supports_relative_mode () const 
 { 
   for (std::vector<ChangeApplicator *>::const_iterator a = m_appl.begin (); a != m_appl.end (); ++a) {
-    if ((*a)->supports_relative_mode ()) {
+    if ((*a) && (*a)->supports_relative_mode ()) {
       return true;
     }
   }

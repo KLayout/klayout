@@ -459,7 +459,8 @@ Service::copy_selected ()
   unsigned int inst_mode = 0;
 
   if (m_hier_copy_mode < 0) {
-    for (objects::const_iterator r = selection ().begin (); r != selection ().end () && ! need_to_ask_for_copy_mode; ++r) {
+    const objects &sel = selection ();
+    for (objects::const_iterator r = sel.begin (); r != sel.end () && ! need_to_ask_for_copy_mode; ++r) {
       if (r->is_cell_inst ()) {
         const db::Cell &cell = view ()->cellview (r->cv_index ())->layout ().cell (r->back ().inst_ptr.cell_index ());
         if (! cell.is_proxy ()) {
@@ -499,10 +500,12 @@ Service::copy_selected ()
 void
 Service::copy_selected (unsigned int inst_mode)
 {
+  const objects &sel = selection ();
+
   //  create one ClipboardData object per cv_index because, this one assumes that there is
   //  only one source layout object.
   std::set <unsigned int> cv_indices;
-  for (objects::const_iterator r = selection ().begin (); r != selection ().end (); ++r) {
+  for (objects::const_iterator r = sel.begin (); r != sel.end (); ++r) {
     cv_indices.insert (r->cv_index ());
   }
 
@@ -512,7 +515,7 @@ Service::copy_selected (unsigned int inst_mode)
 
     //  add the selected objects to the clipboard data objects.
     const lay::CellView &cv = view ()->cellview (*cvi);
-    for (objects::const_iterator r = selection ().begin (); r != selection ().end (); ++r) {
+    for (objects::const_iterator r = sel.begin (); r != sel.end (); ++r) {
       if (r->cv_index () == *cvi) {
         if (! r->is_cell_inst ()) {
           cd->get ().add (cv->layout (), r->layer (), r->shape (), cv.context_trans () * r->trans ());
@@ -614,7 +617,9 @@ Service::selection_bbox ()
   lay::TextInfo text_info (view ());
 
   db::DBox box;
-  for (objects::const_iterator r = selection ().begin (); r != selection ().end (); ++r) {
+
+  const objects &sel = selection ();
+  for (objects::const_iterator r = sel.begin (); r != sel.end (); ++r) {
 
     const lay::CellView &cv = view ()->cellview (r->cv_index ());
     const db::Layout &layout = cv->layout ();
@@ -694,10 +699,12 @@ Service::transform (const db::DCplxTrans &trans, const std::vector<db::DCplxTran
   
   size_t n;
 
+  const objects &sel = selection ();
+
   //  build a list of object references corresponding to the p_trv vector 
   std::vector <objects::iterator> obj_ptrs;
-  obj_ptrs.reserve (selection ().size ());
-  for (objects::iterator r = selection ().begin (); r != selection ().end (); ++r) {
+  obj_ptrs.reserve (sel.size ());
+  for (objects::iterator r = sel.begin (); r != sel.end (); ++r) {
     obj_ptrs.push_back (r);
   }
 
@@ -710,7 +717,7 @@ Service::transform (const db::DCplxTrans &trans, const std::vector<db::DCplxTran
   //  The key is a triple: cell_index, cv_index, layer
   std::map <std::pair <db::cell_index_type, std::pair <unsigned int, unsigned int> >, std::vector <size_t> > shapes_by_cell;
   n = 0;
-  for (objects::iterator r = selection ().begin (); r != selection ().end (); ++r, ++n) {
+  for (objects::iterator r = sel.begin (); r != sel.end (); ++r, ++n) {
     if (! r->is_cell_inst ()) {
       shapes_by_cell.insert (std::make_pair (std::make_pair (r->cell_index (), std::make_pair (r->cv_index (), r->layer ())), std::vector <size_t> ())).first->second.push_back (n);
     }
@@ -780,7 +787,7 @@ Service::transform (const db::DCplxTrans &trans, const std::vector<db::DCplxTran
   //  The key is a pair: cell_index, cv_index
   std::map <std::pair <db::cell_index_type, unsigned int>, std::vector <size_t> > insts_by_cell;
   n = 0;
-  for (objects::iterator r = selection ().begin (); r != selection ().end (); ++r, ++n) {
+  for (objects::iterator r = sel.begin (); r != sel.end (); ++r, ++n) {
     if (r->is_cell_inst ()) {
       insts_by_cell.insert (std::make_pair (std::make_pair (r->cell_index (), r->cv_index ()), std::vector <size_t> ())).first->second.push_back (n);
     }
@@ -1032,7 +1039,8 @@ Service::del_selected ()
   std::set<db::Layout *> needs_cleanup;
 
   //  delete all shapes and instances.
-  for (objects::const_iterator r = selection ().begin (); r != selection ().end (); ++r) {
+  const objects &sel = selection ();
+  for (objects::const_iterator r = sel.begin (); r != sel.end (); ++r) {
     const lay::CellView &cv = view ()->cellview (r->cv_index ());
     if (cv.is_valid ()) {
       db::Cell &cell = cv->layout ().cell (r->cell_index ());
@@ -1722,15 +1730,17 @@ Service::selection_to_view ()
 void 
 Service::do_selection_to_view ()
 {
+  const objects &sel = selection ();
+
   //  Hint: this is a lower bound:
-  m_markers.reserve (selection ().size ());
+  m_markers.reserve (sel.size ());
 
   //  build the transformation variants cache
   TransformationVariants tv (view ());
 
   //  Build markers
 
-  for (std::set<lay::ObjectInstPath>::iterator r = selection ().begin (); r != selection ().end (); ++r) {
+  for (objects::const_iterator r = sel.begin (); r != sel.end (); ++r) {
 
     const lay::CellView &cv = view ()->cellview (r->cv_index ());
 
@@ -1984,10 +1994,16 @@ EditableSelectionIterator::operator++ ()
   return *this;
 }
 
-const EditableSelectionIterator::value_type &
+EditableSelectionIterator::pointer
+EditableSelectionIterator::operator-> () const
+{
+  return m_iter.operator-> ();
+}
+
+EditableSelectionIterator::reference
 EditableSelectionIterator::operator* () const
 {
-  return *m_iter;
+  return m_iter.operator* ();
 }
 
 void

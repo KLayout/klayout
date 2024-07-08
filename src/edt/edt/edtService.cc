@@ -1994,10 +1994,16 @@ EditableSelectionIterator::operator++ ()
   return *this;
 }
 
-const EditableSelectionIterator::value_type &
+EditableSelectionIterator::pointer
+EditableSelectionIterator::operator-> () const
+{
+  return m_iter.operator-> ();
+}
+
+EditableSelectionIterator::reference
 EditableSelectionIterator::operator* () const
 {
-  return *m_iter;
+  return m_iter.operator* ();
 }
 
 void

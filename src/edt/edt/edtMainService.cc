@@ -2409,7 +2409,7 @@ MainService::cm_change_layer ()
   int cv_index = -1;
 
   //  get (common) cellview index of the selected shapes
-  for (SelectionIterator s (view ()); ! s.at_end (); ++s) {
+  for (EditableSelectionIterator s = begin_objects_selected (view ()); ! s.at_end (); ++s) {
     if (cv_index >= 0 && cv_index != int (s->cv_index ())) {
       throw tl::Exception (tl::to_string (tr ("Selections originate from different layouts - cannot switch layer in this case.")));
     }
@@ -2477,7 +2477,7 @@ MainService::cm_change_layer ()
 
     //  Insert and delete the shape. This exploits the fact, that a shape can be erased multiple times -
     //  this is important since the selection potentially contains the same shape multiple times.
-    for (SelectionIterator s (view ()); ! s.at_end (); ++s) {
+    for (EditableSelectionIterator s = begin_objects_selected (view ()); ! s.at_end (); ++s) {
 
       if (!s->is_cell_inst () && int (s->layer ()) != layer) {
 

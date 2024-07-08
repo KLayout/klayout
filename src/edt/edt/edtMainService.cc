@@ -310,8 +310,7 @@ MainService::cm_descend ()
 
   std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end () && common_inst.valid (); ++es) {
-    const edt::Service::objects &selection = (*es)->selection ();
-    for (edt::Service::objects::const_iterator sel = selection.begin (); sel != selection.end () && common_inst.valid (); ++sel) {
+    for (EditableSelectionIterator sel = (*es)->begin_selection (); ! sel.at_end () && common_inst.valid (); ++sel) {
       common_inst.add (*sel, 1);
     }
   }
@@ -335,12 +334,10 @@ MainService::cm_descend ()
 
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
 
-    const edt::Service::objects &selection = (*es)->selection ();
-
     new_selections.push_back (std::vector<lay::ObjectInstPath> ());
-    new_selections.back ().reserve (selection.size ());
+    new_selections.back ().reserve ((*es)->selection_size ());
 
-    for (edt::Service::objects::const_iterator sel = selection.begin (); sel != selection.end (); ++sel) {
+    for (EditableSelectionIterator sel = (*es)->begin_selection (); ! sel.at_end (); ++sel) {
 
       new_selections.back ().push_back (*sel);
       lay::ObjectInstPath &new_sel = new_selections.back ().back ();

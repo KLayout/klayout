@@ -1,6 +1,6 @@
-Relevant KLayout version: 0.29.3<br>
+Relevant KLayout version: 0.29.4<br>
 Author: Kazzz-S<br>
-Last modified: 2024-07-05<br>
+Last modified: 2024-07-10<br>
 
 # 1. Introduction
 This directory **`macbuild`** contains various files required for building KLayout (http://www.klayout.de/) version 0.29.0 or later for different 64-bit macOS, including:
@@ -190,7 +190,7 @@ $ ./build4mac.py -q qt5macports -r mp33 -p mp311 -Y
 
 ### 6C. Fully Homebrew-flavored build with Homebrew Ruby 3.3 and Homebrew Python 3.11
 > [!IMPORTANT]
-> To build KLayout >= 0.29.0, you need "Qt6" >= 6.7.1 to address [the compilation issue](https://github.com/KLayout/klayout/issues/1599).<br>
+> To build KLayout >= 0.29.0, you need "Qt6" >= 6.7.0 to address [the compilation issue](https://github.com/KLayout/klayout/issues/1599).<br>
 
 0. Install Homebrew, then install Qt6, Ruby 3.3, Python 3.11, and libgit2 by
 ```
@@ -224,7 +224,7 @@ $ ./build4mac.py -q qt6brew -r hb33 -p hb311 -Y
 
 ### 6D. Partially Homebrew-flavored build with System Ruby and Homebrew Python 3.11
 > [!IMPORTANT]
-> To build KLayout >= 0.29.0, you need "Qt6" >= 6.7.1 to address [the compilation issue](https://github.com/KLayout/klayout/issues/1599).<br>
+> To build KLayout >= 0.29.0, you need "Qt6" >= 6.7.0 to address [the compilation issue](https://github.com/KLayout/klayout/issues/1599).<br>
 
 0. Install Homebrew, then install Qt6, Python 3.11, and libgit2 by
 ```

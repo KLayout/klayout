@@ -1057,15 +1057,38 @@ normalized_type (Variant::type type1, Variant::type type2)
 
 static const double epsilon = 1e-13;
 
+//  NOTE: in order to be able to use Variant for std::map or std::set
+//  keys we have to establish a weak order. This means we need to
+//  consider NAN and INFINITY too.
+
+static int numeric_class (double x)
+{
+  if (std::isnan (x)) {
+    return 2;
+  } else {
+    return std::isinf (x) ? (x < 0 ? -1 : 1) : 0;
+  }
+}
+
 static inline bool fequal (double a, double b)
 {
-  double avg = 0.5 * (fabs (a) + fabs (b));
-  return fabs (a - b) <= epsilon * avg;
+  if (numeric_class (a) != 0 || numeric_class (b) != 0) {
+    return numeric_class (a) == numeric_class (b);
+  } else {
+    double avg = 0.5 * (fabs (a) + fabs (b));
+    return fabs (a - b) <= epsilon * avg;
+  }
 }
 
 static inline bool fless (double a, double b)
 {
-  return fequal (a, b) ? false : a < b;
+  if (fequal (a, b)) {
+    return false;
+  } else if (numeric_class (a) != 0 || numeric_class (b) != 0) {
+    return numeric_class (a) < numeric_class (b);
+  } else {
+    return a < b;
+  }
 }
 
 bool 

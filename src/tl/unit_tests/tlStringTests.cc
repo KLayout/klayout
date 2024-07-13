@@ -589,3 +589,62 @@ TEST(15)
   EXPECT_EQ (tl::to_upper_case ("nOrMaliI(\xc3\xa4\xc3\x84\xc3\xbc\xc3\x9c\xc3\xb6\xc3\x96\xc3\x9f-42\xc2\xb0+6\xe2\x82\xac)"), "NORMALII(\xc3\x84\xc3\x84\xc3\x9c\xc3\x9c\xc3\x96\xc3\x96\xc3\x9f-42\xc2\xb0+6\xe2\x82\xac)");
   EXPECT_EQ (tl::to_lower_case ("nOrMaliI(\xc3\xa4\xc3\x84\xc3\xbc\xc3\x9c\xc3\xb6\xc3\x96\xc3\x9f-42\xc2\xb0+6\xe2\x82\xac)"), "normalii(\xc3\xa4\xc3\xa4\xc3\xbc\xc3\xbc\xc3\xb6\xc3\xb6\xc3\x9f-42\xc2\xb0+6\xe2\x82\xac)");
 }
+
+//  Special numerical values
+TEST(16)
+{
+  EXPECT_EQ (tl::to_string (NAN), "nan");
+  EXPECT_EQ (tl::to_string (INFINITY), "inf");
+  EXPECT_EQ (tl::to_string (-INFINITY), "-inf");
+
+  EXPECT_EQ (tl::to_string ((float) NAN), "nan");
+  EXPECT_EQ (tl::to_string ((float) INFINITY), "inf");
+  EXPECT_EQ (tl::to_string ((float) -INFINITY), "-inf");
+
+  EXPECT_EQ (tl::micron_to_string (NAN), "nan");
+  EXPECT_EQ (tl::micron_to_string (INFINITY), "inf");
+  EXPECT_EQ (tl::micron_to_string (-INFINITY), "-inf");
+
+  EXPECT_EQ (tl::db_to_string (NAN), "nan");
+  EXPECT_EQ (tl::db_to_string (INFINITY), "inf");
+  EXPECT_EQ (tl::db_to_string (-INFINITY), "-inf");
+
+  double x = 0.0;
+  tl::from_string ("nan", x);
+  EXPECT_EQ (tl::to_string (x), "nan");
+  x = 0.0;
+  tl::from_string ("NaN", x);
+  EXPECT_EQ (tl::to_string (x), "nan");
+  x = 0.0;
+  tl::from_string ("inf", x);
+  EXPECT_EQ (tl::to_string (x), "inf");
+  x = 0.0;
+  tl::from_string ("INF", x);
+  EXPECT_EQ (tl::to_string (x), "inf");
+  x = 0.0;
+  tl::from_string ("-inf", x);
+  EXPECT_EQ (tl::to_string (x), "-inf");
+  x = 0.0;
+  tl::from_string ("-INF", x);
+  EXPECT_EQ (tl::to_string (x), "-inf");
+
+  std::string s;
+  tl::Extractor ex;
+  x = 0.0;
+  s = "  inf   nan\t -inf";
+  ex = tl::Extractor (s.c_str ());
+  EXPECT_EQ (ex.try_read (x), true);
+  EXPECT_EQ (tl::to_string (x), "inf");
+  EXPECT_EQ (ex.try_read (x), true);
+  EXPECT_EQ (tl::to_string (x), "nan");
+  EXPECT_EQ (ex.try_read (x), true);
+  EXPECT_EQ (tl::to_string (x), "-inf");
+  s = "  Inf   NaN\t -INF";
+  ex = tl::Extractor (s.c_str ());
+  EXPECT_EQ (ex.try_read (x), true);
+  EXPECT_EQ (tl::to_string (x), "inf");
+  EXPECT_EQ (ex.try_read (x), true);
+  EXPECT_EQ (tl::to_string (x), "nan");
+  EXPECT_EQ (ex.try_read (x), true);
+  EXPECT_EQ (tl::to_string (x), "-inf");
+}

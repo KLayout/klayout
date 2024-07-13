@@ -3468,8 +3468,9 @@ MacroEditorDialog::leave_breakpoint_mode ()
   set_exec_point (0, -1, -1);
 
   //  refresh UI that might have been spoiled because we filter events
-  if (lay::MainWindow::instance ()) {
-    lay::MainWindow::instance ()->update ();
+  auto tl_widgets = QApplication::topLevelWidgets ();
+  for (auto w = tl_widgets.begin (); w != tl_widgets.end (); ++w) {
+    (*w)->update ();
   }
 }
 

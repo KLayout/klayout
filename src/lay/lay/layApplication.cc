@@ -94,16 +94,23 @@ namespace lay
 // --------------------------------------------------------------------------------
 //  Exception handlers
 
+static void close_transaction ()
+{
+  //  if any transaction is pending (this may happen when an operation threw an exception)
+  //  close transactions.
+  //  NOTE: don't do this in breakpoint mode as we do not want to interfere with things happening outside
+  if (lay::MainWindow::instance () && lay::MainWindow::instance ()->manager ().transacting () &&
+      !(lay::MacroEditorDialog::instance () && lay::MacroEditorDialog::instance ()->in_breakpoint ())) {
+    lay::MainWindow::instance ()->manager ().commit ();
+  }
+}
+
 static void ui_exception_handler_tl (const tl::Exception &ex, QWidget *parent)
 {
   //  Prevents severe side effects if there are pending deferred methods
   tl::NoDeferredMethods silent;
 
-  //  if any transaction is pending (this may happen when an operation threw an exception)
-  //  close transactions.
-  if (lay::MainWindow::instance () && lay::MainWindow::instance ()->manager ().transacting ()) {
-    lay::MainWindow::instance ()->manager ().commit ();
-  }
+  close_transaction ();
 
   const tl::ExitException *gsi_exit = dynamic_cast <const tl::ExitException *> (&ex);
   const tl::BreakException *gsi_break = dynamic_cast <const tl::BreakException *> (&ex);
@@ -155,13 +162,9 @@ static void ui_exception_handler_std (const std::exception &ex, QWidget *parent)
   //  Prevents severe side effects if there are pending deferred methods
   tl::NoDeferredMethods silent;
 
-  //  if any transaction is pending (this may happen when an operation threw an exception)
-  //  close transactions.
-  if (lay::MainWindow::instance () && lay::MainWindow::instance ()->manager ().transacting ()) {
-    lay::MainWindow::instance ()->manager ().commit ();
-  }
+  close_transaction ();
 
-  tl::error << ex.what (); 
+  tl::error << ex.what ();
   if (! parent) {
     parent = QApplication::activeWindow () ? QApplication::activeWindow () : lay::MainWindow::instance ();
   }
@@ -173,11 +176,7 @@ static void ui_exception_handler_def (QWidget *parent)
   //  Prevents severe side effects if there are pending deferred methods
   tl::NoDeferredMethods silent;
 
-  //  if any transaction is pending (this may happen when an operation threw an exception)
-  //  close transactions.
-  if (lay::MainWindow::instance () && lay::MainWindow::instance ()->manager ().transacting ()) {
-    lay::MainWindow::instance ()->manager ().commit ();
-  }
+  close_transaction ();
 
   if (! parent) {
     parent = QApplication::activeWindow () ? QApplication::activeWindow () : lay::MainWindow::instance ();

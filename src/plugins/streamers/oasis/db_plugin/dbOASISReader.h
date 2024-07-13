@@ -107,8 +107,6 @@ protected:
   virtual void do_read (db::Layout &layout);
 
 private:
-  friend class OASISReaderLayerMapping;
-
   typedef db::coord_traits<db::Coord>::distance_type distance_type;
 
   enum TableMode

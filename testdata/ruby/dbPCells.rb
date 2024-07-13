@@ -774,6 +774,41 @@ class DBPCell_TestClass < TestBase
 
   end
 
+  def test_11
+
+    lib = CircleLib1782::new("CircleLib")
+
+    ly = RBA::Layout::new
+
+    top = ly.create_cell("TOP")
+
+    names = []
+
+    c = ly.create_cell("Circle", "CircleLib", { "l" => RBA::LayerInfo::new(1, 0), "r" => 2.0, "n" => 64 })
+
+    # triggered another flavor of #1782
+    lib.reregister_pcell
+
+    c = ly.create_cell("Circle", "CircleLib", { "l" => RBA::LayerInfo::new(1, 0), "r" => 2.0, "n" => 64 })
+    top.insert(RBA::DCellInstArray::new(c, RBA::DTrans::new()))
+
+    tmp = File::join($ut_testtmp, "tmp.gds")
+    ly.write(tmp)
+
+    # this should not throw an internal error
+    ly._destroy
+
+    # we should be able to read the Layout back
+    ly = RBA::Layout::new
+    ly.read(tmp)
+    assert_equal(ly.top_cell.name, "TOP")
+    assert_equal(ly.cells, 2)
+    ly._destroy
+
+    lib._destroy
+
+  end
+
 end
 
 load("test_epilogue.rb")

@@ -10,19 +10,20 @@
 #     qtVer  = 5 or 6
 #     target = [0='std', 1='ports', 2='brew', 3='brewHW', 4='ana3',
 #               12='pbrew', 13='pbrewHW']
+#     bdType = ['r(elease)', 'd(ebug)']
 #   note that
-#     (qtVer,target)=(6,4) will be omitted
+#     (qtVer,target,bdType)=(6,4,r|d) and (5,4,d) will be omitted
 #-------------------------------------------------------------------------------
-qtVer,target
-5,0
-5,1
-6,2
-6,13
-5,4
-#6,0
-#6,1
-#6,2
-#6,3
-#6,4
-#6,12
-#6,13
+qtVer,target,bdType
+5,0,r
+5,1,r
+6,2,r
+6,13,r
+5,4,r
+#6,0,r
+#6,1,r
+#6,2,r
+#6,3,r
+#6,4,r
+#6,12,r
+#6,13,r

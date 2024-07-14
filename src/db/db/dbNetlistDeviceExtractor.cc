@@ -292,6 +292,7 @@ void NetlistDeviceExtractor::pre_extract_for_device_propagation (const db::hier_
         if (ec == extractor_cache.end ()) {
 
           m_log_entries.clear ();
+          m_new_devices_pre_extracted.clear ();  //  safety
 
           //  do the actual device extraction
           extract_devices (layer_geometry);

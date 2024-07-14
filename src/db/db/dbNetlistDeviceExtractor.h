@@ -504,14 +504,14 @@ private:
   bool m_pre_extract;
   std::map<size_t, std::pair<db::Device *, geometry_per_terminal_type> > m_new_devices;
   std::map<DeviceCellKey, std::pair<db::cell_index_type, db::DeviceAbstract *> > m_device_cells;
-  std::vector<db::Device *> m_new_devices_pre_extracted;
+  tl::shared_collection<db::Device> m_new_devices_pre_extracted;
 
   //  no copying
   NetlistDeviceExtractor (const NetlistDeviceExtractor &);
   NetlistDeviceExtractor &operator= (const NetlistDeviceExtractor &);
 
   void extract_without_initialize (db::Layout &layout, db::Cell &cell, hier_clusters_type &clusters, const std::vector<unsigned int> &layers, double device_scaling, const std::set<cell_index_type> *breakout_cells);
-  void pre_extract_for_device_propagation (const hier_clusters_type &device_clusters, const std::set<db::cell_index_type> &called_cells, std::set<std::pair<db::cell_index_type, db::connected_clusters<shape_type>::id_type> > &to_extract);
+  void pre_extract_for_device_propagation (const hier_clusters_type &device_clusters, const std::vector<unsigned int> &layers, const std::set<db::cell_index_type> &called_cells, std::set<std::pair<db::cell_index_type, db::connected_clusters<shape_type>::id_type> > &to_extract);
   void push_new_devices (const Vector &disp_cache);
   void push_cached_devices (const tl::vector<Device *> &cached_devices, const db::Vector &disp_cache, const db::Vector &new_disp);
 };

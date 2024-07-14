@@ -182,11 +182,272 @@ struct ExtractorCacheValueType {
 
 }
 
-void NetlistDeviceExtractor::pre_extract_for_device_propagation (const db::hier_clusters<shape_type> &device_clusters, const std::set<db::cell_index_type> &called_cells, std::set<std::pair<db::cell_index_type, db::connected_clusters<shape_type>::id_type> > &to_extract)
+static db::Vector normalize_device_layer_geometry (std::vector<db::Region> &layer_geometry)
 {
+  db::Box box;
+  for (std::vector<db::Region>::const_iterator g = layer_geometry.begin (); g != layer_geometry.end (); ++g) {
+    box += g->bbox ();
+  }
 
-  // @@@
+  db::Vector disp = box.p1 () - db::Point ();
+  for (std::vector<db::Region>::iterator g = layer_geometry.begin (); g != layer_geometry.end (); ++g) {
+    g->transform (db::Disp (-disp));
+  }
 
+  return disp;
+}
+
+static db::Vector get_layer_geometry (std::vector<db::Region> &layer_geometry, const std::vector<unsigned int> &layers, const db::hier_clusters<db::NetShape> &device_clusters, db::cell_index_type ci, db::connected_clusters<db::NetShape>::id_type cid)
+{
+  layer_geometry.resize (layers.size ());
+
+  for (std::vector<unsigned int>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
+    db::Region &r = layer_geometry [l - layers.begin ()];
+    for (db::recursive_cluster_shape_iterator<db::NetShape> si (device_clusters, *l, ci, cid); ! si.at_end(); ++si) {
+      insert_into_region (*si, si.trans (), r);
+    }
+    r.set_base_verbosity (50);
+  }
+
+  return normalize_device_layer_geometry (layer_geometry);
+}
+
+namespace
+{
+  struct DevicePtrCompare
+  {
+    bool operator() (const db::Device *d1, const db::Device *d2) const
+    {
+      return db::DeviceClass::less (*d1, *d2);
+    }
+
+    bool equals (const db::Device *d1, const db::Device *d2) const
+    {
+      return db::DeviceClass::equal (*d1, *d2);
+    }
+  };
+}
+
+static int compare_device_lists (std::vector<const db::Device *> &da, std::vector<const db::Device *> &db)
+{
+  if (da.size () != db.size ()) {
+    return da.size () < db.size () ? -1 : 1;
+  }
+
+  std::sort (da.begin (), da.end (), DevicePtrCompare ());
+  std::sort (db.begin (), db.end (), DevicePtrCompare ());
+
+  for (auto i = da.begin (), j = db.begin (); i != da.end (); ++i, ++j) {
+    if (! DevicePtrCompare ().equals (*i, *j)) {
+      return DevicePtrCompare ()(*i, *j) ? -1 : 1;
+    }
+  }
+
+  return 0;
+}
+
+void NetlistDeviceExtractor::pre_extract_for_device_propagation (const db::hier_clusters<shape_type> &device_clusters, const std::vector<unsigned int> &layers, const std::set<db::cell_index_type> &called_cells, std::set<std::pair<db::cell_index_type, db::connected_clusters<shape_type>::id_type> > &to_extract)
+{
+  typedef db::connected_clusters<shape_type>::id_type cluster_id_type;
+
+  m_pre_extract = true;
+
+  tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Pre-extracting devices for hierarchy analysis")));
+
+  //  Step 1: do a pre-extraction on all clusters and collect their devices
+
+  //  compute some effort number
+  size_t n = 0;
+  for (std::set<db::cell_index_type>::const_iterator ci = called_cells.begin (); ci != called_cells.end (); ++ci) {
+    n += device_clusters.clusters_per_cell (*ci).size ();
+  }
+
+  //  do the pre-extraction of all clusters to devices
+  //  -> the result is stored in "cluster2devices" and "extractor_cache" acts as a heap.
+
+  typedef std::map<std::vector<db::Region>, tl::shared_collection<db::Device> > extractor_cache_type;
+  extractor_cache_type extractor_cache;
+
+  typedef std::map<std::pair<db::cell_index_type, cluster_id_type>, const tl::shared_collection<db::Device> *> cluster2devices_map;
+  cluster2devices_map cluster2devices;
+
+  {
+    tl::RelativeProgress progress (tl::to_string (tr ("Pre-extracting devices")), to_extract.size (), 1);
+
+    for (std::set<db::cell_index_type>::const_iterator ci = called_cells.begin (); ci != called_cells.end (); ++ci) {
+
+      const db::connected_clusters<shape_type> &cc = device_clusters.clusters_per_cell (*ci);
+      for (db::connected_clusters<shape_type>::all_iterator c = cc.begin_all (); !c.at_end(); ++c) {
+
+        ++progress;
+
+        //  build layer geometry from the cluster found
+        std::vector<db::Region> layer_geometry;
+        get_layer_geometry (layer_geometry, layers, device_clusters, *ci, *c);
+
+        static tl::shared_collection<Device> empty_devices;
+        const tl::shared_collection<Device> *devices = &empty_devices;
+
+        extractor_cache_type::const_iterator ec = extractor_cache.find (layer_geometry);
+        if (ec == extractor_cache.end ()) {
+
+          m_log_entries.clear ();
+
+          //  do the actual device extraction
+          extract_devices (layer_geometry);
+
+          if (m_log_entries.empty ()) {
+
+            //  cache unless log entries are produced
+            tl::shared_collection<Device> &ce = extractor_cache [layer_geometry];
+            ce.swap (m_new_devices_pre_extracted);
+            devices = &ce;
+
+          }
+
+          m_new_devices_pre_extracted.clear ();
+
+        } else {
+          devices = &ec->second;
+        }
+
+        cluster2devices.insert (std::make_pair (std::make_pair (*ci, *c), devices));
+
+      }
+
+    }
+  }
+
+  //  Step 2: Identify all composed clusters where the devices are not identical to the sum of their child clusters.
+  //  These child clusters will need to be eliminated from the hierarchy.
+
+  //  -> the child clusters that need elimination will be stored in "to_eliminate"
+
+  std::set<std::pair<db::cell_index_type, cluster_id_type> > to_eliminate;
+
+  for (auto c2d = cluster2devices.begin (); c2d != cluster2devices.end (); ++c2d) {
+
+    db::cell_index_type ci = c2d->first.first;
+    cluster_id_type cid = c2d->first.second;
+    const db::connected_clusters<shape_type> &cc = device_clusters.clusters_per_cell (ci);
+
+    //  collect parent cluster devices
+    const tl::shared_collection<db::Device> *devices = c2d->second;
+    std::vector<const Device *> parent_devices;
+    parent_devices.reserve (devices->size ());
+    for (auto d = devices->begin (); d != devices->end (); ++d) {
+      parent_devices.push_back (d.operator-> ());
+    }
+
+    //  collect devices from all child clusters
+    std::vector<const Device *> child_devices;
+    const db::connected_clusters<shape_type>::connections_type &connections = cc.connections_for_cluster (cid);
+    for (auto icc = connections.begin (); icc != connections.end (); ++icc) {
+      db::cell_index_type cci = icc->inst_cell_index ();
+      cluster_id_type ccid = icc->id ();
+      auto cc2d = cluster2devices.find (std::make_pair (cci, ccid));
+      if (cc2d != cluster2devices.end ()) {
+        for (auto d = cc2d->second->begin (); d != cc2d->second->end (); ++d) {
+          child_devices.push_back (d.operator-> ());
+        }
+      }
+    }
+
+    //  if devices are not the same, enter the child clusters into the "to_eliminate" set
+    if (compare_device_lists (parent_devices, child_devices) != 0) {
+      for (auto icc = connections.begin (); icc != connections.end (); ++icc) {
+        db::cell_index_type cci = icc->inst_cell_index ();
+        cluster_id_type ccid = icc->id ();
+        to_eliminate.insert (std::make_pair (cci, ccid));
+      }
+    }
+
+  }
+
+  //  Step 3: spread eliminiation status
+  //  - Children of eliminated clusters get eliminated too.
+  //  - If one child of a cluster gets eliminated, all others will too.
+  //  Iterate until no futher cluster gets added to elimination set.
+  //  NOTE: this algorithm has a bad worst-case performance, but this case
+  //  is unlikely. Having the parents of a cluster would allow a more
+  //  efficient algorithm.
+
+  bool any_eliminated = ! to_eliminate.empty ();
+
+  while (any_eliminated) {
+
+    any_eliminated = false;
+
+    for (auto c2d = cluster2devices.begin (); c2d != cluster2devices.end (); ++c2d) {
+
+      db::cell_index_type ci = c2d->first.first;
+      cluster_id_type cid = c2d->first.second;
+
+      bool eliminate_all_children = (to_eliminate.find (std::make_pair (ci, cid)) != to_eliminate.end ());
+      if (! eliminate_all_children) {
+
+        //  all children need to be eliminated if one child is
+        const db::connected_clusters<shape_type> &cc = device_clusters.clusters_per_cell (ci);
+        const db::connected_clusters<shape_type>::connections_type &connections = cc.connections_for_cluster (cid);
+        for (auto icc = connections.begin (); icc != connections.end () && ! eliminate_all_children; ++icc) {
+          db::cell_index_type cci = icc->inst_cell_index ();
+          cluster_id_type ccid = icc->id ();
+          if (to_eliminate.find (std::make_pair (cci, ccid)) != to_eliminate.end ()) {
+            eliminate_all_children = true;
+          }
+        }
+
+      }
+
+      if (eliminate_all_children) {
+
+        const db::connected_clusters<shape_type> &cc = device_clusters.clusters_per_cell (ci);
+        const db::connected_clusters<shape_type>::connections_type &connections = cc.connections_for_cluster (cid);
+        for (auto icc = connections.begin (); icc != connections.end () && ! eliminate_all_children; ++icc) {
+          db::cell_index_type cci = icc->inst_cell_index ();
+          cluster_id_type ccid = icc->id ();
+          if (to_eliminate.find (std::make_pair (cci, ccid)) == to_eliminate.end ()) {
+            any_eliminated = true;
+            to_eliminate.insert (std::make_pair (cci, ccid));
+          }
+        }
+
+      }
+
+    }
+
+  }
+
+  //  Step 4: extract all clusters
+  //  - that are not eliminated themselves
+  //  - that do not have children OR whose first child cluster is eliminated (then all others are too, see above)
+
+  for (auto c2d = cluster2devices.begin (); c2d != cluster2devices.end (); ++c2d) {
+
+    db::cell_index_type ci = c2d->first.first;
+    cluster_id_type cid = c2d->first.second;
+
+    bool is_eliminated = (to_eliminate.find (std::make_pair (ci, cid)) != to_eliminate.end ());
+    if (! is_eliminated) {
+
+      const db::connected_clusters<shape_type> &cc = device_clusters.clusters_per_cell (ci);
+      const db::connected_clusters<shape_type>::connections_type &connections = cc.connections_for_cluster (cid);
+      if (connections.empty ()) {
+        to_extract.insert (c2d->first);
+      } else {
+        db::cell_index_type cci = connections.begin ()->inst_cell_index ();
+        cluster_id_type ccid = connections.begin ()->id ();
+        bool child_is_eliminated = (to_eliminate.find (std::make_pair (cci, ccid)) != to_eliminate.end ());
+        if (child_is_eliminated) {
+          to_extract.insert (c2d->first);
+        }
+      }
+
+    }
+
+  }
+
+  m_pre_extract = false;
 }
 
 void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db::Cell &cell, hier_clusters_type &clusters, const std::vector<unsigned int> &layers, double device_scaling, const std::set<db::cell_index_type> *breakout_cells)
@@ -239,23 +500,23 @@ void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db:
 
   if (m_smart_device_propagation) {
 
-    pre_extract_for_device_propagation (device_clusters, called_cells, to_extract);
+    pre_extract_for_device_propagation (device_clusters, layers, called_cells, to_extract);
 
   } else {
 
     //  in stupid mode, extract all root clusters
     for (std::set<db::cell_index_type>::const_iterator ci = called_cells.begin (); ci != called_cells.end (); ++ci) {
-      db::connected_clusters<shape_type> cc = device_clusters.clusters_per_cell (*ci);
+      const db::connected_clusters<shape_type> &cc = device_clusters.clusters_per_cell (*ci);
       for (db::connected_clusters<shape_type>::all_iterator c = cc.begin_all (); !c.at_end(); ++c) {
         if (cc.is_root (*c)) {
           to_extract.insert (std::make_pair (*ci, *c));
         }
       }
-
     }
 
   }
 
+  m_log_entries.clear ();
   m_pre_extract = false;
 
   tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Extracting devices")));
@@ -293,27 +554,8 @@ void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db:
     db::connected_clusters<shape_type>::id_type c = e->second;
 
     //  build layer geometry from the cluster found
-
     std::vector<db::Region> layer_geometry;
-    layer_geometry.resize (layers.size ());
-
-    for (std::vector<unsigned int>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
-      db::Region &r = layer_geometry [l - layers.begin ()];
-      for (db::recursive_cluster_shape_iterator<shape_type> si (device_clusters, *l, m_cell_index, c); ! si.at_end(); ++si) {
-        insert_into_region (*si, si.trans (), r);
-      }
-      r.set_base_verbosity (50);
-    }
-
-    db::Box box;
-    for (std::vector<db::Region>::const_iterator g = layer_geometry.begin (); g != layer_geometry.end (); ++g) {
-      box += g->bbox ();
-    }
-
-    db::Vector disp = box.p1 () - db::Point ();
-    for (std::vector<db::Region>::iterator g = layer_geometry.begin (); g != layer_geometry.end (); ++g) {
-      g->transform (db::Disp (-disp));
-    }
+    db::Vector disp = get_layer_geometry (layer_geometry, layers, device_clusters, m_cell_index, c);
 
     extractor_cache_type::const_iterator ec = extractor_cache.find (layer_geometry);
     if (ec == extractor_cache.end ()) {
@@ -538,14 +780,26 @@ Device *NetlistDeviceExtractor::create_device ()
     throw tl::Exception (tl::to_string (tr ("No device class registered")));
   }
 
-  tl_assert (mp_circuit != 0);
-  Device *device = new Device (mp_device_class.get ());
-  mp_circuit->add_device (device);
+  Device *device;
+
+  if (m_pre_extract) {
+    device = new Device (mp_device_class.get ());
+    m_new_devices_pre_extracted.push_back (device);
+  } else {
+    tl_assert (mp_circuit != 0);
+    device = new Device (mp_device_class.get ());
+    mp_circuit->add_device (device);
+  }
+
   return device;
 }
 
 void NetlistDeviceExtractor::define_terminal (Device *device, size_t terminal_id, size_t geometry_index, const db::Region &region)
 {
+  if (m_pre_extract) {
+    return;
+  }
+
   tl_assert (mp_layout != 0);
   tl_assert (geometry_index < m_layers.size ());
   unsigned int layer_index = m_layers [geometry_index];
@@ -561,6 +815,10 @@ void NetlistDeviceExtractor::define_terminal (Device *device, size_t terminal_id
 
 void NetlistDeviceExtractor::define_terminal (Device *device, size_t terminal_id, size_t geometry_index, const db::Polygon &polygon)
 {
+  if (m_pre_extract) {
+    return;
+  }
+
   tl_assert (mp_layout != 0);
   tl_assert (geometry_index < m_layers.size ());
   unsigned int layer_index = m_layers [geometry_index];

@@ -190,20 +190,7 @@ layout(
   pin(6 name(SUBSTRATE))
 
   # Devices and their connections
-  device(1 D$PMOS$2
-   location(850 5800)
-   param(L 0.25)
-   param(W 1.5)
-   param(AS 0.6375)
-   param(AD 0.6375)
-   param(PS 3.85)
-   param(PD 3.85)
-   terminal(S 1)
-   terminal(G 5)
-   terminal(D 2)
-   terminal(B 4)
-  )
-  device(2 D$NMOS$2
+  device(1 D$NMOS$2
    location(850 2135)
    param(L 0.25)
    param(W 0.95)
@@ -215,6 +202,19 @@ layout(
    terminal(G 5)
    terminal(D 2)
    terminal(B 6)
+  )
+  device(2 D$PMOS$2
+   location(850 5800)
+   param(L 0.25)
+   param(W 1.5)
+   param(AS 0.6375)
+   param(AD 0.6375)
+   param(PS 3.85)
+   param(PD 3.85)
+   terminal(S 1)
+   terminal(G 5)
+   terminal(D 2)
+   terminal(B 4)
   )
 
  )
@@ -770,8 +770,8 @@ xref(
    pin(5 5 match)
    pin(0 0 match)
    pin(2 2 match)
-   device(2 2 match)
-   device(1 1 match)
+   device(1 2 match)
+   device(2 1 match)
   )
  )
  circuit(RINGO RINGO match

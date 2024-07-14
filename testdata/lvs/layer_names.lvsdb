@@ -135,20 +135,7 @@ layout(
   pin(4 name(VSS))
 
   # Devices and their connections
-  device(1 D$PMOS
-   location(850 5800)
-   param(L 0.25)
-   param(W 1.5)
-   param(AS 0.6375)
-   param(AD 0.6375)
-   param(PS 3.85)
-   param(PD 3.85)
-   terminal(S 2)
-   terminal(G 3)
-   terminal(D 1)
-   terminal(B 2)
-  )
-  device(2 D$NMOS
+  device(1 D$NMOS
    location(850 2135)
    param(L 0.25)
    param(W 0.95)
@@ -160,6 +147,19 @@ layout(
    terminal(G 3)
    terminal(D 1)
    terminal(B 4)
+  )
+  device(2 D$PMOS
+   location(850 5800)
+   param(L 0.25)
+   param(W 1.5)
+   param(AS 0.6375)
+   param(AD 0.6375)
+   param(PS 3.85)
+   param(PD 3.85)
+   terminal(S 2)
+   terminal(G 3)
+   terminal(D 1)
+   terminal(B 2)
   )
 
  )
@@ -410,8 +410,8 @@ xref(
    pin(0 1 match)
    pin(1 2 match)
    pin(3 3 match)
-   device(2 1 match)
-   device(1 2 match)
+   device(1 1 match)
+   device(2 2 match)
   )
  )
  circuit(TOP TOP match

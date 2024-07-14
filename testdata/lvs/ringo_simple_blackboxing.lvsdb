@@ -43,21 +43,6 @@ layout(
 
  # Circuit section
  # Circuits are the hierarchical building blocks of the netlist.
- circuit(ND2X1
-
-  # Circuit boundary
-  rect((-100 250) (2600 7750))
-
-  # Outgoing pins and their connections to nets
-  pin(name(VDD))
-  pin(name(OUT))
-  pin(name(VSS))
-  pin()
-  pin(name(B))
-  pin(name(A))
-  pin(name(BULK))
-
- )
  circuit(INVX1
 
   # Circuit boundary
@@ -83,6 +68,21 @@ layout(
   pin(name(OUT))
   pin(name(VSS))
   pin()
+  pin(name(BULK))
+
+ )
+ circuit(ND2X1
+
+  # Circuit boundary
+  rect((-100 250) (2600 7750))
+
+  # Outgoing pins and their connections to nets
+  pin(name(VDD))
+  pin(name(OUT))
+  pin(name(VSS))
+  pin()
+  pin(name(B))
+  pin(name(A))
   pin(name(BULK))
 
  )

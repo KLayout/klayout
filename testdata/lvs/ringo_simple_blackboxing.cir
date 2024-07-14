@@ -38,6 +38,17 @@ X$20 6 15 9 6 14 9 INVX1
 X$21 6 11 9 6 15 9 INVX1
 .ENDS RINGO
 
+* cell ND2X1
+* pin VDD
+* pin OUT
+* pin VSS
+* pin 
+* pin B
+* pin A
+* pin BULK
+.SUBCKT ND2X1 1 2 3 4 5 6 7
+.ENDS ND2X1
+
 * cell INVX2
 * pin IN
 * pin VDD
@@ -57,14 +68,3 @@ X$21 6 11 9 6 15 9 INVX1
 * pin BULK
 .SUBCKT INVX1 1 2 3 4 5 6
 .ENDS INVX1
-
-* cell ND2X1
-* pin VDD
-* pin OUT
-* pin VSS
-* pin 
-* pin B
-* pin A
-* pin BULK
-.SUBCKT ND2X1 1 2 3 4 5 6 7
-.ENDS ND2X1

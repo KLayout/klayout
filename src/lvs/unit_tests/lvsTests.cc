@@ -179,15 +179,23 @@ TEST(22a_SP6TArray2X4)
 {
   run_test (_this, "SP6TArray_2X4.lvs", "test_22a.cir", "SP6TArray_2X4.gds", false, "test_22a.lvsdb", "$test22_texts = false\n$test22_deep = false");
 }
+
 TEST(22b_SP6TArray2X4)
 {
   run_test (_this, "SP6TArray_2X4.lvs", "test_22b.cir", "SP6TArray_2X4.gds", false, "test_22b.lvsdb", "$test22_texts = true\n$test22_deep = false");
 }
+
 TEST(22c_SP6TArray2X4)
 {
   run_test (_this, "SP6TArray_2X4.lvs", "test_22c.cir", "SP6TArray_2X4.gds", false, "test_22c.lvsdb", "$test22_texts = false\n$test22_deep = true");
 }
+
 TEST(22d_SP6TArray2X4)
 {
   run_test (_this, "SP6TArray_2X4.lvs", "test_22d.cir", "SP6TArray_2X4.gds", false, "test_22d.lvsdb", "$test22_texts = true\n$test22_deep = true");
+}
+
+TEST(22e_SP6TArray2X4)
+{
+  run_test (_this, "SP6TArray_2X4.lvs", "test_22d.cir", "SP6TArray_2X4.gds", false, "test_22d.lvsdb", "$test22_texts = true\n$test22_deep = true\n$test22_nocheat = true");
 }

@@ -12,6 +12,8 @@ else
   flat
 end
 
+nocheat = !!$test22_nocheat
+
 # Define layers
 nwm = input(64, 20)
 nsdm = input(93, 44)
@@ -161,10 +163,18 @@ extract_devices(diode("sky130_fd_pr__diode_pd2nw_05v5"), {
 
 # Transistors
 # nfet_01v8
-cheat("SP6TCell") do
-extract_devices(mos4("sky130_fd_pr__nfet_01v8__model"), {
+dex = mos4("sky130_fd_pr__nfet_01v8__model")
+dex.smart_device_propagation = nocheat
+if nocheat
+  extract_devices(dex, {
     "SD" => difftap__conn, "G" => gate__mosfet__nfet_01v8, "tG" => poly__conn, "W" => substrate__Sky130,
-})
+  })
+else
+  cheat("SP6TCell") do
+    extract_devices(dex, {
+        "SD" => difftap__conn, "G" => gate__mosfet__nfet_01v8, "tG" => poly__conn, "W" => substrate__Sky130,
+    })
+  end
 end
 
 # nfet_01v8_lvt
@@ -176,10 +186,18 @@ extract_devices(mos4("sky130_fd_pr__nfet_g5v0d10v5__model"), {
     "SD" => difftap__conn, "G" => gate__mosfet__nfet_g5v0d10v5, "tG" => poly__conn, "W" => substrate__Sky130,
 })
 # pfet_01v8
-cheat("SP6TCell") do
-extract_devices(mos4("sky130_fd_pr__pfet_01v8__model"), {
-    "SD" => difftap__conn, "G" => gate__mosfet__pfet_01v8, "tG" => poly__conn, "W" => nwm,
-})
+dex = mos4("sky130_fd_pr__pfet_01v8__model")
+dex.smart_device_propagation = nocheat
+if nocheat
+  extract_devices(dex, {
+      "SD" => difftap__conn, "G" => gate__mosfet__pfet_01v8, "tG" => poly__conn, "W" => nwm,
+  })
+else
+  cheat("SP6TCell") do
+    extract_devices(dex, {
+        "SD" => difftap__conn, "G" => gate__mosfet__pfet_01v8, "tG" => poly__conn, "W" => nwm,
+    })
+  end
 end
 
 # pfet_01v8_hvt

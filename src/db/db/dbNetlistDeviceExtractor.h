@@ -87,12 +87,13 @@ class DB_PUBLIC NetlistDeviceExtractor
   : public gsi::ObjectBase, public tl::Object
 {
 public:
+  typedef db::NetShape shape_type;
   typedef std::list<db::LogEntryData> log_entry_list;
   typedef log_entry_list::const_iterator log_entry_iterator;
   typedef std::vector<db::NetlistDeviceExtractorLayerDefinition> layer_definitions;
   typedef layer_definitions::const_iterator layer_definitions_iterator;
   typedef std::map<std::string, db::ShapeCollection *> input_layers;
-  typedef db::hier_clusters<db::NetShape> hier_clusters_type;
+  typedef db::hier_clusters<shape_type> hier_clusters_type;
 
   /**
    *  @brief Constructor
@@ -123,6 +124,26 @@ public:
    *  This name is used to attach the device class name to cells.
    */
   static const tl::Variant &device_class_property_name ();
+
+  /**
+   *  @brief Sets a flag indicating whether to use "smart device propagation"
+   *  If set to true, the extractor will run a pre-extraction pass to determine which devices
+   *  need to be propagated up in the hierarchy. This may reduce the need for hierarchy cheats
+   *  for overlapping devices.
+   */
+  void set_smart_device_propagation (bool f)
+  {
+    m_smart_device_propagation = f;
+  }
+
+  /**
+   *  @brief Sets a flag indicating whether to use "smart device propagation"
+   *  See set_smart_device_propagation for a description of that flag.
+   */
+  bool smart_device_propagation () const
+  {
+    return m_smart_device_propagation;
+  }
 
   /**
    *  @brief Performs the extraction
@@ -459,11 +480,11 @@ private:
       return false;
     }
 
-    std::map<size_t, std::map<unsigned int, std::set<db::NetShape> > > geometry;
+    std::map<size_t, std::map<unsigned int, std::set<shape_type> > > geometry;
     std::map<size_t, double> parameters;
   };
 
-  typedef std::map<unsigned int, std::vector<db::NetShape> > geometry_per_layer_type;
+  typedef std::map<unsigned int, std::vector<shape_type> > geometry_per_layer_type;
   typedef std::map<size_t, geometry_per_layer_type> geometry_per_terminal_type;
 
   tl::weak_ptr<db::Netlist> m_netlist;
@@ -479,14 +500,18 @@ private:
   layer_definitions m_layer_definitions;
   std::vector<unsigned int> m_layers;
   log_entry_list m_log_entries;
+  bool m_smart_device_propagation;
+  bool m_pre_extract;
   std::map<size_t, std::pair<db::Device *, geometry_per_terminal_type> > m_new_devices;
   std::map<DeviceCellKey, std::pair<db::cell_index_type, db::DeviceAbstract *> > m_device_cells;
+  std::vector<db::Device *> m_new_devices_pre_extracted;
 
   //  no copying
   NetlistDeviceExtractor (const NetlistDeviceExtractor &);
   NetlistDeviceExtractor &operator= (const NetlistDeviceExtractor &);
 
   void extract_without_initialize (db::Layout &layout, db::Cell &cell, hier_clusters_type &clusters, const std::vector<unsigned int> &layers, double device_scaling, const std::set<cell_index_type> *breakout_cells);
+  void pre_extract_for_device_propagation (const hier_clusters_type &device_clusters, const std::set<db::cell_index_type> &called_cells, std::set<std::pair<db::cell_index_type, db::connected_clusters<shape_type>::id_type> > &to_extract);
   void push_new_devices (const Vector &disp_cache);
   void push_cached_devices (const tl::vector<Device *> &cached_devices, const db::Vector &disp_cache, const db::Vector &new_disp);
 };

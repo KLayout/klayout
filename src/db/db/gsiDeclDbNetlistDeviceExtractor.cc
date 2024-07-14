@@ -218,6 +218,23 @@ Class<db::NetlistDeviceExtractor> decl_dbNetlistDeviceExtractor ("db", "DeviceEx
     "\n"
     "This method has been added in version 0.27.3.\n"
   ) +
+  gsi::method ("smart_device_propagation=", &db::NetlistDeviceExtractor::set_smart_device_propagation, gsi::arg ("flag"),
+    "@brief Sets a flag indicating whether to use 'smart device propagation'\n"
+    "If set to true, the extractor will run a pre-extraction pass to determine which devices\n"
+    "need to be propagated up in the hierarchy. This may reduce the need for hierarchy cheats\n"
+    "for overlapping devices.\n"
+    "\n"
+    "The default value is 'false', but can be changed by setting the 'KLAYOUT_SMART_DEVICE_PROPAGATION' environment "
+    "variable to '1'.\n"
+    "\n"
+    "This attribute has been introduced in version 0.29.5."
+  ) +
+  gsi::method ("smart_device_propagation", &db::NetlistDeviceExtractor::smart_device_propagation,
+    "@brief Gets a flag indicating whether to use 'smart device propagation'\n"
+    "See \\smart_device_propagation= for a description of that mode.\n"
+    "\n"
+    "This attribute has been introduced in version 0.29.5."
+  ) +
   gsi::method_ext ("test_initialize", &test_initialize, gsi::arg ("netlist"), "@hide") +   //  for test only
   gsi::iterator ("each_layer_definition", &db::NetlistDeviceExtractor::begin_layer_definitions, &db::NetlistDeviceExtractor::end_layer_definitions,
     "@brief Iterates over all layer definitions."

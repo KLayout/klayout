@@ -191,9 +191,14 @@ TEST(17_layout_variants)
   run_test (_this, "ringo_layout_var", "ringo_layout_var.gds");
 }
 
-TEST(18_cheats)
+TEST(18a_cheats)
 {
   run_test (_this, "invchain_cheat", "invchain_for_cheat.gds");
+}
+
+TEST(18b_nocheats)
+{
+  run_test (_this, "invchain_nocheat", "invchain_for_cheat.gds");
 }
 
 //  testing cell specific net joining for VSS of the double-height inverter standard cell

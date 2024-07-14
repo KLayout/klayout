@@ -291,20 +291,15 @@ void NetlistDeviceExtractor::pre_extract_for_device_propagation (const db::hier_
         extractor_cache_type::const_iterator ec = extractor_cache.find (layer_geometry);
         if (ec == extractor_cache.end ()) {
 
-          m_log_entries.clear ();
           m_new_devices_pre_extracted.clear ();  //  safety
 
           //  do the actual device extraction
           extract_devices (layer_geometry);
 
-          if (m_log_entries.empty ()) {
-
-            //  cache unless log entries are produced
-            tl::shared_collection<Device> &ce = extractor_cache [layer_geometry];
-            ce.swap (m_new_devices_pre_extracted);
-            devices = &ce;
-
-          }
+          //  cache unless log entries are produced
+          tl::shared_collection<Device> &ce = extractor_cache [layer_geometry];
+          ce.swap (m_new_devices_pre_extracted);
+          devices = &ce;
 
           m_new_devices_pre_extracted.clear ();
 
@@ -853,6 +848,10 @@ std::string NetlistDeviceExtractor::cell_name () const
 
 void NetlistDeviceExtractor::error (const std::string &msg)
 {
+  if (m_pre_extract) {
+    return;
+  }
+
   m_log_entries.push_back (db::LogEntryData (db::Error, cell_name (), msg));
   m_log_entries.back ().set_category_name ("device-extract");
 
@@ -863,6 +862,10 @@ void NetlistDeviceExtractor::error (const std::string &msg)
 
 void NetlistDeviceExtractor::error (const std::string &msg, const db::DPolygon &poly)
 {
+  if (m_pre_extract) {
+    return;
+  }
+
   m_log_entries.push_back (db::LogEntryData (db::Error, cell_name (), msg));
   m_log_entries.back ().set_geometry (poly);
   m_log_entries.back ().set_category_name ("device-extract");
@@ -874,6 +877,10 @@ void NetlistDeviceExtractor::error (const std::string &msg, const db::DPolygon &
 
 void NetlistDeviceExtractor::error (const std::string &category_name, const std::string &category_description, const std::string &msg)
 {
+  if (m_pre_extract) {
+    return;
+  }
+
   m_log_entries.push_back (db::LogEntryData (db::Error, cell_name (), msg));
   m_log_entries.back ().set_category_name (category_name);
   m_log_entries.back ().set_category_description (category_description);
@@ -885,6 +892,10 @@ void NetlistDeviceExtractor::error (const std::string &category_name, const std:
 
 void NetlistDeviceExtractor::error (const std::string &category_name, const std::string &category_description, const std::string &msg, const db::DPolygon &poly)
 {
+  if (m_pre_extract) {
+    return;
+  }
+
   m_log_entries.push_back (db::LogEntryData (db::Error, cell_name (), msg));
   m_log_entries.back ().set_category_name (category_name);
   m_log_entries.back ().set_category_description (category_description);
@@ -897,6 +908,10 @@ void NetlistDeviceExtractor::error (const std::string &category_name, const std:
 
 void NetlistDeviceExtractor::warn (const std::string &msg)
 {
+  if (m_pre_extract) {
+    return;
+  }
+
   m_log_entries.push_back (db::LogEntryData (db::Warning, cell_name (), msg));
   m_log_entries.back ().set_category_name ("device-extract");
 
@@ -907,6 +922,10 @@ void NetlistDeviceExtractor::warn (const std::string &msg)
 
 void NetlistDeviceExtractor::warn (const std::string &msg, const db::DPolygon &poly)
 {
+  if (m_pre_extract) {
+    return;
+  }
+
   m_log_entries.push_back (db::LogEntryData (db::Warning, cell_name (), msg));
   m_log_entries.back ().set_geometry (poly);
   m_log_entries.back ().set_category_name ("device-extract");
@@ -918,6 +937,10 @@ void NetlistDeviceExtractor::warn (const std::string &msg, const db::DPolygon &p
 
 void NetlistDeviceExtractor::warn (const std::string &category_name, const std::string &category_description, const std::string &msg)
 {
+  if (m_pre_extract) {
+    return;
+  }
+
   m_log_entries.push_back (db::LogEntryData (db::Warning, cell_name (), msg));
   m_log_entries.back ().set_category_name (category_name);
   m_log_entries.back ().set_category_description (category_description);
@@ -929,6 +952,10 @@ void NetlistDeviceExtractor::warn (const std::string &category_name, const std::
 
 void NetlistDeviceExtractor::warn (const std::string &category_name, const std::string &category_description, const std::string &msg, const db::DPolygon &poly)
 {
+  if (m_pre_extract) {
+    return;
+  }
+
   m_log_entries.push_back (db::LogEntryData (db::Warning, cell_name (), msg));
   m_log_entries.back ().set_category_name (category_name);
   m_log_entries.back ().set_category_description (category_description);

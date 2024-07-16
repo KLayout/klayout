@@ -249,6 +249,33 @@ private:
  */
 DB_PUBLIC void scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db::Coord d);
 
+/**
+ *  @brief Breaks polygons according to max_vertex_count and max_area_ratio
+ *
+ *  This method will investigate all polygons on the given layer and cell and split them in case they
+ *  have more than the specified vertices and an bounding-box area to polygon area ratio larget
+ *  than the specified max_area_ratio. This serves optimization for algorithms needing a good
+ *  bounding box approximation.
+ *
+ *  Setting max_vertex_count or max_area_ratio to 0 disables the respective check.
+ */
+DB_PUBLIC void break_polygons (db::Layout &layout, db::cell_index_type cell_index, unsigned int layer, size_t max_vertex_count, double max_area_ratio);
+
+/**
+ *  @brief Like "break_polygons" before, but applies it to all cells.
+ */
+DB_PUBLIC void break_polygons (db::Layout &layout, unsigned int layer, size_t max_vertex_count, double max_area_ratio);
+
+/**
+ *  @brief Like "break_polygons" before, but applies it to all cells and all layers.
+ */
+DB_PUBLIC void break_polygons (db::Layout &layout, size_t max_vertex_count, double max_area_ratio);
+
+/**
+ *  @brief Like "break_polygons" before, but applies it to the given Shapes container.
+ */
+DB_PUBLIC void break_polygons (db::Shapes &shapes, size_t max_vertex_count, double max_area_ratio);
+
 }  // namespace db
 
 #endif

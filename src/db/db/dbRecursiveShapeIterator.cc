@@ -32,6 +32,7 @@ namespace db
 //  Recursive shape iterator implementation
 
 RecursiveShapeIterator::RecursiveShapeIterator (const RecursiveShapeIterator &d)
+  : gsi::ObjectBase (d)
 {
   operator= (d);
 }

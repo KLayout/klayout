@@ -2895,7 +2895,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "This method returns all polygons in self which are not rectilinear."
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
-  method_ext ("break", &break_polygons, gsi::arg ("max_vertex_count"), gsi::arg ("max_area_ratio", 0.0),
+  method_ext ("break_polygons|#break", &break_polygons, gsi::arg ("max_vertex_count"), gsi::arg ("max_area_ratio", 0.0),
     "@brief Breaks the polygons of the region into smaller ones\n"
     "\n"
     "There are two criteria for splitting a polygon: a polygon is split into parts with less then "
@@ -2908,7 +2908,8 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "algorithm does not have a specific goal to minimize the number of parts for example. "
     "The only goal is to achieve parts within the given limits.\n"
     "\n"
-    "This method has been introduced in version 0.26."
+    "This method has been introduced in version 0.26. The 'break_polygons' alias has been introduced "
+    "in version 0.29.5 to avoid issues with reserved keywords."
   ) +
   method_ext ("delaunay", &delaunay,
     "@brief Computes a constrained Delaunay triangulation from the given region\n"

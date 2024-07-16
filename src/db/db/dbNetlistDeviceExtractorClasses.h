@@ -118,7 +118,7 @@ protected:
    *  @brief A callback when the device is produced
    *  This callback is provided as a debugging port
    */
-  virtual void device_out (const db::Device * /*device*/, const db::Region & /*diff*/, const db::Region & /*gate*/)
+  virtual void device_out (const db::Device * /*device*/, const db::Polygon & /*sdiff*/, const db::Polygon & /*ddiff*/, const db::Polygon & /*gate*/)
   {
     //  .. no specific implementation ..
   }

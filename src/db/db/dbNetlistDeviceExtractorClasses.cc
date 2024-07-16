@@ -127,87 +127,121 @@ void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db
     const db::Region &rdiff = layer_geometry [diff_geometry_index];
     const db::Region &rgates = layer_geometry [gate_geometry_index];
 
+    //  pair<gate shape, pair<diffusion shapes, width>>
+    std::list<std::pair<db::Polygon, std::pair<std::set<db::Polygon>, double> > > cores;
+
+    //  counts, how many times a diffusion polygon is used
+    std::map<db::Polygon, int> diffcount;
+
+    //  collect valid gates (cores) in the first step -> gives gate polygons, diffusion shapes attached and widths
+
     for (db::Region::const_iterator p = rgates.begin_merged (); !p.at_end (); ++p) {
 
       db::Region rgate (*p);
+      rgate.set_merged_semantics (false);
       rgate.set_base_verbosity (rgates.base_verbosity ());
 
       db::Region rdiff2gate = rdiff.selected_interacting (rgate);
       rdiff2gate.set_base_verbosity (rdiff.base_verbosity ());
 
       if (rdiff2gate.empty ()) {
-        warn (tl::to_string (tr ("Gate shape touches no diffusion - ignored")), *p);
-      } else {
+        if (! smart_device_propagation ()) {
+          //  NOTE: in smart device propagation mode we may encounter partial devices on local cell level - ingore them, but do not warn
+          warn (tl::to_string (tr ("Gate shape touches no diffusion - ignored")), *p);
+        }
+        continue;
+      }
 
-        if (rdiff2gate.count () != 2) {
+      if (rdiff2gate.count () != 2) {
+        if (! smart_device_propagation ()) {
+          //  NOTE: in smart device propagation mode we may encounter partial devices on local cell level - ingore them, but do not warn
           warn (tl::sprintf (tl::to_string (tr ("Expected two polygons on diff interacting with one gate shape (found %d) - gate shape ignored")), int (rdiff2gate.count ())), *p);
-          continue;
         }
+        continue;
+      }
 
-        //  normalize the diffusion polygons so that the S/D assignment is more predictable
-        std::vector<db::Polygon> diffpoly;
-        diffpoly.reserve (2);
-        for (db::Region::const_iterator d2g = rdiff2gate.begin (); ! d2g.at_end (); ++d2g) {
-          diffpoly.push_back (*d2g);
-        }
-        std::sort (diffpoly.begin (), diffpoly.end ());
+      double w = 0;
+      int nw = 0;
+      for (db::Region::const_iterator d2g = rdiff2gate.begin (); ! d2g.at_end (); ++d2g) {
 
-        std::vector<db::Edges::length_type> widths;
-        for (std::vector<db::Polygon>::const_iterator d2g = diffpoly.begin (); d2g != diffpoly.end (); ++d2g) {
-
-          db::Edges edges (rgate.edges () & db::Edges (*d2g));
-          db::Edges::length_type l = edges.length ();
-          if (l == 0) {
+        db::Edges edges (rgate.edges () & db::Edges (*d2g));
+        db::Edges::length_type l = edges.length ();
+        if (l == 0) {
+          if (! smart_device_propagation ()) {
+            //  NOTE: in smart device propagation mode we may encounter partial devices on local cell level - ingore them, but do not warn
             warn (tl::to_string (tr ("Vanishing edges for interaction gate/diff (corner interaction) - gate shape ignored")));
-          } else {
-            widths.push_back (l);
           }
-
+        } else {
+          w += l;
+          nw += 1;
         }
-
-        if (widths.size () != 2) {
-          continue;
-        }
-
-        //  Computation of the gate length and width - this scheme is compatible with
-        //  non-rectangular gates and circular gates. The computation is based on the
-        //  relationship: A(gate) = L(gate) * W(gate). W(gate) is determined from the
-        //  accumulated edge lengths (average of left and right length).
-        double param_w = sdbu () * (widths[0] + widths[1]) * 0.5;
-        double param_l = sdbu () * sdbu () * double (rgate.area ()) / param_w;
-
-        db::Device *device = create_device ();
-
-        device->set_trans (db::DCplxTrans ((p->box ().center () - db::Point ()) * dbu ()));
-
-        device->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, param_w);
-        device->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, param_l);
-
-        int diff_index = 0;
-        for (std::vector<db::Polygon>::const_iterator d2g = diffpoly.begin (); d2g != diffpoly.end () && diff_index < 2; ++d2g, ++diff_index) {
-
-          //  count the number of gate shapes attached to this shape and distribute the area of the
-          //  diffusion region to the number of gates
-          size_t n = rgates.selected_interacting (db::Region (*d2g)).count ();
-          tl_assert (n > 0);
-
-          device->set_parameter_value (diff_index == 0 ? db::DeviceClassMOS3Transistor::param_id_AS : db::DeviceClassMOS3Transistor::param_id_AD, sdbu () * sdbu () * d2g->area () / double (n));
-          device->set_parameter_value (diff_index == 0 ? db::DeviceClassMOS3Transistor::param_id_PS : db::DeviceClassMOS3Transistor::param_id_PD, sdbu () * d2g->perimeter () / double (n));
-
-          unsigned int sd_index = diff_index == 0 ? source_terminal_geometry_index : drain_terminal_geometry_index;
-          define_terminal (device, diff_index == 0 ? db::DeviceClassMOS3Transistor::terminal_id_S : db::DeviceClassMOS3Transistor::terminal_id_D, sd_index, *d2g);
-
-        }
-
-        define_terminal (device, db::DeviceClassMOS3Transistor::terminal_id_G, gate_terminal_geometry_index, *p);
-
-        //  allow derived classes to modify the device
-        modify_device (*p, layer_geometry, device);
-
-        //  output the device for debugging
-        device_out (device, rdiff2gate, rgate);
 
       }
+
+      if (nw != 2) {
+        continue;
+      }
+
+      w /= nw;
+
+      //  normalize the diffusion polygons so that the S/D assignment is more predictable
+      std::set<db::Polygon> diffpoly;
+      for (db::Region::const_iterator d2g = rdiff2gate.begin (); ! d2g.at_end (); ++d2g) {
+        diffpoly.insert (*d2g);
+        diffcount [*d2g] += 1;
+      }
+
+      cores.push_back (std::make_pair (*p, std::make_pair (diffpoly, w)));
+
+    }
+
+    //  generate the devices
+
+    for (auto c = cores.begin (); c != cores.end (); ++c) {
+
+      const db::Polygon &gate = c->first;
+      const std::set<db::Polygon> &diff = c->second.first;
+      double w = c->second.second;
+
+      //  Computation of the gate length and width - this scheme is compatible with
+      //  non-rectangular gates and circular gates. The computation is based on the
+      //  relationship: A(gate) = L(gate) * W(gate). W(gate) is determined from the
+      //  accumulated edge lengths (average of left and right length).
+      double param_w = sdbu () * w;
+      double param_l = sdbu () * double (gate.area ()) / w;
+
+      db::Device *device = create_device ();
+
+      device->set_trans (db::DCplxTrans ((gate.box ().center () - db::Point ()) * dbu ()));
+
+      device->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, param_w);
+      device->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, param_l);
+
+      int diff_index = 0;
+      for (auto d2g = diff.begin (); d2g != diff.end () && diff_index < 2; ++d2g, ++diff_index) {
+
+        //  count the number of gate shapes attached to this shape and distribute the area of the
+        //  diffusion region to the number of gates
+        size_t n = diffcount [*d2g];
+        tl_assert (n > 0);
+
+        device->set_parameter_value (diff_index == 0 ? db::DeviceClassMOS3Transistor::param_id_AS : db::DeviceClassMOS3Transistor::param_id_AD, sdbu () * sdbu () * d2g->area () / double (n));
+        device->set_parameter_value (diff_index == 0 ? db::DeviceClassMOS3Transistor::param_id_PS : db::DeviceClassMOS3Transistor::param_id_PD, sdbu () * d2g->perimeter () / double (n));
+
+        unsigned int sd_index = diff_index == 0 ? source_terminal_geometry_index : drain_terminal_geometry_index;
+        define_terminal (device, diff_index == 0 ? db::DeviceClassMOS3Transistor::terminal_id_S : db::DeviceClassMOS3Transistor::terminal_id_D, sd_index, *d2g);
+
+      }
+
+      define_terminal (device, db::DeviceClassMOS3Transistor::terminal_id_G, gate_terminal_geometry_index, gate);
+
+      //  allow derived classes to modify the device
+      modify_device (gate, layer_geometry, device);
+
+      //  output the device for debugging
+      auto dp = diff.begin ();
+      auto sp = dp++;
+      device_out (device, *sp, *dp, gate);
 
     }
 
@@ -225,9 +259,18 @@ void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db
     const db::Region &ddiff = layer_geometry [drain_geometry_index];
     const db::Region &rgates = layer_geometry [gate_geometry_index];
 
+    //  pair<gate shape, pair<diffusion shapes, width>>
+    std::list<std::pair<db::Polygon, std::pair<std::pair<db::Polygon, db::Polygon>, double> > > cores;
+
+    //  counts, how many times a diffusion polygon is used
+    std::map<db::Polygon, int> diffcount;
+
+    //  collect valid gates (cores) in the first step -> gives gate polygons, diffusion shapes attached and widths
+
     for (db::Region::const_iterator p = rgates.begin_merged (); !p.at_end (); ++p) {
 
       db::Region rgate (*p);
+      rgate.set_merged_semantics (false);
       rgate.set_base_verbosity (rgates.base_verbosity ());
 
       db::Region sdiff2gate = sdiff.selected_interacting (rgate);
@@ -237,82 +280,118 @@ void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db
       ddiff2gate.set_base_verbosity (ddiff.base_verbosity ());
 
       if (sdiff2gate.empty () && ddiff2gate.empty ()) {
-        warn (tl::to_string (tr ("Gate shape touches no diffusion - ignored")), *p);
-      } else if (sdiff2gate.empty () || ddiff2gate.empty ()) {
-        warn (tl::to_string (tr ("Gate shape touches a single diffusion only - ignored")), *p);
-      } else {
+        if (! smart_device_propagation ()) {
+          //  NOTE: in smart device propagation mode we may encounter partial devices on local cell level - ingore them, but do not warn
+          warn (tl::to_string (tr ("Gate shape touches no diffusion - ignored")), *p);
+        }
+        continue;
+      }
 
-        if (sdiff2gate.count () != 1) {
+      if (sdiff2gate.empty () || ddiff2gate.empty ()) {
+        if (! smart_device_propagation ()) {
+          //  NOTE: in smart device propagation mode we may encounter partial devices on local cell level - ingore them, but do not warn
+          warn (tl::to_string (tr ("Gate shape touches a single diffusion only - ignored")), *p);
+        }
+        continue;
+      }
+
+      if (sdiff2gate.count () != 1) {
+        if (! smart_device_propagation ()) {
+          //  NOTE: in smart device propagation mode we may encounter partial devices on local cell level - ingore them, but do not warn
           warn (tl::sprintf (tl::to_string (tr ("Expected one polygons on source diff interacting with one gate shape (found %d) - gate shape ignored")), int (sdiff2gate.count ())), *p);
-          continue;
         }
+        continue;
+      }
 
-        if (ddiff2gate.count () != 1) {
+      if (ddiff2gate.count () != 1) {
+        if (! smart_device_propagation ()) {
+          //  NOTE: in smart device propagation mode we may encounter partial devices on local cell level - ingore them, but do not warn
           warn (tl::sprintf (tl::to_string (tr ("Expected one polygons on drain diff interacting with one gate shape (found %d) - gate shape ignored")), int (ddiff2gate.count ())), *p);
+        }
+        continue;
+      }
+
+      db::Edges::length_type sdwidth = 0, ddwidth = 0;
+
+      {
+        db::Edges edges (rgate.edges () & sdiff2gate.edges ());
+        sdwidth = edges.length ();
+        if (sdwidth == 0) {
+          if (! smart_device_propagation ()) {
+            //  NOTE: in smart device propagation mode we may encounter partial devices on local cell level - ingore them, but do not warn
+            warn (tl::to_string (tr ("Vanishing edges for interaction gate/source diff (corner interaction) - gate shape ignored")));
+          }
           continue;
         }
+      }
 
-        db::Edges::length_type sdwidth = 0, ddwidth = 0;
-
-        {
-          db::Edges edges (rgate.edges () & sdiff2gate.edges ());
-          sdwidth = edges.length ();
-          if (sdwidth == 0) {
-            warn (tl::to_string (tr ("Vanishing edges for interaction gate/source diff (corner interaction) - gate shape ignored")));
-            continue;
-          }
-        }
-
-        {
-          db::Edges edges (rgate.edges () & ddiff2gate.edges ());
-          ddwidth = edges.length ();
-          if (ddwidth == 0) {
+      {
+        db::Edges edges (rgate.edges () & ddiff2gate.edges ());
+        ddwidth = edges.length ();
+        if (ddwidth == 0) {
+          if (! smart_device_propagation ()) {
+            //  NOTE: in smart device propagation mode we may encounter partial devices on local cell level - ingore them, but do not warn
             warn (tl::to_string (tr ("Vanishing edges for interaction gate/drain diff (corner interaction) - gate shape ignored")));
-            continue;
           }
+          continue;
         }
+      }
 
-        //  Computation of the gate length and width - this scheme is compatible with
-        //  non-rectangular gates and circular gates. The computation is based on the
-        //  relationship: A(gate) = L(gate) * W(gate). W(gate) is determined from the
-        //  accumulated edge lengths (average of left and right length).
-        double param_w = sdbu () * (sdwidth + ddwidth) * 0.5;
-        double param_l = sdbu () * sdbu () * double (rgate.area ()) / param_w;
+      diffcount [*ddiff2gate.begin ()] += 1;
+      diffcount [*sdiff2gate.begin ()] += 1;
 
-        db::Device *device = create_device ();
+      double w = (sdwidth + ddwidth) * 0.5;
 
-        device->set_trans (db::DCplxTrans ((p->box ().center () - db::Point ()) * dbu ()));
+      cores.push_back (std::make_pair (*p, std::make_pair (std::make_pair (*sdiff2gate.begin (), *ddiff2gate.begin ()), w)));
 
-        device->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, param_w);
-        device->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, param_l);
+    }
 
-        for (int diff_index = 0; diff_index < 2; ++diff_index) {
+    //  generate the devices
 
-          const db::Region *diff = diff_index == 0 ? &sdiff2gate : &ddiff2gate;
+    for (auto c = cores.begin (); c != cores.end (); ++c) {
 
-          //  count the number of gate shapes attached to this shape and distribute the area of the
-          //  diffusion region to the number of gates
-          size_t n = rgates.selected_interacting (*diff).count ();
-          tl_assert (n > 0);
+      const db::Polygon &gate = c->first;
+      const db::Polygon &sdiff = c->second.first.first;
+      const db::Polygon &ddiff = c->second.first.second;
+      double w = c->second.second;
 
-          device->set_parameter_value (diff_index == 0 ? db::DeviceClassMOS3Transistor::param_id_AS : db::DeviceClassMOS3Transistor::param_id_AD, sdbu () * sdbu () * diff->area () / double (n));
-          device->set_parameter_value (diff_index == 0 ? db::DeviceClassMOS3Transistor::param_id_PS : db::DeviceClassMOS3Transistor::param_id_PD, sdbu () * diff->perimeter () / double (n));
+      //  Computation of the gate length and width - this scheme is compatible with
+      //  non-rectangular gates and circular gates. The computation is based on the
+      //  relationship: A(gate) = L(gate) * W(gate). W(gate) is determined from the
+      //  accumulated edge lengths (average of left and right length).
+      double param_w = sdbu () * w;
+      double param_l = sdbu () * double (gate.area ()) / w;
 
-          unsigned int sd_index = diff_index == 0 ? source_terminal_geometry_index : drain_terminal_geometry_index;
-          define_terminal (device, diff_index == 0 ? db::DeviceClassMOS3Transistor::terminal_id_S : db::DeviceClassMOS3Transistor::terminal_id_D, sd_index, *diff);
+      db::Device *device = create_device ();
 
-        }
+      device->set_trans (db::DCplxTrans ((gate.box ().center () - db::Point ()) * dbu ()));
 
-        define_terminal (device, db::DeviceClassMOS3Transistor::terminal_id_G, gate_terminal_geometry_index, *p);
+      device->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_W, param_w);
+      device->set_parameter_value (db::DeviceClassMOS3Transistor::param_id_L, param_l);
 
-        //  allow derived classes to modify the device
-        modify_device (*p, layer_geometry, device);
+      for (int diff_index = 0; diff_index < 2; ++diff_index) {
 
-        //  output the device for debugging
-        db::Region diff2gate = sdiff2gate + ddiff2gate;
-        device_out (device, diff2gate, rgate);
+        const db::Polygon *diff = diff_index == 0 ? &sdiff : &ddiff;
+
+        //  count the number of gate shapes attached to this shape and distribute the area of the
+        //  diffusion region to the number of gates
+        size_t n = diffcount [*diff];
+
+        device->set_parameter_value (diff_index == 0 ? db::DeviceClassMOS3Transistor::param_id_AS : db::DeviceClassMOS3Transistor::param_id_AD, sdbu () * sdbu () * diff->area () / double (n));
+        device->set_parameter_value (diff_index == 0 ? db::DeviceClassMOS3Transistor::param_id_PS : db::DeviceClassMOS3Transistor::param_id_PD, sdbu () * diff->perimeter () / double (n));
+
+        unsigned int sd_index = diff_index == 0 ? source_terminal_geometry_index : drain_terminal_geometry_index;
+        define_terminal (device, diff_index == 0 ? db::DeviceClassMOS3Transistor::terminal_id_S : db::DeviceClassMOS3Transistor::terminal_id_D, sd_index, *diff);
 
       }
+
+      define_terminal (device, db::DeviceClassMOS3Transistor::terminal_id_G, gate_terminal_geometry_index, gate);
+
+      //  allow derived classes to modify the device
+      modify_device (gate, layer_geometry, device);
+
+      //  output the device for debugging
+      device_out (device, sdiff, ddiff, gate);
 
     }
 
@@ -438,7 +517,10 @@ void NetlistDeviceExtractorResistor::extract_devices (const std::vector<db::Regi
     db::Region contacts_per_res = contact_wo_res.selected_interacting (rres);
 
     if (contacts_per_res.count () != 2) {
-      warn (tl::sprintf (tl::to_string (tr ("Expected two polygons on contacts interacting with one resistor shape (found %d) - resistor shape ignored")), int (contacts_per_res.count ())), *p);
+      if (! smart_device_propagation ()) {
+        //  NOTE: in smart device propagation mode we may encounter partial devices on local cell level - ingore them, but do not warn
+        warn (tl::sprintf (tl::to_string (tr ("Expected two polygons on contacts interacting with one resistor shape (found %d) - resistor shape ignored")), int (contacts_per_res.count ())), *p);
+      }
       continue;
     }
 
@@ -458,7 +540,10 @@ void NetlistDeviceExtractorResistor::extract_devices (const std::vector<db::Regi
     db::Coord width2 = eperp.length ();
 
     if (width2 < 1) {
-      warn (tl::to_string (tr ("Invalid contact geometry - resistor shape ignored")), *p);
+      if (! smart_device_propagation ()) {
+        //  NOTE: in smart device propagation mode we may encounter partial devices on local cell level - ingore them, but do not warn
+        warn (tl::to_string (tr ("Invalid contact geometry - resistor shape ignored")), *p);
+      }
       continue;
     }
 
@@ -681,7 +766,10 @@ void NetlistDeviceExtractorBJT3Transistor::extract_devices (const std::vector<db
     db::Region remitter2base = rbase & remitters;
 
     if (remitter2base.empty ()) {
-      warn (tl::to_string (tr ("Base shape without emitters - ignored")), *p);
+      if (! smart_device_propagation ()) {
+        //  NOTE: in smart device propagation mode we may encounter partial devices on local cell level - ingore them, but do not warn
+        warn (tl::to_string (tr ("Base shape without emitters - ignored")), *p);
+      }
     } else {
 
       //  collectors inside base

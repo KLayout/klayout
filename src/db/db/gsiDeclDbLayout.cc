@@ -1967,7 +1967,7 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "\n"
     "This method has been introduced in version 0.26.1.\n"
   ) +
-  gsi::method_ext ("break_polygons", &break_polygons1, gsi::arg ("max_vertex_count"), gsi::arg ("max_area_ratio", 0.0),
+  gsi::method_ext ("break_polygons", &break_polygons1, gsi::arg ("max_vertex_count"), gsi::arg ("max_area_ratio"),
     "@brief Breaks the polygons of the layout into smaller ones\n"
     "\n"
     "There are two criteria for splitting a polygon: a polygon is split into parts with less then "
@@ -1987,7 +1987,7 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "\n"
     "This method has been introduced in version 0.29.5."
   ) +
-  gsi::method_ext ("break_polygons", &break_polygons2, gsi::arg ("layer"), gsi::arg ("max_vertex_count"), gsi::arg ("max_area_ratio", 0.0),
+  gsi::method_ext ("break_polygons", &break_polygons2, gsi::arg ("layer"), gsi::arg ("max_vertex_count"), gsi::arg ("max_area_ratio"),
     "@brief Breaks the polygons of the layer into smaller ones\n"
     "\n"
     "This variant applies breaking to all cells and the given layer.\n"

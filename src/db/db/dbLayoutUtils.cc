@@ -687,6 +687,31 @@ scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db
 // ------------------------------------------------------------
 //  break_polygons implementation
 
+static bool split_polygon (bool first, db::Polygon &poly, size_t max_vertex_count, double max_area_ratio, std::vector<db::Polygon> &parts)
+{
+  if ((max_vertex_count > 0 && poly.vertices () > max_vertex_count) ||
+      (max_area_ratio > 0 && poly.area_ratio () > max_area_ratio)) {
+
+    std::vector<db::Polygon> sp;
+    db::split_polygon (poly, sp);
+    for (auto p = sp.begin (); p != sp.end (); ++p) {
+      split_polygon (false, *p, max_vertex_count, max_area_ratio, parts);
+    }
+
+    return true;
+
+  } else {
+
+    if (! first) {
+      parts.push_back (db::Polygon ());
+      parts.back ().swap (poly);
+    }
+
+    return false;
+
+  }
+}
+
 void
 break_polygons (db::Shapes &shapes, size_t max_vertex_count, double max_area_ratio)
 {
@@ -694,34 +719,11 @@ break_polygons (db::Shapes &shapes, size_t max_vertex_count, double max_area_rat
   std::vector<db::Shape> to_delete;
 
   for (auto s = shapes.begin (db::ShapeIterator::Polygons | db::ShapeIterator::Paths); ! s.at_end (); ++s) {
-
-    std::vector<db::Polygon> polygons;
-    polygons.push_back (db::Polygon ());
-    s->instantiate (polygons.back ());
-
-    bool first = true;
-    while (! polygons.empty ()) {
-
-      std::vector<db::Polygon> split_polygons;
-
-      for (auto p = polygons.begin (); p != polygons.end (); ++p) {
-        if ((max_vertex_count > 0 && p->vertices () > max_vertex_count) ||
-            (max_area_ratio > 0 && p->area_ratio () > max_area_ratio)) {
-          if (first) {
-            to_delete.push_back (*s);
-          }
-          db::split_polygon (*p, split_polygons);
-        } else if (! first) {
-          new_polygons.push_back (db::Polygon ());
-          new_polygons.back ().swap (*p);
-        }
-      }
-
-      first = false;
-      polygons.swap (split_polygons);
-
+    db::Polygon poly;
+    s->instantiate (poly);
+    if (split_polygon (true, poly, max_vertex_count, max_area_ratio, new_polygons)) {
+      to_delete.push_back (*s);
     }
-
   }
 
   shapes.erase_shapes (to_delete);

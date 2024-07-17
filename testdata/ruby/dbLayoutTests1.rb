@@ -2100,6 +2100,48 @@ class DBLayoutTests1_TestClass < TestBase
 
   end
 
+  # break_polygons
+  def test_25
+
+    def shapes2str(shapes)
+      str = []
+      shapes.each do |s|
+        str << s.to_s
+      end
+      str.join(";")
+    end
+
+    ly = RBA::Layout::new
+    top = ly.create_cell("TOP")
+    l1 = ly.layer(1, 0)
+    l2 = ly.layer(2, 0)
+
+    top.shapes(l1).insert(RBA::Polygon::new([ [0, 0], [0, 10000], [10000, 10000], [10000, 9000], [1000, 9000], [1000, 0] ]))
+    top.shapes(l2).insert(RBA::Polygon::new([ [0, 0], [0, 10000], [10000, 10000], [10000, 9000], [1000, 9000], [1000, 0] ]))
+    
+    assert_equal(shapes2str(top.shapes(l1)), "polygon (0,0;0,10000;10000,10000;10000,9000;1000,9000;1000,0)")
+    assert_equal(shapes2str(top.shapes(l2)), "polygon (0,0;0,10000;10000,10000;10000,9000;1000,9000;1000,0)")
+
+    s1 = top.shapes(l1).dup
+    assert_equal(shapes2str(s1), "polygon (0,0;0,10000;10000,10000;10000,9000;1000,9000;1000,0)")
+    s1.break_polygons(10, 3.0)
+    assert_equal(shapes2str(s1), "polygon (0,0;0,9000;1000,9000;1000,0);polygon (0,9000;0,10000;10000,10000;10000,9000)")
+
+    ly2 = ly.dup
+    top2 = ly2.top_cell
+
+    ly.break_polygons(10, 3.0)
+
+    assert_equal(shapes2str(top.shapes(l1)), "polygon (0,0;0,9000;1000,9000;1000,0);polygon (0,9000;0,10000;10000,10000;10000,9000)")
+    assert_equal(shapes2str(top.shapes(l2)), "polygon (0,0;0,9000;1000,9000;1000,0);polygon (0,9000;0,10000;10000,10000;10000,9000)")
+
+    ly2.break_polygons(ly2.layer(1, 0), 10, 3.0)
+
+    assert_equal(shapes2str(top2.shapes(ly2.layer(1, 0))), "polygon (0,0;0,9000;1000,9000;1000,0);polygon (0,9000;0,10000;10000,10000;10000,9000)")
+    assert_equal(shapes2str(top2.shapes(ly2.layer(2, 0))), "polygon (0,0;0,10000;10000,10000;10000,9000;1000,9000;1000,0)")
+
+  end
+
   # Iterating while flatten
   def test_issue200
 

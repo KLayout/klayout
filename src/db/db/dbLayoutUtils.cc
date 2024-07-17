@@ -744,6 +744,8 @@ break_polygons (db::Shapes &shapes, size_t max_vertex_count, double max_area_rat
     break_polygons (tmp, max_vertex_count, max_area_ratio);
     shapes.insert (tmp);
 
+    tl_assert (!shapes.is_editable ());
+
   }
 }
 

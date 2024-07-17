@@ -715,21 +715,35 @@ static bool split_polygon (bool first, db::Polygon &poly, size_t max_vertex_coun
 void
 break_polygons (db::Shapes &shapes, size_t max_vertex_count, double max_area_ratio)
 {
-  std::vector<db::Polygon> new_polygons;
-  std::vector<db::Shape> to_delete;
+  if (shapes.is_editable ()) {
 
-  for (auto s = shapes.begin (db::ShapeIterator::Polygons | db::ShapeIterator::Paths); ! s.at_end (); ++s) {
-    db::Polygon poly;
-    s->instantiate (poly);
-    if (split_polygon (true, poly, max_vertex_count, max_area_ratio, new_polygons)) {
-      to_delete.push_back (*s);
+    std::vector<db::Polygon> new_polygons;
+    std::vector<db::Shape> to_delete;
+
+    for (auto s = shapes.begin (db::ShapeIterator::Polygons | db::ShapeIterator::Paths); ! s.at_end (); ++s) {
+      db::Polygon poly;
+      s->instantiate (poly);
+      if (split_polygon (true, poly, max_vertex_count, max_area_ratio, new_polygons)) {
+        to_delete.push_back (*s);
+      }
     }
-  }
 
-  shapes.erase_shapes (to_delete);
+    shapes.erase_shapes (to_delete);
 
-  for (auto p = new_polygons.begin (); p != new_polygons.end (); ++p) {
-    shapes.insert (*p);
+    for (auto p = new_polygons.begin (); p != new_polygons.end (); ++p) {
+      shapes.insert (*p);
+    }
+
+  } else {
+
+    //  In non-editable mode we cannot do "erase", so we use a temporary, editable Shapes container
+    db::Shapes tmp (true);
+    tmp.insert (shapes);
+
+    shapes.clear ();
+    break_polygons (tmp, max_vertex_count, max_area_ratio);
+    shapes.insert (tmp);
+
   }
 }
 

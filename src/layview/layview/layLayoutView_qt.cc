@@ -945,6 +945,7 @@ LayoutView::configure (const std::string &name, const std::string &value)
       tl::from_string (value, m);
       mp_hierarchy_panel->set_cell_copy_mode (m);
     }
+    return true;
 
   } else if (name == cfg_cell_list_sorting) {
 

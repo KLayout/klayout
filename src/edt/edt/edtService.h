@@ -74,7 +74,7 @@ std::map<std::string, tl::Variant> pcell_parameters_from_string (const std::stri
 /**
  *  @brief A utility class to implement a selection iterator across all editor services
  */
-class EditableSelectionIterator
+class EDT_PUBLIC EditableSelectionIterator
 {
 public:
   typedef std::set<lay::ObjectInstPath> objects;

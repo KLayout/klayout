@@ -50,6 +50,7 @@ namespace Ui {
   class LayoutViewConfigPage6;
   class LayoutViewConfigPage6a;
   class LayoutViewConfigPage7;
+  class LayoutViewConfigPage8;
 }
 
 namespace lay
@@ -353,6 +354,22 @@ public:
 
 private:
   Ui::LayoutViewConfigPage7 *mp_ui;
+};
+
+class LayoutViewConfigPage8
+  : public lay::ConfigPage
+{
+Q_OBJECT
+
+public:
+  LayoutViewConfigPage8 (QWidget *parent);
+  ~LayoutViewConfigPage8 ();
+
+  virtual void setup (lay::Dispatcher *root);
+  virtual void commit (lay::Dispatcher *root);
+
+private:
+  Ui::LayoutViewConfigPage8 *mp_ui;
 };
 
 }

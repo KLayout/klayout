@@ -132,6 +132,7 @@ static const std::string cfg_default_font_size ("default-font-size");
 static const std::string cfg_hide_empty_layers ("hide-empty-layers");
 static const std::string cfg_test_shapes_in_view ("test-shapes-in-view");
 
+static const std::string cfg_copy_cell_mode ("copy-cell-mode");
 static const std::string cfg_flat_cell_list ("flat-cell-list");
 static const std::string cfg_split_cell_list ("split-cell-list");
 static const std::string cfg_cell_list_sorting ("cell-list-sorting");

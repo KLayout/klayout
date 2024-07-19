@@ -122,6 +122,7 @@ public:
     options.push_back (std::pair<std::string, std::string> (cfg_line_style_palette, lay::LineStylePalette ().to_string ()));
     options.push_back (std::pair<std::string, std::string> (cfg_no_stipple, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_markers_visible, "true"));
+    options.push_back (std::pair<std::string, std::string> (cfg_copy_cell_mode, "-1"));
   }
 };
 

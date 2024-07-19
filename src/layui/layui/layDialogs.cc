@@ -579,7 +579,7 @@ CopyCellModeDialog::~CopyCellModeDialog ()
 }
 
 bool 
-CopyCellModeDialog::exec_dialog (int &copy_mode)
+CopyCellModeDialog::exec_dialog (int &copy_mode, bool &dont_ask)
 {
   QRadioButton *buttons [] = { mp_ui->shallow_rb, mp_ui->deep_rb };
 
@@ -592,6 +592,7 @@ CopyCellModeDialog::exec_dialog (int &copy_mode)
       if (buttons [i]->isChecked ()) {
         copy_mode = i;
       }
+      dont_ask = mp_ui->dont_ask_cbx->isChecked ();
     }
     return true;
   } else {

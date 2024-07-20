@@ -935,4 +935,3 @@ bool has_class (const std::type_info &ti)
 }
 
 }
-

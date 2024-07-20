@@ -73,6 +73,54 @@ inline int scale (double sf, int value)
 }
 
 void
+GDS2WriterBase::write_context_string (size_t n, const std::string &s)
+{
+  //  max. size for GDS strings used as payload carrier
+  size_t chunk_size = 32000;
+  short max_short = std::numeric_limits<short>::max ();
+
+  if (n > size_t (max_short) || s.size () > chunk_size) {
+
+    //  Split strings and use a separate notation: "#<n>,<+p>:..." for the partial
+    //  strings. n is the string index and p the part index (zero based).
+    //  The property number is not defined in that case. There may be properties with
+    //  the same number. See issue #1794.
+
+    size_t nchunks = (s.size () + (chunk_size - 1)) / chunk_size;
+    while (nchunks > 0) {
+
+      --nchunks;
+
+      std::string partial;
+      partial.reserve (chunk_size + 100); // approx.
+      partial += "#";
+      partial += tl::to_string (n);
+      partial += ",";
+      partial += tl::to_string (nchunks);
+      partial += ":";
+      size_t pos = nchunks * chunk_size;
+      partial += std::string (s, pos, std::min (s.size (), pos + chunk_size) - pos);
+
+      write_record_size (6);
+      write_record (sPROPATTR);
+      write_short (n <= size_t (max_short) ? short (n) : max_short);
+
+      write_string_record (sPROPVALUE, partial);
+
+    }
+
+  } else {
+
+    write_record_size (6);
+    write_record (sPROPATTR);
+    write_short (short (n));
+
+    write_string_record (sPROPVALUE, s);
+
+  }
+}
+
+void
 GDS2WriterBase::write_context_cell (db::Layout &layout, const short *time_data, const std::vector<db::cell_index_type> &cells)
 {
   write_record_size (4 + 12 * 2);
@@ -112,15 +160,9 @@ GDS2WriterBase::write_context_cell (db::Layout &layout, const short *time_data, 
       //  Hint: write in the reverse order since this way, the reader is more efficient (it knows how many strings
       //  will arrive)
       for (std::vector <std::string>::const_iterator s = context_prop_strings.end (); s != context_prop_strings.begin (); ) {
-
         --s;
-
-        write_record_size (6);
-        write_record (sPROPATTR);
-        write_short (short (std::distance (std::vector <std::string>::const_iterator (context_prop_strings.begin ()), s)));  //  = user string
-
-        write_string_record (sPROPVALUE, *s);
-
+        size_t n = std::distance (std::vector <std::string>::const_iterator (context_prop_strings.begin ()), s);
+        write_context_string (n, *s);
       }
 
     }
@@ -151,15 +193,9 @@ GDS2WriterBase::write_context_cell (db::Layout &layout, const short *time_data, 
         //  Hint: write in the reverse order since this way, the reader is more efficient (it knows how many strings
         //  will arrive)
         for (std::vector <std::string>::const_iterator s = context_prop_strings.end (); s != context_prop_strings.begin (); ) {
-
           --s;
-
-          write_record_size (6);
-          write_record (sPROPATTR);
-          write_short (short (std::distance (std::vector <std::string>::const_iterator (context_prop_strings.begin ()), s)));  //  = user string
-
-          write_string_record (sPROPVALUE, *s);
-
+          size_t n = std::distance (std::vector <std::string>::const_iterator (context_prop_strings.begin ()), s);
+          write_context_string (n, *s);
         }
 
       }

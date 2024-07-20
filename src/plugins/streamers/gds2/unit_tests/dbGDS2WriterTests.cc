@@ -1196,7 +1196,7 @@ TEST(121)
 }
 
 //  Meta info
-TEST(130a)
+TEST(130)
 {
   db::Layout layout_org;
 
@@ -1310,6 +1310,113 @@ TEST(130a)
   EXPECT_EQ (layout_read.meta_info (ci2, "x").value.to_string (), "nil");
   EXPECT_EQ (layout_read.meta_info ("a").value.to_string (), "nil");
   EXPECT_EQ (layout_read.meta_info ("b").value.to_string (), "nil");
+}
+
+//  Giant meta info (issue #1794)
+TEST(131)
+{
+  db::Layout layout_org;
+
+  layout_org.add_cell ("U");
+  db::cell_index_type ci = layout_org.add_cell ("X");
+
+  std::vector<tl::Variant> ll1;
+  std::vector<tl::Variant> ll2;
+
+  for (unsigned int i = 0; i < 100000; ++i) {
+    ll1.push_back (tl::Variant (i));
+    ll2.push_back ("C" + tl::to_string (i));
+  }
+
+  layout_org.add_meta_info ("a", db::MetaInfo ("", ll1, true));
+  layout_org.add_meta_info ("b", db::MetaInfo ("", "value", true));
+
+  layout_org.add_meta_info (ci, "a", db::MetaInfo ("", ll2, true));
+  layout_org.add_meta_info (ci, "c", db::MetaInfo ("", -1, true));
+
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_131.gds");
+
+  {
+    tl::OutputStream out (tmp_file);
+    db::SaveLayoutOptions options;
+    db::Writer writer (options);
+    writer.write (layout_org, out);
+  }
+
+  db::Layout layout_read;
+
+  {
+    tl::InputStream in (tmp_file);
+    db::Reader reader (in);
+    reader.read (layout_read);
+  }
+
+  EXPECT_EQ (layout_read.has_meta_info ("x"), false);
+  EXPECT_EQ (layout_read.has_meta_info ("a"), true);
+  EXPECT_EQ (layout_read.meta_info ("x").value.to_string (), "nil");
+  EXPECT_EQ (layout_read.meta_info ("a").value == ll1, true);
+  EXPECT_EQ (layout_read.has_meta_info ("b"), true);
+  EXPECT_EQ (layout_read.meta_info ("b").value.to_string (), "value");
+
+  db::cell_index_type ci2 = layout_read.cell_by_name ("X").second;
+
+  EXPECT_EQ (layout_read.meta_info (ci2, "x").value.to_string (), "nil");
+  EXPECT_EQ (layout_read.meta_info (ci2, "a").value == ll2, true);
+  EXPECT_EQ (layout_read.meta_info (ci2, "c").value.to_string (), "-1");
+}
+
+//  Many meta info (issue #1794)
+TEST(132)
+{
+  db::Layout layout_org;
+
+  layout_org.add_cell ("U");
+  db::cell_index_type ci = layout_org.add_cell ("X");
+
+  for (unsigned int i = 0; i < 100000; ++i) {
+    layout_org.add_meta_info ("a" + tl::to_string (i), db::MetaInfo ("", i, true));
+  }
+  layout_org.add_meta_info ("b", db::MetaInfo ("", "value", true));
+
+  for (unsigned int i = 0; i < 100000; ++i) {
+    layout_org.add_meta_info (ci, "a" + tl::to_string (i * 2), db::MetaInfo ("", i * 2, true));
+  }
+  layout_org.add_meta_info (ci, "c", db::MetaInfo ("", -1, true));
+
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_132.gds");
+
+  {
+    tl::OutputStream out (tmp_file);
+    db::SaveLayoutOptions options;
+    db::Writer writer (options);
+    writer.write (layout_org, out);
+  }
+
+  db::Layout layout_read;
+
+  {
+    tl::InputStream in (tmp_file);
+    db::Reader reader (in);
+    reader.read (layout_read);
+  }
+
+  EXPECT_EQ (layout_read.has_meta_info ("x"), false);
+  EXPECT_EQ (layout_read.meta_info ("x").value.to_string (), "nil");
+  for (unsigned int i = 0; i < 10; ++i) {
+    EXPECT_EQ (layout_read.has_meta_info ("a" + tl::to_string (i)), true);
+    EXPECT_EQ (layout_read.meta_info ("a" + tl::to_string (i)).value.to_string (), tl::Variant (i).to_string ());
+  }
+  EXPECT_EQ (layout_read.has_meta_info ("b"), true);
+  EXPECT_EQ (layout_read.meta_info ("b").value.to_string (), "value");
+
+  db::cell_index_type ci2 = layout_read.cell_by_name ("X").second;
+
+  EXPECT_EQ (layout_read.meta_info (ci2, "x").value.to_string (), "nil");
+  for (unsigned int i = 0; i < 10; ++i) {
+    EXPECT_EQ (layout_read.has_meta_info (ci2, "a" + tl::to_string (i * 2)), true);
+    EXPECT_EQ (layout_read.meta_info (ci2, "a" + tl::to_string (i * 2)).value.to_string (), tl::Variant (i * 2).to_string ());
+  }
+  EXPECT_EQ (layout_read.meta_info (ci2, "c").value.to_string (), "-1");
 }
 
 //  Extreme fracturing by max. points

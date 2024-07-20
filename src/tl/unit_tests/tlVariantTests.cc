@@ -27,6 +27,8 @@
 #include "tlObject.h"
 #include "tlTypeTraits.h"
 #include "tlUnitTest.h"
+
+#include <cmath>
 #include <cstdio>
 #include <memory>
 

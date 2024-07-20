@@ -29,6 +29,8 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <set>
+#include <list>
 #include <stdexcept>
 #include <typeinfo>
 
@@ -358,12 +360,113 @@ public:
   }
 
   /**
-   *  @brief Initialize the Variant with an explicit vector or variants
+   *  @brief Initialize with a const user type (will always create a reference and NOT own the object)
+   */
+  template <class T>
+  Variant (const T *obj)
+    : m_type (t_nil), m_string (0)
+  {
+    if (obj) {
+      *this = make_variant_ref (obj);
+    }
+  }
+
+  /**
+   *  @brief Initialize with a non-const user type (will always create a reference and NOT own the object)
+   */
+  template <class T>
+  Variant (T *obj)
+    : m_type (t_nil), m_string (0)
+  {
+    if (obj) {
+      *this = make_variant_ref (obj);
+    }
+  }
+
+  /**
+   *  @brief Initialize the Variant with a STL vector
+   */
+  template <class T>
+  Variant (const std::vector<T> &list)
+    : m_type (t_list), m_string (0)
+  {
+    m_var.m_list = new std::vector<tl::Variant> ();
+    m_var.m_list->reserve (list.size ());
+    for (auto i = list.begin (); i != list.end (); ++i) {
+      m_var.m_list->push_back (tl::Variant (*i));
+    }
+  }
+
+  /**
+   *  @brief Initialize the Variant with a STL list
+   */
+  template <class T>
+  Variant (const std::list<T> &list)
+    : m_type (t_list), m_string (0)
+  {
+    m_var.m_list = new std::vector<tl::Variant> ();
+    m_var.m_list->reserve (list.size ());
+    for (auto i = list.begin (); i != list.end (); ++i) {
+      m_var.m_list->push_back (tl::Variant (*i));
+    }
+  }
+
+  /**
+   *  @brief Initialize the Variant with a STL set (not maintaining the set character)
+   */
+  template <class T>
+  Variant (const std::set<T> &list)
+    : m_type (t_list), m_string (0)
+  {
+    m_var.m_list = new std::vector<tl::Variant> ();
+    m_var.m_list->reserve (list.size ());
+    for (auto i = list.begin (); i != list.end (); ++i) {
+      m_var.m_list->push_back (tl::Variant (*i));
+    }
+  }
+
+  /**
+   *  @brief Initialize the Variant with a STL pair
+   */
+  template <class A, class B>
+  Variant (const std::pair<A, B> &pair)
+    : m_type (t_list), m_string (0)
+  {
+    m_var.m_list = new std::vector<tl::Variant> ();
+    m_var.m_list->reserve (2);
+    m_var.m_list->push_back (tl::Variant (pair.first));
+    m_var.m_list->push_back (tl::Variant (pair.second));
+  }
+
+  /**
+   *  @brief Initialize the Variant with a STL map
+   */
+  template <class K, class V>
+  Variant (const std::map<K, V> &map)
+    : m_type (t_array), m_string (0)
+  {
+    m_var.m_array = new std::map<tl::Variant, tl::Variant> ();
+    for (auto i = map.begin (); i != map.end (); ++i) {
+      m_var.m_array->insert (std::make_pair (tl::Variant (i->first), tl::Variant (i->second)));
+    }
+  }
+
+  /**
+   *  @brief Initialize the Variant with an explicit vector of variants
    */
   Variant (const std::vector<tl::Variant> &list)
     : m_type (t_list), m_string (0)
   {
     m_var.m_list = new std::vector<tl::Variant> (list);
+  }
+
+  /**
+   *  @brief Initialize the Variant with an explicit map of variants
+   */
+  Variant (const std::map<tl::Variant, tl::Variant> &map)
+    : m_type (t_array), m_string (0)
+  {
+    m_var.m_array = new std::map<tl::Variant, tl::Variant> (map);
   }
 
   /**

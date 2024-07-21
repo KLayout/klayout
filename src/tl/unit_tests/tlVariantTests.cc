@@ -27,6 +27,8 @@
 #include "tlObject.h"
 #include "tlTypeTraits.h"
 #include "tlUnitTest.h"
+
+#include <cmath>
 #include <cstdio>
 #include <memory>
 
@@ -1088,6 +1090,112 @@ TEST(6)
   EXPECT_EQ (tl::Variant (-0.1 * (1.0 + 1.1e-13)) < tl::Variant (-0.1), true);
   EXPECT_EQ (tl::Variant (-0.1 * (1.0 + 0.9e-13)) < tl::Variant (0.1), true);
   EXPECT_EQ (tl::Variant (-0.1 * (1.0 + 1.1e-13)) < tl::Variant (0.1), true);
+}
+
+//  special numeric values
+TEST(7)
+{
+  std::string s;
+  tl::Extractor ex;
+  tl::Variant v;
+
+  s = " ##\t  0.5";
+  ex = tl::Extractor (s.c_str ());
+  EXPECT_EQ (ex.try_read (v), true);
+  EXPECT_EQ (v.to_parsable_string (), "##0.5");
+
+  s = "## nan";
+  ex = tl::Extractor (s.c_str ());
+  EXPECT_EQ (ex.try_read (v), true);
+  EXPECT_EQ (v.to_parsable_string (), "##nan");
+
+  s = "## NaN";
+  ex = tl::Extractor (s.c_str ());
+  EXPECT_EQ (ex.try_read (v), true);
+  EXPECT_EQ (v.to_parsable_string (), "##nan");
+
+  s = "## inf";
+  ex = tl::Extractor (s.c_str ());
+  EXPECT_EQ (ex.try_read (v), true);
+  EXPECT_EQ (v.to_parsable_string (), "##inf");
+
+  s = "## Inf";
+  ex = tl::Extractor (s.c_str ());
+  EXPECT_EQ (ex.try_read (v), true);
+  EXPECT_EQ (v.to_parsable_string (), "##inf");
+
+  s = "## -inf";
+  ex = tl::Extractor (s.c_str ());
+  EXPECT_EQ (ex.try_read (v), true);
+  EXPECT_EQ (v.to_parsable_string (), "##-inf");
+
+  s = "## -Inf";
+  ex = tl::Extractor (s.c_str ());
+  EXPECT_EQ (ex.try_read (v), true);
+  EXPECT_EQ (v.to_parsable_string (), "##-inf");
+
+  v = tl::Variant ("nan");
+  v = tl::Variant (v.to_double ());
+  EXPECT_EQ (v.to_parsable_string (), "##nan");
+  EXPECT_EQ (v.to_string (), "nan");
+
+  v = tl::Variant ("Inf");
+  v = tl::Variant (v.to_double ());
+  EXPECT_EQ (v.to_parsable_string (), "##inf");
+  EXPECT_EQ (v.to_string (), "inf");
+
+  v = tl::Variant (INFINITY);
+  EXPECT_EQ (v.to_parsable_string (), "##inf");
+  EXPECT_EQ (v.to_string (), "inf");
+
+  v = tl::Variant (-INFINITY);
+  EXPECT_EQ (v.to_parsable_string (), "##-inf");
+  EXPECT_EQ (v.to_string (), "-inf");
+
+  tl::Variant vinf (INFINITY);
+  tl::Variant vninf (-INFINITY);
+  tl::Variant vnan (NAN);
+  tl::Variant vzero (0.0);
+
+  EXPECT_EQ (vninf == vninf, true);
+  EXPECT_EQ (vninf == vzero, false);
+  EXPECT_EQ (vninf == vinf, false);
+  EXPECT_EQ (vninf == vnan, false);
+
+  EXPECT_EQ (vninf < vninf, false);
+  EXPECT_EQ (vninf < vzero, true);
+  EXPECT_EQ (vninf < vinf, true);
+  EXPECT_EQ (vninf < vnan, true);
+
+  EXPECT_EQ (vzero == vninf, false);
+  EXPECT_EQ (vzero == vzero, true);
+  EXPECT_EQ (vzero == vinf, false);
+  EXPECT_EQ (vzero == vnan, false);
+
+  EXPECT_EQ (vzero < vninf, false);
+  EXPECT_EQ (vzero < vzero, false);
+  EXPECT_EQ (vzero < vinf, true);
+  EXPECT_EQ (vzero < vnan, true);
+
+  EXPECT_EQ (vinf == vninf, false);
+  EXPECT_EQ (vinf == vzero, false);
+  EXPECT_EQ (vinf == vinf, true);
+  EXPECT_EQ (vinf == vnan, false);
+
+  EXPECT_EQ (vinf < vninf, false);
+  EXPECT_EQ (vinf < vzero, false);
+  EXPECT_EQ (vinf < vinf, false);
+  EXPECT_EQ (vinf < vnan, true);
+
+  EXPECT_EQ (vnan == vninf, false);
+  EXPECT_EQ (vnan == vzero, false);
+  EXPECT_EQ (vnan == vinf, false);
+  EXPECT_EQ (vnan == vnan, true);
+
+  EXPECT_EQ (vnan < vninf, false);
+  EXPECT_EQ (vnan < vzero, false);
+  EXPECT_EQ (vnan < vinf, false);
+  EXPECT_EQ (vnan < vnan, false);
 }
 
 }

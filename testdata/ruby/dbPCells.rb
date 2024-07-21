@@ -674,6 +674,141 @@ class DBPCell_TestClass < TestBase
 
   end
 
+  # issue #1782
+
+  class Circle1782 < RBA::PCellDeclarationHelper
+
+    def initialize
+      super()
+      param("l", TypeLayer, "Layer", :default => RBA::LayerInfo::new(1, 0))
+      param("r", TypeDouble, "Radius", :default => 1.0)
+      param("n", TypeInt, "Number of points", :default => 16)     
+    end
+
+    def display_text_impl
+      r = self.r
+      if !r
+        r = "nil"
+      else
+        r = '%.3f' % r
+      end
+      "Circle(L=" + self.l.to_s + ",R=" + r + ")"
+    end
+  
+    def produce_impl
+      r = self.r
+      if self.r.to_s == 'NaN'
+        r = 2.0
+      end
+      da = Math::PI * 2 / self.n
+      pts = self.n.times.collect do |i|
+        RBA::DPoint::new(r * Math::cos(i * da), r * Math::sin(i * da))
+      end
+      self.cell.shapes(self.l_layer).insert(RBA::DPolygon::new(pts))
+    end
+
+  end
+
+  class CircleLib1782 < RBA::Library
+
+    def initialize(name)
+      self.description = "Circle Library"
+      self.layout.register_pcell("Circle", Circle1782::new)
+      register(name)
+    end
+
+    def reregister_pcell
+      self.layout.register_pcell("Circle", Circle1782::new)
+    end
+
+  end
+
+  def test_10
+
+    lib = CircleLib1782::new("CircleLib")
+
+    ly = RBA::Layout::new
+
+    top = ly.create_cell("TOP")
+
+    names = []
+
+    2.times do |pass|
+      
+      5.times do |i|
+        5.times do |j|
+          if (i + j) % 2 == 0
+            r = Float::NAN
+          else
+            r = (i + j) * 0.5
+          end
+          n = i * 5 + j
+          c = ly.create_cell("Circle", "CircleLib", { "l" => RBA::LayerInfo::new(1, 0), "r" => r, "n" => n })
+          if pass == 0
+            names << c.name
+          else
+            # triggered bug #1782 - basically all variants are supposed to be unique, but 
+            # the NaN spoiled the hash maps
+            assert_equal(names.shift, c.name)
+          end
+          top.insert(RBA::DCellInstArray::new(c, RBA::DTrans::new(i * 10.0, j * 10.0)))
+        end
+      end
+
+    end
+
+    tmp = File::join($ut_testtmp, "tmp.gds")
+    ly.write(tmp)
+
+    # this should not throw an internal error
+    ly._destroy
+
+    # we should be able to read the Layout back
+    ly = RBA::Layout::new
+    ly.read(tmp)
+    assert_equal(ly.top_cell.name, "TOP")
+    assert_equal(ly.cells, 26)
+    ly._destroy
+
+    lib._destroy
+
+  end
+
+  def test_11
+
+    lib = CircleLib1782::new("CircleLib")
+
+    ly = RBA::Layout::new
+
+    top = ly.create_cell("TOP")
+
+    names = []
+
+    c = ly.create_cell("Circle", "CircleLib", { "l" => RBA::LayerInfo::new(1, 0), "r" => 2.0, "n" => 64 })
+
+    # triggered another flavor of #1782
+    lib.reregister_pcell
+
+    c = ly.create_cell("Circle", "CircleLib", { "l" => RBA::LayerInfo::new(1, 0), "r" => 2.0, "n" => 64 })
+    top.insert(RBA::DCellInstArray::new(c, RBA::DTrans::new()))
+
+    tmp = File::join($ut_testtmp, "tmp.gds")
+    ly.write(tmp)
+
+    # this should not throw an internal error
+    ly._destroy
+
+    # we should be able to read the Layout back
+    ly = RBA::Layout::new
+    ly.read(tmp)
+    assert_equal(ly.top_cell.name, "TOP")
+    assert_equal(ly.cells, 2)
+    ly._destroy
+
+    lib._destroy
+
+  end
+
 end
 
 load("test_epilogue.rb")

@@ -361,6 +361,10 @@ module RBA
 
     def param(name, type, description, args = {})
 
+      if ! args.is_a?(Hash)
+        raise("Too many positional arguments for 'param' (3 expected) - use named arguments for default value etc.")
+      end
+
       if name !~ /^[_A-Za-z]\w*$/
         raise "Invalid parameter name #{name} (needs to be a word)"
       end

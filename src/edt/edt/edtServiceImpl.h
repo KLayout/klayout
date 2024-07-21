@@ -62,6 +62,7 @@ protected:
   virtual void tap (const db::DPoint &initial);
 
   virtual bool configure (const std::string &name, const std::string &value);
+  virtual void activated ();
 
 protected:
   std::pair <bool, db::DPoint> interpolate (const db::DPoint &m, const db::DPoint &o, const db::DPoint &p) const;

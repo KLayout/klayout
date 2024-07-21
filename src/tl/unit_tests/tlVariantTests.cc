@@ -28,10 +28,11 @@
 #include "tlTypeTraits.h"
 #include "tlUnitTest.h"
 
-#define _USE_MATH_DEFINES // for MSVC
-#include <cmath>
 #include <cstdio>
 #include <memory>
+
+#define _USE_MATH_DEFINES // for MSVC
+#include <math.h>
 
 struct A 
 {

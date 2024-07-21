@@ -118,6 +118,15 @@ equals(HAVE_GIT2, "1") {
   DEFINES += HAVE_GIT2
 }
 
+# Use the Address Sanitizer for the debug build on Mac
+mac {
+  USE_ASAN_MAC = $$system(echo $$(MAC_USE_ASAN))
+  equals(USE_ASAN_MAC, "1") {
+    QMAKE_CXXFLAGS += -fsanitize=address
+    QMAKE_LFLAGS += -fsanitize=address
+  }
+}
+
 equals(HAVE_RUBY, "1") {
   !isEmpty(BITS_PATH) {
     include($$BITS_PATH/ruby/ruby.pri)

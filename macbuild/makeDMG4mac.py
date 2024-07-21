@@ -49,6 +49,7 @@ def SetGlobals():
     global DMGSerialNum       # the DMG serial number
     global PackagePrefix      # the package prefix: LW-', 'HW-', or 'EX-'
     global QtIdentification   # Qt identification
+    global BuildType          # build type ['release', 'debug']
     global RubyPythonID       # Ruby- and Python-identification
     global KLVersion          # KLayout's version
     global OccupiedDS         # approx. occupied disc space
@@ -144,6 +145,7 @@ def SetGlobals():
     DMGSerialNum      = 1
     PackagePrefix     = ""
     QtIdentification  = ""
+    BuildType         = ""
     RubyPythonID      = ""
     KLVersion         = GetKLayoutVersionFrom( "./version.sh" )
     OccupiedDS        = -1
@@ -236,6 +238,7 @@ def CheckPkgDirectory():
     global BundleName
     global PackagePrefix
     global QtIdentification
+    global BuildType
     global RubyPythonID
     global BackgroundPNG
     global LatestOSMacPorts
@@ -270,7 +273,8 @@ def CheckPkgDirectory():
     #     * ST-qt6MP.pkg.macos-Monterey-release-RsysPsys
     #     * LW-qt6MP.pkg.macos-Monterey-release-Rmp33Pmp311
     #-----------------------------------------------------------------------------------------------
-    patQRP = u'(ST|LW|HW|EX)([-])([qt5|qt6][0-9A-Za-z]+)([.]pkg[.])([A-Za-z]+[-][A-Za-z]+[-]release[-])([0-9A-Za-z]+)'
+    #                  0      1      2                      3                  4                    5         6        7
+    patQRP = u'(ST|LW|HW|EX)([-])([qt5|qt6][0-9A-Za-z]+)([.]pkg[.])([A-Za-z]+[-][A-Za-z]+[-])(release|debug)([-])([0-9A-Za-z]+)'
     regQRP = re.compile(patQRP)
     if not regQRP.match(PkgDir):
         print( "! Cannot identify (Qt, Ruby, Python) from the package directory name" )
@@ -283,7 +287,6 @@ def CheckPkgDirectory():
         pkgdirComponents = regQRP.match(PkgDir).groups()
         PackagePrefix    = pkgdirComponents[0]
         QtIdentification = pkgdirComponents[2]
-        RubyPythonID     = pkgdirComponents[5]
         if QtIdentification.find('qt5') == 0:
             BackgroundPNG = "KLayoutDMG-BackQt5.png"
         elif QtIdentification.find('qt6') == 0:
@@ -291,6 +294,14 @@ def CheckPkgDirectory():
         else:
             BackgroundPNG = None
             raise Exception( "! neither qt5 nor qt6" )
+        if pkgdirComponents[5] == 'release':
+            BuildType = 'release'
+        elif pkgdirComponents[5] == 'debug':
+            BuildType = 'debug'
+        else:
+            BuildType = None
+            raise Exception( "! neither release nor debug" )
+        RubyPythonID = pkgdirComponents[7]
 
         #-----------------------------------------------------------------------------
         # [3] Check if the "LatestOS" with MacPorts / Homebrew / Anaconda3
@@ -435,6 +446,7 @@ def ParseCommandLineArguments():
     global UnsafePkg
     global PackagePrefix
     global QtIdentification
+    global BuildType
     global RubyPythonID
     global KLVersion
     global OccupiedDS
@@ -532,6 +544,8 @@ def ParseCommandLineArguments():
                         % (PackagePrefix, KLVersion, GenOSName, Platform, DMGSerialNum, QtIdentification, RubyPythonID)
         if Machine == "arm64": # with an Apple Silicon Chip
             TargetDMG = Machine + TargetDMG
+        if BuildType == "debug": # in the case of 'debug' build
+            TargetDMG = "debug-" + TargetDMG
     return
 
 #------------------------------------------------------------------------------
@@ -607,7 +621,7 @@ def MakeTargetDMGFile(msg=""):
     #----------------------------------------------------
     if os.path.exists(WorkDMG):
         os.remove(WorkDMG)
-    dmgsize  = OccupiedDS + 20 # approx. occupied size plus 20[MB]
+    dmgsize  = OccupiedDS + int(0.2*OccupiedDS) # approx. occupied size plus 20[%]
     cmdline  = 'hdiutil create -srcfolder %s -volname %s -fs HFS+ -fsargs "-c c=64,a=16,e=16" '
     cmdline += '-format UDRW -size %dm  %s'
     command  = cmdline % (PkgDir, VolumeDMG, dmgsize, WorkDMG)

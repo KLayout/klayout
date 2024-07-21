@@ -227,7 +227,26 @@ bool skip_newline (const char *&cp)
 }
 
 // -------------------------------------------------------------------------
+//  Utility: case-insensitive compare of the first characters
+
+static bool local_compare (const char *s1, const char *s2)
+{
+  while (*s1 && *s2) {
+    uint32_t c1 = utf32_downcase (utf32_from_utf8 (s1));
+    uint32_t c2 = utf32_downcase (utf32_from_utf8 (s2));
+    if (c1 != c2) {
+      return false;
+    }
+  }
+  return true;
+}
+
+// -------------------------------------------------------------------------
 //  Utility: a strtod version that is independent of the locale
+
+static std::string inf_string = "inf";
+static std::string ninf_string = "-inf";
+static std::string nan_string = "nan";
 
 static std::string micron_format ("%.5f");
 static std::string dbu_format ("%.2f");
@@ -244,12 +263,24 @@ void set_db_resolution (unsigned int ndigits)
 
 std::string micron_to_string (double d)
 {
-  return tl::sprintf (micron_format.c_str (), d);
+  if (std::isnan (d)) {
+    return nan_string;
+  } else if (std::isinf (d)) {
+    return d < 0 ? ninf_string : inf_string;
+  } else {
+    return tl::sprintf (micron_format.c_str (), d);
+  }
 }
 
 std::string db_to_string (double d)
 {
-  return tl::sprintf (dbu_format.c_str (), d);
+  if (std::isnan (d)) {
+    return nan_string;
+  } else if (std::isinf (d)) {
+    return d < 0 ? ninf_string : inf_string;
+  } else {
+    return tl::sprintf (dbu_format.c_str (), d);
+  }
 }
 
 std::string to_upper_case (const std::string &s)
@@ -317,6 +348,18 @@ static double local_strtod (const char *cp, const char *&cp_new)
 {
   const char *cp0 = cp;
 
+  //  special numerical values
+  if (local_compare (cp, nan_string.c_str ())) {
+    cp_new = cp + nan_string.size ();
+    return NAN;
+  } else if (local_compare (cp, inf_string.c_str ())) {
+    cp_new = cp + inf_string.size ();
+    return INFINITY;
+  } else if (local_compare (cp, ninf_string.c_str ())) {
+    cp_new = cp + ninf_string.size ();
+    return -INFINITY;
+  }
+
   //  Extract sign
   double s = 1.0;
   if (*cp == '-') {
@@ -376,6 +419,12 @@ static double local_strtod (const char *cp, const char *&cp_new)
 std::string
 to_string (double d, int prec)
 {
+  if (std::isnan (d)) {
+    return nan_string;
+  } else if (std::isinf (d)) {
+    return d < 0 ? ninf_string : inf_string;
+  }
+
   //  For small values less than 1e-(prec) simply return "0" to avoid ugly values like "1.2321716e-14".
   if (fabs (d) < pow (10.0, -prec)) {
     return "0";
@@ -393,6 +442,12 @@ to_string (double d, int prec)
 std::string
 to_string (float d, int prec)
 {
+  if (std::isnan (d)) {
+    return nan_string;
+  } else if (std::isinf (d)) {
+    return d < 0 ? ninf_string : inf_string;
+  }
+
   //  For small values less than 1e-(prec) simply return "0" to avoid ugly values like "1.2321716e-14".
   if (fabs (d) < pow (10.0, -prec)) {
     return "0";
@@ -813,6 +868,7 @@ from_string_numeric (const std::string &s, double &v, bool eval)
   if (! *cp) {
     throw tl::Exception (tl::to_string (tr ("Got empty string where a real number was expected")));
   }
+
   const char *cp_end = cp;
   v = local_strtod (cp, cp_end);
   while (safe_isspace (*cp_end)) {

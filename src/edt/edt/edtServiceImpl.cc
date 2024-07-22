@@ -40,6 +40,7 @@
 #include "layLayoutViewBase.h"
 
 #if defined(HAVE_QT)
+#  include "layLayoutView.h"
 #  include "layTipDialog.h"
 #  include "layDragDropData.h"
 #endif
@@ -73,6 +74,24 @@ ShapeEditService::configure (const std::string &name, const std::string &value)
 }
   
 void
+ShapeEditService::activated ()
+{
+  edt::Service::activated ();
+
+#if defined(HAVE_QT)
+  if (view () == lay::LayoutView::current ()) {
+    lay::LayerPropertiesConstIterator cl = view ()->current_layer ();
+    if (! cl.is_null () && ! cl->visible (true)) {
+      lay::TipDialog td (QApplication::activeWindow (),
+                         tl::to_string (tr ("You are about to draw on a hidden layer. The result won't be visible.")),
+                         "drawing-on-invisible-layer");
+      td.exec_dialog ();
+    }
+  }
+#endif
+}
+
+void
 ShapeEditService::get_edit_layer ()
 {
   lay::LayerPropertiesConstIterator cl = view ()->current_layer ();
@@ -88,15 +107,6 @@ ShapeEditService::get_edit_layer ()
   if (cv_index < 0 || ! cv.is_valid ()) {
     throw tl::Exception (tl::to_string (tr ("Please select a cell first")));
   }
-
-#if defined(HAVE_QT)
-  if (! cl->visible (true)) {
-    lay::TipDialog td (QApplication::activeWindow (),
-                       tl::to_string (tr ("You are about to draw on a hidden layer. The result won't be visible.")),
-                       "drawing-on-invisible-layer");
-    td.exec_dialog ();
-  }
-#endif
 
   if (layer < 0 || ! cv->layout ().is_valid_layer ((unsigned int) layer)) {
 

@@ -188,6 +188,8 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
       mp_app (app),
       m_manager (undo_enabled)
 {
+  setAnimated (false);
+
   m_dispatcher.set_menu_parent_widget (this);
   m_dispatcher.make_menu ();
 

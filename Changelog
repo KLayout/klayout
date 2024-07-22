@@ -1,3 +1,6 @@
+0.29.4           (2024-07-08):
+* Bug: %GITHUB%/issues/1780 Crash on deleting multiple selected shapes or items
+ 
 0.29.3           (2024-07-06):
 * Bug: %GITHUB%/issues/1774 ImportError: cannot import name '__version__' from 'klayout'
 * Bug: %GITHUB%/issues/1771 Python exception formatting: backtrace missing for Python >=3.11.7

@@ -107,7 +107,7 @@ def GetTimeStamp():
 def ParseCommandLineArguments():
     global Usage
     global RunnerUsage
-    global StartKLayout 
+    global StartKLayout
     global Run
     global ContinueOnError
     global TestsExcluded
@@ -216,7 +216,9 @@ def ExportEnvVariables():
     MyEnviron[ 'TESTTMP' ] = WorkDir
     if System == "Darwin":
         MyEnviron[ 'DYLD_LIBRARY_PATH' ] = "%s:%s/db_plugins:%s/lay_plugins:%s/pymod" % (ProjectDir, ProjectDir, ProjectDir, ProjectDir)
-        for env in [ 'TESTSRC', 'TESTTMP', 'DYLD_LIBRARY_PATH' ]:
+        MyEnviron[ 'MallocNanoZone' ] = "0"
+        MyEnviron[ 'ASAN_OPTIONS' ] = "ast_unwind_on_malloc=0:verbosity=1:detect_leaks=0:abort_on_error=0:halt_on_error=0:symbolize=1"
+        for env in [ 'TESTSRC', 'TESTTMP', 'DYLD_LIBRARY_PATH', 'MallocNanoZone', 'ASAN_OPTIONS' ]:
             os.environ[env] = MyEnviron[env]
     else:
         MyEnviron[ 'LD_LIBRARY_PATH' ] = "%s:%s/db_plugins:%s/lay_plugins:%s/pymod" % (ProjectDir, ProjectDir, ProjectDir, ProjectDir)
@@ -283,7 +285,7 @@ def Main():
     #-------------------------------------------------------
     if StartKLayout:
         StartKLatyouGUIWindow()
-    
+
     #-------------------------------------------------------
     # [4] Run the unit tester
     #-------------------------------------------------------

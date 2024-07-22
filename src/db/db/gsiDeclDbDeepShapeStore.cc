@@ -190,7 +190,7 @@ Class<db::DeepShapeStore> decl_dbDeepShapeStore ("db", "DeepShapeStore",
     "\n"
     "This attribute has been introduced in version 0.28.4"
   ) +
-  gsi::method ("subcircuit_hierarchy_for_nets=", &db::DeepShapeStore::set_subcircuit_hierarchy_for_nets, gsi::arg ("value"),
+  gsi::method ("subcircuit_hierarchy_for_nets", &db::DeepShapeStore::subcircuit_hierarchy_for_nets,
     "@brief Gets a value indicating whether to build a subcircuit hierarchy per net\n"
     "See \\subcircuit_hierarchy_for_nets= for details.\n"
     "\n"

@@ -2526,10 +2526,25 @@ Layout::register_pcell (const std::string &name, pcell_declaration_type *declara
     //  replace any existing PCell declaration with that name.
     id = pcid->second;
     if (m_pcells [id]) {
-      delete m_pcells [id];
-    }
 
-    m_pcells [id] = new pcell_header_type (id, name, declaration);
+      std::unique_ptr<pcell_header_type> org_header (m_pcells [id]);
+      std::vector<pcell_variant_type *> variants;
+      for (auto v = org_header->begin (); v != org_header->end (); ++v) {
+        variants.push_back (v->second);
+      }
+      for (auto v = variants.begin (); v != variants.end (); ++v) {
+        (*v)->unregister ();
+      }
+
+      m_pcells [id] = new pcell_header_type (id, name, declaration);
+
+      for (auto v = variants.begin (); v != variants.end (); ++v) {
+        (*v)->reregister ();
+      }
+
+    } else {
+      m_pcells [id] = new pcell_header_type (id, name, declaration);
+    }
 
   } else {
 

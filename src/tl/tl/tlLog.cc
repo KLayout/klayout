@@ -49,18 +49,22 @@ static int default_verbosity ()
   return verbosity;
 }
 
-static int m_verbosity_level = default_verbosity ();
+static int &verbosity_level ()
+{
+  static int level = default_verbosity ();
+  return level;
+}
 
 void
 verbosity (int level)
 {
-  m_verbosity_level = level;
+  verbosity_level () = level;
 }
 
 int
 verbosity ()
 {
-  return m_verbosity_level;
+  return verbosity_level ();
 }
 
 // ------------------------------------------------

@@ -2044,6 +2044,32 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
     "\n"
     "This method has been introduced in version 0.28.4.\n"
   ) +
+  gsi::method ("top_circuit", static_cast<db::Circuit *(db::Netlist::*) ()> (&db::Netlist::top_circuit),
+    "@brief Gets the top circuit.\n"
+    "This method will return nil, if there is no top circuit. It will raise an error, if there is more than "
+    "a single top circuit.\n"
+    "\n"
+    "This convenience method has been added in version 0.29.5."
+  ) +
+  gsi::method ("top_circuit", static_cast<const db::Circuit *(db::Netlist::*) () const> (&db::Netlist::top_circuit),
+    "@brief Gets the top circuit (const version).\n"
+    "This method will return nil, if there is no top circuit. It will raise an error, if there is more than "
+    "a single top circuit.\n"
+    "\n"
+    "This convenience method has been added in version 0.29.5."
+  ) +
+  gsi::method ("top_circuits", static_cast<std::vector<db::Circuit *> (db::Netlist::*) ()> (&db::Netlist::top_circuits),
+    "@brief Gets the top circuits.\n"
+    "Returns a list of top circuits.\n"
+    "\n"
+    "This convenience method has been added in version 0.29.5."
+  ) +
+  gsi::method ("top_circuits", static_cast<std::vector<const db::Circuit *> (db::Netlist::*) () const> (&db::Netlist::top_circuits),
+    "@brief Gets the top circuits.\n"
+    "Returns a list of top circuits.\n"
+    "\n"
+    "This convenience method has been added in version 0.29.5."
+  ) +
   gsi::method_ext ("nets_by_name", &nets_by_name_const_from_netlist, gsi::arg ("name_pattern"),
     "@brief Gets the net objects for a given name filter (const version).\n"
     "The name filter is a glob pattern. This method will return all \\Net objects matching the glob pattern.\n"

@@ -272,6 +272,32 @@ public:
   }
 
   /**
+   *  @brief Gets the top circuit if there is one
+   *  This method will assert if there is more than a single top circuit.
+   *  It will return 0 if there is no top circuit.
+   */
+  Circuit *top_circuit ();
+
+  /**
+   *  @brief Gets the top circuit if there is one (const version)
+   *  This method will assert if there is more than a single top circuit.
+   *  It will return 0 if there is no top circuit.
+   */
+  const Circuit *top_circuit () const;
+
+  /**
+   *  @brief Gets the top circuits
+   *  This convenience method will return a list of top circuits.
+   */
+  std::vector<Circuit *> top_circuits ();
+
+  /**
+   *  @brief Gets the top circuits (const version)
+   *  This convenience method will return a list of top circuits.
+   */
+  std::vector<const Circuit *> top_circuits () const;
+
+  /**
    *  @brief Gets the top-down circuits iterator (begin)
    *  This iterator will deliver the circuits in a top-down way - i.e. child circuits
    *  will always come after parent circuits.

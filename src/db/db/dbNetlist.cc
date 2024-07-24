@@ -366,6 +366,47 @@ size_t Netlist::top_circuit_count () const
   return m_top_circuits;
 }
 
+Circuit *Netlist::top_circuit ()
+{
+  size_t ntop = top_circuit_count ();
+  if (ntop == 0) {
+    return 0;
+  } else if (ntop > 1) {
+    throw tl::Exception (tl::to_string (tr ("Netlist contains more than a single top circuit")));
+  } else {
+    return begin_top_down ().operator-> ();
+  }
+}
+
+const Circuit *Netlist::top_circuit () const
+{
+  return const_cast<Netlist *> (this)->top_circuit ();
+}
+
+std::vector<Circuit *> Netlist::top_circuits ()
+{
+  size_t ntop = top_circuit_count ();
+  std::vector<Circuit *> result;
+  result.reserve (ntop);
+  for (auto c = begin_top_down (); ntop > 0 && c != end_top_down (); ++c) {
+    result.push_back (c.operator-> ());
+    --ntop;
+  }
+  return result;
+}
+
+std::vector<const Circuit *> Netlist::top_circuits () const
+{
+  size_t ntop = top_circuit_count ();
+  std::vector<const Circuit *> result;
+  result.reserve (ntop);
+  for (auto c = begin_top_down (); ntop > 0 && c != end_top_down (); ++c) {
+    result.push_back (c.operator-> ());
+    --ntop;
+  }
+  return result;
+}
+
 Netlist::bottom_up_circuit_iterator Netlist::begin_bottom_up ()
 {
   if (! m_valid_topology) {

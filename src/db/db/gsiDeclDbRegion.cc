@@ -1132,6 +1132,24 @@ rasterize1 (const db::Region *region, const db::Point &origin, const db::Vector 
   return rasterize2 (region, origin, pixel_size, pixel_size, nx, ny);
 }
 
+static tl::Variant begin_shapes_rec (const db::Region *region)
+{
+  auto res = region->begin_iter ();
+  tl::Variant r = tl::Variant (std::vector<tl::Variant> ());
+  r.push (tl::Variant (res.first));
+  r.push (tl::Variant (res.second));
+  return r;
+}
+
+static tl::Variant begin_merged_shapes_rec (const db::Region *region)
+{
+  auto res = region->begin_merged_iter ();
+  tl::Variant r = tl::Variant (std::vector<tl::Variant> ());
+  r.push (tl::Variant (res.first));
+  r.push (tl::Variant (res.second));
+  return r;
+}
+
 static db::Point default_origin;
 
 //  provided by gsiDeclDbPolygon.cc:
@@ -3757,7 +3775,32 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "metal1_all_nets = metal1.nets\n"
     "@/code\n"
     "\n"
-    "This method was introduced in version 0.28.4"
+    "This method was introduced in version 0.28.4."
+  ) +
+  gsi::method_ext ("begin_shapes_rec", &begin_shapes_rec,
+    "@brief Returns a recursive shape iterator plus a transformation for the shapes constituting this region.\n"
+    "This method returns a pair consisting of a \\RecursiveShapeIterator plus a \\ICplxTrans transformation. "
+    "Both objects allow accessing the shapes (polygons) of the region in a detailed fashion. To iterate the "
+    "the polygons use a code like this:\n"
+    "\n"
+    "@code\n"
+    "iter, trans = region.begin_shapes_rec\n"
+    "iter.each do |i|\n"
+    "  polygon = trans * iter.trans * i.shape.polygon\n"
+    "  ...\n"
+    "end\n"
+    "@/code\n"
+    "\n"
+    "This method is the most powerful way of accessing the shapes inside the region. I allows for example to obtain the "
+    "properties attached to the polygons of the region. It is primarily intended for special applications like iterating net-annotated shapes.\n"
+    "\n"
+    "This speciality method was introduced in version 0.29.5."
+  ) +
+  gsi::method_ext ("begin_merged_shapes_rec", &begin_merged_shapes_rec,
+    "@brief Returns a recursive shape iterator plus a transformation for the shapes constituting the merged region.\n"
+    "It can be used like \\begin_shapes_rec, but delivers shapes from the merged polygons pool.\n"
+    "\n"
+    "This speciality method was introduced in version 0.29.5."
   ) +
   gsi::make_property_methods<db::Region> ()
   ,

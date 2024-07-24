@@ -1376,7 +1376,7 @@ Class<db::Shape> decl_Shape ("db", "Shape",
   ) + 
   gsi::method_ext ("properties", &get_properties,
     "@brief Gets the user properties\n"
-    "This method is a convenience method that gets the properties of the shape as a hash. "
+    "This method is a convenience method that gets the properties of the shape as a single hash.\n"
     "\n"
     "This method has been introduced in version 0.29.5."
   ) +

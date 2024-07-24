@@ -344,7 +344,7 @@ static void set_layout_property (db::Layout *l, const tl::Variant &key, const tl
   l->prop_id (l->properties_repository ().properties_id (props));
 }
 
-static tl::Variant get_layout_property (db::Layout *l, const tl::Variant &key)
+static tl::Variant get_layout_property (const db::Layout *l, const tl::Variant &key)
 {
   //  TODO: check if is editable
   
@@ -365,6 +365,21 @@ static tl::Variant get_layout_property (db::Layout *l, const tl::Variant &key)
   } else {
     return tl::Variant ();
   }
+}
+
+static tl::Variant get_layout_properties (const db::Layout *layout)
+{
+  db::properties_id_type id = layout->prop_id ();
+  if (id == 0) {
+    return tl::Variant::empty_array ();
+  }
+
+  tl::Variant res = tl::Variant::empty_array ();
+  const db::PropertiesRepository::properties_set &props = layout->properties_repository ().properties (id);
+  for (auto i = props.begin (); i != props.end (); ++i) {
+    res.insert (layout->properties_repository ().prop_name (i->first), i->second);
+  }
+  return res;
 }
 
 static db::cell_index_type cell_by_name (db::Layout *l, const char *name)
@@ -1265,6 +1280,12 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "\n"
     "This method has been introduced in version 0.24."
   ) + 
+  gsi::method_ext ("properties", &get_layout_properties,
+    "@brief Gets the user properties as a hash\n"
+    "This method is a convenience method that gets all user properties as a single hash.\n"
+    "\n"
+    "This method has been introduced in version 0.29.5."
+  ) +
   gsi::method_ext ("properties_id", &properties_id, gsi::arg ("properties"),
     "@brief Gets the properties ID for a given properties set\n"
     "\n"

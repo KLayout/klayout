@@ -1334,6 +1334,7 @@ class DBLayoutTests1_TestClass < TestBase
     i0 = nil
     c0c.each_inst { |i| i.cell_index == l.cell("c1$1").cell_index && i0 = i }
     assert_equal(i0.property("p"), 18)
+    assert_equal(i0.properties, {"p" => 18})
     assert_equal(l.cell("c1$1").begin_shapes_rec(0).shape.property("p"), 17)
 
     assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c0$1](0,100;1000,1200)/[c2$1](100,0;1100,1100)/[c3$1](1200,0;2200,1100)/[c3$1](-1200,0;-100,1000)/[c1$1](0,100;1000,1200)")
@@ -1379,6 +1380,7 @@ class DBLayoutTests1_TestClass < TestBase
 
     tt = RBA::Trans.new
     i0 = c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
+    assert_equal(i0.properties, {})
     i0.set_property("p", 18)
     c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
     c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))

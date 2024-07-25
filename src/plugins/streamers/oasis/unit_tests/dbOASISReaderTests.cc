@@ -639,6 +639,31 @@ TEST(Bug_1474)
   }
 }
 
+TEST(Bug_1799)
+{
+  db::Manager m (false);
+  db::Layout layout (&m);
+
+  {
+    tl::InputStream file (tl::testdata () + "/oasis/issue_1799.oas");
+    db::OASISReader reader (file);
+    reader.read (layout);
+  }
+
+  db::properties_id_type pn = layout.properties_repository ().prop_name_id (tl::Variant (1));
+  db::PropertiesRepository::properties_set ps;
+  ps.insert (std::make_pair (pn, tl::Variant ("hello, world!")));
+
+  auto pid = layout.properties_repository ().properties_id (ps);
+
+  auto ps2 = layout.properties_repository ().properties (pid);
+  EXPECT_EQ (ps2.size (), size_t (1));
+  EXPECT_EQ (ps2.find (pn) != ps2.end (), true);
+  if (ps2.find (pn) != ps2.end ()) {
+    EXPECT_EQ (ps2.find (pn)->second.to_string (), "hello, world!");
+  }
+}
+
 TEST(DuplicateCellname)
 {
   db::Manager m (false);

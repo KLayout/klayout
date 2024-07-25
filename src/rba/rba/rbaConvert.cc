@@ -287,8 +287,13 @@ VALUE c2ruby<tl::Variant> (const tl::Variant &c)
   } else if (c.is_user ()) {
     const gsi::ClassBase *cls = c.gsi_cls ();
     if (cls) {
-      void *obj = const_cast<void *> (c.to_user ());
-      return object_to_ruby (obj, 0, c.user_cls ()->gsi_cls (), false, false, true, false);
+      if (! c.user_is_ref () && cls->is_managed ()) {
+        void *obj = c.user_unshare ();
+        return object_to_ruby (obj, 0, c.user_cls ()->gsi_cls (), true, c.user_is_const (), false, false);
+      } else {
+        void *obj = const_cast<void *> (c.to_user ());
+        return object_to_ruby (obj, 0, c.user_cls ()->gsi_cls (), false, false, true, false);
+      }
     } else {
       //  not a known type -> return nil
       return Qnil;

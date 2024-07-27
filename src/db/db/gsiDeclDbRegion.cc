@@ -2951,6 +2951,8 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "and is usually a good choice. The algorithm is stable up to roughly 1.2 which corresponds to "
     "a minimum angle of abouth 37 degree.\n"
     "\n"
+    "The minimum angle of the resulting triangles relates to the 'b' parameter as: @t min_angle = arcsin(B/2) @/t.\n"
+    "\n"
     "The area value is given in terms of DBU units. Picking a value of 0.0 for area and min b will "
     "make the implementation skip the refinement step. In that case, the results are identical to "
     "the standard constrained Delaunay triangulation.\n"

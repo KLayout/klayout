@@ -461,6 +461,7 @@ GDS2ReaderBase::read_context_info_cell ()
     if (valid_hook) {
 
       std::vector <std::string> &strings = m_context_info.insert (std::make_pair (cn, std::vector <std::string> ())).first->second;
+      std::map <size_t, std::vector<std::string> > strings_ex;
 
       size_t attr = 0;
 
@@ -474,16 +475,60 @@ GDS2ReaderBase::read_context_info_cell ()
           attr = size_t (get_ushort ());
         } else if (rec_id == sPROPVALUE) {
 
-          if (strings.size () <= attr) {
-            strings.resize (attr + 1, std::string ());
+          const char *str = get_string ();
+
+          //  To embed long strings and more than 64k attributes, a separate notation is used:
+          //    "#<n>,<p>:<string>"
+          //  where <n> is a string index and <p> is the part index (zero-based).
+          //  For such properties, the PROPATTR value is ignored. This means however, that the
+          //  attribute numbers may not be unique.
+          //  See issue #1794.
+
+          if (str[0] == '#') {
+
+            tl::Extractor ex (str + 1);
+            size_t n = 0, p = 0;
+            if (ex.try_read (n) && ex.test (",") && ex.try_read (p) && ex.test (":")) {
+              if (strings.size () <= n) {
+                strings.resize (n + 1, std::string ());
+              }
+              std::vector<std::string> &sv = strings_ex[n];
+              if (sv.size () <= p) {
+                sv.resize (p + 1, std::string ());
+              }
+              sv[p] = ex.get ();
+            }
+
+          } else {
+
+            if (strings.size () <= attr) {
+              strings.resize (attr + 1, std::string ());
+            }
+            strings [attr] = str;
+
           }
-          strings [attr] = get_string ();
 
         } else {
           error (tl::to_string (tr ("ENDEL, PROPATTR or PROPVALUE record expected")));
         }
 
-      } 
+      }
+
+      //  combine the multipart strings (#1794)
+      for (auto es = strings_ex.begin (); es != strings_ex.end (); ++es) {
+        if (es->first < strings.size ()) {
+          std::string &s = strings [es->first];
+          s.clear ();
+          size_t sz = 0;
+          for (auto i = es->second.begin (); i != es->second.end (); ++i) {
+            sz += i->size ();
+          }
+          s.reserve (sz);
+          for (auto i = es->second.begin (); i != es->second.end (); ++i) {
+            s += *i;
+          }
+        }
+      }
 
     } else {
       error (tl::to_string (tr ("Invalid record inside a context info cell")));

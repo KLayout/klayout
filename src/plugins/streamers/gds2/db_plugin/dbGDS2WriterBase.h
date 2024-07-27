@@ -169,6 +169,7 @@ private:
 
   void write_properties (const db::Layout &layout, db::properties_id_type prop_id);
   void write_context_cell (db::Layout &layout, const short *time_data, const std::vector<cell_index_type> &cells);
+  void write_context_string (size_t n, const std::string &s);
 };
 
 } // namespace db

@@ -46,6 +46,7 @@ std::string cfg_rdb_show_all ("rdb-show-all");
 std::string cfg_rdb_list_shapes ("rdb-list-shapes");
 std::string cfg_rdb_window_state ("rdb-window-state-v2");  // v2: 0.24++
 std::string cfg_rdb_window_mode ("rdb-window-mode");
+std::string cfg_rdb_tree_state ("rdb-tree-state");
 std::string cfg_rdb_window_dim ("rdb-window-dim");
 std::string cfg_rdb_max_marker_count ("rdb-max-marker-count");
 std::string cfg_rdb_marker_color ("rdb-marker-color");
@@ -296,6 +297,7 @@ public:
     options.push_back (std::pair<std::string, std::string> (cfg_rdb_window_mode, "fit-marker"));
     options.push_back (std::pair<std::string, std::string> (cfg_rdb_window_state, ""));
     options.push_back (std::pair<std::string, std::string> (cfg_rdb_window_dim, "1.0"));
+    options.push_back (std::pair<std::string, std::string> (cfg_rdb_tree_state, ""));
     options.push_back (std::pair<std::string, std::string> (cfg_rdb_max_marker_count, "1000"));
     options.push_back (std::pair<std::string, std::string> (cfg_rdb_marker_color, lay::ColorConverter ().to_string (QColor ())));
     options.push_back (std::pair<std::string, std::string> (cfg_rdb_marker_line_width, "-1"));

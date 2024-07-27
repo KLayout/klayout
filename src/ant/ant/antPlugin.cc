@@ -63,16 +63,16 @@ static std::vector<ant::Template> make_standard_templates ()
   templates.push_back (ant::Template (tl::to_string (tr ("Measure edge")), "$X", "$Y", "$D", ant::Object::STY_ruler, ant::Object::OL_diag, true, lay::AC_Global, "_measure_edge"));
   templates.back ().set_mode (ant::Template::RulerAutoMetricEdge);
 
-  templates.push_back (ant::Template (tl::to_string (tr ("Angle")), "", "", "$(sprintf('%.5g',G))°", ant::Object::STY_line, ant::Object::OL_angle, true, lay::AC_Global, "_angle"));
+  templates.push_back (ant::Template (tl::to_string (tr ("Angle")), "", "", "$(sprintf('%.5g',G))°", ant::Object::STY_line, ant::Object::OL_angle, true, lay::AC_Any, "_angle"));
   templates.back ().set_mode (ant::Template::RulerThreeClicks);
 
-  templates.push_back (ant::Template (tl::to_string (tr ("Radius")), "", "", "R=$D", ant::Object::STY_arrow_end, ant::Object::OL_radius, true, lay::AC_Global, "_radius"));
+  templates.push_back (ant::Template (tl::to_string (tr ("Radius")), "", "", "R=$D", ant::Object::STY_arrow_end, ant::Object::OL_radius, true, lay::AC_Any, "_radius"));
   templates.back ().set_mode (ant::Template::RulerThreeClicks);
   templates.back ().set_main_position (ant::Object::POS_center);
 
-  templates.push_back (ant::Template (tl::to_string (tr ("Ellipse")), "W=$(abs(X))", "H=$(abs(Y))", "", ant::Object::STY_line, ant::Object::OL_ellipse, true, lay::AC_Global, std::string ()));
+  templates.push_back (ant::Template (tl::to_string (tr ("Ellipse")), "W=$(abs(X))", "H=$(abs(Y))", "", ant::Object::STY_line, ant::Object::OL_ellipse, true, lay::AC_Any, std::string ()));
 
-  templates.push_back (ant::Template (tl::to_string (tr ("Box")), "W=$(abs(X))", "H=$(abs(Y))", "", ant::Object::STY_line, ant::Object::OL_box, true, lay::AC_Global, std::string ()));
+  templates.push_back (ant::Template (tl::to_string (tr ("Box")), "W=$(abs(X))", "H=$(abs(Y))", "", ant::Object::STY_line, ant::Object::OL_box, true, lay::AC_Any, std::string ()));
 
   return templates;
 }

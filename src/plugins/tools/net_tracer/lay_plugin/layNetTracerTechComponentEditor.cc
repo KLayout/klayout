@@ -140,7 +140,7 @@ NetTracerTechComponentEditor::NetTracerTechComponentEditor (QWidget *parent)
   connect (action, SIGNAL (triggered ()), this, SLOT (add_clicked ()));
   stack_tree->addAction (action);
   action = new QAction (QObject::tr ("Delete Selected Stacks"), this);
-  connect (action, SIGNAL (triggered ()), this, SLOT (delete_clicked ()));
+  connect (action, SIGNAL (triggered ()), this, SLOT (del_clicked ()));
   stack_tree->addAction (action);
   action = new QAction (QObject::tr ("Duplicate Stack"), this);
   connect (action, SIGNAL (triggered ()), this, SLOT (clone_clicked ()));

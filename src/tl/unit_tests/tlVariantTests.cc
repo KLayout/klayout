@@ -28,9 +28,11 @@
 #include "tlTypeTraits.h"
 #include "tlUnitTest.h"
 
-#include <cmath>
 #include <cstdio>
 #include <memory>
+
+#define _USE_MATH_DEFINES // for MSVC
+#include <math.h>
 
 struct A 
 {
@@ -1092,8 +1094,84 @@ TEST(6)
   EXPECT_EQ (tl::Variant (-0.1 * (1.0 + 1.1e-13)) < tl::Variant (0.1), true);
 }
 
+//  precision of double serialization
+TEST(7a)
+{
+  tl::Variant v (M_PI);
+  tl::Variant vx;
+  std::string s (v.to_parsable_string ());
+  tl::Extractor ex (s.c_str ());
+  ex.read (vx);
+
+  EXPECT_EQ (fabs (M_PI - vx.to_double ()) < 4e-15, true);
+}
+
+TEST(7b)
+{
+  tl::Variant v ((float) M_PI);
+  tl::Variant vx;
+  std::string s (v.to_parsable_string ());
+  tl::Extractor ex (s.c_str ());
+  ex.read (vx);
+
+  EXPECT_EQ (fabs (M_PI - vx.to_double ()) < 1e-7, true);
+}
+
+//  null strings
+TEST(8)
+{
+  tl::Variant v ((const char *) 0);
+  EXPECT_EQ (v.to_parsable_string (), "nil");
+  v = tl::Variant ("abc");
+  EXPECT_EQ (v.to_parsable_string (), "'abc'");
+  v = (const char *) 0;
+  EXPECT_EQ (v.to_parsable_string (), "nil");
+
+#if defined(HAVE_QT)
+  v = tl::Variant (QString ());
+  EXPECT_EQ (v.to_parsable_string (), "nil");
+  v = tl::Variant (QString::fromUtf8 ("abc"));
+  EXPECT_EQ (v.to_parsable_string (), "'abc'");
+  v = QString ();
+  EXPECT_EQ (v.to_parsable_string (), "nil");
+
+  v = tl::Variant (QByteArray ());
+  EXPECT_EQ (v.to_parsable_string (), "nil");
+  v = tl::Variant (QByteArray ("abc"));
+  EXPECT_EQ (v.to_parsable_string (), "'abc'");
+  v = QByteArray ();
+  EXPECT_EQ (v.to_parsable_string (), "nil");
+#endif
+}
+
+//  create from STL containers
+TEST(9)
+{
+  tl::Variant v;
+
+  std::vector<int> vi;
+  vi.push_back (17);
+  vi.push_back (1);
+  std::list<int> li;
+  li.push_back (42);
+  li.push_back (-17);
+  std::set<int> si;
+  si.insert (31);
+  si.insert (63);
+  std::pair<int, int> pi (1, 3);
+  std::map<int, int> mi;
+  mi[17] = 42;
+  mi[-1] = 31;
+
+  EXPECT_EQ (tl::Variant (vi).to_parsable_string (), "(#17,#1)");
+  EXPECT_EQ (tl::Variant (li).to_parsable_string (), "(#42,#-17)");
+  EXPECT_EQ (tl::Variant (si).to_parsable_string (), "(#31,#63)");
+  EXPECT_EQ (tl::Variant (pi).to_parsable_string (), "(#1,#3)");
+  EXPECT_EQ (tl::Variant (mi).to_parsable_string (), "{#-1=>#31,#17=>#42}");
+}
+
 //  special numeric values
-TEST(7)
+TEST(10)
 {
   std::string s;
   tl::Extractor ex;

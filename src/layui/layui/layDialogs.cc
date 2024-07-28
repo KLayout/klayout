@@ -1457,7 +1457,7 @@ class UndoRedoListViewModel
 {
 public:
   UndoRedoListViewModel (QObject *parent, db::Manager *manager, bool for_undo)
-    : QAbstractListModel (parent), mp_manager (manager), m_for_undo (for_undo)
+    : QAbstractListModel (parent), mp_manager (manager), m_for_undo (for_undo), m_step (-1)
   {
     //  .. nothing yet ..
   }
@@ -1477,9 +1477,14 @@ public:
         delta = index.row ();
       }
       return QVariant (tl::to_qstring (mp_manager->undo_or_redo_item (delta)));
-    } else {
-      return QVariant ();
+    } else if (role == Qt::FontRole) {
+      if (index.row () <= m_step) {
+        QFont font;
+        font.setBold (true);
+        return QVariant (font);
+      }
     }
+    return QVariant ();
   }
 
   QModelIndex index (int row, int column, const QModelIndex &parent) const
@@ -1496,7 +1501,7 @@ public:
     return QModelIndex ();
   }
 
-  virtual int rowCount (const QModelIndex &parent) const
+  int rowCount (const QModelIndex &parent) const
   {
     if (parent.isValid ()) {
       return 0;
@@ -1505,9 +1510,18 @@ public:
     }
   }
 
+  void set_current_step (int step)
+  {
+    if (m_step != step) {
+      m_step = step;
+      emit dataChanged (index (0, 0, QModelIndex ()), index (rowCount (QModelIndex ()) - 1, 0, QModelIndex ()));
+    }
+  }
+
 private:
   db::Manager *mp_manager;
   bool m_for_undo;
+  int m_step;
 };
 
 }
@@ -1541,12 +1555,19 @@ UndoRedoListForm::selection_changed (const QModelIndex &current)
     mp_ui->title_lbl->setText (m_for_undo ? tr ("Undo to step (select one)") : tr ("Redo to step (select one)"));
     m_steps = -1;
   } else {
+
     m_steps = current.row () + 1;
     if (m_steps == 1) {
       mp_ui->title_lbl->setText (m_for_undo ? tr ("Undo one step") : tr ("Redo one step"));
     } else {
       mp_ui->title_lbl->setText ((m_for_undo ? tr ("Undo %1 steps") : tr ("Redo %1 steps")).arg (m_steps));
     }
+
+    UndoRedoListViewModel *model = dynamic_cast<UndoRedoListViewModel *> (mp_ui->items->model ());
+    if (model) {
+      model->set_current_step (m_steps - 1);
+    }
+
   }
 }
 

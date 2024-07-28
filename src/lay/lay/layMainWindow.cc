@@ -1708,6 +1708,27 @@ MainWindow::cm_undo ()
 }
 
 void
+MainWindow::cm_undo_list ()
+{
+  if (current_view () && m_manager.available_undo ().first) {
+
+    std::unique_ptr<lay::UndoRedoListForm> dialog (new lay::UndoRedoListForm (this, &m_manager, true));
+
+    int steps = 0;
+    if (dialog->exec (steps)) {
+      for (std::vector <lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
+        (*vp)->view ()->clear_selection ();
+        (*vp)->view ()->cancel ();
+      }
+      while (steps-- > 0) {
+        m_manager.undo ();
+      }
+    }
+
+  }
+}
+
+void
 MainWindow::cm_redo ()
 {
   if (current_view () && m_manager.available_redo ().first) {
@@ -1716,6 +1737,27 @@ MainWindow::cm_redo ()
       (*vp)->view ()->cancel ();
     }
     m_manager.redo ();
+  }
+}
+
+void
+MainWindow::cm_redo_list ()
+{
+  if (current_view () && m_manager.available_redo ().first) {
+
+    std::unique_ptr<lay::UndoRedoListForm> dialog (new lay::UndoRedoListForm (this, &m_manager, false));
+
+    int steps = 0;
+    if (dialog->exec (steps)) {
+      for (std::vector <lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
+        (*vp)->view ()->clear_selection ();
+        (*vp)->view ()->cancel ();
+      }
+      while (steps-- > 0) {
+        m_manager.redo ();
+      }
+    }
+
   }
 }
 
@@ -1847,6 +1889,11 @@ MainWindow::update_action_states ()
       undo_action->set_title (undo_txt);
       undo_action->set_enabled (undo_enable && edits_enabled ());
 
+      if (menu ()->is_valid ("edit_menu.undo_list")) {
+        Action *undo_list_action = menu ()->action ("edit_menu.undo_list");
+        undo_list_action->set_enabled (undo_enable && edits_enabled ());
+      }
+
     }
 
     if (menu ()->is_valid ("edit_menu.redo")) {
@@ -1861,6 +1908,11 @@ MainWindow::update_action_states ()
       }
       redo_action->set_title (redo_txt);
       redo_action->set_enabled (redo_enable && edits_enabled ());
+
+      if (menu ()->is_valid ("edit_menu.redo_list")) {
+        Action *redo_list_action = menu ()->action ("edit_menu.redo_list");
+        redo_list_action->set_enabled (redo_enable && edits_enabled ());
+      }
 
     }
 
@@ -3922,6 +3974,10 @@ MainWindow::menu_activated (const std::string &symbol)
     cm_undo ();
   } else if (symbol == "cm_redo") {
     cm_redo ();
+  } else if (symbol == "cm_undo_list") {
+    cm_undo_list ();
+  } else if (symbol == "cm_redo_list") {
+    cm_redo_list ();
   } else if (symbol == "cm_goto_position") {
     cm_goto_position ();
   } else if (symbol == "cm_manage_bookmarks") {

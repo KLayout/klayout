@@ -2113,6 +2113,8 @@ public:
     at = "edit_menu.edit_options_group";
     menu_entries.push_back (lay::menu_item ("cm_undo", "undo:edit", at, tl::to_string (tr ("Undo(Ctrl+Z)"))));
     menu_entries.push_back (lay::menu_item ("cm_redo", "redo:edit", at, tl::to_string (tr ("Redo(Ctrl+Y)"))));
+    menu_entries.push_back (lay::menu_item ("cm_undo_list", "undo_list:edit", at, tl::to_string (tr ("Undo by List"))));
+    menu_entries.push_back (lay::menu_item ("cm_redo_list", "redo_list:edit", at, tl::to_string (tr ("Redo by List"))));
 
     menu_entries.push_back (lay::separator ("basic_group", at));
     menu_entries.push_back (lay::submenu ("layout_menu:edit:edit_mode", at, tl::to_string (tr ("Layout"))));

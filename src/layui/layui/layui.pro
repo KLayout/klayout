@@ -60,6 +60,7 @@ FORMS = \
   SaveLayoutAsOptionsDialog.ui \
   SelectStippleForm.ui \
   TipDialog.ui \
+  UndoRedoListForm.ui \
   UserPropertiesForm.ui \
   UserPropertiesEditForm.ui \
   SpecificLoadLayoutOptionsDialog.ui \

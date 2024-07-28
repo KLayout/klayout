@@ -203,6 +203,29 @@ public:
   std::pair<bool, std::string> available_redo () const;
 
   /**
+   *  @brief Gets the number of available undo items
+   */
+  int available_undo_items ();
+
+  /**
+   *  @brief Gets the number of available redo items
+   */
+  int available_redo_items ();
+
+  /**
+   *  @brief Gets an item from the list
+   *
+   *  @param delta A positive value or 0 for the nth redo item, A negative value for the nth undo item
+   *
+   *  A delta of "0" will give you the next redo item, a delta of "1" the second next one.
+   *  A delta of "-1" will give you the first undo item.
+   *  delta must be less than "available_redo_items" and larger or equal than "-available_undo_items".
+   *
+   *  @return The description of the transaction
+   */
+  std::string undo_or_redo_item (int delta) const;
+
+  /**
    *  @brief Queue a operation for undo
    *
    *  With this method a atomic undoable operation can be registered.

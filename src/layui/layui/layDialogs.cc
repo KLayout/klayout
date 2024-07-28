@@ -55,6 +55,7 @@
 #include "ui_FlattenInstOptionsDialog.h"
 #include "ui_UserPropertiesForm.h"
 #include "ui_UserPropertiesEditForm.h"
+#include "ui_UndoRedoListForm.h"
 
 #include <QResource>
 #include <QBuffer>
@@ -1445,6 +1446,121 @@ BEGIN_PROTECTED
 
 END_PROTECTED
 }
+
+// ----------------------------------------------------------------------
+//  UndoRedoListForm implementation
+
+namespace {
+
+class UndoRedoListViewModel
+  : public QAbstractListModel
+{
+public:
+  UndoRedoListViewModel (QObject *parent, db::Manager *manager, bool for_undo)
+    : QAbstractListModel (parent), mp_manager (manager), m_for_undo (for_undo)
+  {
+    //  .. nothing yet ..
+  }
+
+  int columnCount (const QModelIndex &) const
+  {
+    return 1;
+  }
+
+  QVariant data (const QModelIndex &index, int role) const
+  {
+    if (role == Qt::DisplayRole) {
+      int delta;
+      if (m_for_undo) {
+        delta = -(index.row () + 1);
+      } else {
+        delta = index.row ();
+      }
+      return QVariant (tl::to_qstring (mp_manager->undo_or_redo_item (delta)));
+    } else {
+      return QVariant ();
+    }
+  }
+
+  QModelIndex index (int row, int column, const QModelIndex &parent) const
+  {
+    if (parent.isValid ()) {
+      return QModelIndex ();
+    } else {
+      return createIndex (row, column);
+    }
+  }
+
+  QModelIndex parent(const QModelIndex &) const
+  {
+    return QModelIndex ();
+  }
+
+  virtual int rowCount (const QModelIndex &parent) const
+  {
+    if (parent.isValid ()) {
+      return 0;
+    } else {
+      return m_for_undo ? mp_manager->available_undo_items () : mp_manager->available_redo_items ();
+    }
+  }
+
+private:
+  db::Manager *mp_manager;
+  bool m_for_undo;
+};
+
+}
+
+UndoRedoListForm::UndoRedoListForm (QWidget *parent, db::Manager *manager, bool for_undo)
+  : QDialog (parent), m_for_undo (for_undo), mp_manager (manager)
+{
+  setObjectName (QString::fromUtf8 ("undo_redo_list_form"));
+
+  mp_ui = new Ui::UndoRedoListForm ();
+  mp_ui->setupUi (this);
+
+  setWindowTitle (for_undo ? tr ("Undo By List") : tr ("Redo By List"));
+
+  mp_ui->items->setModel (new UndoRedoListViewModel (mp_ui->items, manager, for_undo));
+
+  connect (mp_ui->items->selectionModel (), SIGNAL (currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT (selection_changed(const QModelIndex &)));
+  selection_changed (QModelIndex ());
+}
+
+UndoRedoListForm::~UndoRedoListForm ()
+{
+  delete mp_ui;
+  mp_ui = 0;
+}
+
+void
+UndoRedoListForm::selection_changed (const QModelIndex &current)
+{
+  if (! current.isValid () || current.row () < 0) {
+    mp_ui->title_lbl->setText (m_for_undo ? tr ("Undo to step (select one)") : tr ("Redo to step (select one)"));
+    m_steps = -1;
+  } else {
+    m_steps = current.row () + 1;
+    if (m_steps == 1) {
+      mp_ui->title_lbl->setText (m_for_undo ? tr ("Undo one step") : tr ("Redo one step"));
+    } else {
+      mp_ui->title_lbl->setText ((m_for_undo ? tr ("Undo %1 steps") : tr ("Redo %1 steps")).arg (m_steps));
+    }
+  }
+}
+
+bool
+UndoRedoListForm::exec (int &steps)
+{
+  if (QDialog::exec ()) {
+    steps = m_steps;
+    return true;
+  } else {
+    return false;
+  }
+}
+
 
 }
 

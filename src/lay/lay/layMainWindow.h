@@ -800,6 +800,8 @@ private:
   void cm_reset_window_state ();
   void cm_undo ();
   void cm_redo ();
+  void cm_undo_list ();
+  void cm_redo_list ();
   void cm_goto_position ();
   void cm_manage_bookmarks ();
   void cm_bookmark_view ();

@@ -89,6 +89,11 @@ PropertiesRepository::prop_name_id (const tl::Variant &name)
 void 
 PropertiesRepository::change_properties (property_names_id_type id, const properties_set &new_props)
 {
+  //  NOTE: change_properties MAY put the property map into a state where there is
+  //  more than one property ID per set. For example, 1 and 5 may be valid property
+  //  ids for the same set. "properties(1)" and "properties(5)" returns the same
+  //  property set "S", while "properties_id(S)" only returns 1.
+
   const properties_set &old_props = properties (id);
 
   std::map <properties_set, properties_id_type>::const_iterator pi = m_properties_ids_by_set.find (old_props);
@@ -149,7 +154,10 @@ PropertiesRepository::properties_id (const properties_set &props)
   std::map <properties_set, properties_id_type>::const_iterator pi = m_properties_ids_by_set.find (props);
   if (pi == m_properties_ids_by_set.end ()) {
 
-    properties_id_type id = m_properties_ids_by_set.size ();
+    properties_id_type id = 0;
+    if (! m_properties_by_id.empty ()) {
+      id = (--m_properties_by_id.end ())->first + 1;
+    }
     m_properties_ids_by_set.insert (std::make_pair (props, id));
     m_properties_by_id.insert (std::make_pair (id, props));
     for (properties_set::const_iterator nv = props.begin (); nv != props.end (); ++nv) {

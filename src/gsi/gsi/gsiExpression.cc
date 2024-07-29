@@ -1036,10 +1036,10 @@ VariantUserClassImpl::execute_gsi (const tl::ExpressionParserContext & /*context
               //  leave it to the consumer to establish the default values (that is faster)
               break;
             }
-            const tl::Variant &def_value = a->spec ()->default_value ();
-            //  NOTE: this const_cast means we need to take care that we do not use default values on "out" parameters.
-            //  Otherwise there is a chance we will modify the default value.
-            gsi::push_arg (arglist, *a, const_cast<tl::Variant &> (def_value), &heap);
+            //  Note: we will use the default value variant for longer, so push it to the heap (#1793)
+            tl::Variant *def_value = new tl::Variant (a->spec ()->default_value ());
+            heap.push (def_value);
+            gsi::push_arg (arglist, *a, *def_value, &heap);
           } else {
             throw tl::Exception (tl::to_string ("No argument provided (positional or keyword) and no default value available"));
           }

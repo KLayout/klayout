@@ -1,5 +1,4 @@
 
-
 /*
 
   KLayout Layout Viewer
@@ -397,7 +396,7 @@ void LayoutToNetlist::join_nets (const tl::GlobPattern &cell, const std::set<std
   m_joined_nets_per_cell.push_back (std::make_pair (cell, gp));
 }
 
-#if defined(_DEBUG)
+#if defined(HAVE_DEBUG)
 static bool check_many_pins (const db::Netlist *netlist)
 {
   bool ok = true;
@@ -430,7 +429,7 @@ void LayoutToNetlist::extract_netlist ()
   do_soft_connections ();
 
   //  implement the "join_nets" (aka "must connect") feature
-#if defined(_DEBUG)
+#if defined(HAVE_DEBUG)
   //  NOTE: the join_nets feature only works for "one pin per net" case
   //  TODO: either fix that or make sure we do not get multiple pins per net.
   //  Right now, there no known case that produces multiple pins on a net at

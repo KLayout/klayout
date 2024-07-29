@@ -927,7 +927,7 @@ TEST(8)
   bool t;
 
   v = e.parse ("1==2?log('a'):log(2)").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("0.69314718056"));
+  EXPECT_EQ (v.to_string (), std::string ("0.693147180559945"));
   t = false;
   try {
     v = e.parse ("1==1?log('a'):log(2)").execute ();

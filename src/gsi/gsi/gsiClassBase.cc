@@ -432,7 +432,7 @@ static const std::set<std::pair<std::string, bool> > &name_map_for_class (const 
   return cc->second;
 }
 
-#if defined(_DEBUG)
+#if defined(HAVE_DEBUG)
 static std::string type_signature (const gsi::ArgType &t)
 {
   gsi::ArgType tr (t);
@@ -622,7 +622,7 @@ ClassBase::merge_declarations ()
     tl_assert (! c->declaration () || c->declaration () == &*c);
   }
 
-#if defined(_DEBUG)
+#if defined(HAVE_DEBUG)
   //  do a sanity check
   for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
 
@@ -632,6 +632,16 @@ ClassBase::merge_declarations ()
       if (! (*m)->is_callback ()) {
         for (gsi::MethodBase::synonym_iterator s = (*m)->begin_synonyms (); s != (*m)->end_synonyms (); ++s) {
           method_counts [signature (*m, *s)] += 1;
+        }
+      }
+      //  try to obtain the default values to find potential binding issues
+      for (gsi::MethodBase::argument_iterator a = (*m)->begin_arguments (); a != (*m)->end_arguments (); ++a) {
+        if (a->spec ()) {
+          try {
+            a->spec ()->default_value ();
+          } catch (tl::Exception &ex) {
+            tl::warn << "Method " << signature (*m, *(*m)->begin_synonyms ()) << ": error obtaining default value for argument '" << a->spec ()->name () << "': " << ex.msg ();
+          }
         }
       }
     }
@@ -925,4 +935,3 @@ bool has_class (const std::type_info &ti)
 }
 
 }
-

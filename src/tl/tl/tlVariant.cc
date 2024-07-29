@@ -317,15 +317,19 @@ Variant::Variant (const std::vector<char> &ba)
 #if defined(HAVE_QT)
 
 Variant::Variant (const QByteArray &qba) 
-  : m_type (t_qbytearray), m_string (0)
+  : m_type (qba.isNull () ? t_nil : t_qbytearray), m_string (0)
 {
-  m_var.m_qbytearray = new QByteArray (qba);
+  if (! qba.isNull ()) {
+    m_var.m_qbytearray = new QByteArray (qba);
+  }
 }
 
 Variant::Variant (const QString &qs) 
-  : m_type (t_qstring), m_string (0)
+  : m_type (qs.isNull () ? t_nil : t_qstring), m_string (0)
 {
-  m_var.m_qstring = new QString (qs);
+  if (! qs.isNull ()) {
+    m_var.m_qstring = new QString (qs);
+  }
 }
 
 Variant::Variant (const QVariant &v)
@@ -526,10 +530,14 @@ Variant::Variant (const std::string &s)
 }
 
 Variant::Variant (const char *s) 
-  : m_type (t_string)
+  : m_type (s != 0 ? t_string : t_nil)
 {
-  m_string = new char [strlen (s) + 1];
-  strcpy (m_string, s);
+  if (s) {
+    m_string = new char [strlen (s) + 1];
+    strcpy (m_string, s);
+  } else {
+    m_string = 0;
+  }
 }
 
 Variant::Variant (double d)
@@ -676,7 +684,9 @@ Variant::reset ()
 Variant &
 Variant::operator= (const char *s)
 {
-  if (m_type == t_string && s == m_string) {
+  if (! s) {
+    reset ();
+  } else if (m_type == t_string && s == m_string) {
     //  we are assigning to ourselves
   } else {
     char *snew = new char [strlen (s) + 1];
@@ -721,7 +731,9 @@ Variant::operator= (const std::vector<char> &s)
 Variant &
 Variant::operator= (const QByteArray &qs)
 {
-  if (m_type == t_qbytearray && &qs == m_var.m_qbytearray) {
+  if (qs.isNull ()) {
+    reset ();
+  } else if (m_type == t_qbytearray && &qs == m_var.m_qbytearray) {
     //  we are assigning to ourselves
   } else {
     QByteArray *snew = new QByteArray (qs);
@@ -735,7 +747,9 @@ Variant::operator= (const QByteArray &qs)
 Variant &
 Variant::operator= (const QString &qs)
 {
-  if (m_type == t_qstring && &qs == m_var.m_qstring) {
+  if (qs.isNull ()) {
+    reset ();
+  } else if (m_type == t_qstring && &qs == m_var.m_qstring) {
     //  we are assigning to ourselves
   } else {
     QString *snew = new QString (qs);
@@ -1784,9 +1798,9 @@ Variant::to_string () const
     if (m_type == t_nil) {
       r = "nil";
     } else if (m_type == t_double) {
-      r = tl::to_string (m_var.m_double);
+      r = tl::to_string (m_var.m_double, 15);
     } else if (m_type == t_float) {
-      r = tl::to_string (m_var.m_float);
+      r = tl::to_string (m_var.m_float, 7);
     } else if (m_type == t_char) {
       r = tl::to_string ((int) m_var.m_char);
     } else if (m_type == t_schar) {
@@ -2421,7 +2435,7 @@ Variant::to_parsable_string () const
   } else if (is_ulonglong ()) {
     return "#lu" + tl::to_string (to_ulonglong ());
   } else if (is_double ()) {
-    return "##" + tl::to_string (to_double ());
+    return "##" + tl::to_string (to_double (), 15);
   } else if (is_bool ()) {
     return m_var.m_bool ? "true" : "false";
   } else if (is_nil ()) {

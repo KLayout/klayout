@@ -359,3 +359,6 @@ DEFINES += \
 
 VERSION = $$KLAYOUT_VERSION
 
+CONFIG(debug, debug|release) {
+  DEFINES += HAVE_DEBUG
+}

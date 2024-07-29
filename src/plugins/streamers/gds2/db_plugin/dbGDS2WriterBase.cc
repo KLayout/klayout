@@ -51,25 +51,108 @@ GDS2WriterBase::GDS2WriterBase ()
   // .. nothing yet ..
 }
 
-static int safe_scale (double sf, int value)
+static int32_t safe_convert_to_int32 (int32_t value)
 {
-  double i = floor (sf * value + 0.5);
-  if (i < double (std::numeric_limits<int>::min ())) {
-    throw tl::Exception ("Scaling failed: coordinate underflow");
-  }
-  if (i > double (std::numeric_limits<int>::max ())) {
-    throw tl::Exception ("Scaling failed: coordinate overflow");
-  }
-  return int (i);
+  return value;
 }
 
-inline int scale (double sf, int value)
+static int32_t safe_convert_to_int32 (uint32_t value)
+{
+  if (value > std::numeric_limits<int32_t>::max ()) {
+    throw tl::Exception (tl::to_string (tr ("Coordinate overflow")));
+  }
+  return int32_t (value);
+}
+
+static int32_t safe_convert_to_int32 (int64_t value)
+{
+  if (value < std::numeric_limits<int32_t>::min ()) {
+    throw tl::Exception (tl::to_string (tr ("Coordinate underflow")));
+  }
+  if (value > std::numeric_limits<int32_t>::max ()) {
+    throw tl::Exception (tl::to_string (tr ("Coordinate overflow")));
+  }
+  return int32_t (value);
+}
+
+static int32_t safe_convert_to_int32 (uint64_t value)
+{
+  if (value > std::numeric_limits<int32_t>::max ()) {
+    throw tl::Exception (tl::to_string (tr ("Coordinate overflow")));
+  }
+  return int32_t (value);
+}
+
+template <class T>
+static int32_t safe_scale (double sf, T value)
+{
+  double i = floor (sf * value + 0.5);
+  if (i < double (std::numeric_limits<int32_t>::min ())) {
+    throw tl::Exception (tl::to_string (tr ("Scaling failed: coordinate underflow")));
+  }
+  if (i > double (std::numeric_limits<int32_t>::max ())) {
+    throw tl::Exception (tl::to_string (tr ("Scaling failed: coordinate overflow")));
+  }
+  return int32_t (i);
+}
+
+template <class T>
+inline int32_t scale (double sf, T value)
 {
   if (sf == 1.0) {
-    return value;
+    return safe_convert_to_int32 (value);
   } else {
     return safe_scale (sf, value);
   }
+}
+
+static uint16_t safe_convert_to_uint16 (int16_t value)
+{
+  //  we accept this as GDS is not well defined here ...
+  return value;
+}
+
+static uint16_t safe_convert_to_uint16 (uint16_t value)
+{
+  return value;
+}
+
+static uint16_t safe_convert_to_uint16 (int32_t value)
+{
+  if (value < 0) {
+    throw tl::Exception (tl::to_string (tr ("Short unsigned integer underflow")));
+  }
+  if (value > std::numeric_limits<uint16_t>::max ()) {
+    throw tl::Exception (tl::to_string (tr ("Short unsigned integer overflow")));
+  }
+  return uint16_t (value);
+}
+
+static uint16_t safe_convert_to_uint16 (uint32_t value)
+{
+  if (value > std::numeric_limits<uint16_t>::max ()) {
+    throw tl::Exception (tl::to_string (tr ("Short unsigned integer overflow")));
+  }
+  return uint16_t (value);
+}
+
+static uint16_t safe_convert_to_uint16 (int64_t value)
+{
+  if (value < 0) {
+    throw tl::Exception (tl::to_string (tr ("Short unsigned integer underflow")));
+  }
+  if (value > std::numeric_limits<uint16_t>::max ()) {
+    throw tl::Exception (tl::to_string (tr ("Short unsigned integer overflow")));
+  }
+  return uint16_t (value);
+}
+
+static uint16_t safe_convert_to_uint16 (uint64_t value)
+{
+  if (value > std::numeric_limits<uint16_t>::max ()) {
+    throw tl::Exception (tl::to_string (tr ("Short unsigned integer overflow")));
+  }
+  return uint16_t (value);
 }
 
 void
@@ -117,7 +200,7 @@ GDS2WriterBase::write_context_cell (db::Layout &layout, const short *time_data, 
 
         write_record_size (6);
         write_record (sPROPATTR);
-        write_short (short (std::distance (std::vector <std::string>::const_iterator (context_prop_strings.begin ()), s)));  //  = user string
+        write_short (safe_convert_to_uint16 (std::distance (std::vector <std::string>::const_iterator (context_prop_strings.begin ()), s)));  //  = user string
 
         write_string_record (sPROPVALUE, *s);
 
@@ -156,7 +239,7 @@ GDS2WriterBase::write_context_cell (db::Layout &layout, const short *time_data, 
 
           write_record_size (6);
           write_record (sPROPATTR);
-          write_short (short (std::distance (std::vector <std::string>::const_iterator (context_prop_strings.begin ()), s)));  //  = user string
+          write_short (safe_convert_to_uint16 (std::distance (std::vector <std::string>::const_iterator (context_prop_strings.begin ()), s)));  //  = user string
 
           write_string_record (sPROPVALUE, *s);
 
@@ -266,7 +349,11 @@ GDS2WriterBase::write (db::Layout &layout, tl::OutputStream &stream, const db::S
   write_time (time_data);
   write_time (time_data);
 
-  write_string_record (sLIBNAME, gds2_options.libname);
+  try {
+    write_string_record (sLIBNAME, gds2_options.libname);
+  } catch (tl::Exception &ex) {
+    throw tl::Exception (ex.msg () + tl::to_string (tr (", writing LIBNAME")));
+  }
 
   write_record_size (4 + 8 * 2);
   write_record (sUNITS);
@@ -276,7 +363,11 @@ GDS2WriterBase::write (db::Layout &layout, tl::OutputStream &stream, const db::S
   //  layout properties 
 
   if (gds2_options.write_file_properties && layout.prop_id () != 0) {
-    write_properties (layout, layout.prop_id ());
+    try {
+      write_properties (layout, layout.prop_id ());
+    } catch (tl::Exception &ex) {
+      throw tl::Exception (ex.msg () + tl::to_string (tr (", writing layout properties")));
+    }
   }
 
   //  write context info
@@ -291,7 +382,11 @@ GDS2WriterBase::write (db::Layout &layout, tl::OutputStream &stream, const db::S
   }
 
   if (has_context) {
-    write_context_cell (layout, time_data, cells);
+    try {
+      write_context_cell (layout, time_data, cells);
+    } catch (tl::Exception &ex) {
+      throw tl::Exception (ex.msg () + tl::to_string (tr (", writing context cell")));
+    }
   }
 
   //  body
@@ -302,88 +397,118 @@ GDS2WriterBase::write (db::Layout &layout, tl::OutputStream &stream, const db::S
 
     const db::Cell &cref (layout.cell (*cell));
 
-    //  don't write ghost cells unless they are not empty (any more)
-    //  also don't write proxy cells which are not employed
-    if ((! cref.is_ghost_cell () || ! cref.empty ()) && (! cref.is_proxy () || ! cref.is_top ())) {
+    try {
 
-      //  cell header 
+      //  don't write ghost cells unless they are not empty (any more)
+      //  also don't write proxy cells which are not employed
+      if ((! cref.is_ghost_cell () || ! cref.empty ()) && (! cref.is_proxy () || ! cref.is_top ())) {
 
-      write_record_size (4 + 12 * 2);
-      write_record (sBGNSTR);
-      write_time (time_data);
-      write_time (time_data);
+        //  cell header
 
-      write_string_record (sSTRNAME, m_cell_name_map.cell_name (*cell));
+        write_record_size (4 + 12 * 2);
+        write_record (sBGNSTR);
+        write_time (time_data);
+        write_time (time_data);
 
-      //  cell body 
-
-      if (gds2_options.write_cell_properties && cref.prop_id () != 0) {
-        write_properties (layout, cref.prop_id ());
-      }
-
-      //  instances
-      
-      for (db::Cell::const_iterator inst = cref.begin (); ! inst.at_end (); ++inst) {
-
-        //  write only instances to selected cells
-        if (options.keep_instances () || cell_set.find (inst->cell_index ()) != cell_set.end ()) {
-
-          progress_checkpoint ();
-          write_inst (sf, *inst, true /*normalize*/, resolve_skew_arrays, layout, inst->prop_id ());
-
+        try {
+          write_string_record (sSTRNAME, m_cell_name_map.cell_name (*cell));
+        } catch (tl::Exception &ex) {
+          throw tl::Exception (ex.msg () + tl::to_string (tr (", writing cell name")));
         }
 
-      }
+        //  cell body
 
-      //  shapes
+        if (gds2_options.write_cell_properties && cref.prop_id () != 0) {
+          try {
+            write_properties (layout, cref.prop_id ());
+          } catch (tl::Exception &ex) {
+            throw tl::Exception (ex.msg () + tl::to_string (tr (", writing layout properties")));
+          }
+        }
 
-      for (std::vector <std::pair <unsigned int, db::LayerProperties> >::const_iterator l = layers.begin (); l != layers.end (); ++l) {
-   
-        if (layout.is_valid_layer (l->first)) {
+        //  instances
 
-          int layer = l->second.layer;
-          int datatype = l->second.datatype;
+        for (db::Cell::const_iterator inst = cref.begin (); ! inst.at_end (); ++inst) {
 
-          db::ShapeIterator shape (cref.shapes (l->first).begin (db::ShapeIterator::Boxes | db::ShapeIterator::Polygons | db::ShapeIterator::Edges | db::ShapeIterator::EdgePairs | db::ShapeIterator::Paths | db::ShapeIterator::Texts));
-          while (! shape.at_end ()) {
+          //  write only instances to selected cells
+          if (options.keep_instances () || cell_set.find (inst->cell_index ()) != cell_set.end ()) {
 
             progress_checkpoint ();
-
-            if (shape->is_text ()) {
-              write_text (layer, datatype, sf, dbu, *shape, layout, shape->prop_id ());
-            } else if (shape->is_polygon ()) {
-              write_polygon (layer, datatype, sf, *shape, multi_xy, max_vertex_count, layout, shape->prop_id ());
-            } else if (shape->is_edge ()) {
-              write_edge (layer, datatype, sf, *shape, layout, shape->prop_id ());
-            } else if (shape->is_edge_pair ()) {
-              write_edge (layer, datatype, sf, shape->edge_pair ().first (), layout, shape->prop_id ());
-              write_edge (layer, datatype, sf, shape->edge_pair ().second (), layout, shape->prop_id ());
-            } else if (shape->is_path ()) {
-              if (no_zero_length_paths && (shape->path_length () - shape->path_extensions ().first - shape->path_extensions ().second) == 0) {
-                //  eliminate the zero-width path
-                db::Polygon poly;
-                shape->polygon (poly);
-                write_polygon (layer, datatype, sf, poly, multi_xy, max_vertex_count, layout, shape->prop_id (), false);
-              } else {
-                write_path (layer, datatype, sf, *shape, multi_xy, layout, shape->prop_id ());
-              }
-            } else if (shape->is_box ()) {
-              write_box (layer, datatype, sf, *shape, layout, shape->prop_id ());
+            try {
+              write_inst (sf, *inst, true /*normalize*/, resolve_skew_arrays, layout, inst->prop_id ());
+            } catch (tl::Exception &ex) {
+              throw tl::Exception (ex.msg () + tl::to_string (tr (", writing instances")));
             }
-
-            ++shape;
 
           }
 
         }
 
+        //  shapes
+
+        for (std::vector <std::pair <unsigned int, db::LayerProperties> >::const_iterator l = layers.begin (); l != layers.end (); ++l) {
+
+          if (layout.is_valid_layer (l->first) && l->second.layer >= 0 && l->second.datatype >= 0) {
+
+            int layer = l->second.layer;
+            if (layer > std::numeric_limits<uint16_t>::max ()) {
+              throw tl::Exception (tl::sprintf (tl::to_string (tr ("Cannot write layer numbers larger than %d to GDS2 streams")), int (std::numeric_limits<uint16_t>::max ())));
+            }
+            int datatype = l->second.datatype;
+            if (datatype > std::numeric_limits<uint16_t>::max ()) {
+              throw tl::Exception (tl::sprintf (tl::to_string (tr ("Cannot write datatype numbers larger than %d to GDS2 streams")), int (std::numeric_limits<uint16_t>::max ())));
+            }
+
+            try {
+
+              db::ShapeIterator shape (cref.shapes (l->first).begin (db::ShapeIterator::Boxes | db::ShapeIterator::Polygons | db::ShapeIterator::Edges | db::ShapeIterator::EdgePairs | db::ShapeIterator::Paths | db::ShapeIterator::Texts));
+              while (! shape.at_end ()) {
+
+                progress_checkpoint ();
+
+                if (shape->is_text ()) {
+                  write_text (layer, datatype, sf, dbu, *shape, layout, shape->prop_id ());
+                } else if (shape->is_polygon ()) {
+                  write_polygon (layer, datatype, sf, *shape, multi_xy, max_vertex_count, layout, shape->prop_id ());
+                } else if (shape->is_edge ()) {
+                  write_edge (layer, datatype, sf, *shape, layout, shape->prop_id ());
+                } else if (shape->is_edge_pair ()) {
+                  write_edge (layer, datatype, sf, shape->edge_pair ().first (), layout, shape->prop_id ());
+                  write_edge (layer, datatype, sf, shape->edge_pair ().second (), layout, shape->prop_id ());
+                } else if (shape->is_path ()) {
+                  if (no_zero_length_paths && (shape->path_length () - shape->path_extensions ().first - shape->path_extensions ().second) == 0) {
+                    //  eliminate the zero-width path
+                    db::Polygon poly;
+                    shape->polygon (poly);
+                    write_polygon (layer, datatype, sf, poly, multi_xy, max_vertex_count, layout, shape->prop_id (), false);
+                  } else {
+                    write_path (layer, datatype, sf, *shape, multi_xy, layout, shape->prop_id ());
+                  }
+                } else if (shape->is_box ()) {
+                  write_box (layer, datatype, sf, *shape, layout, shape->prop_id ());
+                }
+
+                ++shape;
+
+              }
+
+            } catch (tl::Exception &ex) {
+              throw tl::Exception (ex.msg () + tl::sprintf (tl::to_string (tr (", writing layer %d/%d")), layer, datatype));
+            }
+
+          }
+
+        }
+
+        //  end of cell
+
+        write_record_size (4);
+        write_record (sENDSTR);
+
       }
 
-      //  end of cell
-
-      write_record_size (4);
-      write_record (sENDSTR);
-
+    } catch (tl::Exception &ex) {
+      throw tl::Exception (ex.msg () + tl::sprintf (tl::to_string (tr (", writing cell '%s'")), layout.cell_name (*cell)));
     }
 
   }
@@ -509,8 +634,8 @@ GDS2WriterBase::write_inst (double sf, const db::Instance &instance, bool normal
     if (is_reg) {
       write_record_size (4 + 2 * 2);
       write_record (sCOLROW);
-      if (amax > 32767 || bmax > 32767) {
-        throw tl::Exception (tl::to_string (tr ("Cannot write array references with more than 32767 columns or rows to GDS2 streams")));
+      if (amax > std::numeric_limits<int16_t>::max () || bmax > std::numeric_limits<int16_t>::max ()) {
+        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Cannot write array references with more than %d columns or rows to GDS2 streams")), int (std::numeric_limits<int16_t>::max ())));
       }
       write_short (std::max ((unsigned long) 1, bmax));
       write_short (std::max ((unsigned long) 1, amax));
@@ -522,10 +647,10 @@ GDS2WriterBase::write_inst (double sf, const db::Instance &instance, bool normal
     write_int (scale (sf, t.disp ().y ()));
 
     if (is_reg) {
-      write_int (scale (sf, t.disp ().x () + b.x () * bmax));
-      write_int (scale (sf, t.disp ().y () + b.y () * bmax));
-      write_int (scale (sf, t.disp ().x () + a.x () * amax));
-      write_int (scale (sf, t.disp ().y () + a.y () * amax));
+      write_int (scale (sf, t.disp ().x () + b.x () * (long) bmax));
+      write_int (scale (sf, t.disp ().y () + b.y () * (long) bmax));
+      write_int (scale (sf, t.disp ().x () + a.x () * (long) amax));
+      write_int (scale (sf, t.disp ().y () + a.y () * (long) amax));
     }
 
     finish (layout, prop_id);
@@ -548,11 +673,11 @@ GDS2WriterBase::write_box (int layer, int datatype, double sf, const db::Shape &
 
   write_record_size (4 + 2);
   write_record (sLAYER);
-  write_short (layer);
+  write_short (safe_convert_to_uint16 (layer));
 
   write_record_size (4 + 2);
   write_record (sDATATYPE);
-  write_short (datatype);
+  write_short (safe_convert_to_uint16 (datatype));
 
   write_record_size (4 + 5 * 2 * 4);
   write_record (sXY);
@@ -582,11 +707,11 @@ GDS2WriterBase::write_path (int layer, int datatype, double sf, const db::Shape 
 
   write_record_size (4 + 2);
   write_record (sLAYER);
-  write_short (layer);
+  write_short (safe_convert_to_uint16 (layer));
 
   write_record_size (4 + 2);
   write_record (sDATATYPE);
-  write_short (datatype);
+  write_short (safe_convert_to_uint16 (datatype));
 
   short type = 0;
   db::Coord w = path.width ();
@@ -662,11 +787,11 @@ GDS2WriterBase::write_edge (int layer, int datatype, double sf, const db::Edge &
 
   write_record_size (4 + 2);
   write_record (sLAYER);
-  write_short (layer);
+  write_short (safe_convert_to_uint16 (layer));
 
   write_record_size (4 + 2);
   write_record (sDATATYPE);
-  write_short (datatype);
+  write_short (safe_convert_to_uint16 (datatype));
 
   write_record_size (4 + 2);
   write_record (sPATHTYPE);
@@ -696,11 +821,11 @@ GDS2WriterBase::write_text (int layer, int datatype, double sf, double dbu, cons
 
   write_record_size (4 + 2);
   write_record (sLAYER);
-  write_short (layer);
+  write_short (safe_convert_to_uint16 (layer));
 
   write_record_size (4 + 2);
   write_record (sTEXTTYPE);
-  write_short (datatype);
+  write_short (safe_convert_to_uint16 (datatype));
 
   if (shape.text_halign () != db::NoHAlign || shape.text_valign () != db::NoVAlign || shape.text_font () != db::NoFont) {
     short ha = short (shape.text_halign () == db::NoHAlign ? db::HAlignLeft : shape.text_halign ());
@@ -781,11 +906,11 @@ GDS2WriterBase::write_polygon (int layer, int datatype, double sf, const db::Pol
 
     write_record_size (4 + 2);
     write_record (sLAYER);
-    write_short (layer);
+    write_short (safe_convert_to_uint16 (layer));
 
     write_record_size (4 + 2);
     write_record (sDATATYPE);
-    write_short (datatype);
+    write_short (safe_convert_to_uint16 (datatype));
 
     size_t n = polygon.vertices ();
 
@@ -856,11 +981,11 @@ GDS2WriterBase::write_polygon (int layer, int datatype, double sf, const db::Sha
 
       write_record_size (4 + 2);
       write_record (sLAYER);
-      write_short (layer);
+      write_short (safe_convert_to_uint16 (layer));
 
       write_record_size (4 + 2);
       write_record (sDATATYPE);
-      write_short (datatype);
+      write_short (safe_convert_to_uint16 (datatype));
 
       db::Shape::point_iterator e (shape.begin_hull ());
       while (n > 0) {
@@ -911,11 +1036,11 @@ GDS2WriterBase::write_properties (const db::Layout &layout, db::properties_id_ty
       attr = name.to_long ();
     }
 
-    if (attr >= 0 && attr < 65535) {
+    if (attr >= 0 && attr <= std::numeric_limits<uint16_t>::max ()) {
 
       write_record_size (6);
       write_record (sPROPATTR);
-      write_short (attr);
+      write_short ((int16_t) attr);
 
       write_string_record (sPROPVALUE, p->second.to_string ());
 
@@ -938,7 +1063,11 @@ GDS2WriterBase::finish (const db::Layout &layout, db::properties_id_type prop_id
 void 
 GDS2WriterBase::write_string_record (short record, const std::string &t)
 {
-  write_record_size (4 + (int16_t (t.size () + 1) / 2) * 2);
+  size_t rs = 4 + ((t.size () + 1) / 2) * 2;
+  if (rs > std::numeric_limits<uint16_t>::max ()) {
+    throw tl::Exception (tl::to_string (tr ("String max. length overflow")));
+  }
+  write_record_size (uint16_t (rs));
   write_record (record);
   write_string (t);
 }

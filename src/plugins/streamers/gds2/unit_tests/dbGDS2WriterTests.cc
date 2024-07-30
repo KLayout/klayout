@@ -1419,6 +1419,96 @@ TEST(132)
   EXPECT_EQ (layout_read.meta_info (ci2, "c").value.to_string (), "-1");
 }
 
+//  Limits
+static std::string run_test_with_error (double sf, db::Layout &layout)
+{
+  try {
+
+    tl::OutputMemoryStream buffer;
+    tl::OutputStream stream (buffer);
+
+    db::SaveLayoutOptions options;
+    options.set_format ("GDS2");
+    options.set_scale_factor (sf);
+
+    db::Writer writer (options);
+    writer.write (layout, stream);
+
+    return std::string ();
+
+  } catch (tl::Exception &ex) {
+    return ex.msg ();
+  }
+}
+
+static std::string huge_string ()
+{
+  std::string n;
+  for (unsigned int i = 0; i < 100000; ++i) {
+    n += "A";
+  }
+  return n;
+}
+
+//  Exceeding limits
+TEST(140)
+{
+  db::Layout layout;
+  db::cell_index_type top_index = layout.add_cell ("TOP");
+  db::Cell &top = layout.cell (top_index);
+  unsigned int l1 = layout.insert_layer (db::LayerProperties (1, 0));
+  top.shapes (l1).insert (db::Text (huge_string (), db::Trans ()));
+
+  EXPECT_EQ (run_test_with_error (1.0, layout), "String max. length overflow, writing layer 1/0, writing cell 'TOP'");
+}
+
+TEST(141)
+{
+  db::Layout layout;
+  db::cell_index_type top_index = layout.add_cell ("TOP");
+  db::Cell &top = layout.cell (top_index);
+  unsigned int l1 = layout.insert_layer (db::LayerProperties (100000, 0));
+  top.shapes (l1).insert (db::Box (0, 0, 100, 200));
+
+  EXPECT_EQ (run_test_with_error (1.0, layout), "Cannot write layer numbers larger than 65535 to GDS2 streams, writing cell 'TOP'");
+}
+
+TEST(142)
+{
+  db::Layout layout;
+  db::cell_index_type top_index = layout.add_cell ("TOP");
+  db::Cell &top = layout.cell (top_index);
+  db::cell_index_type child_index = layout.add_cell ("CHILD");
+  db::Cell &child = layout.cell (child_index);
+  unsigned int l1 = layout.insert_layer (db::LayerProperties (1, 0));
+  child.shapes (l1).insert (db::Box (0, 0, 100, 200));
+
+  top.insert (db::CellInstArray (child_index, db::Trans (), db::Vector (100000000, 0), db::Vector (0, 100000000), 10, 10));
+  EXPECT_EQ (run_test_with_error (1.0, layout), "");  //  no error
+
+  top.clear_insts ();
+
+  top.insert (db::CellInstArray (child_index, db::Trans (), db::Vector (100000000, 0), db::Vector (0, 100000000), 100, 100));
+  EXPECT_EQ (run_test_with_error (1.0, layout), "Coordinate overflow, writing instances, writing cell 'TOP'");
+
+  top.clear_insts ();
+
+  top.insert (db::CellInstArray (child_index, db::Trans (), db::Vector (100, 0), db::Vector (0, 100), 100000, 100));
+  EXPECT_EQ (run_test_with_error (1.0, layout), "Cannot write array references with more than 32767 columns or rows to GDS2 streams, writing instances, writing cell 'TOP'");
+}
+
+TEST(143)
+{
+  db::Layout layout;
+  db::cell_index_type top_index = layout.add_cell ("TOP");
+  db::Cell &top = layout.cell (top_index);
+  unsigned int l1 = layout.insert_layer (db::LayerProperties (1, 0));
+  top.shapes (l1).insert (db::Box (-2000000000, 0, 0, 200000000));
+
+  EXPECT_EQ (run_test_with_error (1.0, layout), "");
+  EXPECT_EQ (run_test_with_error (23.0, layout), "Scaling failed: coordinate underflow, writing layer 1/0, writing cell 'TOP'");
+}
+
 //  Extreme fracturing by max. points
 TEST(166)
 {
@@ -1426,4 +1516,6 @@ TEST(166)
   opt.max_vertex_count = 4;
   run_test (_this, "t166.oas.gz", "t166_au.gds.gz", false, opt);
 }
+
+
 

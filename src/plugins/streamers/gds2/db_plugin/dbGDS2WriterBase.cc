@@ -711,10 +711,10 @@ GDS2WriterBase::write_inst (double sf, const db::Instance &instance, bool normal
     write_int (scale (sf, t.disp ().y ()));
 
     if (is_reg) {
-      write_int (scale (sf, t.disp ().x () + b.x () * (long) bmax));
-      write_int (scale (sf, t.disp ().y () + b.y () * (long) bmax));
-      write_int (scale (sf, t.disp ().x () + a.x () * (long) amax));
-      write_int (scale (sf, t.disp ().y () + a.y () * (long) amax));
+      write_int (scale (sf, t.disp ().x () + b.x () * (int64_t) bmax));
+      write_int (scale (sf, t.disp ().y () + b.y () * (int64_t) bmax));
+      write_int (scale (sf, t.disp ().x () + a.x () * (int64_t) amax));
+      write_int (scale (sf, t.disp ().y () + a.y () * (int64_t) amax));
     }
 
     finish (layout, prop_id);

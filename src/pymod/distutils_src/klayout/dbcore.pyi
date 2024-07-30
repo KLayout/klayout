@@ -12784,7 +12784,8 @@ class DText:
     Setter:
     @brief Sets the horizontal alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     size: float
     r"""
@@ -14473,20 +14474,6 @@ class DeepShapeStore:
 
     This class has been introduced in version 0.26.
     """
-    @property
-    def subcircuit_hierarchy_for_nets(self) -> None:
-        r"""
-        WARNING: This variable can only be set, not retrieved.
-        @brief Sets a value indicating whether to build a subcircuit hierarchy per net
-
-
-        This flag is used to determine the way, net subcircuit hierarchies are built:
-        when true, subcells are created for subcircuits on a net. Otherwise the net
-        shapes are produced flat inside the cell they appear on.
-
-        This attribute has been introduced in version 0.28.4
-        """
-        ...
     max_area_ratio: float
     r"""
     Getter:
@@ -14522,6 +14509,23 @@ class DeepShapeStore:
     Some kind of 'odd' (e.g. non-orientable) polygons may spoil the functionality because they cannot be handled properly. By using this flag, the shape store we reject these kind of polygons. The default is 'accept' (without warning).
 
     This attribute has been introduced in version 0.27.
+    """
+    subcircuit_hierarchy_for_nets: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether to build a subcircuit hierarchy per net
+    See \subcircuit_hierarchy_for_nets= for details.
+
+    This attribute has been introduced in version 0.28.4
+    Setter:
+    @brief Sets a value indicating whether to build a subcircuit hierarchy per net
+
+
+    This flag is used to determine the way, net subcircuit hierarchies are built:
+    when true, subcells are created for subcircuits on a net. Otherwise the net
+    shapes are produced flat inside the cell they appear on.
+
+    This attribute has been introduced in version 0.28.4
     """
     text_enlargement: int
     r"""
@@ -28599,11 +28603,11 @@ class Instance:
 
     Starting with version 0.25 the displacement is of vector type.
     Setter:
-    @brief Sets the displacement vector for the 'b' axis in micrometer units
+    @brief Sets the displacement vector for the 'b' axis
 
-    Like \b= with an integer displacement, this method will set the displacement vector but it accepts a vector in micrometer units that is of \DVector type. The vector will be translated to database units internally.
+    If the instance was not an array instance before it is made one.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.23. Starting with version 0.25 the displacement is of vector type.
     """
     cell: Cell
     r"""
@@ -28646,10 +28650,9 @@ class Instance:
     @brief Gets the complex transformation of the instance or the first instance in the array
     This method is always valid compared to \trans, since simple transformations can be expressed as complex transformations as well.
     Setter:
-    @brief Sets the complex transformation of the instance or the first instance in the array (in micrometer units)
-    This method sets the transformation the same way as \cplx_trans=, but the displacement of this transformation is given in micrometer units. It is internally translated into database units.
+    @brief Sets the complex transformation of the instance or the first instance in the array
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.23.
     """
     da: DVector
     r"""
@@ -39345,17 +39348,17 @@ class NetTerminalRef:
     @overload
     def device(self) -> Device:
         r"""
-        @brief Gets the device reference.
+        @brief Gets the device reference (non-const version).
         Gets the device object that this connection is made to.
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def device(self) -> Device:
         r"""
-        @brief Gets the device reference (non-const version).
+        @brief Gets the device reference.
         Gets the device object that this connection is made to.
-
-        This constness variant has been introduced in version 0.26.8
         """
         ...
     def device_class(self) -> DeviceClass:
@@ -39378,15 +39381,15 @@ class NetTerminalRef:
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this terminal reference is attached to.
+        @brief Gets the net this terminal reference is attached to (non-const version).
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this terminal reference is attached to (non-const version).
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the net this terminal reference is attached to.
         """
         ...
     def terminal_def(self) -> DeviceTerminalDefinition:
@@ -40289,17 +40292,17 @@ class Netlist:
     @overload
     def circuit_by_name(self, name: str) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given name (const version).
+        @brief Gets the circuit object for a given name.
         If the name is not a valid circuit name, nil is returned.
-
-        This constness variant has been introduced in version 0.26.8.
         """
         ...
     @overload
     def circuit_by_name(self, name: str) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given name.
+        @brief Gets the circuit object for a given name (const version).
         If the name is not a valid circuit name, nil is returned.
+
+        This constness variant has been introduced in version 0.26.8.
         """
         ...
     @overload
@@ -40372,15 +40375,15 @@ class Netlist:
     @overload
     def each_circuit(self) -> Iterator[Circuit]:
         r"""
-        @brief Iterates over the circuits of the netlist (const version)
-
-        This constness variant has been introduced in version 0.26.8.
+        @brief Iterates over the circuits of the netlist
         """
         ...
     @overload
     def each_circuit(self) -> Iterator[Circuit]:
         r"""
-        @brief Iterates over the circuits of the netlist
+        @brief Iterates over the circuits of the netlist (const version)
+
+        This constness variant has been introduced in version 0.26.8.
         """
         ...
     @overload
@@ -53925,10 +53928,11 @@ class Shape:
 
     Starting with version 0.23, this method returns nil, if the shape does not represent a path.
     Setter:
-    @brief Replaces the shape by the given path (in micrometer units)
-    This method replaces the shape by the given path, like \path= with a \Path argument does. This version translates the path from micrometer units to database units internally.
+    @brief Replaces the shape by the given path object
+    This method replaces the shape by the given path object. This method can only be called for editable layouts. It does not change the user properties of the shape.
+    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.22.
     """
     path_bgnext: int
     r"""
@@ -54036,11 +54040,10 @@ class Shape:
     Starting with version 0.23, this method returns nil, if the shape does not represent a geometrical primitive that can be converted to a polygon.
 
     Setter:
-    @brief Replaces the shape by the given polygon object
-    This method replaces the shape by the given polygon object. This method can only be called for editable layouts. It does not change the user properties of the shape.
-    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
+    @brief Replaces the shape by the given polygon (in micrometer units)
+    This method replaces the shape by the given polygon, like \polygon= with a \Polygon argument does. This version translates the polygon from micrometer units to database units internally.
 
-    This method has been introduced in version 0.22.
+    This method has been introduced in version 0.25.
     """
     prop_id: int
     r"""
@@ -57741,16 +57744,16 @@ class SubCircuit(NetlistObject):
     @overload
     def circuit_ref(self) -> Circuit:
         r"""
-        @brief Gets the circuit referenced by the subcircuit.
+        @brief Gets the circuit referenced by the subcircuit (non-const version).
+
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def circuit_ref(self) -> Circuit:
         r"""
-        @brief Gets the circuit referenced by the subcircuit (non-const version).
-
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the circuit referenced by the subcircuit.
         """
         ...
     @overload
@@ -58394,8 +58397,7 @@ class Text:
     Setter:
     @brief Sets the horizontal alignment
 
-    This property specifies how the text is aligned relative to the anchor point. 
-    This property has been introduced in version 0.22 and extended to enums in 0.28.
+    This is the version accepting integer values. It's provided for backward compatibility.
     """
     size: int
     r"""
@@ -58431,7 +58433,8 @@ class Text:
     Setter:
     @brief Sets the vertical alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     x: int
     r"""

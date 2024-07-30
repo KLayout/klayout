@@ -47,10 +47,9 @@ ShapePropertiesPage::ShapePropertiesPage (const std::string &description, edt::S
   : lay::PropertiesPage (parent, manager, service),
     m_description (description), mp_service (service), m_enable_cb_callback (true)
 {
-  const edt::Service::objects &selection = service->selection ();
-  m_selection_ptrs.reserve (selection.size ());
-  for (edt::Service::obj_iterator s = selection.begin (); s != selection.end (); ++s) {
-    m_selection_ptrs.push_back (s);
+  m_selection_ptrs.reserve (service->selection_size ());
+  for (edt::EditableSelectionIterator s = service->begin_selection (); ! s.at_end (); ++s) {
+    m_selection_ptrs.push_back (s.operator-> ());
   }
   m_prop_id = 0;
   mp_service->clear_highlights ();
@@ -191,7 +190,7 @@ ShapePropertiesPage::update ()
 {
   std::set<const lay::ObjectInstPath *> highlights;
   for (auto i = m_indexes.begin (); i != m_indexes.end (); ++i) {
-    highlights.insert (m_selection_ptrs [*i].operator-> ());
+    highlights.insert (m_selection_ptrs [*i]);
   }
   mp_service->highlight (highlights);
 
@@ -201,16 +200,15 @@ ShapePropertiesPage::update ()
 void 
 ShapePropertiesPage::recompute_selection_ptrs (const std::vector<lay::ObjectInstPath> &new_sel)
 {
-  std::map<lay::ObjectInstPath, edt::Service::obj_iterator> ptrs;
+  std::map<lay::ObjectInstPath, EditableSelectionIterator::pointer> ptrs;
 
-  const edt::Service::objects &selection = mp_service->selection ();
-  for (edt::Service::obj_iterator pos = selection.begin (); pos != selection.end (); ++pos) {
-    ptrs.insert (std::make_pair (*pos, pos));
+  for (EditableSelectionIterator pos = mp_service->begin_selection (); ! pos.at_end (); ++pos) {
+    ptrs.insert (std::make_pair (*pos, pos.operator-> ()));
   }
 
   m_selection_ptrs.clear ();
   for (std::vector<lay::ObjectInstPath>::const_iterator s = new_sel.begin (); s != new_sel.end (); ++s) {
-    std::map<lay::ObjectInstPath, edt::Service::obj_iterator>::const_iterator pm = ptrs.find (*s);
+    std::map<lay::ObjectInstPath, EditableSelectionIterator::pointer>::const_iterator pm = ptrs.find (*s);
     tl_assert (pm != ptrs.end ());
     m_selection_ptrs.push_back (pm->second);
   }
@@ -228,7 +226,7 @@ ShapePropertiesPage::do_apply (bool current_only, bool relative)
   unsigned int cv_index = m_selection_ptrs [m_indexes.front ()]->cv_index ();
 
   {
-    edt::Service::obj_iterator pos = m_selection_ptrs [m_indexes.front ()];
+    EditableSelectionIterator::pointer pos = m_selection_ptrs [m_indexes.front ()];
     tl_assert (! pos->is_cell_inst ());
 
     const lay::CellView &cv = mp_service->view ()->cellview (pos->cv_index ());
@@ -261,7 +259,7 @@ ShapePropertiesPage::do_apply (bool current_only, bool relative)
 
   std::vector<lay::ObjectInstPath> new_sel;
   new_sel.reserve (m_selection_ptrs.size ());
-  for (std::vector<edt::Service::obj_iterator>::const_iterator p = m_selection_ptrs.begin (); p != m_selection_ptrs.end (); ++p) {
+  for (std::vector<EditableSelectionIterator::pointer>::const_iterator p = m_selection_ptrs.begin (); p != m_selection_ptrs.end (); ++p) {
     new_sel.push_back (**p);
   }
 
@@ -274,7 +272,7 @@ ShapePropertiesPage::do_apply (bool current_only, bool relative)
     for (auto i = m_indexes.begin (); i != m_indexes.end (); ++i) {
 
       size_t index = *i;
-      edt::Service::obj_iterator pos = m_selection_ptrs [*i];
+      EditableSelectionIterator::pointer pos = m_selection_ptrs [*i];
 
       //  only update objects from the same layout - this is not practical limitation but saves a lot of effort for
       //  managing different property id's etc.
@@ -376,7 +374,7 @@ ShapePropertiesPage::update_shape ()
     return;
   }
 
-  edt::Service::obj_iterator pos = m_selection_ptrs [m_indexes.front ()];
+  EditableSelectionIterator::pointer pos = m_selection_ptrs [m_indexes.front ()];
 
   const lay::CellView &cv = mp_service->view ()->cellview (pos->cv_index ());
   double dbu = cv->layout ().dbu ();

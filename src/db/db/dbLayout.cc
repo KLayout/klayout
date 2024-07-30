@@ -2887,15 +2887,18 @@ Layout::get_context_info (cell_index_type cell_index, LayoutOrCellContextInfo &i
   if (pcell_variant) {
     
     const db::PCellDeclaration *pcell_decl = ly->pcell_declaration (pcell_variant->pcell_id ());
-
-    const std::vector<db::PCellParameterDeclaration> &pcp = pcell_decl->parameter_declarations ();
-    std::vector<db::PCellParameterDeclaration>::const_iterator pd = pcp.begin ();
-    for (std::vector<tl::Variant>::const_iterator p = pcell_variant->parameters ().begin (); p != pcell_variant->parameters ().end () && pd != pcp.end (); ++p, ++pd) {
-      info.pcell_parameters.insert (std::make_pair (pd->get_name (), *p));
+    if (pcell_decl) {
+      const std::vector<db::PCellParameterDeclaration> &pcp = pcell_decl->parameter_declarations ();
+      std::vector<db::PCellParameterDeclaration>::const_iterator pd = pcp.begin ();
+      for (std::vector<tl::Variant>::const_iterator p = pcell_variant->parameters ().begin (); p != pcell_variant->parameters ().end () && pd != pcp.end (); ++p, ++pd) {
+        info.pcell_parameters.insert (std::make_pair (pd->get_name (), *p));
+      }
     }
 
     const db::PCellHeader *header = ly->pcell_header (pcell_variant->pcell_id ());
-    info.pcell_name = header->get_name ();
+    if (header) {
+      info.pcell_name = header->get_name ();
+    }
 
   } else if (ly != this) {
     info.cell_name = ly->cell_name (cptr->cell_index ());

@@ -408,7 +408,7 @@ FillDialog::get_fill_parameters ()
     //  selection
     std::vector<edt::Service *> edt_services = mp_view->get_plugins <edt::Service> ();
     for (std::vector<edt::Service *>::const_iterator s = edt_services.begin (); s != edt_services.end (); ++s) {
-      for (edt::Service::objects::const_iterator sel = (*s)->selection ().begin (); sel != (*s)->selection ().end (); ++sel) {
+      for (edt::EditableSelectionIterator sel = (*s)->begin_selection (); ! sel.at_end (); ++sel) {
         if (! sel->is_cell_inst () && (sel->shape ().is_polygon () || sel->shape ().is_path () || sel->shape ().is_box ())) {
           db::Polygon poly;
           sel->shape ().polygon (poly);

@@ -1511,26 +1511,25 @@ MacroEditorDialog::eventFilter (QObject *obj, QEvent *event)
 
     if (lay::BusySection::is_busy ()) {
 
-#if 0
-      if (dynamic_cast <QInputEvent *> (event) != 0 || dynamic_cast <QPaintEvent *> (event) != 0) {
+      if (m_in_breakpoint && (dynamic_cast <QInputEvent *> (event) != 0 || dynamic_cast <QPaintEvent *> (event) != 0)) {
 
-        //  In breakpoint or execution mode and while processing the events inside the debugger,
+        //  In breakpoint mode and while processing the events inside the debugger,
         //  ignore all input or paint events targeted to widgets which are not children of this or the assistant dialog.
         //  Ignoring the paint event is required because otherwise a repaint action would be triggered on a layout which
         //  is potentially unstable or inconsistent.
         //  We nevertheless allow events send to a HelpDialog or ProgressWidget since those are vital for the application's
         //  functionality and are known not to cause any interference.
         QObject *rec = obj;
-        while (rec && (rec != this && !dynamic_cast<lay::HelpDialog *> (rec) && !dynamic_cast<lay::ProgressWidget *> (rec))) {
+        while (rec && rec != this) {
           rec = rec->parent ();
         }
         if (! rec) {
           //  TODO: reschedule the paint events (?)
+          event->accept ();
           return true;
         }
 
       }
-#endif
 
     } else {
 
@@ -2267,19 +2266,35 @@ END_PROTECTED
 }
 
 void
-MacroEditorDialog::help_requested(const QString &s)
+MacroEditorDialog::help_requested (const QString &s)
 {
+BEGIN_PROTECTED
+  //  Do not allow modal popups in breakpoint mode - this would interfere with
+  //  event filtering during breakpoint execution
+  if (m_in_breakpoint) {
+    throw tl::Exception (tl::to_string (tr ("The help function is not available in breakpoint mode.")));
+  }
+
   lay::MainWindow::instance ()->show_assistant_topic (tl::to_string (s));
+END_PROTECTED
 }
 
 void 
-MacroEditorDialog::help_button_clicked()
+MacroEditorDialog::help_button_clicked ()
 {
+BEGIN_PROTECTED
+  //  Do not allow modal popups in breakpoint mode - this would interfere with
+  //  event filtering during breakpoint execution
+  if (m_in_breakpoint) {
+    throw tl::Exception (tl::to_string (tr ("The help function is not available in breakpoint mode.")));
+  }
+
   lay::MainWindow::instance ()->show_assistant_url ("int:/code/index.xml");
+END_PROTECTED
 }
 
 void 
-MacroEditorDialog::add_button_clicked()
+MacroEditorDialog::add_button_clicked ()
 {
 BEGIN_PROTECTED
   new_macro ();
@@ -2287,7 +2302,7 @@ END_PROTECTED
 }
 
 lym::Macro *
-MacroEditorDialog::new_macro()
+MacroEditorDialog::new_macro ()
 {
   ensure_writeable_collection_selected ();
 
@@ -3451,6 +3466,12 @@ MacroEditorDialog::leave_breakpoint_mode ()
   mp_current_interpreter = 0;
   do_update_ui_to_run_mode ();
   set_exec_point (0, -1, -1);
+
+  //  refresh UI that might have been spoiled because we filter events
+  auto tl_widgets = QApplication::topLevelWidgets ();
+  for (auto w = tl_widgets.begin (); w != tl_widgets.end (); ++w) {
+    (*w)->update ();
+  }
 }
 
 void 

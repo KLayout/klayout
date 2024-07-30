@@ -55,6 +55,7 @@ extern std::string cfg_rdb_list_shapes;
 extern std::string cfg_rdb_window_state;
 extern std::string cfg_rdb_window_mode;
 extern std::string cfg_rdb_window_dim;
+extern std::string cfg_rdb_tree_state;
 extern std::string cfg_rdb_max_marker_count;
 extern std::string cfg_rdb_marker_color;
 extern std::string cfg_rdb_marker_line_width;
@@ -847,6 +848,10 @@ MarkerBrowserDialog::update_content ()
   mp_ui->browser_frame->set_view (view (), m_cv_index);
   mp_ui->browser_frame->enable_updates (true);
 
+  std::string tree_state;
+  view ()->config_get (cfg_rdb_tree_state, tree_state);
+  mp_ui->browser_frame->set_tree_state (tree_state);
+
   if (rdb) {
     //  Note: it appears to be required to show the browser page after it has been configured. 
     //  Otherwise the header gets messed up and the configuration is reset.
@@ -872,7 +877,11 @@ void
 MarkerBrowserDialog::deactivated ()
 {
   if (lay::Dispatcher::instance ()) {
-    lay::Dispatcher::instance ()->config_set (cfg_rdb_window_state, lay::save_dialog_state (this).c_str ());
+    lay::Dispatcher::instance ()->config_set (cfg_rdb_window_state, lay::save_dialog_state (this));
+    std::string tree_state = mp_ui->browser_frame->get_tree_state ();
+    if (! tree_state.empty ()) {
+      lay::Dispatcher::instance ()->config_set (cfg_rdb_tree_state, tree_state);
+    }
   }
 
   mp_ui->browser_frame->set_rdb (0);

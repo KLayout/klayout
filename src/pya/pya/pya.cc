@@ -684,7 +684,11 @@ PythonInterpreter::trace_func (PyFrameObject *frame, int event, PyObject *arg)
         exc_value = PythonPtr (PyTuple_GetItem (arg, 1));
       }
 
-      if (exc_type && exc_type.get () != PyExc_StopIteration) {
+#if PY_VERSION_HEX >= 0x03050000
+      if (exc_type && exc_type.get () != PyExc_StopIteration && exc_type.get () != PyExc_GeneratorExit && exc_type.get () != PyExc_StopAsyncIteration) {
+#else
+      if (exc_type && exc_type.get () != PyExc_StopIteration && exc_type.get () != PyExc_GeneratorExit) {
+#endif
 
         //  If the next exception shall be ignored, do so
         if (m_ignore_next_exception) {

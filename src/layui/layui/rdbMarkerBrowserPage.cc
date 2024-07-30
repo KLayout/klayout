@@ -1953,7 +1953,83 @@ MarkerBrowserPage::set_rdb (rdb::Database *database)
   }
 }
 
-void 
+static std::string top_item_by_index (int i)
+{
+  if (i == 0) {
+    return std::string ("by-cell");
+  } else if (i == 1) {
+    return std::string ("by-category");
+  } else {
+    return std::string ();
+  }
+}
+
+static int top_index_from_item (const std::string &s)
+{
+  if (s == "by-cell") {
+    return 0;
+  } else if (s == "by-category") {
+    return 1;
+  } else {
+    return -1;
+  }
+}
+
+std::string
+MarkerBrowserPage::get_tree_state ()
+{
+  std::string res;
+
+  QAbstractItemModel *tree_model = directory_tree->model ();
+  if (! tree_model) {
+    return res;
+  }
+
+  int rows = tree_model->rowCount (QModelIndex ());
+  for (int i = 0; i < rows; ++i) {
+    bool expanded = directory_tree->isExpanded (tree_model->index (i, 0, QModelIndex ()));
+    std::string item = top_item_by_index (i);
+    if (! item.empty ()) {
+      if (! res.empty ()) {
+        res += ",";
+      }
+      res += expanded ? "+" : "-";
+      res += item;
+    }
+  }
+
+  return res;
+}
+
+void
+MarkerBrowserPage::set_tree_state (const std::string &state)
+{
+  QAbstractItemModel *tree_model = directory_tree->model ();
+  if (! tree_model) {
+    return;
+  }
+
+  tl::Extractor ex (state.c_str ());
+  while (! ex.at_end ()) {
+    bool expanded = false;
+    if (ex.test ("+")) {
+      expanded = true;
+    } else {
+      ex.test ("-");
+    }
+    std::string item;
+    if (! ex.try_read_word (item, "-_")) {
+      break;
+    }
+    int index = top_index_from_item (item);
+    if (index >= 0) {
+      directory_tree->setExpanded (tree_model->index (index, 0, QModelIndex ()), expanded);
+    }
+    ex.test (",");
+  }
+}
+
+void
 MarkerBrowserPage::update_content ()
 {
 

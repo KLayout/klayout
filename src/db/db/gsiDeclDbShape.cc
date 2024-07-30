@@ -1004,6 +1004,26 @@ static tl::Variant get_property (const db::Shape *s, const tl::Variant &key)
   }
 }
 
+static tl::Variant get_properties (const db::Shape *s)
+{
+  db::properties_id_type id = s->prop_id ();
+  if (id == 0) {
+    return tl::Variant::empty_array ();
+  }
+
+  const db::Layout *layout = layout_ptr_const (s);
+  if (! layout) {
+    throw tl::Exception (tl::to_string (tr ("Shape does not reside inside a layout - cannot retrieve properties")));
+  }
+
+  tl::Variant res = tl::Variant::empty_array ();
+  const db::PropertiesRepository::properties_set &props = layout->properties_repository ().properties (id);
+  for (auto i = props.begin (); i != props.end (); ++i) {
+    res.insert (layout->properties_repository ().prop_name (i->first), i->second);
+  }
+  return res;
+}
+
 namespace
 {
 
@@ -1354,6 +1374,12 @@ Class<db::Shape> decl_Shape ("db", "Shape",
     "\n"
     "This method has been introduced in version 0.22."
   ) + 
+  gsi::method_ext ("properties", &get_properties,
+    "@brief Gets the user properties\n"
+    "This method is a convenience method that gets the properties of the shape as a single hash.\n"
+    "\n"
+    "This method has been introduced in version 0.29.5."
+  ) +
   gsi::iterator ("each_point", &db::Shape::begin_point, &db::Shape::end_point,
     "@brief Iterates over all points of the object\n"
     "\n"

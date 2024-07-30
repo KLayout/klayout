@@ -208,10 +208,80 @@ static std::string parents2string (const db::Circuit *c)
   return res;
 }
 
+static std::string td2string_nc (db::Netlist *nl)
+{
+  std::string res;
+  for (db::Netlist::top_down_circuit_iterator r = nl->begin_top_down (); r != nl->end_top_down (); ++r) {
+    if (!res.empty ()) {
+      res += ",";
+    }
+    res += r->name ();
+  }
+  return res;
+}
+
 static std::string td2string (const db::Netlist *nl)
 {
   std::string res;
   for (db::Netlist::const_top_down_circuit_iterator r = nl->begin_top_down (); r != nl->end_top_down (); ++r) {
+    if (!res.empty ()) {
+      res += ",";
+    }
+    res += r->name ();
+  }
+  return res;
+}
+
+static std::string tcs2string_nc (db::Netlist *nl)
+{
+  std::string res;
+  std::vector<db::Circuit *> tops = nl->top_circuits ();
+  for (auto i = tops.begin (); i != tops.end (); ++i) {
+    if (!res.empty ()) {
+      res += ",";
+    }
+    res += (*i)->name ();
+  }
+  return res;
+}
+
+static std::string tcs2string (const db::Netlist *nl)
+{
+  std::string res;
+  std::vector<const db::Circuit *> tops = nl->top_circuits ();
+  for (auto i = tops.begin (); i != tops.end (); ++i) {
+    if (!res.empty ()) {
+      res += ",";
+    }
+    res += (*i)->name ();
+  }
+  return res;
+}
+
+static std::string tc2string_nc (db::Netlist *nl)
+{
+  const db::Circuit *tc = nl->top_circuit ();
+  if (!tc) {
+    return "(nil)";
+  } else {
+    return tc->name ();
+  }
+}
+
+static std::string tc2string (const db::Netlist *nl)
+{
+  const db::Circuit *tc = nl->top_circuit ();
+  if (!tc) {
+    return "(nil)";
+  } else {
+    return tc->name ();
+  }
+}
+
+static std::string bu2string_nc (db::Netlist *nl)
+{
+  std::string res;
+  for (db::Netlist::bottom_up_circuit_iterator r = nl->begin_bottom_up (); r != nl->end_bottom_up (); ++r) {
     if (!res.empty ()) {
       res += ",";
     }
@@ -1038,20 +1108,44 @@ TEST(12_NetlistTopology)
 {
   std::unique_ptr<db::Netlist> nl (new db::Netlist ());
   EXPECT_EQ (nl->top_circuit_count (), size_t (0));
+  EXPECT_EQ (tcs2string (nl.get ()), "");
+  EXPECT_EQ (tcs2string_nc (nl.get ()), "");
+  EXPECT_EQ (tc2string (nl.get ()), "(nil)");
+  EXPECT_EQ (tc2string_nc (nl.get ()), "(nil)");
 
   db::Circuit *c1 = new db::Circuit ();
   c1->set_name ("c1");
   nl->add_circuit (c1);
   EXPECT_EQ (nl->top_circuit_count (), size_t (1));
   EXPECT_EQ (td2string (nl.get ()), "c1");
+  EXPECT_EQ (td2string_nc (nl.get ()), "c1");
+  EXPECT_EQ (tcs2string (nl.get ()), "c1");
+  EXPECT_EQ (tcs2string_nc (nl.get ()), "c1");
+  EXPECT_EQ (tc2string (nl.get ()), "c1");
+  EXPECT_EQ (tc2string_nc (nl.get ()), "c1");
   EXPECT_EQ (bu2string (nl.get ()), "c1");
+  EXPECT_EQ (bu2string_nc (nl.get ()), "c1");
 
   db::Circuit *c2 = new db::Circuit ();
   c2->set_name ("c2");
   nl->add_circuit (c2);
   EXPECT_EQ (nl->top_circuit_count (), size_t (2));
   EXPECT_EQ (td2string (nl.get ()), "c2,c1");
+  EXPECT_EQ (td2string_nc (nl.get ()), "c2,c1");
+  EXPECT_EQ (tcs2string (nl.get ()), "c2,c1");
+  EXPECT_EQ (tcs2string_nc (nl.get ()), "c2,c1");
+  try {
+    tc2string (nl.get ());
+    EXPECT_EQ (true, false);
+  } catch (...) {
+  }
+  try {
+    tc2string_nc (nl.get ());
+    EXPECT_EQ (true, false);
+  } catch (...) {
+  }
   EXPECT_EQ (bu2string (nl.get ()), "c1,c2");
+  EXPECT_EQ (bu2string_nc (nl.get ()), "c1,c2");
 
   std::unique_ptr<db::NetlistLocker> locker (new db::NetlistLocker (nl.get ()));
 

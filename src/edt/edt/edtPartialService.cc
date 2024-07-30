@@ -1182,6 +1182,19 @@ PartialService::timeout ()
   mp_view->clear_transient_selection ();
   clear_mouse_cursors ();
 
+  double le = catch_distance () * 3.0;  //  see Editables::selection_catch_bbox()
+  db::DBox sel_catch_box = selection_bbox ().enlarged (db::DVector (le, le));
+  if (has_selection () && sel_catch_box.contains (m_hover_point)) {
+
+    //  no transient selection if inside current selection - if we click there, we catch the
+    //  currently selected objects
+    resize_markers (0, true);
+    resize_inst_markers (0, true);
+
+    return;
+
+  }
+
   //  compute search box
   double l = catch_distance ();
   db::DBox search_box = db::DBox (m_hover_point, m_hover_point).enlarged (db::DVector (l, l));
@@ -2035,45 +2048,13 @@ PartialService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bo
     //  select is allowed to throw an exception 
     try {
 
-      //  compute search box
-      double l = catch_distance ();
-      db::DBox search_box = db::DBox (p, p).enlarged (db::DVector (l, l));
+      bool new_selection = true;
 
-      //  check, if there is a selected shape under the mouse - in this case, we do not do a new selection
-      PartialShapeFinder finder (true /*point mode*/, m_top_level_sel, db::ShapeIterator::All);
-      finder.find (view (), search_box);
-
-      //  check, if there is a selected shape under the mouse - in this case, we do not do a new selection
-      lay::InstFinder inst_finder (true /*point mode*/, m_top_level_sel, true /*full arrays*/, true /*enclose*/, 0 /*no excludes*/, true /*visible layers*/);
-      inst_finder.find (view (), search_box);
-
-      //  collect the founds from the finder
-      //  consider a new selection if new objects are selected or the current selection is shape-only 
-      //  (this may happen if points have been inserted)
-      bool new_selection = ((finder.begin () == finder.end () && inst_finder.begin () == inst_finder.end ()) 
-                             || mode != lay::Editable::Replace);
-
-      for (PartialShapeFinder::iterator f = finder.begin (); f != finder.end () && ! new_selection; ++f) {
-        partial_objects::const_iterator sel = m_selection.find (f->first);
-        new_selection = true;
-        if (sel != m_selection.end ()) {
-          for (std::vector<edt::EdgeWithIndex>::const_iterator e = f->second.begin (); e != f->second.end () && new_selection; ++e) {
-            if (sel->second.find (*e) != sel->second.end ()) {
-              new_selection = false;
-            }
-          }
-        }
-      }
-
-      if (finder.begin () == finder.end ()) {
-
-        for (lay::InstFinder::iterator f = inst_finder.begin (); f != inst_finder.end () && ! new_selection; ++f) {
-          partial_objects::const_iterator sel = m_selection.find (*f);
-          if (sel == m_selection.end ()) {
-            new_selection = true;
-          }
-        }
-
+      double le = catch_distance () * 3.0;  //  see Editables::selection_catch_bbox()
+      db::DBox sel_catch_box = selection_bbox ().enlarged (db::DVector (le, le));
+      if (mode == lay::Editable::Replace && has_selection () && sel_catch_box.contains (p)) {
+        //  drag current selection
+        new_selection = false;
       }
 
       if (new_selection) {
@@ -2081,6 +2062,18 @@ PartialService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bo
         if (mode == lay::Editable::Replace) {
           m_selection.clear ();
         }
+
+        //  compute search box
+        double l = catch_distance ();
+        db::DBox search_box = db::DBox (p, p).enlarged (db::DVector (l, l));
+
+        //  identify the edges under the mouse
+        PartialShapeFinder finder (true /*point mode*/, m_top_level_sel, db::ShapeIterator::All);
+        finder.find (view (), search_box);
+
+        //  identify the instances under the mouse
+        lay::InstFinder inst_finder (true /*point mode*/, m_top_level_sel, true /*full arrays*/, true /*enclose*/, 0 /*no excludes*/, true /*visible layers*/);
+        inst_finder.find (view (), search_box);
 
         //  clear the selection if we now select a guiding shape or if it was consisting of a guiding shape before
         //  (that way we ensure there is only a guiding shape selected)

@@ -71,6 +71,41 @@ std::map<std::string, tl::Variant> pcell_parameters_from_string (const std::stri
 
 // -------------------------------------------------------------
 
+/**
+ *  @brief A utility class to implement a selection iterator across all editor services
+ */
+class EDT_PUBLIC EditableSelectionIterator
+{
+public:
+  typedef std::set<lay::ObjectInstPath> objects;
+  typedef objects::value_type value_type;
+  typedef objects::const_iterator iterator_type;
+  typedef const value_type *pointer;
+  typedef const value_type &reference;
+  typedef std::forward_iterator_tag iterator_category;
+  typedef void difference_type;
+
+  EditableSelectionIterator (const std::vector<edt::Service *> &services, bool transient);
+  EditableSelectionIterator (const edt::Service *service, bool transient);
+
+  bool at_end () const;
+
+  EditableSelectionIterator &operator++ ();
+  reference operator* () const;
+  pointer operator-> () const;
+
+private:
+  std::vector<const edt::Service *> m_services;
+  unsigned int m_service;
+  bool m_transient_selection;
+  iterator_type m_iter, m_end;
+
+  void next ();
+  void init ();
+};
+
+// -------------------------------------------------------------
+
 class EDT_PUBLIC Service
   : public lay::EditorServiceBase,
     public db::Object
@@ -227,16 +262,6 @@ public:
   }
 
   /**
-   *  @brief Get the selection container
-   */
-  const objects &selection () const;
-
-  /**
-   *  @brief Get the transient selection container
-   */
-  const objects &transient_selection () const;
-
-  /**
    *  @brief Access to the view object
    */
   lay::LayoutViewBase *view () const
@@ -258,9 +283,19 @@ public:
   void clear_previous_selection ();
 
   /**
+   *  @brief Gets the selection iterator
+   */
+  EditableSelectionIterator begin_selection () const;
+
+  /**
    *  @brief Establish a transient selection
    */
   bool transient_select (const db::DPoint &pos);
+
+  /**
+   *  @brief Gets the transient selection iterator
+   */
+  EditableSelectionIterator begin_transient_selection () const;
 
   /**
    *  @brief Turns the transient selection to the selection
@@ -585,6 +620,8 @@ protected:
   lay::PointSnapToObjectResult snap2_details (const db::DPoint &p) const;
 
 private:
+  friend class EditableSelectionIterator;
+
   //  The layout view that the editor service is attached to
   lay::LayoutViewBase *mp_view;
 
@@ -685,41 +722,21 @@ private:
    */
   void apply_highlights ();
 
+  /**
+   *  @brief Get the selection container
+   */
+  const objects &selection () const;
+
+  /**
+   *  @brief Get the transient selection container
+   */
+  const objects &transient_selection () const;
+
 private:
   void copy_selected (unsigned int inst_mode);
   void update_vector_snapped_point (const db::DPoint &pt, db::DVector &vr, bool &result_set) const;
   void update_vector_snapped_marker (const lay::ShapeMarker *sm, const db::DTrans &trans, db::DVector &vr, bool &result_set, size_t &count) const;
   void update_vector_snapped_marker (const lay::InstanceMarker *sm, const db::DTrans &trans, db::DVector &vr, bool &result_set, size_t &count) const;
-};
-
-/**
- *  @brief A utility class to implement a selection iterator across all editor services
- */
-class EditableSelectionIterator
-{
-public:
-  typedef edt::Service::objects::value_type value_type;
-  typedef edt::Service::objects::const_iterator iterator_type;
-  typedef const value_type *pointer;
-  typedef const value_type &reference;
-  typedef std::forward_iterator_tag iterator_category;
-  typedef void difference_type;
-
-  EditableSelectionIterator (const std::vector<edt::Service *> &services, bool transient);
-
-  bool at_end () const;
-
-  EditableSelectionIterator &operator++ ();
-  reference operator* () const;
-  pointer operator-> () const;
-
-private:
-  std::vector<edt::Service *> m_services;
-  unsigned int m_service;
-  bool m_transient_selection;
-  iterator_type m_iter, m_end;
-
-  void next ();
 };
 
 /**

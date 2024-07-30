@@ -779,3 +779,42 @@ TEST(20_scale_and_snap)
   db::compare_layouts (_this, l1, tl::testdata () + "/algo/layout_utils_au_sns4.oas", db::NormalizationMode (db::WriteOAS + db::WithArrays));
 }
 
+
+TEST(21_break1)
+{
+  db::Layout l1;
+  {
+    std::string fn (tl::testdata ());
+    fn += "/algo/break_polygons_test.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (l1);
+  }
+
+  db::break_polygons (l1, 10, 3.0);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, l1, tl::testdata () + "/algo/layout_utils_au_bp1.gds");
+}
+
+TEST(22_break2)
+{
+  db::Layout l1;
+  {
+    std::string fn (tl::testdata ());
+    fn += "/algo/break_polygons_test.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (l1);
+  }
+
+  unsigned int li1 = find_layer (l1, 1, 0);
+  unsigned int li2 = find_layer (l1, 2, 0);
+
+  db::break_polygons (l1, li1, 10, 0.0);
+  db::break_polygons (l1, li2, 0, 3.0);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, l1, tl::testdata () + "/algo/layout_utils_au_bp2.gds");
+}
+

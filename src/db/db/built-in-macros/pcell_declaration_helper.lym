@@ -272,6 +272,11 @@ module RBA
   # of a PCell
   class PCellDeclarationHelper &lt; PCellDeclaration
 
+    # makes PCellDeclaration's "layout" method available
+    if ! self.method_defined?(:_layout_base)
+      alias_method :_layout_base, :layout
+    end
+
     # import the Type... constants from PCellParameterDeclaration
     PCellParameterDeclaration.constants.each do |c|
       if !const_defined?(c)
@@ -290,17 +295,57 @@ module RBA
       @cell = nil
       @layer_param_index = []
       @layers = nil
+      @state_stack = []
     end
     
     # provide accessors for the current layout and cell (for prod)
-    attr_reader :layout, :cell, :shape, :layer
+    attr_reader :cell, :shape, :layer
+
+    def layout
+      @layout || _layout_base()
+    end
 
     # provide fallback accessors in case of a name clash with a 
     # parameter
     def _layer; @layer; end
-    def _layout; @layout; end
+    def _layout; @layout || _layout_base(); end
     def _cell; @cell; end
     def _shape; @shape; end
+
+    # Starts an operation - pushes the state on the state stack
+
+    def start
+      @state_stack &lt;&lt; [ @param_values, @param_states, @layers, @cell, @layout, @layer, @shape ]
+      self._reset_state
+    end
+
+    # Finishes an operation - pops the state from the state stack
+
+    def finish
+      if ! @state_stack.empty?
+        @param_values, @param_states, @layers, @cell, @layout, @layer, @shape = @state_stack.pop
+      else
+        self._reset_state
+      end
+    end
+
+    # Resets the state to default values
+
+    def _reset_state
+
+      @param_values = nil
+      @param_states = nil
+      @layers = nil
+      @layout = nil
+
+      # This should be here:
+      #  @cell = nil
+      #  @layer = nil
+      #  @shape = nil
+      # but this would break backward compatibility of "display_text" (actually
+      # exploiting this bug) - fix this in the next major release.
+
+    end
 
     # A helper method to access the nth parameter
     
@@ -410,11 +455,13 @@ module RBA
     
     # implementation of display_text
     def display_text(parameters)
+      self.start
       @param_values = parameters
+      text = ""
       begin
         text = display_text_impl
       ensure
-        @param_values = nil
+        self.finish
       end
       text
     end
@@ -431,34 +478,33 @@ module RBA
       
     # coerce parameters (make consistent)
     def coerce_parameters(layout, parameters)
+      self.start
       @param_values = parameters
       @layout = layout
-      ret = parameters
       begin
         coerce_parameters_impl
       ensure
-        @layout = nil
         ret = @param_values
-        @param_values = nil
+        self.finish
       end
       ret
     end
 
     # parameter change callback
     def callback(layout, name, states)
-      @param_values = nil
+      self.start
       @param_states = states
       @layout = layout
       begin
         callback_impl(name)
       ensure
-        @param_states = nil
-        @layout = nil
+        self.finish
       end
     end
 
     # produce the layout    
     def produce(layout, layers, parameters, cell)
+      self.start
       @layers = layers
       @cell = cell
       @param_values = parameters
@@ -466,15 +512,13 @@ module RBA
       begin
         produce_impl
       ensure
-        @layers = nil
-        @cell = nil
-        @param_values = nil
-        @layout = nil
+        self.finish
       end
     end
 
     # produce a helper for can_create_from_shape
     def can_create_from_shape(layout, shape, layer)
+      self.start
       ret = false
       @layout = layout
       @shape = shape
@@ -482,24 +526,22 @@ module RBA
       begin
         ret = can_create_from_shape_impl
       ensure
-        @layout = nil
-        @shape = nil
-        @layer = nil
+        self.finish
       end
       ret
     end
     
-    # produce a helper for parameters_from_shape
+    # produce a helper for transformation_from_shape
     def transformation_from_shape(layout, shape, layer)
+      self.start
       @layout = layout
       @shape = shape
       @layer = layer
+      t = nil
       begin
         t = transformation_from_shape_impl
       ensure
-        @layout = nil
-        @shape = nil
-        @layer = nil
+        self.finish
       end
       t
     end
@@ -507,6 +549,7 @@ module RBA
     # produce a helper for parameters_from_shape
     # with this helper, the implementation can use the parameter setters
     def parameters_from_shape(layout, shape, layer)
+      self.start
       @param_values = @param_decls.map { |pd| pd.default }
       @layout = layout
       @shape = shape
@@ -514,11 +557,10 @@ module RBA
       begin
         parameters_from_shape_impl
       ensure
-        @layout = nil
-        @shape = nil
-        @layer = nil
+        ret = @param_values
+        self.finish
       end
-      @param_values
+      ret
     end
     
     # default implementation

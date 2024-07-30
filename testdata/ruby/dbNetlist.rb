@@ -832,18 +832,25 @@ END
 
     nl = RBA::Netlist::new
     assert_equal(nl.top_circuit_count, 0)
+    assert_equal(nl.top_circuit == nil, true)
 
     c1 = RBA::Circuit::new
     c1.name = "C1"
     c1.cell_index = 17
     nl.add(c1)
     assert_equal(nl.top_circuit_count, 1)
+    assert_equal(nl.top_circuit.name, "C1")
 
     c2 = RBA::Circuit::new
     c2.name = "C2"
     c1.cell_index = 42
     nl.add(c2)
     assert_equal(nl.top_circuit_count, 2)
+    begin
+      nl.top_circuit
+      assert_equal(true, false)
+    rescue
+    end
 
     c3 = RBA::Circuit::new
     c3.name = "C3"
@@ -852,6 +859,10 @@ END
 
     names = []
     nl.each_circuit_top_down { |c| names << c.name }
+    assert_equal(names.join(","), "C3,C2,C1")
+
+    names = []
+    nl.top_circuits.each { |c| names << c.name }
     assert_equal(names.join(","), "C3,C2,C1")
 
     names = []

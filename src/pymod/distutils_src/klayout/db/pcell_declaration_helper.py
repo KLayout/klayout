@@ -60,6 +60,7 @@ class _PCellDeclarationHelperMixin:
     self._param_states = None
     self._layer_param_index = []
     self._layers = []
+    self._state_stack = []
     # public attributes
     self.layout = None
     self.shape = None
@@ -129,6 +130,7 @@ class _PCellDeclarationHelperMixin:
     This function delegates the implementation to self.display_text_impl
     after configuring the PCellDeclaration object.
     """
+    self.start()
     self._param_values = parameters
     try:
       text = self.display_text_impl()
@@ -165,6 +167,7 @@ class _PCellDeclarationHelperMixin:
     "layers" are the layer indexes corresponding to the layer
     parameters.
     """
+    self.start()
     self._param_values = None
     self._param_states = None
     if states:
@@ -177,17 +180,39 @@ class _PCellDeclarationHelperMixin:
       self._param_values = values
     self._layers = layers
 
+  def start(self):
+    """ 
+    Is called to prepare the environment for an operation
+    After the operation, "finish" must be called.
+    This method will push the state onto a stack, hence implementing
+    reentrant implementation methods.
+    """
+    self._state_stack.append( (self._param_values, self._param_states, self._layers, self.cell, self.layout, self.layer, self.shape) )
+    self._reset_state()
+
   def finish(self):
     """
     Is called at the end of an implementation of a PCellDeclaration method
     """
+    if len(self._state_stack) > 0:
+      self._param_values, self._param_states, self._layers, self.cell, self.layout, self.layer, self.shape = self._state_stack.pop()
+    else:
+      self._reset_state()
+
+  def _reset_state(self):
+    """
+    Resets the internal state
+    """
     self._param_values = None
     self._param_states = None
     self._layers = None
-    self._cell = None
-    self._layout = None
-    self._layer = None
-    self._shape = None
+    self.layout = super(_PCellDeclarationHelperMixin, self).layout()
+    # This should be here:
+    #  self.cell = None
+    #  self.layer = None
+    #  self.shape = None
+    # but this would break backward compatibility of "display_text" (actually
+    # exploiting this bug) - fix this in the next major release.
     
   def get_layers(self, parameters):
     """
@@ -255,6 +280,7 @@ class _PCellDeclarationHelperMixin:
     The function delegates the implementation to can_create_from_shape_impl
     after updating the state of this object with the current parameters.
     """
+    self.start()
     self.layout = layout
     self.shape = shape
     self.layer = layer
@@ -271,6 +297,7 @@ class _PCellDeclarationHelperMixin:
     The function delegates the implementation to transformation_from_shape_impl
     after updating the state of this object with the current parameters.
     """
+    self.start()
     self.layout = layout
     self.shape = shape
     self.layer = layer

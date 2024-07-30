@@ -1471,6 +1471,33 @@ class DBRegion_TestClass < TestBase
 
   end
 
+  # begin_shapes_rec and begin_shapes_merged_rec
+  def test_extended_iter
+
+    r = RBA::Region::new()
+
+    # NOTE: this also tests the copy semantics of the RecursiveShape to Variant binding in RBA:
+    iter, trans = r.begin_shapes_rec
+    str = iter.each.collect { |i| (trans*i.trans*i.shape.polygon).to_s }.join(",")
+    assert_equal(str, "")
+
+    iter, trans = r.begin_merged_shapes_rec
+    str = iter.each.collect { |i| (trans*i.trans*i.shape.polygon).to_s }.join(",")
+    assert_equal(str, "")
+
+    r.insert(RBA::Box::new(0, 0, 100, 100))
+    r.insert(RBA::Box::new(50, 50, 200, 200))
+
+    iter, trans = r.begin_shapes_rec
+    str = iter.each.collect { |i| (trans*i.trans*i.shape.polygon).to_s }.join(",")
+    assert_equal(str, "(0,0;0,100;100,100;100,0),(50,50;50,200;200,200;200,50)")
+
+    iter, trans = r.begin_merged_shapes_rec
+    str = iter.each.collect { |i| (trans*i.trans*i.shape.polygon).to_s }.join(",")
+    assert_equal(str, "(0,0;0,100;50,100;50,200;200,200;200,50;100,50;100,0)")
+
+  end
+
 end
 
 load("test_epilogue.rb")

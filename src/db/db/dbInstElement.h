@@ -148,7 +148,11 @@ struct DB_PUBLIC InstElement
    */
   db::ICplxTrans complex_trans () const
   {
-    return inst_ptr.cell_inst ().complex_trans (*array_inst);
+    if (array_inst.at_end ()) {
+      return inst_ptr.cell_inst ().complex_trans ();
+    } else {
+      return inst_ptr.cell_inst ().complex_trans (*array_inst);
+    }
   }
 
   /**

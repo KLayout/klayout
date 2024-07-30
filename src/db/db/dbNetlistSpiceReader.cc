@@ -54,7 +54,7 @@ read_param_card (tl::Extractor &ex, const db::Netlist *netlist, std::map<std::st
   //  taken from:
   //    https://nmg.gitlab.io/ngspice-manual/circuitdescription/paramparametricnetlists/paramline.html
 
-  while (! ex.at_end ()) {
+  while (! NetlistSpiceReader::at_eol (ex)) {
 
     std::string name;
     ex.read_word (name);
@@ -333,7 +333,7 @@ read_name (tl::Extractor &ex, const db::Netlist *netlist)
 {
   std::string n;
   ex.read_word_or_quoted (n, allowed_name_chars);
-  return netlist->normalize_name (n);
+  return netlist->normalize_name (NetlistSpiceReader::unescape_name (n));
 }
 
 class SpiceCircuitDict
@@ -610,7 +610,7 @@ SpiceCircuitDict::get_line ()
         std::string path_or_libname;
 
         ex.read_word_or_quoted (path_or_libname, allowed_name_chars);
-        if (! ex.at_end ()) {
+        if (! NetlistSpiceReader::at_eol (ex)) {
 
           std::string libname;
           ex.read_word_or_quoted (libname, allowed_name_chars);
@@ -648,7 +648,7 @@ SpiceCircuitDict::get_line ()
 
         ex.expect_end ();
 
-      } else if (ex.at_end () || ex.test ("*")) {
+      } else if (NetlistSpiceReader::at_eol (ex)) {
 
         //  skip empty and comment lines
 
@@ -680,7 +680,7 @@ SpiceCircuitDict::read_card ()
 
   } else if (ex.test_without_case (".global")) {
 
-    while (! ex.at_end ()) {
+    while (! NetlistSpiceReader::at_eol (ex)) {
       std::string n = mp_delegate->translate_net_name (read_name (ex, mp_netlist));
       if (m_global_net_names.find (n) == m_global_net_names.end ()) {
         m_global_nets.push_back (n);
@@ -766,7 +766,7 @@ SpiceCircuitDict::read_card ()
 void
 SpiceCircuitDict::read_options (tl::Extractor &ex)
 {
-  while (! ex.at_end ()) {
+  while (! NetlistSpiceReader::at_eol (ex)) {
 
     std::string n;
     ex.read_word_or_quoted (n, allowed_name_chars);
@@ -780,7 +780,7 @@ SpiceCircuitDict::read_options (tl::Extractor &ex)
       } else {
         //  skip until end or next space
         ex.skip ();
-        while (! ex.at_end () && ! isspace (*ex)) {
+        while (! NetlistSpiceReader::at_eol (ex) && ! isspace (*ex)) {
           ++ex;
         }
       }
@@ -1343,6 +1343,108 @@ void NetlistSpiceReader::read (tl::InputStream &stream, db::Netlist &netlist)
     mp_delegate->set_netlist (0);
     throw;
   }
+}
+
+bool NetlistSpiceReader::at_eol (tl::Extractor &ex)
+{
+  //  terminate at end or midline comment
+  return ex.at_end () || ex.test ("*") || ex.test (";");
+}
+
+inline static int hex_num (char c)
+{
+  if (c >= '0' && c <= '9') {
+    return (int (c - '0'));
+  } else if (c >= 'a' && c <= 'f') {
+    return (int (c - 'f') + 10);
+  } else {
+    return -1;
+  }
+}
+
+std::string NetlistSpiceReader::unescape_name (const std::string &n)
+{
+  std::string nn;
+  nn.reserve (n.size ());
+
+  char quote = 0;
+
+  const char *cp = n.c_str ();
+  while (*cp) {
+
+    if (*cp == quote) {
+
+      quote = 0;
+      ++cp;
+
+    } else if (! quote && (*cp == '"' || *cp == '\'')) {
+
+      quote = *cp++;
+
+    } else if (*cp == '\\' && cp[1]) {
+
+      if (tolower (cp[1]) == 'x') {
+
+        cp += 2;
+
+        char c = 0;
+        for (int i = 0; i < 2 && *cp; ++i) {
+          int n = hex_num (*cp);
+          if (n >= 0) {
+            ++cp;
+            c = c * 16 + char (n);
+          } else {
+            break;
+          }
+        }
+
+        nn += c;
+
+      } else {
+        ++cp;
+        nn += *cp++;
+      }
+
+    } else {
+      nn += *cp++;
+    }
+
+  }
+
+  return nn;
+}
+
+std::string NetlistSpiceReader::parse_component (tl::Extractor &ex)
+{
+  const char *cp = ex.skip ();
+  const char *cp0 = cp;
+
+  char quote = 0;
+  unsigned int brackets = 0;
+
+  while (*cp) {
+    if (quote) {
+      if (*cp == quote) {
+        quote = 0;
+      } else if (*cp == '\\' && cp[1]) {
+        ++cp;
+      }
+    } else if ((isspace (*cp) || *cp == '=') && ! brackets) {
+      break;
+    } else if (*cp == '"' || *cp == '\'') {
+      quote = *cp;
+    } else if (*cp == '(') {
+      ++brackets;
+    } else if (*cp == ')') {
+      if (brackets > 0) {
+        --brackets;
+      }
+    }
+    ++cp;
+  }
+
+  ex = tl::Extractor (cp);
+  return std::string (cp0, cp - cp0);
 }
 
 }

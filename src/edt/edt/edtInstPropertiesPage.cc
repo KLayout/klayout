@@ -47,7 +47,7 @@ namespace edt
 
 // -------------------------------------------------------------------------
 
-static std::string cell_name_from_sel (const edt::Service::obj_iterator &pos, edt::Service *service)
+static std::string cell_name_from_sel (EditableSelectionIterator::pointer pos, edt::Service *service)
 {
   if (! pos->is_cell_inst ()) {
     return std::string ();
@@ -81,7 +81,7 @@ struct SelectionPtrSort
     //  .. nothing yet ..
   }
 
-  bool operator() (const edt::Service::obj_iterator &a, const edt::Service::obj_iterator &b)
+  bool operator() (EditableSelectionIterator::pointer a, EditableSelectionIterator::pointer b)
   {
     return cell_name_from_sel (a, mp_service) < cell_name_from_sel (b, mp_service);
   }
@@ -104,10 +104,9 @@ static bool is_orthogonal (const db::DVector &rv, const db::DVector &cv)
 InstPropertiesPage::InstPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent)
   : lay::PropertiesPage (parent, manager, service), mp_service (service), m_enable_cb_callback (true), mp_pcell_parameters (0)
 {
-  const edt::Service::objects &selection = service->selection ();
-  m_selection_ptrs.reserve (selection.size ());
-  for (edt::Service::obj_iterator s = selection.begin (); s != selection.end (); ++s) {
-    m_selection_ptrs.push_back (s);
+  m_selection_ptrs.reserve (service->selection_size ());
+  for (EditableSelectionIterator s = service->begin_selection (); ! s.at_end (); ++s) {
+    m_selection_ptrs.push_back (s.operator-> ());
   }
 
   std::sort (m_selection_ptrs.begin (), m_selection_ptrs.end (), SelectionPtrSort (service));
@@ -221,7 +220,7 @@ BEGIN_PROTECTED
     lib = lib_cbx->current_library ();
     layout = &lib->layout ();
   } else {
-    edt::Service::obj_iterator pos = m_selection_ptrs [m_indexes.front ()];
+    EditableSelectionIterator::pointer pos = m_selection_ptrs [m_indexes.front ()];
     const lay::CellView &cv = mp_service->view ()->cellview (pos->cv_index ());
     layout = &cv->layout ();
   }
@@ -300,7 +299,7 @@ InstPropertiesPage::select_entries (const std::vector<size_t> &entries)
 std::string
 InstPropertiesPage::description (size_t entry) const
 {
-  edt::Service::obj_iterator pos = m_selection_ptrs [entry];
+  EditableSelectionIterator::pointer pos = m_selection_ptrs [entry];
   std::string d = cell_name_from_sel (pos, mp_service);
 
   if (! pos->is_cell_inst ()) {
@@ -343,12 +342,12 @@ InstPropertiesPage::update ()
     return;
   }
 
-  edt::Service::obj_iterator pos = m_selection_ptrs [m_indexes.front ()];
+  EditableSelectionIterator::pointer pos = m_selection_ptrs [m_indexes.front ()];
   tl_assert (pos->is_cell_inst ());
 
   std::set<const lay::ObjectInstPath *> highlights;
   for (auto i = m_indexes.begin (); i != m_indexes.end (); ++i) {
-    highlights.insert (m_selection_ptrs [*i].operator-> ());
+    highlights.insert (m_selection_ptrs [*i]);
   }
   mp_service->highlight (highlights);
 
@@ -472,7 +471,7 @@ InstPropertiesPage::show_cell ()
     return;
   }
 
-  edt::Service::obj_iterator pos = m_selection_ptrs [m_indexes.front ()];
+  EditableSelectionIterator::pointer pos = m_selection_ptrs [m_indexes.front ()];
 
   lay::CellView::unspecific_cell_path_type path (mp_service->view ()->cellview (pos->cv_index ()).combined_unspecific_path ());
   for (lay::ObjectInstPath::iterator p = pos->begin (); p != pos->end (); ++p) {
@@ -509,7 +508,7 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
 
   std::unique_ptr<CombinedChangeApplicator> appl (new CombinedChangeApplicator ());
 
-  edt::Service::obj_iterator pos = m_selection_ptrs [m_indexes.front ()];
+  EditableSelectionIterator::pointer pos = m_selection_ptrs [m_indexes.front ()];
   const lay::CellView &cv = mp_service->view ()->cellview (pos->cv_index ());
 
   bool du = dbu_cb->isChecked ();
@@ -786,16 +785,15 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
 void
 InstPropertiesPage::recompute_selection_ptrs (const std::vector<lay::ObjectInstPath> &new_sel)
 {
-  std::map<lay::ObjectInstPath, edt::Service::obj_iterator> ptrs;
+  std::map<lay::ObjectInstPath, EditableSelectionIterator::pointer> ptrs;
 
-  const edt::Service::objects &selection = mp_service->selection ();
-  for (edt::Service::obj_iterator pos = selection.begin (); pos != selection.end (); ++pos) {
-    ptrs.insert (std::make_pair (*pos, pos));
+  for (EditableSelectionIterator pos = mp_service->begin_selection (); ! pos.at_end (); ++pos) {
+    ptrs.insert (std::make_pair (*pos, pos.operator -> ()));
   }
 
   m_selection_ptrs.clear ();
   for (std::vector<lay::ObjectInstPath>::const_iterator s = new_sel.begin (); s != new_sel.end (); ++s) {
-    std::map<lay::ObjectInstPath, edt::Service::obj_iterator>::const_iterator pm = ptrs.find (*s);
+    std::map<lay::ObjectInstPath, EditableSelectionIterator::pointer>::const_iterator pm = ptrs.find (*s);
     tl_assert (pm != ptrs.end ());
     m_selection_ptrs.push_back (pm->second);
   }
@@ -814,7 +812,7 @@ InstPropertiesPage::do_apply (bool current_only, bool relative)
   std::unique_ptr<ChangeApplicator> applicator;
 
   {
-    edt::Service::obj_iterator pos = m_selection_ptrs [m_indexes.front ()];
+    EditableSelectionIterator::pointer pos = m_selection_ptrs [m_indexes.front ()];
     tl_assert (pos->is_cell_inst ());
 
     const lay::CellView &cv = mp_service->view ()->cellview (pos->cv_index ());
@@ -846,7 +844,7 @@ InstPropertiesPage::do_apply (bool current_only, bool relative)
 
   std::vector<lay::ObjectInstPath> new_sel;
   new_sel.reserve (m_selection_ptrs.size ());
-  for (std::vector<edt::Service::obj_iterator>::const_iterator p = m_selection_ptrs.begin (); p != m_selection_ptrs.end (); ++p) {
+  for (std::vector<EditableSelectionIterator::pointer>::const_iterator p = m_selection_ptrs.begin (); p != m_selection_ptrs.end (); ++p) {
     new_sel.push_back (**p);
   }
 
@@ -859,7 +857,7 @@ InstPropertiesPage::do_apply (bool current_only, bool relative)
     for (auto ii = m_indexes.begin (); ii != m_indexes.end (); ++ii) {
 
       size_t index = *ii;
-      edt::Service::obj_iterator pos = m_selection_ptrs [*ii];
+      EditableSelectionIterator::pointer pos = m_selection_ptrs [*ii];
 
       //  only update objects from the same layout - this is not practical limitation but saves a lot of effort for
       //  managing different property id's etc.
@@ -958,7 +956,7 @@ InstPropertiesPage::update_pcell_parameters ()
 
   } else {
 
-    edt::Service::obj_iterator pos = m_selection_ptrs [m_indexes.front ()];
+    EditableSelectionIterator::pointer pos = m_selection_ptrs [m_indexes.front ()];
     const lay::CellView &cv = mp_service->view ()->cellview (pos->cv_index ());
     layout = &cv->layout ();
 
@@ -982,7 +980,7 @@ InstPropertiesPage::update_pcell_parameters ()
 
     std::vector<tl::Variant> parameters;
 
-    edt::Service::obj_iterator pos = m_selection_ptrs [m_indexes.front ()];
+    EditableSelectionIterator::pointer pos = m_selection_ptrs [m_indexes.front ()];
     const lay::CellView &cv = mp_service->view ()->cellview (pos->cv_index ());
     db::Cell &cell = cv->layout ().cell (pos->cell_index ());
     std::pair<bool, db::pcell_id_type> pci = cell.is_pcell_instance (pos->back ().inst_ptr);

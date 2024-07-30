@@ -32,60 +32,6 @@ namespace db
 
 // ------------------------------------------------------------------------------------------------------
 
-inline static int hex_num (char c)
-{
-  if (c >= '0' && c <= '9') {
-    return (int (c - '0'));
-  } else if (c >= 'a' && c <= 'f') {
-    return (int (c - 'f') + 10);
-  } else {
-    return -1;
-  }
-}
-
-static std::string unescape_name (const std::string &n)
-{
-  std::string nn;
-  nn.reserve (n.size ());
-
-  const char *cp = n.c_str ();
-  while (*cp) {
-
-    if (*cp == '\\' && cp[1]) {
-
-      if (tolower (cp[1]) == 'x') {
-
-        cp += 2;
-
-        char c = 0;
-        for (int i = 0; i < 2 && *cp; ++i) {
-          int n = hex_num (*cp);
-          if (n >= 0) {
-            ++cp;
-            c = c * 16 + char (n);
-          } else {
-            break;
-          }
-        }
-
-        nn += c;
-
-      } else {
-        ++cp;
-        nn += *cp++;
-      }
-
-    } else {
-      nn += *cp++;
-    }
-
-  }
-
-  return nn;
-}
-
-// ------------------------------------------------------------------------------------------------------
-
 NetlistSpiceReaderOptions::NetlistSpiceReaderOptions ()
 {
   scale = 1.0;
@@ -147,7 +93,7 @@ bool NetlistSpiceReaderDelegate::wants_subcircuit (const std::string & /*circuit
 
 std::string NetlistSpiceReaderDelegate::translate_net_name (const std::string &nn)
 {
-  return unescape_name (nn);
+  return NetlistSpiceReader::unescape_name (nn);
 }
 
 void NetlistSpiceReaderDelegate::error (const std::string &msg)
@@ -172,45 +118,12 @@ static db::DeviceClass *make_device_class (db::Circuit *circuit, const std::stri
   return cls;
 }
 
-static std::string parse_component (tl::Extractor &ex)
-{
-  const char *cp = ex.skip ();
-  const char *cp0 = cp;
-
-  char quote = 0;
-  unsigned int brackets = 0;
-
-  while (*cp) {
-    if (quote) {
-      if (*cp == quote) {
-        quote = 0;
-      } else if (*cp == '\\' && cp[1]) {
-        ++cp;
-      }
-    } else if ((isspace (*cp) || *cp == '=') && ! brackets) {
-      break;
-    } else if (*cp == '"' || *cp == '\'') {
-      quote = *cp;
-    } else if (*cp == '(') {
-      ++brackets;
-    } else if (*cp == ')') {
-      if (brackets > 0) {
-        --brackets;
-      }
-    }
-    ++cp;
-  }
-
-  ex = tl::Extractor (cp);
-  return std::string (cp0, cp - cp0);
-}
-
 void NetlistSpiceReaderDelegate::parse_element_components (const std::string &s, std::vector<std::string> &strings, std::map<std::string, tl::Variant> &pv, const std::map<std::string, tl::Variant> &variables)
 {
   tl::Extractor ex (s.c_str ());
   bool in_params = false;
 
-  while (! ex.at_end ()) {
+  while (! NetlistSpiceReader::at_eol (ex)) {
 
     if (ex.test_without_case ("params:")) {
 
@@ -235,7 +148,7 @@ void NetlistSpiceReaderDelegate::parse_element_components (const std::string &s,
           ex.error (tl::to_string (tr ("Invalid syntax for parameter assignment - needs keyword followed by '='")));
         }
 
-        std::string comp_name = parse_component (ex);
+        std::string comp_name = NetlistSpiceReader::parse_component (ex);
         comp_name = mp_netlist ? mp_netlist->normalize_name (comp_name) : tl::to_upper_case (comp_name);
 
         //  resolve variables if string type

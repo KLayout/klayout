@@ -674,6 +674,7 @@ class DBLayoutTests2_TestClass < TestBase
     lindex = ly.insert_layer( linfo )
 
     c1 = ly.cell( ci1 )
+    assert_equal( c1.properties, {} )
     c2 = ly.cell( ci2 )
     tr = RBA::Trans::new
     inst = c2.insert( RBA::CellInstArray::new( c1.cell_index, tr ) )
@@ -701,6 +702,7 @@ class DBLayoutTests2_TestClass < TestBase
     c1.prop_id = pid
     assert_equal( c1.prop_id, pid )
     assert_equal( c1.property( 17 ).inspect, "\"a\"" )
+    assert_equal( c1.properties, { 17 => "a", "b" => [1, 5, 7] } )
     c1.set_property( 5, 23 ) 
     c1.delete_property( 17 )
     assert_equal( c1.property( 17 ).inspect, "nil" )
@@ -1027,6 +1029,7 @@ class DBLayoutTests2_TestClass < TestBase
   def test_11
 
     ly = RBA::Layout::new
+    assert_equal(ly.properties, {})
 
     assert_equal(ly.prop_id, 0)
     ly.prop_id = 1
@@ -1037,6 +1040,7 @@ class DBLayoutTests2_TestClass < TestBase
     ly.set_property("x", 1)
     assert_equal(ly.prop_id, 1)
     assert_equal(ly.property("x"), 1)
+    assert_equal(ly.properties, {"x" => 1})
     ly.set_property("x", 17)
     assert_equal(ly.prop_id, 2)
     assert_equal(ly.property("x"), 17)

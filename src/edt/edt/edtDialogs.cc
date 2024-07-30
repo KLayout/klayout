@@ -26,6 +26,7 @@
 #include "dbLayout.h"
 
 #include "edtDialogs.h"
+#include "edtUtils.h"
 #include "layObjectInstPath.h"
 #include "layCellView.h"
 #include "layLayoutViewBase.h"
@@ -79,29 +80,39 @@ InstantiationForm::double_clicked (QListWidgetItem *item)
     return;
   }
 
-  lay::CellView::unspecific_cell_path_type path (mp_view->cellview (mp_path->cv_index ()).combined_unspecific_path ());
+  int cv_index = mp_path->cv_index ();
+  const lay::CellView &cv = mp_view->cellview (cv_index);
+
+  lay::CellView::unspecific_cell_path_type path (cv.combined_unspecific_path ());
   int nrow = 0;
+
+  for (lay::CellView::specific_cell_path_type::const_iterator p = cv.specific_path ().begin (); p != cv.specific_path ().end () && nrow < row; ++p, ++nrow) {
+    path.push_back (p->inst_ptr.cell_index ());
+  }
   for (lay::ObjectInstPath::iterator p = mp_path->begin (); p != mp_path->end () && nrow < row; ++p, ++nrow) {
     path.push_back (p->inst_ptr.cell_index ());
   }
 
-  mp_view->set_current_cell_path (mp_path->cv_index (), path);
+  mp_view->set_current_cell_path (cv_index, path);
 
   if (! mp_marker) {
-    mp_marker = new lay::Marker (mp_view, mp_path->cv_index ());
+    mp_marker = new lay::Marker (mp_view, cv_index);
   }
 
-  const db::Layout &layout = mp_view->cellview (mp_path->cv_index ())->layout ();
-  db::Box box = layout.cell (row == 0 ? mp_path->topcell () : path.back ()).bbox ();
+  const db::Layout &layout = cv->layout ();
+  db::Box box = layout.cell (row == 0 ? cv.ctx_cell_index (): path.back ()).bbox ();
 
   //  TODO: this does not consider global transformation and variants of this
   db::ICplxTrans abs_trans;
   nrow = 0;
+  for (lay::CellView::specific_cell_path_type::const_iterator p = cv.specific_path ().begin (); p != cv.specific_path ().end () && nrow < row; ++p, ++nrow) {
+    abs_trans = abs_trans * p->complex_trans ();
+  }
   for (lay::ObjectInstPath::iterator p = mp_path->begin (); p != mp_path->end () && nrow < row; ++p, ++nrow) {
-    abs_trans = abs_trans * (p->inst_ptr.cell_inst ().complex_trans (*(p->array_inst)));
+    abs_trans = abs_trans * p->complex_trans ();
   }
 
-  mp_marker->set (box, abs_trans, mp_view->cv_transform_variants (mp_path->cv_index ()));
+  mp_marker->set (box, abs_trans, mp_view->cv_transform_variants (cv_index));
 }
 
 void 
@@ -136,14 +147,15 @@ InstantiationForm::update ()
   list->clear ();
 
   list->addItem (tl::to_qstring (cv->layout ().cell_name (cv.ctx_cell_index ())));
-  db::CplxTrans abs_trans;
+  db::ICplxTrans abs_trans;
 
   //  first include the context path of the cellview in order to tell the path within the cell shown
   for (lay::CellView::specific_cell_path_type::const_iterator p = cv.specific_path ().begin (); p != cv.specific_path ().end (); ++p) {
 
     //  build the instance information from the path
 
-    db::CplxTrans trans (p->inst_ptr.cell_inst ().complex_trans (*(p->array_inst)));
+    db::ICplxTrans trans = p->complex_trans ();
+    size_t n = p->array_inst.at_end () ? p->inst_ptr.cell_inst ().size () : size_t (1);
     abs_trans = abs_trans * trans;
 
     if (abs_coord) {
@@ -152,8 +164,11 @@ InstantiationForm::update ()
 
     std::string line;
     line += cv->layout ().cell_name (p->inst_ptr.cell_index ());
-    line += "\tat ";
+    line += "\t" + tl::to_string (tr ("at")) + " ";
     line += trans.to_string (true /*lazy*/, dbu_coord ? 0.0 : dbu);
+    if (n > 1) {
+      line += " " + tl::sprintf (tl::to_string (tr ("(first of %lu array members)")), (unsigned long) n);
+    }
     
     list->addItem (tl::to_qstring (line));
 
@@ -164,7 +179,8 @@ InstantiationForm::update ()
 
     //  build the instance information from the path
 
-    db::CplxTrans trans (p->inst_ptr.cell_inst ().complex_trans (*(p->array_inst)));
+    db::ICplxTrans trans = p->complex_trans ();
+    size_t n = p->array_inst.at_end () ? p->inst_ptr.cell_inst ().size () : size_t (1);
     abs_trans = abs_trans * trans;
 
     if (abs_coord) {
@@ -173,9 +189,12 @@ InstantiationForm::update ()
 
     std::string line;
     line += cv->layout ().cell_name (p->inst_ptr.cell_index ());
-    line += "\tat ";
+    line += "\t" + tl::to_string (tr ("at")) + " ";
     line += trans.to_string (true /*lazy*/, dbu_coord ? 0.0 : dbu);
-    
+    if (n > 1) {
+      line += " " + tl::sprintf (tl::to_string (tr ("(first of %lu array members)")), (unsigned long) n);
+    }
+
     list->addItem (tl::to_qstring (line));
 
   }

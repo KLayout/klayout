@@ -161,6 +161,16 @@ public:
    */
   void enable_updates (bool f);
 
+  /**
+   *  @brief Gets a string with the serialized tree state
+   */
+  std::string get_tree_state ();
+
+  /**
+   *  @brief Restores the tree state from the serialized string (see get_tree_state)
+   */
+  void set_tree_state (const std::string &state);
+
 public slots:
   void directory_header_clicked (int section);
   void directory_sorting_changed (int section, Qt::SortOrder order);

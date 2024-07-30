@@ -1,3 +1,39 @@
+0.29.5           (2024-07-30):
+* Bug: %GITHUB%/issues/1784 Spice throws error at midline semicolon comments
+* Enhancement: %GITHUB%/issues/1790 Support for recursive PCell instances
+* Bug: %GITHUB%/issues/1804 Instantation path highlight mismatch with view window
+* Bug: %GITHUB%/issues/1768 Change "angle constraint" of box and ellipse ruler templates to "any angle" by default
+* Enhancement: %GITHUB%/issues/1776 Undo/redo from List 
+* Enhancement: %GITHUB%/issues/1779 Marker Browser: make the state of the "By Cell" or "By Category" tree persistent
+* Bug: %GITHUB%/issues/1799 Can't set cell properties by script
+* Bug: %GITHUB%/issues/1794 MetaInfo with (gigantic) size makes klayout write a faulty gds
+* Bug: %GITHUB%/issues/1793 inconsistent results in width_check when calling by keyword argument
+* Bug: %GITHUB%/issues/1782 Internal error on "nan" values in PCells
+* Enhancement: GDS2 writer now observes limitations of the file format 
+  and raises more errors on value over- or underflows. This should specifically
+  avoid issues writing certain large arrays which are legal inside KLayout, but
+  illegal in GDS2.
+* Bugfix: Small bugfix: 'Delete selected stacks' was not working from stack tech component editor's context menu
+* Enhancement: Trying to improve "grab" behavior of partial selection.
+  In certain situations is was difficult to grab the partial selected edges.
+  Instead other edges would be selected. Now, it is enough to click inside the
+  bounding box of the partial selection.
+* Bugfix: Including more GeneratorExit and StopAsyncIteration in the ignored exceptions for Python.
+  These exception now do not make the debugger stop any longer.
+* Bugfix: Properly transferring ownership for variant to Python/Ruby translation.
+  This is required for some Python and Ruby bindings, when objects are
+  transferred through generic arrays.
+* Enhancement: Added Region#being_shapes_rec and Region#begin_merged_shapes_rec.
+  Mainly for being able to retrieve shapes with properties from Region#nets
+* Enhancement: Convenience methods Shape#properties, Layout#properties, Cell#properties, Instance#properties.
+  These method will obtain all properties as a hash.
+* Enhancement: Added Netlist#top_circuit and Netlist#top_circuits convenience methods.
+  These methods will deliver the single top circuit or a list of top circuits.
+* Enhancement: "Copy cells" now has an option to mute the dialog (shallow/deep) 
+  and the dialog is only shown if there are subcells
+* Enhancement: Added Shapes#break_polygons, Layout#break_polygons, Region#break_polygons.
+  These methods split large polygons into smaller pieces.
+
 0.29.4           (2024-07-08):
 * Bug: %GITHUB%/issues/1780 Crash on deleting multiple selected shapes or items
  

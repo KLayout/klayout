@@ -32,6 +32,7 @@
 #include <memory>
 
 class QTreeWidgetItem;
+class QModelIndex;
 
 namespace lay
 {

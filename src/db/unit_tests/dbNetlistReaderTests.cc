@@ -914,6 +914,25 @@ TEST(25_dismiss_top_level)
   );
 }
 
+TEST(26_comments)
+{
+  db::Netlist nl;
+
+  std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader26.cir");
+
+  db::NetlistSpiceReader reader;
+  tl::InputStream is (path);
+  reader.read (is, nl);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit TOP (A=A,B=B);\n"
+    "  device NMOS '1' (S=A,G=B,D=A,B=B) (L=100,W=100,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS '2' (S='\\\\A',G='NET\"Q\"',D=A,B='NET[0]') (L=100,W=100,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS 'FET[1]' (S='\\\\A',G='NET\"Q\"',D=AAA,B='NET[0]') (L=100,W=1.7,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+}
+
 TEST(100_ExpressionParser)
 {
   std::map<std::string, tl::Variant> vars;

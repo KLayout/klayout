@@ -1,0 +1,14 @@
+* Test: dismiss empty top level circuit
+; a comment
+
+.subckt top a b 
+m1 a b a b nmos  * a comment
+m2 a 'net"q"' \\a net[0] nmos  * a comment
+mfet\[1\] \a\x41a "net\"q\"" "\\a" net\[0\] nmos w=1.7u ; a comment
+.ends
+
+* this triggered generation of a top level circuit
+.param p1 17 ; a comment
+
+.end    ; a comment
+

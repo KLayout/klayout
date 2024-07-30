@@ -29,6 +29,7 @@
 #include "tlStream.h"
 #include "tlObject.h"
 #include "tlVariant.h"
+#include "tlString.h"
 
 #include <map>
 #include <string>
@@ -62,6 +63,29 @@ public:
   {
     m_strict = s;
   }
+
+  /**
+   *  @brief Returns true, if the extractor is at the end of the line
+   *  "at_eol" is true at the line end or when a midline comment starts.
+   */
+  static bool at_eol (tl::Extractor &ex);
+
+  /**
+   *  @brief Unescapes a name
+   *  Replaces backslash sequences with the true character and removes quotes.
+   */
+  static std::string unescape_name (const std::string &n);
+
+  /**
+   *  @brief Parses a netlist component (net name, expression etc.)
+   *  Scans over the expression or net name and returns a string representing the latter.
+   */
+  static std::string parse_component (tl::Extractor &ex);
+
+  /**
+   *  @brief Reads a component name
+   *  Scans over a component name and returns the
+   */
 
 private:
   tl::weak_ptr<NetlistSpiceReaderDelegate> mp_delegate;

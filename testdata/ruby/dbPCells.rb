@@ -170,6 +170,71 @@ if RBA.constants.member?(:PCellDeclarationHelper)
 
   end
 
+  # A recursive PCell
+
+  class RecursivePCell < RBA::PCellDeclarationHelper
+
+    def initialize
+
+      super()
+    
+      param("layer", RecursivePCell::TypeLayer, "Layer", :default => RBA::LayerInfo::new(0, 0))
+      param("line", RecursivePCell::TypeShape, "Line", :default => RBA::Edge::new(0, 0, 10000, 0))
+      param("level", RecursivePCell::TypeInt, "Level", :default => 1)
+
+    end
+      
+    def display_text_impl
+      # provide a descriptive text for the cell
+      return "RecursivePCell(L=" + self.layer.to_s + ",E=" + (RBA::CplxTrans::new(self.layout.dbu) * self.line).to_s + ",LVL=" + self.level.to_s
+    end
+    
+    def produce_impl
+    
+      # fetch the parameters
+      l = self.layer_layer
+      e = self.line
+
+      if self.level <= 0
+        self.cell.shapes(l).insert(e)
+        return
+      end
+
+      d3 = e.d * (1.0 / 3.0)
+      d3n = RBA::Vector::new(-d3.y, d3.x)
+
+      e1 = RBA::Edge::new(e.p1, e.p1 + d3)
+      e2 = RBA::Edge::new(e1.p2, e1.p2 + d3 * 0.5 + d3n * Math::cos(Math::PI / 6))
+      e3 = RBA::Edge::new(e2.p2, e.p1 + d3 * 2.0)
+      e4 = RBA::Edge::new(e3.p2, e.p2)
+
+      [ e1, e2, e3, e4 ].each do |e|
+        t = RBA::Trans::new(e.p1 - RBA::Point::new)
+        cc = self.layout.create_cell("RecursivePCell", { "layer" => self.layer, "line" => t.inverted * e, "level" => self.level - 1 })
+        self.cell.insert(RBA::CellInstArray::new(cc, t))
+      end
+
+    end
+
+  end
+      
+  class PCellTestLib3 < RBA::Library
+
+    def initialize
+    
+      # set the description
+      self.description = "PCell test lib3"
+      
+      # create the PCell declarations
+      self.layout().register_pcell("RecursivePCell", RecursivePCell::new)
+
+      # register us with the name "PCellTestLib3"
+      self.register("PCellTestLib3")
+
+    end
+
+  end
+
 end
 
 # A helper for testing: provide an inspect method
@@ -806,6 +871,30 @@ class DBPCell_TestClass < TestBase
     ly._destroy
 
     lib._destroy
+
+  end
+
+  def test_12
+
+    if !RBA.constants.member?(:PCellDeclarationHelper)
+      return
+    end
+
+    # instantiate and register the library
+    tl = PCellTestLib3::new
+
+    ly = RBA::Layout::new
+
+    li1 = ly.find_layer("1/0")
+    assert_equal(li1 == nil, true)
+
+    c1 = ly.create_cell("c1")
+
+    c2 = ly.create_cell("RecursivePCell", "PCellTestLib3", { "layer" => RBA::LayerInfo::new(1, 0), "level" => 4, "line" => RBA::Edge::new(0, 0, 20000, 0) })
+    c1.insert(RBA::CellInstArray::new(c2.cell_index(), RBA::Trans::new))
+
+    assert_equal(c2.display_title, "PCellTestLib3.RecursivePCell(L=1/0,E=(0,0;20,0),LVL=4")
+    assert_equal(c1.dbbox.to_s, "(0,0;20,5.774)")
 
   end
 

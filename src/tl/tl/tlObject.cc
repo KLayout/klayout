@@ -227,6 +227,11 @@ const Object *WeakOrSharedPtr::get () const
   return mp_t;
 }
 
+void WeakOrSharedPtr::unshare ()
+{
+  m_is_shared = false;
+}
+
 void WeakOrSharedPtr::reset_object ()
 {
   tl::MutexLocker locker (&lock ());

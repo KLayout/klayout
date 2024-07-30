@@ -233,7 +233,7 @@ public:
    *
    *  The mode is either 0 (for shallow), 1 (for deep)
    */
-  bool exec_dialog (int &copy_mode);
+  bool exec_dialog (int &copy_mode, bool &dont_ask_again);
 
 private:
   Ui::CopyCellModeDialog *mp_ui;

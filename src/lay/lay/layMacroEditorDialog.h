@@ -167,6 +167,14 @@ public:
   }
 
   /**
+   *  @brief Returns true while the macro IDE is in breakpoint mode
+   */
+  bool in_breakpoint () const
+  {
+    return m_in_breakpoint;
+  }
+
+  /**
    *  @brief Selects the current category in the tree view
    */
   void select_category (const std::string &cat);

@@ -41,6 +41,7 @@
 #include "dbLayerMapping.h"
 #include "dbCellMapping.h"
 #include "dbTechnology.h"
+#include "dbLayoutUtils.h"
 #include "tlStream.h"
 #include "tlGlobPattern.h"
 
@@ -343,7 +344,7 @@ static void set_layout_property (db::Layout *l, const tl::Variant &key, const tl
   l->prop_id (l->properties_repository ().properties_id (props));
 }
 
-static tl::Variant get_layout_property (db::Layout *l, const tl::Variant &key)
+static tl::Variant get_layout_property (const db::Layout *l, const tl::Variant &key)
 {
   //  TODO: check if is editable
   
@@ -364,6 +365,21 @@ static tl::Variant get_layout_property (db::Layout *l, const tl::Variant &key)
   } else {
     return tl::Variant ();
   }
+}
+
+static tl::Variant get_layout_properties (const db::Layout *layout)
+{
+  db::properties_id_type id = layout->prop_id ();
+  if (id == 0) {
+    return tl::Variant::empty_array ();
+  }
+
+  tl::Variant res = tl::Variant::empty_array ();
+  const db::PropertiesRepository::properties_set &props = layout->properties_repository ().properties (id);
+  for (auto i = props.begin (); i != props.end (); ++i) {
+    res.insert (layout->properties_repository ().prop_name (i->first), i->second);
+  }
+  return res;
 }
 
 static db::cell_index_type cell_by_name (db::Layout *l, const char *name)
@@ -1050,6 +1066,16 @@ static void set_properties (db::Layout *layout, unsigned int index, const db::La
   }
 }
 
+void break_polygons2 (db::Layout *layout, unsigned int layer, size_t max_vertex_count, double max_area_ratio)
+{
+  db::break_polygons (*layout, layer, max_vertex_count, max_area_ratio);
+}
+
+void break_polygons1 (db::Layout *layout, size_t max_vertex_count, double max_area_ratio)
+{
+  db::break_polygons (*layout, max_vertex_count, max_area_ratio);
+}
+
 Class<db::Layout> decl_Layout ("db", "Layout",
   gsi::constructor ("new", &layout_ctor_with_manager, gsi::arg ("manager"),
     "@brief Creates a layout object attached to a manager\n"
@@ -1254,6 +1280,12 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "\n"
     "This method has been introduced in version 0.24."
   ) + 
+  gsi::method_ext ("properties", &get_layout_properties,
+    "@brief Gets the user properties as a hash\n"
+    "This method is a convenience method that gets all user properties as a single hash.\n"
+    "\n"
+    "This method has been introduced in version 0.29.5."
+  ) +
   gsi::method_ext ("properties_id", &properties_id, gsi::arg ("properties"),
     "@brief Gets the properties ID for a given properties set\n"
     "\n"
@@ -1955,6 +1987,33 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "Like the other version of \\scale_and_snap, but taking a cell index for the argument.\n"
     "\n"
     "This method has been introduced in version 0.26.1.\n"
+  ) +
+  gsi::method_ext ("break_polygons", &break_polygons1, gsi::arg ("max_vertex_count"), gsi::arg ("max_area_ratio"),
+    "@brief Breaks the polygons of the layout into smaller ones\n"
+    "\n"
+    "There are two criteria for splitting a polygon: a polygon is split into parts with less then "
+    "'max_vertex_count' points and an bounding box-to-polygon area ratio less than 'max_area_ratio'. "
+    "The area ratio is supposed to render polygons whose bounding box is a better approximation. "
+    "This applies for example to 'L' shape polygons.\n"
+    "\n"
+    "Using a value of 0 for either limit means that the respective limit isn't checked. "
+    "Breaking happens by cutting the polygons into parts at 'good' locations. The "
+    "algorithm does not have a specific goal to minimize the number of parts for example. "
+    "The only goal is to achieve parts within the given limits.\n"
+    "\n"
+    "Breaking also applies to paths if their polygon representation satisfies the breaking criterion. "
+    "In that case, paths are converted to polygons and broken into smaller parts.\n"
+    "\n"
+    "This variant applies breaking to all cells and layers.\n"
+    "\n"
+    "This method has been introduced in version 0.29.5."
+  ) +
+  gsi::method_ext ("break_polygons", &break_polygons2, gsi::arg ("layer"), gsi::arg ("max_vertex_count"), gsi::arg ("max_area_ratio"),
+    "@brief Breaks the polygons of the layer into smaller ones\n"
+    "\n"
+    "This variant applies breaking to all cells and the given layer.\n"
+    "\n"
+    "This method has been introduced in version 0.29.5."
   ) +
   gsi::method ("transform", (void (db::Layout::*) (const db::Trans &t)) &db::Layout::transform, gsi::arg ("trans"),
     "@brief Transforms the layout with the given transformation\n"

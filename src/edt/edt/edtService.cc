@@ -459,11 +459,10 @@ Service::copy_selected ()
   unsigned int inst_mode = 0;
 
   if (m_hier_copy_mode < 0) {
-    const objects &sel = selection ();
-    for (objects::const_iterator r = sel.begin (); r != sel.end () && ! need_to_ask_for_copy_mode; ++r) {
+    for (EditableSelectionIterator r = begin_selection (); ! r.at_end () && ! need_to_ask_for_copy_mode; ++r) {
       if (r->is_cell_inst ()) {
         const db::Cell &cell = view ()->cellview (r->cv_index ())->layout ().cell (r->back ().inst_ptr.cell_index ());
-        if (! cell.is_proxy ()) {
+        if (! cell.is_proxy () && ! cell.is_leaf ()) {
           need_to_ask_for_copy_mode = true;
         }
       }
@@ -500,12 +499,10 @@ Service::copy_selected ()
 void
 Service::copy_selected (unsigned int inst_mode)
 {
-  const objects &sel = selection ();
-
   //  create one ClipboardData object per cv_index because, this one assumes that there is
   //  only one source layout object.
   std::set <unsigned int> cv_indices;
-  for (objects::const_iterator r = sel.begin (); r != sel.end (); ++r) {
+  for (EditableSelectionIterator r = begin_selection (); ! r.at_end (); ++r) {
     cv_indices.insert (r->cv_index ());
   }
 
@@ -515,7 +512,7 @@ Service::copy_selected (unsigned int inst_mode)
 
     //  add the selected objects to the clipboard data objects.
     const lay::CellView &cv = view ()->cellview (*cvi);
-    for (objects::const_iterator r = sel.begin (); r != sel.end (); ++r) {
+    for (EditableSelectionIterator r = begin_selection (); ! r.at_end (); ++r) {
       if (r->cv_index () == *cvi) {
         if (! r->is_cell_inst ()) {
           cd->get ().add (cv->layout (), r->layer (), r->shape (), cv.context_trans () * r->trans ());
@@ -618,8 +615,7 @@ Service::selection_bbox ()
 
   db::DBox box;
 
-  const objects &sel = selection ();
-  for (objects::const_iterator r = sel.begin (); r != sel.end (); ++r) {
+  for (EditableSelectionIterator r = begin_selection (); ! r.at_end (); ++r) {
 
     const lay::CellView &cv = view ()->cellview (r->cv_index ());
     const db::Layout &layout = cv->layout ();
@@ -699,13 +695,10 @@ Service::transform (const db::DCplxTrans &trans, const std::vector<db::DCplxTran
   
   size_t n;
 
-  const objects &sel = selection ();
-
   //  build a list of object references corresponding to the p_trv vector 
-  std::vector <objects::iterator> obj_ptrs;
-  obj_ptrs.reserve (sel.size ());
-  for (objects::iterator r = sel.begin (); r != sel.end (); ++r) {
-    obj_ptrs.push_back (r);
+  std::vector <EditableSelectionIterator::pointer> obj_ptrs;
+  for (EditableSelectionIterator r = begin_selection (); ! r.at_end (); ++r) {
+    obj_ptrs.push_back (r.operator-> ());
   }
 
   //  build the transformation variants cache
@@ -717,7 +710,7 @@ Service::transform (const db::DCplxTrans &trans, const std::vector<db::DCplxTran
   //  The key is a triple: cell_index, cv_index, layer
   std::map <std::pair <db::cell_index_type, std::pair <unsigned int, unsigned int> >, std::vector <size_t> > shapes_by_cell;
   n = 0;
-  for (objects::iterator r = sel.begin (); r != sel.end (); ++r, ++n) {
+  for (EditableSelectionIterator r = begin_selection (); ! r.at_end (); ++r, ++n) {
     if (! r->is_cell_inst ()) {
       shapes_by_cell.insert (std::make_pair (std::make_pair (r->cell_index (), std::make_pair (r->cv_index (), r->layer ())), std::vector <size_t> ())).first->second.push_back (n);
     }
@@ -740,7 +733,7 @@ Service::transform (const db::DCplxTrans &trans, const std::vector<db::DCplxTran
 
         for (std::vector <size_t>::iterator si = sbc->second.begin (); si != sbc->second.end (); ++si) {
 
-          objects::iterator s = obj_ptrs [*si];
+          EditableSelectionIterator::pointer s = obj_ptrs [*si];
 
           //  mt = transformation in DBU units
           db::ICplxTrans mt;
@@ -764,14 +757,14 @@ Service::transform (const db::DCplxTrans &trans, const std::vector<db::DCplxTran
 
         for (std::vector <size_t>::iterator si = sbc->second.begin (); si != sbc->second.end (); ++si) {
 
-          objects::iterator &s = obj_ptrs [*si];
+          EditableSelectionIterator::pointer &s = obj_ptrs [*si];
 
           lay::ObjectInstPath new_path (*s);
           new_path.set_shape (new_shapes.find (s->shape ())->second);
 
           //  modify the selection
-          m_selection.erase (s);
-          s = m_selection.insert (new_path).first;
+          m_selection.erase (*s);
+          s = m_selection.insert (new_path).first.operator-> ();
 
         }
 
@@ -787,7 +780,7 @@ Service::transform (const db::DCplxTrans &trans, const std::vector<db::DCplxTran
   //  The key is a pair: cell_index, cv_index
   std::map <std::pair <db::cell_index_type, unsigned int>, std::vector <size_t> > insts_by_cell;
   n = 0;
-  for (objects::iterator r = sel.begin (); r != sel.end (); ++r, ++n) {
+  for (EditableSelectionIterator r = begin_selection (); ! r.at_end (); ++r, ++n) {
     if (r->is_cell_inst ()) {
       insts_by_cell.insert (std::make_pair (std::make_pair (r->cell_index (), r->cv_index ()), std::vector <size_t> ())).first->second.push_back (n);
     }
@@ -810,7 +803,7 @@ Service::transform (const db::DCplxTrans &trans, const std::vector<db::DCplxTran
 
         for (std::vector <size_t>::iterator ii = ibc->second.begin (); ii != ibc->second.end (); ++ii) {
 
-          objects::iterator i = obj_ptrs [*ii];
+          EditableSelectionIterator::pointer i = obj_ptrs [*ii];
 
           //  mt = transformation in DBU units
           db::ICplxTrans mt;
@@ -836,14 +829,14 @@ Service::transform (const db::DCplxTrans &trans, const std::vector<db::DCplxTran
 
         for (std::vector <size_t>::iterator ii = ibc->second.begin (); ii != ibc->second.end (); ++ii) {
 
-          objects::iterator &i = obj_ptrs [*ii];
+          EditableSelectionIterator::pointer &i = obj_ptrs [*ii];
 
           lay::ObjectInstPath new_path (*i);
           new_path.back ().inst_ptr = new_insts.find (i->back ().inst_ptr)->second;
 
           //  modify the selection
-          m_selection.erase (i);
-          i = m_selection.insert (new_path).first;
+          m_selection.erase (*i);
+          i = m_selection.insert (new_path).first.operator-> ();
 
         }
 
@@ -1039,8 +1032,7 @@ Service::del_selected ()
   std::set<db::Layout *> needs_cleanup;
 
   //  delete all shapes and instances.
-  const objects &sel = selection ();
-  for (objects::const_iterator r = sel.begin (); r != sel.end (); ++r) {
+  for (EditableSelectionIterator r = begin_selection (); ! r.at_end (); ++r) {
     const lay::CellView &cv = view ()->cellview (r->cv_index ());
     if (cv.is_valid ()) {
       db::Cell &cell = cv->layout ().cell (r->cell_index ());
@@ -1326,11 +1318,12 @@ static std::string path_to_string (const db::Layout &layout, const lay::ObjectIn
 void 
 Service::display_status (bool transient)
 {
-  const objects *sel = transient ? &transient_selection () : &selection ();
+  EditableSelectionIterator r = transient ? begin_transient_selection () : begin_selection ();
+  EditableSelectionIterator rr = r;
+  ++rr;
 
-  if (sel->size () == 1) {
+  if (rr.at_end ()) {
 
-    objects::const_iterator r = sel->begin ();
     const db::Layout &layout = view ()->cellview (r->cv_index ())->layout ();
 
     if (m_cell_inst_service) {
@@ -1606,6 +1599,18 @@ Service::transient_selection () const
   return m_transient_selection;
 }
 
+EditableSelectionIterator
+Service::begin_selection () const
+{
+  return EditableSelectionIterator (this, false);
+}
+
+EditableSelectionIterator
+Service::begin_transient_selection () const
+{
+  return EditableSelectionIterator (this, true);
+}
+
 bool
 Service::select (const lay::ObjectInstPath &obj, lay::Editable::SelectionMode mode)
 {
@@ -1730,17 +1735,15 @@ Service::selection_to_view ()
 void 
 Service::do_selection_to_view ()
 {
-  const objects &sel = selection ();
-
   //  Hint: this is a lower bound:
-  m_markers.reserve (sel.size ());
+  m_markers.reserve (selection_size ());
 
   //  build the transformation variants cache
   TransformationVariants tv (view ());
 
   //  Build markers
 
-  for (objects::const_iterator r = sel.begin (); r != sel.end (); ++r) {
+  for (EditableSelectionIterator r = begin_selection (); ! r.at_end (); ++r) {
 
     const lay::CellView &cv = view ()->cellview (r->cv_index ());
 
@@ -1939,12 +1942,14 @@ Service::handle_guiding_shape_changes (const lay::ObjectInstPath &obj) const
 bool 
 Service::handle_guiding_shape_changes ()
 {
+  EditableSelectionIterator s = begin_selection ();
+
   //  just allow one guiding shape to be selected
-  if (selection ().empty ()) {
+  if (s.at_end ()) {
     return false;
   }
 
-  std::pair<bool, lay::ObjectInstPath> gs = handle_guiding_shape_changes (*selection ().begin ());
+  std::pair<bool, lay::ObjectInstPath> gs = handle_guiding_shape_changes (*s);
   if (gs.first) {
 
     //  remove superfluous proxies
@@ -1966,7 +1971,20 @@ Service::handle_guiding_shape_changes ()
 //  Implementation of EditableSelectionIterator
 
 EditableSelectionIterator::EditableSelectionIterator (const std::vector<edt::Service *> &services, bool transient)
-  : m_services (services), m_service (0), m_transient_selection (transient)
+  : m_services (services.begin (), services.end ()), m_service (0), m_transient_selection (transient)
+{
+  init ();
+}
+
+EditableSelectionIterator::EditableSelectionIterator (const edt::Service *service, bool transient)
+  : m_services (), m_service (0), m_transient_selection (transient)
+{
+  m_services.push_back (service);
+  init ();
+}
+
+void
+EditableSelectionIterator::init ()
 {
   if (! m_services.empty ()) {
     if (m_transient_selection) {

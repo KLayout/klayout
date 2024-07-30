@@ -71,7 +71,7 @@ private:
 
 protected:
   std::string m_description;
-  std::vector<edt::Service::obj_iterator> m_selection_ptrs;
+  std::vector<EditableSelectionIterator::pointer> m_selection_ptrs;
   std::vector<size_t> m_indexes;
   edt::Service *mp_service;
   bool m_enable_cb_callback;

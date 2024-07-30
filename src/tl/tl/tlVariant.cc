@@ -2723,6 +2723,21 @@ void *Variant::user_take ()
   return obj;
 }
 
+void *Variant::user_unshare () const
+{
+  tl_assert (is_user () && ! user_is_ref ());
+
+  if (m_type == t_user) {
+    Variant *nc_this = const_cast<Variant *> (this);
+    nc_this->m_var.mp_user.shared = false;
+  } else if (m_type == t_user_ref) {
+    tl::WeakOrSharedPtr *wptr = const_cast<tl::WeakOrSharedPtr *> (reinterpret_cast <const tl::WeakOrSharedPtr *> (m_var.mp_user_ref.ptr));
+    wptr->unshare ();
+  }
+
+  return const_cast<void *> (to_user ());
+}
+
 void Variant::user_assign (const tl::Variant &other)
 {
   tl_assert (is_user ());

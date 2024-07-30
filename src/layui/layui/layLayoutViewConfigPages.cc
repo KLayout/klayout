@@ -42,6 +42,7 @@
 #include "ui_LayoutViewConfigPage6.h"
 #include "ui_LayoutViewConfigPage6a.h"
 #include "ui_LayoutViewConfigPage7.h"
+#include "ui_LayoutViewConfigPage8.h"
 
 #include "laySelectStippleForm.h"
 #include "laySelectLineStyleForm.h"
@@ -1530,6 +1531,37 @@ LayoutViewConfigPage7::commit (lay::Dispatcher *root)
 }
 
 // ------------------------------------------------------------
+//  LayoutConfigPage8 implementation
+
+LayoutViewConfigPage8::LayoutViewConfigPage8 (QWidget *parent)
+  : lay::ConfigPage (parent)
+{
+  mp_ui = new Ui::LayoutViewConfigPage8 ();
+  mp_ui->setupUi (this);
+}
+
+LayoutViewConfigPage8::~LayoutViewConfigPage8 ()
+{
+  delete mp_ui;
+  mp_ui = 0;
+}
+
+void
+LayoutViewConfigPage8::setup (lay::Dispatcher *root)
+{
+  int cpm = -1;
+  root->config_get (cfg_copy_cell_mode, cpm);
+  mp_ui->hier_copy_mode_cbx->setCurrentIndex ((cpm < 0 || cpm > 1) ? 2 : cpm);
+}
+
+void
+LayoutViewConfigPage8::commit (lay::Dispatcher *root)
+{
+  int cpm = mp_ui->hier_copy_mode_cbx->currentIndex ();
+  root->config_set (cfg_copy_cell_mode, (cpm < 0 || cpm > 1) ? -1 : cpm);
+}
+
+// ------------------------------------------------------------
 //  The dummy plugin declaration to register the configuration options
 
 class LayoutViewConfigDeclaration
@@ -1554,6 +1586,7 @@ public:
     pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Application|Tracking")),    new LayoutViewConfigPage2d (parent)));
     pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Application|Layer Properties")),  new LayoutViewConfigPage5 (parent)));
     pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Application|Units")),       new LayoutViewConfigPage3c (parent)));
+    pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Application|Cells")),       new LayoutViewConfigPage8 (parent)));
 
     pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Navigation|New Cell")),     new LayoutViewConfigPage3a (parent)));
     pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Navigation|Zoom And Pan")), new LayoutViewConfigPage3b (parent)));

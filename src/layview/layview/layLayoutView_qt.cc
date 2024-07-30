@@ -938,6 +938,15 @@ LayoutView::configure (const std::string &name, const std::string &value)
     }
     return true;
 
+  } else if (name == cfg_copy_cell_mode) {
+
+    if (mp_hierarchy_panel) {
+      int m = 0;
+      tl::from_string (value, m);
+      mp_hierarchy_panel->set_cell_copy_mode (m);
+    }
+    return true;
+
   } else if (name == cfg_cell_list_sorting) {
 
     if (mp_hierarchy_panel) {

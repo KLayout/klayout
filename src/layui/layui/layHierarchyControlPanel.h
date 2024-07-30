@@ -220,6 +220,12 @@ public:
   void paste ();
 
   /**
+   *  @brief Selects cell copy mode
+   *  0: shallow, 1: deep, -1: ask
+   */
+  void set_cell_copy_mode (int m);
+
+  /**
    *  @brief Return true, if the panel has a selection
    */
   bool has_selection ();
@@ -308,6 +314,7 @@ private:
   QSplitter *mp_splitter;
   tl::Color m_background_color;
   tl::Color m_text_color;
+  int m_cell_copy_mode;
   tl::DeferredMethod<HierarchyControlPanel> m_do_update_content_dm;
   tl::DeferredMethod<HierarchyControlPanel> m_do_full_update_content_dm;
   std::unique_ptr<QStyle> mp_tree_style;
@@ -336,6 +343,9 @@ private:
 
   //  clears all widgets of the cell lists
   void clear_all ();
+
+  //  ask for cell copy mode
+  bool ask_for_cell_copy_mode (const db::Layout &layout, const std::vector<cell_path_type> &paths, int &cell_copy_mode);
 };
 
 } // namespace lay

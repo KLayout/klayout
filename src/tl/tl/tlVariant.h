@@ -995,6 +995,13 @@ public:
   void *user_take ();
 
   /**
+   *  @brief Takes the user object and releases ownership by the variant
+   *  This method is const as it does not change the value, but the ownership of
+   *  the contained object. The object must not be "user_is_ref".
+   */
+  void *user_unshare () const;
+
+  /**
    *  @brief Assigns the object stored in other to self
    *
    *  "other" needs to be a user object and the class of "other" needs to be same as self.

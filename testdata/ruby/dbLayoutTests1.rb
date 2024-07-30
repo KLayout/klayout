@@ -1334,6 +1334,7 @@ class DBLayoutTests1_TestClass < TestBase
     i0 = nil
     c0c.each_inst { |i| i.cell_index == l.cell("c1$1").cell_index && i0 = i }
     assert_equal(i0.property("p"), 18)
+    assert_equal(i0.properties, {"p" => 18})
     assert_equal(l.cell("c1$1").begin_shapes_rec(0).shape.property("p"), 17)
 
     assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c0$1](0,100;1000,1200)/[c2$1](100,0;1100,1100)/[c3$1](1200,0;2200,1100)/[c3$1](-1200,0;-100,1000)/[c1$1](0,100;1000,1200)")
@@ -1379,6 +1380,7 @@ class DBLayoutTests1_TestClass < TestBase
 
     tt = RBA::Trans.new
     i0 = c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
+    assert_equal(i0.properties, {})
     i0.set_property("p", 18)
     c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
     c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
@@ -2097,6 +2099,48 @@ class DBLayoutTests1_TestClass < TestBase
     assert_equal(17, ly_dup.property("k1"))
     assert_equal("42", ly_dup.property(17))
     assert_equal(nil, ly_dup.property(42))
+
+  end
+
+  # break_polygons
+  def test_25
+
+    def shapes2str(shapes)
+      str = []
+      shapes.each do |s|
+        str << s.to_s
+      end
+      str.join(";")
+    end
+
+    ly = RBA::Layout::new
+    top = ly.create_cell("TOP")
+    l1 = ly.layer(1, 0)
+    l2 = ly.layer(2, 0)
+
+    top.shapes(l1).insert(RBA::Polygon::new([ [0, 0], [0, 10000], [10000, 10000], [10000, 9000], [1000, 9000], [1000, 0] ]))
+    top.shapes(l2).insert(RBA::Polygon::new([ [0, 0], [0, 10000], [10000, 10000], [10000, 9000], [1000, 9000], [1000, 0] ]))
+    
+    assert_equal(shapes2str(top.shapes(l1)), "polygon (0,0;0,10000;10000,10000;10000,9000;1000,9000;1000,0)")
+    assert_equal(shapes2str(top.shapes(l2)), "polygon (0,0;0,10000;10000,10000;10000,9000;1000,9000;1000,0)")
+
+    s1 = top.shapes(l1).dup
+    assert_equal(shapes2str(s1), "polygon (0,0;0,10000;10000,10000;10000,9000;1000,9000;1000,0)")
+    s1.break_polygons(10, 3.0)
+    assert_equal(shapes2str(s1), "polygon (0,0;0,9000;1000,9000;1000,0);polygon (0,9000;0,10000;10000,10000;10000,9000)")
+
+    ly2 = ly.dup
+    top2 = ly2.top_cell
+
+    ly.break_polygons(10, 3.0)
+
+    assert_equal(shapes2str(top.shapes(l1)), "polygon (0,0;0,9000;1000,9000;1000,0);polygon (0,9000;0,10000;10000,10000;10000,9000)")
+    assert_equal(shapes2str(top.shapes(l2)), "polygon (0,0;0,9000;1000,9000;1000,0);polygon (0,9000;0,10000;10000,10000;10000,9000)")
+
+    ly2.break_polygons(ly2.layer(1, 0), 10, 3.0)
+
+    assert_equal(shapes2str(top2.shapes(ly2.layer(1, 0))), "polygon (0,0;0,9000;1000,9000;1000,0);polygon (0,9000;0,10000;10000,10000;10000,9000)")
+    assert_equal(shapes2str(top2.shapes(ly2.layer(2, 0))), "polygon (0,0;0,10000;10000,10000;10000,9000;1000,9000;1000,0)")
 
   end
 

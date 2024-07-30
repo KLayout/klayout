@@ -218,6 +218,7 @@ HierarchyControlPanel::HierarchyControlPanel (lay::LayoutViewBase *view, QWidget
     m_flat (false),
     m_split_mode (false),
     m_sorting (CellTreeModel::ByName),
+    m_cell_copy_mode (-1),
     m_do_update_content_dm (this, &HierarchyControlPanel::do_update_content),
     m_do_full_update_content_dm (this, &HierarchyControlPanel::do_full_update_content)
 {
@@ -396,6 +397,12 @@ HierarchyControlPanel::clear_all ()
   mp_cell_list_frames.clear ();
   mp_cell_list_headers.clear ();
   mp_cell_lists.clear ();
+}
+
+void
+HierarchyControlPanel::set_cell_copy_mode (int m)
+{
+  m_cell_copy_mode = m;
 }
 
 void
@@ -1002,6 +1009,47 @@ HierarchyControlPanel::has_focus () const
   return m_active_index >= 0 && m_active_index < int (mp_cell_lists.size ()) && mp_cell_lists [m_active_index]->hasFocus ();
 }
 
+bool
+HierarchyControlPanel::ask_for_cell_copy_mode (const db::Layout &layout, const std::vector<cell_path_type> &paths, int &cell_copy_mode)
+{
+  bool needs_to_ask = false;
+  cell_copy_mode = 0;
+
+  if (m_cell_copy_mode < 0) {  //  ask
+
+    //  check if there is a cell that we have to ask for
+    for (std::vector<cell_path_type>::const_iterator p = paths.begin (); p != paths.end (); ++p) {
+      if (! p->empty ()) {
+        const db::Cell &cell = layout.cell (p->back ());
+        if (! cell.is_proxy () && ! cell.is_leaf ()) {
+          needs_to_ask = true;
+        }
+      }
+    }
+
+  } else {
+    cell_copy_mode = m_cell_copy_mode;
+  }
+
+  if (needs_to_ask) {
+
+    bool dont_ask_again = false;
+
+    lay::CopyCellModeDialog mode_dialog (this);
+    if (! mode_dialog.exec_dialog (cell_copy_mode, dont_ask_again)) {
+      return false;
+    }
+
+    if (dont_ask_again) {
+      view ()->dispatcher ()->config_set (cfg_copy_cell_mode, tl::to_string (cell_copy_mode));
+      view ()->dispatcher ()->config_end ();
+    }
+
+  }
+
+  return true;
+}
+
 void
 HierarchyControlPanel::cut () 
 {
@@ -1017,34 +1065,25 @@ HierarchyControlPanel::cut ()
   }
 
   //  first copy
-  bool needs_to_ask = false;
 
   db::Layout &layout = m_cellviews [m_active_index]->layout ();
   if (! layout.is_editable ()) {
     return;
   }
 
-  //  collect the called cells of the cells to copy, so we don't copy a cell twice
-
   db::Clipboard::instance ().clear ();
 
-  //  don't copy the cells which would be copied anyway
+  int cut_mode = 1; // 0: shallow, 1: deep
+  if (! ask_for_cell_copy_mode (layout, paths, cut_mode)) {
+    return;
+  }
+
+  //  collect the called cells of the cells to copy, so we don't copy a cell twice
   std::set<db::cell_index_type> called_cells;
   for (std::vector<cell_path_type>::const_iterator p = paths.begin (); p != paths.end (); ++p) {
     if (! p->empty ()) {
       const db::Cell &cell = layout.cell (p->back ());
       cell.collect_called_cells (called_cells);
-      if (cell.cell_instances () > 0) {
-        needs_to_ask = true;
-      }
-    }
-  }
-
-  int cut_mode = 1; // 0: shallow, 1: deep
-  if (needs_to_ask) {
-    lay::CopyCellModeDialog mode_dialog (this);
-    if (! mode_dialog.exec_dialog (cut_mode)) {
-      return;
     }
   }
 
@@ -1115,34 +1154,25 @@ HierarchyControlPanel::copy ()
     return;
   }
 
-  bool needs_to_ask = false;
-
   db::Layout &layout = m_cellviews [m_active_index]->layout ();
-
-  //  collect the called cells of the cells to copy, so we don't copy a cell twice
 
   db::Clipboard::instance ().clear ();
 
-  //  don't copy the cells which would be copied anyway
+  int copy_mode = 1; // 0: shallow, 1: deep
+  if (! ask_for_cell_copy_mode (layout, paths, copy_mode)) {
+    return;
+  }
+
+  //  collect the called cells of the cells to copy, so we don't copy a cell twice
   std::set<db::cell_index_type> called_cells;
   for (std::vector<cell_path_type>::const_iterator p = paths.begin (); p != paths.end (); ++p) {
     if (! p->empty ()) {
       const db::Cell &cell = layout.cell (p->back ());
       cell.collect_called_cells (called_cells);
-      if (cell.cell_instances () > 0) {
-        needs_to_ask = true;
-      }
     }
   }
 
-  int copy_mode = 1; // 0: shallow, 1: deep
-  if (needs_to_ask) {
-    lay::CopyCellModeDialog mode_dialog (this);
-    if (! mode_dialog.exec_dialog (copy_mode)) {
-      return;
-    }
-  }
-
+  //  actually copy
   for (std::vector<cell_path_type>::const_iterator p = paths.begin (); p != paths.end (); ++p) {
     if (! p->empty () && called_cells.find (p->back ()) == called_cells.end ()) {
       db::ClipboardValue<lay::CellClipboardData> *cd = new db::ClipboardValue<lay::CellClipboardData> ();

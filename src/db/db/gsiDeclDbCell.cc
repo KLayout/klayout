@@ -1104,14 +1104,14 @@ static void set_cell_property (db::Cell *c, const tl::Variant &key, const tl::Va
   c->prop_id (layout->properties_repository ().properties_id (props));
 }
 
-static tl::Variant get_cell_property (db::Cell *c, const tl::Variant &key)
+static tl::Variant get_cell_property (const db::Cell *c, const tl::Variant &key)
 {
   db::properties_id_type id = c->prop_id ();
   if (id == 0) {
     return tl::Variant ();
   }
 
-  db::Layout *layout = c->layout ();
+  const db::Layout *layout = c->layout ();
   if (! layout) {
     throw tl::Exception (tl::to_string (tr ("Cell does not reside inside a layout - cannot retrieve properties")));
   }
@@ -1128,6 +1128,26 @@ static tl::Variant get_cell_property (db::Cell *c, const tl::Variant &key)
   } else {
     return tl::Variant ();
   }
+}
+
+static tl::Variant get_cell_properties (const db::Cell *c)
+{
+  db::properties_id_type id = c->prop_id ();
+  if (id == 0) {
+    return tl::Variant::empty_array ();
+  }
+
+  const db::Layout *layout = c->layout ();
+  if (! layout) {
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside inside a layout - cannot retrieve properties")));
+  }
+
+  tl::Variant res = tl::Variant::empty_array ();
+  const db::PropertiesRepository::properties_set &props = layout->properties_repository ().properties (id);
+  for (auto i = props.begin (); i != props.end (); ++i) {
+    res.insert (layout->properties_repository ().prop_name (i->first), i->second);
+  }
+  return res;
 }
 
 static bool is_pcell_variant (const db::Cell *cell)
@@ -1841,10 +1861,16 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "@brief Gets the user property with the given key\n"
     "This method is a convenience method that gets the property with the given key. "
     "If no property with that key exists, it will return nil. Using that method is more "
-    "convenient than using the layout object and the properties ID to retrieve the property value. "
+    "convenient than using the layout object and the properties ID to retrieve the property value.\n"
     "\n"
     "This method has been introduced in version 0.23."
   ) + 
+  gsi::method_ext ("properties", &get_cell_properties,
+    "@brief Gets the user properties as a hash\n"
+    "This method is a convenience method that gets all user properties as a single hash.\n"
+    "\n"
+    "This method has been introduced in version 0.29.5."
+  ) +
   gsi::method_ext ("add_meta_info", &cell_add_meta_info, gsi::arg ("info"),
     "@brief Adds meta information to the cell\n"
     "See \\LayoutMetaInfo for details about cells and meta information.\n"
@@ -3539,6 +3565,26 @@ static tl::Variant get_property (const db::Instance *i, const tl::Variant &key)
   }
 }
 
+static tl::Variant get_properties (const db::Instance *i)
+{
+  db::properties_id_type id = i->prop_id ();
+  if (id == 0) {
+    return tl::Variant::empty_array ();
+  }
+
+  const db::Layout *layout = layout_ptr_const (i);
+  if (! layout) {
+    throw tl::Exception (tl::to_string (tr ("Instance does not reside inside a layout - cannot retrieve properties")));
+  }
+
+  tl::Variant res = tl::Variant::empty_array ();
+  const db::PropertiesRepository::properties_set &props = layout->properties_repository ().properties (id);
+  for (auto i = props.begin (); i != props.end (); ++i) {
+    res.insert (layout->properties_repository ().prop_name (i->first), i->second);
+  }
+  return res;
+}
+
 static bool inst_is_valid (const db::Instance *inst)
 {
   return inst->instances () && inst->instances ()->is_valid (*inst);
@@ -4011,6 +4057,12 @@ Class<db::Instance> decl_Instance ("db", "Instance",
     "\n"
     "This method has been introduced in version 0.22."
   ) + 
+  gsi::method_ext ("properties", &get_properties,
+    "@brief Gets the user properties as a hash\n"
+    "This method is a convenience method that gets all user properties as a single hash.\n"
+    "\n"
+    "This method has been introduced in version 0.29.5."
+  ) +
   method_ext ("[]", &inst_index, gsi::arg ("key"),
     "@brief Gets the user property with the given key or, if available, the PCell parameter with the name given by the key\n"
     "Getting the PCell parameter has priority over the user property."

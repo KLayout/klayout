@@ -683,5 +683,106 @@ scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db
   }
 }
 
+
+// ------------------------------------------------------------
+//  break_polygons implementation
+
+static bool split_polygon (bool first, db::Polygon &poly, size_t max_vertex_count, double max_area_ratio, std::vector<db::Polygon> &parts)
+{
+  if ((max_vertex_count > 0 && poly.vertices () > max_vertex_count) ||
+      (max_area_ratio > 0 && poly.area_ratio () > max_area_ratio)) {
+
+    std::vector<db::Polygon> sp;
+    db::split_polygon (poly, sp);
+    for (auto p = sp.begin (); p != sp.end (); ++p) {
+      split_polygon (false, *p, max_vertex_count, max_area_ratio, parts);
+    }
+
+    return true;
+
+  } else {
+
+    if (! first) {
+      parts.push_back (db::Polygon ());
+      parts.back ().swap (poly);
+    }
+
+    return false;
+
+  }
+}
+
+void
+break_polygons (db::Shapes &shapes, size_t max_vertex_count, double max_area_ratio)
+{
+  if (shapes.is_editable ()) {
+
+    std::vector<db::Polygon> new_polygons;
+    std::vector<db::Shape> to_delete;
+
+    for (auto s = shapes.begin (db::ShapeIterator::Polygons | db::ShapeIterator::Paths); ! s.at_end (); ++s) {
+      db::Polygon poly;
+      s->instantiate (poly);
+      if (split_polygon (true, poly, max_vertex_count, max_area_ratio, new_polygons)) {
+        to_delete.push_back (*s);
+      }
+    }
+
+    shapes.erase_shapes (to_delete);
+
+    for (auto p = new_polygons.begin (); p != new_polygons.end (); ++p) {
+      shapes.insert (*p);
+    }
+
+  } else {
+
+    //  In non-editable mode we cannot do "erase", so we use a temporary, editable Shapes container
+    db::Shapes tmp (true);
+    tmp.insert (shapes);
+
+    shapes.clear ();
+    break_polygons (tmp, max_vertex_count, max_area_ratio);
+    shapes.insert (tmp);
+
+    tl_assert (!shapes.is_editable ());
+
+  }
+}
+
+void
+break_polygons (db::Layout &layout, db::cell_index_type cell_index, unsigned int layer, size_t max_vertex_count, double max_area_ratio)
+{
+  if (layout.is_valid_cell_index (cell_index) && layout.is_valid_layer (layer)) {
+    db::Cell &cell = layout.cell (cell_index);
+    break_polygons (cell.shapes (layer), max_vertex_count, max_area_ratio);
+  }
+}
+
+void
+break_polygons (db::Layout &layout, unsigned int layer, size_t max_vertex_count, double max_area_ratio)
+{
+  for (db::cell_index_type ci = 0; ci < layout.cells (); ++ci) {
+    if (layout.is_valid_cell_index (ci)) {
+      db::Cell &cell = layout.cell (ci);
+      break_polygons (cell.shapes (layer), max_vertex_count, max_area_ratio);
+    }
+  }
+}
+
+void
+break_polygons (db::Layout &layout, size_t max_vertex_count, double max_area_ratio)
+{
+  for (db::cell_index_type ci = 0; ci < layout.cells (); ++ci) {
+    if (layout.is_valid_cell_index (ci)) {
+      db::Cell &cell = layout.cell (ci);
+      for (unsigned int li = 0; li < layout.layers (); ++li) {
+        if (layout.is_valid_layer (li)) {
+          break_polygons (cell.shapes (li), max_vertex_count, max_area_ratio);
+        }
+      }
+    }
+  }
+}
+
 }
 

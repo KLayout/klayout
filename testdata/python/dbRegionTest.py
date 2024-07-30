@@ -81,6 +81,31 @@ class DBRegionTest(unittest.TestCase):
     dss = None
     self.assertEqual(pya.DeepShapeStore.instance_count(), 0)
 
+  # begin_shapes_rec and begin_shapes_merged_rec
+  def test_extended_iter(self):
+
+    r = pya.Region()
+
+    # NOTE: this also tests the copy semantics of the RecursiveShape to Variant binding in RBA:
+    it, trans = r.begin_shapes_rec()
+    s = ",".join([ str(trans*i.trans()*i.shape().polygon) for i in it.each() ])
+    self.assertEqual(s, "")
+
+    it, trans = r.begin_merged_shapes_rec()
+    s = ",".join([ str(trans*i.trans()*i.shape().polygon) for i in it.each() ])
+    self.assertEqual(s, "")
+
+    r.insert(pya.Box(0, 0, 100, 100))
+    r.insert(pya.Box(50, 50, 200, 200))
+
+    it, trans = r.begin_shapes_rec()
+    s = ",".join([ str(trans*i.trans()*i.shape().polygon) for i in it.each() ])
+    self.assertEqual(s, "(0,0;0,100;100,100;100,0),(50,50;50,200;200,200;200,50)")
+
+    it, trans = r.begin_merged_shapes_rec()
+    s = ",".join([ str(trans*i.trans()*i.shape().polygon) for i in it.each() ])
+    self.assertEqual(s, "(0,0;0,100;50,100;50,200;200,200;200,50;100,50;100,0)")
+
 # run unit tests
 if __name__ == '__main__':
   suite = unittest.TestLoader().loadTestsFromTestCase(DBRegionTest)

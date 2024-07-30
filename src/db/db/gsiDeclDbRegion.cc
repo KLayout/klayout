@@ -1132,6 +1132,24 @@ rasterize1 (const db::Region *region, const db::Point &origin, const db::Vector 
   return rasterize2 (region, origin, pixel_size, pixel_size, nx, ny);
 }
 
+static tl::Variant begin_shapes_rec (const db::Region *region)
+{
+  auto res = region->begin_iter ();
+  tl::Variant r = tl::Variant (std::vector<tl::Variant> ());
+  r.push (tl::Variant (res.first));
+  r.push (tl::Variant (res.second));
+  return r;
+}
+
+static tl::Variant begin_merged_shapes_rec (const db::Region *region)
+{
+  auto res = region->begin_merged_iter ();
+  tl::Variant r = tl::Variant (std::vector<tl::Variant> ());
+  r.push (tl::Variant (res.first));
+  r.push (tl::Variant (res.second));
+  return r;
+}
+
 static db::Point default_origin;
 
 //  provided by gsiDeclDbPolygon.cc:
@@ -2895,7 +2913,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "This method returns all polygons in self which are not rectilinear."
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
-  method_ext ("break", &break_polygons, gsi::arg ("max_vertex_count"), gsi::arg ("max_area_ratio", 0.0),
+  method_ext ("break_polygons|#break", &break_polygons, gsi::arg ("max_vertex_count"), gsi::arg ("max_area_ratio", 0.0),
     "@brief Breaks the polygons of the region into smaller ones\n"
     "\n"
     "There are two criteria for splitting a polygon: a polygon is split into parts with less then "
@@ -2908,7 +2926,8 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "algorithm does not have a specific goal to minimize the number of parts for example. "
     "The only goal is to achieve parts within the given limits.\n"
     "\n"
-    "This method has been introduced in version 0.26."
+    "This method has been introduced in version 0.26. The 'break_polygons' alias has been introduced "
+    "in version 0.29.5 to avoid issues with reserved keywords."
   ) +
   method_ext ("delaunay", &delaunay,
     "@brief Computes a constrained Delaunay triangulation from the given region\n"
@@ -2931,6 +2950,8 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "A minimum number for b can be given. The default of 1.0 corresponds to a minimum angle of 30 degree "
     "and is usually a good choice. The algorithm is stable up to roughly 1.2 which corresponds to "
     "a minimum angle of abouth 37 degree.\n"
+    "\n"
+    "The minimum angle of the resulting triangles relates to the 'b' parameter as: @t min_angle = arcsin(B/2) @/t.\n"
     "\n"
     "The area value is given in terms of DBU units. Picking a value of 0.0 for area and min b will "
     "make the implementation skip the refinement step. In that case, the results are identical to "
@@ -3756,7 +3777,32 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "metal1_all_nets = metal1.nets\n"
     "@/code\n"
     "\n"
-    "This method was introduced in version 0.28.4"
+    "This method was introduced in version 0.28.4."
+  ) +
+  gsi::method_ext ("begin_shapes_rec", &begin_shapes_rec,
+    "@brief Returns a recursive shape iterator plus a transformation for the shapes constituting this region.\n"
+    "This method returns a pair consisting of a \\RecursiveShapeIterator plus a \\ICplxTrans transformation. "
+    "Both objects allow accessing the shapes (polygons) of the region in a detailed fashion. To iterate the "
+    "the polygons use a code like this:\n"
+    "\n"
+    "@code\n"
+    "iter, trans = region.begin_shapes_rec\n"
+    "iter.each do |i|\n"
+    "  polygon = trans * iter.trans * i.shape.polygon\n"
+    "  ...\n"
+    "end\n"
+    "@/code\n"
+    "\n"
+    "This method is the most powerful way of accessing the shapes inside the region. I allows for example to obtain the "
+    "properties attached to the polygons of the region. It is primarily intended for special applications like iterating net-annotated shapes.\n"
+    "\n"
+    "This speciality method was introduced in version 0.29.5."
+  ) +
+  gsi::method_ext ("begin_merged_shapes_rec", &begin_merged_shapes_rec,
+    "@brief Returns a recursive shape iterator plus a transformation for the shapes constituting the merged region.\n"
+    "It can be used like \\begin_shapes_rec, but delivers shapes from the merged polygons pool.\n"
+    "\n"
+    "This speciality method was introduced in version 0.29.5."
   ) +
   gsi::make_property_methods<db::Region> ()
   ,

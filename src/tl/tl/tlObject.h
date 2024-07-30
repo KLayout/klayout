@@ -198,6 +198,12 @@ public:
   void detach_from_all_events ();
 
   /**
+   *  @brief Unshares the object
+   *  This will turn a shared reference into a weak one.
+   */
+  void unshare ();
+
+  /**
    *  @brief Indicates that this object is an event
    *  This property is intended for internal use only.
    */
@@ -401,6 +407,9 @@ public:
   {
     //  .. nothing yet ..
   }
+
+private:
+  using weak_or_shared_ptr<T, false>::unshare;
 };
 
 /**
@@ -429,6 +438,9 @@ public:
   {
     //  .. nothing yet ..
   }
+
+private:
+  using weak_or_shared_ptr<T, true>::unshare;
 };
 
 }

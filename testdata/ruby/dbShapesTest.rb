@@ -1656,6 +1656,28 @@ class DBShapes_TestClass < TestBase
 
   end
 
+  # Shape objects and properties
+  def test_13
+
+    ly = RBA::Layout::new
+    l1 = ly.layer(1, 0)
+    tc = ly.create_cell("TOP")
+    sh = tc.shapes(l1).insert(RBA::Box::new(0, 0, 100, 200))
+
+    assert_equal(sh.property("k").inspect, "nil")
+    assert_equal(sh.properties.inspect, "{}")
+
+    sh.set_property("k", 17)
+    
+    assert_equal(sh.property("k").inspect, "17")
+    assert_equal(sh.property("u").inspect, "nil")
+    assert_equal(sh.properties.inspect, "{\"k\"=>17}")
+
+    sh.set_property("u", "42")
+    assert_equal(sh.properties.inspect, "{\"k\"=>17, \"u\"=>\"42\"}")
+
+  end
+
 end
 
 load("test_epilogue.rb")

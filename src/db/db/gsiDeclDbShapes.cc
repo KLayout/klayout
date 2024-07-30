@@ -30,6 +30,7 @@
 #include "dbRegion.h"
 #include "dbEdgePairs.h"
 #include "dbEdges.h"
+#include "dbLayoutUtils.h"
 
 namespace gsi
 {
@@ -441,6 +442,11 @@ static db::Layout *layout (db::Shapes *sh)
   }
 }
 
+static void break_polygons (db::Shapes *sh, size_t max_vertex_count, double max_area_ratio)
+{
+  db::break_polygons (*sh, max_vertex_count, max_area_ratio);
+}
+
 static unsigned int s_all ()                 { return db::ShapeIterator::All; }
 static unsigned int s_all_with_properties () { return db::ShapeIterator::AllWithProperties; }
 static unsigned int s_properties ()          { return db::ShapeIterator::Properties; }
@@ -790,6 +796,24 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "It is permitted in editable mode only."
     "\n"
     "This method has been introduced in version 0.25.\n"
+  ) +
+  gsi::method_ext ("break_polygons", &break_polygons, gsi::arg ("max_vertex_count"), gsi::arg ("max_area_ratio", 0.0),
+    "@brief Breaks the polygons of the shape container into smaller ones\n"
+    "\n"
+    "There are two criteria for splitting a polygon: a polygon is split into parts with less then "
+    "'max_vertex_count' points and an bounding box-to-polygon area ratio less than 'max_area_ratio'. "
+    "The area ratio is supposed to render polygons whose bounding box is a better approximation. "
+    "This applies for example to 'L' shape polygons.\n"
+    "\n"
+    "Using a value of 0 for either limit means that the respective limit isn't checked. "
+    "Breaking happens by cutting the polygons into parts at 'good' locations. The "
+    "algorithm does not have a specific goal to minimize the number of parts for example. "
+    "The only goal is to achieve parts within the given limits.\n"
+    "\n"
+    "Breaking also applies to paths if their polygon representation satisfies the breaking criterion. "
+    "In that case, paths are converted to polygons and broken into smaller parts.\n"
+    "\n"
+    "This method has been introduced in version 0.29.5."
   ) +
   gsi::method_ext ("replace", &replace<db::Box>, gsi::arg ("shape"), gsi::arg ("box"),
     "@brief Replaces the given shape with a box\n"

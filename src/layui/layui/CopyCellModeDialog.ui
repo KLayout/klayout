@@ -1,46 +1,41 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>CopyCellModeDialog</class>
- <widget class="QDialog" name="CopyCellModeDialog" >
-  <property name="geometry" >
+ <widget class="QDialog" name="CopyCellModeDialog">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>178</height>
+    <width>546</width>
+    <height>198</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Copy Cell Options</string>
   </property>
-  <layout class="QVBoxLayout" >
-   <property name="margin" >
-    <number>9</number>
-   </property>
-   <property name="spacing" >
-    <number>6</number>
-   </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QGroupBox" name="groupBox" >
-     <property name="title" >
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
       <string>Copy Cell Mode</string>
      </property>
-     <layout class="QVBoxLayout" >
-      <property name="margin" >
-       <number>9</number>
-      </property>
-      <property name="spacing" >
+     <layout class="QVBoxLayout">
+      <property name="spacing">
        <number>6</number>
       </property>
+      <property name="margin" stdset="0">
+       <number>9</number>
+      </property>
       <item>
-       <widget class="QRadioButton" name="shallow_rb" >
-        <property name="text" >
+       <widget class="QRadioButton" name="shallow_rb">
+        <property name="text">
          <string>Shallow copy (don't copy subcells)</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="deep_rb" >
-        <property name="text" >
+       <widget class="QRadioButton" name="deep_rb">
+        <property name="text">
          <string>Deep copy (include subcells)</string>
         </property>
        </widget>
@@ -49,11 +44,18 @@
     </widget>
    </item>
    <item>
+    <widget class="QCheckBox" name="dont_ask_cbx">
+     <property name="text">
+      <string>Don't ask again (you can always reset this in Setup: Application/Cells page)</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <spacer>
-     <property name="orientation" >
+     <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>382</width>
        <height>31</height>
@@ -62,12 +64,12 @@
     </spacer>
    </item>
    <item>
-    <widget class="QDialogButtonBox" name="buttonBox" >
-     <property name="orientation" >
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <property name="standardButtons" >
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::NoButton|QDialogButtonBox::Ok</set>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
     </widget>
    </item>
@@ -86,11 +88,11 @@
    <receiver>CopyCellModeDialog</receiver>
    <slot>accept()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>248</x>
      <y>254</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>157</x>
      <y>274</y>
     </hint>
@@ -102,11 +104,11 @@
    <receiver>CopyCellModeDialog</receiver>
    <slot>reject()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>316</x>
      <y>260</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>286</x>
      <y>274</y>
     </hint>

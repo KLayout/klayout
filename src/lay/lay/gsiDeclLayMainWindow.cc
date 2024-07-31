@@ -51,6 +51,8 @@ static const char *cm_symbols[] = {
   "cm_unselect_all",
   "cm_undo",
   "cm_redo",
+  "cm_undo_list",
+  "cm_redo_list",
   "cm_delete",
   "cm_show_properties",
   "cm_copy",

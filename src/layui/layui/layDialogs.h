@@ -32,6 +32,7 @@
 #include <memory>
 
 class QTreeWidgetItem;
+class QModelIndex;
 
 namespace lay
 {
@@ -57,6 +58,7 @@ namespace Ui
   class FlattenInstOptionsDialog;
   class UserPropertiesForm;
   class UserPropertiesEditForm;
+  class UndoRedoListForm;
 }
 
 namespace lay
@@ -458,6 +460,30 @@ public:
   virtual void accept ();
 
   Ui::UserPropertiesEditForm *mp_ui;
+};
+
+/**
+ *  @brief The undo/redo list form
+ */
+class LAYUI_PUBLIC UndoRedoListForm
+  : public QDialog
+{
+Q_OBJECT
+
+public:
+  UndoRedoListForm (QWidget *parent, db::Manager *manager, bool for_undo);
+  virtual ~UndoRedoListForm ();
+
+  bool exec (int &steps);
+
+private slots:
+  void selection_changed (const QModelIndex &current);
+
+private:
+  Ui::UndoRedoListForm *mp_ui;
+  bool m_for_undo;
+  db::Manager *mp_manager;
+  int m_steps;
 };
 
 }

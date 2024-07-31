@@ -283,7 +283,7 @@ Manager::redo ()
   }
 }
 
-std::pair<bool, std::string> 
+std::pair<bool, std::string>
 Manager::available_undo () const
 {
   if (m_opened || m_current == m_transactions.begin ()) {
@@ -304,6 +304,71 @@ Manager::available_redo () const
     return std::make_pair (true, m_current->second);
   }
 }
+
+int
+Manager::available_undo_items ()
+{
+  if (m_opened) {
+    return 0;
+  }
+
+  int n = 0;
+  for (auto i = m_current; i != m_transactions.begin (); --i) {
+    ++n;
+  }
+  return n;
+}
+
+int
+Manager::available_redo_items ()
+{
+  if (m_opened) {
+    return 0;
+  }
+
+  int n = 0;
+  for (auto i = m_current; i != m_transactions.end (); ++i) {
+    ++n;
+  }
+  return n;
+}
+
+std::string
+Manager::undo_or_redo_item (int delta) const
+{
+  if (delta < 0) {
+
+    auto i = m_current;
+    while (delta < 0) {
+      if (i == m_transactions.begin ()) {
+        return std::string ();
+      }
+      ++delta;
+      --i;
+    }
+
+    return i->second;
+
+  } else {
+
+    auto i = m_current;
+    while (delta > 0) {
+      if (i == m_transactions.end ()) {
+        return std::string ();
+      }
+      --delta;
+      ++i;
+    }
+
+    if (i == m_transactions.end ()) {
+      return std::string ();
+    } else {
+      return i->second;
+    }
+
+  }
+}
+
 
 db::Op *
 Manager::last_queued (db::Object *object) 

@@ -1320,9 +1320,8 @@ Service::display_status (bool transient)
 {
   EditableSelectionIterator r = transient ? begin_transient_selection () : begin_selection ();
   EditableSelectionIterator rr = r;
-  ++rr;
 
-  if (rr.at_end ()) {
+  if (! rr.at_end () && (++rr).at_end ()) {
 
     const db::Layout &layout = view ()->cellview (r->cv_index ())->layout ();
 

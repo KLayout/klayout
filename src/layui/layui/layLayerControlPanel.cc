@@ -338,6 +338,7 @@ LayerControlPanel::LayerControlPanel (lay::LayoutViewBase *view, db::Manager *ma
   mp_view->cellview_changed_event.add (this, &LayerControlPanel::signal_cv_changed_with_int);
   mp_view->viewport_changed_event.add (this, &LayerControlPanel::signal_vp_changed);
   mp_view->hier_levels_changed_event.add (this, &LayerControlPanel::signal_vp_changed);
+  mp_view->resolution_changed_event.add (this, &LayerControlPanel::signal_resolution_changed);
 
   QFrame *tb = new QFrame (this);
   l->addWidget (tb);
@@ -2049,6 +2050,12 @@ LayerControlPanel::redo (db::Op *op)
     set_selection (std::vector<lay::LayerPropertiesConstIterator> ()); // clear selection
     return;
   }
+}
+
+void
+LayerControlPanel::signal_resolution_changed ()
+{
+  m_do_update_content_dm ();
 }
 
 void 

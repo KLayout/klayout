@@ -339,6 +339,14 @@ public:
   double resolution () const;
 
   /**
+   *  @brief Gets the gamma value
+   */
+  double gamma () const
+  {
+    return m_gamma;
+  }
+
+  /**
    *  @brief Reimplementation of ViewObjectCanvas: Background color 
    */
   tl::Color background_color () const

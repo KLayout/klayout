@@ -385,6 +385,7 @@ private:
   void signal_cv_changed ();
   void signal_cv_changed_with_int (int index);
   void signal_vp_changed ();
+  void signal_resolution_changed ();
 
   void do_update_content ();
   void do_update_visibility ();

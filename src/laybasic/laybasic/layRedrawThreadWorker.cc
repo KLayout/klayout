@@ -204,7 +204,7 @@ RedrawThreadWorker::perform_task (tl::Task *task)
           mp_renderer->draw_texts (m_text_visible);
           mp_renderer->draw_properties (m_show_properties);
           mp_renderer->draw_description_property (false);
-          mp_renderer->default_text_size (db::Coord (m_default_text_size / mp_layout->dbu ()));
+          mp_renderer->default_text_size (m_default_text_size / mp_layout->dbu ());
           mp_renderer->set_font (db::Font (m_text_font));
           mp_renderer->apply_text_trans (m_apply_text_trans);
 

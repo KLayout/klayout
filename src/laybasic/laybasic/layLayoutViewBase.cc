@@ -780,21 +780,30 @@ LayoutViewBase::configure (const std::string &name, const std::string &value)
 
     int os = 1;
     tl::from_string (value, os);
-    mp_canvas->set_oversampling (os);
+    if (os != mp_canvas->oversampling ()) {
+      mp_canvas->set_oversampling (os);
+      resolution_changed_event ();
+    }
     return true;
 
   } else if (name == cfg_highres_mode) {
 
     bool hrm = false;
     tl::from_string (value, hrm);
-    mp_canvas->set_highres_mode (hrm);
+    if (hrm != mp_canvas->highres_mode ()) {
+      mp_canvas->set_highres_mode (hrm);
+      resolution_changed_event ();
+    }
     return true;
 
   } else if (name == cfg_subres_mode) {
 
     bool srm = false;
     tl::from_string (value, srm);
-    mp_canvas->set_subres_mode (srm);
+    if (srm != mp_canvas->subres_mode ()) {
+      mp_canvas->set_subres_mode (srm);
+      resolution_changed_event ();
+    }
     return true;
 
   } else if (name == cfg_image_cache_size) {
@@ -1565,14 +1574,12 @@ tl::PixelBuffer
 LayoutViewBase::icon_for_layer (const LayerPropertiesConstIterator &iter, unsigned int w, unsigned int h, double dpr, unsigned int di_off, bool no_state)
 {
   if (dpr < 0.0) {
-    dpr = canvas ()->dpr ();
+    dpr = canvas () ? canvas ()->dpr () : 1.0;
   }
 
-  int oversampling = canvas () ? canvas ()->oversampling () : 1;
-  double gamma = 2.0;
-
-  bool hrm = canvas () ? canvas ()->highres_mode () : false;
-  double dpr_drawing = oversampling * (hrm ? 1.0 : dpr);
+  double gamma = canvas () ? canvas ()->gamma () : 2.0;
+  double dpr_drawing = canvas () ? 1.0 / canvas ()->resolution () : 1.0;
+  unsigned int oversampling = canvas () ? canvas ()->oversampling () : 1;
 
   h = std::max ((unsigned int) 16, h) * oversampling * dpr + 0.5;
   w = std::max ((unsigned int) 16, w) * oversampling * dpr + 0.5;

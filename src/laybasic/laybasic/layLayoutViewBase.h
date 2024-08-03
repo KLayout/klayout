@@ -790,6 +790,11 @@ public:
   tl::Event cell_visibility_changed_event;
 
   /**
+   *  @brief An event signalling that the resolution has changed
+   */
+  tl::Event resolution_changed_event;
+
+  /**
    *  @brief Save the given cellview into the given file (with options)
    *  If "update" is true, the cell view's properties will be updated (options, filename etc.).
    */

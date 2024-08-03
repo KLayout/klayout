@@ -2899,7 +2899,7 @@ LayoutViewBase::get_pixels (unsigned int width, unsigned int height)
 
 #if defined(HAVE_QT)
 QImage
-LayoutViewBase::get_image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution,
+LayoutViewBase::get_image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, double font_resolution,
                                         tl::Color background, tl::Color foreground, tl::Color active, const db::DBox &target_box, bool monochrome)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Get image")));
@@ -2909,20 +2909,20 @@ LayoutViewBase::get_image_with_options (unsigned int width, unsigned int height,
   if (monochrome) {
     return mp_canvas->image_with_options_mono (width, height, linewidth, background, foreground, active, target_box).to_image_copy ();
   } else {
-    return mp_canvas->image_with_options (width, height, linewidth, oversampling, resolution, background, foreground, active, target_box).to_image_copy ();
+    return mp_canvas->image_with_options (width, height, linewidth, oversampling, resolution, font_resolution, background, foreground, active, target_box).to_image_copy ();
   }
 }
 #endif
 
 tl::PixelBuffer
-LayoutViewBase::get_pixels_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution,
+LayoutViewBase::get_pixels_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, double font_resolution,
                                          tl::Color background, tl::Color foreground, tl::Color active, const db::DBox &target_box)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Get image")));
 
   refresh ();
 
-  return mp_canvas->image_with_options (width, height, linewidth, oversampling, resolution, background, foreground, active, target_box);
+  return mp_canvas->image_with_options (width, height, linewidth, oversampling, resolution, font_resolution, background, foreground, active, target_box);
 }
 
 tl::BitmapBuffer
@@ -2987,7 +2987,7 @@ LayoutViewBase::save_image (const std::string &, unsigned int, unsigned int)
 #if defined(HAVE_QT) && !defined(PREFER_LIBPNG_FOR_SAVE)
 void
 LayoutViewBase::save_image_with_options (const std::string &fn,
-                                         unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution,
+                                         unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, double font_resolution,
                                          tl::Color background, tl::Color foreground, tl::Color active, const db::DBox &target_box, bool monochrome)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Save image")));
@@ -3007,7 +3007,7 @@ LayoutViewBase::save_image_with_options (const std::string &fn,
       throw tl::Exception (tl::to_string (tr ("Unable to write screenshot to file: %s (%s)")), fn, tl::to_string (writer.errorString ()));
     }
   } else {
-    if (! writer.write (mp_canvas->image_with_options (width, height, linewidth, oversampling, resolution, background, foreground, active, target_box).to_image ())) {
+    if (! writer.write (mp_canvas->image_with_options (width, height, linewidth, oversampling, resolution, font_resolution, background, foreground, active, target_box).to_image ())) {
       throw tl::Exception (tl::to_string (tr ("Unable to write screenshot to file: %s (%s)")), fn, tl::to_string (writer.errorString ()));
     }
   }

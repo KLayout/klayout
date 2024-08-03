@@ -1559,6 +1559,7 @@ MainWindow::cm_print ()
                                                             scale_factor,
                                                             1,
                                                             1.0 / scale_factor,
+                                                            1.0 / scale_factor,
                                                             tl::Color (QColor (Qt::white)),  //  foreground
                                                             tl::Color (QColor (Qt::black)),  //  background
                                                             tl::Color (QColor (Qt::black)),  //  active

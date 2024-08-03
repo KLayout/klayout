@@ -769,17 +769,20 @@ private:
 tl::PixelBuffer
 LayoutCanvas::image (unsigned int width, unsigned int height) 
 {
-  return image_with_options (width, height, -1, -1, -1.0, tl::Color (), tl::Color (), tl::Color (), db::DBox ());
+  return image_with_options (width, height, -1, -1, -1.0, -1.0, tl::Color (), tl::Color (), tl::Color (), db::DBox ());
 }
 
 tl::PixelBuffer
-LayoutCanvas::image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, tl::Color background, tl::Color foreground, tl::Color active, const db::DBox &target_box)
+LayoutCanvas::image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, double font_resolution, tl::Color background, tl::Color foreground, tl::Color active, const db::DBox &target_box)
 {
   if (oversampling <= 0) {
     oversampling = m_oversampling;
   }
   if (resolution <= 0.0) {
     resolution = 1.0 / oversampling;
+  }
+  if (font_resolution <= 0.0) {
+    font_resolution = resolution;
   }
   if (linewidth <= 0) {
     linewidth = 1.0 / resolution + 0.5;
@@ -806,7 +809,7 @@ LayoutCanvas::image_with_options (unsigned int width, unsigned int height, int l
 
   //  provide canvas objects for the layout bitmaps and the foreground/background objects
   BitmapRedrawThreadCanvas rd_canvas;
-  DetachedViewObjectCanvas vo_canvas (background, foreground, active, width * oversampling, height * oversampling, resolution, resolution, &img);
+  DetachedViewObjectCanvas vo_canvas (background, foreground, active, width * oversampling, height * oversampling, resolution, font_resolution, &img);
 
   //  compute the new viewport 
   db::DBox tb (target_box);
@@ -819,7 +822,7 @@ LayoutCanvas::image_with_options (unsigned int width, unsigned int height, int l
   lay::RedrawThread redraw_thread (&rd_canvas, mp_view);
 
   //  render the layout
-  redraw_thread.start (0 /*synchronous*/, m_layers, vp, resolution, resolution, true);
+  redraw_thread.start (0 /*synchronous*/, m_layers, vp, resolution, font_resolution, true);
   redraw_thread.stop (); // safety
 
   //  paint the background objects. It uses "img" to paint on.

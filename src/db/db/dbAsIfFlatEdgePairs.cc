@@ -242,6 +242,90 @@ AsIfFlatEdgePairs::filtered (const EdgePairFilterBase &filter) const
 }
 
 RegionDelegate *
+AsIfFlatEdgePairs::pull_interacting (const Region &) const
+{
+  // @@@
+}
+
+EdgesDelegate *
+AsIfFlatEdgePairs::pull_interacting (const Edges &) const
+{
+  // @@@
+}
+
+EdgePairsDelegate *
+AsIfFlatEdgePairs::selected_interacting (const Region &other, size_t min_count, size_t max_count) const
+{
+  // @@@
+}
+
+EdgePairsDelegate *
+AsIfFlatEdgePairs::selected_not_interacting (const Region &other, size_t min_count, size_t max_count) const
+{
+  // @@@
+}
+
+EdgePairsDelegate *
+AsIfFlatEdgePairs::selected_interacting (const Edges &other, size_t min_count, size_t max_count) const
+{
+  // @@@
+}
+
+EdgePairsDelegate *
+AsIfFlatEdgePairs::selected_not_interacting (const Edges &other, size_t min_count, size_t max_count) const
+{
+  // @@@
+}
+
+std::pair<EdgePairsDelegate *, EdgePairsDelegate *>
+AsIfFlatEdgePairs::selected_interacting_pair (const Region &other, size_t min_count, size_t max_count) const
+{
+  // @@@
+}
+
+std::pair<EdgePairsDelegate *, EdgePairsDelegate *>
+AsIfFlatEdgePairs::selected_interacting_pair (const Edges &other, size_t min_count, size_t max_count) const
+{
+  // @@@
+}
+
+EdgePairsDelegate *
+AsIfFlatEdgePairs::selected_outside (const Region &other) const
+{
+  // @@@
+}
+
+EdgePairsDelegate *
+AsIfFlatEdgePairs::selected_not_outside (const Region &other) const
+{
+  // @@@
+}
+
+std::pair<EdgePairsDelegate *, EdgePairsDelegate *>
+AsIfFlatEdgePairs::selected_outside_pair (const Region &other) const
+{
+  // @@@
+}
+
+EdgePairsDelegate *
+AsIfFlatEdgePairs::selected_inside (const Region &other) const
+{
+  // @@@
+}
+
+EdgePairsDelegate *
+AsIfFlatEdgePairs::selected_not_inside (const Region &other) const
+{
+  // @@@
+}
+
+std::pair<EdgePairsDelegate *, EdgePairsDelegate *>
+AsIfFlatEdgePairs::selected_inside_pair (const Region &other) const
+{
+  // @@@
+}
+
+RegionDelegate *
 AsIfFlatEdgePairs::polygons (db::Coord e) const
 {
   std::unique_ptr<FlatRegion> output (new FlatRegion ());

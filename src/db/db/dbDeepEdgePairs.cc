@@ -497,6 +497,90 @@ RegionDelegate *DeepEdgePairs::polygons (db::Coord e) const
   return new db::DeepRegion (new_layer);
 }
 
+RegionDelegate *
+DeepEdgePairs::pull_interacting (const Region &) const
+{
+  // @@@
+}
+
+EdgesDelegate *
+DeepEdgePairs::pull_interacting (const Edges &) const
+{
+  // @@@
+}
+
+EdgePairsDelegate *
+DeepEdgePairs::selected_interacting (const Region &other, size_t min_count, size_t max_count) const
+{
+  // @@@
+}
+
+EdgePairsDelegate *
+DeepEdgePairs::selected_not_interacting (const Region &other, size_t min_count, size_t max_count) const
+{
+  // @@@
+}
+
+EdgePairsDelegate *
+DeepEdgePairs::selected_interacting (const Edges &other, size_t min_count, size_t max_count) const
+{
+  // @@@
+}
+
+EdgePairsDelegate *
+DeepEdgePairs::selected_not_interacting (const Edges &other, size_t min_count, size_t max_count) const
+{
+  // @@@
+}
+
+std::pair<EdgePairsDelegate *, EdgePairsDelegate *>
+DeepEdgePairs::selected_interacting_pair (const Region &other, size_t min_count, size_t max_count) const
+{
+  // @@@
+}
+
+std::pair<EdgePairsDelegate *, EdgePairsDelegate *>
+DeepEdgePairs::selected_interacting_pair (const Edges &other, size_t min_count, size_t max_count) const
+{
+  // @@@
+}
+
+EdgePairsDelegate *
+DeepEdgePairs::selected_outside (const Region &other) const
+{
+  // @@@
+}
+
+EdgePairsDelegate *
+DeepEdgePairs::selected_not_outside (const Region &other) const
+{
+  // @@@
+}
+
+std::pair<EdgePairsDelegate *, EdgePairsDelegate *>
+DeepEdgePairs::selected_outside_pair (const Region &other) const
+{
+  // @@@
+}
+
+EdgePairsDelegate *
+DeepEdgePairs::selected_inside (const Region &other) const
+{
+  // @@@
+}
+
+EdgePairsDelegate *
+DeepEdgePairs::selected_not_inside (const Region &other) const
+{
+  // @@@
+}
+
+std::pair<EdgePairsDelegate *, EdgePairsDelegate *>
+DeepEdgePairs::selected_inside_pair (const Region &other) const
+{
+  // @@@
+}
+
 EdgesDelegate *DeepEdgePairs::generic_edges (bool first, bool second) const
 {
   db::DeepLayer new_layer = deep_layer ().derived ();

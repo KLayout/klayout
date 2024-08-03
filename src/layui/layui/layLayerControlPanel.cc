@@ -210,8 +210,6 @@ LayerControlPanel::LayerControlPanel (lay::LayoutViewBase *view, db::Manager *ma
     m_hidden_flags_need_update (true),
     m_in_update (false),
     m_phase (0), 
-    m_oversampling (1),
-    m_hrm (false),
     m_do_update_content_dm (this, &LayerControlPanel::do_update_content),
     m_do_update_visibility_dm (this, &LayerControlPanel::do_update_visibility),
     m_no_stipples (false),
@@ -1788,24 +1786,6 @@ LayerControlPanel::set_phase (int phase)
 {
   if (m_phase != phase) {
     m_phase = phase;
-    m_do_update_content_dm ();
-  }
-}
-
-void
-LayerControlPanel::set_highres_mode (bool hrm)
-{
-  if (m_hrm != hrm) {
-    m_hrm = hrm;
-    m_do_update_content_dm ();
-  }
-}
-
-void
-LayerControlPanel::set_oversampling (int os)
-{
-  if (m_oversampling != os) {
-    m_oversampling = os;
     m_do_update_content_dm ();
   }
 }

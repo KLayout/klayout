@@ -278,6 +278,19 @@ public:
   }
 
   /**
+   *  @brief Set sub resolution mode (sub-pixel resolution in oversampling mode)
+   */
+  void set_subres_mode (bool srm);
+
+  /**
+   *  @brief Gets the sub resolution mode flag
+   */
+  bool subres_mode () const
+  {
+    return m_srm;
+  }
+
+  /**
    *  @brief Gets the default device pixel ratio for this canvas
    */
   double dpr () const;
@@ -412,6 +425,7 @@ private:
   std::map<unsigned int, std::vector <lay::ViewOp> > m_scaled_view_ops;
   unsigned int m_oversampling;
   bool m_hrm;
+  bool m_srm;
   double m_gamma;
 
   bool m_need_redraw;

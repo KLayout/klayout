@@ -151,6 +151,7 @@ LayoutCanvas::LayoutCanvas (lay::LayoutViewBase *view)
     m_background (0), m_foreground (0), m_active (0),
     m_oversampling (1),
     m_hrm (false),
+    m_srm (false),
     m_need_redraw (false),
     m_redraw_clearing (false),
     m_redraw_force_update (true),
@@ -201,11 +202,7 @@ LayoutCanvas::~LayoutCanvas ()
 double
 LayoutCanvas::resolution () const
 {
-  if (m_hrm) {
-    return 1.0 / m_oversampling;
-  } else {
-    return 1.0 / (m_oversampling * dpr ());
-  }
+  return (m_srm ? 1.0 : 1.0 / m_oversampling) * (m_hrm ? 1.0 : 1.0 / dpr ());
 }
 
 #if defined(HAVE_QT)
@@ -279,6 +276,16 @@ LayoutCanvas::set_highres_mode (bool hrm)
   if (hrm != m_hrm) {
     m_image_cache.clear ();
     m_hrm = hrm;
+    do_redraw_all ();
+  }
+}
+
+void
+LayoutCanvas::set_subres_mode (bool srm)
+{
+  if (srm != m_srm) {
+    m_image_cache.clear ();
+    m_srm = srm;
     do_redraw_all ();
   }
 }

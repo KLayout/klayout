@@ -790,6 +790,13 @@ LayoutViewBase::configure (const std::string &name, const std::string &value)
     mp_canvas->set_highres_mode (hrm);
     return true;
 
+  } else if (name == cfg_subres_mode) {
+
+    bool srm = false;
+    tl::from_string (value, srm);
+    mp_canvas->set_subres_mode (srm);
+    return true;
+
   } else if (name == cfg_image_cache_size) {
 
     int sz = 0;

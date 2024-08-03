@@ -237,7 +237,7 @@ GridNet::render_bg (const lay::Viewport &vp, ViewObjectCanvas &canvas)
       return;
     }
 
-    PixelBufferPainter painter (*bmp_canvas->bg_image (), bmp_canvas->canvas_width (), bmp_canvas->canvas_height (), bmp_canvas->resolution ());
+    PixelBufferPainter painter (*bmp_canvas->bg_image (), bmp_canvas->canvas_width (), bmp_canvas->canvas_height (), bmp_canvas->resolution (), bmp_canvas->font_resolution ());
 
     db::DCplxTrans trans = vp.trans ();
     db::DCplxTrans::inverse_trans trans_inv (trans.inverted ());
@@ -245,15 +245,14 @@ GridNet::render_bg (const lay::Viewport &vp, ViewObjectCanvas &canvas)
     db::DBox dbworld (trans_inv * db::DBox (0.0, 0.0, double (vp.width ()), double (vp.height ())));
 
     //  fw is the basic unit of the ruler geometry
-    const lay::FixedFont &ff = lay::FixedFont::get_font (bmp_canvas->resolution ());
-    int fw = ff.width ();
+    int fwr = lay::FixedFont::get_font (bmp_canvas->font_resolution ()).width ();
 
     double dgrid = trans.ctrans (m_grid);
     GridStyle style = m_style1;
 
     //  compute major grid and switch to secondary style if necessary
     int s = 0;
-    while (dgrid < fw * 4) {
+    while (dgrid < fwr * 4) {
       if (s == 0) {
         dgrid *= 2.0;
       } else if (s == 1) {
@@ -282,9 +281,9 @@ GridNet::render_bg (const lay::Viewport &vp, ViewObjectCanvas &canvas)
 
     if (m_show_ruler && dgrid < vp.width () * 0.2) {
 
-      int rh = int (floor (0.5 + fw * 0.8));
-      int xoffset = int (floor (0.5 + fw * 2.5));
-      int yoffset = int (floor (0.5 + fw * 2.5));
+      int rh = int (floor (0.5 + fwr * 0.8));
+      int xoffset = int (floor (0.5 + fwr * 2.5));
+      int yoffset = int (floor (0.5 + fwr * 2.5));
 
       painter.fill_rect (db::Point (xoffset, vp.height () - yoffset - rh / 2),
                          db::Point (xoffset + int (floor (0.5 + dgrid)), vp.height () - yoffset + rh / 2),

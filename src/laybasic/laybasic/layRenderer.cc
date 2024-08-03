@@ -36,7 +36,7 @@ namespace lay
 // ----------------------------------------------------------------------------------------------
 //  Renderer implementation
 
-Renderer::Renderer (unsigned int width, unsigned int height, double resolution)
+Renderer::Renderer (unsigned int width, unsigned int height, double resolution, double font_resolution)
   : m_draw_texts (true),
     m_draw_properties (false),
     m_draw_description_property (false),
@@ -47,7 +47,8 @@ Renderer::Renderer (unsigned int width, unsigned int height, double resolution)
     m_xfill (false),
     m_font (db::DefaultFont),
     m_width (width), m_height (height),
-    m_resolution (resolution)
+    m_resolution (resolution),
+    m_font_resolution (font_resolution)
 {
   // .. nothing else ..
 }

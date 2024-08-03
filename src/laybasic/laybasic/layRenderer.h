@@ -66,7 +66,7 @@ public:
   /**
    *  @brief The ctor
    */
-  Renderer (unsigned int width, unsigned int height, double resolution);
+  Renderer (unsigned int width, unsigned int height, double resolution, double font_resolution);
 
   /**
    *  @brief The destructor
@@ -400,6 +400,17 @@ public:
     return m_resolution;
   }
 
+  /**
+   *  @brief Get the font resolution value
+   *
+   *  The resolution value is used to convert dimensions on the output device into canvas
+   *  units. This value applies to rendering the "Default" font.
+   */
+  double font_resolution () const
+  {
+    return m_font_resolution;
+  }
+
 protected:
   bool m_draw_texts;
   bool m_draw_properties;
@@ -412,6 +423,7 @@ protected:
   db::Font m_font;
   unsigned int m_width, m_height;
   double m_resolution;
+  double m_font_resolution;
 };
 
 } // namespace lay

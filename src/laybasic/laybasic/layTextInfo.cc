@@ -33,7 +33,7 @@ TextInfo::TextInfo (const LayoutViewBase *view)
   : m_default_text_size (view->default_text_size ()),
     m_default_font (db::Font (view->text_font ())),
     m_apply_text_trans (view->apply_text_trans ()),
-    m_resolution (view->canvas ()->resolution ()),
+    m_resolution (view->canvas ()->font_resolution ()),
     m_point_mode (view->text_point_mode ())
 {
   //  .. nothing yet ..

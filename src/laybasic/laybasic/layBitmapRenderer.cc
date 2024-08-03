@@ -30,8 +30,8 @@ namespace lay
 // ----------------------------------------------------------------------------------------------
 //  BitmapRenderer implementation
 
-BitmapRenderer::BitmapRenderer (unsigned int width, unsigned int height, double resolution)
-  : Renderer (width, height, resolution),
+BitmapRenderer::BitmapRenderer (unsigned int width, unsigned int height, double resolution, double font_resolution)
+  : Renderer (width, height, resolution, font_resolution),
     m_xmin (0.0), m_xmax (0.0), m_ymin (0.0), m_ymax (0.0),
     m_ortho (true)
 {

@@ -33,13 +33,15 @@ Bitmap::Bitmap ()
 {
   init (0, 0);
   m_resolution = 1.0;
+  m_font_resolution = 1.0;
 }
 
-Bitmap::Bitmap (unsigned int w, unsigned int h, double r)
+Bitmap::Bitmap (unsigned int w, unsigned int h, double r, double rf)
   : m_empty_scanline (0)
 {
   init (w, h);
   m_resolution = r;
+  m_font_resolution = rf;
 }
 
 Bitmap::Bitmap (const Bitmap &d)
@@ -60,6 +62,7 @@ Bitmap::operator= (const Bitmap &d)
     }
 
     m_resolution = d.m_resolution;
+    m_font_resolution = d.m_font_resolution;
 
     for (unsigned int i = 0; i < m_height; ++i) {
       if (! d.m_scanlines.empty () && d.m_scanlines [i] != 0) {
@@ -796,7 +799,7 @@ Bitmap::render_text (const lay::RenderText &text)
 {
   if (text.font == db::DefaultFont) {
 
-    const lay::FixedFont &ff = lay::FixedFont::get_font (m_resolution);
+    const lay::FixedFont &ff = lay::FixedFont::get_font (m_font_resolution);
 
     //  count the lines and max. characters per line
 
@@ -877,7 +880,7 @@ Bitmap::render_text (const lay::RenderText &text)
   } else {
    
     //  Create a sub-renderer so we do not need to clear *this
-    lay::BitmapRenderer hr (m_width, m_height, m_resolution);
+    lay::BitmapRenderer hr (m_width, m_height, m_resolution, m_font_resolution);
 
     db::DHershey ht (text.text, text.font);
     hr.reserve_edges (ht.count_edges ());

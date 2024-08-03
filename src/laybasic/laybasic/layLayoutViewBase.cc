@@ -1598,10 +1598,10 @@ LayoutViewBase::icon_for_layer (const LayerPropertiesConstIterator &iter, unsign
     *sl0++ = 0;
   }
 
-  lay::Bitmap fill (w, h, 1.0);
-  lay::Bitmap frame (w, h, 1.0);
-  lay::Bitmap text (w, h, 1.0);
-  lay::Bitmap vertex (w, h, 1.0);
+  lay::Bitmap fill (w, h, 1.0, 1.0);
+  lay::Bitmap frame (w, h, 1.0, 1.0);
+  lay::Bitmap text (w, h, 1.0, 1.0);
+  lay::Bitmap vertex (w, h, 1.0, 1.0);
 
   unsigned int wp = w - 1;
 

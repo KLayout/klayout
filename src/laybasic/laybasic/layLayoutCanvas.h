@@ -334,9 +334,14 @@ public:
   }
 
   /**
-   *  @brief Reimplementation of ViewObjectCanvas: Resolution
+   *  @brief Reimplementation of ViewObjectCanvas interface
    */
   double resolution () const;
+
+  /**
+   *  @brief Reimplementation of ViewObjectCanvas interface
+   */
+  double font_resolution () const;
 
   /**
    *  @brief Gets the gamma value

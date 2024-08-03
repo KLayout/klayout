@@ -43,14 +43,14 @@ to_string (const tl::PixelBuffer &img, unsigned int mask)
 
 TEST(1) 
 {
-  lay::Bitmap b1 (32, 32, 1.0);
-  lay::Bitmap b2 (32, 32, 1.0);
-  lay::Bitmap b3 (32, 32, 1.0);
-  lay::Bitmap b4 (32, 32, 1.0);
-  lay::Bitmap b5 (32, 32, 1.0);
-  lay::Bitmap b6 (32, 32, 1.0);
-  lay::Bitmap b7 (32, 32, 1.0);
-  lay::Bitmap b8 (32, 32, 1.0);
+  lay::Bitmap b1 (32, 32, 1.0, 1.0);
+  lay::Bitmap b2 (32, 32, 1.0, 1.0);
+  lay::Bitmap b3 (32, 32, 1.0, 1.0);
+  lay::Bitmap b4 (32, 32, 1.0, 1.0);
+  lay::Bitmap b5 (32, 32, 1.0, 1.0);
+  lay::Bitmap b6 (32, 32, 1.0, 1.0);
+  lay::Bitmap b7 (32, 32, 1.0, 1.0);
+  lay::Bitmap b8 (32, 32, 1.0, 1.0);
 
   std::vector<lay::Bitmap *> pbitmaps;
   pbitmaps.push_back (&b1);

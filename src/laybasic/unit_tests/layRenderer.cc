@@ -68,9 +68,9 @@ to_string (const lay::Bitmap &bm, const lay::Bitmap &bf)
 
 TEST(1) 
 {
-  lay::Bitmap b1 (16, 16, 1.0);
+  lay::Bitmap b1 (16, 16, 1.0, 1.0);
    
-  lay::BitmapRenderer r (16, 16, 1.0);
+  lay::BitmapRenderer r (16, 16, 1.0, 1.0);
   r.insert (db::DEdge (3.4, 2.1, 12.7, -2.1));
   r.insert (db::DEdge (12.7, -2.1, 3.4, 2.1));
   r.insert (db::DEdge (3.4, 2.1, 12.7, 2.1));
@@ -103,9 +103,9 @@ TEST(1)
 
 TEST(2) 
 {
-  lay::Bitmap b1 (16, 16, 1.0);
+  lay::Bitmap b1 (16, 16, 1.0, 1.0);
 
-  lay::BitmapRenderer r(16, 16, 1.0);
+  lay::BitmapRenderer r(16, 16, 1.0, 1.0);
   r.clear ();
   r.insert (db::DEdge (3.4, 2.1, 12.7, 12.1));
   r.insert (db::DEdge (3.4, 0.1, 100.0, 22.5));
@@ -135,7 +135,7 @@ TEST(2)
   r.insert (db::DEdge (100.0, 0.1, 3.4, 14.5));
   r.insert (db::DEdge (12.7, 5.1, 3.4, 5.1));
   r.insert (db::DEdge (15.3, -5.1, -5.1, 5.0));
-  b1 = lay::Bitmap (16, 16, 1.0);
+  b1 = lay::Bitmap (16, 16, 1.0, 1.0);
   r.render_contour (b1);
 
   EXPECT_EQ (to_string (b1), "---#------------\n"
@@ -159,10 +159,10 @@ TEST(2)
 
 TEST(3) 
 {
-  lay::Bitmap b1 (16, 16, 1.0);
-  lay::Bitmap b2 (16, 16, 1.0);
+  lay::Bitmap b1 (16, 16, 1.0, 1.0);
+  lay::Bitmap b2 (16, 16, 1.0, 1.0);
    
-  lay::BitmapRenderer r(16, 16, 1.0);
+  lay::BitmapRenderer r(16, 16, 1.0, 1.0);
   r.insert (db::DEdge (3.4, 2.1, 12.7, 14.5));
   r.insert (db::DEdge (12.7, 14.5, 10.7, 0.6));
   r.insert (db::DEdge (10.7, 0.6, 3.4, 2.1));
@@ -190,8 +190,8 @@ TEST(3)
   r.insert (db::DEdge (3.1, 9.0, 12.7, 14.5));
   r.insert (db::DEdge (12.7, 14.5, 10.7, 0.6));
   r.insert (db::DEdge (10.7, 0.6, 3.1, 9.0));
-  b1 = lay::Bitmap (16, 16, 1.0);
-  b2 = lay::Bitmap (16, 16, 1.0);
+  b1 = lay::Bitmap (16, 16, 1.0, 1.0);
+  b2 = lay::Bitmap (16, 16, 1.0, 1.0);
   r.render_fill (b1);
   r.render_contour (b2);
 
@@ -217,8 +217,8 @@ TEST(3)
   r.insert (db::DEdge (3.0, 14.0, 12.0, 14.0));
   r.insert (db::DEdge (12.0, 14.0, 12.0, 9.0));
   r.insert (db::DEdge (12.0, 9.0, 3.0, 9.0));
-  b1 = lay::Bitmap (16, 16, 1.0);
-  b2 = lay::Bitmap (16, 16, 1.0);
+  b1 = lay::Bitmap (16, 16, 1.0, 1.0);
+  b2 = lay::Bitmap (16, 16, 1.0, 1.0);
   r.render_fill (b1);
   // r.render_contour (b2);
 
@@ -250,8 +250,8 @@ TEST(3)
   r.insert (db::DEdge (8.8, 6.0, 4.2, 2.9));
   r.insert (db::DEdge (4.2, 2.9, 12.2, 0.4));
   r.insert (db::DEdge (12.2, 0.4, 0.2, 9.6));
-  b1 = lay::Bitmap (16, 16, 1.0);
-  b2 = lay::Bitmap (16, 16, 1.0);
+  b1 = lay::Bitmap (16, 16, 1.0, 1.0);
+  b2 = lay::Bitmap (16, 16, 1.0, 1.0);
   r.render_fill (b1);
   r.render_contour (b2);
 

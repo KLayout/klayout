@@ -41,6 +41,12 @@ static void insert_into_ep (const db::EdgePair &ep, db::EdgeProcessor &proc, siz
 
 bool edge_pair_interacts (const db::EdgePair &a, const db::Polygon &b)
 {
+  //  fall back to edge-only checks for degenerate edge pairs
+  if (a.area () == 0) {
+    return edge_interacts (a.first (), b) || edge_interacts (db::Edge (a.first ().p2 (), a.second ().p1 ()), b) ||
+           edge_interacts (a.second (), b) || edge_interacts (db::Edge (a.second ().p2 (), a.first ().p1 ()), b);
+  }
+
   db::EdgeProcessor ep;
   insert_into_ep (a, ep, 1);
   ep.insert (b, 0);
@@ -56,6 +62,12 @@ bool edge_pair_interacts (const db::EdgePair &a, const db::Polygon &b)
 
 bool edge_pair_is_inside (const db::EdgePair &a, const db::Polygon &b)
 {
+  //  fall back to edge-only checks for degenerate edge pairs
+  if (a.area () == 0) {
+    return edge_is_inside (a.first (), b) && edge_is_inside (db::Edge (a.first ().p2 (), a.second ().p1 ()), b) &&
+           edge_is_inside (a.second (), b) && edge_is_inside (db::Edge (a.second ().p2 (), a.first ().p1 ()), b);
+  }
+
   db::EdgeProcessor ep;
   insert_into_ep (a, ep, 1);
   ep.insert (b, 0);
@@ -71,6 +83,12 @@ bool edge_pair_is_inside (const db::EdgePair &a, const db::Polygon &b)
 
 bool edge_pair_is_outside (const db::EdgePair &a, const db::Polygon &b)
 {
+  //  fall back to edge-only checks for degenerate edge pairs
+  if (a.area () == 0) {
+    return edge_is_outside (a.first (), b) && edge_is_outside (db::Edge (a.first ().p2 (), a.second ().p1 ()), b) &&
+           edge_is_outside (a.second (), b) && edge_is_outside (db::Edge (a.second ().p2 (), a.first ().p1 ()), b);
+  }
+
   db::EdgeProcessor ep;
   insert_into_ep (a, ep, 1);
   ep.insert (b, 0);
@@ -86,7 +104,8 @@ bool edge_pair_is_outside (const db::EdgePair &a, const db::Polygon &b)
 
 bool edge_pair_interacts (const db::EdgePair &a, const db::Edge &b)
 {
-  return edge_interacts (a.first (), b) || edge_interacts (a.second (), b);
+  return edge_interacts (a.first (), b) || edge_interacts (db::Edge (a.first ().p2 (), a.second ().p1 ()), b) ||
+         edge_interacts (a.second (), b) || edge_interacts (db::Edge (a.second ().p2 (), a.first ().p1 ()), b);
 }
 
 }

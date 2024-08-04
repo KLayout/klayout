@@ -218,6 +218,16 @@ public:
   }
 
   /**
+   *  @brief Takes the underlying delegate object
+   */
+  EdgePairsDelegate *take_delegate ()
+  {
+    EdgePairsDelegate *delegate = mp_delegate;
+    mp_delegate = 0;
+    return delegate;
+  }
+
+  /**
    *  @brief Iterator of the edge pair set
    *
    *  The iterator delivers the edges of the edge pair set.

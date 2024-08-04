@@ -1366,14 +1366,14 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
   method ("inside", (db::Edges (db::Edges::*) (const db::Edges &) const) &db::Edges::selected_inside, gsi::arg ("other"),
     "@brief Returns the edges of this edge collection which are inside (completely covered by) edges from the other edge collection\n"
     "\n"
-    "@return A new edge collection containing the edges overlapping or touching edges from the other edge collection\n"
+    "@return A new edge collection containing the the selected edges\n"
     "\n"
     "This method has been introduced in version 0.28."
   ) +
   method ("not_inside", (db::Edges (db::Edges::*) (const db::Edges &) const) &db::Edges::selected_not_inside, gsi::arg ("other"),
     "@brief Returns the edges of this edge collection which are not inside (completely covered by) edges from the other edge collection\n"
     "\n"
-    "@return A new edge collection containing the edges not overlapping or touching edges from the other edge collection\n"
+    "@return A new edge collection containing the the selected edges\n"
     "\n"
     "This method has been introduced in version 0.28."
   ) +
@@ -1402,14 +1402,14 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
   method ("inside", (db::Edges (db::Edges::*) (const db::Region &) const) &db::Edges::selected_inside, gsi::arg ("other"),
     "@brief Returns the edges from this edge collection which are inside (completely covered by) polygons from the region\n"
     "\n"
-    "@return A new edge collection containing the edges overlapping or touching polygons from the region\n"
+    "@return A new edge collection containing the the selected edges\n"
     "\n"
     "This method has been introduced in version 0.28."
   ) +
   method ("not_inside", (db::Edges (db::Edges::*) (const db::Region &) const) &db::Edges::selected_not_inside, gsi::arg ("other"),
     "@brief Returns the edges from this edge collection which are not inside (completely covered by) polygons from the region\n"
     "\n"
-    "@return A new edge collection containing the edges not overlapping or touching polygons from the region\n"
+    "@return A new edge collection containing the the selected edges\n"
     "\n"
     "This method has been introduced in version 0.28."
   ) +
@@ -1436,35 +1436,35 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "It has been introduced in version 0.28."
   ) +
   method ("outside", (db::Edges (db::Edges::*) (const db::Edges &) const) &db::Edges::selected_outside, gsi::arg ("other"),
-    "@brief Returns the edges of this edge collection which are outside (completely covered by) edges from the other edge collection\n"
+    "@brief Returns the edges of this edge collection which are outside (not overlapped by) edges from the other edge collection\n"
     "\n"
-    "@return A new edge collection containing the edges overlapping or touching edges from the other edge collection\n"
+    "@return A new edge collection containing the the selected edges\n"
     "\n"
     "This method has been introduced in version 0.28."
   ) +
   method ("not_outside", (db::Edges (db::Edges::*) (const db::Edges &) const) &db::Edges::selected_not_outside, gsi::arg ("other"),
-    "@brief Returns the edges of this edge collection which are not outside (completely covered by) edges from the other edge collection\n"
+    "@brief Returns the edges of this edge collection which are not outside (partially overlapped by) edges from the other edge collection\n"
     "\n"
-    "@return A new edge collection containing the edges not overlapping or touching edges from the other edge collection\n"
+    "@return A new edge collection containing the the selected edges\n"
     "\n"
     "This method has been introduced in version 0.28."
   ) +
   method ("select_outside", (db::Edges &(db::Edges::*) (const db::Edges &)) &db::Edges::select_outside, gsi::arg ("other"),
-    "@brief Selects the edges from this edge collection which are outside (completely covered by) edges from the other edge collection\n"
+    "@brief Selects the edges from this edge collection which are outside (not overlapped by) edges from the other edge collection\n"
     "\n"
     "@return The edge collection after the edges have been selected (self)\n"
     "\n"
     "This method has been introduced in version 0.28."
   ) +
   method ("select_not_outside", (db::Edges &(db::Edges::*) (const db::Edges &)) &db::Edges::select_not_outside, gsi::arg ("other"),
-    "@brief Selects the edges from this edge collection which are not outside (completely covered by) edges from the other edge collection\n"
+    "@brief Selects the edges from this edge collection which are not outside (partially overlapped by) edges from the other edge collection\n"
     "\n"
     "@return The edge collection after the edges have been selected (self)\n"
     "\n"
     "This method has been introduced in version 0.28."
   ) +
   method_ext ("split_outside", &split_outside_with_edges, gsi::arg ("other"),
-    "@brief Selects the edges from this edge collection which are and are not outside (completely covered by) edges from the other collection\n"
+    "@brief Selects the edges from this edge collection which are and are not outside (not overlapped by) edges from the other collection\n"
     "\n"
     "@return A two-element list of edge collections (first: outside, second: non-outside)\n"
     "\n"
@@ -1472,35 +1472,35 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "It has been introduced in version 0.28."
   ) +
   method ("outside", (db::Edges (db::Edges::*) (const db::Region &) const) &db::Edges::selected_outside, gsi::arg ("other"),
-    "@brief Returns the edges from this edge collection which are outside (completely covered by) polygons from the region\n"
+    "@brief Returns the edges from this edge collection which are outside (not overlapped by) polygons from the region\n"
     "\n"
-    "@return A new edge collection containing the edges overlapping or touching polygons from the region\n"
+    "@return A new edge collection containing the the selected edges\n"
     "\n"
     "This method has been introduced in version 0.28."
   ) +
   method ("not_outside", (db::Edges (db::Edges::*) (const db::Region &) const) &db::Edges::selected_not_outside, gsi::arg ("other"),
-    "@brief Returns the edges from this edge collection which are not outside (completely covered by) polygons from the region\n"
+    "@brief Returns the edges from this edge collection which are not outside (partially overlapped by) polygons from the region\n"
     "\n"
-    "@return A new edge collection containing the edges not overlapping or touching polygons from the region\n"
+    "@return A new edge collection containing the the selected edges\n"
     "\n"
     "This method has been introduced in version 0.28."
   ) +
   method ("select_outside", (db::Edges &(db::Edges::*) (const db::Region &)) &db::Edges::select_outside, gsi::arg ("other"),
-    "@brief Selects the edges from this edge collection which are outside (completely covered by) polygons from the region\n"
+    "@brief Selects the edges from this edge collection which are outside (not overlapped by) polygons from the region\n"
     "\n"
     "@return The edge collection after the edges have been selected (self)\n"
     "\n"
     "This method has been introduced in version 0.28."
   ) +
   method ("select_not_outside", (db::Edges &(db::Edges::*) (const db::Region &)) &db::Edges::select_not_outside, gsi::arg ("other"),
-    "@brief Selects the edges from this edge collection which are not outside (completely covered by) polygons from the region\n"
+    "@brief Selects the edges from this edge collection which are not outside (partially overlapped by) polygons from the region\n"
     "\n"
     "@return The edge collection after the edges have been selected (self)\n"
     "\n"
     "This method has been introduced in version 0.28."
   ) +
   method_ext ("split_outside", &split_outside_with_region, gsi::arg ("other"),
-    "@brief Selects the edges from this edge collection which are and are not outside (completely covered by) polygons from the other region\n"
+    "@brief Selects the edges from this edge collection which are and are not outside (not overlapped by) polygons from the other region\n"
     "\n"
     "@return A two-element list of edge collections (first: outside, second: non-outside)\n"
     "\n"

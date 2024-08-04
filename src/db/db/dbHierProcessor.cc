@@ -2558,6 +2558,12 @@ template class DB_PUBLIC local_processor_cell_context<db::Polygon, db::Polygon, 
 template class DB_PUBLIC local_processor_cell_context<db::Edge, db::Edge, db::Edge>;
 template class DB_PUBLIC local_processor_cell_context<db::Edge, db::Polygon, db::Edge>;
 template class DB_PUBLIC local_processor_cell_context<db::Edge, db::Edge, db::EdgePair>;
+template class DB_PUBLIC local_processor_cell_context<db::EdgePair, db::Polygon, db::EdgePair>;
+template class DB_PUBLIC local_processor_cell_context<db::EdgePair, db::PolygonRef, db::EdgePair>;
+template class DB_PUBLIC local_processor_cell_context<db::EdgePair, db::Edge, db::EdgePair>;
+template class DB_PUBLIC local_processor_cell_context<db::EdgePair, db::Polygon, db::Polygon>;
+template class DB_PUBLIC local_processor_cell_context<db::EdgePair, db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC local_processor_cell_context<db::EdgePair, db::Edge, db::Edge>;
 
 //  explicit instantiations
 template class DB_PUBLIC local_processor_cell_contexts<db::Polygon, db::Polygon, db::Polygon>;
@@ -2581,6 +2587,12 @@ template class DB_PUBLIC local_processor_cell_contexts<db::Edge, db::PolygonRef,
 template class DB_PUBLIC local_processor_cell_contexts<db::Edge, db::Polygon, db::Edge>;
 template class DB_PUBLIC local_processor_cell_contexts<db::Edge, db::Edge, db::Edge>;
 template class DB_PUBLIC local_processor_cell_contexts<db::Edge, db::Edge, db::EdgePair>;
+template class DB_PUBLIC local_processor_cell_contexts<db::EdgePair, db::Polygon, db::EdgePair>;
+template class DB_PUBLIC local_processor_cell_contexts<db::EdgePair, db::PolygonRef, db::EdgePair>;
+template class DB_PUBLIC local_processor_cell_contexts<db::EdgePair, db::Edge, db::EdgePair>;
+template class DB_PUBLIC local_processor_cell_contexts<db::EdgePair, db::Polygon, db::Polygon>;
+template class DB_PUBLIC local_processor_cell_contexts<db::EdgePair, db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC local_processor_cell_contexts<db::EdgePair, db::Edge, db::Edge>;
 
 //  explicit instantiations
 template class DB_PUBLIC shape_interactions<db::Polygon, db::Polygon>;
@@ -2598,6 +2610,9 @@ template class DB_PUBLIC shape_interactions<db::Edge, db::PolygonRef>;
 template class DB_PUBLIC shape_interactions<db::Edge, db::Polygon>;
 template class DB_PUBLIC shape_interactions<db::TextRef, db::TextRef>;
 template class DB_PUBLIC shape_interactions<db::TextRef, db::PolygonRef>;
+template class DB_PUBLIC shape_interactions<db::EdgePair, db::Polygon>;
+template class DB_PUBLIC shape_interactions<db::EdgePair, db::PolygonRef>;
+template class DB_PUBLIC shape_interactions<db::EdgePair, db::Edge>;
 
 //  explicit instantiations
 template class DB_PUBLIC local_processor_context_computation_task<db::Polygon, db::Polygon, db::Polygon>;
@@ -2629,6 +2644,12 @@ template class DB_PUBLIC local_processor_context_computation_task<db::Edge, db::
 template class DB_PUBLIC local_processor_context_computation_task<db::Edge, db::Polygon, db::Edge>;
 template class DB_PUBLIC local_processor_context_computation_task<db::Edge, db::Edge, db::EdgePair>;
 template class DB_PUBLIC local_processor_context_computation_task<db::Edge, db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC local_processor_context_computation_task<db::EdgePair, db::Polygon, db::EdgePair>;
+template class DB_PUBLIC local_processor_context_computation_task<db::EdgePair, db::PolygonRef, db::EdgePair>;
+template class DB_PUBLIC local_processor_context_computation_task<db::EdgePair, db::Edge, db::EdgePair>;
+template class DB_PUBLIC local_processor_context_computation_task<db::EdgePair, db::Polygon, db::Polygon>;
+template class DB_PUBLIC local_processor_context_computation_task<db::EdgePair, db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC local_processor_context_computation_task<db::EdgePair, db::Edge, db::Edge>;
 
 //  explicit instantiations
 template class DB_PUBLIC local_processor_result_computation_task<db::Polygon, db::Polygon, db::Polygon>;
@@ -2652,6 +2673,12 @@ template class DB_PUBLIC local_processor_result_computation_task<db::Edge, db::E
 template class DB_PUBLIC local_processor_result_computation_task<db::Edge, db::PolygonRef, db::Edge>;
 template class DB_PUBLIC local_processor_result_computation_task<db::Edge, db::Polygon, db::Edge>;
 template class DB_PUBLIC local_processor_result_computation_task<db::Edge, db::Edge, db::EdgePair>;
+template class DB_PUBLIC local_processor_result_computation_task<db::EdgePair, db::Polygon, db::EdgePair>;
+template class DB_PUBLIC local_processor_result_computation_task<db::EdgePair, db::PolygonRef, db::EdgePair>;
+template class DB_PUBLIC local_processor_result_computation_task<db::EdgePair, db::Edge, db::EdgePair>;
+template class DB_PUBLIC local_processor_result_computation_task<db::EdgePair, db::Polygon, db::Polygon>;
+template class DB_PUBLIC local_processor_result_computation_task<db::EdgePair, db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC local_processor_result_computation_task<db::EdgePair, db::Edge, db::Edge>;
 
 //  explicit instantiations
 template class DB_PUBLIC local_processor<db::Polygon, db::Polygon, db::Polygon>;
@@ -2683,6 +2710,12 @@ template class DB_PUBLIC local_processor<db::Edge, db::PolygonRef, db::PolygonRe
 template class DB_PUBLIC local_processor<db::Edge, db::Edge, db::EdgePair>;
 template class DB_PUBLIC local_processor<db::TextRef, db::PolygonRef, db::TextRef>;
 template class DB_PUBLIC local_processor<db::TextRef, db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC local_processor<db::EdgePair, db::Polygon, db::EdgePair>;
+template class DB_PUBLIC local_processor<db::EdgePair, db::PolygonRef, db::EdgePair>;
+template class DB_PUBLIC local_processor<db::EdgePair, db::Edge, db::EdgePair>;
+template class DB_PUBLIC local_processor<db::EdgePair, db::Polygon, db::Polygon>;
+template class DB_PUBLIC local_processor<db::EdgePair, db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC local_processor<db::EdgePair, db::Edge, db::Edge>;
 
 }
 

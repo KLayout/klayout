@@ -2813,13 +2813,14 @@ CODE
             requires_region
             other.requires_region
           else
-            requires_edges_texts_or_region
-            if self.data.is_a?(RBA::Text)
+            if self.data.is_a?(RBA::Texts)
               other.requires_region
             elsif self.data.is_a?(RBA::Region)
               other.requires_edges_texts_or_region
-            else
+            elsif self.data.is_a?(RBA::Edges) || self.data.is_a?(RBA::EdgePairs)
               other.requires_edges_or_region
+            else
+              raise("Invalid data type of primary layer")
             end
           end
 
@@ -2837,11 +2838,13 @@ CODE
 
         @engine._context("#{f}") do
 
-          requires_edges_or_region
+          check_is_layer(other)
           if self.data.is_a?(RBA::Edges)
             other.requires_edges_or_region
-          else
+          elsif self.data.is_a?(RBA::Region) || self.data.is_a?(RBA::EdgePairs)
             other.requires_region
+          else
+            raise("Invalid data type of primary layer")
           end
 
           DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data))
@@ -2913,12 +2916,14 @@ CODE
         @engine._context("#{f}") do
 
           check_is_layer(other)
-          if self.data.is_a?(RBA::Text)
+          if self.data.is_a?(RBA::Texts)
             other.requires_region
           elsif self.data.is_a?(RBA::Region)
             other.requires_edges_texts_or_region
-          else
+          elsif self.data.is_a?(RBA::Edges) || self.data.is_a?(RBA::EdgePairs)
             other.requires_edges_or_region
+          else
+            raise("Invalid data type of primary layer")
           end
 
           DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data, *minmax_count(*args)))
@@ -2938,13 +2943,14 @@ CODE
         @engine._context("#{f}") do
 
           check_is_layer(other)
-          requires_edges_texts_or_region
-          if self.data.is_a?(RBA::Text)
+          if self.data.is_a?(RBA::Texts)
             other.requires_region
           elsif self.data.is_a?(RBA::Region)
             other.requires_edges_texts_or_region
-          else
+          elsif self.data.is_a?(RBA::Edges) || self.data.is_a?(RBA::EdgePairs)
             other.requires_edges_or_region
+          else
+            raise("Invalid data type of primary layer")
           end
 
           if @engine.is_tiled?
@@ -2985,11 +2991,13 @@ CODE
         @engine._context("#{f}") do
 
           check_is_layer(other)
-          requires_edges_or_region
-          if self.data.is_a?(RBA::Edges)
-            other.requires_edges_or_region
-          elsif self.data.is_a?(RBA::Region)
+          if self.data.is_a?(RBA::Region)
             other.requires_edges_texts_or_region
+          elsif self.data.is_a?(RBA::Edges) || self.data.is_a?(RBA::EdgePairs)
+            other.requires_edges_or_region
+          else
+            # Note: there is no "split" for Texts yet.
+            raise("Invalid data type of primary layer")
           end
 
           res = @engine._tcmd_a2(self.data, 0, self.data.class, self.data.class, :#{f}, other.data, *minmax_count(*args))
@@ -3088,11 +3096,13 @@ CODE
 
         @engine._context("#{f}") do
 
-          requires_edges_or_region
+          check_is_layer(other)
           if self.data.is_a?(RBA::Edges)
             other.requires_edges_or_region
-          else
+          elsif self.data.is_a?(RBA::Region) || self.data.is_a?(RBA::EdgePairs)
             other.requires_region
+          else
+            raise("Invalid data type of primary layer")
           end
 
           if @engine.is_tiled?
@@ -3115,11 +3125,12 @@ CODE
         @engine._context("#{f}") do
 
           check_is_layer(other)
-          requires_edges_or_region
           if self.data.is_a?(RBA::Edges)
             other.requires_edges_or_region
-          elsif self.data.is_a?(RBA::Region)
+          elsif self.data.is_a?(RBA::Region) || self.data.is_a?(RBA::EdgePairs)
             other.requires_region
+          else
+            raise("Invalid data type of primary layer")
           end
 
           res = @engine._tcmd_a2(self.data, 0, self.data.class, self.data.class, :#{f}, other.data, *minmax_count(*args))

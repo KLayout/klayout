@@ -218,6 +218,16 @@ public:
   }
 
   /**
+   *  @brief Takes the underlying delegate object
+   */
+  EdgePairsDelegate *take_delegate ()
+  {
+    EdgePairsDelegate *delegate = mp_delegate;
+    mp_delegate = 0;
+    return delegate;
+  }
+
+  /**
    *  @brief Iterator of the edge pair set
    *
    *  The iterator delivers the edges of the edge pair set.
@@ -369,6 +379,214 @@ public:
    *  with the outputs of the processor.
    */
   void processed (Edges &output, const EdgePairToEdgeProcessorBase &proc) const;
+
+  /**
+   *  @brief Selects all polygons of the region set which overlap or touch edges from this edge pair set
+   *
+   *  Merged semantics applies for the other region. Merged polygons will be selected from the other region
+   *  if merged semantics is enabled.
+   */
+  void pull_interacting (Region &output, const Region &other) const;
+
+  /**
+   *  @brief Selects all edges of the other edge set which overlap or touch edges from this edge pair set
+   *
+   *  Merged semantics applies. If merged semantics is chosen, the connected edge parts will be
+   *  selected as a whole from other.
+   */
+  void pull_interacting (Edges &output, const Edges &other) const;
+
+  /**
+   *  @brief Selects all edge pairs of this set which overlap or touch with polygons from the region
+   */
+  EdgePairs &select_interacting (const Region &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ())
+  {
+    set_delegate (mp_delegate->selected_interacting (other, min_count, max_count));
+    return *this;
+  }
+
+  /**
+   *  @brief Returns all edge pairs of this set which overlap or touch with polygons from the region
+   *
+   *  This method is an out-of-place version of select_interacting.
+   */
+  EdgePairs selected_interacting (const Region &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const
+  {
+    return EdgePairs (mp_delegate->selected_interacting (other, min_count, max_count));
+  }
+
+  /**
+   *  @brief Selects all edge pairs of this set which do not overlap or touch with polygons from the region
+   */
+  EdgePairs &select_not_interacting (const Region &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ())
+  {
+    set_delegate (mp_delegate->selected_not_interacting (other, min_count, max_count));
+    return *this;
+  }
+
+  /**
+   *  @brief Returns all edge pairs of this set which do not overlap or touch with polygons from the region
+   *
+   *  This method is an out-of-place version of select_not_interacting.
+   */
+  EdgePairs selected_not_interacting (const Region &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const
+  {
+    return EdgePairs (mp_delegate->selected_not_interacting (other, min_count, max_count));
+  }
+
+  /**
+   *  @brief Returns all edge pairs of this set which do not overlap or touch with polygons from the region together with the ones that do not
+   */
+  std::pair<EdgePairs, EdgePairs> selected_interacting_differential (const Region &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const
+  {
+    std::pair<db::EdgePairsDelegate *, db::EdgePairsDelegate *> p = mp_delegate->selected_interacting_pair (other, min_count, max_count);
+    return std::pair<EdgePairs, EdgePairs> (EdgePairs (p.first), EdgePairs (p.second));
+  }
+
+  /**
+   *  @brief Selects all edge pairs of this collection which are completely outside polygons from the region
+   */
+  EdgePairs &select_outside (const Region &other)
+  {
+    set_delegate (mp_delegate->selected_outside (other));
+    return *this;
+  }
+
+  /**
+   *  @brief Selects all edge pairs of this collection which are not completely outside polygons from the region
+   */
+  EdgePairs &select_not_outside (const Region &other)
+  {
+    set_delegate (mp_delegate->selected_not_outside (other));
+    return *this;
+  }
+
+  /**
+   *  @brief Returns all edge pairs of this collection which are completely outside polygons from the region
+   *
+   *  This method is an out-of-place version of select_outside.
+   */
+  EdgePairs selected_outside (const Region &other) const
+  {
+    return EdgePairs (mp_delegate->selected_outside (other));
+  }
+
+  /**
+   *  @brief Returns all edge pairs of this collection which are not completely outside polygons from the region
+   *
+   *  This method is an out-of-place version of select_not_outside.
+   */
+  EdgePairs selected_not_outside (const Region &other) const
+  {
+    return EdgePairs (mp_delegate->selected_not_outside (other));
+  }
+
+  /**
+   *  @brief Returns all edge pairs of this which are completely outside polygons from the region and the opposite ones at the same time
+   *
+   *  This method is equivalent to calling selected_outside and selected_not_outside, but faster.
+   */
+  std::pair<EdgePairs, EdgePairs> selected_outside_differential (const Region &other) const
+  {
+    std::pair<db::EdgePairsDelegate *, db::EdgePairsDelegate *> p = mp_delegate->selected_outside_pair (other);
+    return std::pair<EdgePairs, EdgePairs> (EdgePairs (p.first), EdgePairs (p.second));
+  }
+
+  /**
+   *  @brief Selects all edge pairs of this collection which are completely inside polygons from the region
+   */
+  EdgePairs &select_inside (const Region &other)
+  {
+    set_delegate (mp_delegate->selected_inside (other));
+    return *this;
+  }
+
+  /**
+   *  @brief Selects all edge pairs of this collection which are not completely inside polygons from the region
+   */
+  EdgePairs &select_not_inside (const Region &other)
+  {
+    set_delegate (mp_delegate->selected_not_inside (other));
+    return *this;
+  }
+
+  /**
+   *  @brief Returns all edge pairs of this which are completely inside polygons from the region
+   *
+   *  This method is an out-of-place version of select_inside.
+   */
+  EdgePairs selected_inside (const Region &other) const
+  {
+    return EdgePairs (mp_delegate->selected_inside (other));
+  }
+
+  /**
+   *  @brief Returns all edge pairs of this which are not completely inside polygons from the region
+   *
+   *  This method is an out-of-place version of select_not_inside.
+   */
+  EdgePairs selected_not_inside (const Region &other) const
+  {
+    return EdgePairs (mp_delegate->selected_not_inside (other));
+  }
+
+  /**
+   *  @brief Returns all edge pairs of this which are completely inside polygons from the region and the opposite ones at the same time
+   *
+   *  This method is equivalent to calling selected_inside and selected_not_inside, but faster.
+   */
+  std::pair<EdgePairs, EdgePairs> selected_inside_differential (const Region &other) const
+  {
+    std::pair<db::EdgePairsDelegate *, db::EdgePairsDelegate *> p = mp_delegate->selected_inside_pair (other);
+    return std::pair<EdgePairs, EdgePairs> (EdgePairs (p.first), EdgePairs (p.second));
+  }
+
+  /**
+   *  @brief Selects all edge pairs of this edge pairs set which overlap or touch with edges from the edge set
+   */
+  EdgePairs &select_interacting (const Edges &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ())
+  {
+    set_delegate (mp_delegate->selected_interacting (other, min_count, max_count));
+    return *this;
+  }
+
+  /**
+   *  @brief Returns all edge pairs of this edge pairs set which overlap or touch with edges from the edge set
+   *
+   *  This method is an out-of-place version of select_interacting.
+   */
+  EdgePairs selected_interacting (const Edges &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const
+  {
+    return EdgePairs (mp_delegate->selected_interacting (other, min_count, max_count));
+  }
+
+  /**
+   *  @brief Returns all edge pairs of this edge set which do not overlap or touch with edges from the other edge set together with the ones that do not
+   */
+  std::pair<EdgePairs, EdgePairs> selected_interacting_differential (const Edges &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const
+  {
+    std::pair<db::EdgePairsDelegate *, db::EdgePairsDelegate *> p = mp_delegate->selected_interacting_pair (other, min_count, max_count);
+    return std::pair<EdgePairs, EdgePairs> (EdgePairs (p.first), EdgePairs (p.second));
+  }
+
+  /**
+   *  @brief Selects all edge pairs of this edge pairs set which do not overlap or touch with edges from the edge set
+   */
+  EdgePairs &select_not_interacting (const Edges &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ())
+  {
+    set_delegate (mp_delegate->selected_not_interacting (other, min_count, max_count));
+    return *this;
+  }
+
+  /**
+   *  @brief Returns all edge pairs of this edge pairs set which do not overlap or touch with edges from the edge set
+   *
+   *  This method is an out-of-place version of select_not_interacting.
+   */
+  EdgePairs selected_not_interacting (const Edges &other, size_t min_count = 1, size_t max_count = std::numeric_limits<size_t>::max ()) const
+  {
+    return EdgePairs (mp_delegate->selected_not_interacting (other, min_count, max_count));
+  }
 
   /**
    *  @brief Transforms the edge pair set
@@ -558,6 +776,26 @@ public:
    *  appended.
    */  
   void second_edges (Edges &output) const;
+
+  /**
+   *  @brief Sets the base verbosity
+   *
+   *  Setting this value will make timing measurements appear at least at
+   *  the given verbosity level and more detailed timing at the given level
+   *  plus 10. The default level is 30.
+   */
+  void set_base_verbosity (int vb)
+  {
+    mp_delegate->set_base_verbosity (vb);
+  }
+
+  /**
+   *  @brief Gets the base verbosity
+   */
+  unsigned int base_verbosity () const
+  {
+    return mp_delegate->base_verbosity ();
+  }
 
   /**
    *  @brief Enable progress reporting

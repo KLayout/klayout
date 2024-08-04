@@ -211,6 +211,15 @@ Class<shape_processor_impl<db::EdgePairToEdgeProcessorBase> > decl_EdgePairToEdg
 // ---------------------------------------------------------------------------------
 //  EdgePairs binding
 
+static inline std::vector<db::EdgePairs> as_2edge_pairs_vector (const std::pair<db::EdgePairs, db::EdgePairs> &rp)
+{
+  std::vector<db::EdgePairs> res;
+  res.reserve (2);
+  res.push_back (db::EdgePairs (const_cast<db::EdgePairs &> (rp.first).take_delegate ()));
+  res.push_back (db::EdgePairs (const_cast<db::EdgePairs &> (rp.second).take_delegate ()));
+  return res;
+}
+
 static db::EdgePairs *new_v ()
 {
   return new db::EdgePairs ();
@@ -285,6 +294,40 @@ static db::EdgePairs moved_p (const db::EdgePairs *r, const db::Vector &p)
 static db::EdgePairs moved_xy (const db::EdgePairs *r, db::Coord x, db::Coord y)
 {
   return r->transformed (db::Disp (db::Vector (x, y)));
+}
+
+static db::Region pull_interacting_polygons (const db::EdgePairs *r, const db::Region &other)
+{
+  db::Region out;
+  r->pull_interacting (out, other);
+  return out;
+}
+
+static db::Edges pull_interacting_edges (const db::EdgePairs *r, const db::Edges &other)
+{
+  db::Edges out;
+  r->pull_interacting (out, other);
+  return out;
+}
+
+static std::vector<db::EdgePairs> split_inside_with_region (const db::EdgePairs *r, const db::Region &other)
+{
+  return as_2edge_pairs_vector (r->selected_inside_differential (other));
+}
+
+static std::vector<db::EdgePairs> split_outside_with_region (const db::EdgePairs *r, const db::Region &other)
+{
+  return as_2edge_pairs_vector (r->selected_outside_differential (other));
+}
+
+static std::vector<db::EdgePairs> split_interacting_with_edges (const db::EdgePairs *r, const db::Edges &other, size_t min_count, size_t max_count)
+{
+  return as_2edge_pairs_vector (r->selected_interacting_differential (other, min_count, max_count));
+}
+
+static std::vector<db::EdgePairs> split_interacting_with_region (const db::EdgePairs *r, const db::Region &other, size_t min_count, size_t max_count)
+{
+  return as_2edge_pairs_vector (r->selected_interacting_differential (other, min_count, max_count));
 }
 
 static db::Region polygons1 (const db::EdgePairs *e)
@@ -1157,6 +1200,247 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "modified by applying the enlargement and the edges are shifted by the enlargement. By specifying an "
     "enlargement it is possible to give edge pairs an area which otherwise would not have one (coincident edges, "
     "two point-like edges)."
+  ) +
+  method ("interacting", (db::EdgePairs (db::EdgePairs::*) (const db::Edges &, size_t, size_t) const)  &db::EdgePairs::selected_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
+    "@brief Returns the edge pairs from this edge pair collection which overlap or touch edges from the other edge collection\n"
+    "\n"
+    "@return A new edge pair collection containing the edge pairs overlapping or touching edges from the other edge collection\n"
+    "\n"
+    "'min_count' and 'max_count' impose a constraint on the number of times an edge pair of this collection "
+    "has to interact with (different) edges of the other collection to make the edge pair selected. An edge pair is "
+    "not selected by this method if the number of edges interacting with an edge pair of this collection is between min_count and max_count "
+    "(including max_count).\n"
+    "\n"
+    "Edge pairs are considered 'filled' in the context of this operation - i.e. the area between the edges belongs to "
+    "the edge pair, hence participates in the check.\n"
+    "\n"
+    "This method has been introduced in version 0.29.6\n"
+  ) +
+  method ("not_interacting", (db::EdgePairs (db::EdgePairs::*) (const db::Edges &, size_t, size_t) const)  &db::EdgePairs::selected_not_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
+    "@brief Returns the edge pairs from this edge pair collection which do not overlap or touch edges from the other edge collection\n"
+    "\n"
+    "@return A new edge pair collection containing the edge pairs not overlapping or touching edges from the other edge collection\n"
+    "\n"
+    "'min_count' and 'max_count' impose a constraint on the number of times an edge pair of this collection "
+    "has to interact with (different) edges of the other collection to make the edge pair selected. An edge pair is "
+    "not selected by this method if the number of edges interacting with an edge pair of this collection is between min_count and max_count "
+    "(including max_count).\n"
+    "\n"
+    "Edge pairs are considered 'filled' in the context of this operation - i.e. the area between the edges belongs to "
+    "the edge pair, hence participates in the check.\n"
+    "\n"
+    "This method has been introduced in version 0.29.6\n"
+  ) +
+  method ("select_interacting", (db::EdgePairs &(db::EdgePairs::*) (const db::Edges &, size_t, size_t)) &db::EdgePairs::select_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
+    "@brief Selects the edge pairs from this edge pair collection which overlap or touch edges from the other edge collection\n"
+    "\n"
+    "@return The edge pair collection after the edge pairs have been selected (self)\n"
+    "\n"
+    "This is the in-place version of \\interacting - i.e. self is modified rather than a new collection is returned.\n"
+    "\n"
+    "This method has been introduced in version 0.29.6\n"
+  ) +
+  method ("select_not_interacting", (db::EdgePairs &(db::EdgePairs::*) (const db::Edges &, size_t, size_t)) &db::EdgePairs::select_not_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
+    "@brief Selects the edge pairs from this edge pair collection which do not overlap or touch edges from the other edge collection\n"
+    "\n"
+    "@return The edge pair collection after the edge pairs have been selected (self)\n"
+    "\n"
+    "This is the in-place version of \\not_interacting - i.e. self is modified rather than a new collection is returned.\n"
+    "\n"
+    "This method has been introduced in version 0.29.6\n"
+  ) +
+  method_ext ("split_interacting", &split_interacting_with_edges, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
+    "@brief Selects the edge pairs from this edge pair collection which do and do not interact with edges from the other collection\n"
+    "\n"
+    "@return A two-element list of edge pair collections (first: interacting, second: non-interacting)\n"
+    "\n"
+    "This method provides a faster way to compute both interacting and non-interacting edges compared to using separate methods. "
+    "It has been introduced in version 0.29.6.\n"
+  ) +
+  method ("interacting", (db::EdgePairs (db::EdgePairs::*) (const db::Region &, size_t, size_t) const)  &db::EdgePairs::selected_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
+    "@brief Returns the edge pairs from this edge pair collection which overlap or touch polygons from the region\n"
+    "\n"
+    "@return A new edge pair collection containing the edge pairs overlapping or touching polygons from the region\n"
+    "\n"
+    "'min_count' and 'max_count' impose a constraint on the number of times an edge pair of this collection "
+    "has to interact with (different) polygons of the other region to make the edge pair selected. An edge pair is "
+    "not selected by this method if the number of polygons interacting with an edge pair of this collection is between min_count and max_count "
+    "(including max_count).\n"
+    "\n"
+    "Edge pairs are considered 'filled' in the context of this operation - i.e. the area between the edges belongs to "
+    "the edge pair, hence participates in the check.\n"
+    "\n"
+    "This method has been introduced in version 0.29.6\n"
+  ) +
+  method ("not_interacting", (db::EdgePairs (db::EdgePairs::*) (const db::Region &, size_t, size_t) const)  &db::EdgePairs::selected_not_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
+    "@brief Returns the edge pairs from this edge pair collection which do not overlap or touch polygons from the region\n"
+    "\n"
+    "@return A new edge pair collection containing the edge pairs not overlapping or touching polygons from the region\n"
+    "\n"
+    "'min_count' and 'max_count' impose a constraint on the number of times an edge pair of this collection "
+    "has to interact with (different) polygons of the other region to make the edge pair selected. An edge pair is "
+    "not selected by this method if the number of polygons interacting with an edge pair of this collection is between min_count and max_count "
+    "(including max_count).\n"
+    "\n"
+    "Edge pairs are considered 'filled' in the context of this operation - i.e. the area between the edges belongs to "
+    "the edge pair, hence participates in the check.\n"
+    "\n"
+    "This method has been introduced in version 0.29.6\n"
+  ) +
+  method ("select_interacting", (db::EdgePairs &(db::EdgePairs::*) (const db::Region &, size_t, size_t)) &db::EdgePairs::select_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
+    "@brief Selects the edge pairs from this edge pair collection which overlap or touch polygons from the region\n"
+    "\n"
+    "@return The edge pair collection after the edge pairs have been selected (self)\n"
+    "\n"
+    "This is the in-place version of \\interacting - i.e. self is modified rather than a new collection is returned.\n"
+    "\n"
+    "This method has been introduced in version 0.29.6\n"
+  ) +
+  method ("select_not_interacting", (db::EdgePairs &(db::EdgePairs::*) (const db::Region &, size_t, size_t)) &db::EdgePairs::select_not_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
+    "@brief Selects the edge pairs from this edge pair collection which do not overlap or touch polygons from the region\n"
+    "\n"
+    "@return The edge pair collection after the edge pairs have been selected (self)\n"
+    "\n"
+    "This is the in-place version of \\not_interacting - i.e. self is modified rather than a new collection is returned.\n"
+    "\n"
+    "This method has been introduced in version 0.29.6\n"
+  ) +
+  method_ext ("split_interacting", &split_interacting_with_region, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
+    "@brief Selects the edge pairs from this edge pair collection which do and do not interact with polygons from the other region\n"
+    "\n"
+    "@return A two-element list of edge pair collections (first: interacting, second: non-interacting)\n"
+    "\n"
+    "This method provides a faster way to compute both interacting and non-interacting edges compared to using separate methods. "
+    "It has been introduced in version 0.29.6.\n"
+  ) +
+  method ("inside", (db::EdgePairs (db::EdgePairs::*) (const db::Region &) const) &db::EdgePairs::selected_inside, gsi::arg ("other"),
+    "@brief Returns the edge pairs from this edge pair collection which are inside (completely covered by) polygons from the region\n"
+    "\n"
+    "@return A new edge pair collection containing the edge pairs completely inside polygons from the region\n"
+    "\n"
+    "Edge pairs are considered 'filled' in the context of this operation - i.e. the area between the edges belongs to "
+    "the edge pair, hence participates in the check.\n"
+    "\n"
+    "This method has been introduced in version 0.29.6\n"
+  ) +
+  method ("not_inside", (db::EdgePairs (db::EdgePairs::*) (const db::Region &) const) &db::EdgePairs::selected_not_inside, gsi::arg ("other"),
+    "@brief Returns the edge pairs from this edge pair collection which are not inside (not completely covered by) polygons from the region\n"
+    "\n"
+    "@return A new edge pair collection containing the edge pairs not completely inside polygons from the region\n"
+    "\n"
+    "Edge pairs are considered 'filled' in the context of this operation - i.e. the area between the edges belongs to "
+    "the edge pair, hence participates in the check.\n"
+    "\n"
+    "This method has been introduced in version 0.29.6\n"
+  ) +
+  method ("select_inside", (db::EdgePairs &(db::EdgePairs::*) (const db::Region &)) &db::EdgePairs::select_inside, gsi::arg ("other"),
+    "@brief Selects the edge pairs from this edge pair collection which are inside (completely covered by) polygons from the region\n"
+    "\n"
+    "@return The edge pair collection after the edge pairs have been selected (self)\n"
+    "\n"
+    "Edge pairs are considered 'filled' in the context of this operation - i.e. the area between the edges belongs to "
+    "the edge pair, hence participates in the check.\n"
+    "\n"
+    "This method has been introduced in version 0.29.6\n"
+  ) +
+  method ("select_not_inside", (db::EdgePairs &(db::EdgePairs::*) (const db::Region &)) &db::EdgePairs::select_not_inside, gsi::arg ("other"),
+    "@brief Selects the edge pairs from this edge pair collection which are not inside (completely covered by) polygons from the region\n"
+    "\n"
+    "@return The edge pair collection after the edge pairs have been selected (self)\n"
+    "\n"
+    "Edge pairs are considered 'filled' in the context of this operation - i.e. the area between the edges belongs to "
+    "the edge pair, hence participates in the check.\n"
+    "\n"
+    "This method has been introduced in version 0.29.6\n"
+  ) +
+  method_ext ("split_inside", &split_inside_with_region, gsi::arg ("other"),
+    "@brief Selects the edge pairs from this edge pair collection which are and are not inside (completely covered by) polygons from the other region\n"
+    "\n"
+    "@return A two-element list of edge pair collections (first: inside, second: non-inside)\n"
+    "\n"
+    "This method provides a faster way to compute both inside and non-inside edge pairs compared to using separate methods. "
+    "It has been introduced in version 0.29.6."
+  ) +
+  method ("outside", (db::EdgePairs (db::EdgePairs::*) (const db::Region &) const) &db::EdgePairs::selected_outside, gsi::arg ("other"),
+    "@brief Returns the edge pairs from this edge pair collection which are outside (not overlapped by) polygons from the other region\n"
+    "\n"
+    "@return A new edge pair collection containing the the selected edges\n"
+    "\n"
+    "Edge pairs are considered 'filled' in the context of this operation - i.e. the area between the edges belongs to "
+    "the edge pair, hence participates in the check.\n"
+    "\n"
+    "This method has been introduced in version 0.29.6\n"
+  ) +
+  method ("not_outside", (db::EdgePairs (db::EdgePairs::*) (const db::Region &) const) &db::EdgePairs::selected_not_outside, gsi::arg ("other"),
+    "@brief Returns the edge pairs from this edge pair collection which are not outside (partially overlapped by) polygons from the other region\n"
+    "\n"
+    "@return A new edge pair collection containing the the selected edges\n"
+    "\n"
+    "Edge pairs are considered 'filled' in the context of this operation - i.e. the area between the edges belongs to "
+    "the edge pair, hence participates in the check.\n"
+    "\n"
+    "This method has been introduced in version 0.29.6\n"
+  ) +
+  method ("select_outside", (db::EdgePairs &(db::EdgePairs::*) (const db::Region &)) &db::EdgePairs::select_outside, gsi::arg ("other"),
+    "@brief Selects the edge pairs from this edge pair collection which are outside (not overlapped by) polygons from the other region\n"
+    "\n"
+    "@return The edge pair collection after the edges have been selected (self)\n"
+    "\n"
+    "Edge pairs are considered 'filled' in the context of this operation - i.e. the area between the edges belongs to "
+    "the edge pair, hence participates in the check.\n"
+    "\n"
+    "This method has been introduced in version 0.29.6\n"
+  ) +
+  method ("select_not_outside", (db::EdgePairs &(db::EdgePairs::*) (const db::Region &)) &db::EdgePairs::select_not_outside, gsi::arg ("other"),
+    "@brief Selects the edge pairs from this edge pair collection which are not outside (partially overlapped by) polygons from the other region\n"
+    "\n"
+    "@return The edge pair collection after the edges have been selected (self)\n"
+    "\n"
+    "Edge pairs are considered 'filled' in the context of this operation - i.e. the area between the edges belongs to "
+    "the edge pair, hence participates in the check.\n"
+    "\n"
+    "This method has been introduced in version 0.29.6\n"
+  ) +
+  method_ext ("split_outside", &split_outside_with_region, gsi::arg ("other"),
+    "@brief Selects the edge pairs from this edge pair collection which are and are not outside (not overlapped by) polygons from the other region\n"
+    "\n"
+    "@return A two-element list of edge pair collections (first: outside, second: non-outside)\n"
+    "\n"
+    "This method provides a faster way to compute both outside and non-outside edges compared to using separate methods. "
+    "\n"
+    "This method has been introduced in version 0.29.6\n"
+  ) +
+  method_ext ("pull_interacting", &pull_interacting_edges, gsi::arg ("other"),
+    "@brief Returns all edges of \"other\" which are interacting with (overlapping, touching) edge pairs of this set\n"
+    "The \"pull_...\" methods are similar to \"select_...\" but work the opposite way: they "
+    "select shapes from the argument region rather than self. In a deep (hierarchical) context "
+    "the output region will be hierarchically aligned with self, so the \"pull_...\" methods "
+    "provide a way for re-hierarchization.\n"
+    "\n"
+    "Edge pairs are considered 'filled' in the context of this operation - i.e. the area between the edges belongs to "
+    "the edge pair, hence participates in the check.\n"
+    "\n"
+    "@return The edge collection after the edges have been selected (from other)\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.29.6\n"
+  ) +
+  method_ext ("pull_interacting", &pull_interacting_polygons, gsi::arg ("other"),
+    "@brief Returns all polygons of \"other\" which are interacting with (overlapping, touching) edge pairs of this set\n"
+    "The \"pull_...\" methods are similar to \"select_...\" but work the opposite way: they "
+    "select shapes from the argument region rather than self. In a deep (hierarchical) context "
+    "the output region will be hierarchically aligned with self, so the \"pull_...\" methods "
+    "provide a way for re-hierarchization.\n"
+    "\n"
+    "Edge pairs are considered 'filled' in the context of this operation - i.e. the area between the edges belongs to "
+    "the edge pair, hence participates in the check.\n"
+    "\n"
+    "@return The region after the polygons have been selected (from other)\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.29.6\n"
   ) +
   method ("clear", &db::EdgePairs::clear,
     "@brief Clears the edge pair collection\n"

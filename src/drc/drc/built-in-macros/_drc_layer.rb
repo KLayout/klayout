@@ -2283,11 +2283,15 @@ CODE
     
     # %DRC%
     # @name inside
-    # @brief Selects edges or polygons of self which are inside edges or polygons from the other layer
+    # @brief Selects edges, edge pairs or polygons of self which are inside edges or polygons from the other layer
     # @synopsis layer.inside(other)
     #
     # If layer is a polygon layer, the other layer needs to be a polygon layer too.
     # In this case, this method selects all polygons which are completely inside 
+    # polygons from the other layer.
+    #
+    # If layer is an edge pair layer, the other layer needs to be a polygon layer.
+    # In this case, this method selects all edge pairs which are completely inside 
     # polygons from the other layer.
     #
     # If layer is an edge layer, the other layer can be polygon or edge layer. In the
@@ -2329,10 +2333,10 @@ CODE
     
     # %DRC%
     # @name not_inside
-    # @brief Selects edges or polygons of self which are not inside edges or polygons from the other layer
+    # @brief Selects edges, edge pairs or polygons of self which are not inside edges or polygons from the other layer
     # @synopsis layer.not_inside(other)
     #
-    # This method computes the inverse of \inside - i.e. edges or polygons from the layer
+    # This method computes the inverse of \inside - i.e. edge, edge pairs or polygons from the layer
     # not being inside polygons or edges from the other layer. 
     #
     # This method returns a new layer containing the selected shapes. A version which modifies self
@@ -2370,7 +2374,7 @@ CODE
     # @brief Returns the results of \inside and \not_inside at the same time
     # @synopsis (a, b) = layer.split_inside(other)
     #
-    # This method returns the polygons or edges inside of polygons or edges from the other layer in 
+    # This method returns the polygons, edge pairs or edges inside of polygons or edges from the other layer in 
     # one layer and all others in a second layer. This method is equivalent to calling 
     # \inside and \not_inside, but is faster than doing this in separate steps:
     #
@@ -2380,7 +2384,7 @@ CODE
     
     # %DRC%
     # @name select_inside
-    # @brief Selects edges or polygons of self which are inside edges or polygons from the other layer
+    # @brief Selects edges, edge pairs or polygons of self which are inside edges or polygons from the other layer
     # @synopsis layer.select_inside(other)
     #
     # This method is the in-place version of \inside - i.e. it modifies the layer instead
@@ -2388,7 +2392,7 @@ CODE
     
     # %DRC%
     # @name select_not_inside
-    # @brief Selects edges or polygons of self which are not inside edges or polygons from the other layer
+    # @brief Selects edges, edge pairs or polygons of self which are not inside edges or polygons from the other layer
     # @synopsis layer.select_not_inside(other)
     #
     # This method is the in-place version of \inside - i.e. it modifies the layer instead
@@ -2396,11 +2400,15 @@ CODE
     
     # %DRC%
     # @name outside
-    # @brief Selects edges or polygons of self which are outside edges or polygons from the other layer
+    # @brief Selects edges, edge pairs or polygons of self which are outside edges or polygons from the other layer
     # @synopsis layer.outside(other)
     #
     # If layer is a polygon layer, the other layer needs to be a polygon layer too.
     # In this case, this method selects all polygons which are entirely outside 
+    # polygons from the other layer.
+    #
+    # If layer is an edge pair layer, the other layer needs to be a polygon layer.
+    # In this case, this method selects all edge pairs which are entirely outside 
     # polygons from the other layer.
     #
     # If layer is an edge layer, the other layer can be polygon or edge layer. In the
@@ -2442,10 +2450,10 @@ CODE
     
     # %DRC%
     # @name not_outside
-    # @brief Selects edges or polygons of self which are not outside edges or polygons from the other layer
+    # @brief Selects edges, edge pairs or polygons of self which are not outside edges or polygons from the other layer
     # @synopsis layer.not_outside(other)
     #
-    # This method computes the inverse of \outside - i.e. edges or polygons from the layer
+    # This method computes the inverse of \outside - i.e. edges, edge pairs or polygons from the layer
     # not being outside polygons or edges from the other layer. 
     #
     # This method returns a new layer containing the selected shapes. A version which modifies self
@@ -2483,7 +2491,7 @@ CODE
     # @brief Returns the results of \outside and \not_outside at the same time
     # @synopsis (a, b) = layer.split_outside(other)
     #
-    # This method returns the polygons or edges outside of polygons or edges from the other layer in 
+    # This method returns the polygons, edge pairs or edges outside of polygons or edges from the other layer in 
     # one layer and all others in a second layer. This method is equivalent to calling 
     # \outside and \not_outside, but is faster than doing this in separate steps:
     #
@@ -2493,7 +2501,7 @@ CODE
     
     # %DRC%
     # @name select_outside
-    # @brief Selects edges or polygons of self which are outside edges or polygons from the other layer
+    # @brief Selects edges, edge pairs or polygons of self which are outside edges or polygons from the other layer
     # @synopsis layer.select_outside(other)
     #
     # This method is the in-place version of \outside - i.e. it modifies the layer instead
@@ -2501,7 +2509,7 @@ CODE
     
     # %DRC%
     # @name select_not_outside
-    # @brief Selects edges or polygons of self which are not outside edges or polygons from the other layer
+    # @brief Selects edges, edge pairs or polygons of self which are not outside edges or polygons from the other layer
     # @synopsis layer.select_not_outside(other)
     #
     # This method is the in-place version of \outside - i.e. it modifies the layer instead
@@ -2571,7 +2579,7 @@ CODE
     # It returns a new layer containing the selected shapes. A version which modifies self
     # is \select_interacting.
     #
-    # This method is available for polygon, text and edge layers. Edges can be selected
+    # This method is available for polygon, text, edge and edge pair layers. Edges and edge pairs can be selected
     # with respect to other edges or polygons. Texts can be selected with respect to 
     # polygons. Polygons can be selected with respect to edges, texts and other polygons.
     #
@@ -2612,7 +2620,7 @@ CODE
     # It returns a new layer containing the selected shapes. A version which modifies self
     # is \select_not_interacting.
     #
-    # This method is available for polygon, text and edge layers. Edges can be selected
+    # This method is available for polygon, text, edge and edge pair layers. Edges and edge pairs can be selected
     # with respect to other edges or polygons. Texts can be selected with respect to 
     # polygons. Polygons can be selected with respect to edges, texts and other polygons.
     #
@@ -2668,7 +2676,7 @@ CODE
     # It modifies self to contain the selected shapes. A version which does not modify self
     # is \interacting.
     #
-    # This method is available for polygon, text and edge layers. Edges can be selected
+    # This method is available for polygon, text, edge and edge pair layers. Edges and edge pairs can be selected
     # with respect to other edges or polygons. Texts can be selected with respect to 
     # polygons. Polygons can be selected with respect to edges, texts and other polygons.
     #
@@ -2690,7 +2698,7 @@ CODE
     # It modifies self to contain the selected shapes. A version which does not modify self
     # is \not_interacting.
     #
-    # This method is available for polygon, text and edge layers. Edges can be selected
+    # This method is available for polygon, text, edge and edge pair layers. Edges or edge pairs can be selected
     # with respect to other edges or polygons. Texts can be selected with respect to 
     # polygons. Polygons can be selected with respect to edges, texts and other polygons.
     #
@@ -2772,7 +2780,7 @@ CODE
     #
     # This method will neither modify self nor other.
     #
-    # This method is available for polygon, edge and text layers, similar to interacting.
+    # This method is available for polygon, edge, edge pair and text layers, similar to interacting.
     
     # %DRC%
     # @name pull_overlapping
@@ -2813,13 +2821,14 @@ CODE
             requires_region
             other.requires_region
           else
-            requires_edges_texts_or_region
-            if self.data.is_a?(RBA::Text)
+            if self.data.is_a?(RBA::Texts)
               other.requires_region
             elsif self.data.is_a?(RBA::Region)
               other.requires_edges_texts_or_region
-            else
+            elsif self.data.is_a?(RBA::Edges) || self.data.is_a?(RBA::EdgePairs)
               other.requires_edges_or_region
+            else
+              raise("Invalid data type of primary layer")
             end
           end
 
@@ -2837,11 +2846,13 @@ CODE
 
         @engine._context("#{f}") do
 
-          requires_edges_or_region
+          check_is_layer(other)
           if self.data.is_a?(RBA::Edges)
             other.requires_edges_or_region
-          else
+          elsif self.data.is_a?(RBA::Region) || self.data.is_a?(RBA::EdgePairs)
             other.requires_region
+          else
+            raise("Invalid data type of primary layer")
           end
 
           DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data))
@@ -2913,12 +2924,14 @@ CODE
         @engine._context("#{f}") do
 
           check_is_layer(other)
-          if self.data.is_a?(RBA::Text)
+          if self.data.is_a?(RBA::Texts)
             other.requires_region
           elsif self.data.is_a?(RBA::Region)
             other.requires_edges_texts_or_region
-          else
+          elsif self.data.is_a?(RBA::Edges) || self.data.is_a?(RBA::EdgePairs)
             other.requires_edges_or_region
+          else
+            raise("Invalid data type of primary layer")
           end
 
           DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data, *minmax_count(*args)))
@@ -2938,13 +2951,14 @@ CODE
         @engine._context("#{f}") do
 
           check_is_layer(other)
-          requires_edges_texts_or_region
-          if self.data.is_a?(RBA::Text)
+          if self.data.is_a?(RBA::Texts)
             other.requires_region
           elsif self.data.is_a?(RBA::Region)
             other.requires_edges_texts_or_region
-          else
+          elsif self.data.is_a?(RBA::Edges) || self.data.is_a?(RBA::EdgePairs)
             other.requires_edges_or_region
+          else
+            raise("Invalid data type of primary layer")
           end
 
           if @engine.is_tiled?
@@ -2985,11 +2999,13 @@ CODE
         @engine._context("#{f}") do
 
           check_is_layer(other)
-          requires_edges_or_region
-          if self.data.is_a?(RBA::Edges)
-            other.requires_edges_or_region
-          elsif self.data.is_a?(RBA::Region)
+          if self.data.is_a?(RBA::Region)
             other.requires_edges_texts_or_region
+          elsif self.data.is_a?(RBA::Edges) || self.data.is_a?(RBA::EdgePairs)
+            other.requires_edges_or_region
+          else
+            # Note: there is no "split" for Texts yet.
+            raise("Invalid data type of primary layer")
           end
 
           res = @engine._tcmd_a2(self.data, 0, self.data.class, self.data.class, :#{f}, other.data, *minmax_count(*args))
@@ -3088,11 +3104,13 @@ CODE
 
         @engine._context("#{f}") do
 
-          requires_edges_or_region
+          check_is_layer(other)
           if self.data.is_a?(RBA::Edges)
             other.requires_edges_or_region
-          else
+          elsif self.data.is_a?(RBA::Region) || self.data.is_a?(RBA::EdgePairs)
             other.requires_region
+          else
+            raise("Invalid data type of primary layer")
           end
 
           if @engine.is_tiled?
@@ -3115,11 +3133,12 @@ CODE
         @engine._context("#{f}") do
 
           check_is_layer(other)
-          requires_edges_or_region
           if self.data.is_a?(RBA::Edges)
             other.requires_edges_or_region
-          elsif self.data.is_a?(RBA::Region)
+          elsif self.data.is_a?(RBA::Region) || self.data.is_a?(RBA::EdgePairs)
             other.requires_region
+          else
+            raise("Invalid data type of primary layer")
           end
 
           res = @engine._tcmd_a2(self.data, 0, self.data.class, self.data.class, :#{f}, other.data, *minmax_count(*args))

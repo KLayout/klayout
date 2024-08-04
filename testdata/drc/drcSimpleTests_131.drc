@@ -1,0 +1,146 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+end
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+l3 = input(3, 0)
+l4 = input(4, 0)
+l5 = input(5, 0)
+l6 = input(6, 0)
+
+l1.output(1, 0)
+l2.output(2, 0)
+l3.output(3, 0)
+l4.output(4, 0)
+l5.output(5, 0)
+l6.output(6, 0)
+
+eps = l1.sep(l2, 200.nm)
+
+eps.output(10, 0)
+
+l = 100
+eps.interacting(l3).output(l + 0, 0)
+eps.interacting(l4).output(l + 1, 0)
+eps.interacting(l5).output(l + 2, 0)
+eps.interacting(l6).output(l + 3, 0)
+
+l = 110
+eps.interacting(l3, 1..1).output(l + 0, 0)
+eps.interacting(l4, 1..1).output(l + 1, 0)
+eps.interacting(l5, 1..1).output(l + 2, 0)
+eps.interacting(l6, 1..1).output(l + 3, 0)
+
+l = 120
+eps.interacting(l3, 2).output(l + 0, 0)
+eps.interacting(l4, 2).output(l + 1, 0)
+eps.interacting(l5, 2).output(l + 2, 0)
+eps.interacting(l6, 2).output(l + 3, 0)
+
+l = 130
+eps.not_interacting(l3).output(l + 0, 0)
+eps.not_interacting(l4).output(l + 1, 0)
+eps.not_interacting(l5).output(l + 2, 0)
+eps.not_interacting(l6).output(l + 3, 0)
+
+l = 140
+eps.interacting(l3.edges).output(l + 0, 0)
+eps.interacting(l4.edges).output(l + 1, 0)
+eps.interacting(l5.edges).output(l + 2, 0)
+eps.interacting(l6.edges).output(l + 3, 0)
+
+l = 150
+eps.interacting(l3.edges, 1 .. 1).output(l + 0, 0)
+eps.interacting(l4.edges, 1 .. 1).output(l + 1, 0)
+eps.interacting(l5.edges, 1 .. 1).output(l + 2, 0)
+eps.interacting(l6.edges, 1 .. 1).output(l + 3, 0)
+
+l = 160
+eps.interacting(l3.edges, 2).output(l + 0, 0)
+eps.interacting(l4.edges, 2).output(l + 1, 0)
+eps.interacting(l5.edges, 2).output(l + 2, 0)
+eps.interacting(l6.edges, 2).output(l + 3, 0)
+
+l = 170
+eps.not_interacting(l3.edges).output(l + 0, 0)
+eps.not_interacting(l4.edges).output(l + 1, 0)
+eps.not_interacting(l5.edges).output(l + 2, 0)
+eps.not_interacting(l6.edges).output(l + 3, 0)
+
+l = 180
+eps.split_interacting(l3, 1..1)[0].output(l + 0, 0)
+eps.split_interacting(l4, 1..1)[0].output(l + 1, 0)
+eps.split_interacting(l5, 1..1)[0].output(l + 2, 0)
+eps.split_interacting(l6, 1..1)[0].output(l + 3, 0)
+
+l = 190
+eps.split_interacting(l3, 1..1)[1].output(l + 0, 0)
+eps.split_interacting(l4, 1..1)[1].output(l + 1, 0)
+eps.split_interacting(l5, 1..1)[1].output(l + 2, 0)
+eps.split_interacting(l6, 1..1)[1].output(l + 3, 0)
+
+l = 200
+eps.split_interacting(l3.edges, 1..1)[0].output(l + 0, 0)
+eps.split_interacting(l4.edges, 1..1)[0].output(l + 1, 0)
+eps.split_interacting(l5.edges, 1..1)[0].output(l + 2, 0)
+eps.split_interacting(l6.edges, 1..1)[0].output(l + 3, 0)
+
+l = 210
+eps.split_interacting(l3.edges, 1..1)[1].output(l + 0, 0)
+eps.split_interacting(l4.edges, 1..1)[1].output(l + 1, 0)
+eps.split_interacting(l5.edges, 1..1)[1].output(l + 2, 0)
+eps.split_interacting(l6.edges, 1..1)[1].output(l + 3, 0)
+
+l = 300
+eps.inside(l3).output(l + 0, 0)
+eps.inside(l4).output(l + 1, 0)
+eps.inside(l5).output(l + 2, 0)
+eps.inside(l6).output(l + 3, 0)
+
+l = 310
+eps.not_inside(l3).output(l + 0, 0)
+eps.not_inside(l4).output(l + 1, 0)
+eps.not_inside(l5).output(l + 2, 0)
+eps.not_inside(l6).output(l + 3, 0)
+
+l = 320
+eps.split_inside(l3)[0].output(l + 0, 0)
+eps.split_inside(l4)[0].output(l + 1, 0)
+eps.split_inside(l5)[0].output(l + 2, 0)
+eps.split_inside(l6)[0].output(l + 3, 0)
+
+l = 330
+eps.split_inside(l3)[1].output(l + 0, 0)
+eps.split_inside(l4)[1].output(l + 1, 0)
+eps.split_inside(l5)[1].output(l + 2, 0)
+eps.split_inside(l6)[1].output(l + 3, 0)
+
+l = 400
+eps.outside(l3).output(l + 0, 0)
+eps.outside(l4).output(l + 1, 0)
+eps.outside(l5).output(l + 2, 0)
+eps.outside(l6).output(l + 3, 0)
+
+l = 410
+eps.not_outside(l3).output(l + 0, 0)
+eps.not_outside(l4).output(l + 1, 0)
+eps.not_outside(l5).output(l + 2, 0)
+eps.not_outside(l6).output(l + 3, 0)
+
+l = 420
+eps.split_outside(l3)[0].output(l + 0, 0)
+eps.split_outside(l4)[0].output(l + 1, 0)
+eps.split_outside(l5)[0].output(l + 2, 0)
+eps.split_outside(l6)[0].output(l + 3, 0)
+
+l = 430
+eps.split_outside(l3)[1].output(l + 0, 0)
+eps.split_outside(l4)[1].output(l + 1, 0)
+eps.split_outside(l5)[1].output(l + 2, 0)
+eps.split_outside(l6)[1].output(l + 3, 0)
+

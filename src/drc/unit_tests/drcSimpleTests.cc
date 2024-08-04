@@ -1953,3 +1953,13 @@ TEST(130d_size_inside_outside)
 {
   run_test (_this, "130", true);
 }
+
+TEST(131_edge_pair_interactions)
+{
+  run_test (_this, "131", false);
+}
+
+TEST(131d_edge_pair_interactions)
+{
+  run_test (_this, "131", true);
+}

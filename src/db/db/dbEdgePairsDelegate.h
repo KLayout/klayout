@@ -173,6 +173,12 @@ public:
     return this;
   }
 
+  void set_base_verbosity (int vb);
+  int base_verbosity () const
+  {
+    return m_base_verbosity;
+  }
+
   void enable_progress (const std::string &progress_desc);
   void disable_progress ();
 
@@ -199,6 +205,22 @@ public:
   virtual EdgePairsDelegate *processed (const EdgePairProcessorBase &proc) const = 0;
   virtual RegionDelegate *processed_to_polygons (const EdgePairToPolygonProcessorBase &proc) const = 0;
   virtual EdgesDelegate *processed_to_edges (const EdgePairToEdgeProcessorBase &proc) const = 0;
+
+  virtual RegionDelegate *pull_interacting (const Region &) const = 0;
+  virtual EdgesDelegate *pull_interacting (const Edges &) const = 0;
+  virtual EdgePairsDelegate *selected_interacting (const Region &other, size_t min_count, size_t max_count) const = 0;
+  virtual EdgePairsDelegate *selected_not_interacting (const Region &other, size_t min_count, size_t max_count) const = 0;
+  virtual EdgePairsDelegate *selected_interacting (const Edges &other, size_t min_count, size_t max_count) const = 0;
+  virtual EdgePairsDelegate *selected_not_interacting (const Edges &other, size_t min_count, size_t max_count) const = 0;
+  virtual std::pair<EdgePairsDelegate *, EdgePairsDelegate *> selected_interacting_pair (const Region &other, size_t min_count, size_t max_count) const = 0;
+  virtual std::pair<EdgePairsDelegate *, EdgePairsDelegate *> selected_interacting_pair (const Edges &other, size_t min_count, size_t max_count) const = 0;
+
+  virtual EdgePairsDelegate *selected_outside (const Region &other) const = 0;
+  virtual EdgePairsDelegate *selected_not_outside (const Region &other) const = 0;
+  virtual std::pair<EdgePairsDelegate *, EdgePairsDelegate *> selected_outside_pair (const Region &other) const = 0;
+  virtual EdgePairsDelegate *selected_inside (const Region &other) const = 0;
+  virtual EdgePairsDelegate *selected_not_inside (const Region &other) const = 0;
+  virtual std::pair<EdgePairsDelegate *, EdgePairsDelegate *> selected_inside_pair (const Region &other) const = 0;
 
   virtual RegionDelegate *polygons (db::Coord e) const = 0;
   virtual EdgesDelegate *edges () const = 0;
@@ -238,6 +260,7 @@ protected:
 private:
   bool m_report_progress;
   std::string m_progress_desc;
+  int m_base_verbosity;
 };
 
 }

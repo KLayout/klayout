@@ -224,6 +224,16 @@ void EdgePairs::second_edges (Edges &output) const
   output.set_delegate (mp_delegate->second_edges ());
 }
 
+void EdgePairs::pull_interacting (Region &output, const Region &other) const
+{
+  output = Region (mp_delegate->pull_interacting (other));
+}
+
+void EdgePairs::pull_interacting (Edges &output, const Edges &other) const
+{
+  output = Edges (mp_delegate->pull_interacting (other));
+}
+
 void EdgePairs::set_delegate (EdgePairsDelegate *delegate)
 {
   if (delegate != mp_delegate) {

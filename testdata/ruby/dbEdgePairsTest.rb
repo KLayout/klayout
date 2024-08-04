@@ -480,6 +480,100 @@ class DBEdgePairs_TestClass < TestBase
 
   end
 
+  # Interactions
+  def test_interactions
+
+    edge_pairs = RBA::EdgePairs::new
+    edge_pairs.insert(RBA::EdgePair::new(RBA::Edge::new(0, 0, 100, 100), RBA::Edge::new(200, 300, 200, 500)))
+    edge_pairs.insert(RBA::EdgePair::new(RBA::Edge::new(0, 1000, 100, 1000), RBA::Edge::new(100, 1000, 0, 1000)))
+
+    e = RBA::Edges::new
+    e.insert(RBA::Edge::new(0, 200, 200, 200))
+
+    assert_equal(edge_pairs.interacting(e).to_s, "(0,0;100,100)/(200,300;200,500)")
+    assert_equal(edge_pairs.interacting(e, 1, 1).to_s, "(0,0;100,100)/(200,300;200,500)")
+    assert_equal(edge_pairs.interacting(e, 2, 2).to_s, "")
+    assert_equal(edge_pairs.not_interacting(e).to_s, "(0,1000;100,1000)/(100,1000;0,1000)")
+    assert_equal(edge_pairs.not_interacting(e, 2, 2).to_s, "(0,0;100,100)/(200,300;200,500);(0,1000;100,1000)/(100,1000;0,1000)")
+    ep = edge_pairs.dup
+    ep.select_interacting(e)
+    assert_equal(ep.to_s, "(0,0;100,100)/(200,300;200,500)")
+    ep = edge_pairs.dup
+    ep.select_interacting(e, 1, 1)
+    assert_equal(ep.to_s, "(0,0;100,100)/(200,300;200,500)")
+    ep = edge_pairs.dup
+    ep.select_interacting(e, 2, 2)
+    assert_equal(ep.to_s, "")
+    ep = edge_pairs.dup
+    ep.select_not_interacting(e)
+    assert_equal(ep.to_s, "(0,1000;100,1000)/(100,1000;0,1000)")
+    ep = edge_pairs.dup
+    ep.select_not_interacting(e, 2, 2)
+    assert_equal(ep.to_s, "(0,0;100,100)/(200,300;200,500);(0,1000;100,1000)/(100,1000;0,1000)")
+    assert_equal(edge_pairs.split_interacting(e)[0].to_s, "(0,0;100,100)/(200,300;200,500)")
+    assert_equal(edge_pairs.split_interacting(e)[1].to_s, "(0,1000;100,1000)/(100,1000;0,1000)")
+    assert_equal(edge_pairs.split_interacting(e, 1, 1)[0].to_s, "(0,0;100,100)/(200,300;200,500)")
+    assert_equal(edge_pairs.split_interacting(e, 1, 1)[1].to_s, "(0,1000;100,1000)/(100,1000;0,1000)")
+    assert_equal(edge_pairs.split_interacting(e, 2, 2)[0].to_s, "")
+    assert_equal(edge_pairs.split_interacting(e, 2, 2)[1].to_s, "(0,0;100,100)/(200,300;200,500);(0,1000;100,1000)/(100,1000;0,1000)")
+    
+    r = RBA::Region::new
+    r.insert(RBA::Box::new(0, 190, 200, 210))
+
+    assert_equal(edge_pairs.interacting(r).to_s, "(0,0;100,100)/(200,300;200,500)")
+    assert_equal(edge_pairs.interacting(r, 1, 1).to_s, "(0,0;100,100)/(200,300;200,500)")
+    assert_equal(edge_pairs.interacting(r, 2, 2).to_s, "")
+    assert_equal(edge_pairs.not_interacting(r).to_s, "(0,1000;100,1000)/(100,1000;0,1000)")
+    assert_equal(edge_pairs.not_interacting(r, 2, 2).to_s, "(0,0;100,100)/(200,300;200,500);(0,1000;100,1000)/(100,1000;0,1000)")
+    ep = edge_pairs.dup
+    ep.select_interacting(r)
+    assert_equal(ep.to_s, "(0,0;100,100)/(200,300;200,500)")
+    ep = edge_pairs.dup
+    ep.select_interacting(r, 1, 1)
+    assert_equal(ep.to_s, "(0,0;100,100)/(200,300;200,500)")
+    ep = edge_pairs.dup
+    ep.select_interacting(r, 2, 2)
+    assert_equal(ep.to_s, "")
+    ep = edge_pairs.dup
+    ep.select_not_interacting(r)
+    assert_equal(ep.to_s, "(0,1000;100,1000)/(100,1000;0,1000)")
+    ep = edge_pairs.dup
+    ep.select_not_interacting(r, 2, 2)
+    assert_equal(ep.to_s, "(0,0;100,100)/(200,300;200,500);(0,1000;100,1000)/(100,1000;0,1000)")
+    assert_equal(edge_pairs.split_interacting(r)[0].to_s, "(0,0;100,100)/(200,300;200,500)")
+    assert_equal(edge_pairs.split_interacting(r)[1].to_s, "(0,1000;100,1000)/(100,1000;0,1000)")
+    assert_equal(edge_pairs.split_interacting(r, 1, 1)[0].to_s, "(0,0;100,100)/(200,300;200,500)")
+    assert_equal(edge_pairs.split_interacting(r, 1, 1)[1].to_s, "(0,1000;100,1000)/(100,1000;0,1000)")
+    assert_equal(edge_pairs.split_interacting(r, 2, 2)[0].to_s, "")
+    assert_equal(edge_pairs.split_interacting(r, 2, 2)[1].to_s, "(0,0;100,100)/(200,300;200,500);(0,1000;100,1000)/(100,1000;0,1000)")
+    
+    r = RBA::Region::new
+    r.insert(RBA::Box::new(0, 0, 200, 500))
+
+    assert_equal(edge_pairs.inside(r).to_s, "(0,0;100,100)/(200,300;200,500)")
+    assert_equal(edge_pairs.not_inside(r).to_s, "(0,1000;100,1000)/(100,1000;0,1000)")
+    ep = edge_pairs.dup
+    ep.select_inside(r)
+    assert_equal(ep.to_s, "(0,0;100,100)/(200,300;200,500)")
+    ep = edge_pairs.dup
+    ep.select_not_inside(r)
+    assert_equal(ep.to_s, "(0,1000;100,1000)/(100,1000;0,1000)")
+    assert_equal(edge_pairs.split_inside(r)[0].to_s, "(0,0;100,100)/(200,300;200,500)")
+    assert_equal(edge_pairs.split_inside(r)[1].to_s, "(0,1000;100,1000)/(100,1000;0,1000)")
+
+    assert_equal(edge_pairs.outside(r).to_s, "(0,1000;100,1000)/(100,1000;0,1000)")
+    assert_equal(edge_pairs.not_outside(r).to_s, "(0,0;100,100)/(200,300;200,500)")
+    ep = edge_pairs.dup
+    ep.select_outside(r)
+    assert_equal(ep.to_s, "(0,1000;100,1000)/(100,1000;0,1000)")
+    ep = edge_pairs.dup
+    ep.select_not_outside(r)
+    assert_equal(ep.to_s, "(0,0;100,100)/(200,300;200,500)")
+    assert_equal(edge_pairs.split_outside(r)[0].to_s, "(0,1000;100,1000)/(100,1000;0,1000)")
+    assert_equal(edge_pairs.split_outside(r)[1].to_s, "(0,0;100,100)/(200,300;200,500)")
+
+  end
+
 end
 
 

@@ -768,6 +768,26 @@ public:
   void second_edges (Edges &output) const;
 
   /**
+   *  @brief Sets the base verbosity
+   *
+   *  Setting this value will make timing measurements appear at least at
+   *  the given verbosity level and more detailed timing at the given level
+   *  plus 10. The default level is 30.
+   */
+  void set_base_verbosity (int vb)
+  {
+    mp_delegate->set_base_verbosity (vb);
+  }
+
+  /**
+   *  @brief Gets the base verbosity
+   */
+  unsigned int base_verbosity () const
+  {
+    return mp_delegate->base_verbosity ();
+  }
+
+  /**
    *  @brief Enable progress reporting
    *
    *  @param progress_text The description text of the progress object

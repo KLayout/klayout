@@ -83,22 +83,6 @@ public:
   virtual RegionDelegate *processed_to_polygons (const EdgePairToPolygonProcessorBase &filter) const;
   virtual EdgesDelegate *processed_to_edges (const EdgePairToEdgeProcessorBase &filter) const;
 
-  virtual RegionDelegate *pull_interacting (const Region &) const;
-  virtual EdgesDelegate *pull_interacting (const Edges &) const;
-  virtual EdgePairsDelegate *selected_interacting (const Region &other, size_t min_count, size_t max_count) const;
-  virtual EdgePairsDelegate *selected_not_interacting (const Region &other, size_t min_count, size_t max_count) const;
-  virtual EdgePairsDelegate *selected_interacting (const Edges &other, size_t min_count, size_t max_count) const;
-  virtual EdgePairsDelegate *selected_not_interacting (const Edges &other, size_t min_count, size_t max_count) const;
-  virtual std::pair<EdgePairsDelegate *, EdgePairsDelegate *> selected_interacting_pair (const Region &other, size_t min_count, size_t max_count) const;
-  virtual std::pair<EdgePairsDelegate *, EdgePairsDelegate *> selected_interacting_pair (const Edges &other, size_t min_count, size_t max_count) const;
-
-  virtual EdgePairsDelegate *selected_outside (const Region &other) const;
-  virtual EdgePairsDelegate *selected_not_outside (const Region &other) const;
-  virtual std::pair<EdgePairsDelegate *, EdgePairsDelegate *> selected_outside_pair (const Region &other) const;
-  virtual EdgePairsDelegate *selected_inside (const Region &other) const;
-  virtual EdgePairsDelegate *selected_not_inside (const Region &other) const;
-  virtual std::pair<EdgePairsDelegate *, EdgePairsDelegate *> selected_inside_pair (const Region &other) const;
-
   virtual EdgePairsDelegate *add_in_place (const EdgePairs &other);
   virtual EdgePairsDelegate *add (const EdgePairs &other) const;
 
@@ -119,6 +103,14 @@ public:
   {
     return this;
   }
+
+protected:
+  virtual EdgesDelegate *pull_generic (const Edges &other) const;
+  virtual RegionDelegate *pull_generic (const Region &other) const;
+  virtual EdgePairsDelegate *selected_interacting_generic (const Edges &other, bool inverse, size_t min_count, size_t max_count) const;
+  virtual std::pair<EdgePairsDelegate *, EdgePairsDelegate *> selected_interacting_pair_generic (const Edges &other, size_t min_count, size_t max_count) const;
+  virtual EdgePairsDelegate *selected_interacting_generic (const Region &other, EdgePairInteractionMode mode, bool inverse, size_t min_count, size_t max_count) const;
+  virtual std::pair<EdgePairsDelegate *, EdgePairsDelegate *> selected_interacting_pair_generic (const Region &other, EdgePairInteractionMode mode, size_t min_count, size_t max_count) const;
 
 private:
   DeepEdgePairs &operator= (const DeepEdgePairs &other);

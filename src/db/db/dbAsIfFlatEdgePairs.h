@@ -27,6 +27,7 @@
 #include "dbCommon.h"
 
 #include "dbEdgePairsDelegate.h"
+#include "dbEdgePairsUtils.h"
 
 namespace db {
 
@@ -101,6 +102,12 @@ public:
 protected:
   void update_bbox (const db::Box &box);
   void invalidate_bbox ();
+  virtual EdgesDelegate *pull_generic (const Edges &other) const;
+  virtual RegionDelegate *pull_generic (const Region &other) const;
+  virtual EdgePairsDelegate *selected_interacting_generic (const Edges &other, bool inverse, size_t min_count, size_t max_count) const;
+  virtual std::pair<EdgePairsDelegate *, EdgePairsDelegate *> selected_interacting_pair_generic (const Edges &other, size_t min_count, size_t max_count) const;
+  virtual EdgePairsDelegate *selected_interacting_generic (const Region &other, EdgePairInteractionMode mode, bool inverse, size_t min_count, size_t max_count) const;
+  virtual std::pair<EdgePairsDelegate *, EdgePairsDelegate *> selected_interacting_pair_generic (const Region &other, EdgePairInteractionMode mode, size_t min_count, size_t max_count) const;
 
 private:
   friend class DeepEdgePairs;

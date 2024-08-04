@@ -339,7 +339,7 @@ Class<db::ParameterState> decl_PCellParameterState ("db", "PCellParameterState",
   gsi::method("icon=", &db::ParameterState::set_icon, gsi::arg ("i"),
     "@brief Sets the icon for the parameter\n"
   ) +
-  gsi::method("tooltip", &db::ParameterState::tooltip,
+  gsi::method("icon", &db::ParameterState::icon,
     "@brief Gets the icon for the parameter\n"
   ),
   "@brief Provides access to the attributes of a single parameter within \\PCellParameterStates.\n"

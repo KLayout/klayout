@@ -1331,6 +1331,18 @@ MainWindow::update_dock_widget_state ()
 void
 MainWindow::exit ()
 {
+  if (m_busy) {
+    if (QMessageBox::warning (this,
+      QObject::tr ("Application Busy - Close Anyway?"),
+      QObject::tr ("The application is busy.\nYou can close the application now, but this will terminate any running operations.\nDo you want to close anyway?\n\n"
+                   "Press 'Yes' to end the application now."),
+      QMessageBox::Yes | QMessageBox::No,
+      QMessageBox::Yes) != QMessageBox::Yes)
+    {
+      return;
+    }
+  }
+
   m_exited = true;
 
   //  If there is a operation ongoing, request a break and delay execution of the exit operation.
@@ -1394,20 +1406,6 @@ MainWindow::dirty_files (std::string &dirty_files)
 bool
 MainWindow::can_close ()
 {
-  if (m_busy) {
-
-    bool can_close = false;
-
-    can_close = (QMessageBox::warning (this,
-      QObject::tr ("Application Busy"),
-      QObject::tr ("The application is busy.\nYou can close the application now, but any unsaved data will be lost.\n\nPress 'Yes' to end the application now."),
-      QMessageBox::Yes | QMessageBox::No,
-      QMessageBox::Yes) == QMessageBox::Yes);
-
-    return can_close;
-
-  }
-
   for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
     lay::PluginDeclaration *pd = const_cast<lay::PluginDeclaration *> (&*cls);
     if (! pd->can_exit (dispatcher ())) {

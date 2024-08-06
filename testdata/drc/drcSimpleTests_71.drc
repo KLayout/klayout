@@ -1,0 +1,41 @@
+
+# Moved implementation
+
+source($drc_test_source)
+target($drc_test_target)
+
+if $drc_test_deep
+  deep
+end
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+l3 = input(3, 0)
+
+# dump to output
+
+l1.output(1, 0)
+l2.output(2, 0)
+l3.output(3, 0)
+
+ctx1 = netter
+ctx1.connect(l1, l2)
+
+connect(l1, l3)
+
+l1.nets.output(100, 0)
+begin
+  l2.nets.output(101, 0)
+  raise "internal error - l2 was not used in connectivity"
+rescue => ex
+end
+l3.nets.output(102, 0)
+
+l1.nets(ctx1).output(110, 0)
+l2.nets(ctx1).output(111, 0)
+begin
+  l3.nets(ctx1).output(112, 0)
+  raise "internal error - l3 was not used in connectivity"
+rescue => ex
+end
+

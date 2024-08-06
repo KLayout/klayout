@@ -721,6 +721,50 @@ object_is_const (PyObject *self, PyObject *args)
   return c2python (PYAObjectBase::from_pyobject (self)->const_ref ());
 }
 
+/**
+ *  @brief Implements to_const and const_cast
+ */
+static PyObject *
+object_change_const (PyObject *self, PyObject *args, bool to_const)
+{
+  if (PYAObjectBase::from_pyobject (self)->const_ref () == to_const) {
+    return self;
+  }
+
+  const gsi::ClassBase *cls_decl_self = PythonModule::cls_for_type (Py_TYPE (self));
+  tl_assert (cls_decl_self != 0);
+
+  if (! PyArg_ParseTuple (args, "")) {
+    return NULL;
+  }
+
+  PyObject *new_object = Py_TYPE (self)->tp_alloc (Py_TYPE (self), 0);
+  PythonRef obj (new_object);
+  PYAObjectBase *new_pya_base = PYAObjectBase::from_pyobject_unsafe (new_object);
+  new (new_pya_base) PYAObjectBase (cls_decl_self, new_object);
+  new_pya_base->set (PYAObjectBase::from_pyobject (self)->obj (), false, to_const, false);
+
+  return obj.release ();
+}
+
+/**
+ *  @brief Implements to_const
+ */
+static PyObject *
+object_to_const (PyObject *self, PyObject *args)
+{
+  return object_change_const (self, args, true);
+}
+
+/**
+ *  @brief Implements const_cast
+ */
+static PyObject *
+object_const_cast (PyObject *self, PyObject *args)
+{
+  return object_change_const (self, args, false);
+}
+
 static PyObject *
 special_method_impl (gsi::MethodBase::special_method_type smt, PyObject *self, PyObject *args)
 {
@@ -734,6 +778,10 @@ special_method_impl (gsi::MethodBase::special_method_type smt, PyObject *self, P
     return object_create (self, args);
   } else if (smt == gsi::MethodBase::IsConst) {
     return object_is_const (self, args);
+  } else if (smt == gsi::MethodBase::ToConst) {
+    return object_to_const (self, args);
+  } else if (smt == gsi::MethodBase::ConstCast) {
+    return object_const_cast (self, args);
   } else if (smt == gsi::MethodBase::Destroyed) {
     return object_destroyed (self, args);
   } else if (smt == gsi::MethodBase::Assign) {

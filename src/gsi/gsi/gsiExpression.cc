@@ -305,13 +305,17 @@ initialize_expressions ()
     //  install the method table:
     ExpressionMethodTable::initialize_class (*c);
 
-    //  register a function that creates a class object (use a function to avoid issues with
-    //  late destruction of global variables which the class object is already gone)
-    const tl::VariantUserClassBase *cc = (*c)->var_cls_cls ();
-    if (cc) {
-      tl::Eval::define_global_function ((*c)->name (), new EvalClassFunction (cc));
-    }
+    //  Note: skip non-top-level classes
+    if ((*c)->parent () == 0) {
 
+      //  register a function that creates a class object (use a function to avoid issues with
+      //  late destruction of global variables which the class object is already gone)
+      const tl::VariantUserClassBase *cc = (*c)->var_cls_cls ();
+      if (cc) {
+        tl::Eval::define_global_function ((*c)->name (), new EvalClassFunction (cc));
+      }
+
+    }
   }
 }
 
@@ -630,6 +634,14 @@ special_method_impl (gsi::MethodBase::special_method_type smt, tl::Variant &self
     //  nothing to do here for GSI objects
   } else if (smt == gsi::MethodBase::IsConst) {
     return tl::Variant (self.user_is_const ());
+  } else if (smt == gsi::MethodBase::ToConst) {
+    tl::Variant res (self);
+    res.user_change_constness (true);
+    return res;
+  } else if (smt == gsi::MethodBase::ConstCast) {
+    tl::Variant res (self);
+    res.user_change_constness (false);
+    return res;
   } else if (smt == gsi::MethodBase::Destroyed) {
 
     if (self.type_code () == tl::Variant::t_user) {

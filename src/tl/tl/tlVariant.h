@@ -89,6 +89,7 @@ public:
   virtual const gsi::ClassBase *gsi_cls () const = 0;
   virtual const tl::EvalClass *eval_cls () const = 0;
   virtual void *deref_proxy (tl::Object *proxy) const = 0;
+  virtual const tl::VariantUserClassBase *change_constness (bool constness) const = 0;
 
   const void *deref_proxy_const (const tl::Object *proxy) const
   {
@@ -124,6 +125,11 @@ public:
   static const tl::VariantUserClassBase *instance (bool is_const)
   {
     return VariantUserClassBase::instance (typeid (T), is_const);
+  }
+
+  const tl::VariantUserClassBase *change_constness (bool constness) const
+  {
+    return instance (constness);
   }
 
 private:
@@ -1000,6 +1006,11 @@ public:
    *  the contained object. The object must not be "user_is_ref".
    */
   void *user_unshare () const;
+
+  /**
+   *  @brief Changes the constness of the user object
+   */
+  void user_change_constness (bool constness);
 
   /**
    *  @brief Assigns the object stored in other to self

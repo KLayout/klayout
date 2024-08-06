@@ -829,3 +829,37 @@ TEST(15)
   v = e.parse("var bb = BB.new; bb.d4(1, 'a', 2.0, BB.E.E3B, 42)").execute();
   EXPECT_EQ (v.to_string (), "1,a,2,101,42");
 }
+
+//  constness
+TEST(16)
+{
+  tl::Eval e;
+  tl::Variant v;
+  v = e.parse ("var b=B.new(); b._is_const_object").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("false"));
+  try {
+    v = e.parse ("var b=B.new(); var bc=b._to_const_object; bc.set_str('abc')").execute ();
+    EXPECT_EQ (1, 0);
+  } catch (tl::Exception &ex) {
+    EXPECT_EQ (ex.msg (), "Cannot call non-const method set_str, class B on a const reference at position 44 (...set_str('abc'))");
+  }
+  v = e.parse ("var e=E.new(); var ec=e.dup; [e._is_const_object, ec._to_const_object._is_const_object]").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("false,true"));
+  v = e.parse ("var e=E.new(); var ec=e._to_const_object; e.x=17; [e.x, ec.x]").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("17,17"));
+  v = e.parse ("var e=E.new(); var ec=e._to_const_object; ec._is_const_object").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("true"));
+  v = e.parse ("var e=E.new(); var ec=e._to_const_object; ec=ec._const_cast; ec._is_const_object").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("false"));
+  v = e.parse ("var e=E.new(); var ec=e._to_const_object; ec=ec._const_cast; ec.x=42; e.x").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("42"));
+  v = e.parse ("var e=E.new(); var ec=e._to_const_object; e.x=17; ec.x").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("17"));
+  try {
+    v = e.parse ("var e=E.new(); var ec=e._to_const_object; e.x=17; e._destroy; ec.x").execute ();
+    EXPECT_EQ (1, 0);
+  } catch (tl::Exception &ex) {
+    EXPECT_EQ (ex.msg (), "Object has been destroyed already at position 64 (...x)");
+  }
+}
+

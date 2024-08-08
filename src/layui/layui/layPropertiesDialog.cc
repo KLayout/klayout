@@ -637,6 +637,12 @@ PropertiesDialog::reject ()
   QDialog::reject ();
 }
 
+void
+PropertiesDialog::accept ()
+{
+  //  stop handling "Enter" key.
+}
+
 }
 
 #endif

@@ -370,23 +370,6 @@ Editables::clear_selection ()
 }
 
 void 
-Editables::select ()
-{
-  cancel_edits ();
-  clear_transient_selection ();
-  clear_previous_selection ();
-
-  for (iterator e = begin (); e != end (); ++e) {
-    if (m_enabled.find (&*e) != m_enabled.end ()) {
-      e->select (db::DBox (), lay::Editable::Replace);  //  select "all"
-    }
-  }
-
-  //  send a signal to the observers
-  signal_selection_changed ();
-}
-
-void 
 Editables::select (const db::DBox &box, lay::Editable::SelectionMode mode)
 {
   if (box.is_point ()) {

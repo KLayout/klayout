@@ -68,11 +68,14 @@ l1.nets(self._netter).output(101, 0)
 l1.nets(prop(1)).output(102, 0)
 l1.nets(prop(nil)).output(103, 0)
 
-l1.nets("X").output(110, 0)
+x1 = l1.nets("X")
+x1.output(110, 0)
 l1.nets("TOP", "X").output(111, 0)
 l1.nets("TOP", "NOTEXIST").output(112, 0)
 l1.nets("NOTEXIST", "NOTEXIST").output(113, 0)
 
+x2 = l1.nets(*netlist.nets_by_name("X"))
+(x1 ^ x2).output(114, 0)
 
 # checks with property constraints
 

@@ -465,6 +465,7 @@ public:
   virtual bool is_ref () const { return false; }
   virtual void *deref_proxy (tl::Object *) const { return 0; }
   virtual const gsi::ClassBase*gsi_cls() const { return 0; }
+  virtual const tl::VariantUserClassBase *change_constness (bool) const { return this; }
   static BoxClassClass instance;
 };
 
@@ -533,6 +534,7 @@ public:
   virtual bool is_ref () const { return false; }
   virtual void *deref_proxy (tl::Object *) const { return 0; }
   virtual const gsi::ClassBase*gsi_cls() const { return 0; }
+  virtual const tl::VariantUserClassBase *change_constness (bool) const { return this; }
   static EdgeClassClass instance;
 };
 
@@ -1209,3 +1211,4 @@ TEST(20)
   v = e.parse ("i2.dtrans.disp.y").execute ();
   EXPECT_EQ (v.to_string (), std::string ("0.3"));
 }
+

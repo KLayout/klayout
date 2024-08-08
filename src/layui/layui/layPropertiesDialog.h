@@ -116,6 +116,7 @@ public slots:
 
 protected:
   void reject ();
+  void accept ();
 
 private:
   Ui::PropertiesDialog *mp_ui;

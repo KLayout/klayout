@@ -3192,6 +3192,17 @@ Eval::set_var (const std::string &name, const tl::Variant &var)
   m_local_vars.insert (std::make_pair (name, tl::Variant ())).first->second = var;
 }
 
+tl::Variant *
+Eval::var (const std::string &name)
+{
+  auto f = m_local_vars.find (name);
+  if (f != m_local_vars.end ()) {
+    return &f->second;
+  } else {
+    return 0;
+  }
+}
+
 void 
 Eval::define_function (const std::string &name, EvalFunction *function)
 {
@@ -3200,6 +3211,17 @@ Eval::define_function (const std::string &name, EvalFunction *function)
     delete f;
   }
   f = function;
+}
+
+EvalFunction *
+Eval::function (const std::string &name)
+{
+  auto f = m_local_functions.find (name);
+  if (f != m_local_functions.end ()) {
+    return f->second;
+  } else {
+    return 0;
+  }
 }
 
 void

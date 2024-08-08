@@ -379,7 +379,7 @@ PropertiesDialog::update_controls ()
 
   mp_ui->apply_to_all_cbx->setChecked (m_object_indexes.size () > 1);
 
-  if (m_index < 0) {
+  if (m_index < 0 || m_index >= int (mp_properties_pages.size ())) {
 
     mp_stack->setCurrentWidget (mp_none);
 
@@ -552,6 +552,10 @@ PropertiesDialog::apply ()
 {
 BEGIN_PROTECTED
 
+  if (m_index < 0 || m_index >= int (mp_properties_pages.size ())) {
+    return;
+  }
+
   db::Transaction t (mp_manager, tl::to_string (QObject::tr ("Apply changes")), m_transaction_id);
 
   try {
@@ -631,6 +635,12 @@ PropertiesDialog::reject ()
   //  make sure that the property pages are no longer used ..
   disconnect ();
   QDialog::reject ();
+}
+
+void
+PropertiesDialog::accept ()
+{
+  //  stop handling "Enter" key.
 }
 
 }

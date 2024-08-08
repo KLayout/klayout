@@ -449,6 +449,12 @@ public:
   void define_function (const std::string &name, EvalFunction *function);
 
   /**
+   *  @brief Gets the function for the given name
+   *  Returns 0 if there is no such function.
+   */
+  EvalFunction *function (const std::string &name);
+
+  /**
    *  @brief Define a global variable for use within an expression
    */
   static void set_global_var (const std::string &name, const tl::Variant &var)
@@ -460,6 +466,12 @@ public:
    *  @brief Define a variable for use within an expression
    */
   void set_var (const std::string &name, const tl::Variant &var);
+
+  /**
+   *  @brief Gets the function for the given name
+   *  Returns 0 if there is no such function.
+   */
+  tl::Variant *var (const std::string &name);
 
   /**
    *  @brief Parse an expression from the extractor
@@ -541,6 +553,30 @@ public:
   const std::vector<std::string> &match_substrings () const 
   {
     return m_match_substrings;
+  }
+
+  /**
+   *  @brief Gets the global context
+   */
+  static tl::Eval &global_context ()
+  {
+    return m_global;
+  }
+
+  /**
+   *  @brief Gets the global context for this context
+   */
+  tl::Eval *global ()
+  {
+    return mp_global;
+  }
+
+  /**
+   *  @brief Gets the parent context for this context
+   */
+  tl::Eval *parent ()
+  {
+    return mp_parent;
   }
 
 private:

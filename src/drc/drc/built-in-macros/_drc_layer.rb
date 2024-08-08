@@ -5186,6 +5186,7 @@ CODE
     # @brief Pulls net shapes from selected or all nets, optionally annotating nets with properties
     # @synopsis layer.nets
     # @synopsis layer.nets(net_filter)
+    # @synopsis layer.nets(net_object)
     # @synopsis layer.nets(circuit_filter, net_filter)
     # @synopsis layer.nets(netter, ...)
     # @synopsis layer.nets(prop(key), ...)
@@ -5202,7 +5203,7 @@ CODE
     # complete - subnets from subcircuits are not selected. The net name is taken from
     # the net's home circuit (to topmost location where all net connections are formed).
     # You can specify a circuit filter to select nets from certain circuits only or
-    # give a RBA::Circuit object explicitly. 
+    # give a RBA::Circuit object explicitly. You can also specify RBA::Net objects directly.
     # 
     # @code
     # connect(metal1, via1)
@@ -5230,6 +5231,8 @@ CODE
 
       @engine._context("nets") do
 
+        nets = nil
+
         # parse arguments
         filters = nil
         circuits = nil
@@ -5241,6 +5244,9 @@ CODE
             filters << a
           elsif a.is_a?(1.class)
             prop_id = a
+          elsif a.is_a?(RBA::Net)
+            nets ||= []
+            nets << a
           elsif a.is_a?(RBA::Circuit)
             circuits ||= []
             circuits << a
@@ -5272,13 +5278,14 @@ CODE
           circuits ||= []
           circuits += netlist.circuits_by_name(circuit_filter)
         end
-        nets = nil
         if !circuits
           if filters
-            nets = filters.collect { |f| netlist.nets_by_name(f) }.flatten
+            nets ||= []
+            nets += filters.collect { |f| netlist.nets_by_name(f) }.flatten
           end
         else
-          nets = circuits.collect do |circuit|
+          nets ||= []
+          nets += circuits.collect do |circuit|
             (filters || ["*"]).collect { |f| circuit.nets_by_name(f) }.flatten
           end.flatten
         end

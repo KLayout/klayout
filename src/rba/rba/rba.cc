@@ -913,6 +913,16 @@ handle_exception (const std::string &where)
     handle_exception ((where)); \
   }
 
+static void free_proxy (void *p)
+{
+  delete ((Proxy *) p);
+}
+
+static void mark_proxy (void *p)
+{
+  ((Proxy *) p)->mark ();
+}
+
 static VALUE
 destroy (VALUE self)
 {
@@ -972,6 +982,37 @@ is_const (VALUE self)
 }
 
 static VALUE
+to_const (VALUE self)
+{
+  Proxy *p = 0;
+  Data_Get_Struct (self, Proxy, p);
+  if (! p->const_ref ()) {
+    //  promote to const object
+    //  NOTE: there is only ONE instance we're going to change this instance
+    //  to const here. This has a global effect and this is the reason why this
+    //  method is not public. It is provided for testing purposes mainly.
+    p->set_const_ref (true);
+  }
+
+  return self;
+}
+
+static VALUE
+const_cast_ (VALUE self)
+{
+  Proxy *p = 0;
+  Data_Get_Struct (self, Proxy, p);
+  if (p->const_ref ()) {
+    //  promote to non-const object
+    //  NOTE: this is a global change of constness and will affect all references
+    //  that exist for this object.
+    p->set_const_ref (false);
+  }
+
+  return self;
+}
+
+static VALUE
 assign (VALUE self, VALUE src)
 {
   //  Compare if the classes are identical
@@ -1024,6 +1065,12 @@ special_method_impl (const gsi::MethodBase *meth, int argc, VALUE *argv, VALUE s
   } else if (smt == gsi::MethodBase::IsConst) {
     tl_assert (!ctor);
     return is_const (self);
+  } else if (smt == gsi::MethodBase::ToConst) {
+    tl_assert (!ctor);
+    return to_const (self);
+  } else if (smt == gsi::MethodBase::ConstCast) {
+    tl_assert (!ctor);
+    return const_cast_ (self);
   } else if (smt == gsi::MethodBase::Destroyed) {
     tl_assert (!ctor);
     return destroyed (self);
@@ -1041,16 +1088,6 @@ special_method_impl (const gsi::MethodBase *meth, int argc, VALUE *argv, VALUE s
   } else {
     return Qnil;
   }
-}
-
-static void free_proxy (void *p)
-{
-  delete ((Proxy *) p);
-}
-
-static void mark_proxy (void *p)
-{
-  ((Proxy *) p)->mark ();
 }
 
 static VALUE alloc_proxy (VALUE klass)

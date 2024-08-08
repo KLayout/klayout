@@ -3280,6 +3280,44 @@ class BasicTest(unittest.TestCase):
     self.assertEqual(bb.d4(1, "a", d=pya.BB.E.E3B, c=2.5), "1,a,2.5,101,nil")
     self.assertEqual(bb.d4(1, "a", 2.0, pya.BB.E.E3B, 42), "1,a,2,101,42")
 
+  # constness
+  def test_93(self):
+
+    b = pya.B()
+    self.assertEqual(b.is_const_object(), False)
+
+    bc = b._to_const_object()
+    self.assertEqual(bc.is_const_object(), True)
+
+    m = ""
+    try:
+      bc.set_str("abc")
+      self.assertEqual(1, 0)
+    except Exception as ex:
+      m = str(ex)
+
+    self.assertEqual(m, "Cannot call non-const method on a const reference in B.set_str")
+
+    b = pya.B()
+    bc = b
+    self.assertEqual(b._is_const_object(), False)
+    self.assertEqual(bc._is_const_object(), False)
+    bc = bc._to_const_object()
+    b.set_str("abc")
+    self.assertEqual(b._is_const_object(), False)
+    self.assertEqual(bc._is_const_object(), True)
+    self.assertEqual(b.str(), "abc")
+    self.assertEqual(bc.str(), "abc")
+
+    bnc = bc._const_cast()
+    self.assertEqual(b._is_const_object(), False)
+    self.assertEqual(bc._is_const_object(), True)
+    self.assertEqual(bnc._is_const_object(), False)
+    bnc.set_str("xyz")
+    self.assertEqual(b.str(), "xyz")
+    self.assertEqual(bc.str(), "xyz")
+    self.assertEqual(bnc.str(), "xyz")
+
 # run unit tests
 if __name__ == '__main__':
   suite = unittest.TestSuite()

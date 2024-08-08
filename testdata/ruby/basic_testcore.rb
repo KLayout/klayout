@@ -3233,4 +3233,45 @@ class Basic_TestClass < TestBase
 
   end
 
+  # constness
+  def test_82
+
+    b = RBA::B::new
+    assert_equal(b.is_const_object, false)
+
+    bc = b._to_const_object
+    assert_equal(bc.is_const_object, true)
+
+    m = ""
+    begin
+      bc.set_str("abc")
+      assert_equal(1, 0)
+    rescue => ex
+      m = ex.to_s
+    end
+
+    assert_equal(m, "Cannot call non-const method on a const reference in B::set_str")
+
+    b = RBA::B::new
+    bc = b
+    assert_equal(b._is_const_object, false)
+    assert_equal(bc._is_const_object, false)
+    b.set_str("abc")
+    bc._to_const_object
+    assert_equal(b._is_const_object, true)  # special
+    assert_equal(bc._is_const_object, true)
+    assert_equal(b.str, "abc")
+    assert_equal(bc.str, "abc")
+
+    bnc = bc._const_cast
+    assert_equal(b._is_const_object, false)  # special
+    assert_equal(bc._is_const_object, false)   # special
+    assert_equal(bnc._is_const_object, false)
+    bnc.set_str("xyz")
+    assert_equal(b.str, "xyz")
+    assert_equal(bc.str, "xyz")
+    assert_equal(bnc.str, "xyz")
+
+  end
+
 end

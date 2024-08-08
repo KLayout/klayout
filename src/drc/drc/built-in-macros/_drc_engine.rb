@@ -2308,7 +2308,7 @@ CODE
  
     def netter
       self._context("netter") do
-        DRC::DRCNetter::new
+        DRC::DRCNetter::new(self)
       end
     end
 

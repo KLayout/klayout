@@ -1173,6 +1173,13 @@ public:
   virtual double resolution () const = 0;
 
   /**
+   *  @brief Get the font resolution
+   *
+   *  The resolution describes the size of one pixel for the rendering of the "Default" font.
+   */
+  virtual double font_resolution () const = 0;
+
+  /**
    *  @brief CanvasPlane provider
    *
    *  This method is used by the view objects to obtain the planes
@@ -1225,7 +1232,7 @@ public:
   /**
    *  @brief Constructor
    */
-  BitmapViewObjectCanvas (unsigned int width, unsigned int height, double resolution);
+  BitmapViewObjectCanvas (unsigned int width, unsigned int height, double resolution, double font_resolution);
 
   /**
    *  @brief The destructor 
@@ -1274,6 +1281,14 @@ public:
   virtual double resolution () const 
   {
     return m_resolution;
+  }
+
+  /**
+   *  @brief Get the font resolution
+   */
+  virtual double font_resolution () const
+  {
+    return m_font_resolution;
   }
 
   /**
@@ -1330,7 +1345,7 @@ public:
   /**
    *  @brief Set the width and height and resolution
    */
-  void set_size (unsigned int width, unsigned int height, double resolution);
+  void set_size (unsigned int width, unsigned int height, double resolution, double font_resolution);
 
   /**
    *  @brief Set the width and height
@@ -1340,7 +1355,7 @@ public:
   /**
    *  @brief Set the resolution
    */
-  void set_size (double resolution);
+  void set_size (double resolution, double font_resolution);
 
   /**
    *  @brief Get the width
@@ -1377,6 +1392,7 @@ private:
   lay::BitmapRenderer m_renderer;
   unsigned int m_width, m_height;
   double m_resolution;
+  double m_font_resolution;
 };
 
 } // namespace lay

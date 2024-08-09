@@ -157,8 +157,9 @@ public:
    *  @param w The width of the bitmap 
    *  @param h The height of the bitmap
    *  @param r The resolution of the bitmap
+   *  @param rf The font resolution of the bitmap
    */
-  Bitmap (unsigned int w, unsigned int h, double r);
+  Bitmap (unsigned int w, unsigned int h, double r, double rf);
 
   /**
    *  @brief Copy constructor
@@ -217,6 +218,11 @@ public:
    *  @brief Get the resolution of the bitmap
    */
   double resolution () const;
+
+  /**
+   *  @brief Get the font resolution of the bitmap (applies to "Default" font)
+   */
+  double font_resolution () const;
 
   /**
    *  @brief Get the width of the bitmap
@@ -311,7 +317,7 @@ public:
 private:
   unsigned int m_width;
   unsigned int m_height;
-  double m_resolution;
+  double m_resolution, m_font_resolution;
   std::vector<uint32_t *> m_scanlines;
   std::vector<uint32_t *> m_free;
   uint32_t *m_empty_scanline;
@@ -356,6 +362,12 @@ Bitmap::resolution () const
 {
   return m_resolution;
 }  
+
+inline double
+Bitmap::font_resolution () const
+{
+  return m_font_resolution;
+}
 
 inline unsigned int
 Bitmap::width () const

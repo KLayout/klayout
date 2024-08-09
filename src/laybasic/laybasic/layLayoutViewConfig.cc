@@ -114,6 +114,7 @@ public:
     options.push_back (std::pair<std::string, std::string> (cfg_array_border_instances, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_bitmap_oversampling, "1"));
     options.push_back (std::pair<std::string, std::string> (cfg_highres_mode, "false"));
+    options.push_back (std::pair<std::string, std::string> (cfg_subres_mode, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_image_cache_size, "1"));
     options.push_back (std::pair<std::string, std::string> (cfg_default_font_size, "0"));
     options.push_back (std::pair<std::string, std::string> (cfg_color_palette, lay::ColorPalette ().to_string ()));

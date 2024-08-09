@@ -151,6 +151,7 @@ LayoutCanvas::LayoutCanvas (lay::LayoutViewBase *view)
     m_background (0), m_foreground (0), m_active (0),
     m_oversampling (1),
     m_hrm (false),
+    m_srm (false),
     m_need_redraw (false),
     m_redraw_clearing (false),
     m_redraw_force_update (true),
@@ -201,11 +202,15 @@ LayoutCanvas::~LayoutCanvas ()
 double
 LayoutCanvas::resolution () const
 {
-  if (m_hrm) {
-    return 1.0 / m_oversampling;
-  } else {
-    return 1.0 / (m_oversampling * dpr ());
-  }
+  return (m_srm ? 1.0 : 1.0 / m_oversampling) * (m_hrm ? 1.0 : 1.0 / dpr ());
+}
+
+double
+LayoutCanvas::font_resolution () const
+{
+  //  NOTE: for font resolution we do not include the subresolution mode - otherwise
+  //  the labels will become very hard to read.
+  return (1.0 / m_oversampling) * (m_hrm ? 1.0 : 1.0 / dpr ());
 }
 
 #if defined(HAVE_QT)
@@ -279,6 +284,16 @@ LayoutCanvas::set_highres_mode (bool hrm)
   if (hrm != m_hrm) {
     m_image_cache.clear ();
     m_hrm = hrm;
+    do_redraw_all ();
+  }
+}
+
+void
+LayoutCanvas::set_subres_mode (bool srm)
+{
+  if (srm != m_srm) {
+    m_image_cache.clear ();
+    m_srm = srm;
     do_redraw_all ();
   }
 }
@@ -363,7 +378,7 @@ LayoutCanvas::prepare_drawing ()
 {
   if (m_need_redraw) {
 
-    BitmapViewObjectCanvas::set_size (m_viewport_l.width (), m_viewport_l.height (), resolution ());
+    BitmapViewObjectCanvas::set_size (m_viewport_l.width (), m_viewport_l.height (), resolution (), font_resolution ());
 
     if (! mp_image ||
         (unsigned int) mp_image->width () != m_viewport_l.width () || 
@@ -399,7 +414,7 @@ LayoutCanvas::prepare_drawing ()
         ++c;
       }
 
-      mp_redraw_thread->commit (m_layers, m_viewport_l, resolution ());
+      mp_redraw_thread->commit (m_layers, m_viewport_l, resolution (), font_resolution ());
 
       if (tl::verbosity () >= 20) {
         tl::info << "Restored image from cache";
@@ -449,7 +464,7 @@ LayoutCanvas::prepare_drawing ()
       }
 
       if (m_redraw_clearing) {
-        mp_redraw_thread->start (mp_view->synchronous () ? 0 : mp_view->drawing_workers (), m_layers, m_viewport_l, resolution (), m_redraw_force_update);
+        mp_redraw_thread->start (mp_view->synchronous () ? 0 : mp_view->drawing_workers (), m_layers, m_viewport_l, resolution (), font_resolution (), m_redraw_force_update);
       } else {
         mp_redraw_thread->restart (m_need_redraw_layer);
       }
@@ -635,8 +650,8 @@ class DetachedViewObjectCanvas
   : public BitmapViewObjectCanvas
 {
 public:
-  DetachedViewObjectCanvas (tl::Color bg, tl::Color fg, tl::Color ac, unsigned int width_l, unsigned int height_l, double resolution, tl::PixelBuffer *img)
-    : BitmapViewObjectCanvas (width_l, height_l, resolution),
+  DetachedViewObjectCanvas (tl::Color bg, tl::Color fg, tl::Color ac, unsigned int width_l, unsigned int height_l, double resolution, double font_resolution, tl::PixelBuffer *img)
+    : BitmapViewObjectCanvas (width_l, height_l, resolution, font_resolution),
       m_bg (bg), m_fg (fg), m_ac (ac), mp_image (img)
   {
     //  TODO: Good choice?
@@ -721,7 +736,7 @@ class DetachedViewObjectCanvasMono
 {
 public:
   DetachedViewObjectCanvasMono (bool bg, bool fg, bool ac, unsigned int width, unsigned int height)
-    : BitmapViewObjectCanvas (width, height, 1.0),
+    : BitmapViewObjectCanvas (width, height, 1.0, 1.0),
       m_bg (bg), m_fg (fg), m_ac (ac)
   {
     //  .. nothing yet ..
@@ -754,17 +769,20 @@ private:
 tl::PixelBuffer
 LayoutCanvas::image (unsigned int width, unsigned int height) 
 {
-  return image_with_options (width, height, -1, -1, -1.0, tl::Color (), tl::Color (), tl::Color (), db::DBox ());
+  return image_with_options (width, height, -1, -1, -1.0, -1.0, tl::Color (), tl::Color (), tl::Color (), db::DBox ());
 }
 
 tl::PixelBuffer
-LayoutCanvas::image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, tl::Color background, tl::Color foreground, tl::Color active, const db::DBox &target_box)
+LayoutCanvas::image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, double font_resolution, tl::Color background, tl::Color foreground, tl::Color active, const db::DBox &target_box)
 {
   if (oversampling <= 0) {
     oversampling = m_oversampling;
   }
   if (resolution <= 0.0) {
     resolution = 1.0 / oversampling;
+  }
+  if (font_resolution <= 0.0) {
+    font_resolution = resolution;
   }
   if (linewidth <= 0) {
     linewidth = 1.0 / resolution + 0.5;
@@ -791,7 +809,7 @@ LayoutCanvas::image_with_options (unsigned int width, unsigned int height, int l
 
   //  provide canvas objects for the layout bitmaps and the foreground/background objects
   BitmapRedrawThreadCanvas rd_canvas;
-  DetachedViewObjectCanvas vo_canvas (background, foreground, active, width * oversampling, height * oversampling, resolution, &img);
+  DetachedViewObjectCanvas vo_canvas (background, foreground, active, width * oversampling, height * oversampling, resolution, font_resolution, &img);
 
   //  compute the new viewport 
   db::DBox tb (target_box);
@@ -804,7 +822,7 @@ LayoutCanvas::image_with_options (unsigned int width, unsigned int height, int l
   lay::RedrawThread redraw_thread (&rd_canvas, mp_view);
 
   //  render the layout
-  redraw_thread.start (0 /*synchronous*/, m_layers, vp, resolution, true);
+  redraw_thread.start (0 /*synchronous*/, m_layers, vp, resolution, font_resolution, true);
   redraw_thread.stop (); // safety
 
   //  paint the background objects. It uses "img" to paint on.
@@ -852,7 +870,7 @@ LayoutCanvas::image_with_options_mono (unsigned int width, unsigned int height, 
   lay::RedrawThread redraw_thread (&rd_canvas, mp_view);
 
   //  render the layout
-  redraw_thread.start (0 /*synchronous*/, m_layers, vp, 1.0, true);
+  redraw_thread.start (0 /*synchronous*/, m_layers, vp, 1.0, 1.0, true);
   redraw_thread.stop (); // safety
 
   tl::BitmapBuffer img (width, height);
@@ -872,7 +890,7 @@ LayoutCanvas::screenshot ()
   tl::PixelBuffer img (m_viewport.width (), m_viewport.height ());
   img.fill (m_background);
 
-  DetachedViewObjectCanvas vo_canvas (background_color (), foreground_color (), active_color (), m_viewport_l.width (), m_viewport_l.height (), resolution (), &img);
+  DetachedViewObjectCanvas vo_canvas (background_color (), foreground_color (), active_color (), m_viewport_l.width (), m_viewport_l.height (), resolution (), font_resolution (), &img);
 
   //  and paint the background objects. It uses "img" to paint on.
   do_render_bg (m_viewport_l, vo_canvas);

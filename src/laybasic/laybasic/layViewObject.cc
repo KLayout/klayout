@@ -1274,14 +1274,14 @@ ViewObjectUI::mouse_event_viewport () const
 //  BitmapViewObjectCanvas implementation
 
 BitmapViewObjectCanvas::BitmapViewObjectCanvas ()
-  : ViewObjectCanvas (), m_renderer (1, 1, 1.0), m_width (1), m_height (1), m_resolution (1.0)
+  : ViewObjectCanvas (), m_renderer (1, 1, 1.0, 1.0), m_width (1), m_height (1), m_resolution (1.0), m_font_resolution (1.0)
 {
   // .. nothing yet ..
 }
 
-BitmapViewObjectCanvas::BitmapViewObjectCanvas (unsigned int width, unsigned int height, double resolution)
-  : ViewObjectCanvas (), m_renderer (width, height, resolution), 
-    m_width (width), m_height (height), m_resolution (resolution)
+BitmapViewObjectCanvas::BitmapViewObjectCanvas (unsigned int width, unsigned int height, double resolution, double font_resolution)
+  : ViewObjectCanvas (), m_renderer (width, height, resolution, font_resolution),
+    m_width (width), m_height (height), m_resolution (resolution), m_font_resolution (font_resolution)
 {
   // .. nothing yet ..
 }
@@ -1299,7 +1299,7 @@ BitmapViewObjectCanvas::plane (const lay::ViewOp &style)
 
     //  we need to create a new plane
     m_fg_bitmap_table.insert (std::make_pair (style, (unsigned int) mp_alloc_bitmaps.size ()));
-    lay::Bitmap *bm = new lay::Bitmap (m_width, m_height, m_resolution);
+    lay::Bitmap *bm = new lay::Bitmap (m_width, m_height, m_resolution, m_font_resolution);
     mp_fg_bitmaps.push_back (bm);
     mp_alloc_bitmaps.push_back (bm);
     m_fg_view_ops.push_back (style);
@@ -1319,7 +1319,7 @@ BitmapViewObjectCanvas::plane (const std::vector<lay::ViewOp> &style)
 
     //  we need to create a new bitmap
     m_fgv_bitmap_table.insert (std::make_pair (style, (unsigned int) mp_alloc_bitmaps.size ()));
-    lay::Bitmap *bm = new lay::Bitmap (m_width, m_height, m_resolution);
+    lay::Bitmap *bm = new lay::Bitmap (m_width, m_height, m_resolution, m_font_resolution);
     mp_alloc_bitmaps.push_back (bm);
     for (std::vector<lay::ViewOp>::const_iterator s = style.begin (); s != style.end (); ++s) {
       mp_fg_bitmaps.push_back (bm);
@@ -1366,26 +1366,27 @@ BitmapViewObjectCanvas::sort_planes ()
 }
 
 void 
-BitmapViewObjectCanvas::set_size (unsigned int width, unsigned int height, double resolution)
+BitmapViewObjectCanvas::set_size (unsigned int width, unsigned int height, double resolution, double font_resolution)
 {
-  m_renderer = lay::BitmapRenderer (width, height, resolution);
+  m_renderer = lay::BitmapRenderer (width, height, resolution, font_resolution);
   m_width = width;
   m_height = height;
   m_resolution = resolution;
+  m_font_resolution = font_resolution;
 }
 
 void 
 BitmapViewObjectCanvas::set_size (unsigned int width, unsigned int height)
 {
-  m_renderer = lay::BitmapRenderer (width, height, m_resolution);
+  m_renderer = lay::BitmapRenderer (width, height, m_resolution, m_font_resolution);
   m_width = width;
   m_height = height;
 }
 
 void 
-BitmapViewObjectCanvas::set_size (double resolution)
+BitmapViewObjectCanvas::set_size (double resolution, double font_resolution)
 {
-  m_renderer = lay::BitmapRenderer (m_width, m_height, resolution);
+  m_renderer = lay::BitmapRenderer (m_width, m_height, resolution, font_resolution);
   m_resolution = resolution;
 }
 

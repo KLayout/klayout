@@ -66,7 +66,7 @@ public:
   /**
    *  @brief The ctor
    */
-  Renderer (unsigned int width, unsigned int height, double resolution);
+  Renderer (unsigned int width, unsigned int height, double resolution, double font_resolution);
 
   /**
    *  @brief The destructor
@@ -116,31 +116,31 @@ public:
   }
 
   /**
-   *  @brief The default text size to use for draw(db::Text..) 
+   *  @brief The default text size to use for draw(db::Text..) - i.e in DBU units
    */
-  void default_text_size (db::Coord sz)
+  void default_text_size (db::DCoord sz)
   {
     m_default_text_size = sz;
   }
 
   /**
-   *  @brief Get the default text size
+   *  @brief Get the default text size to use for draw(db::Text..) - i.e in DBU units
    */
-  db::Coord default_text_size () const
+  db::DCoord default_text_size () const
   {
     return m_default_text_size;
   }
 
   /**
-   *  @brief The default text size to use for draw(db::DText..) 
+   *  @brief The default text size to use for draw(db::DText..) - i.e. in micron units
    */
-  void default_text_size (double sz)
+  void default_text_size_dbl (double sz)
   {
     m_default_text_size_dbl = sz;
   }
 
   /**
-   *  @brief Get the default text size for draw (DText ...)
+   *  @brief Get the default text size for draw (DText ...) - i.e. in micron units
    */
   double default_text_size_dbl () const
   {
@@ -400,11 +400,22 @@ public:
     return m_resolution;
   }
 
+  /**
+   *  @brief Get the font resolution value
+   *
+   *  The resolution value is used to convert dimensions on the output device into canvas
+   *  units. This value applies to rendering the "Default" font.
+   */
+  double font_resolution () const
+  {
+    return m_font_resolution;
+  }
+
 protected:
   bool m_draw_texts;
   bool m_draw_properties;
   bool m_draw_description_property;
-  db::Coord m_default_text_size;
+  db::DCoord m_default_text_size;
   double m_default_text_size_dbl;
   bool m_apply_text_trans;
   bool m_precise;
@@ -412,6 +423,7 @@ protected:
   db::Font m_font;
   unsigned int m_width, m_height;
   double m_resolution;
+  double m_font_resolution;
 };
 
 } // namespace lay

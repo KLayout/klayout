@@ -637,7 +637,7 @@ ShapeMarker::render (const Viewport &vp, ViewObjectCanvas &canvas)
 
   r.set_font (db::Font (view ()->text_font ()));
   r.apply_text_trans (view ()->apply_text_trans ());
-  r.default_text_size (db::Coord (view ()->default_text_size () / ly->dbu ()));
+  r.default_text_size (view ()->default_text_size () / ly->dbu ());
   r.set_precise (true);
 
   if (trans_vector ()) {
@@ -1168,7 +1168,7 @@ Marker::render (const Viewport &vp, ViewObjectCanvas &canvas)
 
   r.set_font (db::Font (view ()->text_font ()));
   r.apply_text_trans (view ()->apply_text_trans ());
-  r.default_text_size (db::Coord (view ()->default_text_size () / dbu ()));
+  r.default_text_size (view ()->default_text_size () / dbu ());
   r.set_precise (true);
 
   if (! trans_vector ()) {
@@ -1316,7 +1316,7 @@ DMarker::render (const Viewport &vp, ViewObjectCanvas &canvas)
 
   r.set_font (db::Font (view ()->text_font ()));
   r.apply_text_trans (view ()->apply_text_trans ());
-  r.default_text_size (view ()->default_text_size ());
+  r.default_text_size_dbl (view ()->default_text_size ());
   r.set_precise (true);
 
   db::DCplxTrans t = vp.trans ();

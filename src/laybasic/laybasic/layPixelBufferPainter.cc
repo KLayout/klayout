@@ -24,13 +24,14 @@
 
 #include "layFixedFont.h"
 #include "tlPixelBuffer.h"
+#include "dbVector.h"
 
 namespace lay
 {
 
-PixelBufferPainter::PixelBufferPainter (tl::PixelBuffer &img, unsigned int width, unsigned int height, double resolution)
+PixelBufferPainter::PixelBufferPainter (tl::PixelBuffer &img, unsigned int width, unsigned int height, double resolution, double font_resolution)
   : mp_img (&img),
-    m_resolution (resolution), m_width (width), m_height (height)
+    m_resolution (resolution), m_font_resolution (font_resolution), m_width (width), m_height (height)
 {
   // .. nothing yet ..
 }
@@ -38,13 +39,29 @@ PixelBufferPainter::PixelBufferPainter (tl::PixelBuffer &img, unsigned int width
 void
 PixelBufferPainter::set (const db::Point &p, tl::Color c)
 {
-  if (p.x () >= 0 && p.x () < m_width && p.y () >= 0 && p.y () < m_height) {
+  if (m_resolution < 1.0 - 1e-10) {
+    fill_rect (p, p, c);
+  } else if (p.x () >= 0 && p.x () < m_width && p.y () >= 0 && p.y () < m_height) {
     ((unsigned int *) mp_img->scan_line (p.y ())) [p.x ()] = c.rgb ();
   }
 }
 
 void
 PixelBufferPainter::draw_line (const db::Point &p1, const db::Point &p2, tl::Color c)
+{
+  if (m_resolution < 1.0 - 1e-10) {
+    if (p1.x () == p2.x () || p1.y () == p2.y ()) {
+      fill_rect (p1, p2, c);
+    } else {
+      // TODO: not implemented yet.
+    }
+  } else {
+    draw_line_int (p1, p2, c);
+  }
+}
+
+void
+PixelBufferPainter::draw_line_int (const db::Point &p1, const db::Point &p2, tl::Color c)
 {
   if (p1.x () == p2.x ()) {
 
@@ -81,10 +98,21 @@ PixelBufferPainter::draw_line (const db::Point &p1, const db::Point &p2, tl::Col
 void
 PixelBufferPainter::fill_rect (const db::Point &p1, const db::Point &p2, tl::Color c)
 {
+  unsigned int f = (unsigned int) (1.0 / m_resolution + 1e-10);
+  if (f == 1) {
+    fill_rect_int (p1, p2, c);
+  } else {
+    fill_rect_int (p1 - db::Vector (db::Coord (f / 2), db::Coord (f / 2)), p2 + db::Vector (db::Coord (f - f / 2 - 1), db::Coord (f - f / 2 - 1)), c);
+  }
+}
+
+void
+PixelBufferPainter::fill_rect_int (const db::Point &p1, const db::Point &p2, tl::Color c)
+{
   int y1 = std::min (p1.y (), p2.y ());
   int y2 = std::max (p1.y (), p2.y ());
   for (int y = y1; y <= y2; ++y) {
-    draw_line (db::Point (p1.x (), y), db::Point (p2.x (), y), c);
+    draw_line_int (db::Point (p1.x (), y), db::Point (p2.x (), y), c);
   }
 }
 
@@ -104,7 +132,7 @@ PixelBufferPainter::draw_rect (const db::Point &p1, const db::Point &p2, tl::Col
 void
 PixelBufferPainter::draw_text (const char *t, const db::Point &p, tl::Color c, int halign, int valign)
 {
-  const lay::FixedFont &ff = lay::FixedFont::get_font (m_resolution);
+  const lay::FixedFont &ff = lay::FixedFont::get_font (m_font_resolution);
   int x = p.x (), y = p.y ();
 
   if (halign < 0) {

@@ -91,7 +91,7 @@ TEST(1)
   lv.load_layout (tl::testsrc () + "/testdata/gds/t10.gds", true);
 
   QImage qimg;
-  qimg = lv.get_image_with_options (500, 500, 1, 1, 1.0, tl::Color (255, 255, 255), tl::Color (0, 0, 0), tl::Color (128, 128, 128), db::DBox (), false);
+  qimg = lv.get_image_with_options (500, 500, 1, 1, 1.0, 1.0, tl::Color (255, 255, 255), tl::Color (0, 0, 0), tl::Color (128, 128, 128), db::DBox (), false);
 
   EXPECT_EQ (qimg.format () == QImage::Format_RGB32, true);
 
@@ -113,7 +113,7 @@ TEST(2)
   lv.load_layout (tl::testsrc () + "/testdata/gds/t10.gds", true);
 
   QImage qimg;
-  qimg = lv.get_image_with_options (500, 500, 1, 1, 1.0, tl::Color (255, 255, 255), tl::Color (0, 0, 0), tl::Color (128, 128, 128), db::DBox (), false);
+  qimg = lv.get_image_with_options (500, 500, 1, 1, 1.0, 1.0, tl::Color (255, 255, 255), tl::Color (0, 0, 0), tl::Color (128, 128, 128), db::DBox (), false);
 
   EXPECT_EQ (qimg.format () == QImage::Format_RGB32, true);
 
@@ -136,7 +136,7 @@ TEST(3)
   lv.load_layout (tl::testsrc () + "/testdata/gds/t10.gds", true);
 
   QImage qimg;
-  qimg = lv.get_image_with_options (500, 500, 1, 1, 1.0, tl::Color (255, 255, 255), tl::Color (0, 0, 0), tl::Color (128, 128, 128), db::DBox (), true);
+  qimg = lv.get_image_with_options (500, 500, 1, 1, 1.0, 1.0, tl::Color (255, 255, 255), tl::Color (0, 0, 0), tl::Color (128, 128, 128), db::DBox (), true);
 
   EXPECT_EQ (qimg.format () == QImage::Format_MonoLSB, true);
 
@@ -182,7 +182,7 @@ TEST(11)
   lv.load_layout (tl::testsrc () + "/testdata/gds/t10.gds", true);
 
   tl::PixelBuffer img;
-  img = lv.get_pixels_with_options (500, 500, 1, 1, 1.0, tl::Color (255, 255, 255), tl::Color (0, 0, 0), tl::Color (128, 128, 128), db::DBox ());
+  img = lv.get_pixels_with_options (500, 500, 1, 1, 1.0, 1.0, tl::Color (255, 255, 255), tl::Color (0, 0, 0), tl::Color (128, 128, 128), db::DBox ());
 
   std::string tmp = tmp_file ("test.png");
   {
@@ -210,7 +210,7 @@ TEST(12)
   lv.load_layout (tl::testsrc () + "/testdata/gds/t10.gds", true);
 
   tl::PixelBuffer img;
-  img = lv.get_pixels_with_options (500, 500, 1, 1, 1.0, tl::Color (255, 255, 255), tl::Color (0, 0, 0), tl::Color (128, 128, 128), db::DBox ());
+  img = lv.get_pixels_with_options (500, 500, 1, 1, 1.0, 1.0, tl::Color (255, 255, 255), tl::Color (0, 0, 0), tl::Color (128, 128, 128), db::DBox ());
 
   std::string tmp = tmp_file ("test.png");
   {
@@ -269,7 +269,7 @@ TEST(21)
   lv.load_layout (tl::testsrc () + "/testdata/gds/t10.gds", true);
 
   std::string tmp = tmp_file ("test.png");
-  lv.save_image_with_options (tmp, 500, 500, 1, 1, 1.0, tl::Color (255, 255, 255), tl::Color (0, 0, 0), tl::Color (128, 128, 128), db::DBox (), false);
+  lv.save_image_with_options (tmp, 500, 500, 1, 1, 1.0, 1.0, tl::Color (255, 255, 255), tl::Color (0, 0, 0), tl::Color (128, 128, 128), db::DBox (), false);
 
   tl::PixelBuffer img;
   {
@@ -297,7 +297,7 @@ TEST(22)
   lv.load_layout (tl::testsrc () + "/testdata/gds/t10.gds", true);
 
   std::string tmp = tmp_file ("test.png");
-  lv.save_image_with_options (tmp, 500, 500, 1, 1, 1.0, tl::Color (255, 255, 255), tl::Color (0, 0, 0), tl::Color (128, 128, 128), db::DBox (), false);
+  lv.save_image_with_options (tmp, 500, 500, 1, 1, 1.0, 1.0, tl::Color (255, 255, 255), tl::Color (0, 0, 0), tl::Color (128, 128, 128), db::DBox (), false);
 
   tl::PixelBuffer img;
   {
@@ -326,7 +326,7 @@ TEST(23)
   lv.load_layout (tl::testsrc () + "/testdata/gds/t10.gds", true);
 
   std::string tmp = tmp_file ("test.png");
-  lv.save_image_with_options (tmp, 500, 500, 1, 1, 1.0, tl::Color (255, 255, 255), tl::Color (0, 0, 0), tl::Color (128, 128, 128), db::DBox (), true);
+  lv.save_image_with_options (tmp, 500, 500, 1, 1, 1.0, 1.0, tl::Color (255, 255, 255), tl::Color (0, 0, 0), tl::Color (128, 128, 128), db::DBox (), true);
 
   tl::BitmapBuffer img;
   {

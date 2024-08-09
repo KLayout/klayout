@@ -55,8 +55,8 @@ public:
   RedrawThread (lay::RedrawThreadCanvas *canvas, lay::LayoutViewBase *view);
   virtual ~RedrawThread ();
 
-  void commit (const std::vector <lay::RedrawLayerInfo> &layers, const lay::Viewport &vp, double resolution);
-  void start (int workers, const std::vector <lay::RedrawLayerInfo> &layers, const lay::Viewport &vp, double resolution, bool force_redraw);
+  void commit (const std::vector <lay::RedrawLayerInfo> &layers, const lay::Viewport &vp, double resolution, double font_resolution);
+  void start (int workers, const std::vector <lay::RedrawLayerInfo> &layers, const lay::Viewport &vp, double resolution, double font_resolution, bool force_redraw);
   void restart (const std::vector<int> &restart);
   void wakeup_checked ();
   void wakeup ();
@@ -107,6 +107,7 @@ private:
   db::DCplxTrans m_vp_trans;
   int m_width, m_height;
   double m_resolution;
+  double m_font_resolution;
   std::vector<db::Box> m_redraw_regions;
   db::DBox m_stored_region, m_valid_region;
   db::DPoint m_last_center;

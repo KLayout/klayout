@@ -210,8 +210,6 @@ LayerControlPanel::LayerControlPanel (lay::LayoutViewBase *view, db::Manager *ma
     m_hidden_flags_need_update (true),
     m_in_update (false),
     m_phase (0), 
-    m_oversampling (1),
-    m_hrm (false),
     m_do_update_content_dm (this, &LayerControlPanel::do_update_content),
     m_do_update_visibility_dm (this, &LayerControlPanel::do_update_visibility),
     m_no_stipples (false),
@@ -340,6 +338,7 @@ LayerControlPanel::LayerControlPanel (lay::LayoutViewBase *view, db::Manager *ma
   mp_view->cellview_changed_event.add (this, &LayerControlPanel::signal_cv_changed_with_int);
   mp_view->viewport_changed_event.add (this, &LayerControlPanel::signal_vp_changed);
   mp_view->hier_levels_changed_event.add (this, &LayerControlPanel::signal_vp_changed);
+  mp_view->resolution_changed_event.add (this, &LayerControlPanel::signal_resolution_changed);
 
   QFrame *tb = new QFrame (this);
   l->addWidget (tb);
@@ -1792,24 +1791,6 @@ LayerControlPanel::set_phase (int phase)
   }
 }
 
-void
-LayerControlPanel::set_highres_mode (bool hrm)
-{
-  if (m_hrm != hrm) {
-    m_hrm = hrm;
-    m_do_update_content_dm ();
-  }
-}
-
-void
-LayerControlPanel::set_oversampling (int os)
-{
-  if (m_oversampling != os) {
-    m_oversampling = os;
-    m_do_update_content_dm ();
-  }
-}
-
 static void 
 set_hidden_flags_rec (LayerTreeModel *model, QTreeView *tree_view, const QModelIndex &parent)
 {
@@ -2069,6 +2050,12 @@ LayerControlPanel::redo (db::Op *op)
     set_selection (std::vector<lay::LayerPropertiesConstIterator> ()); // clear selection
     return;
   }
+}
+
+void
+LayerControlPanel::signal_resolution_changed ()
+{
+  m_do_update_content_dm ();
 }
 
 void 

@@ -332,7 +332,7 @@ static void save_as2 (lay::LayoutViewBase *view, unsigned int index, const std::
 
 static tl::PixelBuffer get_pixels_with_options (lay::LayoutViewBase *view, unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, const db::DBox &target_box)
 {
-  return view->get_pixels_with_options (width, height, linewidth, oversampling, resolution, tl::Color (), tl::Color (), tl::Color (), target_box);
+  return view->get_pixels_with_options (width, height, linewidth, oversampling, resolution, resolution, tl::Color (), tl::Color (), tl::Color (), target_box);
 }
 
 static tl::BitmapBuffer get_pixels_with_options_mono (lay::LayoutViewBase *view, unsigned int width, unsigned int height, int linewidth, const db::DBox &target_box)
@@ -342,13 +342,13 @@ static tl::BitmapBuffer get_pixels_with_options_mono (lay::LayoutViewBase *view,
 
 static void save_image_with_options (lay::LayoutViewBase *view, const std::string &fn, unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, const db::DBox &target_box, bool monochrome)
 {
-  view->save_image_with_options (fn, width, height, linewidth, oversampling, resolution, tl::Color (), tl::Color (), tl::Color (), target_box, monochrome);
+  view->save_image_with_options (fn, width, height, linewidth, oversampling, resolution, resolution, tl::Color (), tl::Color (), tl::Color (), target_box, monochrome);
 }
 
 #if defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
 static QImage get_image_with_options (lay::LayoutViewBase *view, unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, const db::DBox &target_box, bool monochrome)
 {
-  return view->get_image_with_options (width, height, linewidth, oversampling, resolution, tl::Color (), tl::Color (), tl::Color (), target_box, monochrome);
+  return view->get_image_with_options (width, height, linewidth, oversampling, resolution, resolution, tl::Color (), tl::Color (), tl::Color (), target_box, monochrome);
 }
 
 static QWidget *widget (lay::LayoutViewBase *view)

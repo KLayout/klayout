@@ -53,7 +53,7 @@ public:
   /**
    *  @brief The default ctor
    */
-  BitmapRenderer (unsigned int width, unsigned int height, double resolution);
+  BitmapRenderer (unsigned int width, unsigned int height, double resolution, double font_resolution);
 
   /**
    *  @brief Reserve space for n edges 

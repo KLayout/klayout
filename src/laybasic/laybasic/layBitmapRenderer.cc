@@ -30,8 +30,8 @@ namespace lay
 // ----------------------------------------------------------------------------------------------
 //  BitmapRenderer implementation
 
-BitmapRenderer::BitmapRenderer (unsigned int width, unsigned int height, double resolution)
-  : Renderer (width, height, resolution),
+BitmapRenderer::BitmapRenderer (unsigned int width, unsigned int height, double resolution, double font_resolution)
+  : Renderer (width, height, resolution, font_resolution),
     m_xmin (0.0), m_xmax (0.0), m_ymin (0.0), m_ymax (0.0),
     m_ortho (true)
 {
@@ -386,12 +386,12 @@ BitmapRenderer::draw (const db::Shape &shape, const db::CplxTrans &trans,
     if (m_draw_texts && text) {
 
       db::DFTrans fp (db::DFTrans::r0);
-      db::DCoord h = trans.ctrans (m_default_text_size);
+      db::DCoord h = trans.mag () * m_default_text_size;
       db::Font font = shape.text_font () == db::NoFont ? m_font : shape.text_font ();
 
       if (m_apply_text_trans && font != db::NoFont && font != db::DefaultFont) {
         fp = db::DFTrans (trans.fp_trans () * shape.text_trans ());
-        h = trans.ctrans (shape.text_size () > 0 ? shape.text_size () : m_default_text_size);
+        h = trans.mag () * (shape.text_size () > 0 ? shape.text_size () : m_default_text_size);
       }
 
       db::HAlign halign = shape.text_halign ();
@@ -1087,12 +1087,12 @@ BitmapRenderer::draw (const db::Text &txt, const db::CplxTrans &trans,
   if (m_draw_texts && text) {
 
     db::DFTrans fp (db::DFTrans::r0);
-    db::DCoord h = trans.ctrans (m_default_text_size);
+    db::DCoord h = trans.mag () * m_default_text_size;
     db::Font font = txt.font () == db::NoFont ? m_font : txt.font ();
 
     if (m_apply_text_trans && font != db::NoFont && font != db::DefaultFont) {
       fp = db::DFTrans (trans.fp_trans () * txt.trans ());
-      h = trans.ctrans (txt.size () > 0 ? txt.size () : m_default_text_size);
+      h = trans.mag () * (txt.size () > 0 ? txt.size () : m_default_text_size);
     }
 
     double fy = 0.0;

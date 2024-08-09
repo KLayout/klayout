@@ -46,6 +46,7 @@ RedrawThread::RedrawThread (lay::RedrawThreadCanvas *canvas, LayoutViewBase *vie
   m_width = 0;
   m_height = 0;
   m_resolution = 1.0;
+  m_font_resolution = 1.0;
   m_boxes_already_drawn = false;
   m_custom_already_drawn = false;
   m_nlayers = 0;
@@ -106,12 +107,13 @@ subtract_box (const db::DBox &subject, const db::DBox &with)
 }
 
 void
-RedrawThread::commit (const std::vector <lay::RedrawLayerInfo> &layers, const lay::Viewport &vp, double resolution)
+RedrawThread::commit (const std::vector <lay::RedrawLayerInfo> &layers, const lay::Viewport &vp, double resolution, double font_resolution)
 {
   m_vp_trans = vp.trans ();
   m_width = vp.width ();
   m_height = vp.height ();
   m_resolution = resolution;
+  m_font_resolution = font_resolution;
 
   m_layers = layers;
   m_nlayers = int (m_layers.size ());
@@ -131,12 +133,13 @@ RedrawThread::commit (const std::vector <lay::RedrawLayerInfo> &layers, const la
 }
 
 void
-RedrawThread::start (int workers, const std::vector <lay::RedrawLayerInfo> &layers, const lay::Viewport &vp, double resolution, bool force_redraw)
+RedrawThread::start (int workers, const std::vector <lay::RedrawLayerInfo> &layers, const lay::Viewport &vp, double resolution, double font_resolution, bool force_redraw)
 {
   m_vp_trans = vp.trans ();
   m_width = vp.width ();
   m_height = vp.height ();
   m_resolution = resolution;
+  m_font_resolution = font_resolution;
 
   db::DBox new_region = m_vp_trans.inverted () * db::DBox (db::DPoint (0, 0), db::DPoint (m_width, m_height));
   double epsilon = m_vp_trans.inverted ().ctrans (1e-3);
@@ -261,7 +264,7 @@ RedrawThread::do_start (bool clear, const db::Vector *shift_vector, const std::v
 
       if (clear) {
 
-        mp_canvas->prepare (m_nlayers * planes_per_layer + special_planes_before + special_planes_after, m_width, m_height, m_resolution, shift_vector, 0, mp_view->drawings ());
+        mp_canvas->prepare (m_nlayers * planes_per_layer + special_planes_before + special_planes_after, m_width, m_height, m_resolution, m_font_resolution, shift_vector, 0, mp_view->drawings ());
         m_boxes_already_drawn = false;
         m_custom_already_drawn = false;
 
@@ -281,7 +284,7 @@ RedrawThread::do_start (bool clear, const db::Vector *shift_vector, const std::v
           }
         }
 
-        mp_canvas->prepare (m_nlayers * planes_per_layer + special_planes_before + special_planes_after, m_width, m_height, m_resolution, shift_vector, &planes_to_init, mp_view->drawings ());
+        mp_canvas->prepare (m_nlayers * planes_per_layer + special_planes_before + special_planes_after, m_width, m_height, m_resolution, m_font_resolution, shift_vector, &planes_to_init, mp_view->drawings ());
 
         for (std::vector<int>::const_iterator l = restart.begin (); l != restart.end (); ++l) {
           if (*l >= 0 && *l < int (m_layers.size ())) {
@@ -315,7 +318,7 @@ RedrawThread::do_start (bool clear, const db::Vector *shift_vector, const std::v
       }
 
     } else {
-      mp_canvas->prepare (1, m_width, m_height, m_resolution, 0, 0, mp_view->drawings ());
+      mp_canvas->prepare (1, m_width, m_height, m_resolution, m_font_resolution, 0, 0, mp_view->drawings ());
     }
 
   }

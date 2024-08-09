@@ -242,9 +242,9 @@ shift_bitmap (const lay::Bitmap *from, lay::Bitmap *to, int dx, int dy)
 }
 
 void 
-BitmapRedrawThreadCanvas::prepare (unsigned int nlayers, unsigned int width, unsigned int height, double resolution, const db::Vector *shift_vector, const std::vector<int> *planes, const lay::Drawings *drawings)
+BitmapRedrawThreadCanvas::prepare (unsigned int nlayers, unsigned int width, unsigned int height, double resolution, double font_resolution, const db::Vector *shift_vector, const std::vector<int> *planes, const lay::Drawings *drawings)
 {
-  RedrawThreadCanvas::prepare (nlayers, width, height, resolution, shift_vector, planes, drawings);
+  RedrawThreadCanvas::prepare (nlayers, width, height, resolution, font_resolution, shift_vector, planes, drawings);
 
   lock ();
 
@@ -256,7 +256,7 @@ BitmapRedrawThreadCanvas::prepare (unsigned int nlayers, unsigned int width, uns
 
     for (size_t i = 0; i < mp_plane_buffers.size (); ++i) {
       lay::Bitmap *from = mp_plane_buffers [i];
-      lay::Bitmap *to   = mp_plane_buffers [i] = new lay::Bitmap (width, height, resolution);
+      lay::Bitmap *to   = mp_plane_buffers [i] = new lay::Bitmap (width, height, resolution, font_resolution);
       shift_bitmap (from, to, shift_vector->x (), shift_vector->y ());
       delete from;
     }
@@ -265,7 +265,7 @@ BitmapRedrawThreadCanvas::prepare (unsigned int nlayers, unsigned int width, uns
     for (lay::Drawings::const_iterator d = drawings->begin (); d != drawings->end (); ++d, ++di) {
       for (unsigned int i = 0; i < d->num_planes (); ++i) {
         lay::Bitmap *from = mp_drawing_plane_buffers[di][i];
-        lay::Bitmap *to   = mp_drawing_plane_buffers[di][i] = new lay::Bitmap (width, height, resolution);
+        lay::Bitmap *to   = mp_drawing_plane_buffers[di][i] = new lay::Bitmap (width, height, resolution, font_resolution);
         shift_bitmap (from, to, shift_vector->x (), shift_vector->y ());
         delete from;
       }
@@ -305,13 +305,13 @@ BitmapRedrawThreadCanvas::prepare (unsigned int nlayers, unsigned int width, uns
     clear_planes ();
 
     for (unsigned int i = 0; i < nlayers; ++i) {
-      mp_plane_buffers.push_back (new lay::Bitmap (width, height, resolution));
+      mp_plane_buffers.push_back (new lay::Bitmap (width, height, resolution, font_resolution));
     }
 
     for (lay::Drawings::const_iterator d = drawings->begin (); d != drawings->end (); ++d) {
       mp_drawing_plane_buffers.push_back (std::vector <lay::Bitmap *> ());
       for (unsigned int i = 0; i < d->num_planes (); ++i) {
-        mp_drawing_plane_buffers.back ().push_back (new lay::Bitmap (width, height, resolution));
+        mp_drawing_plane_buffers.back ().push_back (new lay::Bitmap (width, height, resolution, font_resolution));
       }
     }
 
@@ -364,7 +364,7 @@ BitmapRedrawThreadCanvas::clear_planes ()
 lay::CanvasPlane *
 BitmapRedrawThreadCanvas::create_drawing_plane ()
 {
-  return new lay::Bitmap(m_width, m_height, resolution ());
+  return new lay::Bitmap(m_width, m_height, resolution (), font_resolution ());
 }
 
 void 

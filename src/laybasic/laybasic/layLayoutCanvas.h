@@ -175,7 +175,7 @@ public:
 
   tl::PixelBuffer screenshot ();
   tl::PixelBuffer image (unsigned int width, unsigned int height);
-  tl::PixelBuffer image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, tl::Color background, tl::Color foreground, tl::Color active_color, const db::DBox &target_box);
+  tl::PixelBuffer image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, double font_resolution, tl::Color background, tl::Color foreground, tl::Color active_color, const db::DBox &target_box);
   tl::BitmapBuffer image_with_options_mono (unsigned int width, unsigned int height, int linewidth, tl::Color background, tl::Color foreground, tl::Color active, const db::DBox &target_box);
 
   void update_image ();
@@ -278,6 +278,19 @@ public:
   }
 
   /**
+   *  @brief Set sub resolution mode (sub-pixel resolution in oversampling mode)
+   */
+  void set_subres_mode (bool srm);
+
+  /**
+   *  @brief Gets the sub resolution mode flag
+   */
+  bool subres_mode () const
+  {
+    return m_srm;
+  }
+
+  /**
    *  @brief Gets the default device pixel ratio for this canvas
    */
   double dpr () const;
@@ -321,9 +334,22 @@ public:
   }
 
   /**
-   *  @brief Reimplementation of ViewObjectCanvas: Resolution
+   *  @brief Reimplementation of ViewObjectCanvas interface
    */
   double resolution () const;
+
+  /**
+   *  @brief Reimplementation of ViewObjectCanvas interface
+   */
+  double font_resolution () const;
+
+  /**
+   *  @brief Gets the gamma value
+   */
+  double gamma () const
+  {
+    return m_gamma;
+  }
 
   /**
    *  @brief Reimplementation of ViewObjectCanvas: Background color 
@@ -412,6 +438,7 @@ private:
   std::map<unsigned int, std::vector <lay::ViewOp> > m_scaled_view_ops;
   unsigned int m_oversampling;
   bool m_hrm;
+  bool m_srm;
   double m_gamma;
 
   bool m_need_redraw;

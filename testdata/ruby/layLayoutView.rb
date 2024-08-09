@@ -187,16 +187,22 @@ class LAYLayoutView_TestClass < TestBase
     view.set_config("search-range", "0")
     view.select_from(RBA::DBox::new(-2.5, -2.5, 2.5, 2.5))
     assert_equal(selection_changed, 1)
-    assert_equal(view.selection_size, 2)
+    assert_equal(view.selection_size, 4)
     assert_equal(view.has_selection?, true)
 
     view.select_from(RBA::DPoint::new(0, 0), RBA::LayoutView::Invert)
     assert_equal(selection_changed, 2)
-    assert_equal(view.selection_size, 3)
+    assert_equal(view.selection_size, 5)
     assert_equal(view.has_selection?, true)
 
     view.clear_selection
-    assert_equal(selection_changed, 3)
+    view.select_all
+    assert_equal(selection_changed, 4)
+    assert_equal(view.has_selection?, true)
+    assert_equal(view.selection_size, 20)
+
+    view.clear_selection
+    assert_equal(selection_changed, 5)
     assert_equal(view.has_selection?, false)
     assert_equal(view.selection_size, 0)
     selection_changed = 0

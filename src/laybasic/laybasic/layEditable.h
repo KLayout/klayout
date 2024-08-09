@@ -508,11 +508,6 @@ public:
   void clear_previous_selection ();
 
   /**
-   *  @brief Select "all"
-   */
-  void select ();
-
-  /**
    *  @brief Select geometrically by a rectangle
    */
   void select (const db::DBox &box, Editable::SelectionMode mode);

@@ -324,7 +324,7 @@ ShapeFinder::find (LayoutViewBase *view, const db::DBox &region_mu)
   m_cells_with_context.clear ();
 
   lay::TextInfo text_info (view);
-  mp_text_info = (m_flags & db::ShapeIterator::Texts) != 0 ? &text_info : 0;
+  mp_text_info = (m_flags & db::ShapeIterator::Texts) != 0 && point_mode () ? &text_info : 0;
 
   std::vector<lay::LayerPropertiesConstIterator> lprops;
   for (lay::LayerPropertiesConstIterator lp = view->begin_layers (); ! lp.at_end (); ++lp) {

@@ -3017,7 +3017,7 @@ LayoutViewBase::save_image_with_options (const std::string &fn,
 #elif defined(HAVE_PNG)
 void
 LayoutViewBase::save_image_with_options (const std::string &fn,
-                                         unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution,
+                                         unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, double font_resolution,
                                          tl::Color background, tl::Color foreground, tl::Color active, const db::DBox &target_box, bool monochrome)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Save image")));
@@ -3036,7 +3036,7 @@ LayoutViewBase::save_image_with_options (const std::string &fn,
 
   } else {
 
-    tl::PixelBuffer img = mp_canvas->image_with_options (width, height, linewidth, oversampling, resolution, background, foreground, active, target_box);
+    tl::PixelBuffer img = mp_canvas->image_with_options (width, height, linewidth, oversampling, resolution, font_resolution, background, foreground, active, target_box);
     img.set_texts (texts);
     img.write_png (stream);
 

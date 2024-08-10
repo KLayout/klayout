@@ -449,7 +449,7 @@ static void create_precursor_bitmaps (const std::vector<lay::ViewOp> &view_ops_i
         mutex->lock ();
       }
 
-      lay::Bitmap &bp = precursors.insert (std::make_pair (bm_index, lay::Bitmap (width, height, 1.0))).first->second;
+      lay::Bitmap &bp = precursors.insert (std::make_pair (bm_index, lay::Bitmap (width, height, 1.0, 1.0))).first->second;
       const LineStyleInfo &ls_info = ls.style (op.line_style_index ()).scaled (op.width ());
 
       for (unsigned int y = 0; y < height; y++) {
@@ -961,7 +961,7 @@ bitmap_to_bitmap (const lay::ViewOp &view_op, const lay::Bitmap &bitmap,
         lay::Bitmap precursor;
         if (ls_info.width () > 0) {
 
-          precursor = lay::Bitmap (width, height, 1.0);
+          precursor = lay::Bitmap (width, height, 1.0, 1.0);
 
           LineStyleInfo lsi = ls_info;
 

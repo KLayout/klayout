@@ -36,18 +36,19 @@ namespace lay
 // ----------------------------------------------------------------------------------------------
 //  Renderer implementation
 
-Renderer::Renderer (unsigned int width, unsigned int height, double resolution)
+Renderer::Renderer (unsigned int width, unsigned int height, double resolution, double font_resolution)
   : m_draw_texts (true),
     m_draw_properties (false),
     m_draw_description_property (false),
-    m_default_text_size (16),
-    m_default_text_size_dbl (16),
+    m_default_text_size (1000),
+    m_default_text_size_dbl (1.0),
     m_apply_text_trans (true),
     m_precise (false),
     m_xfill (false),
     m_font (db::DefaultFont),
     m_width (width), m_height (height),
-    m_resolution (resolution)
+    m_resolution (resolution),
+    m_font_resolution (font_resolution)
 {
   // .. nothing else ..
 }
@@ -94,7 +95,7 @@ Renderer::draw_propstring (db::properties_id_type id,
                            lay::CanvasPlane *text, const db::CplxTrans &trans)
 {
   db::DPoint tp1 (pref + db::DVector (2.0, -2.0));
-  db::DPoint tp2 (pref + db::DVector (2.0, -2.0 - trans.ctrans (m_default_text_size)));
+  db::DPoint tp2 (pref + db::DVector (2.0, -2.0 - trans.mag () * m_default_text_size));
 
   std::string ptext;
 
@@ -119,7 +120,7 @@ Renderer::draw_description_propstring (db::properties_id_type id,
                                        lay::CanvasPlane *text, const db::CplxTrans &trans)
 {
   db::DPoint tp1 (pref + db::DVector (5.0, -5.0));
-  db::DPoint tp2 (pref + db::DVector (5.0, -5.0 - trans.ctrans (m_default_text_size)));
+  db::DPoint tp2 (pref + db::DVector (5.0, -5.0 - trans.mag () * m_default_text_size));
 
   const db::PropertiesRepository::properties_set &props = prep->properties (id);
   //  TODO: get rid of this const_cast hack (i.e. by a mutable definition inside the properties repository)

@@ -204,7 +204,7 @@ RedrawThreadWorker::perform_task (tl::Task *task)
           mp_renderer->draw_texts (m_text_visible);
           mp_renderer->draw_properties (m_show_properties);
           mp_renderer->draw_description_property (false);
-          mp_renderer->default_text_size (db::Coord (m_default_text_size / mp_layout->dbu ()));
+          mp_renderer->default_text_size (m_default_text_size / mp_layout->dbu ());
           mp_renderer->set_font (db::Font (m_text_font));
           mp_renderer->apply_text_trans (m_apply_text_trans);
 
@@ -1284,7 +1284,7 @@ RedrawThreadWorker::draw_text_layer (bool drawing_context, db::cell_index_type c
   std::unique_ptr<lay::Bitmap> opt_bitmap;
   lay::Bitmap *vertex_bitmap = dynamic_cast<lay::Bitmap *> (vertex);
   if (m_text_lazy_rendering && vertex_bitmap) {
-    opt_bitmap.reset (new lay::Bitmap (vertex_bitmap->width (), vertex_bitmap->height (), vertex_bitmap->resolution ()));
+    opt_bitmap.reset (new lay::Bitmap (vertex_bitmap->width (), vertex_bitmap->height (), vertex_bitmap->resolution (), vertex_bitmap->font_resolution ()));
   }
 
   for (std::vector<db::Box>::const_iterator b = vp.begin (); b != vp.end (); ++b) {
@@ -1991,10 +1991,10 @@ RedrawThreadWorker::draw_layer (int from_level, int to_level, db::cell_index_typ
           int width = int (cell_box_trans.width () + 3);    //  +3 = one pixel for a one-pixel frame at both sides and one for safety
           int height = int (cell_box_trans.height () + 3);
 
-          cached_cell->second.fill   = new lay::Bitmap (width, height, 1.0);
-          cached_cell->second.frame  = new lay::Bitmap (width, height, 1.0);
-          cached_cell->second.vertex = new lay::Bitmap (width, height, 1.0);
-          cached_cell->second.text   = new lay::Bitmap (width, height, 1.0);
+          cached_cell->second.fill   = new lay::Bitmap (width, height, 1.0, 1.0);
+          cached_cell->second.frame  = new lay::Bitmap (width, height, 1.0, 1.0);
+          cached_cell->second.vertex = new lay::Bitmap (width, height, 1.0, 1.0);
+          cached_cell->second.text   = new lay::Bitmap (width, height, 1.0, 1.0);
 
           //  this object is responsible for doing updates when a snapshot is taken
           UpdateSnapshotWithCache update_cached_snapshot (update_snapshot, &trans, &cached_cell->second, fill, frame, vertex, text);

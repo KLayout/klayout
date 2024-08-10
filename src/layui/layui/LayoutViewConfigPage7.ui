@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>791</width>
-    <height>403</height>
+    <width>613</width>
+    <height>559</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -50,17 +50,30 @@
       <property name="spacing">
        <number>6</number>
       </property>
+      <item row="0" column="0" colspan="3">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Oversampling increases the image quality by using an internal resolution larger than the image resolution. Drawing speed is somewhat reduced.</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0" colspan="3">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>High resolution mode utilizes the full pixel density on high-DPI displays. Features may look smaller, but richer in details.</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
       <item row="1" column="0">
        <widget class="QLabel" name="label_2">
         <property name="text">
          <string>Oversampling mode</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0" colspan="3">
-       <widget class="QLabel" name="label_5">
-        <property name="text">
-         <string>High resolution mode utilizes the full pixel density on high-DPI displays. Features may look small but rich in details.</string>
         </property>
        </widget>
       </item>
@@ -83,6 +96,13 @@
         </item>
        </widget>
       </item>
+      <item row="6" column="0" colspan="3">
+       <widget class="QCheckBox" name="highres_mode">
+        <property name="text">
+         <string>High resolution mode enabled</string>
+        </property>
+       </widget>
+      </item>
       <item row="1" column="2">
        <spacer>
         <property name="orientation">
@@ -96,10 +116,10 @@
         </property>
        </spacer>
       </item>
-      <item row="0" column="0" colspan="3">
-       <widget class="QLabel" name="label">
+      <item row="2" column="0" colspan="3">
+       <widget class="QLabel" name="label_6">
         <property name="text">
-         <string>Oversampling increases the image quality by using an internal resolution larger than the image resolution. Drawing speed is somewhat reduced and lines may appear thinner.</string>
+         <string>With small rendering, the line widths and stipples are scaled down - a single pixel line becomes half a pixel wide with 2x oversampling. This provides a virtual sub-pixel resolution with finer details.</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -107,9 +127,16 @@
        </widget>
       </item>
       <item row="3" column="0" colspan="3">
-       <widget class="QCheckBox" name="highres_mode">
+       <widget class="QCheckBox" name="subres_mode">
         <property name="text">
-         <string>High resolution mode enabled</string>
+         <string>Small rendering in oversampling mode</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="3">
+       <widget class="Line" name="line">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
        </widget>
       </item>

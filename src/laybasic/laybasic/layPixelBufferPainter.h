@@ -44,7 +44,7 @@ namespace lay {
 class LAYBASIC_PUBLIC PixelBufferPainter
 {
 public:
-  PixelBufferPainter (tl::PixelBuffer &img, unsigned int width, unsigned int height, double resolution);
+  PixelBufferPainter (tl::PixelBuffer &img, unsigned int width, unsigned int height, double resolution, double font_resolution);
 
   void set (const db::Point &p, tl::Color c);
   void draw_line (const db::Point &p1, const db::Point &p2, tl::Color c);
@@ -54,8 +54,11 @@ public:
 
 private:
   tl::PixelBuffer *mp_img;
-  double m_resolution;
+  double m_resolution, m_font_resolution;
   int m_width, m_height;
+
+  void fill_rect_int (const db::Point &p1, const db::Point &p2, tl::Color c);
+  void draw_line_int (const db::Point &p1, const db::Point &p2, tl::Color c);
 };
 
 }

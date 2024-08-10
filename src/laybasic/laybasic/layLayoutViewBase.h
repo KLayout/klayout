@@ -790,6 +790,11 @@ public:
   tl::Event cell_visibility_changed_event;
 
   /**
+   *  @brief An event signalling that the resolution has changed
+   */
+  tl::Event resolution_changed_event;
+
+  /**
    *  @brief Save the given cellview into the given file (with options)
    *  If "update" is true, the cell view's properties will be updated (options, filename etc.).
    */
@@ -917,13 +922,14 @@ public:
    *  @param linewidth The width of a line in pixels (usually 1) or 0 for default
    *  @param oversampling The oversampling factor (1..3) or 0 for default
    *  @param resolution The resolution (pixel size compared to a screen pixel size, i.e 1/oversampling) or 0 for default
+   *  @param font_resolution The resolution for rendering the "Default" font
    *  @param background The background color or tl::Color() for default
    *  @param foreground The foreground color or tl::Color() for default
    *  @param active The active color or tl::Color() for default
    *  @param target_box The box to draw or db::DBox() for default
    *  @param monochrome If true, monochrome images will be produced
    */
-  void save_image_with_options (const std::string &fn, unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, tl::Color background, tl::Color foreground, tl::Color active_color, const db::DBox &target_box, bool monochrome);
+  void save_image_with_options (const std::string &fn, unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, double font_resolution, tl::Color background, tl::Color foreground, tl::Color active_color, const db::DBox &target_box, bool monochrome);
 
 #if defined(HAVE_QT)
   /**
@@ -946,13 +952,14 @@ public:
    *  @param linewidth The width of a line in pixels (usually 1) or 0 for default
    *  @param oversampling The oversampling factor (1..3) or 0 for default
    *  @param resolution The resolution (pixel size compared to a screen pixel size, i.e 1/oversampling) or 0 for default
+   *  @param font_resolution The resolution for rendering the "Default" font
    *  @param background The background color or tl::Color() for default
    *  @param foreground The foreground color or tl::Color() for default
    *  @param active The active color or tl::Color() for default
    *  @param target_box The box to draw or db::DBox() for default
    *  @param monochrome If true, monochrome images will be produced
    */
-  QImage get_image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, tl::Color background, tl::Color foreground, tl::Color active_color, const db::DBox &target_box, bool monochrome);
+  QImage get_image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, double font_resolution, tl::Color background, tl::Color foreground, tl::Color active_color, const db::DBox &target_box, bool monochrome);
 #endif
 
   /**
@@ -963,12 +970,13 @@ public:
    *  @param linewidth The width of a line in pixels (usually 1) or 0 for default
    *  @param oversampling The oversampling factor (1..3) or 0 for default
    *  @param resolution The resolution (pixel size compared to a screen pixel size, i.e 1/oversampling) or 0 for default
+   *  @param font_resolution The resolution for rendering the "Default" font
    *  @param background The background color or tl::Color() for default
    *  @param foreground The foreground color or tl::Color() for default
    *  @param active The active color or tl::Color() for default
    *  @param target_box The box to draw or db::DBox() for default
    */
-  tl::PixelBuffer get_pixels_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, tl::Color background, tl::Color foreground, tl::Color active_color, const db::DBox &target_box);
+  tl::PixelBuffer get_pixels_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, double font_resolution, tl::Color background, tl::Color foreground, tl::Color active_color, const db::DBox &target_box);
 
   /**
    *  @brief Get the screen content as a monochrome tl::BitmapBuffer object with the given options

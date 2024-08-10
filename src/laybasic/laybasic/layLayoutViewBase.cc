@@ -780,14 +780,30 @@ LayoutViewBase::configure (const std::string &name, const std::string &value)
 
     int os = 1;
     tl::from_string (value, os);
-    mp_canvas->set_oversampling (os);
+    if (os != mp_canvas->oversampling ()) {
+      mp_canvas->set_oversampling (os);
+      resolution_changed_event ();
+    }
     return true;
 
   } else if (name == cfg_highres_mode) {
 
     bool hrm = false;
     tl::from_string (value, hrm);
-    mp_canvas->set_highres_mode (hrm);
+    if (hrm != mp_canvas->highres_mode ()) {
+      mp_canvas->set_highres_mode (hrm);
+      resolution_changed_event ();
+    }
+    return true;
+
+  } else if (name == cfg_subres_mode) {
+
+    bool srm = false;
+    tl::from_string (value, srm);
+    if (srm != mp_canvas->subres_mode ()) {
+      mp_canvas->set_subres_mode (srm);
+      resolution_changed_event ();
+    }
     return true;
 
   } else if (name == cfg_image_cache_size) {
@@ -1558,14 +1574,12 @@ tl::PixelBuffer
 LayoutViewBase::icon_for_layer (const LayerPropertiesConstIterator &iter, unsigned int w, unsigned int h, double dpr, unsigned int di_off, bool no_state)
 {
   if (dpr < 0.0) {
-    dpr = canvas ()->dpr ();
+    dpr = canvas () ? canvas ()->dpr () : 1.0;
   }
 
-  int oversampling = canvas () ? canvas ()->oversampling () : 1;
-  double gamma = 2.0;
-
-  bool hrm = canvas () ? canvas ()->highres_mode () : false;
-  double dpr_drawing = oversampling * (hrm ? 1.0 : dpr);
+  double gamma = canvas () ? canvas ()->gamma () : 2.0;
+  double dpr_drawing = canvas () ? 1.0 / canvas ()->resolution () : 1.0;
+  unsigned int oversampling = canvas () ? canvas ()->oversampling () : 1;
 
   h = std::max ((unsigned int) 16, h) * oversampling * dpr + 0.5;
   w = std::max ((unsigned int) 16, w) * oversampling * dpr + 0.5;
@@ -1584,10 +1598,10 @@ LayoutViewBase::icon_for_layer (const LayerPropertiesConstIterator &iter, unsign
     *sl0++ = 0;
   }
 
-  lay::Bitmap fill (w, h, 1.0);
-  lay::Bitmap frame (w, h, 1.0);
-  lay::Bitmap text (w, h, 1.0);
-  lay::Bitmap vertex (w, h, 1.0);
+  lay::Bitmap fill (w, h, 1.0, 1.0);
+  lay::Bitmap frame (w, h, 1.0, 1.0);
+  lay::Bitmap text (w, h, 1.0, 1.0);
+  lay::Bitmap vertex (w, h, 1.0, 1.0);
 
   unsigned int wp = w - 1;
 
@@ -2885,7 +2899,7 @@ LayoutViewBase::get_pixels (unsigned int width, unsigned int height)
 
 #if defined(HAVE_QT)
 QImage
-LayoutViewBase::get_image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution,
+LayoutViewBase::get_image_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, double font_resolution,
                                         tl::Color background, tl::Color foreground, tl::Color active, const db::DBox &target_box, bool monochrome)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Get image")));
@@ -2895,20 +2909,20 @@ LayoutViewBase::get_image_with_options (unsigned int width, unsigned int height,
   if (monochrome) {
     return mp_canvas->image_with_options_mono (width, height, linewidth, background, foreground, active, target_box).to_image_copy ();
   } else {
-    return mp_canvas->image_with_options (width, height, linewidth, oversampling, resolution, background, foreground, active, target_box).to_image_copy ();
+    return mp_canvas->image_with_options (width, height, linewidth, oversampling, resolution, font_resolution, background, foreground, active, target_box).to_image_copy ();
   }
 }
 #endif
 
 tl::PixelBuffer
-LayoutViewBase::get_pixels_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution,
+LayoutViewBase::get_pixels_with_options (unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, double font_resolution,
                                          tl::Color background, tl::Color foreground, tl::Color active, const db::DBox &target_box)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Get image")));
 
   refresh ();
 
-  return mp_canvas->image_with_options (width, height, linewidth, oversampling, resolution, background, foreground, active, target_box);
+  return mp_canvas->image_with_options (width, height, linewidth, oversampling, resolution, font_resolution, background, foreground, active, target_box);
 }
 
 tl::BitmapBuffer
@@ -2973,7 +2987,7 @@ LayoutViewBase::save_image (const std::string &, unsigned int, unsigned int)
 #if defined(HAVE_QT) && !defined(PREFER_LIBPNG_FOR_SAVE)
 void
 LayoutViewBase::save_image_with_options (const std::string &fn,
-                                         unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution,
+                                         unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, double font_resolution,
                                          tl::Color background, tl::Color foreground, tl::Color active, const db::DBox &target_box, bool monochrome)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Save image")));
@@ -2993,7 +3007,7 @@ LayoutViewBase::save_image_with_options (const std::string &fn,
       throw tl::Exception (tl::to_string (tr ("Unable to write screenshot to file: %s (%s)")), fn, tl::to_string (writer.errorString ()));
     }
   } else {
-    if (! writer.write (mp_canvas->image_with_options (width, height, linewidth, oversampling, resolution, background, foreground, active, target_box).to_image ())) {
+    if (! writer.write (mp_canvas->image_with_options (width, height, linewidth, oversampling, resolution, font_resolution, background, foreground, active, target_box).to_image ())) {
       throw tl::Exception (tl::to_string (tr ("Unable to write screenshot to file: %s (%s)")), fn, tl::to_string (writer.errorString ()));
     }
   }
@@ -3003,7 +3017,7 @@ LayoutViewBase::save_image_with_options (const std::string &fn,
 #elif defined(HAVE_PNG)
 void
 LayoutViewBase::save_image_with_options (const std::string &fn,
-                                         unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution,
+                                         unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, double font_resolution,
                                          tl::Color background, tl::Color foreground, tl::Color active, const db::DBox &target_box, bool monochrome)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Save image")));
@@ -3022,7 +3036,7 @@ LayoutViewBase::save_image_with_options (const std::string &fn,
 
   } else {
 
-    tl::PixelBuffer img = mp_canvas->image_with_options (width, height, linewidth, oversampling, resolution, background, foreground, active, target_box);
+    tl::PixelBuffer img = mp_canvas->image_with_options (width, height, linewidth, oversampling, resolution, font_resolution, background, foreground, active, target_box);
     img.set_texts (texts);
     img.write_png (stream);
 

@@ -29,6 +29,7 @@ SOURCES = \
     tlObject.cc \
     tlProgress.cc \
     tlPixelBuffer.cc \
+    tlProtocolBuffer.cc \
     tlResources.cc \
     tlScriptError.cc \
     tlSleep.cc \
@@ -85,6 +86,7 @@ HEADERS = \
     tlObjectCollection.h \
     tlProgress.h \
     tlPixelBuffer.h \
+    tlProtocolBuffer.h \
     tlResources.h \
     tlReuseVector.h \
     tlScriptError.h \

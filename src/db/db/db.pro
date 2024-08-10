@@ -37,6 +37,7 @@ SOURCES = \
   dbGenericShapeIterator.cc \
   dbGlyphs.cc \
   dbHershey.cc \
+  dbHierProcessor2.cc \
   dbInstances.cc \
   dbInstElement.cc \
   dbLayerMapping.cc \
@@ -264,6 +265,7 @@ HEADERS = \
   dbHash.h \
   dbHersheyFont.h \
   dbHershey.h \
+  dbHierProcessorUtils.h \
   dbInstances.h \
   dbInstElement.h \
   dbLayer.h \

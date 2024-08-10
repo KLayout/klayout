@@ -26,6 +26,9 @@
 namespace tl
 {
 
+  // --------------------------------------------------------------------
+//  PBParser implementation
+
 PBParser::PBParser ()
 {
   //  .. nothing yet ..
@@ -68,6 +71,58 @@ PBParser::parse_element (const PBElementBase *parent, tl::ProtocolBufferReader &
     }
 
   }
+}
+
+// --------------------------------------------------------------------
+//  PBElementProxy implementation
+
+PBElementProxy::PBElementProxy (const PBElementProxy &d)
+  : mp_ptr (d.mp_ptr->clone ())
+{
+  //  .. nothing yet ..
+}
+
+PBElementProxy::PBElementProxy (const PBElementBase &d)
+  : mp_ptr (d.clone ())
+{
+  //  .. nothing yet ..
+}
+
+PBElementProxy::PBElementProxy (PBElementBase *d)
+  : mp_ptr (d)
+{
+  //  .. nothing yet ..
+}
+
+PBElementProxy::~PBElementProxy ()
+{
+  delete mp_ptr;
+  mp_ptr = 0;
+}
+
+// --------------------------------------------------------------------
+//  PBReaderState implementation
+
+PBReaderState::PBReaderState ()
+{
+  //  .. nothing yet ..
+}
+
+PBReaderState::~PBReaderState ()
+{
+  for (std::vector <PBReaderProxyBase *>::const_iterator o = m_objects.begin (); o != m_objects.end (); ++o) {
+    (*o)->release ();
+    delete *o;
+  }
+  m_objects.clear ();
+}
+
+// --------------------------------------------------------------------
+//  PBWriterState implementation
+
+PBWriterState::PBWriterState ()
+{
+  //  .. nothing yet ..
 }
 
 }

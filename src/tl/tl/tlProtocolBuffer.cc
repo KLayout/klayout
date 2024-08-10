@@ -36,6 +36,7 @@ ProtocolBufferReader::ProtocolBufferReader (tl::InputStream &input)
 int
 ProtocolBufferReader::read_tag ()
 {
+  m_type = PB_VARINT;
   uint32_t value = 0;
   read (value);
   m_type = PBWireType (value & 7);
@@ -102,9 +103,9 @@ ProtocolBufferReader::read (std::string &s)
 }
 
 void
-ProtocolBufferReader::read (uint32_t &ui32, bool fixed)
+ProtocolBufferReader::read (uint32_t &ui32)
 {
-  if (! fixed) {
+  if (m_type != PB_I32) {
 
     pb_varint ui64 = read_varint ();
     if (ui64 > std::numeric_limits<uint32_t>::max ()) {
@@ -125,12 +126,12 @@ ProtocolBufferReader::read (uint32_t &ui32, bool fixed)
 }
 
 void
-ProtocolBufferReader::read (int32_t &i32, bool fixed)
+ProtocolBufferReader::read (int32_t &i32)
 {
   uint32_t ui32;
-  read (ui32, fixed);
+  read (ui32);
 
-  if (! fixed) {
+  if (m_type != PB_I32) {
     if (ui32 & 1) {
       i32 = -(int32_t (ui32 >> 1) + 1);
     } else {
@@ -142,9 +143,9 @@ ProtocolBufferReader::read (int32_t &i32, bool fixed)
 }
 
 void
-ProtocolBufferReader::read (uint64_t &ui64, bool fixed)
+ProtocolBufferReader::read (uint64_t &ui64)
 {
-  if (! fixed) {
+  if (m_type != PB_I64) {
 
     ui64 = read_varint ();
 
@@ -160,12 +161,12 @@ ProtocolBufferReader::read (uint64_t &ui64, bool fixed)
 }
 
 void
-ProtocolBufferReader::read (int64_t &i64, bool fixed)
+ProtocolBufferReader::read (int64_t &i64)
 {
   uint64_t ui64;
-  read (ui64, fixed);
+  read (ui64);
 
-  if (! fixed) {
+  if (m_type != PB_I64) {
     if (ui64 & 1) {
       i64 = -(int64_t (ui64 >> 1) + 1);
     } else {
@@ -241,6 +242,7 @@ pb_varint
 ProtocolBufferReader::read_varint ()
 {
   pb_varint v = 0;
+  unsigned int s = 0;
 
   while (true) {
     const char *cp = get (1);
@@ -250,8 +252,8 @@ ProtocolBufferReader::read_varint ()
     if ((v & 0xfe00000000000000l) != 0) {
       error (tl::to_string (tr ("64 bit integer overflow")));
     }
-    v <<= 7;
-    v |= (unsigned char) (*cp & 0x7f);
+    v |= (pb_varint ((unsigned char) (*cp & 0x7f)) << s);
+    s += 7;
     if ((*cp & 0x80) == 0) {
       break;
     }
@@ -289,12 +291,12 @@ ProtocolBufferWriter::ProtocolBufferWriter (tl::OutputStream &stream)
 
 void ProtocolBufferWriter::write (int tag, float v)
 {
-  write (tag, *reinterpret_cast<uint32_t *> (&v));
+  write (tag, *reinterpret_cast<uint32_t *> (&v), true);
 }
 
 void ProtocolBufferWriter::write (int tag, double v)
 {
-  write (tag, *reinterpret_cast<uint64_t *> (&v));
+  write (tag, *reinterpret_cast<uint64_t *> (&v), true);
 }
 
 void ProtocolBufferWriter::write (int tag, uint32_t v, bool fixed)
@@ -335,7 +337,7 @@ void ProtocolBufferWriter::write (int tag, int32_t v, bool fixed)
     if (v < 0) {
       write (tag, ((uint32_t (-v) - 1) << 1) + 1, false);
     } else {
-      write (tag, uint32_t (v), false);
+      write (tag, uint32_t (v) << 1, false);
     }
   }
 }
@@ -378,7 +380,7 @@ void ProtocolBufferWriter::write (int tag, int64_t v, bool fixed)
     if (v < 0) {
       write (tag, ((uint64_t (-v) - 1) << 1) + 1, false);
     } else {
-      write (tag, uint64_t (v), false);
+      write (tag, uint64_t (v) << 1, false);
     }
   }
 }
@@ -471,7 +473,7 @@ ProtocolBufferWriter::write_varint (pb_varint v)
       v >>= 7;
     }
 
-    m_byte_counter_stack.back () += (cp - b);
+    mp_stream->put (b, cp - b);
 
   }
 }

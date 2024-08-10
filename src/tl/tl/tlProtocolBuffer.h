@@ -147,25 +147,25 @@ public:
    *  @brief Reads a uint32_t value from the current message
    *  Throws a reader error if the current tag's value is not compatible with a uint32_t.
    */
-  void read (uint32_t &ui32, bool fixed = false);
+  void read (uint32_t &ui32);
 
   /**
    *  @brief Reads a int32_t value from the current message
    *  Throws a reader error if the current tag's value is not compatible with a int32_t.
    */
-  void read (int32_t &i32, bool fixed = false);
+  void read (int32_t &i32);
 
   /**
    *  @brief Reads a uint64_t value from the current message
    *  Throws a reader error if the current tag's value is not compatible with a uint64_t.
    */
-  void read (uint64_t &ui64, bool fixed = false);
+  void read (uint64_t &ui64);
 
   /**
    *  @brief Reads a int64_t value from the current message
    *  Throws a reader error if the current tag's value is not compatible with a int64_t.
    */
-  void read (int64_t &i64, bool fixed = false);
+  void read (int64_t &i64);
 
   /**
    *  @brief Reads a boolean value from the current message

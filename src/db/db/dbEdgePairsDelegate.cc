@@ -30,6 +30,7 @@ namespace db
 
 EdgePairsDelegate::EdgePairsDelegate ()
 {
+  m_base_verbosity = 30;
   m_report_progress = false;
 }
 
@@ -43,6 +44,7 @@ EdgePairsDelegate &
 EdgePairsDelegate::operator= (const EdgePairsDelegate &other)
 {
   if (this != &other) {
+    m_base_verbosity = other.m_base_verbosity;
     m_report_progress = other.m_report_progress;
   }
   return *this;
@@ -51,6 +53,11 @@ EdgePairsDelegate::operator= (const EdgePairsDelegate &other)
 EdgePairsDelegate::~EdgePairsDelegate ()
 {
   //  .. nothing yet ..
+}
+
+void EdgePairsDelegate::set_base_verbosity (int vb)
+{
+  m_base_verbosity = vb;
 }
 
 void EdgePairsDelegate::enable_progress (const std::string &progress_desc)

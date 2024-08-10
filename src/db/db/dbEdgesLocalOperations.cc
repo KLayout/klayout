@@ -344,7 +344,7 @@ std::string Edge2EdgePullLocalOperation::description () const
 
 
 // ---------------------------------------------------------------------------------------------
-//  Edge2EdgePullLocalOperation implementation
+//  edge_to_polygon_interacting_local_operation implementation
 
 template <class TI>
 edge_to_polygon_interacting_local_operation<TI>::edge_to_polygon_interacting_local_operation (EdgeInteractionMode mode, output_mode_t output_mode, size_t min_count, size_t max_count)

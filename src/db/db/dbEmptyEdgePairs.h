@@ -61,6 +61,22 @@ public:
   virtual RegionDelegate *processed_to_polygons (const EdgePairToPolygonProcessorBase &filter) const;
   virtual EdgesDelegate *processed_to_edges (const EdgePairToEdgeProcessorBase &filter) const;
 
+  virtual RegionDelegate *pull_interacting (const Region &) const;
+  virtual EdgesDelegate *pull_interacting (const Edges &) const;
+  virtual EdgePairsDelegate *selected_interacting (const Region &, size_t, size_t) const { return new EmptyEdgePairs (); }
+  virtual EdgePairsDelegate *selected_not_interacting (const Region &, size_t, size_t) const { return new EmptyEdgePairs (); }
+  virtual EdgePairsDelegate *selected_interacting (const Edges &, size_t, size_t) const { return new EmptyEdgePairs (); }
+  virtual EdgePairsDelegate *selected_not_interacting (const Edges &, size_t, size_t) const { return new EmptyEdgePairs (); }
+  virtual std::pair<EdgePairsDelegate *, EdgePairsDelegate *> selected_interacting_pair (const Region &, size_t, size_t) const { return std::make_pair (new EmptyEdgePairs (), new EmptyEdgePairs ()); }
+  virtual std::pair<EdgePairsDelegate *, EdgePairsDelegate *> selected_interacting_pair (const Edges &, size_t, size_t) const { return std::make_pair (new EmptyEdgePairs (), new EmptyEdgePairs ()); }
+
+  virtual EdgePairsDelegate *selected_outside (const Region &) const { return new EmptyEdgePairs (); }
+  virtual EdgePairsDelegate *selected_not_outside (const Region &) const { return new EmptyEdgePairs (); }
+  virtual std::pair<EdgePairsDelegate *, EdgePairsDelegate *> selected_outside_pair (const Region &) const { return std::make_pair (new EmptyEdgePairs (), new EmptyEdgePairs ()); }
+  virtual EdgePairsDelegate *selected_inside (const Region &) const { return new EmptyEdgePairs (); }
+  virtual EdgePairsDelegate *selected_not_inside (const Region &) const { return new EmptyEdgePairs (); }
+  virtual std::pair<EdgePairsDelegate *, EdgePairsDelegate *> selected_inside_pair (const Region &) const { return std::make_pair (new EmptyEdgePairs (), new EmptyEdgePairs ()); }
+
   virtual RegionDelegate *polygons (db::Coord e) const;
   virtual EdgesDelegate *edges () const;
   virtual EdgesDelegate *first_edges () const;

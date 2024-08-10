@@ -27,6 +27,9 @@
 #include "dbDeepRegion.h"
 #include "dbCellMapping.h"
 #include "dbLayoutUtils.h"
+#include "dbEdgePairsLocalOperations.h"
+#include "dbHierProcessor.h"
+#include "dbRegion.h"
 
 #include <sstream>
 
@@ -495,6 +498,192 @@ RegionDelegate *DeepEdgePairs::polygons (db::Coord e) const
   }
 
   return new db::DeepRegion (new_layer);
+}
+
+EdgesDelegate *
+DeepEdgePairs::pull_generic (const Edges &other) const
+{
+  std::unique_ptr<db::DeepEdges> dr_holder;
+  const db::DeepEdges *other_deep = dynamic_cast<const db::DeepEdges *> (other.delegate ());
+  if (! other_deep) {
+    //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchization
+    dr_holder.reset (new db::DeepEdges (other, const_cast<db::DeepShapeStore &> (*deep_layer ().store ())));
+    other_deep = dr_holder.get ();
+  }
+
+  const db::DeepLayer &edge_pairs = deep_layer ();
+  const db::DeepLayer &other_edges = other_deep->merged_deep_layer ();
+
+  DeepLayer dl_out (other_edges.derived ());
+
+  db::EdgePair2EdgePullLocalOperation op;
+
+  db::local_processor<db::EdgePair, db::Edge, db::Edge> proc (const_cast<db::Layout *> (&edge_pairs.layout ()), const_cast<db::Cell *> (&edge_pairs.initial_cell ()), &other_edges.layout (), &other_edges.initial_cell (), edge_pairs.breakout_cells (), other_edges.breakout_cells ());
+  proc.set_base_verbosity (base_verbosity ());
+  proc.set_threads (edge_pairs.store ()->threads ());
+
+  proc.run (&op, edge_pairs.layer (), other_edges.layer (), dl_out.layer ());
+
+  return new db::DeepEdges (dl_out);
+}
+
+RegionDelegate *
+DeepEdgePairs::pull_generic (const Region &other) const
+{
+  std::unique_ptr<db::DeepRegion> dr_holder;
+  const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> (other.delegate ());
+  if (! other_deep) {
+    //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchization
+    dr_holder.reset (new db::DeepRegion (other, const_cast<db::DeepShapeStore &> (*deep_layer ().store ())));
+    other_deep = dr_holder.get ();
+  }
+
+  const db::DeepLayer &edge_pairs = deep_layer ();
+  const db::DeepLayer &other_polygons = other_deep->merged_deep_layer ();
+
+  DeepLayer dl_out (other_polygons.derived ());
+
+  db::EdgePair2PolygonPullLocalOperation op;
+
+  db::local_processor<db::EdgePair, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&edge_pairs.layout ()), const_cast<db::Cell *> (&edge_pairs.initial_cell ()), &other_polygons.layout (), &other_polygons.initial_cell (), edge_pairs.breakout_cells (), other_polygons.breakout_cells ());
+  proc.set_base_verbosity (base_verbosity ());
+  proc.set_threads (edge_pairs.store ()->threads ());
+
+  proc.run (&op, edge_pairs.layer (), other_polygons.layer (), dl_out.layer ());
+
+  return new db::DeepRegion (dl_out);
+}
+
+EdgePairsDelegate *
+DeepEdgePairs::selected_interacting_generic (const Edges &other, bool inverse, size_t min_count, size_t max_count) const
+{
+  std::unique_ptr<db::DeepEdges> dr_holder;
+  const db::DeepEdges *other_deep = dynamic_cast<const db::DeepEdges *> (other.delegate ());
+  if (! other_deep) {
+    //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchization
+    dr_holder.reset (new db::DeepEdges (other, const_cast<db::DeepShapeStore &> (*deep_layer ().store ())));
+    other_deep = dr_holder.get ();
+  }
+
+  min_count = std::max (size_t (1), min_count);
+  bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
+
+  const db::DeepLayer &edge_pairs = deep_layer ();
+
+  DeepLayer dl_out (edge_pairs.derived ());
+
+  db::EdgePair2EdgeInteractingLocalOperation op (inverse ? db::EdgePair2EdgeInteractingLocalOperation::Inverse : db::EdgePair2EdgeInteractingLocalOperation::Normal, min_count, max_count);
+
+  db::local_processor<db::EdgePair, db::Edge, db::EdgePair> proc (const_cast<db::Layout *> (&edge_pairs.layout ()), const_cast<db::Cell *> (&edge_pairs.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell (), edge_pairs.breakout_cells (), other_deep->deep_layer ().breakout_cells ());
+  proc.set_base_verbosity (base_verbosity ());
+  proc.set_threads (edge_pairs.store ()->threads ());
+
+  //  NOTE: with counting the other region needs to be merged
+  proc.run (&op, edge_pairs.layer (), (counting ? other_deep->merged_deep_layer () : other_deep->deep_layer ()).layer (), dl_out.layer ());
+
+  return new db::DeepEdgePairs (dl_out);
+}
+
+EdgePairsDelegate *
+DeepEdgePairs::selected_interacting_generic (const Region &other, EdgePairInteractionMode mode, bool inverse, size_t min_count, size_t max_count) const
+{
+  std::unique_ptr<db::DeepRegion> dr_holder;
+  const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> (other.delegate ());
+  if (! other_deep) {
+    //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchization
+    dr_holder.reset (new db::DeepRegion (other, const_cast<db::DeepShapeStore &> (*deep_layer ().store ())));
+    other_deep = dr_holder.get ();
+  }
+
+  min_count = std::max (size_t (1), min_count);
+  bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
+
+  const db::DeepLayer &edge_pairs = deep_layer ();
+
+  DeepLayer dl_out (edge_pairs.derived ());
+
+  db::edge_pair_to_polygon_interacting_local_operation<db::PolygonRef> op (mode, inverse ? db::edge_pair_to_polygon_interacting_local_operation<db::PolygonRef>::Inverse : db::edge_pair_to_polygon_interacting_local_operation<db::PolygonRef>::Normal, min_count, max_count);
+
+  db::local_processor<db::EdgePair, db::PolygonRef, db::EdgePair> proc (const_cast<db::Layout *> (&edge_pairs.layout ()), const_cast<db::Cell *> (&edge_pairs.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell (), edge_pairs.breakout_cells (), other_deep->deep_layer ().breakout_cells ());
+  proc.set_base_verbosity (base_verbosity ());
+  proc.set_threads (edge_pairs.store ()->threads ());
+
+  //  NOTE: with counting the other region needs to be merged
+  proc.run (&op, edge_pairs.layer (), (counting || mode != EdgePairsInteract ? other_deep->merged_deep_layer () : other_deep->deep_layer ()).layer (), dl_out.layer ());
+
+  return new db::DeepEdgePairs (dl_out);
+}
+
+std::pair<EdgePairsDelegate *, EdgePairsDelegate *>
+DeepEdgePairs::selected_interacting_pair_generic (const Edges &other, size_t min_count, size_t max_count) const
+{
+  std::unique_ptr<db::DeepEdges> dr_holder;
+  const db::DeepEdges *other_deep = dynamic_cast<const db::DeepEdges *> (other.delegate ());
+  if (! other_deep) {
+    //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchization
+    dr_holder.reset (new db::DeepEdges (other, const_cast<db::DeepShapeStore &> (*deep_layer ().store ())));
+    other_deep = dr_holder.get ();
+  }
+
+  min_count = std::max (size_t (1), min_count);
+  bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
+
+  const db::DeepLayer &edge_pairs = deep_layer ();
+
+  DeepLayer dl_out (edge_pairs.derived ());
+  DeepLayer dl_out2 (edge_pairs.derived ());
+
+  std::vector<unsigned int> output_layers;
+  output_layers.reserve (2);
+  output_layers.push_back (dl_out.layer ());
+  output_layers.push_back (dl_out2.layer ());
+
+  db::EdgePair2EdgeInteractingLocalOperation op (db::EdgePair2EdgeInteractingLocalOperation::Both, min_count, max_count);
+
+  db::local_processor<db::EdgePair, db::Edge, db::EdgePair> proc (const_cast<db::Layout *> (&edge_pairs.layout ()), const_cast<db::Cell *> (&edge_pairs.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell (), edge_pairs.breakout_cells (), other_deep->deep_layer ().breakout_cells ());
+  proc.set_base_verbosity (base_verbosity ());
+  proc.set_threads (edge_pairs.store ()->threads ());
+
+  //  NOTE: with counting the other region needs to be merged
+  proc.run (&op, edge_pairs.layer (), (counting ? other_deep->merged_deep_layer () : other_deep->deep_layer ()).layer (), output_layers);
+
+  return std::make_pair (new db::DeepEdgePairs (dl_out), new db::DeepEdgePairs (dl_out2));
+}
+
+std::pair<EdgePairsDelegate *, EdgePairsDelegate *>
+DeepEdgePairs::selected_interacting_pair_generic (const Region &other, EdgePairInteractionMode mode, size_t min_count, size_t max_count) const
+{
+  std::unique_ptr<db::DeepRegion> dr_holder;
+  const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> (other.delegate ());
+  if (! other_deep) {
+    //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchization
+    dr_holder.reset (new db::DeepRegion (other, const_cast<db::DeepShapeStore &> (*deep_layer ().store ())));
+    other_deep = dr_holder.get ();
+  }
+
+  min_count = std::max (size_t (1), min_count);
+  bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
+
+  const db::DeepLayer &edge_pairs = deep_layer ();
+
+  DeepLayer dl_out (edge_pairs.derived ());
+  DeepLayer dl_out2 (edge_pairs.derived ());
+
+  std::vector<unsigned int> output_layers;
+  output_layers.reserve (2);
+  output_layers.push_back (dl_out.layer ());
+  output_layers.push_back (dl_out2.layer ());
+
+  db::edge_pair_to_polygon_interacting_local_operation<db::PolygonRef> op (mode, db::edge_pair_to_polygon_interacting_local_operation<db::PolygonRef>::Both, min_count, max_count);
+
+  db::local_processor<db::EdgePair, db::PolygonRef, db::EdgePair> proc (const_cast<db::Layout *> (&edge_pairs.layout ()), const_cast<db::Cell *> (&edge_pairs.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell (), edge_pairs.breakout_cells (), other_deep->deep_layer ().breakout_cells ());
+  proc.set_base_verbosity (base_verbosity ());
+  proc.set_threads (edge_pairs.store ()->threads ());
+
+  //  NOTE: with counting the other region needs to be merged
+  proc.run (&op, edge_pairs.layer (), (counting || mode != EdgePairsInteract ? other_deep->merged_deep_layer () : other_deep->deep_layer ()).layer (), output_layers);
+
+  return std::make_pair (new db::DeepEdgePairs (dl_out), new db::DeepEdgePairs (dl_out2));
 }
 
 EdgesDelegate *DeepEdgePairs::generic_edges (bool first, bool second) const

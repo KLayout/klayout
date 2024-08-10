@@ -65,6 +65,18 @@ EmptyEdgePairs::processed_to_edges (const EdgePairToEdgeProcessorBase &) const
   return new EmptyEdges ();
 }
 
+RegionDelegate *
+EmptyEdgePairs::pull_interacting (const Region &) const
+{
+  return new EmptyRegion ();
+}
+
+EdgesDelegate *
+EmptyEdgePairs::pull_interacting (const Edges &) const
+{
+  return new EmptyEdges ();
+}
+
 EdgesDelegate *
 EmptyEdgePairs::edges () const
 {

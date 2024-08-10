@@ -83,14 +83,21 @@ class DBLayoutTests2_TestClass < TestBase
     assert_equal( ly.cell_name(ci), "new_cell" )
 
     assert_equal( ly.cell_by_name("new_cell"), ci )
+    assert_equal( ly.cell(ci).cell_index, ci )
     assert_equal( ly.cells("A*"), [] )
     assert_equal( ly.cell("new_cell").name, "new_cell" )
     assert_equal( ly.cell("x").inspect, "nil" )
+    lyc = ly.dup
+    assert_equal( lyc._to_const_object.cell("new_cell").name, "new_cell" ) 
+    assert_equal( lyc._to_const_object.cell(ci).cell_index, ci ) 
 
     ci2 = ly.add_cell( "new_cell_b" )
     assert_equal( ly.cells, 2 )
     assert_equal( ly.cell_by_name("new_cell_b"), ci2 )
+    assert_equal( ly.cells("new*").collect { |c| c.name }.sort, ['new_cell', 'new_cell_b'] )
     assert_equal( ci != ci2, true )
+    lyc = ly.dup
+    assert_equal( lyc._to_const_object.cells("new*").collect { |c| c.name }.sort, ['new_cell', 'new_cell_b'] )
 
     ly.rename_cell( ci2, "x" )
     assert_equal( ly.cell_by_name("x"), ci2 )
@@ -900,6 +907,9 @@ class DBLayoutTests2_TestClass < TestBase
     assert_equal(tc.collect { |s| s.to_s }.join(","), "c0")
     assert_equal(l.top_cell.name, "c0")
     assert_equal(l.top_cells.collect { |t| t.name }.join(","), "c0")
+    lc = l.dup
+    assert_equal(lc._to_const_object.top_cell.name, "c0")
+    assert_equal(lc._to_const_object.top_cells.collect { |t| t.name }.join(","), "c0")
 
     c1 = l.create_cell("c1")
     assert_equal(c1.name, "c1")

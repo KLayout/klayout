@@ -83,7 +83,9 @@ public:
     Destroy,
     Create,
     IsConst, 
-    Destroyed, 
+    ConstCast,
+    ToConst,
+    Destroyed,
     Assign, 
     Dup
   };

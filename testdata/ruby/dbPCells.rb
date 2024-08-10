@@ -900,5 +900,41 @@ class DBPCell_TestClass < TestBase
 
 end
 
+class DBPCellParameterStates_TestClass < TestBase
+
+  def test_1
+
+    ps = RBA::PCellParameterState::new
+
+    ps.value = 17
+    assert_equal(ps.value, 17)
+    ps.value = "u"
+    assert_equal(ps.value, "u")
+
+    ps.visible = true
+    assert_equal(ps.is_visible?, true)
+    ps.visible = false
+    assert_equal(ps.is_visible?, false)
+
+    ps.enabled = true
+    assert_equal(ps.is_enabled?, true)
+    ps.enabled = false
+    assert_equal(ps.is_enabled?, false)
+
+    ps.readonly = true
+    assert_equal(ps.is_readonly?, true)
+    ps.readonly = false
+    assert_equal(ps.is_readonly?, false)
+
+    ps.tooltip = "uvw"
+    assert_equal(ps.tooltip, "uvw")
+
+    ps.icon = RBA::PCellParameterState::InfoIcon
+    assert_equal(ps.icon, RBA::PCellParameterState::InfoIcon)
+
+  end
+
+end
+
 load("test_epilogue.rb")
 

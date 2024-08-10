@@ -75,13 +75,20 @@ class DBLayoutTest(unittest.TestCase):
     self.assertEqual( ly.cell_name(ci), "new_cell" )
 
     self.assertEqual( ly.cell_by_name("new_cell"), ci )
+    self.assertEqual( ly.cell(ci).cell_index(), ci )
     self.assertEqual( ly.cell("new_cell").name, "new_cell" )
     self.assertEqual( repr(ly.cell("x")), "None" )
+    lyc = ly.dup()
+    self.assertEqual( lyc._to_const_object().cell("new_cell").name, "new_cell" )
+    self.assertEqual( lyc._to_const_object().cell(ci).cell_index(), ci )
 
     ci2 = ly.add_cell( "new_cell_b" )
     self.assertEqual( ly.cells(), 2 )
     self.assertEqual( ly.cell_by_name("new_cell_b"), ci2 )
+    self.assertEqual( sorted([ c.name for c in ly.cells("new*") ]), ['new_cell', 'new_cell_b'] )
     self.assertEqual( ci != ci2, True )
+    lyc = ly.dup()
+    self.assertEqual( sorted([ c.name for c in lyc._to_const_object().cells("new*") ]), ['new_cell', 'new_cell_b'] )
 
     ly.rename_cell( ci2, "x" )
     self.assertEqual( ly.cell_by_name("x"), ci2 )
@@ -918,6 +925,8 @@ class DBLayoutTest(unittest.TestCase):
       tc.append(l.cell(t).name) 
     self.assertEqual(",".join(tc), "c0")
     self.assertEqual(l.top_cell().name, "c0")
+    lc = l.dup()
+    self.assertEqual(lc._to_const_object().top_cell().name, "c0")  # const version
     tc = []
     for t in l.top_cells():
       tc.append(t.name) 
@@ -937,6 +946,11 @@ class DBLayoutTest(unittest.TestCase):
     self.assertEqual(error, True)
     tc = []
     for t in l.top_cells():
+      tc.append(t.name) 
+    self.assertEqual(",".join(tc), "c0,c1")
+    tc = []
+    lc = l.dup()
+    for t in lc._to_const_object().top_cells(): # const version
       tc.append(t.name) 
     self.assertEqual(",".join(tc), "c0,c1")
 

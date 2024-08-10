@@ -854,6 +854,11 @@ static db::Cell *cell_from_index (db::Layout *ly, db::cell_index_type ci)
   return &ly->cell (ci);
 }
 
+static const db::Cell *cell_from_index_const (const db::Layout *layout, db::cell_index_type ci)
+{
+  return cell_from_index (const_cast <db::Layout *> (layout), ci);
+}
+
 static db::Cell *cell_from_name (db::Layout *ly, const std::string &name)
 {
   std::pair<bool, db::cell_index_type> cn = ly->cell_by_name (name.c_str ());
@@ -862,6 +867,11 @@ static db::Cell *cell_from_name (db::Layout *ly, const std::string &name)
   } else {
     return 0;
   }
+}
+
+static const db::Cell *cell_from_name_const (const db::Layout *layout, const std::string &name)
+{
+  return cell_from_name (const_cast <db::Layout *> (layout), name);
 }
 
 static std::vector<db::Cell *> cells_from_name (db::Layout *layout, const std::string &filter)
@@ -880,6 +890,12 @@ static std::vector<db::Cell *> cells_from_name (db::Layout *layout, const std::s
   return result;
 }
 
+static std::vector<const db::Cell *> cells_from_name_const (const db::Layout *layout, const std::string &filter)
+{
+  std::vector<db::Cell *> tcs = cells_from_name (const_cast <db::Layout *> (layout), filter);
+  return std::vector<const db::Cell *> (tcs.begin (), tcs.end ());
+}
+
 static std::vector<db::Cell *> top_cells (db::Layout *layout)
 {
   std::vector<db::Cell *> tc;
@@ -889,6 +905,12 @@ static std::vector<db::Cell *> top_cells (db::Layout *layout)
     ++td;
   }
   return tc;
+}
+
+static std::vector<const db::Cell *> top_cells_const (const db::Layout *layout)
+{
+  std::vector<db::Cell *> tcs = top_cells (const_cast <db::Layout *> (layout));
+  return std::vector<const db::Cell *> (tcs.begin (), tcs.end ());
 }
 
 static db::Cell *top_cell (db::Layout *layout)
@@ -904,6 +926,11 @@ static db::Cell *top_cell (db::Layout *layout)
     ++td;
   }
   return tc;
+}
+
+static const db::Cell *top_cell_const (const db::Layout *layout)
+{
+  return top_cell (const_cast <db::Layout *> (layout));
 }
 
 static db::Cell *create_cell (db::Layout *layout, const std::string &name)
@@ -1328,7 +1355,16 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "\n"
     "This method has been introduced in version 0.23."
   ) + 
-  gsi::method_ext ("top_cells", &top_cells, 
+  gsi::method_ext ("top_cell", &top_cell_const,
+    "@brief Returns the top cell object (const version)\n"
+    "@return The \\Cell object of the top cell\n"
+    "If the layout has a single top cell, this method returns the top cell's \\Cell object.\n"
+    "If the layout does not have a top cell, this method returns \"nil\". If the layout has multiple\n"
+    "top cells, this method raises an error.\n"
+    "\n"
+    "This variant has been introduced in version 0.29.6."
+  ) +
+  gsi::method_ext ("top_cells", &top_cells,
     "@brief Returns the top cell objects\n"
     "@return The \\Cell objects of the top cells\n"
     "This method returns and array of \\Cell objects representing the top cells of the layout.\n"
@@ -1336,6 +1372,14 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "\n"
     "This method has been introduced in version 0.23."
   ) + 
+  gsi::method_ext ("top_cells", &top_cells_const,
+    "@brief Returns the top cell objects (const version)\n"
+    "@return The \\Cell objects of the top cells\n"
+    "This method returns and array of \\Cell objects representing the top cells of the layout.\n"
+    "This array can be empty, if the layout does not have a top cell (i.e. no cell at all).\n"
+    "\n"
+    "This variant has been introduced in version 0.29.6."
+  ) +
   gsi::method ("has_cell?", &db::Layout::has_cell, gsi::arg ("name"),
     "@brief Returns true if a cell with a given name exists\n"
     "Returns true, if the layout has a cell with the given name"
@@ -1780,6 +1824,16 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "\n"
     "This method has been introduced in version 0.27.3.\n"
   ) +
+  gsi::method_ext ("cells", &cells_from_name_const, gsi::arg ("name_filter"),
+    "@brief Gets the cell objects for a given name filter (const version)\n"
+    "\n"
+    "@param name_filter The cell name filter (glob pattern)\n"
+    "@return A list of \\Cell object of the cells matching the pattern\n"
+    "\n"
+    "This method has been introduced in version 0.27.3.\n"
+    "\n"
+    "This variant has been introduced in version 0.29.6."
+  ) +
   gsi::method_ext ("cell", &cell_from_name, gsi::arg ("name"),
     "@brief Gets a cell object from the cell name\n"
     "\n"
@@ -1789,6 +1843,17 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "If name is not a valid cell name, this method will return \"nil\".\n"
     "This method has been introduced in version 0.23 and replaces \\cell_by_name.\n"
   ) +
+  gsi::method_ext ("cell", &cell_from_name_const, gsi::arg ("name"),
+    "@brief Gets a cell object from the cell name (const version)\n"
+    "\n"
+    "@param name The cell name\n"
+    "@return A reference to the cell (a \\Cell object)\n"
+    "\n"
+    "If name is not a valid cell name, this method will return \"nil\".\n"
+    "This method has been introduced in version 0.23 and replaces \\cell_by_name.\n"
+    "\n"
+    "This variant has been introduced in version 0.29.6."
+  ) +
   gsi::method_ext ("cell", &cell_from_index, gsi::arg ("i"),
     "@brief Gets a cell object from the cell index\n"
     "\n"
@@ -1797,6 +1862,17 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "\n"
     "If the cell index is not a valid cell index, this method will raise an error. "
     "Use \\is_valid_cell_index? to test whether a given cell index is valid.\n"
+  ) +
+  gsi::method_ext ("cell", &cell_from_index_const, gsi::arg ("i"),
+    "@brief Gets a cell object from the cell index (const version)\n"
+    "\n"
+    "@param i The cell index\n"
+    "@return A reference to the cell (a \\Cell object)\n"
+    "\n"
+    "If the cell index is not a valid cell index, this method will raise an error. "
+    "Use \\is_valid_cell_index? to test whether a given cell index is valid.\n"
+    "\n"
+    "This variant has been introduced in version 0.29.6."
   ) +
   gsi::iterator ("each_cell", (db::Layout::iterator (db::Layout::*) ()) &db::Layout::begin, (db::Layout::iterator (db::Layout::*) ()) &db::Layout::end,
     "@brief Iterates the unsorted cell list\n"

@@ -2738,6 +2738,17 @@ void *Variant::user_unshare () const
   return const_cast<void *> (to_user ());
 }
 
+void Variant::user_change_constness (bool constness)
+{
+  tl_assert (is_user ());
+
+  if (m_type == t_user) {
+    m_var.mp_user.cls = m_var.mp_user.cls->change_constness (constness);
+  } else if (m_type == t_user_ref) {
+    m_var.mp_user_ref.cls = m_var.mp_user_ref.cls->change_constness (constness);
+  }
+}
+
 void Variant::user_assign (const tl::Variant &other)
 {
   tl_assert (is_user ());

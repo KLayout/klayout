@@ -1568,6 +1568,16 @@ TEST(70d_props)
   run_test (_this, "70", true);
 }
 
+TEST(71_netter)
+{
+  run_test (_this, "71", false);
+}
+
+TEST(71d_netter)
+{
+  run_test (_this, "71", true);
+}
+
 TEST(80_deep_with_mag_width)
 {
   run_test (_this, "80", true);

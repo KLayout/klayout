@@ -354,6 +354,48 @@ sm_is_const (const char *name)
 }
 
 static SpecialMethod *
+sm_to_const (const char *name, const gsi::ClassBase *cls)
+{
+  SpecialMethod *sm = new SpecialMethod (name,
+    tl::to_string (tr ("@hide")),  //  provided for test purposes mainly
+    true,    //  const
+    false,   //  non-static
+    MethodBase::ToConst);
+
+  gsi::ArgType ret;
+  ret.set_is_cptr (true);
+  ret.set_type (gsi::T_object);
+  ret.set_pass_obj (false);
+  ret.set_cls (cls);
+  sm->set_return (ret);
+
+  return sm;
+}
+
+static SpecialMethod *
+sm_const_cast (const char *name, const gsi::ClassBase *cls)
+{
+  SpecialMethod *sm = new SpecialMethod (name,
+    tl::to_string (tr ("@brief Returns a non-const reference to self.\n"
+                       "Basically, this method allows turning a const object reference to a non-const one. "
+                       "This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.\n"
+                       "\n"
+                       "This method has been introduced in version 0.29.6.")),
+    true,    //  const
+    false,   //  non-static
+    MethodBase::ConstCast);
+
+  gsi::ArgType ret;
+  ret.set_is_ptr (true);
+  ret.set_type (gsi::T_object);
+  ret.set_pass_obj (false);
+  ret.set_cls (cls);
+  sm->set_return (ret);
+
+  return sm;
+}
+
+static SpecialMethod *
 sm_destroyed (const char *name)
 {
   SpecialMethod *sm = new SpecialMethod (name,
@@ -597,6 +639,9 @@ ClassBase::merge_declarations ()
       //  fallback name is "_is_const" to avoid conflicts
       non_const_decl->add_method (sm_is_const ("_is_const_object?"));
     }
+
+    non_const_decl->add_method (sm_to_const ("_to_const_object", &*c));
+    non_const_decl->add_method (sm_const_cast ("_const_cast", &*c));
 
   }
 

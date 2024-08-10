@@ -780,7 +780,7 @@ LayoutViewBase::configure (const std::string &name, const std::string &value)
 
     int os = 1;
     tl::from_string (value, os);
-    if (os != mp_canvas->oversampling ()) {
+    if (os != int (mp_canvas->oversampling ())) {
       mp_canvas->set_oversampling (os);
       resolution_changed_event ();
     }
@@ -5899,17 +5899,40 @@ LayoutViewBase::ascend (int index)
 {
   tl_assert (int (m_cellviews.size ()) > index && cellview_iter (index)->is_valid ());
 
+  lay::CellView &cv = *cellview_iter (index);
+
   cellview_about_to_change_event (index);
 
-  lay::CellView::specific_cell_path_type spath (cellview_iter (index)->specific_path ());
+  lay::CellView::specific_cell_path_type spath (cv.specific_path ());
   if (spath.empty ()) {
+
+    lay::CellView::unspecific_cell_path_type upath (cv.unspecific_path ());
+    if (upath.size () >= 2) {
+
+      db::cell_index_type last = upath.back ();
+      upath.pop_back ();
+      const db::Cell &new_cell = cv->layout ().cell (upath.back ());
+
+      auto i = new_cell.begin ();
+      while (! i.at_end () && i->cell_index () != last) {
+        ++i;
+      }
+
+      if (! i.at_end ()) {
+        select_cell_dispatch (upath, index);
+        return db::InstElement (*i);
+      }
+
+    }
+
     return db::InstElement ();
+
   } else {
 
     cancel (); 
     db::InstElement ret = spath.back ();
     spath.pop_back ();
-    cellview_iter (index)->set_specific_path (spath);
+    cv.set_specific_path (spath);
 
     store_state ();
     redraw ();

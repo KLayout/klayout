@@ -298,14 +298,6 @@ public:
 
   void parse (tl::ProtocolBufferReader &reader, const PBElementBase *root, PBReaderState *reader_state);
 
-  template <class Obj>
-  void parse (tl::ProtocolBufferReader &reader, const PBElementBase *root, Obj &obj)
-  {
-    PBReaderState rs;
-    rs.push (&obj);
-    parse (reader, root, &rs);
-  }
-
 private:
   std::vector <const PBElementBase *> m_stack;
   const PBElementBase *mp_root;
@@ -525,9 +517,10 @@ public:
   virtual void cdata (const std::string &cdata, PBReaderState &objs) const = 0;
   virtual void finish (const PBElementBase *parent, PBReaderState &objs, const std::string &uri, const std::string &lname, const std::string &qname) const = 0;
 
-  virtual void write (const PBElementBase * /*parent*/, tl::ProtocolBufferWriter & /*writer*/, PBWriterState & /*objs*/) const { }
   virtual bool has_any (PBWriterState & /*objs*/) const { return false; }
 #endif
+
+  virtual void write (const PBElementBase*, tl::ProtocolBufferWriter &, PBWriterState &) const { }
 
   int tag () const
   {
@@ -641,32 +634,64 @@ public:
   }
 #endif
 
+  virtual void write (const PBElementBase * /*parent*/, tl::ProtocolBufferWriter &writer, PBWriterState &objs) const
+  {
+    PBObjTag<Parent> parent_tag;
+
+    Read r (m_r);
+    r.start (*objs.back (parent_tag));
+    while (! r.at_end ()) {
+      typedef typename Read::tag read_tag_type;
+      read_tag_type read_tag;
+      write_obj (r (), tag (), writer, read_tag, objs);
+      r.next ();
+    }
+  }
+
+protected:
+  Read &rear () { return m_r; }
+  Write &write () { return m_w; }
+
 private:
   Read m_r;
   Write m_w;
 
-#if 0 // @@@
   //  this write helper is used if the reader delivers an object by value
-  void write_obj (Obj obj, tl::OutputStream &os, int indent, tl::pass_by_value_tag, PBWriterState &objs) const
+  void write_obj (Obj obj, int tag, tl::ProtocolBufferWriter &writer, tl::pass_by_value_tag, PBWriterState &objs) const
   {
-    PBObjTag<Obj> tag;
-    objs.push (&obj);
-    for (PBElementBase::iterator c = this->begin (); c != this->end (); ++c) {
-      c->get ()->write (this, os, indent + 1, objs);
+    PBObjTag<Obj> self_tag;
+
+    for (unsigned int pass = 0; pass < 2; ++pass) {
+      writer.begin_seq (tag, pass == 0);
+      objs.push (&obj);
+      for (PBElementBase::iterator c = this->begin (); c != this->end (); ++c) {
+        c->get ()->write (this, writer, objs);
+      }
+      objs.pop (self_tag);
+      writer.end_seq ();
+      if (! writer.is_counting ()) {
+        break;
+      }
     }
-    objs.pop (tag);
   }
 
-  void write_obj (const Obj &obj, tl::OutputStream &os, int indent, tl::pass_by_ref_tag, PBWriterState &objs) const
+  void write_obj (const Obj &obj, int tag, tl::ProtocolBufferWriter &writer, tl::pass_by_ref_tag, PBWriterState &objs) const
   {
-    PBObjTag<Obj> tag;
-    objs.push (&obj);
-    for (PBElementBase::iterator c = this->begin (); c != this->end (); ++c) {
-      c->get ()->write (this, os, indent + 1, objs);
+    PBObjTag<Obj> self_tag;
+
+    for (unsigned int pass = 0; pass < 2; ++pass) {
+      writer.begin_seq (tag, pass == 0);
+      objs.push (&obj);
+      for (PBElementBase::iterator c = this->begin (); c != this->end (); ++c) {
+        c->get ()->write (this, writer, objs);
+      }
+      objs.pop (self_tag);
+      writer.end_seq ();
+      if (! writer.is_counting ()) {
+        break;
+      }
     }
-    objs.pop (tag);
   }
-#endif
 };
 
 /**
@@ -678,23 +703,23 @@ private:
 
 template <class Obj, class Parent, class Read, class Write>
 class TL_PUBLIC_TEMPLATE PBElementWithParentRef
-  : public PBElementBase
+  : public PBElement<Obj, Parent, Read, Write>
 {
 public:
   PBElementWithParentRef (const Read &r, const Write &w, int tag, const PBElementList &children)
-    : PBElementBase (tag, children), m_r (r), m_w (w)
+    : PBElement<Obj, Parent, Read, Write> (r, w, tag, children)
   {
     // .. nothing yet ..
   }
 
   PBElementWithParentRef (const Read &r, const Write &w, int tag, const PBElementList *children)
-    : PBElementBase (tag, children), m_r (r), m_w (w)
+    : PBElement<Obj, Parent, Read, Write> (r, w, tag, children)
   {
     // .. nothing yet ..
   }
 
   PBElementWithParentRef (const PBElementWithParentRef<Obj, Parent, Read, Write> &d)
-    : PBElementBase (d), m_r (d.m_r), m_w (d.m_w)
+    : PBElement<Obj, Parent, Read, Write> (d)
   {
     // .. nothing yet ..
   }
@@ -748,33 +773,6 @@ public:
     Read r (m_r);
     r.start (*objs.back (parent_tag));
     return (! r.at_end ());
-  }
-#endif
-
-private:
-  Read m_r;
-  Write m_w;
-
-#if 0 // @@@
-  //  this write helper is used if the reader delivers an object by value
-  void write_obj (Obj obj, tl::OutputStream &os, int indent, tl::pass_by_value_tag, PBWriterState &objs) const
-  {
-    PBObjTag<Obj> tag;
-    objs.push (&obj);
-    for (PBElementBase::iterator c = this->begin (); c != this->end (); ++c) {
-      c->get ()->write (this, os, indent + 1, objs);
-    }
-    objs.pop (tag);
-  }
-
-  void write_obj (const Obj &obj, tl::OutputStream &os, int indent, tl::pass_by_ref_tag, PBWriterState &objs) const
-  {
-    PBObjTag<Obj> tag;
-    objs.push (&obj);
-    for (PBElementBase::iterator c = this->begin (); c != this->end (); ++c) {
-      c->get ()->write (this, os, indent + 1, objs);
-    }
-    objs.pop (tag);
   }
 #endif
 };
@@ -874,10 +872,87 @@ public:
   }
 #endif
 
+  virtual void write (const PBElementBase * /*parent*/, tl::ProtocolBufferWriter &writer, PBWriterState &objs) const
+  {
+    PBObjTag<Parent> parent_tag;
+    Read r (m_r);
+    r.start (* objs.back (parent_tag));
+    while (! r.at_end ()) {
+      write (writer, tag (), r ());
+      r.next ();
+    }
+  }
+
 private:
   Read m_r;
   Write m_w;
   Converter m_c;
+
+  void write (tl::ProtocolBufferWriter &writer, int tag, float v) const
+  {
+    writer.write (tag, v);
+  }
+
+  void write (tl::ProtocolBufferWriter &writer, int tag, double v) const
+  {
+    writer.write (tag, v);
+  }
+
+  void write (tl::ProtocolBufferWriter &writer, int tag, uint8_t v) const
+  {
+    writer.write (tag, (uint32_t) v);
+  }
+
+  void write (tl::ProtocolBufferWriter &writer, int tag, int8_t v) const
+  {
+    writer.write (tag, (int32_t) v);
+  }
+
+  void write (tl::ProtocolBufferWriter &writer, int tag, uint16_t v) const
+  {
+    writer.write (tag, (uint32_t) v);
+  }
+
+  void write (tl::ProtocolBufferWriter &writer, int tag, int16_t v) const
+  {
+    writer.write (tag, (int32_t) v);
+  }
+
+  void write (tl::ProtocolBufferWriter &writer, int tag, uint32_t v) const
+  {
+    writer.write (tag, v);
+  }
+
+  void write (tl::ProtocolBufferWriter &writer, int tag, int32_t v) const
+  {
+    writer.write (tag, v);
+  }
+
+  void write (tl::ProtocolBufferWriter &writer, int tag, uint64_t v) const
+  {
+    writer.write (tag, v);
+  }
+
+  void write (tl::ProtocolBufferWriter &writer, int tag, int64_t v) const
+  {
+    writer.write (tag, v);
+  }
+
+  void write (tl::ProtocolBufferWriter &writer, int tag, bool v) const
+  {
+    writer.write (tag, v);
+  }
+
+  void write (tl::ProtocolBufferWriter &writer, int tag, const std::string &v) const
+  {
+    writer.write (tag, v);
+  }
+
+  template <class T>
+  void write (tl::ProtocolBufferWriter &writer, int tag, const T &v) const
+  {
+    writer.write (tag, m_c.to_string (v));
+  }
 };
 
 /**
@@ -893,14 +968,14 @@ class TL_PUBLIC_TEMPLATE PBStruct
   : public PBElementBase
 {
 public:
-  PBStruct (int tag, const PBElementList *children)
-    : PBElementBase (tag, children)
+  PBStruct (const PBElementList *children)
+    : PBElementBase (0, children)
   {
     // .. nothing yet ..
   }
 
-  PBStruct (int tag, const PBElementList &children)
-    : PBElementBase (tag, children)
+  PBStruct (const PBElementList &children)
+    : PBElementBase (0, children)
   {
     // .. nothing yet ..
   }
@@ -931,42 +1006,36 @@ public:
   {
     // .. nothing yet ..
   }
+#endif
 
-  void write (tl::OutputStream &os, const Obj &root) const
+  void write (tl::ProtocolBufferWriter &writer, const Obj &root) const
   {
     PBWriterState writer_state;
     writer_state.push (& root);
 
-    os << "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
-    os << "<" << this->name () << ">\n";
-    for (PBElementBase::iterator c = this->begin (); c != this->end (); ++c) {
-      c->get ()->write (this, os, 1, writer_state);
-    }
-    os << "</" << this->name () << ">\n";
+    // @@@ writer.write (0, name ());
 
-    os.flush ();
+    for (PBElementBase::iterator c = this->begin (); c != this->end (); ++c) {
+      c->get ()->write (this, writer, writer_state);
+    }
   }
 
-  void parse (PBSource &source, Obj &root) const
+  void parse (tl::ProtocolBufferReader &reader, Obj &root) const
   {
     PBObjTag<Obj> tag;
-    PBParser p;
     PBReaderState rs;
     rs.push (&root);
-    PBStructureHandler h (this, &rs);
-    p.parse (source, h);
+    PBParser h;
+    h.parse (reader, this, &rs);
     rs.pop (tag);
     tl_assert (rs.empty ());
   }
-#endif
 
 private:
-#if 0 // @@@
-  virtual void write (const PBElementBase*, tl::OutputStream &, int, PBWriterState &) const
+  virtual void write (const PBElementBase*, tl::ProtocolBufferWriter &, PBWriterState &) const
   {
     // .. see write (os)
   }
-#endif
 };
 
 /**

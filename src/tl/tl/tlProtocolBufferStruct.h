@@ -297,10 +297,14 @@ public:
   ~PBParser ();
 
   void parse (tl::ProtocolBufferReader &reader, const PBElementBase *root, PBReaderState *reader_state);
+  void parse_element (const PBElementBase *parent, tl::ProtocolBufferReader &reader);
+
+  PBReaderState &reader_state ()
+  {
+    return *mp_state;
+  }
 
 private:
-  std::vector <const PBElementBase *> m_stack;
-  const PBElementBase *mp_root;
   PBReaderState *mp_state;
 };
 
@@ -512,15 +516,11 @@ public:
 
   virtual PBElementBase *clone () const = 0;
 
-#if 0 // @@@
-  virtual void create (const PBElementBase *parent, PBReaderState &objs, const std::string &uri, const std::string &lname, const std::string &qname) const = 0;
-  virtual void cdata (const std::string &cdata, PBReaderState &objs) const = 0;
-  virtual void finish (const PBElementBase *parent, PBReaderState &objs, const std::string &uri, const std::string &lname, const std::string &qname) const = 0;
+  virtual void create (const PBElementBase *parent, PBReaderState &objs) const = 0;
+  virtual void parse (PBParser *, tl::ProtocolBufferReader &) const = 0;
+  virtual void finish (const PBElementBase *parent, PBReaderState &objs) const = 0;
 
-  virtual bool has_any (PBWriterState & /*objs*/) const { return false; }
-#endif
-
-  virtual void write (const PBElementBase*, tl::ProtocolBufferWriter &, PBWriterState &) const { }
+  virtual void write (const PBElementBase *, tl::ProtocolBufferWriter &, PBWriterState &) const { }
 
   int tag () const
   {
@@ -588,19 +588,13 @@ public:
     return new PBElement<Obj, Parent, Read, Write> (*this);
   }
 
-#if 0 // @@@
-  virtual void create (const PBElementBase *, PBReaderState &objs, const std::string & /*uri*/, const std::string & /*lname*/, const std::string & /*qname*/) const
+  virtual void create (const PBElementBase *, PBReaderState &objs) const
   {
     PBObjTag<Obj> tag;
     objs.push (tag);
   }
 
-  virtual void cdata (const std::string & /*cdata*/, PBReaderState & /*objs*/) const
-  {
-    // .. nothing yet ..
-  }
-
-  virtual void finish (const PBElementBase * /*parent*/, PBReaderState &objs, const std::string & /*uri*/, const std::string & /*lname*/, const std::string & /*qname*/) const
+  virtual void finish (const PBElementBase * /*parent*/, PBReaderState &objs) const
   {
     PBObjTag<Obj> tag;
     PBObjTag<Parent> parent_tag;
@@ -608,31 +602,10 @@ public:
     objs.pop (tag);
   }
 
-  virtual void write (const PBElementBase * /*parent*/, tl::OutputStream &os, int indent, PBWriterState &objs) const
+  virtual void parse (PBParser *parser, tl::ProtocolBufferReader &reader) const
   {
-    PBObjTag<Parent> parent_tag;
-    Read r (m_r);
-    r.start (*objs.back (parent_tag));
-    while (! r.at_end ()) {
-      PBElementBase::write_indent (os, indent);
-      os << "<" << this->name () << ">\n";
-      typedef typename Read::tag read_tag_type;
-      read_tag_type read_tag;
-      write_obj (r (), os, indent, read_tag, objs);
-      PBElementBase::write_indent (os, indent);
-      os << "</" << this->name () << ">\n";
-      r.next ();
-    }
+    parser->parse_element (this, reader);
   }
-
-  virtual bool has_any (PBWriterState &objs) const
-  {
-    PBObjTag<Parent> parent_tag;
-    Read r (m_r);
-    r.start (*objs.back (parent_tag));
-    return (! r.at_end ());
-  }
-#endif
 
   virtual void write (const PBElementBase * /*parent*/, tl::ProtocolBufferWriter &writer, PBWriterState &objs) const
   {
@@ -729,52 +702,20 @@ public:
     return new PBElementWithParentRef<Obj, Parent, Read, Write> (*this);
   }
 
- #if 0 // @@@
-  virtual void create (const PBElementBase *, PBReaderState &objs, const std::string & /*uri*/, const std::string & /*lname*/, const std::string & /*qname*/) const
+  virtual void create (const PBElementBase *, PBReaderState &objs) const
   {
     PBObjTag<Obj> tag;
     PBObjTag<Parent> parent_tag;
     objs.push (new Obj (objs.back (parent_tag)), true);
   }
 
-  virtual void cdata (const std::string & /*cdata*/, PBReaderState & /*objs*/) const
-  {
-    // .. nothing yet ..
-  }
-
-  virtual void finish (const PBElementBase * /*parent*/, PBReaderState &objs, const std::string & /*uri*/, const std::string & /*lname*/, const std::string & /*qname*/) const
+  virtual void finish (const PBElementBase * /*parent*/, PBReaderState &objs) const
   {
     PBObjTag<Obj> tag;
     PBObjTag<Parent> parent_tag;
     m_w (*objs.parent (parent_tag), objs);
     objs.pop (tag);
   }
-
-  virtual void write (const PBElementBase * /*parent*/, tl::OutputStream &os, int indent, PBWriterState &objs) const
-  {
-    PBObjTag<Parent> parent_tag;
-    Read r (m_r);
-    r.start (*objs.back (parent_tag));
-    while (! r.at_end ()) {
-      PBElementBase::write_indent (os, indent);
-      os << "<" << this->name () << ">\n";
-      typedef typename Read::tag read_tag_type;
-      read_tag_type read_tag;
-      write_obj (r (), os, indent, read_tag, objs);
-      PBElementBase::write_indent (os, indent);
-      os << "</" << this->name () << ">\n";
-      r.next ();
-    }
-  }
-
-  virtual bool has_any (PBWriterState &objs) const
-  {
-    PBObjTag<Parent> parent_tag;
-    Read r (m_r);
-    r.start (*objs.back (parent_tag));
-    return (! r.at_end ());
-  }
-#endif
 };
 
 /**
@@ -814,18 +755,17 @@ public:
     return new PBMember<Value, Parent, Read, Write, Converter> (*this);
   }
 
- #if 0 // @@@
-  virtual void create (const PBElementBase *, PBReaderState &objs, const std::string & /*uri*/, const std::string & /*lname*/, const std::string & /*qname*/) const
+  virtual void create (const PBElementBase *, PBReaderState &) const
   {
-    objs.cdata = "";
+    // .. nothing yet ..
   }
 
-  virtual void cdata (const std::string &cd, PBReaderState &objs) const
+  virtual void finish (const PBElementBase *, PBReaderState &) const
   {
-    objs.cdata += cd;
+    // .. nothing yet ..
   }
 
-  virtual void finish (const PBElementBase * /*parent*/, PBReaderState &objs, const std::string & /*uri*/, const std::string & /*lname*/, const std::string & /*qname*/) const
+  virtual void parse (PBParser *parser, tl::ProtocolBufferReader &reader) const
   {
     PBObjTag<Value> tag;
     PBObjTag<Parent> parent_tag;
@@ -833,44 +773,11 @@ public:
     PBReaderState value_obj;
     value_obj.push (tag);
 
-    m_c.from_string (objs.cdata, *value_obj.back (tag));
-    m_w (*objs.back (parent_tag), value_obj);
+    read (reader, *value_obj.back (tag));
+    m_w (*parser->reader_state ().back (parent_tag), value_obj);
 
     value_obj.pop (tag);
   }
-
-  virtual void write (const PBElementBase * /*parent*/, tl::OutputStream &os, int indent, PBWriterState &objs) const
-  {
-    PBObjTag<Parent> parent_tag;
-    Read r (m_r);
-    r.start (* objs.back (parent_tag));
-    while (! r.at_end ()) {
-
-      std::string value = m_c.to_string (r ());
-
-      write_indent (os, indent);
-
-      if (value.empty ()) {
-        os << "<" << name () << "/>\n";
-      } else {
-        os << "<" << name () << ">";
-        write_string (os, value);
-        os << "</" << name () << ">\n";
-      }
-
-      r.next ();
-
-    }
-  }
-
-  virtual bool has_any (PBWriterState &objs) const
-  {
-    PBObjTag<Parent> parent_tag;
-    Read r (m_r);
-    r.start (*objs.back (parent_tag));
-    return (! r.at_end ());
-  }
-#endif
 
   virtual void write (const PBElementBase * /*parent*/, tl::ProtocolBufferWriter &writer, PBWriterState &objs) const
   {
@@ -888,6 +795,7 @@ private:
   Write m_w;
   Converter m_c;
 
+  //  write incarnations
   void write (tl::ProtocolBufferWriter &writer, int tag, float v) const
   {
     writer.write (tag, v);
@@ -953,6 +861,87 @@ private:
   {
     writer.write (tag, m_c.to_string (v));
   }
+
+  //  read incarnations
+  void read (tl::ProtocolBufferReader &reader, float &v) const
+  {
+    reader.read (v);
+  }
+
+  void read (tl::ProtocolBufferReader &reader, double &v) const
+  {
+    reader.read (v);
+  }
+
+  void read (tl::ProtocolBufferReader &reader, uint8_t &v) const
+  {
+    uint32_t vv = 0;
+    reader.read (vv);
+    //  TODO: check for overflow?
+    v = vv;
+  }
+
+  void read (tl::ProtocolBufferReader &reader, int8_t &v) const
+  {
+    int32_t vv = 0;
+    reader.read (vv);
+    //  TODO: check for overflow?
+    v = vv;
+  }
+
+  void read (tl::ProtocolBufferReader &reader, uint16_t &v) const
+  {
+    uint32_t vv = 0;
+    reader.read (vv);
+    //  TODO: check for overflow?
+    v = vv;
+  }
+
+  void read (tl::ProtocolBufferReader &reader, int16_t &v) const
+  {
+    int32_t vv = 0;
+    reader.read (vv);
+    //  TODO: check for overflow?
+    v = vv;
+  }
+
+  void read (tl::ProtocolBufferReader &reader, uint32_t &v) const
+  {
+    reader.read (v);
+  }
+
+  void read (tl::ProtocolBufferReader &reader, int32_t &v) const
+  {
+    reader.read (v);
+  }
+
+  void read (tl::ProtocolBufferReader &reader, uint64_t &v) const
+  {
+    reader.read (v);
+  }
+
+  void read (tl::ProtocolBufferReader &reader, int64_t &v) const
+  {
+    reader.read (v);
+  }
+
+  void read (tl::ProtocolBufferReader &reader, bool &v) const
+  {
+    reader.read (v);
+  }
+
+  void read (tl::ProtocolBufferReader &reader, std::string &v) const
+  {
+    reader.read (v);
+  }
+
+  template <class T>
+  void read (tl::ProtocolBufferReader &reader, const T &v) const
+  {
+    std::string vv;
+    reader.read (vv);
+    m_c.from_string (vv, v);
+  }
 };
 
 /**
@@ -991,23 +980,6 @@ public:
     return new PBStruct<Obj> (*this);
   }
 
-#if 0  // @@@
-  virtual void create (const PBElementBase *, PBReaderState &, const std::string & /*uri*/, const std::string & /*lname*/, const std::string & /*qname*/) const
-  {
-    // .. nothing yet ..
-  }
-
-  virtual void cdata (const std::string &, PBReaderState &) const
-  {
-    // .. nothing yet ..
-  }
-
-  virtual void finish (const PBElementBase *, PBReaderState &, const std::string & /*uri*/, const std::string & /*lname*/, const std::string & /*qname*/) const
-  {
-    // .. nothing yet ..
-  }
-#endif
-
   void write (tl::ProtocolBufferWriter &writer, const Obj &root) const
   {
     PBWriterState writer_state;
@@ -1034,7 +1006,22 @@ public:
 private:
   virtual void write (const PBElementBase*, tl::ProtocolBufferWriter &, PBWriterState &) const
   {
-    // .. see write (os)
+    // disable base class implementation
+  }
+
+  virtual void parse (PBParser *, tl::ProtocolBufferReader &) const
+  {
+    // disable base class implementation
+  }
+
+  virtual void create (const PBElementBase *, PBReaderState &) const
+  {
+    // disable base class implementation
+  }
+
+  virtual void finish (const PBElementBase * /*parent*/, PBReaderState &) const
+  {
+    // disable base class implementation
   }
 };
 

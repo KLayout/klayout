@@ -26,6 +26,48 @@
 namespace tl
 {
 
+PBParser::PBParser ()
+{
+  //  .. nothing yet ..
+}
 
+PBParser::~PBParser ()
+{
+  //  .. nothing yet ..
+}
+
+void
+PBParser::parse (tl::ProtocolBufferReader &reader, const PBElementBase *root, PBReaderState *reader_state)
+{
+  mp_state = reader_state;
+  parse_element (root, reader);
+}
+
+void
+PBParser::parse_element (const PBElementBase *parent, tl::ProtocolBufferReader &reader)
+{
+  while (! reader.at_end ()) {
+
+    int tag = reader.read_tag ();
+
+    const PBElementBase *new_element = 0;
+    if (parent) {
+      for (PBElementBase::iterator c = parent->begin (); c != parent->end (); ++c) {
+        if ((*c)->tag () == tag) {
+          new_element = (*c).get ();
+          break;
+        }
+      }
+    }
+
+    if (! new_element) {
+      reader.skip ();
+    } else {
+      new_element->create (parent, *mp_state);
+      new_element->parse (this, reader);
+    }
+
+  }
+}
 
 }

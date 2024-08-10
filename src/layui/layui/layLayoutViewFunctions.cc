@@ -135,7 +135,7 @@ LayoutViewFunctions::menu_activated (const std::string &symbol)
   } else if (symbol == "cm_unselect_all") {
     view ()->select (db::DBox (), lay::Editable::Reset);
   } else if (symbol == "cm_select_all") {
-    view ()->select (view ()->full_box (), lay::Editable::Replace);
+    view ()->select_all ();
   } else if (symbol == "cm_select_next_item") {
     view ()->repeat_selection (lay::Editable::Replace);
   } else if (symbol == "cm_select_next_item_add") {

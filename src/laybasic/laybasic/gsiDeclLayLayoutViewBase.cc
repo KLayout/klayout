@@ -1058,7 +1058,7 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase ("lay", "LayoutVi
     "\n"
     "This method has been introduced in version 0.26.2\n"
   ) +
-  gsi::method ("select_all", (void (lay::LayoutViewBase::*) ()) &lay::LayoutViewBase::select,
+  gsi::method ("select_all", (void (lay::LayoutViewBase::*) ()) &lay::LayoutViewBase::select_all,
     "@brief Selects all objects from the view\n"
     "\n"
     "This method has been introduced in version 0.27\n"

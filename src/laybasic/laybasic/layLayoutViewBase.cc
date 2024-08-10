@@ -3768,6 +3768,12 @@ LayoutViewBase::full_box () const
 }
 
 void
+LayoutViewBase::select_all ()
+{
+  select (full_box (), lay::Editable::Replace);
+}
+
+void
 LayoutViewBase::zoom_fit ()
 {
   mp_canvas->zoom_box (full_box (), true /*precious*/);

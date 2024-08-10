@@ -2632,6 +2632,11 @@ public:
   db::DBox full_box () const;
 
   /**
+   *  @brief Selects everything
+   */
+  void select_all ();
+
+  /**
    *  @brief Gets called when a menu item is activated
    */
   void menu_activated (const std::string &symbol);

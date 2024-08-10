@@ -155,17 +155,18 @@ struct Child {
 struct Root {
   long m;
   unsigned int mi;
+  bool b;
   std::vector<double> m_subs;
   std::vector<int> m_isubs;
   std::vector<Child> m_children;
   Child m_child;
 
-  Root () : m(0), mi(0) { }
+  Root () : m(0), mi(0), b(false) { }
 
   bool operator== (const Root &x) const { return m == x.m &&
                                           mi == x.mi && m_subs == x.m_subs &&
                                           m_isubs == x.m_isubs && m_children == x.m_children
-                                          && m_child == x.m_child; }
+                                          && m_child == x.m_child && b == x.b; }
 
   int get_mi () const { return mi; }
   void set_mi (int i) { mi = i; }
@@ -204,23 +205,26 @@ struct Root {
   const Child &get_child () const { return m_child; }
 };
 
-TEST (100)
+TEST (100_BasicStruct)
 {
   Root root;
+
+  tl::PBElementList child_struct =
+      tl::pb_make_member (&Child::txt, 1) +
+      tl::pb_make_member (&Child::d, 2) +
+      tl::pb_make_element (&Child::begin_children, &Child::end_children, &Child::add_child, 3, &child_struct);
 
   tl::PBStruct<Root> structure (
     tl::pb_make_member (&Root::begin_subs, &Root::end_subs, &Root::add_sub, 1) +
     tl::pb_make_member (&Root::begin_isubs, &Root::end_isubs, &Root::add_isub, 2) +
-    tl::pb_make_element (&Root::begin_children, &Root::end_children, &Root::add_child, 3,
-      tl::pb_make_member (&Child::txt, 1) +
-      tl::pb_make_member (&Child::d, 2)
-    ) +
+    tl::pb_make_element (&Root::begin_children, &Root::end_children, &Root::add_child, 3, &child_struct) +
     tl::pb_make_element (&Root::get_child, &Root::set_child, 4,
       tl::pb_make_member (&Child::txt, 1) +
       tl::pb_make_member (&Child::d, 2)
     ) +
     tl::pb_make_member (&Root::m, 5) +
-    tl::pb_make_member (&Root::get_mi, &Root::set_mi, 6)
+    tl::pb_make_member (&Root::get_mi, &Root::set_mi, 6) +
+    tl::pb_make_member (&Root::b, 7)
   );
 
   root.add_sub (0.5);
@@ -228,6 +232,7 @@ TEST (100)
   root.add_isub (420000000);
   root.m = -1700000;
   root.set_mi (21);
+  root.b = true;
 
   Child c1;
   c1.txt = "c1";
@@ -265,6 +270,7 @@ TEST (100)
   {
     tl::OutputStream os (fn);
     tl::ProtocolBufferWriter writer (os);
+    //  For development: writer.set_debug (true);
     structure.write (writer, root);
   }
 
@@ -287,10 +293,11 @@ TEST (100)
   EXPECT_EQ (root.m_isubs.size (), size_t (1));
   EXPECT_EQ (root.m_isubs [0], 420000000);
   EXPECT_EQ (root.m, -1700000);
+  EXPECT_EQ (root.b, true);
   EXPECT_EQ (root.mi, (unsigned int) 21);
   EXPECT_EQ (root.m_children.size (), size_t (2));
   EXPECT_EQ (root.m_children [0].txt, "c1");
-  EXPECT_EQ (root.m_children [1].d, 1.0);
+  EXPECT_EQ (root.m_children [0].d, 1.0);
   EXPECT_EQ (root.m_children [1].txt, "c2");
   EXPECT_EQ (root.m_children [1].d, 2.0);
   EXPECT_EQ (root.m_children [1].end_children () - root.m_children [1].begin_children (), 3);
@@ -322,4 +329,29 @@ TEST (100)
 
   EXPECT_EQ (error, "");
   EXPECT_EQ (root == rsave, true);
+
+  //  write empty object
+  out.clear ();
+  root = Root ();
+
+  {
+    tl::OutputStream os (out);
+    tl::ProtocolBufferWriter writer (os);
+    structure.write (writer, root);
+  }
+
+  //  and read again.
+  try {
+    error.clear ();
+    tl::InputMemoryStream s2 (out.data (), out.size ());
+    tl::InputStream is (s2);
+    root = Root ();
+    tl::ProtocolBufferReader reader (is);
+    structure.parse (reader, root);
+  } catch (tl::Exception &ex) {
+    error = ex.msg ();
+  }
+
+  EXPECT_EQ (error, "");
+  EXPECT_EQ (root == Root (), true);
 }

@@ -604,7 +604,9 @@ public:
 
   virtual void parse (PBParser *parser, tl::ProtocolBufferReader &reader) const
   {
+    reader.open ();
     parser->parse_element (this, reader);
+    reader.close ();
   }
 
   virtual void write (const PBElementBase * /*parent*/, tl::ProtocolBufferWriter &writer, PBWriterState &objs) const
@@ -660,7 +662,7 @@ private:
       }
       objs.pop (self_tag);
       writer.end_seq ();
-      if (! writer.is_counting ()) {
+      if (writer.is_counting ()) {
         break;
       }
     }

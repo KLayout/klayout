@@ -68,6 +68,7 @@ PBParser::parse_element (const PBElementBase *parent, tl::ProtocolBufferReader &
     } else {
       new_element->create (parent, *mp_state);
       new_element->parse (this, reader);
+      new_element->finish (parent, *mp_state);
     }
 
   }

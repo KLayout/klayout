@@ -21,9 +21,13 @@
 */
 
 #include "tlProtocolBuffer.h"
+#include "tlLog.h"
 
 namespace tl
 {
+
+// @@@
+// Missing: readers should check for proper wire type (i.e. read(int64)->either VARINT or I64, not I32
 
 // ----------------------------------------------------------------------------------
 
@@ -284,9 +288,15 @@ ProtocolBufferReader::error (const std::string &msg)
 // ----------------------------------------------------------------------------------
 
 ProtocolBufferWriter::ProtocolBufferWriter (tl::OutputStream &stream)
-  : mp_stream (&stream), m_bytes_counted (0)
+  : mp_stream (&stream), m_bytes_counted (0), m_debug (false), m_debug_pos (0)
 {
   //  .. nothing yet ..
+}
+
+void ProtocolBufferWriter::set_debug (bool f)
+{
+  m_debug = f;
+  m_debug_pos = 0;
 }
 
 void ProtocolBufferWriter::write (int tag, float v)
@@ -303,7 +313,7 @@ void ProtocolBufferWriter::write (int tag, uint32_t v, bool fixed)
 {
   if (fixed) {
 
-    write_varint (pb_varint ((tag << 3) + PB_I32));
+    write_varint (pb_varint ((tag << 3) + PB_I32), true);
 
     if (is_counting ()) {
 
@@ -311,10 +321,16 @@ void ProtocolBufferWriter::write (int tag, uint32_t v, bool fixed)
 
     } else {
 
+      auto vv = v;
+
       char b[sizeof (v)];
       for (unsigned int i = 0; i < sizeof (v); ++i) {
         b[sizeof (v) - 1 - i] = (char) v;
         v >>= 8;
+      }
+
+      if (m_debug) {
+        dump (b, sizeof (v), "I32", tl::to_string (vv));
       }
 
       mp_stream->put (b, sizeof (v));
@@ -323,7 +339,7 @@ void ProtocolBufferWriter::write (int tag, uint32_t v, bool fixed)
 
   } else {
 
-    write_varint (pb_varint ((tag << 3) + PB_VARINT));
+    write_varint (pb_varint ((tag << 3) + PB_VARINT), true);
     write_varint (pb_varint (v));
 
   }
@@ -346,7 +362,7 @@ void ProtocolBufferWriter::write (int tag, uint64_t v, bool fixed)
 {
   if (fixed) {
 
-    write_varint (pb_varint ((tag << 3) + PB_I64));
+    write_varint (pb_varint ((tag << 3) + PB_I64), true);
 
     if (is_counting ()) {
 
@@ -354,10 +370,16 @@ void ProtocolBufferWriter::write (int tag, uint64_t v, bool fixed)
 
     } else {
 
+      auto vv = v;
+
       char b[sizeof (v)];
       for (unsigned int i = 0; i < sizeof (v); ++i) {
         b[sizeof (v) - 1 - i] = (char) v;
         v >>= 8;
+      }
+
+      if (m_debug) {
+        dump (b, sizeof (v), "I64", tl::to_string (vv));
       }
 
       mp_stream->put (b, sizeof (v));
@@ -366,7 +388,7 @@ void ProtocolBufferWriter::write (int tag, uint64_t v, bool fixed)
 
   } else {
 
-    write_varint (pb_varint ((tag << 3) + PB_VARINT));
+    write_varint (pb_varint ((tag << 3) + PB_VARINT), true);
     write_varint (pb_varint (v));
 
   }
@@ -392,13 +414,21 @@ void ProtocolBufferWriter::write (int tag, bool b)
 
 void ProtocolBufferWriter::write (int tag, const std::string &s)
 {
-  write_varint (pb_varint ((tag << 3) + PB_LEN));
+  write_varint (pb_varint ((tag << 3) + PB_LEN), true);
   write_varint (s.size ());
 
   if (is_counting ()) {
+
     m_byte_counter_stack.back () += s.size ();
+
   } else {
+
+    if (m_debug) {
+      dump (s.c_str (), s.size (), "(string)", s);
+    }
+
     mp_stream->put (s.c_str (), s.size ());
+
   }
 }
 
@@ -411,16 +441,15 @@ void ProtocolBufferWriter::begin_seq (int tag, bool counting)
 {
   if (counting) {
 
-    //  header only
-    m_byte_counter_stack.push_back (0);
-    write_varint (pb_varint ((tag << 3) + PB_LEN));
+    if (is_counting ()) {
+      write_varint (pb_varint ((tag << 3) + PB_LEN), true);
+    }
 
-    //  body only
     m_byte_counter_stack.push_back (0);
 
   } else {
 
-    write_varint (pb_varint ((tag << 3) + PB_LEN));
+    write_varint (pb_varint ((tag << 3) + PB_LEN), true);
     write_varint (m_bytes_counted);
 
   }
@@ -434,17 +463,15 @@ void ProtocolBufferWriter::end_seq ()
     m_byte_counter_stack.pop_back ();
 
     //  just for adding the required bytes
-    write_varint (m_bytes_counted);
-
-    //  now add header bytes
-    m_bytes_counted += m_byte_counter_stack.back ();
-    m_byte_counter_stack.pop_back ();
+    if (is_counting ()) {
+      write_varint (m_bytes_counted);
+    }
 
   }
 }
 
 void
-ProtocolBufferWriter::write_varint (pb_varint v)
+ProtocolBufferWriter::write_varint (pb_varint v, bool id)
 {
   if (is_counting ()) {
 
@@ -461,6 +488,8 @@ ProtocolBufferWriter::write_varint (pb_varint v)
 
   } else {
 
+    auto vv = v;
+
     char b[16];
     char *cp = b;
     while (true) {
@@ -473,9 +502,75 @@ ProtocolBufferWriter::write_varint (pb_varint v)
       v >>= 7;
     }
 
+    if (m_debug) {
+      if (id) {
+        unsigned int wt = v & 7;
+        std::string wire_type;
+        if (wt == PB_EGROUP) {
+          wire_type = "EGROUP";
+        } else if (wt == PB_SGROUP) {
+          wire_type = "SGROUP";
+        } else if (wt == PB_VARINT) {
+          wire_type = "VARINT";
+        } else if (wt == PB_I32) {
+          wire_type = "I32";
+        } else if (wt == PB_I64) {
+          wire_type = "I64";
+        } else if (wt == PB_LEN) {
+          wire_type = "LEN";
+        }
+        dump (b, cp - b, "(id)", "#" + tl::to_string (vv >> 3) + " " + wire_type);
+      } else {
+        dump (b, cp - b, "VARINT", tl::to_string (vv));
+      }
+    }
+
     mp_stream->put (b, cp - b);
 
   }
+}
+
+void
+ProtocolBufferWriter::dump (const char *cp, size_t n, const std::string &type, const std::string &value)
+{
+  bool first = true;
+  size_t nn = n;
+
+  while (n > 0) {
+
+    std::string line;
+    if (first) {
+      line += tl::sprintf ("%08ld", m_debug_pos);
+    } else {
+      line += "      ";
+    }
+    line += "  ";
+
+    for (unsigned int i = 0; i < 8; ++i) {
+      if (n > 0) {
+        line += tl::sprintf ("%02x", (unsigned int) ((unsigned char) *cp));
+        ++cp;
+        --n;
+      } else {
+        line += "  ";
+      }
+      line += " ";
+    }
+
+    if (first) {
+      line += " ";
+      line += type;
+      line += " ";
+      line += value;
+    }
+
+    tl::info << line;
+
+    first = false;
+
+  }
+
+  m_debug_pos += nn;
 }
 
 }

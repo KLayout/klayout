@@ -259,12 +259,21 @@ public:
    */
   void end_seq ();
 
+  /**
+   *  @brief Enables or disables debug mode
+   *  In debug mode, the stream will be dumped in a human readable form
+   */
+  void set_debug (bool f);
+
 private:
-  void write_varint (pb_varint v);
+  void write_varint (pb_varint v, bool id = false);
+  void dump (const char *cp, size_t n, const std::string &type, const std::string &value);
 
   tl::OutputStream *mp_stream;
   size_t m_bytes_counted;
   std::vector<size_t> m_byte_counter_stack;
+  bool m_debug;
+  size_t m_debug_pos;
 };
 
 }

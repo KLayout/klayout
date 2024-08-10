@@ -30,7 +30,7 @@ namespace tl
 {
 
 //  Representation of VARINT values
-typedef size_t pb_varint;
+typedef uint64_t pb_varint;
 
 enum PBWireType
 {
@@ -55,7 +55,7 @@ public:
 
   virtual std::string msg () const
   {
-    return basic_msg () + tl::to_string (tr (", at position ") + tl::to_string (m_position));
+    return basic_msg () + tl::to_string (tr (", at position ")) + tl::to_string (m_position);
   }
 
 private:
@@ -97,7 +97,7 @@ public:
 
   /**
    *  @brief Reads a new tag
-   *
+   *  This method will also set the current write type.
    *  @returns The message ID
    */
   int read_tag ();
@@ -178,7 +178,7 @@ public:
    *  After calling "open", the parser will continue reading messages, but
    *  "at_end" will report true on the end of the sequence, not at the end of the
    *  file.
-   *  Thie method will throw an exception if not in a message of LEN type.
+   *  This method will throw an exception if not in a message of LEN type.
    */
   void open ();
 
@@ -195,15 +195,16 @@ public:
   bool at_end () const;
 
 private:
-  tl::InputStream m_stream;
+  tl::InputStream *mp_stream;
   PBWireType m_type;
   size_t m_pos;
-  std::vector<size_t> m_block_end;
+  size_t m_pos_before;
+  std::vector<size_t> m_seq_counts;
 
   pb_varint read_varint ();
-  bool has_bytes (size_t n);
   void skip_bytes (size_t n);
   void error (const std::string &msg);
+  const char *get (size_t n);
 };
 
 /**
@@ -259,10 +260,9 @@ public:
   void end_seq ();
 
 private:
-  size_t count_bytes_for (pb_varint v);
   void write_varint (pb_varint v);
 
-  tl::OutputStream m_stream;
+  tl::OutputStream *mp_stream;
   size_t m_bytes_counted;
   std::vector<size_t> m_byte_counter_stack;
 };

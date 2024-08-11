@@ -205,28 +205,26 @@ struct Root {
   const Child &get_child () const { return m_child; }
 };
 
-TEST (100_BasicStruct)
+static tl::PBElementList child_struct =
+    tl::pb_make_member (&Child::txt, 1) +
+    tl::pb_make_member (&Child::d, 2) +
+    tl::pb_make_element (&Child::begin_children, &Child::end_children, &Child::add_child, 3, &child_struct);
+
+static tl::PBStruct<Root> structure ("pbtest-struct", 88888888,
+  tl::pb_make_member (&Root::begin_subs, &Root::end_subs, &Root::add_sub, 1) +
+  tl::pb_make_member (&Root::begin_isubs, &Root::end_isubs, &Root::add_isub, 2) +
+  tl::pb_make_element (&Root::begin_children, &Root::end_children, &Root::add_child, 3, &child_struct) +
+  tl::pb_make_element (&Root::get_child, &Root::set_child, 4,
+    tl::pb_make_member (&Child::txt, 1) +
+    tl::pb_make_member (&Child::d, 2)
+  ) +
+  tl::pb_make_member (&Root::m, 5) +
+  tl::pb_make_member (&Root::get_mi, &Root::set_mi, 6) +
+  tl::pb_make_member (&Root::b, 7)
+);
+
+static void build_struct (Root &root)
 {
-  Root root;
-
-  tl::PBElementList child_struct =
-      tl::pb_make_member (&Child::txt, 1) +
-      tl::pb_make_member (&Child::d, 2) +
-      tl::pb_make_element (&Child::begin_children, &Child::end_children, &Child::add_child, 3, &child_struct);
-
-  tl::PBStruct<Root> structure ("pbtest-struct", 88888888,
-    tl::pb_make_member (&Root::begin_subs, &Root::end_subs, &Root::add_sub, 1) +
-    tl::pb_make_member (&Root::begin_isubs, &Root::end_isubs, &Root::add_isub, 2) +
-    tl::pb_make_element (&Root::begin_children, &Root::end_children, &Root::add_child, 3, &child_struct) +
-    tl::pb_make_element (&Root::get_child, &Root::set_child, 4,
-      tl::pb_make_member (&Child::txt, 1) +
-      tl::pb_make_member (&Child::d, 2)
-    ) +
-    tl::pb_make_member (&Root::m, 5) +
-    tl::pb_make_member (&Root::get_mi, &Root::set_mi, 6) +
-    tl::pb_make_member (&Root::b, 7)
-  );
-
   root.add_sub (0.5);
   root.add_sub (7.5);
   root.add_isub (420000000);
@@ -264,6 +262,12 @@ TEST (100_BasicStruct)
   sc.txt = "single";
   sc.d = 4.2e6;
   root.set_child (sc);
+}
+
+TEST (100_BasicStruct)
+{
+  Root root;
+  build_struct (root);
 
   std::string fn = tl::combine_path (tl::testtmp (), "pb_test.pb");
 
@@ -405,13 +409,13 @@ struct TestClassEnumConverter
   }
 };
 
+tl::PBStruct<TestClass> tc_structure ("pbtest-tc", 1,
+  tl::pb_make_member (&TestClass::e, 2, TestClassEnumConverter ())
+);
+
 TEST (101_Converter)
 {
   TestClass tc;
-
-  tl::PBStruct<TestClass> structure ("pbtest-tc", 1,
-    tl::pb_make_member (&TestClass::e, 2, TestClassEnumConverter ())
-  );
 
   tc.e = TestClass::A;
   std::string fn = tl::combine_path (tl::testtmp (), "pb_101a.pb");
@@ -419,7 +423,7 @@ TEST (101_Converter)
   {
     tl::OutputStream os (fn);
     tl::ProtocolBufferWriter writer (os);
-    structure.write (writer, tc);
+    tc_structure.write (writer, tc);
   }
 
   tc = TestClass ();
@@ -428,7 +432,7 @@ TEST (101_Converter)
   try {
     tl::InputStream is (fn);
     tl::ProtocolBufferReader reader (is);
-    structure.parse (reader, tc);
+    tc_structure.parse (reader, tc);
   } catch (tl::Exception &ex) {
     error = ex.msg ();
   }
@@ -442,7 +446,7 @@ TEST (101_Converter)
   {
     tl::OutputStream os (fn);
     tl::ProtocolBufferWriter writer (os);
-    structure.write (writer, tc);
+    tc_structure.write (writer, tc);
   }
 
   tc = TestClass ();
@@ -451,11 +455,159 @@ TEST (101_Converter)
   try {
     tl::InputStream is (fn);
     tl::ProtocolBufferReader reader (is);
-    structure.parse (reader, tc);
+    tc_structure.parse (reader, tc);
   } catch (tl::Exception &ex) {
     error = ex.msg ();
   }
 
   EXPECT_EQ (tc.e, TestClass::B);
+}
+
+TEST (101_ExternalFiles)
+{
+  Root root_au;
+  build_struct (root_au);
+
+  std::string fn = tl::combine_path (tl::testsrc (), "testdata/pb/struct1.pb");
+
+  Root root;
+  std::string error;
+  try {
+    tl::InputStream is (fn);
+    tl::ProtocolBufferReader reader (is);
+    structure.parse (reader, root);
+  } catch (tl::Exception &ex) {
+    error = ex.msg ();
+  }
+
+  EXPECT_EQ (error, "");
+  EXPECT_EQ (root == root_au, true);
+}
+
+TEST (102_InvalidHeader)
+{
+  std::string fn = tl::combine_path (tl::testsrc (), "testdata/pb/struct2_invalid_header.pb");
+
+  Root root;
+  std::string error;
+  try {
+    tl::InputStream is (fn);
+    tl::ProtocolBufferReader reader (is);
+    structure.parse (reader, root);
+  } catch (tl::Exception &ex) {
+    error = ex.msg ();
+  }
+
+  EXPECT_EQ (std::string (error, 0, 49), "Expected header field with ID 88888888 (got 4444)");
+}
+
+TEST (103_InvalidHeader)
+{
+  std::string fn = tl::combine_path (tl::testsrc (), "testdata/pb/struct3_invalid_header.pb");
+
+  Root root;
+  std::string error;
+  try {
+    tl::InputStream is (fn);
+    tl::ProtocolBufferReader reader (is);
+    structure.parse (reader, root);
+  } catch (tl::Exception &ex) {
+    error = ex.msg ();
+  }
+
+  EXPECT_EQ (std::string (error, 0, 71), "Expected header field with string 'pbtest-struct' (got 'xxxxxxxxxxxxx')");
+}
+
+//  "last one wins", unknown IDs are skipped
+TEST (104_Deviations)
+{
+  Root root_au;
+  build_struct (root_au);
+
+  std::string fn = tl::combine_path (tl::testsrc (), "testdata/pb/struct4_deviations.pb");
+
+  Root root;
+  std::string error;
+  try {
+    tl::InputStream is (fn);
+    tl::ProtocolBufferReader reader (is);
+    structure.parse (reader, root);
+  } catch (tl::Exception &ex) {
+    error = ex.msg ();
+  }
+
+  EXPECT_EQ (error, "");
+  EXPECT_EQ (root == root_au, true);
+}
+
+TEST (105_Int32Overflow)
+{
+  std::string fn = tl::combine_path (tl::testsrc (), "testdata/pb/struct5_overflow.pb");
+
+  TestClass tc;
+  std::string error;
+  try {
+    tl::InputStream is (fn);
+    tl::ProtocolBufferReader reader (is);
+    tc_structure.parse (reader, tc);
+  } catch (tl::Exception &ex) {
+    error = ex.msg ();
+  }
+
+  EXPECT_EQ (std::string (error, 0, 21), "32 bit value overflow");
+}
+
+TEST (106_InvalidType)
+{
+  std::string fn = tl::combine_path (tl::testsrc (), "testdata/pb/struct6_invalid_type.pb");
+
+  TestClass tc;
+  std::string error;
+  try {
+    tl::InputStream is (fn);
+    tl::ProtocolBufferReader reader (is);
+    tc_structure.parse (reader, tc);
+  } catch (tl::Exception &ex) {
+    error = ex.msg ();
+  }
+
+  EXPECT_EQ (std::string (error, 0, 34), "Expected a VARINT or I32 wire type");
+}
+
+TEST (107_InvalidType)
+{
+  //  uses I32 to represent enum - works too, not just VARINT
+  std::string fn = tl::combine_path (tl::testsrc (), "testdata/pb/struct7_invalid_type.pb");
+
+  TestClass tc;
+  tc.e = TestClass::B;
+  std::string error;
+  try {
+    tl::InputStream is (fn);
+    tl::ProtocolBufferReader reader (is);
+    tc_structure.parse (reader, tc);
+  } catch (tl::Exception &ex) {
+    error = ex.msg ();
+  }
+
+  EXPECT_EQ (error, "");
+  EXPECT_EQ (tc.e, TestClass::A);
+}
+
+TEST (108_InvalidType)
+{
+  std::string fn = tl::combine_path (tl::testsrc (), "testdata/pb/struct8_invalid_type.pb");
+
+  TestClass tc;
+  std::string error;
+  try {
+    tl::InputStream is (fn);
+    tl::ProtocolBufferReader reader (is);
+    tc_structure.parse (reader, tc);
+  } catch (tl::Exception &ex) {
+    error = ex.msg ();
+  }
+
+  EXPECT_EQ (std::string (error, 0, 34), "Expected a VARINT or I32 wire type");
 }
 

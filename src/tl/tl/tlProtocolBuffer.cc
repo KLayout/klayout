@@ -63,8 +63,7 @@ ProtocolBufferReader::skip ()
 
   } else if (m_type == PB_LEN) {
 
-    size_t value = 0;
-    read (value);
+    size_t value = read_varint ();
     skip_bytes (value);
 
   }
@@ -93,8 +92,7 @@ ProtocolBufferReader::read (std::string &s)
     error (tl::to_string (tr ("Expected a LEN wire type for a string")));
   }
 
-  size_t value = 0;
-  read (value);
+  size_t value = read_varint ();
 
   s = std::string ();
   s.reserve (value);
@@ -110,7 +108,7 @@ ProtocolBufferReader::read (std::string &s)
 void
 ProtocolBufferReader::read (uint32_t &ui32)
 {
-  if (m_type == PB_VARINT || m_type == PB_LEN) {
+  if (m_type == PB_VARINT) {
 
     pb_varint ui64 = read_varint ();
     if (ui64 > std::numeric_limits<uint32_t>::max ()) {
@@ -153,7 +151,7 @@ ProtocolBufferReader::read (int32_t &i32)
 void
 ProtocolBufferReader::read (uint64_t &ui64)
 {
-  if (m_type == PB_VARINT || m_type == PB_LEN) {
+  if (m_type == PB_VARINT) {
 
     ui64 = read_varint ();
 
@@ -203,8 +201,7 @@ ProtocolBufferReader::open ()
     error (tl::to_string (tr ("Expected a LEN wire type for a submessage")));
   }
 
-  size_t value = 0;
-  read (value);
+  size_t value = read_varint ();
   if (! m_seq_counts.empty ()) {
     //  take out the following bytes from the current sequence
     m_seq_counts.back () -= value;
@@ -284,6 +281,15 @@ ProtocolBufferReader::read_varint ()
 void
 ProtocolBufferReader::skip_bytes (size_t n)
 {
+  m_pos_before = m_pos;
+  m_pos += n;
+  if (! m_seq_counts.empty ()) {
+    if (m_seq_counts.back () < n) {
+      error (tl::to_string (tr ("sequence underflow")));
+    }
+    m_seq_counts.back () -= n;
+  }
+
   const size_t chunk_size = 1024;
   while (n > 0) {
     size_t l = std::min (chunk_size, n);

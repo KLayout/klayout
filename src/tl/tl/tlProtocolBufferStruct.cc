@@ -74,6 +74,21 @@ PBParser::parse_element (const PBElementBase *parent, tl::ProtocolBufferReaderBa
   }
 }
 
+void
+PBParser::expect_header (tl::ProtocolBufferReaderBase &reader, int name_tag, const std::string &name)
+{
+  int tag = reader.read_tag ();
+  if (tag != name_tag) {
+    reader.error (tl::sprintf (tl::to_string (tr ("Expected header field with ID %d (got %d)")), name_tag, tag));
+  }
+
+  std::string n;
+  reader.read (n);
+  if (n != name) {
+    reader.error (tl::sprintf (tl::to_string (tr ("Expected header field with string '%s' (got '%s')")), name, n));
+  }
+}
+
 // --------------------------------------------------------------------
 //  PBElementProxy implementation
 

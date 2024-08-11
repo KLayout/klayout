@@ -26,9 +26,6 @@
 namespace tl
 {
 
-// @@@
-// Missing: readers should check for proper wire type (i.e. read(int64)->either VARINT or I64, not I32
-
 // ----------------------------------------------------------------------------------
 
 ProtocolBufferReader::ProtocolBufferReader (tl::InputStream &input)
@@ -92,6 +89,10 @@ ProtocolBufferReader::read (float &f)
 void
 ProtocolBufferReader::read (std::string &s)
 {
+  if (m_type != PB_LEN) {
+    error (tl::to_string (tr ("Expected a LEN wire type for a string")));
+  }
+
   size_t value = 0;
   read (value);
 
@@ -109,7 +110,7 @@ ProtocolBufferReader::read (std::string &s)
 void
 ProtocolBufferReader::read (uint32_t &ui32)
 {
-  if (m_type != PB_I32) {
+  if (m_type == PB_VARINT || m_type == PB_LEN) {
 
     pb_varint ui64 = read_varint ();
     if (ui64 > std::numeric_limits<uint32_t>::max ()) {
@@ -118,7 +119,7 @@ ProtocolBufferReader::read (uint32_t &ui32)
 
     ui32 = uint32_t (ui64);
 
-  } else {
+  } else if (m_type == PB_I32) {
 
     ui32 = 0;
     const char *cp = get (sizeof (ui32));
@@ -127,6 +128,8 @@ ProtocolBufferReader::read (uint32_t &ui32)
       ui32 |= (unsigned char) cp [sizeof (ui32) - 1 - i];
     }
 
+  } else {
+    error (tl::to_string (tr ("Expected a VARINT or I32 wire type")));
   }
 }
 
@@ -150,11 +153,11 @@ ProtocolBufferReader::read (int32_t &i32)
 void
 ProtocolBufferReader::read (uint64_t &ui64)
 {
-  if (m_type != PB_I64) {
+  if (m_type == PB_VARINT || m_type == PB_LEN) {
 
     ui64 = read_varint ();
 
-  } else {
+  } else if (m_type == PB_I64) {
 
     ui64 = 0;
     const char *cp = get (sizeof (ui64));
@@ -163,6 +166,8 @@ ProtocolBufferReader::read (uint64_t &ui64)
       ui64 |= (unsigned char) cp [sizeof (ui64) - 1 - i];
     }
 
+  } else {
+    error (tl::to_string (tr ("Expected a VARINT or I64 wire type")));
   }
 }
 
@@ -194,6 +199,10 @@ ProtocolBufferReader::read (bool &b)
 void
 ProtocolBufferReader::open ()
 {
+  if (m_type != PB_LEN) {
+    error (tl::to_string (tr ("Expected a LEN wire type for a submessage")));
+  }
+
   size_t value = 0;
   read (value);
   if (! m_seq_counts.empty ()) {
@@ -259,7 +268,7 @@ ProtocolBufferReader::read_varint ()
     if (! cp) {
       error (tl::to_string (tr ("unexpected end of file")));
     }
-    if ((v & 0xfe00000000000000l) != 0) {
+    if (s + 7 > 64 && pb_varint ((unsigned char) (*cp & 0x7f)) >> (s + 7 - 64) != 0) {
       error (tl::to_string (tr ("64 bit integer overflow")));
     }
     v |= (pb_varint ((unsigned char) (*cp & 0x7f)) << s);

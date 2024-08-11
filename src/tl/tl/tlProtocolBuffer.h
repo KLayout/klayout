@@ -176,6 +176,11 @@ public:
    *  @brief Returns true if at the end of the file or end of a block
    */
   virtual bool at_end () const = 0;
+
+  /**
+   *  @brief Emits an error at the current position
+   */
+  virtual void error (const std::string &msg) = 0;
 };
 
 /**
@@ -283,6 +288,11 @@ public:
    */
   bool at_end () const;
 
+  /**
+   *  @brief Emits an error at the current position
+   */
+  void error (const std::string &msg);
+
 private:
   tl::InputStream *mp_stream;
   PBWireType m_type;
@@ -292,7 +302,6 @@ private:
 
   pb_varint read_varint ();
   void skip_bytes (size_t n);
-  void error (const std::string &msg);
   const char *get (size_t n);
 };
 

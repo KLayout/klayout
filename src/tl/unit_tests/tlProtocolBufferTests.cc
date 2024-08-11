@@ -214,7 +214,7 @@ TEST (100_BasicStruct)
       tl::pb_make_member (&Child::d, 2) +
       tl::pb_make_element (&Child::begin_children, &Child::end_children, &Child::add_child, 3, &child_struct);
 
-  tl::PBStruct<Root> structure (
+  tl::PBStruct<Root> structure ("pbtest-struct", 88888888,
     tl::pb_make_member (&Root::begin_subs, &Root::end_subs, &Root::add_sub, 1) +
     tl::pb_make_member (&Root::begin_isubs, &Root::end_isubs, &Root::add_isub, 2) +
     tl::pb_make_element (&Root::begin_children, &Root::end_children, &Root::add_child, 3, &child_struct) +
@@ -270,8 +270,12 @@ TEST (100_BasicStruct)
   {
     tl::OutputStream os (fn);
     tl::ProtocolBufferWriter writer (os);
-    //  For development: writer.set_debug (true);
     structure.write (writer, root);
+    /*
+    for debugging:
+    tl::ProtocolBufferDumper dumper;
+    structure.write (dumper, root);
+    */
   }
 
   root = Root ();

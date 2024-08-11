@@ -299,6 +299,8 @@ public:
   void parse (tl::ProtocolBufferReaderBase &reader, const PBElementBase *root, PBReaderState *reader_state);
   void parse_element (const PBElementBase *parent, tl::ProtocolBufferReaderBase &reader);
 
+  void expect_header (tl::ProtocolBufferReaderBase &reader, int name_tag, const std::string &name);
+
   PBReaderState &reader_state ()
   {
     return *mp_state;
@@ -949,9 +951,16 @@ private:
 /**
  *  @brief The root element of the PB structure
  *
- *  The root element is also the handler implementation.
- *  It must be supplied a pointer to an actual root object,
- *  a name and a list of children.
+ *  The root object is also a element node. It belongs to an object
+ *  representing the root of the object hierarchy. Correspondingly,
+ *  child elements (members, elements - aka submessages) need to be
+ *  specified.
+ *
+ *  In addition, the root element has a name and a name tag.
+ *  The name / name tag are emitted as the first element in the
+ *  message, providing a file header with fixed content. This
+ *  allows identifying the file as a encoded protocol buffer
+ *  file for a specific object type.
  */
 
 template <class Obj>
@@ -959,20 +968,20 @@ class TL_PUBLIC_TEMPLATE PBStruct
   : public PBElementBase
 {
 public:
-  PBStruct (const PBElementList *children)
-    : PBElementBase (0, children)
+  PBStruct (const std::string &name, int name_tag, const PBElementList *children)
+    : PBElementBase (0, children), m_name (name), m_name_tag (name_tag)
   {
     // .. nothing yet ..
   }
 
-  PBStruct (const PBElementList &children)
-    : PBElementBase (0, children)
+  PBStruct (const std::string &name, int name_tag, const PBElementList &children)
+    : PBElementBase (0, children), m_name (name), m_name_tag (name_tag)
   {
     // .. nothing yet ..
   }
 
   PBStruct (const PBStruct<Obj> &d)
-    : PBElementBase (d)
+    : PBElementBase (d), m_name (d.name ()), m_name_tag (d.name_tag ())
   {
     // .. nothing yet ..
   }
@@ -982,12 +991,22 @@ public:
     return new PBStruct<Obj> (*this);
   }
 
+  const std::string &name () const
+  {
+    return m_name;
+  }
+
+  int name_tag () const
+  {
+    return m_name_tag;
+  }
+
   void write (tl::ProtocolBufferWriterBase &writer, const Obj &root) const
   {
     PBWriterState writer_state;
     writer_state.push (& root);
 
-    // @@@ writer.write (0, name ());
+    writer.write (name_tag (), name ());
 
     for (PBElementBase::iterator c = this->begin (); c != this->end (); ++c) {
       c->get ()->write (this, writer, writer_state);
@@ -1000,6 +1019,7 @@ public:
     PBReaderState rs;
     rs.push (&root);
     PBParser h;
+    h.expect_header (reader, m_name_tag, m_name);
     h.parse (reader, this, &rs);
     rs.pop (tag);
     tl_assert (rs.empty ());
@@ -1025,6 +1045,9 @@ private:
   {
     // disable base class implementation
   }
+
+  std::string m_name;
+  int m_name_tag;
 };
 
 /**

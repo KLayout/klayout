@@ -121,9 +121,10 @@ ProtocolBufferReader::read (uint32_t &ui32)
   } else {
 
     ui32 = 0;
-    for (unsigned int i = 0; i < sizeof (ui32) && ! at_end (); ++i) {
+    const char *cp = get (sizeof (ui32));
+    for (unsigned int i = 0; i < sizeof (ui32); ++i) {
       ui32 <<= 8;
-      ui32 |= (unsigned char) *get (1);
+      ui32 |= (unsigned char) cp [sizeof (ui32) - 1 - i];
     }
 
   }
@@ -156,9 +157,10 @@ ProtocolBufferReader::read (uint64_t &ui64)
   } else {
 
     ui64 = 0;
-    for (unsigned int i = 0; i < sizeof (ui64) && ! at_end (); ++i) {
+    const char *cp = get (sizeof (ui64));
+    for (unsigned int i = 0; i < sizeof (ui64); ++i) {
       ui64 <<= 8;
-      ui64 |= (unsigned char) *get (1);
+      ui64 |= (unsigned char) cp [sizeof (ui64) - 1 - i];
     }
 
   }
@@ -194,6 +196,10 @@ ProtocolBufferReader::open ()
 {
   size_t value = 0;
   read (value);
+  if (! m_seq_counts.empty ()) {
+    //  take out the following bytes from the current sequence
+    m_seq_counts.back () -= value;
+  }
   m_seq_counts.push_back (value);
 }
 
@@ -325,7 +331,7 @@ void ProtocolBufferWriter::write (int tag, uint32_t v, bool fixed)
 
       char b[sizeof (v)];
       for (unsigned int i = 0; i < sizeof (v); ++i) {
-        b[sizeof (v) - 1 - i] = (char) v;
+        b[i] = (char) v;
         v >>= 8;
       }
 
@@ -374,7 +380,7 @@ void ProtocolBufferWriter::write (int tag, uint64_t v, bool fixed)
 
       char b[sizeof (v)];
       for (unsigned int i = 0; i < sizeof (v); ++i) {
-        b[sizeof (v) - 1 - i] = (char) v;
+        b[i] = (char) v;
         v >>= 8;
       }
 
@@ -464,6 +470,7 @@ void ProtocolBufferWriter::end_seq ()
 
     //  just for adding the required bytes
     if (is_counting ()) {
+      m_byte_counter_stack.back () += m_bytes_counted;
       write_varint (m_bytes_counted);
     }
 

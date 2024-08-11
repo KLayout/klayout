@@ -486,20 +486,20 @@ class TL_PUBLIC PBElementBase
 public:
   typedef PBElementList::iterator iterator;
 
-  PBElementBase (int tag, const PBElementList &children)
-    : m_tag (tag), mp_children (new PBElementList (children)), m_owns_child_list (true)
+  PBElementBase (const std::string &name, int tag, const PBElementList &children)
+    : m_name (name), m_tag (tag), mp_children (new PBElementList (children)), m_owns_child_list (true)
   {
     // .. nothing yet ..
   }
 
-  PBElementBase (int tag, const PBElementList *children)
-    : m_tag (tag), mp_children (children), m_owns_child_list (false)
+  PBElementBase (const std::string &name, int tag, const PBElementList *children)
+    : m_name (name), m_tag (tag), mp_children (children), m_owns_child_list (false)
   {
     // .. nothing yet ..
   }
 
   PBElementBase (const PBElementBase &d)
-    : m_tag (d.m_tag), m_owns_child_list (d.m_owns_child_list)
+    : m_name (d.m_name), m_tag (d.m_tag), m_owns_child_list (d.m_owns_child_list)
   {
     if (m_owns_child_list) {
       mp_children = new PBElementList (*d.mp_children);
@@ -529,6 +529,11 @@ public:
     return m_tag;
   }
 
+  const std::string &name () const
+  {
+    return m_name;
+  }
+
   iterator begin () const
   {
     return mp_children->begin ();
@@ -540,6 +545,7 @@ public:
   }
 
 private:
+  std::string m_name;
   int m_tag;
   const PBElementList *mp_children;
   bool m_owns_child_list;
@@ -567,14 +573,14 @@ class TL_PUBLIC_TEMPLATE PBElement
   : public PBElementBase
 {
 public:
-  PBElement (const Read &r, const Write &w, int tag, const PBElementList &children)
-    : PBElementBase (tag, children), m_r (r), m_w (w)
+  PBElement (const Read &r, const Write &w, const std::string &name, int tag, const PBElementList &children)
+    : PBElementBase (name, tag, children), m_r (r), m_w (w)
   {
     // .. nothing yet ..
   }
 
-  PBElement (const Read &r, const Write &w, int tag, const PBElementList *children)
-    : PBElementBase (tag, children), m_r (r), m_w (w)
+  PBElement (const Read &r, const Write &w, const std::string &name, int tag, const PBElementList *children)
+    : PBElementBase (name, tag, children), m_r (r), m_w (w)
   {
     // .. nothing yet ..
   }
@@ -683,14 +689,14 @@ class TL_PUBLIC_TEMPLATE PBElementWithParentRef
   : public PBElement<Obj, Parent, Read, Write>
 {
 public:
-  PBElementWithParentRef (const Read &r, const Write &w, int tag, const PBElementList &children)
-    : PBElement<Obj, Parent, Read, Write> (r, w, tag, children)
+  PBElementWithParentRef (const Read &r, const Write &w, const std::string &name, int tag, const PBElementList &children)
+    : PBElement<Obj, Parent, Read, Write> (r, w, name, tag, children)
   {
     // .. nothing yet ..
   }
 
-  PBElementWithParentRef (const Read &r, const Write &w, int tag, const PBElementList *children)
-    : PBElement<Obj, Parent, Read, Write> (r, w, tag, children)
+  PBElementWithParentRef (const Read &r, const Write &w, const std::string &name, int tag, const PBElementList *children)
+    : PBElement<Obj, Parent, Read, Write> (r, w, name, tag, children)
   {
     // .. nothing yet ..
   }
@@ -742,8 +748,8 @@ class TL_PUBLIC_TEMPLATE PBMember
   : public PBElementBase
 {
 public:
-  PBMember (const Read &r, const Write &w, int tag, Converter c = Converter ())
-    : PBElementBase (tag, PBElementList::empty ()), m_r (r), m_w (w), m_c (c)
+  PBMember (const Read &r, const Write &w, const std::string &name, int tag, Converter c = Converter ())
+    : PBElementBase (name, tag, PBElementList::empty ()), m_r (r), m_w (w), m_c (c)
   {
     // .. nothing yet ..
   }
@@ -969,60 +975,67 @@ class TL_PUBLIC_TEMPLATE PBStruct
 {
 public:
   PBStruct (const std::string &name, int name_tag, const PBElementList *children)
-    : PBElementBase (0, children), m_name (name), m_name_tag (name_tag)
+    : PBElementBase (name, name_tag, children)
   {
     // .. nothing yet ..
   }
 
   PBStruct (const std::string &name, int name_tag, const PBElementList &children)
-    : PBElementBase (0, children), m_name (name), m_name_tag (name_tag)
+    : PBElementBase (name, name_tag, children)
   {
     // .. nothing yet ..
   }
 
   PBStruct (const PBStruct<Obj> &d)
-    : PBElementBase (d), m_name (d.name ()), m_name_tag (d.name_tag ())
+    : PBElementBase (d)
   {
     // .. nothing yet ..
   }
 
+  /**
+   *  @brief Creates a deep copy of the structure
+   */
   virtual PBElementBase *clone () const
   {
     return new PBStruct<Obj> (*this);
   }
 
-  const std::string &name () const
-  {
-    return m_name;
-  }
-
-  int name_tag () const
-  {
-    return m_name_tag;
-  }
-
+  /**
+   *  @brief Serializes the given object (root) to the writer
+   */
   void write (tl::ProtocolBufferWriterBase &writer, const Obj &root) const
   {
     PBWriterState writer_state;
     writer_state.push (& root);
 
-    writer.write (name_tag (), name ());
+    writer.write (tag (), name ());
 
     for (PBElementBase::iterator c = this->begin (); c != this->end (); ++c) {
       c->get ()->write (this, writer, writer_state);
     }
   }
 
+  /**
+   *  @brief Deserializes the given object (root) from the reader
+   */
   void parse (tl::ProtocolBufferReaderBase &reader, Obj &root) const
   {
-    PBObjTag<Obj> tag;
+    PBObjTag<Obj> self_tag;
     PBReaderState rs;
     rs.push (&root);
     PBParser h;
-    h.expect_header (reader, m_name_tag, m_name);
+    h.expect_header (reader, tag (), name ());
     h.parse (reader, this, &rs);
-    rs.pop (tag);
+    rs.pop (self_tag);
     tl_assert (rs.empty ());
+  }
+
+  /**
+   *  @brief Produces a definition for the protoc compiler
+   */
+  std::string create_def () const
+  {
+    return std::string (); // @@@
   }
 
 private:
@@ -1045,9 +1058,6 @@ private:
   {
     // disable base class implementation
   }
-
-  std::string m_name;
-  int m_name_tag;
 };
 
 /**
@@ -1351,11 +1361,11 @@ private:
  */
 template <class Value, class Parent>
 PBElement<Value, Parent, PBMemberDummyReadAdaptor <Value, Parent>, PBMemberAccRefWriteAdaptor <Value, Parent> >
-pb_make_element (void (Parent::*setter) (const Value &), int tag, const PBElementList *children)
+pb_make_element (void (Parent::*setter) (const Value &), const std::string &name, int tag, const PBElementList *children)
 {
   return PBElement<Value, Parent, PBMemberDummyReadAdaptor <Value, Parent>, PBMemberAccRefWriteAdaptor <Value, Parent> > (
           PBMemberDummyReadAdaptor <Value, Parent> (),
-          PBMemberAccRefWriteAdaptor <Value, Parent> (setter), tag, children);
+          PBMemberAccRefWriteAdaptor <Value, Parent> (setter), name, tag, children);
 }
 
 /**
@@ -1363,11 +1373,11 @@ pb_make_element (void (Parent::*setter) (const Value &), int tag, const PBElemen
  */
 template <class Value, class Parent>
 PBElement<Value, Parent, PBMemberDummyReadAdaptor <Value, Parent>, PBMemberTransferWriteAdaptor <Value, Parent> >
-pb_make_element (void (Parent::*setter) (Value *), int tag, const PBElementList *children)
+pb_make_element (void (Parent::*setter) (Value *), const std::string &name, int tag, const PBElementList *children)
 {
   return PBElement<Value, Parent, PBMemberDummyReadAdaptor <Value, Parent>, PBMemberTransferWriteAdaptor <Value, Parent> > (
           PBMemberDummyReadAdaptor <Value, Parent> (),
-          PBMemberTransferWriteAdaptor <Value, Parent> (setter), tag, children);
+          PBMemberTransferWriteAdaptor <Value, Parent> (setter), name, tag, children);
 }
 
 /**
@@ -1375,11 +1385,11 @@ pb_make_element (void (Parent::*setter) (Value *), int tag, const PBElementList 
  */
 template <class Value, class Parent>
 PBElement<Value, Parent, PBMemberAccRefReadAdaptor <Value, Parent>, PBMemberAccRefWriteAdaptor <Value, Parent> >
-pb_make_element (const Value &(Parent::*getter) () const, void (Parent::*setter) (const Value &), int tag, const PBElementList *children)
+pb_make_element (const Value &(Parent::*getter) () const, void (Parent::*setter) (const Value &), const std::string &name, int tag, const PBElementList *children)
 {
   return PBElement<Value, Parent, PBMemberAccRefReadAdaptor <Value, Parent>, PBMemberAccRefWriteAdaptor <Value, Parent> > (
           PBMemberAccRefReadAdaptor <Value, Parent> (getter),
-          PBMemberAccRefWriteAdaptor <Value, Parent> (setter), tag, children);
+          PBMemberAccRefWriteAdaptor <Value, Parent> (setter), name, tag, children);
 }
 
 /**
@@ -1387,11 +1397,11 @@ pb_make_element (const Value &(Parent::*getter) () const, void (Parent::*setter)
  */
 template <class Value, class Parent>
 PBElement<Value, Parent, PBMemberAccRefReadAdaptor <Value, Parent>, PBMemberTransferWriteAdaptor <Value, Parent> >
-pb_make_element (const Value &(Parent::*getter) () const, void (Parent::*setter) (Value *), int tag, const PBElementList *children)
+pb_make_element (const Value &(Parent::*getter) () const, void (Parent::*setter) (Value *), const std::string &name, int tag, const PBElementList *children)
 {
   return PBElement<Value, Parent, PBMemberAccRefReadAdaptor <Value, Parent>, PBMemberTransferWriteAdaptor <Value, Parent> > (
           PBMemberAccRefReadAdaptor <Value, Parent> (getter),
-          PBMemberTransferWriteAdaptor <Value, Parent> (setter), tag, children);
+          PBMemberTransferWriteAdaptor <Value, Parent> (setter), name, tag, children);
 }
 
 /**
@@ -1399,11 +1409,11 @@ pb_make_element (const Value &(Parent::*getter) () const, void (Parent::*setter)
  */
 template <class Value, class Parent>
 PBElement<Value, Parent, PBMemberAccRefReadAdaptor <Value, Parent>, PBMemberAccWriteAdaptor <Value, Parent> >
-pb_make_element (const Value &(Parent::*getter) () const, void (Parent::*setter) (Value), int tag, const PBElementList *children)
+pb_make_element (const Value &(Parent::*getter) () const, void (Parent::*setter) (Value), const std::string &name, int tag, const PBElementList *children)
 {
   return PBElement<Value, Parent, PBMemberAccRefReadAdaptor <Value, Parent>, PBMemberAccWriteAdaptor <Value, Parent> > (
           PBMemberAccRefReadAdaptor <Value, Parent> (getter),
-          PBMemberAccWriteAdaptor <Value, Parent> (setter), tag, children);
+          PBMemberAccWriteAdaptor <Value, Parent> (setter), name, tag, children);
 }
 
 /**
@@ -1411,11 +1421,11 @@ pb_make_element (const Value &(Parent::*getter) () const, void (Parent::*setter)
  */
 template <class Value, class Parent>
 PBElement<Value, Parent, PBMemberAccReadAdaptor <Value, Parent>, PBMemberAccRefWriteAdaptor <Value, Parent> >
-pb_make_element (Value (Parent::*getter) () const, void (Parent::*setter) (const Value &), int tag, const PBElementList *children)
+pb_make_element (Value (Parent::*getter) () const, void (Parent::*setter) (const Value &), const std::string &name, int tag, const PBElementList *children)
 {
   return PBElement<Value, Parent, PBMemberAccReadAdaptor <Value, Parent>, PBMemberAccRefWriteAdaptor <Value, Parent> > (
           PBMemberAccReadAdaptor <Value, Parent> (getter),
-          PBMemberAccRefWriteAdaptor <Value, Parent> (setter), tag, children);
+          PBMemberAccRefWriteAdaptor <Value, Parent> (setter), name, tag, children);
 }
 
 /**
@@ -1423,11 +1433,11 @@ pb_make_element (Value (Parent::*getter) () const, void (Parent::*setter) (const
  */
 template <class Value, class Parent>
 PBElement<Value, Parent, PBMemberAccReadAdaptor <Value, Parent>, PBMemberTransferWriteAdaptor <Value, Parent> >
-pb_make_element (Value (Parent::*getter) () const, void (Parent::*setter) (Value *), int tag, const PBElementList *children)
+pb_make_element (Value (Parent::*getter) () const, void (Parent::*setter) (Value *), const std::string &name, int tag, const PBElementList *children)
 {
   return PBElement<Value, Parent, PBMemberAccReadAdaptor <Value, Parent>, PBMemberTransferWriteAdaptor <Value, Parent> > (
           PBMemberAccReadAdaptor <Value, Parent> (getter),
-          PBMemberTransferWriteAdaptor <Value, Parent> (setter), tag, children);
+          PBMemberTransferWriteAdaptor <Value, Parent> (setter), name, tag, children);
 }
 
 /**
@@ -1435,11 +1445,11 @@ pb_make_element (Value (Parent::*getter) () const, void (Parent::*setter) (Value
  */
 template <class Value, class Parent>
 PBElement<Value, Parent, PBMemberAccReadAdaptor <Value, Parent>, PBMemberAccWriteAdaptor <Value, Parent> >
-pb_make_element (Value (Parent::*getter) () const, void (Parent::*setter) (Value), int tag, const PBElementList *children)
+pb_make_element (Value (Parent::*getter) () const, void (Parent::*setter) (Value), const std::string &name, int tag, const PBElementList *children)
 {
   return PBElement<Value, Parent, PBMemberAccReadAdaptor <Value, Parent>, PBMemberAccWriteAdaptor <Value, Parent> > (
           PBMemberAccReadAdaptor <Value, Parent> (getter),
-          PBMemberAccWriteAdaptor <Value, Parent> (setter), tag, children);
+          PBMemberAccWriteAdaptor <Value, Parent> (setter), name, tag, children);
 }
 
 /**
@@ -1447,11 +1457,11 @@ pb_make_element (Value (Parent::*getter) () const, void (Parent::*setter) (Value
  */
 template <class Value, class Parent>
 PBElement<Value, Parent, PBMemberReadAdaptor <Value, Parent>, PBMemberWriteAdaptor <Value, Parent> >
-pb_make_element (Value Parent::*member, int tag, const PBElementList *children)
+pb_make_element (Value Parent::*member, const std::string &name, int tag, const PBElementList *children)
 {
   return PBElement<Value, Parent, PBMemberReadAdaptor <Value, Parent>, PBMemberWriteAdaptor <Value, Parent> > (
           PBMemberReadAdaptor <Value, Parent> (member),
-          PBMemberWriteAdaptor <Value, Parent> (member), tag, children);
+          PBMemberWriteAdaptor <Value, Parent> (member), name, tag, children);
 }
 
 /**
@@ -1459,11 +1469,11 @@ pb_make_element (Value Parent::*member, int tag, const PBElementList *children)
  */
 template <class Value, class Iter, class Parent>
 PBElement<Value, Parent, PBMemberIterReadAdaptor <const Value &, Iter, Parent>, PBMemberAccRefWriteAdaptor <Value, Parent> >
-pb_make_element (Iter (Parent::*begin) () const, Iter (Parent::*end) () const, void (Parent::*setter) (const Value &), int tag, const PBElementList *children)
+pb_make_element (Iter (Parent::*begin) () const, Iter (Parent::*end) () const, void (Parent::*setter) (const Value &), const std::string &name, int tag, const PBElementList *children)
 {
   return PBElement<Value, Parent, PBMemberIterReadAdaptor <const Value &, Iter, Parent>, PBMemberAccRefWriteAdaptor <Value, Parent> > (
           PBMemberIterReadAdaptor <const Value &, Iter, Parent> (begin, end),
-          PBMemberAccRefWriteAdaptor <Value, Parent> (setter), tag, children);
+          PBMemberAccRefWriteAdaptor <Value, Parent> (setter), name, tag, children);
 }
 
 /**
@@ -1471,11 +1481,11 @@ pb_make_element (Iter (Parent::*begin) () const, Iter (Parent::*end) () const, v
  */
 template <class Value, class Iter, class Parent>
 PBElement<Value, Parent, PBMemberIterReadAdaptor <const Value &, Iter, Parent>, PBMemberTransferWriteAdaptor <Value, Parent> >
-pb_make_element (Iter (Parent::*begin) () const, Iter (Parent::*end) () const, void (Parent::*setter) (Value *), int tag, const PBElementList *children)
+pb_make_element (Iter (Parent::*begin) () const, Iter (Parent::*end) () const, void (Parent::*setter) (Value *), const std::string &name, int tag, const PBElementList *children)
 {
   return PBElement<Value, Parent, PBMemberIterReadAdaptor <const Value &, Iter, Parent>, PBMemberTransferWriteAdaptor <Value, Parent> > (
           PBMemberIterReadAdaptor <const Value &, Iter, Parent> (begin, end),
-          PBMemberTransferWriteAdaptor <Value, Parent> (setter), tag, children);
+          PBMemberTransferWriteAdaptor <Value, Parent> (setter), name, tag, children);
 }
 
 /**
@@ -1483,11 +1493,11 @@ pb_make_element (Iter (Parent::*begin) () const, Iter (Parent::*end) () const, v
  */
 template <class Value, class Parent>
 PBElement<Value, Parent, PBMemberDummyReadAdaptor <Value, Parent>, PBMemberAccRefWriteAdaptor <Value, Parent> >
-pb_make_element (void (Parent::*setter) (const Value &), int tag, const PBElementList &children)
+pb_make_element (void (Parent::*setter) (const Value &), const std::string &name, int tag, const PBElementList &children)
 {
   return PBElement<Value, Parent, PBMemberDummyReadAdaptor <Value, Parent>, PBMemberAccRefWriteAdaptor <Value, Parent> > (
           PBMemberDummyReadAdaptor <Value, Parent> (),
-          PBMemberAccRefWriteAdaptor <Value, Parent> (setter), tag, children);
+          PBMemberAccRefWriteAdaptor <Value, Parent> (setter), name, tag, children);
 }
 
 /**
@@ -1495,11 +1505,11 @@ pb_make_element (void (Parent::*setter) (const Value &), int tag, const PBElemen
  */
 template <class Value, class Parent>
 PBElement<Value, Parent, PBMemberDummyReadAdaptor <Value, Parent>, PBMemberTransferWriteAdaptor <Value, Parent> >
-pb_make_element (void (Parent::*setter) (Value *), int tag, const PBElementList &children)
+pb_make_element (void (Parent::*setter) (Value *), const std::string &name, int tag, const PBElementList &children)
 {
   return PBElement<Value, Parent, PBMemberDummyReadAdaptor <Value, Parent>, PBMemberTransferWriteAdaptor <Value, Parent> > (
           PBMemberDummyReadAdaptor <Value, Parent> (),
-          PBMemberTransferWriteAdaptor <Value, Parent> (setter), tag, children);
+          PBMemberTransferWriteAdaptor <Value, Parent> (setter), name, tag, children);
 }
 
 /**
@@ -1507,11 +1517,11 @@ pb_make_element (void (Parent::*setter) (Value *), int tag, const PBElementList 
  */
 template <class Value, class Parent>
 PBElement<Value, Parent, PBMemberAccRefReadAdaptor <Value, Parent>, PBMemberAccRefWriteAdaptor <Value, Parent> >
-pb_make_element (const Value &(Parent::*getter) () const, void (Parent::*setter) (const Value &), int tag, const PBElementList &children)
+pb_make_element (const Value &(Parent::*getter) () const, void (Parent::*setter) (const Value &), const std::string &name, int tag, const PBElementList &children)
 {
   return PBElement<Value, Parent, PBMemberAccRefReadAdaptor <Value, Parent>, PBMemberAccRefWriteAdaptor <Value, Parent> > (
           PBMemberAccRefReadAdaptor <Value, Parent> (getter),
-          PBMemberAccRefWriteAdaptor <Value, Parent> (setter), tag, children);
+          PBMemberAccRefWriteAdaptor <Value, Parent> (setter), name, tag, children);
 }
 
 /**
@@ -1519,11 +1529,11 @@ pb_make_element (const Value &(Parent::*getter) () const, void (Parent::*setter)
  */
 template <class Value, class Parent>
 PBElement<Value, Parent, PBMemberAccRefReadAdaptor <Value, Parent>, PBMemberTransferWriteAdaptor <Value, Parent> >
-pb_make_element (const Value &(Parent::*getter) () const, void (Parent::*setter) (Value *), int tag, const PBElementList &children)
+pb_make_element (const Value &(Parent::*getter) () const, void (Parent::*setter) (Value *), const std::string &name, int tag, const PBElementList &children)
 {
   return PBElement<Value, Parent, PBMemberAccRefReadAdaptor <Value, Parent>, PBMemberTransferWriteAdaptor <Value, Parent> > (
           PBMemberAccRefReadAdaptor <Value, Parent> (getter),
-          PBMemberTransferWriteAdaptor <Value, Parent> (setter), tag, children);
+          PBMemberTransferWriteAdaptor <Value, Parent> (setter), name, tag, children);
 }
 
 /**
@@ -1531,11 +1541,11 @@ pb_make_element (const Value &(Parent::*getter) () const, void (Parent::*setter)
  */
 template <class Value, class Parent>
 PBElement<Value, Parent, PBMemberAccRefReadAdaptor <Value, Parent>, PBMemberAccWriteAdaptor <Value, Parent> >
-pb_make_element (const Value &(Parent::*getter) () const, void (Parent::*setter) (Value), int tag, const PBElementList &children)
+pb_make_element (const Value &(Parent::*getter) () const, void (Parent::*setter) (Value), const std::string &name, int tag, const PBElementList &children)
 {
   return PBElement<Value, Parent, PBMemberAccRefReadAdaptor <Value, Parent>, PBMemberAccWriteAdaptor <Value, Parent> > (
           PBMemberAccRefReadAdaptor <Value, Parent> (getter),
-          PBMemberAccWriteAdaptor <Value, Parent> (setter), tag, children);
+          PBMemberAccWriteAdaptor <Value, Parent> (setter), name, tag, children);
 }
 
 /**
@@ -1543,11 +1553,11 @@ pb_make_element (const Value &(Parent::*getter) () const, void (Parent::*setter)
  */
 template <class Value, class Parent>
 PBElement<Value, Parent, PBMemberAccReadAdaptor <Value, Parent>, PBMemberAccRefWriteAdaptor <Value, Parent> >
-pb_make_element (Value (Parent::*getter) () const, void (Parent::*setter) (const Value &), int tag, const PBElementList &children)
+pb_make_element (Value (Parent::*getter) () const, void (Parent::*setter) (const Value &), const std::string &name, int tag, const PBElementList &children)
 {
   return PBElement<Value, Parent, PBMemberAccReadAdaptor <Value, Parent>, PBMemberAccRefWriteAdaptor <Value, Parent> > (
           PBMemberAccReadAdaptor <Value, Parent> (getter),
-          PBMemberAccRefWriteAdaptor <Value, Parent> (setter), tag, children);
+          PBMemberAccRefWriteAdaptor <Value, Parent> (setter), name, tag, children);
 }
 
 /**
@@ -1555,11 +1565,11 @@ pb_make_element (Value (Parent::*getter) () const, void (Parent::*setter) (const
  */
 template <class Value, class Parent>
 PBElement<Value, Parent, PBMemberAccReadAdaptor <Value, Parent>, PBMemberTransferWriteAdaptor <Value, Parent> >
-pb_make_element (Value (Parent::*getter) () const, void (Parent::*setter) (Value *), int tag, const PBElementList &children)
+pb_make_element (Value (Parent::*getter) () const, void (Parent::*setter) (Value *), const std::string &name, int tag, const PBElementList &children)
 {
   return PBElement<Value, Parent, PBMemberAccReadAdaptor <Value, Parent>, PBMemberTransferWriteAdaptor <Value, Parent> > (
           PBMemberAccReadAdaptor <Value, Parent> (getter),
-          PBMemberTransferWriteAdaptor <Value, Parent> (setter), tag, children);
+          PBMemberTransferWriteAdaptor <Value, Parent> (setter), name, tag, children);
 }
 
 /**
@@ -1567,11 +1577,11 @@ pb_make_element (Value (Parent::*getter) () const, void (Parent::*setter) (Value
  */
 template <class Value, class Parent>
 PBElement<Value, Parent, PBMemberAccReadAdaptor <Value, Parent>, PBMemberAccWriteAdaptor <Value, Parent> >
-pb_make_element (Value (Parent::*getter) () const, void (Parent::*setter) (Value), int tag, const PBElementList &children)
+pb_make_element (Value (Parent::*getter) () const, void (Parent::*setter) (Value), const std::string &name, int tag, const PBElementList &children)
 {
   return PBElement<Value, Parent, PBMemberAccReadAdaptor <Value, Parent>, PBMemberAccWriteAdaptor <Value, Parent> > (
           PBMemberAccReadAdaptor <Value, Parent> (getter),
-          PBMemberAccWriteAdaptor <Value, Parent> (setter), tag, children);
+          PBMemberAccWriteAdaptor <Value, Parent> (setter), name, tag, children);
 }
 
 /**
@@ -1579,11 +1589,11 @@ pb_make_element (Value (Parent::*getter) () const, void (Parent::*setter) (Value
  */
 template <class Value, class Parent>
 PBElement<Value, Parent, PBMemberReadAdaptor <Value, Parent>, PBMemberWriteAdaptor <Value, Parent> >
-pb_make_element (Value Parent::*member, int tag, const PBElementList &children)
+pb_make_element (Value Parent::*member, const std::string &name, int tag, const PBElementList &children)
 {
   return PBElement<Value, Parent, PBMemberReadAdaptor <Value, Parent>, PBMemberWriteAdaptor <Value, Parent> > (
           PBMemberReadAdaptor <Value, Parent> (member),
-          PBMemberWriteAdaptor <Value, Parent> (member), tag, children);
+          PBMemberWriteAdaptor <Value, Parent> (member), name, tag, children);
 }
 
 /**
@@ -1591,11 +1601,11 @@ pb_make_element (Value Parent::*member, int tag, const PBElementList &children)
  */
 template <class Value, class Iter, class Parent>
 PBElement<Value, Parent, PBMemberIterReadAdaptor <const Value &, Iter, Parent>, PBMemberAccRefWriteAdaptor <Value, Parent> >
-pb_make_element (Iter (Parent::*begin) () const, Iter (Parent::*end) () const, void (Parent::*setter) (const Value &), int tag, const PBElementList &children)
+pb_make_element (Iter (Parent::*begin) () const, Iter (Parent::*end) () const, void (Parent::*setter) (const Value &), const std::string &name, int tag, const PBElementList &children)
 {
   return PBElement<Value, Parent, PBMemberIterReadAdaptor <const Value &, Iter, Parent>, PBMemberAccRefWriteAdaptor <Value, Parent> > (
           PBMemberIterReadAdaptor <const Value &, Iter, Parent> (begin, end),
-          PBMemberAccRefWriteAdaptor <Value, Parent> (setter), tag, children);
+          PBMemberAccRefWriteAdaptor <Value, Parent> (setter), name, tag, children);
 }
 
 /**
@@ -1603,65 +1613,65 @@ pb_make_element (Iter (Parent::*begin) () const, Iter (Parent::*end) () const, v
  */
 template <class Value, class Iter, class Parent>
 PBElement<Value, Parent, PBMemberIterReadAdaptor <const Value &, Iter, Parent>, PBMemberTransferWriteAdaptor <Value, Parent> >
-pb_make_element (Iter (Parent::*begin) () const, Iter (Parent::*end) () const, void (Parent::*setter) (Value *), int tag, const PBElementList &children)
+pb_make_element (Iter (Parent::*begin) () const, Iter (Parent::*end) () const, void (Parent::*setter) (Value *), const std::string &name, int tag, const PBElementList &children)
 {
   return PBElement<Value, Parent, PBMemberIterReadAdaptor <const Value &, Iter, Parent>, PBMemberTransferWriteAdaptor <Value, Parent> > (
           PBMemberIterReadAdaptor <const Value &, Iter, Parent> (begin, end),
-          PBMemberTransferWriteAdaptor <Value, Parent> (setter), tag, children);
+          PBMemberTransferWriteAdaptor <Value, Parent> (setter), name, tag, children);
 }
 
 template <class Value, class Parent>
 PBElementWithParentRef<Value, Parent, PBMemberAccRefReadAdaptor <Value, Parent>, PBMemberAccRefWriteAdaptor <Value, Parent> >
-pb_make_element_with_parent_ref (const Value &(Parent::*getter) () const, void (Parent::*setter) (const Value &), int tag, const PBElementList &children)
+pb_make_element_with_parent_ref (const Value &(Parent::*getter) () const, void (Parent::*setter) (const Value &), const std::string &name, int tag, const PBElementList &children)
 {
   return PBElementWithParentRef<Value, Parent, PBMemberAccRefReadAdaptor <Value, Parent>, PBMemberAccRefWriteAdaptor <Value, Parent> > (
           PBMemberAccRefReadAdaptor <Value, Parent> (getter),
-          PBMemberAccRefWriteAdaptor <Value, Parent> (setter), tag, children);
+          PBMemberAccRefWriteAdaptor <Value, Parent> (setter), name, tag, children);
 }
 
 template <class Value, class Parent>
 PBElementWithParentRef<Value, Parent, PBMemberAccRefReadAdaptor <Value, Parent>, PBMemberAccRefWriteAdaptor <Value, Parent> >
-pb_make_element_with_parent_ref (const Value &(Parent::*getter) () const, void (Parent::*setter) (const Value &), int tag, const PBElementList *children)
+pb_make_element_with_parent_ref (const Value &(Parent::*getter) () const, void (Parent::*setter) (const Value &), const std::string &name, int tag, const PBElementList *children)
 {
   return PBElementWithParentRef<Value, Parent, PBMemberAccRefReadAdaptor <Value, Parent>, PBMemberAccRefWriteAdaptor <Value, Parent> > (
           PBMemberAccRefReadAdaptor <Value, Parent> (getter),
-          PBMemberAccRefWriteAdaptor <Value, Parent> (setter), tag, children);
+          PBMemberAccRefWriteAdaptor <Value, Parent> (setter), name, tag, children);
 }
 
 template <class Value, class Parent>
 PBElementWithParentRef<Value, Parent, PBMemberAccRefReadAdaptor <Value, Parent>, PBMemberTransferWriteAdaptor <Value, Parent> >
-pb_make_element_with_parent_ref (const Value &(Parent::*getter) () const, void (Parent::*setter) (Value *), int tag, const PBElementList &children)
+pb_make_element_with_parent_ref (const Value &(Parent::*getter) () const, void (Parent::*setter) (Value *), const std::string &name, int tag, const PBElementList &children)
 {
   return PBElementWithParentRef<Value, Parent, PBMemberAccRefReadAdaptor <Value, Parent>, PBMemberTransferWriteAdaptor <Value, Parent> > (
           PBMemberAccRefReadAdaptor <Value, Parent> (getter),
-          PBMemberTransferWriteAdaptor <Value, Parent> (setter), tag, children);
+          PBMemberTransferWriteAdaptor <Value, Parent> (setter), name, tag, children);
 }
 
 template <class Value, class Parent>
 PBElementWithParentRef<Value, Parent, PBMemberAccRefReadAdaptor <Value, Parent>, PBMemberTransferWriteAdaptor <Value, Parent> >
-pb_make_element_with_parent_ref (const Value &(Parent::*getter) () const, void (Parent::*setter) (Value *), int tag, const PBElementList *children)
+pb_make_element_with_parent_ref (const Value &(Parent::*getter) () const, void (Parent::*setter) (Value *), const std::string &name, int tag, const PBElementList *children)
 {
   return PBElementWithParentRef<Value, Parent, PBMemberAccRefReadAdaptor <Value, Parent>, PBMemberTransferWriteAdaptor <Value, Parent> > (
           PBMemberAccRefReadAdaptor <Value, Parent> (getter),
-          PBMemberTransferWriteAdaptor <Value, Parent> (setter), tag, children);
+          PBMemberTransferWriteAdaptor <Value, Parent> (setter), name, tag, children);
 }
 
 template <class Value, class Iter, class Parent>
 PBElementWithParentRef<Value, Parent, PBMemberIterReadAdaptor <const Value &, Iter, Parent>, PBMemberAccRefWriteAdaptor <Value, Parent> >
-pb_make_element_with_parent_ref (Iter (Parent::*begin) () const, Iter (Parent::*end) () const, void (Parent::*setter) (const Value &), int tag, const PBElementList &children)
+pb_make_element_with_parent_ref (Iter (Parent::*begin) () const, Iter (Parent::*end) () const, void (Parent::*setter) (const Value &), const std::string &name, int tag, const PBElementList &children)
 {
   return PBElementWithParentRef<Value, Parent, PBMemberIterReadAdaptor <const Value &, Iter, Parent>, PBMemberAccRefWriteAdaptor <Value, Parent> > (
           PBMemberIterReadAdaptor <const Value &, Iter, Parent> (begin, end),
-          PBMemberAccRefWriteAdaptor <Value, Parent> (setter), tag, children);
+          PBMemberAccRefWriteAdaptor <Value, Parent> (setter), name, tag, children);
 }
 
 template <class Value, class Iter, class Parent>
 PBElementWithParentRef<Value, Parent, PBMemberIterReadAdaptor <const Value &, Iter, Parent>, PBMemberTransferWriteAdaptor <Value, Parent> >
-pb_make_element_with_parent_ref (Iter (Parent::*begin) () const, Iter (Parent::*end) () const, void (Parent::*setter) (Value *), int tag, const PBElementList &children)
+pb_make_element_with_parent_ref (Iter (Parent::*begin) () const, Iter (Parent::*end) () const, void (Parent::*setter) (Value *), const std::string &name, int tag, const PBElementList &children)
 {
   return PBElementWithParentRef<Value, Parent, PBMemberIterReadAdaptor <const Value &, Iter, Parent>, PBMemberTransferWriteAdaptor <Value, Parent> > (
           PBMemberIterReadAdaptor <const Value &, Iter, Parent> (begin, end),
-          PBMemberTransferWriteAdaptor <Value, Parent> (setter), tag, children);
+          PBMemberTransferWriteAdaptor <Value, Parent> (setter), name, tag, children);
 }
 
 /**
@@ -1689,11 +1699,11 @@ struct PBStdConverter
  */
 template <class Parent>
 PBMember<std::string, Parent, PBMemberDummyReadAdaptor <std::string, Parent>, PBMemberDummyWriteAdaptor <std::string, Parent>, PBStdConverter <std::string> >
-pb_make_member (int tag)
+pb_make_member (const std::string &name, int tag)
 {
   return PBMember<std::string, Parent, PBMemberDummyReadAdaptor <std::string, Parent>, PBMemberDummyWriteAdaptor <std::string, Parent>, PBStdConverter <std::string> > (
           PBMemberDummyReadAdaptor <std::string, Parent> (),
-          PBMemberDummyWriteAdaptor <std::string, Parent> (), tag);
+          PBMemberDummyWriteAdaptor <std::string, Parent> (), name, tag);
 }
 
 /**
@@ -1701,11 +1711,11 @@ pb_make_member (int tag)
  */
 template <class Value, class Parent>
 PBMember<Value, Parent, PBMemberReadAdaptor <Value, Parent>, PBMemberWriteAdaptor <Value, Parent>, PBStdConverter <Value> >
-pb_make_member (Value Parent::*member, int tag)
+pb_make_member (Value Parent::*member, const std::string &name, int tag)
 {
   return PBMember<Value, Parent, PBMemberReadAdaptor <Value, Parent>, PBMemberWriteAdaptor <Value, Parent>, PBStdConverter <Value> > (
           PBMemberReadAdaptor <Value, Parent> (member),
-          PBMemberWriteAdaptor <Value, Parent> (member), tag);
+          PBMemberWriteAdaptor <Value, Parent> (member), name, tag);
 }
 
 /**
@@ -1713,11 +1723,11 @@ pb_make_member (Value Parent::*member, int tag)
  */
 template <class Value, class Parent>
 PBMember<Value, Parent, PBMemberDummyReadAdaptor <Value, Parent>, PBMemberAccRefWriteAdaptor <Value, Parent>, PBStdConverter <Value> >
-pb_make_member (void (Parent::*setter) (const Value &), int tag)
+pb_make_member (void (Parent::*setter) (const Value &), const std::string &name, int tag)
 {
   return PBMember<Value, Parent, PBMemberDummyReadAdaptor <Value, Parent>, PBMemberAccRefWriteAdaptor <Value, Parent>, PBStdConverter <Value> > (
           PBMemberDummyReadAdaptor <Value, Parent> (),
-          PBMemberAccRefWriteAdaptor <Value, Parent> (setter), tag);
+          PBMemberAccRefWriteAdaptor <Value, Parent> (setter), name, tag);
 }
 
 /**
@@ -1725,11 +1735,11 @@ pb_make_member (void (Parent::*setter) (const Value &), int tag)
  */
 template <class Value, class Parent>
 PBMember<Value, Parent, PBMemberDummyReadAdaptor <Value, Parent>, PBMemberAccWriteAdaptor <Value, Parent>, PBStdConverter <Value> >
-pb_make_member (void (Parent::*setter) (Value), int tag)
+pb_make_member (void (Parent::*setter) (Value), const std::string &name, int tag)
 {
   return PBMember<Value, Parent, PBMemberDummyReadAdaptor <Value, Parent>, PBMemberAccWriteAdaptor <Value, Parent>, PBStdConverter <Value> > (
           PBMemberDummyReadAdaptor <Value, Parent> (),
-          PBMemberAccWriteAdaptor <Value, Parent> (setter), tag);
+          PBMemberAccWriteAdaptor <Value, Parent> (setter), name, tag);
 }
 
 /**
@@ -1737,11 +1747,11 @@ pb_make_member (void (Parent::*setter) (Value), int tag)
  */
 template <class Value, class Parent>
 PBMember<Value, Parent, PBMemberAccRefReadAdaptor <Value, Parent>, PBMemberAccRefWriteAdaptor <Value, Parent>, PBStdConverter <Value> >
-pb_make_member (const Value &(Parent::*getter) () const, void (Parent::*setter) (const Value &), int tag)
+pb_make_member (const Value &(Parent::*getter) () const, void (Parent::*setter) (const Value &), const std::string &name, int tag)
 {
   return PBMember<Value, Parent, PBMemberAccRefReadAdaptor <Value, Parent>, PBMemberAccRefWriteAdaptor <Value, Parent>, PBStdConverter <Value> > (
           PBMemberAccRefReadAdaptor <Value, Parent> (getter),
-          PBMemberAccRefWriteAdaptor <Value, Parent> (setter), tag);
+          PBMemberAccRefWriteAdaptor <Value, Parent> (setter), name, tag);
 }
 
 /**
@@ -1749,11 +1759,11 @@ pb_make_member (const Value &(Parent::*getter) () const, void (Parent::*setter) 
  */
 template <class Value, class Parent>
 PBMember<Value, Parent, PBMemberAccReadAdaptor <Value, Parent>, PBMemberAccWriteAdaptor <Value, Parent>, PBStdConverter <Value> >
-pb_make_member (Value (Parent::*getter) () const, void (Parent::*setter) (Value), int tag)
+pb_make_member (Value (Parent::*getter) () const, void (Parent::*setter) (Value), const std::string &name, int tag)
 {
   return PBMember<Value, Parent, PBMemberAccReadAdaptor <Value, Parent>, PBMemberAccWriteAdaptor <Value, Parent>, PBStdConverter <Value> > (
           PBMemberAccReadAdaptor <Value, Parent> (getter),
-          PBMemberAccWriteAdaptor <Value, Parent> (setter), tag);
+          PBMemberAccWriteAdaptor <Value, Parent> (setter), name, tag);
 }
 
 /**
@@ -1761,11 +1771,11 @@ pb_make_member (Value (Parent::*getter) () const, void (Parent::*setter) (Value)
  */
 template <class Value, class Parent>
 PBMember<Value, Parent, PBMemberAccRefReadAdaptor <Value, Parent>, PBMemberAccWriteAdaptor <Value, Parent>, PBStdConverter <Value> >
-pb_make_member (const Value & (Parent::*getter) () const, void (Parent::*setter) (Value), int tag)
+pb_make_member (const Value & (Parent::*getter) () const, void (Parent::*setter) (Value), const std::string &name, int tag)
 {
   return PBMember<Value, Parent, PBMemberAccRefReadAdaptor <Value, Parent>, PBMemberAccWriteAdaptor <Value, Parent>, PBStdConverter <Value> > (
           PBMemberAccRefReadAdaptor <Value, Parent> (getter),
-          PBMemberAccWriteAdaptor <Value, Parent> (setter), tag);
+          PBMemberAccWriteAdaptor <Value, Parent> (setter), name, tag);
 }
 
 /**
@@ -1773,11 +1783,11 @@ pb_make_member (const Value & (Parent::*getter) () const, void (Parent::*setter)
  */
 template <class Value, class Parent>
 PBMember<Value, Parent, PBMemberAccReadAdaptor <Value, Parent>, PBMemberAccRefWriteAdaptor <Value, Parent>, PBStdConverter <Value> >
-pb_make_member (Value (Parent::*getter) () const, void (Parent::*setter) (const Value &), int tag)
+pb_make_member (Value (Parent::*getter) () const, void (Parent::*setter) (const Value &), const std::string &name, int tag)
 {
   return PBMember<Value, Parent, PBMemberAccReadAdaptor <Value, Parent>, PBMemberAccRefWriteAdaptor <Value, Parent>, PBStdConverter <Value> > (
           PBMemberAccReadAdaptor <Value, Parent> (getter),
-          PBMemberAccRefWriteAdaptor <Value, Parent> (setter), tag);
+          PBMemberAccRefWriteAdaptor <Value, Parent> (setter), name, tag);
 }
 
 /**
@@ -1785,11 +1795,11 @@ pb_make_member (Value (Parent::*getter) () const, void (Parent::*setter) (const 
  */
 template <class Value, class Iter, class Parent>
 PBMember<Value, Parent, PBMemberIterReadAdaptor <const Value &, Iter, Parent>, PBMemberAccRefWriteAdaptor <Value, Parent>, PBStdConverter <Value> >
-pb_make_member (Iter (Parent::*begin) () const, Iter (Parent::*end) () const, void (Parent::*setter) (const Value &), int tag)
+pb_make_member (Iter (Parent::*begin) () const, Iter (Parent::*end) () const, void (Parent::*setter) (const Value &), const std::string &name, int tag)
 {
   return PBMember<Value, Parent, PBMemberIterReadAdaptor <const Value &, Iter, Parent>, PBMemberAccRefWriteAdaptor <Value, Parent>, PBStdConverter <Value> > (
           PBMemberIterReadAdaptor <const Value &, Iter, Parent> (begin, end),
-          PBMemberAccRefWriteAdaptor <Value, Parent> (setter), tag);
+          PBMemberAccRefWriteAdaptor <Value, Parent> (setter), name, tag);
 }
 
 /**
@@ -1797,11 +1807,11 @@ pb_make_member (Iter (Parent::*begin) () const, Iter (Parent::*end) () const, vo
  */
 template <class Value, class Parent, class Converter>
 PBMember<Value, Parent, PBMemberReadAdaptor <Value, Parent>, PBMemberWriteAdaptor <Value, Parent>, Converter>
-pb_make_member (Value Parent::*member, int tag, Converter conv)
+pb_make_member (Value Parent::*member, const std::string &name, int tag, Converter conv)
 {
   return PBMember<Value, Parent, PBMemberReadAdaptor <Value, Parent>, PBMemberWriteAdaptor <Value, Parent>, Converter> (
           PBMemberReadAdaptor <Value, Parent> (member),
-          PBMemberWriteAdaptor <Value, Parent> (member), tag, conv);
+          PBMemberWriteAdaptor <Value, Parent> (member), name, tag, conv);
 }
 
 /**
@@ -1809,11 +1819,11 @@ pb_make_member (Value Parent::*member, int tag, Converter conv)
  */
 template <class Value, class Parent, class Converter>
 PBMember<Value, Parent, PBMemberDummyReadAdaptor <Value, Parent>, PBMemberAccRefWriteAdaptor <Value, Parent>, Converter>
-pb_make_member (void (Parent::*setter) (const Value &), int tag, Converter conv)
+pb_make_member (void (Parent::*setter) (const Value &), const std::string &name, int tag, Converter conv)
 {
   return PBMember<Value, Parent, PBMemberDummyReadAdaptor <Value, Parent>, PBMemberAccRefWriteAdaptor <Value, Parent>, Converter> (
           PBMemberDummyReadAdaptor <Value, Parent> (),
-          PBMemberAccRefWriteAdaptor <Value, Parent> (setter), tag, conv);
+          PBMemberAccRefWriteAdaptor <Value, Parent> (setter), name, tag, conv);
 }
 
 /**
@@ -1821,11 +1831,11 @@ pb_make_member (void (Parent::*setter) (const Value &), int tag, Converter conv)
  */
 template <class Value, class Parent, class Converter>
 PBMember<Value, Parent, PBMemberAccReadAdaptor <Value, Parent>, PBMemberDummyWriteAdaptor <Value, Parent>, Converter>
-pb_make_member (void (Parent::*setter) (Value), int tag, Converter conv)
+pb_make_member (void (Parent::*setter) (Value), const std::string &name, int tag, Converter conv)
 {
   return PBMember<Value, Parent, PBMemberAccReadAdaptor <Value, Parent>, PBMemberDummyWriteAdaptor <Value, Parent>, Converter> (
           PBMemberAccReadAdaptor <Value, Parent> (setter),
-          PBMemberDummyWriteAdaptor <Value, Parent> (), tag, conv);
+          PBMemberDummyWriteAdaptor <Value, Parent> (), name, tag, conv);
 }
 
 /**
@@ -1833,11 +1843,11 @@ pb_make_member (void (Parent::*setter) (Value), int tag, Converter conv)
  */
 template <class Value, class Parent, class Converter>
 PBMember<Value, Parent, PBMemberAccRefReadAdaptor <Value, Parent>, PBMemberAccRefWriteAdaptor <Value, Parent>, Converter>
-pb_make_member (const Value &(Parent::*getter) () const, void (Parent::*setter) (const Value &), int tag, Converter conv)
+pb_make_member (const Value &(Parent::*getter) () const, void (Parent::*setter) (const Value &), const std::string &name, int tag, Converter conv)
 {
   return PBMember<Value, Parent, PBMemberAccRefReadAdaptor <Value, Parent>, PBMemberAccRefWriteAdaptor <Value, Parent>, Converter> (
           PBMemberAccRefReadAdaptor <Value, Parent> (getter),
-          PBMemberAccRefWriteAdaptor <Value, Parent> (setter), tag, conv);
+          PBMemberAccRefWriteAdaptor <Value, Parent> (setter), name, tag, conv);
 }
 
 /**
@@ -1845,11 +1855,11 @@ pb_make_member (const Value &(Parent::*getter) () const, void (Parent::*setter) 
  */
 template <class Value, class Parent, class Converter>
 PBMember<Value, Parent, PBMemberAccReadAdaptor <Value, Parent>, PBMemberAccWriteAdaptor <Value, Parent>, Converter>
-pb_make_member (Value (Parent::*getter) () const, void (Parent::*setter) (Value), int tag, Converter conv)
+pb_make_member (Value (Parent::*getter) () const, void (Parent::*setter) (Value), const std::string &name, int tag, Converter conv)
 {
   return PBMember<Value, Parent, PBMemberAccReadAdaptor <Value, Parent>, PBMemberAccWriteAdaptor <Value, Parent>, Converter> (
           PBMemberAccReadAdaptor <Value, Parent> (getter),
-          PBMemberAccWriteAdaptor <Value, Parent> (setter), tag, conv);
+          PBMemberAccWriteAdaptor <Value, Parent> (setter), name, tag, conv);
 }
 
 /**
@@ -1857,11 +1867,11 @@ pb_make_member (Value (Parent::*getter) () const, void (Parent::*setter) (Value)
  */
 template <class Value, class Iter, class Parent, class Converter>
 PBMember<Value, Parent, PBMemberIterReadAdaptor <const Value &, Iter, Parent>, PBMemberAccRefWriteAdaptor <Value, Parent>, Converter>
-pb_make_member (Iter (Parent::*begin) () const, Iter (Parent::*end) () const, void (Parent::*setter) (const Value &), int tag, Converter conv)
+pb_make_member (Iter (Parent::*begin) () const, Iter (Parent::*end) () const, void (Parent::*setter) (const Value &), const std::string &name, int tag, Converter conv)
 {
   return PBMember<Value, Parent, PBMemberIterReadAdaptor <const Value &, Iter, Parent>, PBMemberAccRefWriteAdaptor <Value, Parent>, Converter> (
           PBMemberIterReadAdaptor <const Value &, Iter, Parent> (begin, end),
-          PBMemberAccRefWriteAdaptor <Value, Parent> (setter), tag, conv);
+          PBMemberAccRefWriteAdaptor <Value, Parent> (setter), name, tag, conv);
 }
 
 }

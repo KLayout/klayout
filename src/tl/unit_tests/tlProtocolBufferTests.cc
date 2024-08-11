@@ -206,21 +206,18 @@ struct Root {
 };
 
 static tl::PBElementList child_struct =
-    tl::pb_make_member (&Child::txt, 1) +
-    tl::pb_make_member (&Child::d, 2) +
-    tl::pb_make_element (&Child::begin_children, &Child::end_children, &Child::add_child, 3, &child_struct);
+    tl::pb_make_member (&Child::txt, "txt", 1) +
+    tl::pb_make_member (&Child::d, "d", 2) +
+    tl::pb_make_element (&Child::begin_children, &Child::end_children, &Child::add_child, "children", 3, &child_struct);
 
 static tl::PBStruct<Root> structure ("pbtest-struct", 88888888,
-  tl::pb_make_member (&Root::begin_subs, &Root::end_subs, &Root::add_sub, 1) +
-  tl::pb_make_member (&Root::begin_isubs, &Root::end_isubs, &Root::add_isub, 2) +
-  tl::pb_make_element (&Root::begin_children, &Root::end_children, &Root::add_child, 3, &child_struct) +
-  tl::pb_make_element (&Root::get_child, &Root::set_child, 4,
-    tl::pb_make_member (&Child::txt, 1) +
-    tl::pb_make_member (&Child::d, 2)
-  ) +
-  tl::pb_make_member (&Root::m, 5) +
-  tl::pb_make_member (&Root::get_mi, &Root::set_mi, 6) +
-  tl::pb_make_member (&Root::b, 7)
+  tl::pb_make_member (&Root::begin_subs, &Root::end_subs, &Root::add_sub, "sub", 1) +
+  tl::pb_make_member (&Root::begin_isubs, &Root::end_isubs, &Root::add_isub, "isub", 2) +
+  tl::pb_make_element (&Root::begin_children, &Root::end_children, &Root::add_child, "childredn", 3, &child_struct) +
+  tl::pb_make_element (&Root::get_child, &Root::set_child, "child", 4, &child_struct) +
+  tl::pb_make_member (&Root::m, "m", 5) +
+  tl::pb_make_member (&Root::get_mi, &Root::set_mi, "mi", 6) +
+  tl::pb_make_member (&Root::b, "b", 7)
 );
 
 static void build_struct (Root &root)
@@ -410,7 +407,7 @@ struct TestClassEnumConverter
 };
 
 tl::PBStruct<TestClass> tc_structure ("pbtest-tc", 1,
-  tl::pb_make_member (&TestClass::e, 2, TestClassEnumConverter ())
+  tl::pb_make_member (&TestClass::e, "e", 2, TestClassEnumConverter ())
 );
 
 TEST (101_Converter)

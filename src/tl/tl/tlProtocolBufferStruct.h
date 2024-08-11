@@ -520,7 +520,7 @@ public:
   virtual void parse (PBParser *, tl::ProtocolBufferReaderBase &) const = 0;
   virtual void finish (const PBElementBase *parent, PBReaderState &objs) const = 0;
 
-  virtual void write (const PBElementBase *, tl::ProtocolBufferWriter &, PBWriterState &) const { }
+  virtual void write (const PBElementBase *, tl::ProtocolBufferWriterBase &, PBWriterState &) const { }
 
   int tag () const
   {
@@ -609,7 +609,7 @@ public:
     reader.close ();
   }
 
-  virtual void write (const PBElementBase * /*parent*/, tl::ProtocolBufferWriter &writer, PBWriterState &objs) const
+  virtual void write (const PBElementBase * /*parent*/, tl::ProtocolBufferWriterBase &writer, PBWriterState &objs) const
   {
     PBObjTag<Parent> parent_tag;
 
@@ -632,7 +632,7 @@ private:
   Write m_w;
 
   //  this write helper is used if the reader delivers an object by value
-  void write_obj (Obj obj, int tag, tl::ProtocolBufferWriter &writer, tl::pass_by_value_tag, PBWriterState &objs) const
+  void write_obj (Obj obj, int tag, tl::ProtocolBufferWriterBase &writer, tl::pass_by_value_tag, PBWriterState &objs) const
   {
     PBObjTag<Obj> self_tag;
 
@@ -650,7 +650,7 @@ private:
     }
   }
 
-  void write_obj (const Obj &obj, int tag, tl::ProtocolBufferWriter &writer, tl::pass_by_ref_tag, PBWriterState &objs) const
+  void write_obj (const Obj &obj, int tag, tl::ProtocolBufferWriterBase &writer, tl::pass_by_ref_tag, PBWriterState &objs) const
   {
     PBObjTag<Obj> self_tag;
 
@@ -781,7 +781,7 @@ public:
     value_obj.pop (tag);
   }
 
-  virtual void write (const PBElementBase * /*parent*/, tl::ProtocolBufferWriter &writer, PBWriterState &objs) const
+  virtual void write (const PBElementBase * /*parent*/, tl::ProtocolBufferWriterBase &writer, PBWriterState &objs) const
   {
     PBObjTag<Parent> parent_tag;
     Read r (m_r);
@@ -798,68 +798,68 @@ private:
   Converter m_c;
 
   //  write incarnations
-  void write (tl::ProtocolBufferWriter &writer, int tag, float v) const
+  void write (tl::ProtocolBufferWriterBase &writer, int tag, float v) const
   {
     writer.write (tag, v);
   }
 
-  void write (tl::ProtocolBufferWriter &writer, int tag, double v) const
+  void write (tl::ProtocolBufferWriterBase &writer, int tag, double v) const
   {
     writer.write (tag, v);
   }
 
-  void write (tl::ProtocolBufferWriter &writer, int tag, uint8_t v) const
+  void write (tl::ProtocolBufferWriterBase &writer, int tag, uint8_t v) const
   {
     writer.write (tag, (uint32_t) v);
   }
 
-  void write (tl::ProtocolBufferWriter &writer, int tag, int8_t v) const
+  void write (tl::ProtocolBufferWriterBase &writer, int tag, int8_t v) const
   {
     writer.write (tag, (int32_t) v);
   }
 
-  void write (tl::ProtocolBufferWriter &writer, int tag, uint16_t v) const
+  void write (tl::ProtocolBufferWriterBase &writer, int tag, uint16_t v) const
   {
     writer.write (tag, (uint32_t) v);
   }
 
-  void write (tl::ProtocolBufferWriter &writer, int tag, int16_t v) const
+  void write (tl::ProtocolBufferWriterBase &writer, int tag, int16_t v) const
   {
     writer.write (tag, (int32_t) v);
   }
 
-  void write (tl::ProtocolBufferWriter &writer, int tag, uint32_t v) const
+  void write (tl::ProtocolBufferWriterBase &writer, int tag, uint32_t v) const
   {
     writer.write (tag, v);
   }
 
-  void write (tl::ProtocolBufferWriter &writer, int tag, int32_t v) const
+  void write (tl::ProtocolBufferWriterBase &writer, int tag, int32_t v) const
   {
     writer.write (tag, v);
   }
 
-  void write (tl::ProtocolBufferWriter &writer, int tag, uint64_t v) const
+  void write (tl::ProtocolBufferWriterBase &writer, int tag, uint64_t v) const
   {
     writer.write (tag, v);
   }
 
-  void write (tl::ProtocolBufferWriter &writer, int tag, int64_t v) const
+  void write (tl::ProtocolBufferWriterBase &writer, int tag, int64_t v) const
   {
     writer.write (tag, v);
   }
 
-  void write (tl::ProtocolBufferWriter &writer, int tag, bool v) const
+  void write (tl::ProtocolBufferWriterBase &writer, int tag, bool v) const
   {
     writer.write (tag, v);
   }
 
-  void write (tl::ProtocolBufferWriter &writer, int tag, const std::string &v) const
+  void write (tl::ProtocolBufferWriterBase &writer, int tag, const std::string &v) const
   {
     writer.write (tag, v);
   }
 
   template <class T>
-  void write (tl::ProtocolBufferWriter &writer, int tag, const T &v) const
+  void write (tl::ProtocolBufferWriterBase &writer, int tag, const T &v) const
   {
     writer.write (tag, m_c.to_string (v));
   }
@@ -982,7 +982,7 @@ public:
     return new PBStruct<Obj> (*this);
   }
 
-  void write (tl::ProtocolBufferWriter &writer, const Obj &root) const
+  void write (tl::ProtocolBufferWriterBase &writer, const Obj &root) const
   {
     PBWriterState writer_state;
     writer_state.push (& root);
@@ -1006,7 +1006,7 @@ public:
   }
 
 private:
-  virtual void write (const PBElementBase*, tl::ProtocolBufferWriter &, PBWriterState &) const
+  virtual void write (const PBElementBase*, tl::ProtocolBufferWriterBase &, PBWriterState &) const
   {
     // disable base class implementation
   }

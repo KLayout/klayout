@@ -319,45 +319,52 @@ public:
   /**
    *  @brief Constructor
    */
-  ProtocolBufferWriterBase ()
-  {
-    //  .. nothing yet ..
-  }
+  ProtocolBufferWriterBase ();
 
   /**
    *  @brief Destructor
    */
-  virtual ~ProtocolBufferWriterBase ()
-  {
-    //  .. nothing yet ..
-  }
+  virtual ~ProtocolBufferWriterBase ();
 
   /**
-   *  @brief Writes a scalar tag with the given value
+   *  @brief Writes a scalar element with the given value and tag
    */
-  virtual void write (int tag, float v) = 0;
-  virtual void write (int tag, double v) = 0;
-  virtual void write (int tag, uint32_t v, bool fixed = false) = 0;
-  virtual void write (int tag, int32_t v, bool fixed = false) = 0;
-  virtual void write (int tag, uint64_t v, bool fixed = false) = 0;
-  virtual void write (int tag, int64_t v, bool fixed = false) = 0;
-  virtual void write (int tag, bool b) = 0;
-  virtual void write (int tag, const std::string &s) = 0;
+
+  //  implicit types
+  void write (int tag, float v);
+  void write (int tag, double v);
+  void write (int tag, int32_t v, bool fixed = false);
+  void write (int tag, int64_t v, bool fixed = false);
+  void write (int tag, uint32_t v, bool fixed = false);
+  void write (int tag, uint64_t v, bool fixed = false);
+  void write (int tag, bool b);
+  void write (int tag, const std::string &s);
 
   /**
    *  @brief Returns true if the writer is in counting mode
    */
-  virtual bool is_counting () const = 0;
+  bool is_counting () const;
 
   /**
    *  @brief Initiates a new sequence. See class documentation for details.
    */
-  virtual void begin_seq (int tag, bool counting) = 0;
+  void begin_seq (int tag, bool counting);
 
   /**
    *  @brief Ends a sequence. See class documentation for details.
    */
-  virtual void end_seq () = 0;
+  void end_seq ();
+
+protected:
+  virtual void write_bytes (const std::string &s) = 0;
+  virtual void write_fixed (uint32_t v) = 0;
+  virtual void write_fixed (uint64_t v) = 0;
+  virtual void write_varint (pb_varint v, bool id) = 0;
+  void add_bytes (size_t n);
+
+private:
+  size_t m_bytes_counted;
+  std::vector<size_t> m_byte_counter_stack;
 };
 
 /**
@@ -376,39 +383,14 @@ public:
    */
   ProtocolBufferWriter (tl::OutputStream &stream);
 
-  /**
-   *  @brief Writes a scalar tag with the given value
-   */
-  void write (int tag, float v);
-  void write (int tag, double v);
-  void write (int tag, uint32_t v, bool fixed = false);
-  void write (int tag, int32_t v, bool fixed = false);
-  void write (int tag, uint64_t v, bool fixed = false);
-  void write (int tag, int64_t v, bool fixed = false);
-  void write (int tag, bool b);
-  void write (int tag, const std::string &s);
-
-  /**
-   *  @brief Returns true if the writer is in counting mode
-   */
-  bool is_counting () const;
-
-  /**
-   *  @brief Initiates a new sequence. See class documentation for details.
-   */
-  void begin_seq (int tag, bool counting);
-
-  /**
-   *  @brief Ends a sequence. See class documentation for details.
-   */
-  void end_seq ();
+protected:
+  virtual void write_bytes (const std::string &s);
+  virtual void write_fixed (uint32_t v);
+  virtual void write_fixed (uint64_t v);
+  virtual void write_varint (pb_varint v, bool id = false);
 
 private:
-  void write_varint (pb_varint v, bool id = false);
-
   tl::OutputStream *mp_stream;
-  size_t m_bytes_counted;
-  std::vector<size_t> m_byte_counter_stack;
 };
 
 /**
@@ -426,39 +408,14 @@ public:
    */
   ProtocolBufferDumper ();
 
-  /**
-   *  @brief Writes a scalar tag with the given value
-   */
-  void write (int tag, float v);
-  void write (int tag, double v);
-  void write (int tag, uint32_t v, bool fixed = false);
-  void write (int tag, int32_t v, bool fixed = false);
-  void write (int tag, uint64_t v, bool fixed = false);
-  void write (int tag, int64_t v, bool fixed = false);
-  void write (int tag, bool b);
-  void write (int tag, const std::string &s);
-
-  /**
-   *  @brief Returns true if the writer is in counting mode
-   */
-  bool is_counting () const;
-
-  /**
-   *  @brief Initiates a new sequence. See class documentation for details.
-   */
-  void begin_seq (int tag, bool counting);
-
-  /**
-   *  @brief Ends a sequence. See class documentation for details.
-   */
-  void end_seq ();
-
-private:
-  void write_varint (pb_varint v, bool id = false);
+protected:
+  virtual void write_bytes (const std::string &s);
+  virtual void write_fixed (uint32_t v);
+  virtual void write_fixed (uint64_t v);
+  virtual void write_varint (pb_varint v, bool id = false);
   void dump (const char *cp, size_t n, const std::string &type, const std::string &value);
 
-  size_t m_bytes_counted;
-  std::vector<size_t> m_byte_counter_stack;
+private:
   size_t m_debug_pos;
 };
 

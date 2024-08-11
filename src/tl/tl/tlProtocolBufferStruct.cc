@@ -40,14 +40,14 @@ PBParser::~PBParser ()
 }
 
 void
-PBParser::parse (tl::ProtocolBufferReader &reader, const PBElementBase *root, PBReaderState *reader_state)
+PBParser::parse (tl::ProtocolBufferReaderBase &reader, const PBElementBase *root, PBReaderState *reader_state)
 {
   mp_state = reader_state;
   parse_element (root, reader);
 }
 
 void
-PBParser::parse_element (const PBElementBase *parent, tl::ProtocolBufferReader &reader)
+PBParser::parse_element (const PBElementBase *parent, tl::ProtocolBufferReaderBase &reader)
 {
   while (! reader.at_end ()) {
 

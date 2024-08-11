@@ -67,27 +67,126 @@ private:
  *
  *  This is a low-level decoder for ProtocolBuffer files.
  *
- *  The following LEN-type related concepts need to be implemented by the client code:
- *  - submessages
- *  - maps
- *  - packed repetitions
- *  - strings
+ *  Use "read_tag" to read a new tag. Unknown tags must be skipped.
+ *  Use "skip" to skip an entry.
  *
- *  Unknown tags need to be skipped with "skip".
  *
- *  Submessages: if a corresponding tag is encountered with "is_seq()" true, the
- *  reader code needs to call "open" to enter the sequence and read tags until
- *  "at_end" is true. Then, call "close" to leave the sequence.
+ */
+class TL_PUBLIC ProtocolBufferReaderBase
+{
+public:
+  /**
+   *  @brief Constructor
+   */
+  ProtocolBufferReaderBase ()
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief Destructor
+   */
+  virtual ~ProtocolBufferReaderBase ()
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief Reads a new tag
+   *  This method will also set the current write type.
+   *  @returns The message ID
+   */
+  virtual int read_tag () = 0;
+
+  /**
+   *  @brief Gets the current wire type
+   */
+  virtual PBWireType type () const = 0;
+
+  /**
+   *  @brief Skips the current tag
+   */
+  virtual void skip () = 0;
+
+  /**
+   *  @brief Reads a floating-point value from the current message
+   *  Throws a reader error if the current tag's value is not compatible with a double value.
+   */
+  virtual void read (double &d) = 0;
+
+  /**
+   *  @brief Reads a floating-point value from the current message
+   *  Throws a reader error if the current tag's value is not compatible with a float value.
+   */
+  virtual void read (float &f) = 0;
+
+  /**
+   *  @brief Reads a string from the current message
+   *  Throws a reader error if the current tag's value is not compatible with a string.
+   */
+  virtual void read (std::string &s) = 0;
+
+  /**
+   *  @brief Reads a uint32_t value from the current message
+   *  Throws a reader error if the current tag's value is not compatible with a uint32_t.
+   */
+  virtual void read (uint32_t &ui32) = 0;
+
+  /**
+   *  @brief Reads a int32_t value from the current message
+   *  Throws a reader error if the current tag's value is not compatible with a int32_t.
+   */
+  virtual void read (int32_t &i32) = 0;
+
+  /**
+   *  @brief Reads a uint64_t value from the current message
+   *  Throws a reader error if the current tag's value is not compatible with a uint64_t.
+   */
+  virtual void read (uint64_t &ui64) = 0;
+
+  /**
+   *  @brief Reads a int64_t value from the current message
+   *  Throws a reader error if the current tag's value is not compatible with a int64_t.
+   */
+  virtual void read (int64_t &i64) = 0;
+
+  /**
+   *  @brief Reads a boolean value from the current message
+   *  Throws a reader error if the current tag's value is not compatible with a bool.
+   */
+  virtual void read (bool &b) = 0;
+
+  /**
+   *  @brief Opens a LEN sequence
+   *  After calling "open", the parser will continue reading messages, but
+   *  "at_end" will report true on the end of the sequence, not at the end of the
+   *  file.
+   *  This method will throw an exception if not in a message of LEN type.
+   */
+  virtual void open () = 0;
+
+  /**
+   *  @brief Closes the LEN sequence
+   *  This method will jump to the end of the sequence and continue reading
+   *  messages from the previous block or file.
+   */
+  virtual void close () = 0;
+
+  /**
+   *  @brief Returns true if at the end of the file or end of a block
+   */
+  virtual bool at_end () const = 0;
+};
+
+/**
+ *  @brief A reader for ProtocolBuffer files and streams
  *
- *  Packed repetitions: same a submessages, but single values are read
- *  with one of the "read" types.
- *
- *  Maps are read like submessages with key/values as tags 1 and 2.
- *
- *  Strings: if a corresponding tag is encountered, use "read(s)" to read
- *  the string. "is_seq()" is required to be true, i.e. wire type is LEN.
+ *  This is the reader implementation for binary files
+ *  as described here:
+ *  https://protobuf.dev/programming-guides/encoding/
  */
 class TL_PUBLIC ProtocolBufferReader
+  : public ProtocolBufferReaderBase
 {
 public:
   /**
@@ -108,16 +207,6 @@ public:
   PBWireType type () const
   {
     return m_type;
-  }
-
-  /**
-   *  @brief Returns true, if the current message is a LEN type sequence
-   *  Such messages can be read into strings or "open" can be used on them to
-   *  open a submessage, map or packed repetition.
-   */
-  bool is_seq () const
-  {
-    return m_type == PB_LEN;
   }
 
   /**
@@ -224,7 +313,62 @@ private:
  *  4. if "is_counting()" is false, repeat steps 1 to 3 with
  *     "counting" set to false on "begin_seq".
  */
+class TL_PUBLIC ProtocolBufferWriterBase
+{
+public:
+  /**
+   *  @brief Constructor
+   */
+  ProtocolBufferWriterBase ()
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief Destructor
+   */
+  virtual ~ProtocolBufferWriterBase ()
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief Writes a scalar tag with the given value
+   */
+  virtual void write (int tag, float v) = 0;
+  virtual void write (int tag, double v) = 0;
+  virtual void write (int tag, uint32_t v, bool fixed = false) = 0;
+  virtual void write (int tag, int32_t v, bool fixed = false) = 0;
+  virtual void write (int tag, uint64_t v, bool fixed = false) = 0;
+  virtual void write (int tag, int64_t v, bool fixed = false) = 0;
+  virtual void write (int tag, bool b) = 0;
+  virtual void write (int tag, const std::string &s) = 0;
+
+  /**
+   *  @brief Returns true if the writer is in counting mode
+   */
+  virtual bool is_counting () const = 0;
+
+  /**
+   *  @brief Initiates a new sequence. See class documentation for details.
+   */
+  virtual void begin_seq (int tag, bool counting) = 0;
+
+  /**
+   *  @brief Ends a sequence. See class documentation for details.
+   */
+  virtual void end_seq () = 0;
+};
+
+/**
+ *  @brief A writer for ProtocolBuffer files and streams
+ *
+ *  This is the writer implementation for binary files
+ *  as described here:
+ *  https://protobuf.dev/programming-guides/encoding/
+ */
 class TL_PUBLIC ProtocolBufferWriter
+  : public ProtocolBufferWriterBase
 {
 public:
   /**
@@ -259,20 +403,62 @@ public:
    */
   void end_seq ();
 
+private:
+  void write_varint (pb_varint v, bool id = false);
+
+  tl::OutputStream *mp_stream;
+  size_t m_bytes_counted;
+  std::vector<size_t> m_byte_counter_stack;
+};
+
+/**
+ *  @brief A writer implementation that dumps the file content to tl::info
+ *
+ *  This implementation does a halfway job of producing binary files,
+ *  but only insofar it is needed for dumping the binary data.
+ */
+class TL_PUBLIC ProtocolBufferDumper
+  : public ProtocolBufferWriterBase
+{
+public:
   /**
-   *  @brief Enables or disables debug mode
-   *  In debug mode, the stream will be dumped in a human readable form
+   *  @brief Creates the writer
    */
-  void set_debug (bool f);
+  ProtocolBufferDumper ();
+
+  /**
+   *  @brief Writes a scalar tag with the given value
+   */
+  void write (int tag, float v);
+  void write (int tag, double v);
+  void write (int tag, uint32_t v, bool fixed = false);
+  void write (int tag, int32_t v, bool fixed = false);
+  void write (int tag, uint64_t v, bool fixed = false);
+  void write (int tag, int64_t v, bool fixed = false);
+  void write (int tag, bool b);
+  void write (int tag, const std::string &s);
+
+  /**
+   *  @brief Returns true if the writer is in counting mode
+   */
+  bool is_counting () const;
+
+  /**
+   *  @brief Initiates a new sequence. See class documentation for details.
+   */
+  void begin_seq (int tag, bool counting);
+
+  /**
+   *  @brief Ends a sequence. See class documentation for details.
+   */
+  void end_seq ();
 
 private:
   void write_varint (pb_varint v, bool id = false);
   void dump (const char *cp, size_t n, const std::string &type, const std::string &value);
 
-  tl::OutputStream *mp_stream;
   size_t m_bytes_counted;
   std::vector<size_t> m_byte_counter_stack;
-  bool m_debug;
   size_t m_debug_pos;
 };
 

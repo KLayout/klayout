@@ -292,17 +292,78 @@ ProtocolBufferReader::error (const std::string &msg)
 }
 
 // ----------------------------------------------------------------------------------
+//  Writer utilities
 
-ProtocolBufferWriter::ProtocolBufferWriter (tl::OutputStream &stream)
-  : mp_stream (&stream), m_bytes_counted (0), m_debug (false), m_debug_pos (0)
+inline uint32_t zigzag_encode (int32_t v)
 {
-  //  .. nothing yet ..
+  if (v < 0) {
+    return ((uint32_t (-v) - 1) << 1) + 1;
+  } else {
+    return uint32_t (v) << 1;
+  }
 }
 
-void ProtocolBufferWriter::set_debug (bool f)
+inline uint64_t zigzag_encode (int64_t v)
 {
-  m_debug = f;
-  m_debug_pos = 0;
+  if (v < 0) {
+    return ((uint64_t (-v) - 1) << 1) + 1;
+  } else {
+    return uint64_t (v) << 1;
+  }
+}
+
+inline void little_endian_encode (char *b, uint32_t v)
+{
+  for (unsigned int i = 0; i < sizeof (v); ++i) {
+    b[i] = (char) v;
+    v >>= 8;
+  }
+}
+
+inline void little_endian_encode (char *b, uint64_t v)
+{
+  for (unsigned int i = 0; i < sizeof (v); ++i) {
+    b[i] = (char) v;
+    v >>= 8;
+  }
+}
+
+inline size_t count_varint_bytes (pb_varint v)
+{
+  size_t n = 0;
+  while (true) {
+    ++n;
+    if (v < 0x80) {
+      break;
+    }
+    v >>= 7;
+  }
+  return n;
+}
+
+const size_t max_varint_bytes = (sizeof (pb_varint) * 8) / 7 + 1;
+
+inline size_t varint_encode (char *b, pb_varint v)
+{
+  char *cp = b;
+  while (true) {
+    if (v < 0x80) {
+      *cp++ = char (v);
+      break;
+    } else {
+      *cp++ = (char (v) | 0x80);
+    }
+    v >>= 7;
+  }
+  return cp - b;
+}
+
+// ----------------------------------------------------------------------------------
+
+ProtocolBufferWriter::ProtocolBufferWriter (tl::OutputStream &stream)
+  : mp_stream (&stream), m_bytes_counted (0)
+{
+  //  .. nothing yet ..
 }
 
 void ProtocolBufferWriter::write (int tag, float v)
@@ -322,25 +383,11 @@ void ProtocolBufferWriter::write (int tag, uint32_t v, bool fixed)
     write_varint (pb_varint ((tag << 3) + PB_I32), true);
 
     if (is_counting ()) {
-
       m_byte_counter_stack.back () += sizeof (v);
-
     } else {
-
-      auto vv = v;
-
       char b[sizeof (v)];
-      for (unsigned int i = 0; i < sizeof (v); ++i) {
-        b[i] = (char) v;
-        v >>= 8;
-      }
-
-      if (m_debug) {
-        dump (b, sizeof (v), "I32", tl::to_string (vv));
-      }
-
+      little_endian_encode (b, v);
       mp_stream->put (b, sizeof (v));
-
     }
 
   } else {
@@ -356,11 +403,7 @@ void ProtocolBufferWriter::write (int tag, int32_t v, bool fixed)
   if (fixed) {
     write (tag, uint32_t (v), true);
   } else {
-    if (v < 0) {
-      write (tag, ((uint32_t (-v) - 1) << 1) + 1, false);
-    } else {
-      write (tag, uint32_t (v) << 1, false);
-    }
+    write (tag, zigzag_encode (v), false);
   }
 }
 
@@ -371,25 +414,11 @@ void ProtocolBufferWriter::write (int tag, uint64_t v, bool fixed)
     write_varint (pb_varint ((tag << 3) + PB_I64), true);
 
     if (is_counting ()) {
-
       m_byte_counter_stack.back () += sizeof (v);
-
     } else {
-
-      auto vv = v;
-
       char b[sizeof (v)];
-      for (unsigned int i = 0; i < sizeof (v); ++i) {
-        b[i] = (char) v;
-        v >>= 8;
-      }
-
-      if (m_debug) {
-        dump (b, sizeof (v), "I64", tl::to_string (vv));
-      }
-
+      little_endian_encode (b, v);
       mp_stream->put (b, sizeof (v));
-
     }
 
   } else {
@@ -405,11 +434,7 @@ void ProtocolBufferWriter::write (int tag, int64_t v, bool fixed)
   if (fixed) {
     write (tag, uint64_t (v), true);
   } else {
-    if (v < 0) {
-      write (tag, ((uint64_t (-v) - 1) << 1) + 1, false);
-    } else {
-      write (tag, uint64_t (v) << 1, false);
-    }
+    write (tag, zigzag_encode (v), false);
   }
 }
 
@@ -424,17 +449,9 @@ void ProtocolBufferWriter::write (int tag, const std::string &s)
   write_varint (s.size ());
 
   if (is_counting ()) {
-
     m_byte_counter_stack.back () += s.size ();
-
   } else {
-
-    if (m_debug) {
-      dump (s.c_str (), s.size (), "(string)", s);
-    }
-
     mp_stream->put (s.c_str (), s.size ());
-
   }
 }
 
@@ -477,68 +494,199 @@ void ProtocolBufferWriter::end_seq ()
   }
 }
 
-void
-ProtocolBufferWriter::write_varint (pb_varint v, bool id)
+void ProtocolBufferWriter::write_varint (pb_varint v, bool /*id*/)
 {
   if (is_counting ()) {
 
-    size_t n = 0;
-    while (true) {
-      ++n;
-      if (v < 0x80) {
-        break;
-      }
-      v >>= 7;
-    }
-
-    m_byte_counter_stack.back () += n;
+    m_byte_counter_stack.back () += count_varint_bytes (v);
 
   } else {
 
-    auto vv = v;
+    char b [max_varint_bytes];
+    size_t n = varint_encode (b, v);
+    mp_stream->put (b, n);
 
-    char b[16];
-    char *cp = b;
-    while (true) {
-      if (v < 0x80) {
-        *cp++ = char (v);
-        break;
-      } else {
-        *cp++ = (char (v) | 0x80);
-      }
-      v >>= 7;
+  }
+}
+
+// ----------------------------------------------------------------------------------
+
+ProtocolBufferDumper::ProtocolBufferDumper ()
+  : m_bytes_counted (0), m_debug_pos (0)
+{
+  //  .. nothing yet ..
+}
+
+void ProtocolBufferDumper::write (int tag, float v)
+{
+  write (tag, *reinterpret_cast<uint32_t *> (&v), true);
+}
+
+void ProtocolBufferDumper::write (int tag, double v)
+{
+  write (tag, *reinterpret_cast<uint64_t *> (&v), true);
+}
+
+void ProtocolBufferDumper::write (int tag, uint32_t v, bool fixed)
+{
+  if (fixed) {
+
+    write_varint (pb_varint ((tag << 3) + PB_I32), true);
+
+    if (is_counting ()) {
+      m_byte_counter_stack.back () += sizeof (v);
+    } else {
+      char b[sizeof (v)];
+      little_endian_encode (b, v);
+      dump (b, sizeof (v), "I32", tl::to_string (v));
     }
 
-    if (m_debug) {
-      if (id) {
-        unsigned int wt = v & 7;
-        std::string wire_type;
-        if (wt == PB_EGROUP) {
-          wire_type = "EGROUP";
-        } else if (wt == PB_SGROUP) {
-          wire_type = "SGROUP";
-        } else if (wt == PB_VARINT) {
-          wire_type = "VARINT";
-        } else if (wt == PB_I32) {
-          wire_type = "I32";
-        } else if (wt == PB_I64) {
-          wire_type = "I64";
-        } else if (wt == PB_LEN) {
-          wire_type = "LEN";
-        }
-        dump (b, cp - b, "(id)", "#" + tl::to_string (vv >> 3) + " " + wire_type);
-      } else {
-        dump (b, cp - b, "VARINT", tl::to_string (vv));
-      }
+  } else {
+
+    write_varint (pb_varint ((tag << 3) + PB_VARINT), true);
+    write_varint (pb_varint (v));
+
+  }
+}
+
+void ProtocolBufferDumper::write (int tag, int32_t v, bool fixed)
+{
+  if (fixed) {
+    write (tag, uint32_t (v), true);
+  } else {
+    write (tag, zigzag_encode (v), false);
+  }
+}
+
+void ProtocolBufferDumper::write (int tag, uint64_t v, bool fixed)
+{
+  if (fixed) {
+
+    write_varint (pb_varint ((tag << 3) + PB_I64), true);
+
+    if (is_counting ()) {
+      m_byte_counter_stack.back () += sizeof (v);
+    } else {
+      char b[sizeof (v)];
+      little_endian_encode (b, v);
+      dump (b, sizeof (v), "I64", tl::to_string (v));
     }
 
-    mp_stream->put (b, cp - b);
+  } else {
+
+    write_varint (pb_varint ((tag << 3) + PB_VARINT), true);
+    write_varint (pb_varint (v));
+
+  }
+}
+
+void ProtocolBufferDumper::write (int tag, int64_t v, bool fixed)
+{
+  if (fixed) {
+    write (tag, uint64_t (v), true);
+  } else {
+    write (tag, zigzag_encode (v), false);
+  }
+}
+
+void ProtocolBufferDumper::write (int tag, bool b)
+{
+  write (tag, uint32_t (b ? 1 : 0));
+}
+
+void ProtocolBufferDumper::write (int tag, const std::string &s)
+{
+  write_varint (pb_varint ((tag << 3) + PB_LEN), true);
+  write_varint (s.size ());
+
+  if (is_counting ()) {
+
+    m_byte_counter_stack.back () += s.size ();
+
+  } else {
+
+    dump (s.c_str (), s.size (), "(string)", s);
+
+  }
+}
+
+bool ProtocolBufferDumper::is_counting () const
+{
+  return ! m_byte_counter_stack.empty ();
+}
+
+void ProtocolBufferDumper::begin_seq (int tag, bool counting)
+{
+  if (counting) {
+
+    if (is_counting ()) {
+      write_varint (pb_varint ((tag << 3) + PB_LEN), true);
+    }
+
+    m_byte_counter_stack.push_back (0);
+
+  } else {
+
+    write_varint (pb_varint ((tag << 3) + PB_LEN), true);
+    write_varint (m_bytes_counted);
+
+  }
+}
+
+void ProtocolBufferDumper::end_seq ()
+{
+  if (is_counting ()) {
+
+    m_bytes_counted = m_byte_counter_stack.back ();
+    m_byte_counter_stack.pop_back ();
+
+    //  just for adding the required bytes
+    if (is_counting ()) {
+      m_byte_counter_stack.back () += m_bytes_counted;
+      write_varint (m_bytes_counted);
+    }
 
   }
 }
 
 void
-ProtocolBufferWriter::dump (const char *cp, size_t n, const std::string &type, const std::string &value)
+ProtocolBufferDumper::write_varint (pb_varint v, bool id)
+{
+  if (is_counting ()) {
+
+    m_byte_counter_stack.back () += count_varint_bytes (v);
+
+  } else {
+
+    char b[max_varint_bytes];
+    size_t n = varint_encode (b, v);
+
+    if (id) {
+      tl::PBWireType wt = tl::PBWireType (v & 7);
+      std::string wire_type;
+      if (wt == PB_EGROUP) {
+        wire_type = "EGROUP";
+      } else if (wt == PB_SGROUP) {
+        wire_type = "SGROUP";
+      } else if (wt == PB_VARINT) {
+        wire_type = "VARINT";
+      } else if (wt == PB_I32) {
+        wire_type = "I32";
+      } else if (wt == PB_I64) {
+        wire_type = "I64";
+      } else if (wt == PB_LEN) {
+        wire_type = "LEN";
+      }
+      dump (b, n, "(id)", "#" + tl::to_string (v >> 3) + " " + wire_type);
+    } else {
+      dump (b, n, "VARINT", tl::to_string (v));
+    }
+
+  }
+}
+
+void
+ProtocolBufferDumper::dump (const char *cp, size_t n, const std::string &type, const std::string &value)
 {
   bool first = true;
   size_t nn = n;

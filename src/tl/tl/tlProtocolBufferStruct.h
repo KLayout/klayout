@@ -296,8 +296,8 @@ public:
   PBParser ();
   ~PBParser ();
 
-  void parse (tl::ProtocolBufferReader &reader, const PBElementBase *root, PBReaderState *reader_state);
-  void parse_element (const PBElementBase *parent, tl::ProtocolBufferReader &reader);
+  void parse (tl::ProtocolBufferReaderBase &reader, const PBElementBase *root, PBReaderState *reader_state);
+  void parse_element (const PBElementBase *parent, tl::ProtocolBufferReaderBase &reader);
 
   PBReaderState &reader_state ()
   {
@@ -517,7 +517,7 @@ public:
   virtual PBElementBase *clone () const = 0;
 
   virtual void create (const PBElementBase *parent, PBReaderState &objs) const = 0;
-  virtual void parse (PBParser *, tl::ProtocolBufferReader &) const = 0;
+  virtual void parse (PBParser *, tl::ProtocolBufferReaderBase &) const = 0;
   virtual void finish (const PBElementBase *parent, PBReaderState &objs) const = 0;
 
   virtual void write (const PBElementBase *, tl::ProtocolBufferWriter &, PBWriterState &) const { }
@@ -602,7 +602,7 @@ public:
     objs.pop (tag);
   }
 
-  virtual void parse (PBParser *parser, tl::ProtocolBufferReader &reader) const
+  virtual void parse (PBParser *parser, tl::ProtocolBufferReaderBase &reader) const
   {
     reader.open ();
     parser->parse_element (this, reader);
@@ -767,7 +767,7 @@ public:
     // .. nothing yet ..
   }
 
-  virtual void parse (PBParser *parser, tl::ProtocolBufferReader &reader) const
+  virtual void parse (PBParser *parser, tl::ProtocolBufferReaderBase &reader) const
   {
     PBObjTag<Value> tag;
     PBObjTag<Parent> parent_tag;
@@ -865,17 +865,17 @@ private:
   }
 
   //  read incarnations
-  void read (tl::ProtocolBufferReader &reader, float &v) const
+  void read (tl::ProtocolBufferReaderBase &reader, float &v) const
   {
     reader.read (v);
   }
 
-  void read (tl::ProtocolBufferReader &reader, double &v) const
+  void read (tl::ProtocolBufferReaderBase &reader, double &v) const
   {
     reader.read (v);
   }
 
-  void read (tl::ProtocolBufferReader &reader, uint8_t &v) const
+  void read (tl::ProtocolBufferReaderBase &reader, uint8_t &v) const
   {
     uint32_t vv = 0;
     reader.read (vv);
@@ -883,7 +883,7 @@ private:
     v = vv;
   }
 
-  void read (tl::ProtocolBufferReader &reader, int8_t &v) const
+  void read (tl::ProtocolBufferReaderBase &reader, int8_t &v) const
   {
     int32_t vv = 0;
     reader.read (vv);
@@ -891,7 +891,7 @@ private:
     v = vv;
   }
 
-  void read (tl::ProtocolBufferReader &reader, uint16_t &v) const
+  void read (tl::ProtocolBufferReaderBase &reader, uint16_t &v) const
   {
     uint32_t vv = 0;
     reader.read (vv);
@@ -899,7 +899,7 @@ private:
     v = vv;
   }
 
-  void read (tl::ProtocolBufferReader &reader, int16_t &v) const
+  void read (tl::ProtocolBufferReaderBase &reader, int16_t &v) const
   {
     int32_t vv = 0;
     reader.read (vv);
@@ -907,38 +907,38 @@ private:
     v = vv;
   }
 
-  void read (tl::ProtocolBufferReader &reader, uint32_t &v) const
+  void read (tl::ProtocolBufferReaderBase &reader, uint32_t &v) const
   {
     reader.read (v);
   }
 
-  void read (tl::ProtocolBufferReader &reader, int32_t &v) const
+  void read (tl::ProtocolBufferReaderBase &reader, int32_t &v) const
   {
     reader.read (v);
   }
 
-  void read (tl::ProtocolBufferReader &reader, uint64_t &v) const
+  void read (tl::ProtocolBufferReaderBase &reader, uint64_t &v) const
   {
     reader.read (v);
   }
 
-  void read (tl::ProtocolBufferReader &reader, int64_t &v) const
+  void read (tl::ProtocolBufferReaderBase &reader, int64_t &v) const
   {
     reader.read (v);
   }
 
-  void read (tl::ProtocolBufferReader &reader, bool &v) const
+  void read (tl::ProtocolBufferReaderBase &reader, bool &v) const
   {
     reader.read (v);
   }
 
-  void read (tl::ProtocolBufferReader &reader, std::string &v) const
+  void read (tl::ProtocolBufferReaderBase &reader, std::string &v) const
   {
     reader.read (v);
   }
 
   template <class T>
-  void read (tl::ProtocolBufferReader &reader, const T &v) const
+  void read (tl::ProtocolBufferReaderBase &reader, const T &v) const
   {
     std::string vv;
     reader.read (vv);
@@ -994,7 +994,7 @@ public:
     }
   }
 
-  void parse (tl::ProtocolBufferReader &reader, Obj &root) const
+  void parse (tl::ProtocolBufferReaderBase &reader, Obj &root) const
   {
     PBObjTag<Obj> tag;
     PBReaderState rs;
@@ -1011,7 +1011,7 @@ private:
     // disable base class implementation
   }
 
-  virtual void parse (PBParser *, tl::ProtocolBufferReader &) const
+  virtual void parse (PBParser *, tl::ProtocolBufferReaderBase &) const
   {
     // disable base class implementation
   }

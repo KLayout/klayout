@@ -205,15 +205,16 @@ struct Root {
   const Child &get_child () const { return m_child; }
 };
 
-static tl::PBElementList child_struct =
-    tl::pb_make_member (&Child::txt, "txt", 1) +
-    tl::pb_make_member (&Child::d, "d", 2) +
-    tl::pb_make_element (&Child::begin_children, &Child::end_children, &Child::add_child, "children", 3, &child_struct);
+static tl::PBElementList child_struct ("Child",
+  tl::pb_make_member (&Child::txt, "txt", 1) +
+  tl::pb_make_member (&Child::d, "d", 2) +
+  tl::pb_make_element (&Child::begin_children, &Child::end_children, &Child::add_child, "children", 3, &child_struct)
+);
 
 static tl::PBStruct<Root> structure ("pbtest-struct", 88888888,
   tl::pb_make_member (&Root::begin_subs, &Root::end_subs, &Root::add_sub, "sub", 1) +
   tl::pb_make_member (&Root::begin_isubs, &Root::end_isubs, &Root::add_isub, "isub", 2) +
-  tl::pb_make_element (&Root::begin_children, &Root::end_children, &Root::add_child, "childredn", 3, &child_struct) +
+  tl::pb_make_element (&Root::begin_children, &Root::end_children, &Root::add_child, "children", 3, &child_struct) +
   tl::pb_make_element (&Root::get_child, &Root::set_child, "child", 4, &child_struct) +
   tl::pb_make_member (&Root::m, "m", 5) +
   tl::pb_make_member (&Root::get_mi, &Root::set_mi, "mi", 6) +
@@ -608,3 +609,27 @@ TEST (108_InvalidType)
   EXPECT_EQ (std::string (error, 0, 34), "Expected a VARINT or I32 wire type");
 }
 
+TEST (109_DumpSpec)
+{
+  EXPECT_EQ (structure.create_def (),
+    "// created from KLayout proto definition 'pbtest-struct'\n"
+    "\n"
+    "syntax = \"proto2\";\n"
+    "\n"
+    "message Child {\n"
+    "  optional string txt = 1;\n"
+    "  optional double d = 2;\n"
+    "  repeated Child children = 3;\n"
+    "}\n"
+    "\n"
+    "message PbtestStruct {\n"
+    "  repeated double sub = 1;\n"
+    "  repeated sint32 isub = 2;\n"
+    "  repeated Child children = 3;\n"
+    "  optional Child child = 4;\n"
+    "  optional sint64 m = 5;\n"
+    "  optional sint32 mi = 6;\n"
+    "  optional uint32 b = 7;\n"
+    "}"
+  );
+}

@@ -26,6 +26,8 @@
 #include "tlCommon.h"
 #include "tlProtocolBuffer.h"
 
+#include <map>
+
 namespace tl
 {
 
@@ -277,12 +279,24 @@ private:
 
 class TL_PUBLIC PBElementBase;
 
-struct pass_by_value_tag {
-  pass_by_value_tag () { }
+struct pb_pass_by_value_tag {
+  pb_pass_by_value_tag () { }
 };
 
-struct pass_by_ref_tag {
-  pass_by_ref_tag () { }
+struct pb_pass_by_ref_tag {
+  pb_pass_by_ref_tag () { }
+};
+
+struct pb_zero_cardinality_tag {
+  pb_zero_cardinality_tag () { }
+};
+
+struct pb_single_cardinality_tag {
+  pb_single_cardinality_tag () { }
+};
+
+struct pb_many_cardinality_tag {
+  pb_many_cardinality_tag () { }
 };
 
 /**
@@ -360,66 +374,36 @@ public:
   typedef std::list <PBElementProxy> children_list;
   typedef children_list::const_iterator iterator;
 
-  PBElementList ()
+  PBElementList ();
+  PBElementList (const PBElementBase &e);
+  PBElementList (PBElementBase *e);
+  PBElementList (const std::string &name, const PBElementList &d);
+  PBElementList (const PBElementList &d);
+  PBElementList (const PBElementList &d, const PBElementBase &e);
+  PBElementList (const PBElementList &d, PBElementBase *e);
+
+  void append (const PBElementBase &e);
+  void append (PBElementBase *e);
+
+  iterator begin () const;
+  iterator end () const;
+
+  static PBElementList empty ();
+
+  size_t oid () const
   {
-    //  .. nothing yet ..
+    return m_oid;
   }
 
-  PBElementList (const PBElementBase &e)
+  const std::string &name () const
   {
-    m_elements.push_back (PBElementProxy (e));
-  }
-
-  PBElementList (PBElementBase *e)
-  {
-    if (e) {
-      m_elements.push_back (PBElementProxy (e));
-    }
-  }
-
-  PBElementList (const PBElementList &d, const PBElementBase &e)
-    : m_elements (d.m_elements)
-  {
-    m_elements.push_back (PBElementProxy (e));
-  }
-
-  PBElementList (const PBElementList &d, PBElementBase *e)
-    : m_elements (d.m_elements)
-  {
-    if (e) {
-      m_elements.push_back (PBElementProxy (e));
-    }
-  }
-
-  void append (const PBElementBase &e)
-  {
-    m_elements.push_back (PBElementProxy (e));
-  }
-
-  void append (PBElementBase *e)
-  {
-    if (e) {
-      m_elements.push_back (PBElementProxy (e));
-    }
-  }
-
-  iterator begin () const
-  {
-    return m_elements.begin ();
-  }
-
-  iterator end () const
-  {
-    return m_elements.end ();
-  }
-
-  static PBElementList empty ()
-  {
-    return PBElementList ();
+    return m_name;
   }
 
 private:
   std::list <PBElementProxy> m_elements;
+  size_t m_oid;
+  std::string m_name;
 };
 
 /**
@@ -486,35 +470,14 @@ class TL_PUBLIC PBElementBase
 public:
   typedef PBElementList::iterator iterator;
 
-  PBElementBase (const std::string &name, int tag, const PBElementList &children)
-    : m_name (name), m_tag (tag), mp_children (new PBElementList (children)), m_owns_child_list (true)
-  {
-    // .. nothing yet ..
-  }
+  enum Cardinality {
+    Zero, Single, Many
+  };
 
-  PBElementBase (const std::string &name, int tag, const PBElementList *children)
-    : m_name (name), m_tag (tag), mp_children (children), m_owns_child_list (false)
-  {
-    // .. nothing yet ..
-  }
-
-  PBElementBase (const PBElementBase &d)
-    : m_name (d.m_name), m_tag (d.m_tag), m_owns_child_list (d.m_owns_child_list)
-  {
-    if (m_owns_child_list) {
-      mp_children = new PBElementList (*d.mp_children);
-    } else {
-      mp_children = d.mp_children;
-    }
-  }
-
-  virtual ~PBElementBase ()
-  {
-    if (m_owns_child_list) {
-      delete const_cast <PBElementList *> (mp_children);
-      mp_children = 0;
-    }
-  }
+  PBElementBase (const std::string &name, int tag, const PBElementList &children);
+  PBElementBase (const std::string &name, int tag, const PBElementList *children);
+  PBElementBase (const PBElementBase &d);
+  virtual ~PBElementBase ();
 
   virtual PBElementBase *clone () const = 0;
 
@@ -523,6 +486,13 @@ public:
   virtual void finish (const PBElementBase *parent, PBReaderState &objs) const = 0;
 
   virtual void write (const PBElementBase *, tl::ProtocolBufferWriterBase &, PBWriterState &) const { }
+
+  virtual Cardinality cardinality () const;
+
+  size_t oid () const
+  {
+    return mp_children->oid ();
+  }
 
   int tag () const
   {
@@ -534,14 +504,36 @@ public:
     return m_name;
   }
 
-  iterator begin () const
+  /**
+   *  @brief Returns a name suitable for code
+   *  Specifically, hyphens are replaced by underscores.
+   */
+  std::string name4code () const;
+
+  iterator begin () const;
+  iterator end () const;
+
+  std::string create_def (std::map<size_t, std::pair <const PBElementBase *, std::string> > &messages) const;
+
+protected:
+  virtual void collect_messages (std::map<size_t, std::pair <const PBElementBase *, std::string> > &messages) const;
+  virtual std::string create_def_entry (std::map<size_t, std::pair <const PBElementBase *, std::string> > &messages) const = 0;
+
+  std::string make_message_name () const;
+
+  static Cardinality get_cardinality (tl::pb_zero_cardinality_tag)
   {
-    return mp_children->begin ();
+    return Zero;
   }
 
-  iterator end () const
+  static Cardinality get_cardinality (tl::pb_single_cardinality_tag)
   {
-    return mp_children->end ();
+    return Single;
+  }
+
+  static Cardinality get_cardinality (tl::pb_many_cardinality_tag)
+  {
+    return Many;
   }
 
 private:
@@ -625,9 +617,32 @@ public:
     r.start (*objs.back (parent_tag));
     while (! r.at_end ()) {
       typedef typename Read::tag read_tag_type;
-      read_tag_type read_tag;
-      write_obj (r (), tag (), writer, read_tag, objs);
+      write_obj (r (), tag (), writer, read_tag_type (), objs);
       r.next ();
+    }
+  }
+
+  virtual Cardinality cardinality () const
+  {
+    typedef typename Read::cardinality cardinality_type;
+    return get_cardinality (cardinality_type ());
+  }
+
+  virtual void collect_messages (std::map<size_t, std::pair <const PBElementBase *, std::string> > &messages) const
+  {
+    if (messages.find (oid ()) == messages.end ()) {
+      messages [oid ()] = std::make_pair (this, make_message_name ());
+      PBElementBase::collect_messages (messages);
+    }
+  }
+
+  virtual std::string create_def_entry (std::map<size_t, std::pair <const PBElementBase *, std::string> > &messages) const
+  {
+    auto m = messages.find (oid ());
+    if (m != messages.end ()) {
+      return m->second.second + " " + name4code () + " = " + tl::to_string (tag ()) + ";";
+    } else {
+      return std::string ();
     }
   }
 
@@ -640,7 +655,7 @@ private:
   Write m_w;
 
   //  this write helper is used if the reader delivers an object by value
-  void write_obj (Obj obj, int tag, tl::ProtocolBufferWriterBase &writer, tl::pass_by_value_tag, PBWriterState &objs) const
+  void write_obj (Obj obj, int tag, tl::ProtocolBufferWriterBase &writer, tl::pb_pass_by_value_tag, PBWriterState &objs) const
   {
     PBObjTag<Obj> self_tag;
 
@@ -658,7 +673,7 @@ private:
     }
   }
 
-  void write_obj (const Obj &obj, int tag, tl::ProtocolBufferWriterBase &writer, tl::pass_by_ref_tag, PBWriterState &objs) const
+  void write_obj (const Obj &obj, int tag, tl::ProtocolBufferWriterBase &writer, tl::pb_pass_by_ref_tag, PBWriterState &objs) const
   {
     PBObjTag<Obj> self_tag;
 
@@ -798,6 +813,23 @@ public:
       write (writer, tag (), r ());
       r.next ();
     }
+  }
+
+  virtual Cardinality cardinality () const
+  {
+    typedef typename Read::cardinality cardinality_type;
+    return get_cardinality (cardinality_type ());
+  }
+
+  virtual void collect_messages (std::map<size_t, std::pair <const PBElementBase *, std::string> > & /*messages*/) const
+  {
+    //  no messages here.
+  }
+
+  virtual std::string create_def_entry (std::map<size_t, std::pair <const PBElementBase *, std::string> > & /*messages*/) const
+  {
+    const Value *v = 0;
+    return typestring (v) + " " + name4code () + " = " + tl::to_string (tag ()) + ";";
   }
 
 private:
@@ -952,6 +984,74 @@ private:
     reader.read (vv);
     m_c.pb_decode (vv, v);
   }
+
+  //  type strings
+  std::string typestring (const float *) const
+  {
+    return "float";
+  }
+
+  std::string typestring (const double *) const
+  {
+    return "double";
+  }
+
+  std::string typestring (const uint8_t *) const
+  {
+    return "uint32";
+  }
+
+  std::string typestring (const uint16_t *) const
+  {
+    return "uint32";
+  }
+
+  std::string typestring (const uint32_t *) const
+  {
+    return "uint32";
+  }
+
+  std::string typestring (const uint64_t *) const
+  {
+    return "uint64";
+  }
+
+  std::string typestring (const int8_t *) const
+  {
+    return "sint32";
+  }
+
+  std::string typestring (const int16_t *) const
+  {
+    return "sint32";
+  }
+
+  std::string typestring (const int32_t *) const
+  {
+    return "sint32";
+  }
+
+  std::string typestring (const int64_t *) const
+  {
+    return "sint64";
+  }
+
+  std::string typestring (const bool *) const
+  {
+    return "uint32";
+  }
+
+  std::string typestring (const std::string *) const
+  {
+    return "string";
+  }
+
+  template <class T>
+  std::string typestring (const T *) const
+  {
+    const typename Converter::pb_type *v = 0;
+    return typestring (v);
+  }
 };
 
 /**
@@ -1035,7 +1135,23 @@ public:
    */
   std::string create_def () const
   {
-    return std::string (); // @@@
+    std::map<size_t, std::pair <const PBElementBase *, std::string> > msgs;
+    collect_messages (msgs);
+    msgs[oid ()] = std::make_pair (this, make_message_name ());
+
+    std::string res = "// created from KLayout proto definition '" + name () + "'\n\n";
+    res += "syntax = \"proto2\";";
+
+    for (auto i = msgs.begin (); i != msgs.end (); ++i) {
+      std::string entry = i->second.first->create_def (msgs);
+      if (! entry.empty ()) {
+        res += "\n";
+        res += "\n";
+        res += entry;
+      }
+    }
+
+    return res;
   }
 
 private:
@@ -1054,9 +1170,14 @@ private:
     // disable base class implementation
   }
 
-  virtual void finish (const PBElementBase * /*parent*/, PBReaderState &) const
+  virtual void finish (const PBElementBase *, PBReaderState &) const
   {
     // disable base class implementation
+  }
+
+  virtual std::string create_def_entry (std::map<size_t, std::pair<const PBElementBase *, std::string> > &) const
+  {
+    return std::string ();
   }
 };
 
@@ -1176,7 +1297,8 @@ private:
 template <class Value, class Parent>
 struct PBMemberDummyReadAdaptor
 {
-  typedef pass_by_ref_tag tag;
+  typedef pb_pass_by_ref_tag tag;
+  typedef pb_zero_cardinality_tag cardinality;
 
   PBMemberDummyReadAdaptor ()
   {
@@ -1207,7 +1329,8 @@ struct PBMemberDummyReadAdaptor
 template <class Value, class Parent>
 struct PBMemberReadAdaptor
 {
-  typedef pass_by_ref_tag tag;
+  typedef pb_pass_by_ref_tag tag;
+  typedef pb_single_cardinality_tag cardinality;
 
   PBMemberReadAdaptor (Value Parent::*member)
     : mp_member (member), mp_owner (0), m_done (false)
@@ -1245,7 +1368,8 @@ private:
 template <class Value, class Parent>
 struct PBMemberAccRefReadAdaptor
 {
-  typedef pass_by_ref_tag tag;
+  typedef pb_pass_by_ref_tag tag;
+  typedef pb_single_cardinality_tag cardinality;
 
   PBMemberAccRefReadAdaptor (const Value &(Parent::*member) () const)
     : mp_member (member), mp_owner (0), m_done (false)
@@ -1283,7 +1407,8 @@ private:
 template <class Value, class Parent>
 struct PBMemberAccReadAdaptor
 {
-  typedef pass_by_value_tag tag;
+  typedef pb_pass_by_value_tag tag;
+  typedef pb_single_cardinality_tag cardinality;
 
   PBMemberAccReadAdaptor (Value (Parent::*member) () const)
     : mp_member (member), mp_owner (0), m_done (false)
@@ -1321,7 +1446,8 @@ private:
 template <class Value, class Iter, class Parent>
 struct PBMemberIterReadAdaptor
 {
-  typedef pass_by_ref_tag tag;
+  typedef pb_pass_by_ref_tag tag;
+  typedef pb_many_cardinality_tag cardinality;
 
   PBMemberIterReadAdaptor (Iter (Parent::*begin) () const, Iter (Parent::*end) () const)
     : mp_begin (begin), mp_end (end)

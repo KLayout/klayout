@@ -359,3 +359,103 @@ TEST (100_BasicStruct)
   EXPECT_EQ (error, "");
   EXPECT_EQ (root == Root (), true);
 }
+
+struct TestClass
+{
+  enum enum_type { A, B, C };
+
+  TestClass () : e (A) { }
+  enum_type e;
+};
+
+struct TestClassEnumConverter
+{
+  typedef uint32_t pb_type;
+
+  pb_type pb_encode (TestClass::enum_type e) const
+  {
+    switch (e) {
+    case TestClass::A:
+      return 17;
+    case TestClass::B:
+      return 18;
+    case TestClass::C:
+      return 19;
+    default:
+      return 0;
+    }
+  }
+
+  void pb_decode (uint32_t value, TestClass::enum_type &e) const
+  {
+    switch (value) {
+    case 17:
+      e = TestClass::A;
+      break;
+    case 18:
+      e = TestClass::B;
+      break;
+    case 19:
+      e = TestClass::C;
+      break;
+    default:
+      e = TestClass::enum_type (0);
+      break;
+    }
+  }
+};
+
+TEST (101_Converter)
+{
+  TestClass tc;
+
+  tl::PBStruct<TestClass> structure ("pbtest-tc", 1,
+    tl::pb_make_member (&TestClass::e, 2, TestClassEnumConverter ())
+  );
+
+  tc.e = TestClass::A;
+  std::string fn = tl::combine_path (tl::testtmp (), "pb_101a.pb");
+
+  {
+    tl::OutputStream os (fn);
+    tl::ProtocolBufferWriter writer (os);
+    structure.write (writer, tc);
+  }
+
+  tc = TestClass ();
+
+  std::string error;
+  try {
+    tl::InputStream is (fn);
+    tl::ProtocolBufferReader reader (is);
+    structure.parse (reader, tc);
+  } catch (tl::Exception &ex) {
+    error = ex.msg ();
+  }
+
+  EXPECT_EQ (tc.e, TestClass::A);
+
+  tc.e = TestClass::B;
+
+  fn = tl::combine_path (tl::testtmp (), "pb_101b.pb");
+
+  {
+    tl::OutputStream os (fn);
+    tl::ProtocolBufferWriter writer (os);
+    structure.write (writer, tc);
+  }
+
+  tc = TestClass ();
+
+  error.clear ();
+  try {
+    tl::InputStream is (fn);
+    tl::ProtocolBufferReader reader (is);
+    structure.parse (reader, tc);
+  } catch (tl::Exception &ex) {
+    error = ex.msg ();
+  }
+
+  EXPECT_EQ (tc.e, TestClass::B);
+}
+

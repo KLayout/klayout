@@ -863,7 +863,7 @@ private:
   template <class T>
   void write (tl::ProtocolBufferWriterBase &writer, int tag, const T &v) const
   {
-    writer.write (tag, m_c.to_string (v));
+    writer.write (tag, m_c.pb_encode (v));
   }
 
   //  read incarnations
@@ -940,11 +940,11 @@ private:
   }
 
   template <class T>
-  void read (tl::ProtocolBufferReaderBase &reader, const T &v) const
+  void read (tl::ProtocolBufferReaderBase &reader, T &v) const
   {
-    std::string vv;
+    typename Converter::pb_type vv;
     reader.read (vv);
-    m_c.from_string (vv, v);
+    m_c.pb_decode (vv, v);
   }
 };
 
@@ -1671,12 +1671,14 @@ pb_make_element_with_parent_ref (Iter (Parent::*begin) () const, Iter (Parent::*
 template <class Value>
 struct PBStdConverter
 {
-  std::string to_string (const Value &v) const
+  typedef std::string pb_type;
+
+  pb_type pb_encode (const Value &v) const
   {
     return tl::to_string (v);
   }
 
-  void from_string (const std::string &s, Value &v) const
+  void pb_decode (const pb_type &s, Value &v) const
   {
     tl::from_string (s, v);
   }

@@ -351,6 +351,7 @@ public:
 
     menu_entries.push_back (lay::separator ("edt::hier_group", "zoom_menu.end"));
     menu_entries.push_back (lay::menu_item ("edt::descend", "descend", "zoom_menu.end", tl::to_string (tr ("Descend")) + "(Ctrl+D)"));
+    menu_entries.push_back (lay::menu_item ("edt::descend_into", "descend_into", "zoom_menu.end", tl::to_string (tr ("Descend Into")) + "(D)"));
     menu_entries.push_back (lay::menu_item ("edt::ascend", "ascend", "zoom_menu.end", tl::to_string (tr ("Ascend")) + "(Ctrl+A)"));
 
     menu_entries.push_back (lay::menu_item ("edt::sel_make_array", "make_array:edit_mode", "edit_menu.selection_menu.end", tl::to_string (tr ("Make Array"))));

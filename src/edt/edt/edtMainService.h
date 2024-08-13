@@ -91,6 +91,11 @@ public:
   void cm_descend ();
 
   /**
+   *  @brief Descend to selection and make cell current top
+   */
+  void cm_descend_into ();
+
+  /**
    *  @brief Ascend one level
    */
   void cm_ascend ();
@@ -239,6 +244,7 @@ private:
 
   void boolean_op (int mode);
   void check_no_guiding_shapes ();
+  void descend (bool make_new_top);
 #if defined(HAVE_QT)
   edt::RoundCornerOptionsDialog *round_corners_dialog ();
   edt::AreaAndPerimeterDialog *area_and_perimeter_dialog ();

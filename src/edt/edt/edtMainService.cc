@@ -169,6 +169,8 @@ MainService::menu_activated (const std::string &symbol)
 {
   if (symbol == "edt::descend") {
     cm_descend ();
+  } else if (symbol == "edt::descend_into") {
+    cm_descend_into ();
   } else if (symbol == "edt::ascend") {
     cm_ascend ();
   } else if (symbol == "edt::sel_align") {
@@ -303,8 +305,20 @@ private:
 };
 
 
-void  
+void
 MainService::cm_descend ()
+{
+  descend (false);
+}
+
+void
+MainService::cm_descend_into ()
+{
+  descend (true);
+}
+
+void
+MainService::descend (bool into)
 {
   CommonInsts common_inst;
 
@@ -312,6 +326,15 @@ MainService::cm_descend ()
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end () && common_inst.valid (); ++es) {
     for (EditableSelectionIterator sel = (*es)->begin_selection (); ! sel.at_end () && common_inst.valid (); ++sel) {
       common_inst.add (*sel, 1);
+    }
+  }
+
+  if (! common_inst.anything ()) {
+    //  try transient selection
+    for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end () && common_inst.valid (); ++es) {
+      for (EditableSelectionIterator sel = (*es)->begin_transient_selection (); ! sel.at_end () && common_inst.valid (); ++sel) {
+        common_inst.add (*sel, 1);
+      }
     }
   }
 
@@ -354,6 +377,9 @@ MainService::cm_descend ()
 
   //  this will clear the selection:
   view ()->descend (common_inst.common_path (), common_inst.cv_index ());
+  if (into) {
+    view ()->select_cell_dispatch (view ()->cellview (common_inst.cv_index ()).combined_unspecific_path (), common_inst.cv_index ());
+  }
   view ()->set_current_cell_path (common_inst.cv_index (), view ()->cellview (common_inst.cv_index ()).combined_unspecific_path ());
 
   //  set the new selections
@@ -371,6 +397,7 @@ MainService::cm_ascend ()
 
   std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
 
+  bool any_selected = false;
   std::vector< std::vector<lay::ObjectInstPath> > new_selections;
   new_selections.reserve (edt_services.size ());
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
@@ -382,6 +409,7 @@ MainService::cm_ascend ()
     new_selections.back ().reserve (n);
     for (EditableSelectionIterator i = (*es)->begin_selection (); ! i.at_end (); ++i) {
       new_selections.back ().push_back (*i);
+      any_selected = true;
     }
   }
 
@@ -394,14 +422,36 @@ MainService::cm_ascend ()
       db::cell_index_type new_top = view ()->cellview (cv_index).cell_index ();
       view ()->set_current_cell_path (cv_index, view ()->cellview (cv_index).combined_unspecific_path ());
 
-      //  create and the new selections
-      unsigned int index = 0;
-      for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es, ++index) {
-        for (std::vector<lay::ObjectInstPath>::iterator sel = new_selections [index].begin (); sel != new_selections [index].end (); ++sel) {
-          if (int (sel->cv_index ()) == cv_index) {
-            sel->insert_front (new_top, removed);
+      if (! any_selected) {
+
+#if 0
+        //  make the instance we just left the selected one
+        //  (Note: this is a nice idea, but it kind of pins the path to the current cell.
+        //  Specifically after enabling the transient selection for "descend", this is more
+        //  annoying than useful)
+        edt::InstService *inst_service = view ()->get_plugin <edt::InstService> ();
+        unsigned int index = 0;
+        for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es, ++index) {
+          if (*es == inst_service) {
+            new_selections [index].push_back (lay::ObjectInstPath ());
+            new_selections [index].back ().add_path (removed);
+            break;
           }
         }
+#endif
+
+      } else {
+
+        //  modify the selections by adding the new path element
+        unsigned int index = 0;
+        for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es, ++index) {
+          for (std::vector<lay::ObjectInstPath>::iterator sel = new_selections [index].begin (); sel != new_selections [index].end (); ++sel) {
+            if (int (sel->cv_index ()) == cv_index) {
+              sel->insert_front (new_top, removed);
+            }
+          }
+        }
+
       }
 
     }

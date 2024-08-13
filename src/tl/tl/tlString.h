@@ -786,7 +786,7 @@ public:
   /**
    *  @brief Throw an error with a context information
    */
-  virtual void error (const std::string &msg);
+  virtual void error (const std::string &msg) const;
 
   /**
    *  @brief Some syntactic sugar

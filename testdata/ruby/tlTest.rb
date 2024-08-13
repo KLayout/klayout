@@ -220,8 +220,66 @@ class Tl_TestClass < TestBase
 
   end
 
+  class MyFunction < RBA::FunctionBody
+    def initialize
+      self.with_kwargs = false
+      self.min_args = 1
+      self.max_args = 1
+    end
+    def execute(args, kwargs)
+      return args[0] + 1
+    end
+  end
+
+  # Functions
+  def test_3_FunctionsInExpressions
+
+    e = RBA::ExpressionContext::new
+    e.func("f", MyFunction::new)
+
+    self.assert_equal(e.eval("f(17)"), 18)
+    
+    # now with embedded expression
+    e = RBA::Expression::new
+    e.func("f", MyFunction::new)
+
+    e.var("A", nil)
+    e.text = "f(A)"
+
+    e.var("A", 1)
+    self.assert_equal(e.eval, 2)
+
+    e.var("A", 4)
+    self.assert_equal(e.eval, 5)
+
+  end
+
+  # Parent contexts
+  def test_4_FunctionsInExpressions
+
+    pc = RBA::ExpressionContext::new
+    pc.var("A", 17)
+    
+    e1 = RBA::Expression::new(pc)
+    e1.text = "A + 1"
+    self.assert_equal(e1.eval, 18)
+
+    e2 = RBA::Expression::new(pc)
+    e2.text = "A + 2"
+    self.assert_equal(e2.eval, 19)
+
+    pc.var("A", 4)
+    self.assert_equal(e1.eval, 5)
+    self.assert_equal(e2.eval, 6)
+
+    pc._destroy
+
+    self.assert_equal(e1.eval, 5)
+
+  end
+
   # Glob pattern
-  def test_3_GlobPattern
+  def test_10_GlobPattern
 
     pat = RBA::GlobPattern::new("a*b")
 
@@ -290,7 +348,7 @@ class Tl_TestClass < TestBase
   end
 
   # Recipe
-  def test_4_Recipe
+  def test_20_Recipe
 
     # make sure there isn't a second instance
     GC.start

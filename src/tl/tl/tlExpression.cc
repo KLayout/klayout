@@ -83,7 +83,7 @@ ExpressionParserContext::ExpressionParserContext (const Expression *expr, const 
 }
 
 void 
-ExpressionParserContext::error (const std::string &message)
+ExpressionParserContext::error (const std::string &message) const
 {
   throw EvalError (message, *this);
 }

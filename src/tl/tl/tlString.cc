@@ -1582,11 +1582,11 @@ Extractor::skip ()
 }
 
 void
-Extractor::error (const std::string &msg)
+Extractor::error (const std::string &msg) const
 {
   std::string m (msg);
 
-  if (at_end ()) {
+  if (! *m_cp) {
     m += tl::to_string (tr (", but text ended"));
   } else {
     m += tl::to_string (tr (" here: "));

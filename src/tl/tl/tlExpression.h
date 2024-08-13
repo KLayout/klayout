@@ -137,7 +137,7 @@ public:
   /**
    *  @brief Reimplementation of tl::Extractor's error method
    */
-  virtual void error (const std::string &message);
+  virtual void error (const std::string &message) const;
 
   /**
    *  @brief Gets a string indication where we are currently
@@ -383,6 +383,7 @@ private:
  *  @brief Provides the context for the expression parser and evaluation
  */
 class TL_PUBLIC Eval
+  : public tl::Object
 {
 public:
   /**
@@ -568,7 +569,7 @@ public:
    */
   tl::Eval *global ()
   {
-    return mp_global;
+    return mp_global.get ();
   }
 
   /**
@@ -576,13 +577,13 @@ public:
    */
   tl::Eval *parent ()
   {
-    return mp_parent;
+    return mp_parent.get ();
   }
 
 private:
   friend class Expression;
 
-  Eval *mp_parent, *mp_global;
+  tl::weak_ptr<Eval> mp_parent, mp_global;
   std::map <std::string, tl::Variant> m_local_vars;
   std::map <std::string, EvalFunction *> m_local_functions;
   bool m_sloppy;

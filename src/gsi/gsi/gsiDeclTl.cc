@@ -430,6 +430,18 @@ public:
     //  .. nothing yet ..
   }
 
+  ExpressionWrapper (tl::Eval *parent)
+    : tl::Eval (parent)
+  {
+    //  .. nothing yet ..
+  }
+
+  ExpressionWrapper (tl::Eval *global, tl::Eval *parent)
+    : tl::Eval (global, parent)
+  {
+    //  .. nothing yet ..
+  }
+
   void parse (const std::string &e)
   {
     mp_expr.reset (0);
@@ -452,13 +464,104 @@ private:
   std::unique_ptr<tl::Expression> mp_expr;
 };
 
+class FunctionBody
+  : public gsi::ObjectBase, public tl::EvalFunction
+{
+public:
+  FunctionBody ()
+    : tl::EvalFunction (), m_supports_keyword_parameters (false), m_min_args (0), m_max_args (std::numeric_limits<unsigned int>::max ())
+  { }
+
+  bool supports_keyword_parameters () const
+  {
+    return m_supports_keyword_parameters;
+  }
+
+  void set_with_kwargs (bool f)
+  {
+    m_supports_keyword_parameters = f;
+  }
+
+  bool with_kwargs () const
+  {
+    return m_supports_keyword_parameters;
+  }
+
+  void set_min_args (unsigned int a)
+  {
+    m_min_args = a;
+  }
+
+  unsigned int min_args () const
+  {
+    return m_min_args;
+  }
+
+  void set_max_args (unsigned int a)
+  {
+    m_max_args = a;
+  }
+
+  unsigned int max_args () const
+  {
+    return m_max_args;
+  }
+
+  tl::Variant do_execute (const std::vector<tl::Variant> &, const std::map<std::string, tl::Variant> &) const
+  {
+    return tl::Variant ();
+  }
+
+  virtual void execute (const tl::ExpressionParserContext &context, tl::Variant &out, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> *kwargs) const
+  {
+    if (args.size () < m_min_args) {
+      context.error (tl::sprintf (tl::to_string (tr ("Too few arguments (got %d, expected %d at least)")), int (args.size ()), int (m_min_args)));
+    }
+    if (args.size () > m_max_args) {
+      context.error (tl::sprintf (tl::to_string (tr ("Too many arguments (got %d, expected %d at most)")), int (args.size ()), int (m_max_args)));
+    }
+
+    static std::map<std::string, tl::Variant> no_args;
+    const std::map<std::string, tl::Variant> &kwa = kwargs ? *kwargs : no_args;
+    if (execute_cb.can_issue ()) {
+      out = execute_cb.issue<FunctionBody, tl::Variant, const std::vector<tl::Variant> &, const std::map<std::string, tl::Variant> &> (&FunctionBody::do_execute, args, kwa);
+    } else {
+      out = FunctionBody::do_execute (args, kwa);
+    }
+  }
+
+  gsi::Callback execute_cb;
+
+private:
+  bool m_supports_keyword_parameters;
+  unsigned int m_min_args, m_max_args;
+};
+
 }
 
-static tl::Variant eval_expr (const std::string &e)
+static tl::Variant eval_expr (const std::string &e, const std::map<std::string, tl::Variant> &variables)
 {
   ExpressionWrapper expr;
+  for (std::map<std::string, tl::Variant>::const_iterator v = variables.begin (); v != variables.end (); ++v) {
+    expr.set_var (v->first, v->second);
+  }
   expr.parse (e);
   return expr.eval ();
+}
+
+static ExpressionWrapper *new_expr0 ()
+{
+  return new ExpressionWrapper ();
+}
+
+static ExpressionWrapper *new_expr1a (tl::Eval *parent)
+{
+  return new ExpressionWrapper (parent);
+}
+
+static ExpressionWrapper *new_expr1b (tl::Eval *global, tl::Eval *parent)
+{
+  return new ExpressionWrapper (global, parent);
 }
 
 static ExpressionWrapper *new_expr1 (const std::string &e)
@@ -481,12 +584,76 @@ static ExpressionWrapper *new_expr2 (const std::string &e, const std::map<std::s
 namespace gsi
 {
 
+static void def_func (tl::Eval *eval, const std::string &name, FunctionBody *func)
+{
+  func->keep ();
+  eval->define_function (name, func);
+}
+
+Class<FunctionBody> decl_FunctionBody ("tl", "FunctionBody",
+  gsi::method ("with_kwargs=", &FunctionBody::set_with_kwargs, gsi::arg ("f"),
+    "@brief Sets a value indicating whether this function accepts keyword arguments.\n"
+    "By default, the function will not accept keyword arguments and the 'kwargs' argument "
+    "is always empty upon 'execute'. Set this attribute to 'true' to enable keyword arguments."
+  ) +
+  gsi::method ("with_kwargs", &FunctionBody::with_kwargs,
+    "@brief Gets a value indicating whether this function accepts keyword arguments.\n"
+  ) +
+  gsi::method ("min_args=", &FunctionBody::set_min_args, gsi::arg ("a"),
+    "@brief Specifies the minimum number of arguments expected by this function.\n"
+  ) +
+  gsi::method ("min_args", &FunctionBody::min_args,
+    "@brief Gets the minimum number of arguments expected by this function.\n"
+  ) +
+  gsi::method ("max_args=", &FunctionBody::set_max_args, gsi::arg ("a"),
+    "@brief Specifies the maximum number of arguments expected by this function.\n"
+  ) +
+  gsi::method ("max_args", &FunctionBody::max_args,
+    "@brief Gets the maximum number of arguments expected by this function.\n"
+  ) +
+  gsi::callback ("execute", &FunctionBody::do_execute, &FunctionBody::execute_cb, gsi::arg ("args"), gsi::arg ("kwargs"),
+    "@brief Implements the function\n"
+    "@param args The function arguments\n"
+    "@param kwargs The keyword arguments (only present if \\with_kwargs is true)"
+    "Reimplement this method to provide the function's implementation. The number of arguments is "
+    "between \\min_args and \\max_args.\n"
+  ),
+  "@brief Defines a function for use in expressions.\n"
+  "This class provides an interface for implementing custom functions for expressions. "
+  "See \\ExpressionContext#func for a use case.\n"
+  "\n"
+  "This class has been introduced in version 0.29.6."
+);
+
 Class<tl::Eval> decl_ExpressionContext ("tl", "ExpressionContext",
   gsi::method ("var", &tl::Eval::set_var, gsi::arg ("name"), gsi::arg ("value"),
     "@brief Defines a variable with the given name and value\n"
   ) +
+  gsi::method_ext ("func", &def_func, gsi::arg ("name"), gsi::arg ("body"),
+    "@brief Defines a function with the given name and function body\n"
+    "The function body is an implementation of the \\FunctionBody class. To use it, create a subclass, i.e.\n"
+    "\n"
+    "@code\n"
+    "class MyFunction < RBA::FunctionBody\n"
+    "  def initialize\n"
+    "    self.min_args = self.max_args = 1  # one argument\n"
+    "    self.with_kwargs = false\n"
+    "  end\n"
+    "  def execute(args, kwargs)\n"
+    "    return args[0] + 1  # one more\n"
+    "  end\n"
+    "end\n"
+    "\n"
+    "ctx = ExpressionContext::new\n"
+    "ctx.func('myfunction', MyFunction::new)\n"
+    "ctx.eval('myfunction(17)')  # gives 18\n"
+    "@endcode\n"
+    "\n"
+    "This method has been introduced in version 0.29.6."
+  ) +
   gsi::method ("global_var", &tl::Eval::set_global_var, gsi::arg ("name"), gsi::arg ("value"),
     "@brief Defines a global variable with the given name and value\n"
+    "Global variables are available to all expressions sharing the same global context."
   ) +
   gsi::method ("eval", &tl::Eval::eval, gsi::arg ("expr"),
     "@brief Compiles and evaluates the given expression in this context\n"
@@ -494,18 +661,63 @@ Class<tl::Eval> decl_ExpressionContext ("tl", "ExpressionContext",
   ),
   "@brief Represents the context of an expression evaluation\n"
   "\n"
-  "The context provides a variable namespace for the expression evaluation.\n"
+  "The context provides a variable and function namespace for the expression evaluation.\n"
   "\n"
   "This class has been introduced in version 0.26 when \\Expression was separated into the execution and context part.\n"
 );
 
 Class<ExpressionWrapper> decl_ExpressionWrapper (decl_ExpressionContext, "tl", "Expression",
+  gsi::constructor ("new", &new_expr0,
+    "@brief Creates a new expression evaluator for late compilation\n"
+    "Use \\var to define variables, \\func to define functions and use \\text= to compile an expression.\n"
+    "\n"
+    "This constructor has been added in version 0.29.6."
+  ) +
+  gsi::constructor ("new", &new_expr1a, gsi::arg ("parent"),
+    "@brief Creates a new expression object with a parent context.\n"
+    "Variables and functions not found in this context are looked up in the parent context. "
+    "The parent context itself can have another parent context. Parent contexts allow "
+    "sharing variables among multiple expressions.\n"
+    "\n"
+    "Note that the expression object will not hold a strong reference to the parent context. It "
+    "will get lost of the variable holding the parent context goes out of scope.\n"
+    "\n"
+    "This constructor has been introduced in version 0.29.6."
+  ) +
+  gsi::constructor ("new", &new_expr1b, gsi::arg ("global"), gsi::arg ("parent"),
+    "@brief Creates a new expression object with a parent and a global context.\n"
+    "Variables and functions not found in this context are looked up in the parent context and "
+    "finally in the global context.\n"
+    "The parent and the global context themselves can have another parent contexts. Parent and global contexts allow "
+    "sharing variables among multiple expressions.\n"
+    "\n"
+    "Without a global context given, the expressions will use the global context singleton that is available to "
+    "all expressions.\n"
+    "\n"
+    "Note that the expression object will not hold a strong reference to the parent or global context. These contexts "
+    "will get lost of a variable holding them goes out of scope.\n"
+    "\n"
+    "This constructor has been introduced in version 0.29.6."
+  ) +
   gsi::constructor ("new", &new_expr1, gsi::arg ("expr"),
     "@brief Creates an expression evaluator\n"
+    "This is a convenience constructor that is equivalent to:\n"
+    "@code\n"
+    "e = RBA::Expression::new\n"
+    "e.text = expr\n"
+    "..."
+    "@/code\n"
   ) +
   gsi::constructor ("new", &new_expr2, gsi::arg ("expr"), gsi::arg ("variables"),
     "@brief Creates an expression evaluator\n"
-    "This version of the constructor takes a hash of variables available to the expressions."
+    "This version of the constructor takes a hash of variables available to the expressions. "
+    "It is a convenience constructor that is equivalent to:\n"
+    "@code\n"
+    "e = RBA::Expression::new\n"
+    "variables.each { |n,v| e.var(n, v) }\n"
+    "e.text = expr\n"
+    "..."
+    "@/code\n"
   ) +
   gsi::method ("text=", &ExpressionWrapper::parse, gsi::arg ("expr"),
     "@brief Sets the given text as the expression."
@@ -513,9 +725,13 @@ Class<ExpressionWrapper> decl_ExpressionWrapper (decl_ExpressionContext, "tl", "
   gsi::method ("eval", &ExpressionWrapper::eval,
     "@brief Evaluates the current expression and returns the result\n"
   ) +
-  gsi::method ("eval", &eval_expr, gsi::arg ("expr"),
-    "@brief A convience function to evaluate the given expression and directly return the result\n"
-    "This is a static method that does not require instantiation of the expression object first."
+  gsi::method ("eval", &eval_expr, gsi::arg ("expr"), gsi::arg ("variables", std::map<std::string, tl::Variant> (), "{}"),
+    "@brief A convience function to evaluate the given expression and directly returns the result\n"
+    "@param expr The expression to evaluate\n"
+    "@param variables The variables to use in the expression\n"
+    "This is a static method that does not require instantiation of the expression object first.\n"
+    "\n"
+    "The variable argument has been added in version 0.29.6.\n"
   ),
   "@brief Evaluation of Expressions\n"
   "\n"
@@ -524,8 +740,42 @@ Class<ExpressionWrapper> decl_ExpressionWrapper (decl_ExpressionContext, "tl", "
   "inside a script client. This class is provided mainly for testing purposes.\n"
   "\n"
   "An expression is 'compiled' into an Expression object and can be evaluated multiple times.\n"
+  "The Expression object is based on the \\ExpressionContext object which provides a namespace for variables \n"
+  "and functions.\n"
+  "\n"
+  "The basic use model for the Expression object is this:\n"
+  "\n"
+  "@code\n"
+  "e = RBA::Expression::new\n"
+  "e.var('A', 17)\n"
+  "e.text = 'A + 1'\n"
+  "e.eval    # gives 18\n"
+  "e.var('A', 2)\n"
+  "e.eval    # gives 3\n"
+  "@/code\n"
+  "\n"
+  "Expressions allow to share variables among multiple expressions through parent contexts:\n"
+  "\n"
+  "@code\n"
+  "pc = RBA::ExpressionContext::new\n"
+  "pc.var('A', 17)\n"
+  "\n"
+  "e1 = RBA::Expression::new(pc)\n"
+  "e1.text = 'A + 1'\n"
+  "e1.eval    # gives 18\n"
+  "\n"
+  "e2 = RBA::Expression::new(pc)\n"
+  "e2.text = 'A + 2'\n"
+  "e2.eval    # gives 19\n"
+  "\n"
+  "# modifying 'A' in pc changes input for both expressions\n"
+  "pc.var('A', 2)\n"
+  "e1.eval    # gives 3\n"
+  "e2.eval    # gives 4\n"
+  "@/code\n"
   "\n"
   "This class has been introduced in version 0.25. In version 0.26 it was separated into execution and context.\n"
+  "In version 0.29.6, the context was significantly enhanced towards parent contexts and functions.\n"
 );
 
 static tl::GlobPattern *new_glob_pattern (const std::string &s)

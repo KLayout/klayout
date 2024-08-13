@@ -409,15 +409,15 @@ class AnnotationEval
   : public tl::Eval
 {
 public:
-  AnnotationEval (const Object &obj, const db::DFTrans &t)
+  AnnotationEval (const ant::Object &obj, const db::DFTrans &t)
     : m_obj (obj), m_trans (t)
   { }
 
-  const Object &obj () const { return m_obj; }
+  const ant::Object &obj () const { return m_obj; }
   const db::DFTrans &trans () const { return m_trans; }
 
 private:
-  const Object &m_obj;
+  const ant::Object &m_obj;
   db::DFTrans m_trans;
 };
 

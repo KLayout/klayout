@@ -1,3 +1,25 @@
+0.29.6           (2024-08-15):
+* Bug: %GITHUB%/issues/1814 Application freezes on Ctrl+Select
+* Bug: %GITHUB%/issues/1816 interacting operation between EdgePairs and Region (or edges)
+  EdgePair layers in DRC can now tested for interacting with edges and polygons
+  (includes: inside, outside). New methods for EdgePairs: EdgePairs#inside etc.
+* Bug: %GITHUB%/issues/1819 Discrete soft small rendering
+* Bug: %GITHUB%/issues/1823 "Select all" was not working as expected for texts, API "select_all" was not working at all.
+* Bugfix: Typo: ParameterState#icon was named 'tooltip'
+* Enhancement: Allowing RBA::Net objects for DRCLayer#nets as well
+* Enhancement: const versions of Layout#cell and Layout#top_cell(s)
+* Enhancement: Generic GSI method and #_const_cast to make a const
+  reference into a non-const one (use with care)
+* Bugfix: 'netter' function in DRC wasn't working as described - it raised an error
+* Enhancement: Provide a warning message when closing the window while an operation is ongoing
+* Bugfix: Avoid a segfault in the property editor due to invalid array access
+* Bugfix: Properties dialog: stop handling 'Enter' key - use 'Ok' to close it
+* Enhancement: Some improvements on Ascend and Descend:
+  - Ascend now walks up the unspecific tree too
+  - Descend enters cell if selected transiently
+  - New feature "Descend into" which also selects the child cell
+    as current top
+  
 0.29.5           (2024-07-30):
 * Bug: %GITHUB%/issues/1784 Spice throws error at midline semicolon comments
 * Enhancement: %GITHUB%/issues/1790 Support for recursive PCell instances

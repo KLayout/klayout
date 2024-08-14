@@ -29,6 +29,14 @@ class RdbCategory:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> RdbCategory:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -62,6 +70,11 @@ class RdbCategory:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> RdbCategory:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -270,6 +283,14 @@ class RdbCell:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> RdbCell:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -303,6 +324,11 @@ class RdbCell:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> RdbCell:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -515,6 +541,14 @@ class RdbItem:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> RdbItem:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -548,6 +582,11 @@ class RdbItem:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> RdbItem:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -910,6 +949,14 @@ class RdbItemValue:
         @return The string
         """
         ...
+    def _const_cast(self) -> RdbItemValue:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -943,6 +990,11 @@ class RdbItemValue:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> RdbItemValue:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -1140,6 +1192,14 @@ class RdbReference:
         @brief Creates a reference with a given transformation and parent cell ID
         """
         ...
+    def _const_cast(self) -> RdbReference:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -1173,6 +1233,11 @@ class RdbReference:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> RdbReference:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -1313,6 +1378,14 @@ class ReportDatabase:
         The name of the database will be used in the user interface to refer to a certain database.
         """
         ...
+    def _const_cast(self) -> ReportDatabase:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -1346,6 +1419,11 @@ class ReportDatabase:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> ReportDatabase:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:

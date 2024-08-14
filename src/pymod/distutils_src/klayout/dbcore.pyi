@@ -402,6 +402,14 @@ class Box:
         This feature has been introduced in version 0.29.
         """
         ...
+    def _const_cast(self) -> Box:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -435,6 +443,11 @@ class Box:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Box:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -878,6 +891,14 @@ class Cell:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> Cell:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -911,6 +932,11 @@ class Cell:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Cell:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -2242,10 +2268,19 @@ class Cell:
         This method has been introduced in version 0.24.
         """
         ...
+    def properties(self) -> Any:
+        r"""
+        @brief Gets the user properties as a hash
+        This method is a convenience method that gets all user properties as a single hash.
+
+        This method has been introduced in version 0.29.5.
+        """
+        ...
     def property(self, key: Any) -> Any:
         r"""
         @brief Gets the user property with the given key
-        This method is a convenience method that gets the property with the given key. If no property with that key exists, it will return nil. Using that method is more convenient than using the layout object and the properties ID to retrieve the property value. 
+        This method is a convenience method that gets the property with the given key. If no property with that key exists, it will return nil. Using that method is more convenient than using the layout object and the properties ID to retrieve the property value.
+
         This method has been introduced in version 0.23.
         """
         ...
@@ -3106,6 +3141,14 @@ class CellInstArray:
         This method was introduced in version 0.22.
         """
         ...
+    def _const_cast(self) -> CellInstArray:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -3139,6 +3182,11 @@ class CellInstArray:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> CellInstArray:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -3413,6 +3461,14 @@ class CellMapping:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> CellMapping:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -3446,6 +3502,11 @@ class CellMapping:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> CellMapping:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -3831,6 +3892,14 @@ class Circuit(NetlistObject):
         @brief Assigns another object to self
         """
         ...
+    def _const_cast(self) -> Circuit:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -3869,6 +3938,11 @@ class Circuit(NetlistObject):
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Circuit:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -5428,6 +5502,14 @@ class CompoundRegionOperationNode:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> CompoundRegionOperationNode:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -5461,6 +5543,11 @@ class CompoundRegionOperationNode:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> CompoundRegionOperationNode:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -5552,6 +5639,14 @@ class Connectivity:
         @hide
         """
         ...
+    def _const_cast(self) -> Connectivity:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -5585,6 +5680,11 @@ class Connectivity:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Connectivity:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -6366,6 +6466,14 @@ class CplxTrans:
         The lazy and DBU arguments have been added in version 0.27.6.
         """
         ...
+    def _const_cast(self) -> CplxTrans:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -6399,6 +6507,11 @@ class CplxTrans:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> CplxTrans:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -7084,6 +7197,14 @@ class DBox:
         This feature has been introduced in version 0.29.
         """
         ...
+    def _const_cast(self) -> DBox:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -7117,6 +7238,11 @@ class DBox:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DBox:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -7893,6 +8019,14 @@ class DCellInstArray:
         @brief Converts the array to a string
         """
         ...
+    def _const_cast(self) -> DCellInstArray:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -7926,6 +8060,11 @@ class DCellInstArray:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DCellInstArray:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -8747,6 +8886,14 @@ class DCplxTrans:
         The lazy and DBU arguments have been added in version 0.27.6.
         """
         ...
+    def _const_cast(self) -> DCplxTrans:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -8780,6 +8927,11 @@ class DCplxTrans:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DCplxTrans:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -9311,6 +9463,14 @@ class DEdge:
         The DBU argument has been added in version 0.27.6.
         """
         ...
+    def _const_cast(self) -> DEdge:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -9344,6 +9504,11 @@ class DEdge:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DEdge:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -10054,6 +10219,14 @@ class DEdgePair:
         The DBU argument has been added in version 0.27.6.
         """
         ...
+    def _const_cast(self) -> DEdgePair:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -10087,6 +10260,11 @@ class DEdgePair:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DEdgePair:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -10543,6 +10721,14 @@ class DPath:
         @brief Convert to a string
         """
         ...
+    def _const_cast(self) -> DPath:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -10576,6 +10762,11 @@ class DPath:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DPath:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -11061,6 +11252,14 @@ class DPoint:
         Returns the scaled object. All coordinates are divided with the given divisor and if necessary rounded.
         """
         ...
+    def _const_cast(self) -> DPoint:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -11094,6 +11293,11 @@ class DPoint:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DPoint:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -11434,6 +11638,14 @@ class DPolygon:
         @brief Returns a string representing the polygon
         """
         ...
+    def _const_cast(self) -> DPolygon:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -11467,6 +11679,11 @@ class DPolygon:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DPolygon:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -12278,6 +12495,14 @@ class DSimplePolygon:
         @brief Returns a string representing the polygon
         """
         ...
+    def _const_cast(self) -> DSimplePolygon:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -12311,6 +12536,11 @@ class DSimplePolygon:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DSimplePolygon:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -12784,8 +13014,7 @@ class DText:
     Setter:
     @brief Sets the horizontal alignment
 
-    This property specifies how the text is aligned relative to the anchor point. 
-    This property has been introduced in version 0.22 and extended to enums in 0.28.
+    This is the version accepting integer values. It's provided for backward compatibility.
     """
     size: float
     r"""
@@ -13008,6 +13237,14 @@ class DText:
         The DBU argument has been added in version 0.27.6.
         """
         ...
+    def _const_cast(self) -> DText:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -13041,6 +13278,11 @@ class DText:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DText:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -13810,6 +14052,14 @@ class DTrans:
         The DBU argument has been added in version 0.27.6.
         """
         ...
+    def _const_cast(self) -> DTrans:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -13843,6 +14093,11 @@ class DTrans:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DTrans:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -14289,6 +14544,14 @@ class DVector:
         Returns the scaled object. All coordinates are divided with the given divisor and if necessary rounded.
         """
         ...
+    def _const_cast(self) -> DVector:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -14322,6 +14585,11 @@ class DVector:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DVector:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -14591,6 +14859,14 @@ class DeepShapeStore:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> DeepShapeStore:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -14624,6 +14900,11 @@ class DeepShapeStore:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DeepShapeStore:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -14814,6 +15095,14 @@ class Device(NetlistObject):
         @brief Assigns another object to self
         """
         ...
+    def _const_cast(self) -> Device:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -14852,6 +15141,11 @@ class Device(NetlistObject):
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Device:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -15065,6 +15359,14 @@ class DeviceAbstract:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> DeviceAbstract:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -15098,6 +15400,11 @@ class DeviceAbstract:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DeviceAbstract:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -15224,6 +15531,14 @@ class DeviceAbstractRef:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> DeviceAbstractRef:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -15257,6 +15572,11 @@ class DeviceAbstractRef:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DeviceAbstractRef:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -15417,6 +15737,14 @@ class DeviceClass:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> DeviceClass:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -15450,6 +15778,11 @@ class DeviceClass:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DeviceClass:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -15692,6 +16025,14 @@ class DeviceClassBJT3Transistor(DeviceClass):
         @brief Assigns another object to self
         """
         ...
+    def _const_cast(self) -> DeviceClassBJT3Transistor:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -15732,6 +16073,11 @@ class DeviceClassBJT3Transistor(DeviceClass):
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
         ...
+    def _to_const_object(self) -> DeviceClassBJT3Transistor:
+        r"""
+        @hide
+        """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -15758,6 +16104,14 @@ class DeviceClassBJT4Transistor(DeviceClassBJT3Transistor):
     def _assign(self, other: DeviceClass) -> None:
         r"""
         @brief Assigns another object to self
+        """
+        ...
+    def _const_cast(self) -> DeviceClassBJT4Transistor:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
         """
         ...
     def _create(self) -> None:
@@ -15798,6 +16152,11 @@ class DeviceClassBJT4Transistor(DeviceClassBJT3Transistor):
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DeviceClassBJT4Transistor:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -15845,6 +16204,14 @@ class DeviceClassCapacitor(DeviceClass):
         @brief Assigns another object to self
         """
         ...
+    def _const_cast(self) -> DeviceClassCapacitor:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -15885,6 +16252,11 @@ class DeviceClassCapacitor(DeviceClass):
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
         ...
+    def _to_const_object(self) -> DeviceClassCapacitor:
+        r"""
+        @hide
+        """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -15911,6 +16283,14 @@ class DeviceClassCapacitorWithBulk(DeviceClassCapacitor):
     def _assign(self, other: DeviceClass) -> None:
         r"""
         @brief Assigns another object to self
+        """
+        ...
+    def _const_cast(self) -> DeviceClassCapacitorWithBulk:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
         """
         ...
     def _create(self) -> None:
@@ -15951,6 +16331,11 @@ class DeviceClassCapacitorWithBulk(DeviceClassCapacitor):
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DeviceClassCapacitorWithBulk:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -15994,6 +16379,14 @@ class DeviceClassDiode(DeviceClass):
         @brief Assigns another object to self
         """
         ...
+    def _const_cast(self) -> DeviceClassDiode:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -16032,6 +16425,11 @@ class DeviceClassDiode(DeviceClass):
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DeviceClassDiode:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -16090,6 +16488,14 @@ class DeviceClassFactory:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> DeviceClassFactory:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -16123,6 +16529,11 @@ class DeviceClassFactory:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DeviceClassFactory:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -16198,6 +16609,14 @@ class DeviceClassInductor(DeviceClass):
         @brief Assigns another object to self
         """
         ...
+    def _const_cast(self) -> DeviceClassInductor:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -16236,6 +16655,11 @@ class DeviceClassInductor(DeviceClass):
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DeviceClassInductor:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -16302,6 +16726,14 @@ class DeviceClassMOS3Transistor(DeviceClass):
         @brief Assigns another object to self
         """
         ...
+    def _const_cast(self) -> DeviceClassMOS3Transistor:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -16342,6 +16774,11 @@ class DeviceClassMOS3Transistor(DeviceClass):
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
         ...
+    def _to_const_object(self) -> DeviceClassMOS3Transistor:
+        r"""
+        @hide
+        """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -16375,6 +16812,14 @@ class DeviceClassMOS4Transistor(DeviceClassMOS3Transistor):
     def _assign(self, other: DeviceClass) -> None:
         r"""
         @brief Assigns another object to self
+        """
+        ...
+    def _const_cast(self) -> DeviceClassMOS4Transistor:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
         """
         ...
     def _create(self) -> None:
@@ -16415,6 +16860,11 @@ class DeviceClassMOS4Transistor(DeviceClassMOS3Transistor):
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DeviceClassMOS4Transistor:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -16470,6 +16920,14 @@ class DeviceClassResistor(DeviceClass):
         @brief Assigns another object to self
         """
         ...
+    def _const_cast(self) -> DeviceClassResistor:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -16510,6 +16968,11 @@ class DeviceClassResistor(DeviceClass):
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
         ...
+    def _to_const_object(self) -> DeviceClassResistor:
+        r"""
+        @hide
+        """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -16536,6 +16999,14 @@ class DeviceClassResistorWithBulk(DeviceClassResistor):
     def _assign(self, other: DeviceClass) -> None:
         r"""
         @brief Assigns another object to self
+        """
+        ...
+    def _const_cast(self) -> DeviceClassResistorWithBulk:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
         """
         ...
     def _create(self) -> None:
@@ -16576,6 +17047,11 @@ class DeviceClassResistorWithBulk(DeviceClassResistor):
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DeviceClassResistorWithBulk:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -16638,6 +17114,14 @@ class DeviceExtractorBJT3Transistor(DeviceExtractorBase):
         For the 'factory' parameter see \DeviceClassFactory. It has been added in version 0.27.3.
         """
         ...
+    def _const_cast(self) -> DeviceExtractorBJT3Transistor:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -16671,6 +17155,11 @@ class DeviceExtractorBJT3Transistor(DeviceExtractorBase):
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DeviceExtractorBJT3Transistor:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -16717,6 +17206,14 @@ class DeviceExtractorBJT4Transistor(DeviceExtractorBJT3Transistor):
         For the 'factory' parameter see \DeviceClassFactory. It has been added in version 0.27.3.
         """
         ...
+    def _const_cast(self) -> DeviceExtractorBJT4Transistor:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -16750,6 +17247,11 @@ class DeviceExtractorBJT4Transistor(DeviceExtractorBJT3Transistor):
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DeviceExtractorBJT4Transistor:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -16789,6 +17291,14 @@ class DeviceExtractorBase:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> DeviceExtractorBase:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -16822,6 +17332,11 @@ class DeviceExtractorBase:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DeviceExtractorBase:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -16936,6 +17451,14 @@ class DeviceExtractorCapacitor(DeviceExtractorBase):
         For the 'factory' parameter see \DeviceClassFactory. It has been added in version 0.27.3.
         """
         ...
+    def _const_cast(self) -> DeviceExtractorCapacitor:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -16969,6 +17492,11 @@ class DeviceExtractorCapacitor(DeviceExtractorBase):
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DeviceExtractorCapacitor:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -17029,6 +17557,14 @@ class DeviceExtractorCapacitorWithBulk(DeviceExtractorBase):
         For the 'factory' parameter see \DeviceClassFactory. It has been added in version 0.27.3.
         """
         ...
+    def _const_cast(self) -> DeviceExtractorCapacitorWithBulk:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -17062,6 +17598,11 @@ class DeviceExtractorCapacitorWithBulk(DeviceExtractorBase):
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DeviceExtractorCapacitorWithBulk:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -17124,6 +17665,14 @@ class DeviceExtractorDiode(DeviceExtractorBase):
         For the 'factory' parameter see \DeviceClassFactory. It has been added in version 0.27.3.
         """
         ...
+    def _const_cast(self) -> DeviceExtractorDiode:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -17157,6 +17706,11 @@ class DeviceExtractorDiode(DeviceExtractorBase):
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DeviceExtractorDiode:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -17229,6 +17783,14 @@ class DeviceExtractorMOS3Transistor(DeviceExtractorBase):
         For the 'factory' parameter see \DeviceClassFactory. It has been added in version 0.27.3.
         """
         ...
+    def _const_cast(self) -> DeviceExtractorMOS3Transistor:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -17262,6 +17824,11 @@ class DeviceExtractorMOS3Transistor(DeviceExtractorBase):
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DeviceExtractorMOS3Transistor:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -17319,6 +17886,14 @@ class DeviceExtractorMOS4Transistor(DeviceExtractorBase):
         For the 'factory' parameter see \DeviceClassFactory. It has been added in version 0.27.3.
         """
         ...
+    def _const_cast(self) -> DeviceExtractorMOS4Transistor:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -17352,6 +17927,11 @@ class DeviceExtractorMOS4Transistor(DeviceExtractorBase):
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DeviceExtractorMOS4Transistor:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -17413,6 +17993,14 @@ class DeviceExtractorResistor(DeviceExtractorBase):
         For the 'factory' parameter see \DeviceClassFactory. It has been added in version 0.27.3.
         """
         ...
+    def _const_cast(self) -> DeviceExtractorResistor:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -17446,6 +18034,11 @@ class DeviceExtractorResistor(DeviceExtractorBase):
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DeviceExtractorResistor:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -17507,6 +18100,14 @@ class DeviceExtractorResistorWithBulk(DeviceExtractorBase):
         For the 'factory' parameter see \DeviceClassFactory. It has been added in version 0.27.3.
         """
         ...
+    def _const_cast(self) -> DeviceExtractorResistorWithBulk:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -17540,6 +18141,11 @@ class DeviceExtractorResistorWithBulk(DeviceExtractorBase):
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DeviceExtractorResistorWithBulk:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -17647,6 +18253,14 @@ class DeviceParameterDefinition:
         @param geo_scaling_exponent Indicates how the parameter scales with geometrical scaling (0: no scaling, 1.0: linear, 2.0: quadratic)
         """
         ...
+    def _const_cast(self) -> DeviceParameterDefinition:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -17680,6 +18294,11 @@ class DeviceParameterDefinition:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DeviceParameterDefinition:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -17783,6 +18402,14 @@ class DeviceReconnectedTerminal:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> DeviceReconnectedTerminal:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -17816,6 +18443,11 @@ class DeviceReconnectedTerminal:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DeviceReconnectedTerminal:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -17907,6 +18539,14 @@ class DeviceTerminalDefinition:
         @brief Creates a new terminal definition.
         """
         ...
+    def _const_cast(self) -> DeviceTerminalDefinition:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -17940,6 +18580,11 @@ class DeviceTerminalDefinition:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DeviceTerminalDefinition:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -18234,6 +18879,14 @@ class Edge:
         The DBU argument has been added in version 0.27.6.
         """
         ...
+    def _const_cast(self) -> Edge:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -18267,6 +18920,11 @@ class Edge:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Edge:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -18900,6 +19558,14 @@ class EdgeFilter:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> EdgeFilter:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -18933,6 +19599,11 @@ class EdgeFilter:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> EdgeFilter:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -19138,6 +19809,14 @@ class EdgeMode:
         @brief Gets the symbolic string from an enum
         """
         ...
+    def _const_cast(self) -> EdgeMode:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -19171,6 +19850,11 @@ class EdgeMode:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> EdgeMode:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -19345,6 +20029,14 @@ class EdgeOperator:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> EdgeOperator:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -19378,6 +20070,11 @@ class EdgeOperator:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> EdgeOperator:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -19600,6 +20297,14 @@ class EdgePair:
         The DBU argument has been added in version 0.27.6.
         """
         ...
+    def _const_cast(self) -> EdgePair:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -19633,6 +20338,11 @@ class EdgePair:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> EdgePair:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -19883,6 +20593,14 @@ class EdgePairFilter:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> EdgePairFilter:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -19916,6 +20634,11 @@ class EdgePairFilter:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> EdgePairFilter:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -20042,6 +20765,14 @@ class EdgePairOperator:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> EdgePairOperator:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -20075,6 +20806,11 @@ class EdgePairOperator:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> EdgePairOperator:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -20183,6 +20919,14 @@ class EdgePairToEdgeOperator:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> EdgePairToEdgeOperator:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -20216,6 +20960,11 @@ class EdgePairToEdgeOperator:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> EdgePairToEdgeOperator:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -20324,6 +21073,14 @@ class EdgePairToPolygonOperator:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> EdgePairToPolygonOperator:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -20357,6 +21114,11 @@ class EdgePairToPolygonOperator:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> EdgePairToPolygonOperator:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -20754,6 +21516,14 @@ class EdgePairs(ShapeCollection):
         The length of the output is limited to 20 edge pairs to avoid giant strings on large regions. For full output use "to_s" with a maximum count parameter.
         """
         ...
+    def _const_cast(self) -> EdgePairs:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -20787,6 +21557,11 @@ class EdgePairs(ShapeCollection):
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> EdgePairs:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -21006,6 +21781,45 @@ class EdgePairs(ShapeCollection):
         This method has been introduced in version 0.26.
         """
         ...
+    def inside(self, other: Region) -> EdgePairs:
+        r"""
+        @brief Returns the edge pairs from this edge pair collection which are inside (completely covered by) polygons from the region
+
+        @return A new edge pair collection containing the edge pairs completely inside polygons from the region
+
+        Edge pairs are considered 'filled' in the context of this operation - i.e. the area between the edges belongs to the edge pair, hence participates in the check.
+
+        This method has been introduced in version 0.29.6
+        """
+        ...
+    @overload
+    def interacting(self, other: Edges, min_count: Optional[int] = ..., max_count: Optional[int] = ...) -> EdgePairs:
+        r"""
+        @brief Returns the edge pairs from this edge pair collection which overlap or touch edges from the other edge collection
+
+        @return A new edge pair collection containing the edge pairs overlapping or touching edges from the other edge collection
+
+        'min_count' and 'max_count' impose a constraint on the number of times an edge pair of this collection has to interact with (different) edges of the other collection to make the edge pair selected. An edge pair is not selected by this method if the number of edges interacting with an edge pair of this collection is between min_count and max_count (including max_count).
+
+        Edge pairs are considered 'filled' in the context of this operation - i.e. the area between the edges belongs to the edge pair, hence participates in the check.
+
+        This method has been introduced in version 0.29.6
+        """
+        ...
+    @overload
+    def interacting(self, other: Region, min_count: Optional[int] = ..., max_count: Optional[int] = ...) -> EdgePairs:
+        r"""
+        @brief Returns the edge pairs from this edge pair collection which overlap or touch polygons from the region
+
+        @return A new edge pair collection containing the edge pairs overlapping or touching polygons from the region
+
+        'min_count' and 'max_count' impose a constraint on the number of times an edge pair of this collection has to interact with (different) polygons of the other region to make the edge pair selected. An edge pair is not selected by this method if the number of polygons interacting with an edge pair of this collection is between min_count and max_count (including max_count).
+
+        Edge pairs are considered 'filled' in the context of this operation - i.e. the area between the edges belongs to the edge pair, hence participates in the check.
+
+        This method has been introduced in version 0.29.6
+        """
+        ...
     def is_const_object(self) -> bool:
         r"""
         @brief Returns a value indicating whether the reference is a const reference
@@ -21119,6 +21933,67 @@ class EdgePairs(ShapeCollection):
         @return The moved edge pairs.
         """
         ...
+    def not_inside(self, other: Region) -> EdgePairs:
+        r"""
+        @brief Returns the edge pairs from this edge pair collection which are not inside (not completely covered by) polygons from the region
+
+        @return A new edge pair collection containing the edge pairs not completely inside polygons from the region
+
+        Edge pairs are considered 'filled' in the context of this operation - i.e. the area between the edges belongs to the edge pair, hence participates in the check.
+
+        This method has been introduced in version 0.29.6
+        """
+        ...
+    @overload
+    def not_interacting(self, other: Edges, min_count: Optional[int] = ..., max_count: Optional[int] = ...) -> EdgePairs:
+        r"""
+        @brief Returns the edge pairs from this edge pair collection which do not overlap or touch edges from the other edge collection
+
+        @return A new edge pair collection containing the edge pairs not overlapping or touching edges from the other edge collection
+
+        'min_count' and 'max_count' impose a constraint on the number of times an edge pair of this collection has to interact with (different) edges of the other collection to make the edge pair selected. An edge pair is not selected by this method if the number of edges interacting with an edge pair of this collection is between min_count and max_count (including max_count).
+
+        Edge pairs are considered 'filled' in the context of this operation - i.e. the area between the edges belongs to the edge pair, hence participates in the check.
+
+        This method has been introduced in version 0.29.6
+        """
+        ...
+    @overload
+    def not_interacting(self, other: Region, min_count: Optional[int] = ..., max_count: Optional[int] = ...) -> EdgePairs:
+        r"""
+        @brief Returns the edge pairs from this edge pair collection which do not overlap or touch polygons from the region
+
+        @return A new edge pair collection containing the edge pairs not overlapping or touching polygons from the region
+
+        'min_count' and 'max_count' impose a constraint on the number of times an edge pair of this collection has to interact with (different) polygons of the other region to make the edge pair selected. An edge pair is not selected by this method if the number of polygons interacting with an edge pair of this collection is between min_count and max_count (including max_count).
+
+        Edge pairs are considered 'filled' in the context of this operation - i.e. the area between the edges belongs to the edge pair, hence participates in the check.
+
+        This method has been introduced in version 0.29.6
+        """
+        ...
+    def not_outside(self, other: Region) -> EdgePairs:
+        r"""
+        @brief Returns the edge pairs from this edge pair collection which are not outside (partially overlapped by) polygons from the other region
+
+        @return A new edge pair collection containing the the selected edges
+
+        Edge pairs are considered 'filled' in the context of this operation - i.e. the area between the edges belongs to the edge pair, hence participates in the check.
+
+        This method has been introduced in version 0.29.6
+        """
+        ...
+    def outside(self, other: Region) -> EdgePairs:
+        r"""
+        @brief Returns the edge pairs from this edge pair collection which are outside (not overlapped by) polygons from the other region
+
+        @return A new edge pair collection containing the the selected edges
+
+        Edge pairs are considered 'filled' in the context of this operation - i.e. the area between the edges belongs to the edge pair, hence participates in the check.
+
+        This method has been introduced in version 0.29.6
+        """
+        ...
     @overload
     def polygons(self) -> Region:
         r"""
@@ -21168,6 +22043,36 @@ class EdgePairs(ShapeCollection):
         This method has been introduced in version 0.29.
         """
         ...
+    @overload
+    def pull_interacting(self, other: Edges) -> Edges:
+        r"""
+        @brief Returns all edges of "other" which are interacting with (overlapping, touching) edge pairs of this set
+        The "pull_..." methods are similar to "select_..." but work the opposite way: they select shapes from the argument region rather than self. In a deep (hierarchical) context the output region will be hierarchically aligned with self, so the "pull_..." methods provide a way for re-hierarchization.
+
+        Edge pairs are considered 'filled' in the context of this operation - i.e. the area between the edges belongs to the edge pair, hence participates in the check.
+
+        @return The edge collection after the edges have been selected (from other)
+
+        Merged semantics applies for this method (see \merged_semantics= of merged semantics)
+
+        This method has been introduced in version 0.29.6
+        """
+        ...
+    @overload
+    def pull_interacting(self, other: Region) -> Region:
+        r"""
+        @brief Returns all polygons of "other" which are interacting with (overlapping, touching) edge pairs of this set
+        The "pull_..." methods are similar to "select_..." but work the opposite way: they select shapes from the argument region rather than self. In a deep (hierarchical) context the output region will be hierarchically aligned with self, so the "pull_..." methods provide a way for re-hierarchization.
+
+        Edge pairs are considered 'filled' in the context of this operation - i.e. the area between the edges belongs to the edge pair, hence participates in the check.
+
+        @return The region after the polygons have been selected (from other)
+
+        Merged semantics applies for this method (see \merged_semantics= of merged semantics)
+
+        This method has been introduced in version 0.29.6
+        """
+        ...
     def remove_properties(self) -> None:
         r"""
         @brief Removes properties for the given container.
@@ -21182,6 +22087,98 @@ class EdgePairs(ShapeCollection):
         @return An edge collection containing the second edges
         """
         ...
+    def select_inside(self, other: Region) -> EdgePairs:
+        r"""
+        @brief Selects the edge pairs from this edge pair collection which are inside (completely covered by) polygons from the region
+
+        @return The edge pair collection after the edge pairs have been selected (self)
+
+        Edge pairs are considered 'filled' in the context of this operation - i.e. the area between the edges belongs to the edge pair, hence participates in the check.
+
+        This method has been introduced in version 0.29.6
+        """
+        ...
+    @overload
+    def select_interacting(self, other: Edges, min_count: Optional[int] = ..., max_count: Optional[int] = ...) -> EdgePairs:
+        r"""
+        @brief Selects the edge pairs from this edge pair collection which overlap or touch edges from the other edge collection
+
+        @return The edge pair collection after the edge pairs have been selected (self)
+
+        This is the in-place version of \interacting - i.e. self is modified rather than a new collection is returned.
+
+        This method has been introduced in version 0.29.6
+        """
+        ...
+    @overload
+    def select_interacting(self, other: Region, min_count: Optional[int] = ..., max_count: Optional[int] = ...) -> EdgePairs:
+        r"""
+        @brief Selects the edge pairs from this edge pair collection which overlap or touch polygons from the region
+
+        @return The edge pair collection after the edge pairs have been selected (self)
+
+        This is the in-place version of \interacting - i.e. self is modified rather than a new collection is returned.
+
+        This method has been introduced in version 0.29.6
+        """
+        ...
+    def select_not_inside(self, other: Region) -> EdgePairs:
+        r"""
+        @brief Selects the edge pairs from this edge pair collection which are not inside (completely covered by) polygons from the region
+
+        @return The edge pair collection after the edge pairs have been selected (self)
+
+        Edge pairs are considered 'filled' in the context of this operation - i.e. the area between the edges belongs to the edge pair, hence participates in the check.
+
+        This method has been introduced in version 0.29.6
+        """
+        ...
+    @overload
+    def select_not_interacting(self, other: Edges, min_count: Optional[int] = ..., max_count: Optional[int] = ...) -> EdgePairs:
+        r"""
+        @brief Selects the edge pairs from this edge pair collection which do not overlap or touch edges from the other edge collection
+
+        @return The edge pair collection after the edge pairs have been selected (self)
+
+        This is the in-place version of \not_interacting - i.e. self is modified rather than a new collection is returned.
+
+        This method has been introduced in version 0.29.6
+        """
+        ...
+    @overload
+    def select_not_interacting(self, other: Region, min_count: Optional[int] = ..., max_count: Optional[int] = ...) -> EdgePairs:
+        r"""
+        @brief Selects the edge pairs from this edge pair collection which do not overlap or touch polygons from the region
+
+        @return The edge pair collection after the edge pairs have been selected (self)
+
+        This is the in-place version of \not_interacting - i.e. self is modified rather than a new collection is returned.
+
+        This method has been introduced in version 0.29.6
+        """
+        ...
+    def select_not_outside(self, other: Region) -> EdgePairs:
+        r"""
+        @brief Selects the edge pairs from this edge pair collection which are not outside (partially overlapped by) polygons from the other region
+
+        @return The edge pair collection after the edges have been selected (self)
+
+        Edge pairs are considered 'filled' in the context of this operation - i.e. the area between the edges belongs to the edge pair, hence participates in the check.
+
+        This method has been introduced in version 0.29.6
+        """
+        ...
+    def select_outside(self, other: Region) -> EdgePairs:
+        r"""
+        @brief Selects the edge pairs from this edge pair collection which are outside (not overlapped by) polygons from the other region
+
+        @return The edge pair collection after the edges have been selected (self)
+
+        Edge pairs are considered 'filled' in the context of this operation - i.e. the area between the edges belongs to the edge pair, hence participates in the check.
+
+        This method has been introduced in version 0.29.6
+        """
+        ...
     def size(self) -> int:
         r"""
         @brief Returns the (flat) number of edge pairs in the edge pair collection
@@ -21189,6 +22186,45 @@ class EdgePairs(ShapeCollection):
         The count is computed 'as if flat', i.e. edge pairs inside a cell are multiplied by the number of times a cell is instantiated.
 
         Starting with version 0.27, the method is called 'count' for consistency with \Region. 'size' is still provided as an alias.
+        """
+        ...
+    def split_inside(self, other: Region) -> List[EdgePairs]:
+        r"""
+        @brief Selects the edge pairs from this edge pair collection which are and are not inside (completely covered by) polygons from the other region
+
+        @return A two-element list of edge pair collections (first: inside, second: non-inside)
+
+        This method provides a faster way to compute both inside and non-inside edge pairs compared to using separate methods. It has been introduced in version 0.29.6.
+        """
+        ...
+    @overload
+    def split_interacting(self, other: Edges, min_count: Optional[int] = ..., max_count: Optional[int] = ...) -> List[EdgePairs]:
+        r"""
+        @brief Selects the edge pairs from this edge pair collection which do and do not interact with edges from the other collection
+
+        @return A two-element list of edge pair collections (first: interacting, second: non-interacting)
+
+        This method provides a faster way to compute both interacting and non-interacting edges compared to using separate methods. It has been introduced in version 0.29.6.
+        """
+        ...
+    @overload
+    def split_interacting(self, other: Region, min_count: Optional[int] = ..., max_count: Optional[int] = ...) -> List[EdgePairs]:
+        r"""
+        @brief Selects the edge pairs from this edge pair collection which do and do not interact with polygons from the other region
+
+        @return A two-element list of edge pair collections (first: interacting, second: non-interacting)
+
+        This method provides a faster way to compute both interacting and non-interacting edges compared to using separate methods. It has been introduced in version 0.29.6.
+        """
+        ...
+    def split_outside(self, other: Region) -> List[EdgePairs]:
+        r"""
+        @brief Selects the edge pairs from this edge pair collection which are and are not outside (not overlapped by) polygons from the other region
+
+        @return A two-element list of edge pair collections (first: outside, second: non-outside)
+
+        This method provides a faster way to compute both outside and non-outside edges compared to using separate methods. 
+        This method has been introduced in version 0.29.6
         """
         ...
     def swap(self, other: EdgePairs) -> None:
@@ -21712,6 +22748,14 @@ class EdgeProcessor:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> EdgeProcessor:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -21745,6 +22789,11 @@ class EdgeProcessor:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> EdgeProcessor:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -22675,6 +23724,14 @@ class EdgeToEdgePairOperator:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> EdgeToEdgePairOperator:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -22708,6 +23765,11 @@ class EdgeToEdgePairOperator:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> EdgeToEdgePairOperator:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -22856,6 +23918,14 @@ class EdgeToPolygonOperator:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> EdgeToPolygonOperator:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -22889,6 +23959,11 @@ class EdgeToPolygonOperator:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> EdgeToPolygonOperator:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -23861,6 +24936,14 @@ class Edges(ShapeCollection):
         The 'xor' alias has been introduced in version 0.28.12.
         """
         ...
+    def _const_cast(self) -> Edges:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -23894,6 +24977,11 @@ class Edges(ShapeCollection):
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Edges:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -24423,7 +25511,7 @@ class Edges(ShapeCollection):
         r"""
         @brief Returns the edges of this edge collection which are inside (completely covered by) edges from the other edge collection
 
-        @return A new edge collection containing the edges overlapping or touching edges from the other edge collection
+        @return A new edge collection containing the the selected edges
 
         This method has been introduced in version 0.28.
         """
@@ -24433,7 +25521,7 @@ class Edges(ShapeCollection):
         r"""
         @brief Returns the edges from this edge collection which are inside (completely covered by) polygons from the region
 
-        @return A new edge collection containing the edges overlapping or touching polygons from the region
+        @return A new edge collection containing the the selected edges
 
         This method has been introduced in version 0.28.
         """
@@ -24721,7 +25809,7 @@ class Edges(ShapeCollection):
         r"""
         @brief Returns the edges of this edge collection which are not inside (completely covered by) edges from the other edge collection
 
-        @return A new edge collection containing the edges not overlapping or touching edges from the other edge collection
+        @return A new edge collection containing the the selected edges
 
         This method has been introduced in version 0.28.
         """
@@ -24731,7 +25819,7 @@ class Edges(ShapeCollection):
         r"""
         @brief Returns the edges from this edge collection which are not inside (completely covered by) polygons from the region
 
-        @return A new edge collection containing the edges not overlapping or touching polygons from the region
+        @return A new edge collection containing the the selected edges
 
         This method has been introduced in version 0.28.
         """
@@ -24769,9 +25857,9 @@ class Edges(ShapeCollection):
     @overload
     def not_outside(self, other: Edges) -> Edges:
         r"""
-        @brief Returns the edges of this edge collection which are not outside (completely covered by) edges from the other edge collection
+        @brief Returns the edges of this edge collection which are not outside (partially overlapped by) edges from the other edge collection
 
-        @return A new edge collection containing the edges not overlapping or touching edges from the other edge collection
+        @return A new edge collection containing the the selected edges
 
         This method has been introduced in version 0.28.
         """
@@ -24779,9 +25867,9 @@ class Edges(ShapeCollection):
     @overload
     def not_outside(self, other: Region) -> Edges:
         r"""
-        @brief Returns the edges from this edge collection which are not outside (completely covered by) polygons from the region
+        @brief Returns the edges from this edge collection which are not outside (partially overlapped by) polygons from the region
 
-        @return A new edge collection containing the edges not overlapping or touching polygons from the region
+        @return A new edge collection containing the the selected edges
 
         This method has been introduced in version 0.28.
         """
@@ -24842,9 +25930,9 @@ class Edges(ShapeCollection):
     @overload
     def outside(self, other: Edges) -> Edges:
         r"""
-        @brief Returns the edges of this edge collection which are outside (completely covered by) edges from the other edge collection
+        @brief Returns the edges of this edge collection which are outside (not overlapped by) edges from the other edge collection
 
-        @return A new edge collection containing the edges overlapping or touching edges from the other edge collection
+        @return A new edge collection containing the the selected edges
 
         This method has been introduced in version 0.28.
         """
@@ -24852,9 +25940,9 @@ class Edges(ShapeCollection):
     @overload
     def outside(self, other: Region) -> Edges:
         r"""
-        @brief Returns the edges from this edge collection which are outside (completely covered by) polygons from the region
+        @brief Returns the edges from this edge collection which are outside (not overlapped by) polygons from the region
 
-        @return A new edge collection containing the edges overlapping or touching polygons from the region
+        @return A new edge collection containing the the selected edges
 
         This method has been introduced in version 0.28.
         """
@@ -25072,7 +26160,7 @@ class Edges(ShapeCollection):
     @overload
     def select_not_outside(self, other: Edges) -> Edges:
         r"""
-        @brief Selects the edges from this edge collection which are not outside (completely covered by) edges from the other edge collection
+        @brief Selects the edges from this edge collection which are not outside (partially overlapped by) edges from the other edge collection
 
         @return The edge collection after the edges have been selected (self)
 
@@ -25082,7 +26170,7 @@ class Edges(ShapeCollection):
     @overload
     def select_not_outside(self, other: Region) -> Edges:
         r"""
-        @brief Selects the edges from this edge collection which are not outside (completely covered by) polygons from the region
+        @brief Selects the edges from this edge collection which are not outside (partially overlapped by) polygons from the region
 
         @return The edge collection after the edges have been selected (self)
 
@@ -25092,7 +26180,7 @@ class Edges(ShapeCollection):
     @overload
     def select_outside(self, other: Edges) -> Edges:
         r"""
-        @brief Selects the edges from this edge collection which are outside (completely covered by) edges from the other edge collection
+        @brief Selects the edges from this edge collection which are outside (not overlapped by) edges from the other edge collection
 
         @return The edge collection after the edges have been selected (self)
 
@@ -25102,7 +26190,7 @@ class Edges(ShapeCollection):
     @overload
     def select_outside(self, other: Region) -> Edges:
         r"""
-        @brief Selects the edges from this edge collection which are outside (completely covered by) polygons from the region
+        @brief Selects the edges from this edge collection which are outside (not overlapped by) polygons from the region
 
         @return The edge collection after the edges have been selected (self)
 
@@ -25227,7 +26315,7 @@ class Edges(ShapeCollection):
     @overload
     def split_outside(self, other: Edges) -> List[Edges]:
         r"""
-        @brief Selects the edges from this edge collection which are and are not outside (completely covered by) edges from the other collection
+        @brief Selects the edges from this edge collection which are and are not outside (not overlapped by) edges from the other collection
 
         @return A two-element list of edge collections (first: outside, second: non-outside)
 
@@ -25237,7 +26325,7 @@ class Edges(ShapeCollection):
     @overload
     def split_outside(self, other: Region) -> List[Edges]:
         r"""
-        @brief Selects the edges from this edge collection which are and are not outside (completely covered by) polygons from the other region
+        @brief Selects the edges from this edge collection which are and are not outside (not overlapped by) polygons from the other region
 
         @return A two-element list of edge collections (first: outside, second: non-outside)
 
@@ -25619,6 +26707,14 @@ class EqualDeviceParameters:
         If 'absolute' and 'relative' are both given, their deviations will add to the allowed difference between two parameter values. The relative deviation will be applied to the mean value of both parameter values. For example, when comparing parameter values of 40 and 60, a relative deviation of 0.35 means an absolute deviation of 17.5 (= 0.35 * average of 40 and 60) which does not make both values match.
         """
         ...
+    def _const_cast(self) -> EqualDeviceParameters:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -25652,6 +26748,11 @@ class EqualDeviceParameters:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> EqualDeviceParameters:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -25737,6 +26838,14 @@ class GenericDeviceCombiner:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> GenericDeviceCombiner:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -25770,6 +26879,11 @@ class GenericDeviceCombiner:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> GenericDeviceCombiner:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -25845,6 +26959,14 @@ class GenericDeviceExtractor(DeviceExtractorBase):
 
     This class has been introduced in version 0.26.
     """
+    def _const_cast(self) -> GenericDeviceExtractor:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -25878,6 +27000,11 @@ class GenericDeviceExtractor(DeviceExtractorBase):
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> GenericDeviceExtractor:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -26092,6 +27219,14 @@ class GenericDeviceParameterCompare(EqualDeviceParameters):
         @brief Assigns another object to self
         """
         ...
+    def _const_cast(self) -> GenericDeviceParameterCompare:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -26132,6 +27267,11 @@ class GenericDeviceParameterCompare(EqualDeviceParameters):
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
         ...
+    def _to_const_object(self) -> GenericDeviceParameterCompare:
+        r"""
+        @hide
+        """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -26164,6 +27304,14 @@ class GenericNetlistCompareLogger(NetlistCompareLogger):
     r"""
     @brief Specifies warning severity (log with high priority, but do not stop)
     """
+    def _const_cast(self) -> GenericNetlistCompareLogger:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -26197,6 +27345,11 @@ class GenericNetlistCompareLogger(NetlistCompareLogger):
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> GenericNetlistCompareLogger:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -26322,6 +27475,14 @@ class HAlign:
         @brief Gets the symbolic string from an enum
         """
         ...
+    def _const_cast(self) -> HAlign:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -26355,6 +27516,11 @@ class HAlign:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> HAlign:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -27109,6 +28275,14 @@ class ICplxTrans:
         The lazy and DBU arguments have been added in version 0.27.6.
         """
         ...
+    def _const_cast(self) -> ICplxTrans:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -27142,6 +28316,11 @@ class ICplxTrans:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> ICplxTrans:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -27686,6 +28865,14 @@ class IMatrix2d:
         @return The string representing this matrix
         """
         ...
+    def _const_cast(self) -> IMatrix2d:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -27719,6 +28906,11 @@ class IMatrix2d:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> IMatrix2d:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -28162,6 +29354,14 @@ class IMatrix3d:
         @return The string representing this matrix
         """
         ...
+    def _const_cast(self) -> IMatrix3d:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -28195,6 +29395,11 @@ class IMatrix3d:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> IMatrix3d:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -28424,6 +29629,14 @@ class InstElement:
         See the comments on the == operator.
         """
         ...
+    def _const_cast(self) -> InstElement:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -28457,6 +29670,11 @@ class InstElement:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> InstElement:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -28590,11 +29808,11 @@ class Instance:
 
     Starting with version 0.25 the displacement is of vector type.
     Setter:
-    @brief Sets the displacement vector for the 'a' axis
+    @brief Sets the displacement vector for the 'a' axis in micrometer units
 
-    If the instance was not an array instance before it is made one.
+    Like \a= with an integer displacement, this method will set the displacement vector but it accepts a vector in micrometer units that is of \DVector type. The vector will be translated to database units internally.
 
-    This method has been introduced in version 0.23. Starting with version 0.25 the displacement is of vector type.
+    This method has been introduced in version 0.25.
     """
     b: Vector
     r"""
@@ -28859,6 +30077,14 @@ class Instance:
         This method has been introduced with version 0.16.
         """
         ...
+    def _const_cast(self) -> Instance:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -28892,6 +30118,11 @@ class Instance:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Instance:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -29171,6 +30402,14 @@ class Instance:
         If the instance is a PCell instance, this method will return a map of values vs. parameter names. The names are the ones defined in the PCell declaration.If the instance is not a PCell instance, the dictionary returned will be empty.
 
         This method has been introduced in version 0.24.
+        """
+        ...
+    def properties(self) -> Any:
+        r"""
+        @brief Gets the user properties as a hash
+        This method is a convenience method that gets all user properties as a single hash.
+
+        This method has been introduced in version 0.29.5.
         """
         ...
     def property(self, key: Any) -> Any:
@@ -30011,6 +31250,14 @@ class LEFDEFReaderConfiguration:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> LEFDEFReaderConfiguration:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -30044,6 +31291,11 @@ class LEFDEFReaderConfiguration:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> LEFDEFReaderConfiguration:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -30543,6 +31795,14 @@ class LayerInfo:
         The 'as_target' argument has been added in version 0.26.5.
         """
         ...
+    def _const_cast(self) -> LayerInfo:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -30576,6 +31836,11 @@ class LayerInfo:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> LayerInfo:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -30767,6 +32032,14 @@ class LayerMap:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> LayerMap:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -30800,6 +32073,11 @@ class LayerMap:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> LayerMap:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -31113,6 +32391,14 @@ class LayerMapping:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> LayerMapping:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -31146,6 +32432,11 @@ class LayerMapping:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> LayerMapping:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -31412,6 +32703,14 @@ class Layout:
         Starting with version 0.25, layouts created with the default constructor are always editable. Before that version, they inherited the editable flag from the application.
         """
         ...
+    def _const_cast(self) -> Layout:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -31445,6 +32744,11 @@ class Layout:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Layout:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -31739,6 +33043,32 @@ class Layout:
         """
         ...
     @overload
+    def break_polygons(self, layer: int, max_vertex_count: int, max_area_ratio: float) -> None:
+        r"""
+        @brief Breaks the polygons of the layer into smaller ones
+
+        This variant applies breaking to all cells and the given layer.
+
+        This method has been introduced in version 0.29.5.
+        """
+        ...
+    @overload
+    def break_polygons(self, max_vertex_count: int, max_area_ratio: float) -> None:
+        r"""
+        @brief Breaks the polygons of the layout into smaller ones
+
+        There are two criteria for splitting a polygon: a polygon is split into parts with less then 'max_vertex_count' points and an bounding box-to-polygon area ratio less than 'max_area_ratio'. The area ratio is supposed to render polygons whose bounding box is a better approximation. This applies for example to 'L' shape polygons.
+
+        Using a value of 0 for either limit means that the respective limit isn't checked. Breaking happens by cutting the polygons into parts at 'good' locations. The algorithm does not have a specific goal to minimize the number of parts for example. The only goal is to achieve parts within the given limits.
+
+        Breaking also applies to paths if their polygon representation satisfies the breaking criterion. In that case, paths are converted to polygons and broken into smaller parts.
+
+        This variant applies breaking to all cells and layers.
+
+        This method has been introduced in version 0.29.5.
+        """
+        ...
+    @overload
     def cell(self, i: int) -> Cell:
         r"""
         @brief Gets a cell object from the cell index
@@ -31747,6 +33077,19 @@ class Layout:
         @return A reference to the cell (a \Cell object)
 
         If the cell index is not a valid cell index, this method will raise an error. Use \is_valid_cell_index? to test whether a given cell index is valid.
+        """
+        ...
+    @overload
+    def cell(self, i: int) -> Cell:
+        r"""
+        @brief Gets a cell object from the cell index (const version)
+
+        @param i The cell index
+        @return A reference to the cell (a \Cell object)
+
+        If the cell index is not a valid cell index, this method will raise an error. Use \is_valid_cell_index? to test whether a given cell index is valid.
+
+        This variant has been introduced in version 0.29.6.
         """
         ...
     @overload
@@ -31759,6 +33102,20 @@ class Layout:
 
         If name is not a valid cell name, this method will return "nil".
         This method has been introduced in version 0.23 and replaces \cell_by_name.
+        """
+        ...
+    @overload
+    def cell(self, name: str) -> Cell:
+        r"""
+        @brief Gets a cell object from the cell name (const version)
+
+        @param name The cell name
+        @return A reference to the cell (a \Cell object)
+
+        If name is not a valid cell name, this method will return "nil".
+        This method has been introduced in version 0.23 and replaces \cell_by_name.
+
+        This variant has been introduced in version 0.29.6.
         """
         ...
     def cell_by_name(self, name: str) -> int:
@@ -31790,6 +33147,19 @@ class Layout:
         @return A list of \Cell object of the cells matching the pattern
 
         This method has been introduced in version 0.27.3.
+        """
+        ...
+    @overload
+    def cells(self, name_filter: str) -> List[Cell]:
+        r"""
+        @brief Gets the cell objects for a given name filter (const version)
+
+        @param name_filter The cell name filter (glob pattern)
+        @return A list of \Cell object of the cells matching the pattern
+
+        This method has been introduced in version 0.27.3.
+
+        This variant has been introduced in version 0.29.6.
         """
         ...
     def cleanup(self, cell_indexes_to_keep: Optional[Sequence[int]] = ...) -> None:
@@ -32807,6 +34177,16 @@ class Layout:
         This method has been introduced in version 0.24.
         """
         ...
+    @overload
+    def properties(self) -> Any:
+        r"""
+        @brief Gets the user properties as a hash
+        This method is a convenience method that gets all user properties as a single hash.
+
+        This method has been introduced in version 0.29.5.
+        """
+        ...
+    @overload
     def properties(self, properties_id: int) -> List[Any]:
         r"""
         @brief Gets the properties set for a given properties ID
@@ -32991,6 +34371,7 @@ class Layout:
         This method has been introduced in version 0.27. Before that, the technology has been kept in the 'technology' meta data element.
         """
         ...
+    @overload
     def top_cell(self) -> Cell:
         r"""
         @brief Returns the top cell object
@@ -33002,6 +34383,19 @@ class Layout:
         This method has been introduced in version 0.23.
         """
         ...
+    @overload
+    def top_cell(self) -> Cell:
+        r"""
+        @brief Returns the top cell object (const version)
+        @return The \Cell object of the top cell
+        If the layout has a single top cell, this method returns the top cell's \Cell object.
+        If the layout does not have a top cell, this method returns "nil". If the layout has multiple
+        top cells, this method raises an error.
+
+        This variant has been introduced in version 0.29.6.
+        """
+        ...
+    @overload
     def top_cells(self) -> List[Cell]:
         r"""
         @brief Returns the top cell objects
@@ -33010,6 +34404,17 @@ class Layout:
         This array can be empty, if the layout does not have a top cell (i.e. no cell at all).
 
         This method has been introduced in version 0.23.
+        """
+        ...
+    @overload
+    def top_cells(self) -> List[Cell]:
+        r"""
+        @brief Returns the top cell objects (const version)
+        @return The \Cell objects of the top cells
+        This method returns and array of \Cell objects representing the top cells of the layout.
+        This array can be empty, if the layout does not have a top cell (i.e. no cell at all).
+
+        This variant has been introduced in version 0.29.6.
         """
         ...
     @overload
@@ -33615,6 +35020,14 @@ class LayoutDiff:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> LayoutDiff:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -33648,6 +35061,11 @@ class LayoutDiff:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> LayoutDiff:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -33883,6 +35301,14 @@ class LayoutMetaInfo:
         The 'persisted' attribute has been introduced in version 0.28.8.
         """
         ...
+    def _const_cast(self) -> LayoutMetaInfo:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -33916,6 +35342,11 @@ class LayoutMetaInfo:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> LayoutMetaInfo:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -34002,6 +35433,14 @@ class LayoutQuery:
         @brief Creates a new query object from the given query string
         """
         ...
+    def _const_cast(self) -> LayoutQuery:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -34035,6 +35474,11 @@ class LayoutQuery:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> LayoutQuery:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -34119,6 +35563,14 @@ class LayoutQueryIterator:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> LayoutQueryIterator:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -34152,6 +35604,11 @@ class LayoutQueryIterator:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> LayoutQueryIterator:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -34674,6 +36131,14 @@ class LayoutToNetlist:
         The database unit is mandatory because the physical parameter extraction for devices requires this unit for translation of layout to physical dimensions.
         """
         ...
+    def _const_cast(self) -> LayoutToNetlist:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -34707,6 +36172,11 @@ class LayoutToNetlist:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> LayoutToNetlist:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -35596,6 +37066,14 @@ class LayoutVsSchematic(LayoutToNetlist):
         See the corresponding constructor of the \LayoutToNetlist object for more details.
         """
         ...
+    def _const_cast(self) -> LayoutVsSchematic:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -35629,6 +37107,11 @@ class LayoutVsSchematic(LayoutToNetlist):
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> LayoutVsSchematic:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -35770,6 +37253,14 @@ class Library:
         @brief Creates a new, empty library
         """
         ...
+    def _const_cast(self) -> Library:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -35803,6 +37294,11 @@ class Library:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Library:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -36577,204 +38073,6 @@ class LoadLayoutOptions:
 
     This method has been added in version 0.26.2.
     """
-    mebes_boundary_datatype: int
-    r"""
-    Getter:
-    @brief Gets the datatype number of the boundary layer to produce
-    See \mebes_produce_boundary= for a description of this attribute.
-
-    This property has been added in version 0.23.10.
-
-    Setter:
-    @brief Sets the datatype number of the boundary layer to produce
-    See \mebes_produce_boundary= for a description of this attribute.
-
-    This property has been added in version 0.23.10.
-    """
-    mebes_boundary_layer: int
-    r"""
-    Getter:
-    @brief Gets the layer number of the boundary layer to produce
-    See \mebes_produce_boundary= for a description of this attribute.
-
-    This property has been added in version 0.23.10.
-
-    Setter:
-    @brief Sets the layer number of the boundary layer to produce
-    See \mebes_produce_boundary= for a description of this attribute.
-
-    This property has been added in version 0.23.10.
-    """
-    mebes_boundary_name: str
-    r"""
-    Getter:
-    @brief Gets the name of the boundary layer to produce
-    See \mebes_produce_boundary= for a description of this attribute.
-
-    This property has been added in version 0.23.10.
-
-    Setter:
-    @brief Sets the name of the boundary layer to produce
-    See \mebes_produce_boundary= for a description of this attribute.
-
-    This property has been added in version 0.23.10.
-    """
-    mebes_create_other_layers: bool
-    r"""
-    Getter:
-    @brief Gets a value indicating whether other layers shall be created
-    @return True, if other layers will be created.
-    This attribute acts together with a layer map (see \mebes_layer_map=). Layers not listed in this map are created as well when \mebes_create_other_layers? is true. Otherwise they are ignored.
-
-    This method has been added in version 0.25 and replaces the respective global option in \LoadLayoutOptions in a format-specific fashion.
-    Setter:
-    @brief Specifies whether other layers shall be created
-    @param create True, if other layers will be created.
-    See \mebes_create_other_layers? for a description of this attribute.
-
-    This method has been added in version 0.25 and replaces the respective global option in \LoadLayoutOptions in a format-specific fashion.
-    """
-    mebes_data_datatype: int
-    r"""
-    Getter:
-    @brief Gets the datatype number of the data layer to produce
-
-    This property has been added in version 0.23.10.
-
-    Setter:
-    @brief Sets the datatype number of the data layer to produce
-
-    This property has been added in version 0.23.10.
-    """
-    mebes_data_layer: int
-    r"""
-    Getter:
-    @brief Gets the layer number of the data layer to produce
-
-    This property has been added in version 0.23.10.
-
-    Setter:
-    @brief Sets the layer number of the data layer to produce
-
-    This property has been added in version 0.23.10.
-    """
-    mebes_data_name: str
-    r"""
-    Getter:
-    @brief Gets the name of the data layer to produce
-
-    This property has been added in version 0.23.10.
-
-    Setter:
-    @brief Sets the name of the data layer to produce
-
-    This property has been added in version 0.23.10.
-    """
-    mebes_invert: bool
-    r"""
-    Getter:
-    @brief Gets a value indicating whether to invert the MEBES pattern
-    If this property is set to true, the pattern will be inverted.
-
-    This property has been added in version 0.22.
-
-    Setter:
-    @brief Specify whether to invert the MEBES pattern
-    If this property is set to true, the pattern will be inverted.
-
-    This property has been added in version 0.22.
-    """
-    mebes_layer_map: LayerMap
-    r"""
-    Getter:
-    @brief Gets the layer map
-    @return The layer map.
-
-    This method has been added in version 0.25 and replaces the respective global option in \LoadLayoutOptions in a format-specific fashion.
-    Setter:
-    @brief Sets the layer map
-    This sets a layer mapping for the reader. Unlike \mebes_set_layer_map, the 'create_other_layers' flag is not changed.
-    @param map The layer map to set.
-
-    This convenience method has been added in version 0.26.2.
-    """
-    mebes_num_shapes_per_cell: int
-    r"""
-    Getter:
-    @brief Gets the number of stripes collected per cell
-    See \mebes_num_stripes_per_cell= for details about this property.
-
-    This property has been added in version 0.24.5.
-
-    Setter:
-    @brief Specify the number of stripes collected per cell
-    See \mebes_num_stripes_per_cell= for details about this property.
-
-    This property has been added in version 0.24.5.
-    """
-    mebes_num_stripes_per_cell: int
-    r"""
-    Getter:
-    @brief Gets the number of stripes collected per cell
-    See \mebes_num_stripes_per_cell= for details about this property.
-
-    This property has been added in version 0.23.10.
-
-    Setter:
-    @brief Specify the number of stripes collected per cell
-    This property specifies how many stripes will be collected into one cell.
-    A smaller value means less but bigger cells. The default value is 64.
-    New cells will be formed whenever more than this number of stripes has been read
-    or a new segment is started and the number of shapes given by \mebes_num_shapes_per_cell
-    is exceeded.
-
-    This property has been added in version 0.23.10.
-    """
-    mebes_produce_boundary: bool
-    r"""
-    Getter:
-    @brief Gets a value indicating whether a boundary layer will be produced
-    See \mebes_produce_boundary= for details about this property.
-
-    This property has been added in version 0.23.10.
-
-    Setter:
-    @brief Specify whether to produce a boundary layer
-    If this property is set to true, the pattern boundary will be written to the layer and datatype specified with \mebes_boundary_name, \mebes_boundary_layer and \mebes_boundary_datatype.
-    By default, the boundary layer is produced.
-
-    This property has been added in version 0.23.10.
-    """
-    mebes_subresolution: bool
-    r"""
-    Getter:
-    @brief Gets a value indicating whether to invert the MEBES pattern
-    See \subresolution= for details about this property.
-
-    This property has been added in version 0.23.10.
-
-    Setter:
-    @brief Specify whether subresolution trapezoids are supported
-    If this property is set to true, subresolution trapezoid vertices are supported.
-    In order to implement support, the reader will create magnified instances with a magnification of 1/16.
-    By default this property is enabled.
-
-    This property has been added in version 0.23.10.
-    """
-    mebes_top_cell_index: int
-    r"""
-    Getter:
-    @brief Gets the cell index for the top cell to use
-    See \mebes_top_cell_index= for a description of this property.
-
-    This property has been added in version 0.23.10.
-
-    Setter:
-    @brief Specify the cell index for the top cell to use
-    If this property is set to a valid cell index, the MEBES reader will put the subcells and shapes into this cell.
-
-    This property has been added in version 0.23.10.
-    """
     oasis_expect_strict_mode: int
     r"""
     Getter:
@@ -36847,6 +38145,14 @@ class LoadLayoutOptions:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> LoadLayoutOptions:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -36880,6 +38186,11 @@ class LoadLayoutOptions:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> LoadLayoutOptions:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -36999,26 +38310,6 @@ class LoadLayoutOptions:
         @param create_other_layers The flag indicating whether other layers will be created as well. Set to false to read only the layers in the layer map.
 
         This method has been added in version 0.26.2.
-        """
-        ...
-    def mebes_select_all_layers(self) -> None:
-        r"""
-        @brief Selects all layers and disables the layer map
-
-        This disables any layer map and enables reading of all layers.
-        New layers will be created when required.
-
-        This method has been added in version 0.25 and replaces the respective global option in \LoadLayoutOptions in a format-specific fashion.
-        """
-        ...
-    def mebes_set_layer_map(self, map: LayerMap, create_other_layers: bool) -> None:
-        r"""
-        @brief Sets the layer map
-        This sets a layer mapping for the reader. The layer map allows selection and translation of the original layers.
-        @param map The layer map to set.
-        @param create_other_layers The flag indicating whether other layers will be created as well. Set to false to read only the layers in the layer map.
-
-        This method has been added in version 0.25 and replaces the respective global option in \LoadLayoutOptions in a format-specific fashion.
         """
         ...
     def select_all_layers(self) -> None:
@@ -37151,6 +38442,14 @@ class LogEntryData:
         This method has been introduced in version 0.28.13.
         """
         ...
+    def _const_cast(self) -> LogEntryData:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -37184,6 +38483,11 @@ class LogEntryData:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> LogEntryData:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -37272,6 +38576,14 @@ class Manager:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> Manager:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -37305,6 +38617,11 @@ class Manager:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Manager:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -37688,6 +39005,14 @@ class Matrix2d:
         @return The string representing this matrix
         """
         ...
+    def _const_cast(self) -> Matrix2d:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -37721,6 +39046,11 @@ class Matrix2d:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Matrix2d:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -38196,6 +39526,14 @@ class Matrix3d:
         @return The string representing this matrix
         """
         ...
+    def _const_cast(self) -> Matrix3d:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -38229,6 +39567,11 @@ class Matrix3d:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Matrix3d:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -38507,6 +39850,14 @@ class Metrics:
         @brief Gets the symbolic string from an enum
         """
         ...
+    def _const_cast(self) -> Metrics:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -38540,6 +39891,11 @@ class Metrics:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Metrics:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -38657,6 +40013,14 @@ class Net(NetlistObject):
         @brief Assigns another object to self
         """
         ...
+    def _const_cast(self) -> Net:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -38695,6 +40059,11 @@ class Net(NetlistObject):
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Net:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -38856,6 +40225,14 @@ class NetElement:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> NetElement:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -38889,6 +40266,11 @@ class NetElement:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> NetElement:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -38993,6 +40375,14 @@ class NetPinRef:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> NetPinRef:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -39026,6 +40416,11 @@ class NetPinRef:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> NetPinRef:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -39076,15 +40471,15 @@ class NetPinRef:
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this pin reference is attached to.
+        @brief Gets the net this pin reference is attached to (non-const version).
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this pin reference is attached to (non-const version).
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the net this pin reference is attached to.
         """
         ...
     def pin(self) -> Pin:
@@ -39127,6 +40522,14 @@ class NetSubcircuitPinRef:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> NetSubcircuitPinRef:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -39160,6 +40563,11 @@ class NetSubcircuitPinRef:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> NetSubcircuitPinRef:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -39277,6 +40685,14 @@ class NetTerminalRef:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> NetTerminalRef:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -39310,6 +40726,11 @@ class NetTerminalRef:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> NetTerminalRef:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -39468,6 +40889,14 @@ class NetTracer:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> NetTracer:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -39501,6 +40930,11 @@ class NetTracer:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> NetTracer:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -39674,6 +41108,14 @@ class NetTracerConnectionInfo:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> NetTracerConnectionInfo:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -39707,6 +41149,11 @@ class NetTracerConnectionInfo:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> NetTracerConnectionInfo:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -39825,6 +41272,14 @@ class NetTracerConnectivity:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> NetTracerConnectivity:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -39858,6 +41313,11 @@ class NetTracerConnectivity:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> NetTracerConnectivity:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -39965,6 +41425,14 @@ class NetTracerSymbolInfo:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> NetTracerSymbolInfo:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -39998,6 +41466,11 @@ class NetTracerSymbolInfo:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> NetTracerSymbolInfo:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -40077,6 +41550,14 @@ class NetTracerTechnologyComponent(TechnologyComponent):
         @brief Gets the connectivity definitions from the net tracer technology component.
         """
         ...
+    def _const_cast(self) -> NetTracerTechnologyComponent:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -40110,6 +41591,11 @@ class NetTracerTechnologyComponent(TechnologyComponent):
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> NetTracerTechnologyComponent:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -40202,6 +41688,14 @@ class Netlist:
         This method is intended for test purposes mainly.
         """
         ...
+    def _const_cast(self) -> Netlist:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -40235,6 +41729,11 @@ class Netlist:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Netlist:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -40276,17 +41775,17 @@ class Netlist:
     @overload
     def circuit_by_cell_index(self, cell_index: int) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given cell index.
+        @brief Gets the circuit object for a given cell index (const version).
         If the cell index is not valid or no circuit is registered with this index, nil is returned.
+
+        This constness variant has been introduced in version 0.26.8.
         """
         ...
     @overload
     def circuit_by_cell_index(self, cell_index: int) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given cell index (const version).
+        @brief Gets the circuit object for a given cell index.
         If the cell index is not valid or no circuit is registered with this index, nil is returned.
-
-        This constness variant has been introduced in version 0.26.8.
         """
         ...
     @overload
@@ -40308,20 +41807,20 @@ class Netlist:
     @overload
     def circuits_by_name(self, name_pattern: str) -> List[Circuit]:
         r"""
-        @brief Gets the circuit objects for a given name filter (const version).
+        @brief Gets the circuit objects for a given name filter.
         The name filter is a glob pattern. This method will return all \Circuit objects matching the glob pattern.
 
-
-        This constness variant has been introduced in version 0.26.8.
+        This method has been introduced in version 0.26.4.
         """
         ...
     @overload
     def circuits_by_name(self, name_pattern: str) -> List[Circuit]:
         r"""
-        @brief Gets the circuit objects for a given name filter.
+        @brief Gets the circuit objects for a given name filter (const version).
         The name filter is a glob pattern. This method will return all \Circuit objects matching the glob pattern.
 
-        This method has been introduced in version 0.26.4.
+
+        This constness variant has been introduced in version 0.26.8.
         """
         ...
     def combine_devices(self) -> None:
@@ -40555,10 +42054,46 @@ class Netlist:
         This method is intended for test purposes mainly.
         """
         ...
+    @overload
+    def top_circuit(self) -> Circuit:
+        r"""
+        @brief Gets the top circuit.
+        This method will return nil, if there is no top circuit. It will raise an error, if there is more than a single top circuit.
+
+        This convenience method has been added in version 0.29.5.
+        """
+        ...
+    @overload
+    def top_circuit(self) -> Circuit:
+        r"""
+        @brief Gets the top circuit (const version).
+        This method will return nil, if there is no top circuit. It will raise an error, if there is more than a single top circuit.
+
+        This convenience method has been added in version 0.29.5.
+        """
+        ...
     def top_circuit_count(self) -> int:
         r"""
         @brief Gets the number of top circuits.
         Top circuits are those which are not referenced by other circuits via subcircuits. A well-formed netlist has a single top circuit.
+        """
+        ...
+    @overload
+    def top_circuits(self) -> List[Circuit]:
+        r"""
+        @brief Gets the top circuits.
+        Returns a list of top circuits.
+
+        This convenience method has been added in version 0.29.5.
+        """
+        ...
+    @overload
+    def top_circuits(self) -> List[Circuit]:
+        r"""
+        @brief Gets the top circuits.
+        Returns a list of top circuits.
+
+        This convenience method has been added in version 0.29.5.
         """
         ...
     def write(self, file: str, writer: NetlistWriter, description: Optional[str] = ...) -> None:
@@ -40583,6 +42118,14 @@ class NetlistCompareLogger:
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
+        """
+        ...
+    def _const_cast(self) -> NetlistCompareLogger:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
         """
         ...
     def _create(self) -> None:
@@ -40618,6 +42161,11 @@ class NetlistCompareLogger:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> NetlistCompareLogger:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -40771,6 +42319,14 @@ class NetlistComparer:
         The logger is a delegate or event receiver which the comparer will send compare events to. See the class description for more details.
         """
         ...
+    def _const_cast(self) -> NetlistComparer:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -40804,6 +42360,11 @@ class NetlistComparer:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> NetlistComparer:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -41319,6 +42880,14 @@ class NetlistCrossReference(NetlistCompareLogger):
     @brief Enum constant NetlistCrossReference::Skipped
     On circuits this code means that a match has not been attempted because subcircuits of this circuits were not matched. As circuit matching happens bottom-up, all subcircuits must match at least with respect to their pins to allow any parent circuit to be matched.
     """
+    def _const_cast(self) -> NetlistCrossReference:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -41352,6 +42921,11 @@ class NetlistCrossReference(NetlistCompareLogger):
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> NetlistCrossReference:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -41502,6 +43076,14 @@ class NetlistDeviceExtractorLayerDefinition:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> NetlistDeviceExtractorLayerDefinition:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -41535,6 +43117,11 @@ class NetlistDeviceExtractorLayerDefinition:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> NetlistDeviceExtractorLayerDefinition:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -41633,6 +43220,14 @@ class NetlistObject:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> NetlistObject:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -41666,6 +43261,11 @@ class NetlistObject:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> NetlistObject:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -41749,6 +43349,14 @@ class NetlistReader:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> NetlistReader:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -41782,6 +43390,11 @@ class NetlistReader:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> NetlistReader:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -41930,6 +43543,14 @@ class NetlistSpiceReader(NetlistReader):
         @brief Creates a new reader with a delegate.
         """
         ...
+    def _const_cast(self) -> NetlistSpiceReader:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -41963,6 +43584,11 @@ class NetlistSpiceReader(NetlistReader):
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> NetlistSpiceReader:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -42005,6 +43631,14 @@ class NetlistSpiceReaderDelegate:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> NetlistSpiceReaderDelegate:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -42038,6 +43672,11 @@ class NetlistSpiceReaderDelegate:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> NetlistSpiceReaderDelegate:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -42291,6 +43930,14 @@ class NetlistSpiceWriter(NetlistWriter):
         @brief Creates a new writer with a delegate.
         """
         ...
+    def _const_cast(self) -> NetlistSpiceWriter:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -42324,6 +43971,11 @@ class NetlistSpiceWriter(NetlistWriter):
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> NetlistSpiceWriter:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -42376,6 +44028,14 @@ class NetlistSpiceWriterDelegate:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> NetlistSpiceWriterDelegate:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -42409,6 +44069,11 @@ class NetlistSpiceWriterDelegate:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> NetlistSpiceWriterDelegate:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -42512,6 +44177,14 @@ class NetlistWriter:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> NetlistWriter:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -42545,6 +44218,11 @@ class NetlistWriter:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> NetlistWriter:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -42614,6 +44292,14 @@ class PCellDeclaration(PCellDeclaration_Native):
         @brief Assigns another object to self
         """
         ...
+    def _const_cast(self) -> PCellDeclaration:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -42652,6 +44338,11 @@ class PCellDeclaration(PCellDeclaration_Native):
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> PCellDeclaration:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -42730,6 +44421,14 @@ class PCellDeclaration_Native:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> PCellDeclaration_Native:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -42763,6 +44462,11 @@ class PCellDeclaration_Native:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> PCellDeclaration_Native:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -43061,6 +44765,14 @@ class PCellParameterDeclaration:
         @param unit The unit string
         """
         ...
+    def _const_cast(self) -> PCellParameterDeclaration:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -43094,6 +44806,11 @@ class PCellParameterDeclaration:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> PCellParameterDeclaration:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -43315,13 +45032,6 @@ class PCellParameterState:
     r"""
     @brief An icon indicating a warning is shown
     """
-    @property
-    def icon(self) -> None:
-        r"""
-        WARNING: This variable can only be set, not retrieved.
-        @brief Sets the icon for the parameter
-        """
-        ...
     enabled: bool
     r"""
     Getter:
@@ -43329,6 +45039,14 @@ class PCellParameterState:
 
     Setter:
     @brief Sets a value indicating whether the parameter is enabled in the parameter form
+    """
+    icon: PCellParameterState.ParameterStateIcon
+    r"""
+    Getter:
+    @brief Gets the icon for the parameter
+
+    Setter:
+    @brief Sets the icon for the parameter
     """
     readonly: bool
     r"""
@@ -43385,6 +45103,14 @@ class PCellParameterState:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> PCellParameterState:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -43418,6 +45144,11 @@ class PCellParameterState:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> PCellParameterState:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -43516,6 +45247,14 @@ class PCellParameterStates:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> PCellParameterStates:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -43549,6 +45288,11 @@ class PCellParameterStates:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> PCellParameterStates:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -43647,6 +45391,14 @@ class ParentInstArray:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> ParentInstArray:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -43680,6 +45432,11 @@ class ParentInstArray:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> ParentInstArray:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -43797,6 +45554,14 @@ class ParseElementComponentsData:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> ParseElementComponentsData:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -43830,6 +45595,11 @@ class ParseElementComponentsData:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> ParseElementComponentsData:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -43939,6 +45709,14 @@ class ParseElementData:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> ParseElementData:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -43972,6 +45750,11 @@ class ParseElementData:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> ParseElementData:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -44290,6 +46073,14 @@ class Path:
         @brief Convert to a string
         """
         ...
+    def _const_cast(self) -> Path:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -44323,6 +46114,11 @@ class Path:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Path:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -44581,6 +46377,14 @@ class Pin(NetlistObject):
         @brief Assigns another object to self
         """
         ...
+    def _const_cast(self) -> Pin:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -44619,6 +46423,11 @@ class Pin(NetlistObject):
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Pin:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -44886,6 +46695,14 @@ class Point:
         Returns the scaled object. All coordinates are divided with the given divisor and if necessary rounded.
         """
         ...
+    def _const_cast(self) -> Point:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -44919,6 +46736,11 @@ class Point:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Point:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -45306,6 +47128,14 @@ class Polygon:
         @brief Returns a string representing the polygon
         """
         ...
+    def _const_cast(self) -> Polygon:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -45339,6 +47169,11 @@ class Polygon:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Polygon:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -46221,6 +48056,14 @@ class PolygonFilter:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> PolygonFilter:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -46254,6 +48097,11 @@ class PolygonFilter:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> PolygonFilter:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -46422,6 +48270,14 @@ class PolygonOperator:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> PolygonOperator:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -46455,6 +48311,11 @@ class PolygonOperator:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> PolygonOperator:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -46603,6 +48464,14 @@ class PolygonToEdgeOperator:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> PolygonToEdgeOperator:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -46636,6 +48505,11 @@ class PolygonToEdgeOperator:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> PolygonToEdgeOperator:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -46784,6 +48658,14 @@ class PolygonToEdgePairOperator:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> PolygonToEdgePairOperator:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -46817,6 +48699,11 @@ class PolygonToEdgePairOperator:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> PolygonToEdgePairOperator:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -46998,6 +48885,14 @@ class PreferredOrientation:
         @brief Gets the symbolic string from an enum
         """
         ...
+    def _const_cast(self) -> PreferredOrientation:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -47031,6 +48926,11 @@ class PreferredOrientation:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> PreferredOrientation:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -47228,6 +49128,14 @@ class PropertyConstraint:
         @brief Gets the symbolic string from an enum
         """
         ...
+    def _const_cast(self) -> PropertyConstraint:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -47261,6 +49169,11 @@ class PropertyConstraint:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> PropertyConstraint:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -47604,6 +49517,14 @@ class RecursiveInstanceIterator:
         Two iterators are not equal if they do not point to the same instance.
         """
         ...
+    def _const_cast(self) -> RecursiveInstanceIterator:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -47637,6 +49558,11 @@ class RecursiveInstanceIterator:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> RecursiveInstanceIterator:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -48346,6 +50272,14 @@ class RecursiveShapeIterator:
         Two iterators are not equal if they do not point to the same shape.
         """
         ...
+    def _const_cast(self) -> RecursiveShapeIterator:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -48379,6 +50313,11 @@ class RecursiveShapeIterator:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> RecursiveShapeIterator:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -49802,6 +51741,14 @@ class Region(ShapeCollection):
         The 'xor' alias has been introduced in version 0.28.12.
         """
         ...
+    def _const_cast(self) -> Region:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -49835,6 +51782,11 @@ class Region(ShapeCollection):
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Region:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -49910,6 +51862,32 @@ class Region(ShapeCollection):
         The bounding box is the box enclosing all points of all polygons.
         """
         ...
+    def begin_merged_shapes_rec(self) -> Any:
+        r"""
+        @brief Returns a recursive shape iterator plus a transformation for the shapes constituting the merged region.
+        It can be used like \begin_shapes_rec, but delivers shapes from the merged polygons pool.
+
+        This speciality method was introduced in version 0.29.5.
+        """
+        ...
+    def begin_shapes_rec(self) -> Any:
+        r"""
+        @brief Returns a recursive shape iterator plus a transformation for the shapes constituting this region.
+        This method returns a pair consisting of a \RecursiveShapeIterator plus a \ICplxTrans transformation. Both objects allow accessing the shapes (polygons) of the region in a detailed fashion. To iterate the the polygons use a code like this:
+
+        @code
+        iter, trans = region.begin_shapes_rec
+        iter.each do |i|
+          polygon = trans * iter.trans * i.shape.polygon
+          ...
+        end
+        @/code
+
+        This method is the most powerful way of accessing the shapes inside the region. I allows for example to obtain the properties attached to the polygons of the region. It is primarily intended for special applications like iterating net-annotated shapes.
+
+        This speciality method was introduced in version 0.29.5.
+        """
+        ...
     def break_(self, max_vertex_count: int, max_area_ratio: Optional[float] = ...) -> None:
         r"""
         @brief Breaks the polygons of the region into smaller ones
@@ -49918,7 +51896,18 @@ class Region(ShapeCollection):
 
         Using a value of 0 for either limit means that the respective limit isn't checked. Breaking happens by cutting the polygons into parts at 'good' locations. The algorithm does not have a specific goal to minimize the number of parts for example. The only goal is to achieve parts within the given limits.
 
-        This method has been introduced in version 0.26.
+        This method has been introduced in version 0.26. The 'break_polygons' alias has been introduced in version 0.29.5 to avoid issues with reserved keywords.
+        """
+        ...
+    def break_polygons(self, max_vertex_count: int, max_area_ratio: Optional[float] = ...) -> None:
+        r"""
+        @brief Breaks the polygons of the region into smaller ones
+
+        There are two criteria for splitting a polygon: a polygon is split into parts with less then 'max_vertex_count' points and an bounding box-to-polygon area ratio less than 'max_area_ratio'. The area ratio is supposed to render polygons whose bounding box is a better approximation. This applies for example to 'L' shape polygons.
+
+        Using a value of 0 for either limit means that the respective limit isn't checked. Breaking happens by cutting the polygons into parts at 'good' locations. The algorithm does not have a specific goal to minimize the number of parts for example. The only goal is to achieve parts within the given limits.
+
+        This method has been introduced in version 0.26. The 'break_polygons' alias has been introduced in version 0.29.5 to avoid issues with reserved keywords.
         """
         ...
     def clear(self) -> None:
@@ -50065,6 +52054,8 @@ class Region(ShapeCollection):
         @return A new region holding the triangles of the refined, constrained Delaunay triangulation.
 
         Refinement is implemented by Chew's second algorithm. A maximum area can be given. Triangles larger than this area will be split. In addition 'skinny' triangles will be resolved where possible. 'skinny' is defined in terms of shortest edge to circumcircle radius ratio (b). A minimum number for b can be given. The default of 1.0 corresponds to a minimum angle of 30 degree and is usually a good choice. The algorithm is stable up to roughly 1.2 which corresponds to a minimum angle of abouth 37 degree.
+
+        The minimum angle of the resulting triangles relates to the 'b' parameter as: @t min_angle = arcsin(B/2) @/t.
 
         The area value is given in terms of DBU units. Picking a value of 0.0 for area and min b will make the implementation skip the refinement step. In that case, the results are identical to the standard constrained Delaunay triangulation.
 
@@ -50968,7 +52959,7 @@ class Region(ShapeCollection):
         metal1_all_nets = metal1.nets
         @/code
 
-        This method was introduced in version 0.28.4
+        This method was introduced in version 0.28.4.
         """
         ...
     def non_rectangles(self) -> Region:
@@ -53061,6 +55052,14 @@ class SaveLayoutOptions:
         The default format is GDS2.
         """
         ...
+    def _const_cast(self) -> SaveLayoutOptions:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -53094,6 +55093,11 @@ class SaveLayoutOptions:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> SaveLayoutOptions:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -53360,6 +55364,14 @@ class Severity:
         @brief Gets the symbolic string from an enum
         """
         ...
+    def _const_cast(self) -> Severity:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -53393,6 +55405,11 @@ class Severity:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Severity:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -54040,10 +56057,11 @@ class Shape:
     Starting with version 0.23, this method returns nil, if the shape does not represent a geometrical primitive that can be converted to a polygon.
 
     Setter:
-    @brief Replaces the shape by the given polygon (in micrometer units)
-    This method replaces the shape by the given polygon, like \polygon= with a \Polygon argument does. This version translates the polygon from micrometer units to database units internally.
+    @brief Replaces the shape by the given polygon object
+    This method replaces the shape by the given polygon object. This method can only be called for editable layouts. It does not change the user properties of the shape.
+    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.22.
     """
     prop_id: int
     r"""
@@ -54461,6 +56479,14 @@ class Shape:
         This method has been introduced with version 0.16.
         """
         ...
+    def _const_cast(self) -> Shape:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -54494,6 +56520,11 @@ class Shape:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Shape:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -54851,6 +56882,14 @@ class Shape:
         This method has been added in version 0.23.
         """
         ...
+    def properties(self) -> Any:
+        r"""
+        @brief Gets the user properties
+        This method is a convenience method that gets the properties of the shape as a single hash.
+
+        This method has been introduced in version 0.29.5.
+        """
+        ...
     def property(self, key: Any) -> Any:
         r"""
         @brief Gets the user property with the given key
@@ -54946,6 +56985,14 @@ class ShapeCollection:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> ShapeCollection:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -54979,6 +57026,11 @@ class ShapeCollection:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> ShapeCollection:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -55045,6 +57097,14 @@ class ShapeProcessor:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> ShapeProcessor:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -55078,6 +57138,11 @@ class ShapeProcessor:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> ShapeProcessor:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -55634,6 +57699,14 @@ class Shapes:
         @return The number of shapes in this container
         """
         ...
+    def _const_cast(self) -> Shapes:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -55669,6 +57742,11 @@ class Shapes:
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
         ...
+    def _to_const_object(self) -> Shapes:
+        r"""
+        @hide
+        """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -55680,6 +57758,19 @@ class Shapes:
     def assign(self, other: Shapes) -> None:
         r"""
         @brief Assigns another object to self
+        """
+        ...
+    def break_polygons(self, max_vertex_count: int, max_area_ratio: Optional[float] = ...) -> None:
+        r"""
+        @brief Breaks the polygons of the shape container into smaller ones
+
+        There are two criteria for splitting a polygon: a polygon is split into parts with less then 'max_vertex_count' points and an bounding box-to-polygon area ratio less than 'max_area_ratio'. The area ratio is supposed to render polygons whose bounding box is a better approximation. This applies for example to 'L' shape polygons.
+
+        Using a value of 0 for either limit means that the respective limit isn't checked. Breaking happens by cutting the polygons into parts at 'good' locations. The algorithm does not have a specific goal to minimize the number of parts for example. The only goal is to achieve parts within the given limits.
+
+        Breaking also applies to paths if their polygon representation satisfies the breaking criterion. In that case, paths are converted to polygons and broken into smaller parts.
+
+        This method has been introduced in version 0.29.5.
         """
         ...
     def cell(self) -> Cell:
@@ -57086,6 +59177,14 @@ class SimplePolygon:
         @brief Returns a string representing the polygon
         """
         ...
+    def _const_cast(self) -> SimplePolygon:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -57119,6 +59218,11 @@ class SimplePolygon:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> SimplePolygon:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -57677,6 +59781,14 @@ class SubCircuit(NetlistObject):
         @brief Assigns another object to self
         """
         ...
+    def _const_cast(self) -> SubCircuit:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -57717,6 +59829,11 @@ class SubCircuit(NetlistObject):
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
         ...
+    def _to_const_object(self) -> SubCircuit:
+        r"""
+        @hide
+        """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -57728,17 +59845,17 @@ class SubCircuit(NetlistObject):
     @overload
     def circuit(self) -> Circuit:
         r"""
-        @brief Gets the circuit the subcircuit lives in.
+        @brief Gets the circuit the subcircuit lives in (non-const version).
         This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def circuit(self) -> Circuit:
         r"""
-        @brief Gets the circuit the subcircuit lives in (non-const version).
+        @brief Gets the circuit the subcircuit lives in.
         This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
-
-        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
@@ -58066,6 +60183,14 @@ class Technology:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> Technology:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -58099,6 +60224,11 @@ class Technology:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Technology:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -58250,6 +60380,14 @@ class TechnologyComponent:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> TechnologyComponent:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -58283,6 +60421,11 @@ class TechnologyComponent:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> TechnologyComponent:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -58397,7 +60540,8 @@ class Text:
     Setter:
     @brief Sets the horizontal alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     size: int
     r"""
@@ -58433,8 +60577,7 @@ class Text:
     Setter:
     @brief Sets the vertical alignment
 
-    This property specifies how the text is aligned relative to the anchor point. 
-    This property has been introduced in version 0.22 and extended to enums in 0.28.
+    This is the version accepting integer values. It's provided for backward compatibility.
     """
     x: int
     r"""
@@ -58619,6 +60762,14 @@ class Text:
         The DBU argument has been added in version 0.27.6.
         """
         ...
+    def _const_cast(self) -> Text:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -58652,6 +60803,11 @@ class Text:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Text:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -58899,6 +61055,14 @@ class TextFilter:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> TextFilter:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -58932,6 +61096,11 @@ class TextFilter:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> TextFilter:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -59104,6 +61273,14 @@ class TextGenerator:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> TextGenerator:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -59137,6 +61314,11 @@ class TextGenerator:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> TextGenerator:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -59360,6 +61542,14 @@ class TextOperator:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> TextOperator:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -59393,6 +61583,11 @@ class TextOperator:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> TextOperator:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -59501,6 +61696,14 @@ class TextToPolygonOperator:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> TextToPolygonOperator:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -59534,6 +61737,11 @@ class TextToPolygonOperator:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> TextToPolygonOperator:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -59912,6 +62120,14 @@ class Texts(ShapeCollection):
         @return A new text collection containing the texts not inside or on the edge of polygons from the region
         """
         ...
+    def _const_cast(self) -> Texts:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -59945,6 +62161,11 @@ class Texts(ShapeCollection):
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Texts:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -60433,6 +62654,14 @@ class TileOutputReceiver(TileOutputReceiverBase):
         @brief Assigns another object to self
         """
         ...
+    def _const_cast(self) -> TileOutputReceiver:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -60473,6 +62702,11 @@ class TileOutputReceiver(TileOutputReceiverBase):
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
         ...
+    def _to_const_object(self) -> TileOutputReceiver:
+        r"""
+        @hide
+        """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -60509,6 +62743,14 @@ class TileOutputReceiverBase:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> TileOutputReceiverBase:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -60542,6 +62784,11 @@ class TileOutputReceiverBase:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> TileOutputReceiverBase:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -60722,6 +62969,14 @@ class TilingProcessor:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> TilingProcessor:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -60755,6 +63010,11 @@ class TilingProcessor:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> TilingProcessor:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -61745,6 +64005,14 @@ class Trans:
         The DBU argument has been added in version 0.27.6.
         """
         ...
+    def _const_cast(self) -> Trans:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -61778,6 +64046,11 @@ class Trans:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Trans:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -62094,6 +64367,14 @@ class TrapezoidDecompositionMode:
         @brief Gets the symbolic string from an enum
         """
         ...
+    def _const_cast(self) -> TrapezoidDecompositionMode:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -62127,6 +64408,11 @@ class TrapezoidDecompositionMode:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> TrapezoidDecompositionMode:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -62274,6 +64560,14 @@ class Utils:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> Utils:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -62307,6 +64601,11 @@ class Utils:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Utils:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -62469,6 +64768,14 @@ class VAlign:
         @brief Gets the symbolic string from an enum
         """
         ...
+    def _const_cast(self) -> VAlign:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -62502,6 +64809,11 @@ class VAlign:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> VAlign:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -63249,6 +65561,14 @@ class VCplxTrans:
         The lazy and DBU arguments have been added in version 0.27.6.
         """
         ...
+    def _const_cast(self) -> VCplxTrans:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -63282,6 +65602,11 @@ class VCplxTrans:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> VCplxTrans:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -63813,6 +66138,14 @@ class Vector:
         Returns the scaled object. All coordinates are divided with the given divisor and if necessary rounded.
         """
         ...
+    def _const_cast(self) -> Vector:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -63846,6 +66179,11 @@ class Vector:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Vector:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -64104,6 +66442,14 @@ class ZeroDistanceMode:
         @brief Gets the symbolic string from an enum
         """
         ...
+    def _const_cast(self) -> ZeroDistanceMode:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -64137,6 +66483,11 @@ class ZeroDistanceMode:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> ZeroDistanceMode:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:

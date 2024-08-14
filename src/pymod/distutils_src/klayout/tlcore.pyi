@@ -106,6 +106,14 @@ class AbsoluteProgress(Progress):
         The yield interval specifies, how often the event loop will be triggered. When the yield interval is 10 for example, the event loop will be executed every tenth call of \inc or \set.
         """
         ...
+    def _const_cast(self) -> AbsoluteProgress:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -139,6 +147,11 @@ class AbsoluteProgress(Progress):
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> AbsoluteProgress:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -205,6 +218,14 @@ class AbstractProgress(Progress):
         @brief Creates an abstract progress reporter with the given description
         """
         ...
+    def _const_cast(self) -> AbstractProgress:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -238,6 +259,11 @@ class AbstractProgress(Progress):
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> AbstractProgress:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -371,6 +397,14 @@ class ArgType:
         @brief Convert to a string
         """
         ...
+    def _const_cast(self) -> ArgType:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -404,6 +438,11 @@ class ArgType:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> ArgType:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -556,6 +595,14 @@ class Class:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> Class:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -589,6 +636,11 @@ class Class:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Class:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -712,6 +764,14 @@ class EmptyClass:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> EmptyClass:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -745,6 +805,11 @@ class EmptyClass:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> EmptyClass:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -808,6 +873,14 @@ class Executable(ExecutableBase):
         @brief Assigns another object to self
         """
         ...
+    def _const_cast(self) -> Executable:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -848,6 +921,11 @@ class Executable(ExecutableBase):
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
         ...
+    def _to_const_object(self) -> Executable:
+        r"""
+        @hide
+        """
+        ...
     def _unmanage(self) -> None:
         r"""
         @brief Marks the object as no longer owned by the script side.
@@ -884,6 +962,14 @@ class ExecutableBase:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> ExecutableBase:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -917,6 +1003,11 @@ class ExecutableBase:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> ExecutableBase:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -1025,6 +1116,14 @@ class Expression(ExpressionContext):
         This version of the constructor takes a hash of variables available to the expressions.
         """
         ...
+    def _const_cast(self) -> Expression:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -1063,6 +1162,11 @@ class Expression(ExpressionContext):
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Expression:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -1115,6 +1219,14 @@ class ExpressionContext:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> ExpressionContext:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -1148,6 +1260,11 @@ class ExpressionContext:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> ExpressionContext:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -1252,6 +1369,14 @@ class GlobPattern:
         @brief Creates a new glob pattern match object
         """
         ...
+    def _const_cast(self) -> GlobPattern:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -1285,6 +1410,11 @@ class GlobPattern:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> GlobPattern:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -1382,6 +1512,14 @@ class Interpreter:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> Interpreter:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -1415,6 +1553,11 @@ class Interpreter:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Interpreter:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -1552,6 +1695,14 @@ class Logger:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> Logger:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -1585,6 +1736,11 @@ class Logger:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Logger:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -1675,6 +1831,14 @@ class Method:
         This method has been introduced in version 0.29.
         """
         ...
+    def _const_cast(self) -> Method:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -1708,6 +1872,11 @@ class Method:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Method:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -1881,6 +2050,14 @@ class MethodOverload:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> MethodOverload:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -1914,6 +2091,11 @@ class MethodOverload:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> MethodOverload:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -2027,6 +2209,14 @@ class Progress:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> Progress:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -2060,6 +2250,11 @@ class Progress:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Progress:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -2124,6 +2319,14 @@ class PythonFunction:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> PythonFunction:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -2157,6 +2360,11 @@ class PythonFunction:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> PythonFunction:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -2251,6 +2459,14 @@ class PythonGetterSetterPair:
         @brief Creates a new object of this class
         """
         ...
+    def _const_cast(self) -> PythonGetterSetterPair:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -2284,6 +2500,11 @@ class PythonGetterSetterPair:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> PythonGetterSetterPair:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -2382,6 +2603,14 @@ class Recipe:
         @brief Creates a new recipe object with the given name and (optional) description
         """
         ...
+    def _const_cast(self) -> Recipe:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -2415,6 +2644,11 @@ class Recipe:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Recipe:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -2560,6 +2794,14 @@ class RelativeProgress(Progress):
         The yield interval specifies, how often the event loop will be triggered. When the yield interval is 10 for example, the event loop will be executed every tenth call of \inc or \set.
         """
         ...
+    def _const_cast(self) -> RelativeProgress:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -2593,6 +2835,11 @@ class RelativeProgress(Progress):
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> RelativeProgress:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -2685,6 +2932,14 @@ class Timer:
         @brief Produces a string with the currently elapsed times
         """
         ...
+    def _const_cast(self) -> Timer:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -2718,6 +2973,11 @@ class Timer:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Timer:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:
@@ -2860,6 +3120,14 @@ class Value:
         @brief Convert this object to a string
         """
         ...
+    def _const_cast(self) -> Value:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -2893,6 +3161,11 @@ class Value:
         After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> Value:
+        r"""
+        @hide
         """
         ...
     def _unmanage(self) -> None:

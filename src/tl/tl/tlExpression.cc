@@ -3156,6 +3156,10 @@ Expression::execute () const
 void
 Expression::execute (EvalTarget &v) const
 {
+  if (! mp_eval.get ()) {
+    throw tl::Exception (tl::to_string (tr ("Context was destroyed")));
+  }
+  mp_eval->check ();
   if (m_root.get ()) {
     m_root->execute (v);
   } 
@@ -3167,13 +3171,13 @@ Expression::execute (EvalTarget &v) const
 Eval Eval::m_global (0, 0, false);
 
 Eval::Eval (Eval *parent, bool sloppy)
-  : mp_parent (parent), mp_global (&Eval::m_global), m_sloppy (sloppy), mp_ctx_handler (0)
+  : mp_parent (parent), m_has_parent (parent != 0), mp_global (&Eval::m_global), m_has_global (false), m_sloppy (sloppy), mp_ctx_handler (0)
 {
   // .. nothing yet ..
 }
 
 Eval::Eval (Eval *global, Eval *parent, bool sloppy)
-  : mp_parent (parent), mp_global (global), m_sloppy (sloppy), mp_ctx_handler (0)
+  : mp_parent (parent), m_has_parent (parent != 0), mp_global (global), m_has_global (global != 0), m_sloppy (sloppy), mp_ctx_handler (0)
 {
   // .. nothing yet ..
 }
@@ -3184,6 +3188,23 @@ Eval::~Eval ()
     delete f->second;
   }
   m_local_functions.clear ();
+}
+
+void
+Eval::check ()
+{
+  if (m_has_parent) {
+    if (! mp_parent.get ()) {
+      throw tl::Exception (tl::to_string (tr ("Parent context was destroyed")));
+    }
+    mp_parent->check ();
+  }
+  if (m_has_global) {
+    if (! mp_global.get ()) {
+      throw tl::Exception (tl::to_string (tr ("Global context was destroyed")));
+    }
+    mp_global->check ();
+  }
 }
 
 void 

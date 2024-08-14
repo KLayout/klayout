@@ -356,7 +356,7 @@ private:
   const char *mp_text;
   std::string m_local_text;
   std::unique_ptr<ExpressionNode> m_root;
-  Eval *mp_eval;
+  tl::weak_ptr<Eval> mp_eval;
 
   friend class Eval;
 
@@ -580,10 +580,18 @@ public:
     return mp_parent.get ();
   }
 
+  /**
+   *  @brief Checks the contexts and throws an exception if one of them got lost
+   */
+  void check ();
+
 private:
   friend class Expression;
 
-  tl::weak_ptr<Eval> mp_parent, mp_global;
+  tl::weak_ptr<Eval> mp_parent;
+  bool m_has_parent;
+  tl::weak_ptr<Eval> mp_global;
+  bool m_has_global;
   std::map <std::string, tl::Variant> m_local_vars;
   std::map <std::string, EvalFunction *> m_local_functions;
   bool m_sloppy;

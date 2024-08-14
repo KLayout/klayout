@@ -3184,14 +3184,11 @@ Eval::Eval (Eval *global, Eval *parent, bool sloppy)
 
 Eval::~Eval ()
 {
-  for (std::map <std::string, EvalFunction *>::iterator f = m_local_functions.begin (); f != m_local_functions.end (); ++f) {
-    delete f->second;
-  }
   m_local_functions.clear ();
 }
 
 void
-Eval::check ()
+Eval::check () const
 {
   if (m_has_parent) {
     if (! mp_parent.get ()) {
@@ -3227,11 +3224,7 @@ Eval::var (const std::string &name)
 void 
 Eval::define_function (const std::string &name, EvalFunction *function)
 {
-  EvalFunction *&f = m_local_functions.insert (std::make_pair (name, (EvalFunction *) 0)).first->second;
-  if (f != 0) {
-    delete f;
-  }
-  f = function;
+  m_local_functions [name].reset (function);
 }
 
 EvalFunction *
@@ -3239,7 +3232,7 @@ Eval::function (const std::string &name)
 {
   auto f = m_local_functions.find (name);
   if (f != m_local_functions.end ()) {
-    return f->second;
+    return f->second.get ();
   } else {
     return 0;
   }
@@ -4040,13 +4033,11 @@ Eval::resolve_name (const std::string &t, const EvalFunction *&function, const t
   value = 0;
   var = 0;
 
-  std::map <std::string, EvalFunction *>::const_iterator f;
-  f = m_local_functions.find (t);
+  auto f = m_local_functions.find (t);
   if (f != m_local_functions.end ()) {
-    function = f->second;
+    function = f->second.get ();
   } else if ((function = EvalStaticFunction::function_by_name (t)) == 0) {
-    std::map<std::string, tl::Variant>::iterator v;
-    v = m_local_vars.find (t);
+    auto v = m_local_vars.find (t);
     if (v != m_local_vars.end ()) {
       var = &v->second;
     } else {
@@ -4054,12 +4045,11 @@ Eval::resolve_name (const std::string &t, const EvalFunction *&function, const t
     }
   }
 
-  if (! function && ! value && ! var) {
-    if (mp_parent) {
-      mp_parent->resolve_name (t, function, value, var);
-    } else if (mp_global) {
-      mp_global->resolve_name (t, function, value, var);
-    }
+  if (mp_parent && ! function && ! value && ! var) {
+    mp_parent->resolve_name (t, function, value, var);
+  }
+  if (mp_global && ! function && ! value && ! var) {
+    mp_global->resolve_name (t, function, value, var);
   }
 }
 

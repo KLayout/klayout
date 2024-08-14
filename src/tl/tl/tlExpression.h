@@ -270,6 +270,7 @@ public:
  *  @brief A base class for a function 
  */
 class TL_PUBLIC EvalFunction
+  : public tl::Object
 {
 public:
   /**
@@ -583,7 +584,7 @@ public:
   /**
    *  @brief Checks the contexts and throws an exception if one of them got lost
    */
-  void check ();
+  void check () const;
 
 private:
   friend class Expression;
@@ -593,7 +594,7 @@ private:
   tl::weak_ptr<Eval> mp_global;
   bool m_has_global;
   std::map <std::string, tl::Variant> m_local_vars;
-  std::map <std::string, EvalFunction *> m_local_functions;
+  std::map <std::string, tl::shared_ptr<EvalFunction> > m_local_functions;
   bool m_sloppy;
   const ContextHandler *mp_ctx_handler;
   std::vector<std::string> m_match_substrings;

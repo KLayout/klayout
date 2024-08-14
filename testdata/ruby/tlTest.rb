@@ -274,7 +274,53 @@ class Tl_TestClass < TestBase
 
     pc._destroy
 
-    self.assert_equal(e1.eval, 5)
+    begin
+      e1.eval
+      self.assert_equal(true, false)
+    rescue => ex
+      self.assert_equal(ex.to_s, "Parent context was destroyed in Expression::eval")
+    end
+
+  end
+
+  # Parent contexts
+  def test_5_GlobalContext
+
+    # this is a new disconnected context
+    pc = RBA::ExpressionContext::new(nil, nil)
+    pc.var("A", 10)
+    
+    # this is a new disconnected context
+    gc = RBA::ExpressionContext::new(nil, nil)
+    gc.var("B", 1.5)
+    
+    e = RBA::Expression::new(gc, pc)
+    e.text = "B * A"
+    self.assert_equal(e.eval, 15)
+
+    # built-in functions still work
+    e.text = "pow(A,2)"
+    self.assert_equal(e.eval, 100)
+
+    # but other classes don't
+    begin
+      e.text = "Box.new(1, 2, 3, 4)"
+      self.assert_equal(true, false)
+    rescue => ex
+    end
+
+    # borrow "Box" from the global context (reference context)
+    e.import("Box")
+
+    e.text = "Box.new(1, 2, 3, 4)"
+    self.assert_equal(e.eval.to_s, "(1,2;3,4)")
+
+    # DBox still does not work
+    begin
+      e.text = "DBox.new(1, 2, 3, 4)"
+      self.assert_equal(true, false)
+    rescue => ex
+    end
 
   end
 

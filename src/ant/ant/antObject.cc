@@ -437,7 +437,7 @@ public:
       throw tl::EvalError (tl::to_string (tr ("Annotation function must not have arguments")), context);
     }
 
-    const Object &obj = mp_eval->obj ();
+    const ant::Object &obj = mp_eval->obj ();
     const db::DFTrans &trans = mp_eval->trans ();
 
     if (m_function == 'L') {
@@ -471,18 +471,18 @@ public:
     }
   }
 
-  db::DPoint p1 (const Object &obj) const
+  db::DPoint p1 (const ant::Object &obj) const
   {
     return obj.seg_p1 (m_index);
   }
 
-  db::DPoint p2 (const Object &obj) const
+  db::DPoint p2 (const ant::Object &obj) const
   {
     return obj.seg_p2 (m_index);
   }
 
   double
-  delta_x (const Object &obj, const db::DFTrans &t) const
+  delta_x (const ant::Object &obj, const db::DFTrans &t) const
   {
     double dx = ((t * p2 (obj)).x () - (t * p1 (obj)).x ());
 
@@ -495,7 +495,7 @@ public:
   }
 
   double
-  delta_y (const Object &obj, const db::DFTrans &t) const
+  delta_y (const ant::Object &obj, const db::DFTrans &t) const
   {
     double dy = ((t * p2 (obj)).y () - (t * p1 (obj)).y ());
 

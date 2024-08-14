@@ -590,6 +590,12 @@ static void def_func (tl::Eval *eval, const std::string &name, FunctionBody *fun
   eval->define_function (name, func);
 }
 
+static void def_global_func (const std::string &name, FunctionBody *func)
+{
+  func->keep ();
+  tl::Eval::define_global_function (name, func);
+}
+
 Class<FunctionBody> decl_FunctionBody ("tl", "FunctionBody",
   gsi::method ("with_kwargs=", &FunctionBody::set_with_kwargs, gsi::arg ("f"),
     "@brief Sets a value indicating whether this function accepts keyword arguments.\n"
@@ -625,12 +631,115 @@ Class<FunctionBody> decl_FunctionBody ("tl", "FunctionBody",
   "This class has been introduced in version 0.29.6."
 );
 
+tl::Eval *new_expr_ctx0 ()
+{
+  return new tl::Eval ();
+}
+
+tl::Eval *new_expr_ctx1 (tl::Eval *parent)
+{
+  return new tl::Eval (parent);
+}
+
+tl::Eval *new_expr_ctx2 (tl::Eval *global, tl::Eval *parent)
+{
+  return new tl::Eval (global, parent);
+}
+
+void import3 (tl::Eval *eval, tl::Eval *from, const std::string &name)
+{
+  tl::Variant *var = from->var (name);
+  if (var) {
+    eval->set_var (name, *var);
+  } else {
+    tl::EvalFunction *func = from->function (name);
+    if (func) {
+      eval->define_function (name, func);
+    }
+  }
+}
+
+void import4 (tl::Eval *eval, tl::Eval *from, const std::vector<std::string> &names)
+{
+  for (auto i = names.begin (); i != names.end (); ++i) {
+    import3 (eval, from, *i);
+  }
+}
+
+void import1 (tl::Eval *eval, const std::string &name)
+{
+  import3 (eval, &tl::Eval::global_context (), name);
+}
+
+void import2 (tl::Eval *eval, const std::vector<std::string> &names)
+{
+  import4 (eval, &tl::Eval::global_context (), names);
+}
+
 Class<tl::Eval> decl_ExpressionContext ("tl", "ExpressionContext",
+  gsi::constructor ("new", &new_expr_ctx0,
+    "@brief Creates a new expression context\n"
+    "The expression context acts as a namespace for variables and functions. "
+    "This version of the context is connected to the global, singleton context. "
+    "There are other constructors available for creating expression contexts with "
+    "a parent context or connected to another global context.\n"
+  ) +
+  gsi::constructor ("new", &new_expr_ctx1, gsi::arg ("parent"),
+    "@brief Creates a context with a parent context.\n"
+    "This context uses a parent context which is searched for variables and functions "
+    "when not local definition can be found. This version of the context also connects to "
+    "the global singleton context.\n"
+    "\n"
+    "This constructor was introduced in version 0.29.6."
+  ) +
+  gsi::constructor ("new", &new_expr_ctx2, gsi::arg ("global"), gsi::arg ("parent"),
+    "@brief Creates a context with a parent context and connecting to a separate global context.\n"
+    "This version allows specifying a global and parent context. The global context is not "
+    "the singleton context in this case. Specifically, this methods allows creating a detached "
+    "context by using 'nil' for both global and parent contexts. Such a context provides no "
+    "specific definitions and can be used to establish a safe environment without access to "
+    "higher-level classes.\n"
+    "\n"
+    "@code\n"
+    "ctx = RBA::ExpressionContext::new(nil, nil)\n"
+    "# imports the 'Box' class from the global singleton namespace\n"
+    "ctx.import('Box')\n"
+    "# Box is the only class that can be used here:\n"
+    "ctx.eval('Box(0,0,100,200)')\n"
+    "@/code\n"
+    "\n"
+    "This constructor was introduced in version 0.29.6."
+  ) +
+  gsi::method_ext ("import", &import1, gsi::arg ("name"),
+    "@brief Imports a variable from the global, singleton namespace.\n"
+    "This method can be used for importing classes from the global namespace and make it accessible to "
+    "this context, even if it is not connected to the global singleton one.\n"
+    "\n"
+    "This method has been introduced in version 0.29.6."
+  ) +
+  gsi::method_ext ("import", &import2, gsi::arg ("names"),
+    "@brief Imports variables from the global, singleton namespace.\n"
+    "This variant allows specifying a list of names to import.\n"
+    "\n"
+    "This method has been introduced in version 0.29.6."
+  ) +
+  gsi::method_ext ("import", &import3, gsi::arg ("from"), gsi::arg ("name"),
+    "@brief Import a variable from the given context.\n"
+    "This variant allows to give a source context.\n"
+    "\n"
+    "This method has been introduced in version 0.29.6."
+  ) +
+  gsi::method_ext ("import", &import4, gsi::arg ("from"), gsi::arg ("names"),
+    "@brief Imports variables from the given context.\n"
+    "This variant allows to give a source context and a list of names to import.\n"
+    "\n"
+    "This method has been introduced in version 0.29.6."
+  ) +
   gsi::method ("var", &tl::Eval::set_var, gsi::arg ("name"), gsi::arg ("value"),
-    "@brief Defines a variable with the given name and value\n"
+    "@brief Defines a variable with the given name and value.\n"
   ) +
   gsi::method_ext ("func", &def_func, gsi::arg ("name"), gsi::arg ("body"),
-    "@brief Defines a function with the given name and function body\n"
+    "@brief Defines a function with the given name and function body.\n"
     "The function body is an implementation of the \\FunctionBody class. To use it, create a subclass, i.e.\n"
     "\n"
     "@code\n"
@@ -651,9 +760,18 @@ Class<tl::Eval> decl_ExpressionContext ("tl", "ExpressionContext",
     "\n"
     "This method has been introduced in version 0.29.6."
   ) +
+  gsi::method ("global_func", &def_global_func, gsi::arg ("name"), gsi::arg ("body"),
+    "Defines a function in the global namespace.\n"
+    "This method defines a function in the global singleton namespace. It works like \\func and acts "
+    "on the global namespace like \\global_var.\n"
+    "Note that the new function only becomes visible to contexts that connect to the global context.\n"
+    "\n"
+    "It has been introduced in version 0.29.6."
+  ) +
   gsi::method ("global_var", &tl::Eval::set_global_var, gsi::arg ("name"), gsi::arg ("value"),
     "@brief Defines a global variable with the given name and value\n"
-    "Global variables are available to all expressions sharing the same global context."
+    "This method defines a variable in the global singleton namespace. "
+    "Note that the new variable only becomes visible to contexts that connect to the global context.\n"
   ) +
   gsi::method ("eval", &tl::Eval::eval, gsi::arg ("expr"),
     "@brief Compiles and evaluates the given expression in this context\n"

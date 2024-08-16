@@ -20,6 +20,15 @@ import pya
 import unittest
 import sys
 
+class MyFunction(pya.FunctionBody):
+  def __init__(self):
+    self.with_kwargs = False
+    self.min_args = 1
+    self.max_args = 1
+
+  def execute(self, args, kwargs):
+    return args[0] + 1
+
 def astr(a):
   astr = []
   for i in a:
@@ -216,6 +225,120 @@ class TLTest(unittest.TestCase):
     self.assertEqual(res[0].destroyed(), True)
     self.assertEqual(res[1].destroyed(), True)
     self.assertEqual(res[2].destroyed(), True)
+
+  # Functions
+  def test_3_FunctionsInExpressions(self):
+
+    e = pya.ExpressionContext()
+    e.func("f", MyFunction())
+
+    self.assertEqual(e.eval("f(17)"), 18)
+    
+    # now with embedded expression
+    e = pya.Expression()
+    e.func("f", MyFunction())
+
+    e.var("A", None)
+    e.text = "f(A)"
+
+    e.var("A", 1)
+    self.assertEqual(e.eval(), 2)
+
+    e.var("A", 4)
+    self.assertEqual(e.eval(), 5)
+
+  # Parent contexts
+  def test_4_FunctionsInExpressions(self):
+
+    pc = pya.ExpressionContext()
+    pc.var("A", 17)
+    
+    e1 = pya.Expression(pc)
+    e1.text = "A + 1"
+    self.assertEqual(e1.eval(), 18)
+
+    e2 = pya.Expression(pc)
+    e2.text = "A + 2"
+    self.assertEqual(e2.eval(), 19)
+
+    pc.var("A", 4)
+    self.assertEqual(e1.eval(), 5)
+    self.assertEqual(e2.eval(), 6)
+
+    pc._destroy()
+
+    try:
+      e1.eval()
+      self.assertEqual(True, False)
+    except Exception as ex:
+      self.assertEqual(str(ex), "Parent context was destroyed in Expression.eval")
+
+  # Parent contexts
+  def test_5_GlobalContext(self):
+
+    # this is a new disconnected context
+    pc = pya.ExpressionContext(None, None)
+    pc.var("A", 10)
+    
+    # this is a new disconnected context
+    gc = pya.ExpressionContext(None, None)
+    gc.var("B", 1.5)
+    
+    e = pya.Expression(gc, pc)
+    e.text = "B * A"
+    self.assertEqual(e.eval(), 15)
+
+    # built-in functions still work
+    e.text = "pow(A,2)"
+    self.assertEqual(e.eval(), 100)
+
+    # but other classes don't
+    try:
+      e.text = "Box.new(1, 2, 3, 4)"
+      self.assertEqual(True, False)
+    except:
+      pass
+
+    # borrow "Box" from the global context (reference context)
+    e.import_("Box")
+
+    e.text = "Box.new(1, 2, 3, 4)"
+    self.assertEqual(str(e.eval()), "(1,2;3,4)")
+
+    # DBox still does not work
+    try:
+      e.text = "DBox.new(1, 2, 3, 4)"
+      self.assertEqual(True, False)
+    except:
+      pass
+
+    # Other versions of import
+
+    # from global with list
+    e = pya.Expression(gc, pc)
+    e.import_([ "Box", "DBox" ])
+    e.text = "DBox.new(1, 2, 3, 4)"
+    self.assertEqual(str(e.eval()), "(1,2;3,4)")
+    e.text = "Box.new(1, 2, 3, 4)"
+    self.assertEqual(str(e.eval()), "(1,2;3,4)")
+
+    sc = pya.Expression(None, None)
+    sc.import_("Box")
+    sc.import_("DBox")
+
+    # from other context
+    e = pya.Expression(None, None)
+    e.import_(sc, "Box")
+    e.text = "Box.new(1, 2, 3, 4)"
+    self.assertEqual(str(e.eval()), "(1,2;3,4)")
+
+    # from other context with list
+    e = pya.Expression(None, None)
+    e.import_(sc, [ "Box", "DBox" ])
+    e.text = "DBox.new(1, 2, 3, 4)"
+    self.assertEqual(str(e.eval()), "(1,2;3,4)")
+    e.text = "Box.new(1, 2, 3, 4)"
+    self.assertEqual(str(e.eval()), "(1,2;3,4)")
 
 # run unit tests
 if __name__ == '__main__':

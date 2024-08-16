@@ -85,6 +85,10 @@ class Tl_TestClass < TestBase
     assert_equal(res.class.to_s, "Hash")
     assert_equal(res.inspect, {8=>"x", "u"=>42}.inspect)
 
+    # static evaluation
+    assert_equal(RBA::Expression::eval("1+2"), 3)
+    assert_equal(RBA::Expression::eval("1+A", { "A" => 17 }), 18)
+
   end
 
   # Advanced expressions 
@@ -321,6 +325,34 @@ class Tl_TestClass < TestBase
       self.assert_equal(true, false)
     rescue => ex
     end
+
+    # Other versions of import
+
+    # from global with list
+    e = RBA::Expression::new(gc, pc)
+    e.import([ "Box", "DBox" ])
+    e.text = "DBox.new(1, 2, 3, 4)"
+    self.assert_equal(e.eval.to_s, "(1,2;3,4)")
+    e.text = "Box.new(1, 2, 3, 4)"
+    self.assert_equal(e.eval.to_s, "(1,2;3,4)")
+
+    sc = RBA::Expression::new(nil, nil)
+    sc.import("Box")
+    sc.import("DBox")
+
+    # from other context
+    e = RBA::Expression::new(nil, nil)
+    e.import(sc, "Box")
+    e.text = "Box.new(1, 2, 3, 4)"
+    self.assert_equal(e.eval.to_s, "(1,2;3,4)")
+
+    # from other context with list
+    e = RBA::Expression::new(nil, nil)
+    e.import(sc, [ "Box", "DBox" ])
+    e.text = "DBox.new(1, 2, 3, 4)"
+    self.assert_equal(e.eval.to_s, "(1,2;3,4)")
+    e.text = "Box.new(1, 2, 3, 4)"
+    self.assert_equal(e.eval.to_s, "(1,2;3,4)")
 
   end
 

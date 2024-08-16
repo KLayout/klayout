@@ -628,7 +628,7 @@ Class<FunctionBody> decl_FunctionBody ("tl", "FunctionBody",
   "This class provides an interface for implementing custom functions for expressions. "
   "See \\ExpressionContext#func for a use case.\n"
   "\n"
-  "This class has been introduced in version 0.29.6."
+  "This class has been introduced in version 0.29.7."
 );
 
 tl::Eval *new_expr_ctx0 ()
@@ -690,7 +690,7 @@ Class<tl::Eval> decl_ExpressionContext ("tl", "ExpressionContext",
     "when not local definition can be found. This version of the context also connects to "
     "the global singleton context.\n"
     "\n"
-    "This constructor was introduced in version 0.29.6."
+    "This constructor was introduced in version 0.29.7."
   ) +
   gsi::constructor ("new", &new_expr_ctx2, gsi::arg ("global"), gsi::arg ("parent"),
     "@brief Creates a context with a parent context and connecting to a separate global context.\n"
@@ -708,32 +708,32 @@ Class<tl::Eval> decl_ExpressionContext ("tl", "ExpressionContext",
     "ctx.eval('Box(0,0,100,200)')\n"
     "@/code\n"
     "\n"
-    "This constructor was introduced in version 0.29.6."
+    "This constructor was introduced in version 0.29.7."
   ) +
   gsi::method_ext ("import", &import1, gsi::arg ("name"),
     "@brief Imports a variable from the global, singleton namespace.\n"
     "This method can be used for importing classes from the global namespace and make it accessible to "
     "this context, even if it is not connected to the global singleton one.\n"
     "\n"
-    "This method has been introduced in version 0.29.6."
+    "This method has been introduced in version 0.29.7."
   ) +
   gsi::method_ext ("import", &import2, gsi::arg ("names"),
     "@brief Imports variables from the global, singleton namespace.\n"
     "This variant allows specifying a list of names to import.\n"
     "\n"
-    "This method has been introduced in version 0.29.6."
+    "This method has been introduced in version 0.29.7."
   ) +
   gsi::method_ext ("import", &import3, gsi::arg ("from"), gsi::arg ("name"),
     "@brief Import a variable from the given context.\n"
     "This variant allows to give a source context.\n"
     "\n"
-    "This method has been introduced in version 0.29.6."
+    "This method has been introduced in version 0.29.7."
   ) +
   gsi::method_ext ("import", &import4, gsi::arg ("from"), gsi::arg ("names"),
     "@brief Imports variables from the given context.\n"
     "This variant allows to give a source context and a list of names to import.\n"
     "\n"
-    "This method has been introduced in version 0.29.6."
+    "This method has been introduced in version 0.29.7."
   ) +
   gsi::method ("var", &tl::Eval::set_var, gsi::arg ("name"), gsi::arg ("value"),
     "@brief Defines a variable with the given name and value.\n"
@@ -758,7 +758,7 @@ Class<tl::Eval> decl_ExpressionContext ("tl", "ExpressionContext",
     "ctx.eval('myfunction(17)')  # gives 18\n"
     "@endcode\n"
     "\n"
-    "This method has been introduced in version 0.29.6."
+    "This method has been introduced in version 0.29.7."
   ) +
   gsi::method ("global_func", &def_global_func, gsi::arg ("name"), gsi::arg ("body"),
     "Defines a function in the global namespace.\n"
@@ -766,7 +766,7 @@ Class<tl::Eval> decl_ExpressionContext ("tl", "ExpressionContext",
     "on the global namespace like \\global_var.\n"
     "Note that the new function only becomes visible to contexts that connect to the global context.\n"
     "\n"
-    "It has been introduced in version 0.29.6."
+    "It has been introduced in version 0.29.7."
   ) +
   gsi::method ("global_var", &tl::Eval::set_global_var, gsi::arg ("name"), gsi::arg ("value"),
     "@brief Defines a global variable with the given name and value\n"
@@ -775,13 +775,19 @@ Class<tl::Eval> decl_ExpressionContext ("tl", "ExpressionContext",
   ) +
   gsi::method ("eval", &tl::Eval::eval, gsi::arg ("expr"),
     "@brief Compiles and evaluates the given expression in this context\n"
+    "This is a convenience method for one-time evaluation of the expression. To evaluate an expression "
+    "multiple times with different variable values, it is more efficient to use the \\Expression class "
+    "which provides a context plus stores the compiled version of an expression, saving the compile "
+    "step between the evaluations.\n"
+    "\n"
     "This method has been introduced in version 0.26."
   ),
   "@brief Represents the context of an expression evaluation\n"
   "\n"
-  "The context provides a variable and function namespace for the expression evaluation.\n"
+  "The context provides a variable and function namespace for the expression evaluation. The \\Expression class \n"
+  "is an extension that also stores a compiled version of the expression for faster re-evaluation.\n"
   "\n"
-  "This class has been introduced in version 0.26 when \\Expression was separated into the execution and context part.\n"
+  "The \\ExpressionContext class has been introduced in version 0.26 when \\Expression was separated into the execution and context part.\n"
 );
 
 Class<ExpressionWrapper> decl_ExpressionWrapper (decl_ExpressionContext, "tl", "Expression",
@@ -789,7 +795,7 @@ Class<ExpressionWrapper> decl_ExpressionWrapper (decl_ExpressionContext, "tl", "
     "@brief Creates a new expression evaluator for late compilation\n"
     "Use \\var to define variables, \\func to define functions and use \\text= to compile an expression.\n"
     "\n"
-    "This constructor has been added in version 0.29.6."
+    "This constructor has been added in version 0.29.7."
   ) +
   gsi::constructor ("new", &new_expr1a, gsi::arg ("parent"),
     "@brief Creates a new expression object with a parent context.\n"
@@ -800,7 +806,7 @@ Class<ExpressionWrapper> decl_ExpressionWrapper (decl_ExpressionContext, "tl", "
     "Note that the expression object will not hold a strong reference to the parent context. It "
     "will get lost of the variable holding the parent context goes out of scope.\n"
     "\n"
-    "This constructor has been introduced in version 0.29.6."
+    "This constructor has been introduced in version 0.29.7."
   ) +
   gsi::constructor ("new", &new_expr1b, gsi::arg ("global"), gsi::arg ("parent"),
     "@brief Creates a new expression object with a parent and a global context.\n"
@@ -815,7 +821,7 @@ Class<ExpressionWrapper> decl_ExpressionWrapper (decl_ExpressionContext, "tl", "
     "Note that the expression object will not hold a strong reference to the parent or global context. These contexts "
     "will get lost of a variable holding them goes out of scope.\n"
     "\n"
-    "This constructor has been introduced in version 0.29.6."
+    "This constructor has been introduced in version 0.29.7."
   ) +
   gsi::constructor ("new", &new_expr1, gsi::arg ("expr"),
     "@brief Creates an expression evaluator\n"
@@ -849,7 +855,7 @@ Class<ExpressionWrapper> decl_ExpressionWrapper (decl_ExpressionContext, "tl", "
     "@param variables The variables to use in the expression\n"
     "This is a static method that does not require instantiation of the expression object first.\n"
     "\n"
-    "The variable argument has been added in version 0.29.6.\n"
+    "The variable argument has been added in version 0.29.7.\n"
   ),
   "@brief Evaluation of Expressions\n"
   "\n"
@@ -892,7 +898,7 @@ Class<ExpressionWrapper> decl_ExpressionWrapper (decl_ExpressionContext, "tl", "
   "e2.eval    # gives 4\n"
   "@/code\n"
   "\n"
-  "This class has been introduced in version 0.25. In version 0.26 it was separated into execution and context.\n"
+  "The Expression class has been introduced in version 0.25. In version 0.26 it was separated into execution and context.\n"
   "In version 0.29.6, the context was significantly enhanced towards parent contexts and functions.\n"
 );
 

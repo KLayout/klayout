@@ -40,51 +40,47 @@ struct ValueConverter
 {
   typedef std::string pb_type;
 
-  ValueConverter (rdb::Database *rdb)
-    : mp_rdb (rdb)
+  ValueConverter ()
   {
   }
 
   std::string to_string (const ValueWrapper &value) const
   {
-    return value.to_string (mp_rdb);
+    return value.to_string ();
   }
 
   void from_string (const std::string &s, ValueWrapper &value) const
   {
-    value.from_string (mp_rdb, s);
+    value.from_string (s);
   }
 
   std::string pb_encode (const ValueWrapper &value) const
   {
-    return value.to_string (mp_rdb);
+    return value.to_string ();
   }
 
   void pb_decode (const std::string &s, ValueWrapper &value) const
   {
-    value.from_string (mp_rdb, s);
+    value.from_string (s);
   }
-
-private:
-  rdb::Database *mp_rdb;
 };
-
-static 
-tl::XMLElementList categories_format = 
-  tl::make_element_with_parent_ref<rdb::Category, rdb::Categories::const_iterator, rdb::Categories> (&rdb::Categories::begin, &rdb::Categories::end, &rdb::Categories::import_category, "category", 
-    tl::make_member<std::string, rdb::Category> (&rdb::Category::name, &rdb::Category::set_name, "name") + 
-    tl::make_member<std::string, rdb::Category> (&rdb::Category::description, &rdb::Category::set_description, "description") +
-    tl::make_element_with_parent_ref<rdb::Categories, rdb::Category> (&rdb::Category::sub_categories, &rdb::Category::import_sub_categories, "categories",
-      &categories_format
-    ) 
-  ) 
-;
 
 //  generation of the RDB file XML structure
 static tl::XMLStruct <rdb::Database> 
-make_rdb_structure (rdb::Database *rdb)
+make_rdb_structure ()
 {
-  return tl::XMLStruct <rdb::Database>("report-database", 
+  static
+  tl::XMLElementList categories_format =
+    tl::make_element_with_parent_ref<rdb::Category, rdb::Categories::const_iterator, rdb::Categories> (&rdb::Categories::begin, &rdb::Categories::end, &rdb::Categories::import_category, "category",
+      tl::make_member<std::string, rdb::Category> (&rdb::Category::name, &rdb::Category::set_name, "name") +
+      tl::make_member<std::string, rdb::Category> (&rdb::Category::description, &rdb::Category::set_description, "description") +
+      tl::make_element_with_parent_ref<rdb::Categories, rdb::Category> (&rdb::Category::sub_categories, &rdb::Category::import_sub_categories, "categories",
+        &categories_format
+      )
+    )
+  ;
+
+  return tl::XMLStruct <rdb::Database>("report-database",
     tl::make_member<std::string, rdb::Database> (&rdb::Database::description, &rdb::Database::set_description, "description") +
     tl::make_member<std::string, rdb::Database> (&rdb::Database::original_file, &rdb::Database::set_original_file, "original-file") +
     tl::make_member<std::string, rdb::Database> (&rdb::Database::generator, &rdb::Database::set_generator, "generator") +
@@ -122,12 +118,14 @@ make_rdb_structure (rdb::Database *rdb)
         tl::make_member<std::string, rdb::Item> (&rdb::Item::comment, &rdb::Item::set_comment, "comment") +
         tl::make_member<std::string, rdb::Item> (&rdb::Item::image_str, &rdb::Item::set_image_str, "image") +
         tl::make_element<rdb::Values, rdb::Item> (&rdb::Item::values, &rdb::Item::set_values, "values", 
-          tl::make_member<rdb::ValueWrapper, rdb::Values::const_iterator, rdb::Values> (&rdb::Values::begin, &rdb::Values::end, &rdb::Values::add, "value", ValueConverter (rdb))
+          tl::make_member<rdb::ValueWrapper, rdb::Values::const_iterator, rdb::Values> (&rdb::Values::begin, &rdb::Values::end, &rdb::Values::add, "value", ValueConverter ())
         )
       )
     )
   );
 }
+
+static tl::XMLStruct <rdb::Database> s_rdb_struct = make_rdb_structure ();
 
 // -------------------------------------------------------------
 //  Implementation of rdb::Database::save and write
@@ -144,7 +142,7 @@ void
 rdb::Database::write (const std::string &fn)
 {
   tl::OutputStream os (fn, tl::OutputStream::OM_Auto);
-  make_rdb_structure (this).write (os, *this);
+  s_rdb_struct.write (os, *this);
 
   if (tl::verbosity () >= 10) {
     tl::log << "Saved RDB to " << fn;
@@ -168,7 +166,7 @@ public:
   {
     tl::SelfTimer timer (tl::verbosity () >= 11, "Reading marker database file");
     tl::XMLStreamSource in (m_input_stream, tl::to_string (tr ("Reading RDB")));
-    make_rdb_structure (&db).parse (in, db); 
+    s_rdb_struct.parse (in, db);
   }
 
   virtual const char *format () const 

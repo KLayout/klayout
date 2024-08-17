@@ -629,17 +629,17 @@ public:
   /**
    *  @brief Convert the values collection to a string 
    */
-  std::string to_string (const Database *rdb = 0) const;
+  std::string to_string () const;
 
   /**
    *  @brief Fill the values collection from the string
    */
-  void from_string (Database *rdb, const std::string &s);  
+  void from_string (const std::string &s);
 
   /**
    *  @brief Fill the values collection from an extractor
    */
-  void from_string (Database *rdb, tl::Extractor &ex);  
+  void from_string (tl::Extractor &ex);
 
 private:
   ValueBase *mp_ptr;
@@ -687,7 +687,7 @@ public:
    *
    *  The order of the values matters.
    */
-  bool compare (const Values &other, const std::map<id_type, id_type> &tag_map, const std::map<id_type, id_type> &rev_tag_map) const;
+  bool compare (const Values &other, const std::set<id_type> &common_tags) const;
 
   /**
    *  @brief The const iterator (begin)
@@ -760,12 +760,12 @@ public:
   /**
    *  @brief Convert the values collection to a string 
    */
-  std::string to_string (const Database *rdb) const;
+  std::string to_string () const;
 
   /**
    *  @brief Fill the values collection from the string
    */
-  void from_string (Database *rdb, const std::string &s);  
+  void from_string (const std::string &s);
 
 private:
   std::list <ValueWrapper> m_values;
@@ -1057,7 +1057,7 @@ private:
   size_t m_multiplicity;
   std::string m_comment;
   bool m_visited;
-  std::vector <bool> m_tag_ids;
+  std::set <id_type> m_tag_ids;
   Database *mp_database;
   std::string m_image_str;
 
@@ -1982,11 +1982,32 @@ public:
    */
   void clear ();
 
+  /**
+   *  @brief Gets the name and user flag for a tag ID
+   *
+   *  This method will assert if the tag ID is not valid in the global namespace.
+   */
+  static const std::pair<std::string, bool> &name_for_id (id_type tag_id);
+
+  /**
+   *  @brief Gets the id for a given name and user flag
+   *
+   *  This will pull the ID from the global namespace.
+   */
+  static id_type id_for_name (const std::string &name, bool user_flag);
+
+  /**
+   *  @brief Gets a tag object for a given name and user flag
+   *
+   *  This will create the tag from the global namespace.
+   */
+  static Tag tag_for_name (const std::string &name, bool user_flag);
+
 private:
   friend class Database;
 
-  mutable std::map <std::pair<std::string, bool>, id_type> m_ids_for_names;
-  mutable std::vector <Tag> m_tags;
+  mutable std::map<id_type, size_t> m_tags_per_id;
+  mutable std::vector<Tag> m_tags;
 };
 
 /**

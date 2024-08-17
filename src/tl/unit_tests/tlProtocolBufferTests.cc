@@ -20,15 +20,13 @@
 
 */
 
-#include "tlProtocolBufferStruct.h"
+#include "tlXMLParser.h"
+#include "tlProtocolBuffer.h"
 #include "tlUnitTest.h"
 #include "tlFileUtils.h"
 
 #include <sstream>
 #include <cmath>
-
-// @@@
-// Missing: all kind of variants (uint8_t, ...), float
 
 //  Basic tests of reader and writer
 TEST (1_BasicTypes)
@@ -205,20 +203,20 @@ struct Root {
   const Child &get_child () const { return m_child; }
 };
 
-static tl::PBElementList child_struct ("Child",
-  tl::pb_make_member (&Child::txt, "txt", 1) +
-  tl::pb_make_member (&Child::d, "d", 2) +
-  tl::pb_make_element (&Child::begin_children, &Child::end_children, &Child::add_child, "children", 3, &child_struct)
+static tl::XMLElementList child_struct ("Child",
+  tl::make_member (&Child::txt, "txt#1") +
+  tl::make_member (&Child::d, "d#2") +
+  tl::make_element (&Child::begin_children, &Child::end_children, &Child::add_child, "children#3", &child_struct)
 );
 
-static tl::PBStruct<Root> structure ("pbtest-struct", 88888888,
-  tl::pb_make_member (&Root::begin_subs, &Root::end_subs, &Root::add_sub, "sub", 1) +
-  tl::pb_make_member (&Root::begin_isubs, &Root::end_isubs, &Root::add_isub, "isub", 2) +
-  tl::pb_make_element (&Root::begin_children, &Root::end_children, &Root::add_child, "children", 3, &child_struct) +
-  tl::pb_make_element (&Root::get_child, &Root::set_child, "child", 4, &child_struct) +
-  tl::pb_make_member (&Root::m, "m", 5) +
-  tl::pb_make_member (&Root::get_mi, &Root::set_mi, "mi", 6) +
-  tl::pb_make_member (&Root::b, "b", 7)
+static tl::XMLStruct<Root> structure ("pbtest-struct#88888888",
+  tl::make_member (&Root::begin_subs, &Root::end_subs, &Root::add_sub, "sub#1") +
+  tl::make_member (&Root::begin_isubs, &Root::end_isubs, &Root::add_isub, "isub#2") +
+  tl::make_element (&Root::begin_children, &Root::end_children, &Root::add_child, "children#3", &child_struct) +
+  tl::make_element (&Root::get_child, &Root::set_child, "child#4", &child_struct) +
+  tl::make_member (&Root::m, "m#5") +
+  tl::make_member (&Root::get_mi, &Root::set_mi, "mi#6") +
+  tl::make_member (&Root::b, "b#7")
 );
 
 static void build_struct (Root &root)
@@ -405,10 +403,13 @@ struct TestClassEnumConverter
       break;
     }
   }
+
+  void from_string (const std::string &, TestClass::enum_type) const { }
+  std::string to_string (TestClass::enum_type) const { return std::string (); }
 };
 
-tl::PBStruct<TestClass> tc_structure ("pbtest-tc", 1,
-  tl::pb_make_member (&TestClass::e, "e", 2, TestClassEnumConverter ())
+tl::XMLStruct<TestClass> tc_structure ("pbtest-tc#1",
+  tl::make_member (&TestClass::e, "e#2", TestClassEnumConverter ())
 );
 
 TEST (101_Converter)

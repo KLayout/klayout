@@ -45,6 +45,7 @@ SOURCES = \
     tlUnitTest.cc \
     tlInt128Support.cc \
     tlXMLParser.cc \
+    tlXMLReader.cc \
     tlXMLWriter.cc \
     tlThreadedWorkers.cc \
     tlThreads.cc \
@@ -113,6 +114,7 @@ HEADERS = \
     tlInt128Support.h \
     tlDefs.h \
     tlXMLParser.h \
+    tlXMLReader.h \
     tlXMLWriter.h \
     tlThreadedWorkers.h \
     tlThreads.h \

@@ -387,7 +387,7 @@ BEGIN_PROTECTED
 
       } else {
 
-        rdb->save (rdb->filename ());
+        rdb->save (rdb->filename (), rdb->binary ());
         rdb->reset_modified ();
 
       }
@@ -459,7 +459,7 @@ BEGIN_PROTECTED
     throw tl::Exception (tl::to_string (tr ("The current report database is not saved.\nSave it to some file with 'Save As', before saving it as waiver DB.")));
   }
 
-  rdb->write (rdb->filename () + ".w");
+  rdb->write (rdb->filename () + ".w", rdb->binary ());
 
 END_PROTECTED
 }
@@ -475,11 +475,13 @@ BEGIN_PROTECTED
     if (rdb) {
 
       //  prepare and open the file dialog
-      lay::FileDialog save_dialog (this, tl::to_string (QObject::tr ("Save Marker Database File")), "KLayout RDB files (*.lyrdb)");
+      lay::FileDialog save_dialog (this, tl::to_string (QObject::tr ("Save Marker Database File")), tl::to_string (tr ("KLayout RDB files (*.lyrdb);;KLayout binary RDB files (*.rdb);;All files (*)")));
       std::string fn (rdb->filename ());
       if (save_dialog.get_save (fn)) {
 
-        rdb->save (fn);
+        bool binary = (tl::extension (fn) == "rdb");
+
+        rdb->save (fn, binary);
         rdb->reset_modified ();
 
         //  update the RDB title strings

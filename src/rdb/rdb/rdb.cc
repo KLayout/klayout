@@ -1767,6 +1767,7 @@ Database::clear ()
 
   m_generator = "";
   m_filename = "";
+  m_binary = false;
   m_description = "";
   m_name = "";
   m_topcell = "";
@@ -1819,6 +1820,7 @@ Database::load (std::string fn)
   tl::log << "Loading RDB from " << fn;
 
   clear ();
+  set_binary (false);
 
   tl::InputStream stream (fn);
 

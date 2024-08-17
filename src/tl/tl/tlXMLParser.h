@@ -2092,6 +2092,18 @@ make_element_with_parent_ref (Iter (Parent::*begin) () const, Iter (Parent::*end
 template <class Value>
 struct XMLStdConverter
 {
+  typedef std::string pb_type;
+
+  pb_type pb_encode (const Value &v) const
+  {
+    return tl::to_string (v);
+  }
+
+  void pb_decode (const pb_type &s, Value &v) const
+  {
+    tl::from_string (s, v);
+  }
+
   std::string to_string (const Value &v) const
   {
     return tl::to_string (v);

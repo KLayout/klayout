@@ -154,6 +154,7 @@ class StreamOptionsReadAdaptor
 {
 public:
   typedef tl::pass_by_ref_tag tag;
+  typedef tl::pb_zero_cardinality_tag cardinality;
 
   StreamOptionsReadAdaptor ()
     : mp_options (0), m_done (false)

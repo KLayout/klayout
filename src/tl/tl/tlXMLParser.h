@@ -62,16 +62,16 @@ struct pass_by_ref_tag {
   pass_by_ref_tag () { } 
 };
 
-struct pb_zero_cardinality_tag {
-  pb_zero_cardinality_tag () { }
+struct zero_cardinality_tag {
+  zero_cardinality_tag () { }
 };
 
-struct pb_single_cardinality_tag {
-  pb_single_cardinality_tag () { }
+struct single_cardinality_tag {
+  single_cardinality_tag () { }
 };
 
-struct pb_many_cardinality_tag {
-  pb_many_cardinality_tag () { }
+struct many_cardinality_tag {
+  many_cardinality_tag () { }
 };
 
 /**
@@ -570,17 +570,17 @@ protected:
 
   std::string make_message_name () const;
 
-  static Cardinality get_cardinality (tl::pb_zero_cardinality_tag)
+  static Cardinality get_cardinality (tl::zero_cardinality_tag)
   {
     return Zero;
   }
 
-  static Cardinality get_cardinality (tl::pb_single_cardinality_tag)
+  static Cardinality get_cardinality (tl::single_cardinality_tag)
   {
     return Single;
   }
 
-  static Cardinality get_cardinality (tl::pb_many_cardinality_tag)
+  static Cardinality get_cardinality (tl::many_cardinality_tag)
   {
     return Many;
   }
@@ -593,67 +593,35 @@ private:
 };
 
 /**
- *  @brief A XML child element 
- *
- *  This class is a XML structure component describing a child
- *  element in the XML tree. There is no limit about the number of
- *  child elements. 
- *  This object must be provided a pointer to a factory method (in
- *  the parent's class), a name and a list of children (which can be
- *  empty).
- *  Write is a class providing a Obj &operator(Parent &) operator.
- *  It is supposed to create a new instance of Obj within Parent.
- *  Read is a class providing a start(const Parent &) method to start 
- *  iterating over the instances, a const Obj &operator() const for 
- *  access and a bool at_end() method to determine if the iterator
- *  is at the end and next() to increment the iterator.
+ *  @brief Basic implementation for XMLElement and XMLElementWithParentRef
  */
 
 template <class Obj, class Parent, class Read, class Write>
-class TL_PUBLIC_TEMPLATE XMLElement
+class TL_PUBLIC_TEMPLATE XMLElementImplBase
   : public XMLElementBase
 {
 public:
-  XMLElement (const Read &r, const Write &w, const std::string &name, const XMLElementList &children)
+  XMLElementImplBase (const Read &r, const Write &w, const std::string &name, const XMLElementList &children)
     : XMLElementBase (name, children), m_r (r), m_w (w)
   {
     // .. nothing yet ..
   }
 
-  XMLElement (const Read &r, const Write &w, const std::string &name, const XMLElementList *children)
+  XMLElementImplBase (const Read &r, const Write &w, const std::string &name, const XMLElementList *children)
     : XMLElementBase (name, children), m_r (r), m_w (w)
   {
     // .. nothing yet ..
   }
 
-  XMLElement (const XMLElement<Obj, Parent, Read, Write> &d)
+  XMLElementImplBase (const XMLElementImplBase<Obj, Parent, Read, Write> &d)
     : XMLElementBase (d), m_r (d.m_r), m_w (d.m_w)
   {
     // .. nothing yet ..
   }
 
-  virtual XMLElementBase *clone () const
-  {
-    return new XMLElement<Obj, Parent, Read, Write> (*this);
-  }
-
-  virtual void create (const XMLElementBase *, XMLReaderState &objs, const std::string & /*uri*/, const std::string & /*lname*/, const std::string & /*qname*/) const
-  {
-    XMLObjTag<Obj> tag;
-    objs.push (tag);
-  }
-
   virtual void cdata (const std::string & /*cdata*/, XMLReaderState & /*objs*/) const
   {
     // .. nothing yet ..
-  }
-
-  virtual void finish (const XMLElementBase * /*parent*/, XMLReaderState &objs, const std::string & /*uri*/, const std::string & /*lname*/, const std::string & /*qname*/) const
-  {
-    XMLObjTag<Obj> tag;
-    XMLObjTag<Parent> parent_tag;
-    m_w (*objs.parent (parent_tag), objs);
-    objs.pop (tag);
   }
 
   virtual void write (const XMLElementBase * /*parent*/, tl::OutputStream &os, int indent, XMLWriterState &objs) const
@@ -673,26 +641,12 @@ public:
     }
   }
 
-  virtual bool has_any (XMLWriterState &objs) const 
+  virtual bool has_any (XMLWriterState &objs) const
   {
     XMLObjTag<Parent> parent_tag;
     Read r (m_r);
     r.start (*objs.back (parent_tag));
     return (! r.at_end ());
-  }
-
-  virtual void pb_create (const XMLElementBase *, XMLReaderState &objs) const
-  {
-    XMLObjTag<Obj> tag;
-    objs.push (tag);
-  }
-
-  virtual void pb_finish (const XMLElementBase * /*parent*/, XMLReaderState &objs) const
-  {
-    XMLObjTag<Obj> tag;
-    XMLObjTag<Parent> parent_tag;
-    m_w (*objs.parent (parent_tag), objs);
-    objs.pop (tag);
   }
 
   virtual void pb_parse (PBParser *parser, tl::ProtocolBufferReaderBase &reader) const
@@ -739,10 +693,11 @@ public:
     }
   }
 
-private:
+protected:
   Read m_r;
   Write m_w;
 
+private:
   //  this write helper is used if the reader delivers an object by value
   void write_obj (Obj obj, tl::OutputStream &os, int indent, tl::pass_by_value_tag, XMLWriterState &objs) const
   {
@@ -773,7 +728,7 @@ private:
       writer.begin_seq (tag, pass == 0);
       objs.push (&obj);
       for (XMLElementBase::iterator c = this->begin (); c != this->end (); ++c) {
-        c->get ()->write (this, writer, objs);
+        c->get ()->pb_write (this, writer, objs);
       }
       objs.pop (self_tag);
       writer.end_seq ();
@@ -803,6 +758,80 @@ private:
 };
 
 /**
+ *  @brief A XML child element 
+ *
+ *  This class is a XML structure component describing a child
+ *  element in the XML tree. There is no limit about the number of
+ *  child elements. 
+ *  This object must be provided a pointer to a factory method (in
+ *  the parent's class), a name and a list of children (which can be
+ *  empty).
+ *  Write is a class providing a Obj &operator(Parent &) operator.
+ *  It is supposed to create a new instance of Obj within Parent.
+ *  Read is a class providing a start(const Parent &) method to start 
+ *  iterating over the instances, a const Obj &operator() const for 
+ *  access and a bool at_end() method to determine if the iterator
+ *  is at the end and next() to increment the iterator.
+ */
+
+template <class Obj, class Parent, class Read, class Write>
+class TL_PUBLIC_TEMPLATE XMLElement
+  : public XMLElementImplBase<Obj, Parent, Read, Write>
+{
+public:
+  XMLElement (const Read &r, const Write &w, const std::string &name, const XMLElementList &children)
+    : XMLElementImplBase<Obj, Parent, Read, Write> (r, w, name, children)
+  {
+    // .. nothing yet ..
+  }
+
+  XMLElement (const Read &r, const Write &w, const std::string &name, const XMLElementList *children)
+    : XMLElementImplBase<Obj, Parent, Read, Write> (r, w, name, children)
+  {
+    // .. nothing yet ..
+  }
+
+  XMLElement (const XMLElement<Obj, Parent, Read, Write> &d)
+    : XMLElementImplBase<Obj, Parent, Read, Write> (d)
+  {
+    // .. nothing yet ..
+  }
+
+  virtual XMLElementBase *clone () const
+  {
+    return new XMLElement<Obj, Parent, Read, Write> (*this);
+  }
+
+  virtual void create (const XMLElementBase *, XMLReaderState &objs, const std::string & /*uri*/, const std::string & /*lname*/, const std::string & /*qname*/) const
+  {
+    XMLObjTag<Obj> tag;
+    objs.push (tag);
+  }
+
+  virtual void finish (const XMLElementBase * /*parent*/, XMLReaderState &objs, const std::string & /*uri*/, const std::string & /*lname*/, const std::string & /*qname*/) const
+  {
+    XMLObjTag<Obj> tag;
+    XMLObjTag<Parent> parent_tag;
+    this->m_w (*objs.parent (parent_tag), objs);
+    objs.pop (tag);
+  }
+
+  virtual void pb_create (const XMLElementBase *, XMLReaderState &objs) const
+  {
+    XMLObjTag<Obj> tag;
+    objs.push (tag);
+  }
+
+  virtual void pb_finish (const XMLElementBase * /*parent*/, XMLReaderState &objs) const
+  {
+    XMLObjTag<Obj> tag;
+    XMLObjTag<Parent> parent_tag;
+    this->m_w (*objs.parent (parent_tag), objs);
+    objs.pop (tag);
+  }
+};
+
+/**
  *  @brief A XML child element with is instantiated with a parent reference
  *
  *  This declares a XML element with a constructor that takes a (object *) arguments
@@ -811,23 +840,23 @@ private:
 
 template <class Obj, class Parent, class Read, class Write>
 class TL_PUBLIC_TEMPLATE XMLElementWithParentRef
-  : public XMLElement<Obj, Parent, Read, Write>
+  : public XMLElementImplBase<Obj, Parent, Read, Write>
 {
 public:
   XMLElementWithParentRef (const Read &r, const Write &w, const std::string &name, const XMLElementList &children)
-    : XMLElement<Obj, Parent, Read, Write> (r, w, name, children)
+    : XMLElementImplBase<Obj, Parent, Read, Write> (r, w, name, children)
   {
     // .. nothing yet ..
   }
 
   XMLElementWithParentRef (const Read &r, const Write &w, const std::string &name, const XMLElementList *children)
-    : XMLElement<Obj, Parent, Read, Write> (r, w, name, children)
+    : XMLElementImplBase<Obj, Parent, Read, Write> (r, w, name, children)
   {
     // .. nothing yet ..
   }
 
   XMLElementWithParentRef (const XMLElementWithParentRef<Obj, Parent, Read, Write> &d)
-    : XMLElement<Obj, Parent, Read, Write> (d)
+    : XMLElementImplBase<Obj, Parent, Read, Write> (d)
   {
     // .. nothing yet ..
   }
@@ -848,7 +877,7 @@ public:
   {
     XMLObjTag<Obj> tag;
     XMLObjTag<Parent> parent_tag;
-    m_w (*objs.parent (parent_tag), objs);
+    this->m_w (*objs.parent (parent_tag), objs);
     objs.pop (tag);
   }
 
@@ -863,7 +892,7 @@ public:
   {
     XMLObjTag<Obj> tag;
     XMLObjTag<Parent> parent_tag;
-    m_w (*objs.parent (parent_tag), objs);
+    this->m_w (*objs.parent (parent_tag), objs);
     objs.pop (tag);
   }
 };
@@ -1297,6 +1326,11 @@ public:
     return false;
   }
 
+  virtual void pb_create (const XMLElementBase *, XMLReaderState &) const { }
+  virtual void pb_parse (PBParser *, tl::ProtocolBufferReaderBase &) const { }
+  virtual void pb_finish (const XMLElementBase *, XMLReaderState &) const { }
+  virtual std::string create_def_entry (std::map<size_t, std::pair<const XMLElementBase *, std::string> > &) const { return std::string (); }
+
 private:
   Write m_w;
   Converter m_c;
@@ -1583,7 +1617,7 @@ template <class Value, class Parent>
 struct XMLMemberDummyReadAdaptor
 {
   typedef pass_by_ref_tag tag;
-  typedef pb_zero_cardinality_tag cardinality;
+  typedef zero_cardinality_tag cardinality;
 
   XMLMemberDummyReadAdaptor ()
   {
@@ -1615,7 +1649,7 @@ template <class Value, class Parent>
 struct XMLMemberReadAdaptor
 {
   typedef pass_by_ref_tag tag;
-  typedef pb_single_cardinality_tag cardinality;
+  typedef single_cardinality_tag cardinality;
 
   XMLMemberReadAdaptor (Value Parent::*member)
     : mp_member (member), mp_owner (0), m_done (false)
@@ -1654,7 +1688,7 @@ template <class Value, class Parent>
 struct XMLMemberAccRefReadAdaptor
 {
   typedef pass_by_ref_tag tag;
-  typedef pb_single_cardinality_tag cardinality;
+  typedef single_cardinality_tag cardinality;
 
   XMLMemberAccRefReadAdaptor (const Value &(Parent::*member) () const)
     : mp_member (member), mp_owner (0), m_done (false)
@@ -1693,7 +1727,7 @@ template <class Value, class Parent>
 struct XMLMemberAccReadAdaptor
 {
   typedef pass_by_value_tag tag;
-  typedef pb_single_cardinality_tag cardinality;
+  typedef single_cardinality_tag cardinality;
 
   XMLMemberAccReadAdaptor (Value (Parent::*member) () const)
     : mp_member (member), mp_owner (0), m_done (false)
@@ -1732,7 +1766,7 @@ template <class Value, class Iter, class Parent>
 struct XMLMemberIterReadAdaptor
 {
   typedef pass_by_ref_tag tag;
-  typedef pb_many_cardinality_tag cardinality;
+  typedef many_cardinality_tag cardinality;
 
   XMLMemberIterReadAdaptor (Iter (Parent::*begin) () const, Iter (Parent::*end) () const)
     : mp_begin (begin), mp_end (end)
@@ -2112,6 +2146,26 @@ struct XMLStdConverter
   void from_string (const std::string &s, Value &v) const
   {
     tl::from_string (s, v);
+  }
+};
+
+/**
+ *  @brief A helper class to convert a string converter to a XML converter
+ */
+template <class StringConverter>
+struct XMLStringBasedConverter
+  : public StringConverter
+{
+  typedef std::string pb_type;
+
+  pb_type pb_encode (const typename StringConverter::value_type &v) const
+  {
+    return StringConverter::to_string (v);
+  }
+
+  void pb_decode (const pb_type &s, typename StringConverter::value_type &v) const
+  {
+    StringConverter::from_string (s, v);
   }
 };
 

@@ -40,6 +40,8 @@ namespace db
 template <class T>
 struct DB_PUBLIC_TEMPLATE TransformationConverter
 {
+  typedef T value_type;
+
   std::string to_string (const T &t) const
   {
     return t.to_string ();
@@ -58,6 +60,8 @@ struct DB_PUBLIC_TEMPLATE TransformationConverter
  */
 struct DB_PUBLIC LayoutLayerConverter
 {
+  typedef db::LayerProperties value_type;
+
   std::string to_string (const db::LayerProperties &p) const
   {
     return p.to_string ();
@@ -79,6 +83,8 @@ struct DB_PUBLIC LayoutLayerConverter
 template <class P>
 struct DB_PUBLIC_TEMPLATE PointConverter
 {
+  typedef P value_type;
+
   std::string to_string (const P &p) const
   {
     return tl::to_string (p.x ()) + "," + tl::to_string (p.y ());

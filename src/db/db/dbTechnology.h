@@ -807,6 +807,7 @@ class TechnologyComponentReadAdaptor
 {
 public:
   typedef tl::pass_by_ref_tag tag;
+  typedef tl::single_cardinality_tag cardinality;
 
   TechnologyComponentReadAdaptor (const std::string &name)
     : m_name (name), mp_t (0), m_done (false)

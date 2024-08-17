@@ -24,49 +24,48 @@
 #include "dbTechnology.h"
 #include "tlClassRegistry.h"
 
-namespace tl
-{
-  /**
-   *  @brief A specialization of the XMLConverter that is used to serialize the connection info
-   */
-
-  template <>
-  struct XMLStdConverter<db::NetTracerConnectionInfo>
-  {
-    std::string to_string (const db::NetTracerConnectionInfo &v) const
-    {
-      return v.to_string ();
-    }
-
-    void from_string (const std::string &s, db::NetTracerConnectionInfo &v) const
-    {
-      tl::Extractor ex (s.c_str ());
-      v.parse (ex);
-    }
-  };
-
-  /**
-   *  @brief A specialization of the XMLConverter that is used to serialize the symbol info
-   */
-
-  template <>
-  struct XMLStdConverter<db::NetTracerSymbolInfo>
-  {
-    std::string to_string (const db::NetTracerSymbolInfo &v) const
-    {
-      return v.to_string ();
-    }
-
-    void from_string (const std::string &s, db::NetTracerSymbolInfo &v) const
-    {
-      tl::Extractor ex (s.c_str ());
-      v.parse (ex);
-    }
-  };
-}
-
 namespace
 {
+
+/**
+ *  @brief A string converter for NetTracerConnectionInfo
+ */
+
+struct NetTracerConnectionInfoConverter
+{
+  typedef db::NetTracerConnectionInfo value_type;
+
+  std::string to_string (const db::NetTracerConnectionInfo &v) const
+  {
+    return v.to_string ();
+  }
+
+  void from_string (const std::string &s, db::NetTracerConnectionInfo &v) const
+  {
+    tl::Extractor ex (s.c_str ());
+    v.parse (ex);
+  }
+};
+
+/**
+ *  @brief A specialization of the XMLConverter that is used to serialize the symbol info
+ */
+
+struct NetTracerSymbolInfoConverter
+{
+  typedef db::NetTracerSymbolInfo value_type;
+
+  std::string to_string (const db::NetTracerSymbolInfo &v) const
+  {
+    return v.to_string ();
+  }
+
+  void from_string (const std::string &s, db::NetTracerSymbolInfo &v) const
+  {
+    tl::Extractor ex (s.c_str ());
+    v.parse (ex);
+  }
+};
 
 static const db::NetTracerConnectivity *
 get_fallback_default (const db::NetTracerTechnologyComponent &tc)
@@ -129,6 +128,7 @@ template <class Value, class Iter>
 struct FallbackXMLReadAdaptor
 {
   typedef tl::pass_by_ref_tag tag;
+  typedef tl::many_cardinality_tag cardinality;
 
   FallbackXMLReadAdaptor (Iter (db::NetTracerConnectivity::*begin) () const, Iter (db::NetTracerConnectivity::*end) () const)
     : mp_begin (begin), mp_end (end)
@@ -195,10 +195,10 @@ public:
         tl::make_member ((NetTracerConnectivity::const_symbol_iterator (NetTracerConnectivity::*) () const) &NetTracerConnectivity::begin_symbols, (NetTracerConnectivity::const_symbol_iterator (NetTracerConnectivity::*) () const) &NetTracerConnectivity::end_symbols, &NetTracerConnectivity::add_symbol, "symbols")
       ) +
       //  Fallback readers for migrating pre-0.28 setups to 0.28 and backward compatibility
-      tl::XMLMember<NetTracerConnectionInfo, NetTracerTechnologyComponent, FallbackXMLReadAdaptor <NetTracerConnectionInfo, NetTracerConnectivity::const_iterator>, FallbackXMLWriteAdaptor <NetTracerConnectionInfo>, tl::XMLStdConverter <NetTracerConnectionInfo> > (
+      tl::XMLMember<NetTracerConnectionInfo, NetTracerTechnologyComponent, FallbackXMLReadAdaptor <NetTracerConnectionInfo, NetTracerConnectivity::const_iterator>, FallbackXMLWriteAdaptor <NetTracerConnectionInfo>, tl::XMLStringBasedConverter <NetTracerConnectionInfoConverter> > (
         FallbackXMLReadAdaptor <NetTracerConnectionInfo, NetTracerConnectivity::const_iterator> (&NetTracerConnectivity::begin, &NetTracerConnectivity::end),
         FallbackXMLWriteAdaptor <NetTracerConnectionInfo> (&NetTracerConnectivity::add), "connection") +
-      tl::XMLMember<NetTracerSymbolInfo, NetTracerTechnologyComponent, FallbackXMLReadAdaptor <NetTracerSymbolInfo, NetTracerConnectivity::const_symbol_iterator>, FallbackXMLWriteAdaptor <NetTracerSymbolInfo>, tl::XMLStdConverter <NetTracerSymbolInfo> > (
+      tl::XMLMember<NetTracerSymbolInfo, NetTracerTechnologyComponent, FallbackXMLReadAdaptor <NetTracerSymbolInfo, NetTracerConnectivity::const_symbol_iterator>, FallbackXMLWriteAdaptor <NetTracerSymbolInfo>, tl::XMLStringBasedConverter <NetTracerSymbolInfoConverter> > (
         FallbackXMLReadAdaptor <NetTracerSymbolInfo, NetTracerConnectivity::const_symbol_iterator> (&NetTracerConnectivity::begin_symbols, &NetTracerConnectivity::end_symbols),
         FallbackXMLWriteAdaptor <NetTracerSymbolInfo> (&NetTracerConnectivity::add_symbol), "symbols")
     );

@@ -108,6 +108,8 @@ Dispatcher::config_finalize ()
 
 struct ConfigGetAdaptor
 {
+  typedef tl::zero_cardinality_tag cardinality;
+
   ConfigGetAdaptor (const std::string &name)
     : mp_owner (0), m_done (false), m_name (name)
   {
@@ -145,6 +147,8 @@ private:
 
 struct ConfigGetNullAdaptor
 {
+  typedef tl::zero_cardinality_tag cardinality;
+
   ConfigGetNullAdaptor ()
   {
     // .. nothing yet ..

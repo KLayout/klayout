@@ -150,6 +150,8 @@ bool Macro::del ()
 
 struct Interpreter2s
 {
+  typedef Macro::Interpreter value_type;
+
   std::string to_string (Macro::Interpreter i) const
   {
     switch (i) {
@@ -199,7 +201,7 @@ static tl::XMLStruct<lym::Macro> xml_struct ("klayout-macro",
   tl::make_member (&Macro::show_in_menu, &Macro::set_show_in_menu, "show-in-menu") +
   tl::make_member (&Macro::group_name, &Macro::set_group_name, "group-name") +
   tl::make_member (&Macro::menu_path, &Macro::set_menu_path, "menu-path") +
-  tl::make_member (&Macro::interpreter, &Macro::set_interpreter, "interpreter", Interpreter2s ()) +
+  tl::make_member (&Macro::interpreter, &Macro::set_interpreter, "interpreter", tl::XMLStringBasedConverter<Interpreter2s> ()) +
   tl::make_member (&Macro::dsl_interpreter, &Macro::set_dsl_interpreter, "dsl-interpreter-name") +
   tl::make_member (&Macro::text, &Macro::set_text, "text") +
   tl::make_member<Macro> ("format")  //  for backward compatibility

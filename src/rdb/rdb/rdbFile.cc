@@ -38,6 +38,8 @@ namespace rdb
 
 struct ValueConverter
 {
+  typedef std::string pb_type;
+
   ValueConverter (rdb::Database *rdb)
     : mp_rdb (rdb)
   {
@@ -49,6 +51,16 @@ struct ValueConverter
   }
 
   void from_string (const std::string &s, ValueWrapper &value) const
+  {
+    value.from_string (mp_rdb, s);
+  }
+
+  std::string pb_encode (const ValueWrapper &value) const
+  {
+    return value.to_string (mp_rdb);
+  }
+
+  void pb_decode (const std::string &s, ValueWrapper &value) const
   {
     value.from_string (mp_rdb, s);
   }
@@ -110,7 +122,7 @@ make_rdb_structure (rdb::Database *rdb)
         tl::make_member<std::string, rdb::Item> (&rdb::Item::comment, &rdb::Item::set_comment, "comment") +
         tl::make_member<std::string, rdb::Item> (&rdb::Item::image_str, &rdb::Item::set_image_str, "image") +
         tl::make_element<rdb::Values, rdb::Item> (&rdb::Item::values, &rdb::Item::set_values, "values", 
-          tl::make_member<rdb::ValueWrapper, rdb::Values::const_iterator, rdb::Values> (&rdb::Values::begin, &rdb::Values::end, &rdb::Values::add, "value", ValueConverter (rdb)) 
+          tl::make_member<rdb::ValueWrapper, rdb::Values::const_iterator, rdb::Values> (&rdb::Values::begin, &rdb::Values::end, &rdb::Values::add, "value", ValueConverter (rdb))
         )
       )
     )

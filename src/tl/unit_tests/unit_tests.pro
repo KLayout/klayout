@@ -9,6 +9,7 @@ include($$PWD/../../lib_ut.pri)
 SOURCES = \
   tlAlgorithmTests.cc \
   tlBase64Tests.cc \
+  tlBitSetMapTests.cc \
   tlBitSetMaskTests.cc \
   tlBitSetTests.cc \
   tlClassRegistryTests.cc \

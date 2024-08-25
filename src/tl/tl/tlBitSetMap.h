@@ -208,7 +208,10 @@ public:
   void sort ()
   {
     if (! m_sorted) {
-      sort_range (0, m_nodes.begin (), m_nodes.end ());
+      if (! m_nodes.empty ()) {
+        m_nodes.front ().next = m_nodes.size ();
+        sort_range (0, m_nodes.begin (), m_nodes.end ());
+      }
       m_sorted = true;
     }
   }
@@ -243,10 +246,42 @@ public:
    *  The return value is true, if any value has been found.
    */
   template <class Inserter>
-  bool lookup (const tl::BitSet &bit_set, Inserter inserter)
+  bool lookup (const tl::BitSet &bit_set, Inserter inserter) const
   {
     tl_assert (m_sorted);
     return partial_lookup (0, m_nodes.begin (), m_nodes.end (), bit_set, inserter);
+  }
+
+  /**
+   *  @brief Begin iterator
+   */
+  iterator begin ()
+  {
+    return m_nodes.begin ();
+  }
+
+  /**
+   *  @brief End iterator
+   */
+  iterator end ()
+  {
+    return m_nodes.end ();
+  }
+
+  /**
+   *  @brief Begin iterator (const version)
+   */
+  const_iterator begin () const
+  {
+    return m_nodes.begin ();
+  }
+
+  /**
+   *  @brief End iterator (const version)
+   */
+  const_iterator end () const
+  {
+    return m_nodes.end ();
   }
 
 private:
@@ -263,7 +298,7 @@ private:
     //  single entries
     bool all_same = true;
     for (auto i = from + 1; i != to && all_same; ++i) {
-      if (*i != *from) {
+      if (i->mask != from->mask) {
         all_same = false;
       }
     }
@@ -279,9 +314,9 @@ private:
     //  at the second node
     ++from;
 
-    auto middle_false = std::partition (from, to, tl::bit_set_mask_compare (bit, tl::BitSetMask::False));
-    auto middle_true = std::partition (middle_false, to, tl::bit_set_mask_compare (bit, tl::BitSetMask::True));
-    auto middle_never = std::partition (middle_true, to, tl::bit_set_mask_compare (bit, tl::BitSetMask::Never));
+    auto middle_false = std::partition (from, to, tl::bit_set_mask_compare<Value> (bit, tl::BitSetMask::False));
+    auto middle_true = std::partition (middle_false, to, tl::bit_set_mask_compare<Value> (bit, tl::BitSetMask::True));
+    auto middle_never = std::partition (middle_true, to, tl::bit_set_mask_compare<Value> (bit, tl::BitSetMask::Never));
 
     from->next = middle_false - from;
     if (middle_false != to) {
@@ -301,7 +336,7 @@ private:
   }
 
   template <class Inserter>
-  bool partial_lookup (tl::BitSetMask::index_type bit, const_iterator from, const_iterator to, const tl::BitSet &bit_set, Inserter inserter)
+  bool partial_lookup (tl::BitSetMask::index_type bit, const_iterator from, const_iterator to, const tl::BitSet &bit_set, Inserter inserter) const
   {
     if (from == to) {
       return false;
@@ -323,7 +358,7 @@ private:
           any = true;
         }
       }
-      if (i->next) {
+      if (i->next == 0) {
         break;
       }
       i += i->next;

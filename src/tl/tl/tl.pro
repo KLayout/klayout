@@ -13,7 +13,7 @@ SOURCES = \
     tlBase64.cc \
     tlBitSet.cc \
     tlBitSetMap.cc \
-    tlBitSetMatch.cc \
+    tlBitSetMask.cc \
     tlColor.cc \
     tlClassRegistry.cc \
     tlCopyOnWrite.cc \
@@ -67,7 +67,7 @@ HEADERS = \
     tlBase64.h \
     tlBitSet.h \
     tlBitSetMap.h \
-    tlBitSetMatch.h \
+    tlBitSetMask.h \
     tlColor.h \
     tlClassRegistry.h \
     tlCopyOnWrite.h \

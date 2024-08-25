@@ -231,6 +231,8 @@ public:
   }
 
 private:
+  friend class BitSetMask;
+
   data_type *mp_data;
   size_type m_size;
 };

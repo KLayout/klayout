@@ -49,6 +49,18 @@ static std::string l2s (const tl::BitSetMask &s)
   return x;
 }
 
+static tl::BitSet bs (const char *s)
+{
+  tl::BitSet res;
+  for (unsigned int i = 0; *s; ++i, ++s) {
+    res.set (i);
+    if (*s == '0') {
+      res.reset (i);
+    }
+  }
+  return res;
+}
+
 TEST(1_Basic)
 {
   tl::BitSetMask bs;
@@ -259,6 +271,53 @@ TEST(4_Assign)
   EXPECT_EQ (l2s (bs2), "");
   EXPECT_EQ (bs3.size (), 33u);
   EXPECT_EQ (l2s (bs3), "XXX1XXXXXXXXXXXXXXXXXXXXXXXXXXXX0");
+}
+
+TEST(5_Match)
+{
+  tl::BitSetMask bsm;
+  EXPECT_EQ (bsm.match (bs ("")), true);
+  EXPECT_EQ (bsm.match (bs ("0")), true);
+  EXPECT_EQ (bsm.match (bs ("1")), true);
+  EXPECT_EQ (bsm.match (bs ("10101")), true);
+
+  bsm.set (1, tl::BitSetMask::Never);
+  EXPECT_EQ (l2s (bsm), "X-");
+  EXPECT_EQ (bsm.match (bs ("")), true);
+  EXPECT_EQ (bsm.match (bs ("0")), true);
+  EXPECT_EQ (bsm.match (bs ("1")), true);
+  EXPECT_EQ (bsm.match (bs ("10101")), false);  //  fails because "never bit" is used.
+
+  bsm.clear ();
+  bsm.set (1, tl::BitSetMask::True);
+  bsm.set (2, tl::BitSetMask::False);
+  EXPECT_EQ (l2s (bsm), "X10");
+
+  EXPECT_EQ (bsm.match (bs ("")), false);
+  EXPECT_EQ (bsm.match (bs ("0")), false);
+  EXPECT_EQ (bsm.match (bs ("000")), false);
+  EXPECT_EQ (bsm.match (bs ("001")), false);
+  EXPECT_EQ (bsm.match (bs ("010")), true);
+  EXPECT_EQ (bsm.match (bs ("011")), false);
+  EXPECT_EQ (bsm.match (bs ("1")), false);
+  EXPECT_EQ (bsm.match (bs ("100")), false);
+  EXPECT_EQ (bsm.match (bs ("101")), false);
+  EXPECT_EQ (bsm.match (bs ("110")), true);
+  EXPECT_EQ (bsm.match (bs ("111")), false);
+  EXPECT_EQ (bsm.match (bs ("10101")), false);
+  EXPECT_EQ (bsm.match (bs ("11001")), true);
+
+  bsm.clear ();
+  bsm.set (32, tl::BitSetMask::True);
+  EXPECT_EQ (bsm.match (bs ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX0")), false);
+  EXPECT_EQ (bsm.match (bs ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX1")), true);
+  EXPECT_EQ (bsm.match (bs ("")), false);
+
+  bsm.clear ();
+  bsm.set (32, tl::BitSetMask::False);
+  EXPECT_EQ (bsm.match (bs ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX0")), true);
+  EXPECT_EQ (bsm.match (bs ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX1")), false);
+  EXPECT_EQ (bsm.match (bs ("")), true);  //  because unset bits count as zero
 }
 
 }

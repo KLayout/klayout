@@ -45,7 +45,7 @@ namespace tl
  *  the bit set corresponds to the mask.
  *
  *  Allocation is dynamic when a mask element is accessed for write. Bits beyond the
- *  size are treated as "Any".
+ *  allocated size are treated as "Any".
  */
 class TL_PUBLIC BitSetMask
 {
@@ -183,6 +183,17 @@ private:
   data_type *mp_data0, *mp_data1;
   size_type m_size;
 };
+
+}
+
+namespace std
+{
+
+inline void
+swap (tl::BitSetMask &a, tl::BitSetMask &b)
+{
+  a.swap (b);
+}
 
 }
 

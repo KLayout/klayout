@@ -265,23 +265,38 @@ BitSetMask::operator[] (index_type index) const
 bool
 BitSetMask::match (const tl::BitSet &bs) const
 {
-  unsigned nw_bs = nwords (bs.m_size);
-  unsigned nw = nwords (m_size);
+  unsigned int nw_bs = nwords (bs.m_size);
+  unsigned int nw = nwords (m_size);
 
   const tl::BitSet::data_type *d0 = mp_data0, *d1 = mp_data1;
   const tl::BitSet::data_type *s = bs.mp_data;
 
   unsigned int i;
-  for (i = 0; i < nw_bs && i < nw; ++i, ++d0, ++d1, ++s) {
-    tl::BitSet::data_type d = *s;
+  for (i = 0; i < nw; ++i, ++d0, ++d1) {
+
+    tl::BitSet::data_type d = i < nw_bs ? *s++ : 0;
+
+    tl::BitSet::data_type invalid = 0;
+    if (i >= nw_bs) {
+      invalid = ~invalid;
+    } else if (bs.m_size < (i + 1) * (sizeof (tl::BitSet::data_type) * 8)) {
+      invalid = (1 << ((i + 1) * (sizeof (tl::BitSet::data_type) * 8) - bs.m_size)) - 1;
+    }
+
+    //  "never" matches no valid bit ("never" is: d0 and d1 bits are ones)
+    if (((*d0 & *d1) & ~invalid) != 0) {
+      return false;
+    }
+
     //  A "true" in place of "false expected" gives "no match"
-    if ((*d0 & d) != 0) {
+    if ((*d0 & ~*d1 & d) != 0) {
       return false;
     }
     //  A "false" in place of "true expected" gives "no match"
-    if ((*d1 & ~d) != 0) {
+    if ((*d1 & ~*d0 & ~d) != 0) {
       return false;
     }
+
   }
 
   //  as "not set" corresponds to "Any", we can stop here and have a match.

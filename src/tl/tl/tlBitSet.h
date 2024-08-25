@@ -40,7 +40,7 @@ namespace tl
  *  with tl::BitSetMap and tl::BitSetMatch.
  *
  *  Allocation is dynamic when a bit is accessed for write. Bits beyond the
- *  size are treated as false.
+ *  allocated size are treated as "false" or zero.
  */
 class TL_PUBLIC BitSet
 {
@@ -236,6 +236,17 @@ private:
   data_type *mp_data;
   size_type m_size;
 };
+
+}
+
+namespace std
+{
+
+inline void
+swap (tl::BitSet &a, tl::BitSet &b)
+{
+  a.swap (b);
+}
 
 }
 

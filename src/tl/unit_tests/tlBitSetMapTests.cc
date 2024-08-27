@@ -25,6 +25,8 @@
 #include "tlString.h"
 #include "tlTimer.h"
 
+#include <iostream>
+
 static tl::BitSet bs (const char *s)
 {
   tl::BitSet res;
@@ -66,11 +68,8 @@ struct SetInserter
   std::set<int> *ps;
 };
 
-static std::string match (const tl::bit_set_map<int> &bsm, const tl::BitSet &bs)
+static std::string s2s (const std::set<int> &values)
 {
-  std::set<int> values;
-  bsm.lookup (bs, SetInserter (values));
-
   std::string res;
   for (auto i = values.begin (); i != values.end (); ++i) {
     if (!res.empty ()) {
@@ -79,6 +78,13 @@ static std::string match (const tl::bit_set_map<int> &bsm, const tl::BitSet &bs)
     res += tl::to_string (*i);
   }
   return res;
+}
+
+static std::string match (const tl::bit_set_map<int> &bsm, const tl::BitSet &bs)
+{
+  std::set<int> values;
+  bsm.lookup (bs, SetInserter (values));
+  return s2s (values);
 }
 
 namespace
@@ -160,6 +166,72 @@ TEST(2_Regular)
       EXPECT_EQ (value, int (i));
     }
   }
+}
+
+TEST(3_IrregularTest)
+{
+  srand (0);
+
+  tl::bit_set_map<int> map;
+
+  unsigned int num = 10000;
+  unsigned int nbits_min = 10;
+  unsigned int nbits_max = 20;
+
+  for (unsigned int i = 0; i < num; ++i) {
+    std::string s;
+    unsigned int n = nbits_min + (rand () % (nbits_max - nbits_min));
+    for (unsigned int j = 0; j < n; ++j) {
+      //  this pattern gives roughly 5 matches per entry with 10k entries
+      s += "010101X"[rand () % 7];
+    }
+    map.insert (bsm (s.c_str ()), int (i));
+  }
+
+  std::vector<tl::BitSet> test_vectors;
+  for (unsigned int i = 0; i < num; ++i) {
+    std::string s;
+    unsigned int n = nbits_min + (rand () % (nbits_max - nbits_min));
+    for (unsigned int j = 0; j < n; ++j) {
+      s += "01"[rand () % 2];
+    }
+    test_vectors.push_back (bs (s.c_str ()));
+  }
+
+  {
+    tl::SelfTimer timer ("sorting");
+    map.sort ();
+  }
+
+  std::vector<std::string> matches;
+
+  {
+    tl::SelfTimer timer ("match method");
+    for (auto i = test_vectors.begin (); i != test_vectors.end (); ++i) {
+      matches.push_back (match (map, *i));
+    }
+  }
+
+  size_t max_matches = 0;
+
+  //  brute force
+  {
+    tl::SelfTimer timer ("brute force");
+    for (auto i = test_vectors.begin (); i != test_vectors.end (); ++i) {
+      std::set<int> values;
+      for (auto j = map.begin (); j != map.end (); ++j) {
+        if (j->mask.match (*i)) {
+          values.insert(j->value);
+        }
+      }
+      max_matches = std::max (max_matches, values.size ());
+      EXPECT_EQ (s2s (values), matches [i - test_vectors.begin ()]);
+    }
+  }
+
+  //  sanity check
+  tl::info << "Max. matches: " << max_matches;
+  EXPECT_EQ (max_matches > 5, true);
 }
 
 }

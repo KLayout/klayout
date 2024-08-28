@@ -265,6 +265,7 @@ public:
 
   virtual void reset () { }
   virtual void reserve (size_t /*n*/) { }
+  virtual void begin_group () { }
   virtual int edge (bool /*north*/, bool /*enter*/, property_type /*p*/) { return 0; }
   virtual int select_edge (bool /*horizontal*/, property_type /*p*/) { return 0; }
   virtual int compare_ns () const { return 0; }

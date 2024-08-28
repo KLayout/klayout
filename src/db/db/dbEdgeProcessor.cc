@@ -1694,6 +1694,7 @@ public:
   void next_coincident ()
   {
     m_pn = m_ps = 0;
+    mp_op->begin_group ();
   }
 
   void end_coincident ()

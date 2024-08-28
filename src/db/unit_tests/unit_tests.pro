@@ -7,6 +7,7 @@ TARGET = db_tests
 include($$PWD/../../lib_ut.pri)
 
 SOURCES = \
+  dbAreaCollectorTests.cc \
   dbCompoundOperationTests.cc \
   dbFillToolTests.cc \
   dbLogTests.cc \

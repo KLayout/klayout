@@ -147,7 +147,9 @@ public:
   {
     if (north) {
 
-      m_counts.resize (p + 1, 0);
+      while (m_counts.size () <= p) {
+        m_counts.push_back (0);
+      }
 
       int &count = m_counts [p];
       if (enter) {
@@ -172,7 +174,11 @@ public:
 
   virtual bool is_reset () const
   {
-    //  that is a dummy
+    for (auto i = m_counts.begin (); i != m_counts.end (); ++i) {
+      if (*i) {
+        return false;
+      }
+    }
     return true;
   }
 

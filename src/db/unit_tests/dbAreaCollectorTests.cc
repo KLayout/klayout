@@ -35,7 +35,11 @@ public:
   typedef db::coord_traits<db::Coord>::area_type area_type;
 
   AreaReceiver () : m_sum (0.0) { }
-  virtual void add_area (area_type area, const double &value) { m_sum += value * area; }
+
+  virtual void add_area (area_type area, const double &value)
+  {
+    m_sum += value * area;
+  }
 
   double get () const { return m_sum; }
 
@@ -58,8 +62,8 @@ TEST(1)
   bs0.set (0, tl::BitSetMask::True);
   bs0.set (1, tl::BitSetMask::False);
   tl::BitSetMask bs1;
-  bs0.set (0, tl::BitSetMask::False);
-  bs0.set (1, tl::BitSetMask::True);
+  bs1.set (0, tl::BitSetMask::False);
+  bs1.set (1, tl::BitSetMask::True);
   bsm.insert (bs0, 1.0);
   bsm.insert (bs1, 2.0);
   bsm.sort ();
@@ -68,5 +72,5 @@ TEST(1)
   db::tagged_area_collector<double> coll (bsm, rec);
   ep.process (coll, coll);
 
-  EXPECT_EQ (rec.get (), 0.0); // @@@
+  EXPECT_EQ (rec.get (), 4500000);
 }

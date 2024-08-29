@@ -126,7 +126,7 @@ public:
    *  @brief Constructor
    */
   tagged_area_collector<Value> (const tl::bit_set_map<Value> &bsm, tagged_area_receiver<Value> &receiver)
-    : mp_bsm (&bsm), mp_receiver (&receiver)
+    : mp_bsm (&bsm), mp_receiver (&receiver), m_state_one_bits (0), m_prev_one_bits (0)
   {
     //  .. nothing yet ..
   }
@@ -136,11 +136,14 @@ public:
   {
     m_prev = tl::BitSet ();
     m_state = tl::BitSet ();
+    m_state_one_bits = 0;
+    m_prev_one_bits = 0;
   }
 
   virtual void begin_group ()
   {
     m_prev = m_state;
+    m_prev_one_bits = m_state_one_bits;
   }
 
   virtual int edge (bool north, bool enter, property_type p)
@@ -155,12 +158,14 @@ public:
       if (enter) {
         if (count == 0) {
           m_state.set (p);
+          ++m_state_one_bits;
         }
         ++count;
       } else {
         --count;
         if (count == 0) {
           m_state.reset (p);
+          --m_state_one_bits;
         }
       }
 
@@ -174,12 +179,7 @@ public:
 
   virtual bool is_reset () const
   {
-    for (auto i = m_counts.begin (); i != m_counts.end (); ++i) {
-      if (*i) {
-        return false;
-      }
-    }
-    return true;
+    return m_state_one_bits == 0;
   }
 
   virtual bool prefer_touch () const
@@ -209,8 +209,12 @@ public:
   virtual void put (const db::Edge &edge)
   {
     area_type partial_area = area_type (edge.p1 ().x () + edge.p2 ().x ()) * area_type (edge.dy ()) * 0.5;
-    mp_bsm->lookup (m_prev, tagged_area_inserter<Value> (partial_area, mp_receiver));
-    mp_bsm->lookup (m_state, tagged_area_inserter<Value> (-partial_area, mp_receiver));
+    if (m_prev_one_bits > 0) {
+      mp_bsm->lookup (m_prev, tagged_area_inserter<Value> (partial_area, mp_receiver));
+    }
+    if (m_state_one_bits > 0) {
+      mp_bsm->lookup (m_state, tagged_area_inserter<Value> (-partial_area, mp_receiver));
+    }
   }
 
 private:
@@ -219,6 +223,7 @@ private:
   tagged_area_receiver<Value> *mp_receiver;
   tl::BitSet m_prev, m_state;
   std::vector<int> m_counts;
+  unsigned int m_state_one_bits, m_prev_one_bits;
 };
 
 }

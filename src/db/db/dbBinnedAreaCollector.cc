@@ -20,7 +20,7 @@
 
 */
 
-#include "dbAreaCollector.h"
+#include "dbBinnedAreaCollector.h"
 
 namespace db
 {

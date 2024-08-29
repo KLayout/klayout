@@ -7,8 +7,8 @@ include($$PWD/../../lib.pri)
 DEFINES += MAKE_DB_LIBRARY
 
 SOURCES = \
-  dbAreaCollector.cc \
   dbArray.cc \
+  dbBinnedAreaCollector.cc \
   dbBox.cc \
   dbBoxConvert.cc \
   dbBoxScanner.cc \
@@ -233,8 +233,8 @@ SOURCES = \
   dbShapeCollectionUtils.cc
 
 HEADERS = \
-  dbAreaCollector.h \
   dbArray.h \
+  dbBinnedAreaCollector.h \
   dbBoxConvert.h \
   dbBox.h \
   dbBoxScanner.h \

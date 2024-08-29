@@ -20,8 +20,8 @@
 
 */
 
-#ifndef HDR_dbAreaCollector
-#define HDR_dbAreaCollector
+#ifndef HDR_dbBinnedAreaCollector
+#define HDR_dbBinnedAreaCollector
 
 #include "dbCommon.h"
 
@@ -31,12 +31,12 @@
 namespace db {
 
 /**
- *  @brief The receiver for the tagged partial areas
+ *  @brief The receiver for the binned partial areas
  *
- *  See description of tagged_area_collector for details.
+ *  See description of binned_area_collector for details.
  */
 template <class Value>
-class DB_PUBLIC tagged_area_receiver
+class DB_PUBLIC binned_area_receiver
 {
 public:
   typedef db::coord_traits<db::Coord>::area_type area_type;
@@ -44,12 +44,12 @@ public:
   /**
    *  @brief Constructor
    */
-  tagged_area_receiver<Value> () { }
+  binned_area_receiver<Value> () { }
 
   /**
    *  @brief Destructor
    */
-  virtual ~tagged_area_receiver () { }
+  virtual ~binned_area_receiver () { }
 
   /**
    *  @brief This method gets called when the scanline process starts
@@ -71,22 +71,22 @@ public:
  *  @brief A helper class providing an inserter that is the connection between the receiver and the provider
  */
 template <class Value>
-class DB_PUBLIC tagged_area_inserter
+class DB_PUBLIC binned_area_inserter
 {
 public:
   typedef db::coord_traits<db::Coord>::area_type area_type;
 
-  tagged_area_inserter<Value> (area_type area, tagged_area_receiver<Value> *receiver)
+  binned_area_inserter<Value> (area_type area, binned_area_receiver<Value> *receiver)
     : m_area (area), mp_receiver (receiver)
   {
     //  .. nothing yet ..
   }
 
   //  methods necessary, so this object can act as an inserter
-  tagged_area_inserter<Value> &operator* () { return *this; }
-  tagged_area_inserter<Value> &operator++ (int) { return *this; }
+  binned_area_inserter<Value> &operator* () { return *this; }
+  binned_area_inserter<Value> &operator++ (int) { return *this; }
 
-  tagged_area_inserter<Value> &operator= (const Value &value)
+  binned_area_inserter<Value> &operator= (const Value &value)
   {
     mp_receiver->add_area (m_area, value);
     return *this;
@@ -94,16 +94,16 @@ public:
 
 private:
   area_type m_area;
-  tagged_area_receiver<Value> *mp_receiver;
+  binned_area_receiver<Value> *mp_receiver;
 };
 
 /**
- *  @brief Provides the operation and edge receiver part of the tagged area collector
+ *  @brief Provides the operation and edge receiver part of the binned area collector
  *
  *  Use this object both as the edge operator and as an edge collector.
  *  After running the edge processor, use "area" to obtain the area.
  *
- *  This method collects "tagged areas". That is, each field of the area divided by
+ *  This method collects "binned areas". That is, each field of the area divided by
  *  the edges carries a bit set which is made from the combinations of overlapping
  *  layers. The layers are given by the property number where the number is the
  *  bit set in the bit field. Hence, every field is associated with a bit set.
@@ -111,11 +111,11 @@ private:
  *  The Area collector will now report the field's areas for accumulation together with
  *  a field value that is obtained from the bit set map. As the bit set map
  *  may deliver multiple fields, multiple such values can be present for each field.
- *  The areas are reported through the tagged_area_receiver object. This object
+ *  The areas are reported through the binned_area_receiver object. This object
  *  is supposed to add up the areas in an application specific fashion.
  */
 template <class Value>
-class DB_PUBLIC tagged_area_collector
+class DB_PUBLIC binned_area_collector
   : public EdgeEvaluatorBase,
     public EdgeSink
 {
@@ -125,7 +125,7 @@ public:
   /**
    *  @brief Constructor
    */
-  tagged_area_collector<Value> (const tl::bit_set_map<Value> &bsm, tagged_area_receiver<Value> &receiver)
+  binned_area_collector<Value> (const tl::bit_set_map<Value> &bsm, binned_area_receiver<Value> &receiver)
     : mp_bsm (&bsm), mp_receiver (&receiver), m_state_one_bits (0), m_prev_one_bits (0)
   {
     //  .. nothing yet ..
@@ -210,17 +210,17 @@ public:
   {
     area_type partial_area = area_type (edge.p1 ().x () + edge.p2 ().x ()) * area_type (edge.dy ()) * 0.5;
     if (m_prev_one_bits > 0) {
-      mp_bsm->lookup (m_prev, tagged_area_inserter<Value> (partial_area, mp_receiver));
+      mp_bsm->lookup (m_prev, binned_area_inserter<Value> (partial_area, mp_receiver));
     }
     if (m_state_one_bits > 0) {
-      mp_bsm->lookup (m_state, tagged_area_inserter<Value> (-partial_area, mp_receiver));
+      mp_bsm->lookup (m_state, binned_area_inserter<Value> (-partial_area, mp_receiver));
     }
   }
 
 private:
   area_type m_area_sum;
   const tl::bit_set_map<Value> *mp_bsm;
-  tagged_area_receiver<Value> *mp_receiver;
+  binned_area_receiver<Value> *mp_receiver;
   tl::BitSet m_prev, m_state;
   std::vector<int> m_counts;
   unsigned int m_state_one_bits, m_prev_one_bits;

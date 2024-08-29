@@ -20,7 +20,7 @@
 
 */
 
-#include "dbAreaCollector.h"
+#include "dbBinnedAreaCollector.h"
 #include "dbEdgeProcessor.h"
 #include "tlUnitTest.h"
 
@@ -29,7 +29,7 @@ namespace
 {
 
 class AreaReceiver
-  : public db::tagged_area_receiver<double>
+  : public db::binned_area_receiver<double>
 {
 public:
   typedef db::coord_traits<db::Coord>::area_type area_type;
@@ -69,7 +69,7 @@ TEST(1_Basic)
   bsm.sort ();
 
   AreaReceiver rec;
-  db::tagged_area_collector<double> coll (bsm, rec);
+  db::binned_area_collector<double> coll (bsm, rec);
   ep.process (coll, coll);
 
   EXPECT_EQ (rec.get (), 4500000);
@@ -98,7 +98,7 @@ TEST(2_ShapesGetMerged)
   bsm.sort ();
 
   AreaReceiver rec;
-  db::tagged_area_collector<double> coll (bsm, rec);
+  db::binned_area_collector<double> coll (bsm, rec);
   ep.process (coll, coll);
 
   EXPECT_EQ (rec.get (), 5500000);
@@ -127,7 +127,7 @@ TEST(3_TouchingOnly)
   bsm.sort ();
 
   AreaReceiver rec;
-  db::tagged_area_collector<double> coll (bsm, rec);
+  db::binned_area_collector<double> coll (bsm, rec);
   ep.process (coll, coll);
 
   EXPECT_EQ (rec.get (), 6000000);
@@ -148,7 +148,7 @@ TEST(4_PlainAreaApproximation)
   bsm.sort ();
 
   AreaReceiver rec;
-  db::tagged_area_collector<double> coll (bsm, rec);
+  db::binned_area_collector<double> coll (bsm, rec);
   ep.process (coll, coll);
 
   EXPECT_EQ (rec.get (), 4500000);

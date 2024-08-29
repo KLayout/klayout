@@ -206,6 +206,11 @@ public:
     mp_receiver->finish ();
   }
 
+  virtual void put (const db::Edge &, int)
+  {
+    //  not used.
+  }
+
   virtual void put (const db::Edge &edge)
   {
     area_type partial_area = area_type (edge.p1 ().x () + edge.p2 ().x ()) * area_type (edge.dy ()) * 0.5;

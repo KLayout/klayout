@@ -29,11 +29,7 @@ namespace
 
 static std::string l2s (const tl::BitSet &s)
 {
-  std::string x;
-  for (tl::BitSet::index_type i = 0; i < s.size (); ++i) {
-    x += s[i] ? "1" : "0";
-  }
-  return x;
+  return s.to_string ();
 }
 
 TEST(1_Basic)
@@ -42,23 +38,28 @@ TEST(1_Basic)
   EXPECT_EQ (bs.is_empty (), true);
   EXPECT_EQ (bs.size (), 0u);
   EXPECT_EQ (l2s (bs), "");
+  EXPECT_EQ (l2s (tl::BitSet (l2s (bs))), "");
 
   bs.set (1);
   EXPECT_EQ (bs.size (), 2u);
   EXPECT_EQ (l2s (bs), "01");
+  EXPECT_EQ (l2s (tl::BitSet (l2s (bs))), "01");
 
   bs.set (32);
   EXPECT_EQ (bs.size (), 33u);
   EXPECT_EQ (l2s (bs), "010000000000000000000000000000001");
+  EXPECT_EQ (l2s (tl::BitSet (l2s (bs))), "010000000000000000000000000000001");
 
   bs.set (3);
   EXPECT_EQ (bs.size (), 33u);
   EXPECT_EQ (l2s (bs), "010100000000000000000000000000001");
+  EXPECT_EQ (l2s (tl::BitSet (l2s (bs))), "010100000000000000000000000000001");
 
   unsigned int indexes[] = { 5, 6, 7 };
   bs.set (indexes + 0, indexes + sizeof (indexes) / sizeof (indexes [0]));
   EXPECT_EQ (bs.size (), 33u);
   EXPECT_EQ (l2s (bs), "010101110000000000000000000000001");
+  EXPECT_EQ (l2s (tl::BitSet (l2s (bs))), "010101110000000000000000000000001");
 
   bs.reset (128);
   EXPECT_EQ (bs.size (), 33u);

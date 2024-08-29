@@ -29,36 +29,12 @@ namespace
 
 static std::string l2s (const tl::BitSetMask &s)
 {
-  std::string x;
-  for (tl::BitSetMask::index_type i = 0; i < s.size (); ++i) {
-    switch (s[i]) {
-    case tl::BitSetMask::Any:
-      x += "X";
-      break;
-    case tl::BitSetMask::True:
-      x += "1";
-      break;
-    case tl::BitSetMask::False:
-      x += "0";
-      break;
-    default:
-      x += "-";
-      break;
-    }
-  }
-  return x;
+  return s.to_string ();
 }
 
 static tl::BitSet bs (const char *s)
 {
-  tl::BitSet res;
-  for (unsigned int i = 0; *s; ++i, ++s) {
-    res.set (i);
-    if (*s == '0') {
-      res.reset (i);
-    }
-  }
-  return res;
+  return tl::BitSet (s);
 }
 
 TEST(1_Basic)
@@ -67,22 +43,27 @@ TEST(1_Basic)
   EXPECT_EQ (bs.is_empty (), true);
   EXPECT_EQ (bs.size (), 0u);
   EXPECT_EQ (l2s (bs), "");
+  EXPECT_EQ (l2s (tl::BitSetMask (l2s (bs))), "");
 
   bs.set (1, tl::BitSetMask::True);
   EXPECT_EQ (bs.size (), 2u);
   EXPECT_EQ (l2s (bs), "X1");
+  EXPECT_EQ (l2s (tl::BitSetMask (l2s (bs))), "X1");
 
   bs.set (32, tl::BitSetMask::False);
   EXPECT_EQ (bs.size (), 33u);
   EXPECT_EQ (l2s (bs), "X1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX0");
+  EXPECT_EQ (l2s (tl::BitSetMask (l2s (bs))), "X1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX0");
 
   bs.set (3, tl::BitSetMask::False);
   EXPECT_EQ (bs.size (), 33u);
   EXPECT_EQ (l2s (bs), "X1X0XXXXXXXXXXXXXXXXXXXXXXXXXXXX0");
+  EXPECT_EQ (l2s (tl::BitSetMask (l2s (bs))), "X1X0XXXXXXXXXXXXXXXXXXXXXXXXXXXX0");
 
   bs.set (128, tl::BitSetMask::Any);
   EXPECT_EQ (bs.size (), 33u);
   EXPECT_EQ (l2s (bs), "X1X0XXXXXXXXXXXXXXXXXXXXXXXXXXXX0");
+  EXPECT_EQ (l2s (tl::BitSetMask (l2s (bs))), "X1X0XXXXXXXXXXXXXXXXXXXXXXXXXXXX0");
 
   bs.clear ();
   EXPECT_EQ (bs.size (), 0u);

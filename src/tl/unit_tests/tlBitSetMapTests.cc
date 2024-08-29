@@ -29,31 +29,12 @@
 
 static tl::BitSet bs (const char *s)
 {
-  tl::BitSet res;
-  for (unsigned int i = 0; *s; ++i, ++s) {
-    res.set (i);
-    if (*s == '0') {
-      res.reset (i);
-    }
-  }
-  return res;
+  return tl::BitSet (s);
 }
 
 static tl::BitSetMask bsm (const char *s)
 {
-  tl::BitSetMask res;
-  for (unsigned int i = 0; *s; ++i, ++s) {
-    if (*s == '0') {
-      res.set (i, tl::BitSetMask::False);
-    } else if (*s == '1') {
-      res.set (i, tl::BitSetMask::True);
-    } else if (*s == 'X') {
-      res.set (i, tl::BitSetMask::Any);
-    } else if (*s == '-') {
-      res.set (i, tl::BitSetMask::Never);
-    }
-  }
-  return res;
+  return tl::BitSetMask (s);
 }
 
 struct SetInserter

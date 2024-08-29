@@ -46,6 +46,73 @@ static inline unsigned int bit (BitSetMask::size_type index)
   return 31 - (index % (sizeof (BitSetMask::data_type) * 8));
 }
 
+BitSetMask::BitSetMask ()
+  : mp_data0 (0), mp_data1 (0), m_size (0)
+{
+  //  .. nothing yet ..
+}
+
+BitSetMask::BitSetMask (const std::string &s)
+  : mp_data0 (0), mp_data1 (0), m_size (0)
+{
+  index_type bit = 0;
+  for (const char *cp = s.c_str (); *cp; ++cp, ++bit) {
+    mask_type m = Any;
+    if (*cp == '0') {
+      m = False;
+    } else if (*cp == '1') {
+      m = True;
+    } else if (*cp == '-') {
+      m = Never;
+    }
+    set (bit, m);
+  }
+}
+
+BitSetMask::BitSetMask (const BitSetMask &other)
+  : mp_data0 (0), mp_data1 (0), m_size (0)
+{
+  operator= (other);
+}
+
+BitSetMask::BitSetMask (BitSetMask &&other)
+  : mp_data0 (0), mp_data1 (0), m_size (0)
+{
+  operator= (std::move (other));
+}
+
+BitSetMask::~BitSetMask ()
+{
+  clear ();
+}
+
+std::string
+BitSetMask::to_string () const
+{
+  std::string r;
+  r.reserve (m_size);
+
+  for (index_type i = 0; i < m_size; ++i) {
+    switch (operator[] (i)) {
+    case False:
+      r += '0';
+      break;
+    case True:
+      r += '1';
+      break;
+    case Never:
+      r += '-';
+      break;
+    case Any:
+    default:
+      r += 'X';
+      break;
+    }
+  }
+
+  return r;
+}
+
 BitSetMask &
 BitSetMask::operator= (const BitSetMask &other)
 {

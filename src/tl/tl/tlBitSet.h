@@ -28,6 +28,7 @@
 
 #include <cstdint>
 #include <algorithm>
+#include <string>
 
 namespace tl
 {
@@ -52,11 +53,7 @@ public:
   /**
    *  @brief Default constructor: creates an empty bit set
    */
-  BitSet ()
-    : mp_data (0), m_size (0)
-  {
-    //  .. nothing yet ..
-  }
+  BitSet ();
 
   /**
    *  @brief Creates and initializes a bit set from a range of indexes
@@ -70,30 +67,31 @@ public:
   }
 
   /**
+   *  @brief Creates a bit set from a string
+   *
+   *  In the string, a '0' character is for False, '1' for True.
+   */
+  BitSet (const std::string &s);
+
+  /**
    *  @brief Copy constructor
    */
-  BitSet (const BitSet &other)
-    : mp_data (0), m_size (0)
-  {
-    operator= (other);
-  }
+  BitSet (const BitSet &other);
 
   /**
    *  @brief Move constructor
    */
-  BitSet (BitSet &&other)
-    : mp_data (0), m_size (0)
-  {
-    operator= (std::move (other));
-  }
+  BitSet (BitSet &&other);
+
+  /**
+   *  @brief Converts the bit set to a string
+   */
+  std::string to_string () const;
 
   /**
    *  @brief Destructor
    */
-  ~BitSet ()
-  {
-    clear ();
-  }
+  ~BitSet ();
 
   /**
    *  @brief Assignment

@@ -29,6 +29,7 @@
 
 #include <cstdint>
 #include <algorithm>
+#include <string>
 
 namespace tl
 {
@@ -59,37 +60,34 @@ public:
   /**
    *  @brief Default constructor: creates an empty bit set
    */
-  BitSetMask ()
-    : mp_data0 (0), mp_data1 (0), m_size (0)
-  {
-    //  .. nothing yet ..
-  }
+  BitSetMask ();
+
+  /**
+   *  @brief Creates a bit set mask from a string
+   *
+   *  In the string, a '0' character is for False, '1' for True, 'X' for Any and '-' for Never.
+   */
+  BitSetMask (const std::string &s);
 
   /**
    *  @brief Copy constructor
    */
-  BitSetMask (const BitSetMask &other)
-    : mp_data0 (0), mp_data1 (0), m_size (0)
-  {
-    operator= (other);
-  }
+  BitSetMask (const BitSetMask &other);
 
   /**
    *  @brief Move constructor
    */
-  BitSetMask (BitSetMask &&other)
-    : mp_data0 (0), mp_data1 (0), m_size (0)
-  {
-    operator= (std::move (other));
-  }
+  BitSetMask (BitSetMask &&other);
 
   /**
    *  @brief Destructor
    */
-  ~BitSetMask ()
-  {
-    clear ();
-  }
+  ~BitSetMask ();
+
+  /**
+   *  @brief Converts the mask to a string
+   */
+  std::string to_string () const;
 
   /**
    *  @brief Assignment

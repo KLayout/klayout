@@ -45,6 +45,51 @@ static inline unsigned int bit (BitSet::size_type index)
   return 31 - (index % (sizeof (BitSet::data_type) * 8));
 }
 
+BitSet::BitSet ()
+  : mp_data (0), m_size (0)
+{
+  //  .. nothing yet ..
+}
+
+BitSet::BitSet (const std::string &s)
+  : mp_data (0), m_size (0)
+{
+  index_type bit = 0;
+  for (const char *cp = s.c_str (); *cp; ++cp, ++bit) {
+    set_value (bit, *cp == '1');
+  }
+}
+
+BitSet::BitSet (const BitSet &other)
+  : mp_data (0), m_size (0)
+{
+  operator= (other);
+}
+
+BitSet::BitSet (BitSet &&other)
+  : mp_data (0), m_size (0)
+{
+  operator= (std::move (other));
+}
+
+std::string
+BitSet::to_string () const
+{
+  std::string r;
+  r.reserve (m_size);
+
+  for (index_type i = 0; i < m_size; ++i) {
+    r += operator[] (i) ? '1' : '0';
+  }
+
+  return r;
+}
+
+BitSet::~BitSet ()
+{
+  clear ();
+}
+
 BitSet &
 BitSet::operator= (const BitSet &other)
 {

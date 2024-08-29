@@ -104,7 +104,7 @@ gsi::ClassExt<db::Region> extend_region_by_binned_area (
     "identical to the total area. A bin with an empty string mask will deliver the total area.\n"
     "\n"
     "Merge semantics always applies - i.e. all shapes inside the regions are conceptually "
-    "merged in 'positive wrap count' mode before computing the area. Hence overlapping shapes ""
+    "merged in 'positive wrap count' mode before computing the area. Hence overlapping shapes "
     "per input region just count once.\n"
     "\n"
     "Example:\n"

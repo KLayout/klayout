@@ -44,11 +44,6 @@ static db::LayoutToNetlist *make_l2n_from_existing_dss_with_layout (db::DeepShap
   return new db::LayoutToNetlist (dss, layout_index);
 }
 
-static db::LayoutToNetlist *make_l2n_from_existing_dss (db::DeepShapeStore *dss)
-{
-  return new db::LayoutToNetlist (dss);
-}
-
 static db::LayoutToNetlist *make_l2n_flat (const std::string &topcell_name, double dbu)
 {
   return new db::LayoutToNetlist (topcell_name, dbu);
@@ -225,12 +220,23 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "@brief Creates a new extractor connected to an original layout\n"
     "This constructor will attach the extractor to an original layout through the "
     "shape iterator.\n"
+    "\n"
+    "The shape iterator does not need to be an actual shape iterator. It is merely used to identify the original "
+    "layout and provides additional parameters such as the top cell to use and advanced options such as subtree pruning.\n"
+    "\n"
+    "You can construct a dummy iteraor usable for this purpose without layers using an empty layer set:\n"
+    "\n"
+    "@code\n"
+    "ly = ...  # external layout\n"
+    "l2n = RBA::LayoutToNetlist::new(RBA::RecursiveShapeIterator::new(ly, ly.top_cell, []))"
+    "..."
+    "@/code\n"
   ) +
   gsi::constructor ("new", &make_l2n_default,
     "@brief Creates a new and empty extractor object\n"
     "The main objective for this constructor is to create an object suitable for reading an annotated netlist.\n"
   ) +
-  gsi::constructor ("new", &make_l2n_from_existing_dss, gsi::arg ("dss"),
+  gsi::constructor ("new", &make_l2n_from_existing_dss_with_layout, gsi::arg ("dss"), gsi::arg ("layout_index", 0),
     "@brief Creates a new extractor object reusing an existing \\DeepShapeStore object\n"
     "This constructor can be used if there is a DSS object already from which the "
     "shapes can be taken. This version can only be used with \\register to "
@@ -241,14 +247,8 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "\n"
     "The extractor will not take ownership of the dss object unless you call \\keep_dss."
   ) +
-  gsi::constructor ("new", &make_l2n_from_existing_dss_with_layout, gsi::arg ("dss"), gsi::arg ("layout_index"),
-    "@brief Creates a new extractor object reusing an existing \\DeepShapeStore object\n"
-    "This constructor can be used if there is a DSS object already from which the "
-    "shapes can be taken. NOTE: in this case, the make_... functions will create "
-    "new layers inside this DSS. To register existing layers (regions) use \\register.\n"
-  ) +
   gsi::constructor ("new", &make_l2n_flat, gsi::arg ("topcell_name"), gsi::arg ("dbu"),
-    "@brief Creates a new extractor object with a flat DSS\n"
+    "@brief Creates a new, detached extractor object with a flat DSS\n"
     "@param topcell_name The name of the top cell of the internal flat layout\n"
     "@param dbu The database unit to use for the internal flat layout\n"
     "\n"
@@ -258,6 +258,25 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "\n"
     "The database unit is mandatory because the physical parameter extraction "
     "for devices requires this unit for translation of layout to physical dimensions.\n"
+    "\n"
+    "Example:\n"
+    "\n"
+    "@code\n"
+    "rmetal1 = ...  # an external Region object representing 'metal1' layer\n"
+    "rvia11  = ...  # an external Region object representing 'via1' layer\n"
+    "rmetal2 = ...  # an external Region object representing 'metal2' layer\n"
+    "\n"
+    "l2n = RBA::LayoutToNetlist::new(\"TOP_CELL\", 0.001)\n"
+    "# imports the external Regions as flat ones and assigns proper names\n"
+    "l2n.register(rmetal1, \"metal1\")\n"
+    "l2n.register(rvia1, \"via1\")\n"
+    "l2n.register(rmetal2, \"metal2\")\n"
+    "\n"
+    "# intra- and inter-layer connects:\n"
+    "l2n.connect(metal1)\n"
+    "l2n.connect(metal1, via1)\n"
+    "l2n.connect(metal2)\n"
+    "@/code\n"
   ) +
   gsi::method ("generator", &db::LayoutToNetlist::generator,
     "@brief Gets the generator string.\n"
@@ -268,9 +287,11 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   ) +
   gsi::method ("dss", (db::DeepShapeStore &(db::LayoutToNetlist::*) ()) &db::LayoutToNetlist::dss,
     "@brief Gets a reference to the internal DSS object.\n"
+    "See the class description for details about the DSS object used inside the LayoutToNetlist object."
   ) +
   gsi::method ("keep_dss", &db::LayoutToNetlist::keep_dss,
-    "@brief Resumes ownership over the DSS object if created with an external one.\n"
+    "@brief Takes ownership of the DSS object if the LayoutToNetlist object was created with an external one.\n"
+    "See the class description for details about the DSS object used inside the LayoutToNetlist object."
   ) +
   gsi::method ("threads=", &db::LayoutToNetlist::set_threads, gsi::arg ("n"),
     "@brief Sets the number of threads to use for operations which support multiple threads\n"
@@ -329,13 +350,28 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   ) +
   gsi::method ("layer_name", (std::string (db::LayoutToNetlist::*) (const db::ShapeCollection &region) const) &db::LayoutToNetlist::name, gsi::arg ("l"),
     "@brief Gets the name of the given layer\n"
+    "The layer is given by a \\ShapeCollection object which is either a \\Region or \\Texts object.\n"
+    "This \\Region or \\Texts object needs to be either one that was created by make_... or one that\n"
+    "was registered through \\register. This function will return the name that was given to that \\Region or \\Texts "
+    "during those operations."
+    "\n"
+    "You can use \\layer_by_name to retrieve the \\Region object of a layer from the layer index.\n"
   ) +
   gsi::method ("layer_index", (unsigned int (db::LayoutToNetlist::*) (const db::ShapeCollection &region) const) &db::LayoutToNetlist::layer_of<db::ShapeCollection>, gsi::arg ("l"),
     "@brief Gets the layer index for the given data object\n"
+    "This method is essentially identical to \\layer_of, but uses \\ShapeCollection, which is a polymorphic base class "
+    "for a variety of shape containers.\n"
+    "\n"
+    "The layer index returned is index of the corresponding layer inside the internal layout (see \\internal_layout).\n"
+    "The layer index is more handy to use for identifying a layer than a \\Region of \\Texts object, for example when using it as a key in hashes.\n"
+    "\n"
+    "You can use \\layer_by_index to retrieve the \\Region object of a layer from the layer index.\n"
+    "\n"
     "This method has been introduced in version 0.29.3.\n"
   ) +
   gsi::method ("layer_name", (std::string (db::LayoutToNetlist::*) (unsigned int) const) &db::LayoutToNetlist::name, gsi::arg ("l"),
     "@brief Gets the name of the given layer (by index)\n"
+    "See \\layer_index for a description of the layer index.\n"
   ) +
   gsi::method ("register", (unsigned int (db::LayoutToNetlist::*) (const db::ShapeCollection &collection, const std::string &)) &db::LayoutToNetlist::register_layer, gsi::arg ("l"), gsi::arg ("n", std::string ()),
     "@brief Names the given layer\n"
@@ -345,11 +381,16 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "Registering will copy the shapes into the LayoutToNetlist object in this step to enable "
     "netlist extraction.\n"
     "\n"
-    "Naming a layer allows the system to indicate the layer in various contexts, i.e. "
-    "when writing the data to a file. Named layers are also persisted inside the LayoutToNetlist object. "
-    "They are not discarded when the Region object is destroyed.\n"
+    "External \\Region or \\Texts objects that are registered are persisted. This means "
+    "the LayoutToNetlist object becomes owner of them and they are not discarded when the "
+    "Region or Text object is destroyed.\n"
     "\n"
-    "If required, the system will assign a name automatically."
+    "Naming a layer allows allows retrieving the layer later, for example after the LayoutToNetlist object\n"
+    "has been written to a file and restored from that file (during this process, the layer indexes will change).\n"
+    "\n"
+    "If no name is given, the system will assign a name automatically.\n"
+    "It is recommended to specify a name if it is required to identify the layer later - for example for "
+    "retrieving shapes from it.\n"
     "\n"
     "This method has been generalized in version 0.27. Starting with version 0.29.3, the index of the layer is returned.\n"
   ) +
@@ -360,6 +401,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "@brief Returns a list of indexes of the layers kept inside the LayoutToNetlist object.\n"
     "You can use \\layer_name to get the name from a layer index. You can use \\layer_info to get "
     "the \\LayerInfo object attached to a layer - if the layer is an original layer.\n"
+    "You can use \\layer_by_index to get the \\Region object for the layer by index.\n"
     "\n"
     "This method has been introduced in version 0.29.2.\n"
   ) +
@@ -369,70 +411,109 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "stream layer information where the original layer was taken from. Otherwise an empty \\LayerInfo object "
     "is returned.\n"
     "\n"
+    "The LayerInfo object is usually empty for derived layers - i.e. those which are computed through "
+    "boolean operations for example. It is recommended to assign names to such layers for easy identification later.\n"
+    "\n"
     "This method has been introduced in version 0.29.2.\n"
   ) +
   gsi::factory ("layer_by_name", &db::LayoutToNetlist::layer_by_name, gsi::arg ("name"),
     "@brief Gets a layer object for the given name.\n"
-    "The returned object is a copy which represents the named layer."
+    "The returned object is a new Region object representing the named layer. It will refer to a layer inside the "
+    "internal layout, or more specifically inside the \\DeepShapeStorage object (see \\dss and \\internal_layout).\n"
+    "The method returns 'nil' if the name is not a valid layer name.\n"
+    "See \\register and the make_... methods for a description of layer naming.\n"
   ) +
   gsi::factory ("layer_by_index", &db::LayoutToNetlist::layer_by_index, gsi::arg ("index"),
     "@brief Gets a layer object for the given index.\n"
-    "Only named layers can be retrieved with this method. "
-    "The returned object is a copy which represents the named layer."
+    "The returned object is a new Region object representing the layer with the given index. It will refer to a layer inside the "
+    "internal layout, or more specifically inside the \\DeepShapeStorage object (see \\dss and \\internal_layout).\n"
+    "The method returns 'nil' if the index is not a valid layer index."
   ) +
   gsi::method ("is_persisted?", &db::LayoutToNetlist::is_persisted<db::Region>, gsi::arg ("layer"),
     "@brief Returns true, if the given layer is a persisted region.\n"
     "Persisted layers are kept inside the LayoutToNetlist object and are not released "
-    "if their object is destroyed. Named layers are persisted, unnamed layers are not. "
-    "Only persisted, named layers can be put into \\connect."
+    "if their object is destroyed. Layers created with make_... or registered through \\register are persisted.\n"
+    "This basically applies to all layers, except intermediate layers that are potentially created as results of "
+    "operations between layers and which are not registered.\n"
   ) +
   gsi::method ("is_persisted?", &db::LayoutToNetlist::is_persisted<db::Texts>, gsi::arg ("layer"),
     "@brief Returns true, if the given layer is a persisted texts collection.\n"
     "Persisted layers are kept inside the LayoutToNetlist object and are not released "
-    "if their object is destroyed. Named layers are persisted, unnamed layers are not. "
-    "Only persisted, named layers can be put into \\connect.\n"
+    "if their object is destroyed. Layers created with make_... or registered through \\register are persisted.\n"
+    "This basically applies to all layers, except intermediate layers that are potentially created as results of "
+    "operations between layers and which are not registered.\n"
     "\n"
     "The variant for Texts collections has been added in version 0.27."
   ) +
   gsi::factory ("make_layer", (db::Region *(db::LayoutToNetlist::*) (const std::string &)) &db::LayoutToNetlist::make_layer, gsi::arg ("name", std::string ()),
     "@brief Creates a new, empty hierarchical region\n"
     "\n"
+    "This method will create a new, empty layer inside the internal layout and register it.\n"
+    "It returns a new Region object that represents the new layer. See the class description for more details.\n"
     "The name is optional. If given, the layer will already be named accordingly (see \\register).\n"
   ) +
   gsi::factory ("make_layer", (db::Region *(db::LayoutToNetlist::*) (unsigned int, const std::string &)) &db::LayoutToNetlist::make_layer, gsi::arg ("layer_index"), gsi::arg ("name", std::string ()),
     "@brief Creates a new hierarchical region representing an original layer\n"
     "'layer_index' is the layer index of the desired layer in the original layout.\n"
-    "This variant produces polygons and takes texts for net name annotation.\n"
+    "This variant produces polygons and takes texts for net name annotation as special, property-annotated polygons.\n"
     "A variant not taking texts is \\make_polygon_layer. A Variant only taking\n"
     "texts is \\make_text_layer.\n"
     "\n"
-    "The name is optional. If given, the layer will already be named accordingly (see \\register).\n"
+    "This method will basically create a copy of the original layer inside the internal layout - more specifically inside "
+    "the DSS (see \\dss and \\internal_layout). It returns a new Region object that represents this layer copy. "
+    "The new layer is already registered with the given name and can be used for \\connect for example.\n"
   ) +
   gsi::factory ("make_text_layer", &db::LayoutToNetlist::make_text_layer, gsi::arg ("layer_index"), gsi::arg ("name", std::string ()),
     "@brief Creates a new region representing an original layer taking texts only\n"
     "See \\make_layer for details.\n"
     "\n"
-    "The name is optional. If given, the layer will already be named accordingly (see \\register).\n"
-    "\n"
     "Starting with version 0.27, this method returns a \\Texts object."
   ) +
   gsi::factory ("make_polygon_layer", &db::LayoutToNetlist::make_polygon_layer, gsi::arg ("layer_index"), gsi::arg ("name", std::string ()),
-    "@brief Creates a new region representing an original layer taking polygons and texts\n"
+    "@brief Creates a new region representing an original layer taking polygons only\n"
     "See \\make_layer for details.\n"
-    "\n"
-    "The name is optional. If given, the layer will already be named accordingly (see \\register).\n"
   ) +
   gsi::method ("extract_devices", &db::LayoutToNetlist::extract_devices, gsi::arg ("extractor"), gsi::arg ("layers"),
     "@brief Extracts devices\n"
     "See the class description for more details.\n"
     "This method will run device extraction for the given extractor. The layer map is specific\n"
-    "for the extractor and uses the region objects derived with \\make_layer and its variants.\n"
+    "for the extractor and uses the Region objects derived with \\make_layer and its variants or Region "
+    "objects registered through \\register. The layer map keys are the inputs layers defined for the\n"
+    "specific extractor, but also the output layers where the extractor places markers for the device terminals.\n"
     "\n"
-    "In addition, derived regions can be passed too. Certain limitations apply. It's safe to use\n"
+    "In addition, derived regions can also be passed to the device extractor inside the layer map.\n"
+    "Certain limitations apply. It is usually safe to use\n"
     "boolean operations for deriving layers. Other operations are applicable as long as they are\n"
     "capable of delivering hierarchical layers.\n"
     "\n"
-    "If errors occur, the device extractor will contain theses errors.\n"
+    "Example:\n"
+    "\n"
+    "@code\n"
+    "ly = ... # original Layout\n"
+    "\n"
+    "l2n = RBA::LayoutToNetlist::new(RBA::RecursiveShapeIterator::new(ly, ly.top_cell, []))\n"
+    "rnwell   = l2n.make_layer(ly.layer(1, 0), \"nwell\" )\n"
+    "ractive  = l2n.make_layer(ly.layer(2, 0), \"active\" )\n"
+    "rpoly    = l2n.make_layer(ly.layer(3, 0), \"poly\" )\n"
+    "\n"
+    "rpactive = ractive & rnwell\n"
+    "rpgate   = rpactive & rpoly\n"
+    "rpsd     = rpactive - rpgate\n"
+    "\n"
+    "rnactive = ractive - rnwell\n"
+    "rngate   = rnactive & rpoly\n"
+    "rnsd     = rnactive - rngate\n"
+    "\n"
+    "# PMOS transistor device extraction\n"
+    "pmos_ex = RBA::DeviceExtractorMOS3Transistor::new(\"PMOS\")\n"
+    "l2n.extract_devices(pmos_ex, { \"SD\" => rpsd, \"G\" => rpgate, \"P\" => rpoly })\n"
+    "\n"
+    "# NMOS transistor device extraction\n"
+    "nmos_ex = RBA::DeviceExtractorMOS3Transistor::new(\"NMOS\")\n"
+    "l2n.extract_devices(nmos_ex, { \"SD\" => rnsd, \"G\" => rngate, \"P\" => rpoly })\n"
+    "@/code\n"
+    "\n"
+    "If errors occur, they will be logged inside the device extractor object and copied to the log of this LayoutToNetlist object (self).\n"
   ) +
   gsi::method ("reset_extracted", &db::LayoutToNetlist::reset_extracted,
     "@brief Resets the extracted netlist and enables re-extraction\n"
@@ -448,10 +529,12 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   ) +
   gsi::method ("connect", (void (db::LayoutToNetlist::*) (const db::Region &)) &db::LayoutToNetlist::connect, gsi::arg ("l"),
     "@brief Defines an intra-layer connection for the given layer.\n"
-    "The layer is either an original layer created with \\make_includelayer and its variants or\n"
-    "a derived layer. Certain limitations apply. It's safe to use\n"
+    "The layer as a Region object, representing either an original layer created with \\make_layer and its variants or\n"
+    "a derived layer which was registered using \\register. Certain limitations apply. It's safe to use\n"
     "boolean operations for deriving layers. Other operations are applicable as long as they are\n"
-    "capable of delivering hierarchical layers.\n"
+    "capable of delivering hierarchical layers. Operations that introduce flat layers will create additonal pins\n"
+    "as connections need to be made from a subcell to the top cell. Hence, flat layers - or rather some with a bad hierarchy - should\n"
+    "be avoided in \\connect.\n"
   ) +
   gsi::method ("connect", (void (db::LayoutToNetlist::*) (const db::Region &, const db::Region &)) &db::LayoutToNetlist::connect, gsi::arg ("a"), gsi::arg ("b"),
     "@brief Defines an inter-layer connection for the given layers.\n"
@@ -544,12 +627,6 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "\n"
     "This attribute has been introduced in version 0.27.\n"
   ) +
-  gsi::method ("make_soft_connection_diodes=", &db::LayoutToNetlist::set_make_soft_connection_diodes, gsi::arg ("flag"),
-    "@hide"
-  ) +
-  gsi::method ("make_soft_connection_diodes", &db::LayoutToNetlist::make_soft_connection_diodes,
-    "@hide"
-  ) +
   gsi::method ("top_level_mode=", &db::LayoutToNetlist::set_top_level_mode, gsi::arg ("flag"),
     "@brief Sets a flag indicating whether top level mode is enabled.\n"
     "\n"
@@ -640,12 +717,16 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "The internal layout is where the LayoutToNetlist database stores the shapes for the nets. "
     "Usually you do not need to access this object - you must use \\build_net or \\shapes_of_net to "
     "retrieve the per-net shape information. If you access the internal layout, make sure you do not "
-    "modify it."
+    "modify it.\n"
+    "\n"
+    "See the class description for details about the internal layout object."
   ) +
   gsi::method_ext ("internal_top_cell", &l2n_internal_top_cell,
     "@brief Gets the internal top cell\n"
     "Usually it should not be required to obtain the internal cell. If you need to do so, make sure not to modify the cell as\n"
-    "the functionality of the netlist extractor depends on it."
+    "the functionality of the netlist extractor depends on it.\n"
+    "\n"
+    "See the class description for details about the internal layout object."
   ) +
   gsi::method ("layer_of", &db::LayoutToNetlist::layer_of<db::Region>, gsi::arg ("l"),
     "@brief Gets the internal layer for a given extraction layer\n"
@@ -950,56 +1031,87 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
    "This variant has been introduced in version 0.26.6.\n"
   ) +
   //  test API
+  gsi::method ("make_soft_connection_diodes=", &db::LayoutToNetlist::set_make_soft_connection_diodes, gsi::arg ("flag"), "@hide") +
+  gsi::method ("make_soft_connection_diodes", &db::LayoutToNetlist::make_soft_connection_diodes, "@hide") +
   gsi::method_ext ("dump_joined_net_names", &dump_joined_net_names, "@hide") +
   gsi::method_ext ("dump_joined_net_names_per_cell", &dump_joined_net_names_per_cell, "@hide") +
   gsi::method_ext ("dump_joined_nets", &dump_joined_nets, "@hide") +
   gsi::method_ext ("dump_joined_nets_per_cell", &dump_joined_nets_per_cell, "@hide")
   ,
-  "@brief A generic framework for extracting netlists from layouts\n"
+  "@brief A framework for extracting netlists from layouts\n"
   "\n"
-  "This class wraps various concepts from db::NetlistExtractor and db::NetlistDeviceExtractor\n"
-  "and more. It is supposed to provide a framework for extracting a netlist from a layout.\n"
+  "This class provides a framework for extracting a netlist from a layout.\n"
   "\n"
-  "The use model of this class consists of five steps which need to be executed in this order.\n"
+  "A LayoutToNetlist object extracts a netlist from an external \\Layout. To do so, it keeps "
+  "an internal copy with an optimized representation of the original layout. When a netlist is extracted "
+  "the net geometries can be recovered from that internal layout. In addition to that layout, it keeps "
+  "the extracted netlist. Netlist and internal layout form a pair and there are references between them. "
+  "For example, the \\Circuit objects from the netlist have an attribute \\cell_index, which tells what cell "
+  "from the internal layout the circuit was derived from. In the same way, subcircuit references refer to "
+  "cell instances and nets keep a reference to the shapes they were derived from.\n"
+  "\n"
+  "LayoutToNetlist can also operate in detached mode, when there is no external layout. In this mode, "
+  "layers are created inside the internal layout only. As there is no input hierarchy, operation is "
+  "necessarily flat in that case. Single \\Region and \\Texts shape collections can be introduced into "
+  "the LayoutToNetlist objects from external sources to populate the layers from the internal layout.\n"
+  "For detached mode, use the 'LayoutToNetlist(topcell, dbu)' constructor.\n"
+  "\n"
+  "Usually, the internal layout is stored inside an internal \\DeepShapeStore object, which supplies "
+  "additional services such as layer lifetime management and maintains the connection to and from "
+  "the external layout.\n"
+  "However, you can also use the extractor with an existing \\DeepShapeStore object.\n"
+  "In that case, this external \\DeepShapeStore object is used instead of the internal one.\n"
+  "\n"
+  "The LayoutToNetlist object can be persisted into a 'Layout to netlist database' file. This database "
+  "is a storage for both the netlist and the net or circuit geometries. When reading such file into "
+  "a new LayoutToNetlist object, there will be no connection to any external layout, but all the "
+  "essential netlist and geometry information will be available.\n"
+  "\n"
+  "The LayoutToNetlist object is also the entry point for netlist-driven algorithms such as antenna checks.\n"
+  "\n"
+  "The use model of the LayoutToNetlist object consists of five steps which need to be executed in this order.\n"
   "\n"
   "@ul\n"
-  "@li Configuration: in this step, the LayoutToNetlist object is created and\n"
+  "@li @b Configuration: @/b\n"
+  "    In this step, the LayoutToNetlist object is created and\n"
   "    if required, configured. Methods to be used in this step are \\threads=,\n"
   "    \\area_ratio= or \\max_vertex_count=. The constructor for the LayoutToNetlist\n"
   "    object receives a \\RecursiveShapeIterator object which basically supplies the\n"
-  "    hierarchy and the layout taken as input.\n"
+  "    hierarchy and the external layout taken as input. The constructor will initialize\n"
+  "    the internal layout and connect it to the external one.\n"
   "@/li\n"
-  "@li Preparation\n"
+  "@li @b Preparation: @/b\n"
   "    In this step, the device recognition and extraction layers are drawn from\n"
-  "    the framework. Derived can now be computed using boolean operations.\n"
-  "    Methods to use in this step are \\make_layer and its variants.\n"
+  "    the framework. Derived layers can now be computed using boolean operations.\n"
+  "    Methods to use in this step are \\make_layer and its variants. \\make_layer will either create\n"
+  "    a new, empty layer or pull a layer from the external layout into the internal layout.\n"
+  "    Derived layers are computed using the \\Region or \\Texts objects representing\n"
+  "    existing layers. If derived layers are to be used in connectivity, they\n"
+  "    need to be registered using \\register. This makes the LayoutToNetlist object the owner of "
+  "    the layer (the layer is said to be persisted then). Registered layers can or should be given a "
+  "    name. That helps indentifying them later.\n"
   "    Layer preparation is not necessarily required to happen before all\n"
   "    other steps. Layers can be computed shortly before they are required.\n"
   "@/li\n"
-  "@li Following the preparation, the devices can be extracted using \\extract_devices.\n"
+  "@li @b Device extraction: @/b\n"
+  "    Following the preparation, the devices can be extracted using \\extract_devices.\n"
   "    This method needs to be called for each device extractor required. Each time,\n"
-  "    a device extractor needs to be given plus a map of device layers. The device\n"
+  "    a device extractor needs to be given, plus a map of device layers. The device\n"
   "    layers are device extractor specific. Either original or derived layers\n"
   "    may be specified here. Layer preparation may happen between calls to \\extract_devices.\n"
   "@/li\n"
-  "@li Once the devices are derived, the netlist connectivity can be defined and the\n"
+  "@li @b Connectivity definition: @/b\n"
+  "    Once the devices are derived, the netlist connectivity can be defined and the\n"
   "    netlist extracted. The connectivity is defined with \\connect and its\n"
   "    flavours. The actual netlist extraction happens with \\extract_netlist.\n"
   "@/li\n"
-  "@li After netlist extraction, the information is ready to be retrieved.\n"
+  "@li @b Netlist extraction: @/b\n"
+  "    After netlist extraction, the information is ready to be retrieved.\n"
   "    The produced netlist is available with \\netlist. The Shapes of a\n"
   "    specific net are available with \\shapes_of_net. \\probe_net allows\n"
   "    finding a net by probing a specific location.\n"
   "@/li\n"
   "@/ul\n"
-  "\n"
-  "You can also use the extractor with an existing \\DeepShapeStore object "
-  "or even flat data. In this case, preparation means importing existing regions "
-  "with the \\register method.\n"
-  "If you want to use the \\LayoutToNetlist object with flat data, use the "
-  "'LayoutToNetlist(topcell, dbu)' constructor. If you want to use it with "
-  "hierarchical data and an existing DeepShapeStore object, use the "
-  "'LayoutToNetlist(dss)' constructor.\n"
   "\n"
   "Once the extraction is done, you can persist the \\LayoutToNetlist object "
   "using \\write and restore it using \\read. You can use the query API (see below) to "
@@ -1008,7 +1120,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   "The query API of the \\LayoutToNetlist object consists of the following parts:\n"
   "\n"
   "@ul\n"
-  "@li Net shape retrieval: \\build_all_nets, \\build_nets, \\build_net and \\shapes_per_net @/li\n"
+  "@li Net shape retrieval: \\build_all_nets, \\build_nets, \\build_net and \\shapes_of_net @/li\n"
   "@li Layers: \\layer_by_index, \\layer_by_name, \\layer_indexes, \\layer_names, \\layer_info, \\layer_name @/li\n"
   "@li Log entries: \\each_log_entry @/li\n"
   "@li Probing (get net from position): \\probe_net @/li\n"

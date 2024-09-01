@@ -23,6 +23,7 @@
 
 
 #include "dbCommonReader.h"
+#include "dbColdProxy.h"
 #include "dbStream.h"
 #include "tlXMLParser.h"
 
@@ -475,7 +476,7 @@ CommonReaderBase::finish (db::Layout &layout)
     }
 
     if (name) {
-      //  need to rename: add a new madding to m_layer_map_out and adjust the layout's layer properties
+      //  need to rename: add a new mapping to m_layer_map_out and adjust the layout's layer properties
       db::LayerProperties lpp = lp;
       join_layer_names (lpp.name, *name);
       layout.set_properties (*i, lpp);
@@ -580,9 +581,32 @@ CommonReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
   }
 
   //  A cleanup may be necessary because of the following scenario: if library proxies contain subcells
-  //  which are proxies itself, the proxy update may make them orphans (the proxies are regenerated).
+  //  which are proxies themselves, the proxy update may make them orphans (the proxies are regenerated).
   //  The cleanup will removed these.
-  layout.cleanup ();
+
+  //  Adressing issue #1835 (reading proxy-only GDS file renders empty layout) we do not delete
+  //  the first (non-cold) proxy if there are only proxy top cells.
+  //  We never clean up the top cell if there is a single one. This catches the case of having
+  //  defunct proxies for top cells.
+
+  std::set<db::cell_index_type> keep;
+  if (layout.end_top_cells () - layout.begin_top_down () == 1) {
+    keep.insert (*layout.begin_top_down ());
+  } else {
+    for (auto c = layout.begin_top_down (); c != layout.end_top_cells (); ++c) {
+      const db::Cell *cptr = &layout.cell (*c);
+      if (cptr->is_proxy ()) {
+        if (! dynamic_cast <const db::ColdProxy *> (cptr) && keep.empty ()) {
+          keep.insert (*c);
+        }
+      } else {
+        keep.clear ();
+        break;
+      }
+    }
+  }
+
+  layout.cleanup (keep);
 
   return layer_map_out ();
 }

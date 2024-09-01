@@ -130,12 +130,12 @@ class _PCellDeclarationHelperMixin:
     This function delegates the implementation to self.display_text_impl
     after configuring the PCellDeclaration object.
     """
-    self.start()
+    self._start()
     self._param_values = parameters
     try:
       text = self.display_text_impl()
     finally:
-      self.finish()
+      self._finish()
     return text
   
   def get_parameters(self):
@@ -147,7 +147,7 @@ class _PCellDeclarationHelperMixin:
     """
     return self._param_decls
 
-  def get_values(self):
+  def _get_values(self):
     """
     Gets the temporary parameter values used for the current evaluation
 
@@ -158,7 +158,7 @@ class _PCellDeclarationHelperMixin:
     self._param_values = None
     return v
   
-  def init_values(self, values = None, layers = None, states = None):
+  def _init_values(self, values = None, layers = None, states = None):
     """
     initializes the temporary parameter values for the current evaluation
 
@@ -167,7 +167,7 @@ class _PCellDeclarationHelperMixin:
     "layers" are the layer indexes corresponding to the layer
     parameters.
     """
-    self.start()
+    self._start()
     self._param_values = None
     self._param_states = None
     if states:
@@ -180,17 +180,17 @@ class _PCellDeclarationHelperMixin:
       self._param_values = values
     self._layers = layers
 
-  def start(self):
+  def _start(self):
     """ 
     Is called to prepare the environment for an operation
-    After the operation, "finish" must be called.
+    After the operation, "_finish" must be called.
     This method will push the state onto a stack, hence implementing
     reentrant implementation methods.
     """
     self._state_stack.append( (self._param_values, self._param_states, self._layers, self.cell, self.layout, self.layer, self.shape) )
     self._reset_state()
 
-  def finish(self):
+  def _finish(self):
     """
     Is called at the end of an implementation of a PCellDeclaration method
     """
@@ -235,12 +235,12 @@ class _PCellDeclarationHelperMixin:
     The function delegates the implementation to callback_impl
     after updating the state of this object with the current parameters.
     """
-    self.init_values(states = states)
+    self._init_values(states = states)
     self.layout = layout
     try:
       self.callback_impl(name)
     finally:
-      self.finish()
+      self._finish()
 
   def coerce_parameters(self, layout, parameters):
     """
@@ -249,13 +249,13 @@ class _PCellDeclarationHelperMixin:
     The function delegates the implementation to coerce_parameters_impl
     after updating the state of this object with the current parameters.
     """
-    self.init_values(parameters)
+    self._init_values(parameters)
     self.layout = layout
     try:
       self.coerce_parameters_impl()
-      parameters = self.get_values()
+      parameters = self._get_values()
     finally:
-      self.finish()
+      self._finish()
     return parameters
 
   def produce(self, layout, layers, parameters, cell):
@@ -265,13 +265,13 @@ class _PCellDeclarationHelperMixin:
     The function delegates the implementation to produce_impl
     after updating the state of this object with the current parameters.
     """
-    self.init_values(parameters, layers)
+    self._init_values(parameters, layers)
     self.cell = cell
     self.layout = layout
     try:
       self.produce_impl()
     finally:
-      self.finish()
+      self._finish()
 
   def can_create_from_shape(self, layout, shape, layer):
     """
@@ -280,14 +280,14 @@ class _PCellDeclarationHelperMixin:
     The function delegates the implementation to can_create_from_shape_impl
     after updating the state of this object with the current parameters.
     """
-    self.start()
+    self._start()
     self.layout = layout
     self.shape = shape
     self.layer = layer
     try:
       ret = self.can_create_from_shape_impl()
     finally:
-      self.finish()
+      self._finish()
     return ret
   
   def transformation_from_shape(self, layout, shape, layer):
@@ -297,7 +297,7 @@ class _PCellDeclarationHelperMixin:
     The function delegates the implementation to transformation_from_shape_impl
     after updating the state of this object with the current parameters.
     """
-    self.start()
+    self._start()
     self.layout = layout
     self.shape = shape
     self.layer = layer
@@ -306,7 +306,7 @@ class _PCellDeclarationHelperMixin:
       if t is None:
         t = self._make_default_trans()
     finally:
-      self.finish()
+      self._finish()
     return t
   
   def parameters_from_shape(self, layout, shape, layer):
@@ -316,15 +316,15 @@ class _PCellDeclarationHelperMixin:
     The function delegates the implementation to parameters_from_shape_impl
     after updating the state of this object with the current parameters.
     """
-    self.init_values()
+    self._init_values()
     self.layout = layout
     self.shape = shape
     self.layer = layer
     try:
       self.parameters_from_shape_impl()
-      param = self.get_values()
+      param = self._get_values()
     finally:
-      self.finish()
+      self._finish()
     return param
   
   def display_text_impl(self):

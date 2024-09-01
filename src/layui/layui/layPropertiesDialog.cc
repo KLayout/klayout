@@ -343,9 +343,9 @@ PropertiesDialog::current_index_changed (const QModelIndex &index, const QModelI
           m_object_indexes.push_back (oi);
         }
 
-      } else {
+      } else if (mp_properties_pages [m_index]->count () > 0) {
 
-        m_object_indexes.push_back (size_t (mp_tree_model->object_index (index)));
+        m_object_indexes.push_back (0);
 
       }
 

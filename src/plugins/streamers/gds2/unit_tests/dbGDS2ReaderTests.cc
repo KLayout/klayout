@@ -704,3 +704,24 @@ TEST(5_issue893)
   db::compare_layouts (_this, layout, fn_au, db::WriteGDS2, 1);
 }
 
+//  PCell saved as top cell
+TEST(6_issue1835)
+{
+  db::Manager m (false);
+  db::Layout layout (&m);
+
+  db::LoadLayoutOptions options;
+
+  {
+    tl::InputStream file (tl::testdata () + "/gds/issue_1835.gds");
+    db::Reader reader (file);
+    reader.read (layout, options);
+  }
+
+  tl_assert (layout.begin_top_down () != layout.end_top_cells ());
+  layout.convert_cell_to_static (*layout.begin_top_down ());
+
+  std::string fn_au (tl::testdata () + "/gds/issue_1835_au.gds");
+  db::compare_layouts (_this, layout, fn_au, db::WriteGDS2, 1);
+}
+

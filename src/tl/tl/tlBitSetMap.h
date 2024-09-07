@@ -30,6 +30,7 @@
 #include "tlAssert.h"
 
 #include <algorithm>
+#include <vector>
 
 namespace tl
 {

@@ -733,6 +733,14 @@ public:
   void purge_nets_keep_pins ();
 
   /**
+   *  @brief Purges invalid devices
+   *
+   *  This method will purge all invalid devices, i.e. those
+   *  whose terminals are all connected to the same net.
+   */
+  void purge_devices ();
+
+  /**
    *  @brief Combine devices
    *
    *  This method will combine devices that can be combined according

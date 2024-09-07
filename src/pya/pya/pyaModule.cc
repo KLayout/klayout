@@ -93,8 +93,6 @@ PythonModule::cleanup ()
   //  the Python objects are probably deleted by Python itself as it exits -
   //  don't try to delete them again in the destructor.
   mp_module.release ();
-
-  PYAObjectBase::clear_callbacks_cache ();
 }
 
 PyObject *

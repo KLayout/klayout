@@ -32,19 +32,19 @@ namespace pya
 //  PythonRef implementation
 
 PythonRef::PythonRef ()
-  : mp_obj (NULL)
+  : mp_obj (NULL), m_owns_pointer (true)
 { 
   //  .. nothing yet ..
 }
 
 PythonRef::PythonRef (const PythonPtr &ptr)
-  : mp_obj (ptr.get ())
+  : mp_obj (ptr.get ()), m_owns_pointer (true)
 { 
   Py_XINCREF (mp_obj);
 }
 
 PythonRef::PythonRef (PyObject *obj, bool new_ref)
-  : mp_obj (obj)
+  : mp_obj (obj), m_owns_pointer (true)
 { 
   if (! new_ref) {
     Py_XINCREF (mp_obj);
@@ -53,38 +53,49 @@ PythonRef::PythonRef (PyObject *obj, bool new_ref)
 
 PythonRef &PythonRef::operator= (PyObject *obj)
 {
-  Py_XDECREF (mp_obj);
+  if (m_owns_pointer) {
+    Py_XDECREF (mp_obj);
+  }
   mp_obj = obj;
+  m_owns_pointer = true;
   return *this;
 }
 
 PythonRef &PythonRef::operator= (const PythonPtr &ptr)
 {
-  Py_XDECREF (mp_obj);
+  if (m_owns_pointer) {
+    Py_XDECREF (mp_obj);
+  }
   mp_obj = ptr.get ();
   Py_XINCREF (mp_obj);
+  m_owns_pointer = true;
   return *this;
 }
 
 PythonRef &PythonRef::operator= (const PythonRef &other)
 {
   if (this != &other && mp_obj != other.mp_obj) {
-    Py_XDECREF (mp_obj);
+    if (m_owns_pointer) {
+      Py_XDECREF (mp_obj);
+    }
     mp_obj = other.mp_obj;
+    m_owns_pointer = true;
     Py_XINCREF (mp_obj);
   }
   return *this;
 }
 
 PythonRef::PythonRef (const PythonRef &other)
-  : mp_obj (other.mp_obj)
+  : mp_obj (other.mp_obj), m_owns_pointer (true)
 {
   Py_XINCREF (mp_obj);
 }
 
 PythonRef::~PythonRef ()
 {
-  Py_XDECREF (mp_obj);
+  if (m_owns_pointer) {
+    Py_XDECREF (mp_obj);
+  }
 }
 
 PythonRef::operator bool () const
@@ -107,6 +118,12 @@ PyObject *PythonRef::release ()
   PyObject *o = mp_obj;
   mp_obj = NULL;
   return o;
+}
+
+PyObject *PythonRef::release_const () const
+{
+  m_owns_pointer = false;
+  return mp_obj;
 }
 
 // --------------------------------------------------------------------------

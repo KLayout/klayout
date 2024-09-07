@@ -394,25 +394,34 @@ CustomizeMenuConfigPage::apply (const std::vector<std::pair<std::string, std::st
   m_item_for_path.clear ();
   m_paths_for_action.clear ();
 
-  //  get the current bindings
-  m_current_bindings = mp_dispatcher->menu ()->get_shortcuts (false);
-
   //  get the default bindings
   std::map<std::string, std::string> default_bindings = mp_dispatcher->menu ()->get_shortcuts (true);
 
   m_enable_event = false;
 
   //  clear bindings and initialize with the given ones
-  std::map<std::string, std::string> b;
-  b.insert (key_bindings.begin (), key_bindings.end ());
-  for (std::map<std::string, std::string>::iterator kb = m_current_bindings.begin (); kb != m_current_bindings.end (); ++kb) {
-    std::map<std::string, std::string>::iterator bb = b.find (kb->first);
-    if (bb != b.end ()) {
-      lay::Action *a = mp_dispatcher->menu ()->action (kb->first);
-      kb->second = a->get_effective_shortcut_for (bb->second);
-    } else {
-      kb->second.clear ();
+  if (! key_bindings.empty ()) {
+
+    //  gets the current bindings and merges with the given ones
+    m_current_bindings = mp_dispatcher->menu ()->get_shortcuts (false);
+
+    std::map<std::string, std::string> b;
+    b.insert (key_bindings.begin (), key_bindings.end ());
+    for (std::map<std::string, std::string>::iterator kb = m_current_bindings.begin (); kb != m_current_bindings.end (); ++kb) {
+      std::map<std::string, std::string>::iterator bb = b.find (kb->first);
+      if (bb != b.end ()) {
+        lay::Action *a = mp_dispatcher->menu ()->action (kb->first);
+        kb->second = a->get_effective_shortcut_for (bb->second);
+      } else {
+        kb->second.clear ();
+      }
     }
+
+  } else {
+
+    //  an empty list is a request for reset
+    m_current_bindings = default_bindings;
+
   }
 
   //  clear hidden flags and initialize with the given ones

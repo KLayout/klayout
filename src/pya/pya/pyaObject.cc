@@ -514,8 +514,16 @@ PYAObjectBase::initialize_callbacks ()
 }
 
 void 
-PYAObjectBase::clear_callbacks_cache ()
+PYAObjectBase::clear_callbacks_cache (bool embedded)
 {
+  //  if not embedded, we cannot use the python API at this stage - do not try to
+  //  reference count the objects there.
+  if (! embedded) {
+    for (auto c = s_callbacks_cache.begin (); c != s_callbacks_cache.end (); ++c) {
+      c->first.release_const ();
+    }
+  }
+
   s_callbacks_cache.clear ();
 }
 

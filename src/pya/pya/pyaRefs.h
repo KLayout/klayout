@@ -117,6 +117,14 @@ public:
   PyObject *release ();
 
   /**
+   *  @brief Takes the pointer, but does not change the value
+   *  This method will stop the reference from managing the object, but
+   *  maintains the pointer. Do not access the pointer after this
+   *  operation.
+   */
+  PyObject *release_const () const;
+
+  /**
    *  @brief Comparison operator
    */
   bool operator== (const PythonRef &other) const
@@ -134,6 +142,7 @@ public:
 
 private:
   PyObject *mp_obj;
+  mutable bool m_owns_pointer;
 };
 
 /**

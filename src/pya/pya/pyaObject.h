@@ -200,7 +200,7 @@ public:
   /**
    *  @brief Clears the callbacks cache
    */
-  static void clear_callbacks_cache ();
+  static void clear_callbacks_cache (bool embedded);
 
 private:
   friend class StatusChangedListener;

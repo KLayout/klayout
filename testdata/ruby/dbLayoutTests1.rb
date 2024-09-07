@@ -2144,6 +2144,43 @@ class DBLayoutTests1_TestClass < TestBase
 
   end
 
+  # Methods taking LayoutInfo instead of layer index
+  def test_26
+
+    ly = RBA::Layout::new
+    top = ly.create_cell("TOP")
+    l1 = ly.layer(1, 0)
+
+    # ignored
+    ly.clear_layer(RBA::LayerInfo::new(2, 0))
+
+    top.shapes(l1).insert(RBA::Box::new(0, 0, 100, 200))
+    assert_equal(top.shapes(l1).size, 1)
+
+    ly.clear_layer(RBA::LayerInfo::new(1, 0))
+    assert_equal(top.shapes(l1).size, 0)
+
+    top.shapes(l1).insert(RBA::Box::new(0, 0, 100, 200))
+    assert_equal(top.shapes(l1).size, 1)
+
+    ly.clear_layer(RBA::LayerInfo::new(1, 0), RBA::Shapes::SPolygons)
+    assert_equal(top.shapes(l1).size, 1)
+
+    ly.clear_layer(RBA::LayerInfo::new(1, 0), RBA::Shapes::SBoxes)
+    assert_equal(top.shapes(l1).size, 0)
+
+    assert_equal(ly.layer_infos, [ RBA::LayerInfo::new(1, 0) ])
+
+    # ignored
+    ly.delete_layer(RBA::LayerInfo::new(2, 0))
+    assert_equal(ly.layer_infos, [ RBA::LayerInfo::new(1, 0) ])
+    
+    ly.delete_layer(RBA::LayerInfo::new(1, 0))
+    assert_equal(ly.layer_infos, [ ])
+
+  end
+
+
   # Iterating while flatten
   def test_issue200
 

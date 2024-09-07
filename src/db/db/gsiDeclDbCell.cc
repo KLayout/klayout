@@ -1802,6 +1802,39 @@ read_simple (db::Cell *cell, const std::string &path)
   return read_options (cell, path, db::LoadLayoutOptions ());
 }
 
+static db::Shapes &shapes_with_layer_info (db::Cell *cell, const db::LayerProperties &info)
+{
+  if (! cell->layout ()) {
+    throw tl::Exception (tl::to_string (tr ("Cell is not associated with a layout")));
+  }
+
+  unsigned int li = cell->layout ()->get_layer (info);
+  return cell->shapes (li);
+}
+
+static const db::Shapes &shapes_with_layer_info_const (const db::Cell *cell, const db::LayerProperties &info)
+{
+  if (! cell->layout ()) {
+    throw tl::Exception (tl::to_string (tr ("Cell is not associated with a layout")));
+  }
+
+  int li = cell->layout ()->get_layer_maybe (info);
+  if (li < 0) {
+    throw tl::Exception (tl::sprintf (tl::to_string (tr ("%s is not a valid layer within the layout of the cell")), info.to_string ()));
+  }
+
+  return cell->shapes ((unsigned int) li);
+}
+
+static void clear_layer_with_info (db::Cell *cell, const db::LayerProperties &info)
+{
+  if (cell->layout ()) {
+    int layer = cell->layout ()->get_layer_maybe (info);
+    if (layer >= 0) {
+      cell->clear ((unsigned int) layer);
+    }
+  }
+}
 
 static db::Point default_origin;
 
@@ -1992,9 +2025,21 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "This method gives access to the shapes list on a certain layer.\n"
     "If the layer does not exist yet, it is created.\n"
     "\n"
-    "@param index The layer index of the shapes list to retrieve\n"
+    "@param layer_index The layer index of the shapes list to retrieve\n"
     "\n"
     "@return A reference to the shapes list\n"
+  ) +
+  gsi::method_ext ("shapes", shapes_with_layer_info, gsi::arg ("layer"),
+    "@brief Returns the shapes list of the given layer\n"
+    "\n"
+    "This version takes a \\LayerInfo object and will look up the layer index. If no layer exists "
+    "with these attributes, it will be created.\n"
+    "\n"
+    "@param layer The layer attributes\n"
+    "\n"
+    "@return A reference to the shapes list\n"
+    "\n"
+    "This variant has been introduced in version 0.29.7.\n"
   ) +
   gsi::method_ext ("shapes", &shapes_of_cell_const, gsi::arg ("layer_index"),
     "@brief Returns the shapes list of the given layer (const version)\n"
@@ -2002,11 +2047,23 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "This method gives access to the shapes list on a certain layer. This is the const version - only const (reading) methods "
     "can be called on the returned object.\n"
     "\n"
-    "@param index The layer index of the shapes list to retrieve\n"
+    "@param layer_index The layer index of the shapes list to retrieve\n"
     "\n"
     "@return A reference to the shapes list\n"
     "\n"
     "This variant has been introduced in version 0.26.4.\n"
+  ) +
+  gsi::method_ext ("shapes", shapes_with_layer_info_const, gsi::arg ("layer"),
+    "@brief Returns the shapes list of the given layer (const version)\n"
+    "\n"
+    "This version takes a \\LayerInfo object and will look up the layer index. An error is raised if "
+    "no layer with these attributes exists.\n"
+    "\n"
+    "@param layer The layer attributes\n"
+    "\n"
+    "@return A reference to the shapes list\n"
+    "\n"
+    "This variant has been introduced in version 0.29.7.\n"
   ) +
   gsi::method ("clear_shapes", &db::Cell::clear_shapes,
     "@brief Clears all shapes in the cell\n"
@@ -2081,6 +2138,13 @@ Class<db::Cell> decl_Cell ("db", "Cell",
   ) + 
   gsi::method ("clear", &db::Cell::clear, gsi::arg ("layer_index"),
     "@brief Clears the shapes on the given layer\n"
+  ) +
+  gsi::method_ext ("clear", &clear_layer_with_info, gsi::arg ("layer"),
+    "@brief Clears the shapes on the given layer\n"
+    "\n"
+    "This version takes a \\LayerInfo object for the layer. If no such layer exists, this method does nothing.\n"
+    "\n"
+    "This variant has been introduced in version 0.29.7.\n"
   ) +
   gsi::method_ext ("clear", &clear_all,
     "@brief Clears the cell (deletes shapes and instances)\n"

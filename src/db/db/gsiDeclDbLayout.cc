@@ -1103,6 +1103,30 @@ void break_polygons1 (db::Layout *layout, size_t max_vertex_count, double max_ar
   db::break_polygons (*layout, max_vertex_count, max_area_ratio);
 }
 
+void delete_layer_from_info (db::Layout *layout, const db::LayerProperties &info)
+{
+  int li = layout->get_layer_maybe (info);
+  if (li >= 0) {
+    layout->delete_layer ((unsigned int) li);
+  }
+}
+
+void clear_layer_from_info (db::Layout *layout, const db::LayerProperties &info)
+{
+  int li = layout->get_layer_maybe (info);
+  if (li >= 0) {
+    layout->clear_layer ((unsigned int) li);
+  }
+}
+
+void clear_layer_from_info_with_flags (db::Layout *layout, const db::LayerProperties &info, unsigned int flags)
+{
+  int li = layout->get_layer_maybe (info);
+  if (li >= 0) {
+    layout->clear_layer ((unsigned int) li, flags);
+  }
+}
+
 Class<db::Layout> decl_Layout ("db", "Layout",
   gsi::constructor ("new", &layout_ctor_with_manager, gsi::arg ("manager"),
     "@brief Creates a layout object attached to a manager\n"
@@ -1963,8 +1987,18 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "\n"
     "This method was introduced in version 0.19.\n"
     "\n"
-    "@param layer_index The index of the layer to delete.\n"
+    "@param layer_index The index of the layer to clear.\n"
   ) +                               
+  gsi::method_ext ("clear_layer", &clear_layer_from_info, gsi::arg ("layer"),
+    "@brief Clears a layer\n"
+    "\n"
+    "This variant takes a \\LayerInfo object to address the layer.\n"
+    "It does nothing if no layer with these attributes exists.\n"
+    "\n"
+    "This variant was introduced in version 0.26.7.\n"
+    "\n"
+    "@param layer The attributes of the layer to clear.\n"
+  ) +
   gsi::method ("clear_layer", static_cast<void (db::Layout::*) (unsigned int, unsigned int)> (&db::Layout::clear_layer), gsi::arg ("layer_index"), gsi::arg ("flags"),
     "@brief Clears a layer (given shape types only)\n"
     "\n"
@@ -1972,8 +2006,18 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "\n"
     "This method was introduced in version 0.28.9.\n"
     "\n"
-    "@param layer_index The index of the layer to delete.\n"
+    "@param layer_index The index of the layer to clear.\n"
     "@param flags The type selector for the shapes to delete (see \\Shapes class, S... constants).\n"
+  ) +
+  gsi::method_ext ("clear_layer", &clear_layer_from_info_with_flags, gsi::arg ("layer"), gsi::arg ("flags"),
+    "@brief Clears a layer (given shape types only)\n"
+    "\n"
+    "This variant takes a \\LayerInfo object to address the layer.\n"
+    "It does nothing if no layer with these attributes exists.\n"
+    "\n"
+    "This variant was introduced in version 0.26.7.\n"
+    "\n"
+    "@param layer The attributes of the layer to clear.\n"
   ) +
   gsi::method ("delete_layer", &db::Layout::delete_layer, gsi::arg ("layer_index"),
     "@brief Deletes a layer\n"
@@ -1982,6 +2026,16 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "layer's index for reuse when the next layer is allocated.\n"
     "\n"
     "@param layer_index The index of the layer to delete.\n"
+  ) +
+  gsi::method_ext ("delete_layer", &delete_layer_from_info, gsi::arg ("layer"),
+    "@brief Deletes a layer\n"
+    "\n"
+    "This variant takes a \\LayerInfo object to address the layer.\n"
+    "It does nothing if no layer with these attributes exists.\n"
+    "\n"
+    "This variant was introduced in version 0.26.7.\n"
+    "\n"
+    "@param layer The attributes of the layer to delete.\n"
   ) +
   gsi::method_ext ("layer_indexes|#layer_indices", &layer_indexes,
     "@brief Gets a list of valid layer's indices\n"

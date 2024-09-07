@@ -66,6 +66,12 @@ public:
   ~PythonModule ();
 
   /**
+   *  @brief Clean up the module
+   *  This method is called by the interpreter before Py_Finalize
+   */
+  void cleanup ();
+
+  /**
    *  @brief Initializes the module
    *  This entry point is for external use where the module has not been created yet
    */

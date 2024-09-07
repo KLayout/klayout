@@ -34,6 +34,7 @@
 
 #include "pyaModule.h"
 #include "pyaUtils.h"
+#include "pya.h"
 
 #include "gsi.h"
 #include "gsiExpression.h"
@@ -41,7 +42,12 @@
 static PyObject *
 module_init (const char *pymod_name, const char *mod_name, const char *mod_description)
 {
-  static pya::PythonModule module;
+  if (! pya::PythonInterpreter::instance ()) {
+    return 0;
+  }
+
+  pya::PythonModule *module = new pya::PythonModule ();
+  pya::PythonInterpreter::instance ()->register_module (module);
 
   PYA_TRY
   
@@ -50,10 +56,10 @@ module_init (const char *pymod_name, const char *mod_name, const char *mod_descr
     //  required for the tiling processor for example
     gsi::initialize_expressions ();
 
-    module.init (pymod_name, mod_description);
-    module.make_classes (mod_name);
+    module->init (pymod_name, mod_description);
+    module->make_classes (mod_name);
 
-    return module.take_module ();
+    return module->take_module ();
 
   PYA_CATCH_ANYWHERE
   

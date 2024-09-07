@@ -51,6 +51,9 @@ pya_object_deallocate (PyObject *self)
   //  we better work around it.
   ++self->ob_refcnt;
 
+  //  Mute Python warnings in debug case
+  PyObject_GC_UnTrack (self);
+
   PYAObjectBase *p = PYAObjectBase::from_pyobject (self);
   p->~PYAObjectBase ();
   Py_TYPE (self)->tp_free (self);

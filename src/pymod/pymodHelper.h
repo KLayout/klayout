@@ -42,12 +42,7 @@
 static PyObject *
 module_init (const char *pymod_name, const char *mod_name, const char *mod_description)
 {
-  if (! pya::PythonInterpreter::instance ()) {
-    return 0;
-  }
-
-  pya::PythonModule *module = new pya::PythonModule ();
-  pya::PythonInterpreter::instance ()->register_module (module);
+  std::unique_ptr<pya::PythonModule> module (new pya::PythonModule ());
 
   PYA_TRY
   
@@ -59,10 +54,15 @@ module_init (const char *pymod_name, const char *mod_name, const char *mod_descr
     module->init (pymod_name, mod_description);
     module->make_classes (mod_name);
 
-    return module->take_module ();
+    PyObject *mod_object = module->take_module ();
+
+    tl_assert (pya::PythonInterpreter::instance () != 0);
+    pya::PythonInterpreter::instance ()->register_module (module.release ());
+
+    return mod_object;
 
   PYA_CATCH_ANYWHERE
-  
+
   return 0;
 }
 

@@ -360,6 +360,10 @@ PythonInterpreter::PythonInterpreter (bool embedded)
 
 PythonInterpreter::~PythonInterpreter ()
 {
+  for (auto m = m_modules.begin (); m != m_modules.end (); ++m) {
+    (*m)->cleanup ();
+  }
+
   m_stdout_channel = PythonRef ();
   m_stderr_channel = PythonRef ();
   m_stdout = PythonPtr ();
@@ -370,6 +374,23 @@ PythonInterpreter::~PythonInterpreter ()
   if (m_embedded) {
     Py_Finalize ();
   }
+
+  for (auto m = m_modules.begin (); m != m_modules.end (); ++m) {
+    delete *m;
+  }
+  m_modules.clear ();
+}
+
+void
+PythonInterpreter::register_module (pya::PythonModule *module)
+{
+  for (auto m = m_modules.begin (); m != m_modules.end (); ++m) {
+    if (*m == module) {
+      return; //  already registered
+    }
+  }
+
+  m_modules.push_back (module);
 }
 
 char *

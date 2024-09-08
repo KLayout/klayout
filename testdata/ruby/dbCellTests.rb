@@ -98,6 +98,32 @@ class DBCellTests_TestClass < TestBase
 
   end
 
+  # methods with LayerInfo instead layer index
+  def test_3
+
+    ly = RBA::Layout::new
+    top = ly.create_cell("TOP")
+
+    l1 = ly.layer(1, 0)
+    top.shapes(RBA::LayerInfo::new(1, 0)).insert(RBA::Box::new(0, 0, 100, 200))
+
+    assert_equal(top.shapes(l1).size, 1)
+
+    # unknown layers are ignored in clear
+    top.clear(RBA::LayerInfo::new(2, 0))
+    assert_equal(top.shapes(l1).size, 1)
+
+    # clear with LayerInfo
+    top.clear(RBA::LayerInfo::new(1, 0))
+    assert_equal(top.shapes(l1).size, 0)
+
+    # layer is created if not there
+    assert_equal(ly.layer_infos, [ RBA::LayerInfo::new(1, 0) ])
+    top.shapes(RBA::LayerInfo::new(2, 0)).insert(RBA::Box::new(0, 0, 100, 200))
+    assert_equal(ly.layer_infos, [ RBA::LayerInfo::new(1, 0), RBA::LayerInfo::new(2, 0) ])
+
+  end
+
 end
 
 load("test_epilogue.rb")

@@ -36,7 +36,7 @@ namespace db {
  *  See description of binned_area_collector for details.
  */
 template <class Value>
-class DB_PUBLIC binned_area_receiver
+class DB_PUBLIC_TEMPLATE binned_area_receiver
 {
 public:
   typedef db::coord_traits<db::Coord>::area_type area_type;
@@ -71,7 +71,7 @@ public:
  *  @brief A helper class providing an inserter that is the connection between the receiver and the provider
  */
 template <class Value>
-class DB_PUBLIC binned_area_inserter
+class DB_PUBLIC_TEMPLATE binned_area_inserter
 {
 public:
   typedef db::coord_traits<db::Coord>::area_type area_type;
@@ -115,7 +115,7 @@ private:
  *  is supposed to add up the areas in an application specific fashion.
  */
 template <class Value>
-class DB_PUBLIC binned_area_collector
+class DB_PUBLIC_TEMPLATE binned_area_collector
   : public EdgeEvaluatorBase,
     public EdgeSink
 {

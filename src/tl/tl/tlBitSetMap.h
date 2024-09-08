@@ -36,7 +36,7 @@ namespace tl
 {
 
 template <class Value>
-struct TL_PUBLIC bit_set_mask_node
+struct TL_PUBLIC_TEMPLATE bit_set_mask_node
 {
   bit_set_mask_node ()
     : mask (), next (0), value ()
@@ -56,7 +56,7 @@ struct TL_PUBLIC bit_set_mask_node
 };
 
 template <class Value>
-class TL_PUBLIC bit_set_mask_compare
+class TL_PUBLIC_TEMPLATE bit_set_mask_compare
 {
 public:
   bit_set_mask_compare (tl::BitSetMask::index_type bit, tl::BitSetMask::mask_type mask)
@@ -103,7 +103,7 @@ namespace tl
  *  "insert" and do a "sort" before using "lookup".
  */
 template <class Value>
-class TL_PUBLIC bit_set_map
+class TL_PUBLIC_TEMPLATE bit_set_map
 {
 public:
   typedef std::vector<bit_set_mask_node<Value> > node_list;

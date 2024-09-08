@@ -2190,7 +2190,7 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
   ) +
   gsi::method ("simplify", &db::Netlist::simplify,
     "@brief Convenience method that combines the simplification.\n"
-    "This method is a convenience method that runs \\make_top_level_pins, \\purge, \\combine_devices, \\purge_devices and \\purge_nets."
+    "This method is a convenience method that runs \\make_top_level_pins, \\purge, \\combine_devices and \\purge_nets."
   ) +
   gsi::method_ext ("read", &read_netlist, gsi::arg ("file"), gsi::arg ("reader"),
     "@brief Writes the netlist to the given file using the given reader object to parse the file\n"

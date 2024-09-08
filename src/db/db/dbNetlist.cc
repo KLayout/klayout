@@ -658,9 +658,6 @@ void Netlist::purge ()
 
     Circuit *circuit = c.operator-> ();
 
-    //  purge invalid devices
-    circuit->purge_devices ();
-
     //  purge floating, disconnected nets
     circuit->purge_nets ();
 

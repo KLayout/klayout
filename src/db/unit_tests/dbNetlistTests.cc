@@ -2034,7 +2034,7 @@ TEST(28_EliminateShortedDevices)
     "end;\n"
   );
 
-  nl.simplify ();
+  nl.purge_devices ();
 
   EXPECT_EQ (nl.to_string (),
     "circuit TOP (p1=n1,p2=n2);\n"

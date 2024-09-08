@@ -121,6 +121,12 @@ TEST(12_private)
   run_test (_this, "test_12.lvs", "test_12b.cir.gz", "test_12.gds.gz", true);
 }
 
+TEST(121_private)
+{
+  // test_is_long_runner ();
+  run_test (_this, "test_121.lvs", "test_121.cir.gz", "test_121.gds.gz", true);
+}
+
 TEST(13_private)
 {
   // test_is_long_runner ();

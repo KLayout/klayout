@@ -314,14 +314,14 @@ module RBA
 
     # Starts an operation - pushes the state on the state stack
 
-    def start
+    def _start
       @state_stack &lt;&lt; [ @param_values, @param_states, @layers, @cell, @layout, @layer, @shape ]
       self._reset_state
     end
 
     # Finishes an operation - pops the state from the state stack
 
-    def finish
+    def _finish
       if ! @state_stack.empty?
         @param_values, @param_states, @layers, @cell, @layout, @layer, @shape = @state_stack.pop
       else
@@ -455,13 +455,13 @@ module RBA
     
     # implementation of display_text
     def display_text(parameters)
-      self.start
+      self._start
       @param_values = parameters
       text = ""
       begin
         text = display_text_impl
       ensure
-        self.finish
+        self._finish
       end
       text
     end
@@ -478,33 +478,33 @@ module RBA
       
     # coerce parameters (make consistent)
     def coerce_parameters(layout, parameters)
-      self.start
+      self._start
       @param_values = parameters
       @layout = layout
       begin
         coerce_parameters_impl
       ensure
         ret = @param_values
-        self.finish
+        self._finish
       end
       ret
     end
 
     # parameter change callback
     def callback(layout, name, states)
-      self.start
+      self._start
       @param_states = states
       @layout = layout
       begin
         callback_impl(name)
       ensure
-        self.finish
+        self._finish
       end
     end
 
     # produce the layout    
     def produce(layout, layers, parameters, cell)
-      self.start
+      self._start
       @layers = layers
       @cell = cell
       @param_values = parameters
@@ -512,13 +512,13 @@ module RBA
       begin
         produce_impl
       ensure
-        self.finish
+        self._finish
       end
     end
 
     # produce a helper for can_create_from_shape
     def can_create_from_shape(layout, shape, layer)
-      self.start
+      self._start
       ret = false
       @layout = layout
       @shape = shape
@@ -526,14 +526,14 @@ module RBA
       begin
         ret = can_create_from_shape_impl
       ensure
-        self.finish
+        self._finish
       end
       ret
     end
     
     # produce a helper for transformation_from_shape
     def transformation_from_shape(layout, shape, layer)
-      self.start
+      self._start
       @layout = layout
       @shape = shape
       @layer = layer
@@ -541,7 +541,7 @@ module RBA
       begin
         t = transformation_from_shape_impl
       ensure
-        self.finish
+        self._finish
       end
       t
     end
@@ -549,7 +549,7 @@ module RBA
     # produce a helper for parameters_from_shape
     # with this helper, the implementation can use the parameter setters
     def parameters_from_shape(layout, shape, layer)
-      self.start
+      self._start
       @param_values = @param_decls.map { |pd| pd.default }
       @layout = layout
       @shape = shape
@@ -558,7 +558,7 @@ module RBA
         parameters_from_shape_impl
       ensure
         ret = @param_values
-        self.finish
+        self._finish
       end
       ret
     end

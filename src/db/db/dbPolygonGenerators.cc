@@ -56,13 +56,13 @@ public:
   typedef contour_type::iterator iterator;
 
   PGPolyContour ()
-    : m_is_hole (false), m_next (-1), m_last (-1)
+    : m_is_hole (false), m_next (-1), m_last (-1), m_size (0)
   {
     // ...
   }
 
   PGPolyContour (const PGPolyContour &d)
-    : m_contour (d.m_contour), m_is_hole (d.m_is_hole), m_next (d.m_next), m_last (d.m_last)
+    : m_contour (d.m_contour), m_is_hole (d.m_is_hole), m_next (d.m_next), m_last (d.m_last), m_size (d.m_size)
   {
     // ...
   }
@@ -74,6 +74,7 @@ public:
       m_is_hole = d.m_is_hole;
       m_next = d.m_next;
       m_last = d.m_last;
+      m_size = d.m_size;
     }
     return *this;
   }
@@ -86,14 +87,45 @@ public:
   db::Point &front () { return m_contour.front (); }
   const db::Point &back () const { return m_contour.back (); }
   db::Point &back () { return m_contour.back (); }
-  void push_back (const db::Point &p) { m_contour.push_back (p); }
-  void push_front (const db::Point &p) { m_contour.push_front (p); }
-  void pop_back () { m_contour.pop_back (); }
-  void pop_front () { m_contour.pop_front (); }
-  iterator erase (iterator i) { return m_contour.erase (i); }
-  iterator insert (iterator i, const db::Point &p) { return m_contour.insert (i, p); }
+
+  void push_back (const db::Point &p)
+  {
+    m_contour.push_back (p);
+    ++m_size;
+  }
+
+  void push_front (const db::Point &p)
+  {
+    m_contour.push_front (p);
+    ++m_size;
+  }
+
+  void pop_back ()
+  {
+    m_contour.pop_back ();
+    --m_size;
+  }
+
+  void pop_front ()
+  {
+    m_contour.pop_front ();
+    --m_size;
+  }
+
+  iterator erase (iterator i)
+  {
+    --m_size;
+    return m_contour.erase (i);
+  }
+
+  iterator insert (iterator i, const db::Point &p)
+  {
+    ++m_size;
+    return m_contour.insert (i, p);
+  }
+
   bool empty () const { return m_contour.empty (); }
-  size_t size () const { return m_contour.size (); }
+  size_t size () const { return m_size; }
 
   void last (long n) 
   {
@@ -127,19 +159,23 @@ public:
 
   void clear ()
   { 
+    m_size = 0;
     m_next = -1;
     m_last = -1;
     m_contour.clear ();
   }
 
-  void erase (iterator from, iterator to) 
+  void erase (iterator from, iterator to)
   {
+    m_size -= std::distance (from, to);
     m_contour.erase (from, to);
   }
 
   template <class I>
   iterator insert (iterator at, I from, I to)
   {
+    m_size += std::distance (from, to);
+
     //  NOTE: in some STL m_contour.insert already returns the new iterator
     size_t index_at = at - m_contour.begin ();
     m_contour.insert (at, from, to);
@@ -151,6 +187,7 @@ private:
   bool m_is_hole;
   long m_next;
   long m_last;
+  size_t m_size;
 };
 
 

@@ -410,6 +410,8 @@ PolygonGenerator::begin_scanline (db::Coord y)
   m_open_pos = m_open.begin ();
   m_y = y;
 
+  m_prev_stitch_index = std::numeric_limits<size_t>::max ();
+
 #ifdef DEBUG_POLYGON_GENERATOR
   printf ("m_open=");
   for (open_map_type::const_iterator o = m_open.begin (); o != m_open.end (); ++o) {
@@ -820,27 +822,68 @@ PolygonGenerator::join_contours (db::Coord x)
         tl_assert (c1.size () >= 2);
 
         PGPolyContour::iterator ins = cprev.end ();
-        db::Coord xprev = 0;
-        db::Edge eprev;
 
-#if 1
+        PGPolyContour::iterator ii = ins;
+        --ii;
+        PGPolyContour::iterator iii = ii;
+        --iii;
+
         //  shallow analysis: insert the cutline at the end of the sequence - this may
         //  cut lines collinear with contour edges
 
-        eprev = db::Edge (*(ins - 2), *(ins - 1));
-        xprev = db::coord_traits<db::Coord>::rounded (edge_xaty (db::Edge (*(ins - 2), *(ins - 1)), m_y));
-#else
-        //  deep analysis: determine insertion point: pick the one where the cutline is shortest
+        db::Edge eprev = db::Edge (*iii, *ii);
+        db::Coord xprev = db::coord_traits<db::Coord>::rounded (edge_xaty (eprev, m_y));
 
-        for (PGPolyContour::iterator i = ins; i > cprev.begin () + 1; --i) {
+#if 1  //  experimental
+        if (m_prev_stitch_index == iprev) {
 
-          db::Edge ecut (i[-2], i[-1]);
-          db::Coord xcut = db::coord_traits<db::Coord>::rounded (edge_xaty (db::Edge (i[-2], i[-1]), m_y));
+          auto i = m_prev_stitch_ins;
+          ii = i;
+          iii = --ii;
+          --iii;
 
-          if (ins == i || (i[-1].y () >= m_y && i[-2].y () < m_y && xcut < c1.back ().x () && xcut > xprev)) {
-            xprev = xcut;
-            eprev = ecut;
-            ins = i;
+          if (ii->y () >= m_y) {
+
+            db::Edge ecut (*iii, *ii);
+            db::Coord xcut = db::coord_traits<db::Coord>::rounded (edge_xaty (ecut, m_y));
+
+            if (iii->y () < m_y && xcut < c1.back ().x () && xcut > xprev) {
+              xprev = xcut;
+              eprev = ecut;
+              ins = i;
+            }
+
+          }
+
+        } else {
+
+          //  deep analysis: determine insertion point: pick the one where the cutline is shortest
+          //  CAUTION: this may introduce a O(2) complexity in the number of holes along the x axis
+
+          while (true) {
+
+            auto i = ii;
+
+            ii = iii;
+            if (ii == cprev.begin ()) {
+              break;
+            }
+
+            --iii;
+
+            if (ii->y () >= m_y) {
+
+              db::Edge ecut (*iii, *ii);
+              db::Coord xcut = db::coord_traits<db::Coord>::rounded (edge_xaty (ecut, m_y));
+
+              if (iii->y () < m_y && xcut < c1.back ().x () && xcut > xprev) {
+                xprev = xcut;
+                eprev = ecut;
+                ins = i;
+              }
+
+            }
+
           }
 
         }
@@ -864,6 +907,11 @@ PolygonGenerator::join_contours (db::Coord x)
         }
 
         ins = cprev.insert (ins, pprev);
+
+        //  remember the insertion point - it may be a candidate to attach the next hole
+        m_prev_stitch_ins = ins;
+        m_prev_stitch_index = iprev;
+
         ++ins;
         if (eprev.p2 () != pprev) {
           cprev.insert (ins, eprev.p2 ());

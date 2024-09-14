@@ -183,6 +183,8 @@ private:
   db::SimplePolygon m_spoly;
   static bool ms_compress;
   bool m_compress;
+  size_t m_prev_stitch_index;
+  std::list<db::Point>::iterator m_prev_stitch_ins;
 
   void join_contours (db::Coord x);
   void produce_poly (const PGPolyContour &c);

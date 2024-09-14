@@ -52,7 +52,7 @@ struct PGPoint
 class PGPolyContour
 {
 public:
-  typedef std::deque <db::Point> contour_type;
+  typedef std::list <db::Point> contour_type;
   typedef contour_type::const_iterator const_iterator;
   typedef contour_type::iterator iterator;
 
@@ -172,6 +172,13 @@ public:
     m_contour.erase (from, to);
   }
 
+  void splice (iterator at, PGPolyContour &contour)
+  {
+    m_size += contour.size ();
+    contour.m_size = 0;
+    m_contour.splice (at, contour.m_contour);
+  }
+
   template <class I>
   iterator insert (iterator at, I from, I to)
   {
@@ -194,8 +201,43 @@ private:
   size_t m_size;
 };
 
+static inline
+PGPolyContour::const_iterator operator+ (PGPolyContour::const_iterator i, int n)
+{
+  while (n-- > 0) {
+    ++i;
+  }
+  return i;
+}
 
-class PGContourList 
+static inline
+PGPolyContour::iterator operator+ (PGPolyContour::iterator i, int n)
+{
+  while (n-- > 0) {
+    ++i;
+  }
+  return i;
+}
+
+static inline
+PGPolyContour::const_iterator operator- (PGPolyContour::const_iterator i, int n)
+{
+  while (n-- > 0) {
+    --i;
+  }
+  return i;
+}
+
+static inline
+PGPolyContour::iterator operator- (PGPolyContour::iterator i, int n)
+{
+  while (n-- > 0) {
+    --i;
+  }
+  return i;
+}
+
+class PGContourList
 {
 public:
   PGContourList () 
@@ -528,7 +570,7 @@ void PolygonGenerator::eliminate_hole ()
   tl_assert (cprev.size () >= 2);
 
   //  Compute intersection point with next edge
-  db::Edge eprev (cprev.end ()[-2], cprev.back ());
+  db::Edge eprev (*(cprev.end () - 2), cprev.back ());
   db::Coord xprev = db::coord_traits<db::Coord>::rounded (edge_xaty (eprev, m_y));
   db::Point pprev (xprev, m_y);
 
@@ -538,7 +580,7 @@ void PolygonGenerator::eliminate_hole ()
 
   cc.is_hole (false);
   cc.push_back (c.front ());
-  cc.push_back (c.begin ()[1]);
+  cc.push_back (*(c.begin () + 1));
   if (pprev != cc.back ()) {
     cc.push_back (pprev);
   }
@@ -547,7 +589,7 @@ void PolygonGenerator::eliminate_hole ()
   }
 
   cprev.back () = pprev;
-  while (cprev.size () > 2 && cprev.back ().y () == m_y && cprev.end ()[-2].y () == m_y && cprev.back ().x () <= cprev.end ()[-2].x ()) {
+  while (cprev.size () > 2 && cprev.back ().y () == m_y && (cprev.end () - 2)->y () == m_y && cprev.back ().x () <= (cprev.end () - 2)->x ()) {
     cprev.pop_back ();
   }
   cprev.insert (cprev.end (), c.end () - 2, c.end ());
@@ -638,7 +680,7 @@ PolygonGenerator::join_contours (db::Coord x)
         tl_assert (cprev.size () >= 2);
 
         //  compute intersection point with next edge
-        db::Edge eprev (cprev.end ()[-2], cprev.back ());
+        db::Edge eprev (*(cprev.end () - 2), cprev.back ());
         db::Coord xprev = db::coord_traits<db::Coord>::rounded (edge_xaty (eprev, m_y));
         db::Point pprev (xprev, m_y);
 
@@ -646,13 +688,13 @@ PolygonGenerator::join_contours (db::Coord x)
         tl_assert (c2.size () >= 2);
 
         cprev.back () = pprev;
-        while (cprev.size () > 2 && cprev.back ().y () == m_y && cprev.end ()[-2].y () == m_y && cprev.back ().x () <= cprev.end ()[-2].x ()) {
+        while (cprev.size () > 2 && cprev.back ().y () == m_y && (cprev.end () - 2)->y () == m_y && cprev.back ().x () <= (cprev.end () - 2)->x ()) {
           cprev.pop_back ();
         }
 
         if (iprev == i1) {
 
-          if (cprev.begin ()->y () == m_y && cprev.begin ()[1].y () == m_y && cprev.front ().x () >= cprev.begin ()[1].x ()) {
+          if (cprev.front ().y () == m_y && (cprev.begin () + 1)->y () == m_y && cprev.front ().x () >= (cprev.begin () + 1)->x ()) {
             cprev.front () = cprev.back ();
           } else {
             cprev.push_front (cprev.back ());
@@ -662,7 +704,7 @@ PolygonGenerator::join_contours (db::Coord x)
 
         } else {
 
-          cprev.insert (cprev.end (), c1.begin (), c1.end ());
+          cprev.splice (cprev.end (), c1);
           cprev.is_hole (false);
 
           mp_contours->join (iprev, i1);
@@ -705,20 +747,16 @@ PolygonGenerator::join_contours (db::Coord x)
 
       } else if (! m_open_pos->first && ! n->first) {
 
-{
-  tl::SelfTimer timer ("PGContour::insert");
         //  remove c1 from list of contours, join with c2
         if (c2.is_hole ()) {
-          c2.insert (c2.end (), c1.begin () + 1, c1.end ());
+          c1.pop_front ();
+          c2.splice (c2.end (), c1);
         } else {
-          c2.insert (c2.begin (), c1.begin (), c1.end () - 1);
+          c1.pop_back ();
+          c2.splice (c2.begin (), c1);
         }
-}
 
-{
-  tl::SelfTimer timer ("join_contours");
         mp_contours->join (i2, i1);
-}
 
         open_map_iterator_type o = m_open_pos;
         do {
@@ -732,9 +770,11 @@ PolygonGenerator::join_contours (db::Coord x)
 
         //  remove c1 from list of contours, join with c2
         if (c2.is_hole ()) {  // yes! c2 is correct!
-          c1.insert (c1.end (), c2.begin () + 1, c2.end ());
+          c2.pop_front ();
+          c1.splice (c1.end (), c2);
         } else {
-          c1.insert (c1.begin (), c2.begin (), c2.end () - 1);
+          c2.pop_back ();
+          c1.splice (c1.begin (), c2);
         }
 
         mp_contours->join (i1, i2);
@@ -787,8 +827,8 @@ PolygonGenerator::join_contours (db::Coord x)
         //  shallow analysis: insert the cutline at the end of the sequence - this may
         //  cut lines collinear with contour edges
 
-        eprev = db::Edge (ins[-2], ins[-1]);
-        xprev = db::coord_traits<db::Coord>::rounded (edge_xaty (db::Edge (ins[-2], ins[-1]), m_y));
+        eprev = db::Edge (*(ins - 2), *(ins - 1));
+        xprev = db::coord_traits<db::Coord>::rounded (edge_xaty (db::Edge (*(ins - 2), *(ins - 1)), m_y));
 #else
         //  deep analysis: determine insertion point: pick the one where the cutline is shortest
 
@@ -810,17 +850,17 @@ PolygonGenerator::join_contours (db::Coord x)
         db::Point pprev (xprev, m_y);
 
         //  remove collinear edges along the cut line
-        ins[-1] = pprev;
-        while (ins - cprev.begin () > 1 && ins[-2].y () == m_y && ins[-1].y () == m_y) {
+        *(ins - 1) = pprev;
+        while (ins - 1 != cprev.begin () && (ins - 2)->y () == m_y && (ins - 1)->y () == m_y) {
           ins = cprev.erase (ins - 1);
         }
 
         if ((c1.begin () + 1)->y () == m_y) {
           ins = cprev.insert (ins, c1.begin () + 1, c1.end ());
-          ins += c1.size () - 1;
+          ins = ins + (c1.size () - 1);
         } else {
           ins = cprev.insert (ins, c1.begin (), c1.end ());
-          ins += c1.size ();
+          ins = ins + c1.size ();
         }
 
         ins = cprev.insert (ins, pprev);

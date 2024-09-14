@@ -98,14 +98,17 @@ static int64_t ns_time ()
 
 #elif defined(_MSC_VER)
 
-  FILETIME ft;
-  GetSystemTimeAsFileTime (&ft);
+  static LARGE_INTEGER freq = { 0 };
 
-  uint64_t t = (uint64_t (ft.dwHighDateTime) << (sizeof (ft.dwHighDateTime) * 8)) | uint64_t (ft.dwLowDateTime);
-  t -= ft_to_epoch_offset;
+  if (freq.QuadPart == 0) {
+    QueryPerformanceFrequency (&freq);
+    tl_assert (freq.QuadPart > 0);
+  }
 
-  //  FILETIME uses 100ns resolution, hence multiply with 100 to get ns:
-  return int64_t (t) * 100;
+  LARGE_INTEGER qpc;
+  QueryPerformanceCounter (&qpc);
+
+  return int64_t (double (qpc.QuadPart) / double (freq.QuadPart) * 1e9 + 0.5);
 
 #else
 

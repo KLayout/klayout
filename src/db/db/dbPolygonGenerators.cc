@@ -23,6 +23,7 @@
 
 
 #include "dbPolygonGenerators.h"
+#include "tlTimer.h"
 
 #include <vector>
 #include <deque>
@@ -175,11 +176,14 @@ public:
   iterator insert (iterator at, I from, I to)
   {
     m_size += std::distance (from, to);
-
+#if 0
     //  NOTE: in some STL m_contour.insert already returns the new iterator
     size_t index_at = at - m_contour.begin ();
     m_contour.insert (at, from, to);
     return m_contour.begin () + index_at;
+#else
+    return m_contour.insert (at, from, to);
+#endif
   }
 
 private:
@@ -701,14 +705,20 @@ PolygonGenerator::join_contours (db::Coord x)
 
       } else if (! m_open_pos->first && ! n->first) {
 
+{
+  tl::SelfTimer timer ("PGContour::insert");
         //  remove c1 from list of contours, join with c2
         if (c2.is_hole ()) {
           c2.insert (c2.end (), c1.begin () + 1, c1.end ());
         } else {
           c2.insert (c2.begin (), c1.begin (), c1.end () - 1);
         }
+}
 
+{
+  tl::SelfTimer timer ("join_contours");
         mp_contours->join (i2, i1);
+}
 
         open_map_iterator_type o = m_open_pos;
         do {

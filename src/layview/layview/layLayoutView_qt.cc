@@ -650,6 +650,11 @@ void LayoutView::close()
     ms_current = 0;
   }
 
+  if (mp_properties_dialog) {
+    //  must happen before "shutdown" (issue #1857)
+    delete mp_properties_dialog.data ();
+  }
+
   //  release all components and plugins before we delete the user interface
   shutdown ();
 
@@ -687,10 +692,6 @@ void LayoutView::close()
   }
   mp_bookmarks_frame = 0;
   mp_bookmarks_view = 0;
-
-  if (mp_properties_dialog) {
-    delete mp_properties_dialog.data ();
-  }
 }
 
 void

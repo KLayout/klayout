@@ -462,5 +462,20 @@ TEST(Backups)
   }
 }
 
+TEST(RefuseToWrite)
+{
+  try {
+    tl::OutputStream os ("");
+    EXPECT_EQ (1, 0);
+  } catch (tl::Exception &ex) {
+    EXPECT_EQ (ex.msg (), "Path cannot be an empty string");
+  }
 
+  try {
+    tl::OutputStream os (".");
+    EXPECT_EQ (1, 0);
+  } catch (tl::Exception &ex) {
+    EXPECT_EQ (ex.msg ().find ("Path exists and is a directory"), size_t (0));
+  }
+}
 

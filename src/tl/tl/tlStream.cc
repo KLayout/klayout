@@ -1178,20 +1178,34 @@ OutputStream::seek (size_t pos)
 OutputFileBase::OutputFileBase (const std::string &p, int keep_backups)
   : m_keep_backups (keep_backups), m_path (tl::absolute_file_path (p)), m_has_error (false)
 {
+  if (p.empty ()) {
+    throw tl::Exception (tl::to_string (tr ("Path cannot be an empty string")));
+  }
+
   if (tl::file_exists (m_path)) {
-    m_backup_path = m_path + ".~backup";
-    if (tl::file_exists (m_backup_path)) {
-      if (! tl::rm_file (m_backup_path)) {
-        tl::warn << tl::sprintf (tl::to_string (tr ("Could not create backup file: unable to remove existing file '%s'")), m_backup_path);
-        m_backup_path = std::string ();
+
+    if (tl::is_dir (m_path)) {
+
+      throw tl::Exception (tl::to_string (tr ("Path exists and is a directory: '%s'")), m_path);
+
+    } else {
+
+      m_backup_path = m_path + ".~backup";
+      if (tl::file_exists (m_backup_path)) {
+        if (! tl::rm_file (m_backup_path)) {
+          tl::warn << tl::sprintf (tl::to_string (tr ("Could not create backup file: unable to remove existing file '%s'")), m_backup_path);
+          m_backup_path = std::string ();
+        }
       }
-    }
-    if (! m_backup_path.empty ()) {
-      if (! tl::rename_file (m_path, tl::filename (m_backup_path))) {
-        tl::warn << tl::sprintf (tl::to_string (tr ("Could not create backup file: unable to rename original file '%s' to backup file")), m_path, m_backup_path);
-        m_backup_path = std::string ();
+      if (! m_backup_path.empty ()) {
+        if (! tl::rename_file (m_path, tl::filename (m_backup_path))) {
+          tl::warn << tl::sprintf (tl::to_string (tr ("Could not create backup file: unable to rename original file '%s' to backup file")), m_path, m_backup_path);
+          m_backup_path = std::string ();
+        }
       }
+
     }
+
   }
 }
 

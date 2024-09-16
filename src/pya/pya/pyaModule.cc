@@ -71,12 +71,6 @@ PythonModule::PythonModule ()
 
 PythonModule::~PythonModule ()
 {
-  PYAObjectBase::clear_callbacks_cache ();
-
-  //  the Python objects were probably deleted by Python itself as it exited -
-  //  don't try to delete them again.
-  mp_module.release ();
-
   while (!m_methods_heap.empty ()) {
     delete m_methods_heap.back ();
     m_methods_heap.pop_back ();
@@ -91,6 +85,14 @@ PythonModule::~PythonModule ()
     delete[] mp_mod_def;
     mp_mod_def = 0;
   }
+}
+
+void
+PythonModule::cleanup ()
+{
+  //  the Python objects are probably deleted by Python itself as it exits -
+  //  don't try to delete them again in the destructor.
+  mp_module.release ();
 }
 
 PyObject *

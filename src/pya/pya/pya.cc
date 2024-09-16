@@ -192,7 +192,7 @@ PythonInterpreter::PythonInterpreter (bool embedded)
 
     sp_interpreter = this;
 
-    //  this monitor whether Python shuts down and deletes the interpreter's
+    //  this monitors whether Python shuts down and deletes the interpreter's
     //  instance.
     //  NOTE: this assumes, the interpreter was created with new(!)
     Py_AtExit (&reset_interpreter);
@@ -360,6 +360,12 @@ PythonInterpreter::PythonInterpreter (bool embedded)
 
 PythonInterpreter::~PythonInterpreter ()
 {
+  for (auto m = m_modules.begin (); m != m_modules.end (); ++m) {
+    (*m)->cleanup ();
+  }
+
+  PYAObjectBase::clear_callbacks_cache (m_embedded);
+
   m_stdout_channel = PythonRef ();
   m_stderr_channel = PythonRef ();
   m_stdout = PythonPtr ();
@@ -370,6 +376,23 @@ PythonInterpreter::~PythonInterpreter ()
   if (m_embedded) {
     Py_Finalize ();
   }
+
+  for (auto m = m_modules.begin (); m != m_modules.end (); ++m) {
+    delete *m;
+  }
+  m_modules.clear ();
+}
+
+void
+PythonInterpreter::register_module (pya::PythonModule *module)
+{
+  for (auto m = m_modules.begin (); m != m_modules.end (); ++m) {
+    if (*m == module) {
+      return; //  already registered
+    }
+  }
+
+  m_modules.push_back (module);
 }
 
 char *

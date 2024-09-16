@@ -106,6 +106,14 @@ public:
   ~PythonInterpreter ();
 
   /**
+   *  @brief Registers a module
+   *
+   *  The registered modules are cleaned up before the interpreter shuts down. The interpreter takes
+   *  ownership of the module object.
+   */
+  void register_module (pya::PythonModule *module);
+
+  /**
    *  @brief Add the given path to the search path
    */
   void add_path (const std::string &path, bool prepend = false);
@@ -279,7 +287,7 @@ private:
   std::map<PyObject *, size_t> m_file_id_map;
   std::wstring mp_py3_app_name;
   bool m_embedded;
-  std::unique_ptr<pya::PythonModule> m_pya_module;
+  std::vector<pya::PythonModule *> m_modules;
 };
 
 }

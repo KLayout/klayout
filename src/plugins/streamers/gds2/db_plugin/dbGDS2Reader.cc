@@ -282,7 +282,7 @@ GDS2Reader::path () const
 void 
 GDS2Reader::error (const std::string &msg)
 {
-  throw GDS2ReaderException (msg, m_stream.pos (), m_recnum, cellname ().c_str ());
+  throw GDS2ReaderException (msg, m_stream.pos (), m_recnum, cellname ().c_str (), m_stream.source ());
 }
 
 void 
@@ -292,12 +292,20 @@ GDS2Reader::warn (const std::string &msg, int wl)
     return;
   }
 
-  // TODO: compress
-  tl::warn << msg 
-           << tl::to_string (tr (" (position=")) << m_stream.pos ()
-           << tl::to_string (tr (", record number=")) << m_recnum
-           << tl::to_string (tr (", cell=")) << cellname ().c_str ()
-           << ")";
+  if (first_warning ()) {
+    tl::warn << tl::sprintf (tl::to_string (tr ("In file %s:")), m_stream.source ());
+  }
+
+  int ws = compress_warning (msg);
+  if (ws < 0) {
+    tl::warn << msg
+             << tl::to_string (tr (" (position=")) << m_stream.pos ()
+             << tl::to_string (tr (", record number=")) << m_recnum
+             << tl::to_string (tr (", cell=")) << cellname ().c_str ()
+             << ")";
+  } else if (ws == 0) {
+    tl::warn << tl::to_string (tr ("... further warnings of this kind are not shown"));
+  }
 }
 
 }

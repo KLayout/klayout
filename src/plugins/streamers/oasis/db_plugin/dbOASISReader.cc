@@ -482,7 +482,7 @@ OASISReader::get_gdelta (long grid)
 void
 OASISReader::error (const std::string &msg)
 {
-  throw OASISReaderException (msg, m_stream.pos (), m_cellname.c_str ());
+  throw OASISReaderException (msg, m_stream.pos (), m_cellname.c_str (), m_stream.source ());
 }
 
 void
@@ -493,13 +493,25 @@ OASISReader::warn (const std::string &msg, int wl)
   }
 
   if (warnings_as_errors ()) {
+
     error (msg);
+
   } else {
-    // TODO: compress
-    tl::warn << msg
-             << tl::to_string (tr (" (position=")) << m_stream.pos ()
-             << tl::to_string (tr (", cell=")) << m_cellname
-             << ")";
+
+    if (first_warning ()) {
+      tl::warn << tl::sprintf (tl::to_string (tr ("In file %s:")), m_stream.source ());
+    }
+
+    int ws = compress_warning (msg);
+    if (ws < 0) {
+      tl::warn << msg
+               << tl::to_string (tr (" (position=")) << m_stream.pos ()
+               << tl::to_string (tr (", cell=")) << m_cellname
+               << ")";
+    } else if (ws == 0) {
+      tl::warn << tl::to_string (tr ("... further warnings of this kind are not shown"));
+    }
+
   }
 }
 

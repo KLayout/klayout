@@ -298,7 +298,7 @@ GDS2ReaderText::path () const
 void 
 GDS2ReaderText::error (const std::string &msg)
 {
-  throw GDS2ReaderTextException (msg, int(sStream.line_number()), cellname().c_str ());
+  throw GDS2ReaderTextException (msg, int (sStream.line_number()), cellname ().c_str (), sStream.source ());
 }
 
 void 
@@ -308,11 +308,19 @@ GDS2ReaderText::warn (const std::string &msg, int wl)
     return;
   }
 
-  // TODO: compress
-  tl::warn << msg 
-           << tl::to_string (tr (", line number=")) << sStream.line_number()
-           << tl::to_string (tr (", cell=")) << cellname ().c_str ()
-           << ")";
+  if (first_warning ()) {
+    tl::warn << tl::sprintf (tl::to_string (tr ("In file %s:")), sStream.source ());
+  }
+
+  int ws = compress_warning (msg);
+  if (ws < 0) {
+    tl::warn << msg
+             << tl::to_string (tr (", line number=")) << sStream.line_number()
+             << tl::to_string (tr (", cell=")) << cellname ().c_str ()
+             << ")";
+  } else if (ws == 0) {
+    tl::warn << tl::to_string (tr ("... further warnings of this kind are not shown"));
+  }
 }
 
 void 

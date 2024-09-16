@@ -92,7 +92,7 @@ public:
    */
   double sec_wall () const
   {
-    return (double (m_wall_ms_res) * 0.001);
+    return (double (m_wall_ns_res) * 1e-9);
   }
 
   /**
@@ -101,8 +101,8 @@ public:
   static size_t memory_size ();
 
 private:
-  timer_t m_user_ms, m_sys_ms, m_wall_ms;
-  timer_t m_user_ms_res, m_sys_ms_res, m_wall_ms_res;
+  timer_t m_user_ms, m_sys_ms, m_wall_ns;
+  timer_t m_user_ms_res, m_sys_ms_res, m_wall_ns_res;
 };
 
 /**
@@ -182,7 +182,7 @@ public:
   /**
    *  @brief Default constructor: construct a clock object pointing to an arbitrary value
    */
-  Clock () : m_clock_ms (0)
+  Clock () : m_clock_ns (0)
   {
     // .. nothing yet ..
   }
@@ -196,7 +196,7 @@ public:
    *  @brief Copy constructor
    */
   Clock (const Clock &d)
-    : m_clock_ms (d.m_clock_ms)
+    : m_clock_ns (d.m_clock_ns)
   {
     //  .. nothing yet ..
   }
@@ -206,7 +206,7 @@ public:
    */
   Clock &operator= (Clock d)
   {
-    m_clock_ms = d.m_clock_ms;
+    m_clock_ns = d.m_clock_ns;
     return *this;
   }
 
@@ -215,7 +215,7 @@ public:
    */
   bool operator== (Clock d) const
   {
-    return m_clock_ms == d.m_clock_ms;
+    return m_clock_ns == d.m_clock_ns;
   }
 
   /**
@@ -231,7 +231,7 @@ public:
    */
   bool operator< (Clock d) const
   {
-    return m_clock_ms < d.m_clock_ms;
+    return m_clock_ns < d.m_clock_ns;
   }
 
   /**
@@ -239,7 +239,7 @@ public:
    */
   Clock &operator-= (Clock d)
   {
-    m_clock_ms -= d.m_clock_ms;
+    m_clock_ns -= d.m_clock_ns;
     return *this;
   }
 
@@ -264,7 +264,7 @@ public:
   static Clock current ();
 
 private:
-  timer_t m_clock_ms;
+  timer_t m_clock_ns;
 };
 
 } // namespace tl

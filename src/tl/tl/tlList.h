@@ -109,14 +109,128 @@ private:
   bool m_owned;
 };
 
+/**
+ *  @brief An iterator for the linked list
+ */
+template <class C>
+class list_iterator
+{
+public:
+  typedef std::bidirectional_iterator_tag category;
+  typedef C value_type;
+  typedef C &reference;
+  typedef C *pointer;
+
+  list_iterator (C *p = 0) : mp_p (p) { }
+  list_iterator operator++ () { mp_p = static_cast<C *> (mp_p->mp_next); return *this; }
+  list_iterator operator-- () { mp_p = static_cast<C *> (mp_p->mp_prev); return *this; }
+
+  list_iterator operator++ (int)
+  {
+    list_iterator r = *this;
+    ++*this;
+    return r;
+  }
+
+  list_iterator operator-- (int)
+  {
+    list_iterator r = *this;
+    --*this;
+    return r;
+  }
+
+  C *operator-> () const
+  {
+    return mp_p;
+  }
+
+  C &operator* () const
+  {
+    return *mp_p;
+  }
+
+  bool operator== (list_iterator other) const { return mp_p == other.mp_p; }
+  bool operator!= (list_iterator other) const { return mp_p != other.mp_p; }
+
+private:
+   C *mp_p;
+};
+
+/**
+ *  @brief A reverse iterator for the linked list
+ */
+template <class C>
+class reverse_list_iterator
+{
+public:
+  typedef std::bidirectional_iterator_tag category;
+  typedef C value_type;
+  typedef C &reference;
+  typedef C *pointer;
+
+  reverse_list_iterator (C *p = 0) : mp_p (p) { }
+  reverse_list_iterator operator++ () { mp_p = static_cast<C *> (mp_p->mp_prev); return *this; }
+  reverse_list_iterator operator-- () { mp_p = static_cast<C *> (mp_p->mp_next); return *this; }
+
+  reverse_list_iterator operator++ (int)
+  {
+    reverse_list_iterator r = *this;
+    ++*this;
+    return r;
+  }
+
+  reverse_list_iterator operator-- (int)
+  {
+    reverse_list_iterator r = *this;
+    --*this;
+    return r;
+  }
+
+  C *operator-> () const
+  {
+    return mp_p;
+  }
+
+  C &operator* () const
+  {
+    return *mp_p;
+  }
+
+  bool operator== (reverse_list_iterator other) const { return mp_p == other.mp_p; }
+  bool operator!= (reverse_list_iterator other) const { return mp_p != other.mp_p; }
+
+private:
+   C *mp_p;
+};
+
 template <class C>
 class list_impl<C, false>
 {
 public:
+  typedef list_iterator<C> iterator;
+  typedef list_iterator<const C> const_iterator;
+  typedef reverse_list_iterator<C> reverse_iterator;
+  typedef reverse_list_iterator<const C> const_reverse_iterator;
+
+  typedef C value_type;
+
   list_impl () : m_head (), m_back ()
   {
     m_head.mp_next = &m_back;
     m_back.mp_prev = &m_head;
+  }
+
+  list_impl (const list_impl &&other)
+  {
+    swap (other);
+  }
+
+  list_impl &operator= (const list_impl &&other)
+  {
+    if (&other != this) {
+      swap (other);
+    }
+    return *this;
   }
 
   list_impl (const list_impl &) { tl_assert (false); }
@@ -140,6 +254,18 @@ public:
       delete c;
     } else {
       c->unlink ();
+    }
+  }
+
+  void erase (iterator i)
+  {
+    erase (i.operator-> ());
+  }
+
+  void erase (iterator from, iterator to)
+  {
+    while (from != to) {
+      erase (from++);
     }
   }
 
@@ -196,14 +322,24 @@ public:
     delete first ();
   }
 
-  void insert (C *after, C *new_obj)
+  C *insert (C *after, C *new_obj)
   {
-    insert_impl (after, new_obj, true);
+    return insert_impl (after, new_obj, true);
   }
 
-  void insert_before (C *before, C *new_obj)
+  iterator insert (iterator after, C *new_obj)
   {
-    insert_before_impl (before, new_obj, true);
+    return iterator (insert (after.operator-> (), new_obj));
+  }
+
+  C *insert_before (C *before, C *new_obj)
+  {
+    return insert_before_impl (before, new_obj, true);
+  }
+
+  iterator insert_before (iterator before, C *new_obj)
+  {
+    return iterator (insert_before_impl (before.operator-> (), new_obj, true));
   }
 
   void push_back (C *new_obj)
@@ -216,14 +352,24 @@ public:
     push_front_impl (new_obj, true);
   }
 
-  void insert (C *after, C &new_obj)
+  C *insert (C *after, C &new_obj)
   {
-    insert_impl (after, &new_obj, false);
+    return insert_impl (after, &new_obj, false);
   }
 
-  void insert_before (C *before, C &new_obj)
+  iterator insert (iterator after, C &new_obj)
   {
-    insert_before_impl (before, &new_obj, false);
+    return iterator (insert_impl (after.operator-> (), &new_obj, false));
+  }
+
+  C *insert_before (C *before, C &new_obj)
+  {
+    return insert_before_impl (before, &new_obj, false);
+  }
+
+  iterator insert_before (iterator before, C &new_obj)
+  {
+    return iterator (insert_before_impl (before.operator-> (), &new_obj, false));
   }
 
   void push_back (C &new_obj)
@@ -269,7 +415,7 @@ protected:
 private:
   list_node<C> m_head, m_back;
 
-  void insert_impl (C *after, C *new_obj, bool owned)
+  C *insert_impl (C *after, C *new_obj, bool owned)
   {
     list_node<C> *after_node = after;
     if (! after) {
@@ -281,9 +427,11 @@ private:
     after_node->mp_next = new_obj;
     new_obj->mp_prev = after_node;
     new_obj->mp_next->mp_prev = new_obj;
+
+    return new_obj;
   }
 
-  void insert_before_impl (C *before, C *new_obj, bool owned)
+  C *insert_before_impl (C *before, C *new_obj, bool owned)
   {
     list_node<C> *before_node = before;
     if (! before) {
@@ -295,6 +443,8 @@ private:
     before_node->mp_prev = new_obj;
     new_obj->mp_next = before_node;
     new_obj->mp_prev->mp_next = new_obj;
+
+    return new_obj;
   }
 
   void push_back_impl (C *new_obj, bool owned)
@@ -313,6 +463,11 @@ class list_impl<C, true>
   : public list_impl<C, false>
 {
 public:
+  typedef typename list_impl<C, false>::iterator iterator;
+  typedef typename list_impl<C, false>::const_iterator const_iterator;
+  typedef typename list_impl<C, false>::reverse_iterator reverse_iterator;
+  typedef typename list_impl<C, false>::const_reverse_iterator const_reverse_iterator;
+
   using list_impl<C, false>::insert;
   using list_impl<C, false>::push_back;
   using list_impl<C, false>::pop_back;
@@ -339,14 +494,52 @@ public:
     return *this;
   }
 
-  void insert (C *after, const C &obj)
+  C *insert (C *after, const C &obj)
   {
-    insert (after, new C (obj));
+    return insert (after, new C (obj));
   }
 
-  void insert_before (C *before, const C &obj)
+  iterator insert (iterator after, const C &obj)
   {
-    insert_before (before, new C (obj));
+    return insert (after, new C (obj));
+  }
+
+  template <class Iter>
+  iterator insert (iterator after, Iter from, Iter to)
+  {
+    if (from == to) {
+      return after;
+    } else {
+      iterator first = this->insert (after, *from++);
+      for (iterator next = first; from != to; ++from) {
+        next = this->insert (next, *from);
+      }
+      return first;
+    }
+  }
+
+  C *insert_before (C *before, const C &obj)
+  {
+    return insert_before (before, new C (obj));
+  }
+
+  iterator insert_before (iterator before, const C &obj)
+  {
+    return insert_before (before, new C (obj));
+  }
+
+  template <class Iter>
+  iterator insert_before (iterator before, Iter from, Iter to)
+  {
+    if (from == to) {
+      return before;
+    } else {
+      iterator first = this->insert_before (before, *from++);
+      for (iterator next = first; from != to; ++from) {
+        next = this->insert (next, *from);
+      }
+      return first;
+    }
   }
 
   void push_back (const C &obj)
@@ -358,72 +551,6 @@ public:
   {
     insert (0, new C (obj));
   }
-};
-
-/**
- *  @brief An iterator for the linked list
- */
-template <class C>
-class list_iterator
-{
-public:
-  typedef std::bidirectional_iterator_tag category;
-  typedef C value_type;
-  typedef C &reference;
-  typedef C *pointer;
-
-  list_iterator (C *p = 0) : mp_p (p) { }
-  list_iterator operator++ () { mp_p = static_cast<C *> (mp_p->mp_next); return *this; }
-  list_iterator operator-- () { mp_p = static_cast<C *> (mp_p->mp_prev); return *this; }
-
-  C *operator-> () const
-  {
-    return mp_p;
-  }
-
-  C &operator* () const
-  {
-    return *mp_p;
-  }
-
-  bool operator== (list_iterator other) const { return mp_p == other.mp_p; }
-  bool operator!= (list_iterator other) const { return mp_p != other.mp_p; }
-
-private:
-   C *mp_p;
-};
-
-/**
- *  @brief A reverse iterator for the linked list
- */
-template <class C>
-class reverse_list_iterator
-{
-public:
-  typedef std::bidirectional_iterator_tag category;
-  typedef C value_type;
-  typedef C &reference;
-  typedef C *pointer;
-
-  reverse_list_iterator (C *p = 0) : mp_p (p) { }
-  reverse_list_iterator operator++ () { mp_p = static_cast<C *> (mp_p->mp_prev); return *this; }
-  reverse_list_iterator operator-- () { mp_p = static_cast<C *> (mp_p->mp_next); return *this; }
-
-  C *operator-> () const
-  {
-    return mp_p;
-  }
-
-  C &operator* () const
-  {
-    return *mp_p;
-  }
-
-  bool operator== (reverse_list_iterator other) const { return mp_p == other.mp_p; }
-  bool operator!= (reverse_list_iterator other) const { return mp_p != other.mp_p; }
-
-private:
-   C *mp_p;
 };
 
 /**
@@ -448,12 +575,10 @@ class list
   : public list_impl<C, CanCopy>
 {
 public:
-  typedef list_iterator<C> iterator;
-  typedef list_iterator<const C> const_iterator;
-  typedef reverse_list_iterator<C> reverse_iterator;
-  typedef reverse_list_iterator<const C> const_reverse_iterator;
-
-  typedef C value_type;
+  typedef typename list_impl<C, CanCopy>::iterator iterator;
+  typedef typename list_impl<C, CanCopy>::const_iterator const_iterator;
+  typedef typename list_impl<C, CanCopy>::reverse_iterator reverse_iterator;
+  typedef typename list_impl<C, CanCopy>::const_reverse_iterator const_reverse_iterator;
 
   using list_impl<C, CanCopy>::first;
   using list_impl<C, CanCopy>::last;

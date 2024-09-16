@@ -403,3 +403,70 @@ TEST(2_BasicNoCopy)
 
   EXPECT_EQ (obj_count, size_t (0)); // mc2 gone as well
 }
+
+TEST(3_Insert)
+{
+  obj_count = 0;
+
+  tl::list<MyClass1> l1;
+  tl::list<MyClass1>::iterator i1;
+
+  EXPECT_EQ (l1.empty (), true);
+  EXPECT_EQ (l1.size (), size_t (0));
+  EXPECT_EQ (l2s (l1), "");
+
+  l1.push_back (MyClass1 (42));
+  EXPECT_EQ (l2s (l1), "42");
+  EXPECT_EQ (l1.size (), size_t (1));
+
+  i1 = l1.insert_before (l1.end (), MyClass1 (17));
+  EXPECT_EQ (l2s (l1), "42,17");
+  EXPECT_EQ (i1->n, 17);
+  EXPECT_EQ (l1.size (), size_t (2));
+
+  i1 = l1.insert_before (i1, MyClass1 (11));
+  EXPECT_EQ (l2s (l1), "42,11,17");
+  EXPECT_EQ (i1->n, 11);
+  EXPECT_EQ (l1.size (), size_t (3));
+
+  i1 = l1.insert (i1, MyClass1 (12));
+  EXPECT_EQ (l2s (l1), "42,11,12,17");
+  EXPECT_EQ (i1->n, 12);
+  EXPECT_EQ (l1.size (), size_t (4));
+
+  MyClass1 arr[3] = { MyClass1 (1), MyClass1 (2), MyClass1 (3) };
+
+  i1 = l1.insert (i1, arr + 0, arr + 0);
+  EXPECT_EQ (l2s (l1), "42,11,12,17");
+  EXPECT_EQ (i1->n, 12);
+  EXPECT_EQ (l1.size (), size_t (4));
+
+  i1 = l1.insert (i1, arr + 0, arr + 3);
+  EXPECT_EQ (l2s (l1), "42,11,12,1,2,3,17");
+  EXPECT_EQ (i1->n, 1);
+  EXPECT_EQ (l1.size (), size_t (7));
+
+  l1.clear ();
+  l1.push_back (MyClass1 (42));
+  i1 = l1.insert_before (l1.end (), MyClass1 (17));
+  EXPECT_EQ (l2s (l1), "42,17");
+  EXPECT_EQ (i1->n, 17);
+  EXPECT_EQ (l1.size (), size_t (2));
+
+  i1 = l1.insert_before (i1, arr + 0, arr + 0);
+  EXPECT_EQ (l2s (l1), "42,17");
+  EXPECT_EQ (i1->n, 17);
+  EXPECT_EQ (l1.size (), size_t (2));
+
+  i1 = l1.insert_before (i1, arr + 0, arr + 3);
+  EXPECT_EQ (l2s (l1), "42,1,2,3,17");
+  EXPECT_EQ (i1->n, 1);
+  EXPECT_EQ (l1.size (), size_t (5));
+
+  //  test erase range
+  l1.erase (i1, l1.end ());
+  EXPECT_EQ (l2s (l1), "42");
+  EXPECT_EQ (l1.size (), size_t (1));
+}
+
+

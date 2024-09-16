@@ -82,9 +82,9 @@ void current_utc_time (struct timespec *ts)
 }
 
 // -------------------------------------------------------------
-//  Gets the current time in ms from epoch
+//  Gets the current time in ns from epoch
 
-static int64_t ms_time ()
+static int64_t ns_time ()
 {
 #if defined(__MACH__) && defined(__APPLE__)
 
@@ -94,24 +94,27 @@ static int64_t ms_time ()
   clock_get_time(cclock, &mts);
   mach_port_deallocate(mach_task_self(), cclock);
 
-  return int64_t (mts.tv_sec) * 1000 + int64_t (0.5 + mts.tv_nsec / 1.0e6);
+  return int64_t (mts.tv_sec) * 1000000000 + int64_t (mts.tv_nsec);
 
 #elif defined(_MSC_VER)
 
-  FILETIME ft;
-  GetSystemTimeAsFileTime (&ft);
+  static LARGE_INTEGER freq = { 0 };
 
-  uint64_t t = (uint64_t (ft.dwHighDateTime) << (sizeof (ft.dwHighDateTime) * 8)) | uint64_t (ft.dwLowDateTime);
-  t -= ft_to_epoch_offset;
+  if (freq.QuadPart == 0) {
+    QueryPerformanceFrequency (&freq);
+    tl_assert (freq.QuadPart > 0);
+  }
 
-  //  FILETIME uses 100ns resolution, hence divide by 10000 to get ms:
-  return int64_t (t / 10000);
+  LARGE_INTEGER qpc;
+  QueryPerformanceCounter (&qpc);
+
+  return int64_t (double (qpc.QuadPart) / double (freq.QuadPart) * 1e9 + 0.5);
 
 #else
 
   timespec ts;
   clock_gettime (CLOCK_REALTIME, &ts);
-  return int64_t (ts.tv_sec) * 1000 + int64_t (0.5 + ts.tv_nsec / 1.0e6);
+  return int64_t (ts.tv_sec) * 1000000000 + int64_t (ts.tv_nsec);
 
 #endif
 }
@@ -120,8 +123,8 @@ static int64_t ms_time ()
 //  Implementation of Timer
 
 Timer::Timer ()
-    : m_user_ms (0), m_sys_ms (0), m_wall_ms (0),
-      m_user_ms_res (0), m_sys_ms_res (0), m_wall_ms_res (0)
+    : m_user_ms (0), m_sys_ms (0), m_wall_ns (0),
+      m_user_ms_res (0), m_sys_ms_res (0), m_wall_ns_res (0)
 {
   // ..
 }
@@ -142,7 +145,7 @@ Timer::start ()
   m_sys_ms += (timer_t) ((clks.tms_stime + clks.tms_cstime) * clk2msec + 0.5);
 #endif
 
-  m_wall_ms += ms_time ();
+  m_wall_ns += ns_time ();
 }
 
 void
@@ -150,15 +153,15 @@ Timer::stop ()
 {
   m_user_ms = -m_user_ms;
   m_sys_ms = -m_sys_ms;
-  m_wall_ms = -m_wall_ms;
+  m_wall_ns = -m_wall_ns;
   start ();
 
   m_user_ms_res = m_user_ms;
   m_sys_ms_res = m_sys_ms;
-  m_wall_ms_res = m_wall_ms;
+  m_wall_ns_res = m_wall_ns;
   m_user_ms = 0;
   m_sys_ms = 0;
-  m_wall_ms = 0;
+  m_wall_ns = 0;
 }
 
 void
@@ -166,20 +169,20 @@ Timer::take ()
 {
   timer_t user_ms = m_user_ms;
   timer_t sys_ms = m_sys_ms;
-  timer_t wall_ms = m_wall_ms;
+  timer_t wall_ns = m_wall_ns;
 
   m_user_ms = -m_user_ms;
   m_sys_ms = -m_sys_ms;
-  m_wall_ms = -m_wall_ms;
+  m_wall_ns = -m_wall_ns;
   start ();
 
   m_user_ms_res = m_user_ms;
   m_sys_ms_res = m_sys_ms;
-  m_wall_ms_res = m_wall_ms;
+  m_wall_ns_res = m_wall_ns;
 
   m_user_ms = user_ms;
   m_sys_ms = sys_ms;
-  m_wall_ms = wall_ms;
+  m_wall_ns = wall_ns;
 }
 
 size_t
@@ -288,20 +291,20 @@ SelfTimer::report () const
 
 Clock::Clock (double s)
 {
-  m_clock_ms = s * 1000.0;
+  m_clock_ns = s * 1e9;
 }
 
 double 
 Clock::seconds () const
 {
-  return double (m_clock_ms) * 0.001;
+  return double (m_clock_ns) * 1e-9;
 }
 
 Clock
 Clock::current ()
 {
   Clock c;
-  c.m_clock_ms += ms_time ();
+  c.m_clock_ns += ns_time ();
   return c;
 }
 

@@ -640,10 +640,9 @@ template <class PolygonType>
 bool
 suggest_split_polygon (const PolygonType &polygon, size_t max_vertex_count, double max_area_ratio)
 {
-  size_t v = polygon.vertices ();
-  if (v <= 4) {
+  if (polygon.is_box () || polygon.vertices () <= 3) {
     return false;
-  } else if (max_vertex_count > 0 && v > max_vertex_count) {
+  } else if (max_vertex_count > 0 && polygon.vertices () > max_vertex_count) {
     return true;
   } else if (max_area_ratio > 0 && polygon.area_ratio () > max_area_ratio) {
     return true;

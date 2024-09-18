@@ -42,8 +42,7 @@ static std::vector<C> split_poly (const C *p)
 template <class C>
 static void break_polygon (const C &poly, size_t max_vertex_count, double max_area_ratio, std::vector<C> &result)
 {
-  if ((max_vertex_count > 0 && poly.vertices () > max_vertex_count) ||
-      (max_area_ratio > 0 && poly.area_ratio () > max_area_ratio)) {
+  if (db::suggest_split_polygon (poly, max_vertex_count, max_area_ratio)) {
 
     std::vector<C> split_polygons;
     db::split_polygon (poly, split_polygons);
@@ -220,6 +219,26 @@ struct simple_polygon_defs
 #endif
   {
     return poly->area2 ();
+  }
+
+#if defined(HAVE_64BIT_COORD)
+  //  workaround for missing 128bit binding of GSI
+  static double area_upper_manhattan_bound (const C *poly)
+#else
+  static area_type area_upper_manhattan_bound (const C *poly)
+#endif
+  {
+    return poly->area_upper_manhattan_bound ();
+  }
+
+#if defined(HAVE_64BIT_COORD)
+  //  workaround for missing 128bit binding of GSI
+  static double area_upper_manhattan_bound2 (const C *poly)
+#else
+  static area_type area_upper_manhattan_bound2 (const C *poly)
+#endif
+  {
+    return poly->area_upper_manhattan_bound2 ();
   }
 
   static std::vector<tl::Variant> extract_rad (const C *sp)
@@ -571,6 +590,12 @@ struct simple_polygon_defs
       "Hence the double area can be expresses precisely as an integer for these types.\n"
       "\n"
       "This method has been introduced in version 0.26.1\n"
+    ) +
+    method_ext ("area_upper_manhattan_bound", &area_upper_manhattan_bound,
+      "@hide"  //  too special
+    ) +
+    method_ext ("area_upper_manhattan_bound2", &area_upper_manhattan_bound2,
+      "@hide"  //  too special
     ) +
     method ("perimeter", &C::perimeter,
       "@brief Gets the perimeter of the polygon\n"
@@ -1091,6 +1116,26 @@ struct polygon_defs
     return poly->area2 ();
   }
 
+#if defined(HAVE_64BIT_COORD)
+  //  workaround for missing 128bit binding of GSI
+  static double area_upper_manhattan_bound (const C *poly)
+#else
+  static area_type area_upper_manhattan_bound (const C *poly)
+#endif
+  {
+    return poly->area_upper_manhattan_bound ();
+  }
+
+#if defined(HAVE_64BIT_COORD)
+  //  workaround for missing 128bit binding of GSI
+  static double area_upper_manhattan_bound2 (const C *poly)
+#else
+  static area_type area_upper_manhattan_bound2 (const C *poly)
+#endif
+  {
+    return poly->area_upper_manhattan_bound2 ();
+  }
+
   static std::vector<tl::Variant> extract_rad (const C *p)
   {
     C pnew;
@@ -1591,6 +1636,12 @@ struct polygon_defs
       "Hence the double area can be expresses precisely as an integer for these types.\n"
       "\n"
       "This method has been introduced in version 0.26.1\n"
+    ) +
+    method_ext ("area_upper_manhattan_bound", &area_upper_manhattan_bound,
+      "@hide"  //  too special
+    ) +
+    method_ext ("area_upper_manhattan_bound2", &area_upper_manhattan_bound2,
+      "@hide"  //  too special
     ) +
     method ("perimeter", &C::perimeter,
       "@brief Gets the perimeter of the polygon\n"

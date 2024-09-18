@@ -1451,7 +1451,7 @@ NetTracer::determine_interactions (const db::Polygon &seed, const NetTracerShape
 {
   int area_ratio = 2;
 
-  db::Polygon::area_type poly_area = seed.area ();
+  db::Polygon::area_type poly_area = seed.area_upper_manhattan_bound ();
   db::Polygon::area_type box_area = seed.box ().area ();
 
   if (poly_area == box_area && seed.vertices () == 4) {

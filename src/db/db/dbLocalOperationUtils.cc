@@ -58,7 +58,7 @@ PolygonSplitter::PolygonSplitter (PolygonSink &sink, double max_area_ratio, size
 void
 PolygonSplitter::put (const db::Polygon &poly)
 {
-  if ((m_max_vertex_count > 0 && poly.vertices () > m_max_vertex_count) || (m_max_area_ratio > 0.0 && poly.area_ratio () > m_max_area_ratio)) {
+  if (db::suggest_split_polygon (poly, m_max_vertex_count, m_max_area_ratio)) {
 
     std::vector <db::Polygon> split_polygons;
     db::split_polygon (poly, split_polygons);

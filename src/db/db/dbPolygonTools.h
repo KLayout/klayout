@@ -130,6 +130,21 @@ template <class PolygonType>
 void DB_PUBLIC split_polygon (const PolygonType &polygon, std::vector<PolygonType> &output);
 
 /**
+ *  @brief Determines whether a polygon needs to be split according to the given max_vertex and area_ratio criteron
+ *
+ *  If max_vertex is 0, there is no vertex limit.
+ *  If max_vertex is >0, the function returns true, if the vertex limit is exceeded.
+ *
+ *  If area_ratio is 0, there is no area ratio limit.
+ *  If area_ratio is >0, the function returns true, if the bounding box area is larger than area_ratio times the polygon area.
+ *  If area_ratio is <0, the function returns true, if the bounding box area is larger than -area_ratio times the polygon
+ *    manhattan approximation upper area bound.
+ *  (the latter definition is useful to prevent splitting of thin diagonal lines).
+ */
+template <class PolygonType>
+bool DB_PUBLIC suggest_split_polygon (const PolygonType &polygon, size_t max_vertex, double area_ratio);
+
+/**
  *  @brief Determines whether a polygon and a box interact
  *
  *  This function determines whether the polygon and the box share at least on common point

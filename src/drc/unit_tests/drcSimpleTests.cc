@@ -1978,3 +1978,8 @@ TEST(131d_edge_pair_interactions)
 {
   run_test (_this, "131", true);
 }
+
+TEST(132d_sensitive_breaking)
+{
+  run_test (_this, "132", true);
+}

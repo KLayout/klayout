@@ -156,6 +156,11 @@ ClipboardData::add (const db::Layout &layout, const db::Cell &cell, unsigned int
 std::vector<unsigned int>
 ClipboardData::do_insert (db::Layout &layout, const db::ICplxTrans *trans, db::Cell *cell, std::vector<db::cell_index_type> *new_tops, ClipboardDataInsertReceiver *insert_receiver) const
 {
+  //  identify the cells our target is eventually called from, including itself
+  std::set<db::cell_index_type> callers;
+  cell->collect_caller_cells (callers);
+  callers.insert (cell->cell_index ());
+
   std::vector <unsigned int> new_layers;
   PropertyMapper prop_id_map (&layout, &m_layout);
 
@@ -279,14 +284,21 @@ ClipboardData::do_insert (db::Layout &layout, const db::ICplxTrans *trans, db::C
 
       for (db::Cell::const_iterator inst = c->begin (); ! inst.at_end (); ++inst) {
 
-        tl::const_map<db::cell_index_type> im (cell_map.find (inst->cell_index ())->second);
-        db::Instance new_inst = t.insert (*inst, im, prop_id_map);
-        if (trans) {
-          new_inst = t.transform (new_inst, *trans);
-        }
+        db::cell_index_type inst_cell = cell_map.find (inst->cell_index ())->second;
+        if (callers.find (inst_cell) == callers.end ()) {
 
-        if (insert_receiver) {
-          insert_receiver->instance_inserted (cp->second, new_inst);
+          tl::const_map<db::cell_index_type> im (inst_cell);
+          db::Instance new_inst = t.insert (*inst, im, prop_id_map);
+          if (trans) {
+            new_inst = t.transform (new_inst, *trans);
+          }
+
+          if (insert_receiver) {
+            insert_receiver->instance_inserted (cp->second, new_inst);
+          }
+
+        } else {
+          tl::warn << tl::sprintf (tl::to_string (tr ("Refusing to paste an instance for cell %s, as this would create a recursive hierarchy")), layout.cell_name (inst_cell));
         }
 
       }

@@ -2667,8 +2667,22 @@ MainService::paste ()
 {
   if (view ()->is_editable ()) {
 
+    //  skip, if there is nothing to insert
+    bool any = false;
+    for (db::Clipboard::iterator c = db::Clipboard::instance ().begin (); c != db::Clipboard::instance ().end () && ! any; ++c) {
+      const db::ClipboardValue<edt::ClipboardData> *value = dynamic_cast<const db::ClipboardValue<edt::ClipboardData> *> (*c);
+      any = (value != 0);
+    }
+    if (! any) {
+      return;
+    }
+
     int cv_index = view ()->active_cellview_index ();
+
     const lay::CellView &cv = view ()->cellview (cv_index);
+    if (! cv.is_valid ()) {
+      throw tl::Exception (tl::to_string (tr ("No cell selected to paste something into")));
+    }
 
     NewObjectsSelection insert_notification (cv_index, cv.cell_index (), view ());
 
@@ -2678,14 +2692,8 @@ MainService::paste ()
     for (db::Clipboard::iterator c = db::Clipboard::instance ().begin (); c != db::Clipboard::instance ().end (); ++c) {
       const db::ClipboardValue<edt::ClipboardData> *value = dynamic_cast<const db::ClipboardValue<edt::ClipboardData> *> (*c);
       if (value) {
-
-        if (! cv.is_valid ()) {
-          throw tl::Exception (tl::to_string (tr ("No cell selected to paste something into")));
-        }
-
         std::vector<unsigned int> nl = value->get ().insert (cv->layout (), cv.context_trans ().inverted (), &cv->layout ().cell (cv.cell_index ()), 0 /*new_tops*/, &insert_notification);
         new_layers.insert (new_layers.end (), nl.begin (), nl.end ());
-
       }
     }
 

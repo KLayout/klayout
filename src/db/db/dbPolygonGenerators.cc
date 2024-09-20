@@ -182,15 +182,18 @@ public:
   template <class I>
   iterator insert (iterator at, I from, I to)
   {
-    m_size += std::distance (from, to);
-#if 0
     //  NOTE: in some STL m_contour.insert already returns the new iterator
-    size_t index_at = at - m_contour.begin ();
-    m_contour.insert (at, from, to);
-    return m_contour.begin () + index_at;
-#else
-    return m_contour.insert (at, from, to);
-#endif
+    //  For CentOS7 we compute the result explicitly
+    m_size += std::distance (from, to);
+    if (at == m_contour.begin ()) {
+      m_contour.insert (at, from, to);
+      return m_contour.begin ();
+    } else {
+      iterator prev = at;
+      --prev;
+      m_contour.insert (at, from, to);
+      return ++prev;
+    }
   }
 
 private:

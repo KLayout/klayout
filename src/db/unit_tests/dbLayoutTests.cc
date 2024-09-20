@@ -871,3 +871,42 @@ TEST(11_FindPath)
   std::string d = tl::join (path.begin (), path.end (), ";");
   EXPECT_EQ (d, "cell_index=1 r90 *1 0,0;cell_index=2 r0 *1 100,200");
 }
+
+//  issue #1860
+TEST(100_UndoOfDeleteLayer)
+{
+  db::Manager m;
+  db::Layout l (&m);
+  db::Cell &top = l.cell (l.add_cell ("TOP"));
+
+  unsigned int li = 0, li2 = 0;
+
+  {
+    db::Transaction t (&m, "insert_layer");
+    li = l.insert_layer (db::LayerProperties (1, 0));
+  }
+
+  EXPECT_EQ (l.is_valid_layer (li), true);
+
+  {
+    db::Transaction t (&m, "remove_layer");
+    l.delete_layer (li);
+  }
+
+  EXPECT_EQ (l.is_valid_layer (li), false);
+
+  m.undo ();
+
+  EXPECT_EQ (l.is_valid_layer (li), true);
+  EXPECT_EQ (l.get_properties (li).to_string (), "1/0");
+
+  {
+    db::Transaction t (&m, "remove_layer");
+    li2 = l.insert_layer (db::LayerProperties (2, 0));
+  }
+
+  EXPECT_EQ (l.is_valid_layer (li2), true);
+  EXPECT_NE (li, li2);
+  EXPECT_EQ (l.get_properties (li).to_string (), "1/0");
+  EXPECT_EQ (l.get_properties (li2).to_string (), "2/0");
+}

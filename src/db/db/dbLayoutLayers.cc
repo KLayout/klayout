@@ -251,7 +251,7 @@ LayoutLayers::do_insert_layer (unsigned int index, bool special)
   if (index >= layers ()) {
 
     //  add layer to the end of the list.
-    //  add as may freelist entries as required.
+    //  add as many freelist entries as required.
     while (index > layers ()) {
       m_free_indices.push_back (layers ());
       m_layer_states.push_back (Free);
@@ -262,6 +262,14 @@ LayoutLayers::do_insert_layer (unsigned int index, bool special)
 
     tl_assert (m_layer_states [index] == Free);
     m_layer_states [index] = special ? Special : Normal;
+
+    //  remove from the list of free indexes (issue #1860)
+    for (auto i = m_free_indices.begin (); i != m_free_indices.end (); ++i) {
+      if (*i == index) {
+        m_free_indices.erase (i);
+        break;
+      }
+    }
   
   }
 

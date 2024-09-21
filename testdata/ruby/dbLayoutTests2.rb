@@ -489,7 +489,8 @@ class DBLayoutTests2_TestClass < TestBase
   def test_6_Layout_props
 
     ly = RBA::Layout::new
-    pid = ly.properties_id( { 17 => "a", "b" => [ 1, 5, 7 ] }.to_a )
+    pid = ly.properties_id({ 17 => "a", "b" => [ 1, 5, 7 ] }.to_a)
+    assert_equal(ly.properties_id({ 17 => "a", "b" => [ 1, 5, 7 ] }), pid)
 
     ci1 = ly.add_cell( "c1" )
     ci2 = ly.add_cell( "c2" )
@@ -1051,6 +1052,10 @@ class DBLayoutTests2_TestClass < TestBase
     assert_equal(ly.prop_id, 1)
     assert_equal(ly.property("x"), 1)
     assert_equal(ly.properties, {"x" => 1})
+    assert_equal(ly.properties_hash(ly.prop_id), {"x" => 1})
+    assert_equal(ly.properties_id(ly.properties_hash(ly.prop_id)), ly.prop_id)
+    assert_equal(ly.properties_array(ly.prop_id), [["x", 1]])
+    assert_equal(ly.properties_id(ly.properties_array(ly.prop_id)), ly.prop_id)
     ly.set_property("x", 17)
     assert_equal(ly.prop_id, 2)
     assert_equal(ly.property("x"), 17)

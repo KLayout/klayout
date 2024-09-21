@@ -367,9 +367,8 @@ static tl::Variant get_layout_property (const db::Layout *l, const tl::Variant &
   }
 }
 
-static tl::Variant get_layout_properties (const db::Layout *layout)
+static tl::Variant get_properties_hash (const db::Layout *layout, db::properties_id_type id)
 {
-  db::properties_id_type id = layout->prop_id ();
   if (id == 0) {
     return tl::Variant::empty_array ();
   }
@@ -380,6 +379,11 @@ static tl::Variant get_layout_properties (const db::Layout *layout)
     res.insert (layout->properties_repository ().prop_name (i->first), i->second);
   }
   return res;
+}
+
+static tl::Variant get_layout_properties (const db::Layout *layout)
+{
+  return get_properties_hash (layout, layout->prop_id ());
 }
 
 static db::cell_index_type cell_by_name (db::Layout *l, const char *name)
@@ -614,6 +618,18 @@ static db::properties_id_type properties_id (db::Layout *layout, const std::vect
     }
     db::property_names_id_type name_id = layout->properties_repository ().prop_name_id (v->get_list ()[0]);
     props.insert (std::make_pair (name_id, v->get_list () [1]));
+  }
+
+  return layout->properties_repository ().properties_id (props);
+}
+
+static db::properties_id_type properties_id_from_hash (db::Layout *layout, const std::map<tl::Variant, tl::Variant> &properties)
+{
+  db::PropertiesRepository::properties_set props;
+
+  for (std::map<tl::Variant, tl::Variant>::const_iterator v = properties.begin (); v != properties.end (); ++v) {
+    db::property_names_id_type name_id = layout->properties_repository ().prop_name_id (v->first);
+    props.insert (std::make_pair (name_id, v->second));
   }
 
   return layout->properties_repository ().properties_id (props);
@@ -1324,7 +1340,7 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "This method has been introduced in version 0.24."
   ) + 
   gsi::method_ext ("property", &get_layout_property, gsi::arg ("key"),
-    "@brief Gets the user property with the given key\n"
+    "@brief Gets the Layout's user property with the given key\n"
     "This method is a convenience method that gets the property with the given key. "
     "If no property with that key exists, it will return nil. Using that method is more "
     "convenient than using the properties ID to retrieve the property value. "
@@ -1332,8 +1348,8 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "This method has been introduced in version 0.24."
   ) + 
   gsi::method_ext ("properties", &get_layout_properties,
-    "@brief Gets the user properties as a hash\n"
-    "This method is a convenience method that gets all user properties as a single hash.\n"
+    "@brief Gets the Layout's user properties as a hash\n"
+    "This method is a convenience method that gets all user properties of the Layout object as a single hash.\n"
     "\n"
     "This method has been introduced in version 0.29.5."
   ) +
@@ -1348,16 +1364,42 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "@param properties The array of pairs of variants (both elements can be integer, double or string)\n"
     "@return The unique properties ID for that set"
   ) +
-  gsi::method_ext ("properties", &properties, gsi::arg ("properties_id"),
+  gsi::method_ext ("properties_id", &properties_id_from_hash, gsi::arg ("properties"),
+    "@brief Gets the properties ID for a given properties set\n"
+    "\n"
+    "This variant accepts a hash of value vs. key for the properties instead of array of key/value pairs. "
+    "Apart from this, it behaves like the other \\properties_id variant.\n"
+    "\n"
+    "@param properties A hash of property keys/values (both keys and values can be integer, double or string)\n"
+    "@return The unique properties ID for that set\n"
+    "\n"
+    "This variant has been introduced in version 0.29.7."
+  ) +
+  gsi::method_ext ("properties_array|#properties", &properties, gsi::arg ("properties_id"),
     "@brief Gets the properties set for a given properties ID\n"
     "\n"
-    "Basically performs the backward conversion of the 'properties_id' method. "
-    "Given a properties ID, returns the properties set as an array of pairs of "
-    "variants. In this array, each key and the value are stored as pairs (arrays with two elements).\n"
+    "Basically this method performs the backward conversion of the 'properties_id' method. "
+    "Given a properties ID, it returns the properties set as an array. "
+    "In this array, each key and the value is stored as a pair (an array with two elements).\n"
     "If the properties ID is not valid, an empty array is returned.\n"
+    "A version that returns a hash instead of pairs of key/values, is \\properties_hash.\n"
     "\n"
     "@param properties_id The properties ID to get the properties for\n"
-    "@return The array of variants (see \\properties_id)\n"
+    "@return An array of key/value pairs (see \\properties_id)\n"
+    "\n"
+    "The 'properties_array' alias was introduced in version 0.29.7 and the plain 'properties' alias was deprecated."
+  ) +
+  gsi::method_ext ("properties_hash", &get_properties_hash, gsi::arg ("properties_id"),
+    "@brief Gets the properties set for a given properties ID as a hash\n"
+    "\n"
+    "Returns the properties for a given properties ID as a hash.\n"
+    "It is a convenient alternative to \\properties_array, which returns "
+    "an array of key/value pairs.\n"
+    "\n"
+    "@param properties_id The properties ID to get the properties for\n"
+    "@return The hash representing the properties for the given ID (values vs. key)\n"
+    "\n"
+    "This method has been introduced in version 0.29.7."
   ) +
   gsi::method ("unique_cell_name", &db::Layout::uniquify_cell_name, gsi::arg ("name"),
     "@brief Creates a new unique cell name from the given name\n"

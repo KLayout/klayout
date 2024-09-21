@@ -48,8 +48,8 @@ class DB_PLUGIN_PUBLIC GDS2ReaderException
   : public ReaderException 
 {
 public:
-  GDS2ReaderException (const std::string &msg, size_t p, size_t n, const std::string &cell)
-    : ReaderException (tl::sprintf (tl::to_string (tr ("%s (position=%ld, record number=%ld, cell=%s)")), msg, p, n, cell))
+  GDS2ReaderException (const std::string &msg, size_t p, size_t n, const std::string &cell, const std::string &source)
+    : ReaderException (tl::sprintf (tl::to_string (tr ("%s (position=%ld, record number=%ld, cell=%s), in file: %s")), msg, p, n, cell, source))
   { }
 };
 

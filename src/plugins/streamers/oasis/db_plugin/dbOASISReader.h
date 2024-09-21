@@ -54,8 +54,8 @@ class DB_PLUGIN_PUBLIC OASISReaderException
   : public ReaderException
 {
 public:
-  OASISReaderException (const std::string &msg, size_t p, const std::string &cell)
-    : ReaderException (tl::sprintf (tl::to_string (tr ("%s (position=%ld, cell=%s)")), msg, p, cell))
+  OASISReaderException (const std::string &msg, size_t p, const std::string &cell, const std::string &source)
+    : ReaderException (tl::sprintf (tl::to_string (tr ("%s (position=%ld, cell=%s), in file: %s")), msg, p, cell, source))
   { }
 };
 

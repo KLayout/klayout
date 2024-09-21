@@ -1,0 +1,132 @@
+
+source $drc_test_source
+target $drc_test_target
+
+lp = polygons
+le = edges
+ll = labels
+
+lp.insert(RBA::Box::new(0, 0, 100, 200))
+lp.insert(RBA::DBox::new(0.200, 0, 0.300, 0.200))
+lp.insert(RBA::Polygon::new(RBA::Box::new(400, 0, 500, 200)))
+lp.insert(RBA::DPolygon::new(RBA::DBox::new(0.600, 0, 0.700, 0.200)))
+lp.insert(RBA::SimplePolygon::new(RBA::Box::new(800, 0, 900, 200)))
+lp.insert(RBA::DSimplePolygon::new(RBA::DBox::new(1.000, 0, 1.100, 0.200)))
+lp.insert(RBA::Path::new([ RBA::Point::new(1200, 100), RBA::Point::new(1300, 100) ], 200))
+lp.insert(RBA::DPath::new([ RBA::DPoint::new(1.400, 0.1), RBA::DPoint::new(1.500, 0.1) ], 0.2))
+
+begin
+  lp.insert(RBA::Edge::new(RBA::Point::new(0, 0), RBA::Point::new(100, 100)))
+  raise Exception::new("Error expected")
+rescue => ex
+end
+
+begin
+  lp.insert(RBA::DEdge::new(RBA::DPoint::new(0, 0), RBA::DPoint::new(0.1, 0.1)))
+  raise Exception::new("Error expected")
+rescue => ex
+end
+
+begin
+  lp.insert(RBA::Text::new("ABC", RBA::Trans::new(RBA::Vector::new(0, 0))))
+  raise Exception::new("Error expected")
+rescue => ex
+end
+
+begin
+  lp.insert(RBA::DText::new("XYZ", RBA::DTrans::new(RBA::DVector::new(0, 0.1))))
+  raise Exception::new("Error expected")
+rescue => ex
+end
+
+le.insert(RBA::Box::new(0, 0, 100, 200))
+le.insert(RBA::DBox::new(0.200, 0, 0.300, 0.200))
+le.insert(RBA::Polygon::new(RBA::Box::new(400, 0, 500, 200)))
+le.insert(RBA::DPolygon::new(RBA::DBox::new(0.600, 0, 0.700, 0.200)))
+le.insert(RBA::SimplePolygon::new(RBA::Box::new(800, 0, 900, 200)))
+le.insert(RBA::DSimplePolygon::new(RBA::DBox::new(1.000, 0, 1.100, 0.200)))
+le.insert(RBA::Path::new([ RBA::Point::new(1200, 100), RBA::Point::new(1300, 100) ], 200))
+le.insert(RBA::DPath::new([ RBA::DPoint::new(1.400, 0.1), RBA::DPoint::new(1.500, 0.1) ], 0.2))
+
+le.insert(RBA::Edge::new(RBA::Point::new(0, 0), RBA::Point::new(100, 100)))
+le.insert(RBA::DEdge::new(RBA::DPoint::new(0, 0.1), RBA::DPoint::new(0.1, 0.2)))
+
+begin
+  le.insert(RBA::Text::new("ABC", RBA::Trans::new(RBA::Vector::new(0, 0))))
+  raise Exception::new("Error expected")
+rescue => ex
+end
+
+begin
+  le.insert(RBA::DText::new("XYZ", RBA::DTrans::new(RBA::DVector::new(0, 0.1))))
+  raise Exception::new("Error expected")
+rescue => ex
+end
+
+begin
+  ll.insert(RBA::Box::new(0, 0, 100, 200))
+  raise Exception::new("Error expected")
+rescue => ex
+end
+
+begin
+  ll.insert(RBA::DBox::new(0.200, 0, 0.300, 0.200))
+  raise Exception::new("Error expected")
+rescue => ex
+end
+
+begin
+  ll.insert(RBA::Polygon::new(RBA::Box::new(400, 0, 500, 200)))
+  raise Exception::new("Error expected")
+rescue => ex
+end
+
+begin
+  ll.insert(RBA::DPolygon::new(RBA::DBox::new(0.600, 0, 0.700, 0.200)))
+  raise Exception::new("Error expected")
+rescue => ex
+end
+
+begin
+  ll.insert(RBA::SimplePolygon::new(RBA::Box::new(800, 0, 900, 200)))
+  raise Exception::new("Error expected")
+rescue => ex
+end
+
+begin
+  ll.insert(RBA::DSimplePolygon::new(RBA::DBox::new(1.000, 0, 1.100, 0.200)))
+  raise Exception::new("Error expected")
+rescue => ex
+end
+
+begin
+  ll.insert(RBA::Path::new([ RBA::Point::new(1200, 100), RBA::Point::new(1300, 100) ], 200))
+  raise Exception::new("Error expected")
+rescue => ex
+end
+
+begin
+  ll.insert(RBA::DPath::new([ RBA::DPoint::new(1.400, 0.1), RBA::DPoint::new(1.500, 0.1) ], 0.2))
+  raise Exception::new("Error expected")
+rescue => ex
+end
+
+begin
+  ll.insert(RBA::Edge::new(RBA::Point::new(0, 0), RBA::Point::new(100, 100)))
+  raise Exception::new("Error expected")
+rescue => ex
+end
+
+begin
+  ll.insert(RBA::DEdge::new(RBA::DPoint::new(0, 0.1), RBA::DPoint::new(0.1, 0.2)))
+  raise Exception::new("Error expected")
+rescue => ex
+end
+
+ll.insert(RBA::Text::new("ABC", RBA::Trans::new(RBA::Vector::new(100, 0))))
+ll.insert(RBA::DText::new("XYZ", RBA::DTrans::new(RBA::DVector::new(0, 0.1))))
+
+lp.output(1, 0)
+le.output(2, 0)
+ll.output(3, 0)
+

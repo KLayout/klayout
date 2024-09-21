@@ -42,22 +42,38 @@ module DRC
 
       @engine._context("insert") do
 
-        requires_edges_or_region
         args.each do |a|
           if a.is_a?(RBA::DBox) 
+            requires_edges_or_region
             self.data.insert(RBA::Box::from_dbox(a * (1.0 / @engine.dbu)))
           elsif a.is_a?(RBA::DPolygon) 
+            requires_edges_or_region
             self.data.insert(RBA::Polygon::from_dpoly(a * (1.0 / @engine.dbu)))
           elsif a.is_a?(RBA::DSimplePolygon) 
+            requires_edges_or_region
             self.data.insert(RBA::SimplePolygon::from_dpoly(a * (1.0 / @engine.dbu)))
           elsif a.is_a?(RBA::DPath) 
+            requires_edges_or_region
             self.data.insert(RBA::Path::from_dpath(a * (1.0 / @engine.dbu)))
+          elsif a.is_a?(RBA::Box) || a.is_a?(RBA::Polygon) || a.is_a?(RBA::SimplePolygon) || a.is_a?(RBA::Path)
+            requires_edges_or_region
+            self.data.insert(a)
           elsif a.is_a?(RBA::DEdge) 
+            requires_edges
             self.data.insert(RBA::Edge::from_dedge(a * (1.0 / @engine.dbu)))
+          elsif a.is_a?(RBA::Edge) 
+            requires_edges
+            self.data.insert(a)
+          elsif a.is_a?(RBA::DText) 
+            requires_texts
+            self.data.insert(RBA::CplxTrans::new(@engine.dbu).inverted * a)
+          elsif a.is_a?(RBA::Text) 
+            requires_texts
+            self.data.insert(a)
           elsif a.is_a?(Array)
             insert(*a)
           else
-            raise("Invalid argument type for #{a.inspect}")
+            raise("Invalid argument type of #{a.inspect}")
           end
         end
 

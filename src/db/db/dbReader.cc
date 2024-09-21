@@ -61,7 +61,7 @@ join_layer_names (std::string &s, const std::string &n)
 //  ReaderBase implementation
 
 ReaderBase::ReaderBase () 
-  : m_warnings_as_errors (false), m_warn_level (1)
+  : m_warnings_as_errors (false), m_warn_level (1), m_warn_count_for_same_message (0), m_first_warning (true)
 { 
 }
 
@@ -79,6 +79,39 @@ void
 ReaderBase::init (const db::LoadLayoutOptions &options)
 {
   m_warn_level = options.warn_level ();
+  m_last_warning.clear ();
+  m_warn_count_for_same_message = 0;
+  m_first_warning = true;
+}
+
+bool
+ReaderBase::first_warning ()
+{
+  bool f = m_first_warning;
+  m_first_warning = false;
+  return f;
+}
+
+int
+ReaderBase::compress_warning (const std::string &msg)
+{
+  const int max_warnings = 10;
+
+  if (! msg.empty () && msg == m_last_warning) {
+    if (m_warn_count_for_same_message < max_warnings) {
+      ++m_warn_count_for_same_message;
+      return -1;
+    } else if (m_warn_count_for_same_message == max_warnings) {
+      ++m_warn_count_for_same_message;
+      return 0;
+    } else {
+      return 1;
+    }
+  } else {
+    m_last_warning = msg;
+    m_warn_count_for_same_message = 0;
+    return -1;
+  }
 }
 
 // ---------------------------------------------------------------

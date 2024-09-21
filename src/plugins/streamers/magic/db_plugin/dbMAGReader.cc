@@ -143,11 +143,19 @@ MAGReader::warn (const std::string &msg, int wl)
     return;
   }
 
-  // TODO: compress
-  tl::warn << msg 
-           << tl::to_string (tr (" (line=")) << mp_current_stream->line_number ()
-           << tl::to_string (tr (", file=")) << mp_current_stream->source ()
-           << ")";
+  if (first_warning ()) {
+    tl::warn << tl::sprintf (tl::to_string (tr ("In file %s:")), mp_current_stream->source ());
+  }
+
+  int ws = compress_warning (msg);
+  if (ws < 0) {
+    tl::warn << msg
+             << tl::to_string (tr (" (line=")) << mp_current_stream->line_number ()
+             << tl::to_string (tr (", file=")) << mp_current_stream->source ()
+             << ")";
+  } else if (ws == 0) {
+    tl::warn << tl::to_string (tr ("... further warnings of this kind are not shown"));
+  }
 }
 
 db::cell_index_type

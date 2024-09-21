@@ -308,6 +308,25 @@ PropertiesDialog::current_index_changed (const QModelIndex &index, const QModelI
 
   } else {
 
+    if (m_index >= 0 && m_index < int (mp_properties_pages.size ()) && ! mp_properties_pages [m_index]->readonly ()) {
+
+      try {
+
+        db::Transaction t (mp_manager, tl::to_string (QObject::tr ("Apply changes")), m_transaction_id);
+
+        mp_properties_pages [m_index]->apply ();
+
+        if (! t.is_empty ()) {
+          m_transaction_id = t.id ();
+        }
+
+      } catch (...) {
+      }
+
+      mp_properties_pages [m_index]->update ();
+
+    }
+
     if (mp_tree_model->parent (index).isValid ()) {
 
       m_index = mp_tree_model->page_index (index);
@@ -343,9 +362,9 @@ PropertiesDialog::current_index_changed (const QModelIndex &index, const QModelI
           m_object_indexes.push_back (oi);
         }
 
-      } else {
+      } else if (mp_properties_pages [m_index]->count () > 0) {
 
-        m_object_indexes.push_back (size_t (mp_tree_model->object_index (index)));
+        m_object_indexes.push_back (0);
 
       }
 

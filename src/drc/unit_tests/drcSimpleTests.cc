@@ -1954,6 +1954,11 @@ TEST(122_NamedLayers)
   compare_text_files (output, au_output);
 }
 
+TEST(123_DirectInsert)
+{
+  run_test (_this, "123", false);
+}
+
 TEST(130_size_inside_outside)
 {
   run_test (_this, "130", false);

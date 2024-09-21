@@ -132,6 +132,7 @@ LibraryProxy::get_layer_indices (db::Layout &layout, db::ImportLayerMapping *lay
 
   Library *lib = LibraryManager::instance ().lib (lib_id ());
   tl_assert (lib != 0);
+  tl_assert (lib->layout ().is_valid_cell_index (library_cell_index ()));
 
   const db::Cell &cell = lib->layout ().cell (library_cell_index ());
 
@@ -247,11 +248,11 @@ LibraryProxy::get_basic_name () const
 {
   Library *lib = LibraryManager::instance ().lib (lib_id ());
   if (lib) {
-    const db::Cell *lib_cell = &lib->layout ().cell (library_cell_index ());
-    if (! lib_cell) {
+    if (! lib->layout ().is_valid_cell_index (library_cell_index ())) {
       return "<defunct>";
     } else {
-      return lib_cell->get_basic_name ();
+      const db::Cell &lib_cell = lib->layout ().cell (library_cell_index ());
+      return lib_cell.get_basic_name ();
     }
   } else {
     return Cell::get_basic_name ();
@@ -263,11 +264,11 @@ LibraryProxy::get_display_name () const
 {
   Library *lib = LibraryManager::instance ().lib (lib_id ());
   if (lib) {
-    const db::Cell *lib_cell = &lib->layout ().cell (library_cell_index ());
-    if (! lib_cell) {
+    if (! lib->layout ().is_valid_cell_index (library_cell_index ())) {
       return lib->get_name () + "." + "<defunct>";
     } else {
-      return lib->get_name () + "." + lib_cell->get_display_name ();
+      const db::Cell &lib_cell = lib->layout ().cell (library_cell_index ());
+      return lib->get_name () + "." + lib_cell.get_display_name ();
     }
   } else {
     return Cell::get_display_name ();
@@ -279,11 +280,11 @@ LibraryProxy::get_qualified_name () const
 {
   Library *lib = LibraryManager::instance ().lib (lib_id ());
   if (lib) {
-    const db::Cell *lib_cell = &lib->layout ().cell (library_cell_index ());
-    if (! lib_cell) {
+    if (! lib->layout ().is_valid_cell_index (library_cell_index ())) {
       return lib->get_name () + "." + "<defunct>";
     } else {
-      return lib->get_name () + "." + lib_cell->get_qualified_name ();
+      const db::Cell &lib_cell = lib->layout ().cell (library_cell_index ());
+      return lib->get_name () + "." + lib_cell.get_qualified_name ();
     }
   } else {
     return Cell::get_qualified_name ();

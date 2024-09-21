@@ -367,9 +367,9 @@ void
 DXFReader::error (const std::string &msg)
 {
   if (m_ascii) {
-    throw DXFReaderException (msg, m_line_number, m_cellname);
+    throw DXFReaderException (msg, m_line_number, m_cellname, m_stream.source ());
   } else {
-    throw DXFReaderException (msg, m_stream.pos (), m_cellname);
+    throw DXFReaderException (msg, m_stream.pos (), m_cellname, m_stream.source ());
   }
 }
 
@@ -380,17 +380,25 @@ DXFReader::warn (const std::string &msg, int wl)
     return;
   }
 
-  // TODO: compress
-  if (m_ascii) {
-    tl::warn << msg 
-             << tl::to_string (tr (" (line=")) << m_line_number
-             << tl::to_string (tr (", cell=")) << m_cellname
-             << ")";
-  } else {
-    tl::warn << msg 
-             << tl::to_string (tr (" (position=")) << m_stream.pos ()
-             << tl::to_string (tr (", cell=")) << m_cellname
-             << ")";
+  if (first_warning ()) {
+    tl::warn << tl::sprintf (tl::to_string (tr ("In file %s:")), m_stream.source ());
+  }
+
+  int ws = compress_warning (msg);
+  if (ws < 0) {
+    if (m_ascii) {
+      tl::warn << msg
+               << tl::to_string (tr (" (line=")) << m_line_number
+               << tl::to_string (tr (", cell=")) << m_cellname
+               << ")";
+    } else {
+      tl::warn << msg
+               << tl::to_string (tr (" (position=")) << m_stream.pos ()
+               << tl::to_string (tr (", cell=")) << m_cellname
+               << ")";
+    }
+  } else if (ws == 0) {
+    tl::warn << tl::to_string (tr ("... further warnings of this kind are not shown"));
   }
 }
 

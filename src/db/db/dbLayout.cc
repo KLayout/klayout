@@ -2876,6 +2876,9 @@ Layout::get_context_info (cell_index_type cell_index, LayoutOrCellContextInfo &i
 
       //  one level of library indirection
       ly = &lib->layout ();
+      if (! ly->is_valid_cell_index (lib_proxy->library_cell_index ())) {
+        return any_meta; //  abort
+      }
       cptr = &ly->cell (lib_proxy->library_cell_index ());
       info.lib_name = lib->get_name ();
 

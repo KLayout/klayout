@@ -126,12 +126,27 @@ public:
     return m_warn_level;
   }
 
+  /**
+   *  @brief Returns true (once) if this is the first warning
+   */
+  bool first_warning ();
+
+  /**
+   *  @brief Returns a value indicating whether to compress the given warning
+   *
+   *  The return value is either -1 (do not skip), 0 (first warning not to be shown), 1 (warning not shown(.
+   */
+  int compress_warning (const std::string &msg);
+
 protected:
   virtual void init (const db::LoadLayoutOptions &options);
 
 private:
   bool m_warnings_as_errors;
   int m_warn_level;
+  std::string m_last_warning;
+  int m_warn_count_for_same_message;
+  bool m_first_warning;
 };
 
 /**

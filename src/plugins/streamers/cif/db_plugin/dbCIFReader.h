@@ -52,8 +52,8 @@ class DB_PLUGIN_PUBLIC CIFReaderException
   : public ReaderException
 {
 public:
-  CIFReaderException (const std::string &msg, size_t l, const std::string &cell)
-    : ReaderException (tl::sprintf (tl::to_string (tr ("%s (line=%ld, cell=%s)")), msg, l, cell))
+  CIFReaderException (const std::string &msg, size_t l, const std::string &cell, const std::string &source)
+    : ReaderException (tl::sprintf (tl::to_string (tr ("%s (line=%ld, cell=%s), in file: %s")), msg, l, cell, source))
   { }
 };
 

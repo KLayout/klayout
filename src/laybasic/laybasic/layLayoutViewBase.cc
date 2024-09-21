@@ -3047,7 +3047,7 @@ LayoutViewBase::save_image_with_options (const std::string &fn,
 #else
 void
 LayoutViewBase::save_image_with_options (const std::string &,
-                                         unsigned int, unsigned int, int, int, double,
+                                         unsigned int, unsigned int, int, int, double, double,
                                          tl::Color, tl::Color, tl::Color, const db::DBox &, bool)
 {
   throw tl::Exception (tl::to_string (tr ("Unable to save image - PNG library not compiled in")));

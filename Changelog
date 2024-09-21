@@ -1,3 +1,43 @@
+0.29.7           (2024-09-22):
+* Bug: %GITHUB%/issues/1864 Copy & paste allows creating a recursive hierarchy
+* Bug: %GITHUB%/issues/1860 A bug about layer undo
+* Bug: %GITHUB%/issues/1857 Crash when closing application with property dialog open
+* Bug: %GITHUB%/issues/1853 Cell.write and Layout.write are very slow on Windows if there are gigantic polygons in the cell
+* Bug: %GITHUB%/issues/1847 Little problem with File::Setup/Application::Customize Menu
+* Bug: %GITHUB%/issues/1840 "start" and "finish" became reserved names in PCells in version 0.29.5
+* Enhancement: %GITHUB%/issues/1836 Allow the usage of Cell.shapes(LayerInfo(...))
+* Bug: %GITHUB%/issues/1835 Single PCell file cannot be read
+* Bug: %GITHUB%/issues/1832 Netlist device combination / simplify requests
+* Enhancement: Print file name before warnings and add to errors (good when reading multiple files from command line)
+* Bugfix: Disallow empty filenames or writing to directories as this has severe side effects
+* Bugfix: Further trying to improve stability when debugging PCells in the IDE (still not perfect)
+* Enhancement: More variants of Layout#properties_id, added Layout#properties_hash and Layout#properties_array
+* Enhancement: DRC - more variants for Layer#insert, such as Texts and integer-type shapes
+* Bugfix: Properties dialog did not apply some changes when switching the object node
+* Bugfixes: Mute diagnostic warnings on Python 3.12 debug builds, fixed a potential crash during Python module cleanup
+* Bugfix: Fixed a crash in the properties editor happening while selecting object type nodes in certain cases
+* Enhancement: Cleaned up and enhanced documentation of LayoutToNetlist class
+  
+* Bug: %GITHUB%/issues/1816 interacting operation between EdgePairs and Region (or edges)
+  EdgePair layers in DRC can now tested for interacting with edges and polygons
+  (includes: inside, outside). New methods for EdgePairs: EdgePairs#inside etc.
+* Bug: %GITHUB%/issues/1819 Discrete soft small rendering
+* Bug: %GITHUB%/issues/1823 "Select all" was not working as expected for texts, API "select_all" was not working at all.
+* Bugfix: Typo: ParameterState#icon was named 'tooltip'
+* Enhancement: Allowing RBA::Net objects for DRCLayer#nets as well
+* Enhancement: const versions of Layout#cell and Layout#top_cell(s)
+* Enhancement: Generic GSI method and #_const_cast to make a const
+  reference into a non-const one (use with care)
+* Bugfix: 'netter' function in DRC wasn't working as described - it raised an error
+* Enhancement: Provide a warning message when closing the window while an operation is ongoing
+* Bugfix: Avoid a segfault in the property editor due to invalid array access
+* Bugfix: Properties dialog: stop handling 'Enter' key - use 'Ok' to close it
+* Enhancement: Some improvements on Ascend and Descend:
+  - Ascend now walks up the unspecific tree too
+  - Descend enters cell if selected transiently
+  - New feature "Descend into" which also selects the child cell
+    as current top
+  
 0.29.6           (2024-08-15):
 * Bug: %GITHUB%/issues/1814 Application freezes on Ctrl+Select
 * Bug: %GITHUB%/issues/1816 interacting operation between EdgePairs and Region (or edges)

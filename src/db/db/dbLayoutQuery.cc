@@ -1938,9 +1938,11 @@ struct SelectFilterPropertyIDs
   SelectFilterPropertyIDs (LayoutQuery *q)
   {
     data               = q->register_property ("data", LQ_variant);
+    expressions        = q->register_property ("expressions", LQ_variant);
   }
 
   unsigned int data;                // data                 -> An array of the selected values
+  unsigned int expressions;         // data                 -> An array with the expressions
 };
 
 class DB_PUBLIC SelectFilterReportingState
@@ -2037,7 +2039,16 @@ public:
     }
   }
 
-  virtual void reset (FilterStateBase *previous) 
+  void get_expressions (tl::Variant &v)
+  {
+    std::vector<tl::Variant> vd;
+    v = tl::Variant (vd.begin (), vd.end ());
+    for (std::vector<tl::Expression>::const_iterator e = m_expressions.begin (); e != m_expressions.end (); ++e) {
+      v.push (e->text ());
+    }
+  }
+
+  virtual void reset (FilterStateBase *previous)
   {
     if (m_has_sorting) {
 
@@ -2081,6 +2092,9 @@ public:
   {
     if (id == m_pids.data) {
       get_data (v);
+      return true;
+    } else if (id == m_pids.expressions) {
+      get_expressions (v);
       return true;
     } else if (m_in_data_eval) {
       return FilterStateBase::get_property (id, v);

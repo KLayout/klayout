@@ -98,6 +98,7 @@ public:
   SearchReplaceResults ();
 
   void clear ();
+  void set_data_column_headers (const tl::Variant &v);
   void push_back (const tl::Variant &v);
   void push_back (const QueryShapeResult &v);
   void push_back (const QueryInstResult &v);
@@ -169,6 +170,7 @@ private:
   std::vector<QueryInstResult> m_inst_result;
   std::vector<QueryCellResult> m_cell_result;
   size_t m_data_columns;
+  tl::Variant m_data_column_headers;
   mutable int m_last_column_count;
   std::map<db::cell_index_type, std::string> m_cellname_map;
   std::map<unsigned int, db::LayerProperties> m_lp_map;

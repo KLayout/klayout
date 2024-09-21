@@ -78,6 +78,15 @@ SearchReplaceResults::clear ()
   m_has_more = false;
 }
 
+void
+SearchReplaceResults::set_data_column_headers (const tl::Variant &v)
+{
+  m_data_column_headers = v;
+  if (v.is_list ()) {
+    m_data_columns = std::max (v.get_list ().size (), m_data_columns);
+  }
+}
+
 void 
 SearchReplaceResults::push_back (const tl::Variant &v)
 {
@@ -168,7 +177,13 @@ SearchReplaceResults::headerData (int section, Qt::Orientation /*orientation*/, 
 {
   if (role == Qt::DisplayRole) {
     if (! m_data_result.empty ()) {
-      if (section == 0) {
+      if (m_data_column_headers.is_list ()) {
+        if (section < int (m_data_column_headers.get_list ().size ())) {
+          return QVariant (m_data_column_headers.get_list () [section].to_string ());
+        } else {
+          return QVariant (QString ());
+        }
+      } else if (section == 0) {
         return QVariant (QObject::tr ("Value"));
       } else {
         return QVariant (QString ());
@@ -1774,6 +1789,7 @@ SearchReplaceDialog::query_to_model (SearchReplaceResults &model, const db::Layo
   bool res = false;
 
   int data_prop_id = lq.has_property ("data") ? int (lq.property_by_name ("data")) : -1;
+  int expressions_prop_id = lq.has_property ("expressions") ? int (lq.property_by_name ("expressions")) : -1;
   int shape_prop_id = lq.has_property ("shape") ? int (lq.property_by_name ("shape")) : -1;
   int layer_index_prop_id = lq.has_property ("layer_index") ? int (lq.property_by_name ("layer_index")) : -1;
   int instance_prop_id = lq.has_property ("inst") ? int (lq.property_by_name ("inst")) : -1;
@@ -1783,6 +1799,11 @@ SearchReplaceDialog::query_to_model (SearchReplaceResults &model, const db::Layo
   int cell_index_prop_id = lq.has_property ("cell_index") ? int (lq.property_by_name ("cell_index")) : -1;
   int parent_cell_index_prop_id = lq.has_property ("parent_cell_index") ? int (lq.property_by_name ("parent_cell_index")) : -1;
   int initial_cell_index_prop_id = lq.has_property ("initial_cell_index") ? int (lq.property_by_name ("initial_cell_index")) : -1;
+
+  tl::Variant ve;
+  if (expressions_prop_id >= 0 && iq.get (expressions_prop_id, ve)) {
+    model.set_data_column_headers (ve);
+  }
 
   while (! iq.at_end ()) {
 

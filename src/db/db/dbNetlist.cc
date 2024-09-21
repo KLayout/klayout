@@ -619,6 +619,13 @@ void Netlist::purge_nets ()
   }
 }
 
+void Netlist::purge_devices ()
+{
+  for (bottom_up_circuit_iterator c = begin_bottom_up (); c != end_bottom_up (); ++c) {
+    c->purge_devices ();
+  }
+}
+
 void Netlist::make_top_level_pins ()
 {
   size_t ntop = top_circuit_count ();
@@ -684,6 +691,8 @@ void Netlist::simplify ()
 {
   make_top_level_pins ();
   purge ();
+
+  //  combine devices are purge nets that are created in that step
   combine_devices ();
   purge_nets ();
 }

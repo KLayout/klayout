@@ -509,6 +509,14 @@ public:
   void purge_nets ();
 
   /**
+   *  @brief Purges invalid devices
+   *
+   *  This method will purge all invalid devices, i.e. those
+   *  whose terminals are all connected to the same net.
+   */
+  void purge_devices ();
+
+  /**
    *  @brief Creates pins for top-level circuits
    *
    *  This method will turn all named nets of top-level circuits (such that are not

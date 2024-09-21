@@ -825,6 +825,41 @@ void Circuit::do_purge_nets (bool keep_pins)
   }
 }
 
+static bool can_purge_device (const db::Device &device)
+{
+  if (! device.device_class ()) {
+    return false;
+  }
+
+  const std::vector<db::DeviceTerminalDefinition> &tdefs = device.device_class ()->terminal_definitions ();
+  if (tdefs.size () <= 1) {
+    return false;
+  }
+
+  const db::Net *net = device.net_for_terminal (tdefs.front ().id ());
+  for (auto t = tdefs.begin () + 1; t != tdefs.end (); ++t) {
+    if (net != device.net_for_terminal (t->id ())) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+void Circuit::purge_devices ()
+{
+  std::vector<db::Device *> devices_to_be_purged;
+  for (device_iterator d = begin_devices (); d != end_devices (); ++d) {
+    if (can_purge_device (*d)) {
+      devices_to_be_purged.push_back (d.operator-> ());
+    }
+  }
+
+  for (auto d = devices_to_be_purged.begin (); d != devices_to_be_purged.end (); ++d) {
+    remove_device (*d);
+  }
+}
+
 /**
  *  @brief Sanity check for device to be removed
  */

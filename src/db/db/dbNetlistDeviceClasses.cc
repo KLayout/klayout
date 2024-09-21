@@ -116,7 +116,7 @@ public:
   {
     double va = a->parameter_value (0);
     double vb = b->parameter_value (0);
-    a->set_parameter_value (0, va + vb < 1e-10 ? 0.0 : va * vb / (va + vb));
+    a->set_parameter_value (0, va + vb < 1e-30 ? 0.0 : va * vb / (va + vb));
 
     //  parallel width is sum of both, length is the one that gives the same value of resistance
     //    R = 1/(1/R1 + 1/R2)
@@ -204,7 +204,7 @@ public:
   {
     double va = a->parameter_value (0);
     double vb = b->parameter_value (0);
-    a->set_parameter_value (0, va + vb < 1e-10 ? 0.0 : va * vb / (va + vb));
+    a->set_parameter_value (0, va + vb < 1e-30 ? 0.0 : va * vb / (va + vb));
 
     //  TODO: does this implementation make sense?
     double aa = a->parameter_value (1);
@@ -259,7 +259,7 @@ public:
   {
     double va = a->parameter_value (0);
     double vb = b->parameter_value (0);
-    a->set_parameter_value (0, va + vb < 1e-10 ? 0.0 : va * vb / (va + vb));
+    a->set_parameter_value (0, va + vb < 1e-30 ? 0.0 : va * vb / (va + vb));
   }
 
   void serial (Device *a, Device *b) const

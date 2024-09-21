@@ -1809,6 +1809,12 @@ Class<db::Circuit> decl_dbCircuit (decl_dbNetlistObject, "db", "Circuit",
     "For example, serial or parallel resistors can be combined into "
     "a single resistor.\n"
   ) +
+  gsi::method ("purge_devices", &db::Circuit::purge_devices,
+    "@brief Purges invalid devices.\n"
+    "Purges devices which are considered invalid. Such devices are for example those whose terminals are all connected to a single net.\n"
+    "\n"
+    "This method has been added in version 0.29.7."
+  ) +
   gsi::method ("purge_nets", &db::Circuit::purge_nets,
     "@brief Purges floating nets.\n"
     "Floating nets are nets with no device or subcircuit attached to. Such floating "
@@ -2175,6 +2181,12 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
     "@brief Purges floating nets.\n"
     "Floating nets can be created as effect of reconnections of devices or pins. "
     "This method will eliminate all nets that make less than two connections."
+  ) +
+  gsi::method ("purge_devices", &db::Netlist::purge_devices,
+    "@brief Purges invalid devices.\n"
+    "Purges devices which are considered invalid. Such devices are for example those whose terminals are all connected to a single net.\n"
+    "\n"
+    "This method has been added in version 0.29.7."
   ) +
   gsi::method ("simplify", &db::Netlist::simplify,
     "@brief Convenience method that combines the simplification.\n"

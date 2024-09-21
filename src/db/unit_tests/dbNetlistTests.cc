@@ -1792,3 +1792,253 @@ TEST(26_JoinNets)
     "end;\n"
   );
 }
+
+//  Issue #1832 - small caps are not combined properly
+TEST(27_CombineSmallC)
+{
+  db::Netlist nl;
+
+  db::Circuit *circuit = new db::Circuit ();
+  circuit->set_name ("TOP");
+  nl.add_circuit (circuit);
+
+  db::DeviceClass *device = new db::DeviceClassCapacitor ();
+  device->set_name ("model_name");
+  nl.add_device_class (device);
+
+  db::Net *n1 = new db::Net ("n1");
+  circuit->add_net (n1);
+
+  db::Net *n2 = new db::Net ("n2");
+  circuit->add_net (n2);
+
+  db::Net *n3 = new db::Net ("n3");
+  circuit->add_net (n3);
+
+  auto p1 = circuit->add_pin ("p1");
+  auto p2 = circuit->add_pin ("p2");
+
+  circuit->connect_pin (p1.id (), n1);
+  circuit->connect_pin (p2.id (), n3);
+
+  db::Device *c1 = new db::Device (device, "c1");
+  circuit->add_device (c1);
+  c1->set_parameter_value (db::DeviceClassCapacitor::param_id_C, 1e-15);
+
+  db::Device *c2 = new db::Device (device, "c2");
+  circuit->add_device (c2);
+  c2->set_parameter_value (db::DeviceClassCapacitor::param_id_C, 2e-15);
+
+  db::Device *c3 = new db::Device (device, "c3");
+  circuit->add_device (c3);
+  c3->set_parameter_value (db::DeviceClassCapacitor::param_id_C, 3e-15);
+
+  c1->connect_terminal (db::DeviceClassCapacitor::terminal_id_A, n1);
+  c1->connect_terminal (db::DeviceClassCapacitor::terminal_id_B, n2);
+
+  c2->connect_terminal (db::DeviceClassCapacitor::terminal_id_A, n2);
+  c2->connect_terminal (db::DeviceClassCapacitor::terminal_id_B, n3);
+
+  c3->connect_terminal (db::DeviceClassCapacitor::terminal_id_A, n1);
+  c3->connect_terminal (db::DeviceClassCapacitor::terminal_id_B, n3);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit TOP (p1=n1,p2=n3);\n"
+    "  device model_name c1 (A=n1,B=n2) (C=1e-15,A=0,P=0);\n"
+    "  device model_name c2 (A=n2,B=n3) (C=2e-15,A=0,P=0);\n"
+    "  device model_name c3 (A=n1,B=n3) (C=3e-15,A=0,P=0);\n"
+    "end;\n"
+  );
+
+  nl.combine_devices ();
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit TOP (p1=n1,p2=n3);\n"
+    "  device model_name c1 (A=n1,B=n3) (C=3.66666666667e-15,A=0,P=0);\n"
+    "end;\n"
+  );
+}
+
+TEST(27_CombineSmallR)
+{
+  db::Netlist nl;
+
+  db::Circuit *circuit = new db::Circuit ();
+  circuit->set_name ("TOP");
+  nl.add_circuit (circuit);
+
+  db::DeviceClass *device = new db::DeviceClassResistor ();
+  device->set_name ("model_name");
+  nl.add_device_class (device);
+
+  db::Net *n1 = new db::Net ("n1");
+  circuit->add_net (n1);
+
+  db::Net *n2 = new db::Net ("n2");
+  circuit->add_net (n2);
+
+  db::Net *n3 = new db::Net ("n3");
+  circuit->add_net (n3);
+
+  auto p1 = circuit->add_pin ("p1");
+  auto p2 = circuit->add_pin ("p2");
+
+  circuit->connect_pin (p1.id (), n1);
+  circuit->connect_pin (p2.id (), n3);
+
+  db::Device *c1 = new db::Device (device, "c1");
+  circuit->add_device (c1);
+  c1->set_parameter_value (db::DeviceClassResistor::param_id_R, 1e-15);
+
+  db::Device *c2 = new db::Device (device, "c2");
+  circuit->add_device (c2);
+  c2->set_parameter_value (db::DeviceClassResistor::param_id_R, 2e-15);
+
+  db::Device *c3 = new db::Device (device, "c3");
+  circuit->add_device (c3);
+  c3->set_parameter_value (db::DeviceClassResistor::param_id_R, 3e-15);
+
+  c1->connect_terminal (db::DeviceClassResistor::terminal_id_A, n1);
+  c1->connect_terminal (db::DeviceClassResistor::terminal_id_B, n2);
+
+  c2->connect_terminal (db::DeviceClassResistor::terminal_id_A, n2);
+  c2->connect_terminal (db::DeviceClassResistor::terminal_id_B, n3);
+
+  c3->connect_terminal (db::DeviceClassResistor::terminal_id_A, n1);
+  c3->connect_terminal (db::DeviceClassResistor::terminal_id_B, n3);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit TOP (p1=n1,p2=n3);\n"
+    "  device model_name c1 (A=n1,B=n2) (R=1e-15,L=0,W=0,A=0,P=0);\n"
+    "  device model_name c2 (A=n2,B=n3) (R=2e-15,L=0,W=0,A=0,P=0);\n"
+    "  device model_name c3 (A=n1,B=n3) (R=3e-15,L=0,W=0,A=0,P=0);\n"
+    "end;\n"
+  );
+
+  nl.combine_devices ();
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit TOP (p1=n1,p2=n3);\n"
+    "  device model_name c1 (A=n1,B=n3) (R=1.5e-15,L=0,W=0,A=0,P=0);\n"
+    "end;\n"
+  );
+}
+
+TEST(27_CombineSmallL)
+{
+  db::Netlist nl;
+
+  db::Circuit *circuit = new db::Circuit ();
+  circuit->set_name ("TOP");
+  nl.add_circuit (circuit);
+
+  db::DeviceClass *device = new db::DeviceClassInductor ();
+  device->set_name ("model_name");
+  nl.add_device_class (device);
+
+  db::Net *n1 = new db::Net ("n1");
+  circuit->add_net (n1);
+
+  db::Net *n2 = new db::Net ("n2");
+  circuit->add_net (n2);
+
+  db::Net *n3 = new db::Net ("n3");
+  circuit->add_net (n3);
+
+  auto p1 = circuit->add_pin ("p1");
+  auto p2 = circuit->add_pin ("p2");
+
+  circuit->connect_pin (p1.id (), n1);
+  circuit->connect_pin (p2.id (), n3);
+
+  db::Device *c1 = new db::Device (device, "c1");
+  circuit->add_device (c1);
+  c1->set_parameter_value (db::DeviceClassInductor::param_id_L, 1e-15);
+
+  db::Device *c2 = new db::Device (device, "c2");
+  circuit->add_device (c2);
+  c2->set_parameter_value (db::DeviceClassInductor::param_id_L, 2e-15);
+
+  db::Device *c3 = new db::Device (device, "c3");
+  circuit->add_device (c3);
+  c3->set_parameter_value (db::DeviceClassInductor::param_id_L, 3e-15);
+
+  c1->connect_terminal (db::DeviceClassInductor::terminal_id_A, n1);
+  c1->connect_terminal (db::DeviceClassInductor::terminal_id_B, n2);
+
+  c2->connect_terminal (db::DeviceClassInductor::terminal_id_A, n2);
+  c2->connect_terminal (db::DeviceClassInductor::terminal_id_B, n3);
+
+  c3->connect_terminal (db::DeviceClassInductor::terminal_id_A, n1);
+  c3->connect_terminal (db::DeviceClassInductor::terminal_id_B, n3);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit TOP (p1=n1,p2=n3);\n"
+    "  device model_name c1 (A=n1,B=n2) (L=1e-15);\n"
+    "  device model_name c2 (A=n2,B=n3) (L=2e-15);\n"
+    "  device model_name c3 (A=n1,B=n3) (L=3e-15);\n"
+    "end;\n"
+  );
+
+  nl.combine_devices ();
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit TOP (p1=n1,p2=n3);\n"
+    "  device model_name c1 (A=n1,B=n3) (L=1.5e-15);\n"
+    "end;\n"
+  );
+}
+
+TEST(28_EliminateShortedDevices)
+{
+  db::Netlist nl;
+
+  db::Circuit *circuit = new db::Circuit ();
+  circuit->set_name ("TOP");
+  nl.add_circuit (circuit);
+
+  db::DeviceClass *device = new db::DeviceClassCapacitor ();
+  device->set_name ("model_name");
+  nl.add_device_class (device);
+
+  db::Net *n1 = new db::Net ("n1");
+  circuit->add_net (n1);
+
+  db::Net *n2 = new db::Net ("n2");
+  circuit->add_net (n2);
+
+  auto p1 = circuit->add_pin ("p1");
+  auto p2 = circuit->add_pin ("p2");
+
+  circuit->connect_pin (p1.id (), n1);
+  circuit->connect_pin (p2.id (), n2);
+
+  db::Device *c1 = new db::Device (device, "c1");
+  circuit->add_device (c1);
+  c1->set_parameter_value (db::DeviceClassInductor::param_id_L, 1e-15);
+
+  db::Device *c2 = new db::Device (device, "c2");
+  circuit->add_device (c2);
+  c2->set_parameter_value (db::DeviceClassInductor::param_id_L, 2e-15);
+
+  c1->connect_terminal (db::DeviceClassInductor::terminal_id_A, n1);
+  c1->connect_terminal (db::DeviceClassInductor::terminal_id_B, n1);
+
+  c2->connect_terminal (db::DeviceClassInductor::terminal_id_A, n1);
+  c2->connect_terminal (db::DeviceClassInductor::terminal_id_B, n2);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit TOP (p1=n1,p2=n2);\n"
+    "  device model_name c1 (A=n1,B=n1) (C=1e-15,A=0,P=0);\n"
+    "  device model_name c2 (A=n1,B=n2) (C=2e-15,A=0,P=0);\n"
+    "end;\n"
+  );
+
+  nl.purge_devices ();
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit TOP (p1=n1,p2=n2);\n"
+    "  device model_name c2 (A=n1,B=n2) (C=2e-15,A=0,P=0);\n"
+    "end;\n"
+  );
+}

@@ -103,7 +103,7 @@ jobs:
         name: artifact
         path: dist
 
-    - uses: pypa/gh-action-pypi-publish@v1.9.0
+    - uses: pypa/gh-action-pypi-publish@v1.10.0
       continue-on-error: true   # might fail if we don't bump the version
       with:
         user: __token__
@@ -120,7 +120,7 @@ jobs:
         name: artifact
         path: dist
 
-    - uses: pypa/gh-action-pypi-publish@v1.9.0
+    - uses: pypa/gh-action-pypi-publish@v1.10.0
       with:
         user: __token__
         password: ${{ secrets.pypi_password }}

@@ -689,8 +689,7 @@ scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db
 
 static bool split_polygon (bool first, db::Polygon &poly, size_t max_vertex_count, double max_area_ratio, std::vector<db::Polygon> &parts)
 {
-  if ((max_vertex_count > 0 && poly.vertices () > max_vertex_count) ||
-      (max_area_ratio > 0 && poly.area_ratio () > max_area_ratio)) {
+  if (db::suggest_split_polygon (poly, max_vertex_count, max_area_ratio)) {
 
     std::vector<db::Polygon> sp;
     db::split_polygon (poly, sp);

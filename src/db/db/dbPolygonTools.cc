@@ -634,6 +634,31 @@ template<> DB_PUBLIC void cut_polygon_internal (const db::DSimplePolygon &polygo
 
 
 // -------------------------------------------------------------------------
+//  Implementation of suggest_split_polygon
+
+template <class PolygonType>
+bool
+suggest_split_polygon (const PolygonType &polygon, size_t max_vertex_count, double max_area_ratio)
+{
+  if (polygon.is_box () || polygon.vertices () <= 3) {
+    return false;
+  } else if (max_vertex_count > 0 && polygon.vertices () > max_vertex_count) {
+    return true;
+  } else if (max_area_ratio > 0 && polygon.area_ratio () > max_area_ratio) {
+    return true;
+  } else if (max_area_ratio < 0 && polygon.area_upper_manhattan_bound_ratio () > -max_area_ratio) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+template DB_PUBLIC bool suggest_split_polygon<> (const db::Polygon &polygon, size_t max_vertex_count, double max_area_ratio);
+template DB_PUBLIC bool suggest_split_polygon<> (const db::SimplePolygon &polygon, size_t max_vertex_count, double max_area_ratio);
+template DB_PUBLIC bool suggest_split_polygon<> (const db::DPolygon &polygon, size_t max_vertex_count, double max_area_ratio);
+template DB_PUBLIC bool suggest_split_polygon<> (const db::DSimplePolygon &polygon, size_t max_vertex_count, double max_area_ratio);
+
+// -------------------------------------------------------------------------
 //  Implementation of split_polygon
 
 template <class PolygonType>

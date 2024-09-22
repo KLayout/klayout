@@ -405,7 +405,7 @@ private:
 // ----------------------------------------------------------------------------------
 
 DeepShapeStoreState::DeepShapeStoreState ()
-  : m_threads (1), m_max_area_ratio (3.0), m_max_vertex_count (16), m_reject_odd_polygons (false), m_text_property_name (), m_text_enlargement (-1), m_subcircuit_hierarchy_for_nets (false)
+  : m_threads (1), m_max_area_ratio (-3.0), m_max_vertex_count (16), m_reject_odd_polygons (false), m_text_property_name (), m_text_enlargement (-1), m_subcircuit_hierarchy_for_nets (false)
 {
   //  .. nothing yet ..
 }

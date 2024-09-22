@@ -786,6 +786,14 @@ public:
   }
 
   /**
+   *  @brief The upper bound area for a manhattan approximation of the contour times
+   */
+  area_type area_upper_manhattan_bound () const
+  {
+    return area_upper_manhattan_bound2 () / 2;
+  }
+
+  /**
    *  @brief The area of the contour times 2
    *  For integer area types, this is the more precise value as the division
    *  by 2 might round off.
@@ -803,6 +811,52 @@ public:
       point_type pp = (*this) [p];
       a += db::vprod (pp - point_type (), pl - point_type ());
       pl = pp;
+    }
+    return a;
+  }
+
+  /**
+   *  @brief The upper bound area for a manhattan approximation of the contour times 2
+   *  This area takes non-manhattan edges as being manhattan-interpolated to the outside.
+   */
+  area_type area_upper_manhattan_bound2 () const
+  {
+    size_type n = size ();
+    if (n < 3) {
+      return 0;
+    }
+
+    area_type a = 0;
+    point_type pl = (*this) [n - 1];
+    for (size_type p = 0; p < n; ++p) {
+
+      point_type pp = (*this) [p];
+
+      int sdx = pp.x () < pl.x () ? -1 : (pp.x () == pl.x () ? 0 : 1);
+      int sdy = pp.y () < pl.y () ? -1 : (pp.y () == pl.y () ? 0 : 1);
+
+      if (sdx != 0 && sdy != 0) {
+
+        point_type pm;
+
+        //  determine an interpolation point
+        if (sdx * sdy < 0) {
+          pm = point_type (pp.x (), pl.y ());
+        } else {
+          pm = point_type (pl.x (), pp.y ());
+        }
+
+        a += db::vprod (pm - point_type (), pl - point_type ());
+        a += db::vprod (pp - point_type (), pm - point_type ());
+
+      } else {
+
+        a += db::vprod (pp - point_type (), pl - point_type ());
+
+      }
+
+      pl = pp;
+
     }
     return a;
   }
@@ -1748,6 +1802,26 @@ public:
   }
 
   /**
+   *  @brief Returns the area ratio between the polygon's bounding box and upper manhattan approximation bound
+   *
+   *  This number is a measure how well the polygon is approximated by the bounding box,
+   *  while assuming an outer manhattan approximation is a good measure for the polygon's
+   *  area.
+   *  Values are bigger than 1 for well-formed polygons. Bigger values mean worse
+   *  approximation.
+   */
+  double area_upper_manhattan_bound_ratio () const
+  {
+    area_type a = this->area_upper_manhattan_bound2 ();
+    if (a == 0) {
+      //  By our definition, an empty polygon has an area ratio of 0
+      return 0.0;
+    } else {
+      return double (box ().area ()) / (0.5 * a);
+    }
+  }
+
+  /**
    *  @brief The hull "begin" point iterator
    *
    *  The hull point sequence delivers the points that the hull
@@ -2184,11 +2258,26 @@ public:
   /** 
    *  @brief The area of the polygon
    */
-  area_type area () const 
+  area_type area () const
   {
     area_type a = 0;
     for (typename contour_list_type::const_iterator h = m_ctrs.begin (); h != m_ctrs.end (); ++h) {
       a += h->area ();
+    }
+    return a;
+  }
+
+  /**
+   *  @brief The area of the polygon - upper manhattan bound
+   *
+   *  This gives the upper area bound for a manhattan approximation of the
+   *  polygon.
+   */
+  area_type area_upper_manhattan_bound () const
+  {
+    area_type a = 0;
+    for (typename contour_list_type::const_iterator h = m_ctrs.begin (); h != m_ctrs.end (); ++h) {
+      a += h->area_upper_manhattan_bound ();
     }
     return a;
   }
@@ -2203,6 +2292,21 @@ public:
     area_type a = 0;
     for (typename contour_list_type::const_iterator h = m_ctrs.begin (); h != m_ctrs.end (); ++h) {
       a += h->area2 ();
+    }
+    return a;
+  }
+
+  /**
+   *  @brief The area of the polygon - upper manhattan bound times 2
+   *
+   *  This gives the upper area bound for a manhattan approximation of the
+   *  polygon.
+   */
+  area_type area_upper_manhattan_bound2 () const
+  {
+    area_type a = 0;
+    for (typename contour_list_type::const_iterator h = m_ctrs.begin (); h != m_ctrs.end (); ++h) {
+      a += h->area_upper_manhattan_bound2 ();
     }
     return a;
   }
@@ -2967,6 +3071,17 @@ public:
   }
 
   /**
+   *  @brief The area of the polygon - upper manhattan bound
+   *
+   *  This gives the upper area bound for a manhattan approximation of the
+   *  polygon.
+   */
+  area_type area_upper_manhattan_bound () const
+  {
+    return m_hull.area_upper_manhattan_bound ();
+  }
+
+  /**
    *  @brief The area of the polygon times 2
    *  For integer area types, this is the more precise value as the division
    *  by 2 might round off.
@@ -2974,6 +3089,17 @@ public:
   area_type area2 () const
   {
     return m_hull.area2 ();
+  }
+
+  /**
+   *  @brief The area of the polygon - upper manhattan bound times 2
+   *
+   *  This gives the upper area bound for a manhattan approximation of the
+   *  polygon.
+   */
+  area_type area_upper_manhattan_bound2 () const
+  {
+    return m_hull.area_upper_manhattan_bound2 ();
   }
 
   /**
@@ -3093,6 +3219,26 @@ public:
   double area_ratio () const
   {
     area_type a = area2 ();
+    if (a == 0) {
+      //  By our definition, an empty polygon has an area ratio of 0
+      return 0.0;
+    } else {
+      return double (box ().area ()) / (0.5 * a);
+    }
+  }
+
+  /**
+   *  @brief Returns the area ratio between the polygon's bounding box and upper manhattan approximation bound
+   *
+   *  This number is a measure how well the polygon is approximated by the bounding box,
+   *  while assuming an outer manhattan approximation is a good measure for the polygon's
+   *  area.
+   *  Values are bigger than 1 for well-formed polygons. Bigger values mean worse
+   *  approximation.
+   */
+  double area_upper_manhattan_bound_ratio () const
+  {
+    area_type a = this->area_upper_manhattan_bound2 ();
     if (a == 0) {
       //  By our definition, an empty polygon has an area ratio of 0
       return 0.0;

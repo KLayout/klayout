@@ -1,0 +1,26 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+end
+
+l1 = input(1, 0)
+l1.output(100, 0)
+
+max_area_ratio(0.0)
+
+l1 = input(1, 0)
+l1.output(101, 0)
+
+max_area_ratio(3.0)
+
+l1 = input(1, 0)
+l1.output(102, 0)
+
+max_area_ratio(-3.0)
+
+l1 = input(1, 0)
+l1.output(103, 0)
+

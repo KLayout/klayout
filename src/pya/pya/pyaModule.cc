@@ -334,6 +334,10 @@ public:
 
     //  Customize
     if (! as_static) {
+#if PY_VERSION_HEX >= 0x030D0000
+      //  crashes with this option set
+      type->tp_flags &= ~Py_TPFLAGS_INLINE_VALUES;
+#endif
       type->tp_basicsize += sizeof (PYAObjectBase);
       type->tp_init = &pya_object_init;
       type->tp_new = &pya_object_new;
@@ -653,8 +657,8 @@ public:
 
           PyObject *desc = PYAAmbiguousMethodDispatcher::create (attr_inst, attr_class);
           PythonRef name (c2python (*a));
-          //  Note: we use GenericSetAttr since that one allows us setting attributes on built-in types
-          PyObject_GenericSetAttr ((PyObject *) type, name.get (), desc);
+          //  Note: we use the setattro function since that one allows us setting attributes on built-in types
+          (PyType_Type.tp_setattro) ((PyObject *) type, name.get (), desc);
 
         }
 

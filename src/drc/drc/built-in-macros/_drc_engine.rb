@@ -1296,25 +1296,24 @@ module DRC
     # @synopsis max_area_ratio
     #
     # In deep mode, polygons with a bounding box to polygon area ratio bigger than the given number
-    # will be split into smaller chunks to optimize performance (which gets better if the polygon's
-    # bounding boxes do not cover a lot of empty space).
+    # will be split into smaller chunks to optimize performance. Performance gets better if the polygon's
+    # bounding boxes do not cover too much of empty space.
     #
-    # The area ratio is a signed value. Negative values indicate a area ratio, taking the outer
-    # manhattan approximation of the polygons for the area ratio. 
-    # The sign of the value indicates the mode (manhattan approximation or real polygon) - the actual area 
-    # ratio checked is the absolute value.
+    # The area ratio is a signed value. Negative values indicate to use the outer
+    # manhattan approximation of the polygons for the area ratio. Positive values indicate to
+    # take the polygons as they are.
+    # The sign of the value indicates the mode - the actual area ratio checked is the absolute value.
     #
     # For manhattan polygons, an area ratio of -3.0 gives the same results than a positive 3.0. 
-    # For non-manhattan polygons, the area used for the polygon is larger than
-    # the actual polygon area. So splitting is less likely in these cases. This avoids degeneration
-    # of the split polygon which can otherwise happen for thin diagonal lines. These are often 
-    # resolved into a large number of small triangles which does not provide any benefit for 
-    # the algorithms.
+    # For non-manhattan polygons and a negative area ratio, the area taken for the polygon is larger than
+    # the actual polygon area. So splitting is less likely in this case. This avoids degeneration
+    # of the polygon assembly, which can otherwise happen for skinny diagonal polygons. These are usually 
+    # resolved into a large number of small triangles with no benefit for the algorithms.
     #
     # With a negative area ratio, triangles are equivalent to their bounding box and always
     # have an area ratio of 1.0.
     #
-    # The default threshold is -3.0 which gives fairly compact polygons and using their outer
+    # The default value is -3.0 which gives fairly compact polygons and is using their outer
     # manhattan approximation. Skinny diagonals will be maintained.
     #
     # Use this method with a numeric 

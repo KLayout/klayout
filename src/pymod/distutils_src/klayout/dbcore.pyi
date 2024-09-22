@@ -1219,6 +1219,16 @@ class Cell:
         """
         ...
     @overload
+    def clear(self, layer: LayerInfo) -> None:
+        r"""
+        @brief Clears the shapes on the given layer
+
+        This version takes a \LayerInfo object for the layer. If no such layer exists, this method does nothing.
+
+        This variant has been introduced in version 0.29.7.
+        """
+        ...
+    @overload
     def clear(self, layer_index: int) -> None:
         r"""
         @brief Clears the shapes on the given layer
@@ -2465,6 +2475,34 @@ class Cell:
         """
         ...
     @overload
+    def shapes(self, layer: LayerInfo) -> Shapes:
+        r"""
+        @brief Returns the shapes list of the given layer
+
+        This version takes a \LayerInfo object and will look up the layer index. If no layer exists with these attributes, it will be created.
+
+        @param layer The layer attributes
+
+        @return A reference to the shapes list
+
+        This variant has been introduced in version 0.29.7.
+        """
+        ...
+    @overload
+    def shapes(self, layer: LayerInfo) -> Shapes:
+        r"""
+        @brief Returns the shapes list of the given layer (const version)
+
+        This version takes a \LayerInfo object and will look up the layer index. An error is raised if no layer with these attributes exists.
+
+        @param layer The layer attributes
+
+        @return A reference to the shapes list
+
+        This variant has been introduced in version 0.29.7.
+        """
+        ...
+    @overload
     def shapes(self, layer_index: int) -> Shapes:
         r"""
         @brief Returns the shapes list of the given layer
@@ -2472,7 +2510,7 @@ class Cell:
         This method gives access to the shapes list on a certain layer.
         If the layer does not exist yet, it is created.
 
-        @param index The layer index of the shapes list to retrieve
+        @param layer_index The layer index of the shapes list to retrieve
 
         @return A reference to the shapes list
         """
@@ -2484,7 +2522,7 @@ class Cell:
 
         This method gives access to the shapes list on a certain layer. This is the const version - only const (reading) methods can be called on the returned object.
 
-        @param index The layer index of the shapes list to retrieve
+        @param layer_index The layer index of the shapes list to retrieve
 
         @return A reference to the shapes list
 
@@ -4311,6 +4349,14 @@ class Circuit(NetlistObject):
     def pin_count(self) -> int:
         r"""
         @brief Gets the number of pins in the circuit
+        """
+        ...
+    def purge_devices(self) -> None:
+        r"""
+        @brief Purges invalid devices.
+        Purges devices which are considered invalid. Such devices are for example those whose terminals are all connected to a single net.
+
+        This method has been added in version 0.29.7.
         """
         ...
     def purge_nets(self) -> None:
@@ -11708,6 +11754,16 @@ class DPolygon:
         This method has been introduced in version 0.26.1
         """
         ...
+    def area_upper_manhattan_bound(self) -> float:
+        r"""
+        @hide
+        """
+        ...
+    def area_upper_manhattan_bound2(self) -> float:
+        r"""
+        @hide
+        """
+        ...
     def assign(self, other: DPolygon) -> None:
         r"""
         @brief Assigns another object to self
@@ -12565,6 +12621,16 @@ class DSimplePolygon:
         This method has been introduced in version 0.26.1
         """
         ...
+    def area_upper_manhattan_bound(self) -> float:
+        r"""
+        @hide
+        """
+        ...
+    def area_upper_manhattan_bound2(self) -> float:
+        r"""
+        @hide
+        """
+        ...
     def assign(self, other: DSimplePolygon) -> None:
         r"""
         @brief Assigns another object to self
@@ -13014,7 +13080,8 @@ class DText:
     Setter:
     @brief Sets the horizontal alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     size: float
     r"""
@@ -15472,15 +15539,15 @@ class DeviceAbstract:
     @overload
     def netlist(self) -> Netlist:
         r"""
-        @brief Gets the netlist the device abstract lives in (non-const version).
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the netlist the device abstract lives in.
         """
         ...
     @overload
     def netlist(self) -> Netlist:
         r"""
-        @brief Gets the netlist the device abstract lives in.
+        @brief Gets the netlist the device abstract lives in (non-const version).
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     ...
@@ -29808,11 +29875,11 @@ class Instance:
 
     Starting with version 0.25 the displacement is of vector type.
     Setter:
-    @brief Sets the displacement vector for the 'a' axis in micrometer units
+    @brief Sets the displacement vector for the 'a' axis
 
-    Like \a= with an integer displacement, this method will set the displacement vector but it accepts a vector in micrometer units that is of \DVector type. The vector will be translated to database units internally.
+    If the instance was not an array instance before it is made one.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.23. Starting with version 0.25 the displacement is of vector type.
     """
     b: Vector
     r"""
@@ -29857,10 +29924,10 @@ class Instance:
     Getter:
     @brief Gets the basic \CellInstArray object associated with this instance reference.
     Setter:
-    @brief Returns the basic cell instance array object by giving a micrometer unit object.
-    This method replaces the instance by the given CellInstArray object and it internally transformed into database units.
+    @brief Changes the \CellInstArray object to the given one.
+    This method replaces the instance by the given CellInstArray object.
 
-    This method has been introduced in version 0.25
+    This method has been introduced in version 0.22
     """
     cplx_trans: ICplxTrans
     r"""
@@ -29999,10 +30066,9 @@ class Instance:
     @brief Gets the transformation of the instance or the first instance in the array
     The transformation returned is only valid if the array does not represent a complex transformation array
     Setter:
-    @brief Sets the transformation of the instance or the first instance in the array (in micrometer units)
-    This method sets the transformation the same way as \cplx_trans=, but the displacement of this transformation is given in micrometer units. It is internally translated into database units.
+    @brief Sets the transformation of the instance or the first instance in the array
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.23.
     """
     @classmethod
     def new(cls) -> Instance:
@@ -33187,6 +33253,32 @@ class Layout:
         """
         ...
     @overload
+    def clear_layer(self, layer: LayerInfo) -> None:
+        r"""
+        @brief Clears a layer
+
+        This variant takes a \LayerInfo object to address the layer.
+        It does nothing if no layer with these attributes exists.
+
+        This variant was introduced in version 0.26.7.
+
+        @param layer The attributes of the layer to clear.
+        """
+        ...
+    @overload
+    def clear_layer(self, layer: LayerInfo, flags: int) -> None:
+        r"""
+        @brief Clears a layer (given shape types only)
+
+        This variant takes a \LayerInfo object to address the layer.
+        It does nothing if no layer with these attributes exists.
+
+        This variant was introduced in version 0.26.7.
+
+        @param layer The attributes of the layer to clear.
+        """
+        ...
+    @overload
     def clear_layer(self, layer_index: int) -> None:
         r"""
         @brief Clears a layer
@@ -33195,7 +33287,7 @@ class Layout:
 
         This method was introduced in version 0.19.
 
-        @param layer_index The index of the layer to delete.
+        @param layer_index The index of the layer to clear.
         """
         ...
     @overload
@@ -33207,7 +33299,7 @@ class Layout:
 
         This method was introduced in version 0.28.9.
 
-        @param layer_index The index of the layer to delete.
+        @param layer_index The index of the layer to clear.
         @param flags The type selector for the shapes to delete (see \Shapes class, S... constants).
         """
         ...
@@ -33512,6 +33604,20 @@ class Layout:
         This method has been introduced in version 0.20.
         """
         ...
+    @overload
+    def delete_layer(self, layer: LayerInfo) -> None:
+        r"""
+        @brief Deletes a layer
+
+        This variant takes a \LayerInfo object to address the layer.
+        It does nothing if no layer with these attributes exists.
+
+        This variant was introduced in version 0.26.7.
+
+        @param layer The attributes of the layer to delete.
+        """
+        ...
+    @overload
     def delete_layer(self, layer_index: int) -> None:
         r"""
         @brief Deletes a layer
@@ -34180,8 +34286,8 @@ class Layout:
     @overload
     def properties(self) -> Any:
         r"""
-        @brief Gets the user properties as a hash
-        This method is a convenience method that gets all user properties as a single hash.
+        @brief Gets the Layout's user properties as a hash
+        This method is a convenience method that gets all user properties of the Layout object as a single hash.
 
         This method has been introduced in version 0.29.5.
         """
@@ -34191,13 +34297,57 @@ class Layout:
         r"""
         @brief Gets the properties set for a given properties ID
 
-        Basically performs the backward conversion of the 'properties_id' method. Given a properties ID, returns the properties set as an array of pairs of variants. In this array, each key and the value are stored as pairs (arrays with two elements).
+        Basically this method performs the backward conversion of the 'properties_id' method. Given a properties ID, it returns the properties set as an array. In this array, each key and the value is stored as a pair (an array with two elements).
         If the properties ID is not valid, an empty array is returned.
+        A version that returns a hash instead of pairs of key/values, is \properties_hash.
 
         @param properties_id The properties ID to get the properties for
-        @return The array of variants (see \properties_id)
+        @return An array of key/value pairs (see \properties_id)
+
+        The 'properties_array' alias was introduced in version 0.29.7 and the plain 'properties' alias was deprecated.
         """
         ...
+    def properties_array(self, properties_id: int) -> List[Any]:
+        r"""
+        @brief Gets the properties set for a given properties ID
+
+        Basically this method performs the backward conversion of the 'properties_id' method. Given a properties ID, it returns the properties set as an array. In this array, each key and the value is stored as a pair (an array with two elements).
+        If the properties ID is not valid, an empty array is returned.
+        A version that returns a hash instead of pairs of key/values, is \properties_hash.
+
+        @param properties_id The properties ID to get the properties for
+        @return An array of key/value pairs (see \properties_id)
+
+        The 'properties_array' alias was introduced in version 0.29.7 and the plain 'properties' alias was deprecated.
+        """
+        ...
+    def properties_hash(self, properties_id: int) -> Any:
+        r"""
+        @brief Gets the properties set for a given properties ID as a hash
+
+        Returns the properties for a given properties ID as a hash.
+        It is a convenient alternative to \properties_array, which returns an array of key/value pairs.
+
+        @param properties_id The properties ID to get the properties for
+        @return The hash representing the properties for the given ID (values vs. key)
+
+        This method has been introduced in version 0.29.7.
+        """
+        ...
+    @overload
+    def properties_id(self, properties: Dict[Any, Any]) -> int:
+        r"""
+        @brief Gets the properties ID for a given properties set
+
+        This variant accepts a hash of value vs. key for the properties instead of array of key/value pairs. Apart from this, it behaves like the other \properties_id variant.
+
+        @param properties A hash of property keys/values (both keys and values can be integer, double or string)
+        @return The unique properties ID for that set
+
+        This variant has been introduced in version 0.29.7.
+        """
+        ...
+    @overload
     def properties_id(self, properties: Sequence[Any]) -> int:
         r"""
         @brief Gets the properties ID for a given properties set
@@ -34211,7 +34361,7 @@ class Layout:
         ...
     def property(self, key: Any) -> Any:
         r"""
-        @brief Gets the user property with the given key
+        @brief Gets the Layout's user property with the given key
         This method is a convenience method that gets the property with the given key. If no property with that key exists, it will return nil. Using that method is more convenient than using the properties ID to retrieve the property value. 
         This method has been introduced in version 0.24.
         """
@@ -35739,53 +35889,71 @@ class LayoutQueryIterator:
 
 class LayoutToNetlist:
     r"""
-    @brief A generic framework for extracting netlists from layouts
+    @brief A framework for extracting netlists from layouts
 
-    This class wraps various concepts from db::NetlistExtractor and db::NetlistDeviceExtractor
-    and more. It is supposed to provide a framework for extracting a netlist from a layout.
+    This class provides a framework for extracting a netlist from a layout.
 
-    The use model of this class consists of five steps which need to be executed in this order.
+    A LayoutToNetlist object extracts a netlist from an external \Layout. To do so, it keeps an internal copy with an optimized representation of the original layout. When a netlist is extracted the net geometries can be recovered from that internal layout. In addition to that layout, it keeps the extracted netlist. Netlist and internal layout form a pair and there are references between them. For example, the \Circuit objects from the netlist have an attribute \cell_index, which tells what cell from the internal layout the circuit was derived from. In the same way, subcircuit references refer to cell instances and nets keep a reference to the shapes they were derived from.
+
+    LayoutToNetlist can also operate in detached mode, when there is no external layout. In this mode, layers are created inside the internal layout only. As there is no input hierarchy, operation is necessarily flat in that case. Single \Region and \Texts shape collections can be introduced into the LayoutToNetlist objects from external sources to populate the layers from the internal layout.
+    For detached mode, use the 'LayoutToNetlist(topcell, dbu)' constructor.
+
+    Usually, the internal layout is stored inside an internal \DeepShapeStore object, which supplies additional services such as layer lifetime management and maintains the connection to and from the external layout.
+    However, you can also use the extractor with an existing \DeepShapeStore object.
+    In that case, this external \DeepShapeStore object is used instead of the internal one.
+
+    The LayoutToNetlist object can be persisted into a 'Layout to netlist database' file. This database is a storage for both the netlist and the net or circuit geometries. When reading such file into a new LayoutToNetlist object, there will be no connection to any external layout, but all the essential netlist and geometry information will be available.
+
+    The LayoutToNetlist object is also the entry point for netlist-driven algorithms such as antenna checks.
+
+    The use model of the LayoutToNetlist object consists of five steps which need to be executed in this order.
 
     @ul
-    @li Configuration: in this step, the LayoutToNetlist object is created and
+    @li @b Configuration: @/b
+        In this step, the LayoutToNetlist object is created and
         if required, configured. Methods to be used in this step are \threads=,
         \area_ratio= or \max_vertex_count=. The constructor for the LayoutToNetlist
         object receives a \RecursiveShapeIterator object which basically supplies the
-        hierarchy and the layout taken as input.
+        hierarchy and the external layout taken as input. The constructor will initialize
+        the internal layout and connect it to the external one.
     @/li
-    @li Preparation
+    @li @b Preparation: @/b
         In this step, the device recognition and extraction layers are drawn from
-        the framework. Derived can now be computed using boolean operations.
-        Methods to use in this step are \make_layer and its variants.
+        the framework. Derived layers can now be computed using boolean operations.
+        Methods to use in this step are \make_layer and its variants. \make_layer will either create
+        a new, empty layer or pull a layer from the external layout into the internal layout.
+        Derived layers are computed using the \Region or \Texts objects representing
+        existing layers. If derived layers are to be used in connectivity, they
+        need to be registered using \register. This makes the LayoutToNetlist object the owner of     the layer (the layer is said to be persisted then). Registered layers can or should be given a     name. That helps indentifying them later.
         Layer preparation is not necessarily required to happen before all
         other steps. Layers can be computed shortly before they are required.
     @/li
-    @li Following the preparation, the devices can be extracted using \extract_devices.
+    @li @b Device extraction: @/b
+        Following the preparation, the devices can be extracted using \extract_devices.
         This method needs to be called for each device extractor required. Each time,
-        a device extractor needs to be given plus a map of device layers. The device
+        a device extractor needs to be given, plus a map of device layers. The device
         layers are device extractor specific. Either original or derived layers
         may be specified here. Layer preparation may happen between calls to \extract_devices.
     @/li
-    @li Once the devices are derived, the netlist connectivity can be defined and the
+    @li @b Connectivity definition: @/b
+        Once the devices are derived, the netlist connectivity can be defined and the
         netlist extracted. The connectivity is defined with \connect and its
         flavours. The actual netlist extraction happens with \extract_netlist.
     @/li
-    @li After netlist extraction, the information is ready to be retrieved.
+    @li @b Netlist extraction: @/b
+        After netlist extraction, the information is ready to be retrieved.
         The produced netlist is available with \netlist. The Shapes of a
         specific net are available with \shapes_of_net. \probe_net allows
         finding a net by probing a specific location.
     @/li
     @/ul
 
-    You can also use the extractor with an existing \DeepShapeStore object or even flat data. In this case, preparation means importing existing regions with the \register method.
-    If you want to use the \LayoutToNetlist object with flat data, use the 'LayoutToNetlist(topcell, dbu)' constructor. If you want to use it with hierarchical data and an existing DeepShapeStore object, use the 'LayoutToNetlist(dss)' constructor.
-
     Once the extraction is done, you can persist the \LayoutToNetlist object using \write and restore it using \read. You can use the query API (see below) to analyze the LayoutToNetlist database.
 
     The query API of the \LayoutToNetlist object consists of the following parts:
 
     @ul
-    @li Net shape retrieval: \build_all_nets, \build_nets, \build_net and \shapes_per_net @/li
+    @li Net shape retrieval: \build_all_nets, \build_nets, \build_net and \shapes_of_net @/li
     @li Layers: \layer_by_index, \layer_by_name, \layer_indexes, \layer_names, \layer_info, \layer_name @/li
     @li Log entries: \each_log_entry @/li
     @li Probing (get net from position): \probe_net @/li
@@ -36048,7 +36216,7 @@ class LayoutToNetlist:
         ...
     @overload
     @classmethod
-    def new(cls, dss: DeepShapeStore) -> LayoutToNetlist:
+    def new(cls, dss: DeepShapeStore, layout_index: Optional[int] = ...) -> LayoutToNetlist:
         r"""
         @brief Creates a new extractor object reusing an existing \DeepShapeStore object
         This constructor can be used if there is a DSS object already from which the shapes can be taken. This version can only be used with \register to add layers (regions) inside the 'dss' object.
@@ -36060,31 +36228,50 @@ class LayoutToNetlist:
         ...
     @overload
     @classmethod
-    def new(cls, dss: DeepShapeStore, layout_index: int) -> LayoutToNetlist:
-        r"""
-        @brief Creates a new extractor object reusing an existing \DeepShapeStore object
-        This constructor can be used if there is a DSS object already from which the shapes can be taken. NOTE: in this case, the make_... functions will create new layers inside this DSS. To register existing layers (regions) use \register.
-        """
-        ...
-    @overload
-    @classmethod
     def new(cls, iter: RecursiveShapeIterator) -> LayoutToNetlist:
         r"""
         @brief Creates a new extractor connected to an original layout
         This constructor will attach the extractor to an original layout through the shape iterator.
+
+        The shape iterator does not need to be an actual shape iterator. It is merely used to identify the original layout and provides additional parameters such as the top cell to use and advanced options such as subtree pruning.
+
+        You can construct a dummy iteraor usable for this purpose without layers using an empty layer set:
+
+        @code
+        ly = ...  # external layout
+        l2n = RBA::LayoutToNetlist::new(RBA::RecursiveShapeIterator::new(ly, ly.top_cell, []))...@/code
         """
         ...
     @overload
     @classmethod
     def new(cls, topcell_name: str, dbu: float) -> LayoutToNetlist:
         r"""
-        @brief Creates a new extractor object with a flat DSS
+        @brief Creates a new, detached extractor object with a flat DSS
         @param topcell_name The name of the top cell of the internal flat layout
         @param dbu The database unit to use for the internal flat layout
 
         This constructor will create an extractor for flat extraction. Layers registered with \register will be flattened. New layers created with make_... will be flat layers.
 
         The database unit is mandatory because the physical parameter extraction for devices requires this unit for translation of layout to physical dimensions.
+
+        Example:
+
+        @code
+        rmetal1 = ...  # an external Region object representing 'metal1' layer
+        rvia11  = ...  # an external Region object representing 'via1' layer
+        rmetal2 = ...  # an external Region object representing 'metal2' layer
+
+        l2n = RBA::LayoutToNetlist::new("TOP_CELL", 0.001)
+        # imports the external Regions as flat ones and assigns proper names
+        l2n.register(rmetal1, "metal1")
+        l2n.register(rvia1, "via1")
+        l2n.register(rmetal2, "metal2")
+
+        # intra- and inter-layer connects:
+        l2n.connect(metal1)
+        l2n.connect(metal1, via1)
+        l2n.connect(metal2)
+        @/code
         """
         ...
     @overload
@@ -36095,7 +36282,7 @@ class LayoutToNetlist:
         """
         ...
     @overload
-    def __init__(self, dss: DeepShapeStore) -> None:
+    def __init__(self, dss: DeepShapeStore, layout_index: Optional[int] = ...) -> None:
         r"""
         @brief Creates a new extractor object reusing an existing \DeepShapeStore object
         This constructor can be used if there is a DSS object already from which the shapes can be taken. This version can only be used with \register to add layers (regions) inside the 'dss' object.
@@ -36106,29 +36293,49 @@ class LayoutToNetlist:
         """
         ...
     @overload
-    def __init__(self, dss: DeepShapeStore, layout_index: int) -> None:
-        r"""
-        @brief Creates a new extractor object reusing an existing \DeepShapeStore object
-        This constructor can be used if there is a DSS object already from which the shapes can be taken. NOTE: in this case, the make_... functions will create new layers inside this DSS. To register existing layers (regions) use \register.
-        """
-        ...
-    @overload
     def __init__(self, iter: RecursiveShapeIterator) -> None:
         r"""
         @brief Creates a new extractor connected to an original layout
         This constructor will attach the extractor to an original layout through the shape iterator.
+
+        The shape iterator does not need to be an actual shape iterator. It is merely used to identify the original layout and provides additional parameters such as the top cell to use and advanced options such as subtree pruning.
+
+        You can construct a dummy iteraor usable for this purpose without layers using an empty layer set:
+
+        @code
+        ly = ...  # external layout
+        l2n = RBA::LayoutToNetlist::new(RBA::RecursiveShapeIterator::new(ly, ly.top_cell, []))...@/code
         """
         ...
     @overload
     def __init__(self, topcell_name: str, dbu: float) -> None:
         r"""
-        @brief Creates a new extractor object with a flat DSS
+        @brief Creates a new, detached extractor object with a flat DSS
         @param topcell_name The name of the top cell of the internal flat layout
         @param dbu The database unit to use for the internal flat layout
 
         This constructor will create an extractor for flat extraction. Layers registered with \register will be flattened. New layers created with make_... will be flat layers.
 
         The database unit is mandatory because the physical parameter extraction for devices requires this unit for translation of layout to physical dimensions.
+
+        Example:
+
+        @code
+        rmetal1 = ...  # an external Region object representing 'metal1' layer
+        rvia11  = ...  # an external Region object representing 'via1' layer
+        rmetal2 = ...  # an external Region object representing 'metal2' layer
+
+        l2n = RBA::LayoutToNetlist::new("TOP_CELL", 0.001)
+        # imports the external Regions as flat ones and assigns proper names
+        l2n.register(rmetal1, "metal1")
+        l2n.register(rvia1, "via1")
+        l2n.register(rmetal2, "metal2")
+
+        # intra- and inter-layer connects:
+        l2n.connect(metal1)
+        l2n.connect(metal1, via1)
+        l2n.connect(metal2)
+        @/code
         """
         ...
     def _const_cast(self) -> LayoutToNetlist:
@@ -36424,10 +36631,12 @@ class LayoutToNetlist:
     def connect(self, l: Region) -> None:
         r"""
         @brief Defines an intra-layer connection for the given layer.
-        The layer is either an original layer created with \make_includelayer and its variants or
-        a derived layer. Certain limitations apply. It's safe to use
+        The layer as a Region object, representing either an original layer created with \make_layer and its variants or
+        a derived layer which was registered using \register. Certain limitations apply. It's safe to use
         boolean operations for deriving layers. Other operations are applicable as long as they are
-        capable of delivering hierarchical layers.
+        capable of delivering hierarchical layers. Operations that introduce flat layers will create additonal pins
+        as connections need to be made from a subcell to the top cell. Hence, flat layers - or rather some with a bad hierarchy - should
+        be avoided in \connect.
         """
         ...
     @overload
@@ -36476,6 +36685,7 @@ class LayoutToNetlist:
     def dss(self) -> DeepShapeStore:
         r"""
         @brief Gets a reference to the internal DSS object.
+        See the class description for details about the DSS object used inside the LayoutToNetlist object.
         """
         ...
     def dump_joined_net_names(self) -> str:
@@ -36515,13 +36725,42 @@ class LayoutToNetlist:
         @brief Extracts devices
         See the class description for more details.
         This method will run device extraction for the given extractor. The layer map is specific
-        for the extractor and uses the region objects derived with \make_layer and its variants.
+        for the extractor and uses the Region objects derived with \make_layer and its variants or Region objects registered through \register. The layer map keys are the inputs layers defined for the
+        specific extractor, but also the output layers where the extractor places markers for the device terminals.
 
-        In addition, derived regions can be passed too. Certain limitations apply. It's safe to use
+        In addition, derived regions can also be passed to the device extractor inside the layer map.
+        Certain limitations apply. It is usually safe to use
         boolean operations for deriving layers. Other operations are applicable as long as they are
         capable of delivering hierarchical layers.
 
-        If errors occur, the device extractor will contain theses errors.
+        Example:
+
+        @code
+        ly = ... # original Layout
+
+        l2n = RBA::LayoutToNetlist::new(RBA::RecursiveShapeIterator::new(ly, ly.top_cell, []))
+        rnwell   = l2n.make_layer(ly.layer(1, 0), "nwell" )
+        ractive  = l2n.make_layer(ly.layer(2, 0), "active" )
+        rpoly    = l2n.make_layer(ly.layer(3, 0), "poly" )
+
+        rpactive = ractive & rnwell
+        rpgate   = rpactive & rpoly
+        rpsd     = rpactive - rpgate
+
+        rnactive = ractive - rnwell
+        rngate   = rnactive & rpoly
+        rnsd     = rnactive - rngate
+
+        # PMOS transistor device extraction
+        pmos_ex = RBA::DeviceExtractorMOS3Transistor::new("PMOS")
+        l2n.extract_devices(pmos_ex, { "SD" => rpsd, "G" => rpgate, "P" => rpoly })
+
+        # NMOS transistor device extraction
+        nmos_ex = RBA::DeviceExtractorMOS3Transistor::new("NMOS")
+        l2n.extract_devices(nmos_ex, { "SD" => rnsd, "G" => rngate, "P" => rpoly })
+        @/code
+
+        If errors occur, they will be logged inside the device extractor object and copied to the log of this LayoutToNetlist object (self).
         """
         ...
     def extract_netlist(self) -> None:
@@ -36548,6 +36787,8 @@ class LayoutToNetlist:
         r"""
         @brief Gets the internal layout
         The internal layout is where the LayoutToNetlist database stores the shapes for the nets. Usually you do not need to access this object - you must use \build_net or \shapes_of_net to retrieve the per-net shape information. If you access the internal layout, make sure you do not modify it.
+
+        See the class description for details about the internal layout object.
         """
         ...
     def internal_top_cell(self) -> Cell:
@@ -36555,6 +36796,8 @@ class LayoutToNetlist:
         @brief Gets the internal top cell
         Usually it should not be required to obtain the internal cell. If you need to do so, make sure not to modify the cell as
         the functionality of the netlist extractor depends on it.
+
+        See the class description for details about the internal layout object.
         """
         ...
     def is_const_object(self) -> bool:
@@ -36575,14 +36818,16 @@ class LayoutToNetlist:
     def is_persisted(self, layer: Region) -> bool:
         r"""
         @brief Returns true, if the given layer is a persisted region.
-        Persisted layers are kept inside the LayoutToNetlist object and are not released if their object is destroyed. Named layers are persisted, unnamed layers are not. Only persisted, named layers can be put into \connect.
+        Persisted layers are kept inside the LayoutToNetlist object and are not released if their object is destroyed. Layers created with make_... or registered through \register are persisted.
+        This basically applies to all layers, except intermediate layers that are potentially created as results of operations between layers and which are not registered.
         """
         ...
     @overload
     def is_persisted(self, layer: Texts) -> bool:
         r"""
         @brief Returns true, if the given layer is a persisted texts collection.
-        Persisted layers are kept inside the LayoutToNetlist object and are not released if their object is destroyed. Named layers are persisted, unnamed layers are not. Only persisted, named layers can be put into \connect.
+        Persisted layers are kept inside the LayoutToNetlist object and are not released if their object is destroyed. Layers created with make_... or registered through \register are persisted.
+        This basically applies to all layers, except intermediate layers that are potentially created as results of operations between layers and which are not registered.
 
         The variant for Texts collections has been added in version 0.27.
         """
@@ -36645,24 +36890,35 @@ class LayoutToNetlist:
         ...
     def keep_dss(self) -> None:
         r"""
-        @brief Resumes ownership over the DSS object if created with an external one.
+        @brief Takes ownership of the DSS object if the LayoutToNetlist object was created with an external one.
+        See the class description for details about the DSS object used inside the LayoutToNetlist object.
         """
         ...
     def layer_by_index(self, index: int) -> Region:
         r"""
         @brief Gets a layer object for the given index.
-        Only named layers can be retrieved with this method. The returned object is a copy which represents the named layer.
+        The returned object is a new Region object representing the layer with the given index. It will refer to a layer inside the internal layout, or more specifically inside the \DeepShapeStorage object (see \dss and \internal_layout).
+        The method returns 'nil' if the index is not a valid layer index.
         """
         ...
     def layer_by_name(self, name: str) -> Region:
         r"""
         @brief Gets a layer object for the given name.
-        The returned object is a copy which represents the named layer.
+        The returned object is a new Region object representing the named layer. It will refer to a layer inside the internal layout, or more specifically inside the \DeepShapeStorage object (see \dss and \internal_layout).
+        The method returns 'nil' if the name is not a valid layer name.
+        See \register and the make_... methods for a description of layer naming.
         """
         ...
     def layer_index(self, l: ShapeCollection) -> int:
         r"""
         @brief Gets the layer index for the given data object
+        This method is essentially identical to \layer_of, but uses \ShapeCollection, which is a polymorphic base class for a variety of shape containers.
+
+        The layer index returned is index of the corresponding layer inside the internal layout (see \internal_layout).
+        The layer index is more handy to use for identifying a layer than a \Region of \Texts object, for example when using it as a key in hashes.
+
+        You can use \layer_by_index to retrieve the \Region object of a layer from the layer index.
+
         This method has been introduced in version 0.29.3.
         """
         ...
@@ -36670,6 +36926,7 @@ class LayoutToNetlist:
         r"""
         @brief Returns a list of indexes of the layers kept inside the LayoutToNetlist object.
         You can use \layer_name to get the name from a layer index. You can use \layer_info to get the \LayerInfo object attached to a layer - if the layer is an original layer.
+        You can use \layer_by_index to get the \Region object for the layer by index.
 
         This method has been introduced in version 0.29.2.
         """
@@ -36679,6 +36936,8 @@ class LayoutToNetlist:
         @brief Returns the LayerInfo object attached to a layer (by index).
         If the layer is an original layer and not a derived one, this method will return the stream layer information where the original layer was taken from. Otherwise an empty \LayerInfo object is returned.
 
+        The LayerInfo object is usually empty for derived layers - i.e. those which are computed through boolean operations for example. It is recommended to assign names to such layers for easy identification later.
+
         This method has been introduced in version 0.29.2.
         """
         ...
@@ -36686,12 +36945,17 @@ class LayoutToNetlist:
     def layer_name(self, l: ShapeCollection) -> str:
         r"""
         @brief Gets the name of the given layer
+        The layer is given by a \ShapeCollection object which is either a \Region or \Texts object.
+        This \Region or \Texts object needs to be either one that was created by make_... or one that
+        was registered through \register. This function will return the name that was given to that \Region or \Texts during those operations.
+        You can use \layer_by_name to retrieve the \Region object of a layer from the layer index.
         """
         ...
     @overload
     def layer_name(self, l: int) -> str:
         r"""
         @brief Gets the name of the given layer (by index)
+        See \layer_index for a description of the layer index.
         """
         ...
     def layer_names(self) -> List[str]:
@@ -36722,11 +36986,11 @@ class LayoutToNetlist:
         r"""
         @brief Creates a new hierarchical region representing an original layer
         'layer_index' is the layer index of the desired layer in the original layout.
-        This variant produces polygons and takes texts for net name annotation.
+        This variant produces polygons and takes texts for net name annotation as special, property-annotated polygons.
         A variant not taking texts is \make_polygon_layer. A Variant only taking
         texts is \make_text_layer.
 
-        The name is optional. If given, the layer will already be named accordingly (see \register).
+        This method will basically create a copy of the original layer inside the internal layout - more specifically inside the DSS (see \dss and \internal_layout). It returns a new Region object that represents this layer copy. The new layer is already registered with the given name and can be used for \connect for example.
         """
         ...
     @overload
@@ -36734,23 +36998,21 @@ class LayoutToNetlist:
         r"""
         @brief Creates a new, empty hierarchical region
 
+        This method will create a new, empty layer inside the internal layout and register it.
+        It returns a new Region object that represents the new layer. See the class description for more details.
         The name is optional. If given, the layer will already be named accordingly (see \register).
         """
         ...
     def make_polygon_layer(self, layer_index: int, name: Optional[str] = ...) -> Region:
         r"""
-        @brief Creates a new region representing an original layer taking polygons and texts
+        @brief Creates a new region representing an original layer taking polygons only
         See \make_layer for details.
-
-        The name is optional. If given, the layer will already be named accordingly (see \register).
         """
         ...
     def make_text_layer(self, layer_index: int, name: Optional[str] = ...) -> Texts:
         r"""
         @brief Creates a new region representing an original layer taking texts only
         See \make_layer for details.
-
-        The name is optional. If given, the layer will already be named accordingly (see \register).
 
         Starting with version 0.27, this method returns a \Texts object.
         """
@@ -36816,9 +37078,14 @@ class LayoutToNetlist:
         'l' must be a \Region or \Texts object.
         Flat regions or text collections must be registered with this function, before they can be used in \connect. Registering will copy the shapes into the LayoutToNetlist object in this step to enable netlist extraction.
 
-        Naming a layer allows the system to indicate the layer in various contexts, i.e. when writing the data to a file. Named layers are also persisted inside the LayoutToNetlist object. They are not discarded when the Region object is destroyed.
+        External \Region or \Texts objects that are registered are persisted. This means the LayoutToNetlist object becomes owner of them and they are not discarded when the Region or Text object is destroyed.
 
-        If required, the system will assign a name automatically.
+        Naming a layer allows allows retrieving the layer later, for example after the LayoutToNetlist object
+        has been written to a file and restored from that file (during this process, the layer indexes will change).
+
+        If no name is given, the system will assign a name automatically.
+        It is recommended to specify a name if it is required to identify the layer later - for example for retrieving shapes from it.
+
         This method has been generalized in version 0.27. Starting with version 0.29.3, the index of the layer is returned.
         """
         ...
@@ -38073,6 +38340,204 @@ class LoadLayoutOptions:
 
     This method has been added in version 0.26.2.
     """
+    mebes_boundary_datatype: int
+    r"""
+    Getter:
+    @brief Gets the datatype number of the boundary layer to produce
+    See \mebes_produce_boundary= for a description of this attribute.
+
+    This property has been added in version 0.23.10.
+
+    Setter:
+    @brief Sets the datatype number of the boundary layer to produce
+    See \mebes_produce_boundary= for a description of this attribute.
+
+    This property has been added in version 0.23.10.
+    """
+    mebes_boundary_layer: int
+    r"""
+    Getter:
+    @brief Gets the layer number of the boundary layer to produce
+    See \mebes_produce_boundary= for a description of this attribute.
+
+    This property has been added in version 0.23.10.
+
+    Setter:
+    @brief Sets the layer number of the boundary layer to produce
+    See \mebes_produce_boundary= for a description of this attribute.
+
+    This property has been added in version 0.23.10.
+    """
+    mebes_boundary_name: str
+    r"""
+    Getter:
+    @brief Gets the name of the boundary layer to produce
+    See \mebes_produce_boundary= for a description of this attribute.
+
+    This property has been added in version 0.23.10.
+
+    Setter:
+    @brief Sets the name of the boundary layer to produce
+    See \mebes_produce_boundary= for a description of this attribute.
+
+    This property has been added in version 0.23.10.
+    """
+    mebes_create_other_layers: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether other layers shall be created
+    @return True, if other layers will be created.
+    This attribute acts together with a layer map (see \mebes_layer_map=). Layers not listed in this map are created as well when \mebes_create_other_layers? is true. Otherwise they are ignored.
+
+    This method has been added in version 0.25 and replaces the respective global option in \LoadLayoutOptions in a format-specific fashion.
+    Setter:
+    @brief Specifies whether other layers shall be created
+    @param create True, if other layers will be created.
+    See \mebes_create_other_layers? for a description of this attribute.
+
+    This method has been added in version 0.25 and replaces the respective global option in \LoadLayoutOptions in a format-specific fashion.
+    """
+    mebes_data_datatype: int
+    r"""
+    Getter:
+    @brief Gets the datatype number of the data layer to produce
+
+    This property has been added in version 0.23.10.
+
+    Setter:
+    @brief Sets the datatype number of the data layer to produce
+
+    This property has been added in version 0.23.10.
+    """
+    mebes_data_layer: int
+    r"""
+    Getter:
+    @brief Gets the layer number of the data layer to produce
+
+    This property has been added in version 0.23.10.
+
+    Setter:
+    @brief Sets the layer number of the data layer to produce
+
+    This property has been added in version 0.23.10.
+    """
+    mebes_data_name: str
+    r"""
+    Getter:
+    @brief Gets the name of the data layer to produce
+
+    This property has been added in version 0.23.10.
+
+    Setter:
+    @brief Sets the name of the data layer to produce
+
+    This property has been added in version 0.23.10.
+    """
+    mebes_invert: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether to invert the MEBES pattern
+    If this property is set to true, the pattern will be inverted.
+
+    This property has been added in version 0.22.
+
+    Setter:
+    @brief Specify whether to invert the MEBES pattern
+    If this property is set to true, the pattern will be inverted.
+
+    This property has been added in version 0.22.
+    """
+    mebes_layer_map: LayerMap
+    r"""
+    Getter:
+    @brief Gets the layer map
+    @return The layer map.
+
+    This method has been added in version 0.25 and replaces the respective global option in \LoadLayoutOptions in a format-specific fashion.
+    Setter:
+    @brief Sets the layer map
+    This sets a layer mapping for the reader. Unlike \mebes_set_layer_map, the 'create_other_layers' flag is not changed.
+    @param map The layer map to set.
+
+    This convenience method has been added in version 0.26.2.
+    """
+    mebes_num_shapes_per_cell: int
+    r"""
+    Getter:
+    @brief Gets the number of stripes collected per cell
+    See \mebes_num_stripes_per_cell= for details about this property.
+
+    This property has been added in version 0.24.5.
+
+    Setter:
+    @brief Specify the number of stripes collected per cell
+    See \mebes_num_stripes_per_cell= for details about this property.
+
+    This property has been added in version 0.24.5.
+    """
+    mebes_num_stripes_per_cell: int
+    r"""
+    Getter:
+    @brief Gets the number of stripes collected per cell
+    See \mebes_num_stripes_per_cell= for details about this property.
+
+    This property has been added in version 0.23.10.
+
+    Setter:
+    @brief Specify the number of stripes collected per cell
+    This property specifies how many stripes will be collected into one cell.
+    A smaller value means less but bigger cells. The default value is 64.
+    New cells will be formed whenever more than this number of stripes has been read
+    or a new segment is started and the number of shapes given by \mebes_num_shapes_per_cell
+    is exceeded.
+
+    This property has been added in version 0.23.10.
+    """
+    mebes_produce_boundary: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether a boundary layer will be produced
+    See \mebes_produce_boundary= for details about this property.
+
+    This property has been added in version 0.23.10.
+
+    Setter:
+    @brief Specify whether to produce a boundary layer
+    If this property is set to true, the pattern boundary will be written to the layer and datatype specified with \mebes_boundary_name, \mebes_boundary_layer and \mebes_boundary_datatype.
+    By default, the boundary layer is produced.
+
+    This property has been added in version 0.23.10.
+    """
+    mebes_subresolution: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether to invert the MEBES pattern
+    See \subresolution= for details about this property.
+
+    This property has been added in version 0.23.10.
+
+    Setter:
+    @brief Specify whether subresolution trapezoids are supported
+    If this property is set to true, subresolution trapezoid vertices are supported.
+    In order to implement support, the reader will create magnified instances with a magnification of 1/16.
+    By default this property is enabled.
+
+    This property has been added in version 0.23.10.
+    """
+    mebes_top_cell_index: int
+    r"""
+    Getter:
+    @brief Gets the cell index for the top cell to use
+    See \mebes_top_cell_index= for a description of this property.
+
+    This property has been added in version 0.23.10.
+
+    Setter:
+    @brief Specify the cell index for the top cell to use
+    If this property is set to a valid cell index, the MEBES reader will put the subcells and shapes into this cell.
+
+    This property has been added in version 0.23.10.
+    """
     oasis_expect_strict_mode: int
     r"""
     Getter:
@@ -38310,6 +38775,26 @@ class LoadLayoutOptions:
         @param create_other_layers The flag indicating whether other layers will be created as well. Set to false to read only the layers in the layer map.
 
         This method has been added in version 0.26.2.
+        """
+        ...
+    def mebes_select_all_layers(self) -> None:
+        r"""
+        @brief Selects all layers and disables the layer map
+
+        This disables any layer map and enables reading of all layers.
+        New layers will be created when required.
+
+        This method has been added in version 0.25 and replaces the respective global option in \LoadLayoutOptions in a format-specific fashion.
+        """
+        ...
+    def mebes_set_layer_map(self, map: LayerMap, create_other_layers: bool) -> None:
+        r"""
+        @brief Sets the layer map
+        This sets a layer mapping for the reader. The layer map allows selection and translation of the original layers.
+        @param map The layer map to set.
+        @param create_other_layers The flag indicating whether other layers will be created as well. Set to false to read only the layers in the layer map.
+
+        This method has been added in version 0.25 and replaces the respective global option in \LoadLayoutOptions in a format-specific fashion.
         """
         ...
     def select_all_layers(self) -> None:
@@ -40471,15 +40956,15 @@ class NetPinRef:
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this pin reference is attached to (non-const version).
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the net this pin reference is attached to.
         """
         ...
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this pin reference is attached to.
+        @brief Gets the net this pin reference is attached to (non-const version).
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     def pin(self) -> Pin:
@@ -40802,15 +41287,15 @@ class NetTerminalRef:
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this terminal reference is attached to (non-const version).
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the net this terminal reference is attached to.
         """
         ...
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this terminal reference is attached to.
+        @brief Gets the net this terminal reference is attached to (non-const version).
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     def terminal_def(self) -> DeviceTerminalDefinition:
@@ -41775,17 +42260,17 @@ class Netlist:
     @overload
     def circuit_by_cell_index(self, cell_index: int) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given cell index (const version).
+        @brief Gets the circuit object for a given cell index.
         If the cell index is not valid or no circuit is registered with this index, nil is returned.
-
-        This constness variant has been introduced in version 0.26.8.
         """
         ...
     @overload
     def circuit_by_cell_index(self, cell_index: int) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given cell index.
+        @brief Gets the circuit object for a given cell index (const version).
         If the cell index is not valid or no circuit is registered with this index, nil is returned.
+
+        This constness variant has been introduced in version 0.26.8.
         """
         ...
     @overload
@@ -42014,6 +42499,14 @@ class Netlist:
         r"""
         @brief Removes the given circuit object and all child circuits which are not used otherwise from the netlist
         After the circuit has been removed, the object becomes invalid and cannot be used further. A circuit with references (see \has_refs?) should not be removed as the subcircuits calling it would afterwards point to nothing.
+        """
+        ...
+    def purge_devices(self) -> None:
+        r"""
+        @brief Purges invalid devices.
+        Purges devices which are considered invalid. Such devices are for example those whose terminals are all connected to a single net.
+
+        This method has been added in version 0.29.7.
         """
         ...
     def purge_nets(self) -> None:
@@ -47196,6 +47689,16 @@ class Polygon:
         This method is provided because the area for an integer-type polygon is a multiple of 1/2. Hence the double area can be expresses precisely as an integer for these types.
 
         This method has been introduced in version 0.26.1
+        """
+        ...
+    def area_upper_manhattan_bound(self) -> int:
+        r"""
+        @hide
+        """
+        ...
+    def area_upper_manhattan_bound2(self) -> int:
+        r"""
+        @hide
         """
         ...
     def assign(self, other: Polygon) -> None:
@@ -55598,11 +56101,12 @@ class Shape:
     This method has been introduced in version 0.23.
 
     Setter:
-    @brief Sets the center of the box
+    @brief Sets the center of the box with the point being given in micrometer units
 
     Applies to boxes only. Changes the center of the box and throws an exception if the shape is not a box.
+    Translation from micrometer units to database units is done internally.
 
-    This method has been introduced in version 0.23.
+    This method has been introduced in version 0.25.
     """
     box_dcenter: DPoint
     r"""
@@ -55892,11 +56396,10 @@ class Shape:
 
     Starting with version 0.23, this method returns nil, if the shape does not represent an edge.
     Setter:
-    @brief Replaces the shape by the given edge
-    This method replaces the shape by the given edge. This method can only be called for editable layouts. It does not change the user properties of the shape.
-    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
+    @brief Replaces the shape by the given edge (in micrometer units)
+    This method replaces the shape by the given edge, like \edge= with a \Edge argument does. This version translates the edge from micrometer units to database units internally.
 
-    This method has been introduced in version 0.22.
+    This method has been introduced in version 0.25.
     """
     edge_pair: Any
     r"""
@@ -59247,6 +59750,16 @@ class SimplePolygon:
         This method has been introduced in version 0.26.1
         """
         ...
+    def area_upper_manhattan_bound(self) -> int:
+        r"""
+        @hide
+        """
+        ...
+    def area_upper_manhattan_bound2(self) -> int:
+        r"""
+        @hide
+        """
+        ...
     def assign(self, other: SimplePolygon) -> None:
         r"""
         @brief Assigns another object to self
@@ -59861,16 +60374,16 @@ class SubCircuit(NetlistObject):
     @overload
     def circuit_ref(self) -> Circuit:
         r"""
-        @brief Gets the circuit referenced by the subcircuit (non-const version).
-
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the circuit referenced by the subcircuit.
         """
         ...
     @overload
     def circuit_ref(self) -> Circuit:
         r"""
-        @brief Gets the circuit referenced by the subcircuit.
+        @brief Gets the circuit referenced by the subcircuit (non-const version).
+
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload

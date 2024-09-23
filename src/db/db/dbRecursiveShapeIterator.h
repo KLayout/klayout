@@ -773,6 +773,15 @@ public:
   }
 
   /**
+   *  @brief Increments the iterator with `RecursiveShapeReceiver` customization
+   *
+   *  This combines the flexibility of pull-based iteration with the
+   *  extra notifications and iteration control provided by
+   *  `RecursiveShapeReceiver`.
+   */
+  void next (RecursiveShapeReceiver *receiver);
+
+  /**
    *  @brief Comparison of iterators - equality
    */
   bool operator==(const RecursiveShapeIterator &d) const
@@ -881,7 +890,6 @@ private:
   void skip_inst_iter_for_complex_region () const;
   void validate (RecursiveShapeReceiver *receiver) const;
   void start_shapes () const;
-  void next (RecursiveShapeReceiver *receiver);
   void next_shape (RecursiveShapeReceiver *receiver) const;
   void new_inst (RecursiveShapeReceiver *receiver) const;
   void new_inst_member (RecursiveShapeReceiver *receiver) const;

@@ -6,7 +6,7 @@
 #
 # Here are dictionaries of ...
 #  different modules for building KLayout (http://www.klayout.de/index.php)
-#  version 0.29.0 or later on different Apple Mac OSX platforms.
+#  version 0.29.7 or later on different Apple Mac OSX platforms.
 #
 # This file is imported by 'build4mac.py' script.
 #===============================================================================
@@ -129,7 +129,7 @@ Qt56Dictionary  = { 'Qt5MacPorts': Qt5MacPorts,
 #           for the previous states.
 #-----------------------------------------------------
 RubyNil  = [ 'nil' ]
-RubySys  = [ 'RubyMonterey', 'RubyVentura', 'RubySonoma' ]
+RubySys  = [ 'RubyMonterey', 'RubyVentura', 'RubySonoma', 'RubySequoia' ]
 RubyExt  = [ 'Ruby33MacPorts', 'Ruby33Brew', 'RubyAnaconda3' ]
 Rubies   = RubyNil + RubySys + RubyExt
 
@@ -178,11 +178,21 @@ RubySonoma      = { 'exe':  '/System/Library/Frameworks/Ruby.framework/Versions/
                     'lib':  '%s/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/lib/libruby.tbd' % SonomaXcSDK
                   }
 
+# Bundled with Sequoia (15.x)
+# [Key Type Name] = 'Sys'
+SequoiaXcSDK     = "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"
+SequoiaCLTSDK    = "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
+RubySequoia      = { 'exe':  '/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/bin/ruby',
+                     'inc':  '%s/System/Library/Frameworks/Ruby.framework/Headers' % SequoiaXcSDK,
+                     'inc2': '%s/System/Library/Frameworks/Ruby.framework/Headers/ruby' % SequoiaXcSDK,
+                     'lib':  '%s/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/lib/libruby.tbd' % SequoiaXcSDK
+                   }
+
 # Ruby 3.3 from MacPorts (https://www.macports.org/)
 #  install with 'sudo port install ruby33'
 # [Key Type Name] = 'MP33'
 Ruby33MacPorts  = { 'exe': '/opt/local/bin/ruby3.3',
-                    'inc': '/opt/local/include/ruby-3.3.4',
+                    'inc': '/opt/local/include/ruby-3.3.5',
                     'lib': '/opt/local/lib/libruby.3.3.dylib'
                   }
 
@@ -209,6 +219,7 @@ RubyDictionary  = { 'nil'           : None,
                     'RubyMonterey'  : RubyMonterey,
                     'RubyVentura'   : RubyVentura,
                     'RubySonoma'    : RubySonoma,
+                    'RubySequoia'   : RubySequoia,
                     'Ruby33MacPorts': Ruby33MacPorts,
                     'Ruby33Brew'    : Ruby33Brew,
                     'RubyAnaconda3' : RubyAnaconda3
@@ -223,10 +234,10 @@ RubyDictionary  = { 'nil'           : None,
 #           for the previous states.
 #-----------------------------------------------------
 PythonNil  = [ 'nil' ]
-PythonSys  = [ 'PythonMonterey', 'PythonVentura', 'PythonSonoma' ]
-PythonExt  = [ 'Python39MacPorts', 'Python39Brew' ]
-PythonExt += [ 'Python311MacPorts', 'Python311Brew' ]
-PythonExt += [ 'PythonAnaconda3', 'PythonAutoBrew' ]
+PythonSys  = [ 'PythonMonterey', 'PythonVentura', 'PythonSonoma', 'PythonSequoia' ]
+PythonExt  = [ 'Python311MacPorts', 'Python312MacPorts' ]
+PythonExt += [ 'Python311Brew', 'Python312Brew', 'PythonAutoBrew' ]
+PythonExt += [ 'PythonAnaconda3' ]
 Pythons    = PythonNil + PythonSys + PythonExt
 
 #-----------------------------------------------------
@@ -259,13 +270,14 @@ PythonSonoma    = { 'exe': '%s/Python3.framework/Versions/3.9/bin/python3.9' % S
                     'lib': '%s/Python3.framework/Versions/3.9/lib/libpython3.9.dylib' % SonomaPy3FW
                   }
 
-# Python 3.9 from MacPorts (https://www.macports.org/)
-#   install with 'sudo port install python39'
-# [Key Type Name] = 'MP39'
-Python39MacPorts  = { 'exe': '/opt/local/Library/Frameworks/Python.framework/Versions/3.9/bin/python3.9',
-                      'inc': '/opt/local/Library/Frameworks/Python.framework/Versions/3.9/include/python3.9',
-                      'lib': '/opt/local/Library/Frameworks/Python.framework/Versions/3.9/lib/libpython3.9.dylib'
-                    }
+# Bundled with Sequoia (15.x)
+# [Key Type Name] = 'Sys'
+SequoiaPy3FWXc   = "/Applications/Xcode.app/Contents/Developer/Library/Frameworks"
+SequoiaPy3FW     = "/Library/Developer/CommandLineTools/Library/Frameworks"
+PythonSequoia    = { 'exe': '%s/Python3.framework/Versions/3.9/bin/python3.9' % SequoiaPy3FW,
+                     'inc': '%s/Python3.framework/Versions/3.9/include/python3.9' % SequoiaPy3FW,
+                     'lib': '%s/Python3.framework/Versions/3.9/lib/libpython3.9.dylib' % SequoiaPy3FW
+                   }
 
 # Python 3.11 from MacPorts (https://www.macports.org/)
 #   install with 'sudo port install python311'
@@ -275,13 +287,12 @@ Python311MacPorts = { 'exe': '/opt/local/Library/Frameworks/Python.framework/Ver
                       'lib': '/opt/local/Library/Frameworks/Python.framework/Versions/3.11/lib/libpython3.11.dylib'
                     }
 
-# Python 3.9 from Homebrew
-#   install with 'brew install python@3.9'
-# [Key Type Name] = 'HB39'
-HBPython39FrameworkPath = '%s/opt/python@3.9/Frameworks/Python.framework' % DefaultHomebrewRoot
-Python39Brew      = { 'exe': '%s/Versions/3.9/bin/python3.9' % HBPython39FrameworkPath,
-                      'inc': '%s/Versions/3.9/include/python3.9' % HBPython39FrameworkPath,
-                      'lib': '%s/Versions/3.9/lib/libpython3.9.dylib' % HBPython39FrameworkPath
+# Python 3.12 from MacPorts (https://www.macports.org/)
+#   install with 'sudo port install python312'
+# [Key Type Name] = 'MP312'
+Python312MacPorts = { 'exe': '/opt/local/Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12',
+                      'inc': '/opt/local/Library/Frameworks/Python.framework/Versions/3.12/include/python3.12',
+                      'lib': '/opt/local/Library/Frameworks/Python.framework/Versions/3.12/lib/libpython3.12.dylib'
                     }
 
 # Python 3.11 from Homebrew
@@ -293,19 +304,28 @@ Python311Brew     = { 'exe': '%s/Versions/3.11/bin/python3.11' % HBPython311Fram
                       'lib': '%s/Versions/3.11/lib/libpython3.11.dylib' % HBPython311FrameworkPath
                     }
 
-# Python 3.11 bundled with anaconda3 installed under /Applications/anaconda3/
+# Python 3.12 from Homebrew
+#   install with 'brew install python@3.12'
+# [Key Type Name] = 'HB312'
+HBPython312FrameworkPath = '%s/opt/python@3.12/Frameworks/Python.framework' % DefaultHomebrewRoot
+Python312Brew     = { 'exe': '%s/Versions/3.12/bin/python3.12' % HBPython312FrameworkPath,
+                      'inc': '%s/Versions/3.12/include/python3.12' % HBPython312FrameworkPath,
+                      'lib': '%s/Versions/3.12/lib/libpython3.12.dylib' % HBPython312FrameworkPath
+                    }
+
+# Python 3.12 bundled with anaconda3 installed under /Applications/anaconda3/
 # The standard installation deploys the tool under $HOME/opt/anaconda3/.
 # If so, you need to make a symbolic link: /Applications/anaconda3 ---> $HOME/opt/anaconda3/
 # [Key Type Name] = 'Ana3'
-PythonAnaconda3 = { 'exe': '/Applications/anaconda3/bin/python3.11',
-                    'inc': '/Applications/anaconda3/include/python3.11',
-                    'lib': '/Applications/anaconda3/lib/libpython3.11.dylib'
+PythonAnaconda3 = { 'exe': '/Applications/anaconda3/bin/python3.12',
+                    'inc': '/Applications/anaconda3/include/python3.12',
+                    'lib': '/Applications/anaconda3/lib/libpython3.12.dylib'
                   }
 
 # Latest Python from Homebrew
 #   install with 'brew install python'
 #   There can be multiple candidates such as: (python, python3, python@3, python@3.8, python@3.9,
-#                                              python@3.10, python@3.11, python@3.12, python@3.13 )
+#                                              python@3.10, python@3.12, python@3.12, python@3.13 )
 #   Hard to tell which is going to be available to the user. Picking the last one.
 # [Key Type Name] = 'HBAuto'
 HBPythonAutoFrameworkPath = ""
@@ -330,19 +350,19 @@ try:
                         'lib': glob.glob( "%s/%s/lib/*.dylib" % ( HBAutoFrameworkVersionPath, HBPythonAutoVersion ) )[0]
                       }
     """
-    # when I have [python3, python@3, python@3.8, python@3.9, python@3.10, python@3.11]
+    # when I have [python3, python@3, python@3.11, python@3.12]
     print(HBPythonAutoFrameworkPath)
     print(HBAutoFrameworkVersionPath)
     print(HBPythonAutoVersion)
     print(PythonAutoBrew)
     quit()
 
-    /usr/local/opt/python@3.11/Frameworks/Python.framework
-    /usr/local/opt/python@3.11/Frameworks/Python.framework/Versions
-    3.11
-    { 'exe': '/usr/local/opt/python@3.11/Frameworks/Python.framework/Versions/3.11/bin/python3.11',
-      'inc': '/usr/local/opt/python@3.11/Frameworks/Python.framework/Versions/3.11/include/python3.11',
-      'lib': '/usr/local/opt/python@3.11/Frameworks/Python.framework/Versions/3.11/lib/libpython3.11.dylib'
+    /usr/local/opt/python@3.12/Frameworks/Python.framework
+    /usr/local/opt/python@3.12/Frameworks/Python.framework/Versions
+    3.12
+    { 'exe': '/usr/local/opt/python@3.12/Frameworks/Python.framework/Versions/3.12/bin/python3.12',
+      'inc': '/usr/local/opt/python@3.12/Frameworks/Python.framework/Versions/3.12/include/python3.12',
+      'lib': '/usr/local/opt/python@3.12/Frameworks/Python.framework/Versions/3.12/lib/libpython3.12.dylib'
     }
     """
 except Exception as e:
@@ -357,11 +377,12 @@ PythonDictionary = { 'nil'              : None,
                      'PythonMonterey'   : PythonMonterey,
                      'PythonVentura'    : PythonVentura,
                      'PythonSonoma'     : PythonSonoma,
-                     'Python39MacPorts' : Python39MacPorts,
+                     'PythonSequoia'    : PythonSequoia,
+                     'Python312MacPorts': Python312MacPorts,
+                     'Python312Brew'    : Python312Brew,
+                     'PythonAnaconda3'  : PythonAnaconda3,
                      'Python311MacPorts': Python311MacPorts,
-                     'Python39Brew'     : Python39Brew,
-                     'Python311Brew'    : Python311Brew,
-                     'PythonAnaconda3'  : PythonAnaconda3
+                     'Python311Brew'    : Python311Brew
                    }
 if _have_Homebrew_Python:
     PythonDictionary['PythonAutoBrew'] = PythonAutoBrew

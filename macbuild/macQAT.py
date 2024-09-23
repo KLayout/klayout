@@ -5,8 +5,8 @@
 # File: "macbuild/macQAT.py"
 #
 #  The top Python script to run "ut_runner" after building KLayout
-#  (http://www.klayout.de/index.php) version 0.29.0 or later on different Apple
-#  ßMac OSX platforms.
+#  (http://www.klayout.de/index.php) version 0.29.7 or later on different
+#  Apple Mac OSX platforms.
 #
 #  This script must be copied to a "*.macQAT/" directory to run.
 #===============================================================================

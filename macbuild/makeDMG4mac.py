@@ -78,7 +78,7 @@ def SetGlobals():
     Usage  = "\n"
     Usage += "---------------------------------------------------------------------------------------------------------\n"
     Usage += "<< Usage of 'makeDMG4mac.py' >>\n"
-    Usage += "       for making a DMG file of KLayout 0.29.0 or later on different Apple macOS platforms.\n"
+    Usage += "       for making a DMG file of KLayout 0.29.7 or later on different Apple macOS platforms.\n"
     Usage += "\n"
     Usage += "$ [python] ./makeDMG4mac.py\n"
     Usage += "   option & argument    : descriptions                                               | default value\n"
@@ -106,7 +106,11 @@ def SetGlobals():
 
     release = int( Release.split(".")[0] ) # take the first of ['21', '0', '0']
     LatestOS = ""
-    if release == 23:
+    if release == 24:
+        GenOSName = "macOS"
+        Platform  = "Sequoia"
+        LatestOS  = Platform
+    elif release == 23:
         GenOSName = "macOS"
         Platform  = "Sonoma"
         LatestOS  = Platform
@@ -126,7 +130,8 @@ def SetGlobals():
         sys.exit(1)
 
     if not Machine == "x86_64":
-        if Machine == "arm64" and Platform in ["Sonoma", "Ventura", "Monterey"]: # with an Apple Silicon Chip
+        # with an Apple Silicon Chip?
+        if Machine == "arm64" and Platform in ["Sequoia", "Sonoma", "Ventura", "Monterey"]:
             print("")
             print( "### Your Mac equips an Apple Silicon Chip ###" )
             print("")
@@ -223,7 +228,7 @@ def SetGlobals():
 #     * LW-qt6MP.pkg.macos-Monterey-release-Rmp33Pmp311
 #
 # Generated DMG will be, for example,
-#     (1) ---> LW-klayout-0.29.0-macOS-Monterey-1-qt6Brew-Rhb33Phb311.dmg
+#     (1) ---> LW-klayout-0.29.7-macOS-Monterey-1-qt6Brew-Rhb33Phb311.dmg
 #
 # @return on success, positive integer in [MB] that tells approx. occupied disc space;
 #         on failure, -1

@@ -4,8 +4,8 @@
 # File: "macbuild/macQAT2.sh"
 #
 #  The top Bash script to run "ut_runner" after building KLayout
-#  (http://www.klayout.de/index.php) version 0.28.17 or later on different Apple
-#  Mac OSX platforms.
+#  (http://www.klayout.de/index.php) version 0.29.7 or later on different
+#  Apple Mac OSX platforms.
 #
 #  This script must be copied to a directory that can be found in $PATH.
 #===============================================================================

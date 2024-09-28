@@ -30,14 +30,16 @@ import pandas as pd
 #
 # @return matching platform name on success; "" on failure
 #------------------------------------------------------------------------------
-def Test_My_Platform( platforms=[ 'Monterey', 'Ventura', 'Sonoma' ] ):
+def Test_My_Platform( platforms=[ 'Monterey', 'Ventura', 'Sonoma', 'Sequoia'] ):
     (System, Node, Release, MacVersion, Machine, Processor) = platform.uname()
 
     if not System == "Darwin":
         return ""
 
     release = int( Release.split(".")[0] ) # take the first of ['21', '0', '0']
-    if   release == 23:
+    if   release == 24:
+        Platform = "Sequoia"
+    elif release == 23:
         Platform = "Sonoma"
     elif release == 22:
         Platform = "Ventura"
@@ -99,15 +101,15 @@ def Get_Build_Options( targetDic, platform ):
                 buildOp[(qtVer, "std", "d")] = [ '-q', '%sMacPorts' % qtType, '-r', 'sys',  '-p', 'sys', '--debug' ]
                 logfile[(qtVer, "std", "d")] = "%sMP.build.macos-%s-%s-%s.log" % (qtType.lower(), platform, "debug", "RsysPsys")
             elif target == "ports":
-                buildOp[(qtVer, "ports", "r")] = [ '-q', '%sMacPorts' % qtType, '-r', 'MP33', '-p', 'MP311' ]
-                logfile[(qtVer, "ports", "r")] = "%sMP.build.macos-%s-%s-%s.log" % (qtType.lower(), platform, "release", "Rmp33Pmp311")
-                buildOp[(qtVer, "ports", "d")] = [ '-q', '%sMacPorts' % qtType, '-r', 'MP33', '-p', 'MP311', '--debug' ]
-                logfile[(qtVer, "ports", "d")] = "%sMP.build.macos-%s-%s-%s.log" % (qtType.lower(), platform, "debug", "Rmp33Pmp311")
+                buildOp[(qtVer, "ports", "r")] = [ '-q', '%sMacPorts' % qtType, '-r', 'MP33', '-p', 'MP312' ]
+                logfile[(qtVer, "ports", "r")] = "%sMP.build.macos-%s-%s-%s.log" % (qtType.lower(), platform, "release", "Rmp33Pmp312")
+                buildOp[(qtVer, "ports", "d")] = [ '-q', '%sMacPorts' % qtType, '-r', 'MP33', '-p', 'MP312', '--debug' ]
+                logfile[(qtVer, "ports", "d")] = "%sMP.build.macos-%s-%s-%s.log" % (qtType.lower(), platform, "debug", "Rmp33Pmp312")
             elif target == "brew":
-                buildOp[(qtVer, "brew", "r")] = [ '-q', '%sBrew' % qtType, '-r', 'HB33', '-p', 'HB311' ]
-                logfile[(qtVer, "brew", "r")] = "%sBrew.build.macos-%s-%s-%s.log" % (qtType.lower(), platform, "release", "Rhb33Phb311")
-                buildOp[(qtVer, "brew", "d")] = [ '-q', '%sBrew' % qtType, '-r', 'HB33', '-p', 'HB311', '--debug' ]
-                logfile[(qtVer, "brew", "d")] = "%sBrew.build.macos-%s-%s-%s.log" % (qtType.lower(), platform, "debug", "Rhb33Phb311")
+                buildOp[(qtVer, "brew", "r")] = [ '-q', '%sBrew' % qtType, '-r', 'HB33', '-p', 'HB312' ]
+                logfile[(qtVer, "brew", "r")] = "%sBrew.build.macos-%s-%s-%s.log" % (qtType.lower(), platform, "release", "Rhb33Phb312")
+                buildOp[(qtVer, "brew", "d")] = [ '-q', '%sBrew' % qtType, '-r', 'HB33', '-p', 'HB312', '--debug' ]
+                logfile[(qtVer, "brew", "d")] = "%sBrew.build.macos-%s-%s-%s.log" % (qtType.lower(), platform, "debug", "Rhb33Phb312")
             elif target == "brewHW":
                 buildOp[(qtVer, "brewHW", "r")] = [ '-q', '%sBrew' % qtType, '-r', 'sys',  '-p', 'HB311' ]
                 logfile[(qtVer, "brewHW", "r")] = "%sBrew.build.macos-%s-%s-%s.log" % (qtType.lower(), platform, "release", "RsysPhb311")
@@ -129,10 +131,10 @@ def Get_Build_Options( targetDic, platform ):
                 buildOp[(qtVer, "brewAHW", "d")] = [ '-q', '%sBrew' % qtType, '-r', 'sys',  '-p', 'HBAuto', '--debug' ]
                 logfile[(qtVer, "brewAHW", "d")] = "%sBrew.build.macos-%s-%s-%s.log" % (qtType.lower(), platform, "debug", "RsysPhbauto")
             elif target == "pbrew":
-                buildOp[(qtVer, "pbrew", "r")] = [ '-q', '%sMacPorts' % qtType, '-r', 'HB33', '-p', 'HB311' ]
-                logfile[(qtVer, "pbrew", "r")] = "%sMP.build.macos-%s-%s-%s.log" % (qtType.lower(), platform, "release", "Rhb33Phb311")
-                buildOp[(qtVer, "pbrew", "d")] = [ '-q', '%sMacPorts' % qtType, '-r', 'HB33', '-p', 'HB311', '--debug' ]
-                logfile[(qtVer, "pbrew", "d")] = "%sMP.build.macos-%s-%s-%s.log" % (qtType.lower(), platform, "debug", "Rhb33Phb311")
+                buildOp[(qtVer, "pbrew", "r")] = [ '-q', '%sMacPorts' % qtType, '-r', 'HB33', '-p', 'HB312' ]
+                logfile[(qtVer, "pbrew", "r")] = "%sMP.build.macos-%s-%s-%s.log" % (qtType.lower(), platform, "release", "Rhb33Phb312")
+                buildOp[(qtVer, "pbrew", "d")] = [ '-q', '%sMacPorts' % qtType, '-r', 'HB33', '-p', 'HB312', '--debug' ]
+                logfile[(qtVer, "pbrew", "d")] = "%sMP.build.macos-%s-%s-%s.log" % (qtType.lower(), platform, "debug", "Rhb33Phb312")
             elif target == "pbrewHW":
                 buildOp[(qtVer, "pbrewHW", "r")] = [ '-q', '%sMacPorts' % qtType, '-r', 'sys',  '-p', 'HB311' ]
                 logfile[(qtVer, "pbrewHW", "r")] = "%sMP.build.macos-%s-%s-%s.log" % (qtType.lower(), platform, "release", "RsysPhb311")
@@ -141,9 +143,9 @@ def Get_Build_Options( targetDic, platform ):
 
         if WithPymod:
             buildOp[(qtVer, "ports", "r")] = buildOp[(qtVer, "ports", "r")] + ['--buildPymod']
-            buildOp[(qtVer, "brew", "r")]  = buildOp[(qtVer, "brew", "r")]  + ['--buildPymod']
+            buildOp[(qtVer, "brew", "r")]  = buildOp[(qtVer, "brew", "r")]
             buildOp[(qtVer, "ana3", "r")]  = buildOp[(qtVer, "ana3", "r")]  + ['--buildPymod']
-            buildOp[(qtVer, "pbrew", "r")] = buildOp[(qtVer, "pbrew", "r")] + ['--buildPymod']
+            buildOp[(qtVer, "pbrew", "r")] = buildOp[(qtVer, "pbrew", "r")]
 
             buildOp[(qtVer, "ports", "d")] = buildOp[(qtVer, "ports", "d")]
             buildOp[(qtVer, "brew", "d")]  = buildOp[(qtVer, "brew", "d")]
@@ -175,11 +177,11 @@ def Get_QAT_Directory( targetDic, platform ):
                 dirQAT[(qtVer, "std", "r")] = '%sMP.build.macos-%s-release-RsysPsys.macQAT' % (qtType.lower(), platform)
                 dirQAT[(qtVer, "std", "d")] = '%sMP.build.macos-%s-debug-RsysPsys.macQAT'   % (qtType.lower(), platform)
             elif target == "ports":
-                dirQAT[(qtVer, "ports", "r")] = '%sMP.build.macos-%s-release-Rmp33Pmp311.macQAT' % (qtType.lower(), platform)
-                dirQAT[(qtVer, "ports", "d")] = '%sMP.build.macos-%s-debug-Rmp33Pmp311.macQAT'   % (qtType.lower(), platform)
+                dirQAT[(qtVer, "ports", "r")] = '%sMP.build.macos-%s-release-Rmp33Pmp312.macQAT' % (qtType.lower(), platform)
+                dirQAT[(qtVer, "ports", "d")] = '%sMP.build.macos-%s-debug-Rmp33Pmp312.macQAT'   % (qtType.lower(), platform)
             elif target == "brew":
-                dirQAT[(qtVer, "brew", "r")] = '%sBrew.build.macos-%s-release-Rhb33Phb311.macQAT' % (qtType.lower(), platform)
-                dirQAT[(qtVer, "brew", "d")] = '%sBrew.build.macos-%s-debug-Rhb33Phb311.macQAT'   % (qtType.lower(), platform)
+                dirQAT[(qtVer, "brew", "r")] = '%sBrew.build.macos-%s-release-Rhb33Phb312.macQAT' % (qtType.lower(), platform)
+                dirQAT[(qtVer, "brew", "d")] = '%sBrew.build.macos-%s-debug-Rhb33Phb312.macQAT'   % (qtType.lower(), platform)
             elif target == "brewHW":
                 dirQAT[(qtVer, "brewHW", "r")] = '%sBrew.build.macos-%s-release-RsysPhb311.macQAT' % (qtType.lower(), platform)
                 dirQAT[(qtVer, "brewHW", "d")] = '%sBrew.build.macos-%s-debug-RsysPhb311.macQAT'   % (qtType.lower(), platform)
@@ -193,8 +195,8 @@ def Get_QAT_Directory( targetDic, platform ):
                 dirQAT[(qtVer, "brewAHW", "r")] = '%sBrew.build.macos-%s-release-RsysPhbauto.macQAT' % (qtType.lower(), platform)
                 dirQAT[(qtVer, "brewAHW", "d")] = '%sBrew.build.macos-%s-debug-RsysPhbauto.macQAT'   % (qtType.lower(), platform)
             elif target == "pbrew":
-                dirQAT[(qtVer, "pbrew", "r")] = '%sMP.build.macos-%s-release-Rhb33Phb311.macQAT' % (qtType.lower(), platform)
-                dirQAT[(qtVer, "pbrew", "d")] = '%sMP.build.macos-%s-debug-Rhb33Phb311.macQAT'   % (qtType.lower(), platform)
+                dirQAT[(qtVer, "pbrew", "r")] = '%sMP.build.macos-%s-release-Rhb33Phb312.macQAT' % (qtType.lower(), platform)
+                dirQAT[(qtVer, "pbrew", "d")] = '%sMP.build.macos-%s-debug-Rhb33Phb312.macQAT'   % (qtType.lower(), platform)
             elif target == "pbrewHW":
                 dirQAT[(qtVer, "pbrewHW", "r")] = '%sMP.build.macos-%s-release-RsysPhb311.macQAT' % (qtType.lower(), platform)
                 dirQAT[(qtVer, "pbrewHW", "d")] = '%sMP.build.macos-%s-debug-RsysPhb311.macQAT'   % (qtType.lower(), platform)
@@ -233,14 +235,14 @@ def Get_Package_Options( targetDic, platform, srlDMG, makeflag ):
                 packOp[(qtVer, "std", "d")] = [ '-p', 'ST-%sMP.pkg.macos-%s-debug-RsysPsys'   % (qtType.lower(), platform),
                                                 '-s', '%d' % srlDMG, '%s' % flag ]
             elif target == "ports":
-                packOp[(qtVer, "ports", "r")] = [ '-p', 'LW-%sMP.pkg.macos-%s-release-Rmp33Pmp311' % (qtType.lower(), platform),
+                packOp[(qtVer, "ports", "r")] = [ '-p', 'LW-%sMP.pkg.macos-%s-release-Rmp33Pmp312' % (qtType.lower(), platform),
                                                   '-s', '%d' % srlDMG, '%s' % flag ]
-                packOp[(qtVer, "ports", "d")] = [ '-p', 'LW-%sMP.pkg.macos-%s-debug-Rmp33Pmp311'   % (qtType.lower(), platform),
+                packOp[(qtVer, "ports", "d")] = [ '-p', 'LW-%sMP.pkg.macos-%s-debug-Rmp33Pmp312'   % (qtType.lower(), platform),
                                                   '-s', '%d' % srlDMG, '%s' % flag ]
             elif target == "brew":
-                packOp[(qtVer, "brew", "r")] = [ '-p', 'LW-%sBrew.pkg.macos-%s-release-Rhb33Phb311' % (qtType.lower(), platform),
+                packOp[(qtVer, "brew", "r")] = [ '-p', 'LW-%sBrew.pkg.macos-%s-release-Rhb33Phb312' % (qtType.lower(), platform),
                                                  '-s', '%d' % srlDMG, '%s' % flag ]
-                packOp[(qtVer, "brew", "d")] = [ '-p', 'LW-%sBrew.pkg.macos-%s-debug-Rhb33Phb311'   % (qtType.lower(), platform),
+                packOp[(qtVer, "brew", "d")] = [ '-p', 'LW-%sBrew.pkg.macos-%s-debug-Rhb33Phb312'   % (qtType.lower(), platform),
                                                  '-s', '%d' % srlDMG, '%s' % flag ]
             elif target == "brewHW":
                 packOp[(qtVer, "brewHW", "r")] = [ '-p', 'HW-%sBrew.pkg.macos-%s-release-RsysPhb311' % (qtType.lower(), platform),
@@ -263,9 +265,9 @@ def Get_Package_Options( targetDic, platform, srlDMG, makeflag ):
                 packOp[(qtVer, "brewAHW", "d")] = [ '-p', 'HW-%sBrew.pkg.macos-%s-debug-RsysPhbauto'   % (qtType.lower(), platform),
                                                     '-s', '%d' % srlDMG, '%s' % flag ]
             elif target == "pbrew":
-                packOp[(qtVer, "pbrew", "r")] = [ '-p', 'LW-%sMP.pkg.macos-%s-release-Rhb33Phb311' % (qtType.lower(), platform),
+                packOp[(qtVer, "pbrew", "r")] = [ '-p', 'LW-%sMP.pkg.macos-%s-release-Rhb33Phb312' % (qtType.lower(), platform),
                                                   '-s', '%d' % srlDMG, '%s' % flag ]
-                packOp[(qtVer, "pbrew", "d")] = [ '-p', 'LW-%sMP.pkg.macos-%s-debug-Rhb33Phb311'   % (qtType.lower(), platform),
+                packOp[(qtVer, "pbrew", "d")] = [ '-p', 'LW-%sMP.pkg.macos-%s-debug-Rhb33Phb312'   % (qtType.lower(), platform),
                                                   '-s', '%d' % srlDMG, '%s' % flag ]
             elif target == "pbrewHW":
                 packOp[(qtVer, "pbrewHW", "r")] = [ '-p', 'HW-%sMP.pkg.macos-%s-release-RsysPhb311' % (qtType.lower(), platform),
@@ -294,8 +296,8 @@ def Parse_CommandLine_Arguments():
     global DryRun       # True for dry-run
 
     platform = Test_My_Platform()
-    if platform in [ "Sonoma", "Ventura", "Monterey" ]:
-        targetopt = "0,1,2,3,4"
+    if platform in [ "Sequoia", "Sonoma", "Ventura", "Monterey" ]:
+        targetopt = "0,1,2,13,4"
     else:
         targetopt = ""
 
@@ -303,7 +305,7 @@ def Parse_CommandLine_Arguments():
     Usage += "----------------------------------------------------------------------------------------------------------\n"
     Usage += " nightlyBuild.py [EXPERIMENTAL]\n"
     Usage += "   << To execute the jobs for making KLayout's DMGs for\n"
-    Usage += "                                               macOS Monterey, Ventura, or Sonoma >>\n"
+    Usage += "                                               macOS Monterey, Ventura, Sonoma, or Sequoia >>\n"
     Usage += "\n"
     Usage += "$ [python] nightlyBuild.py\n"
     Usage += "   option & argument : comment on option if any                              | default value\n"
@@ -337,7 +339,7 @@ def Parse_CommandLine_Arguments():
     Usage += "          (3) $ ./nightlyBuild.py  --test                                    |\n"
     Usage += "          (4) $ ./nightlyBuild.py  --check (confirm the QA Test results)     |\n"
     Usage += "          (5) $ ./nightlyBuild.py  --makedmg  1                              |\n"
-    Usage += "          (6) $ ./nightlyBuild.py  --upload  '0.29.0'                        |\n"
+    Usage += "          (6) $ ./nightlyBuild.py  --upload  '0.29.7'                        |\n"
     Usage += "          (7) $ ./nightlyBuild.py  --cleandmg 1                              |\n"
     Usage += "-----------------------------------------------------------------------------+----------------------------\n"
 
@@ -421,9 +423,9 @@ def Parse_CommandLine_Arguments():
         print(Usage)
         quit()
 
-    myPlatform = Test_My_Platform( [ 'Monterey', 'Ventura', 'Sonoma' ] )
+    myPlatform = Test_My_Platform( [ 'Monterey', 'Ventura', 'Sonoma', 'Sequoia' ] )
     if myPlatform == "":
-        print( "! Current platform is not [ 'Monterey', 'Ventura', 'Sonoma' ]" )
+        print( "! Current platform is not [ 'Monterey', 'Ventura', 'Sonoma', 'Sequoia' ]" )
         print(Usage)
         quit()
 

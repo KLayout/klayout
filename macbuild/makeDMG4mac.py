@@ -78,7 +78,7 @@ def SetGlobals():
     Usage  = "\n"
     Usage += "---------------------------------------------------------------------------------------------------------\n"
     Usage += "<< Usage of 'makeDMG4mac.py' >>\n"
-    Usage += "       for making a DMG file of KLayout 0.29.0 or later on different Apple macOS platforms.\n"
+    Usage += "       for making a DMG file of KLayout 0.29.7 or later on different Apple macOS platforms.\n"
     Usage += "\n"
     Usage += "$ [python] ./makeDMG4mac.py\n"
     Usage += "   option & argument    : descriptions                                               | default value\n"
@@ -106,7 +106,11 @@ def SetGlobals():
 
     release = int( Release.split(".")[0] ) # take the first of ['21', '0', '0']
     LatestOS = ""
-    if release == 23:
+    if release == 24:
+        GenOSName = "macOS"
+        Platform  = "Sequoia"
+        LatestOS  = Platform
+    elif release == 23:
         GenOSName = "macOS"
         Platform  = "Sonoma"
         LatestOS  = Platform
@@ -126,7 +130,8 @@ def SetGlobals():
         sys.exit(1)
 
     if not Machine == "x86_64":
-        if Machine == "arm64" and Platform in ["Sonoma", "Ventura", "Monterey"]: # with an Apple Silicon Chip
+        # with an Apple Silicon Chip?
+        if Machine == "arm64" and Platform in ["Sequoia", "Sonoma", "Ventura", "Monterey"]:
             print("")
             print( "### Your Mac equips an Apple Silicon Chip ###" )
             print("")
@@ -213,17 +218,17 @@ def SetGlobals():
 ## To check the contents of the package directory
 #
 # The package directory name should look like:
-#     * ST-qt5MP.pkg.macos-Monterey-release-RsysPsys
-#     * LW-qt5Ana3.pkg.macos-Monterey-release-Rana3Pana3
-#     * LW-qt6Brew.pkg.macos-Monterey-release-Rhb33Phb311  --- (1)
-#     * LW-qt5MP.pkg.macos-Monterey-release-Rmp33Pmp311
-#     * HW-qt6Brew.pkg.macos-Monterey-release-RsysPhb311
+#     * ST-qt5MP.pkg.macos-Sonoma-release-RsysPsys
+#     * LW-qt5Ana3.pkg.macos-Sonoma-release-Rana3Pana3
+#     * LW-qt6Brew.pkg.macos-Sonoma-release-Rhb33Phb312  --- (1)
+#     * LW-qt5MP.pkg.macos-Sonoma-release-Rmp33Pmp312
+#     * HW-qt6Brew.pkg.macos-Sonoma-release-RsysPhb311
 #
-#     * ST-qt6MP.pkg.macos-Monterey-release-RsysPsys
-#     * LW-qt6MP.pkg.macos-Monterey-release-Rmp33Pmp311
+#     * ST-qt6MP.pkg.macos-Sonoma-release-RsysPsys
+#     * LW-qt6MP.pkg.macos-Sonoma-release-Rmp33Pmp312
 #
 # Generated DMG will be, for example,
-#     (1) ---> LW-klayout-0.29.0-macOS-Monterey-1-qt6Brew-Rhb33Phb311.dmg
+#     (1) ---> LW-klayout-0.29.7-macOS-Sonoma-1-qt6Brew-Rhb33Phb312.dmg
 #
 # @return on success, positive integer in [MB] that tells approx. occupied disc space;
 #         on failure, -1
@@ -263,15 +268,15 @@ def CheckPkgDirectory():
 
     #-----------------------------------------------------------------------------------------------
     # [2] Identify (Qt, Ruby, Python) from PkgDir
-    #     * ST-qt5MP.pkg.macos-Monterey-release-RsysPsys
-    #     * LW-qt5Ana3.pkg.macos-Monterey-release-Rana3Pana3
-    #     * LW-qt6Brew.pkg.macos-Monterey-release-Rhb33Phb311
-    #     * LW-qt5MP.pkg.macos-Monterey-release-Rmp33Pmp311
-    #     * HW-qt6Brew.pkg.macos-Monterey-release-RsysPhb311
-    #     * EX-qt5MP.pkg.macos-Monterey-release-Rhb33Pmp311
+    #     * ST-qt5MP.pkg.macos-Sonoma-release-RsysPsys
+    #     * LW-qt5Ana3.pkg.macos-Sonoma-release-Rana3Pana3
+    #     * LW-qt6Brew.pkg.macos-Sonoma-release-Rhb33Phb312
+    #     * LW-qt5MP.pkg.macos-Sonoma-release-Rmp33Pmp312
+    #     * HW-qt6Brew.pkg.macos-Sonoma-release-RsysPhb311
+    #     * EX-qt5MP.pkg.macos-Sonoma-release-Rhb33Pmp312
     #
-    #     * ST-qt6MP.pkg.macos-Monterey-release-RsysPsys
-    #     * LW-qt6MP.pkg.macos-Monterey-release-Rmp33Pmp311
+    #     * ST-qt6MP.pkg.macos-Sonoma-release-RsysPsys
+    #     * LW-qt6MP.pkg.macos-Sonoma-release-Rmp33Pmp312
     #-----------------------------------------------------------------------------------------------
     #                  0      1      2                      3                  4                    5         6        7
     patQRP = u'(ST|LW|HW|EX)([-])([qt5|qt6][0-9A-Za-z]+)([.]pkg[.])([A-Za-z]+[-][A-Za-z]+[-])(release|debug)([-])([0-9A-Za-z]+)'
@@ -314,12 +319,12 @@ def CheckPkgDirectory():
         LatestOSMacPorts   = Platform == LatestOS
         LatestOSMacPorts  &= PackagePrefix == "LW"
         LatestOSMacPorts  &= QtIdentification in [ "qt5MP", "qt6MP" ]
-        LatestOSMacPorts  &= RubyPythonID in [ "Rmp33Pmp311", "Rmp33Pmp39" ]
+        LatestOSMacPorts  &= RubyPythonID in [ "Rmp33Pmp312", "Rmp33Pmp311" ]
 
         LatestOSHomebrew   = Platform == LatestOS
         LatestOSHomebrew  &= PackagePrefix == "LW"
         LatestOSHomebrew  &= QtIdentification in [ "qt5Brew", "qt6Brew", "qt5MP", "qt6MP" ] # "qt[5|6]MP" are the alternatives
-        LatestOSHomebrew  &= RubyPythonID in [ "Rhb33Phb311", "Rhb33Phb39", "Rhb33Phbauto" ]
+        LatestOSHomebrew  &= RubyPythonID in [ "Rhb33Phb312", "Rhb33Phb311", "Rhb33Phbauto" ]
 
         LatestOSAnaconda3  = Platform == LatestOS
         LatestOSAnaconda3 &= PackagePrefix == "LW"
@@ -329,7 +334,7 @@ def CheckPkgDirectory():
         LatestOSHomebrewH  = Platform == LatestOS
         LatestOSHomebrewH &= PackagePrefix == "HW"
         LatestOSHomebrewH &= QtIdentification in [ "qt5Brew", "qt6Brew", "qt5MP", "qt6MP" ] # "qt[5|6]MP" are the alternatives
-        LatestOSHomebrewH &= RubyPythonID in [ "RsysPhb311", "RsysPhb39", "RsysPhbauto" ] # Sys-Homebrew hybrid
+        LatestOSHomebrewH &= RubyPythonID in [ "RsysPhb311", "RsysPhbauto" ] # Sys-Homebrew hybrid
 
         if LatestOSSys:
             mydic  = DicStdLightHeavyW["std"]

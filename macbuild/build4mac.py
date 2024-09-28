@@ -5,7 +5,7 @@
 # File: "macbuild/build4mac.py"
 #
 #  The top Python script for building KLayout (http://www.klayout.de/index.php)
-#  version 0.29.0 or later on different Apple Mac OSX platforms.
+#  version 0.29.7 or later on different Apple Mac OSX platforms.
 #===============================================================================
 import sys
 import os
@@ -34,7 +34,7 @@ from build4mac_util import *
 # @return (usage, moduleset)-tuple
 #-------------------------------------------------------------------------------
 def GenerateUsage(platform):
-    if platform.upper() in [ "SONOMA", "VENTURA", "MONTEREY" ]: # with Xcode [13.1 .. ]
+    if platform.upper() in [ "SEQUOIA", "SONOMA", "VENTURA", "MONTEREY" ]: # with Xcode [13.1 .. ]
         myQt56    = "qt5macports"
         myRuby    = "sys"
         myPython  = "sys"
@@ -43,58 +43,58 @@ def GenerateUsage(platform):
         raise Exception( "! Too obsolete platform <%s>" % platform )
 
     usage  = "\n"
-    usage += "---------------------------------------------------------------------------------------------------------\n"
+    usage += "-----------------------------------------------------------------------------------------------------------\n"
     usage += "<< Usage of 'build4mac.py' >>\n"
-    usage += "       for building KLayout 0.29.0 or later on different Apple macOS platforms.\n"
+    usage += "       for building KLayout 0.29.7 or later on different Apple macOS platforms.\n"
     usage += "\n"
     usage += "$ [python] ./build4mac.py\n"
-    usage += "   option & argument    : descriptions (refer to 'macbuild/build4mac_env.py' for details)| default value\n"
-    usage += "   --------------------------------------------------------------------------------------+---------------\n"
-    usage += "   [-q|--qt <type>]     : case-insensitive type=['Qt5MacPorts', 'Qt5Brew', 'Qt5Ana3',    | %s\n" % myQt56
-    usage += "                        :                        'Qt6MacPorts', 'Qt6Brew']               |\n"
-    usage += "                        :   Qt5MacPorts: use Qt5 from MacPorts                           |\n"
-    usage += "                        :       Qt5Brew: use Qt5 from Homebrew                           |\n"
-    usage += "                        :       Qt5Ana3: use Qt5 from Anaconda3                          |\n"
-    usage += "                        :   Qt6MacPorts: use Qt6 from MacPorts (*)                       |\n"
-    usage += "                        :       Qt6Brew: use Qt6 from Homebrew (*)                       |\n"
-    usage += "                        :                        (*) migration to Qt6 is ongoing         |\n"
-    usage += "   [-r|--ruby <type>]   : case-insensitive type=['nil', 'Sys', 'MP33', 'HB33', 'Ana3']   | %s\n" % myRuby
-    usage += "                        :    nil: don't bind Ruby                                        |\n"
-    usage += "                        :    Sys: use [Sonoma|Ventura|Monterey]-bundled Ruby 2.6         |\n"
-    usage += "                        :   MP33: use Ruby 3.3 from MacPorts                             |\n"
-    usage += "                        :   HB33: use Ruby 3.3 from Homebrew                             |\n"
-    usage += "                        :   Ana3: use Ruby 3.2 from Anaconda3                            |\n"
-    usage += "   [-p|--python <type>] : case-insensitive type=['nil', 'Sys', 'MP311', 'HB311', 'Ana3', | %s\n" % myPython
-    usage += "                        :                        'MP39', 'HB39', 'HBAuto']               |\n"
-    usage += "                        :    nil: don't bind Python                                      |\n"
-    usage += "                        :    Sys: use [Sonoma|Ventura|Monterey]-bundled Python 3.9       |\n"
-    usage += "                        :  MP311: use Python 3.11 from MacPorts                          |\n"
-    usage += "                        :  HB311: use Python 3.11 from Homebrew                          |\n"
-    usage += "                        :   Ana3: use Python 3.11 from Anaconda3                         |\n"
-    usage += "                        :   MP39: use Python 3.9 from MacPorts (+)                       |\n"
-    usage += "                        :   HB39: use Python 3.9 from Homebrew (+)                       |\n"
-    usage += "                        :                    (+) for the backward compatibility tests    |\n"
-    usage += "                        : HBAuto: use the latest Python 3.x auto-detected from Homebrew  |\n"
-    usage += "   [-P|--buildPymod]    : build and deploy Pymod (*.whl) for LW-*.dmg                    | disabled\n"
-    usage += "   [-n|--noqtbinding]   : don't create Qt bindings for ruby scripts                      | disabled\n"
-    usage += "   [-u|--noqtuitools]   : don't include uitools in Qt binding                            | disabled\n"
-    usage += "   [-g|--nolibgit2]     : don't include libgit2 for Git package support                  | disabled\n"
-    usage += "   [-m|--make <option>] : option passed to 'make'                                        | '--jobs=4'\n"
-    usage += "   [-d|--debug]         : enable debug mode build; AddressSanitizer (ASAN) is linked     | disabled\n"
-    usage += "   [-c|--checkcom]      : check command-line and exit without building                   | disabled\n"
-    usage += "   [-y|--deploy]        : deploy executables and dylibs, including Qt's Frameworks       | disabled\n"
-    usage += "   [-Y|--DEPLOY]        : deploy executables and dylibs for those who built KLayout      | disabled\n"
-    usage += "                        : from the source code and use the tools in the same machine     |\n"
-    usage += "                        : ! After confirmation of the successful build of 'klayout.app', |\n"
-    usage += "                        :   rerun this script with BOTH:                                 |\n"
-    usage += "                        :     1) the same options used for building AND                  |\n"
-    usage += "                        :     2) <-y|--deploy> OR <-Y|--DEPLOY>                          |\n"
-    usage += "                        :   optionally with [-v|--verbose <0-3>]                         |\n"
-    usage += "   [-v|--verbose <0-3>] : verbose level of `macdeployqt' (effective with -y only)        | 1\n"
-    usage += "                        : 0 = no output, 1 = error/warning (default),                    |\n"
-    usage += "                        : 2 = normal,    3 = debug                                       |\n"
-    usage += "   [-?|--?]             : print this usage and exit; in zsh, quote like '-?' or '--?'    | disabled\n"
-    usage += "-----------------------------------------------------------------------------------------+---------------\n"
+    usage += "   option & argument    : descriptions (refer to 'macbuild/build4mac_env.py' for details)  | default value\n"
+    usage += "   ----------------------------------------------------------------------------------------+---------------\n"
+    usage += "   [-q|--qt <type>]     : case-insensitive type=['Qt5MacPorts', 'Qt5Brew', 'Qt5Ana3',      | %s\n" % myQt56
+    usage += "                        :                        'Qt6MacPorts', 'Qt6Brew']                 |\n"
+    usage += "                        :   Qt5MacPorts: use Qt5 from MacPorts                             |\n"
+    usage += "                        :       Qt5Brew: use Qt5 from Homebrew                             |\n"
+    usage += "                        :       Qt5Ana3: use Qt5 from Anaconda3                            |\n"
+    usage += "                        :   Qt6MacPorts: use Qt6 from MacPorts (*)                         |\n"
+    usage += "                        :       Qt6Brew: use Qt6 from Homebrew (*)                         |\n"
+    usage += "                        :                        (*) migration to Qt6 is ongoing           |\n"
+    usage += "   [-r|--ruby <type>]   : case-insensitive type=['nil', 'Sys', 'MP33', 'HB33', 'Ana3']     | %s\n" % myRuby
+    usage += "                        :    nil: don't bind Ruby                                          |\n"
+    usage += "                        :    Sys: use [Sequoia|Sonoma|Ventura|Monterey]-bundled Ruby 2.6   |\n"
+    usage += "                        :   MP33: use Ruby 3.3 from MacPorts                               |\n"
+    usage += "                        :   HB33: use Ruby 3.3 from Homebrew                               |\n"
+    usage += "                        :   Ana3: use Ruby 3.2 from Anaconda3                              |\n"
+    usage += "   [-p|--python <type>] : case-insensitive type=['nil', 'Sys', 'MP312', 'HB312', 'Ana3',   | %s\n" % myPython
+    usage += "                        :                        'MP311', 'HB311', 'HBAuto']               |\n"
+    usage += "                        :    nil: don't bind Python                                        |\n"
+    usage += "                        :    Sys: use [Sequoia|Sonoma|Ventura|Monterey]-bundled Python 3.9 |\n"
+    usage += "                        :  MP312: use Python 3.12 from MacPorts                            |\n"
+    usage += "                        :  HB312: use Python 3.12 from Homebrew                            |\n"
+    usage += "                        :   Ana3: use Python 3.12 from Anaconda3                           |\n"
+    usage += "                        :  MP311: use Python 3.11 from MacPorts                            |\n"
+    usage += "                        :  HB311: use Python 3.11 from Homebrew (+)                        |\n"
+    usage += "                        :               (+) required to provide the legacy pip in HW-*.dmg |\n"
+    usage += "                        : HBAuto: use the latest Python 3.x auto-detected from Homebrew    |\n"
+    usage += "   [-P|--buildPymod]    : build and deploy Pymod (*.whl) for LW-*.dmg                      | disabled\n"
+    usage += "   [-n|--noqtbinding]   : don't create Qt bindings for ruby scripts                        | disabled\n"
+    usage += "   [-u|--noqtuitools]   : don't include uitools in Qt binding                              | disabled\n"
+    usage += "   [-g|--nolibgit2]     : don't include libgit2 for Git package support                    | disabled\n"
+    usage += "   [-m|--make <option>] : option passed to 'make'                                          | '--jobs=4'\n"
+    usage += "   [-d|--debug]         : enable debug mode build; AddressSanitizer (ASAN) is linked       | disabled\n"
+    usage += "   [-c|--checkcom]      : check command-line and exit without building                     | disabled\n"
+    usage += "   [-y|--deploy]        : deploy executables and dylibs, including Qt's Frameworks         | disabled\n"
+    usage += "   [-Y|--DEPLOY]        : deploy executables and dylibs for those who built KLayout        | disabled\n"
+    usage += "                        : from the source code and use the tools in the same machine       |\n"
+    usage += "                        : ! After confirmation of the successful build of 'klayout.app',   |\n"
+    usage += "                        :   rerun this script with BOTH:                                   |\n"
+    usage += "                        :     1) the same options used for building AND                    |\n"
+    usage += "                        :     2) <-y|--deploy> OR <-Y|--DEPLOY>                            |\n"
+    usage += "                        :   optionally with [-v|--verbose <0-3>]                           |\n"
+    usage += "   [-v|--verbose <0-3>] : verbose level of `macdeployqt' (effective with -y only)          | 1\n"
+    usage += "                        : 0 = no output, 1 = error/warning (default),                      |\n"
+    usage += "                        : 2 = normal,    3 = debug                                         |\n"
+    usage += "   [-?|--?]             : print this usage and exit; in zsh, quote like '-?' or '--?'      | disabled\n"
+    usage += "-------------------------------------------------------------------------------------------+---------------\n"
     return (usage, moduleset)
 
 #-------------------------------------------------------------------------------
@@ -117,7 +117,9 @@ def Get_Default_Config():
     # Dropped [ElCapitan - BigSur] (2023-10-24).
     # See 415b5aa2efca04928f1148a69e77efd5d76f8c1d for the previous states.
     #----------------------------------------------------------------------------
-    if   release == 23:
+    if   release == 24:
+        Platform = "Sequoia"
+    elif release == 23:
         Platform = "Sonoma"
     elif release == 22:
         Platform = "Ventura"
@@ -131,7 +133,8 @@ def Get_Default_Config():
         sys.exit(1)
 
     if not Machine == "x86_64":
-        if Machine == "arm64" and Platform in ["Sonoma", "Ventura", "Monterey"]: # with an Apple Silicon Chip
+		# with an Apple Silicon Chip?
+        if Machine == "arm64" and Platform in ["Sequoia", "Sonoma", "Ventura", "Monterey"]:
             print("")
             print( "### Your Mac equips an Apple Silicon Chip ###" )
             print( "    Setting QMAKE_APPLE_DEVICE_ARCHS=arm64\n")
@@ -149,7 +152,11 @@ def Get_Default_Config():
     ToolDebug = list()
 
     # Set the default modules
-    if   Platform == "Sonoma":
+    if   Platform == "Sequoia":
+        ModuleQt     = "Qt5MacPorts"
+        ModuleRuby   = "Sys"
+        ModulePython = "Sys"
+    elif Platform == "Sonoma":
         ModuleQt     = "Qt5MacPorts"
         ModuleRuby   = "Sys"
         ModulePython = "Sys"
@@ -179,8 +186,7 @@ def Get_Default_Config():
     PackagePrefix = ""
     DeployVerbose = 1
     Version       = GetKLayoutVersionFrom( "./version.sh" )
-    HBPythonIs39  = False # because ModulePython == "Python311Brew" by default
-    OSPython3FW   = None  # system Python3 frameworks in [ None, MontereyPy3FW, VenturaPy3FW, SonomaPy3FW ]
+    OSPython3FW   = None  # system Python3 frameworks in [ None, MontereyPy3FW, VenturaPy3FW, SonomaPy3FW, SequoiaPy3FW ]
     EmbedQt       = False
     EmbedPython3  = False
 
@@ -207,8 +213,7 @@ def Get_Default_Config():
     config['Version']       = Version           # KLayout's version
     config['ModuleSet']     = ModuleSet         # (Qt, Ruby, Python)-tuple
     config['ToolDebug']     = ToolDebug         # debug level list for this tool
-    config['HBPythonIs39']  = HBPythonIs39      # True if the Homebrew Python version <= 3.9
-    config['OSPython3FW']   = OSPython3FW       # system Python3 frameworks in [ None, MontereyPy3FW, VenturaPy3FW, SonomaPy3FW ]
+    config['OSPython3FW']   = OSPython3FW       # system Python3 frameworks in [ None, MontereyPy3FW, VenturaPy3FW, SonomaPy3FW, SequoiaPy3FW ]
     config['EmbedQt']       = EmbedQt           # True if Qt is embedded
     config['EmbedPython3']  = EmbedPython3      # True if Python3 is embedded
     # auxiliary variables on platform
@@ -252,7 +257,6 @@ def Parse_CLI_Args(config):
     DeployVerbose = config['DeployVerbose']
     ModuleSet     = config['ModuleSet']
     ToolDebug     = config['ToolDebug']
-    HBPythonIs39  = config['HBPythonIs39']
     OSPython3FW   = config['OSPython3FW']
     EmbedQt       = config['EmbedQt']
     EmbedPython3  = config['EmbedPython3']
@@ -271,7 +275,7 @@ def Parse_CLI_Args(config):
 
     p.add_option( '-p', '--python',
                     dest='type_python',
-                    help="Python type=['nil', 'Sys', 'MP311', 'HB311', 'Ana3', 'MP39', 'HB39', 'HBAuto']" )
+                    help="Python type=['nil', 'Sys', 'MP312', 'HB312', 'Ana3', 'MP311', 'HB311', 'HBAuto']" )
 
     p.add_option( '-P', '--buildPymod',
                     action='store_true',
@@ -340,7 +344,7 @@ def Parse_CLI_Args(config):
                     default=False,
                     help='check usage' )
 
-    if Platform.upper() in [ "SONOMA", "VENTURA", "MONTEREY" ]: # with Xcode [13.1 .. ]
+    if Platform.upper() in [ "SEQUOIA", "SONOMA", "VENTURA", "MONTEREY" ]: # with Xcode [13.1 .. ]
         p.set_defaults( type_qt         = "qt5macports",
                         type_ruby       = "sys",
                         type_python     = "sys",
@@ -413,7 +417,9 @@ def Parse_CLI_Args(config):
         if choiceRuby == "nil":
             ModuleRuby = 'nil'
         elif choiceRuby == "Sys":
-            if Platform == "Sonoma":
+            if Platform == "Sequoia":
+                ModuleRuby = 'RubySequoia'
+            elif Platform == "Sonoma":
                 ModuleRuby = 'RubySonoma'
             elif Platform == "Ventura":
                 ModuleRuby = 'RubyVentura'
@@ -439,11 +445,11 @@ def Parse_CLI_Args(config):
     candidates           = dict()
     candidates['NIL']    = 'nil'
     candidates['SYS']    = 'Sys'
+    candidates['MP312']  = 'MP312'
+    candidates['HB312']  = 'HB312'
+    candidates['ANA3']   = 'Ana3'
     candidates['MP311']  = 'MP311'
     candidates['HB311']  = 'HB311'
-    candidates['ANA3']   = 'Ana3'
-    candidates['MP39']   = 'MP39'
-    candidates['HB39']   = 'HB39'
     candidates['HBAUTO'] = 'HBAuto'
     try:
         choicePython = candidates[ opt.type_python.upper() ]
@@ -454,49 +460,38 @@ def Parse_CLI_Args(config):
         ModulePython = ''
         if choicePython ==  "nil":
             ModulePython = 'nil'
-            HBPythonIs39 = None
             OSPython3FW  = None
         elif choicePython == "Sys":
-            if Platform == "Sonoma":
+            if Platform == "Sequoia":
+                ModulePython = 'PythonSequoia'
+                OSPython3FW  = SequoiaPy3FW
+            elif Platform == "Sonoma":
                 ModulePython = 'PythonSonoma'
-                HBPythonIs39 = None
                 OSPython3FW  = SonomaPy3FW
             elif Platform == "Ventura":
                 ModulePython = 'PythonVentura'
-                HBPythonIs39 = None
                 OSPython3FW  = VenturaPy3FW
             elif Platform == "Monterey":
                 ModulePython = 'PythonMonterey'
-                HBPythonIs39 = None
                 OSPython3FW  = MontereyPy3FW
-        elif choicePython == "MP311":
-            ModulePython = 'Python311MacPorts'
-            HBPythonIs39 = None
+        elif choicePython == "MP312":
+            ModulePython = 'Python312MacPorts'
             OSPython3FW  = None
             NonOSStdLang = True
-        elif choicePython == "HB311":
-            ModulePython = 'Python311Brew'
-            HBPythonIs39 = False
+        elif choicePython == "HB312":
+            ModulePython = 'Python312Brew'
             OSPython3FW  = None
             NonOSStdLang = True
         elif choicePython == "Ana3":
             ModulePython = 'PythonAnaconda3'
-            HBPythonIs39 = None
             OSPython3FW  = None
             NonOSStdLang = True
-        elif choicePython == "MP39":
-            ModulePython = 'Python39MacPorts'
-            HBPythonIs39 = None
-            OSPython3FW  = None
-            NonOSStdLang = True
-        elif choicePython == "HB39":
-            ModulePython = 'Python39Brew'
-            HBPythonIs39 = True
+        elif choicePython == "HB311":
+            ModulePython = 'Python311Brew'
             OSPython3FW  = None
             NonOSStdLang = True
         elif choicePython == "HBAuto":
             ModulePython = 'PythonAutoBrew'
-            HBPythonIs39 = (HBPythonAutoVersion == "3.9")
             OSPython3FW  = None
             NonOSStdLang = True
     if ModulePython == '':
@@ -566,14 +561,13 @@ def Parse_CLI_Args(config):
                 PackagePrefix = "ST-"
                 EmbedQt       = True
                 message      += "a standard (ST-) package including Qt[5|6] and using OS-bundled Ruby and Python..."
-            elif ModulePython in ['Python311Brew', 'Python39Brew', 'PythonAutoBrew']:
+            elif ModulePython in ['Python311Brew', 'PythonAutoBrew']:
                 PackagePrefix = "HW-"
                 EmbedQt       = True
                 EmbedPython3  = True
-                message      += "a heavyweight (HW-) package including Qt[5|6] and Python3.[11|9] from Homebrew..."
+                message      += "a heavyweight (HW-) package including Qt[5|6] and Python3.[11] from Homebrew..."
                 okHWdmg = (ModulePython == 'Python311Brew') or \
-                          (ModulePython == 'Python39Brew')  or \
-                          (ModulePython == 'PythonAutoBrew' and HBPythonAutoVersion in ["3.11", "3.9"] )
+                          (ModulePython == 'PythonAutoBrew' and HBPythonAutoVersion in ["3.11"] )
             else:
                 PackagePrefix = "EX-"
                 message      += "a package with exceptional (EX-) combinations of different modules..."
@@ -583,7 +577,7 @@ def Parse_CLI_Args(config):
         if not okHWdmg:
             print( "!!! HW-dmg package assumes the two conditions:" )
             print( "      (1) either Qt5 or Qt6 from MacPorts or Homebrew (Anaconda3 is not a candidate)" )
-            print( "      (2) either python@3.11 or python@3.9 from Homebrew" )
+            print( "      (2) python@3.11 from Homebrew" )
             sys.exit(1)
         if CheckComOnly:
             sys.exit(0)
@@ -610,7 +604,6 @@ def Parse_CLI_Args(config):
     config['DeployVerbose'] = DeployVerbose
     config['ModuleSet']     = ModuleSet
     config['ToolDebug']     = ToolDebug
-    config['HBPythonIs39']  = HBPythonIs39
     config['OSPython3FW']   = OSPython3FW
     config['EmbedQt']       = EmbedQt
     config['EmbedPython3']  = EmbedPython3
@@ -688,7 +681,7 @@ def Get_Build_Parameters(config):
     parameters['qt_lib_root'] = Qt56Dictionary[ModuleQt]['libdir']
 
     # (E) rpath
-    if OSPython3FW in [ MontereyPy3FW, VenturaPy3FW, SonomaPy3FW ]:
+    if OSPython3FW in [ MontereyPy3FW, VenturaPy3FW, SonomaPy3FW, SequoiaPy3FW ]:
         parameters['rpath'] = OSPython3FW
     else:
         parameters['rpath'] = "@executable_path/../Frameworks"
@@ -736,10 +729,10 @@ def Get_Build_Parameters(config):
     # (L) Extra parameters needed for <pymod>
     #     <pymod> will be built if:
     #       BuildPymodWhl = True
-    #       Platform      = [ 'Sonoma', 'Ventura', 'Monterey']
+    #       Platform      = [ 'Sequoia', 'Sonoma', 'Ventura', 'Monterey']
     #       ModuleRuby    = [ 'Ruby33MacPorts', 'Ruby33Brew', 'RubyAnaconda3' ]
-    #       ModulePython  = [ 'Python311MacPorts', 'Python39MacPorts',
-    #                         'Python311Brew', Python39Brew', 'PythonAutoBrew',
+    #       ModulePython  = [ 'Python312MacPorts', 'Python311MacPorts',
+    #                         'Python311Brew',
     #                         'PythonAnaconda3' ]
     parameters['BuildPymodWhl'] = BuildPymodWhl
     parameters['Platform']      = Platform
@@ -747,11 +740,11 @@ def Get_Build_Parameters(config):
     parameters['ModulePython']  = ModulePython
 
     PymodDistDir = dict()
-    if Platform in [ 'Sonoma', 'Ventura', 'Monterey' ]:
+    if Platform in [ 'Sequoia', 'Sonoma', 'Ventura', 'Monterey' ]:
         if ModuleRuby in [ 'Ruby33MacPorts', 'Ruby33Brew', 'RubyAnaconda3' ]:
-            if ModulePython in [ 'Python311MacPorts', 'Python39MacPorts' ]:
+            if ModulePython in [ 'Python312MacPorts', 'Python311MacPorts' ]:
                 PymodDistDir[ModulePython] = 'dist-MP3-%s' % ModuleQt
-            elif ModulePython in [ 'Python311Brew', 'Python39Brew', 'PythonAutoBrew' ]:
+            elif ModulePython in [ 'Python311Brew' ]:
                 PymodDistDir[ModulePython] = 'dist-HB3-%s' % ModuleQt
             elif ModulePython in [ 'PythonAnaconda3' ]:
                 PymodDistDir[ModulePython] = 'dist-ana3-%s' % ModuleQt
@@ -770,10 +763,10 @@ def Build_pymod_wheel(parameters):
     #-----------------------------------------------------------------------------------------------------------
     # [1] <pymod> will be built if:
     #       BuildPymodWhl = True
-    #       Platform      = [ 'Sonoma', 'Ventura', 'Monterey']
+    #       Platform      = [ 'Sequoia', 'Sonoma', 'Ventura', 'Monterey']
     #       ModuleRuby    = [ 'Ruby33MacPorts', 'Ruby33Brew', 'RubyAnaconda3' ]
-    #       ModulePython  = [ 'Python311MacPorts', 'Python39MacPorts',
-    #                         'Python311Brew', Python39Brew', 'PythonAutoBrew',
+    #       ModulePython  = [ 'Python312MacPorts', 'Python311MacPorts',
+    #                         'Python311Brew',
     #                         'PythonAnaconda3' ]
     #-----------------------------------------------------------------------------------------------------------
     BuildPymodWhl = parameters['BuildPymodWhl']
@@ -782,12 +775,13 @@ def Build_pymod_wheel(parameters):
     ModulePython  = parameters['ModulePython']
     if not BuildPymodWhl:
         return 0
-    if not Platform in [ 'Sonoma', 'Ventura', 'Monterey' ]:
+    if not Platform in [ 'Sequoia', 'Sonoma', 'Ventura', 'Monterey' ]:
         return 0
     elif not ModuleRuby in [ 'Ruby33MacPorts', 'Ruby33Brew', 'RubyAnaconda3' ]:
         return 0
-    elif not ModulePython in [ 'Python311MacPorts', 'Python39MacPorts', 'PythonAnaconda3', \
-                               'Python311Brew',     'Python39Brew',     'PythonAutoBrew' ]:
+    elif not ModulePython in [ 'Python312MacPorts', 'Python311MacPorts', \
+                               'Python311Brew', \
+                               'PythonAnaconda3' ]:
         return 0
 
     #--------------------------------------------------------------------
@@ -929,7 +923,7 @@ def Build_pymod_wheel(parameters):
     #       Refer to: https://github.com/Kazzz-S/klayout/issues/49#issuecomment-1432154118
     #                 https://pypi.org/project/delocate/
     #---------------------------------------------------------------------------------------------------------
-    cmd3_args = glob.glob( "dist/*.whl" )  # like ['dist/klayout-0.29.0-cp311-cp311-macosx_12_0_x86_64.whl']
+    cmd3_args = glob.glob( "dist/*.whl" )  # like ['dist/klayout-0.29.7-cp312-cp312-macosx_12_0_x86_64.whl']
     if len(cmd3_args) == 1:
         command3  = "time"
         command3 += " \\\n   %s \\\n" % deloc_cmd
@@ -959,13 +953,13 @@ def Build_pymod_wheel(parameters):
     #------------------------------------------------------------------------
     # [5-C] Forcibly change the wheel file name for anaconda3
     #       Ref. https://github.com/Kazzz-S/klayout/issues/53
-    #         original: klayout-0.29.0-cp311-cp311-macosx_12_0_x86_64.whl
+    #         original: klayout-0.29.7-cp312-cp312-macosx_12_0_x86_64.whl
     #               |
     #               V
-    #              new: klayout-0.29.0-cp311-cp311-macosx_10_9_x86_64.whl
+    #              new: klayout-0.29.7-cp312-cp312-macosx_10_9_x86_64.whl
     #------------------------------------------------------------------------
     if whlTarget == "ana3":
-        wheels = glob.glob( "dist/*.whl" )  # like ['dist/klayout-0.29.0-cp311-cp311-macosx_12_0_x86_64.whl']
+        wheels = glob.glob( "dist/*.whl" )  # like ['dist/klayout-0.29.7-cp312-cp312-macosx_12_0_x86_64.whl']
         if not len(wheels) == 1:
             print( "", file=sys.stderr )
             print( "-------------------------------------------------------------", file=sys.stderr )
@@ -1225,7 +1219,6 @@ def Deploy_Binaries_For_Bundle(config, parameters):
     ModuleRuby     = config['ModuleRuby']
     ModulePython   = config['ModulePython']
     ToolDebug      = config['ToolDebug']
-    HBPythonIs39   = config['HBPythonIs39']
     EmbedQt        = config['EmbedQt']
     EmbedPython3   = config['EmbedPython3']
 
@@ -1601,8 +1594,8 @@ def Deploy_Binaries_For_Bundle(config, parameters):
         regQt = re.compile(patQt)
 
         # (4) Python frameworks (only for Homebrew) # in the case of Intel Mac...
-        libPy3_1 = "%s/" % HBPython311FrameworkPath # /usr/local/opt/python@3.11/Frameworks/Python.framework/
-        libPy3_2 = "%s/" % HBPython39FrameworkPath  # /usr/local/opt/python@3.9/Frameworks/Python.framework/
+        libPy3_1 = "%s/" % HBPython312FrameworkPath # /usr/local/opt/python@3.12/Frameworks/Python.framework/
+        libPy3_2 = "%s/" % HBPython311FrameworkPath # /usr/local/opt/python@3.11/Frameworks/Python.framework/
         patPy3   = r'^(%s|%s)(.+)' % (libPy3_1, libPy3_2)
         regPy3   = re.compile(patPy3)
 
@@ -1837,56 +1830,50 @@ def Deploy_Binaries_For_Bundle(config, parameters):
             return 1
 
         #-----------------------------------------------------------------------------------------------
-        # [9] Special deployment of Python3.8 or newer from Homebrew
-        #     To use Python3.8 from Homebrew on Catalina...
-        #       in "/usr/local/opt/python@3.8/lib/"
+        # [9] Special deployment of Python3.11 from Homebrew
+        #     To use Python3.1 from Homebrew on Sonoma...
+        #       in "/usr/local/opt/python@3.11/lib/"
         #             Python.framework -> ../Frameworks/Python.framework/ <=== this symbolic was needed
         #             pkgconfig/
         #
         #     Use the "python3HB.py" tool to make different symbolic links [*] including the above one.
-        #        Catalina0{kazzz-s} lib (1)% pwd
-        #        /usr/local/opt/python@3.8/lib
-        #        Catalina0{kazzz-s} lib (2)% ll
+        #        Sonoma{kazzz-s} lib (1)% pwd
+        #        /usr/local/opt/python@3.11/lib
+        #        Sonoma{kazzz-s} lib (2)% ll
         #        total 0
-        #        drwxr-xr-x  4 kazzz-s admin 128 12 16 21:40 .
-        #        drwxr-xr-x 13 kazzz-s admin 416 12 12 23:08 ..
-        #    [*] lrwxr-xr-x  1 kazzz-s admin  31 12 16 21:40 Python.framework -> ../Frameworks/Python.framework/
-        #        drwxr-xr-x  4 kazzz-s admin 128 12 12 23:08 pkgconfig
+        #        drwxr-xr-x  4 kazzz-s admin 128  9 21 23:03 .
+        #        drwxr-xr-x 14 kazzz-s admin 448  9 21 18:33 ..
+        #    [*] lrwxr-xr-x  1 kazzz-s admin  31  9 21 23:03 Python.framework -> ../Frameworks/Python.framework/
+        #        drwxr-xr-x  4 kazzz-s admin 128  9  7 10:03 pkgconfig
         #
-        #        Catalina0{kazzz-s} Python.framework (3)% pwd
-        #        /usr/local/opt/python@3.8/Frameworks/Python.framework/Versions
-        #        Catalina0{kazzz-s} Versions (4)% ll
+        #        Sonoma{kazzz-s} Python.framework (3)% pwd
+        #        /usr/local/opt/python@3.11/Frameworks/Python.framework/Versions
+        #        Sonoma{kazzz-s} Versions (4)% ll
         #        total 0
-        #        drwxr-xr-x 4 kazzz-s admin 128 12 16 21:40 .
-        #        drwxr-xr-x 6 kazzz-s admin 192 12 16 21:40 ..
-        #        drwxr-xr-x 9 kazzz-s admin 288 12 12 23:08 3.8
-        #    [*] lrwxr-xr-x 1 kazzz-s admin   4 12 16 21:40 Current -> 3.8/
+        #        drwxr-xr-x 4 kazzz-s admin 128  9 21 23:03 .
+        #        drwxr-xr-x 6 kazzz-s admin 192  9 21 23:03 ..
+        #        drwxr-xr-x 9 kazzz-s admin 288  9  7 10:03 3.11
+        #    [*] lrwxr-xr-x 1 kazzz-s admin   5  9 21 23:03 Current -> 3.11/
         #
-        #        Catalina0{kazzz-s} Python.framework (5)% pwd
-        #        /usr/local/opt/python@3.8/Frameworks/Python.framework
-        #        Catalina0{kazzz-s} Python.framework (6)% ll
+        #        Sonoma{kazzz-s} Python.framework (5)% pwd
+        #        /usr/local/opt/python@3.11/Frameworks/Python.framework
+        #        Sonoma{kazzz-s} Python.framework (6)% ll
         #        total 0
-        #        drwxr-xr-x 6 kazzz-s admin 192 12 16 21:40 .
-        #        drwxr-xr-x 3 kazzz-s admin  96 12 12 23:07 ..
-        #    [*] lrwxr-xr-x 1 kazzz-s admin  25 12 16 21:40 Headers -> Versions/Current/Headers/
-        #    [*] lrwxr-xr-x 1 kazzz-s admin  23 12 16 21:40 Python -> Versions/Current/Python
-        #    [*] lrwxr-xr-x 1 kazzz-s admin  27 12 16 21:40 Resources -> Versions/Current/Resources/
-        #        drwxr-xr-x 4 kazzz-s admin 128 12 16 21:40 Versions
+        #        drwxr-xr-x 6 kazzz-s admin 192  9 21 23:03 .
+        #        drwxr-xr-x 3 kazzz-s admin  96  9  7 10:03 ..
+        #    [*] lrwxr-xr-x 1 kazzz-s admin  25  9 21 23:03 Headers -> Versions/Current/Headers/
+        #    [*] lrwxr-xr-x 1 kazzz-s admin  23  9 21 23:03 Python -> Versions/Current/Python
+        #    [*] lrwxr-xr-x 1 kazzz-s admin  27  9 21 23:03 Resources -> Versions/Current/Resources/
+        #        drwxr-xr-x 4 kazzz-s admin 128  9 21 23:03 Versions
         #-----------------------------------------------------------------------------------------------
         deploymentPython311HB  = (ModulePython == 'Python311Brew')
-        deploymentPython39HB   = (ModulePython == 'Python39Brew')
         deploymentPythonAutoHB = (ModulePython == 'PythonAutoBrew')
-        if (deploymentPython311HB or deploymentPython39HB or deploymentPythonAutoHB) and NonOSStdLang:
+        if (deploymentPython311HB or deploymentPythonAutoHB) and NonOSStdLang:
             # from build4mac_util import WalkFrameworkPaths, PerformChanges
             # from build4mac_util import Change_Python_LibPath_RelativeToAbsolute, DumpDependencyDic
-
             if deploymentPython311HB:
                 HBPythonFrameworkPath = HBPython311FrameworkPath
-                pythonHBVer           = "3.11" # 'pinned' to this version as of KLayout version 0.28.12 (2020-10-27)
-            elif deploymentPython39HB:
-                HBPythonFrameworkPath = HBPython39FrameworkPath
-                pythonHBVer           = "3.9" # 'pinned' to this version as of KLayout version 0.28.2 (2023-01-02)
-                                              # More specifically, "3.9.17" as of KLayout version 0.28.12 (2023-09-dd)
+                pythonHBVer           = "3.11" # required to provide the legacy pip in HW-*.dmg
             elif deploymentPythonAutoHB:
                 HBPythonFrameworkPath = HBPythonAutoFrameworkPath
                 pythonHBVer           = HBPythonAutoVersion
@@ -1936,15 +1923,12 @@ def Deploy_Binaries_For_Bundle(config, parameters):
                     print( msg % command, file=sys.stderr )
                     sys.exit(1)
 
-            if HBPythonIs39 == None or HBPythonIs39 == True:
-                shutil.copy2( sourceDir2 + "/start-console.py", targetDirM )
-            else:
-                ret = Generate_Start_Console_Py( sourceDir2 + "/template-start-console.py",
-                                                 pythonHBVer,
-                                                 targetDirM + "/start-console.py" )
-                if ret == False:
-                    print( "! Generate_Start_Console_Py() failed", file=sys.stderr )
-                    return 1
+            ret = Generate_Start_Console_Py( sourceDir2 + "/template-start-console.py",
+                                             pythonHBVer,
+                                             targetDirM + "/start-console.py" )
+            if ret == False:
+                print( "! Generate_Start_Console_Py() failed", file=sys.stderr )
+                return 1
 
             shutil.copy2( sourceDir2 + "/klayout_console",  targetDirM )
             os.chmod( targetDirM + "/start-console.py", 0o0755 )
@@ -1995,11 +1979,11 @@ def Deploy_Binaries_For_Bundle(config, parameters):
             #     xz          5.4.4   General-purpose data compression with high compression ratio
             #---------------------------------------------------------------------------------------------------
             # https://formulae.brew.sh/formula/python@3.11
-            #   as of 2023-10-24, python@3.11 depends on:
-            #     mpdecimal   2.5.1   Library for decimal floating point arithmetic
-            #     openssl@3   3.1.3   Cryptography and SSL/TLS Toolkit
-            #     sqlite      3.43.2  Command-line interface for SQLite
-            #     xz          5.4.4   General-purpose data compression with high compression ratio
+            #   as of 2024-09-21, python@3.11 depends on:
+            #     mpdecimal   4.0.0   Library for decimal floating point arithmetic
+            #     openssl@3   3.3.2   Cryptography and SSL/TLS Toolkit
+            #     sqlite      3.46.1  Command-line interface for SQLite
+            #     xz          5.6.2   General-purpose data compression with high compression ratio
             #---------------------------------------------------------------------------------------------------
             print( "   [9.2.4] Patching [mpdecimal, openssl@3, sqlite, xz(, gdbm, readline)]" )
             if 924 in ToolDebug:
@@ -2130,6 +2114,7 @@ def Deploy_Binaries_For_Bundle(config, parameters):
             # However, newer versions of Python deprecate the distutils.cfg file and the distutils module itself.
             #   Ref. https://github.com/Homebrew/homebrew-core/issues/76621
             #----------------------------------------------------------------------------------------------------
+            """
             if deploymentPython39HB or (HBPythonAutoVersion == "3.9"): # Python == 3.9
                 print( deploymentPython39HB, HBPythonAutoVersion )
                 print( "  [9.5.1] Patching distutils/" )
@@ -2157,14 +2142,14 @@ def Deploy_Binaries_For_Bundle(config, parameters):
                         if re.match('prefix=', line) is not None:
                             continue
                         file.write(line)
-
-            elif deploymentPython311HB or (HBPythonAutoVersion == "3.11"): # Python == 3.11
+            """
+            if deploymentPython311HB or (HBPythonAutoVersion == "3.11"): # Python == 3.11
                 # The above 'distutils.cfg' file does not exist in the distutils/ directory of Python 3.11.
                 # Use a different technique.
                 print( "  [9.5.2] In the Python3.11 environment, use an alternative method of patching distutils/" )
                 print( "          See Contents/MacOS/start-console.py in /Applications/klayout.app/" )
-            else: # other than ["3.11", "3.9"]; "3.12" <= Python is yet to be tested
-                print( "!!! HW-dmg package assumes either python@3.11 or python@3.9" )
+            else: # other than ["3.11"]
+                print( "!!! HW-dmg package assumes python@3.11" )
                 print( "!!! 'distutils' has been deprecated in 3.12 <= Python" )
                 print("")
                 os.chdir(ProjectDir)

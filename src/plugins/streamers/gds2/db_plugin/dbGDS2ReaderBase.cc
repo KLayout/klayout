@@ -22,6 +22,7 @@
 
 
 #include "dbGDS2ReaderBase.h"
+#include <cmath>
 #include "dbGDS2Format.h"
 #include "dbGDS2.h"
 #include "dbArray.h"
@@ -240,6 +241,11 @@ GDS2ReaderBase::do_read (db::Layout &layout)
 
       m_dbuu = dbuu;
       m_dbu = dbum * 1e6; /*in micron*/
+      // round to (approximately) the nearest attometer. This enables
+      // preserving DBU values precisely during round trips through GDS2.
+      // Use a power of two so that the division doesn't introduce errors.
+      const double factor = 1024.0 * 1024.0 * 1024.0 * 1024.0;
+      m_dbu = round (m_dbu * factor) / factor;
       layout.dbu (m_dbu);
 
     } else {

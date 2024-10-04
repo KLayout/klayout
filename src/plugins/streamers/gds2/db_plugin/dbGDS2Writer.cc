@@ -107,7 +107,7 @@ GDS2Writer::write_double (double d)
   tl_assert (e >= -64 && e < 64);
   b[0] |= ((e + 64) & 0x7f);
 
-  uint64_t m = uint64_t (d + 0.5);
+  uint64_t m = uint64_t (round (d));
   for (int i = 7; i > 0; --i) {
     b[i] = (m & 0xff);
     m >>= 8;

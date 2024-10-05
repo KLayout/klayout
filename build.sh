@@ -595,7 +595,7 @@ mkdir -p $BUILD
 . $(dirname $(which $0))/version.sh
 
 # qmake needs absolute paths, so we get them now:
-#   OSX does not have `readlink -f` command. Use equivalent Perl script.
+#   OSX does not have `realpath --canonicalize-existing` command. Use equivalent Perl script.
 if [ "$IS_MAC" = "no" ]; then
   BUILD=`realpath --canonicalize-existing $BUILD`
   BIN=`realpath --canonicalize-existing $BIN`

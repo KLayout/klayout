@@ -360,7 +360,7 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
   generic_reader_options_b.set_group_prefix ("Input B");
 
   std::string infile_a, infile_b, output;
-  std::string top_a, top_b;
+  std::string top_a, top_b, top_output;
   bool dont_summarize_missing_layers = false;
   bool silent = false;
   bool no_summary = false;
@@ -392,6 +392,10 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
                  )
       << tl::arg ("-tb|--top-b=name",          &top_b,      "Specifies the top cell for the second layout",
                   "See --top-a for details."
+                 )
+      << tl::arg ("-to|--top-output=name",     &top_output, "Specifies the top cell for the output layout",
+                  "This option is only used if an output layout is given. It will specify the name of top cell to use there. "
+                  "If not specified, KLayout uses the top cell name of the first layout or the one given with --top-a."
                  )
       << tl::arg ("-u|--deep",                 &deep,       "Deep (hierarchical mode)",
                   "Enables hierarchical XOR (experimental). In this mode, tiling is not supported "
@@ -518,7 +522,7 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
 
   if (! output.empty ()) {
     output_layout.reset (new db::Layout ());
-    output_top = output_layout->add_cell ("XOR");
+    output_top = output_layout->add_cell (top_output.empty () ? top_a.c_str () : top_output.c_str ());
   }
 
   std::map<std::pair<int, db::LayerProperties>, ResultDescriptor> results;

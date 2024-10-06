@@ -158,8 +158,10 @@ ClipboardData::do_insert (db::Layout &layout, const db::ICplxTrans *trans, db::C
 {
   //  identify the cells our target is eventually called from, including itself
   std::set<db::cell_index_type> callers;
-  cell->collect_caller_cells (callers);
-  callers.insert (cell->cell_index ());
+  if (cell) {
+    cell->collect_caller_cells (callers);
+    callers.insert (cell->cell_index ());
+  }
 
   std::vector <unsigned int> new_layers;
   PropertyMapper prop_id_map (&layout, &m_layout);

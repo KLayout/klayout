@@ -3450,7 +3450,13 @@ CODE
           view = RBA::LayoutView::current
           view || raise("No view open")
           if $1 == "+"
+            prev_cv = view.active_cellview_index
             n = view.create_layout(true)
+            if prev_cv >= 0
+              # make the original cellview the active one again - this way
+              # we can re-run DRC without using the new output.
+              view.active_cellview_index = prev_cv
+            end
             cellname ||= (@def_cell ? @def_cell.name : "TOP")
           else
             n = $1.to_i - 1

@@ -98,6 +98,8 @@ ShapeEditService::get_edit_layer ()
 
   if (cl.is_null ()) {
     throw tl::Exception (tl::to_string (tr ("Please select a layer first")));
+  } else if (! cl->valid (true)) {
+    throw tl::Exception (tl::to_string (tr ("The selected layer is not valid")));
   }
 
   int cv_index = cl->cellview_index ();

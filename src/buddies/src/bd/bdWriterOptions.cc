@@ -57,7 +57,8 @@ GenericWriterOptions::GenericWriterOptions ()
   m_oasis_recompress = save_options.get_option_by_name ("oasis_recompress").to_bool ();
   m_oasis_permissive = save_options.get_option_by_name ("oasis_permissive").to_bool ();
   m_oasis_write_std_properties = save_options.get_option_by_name ("oasis_write_std_properties").to_int ();
-  m_oasis_subst_char = save_options.get_option_by_name ("oasis_substitution_char").to_string ();
+  //  No substitution by default (issue #1885), so skip this:
+  //  m_oasis_subst_char = save_options.get_option_by_name ("oasis_substitution_char").to_string ();
 
   m_cif_dummy_calls = save_options.get_option_by_name ("cif_dummy_calls").to_bool ();
   m_cif_blank_separator = save_options.get_option_by_name ("cif_blank_separator").to_bool ();
@@ -310,6 +311,8 @@ void GenericWriterOptions::set_oasis_substitution_char (const std::string &text)
 {
   if (! text.empty ()) {
     m_oasis_subst_char = text[0];
+  } else {
+    m_oasis_subst_char = std::string ();
   }
 }
 

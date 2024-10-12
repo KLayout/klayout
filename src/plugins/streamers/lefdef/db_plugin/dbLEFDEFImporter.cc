@@ -223,8 +223,10 @@ RuleBasedViaGenerator::create_cell (LEFDEFReaderState &reader, Layout &layout, d
 
   //  NOTE: missing cuts due to pattern holes don't change mask assignment
 
-  db::Vector vs ((m_cutsize.x () * m_columns + m_cutspacing.x () * (m_columns - 1)) / 2, (m_cutsize.y () * m_rows + m_cutspacing.y () * (m_rows - 1)) / 2);
-  db::Box via_box (m_offset - vs, m_offset + vs);
+  //  special rounding to ensure the dimensions are correct for non-even width or height (issue #1877)
+  db::Vector vs ((m_cutsize.x () * m_columns + m_cutspacing.x () * (m_columns - 1)), (m_cutsize.y () * m_rows + m_cutspacing.y () * (m_rows - 1)));
+  db::Point via_ll = m_offset - db::Vector (vs.x () / 2, vs.y () / 2);
+  db::Box via_box (via_ll, via_ll + vs);
 
   std::set <unsigned int> dl;
 

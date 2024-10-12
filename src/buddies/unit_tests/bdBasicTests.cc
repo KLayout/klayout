@@ -313,3 +313,41 @@ TEST(11)
   EXPECT_EQ (stream_opt.get_option_by_name ("cell_conflict_resolution").to_string (), "RenameCell");
 }
 
+//  Testing writer options
+TEST(12_issue1885)
+{
+  bd::GenericWriterOptions opt;
+  tl::CommandLineOptions cmd;
+
+  opt.add_options (cmd);
+
+  db::Layout layout;
+
+  db::SaveLayoutOptions stream_opt;
+  opt.configure (stream_opt, layout);
+
+  EXPECT_EQ (stream_opt.get_option_by_name ("oasis_substitution_char").to_string (), "");
+
+  const char *argv[] = {
+                   "x",
+                   "--subst-char=x",
+                 };
+
+  cmd.parse (sizeof (argv) / sizeof (argv[0]), const_cast<char **> (argv));
+
+  opt.configure (stream_opt, layout);
+
+  EXPECT_EQ (stream_opt.get_option_by_name ("oasis_substitution_char").to_string (), "x");
+
+  const char *argv2[] = {
+                   "x",
+                   "--subst-char=",
+                 };
+
+  cmd.parse (sizeof (argv2) / sizeof (argv2[0]), const_cast<char **> (argv2));
+
+  opt.configure (stream_opt, layout);
+
+  EXPECT_EQ (stream_opt.get_option_by_name ("oasis_substitution_char").to_string (), "");
+}
+

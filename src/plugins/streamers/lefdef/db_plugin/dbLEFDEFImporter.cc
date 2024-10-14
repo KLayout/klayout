@@ -223,8 +223,13 @@ RuleBasedViaGenerator::create_cell (LEFDEFReaderState &reader, Layout &layout, d
 
   //  NOTE: missing cuts due to pattern holes don't change mask assignment
 
-  db::Vector vs ((m_cutsize.x () * m_columns + m_cutspacing.x () * (m_columns - 1)) / 2, (m_cutsize.y () * m_rows + m_cutspacing.y () * (m_rows - 1)) / 2);
-  db::Box via_box (m_offset - vs, m_offset + vs);
+  //  special rounding to ensure the dimensions are correct for non-even width or height (issue #1877)
+  db::Vector vs ((m_cutsize.x () * m_columns + m_cutspacing.x () * (m_columns - 1)), (m_cutsize.y () * m_rows + m_cutspacing.y () * (m_rows - 1)));
+  if (vs.x () % 2 != 0 || vs.y () % 2 != 0) {
+    reader.warn (tl::sprintf (tl::to_string (tr ("Via has odd width or height (x,y dimension of cut array is %s database units) - this may lead to inaccurate positioning of the via")), vs.to_string ()));
+  }
+  db::Point via_ll = m_offset - db::Vector (vs.x () / 2, vs.y () / 2);
+  db::Box via_box (via_ll, via_ll + vs);
 
   std::set <unsigned int> dl;
 
@@ -975,7 +980,7 @@ LEFDEFReaderState::~LEFDEFReaderState ()
 }
 
 void
-LEFDEFReaderState::common_reader_error (const std::string &msg)
+LEFDEFReaderState::error (const std::string &msg)
 {
   if (mp_importer) {
     mp_importer->error (msg);
@@ -983,7 +988,7 @@ LEFDEFReaderState::common_reader_error (const std::string &msg)
 }
 
 void
-LEFDEFReaderState::common_reader_warn (const std::string &msg, int warn_level)
+LEFDEFReaderState::warn (const std::string &msg, int warn_level)
 {
   if (mp_importer) {
     mp_importer->warn (msg, warn_level);
@@ -1117,7 +1122,7 @@ LEFDEFReaderState::read_single_map_file (const std::string &path, std::map<std::
       size_t max_purpose_str = 15;
 
       if (! ex.try_read_word (w1) || ! ex.try_read_word (w2, "._$,/:") || ! try_read_layers (ex, layers) || ! try_read_layers (ex, datatypes)) {
-        common_reader_warn (tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d not understood - skipped")), path, ts.line_number ()));
+        warn (tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d not understood - skipped")), path, ts.line_number ()));
         continue;
       }
 
@@ -1143,7 +1148,7 @@ LEFDEFReaderState::read_single_map_file (const std::string &path, std::map<std::
           name = "REGIONS_NONE";
           lp = RegionsNone;
         } else if (w2 != "ALL") {
-          common_reader_warn (tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d - ignoring unknowns REGION purpose %s (use FENCE, GUIDE or ALL)")), path, ts.line_number (), w2));
+          warn (tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d - ignoring unknowns REGION purpose %s (use FENCE, GUIDE or ALL)")), path, ts.line_number (), w2));
         }
 
         for (std::vector<int>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
@@ -1176,7 +1181,7 @@ LEFDEFReaderState::read_single_map_file (const std::string &path, std::map<std::
 
           if (*p == "DIEAREA" || *p == "ALL" || *p == "COMP") {
 
-            common_reader_warn (tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d: NAME record ignored for entity: %s")), path, ts.line_number (), *p));
+            warn (tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d: NAME record ignored for entity: %s")), path, ts.line_number (), *p));
 
           } else {
 
@@ -1193,7 +1198,7 @@ LEFDEFReaderState::read_single_map_file (const std::string &path, std::map<std::
               if (label_purpose == Pins || label_purpose == LEFPins) {
                 layer_defs.push_back (std::make_pair (lp.front (), label_purpose == Pins ? Label : LEFLabel));
               } else {
-                common_reader_warn (tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d: NAME record ignored for purpose: %s")), path, ts.line_number (), purpose_to_name (label_purpose)));
+                warn (tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d: NAME record ignored for purpose: %s")), path, ts.line_number (), purpose_to_name (label_purpose)));
               }
 
             } else {
@@ -1226,7 +1231,7 @@ LEFDEFReaderState::read_single_map_file (const std::string &path, std::map<std::
       } else if (w1 == "COMP") {
 
         //  ignore "COMP (ALL) ..."
-        common_reader_warn (tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d: COMP entry ignored")), path, ts.line_number ()));
+        warn (tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d: COMP entry ignored")), path, ts.line_number ()));
 
       } else {
 
@@ -1261,7 +1266,7 @@ LEFDEFReaderState::read_single_map_file (const std::string &path, std::map<std::
               if (ex.test (":VOLTAGE:")) {
                 double f = 0.0;
                 ex.read (f);
-                common_reader_warn (tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d: NET voltage constraint ignored for layer %s")), path, ts.line_number (), w1));
+                warn (tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d: NET voltage constraint ignored for layer %s")), path, ts.line_number (), w1));
               }
 
             } else if (i->second == ViaGeometry) {
@@ -1284,7 +1289,7 @@ LEFDEFReaderState::read_single_map_file (const std::string &path, std::map<std::
 
           if (i == purpose_translation.end ()) {
 
-            common_reader_warn (tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d: purpose %s ignored for layer %s")), path, ts.line_number (), ps, w1));
+            warn (tl::sprintf (tl::to_string (tr ("Reading layer map file %s, line %d: purpose %s ignored for layer %s")), path, ts.line_number (), ps, w1));
 
           } else if (i->second == All) {
 
@@ -1379,7 +1384,7 @@ LEFDEFReaderState::open_layer (db::Layout &layout, const std::string &n, LayerPu
         msg += tl::to_string (tr (" Via size ")) + via_size.to_string ();
       }
 #endif
-      common_reader_warn (msg + tl::to_string (tr (" - layer is ignored")));
+      warn (msg + tl::to_string (tr (" - layer is ignored")));
     }
 
     return ll;

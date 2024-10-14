@@ -1077,3 +1077,26 @@ TEST(213_no_duplicate_LEF)
   db::compare_layouts (_this, ly, fn_path + "au.oas", db::WriteOAS);
 }
 
+//  issue-1877 (VIA placement rounding)
+TEST(214_issue1877)
+{
+  db::Layout ly;
+
+  std::string fn_path (tl::testdata ());
+  fn_path += "/lefdef/issue-1877/";
+
+  db::LEFDEFReaderOptions lefdef_opt = default_options ();
+  lefdef_opt.set_map_file ("tech.map");
+  lefdef_opt.set_read_lef_with_def (true);
+  db::LoadLayoutOptions opt;
+  opt.set_options (lefdef_opt);
+
+  {
+    tl::InputStream is (fn_path + "test.def");
+    db::Reader reader (is);
+    reader.read (ly, opt);
+  }
+
+  db::compare_layouts (_this, ly, fn_path + "au.oas", db::WriteOAS);
+}
+

@@ -1354,9 +1354,19 @@ public:
     return m_foreign_cells;
   }
 
+  /**
+   *  @brief Issues an error
+   */
+  void error (const std::string &msg);
+
+  /**
+   *  @brief Issues a warning
+   */
+  void warn (const std::string &msg, int warn_level = 1);
+
 protected:
-  virtual void common_reader_error (const std::string &msg);
-  virtual void common_reader_warn (const std::string &msg, int warn_level = 1);
+  virtual void common_reader_error (const std::string &msg) { error (msg); }
+  virtual void common_reader_warn (const std::string &msg, int warn_level) { warn (msg, warn_level); }
 
 private:
   /**

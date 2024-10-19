@@ -383,15 +383,21 @@ CODE
     # of layers and/or datatype numbers or layer names. Multiple filters
     # can be given and all layers matching at least one of these filter
     # expressions are joined to render the input layer for the DRC engine.
+    # For the syntax of the filter expressions see RBA::LayerMap#map (look for
+    # the version that uses a map expression).
     #
     # Some filter expressions are:
     #
     # @ul
     # @li @tt 1/0-255 @/tt: Datatypes 0 to 255 for layer 1 @/li
+    # @li @tt 1/* @/tt: All datatypes for layer 1 @/li
+    # @li @tt 1/0,5,10 @/tt: Datatypes 0, 5 and 10 for layer 1 @/li
+    # @li @tt 1/0;2/17 @/tt: Layer 1, datatype 0 and layer 2, datatype 17 @/li
     # @li @tt 1-10 @/tt: Layers 1 to 10, datatype 0 @/li
     # @li @tt METAL @/tt: A layer named "METAL" @/li
-    # @li @tt METAL (17/0) @/tt: A layer named "METAL" or layer 17, datatype 0 (for GDS, which does
-    #           not have names)@/li
+    # @li @tt METAL;VIA @/tt: A layer named "METAL" and the layer named "VIA" @/li
+    # @li @tt METAL;17/0 @/tt: A layer named "METAL" and layer 17, datatype 0 @/li
+    # @li @tt '17' @/tt: A layer named "17". Note the quotes which indicate a string, not a layer number @/li
     # @/ul
     #
     # Layers created with "input" may contain both texts (labels) and polygons. There is a subtle

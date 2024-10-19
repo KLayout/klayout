@@ -150,12 +150,12 @@ static void _call_f_fromShortName_2025 (const qt_gsi::GenericStaticMethod * /*de
 
 //  bool ::operator==(QSslEllipticCurve lhs, QSslEllipticCurve rhs)
 static bool op_QSslEllipticCurve_operator_eq__eq__4216(QSslEllipticCurve *_self, QSslEllipticCurve rhs) {
-  return ::operator==(*_self, rhs);
+  return operator==(*_self, rhs);
 }
 
 //  bool ::operator!=(QSslEllipticCurve lhs, QSslEllipticCurve rhs)
 static bool op_QSslEllipticCurve_operator_excl__eq__4216(QSslEllipticCurve *_self, QSslEllipticCurve rhs) {
-  return ::operator!=(*_self, rhs);
+  return operator!=(*_self, rhs);
 }
 
 

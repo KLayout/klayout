@@ -376,32 +376,32 @@ static void _call_f_fromString_2870 (const qt_gsi::GenericStaticMethod * /*decl*
 
 //  bool ::operator>(const QVersionNumber &lhs, const QVersionNumber &rhs)
 static bool op_QVersionNumber_operator_gt__5398(const QVersionNumber *_self, const QVersionNumber &rhs) {
-  return ::operator>(*_self, rhs);
+  return operator>(*_self, rhs);
 }
 
 //  bool ::operator>=(const QVersionNumber &lhs, const QVersionNumber &rhs)
 static bool op_QVersionNumber_operator_gt__eq__5398(const QVersionNumber *_self, const QVersionNumber &rhs) {
-  return ::operator>=(*_self, rhs);
+  return operator>=(*_self, rhs);
 }
 
 //  bool ::operator<(const QVersionNumber &lhs, const QVersionNumber &rhs)
 static bool op_QVersionNumber_operator_lt__5398(const QVersionNumber *_self, const QVersionNumber &rhs) {
-  return ::operator<(*_self, rhs);
+  return operator<(*_self, rhs);
 }
 
 //  bool ::operator<=(const QVersionNumber &lhs, const QVersionNumber &rhs)
 static bool op_QVersionNumber_operator_lt__eq__5398(const QVersionNumber *_self, const QVersionNumber &rhs) {
-  return ::operator<=(*_self, rhs);
+  return operator<=(*_self, rhs);
 }
 
 //  bool ::operator==(const QVersionNumber &lhs, const QVersionNumber &rhs)
 static bool op_QVersionNumber_operator_eq__eq__5398(const QVersionNumber *_self, const QVersionNumber &rhs) {
-  return ::operator==(*_self, rhs);
+  return operator==(*_self, rhs);
 }
 
 //  bool ::operator!=(const QVersionNumber &lhs, const QVersionNumber &rhs)
 static bool op_QVersionNumber_operator_excl__eq__5398(const QVersionNumber *_self, const QVersionNumber &rhs) {
-  return ::operator!=(*_self, rhs);
+  return operator!=(*_self, rhs);
 }
 
 

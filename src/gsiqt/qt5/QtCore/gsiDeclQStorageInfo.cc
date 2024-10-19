@@ -425,12 +425,12 @@ static void _call_f_root_0 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::S
 
 //  bool ::operator==(const QStorageInfo &first, const QStorageInfo &second)
 static bool op_QStorageInfo_operator_eq__eq__4922(const QStorageInfo *_self, const QStorageInfo &second) {
-  return ::operator==(*_self, second);
+  return operator==(*_self, second);
 }
 
 //  bool ::operator!=(const QStorageInfo &first, const QStorageInfo &second)
 static bool op_QStorageInfo_operator_excl__eq__4922(const QStorageInfo *_self, const QStorageInfo &second) {
-  return ::operator!=(*_self, second);
+  return operator!=(*_self, second);
 }
 
 

@@ -183,6 +183,26 @@ static void _call_f_currentType_0 (const qt_gsi::GenericStaticMethod * /*decl*/,
 }
 
 
+//  bool ::operator>(const QOperatingSystemVersion &lhs, const QOperatingSystemVersion &rhs)
+static bool op_QOperatingSystemVersion_operator_gt__7328(const QOperatingSystemVersion *_self, const QOperatingSystemVersion &rhs) {
+  return operator>(*_self, rhs);
+}
+
+//  bool ::operator>=(const QOperatingSystemVersion &lhs, const QOperatingSystemVersion &rhs)
+static bool op_QOperatingSystemVersion_operator_gt__eq__7328(const QOperatingSystemVersion *_self, const QOperatingSystemVersion &rhs) {
+  return operator>=(*_self, rhs);
+}
+
+//  bool ::operator<(const QOperatingSystemVersion &lhs, const QOperatingSystemVersion &rhs)
+static bool op_QOperatingSystemVersion_operator_lt__7328(const QOperatingSystemVersion *_self, const QOperatingSystemVersion &rhs) {
+  return operator<(*_self, rhs);
+}
+
+//  bool ::operator<=(const QOperatingSystemVersion &lhs, const QOperatingSystemVersion &rhs)
+static bool op_QOperatingSystemVersion_operator_lt__eq__7328(const QOperatingSystemVersion *_self, const QOperatingSystemVersion &rhs) {
+  return operator<=(*_self, rhs);
+}
+
 
 namespace gsi
 {
@@ -198,6 +218,10 @@ static gsi::Methods methods_QOperatingSystemVersion () {
   methods += new qt_gsi::GenericMethod ("type", "@brief Method QOperatingSystemVersion::OSType QOperatingSystemVersion::type()\n", true, &_init_f_type_c0, &_call_f_type_c0);
   methods += new qt_gsi::GenericStaticMethod ("current", "@brief Static method QOperatingSystemVersion QOperatingSystemVersion::current()\nThis method is static and can be called without an instance.", &_init_f_current_0, &_call_f_current_0);
   methods += new qt_gsi::GenericStaticMethod ("currentType", "@brief Static method QOperatingSystemVersion::OSType QOperatingSystemVersion::currentType()\nThis method is static and can be called without an instance.", &_init_f_currentType_0, &_call_f_currentType_0);
+  methods += gsi::method_ext(">", &::op_QOperatingSystemVersion_operator_gt__7328, gsi::arg ("rhs"), "@brief Operator bool ::operator>(const QOperatingSystemVersion &lhs, const QOperatingSystemVersion &rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext(">=", &::op_QOperatingSystemVersion_operator_gt__eq__7328, gsi::arg ("rhs"), "@brief Operator bool ::operator>=(const QOperatingSystemVersion &lhs, const QOperatingSystemVersion &rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("<", &::op_QOperatingSystemVersion_operator_lt__7328, gsi::arg ("rhs"), "@brief Operator bool ::operator<(const QOperatingSystemVersion &lhs, const QOperatingSystemVersion &rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("<=", &::op_QOperatingSystemVersion_operator_lt__eq__7328, gsi::arg ("rhs"), "@brief Operator bool ::operator<=(const QOperatingSystemVersion &lhs, const QOperatingSystemVersion &rhs)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

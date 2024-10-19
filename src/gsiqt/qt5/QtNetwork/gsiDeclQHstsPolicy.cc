@@ -266,12 +266,12 @@ static void _call_f_swap_1741 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 
 //  bool ::operator==(const QHstsPolicy &lhs, const QHstsPolicy &rhs)
 static bool op_QHstsPolicy_operator_eq__eq__4764(const QHstsPolicy *_self, const QHstsPolicy &rhs) {
-  return ::operator==(*_self, rhs);
+  return operator==(*_self, rhs);
 }
 
 //  bool ::operator!=(const QHstsPolicy &lhs, const QHstsPolicy &rhs)
 static bool op_QHstsPolicy_operator_excl__eq__4764(const QHstsPolicy *_self, const QHstsPolicy &rhs) {
-  return ::operator!=(*_self, rhs);
+  return operator!=(*_self, rhs);
 }
 
 

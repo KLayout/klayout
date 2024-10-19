@@ -347,7 +347,7 @@ static void _call_f_swap_3176 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 
 //  bool ::operator!=(const QCameraViewfinderSettings &lhs, const QCameraViewfinderSettings &rhs)
 static bool op_QCameraViewfinderSettings_operator_excl__eq__7634(const QCameraViewfinderSettings *_self, const QCameraViewfinderSettings &rhs) {
-  return ::operator!=(*_self, rhs);
+  return operator!=(*_self, rhs);
 }
 
 

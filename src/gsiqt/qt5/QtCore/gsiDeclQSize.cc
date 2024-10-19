@@ -460,32 +460,32 @@ static void _call_f_width_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 
 //  bool ::operator==(const QSize &s1, const QSize &s2)
 static bool op_QSize_operator_eq__eq__3502(const QSize *_self, const QSize &s2) {
-  return ::operator==(*_self, s2);
+  return operator==(*_self, s2);
 }
 
 //  bool ::operator!=(const QSize &s1, const QSize &s2)
 static bool op_QSize_operator_excl__eq__3502(const QSize *_self, const QSize &s2) {
-  return ::operator!=(*_self, s2);
+  return operator!=(*_self, s2);
 }
 
 //  const QSize ::operator+(const QSize &s1, const QSize &s2)
 static const QSize op_QSize_operator_plus__3502(const QSize *_self, const QSize &s2) {
-  return ::operator+(*_self, s2);
+  return operator+(*_self, s2);
 }
 
 //  const QSize ::operator-(const QSize &s1, const QSize &s2)
 static const QSize op_QSize_operator_minus__3502(const QSize *_self, const QSize &s2) {
-  return ::operator-(*_self, s2);
+  return operator-(*_self, s2);
 }
 
 //  const QSize ::operator*(const QSize &s, qreal c)
 static const QSize op_QSize_operator_star__2666(const QSize *_self, qreal c) {
-  return ::operator*(*_self, c);
+  return operator*(*_self, c);
 }
 
 //  const QSize ::operator/(const QSize &s, qreal c)
 static const QSize op_QSize_operator_slash__2666(const QSize *_self, qreal c) {
-  return ::operator/(*_self, c);
+  return operator/(*_self, c);
 }
 
 

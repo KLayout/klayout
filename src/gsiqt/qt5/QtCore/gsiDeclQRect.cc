@@ -1452,22 +1452,22 @@ static void _call_f_y_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi
 
 //  bool ::operator==(const QRect &, const QRect &)
 static bool op_QRect_operator_eq__eq__3476(const QRect *_self, const QRect &arg2) {
-  return ::operator==(*_self, arg2);
+  return operator==(*_self, arg2);
 }
 
 //  bool ::operator!=(const QRect &, const QRect &)
 static bool op_QRect_operator_excl__eq__3476(const QRect *_self, const QRect &arg2) {
-  return ::operator!=(*_self, arg2);
+  return operator!=(*_self, arg2);
 }
 
 //  QRect ::operator+(const QRect &rectangle, const QMargins &margins)
 static QRect op_QRect_operator_plus__3799u1(const QRect *_self, const QMargins &margins) {
-  return ::operator+(*_self, margins);
+  return operator+(*_self, margins);
 }
 
 //  QRect ::operator-(const QRect &lhs, const QMargins &rhs)
 static QRect op_QRect_operator_minus__3799(const QRect *_self, const QMargins &rhs) {
-  return ::operator-(*_self, rhs);
+  return operator-(*_self, rhs);
 }
 
 

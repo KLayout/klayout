@@ -210,12 +210,12 @@ static void _call_f_translated_c986 (const qt_gsi::GenericMethod * /*decl*/, voi
 
 //  bool ::operator==(const QMediaTimeInterval &, const QMediaTimeInterval &)
 static bool op_QMediaTimeInterval_operator_eq__eq__6112(const QMediaTimeInterval *_self, const QMediaTimeInterval &arg2) {
-  return ::operator==(*_self, arg2);
+  return operator==(*_self, arg2);
 }
 
 //  bool ::operator!=(const QMediaTimeInterval &, const QMediaTimeInterval &)
 static bool op_QMediaTimeInterval_operator_excl__eq__6112(const QMediaTimeInterval *_self, const QMediaTimeInterval &arg2) {
-  return ::operator!=(*_self, arg2);
+  return operator!=(*_self, arg2);
 }
 
 

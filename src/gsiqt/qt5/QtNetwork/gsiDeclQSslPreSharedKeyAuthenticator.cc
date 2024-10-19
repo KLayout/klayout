@@ -225,7 +225,7 @@ static void _call_f_swap_3567 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 
 //  bool ::operator!=(const QSslPreSharedKeyAuthenticator &lhs, const QSslPreSharedKeyAuthenticator &rhs)
 static bool op_QSslPreSharedKeyAuthenticator_operator_excl__eq__8416(const QSslPreSharedKeyAuthenticator *_self, const QSslPreSharedKeyAuthenticator &rhs) {
-  return ::operator!=(*_self, rhs);
+  return operator!=(*_self, rhs);
 }
 
 

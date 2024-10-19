@@ -391,6 +391,11 @@ static void _call_f_system_0 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi:
 }
 
 
+//  bool ::operator!=(const QRandomGenerator &rng1, const QRandomGenerator &rng2)
+static bool op_QRandomGenerator_operator_excl__eq__5768(const QRandomGenerator *_self, const QRandomGenerator &rng2) {
+  return operator!=(*_self, rng2);
+}
+
 
 namespace gsi
 {
@@ -417,6 +422,7 @@ static gsi::Methods methods_QRandomGenerator () {
   methods += new qt_gsi::GenericStaticMethod ("min", "@brief Static method quint32 QRandomGenerator::min()\nThis method is static and can be called without an instance.", &_init_f_min_0, &_call_f_min_0);
   methods += new qt_gsi::GenericStaticMethod ("securelySeeded", "@brief Static method QRandomGenerator QRandomGenerator::securelySeeded()\nThis method is static and can be called without an instance.", &_init_f_securelySeeded_0, &_call_f_securelySeeded_0);
   methods += new qt_gsi::GenericStaticMethod ("system", "@brief Static method QRandomGenerator *QRandomGenerator::system()\nThis method is static and can be called without an instance.", &_init_f_system_0, &_call_f_system_0);
+  methods += gsi::method_ext("!=", &::op_QRandomGenerator_operator_excl__eq__5768, gsi::arg ("rng2"), "@brief Operator bool ::operator!=(const QRandomGenerator &rng1, const QRandomGenerator &rng2)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

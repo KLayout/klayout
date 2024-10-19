@@ -101,12 +101,12 @@ static void _call_f_fromNumericId_986 (const qt_gsi::GenericStaticMethod * /*dec
 
 //  bool ::operator==(QPointingDeviceUniqueId lhs, QPointingDeviceUniqueId rhs)
 static bool op_QPointingDeviceUniqueId_operator_eq__eq__5398(QPointingDeviceUniqueId *_self, QPointingDeviceUniqueId rhs) {
-  return ::operator==(*_self, rhs);
+  return operator==(*_self, rhs);
 }
 
 //  bool ::operator!=(QPointingDeviceUniqueId lhs, QPointingDeviceUniqueId rhs)
 static bool op_QPointingDeviceUniqueId_operator_excl__eq__5398(QPointingDeviceUniqueId *_self, QPointingDeviceUniqueId rhs) {
-  return ::operator!=(*_self, rhs);
+  return operator!=(*_self, rhs);
 }
 
 

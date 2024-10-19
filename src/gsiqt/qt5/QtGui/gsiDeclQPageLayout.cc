@@ -672,12 +672,12 @@ static void _call_f_units_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 
 //  bool ::operator==(const QPageLayout &lhs, const QPageLayout &rhs)
 static bool op_QPageLayout_operator_eq__eq__4718(const QPageLayout *_self, const QPageLayout &rhs) {
-  return ::operator==(*_self, rhs);
+  return operator==(*_self, rhs);
 }
 
 //  bool ::operator!=(const QPageLayout &lhs, const QPageLayout &rhs)
 static bool op_QPageLayout_operator_excl__eq__4718(const QPageLayout *_self, const QPageLayout &rhs) {
-  return ::operator!=(*_self, rhs);
+  return operator!=(*_self, rhs);
 }
 
 

@@ -424,6 +424,24 @@ class CPPStruct
 
   end
 
+  def collect_friend_definitions
+
+    friend_decl = []
+
+    (self.body_decl || []).each do |bd|
+      if bd.is_a?(CPPFriendDecl)
+        bd.decl.each do |decl|
+          if ! decl.template_decl && decl.respond_to?(:is_definition) && decl.is_definition
+            friend_decl << decl
+          end
+        end
+      end
+    end
+
+    friend_decl
+
+  end
+
   def collect_ctors
 
     ctors = []
@@ -1202,7 +1220,7 @@ class Configurator
 
     # we also test for the parent of bd which may be different from cls if 
     # the method is imported from a base class or through "using"
-    cls2 = bd.parent.myself || ""
+    cls2 = (bd.parent && bd.parent.myself) || ""
     sig2 = bd.sig(cls2)
 
     # the drop test includes the static attribute so we can distinguish between
@@ -1977,7 +1995,7 @@ END
       if ctors.empty? && conf.has_default_ctor?(cls)
         func = CPPFunc::new(CPPQualifiedId::new(false, [ CPPId::new(decl_obj.myself, nil) ]), [], nil, nil)
         type = CPPType::new(nil, func, nil)
-        def_ctor = CPPDeclaration::new(type, nil, :public, nil, false, false)
+        def_ctor = CPPDeclaration::new(type, nil, :public, nil, false, false, false)
         def_ctor.parent = decl_obj
         ctors << def_ctor
       end
@@ -1989,7 +2007,9 @@ END
     global_operators = []
 
     # collect global operators with the given class as the first argument
-    @root.decls.each do |bd|
+    # Note that operators can also implicitly be declared as friends
+    (@root.decls + struct.collect_friend_definitions).each do |bd|
+
       if bd.is_a?(CPPDeclaration) && bd.type.func && bd.type.name =~ /^operator/
         op_func = bd.type.func
         if op_func.args.size >= 1
@@ -1999,6 +2019,7 @@ END
           end
         end
       end
+
     end
 
     native_impl = conf.native_impl(cls)
@@ -2359,9 +2380,9 @@ END
       ofile.puts("static #{rt.gsi_decl_return(decl_obj)} op_#{clsn}_#{mn}_#{hk}(#{args}) {")
 
       if !rt.is_void?
-        ofile.puts("  return " + rt.access_gsi_return(decl_obj, "::#{mid}(*#{qt_alist.join(', ')});"))
+        ofile.puts("  return " + rt.access_gsi_return(decl_obj, "#{mid}(*#{qt_alist.join(', ')});"))
       else
-        ofile.puts("  ::#{mid}(*#{qt_alist.join(', ')});")
+        ofile.puts("  #{mid}(*#{qt_alist.join(', ')});")
       end
 
       ofile.puts("}")

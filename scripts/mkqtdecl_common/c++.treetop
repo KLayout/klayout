@@ -183,7 +183,7 @@ grammar CPP
     ( ":" s block_wo_curly_braces s )?
     ( trailing_return_type )?
     a
-    (
+    blk:(
       "{" s block s "}" /
       ";"?
     ) <PDeclaration>
@@ -200,7 +200,7 @@ grammar CPP
     ( ":" s block_wo_curly_braces s )?
     ( trailing_return_type )?
     a
-    (
+    blk:(
       "{" s block s "}" /
       ";" 
     ) <PDeclaration>
@@ -436,7 +436,7 @@ grammar CPP
     s ( ":" s block_wo_curly_braces s )?
     ( trailing_return_type )?
     a
-    (
+    blk:(
       "{" s block s "}" /
       ";" 
     ) <PDeclaration>
@@ -452,7 +452,7 @@ grammar CPP
     s ( ":" s block_wo_curly_braces s )?
     ( trailing_return_type )?
     a
-    (
+    blk:(
       "{" s block s "}" /
       ";"?
     ) <PDeclaration>

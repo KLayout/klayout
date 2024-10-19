@@ -409,6 +409,9 @@ module PClassTemplateArg
 end
 
 module PDeclaration
+  def is_definition
+    blk.text_value =~ /^\{/
+  end
   def cpp
     td = nil
     if template.nonterminal? 
@@ -438,7 +441,7 @@ module PDeclaration
       elsif d.is_a?(CPPEnum)
         CPPEnumDeclaration::new(d, :default)
       else
-        CPPDeclaration::new(d, td, :default, storage_class, virtual, inline)
+        CPPDeclaration::new(d, td, :default, storage_class, virtual, inline, self.is_definition)
       end
     end
   end

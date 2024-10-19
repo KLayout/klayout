@@ -26,7 +26,7 @@ class Module
         # TODO: is there a better way to check whether dup can be used?
         # Implement Hash?
         #{args.map { |arg| "a = other.#{arg}\n"+
-                           "if a.is_a?(TrueClass) || a.is_a?(FalseClass) || a.is_a?(NilClass) || a.is_a?(Fixnum) || a.is_a?(Float) || a.is_a?(Symbol)\n"+
+                           "if a.is_a?(TrueClass) || a.is_a?(FalseClass) || a.is_a?(NilClass) || a.is_a?(1.class) || a.is_a?(1.0.class) || a.is_a?(Symbol)\n"+
                            "  @#{arg} = a\n"+
                            "elsif a.is_a?(Array)\n"+
                            "  @#{arg} = a.collect { |aa| aa.dup }\n"+
@@ -550,8 +550,8 @@ end
 # @attribute inline Is true for inline declarations
 class CPPDeclaration < CPPObject
 
-  attr_accessor :type, :template_decl, :visibility, :storage_class, :virtual, :inline
-  def_initializer :type, :template_decl, :visibility, :storage_class, :virtual, :inline
+  attr_accessor :type, :template_decl, :visibility, :storage_class, :virtual, :inline, :is_definition
+  def_initializer :type, :template_decl, :visibility, :storage_class, :virtual, :inline, :is_definition
 
   def dump(i)
     l = i

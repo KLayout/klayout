@@ -1750,10 +1750,11 @@ Service::transform (const db::DCplxTrans &trans)
     if (robj) {
 
       //  compute transformed object and replace
+      int id = robj->id ();
       ant::Object *rnew = new ant::Object (*robj);
       rnew->transform (trans);
       mp_view->annotation_shapes ().replace (s->first, db::DUserObject (rnew));
-      annotation_changed_event (rnew->id ());
+      annotation_changed_event (id);
 
     }
 

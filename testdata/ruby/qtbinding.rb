@@ -881,6 +881,39 @@ class QtBinding_TestClass < TestBase
 
   end
 
+  # issue-1899
+  def test_61 
+
+    p1 = RBA::QPoint::new(1, 2)
+    p2 = RBA::QPoint::new(1, 2)
+    p3 = RBA::QPoint::new(2, 3)
+    assert_equal((p1 * 5).x, 5)
+    assert_equal((p1 * 5).y, 10)
+    assert_equal(p1 == p2, true)
+    assert_equal(p1 == p3, false)
+    assert_equal(p1 != p2, false)
+    assert_equal(p1 != p3, true)
+    assert_equal((p1 + p3).x, 3)
+    assert_equal((p1 + p3).y, 5)
+    assert_equal((p1 - p3).x, -1)
+    assert_equal((p1 - p3).y, -1)
+
+    p1 = RBA::QPointF::new(1, 2)
+    p2 = RBA::QPointF::new(1, 2)
+    p3 = RBA::QPointF::new(2, 3)
+    assert_equal((p1 * 5).x, 5)
+    assert_equal((p1 * 5).y, 10)
+    assert_equal(p1 == p2, true)
+    assert_equal(p1 == p3, false)
+    assert_equal(p1 != p2, false)
+    assert_equal(p1 != p3, true)
+    assert_equal((p1 + p3).x, 3)
+    assert_equal((p1 + p3).y, 5)
+    assert_equal((p1 - p3).x, -1)
+    assert_equal((p1 - p3).y, -1)
+
+  end
+
 end 
 
 load("test_epilogue.rb")

@@ -928,37 +928,47 @@ static void _call_f_slerp_5666 (const qt_gsi::GenericStaticMethod * /*decl*/, gs
 
 //  const QQuaternion ::operator*(const QQuaternion &q1, const QQuaternion &q2)
 static const QQuaternion op_QQuaternion_operator_star__4804(const QQuaternion *_self, const QQuaternion &q2) {
-  return ::operator*(*_self, q2);
+  return operator*(*_self, q2);
 }
 
 //  const QQuaternion ::operator+(const QQuaternion &q1, const QQuaternion &q2)
 static const QQuaternion op_QQuaternion_operator_plus__4804(const QQuaternion *_self, const QQuaternion &q2) {
-  return ::operator+(*_self, q2);
+  return operator+(*_self, q2);
 }
 
 //  const QQuaternion ::operator-(const QQuaternion &q1, const QQuaternion &q2)
 static const QQuaternion op_QQuaternion_operator_minus__4804(const QQuaternion *_self, const QQuaternion &q2) {
-  return ::operator-(*_self, q2);
+  return operator-(*_self, q2);
 }
 
 //  const QQuaternion ::operator*(const QQuaternion &quaternion, float factor)
 static const QQuaternion op_QQuaternion_operator_star__3318(const QQuaternion *_self, float factor) {
-  return ::operator*(*_self, factor);
+  return operator*(*_self, factor);
 }
 
 //  const QQuaternion ::operator-(const QQuaternion &quaternion)
 static const QQuaternion op_QQuaternion_operator_minus__2456(const QQuaternion *_self) {
-  return ::operator-(*_self);
+  return operator-(*_self);
 }
 
 //  const QQuaternion ::operator/(const QQuaternion &quaternion, float divisor)
 static const QQuaternion op_QQuaternion_operator_slash__3318(const QQuaternion *_self, float divisor) {
-  return ::operator/(*_self, divisor);
+  return operator/(*_self, divisor);
 }
 
 //  QVector3D ::operator*(const QQuaternion &quaternion, const QVector3D &vec)
 static QVector3D op_QQuaternion_operator_star__4488(const QQuaternion *_self, const QVector3D &vec) {
-  return ::operator*(*_self, vec);
+  return operator*(*_self, vec);
+}
+
+//  bool ::operator==(const QQuaternion &q1, const QQuaternion &q2)
+static bool op_QQuaternion_operator_eq__eq__4804(const QQuaternion *_self, const QQuaternion &q2) {
+  return operator==(*_self, q2);
+}
+
+//  bool ::operator!=(const QQuaternion &q1, const QQuaternion &q2)
+static bool op_QQuaternion_operator_excl__eq__4804(const QQuaternion *_self, const QQuaternion &q2) {
+  return operator!=(*_self, q2);
 }
 
 
@@ -1019,6 +1029,8 @@ static gsi::Methods methods_QQuaternion () {
   methods += gsi::method_ext("-", &::op_QQuaternion_operator_minus__2456, "@brief Operator const QQuaternion ::operator-(const QQuaternion &quaternion)\nThis is the mapping of the global operator to the instance method.");
   methods += gsi::method_ext("/", &::op_QQuaternion_operator_slash__3318, gsi::arg ("divisor"), "@brief Operator const QQuaternion ::operator/(const QQuaternion &quaternion, float divisor)\nThis is the mapping of the global operator to the instance method.");
   methods += gsi::method_ext("*", &::op_QQuaternion_operator_star__4488, gsi::arg ("vec"), "@brief Operator QVector3D ::operator*(const QQuaternion &quaternion, const QVector3D &vec)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("==", &::op_QQuaternion_operator_eq__eq__4804, gsi::arg ("q2"), "@brief Operator bool ::operator==(const QQuaternion &q1, const QQuaternion &q2)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QQuaternion_operator_excl__eq__4804, gsi::arg ("q2"), "@brief Operator bool ::operator!=(const QQuaternion &q1, const QQuaternion &q2)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

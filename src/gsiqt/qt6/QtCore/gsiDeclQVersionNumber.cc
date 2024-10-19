@@ -374,6 +374,36 @@ static void _call_f_fromString_2870 (const qt_gsi::GenericStaticMethod * /*decl*
 }
 
 
+//  bool ::operator>(const QVersionNumber &lhs, const QVersionNumber &rhs)
+static bool op_QVersionNumber_operator_gt__5398(const QVersionNumber *_self, const QVersionNumber &rhs) {
+  return operator>(*_self, rhs);
+}
+
+//  bool ::operator>=(const QVersionNumber &lhs, const QVersionNumber &rhs)
+static bool op_QVersionNumber_operator_gt__eq__5398(const QVersionNumber *_self, const QVersionNumber &rhs) {
+  return operator>=(*_self, rhs);
+}
+
+//  bool ::operator<(const QVersionNumber &lhs, const QVersionNumber &rhs)
+static bool op_QVersionNumber_operator_lt__5398(const QVersionNumber *_self, const QVersionNumber &rhs) {
+  return operator<(*_self, rhs);
+}
+
+//  bool ::operator<=(const QVersionNumber &lhs, const QVersionNumber &rhs)
+static bool op_QVersionNumber_operator_lt__eq__5398(const QVersionNumber *_self, const QVersionNumber &rhs) {
+  return operator<=(*_self, rhs);
+}
+
+//  bool ::operator==(const QVersionNumber &lhs, const QVersionNumber &rhs)
+static bool op_QVersionNumber_operator_eq__eq__5398(const QVersionNumber *_self, const QVersionNumber &rhs) {
+  return operator==(*_self, rhs);
+}
+
+//  bool ::operator!=(const QVersionNumber &lhs, const QVersionNumber &rhs)
+static bool op_QVersionNumber_operator_excl__eq__5398(const QVersionNumber *_self, const QVersionNumber &rhs) {
+  return operator!=(*_self, rhs);
+}
+
 
 namespace gsi
 {
@@ -399,6 +429,12 @@ static gsi::Methods methods_QVersionNumber () {
   methods += new qt_gsi::GenericStaticMethod ("commonPrefix", "@brief Static method QVersionNumber QVersionNumber::commonPrefix(const QVersionNumber &v1, const QVersionNumber &v2)\nThis method is static and can be called without an instance.", &_init_f_commonPrefix_5398, &_call_f_commonPrefix_5398);
   methods += new qt_gsi::GenericStaticMethod ("compare", "@brief Static method int QVersionNumber::compare(const QVersionNumber &v1, const QVersionNumber &v2)\nThis method is static and can be called without an instance.", &_init_f_compare_5398, &_call_f_compare_5398);
   methods += new qt_gsi::GenericStaticMethod ("fromString", "@brief Static method QVersionNumber QVersionNumber::fromString(const QString &string, int *suffixIndex)\nThis method is static and can be called without an instance.", &_init_f_fromString_2870, &_call_f_fromString_2870);
+  methods += gsi::method_ext(">", &::op_QVersionNumber_operator_gt__5398, gsi::arg ("rhs"), "@brief Operator bool ::operator>(const QVersionNumber &lhs, const QVersionNumber &rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext(">=", &::op_QVersionNumber_operator_gt__eq__5398, gsi::arg ("rhs"), "@brief Operator bool ::operator>=(const QVersionNumber &lhs, const QVersionNumber &rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("<", &::op_QVersionNumber_operator_lt__5398, gsi::arg ("rhs"), "@brief Operator bool ::operator<(const QVersionNumber &lhs, const QVersionNumber &rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("<=", &::op_QVersionNumber_operator_lt__eq__5398, gsi::arg ("rhs"), "@brief Operator bool ::operator<=(const QVersionNumber &lhs, const QVersionNumber &rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("==", &::op_QVersionNumber_operator_eq__eq__5398, gsi::arg ("rhs"), "@brief Operator bool ::operator==(const QVersionNumber &lhs, const QVersionNumber &rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QVersionNumber_operator_excl__eq__5398, gsi::arg ("rhs"), "@brief Operator bool ::operator!=(const QVersionNumber &lhs, const QVersionNumber &rhs)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

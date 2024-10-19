@@ -244,6 +244,16 @@ static void _call_f_isMonotonic_0 (const qt_gsi::GenericStaticMethod * /*decl*/,
 }
 
 
+//  bool ::operator==(const QElapsedTimer &lhs, const QElapsedTimer &rhs)
+static bool op_QElapsedTimer_operator_eq__eq__5110(const QElapsedTimer *_self, const QElapsedTimer &rhs) {
+  return operator==(*_self, rhs);
+}
+
+//  bool ::operator!=(const QElapsedTimer &lhs, const QElapsedTimer &rhs)
+static bool op_QElapsedTimer_operator_excl__eq__5110(const QElapsedTimer *_self, const QElapsedTimer &rhs) {
+  return operator!=(*_self, rhs);
+}
+
 
 namespace gsi
 {
@@ -263,6 +273,8 @@ static gsi::Methods methods_QElapsedTimer () {
   methods += new qt_gsi::GenericMethod ("start", "@brief Method void QElapsedTimer::start()\n", false, &_init_f_start_0, &_call_f_start_0);
   methods += new qt_gsi::GenericStaticMethod ("clockType", "@brief Static method QElapsedTimer::ClockType QElapsedTimer::clockType()\nThis method is static and can be called without an instance.", &_init_f_clockType_0, &_call_f_clockType_0);
   methods += new qt_gsi::GenericStaticMethod ("isMonotonic?", "@brief Static method bool QElapsedTimer::isMonotonic()\nThis method is static and can be called without an instance.", &_init_f_isMonotonic_0, &_call_f_isMonotonic_0);
+  methods += gsi::method_ext("==", &::op_QElapsedTimer_operator_eq__eq__5110, gsi::arg ("rhs"), "@brief Operator bool ::operator==(const QElapsedTimer &lhs, const QElapsedTimer &rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QElapsedTimer_operator_excl__eq__5110, gsi::arg ("rhs"), "@brief Operator bool ::operator!=(const QElapsedTimer &lhs, const QElapsedTimer &rhs)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

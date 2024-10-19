@@ -112,6 +112,11 @@ static void _call_f_swap_2252 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
+//  bool ::operator<(const QCollatorSortKey &lhs, const QCollatorSortKey &rhs)
+static bool op_QCollatorSortKey_operator_lt__5786(const QCollatorSortKey *_self, const QCollatorSortKey &rhs) {
+  return operator<(*_self, rhs);
+}
+
 
 namespace gsi
 {
@@ -122,6 +127,7 @@ static gsi::Methods methods_QCollatorSortKey () {
   methods += new qt_gsi::GenericMethod ("compare", "@brief Method int QCollatorSortKey::compare(const QCollatorSortKey &key)\n", true, &_init_f_compare_c2947, &_call_f_compare_c2947);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QCollatorSortKey &QCollatorSortKey::operator=(const QCollatorSortKey &other)\n", false, &_init_f_operator_eq__2947, &_call_f_operator_eq__2947);
   methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QCollatorSortKey::swap(QCollatorSortKey &other)\n", false, &_init_f_swap_2252, &_call_f_swap_2252);
+  methods += gsi::method_ext("<", &::op_QCollatorSortKey_operator_lt__5786, gsi::arg ("rhs"), "@brief Operator bool ::operator<(const QCollatorSortKey &lhs, const QCollatorSortKey &rhs)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

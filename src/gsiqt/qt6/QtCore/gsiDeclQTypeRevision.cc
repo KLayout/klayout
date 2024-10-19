@@ -140,6 +140,36 @@ static void _call_f_zero_0 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::S
 }
 
 
+//  bool ::operator==(QTypeRevision lhs, QTypeRevision rhs)
+static bool op_QTypeRevision_operator_eq__eq__3456(QTypeRevision *_self, QTypeRevision rhs) {
+  return operator==(*_self, rhs);
+}
+
+//  bool ::operator!=(QTypeRevision lhs, QTypeRevision rhs)
+static bool op_QTypeRevision_operator_excl__eq__3456(QTypeRevision *_self, QTypeRevision rhs) {
+  return operator!=(*_self, rhs);
+}
+
+//  bool ::operator<(QTypeRevision lhs, QTypeRevision rhs)
+static bool op_QTypeRevision_operator_lt__3456(QTypeRevision *_self, QTypeRevision rhs) {
+  return operator<(*_self, rhs);
+}
+
+//  bool ::operator>(QTypeRevision lhs, QTypeRevision rhs)
+static bool op_QTypeRevision_operator_gt__3456(QTypeRevision *_self, QTypeRevision rhs) {
+  return operator>(*_self, rhs);
+}
+
+//  bool ::operator<=(QTypeRevision lhs, QTypeRevision rhs)
+static bool op_QTypeRevision_operator_lt__eq__3456(QTypeRevision *_self, QTypeRevision rhs) {
+  return operator<=(*_self, rhs);
+}
+
+//  bool ::operator>=(QTypeRevision lhs, QTypeRevision rhs)
+static bool op_QTypeRevision_operator_gt__eq__3456(QTypeRevision *_self, QTypeRevision rhs) {
+  return operator>=(*_self, rhs);
+}
+
 
 namespace gsi
 {
@@ -153,6 +183,12 @@ static gsi::Methods methods_QTypeRevision () {
   methods += new qt_gsi::GenericMethod ("majorVersion", "@brief Method quint8 QTypeRevision::majorVersion()\n", true, &_init_f_majorVersion_c0, &_call_f_majorVersion_c0);
   methods += new qt_gsi::GenericMethod ("minorVersion", "@brief Method quint8 QTypeRevision::minorVersion()\n", true, &_init_f_minorVersion_c0, &_call_f_minorVersion_c0);
   methods += new qt_gsi::GenericStaticMethod ("zero", "@brief Static method QTypeRevision QTypeRevision::zero()\nThis method is static and can be called without an instance.", &_init_f_zero_0, &_call_f_zero_0);
+  methods += gsi::method_ext("==", &::op_QTypeRevision_operator_eq__eq__3456, gsi::arg ("rhs"), "@brief Operator bool ::operator==(QTypeRevision lhs, QTypeRevision rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QTypeRevision_operator_excl__eq__3456, gsi::arg ("rhs"), "@brief Operator bool ::operator!=(QTypeRevision lhs, QTypeRevision rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("<", &::op_QTypeRevision_operator_lt__3456, gsi::arg ("rhs"), "@brief Operator bool ::operator<(QTypeRevision lhs, QTypeRevision rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext(">", &::op_QTypeRevision_operator_gt__3456, gsi::arg ("rhs"), "@brief Operator bool ::operator>(QTypeRevision lhs, QTypeRevision rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("<=", &::op_QTypeRevision_operator_lt__eq__3456, gsi::arg ("rhs"), "@brief Operator bool ::operator<=(QTypeRevision lhs, QTypeRevision rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext(">=", &::op_QTypeRevision_operator_gt__eq__3456, gsi::arg ("rhs"), "@brief Operator bool ::operator>=(QTypeRevision lhs, QTypeRevision rhs)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

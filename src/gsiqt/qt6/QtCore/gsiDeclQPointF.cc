@@ -350,6 +350,46 @@ static void _call_f_dotProduct_3864 (const qt_gsi::GenericStaticMethod * /*decl*
 }
 
 
+//  bool ::operator==(const QPointF &p1, const QPointF &p2)
+static bool op_QPointF_operator_eq__eq__3864u1(const QPointF *_self, const QPointF &p2) {
+  return operator==(*_self, p2);
+}
+
+//  bool ::operator!=(const QPointF &p1, const QPointF &p2)
+static bool op_QPointF_operator_excl__eq__3864u1(const QPointF *_self, const QPointF &p2) {
+  return operator!=(*_self, p2);
+}
+
+//  QPointF ::operator+(const QPointF &p1, const QPointF &p2)
+static QPointF op_QPointF_operator_plus__3864(const QPointF *_self, const QPointF &p2) {
+  return operator+(*_self, p2);
+}
+
+//  QPointF ::operator-(const QPointF &p1, const QPointF &p2)
+static QPointF op_QPointF_operator_minus__3864(const QPointF *_self, const QPointF &p2) {
+  return operator-(*_self, p2);
+}
+
+//  QPointF ::operator*(const QPointF &p, qreal c)
+static QPointF op_QPointF_operator_star__2847(const QPointF *_self, qreal c) {
+  return operator*(*_self, c);
+}
+
+//  QPointF ::operator+(const QPointF &p)
+static QPointF op_QPointF_operator_plus__1986(const QPointF *_self) {
+  return operator+(*_self);
+}
+
+//  QPointF ::operator-(const QPointF &p)
+static QPointF op_QPointF_operator_minus__1986(const QPointF *_self) {
+  return operator-(*_self);
+}
+
+//  QPointF ::operator/(const QPointF &p, qreal divisor)
+static QPointF op_QPointF_operator_slash__2847(const QPointF *_self, qreal divisor) {
+  return operator/(*_self, divisor);
+}
+
 
 namespace gsi
 {
@@ -374,6 +414,14 @@ static gsi::Methods methods_QPointF () {
   methods += new qt_gsi::GenericMethod (":x", "@brief Method double QPointF::x()\n", true, &_init_f_x_c0, &_call_f_x_c0);
   methods += new qt_gsi::GenericMethod (":y", "@brief Method double QPointF::y()\n", true, &_init_f_y_c0, &_call_f_y_c0);
   methods += new qt_gsi::GenericStaticMethod ("dotProduct", "@brief Static method double QPointF::dotProduct(const QPointF &p1, const QPointF &p2)\nThis method is static and can be called without an instance.", &_init_f_dotProduct_3864, &_call_f_dotProduct_3864);
+  methods += gsi::method_ext("==", &::op_QPointF_operator_eq__eq__3864u1, gsi::arg ("p2"), "@brief Operator bool ::operator==(const QPointF &p1, const QPointF &p2)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QPointF_operator_excl__eq__3864u1, gsi::arg ("p2"), "@brief Operator bool ::operator!=(const QPointF &p1, const QPointF &p2)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("+", &::op_QPointF_operator_plus__3864, gsi::arg ("p2"), "@brief Operator QPointF ::operator+(const QPointF &p1, const QPointF &p2)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("-", &::op_QPointF_operator_minus__3864, gsi::arg ("p2"), "@brief Operator QPointF ::operator-(const QPointF &p1, const QPointF &p2)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("*", &::op_QPointF_operator_star__2847, gsi::arg ("c"), "@brief Operator QPointF ::operator*(const QPointF &p, qreal c)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("+", &::op_QPointF_operator_plus__1986, "@brief Operator QPointF ::operator+(const QPointF &p)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("-", &::op_QPointF_operator_minus__1986, "@brief Operator QPointF ::operator-(const QPointF &p)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("/", &::op_QPointF_operator_slash__2847, gsi::arg ("divisor"), "@brief Operator QPointF ::operator/(const QPointF &p, qreal divisor)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

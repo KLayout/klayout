@@ -1213,22 +1213,22 @@ static void _call_f_squareToQuad_3755 (const qt_gsi::GenericStaticMethod * /*dec
 
 //  QTransform ::operator *(const QTransform &a, qreal n)
 static QTransform op_QTransform_operator_star__3211(const QTransform *_self, qreal n) {
-  return ::operator *(*_self, n);
+  return operator *(*_self, n);
 }
 
 //  QTransform ::operator /(const QTransform &a, qreal n)
 static QTransform op_QTransform_operator_slash__3211(const QTransform *_self, qreal n) {
-  return ::operator /(*_self, n);
+  return operator /(*_self, n);
 }
 
 //  QTransform ::operator +(const QTransform &a, qreal n)
 static QTransform op_QTransform_operator_plus__3211(const QTransform *_self, qreal n) {
-  return ::operator +(*_self, n);
+  return operator +(*_self, n);
 }
 
 //  QTransform ::operator -(const QTransform &a, qreal n)
 static QTransform op_QTransform_operator_minus__3211(const QTransform *_self, qreal n) {
-  return ::operator -(*_self, n);
+  return operator -(*_self, n);
 }
 
 

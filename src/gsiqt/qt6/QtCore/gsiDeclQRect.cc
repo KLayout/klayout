@@ -1474,12 +1474,22 @@ static void _call_f_span_3724 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi
 
 //  QRect ::operator+(const QRect &rectangle, const QMargins &margins)
 static QRect op_QRect_operator_plus__3799u1(const QRect *_self, const QMargins &margins) {
-  return ::operator+(*_self, margins);
+  return operator+(*_self, margins);
 }
 
 //  QRect ::operator-(const QRect &lhs, const QMargins &rhs)
 static QRect op_QRect_operator_minus__3799(const QRect *_self, const QMargins &rhs) {
-  return ::operator-(*_self, rhs);
+  return operator-(*_self, rhs);
+}
+
+//  bool ::operator==(const QRect &r1, const QRect &r2)
+static bool op_QRect_operator_eq__eq__3476(const QRect *_self, const QRect &r2) {
+  return operator==(*_self, r2);
+}
+
+//  bool ::operator!=(const QRect &r1, const QRect &r2)
+static bool op_QRect_operator_excl__eq__3476(const QRect *_self, const QRect &r2) {
+  return operator!=(*_self, r2);
 }
 
 
@@ -1563,6 +1573,8 @@ static gsi::Methods methods_QRect () {
   methods += new qt_gsi::GenericStaticMethod ("span", "@brief Static method QRect QRect::span(const QPoint &p1, const QPoint &p2)\nThis method is static and can be called without an instance.", &_init_f_span_3724, &_call_f_span_3724);
   methods += gsi::method_ext("+", &::op_QRect_operator_plus__3799u1, gsi::arg ("margins"), "@brief Operator QRect ::operator+(const QRect &rectangle, const QMargins &margins)\nThis is the mapping of the global operator to the instance method.");
   methods += gsi::method_ext("-", &::op_QRect_operator_minus__3799, gsi::arg ("rhs"), "@brief Operator QRect ::operator-(const QRect &lhs, const QMargins &rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("==", &::op_QRect_operator_eq__eq__3476, gsi::arg ("r2"), "@brief Operator bool ::operator==(const QRect &r1, const QRect &r2)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QRect_operator_excl__eq__3476, gsi::arg ("r2"), "@brief Operator bool ::operator!=(const QRect &r1, const QRect &r2)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

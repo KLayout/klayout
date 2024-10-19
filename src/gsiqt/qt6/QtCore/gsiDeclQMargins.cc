@@ -387,62 +387,72 @@ static void _call_f_top_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, g
 
 //  QMargins ::operator+(const QMargins &m1, const QMargins &m2)
 static QMargins op_QMargins_operator_plus__4122(const QMargins *_self, const QMargins &m2) {
-  return ::operator+(*_self, m2);
+  return operator+(*_self, m2);
 }
 
 //  QMargins ::operator-(const QMargins &m1, const QMargins &m2)
 static QMargins op_QMargins_operator_minus__4122(const QMargins *_self, const QMargins &m2) {
-  return ::operator-(*_self, m2);
+  return operator-(*_self, m2);
 }
 
 //  QMargins ::operator+(const QMargins &lhs, int rhs)
 static QMargins op_QMargins_operator_plus__2774(const QMargins *_self, int rhs) {
-  return ::operator+(*_self, rhs);
+  return operator+(*_self, rhs);
 }
 
 //  QMargins ::operator-(const QMargins &lhs, int rhs)
 static QMargins op_QMargins_operator_minus__2774(const QMargins *_self, int rhs) {
-  return ::operator-(*_self, rhs);
+  return operator-(*_self, rhs);
 }
 
 //  QMargins ::operator*(const QMargins &margins, int factor)
 static QMargins op_QMargins_operator_star__2774(const QMargins *_self, int factor) {
-  return ::operator*(*_self, factor);
+  return operator*(*_self, factor);
 }
 
 //  QMargins ::operator*(const QMargins &margins, qreal factor)
 static QMargins op_QMargins_operator_star__2976(const QMargins *_self, qreal factor) {
-  return ::operator*(*_self, factor);
+  return operator*(*_self, factor);
 }
 
 //  QMargins ::operator/(const QMargins &margins, int divisor)
 static QMargins op_QMargins_operator_slash__2774(const QMargins *_self, int divisor) {
-  return ::operator/(*_self, divisor);
+  return operator/(*_self, divisor);
 }
 
 //  QMargins ::operator/(const QMargins &margins, qreal divisor)
 static QMargins op_QMargins_operator_slash__2976(const QMargins *_self, qreal divisor) {
-  return ::operator/(*_self, divisor);
+  return operator/(*_self, divisor);
 }
 
 //  QMargins ::operator|(const QMargins &m1, const QMargins &m2)
 static QMargins op_QMargins_operator_pipe__4122(const QMargins *_self, const QMargins &m2) {
-  return ::operator|(*_self, m2);
+  return operator|(*_self, m2);
 }
 
 //  QMargins ::operator+(const QMargins &margins)
 static QMargins op_QMargins_operator_plus__2115(const QMargins *_self) {
-  return ::operator+(*_self);
+  return operator+(*_self);
 }
 
 //  QMargins ::operator-(const QMargins &margins)
 static QMargins op_QMargins_operator_minus__2115(const QMargins *_self) {
-  return ::operator-(*_self);
+  return operator-(*_self);
 }
 
 //  QRect ::operator+(const QMargins &margins, const QRect &rectangle)
 static QRect op_QMargins_operator_plus__3799(const QMargins *_self, const QRect &rectangle) {
-  return ::operator+(*_self, rectangle);
+  return operator+(*_self, rectangle);
+}
+
+//  bool ::operator==(const QMargins &m1, const QMargins &m2)
+static bool op_QMargins_operator_eq__eq__4122(const QMargins *_self, const QMargins &m2) {
+  return operator==(*_self, m2);
+}
+
+//  bool ::operator!=(const QMargins &m1, const QMargins &m2)
+static bool op_QMargins_operator_excl__eq__4122(const QMargins *_self, const QMargins &m2) {
+  return operator!=(*_self, m2);
 }
 
 
@@ -482,6 +492,8 @@ static gsi::Methods methods_QMargins () {
   methods += gsi::method_ext("+", &::op_QMargins_operator_plus__2115, "@brief Operator QMargins ::operator+(const QMargins &margins)\nThis is the mapping of the global operator to the instance method.");
   methods += gsi::method_ext("-", &::op_QMargins_operator_minus__2115, "@brief Operator QMargins ::operator-(const QMargins &margins)\nThis is the mapping of the global operator to the instance method.");
   methods += gsi::method_ext("+", &::op_QMargins_operator_plus__3799, gsi::arg ("rectangle"), "@brief Operator QRect ::operator+(const QMargins &margins, const QRect &rectangle)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("==", &::op_QMargins_operator_eq__eq__4122, gsi::arg ("m2"), "@brief Operator bool ::operator==(const QMargins &m1, const QMargins &m2)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QMargins_operator_excl__eq__4122, gsi::arg ("m2"), "@brief Operator bool ::operator!=(const QMargins &m1, const QMargins &m2)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

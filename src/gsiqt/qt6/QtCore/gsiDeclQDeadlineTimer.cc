@@ -420,6 +420,46 @@ static void _call_f_current_1680 (const qt_gsi::GenericStaticMethod * /*decl*/, 
 }
 
 
+//  bool ::operator==(QDeadlineTimer d1, QDeadlineTimer d2)
+static bool op_QDeadlineTimer_operator_eq__eq__3532(QDeadlineTimer *_self, QDeadlineTimer d2) {
+  return operator==(*_self, d2);
+}
+
+//  bool ::operator!=(QDeadlineTimer d1, QDeadlineTimer d2)
+static bool op_QDeadlineTimer_operator_excl__eq__3532(QDeadlineTimer *_self, QDeadlineTimer d2) {
+  return operator!=(*_self, d2);
+}
+
+//  bool ::operator<(QDeadlineTimer d1, QDeadlineTimer d2)
+static bool op_QDeadlineTimer_operator_lt__3532(QDeadlineTimer *_self, QDeadlineTimer d2) {
+  return operator<(*_self, d2);
+}
+
+//  bool ::operator<=(QDeadlineTimer d1, QDeadlineTimer d2)
+static bool op_QDeadlineTimer_operator_lt__eq__3532(QDeadlineTimer *_self, QDeadlineTimer d2) {
+  return operator<=(*_self, d2);
+}
+
+//  bool ::operator>(QDeadlineTimer d1, QDeadlineTimer d2)
+static bool op_QDeadlineTimer_operator_gt__3532(QDeadlineTimer *_self, QDeadlineTimer d2) {
+  return operator>(*_self, d2);
+}
+
+//  bool ::operator>=(QDeadlineTimer d1, QDeadlineTimer d2)
+static bool op_QDeadlineTimer_operator_gt__eq__3532(QDeadlineTimer *_self, QDeadlineTimer d2) {
+  return operator>=(*_self, d2);
+}
+
+//  QDeadlineTimer ::operator-(QDeadlineTimer dt, qint64 msecs)
+static QDeadlineTimer op_QDeadlineTimer_operator_minus__2698(QDeadlineTimer *_self, qint64 msecs) {
+  return operator-(*_self, msecs);
+}
+
+//  qint64 ::operator-(QDeadlineTimer dt1, QDeadlineTimer dt2)
+static qint64 op_QDeadlineTimer_operator_minus__3532(QDeadlineTimer *_self, QDeadlineTimer dt2) {
+  return operator-(*_self, dt2);
+}
+
 
 namespace gsi
 {
@@ -446,6 +486,14 @@ static gsi::Methods methods_QDeadlineTimer () {
   methods += new qt_gsi::GenericMethod (":timerType", "@brief Method Qt::TimerType QDeadlineTimer::timerType()\n", true, &_init_f_timerType_c0, &_call_f_timerType_c0);
   methods += new qt_gsi::GenericStaticMethod ("addNSecs", "@brief Static method QDeadlineTimer QDeadlineTimer::addNSecs(QDeadlineTimer dt, qint64 nsecs)\nThis method is static and can be called without an instance.", &_init_f_addNSecs_2698, &_call_f_addNSecs_2698);
   methods += new qt_gsi::GenericStaticMethod ("current", "@brief Static method QDeadlineTimer QDeadlineTimer::current(Qt::TimerType timerType)\nThis method is static and can be called without an instance.", &_init_f_current_1680, &_call_f_current_1680);
+  methods += gsi::method_ext("==", &::op_QDeadlineTimer_operator_eq__eq__3532, gsi::arg ("d2"), "@brief Operator bool ::operator==(QDeadlineTimer d1, QDeadlineTimer d2)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QDeadlineTimer_operator_excl__eq__3532, gsi::arg ("d2"), "@brief Operator bool ::operator!=(QDeadlineTimer d1, QDeadlineTimer d2)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("<", &::op_QDeadlineTimer_operator_lt__3532, gsi::arg ("d2"), "@brief Operator bool ::operator<(QDeadlineTimer d1, QDeadlineTimer d2)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("<=", &::op_QDeadlineTimer_operator_lt__eq__3532, gsi::arg ("d2"), "@brief Operator bool ::operator<=(QDeadlineTimer d1, QDeadlineTimer d2)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext(">", &::op_QDeadlineTimer_operator_gt__3532, gsi::arg ("d2"), "@brief Operator bool ::operator>(QDeadlineTimer d1, QDeadlineTimer d2)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext(">=", &::op_QDeadlineTimer_operator_gt__eq__3532, gsi::arg ("d2"), "@brief Operator bool ::operator>=(QDeadlineTimer d1, QDeadlineTimer d2)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("-", &::op_QDeadlineTimer_operator_minus__2698, gsi::arg ("msecs"), "@brief Operator QDeadlineTimer ::operator-(QDeadlineTimer dt, qint64 msecs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("-", &::op_QDeadlineTimer_operator_minus__3532, gsi::arg ("dt2"), "@brief Operator qint64 ::operator-(QDeadlineTimer dt1, QDeadlineTimer dt2)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

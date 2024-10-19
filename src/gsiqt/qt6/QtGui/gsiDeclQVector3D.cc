@@ -799,7 +799,52 @@ static void _call_f_normal_3573 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 
 //  QVector3D ::operator*(const QVector3D &vector, const QMatrix4x4 &matrix)
 static QVector3D op_QVector3D_operator_star__4279u1(const QVector3D *_self, const QMatrix4x4 &matrix) {
-  return ::operator*(*_self, matrix);
+  return operator*(*_self, matrix);
+}
+
+//  bool ::operator==(QVector3D v1, QVector3D v2)
+static bool op_QVector3D_operator_eq__eq__2418(QVector3D *_self, QVector3D v2) {
+  return operator==(*_self, v2);
+}
+
+//  bool ::operator!=(QVector3D v1, QVector3D v2)
+static bool op_QVector3D_operator_excl__eq__2418(QVector3D *_self, QVector3D v2) {
+  return operator!=(*_self, v2);
+}
+
+//  QVector3D ::operator+(QVector3D v1, QVector3D v2)
+static QVector3D op_QVector3D_operator_plus__2418(QVector3D *_self, QVector3D v2) {
+  return operator+(*_self, v2);
+}
+
+//  QVector3D ::operator-(QVector3D v1, QVector3D v2)
+static QVector3D op_QVector3D_operator_minus__2418(QVector3D *_self, QVector3D v2) {
+  return operator-(*_self, v2);
+}
+
+//  QVector3D ::operator*(QVector3D vector, float factor)
+static QVector3D op_QVector3D_operator_star__2125(QVector3D *_self, float factor) {
+  return operator*(*_self, factor);
+}
+
+//  QVector3D ::operator*(QVector3D v1, QVector3D v2)
+static QVector3D op_QVector3D_operator_star__2418(QVector3D *_self, QVector3D v2) {
+  return operator*(*_self, v2);
+}
+
+//  QVector3D ::operator-(QVector3D vector)
+static QVector3D op_QVector3D_operator_minus__1263(QVector3D *_self) {
+  return operator-(*_self);
+}
+
+//  QVector3D ::operator/(QVector3D vector, float divisor)
+static QVector3D op_QVector3D_operator_slash__2125(QVector3D *_self, float divisor) {
+  return operator/(*_self, divisor);
+}
+
+//  QVector3D ::operator/(QVector3D vector, QVector3D divisor)
+static QVector3D op_QVector3D_operator_slash__2418(QVector3D *_self, QVector3D divisor) {
+  return operator/(*_self, divisor);
 }
 
 
@@ -849,6 +894,15 @@ static gsi::Methods methods_QVector3D () {
   methods += new qt_gsi::GenericStaticMethod ("normal", "@brief Static method QVector3D QVector3D::normal(QVector3D v1, QVector3D v2)\nThis method is static and can be called without an instance.", &_init_f_normal_2418, &_call_f_normal_2418);
   methods += new qt_gsi::GenericStaticMethod ("normal", "@brief Static method QVector3D QVector3D::normal(QVector3D v1, QVector3D v2, QVector3D v3)\nThis method is static and can be called without an instance.", &_init_f_normal_3573, &_call_f_normal_3573);
   methods += gsi::method_ext("*", &::op_QVector3D_operator_star__4279u1, gsi::arg ("matrix"), "@brief Operator QVector3D ::operator*(const QVector3D &vector, const QMatrix4x4 &matrix)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("==", &::op_QVector3D_operator_eq__eq__2418, gsi::arg ("v2"), "@brief Operator bool ::operator==(QVector3D v1, QVector3D v2)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QVector3D_operator_excl__eq__2418, gsi::arg ("v2"), "@brief Operator bool ::operator!=(QVector3D v1, QVector3D v2)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("+", &::op_QVector3D_operator_plus__2418, gsi::arg ("v2"), "@brief Operator QVector3D ::operator+(QVector3D v1, QVector3D v2)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("-", &::op_QVector3D_operator_minus__2418, gsi::arg ("v2"), "@brief Operator QVector3D ::operator-(QVector3D v1, QVector3D v2)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("*", &::op_QVector3D_operator_star__2125, gsi::arg ("factor"), "@brief Operator QVector3D ::operator*(QVector3D vector, float factor)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("*", &::op_QVector3D_operator_star__2418, gsi::arg ("v2"), "@brief Operator QVector3D ::operator*(QVector3D v1, QVector3D v2)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("-", &::op_QVector3D_operator_minus__1263, "@brief Operator QVector3D ::operator-(QVector3D vector)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("/", &::op_QVector3D_operator_slash__2125, gsi::arg ("divisor"), "@brief Operator QVector3D ::operator/(QVector3D vector, float divisor)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("/", &::op_QVector3D_operator_slash__2418, gsi::arg ("divisor"), "@brief Operator QVector3D ::operator/(QVector3D vector, QVector3D divisor)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

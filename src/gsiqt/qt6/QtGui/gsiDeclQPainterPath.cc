@@ -1602,7 +1602,7 @@ static void _call_f_united_c2514 (const qt_gsi::GenericMethod * /*decl*/, void *
 
 //  QPainterPath ::operator *(const QPainterPath &p, const QTransform &m)
 static QPainterPath op_QPainterPath_operator_star__4756(const QPainterPath *_self, const QTransform &m) {
-  return ::operator *(*_self, m);
+  return operator *(*_self, m);
 }
 
 

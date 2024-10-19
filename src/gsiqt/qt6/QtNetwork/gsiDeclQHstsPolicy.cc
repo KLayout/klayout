@@ -264,6 +264,16 @@ static void _call_f_swap_1741 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
+//  bool ::operator==(const QHstsPolicy &lhs, const QHstsPolicy &rhs)
+static bool op_QHstsPolicy_operator_eq__eq__4764(const QHstsPolicy *_self, const QHstsPolicy &rhs) {
+  return operator==(*_self, rhs);
+}
+
+//  bool ::operator!=(const QHstsPolicy &lhs, const QHstsPolicy &rhs)
+static bool op_QHstsPolicy_operator_excl__eq__4764(const QHstsPolicy *_self, const QHstsPolicy &rhs) {
+  return operator!=(*_self, rhs);
+}
+
 
 namespace gsi
 {
@@ -282,6 +292,8 @@ static gsi::Methods methods_QHstsPolicy () {
   methods += new qt_gsi::GenericMethod ("setHost", "@brief Method void QHstsPolicy::setHost(const QString &host, QUrl::ParsingMode mode)\n", false, &_init_f_setHost_3970, &_call_f_setHost_3970);
   methods += new qt_gsi::GenericMethod ("setIncludesSubDomains|includesSubDomains=", "@brief Method void QHstsPolicy::setIncludesSubDomains(bool include)\n", false, &_init_f_setIncludesSubDomains_864, &_call_f_setIncludesSubDomains_864);
   methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QHstsPolicy::swap(QHstsPolicy &other)\n", false, &_init_f_swap_1741, &_call_f_swap_1741);
+  methods += gsi::method_ext("==", &::op_QHstsPolicy_operator_eq__eq__4764, gsi::arg ("rhs"), "@brief Operator bool ::operator==(const QHstsPolicy &lhs, const QHstsPolicy &rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QHstsPolicy_operator_excl__eq__4764, gsi::arg ("rhs"), "@brief Operator bool ::operator!=(const QHstsPolicy &lhs, const QHstsPolicy &rhs)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

@@ -435,6 +435,16 @@ static void _call_f_yuvLayout_c0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
+//  bool ::operator==(QPixelFormat fmt1, QPixelFormat fmt2)
+static bool op_QPixelFormat_operator_eq__eq__3188(QPixelFormat *_self, QPixelFormat fmt2) {
+  return operator==(*_self, fmt2);
+}
+
+//  bool ::operator!=(QPixelFormat fmt1, QPixelFormat fmt2)
+static bool op_QPixelFormat_operator_excl__eq__3188(QPixelFormat *_self, QPixelFormat fmt2) {
+  return operator!=(*_self, fmt2);
+}
+
 
 namespace gsi
 {
@@ -465,6 +475,8 @@ static gsi::Methods methods_QPixelFormat () {
   methods += new qt_gsi::GenericMethod ("typeInterpretation", "@brief Method QPixelFormat::TypeInterpretation QPixelFormat::typeInterpretation()\n", true, &_init_f_typeInterpretation_c0, &_call_f_typeInterpretation_c0);
   methods += new qt_gsi::GenericMethod ("yellowSize", "@brief Method unsigned char QPixelFormat::yellowSize()\n", true, &_init_f_yellowSize_c0, &_call_f_yellowSize_c0);
   methods += new qt_gsi::GenericMethod ("yuvLayout", "@brief Method QPixelFormat::YUVLayout QPixelFormat::yuvLayout()\n", true, &_init_f_yuvLayout_c0, &_call_f_yuvLayout_c0);
+  methods += gsi::method_ext("==", &::op_QPixelFormat_operator_eq__eq__3188, gsi::arg ("fmt2"), "@brief Operator bool ::operator==(QPixelFormat fmt1, QPixelFormat fmt2)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QPixelFormat_operator_excl__eq__3188, gsi::arg ("fmt2"), "@brief Operator bool ::operator!=(QPixelFormat fmt1, QPixelFormat fmt2)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

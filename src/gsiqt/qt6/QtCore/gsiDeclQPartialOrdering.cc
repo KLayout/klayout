@@ -35,12 +35,24 @@
 // -----------------------------------------------------------------------
 // class QPartialOrdering
 
+//  bool ::operator==(QPartialOrdering p1, QPartialOrdering p2)
+static bool op_QPartialOrdering_operator_eq__eq__4012(QPartialOrdering *_self, QPartialOrdering p2) {
+  return operator==(*_self, p2);
+}
+
+//  bool ::operator!=(QPartialOrdering p1, QPartialOrdering p2)
+static bool op_QPartialOrdering_operator_excl__eq__4012(QPartialOrdering *_self, QPartialOrdering p2) {
+  return operator!=(*_self, p2);
+}
+
 
 namespace gsi
 {
 
 static gsi::Methods methods_QPartialOrdering () {
   gsi::Methods methods;
+  methods += gsi::method_ext("==", &::op_QPartialOrdering_operator_eq__eq__4012, gsi::arg ("p2"), "@brief Operator bool ::operator==(QPartialOrdering p1, QPartialOrdering p2)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QPartialOrdering_operator_excl__eq__4012, gsi::arg ("p2"), "@brief Operator bool ::operator!=(QPartialOrdering p1, QPartialOrdering p2)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

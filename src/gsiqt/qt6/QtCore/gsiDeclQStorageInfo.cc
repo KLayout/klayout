@@ -423,6 +423,16 @@ static void _call_f_root_0 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::S
 }
 
 
+//  bool ::operator==(const QStorageInfo &first, const QStorageInfo &second)
+static bool op_QStorageInfo_operator_eq__eq__4922(const QStorageInfo *_self, const QStorageInfo &second) {
+  return operator==(*_self, second);
+}
+
+//  bool ::operator!=(const QStorageInfo &first, const QStorageInfo &second)
+static bool op_QStorageInfo_operator_excl__eq__4922(const QStorageInfo *_self, const QStorageInfo &second) {
+  return operator!=(*_self, second);
+}
+
 
 namespace gsi
 {
@@ -453,6 +463,8 @@ static gsi::Methods methods_QStorageInfo () {
   methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QStorageInfo::swap(QStorageInfo &other)\n", false, &_init_f_swap_1820, &_call_f_swap_1820);
   methods += new qt_gsi::GenericStaticMethod ("mountedVolumes", "@brief Static method QList<QStorageInfo> QStorageInfo::mountedVolumes()\nThis method is static and can be called without an instance.", &_init_f_mountedVolumes_0, &_call_f_mountedVolumes_0);
   methods += new qt_gsi::GenericStaticMethod ("root", "@brief Static method QStorageInfo QStorageInfo::root()\nThis method is static and can be called without an instance.", &_init_f_root_0, &_call_f_root_0);
+  methods += gsi::method_ext("==", &::op_QStorageInfo_operator_eq__eq__4922, gsi::arg ("second"), "@brief Operator bool ::operator==(const QStorageInfo &first, const QStorageInfo &second)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QStorageInfo_operator_excl__eq__4922, gsi::arg ("second"), "@brief Operator bool ::operator!=(const QStorageInfo &first, const QStorageInfo &second)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

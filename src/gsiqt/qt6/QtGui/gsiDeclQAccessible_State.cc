@@ -50,6 +50,11 @@ static void _call_ctor_QAccessible_State_0 (const qt_gsi::GenericStaticMethod * 
 }
 
 
+//  bool ::operator==(const QAccessible::State &first, const QAccessible::State &second)
+static bool op_QAccessible_State_operator_eq__eq__5950(const QAccessible::State *_self, const QAccessible::State &second) {
+  return operator==(*_self, second);
+}
+
 
 namespace gsi
 {
@@ -57,6 +62,7 @@ namespace gsi
 static gsi::Methods methods_QAccessible_State () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAccessible::State::State()\nThis method creates an object of class QAccessible::State.", &_init_ctor_QAccessible_State_0, &_call_ctor_QAccessible_State_0);
+  methods += gsi::method_ext("==", &::op_QAccessible_State_operator_eq__eq__5950, gsi::arg ("second"), "@brief Operator bool ::operator==(const QAccessible::State &first, const QAccessible::State &second)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

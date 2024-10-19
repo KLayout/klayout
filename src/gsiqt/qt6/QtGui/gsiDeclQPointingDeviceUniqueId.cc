@@ -99,6 +99,16 @@ static void _call_f_fromNumericId_986 (const qt_gsi::GenericStaticMethod * /*dec
 }
 
 
+//  bool ::operator==(QPointingDeviceUniqueId lhs, QPointingDeviceUniqueId rhs)
+static bool op_QPointingDeviceUniqueId_operator_eq__eq__5398(QPointingDeviceUniqueId *_self, QPointingDeviceUniqueId rhs) {
+  return operator==(*_self, rhs);
+}
+
+//  bool ::operator!=(QPointingDeviceUniqueId lhs, QPointingDeviceUniqueId rhs)
+static bool op_QPointingDeviceUniqueId_operator_excl__eq__5398(QPointingDeviceUniqueId *_self, QPointingDeviceUniqueId rhs) {
+  return operator!=(*_self, rhs);
+}
+
 
 namespace gsi
 {
@@ -109,6 +119,8 @@ static gsi::Methods methods_QPointingDeviceUniqueId () {
   methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QPointingDeviceUniqueId::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
   methods += new qt_gsi::GenericMethod ("numericId", "@brief Method qint64 QPointingDeviceUniqueId::numericId()\n", true, &_init_f_numericId_c0, &_call_f_numericId_c0);
   methods += new qt_gsi::GenericStaticMethod ("fromNumericId", "@brief Static method QPointingDeviceUniqueId QPointingDeviceUniqueId::fromNumericId(qint64 id)\nThis method is static and can be called without an instance.", &_init_f_fromNumericId_986, &_call_f_fromNumericId_986);
+  methods += gsi::method_ext("==", &::op_QPointingDeviceUniqueId_operator_eq__eq__5398, gsi::arg ("rhs"), "@brief Operator bool ::operator==(QPointingDeviceUniqueId lhs, QPointingDeviceUniqueId rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QPointingDeviceUniqueId_operator_excl__eq__5398, gsi::arg ("rhs"), "@brief Operator bool ::operator!=(QPointingDeviceUniqueId lhs, QPointingDeviceUniqueId rhs)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

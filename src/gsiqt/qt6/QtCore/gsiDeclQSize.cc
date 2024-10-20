@@ -497,6 +497,36 @@ static void _call_f_width_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
+//  bool ::operator==(const QSize &s1, const QSize &s2)
+static bool op_QSize_operator_eq__eq__3502(const QSize *_self, const QSize &s2) {
+  return operator==(*_self, s2);
+}
+
+//  bool ::operator!=(const QSize &s1, const QSize &s2)
+static bool op_QSize_operator_excl__eq__3502(const QSize *_self, const QSize &s2) {
+  return operator!=(*_self, s2);
+}
+
+//  QSize ::operator+(const QSize &s1, const QSize &s2)
+static QSize op_QSize_operator_plus__3502(const QSize *_self, const QSize &s2) {
+  return operator+(*_self, s2);
+}
+
+//  QSize ::operator-(const QSize &s1, const QSize &s2)
+static QSize op_QSize_operator_minus__3502(const QSize *_self, const QSize &s2) {
+  return operator-(*_self, s2);
+}
+
+//  QSize ::operator*(const QSize &s, qreal c)
+static QSize op_QSize_operator_star__2666(const QSize *_self, qreal c) {
+  return operator*(*_self, c);
+}
+
+//  QSize ::operator/(const QSize &s, qreal c)
+static QSize op_QSize_operator_slash__2666(const QSize *_self, qreal c) {
+  return operator/(*_self, c);
+}
+
 
 namespace gsi
 {
@@ -528,6 +558,12 @@ static gsi::Methods methods_QSize () {
   methods += new qt_gsi::GenericMethod ("transpose", "@brief Method void QSize::transpose()\n", false, &_init_f_transpose_0, &_call_f_transpose_0);
   methods += new qt_gsi::GenericMethod ("transposed", "@brief Method QSize QSize::transposed()\n", true, &_init_f_transposed_c0, &_call_f_transposed_c0);
   methods += new qt_gsi::GenericMethod (":width", "@brief Method int QSize::width()\n", true, &_init_f_width_c0, &_call_f_width_c0);
+  methods += gsi::method_ext("==", &::op_QSize_operator_eq__eq__3502, gsi::arg ("s2"), "@brief Operator bool ::operator==(const QSize &s1, const QSize &s2)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QSize_operator_excl__eq__3502, gsi::arg ("s2"), "@brief Operator bool ::operator!=(const QSize &s1, const QSize &s2)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("+", &::op_QSize_operator_plus__3502, gsi::arg ("s2"), "@brief Operator QSize ::operator+(const QSize &s1, const QSize &s2)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("-", &::op_QSize_operator_minus__3502, gsi::arg ("s2"), "@brief Operator QSize ::operator-(const QSize &s1, const QSize &s2)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("*", &::op_QSize_operator_star__2666, gsi::arg ("c"), "@brief Operator QSize ::operator*(const QSize &s, qreal c)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("/", &::op_QSize_operator_slash__2666, gsi::arg ("c"), "@brief Operator QSize ::operator/(const QSize &s, qreal c)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

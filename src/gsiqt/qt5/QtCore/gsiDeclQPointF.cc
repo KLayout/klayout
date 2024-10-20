@@ -338,42 +338,42 @@ static void _call_f_dotProduct_3864 (const qt_gsi::GenericStaticMethod * /*decl*
 
 //  bool ::operator==(const QPointF &p1, const QPointF &p2)
 static bool op_QPointF_operator_eq__eq__3864(const QPointF *_self, const QPointF &p2) {
-  return ::operator==(*_self, p2);
+  return operator==(*_self, p2);
 }
 
 //  bool ::operator!=(const QPointF &p1, const QPointF &p2)
 static bool op_QPointF_operator_excl__eq__3864(const QPointF *_self, const QPointF &p2) {
-  return ::operator!=(*_self, p2);
+  return operator!=(*_self, p2);
 }
 
 //  const QPointF ::operator+(const QPointF &p1, const QPointF &p2)
 static const QPointF op_QPointF_operator_plus__3864(const QPointF *_self, const QPointF &p2) {
-  return ::operator+(*_self, p2);
+  return operator+(*_self, p2);
 }
 
 //  const QPointF ::operator-(const QPointF &p1, const QPointF &p2)
 static const QPointF op_QPointF_operator_minus__3864(const QPointF *_self, const QPointF &p2) {
-  return ::operator-(*_self, p2);
+  return operator-(*_self, p2);
 }
 
 //  const QPointF ::operator*(const QPointF &p, qreal c)
 static const QPointF op_QPointF_operator_star__2847(const QPointF *_self, qreal c) {
-  return ::operator*(*_self, c);
+  return operator*(*_self, c);
 }
 
 //  const QPointF ::operator+(const QPointF &p)
 static const QPointF op_QPointF_operator_plus__1986(const QPointF *_self) {
-  return ::operator+(*_self);
+  return operator+(*_self);
 }
 
 //  const QPointF ::operator-(const QPointF &p)
 static const QPointF op_QPointF_operator_minus__1986(const QPointF *_self) {
-  return ::operator-(*_self);
+  return operator-(*_self);
 }
 
 //  const QPointF ::operator/(const QPointF &p, qreal divisor)
 static const QPointF op_QPointF_operator_slash__2847(const QPointF *_self, qreal divisor) {
-  return ::operator/(*_self, divisor);
+  return operator/(*_self, divisor);
 }
 
 

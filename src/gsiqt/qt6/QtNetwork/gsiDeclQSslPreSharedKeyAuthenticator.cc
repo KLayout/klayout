@@ -223,6 +223,16 @@ static void _call_f_swap_3567 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
+//  bool ::operator==(const QSslPreSharedKeyAuthenticator &lhs, const QSslPreSharedKeyAuthenticator &rhs)
+static bool op_QSslPreSharedKeyAuthenticator_operator_eq__eq__8416(const QSslPreSharedKeyAuthenticator *_self, const QSslPreSharedKeyAuthenticator &rhs) {
+  return operator==(*_self, rhs);
+}
+
+//  bool ::operator!=(const QSslPreSharedKeyAuthenticator &lhs, const QSslPreSharedKeyAuthenticator &rhs)
+static bool op_QSslPreSharedKeyAuthenticator_operator_excl__eq__8416(const QSslPreSharedKeyAuthenticator *_self, const QSslPreSharedKeyAuthenticator &rhs) {
+  return operator!=(*_self, rhs);
+}
+
 
 namespace gsi
 {
@@ -240,6 +250,8 @@ static gsi::Methods methods_QSslPreSharedKeyAuthenticator () {
   methods += new qt_gsi::GenericMethod ("setIdentity|identity=", "@brief Method void QSslPreSharedKeyAuthenticator::setIdentity(const QByteArray &identity)\n", false, &_init_f_setIdentity_2309, &_call_f_setIdentity_2309);
   methods += new qt_gsi::GenericMethod ("setPreSharedKey|preSharedKey=", "@brief Method void QSslPreSharedKeyAuthenticator::setPreSharedKey(const QByteArray &preSharedKey)\n", false, &_init_f_setPreSharedKey_2309, &_call_f_setPreSharedKey_2309);
   methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QSslPreSharedKeyAuthenticator::swap(QSslPreSharedKeyAuthenticator &other)\n", false, &_init_f_swap_3567, &_call_f_swap_3567);
+  methods += gsi::method_ext("==", &::op_QSslPreSharedKeyAuthenticator_operator_eq__eq__8416, gsi::arg ("rhs"), "@brief Operator bool ::operator==(const QSslPreSharedKeyAuthenticator &lhs, const QSslPreSharedKeyAuthenticator &rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QSslPreSharedKeyAuthenticator_operator_excl__eq__8416, gsi::arg ("rhs"), "@brief Operator bool ::operator!=(const QSslPreSharedKeyAuthenticator &lhs, const QSslPreSharedKeyAuthenticator &rhs)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

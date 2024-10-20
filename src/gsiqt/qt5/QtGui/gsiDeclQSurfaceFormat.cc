@@ -838,12 +838,12 @@ static void _call_f_setDefaultFormat_2724 (const qt_gsi::GenericStaticMethod * /
 
 //  bool ::operator==(const QSurfaceFormat &, const QSurfaceFormat &)
 static bool op_QSurfaceFormat_operator_eq__eq__5340(const QSurfaceFormat *_self, const QSurfaceFormat &arg2) {
-  return ::operator==(*_self, arg2);
+  return operator==(*_self, arg2);
 }
 
 //  bool ::operator!=(const QSurfaceFormat &, const QSurfaceFormat &)
 static bool op_QSurfaceFormat_operator_excl__eq__5340(const QSurfaceFormat *_self, const QSurfaceFormat &arg2) {
-  return ::operator!=(*_self, arg2);
+  return operator!=(*_self, arg2);
 }
 
 

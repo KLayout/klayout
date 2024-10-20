@@ -148,6 +148,16 @@ static void _call_f_fromShortName_2025 (const qt_gsi::GenericStaticMethod * /*de
 }
 
 
+//  bool ::operator==(QSslEllipticCurve lhs, QSslEllipticCurve rhs)
+static bool op_QSslEllipticCurve_operator_eq__eq__4216(QSslEllipticCurve *_self, QSslEllipticCurve rhs) {
+  return operator==(*_self, rhs);
+}
+
+//  bool ::operator!=(QSslEllipticCurve lhs, QSslEllipticCurve rhs)
+static bool op_QSslEllipticCurve_operator_excl__eq__4216(QSslEllipticCurve *_self, QSslEllipticCurve rhs) {
+  return operator!=(*_self, rhs);
+}
+
 
 namespace gsi
 {
@@ -161,6 +171,8 @@ static gsi::Methods methods_QSslEllipticCurve () {
   methods += new qt_gsi::GenericMethod ("shortName", "@brief Method QString QSslEllipticCurve::shortName()\n", true, &_init_f_shortName_c0, &_call_f_shortName_c0);
   methods += new qt_gsi::GenericStaticMethod ("fromLongName", "@brief Static method QSslEllipticCurve QSslEllipticCurve::fromLongName(const QString &name)\nThis method is static and can be called without an instance.", &_init_f_fromLongName_2025, &_call_f_fromLongName_2025);
   methods += new qt_gsi::GenericStaticMethod ("fromShortName", "@brief Static method QSslEllipticCurve QSslEllipticCurve::fromShortName(const QString &name)\nThis method is static and can be called without an instance.", &_init_f_fromShortName_2025, &_call_f_fromShortName_2025);
+  methods += gsi::method_ext("==", &::op_QSslEllipticCurve_operator_eq__eq__4216, gsi::arg ("rhs"), "@brief Operator bool ::operator==(QSslEllipticCurve lhs, QSslEllipticCurve rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QSslEllipticCurve_operator_excl__eq__4216, gsi::arg ("rhs"), "@brief Operator bool ::operator!=(QSslEllipticCurve lhs, QSslEllipticCurve rhs)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

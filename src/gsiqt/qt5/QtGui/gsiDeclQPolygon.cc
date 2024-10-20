@@ -654,12 +654,12 @@ static void _call_f_united_c2138 (const qt_gsi::GenericMethod * /*decl*/, void *
 
 //  QPolygon ::operator *(const QPolygon &a, const QMatrix &m)
 static QPolygon op_QPolygon_operator_star__4053(const QPolygon *_self, const QMatrix &m) {
-  return ::operator *(*_self, m);
+  return operator *(*_self, m);
 }
 
 //  QPolygon ::operator *(const QPolygon &a, const QTransform &m)
 static QPolygon op_QPolygon_operator_star__4380(const QPolygon *_self, const QTransform &m) {
-  return ::operator *(*_self, m);
+  return operator *(*_self, m);
 }
 
 

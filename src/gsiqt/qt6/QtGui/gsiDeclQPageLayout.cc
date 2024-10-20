@@ -670,6 +670,16 @@ static void _call_f_units_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
+//  bool ::operator==(const QPageLayout &lhs, const QPageLayout &rhs)
+static bool op_QPageLayout_operator_eq__eq__4718(const QPageLayout *_self, const QPageLayout &rhs) {
+  return operator==(*_self, rhs);
+}
+
+//  bool ::operator!=(const QPageLayout &lhs, const QPageLayout &rhs)
+static bool op_QPageLayout_operator_excl__eq__4718(const QPageLayout *_self, const QPageLayout &rhs) {
+  return operator!=(*_self, rhs);
+}
+
 
 namespace gsi
 {
@@ -711,6 +721,8 @@ static gsi::Methods methods_QPageLayout () {
   methods += new qt_gsi::GenericMethod ("setUnits|units=", "@brief Method void QPageLayout::setUnits(QPageLayout::Unit units)\n", false, &_init_f_setUnits_2068, &_call_f_setUnits_2068);
   methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QPageLayout::swap(QPageLayout &other)\n", false, &_init_f_swap_1718, &_call_f_swap_1718);
   methods += new qt_gsi::GenericMethod (":units", "@brief Method QPageLayout::Unit QPageLayout::units()\n", true, &_init_f_units_c0, &_call_f_units_c0);
+  methods += gsi::method_ext("==", &::op_QPageLayout_operator_eq__eq__4718, gsi::arg ("rhs"), "@brief Operator bool ::operator==(const QPageLayout &lhs, const QPageLayout &rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QPageLayout_operator_excl__eq__4718, gsi::arg ("rhs"), "@brief Operator bool ::operator!=(const QPageLayout &lhs, const QPageLayout &rhs)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

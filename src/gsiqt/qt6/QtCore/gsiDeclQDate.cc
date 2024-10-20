@@ -855,6 +855,36 @@ static void _call_f_isValid_2085 (const qt_gsi::GenericStaticMethod * /*decl*/, 
 }
 
 
+//  bool ::operator==(QDate lhs, QDate rhs)
+static bool op_QDate_operator_eq__eq__1690(QDate *_self, QDate rhs) {
+  return operator==(*_self, rhs);
+}
+
+//  bool ::operator!=(QDate lhs, QDate rhs)
+static bool op_QDate_operator_excl__eq__1690(QDate *_self, QDate rhs) {
+  return operator!=(*_self, rhs);
+}
+
+//  bool ::operator<(QDate lhs, QDate rhs)
+static bool op_QDate_operator_lt__1690(QDate *_self, QDate rhs) {
+  return operator<(*_self, rhs);
+}
+
+//  bool ::operator<=(QDate lhs, QDate rhs)
+static bool op_QDate_operator_lt__eq__1690(QDate *_self, QDate rhs) {
+  return operator<=(*_self, rhs);
+}
+
+//  bool ::operator>(QDate lhs, QDate rhs)
+static bool op_QDate_operator_gt__1690(QDate *_self, QDate rhs) {
+  return operator>(*_self, rhs);
+}
+
+//  bool ::operator>=(QDate lhs, QDate rhs)
+static bool op_QDate_operator_gt__eq__1690(QDate *_self, QDate rhs) {
+  return operator>=(*_self, rhs);
+}
+
 
 namespace gsi
 {
@@ -903,6 +933,12 @@ static gsi::Methods methods_QDate () {
   methods += new qt_gsi::GenericStaticMethod ("fromString", "@brief Static method QDate QDate::fromString(const QString &string, const QString &format, QCalendar cal)\nThis method is static and can be called without an instance.", &_init_f_fromString_5145, &_call_f_fromString_5145);
   methods += new qt_gsi::GenericStaticMethod ("isLeapYear?", "@brief Static method bool QDate::isLeapYear(int year)\nThis method is static and can be called without an instance.", &_init_f_isLeapYear_767, &_call_f_isLeapYear_767);
   methods += new qt_gsi::GenericStaticMethod ("isValid?", "@brief Static method bool QDate::isValid(int y, int m, int d)\nThis method is static and can be called without an instance.", &_init_f_isValid_2085, &_call_f_isValid_2085);
+  methods += gsi::method_ext("==", &::op_QDate_operator_eq__eq__1690, gsi::arg ("rhs"), "@brief Operator bool ::operator==(QDate lhs, QDate rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QDate_operator_excl__eq__1690, gsi::arg ("rhs"), "@brief Operator bool ::operator!=(QDate lhs, QDate rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("<", &::op_QDate_operator_lt__1690, gsi::arg ("rhs"), "@brief Operator bool ::operator<(QDate lhs, QDate rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("<=", &::op_QDate_operator_lt__eq__1690, gsi::arg ("rhs"), "@brief Operator bool ::operator<=(QDate lhs, QDate rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext(">", &::op_QDate_operator_gt__1690, gsi::arg ("rhs"), "@brief Operator bool ::operator>(QDate lhs, QDate rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext(">=", &::op_QDate_operator_gt__eq__1690, gsi::arg ("rhs"), "@brief Operator bool ::operator>=(QDate lhs, QDate rhs)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

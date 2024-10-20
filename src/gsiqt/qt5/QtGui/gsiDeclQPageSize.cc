@@ -640,12 +640,12 @@ static void _call_f_windowsId_2390 (const qt_gsi::GenericStaticMethod * /*decl*/
 
 //  bool ::operator==(const QPageSize &lhs, const QPageSize &rhs)
 static bool op_QPageSize_operator_eq__eq__4264(const QPageSize *_self, const QPageSize &rhs) {
-  return ::operator==(*_self, rhs);
+  return operator==(*_self, rhs);
 }
 
 //  bool ::operator!=(const QPageSize &lhs, const QPageSize &rhs)
 static bool op_QPageSize_operator_excl__eq__4264(const QPageSize *_self, const QPageSize &rhs) {
-  return ::operator!=(*_self, rhs);
+  return operator!=(*_self, rhs);
 }
 
 

@@ -573,6 +573,51 @@ static void _call_f_dotProduct_2416 (const qt_gsi::GenericStaticMethod * /*decl*
 }
 
 
+//  bool ::operator==(QVector2D v1, QVector2D v2)
+static bool op_QVector2D_operator_eq__eq__2416(QVector2D *_self, QVector2D v2) {
+  return operator==(*_self, v2);
+}
+
+//  bool ::operator!=(QVector2D v1, QVector2D v2)
+static bool op_QVector2D_operator_excl__eq__2416(QVector2D *_self, QVector2D v2) {
+  return operator!=(*_self, v2);
+}
+
+//  QVector2D ::operator+(QVector2D v1, QVector2D v2)
+static QVector2D op_QVector2D_operator_plus__2416(QVector2D *_self, QVector2D v2) {
+  return operator+(*_self, v2);
+}
+
+//  QVector2D ::operator-(QVector2D v1, QVector2D v2)
+static QVector2D op_QVector2D_operator_minus__2416(QVector2D *_self, QVector2D v2) {
+  return operator-(*_self, v2);
+}
+
+//  QVector2D ::operator*(QVector2D vector, float factor)
+static QVector2D op_QVector2D_operator_star__2124(QVector2D *_self, float factor) {
+  return operator*(*_self, factor);
+}
+
+//  QVector2D ::operator*(QVector2D v1, QVector2D v2)
+static QVector2D op_QVector2D_operator_star__2416(QVector2D *_self, QVector2D v2) {
+  return operator*(*_self, v2);
+}
+
+//  QVector2D ::operator-(QVector2D vector)
+static QVector2D op_QVector2D_operator_minus__1262(QVector2D *_self) {
+  return operator-(*_self);
+}
+
+//  QVector2D ::operator/(QVector2D vector, float divisor)
+static QVector2D op_QVector2D_operator_slash__2124(QVector2D *_self, float divisor) {
+  return operator/(*_self, divisor);
+}
+
+//  QVector2D ::operator/(QVector2D vector, QVector2D divisor)
+static QVector2D op_QVector2D_operator_slash__2416(QVector2D *_self, QVector2D divisor) {
+  return operator/(*_self, divisor);
+}
+
 
 namespace gsi
 {
@@ -609,6 +654,15 @@ static gsi::Methods methods_QVector2D () {
   methods += new qt_gsi::GenericMethod (":x", "@brief Method float QVector2D::x()\n", true, &_init_f_x_c0, &_call_f_x_c0);
   methods += new qt_gsi::GenericMethod (":y", "@brief Method float QVector2D::y()\n", true, &_init_f_y_c0, &_call_f_y_c0);
   methods += new qt_gsi::GenericStaticMethod ("dotProduct", "@brief Static method float QVector2D::dotProduct(QVector2D v1, QVector2D v2)\nThis method is static and can be called without an instance.", &_init_f_dotProduct_2416, &_call_f_dotProduct_2416);
+  methods += gsi::method_ext("==", &::op_QVector2D_operator_eq__eq__2416, gsi::arg ("v2"), "@brief Operator bool ::operator==(QVector2D v1, QVector2D v2)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QVector2D_operator_excl__eq__2416, gsi::arg ("v2"), "@brief Operator bool ::operator!=(QVector2D v1, QVector2D v2)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("+", &::op_QVector2D_operator_plus__2416, gsi::arg ("v2"), "@brief Operator QVector2D ::operator+(QVector2D v1, QVector2D v2)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("-", &::op_QVector2D_operator_minus__2416, gsi::arg ("v2"), "@brief Operator QVector2D ::operator-(QVector2D v1, QVector2D v2)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("*", &::op_QVector2D_operator_star__2124, gsi::arg ("factor"), "@brief Operator QVector2D ::operator*(QVector2D vector, float factor)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("*", &::op_QVector2D_operator_star__2416, gsi::arg ("v2"), "@brief Operator QVector2D ::operator*(QVector2D v1, QVector2D v2)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("-", &::op_QVector2D_operator_minus__1262, "@brief Operator QVector2D ::operator-(QVector2D vector)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("/", &::op_QVector2D_operator_slash__2124, gsi::arg ("divisor"), "@brief Operator QVector2D ::operator/(QVector2D vector, float divisor)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("/", &::op_QVector2D_operator_slash__2416, gsi::arg ("divisor"), "@brief Operator QVector2D ::operator/(QVector2D vector, QVector2D divisor)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

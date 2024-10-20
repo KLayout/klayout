@@ -1312,52 +1312,52 @@ static void _call_f_viewport_5280 (const qt_gsi::GenericMethod * /*decl*/, void 
 
 //  QMatrix4x4 ::operator/(const QMatrix4x4 &matrix, float divisor)
 static QMatrix4x4 op_QMatrix4x4_operator_slash__3109(const QMatrix4x4 *_self, float divisor) {
-  return ::operator/(*_self, divisor);
+  return operator/(*_self, divisor);
 }
 
 //  QMatrix4x4 ::operator+(const QMatrix4x4 &m1, const QMatrix4x4 &m2)
 static QMatrix4x4 op_QMatrix4x4_operator_plus__4386(const QMatrix4x4 *_self, const QMatrix4x4 &m2) {
-  return ::operator+(*_self, m2);
+  return operator+(*_self, m2);
 }
 
 //  QMatrix4x4 ::operator-(const QMatrix4x4 &m1, const QMatrix4x4 &m2)
 static QMatrix4x4 op_QMatrix4x4_operator_minus__4386(const QMatrix4x4 *_self, const QMatrix4x4 &m2) {
-  return ::operator-(*_self, m2);
+  return operator-(*_self, m2);
 }
 
 //  QMatrix4x4 ::operator*(const QMatrix4x4 &m1, const QMatrix4x4 &m2)
 static QMatrix4x4 op_QMatrix4x4_operator_star__4386(const QMatrix4x4 *_self, const QMatrix4x4 &m2) {
-  return ::operator*(*_self, m2);
+  return operator*(*_self, m2);
 }
 
 //  QVector3D ::operator*(const QMatrix4x4 &matrix, const QVector3D &vector)
 static QVector3D op_QMatrix4x4_operator_star__4279(const QMatrix4x4 *_self, const QVector3D &vector) {
-  return ::operator*(*_self, vector);
+  return operator*(*_self, vector);
 }
 
 //  QVector4D ::operator*(const QMatrix4x4 &matrix, const QVector4D &vector)
 static QVector4D op_QMatrix4x4_operator_star__4280(const QMatrix4x4 *_self, const QVector4D &vector) {
-  return ::operator*(*_self, vector);
+  return operator*(*_self, vector);
 }
 
 //  QPoint ::operator*(const QMatrix4x4 &matrix, const QPoint &point)
 static QPoint op_QMatrix4x4_operator_star__4055(const QMatrix4x4 *_self, const QPoint &point) {
-  return ::operator*(*_self, point);
+  return operator*(*_self, point);
 }
 
 //  QPointF ::operator*(const QMatrix4x4 &matrix, const QPointF &point)
 static QPointF op_QMatrix4x4_operator_star__4125(const QMatrix4x4 *_self, const QPointF &point) {
-  return ::operator*(*_self, point);
+  return operator*(*_self, point);
 }
 
 //  QMatrix4x4 ::operator-(const QMatrix4x4 &matrix)
 static QMatrix4x4 op_QMatrix4x4_operator_minus__2247(const QMatrix4x4 *_self) {
-  return ::operator-(*_self);
+  return operator-(*_self);
 }
 
 //  QMatrix4x4 ::operator*(const QMatrix4x4 &matrix, float factor)
 static QMatrix4x4 op_QMatrix4x4_operator_star__3109(const QMatrix4x4 *_self, float factor) {
-  return ::operator*(*_self, factor);
+  return operator*(*_self, factor);
 }
 
 

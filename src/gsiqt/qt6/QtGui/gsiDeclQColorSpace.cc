@@ -648,6 +648,16 @@ static void _call_f_fromIccProfile_2309 (const qt_gsi::GenericStaticMethod * /*d
 }
 
 
+//  bool ::operator==(const QColorSpace &colorSpace1, const QColorSpace &colorSpace2)
+static bool op_QColorSpace_operator_eq__eq__4686(const QColorSpace *_self, const QColorSpace &colorSpace2) {
+  return operator==(*_self, colorSpace2);
+}
+
+//  bool ::operator!=(const QColorSpace &colorSpace1, const QColorSpace &colorSpace2)
+static bool op_QColorSpace_operator_excl__eq__4686(const QColorSpace *_self, const QColorSpace &colorSpace2) {
+  return operator!=(*_self, colorSpace2);
+}
+
 
 namespace gsi
 {
@@ -683,6 +693,8 @@ static gsi::Methods methods_QColorSpace () {
   methods += new qt_gsi::GenericMethod ("withTransferFunction", "@brief Method QColorSpace QColorSpace::withTransferFunction(const QList<uint16_t> &transferFunctionTable)\n", true, &_init_f_withTransferFunction_c2690, &_call_f_withTransferFunction_c2690);
   methods += new qt_gsi::GenericMethod ("withTransferFunctions", "@brief Method QColorSpace QColorSpace::withTransferFunctions(const QList<uint16_t> &redTransferFunctionTable, const QList<uint16_t> &greenTransferFunctionTable, const QList<uint16_t> &blueTransferFunctionTable)\n", true, &_init_f_withTransferFunctions_c7854, &_call_f_withTransferFunctions_c7854);
   methods += new qt_gsi::GenericStaticMethod ("fromIccProfile", "@brief Static method QColorSpace QColorSpace::fromIccProfile(const QByteArray &iccProfile)\nThis method is static and can be called without an instance.", &_init_f_fromIccProfile_2309, &_call_f_fromIccProfile_2309);
+  methods += gsi::method_ext("==", &::op_QColorSpace_operator_eq__eq__4686, gsi::arg ("colorSpace2"), "@brief Operator bool ::operator==(const QColorSpace &colorSpace1, const QColorSpace &colorSpace2)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QColorSpace_operator_excl__eq__4686, gsi::arg ("colorSpace2"), "@brief Operator bool ::operator!=(const QColorSpace &colorSpace1, const QColorSpace &colorSpace2)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

@@ -405,12 +405,12 @@ static void _call_f_setPos_3119 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 
 //  bool ::operator==(const QCursor &lhs, const QCursor &rhs)
 static bool op_QCursor_operator_eq__eq__3956(const QCursor *_self, const QCursor &rhs) {
-  return ::operator==(*_self, rhs);
+  return operator==(*_self, rhs);
 }
 
 //  bool ::operator!=(const QCursor &lhs, const QCursor &rhs)
 static bool op_QCursor_operator_excl__eq__3956(const QCursor *_self, const QCursor &rhs) {
-  return ::operator!=(*_self, rhs);
+  return operator!=(*_self, rhs);
 }
 
 

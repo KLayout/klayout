@@ -463,22 +463,22 @@ static void _call_f_removeTimeRange_2766 (const qt_gsi::GenericMethod * /*decl*/
 
 //  bool ::operator==(const QMediaTimeRange &, const QMediaTimeRange &)
 static bool op_QMediaTimeRange_operator_eq__eq__5424(const QMediaTimeRange *_self, const QMediaTimeRange &arg2) {
-  return ::operator==(*_self, arg2);
+  return operator==(*_self, arg2);
 }
 
 //  bool ::operator!=(const QMediaTimeRange &, const QMediaTimeRange &)
 static bool op_QMediaTimeRange_operator_excl__eq__5424(const QMediaTimeRange *_self, const QMediaTimeRange &arg2) {
-  return ::operator!=(*_self, arg2);
+  return operator!=(*_self, arg2);
 }
 
 //  QMediaTimeRange ::operator+(const QMediaTimeRange &, const QMediaTimeRange &)
 static QMediaTimeRange op_QMediaTimeRange_operator_plus__5424(const QMediaTimeRange *_self, const QMediaTimeRange &arg2) {
-  return ::operator+(*_self, arg2);
+  return operator+(*_self, arg2);
 }
 
 //  QMediaTimeRange ::operator-(const QMediaTimeRange &, const QMediaTimeRange &)
 static QMediaTimeRange op_QMediaTimeRange_operator_minus__5424(const QMediaTimeRange *_self, const QMediaTimeRange &arg2) {
-  return ::operator-(*_self, arg2);
+  return operator-(*_self, arg2);
 }
 
 

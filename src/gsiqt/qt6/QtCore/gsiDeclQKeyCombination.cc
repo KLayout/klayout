@@ -162,6 +162,16 @@ static void _call_f_fromCombined_767 (const qt_gsi::GenericStaticMethod * /*decl
 }
 
 
+//  bool ::operator==(QKeyCombination lhs, QKeyCombination rhs)
+static bool op_QKeyCombination_operator_eq__eq__3798(QKeyCombination *_self, QKeyCombination rhs) {
+  return operator==(*_self, rhs);
+}
+
+//  bool ::operator!=(QKeyCombination lhs, QKeyCombination rhs)
+static bool op_QKeyCombination_operator_excl__eq__3798(QKeyCombination *_self, QKeyCombination rhs) {
+  return operator!=(*_self, rhs);
+}
+
 
 namespace gsi
 {
@@ -175,6 +185,8 @@ static gsi::Methods methods_QKeyCombination () {
   methods += new qt_gsi::GenericMethod ("keyboardModifiers", "@brief Method QFlags<Qt::KeyboardModifier> QKeyCombination::keyboardModifiers()\n", true, &_init_f_keyboardModifiers_c0, &_call_f_keyboardModifiers_c0);
   methods += new qt_gsi::GenericMethod ("toCombined", "@brief Method int QKeyCombination::toCombined()\n", true, &_init_f_toCombined_c0, &_call_f_toCombined_c0);
   methods += new qt_gsi::GenericStaticMethod ("fromCombined", "@brief Static method QKeyCombination QKeyCombination::fromCombined(int combined)\nThis method is static and can be called without an instance.", &_init_f_fromCombined_767, &_call_f_fromCombined_767);
+  methods += gsi::method_ext("==", &::op_QKeyCombination_operator_eq__eq__3798, gsi::arg ("rhs"), "@brief Operator bool ::operator==(QKeyCombination lhs, QKeyCombination rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QKeyCombination_operator_excl__eq__3798, gsi::arg ("rhs"), "@brief Operator bool ::operator!=(QKeyCombination lhs, QKeyCombination rhs)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

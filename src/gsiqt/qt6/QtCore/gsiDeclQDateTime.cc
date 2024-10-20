@@ -951,6 +951,36 @@ static void _call_f_fromString_5145 (const qt_gsi::GenericStaticMethod * /*decl*
 }
 
 
+//  bool ::operator==(const QDateTime &lhs, const QDateTime &rhs)
+static bool op_QDateTime_operator_eq__eq__4242(const QDateTime *_self, const QDateTime &rhs) {
+  return operator==(*_self, rhs);
+}
+
+//  bool ::operator!=(const QDateTime &lhs, const QDateTime &rhs)
+static bool op_QDateTime_operator_excl__eq__4242(const QDateTime *_self, const QDateTime &rhs) {
+  return operator!=(*_self, rhs);
+}
+
+//  bool ::operator<(const QDateTime &lhs, const QDateTime &rhs)
+static bool op_QDateTime_operator_lt__4242(const QDateTime *_self, const QDateTime &rhs) {
+  return operator<(*_self, rhs);
+}
+
+//  bool ::operator<=(const QDateTime &lhs, const QDateTime &rhs)
+static bool op_QDateTime_operator_lt__eq__4242(const QDateTime *_self, const QDateTime &rhs) {
+  return operator<=(*_self, rhs);
+}
+
+//  bool ::operator>(const QDateTime &lhs, const QDateTime &rhs)
+static bool op_QDateTime_operator_gt__4242(const QDateTime *_self, const QDateTime &rhs) {
+  return operator>(*_self, rhs);
+}
+
+//  bool ::operator>=(const QDateTime &lhs, const QDateTime &rhs)
+static bool op_QDateTime_operator_gt__eq__4242(const QDateTime *_self, const QDateTime &rhs) {
+  return operator>=(*_self, rhs);
+}
+
 
 namespace gsi
 {
@@ -1006,6 +1036,12 @@ static gsi::Methods methods_QDateTime () {
   methods += new qt_gsi::GenericStaticMethod ("fromSecsSinceEpoch", "@brief Static method QDateTime QDateTime::fromSecsSinceEpoch(qint64 secs, const QTimeZone &timeZone)\nThis method is static and can be called without an instance.", &_init_f_fromSecsSinceEpoch_3083, &_call_f_fromSecsSinceEpoch_3083);
   methods += new qt_gsi::GenericStaticMethod ("fromString", "@brief Static method QDateTime QDateTime::fromString(const QString &string, Qt::DateFormat format)\nThis method is static and can be called without an instance.", &_init_f_fromString_3665, &_call_f_fromString_3665);
   methods += new qt_gsi::GenericStaticMethod ("fromString", "@brief Static method QDateTime QDateTime::fromString(const QString &string, const QString &format, QCalendar cal)\nThis method is static and can be called without an instance.", &_init_f_fromString_5145, &_call_f_fromString_5145);
+  methods += gsi::method_ext("==", &::op_QDateTime_operator_eq__eq__4242, gsi::arg ("rhs"), "@brief Operator bool ::operator==(const QDateTime &lhs, const QDateTime &rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QDateTime_operator_excl__eq__4242, gsi::arg ("rhs"), "@brief Operator bool ::operator!=(const QDateTime &lhs, const QDateTime &rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("<", &::op_QDateTime_operator_lt__4242, gsi::arg ("rhs"), "@brief Operator bool ::operator<(const QDateTime &lhs, const QDateTime &rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("<=", &::op_QDateTime_operator_lt__eq__4242, gsi::arg ("rhs"), "@brief Operator bool ::operator<=(const QDateTime &lhs, const QDateTime &rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext(">", &::op_QDateTime_operator_gt__4242, gsi::arg ("rhs"), "@brief Operator bool ::operator>(const QDateTime &lhs, const QDateTime &rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext(">=", &::op_QDateTime_operator_gt__eq__4242, gsi::arg ("rhs"), "@brief Operator bool ::operator>=(const QDateTime &lhs, const QDateTime &rhs)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

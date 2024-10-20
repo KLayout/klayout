@@ -69,6 +69,16 @@ static void _call_f_isValid_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
+//  bool ::operator==(QSocketDescriptor lhs, QSocketDescriptor rhs)
+static bool op_QSocketDescriptor_operator_eq__eq__4270(QSocketDescriptor *_self, QSocketDescriptor rhs) {
+  return operator==(*_self, rhs);
+}
+
+//  bool ::operator!=(QSocketDescriptor lhs, QSocketDescriptor rhs)
+static bool op_QSocketDescriptor_operator_excl__eq__4270(QSocketDescriptor *_self, QSocketDescriptor rhs) {
+  return operator!=(*_self, rhs);
+}
+
 
 namespace gsi
 {
@@ -77,6 +87,8 @@ static gsi::Methods methods_QSocketDescriptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QSocketDescriptor::QSocketDescriptor(QSocketDescriptor::DescriptorType descriptor)\nThis method creates an object of class QSocketDescriptor.", &_init_ctor_QSocketDescriptor_3778, &_call_ctor_QSocketDescriptor_3778);
   methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QSocketDescriptor::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
+  methods += gsi::method_ext("==", &::op_QSocketDescriptor_operator_eq__eq__4270, gsi::arg ("rhs"), "@brief Operator bool ::operator==(QSocketDescriptor lhs, QSocketDescriptor rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QSocketDescriptor_operator_excl__eq__4270, gsi::arg ("rhs"), "@brief Operator bool ::operator!=(QSocketDescriptor lhs, QSocketDescriptor rhs)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

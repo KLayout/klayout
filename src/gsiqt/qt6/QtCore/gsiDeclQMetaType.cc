@@ -1069,6 +1069,16 @@ static void _call_f_view_4440 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi
 }
 
 
+//  bool ::operator==(QMetaType a, QMetaType b)
+static bool op_QMetaType_operator_eq__eq__2544(QMetaType *_self, QMetaType b) {
+  return operator==(*_self, b);
+}
+
+//  bool ::operator!=(QMetaType a, QMetaType b)
+static bool op_QMetaType_operator_excl__eq__2544(QMetaType *_self, QMetaType b) {
+  return operator!=(*_self, b);
+}
+
 
 namespace gsi
 {
@@ -1125,6 +1135,8 @@ static gsi::Methods methods_QMetaType () {
   methods += new qt_gsi::GenericStaticMethod ("unregisterMetaType", "@brief Static method void QMetaType::unregisterMetaType(QMetaType type)\nThis method is static and can be called without an instance.", &_init_f_unregisterMetaType_1326, &_call_f_unregisterMetaType_1326);
   methods += new qt_gsi::GenericStaticMethod ("unregisterMutableViewFunction", "@brief Static method void QMetaType::unregisterMutableViewFunction(QMetaType from, QMetaType to)\nThis method is static and can be called without an instance.", &_init_f_unregisterMutableViewFunction_2544, &_call_f_unregisterMutableViewFunction_2544);
   methods += new qt_gsi::GenericStaticMethod ("view", "@brief Static method bool QMetaType::view(QMetaType fromType, void *from, QMetaType toType, void *to)\nThis method is static and can be called without an instance.", &_init_f_view_4440, &_call_f_view_4440);
+  methods += gsi::method_ext("==", &::op_QMetaType_operator_eq__eq__2544, gsi::arg ("b"), "@brief Operator bool ::operator==(QMetaType a, QMetaType b)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QMetaType_operator_excl__eq__2544, gsi::arg ("b"), "@brief Operator bool ::operator!=(QMetaType a, QMetaType b)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

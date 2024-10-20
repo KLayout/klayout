@@ -387,6 +387,16 @@ static void _call_f_setSampleRate_767 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
+//  bool ::operator==(const QAudioFormat &a, const QAudioFormat &b)
+static bool op_QAudioFormat_operator_eq__eq__4910(const QAudioFormat *_self, const QAudioFormat &b) {
+  return operator==(*_self, b);
+}
+
+//  bool ::operator!=(const QAudioFormat &a, const QAudioFormat &b)
+static bool op_QAudioFormat_operator_excl__eq__4910(const QAudioFormat *_self, const QAudioFormat &b) {
+  return operator!=(*_self, b);
+}
+
 
 namespace gsi
 {
@@ -413,6 +423,8 @@ static gsi::Methods methods_QAudioFormat () {
   methods += new qt_gsi::GenericMethod ("setChannelCount|channelCount=", "@brief Method void QAudioFormat::setChannelCount(int channelCount)\n", false, &_init_f_setChannelCount_767, &_call_f_setChannelCount_767);
   methods += new qt_gsi::GenericMethod ("setSampleFormat|sampleFormat=", "@brief Method void QAudioFormat::setSampleFormat(QAudioFormat::SampleFormat f)\n", false, &_init_f_setSampleFormat_2975, &_call_f_setSampleFormat_2975);
   methods += new qt_gsi::GenericMethod ("setSampleRate|sampleRate=", "@brief Method void QAudioFormat::setSampleRate(int sampleRate)\n", false, &_init_f_setSampleRate_767, &_call_f_setSampleRate_767);
+  methods += gsi::method_ext("==", &::op_QAudioFormat_operator_eq__eq__4910, gsi::arg ("b"), "@brief Operator bool ::operator==(const QAudioFormat &a, const QAudioFormat &b)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QAudioFormat_operator_excl__eq__4910, gsi::arg ("b"), "@brief Operator bool ::operator!=(const QAudioFormat &a, const QAudioFormat &b)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

@@ -228,6 +228,16 @@ static void _call_f_fromEncoded_3702 (const qt_gsi::GenericStaticMethod * /*decl
 }
 
 
+//  bool ::operator==(const QSslDiffieHellmanParameters &lhs, const QSslDiffieHellmanParameters &rhs)
+static bool op_QSslDiffieHellmanParameters_operator_eq__eq__7956(const QSslDiffieHellmanParameters *_self, const QSslDiffieHellmanParameters &rhs) {
+  return operator==(*_self, rhs);
+}
+
+//  bool ::operator!=(const QSslDiffieHellmanParameters &lhs, const QSslDiffieHellmanParameters &rhs)
+static bool op_QSslDiffieHellmanParameters_operator_excl__eq__7956(const QSslDiffieHellmanParameters *_self, const QSslDiffieHellmanParameters &rhs) {
+  return operator!=(*_self, rhs);
+}
+
 
 namespace gsi
 {
@@ -245,6 +255,8 @@ static gsi::Methods methods_QSslDiffieHellmanParameters () {
   methods += new qt_gsi::GenericStaticMethod ("defaultParameters", "@brief Static method QSslDiffieHellmanParameters QSslDiffieHellmanParameters::defaultParameters()\nThis method is static and can be called without an instance.", &_init_f_defaultParameters_0, &_call_f_defaultParameters_0);
   methods += new qt_gsi::GenericStaticMethod ("fromEncoded", "@brief Static method QSslDiffieHellmanParameters QSslDiffieHellmanParameters::fromEncoded(const QByteArray &encoded, QSsl::EncodingFormat format)\nThis method is static and can be called without an instance.", &_init_f_fromEncoded_4564, &_call_f_fromEncoded_4564);
   methods += new qt_gsi::GenericStaticMethod ("fromEncoded", "@brief Static method QSslDiffieHellmanParameters QSslDiffieHellmanParameters::fromEncoded(QIODevice *device, QSsl::EncodingFormat format)\nThis method is static and can be called without an instance.", &_init_f_fromEncoded_3702, &_call_f_fromEncoded_3702);
+  methods += gsi::method_ext("==", &::op_QSslDiffieHellmanParameters_operator_eq__eq__7956, gsi::arg ("rhs"), "@brief Operator bool ::operator==(const QSslDiffieHellmanParameters &lhs, const QSslDiffieHellmanParameters &rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QSslDiffieHellmanParameters_operator_excl__eq__7956, gsi::arg ("rhs"), "@brief Operator bool ::operator!=(const QSslDiffieHellmanParameters &lhs, const QSslDiffieHellmanParameters &rhs)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

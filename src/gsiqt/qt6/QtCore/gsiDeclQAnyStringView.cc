@@ -304,6 +304,36 @@ static void _call_f_equal_3602 (const qt_gsi::GenericStaticMethod * /*decl*/, gs
 }
 
 
+//  bool ::operator==(QAnyStringView lhs, QAnyStringView rhs)
+static bool op_QAnyStringView_operator_eq__eq__3602(QAnyStringView *_self, QAnyStringView rhs) {
+  return operator==(*_self, rhs);
+}
+
+//  bool ::operator!=(QAnyStringView lhs, QAnyStringView rhs)
+static bool op_QAnyStringView_operator_excl__eq__3602(QAnyStringView *_self, QAnyStringView rhs) {
+  return operator!=(*_self, rhs);
+}
+
+//  bool ::operator<=(QAnyStringView lhs, QAnyStringView rhs)
+static bool op_QAnyStringView_operator_lt__eq__3602(QAnyStringView *_self, QAnyStringView rhs) {
+  return operator<=(*_self, rhs);
+}
+
+//  bool ::operator>=(QAnyStringView lhs, QAnyStringView rhs)
+static bool op_QAnyStringView_operator_gt__eq__3602(QAnyStringView *_self, QAnyStringView rhs) {
+  return operator>=(*_self, rhs);
+}
+
+//  bool ::operator<(QAnyStringView lhs, QAnyStringView rhs)
+static bool op_QAnyStringView_operator_lt__3602(QAnyStringView *_self, QAnyStringView rhs) {
+  return operator<(*_self, rhs);
+}
+
+//  bool ::operator>(QAnyStringView lhs, QAnyStringView rhs)
+static bool op_QAnyStringView_operator_gt__3602(QAnyStringView *_self, QAnyStringView rhs) {
+  return operator>(*_self, rhs);
+}
+
 
 namespace gsi
 {
@@ -326,6 +356,12 @@ static gsi::Methods methods_QAnyStringView () {
   methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QAnyStringView::toString()\n", true, &_init_f_toString_c0, &_call_f_toString_c0);
   methods += new qt_gsi::GenericStaticMethod ("compare", "@brief Static method int QAnyStringView::compare(QAnyStringView lhs, QAnyStringView rhs, Qt::CaseSensitivity cs)\nThis method is static and can be called without an instance.", &_init_f_compare_5818, &_call_f_compare_5818);
   methods += new qt_gsi::GenericStaticMethod ("equal", "@brief Static method bool QAnyStringView::equal(QAnyStringView lhs, QAnyStringView rhs)\nThis method is static and can be called without an instance.", &_init_f_equal_3602, &_call_f_equal_3602);
+  methods += gsi::method_ext("==", &::op_QAnyStringView_operator_eq__eq__3602, gsi::arg ("rhs"), "@brief Operator bool ::operator==(QAnyStringView lhs, QAnyStringView rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QAnyStringView_operator_excl__eq__3602, gsi::arg ("rhs"), "@brief Operator bool ::operator!=(QAnyStringView lhs, QAnyStringView rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("<=", &::op_QAnyStringView_operator_lt__eq__3602, gsi::arg ("rhs"), "@brief Operator bool ::operator<=(QAnyStringView lhs, QAnyStringView rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext(">=", &::op_QAnyStringView_operator_gt__eq__3602, gsi::arg ("rhs"), "@brief Operator bool ::operator>=(QAnyStringView lhs, QAnyStringView rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("<", &::op_QAnyStringView_operator_lt__3602, gsi::arg ("rhs"), "@brief Operator bool ::operator<(QAnyStringView lhs, QAnyStringView rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext(">", &::op_QAnyStringView_operator_gt__3602, gsi::arg ("rhs"), "@brief Operator bool ::operator>(QAnyStringView lhs, QAnyStringView rhs)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

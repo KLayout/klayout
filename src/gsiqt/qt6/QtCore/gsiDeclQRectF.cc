@@ -1471,12 +1471,22 @@ static void _call_f_y_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi
 
 //  QRectF ::operator+(const QRectF &lhs, const QMarginsF &rhs)
 static QRectF op_QRectF_operator_plus__3939u1(const QRectF *_self, const QMarginsF &rhs) {
-  return ::operator+(*_self, rhs);
+  return operator+(*_self, rhs);
 }
 
 //  QRectF ::operator-(const QRectF &lhs, const QMarginsF &rhs)
 static QRectF op_QRectF_operator_minus__3939(const QRectF *_self, const QMarginsF &rhs) {
-  return ::operator-(*_self, rhs);
+  return operator-(*_self, rhs);
+}
+
+//  bool ::operator==(const QRectF &r1, const QRectF &r2)
+static bool op_QRectF_operator_eq__eq__3616(const QRectF *_self, const QRectF &r2) {
+  return operator==(*_self, r2);
+}
+
+//  bool ::operator!=(const QRectF &r1, const QRectF &r2)
+static bool op_QRectF_operator_excl__eq__3616(const QRectF *_self, const QRectF &r2) {
+  return operator!=(*_self, r2);
 }
 
 
@@ -1561,6 +1571,8 @@ static gsi::Methods methods_QRectF () {
   methods += new qt_gsi::GenericMethod (":y", "@brief Method double QRectF::y()\n", true, &_init_f_y_c0, &_call_f_y_c0);
   methods += gsi::method_ext("+", &::op_QRectF_operator_plus__3939u1, gsi::arg ("rhs"), "@brief Operator QRectF ::operator+(const QRectF &lhs, const QMarginsF &rhs)\nThis is the mapping of the global operator to the instance method.");
   methods += gsi::method_ext("-", &::op_QRectF_operator_minus__3939, gsi::arg ("rhs"), "@brief Operator QRectF ::operator-(const QRectF &lhs, const QMarginsF &rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("==", &::op_QRectF_operator_eq__eq__3616, gsi::arg ("r2"), "@brief Operator bool ::operator==(const QRectF &r1, const QRectF &r2)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QRectF_operator_excl__eq__3616, gsi::arg ("r2"), "@brief Operator bool ::operator!=(const QRectF &r1, const QRectF &r2)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

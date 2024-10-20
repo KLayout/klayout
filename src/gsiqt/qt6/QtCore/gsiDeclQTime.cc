@@ -431,6 +431,36 @@ static void _call_f_isValid_2744 (const qt_gsi::GenericStaticMethod * /*decl*/, 
 }
 
 
+//  bool ::operator==(QTime lhs, QTime rhs)
+static bool op_QTime_operator_eq__eq__1724(QTime *_self, QTime rhs) {
+  return operator==(*_self, rhs);
+}
+
+//  bool ::operator!=(QTime lhs, QTime rhs)
+static bool op_QTime_operator_excl__eq__1724(QTime *_self, QTime rhs) {
+  return operator!=(*_self, rhs);
+}
+
+//  bool ::operator<(QTime lhs, QTime rhs)
+static bool op_QTime_operator_lt__1724(QTime *_self, QTime rhs) {
+  return operator<(*_self, rhs);
+}
+
+//  bool ::operator<=(QTime lhs, QTime rhs)
+static bool op_QTime_operator_lt__eq__1724(QTime *_self, QTime rhs) {
+  return operator<=(*_self, rhs);
+}
+
+//  bool ::operator>(QTime lhs, QTime rhs)
+static bool op_QTime_operator_gt__1724(QTime *_self, QTime rhs) {
+  return operator>(*_self, rhs);
+}
+
+//  bool ::operator>=(QTime lhs, QTime rhs)
+static bool op_QTime_operator_gt__eq__1724(QTime *_self, QTime rhs) {
+  return operator>=(*_self, rhs);
+}
+
 
 namespace gsi
 {
@@ -458,6 +488,12 @@ static gsi::Methods methods_QTime () {
   methods += new qt_gsi::GenericStaticMethod ("fromString", "@brief Static method QTime QTime::fromString(const QString &string, Qt::DateFormat format)\nThis method is static and can be called without an instance.", &_init_f_fromString_3665, &_call_f_fromString_3665);
   methods += new qt_gsi::GenericStaticMethod ("fromString", "@brief Static method QTime QTime::fromString(const QString &string, const QString &format)\nThis method is static and can be called without an instance.", &_init_f_fromString_3942, &_call_f_fromString_3942);
   methods += new qt_gsi::GenericStaticMethod ("isValid?", "@brief Static method bool QTime::isValid(int h, int m, int s, int ms)\nThis method is static and can be called without an instance.", &_init_f_isValid_2744, &_call_f_isValid_2744);
+  methods += gsi::method_ext("==", &::op_QTime_operator_eq__eq__1724, gsi::arg ("rhs"), "@brief Operator bool ::operator==(QTime lhs, QTime rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QTime_operator_excl__eq__1724, gsi::arg ("rhs"), "@brief Operator bool ::operator!=(QTime lhs, QTime rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("<", &::op_QTime_operator_lt__1724, gsi::arg ("rhs"), "@brief Operator bool ::operator<(QTime lhs, QTime rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("<=", &::op_QTime_operator_lt__eq__1724, gsi::arg ("rhs"), "@brief Operator bool ::operator<=(QTime lhs, QTime rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext(">", &::op_QTime_operator_gt__1724, gsi::arg ("rhs"), "@brief Operator bool ::operator>(QTime lhs, QTime rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext(">=", &::op_QTime_operator_gt__eq__1724, gsi::arg ("rhs"), "@brief Operator bool ::operator>=(QTime lhs, QTime rhs)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

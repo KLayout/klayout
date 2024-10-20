@@ -399,6 +399,16 @@ static void _call_f_typeName_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
+//  bool ::operator==(const QMetaMethod &m1, const QMetaMethod &m2)
+static bool op_QMetaMethod_operator_eq__eq__4680(const QMetaMethod *_self, const QMetaMethod &m2) {
+  return operator==(*_self, m2);
+}
+
+//  bool ::operator!=(const QMetaMethod &m1, const QMetaMethod &m2)
+static bool op_QMetaMethod_operator_excl__eq__4680(const QMetaMethod *_self, const QMetaMethod &m2) {
+  return operator!=(*_self, m2);
+}
+
 
 namespace gsi
 {
@@ -428,6 +438,8 @@ static gsi::Methods methods_QMetaMethod () {
   methods += new qt_gsi::GenericMethod ("revision", "@brief Method int QMetaMethod::revision()\n", true, &_init_f_revision_c0, &_call_f_revision_c0);
   methods += new qt_gsi::GenericMethod ("tag", "@brief Method const char *QMetaMethod::tag()\n", true, &_init_f_tag_c0, &_call_f_tag_c0);
   methods += new qt_gsi::GenericMethod ("typeName", "@brief Method const char *QMetaMethod::typeName()\n", true, &_init_f_typeName_c0, &_call_f_typeName_c0);
+  methods += gsi::method_ext("==", &::op_QMetaMethod_operator_eq__eq__4680, gsi::arg ("m2"), "@brief Operator bool ::operator==(const QMetaMethod &m1, const QMetaMethod &m2)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QMetaMethod_operator_excl__eq__4680, gsi::arg ("m2"), "@brief Operator bool ::operator!=(const QMetaMethod &m1, const QMetaMethod &m2)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

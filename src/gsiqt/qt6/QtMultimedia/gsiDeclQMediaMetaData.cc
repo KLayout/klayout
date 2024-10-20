@@ -215,6 +215,16 @@ static void _call_f_metaDataKeyToString_2179 (const qt_gsi::GenericStaticMethod 
 }
 
 
+//  bool ::operator==(const QMediaMetaData &a, const QMediaMetaData &b)
+static bool op_QMediaMetaData_operator_eq__eq__5178(const QMediaMetaData *_self, const QMediaMetaData &b) {
+  return operator==(*_self, b);
+}
+
+//  bool ::operator!=(const QMediaMetaData &a, const QMediaMetaData &b)
+static bool op_QMediaMetaData_operator_excl__eq__5178(const QMediaMetaData *_self, const QMediaMetaData &b) {
+  return operator!=(*_self, b);
+}
+
 
 namespace gsi
 {
@@ -231,6 +241,8 @@ static gsi::Methods methods_QMediaMetaData () {
   methods += new qt_gsi::GenericMethod ("stringValue", "@brief Method QString QMediaMetaData::stringValue(QMediaMetaData::Key k)\n", true, &_init_f_stringValue_c2179, &_call_f_stringValue_c2179);
   methods += new qt_gsi::GenericMethod ("value", "@brief Method QVariant QMediaMetaData::value(QMediaMetaData::Key k)\n", true, &_init_f_value_c2179, &_call_f_value_c2179);
   methods += new qt_gsi::GenericStaticMethod ("metaDataKeyToString", "@brief Static method QString QMediaMetaData::metaDataKeyToString(QMediaMetaData::Key k)\nThis method is static and can be called without an instance.", &_init_f_metaDataKeyToString_2179, &_call_f_metaDataKeyToString_2179);
+  methods += gsi::method_ext("==", &::op_QMediaMetaData_operator_eq__eq__5178, gsi::arg ("b"), "@brief Operator bool ::operator==(const QMediaMetaData &a, const QMediaMetaData &b)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QMediaMetaData_operator_excl__eq__5178, gsi::arg ("b"), "@brief Operator bool ::operator!=(const QMediaMetaData &a, const QMediaMetaData &b)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

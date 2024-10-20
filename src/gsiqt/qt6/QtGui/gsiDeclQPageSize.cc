@@ -638,6 +638,16 @@ static void _call_f_windowsId_2390 (const qt_gsi::GenericStaticMethod * /*decl*/
 }
 
 
+//  bool ::operator==(const QPageSize &lhs, const QPageSize &rhs)
+static bool op_QPageSize_operator_eq__eq__4264(const QPageSize *_self, const QPageSize &rhs) {
+  return operator==(*_self, rhs);
+}
+
+//  bool ::operator!=(const QPageSize &lhs, const QPageSize &rhs)
+static bool op_QPageSize_operator_excl__eq__4264(const QPageSize *_self, const QPageSize &rhs) {
+  return operator!=(*_self, rhs);
+}
+
 
 namespace gsi
 {
@@ -676,6 +686,8 @@ static gsi::Methods methods_QPageSize () {
   methods += new qt_gsi::GenericStaticMethod ("sizePixels", "@brief Static method QSize QPageSize::sizePixels(QPageSize::PageSizeId pageSizeId, int resolution)\nThis method is static and can be called without an instance.", &_init_f_sizePixels_3049, &_call_f_sizePixels_3049);
   methods += new qt_gsi::GenericStaticMethod ("sizePoints", "@brief Static method QSize QPageSize::sizePoints(QPageSize::PageSizeId pageSizeId)\nThis method is static and can be called without an instance.", &_init_f_sizePoints_2390, &_call_f_sizePoints_2390);
   methods += new qt_gsi::GenericStaticMethod ("windowsId", "@brief Static method int QPageSize::windowsId(QPageSize::PageSizeId pageSizeId)\nThis method is static and can be called without an instance.", &_init_f_windowsId_2390, &_call_f_windowsId_2390);
+  methods += gsi::method_ext("==", &::op_QPageSize_operator_eq__eq__4264, gsi::arg ("rhs"), "@brief Operator bool ::operator==(const QPageSize &lhs, const QPageSize &rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QPageSize_operator_excl__eq__4264, gsi::arg ("rhs"), "@brief Operator bool ::operator!=(const QPageSize &lhs, const QPageSize &rhs)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

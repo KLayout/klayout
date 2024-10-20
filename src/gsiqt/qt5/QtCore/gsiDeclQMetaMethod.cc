@@ -317,12 +317,12 @@ static void _call_f_typeName_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 
 //  bool ::operator==(const QMetaMethod &m1, const QMetaMethod &m2)
 static bool op_QMetaMethod_operator_eq__eq__4680(const QMetaMethod *_self, const QMetaMethod &m2) {
-  return ::operator==(*_self, m2);
+  return operator==(*_self, m2);
 }
 
 //  bool ::operator!=(const QMetaMethod &m1, const QMetaMethod &m2)
 static bool op_QMetaMethod_operator_excl__eq__4680(const QMetaMethod *_self, const QMetaMethod &m2) {
-  return ::operator!=(*_self, m2);
+  return operator!=(*_self, m2);
 }
 
 

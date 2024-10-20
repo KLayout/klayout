@@ -540,6 +540,16 @@ static void _call_f_setMappedAtKey_c4342 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
+//  bool ::operator==(const QMetaAssociation &a, const QMetaAssociation &b)
+static bool op_QMetaAssociation_operator_eq__eq__5760(const QMetaAssociation *_self, const QMetaAssociation &b) {
+  return operator==(*_self, b);
+}
+
+//  bool ::operator!=(const QMetaAssociation &a, const QMetaAssociation &b)
+static bool op_QMetaAssociation_operator_excl__eq__5760(const QMetaAssociation *_self, const QMetaAssociation &b) {
+  return operator!=(*_self, b);
+}
+
 
 namespace gsi
 {
@@ -573,6 +583,8 @@ static gsi::Methods methods_QMetaAssociation () {
   methods += new qt_gsi::GenericMethod ("removeKey", "@brief Method void QMetaAssociation::removeKey(void *container, const void *key)\n", true, &_init_f_removeKey_c2699, &_call_f_removeKey_c2699);
   methods += new qt_gsi::GenericMethod ("setMappedAtIterator", "@brief Method void QMetaAssociation::setMappedAtIterator(const void *iterator, const void *mapped)\n", true, &_init_f_setMappedAtIterator_c3394, &_call_f_setMappedAtIterator_c3394);
   methods += new qt_gsi::GenericMethod ("setMappedAtKey", "@brief Method void QMetaAssociation::setMappedAtKey(void *container, const void *key, const void *mapped)\n", true, &_init_f_setMappedAtKey_c4342, &_call_f_setMappedAtKey_c4342);
+  methods += gsi::method_ext("==", &::op_QMetaAssociation_operator_eq__eq__5760, gsi::arg ("b"), "@brief Operator bool ::operator==(const QMetaAssociation &a, const QMetaAssociation &b)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QMetaAssociation_operator_excl__eq__5760, gsi::arg ("b"), "@brief Operator bool ::operator!=(const QMetaAssociation &a, const QMetaAssociation &b)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

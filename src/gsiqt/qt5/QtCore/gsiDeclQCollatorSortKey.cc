@@ -114,7 +114,7 @@ static void _call_f_swap_2252 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 
 //  bool ::operator<(const QCollatorSortKey &lhs, const QCollatorSortKey &rhs)
 static bool op_QCollatorSortKey_operator_lt__5786(const QCollatorSortKey *_self, const QCollatorSortKey &rhs) {
-  return ::operator<(*_self, rhs);
+  return operator<(*_self, rhs);
 }
 
 

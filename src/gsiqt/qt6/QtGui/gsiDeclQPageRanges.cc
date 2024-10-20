@@ -296,6 +296,16 @@ static void _call_f_fromString_2025 (const qt_gsi::GenericStaticMethod * /*decl*
 }
 
 
+//  bool ::operator==(const QPageRanges &lhs, const QPageRanges &rhs)
+static bool op_QPageRanges_operator_eq__eq__4658(const QPageRanges *_self, const QPageRanges &rhs) {
+  return operator==(*_self, rhs);
+}
+
+//  bool ::operator!=(const QPageRanges &lhs, const QPageRanges &rhs)
+static bool op_QPageRanges_operator_excl__eq__4658(const QPageRanges *_self, const QPageRanges &rhs) {
+  return operator!=(*_self, rhs);
+}
+
 
 namespace gsi
 {
@@ -317,6 +327,8 @@ static gsi::Methods methods_QPageRanges () {
   methods += new qt_gsi::GenericMethod ("toRangeList", "@brief Method QList<QPageRanges::Range> QPageRanges::toRangeList()\n", true, &_init_f_toRangeList_c0, &_call_f_toRangeList_c0);
   methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QPageRanges::toString()\n", true, &_init_f_toString_c0, &_call_f_toString_c0);
   methods += new qt_gsi::GenericStaticMethod ("fromString", "@brief Static method QPageRanges QPageRanges::fromString(const QString &ranges)\nThis method is static and can be called without an instance.", &_init_f_fromString_2025, &_call_f_fromString_2025);
+  methods += gsi::method_ext("==", &::op_QPageRanges_operator_eq__eq__4658, gsi::arg ("rhs"), "@brief Operator bool ::operator==(const QPageRanges &lhs, const QPageRanges &rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QPageRanges_operator_excl__eq__4658, gsi::arg ("rhs"), "@brief Operator bool ::operator!=(const QPageRanges &lhs, const QPageRanges &rhs)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

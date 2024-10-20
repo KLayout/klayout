@@ -498,12 +498,22 @@ static void _call_f_swap_2071 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 
 //  QMediaTimeRange ::operator+(const QMediaTimeRange &r1, const QMediaTimeRange &r2)
 static QMediaTimeRange op_QMediaTimeRange_operator_plus__5424(const QMediaTimeRange *_self, const QMediaTimeRange &r2) {
-  return ::operator+(*_self, r2);
+  return operator+(*_self, r2);
 }
 
 //  QMediaTimeRange ::operator-(const QMediaTimeRange &r1, const QMediaTimeRange &r2)
 static QMediaTimeRange op_QMediaTimeRange_operator_minus__5424(const QMediaTimeRange *_self, const QMediaTimeRange &r2) {
-  return ::operator-(*_self, r2);
+  return operator-(*_self, r2);
+}
+
+//  bool ::operator==(const QMediaTimeRange &lhs, const QMediaTimeRange &rhs)
+static bool op_QMediaTimeRange_operator_eq__eq__5424(const QMediaTimeRange *_self, const QMediaTimeRange &rhs) {
+  return operator==(*_self, rhs);
+}
+
+//  bool ::operator!=(const QMediaTimeRange &lhs, const QMediaTimeRange &rhs)
+static bool op_QMediaTimeRange_operator_excl__eq__5424(const QMediaTimeRange *_self, const QMediaTimeRange &rhs) {
+  return operator!=(*_self, rhs);
 }
 
 
@@ -539,6 +549,8 @@ static gsi::Methods methods_QMediaTimeRange () {
   methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QMediaTimeRange::swap(QMediaTimeRange &other)\n", false, &_init_f_swap_2071, &_call_f_swap_2071);
   methods += gsi::method_ext("+", &::op_QMediaTimeRange_operator_plus__5424, gsi::arg ("r2"), "@brief Operator QMediaTimeRange ::operator+(const QMediaTimeRange &r1, const QMediaTimeRange &r2)\nThis is the mapping of the global operator to the instance method.");
   methods += gsi::method_ext("-", &::op_QMediaTimeRange_operator_minus__5424, gsi::arg ("r2"), "@brief Operator QMediaTimeRange ::operator-(const QMediaTimeRange &r1, const QMediaTimeRange &r2)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("==", &::op_QMediaTimeRange_operator_eq__eq__5424, gsi::arg ("rhs"), "@brief Operator bool ::operator==(const QMediaTimeRange &lhs, const QMediaTimeRange &rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QMediaTimeRange_operator_excl__eq__5424, gsi::arg ("rhs"), "@brief Operator bool ::operator!=(const QMediaTimeRange &lhs, const QMediaTimeRange &rhs)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

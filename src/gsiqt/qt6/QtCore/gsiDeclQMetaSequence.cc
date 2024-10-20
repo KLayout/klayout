@@ -616,6 +616,16 @@ static void _call_f_valueMetaType_c0 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
+//  bool ::operator==(const QMetaSequence &a, const QMetaSequence &b)
+static bool op_QMetaSequence_operator_eq__eq__5112(const QMetaSequence *_self, const QMetaSequence &b) {
+  return operator==(*_self, b);
+}
+
+//  bool ::operator!=(const QMetaSequence &a, const QMetaSequence &b)
+static bool op_QMetaSequence_operator_excl__eq__5112(const QMetaSequence *_self, const QMetaSequence &b) {
+  return operator!=(*_self, b);
+}
+
 
 namespace gsi
 {
@@ -653,6 +663,8 @@ static gsi::Methods methods_QMetaSequence () {
   methods += new qt_gsi::GenericMethod ("valueAtIndex", "@brief Method void QMetaSequence::valueAtIndex(const void *container, qsizetype index, void *result)\n", true, &_init_f_valueAtIndex_c4033, &_call_f_valueAtIndex_c4033);
   methods += new qt_gsi::GenericMethod ("valueAtIterator", "@brief Method void QMetaSequence::valueAtIterator(const void *iterator, void *result)\n", true, &_init_f_valueAtIterator_c2699, &_call_f_valueAtIterator_c2699);
   methods += new qt_gsi::GenericMethod ("valueMetaType", "@brief Method QMetaType QMetaSequence::valueMetaType()\n", true, &_init_f_valueMetaType_c0, &_call_f_valueMetaType_c0);
+  methods += gsi::method_ext("==", &::op_QMetaSequence_operator_eq__eq__5112, gsi::arg ("b"), "@brief Operator bool ::operator==(const QMetaSequence &a, const QMetaSequence &b)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QMetaSequence_operator_excl__eq__5112, gsi::arg ("b"), "@brief Operator bool ::operator!=(const QMetaSequence &a, const QMetaSequence &b)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

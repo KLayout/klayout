@@ -230,12 +230,12 @@ static void _call_f_fromEncoded_3702 (const qt_gsi::GenericStaticMethod * /*decl
 
 //  bool ::operator==(const QSslDiffieHellmanParameters &lhs, const QSslDiffieHellmanParameters &rhs)
 static bool op_QSslDiffieHellmanParameters_operator_eq__eq__7956(const QSslDiffieHellmanParameters *_self, const QSslDiffieHellmanParameters &rhs) {
-  return ::operator==(*_self, rhs);
+  return operator==(*_self, rhs);
 }
 
 //  bool ::operator!=(const QSslDiffieHellmanParameters &lhs, const QSslDiffieHellmanParameters &rhs)
 static bool op_QSslDiffieHellmanParameters_operator_excl__eq__7956(const QSslDiffieHellmanParameters *_self, const QSslDiffieHellmanParameters &rhs) {
-  return ::operator!=(*_self, rhs);
+  return operator!=(*_self, rhs);
 }
 
 

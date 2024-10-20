@@ -280,6 +280,16 @@ static void _call_f_swap_2533 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
+//  bool ::operator==(const QHttp2Configuration &lhs, const QHttp2Configuration &rhs)
+static bool op_QHttp2Configuration_operator_eq__eq__6348(const QHttp2Configuration *_self, const QHttp2Configuration &rhs) {
+  return operator==(*_self, rhs);
+}
+
+//  bool ::operator!=(const QHttp2Configuration &lhs, const QHttp2Configuration &rhs)
+static bool op_QHttp2Configuration_operator_excl__eq__6348(const QHttp2Configuration *_self, const QHttp2Configuration &rhs) {
+  return operator!=(*_self, rhs);
+}
+
 
 namespace gsi
 {
@@ -300,6 +310,8 @@ static gsi::Methods methods_QHttp2Configuration () {
   methods += new qt_gsi::GenericMethod ("setStreamReceiveWindowSize", "@brief Method bool QHttp2Configuration::setStreamReceiveWindowSize(unsigned int size)\n", false, &_init_f_setStreamReceiveWindowSize_1772, &_call_f_setStreamReceiveWindowSize_1772);
   methods += new qt_gsi::GenericMethod ("streamReceiveWindowSize", "@brief Method unsigned int QHttp2Configuration::streamReceiveWindowSize()\n", true, &_init_f_streamReceiveWindowSize_c0, &_call_f_streamReceiveWindowSize_c0);
   methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QHttp2Configuration::swap(QHttp2Configuration &other)\n", false, &_init_f_swap_2533, &_call_f_swap_2533);
+  methods += gsi::method_ext("==", &::op_QHttp2Configuration_operator_eq__eq__6348, gsi::arg ("rhs"), "@brief Operator bool ::operator==(const QHttp2Configuration &lhs, const QHttp2Configuration &rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QHttp2Configuration_operator_excl__eq__6348, gsi::arg ("rhs"), "@brief Operator bool ::operator!=(const QHttp2Configuration &lhs, const QHttp2Configuration &rhs)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

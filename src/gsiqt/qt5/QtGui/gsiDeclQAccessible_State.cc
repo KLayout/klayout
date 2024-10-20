@@ -52,7 +52,7 @@ static void _call_ctor_QAccessible_State_0 (const qt_gsi::GenericStaticMethod * 
 
 //  bool ::operator==(const QAccessible::State &first, const QAccessible::State &second)
 static bool op_QAccessible_State_operator_eq__eq__5950(const QAccessible::State *_self, const QAccessible::State &second) {
-  return ::operator==(*_self, second);
+  return operator==(*_self, second);
 }
 
 

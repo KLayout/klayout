@@ -2105,6 +2105,16 @@ static void _call_f_territoryToString_2205 (const qt_gsi::GenericStaticMethod * 
 }
 
 
+//  bool ::operator==(const QLocale &lhs, const QLocale &rhs)
+static bool op_QLocale_operator_eq__eq__3864(const QLocale *_self, const QLocale &rhs) {
+  return operator==(*_self, rhs);
+}
+
+//  bool ::operator!=(const QLocale &lhs, const QLocale &rhs)
+static bool op_QLocale_operator_excl__eq__3864(const QLocale *_self, const QLocale &rhs) {
+  return operator!=(*_self, rhs);
+}
+
 
 namespace gsi
 {
@@ -2216,6 +2226,8 @@ static gsi::Methods methods_QLocale () {
   methods += new qt_gsi::GenericStaticMethod ("system", "@brief Static method QLocale QLocale::system()\nThis method is static and can be called without an instance.", &_init_f_system_0, &_call_f_system_0);
   methods += new qt_gsi::GenericStaticMethod ("territoryToCode", "@brief Static method QString QLocale::territoryToCode(QLocale::Territory territory)\nThis method is static and can be called without an instance.", &_init_f_territoryToCode_2205, &_call_f_territoryToCode_2205);
   methods += new qt_gsi::GenericStaticMethod ("territoryToString", "@brief Static method QString QLocale::territoryToString(QLocale::Territory territory)\nThis method is static and can be called without an instance.", &_init_f_territoryToString_2205, &_call_f_territoryToString_2205);
+  methods += gsi::method_ext("==", &::op_QLocale_operator_eq__eq__3864, gsi::arg ("rhs"), "@brief Operator bool ::operator==(const QLocale &lhs, const QLocale &rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QLocale_operator_excl__eq__3864, gsi::arg ("rhs"), "@brief Operator bool ::operator!=(const QLocale &lhs, const QLocale &rhs)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

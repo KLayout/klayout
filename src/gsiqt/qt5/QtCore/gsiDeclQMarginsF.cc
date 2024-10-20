@@ -384,57 +384,57 @@ static void _call_f_top_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, g
 
 //  bool ::operator==(const QMarginsF &lhs, const QMarginsF &rhs)
 static bool op_QMarginsF_operator_eq__eq__4262(const QMarginsF *_self, const QMarginsF &rhs) {
-  return ::operator==(*_self, rhs);
+  return operator==(*_self, rhs);
 }
 
 //  bool ::operator!=(const QMarginsF &lhs, const QMarginsF &rhs)
 static bool op_QMarginsF_operator_excl__eq__4262(const QMarginsF *_self, const QMarginsF &rhs) {
-  return ::operator!=(*_self, rhs);
+  return operator!=(*_self, rhs);
 }
 
 //  QMarginsF ::operator+(const QMarginsF &lhs, const QMarginsF &rhs)
 static QMarginsF op_QMarginsF_operator_plus__4262(const QMarginsF *_self, const QMarginsF &rhs) {
-  return ::operator+(*_self, rhs);
+  return operator+(*_self, rhs);
 }
 
 //  QMarginsF ::operator-(const QMarginsF &lhs, const QMarginsF &rhs)
 static QMarginsF op_QMarginsF_operator_minus__4262(const QMarginsF *_self, const QMarginsF &rhs) {
-  return ::operator-(*_self, rhs);
+  return operator-(*_self, rhs);
 }
 
 //  QMarginsF ::operator+(const QMarginsF &lhs, qreal rhs)
 static QMarginsF op_QMarginsF_operator_plus__3046(const QMarginsF *_self, qreal rhs) {
-  return ::operator+(*_self, rhs);
+  return operator+(*_self, rhs);
 }
 
 //  QMarginsF ::operator-(const QMarginsF &lhs, qreal rhs)
 static QMarginsF op_QMarginsF_operator_minus__3046(const QMarginsF *_self, qreal rhs) {
-  return ::operator-(*_self, rhs);
+  return operator-(*_self, rhs);
 }
 
 //  QMarginsF ::operator*(const QMarginsF &lhs, qreal rhs)
 static QMarginsF op_QMarginsF_operator_star__3046(const QMarginsF *_self, qreal rhs) {
-  return ::operator*(*_self, rhs);
+  return operator*(*_self, rhs);
 }
 
 //  QMarginsF ::operator/(const QMarginsF &lhs, qreal divisor)
 static QMarginsF op_QMarginsF_operator_slash__3046(const QMarginsF *_self, qreal divisor) {
-  return ::operator/(*_self, divisor);
+  return operator/(*_self, divisor);
 }
 
 //  QMarginsF ::operator+(const QMarginsF &margins)
 static QMarginsF op_QMarginsF_operator_plus__2185(const QMarginsF *_self) {
-  return ::operator+(*_self);
+  return operator+(*_self);
 }
 
 //  QMarginsF ::operator-(const QMarginsF &margins)
 static QMarginsF op_QMarginsF_operator_minus__2185(const QMarginsF *_self) {
-  return ::operator-(*_self);
+  return operator-(*_self);
 }
 
 //  QRectF ::operator+(const QMarginsF &lhs, const QRectF &rhs)
 static QRectF op_QMarginsF_operator_plus__3939(const QMarginsF *_self, const QRectF &rhs) {
-  return ::operator+(*_self, rhs);
+  return operator+(*_self, rhs);
 }
 
 

@@ -818,6 +818,16 @@ static void _call_f_setDefaultFormat_2724 (const qt_gsi::GenericStaticMethod * /
 }
 
 
+//  bool ::operator==(const QSurfaceFormat &lhs, const QSurfaceFormat &rhs)
+static bool op_QSurfaceFormat_operator_eq__eq__5340(const QSurfaceFormat *_self, const QSurfaceFormat &rhs) {
+  return operator==(*_self, rhs);
+}
+
+//  bool ::operator!=(const QSurfaceFormat &lhs, const QSurfaceFormat &rhs)
+static bool op_QSurfaceFormat_operator_excl__eq__5340(const QSurfaceFormat *_self, const QSurfaceFormat &rhs) {
+  return operator!=(*_self, rhs);
+}
+
 
 namespace gsi
 {
@@ -868,6 +878,8 @@ static gsi::Methods methods_QSurfaceFormat () {
   methods += new qt_gsi::GenericMethod ("version", "@brief Method QPair<int, int> QSurfaceFormat::version()\n", true, &_init_f_version_c0, &_call_f_version_c0);
   methods += new qt_gsi::GenericStaticMethod (":defaultFormat", "@brief Static method QSurfaceFormat QSurfaceFormat::defaultFormat()\nThis method is static and can be called without an instance.", &_init_f_defaultFormat_0, &_call_f_defaultFormat_0);
   methods += new qt_gsi::GenericStaticMethod ("setDefaultFormat|defaultFormat=", "@brief Static method void QSurfaceFormat::setDefaultFormat(const QSurfaceFormat &format)\nThis method is static and can be called without an instance.", &_init_f_setDefaultFormat_2724, &_call_f_setDefaultFormat_2724);
+  methods += gsi::method_ext("==", &::op_QSurfaceFormat_operator_eq__eq__5340, gsi::arg ("rhs"), "@brief Operator bool ::operator==(const QSurfaceFormat &lhs, const QSurfaceFormat &rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QSurfaceFormat_operator_excl__eq__5340, gsi::arg ("rhs"), "@brief Operator bool ::operator!=(const QSurfaceFormat &lhs, const QSurfaceFormat &rhs)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

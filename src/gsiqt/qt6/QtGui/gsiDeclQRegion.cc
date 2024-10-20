@@ -912,7 +912,7 @@ static void _call_f_xored_c2006 (const qt_gsi::GenericMethod * /*decl*/, void *c
 
 //  QRegion ::operator *(const QRegion &r, const QTransform &m)
 static QRegion op_QRegion_operator_star__4248(const QRegion *_self, const QTransform &m) {
-  return ::operator *(*_self, m);
+  return operator *(*_self, m);
 }
 
 

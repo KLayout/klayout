@@ -753,7 +753,7 @@ void MacroEditorPage::fill_completer_list ()
   QString ssel = c.selectedText ();
   QString s = ssel.mid (0, pos - pos0);
 
-  if (! s[0].isLetter () && s[0].toLatin1 () != '_') {
+  if (s.length () == 0 || (! s[0].isLetter () && s[0].toLatin1 () != '_')) {
     return;  // not a word
   }
 

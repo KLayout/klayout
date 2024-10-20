@@ -868,7 +868,7 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase ("lay", "LayoutVi
   gsi::method ("active_cellview", static_cast<lay::CellViewRef (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::active_cellview_ref),
     "@brief Gets the active cellview (shown in hierarchy browser)\n"
     "\n"
-    "This is a convenience method which is equivalent to cellview(active_cellview_index()).\n"
+    "This is a convenience method which is equivalent to \"cellview(active_cellview_index)\".\n"
     "\n"
     "This method has been introduced in version 0.19.\n"
     "Starting from version 0.25, the returned object can be manipulated which will have an immediate effect "

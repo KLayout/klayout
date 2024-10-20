@@ -1513,7 +1513,9 @@ std::set<unsigned int> LEFDEFReaderState::open_layer_uncached(db::Layout &layout
 
       bool found = false;
       for (db::Layout::layer_iterator i = layout.begin_layers (); i != layout.end_layers () && ! found; ++i) {
-        if ((*i).second->log_equal (lp_new)) {
+        //  NOTE: if lp_new only has a name, we also check for the name. Since we assign a default layer/datatype,
+        //  otherwise, a "reload" in the UI would not recognize the layer as the same.
+        if ((*i).second->log_equal (lp_new) || (lp_new.is_named () && (*i).second->name == lp_new.name)) {
           found = true;
           res.insert ((*i).first);
         }

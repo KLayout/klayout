@@ -691,11 +691,9 @@ ViewObjectUI::do_mouse_move ()
 
     db::DPoint p = pixel_to_um (m_mouse_pressed);
 
-    for (std::list<ViewService *>::iterator g = m_grabbed.begin (); !done && g != m_grabbed.end (); ) {
-      std::list<ViewService *>::iterator gg = g;
-      ++gg;
+    auto grabbed = m_grabbed;
+    for (auto g = grabbed.begin (); !done && g != grabbed.end (); ++g) {
       done = ((*g)->enabled () && (*g)->mouse_press_event (p, m_mouse_buttons, true));
-      g = gg;
     }
 
     if (! done && mp_active_service) {
@@ -726,11 +724,9 @@ ViewObjectUI::do_mouse_move ()
 
     db::DPoint p = pixel_to_um (m_mouse_pos);
 
-    for (std::list<ViewService *>::iterator g = m_grabbed.begin (); !done && g != m_grabbed.end (); ) {
-      std::list<ViewService *>::iterator gg = g;
-      ++gg;
+    auto grabbed = m_grabbed;
+    for (auto g = grabbed.begin (); !done && g != grabbed.end (); ++g) {
       done = ((*g)->enabled () && (*g)->mouse_move_event (p, m_mouse_buttons, true));
-      g = gg;
     }
 
     if (! done && mp_active_service) {
@@ -772,11 +768,9 @@ ViewObjectUI::send_leave_event ()
 
     bool done = false;
 
-    for (std::list<ViewService *>::iterator g = m_grabbed.begin (); !done && g != m_grabbed.end (); ) {
-      std::list<ViewService *>::iterator gg = g;
-      ++gg;
+    auto grabbed = m_grabbed;
+    for (auto g = grabbed.begin (); !done && g != grabbed.end (); ++g) {
       done = ((*g)->enabled () && (*g)->leave_event (true));
-      g = gg;
     }
 
     if (! done && mp_active_service) {
@@ -814,11 +808,9 @@ ViewObjectUI::send_enter_event ()
 
   bool done = false;
 
-  for (std::list<ViewService *>::iterator g = m_grabbed.begin (); !done && g != m_grabbed.end (); ) {
-    std::list<ViewService *>::iterator gg = g;
-    ++gg;
+  auto grabbed = m_grabbed;
+  for (auto g = grabbed.begin (); !done && g != grabbed.end (); ++g) {
     done = ((*g)->enabled () && (*g)->enter_event (true));
-    g = gg;
   }
 
   if (! done && mp_active_service) {
@@ -878,11 +870,9 @@ ViewObjectUI::send_mouse_double_clicked_event (const db::DPoint &pt, unsigned in
 
   db::DPoint p = pixel_to_um (m_mouse_pos);
 
-  for (std::list<ViewService *>::iterator g = m_grabbed.begin (); !done && g != m_grabbed.end (); ) {
-    std::list<ViewService *>::iterator gg = g;
-    ++gg;
+  auto grabbed = m_grabbed;
+  for (auto g = grabbed.begin (); !done && g != grabbed.end (); ++g) {
     done = ((*g)->m_enabled && (*g)->mouse_double_click_event (p, buttons, true));
-    g = gg;
   }
 
   if (! done && mp_active_service) {
@@ -917,15 +907,13 @@ ViewObjectUI::send_mouse_release_event (const db::DPoint &pt, unsigned int /*but
     m_mouse_pos = pt;
     db::DPoint p = pixel_to_um (m_mouse_pos);
 
-    for (std::list<ViewService *>::iterator g = m_grabbed.begin (); !done && g != m_grabbed.end (); ) {
-      std::list<ViewService *>::iterator gg = g;
-      ++gg;
+    auto grabbed = m_grabbed;
+    for (auto g = grabbed.begin (); !done && g != grabbed.end (); ++g) {
       if (m_mouse_pressed_state) {
         done = (*g)->enabled () && (*g)->mouse_click_event (p, m_mouse_buttons, true);
       } else {
         done = (*g)->enabled () && (*g)->mouse_release_event (p, m_mouse_buttons, true);
       }
-      g = gg;
     }
 
     if (! done && mp_active_service && mp_active_service->enabled ()) {
@@ -978,11 +966,9 @@ ViewObjectUI::send_wheel_event (int delta, bool horizontal, const db::DPoint &pt
 
   bool done = false;
 
-  for (std::list<ViewService *>::iterator g = m_grabbed.begin (); !done && g != m_grabbed.end (); ) {
-    std::list<ViewService *>::iterator gg = g;
-    ++gg;
+  auto grabbed = m_grabbed;
+  for (auto g = grabbed.begin (); !done && g != grabbed.end (); ++g) {
     done = ((*g)->enabled () && (*g)->wheel_event (delta, horizontal, p, buttons, true));
-    g = gg;
   }
 
   if (! done && mp_active_service) {

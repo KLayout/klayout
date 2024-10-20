@@ -1,3 +1,21 @@
+0.29.8           (2024-10-20):
+* Enhancement: %GITHUB%/issues/1869 Adding a new option, -to or --top-output to strmxor
+* Bug: %GITHUB%/issues/1870 Do not allow editing on invalid layers
+* Bug: %GITHUB%/issues/1874 Crash when copying a cell to another layout
+* Bug: %GITHUB%/issues/1877 Rounding introduces DRC error in LEF/DEF via
+* Bug: %GITHUB%/issues/1880 Enhancing GDS2 writer float conversion such that less rounding occurs
+* Bug: %GITHUB%/issues/1885 --subst-char option in strm2oas was not accepting "do not substitute"
+* Bug: %GITHUB%/issues/1886 Small documentation fix
+* Bug: %GITHUB%/issues/1887 Small documentation fix
+* Bug: %GITHUB%/issues/1899 Adding global operators for QPoint on Qt6 and more
+* Enhancement: %GITHUB%/issues/1900 Help/about dialog content selectable
+* Bug: %GITHUB%/issues/1902 Two potential memory issues fixed
+* Bugfix: LEF/DEF reader recognizes existing layers by name now
+  This happened to be an issue if you were reloading a LEF/DEF layout as 
+  name layers got added as duplicates.
+* Bugfix: In DRC, with '@+' as target layout, maintain the original active cell view
+  This way, DRC can be re-run on the original layout, but each time generating a new output cellview.
+
 0.29.7           (2024-09-22):
 * Bug: %GITHUB%/issues/1864 Copy & paste allows creating a recursive hierarchy
 * Bug: %GITHUB%/issues/1860 A bug about layer undo

@@ -52659,6 +52659,7 @@ class Region(ShapeCollection):
         @param ignore_angle The angle above which no check is performed
         @param min_projection The lower threshold of the projected length of one edge onto another
         @param max_projection The upper limit of the projected length of one edge onto another
+        @param shielded Enables shielding (see below)
         @param opposite_filter Specifies a filter mode for errors happening on opposite sides of inputs shapes
         @param rect_filter Specifies an error filter for rectangular input shapes
         @param negative Negative output from the first input
@@ -52699,6 +52700,7 @@ class Region(ShapeCollection):
         @param ignore_angle The angle above which no check is performed
         @param min_projection The lower threshold of the projected length of one edge onto another
         @param max_projection The upper limit of the projected length of one edge onto another
+        @param shielded Enables shielding (see below)
         @param opposite_filter Specifies a filter mode for errors happening on opposite sides of inputs shapes
         @param rect_filter Specifies an error filter for rectangular input shapes
         @param negative Negative output from the first input
@@ -53013,6 +53015,7 @@ class Region(ShapeCollection):
         @param ignore_angle The angle above which no check is performed
         @param min_projection The lower threshold of the projected length of one edge onto another
         @param max_projection The upper limit of the projected length of one edge onto another
+        @param shielded Enables shielding (see below)
         @param opposite_filter Specifies a filter mode for errors happening on opposite sides of inputs shapes
         @param rect_filter Specifies an error filter for rectangular input shapes
         @param negative Negative output from the first input
@@ -53131,6 +53134,7 @@ class Region(ShapeCollection):
         @param ignore_angle The angle above which no check is performed
         @param min_projection The lower threshold of the projected length of one edge onto another
         @param max_projection The upper limit of the projected length of one edge onto another
+        @param shielded Enables shielding (see below)
         @param opposite_filter Specifies a filter mode for errors happening on opposite sides of inputs shapes
         @param rect_filter Specifies an error filter for rectangular input shapes
         @param negative If true, edges not violation the condition will be output as pseudo-edge pairs
@@ -53615,7 +53619,7 @@ class Region(ShapeCollection):
         @param ignore_angle The angle above which no check is performed
         @param min_projection The lower threshold of the projected length of one edge onto another
         @param max_projection The upper limit of the projected length of one edge onto another
-        @param shielded Enables shielding
+        @param shielded Enables shielding (see below)
         @param negative If true, edges not violation the condition will be output as pseudo-edge pairs
         @param property_constraint Specifies whether to consider only shapes with a certain property relation
         @param property_constraint Only \IgnoreProperties and \NoPropertyConstraint are allowed - in the last case, properties are copied from the original shapes to the output@param zero_distance_mode Specifies how to handle edges with zero distance
@@ -53682,6 +53686,7 @@ class Region(ShapeCollection):
         @param ignore_angle The angle above which no check is performed
         @param min_projection The lower threshold of the projected length of one edge onto another
         @param max_projection The upper limit of the projected length of one edge onto another
+        @param shielded Enables shielding (see below)
         @param opposite_filter Specifies a filter mode for errors happening on opposite sides of inputs shapes
         @param rect_filter Specifies an error filter for rectangular input shapes
         @param negative Negative output from the first input
@@ -54118,6 +54123,7 @@ class Region(ShapeCollection):
         @param ignore_angle The angle above which no check is performed
         @param min_projection The lower threshold of the projected length of one edge onto another
         @param max_projection The upper limit of the projected length of one edge onto another
+        @param shielded Enables shielding (see below)
         @param opposite_filter Specifies a filter mode for errors happening on opposite sides of inputs shapes
         @param rect_filter Specifies an error filter for rectangular input shapes
         @param negative Negative output from the first input
@@ -54450,6 +54456,7 @@ class Region(ShapeCollection):
         @param ignore_angle The angle above which no check is performed
         @param min_projection The lower threshold of the projected length of one edge onto another
         @param max_projection The upper limit of the projected length of one edge onto another
+        @param shielded Enables shielding (see below)
         @param opposite_filter Specifies a filter mode for errors happening on opposite sides of inputs shapes
         @param rect_filter Specifies an error filter for rectangular input shapes
         @param negative If true, edges not violation the condition will be output as pseudo-edge pairs
@@ -54773,7 +54780,7 @@ class Region(ShapeCollection):
         @param ignore_angle The angle above which no check is performed
         @param min_projection The lower threshold of the projected length of one edge onto another
         @param max_projection The upper limit of the projected length of one edge onto another
-        @param shielded Enables shielding
+        @param shielded Enables shielding (see below)
         @param negative If true, edges not violation the condition will be output as pseudo-edge pairs
         @param property_constraint Only \IgnoreProperties and \NoPropertyConstraint are allowed - in the last case, properties are copied from the original shapes to the output. @param zero_distance_mode Specifies how to handle edges with zero distance
         Other than 'width' allow more options here.

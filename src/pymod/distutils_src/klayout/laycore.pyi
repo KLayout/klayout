@@ -6748,7 +6748,7 @@ class LayoutViewBase:
         r"""
         @brief Gets the active cellview (shown in hierarchy browser)
 
-        This is a convenience method which is equivalent to cellview(active_cellview_index()).
+        This is a convenience method which is equivalent to "cellview(active_cellview_index)".
 
         This method has been introduced in version 0.19.
         Starting from version 0.25, the returned object can be manipulated which will have an immediate effect on the display.

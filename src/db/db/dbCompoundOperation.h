@@ -266,6 +266,7 @@ protected:
   virtual db::Coord computed_dist () const = 0;
 
   virtual std::string generated_description () const;
+  virtual bool wants_caching () const { return true; }
 
 private:
   std::string m_description;
@@ -276,23 +277,32 @@ private:
   {
     //  TODO: confine caching to those nodes which need it.
 
-    std::pair<bool, std::vector<std::unordered_set<TR> > *> cp = cache->get<TR> (this);
+    if (wants_caching ()) {
 
-    if (! cp.first) {
+      std::pair<bool, std::vector<std::unordered_set<TR> > *> cp = cache->get<TR> (this);
 
-      std::vector<std::unordered_set<TR> > uncached_results;
-      uncached_results.resize (results.size ());
+      if (! cp.first) {
 
-      do_compute_local (cache, layout, cell, interactions, uncached_results, proc);
+        std::vector<std::unordered_set<TR> > uncached_results;
+        uncached_results.resize (results.size ());
 
-      cp.second->swap (uncached_results);
+        do_compute_local (cache, layout, cell, interactions, uncached_results, proc);
+
+        cp.second->swap (uncached_results);
+
+      }
+
+      tl_assert (results.size () == cp.second->size ());
+      for (size_t r = 0; r < results.size (); ++r) {
+        results[r].insert ((*cp.second)[r].begin (), (*cp.second)[r].end ());
+      }
+
+    } else {
+
+      do_compute_local (cache, layout, cell, interactions, results, proc);
 
     }
 
-    tl_assert (results.size () == cp.second->size ());
-    for (size_t r = 0; r < results.size (); ++r) {
-      results[r].insert ((*cp.second)[r].begin (), (*cp.second)[r].end ());
-    }
   }
 };
 

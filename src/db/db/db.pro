@@ -23,6 +23,7 @@ SOURCES = \
   dbCommonReader.cc \
   dbCompoundOperation.cc \
   dbEdge.cc \
+  dbEdgeNeighborhood.cc \
   dbEdgePair.cc \
   dbEdgePairFilters.cc \
   dbEdgePairRelations.cc \
@@ -119,6 +120,7 @@ SOURCES = \
   gsiDeclDbCommonStreamOptions.cc \
   gsiDeclDbCompoundOperation.cc \
   gsiDeclDbEdge.cc \
+  gsiDeclDbEdgeNeighborhood.cc \
   gsiDeclDbEdgePair.cc \
   gsiDeclDbEdgePairs.cc \
   gsiDeclDbEdgeProcessor.cc \
@@ -249,6 +251,7 @@ HEADERS = \
   dbCommonReader.h \
   dbCompoundOperation.h \
   dbEdge.h \
+  dbEdgeNeighborhood.h \
   dbEdgePair.h \
   dbEdgePairFilters.h \
   dbEdgePairRelations.h \

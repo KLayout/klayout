@@ -41,7 +41,7 @@ class DB_PUBLIC EdgeNeighborhoodVisitor
 public:
   typedef std::pair<double, double> position_interval_type;
   typedef unsigned int input_key_type;
-  typedef std::list<db::Polygon> neighbor_shapes_type;
+  typedef std::vector<db::Polygon> neighbor_shapes_type;
   typedef std::map<input_key_type, neighbor_shapes_type> neighbors_per_interval_type;
   typedef std::vector<std::pair<position_interval_type, neighbors_per_interval_type> > neighbors_type;
 

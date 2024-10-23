@@ -99,7 +99,11 @@ private:
   tl::Mutex m_lock;
 };
 
-Class<gsi::EdgeNeighborhoodVisitorImpl> decl_EdgeNeighborhoodVisitorImpl ("db", "EdgeNeighborhoodVisitor",
+Class<db::EdgeNeighborhoodVisitor> decl_EdgeNeighborhoodVisitor ("db", "EdgeNeighborhoodVisitorBase",
+  "@hide"
+);
+
+Class<gsi::EdgeNeighborhoodVisitorImpl> decl_EdgeNeighborhoodVisitorImpl (decl_EdgeNeighborhoodVisitor, "db", "EdgeNeighborhoodVisitor",
   gsi::callback ("on_edge", &EdgeNeighborhoodVisitorImpl::issue_on_edge, &EdgeNeighborhoodVisitorImpl::f_on_edge, gsi::arg ("layout"), gsi::arg ("cell"), gsi::arg ("edge"), gsi::arg ("neighborhood"),
     "@brief Is called for each edge with the edge neighbors\n"
     "This method is called for every edge on the input region. It delivers the edge and the edge neighborhood. "

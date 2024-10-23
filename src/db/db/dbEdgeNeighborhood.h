@@ -58,7 +58,7 @@ public:
   /**
    *  @brief Event handler for each edge plus it's neighborhood
    */
-  void on_edge (const db::Layout *layout, const db::Cell *cell, const db::Edge &edge, const neighbors_type &neighbors);
+  virtual void on_edge (const db::Layout * /*layout*/, const db::Cell * /*cell*/, const db::Edge & /*edge*/, const neighbors_type & /*neighbors*/) { }
 };
 
 /**

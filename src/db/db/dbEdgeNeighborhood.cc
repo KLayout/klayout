@@ -93,18 +93,19 @@ private:
     //  transform on the edge
     db::IMatrix2d trans (e.x (), ne.x (), e.y (), ne.y ());
     db::IMatrix2d itrans = trans.inverted ();
+    db::Disp move (db::Point () - edge.p1 ());
 
-    db::Edge ref_edge = itrans * edge;
+    db::Edge ref_edge = itrans * (move * edge);
     tl_assert (ref_edge.dy () == 0);
     tl_assert (ref_edge.dx () > 0);
 
     std::set<db::Coord> xpos;
     db::Coord xmin = -m_bext - 1;
-    db::Coord xmax = m_eext + 1;
+    db::Coord xmax = ref_edge.dx () + m_eext + 1;
 
     for (auto n = neighbors.begin (); n != neighbors.end (); ++n) {
       for (auto p = n->second.begin (); p != n->second.end (); ++p) {
-        db::Polygon poly = itrans * **p;
+        db::Polygon poly = itrans * (move * **p);
         for (auto p = poly.begin_edge (); ! p.at_end (); ++p) {
           db::Edge e = *p;
           xpos.insert (std::max (xmin, std::min (xmax, e.p1 ().x ())));
@@ -124,20 +125,33 @@ private:
       }
       db::Coord xto = *i;
 
-      binned_neighbors.push_back (EdgeNeighborhoodVisitor::neighbors_type::value_type ());
-      binned_neighbors.back ().first.first = xfrom;
-      binned_neighbors.back ().first.second = xto;
+      bool first_per_interval = true;
 
       db::Box clip_box (xfrom, -m_din - 1, xto, m_dout + 1);
 
-      EdgeNeighborhoodVisitor::neighbors_per_interval_type &i2n = binned_neighbors.back ().second;
-
       //  NOTE: this could be more efficient if we had a multi-layer capable trapezoid decomposition tool
       for (auto n = neighbors.begin (); n != neighbors.end (); ++n) {
+
+          EdgeNeighborhoodVisitor::neighbor_shapes_type polygons;
         for (auto p = n->second.begin (); p != n->second.end (); ++p) {
-          db::Polygon poly = itrans * **p;
-          db::clip_poly (poly, clip_box, i2n[n->first], false);
+          db::Polygon poly = itrans * (move * **p);
+          db::clip_poly (poly, clip_box, polygons, false);
         }
+
+        if (!polygons.empty ()) {
+
+          if (first_per_interval) {
+            first_per_interval = false;
+            binned_neighbors.push_back (EdgeNeighborhoodVisitor::neighbors_type::value_type ());
+            binned_neighbors.back ().first.first = xfrom;
+            binned_neighbors.back ().first.second = xto;
+          }
+
+          EdgeNeighborhoodVisitor::neighbors_per_interval_type &i2n = binned_neighbors.back ().second;
+          i2n[n->first].swap (polygons);
+
+        }
+
       }
 
     }

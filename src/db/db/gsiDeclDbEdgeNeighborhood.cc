@@ -59,6 +59,38 @@ public:
 
   gsi::Callback f_on_edge;
 
+  void issue_begin_polygon (const db::Layout *, const db::Cell *, const db::Polygon &poly)
+  {
+    //  just for signature
+  }
+
+  void begin_polygon (const db::Layout *layout, const db::Cell *cell, const db::Polygon &poly)
+  {
+    if (f_begin_polygon.can_issue ()) {
+      //  NOTE: as scripts are potentially thread unsafe, we lock here
+      tl::MutexLocker locker (&m_lock);
+      return f_begin_polygon.issue<EdgeNeighborhoodVisitorImpl, const db::Layout *, const db::Cell *, const db::Polygon &> (&EdgeNeighborhoodVisitorImpl::begin_polygon, layout, cell, poly);
+    }
+  }
+
+  gsi::Callback f_begin_polygon;
+
+  void issue_end_polygon ()
+  {
+    //  just for signature
+  }
+
+  void end_polygon ()
+  {
+    if (f_end_polygon.can_issue ()) {
+      //  NOTE: as scripts are potentially thread unsafe, we lock here
+      tl::MutexLocker locker (&m_lock);
+      return f_end_polygon.issue<EdgeNeighborhoodVisitorImpl> (&EdgeNeighborhoodVisitorImpl::end_polygon);
+    }
+  }
+
+  gsi::Callback f_end_polygon;
+
   static tl::Variant build_neighbors (const db::EdgeNeighborhoodVisitor::neighbors_type &neighbors)
   {
     tl::Variant result;
@@ -127,6 +159,15 @@ Class<gsi::EdgeNeighborhoodVisitorImpl> decl_EdgeNeighborhoodVisitorImpl (decl_E
     "goes from (0,0) to (length,0).\n"
     "\n"
     "The polygons are boxes for manhattan input and trapezoids in the general case.\n"
+  ) +
+  gsi::callback ("begin_polygon", &EdgeNeighborhoodVisitorImpl::issue_begin_polygon, &EdgeNeighborhoodVisitorImpl::f_begin_polygon, gsi::arg ("layout"), gsi::arg ("cell"), gsi::arg ("polygon"),
+    "@brief Is called for each new polygon\n"
+    "This event announces a new primary polygon. After this event, the edges of the polygon are reported via \\on_edge, "
+    "followed by a call of \\end_polygon."
+  ) +
+  gsi::callback ("end_polygon", &EdgeNeighborhoodVisitorImpl::issue_end_polygon, &EdgeNeighborhoodVisitorImpl::f_end_polygon,
+    "@brief Is called after the polygon\n"
+    "See \\begin_polygon for a description of this protocol."
   ),
   "@brief A visitor for the neighborhood of edges in the input\n"
   "\n"

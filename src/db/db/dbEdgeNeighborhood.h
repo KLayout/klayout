@@ -56,6 +56,18 @@ public:
   virtual ~EdgeNeighborhoodVisitor () { }
 
   /**
+   *  @brief Event handler called when a new polygon is encountered
+   *  Following this event, the edges with their neighborhood are reported.
+   *  After the edges are reported, "end_polygon" is called.
+   */
+  virtual void begin_polygon (const db::Layout * /*layout*/, const db::Cell * /*cell*/, const db::Polygon & /*polygon*/) { }
+
+  /**
+   *  @brief Event handler called after the polygon was processed
+   */
+  virtual void end_polygon () { }
+
+  /**
    *  @brief Event handler for each edge plus it's neighborhood
    */
   virtual void on_edge (const db::Layout * /*layout*/, const db::Cell * /*cell*/, const db::Edge & /*edge*/, const neighbors_type & /*neighbors*/) { }

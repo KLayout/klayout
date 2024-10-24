@@ -195,7 +195,9 @@ EdgeNeighborhoodCompoundOperationNode::do_compute_local (CompoundRegionOperation
     scanner.insert1 (&edges.back (), ie);
   }
 
+  const_cast<db::EdgeNeighborhoodVisitor *> (mp_visitor.get ())->begin_polygon (layout, cell, pr.instantiate ());
   do_collect_neighbors (scanner, layout, cell);
+  const_cast<db::EdgeNeighborhoodVisitor *> (mp_visitor.get ())->end_polygon ();
 }
 
 void
@@ -223,7 +225,9 @@ EdgeNeighborhoodCompoundOperationNode::do_compute_local (CompoundRegionOperation
     scanner.insert1 (&edges.back (), ie);
   }
 
+  const_cast<db::EdgeNeighborhoodVisitor *> (mp_visitor.get ())->begin_polygon (layout, cell, pr);
   do_collect_neighbors (scanner, layout, cell);
+  const_cast<db::EdgeNeighborhoodVisitor *> (mp_visitor.get ())->end_polygon ();
 }
 
 }

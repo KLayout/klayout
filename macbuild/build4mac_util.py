@@ -499,7 +499,7 @@ def GetKLayoutVersionFrom( verfile='version.h' ):
     except Exception as e:
         return version
 
-    verReg = re.compile( u'(KLAYOUT_VERSION=\")([0-9A-Z_a-z\.]+)(\")' )
+    verReg = re.compile( r'(KLAYOUT_VERSION=\")([0-9A-Z_a-z\.]+)(\")' )
     for line in contents:
         m = verReg.match(line)
         if m:

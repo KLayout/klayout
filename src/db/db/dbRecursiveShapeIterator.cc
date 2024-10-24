@@ -67,6 +67,7 @@ RecursiveShapeIterator &RecursiveShapeIterator::operator= (const RecursiveShapeI
 
     m_box_convert = d.m_box_convert;
 
+    m_locker = d.m_locker;
     m_inst = d.m_inst;
     m_inst_array = d.m_inst_array;
     m_empty_cells_cache = d.m_empty_cells_cache;
@@ -451,6 +452,8 @@ RecursiveShapeIterator::validate (RecursiveShapeReceiver *receiver) const
   m_needs_reinit = false;
 
   //  re-initialize
+  m_locker = db::LayoutLocker ();
+
   mp_cell = mp_top_cell;
   m_trans_stack.clear ();
   m_inst_iterators.clear ();
@@ -501,6 +504,10 @@ RecursiveShapeIterator::validate (RecursiveShapeReceiver *receiver) const
     mp_layout->update ();
     new_cell (receiver);
     next_shape (receiver);
+  }
+
+  if (mp_layout) {
+    m_locker = db::LayoutLocker (const_cast<db::Layout *> (mp_layout.get ()), true);
   }
 }
 

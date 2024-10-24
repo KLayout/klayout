@@ -854,6 +854,7 @@ private:
   std::unique_ptr<region_type> mp_complex_region;
   db::box_convert<db::CellInst> m_box_convert;
 
+  mutable db::LayoutLocker m_locker;
   mutable inst_iterator m_inst;
   mutable inst_array_iterator m_inst_array;
   mutable std::map<db::cell_index_type, bool> m_empty_cells_cache;

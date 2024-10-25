@@ -1780,3 +1780,69 @@ TEST(13_ForMergedPerformance)
   }
 }
 
+//  layout locking
+TEST(14_LayoutLocking)
+{
+  db::Layout layout;
+
+  layout.insert_layer (0);
+
+  db::Cell &c0 (layout.cell (layout.add_cell ()));
+  db::Cell &c1 (layout.cell (layout.add_cell ()));
+
+  db::Box b (0, 100, 1000, 1200);
+  c1.shapes (0).insert (b);
+
+  db::Trans tt;
+  c0.insert (db::CellInstArray (db::CellInst (c1.cell_index ()), tt));
+  c0.insert (db::CellInstArray (db::CellInst (c1.cell_index ()), db::Trans (db::Vector (2000, -2000))));
+
+  EXPECT_EQ (layout.under_construction (), false);
+
+  db::RecursiveShapeIterator iter (layout, c0, 0);
+
+  EXPECT_EQ (layout.under_construction (), false);
+
+  EXPECT_EQ (iter.at_end (), false);
+  EXPECT_EQ (layout.under_construction (), true);
+
+  EXPECT_EQ (iter.shape ().to_string (), "box (0,100;1000,1200)");
+  EXPECT_EQ (layout.under_construction (), true);
+  ++iter;
+
+  EXPECT_EQ (iter.at_end (), false);
+
+  EXPECT_EQ (iter.shape ().to_string (), "box (0,100;1000,1200)");
+  EXPECT_EQ (layout.under_construction (), true);
+  ++iter;
+
+  EXPECT_EQ (layout.under_construction (), false);
+  EXPECT_EQ (iter.at_end (), true);
+
+  //  reset will restart
+  iter.reset ();
+
+  EXPECT_EQ (layout.under_construction (), false);
+
+  EXPECT_EQ (iter.at_end (), false);
+  EXPECT_EQ (layout.under_construction (), true);
+
+  //  a copy will hold the lock
+  iter.reset ();
+
+  EXPECT_EQ (layout.under_construction (), false);
+  EXPECT_EQ (iter.at_end (), false);
+
+  EXPECT_EQ (layout.under_construction (), true);
+  db::RecursiveShapeIterator iter_copy = iter;
+
+  while (! iter.at_end ()) {
+    ++iter;
+  }
+
+  EXPECT_EQ (layout.under_construction (), true);
+  iter_copy = db::RecursiveShapeIterator ();
+
+  EXPECT_EQ (layout.under_construction (), false);
+}
+

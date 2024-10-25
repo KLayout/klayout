@@ -341,7 +341,7 @@ RecursiveShapeIterator::set_global_trans (const cplx_trans_type &tr)
 {
   if (m_global_trans != tr) {
     m_global_trans = tr;
-    m_needs_reinit = true;
+    reset ();
   }
 }
 
@@ -361,7 +361,7 @@ RecursiveShapeIterator::set_region (const box_type &region)
 {
   if (m_region != region || mp_complex_region.get () != 0) {
     init_region (region);
-    m_needs_reinit = true;
+    reset ();
   }
 }
 
@@ -369,7 +369,7 @@ void
 RecursiveShapeIterator::set_region (const region_type &region)
 {
   init_region (region);
-  m_needs_reinit = true;
+  reset ();
 }
 
 void
@@ -382,7 +382,7 @@ RecursiveShapeIterator::confine_region (const box_type &region)
   } else {
     init_region (m_region & region);
   }
-  m_needs_reinit = true;
+  reset ();
 }
 
 void
@@ -395,7 +395,7 @@ RecursiveShapeIterator::confine_region (const region_type &region)
   } else {
     init_region (region & region_type (m_region));
   }
-  m_needs_reinit = true;
+  reset ();
 }
 
 void
@@ -405,7 +405,7 @@ RecursiveShapeIterator::set_layer (unsigned int layer)
     m_has_layers = false;
     m_layers.clear ();
     m_layer = layer;
-    m_needs_reinit = true;
+    reset ();
   }
 }
 
@@ -416,7 +416,7 @@ RecursiveShapeIterator::set_layers (const std::vector<unsigned int> &layers)
     m_has_layers = true;
     m_layers = layers;
     m_layer = 0;
-    m_needs_reinit = true;
+    reset ();
   }
 }
 
@@ -506,7 +506,7 @@ RecursiveShapeIterator::validate (RecursiveShapeReceiver *receiver) const
     next_shape (receiver);
   }
 
-  if (mp_layout) {
+  if (mp_layout && ! at_end ()) {
     m_locker = db::LayoutLocker (const_cast<db::Layout *> (mp_layout.get ()), true);
   }
 }
@@ -519,7 +519,7 @@ RecursiveShapeIterator::reset_selection ()
     m_start.clear ();
     m_stop.clear ();
 
-    m_needs_reinit = true;
+    reset ();
 
   }
 }
@@ -534,7 +534,7 @@ RecursiveShapeIterator::unselect_cells (const std::set<db::cell_index_type> &cel
       m_start.erase (*c);
     }
 
-    m_needs_reinit = true;
+    reset ();
 
   }
 }
@@ -549,9 +549,16 @@ RecursiveShapeIterator::unselect_all_cells ()
       m_stop.insert (c->cell_index ());
     }
 
-    m_needs_reinit = true;
+    reset ();
 
   }
+}
+
+void
+RecursiveShapeIterator::reset ()
+{
+  m_needs_reinit = true;
+  m_locker = db::LayoutLocker ();
 }
 
 void 
@@ -564,7 +571,7 @@ RecursiveShapeIterator::select_cells (const std::set<db::cell_index_type> &cells
       m_stop.erase (*c);
     }
 
-    m_needs_reinit = true;
+    reset ();
 
   }
 }
@@ -579,7 +586,7 @@ RecursiveShapeIterator::select_all_cells ()
       m_start.insert (c->cell_index ());
     }
 
-    m_needs_reinit = true;
+    reset ();
 
   }
 }

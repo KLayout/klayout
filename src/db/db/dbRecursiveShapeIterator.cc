@@ -511,7 +511,14 @@ RecursiveShapeIterator::validate (RecursiveShapeReceiver *receiver) const
   }
 }
 
-void 
+void
+RecursiveShapeIterator::reset ()
+{
+  m_needs_reinit = true;
+  m_locker = db::LayoutLocker ();
+}
+
+void
 RecursiveShapeIterator::reset_selection ()
 {
   if (mp_layout) {
@@ -552,13 +559,6 @@ RecursiveShapeIterator::unselect_all_cells ()
     reset ();
 
   }
-}
-
-void
-RecursiveShapeIterator::reset ()
-{
-  m_needs_reinit = true;
-  m_locker = db::LayoutLocker ();
 }
 
 void 

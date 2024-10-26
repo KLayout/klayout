@@ -61,6 +61,7 @@ RecursiveInstanceIterator &RecursiveInstanceIterator::operator= (const Recursive
 
     m_box_convert = d.m_box_convert;
 
+    m_locker = d.m_locker;
     m_inst = d.m_inst;
     m_inst_array = d.m_inst_array;
     m_empty_cells_cache = d.m_empty_cells_cache;
@@ -175,7 +176,7 @@ RecursiveInstanceIterator::set_region (const box_type &region)
 {
   if (m_region != region || mp_complex_region.get () != 0) {
     init_region (region);
-    m_needs_reinit = true;
+    reset ();
   }
 }
 
@@ -183,7 +184,7 @@ void
 RecursiveInstanceIterator::set_region (const region_type &region)
 {
   init_region (region);
-  m_needs_reinit = true;
+  reset ();
 }
 
 void
@@ -196,7 +197,7 @@ RecursiveInstanceIterator::confine_region (const box_type &region)
   } else {
     init_region (m_region & region);
   }
-  m_needs_reinit = true;
+  reset ();
 }
 
 void
@@ -209,7 +210,7 @@ RecursiveInstanceIterator::confine_region (const region_type &region)
   } else {
     init_region (region & region_type (m_region));
   }
-  m_needs_reinit = true;
+  reset ();
 }
 
 void
@@ -218,7 +219,7 @@ RecursiveInstanceIterator::enable_all_targets ()
   if (! m_all_targets) {
     m_all_targets = true;
     m_targets.clear ();
-    m_needs_reinit = true;
+    reset ();
   }
 }
 
@@ -228,7 +229,7 @@ RecursiveInstanceIterator::set_targets (const std::set<db::cell_index_type> &tgt
   if (m_all_targets || m_targets != tgt) {
     m_targets = tgt;
     m_all_targets = false;
-    m_needs_reinit = true;
+    reset ();
   }
 }
 
@@ -264,6 +265,8 @@ RecursiveInstanceIterator::validate (RecursiveInstanceReceiver *receiver) const
   m_needs_reinit = false;
 
   //  re-initialize
+  m_locker = db::LayoutLocker ();
+
   mp_cell = mp_top_cell;
   m_trans_stack.clear ();
   m_inst_iterators.clear ();
@@ -310,6 +313,17 @@ RecursiveInstanceIterator::validate (RecursiveInstanceReceiver *receiver) const
     next_instance (receiver);
 
   }
+
+  if (mp_layout && ! at_end ()) {
+    m_locker = db::LayoutLocker (const_cast <db::Layout *> (mp_layout.get ()), true);
+  }
+}
+
+void
+RecursiveInstanceIterator::reset ()
+{
+  m_needs_reinit = true;
+  m_locker = db::LayoutLocker ();
 }
 
 void 
@@ -320,7 +334,7 @@ RecursiveInstanceIterator::reset_selection ()
     m_start.clear ();
     m_stop.clear ();
 
-    m_needs_reinit = true;
+    reset ();
 
   }
 }
@@ -335,7 +349,7 @@ RecursiveInstanceIterator::unselect_cells (const std::set<db::cell_index_type> &
       m_start.erase (*c);
     }
 
-    m_needs_reinit = true;
+    reset ();
 
   }
 }
@@ -350,7 +364,7 @@ RecursiveInstanceIterator::unselect_all_cells ()
       m_stop.insert (c->cell_index ());
     }
 
-    m_needs_reinit = true;
+    reset ();
 
   }
 }
@@ -365,7 +379,7 @@ RecursiveInstanceIterator::select_cells (const std::set<db::cell_index_type> &ce
       m_stop.erase (*c);
     }
 
-    m_needs_reinit = true;
+    reset ();
 
   }
 }
@@ -380,7 +394,7 @@ RecursiveInstanceIterator::select_all_cells ()
       m_start.insert (c->cell_index ());
     }
 
-    m_needs_reinit = true;
+    reset ();
 
   }
 }
@@ -441,6 +455,7 @@ void
 RecursiveInstanceIterator::next (RecursiveInstanceReceiver *receiver)
 {
   if (! at_end ()) {
+
     ++m_inst_array;
     if (! m_inst_array.at_end ()) {
       new_inst_member (receiver);
@@ -449,6 +464,12 @@ RecursiveInstanceIterator::next (RecursiveInstanceReceiver *receiver)
       new_inst (receiver);
     }
     next_instance (receiver);
+
+    if (at_end ()) {
+      //  Take this opportunity the release the layout lock.
+      //  This way, the shape iterator can be held further, without blocking the layout.
+      m_locker = db::LayoutLocker ();
+    }
   }
 }
 

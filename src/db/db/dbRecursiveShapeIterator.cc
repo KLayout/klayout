@@ -703,8 +703,8 @@ RecursiveShapeIterator::next (RecursiveShapeReceiver *receiver)
     }
 
     if (at_end ()) {
-      //  release the layout lock if at end - this way, the shape iterator can be
-      //  held further, without blocking the layout.
+      //  Take this opportunity the release the layout lock.
+      //  This way, the shape iterator can be held further, without blocking the layout.
       m_locker = db::LayoutLocker ();
     }
 

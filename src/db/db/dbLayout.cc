@@ -1749,8 +1749,49 @@ Layout::end_top_cells () const
   return m_top_down_list.begin () + m_top_cells;
 }
 
+void
+Layout::start_changes ()
+{
+  tl::MutexLocker locker (&lock ());
+  ++m_invalid;
+}
+
+void
+Layout::end_changes ()
+{
+  tl::MutexLocker locker (&lock ());
+  if (m_invalid > 0) {
+    if (--m_invalid == 0) {
+      force_update_no_lock ();
+    }
+  }
+}
+
+void
+Layout::end_changes_no_update ()
+{
+  tl::MutexLocker locker (&lock ());
+  if (m_invalid > 0) {
+    --m_invalid;
+  }
+}
+
 void 
 Layout::force_update () 
+{
+  //  NOTE: the assumption is that either one thread is writing or
+  //  multiple threads are reading. Hence, we do not need to lock hier_dirty() or bboxes_dirty().
+  //  We still do double checking as another thread might do the update as well.
+  if (! hier_dirty () && ! bboxes_dirty ()) {
+    return;
+  }
+
+  tl::MutexLocker locker (&lock ());
+  force_update_no_lock ();
+}
+
+void
+Layout::force_update_no_lock () const
 {
   if (hier_dirty () || bboxes_dirty ()) {
 
@@ -1776,22 +1817,17 @@ Layout::force_update ()
 void 
 Layout::update () const
 {
-  if (! under_construction () && (hier_dirty () || bboxes_dirty ())) {
+  //  NOTE: the assumption is that either one thread is writing or
+  //  multiple threads are reading. Hence, we do not need to lock hier_dirty() or bboxes_dirty().
+  //  We still do double checking as another thread might do the update as well.
+  if (under_construction () || (! hier_dirty () && ! bboxes_dirty ())) {
+    return;
+  }
 
-    try {
+  tl::MutexLocker locker (&lock ());
 
-      m_invalid = std::numeric_limits<unsigned int>::max ();   //  prevent recursion
-
-      db::LayoutStateModel *state_model = const_cast<db::LayoutStateModel *> ((const db::LayoutStateModel *) this);
-      state_model->update ();
-
-      m_invalid = 0;
-
-    } catch (...) {
-      m_invalid = 0;
-      throw;
-    }
-
+  if (! under_construction ()) {
+    force_update_no_lock ();
   }
 }
 

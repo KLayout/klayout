@@ -28,6 +28,7 @@
 #include "dbTextWriter.h"
 #include "dbCellMapping.h"
 #include "dbInstElement.h"
+#include "dbWriter.h"
 #include "tlString.h"
 #include "tlUnitTest.h"
 
@@ -870,6 +871,68 @@ TEST(11_FindPath)
 
   std::string d = tl::join (path.begin (), path.end (), ";");
   EXPECT_EQ (d, "cell_index=1 r90 *1 0,0;cell_index=2 r0 *1 100,200");
+}
+
+//  Shapes can be flat-iterated even in locked layout
+TEST(12_ShapesInLockedLayout)
+{
+  db::Layout l;
+  db::Cell &top = l.cell (l.add_cell ("TOP"));
+  unsigned int l1 = l.insert_layer (db::LayerProperties (1, 0));
+
+  {
+    db::LayoutLocker locker (&l);
+    EXPECT_EQ (l.under_construction (), true);
+
+    top.shapes (l1).insert (db::Box (1, 2, 3, 4));
+    top.shapes (l1).insert (db::Box (10, 20, 30, 40));
+    top.shapes (l1).insert (db::Box (100, 200, 300, 400));
+
+    double a = 0;
+    for (auto s = top.shapes (l1).begin (db::ShapeIterator::All); ! s.at_end (); ++s) {
+      a += s->area ();
+    }
+    EXPECT_EQ (a, 40404.0);
+  }
+
+  EXPECT_EQ (l.under_construction (), false);
+
+  double a = 0;
+  for (auto s = top.shapes (l1).begin (db::ShapeIterator::All); ! s.at_end (); ++s) {
+    a += s->area ();
+  }
+  EXPECT_EQ (a, 40404.0);
+}
+
+//  Instances can be flat-iterated even in locked layout
+TEST(13_InstancesInLockedLayout)
+{
+  db::Layout l;
+  db::Cell &top = l.cell (l.add_cell ("TOP"));
+  db::Cell &c = l.cell (l.add_cell ("C"));
+
+  {
+    db::LayoutLocker locker (&l);
+    EXPECT_EQ (l.under_construction (), true);
+
+    top.insert (db::CellInstArray (c.cell_index (), db::Trans (db::Vector (10, 20))));
+    top.insert (db::CellInstArray (c.cell_index (), db::Trans (db::Vector (100, 200))));
+    top.insert (db::CellInstArray (c.cell_index (), db::Trans (db::Vector (1, 2))));
+
+    db::Vector a;
+    for (auto i = top.begin (); ! i.at_end (); ++i) {
+      a += i->cell_inst ().front ().disp ();
+    }
+    EXPECT_EQ (a.to_string (), "111,222");
+  }
+
+  EXPECT_EQ (l.under_construction (), false);
+
+  db::Vector a;
+  for (auto i = top.begin (); ! i.at_end (); ++i) {
+    a += i->cell_inst ().front ().disp ();
+  }
+  EXPECT_EQ (a.to_string (), "111,222");
 }
 
 //  issue #1860

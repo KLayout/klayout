@@ -527,7 +527,9 @@ public:
   typedef typename IterTraits::iter_wp_type iter_wp_type;
   typedef typename IterTraits::stable_iter_type stable_iter_type;
   typedef typename IterTraits::stable_iter_wp_type stable_iter_wp_type;
-  typedef const value_type *pointer; 
+  typedef typename IterTraits::stable_unsorted_iter_type stable_unsorted_iter_type;
+  typedef typename IterTraits::stable_unsorted_iter_wp_type stable_unsorted_iter_wp_type;
+  typedef const value_type *pointer;
   typedef value_type reference;   //  operator* returns a value
   typedef std::forward_iterator_tag iterator_category;
   typedef void difference_type;
@@ -541,7 +543,7 @@ public:
    *  @brief Default ctor
    */
   instance_iterator ()
-    : m_with_props (false), m_stable (false), m_type (TNull), m_traits ()
+    : m_type (TNull), m_with_props (false), m_stable (false), m_unsorted (false), m_traits ()
   { }
 
   /**
@@ -556,7 +558,7 @@ public:
    *  @brief Constructor
    */
   instance_iterator (const IterTraits &traits)
-    : m_with_props (false), m_stable (traits.instances ()->is_editable ()), m_type (TInstance), m_traits (traits)
+    : m_type (TInstance), m_with_props (false), m_stable (traits.instances ()->is_editable ()), m_unsorted (traits.instances ()->instance_tree_needs_sort ()), m_traits (traits)
   { 
     make_iter ();
     make_next ();
@@ -567,7 +569,7 @@ public:
    *  @brief Copy constructor
    */
   instance_iterator (const instance_iterator &iter)
-    : m_with_props (false), m_stable (false), m_type (TNull), m_traits ()
+    : m_type (TNull), m_with_props (false), m_stable (false), m_unsorted (false), m_traits ()
   {
     operator= (iter);
   }
@@ -661,7 +663,7 @@ public:
    */
   stable_iter_type &basic_iter (cell_inst_array_type::tag, InstancesEditableTag)
   {
-    tl_assert (m_type == TInstance && m_stable == true && m_with_props == false);
+    tl_assert (m_type == TInstance && m_stable == true && m_with_props == false && m_unsorted == false);
     return *((stable_iter_type *) m_generic.stable_iter);
   }
 
@@ -670,8 +672,26 @@ public:
    */
   const stable_iter_type &basic_iter (cell_inst_array_type::tag, InstancesEditableTag) const
   {
-    tl_assert (m_type == TInstance && m_stable == true && m_with_props == false);
+    tl_assert (m_type == TInstance && m_stable == true && m_with_props == false && m_unsorted == false);
     return *((stable_iter_type *) m_generic.stable_iter);
+  }
+
+  /**
+   *  @brief Gets the basic iterator in the editable case without properties and in the unsorted case
+   */
+  stable_unsorted_iter_type &basic_unsorted_iter (cell_inst_array_type::tag, InstancesEditableTag)
+  {
+    tl_assert (m_type == TInstance && m_stable == true && m_with_props == false && m_unsorted == true);
+    return *((stable_unsorted_iter_type *) m_generic.stable_unsorted_iter);
+  }
+
+  /**
+   *  @brief Gets the basic iterator in the editable case without properties and in the unsorted case (const version)
+   */
+  const stable_unsorted_iter_type &basic_unsorted_iter (cell_inst_array_type::tag, InstancesEditableTag) const
+  {
+    tl_assert (m_type == TInstance && m_stable == true && m_with_props == false && m_unsorted == true);
+    return *((stable_unsorted_iter_type *) m_generic.stable_unsorted_iter);
   }
 
   /**
@@ -697,7 +717,7 @@ public:
    */
   stable_iter_wp_type &basic_iter (cell_inst_wp_array_type::tag, InstancesEditableTag)
   {
-    tl_assert (m_type == TInstance && m_stable == true && m_with_props == true);
+    tl_assert (m_type == TInstance && m_stable == true && m_with_props == true && m_unsorted == false);
     return *((stable_iter_wp_type *) m_generic.pstable_iter);
   }
 
@@ -706,8 +726,26 @@ public:
    */
   const stable_iter_wp_type &basic_iter (cell_inst_wp_array_type::tag, InstancesEditableTag) const
   {
-    tl_assert (m_type == TInstance && m_stable == true && m_with_props == true);
+    tl_assert (m_type == TInstance && m_stable == true && m_with_props == true && m_unsorted == false);
     return *((stable_iter_wp_type *) m_generic.pstable_iter);
+  }
+
+  /**
+   *  @brief Gets the basic iterator in the editable case with properties and in the unsorted case
+   */
+  stable_unsorted_iter_wp_type &basic_unsorted_iter (cell_inst_wp_array_type::tag, InstancesEditableTag)
+  {
+    tl_assert (m_type == TInstance && m_stable == true && m_with_props == true && m_unsorted == true);
+    return *((stable_unsorted_iter_wp_type *) m_generic.pstable_unsorted_iter);
+  }
+
+  /**
+   *  @brief Gets the basic iterator in the editable case with properties and in the unsorted case (const version)
+   */
+  const stable_unsorted_iter_wp_type &basic_unsorted_iter (cell_inst_wp_array_type::tag, InstancesEditableTag) const
+  {
+    tl_assert (m_type == TInstance && m_stable == true && m_with_props == true && m_unsorted == true);
+    return *((stable_unsorted_iter_wp_type *) m_generic.pstable_unsorted_iter);
   }
 
 private:
@@ -720,11 +758,14 @@ private:
     char piter[sizeof (iter_wp_type)];
     char stable_iter[sizeof (stable_iter_type)];
     char pstable_iter[sizeof (stable_iter_wp_type)];
+    char stable_unsorted_iter[sizeof (stable_unsorted_iter_type)];
+    char pstable_unsorted_iter[sizeof (stable_unsorted_iter_wp_type)];
   } m_generic;
 
-  bool m_with_props : 8;
-  bool m_stable : 8;
   object_type m_type : 16;
+  bool m_with_props : 1;
+  bool m_stable : 1;
+  bool m_unsorted : 1;
   value_type m_ref;
   IterTraits m_traits;
 
@@ -759,6 +800,8 @@ struct DB_PUBLIC NormalInstanceIteratorTraits
   typedef tl::iterator_pair<cell_inst_wp_tree_type::const_iterator> iter_wp_type;
   typedef stable_cell_inst_tree_type::flat_iterator stable_iter_type;
   typedef stable_cell_inst_wp_tree_type::flat_iterator stable_iter_wp_type;
+  typedef tl::iterator_pair<stable_cell_inst_tree_type::const_iterator> stable_unsorted_iter_type;
+  typedef tl::iterator_pair<stable_cell_inst_wp_tree_type::const_iterator> stable_unsorted_iter_wp_type;
 
   NormalInstanceIteratorTraits ();
   NormalInstanceIteratorTraits (const instances_type *insts);
@@ -804,6 +847,8 @@ struct DB_PUBLIC TouchingInstanceIteratorTraits
   typedef cell_inst_wp_tree_type::touching_iterator iter_wp_type;
   typedef stable_cell_inst_tree_type::touching_iterator stable_iter_type;
   typedef stable_cell_inst_wp_tree_type::touching_iterator stable_iter_wp_type;
+  typedef stable_iter_type stable_unsorted_iter_type;
+  typedef stable_iter_wp_type stable_unsorted_iter_wp_type;
 
   TouchingInstanceIteratorTraits ();
   TouchingInstanceIteratorTraits (const instances_type *insts, const box_type &box, const layout_type *layout);
@@ -855,6 +900,8 @@ struct DB_PUBLIC OverlappingInstanceIteratorTraits
   typedef cell_inst_wp_tree_type::overlapping_iterator iter_wp_type;
   typedef stable_cell_inst_tree_type::overlapping_iterator stable_iter_type;
   typedef stable_cell_inst_wp_tree_type::overlapping_iterator stable_iter_wp_type;
+  typedef stable_iter_type stable_unsorted_iter_type;
+  typedef stable_iter_wp_type stable_unsorted_iter_wp_type;
 
   OverlappingInstanceIteratorTraits ();
   OverlappingInstanceIteratorTraits (const instances_type *insts, const box_type &box, const layout_type *layout);
@@ -1741,6 +1788,7 @@ private:
   friend struct NormalInstanceIteratorTraits;
   friend struct TouchingInstanceIteratorTraits;
   friend struct OverlappingInstanceIteratorTraits;
+  template <class Traits> friend class instance_iterator;
   template <class Inst, class ET> friend class InstOp;
 
   union {
@@ -1773,7 +1821,7 @@ private:
   }
 
   /**
-   *  @brief Sets a flag indicating that the instance tree needs sorting
+   *  @brief Gets a flag indicating that the instance tree needs sorting
    */
   bool instance_tree_needs_sort () const
   {

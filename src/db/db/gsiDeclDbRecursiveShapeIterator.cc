@@ -804,6 +804,11 @@ Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("db", "RecursiveS
   "all cells not starting with one of that letters.\n"
   "\n"
   "The RecursiveShapeIterator class has been introduced in version 0.18 and has been extended substantially in 0.23.\n"
+  "Starting with version 0.29.9, the recursive shape iterator will lock the layout it acts on while in iterating mode. "
+  "While the iterator is active, the Layout object is maintained in 'under construction mode' (see \\Layout#under_construction). "
+  "This is to prevent layout modifications to interfere with the iterator's operation. Specifically when coding in Ruby, "
+  "pending iterators may block the Layout until the garbage collector cleans up these objects. To avoid this, call \\_destroy "
+  "on the iterator when you no longer need it. The Layout is automatically unlocked when the iterator reaches the end."
 );
 
 }

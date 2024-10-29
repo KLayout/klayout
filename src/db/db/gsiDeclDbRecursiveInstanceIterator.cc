@@ -603,6 +603,11 @@ Class<db::RecursiveInstanceIterator> decl_RecursiveInstanceIterator ("db", "Recu
   "and the target cell of the current instance.\n"
   "\n"
   "The RecursiveInstanceIterator class has been introduced in version 0.27.\n"
+  "Starting with version 0.29.9, the recursive instance iterator will lock the layout it acts on while in iterating mode. "
+  "While the iterator is active, the Layout object is maintained in 'under construction mode' (see \\Layout#under_construction). "
+  "This is to prevent layout modifications to interfere with the iterator's operation. Specifically when coding in Ruby, "
+  "pending iterators may block the Layout until the garbage collector cleans up these objects. To avoid this, call \\_destroy "
+  "on the iterator when you no longer need it. The Layout is automatically unlocked when the iterator reaches the end."
 );
 
 }

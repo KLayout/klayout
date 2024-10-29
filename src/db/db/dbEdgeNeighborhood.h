@@ -110,6 +110,9 @@ private:
   tl::weak_ptr<EdgeNeighborhoodVisitor> mp_visitor;
 
   void do_collect_neighbors (db::box_scanner2<db::Edge, unsigned int, db::Polygon, unsigned int> &scanner, const db::Layout *layout, const db::Cell *cell) const;
+
+  template <class T>
+  void compute_local_impl (CompoundRegionOperationCache * /*cache*/, db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<T, T> & /*interactions*/, std::vector<std::unordered_set<db::Edge> > & /*results*/, const db::LocalProcessorBase * /*proc*/) const;
 };
 
 }

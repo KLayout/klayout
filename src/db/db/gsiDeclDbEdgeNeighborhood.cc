@@ -218,9 +218,9 @@ gsi::ClassExt<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode_
     "@param children The inputs to use. The first one in the primary input, the others are neighbors.\n"
     "@param visitor The visitor object (see \\EdgeNeighborhoodVisitor) receiving the edge events.\n"
     "@param bext The search window extension to use at the edge beginning.\n"
-    "@param eext The search window extension to use at the edge beginning.\n"
-    "@param din The search window extension to use at the edge beginning.\n"
-    "@param dout The search window extension to use at the edge beginning.\n"
+    "@param eext The search window extension to use at the edge end.\n"
+    "@param din The search window extension to the 'outside' of the edge.\n"
+    "@param dout The search window extension to the 'inside' of the edge.\n"
     "\n"
     "This constructor has been introduced in version 0.29.9.\n"
   )

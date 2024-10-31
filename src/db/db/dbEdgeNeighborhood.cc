@@ -165,9 +165,9 @@ private:
       return;
     }
 
+    //  compute normal and unit vector along edge
     db::DVector e = db::DVector (edge.d ());
     e = e * (1.0 / e.double_length ());
-
     db::DVector ne (-e.y (), e.x ());
 
     //  transform on the edge
@@ -183,11 +183,37 @@ private:
     db::Coord xmin = -m_bext - 1;
     db::Coord xmax = ref_edge.dx () + m_eext + 1;
 
+    db::SimplePolygon per_edge_clip_box (db::Box (xmin, -m_din - 1, xmax, m_dout + 1));
+
+    //  compute the merged neighbors
+    std::map<unsigned int, std::vector<db::Polygon> > merged_neighbors;
+
+    db::EdgeProcessor ep;
     for (auto n = neighbors.begin (); n != neighbors.end (); ++n) {
+
+      ep.clear ();
+
+      size_t id = 0;
+      for (auto nn = n->second.begin (); nn != n->second.end (); ++nn) {
+        for (auto e = (*nn)->begin_edge (); ! e.at_end (); ++e) {
+          ep.insert (itrans * (move * *e), id);
+        }
+        id += 2;
+      }
+
+      ep.insert (per_edge_clip_box, size_t (1));
+
+      db::BooleanOp and_op (db::BooleanOp::And);
+      db::PolygonContainer pc (merged_neighbors [n->first]);
+      db::PolygonGenerator pg (pc, false);
+      ep.process (pg, and_op);
+
+    }
+
+    for (auto n = merged_neighbors.begin (); n != merged_neighbors.end (); ++n) {
       for (auto p = n->second.begin (); p != n->second.end (); ++p) {
-        db::Polygon poly = itrans * (move * **p);
-        for (auto p = poly.begin_edge (); ! p.at_end (); ++p) {
-          db::Edge e = *p;
+        for (auto pe = p->begin_edge (); ! pe.at_end (); ++pe) {
+          db::Edge e = *pe;
           xpos.insert (std::max (xmin, std::min (xmax, e.p1 ().x ())));
           xpos.insert (std::max (xmin, std::min (xmax, e.p2 ().x ())));
         }
@@ -210,12 +236,12 @@ private:
       db::Box clip_box (xfrom, -m_din - 1, xto, m_dout + 1);
 
       //  NOTE: this could be more efficient if we had a multi-layer capable trapezoid decomposition tool
-      for (auto n = neighbors.begin (); n != neighbors.end (); ++n) {
+      for (auto n = merged_neighbors.begin (); n != merged_neighbors.end (); ++n) {
 
-          EdgeNeighborhoodVisitor::neighbor_shapes_type polygons;
+        EdgeNeighborhoodVisitor::neighbor_shapes_type polygons;
+
         for (auto p = n->second.begin (); p != n->second.end (); ++p) {
-          db::Polygon poly = itrans * (move * **p);
-          db::clip_poly (poly, clip_box, polygons, false);
+          db::clip_poly (*p, clip_box, polygons, false);
         }
 
         if (!polygons.empty ()) {

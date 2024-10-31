@@ -59,7 +59,7 @@ public:
 
   gsi::Callback f_on_edge;
 
-  void issue_begin_polygon (const db::Layout *, const db::Cell *, const db::Polygon &poly)
+  void issue_begin_polygon (const db::Layout *, const db::Cell *, const db::Polygon &)
   {
     //  just for signature
   }
@@ -148,7 +148,7 @@ Class<gsi::EdgeNeighborhoodVisitorImpl> decl_EdgeNeighborhoodVisitorImpl (decl_E
     "\n"
     "@code\n"
     "[\n"
-    "  [ [ from, to ], { input_index => polygons }\n"
+    "  [ [ from, to ], { input_index => polygons } ]\n"
     "]\n"
     "@/code\n"
     "\n"
@@ -168,6 +168,30 @@ Class<gsi::EdgeNeighborhoodVisitorImpl> decl_EdgeNeighborhoodVisitorImpl (decl_E
   gsi::callback ("end_polygon", &EdgeNeighborhoodVisitorImpl::issue_end_polygon, &EdgeNeighborhoodVisitorImpl::f_end_polygon,
     "@brief Is called after the polygon\n"
     "See \\begin_polygon for a description of this protocol."
+  ) +
+  gsi::method ("output", &EdgeNeighborhoodVisitorImpl::output_polygon, gsi::arg ("polygon"),
+    "@brief Outputs a polygon\n"
+    "Use this method from one of the callbacks (\\on_edge, \\begin_polygon, \\end_polygon) to deliver a polygon. "
+    "Note that you have to configure the result type as 'Region' on construction of the visitor before being able to do so."
+  ) +
+  gsi::method ("output", &EdgeNeighborhoodVisitorImpl::output_edge, gsi::arg ("edge"),
+    "@brief Outputs an edge\n"
+    "Use this method from one of the callbacks (\\on_edge, \\begin_polygon, \\end_polygon) to deliver a polygon. "
+    "Note that you have to configure the result type as 'Edges' on construction of the visitor before being able to do so."
+  ) +
+  gsi::method ("output", &EdgeNeighborhoodVisitorImpl::output_edge_pair, gsi::arg ("edge_pair"),
+    "@brief Outputs an edge pair\n"
+    "Use this method from one of the callbacks (\\on_edge, \\begin_polygon, \\end_polygon) to deliver a polygon. "
+    "Note that you have to configure the result type as 'EdgePairs' on construction of the visitor before being able to do so."
+  ) +
+  gsi::method ("result_type=", &EdgeNeighborhoodVisitorImpl::set_result_type, gsi::arg ("result_type"),
+    "@brief Configures the result type\n"
+    "Use this method to indicate what type of result you want to deliver. You can use the corresponding 'output' method then to "
+    "deliver result shapes from one the callbacks (\\on_edge, \\begin_polygon, \\end_polygon). Set this attribute when you create "
+    "the visitor object. This attribute does not need to be set if no output is indended to be delivered."
+  ) +
+  gsi::method ("result_type", &EdgeNeighborhoodVisitorImpl::result_type,
+    "@brief Gets the result type\n"
   ),
   "@brief A visitor for the neighborhood of edges in the input\n"
   "\n"
@@ -176,7 +200,7 @@ Class<gsi::EdgeNeighborhoodVisitorImpl> decl_EdgeNeighborhoodVisitorImpl (decl_E
   "\n"
   "See \\on_edge for the description of the events delivered."
   "\n"
-  "This class has been introduced in version 0.xx.\n" // @@@
+  "This class has been introduced in version 0.29.9.\n"
 );
 
 // ---------------------------------------------------------------------------------
@@ -197,6 +221,8 @@ gsi::ClassExt<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode_
     "@param eext The search window extension to use at the edge beginning.\n"
     "@param din The search window extension to use at the edge beginning.\n"
     "@param dout The search window extension to use at the edge beginning.\n"
+    "\n"
+    "This constructor has been introduced in version 0.29.9.\n"
   )
 );
 

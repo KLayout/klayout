@@ -27,6 +27,86 @@
 namespace db
 {
 
+// --------------------------------------------------------------------------------------------------
+
+EdgeNeighborhoodVisitor::EdgeNeighborhoodVisitor ()
+  : m_result_type (db::CompoundRegionOperationNode::ResultType::Edges)
+{
+  disconnect_outputs ();
+}
+
+void
+EdgeNeighborhoodVisitor::connect_output (Layout * /*layout*/, std::unordered_set<db::Polygon> *polygons) const
+{
+  disconnect_outputs ();
+  mp_polygons = polygons;
+}
+
+void
+EdgeNeighborhoodVisitor::connect_output (db::Layout *layout, std::unordered_set<db::PolygonRef> *polygons) const
+{
+  disconnect_outputs ();
+  mp_layout = layout;
+  mp_polygon_refs = polygons;
+}
+
+void
+EdgeNeighborhoodVisitor::connect_output (db::Layout * /*layout*/, std::unordered_set<db::Edge> *edges) const
+{
+  disconnect_outputs ();
+  mp_edges = edges;
+}
+
+void
+EdgeNeighborhoodVisitor::connect_output (Layout * /*layout*/, std::unordered_set<db::EdgePair> *edge_pairs) const
+{
+  disconnect_outputs ();
+  mp_edge_pairs = edge_pairs;
+}
+
+void
+EdgeNeighborhoodVisitor::disconnect_outputs () const
+{
+  mp_layout = 0;
+  mp_polygons = 0;
+  mp_polygon_refs = 0;
+  mp_edges = 0;
+  mp_edge_pairs = 0;
+}
+
+void
+EdgeNeighborhoodVisitor::output_polygon (const db::Polygon &poly)
+{
+  if (mp_polygons) {
+    mp_polygons->insert (poly);
+  } else if (mp_polygon_refs) {
+    tl_assert (mp_layout != 0);
+    mp_polygon_refs->insert (db::PolygonRef (poly, mp_layout->shape_repository ()));
+  } else {
+    throw tl::Exception (tl::to_string (tr ("EdgeNeighborhoodVisitor is not configured for edge output (use 'result_type=Edges')")));
+  }
+}
+
+void
+EdgeNeighborhoodVisitor::output_edge (const db::Edge &edge)
+{
+  if (mp_edges == 0) {
+    throw tl::Exception (tl::to_string (tr ("EdgeNeighborhoodVisitor is not configured for edge output (use 'result_type=Edges')")));
+  }
+  mp_edges->insert (edge);
+}
+
+void
+EdgeNeighborhoodVisitor::output_edge_pair (const db::EdgePair &edge_pair)
+{
+  if (mp_edge_pairs == 0) {
+    throw tl::Exception (tl::to_string (tr ("EdgeNeighborhoodVisitor is not configured for edge pair output (use 'result_type=EdgePairs')")));
+  }
+  mp_edge_pairs->insert (edge_pair);
+}
+
+// --------------------------------------------------------------------------------------------------
+
 EdgeNeighborhoodCompoundOperationNode::EdgeNeighborhoodCompoundOperationNode (const std::vector<CompoundRegionOperationNode *> &children, EdgeNeighborhoodVisitor *visitor, db::Coord bext, db::Coord eext, db::Coord din, db::Coord dout)
   : CompoundRegionMultiInputOperationNode (children), m_bext (bext), m_eext (eext), m_din (din), m_dout (dout), mp_visitor (visitor)
 {
@@ -172,54 +252,90 @@ EdgeNeighborhoodCompoundOperationNode::do_collect_neighbors (db::box_scanner2<db
 void
 EdgeNeighborhoodCompoundOperationNode::do_compute_local (CompoundRegionOperationCache *cache, db::Layout *layout, db::Cell *cell, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Edge> > &results, const db::LocalProcessorBase *proc) const
 {
-  compute_local_impl<db::PolygonRef> (cache, layout, cell, interactions, results, proc);
+  compute_local_impl<db::PolygonRef, db::Edge> (cache, layout, cell, interactions, results, proc);
 }
 
 void
 EdgeNeighborhoodCompoundOperationNode::do_compute_local (CompoundRegionOperationCache *cache, db::Layout *layout, db::Cell *cell, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Edge> > &results, const db::LocalProcessorBase *proc) const
 {
-  compute_local_impl<db::Polygon> (cache, layout, cell, interactions, results, proc);
+  compute_local_impl<db::Polygon, db::Edge> (cache, layout, cell, interactions, results, proc);
 }
 
-template <class T>
 void
-EdgeNeighborhoodCompoundOperationNode::compute_local_impl (CompoundRegionOperationCache *cache, db::Layout *layout, db::Cell *cell, const shape_interactions<T, T> &interactions, std::vector<std::unordered_set<db::Edge> > & /*results*/, const db::LocalProcessorBase *proc) const
+EdgeNeighborhoodCompoundOperationNode::do_compute_local (CompoundRegionOperationCache *cache, db::Layout *layout, db::Cell *cell, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, const db::LocalProcessorBase *proc) const
+{
+  compute_local_impl<db::Polygon, db::Polygon> (cache, layout, cell, interactions, results, proc);
+}
+
+void
+EdgeNeighborhoodCompoundOperationNode::do_compute_local (CompoundRegionOperationCache *cache, db::Layout *layout, db::Cell *cell, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, const db::LocalProcessorBase *proc) const
+{
+  compute_local_impl<db::Polygon, db::EdgePair> (cache, layout, cell, interactions, results, proc);
+}
+
+void
+EdgeNeighborhoodCompoundOperationNode::do_compute_local (CompoundRegionOperationCache *cache, db::Layout *layout, db::Cell *cell, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, const db::LocalProcessorBase *proc) const
+{
+  compute_local_impl<db::PolygonRef, db::PolygonRef> (cache, layout, cell, interactions, results, proc);
+}
+
+void
+EdgeNeighborhoodCompoundOperationNode::do_compute_local (CompoundRegionOperationCache *cache, db::Layout *layout, db::Cell *cell, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, const db::LocalProcessorBase *proc) const
+{
+  compute_local_impl<db::PolygonRef, db::EdgePair> (cache, layout, cell, interactions, results, proc);
+}
+
+template <class T, class TR>
+void
+EdgeNeighborhoodCompoundOperationNode::compute_local_impl (CompoundRegionOperationCache *cache, db::Layout *layout, db::Cell *cell, const shape_interactions<T, T> &interactions, std::vector<std::unordered_set<TR> > &results, const db::LocalProcessorBase *proc) const
 {
   if (! mp_visitor) {
     return;
   }
   tl_assert (interactions.num_subjects () == 1);
+  tl_assert (! results.empty ());
 
-  db::box_scanner2<db::Edge, unsigned int, db::Polygon, unsigned int> scanner;
+  try {
 
-  std::list<db::Edge> edges;
-  std::list<db::Polygon> polygons;
+    mp_visitor->connect_output (layout, &results.front ());
 
-  for (unsigned int i = 0; i < children (); ++i) {
+    db::box_scanner2<db::Edge, unsigned int, db::Polygon, unsigned int> scanner;
 
-    std::vector<std::unordered_set<T> > others;
-    others.push_back (std::unordered_set<T> ());
+    std::list<db::Edge> edges;
+    std::list<db::Polygon> polygons;
 
-    shape_interactions<T, T> computed_interactions;
-    child (i)->compute_local (cache, layout, cell, interactions_for_child (interactions, i, computed_interactions), others, proc);
+    for (unsigned int i = 0; i < children (); ++i) {
 
-    for (auto p = others.front ().begin (); p != others.front ().end (); ++p) {
-      polygons.push_back (p->instantiate ());
-      scanner.insert2 (&polygons.back (), i);
+      std::vector<std::unordered_set<T> > others;
+      others.push_back (std::unordered_set<T> ());
+
+      shape_interactions<T, T> computed_interactions;
+      child (i)->compute_local (cache, layout, cell, interactions_for_child (interactions, i, computed_interactions), others, proc);
+
+      for (auto p = others.front ().begin (); p != others.front ().end (); ++p) {
+        polygons.push_back (p->instantiate ());
+        scanner.insert2 (&polygons.back (), i);
+      }
+
     }
 
-  }
+    const T &pr = interactions.begin_subjects ()->second;
+    unsigned int ie = 0;
+    for (auto e = pr.begin_edge (); ! e.at_end (); ++e, ++ie) {
+      edges.push_back (*e);
+      scanner.insert1 (&edges.back (), ie);
+    }
 
-  const T &pr = interactions.begin_subjects ()->second;
-  unsigned int ie = 0;
-  for (auto e = pr.begin_edge (); ! e.at_end (); ++e, ++ie) {
-    edges.push_back (*e);
-    scanner.insert1 (&edges.back (), ie);
-  }
+    const_cast<db::EdgeNeighborhoodVisitor *> (mp_visitor.get ())->begin_polygon (layout, cell, pr.instantiate ());
+    do_collect_neighbors (scanner, layout, cell);
+    const_cast<db::EdgeNeighborhoodVisitor *> (mp_visitor.get ())->end_polygon ();
 
-  const_cast<db::EdgeNeighborhoodVisitor *> (mp_visitor.get ())->begin_polygon (layout, cell, pr.instantiate ());
-  do_collect_neighbors (scanner, layout, cell);
-  const_cast<db::EdgeNeighborhoodVisitor *> (mp_visitor.get ())->end_polygon ();
+    mp_visitor->disconnect_outputs ();
+
+  } catch (...) {
+    mp_visitor->disconnect_outputs ();
+    throw;
+  }
 }
 
 }

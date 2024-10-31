@@ -117,7 +117,7 @@ EdgeNeighborhoodCompoundOperationNode::EdgeNeighborhoodCompoundOperationNode (co
 db::Coord
 EdgeNeighborhoodCompoundOperationNode::computed_dist () const
 {
-  return std::max (std::max (m_bext, m_eext), std::max (m_din, m_dout));
+  return std::max (std::max (m_bext, m_eext), std::max (m_din, m_dout)) + 1;
 }
 
 std::string
@@ -140,24 +140,40 @@ public:
     //  .. nothing yet ..
   }
 
-  void add (const db::Edge *o1, const unsigned int & /*p1*/, const db::Polygon *o2, const unsigned int &p2)
+  void add (const db::Edge *o1, const unsigned int &p1, const db::Polygon *o2, const unsigned int &p2)
   {
-    m_edge_neighbors[o1][p2].push_back (o2);
+    m_edge_neighbors[p1][p2].push_back (o2);
+    enter_edge (o1, p1);
+  }
+
+  void finish1 (const db::Edge *o1, const unsigned int &p1)
+  {
+    m_edge_neighbors[p1];
+    enter_edge (o1, p1);
   }
 
   void finalize (bool)
   {
     for (auto en = m_edge_neighbors.begin (); en != m_edge_neighbors.end (); ++en) {
-      commit_edge (*en->first, en->second);
+      commit_edge (m_edges[en->first], en->second);
     }
   }
 
 private:
-  std::map<const db::Edge *, std::map<unsigned int, std::vector<const db::Polygon *> > > m_edge_neighbors;
+  std::map<unsigned int, std::map<unsigned int, std::vector<const db::Polygon *> > > m_edge_neighbors;
+  std::vector<db::Edge> m_edges;
   db::EdgeNeighborhoodVisitor *mp_visitor;
   const db::Layout *mp_layout;
   const db::Cell *mp_cell;
   db::Coord m_bext, m_eext, m_din, m_dout;
+
+  void enter_edge (const db::Edge *o1, const unsigned int &p1)
+  {
+    while (size_t (p1) >= m_edges.size ()) {
+      m_edges.push_back (db::Edge ());
+    }
+    m_edges[p1] = *o1;
+  }
 
   void commit_edge (const db::Edge &edge, const std::map<unsigned int, std::vector<const db::Polygon *> > &neighbors) const
   {

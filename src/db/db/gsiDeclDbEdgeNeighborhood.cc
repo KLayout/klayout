@@ -172,17 +172,34 @@ Class<gsi::EdgeNeighborhoodVisitorImpl> decl_EdgeNeighborhoodVisitorImpl (decl_E
   gsi::method ("output", &EdgeNeighborhoodVisitorImpl::output_polygon, gsi::arg ("polygon"),
     "@brief Outputs a polygon\n"
     "Use this method from one of the callbacks (\\on_edge, \\begin_polygon, \\end_polygon) to deliver a polygon. "
-    "Note that you have to configure the result type as 'Region' on construction of the visitor before being able to do so."
+    "Note that you have to configure the result type as 'Region' on construction of the visitor before being able to do so.\n"
+    "\n"
+    "'output' expects an object in original space - i.e. of the input edge. \\to_original_trans gives you a suitable "
+    "transformation to bring objects from 'edge is horizontal' space into the original space."
   ) +
   gsi::method ("output", &EdgeNeighborhoodVisitorImpl::output_edge, gsi::arg ("edge"),
     "@brief Outputs an edge\n"
     "Use this method from one of the callbacks (\\on_edge, \\begin_polygon, \\end_polygon) to deliver a polygon. "
     "Note that you have to configure the result type as 'Edges' on construction of the visitor before being able to do so."
+    "\n"
+    "'output' expects an object in original space - i.e. of the input edge. \\to_original_trans gives you a suitable "
+    "transformation to bring objects from 'edge is horizontal' space into the original space."
   ) +
   gsi::method ("output", &EdgeNeighborhoodVisitorImpl::output_edge_pair, gsi::arg ("edge_pair"),
     "@brief Outputs an edge pair\n"
     "Use this method from one of the callbacks (\\on_edge, \\begin_polygon, \\end_polygon) to deliver a polygon. "
     "Note that you have to configure the result type as 'EdgePairs' on construction of the visitor before being able to do so."
+    "\n"
+    "'output' expects an object in original space - i.e. of the input edge. \\to_original_trans gives you a suitable "
+    "transformation to bring objects from 'edge is horizontal' space into the original space."
+  ) +
+  gsi::method ("to_original_trans", &EdgeNeighborhoodVisitorImpl::to_original_trans, gsi::arg ("edge"),
+    "@brief For a given edge, computes the transformation that brings objects from the normalized space (edge is horizontal) to the original space of the edge.\n"
+    "Use this method to compute the objects suitable for 'output', after you derived them in edge-local space.\n"
+  ) +
+  gsi::method ("to_edge_local_trans", &EdgeNeighborhoodVisitorImpl::to_edge_local_trans, gsi::arg ("edge"),
+    "@brief For a given edge, computes the transformation that brings objects from original space to the edge-local space where the edge is horizontal.\n"
+    "Technically, this transformation is the inverse of \\to_original_trans.\n"
   ) +
   gsi::method ("result_type=", &EdgeNeighborhoodVisitorImpl::set_result_type, gsi::arg ("result_type"),
     "@brief Configures the result type\n"

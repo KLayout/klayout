@@ -62,19 +62,13 @@ public:
 
   void on_edge (const db::Layout * /*layout*/, const db::Cell * /*cell*/, const db::Edge &edge, const neighbors_type &neighbors)
   {
-    //  Compute transformation to original edge
-    db::DVector e = db::DVector (edge.d ());
-    e = e * (1.0 / e.double_length ());
-    db::DVector ne (-e.y (), e.x ());
-
-    db::IMatrix2d trans (e.x (), ne.x (), e.y (), ne.y ());
-    db::Disp move (edge.p1 () - db::Point ());
+    db::IMatrix3d trans = to_original_trans (edge);
 
     for (auto n = neighbors.begin (); n != neighbors.end (); ++n) {
       for (auto nn = n->second.begin (); nn != n->second.end (); ++nn) {
         if (nn->first == m_input) {
           for (auto p = nn->second.begin (); p != nn->second.end (); ++p) {
-            output_polygon (move * (trans * *p));
+            output_polygon (trans * *p);
           }
         }
       }

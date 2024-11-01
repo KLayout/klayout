@@ -28,6 +28,7 @@
 #include "dbCommon.h"
 #include "dbCompoundOperation.h"
 #include "dbBoxScanner.h"
+#include "dbMatrix.h"
 
 namespace db
 {
@@ -96,6 +97,16 @@ public:
    *  @brief Event handler for each edge plus it's neighborhood
    */
   virtual void on_edge (const db::Layout * /*layout*/, const db::Cell * /*cell*/, const db::Edge & /*edge*/, const neighbors_type & /*neighbors*/) { }
+
+  /**
+   *  @brief Gets a transformation to transform from edge-local space to original space
+   */
+  static db::IMatrix3d to_original_trans (const db::Edge &edge);
+
+  /**
+   *  @brief Gets a transformation to transform from original space into edge-local space
+   */
+  static db::IMatrix3d to_edge_local_trans (const db::Edge &edge);
 
   /**
    *  @brief Sets the result type

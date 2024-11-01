@@ -27,6 +27,17 @@
 namespace db
 {
 
+static db::IMatrix3d to_original_trans (const db::Edge &edge)
+{
+  //  compute normal and unit vector along edge
+  db::DVector e = db::DVector (edge.d ());
+  e = e * (1.0 / e.double_length ());
+  db::DVector ne (-e.y (), e.x ());
+
+  //  transform on the edge
+  return db::IMatrix3d (e.x (), ne.x (), e.y (), ne.y (), edge.p1 ().x (), edge.p1 ().y (), 0.0, 0.0);
+}
+
 // --------------------------------------------------------------------------------------------------
 
 EdgeNeighborhoodVisitor::EdgeNeighborhoodVisitor ()
@@ -105,6 +116,18 @@ EdgeNeighborhoodVisitor::output_edge_pair (const db::EdgePair &edge_pair)
   mp_edge_pairs->insert (edge_pair);
 }
 
+db::IMatrix3d
+EdgeNeighborhoodVisitor::to_original_trans (const db::Edge &edge)
+{
+  return db::to_original_trans (edge);
+}
+
+db::IMatrix3d
+EdgeNeighborhoodVisitor::to_edge_local_trans (const db::Edge &edge)
+{
+  return db::to_original_trans (edge).inverted ();
+}
+
 // --------------------------------------------------------------------------------------------------
 
 EdgeNeighborhoodCompoundOperationNode::EdgeNeighborhoodCompoundOperationNode (const std::vector<CompoundRegionOperationNode *> &children, EdgeNeighborhoodVisitor *visitor, db::Coord bext, db::Coord eext, db::Coord din, db::Coord dout)
@@ -181,17 +204,9 @@ private:
       return;
     }
 
-    //  compute normal and unit vector along edge
-    db::DVector e = db::DVector (edge.d ());
-    e = e * (1.0 / e.double_length ());
-    db::DVector ne (-e.y (), e.x ());
+    db::IMatrix3d from_original_trans = db::to_original_trans (edge).inverted ();
 
-    //  transform on the edge
-    db::IMatrix2d trans (e.x (), ne.x (), e.y (), ne.y ());
-    db::IMatrix2d itrans = trans.inverted ();
-    db::Disp move (db::Point () - edge.p1 ());
-
-    db::Edge ref_edge = itrans * (move * edge);
+    db::Edge ref_edge = from_original_trans * edge;
     tl_assert (ref_edge.dy () == 0);
     tl_assert (ref_edge.dx () > 0);
 
@@ -212,7 +227,7 @@ private:
       size_t id = 0;
       for (auto nn = n->second.begin (); nn != n->second.end (); ++nn) {
         for (auto e = (*nn)->begin_edge (); ! e.at_end (); ++e) {
-          ep.insert (itrans * (move * *e), id);
+          ep.insert (from_original_trans * *e, id);
         }
         id += 2;
       }

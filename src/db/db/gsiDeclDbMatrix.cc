@@ -27,6 +27,7 @@
 #include "dbBox.h"
 #include "dbPolygon.h"
 #include "dbEdge.h"
+#include "dbEdgePair.h"
 
 namespace gsi
 {
@@ -126,6 +127,12 @@ static db::box<C> trans_box (const db::matrix_2d<C> *m, const db::box<C> &p)
 
 template <class C>
 static db::edge<C> trans_edge (const db::matrix_2d<C> *m, const db::edge<C> &e)
+{
+  return e.transformed (*m);
+}
+
+template <class C>
+static db::edge_pair<C> trans_edge_pair (const db::matrix_2d<C> *m, const db::edge_pair<C> &e)
 {
   return e.transformed (*m);
 }
@@ -233,6 +240,12 @@ matrix2d_methods ()
       "@brief Transforms an edge with this matrix.\n"
       "@param e The edge to transform.\n"
       "@return The transformed edge\n"
+    ) +
+    gsi::method_ext ("*", &trans_edge_pair<C>, gsi::arg ("ep"),
+      "@brief Transforms an edge pair with this matrix.\n"
+      "@param ep The edge pair to transform.\n"
+      "@return The transformed edge\n"
+      "This variant has been added in version 0.29.9."
     ) +
     gsi::method_ext ("*", &trans_box<C>, gsi::arg ("box"),
       "@brief Transforms a box with this matrix.\n"
@@ -446,6 +459,12 @@ static db::edge<C> trans_edge3 (const db::matrix_3d<C> *m, const db::edge<C> &e)
 }
 
 template <class C>
+static db::edge_pair<C> trans_edge_pair3 (const db::matrix_3d<C> *m, const db::edge_pair<C> &e)
+{
+  return e.transformed (*m);
+}
+
+template <class C>
 static double coeff_m3 (const db::matrix_3d<C> *m, int i, int j)
 {
   if (i < 0 || i >= 3 || j < 0 || j >= 3) {
@@ -616,6 +635,12 @@ matrix3d_methods ()
       "@brief Transforms an edge with this matrix.\n"
       "@param e The edge to transform.\n"
       "@return The transformed edge\n"
+    ) +
+    gsi::method_ext ("*", &trans_edge_pair3<C>, gsi::arg ("ep"),
+      "@brief Transforms an edge pair with this matrix.\n"
+      "@param ep The edge pair to transform.\n"
+      "@return The transformed edge pair\n"
+      "This variant has been added in version 0.29.9."
     ) +
     gsi::method_ext ("*", &trans_box3<C>, gsi::arg ("box"),
       "@brief Transforms a box with this matrix.\n"

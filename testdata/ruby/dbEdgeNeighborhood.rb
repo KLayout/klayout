@@ -56,8 +56,31 @@ class MyVisitor < RBA::EdgeNeighborhoodVisitor
 
 end
     
+class MyVisitor2 < RBA::EdgeNeighborhoodVisitor
+
+  def initialize
+    self.result_type = RBA::CompoundRegionOperationNode::ResultType::EdgePairs
+  end
+
+  def on_edge(layout, cell, edge, neighborhood)
+    neighborhood.each do |n|
+      polygons = n[1]
+      polygons.each do |inp, poly|
+        poly.each do |p|
+          bbox = p.bbox
+          t = self.to_original_trans(edge)
+          ep = RBA::EdgePair::new(edge, t * RBA::Edge::new(bbox.p1, RBA::Point::new(bbox.right, bbox.bottom)))
+          output(ep)
+        end
+      end
+    end
+  end
+
+end
+    
 class DBEdgeNeighborhood_TestClass < TestBase
 
+  # basic events
   def test_1
 
     ly = RBA::Layout::new
@@ -105,6 +128,37 @@ class DBEdgeNeighborhood_TestClass < TestBase
     )
 
     assert_equal(res.to_s, "(-1100,0;-1100,1000;-100,1000;-100,0);(0,0;0,1000;1000,1000;1000,0)")
+
+  end
+
+  # edge pair output, to_original_trans
+  def test_2
+
+    ly = RBA::Layout::new
+
+    l1 = ly.layer(1, 0)
+    cell = ly.create_cell("TOP")
+
+    cell.shapes(l1).insert(RBA::Box::new(0, 0, 1000, 1000))
+    cell.shapes(l1).insert(RBA::Box::new(-1100, 0, -100, 1000))
+
+    prim = RBA::Region::new(cell.begin_shapes_rec(l1))
+
+    visitor = MyVisitor2::new
+
+    bext = 0
+    eext = 0
+    din = 10
+    dout = 100
+
+    children = [
+      RBA::CompoundRegionOperationNode::new_foreign
+    ] 
+
+    node = RBA::CompoundRegionOperationNode::new_edge_neighborhood(children, visitor, bext, eext, din, dout)
+    res = prim.complex_op(node)
+
+    assert_equal(res.to_s, "(-100,1000;-100,0)/(0,1000;0,0);(0,0;0,1000)/(-100,0;-100,1000)")
 
   end
 

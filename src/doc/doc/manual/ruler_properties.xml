@@ -46,7 +46,7 @@
   <p>
   The "Label format" is an arbitrary text with embedded expressions that may represent a measurement
   value. Each such expression starts with a dollar sign, followed by the expression string. The expression 
-  syntax supportis the basic operations ("*", "/", "+", "-" ..), bitwise operations ("|", "&amp;", ..), 
+  syntax supports the basic operations ("*", "/", "+", "-" ..), bitwise operations ("|", "&amp;", ..), 
   the conditional operator ("x:y?z") as well as some functions, i.e. "abs", "sqrt", "exp". It includes a "sprintf" 
   function. These are some examples:
   </p>

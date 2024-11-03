@@ -77,7 +77,7 @@
     <li>Renaming a layer does not change the source - if you rename a layer to something like "1/0", you are likely to fool yourself thinking this is layer 1, datatype 0.</li>
     <li>Changing a layer view's source does not change the database too - it will just change the pointer. To change a layer's information in the database, use Edit/Layer/Edit Layer Specification.</li>
     <li>Deleting a layer from the layer list does <b>not delete</b> the layer from the database. Use Edit/Layer/Delete Layer instead.</li>
-    <li>Additing a new layer does not immediately create the layer in the database. Only once you draw something on that layer, it is generated in the database.</li>
+    <li>Adding a new layer does not immediately create the layer in the database. Only once you draw something on that layer, it is generated in the database.</li>
   </ul>
 
 </doc>

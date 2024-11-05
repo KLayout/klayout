@@ -433,6 +433,15 @@ namespace gsi
     return reader.read (*layout, options);
   }
 
+  static db::LayerMap
+  load_bytes_with_options (db::Layout *layout, const std::vector<char> &bytes, const db::LoadLayoutOptions &options)
+  {
+    tl::InputMemoryStream byte_stream (bytes.data(), bytes.size());
+    tl::InputStream stream (byte_stream);
+    db::Reader reader (stream);
+    return reader.read (*layout, options);
+  }
+
   //  extend the layout class by two reader methods
   static
   gsi::ClassExt<db::Layout> layout_reader_decl (
@@ -454,6 +463,16 @@ namespace gsi
       "@return A layer map that contains the mapping used by the reader including the layers that have been created."
       "\n"
       "This method has been added in version 0.18."
+    ) +
+    gsi::method_ext ("read_bytes", &load_bytes_with_options, gsi::arg ("bytes"), gsi::arg ("options"),
+      "@brief Load the layout from the given bytes array with options\n"
+      "The format of the file is determined automatically and automatic unzipping is provided. "
+      "In this version, some reader options can be specified. "
+      "@param bytes The data to load.\n"
+      "@param options The options object specifying further options for the reader.\n"
+      "@return A layer map that contains the mapping used by the reader including the layers that have been created."
+      "\n"
+      "This method has been added in version 0.29."
     ),
     ""
   );

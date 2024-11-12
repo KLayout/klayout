@@ -9,7 +9,7 @@ test-command = [
   "TESTSRC={package} python {package}/testdata/pymod/pya_tests.py"
 ]
 # Disable building PyPy wheels on all platforms
-skip = "pp*"
+skip = "pp* cp36-* cp37-*"
 
 [tool.cibuildwheel.linux]
 # beware: the before-all script does not persist environment variables!

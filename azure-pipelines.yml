@@ -35,6 +35,9 @@ jobs:
       cp312-cp312-win_amd64.whl:
         python.version: '3.12'
         python.architecture: 'x64'
+      cp313-cp313-win_amd64.whl:
+        python.version: '3.13'
+        python.architecture: 'x64'
       cp36-cp36m-win32.whl:
         python.version: '3.6'
         python.architecture: 'x86'
@@ -55,6 +58,9 @@ jobs:
         python.architecture: 'x86'
       cp312-cp312-win32.whl:
         python.version: '3.12'
+        python.architecture: 'x86'
+      cp313-cp313-win32.whl:
+        python.version: '3.13'
         python.architecture: 'x86'
     maxParallel: 6
 

@@ -293,7 +293,7 @@ PythonInterpreter::PythonInterpreter (bool embedded)
           }
         }
 
-        Py_SetPath (tl::to_wstring (path).c_str ());
+        tl::set_env (pythonpath_name, path);
 
       }
 

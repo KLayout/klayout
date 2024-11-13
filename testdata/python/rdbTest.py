@@ -952,6 +952,26 @@ class RDB_TestClass(unittest.TestCase):
     self.assertEqual(item1._is_const_object(), False)
     self.assertEqual(item1.has_tag(17), True)
 
+  def test_14(self):
+
+    # same names do not generate a new category
+    rdb = pya.ReportDatabase("")
+
+    _cell = rdb.create_cell("CELL")
+
+    _cat = rdb.create_category("cat")
+    _cat_same = rdb.create_category("cat")
+    self.assertEqual(_cat.rdb_id(), _cat_same.rdb_id())
+
+    _subcat = rdb.create_category(_cat, "subcat")
+    _subcat_same = rdb.create_category(_cat_same, "subcat")
+    self.assertEqual(_subcat.rdb_id(), _subcat_same.rdb_id())
+
+    # testing whether decrementing the reference count would do harm
+    _cat = None
+    _cat_same = None
+    self.assertEqual(_subcat.rdb_id(), _subcat_same.rdb_id())
+
 # run unit tests
 if __name__ == '__main__':
   suite = unittest.TestLoader().loadTestsFromTestCase(RDB_TestClass)

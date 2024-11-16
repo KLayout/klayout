@@ -25,7 +25,6 @@ equals(HAVE_RUBY, "1") {
 
 !equals(HAVE_QT, "0") {
 
-  # TODO: make buddies able to build without Qt
   SUBDIRS += \
     klayout_main \
     lay \

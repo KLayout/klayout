@@ -429,45 +429,45 @@ struct simple_polygon_defs
       "Returns the scaled object. All coordinates are multiplied with the given factor and if "
       "necessary rounded."
     ) +
-    method ("move", &C::move, gsi::arg ("p"),
+    method ("move", &C::move, gsi::arg ("v"),
       "@brief Moves the simple polygon.\n"
       "\n"
       "Moves the simple polygon by the given offset and returns the \n"
       "moved simple polygon. The polygon is overwritten.\n"
       "\n"
-      "@param p The distance to move the simple polygon.\n"
+      "@param v The distance to move the simple polygon.\n"
       "\n"
       "@return The moved simple polygon.\n"
     ) +
-    method_ext ("move", &move_xy, gsi::arg ("x"), gsi::arg ("y"),
+    method_ext ("move", &move_xy, gsi::arg ("dx", 0), gsi::arg ("dy", 0),
       "@brief Moves the polygon.\n"
       "\n"
       "Moves the polygon by the given offset and returns the \n"
       "moved polygon. The polygon is overwritten.\n"
       "\n"
-      "@param x The x distance to move the polygon.\n"
-      "@param y The y distance to move the polygon.\n"
+      "@param dx The x distance to move the polygon.\n"
+      "@param dy The y distance to move the polygon.\n"
       "\n"
       "@return The moved polygon (self).\n"
     ) +
-    method ("moved", &C::moved, gsi::arg ("p"),
+    method ("moved", &C::moved, gsi::arg ("v"),
       "@brief Returns the moved simple polygon\n"
       "\n"
       "Moves the simple polygon by the given offset and returns the \n"
       "moved simple polygon. The polygon is not modified.\n"
       "\n"
-      "@param p The distance to move the simple polygon.\n"
+      "@param v The distance to move the simple polygon.\n"
       "\n"
       "@return The moved simple polygon.\n"
     ) +
-    method_ext ("moved", &moved_xy, gsi::arg ("x"), gsi::arg ("y"),
+    method_ext ("moved", &moved_xy, gsi::arg ("dx", 0), gsi::arg ("dy", 0),
       "@brief Returns the moved polygon (does not modify self)\n"
       "\n"
       "Moves the polygon by the given offset and returns the \n"
       "moved polygon. The polygon is not modified.\n"
       "\n"
-      "@param x The x distance to move the polygon.\n"
-      "@param y The y distance to move the polygon.\n"
+      "@param dx The x distance to move the polygon.\n"
+      "@param dy The y distance to move the polygon.\n"
       "\n"
       "@return The moved polygon.\n"
       "\n"
@@ -1470,30 +1470,30 @@ struct polygon_defs
       "Returns the scaled object. All coordinates are multiplied with the given factor and if "
       "necessary rounded."
     ) +
-    method ("move", &C::move, gsi::arg ("p"),
+    method ("move", &C::move, gsi::arg ("v"),
       "@brief Moves the polygon.\n"
       "\n"
       "Moves the polygon by the given offset and returns the \n"
       "moved polygon. The polygon is overwritten.\n"
       "\n"
-      "@param p The distance to move the polygon.\n"
+      "@param v The distance to move the polygon.\n"
       "\n"
       "@return The moved polygon (self).\n"
       "\n"
       "This method has been introduced in version 0.23.\n"
     ) +
-    method_ext ("move", &move_xy, gsi::arg ("x"), gsi::arg ("y"),
+    method_ext ("move", &move_xy, gsi::arg ("dx", 0), gsi::arg ("dy", 0),
       "@brief Moves the polygon.\n"
       "\n"
       "Moves the polygon by the given offset and returns the \n"
       "moved polygon. The polygon is overwritten.\n"
       "\n"
-      "@param x The x distance to move the polygon.\n"
-      "@param y The y distance to move the polygon.\n"
+      "@param dx The x distance to move the polygon.\n"
+      "@param dy The y distance to move the polygon.\n"
       "\n"
       "@return The moved polygon (self).\n"
     ) +
-    method ("moved", &C::moved, gsi::arg ("p"),
+    method ("moved", &C::moved, gsi::arg ("v"),
       "@brief Returns the moved polygon (does not modify self)\n"
       "\n"
       "Moves the polygon by the given offset and returns the \n"
@@ -1505,14 +1505,14 @@ struct polygon_defs
       "\n"
       "This method has been introduced in version 0.23.\n"
     ) +
-    method_ext ("moved", &moved_xy, gsi::arg ("x"), gsi::arg ("y"),
+    method_ext ("moved", &moved_xy, gsi::arg ("dx", 0), gsi::arg ("dy", 0),
       "@brief Returns the moved polygon (does not modify self)\n"
       "\n"
       "Moves the polygon by the given offset and returns the \n"
       "moved polygon. The polygon is not modified.\n"
       "\n"
-      "@param x The x distance to move the polygon.\n"
-      "@param y The y distance to move the polygon.\n"
+      "@param dx The x distance to move the polygon.\n"
+      "@param dy The y distance to move the polygon.\n"
       "\n"
       "@return The moved polygon.\n"
       "\n"

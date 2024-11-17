@@ -36,6 +36,7 @@ template <class C>
 struct point_defs
 {
   typedef typename C::coord_type coord_type;
+  typedef typename C::vector_type vector_type;
 
   static C *from_string (const char *s)
   {
@@ -95,6 +96,28 @@ struct point_defs
   static size_t hash_value (const C *pt)
   {
     return std::hfunc (*pt);
+  }
+
+  static C move_d (C *p, const vector_type &d)
+  {
+    *p += d;
+    return *p;
+  }
+
+  static C move_xy (C *p, coord_type dx, coord_type dy)
+  {
+    *p += vector_type (dx, dy);
+    return *p;
+  }
+
+  static C moved_d (const C *p, const vector_type &d)
+  {
+    return *p + d;
+  }
+
+  static C moved_xy (const C *p, coord_type dx, coord_type dy)
+  {
+    return *p + vector_type (dx, dy);
   }
 
   static gsi::Methods methods ()
@@ -169,6 +192,56 @@ struct point_defs
       "Returns a hash value for the given point. This method enables points as hash keys.\n"
       "\n"
       "This method has been introduced in version 0.25.\n"
+    ) +
+    method_ext ("move", &move_d, gsi::arg ("v"),
+      "@brief Moves the point.\n"
+      "\n"
+      "This method is equivalent to '+='. It was introduced to harmonize the API "
+      "with the other objects. The point is modified.\n"
+      "\n"
+      "@param v The distance to move the point.\n"
+      "\n"
+      "@return The moved point.\n"
+      "\n"
+      "This method has been introduced in version 0.29.9."
+    ) +
+    method_ext ("move", &move_xy, gsi::arg ("dx", 0), gsi::arg ("dy", 0),
+      "@brief Moves the point.\n"
+      "\n"
+      "Moves the point by the given offset and returns the \n"
+      "moved point. The point is modified.\n"
+      "\n"
+      "@param dx The x distance to move the point.\n"
+      "@param dy The y distance to move the point.\n"
+      "\n"
+      "@return The moved point.\n"
+      "\n"
+      "This method has been introduced in version 0.29.9."
+    ) +
+    method_ext ("moved", &moved_d, gsi::arg ("v"),
+      "@brief Returns the moved point.\n"
+      "\n"
+      "This method is equivalent to '+'. It was introduced to harmonize the API "
+      "with the other objects. The point is not modified.\n"
+      "\n"
+      "@param v The distance to move the point.\n"
+      "\n"
+      "@return The moved point.\n"
+      "\n"
+      "This method has been introduced in version 0.29.9."
+    ) +
+    method_ext ("moved", &moved_xy, gsi::arg ("dx", 0), gsi::arg ("dy", 0),
+      "@brief Returns the moved point.\n"
+      "\n"
+      "Moves the point by the given offset and returns the \n"
+      "moved point. The point is not modified.\n"
+      "\n"
+      "@param dx The x distance to move the point.\n"
+      "@param dy The y distance to move the point.\n"
+      "\n"
+      "@return The moved point.\n"
+      "\n"
+      "This method has been introduced in version 0.29.9."
     ) +
     method ("x", &C::x,
       "@brief Accessor to the x coordinate\n"

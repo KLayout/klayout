@@ -208,17 +208,17 @@ struct path_defs
       "Returns the scaled object. All coordinates are multiplied with the given factor and if "
       "necessary rounded."
     ) +
-    method ("move", &C::move, gsi::arg ("p"),
+    method ("move", &C::move, gsi::arg ("v"),
       "@brief Moves the path.\n"
       "\n"
       "Moves the path by the given offset and returns the \n"
       "moved path. The path is overwritten.\n"
       "\n"
-      "@param p The distance to move the path.\n"
+      "@param v The distance to move the path.\n"
       "\n"
       "@return The moved path.\n"
     ) +
-    method_ext ("move", &move_xy, gsi::arg ("dx"), gsi::arg ("dy"),
+    method_ext ("move", &move_xy, gsi::arg ("dx", 0), gsi::arg ("dy", 0),
       "@brief Moves the path.\n"
       "\n"
       "Moves the path by the given offset and returns the \n"
@@ -231,17 +231,17 @@ struct path_defs
       "\n"
       "This version has been added in version 0.23.\n"
     ) +
-    method ("moved", &C::moved, gsi::arg ("p"),
+    method ("moved", &C::moved, gsi::arg ("v"),
       "@brief Returns the moved path (does not change self)\n"
       "\n"
       "Moves the path by the given offset and returns the \n"
       "moved path. The path is not modified.\n"
       "\n"
-      "@param p The distance to move the path.\n"
+      "@param v The distance to move the path.\n"
       "\n"
       "@return The moved path.\n"
     ) +
-    method_ext ("moved", &moved_xy, gsi::arg ("dx"), gsi::arg ("dy"),
+    method_ext ("moved", &moved_xy, gsi::arg ("dx", 0), gsi::arg ("dy", 0),
       "@brief Returns the moved path (does not change self)\n"
       "\n"
       "Moves the path by the given offset and returns the \n"

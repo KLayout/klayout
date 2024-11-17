@@ -207,17 +207,17 @@ struct edge_defs
       "\n"
       "This method has been introduced in version 0.25.\n"
     ) +
-    method ("moved", &C::moved, gsi::arg ("p"),
+    method ("moved", &C::moved, gsi::arg ("v"),
       "@brief Returns the moved edge (does not modify self)\n"
       "\n"
       "Moves the edge by the given offset and returns the \n"
       "moved edge. The edge is not modified.\n"
       "\n"
-      "@param p The distance to move the edge.\n"
+      "@param v The distance to move the edge.\n"
       "\n"
       "@return The moved edge.\n"
     ) +
-    method_ext ("moved", &moved_xy, gsi::arg ("dx"), gsi::arg ("dy"),
+    method_ext ("moved", &moved_xy, gsi::arg ("dx", 0), gsi::arg ("dy", 0),
       "@brief Returns the moved edge (does not modify self)\n"
       "\n"
       "Moves the edge by the given offset and returns the \n"
@@ -325,17 +325,17 @@ struct edge_defs
       "\n"
       "@return The transformed edge.\n"
     ) +
-    method ("move", &C::move, gsi::arg ("p"),
+    method ("move", &C::move, gsi::arg ("v"),
       "@brief Moves the edge.\n"
       "\n"
       "Moves the edge by the given offset and returns the \n"
       "moved edge. The edge is overwritten.\n"
       "\n"
-      "@param p The distance to move the edge.\n"
+      "@param v The distance to move the edge.\n"
       "\n"
       "@return The moved edge.\n"
     ) +
-    method_ext ("move", &move_xy, gsi::arg ("dx"), gsi::arg ("dy"),
+    method_ext ("move", &move_xy, gsi::arg ("dx", 0), gsi::arg ("dy", 0),
       "@brief Moves the edge.\n"
       "\n"
       "Moves the edge by the given offset and returns the \n"

@@ -484,45 +484,45 @@ Class<db::Texts> decl_Texts (decl_dbShapeCollection, "db", "Texts",
     "\n"
     "The 'join_with' alias has been introduced in version 0.28.12."
   ) +
-  method_ext ("move", &move_p, gsi::arg ("p"),
+  method_ext ("move", &move_p, gsi::arg ("v"),
     "@brief Moves the text collection\n"
     "\n"
     "Moves the texts by the given offset and returns the \n"
     "moved text collection. The text collection is overwritten.\n"
     "\n"
-    "@param p The distance to move the texts.\n"
+    "@param v The distance to move the texts.\n"
     "\n"
     "@return The moved texts (self).\n"
   ) +
-  method_ext ("move", &move_xy, gsi::arg ("x"), gsi::arg ("y"),
+  method_ext ("move", &move_xy, gsi::arg ("dx", 0), gsi::arg ("dy", 0),
     "@brief Moves the text collection\n"
     "\n"
     "Moves the edge pairs by the given offset and returns the \n"
     "moved texts. The edge pair collection is overwritten.\n"
     "\n"
-    "@param x The x distance to move the texts.\n"
-    "@param y The y distance to move the texts.\n"
+    "@param dx The x distance to move the texts.\n"
+    "@param dy The y distance to move the texts.\n"
     "\n"
     "@return The moved texts (self).\n"
   ) +
-  method_ext ("moved", &moved_p, gsi::arg ("p"),
+  method_ext ("moved", &moved_p, gsi::arg ("v"),
     "@brief Returns the moved text collection (does not modify self)\n"
     "\n"
     "Moves the texts by the given offset and returns the \n"
     "moved texts. The text collection is not modified.\n"
     "\n"
-    "@param p The distance to move the texts.\n"
+    "@param v The distance to move the texts.\n"
     "\n"
     "@return The moved texts.\n"
   ) +
-  method_ext ("moved", &moved_xy, gsi::arg ("x"), gsi::arg ("y"),
+  method_ext ("moved", &moved_xy, gsi::arg ("dx", 0), gsi::arg ("dy", 0),
     "@brief Returns the moved edge pair collection (does not modify self)\n"
     "\n"
     "Moves the texts by the given offset and returns the \n"
     "moved texts. The text collection is not modified.\n"
     "\n"
-    "@param x The x distance to move the texts.\n"
-    "@param y The y distance to move the texts.\n"
+    "@param dx The x distance to move the texts.\n"
+    "@param dy The y distance to move the texts.\n"
     "\n"
     "@return The moved texts.\n"
   ) +

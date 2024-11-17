@@ -735,49 +735,49 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "\n"
     "The 'join_with' alias has been introduced in version 0.28.12."
   ) +
-  method_ext ("move", &move_p, gsi::arg ("p"),
+  method_ext ("move", &move_p, gsi::arg ("v"),
     "@brief Moves the edge pair collection\n"
     "\n"
     "Moves the edge pairs by the given offset and returns the \n"
     "moved edge pair collection. The edge pair collection is overwritten.\n"
     "\n"
-    "@param p The distance to move the edge pairs.\n"
+    "@param v The distance to move the edge pairs.\n"
     "\n"
     "@return The moved edge pairs (self).\n"
     "\n"
     "Starting with version 0.25 the displacement is of vector type."
   ) +
-  method_ext ("move", &move_xy, gsi::arg ("x"), gsi::arg ("y"),
+  method_ext ("move", &move_xy, gsi::arg ("dx"), gsi::arg ("dy"),
     "@brief Moves the edge pair collection\n"
     "\n"
     "Moves the edge pairs by the given offset and returns the \n"
     "moved edge pairs. The edge pair collection is overwritten.\n"
     "\n"
-    "@param x The x distance to move the edge pairs.\n"
-    "@param y The y distance to move the edge pairs.\n"
+    "@param dx The x distance to move the edge pairs.\n"
+    "@param dy The y distance to move the edge pairs.\n"
     "\n"
     "@return The moved edge pairs (self).\n"
   ) +
-  method_ext ("moved", &moved_p, gsi::arg ("p"),
+  method_ext ("moved", &moved_p, gsi::arg ("v"),
     "@brief Returns the moved edge pair collection (does not modify self)\n"
     "\n"
     "Moves the edge pairs by the given offset and returns the \n"
     "moved edge pairs. The edge pair collection is not modified.\n"
     "\n"
-    "@param p The distance to move the edge pairs.\n"
+    "@param v The distance to move the edge pairs.\n"
     "\n"
     "@return The moved edge pairs.\n"
     "\n"
     "Starting with version 0.25 the displacement is of vector type."
   ) +
-  method_ext ("moved", &moved_xy, gsi::arg ("x"), gsi::arg ("y"),
+  method_ext ("moved", &moved_xy, gsi::arg ("dx", 0), gsi::arg ("dy", 0),
     "@brief Returns the moved edge pair collection (does not modify self)\n"
     "\n"
     "Moves the edge pairs by the given offset and returns the \n"
     "moved edge pairs. The edge pair collection is not modified.\n"
     "\n"
-    "@param x The x distance to move the edge pairs.\n"
-    "@param y The y distance to move the edge pairs.\n"
+    "@param dx The x distance to move the edge pairs.\n"
+    "@param dy The y distance to move the edge pairs.\n"
     "\n"
     "@return The moved edge pairs.\n"
   ) +

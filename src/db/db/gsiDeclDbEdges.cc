@@ -1621,14 +1621,14 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "\n"
     "Starting with version 0.25 the displacement type is a vector."
   ) +
-  method_ext ("move", &move_xy, gsi::arg ("x"), gsi::arg ("y"),
+  method_ext ("move", &move_xy, gsi::arg ("dx", 0), gsi::arg ("dy", 0),
     "@brief Moves the edge collection\n"
     "\n"
     "Moves the edge collection by the given offset and returns the \n"
     "moved edge collection. The edge collection is overwritten.\n"
     "\n"
-    "@param x The x distance to move the edge collection.\n"
-    "@param y The y distance to move the edge collection.\n"
+    "@param dx The x distance to move the edge collection.\n"
+    "@param dy The y distance to move the edge collection.\n"
     "\n"
     "@return The moved edge collection (self).\n"
   ) +
@@ -1644,14 +1644,14 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "\n"
     "Starting with version 0.25 the displacement type is a vector."
   ) +
-  method_ext ("moved", &moved_xy, gsi::arg ("x"), gsi::arg ("v"),
+  method_ext ("moved", &moved_xy, gsi::arg ("dx", 0), gsi::arg ("dv", 0),
     "@brief Returns the moved edge collection (does not modify self)\n"
     "\n"
     "Moves the edge collection by the given offset and returns the \n"
     "moved edge collection. The edge collection is not modified.\n"
     "\n"
-    "@param x The x distance to move the edge collection.\n"
-    "@param y The y distance to move the edge collection.\n"
+    "@param dx The x distance to move the edge collection.\n"
+    "@param dy The y distance to move the edge collection.\n"
     "\n"
     "@return The moved edge collection.\n"
   ) +

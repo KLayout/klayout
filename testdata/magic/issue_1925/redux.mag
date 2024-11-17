@@ -1,0 +1,9 @@
+magic
+tech sky130A
+timestamp 1731684784
+<< metal4 >>
+rect 0 0 10000 100
+<< labels >>
+rlabel metal4 s 10500 -9100 10600 12800 6 vccd1
+port 1 nsew power input
+<< end >>

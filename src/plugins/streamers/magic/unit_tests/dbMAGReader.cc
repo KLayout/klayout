@@ -156,3 +156,8 @@ TEST(3)
   run_test (_this, tl::testdata (), "ringo/RINGO.mag", "ringo_au.cif.gz");
 }
 
+TEST(4)
+{
+  run_test (_this, tl::testdata (), "issue_1925/redux.mag", "redux_au.cif.gz");
+}
+

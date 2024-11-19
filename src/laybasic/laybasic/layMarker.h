@@ -245,7 +245,7 @@ protected:
 private:
   tl::Color m_color;
   tl::Color m_frame_color;
-  char m_line_width, m_vertex_size, m_halo;
+  int m_line_width, m_vertex_size, m_halo;
   bool m_text_enabled;
   lay::ViewOp::Shape m_vertex_shape;
   int m_line_style, m_dither_pattern, m_frame_pattern;

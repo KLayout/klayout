@@ -89,8 +89,8 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset>
-             <normaloff>:/back_16.png</normaloff>:/back_16.png</iconset>
+            <iconset resource="../../icons/icons.qrc">
+             <normaloff>:/back_16px.png</normaloff>:/back_16px.png</iconset>
            </property>
            <property name="autoRaise">
             <bool>true</bool>
@@ -103,8 +103,8 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset>
-             <normaloff>:/forward_16.png</normaloff>:/forward_16.png</iconset>
+            <iconset resource="../../icons/icons.qrc">
+             <normaloff>:/forward_16px.png</normaloff>:/forward_16px.png</iconset>
            </property>
            <property name="autoRaise">
             <bool>true</bool>

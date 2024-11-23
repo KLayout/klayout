@@ -3984,11 +3984,40 @@ LayoutViewBase::redraw ()
 }
 
 void
+LayoutViewBase::transform (const db::DCplxTrans &tr)
+{
+  finish_edits ();
+  lay::Editables::transform (tr);
+}
+
+void
 LayoutViewBase::cancel_edits ()
 {
+  //  the move service takes a special role here as it manages the
+  //  transaction for the collective move operation.
+  mp_move_service->cancel ();
+
   //  cancel all drag and pending edit operations such as move operations.
   mp_canvas->drag_cancel ();
   lay::Editables::cancel_edits ();
+
+  //  re-enable edit mode
+  enable_edits (true);
+}
+
+void
+LayoutViewBase::finish_edits ()
+{
+  //  the move service takes a special role here as it manages the
+  //  transaction for the collective move operation.
+  mp_move_service->finish ();
+
+  //  cancel all drag operations
+  mp_canvas->drag_cancel ();
+  lay::Editables::finish_edits ();
+
+  //  re-enable edit mode
+  enable_edits (true);
 }
 
 void
@@ -3996,8 +4025,6 @@ LayoutViewBase::cancel ()
 {
   //  cancel all drags and pending edit operations such as move operations.
   cancel_edits ();
-  //  re-enable edit mode
-  enable_edits (true);
   //  and clear the selection
   clear_selection ();
 }

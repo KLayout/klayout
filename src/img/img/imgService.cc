@@ -588,9 +588,6 @@ Service::mouse_move_event (const db::DPoint & /*p*/, unsigned int /*buttons*/, b
 bool 
 Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::angle_constraint_type /*ac*/)
 {
-  //  cancel any pending move or drag operations 
-  widget ()->drag_cancel (); // KLUDGE: every service does this to the same service manager
-
   //  compute search box
   double l = catch_distance ();
   db::DBox search_dbox = db::DBox (p, p).enlarged (db::DVector (l, l));

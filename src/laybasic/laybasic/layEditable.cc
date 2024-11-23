@@ -165,9 +165,9 @@ Editables::selection_catch_bbox ()
 }
 
 void
-Editables::transform (const db::DCplxTrans &t, db::Transaction *transaction)
+Editables::transform (const db::DCplxTrans &t)
 {
-  std::unique_ptr<db::Transaction> trans_holder (transaction ? transaction : new db::Transaction (manager (), tl::to_string (tr ("Transform"))));
+  std::unique_ptr<db::Transaction> trans_holder (new db::Transaction (manager (), tl::to_string (tr ("Transform"))));
 
   if (has_selection ()) {
 
@@ -640,11 +640,27 @@ Editables::edit_cancel ()
 }
 
 void
+Editables::edit_finish ()
+{
+  clear_previous_selection ();
+  for (iterator e = begin (); e != end (); ++e) {
+    e->edit_finish ();
+  }
+}
+
+void
 Editables::cancel_edits ()
 {
-  //  cancel any edit operations
   for (iterator e = begin (); e != end (); ++e) {
     e->edit_cancel ();
+  }
+}
+
+void
+Editables::finish_edits ()
+{
+  for (iterator e = begin (); e != end (); ++e) {
+    e->edit_finish ();
   }
 }
 

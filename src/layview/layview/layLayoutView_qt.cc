@@ -1440,6 +1440,17 @@ LayoutView::cancel_edits ()
 }
 
 void
+LayoutView::finish_edits ()
+{
+  //  closes the property dialog
+  if (mp_properties_dialog) {
+    mp_properties_dialog->hide ();
+  }
+
+  LayoutViewBase::finish_edits ();
+}
+
+void
 LayoutView::activate ()
 {
   if (! m_activated) {

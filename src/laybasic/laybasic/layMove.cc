@@ -302,6 +302,7 @@ MoveService::handle_click (const db::DPoint &p, unsigned int buttons, bool drag_
   if (! m_dragging) {
 
     mp_transaction.reset (trans_holder.release ());
+    ui ()->drag_cancel ();
 
     if (mp_editables->begin_move (p, ac_from_buttons (buttons))) {
 
@@ -337,21 +338,31 @@ MoveService::handle_click (const db::DPoint &p, unsigned int buttons, bool drag_
 }
 
 void
-MoveService::drag_cancel () 
-{ 
+MoveService::drag_cancel ()
+{
   m_shift = db::DPoint ();
   if (m_dragging) {
-
-    mp_editables->edit_cancel ();
     ui ()->ungrab_mouse (this);
-
     m_dragging = false;
+  }
+}
 
+void
+MoveService::cancel ()
+{ 
+  if (m_dragging) {
     if (mp_transaction.get ()) {
       mp_transaction->cancel ();
     }
     mp_transaction.reset (0);
+  }
+}
 
+void
+MoveService::finish ()
+{
+  if (m_dragging) {
+    mp_transaction.reset (0);
   }
 }
 

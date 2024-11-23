@@ -460,6 +460,11 @@ public:
   void cancel_edits ();
 
   /**
+   *  @brief Finishes all edit operations and maintains selection
+   */
+  void finish_edits ();
+
+  /**
    *  @brief Select all levels of hierarchy available
    */
   void max_hier ()

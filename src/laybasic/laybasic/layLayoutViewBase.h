@@ -2667,6 +2667,13 @@ public:
   void cancel_edits ();
 
   /**
+   *  @brief Finishes all edit operations and maintains selection
+   *
+   *  In contrast to "cancel_edits" there is no rollback of operations applied already.
+   */
+  void finish_edits ();
+
+  /**
    *  @brief Select all levels of hierarchy available
    */
   void max_hier ();
@@ -2696,7 +2703,14 @@ public:
    */
   void ensure_selection_visible ();
 
-  /** 
+  /**
+   *  @brief Transforms the selection
+   *
+   *  The transformation is given in micron units.
+   */
+  virtual void transform (const db::DCplxTrans &tr);
+
+  /**
    *  @brief Select a cell by index for a certain cell view
    *
    *  This will be forwarded to select_cell or select_cell_fit depending

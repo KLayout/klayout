@@ -2522,7 +2522,7 @@ LayoutViewBase::signal_apply_technology (lay::LayoutHandle *layout_handle)
         lyp_file = tech->eff_layer_properties_file ();
       }
 
-      if (! lyp_file.empty ()) {
+      if (! lyp_file.empty () || tech->add_other_layers ()) {
 
         //  interpolate the layout properties file name
         tl::Eval expr;

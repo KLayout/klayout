@@ -1786,7 +1786,7 @@ Database::load (std::string fn)
     reader.read (*this);
   }
 
-  set_filename (stream.absolute_path ());
+  set_filename (stream.absolute_file_path ());
   set_name (stream.filename ());
 
   reset_modified ();

@@ -479,10 +479,10 @@ std::string
 Technology::correct_path (const std::string &fp) const
 {
   std::string bp = base_path ();
-  if (bp.empty ()) {
+  if (bp.empty () || ! tl::InputStream::is_file_path (fp) || ! tl::InputStream::is_file_path (bp)) {
     return fp;
   } else {
-    return tl::relative_path (bp, fp);
+    return tl::relative_path (tl::InputStream::as_file_path (bp), tl::InputStream::as_file_path (fp));
   }
 }
 
@@ -494,7 +494,11 @@ Technology::load (const std::string &fn)
   xml_struct.parse (source, *this);
 
   //  use the tech file's path as the default base path
-  set_default_base_path (tl::absolute_path (fn));
+  if (tl::InputStream::is_file_path (fn)) {
+    set_default_base_path (tl::absolute_path (fn));
+  } else {
+    set_default_base_path (std::string ());
+  }
 
   set_tech_file_path (fn);
 }
@@ -515,10 +519,10 @@ Technology::build_effective_path (const std::string &p) const
     return p;
   }
 
-  if (tl::is_absolute (p)) {
+  if (tl::InputStream::is_absolute (p)) {
     return p;
   } else {
-    return tl::combine_path (bp, p);
+    return tl::InputStream::combine (bp, p);
   }
 }
 

@@ -120,7 +120,7 @@ LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &opti
 
   std::string base_path;
   if (! effective_options.paths_relative_to_cwd ()) {
-    base_path = tl::dirname (m_stream.absolute_path ());
+    base_path = tl::dirname (m_stream.absolute_file_path ());
   }
 
   db::LEFDEFReaderState state (&effective_options, layout, base_path);
@@ -179,7 +179,7 @@ LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &opti
 
     if (effective_options.read_lef_with_def ()) {
 
-      std::string input_dir = tl::absolute_path (m_stream.absolute_path ());
+      std::string input_dir = tl::absolute_path (m_stream.absolute_file_path ());
 
       if (tl::file_exists (input_dir)) {
 

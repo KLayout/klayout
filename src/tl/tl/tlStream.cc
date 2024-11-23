@@ -425,32 +425,124 @@ InputStream::~InputStream ()
   }
 }
 
-std::string InputStream::absolute_path (const std::string &abstract_path)
+std::string InputStream::absolute_file_path (const std::string &abstract_path)
 {
   //  TODO: align this implementation with InputStream ctor
 
   tl::Extractor ex (abstract_path.c_str ());
-#if defined(HAVE_QT)
   if (ex.test (":")) {
     return abstract_path;
-  } else
-#endif
-#if defined(HAVE_CURL) || defined(HAVE_QT)
-  if (ex.test ("http:") || ex.test ("https:")) {
-    return abstract_path;
-  } else
-#endif
-  if (ex.test ("pipe:")) {
+  } else if (ex.test ("http:") || ex.test ("https:") || ex.test ("pipe:") || ex.test ("data:")) {
     return abstract_path;
   } else if (ex.test ("file:")) {
     tl::URI uri (abstract_path);
-    return tl::absolute_path (uri.path ());
+    return tl::absolute_file_path (uri.path ());
   } else {
     return tl::absolute_file_path (abstract_path);
   }
 }
 
-const char * 
+bool InputStream::is_absolute (const std::string &abstract_path)
+{
+  //  TODO: align this implementation with InputStream ctor
+
+  tl::Extractor ex (abstract_path.c_str ());
+  if (ex.test (":")) {
+    return true;
+  } else if (ex.test ("http:") || ex.test ("https:") || ex.test ("pipe:") || ex.test ("data:")) {
+    return true;
+  } else if (ex.test ("file:")) {
+    tl::URI uri (abstract_path);
+    return tl::is_absolute (uri.path ());
+  } else {
+    return tl::is_absolute (abstract_path);
+  }
+}
+
+bool InputStream::is_file_path (const std::string &abstract_path)
+{
+  tl::Extractor ex (abstract_path.c_str ());
+  if (ex.test (":")) {
+    return false;
+  } else if (ex.test ("http:") || ex.test ("https:") || ex.test ("pipe:") || ex.test ("data:")) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
+std::string InputStream::as_file_path (const std::string &abstract_path)
+{
+  tl::Extractor ex (abstract_path.c_str ());
+  if (ex.test (":")) {
+    return std::string ();
+  } else if (ex.test ("http:") || ex.test ("https:") || ex.test ("pipe:") || ex.test ("data:")) {
+    return std::string ();
+  } else if (ex.test ("file:")) {
+    tl::URI uri (abstract_path);
+    return uri.path ();
+  } else {
+    return abstract_path;
+  }
+}
+
+std::string InputStream::combine (const std::string &path1, const std::string &path2)
+{
+  if (is_absolute (path2)) {
+    return path2;
+  }
+
+  tl::Extractor ex (path1);
+  if (ex.test (":")) {
+    return path1 + "/" + path2;
+  } else if (ex.test ("pipe:") || ex.test ("data:")) {
+    //  ignore un-combinable first parts
+    return path2;
+  }
+
+  tl::URI uri1 (path1);
+  tl::URI uri2 (path2);
+
+  if (uri1.scheme ().empty ()) {
+    if (uri2.scheme ().empty ()) {
+      return tl::combine_path (path1, path2);
+    } else {
+      return tl::combine_path (path1, uri2.path ());
+    }
+  } else {
+    if (uri2.scheme ().empty ()) {
+      uri1.set_path (uri1.path () + "/" + tl::replaced (path2, "\\", "/"));
+    } else {
+      uri1.set_path (uri1.path () + "/" + uri2.path ());
+    }
+    return uri1.to_abstract_path ();
+  }
+}
+
+std::string InputStream::relative_path (const std::string &path1, const std::string &path2)
+{
+  //  TODO: align this implementation with InputStream ctor
+
+  tl::Extractor ex (path2);
+  if (ex.test (":")) {
+    return path2;
+  } else if (ex.test ("pipe:") || ex.test ("data:")) {
+    return path2;
+  }
+
+  tl::URI uri1 (path1);
+  tl::URI uri2 (path2);
+
+  //  NOTE: only file schemes are supported as of now
+  if ((uri1.scheme ().empty () || uri1.scheme () == "file") &&
+      (uri2.scheme ().empty () || uri2.scheme () == "file")) {
+    return tl::relative_path (uri1.path (), uri2.path ());
+  }
+
+  return path2;
+}
+
+const char *
 InputStream::get (size_t n, bool bypass_inflate)
 {
   //  if deflating, employ the deflate filter to get the data

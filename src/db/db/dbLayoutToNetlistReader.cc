@@ -60,7 +60,7 @@ typedef l2n_std_format::keys<true> skeys;
 typedef l2n_std_format::keys<false> lkeys;
 
 LayoutToNetlistStandardReader::LayoutToNetlistStandardReader (tl::InputStream &stream)
-  : m_stream (stream), m_path (stream.absolute_path ()), m_dbu (0.0),
+  : m_stream (stream), m_path (stream.absolute_file_path ()), m_dbu (0.0),
     m_progress (tl::to_string (tr ("Reading L2N database")), 1000)
 {
   m_progress.set_format (tl::to_string (tr ("%.0fk lines")));

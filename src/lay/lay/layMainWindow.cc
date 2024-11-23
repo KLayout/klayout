@@ -2981,7 +2981,7 @@ void
 MainWindow::add_mru (const std::string &fn_rel, const std::string &tech)
 {
   std::vector <std::pair<std::string, std::string> > new_mru;
-  std::string fn (tl::InputStream::absolute_path (fn_rel));
+  std::string fn (tl::InputStream::absolute_file_path (fn_rel));
 
   for (auto mru = m_mru.begin (); mru != m_mru.end (); ++mru) {
     if (mru->first != fn /* delete non-existing files: && tl::is_readable (mru->first) */) {
@@ -3025,7 +3025,7 @@ MainWindow::add_to_other_mru (const std::string &fn_rel, const std::string &cfg)
   }
 
   std::vector <std::string> new_mru;
-  std::string fn (tl::InputStream::absolute_path (fn_rel));
+  std::string fn (tl::InputStream::absolute_file_path (fn_rel));
 
   for (auto mru = mru_ptr->begin (); mru != mru_ptr->end (); ++mru) {
     if (*mru != fn /* delete non-existing files: && tl::is_readable (*mru) */) {

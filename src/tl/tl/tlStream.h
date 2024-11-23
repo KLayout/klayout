@@ -531,7 +531,7 @@ public:
    *
    *  Returns an empty string if no absolute path is available.
    */
-  std::string absolute_path () const
+  std::string absolute_file_path () const
   {
     return mp_delegate->absolute_path ();
   }
@@ -549,9 +549,34 @@ public:
   void close ();
 
   /**
-   *  @brief Gets the absolute path for a given URL
+   *  @brief Gets the absolute, abstract path for a given abstract path
    */
-  static std::string absolute_path (const std::string &path);
+  static std::string absolute_file_path (const std::string &apath);
+
+  /**
+   *  @brief Gets the absolute path for a given abstract path
+   */
+  static bool is_absolute (const std::string &apath);
+
+  /**
+   *  @brief Gets a value indicating whether the path is a file path
+   */
+  static bool is_file_path (const std::string &apath);
+
+  /**
+   *  @brief Gets the file path (no scheme) if it applies to the given abstract path
+   */
+  static std::string as_file_path (const std::string &apath);
+
+  /**
+   *  @brief Combines two abstract paths
+   */
+  static std::string combine (const std::string &apath1, const std::string &apath2);
+
+  /**
+   *  @brief Returns the relative abstract path of path2 vs. path1
+   */
+  static std::string relative_path (const std::string &apath1, const std::string &apath2);
 
   /**
    *  @brief Gets the base reader (delegate)
@@ -621,7 +646,7 @@ public:
 
   virtual std::string absolute_path () const
   {
-    return m_inflating_stream.absolute_path ();
+    return m_inflating_stream.absolute_file_path ();
   }
 
   virtual std::string filename () const

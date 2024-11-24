@@ -77,7 +77,7 @@
   
   <p>
   To configure the depth, enter the desired number of shapes in the 
-  "Trace depth" box at the bottom of the trace dialog. NOTE: the actual number of shapes in the net may be a litte
+  "Trace depth" box at the bottom of the trace dialog. NOTE: the actual number of shapes in the net may be a little
   less than the specified depth due to internal marker shapes which are taken into account, but are not delivered
   as parts of the net.
   </p>

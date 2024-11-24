@@ -29,7 +29,7 @@
 
   <p>
   Choose "Pull In Other Layout" to combine other layouts already loaded into the
-  current panel. Basically, KLayout allows viewsing a layout in multiple panels, either
+  current panel. Basically, KLayout allows viewing a layout in multiple panels, either
   on its own in different configurations or together with other layouts. "Pull In Other Layout" 
   allows configuration of a panel to show another layout which has been loaded into another panel.
   In that sense it's the reverse of closing one layout from a panel showing multiple layouts.

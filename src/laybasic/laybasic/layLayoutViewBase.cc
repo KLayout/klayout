@@ -3986,6 +3986,9 @@ LayoutViewBase::redraw ()
 void
 LayoutViewBase::transform (const db::DCplxTrans &tr)
 {
+  //  NOTE: we call "finish_edits" rather than "cancel_edits" because
+  //  "move by" while "duplicate interactive" relies on keeping the
+  //  pasted shapes from the previous transaction. So we must not roll back.
   finish_edits ();
   lay::Editables::transform (tr);
 }

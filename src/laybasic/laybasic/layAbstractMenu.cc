@@ -76,15 +76,16 @@ std::vector<std::pair<std::string, std::string> >
 unpack_key_binding (const std::string &packed)
 {
   tl::Extractor ex (packed.c_str ());
+  ex.test(";");  //  backward compatibiliy
 
   std::vector<std::pair<std::string, std::string> > key_bindings;
 
   while (! ex.at_end ()) {
-    ex.test(";");
     key_bindings.push_back (std::make_pair (std::string (), std::string ()));
     ex.read_word_or_quoted (key_bindings.back ().first);
     ex.test(":");
     ex.read_word_or_quoted (key_bindings.back ().second);
+    ex.test(";");
   }
 
   return key_bindings;
@@ -93,17 +94,26 @@ unpack_key_binding (const std::string &packed)
 std::string
 pack_key_binding (const std::vector<std::pair<std::string, std::string> > &unpacked)
 {
-  std::string packed;
+  std::string packed = "\n";
+  bool first = true;
 
-  for (std::vector<std::pair<std::string, std::string> >::const_iterator p = unpacked.begin (); p != unpacked.end (); ++p) {
-    if (! packed.empty ()) {
-      packed += ";";
+  //  for easier editing we separate the entries into non-empty and empty ones and put each of them on a new line
+  for (int pass = 0; pass < 2; ++pass) {
+    for (std::vector<std::pair<std::string, std::string> >::const_iterator p = unpacked.begin (); p != unpacked.end (); ++p) {
+      if ((pass == 0) == p->second.empty ()) {
+        continue;
+      }
+      if (! first) {
+        packed += ";\n";
+      }
+      first = false;
+      packed += tl::to_word_or_quoted_string (p->first);
+      packed += ":";
+      packed += tl::to_word_or_quoted_string (p->second);
     }
-    packed += tl::to_word_or_quoted_string (p->first);
-    packed += ":";
-    packed += tl::to_word_or_quoted_string (p->second);
   }
 
+  packed += "\n";
   return packed;
 }
 
@@ -111,15 +121,16 @@ std::vector<std::pair<std::string, bool> >
 unpack_menu_items_hidden (const std::string &packed)
 {
   tl::Extractor ex (packed.c_str ());
+  ex.test(";");  //  backward compatibiliy
 
   std::vector<std::pair<std::string, bool> > hidden;
 
   while (! ex.at_end ()) {
-    ex.test(";");
     hidden.push_back (std::make_pair (std::string (), false));
     ex.read_word_or_quoted (hidden.back ().first);
     ex.test(":");
     ex.read (hidden.back ().second);
+    ex.test(";");
   }
 
   return hidden;
@@ -128,17 +139,26 @@ unpack_menu_items_hidden (const std::string &packed)
 std::string
 pack_menu_items_hidden (const std::vector<std::pair<std::string, bool> > &unpacked)
 {
-  std::string packed;
+  std::string packed = "\n";
+  bool first = true;
 
-  for (std::vector<std::pair<std::string, bool> >::const_iterator p = unpacked.begin (); p != unpacked.end (); ++p) {
-    if (! packed.empty ()) {
-      packed += ";";
+  //  for easier editing we separate the entries into true and false ones and put each of them on a new line
+  for (int pass = 0; pass < 2; ++pass) {
+    for (std::vector<std::pair<std::string, bool> >::const_iterator p = unpacked.begin (); p != unpacked.end (); ++p) {
+      if ((pass == 0) != p->second) {
+        continue;
+      }
+      if (! first) {
+        packed += ";\n";
+      }
+      first = false;
+      packed += tl::to_word_or_quoted_string (p->first);
+      packed += ":";
+      packed += tl::to_string (p->second);
     }
-    packed += tl::to_word_or_quoted_string (p->first);
-    packed += ":";
-    packed += tl::to_string (p->second);
   }
 
+  packed += "\n";
   return packed;
 }
 

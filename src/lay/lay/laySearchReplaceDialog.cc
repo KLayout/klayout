@@ -44,6 +44,8 @@
 #include <QInputDialog>
 #include <QHeaderView>
 #include <QRegExp>
+#include <QClipboard>
+#include <QMimeData>
 
 #include <fstream>
 
@@ -522,11 +524,33 @@ SearchReplaceResults::select_items (lay::LayoutViewBase *view, int cv_index, con
   edt::set_object_selection (view, sel);
 }
 
-void  
+void
+SearchReplaceResults::export_csv_to_clipboard (const std::set<int> *rows)
+{
+  tl::OutputMemoryStream buffer;
+
+  {
+    tl::OutputStream os (buffer, true /* as text */);
+    export_csv (os, rows);
+  }
+
+  QClipboard *clipboard = QGuiApplication::clipboard ();
+  QMimeData *data = new QMimeData ();
+  data->setData (QString::fromUtf8 ("text/csv"), QByteArray (buffer.data (), buffer.size ()));
+  data->setText (QString::fromUtf8 (buffer.data (), buffer.size ()));
+  clipboard->setMimeData (data);
+}
+
+void
 SearchReplaceResults::export_csv (const std::string &file, const std::set<int> *rows)
 {
-  std::ofstream output (file.c_str ());
+  tl::OutputStream os (file, tl::OutputStream::OM_Auto, true /* as text */);
+  export_csv (os, rows);
+}
 
+void
+SearchReplaceResults::export_csv (tl::OutputStream &os, const std::set<int> *rows)
+{
   QModelIndex parent;
 
   size_t n_columns = columnCount (parent);
@@ -534,11 +558,11 @@ SearchReplaceResults::export_csv (const std::string &file, const std::set<int> *
 
   for (size_t c = 0; c < n_columns; ++c) {
     if (c) {
-      output << ",";
+      os << ",";
     }
-    output << escape_csv (tl::to_string (headerData (int (c), Qt::Horizontal, Qt::DisplayRole).toString ()));
+    os << escape_csv (tl::to_string (headerData (int (c), Qt::Horizontal, Qt::DisplayRole).toString ()));
   }
-  output << std::endl;
+  os << "\n";
 
   for (size_t r = 0; r < n_rows; ++r) {
 
@@ -546,13 +570,13 @@ SearchReplaceResults::export_csv (const std::string &file, const std::set<int> *
 
       for (size_t c = 0; c < n_columns; ++c) {
         if (c) {
-          output << ",";
+          os << ",";
         }
         //  TODO: optimize
-        output << escape_csv (tl::to_string (data (index (int (r), int (c), parent), Qt::DisplayRole).toString ()));
+        os << escape_csv (tl::to_string (data (index (int (r), int (c), parent), Qt::DisplayRole).toString ()));
       }
 
-      output << std::endl;
+      os << "\n";
 
     }
 
@@ -843,6 +867,7 @@ SearchReplaceDialog::SearchReplaceDialog (lay::Dispatcher *root, LayoutViewBase 
   connect (results->header (), SIGNAL (sectionCountChanged (int, int)), this, SLOT (header_columns_changed (int, int)));
 
   QMenu *menu = new QMenu (this);
+  menu->addAction (QObject::tr ("Copy to clipboard"), this, SLOT (export_csv_to_clipboard ()));
   menu->addAction (QObject::tr ("To CSV file"), this, SLOT (export_csv ()));
   menu->addAction (QObject::tr ("To report database"), this, SLOT (export_rdb ()));
   menu->addAction (QObject::tr ("To layout"), this, SLOT (export_layout ()));
@@ -850,6 +875,10 @@ SearchReplaceDialog::SearchReplaceDialog (lay::Dispatcher *root, LayoutViewBase 
   export_b->setMenu (menu);
 
   QAction *action;
+
+  action = new QAction (QObject::tr ("Copy to clipboard"), results);
+  connect (action, SIGNAL (triggered ()), this, SLOT (sel_export_csv_to_clipboard ()));
+  results->addAction (action);
 
   action = new QAction (QObject::tr ("Export to CSV file"), results);
   connect (action, SIGNAL (triggered ()), this, SLOT (sel_export_csv ()));
@@ -1161,6 +1190,54 @@ BEGIN_PROTECTED
   query_to_model (model, lq, iq, std::numeric_limits<size_t>::max (), true);
   model.end_changes ();
   model.export_csv (fn);
+
+END_PROTECTED
+}
+
+void
+SearchReplaceDialog::sel_export_csv_to_clipboard ()
+{
+BEGIN_PROTECTED
+
+  std::set<int> rows;
+  QModelIndexList sel = results->selectionModel ()->selectedRows (0);
+  for (auto s = sel.begin (); s != sel.end (); ++s) {
+    rows.insert (s->row ());
+  }
+
+  m_model.export_csv_to_clipboard (&rows);
+
+END_PROTECTED
+}
+
+void
+SearchReplaceDialog::export_csv_to_clipboard ()
+{
+BEGIN_PROTECTED
+
+  int cv_index = m_last_query_cv_index;
+  const lay::CellView &cv = mp_view->cellview (cv_index);
+  if (! cv.is_valid ()) {
+    return;
+  }
+
+  db::LayoutQuery lq (m_last_query);
+
+  tl::AbsoluteProgress progress (tl::to_string (QObject::tr ("Running query")));
+  progress.set_unit (100000);
+  progress.set_format ("Processing ..");
+
+  db::LayoutQueryIterator iq (lq, &cv->layout (), 0, &progress);
+
+  if (tl::verbosity () >= 10) {
+    tl::log << tl::to_string (QObject::tr ("Running query: ")) << m_last_query;
+  }
+
+  SearchReplaceResults model;
+  model.begin_changes (& cv->layout ());
+  query_to_model (model, lq, iq, std::numeric_limits<size_t>::max (), true);
+  model.end_changes ();
+  model.export_csv_to_clipboard ();
 
 END_PROTECTED
 }

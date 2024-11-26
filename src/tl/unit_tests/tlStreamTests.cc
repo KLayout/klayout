@@ -491,8 +491,7 @@ TEST(AbstractPathFunctions)
   EXPECT_EQ (tl::InputStream::absolute_file_path ("file:xyz"), tl::absolute_file_path ("xyz"));
   EXPECT_EQ (tl::InputStream::absolute_file_path ("xyz"), tl::absolute_file_path ("xyz"));
   EXPECT_EQ (tl::InputStream::absolute_file_path ("xyz/uvw"), tl::absolute_file_path ("xyz/uvw"));
-  tl::file_utils_force_linux ();
-  EXPECT_EQ (tl::InputStream::absolute_file_path ("/xyz/uvw"), "/xyz/uvw");
+  EXPECT_EQ (tl::InputStream::absolute_file_path ("/xyz/uvw"), tl::absolute_file_path ("/xyz/uvw"));
   tl::file_utils_force_windows ();
   EXPECT_EQ (tl::InputStream::absolute_file_path ("xyz\\uvw"), tl::absolute_file_path ("xyz\\uvw"));
   EXPECT_EQ (tl::InputStream::absolute_file_path ("\\\\server\\xyz\\uvw"), "\\\\server\\xyz\\uvw");

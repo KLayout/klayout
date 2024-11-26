@@ -491,11 +491,12 @@ TEST(AbstractPathFunctions)
   EXPECT_EQ (tl::InputStream::absolute_file_path ("file:xyz"), tl::absolute_file_path ("xyz"));
   EXPECT_EQ (tl::InputStream::absolute_file_path ("xyz"), tl::absolute_file_path ("xyz"));
   EXPECT_EQ (tl::InputStream::absolute_file_path ("xyz/uvw"), tl::absolute_file_path ("xyz/uvw"));
+  tl::file_utils_force_linux ();
   EXPECT_EQ (tl::InputStream::absolute_file_path ("/xyz/uvw"), "/xyz/uvw");
   tl::file_utils_force_windows ();
   EXPECT_EQ (tl::InputStream::absolute_file_path ("xyz\\uvw"), tl::absolute_file_path ("xyz\\uvw"));
   EXPECT_EQ (tl::InputStream::absolute_file_path ("\\\\server\\xyz\\uvw"), "\\\\server\\xyz\\uvw");
-  EXPECT_EQ (tl::InputStream::absolute_file_path ("c:\\xyz\\uvw"), "c:\\xyz\\uvw");
+  EXPECT_EQ (tl::InputStream::absolute_file_path ("C:\\xyz\\uvw"), "C:\\xyz\\uvw");
   tl::file_utils_force_reset ();
 
   EXPECT_EQ (tl::InputStream::is_absolute (""), false);
@@ -508,6 +509,7 @@ TEST(AbstractPathFunctions)
   EXPECT_EQ (tl::InputStream::is_absolute ("file:xyz"), false);
   EXPECT_EQ (tl::InputStream::is_absolute ("xyz"), false);
   EXPECT_EQ (tl::InputStream::is_absolute ("xyz/uvw"), false);
+  tl::file_utils_force_linux ();
   EXPECT_EQ (tl::InputStream::is_absolute ("/xyz/uvw"), true);
   tl::file_utils_force_windows ();
   EXPECT_EQ (tl::InputStream::is_absolute ("xyz\\uvw"), false);

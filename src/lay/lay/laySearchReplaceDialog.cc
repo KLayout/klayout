@@ -549,7 +549,11 @@ SearchReplaceResults::export_csv_to_clipboard (const std::set<int> *rows)
     export_csv (os, rows);
   }
 
-  QClipboard *clipboard = QGuiApplication::clipboard ();
+#if QT_VERSION >= 0x050000
+  QClipboard *clipboard = QGuiApplication::clipboard();
+#else
+  QClipboard *clipboard = QApplication::clipboard();
+#endif
   QMimeData *data = new QMimeData ();
   data->setData (QString::fromUtf8 ("text/csv"), QByteArray (buffer.data (), buffer.size ()));
   data->setText (QString::fromUtf8 (buffer.data (), buffer.size ()));

@@ -26,30 +26,35 @@ load("test_prologue.rb")
 class MyVisitor < RBA::EdgeNeighborhoodVisitor
 
   def initialize
-    @log = ""
+    @log = {}
+    @current_log = nil
   end
 
   def log
-    @log
+    @log.keys.sort { |a,b| a < b ? -1 : (a == b ? 0 : 1) }.collect { |k| @log[k].join("") }.join("")
   end
 
   def begin_polygon(layout, cell, polygon)
+    polygon = polygon.dup
     output(polygon)
-    @log += "Polygon: #{polygon}\n"
+    @log[polygon] ||= []
+    @current_log = @log[polygon]
+    @current_log << "Polygon: #{polygon}\n"
   end
     
   def end_polygon
-    @log += "/Polygon\n"
+    @current_log << "/Polygon\n"
+    @current_log = nil
   end
     
   def on_edge(layout, cell, edge, neighborhood)
-    @log += "edge = #{edge}\n"
+    @current_log << "edge = #{edge}\n"
     neighborhood.each do |n|
       x1, x2 = n[0]
       polygons = n[1]
       polygons.each do |inp, poly|
         poly_str = poly.collect { |p| p.to_s }.join("/")
-        @log += "  #{x1},#{x2} -> #{inp}: #{poly_str}\n"
+        @current_log << "  #{x1},#{x2} -> #{inp}: #{poly_str}\n"
       end
     end
   end
@@ -68,7 +73,7 @@ class MyVisitor2 < RBA::EdgeNeighborhoodVisitor
       polygons.each do |inp, poly|
         poly.each do |p|
           bbox = p.bbox
-          t = self.to_original_trans(edge)
+          t = RBA::EdgeNeighborhoodVisitor.to_original_trans(edge)
           ep = RBA::EdgePair::new(edge, t * RBA::Edge::new(bbox.p1, RBA::Point::new(bbox.right, bbox.bottom)))
           output(ep)
         end
@@ -111,19 +116,19 @@ class DBEdgeNeighborhood_TestClass < TestBase
     res = prim.complex_op(node)
 
     assert_equal(visitor.log, 
-      "Polygon: (0,0;0,1000;1000,1000;1000,0)\n" +
-      "edge = (0,0;0,1000)\n" +
-      "  0.0,1000.0 -> 0: (0,100;0,101;1000,101;1000,100)\n" +
-      "edge = (0,1000;1000,1000)\n" +
-      "edge = (1000,1000;1000,0)\n" +
-      "edge = (1000,0;0,0)\n" +
-      "/Polygon\n" +
       "Polygon: (-1100,0;-1100,1000;-100,1000;-100,0)\n" +
       "edge = (-1100,0;-1100,1000)\n" +
       "edge = (-1100,1000;-100,1000)\n" +
       "edge = (-100,1000;-100,0)\n" +
       "  0.0,1000.0 -> 0: (0,100;0,101;1000,101;1000,100)\n" +
       "edge = (-100,0;-1100,0)\n" +
+      "/Polygon\n" +
+      "Polygon: (0,0;0,1000;1000,1000;1000,0)\n" +
+      "edge = (0,0;0,1000)\n" +
+      "  0.0,1000.0 -> 0: (0,100;0,101;1000,101;1000,100)\n" +
+      "edge = (0,1000;1000,1000)\n" +
+      "edge = (1000,1000;1000,0)\n" +
+      "edge = (1000,0;0,0)\n" +
       "/Polygon\n"
     )
 

@@ -163,7 +163,10 @@ Class<gsi::EdgeNeighborhoodVisitorImpl> decl_EdgeNeighborhoodVisitorImpl (decl_E
   gsi::callback ("begin_polygon", &EdgeNeighborhoodVisitorImpl::issue_begin_polygon, &EdgeNeighborhoodVisitorImpl::f_begin_polygon, gsi::arg ("layout"), gsi::arg ("cell"), gsi::arg ("polygon"),
     "@brief Is called for each new polygon\n"
     "This event announces a new primary polygon. After this event, the edges of the polygon are reported via \\on_edge, "
-    "followed by a call of \\end_polygon."
+    "followed by a call of \\end_polygon.\n"
+    "\n"
+    "Note, that the polygon object is a temporary reference to a C++ object and it is only valid during the execution of this "
+    "callback. If you like to keep the polygon object, create a copy of it using the 'dup' method."
   ) +
   gsi::callback ("end_polygon", &EdgeNeighborhoodVisitorImpl::issue_end_polygon, &EdgeNeighborhoodVisitorImpl::f_end_polygon,
     "@brief Is called after the polygon\n"

@@ -58,6 +58,11 @@ Writer::write (db::Layout &layout, tl::OutputStream &stream)
 {
   tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Writing file: ")) + stream.path ());
 
+  if (layout.under_construction ()) {
+    tl::warn << tl::to_string (tr ("Cannot properly write a layout that is under construction - forcing update."));
+    layout.force_update ();
+  }
+
   tl_assert (mp_writer != 0);
   mp_writer->write (layout, stream, m_options);
 }

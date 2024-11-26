@@ -209,7 +209,7 @@ private:
   bool m_hier_dirty;
   size_t m_hier_generation_id;
   std::vector<bool> m_bboxes_dirty;
-  bool m_all_bboxes_dirty;
+  bool m_all_bboxes_dirty, m_some_bboxes_dirty;
   bool m_busy;
 
   void do_invalidate_hier ();

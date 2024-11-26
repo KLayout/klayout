@@ -280,11 +280,17 @@ void
 instance_iterator<Traits>::release_iter ()
 { 
   if (m_type == TInstance) {
-    if (m_stable) {
+    if (m_stable && ! m_unsorted) {
       if (m_with_props) {
         basic_iter (cell_inst_wp_array_type::tag (), InstancesEditableTag ()).~stable_iter_wp_type ();
       } else {
         basic_iter (cell_inst_array_type::tag (), InstancesEditableTag ()).~stable_iter_type ();
+      }
+    } else if (m_stable) {
+      if (m_with_props) {
+        basic_unsorted_iter (cell_inst_wp_array_type::tag (), InstancesEditableTag ()).~stable_unsorted_iter_wp_type ();
+      } else {
+        basic_unsorted_iter (cell_inst_array_type::tag (), InstancesEditableTag ()).~stable_unsorted_iter_type ();
       }
     } else {
       if (m_with_props) {
@@ -301,11 +307,17 @@ void
 instance_iterator<Traits>::make_iter ()
 { 
   if (m_type == TInstance) {
-    if (m_stable) {
+    if (m_stable && ! m_unsorted) {
       if (m_with_props) {
         new (&basic_iter (cell_inst_wp_array_type::tag (), InstancesEditableTag ())) stable_iter_wp_type ();
       } else {
         new (&basic_iter (cell_inst_array_type::tag (), InstancesEditableTag ())) stable_iter_type ();
+      }
+    } else if (m_stable) {
+      if (m_with_props) {
+        new (&basic_unsorted_iter (cell_inst_wp_array_type::tag (), InstancesEditableTag ())) stable_unsorted_iter_wp_type ();
+      } else {
+        new (&basic_unsorted_iter (cell_inst_array_type::tag (), InstancesEditableTag ())) stable_unsorted_iter_type ();
       }
     } else {
       if (m_with_props) {
@@ -322,17 +334,23 @@ template <class Traits>
 bool
 instance_iterator<Traits>::operator== (const instance_iterator<Traits> &d) const
 {
-  if (! (m_type == d.m_type && m_stable == d.m_stable && m_with_props == d.m_with_props)) {
+  if (! (m_type == d.m_type && m_stable == d.m_stable && m_with_props == d.m_with_props && m_unsorted == d.m_unsorted)) {
     return false;
   }
   if (m_type == TNull) {
     return true;
   } else {
     if (m_stable) {
-      if (m_with_props) {
+      if (m_with_props && ! m_unsorted) {
         return (basic_iter (cell_inst_wp_array_type::tag (), InstancesEditableTag ()) == d.basic_iter (cell_inst_wp_array_type::tag (), InstancesEditableTag ()));
       } else {
         return (basic_iter (cell_inst_array_type::tag (), InstancesEditableTag ()) == d.basic_iter (cell_inst_array_type::tag (), InstancesEditableTag ()));
+      }
+    } else if (m_stable) {
+      if (m_with_props) {
+        return (basic_unsorted_iter (cell_inst_wp_array_type::tag (), InstancesEditableTag ()) == d.basic_unsorted_iter (cell_inst_wp_array_type::tag (), InstancesEditableTag ()));
+      } else {
+        return (basic_unsorted_iter (cell_inst_array_type::tag (), InstancesEditableTag ()) == d.basic_unsorted_iter (cell_inst_array_type::tag (), InstancesEditableTag ()));
       }
     } else {
       if (m_with_props) {
@@ -355,15 +373,22 @@ instance_iterator<Traits>::operator= (const instance_iterator<Traits> &iter)
     m_type = iter.m_type;
     m_stable = iter.m_stable;
     m_with_props = iter.m_with_props;
+    m_unsorted = iter.m_unsorted;
     m_traits = iter.m_traits;
 
     if (m_type == TInstance) {
 
-      if (m_stable) {
+      if (m_stable && ! m_unsorted) {
         if (m_with_props) {
           new (&basic_iter (cell_inst_wp_array_type::tag (), InstancesEditableTag ())) stable_iter_wp_type (iter.basic_iter (cell_inst_wp_array_type::tag (), InstancesEditableTag ()));
         } else {
           new (&basic_iter (cell_inst_array_type::tag (), InstancesEditableTag ())) stable_iter_type (iter.basic_iter (cell_inst_array_type::tag (), InstancesEditableTag ()));
+        }
+      } else if (m_stable) {
+        if (m_with_props) {
+          new (&basic_unsorted_iter (cell_inst_wp_array_type::tag (), InstancesEditableTag ())) stable_unsorted_iter_wp_type (iter.basic_unsorted_iter (cell_inst_wp_array_type::tag (), InstancesEditableTag ()));
+        } else {
+          new (&basic_unsorted_iter (cell_inst_array_type::tag (), InstancesEditableTag ())) stable_unsorted_iter_type (iter.basic_unsorted_iter (cell_inst_array_type::tag (), InstancesEditableTag ()));
         }
       } else {
         if (m_with_props) {
@@ -387,11 +412,17 @@ db::Box
 instance_iterator<Traits>::quad_box () const
 {
   if (m_type == TInstance) {
-    if (m_stable) {
+    if (m_stable && ! m_unsorted) {
       if (m_with_props) {
         return m_traits.quad_box (basic_iter (cell_inst_wp_array_type::tag (), InstancesEditableTag ()));
       } else {
         return m_traits.quad_box (basic_iter (cell_inst_array_type::tag (), InstancesEditableTag ()));
+      }
+    } else if (m_stable) {
+      if (m_with_props) {
+        return m_traits.quad_box (basic_unsorted_iter (cell_inst_wp_array_type::tag (), InstancesEditableTag ()));
+      } else {
+        return m_traits.quad_box (basic_unsorted_iter (cell_inst_array_type::tag (), InstancesEditableTag ()));
       }
     } else {
       if (m_with_props) {
@@ -409,11 +440,17 @@ size_t
 instance_iterator<Traits>::quad_id () const
 {
   if (m_type == TInstance) {
-    if (m_stable) {
+    if (m_stable && ! m_unsorted) {
       if (m_with_props) {
         return m_traits.quad_id (basic_iter (cell_inst_wp_array_type::tag (), InstancesEditableTag ()));
       } else {
         return m_traits.quad_id (basic_iter (cell_inst_array_type::tag (), InstancesEditableTag ()));
+      }
+    } else if (m_stable) {
+      if (m_with_props) {
+        return m_traits.quad_id (basic_unsorted_iter (cell_inst_wp_array_type::tag (), InstancesEditableTag ()));
+      } else {
+        return m_traits.quad_id (basic_unsorted_iter (cell_inst_array_type::tag (), InstancesEditableTag ()));
       }
     } else {
       if (m_with_props) {
@@ -431,11 +468,17 @@ void
 instance_iterator<Traits>::skip_quad () 
 {
   if (m_type == TInstance) {
-    if (m_stable) {
+    if (m_stable && ! m_unsorted) {
       if (m_with_props) {
         m_traits.skip_quad (basic_iter (cell_inst_wp_array_type::tag (), InstancesEditableTag ()));
       } else {
         m_traits.skip_quad (basic_iter (cell_inst_array_type::tag (), InstancesEditableTag ()));
+      }
+    } else if (m_stable) {
+      if (m_with_props) {
+        m_traits.skip_quad (basic_unsorted_iter (cell_inst_wp_array_type::tag (), InstancesEditableTag ()));
+      } else {
+        m_traits.skip_quad (basic_unsorted_iter (cell_inst_array_type::tag (), InstancesEditableTag ()));
       }
     } else {
       if (m_with_props) {
@@ -454,11 +497,17 @@ instance_iterator<Traits> &
 instance_iterator<Traits>::operator++() 
 {
   if (m_type == TInstance) {
-    if (m_stable) {
+    if (m_stable && ! m_unsorted) {
       if (m_with_props) {
         ++basic_iter (cell_inst_wp_array_type::tag (), InstancesEditableTag ());
       } else {
         ++basic_iter (cell_inst_array_type::tag (), InstancesEditableTag ());
+      }
+    } else if (m_stable) {
+      if (m_with_props) {
+        ++basic_unsorted_iter (cell_inst_wp_array_type::tag (), InstancesEditableTag ());
+      } else {
+        ++basic_unsorted_iter (cell_inst_array_type::tag (), InstancesEditableTag ());
       }
     } else {
       if (m_with_props) {
@@ -478,13 +527,23 @@ void
 instance_iterator<Traits>::make_next () 
 {
   while (true) {
-    if (m_stable) {
+    if (m_stable && ! m_unsorted) {
       if (m_with_props) {
         if (! basic_iter (cell_inst_wp_array_type::tag (), InstancesEditableTag ()).at_end ()) {
           return;
         }
       } else {
         if (! basic_iter (cell_inst_array_type::tag (), InstancesEditableTag ()).at_end ()) {
+          return;
+        }
+      }
+    } else if (m_stable) {
+      if (m_with_props) {
+        if (! basic_unsorted_iter (cell_inst_wp_array_type::tag (), InstancesEditableTag ()).at_end ()) {
+          return;
+        }
+      } else {
+        if (! basic_unsorted_iter (cell_inst_array_type::tag (), InstancesEditableTag ()).at_end ()) {
           return;
         }
       }
@@ -514,11 +573,17 @@ void
 instance_iterator<Traits>::update_ref ()
 {
   if (m_type == TInstance) {
-    if (m_stable) {
+    if (m_stable && ! m_unsorted) {
       if (m_with_props) {
         m_ref = m_traits.instance_from_stable_iter (basic_iter (cell_inst_wp_array_type::tag (), InstancesEditableTag ()));
       } else {
         m_ref = m_traits.instance_from_stable_iter (basic_iter (cell_inst_array_type::tag (), InstancesEditableTag ()));
+      }
+    } else if (m_stable) {
+      if (m_with_props) {
+        m_ref = m_traits.instance_from_stable_iter (basic_unsorted_iter (cell_inst_wp_array_type::tag (), InstancesEditableTag ()));
+      } else {
+        m_ref = m_traits.instance_from_stable_iter (basic_unsorted_iter (cell_inst_array_type::tag (), InstancesEditableTag ()));
       }
     } else {
       if (m_with_props) {
@@ -551,13 +616,21 @@ void
 NormalInstanceIteratorTraits::init (instance_iterator<NormalInstanceIteratorTraits> *iter) const
 {
   tl_assert (mp_insts != 0);
-  if (iter->m_stable) {
+  if (iter->m_stable && ! iter->m_unsorted) {
     if (iter->m_with_props) {
       cell_inst_wp_array_type::tag tag = cell_inst_wp_array_type::tag ();
       iter->basic_iter (tag, InstancesEditableTag ()) = mp_insts->inst_tree (tag, InstancesEditableTag ()).begin_flat ();
     } else {
       cell_inst_array_type::tag tag = cell_inst_array_type::tag ();
       iter->basic_iter (tag, InstancesEditableTag ()) = mp_insts->inst_tree (tag, InstancesEditableTag ()).begin_flat ();
+    }
+  } else if (iter->m_stable) {
+    if (iter->m_with_props) {
+      cell_inst_wp_array_type::tag tag = cell_inst_wp_array_type::tag ();
+      iter->basic_unsorted_iter (tag, InstancesEditableTag ()) = stable_unsorted_iter_wp_type (mp_insts->inst_tree (tag, InstancesEditableTag ()).begin (), mp_insts->inst_tree (tag, InstancesEditableTag ()).end ());
+    } else {
+      cell_inst_array_type::tag tag = cell_inst_array_type::tag ();
+      iter->basic_unsorted_iter (tag, InstancesEditableTag ()) = stable_unsorted_iter_type (mp_insts->inst_tree (tag, InstancesEditableTag ()).begin (), mp_insts->inst_tree (tag, InstancesEditableTag ()).end ());
     }
   } else {
     if (iter->m_with_props) {

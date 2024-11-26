@@ -232,6 +232,16 @@ class DBLayoutTests1_TestClass < TestBase
 
   end
 
+  def first_shape(s)
+
+    sdup = s.dup
+    shape = sdup.shape
+    sdup._destroy
+
+    return shape
+
+  end
+    
   def collect(s, l)
 
     res = []
@@ -1042,18 +1052,18 @@ class DBLayoutTests1_TestClass < TestBase
     c0c = l.cell(l.add_cell("c0"))
     c0c.copy_shapes(c0)
     assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c0$1](0,100;1000,1200)")
-    assert_equal(c0c.begin_shapes_rec(0).shape.property("p"), nil)
+    assert_equal(first_shape(c0c.begin_shapes_rec(0)).property("p"), nil)
     assert_equal(collect(c0c.begin_shapes_rec(1), l), "[c0$1](1,101;1001,1201)")
-    assert_equal(c0c.begin_shapes_rec(1).shape.property("p"), 17)
+    assert_equal(first_shape(c0c.begin_shapes_rec(1)).property("p"), 17)
      
     c0c.clear
     lm = RBA::LayerMapping::new
     lm.map(1, 0)
     c0c.copy_shapes(c0, lm)
     assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c0$1](1,101;1001,1201)")
-    assert_equal(c0c.begin_shapes_rec(0).shape.property("p"), 17)
+    assert_equal(first_shape(c0c.begin_shapes_rec(0)).property("p"), 17)
     assert_equal(collect(c0c.begin_shapes_rec(1), l), "")
-    assert_equal(c0c.begin_shapes_rec(1).shape.property("p"), nil)
+    assert_equal(first_shape(c0c.begin_shapes_rec(1)).property("p"), nil)
 
     l2 = RBA::Layout::new
     l2.dbu = 0.0005
@@ -1063,9 +1073,9 @@ class DBLayoutTests1_TestClass < TestBase
     layer1 = l2.find_layer(1, 0)
     layer2 = l2.find_layer(2, 0)
     assert_equal(collect(c0c.begin_shapes_rec(layer1), l), "[c0](0,200;2000,2400)")
-    assert_equal(c0c.begin_shapes_rec(layer1).shape.property("p"), nil)
+    assert_equal(first_shape(c0c.begin_shapes_rec(layer1)).property("p"), nil)
     assert_equal(collect(c0c.begin_shapes_rec(layer2), l), "[c0](2,202;2002,2402)")
-    assert_equal(c0c.begin_shapes_rec(layer2).shape.property("p"), 17)
+    assert_equal(first_shape(c0c.begin_shapes_rec(layer2)).property("p"), 17)
 
     l2 = RBA::Layout::new
     l2.dbu = 0.0005
@@ -1084,9 +1094,9 @@ class DBLayoutTests1_TestClass < TestBase
     layer1 = l2.find_layer(1, 0)
     layer2 = l2.find_layer(2, 0)
     assert_equal(collect(c0c.begin_shapes_rec(layer1), l), "[c0](0,200;2000,2400)")
-    assert_equal(c0c.begin_shapes_rec(layer1).shape.property("p"), nil)
+    assert_equal(first_shape(c0c.begin_shapes_rec(layer1)).property("p"), nil)
     assert_equal(collect(c0c.begin_shapes_rec(layer2), l), "[c0](2,202;2002,2402)")
-    assert_equal(c0c.begin_shapes_rec(layer2).shape.property("p"), 17)
+    assert_equal(first_shape(c0c.begin_shapes_rec(layer2)).property("p"), 17)
 
   end
 
@@ -1127,9 +1137,9 @@ class DBLayoutTests1_TestClass < TestBase
     assert_equal(collect(c0.begin_shapes_rec(0), l), "[c1](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)")
     assert_equal(collect(c0.begin_shapes_rec(1), l), "")
     assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c0$1](0,100;1000,1200)")
-    assert_equal(c0c.begin_shapes_rec(0).shape.property("p"), nil)
+    assert_equal(first_shape(c0c.begin_shapes_rec(0)).property("p"), nil)
     assert_equal(collect(c0c.begin_shapes_rec(1), l), "[c0$1](1,101;1001,1201)")
-    assert_equal(c0c.begin_shapes_rec(1).shape.property("p"), 17)
+    assert_equal(first_shape(c0c.begin_shapes_rec(1)).property("p"), 17)
     c0.move_shapes(c0c)
     assert_equal(collect(c0.begin_shapes_rec(0), l), "[c0](0,100;1000,1200)/[c1](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)")
     assert_equal(collect(c0.begin_shapes_rec(1), l), "[c0](1,101;1001,1201)")
@@ -1142,9 +1152,9 @@ class DBLayoutTests1_TestClass < TestBase
     assert_equal(collect(c0.begin_shapes_rec(0), l), "[c0](0,100;1000,1200)/[c1](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)")
     assert_equal(collect(c0.begin_shapes_rec(1), l), "")
     assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c0$1](1,101;1001,1201)")
-    assert_equal(c0c.begin_shapes_rec(0).shape.property("p"), 17)
+    assert_equal(first_shape(c0c.begin_shapes_rec(0)).property("p"), 17)
     assert_equal(collect(c0c.begin_shapes_rec(1), l), "")
-    assert_equal(c0c.begin_shapes_rec(1).shape.property("p"), nil)
+    assert_equal(first_shape(c0c.begin_shapes_rec(1)).property("p"), nil)
 
     l = ll.dup
     c0 = l.cell("c0")
@@ -1159,9 +1169,9 @@ class DBLayoutTests1_TestClass < TestBase
     assert_equal(collect(c0.begin_shapes_rec(0), l), "[c1](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)")
     assert_equal(collect(c0.begin_shapes_rec(1), l), "")
     assert_equal(collect(c0c.begin_shapes_rec(layer1), l), "[c0](0,200;2000,2400)")
-    assert_equal(c0c.begin_shapes_rec(layer1).shape.property("p"), nil)
+    assert_equal(first_shape(c0c.begin_shapes_rec(layer1)).property("p"), nil)
     assert_equal(collect(c0c.begin_shapes_rec(layer2), l), "[c0](2,202;2002,2402)")
-    assert_equal(c0c.begin_shapes_rec(layer2).shape.property("p"), 17)
+    assert_equal(first_shape(c0c.begin_shapes_rec(layer2)).property("p"), 17)
 
     l = ll.dup
     c0 = l.cell("c0")
@@ -1185,9 +1195,9 @@ class DBLayoutTests1_TestClass < TestBase
     assert_equal(collect(c0.begin_shapes_rec(0), l), "[c1](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)")
     assert_equal(collect(c0.begin_shapes_rec(1), l), "")
     assert_equal(collect(c0c.begin_shapes_rec(layer1), l), "[c0](0,200;2000,2400)")
-    assert_equal(c0c.begin_shapes_rec(layer1).shape.property("p"), nil)
+    assert_equal(first_shape(c0c.begin_shapes_rec(layer1)).property("p"), nil)
     assert_equal(collect(c0c.begin_shapes_rec(layer2), l), "[c0](2,202;2002,2402)")
-    assert_equal(c0c.begin_shapes_rec(layer2).shape.property("p"), 17)
+    assert_equal(first_shape(c0c.begin_shapes_rec(layer2)).property("p"), 17)
 
   end
 
@@ -1351,7 +1361,7 @@ class DBLayoutTests1_TestClass < TestBase
 
     layer1 = l2.find_layer(1, 0)
     layer2 = l2.find_layer(2, 0)
-    assert_equal(l2.cell("c1").begin_shapes_rec(layer1).shape.property("p"), 17)
+    assert_equal(first_shape(l2.cell("c1").begin_shapes_rec(layer1)).property("p"), 17)
     assert_equal(collect(c0c.begin_shapes_rec(layer1), l2), "[c0](0,200;2000,2400)/[c2](200,0;2200,2200)/[c3](2400,0;4400,2200)/[c3](-2400,0;-200,2000)/[c1](0,200;2000,2400)")
     assert_equal(collect(c0c.begin_shapes_rec(layer2), l2), "[c0](2,202;2002,2402)")
 
@@ -1401,7 +1411,7 @@ class DBLayoutTests1_TestClass < TestBase
     i0 = nil
     c0c.each_inst { |i| i.cell_index == l.cell("c1$1").cell_index && i0 = i }
     assert_equal(i0.property("p"), 18)
-    assert_equal(l.cell("c1$1").begin_shapes_rec(0).shape.property("p"), 17)
+    assert_equal(first_shape(l.cell("c1$1").begin_shapes_rec(0)).property("p"), 17)
 
     assert_equal(collect(c0.begin_shapes_rec(0), l), "")
     assert_equal(collect(c0.begin_shapes_rec(1), l), "")
@@ -1429,7 +1439,7 @@ class DBLayoutTests1_TestClass < TestBase
 
     layer1 = l2.find_layer(1, 0)
     layer2 = l2.find_layer(2, 0)
-    assert_equal(l2.cell("c1").begin_shapes_rec(layer1).shape.property("p"), 17)
+    assert_equal(first_shape(l2.cell("c1").begin_shapes_rec(layer1)).property("p"), 17)
     assert_equal(collect(c0c.begin_shapes_rec(layer1), l2), "[c0](0,200;2000,2400)/[c2](200,0;2200,2200)/[c3](2400,0;4400,2200)/[c3](-2400,0;-200,2000)/[c1](0,200;2000,2400)")
     assert_equal(collect(c0c.begin_shapes_rec(layer2), l2), "[c0](2,202;2002,2402)")
 
@@ -1471,16 +1481,16 @@ class DBLayoutTests1_TestClass < TestBase
     cm.for_single_cell(l, c0c.cell_index, l, c0.cell_index)
     c0c.copy_tree_shapes(c0, cm)
     assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c0$1](0,100;1000,1200)/[c0$1](0,100;1000,1200)/[c0$1](100,0;1100,1100)/[c0$1](-1200,0;-100,1000)/[c0$1](1200,0;2200,1100)")
-    assert_equal(c0c.begin_shapes_rec(0).shape.property("p"), nil)
+    assert_equal(first_shape(c0c.begin_shapes_rec(0)).property("p"), nil)
     assert_equal(collect(c0c.begin_shapes_rec(1), l), "[c0$1](1,101;1001,1201)")
-    assert_equal(c0c.begin_shapes_rec(1).shape.property("p"), 17)
+    assert_equal(first_shape(c0c.begin_shapes_rec(1)).property("p"), 17)
      
     c0c.clear
     lm = RBA::LayerMapping::new
     lm.map(1, 0)
     c0c.copy_tree_shapes(c0, cm, lm)
     assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c0$1](1,101;1001,1201)")
-    assert_equal(c0c.begin_shapes_rec(0).shape.property("p"), 17)
+    assert_equal(first_shape(c0c.begin_shapes_rec(0)).property("p"), 17)
     assert_equal(collect(c0c.begin_shapes_rec(1), l), "")
     assert_equal(c0c.begin_shapes_rec(1).shape.property("p"), nil)
 
@@ -1488,9 +1498,9 @@ class DBLayoutTests1_TestClass < TestBase
     cm.for_single_cell_full(l, c0c.cell_index, l, c0.cell_index)
     c0c.copy_tree_shapes(c0, cm)
     assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c0$1](0,100;1000,1200)/[c2$1](100,0;1100,1100)/[c3$1](1200,0;2200,1100)/[c3$1](-1200,0;-100,1000)/[c1$1](0,100;1000,1200)")
-    assert_equal(c0c.begin_shapes_rec(0).shape.property("p"), nil)
+    assert_equal(first_shape(c0c.begin_shapes_rec(0)).property("p"), nil)
     assert_equal(collect(c0c.begin_shapes_rec(1), l), "[c0$1](1,101;1001,1201)")
-    assert_equal(c0c.begin_shapes_rec(1).shape.property("p"), 17)
+    assert_equal(first_shape(c0c.begin_shapes_rec(1)).property("p"), 17)
 
     i0 = nil
     c0c.each_inst { |i| i.cell_index == l.cell("c1$1").cell_index && i0 = i }
@@ -1505,9 +1515,9 @@ class DBLayoutTests1_TestClass < TestBase
     layer1 = l2.find_layer(1, 0)
     layer2 = l2.find_layer(2, 0)
     assert_equal(collect(c0c.begin_shapes_rec(layer1), l), "[c0](0,200;2000,2400)/[c2](200,0;2200,2200)/[c3](2400,0;4400,2200)/[c3](-2400,0;-200,2000)/[c1](0,200;2000,2400)")
-    assert_equal(c0c.begin_shapes_rec(layer1).shape.property("p"), nil)
+    assert_equal(first_shape(c0c.begin_shapes_rec(layer1)).property("p"), nil)
     assert_equal(collect(c0c.begin_shapes_rec(layer2), l), "[c0](2,202;2002,2402)")
-    assert_equal(c0c.begin_shapes_rec(layer2).shape.property("p"), 17)
+    assert_equal(first_shape(c0c.begin_shapes_rec(layer2)).property("p"), 17)
 
     i0 = nil
     c0c.each_inst { |i| i.cell_index == l2.cell("c1").cell_index && i0 = i }
@@ -1559,9 +1569,9 @@ class DBLayoutTests1_TestClass < TestBase
     assert_equal(collect(c0.begin_shapes_rec(0), l), "")
     assert_equal(collect(c0.begin_shapes_rec(1), l), "")
     assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c0$1](0,100;1000,1200)/[c0$1](0,100;1000,1200)/[c0$1](100,0;1100,1100)/[c0$1](-1200,0;-100,1000)/[c0$1](1200,0;2200,1100)")
-    assert_equal(c0c.begin_shapes_rec(0).shape.property("p"), nil)
+    assert_equal(first_shape(c0c.begin_shapes_rec(0)).property("p"), nil)
     assert_equal(collect(c0c.begin_shapes_rec(1), l), "[c0$1](1,101;1001,1201)")
-    assert_equal(c0c.begin_shapes_rec(1).shape.property("p"), 17)
+    assert_equal(first_shape(c0c.begin_shapes_rec(1)).property("p"), 17)
 
     l = ll.dup
     c0 = l.cell("c0")
@@ -1573,9 +1583,9 @@ class DBLayoutTests1_TestClass < TestBase
     assert_equal(collect(c0.begin_shapes_rec(0), l), "[c0](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)/[c1](0,100;1000,1200)")
     assert_equal(collect(c0.begin_shapes_rec(1), l), "")
     assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c0$1](1,101;1001,1201)")
-    assert_equal(c0c.begin_shapes_rec(0).shape.property("p"), 17)
+    assert_equal(first_shape(c0c.begin_shapes_rec(0)).property("p"), 17)
     assert_equal(collect(c0c.begin_shapes_rec(1), l), "")
-    assert_equal(c0c.begin_shapes_rec(1).shape.property("p"), nil)
+    assert_equal(first_shape(c0c.begin_shapes_rec(1)).property("p"), nil)
 
     l = ll.dup
     c0 = l.cell("c0")
@@ -1586,9 +1596,9 @@ class DBLayoutTests1_TestClass < TestBase
     assert_equal(collect(c0.begin_shapes_rec(0), l), "")
     assert_equal(collect(c0.begin_shapes_rec(1), l), "")
     assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c0$1](0,100;1000,1200)/[c2$1](100,0;1100,1100)/[c3$1](1200,0;2200,1100)/[c3$1](-1200,0;-100,1000)/[c1$1](0,100;1000,1200)")
-    assert_equal(c0c.begin_shapes_rec(0).shape.property("p"), nil)
+    assert_equal(first_shape(c0c.begin_shapes_rec(0)).property("p"), nil)
     assert_equal(collect(c0c.begin_shapes_rec(1), l), "[c0$1](1,101;1001,1201)")
-    assert_equal(c0c.begin_shapes_rec(1).shape.property("p"), 17)
+    assert_equal(first_shape(c0c.begin_shapes_rec(1)).property("p"), 17)
 
     i0 = nil
     c0c.each_inst { |i| i.cell_index == l.cell("c1$1").cell_index && i0 = i }
@@ -1608,9 +1618,9 @@ class DBLayoutTests1_TestClass < TestBase
     layer1 = l2.find_layer(1, 0)
     layer2 = l2.find_layer(2, 0)
     assert_equal(collect(c0c.begin_shapes_rec(layer1), l), "[c0](0,200;2000,2400)/[c2](200,0;2200,2200)/[c3](2400,0;4400,2200)/[c3](-2400,0;-200,2000)/[c1](0,200;2000,2400)")
-    assert_equal(c0c.begin_shapes_rec(layer1).shape.property("p"), nil)
+    assert_equal(first_shape(c0c.begin_shapes_rec(layer1)).property("p"), nil)
     assert_equal(collect(c0c.begin_shapes_rec(layer2), l), "[c0](2,202;2002,2402)")
-    assert_equal(c0c.begin_shapes_rec(layer2).shape.property("p"), 17)
+    assert_equal(first_shape(c0c.begin_shapes_rec(layer2)).property("p"), 17)
 
     i0 = nil
     c0c.each_inst { |i| i.cell_index == l2.cell("c1").cell_index && i0 = i }
@@ -1833,10 +1843,10 @@ class DBLayoutTests1_TestClass < TestBase
 
     lt.copy_tree_shapes(l, cm)
     assert_equal(collect(c0t.begin_shapes_rec(0), lt), "[c0](0,100;1000,1200)/[c0](0,100;1000,1200)/[c0](100,0;1100,1100)/[c0](-1200,0;-100,1000)/[c0](1200,0;2200,1100)")
-    assert_equal(c0t.begin_shapes_rec(0).shape.property("p"), nil)
+    assert_equal(first_shape(c0t.begin_shapes_rec(0)).property("p"), nil)
     assert_equal(collect(c9t.begin_shapes_rec(0), lt), "[c9](0,100;1000,1200)")
     assert_equal(collect(c0t.begin_shapes_rec(1), l), "[c0](1,101;1001,1201)")
-    assert_equal(c0t.begin_shapes_rec(1).shape.property("p"), 17)
+    assert_equal(first_shape(c0t.begin_shapes_rec(1)).property("p"), 17)
     assert_equal(collect(c9t.begin_shapes_rec(1), l), "")
 
     lt = RBA::Layout::new
@@ -1850,10 +1860,10 @@ class DBLayoutTests1_TestClass < TestBase
 
     lt.copy_tree_shapes(l, cm)
     assert_equal(collect(c0t.begin_shapes_rec(0), lt), "[c0](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)/[c1](0,100;1000,1200)")
-    assert_equal(c0t.begin_shapes_rec(0).shape.property("p"), nil)
+    assert_equal(first_shape(c0t.begin_shapes_rec(0)).property("p"), nil)
     assert_equal(collect(c9t.begin_shapes_rec(0), lt), "[c1](0,100;1000,1200)")
     assert_equal(collect(c0t.begin_shapes_rec(1), l), "[c0](1,101;1001,1201)")
-    assert_equal(c0t.begin_shapes_rec(1).shape.property("p"), 17)
+    assert_equal(first_shape(c0t.begin_shapes_rec(1)).property("p"), 17)
     assert_equal(collect(c9t.begin_shapes_rec(1), l), "")
 
     lt = RBA::Layout::new
@@ -1873,7 +1883,7 @@ class DBLayoutTests1_TestClass < TestBase
 
     lt.copy_tree_shapes(l, cm, lm)
     assert_equal(collect(c0t.begin_shapes_rec(ll), lt), "[c0](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)/[c1](0,100;1000,1200)")
-    assert_equal(c0t.begin_shapes_rec(ll).shape.property("p"), nil)
+    assert_equal(first_shape(c0t.begin_shapes_rec(ll)).property("p"), nil)
     assert_equal(collect(c9t.begin_shapes_rec(ll), lt), "[c1](0,100;1000,1200)")
 
     lt = RBA::Layout::new
@@ -1897,10 +1907,10 @@ class DBLayoutTests1_TestClass < TestBase
     assert_equal(collect(ls.cell(c9.cell_index).begin_shapes_rec(1), ls), "")
 
     assert_equal(collect(c0t.begin_shapes_rec(0), lt), "[c0](0,100;1000,1200)/[c0](0,100;1000,1200)/[c0](100,0;1100,1100)/[c0](-1200,0;-100,1000)/[c0](1200,0;2200,1100)")
-    assert_equal(c0t.begin_shapes_rec(0).shape.property("p"), nil)
+    assert_equal(first_shape(c0t.begin_shapes_rec(0)).property("p"), nil)
     assert_equal(collect(c9t.begin_shapes_rec(0), lt), "[c9](0,100;1000,1200)")
     assert_equal(collect(c0t.begin_shapes_rec(1), l), "[c0](1,101;1001,1201)")
-    assert_equal(c0t.begin_shapes_rec(1).shape.property("p"), 17)
+    assert_equal(first_shape(c0t.begin_shapes_rec(1)).property("p"), 17)
     assert_equal(collect(c9t.begin_shapes_rec(1), l), "")
 
     lt = RBA::Layout::new
@@ -1931,7 +1941,7 @@ class DBLayoutTests1_TestClass < TestBase
     assert_equal(collect(ls.cell(c9.cell_index).begin_shapes_rec(1), ls), "")
 
     assert_equal(collect(c0t.begin_shapes_rec(ll), lt), "[c0](0,100;1000,1200)/[c0](0,100;1000,1200)/[c0](100,0;1100,1100)/[c0](-1200,0;-100,1000)/[c0](1200,0;2200,1100)")
-    assert_equal(c0t.begin_shapes_rec(ll).shape.property("p"), nil)
+    assert_equal(first_shape(c0t.begin_shapes_rec(ll)).property("p"), nil)
     assert_equal(collect(c9t.begin_shapes_rec(ll), lt), "[c9](0,100;1000,1200)")
 
   end

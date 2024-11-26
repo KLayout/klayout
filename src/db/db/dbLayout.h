@@ -624,7 +624,7 @@ public:
    *  @brief Gets the lock for the layout object
    *  This is a generic lock that can be used to lock modifications against multiple threads.
    */
-  tl::Mutex &lock ()
+  tl::Mutex &lock () const
   {
     return m_lock;
   }
@@ -1791,34 +1791,18 @@ public:
    *  an operation, the start/end_changes method pair does not
    *  need to be called.
    */
-  void start_changes ()
-  {
-    ++m_invalid;
-  }
+  void start_changes ();
 
   /**
    *  @brief Cancel the "in changes" state (see "start_changes")
    */
-  void end_changes ()
-  {
-    if (m_invalid > 0) {
-      --m_invalid;
-      if (! m_invalid) {
-        update ();
-      }
-    }
-  }
+  void end_changes ();
 
   /**
    *  @brief Cancel the "in changes" state (see "start_changes")
    *  This version does not force an update
    */
-  void end_changes_no_update ()
-  {
-    if (m_invalid > 0) {
-      --m_invalid;
-    }
-  }
+  void end_changes_no_update ();
 
   /**
    *  @brief Tell if the layout object is under construction
@@ -2168,7 +2152,7 @@ private:
   std::map<db::cell_index_type, meta_info_map> m_meta_info_by_cell;
 
   std::string m_tech_name;
-  tl::Mutex m_lock;
+  mutable tl::Mutex m_lock;
 
   /**
    *  @brief Sort the cells topologically
@@ -2211,6 +2195,11 @@ private:
    *  @brief Recovers a proxy without considering the library from context_info
    */
   db::Cell *recover_proxy_no_lib (const LayoutOrCellContextInfo &context_info);
+
+  /**
+   *  @brief Does an update without checking under_construction() and no Mutex
+   */
+  void force_update_no_lock () const;
 };
 
 /**

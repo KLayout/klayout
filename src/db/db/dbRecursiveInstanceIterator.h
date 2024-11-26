@@ -141,7 +141,7 @@ public:
   { 
     if (m_max_depth != depth) {
       m_max_depth = depth; 
-      m_needs_reinit = true;
+      reset ();
     }
   }
 
@@ -164,7 +164,7 @@ public:
   {
     if (m_min_depth != depth) {
       m_min_depth = depth;
-      m_needs_reinit = true;
+      reset ();
     }
   }
 
@@ -262,17 +262,14 @@ public:
   {
     if (m_overlapping != f) {
       m_overlapping = f;
-      m_needs_reinit = true;
+      reset ();
     }
   }
 
   /**
    *  @brief Reset the iterator
    */
-  void reset () 
-  {
-    m_needs_reinit = true;
-  }
+  void reset ();
 
   /**
    *  @brief Gets the selected target cells
@@ -552,6 +549,7 @@ private:
   std::unique_ptr<region_type> mp_complex_region;
   db::box_convert<db::CellInst> m_box_convert;
 
+  mutable db::LayoutLocker m_locker;
   mutable inst_iterator m_inst;
   mutable inst_array_iterator m_inst_array;
   mutable instance_element_type m_combined_instance;

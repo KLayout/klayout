@@ -265,7 +265,7 @@ public:
   { 
     if (m_max_depth != depth) {
       m_max_depth = depth; 
-      m_needs_reinit = true;
+      reset ();
     }
   }
 
@@ -288,7 +288,7 @@ public:
   {
     if (m_min_depth != depth) {
       m_min_depth = depth;
-      m_needs_reinit = true;
+      reset ();
     }
   }
 
@@ -433,7 +433,7 @@ public:
   {
     if (m_overlapping != f) {
       m_overlapping = f;
-      m_needs_reinit = true;
+      reset ();
     }
   }
 
@@ -452,7 +452,7 @@ public:
   {
     if (m_for_merged_input != f) {
       m_for_merged_input = f;
-      m_needs_reinit = true;
+      reset ();
     }
   }
 
@@ -483,10 +483,7 @@ public:
   /**
    *  @brief Reset the iterator
    */
-  void reset () 
-  {
-    m_needs_reinit = true;
-  }
+  void reset ();
 
   /**
    *  @brief Select cells 
@@ -559,7 +556,7 @@ public:
   { 
     if (m_shape_flags != flags) {
       m_shape_flags = flags; 
-      m_needs_reinit = true;
+      reset ();
     }
   }
 
@@ -596,7 +593,7 @@ public:
   { 
     if (mp_shape_prop_sel != prop_sel) {
       mp_shape_prop_sel = prop_sel; 
-      m_needs_reinit = true;
+      reset ();
     }
   }
 
@@ -610,7 +607,7 @@ public:
   { 
     if (m_shape_inv_prop_sel != inv) {
       m_shape_inv_prop_sel = inv; 
-      m_needs_reinit = true;
+      reset ();
     }
   }
 
@@ -854,6 +851,7 @@ private:
   std::unique_ptr<region_type> mp_complex_region;
   db::box_convert<db::CellInst> m_box_convert;
 
+  mutable db::LayoutLocker m_locker;
   mutable inst_iterator m_inst;
   mutable inst_array_iterator m_inst_array;
   mutable std::map<db::cell_index_type, bool> m_empty_cells_cache;

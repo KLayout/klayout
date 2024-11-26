@@ -23,6 +23,16 @@ end
 
 load("test_prologue.rb")
 
+def first_shape(s)
+
+  sdup = s.dup
+  shape = sdup.shape
+  sdup._destroy
+
+  return shape
+
+end
+
 class BoxPCell < RBA::PCellDeclaration
 
   def display_text(parameters)
@@ -428,30 +438,30 @@ class DBPCell_TestClass < TestBase
     li2 = ly.layer_indices.find { |li| ly.get_info(li).to_s == "10/0" }
     assert_equal(li2 != nil, true)
 
-    assert_equal(ly.begin_shapes(c1.cell_index, li1).shape.to_s, "box (-250,-500;250,500)")
-    assert_equal(ly.begin_shapes(lib_proxy.cell_index, li2).shape.to_s, "box (0,0;10,20)")
+    assert_equal(first_shape(ly.begin_shapes(c1.cell_index, li1)).to_s, "box (-250,-500;250,500)")
+    assert_equal(first_shape(ly.begin_shapes(lib_proxy.cell_index, li2)).to_s, "box (0,0;10,20)")
 
     param = { "w" => 1, "h" => 2 }
     c1.change_pcell_parameters(pcell_inst, param)
-    assert_equal(ly.begin_shapes(c1.cell_index, li1).shape.to_s, "box (-50,-100;50,100)")
+    assert_equal(first_shape(ly.begin_shapes(c1.cell_index, li1)).to_s, "box (-50,-100;50,100)")
     
     param = [ RBA::LayerInfo::new(1, 0), 5.0, 5.0 ]
     c1.change_pcell_parameters(pcell_inst, param)
-    assert_equal(ly.begin_shapes(c1.cell_index, li1).shape.to_s, "box (-250,-250;250,250)")
+    assert_equal(first_shape(ly.begin_shapes(c1.cell_index, li1)).to_s, "box (-250,-250;250,250)")
     
     pcell_inst.change_pcell_parameters({ "w" => 2.0, "h" => 10.0 })
-    assert_equal(ly.begin_shapes(c1.cell_index, li1).shape.to_s, "box (-100,-500;100,500)")
+    assert_equal(first_shape(ly.begin_shapes(c1.cell_index, li1)).to_s, "box (-100,-500;100,500)")
 
     pcell_inst.change_pcell_parameters([ RBA::LayerInfo::new(1, 0), 5.0, 5.0 ])
-    assert_equal(ly.begin_shapes(c1.cell_index, li1).shape.to_s, "box (-250,-250;250,250)")
+    assert_equal(first_shape(ly.begin_shapes(c1.cell_index, li1)).to_s, "box (-250,-250;250,250)")
 
     pcell_inst.change_pcell_parameter("w", 5.0)
     pcell_inst.change_pcell_parameter("h", 1.0)
-    assert_equal(ly.begin_shapes(c1.cell_index, li1).shape.to_s, "box (-250,-50;250,50)")
+    assert_equal(first_shape(ly.begin_shapes(c1.cell_index, li1)).to_s, "box (-250,-50;250,50)")
 
     c1.change_pcell_parameter(pcell_inst, "w", 10.0)
     c1.change_pcell_parameter(pcell_inst, "h", 2.0)
-    assert_equal(ly.begin_shapes(c1.cell_index, li1).shape.to_s, "box (-500,-100;500,100)")
+    assert_equal(first_shape(ly.begin_shapes(c1.cell_index, li1)).to_s, "box (-500,-100;500,100)")
 
     assert_equal(ly.cell(pcell_inst.cell_index).is_pcell_variant?, true)
     assert_equal(pcell_inst.is_pcell?, true)
@@ -460,18 +470,18 @@ class DBPCell_TestClass < TestBase
     assert_equal(ly.cell(new_id).is_pcell_variant?, false)
     param = [ RBA::LayerInfo::new(1, 0), 5.0, 5.0 ]
     c1.change_pcell_parameters(pcell_inst, param)
-    assert_equal(ly.begin_shapes(c1.cell_index, li1).shape.to_s, "box (-250,-250;250,250)")
+    assert_equal(first_shape(ly.begin_shapes(c1.cell_index, li1)).to_s, "box (-250,-250;250,250)")
     pcell_inst.cell_index = new_id
-    assert_equal(ly.begin_shapes(c1.cell_index, li1).shape.to_s, "box (-500,-100;500,100)")
+    assert_equal(first_shape(ly.begin_shapes(c1.cell_index, li1)).to_s, "box (-500,-100;500,100)")
 
     l10 = ly.layer(10, 0)
     c1.shapes(l10).insert(RBA::Box::new(0, 10, 100, 210))
     l11 = ly.layer(11, 0)
     c1.shapes(l11).insert(RBA::Text::new("hello", RBA::Trans::new))
-    assert_equal(pcell_decl.can_create_from_shape(ly, ly.begin_shapes(c1.cell_index(), l11).shape(), l10), false)
-    assert_equal(pcell_decl.can_create_from_shape(ly, ly.begin_shapes(c1.cell_index(), l10).shape(), l10), true)
-    assert_equal(pcell_decl.parameters_from_shape(ly, ly.begin_shapes(c1.cell_index(), l10).shape(), l10).inspect, "[<10/0>, 1.0, 2.0]")
-    assert_equal(pcell_decl.transformation_from_shape(ly, ly.begin_shapes(c1.cell_index(), l10).shape(), l10).to_s, "r0 50,110")
+    assert_equal(pcell_decl.can_create_from_shape(ly, first_shape(ly.begin_shapes(c1.cell_index(), l11)), l10), false)
+    assert_equal(pcell_decl.can_create_from_shape(ly, first_shape(ly.begin_shapes(c1.cell_index(), l10)), l10), true)
+    assert_equal(pcell_decl.parameters_from_shape(ly, first_shape(ly.begin_shapes(c1.cell_index(), l10)), l10).inspect, "[<10/0>, 1.0, 2.0]")
+    assert_equal(pcell_decl.transformation_from_shape(ly, first_shape(ly.begin_shapes(c1.cell_index(), l10)), l10).to_s, "r0 50,110")
 
     ly._destroy
     tl._destroy
@@ -522,21 +532,21 @@ class DBPCell_TestClass < TestBase
     pcell_inst.change_pcell_parameter("height", 2.0)
     assert_equal(norm_hash(pcell_inst.pcell_parameters_by_name()), "{\"height\"=>2.0, \"layer\"=><1/0>, \"secret\"=>0, \"width\"=>1.0}")
 
-    assert_equal(ly.begin_shapes(c1.cell_index(), li1).shape().to_s, "box (-50,-100;50,100)")
+    assert_equal(first_shape(ly.begin_shapes(c1.cell_index(), li1)).to_s, "box (-50,-100;50,100)")
 
     param = { "layer" => RBA::LayerInfo::new(2, 0), "width" => 2, "height" => 1 }
     li2 = ly.layer(2, 0)
     c1.change_pcell_parameters(pcell_inst, param)
-    assert_equal(ly.begin_shapes(c1.cell_index(), li2).shape().to_s, "box (-100,-50;100,50)")
+    assert_equal(first_shape(ly.begin_shapes(c1.cell_index(), li2)).to_s, "box (-100,-50;100,50)")
 
     l10 = ly.layer(10, 0)
     c1.shapes(l10).insert(RBA::Box::new(0, 10, 100, 210))
     l11 = ly.layer(11, 0)
     c1.shapes(l11).insert(RBA::Text::new("hello", RBA::Trans::new))
-    assert_equal(pcell_decl.can_create_from_shape(ly, ly.begin_shapes(c1.cell_index(), l11).shape(), l10), false)
-    assert_equal(pcell_decl.can_create_from_shape(ly, ly.begin_shapes(c1.cell_index(), l10).shape(), l10), true)
-    assert_equal(pcell_decl.parameters_from_shape(ly, ly.begin_shapes(c1.cell_index(), l10).shape(), l10).inspect, "[<10/0>, 1.0, 2.0, 0]")
-    assert_equal(pcell_decl.transformation_from_shape(ly, ly.begin_shapes(c1.cell_index(), l10).shape(), l10).to_s, "r0 50,110")
+    assert_equal(pcell_decl.can_create_from_shape(ly, first_shape(ly.begin_shapes(c1.cell_index(), l11)), l10), false)
+    assert_equal(pcell_decl.can_create_from_shape(ly, first_shape(ly.begin_shapes(c1.cell_index(), l10)), l10), true)
+    assert_equal(pcell_decl.parameters_from_shape(ly, first_shape(ly.begin_shapes(c1.cell_index(), l10)), l10).inspect, "[<10/0>, 1.0, 2.0, 0]")
+    assert_equal(pcell_decl.transformation_from_shape(ly, first_shape(ly.begin_shapes(c1.cell_index(), l10)), l10).to_s, "r0 50,110")
 
     param2 = c1.pcell_parameters(pcell_inst)
     param2[3] = -2  # "secret"
@@ -594,13 +604,13 @@ class DBPCell_TestClass < TestBase
 
     assert_equal(pcell_inst.is_pcell?, true)
 
-    assert_equal(ly.begin_shapes(pcell_inst.cell_index, li1).shape.to_s, "box (-500,-100;500,100)")
+    assert_equal(first_shape(ly.begin_shapes(pcell_inst.cell_index, li1)).to_s, "box (-500,-100;500,100)")
     pcell_inst.convert_to_static
     assert_equal(pcell_inst.is_pcell?, false)
-    assert_equal(ly.begin_shapes(pcell_inst.cell_index, li1).shape.to_s, "box (-500,-100;500,100)")
+    assert_equal(first_shape(ly.begin_shapes(pcell_inst.cell_index, li1)).to_s, "box (-500,-100;500,100)")
     pcell_inst.convert_to_static
     assert_equal(pcell_inst.is_pcell?, false)
-    assert_equal(ly.begin_shapes(pcell_inst.cell_index, li1).shape.to_s, "box (-500,-100;500,100)")
+    assert_equal(first_shape(ly.begin_shapes(pcell_inst.cell_index, li1)).to_s, "box (-500,-100;500,100)")
 
     ly._destroy
     tl._destroy
@@ -625,7 +635,7 @@ class DBPCell_TestClass < TestBase
     pcell_var = ly.cell(pcell_var_id)
     pcell_inst = c1.insert(RBA::CellInstArray::new(pcell_var_id, RBA::Trans::new))
 
-    assert_equal(ly.begin_shapes(c1.cell_index, ly.layer(1, 0)).shape.to_s, "box (-200,-400;200,400)")
+    assert_equal(first_shape(ly.begin_shapes(c1.cell_index, ly.layer(1, 0))).to_s, "box (-200,-400;200,400)")
     
     ly._destroy
     tl._destroy
@@ -643,7 +653,7 @@ class DBPCell_TestClass < TestBase
     param = { "w" => 4.0, "h" => 8.0, "l" => RBA::LayerInfo::new(1, 0) }
     pcell_var_id = lib.layout.add_pcell_variant(pcell_decl_id, param)
 
-    assert_equal(lib.layout.begin_shapes(pcell_var_id, lib.layout.layer(1, 0)).shape.to_s, "box (-2000,-4000;2000,4000)")
+    assert_equal(first_shape(lib.layout.begin_shapes(pcell_var_id, lib.layout.layer(1, 0))).to_s, "box (-2000,-4000;2000,4000)")
     
     tl._destroy
 
@@ -660,7 +670,7 @@ class DBPCell_TestClass < TestBase
     param = { "w" => 3.0, "h" => 7.0, "l" => RBA::LayerInfo::new(2, 0) }
     pcell_var_id = lib.layout.add_pcell_variant(pcell_decl_id, param)
 
-    assert_equal(lib.layout.begin_shapes(pcell_var_id, lib.layout.layer(2, 0)).shape.to_s, "box (-1500,-3500;1500,3500)")
+    assert_equal(first_shape(lib.layout.begin_shapes(pcell_var_id, lib.layout.layer(2, 0))).to_s, "box (-1500,-3500;1500,3500)")
 
     tl._destroy
 
@@ -676,7 +686,7 @@ class DBPCell_TestClass < TestBase
     param = { "w" => 3.0, "h" => 8.0, "l" => RBA::LayerInfo::new(3, 0) }
     pcell_var = lib.layout.create_cell("Box", param)
 
-    assert_equal(lib.layout.begin_shapes(pcell_var.cell_index, lib.layout.layer(3, 0)).shape.to_s, "box (-1500,-4000;1500,4000)")
+    assert_equal(first_shape(lib.layout.begin_shapes(pcell_var.cell_index, lib.layout.layer(3, 0))).to_s, "box (-1500,-4000;1500,4000)")
     
     tl._destroy
 
@@ -693,7 +703,7 @@ class DBPCell_TestClass < TestBase
     param = { "w" => 4.0, "h" => 8.0, "l" => RBA::LayerInfo::new(4, 0) }
     cell = ly.create_cell("Box", "PCellTestLib", param)
 
-    assert_equal(ly.begin_shapes(cell, ly.layer(4, 0)).shape.to_s, "box (-200,-400;200,400)")
+    assert_equal(first_shape(ly.begin_shapes(cell, ly.layer(4, 0))).to_s, "box (-200,-400;200,400)")
     
     tl._destroy
     ly._destroy
@@ -715,7 +725,7 @@ class DBPCell_TestClass < TestBase
 
     cell = ly.create_cell("BOXVAR", "PCellTestLib")
 
-    assert_equal(cell.begin_shapes_rec(ly.layer(5, 0)).shape.to_s, "box (-100,-300;100,300)")
+    assert_equal(first_shape(cell.begin_shapes_rec(ly.layer(5, 0))).to_s, "box (-100,-300;100,300)")
 
     tl._destroy
     ly._destroy

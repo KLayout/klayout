@@ -29,13 +29,14 @@ namespace db
 {
 
 LayoutStateModel::LayoutStateModel (bool busy)
-  : m_hier_dirty (false), m_hier_generation_id (0), m_all_bboxes_dirty (false), m_busy (busy)
+  : m_hier_dirty (false), m_hier_generation_id (0), m_all_bboxes_dirty (false), m_some_bboxes_dirty (false), m_busy (busy)
 {
   //  .. nothing yet ..
 }
 
 LayoutStateModel::LayoutStateModel (const LayoutStateModel &d)
-  : m_hier_dirty (d.m_hier_dirty), m_hier_generation_id (d.m_hier_generation_id), m_bboxes_dirty (d.m_bboxes_dirty), m_all_bboxes_dirty (d.m_all_bboxes_dirty), m_busy (d.m_busy)
+  : m_hier_dirty (d.m_hier_dirty), m_hier_generation_id (d.m_hier_generation_id), m_bboxes_dirty (d.m_bboxes_dirty),
+    m_all_bboxes_dirty (d.m_all_bboxes_dirty), m_some_bboxes_dirty (d.m_some_bboxes_dirty), m_busy (d.m_busy)
 {
   //  .. nothing yet ..
 }
@@ -47,6 +48,7 @@ LayoutStateModel::operator= (const LayoutStateModel &d)
   m_hier_generation_id = d.m_hier_generation_id;
   m_bboxes_dirty = d.m_bboxes_dirty;
   m_all_bboxes_dirty = d.m_all_bboxes_dirty;
+  m_some_bboxes_dirty = d.m_some_bboxes_dirty;
   m_busy = d.m_busy;
   return *this;
 }
@@ -84,6 +86,7 @@ LayoutStateModel::invalidate_bboxes (unsigned int index)
         m_bboxes_dirty.resize (index + 1, false);
       }
       m_bboxes_dirty [index] = true;
+      m_some_bboxes_dirty = true;
     }
   }
 }
@@ -91,7 +94,7 @@ LayoutStateModel::invalidate_bboxes (unsigned int index)
 bool
 LayoutStateModel::bboxes_dirty () const
 {
-  return ! m_bboxes_dirty.empty () || m_all_bboxes_dirty;
+  return m_some_bboxes_dirty || m_all_bboxes_dirty;
 }
 
 void
@@ -100,6 +103,7 @@ LayoutStateModel::update ()
   if (bboxes_dirty () || m_hier_dirty) {
     do_update ();
     m_bboxes_dirty.clear ();
+    m_some_bboxes_dirty = false;
     m_all_bboxes_dirty = false;
     m_hier_dirty = false;
   }

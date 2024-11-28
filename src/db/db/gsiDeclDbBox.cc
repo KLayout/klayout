@@ -380,36 +380,34 @@ struct box_defs
       "\n"
       "@return The scaled box\n"
     ) +
-    method_ext ("move", &box_defs<C>::move, gsi::arg ("dx"), gsi::arg ("dy"),
+    method_ext ("move", &box_defs<C>::move, gsi::arg ("dx", 0), gsi::arg ("dy", 0),
       "@brief Moves the box by a certain distance\n"
-      "\n"
       "\n"
       "This is a convenience method which takes two values instead of a Point object.\n"
       "This method has been introduced in version 0.23.\n"
       "\n"
       "@return A reference to this box.\n"
     ) +
-    method_ext ("moved", &box_defs<C>::moved, gsi::arg ("dx"), gsi::arg ("dy"),
+    method_ext ("moved", &box_defs<C>::moved, gsi::arg ("dx, 0"), gsi::arg ("dy", 0),
       "@brief Moves the box by a certain distance\n"
-      "\n"
       "\n"
       "This is a convenience method which takes two values instead of a Point object.\n"
       "This method has been introduced in version 0.23.\n"
       "\n"
       "@return The moved box.\n"
     ) +
-    method ("move", &C::move, gsi::arg ("distance"),
+    method ("move", &C::move, gsi::arg ("d"),
       "@brief Moves the box by a certain distance\n"
       "\n"
       "\n"
       "Moves the box by a given offset and returns the moved\n"
       "box. Does not check for coordinate overflows.\n"
       "\n"
-      "@param distance The offset to move the box.\n"
+      "@param d The offset to move the box.\n"
       "\n"
       "@return A reference to this box.\n"
     ) +
-    method ("moved", &C::moved, gsi::arg ("distance"),
+    method ("moved", &C::moved, gsi::arg ("d"),
       "@brief Returns the box moved by a certain distance\n"
       "\n"
       "\n"
@@ -417,7 +415,7 @@ struct box_defs
       "box. Does not modify this box. Does not check for coordinate\n"
       "overflows.\n"
       "\n"
-      "@param distance The offset to move the box.\n"
+      "@param d The offset to move the box.\n"
       "\n"
       "@return The moved box.\n"
     ) +

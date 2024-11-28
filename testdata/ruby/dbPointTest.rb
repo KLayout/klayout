@@ -163,6 +163,28 @@ class DBPoint_TestClass < TestBase
 
   end
 
+  # move/moved
+  def test_5_Point
+
+    p1 = RBA::DPoint::new(1, 2)
+    assert_equal(p1.moved(2, 3).to_s, "3,5")
+    assert_equal(p1.to_s, "1,2")
+    assert_equal(p1.move(2, 3).to_s, "3,5")
+    assert_equal(p1.to_s, "3,5")
+
+    p1 = RBA::DPoint::new(1, 2)
+    assert_equal(p1.moved(RBA::DVector::new(2, 3)).to_s, "3,5")
+    assert_equal(p1.to_s, "1,2")
+    assert_equal(p1.move(RBA::DVector::new(2, 3)).to_s, "3,5")
+    assert_equal(p1.to_s, "3,5")
+
+    p1 = RBA::DPoint::new(1, 2)
+    assert_equal(p1.moved(:dx => 1).to_s, "2,2")
+    p1.move(:dy => 3)
+    assert_equal(p1.to_s, "1,5")
+
+  end
+
 end
 
 load("test_epilogue.rb")

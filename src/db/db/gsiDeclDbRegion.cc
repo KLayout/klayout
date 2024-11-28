@@ -3039,14 +3039,14 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "@return The moved region (self).\n"
   ) +
-  method_ext ("move", &move_xy, gsi::arg ("x"), gsi::arg ("y"),
+  method_ext ("move", &move_xy, gsi::arg ("dx", 0), gsi::arg ("dy", 0),
     "@brief Moves the region\n"
     "\n"
     "Moves the region by the given offset and returns the \n"
     "moved region. The region is overwritten.\n"
     "\n"
-    "@param x The x distance to move the region.\n"
-    "@param y The y distance to move the region.\n"
+    "@param dx The x distance to move the region.\n"
+    "@param dy The y distance to move the region.\n"
     "\n"
     "@return The moved region (self).\n"
   ) +
@@ -3058,18 +3058,18 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Starting with version 0.25 this method accepts a vector argument.\n"
     "\n"
-    "@param p The distance to move the region.\n"
+    "@param v The distance to move the region.\n"
     "\n"
     "@return The moved region.\n"
   ) +
-  method_ext ("moved", &moved_xy, gsi::arg ("x"), gsi::arg ("y"),
+  method_ext ("moved", &moved_xy, gsi::arg ("dx", 0), gsi::arg ("dy", 0),
     "@brief Returns the moved region (does not modify self)\n"
     "\n"
     "Moves the region by the given offset and returns the \n"
     "moved region. The region is not modified.\n"
     "\n"
-    "@param x The x distance to move the region.\n"
-    "@param y The y distance to move the region.\n"
+    "@param dx The x distance to move the region.\n"
+    "@param dy The y distance to move the region.\n"
     "\n"
     "@return The moved region.\n"
   ) +

@@ -296,18 +296,18 @@ struct text_defs
       "\n"
       "See \\valign= for a description of this property.\n"
     ) +
-    method_ext ("move", &move, gsi::arg ("distance"),
+    method_ext ("move", &move, gsi::arg ("v"),
       "@brief Moves the text by a certain distance (modifies self)\n"
       "\n"
       "\n"
       "Moves the text by a given offset and returns the moved\n"
       "text. Does not check for coordinate overflows.\n"
       "\n"
-      "@param p The offset to move the text.\n"
+      "@param v The offset to move the text.\n"
       "\n"
       "@return A reference to this text object\n"
     ) +
-    method_ext ("move", &move_xy, gsi::arg ("dx"), gsi::arg ("dy"),
+    method_ext ("move", &move_xy, gsi::arg ("dx", 0), gsi::arg ("dy", 0),
       "@brief Moves the text by a certain distance (modifies self)\n"
       "\n"
       "\n"
@@ -321,7 +321,7 @@ struct text_defs
       "\n"
       "This method was introduced in version 0.23."
     ) +
-    method_ext ("moved", &moved, gsi::arg ("distance"),
+    method_ext ("moved", &moved, gsi::arg ("v"),
       "@brief Returns the text moved by a certain distance (does not modify self)\n"
       "\n"
       "\n"
@@ -329,11 +329,11 @@ struct text_defs
       "text. Does not modify *this. Does not check for coordinate\n"
       "overflows.\n"
       "\n"
-      "@param p The offset to move the text.\n"
+      "@param v The offset to move the text.\n"
       "\n"
       "@return The moved text.\n"
     ) +
-    method_ext ("moved", &moved_xy, gsi::arg ("dx"), gsi::arg ("dy"),
+    method_ext ("moved", &moved_xy, gsi::arg ("dx", 0), gsi::arg ("dy", 0),
       "@brief Returns the text moved by a certain distance (does not modify self)\n"
       "\n"
       "\n"

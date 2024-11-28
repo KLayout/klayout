@@ -1017,6 +1017,23 @@ class RDB_TestClass < TestBase
 
   end
 
+  def test_14
+
+    # same names do not generate a new category
+    rdb = RBA::ReportDatabase::new("")
+
+    _cell = rdb.create_cell("CELL")
+
+    _cat = rdb.create_category("cat")
+    _cat_same = rdb.create_category("cat")
+    assert_equal(_cat.rdb_id, _cat_same.rdb_id)
+
+    _subcat = rdb.create_category(_cat, "subcat")
+    _subcat_same = rdb.create_category(_cat_same, "subcat")
+    assert_equal(_subcat.rdb_id, _subcat_same.rdb_id)
+
+  end
+
 end
 
 load("test_epilogue.rb")

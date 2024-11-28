@@ -253,6 +253,7 @@ class DBMatrix_TestClass < TestBase
     assert_equal((m * RBA::Polygon::new(RBA::Box::new(-5, -10, 10, 20))).to_s, "(5,-25;-10,-18;5,43;20,35)")
     assert_equal((m * RBA::SimplePolygon::new(RBA::Box::new(-5, -10, 10, 20))).to_s, "(5,-25;-10,-18;5,43;20,35)")
     assert_equal((m * RBA::Edge::new(RBA::Point::new(-5, -10), RBA::Point::new(10, 20))).to_s, "(-10,-18;20,35)")
+    assert_equal((m * RBA::EdgePair::new(RBA::Edge::new(RBA::Point::new(0, -10), RBA::Point::new(15, 20)), RBA::Edge::new(RBA::Point::new(-5, -10), RBA::Point::new(10, 20)))).to_s, "(-5,-20;25,33)/(-10,-18;20,35)")
     assert_equal(RBA::Region::new(RBA::Box::new(-5, -10, 10, 20)).transformed(m).to_s, "(5,-25;-10,-18;5,43;20,35)")
     r = RBA::Region::new(RBA::Box::new(-5, -10, 10, 20))
     r.transform(m)
@@ -273,6 +274,7 @@ class DBMatrix_TestClass < TestBase
     assert_equal((m * RBA::DPolygon::new(RBA::DBox::new(-5, -10, 10, 20))).to_s, "(5,-25;-10,-17.5;5,42.5;20,35)")
     assert_equal((m * RBA::DSimplePolygon::new(RBA::DBox::new(-5, -10, 10, 20))).to_s, "(5,-25;-10,-17.5;5,42.5;20,35)")
     assert_equal((m * RBA::DEdge::new(RBA::DPoint::new(-5, -10), RBA::DPoint::new(10, 20))).to_s, "(-10,-17.5;20,35)")
+    assert_equal((m * RBA::DEdgePair::new(RBA::DEdge::new(RBA::DPoint::new(0, -10), RBA::DPoint::new(15, 20)), RBA::DEdge::new(RBA::DPoint::new(-5, -10), RBA::DPoint::new(10, 20)))).to_s, "(-5,-20;25,32.5)/(-10,-17.5;20,35)")
 
     m = RBA::IMatrix3d::new(1.0, 0.5, 1.0, -0.5, 2.0, 0.0, 0.0, 0.0, 1.0)
     assert_equal((m * RBA::Point::new(10, 20)).to_s, "21,35")
@@ -281,6 +283,7 @@ class DBMatrix_TestClass < TestBase
     assert_equal((m * RBA::Polygon::new(RBA::Box::new(-5, -10, 10, 20))).to_s, "(6,-25;-9,-18;6,43;21,35)")
     assert_equal((m * RBA::SimplePolygon::new(RBA::Box::new(-5, -10, 10, 20))).to_s, "(6,-25;-9,-18;6,43;21,35)")
     assert_equal((m * RBA::Edge::new(RBA::Point::new(-5, -10), RBA::Point::new(10, 20))).to_s, "(-9,-18;21,35)")
+    assert_equal((m * RBA::EdgePair::new(RBA::Edge::new(RBA::Point::new(0, -10), RBA::Point::new(15, 20)), RBA::Edge::new(RBA::Point::new(-5, -10), RBA::Point::new(10, 20)))).to_s, "(-4,-20;26,33)/(-9,-18;21,35)")
     assert_equal(RBA::Region::new(RBA::Box::new(-5, -10, 10, 20)).transformed(m).to_s, "(6,-25;-9,-18;6,43;21,35)")
     r = RBA::Region::new(RBA::Box::new(-5, -10, 10, 20))
     r.transform(m)
@@ -301,6 +304,7 @@ class DBMatrix_TestClass < TestBase
     assert_equal((m * RBA::DPolygon::new(RBA::DBox::new(-5, -10, 10, 20))).to_s, "(6,-25;-9,-17.5;6,42.5;21,35)")
     assert_equal((m * RBA::DSimplePolygon::new(RBA::DBox::new(-5, -10, 10, 20))).to_s, "(6,-25;-9,-17.5;6,42.5;21,35)")
     assert_equal((m * RBA::DEdge::new(RBA::DPoint::new(-5, -10), RBA::DPoint::new(10, 20))).to_s, "(-9,-17.5;21,35)")
+    assert_equal((m * RBA::DEdgePair::new(RBA::DEdge::new(RBA::DPoint::new(0, -10), RBA::DPoint::new(15, 20)), RBA::DEdge::new(RBA::DPoint::new(-5, -10), RBA::DPoint::new(10, 20)))).to_s, "(-4,-20;26,32.5)/(-9,-17.5;21,35)")
 
   end
 

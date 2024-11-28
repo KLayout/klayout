@@ -413,8 +413,8 @@ public:
   }
 
   void add_category (Category *cath);
-
   void set_database (Database *database);
+  Category *category_by_raw_name (const std::string &name);
 };
 
 /**

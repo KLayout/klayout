@@ -881,6 +881,13 @@ Categories::category_by_name (const char *path)
   return 0;
 }
 
+Category *
+Categories::category_by_raw_name (const std::string &name)
+{
+  auto c = m_categories_by_name.find (name);
+  return c == m_categories_by_name.end () ? 0 : c->second;
+}
+
 void 
 Categories::import_category (Category *category)
 {
@@ -1353,6 +1360,11 @@ Database::create_category (const std::string &name)
 Category *
 Database::create_category (Categories *container, const std::string &name)
 {
+  Category *existing = container->category_by_raw_name (name);
+  if (existing) {
+    return existing;
+  }
+
   set_modified ();
 
   Category *cat = new Category (name);

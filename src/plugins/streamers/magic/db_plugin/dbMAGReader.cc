@@ -531,6 +531,9 @@ MAGReader::read_rlabel (tl::Extractor &ex, Layout &layout, cell_index_type cell_
   std::string lname;
   ex.read (lname);
 
+  //  skip sticky flag (optional)
+  ex.test ("s");
+
   double l, b, r, t;
   ex.read (l);
   ex.read (b);

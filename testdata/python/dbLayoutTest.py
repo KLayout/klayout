@@ -1200,6 +1200,27 @@ class DBLayoutTest(unittest.TestCase):
     self.assertEqual(str(t), "r180 0,0")
     
 
+  def test_read_bytes(self):
+
+    testtmp = os.getenv("TESTTMP_WITH_NAME", os.getenv("TESTTMP", "."))
+
+    file_gds = os.path.join(testtmp, "bytes.gds")
+
+    ly = pya.Layout()
+    top = ly.create_cell("TOP")
+    l1 = ly.layer(1, 0)
+    shape = top.shapes(l1).insert(pya.Box(0, 10, 20, 30))
+    ly.write(file_gds)
+
+    with open(file_gds, "rb") as f:
+      byte_buffer = f.read()
+
+    ly2 = pya.Layout()
+    ly2.read_bytes(byte_buffer, pya.LoadLayoutOptions())
+    l2 = ly2.layer(1, 0)
+    self.assertEqual(ly2.top_cell().bbox().to_s(), "(0,10;20,30)")
+
+
 # run unit tests
 if __name__ == '__main__':
   suite = unittest.TestLoader().loadTestsFromTestCase(DBLayoutTest)

@@ -1445,6 +1445,42 @@ class DBLayoutTests2_TestClass < TestBase
 
   end
 
+  def test_read_bytes
+
+    file_gds = File::join($ut_testtmp, "bytes.gds")
+
+    ly = RBA::Layout::new
+    top = ly.create_cell("TOP")
+    l1 = ly.layer(1, 0)
+    shape = top.shapes(l1).insert(RBA::Box::new(0, 10, 20, 30))
+    ly.write(file_gds)
+
+    byte_buffer = File.open(file_gds, "rb") { |f| f.read }
+
+    ly2 = RBA::Layout::new
+    ly2.read_bytes(byte_buffer, RBA::LoadLayoutOptions::new)
+    l2 = ly2.layer(1, 0)
+    assert_equal(ly2.top_cell.bbox.to_s, "(0,10;20,30)")
+
+  end
+
+  def test_write_bytes
+
+    ly = RBA::Layout::new
+    top = ly.create_cell("TOP")
+    l1 = ly.layer(1, 0)
+    shape = top.shapes(l1).insert(RBA::Box::new(0, 10, 20, 30))
+    options = RBA::SaveLayoutOptions::new
+    options.format = "GDS2"
+    byte_buffer = ly.write_bytes(options)
+
+    ly2 = RBA::Layout::new
+    ly2.read_bytes(byte_buffer)
+    l2 = ly2.layer(1, 0)
+    assert_equal(ly2.top_cell.bbox.to_s, "(0,10;20,30)")
+
+  end
+
 end
 
 load("test_epilogue.rb")

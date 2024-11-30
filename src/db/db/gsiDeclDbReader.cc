@@ -434,9 +434,18 @@ namespace gsi
   }
 
   static db::LayerMap
+  load_bytes (db::Layout *layout, const std::vector<char> &bytes)
+  {
+    tl::InputMemoryStream byte_stream (bytes.data (), bytes.size ());
+    tl::InputStream stream (byte_stream);
+    db::Reader reader (stream);
+    return reader.read (*layout);
+  }
+
+  static db::LayerMap
   load_bytes_with_options (db::Layout *layout, const std::vector<char> &bytes, const db::LoadLayoutOptions &options)
   {
-    tl::InputMemoryStream byte_stream (bytes.data(), bytes.size());
+    tl::InputMemoryStream byte_stream (bytes.data (), bytes.size ());
     tl::InputStream stream (byte_stream);
     db::Reader reader (stream);
     return reader.read (*layout, options);
@@ -464,15 +473,26 @@ namespace gsi
       "\n"
       "This method has been added in version 0.18."
     ) +
+    gsi::method_ext ("read_bytes", &load_bytes, gsi::arg ("bytes"),
+      "@brief Load the layout from the given bytes array\n"
+      "The format of the file is determined automatically and automatic unzipping is provided. "
+      "A function that creates a byte string is \\write_bytes.\n"
+      "\n"
+      "@param bytes The data to load.\n"
+      "@return A layer map that contains the mapping used by the reader including the layers that have been created."
+      "\n"
+      "This method has been added in version 0.29.9."
+    ) +
     gsi::method_ext ("read_bytes", &load_bytes_with_options, gsi::arg ("bytes"), gsi::arg ("options"),
       "@brief Load the layout from the given bytes array with options\n"
       "The format of the file is determined automatically and automatic unzipping is provided. "
-      "In this version, some reader options can be specified. "
+      "In this version, some reader options can be specified. A function that creates a byte string is \\write_bytes.\n"
+      "\n"
       "@param bytes The data to load.\n"
       "@param options The options object specifying further options for the reader.\n"
       "@return A layer map that contains the mapping used by the reader including the layers that have been created."
       "\n"
-      "This method has been added in version 0.29."
+      "This method has been added in version 0.29.9."
     ),
     ""
   );

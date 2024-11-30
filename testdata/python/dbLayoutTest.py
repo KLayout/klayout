@@ -1220,6 +1220,21 @@ class DBLayoutTest(unittest.TestCase):
     l2 = ly2.layer(1, 0)
     self.assertEqual(ly2.top_cell().bbox().to_s(), "(0,10;20,30)")
 
+  def test_write_bytes(self):
+
+    ly = pya.Layout()
+    top = ly.create_cell("TOP")
+    l1 = ly.layer(1, 0)
+    shape = top.shapes(l1).insert(pya.Box(0, 10, 20, 30))
+    options = pya.SaveLayoutOptions()
+    options.format = "GDS2"
+    byte_buffer = ly.write_bytes(options)
+
+    ly2 = pya.Layout()
+    ly2.read_bytes(byte_buffer)
+    l2 = ly2.layer(1, 0)
+    self.assertEqual(ly2.top_cell().bbox().to_s(), "(0,10;20,30)")
+
 
 # run unit tests
 if __name__ == '__main__':

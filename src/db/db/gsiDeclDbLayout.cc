@@ -713,6 +713,20 @@ write_options2 (db::Layout *layout, const std::string &filename, bool /*gzip*/, 
   write_options1 (layout, filename, options);
 }
 
+static std::vector<char>
+write_bytes (db::Layout *layout, const db::SaveLayoutOptions &options)
+{
+  tl::OutputMemoryStream byte_stream;
+
+  {
+    db::Writer writer (options);
+    tl::OutputStream stream (byte_stream);
+    writer.write (*layout, stream);
+  }
+
+  return std::vector<char> (byte_stream.data (), byte_stream.data () + byte_stream.size ());
+}
+
 static void check_layer (const db::Layout *layout, unsigned int layer)
 {
   if (! layout->is_valid_layer (layer) && ! layout->is_special_layer (layer)) {
@@ -2399,6 +2413,16 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "@brief Writes the layout to a stream file\n"
     "@param filename The file to which to write the layout\n"
   ) + 
+  gsi::method_ext ("write_bytes", &write_bytes, gsi::arg ("options"),
+    "@brief Writes the layout to a binary string\n"
+    "@param options The option set to use for writing. See \\SaveLayoutOptions for details. Options are used specifically to define the format to use.\n"
+    "\n"
+    "Instead of writing a file, this function generates a binary string. As there is no filename, the "
+    "format cannot be determined from the suffix. It needs to be specified in the options. A "
+    "function that reads bytes is \\read_bytes.\n"
+    "\n"
+    "This method has been introduced in version 0.29.9.\n"
+  ) +
   gsi::method_ext ("clip", &clip, gsi::arg ("cell"), gsi::arg ("box"),
     "@brief Clips the given cell by the given rectangle and produce a new cell with the clip\n"
     "@param cell The cell index of the cell to clip\n"

@@ -376,6 +376,11 @@ LayoutViewBase::init (db::Manager *mgr)
   m_marker_dither_pattern = 1;
   m_marker_line_style = 0;
   m_marker_halo = true;
+  m_transient_marker_line_width = 0;
+  m_transient_marker_vertex_size = 0;
+  m_transient_marker_dither_pattern = 1;
+  m_transient_marker_line_style = 0;
+  m_transient_marker_halo = true;
   m_transient_selection_mode = true;
   m_sel_inside_pcells = false;
   m_add_other_layers = false;
@@ -1295,6 +1300,84 @@ LayoutViewBase::configure (const std::string &name, const std::string &value)
 
     //  Change the vertex_size
     if (lay::test_and_set (m_marker_halo, halo)) {
+      mp_canvas->update_image ();
+    }
+
+    //  do not take - let others receive this configuration as well
+    return false;
+
+  } else if (name == cfg_transient_sel_color) {
+
+    tl::Color color;
+    lay::ColorConverter ().from_string (value, color);
+
+    //  Change the color
+    if (lay::test_and_set (m_transient_marker_color, color)) {
+      mp_canvas->update_image ();
+    }
+
+    //  do not take - let others receive this configuration as well
+    return false;
+
+  } else if (name == cfg_transient_sel_line_width) {
+
+    int lw = 0;
+    tl::from_string (value, lw);
+
+    //  Change the line width
+    if (lay::test_and_set (m_transient_marker_line_width, lw)) {
+      mp_canvas->update_image ();
+    }
+
+    //  do not take - let others receive this configuration as well
+    return false;
+
+  } else if (name == cfg_transient_sel_dither_pattern) {
+
+    int dp = 0;
+    tl::from_string (value, dp);
+
+    //  Change the vertex_size
+    if (lay::test_and_set (m_transient_marker_dither_pattern, dp)) {
+      mp_canvas->update_image ();
+    }
+
+    //  do not take - let others receive this configuration as well
+    return false;
+
+  } else if (name == cfg_transient_sel_line_style) {
+
+    int dp = 0;
+    tl::from_string (value, dp);
+
+    //  Change the vertex_size
+    if (lay::test_and_set (m_transient_marker_line_style, dp)) {
+      mp_canvas->update_image ();
+    }
+
+    //  do not take - let others receive this configuration as well
+    return false;
+
+  } else if (name == cfg_transient_sel_vertex_size) {
+
+    int vs = 0;
+    tl::from_string (value, vs);
+
+    //  Change the vertex_size
+    if (lay::test_and_set (m_transient_marker_vertex_size, vs)) {
+      mp_canvas->update_image ();
+    }
+
+    //  do not take - let others receive this configuration as well
+    return false;
+
+  } else if (name == cfg_transient_sel_halo) {
+
+    bool halo = 0;
+    tl::from_string (value, halo);
+
+    //  Change the vertex_size
+    if (lay::test_and_set (m_transient_marker_halo, halo)) {
       mp_canvas->update_image ();
     }
 

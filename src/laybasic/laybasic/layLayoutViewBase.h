@@ -2347,6 +2347,55 @@ public:
     return m_marker_halo;
   }
 
+
+  /**
+   *  @brief Get the default color for markers
+   */
+  tl::Color default_transient_marker_color () const
+  {
+    return m_transient_marker_color;
+  }
+
+  /**
+   *  @brief Get the default line width for markers
+   */
+  int default_transient_marker_line_width () const
+  {
+    return m_transient_marker_line_width;
+  }
+
+  /**
+   *  @brief Get the default marker dither pattern index
+   */
+  int default_transient_dither_pattern () const
+  {
+    return m_transient_marker_dither_pattern;
+  }
+
+  /**
+   *  @brief Get the default marker line style index
+   */
+  int default_transient_line_style () const
+  {
+    return m_transient_marker_line_style;
+  }
+
+  /**
+   *  @brief Get the default vertex size for markers
+   */
+  int default_transient_marker_vertex_size () const
+  {
+    return m_transient_marker_vertex_size;
+  }
+
+  /**
+   *  @brief Get the default halo flag for markers
+   */
+  int default_transient_marker_halo () const
+  {
+    return m_transient_marker_halo;
+  }
+
   /**
    *  @brief Gets the "search range" in pixels (for single click)
    *  The search range applies whenever some object is looked up in the vicinity of the
@@ -2844,6 +2893,13 @@ private:
   int m_marker_dither_pattern;
   int m_marker_line_style;
   bool m_marker_halo;
+
+  tl::Color m_transient_marker_color;
+  int m_transient_marker_line_width;
+  int m_transient_marker_vertex_size;
+  int m_transient_marker_dither_pattern;
+  int m_transient_marker_line_style;
+  bool m_transient_marker_halo;
 
   unsigned int m_search_range;
   unsigned int m_search_range_box;

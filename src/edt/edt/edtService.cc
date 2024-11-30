@@ -1192,8 +1192,11 @@ Service::transient_select (const db::DPoint &pos)
         marker->set_vertex_shape (lay::ViewOp::Cross);
         marker->set_vertex_size (9 /*cross vertex size*/);
         marker->set (inst, gt, tv);
-        marker->set_line_width (1);
-        marker->set_halo (0);
+        marker->set_line_width (view ()->default_transient_marker_line_width ());
+        marker->set_halo (view ()->default_transient_marker_halo ());
+        marker->set_color (view ()->default_transient_marker_color ());
+        marker->set_dither_pattern (view ()->default_transient_dither_pattern ());
+        marker->set_line_style (view ()->default_transient_line_style ());
         marker->set_text_enabled (false);
 
         mp_transient_marker = marker;
@@ -1205,9 +1208,12 @@ Service::transient_select (const db::DPoint &pos)
         lay::Marker *marker = new lay::Marker (view (), r->cv_index ());
         db::box_convert<db::CellInst> bc (cv->layout ());
         marker->set (bc (r->back ().inst_ptr.cell_inst ().object ()), gt * r->back ().inst_ptr.cell_inst ().complex_trans (*r->back ().array_inst), tv);
-        marker->set_vertex_size (0);
-        marker->set_line_width (1);
-        marker->set_halo (0);
+        marker->set_vertex_size (view ()->default_transient_marker_vertex_size ());
+        marker->set_line_width (view ()->default_transient_marker_line_width ());
+        marker->set_halo (view ()->default_transient_marker_halo ());
+        marker->set_color (view ()->default_transient_marker_color ());
+        marker->set_dither_pattern (view ()->default_transient_dither_pattern ());
+        marker->set_line_style (view ()->default_transient_line_style ());
 
         mp_transient_marker = marker;
 
@@ -1258,10 +1264,13 @@ Service::transient_select (const db::DPoint &pos)
         marker->set_vertex_shape (lay::ViewOp::Cross);
         marker->set_vertex_size (9 /*cross vertex size*/);
       } else {
-        marker->set_vertex_size (0);
+        marker->set_vertex_size (view ()->default_transient_marker_vertex_size ());
       }
-      marker->set_line_width (1);
-      marker->set_halo (0);
+      marker->set_line_width (view ()->default_transient_marker_line_width ());
+      marker->set_halo (view ()->default_transient_marker_halo ());
+      marker->set_color (view ()->default_transient_marker_color ());
+      marker->set_dither_pattern (view ()->default_transient_dither_pattern ());
+      marker->set_line_style (view ()->default_transient_line_style ());
 
       mp_transient_marker = marker;
 

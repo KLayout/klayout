@@ -361,13 +361,41 @@ LayoutViewConfigPage2c::setup (lay::Dispatcher *root)
   root->config_get (cfg_sel_dither_pattern, dp);
   mp_ui->stipple_pb->set_dither_pattern (dp);
 
+  int ls = 0;
+  root->config_get (cfg_sel_line_style, ls);
+  mp_ui->line_style_pb->set_line_style (ls);
+
   bool halo = 0;
   root->config_get (cfg_sel_halo, halo);
   mp_ui->halo_cb->setChecked (halo);
 
   bool tm = 0;
   root->config_get (cfg_sel_transient_mode, tm);
-  mp_ui->transient_mode_cb->setChecked (tm);
+  mp_ui->transient_mode_gb->setChecked (tm);
+
+  QColor transient_color;
+  root->config_get (cfg_transient_sel_color, transient_color, lay::ColorConverter ());
+  mp_ui->transient_color_pb->set_color (transient_color);
+
+  int transient_lw = 0;
+  root->config_get (cfg_transient_sel_line_width, transient_lw);
+  mp_ui->transient_lw_spinbx->setValue (transient_lw);
+
+  int transient_vs = 0;
+  root->config_get (cfg_transient_sel_vertex_size, transient_vs);
+  mp_ui->transient_vs_spinbx->setValue (transient_vs);
+
+  int transient_dp = 0;
+  root->config_get (cfg_transient_sel_dither_pattern, transient_dp);
+  mp_ui->transient_stipple_pb->set_dither_pattern (transient_dp);
+
+  int transient_ls = 0;
+  root->config_get (cfg_transient_sel_line_style, transient_ls);
+  mp_ui->transient_line_style_pb->set_line_style (transient_ls);
+
+  bool transient_halo = 0;
+  root->config_get (cfg_transient_sel_halo, transient_halo);
+  mp_ui->transient_halo_cb->setChecked (transient_halo);
 
   bool ipm = 0;
   root->config_get (cfg_sel_inside_pcells_mode, ipm);
@@ -393,9 +421,16 @@ LayoutViewConfigPage2c::commit (lay::Dispatcher *root)
   root->config_set (cfg_sel_color, mp_ui->color_pb->get_color (), cc);
   root->config_set (cfg_sel_line_width, mp_ui->lw_spinbx->value ());
   root->config_set (cfg_sel_vertex_size, mp_ui->vs_spinbx->value ());
+  root->config_set (cfg_sel_line_style, mp_ui->line_style_pb->line_style ());
   root->config_set (cfg_sel_dither_pattern, mp_ui->stipple_pb->dither_pattern ());
   root->config_set (cfg_sel_halo, mp_ui->halo_cb->isChecked ());
-  root->config_set (cfg_sel_transient_mode, mp_ui->transient_mode_cb->isChecked ());
+  root->config_set (cfg_transient_sel_color, mp_ui->transient_color_pb->get_color (), cc);
+  root->config_set (cfg_transient_sel_line_width, mp_ui->transient_lw_spinbx->value ());
+  root->config_set (cfg_transient_sel_vertex_size, mp_ui->transient_vs_spinbx->value ());
+  root->config_set (cfg_transient_sel_dither_pattern, mp_ui->transient_stipple_pb->dither_pattern ());
+  root->config_set (cfg_transient_sel_line_style, mp_ui->transient_line_style_pb->line_style ());
+  root->config_set (cfg_transient_sel_halo, mp_ui->transient_halo_cb->isChecked ());
+  root->config_set (cfg_sel_transient_mode, mp_ui->transient_mode_gb->isChecked ());
   root->config_set (cfg_sel_inside_pcells_mode, mp_ui->sel_inside_pcells_cb->isChecked ());
   root->config_set (cfg_text_point_mode, mp_ui->text_point_mode_cb->isChecked ());
   root->config_set (cfg_search_range, (unsigned int) mp_ui->search_range_spinbx->value ());

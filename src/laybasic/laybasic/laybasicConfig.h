@@ -72,6 +72,12 @@ static const std::string cfg_sel_vertex_size ("sel-vertex-size");
 static const std::string cfg_sel_halo ("sel-halo");
 static const std::string cfg_sel_dither_pattern ("sel-dither-pattern");
 static const std::string cfg_sel_line_style ("sel-line-style");
+static const std::string cfg_transient_sel_color ("transient-sel-color");
+static const std::string cfg_transient_sel_line_width ("transient-sel-line-width");
+static const std::string cfg_transient_sel_vertex_size ("transient-sel-vertex-size");
+static const std::string cfg_transient_sel_halo ("transient-sel-halo");
+static const std::string cfg_transient_sel_dither_pattern ("transient-sel-dither-pattern");
+static const std::string cfg_transient_sel_line_style ("transient-sel-line-style");
 static const std::string cfg_sel_transient_mode ("sel-transient-mode");
 static const std::string cfg_sel_inside_pcells_mode ("sel-inside-pcells-mode");
 

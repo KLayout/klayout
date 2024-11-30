@@ -4079,6 +4079,9 @@ LayoutViewBase::transform (const db::DCplxTrans &tr)
 void
 LayoutViewBase::cancel_edits ()
 {
+  //  clear any messages
+  message ();
+
   //  the move service takes a special role here as it manages the
   //  transaction for the collective move operation.
   mp_move_service->cancel ();

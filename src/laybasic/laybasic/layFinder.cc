@@ -783,8 +783,11 @@ InstFinder::checkpoint ()
 }
 
 void 
-InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const db::Box & /*scan_box*/, const db::DCplxTrans & /*vp*/, const db::ICplxTrans &t, int level)
+InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const db::Box & /*scan_box*/, const db::DCplxTrans &vp, const db::ICplxTrans &t, int level)
 {
+  //  Viewport in current cell coordinate space (DBU)
+  db::Box viewport_box = (vp * db::CplxTrans (layout ().dbu ()) * t).inverted () * db::DBox (0, 0, view ()->viewport ().width (), view ()->viewport ().height ());
+
   if (! point_mode ()) {
 
     ++*mp_progress;
@@ -909,11 +912,16 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
               //  convert to polygon and test those edges
               db::Polygon poly (cell_inst.complex_trans (*p) * db::Polygon (ibox));
 
+              bool any_valid_edge = false;
               for (db::Polygon::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end (); ++e) {
-                test_edge (t, *e, d, match);
+                //  only consider edges that cut through the viewport
+                if ((*e).clipped (viewport_box).first) {
+                  any_valid_edge = true;
+                  test_edge (t, *e, d, match);
+                }
               }
 
-              if (! match && db::inside_poly (poly.begin_edge (), search_box.center ())) {
+              if (! match && any_valid_edge && db::inside_poly (poly.begin_edge (), search_box.center ())) {
                 d = t.ctrans (poly_dist (poly.begin_edge (), search_box.center ()));
                 match = true;
               }

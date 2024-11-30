@@ -254,7 +254,6 @@ static std::vector<std::string> split_filename (const std::string &fn)
     const char *cp0 = cp;
     ++cp;
     while (*cp && *cp != '.') {
-      //  backslash escaping (ineffective on Windows because that is a path separator)
       if (*cp == '\\' && cp[1]) {
         ++cp;
       }

@@ -189,6 +189,11 @@ protected:
    */
   void test_edge (const db::ICplxTrans &trans, const db::Edge &edge, double &distance, bool &match);
 
+  /**
+   *  @brief Is called "frequently", so the finder can stop after a number of tries and not waste time
+   */
+  virtual void checkpoint () = 0;
+
 private:
   void do_find (const db::Cell &cell, int level, const db::DCplxTrans &vp, const db::ICplxTrans &t);
 
@@ -282,7 +287,7 @@ protected:
     m_tries = n;
   }
 
-  void checkpoint ();
+  virtual void checkpoint ();
 
 private:
   virtual void visit_cell (const db::Cell &cell, const db::Box &hit_box, const db::Box &scan_box, const db::DCplxTrans &vp, const db::ICplxTrans &t, int level);
@@ -338,6 +343,8 @@ public:
   {
     return m_founds.end ();
   }
+
+  virtual void checkpoint ();
 
 private:
   virtual void visit_cell (const db::Cell &cell, const db::Box &hit_box, const db::Box &scan_box, const db::DCplxTrans &vp, const db::ICplxTrans &t, int level);

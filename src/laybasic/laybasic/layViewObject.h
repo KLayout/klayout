@@ -276,7 +276,7 @@ public:
   virtual void set_colors (tl::Color /*background*/, tl::Color /*text*/) { }
 
   /**
-   *  @brief This method is called when a drag operation should be cancelled
+   *  @brief This method is called when a mouse tracking operation should be cancelled
    */
   virtual void drag_cancel () { }
 

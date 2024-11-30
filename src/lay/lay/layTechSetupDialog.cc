@@ -173,11 +173,10 @@ TechBaseEditorPage::commit ()
 
   if (! mp_ui->lyp_grp->isChecked ()) {
     tech ()->set_layer_properties_file (std::string ());
-    tech ()->set_add_other_layers (true);
   } else {
     tech ()->set_layer_properties_file (tl::to_string (mp_ui->lyp_le->text ()));
-    tech ()->set_add_other_layers (mp_ui->add_other_layers_cbx->isChecked ());
   }
+  tech ()->set_add_other_layers (mp_ui->add_other_layers_cbx->isChecked ());
 }
 
 void 

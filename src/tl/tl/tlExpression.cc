@@ -4059,7 +4059,6 @@ Eval::parse (Expression &expr, const std::string &s, bool top)
   expr = Expression (this, s);
 
   tl::Extractor ex (s.c_str ());
-  tl::Extractor ex0 = ex;
   ExpressionParserContext context (&expr, ex);
 
   if (top) {
@@ -4074,6 +4073,8 @@ Eval::parse (Expression &expr, const std::string &s, bool top)
 void 
 Eval::parse (Expression &expr, tl::Extractor &ex, bool top)
 {
+  ex.skip ();
+
   expr = Expression (this, ex.get ());
 
   tl::Extractor ex0 = ex;
@@ -4093,6 +4094,8 @@ Eval::parse (Expression &expr, tl::Extractor &ex, bool top)
 std::string 
 Eval::parse_expr (tl::Extractor &ex, bool top)
 {
+  ex.skip ();
+
   tl::Eval eval (0, true);
   Expression expr (&eval, ex.get ());
 

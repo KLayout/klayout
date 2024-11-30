@@ -333,6 +333,20 @@ public:
   }
 
   /**
+   *  @brief Finishes any pending operations
+   *
+   *  This event is sent whenever a pending operation such as
+   *  a move operation should be finished.
+   *  In contrast to "edit_cancel", this version is supposed
+   *  not to rollback, for example if transactions are involved.
+   */
+  virtual void edit_finish ()
+  {
+    //  by default maps to edit_cancel
+    edit_cancel ();
+  }
+
+  /**
    *  @brief Indicates if any objects are selected
    */
   virtual bool has_selection ()
@@ -457,14 +471,11 @@ public:
   db::DBox selection_bbox ();
 
   /**
-   *  @brief transform the selection
+   *  @brief Transforms the selection
    *
    *  The transformation is given in micron units.
-   *
-   *  If a transaction is given, the operation will be appended to this pending transaction.
-   *  The Editables object takes ownership over the Transaction object.
    */
-  void transform (const db::DCplxTrans &tr, db::Transaction *transaction = 0);
+  virtual void transform (const db::DCplxTrans &tr);
 
   /**
    *  @brief Enable or disable a certain editable
@@ -565,8 +576,17 @@ public:
 
   /**
    *  @brief Cancel any pending operations
+   *
+   *  This method calls "edit_cancel" on all services and resets selection tracking.
    */
   void edit_cancel ();
+
+  /**
+   *  @brief Finishes any pending operations
+   *
+   *  This method calls "edit_finish" on all services and resets selection tracking.
+   */
+  void edit_finish ();
 
   /**
    *  @brief Editable iterator: begin
@@ -633,10 +653,20 @@ protected:
    *  @brief Cancel all edit operations
    *
    *  This method can be overridden in order to implement special behaviour on cancel
-   *  of edits (i.e. release the mouse).
+   *  of edits (e.g. clean up markers).
    *  Make sure, the base implementation is called as well.
    */
   virtual void cancel_edits ();
+
+  /**
+   *  @brief Finishes all edit operations
+   *
+   *  This method can be overridden in order to implement special behaviour on finishing
+   *  of edits (e.g. clean up markers). In contrast to "cancel_edits", this method
+   *  is expected not to rollback any operations - i.e. undo transactions.
+   *  Make sure, the base implementation is called as well.
+   */
+  virtual void finish_edits ();
 
 private:
   friend class Editable;

@@ -43,6 +43,8 @@ public:
 
   bool configure (const std::string &name, const std::string &value);
   bool begin_move (db::Transaction *transaction = 0, bool transient_selection = false);
+  void finish ();
+  void cancel ();
 
 private:
   virtual bool mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio);

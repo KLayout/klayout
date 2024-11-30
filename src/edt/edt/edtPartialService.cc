@@ -1811,7 +1811,7 @@ PartialService::mouse_move_event (const db::DPoint &p, unsigned int buttons, boo
       if (snap_details.object_snap == lay::PointSnapToObjectResult::NoObject) {
         m_current = m_start + snap_move (p - m_start);
       } else {
-        m_current = snap_details.snapped_point;
+        m_current = m_start + snap_move (snap_details.snapped_point - m_start);
         mouse_cursor_from_snap_details (snap_details);
       }
 

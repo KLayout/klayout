@@ -66,7 +66,7 @@ Session::fetch (const lay::MainWindow &mw)
     if (lh) {
       m_layouts.push_back (SessionLayoutDescriptor ());
       m_layouts.back ().name = *l;
-      m_layouts.back ().file_path = tl::InputStream::absolute_path (lh->filename ());
+      m_layouts.back ().file_path = tl::InputStream::absolute_file_path (lh->filename ());
       m_layouts.back ().load_options = lh->load_options ();
       m_layouts.back ().save_options = lh->save_options ();
       m_layouts.back ().save_options_valid = lh->save_options_valid ();
@@ -89,7 +89,7 @@ Session::fetch (const lay::MainWindow &mw)
 
       const rdb::Database *rdb = view->get_rdb (j);
       if (rdb && ! rdb->filename ().empty ()) {
-        view_desc.rdb_filenames.push_back (tl::InputStream::absolute_path (rdb->filename ()));
+        view_desc.rdb_filenames.push_back (tl::InputStream::absolute_file_path (rdb->filename ()));
       }
 
     }
@@ -98,7 +98,7 @@ Session::fetch (const lay::MainWindow &mw)
 
       const db::LayoutToNetlist *l2ndb = view->get_l2ndb (j);
       if (l2ndb && ! l2ndb->filename ().empty ()) {
-        view_desc.l2ndb_filenames.push_back (tl::InputStream::absolute_path (l2ndb->filename ()));
+        view_desc.l2ndb_filenames.push_back (tl::InputStream::absolute_file_path (l2ndb->filename ()));
       }
 
     }

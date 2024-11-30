@@ -1084,7 +1084,7 @@ LEFDEFReaderState::read_single_map_file (const std::string &path, std::map<std::
   tl::InputStream file_stream (file);
   tl::TextInputStream ts (file_stream);
 
-  tl::log << tl::to_string (tr ("Reading LEF/DEF map file")) << " " << file_stream.absolute_path ();
+  tl::log << tl::to_string (tr ("Reading LEF/DEF map file")) << " " << file_stream.absolute_file_path ();
 
   //  Purpose name to purpose code
   std::map<std::string, LayerPurpose> purpose_translation;
@@ -2011,7 +2011,7 @@ LEFDEFImporter::get_mask (long m)
 void 
 LEFDEFImporter::read (tl::InputStream &stream, db::Layout &layout, LEFDEFReaderState &state)
 {
-  tl::log << tl::to_string (tr ("Reading LEF/DEF file")) << " " << stream.absolute_path ();
+  tl::log << tl::to_string (tr ("Reading LEF/DEF file")) << " " << stream.absolute_file_path ();
 
   m_fn = stream.filename ();
 

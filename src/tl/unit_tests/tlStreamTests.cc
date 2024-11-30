@@ -479,3 +479,112 @@ TEST(RefuseToWrite)
   }
 }
 
+TEST(AbstractPathFunctions)
+{
+  EXPECT_EQ (tl::InputStream::absolute_file_path (""), tl::absolute_file_path ("."));
+  EXPECT_EQ (tl::InputStream::absolute_file_path ("."), tl::absolute_file_path ("."));
+  EXPECT_EQ (tl::InputStream::absolute_file_path ("pipe:xyz"), "pipe:xyz");
+  EXPECT_EQ (tl::InputStream::absolute_file_path ("data:xyz"), "data:xyz");
+  EXPECT_EQ (tl::InputStream::absolute_file_path ("https:xyz"), "https:xyz");
+  EXPECT_EQ (tl::InputStream::absolute_file_path ("http:xyz"), "http:xyz");
+  EXPECT_EQ (tl::InputStream::absolute_file_path (":xyz"), ":xyz");
+  EXPECT_EQ (tl::InputStream::absolute_file_path ("file:xyz"), tl::absolute_file_path ("xyz"));
+  EXPECT_EQ (tl::InputStream::absolute_file_path ("xyz"), tl::absolute_file_path ("xyz"));
+  EXPECT_EQ (tl::InputStream::absolute_file_path ("xyz/uvw"), tl::absolute_file_path ("xyz/uvw"));
+  EXPECT_EQ (tl::InputStream::absolute_file_path ("/xyz/uvw"), tl::absolute_file_path ("/xyz/uvw"));
+  tl::file_utils_force_windows ();
+  EXPECT_EQ (tl::InputStream::absolute_file_path ("xyz\\uvw"), tl::absolute_file_path ("xyz\\uvw"));
+  EXPECT_EQ (tl::InputStream::absolute_file_path ("\\\\server\\xyz\\uvw"), "\\\\server\\xyz\\uvw");
+  EXPECT_EQ (tl::InputStream::absolute_file_path ("C:\\xyz\\uvw"), "C:\\xyz\\uvw");
+  tl::file_utils_force_reset ();
+
+  EXPECT_EQ (tl::InputStream::is_absolute (""), false);
+  EXPECT_EQ (tl::InputStream::is_absolute ("."), false);
+  EXPECT_EQ (tl::InputStream::is_absolute ("pipe:xyz"), true);
+  EXPECT_EQ (tl::InputStream::is_absolute ("data:xyz"), true);
+  EXPECT_EQ (tl::InputStream::is_absolute ("https:xyz"), true);
+  EXPECT_EQ (tl::InputStream::is_absolute ("http:xyz"), true);
+  EXPECT_EQ (tl::InputStream::is_absolute (":xyz"), true);
+  EXPECT_EQ (tl::InputStream::is_absolute ("file:xyz"), false);
+  EXPECT_EQ (tl::InputStream::is_absolute ("xyz"), false);
+  EXPECT_EQ (tl::InputStream::is_absolute ("xyz/uvw"), false);
+  tl::file_utils_force_linux ();
+  EXPECT_EQ (tl::InputStream::is_absolute ("/xyz/uvw"), true);
+  tl::file_utils_force_windows ();
+  EXPECT_EQ (tl::InputStream::is_absolute ("xyz\\uvw"), false);
+  EXPECT_EQ (tl::InputStream::is_absolute ("\\\\server\\xyz\\uvw"), true);
+  EXPECT_EQ (tl::InputStream::is_absolute ("c:\\xyz\\uvw"), true);
+  tl::file_utils_force_reset ();
+
+  tl::file_utils_force_windows ();
+  EXPECT_EQ (tl::InputStream::combine ("a", ""), "a");
+  EXPECT_EQ (tl::InputStream::combine ("", "b"), "\\b");
+  EXPECT_EQ (tl::InputStream::combine ("a", "b"), "a\\b");
+  EXPECT_EQ (tl::InputStream::combine ("a", "b/c"), "a\\b/c");
+  EXPECT_EQ (tl::InputStream::combine ("a", "b\\c"), "a\\b\\c");
+  EXPECT_EQ (tl::InputStream::combine ("a", "data:abc"), "data:abc");
+  EXPECT_EQ (tl::InputStream::combine ("data:a", "b"), "b");
+  EXPECT_EQ (tl::InputStream::combine ("pipe:a", "b"), "b");
+  EXPECT_EQ (tl::InputStream::combine (":a", "b"), ":a/b");
+  EXPECT_EQ (tl::InputStream::combine ("https://a", "b"), "https://a/b");
+  EXPECT_EQ (tl::InputStream::combine ("https://a", "https:b"), "https:b");
+  EXPECT_EQ (tl::InputStream::combine ("a", "https:b"), "https:b");
+  EXPECT_EQ (tl::InputStream::combine ("a", "file:b"), "a\\b");
+  EXPECT_EQ (tl::InputStream::combine ("a", "file:\\b"), "file:\\b");
+  EXPECT_EQ (tl::InputStream::combine ("file:a", "file:b"), "file:a/b");
+  EXPECT_EQ (tl::InputStream::combine ("file:a", "file:b/c"), "file:a/b/c");
+  EXPECT_EQ (tl::InputStream::combine ("file:a", "b\\c"), "file:a/b/c");
+  tl::file_utils_force_linux ();
+  EXPECT_EQ (tl::InputStream::combine ("a", "b"), "a/b");
+  EXPECT_EQ (tl::InputStream::combine ("", "b"), "/b");
+  EXPECT_EQ (tl::InputStream::combine ("a", "b/c"), "a/b/c");
+  EXPECT_EQ (tl::InputStream::combine ("a", "data:abc"), "data:abc");
+  EXPECT_EQ (tl::InputStream::combine ("data:a", "b"), "b");
+  EXPECT_EQ (tl::InputStream::combine ("pipe:a", "b"), "b");
+  EXPECT_EQ (tl::InputStream::combine (":a", "b"), ":a/b");
+  EXPECT_EQ (tl::InputStream::combine ("https://a", "b"), "https://a/b");
+  EXPECT_EQ (tl::InputStream::combine ("https://a", "https:b"), "https:b");
+  EXPECT_EQ (tl::InputStream::combine ("a", "https:b"), "https:b");
+  EXPECT_EQ (tl::InputStream::combine ("a", "file:b"), "a/b");
+  EXPECT_EQ (tl::InputStream::combine ("a", "file:/b"), "file:/b");
+  EXPECT_EQ (tl::InputStream::combine ("file:a", "file:b"), "file:a/b");
+  EXPECT_EQ (tl::InputStream::combine ("file:a", "file:b/c"), "file:a/b/c");
+  EXPECT_EQ (tl::InputStream::combine ("file:a", "b/c"), "file:a/b/c");
+  tl::file_utils_force_reset ();
+
+  tl::file_utils_force_linux ();
+  EXPECT_EQ (tl::InputStream::relative_path ("", "file:/a/b/c"), "/a/b/c");
+  EXPECT_EQ (tl::InputStream::relative_path (".", "file:/a/b/c"), "/a/b/c");
+  EXPECT_EQ (tl::InputStream::relative_path ("https://x", "a/b/c"), "a/b/c");
+  EXPECT_EQ (tl::InputStream::relative_path ("file:/a/b", "file:/a/b/c"), "c");
+  EXPECT_EQ (tl::InputStream::relative_path ("/a/b", "/a/b/c"), "c");
+  EXPECT_EQ (tl::InputStream::relative_path ("/a/b", "/x/b/c"), "/x/b/c");
+  EXPECT_EQ (tl::InputStream::relative_path ("file:/a/b", "file:/a/b/c"), "c");
+  EXPECT_EQ (tl::InputStream::relative_path ("/a/b", "/a/b/c"), "c");
+  tl::file_utils_force_windows ();
+  EXPECT_EQ (tl::InputStream::relative_path ("/a/b", "/a/b/c"), "c");
+  EXPECT_EQ (tl::InputStream::relative_path ("/a/b", "\\a\\b\\c\\d"), "c\\d");
+  tl::file_utils_force_reset ();
+
+  EXPECT_EQ (tl::InputStream::is_file_path (""), true);
+  EXPECT_EQ (tl::InputStream::is_file_path (":abc"), false);
+  EXPECT_EQ (tl::InputStream::is_file_path ("pipe:abc"), false);
+  EXPECT_EQ (tl::InputStream::is_file_path ("data:abc"), false);
+  EXPECT_EQ (tl::InputStream::is_file_path ("http:abc"), false);
+  EXPECT_EQ (tl::InputStream::is_file_path ("file:abc"), true);
+  EXPECT_EQ (tl::InputStream::is_file_path ("a/b/c"), true);
+  tl::file_utils_force_windows ();
+  EXPECT_EQ (tl::InputStream::is_file_path ("a\\b\\c"), true);
+  tl::file_utils_force_reset ();
+
+  EXPECT_EQ (tl::InputStream::as_file_path (""), std::string ());
+  EXPECT_EQ (tl::InputStream::as_file_path (":abc"), std::string ());
+  EXPECT_EQ (tl::InputStream::as_file_path ("pipe:abc"), std::string ());
+  EXPECT_EQ (tl::InputStream::as_file_path ("data:abc"), std::string ());
+  EXPECT_EQ (tl::InputStream::as_file_path ("http:abc"), std::string ());
+  EXPECT_EQ (tl::InputStream::as_file_path ("file:abc"), "abc");
+  EXPECT_EQ (tl::InputStream::as_file_path ("a/b/c"), "a/b/c");
+  tl::file_utils_force_windows ();
+  EXPECT_EQ (tl::InputStream::as_file_path ("a\\b\\c"), "a\\b\\c");
+  tl::file_utils_force_reset ();
+}

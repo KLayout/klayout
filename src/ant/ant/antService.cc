@@ -1382,9 +1382,6 @@ dragging_what (const ant::Object *robj, const db::DBox &search_dbox, ant::Servic
 bool 
 Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::angle_constraint_type /*ac*/)
 {
-  //  cancel any pending move or drag operations, reset mp_active_ruler
-  ui ()->drag_cancel (); // KLUDGE: every service does this to the same service manager
-
   clear_transient_selection ();
 
   //  choose move mode

@@ -98,6 +98,7 @@ public:
   SearchReplaceResults ();
 
   void clear ();
+  void set_data_column_headers (const tl::Variant &v);
   void push_back (const tl::Variant &v);
   void push_back (const QueryShapeResult &v);
   void push_back (const QueryInstResult &v);
@@ -157,6 +158,8 @@ public:
   void has_more (bool hm);
 
   void export_csv (const std::string &file, const std::set<int> *rows = 0);
+  void export_csv_to_clipboard (const std::set<int> *rows = 0);
+  void export_csv (tl::OutputStream &os, const std::set<int> *rows = 0);
   void export_layout (db::Layout &layout, const std::set<int> *rows = 0);
   void export_rdb (rdb::Database &rdb, double dbu, const std::set<int> *rows = 0);
   void select_items (LayoutViewBase *view, int cv_index, const std::set<int> *rows = 0);
@@ -167,6 +170,7 @@ private:
   std::vector<QueryInstResult> m_inst_result;
   std::vector<QueryCellResult> m_cell_result;
   size_t m_data_columns;
+  tl::Variant m_data_column_headers;
   mutable int m_last_column_count;
   std::map<db::cell_index_type, std::string> m_cellname_map;
   std::map<unsigned int, db::LayerProperties> m_lp_map;
@@ -239,10 +243,12 @@ private slots:
   void cancel_exec ();
   void select_items ();
   void export_csv ();
+  void export_csv_to_clipboard ();
   void export_rdb ();
   void export_layout ();
   void sel_select_items ();
   void sel_export_csv ();
+  void sel_export_csv_to_clipboard ();
   void sel_export_rdb ();
   void sel_export_layout ();
 

@@ -235,6 +235,8 @@ Finder::do_find (const db::Cell &cell, int level, const db::DCplxTrans &vp, cons
 
         m_path.push_back (db::InstElement (*inst, p));
 
+        checkpoint ();
+
         do_find (mp_layout->cell (cell_inst.object ().cell_index ()), 
                  level + 1,
                  vp,
@@ -772,6 +774,14 @@ InstFinder::find_internal (LayoutViewBase *view, unsigned int cv_index, const db
   return ! m_founds.empty ();
 }
 
+void
+InstFinder::checkpoint ()
+{
+  if (--m_tries < 0) {
+    throw StopException ();
+  }
+}
+
 void 
 InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const db::Box & /*scan_box*/, const db::DCplxTrans & /*vp*/, const db::ICplxTrans &t, int level)
 {
@@ -854,17 +864,13 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
 
   } else {
 
-    if (--m_tries < 0) {
-      throw StopException ();
-    }
+    checkpoint ();
 
     //  look for instances to check here ..
     db::Cell::touching_iterator inst = cell.begin_touching (search_box); 
     while (! inst.at_end ()) {
 
-      if (--m_tries < 0) {
-        throw StopException ();
-      }
+      checkpoint ();
 
       const db::CellInstArray &cell_inst = inst->cell_inst ();
       const db::Cell &inst_cell = layout ().cell (cell_inst.object ().cell_index ());
@@ -877,9 +883,7 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
         db::box_convert <db::CellInst, false> bc (layout ());
         for (db::CellInstArray::iterator p = cell_inst.begin_touching (search_box, bc); ! p.at_end (); ++p) {
         
-          if (--m_tries < 0) {
-            throw StopException ();
-          }
+          checkpoint ();
 
           bool match = false;
           double d = std::numeric_limits<double>::max ();

@@ -520,7 +520,9 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db:
           checkpoint ();
 
           db::Box bbox;
-          if (text_info () && shape->is_text ()) {
+          if (! view ()->text_visible () && shape->is_text ()) {
+            //  ignore texts if the view does not show them
+          } else if (text_info () && shape->is_text ()) {
             db::CplxTrans t_dbu = db::CplxTrans (layout ().dbu ()) * t;
             db::Text text;
             shape->text (text);
@@ -626,7 +628,7 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db:
               match = true;
             }
 
-          } else if (shape->is_box () || shape->is_point () || shape->is_text ()) {
+          } else if (shape->is_box () || shape->is_point () || (shape->is_text () && view ()->text_visible ())) {
 
             db::Box box = shape->bbox ();
             if (text_info () && shape->is_text ()) {

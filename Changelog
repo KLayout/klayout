@@ -1,3 +1,36 @@
+0.29.9           (2024-12-01):
+* Bug: %GITHUB%/issues/1907 Locking layouts against modification during recursive iteration of instances and shapes
+  This prevents crashes in write-white-iterating scenarios
+* Enhancement: %GITHUB%/issues/1923 Convenience versions of "move", "moved" on various objects
+* Bug: %GITHUB%/issues/1925 Problem with import of MAGIC files
+* Enhancement: %GITHUB%/issues/1934 (partial) shapes are instances are not selected when they exceed the viewport
+  This avoids selecting large background objects my mistake and then
+  moving them without noticing.
+* Bug: %GITHUB%/issues/1930 Selection of structures results in thick black lines
+* Enhancement: An experimental feature: EdgeNeighborhoodVisitor
+* Enhancement: Edge pairs support transformation with Matrix3d now
+* Enhancement: Trying to create a category in a RDB with an existing name will return the present one
+* Bugfix: Typos fixed in manual
+* Bugfix: Status bar was not cleared when the selecting is empty
+* Bugfix: Texts cannot be selected now when they are turned off in the layout view
+* Bugfix: Some icons were missing - for example in the netlist browser
+* Bugfix: By default, layer properties are not initialized with the default when no .lyp file is specified in a technology
+  You can turn this feature off by disabling the "Initialize other layers with default properties"
+  option on the techology's "General" page.
+* Bugfix: More consistent handling of special paths (like data: URLs) for technology components 
+* Bugfix: Improve snapping in partial mode when snapping to objects
+* Enhancement: Supporting "Move by" after "Clone interactive"
+* Enhancement: Key bindings and menu visibility is now formatted for better readability
+  Now, there is one line per entry in the configuration file and the
+  entries are sorted with the important ones first.
+* Enhancement: New export option "Copy to clipboard" in the "Search and Replace" result list
+* Enhancement: Showing "select" expressions in the header row of the "Search and Replace" result list
+* Enhancement: Configuration options for the transient selection markers
+  Now it is possible to configure transient selection differently from
+  static selection (line style, fill)
+* Bugfix: Fixing a problem with slow transient selection in edit mode
+* Enhancement: Layout#read_bytes and Layout#write_bytes
+
 0.29.8           (2024-10-20):
 * Enhancement: %GITHUB%/issues/1869 Adding a new option, -to or --top-output to strmxor
 * Bug: %GITHUB%/issues/1870 Do not allow editing on invalid layers

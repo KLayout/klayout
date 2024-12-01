@@ -661,7 +661,7 @@ class Box:
         """
         ...
     @overload
-    def move(self, distance: Vector) -> Box:
+    def move(self, d: Vector) -> Box:
         r"""
         @brief Moves the box by a certain distance
 
@@ -669,16 +669,15 @@ class Box:
         Moves the box by a given offset and returns the moved
         box. Does not check for coordinate overflows.
 
-        @param distance The offset to move the box.
+        @param d The offset to move the box.
 
         @return A reference to this box.
         """
         ...
     @overload
-    def move(self, dx: int, dy: int) -> Box:
+    def move(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> Box:
         r"""
         @brief Moves the box by a certain distance
-
 
         This is a convenience method which takes two values instead of a Point object.
         This method has been introduced in version 0.23.
@@ -687,7 +686,7 @@ class Box:
         """
         ...
     @overload
-    def moved(self, distance: Vector) -> Box:
+    def moved(self, d: Vector) -> Box:
         r"""
         @brief Returns the box moved by a certain distance
 
@@ -696,16 +695,15 @@ class Box:
         box. Does not modify this box. Does not check for coordinate
         overflows.
 
-        @param distance The offset to move the box.
+        @param d The offset to move the box.
 
         @return The moved box.
         """
         ...
     @overload
-    def moved(self, dx: int, dy: int) -> Box:
+    def moved(self, dx, 0: int, dy: Optional[int] = ...) -> Box:
         r"""
         @brief Moves the box by a certain distance
-
 
         This is a convenience method which takes two values instead of a Point object.
         This method has been introduced in version 0.23.
@@ -5166,6 +5164,21 @@ class CompoundRegionOperationNode:
         """
         ...
     @classmethod
+    def new_edge_neighborhood(cls, children: Sequence[CompoundRegionOperationNode], visitor: EdgeNeighborhoodVisitorBase, bext: Optional[int] = ..., eext: Optional[int] = ..., din: Optional[int] = ..., dout: Optional[int] = ...) -> CompoundRegionOperationNode:
+        r"""
+        @brief Creates a new edge neighborhood collector
+
+        @param children The inputs to use. The first one in the primary input, the others are neighbors.
+        @param visitor The visitor object (see \EdgeNeighborhoodVisitor) receiving the edge events.
+        @param bext The search window extension to use at the edge beginning.
+        @param eext The search window extension to use at the edge end.
+        @param din The search window extension to the 'outside' of the edge.
+        @param dout The search window extension to the 'inside' of the edge.
+
+        This constructor has been introduced in version 0.29.9.
+        """
+        ...
+    @classmethod
     def new_edge_orientation_filter(cls, input: CompoundRegionOperationNode, inverse: bool, amin: float, include_amin: bool, amax: float, include_amax: bool, absolute_angle: Optional[bool] = ...) -> CompoundRegionOperationNode:
         r"""
         @brief Creates a node filtering edges by their orientation.
@@ -7502,7 +7515,7 @@ class DBox:
         """
         ...
     @overload
-    def move(self, distance: DVector) -> DBox:
+    def move(self, d: DVector) -> DBox:
         r"""
         @brief Moves the box by a certain distance
 
@@ -7510,16 +7523,15 @@ class DBox:
         Moves the box by a given offset and returns the moved
         box. Does not check for coordinate overflows.
 
-        @param distance The offset to move the box.
+        @param d The offset to move the box.
 
         @return A reference to this box.
         """
         ...
     @overload
-    def move(self, dx: float, dy: float) -> DBox:
+    def move(self, dx: Optional[float] = ..., dy: Optional[float] = ...) -> DBox:
         r"""
         @brief Moves the box by a certain distance
-
 
         This is a convenience method which takes two values instead of a Point object.
         This method has been introduced in version 0.23.
@@ -7528,7 +7540,7 @@ class DBox:
         """
         ...
     @overload
-    def moved(self, distance: DVector) -> DBox:
+    def moved(self, d: DVector) -> DBox:
         r"""
         @brief Returns the box moved by a certain distance
 
@@ -7537,16 +7549,15 @@ class DBox:
         box. Does not modify this box. Does not check for coordinate
         overflows.
 
-        @param distance The offset to move the box.
+        @param d The offset to move the box.
 
         @return The moved box.
         """
         ...
     @overload
-    def moved(self, dx: float, dy: float) -> DBox:
+    def moved(self, dx, 0: float, dy: Optional[float] = ...) -> DBox:
         r"""
         @brief Moves the box by a certain distance
-
 
         This is a convenience method which takes two values instead of a Point object.
         This method has been introduced in version 0.23.
@@ -9907,7 +9918,7 @@ class DEdge:
         """
         ...
     @overload
-    def move(self, dx: float, dy: float) -> DEdge:
+    def move(self, dx: Optional[float] = ..., dy: Optional[float] = ...) -> DEdge:
         r"""
         @brief Moves the edge.
 
@@ -9923,20 +9934,20 @@ class DEdge:
         """
         ...
     @overload
-    def move(self, p: DVector) -> DEdge:
+    def move(self, v: DVector) -> DEdge:
         r"""
         @brief Moves the edge.
 
         Moves the edge by the given offset and returns the 
         moved edge. The edge is overwritten.
 
-        @param p The distance to move the edge.
+        @param v The distance to move the edge.
 
         @return The moved edge.
         """
         ...
     @overload
-    def moved(self, dx: float, dy: float) -> DEdge:
+    def moved(self, dx: Optional[float] = ..., dy: Optional[float] = ...) -> DEdge:
         r"""
         @brief Returns the moved edge (does not modify self)
 
@@ -9952,14 +9963,14 @@ class DEdge:
         """
         ...
     @overload
-    def moved(self, p: DVector) -> DEdge:
+    def moved(self, v: DVector) -> DEdge:
         r"""
         @brief Returns the moved edge (does not modify self)
 
         Moves the edge by the given offset and returns the 
         moved edge. The edge is not modified.
 
-        @param p The distance to move the edge.
+        @param v The distance to move the edge.
 
         @return The moved edge.
         """
@@ -10899,7 +10910,7 @@ class DPath:
         """
         ...
     @overload
-    def move(self, dx: float, dy: float) -> DPath:
+    def move(self, dx: Optional[float] = ..., dy: Optional[float] = ...) -> DPath:
         r"""
         @brief Moves the path.
 
@@ -10915,20 +10926,20 @@ class DPath:
         """
         ...
     @overload
-    def move(self, p: DVector) -> DPath:
+    def move(self, v: DVector) -> DPath:
         r"""
         @brief Moves the path.
 
         Moves the path by the given offset and returns the 
         moved path. The path is overwritten.
 
-        @param p The distance to move the path.
+        @param v The distance to move the path.
 
         @return The moved path.
         """
         ...
     @overload
-    def moved(self, dx: float, dy: float) -> DPath:
+    def moved(self, dx: Optional[float] = ..., dy: Optional[float] = ...) -> DPath:
         r"""
         @brief Returns the moved path (does not change self)
 
@@ -10944,14 +10955,14 @@ class DPath:
         """
         ...
     @overload
-    def moved(self, p: DVector) -> DPath:
+    def moved(self, v: DVector) -> DPath:
         r"""
         @brief Returns the moved path (does not change self)
 
         Moves the path by the given offset and returns the 
         moved path. The path is not modified.
 
-        @param p The distance to move the path.
+        @param v The distance to move the path.
 
         @return The moved path.
         """
@@ -11414,6 +11425,66 @@ class DPoint:
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
+        """
+        ...
+    @overload
+    def move(self, dx: Optional[float] = ..., dy: Optional[float] = ...) -> DPoint:
+        r"""
+        @brief Moves the point.
+
+        Moves the point by the given offset and returns the 
+        moved point. The point is modified.
+
+        @param dx The x distance to move the point.
+        @param dy The y distance to move the point.
+
+        @return The moved point.
+
+        This method has been introduced in version 0.29.9.
+        """
+        ...
+    @overload
+    def move(self, v: DVector) -> DPoint:
+        r"""
+        @brief Moves the point.
+
+        This method is equivalent to '+='. It was introduced to harmonize the API with the other objects. The point is modified.
+
+        @param v The distance to move the point.
+
+        @return The moved point.
+
+        This method has been introduced in version 0.29.9.
+        """
+        ...
+    @overload
+    def moved(self, dx: Optional[float] = ..., dy: Optional[float] = ...) -> DPoint:
+        r"""
+        @brief Returns the moved point.
+
+        Moves the point by the given offset and returns the 
+        moved point. The point is not modified.
+
+        @param dx The x distance to move the point.
+        @param dy The y distance to move the point.
+
+        @return The moved point.
+
+        This method has been introduced in version 0.29.9.
+        """
+        ...
+    @overload
+    def moved(self, v: DVector) -> DPoint:
+        r"""
+        @brief Returns the moved point.
+
+        This method is equivalent to '+'. It was introduced to harmonize the API with the other objects. The point is not modified.
+
+        @param v The distance to move the point.
+
+        @return The moved point.
+
+        This method has been introduced in version 0.29.9.
         """
         ...
     def sq_abs(self) -> float:
@@ -11993,14 +12064,28 @@ class DPolygon:
         """
         ...
     @overload
-    def move(self, p: DVector) -> DPolygon:
+    def move(self, dx: Optional[float] = ..., dy: Optional[float] = ...) -> DPolygon:
         r"""
         @brief Moves the polygon.
 
         Moves the polygon by the given offset and returns the 
         moved polygon. The polygon is overwritten.
 
-        @param p The distance to move the polygon.
+        @param dx The x distance to move the polygon.
+        @param dy The y distance to move the polygon.
+
+        @return The moved polygon (self).
+        """
+        ...
+    @overload
+    def move(self, v: DVector) -> DPolygon:
+        r"""
+        @brief Moves the polygon.
+
+        Moves the polygon by the given offset and returns the 
+        moved polygon. The polygon is overwritten.
+
+        @param v The distance to move the polygon.
 
         @return The moved polygon (self).
 
@@ -12008,28 +12093,15 @@ class DPolygon:
         """
         ...
     @overload
-    def move(self, x: float, y: float) -> DPolygon:
-        r"""
-        @brief Moves the polygon.
-
-        Moves the polygon by the given offset and returns the 
-        moved polygon. The polygon is overwritten.
-
-        @param x The x distance to move the polygon.
-        @param y The y distance to move the polygon.
-
-        @return The moved polygon (self).
-        """
-        ...
-    @overload
-    def moved(self, p: DVector) -> DPolygon:
+    def moved(self, dx: Optional[float] = ..., dy: Optional[float] = ...) -> DPolygon:
         r"""
         @brief Returns the moved polygon (does not modify self)
 
         Moves the polygon by the given offset and returns the 
         moved polygon. The polygon is not modified.
 
-        @param p The distance to move the polygon.
+        @param dx The x distance to move the polygon.
+        @param dy The y distance to move the polygon.
 
         @return The moved polygon.
 
@@ -12037,15 +12109,14 @@ class DPolygon:
         """
         ...
     @overload
-    def moved(self, x: float, y: float) -> DPolygon:
+    def moved(self, v: DVector) -> DPolygon:
         r"""
         @brief Returns the moved polygon (does not modify self)
 
         Moves the polygon by the given offset and returns the 
         moved polygon. The polygon is not modified.
 
-        @param x The x distance to move the polygon.
-        @param y The y distance to move the polygon.
+        @param p The distance to move the polygon.
 
         @return The moved polygon.
 
@@ -12776,59 +12847,59 @@ class DSimplePolygon:
         """
         ...
     @overload
-    def move(self, p: DVector) -> DSimplePolygon:
-        r"""
-        @brief Moves the simple polygon.
-
-        Moves the simple polygon by the given offset and returns the 
-        moved simple polygon. The polygon is overwritten.
-
-        @param p The distance to move the simple polygon.
-
-        @return The moved simple polygon.
-        """
-        ...
-    @overload
-    def move(self, x: float, y: float) -> DSimplePolygon:
+    def move(self, dx: Optional[float] = ..., dy: Optional[float] = ...) -> DSimplePolygon:
         r"""
         @brief Moves the polygon.
 
         Moves the polygon by the given offset and returns the 
         moved polygon. The polygon is overwritten.
 
-        @param x The x distance to move the polygon.
-        @param y The y distance to move the polygon.
+        @param dx The x distance to move the polygon.
+        @param dy The y distance to move the polygon.
 
         @return The moved polygon (self).
         """
         ...
     @overload
-    def moved(self, p: DVector) -> DSimplePolygon:
+    def move(self, v: DVector) -> DSimplePolygon:
         r"""
-        @brief Returns the moved simple polygon
+        @brief Moves the simple polygon.
 
         Moves the simple polygon by the given offset and returns the 
-        moved simple polygon. The polygon is not modified.
+        moved simple polygon. The polygon is overwritten.
 
-        @param p The distance to move the simple polygon.
+        @param v The distance to move the simple polygon.
 
         @return The moved simple polygon.
         """
         ...
     @overload
-    def moved(self, x: float, y: float) -> DSimplePolygon:
+    def moved(self, dx: Optional[float] = ..., dy: Optional[float] = ...) -> DSimplePolygon:
         r"""
         @brief Returns the moved polygon (does not modify self)
 
         Moves the polygon by the given offset and returns the 
         moved polygon. The polygon is not modified.
 
-        @param x The x distance to move the polygon.
-        @param y The y distance to move the polygon.
+        @param dx The x distance to move the polygon.
+        @param dy The y distance to move the polygon.
 
         @return The moved polygon.
 
         This method has been introduced in version 0.23.
+        """
+        ...
+    @overload
+    def moved(self, v: DVector) -> DSimplePolygon:
+        r"""
+        @brief Returns the moved simple polygon
+
+        Moves the simple polygon by the given offset and returns the 
+        moved simple polygon. The polygon is not modified.
+
+        @param v The distance to move the simple polygon.
+
+        @return The moved simple polygon.
         """
         ...
     def num_points(self) -> int:
@@ -13080,8 +13151,7 @@ class DText:
     Setter:
     @brief Sets the horizontal alignment
 
-    This property specifies how the text is aligned relative to the anchor point. 
-    This property has been introduced in version 0.22 and extended to enums in 0.28.
+    This is the version accepting integer values. It's provided for backward compatibility.
     """
     size: float
     r"""
@@ -13117,7 +13187,8 @@ class DText:
     Setter:
     @brief Sets the vertical alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     x: float
     r"""
@@ -13414,21 +13485,7 @@ class DText:
         """
         ...
     @overload
-    def move(self, distance: DVector) -> DText:
-        r"""
-        @brief Moves the text by a certain distance (modifies self)
-
-
-        Moves the text by a given offset and returns the moved
-        text. Does not check for coordinate overflows.
-
-        @param p The offset to move the text.
-
-        @return A reference to this text object
-        """
-        ...
-    @overload
-    def move(self, dx: float, dy: float) -> DText:
+    def move(self, dx: Optional[float] = ..., dy: Optional[float] = ...) -> DText:
         r"""
         @brief Moves the text by a certain distance (modifies self)
 
@@ -13445,22 +13502,21 @@ class DText:
         """
         ...
     @overload
-    def moved(self, distance: DVector) -> DText:
+    def move(self, v: DVector) -> DText:
         r"""
-        @brief Returns the text moved by a certain distance (does not modify self)
+        @brief Moves the text by a certain distance (modifies self)
 
 
         Moves the text by a given offset and returns the moved
-        text. Does not modify *this. Does not check for coordinate
-        overflows.
+        text. Does not check for coordinate overflows.
 
-        @param p The offset to move the text.
+        @param v The offset to move the text.
 
-        @return The moved text.
+        @return A reference to this text object
         """
         ...
     @overload
-    def moved(self, dx: float, dy: float) -> DText:
+    def moved(self, dx: Optional[float] = ..., dy: Optional[float] = ...) -> DText:
         r"""
         @brief Returns the text moved by a certain distance (does not modify self)
 
@@ -13475,6 +13531,21 @@ class DText:
         @return The moved text.
 
         This method was introduced in version 0.23.
+        """
+        ...
+    @overload
+    def moved(self, v: DVector) -> DText:
+        r"""
+        @brief Returns the text moved by a certain distance (does not modify self)
+
+
+        Moves the text by a given offset and returns the moved
+        text. Does not modify *this. Does not check for coordinate
+        overflows.
+
+        @param v The offset to move the text.
+
+        @return The moved text.
         """
         ...
     def position(self) -> DPoint:
@@ -15539,15 +15610,15 @@ class DeviceAbstract:
     @overload
     def netlist(self) -> Netlist:
         r"""
-        @brief Gets the netlist the device abstract lives in.
+        @brief Gets the netlist the device abstract lives in (non-const version).
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def netlist(self) -> Netlist:
         r"""
-        @brief Gets the netlist the device abstract lives in (non-const version).
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the netlist the device abstract lives in.
         """
         ...
     ...
@@ -19344,7 +19415,7 @@ class Edge:
         """
         ...
     @overload
-    def move(self, dx: int, dy: int) -> Edge:
+    def move(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> Edge:
         r"""
         @brief Moves the edge.
 
@@ -19360,20 +19431,20 @@ class Edge:
         """
         ...
     @overload
-    def move(self, p: Vector) -> Edge:
+    def move(self, v: Vector) -> Edge:
         r"""
         @brief Moves the edge.
 
         Moves the edge by the given offset and returns the 
         moved edge. The edge is overwritten.
 
-        @param p The distance to move the edge.
+        @param v The distance to move the edge.
 
         @return The moved edge.
         """
         ...
     @overload
-    def moved(self, dx: int, dy: int) -> Edge:
+    def moved(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> Edge:
         r"""
         @brief Returns the moved edge (does not modify self)
 
@@ -19389,14 +19460,14 @@ class Edge:
         """
         ...
     @overload
-    def moved(self, p: Vector) -> Edge:
+    def moved(self, v: Vector) -> Edge:
         r"""
         @brief Returns the moved edge (does not modify self)
 
         Moves the edge by the given offset and returns the 
         moved edge. The edge is not modified.
 
-        @param p The distance to move the edge.
+        @param v The distance to move the edge.
 
         @return The moved edge.
         """
@@ -19987,6 +20058,241 @@ class EdgeMode:
     def to_s(self) -> str:
         r"""
         @brief Gets the symbolic string from an enum
+        """
+        ...
+    ...
+
+class EdgeNeighborhoodVisitor(EdgeNeighborhoodVisitorBase):
+    r"""
+    @brief A visitor for the neighborhood of edges in the input
+
+    Objects of this class are passed to \EdgeNeighborhoodCompoundOperationNode constructor to handle events on each edge of the primary input along with the neighborhood taken from the additional inputs.
+
+    See \on_edge for the description of the events delivered.
+    This class has been introduced in version 0.29.9.
+    """
+    result_type: CompoundRegionOperationNode.ResultType
+    r"""
+    Getter:
+    @brief Gets the result type
+
+    Setter:
+    @brief Configures the result type
+    Use this method to indicate what type of result you want to deliver. You can use the corresponding 'output' method then to deliver result shapes from one the callbacks (\on_edge, \begin_polygon, \end_polygon). Set this attribute when you create the visitor object. This attribute does not need to be set if no output is indended to be delivered.
+    """
+    @classmethod
+    def to_edge_local_trans(cls, edge: Edge) -> IMatrix3d:
+        r"""
+        @brief For a given edge, computes the transformation that brings objects from original space to the edge-local space where the edge is horizontal.
+        Technically, this transformation is the inverse of \to_original_trans.
+        """
+        ...
+    @classmethod
+    def to_original_trans(cls, edge: Edge) -> IMatrix3d:
+        r"""
+        @brief For a given edge, computes the transformation that brings objects from the normalized space (edge is horizontal) to the original space of the edge.
+        Use this method to compute the objects suitable for 'output', after you derived them in edge-local space.
+        """
+        ...
+    def _const_cast(self) -> EdgeNeighborhoodVisitor:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> EdgeNeighborhoodVisitor:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    @overload
+    def output(self, edge: Edge) -> None:
+        r"""
+        @brief Outputs an edge
+        Use this method from one of the callbacks (\on_edge, \begin_polygon, \end_polygon) to deliver a polygon. Note that you have to configure the result type as 'Edges' on construction of the visitor before being able to do so.
+        'output' expects an object in original space - i.e. of the input edge. \to_original_trans gives you a suitable transformation to bring objects from 'edge is horizontal' space into the original space.
+        """
+        ...
+    @overload
+    def output(self, edge_pair: EdgePair) -> None:
+        r"""
+        @brief Outputs an edge pair
+        Use this method from one of the callbacks (\on_edge, \begin_polygon, \end_polygon) to deliver a polygon. Note that you have to configure the result type as 'EdgePairs' on construction of the visitor before being able to do so.
+        'output' expects an object in original space - i.e. of the input edge. \to_original_trans gives you a suitable transformation to bring objects from 'edge is horizontal' space into the original space.
+        """
+        ...
+    @overload
+    def output(self, polygon: Polygon) -> None:
+        r"""
+        @brief Outputs a polygon
+        Use this method from one of the callbacks (\on_edge, \begin_polygon, \end_polygon) to deliver a polygon. Note that you have to configure the result type as 'Region' on construction of the visitor before being able to do so.
+
+        'output' expects an object in original space - i.e. of the input edge. \to_original_trans gives you a suitable transformation to bring objects from 'edge is horizontal' space into the original space.
+        """
+        ...
+    ...
+
+class EdgeNeighborhoodVisitorBase:
+    r"""
+    @hide
+    """
+    @classmethod
+    def new(cls) -> EdgeNeighborhoodVisitorBase:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def __copy__(self) -> EdgeNeighborhoodVisitorBase:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def __deepcopy__(self) -> EdgeNeighborhoodVisitorBase:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def _const_cast(self) -> EdgeNeighborhoodVisitorBase:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> EdgeNeighborhoodVisitorBase:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def assign(self, other: EdgeNeighborhoodVisitorBase) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+        ...
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def dup(self) -> EdgeNeighborhoodVisitorBase:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
         """
         ...
     ...
@@ -21943,61 +22249,61 @@ class EdgePairs(ShapeCollection):
         """
         ...
     @overload
-    def move(self, p: Vector) -> EdgePairs:
-        r"""
-        @brief Moves the edge pair collection
-
-        Moves the edge pairs by the given offset and returns the 
-        moved edge pair collection. The edge pair collection is overwritten.
-
-        @param p The distance to move the edge pairs.
-
-        @return The moved edge pairs (self).
-
-        Starting with version 0.25 the displacement is of vector type.
-        """
-        ...
-    @overload
-    def move(self, x: int, y: int) -> EdgePairs:
+    def move(self, dx: int, dy: int) -> EdgePairs:
         r"""
         @brief Moves the edge pair collection
 
         Moves the edge pairs by the given offset and returns the 
         moved edge pairs. The edge pair collection is overwritten.
 
-        @param x The x distance to move the edge pairs.
-        @param y The y distance to move the edge pairs.
+        @param dx The x distance to move the edge pairs.
+        @param dy The y distance to move the edge pairs.
 
         @return The moved edge pairs (self).
         """
         ...
     @overload
-    def moved(self, p: Vector) -> EdgePairs:
+    def move(self, v: Vector) -> EdgePairs:
         r"""
-        @brief Returns the moved edge pair collection (does not modify self)
+        @brief Moves the edge pair collection
 
         Moves the edge pairs by the given offset and returns the 
-        moved edge pairs. The edge pair collection is not modified.
+        moved edge pair collection. The edge pair collection is overwritten.
 
-        @param p The distance to move the edge pairs.
+        @param v The distance to move the edge pairs.
 
-        @return The moved edge pairs.
+        @return The moved edge pairs (self).
 
         Starting with version 0.25 the displacement is of vector type.
         """
         ...
     @overload
-    def moved(self, x: int, y: int) -> EdgePairs:
+    def moved(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> EdgePairs:
         r"""
         @brief Returns the moved edge pair collection (does not modify self)
 
         Moves the edge pairs by the given offset and returns the 
         moved edge pairs. The edge pair collection is not modified.
 
-        @param x The x distance to move the edge pairs.
-        @param y The y distance to move the edge pairs.
+        @param dx The x distance to move the edge pairs.
+        @param dy The y distance to move the edge pairs.
 
         @return The moved edge pairs.
+        """
+        ...
+    @overload
+    def moved(self, v: Vector) -> EdgePairs:
+        r"""
+        @brief Returns the moved edge pair collection (does not modify self)
+
+        Moves the edge pairs by the given offset and returns the 
+        moved edge pairs. The edge pair collection is not modified.
+
+        @param v The distance to move the edge pairs.
+
+        @return The moved edge pairs.
+
+        Starting with version 0.25 the displacement is of vector type.
         """
         ...
     def not_inside(self, other: Region) -> EdgePairs:
@@ -25781,6 +26087,20 @@ class Edges(ShapeCollection):
         """
         ...
     @overload
+    def move(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> Edges:
+        r"""
+        @brief Moves the edge collection
+
+        Moves the edge collection by the given offset and returns the 
+        moved edge collection. The edge collection is overwritten.
+
+        @param dx The x distance to move the edge collection.
+        @param dy The y distance to move the edge collection.
+
+        @return The moved edge collection (self).
+        """
+        ...
+    @overload
     def move(self, v: Vector) -> Edges:
         r"""
         @brief Moves the edge collection
@@ -25796,17 +26116,17 @@ class Edges(ShapeCollection):
         """
         ...
     @overload
-    def move(self, x: int, y: int) -> Edges:
+    def moved(self, dx: Optional[int] = ..., dv: Optional[int] = ...) -> Edges:
         r"""
-        @brief Moves the edge collection
+        @brief Returns the moved edge collection (does not modify self)
 
         Moves the edge collection by the given offset and returns the 
-        moved edge collection. The edge collection is overwritten.
+        moved edge collection. The edge collection is not modified.
 
-        @param x The x distance to move the edge collection.
-        @param y The y distance to move the edge collection.
+        @param dx The x distance to move the edge collection.
+        @param dy The y distance to move the edge collection.
 
-        @return The moved edge collection (self).
+        @return The moved edge collection.
         """
         ...
     @overload
@@ -25822,20 +26142,6 @@ class Edges(ShapeCollection):
         @return The moved edge collection.
 
         Starting with version 0.25 the displacement type is a vector.
-        """
-        ...
-    @overload
-    def moved(self, x: int, v: int) -> Edges:
-        r"""
-        @brief Returns the moved edge collection (does not modify self)
-
-        Moves the edge collection by the given offset and returns the 
-        moved edge collection. The edge collection is not modified.
-
-        @param x The x distance to move the edge collection.
-        @param y The y distance to move the edge collection.
-
-        @return The moved edge collection.
         """
         ...
     @overload
@@ -28823,6 +29129,15 @@ class IMatrix2d:
         """
         ...
     @overload
+    def __mul__(self, ep: EdgePair) -> EdgePair:
+        r"""
+        @brief Transforms an edge pair with this matrix.
+        @param ep The edge pair to transform.
+        @return The transformed edge
+        This variant has been added in version 0.29.9.
+        """
+        ...
+    @overload
     def __mul__(self, m: IMatrix2d) -> IMatrix2d:
         r"""
         @brief Product of two matrices.
@@ -28884,6 +29199,15 @@ class IMatrix2d:
         @brief Transforms an edge with this matrix.
         @param e The edge to transform.
         @return The transformed edge
+        """
+        ...
+    @overload
+    def __rmul__(self, ep: EdgePair) -> EdgePair:
+        r"""
+        @brief Transforms an edge pair with this matrix.
+        @param ep The edge pair to transform.
+        @return The transformed edge
+        This variant has been added in version 0.29.9.
         """
         ...
     @overload
@@ -29312,6 +29636,15 @@ class IMatrix3d:
         """
         ...
     @overload
+    def __mul__(self, ep: EdgePair) -> EdgePair:
+        r"""
+        @brief Transforms an edge pair with this matrix.
+        @param ep The edge pair to transform.
+        @return The transformed edge pair
+        This variant has been added in version 0.29.9.
+        """
+        ...
+    @overload
     def __mul__(self, m: IMatrix3d) -> IMatrix3d:
         r"""
         @brief Product of two matrices.
@@ -29373,6 +29706,15 @@ class IMatrix3d:
         @brief Transforms an edge with this matrix.
         @param e The edge to transform.
         @return The transformed edge
+        """
+        ...
+    @overload
+    def __rmul__(self, ep: EdgePair) -> EdgePair:
+        r"""
+        @brief Transforms an edge pair with this matrix.
+        @param ep The edge pair to transform.
+        @return The transformed edge pair
+        This variant has been added in version 0.29.9.
         """
         ...
     @overload
@@ -29875,11 +30217,11 @@ class Instance:
 
     Starting with version 0.25 the displacement is of vector type.
     Setter:
-    @brief Sets the displacement vector for the 'a' axis
+    @brief Sets the displacement vector for the 'a' axis in micrometer units
 
-    If the instance was not an array instance before it is made one.
+    Like \a= with an integer displacement, this method will set the displacement vector but it accepts a vector in micrometer units that is of \DVector type. The vector will be translated to database units internally.
 
-    This method has been introduced in version 0.23. Starting with version 0.25 the displacement is of vector type.
+    This method has been introduced in version 0.25.
     """
     b: Vector
     r"""
@@ -29935,9 +30277,10 @@ class Instance:
     @brief Gets the complex transformation of the instance or the first instance in the array
     This method is always valid compared to \trans, since simple transformations can be expressed as complex transformations as well.
     Setter:
-    @brief Sets the complex transformation of the instance or the first instance in the array
+    @brief Sets the complex transformation of the instance or the first instance in the array (in micrometer units)
+    This method sets the transformation the same way as \cplx_trans=, but the displacement of this transformation is given in micrometer units. It is internally translated into database units.
 
-    This method has been introduced in version 0.23.
+    This method has been introduced in version 0.25.
     """
     da: DVector
     r"""
@@ -34414,6 +34757,29 @@ class Layout:
         This method has been added in version 0.18.
         """
         ...
+    @overload
+    def read_bytes(self, bytes: bytes) -> LayerMap:
+        r"""
+        @brief Load the layout from the given bytes array
+        The format of the file is determined automatically and automatic unzipping is provided. A function that creates a byte string is \write_bytes.
+
+        @param bytes The data to load.
+        @return A layer map that contains the mapping used by the reader including the layers that have been created.
+        This method has been added in version 0.29.9.
+        """
+        ...
+    @overload
+    def read_bytes(self, bytes: bytes, options: LoadLayoutOptions) -> LayerMap:
+        r"""
+        @brief Load the layout from the given bytes array with options
+        The format of the file is determined automatically and automatic unzipping is provided. In this version, some reader options can be specified. A function that creates a byte string is \write_bytes.
+
+        @param bytes The data to load.
+        @param options The options object specifying further options for the reader.
+        @return A layer map that contains the mapping used by the reader including the layers that have been created.
+        This method has been added in version 0.29.9.
+        """
+        ...
     def refresh(self) -> None:
         r"""
         @brief Calls \Cell#refresh on all cells inside this layout
@@ -34657,6 +35023,16 @@ class Layout:
         This version automatically determines the compression mode from the file name. The file is written with zlib compression if the suffix is ".gz" or ".gzip".
 
         This variant has been introduced in version 0.23.
+        """
+        ...
+    def write_bytes(self, options: SaveLayoutOptions) -> bytes:
+        r"""
+        @brief Writes the layout to a binary string
+        @param options The option set to use for writing. See \SaveLayoutOptions for details. Options are used specifically to define the format to use.
+
+        Instead of writing a file, this function generates a binary string. As there is no filename, the format cannot be determined from the suffix. It needs to be specified in the options. A function that reads bytes is \read_bytes.
+
+        This method has been introduced in version 0.29.9.
         """
         ...
     ...
@@ -39381,6 +39757,15 @@ class Matrix2d:
         """
         ...
     @overload
+    def __mul__(self, ep: DEdgePair) -> DEdgePair:
+        r"""
+        @brief Transforms an edge pair with this matrix.
+        @param ep The edge pair to transform.
+        @return The transformed edge
+        This variant has been added in version 0.29.9.
+        """
+        ...
+    @overload
     def __mul__(self, m: Matrix2d) -> Matrix2d:
         r"""
         @brief Product of two matrices.
@@ -39442,6 +39827,15 @@ class Matrix2d:
         @brief Transforms an edge with this matrix.
         @param e The edge to transform.
         @return The transformed edge
+        """
+        ...
+    @overload
+    def __rmul__(self, ep: DEdgePair) -> DEdgePair:
+        r"""
+        @brief Transforms an edge pair with this matrix.
+        @param ep The edge pair to transform.
+        @return The transformed edge
+        This variant has been added in version 0.29.9.
         """
         ...
     @overload
@@ -39902,6 +40296,15 @@ class Matrix3d:
         """
         ...
     @overload
+    def __mul__(self, ep: DEdgePair) -> DEdgePair:
+        r"""
+        @brief Transforms an edge pair with this matrix.
+        @param ep The edge pair to transform.
+        @return The transformed edge pair
+        This variant has been added in version 0.29.9.
+        """
+        ...
+    @overload
     def __mul__(self, m: Matrix3d) -> Matrix3d:
         r"""
         @brief Product of two matrices.
@@ -39963,6 +40366,15 @@ class Matrix3d:
         @brief Transforms an edge with this matrix.
         @param e The edge to transform.
         @return The transformed edge
+        """
+        ...
+    @overload
+    def __rmul__(self, ep: DEdgePair) -> DEdgePair:
+        r"""
+        @brief Transforms an edge pair with this matrix.
+        @param ep The edge pair to transform.
+        @return The transformed edge pair
+        This variant has been added in version 0.29.9.
         """
         ...
     @overload
@@ -40956,15 +41368,15 @@ class NetPinRef:
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this pin reference is attached to.
+        @brief Gets the net this pin reference is attached to (non-const version).
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this pin reference is attached to (non-const version).
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the net this pin reference is attached to.
         """
         ...
     def pin(self) -> Pin:
@@ -41254,17 +41666,17 @@ class NetTerminalRef:
     @overload
     def device(self) -> Device:
         r"""
-        @brief Gets the device reference (non-const version).
+        @brief Gets the device reference.
         Gets the device object that this connection is made to.
-
-        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def device(self) -> Device:
         r"""
-        @brief Gets the device reference.
+        @brief Gets the device reference (non-const version).
         Gets the device object that this connection is made to.
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     def device_class(self) -> DeviceClass:
@@ -41287,15 +41699,15 @@ class NetTerminalRef:
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this terminal reference is attached to.
+        @brief Gets the net this terminal reference is attached to (non-const version).
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this terminal reference is attached to (non-const version).
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the net this terminal reference is attached to.
         """
         ...
     def terminal_def(self) -> DeviceTerminalDefinition:
@@ -42276,17 +42688,17 @@ class Netlist:
     @overload
     def circuit_by_name(self, name: str) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given name.
+        @brief Gets the circuit object for a given name (const version).
         If the name is not a valid circuit name, nil is returned.
+
+        This constness variant has been introduced in version 0.26.8.
         """
         ...
     @overload
     def circuit_by_name(self, name: str) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given name (const version).
+        @brief Gets the circuit object for a given name.
         If the name is not a valid circuit name, nil is returned.
-
-        This constness variant has been introduced in version 0.26.8.
         """
         ...
     @overload
@@ -46698,7 +47110,7 @@ class Path:
         """
         ...
     @overload
-    def move(self, dx: int, dy: int) -> Path:
+    def move(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> Path:
         r"""
         @brief Moves the path.
 
@@ -46714,20 +47126,20 @@ class Path:
         """
         ...
     @overload
-    def move(self, p: Vector) -> Path:
+    def move(self, v: Vector) -> Path:
         r"""
         @brief Moves the path.
 
         Moves the path by the given offset and returns the 
         moved path. The path is overwritten.
 
-        @param p The distance to move the path.
+        @param v The distance to move the path.
 
         @return The moved path.
         """
         ...
     @overload
-    def moved(self, dx: int, dy: int) -> Path:
+    def moved(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> Path:
         r"""
         @brief Returns the moved path (does not change self)
 
@@ -46743,14 +47155,14 @@ class Path:
         """
         ...
     @overload
-    def moved(self, p: Vector) -> Path:
+    def moved(self, v: Vector) -> Path:
         r"""
         @brief Returns the moved path (does not change self)
 
         Moves the path by the given offset and returns the 
         moved path. The path is not modified.
 
-        @param p The distance to move the path.
+        @param v The distance to move the path.
 
         @return The moved path.
         """
@@ -47304,6 +47716,66 @@ class Point:
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
+        """
+        ...
+    @overload
+    def move(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> Point:
+        r"""
+        @brief Moves the point.
+
+        Moves the point by the given offset and returns the 
+        moved point. The point is modified.
+
+        @param dx The x distance to move the point.
+        @param dy The y distance to move the point.
+
+        @return The moved point.
+
+        This method has been introduced in version 0.29.9.
+        """
+        ...
+    @overload
+    def move(self, v: Vector) -> Point:
+        r"""
+        @brief Moves the point.
+
+        This method is equivalent to '+='. It was introduced to harmonize the API with the other objects. The point is modified.
+
+        @param v The distance to move the point.
+
+        @return The moved point.
+
+        This method has been introduced in version 0.29.9.
+        """
+        ...
+    @overload
+    def moved(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> Point:
+        r"""
+        @brief Returns the moved point.
+
+        Moves the point by the given offset and returns the 
+        moved point. The point is not modified.
+
+        @param dx The x distance to move the point.
+        @param dy The y distance to move the point.
+
+        @return The moved point.
+
+        This method has been introduced in version 0.29.9.
+        """
+        ...
+    @overload
+    def moved(self, v: Vector) -> Point:
+        r"""
+        @brief Returns the moved point.
+
+        This method is equivalent to '+'. It was introduced to harmonize the API with the other objects. The point is not modified.
+
+        @param v The distance to move the point.
+
+        @return The moved point.
+
+        This method has been introduced in version 0.29.9.
         """
         ...
     def sq_abs(self) -> float:
@@ -48072,14 +48544,28 @@ class Polygon:
         """
         ...
     @overload
-    def move(self, p: Vector) -> Polygon:
+    def move(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> Polygon:
         r"""
         @brief Moves the polygon.
 
         Moves the polygon by the given offset and returns the 
         moved polygon. The polygon is overwritten.
 
-        @param p The distance to move the polygon.
+        @param dx The x distance to move the polygon.
+        @param dy The y distance to move the polygon.
+
+        @return The moved polygon (self).
+        """
+        ...
+    @overload
+    def move(self, v: Vector) -> Polygon:
+        r"""
+        @brief Moves the polygon.
+
+        Moves the polygon by the given offset and returns the 
+        moved polygon. The polygon is overwritten.
+
+        @param v The distance to move the polygon.
 
         @return The moved polygon (self).
 
@@ -48087,28 +48573,15 @@ class Polygon:
         """
         ...
     @overload
-    def move(self, x: int, y: int) -> Polygon:
-        r"""
-        @brief Moves the polygon.
-
-        Moves the polygon by the given offset and returns the 
-        moved polygon. The polygon is overwritten.
-
-        @param x The x distance to move the polygon.
-        @param y The y distance to move the polygon.
-
-        @return The moved polygon (self).
-        """
-        ...
-    @overload
-    def moved(self, p: Vector) -> Polygon:
+    def moved(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> Polygon:
         r"""
         @brief Returns the moved polygon (does not modify self)
 
         Moves the polygon by the given offset and returns the 
         moved polygon. The polygon is not modified.
 
-        @param p The distance to move the polygon.
+        @param dx The x distance to move the polygon.
+        @param dy The y distance to move the polygon.
 
         @return The moved polygon.
 
@@ -48116,15 +48589,14 @@ class Polygon:
         """
         ...
     @overload
-    def moved(self, x: int, y: int) -> Polygon:
+    def moved(self, v: Vector) -> Polygon:
         r"""
         @brief Returns the moved polygon (does not modify self)
 
         Moves the polygon by the given offset and returns the 
         moved polygon. The polygon is not modified.
 
-        @param x The x distance to move the polygon.
-        @param y The y distance to move the polygon.
+        @param p The distance to move the polygon.
 
         @return The moved polygon.
 
@@ -49833,6 +50305,7 @@ class RecursiveInstanceIterator:
     \inst_cell, \inst_trans and \inst_dtrans are methods provided for convenience to access the current array member's transformation and the target cell of the current instance.
 
     The RecursiveInstanceIterator class has been introduced in version 0.27.
+    Starting with version 0.29.9, the recursive instance iterator will lock the layout it acts on while in iterating mode. While the iterator is active, the Layout object is maintained in 'under construction mode' (see \Layout#under_construction). This is to prevent layout modifications to interfere with the iterator's operation. Specifically when coding in Ruby, pending iterators may block the Layout until the garbage collector cleans up these objects. To avoid this, call \_destroy on the iterator when you no longer need it. The Layout is automatically unlocked when the iterator reaches the end.
     """
     max_depth: int
     r"""
@@ -50405,6 +50878,7 @@ class RecursiveShapeIterator:
     Cell selection is done using cell indexes or glob pattern. Glob pattern are equivalent to the usual file name wildcards used on various command line shells. For example "A*" matches all cells starting with an "A". The curly brace notation and character classes are supported as well. For example "C{125,512}" matches "C125" and "C512" and "[ABC]*" matches all cells starting with an "A", a "B" or "C". "[^ABC]*" matches all cells not starting with one of that letters.
 
     The RecursiveShapeIterator class has been introduced in version 0.18 and has been extended substantially in 0.23.
+    Starting with version 0.29.9, the recursive shape iterator will lock the layout it acts on while in iterating mode. While the iterator is active, the Layout object is maintained in 'under construction mode' (see \Layout#under_construction). This is to prevent layout modifications to interfere with the iterator's operation. Specifically when coding in Ruby, pending iterators may block the Layout until the garbage collector cleans up these objects. To avoid this, call \_destroy on the iterator when you no longer need it. The Layout is automatically unlocked when the iterator reaches the end.
     """
     for_merged_input: bool
     r"""
@@ -53393,6 +53867,20 @@ class Region(ShapeCollection):
         """
         ...
     @overload
+    def move(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> Region:
+        r"""
+        @brief Moves the region
+
+        Moves the region by the given offset and returns the 
+        moved region. The region is overwritten.
+
+        @param dx The x distance to move the region.
+        @param dy The y distance to move the region.
+
+        @return The moved region (self).
+        """
+        ...
+    @overload
     def move(self, v: Vector) -> Region:
         r"""
         @brief Moves the region
@@ -53408,17 +53896,17 @@ class Region(ShapeCollection):
         """
         ...
     @overload
-    def move(self, x: int, y: int) -> Region:
+    def moved(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> Region:
         r"""
-        @brief Moves the region
+        @brief Returns the moved region (does not modify self)
 
         Moves the region by the given offset and returns the 
-        moved region. The region is overwritten.
+        moved region. The region is not modified.
 
-        @param x The x distance to move the region.
-        @param y The y distance to move the region.
+        @param dx The x distance to move the region.
+        @param dy The y distance to move the region.
 
-        @return The moved region (self).
+        @return The moved region.
         """
         ...
     @overload
@@ -53431,21 +53919,7 @@ class Region(ShapeCollection):
 
         Starting with version 0.25 this method accepts a vector argument.
 
-        @param p The distance to move the region.
-
-        @return The moved region.
-        """
-        ...
-    @overload
-    def moved(self, x: int, y: int) -> Region:
-        r"""
-        @brief Returns the moved region (does not modify self)
-
-        Moves the region by the given offset and returns the 
-        moved region. The region is not modified.
-
-        @param x The x distance to move the region.
-        @param y The y distance to move the region.
+        @param v The distance to move the region.
 
         @return The moved region.
         """
@@ -56092,11 +56566,10 @@ class Shape:
 
     Starting with version 0.23, this method returns nil, if the shape does not represent a box.
     Setter:
-    @brief Replaces the shape by the given box
-    This method replaces the shape by the given box. This method can only be called for editable layouts. It does not change the user properties of the shape.
-    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
+    @brief Replaces the shape by the given box (in micrometer units)
+    This method replaces the shape by the given box, like \box= with a \Box argument does. This version translates the box from micrometer units to database units internally.
 
-    This method has been introduced in version 0.22.
+    This method has been introduced in version 0.25.
     """
     box_center: Point
     r"""
@@ -56108,12 +56581,11 @@ class Shape:
     This method has been introduced in version 0.23.
 
     Setter:
-    @brief Sets the center of the box with the point being given in micrometer units
+    @brief Sets the center of the box
 
     Applies to boxes only. Changes the center of the box and throws an exception if the shape is not a box.
-    Translation from micrometer units to database units is done internally.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.23.
     """
     box_dcenter: DPoint
     r"""
@@ -56403,10 +56875,11 @@ class Shape:
 
     Starting with version 0.23, this method returns nil, if the shape does not represent an edge.
     Setter:
-    @brief Replaces the shape by the given edge (in micrometer units)
-    This method replaces the shape by the given edge, like \edge= with a \Edge argument does. This version translates the edge from micrometer units to database units internally.
+    @brief Replaces the shape by the given edge
+    This method replaces the shape by the given edge. This method can only be called for editable layouts. It does not change the user properties of the shape.
+    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.22.
     """
     edge_pair: Any
     r"""
@@ -56765,10 +57238,10 @@ class Shape:
     Applies to texts only. Will throw an exception if the object is not a text.
 
     Setter:
-    @brief Sets the text transformation
+    @brief Sets the text transformation in micrometer units
     Applies to texts only. Will throw an exception if the object is not a text.
 
-    This method has been introduced in version 0.23.
+    This method has been introduced in version 0.25.
     """
     text_valign: int
     r"""
@@ -60016,59 +60489,59 @@ class SimplePolygon:
         """
         ...
     @overload
-    def move(self, p: Vector) -> SimplePolygon:
-        r"""
-        @brief Moves the simple polygon.
-
-        Moves the simple polygon by the given offset and returns the 
-        moved simple polygon. The polygon is overwritten.
-
-        @param p The distance to move the simple polygon.
-
-        @return The moved simple polygon.
-        """
-        ...
-    @overload
-    def move(self, x: int, y: int) -> SimplePolygon:
+    def move(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> SimplePolygon:
         r"""
         @brief Moves the polygon.
 
         Moves the polygon by the given offset and returns the 
         moved polygon. The polygon is overwritten.
 
-        @param x The x distance to move the polygon.
-        @param y The y distance to move the polygon.
+        @param dx The x distance to move the polygon.
+        @param dy The y distance to move the polygon.
 
         @return The moved polygon (self).
         """
         ...
     @overload
-    def moved(self, p: Vector) -> SimplePolygon:
+    def move(self, v: Vector) -> SimplePolygon:
         r"""
-        @brief Returns the moved simple polygon
+        @brief Moves the simple polygon.
 
         Moves the simple polygon by the given offset and returns the 
-        moved simple polygon. The polygon is not modified.
+        moved simple polygon. The polygon is overwritten.
 
-        @param p The distance to move the simple polygon.
+        @param v The distance to move the simple polygon.
 
         @return The moved simple polygon.
         """
         ...
     @overload
-    def moved(self, x: int, y: int) -> SimplePolygon:
+    def moved(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> SimplePolygon:
         r"""
         @brief Returns the moved polygon (does not modify self)
 
         Moves the polygon by the given offset and returns the 
         moved polygon. The polygon is not modified.
 
-        @param x The x distance to move the polygon.
-        @param y The y distance to move the polygon.
+        @param dx The x distance to move the polygon.
+        @param dy The y distance to move the polygon.
 
         @return The moved polygon.
 
         This method has been introduced in version 0.23.
+        """
+        ...
+    @overload
+    def moved(self, v: Vector) -> SimplePolygon:
+        r"""
+        @brief Returns the moved simple polygon
+
+        Moves the simple polygon by the given offset and returns the 
+        moved simple polygon. The polygon is not modified.
+
+        @param v The distance to move the simple polygon.
+
+        @return The moved simple polygon.
         """
         ...
     def num_points(self) -> int:
@@ -60365,23 +60838,17 @@ class SubCircuit(NetlistObject):
     @overload
     def circuit(self) -> Circuit:
         r"""
-        @brief Gets the circuit the subcircuit lives in (non-const version).
-        This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
-
-        This constness variant has been introduced in version 0.26.8
-        """
-        ...
-    @overload
-    def circuit(self) -> Circuit:
-        r"""
         @brief Gets the circuit the subcircuit lives in.
         This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
         """
         ...
     @overload
-    def circuit_ref(self) -> Circuit:
+    def circuit(self) -> Circuit:
         r"""
-        @brief Gets the circuit referenced by the subcircuit.
+        @brief Gets the circuit the subcircuit lives in (non-const version).
+        This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
@@ -60391,6 +60858,12 @@ class SubCircuit(NetlistObject):
 
 
         This constness variant has been introduced in version 0.26.8
+        """
+        ...
+    @overload
+    def circuit_ref(self) -> Circuit:
+        r"""
+        @brief Gets the circuit referenced by the subcircuit.
         """
         ...
     @overload
@@ -61097,7 +61570,8 @@ class Text:
     Setter:
     @brief Sets the vertical alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     x: int
     r"""
@@ -61392,21 +61866,7 @@ class Text:
         """
         ...
     @overload
-    def move(self, distance: Vector) -> Text:
-        r"""
-        @brief Moves the text by a certain distance (modifies self)
-
-
-        Moves the text by a given offset and returns the moved
-        text. Does not check for coordinate overflows.
-
-        @param p The offset to move the text.
-
-        @return A reference to this text object
-        """
-        ...
-    @overload
-    def move(self, dx: int, dy: int) -> Text:
+    def move(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> Text:
         r"""
         @brief Moves the text by a certain distance (modifies self)
 
@@ -61423,22 +61883,21 @@ class Text:
         """
         ...
     @overload
-    def moved(self, distance: Vector) -> Text:
+    def move(self, v: Vector) -> Text:
         r"""
-        @brief Returns the text moved by a certain distance (does not modify self)
+        @brief Moves the text by a certain distance (modifies self)
 
 
         Moves the text by a given offset and returns the moved
-        text. Does not modify *this. Does not check for coordinate
-        overflows.
+        text. Does not check for coordinate overflows.
 
-        @param p The offset to move the text.
+        @param v The offset to move the text.
 
-        @return The moved text.
+        @return A reference to this text object
         """
         ...
     @overload
-    def moved(self, dx: int, dy: int) -> Text:
+    def moved(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> Text:
         r"""
         @brief Returns the text moved by a certain distance (does not modify self)
 
@@ -61453,6 +61912,21 @@ class Text:
         @return The moved text.
 
         This method was introduced in version 0.23.
+        """
+        ...
+    @overload
+    def moved(self, v: Vector) -> Text:
+        r"""
+        @brief Returns the text moved by a certain distance (does not modify self)
+
+
+        Moves the text by a given offset and returns the moved
+        text. Does not modify *this. Does not check for coordinate
+        overflows.
+
+        @param v The offset to move the text.
+
+        @return The moved text.
         """
         ...
     def position(self) -> Point:
@@ -62903,55 +63377,55 @@ class Texts(ShapeCollection):
         """
         ...
     @overload
-    def move(self, p: Vector) -> Texts:
-        r"""
-        @brief Moves the text collection
-
-        Moves the texts by the given offset and returns the 
-        moved text collection. The text collection is overwritten.
-
-        @param p The distance to move the texts.
-
-        @return The moved texts (self).
-        """
-        ...
-    @overload
-    def move(self, x: int, y: int) -> Texts:
+    def move(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> Texts:
         r"""
         @brief Moves the text collection
 
         Moves the edge pairs by the given offset and returns the 
         moved texts. The edge pair collection is overwritten.
 
-        @param x The x distance to move the texts.
-        @param y The y distance to move the texts.
+        @param dx The x distance to move the texts.
+        @param dy The y distance to move the texts.
 
         @return The moved texts (self).
         """
         ...
     @overload
-    def moved(self, p: Vector) -> Texts:
+    def move(self, v: Vector) -> Texts:
         r"""
-        @brief Returns the moved text collection (does not modify self)
+        @brief Moves the text collection
 
         Moves the texts by the given offset and returns the 
-        moved texts. The text collection is not modified.
+        moved text collection. The text collection is overwritten.
 
-        @param p The distance to move the texts.
+        @param v The distance to move the texts.
 
-        @return The moved texts.
+        @return The moved texts (self).
         """
         ...
     @overload
-    def moved(self, x: int, y: int) -> Texts:
+    def moved(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> Texts:
         r"""
         @brief Returns the moved edge pair collection (does not modify self)
 
         Moves the texts by the given offset and returns the 
         moved texts. The text collection is not modified.
 
-        @param x The x distance to move the texts.
-        @param y The y distance to move the texts.
+        @param dx The x distance to move the texts.
+        @param dy The y distance to move the texts.
+
+        @return The moved texts.
+        """
+        ...
+    @overload
+    def moved(self, v: Vector) -> Texts:
+        r"""
+        @brief Returns the moved text collection (does not modify self)
+
+        Moves the texts by the given offset and returns the 
+        moved texts. The text collection is not modified.
+
+        @param v The distance to move the texts.
 
         @return The moved texts.
         """

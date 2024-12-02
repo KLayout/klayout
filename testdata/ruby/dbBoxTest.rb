@@ -271,6 +271,10 @@ class DBBox_TestClass < TestBase
     assert_equal( a.to_s, "(-9,18;12,22)" )
     a = b.moved( 1, -1 )
     assert_equal( a.to_s, "(-9,16;12,20)" )
+    a = b.moved( dy: 1 )
+    assert_equal( a.to_s, "(-10,18;11,22)" )
+    a = b.moved( dx: 1 )
+    assert_equal( a.to_s, "(-9,17;12,21)" )
 
     a = b.dup
     a.move( 1, -1 )
@@ -304,7 +308,12 @@ class DBBox_TestClass < TestBase
     aa = a.dup
     a.enlarge( -1, 1 )
     assert_equal( a.to_s, "(-10,21;11,25)" )
+    a.enlarge( 1, -1 )
+    a.enlarge( dy: 1 )
+    a.enlarge( dx: -1 )
+    assert_equal( a.to_s, "(-10,21;11,25)" )
     assert_equal( aa.enlarged( -1, 1 ).to_s, "(-10,21;11,25)" )
+    assert_equal( aa.enlarged( :dy => 1, :dx => -1 ).to_s, "(-10,21;11,25)" )
 
     a = a.enlarged( RBA::Point::new(1, -1) )
     assert_equal( a.to_s, "(-11,22;12,24)" )

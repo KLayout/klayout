@@ -1,3 +1,13 @@
+0.29.10          (2024-12-03):
+* Bug: %GITHUB%/issues/1941 Crash with the navigator open
+* Bug: %GITHUB%/issues/1942 Syntax error in pyi stubs
+  As a bonus, added defaults for Box#enlarge and Box#enlarged (dx, dy)
+* Bugfix: Partial mode snapping now is object first, then grid
+* Bugfix: Key bindings have not been properly read from the configuration file
+  The change in the configuration string structure triggered an old bug:
+  Toolbar buttons had a twofold configuration and only the last one was
+  considered. Changing the order of the entries could spoil the configuration.
+
 0.29.9           (2024-12-01):
 * Bug: %GITHUB%/issues/1907 Locking layouts against modification during recursive iteration of instances and shapes
   This prevents crashes in write-white-iterating scenarios

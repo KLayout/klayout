@@ -553,7 +553,7 @@ class Box:
         """
         ...
     @overload
-    def enlarge(self, dx: int, dy: int) -> Box:
+    def enlarge(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> Box:
         r"""
         @brief Enlarges the box by a certain amount.
 
@@ -596,7 +596,7 @@ class Box:
         """
         ...
     @overload
-    def enlarged(self, dx: int, dy: int) -> Box:
+    def enlarged(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> Box:
         r"""
         @brief Enlarges the box by a certain amount.
 
@@ -701,7 +701,7 @@ class Box:
         """
         ...
     @overload
-    def moved(self, dx, 0: int, dy: Optional[int] = ...) -> Box:
+    def moved(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> Box:
         r"""
         @brief Moves the box by a certain distance
 
@@ -7407,7 +7407,7 @@ class DBox:
         """
         ...
     @overload
-    def enlarge(self, dx: float, dy: float) -> DBox:
+    def enlarge(self, dx: Optional[float] = ..., dy: Optional[float] = ...) -> DBox:
         r"""
         @brief Enlarges the box by a certain amount.
 
@@ -7450,7 +7450,7 @@ class DBox:
         """
         ...
     @overload
-    def enlarged(self, dx: float, dy: float) -> DBox:
+    def enlarged(self, dx: Optional[float] = ..., dy: Optional[float] = ...) -> DBox:
         r"""
         @brief Enlarges the box by a certain amount.
 
@@ -7555,7 +7555,7 @@ class DBox:
         """
         ...
     @overload
-    def moved(self, dx, 0: float, dy: Optional[float] = ...) -> DBox:
+    def moved(self, dx: Optional[float] = ..., dy: Optional[float] = ...) -> DBox:
         r"""
         @brief Moves the box by a certain distance
 
@@ -30277,10 +30277,9 @@ class Instance:
     @brief Gets the complex transformation of the instance or the first instance in the array
     This method is always valid compared to \trans, since simple transformations can be expressed as complex transformations as well.
     Setter:
-    @brief Sets the complex transformation of the instance or the first instance in the array (in micrometer units)
-    This method sets the transformation the same way as \cplx_trans=, but the displacement of this transformation is given in micrometer units. It is internally translated into database units.
+    @brief Sets the complex transformation of the instance or the first instance in the array
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.23.
     """
     da: DVector
     r"""
@@ -41368,15 +41367,15 @@ class NetPinRef:
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this pin reference is attached to (non-const version).
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the net this pin reference is attached to.
         """
         ...
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this pin reference is attached to.
+        @brief Gets the net this pin reference is attached to (non-const version).
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     def pin(self) -> Pin:
@@ -41666,17 +41665,17 @@ class NetTerminalRef:
     @overload
     def device(self) -> Device:
         r"""
-        @brief Gets the device reference.
+        @brief Gets the device reference (non-const version).
         Gets the device object that this connection is made to.
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def device(self) -> Device:
         r"""
-        @brief Gets the device reference (non-const version).
+        @brief Gets the device reference.
         Gets the device object that this connection is made to.
-
-        This constness variant has been introduced in version 0.26.8
         """
         ...
     def device_class(self) -> DeviceClass:
@@ -42688,26 +42687,17 @@ class Netlist:
     @overload
     def circuit_by_name(self, name: str) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given name (const version).
-        If the name is not a valid circuit name, nil is returned.
-
-        This constness variant has been introduced in version 0.26.8.
-        """
-        ...
-    @overload
-    def circuit_by_name(self, name: str) -> Circuit:
-        r"""
         @brief Gets the circuit object for a given name.
         If the name is not a valid circuit name, nil is returned.
         """
         ...
     @overload
-    def circuits_by_name(self, name_pattern: str) -> List[Circuit]:
+    def circuit_by_name(self, name: str) -> Circuit:
         r"""
-        @brief Gets the circuit objects for a given name filter.
-        The name filter is a glob pattern. This method will return all \Circuit objects matching the glob pattern.
+        @brief Gets the circuit object for a given name (const version).
+        If the name is not a valid circuit name, nil is returned.
 
-        This method has been introduced in version 0.26.4.
+        This constness variant has been introduced in version 0.26.8.
         """
         ...
     @overload
@@ -42718,6 +42708,15 @@ class Netlist:
 
 
         This constness variant has been introduced in version 0.26.8.
+        """
+        ...
+    @overload
+    def circuits_by_name(self, name_pattern: str) -> List[Circuit]:
+        r"""
+        @brief Gets the circuit objects for a given name filter.
+        The name filter is a glob pattern. This method will return all \Circuit objects matching the glob pattern.
+
+        This method has been introduced in version 0.26.4.
         """
         ...
     def combine_devices(self) -> None:
@@ -56566,10 +56565,11 @@ class Shape:
 
     Starting with version 0.23, this method returns nil, if the shape does not represent a box.
     Setter:
-    @brief Replaces the shape by the given box (in micrometer units)
-    This method replaces the shape by the given box, like \box= with a \Box argument does. This version translates the box from micrometer units to database units internally.
+    @brief Replaces the shape by the given box
+    This method replaces the shape by the given box. This method can only be called for editable layouts. It does not change the user properties of the shape.
+    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.22.
     """
     box_center: Point
     r"""
@@ -57238,10 +57238,10 @@ class Shape:
     Applies to texts only. Will throw an exception if the object is not a text.
 
     Setter:
-    @brief Sets the text transformation in micrometer units
+    @brief Sets the text transformation
     Applies to texts only. Will throw an exception if the object is not a text.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.23.
     """
     text_valign: int
     r"""
@@ -60854,16 +60854,16 @@ class SubCircuit(NetlistObject):
     @overload
     def circuit_ref(self) -> Circuit:
         r"""
-        @brief Gets the circuit referenced by the subcircuit (non-const version).
-
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the circuit referenced by the subcircuit.
         """
         ...
     @overload
     def circuit_ref(self) -> Circuit:
         r"""
-        @brief Gets the circuit referenced by the subcircuit.
+        @brief Gets the circuit referenced by the subcircuit (non-const version).
+
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
@@ -61533,8 +61533,7 @@ class Text:
     Setter:
     @brief Sets the horizontal alignment
 
-    This property specifies how the text is aligned relative to the anchor point. 
-    This property has been introduced in version 0.22 and extended to enums in 0.28.
+    This is the version accepting integer values. It's provided for backward compatibility.
     """
     size: int
     r"""
@@ -61570,8 +61569,7 @@ class Text:
     Setter:
     @brief Sets the vertical alignment
 
-    This property specifies how the text is aligned relative to the anchor point. 
-    This property has been introduced in version 0.22 and extended to enums in 0.28.
+    This is the version accepting integer values. It's provided for backward compatibility.
     """
     x: int
     r"""

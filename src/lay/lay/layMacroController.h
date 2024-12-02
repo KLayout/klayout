@@ -249,8 +249,6 @@ private:
   tl::DeferredMethod<MacroController> dm_do_sync_with_external_sources;
   tl::DeferredMethod<MacroController> dm_sync_file_watcher;
   tl::DeferredMethod<MacroController> dm_sync_files;
-  std::vector<std::pair<std::string, std::string> > m_key_bindings;
-  std::vector<std::pair<std::string, bool> > m_menu_items_hidden;
 
   void sync_implicit_macros (bool ask_before_autorun);
   void add_macro_items_to_menu (lym::MacroCollection &collection, std::set<std::string> &used_names, std::set<std::string> &groups, const db::Technology *tech);

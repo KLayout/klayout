@@ -220,20 +220,22 @@ parse_menu_title (const std::string &s, std::string &title, std::string &shortcu
 //  AbstractMenuItem implementation
 
 AbstractMenuItem::AbstractMenuItem (Dispatcher *dispatcher)
-  : mp_action (new Action ()), mp_dispatcher (dispatcher), m_has_submenu (false), m_remove_on_empty (false)
+  : mp_action (new Action ()), mp_dispatcher (dispatcher), m_has_submenu (false), m_remove_on_empty (false), m_primary (false)
 {
   //  ... nothing yet ..
 }
 
 AbstractMenuItem::AbstractMenuItem (const AbstractMenuItem &item)
-  : mp_action (new Action ()), mp_dispatcher (item.dispatcher ()), m_has_submenu (false), m_remove_on_empty (false)
+  : mp_action (new Action ()), mp_dispatcher (item.dispatcher ()), m_has_submenu (false), m_remove_on_empty (false), m_primary (false)
 {
   //  ... nothing yet ..
 }
 
 void
-AbstractMenuItem::setup_item (const std::string &pn, const std::string &s, Action *a)
+AbstractMenuItem::setup_item (const std::string &pn, const std::string &s, Action *a, bool primary)
 {
+  m_primary = primary;
+
   m_basename.clear ();
 
   tl::Extractor ex (s.c_str ());
@@ -1587,6 +1589,8 @@ AbstractMenu::items (const std::string &path) const
 void
 AbstractMenu::insert_item (const std::string &p, const std::string &name, Action *action)
 {
+  bool primary = true;
+
   tl::Extractor extr (p.c_str ());
   while (! extr.at_end ()) {
 
@@ -1601,7 +1605,8 @@ AbstractMenu::insert_item (const std::string &p, const std::string &name, Action
       parent->children.insert (iter, AbstractMenuItem (mp_dispatcher));
       --iter;
 
-      iter->setup_item (parent->name (), name, action);
+      iter->setup_item (parent->name (), name, action, primary);
+      primary = false;
 
       //  find any items with the same name and remove them
       for (std::list<AbstractMenuItem>::iterator existing = parent->children.begin (); existing != parent->children.end (); ) {
@@ -1635,7 +1640,7 @@ AbstractMenu::insert_separator (const std::string &p, const std::string &name)
     --iter;
     Action *action = new Action ();
     action->set_separator (true);
-    iter->setup_item (parent->name (), name, action);
+    iter->setup_item (parent->name (), name, action, true);
 
   }
 
@@ -1655,7 +1660,7 @@ AbstractMenu::insert_menu (const std::string &p, const std::string &name, Action
 
     parent->children.insert (iter, AbstractMenuItem (mp_dispatcher));
     --iter;
-    iter->setup_item (parent->name (), name, action);
+    iter->setup_item (parent->name (), name, action, true);
     iter->set_has_submenu ();
 
     //  find any items with the same name and remove them
@@ -1945,7 +1950,7 @@ AbstractMenu::find_item (tl::Extractor &extr)
           if (parent) {
             parent->children.insert (iter, AbstractMenuItem (mp_dispatcher));
             --iter;
-            iter->setup_item (parent->name (), n, new Action ());
+            iter->setup_item (parent->name (), n, new Action (), true);
             iter->set_has_submenu ();
             iter->set_remove_on_empty ();
             iter->set_action_title (ndesc.empty () ? n : ndesc);
@@ -2055,16 +2060,17 @@ AbstractMenu::get_shortcuts (const std::string &root, std::map<std::string, std:
   std::vector<std::string> items = this->items (root);
   for (std::vector<std::string>::const_iterator i = items.begin (); i != items.end (); ++i) {
     if (i->size () > 0) {
-      if (is_valid (*i) && action (*i)->is_visible ()) {
-        if (is_menu (*i)) {
+      const AbstractMenuItem *item = find_item_exact (*i);
+      if (item && item->action () && item->action ()->is_visible ()) {
+        if (item->has_submenu ()) {
           //  a menu must be listed (so it can be hidden), but does not have a shortcut
           //  but we don't include special menus
           if (i->at (0) != '@') {
             bindings.insert (std::make_pair (*i, std::string ()));
           }
           get_shortcuts (*i, bindings, with_defaults);
-        } else if (! is_separator (*i)) {
-          bindings.insert (std::make_pair (*i, with_defaults ? action (*i)->get_default_shortcut () : action (*i)->get_effective_shortcut ()));
+        } else if (! item->action ()->is_separator () && item->primary ()) {
+          bindings.insert (std::make_pair (*i, with_defaults ? item->action ()->get_default_shortcut () : item->action ()->get_effective_shortcut ()));
         }
       }
     }

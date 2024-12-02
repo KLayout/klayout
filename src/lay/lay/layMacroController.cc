@@ -208,11 +208,6 @@ MacroController::uninitialize (lay::Dispatcher * /*root*/)
 bool
 MacroController::configure (const std::string &key, const std::string &value)
 {
-  if (key == cfg_key_bindings) {
-    m_key_bindings = unpack_key_binding (value);
-  } else if (key == cfg_menu_items_hidden) {
-    m_menu_items_hidden = unpack_menu_items_hidden (value);
-  }
   return false;
 }
 
@@ -810,21 +805,9 @@ MacroController::do_update_menu_with_macros ()
   add_macro_items_to_menu (m_temp_macros, used_names, groups, tech);
   add_macro_items_to_menu (lym::MacroCollection::root (), used_names, groups, tech);
 
-  //  apply the custom keyboard shortcuts
-  for (std::vector<std::pair<std::string, std::string> >::const_iterator kb = m_key_bindings.begin (); kb != m_key_bindings.end (); ++kb) {
-    if (mp_mw->menu ()->is_valid (kb->first)) {
-      lay::Action *a = mp_mw->menu ()->action (kb->first);
-      a->set_shortcut (kb->second);
-    }
-  }
-
-  //  apply the custom hidden flags
-  for (std::vector<std::pair<std::string, bool> >::const_iterator hf = m_menu_items_hidden.begin (); hf != m_menu_items_hidden.end (); ++hf) {
-    if (mp_mw->menu ()->is_valid (hf->first)) {
-      lay::Action *a = mp_mw->menu ()->action (hf->first);
-      a->set_hidden (hf->second);
-    }
-  }
+  //  apply the custom keyboard shortcuts and hidden flags
+  mp_mw->apply_key_bindings ();
+  mp_mw->apply_hidden ();
 }
 
 void

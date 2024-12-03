@@ -4,6 +4,7 @@
 
 # clean up
 rm -rf build dist
+rm -rf python3-venv-make_stubs
 
 python3 setup.py build
 python3 setup.py bdist_wheel

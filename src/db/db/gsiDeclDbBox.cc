@@ -388,7 +388,7 @@ struct box_defs
       "\n"
       "@return A reference to this box.\n"
     ) +
-    method_ext ("moved", &box_defs<C>::moved, gsi::arg ("dx, 0"), gsi::arg ("dy", 0),
+    method_ext ("moved", &box_defs<C>::moved, gsi::arg ("dx", 0), gsi::arg ("dy", 0),
       "@brief Moves the box by a certain distance\n"
       "\n"
       "This is a convenience method which takes two values instead of a Point object.\n"
@@ -419,7 +419,7 @@ struct box_defs
       "\n"
       "@return The moved box.\n"
     ) +
-    method_ext ("enlarge", &box_defs<C>::enlarge, gsi::arg ("dx"), gsi::arg ("dy"),
+    method_ext ("enlarge", &box_defs<C>::enlarge, gsi::arg ("dx", 0), gsi::arg ("dy", 0),
       "@brief Enlarges the box by a certain amount.\n"
       "\n"
       "\n"
@@ -436,7 +436,7 @@ struct box_defs
       "\n"
       "@return A reference to this box.\n"
     ) +
-    method_ext ("enlarged", &box_defs<C>::enlarged, gsi::arg ("dx"), gsi::arg ("dy"),
+    method_ext ("enlarged", &box_defs<C>::enlarged, gsi::arg ("dx", 0), gsi::arg ("dy", 0),
       "@brief Enlarges the box by a certain amount.\n"
       "\n"
       "\n"

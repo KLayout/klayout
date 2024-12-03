@@ -4084,7 +4084,9 @@ LayoutViewBase::cancel_edits ()
 
   //  the move service takes a special role here as it manages the
   //  transaction for the collective move operation.
-  mp_move_service->cancel ();
+  if (mp_move_service) {
+    mp_move_service->cancel ();
+  }
 
   //  cancel all drag and pending edit operations such as move operations.
   mp_canvas->drag_cancel ();
@@ -4099,7 +4101,9 @@ LayoutViewBase::finish_edits ()
 {
   //  the move service takes a special role here as it manages the
   //  transaction for the collective move operation.
-  mp_move_service->finish ();
+  if (mp_move_service) {
+    mp_move_service->finish ();
+  }
 
   //  cancel all drag operations
   mp_canvas->drag_cancel ();
@@ -5460,7 +5464,7 @@ LayoutViewBase::paste_interactive (bool transient_mode)
   //  operations.
   trans->close ();
 
-  if (mp_move_service->begin_move (trans.release (), transient_mode)) {
+  if (mp_move_service && mp_move_service->begin_move (trans.release (), transient_mode)) {
     switch_mode (-1);  //  move mode
   }
 }

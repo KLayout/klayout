@@ -559,7 +559,7 @@ struct LAYBASIC_PUBLIC AbstractMenuItem
   /**
    *  @brief Internal method used to set up the item
    */
-  void setup_item (const std::string &pn, const std::string &n, Action *a);
+  void setup_item (const std::string &pn, const std::string &n, Action *a, bool primary);
 
   Dispatcher *dispatcher () const
   {
@@ -616,6 +616,11 @@ struct LAYBASIC_PUBLIC AbstractMenuItem
     return m_remove_on_empty;
   }
 
+  bool primary () const
+  {
+    return m_primary;
+  }
+
   std::list <AbstractMenuItem> children;
 
 private:
@@ -623,6 +628,7 @@ private:
   Dispatcher *mp_dispatcher;
   bool m_has_submenu;
   bool m_remove_on_empty;
+  bool m_primary;
   std::string m_name;
   std::string m_basename;
   std::set<std::string> m_groups;
@@ -906,6 +912,16 @@ public:
     return m_root;
   }
 
+  /**
+   *  @brief For internal use: gets the AbstractMenuItem for a given path or 0 if the path is not valid (const version)
+   */
+  const AbstractMenuItem *find_item_exact (const std::string &path) const;
+
+  /**
+   *  @brief For internal use: gets the AbstractMenuItem for a given path or 0 if the path is not valid
+   */
+  AbstractMenuItem *find_item_exact (const std::string &path);
+
 #if defined(HAVE_QT)
 signals:
   /**
@@ -918,8 +934,6 @@ private:
   friend class Action;
 
   std::vector<std::pair<AbstractMenuItem *, std::list<AbstractMenuItem>::iterator> > find_item (tl::Extractor &extr);
-  const AbstractMenuItem *find_item_exact (const std::string &path) const;
-  AbstractMenuItem *find_item_exact (const std::string &path);
   const AbstractMenuItem *find_item_for_action (const Action *action, const AbstractMenuItem *from = 0) const;
   AbstractMenuItem *find_item_for_action (const Action *action, AbstractMenuItem *from = 0);
 #if defined(HAVE_QT)

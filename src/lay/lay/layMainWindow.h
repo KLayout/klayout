@@ -535,6 +535,16 @@ public:
   static std::vector<std::string> menu_symbols ();
 
   /**
+   *  @brief For internal use: apply current key bindings
+   */
+  void apply_key_bindings ();
+
+  /**
+   *  @brief For internal use: apply hidden menu flags
+   */
+  void apply_hidden ();
+
+  /**
    *  @brief Open a new layout in mode 'mode'
    *
    *  If mode is 2, the layout is opened in the current view in addition to the existing ones.
@@ -770,6 +780,7 @@ private:
   double m_default_grid;
   bool m_default_grids_updated;
   std::vector<std::pair<std::string, std::string> > m_key_bindings;
+  std::vector<std::pair<std::string, bool> > m_hidden;
   bool m_new_layout_current_panel;
   bool m_synchronized_views;
   bool m_synchronous;
@@ -864,8 +875,6 @@ private:
   void plugin_removed (lay::PluginDeclaration *cls);
 
   void libraries_changed ();
-  void apply_key_bindings ();
-  void apply_hidden (const std::vector<std::pair <std::string, bool> > &hidden);
 };
 
 }

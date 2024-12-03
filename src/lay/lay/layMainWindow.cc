@@ -1192,8 +1192,8 @@ MainWindow::configure (const std::string &name, const std::string &value)
 
   } else if (name == cfg_menu_items_hidden) {
 
-    std::vector<std::pair<std::string, bool> > hidden = unpack_menu_items_hidden (value);
-    apply_hidden (hidden);
+    m_hidden = unpack_menu_items_hidden (value);
+    apply_hidden ();
     return true;
 
   } else if (name == cfg_initial_technology) {
@@ -1213,12 +1213,15 @@ MainWindow::configure (const std::string &name, const std::string &value)
 }
 
 void
-MainWindow::apply_hidden (const std::vector<std::pair<std::string, bool> > &hidden)
+MainWindow::apply_hidden ()
 {
-  for (std::vector<std::pair<std::string, bool> >::const_iterator hf = hidden.begin (); hf != hidden.end (); ++hf) {
-    if (menu ()->is_valid (hf->first)) {
-      lay::Action *a = menu ()->action (hf->first);
-      a->set_hidden (hf->second);
+  for (std::vector<std::pair<std::string, bool> >::const_iterator hf = m_hidden.begin (); hf != m_hidden.end (); ++hf) {
+    lay::AbstractMenuItem *item = menu ()->find_item_exact (hf->first);
+    if (item && item->primary ()) {
+      lay::Action *a = item->action ();
+      if (a) {
+        a->set_hidden (hf->second);
+      }
     }
   }
 }
@@ -1227,9 +1230,12 @@ void
 MainWindow::apply_key_bindings ()
 {
   for (std::vector<std::pair<std::string, std::string> >::const_iterator kb = m_key_bindings.begin (); kb != m_key_bindings.end (); ++kb) {
-    if (menu ()->is_valid (kb->first)) {
-      lay::Action *a = menu ()->action (kb->first);
-      a->set_shortcut (kb->second);
+    lay::AbstractMenuItem *item = menu ()->find_item_exact (kb->first);
+    if (item && item->primary ()) {
+      lay::Action *a = item->action ();
+      if (a) {
+        a->set_shortcut (kb->second);
+      }
     }
   }
 }

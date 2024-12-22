@@ -1074,19 +1074,15 @@ static void copy_cluster_shapes (const std::string *&attrs, db::Shapes &out, db:
   //  use property #1 to code the cell name
   //  use property #2 to code the attrs string for the first shape
 
-  db::PropertiesRepository &pr = out.layout ()->properties_repository ();
-
   db::properties_id_type cell_pid = 0, cell_and_attr_pid = 0;
 
-  db::property_names_id_type pn_id = pr.prop_name_id (tl::Variant (1));
-  db::PropertiesRepository::properties_set pm;
-  pm.insert (std::make_pair (pn_id, tl::Variant (out.layout ()->cell_name (ci))));
-  cell_pid = pr.properties_id (pm);
+  db::PropertiesSet pm;
+  pm.insert (tl::Variant (1), tl::Variant (out.layout ()->cell_name (ci)));
+  cell_pid = db::properties_id (pm);
 
   if (attrs && ! attrs->empty ()) {
-    db::property_names_id_type pn2_id = pr.prop_name_id (tl::Variant (2));
-    pm.insert (std::make_pair (pn2_id, tl::Variant (*attrs)));
-    cell_and_attr_pid = pr.properties_id (pm);
+    pm.insert (tl::Variant (2), tl::Variant (*attrs));
+    cell_and_attr_pid = db::properties_id (pm);
   }
 
   const db::connected_clusters<db::PolygonRef> &clusters = hc.clusters_per_cell (ci);

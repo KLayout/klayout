@@ -50,19 +50,15 @@ static void remove_properties (Container *c)
 template <class Container>
 static void filter_properties (Container *c, const std::vector<tl::Variant> &keys)
 {
-  if (c->has_properties_repository ()) {
-    std::set<tl::Variant> kf;
-    kf.insert (keys.begin (), keys.end ());
-    c->apply_property_translator (db::PropertiesTranslator::make_filter (c->properties_repository (), kf));
-  }
+  std::set<tl::Variant> kf;
+  kf.insert (keys.begin (), keys.end ());
+  c->apply_property_translator (db::PropertiesTranslator::make_filter (kf));
 }
 
 template <class Container>
 static void map_properties (Container *c, const std::map<tl::Variant, tl::Variant> &map)
 {
-  if (c->has_properties_repository ()) {
-    c->apply_property_translator (db::PropertiesTranslator::make_key_mapper (c->properties_repository (), map));
-  }
+  c->apply_property_translator (db::PropertiesTranslator::make_key_mapper (map));
 }
 
 template <class Container>

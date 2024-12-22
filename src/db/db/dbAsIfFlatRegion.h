@@ -287,7 +287,7 @@ public:
 protected:
   void update_bbox (const db::Box &box);
   void invalidate_bbox ();
-  void merge_polygons_to (db::Shapes &output, bool min_coherence, unsigned int min_wc, PropertiesRepository *target_rp = 0) const;
+  void merge_polygons_to (db::Shapes &output, bool min_coherence, unsigned int min_wc) const;
   RegionDelegate *and_or_not_with (bool is_and, const Region &other, PropertyConstraint property_constraint) const;
 
   virtual EdgePairsDelegate *run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, const RegionCheckOptions &options) const;

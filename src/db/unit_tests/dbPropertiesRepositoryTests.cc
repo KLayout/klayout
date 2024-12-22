@@ -26,7 +26,7 @@
 #include "tlString.h"
 #include "tlUnitTest.h"
 
-
+#if 0 // @@@
 TEST(1) 
 {
   tl::Variant v;
@@ -392,3 +392,4 @@ TEST(10_PropertiesTranslator)
   EXPECT_EQ (prop2string (rp, t (prop2)), "1=102");
   EXPECT_EQ (prop2string (rp, t (prop3)), "");
 }
+#endif

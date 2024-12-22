@@ -533,7 +533,7 @@ public:
    *  The given properties set is checked against the selector and "true" is returned
    *  if the selector applies to the given set.
    */
-  bool check (const db::PropertiesRepository &rep, db::properties_id_type id) const;
+  bool check (db::properties_id_type id) const;
 
   /**
    *  @brief Obtain a list of properties ids that satisfy the selection
@@ -544,7 +544,7 @@ public:
    *  The return value is true if the ids are to be interpreted inversely (every properties id
    *  matches that is not in the set). This allows optimizing the computation of the set.
    */
-  bool matching (const db::PropertiesRepository &rep, std::set<db::properties_id_type> &matching) const;
+  bool matching (std::set<db::properties_id_type> &matching) const;
 
   /**
    *  @brief Return true, if the property selector is not set

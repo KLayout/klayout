@@ -768,12 +768,14 @@ TEST(8)
 {
   db::Manager m (true);
   db::Shapes s (&m, 0, db::default_editable_mode ());
-  db::PropertiesRepository proprep;
 
-  db::PropertiesRepository::properties_set set1;
-  set1.insert (std::make_pair (0, tl::Variant (15l)));
-  db::PropertiesRepository rep;
-  size_t id1 = rep.properties_id (set1);
+  db::PropertiesSet set0;
+  set0.insert (tl::Variant (0), tl::Variant (0));
+  size_t id0 = db::properties_id (set0);
+
+  db::PropertiesSet set1;
+  set1.insert (tl::Variant (0), tl::Variant (15l));
+  size_t id1 = db::properties_id (set1);
 
   db::BoxWithProperties bx2 = db::BoxWithProperties (db::Box (db::Point (0, 1000), db::Point (100, 2000)), id1);
   s.insert (bx2);
@@ -795,7 +797,7 @@ TEST(8)
 
   EXPECT_EQ (si.at_end (), true); 
 
-  prop_sel.insert (22);
+  prop_sel.insert (id0);
   si = db::ShapeIterator (s.begin (db::ShapeIterator::Polygons | db::ShapeIterator::Boxes, &prop_sel, false));
 
   EXPECT_EQ (si.at_end (), true); 

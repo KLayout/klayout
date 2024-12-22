@@ -208,18 +208,6 @@ OriginalLayerEdgePairs::apply_property_translator (const db::PropertiesTranslato
   m_iter.apply_property_translator (pt);
 }
 
-db::PropertiesRepository *
-OriginalLayerEdgePairs::properties_repository ()
-{
-  return m_iter.layout () ? &const_cast<db::Layout * >(m_iter.layout ())->properties_repository () : 0;
-}
-
-const db::PropertiesRepository *
-OriginalLayerEdgePairs::properties_repository () const
-{
-  return m_iter.layout () ? &m_iter.layout ()->properties_repository () : 0;
-}
-
 bool
 OriginalLayerEdgePairs::equals (const EdgePairs &other) const
 {

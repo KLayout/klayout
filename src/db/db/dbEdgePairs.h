@@ -696,20 +696,6 @@ public:
   const db::RecursiveShapeIterator &iter () const;
 
   /**
-   *  @brief Gets the property repository
-   *
-   *  Use this object to decode property IDs.
-   */
-  const db::PropertiesRepository &properties_repository () const;
-
-  /**
-   *  @brief Gets the property repository
-   *
-   *  Use this object to decode and encode property IDs.
-   */
-  db::PropertiesRepository &properties_repository ();
-
-  /**
    *  @brief Equality
    */
   bool operator== (const db::EdgePairs &other) const

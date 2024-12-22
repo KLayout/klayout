@@ -115,22 +115,6 @@ Edges::iter () const
   return *(i ? i : &def_iter);
 }
 
-const db::PropertiesRepository &
-Edges::properties_repository () const
-{
-  static db::PropertiesRepository empty_prop_repo;
-  const db::PropertiesRepository *r = delegate () ? delegate ()->properties_repository () : 0;
-  return *(r ? r : &empty_prop_repo);
-}
-
-db::PropertiesRepository &
-Edges::properties_repository ()
-{
-  db::PropertiesRepository *r = delegate () ? delegate ()->properties_repository () : 0;
-  tl_assert (r != 0);
-  return *r;
-}
-
 void
 Edges::set_delegate (EdgesDelegate *delegate, bool keep_attributes)
 {

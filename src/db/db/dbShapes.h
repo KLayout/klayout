@@ -986,6 +986,23 @@ public:
    *
    *  @param shape The reference of the shape to insert
    *  @param trans The transformation to apply before the shape is inserted
+   *  @return The reference to the new shape
+   */
+  template <class Trans>
+  shape_type insert_transformed (const shape_type &shape, const Trans &trans)
+  {
+    tl::ident_map<db::properties_id_type> pm;
+    tl::func_delegate <tl::ident_map<db::properties_id_type>, db::properties_id_type> pm_delegate (pm);
+    return do_insert (shape, trans, pm_delegate);
+  }
+
+  /**
+   *  @brief Insert an element from the shape reference with a transformation and property mapping
+   *
+   *  Given a shape reference, the corresponding shape is inserted.
+   *
+   *  @param shape The reference of the shape to insert
+   *  @param trans The transformation to apply before the shape is inserted
    *  @param pm The property ID mapper - the property ID will be mapped accordingly, i.e. for transferring shapes from one layout to another
    *  @return The reference to the new shape
    */

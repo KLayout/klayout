@@ -1935,11 +1935,11 @@ db::Region LayoutToNetlist::antenna_check (const db::Region &gate, double gate_a
 
             db::properties_id_type prop_id = 0;
             if (! values) {
-              db::PropertiesRepository::properties_set ps;
+              db::PropertiesSet ps;
               for (auto v = antenna_values.begin (); v != antenna_values.end (); ++v) {
-                ps.insert (std::make_pair (ly.properties_repository ().prop_name_id (v->first), v->second));
+                ps.insert (v->first, v->second);
               }
-              prop_id = ly.properties_repository ().properties_id (ps);
+              prop_id = db::properties_id (ps);
             }
 
             db::Point ref = get_merged_shapes_of_net (m_net_clusters, *cid, *c, layer_of (metal), &ly, shapes, prop_id);
@@ -2157,7 +2157,7 @@ NetBuilder::build_net (db::Cell &target_cell, const db::Net &net, const std::map
 
   double mag = mp_source->internal_layout ()->dbu () / mp_target->dbu ();
 
-  db::properties_id_type netname_propid = make_netname_propid (target ().properties_repository (), net_prop_mode, netname_prop, net);
+  db::properties_id_type netname_propid = make_netname_propid (net_prop_mode, netname_prop, net);
   build_net_rec (net, target_cell, lmap, std::string (), netname_propid, db::ICplxTrans (mag));
 }
 
@@ -2190,7 +2190,7 @@ NetBuilder::build_nets (const std::vector<const Net *> *nets, const std::map<uns
       }
 
       if (! nets || net_set.find (n.operator-> ()) != net_set.end ()) {
-        db::properties_id_type netname_propid = make_netname_propid (target ().properties_repository (), prop_mode, netname_prop, *n);
+        db::properties_id_type netname_propid = make_netname_propid (prop_mode, netname_prop, *n);
         build_net_rec (*n, c->cell_index (), lmap, std::string (), netname_propid, db::ICplxTrans ());
       }
 
@@ -2220,7 +2220,7 @@ NetBuilder::build_nets (const std::vector<const Net *> *nets, const std::map<uns
               db::ICplxTrans tr = db::CplxTrans (dbu).inverted () * subcircuit.trans () * db::CplxTrans (dbu);
 
               std::string net_name_prefix = subcircuit.expanded_name () + ":";
-              db::properties_id_type netname_propid = make_netname_propid (target ().properties_repository (), prop_mode, netname_prop, *n, net_name_prefix);
+              db::properties_id_type netname_propid = make_netname_propid (prop_mode, netname_prop, *n, net_name_prefix);
 
               build_net_rec (*n, c->cell_index (), lmap, net_name_prefix, netname_propid, tr);
 
@@ -2382,7 +2382,7 @@ NetBuilder::build_net_rec (const db::Net &net, db::cell_index_type circuit_cell,
 }
 
 db::properties_id_type
-NetBuilder::make_netname_propid (db::PropertiesRepository &pr, NetPropertyMode net_prop_mode, const tl::Variant &netname_prop, const db::Net &net, const std::string &net_name_prefix)
+NetBuilder::make_netname_propid (NetPropertyMode net_prop_mode, const tl::Variant &netname_prop, const db::Net &net, const std::string &net_name_prefix)
 {
   if (net_prop_mode == NPM_NoProperties) {
 
@@ -2390,30 +2390,28 @@ NetBuilder::make_netname_propid (db::PropertiesRepository &pr, NetPropertyMode n
 
   } else if (! netname_prop.is_nil () || (net_prop_mode == NPM_AllProperties && net.begin_properties () != net.end_properties ())) {
 
-    db::PropertiesRepository::properties_set propset;
+    db::PropertiesSet propset;
 
     //  add the user properties too (TODO: make this configurable?)
     for (db::Net::property_iterator p = net.begin_properties (); p != net.end_properties (); ++p) {
-      db::property_names_id_type key_propnameid = pr.prop_name_id (p->first);
-      propset.insert (std::make_pair (key_propnameid, p->second));
+      propset.insert (p->first, p->second);
     }
 
     if (! netname_prop.is_nil ()) {
-      db::property_names_id_type name_propnameid = pr.prop_name_id (netname_prop);
       if (net_prop_mode == NPM_NetQualifiedNameOnly) {
         std::vector<tl::Variant> l;
         l.reserve (2);
         l.push_back (tl::Variant (net_name_prefix + net.expanded_name ()));
         l.push_back (tl::Variant (net.circuit ()->name ()));
-        propset.insert (std::make_pair (name_propnameid, tl::Variant (l)));
+        propset.insert (netname_prop, tl::Variant (l));
       } else if (net_prop_mode == NPM_NetIDOnly) {
-        propset.insert (std::make_pair (name_propnameid, tl::Variant (reinterpret_cast <size_t> (&net))));
+        propset.insert (netname_prop, tl::Variant (reinterpret_cast <size_t> (&net)));
       } else {
-        propset.insert (std::make_pair (name_propnameid, tl::Variant (net_name_prefix + net.expanded_name ())));
+        propset.insert (netname_prop, tl::Variant (net_name_prefix + net.expanded_name ()));
       }
     }
 
-    return pr.properties_id (propset);
+    return db::properties_id (propset);
 
   } else {
 

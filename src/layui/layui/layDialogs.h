@@ -434,13 +434,12 @@ public slots:
   void tab_changed (int);
 
 private:
-  db::PropertiesRepository::properties_set get_properties (int tab);
-  void set_properties (const db::PropertiesRepository::properties_set &props);
+  db::PropertiesSet get_properties (int tab);
+  void set_properties (const db::PropertiesSet &props);
   void set_meta_info (db::Layout::meta_info_iterator begin_meta, db::Layout::meta_info_iterator end_meta, const db::Layout &layout);
   void accept ();
 
   bool m_editable;
-  db::PropertiesRepository *mp_prep;
   Ui::UserPropertiesForm *mp_ui;
   db::Layout::meta_info_iterator m_begin_meta, m_end_meta;
   std::unique_ptr<lay::GenericSyntaxHighlighterAttributes> mp_hl_attributes, mp_hl_basic_attributes;

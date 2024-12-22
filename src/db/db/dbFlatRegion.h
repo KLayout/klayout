@@ -101,8 +101,6 @@ public:
 
   virtual const db::RecursiveShapeIterator *iter () const;
   virtual void apply_property_translator (const db::PropertiesTranslator &pt);
-  virtual db::PropertiesRepository *properties_repository ();
-  virtual const db::PropertiesRepository *properties_repository () const;
 
   void do_insert (const db::Polygon &polygon, db::properties_id_type prop_id);
 
@@ -148,7 +146,6 @@ private:
   mutable tl::copy_on_write_ptr<db::Shapes> mp_polygons;
   mutable tl::copy_on_write_ptr<db::Shapes> mp_merged_polygons;
   mutable bool m_merged_polygons_valid;
-  mutable tl::copy_on_write_ptr<db::PropertiesRepository> mp_properties_repository;
 
   void init ();
   void ensure_merged_polygons_valid () const;

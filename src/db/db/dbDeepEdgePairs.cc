@@ -322,16 +322,6 @@ void DeepEdgePairs::apply_property_translator (const db::PropertiesTranslator &p
   DeepShapeCollectionDelegateBase::apply_property_translator (pt);
 }
 
-db::PropertiesRepository *DeepEdgePairs::properties_repository ()
-{
-  return &deep_layer ().layout ().properties_repository ();
-}
-
-const db::PropertiesRepository *DeepEdgePairs::properties_repository () const
-{
-  return &deep_layer ().layout ().properties_repository ();
-}
-
 EdgePairsDelegate *
 DeepEdgePairs::add_in_place (const EdgePairs &other)
 {

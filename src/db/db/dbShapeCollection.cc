@@ -72,28 +72,6 @@ DeepShapeCollectionDelegateBase::apply_property_translator (const db::Properties
 // -------------------------------------------------------------------------------------------------------------
 //  ShapeCollection implementation
 
-const db::PropertiesRepository &
-ShapeCollection::properties_repository () const
-{
-  static db::PropertiesRepository empty_prop_repo;
-  const db::PropertiesRepository *r = get_delegate () ? get_delegate ()->properties_repository () : 0;
-  return *(r ? r : &empty_prop_repo);
-}
-
-db::PropertiesRepository &
-ShapeCollection::properties_repository ()
-{
-  db::PropertiesRepository *r = get_delegate () ? get_delegate ()->properties_repository () : 0;
-  tl_assert (r != 0);
-  return *r;
-}
-
-bool
-ShapeCollection::has_properties_repository () const
-{
-  return get_delegate () && get_delegate ()->properties_repository ();
-}
-
 void
 ShapeCollection::apply_property_translator (const db::PropertiesTranslator &pt)
 {

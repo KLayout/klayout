@@ -372,18 +372,17 @@ public:
   }
 
   /**
-   *  @brief Insert an instance given by a instance reference with a different cell index and property ID
+   *  @brief Insert an instance given by a instance reference with a different cell index
    *
    *  This member may be used to map an instance to another layout object. 
    *
    *  @param ref The instance reference of which to insert a copy
    *  @param im The mapper to new cell index to use (for mapping to a different layout for example)
-   *  @param pm The mapper to new cell property ID use (for mapping to a different layout for example)
    */
-  template <class IndexMap, class PropIdMap>
-  instance_type insert (const instance_type &ref, IndexMap &im, PropIdMap &pm)
+  template <class IndexMap>
+  instance_type insert (const instance_type &ref, IndexMap &im)
   {
-    return (m_instances.insert (ref, im, pm));
+    return (m_instances.insert (ref, im));
   }
 
   /**

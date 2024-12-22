@@ -617,7 +617,7 @@ DeepLayer DeepShapeStore::create_from_flat (const db::Region &region, bool for_n
   db::ICplxTrans ttop = trans * ii.second;
 
   //  The chain of operators for producing clipped and reduced polygon references
-  db::PolygonReferenceHierarchyBuilderShapeReceiver refs (&layout (), ii.first.layout (), text_enlargement (), text_property_name ());
+  db::PolygonReferenceHierarchyBuilderShapeReceiver refs (&layout (), text_enlargement (), text_property_name ());
   db::ReducingHierarchyBuilderShapeReceiver red (&refs, max_area_ratio, max_vertex_count, m_state.reject_odd_polygons ());
 
   while (! ii.first.at_end ()) {
@@ -656,7 +656,7 @@ DeepLayer DeepShapeStore::create_from_flat (const db::Edges &edges, const db::IC
   std::pair<db::RecursiveShapeIterator, db::ICplxTrans> ii = edges.begin_iter ();
   db::ICplxTrans ttop = trans * ii.second;
 
-  db::EdgeBuildingHierarchyBuilderShapeReceiver eb (&layout (), ii.first.layout (), false);
+  db::EdgeBuildingHierarchyBuilderShapeReceiver eb (false);
   while (! ii.first.at_end ()) {
     eb.push (*ii.first, ii.first.prop_id (), ttop * ii.first.trans (), world, 0, shapes);
     ++ii.first;
@@ -686,7 +686,7 @@ DeepLayer DeepShapeStore::create_from_flat (const db::Texts &texts, const db::IC
   std::pair<db::RecursiveShapeIterator, db::ICplxTrans> ii = texts.begin_iter ();
   db::ICplxTrans ttop = trans * ii.second;
 
-  db::TextBuildingHierarchyBuilderShapeReceiver tb (&layout (), ii.first.layout ());
+  db::TextBuildingHierarchyBuilderShapeReceiver tb (&layout ());
 
   while (! ii.first.at_end ()) {
     tb.push (*ii.first, ii.first.prop_id (), ttop * ii.first.trans (), world, 0, shapes);
@@ -1027,7 +1027,7 @@ DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator
   builder.set_target_layer (layer_index);
 
   //  The chain of operators for producing clipped and reduced polygon references
-  db::PolygonReferenceHierarchyBuilderShapeReceiver refs (&layout, si.layout (), text_enlargement (), text_property_name ());
+  db::PolygonReferenceHierarchyBuilderShapeReceiver refs (&layout, text_enlargement (), text_property_name ());
   db::ReducingHierarchyBuilderShapeReceiver red (&refs, max_area_ratio, max_vertex_count, m_state.reject_odd_polygons ());
   db::ClippingHierarchyBuilderShapeReceiver clip (&red);
 
@@ -1105,19 +1105,13 @@ DeepLayer DeepShapeStore::create_copy (const DeepLayer &source, HierarchyBuilder
 
 DeepLayer DeepShapeStore::create_edge_layer (const db::RecursiveShapeIterator &si, bool as_edges, const db::ICplxTrans &trans)
 {
-  unsigned int layout_index = layout_for_iter (si, trans);
-  db::Layout &layout = m_layouts[layout_index]->layout;
-
-  db::EdgeBuildingHierarchyBuilderShapeReceiver refs (&layout, si.layout (), as_edges);
+  db::EdgeBuildingHierarchyBuilderShapeReceiver refs (as_edges);
   return create_custom_layer (si, &refs, trans);
 }
 
 DeepLayer DeepShapeStore::create_edge_pair_layer (const db::RecursiveShapeIterator &si, const db::ICplxTrans &trans)
 {
-  unsigned int layout_index = layout_for_iter (si, trans);
-  db::Layout &layout = m_layouts[layout_index]->layout;
-
-  db::EdgePairBuildingHierarchyBuilderShapeReceiver refs (&layout, si.layout ());
+  db::EdgePairBuildingHierarchyBuilderShapeReceiver refs;
   return create_custom_layer (si, &refs, trans);
 }
 
@@ -1126,7 +1120,7 @@ DeepLayer DeepShapeStore::create_text_layer (const db::RecursiveShapeIterator &s
   unsigned int layout_index = layout_for_iter (si, trans);
   db::Layout &layout = m_layouts[layout_index]->layout;
 
-  db::TextBuildingHierarchyBuilderShapeReceiver refs (&layout, si.layout ());
+  db::TextBuildingHierarchyBuilderShapeReceiver refs (&layout);
   return create_custom_layer (si, &refs, trans);
 }
 
@@ -1284,16 +1278,16 @@ namespace
       //  this is how the texts are passed for annotating the net names
       m_text_annot_name_id = std::pair<bool, db::property_names_id_type> (false, 0);
       if (! dss.text_property_name ().is_nil ()) {
-        m_text_annot_name_id = mp_layout->properties_repository ().get_id_of_name (dss.text_property_name ());
+        m_text_annot_name_id = db::PropertiesRepository::instance ().get_id_of_name (dss.text_property_name ());
       }
     }
 
-    void insert_transformed (Shapes &into, const Shapes &from, const ICplxTrans &trans, PropertyMapper &pm) const
+    void insert_transformed (Shapes &into, const Shapes &from, const ICplxTrans &trans) const
     {
       if (! m_text_annot_name_id.first) {
 
         //  fast shortcut
-        into.insert_transformed (from, trans, pm);
+        into.insert_transformed (from, trans);
 
       } else {
 
@@ -1303,12 +1297,12 @@ namespace
 
           if (i->prop_id () > 0) {
 
-            const db::PropertiesRepository::properties_set &ps = mp_layout->properties_repository ().properties (i->prop_id ());
+            const db::PropertiesSet &ps = db::properties (i->prop_id ());
 
-            for (db::PropertiesRepository::properties_set::const_iterator j = ps.begin (); j != ps.end () && ! is_text; ++j) {
+            for (db::PropertiesSet::iterator j = ps.begin (); j != ps.end () && ! is_text; ++j) {
               if (j->first == m_text_annot_name_id.second) {
 
-                db::Text text (j->second.to_string (), db::Trans (i->bbox ().center () - db::Point ()));
+                db::Text text (db::property_value (j->second).to_string (), db::Trans (i->bbox ().center () - db::Point ()));
                 text.transform (trans);
                 if (into.layout ()) {
                   into.insert (db::TextRef (text, into.layout ()->shape_repository ()));
@@ -1324,13 +1318,12 @@ namespace
           }
 
           if (! is_text) {
-            into.insert (*i, trans, pm);
+            into.insert_transformed (*i, trans);
           }
 
         }
 
       }
-
     }
 
   private:

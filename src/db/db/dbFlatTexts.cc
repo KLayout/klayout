@@ -32,7 +32,7 @@ namespace db
 //  FlatTexts implementation
 
 FlatTexts::FlatTexts ()
-  : MutableTexts (), mp_texts (new db::Shapes (false)), mp_properties_repository (new db::PropertiesRepository ())
+  : MutableTexts (), mp_texts (new db::Shapes (false))
 {
   //  .. nothing yet ..
 }
@@ -43,13 +43,13 @@ FlatTexts::~FlatTexts ()
 }
 
 FlatTexts::FlatTexts (const FlatTexts &other)
-  : MutableTexts (other), mp_texts (other.mp_texts), mp_properties_repository (other.mp_properties_repository)
+  : MutableTexts (other), mp_texts (other.mp_texts)
 {
   //  .. nothing yet ..
 }
 
 FlatTexts::FlatTexts (const db::Shapes &texts)
-  : MutableTexts (), mp_texts (new db::Shapes (texts)), mp_properties_repository (new db::PropertiesRepository ())
+  : MutableTexts (), mp_texts (new db::Shapes (texts))
 {
   //  .. nothing yet ..
 }
@@ -199,16 +199,6 @@ void FlatTexts::apply_property_translator (const db::PropertiesTranslator &pt)
     invalidate_cache ();
 
   }
-}
-
-db::PropertiesRepository *FlatTexts::properties_repository ()
-{
-  return mp_properties_repository.get_non_const ();
-}
-
-const db::PropertiesRepository *FlatTexts::properties_repository () const
-{
-  return mp_properties_repository.get_const ();
 }
 
 void

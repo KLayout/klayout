@@ -748,8 +748,8 @@ template class DB_PUBLIC check_local_operation<db::Polygon, db::Polygon>;
 // ---------------------------------------------------------------------------------------------------------------
 
 template <class TS, class TI>
-check_local_operation_with_properties<TS, TI>::check_local_operation_with_properties (const EdgeRelationFilter &check, bool different_polygons, bool is_merged, bool has_other, bool other_is_merged, const db::RegionCheckOptions &options, db::PropertiesRepository *target_pr, const db::PropertiesRepository *subject_pr, const db::PropertiesRepository *intruder_pr)
-  : check_local_operation_base<TS, TI> (check, different_polygons, is_merged, has_other, other_is_merged, options), m_pms (target_pr, subject_pr), m_pmi (target_pr, intruder_pr)
+check_local_operation_with_properties<TS, TI>::check_local_operation_with_properties (const EdgeRelationFilter &check, bool different_polygons, bool is_merged, bool has_other, bool other_is_merged, const db::RegionCheckOptions &options)
+  : check_local_operation_base<TS, TI> (check, different_polygons, is_merged, has_other, other_is_merged, options)
 {
   //  .. nothing yet ..
 }
@@ -760,7 +760,7 @@ check_local_operation_with_properties<TS, TI>::do_compute_local (db::Layout *lay
 {
   tl_assert (results.size () == 1);
 
-  auto by_prop_id = separate_interactions_by_properties (interactions, check_local_operation_base<TS, TI>::m_options.prop_constraint, m_pms, m_pmi);
+  auto by_prop_id = separate_interactions_by_properties (interactions, check_local_operation_base<TS, TI>::m_options.prop_constraint);
 
   for (auto s2p = by_prop_id.begin (); s2p != by_prop_id.end (); ++s2p) {
 
@@ -1622,8 +1622,8 @@ template class DB_PUBLIC bool_and_or_not_local_operation<db::Polygon, db::Polygo
 //  BoolAndOrNotLocalOperationWithProperties implementation
 
 template <class TS, class TI, class TR>
-bool_and_or_not_local_operation_with_properties<TS, TI, TR>::bool_and_or_not_local_operation_with_properties (bool is_and, db::PropertiesRepository *target_pr, const db::PropertiesRepository *subject_pr, const db::PropertiesRepository *intruder_pr, db::PropertyConstraint property_constraint)
-  : m_is_and (is_and), m_property_constraint (property_constraint), m_pms (target_pr, subject_pr), m_pmi (target_pr, intruder_pr)
+bool_and_or_not_local_operation_with_properties<TS, TI, TR>::bool_and_or_not_local_operation_with_properties (bool is_and, db::PropertyConstraint property_constraint)
+  : m_is_and (is_and), m_property_constraint (property_constraint)
 {
   //  .. nothing yet ..
 }
@@ -1660,19 +1660,19 @@ bool_and_or_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (d
     if (i->second.empty ()) {
 
       if (! m_is_and) {
-        result.insert (db::object_with_properties<TR> (subject, m_pms (subject.properties_id ())));
+        result.insert (db::object_with_properties<TR> (subject, subject.properties_id ()));
       }
 
     } else {
 
-      db::properties_id_type prop_id_s = m_pms (subject.properties_id ());
+      db::properties_id_type prop_id_s = subject.properties_id ();
 
       auto &shapes_by_prop = by_prop_id [prop_id_s];
       shapes_by_prop.first.push_front (subject);
 
       for (auto j = i->second.begin (); j != i->second.end (); ++j) {
         const db::object_with_properties<TI> &intruder = interactions.intruder_shape (*j).second;
-        if (pc_match (m_property_constraint, prop_id_s, m_pmi (intruder.properties_id ()))) {
+        if (pc_match (m_property_constraint, prop_id_s, intruder.properties_id ())) {
           shapes_by_prop.second.insert (intruder);
         }
       }
@@ -1824,9 +1824,9 @@ template class DB_PUBLIC two_bool_and_not_local_operation<db::Polygon, db::Polyg
 //  TwoBoolAndNotLocalOperationWithProperties implementation
 
 template <class TS, class TI, class TR>
-two_bool_and_not_local_operation_with_properties<TS, TI, TR>::two_bool_and_not_local_operation_with_properties (db::PropertiesRepository *target1_pr, db::PropertiesRepository *target2_pr, const db::PropertiesRepository *subject_pr, const db::PropertiesRepository *intruder_pr, db::PropertyConstraint property_constraint)
+two_bool_and_not_local_operation_with_properties<TS, TI, TR>::two_bool_and_not_local_operation_with_properties (db::PropertyConstraint property_constraint)
   : db::local_operation<db::object_with_properties<TS>, db::object_with_properties<TI>, db::object_with_properties<TR> > (),
-    m_property_constraint (property_constraint), m_pms (target1_pr, subject_pr), m_pmi (target1_pr, intruder_pr), m_pm12 (target2_pr, target1_pr)
+    m_property_constraint (property_constraint)
 {
   //  .. nothing yet ..
 }
@@ -1849,18 +1849,18 @@ two_bool_and_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (
 
     if (i->second.empty ()) {
 
-      result1.insert (db::object_with_properties<TR> (subject, m_pms (subject.properties_id ())));
+      result1.insert (db::object_with_properties<TR> (subject, subject.properties_id ()));
 
     } else {
 
-      db::properties_id_type prop_id_s = m_pms (subject.properties_id ());
+      db::properties_id_type prop_id_s = subject.properties_id ();
 
       auto &shapes_by_prop = by_prop_id [prop_id_s];
       shapes_by_prop.first.push_front (subject);
 
       for (auto j = i->second.begin (); j != i->second.end (); ++j) {
         const db::object_with_properties<TI> &intruder = interactions.intruder_shape (*j).second;
-        if (pc_match (m_property_constraint, prop_id_s, m_pmi (intruder.properties_id ()))) {
+        if (pc_match (m_property_constraint, prop_id_s, intruder.properties_id ())) {
           shapes_by_prop.second.insert (intruder);
         }
       }
@@ -1884,7 +1884,7 @@ two_bool_and_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (
         result0.insert (db::object_with_properties<TR> (subject, prop_id));
       } else if (others.empty ()) {
         //  shortcut (not: keep, and: drop)
-        result1.insert (db::object_with_properties<TR> (subject, m_pm12 (prop_id)));
+        result1.insert (db::object_with_properties<TR> (subject, prop_id));
       } else {
         for (auto e = subject.begin_edge (); ! e.at_end(); ++e) {
           ep.insert (*e, p1);
@@ -1927,7 +1927,7 @@ two_bool_and_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (
         result0.insert (db::object_with_properties<TR> (*r, prop_id));
       }
       for (auto r = result1_wo_props.begin (); r != result1_wo_props.end (); ++r) {
-        result1.insert (db::object_with_properties<TR> (*r, m_pm12 (prop_id)));
+        result1.insert (db::object_with_properties<TR> (*r, prop_id));
       }
 
     }
@@ -2171,8 +2171,8 @@ std::string SelfOverlapMergeLocalOperation::description () const
 
 // ---------------------------------------------------------------------------------------------
 
-PolygonToEdgeLocalOperation::PolygonToEdgeLocalOperation (db::PropertiesRepository *target_pr, const db::PropertiesRepository *source_pr)
-  : local_operation<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::EdgeWithProperties> (), m_pm (target_pr, source_pr)
+PolygonToEdgeLocalOperation::PolygonToEdgeLocalOperation ()
+  : local_operation<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::EdgeWithProperties> ()
 {
   //  .. nothing yet ..
 }
@@ -2189,7 +2189,7 @@ PolygonToEdgeLocalOperation::do_compute_local (db::Layout * /*layout*/, db::Cell
   db::EdgeProcessor ep;
   ep.set_base_verbosity (50);
 
-  auto by_prop_id = separate_interactions_by_properties (interactions, db::SamePropertiesConstraint, m_pm, m_pm);
+  auto by_prop_id = separate_interactions_by_properties (interactions, db::SamePropertiesConstraint);
   for (auto shapes_by_prop_id = by_prop_id.begin (); shapes_by_prop_id != by_prop_id.end (); ++shapes_by_prop_id) {
 
     db::properties_id_type prop_id = shapes_by_prop_id->first;

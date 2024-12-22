@@ -437,7 +437,8 @@ TEST(4)
 
   g.dbu_changed_event.add (&el, &EventListener::dbu_changed);
   g.cell_name_changed_event.add (&el, &EventListener::cell_name_changed);
-  g.properties_repository ().prop_ids_changed_event.add (&el, &EventListener::property_ids_changed);
+  // @@@
+  db::PropertiesRepository::instance ().prop_ids_changed_event.add (&el, &EventListener::property_ids_changed);
   g.layer_properties_changed_event.add (&el, &EventListener::layer_properties_changed);
 
   EXPECT_EQ (el.dbu_dirty, false);
@@ -469,15 +470,17 @@ TEST(4)
   g.rename_cell (top, "TAP");
   EXPECT_EQ (el.cell_name_dirty, true);  //  but this is
 
-  db::PropertiesRepository::properties_set ps;
-  ps.insert (std::make_pair (g.properties_repository ().prop_name_id (tl::Variant (1)), tl::Variant ("XYZ")));
-  g.properties_repository ().properties_id (ps);
+  // @@@ cannot be like that -> needs to trigger an event if some layout object has changed
+  db::PropertiesSet ps;
+  ps.insert (tl::Variant (1), tl::Variant ("XYZ"));
+  db::properties_id (ps);
   EXPECT_EQ (el.property_ids_dirty, true);
   el.reset ();
 
+  // @@@ cannot be like that -> needs to trigger an event if some layout object has changed
   ps.clear ();
-  ps.insert (std::make_pair (g.properties_repository ().prop_name_id (tl::Variant (1)), tl::Variant ("XXX")));
-  g.properties_repository ().properties_id (ps);
+  ps.insert (tl::Variant (1), tl::Variant ("XXX"));
+  db::properties_id (ps);
   EXPECT_EQ (el.property_ids_dirty, true);
 
   el.layer_properties_dirty = false;

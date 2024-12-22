@@ -648,7 +648,7 @@ RedrawThreadWorker::draw_cell_properties (bool drawing_context, int level, const
 
   lay::CanvasPlane *texts = m_planes[2 + plane_group * (planes_per_layer / 3)];
 
-  r.draw_propstring (prop_id, &mp_layout->properties_repository (), (trans * box).p1 (), texts, trans);
+  r.draw_propstring (prop_id, (trans * box).p1 (), texts, trans);
 }
 
 static bool
@@ -1387,7 +1387,7 @@ RedrawThreadWorker::draw_text_layer (bool drawing_context, db::cell_index_type c
 
               test_snapshot (0); 
 
-              r.draw_propstring (*shape, &mp_layout->properties_repository (), text, trans);
+              r.draw_propstring (*shape, text, trans);
               ++shape;
 
               --ntexts;

@@ -1743,10 +1743,9 @@ TEST(40_BoolWithProperties)
   clip_region.insert (clip);
 
   db::Region clip_region_wp (new db::FlatRegion ());
-  db::property_names_id_type pn = clip_region_wp.properties_repository ().prop_name_id (1);
-  db::PropertiesRepository::properties_set ps;
-  ps.insert (std::make_pair (pn, 42));
-  db::properties_id_type pid42 = clip_region_wp.properties_repository ().properties_id (ps);
+  db::PropertiesSet ps;
+  ps.insert (tl::Variant (1), 42);
+  db::properties_id_type pid42 = db::properties_id (ps);
   clip_region_wp.insert (db::BoxWithProperties (clip, pid42));
 
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (60, 0)), r1.bool_and (clip_region));

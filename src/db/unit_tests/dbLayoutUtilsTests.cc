@@ -661,13 +661,13 @@ TEST(19_scale_and_snap_basic)
   db::Layout l1;
   db::Layout l2;
 
-  db::PropertiesRepository::properties_set ps1;
-  ps1.insert (std::make_pair (l1.properties_repository ().prop_name_id (tl::Variant ("p")), tl::Variant (17)));
-  db::properties_id_type pid1 = l1.properties_repository ().properties_id (ps1);
+  db::PropertiesSet ps1;
+  ps1.insert (tl::Variant ("p"), tl::Variant (17));
+  db::properties_id_type pid1 = db::properties_id (ps1);
 
-  db::PropertiesRepository::properties_set ps2;
-  ps2.insert (std::make_pair (l2.properties_repository ().prop_name_id (tl::Variant ("p")), tl::Variant (17)));
-  db::properties_id_type pid2 = l2.properties_repository ().properties_id (ps2);
+  db::PropertiesSet ps2;
+  ps2.insert (tl::Variant ("p"), tl::Variant (17));
+  db::properties_id_type pid2 = db::properties_id (ps2);
 
   db::Cell &top1 = l1.cell (l1.add_cell ("TOP"));
   db::Cell &top2 = l2.cell (l2.add_cell ("TOP"));

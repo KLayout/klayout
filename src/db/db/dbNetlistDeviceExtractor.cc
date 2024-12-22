@@ -180,9 +180,9 @@ void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db:
   mp_breakout_cells = breakout_cells;
 
   //  terminal properties are kept in a property with the terminal_property_name name
-  m_terminal_id_propname_id = mp_layout->properties_repository ().prop_name_id (terminal_id_property_name ());
-  m_device_id_propname_id = mp_layout->properties_repository ().prop_name_id (device_id_property_name ());
-  m_device_class_propname_id = mp_layout->properties_repository ().prop_name_id (device_class_property_name ());
+  m_terminal_id_propname_id = db::property_names_id (terminal_id_property_name ());
+  m_device_id_propname_id = db::property_names_id (device_id_property_name ());
+  m_device_class_propname_id = db::property_names_id (device_class_property_name ());
 
   tl_assert (m_netlist.get () != 0);
 
@@ -362,7 +362,7 @@ void NetlistDeviceExtractor::push_new_devices (const db::Vector &disp_cache)
       key.parameters.insert (std::make_pair (p->id (), device->parameter_value (p->id ())));
     }
 
-    db::PropertiesRepository::properties_set ps;
+    db::PropertiesSet ps;
 
     std::map<DeviceCellKey, std::pair<db::cell_index_type, db::DeviceAbstract *> >::iterator c = m_device_cells.find (key);
     if (c == m_device_cells.end ()) {
@@ -378,15 +378,15 @@ void NetlistDeviceExtractor::push_new_devices (const db::Vector &disp_cache)
 
       //  attach the device class ID to the cell
       ps.clear ();
-      ps.insert (std::make_pair (m_device_class_propname_id, tl::Variant (mp_device_class->name ())));
-      device_cell.prop_id (mp_layout->properties_repository ().properties_id (ps));
+      ps.insert (m_device_class_propname_id, tl::Variant (mp_device_class->name ()));
+      device_cell.prop_id (db::properties_id (ps));
 
       for (geometry_per_terminal_type::const_iterator t = d->second.second.begin (); t != d->second.second.end (); ++t) {
 
         //  Build a property set for the device terminal ID
         ps.clear ();
-        ps.insert (std::make_pair (m_terminal_id_propname_id, tl::Variant (t->first)));
-        db::properties_id_type pi = mp_layout->properties_repository ().properties_id (ps);
+        ps.insert (m_terminal_id_propname_id, tl::Variant (t->first));
+        db::properties_id_type pi = db::properties_id (ps);
 
         //  build the cell shapes
         for (geometry_per_layer_type::const_iterator l = t->second.begin (); l != t->second.end (); ++l) {
@@ -409,8 +409,8 @@ void NetlistDeviceExtractor::push_new_devices (const db::Vector &disp_cache)
 
     //  Build a property set for the device ID
     ps.clear ();
-    ps.insert (std::make_pair (m_device_id_propname_id, tl::Variant (d->first)));
-    db::properties_id_type pi = mp_layout->properties_repository ().properties_id (ps);
+    ps.insert (m_device_id_propname_id, tl::Variant (d->first));
+    db::properties_id_type pi = db::properties_id (ps);
 
     db::CellInstArrayWithProperties inst (db::CellInstArray (db::CellInst (c->second.first), db::Trans (disp_cache + disp)), pi);
     mp_layout->cell (m_cell_index).insert (inst);
@@ -422,7 +422,7 @@ void NetlistDeviceExtractor::push_cached_devices (const tl::vector<db::Device *>
 {
   db::CplxTrans dbu = db::CplxTrans (mp_layout->dbu ());
   db::VCplxTrans dbu_inv = dbu.inverted ();
-  db::PropertiesRepository::properties_set ps;
+  db::PropertiesSet ps;
 
   for (std::vector<db::Device *>::const_iterator d = cached_devices.begin (); d != cached_devices.end (); ++d) {
 
@@ -435,8 +435,8 @@ void NetlistDeviceExtractor::push_cached_devices (const tl::vector<db::Device *>
 
     //  Build a property set for the device ID
     ps.clear ();
-    ps.insert (std::make_pair (m_device_id_propname_id, tl::Variant (device->id ())));
-    db::properties_id_type pi = mp_layout->properties_repository ().properties_id (ps);
+    ps.insert (m_device_id_propname_id, tl::Variant (device->id ()));
+    db::properties_id_type pi = db::properties_id (ps);
 
     db::CellInstArrayWithProperties inst (db::CellInstArray (db::CellInst (device->device_abstract ()->cell_index ()), db::Trans (new_disp + disp)), pi);
     mp_layout->cell (m_cell_index).insert (inst);

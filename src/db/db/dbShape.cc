@@ -967,7 +967,8 @@ Shape::to_string () const
   }
   
   if (has_prop_id ()) {
-    r += " prop_id=" + tl::to_string (prop_id ());
+    r += " props=";
+    r += db::properties (prop_id ()).to_dict_var ().to_string ();
   }
 
   return r;

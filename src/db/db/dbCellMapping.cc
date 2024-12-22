@@ -371,8 +371,6 @@ CellMapping::do_create_missing_mapping (db::Layout &layout_a, const db::Layout &
 
   if (! new_cells.empty ()) {
 
-    db::PropertyMapper pm (&layout_a, &layout_b);
-
     //  Note: this avoids frequent cell index table rebuilds if source and target layout are identical
     layout_a.start_changes ();
 
@@ -394,7 +392,7 @@ CellMapping::do_create_missing_mapping (db::Layout &layout_a, const db::Layout &
           bci.transform_into (db::ICplxTrans (mag), &layout_a.array_repository ());
 
           if (bi.has_prop_id ()) {
-            pa.insert (db::CellInstArrayWithProperties (bci, pm (bi.prop_id ())));
+            pa.insert (db::CellInstArrayWithProperties (bci, bi.prop_id ()));
           } else {
             pa.insert (bci);
           }

@@ -49,8 +49,8 @@ public:
   virtual PropertySelectorBase *clone () const = 0;
   virtual int compare (const PropertySelectorBase *b) const = 0;
   virtual unsigned int type_id () const = 0;
-  virtual bool check (const db::PropertiesRepository &rep, const db::PropertiesRepository::properties_set &set) const = 0;
-  virtual bool selection (const db::PropertiesRepository &rep, std::set<db::properties_id_type> &ids) const = 0;
+  virtual bool check (const db::PropertiesSet &set) const = 0;
+  virtual bool selection (std::set<db::properties_id_type> &ids) const = 0;
 };
 
 /**
@@ -134,18 +134,18 @@ public:
     return m_op;
   }
 
-  bool check (const db::PropertiesRepository &rep, const db::PropertiesRepository::properties_set &set) const 
+  bool check (const db::PropertiesSet &set) const
   {
     if (m_op == And) {
       for (std::vector<const PropertySelectorBase *>::const_iterator b = m_args.begin (); b != m_args.end (); ++b) {
-        if (! (*b)->check (rep, set)) {
+        if (! (*b)->check (set)) {
           return false;
         }
       }
       return true;
     } else {
       for (std::vector<const PropertySelectorBase *>::const_iterator b = m_args.begin (); b != m_args.end (); ++b) {
-        if ((*b)->check (rep, set)) {
+        if ((*b)->check (set)) {
           return true;
         }
       }
@@ -153,13 +153,13 @@ public:
     }
   }
 
-  bool selection (const db::PropertiesRepository &rep, std::set<db::properties_id_type> &ids) const 
+  bool selection (std::set<db::properties_id_type> &ids) const
   {
     //  this algorithm computes the "or" of two sets by using this relationship: a or b or c or .. = !((!a) and (!b) and (!c) and ..)
 
     //  get the selection of the first operand into ids
     std::vector<const PropertySelectorBase *>::const_iterator b = m_args.begin ();
-    bool inv = (*b)->selection (rep, ids);
+    bool inv = (*b)->selection (ids);
     if (m_op == Or) {
       inv = !inv;
     }
@@ -168,7 +168,7 @@ public:
 
       //  get the selection of the next operand into ids2
       std::set<db::properties_id_type> ids2;
-      bool inv2 = (*b)->selection (rep, ids2);
+      bool inv2 = (*b)->selection (ids2);
       if (m_op == Or) {
         inv2 = !inv2;
       }
@@ -270,14 +270,14 @@ public:
     return new PropertySelectorNot (mp_arg->clone ());
   }
 
-  bool check (const db::PropertiesRepository &rep, const db::PropertiesRepository::properties_set &set) const 
+  bool check (const db::PropertiesSet &set) const
   {
-    return ! mp_arg->check (rep, set);
+    return ! mp_arg->check (set);
   }
 
-  bool selection (const db::PropertiesRepository &rep, std::set<db::properties_id_type> &ids) const 
+  bool selection (std::set<db::properties_id_type> &ids) const
   {
-    return ! mp_arg->selection (rep, ids);
+    return ! mp_arg->selection (ids);
   }
 
   unsigned int type_id () const 
@@ -333,23 +333,17 @@ public:
     return new PropertySelectorEqual (m_name, m_value, m_equal);
   }
 
-  bool check (const db::PropertiesRepository &rep, const db::PropertiesRepository::properties_set &set) const 
+  bool check (const db::PropertiesSet &set) const
   {
-    std::pair<bool, db::property_names_id_type> p = rep.get_id_of_name (m_name);
-    if (! p.first) {
-      //  name is not known at all.
-      return false;
-    }
-
-    db::PropertiesRepository::properties_set::const_iterator i = set.find (p.second);
-    if (i == set.end ()) {
+    const tl::Variant &value = set.value (m_name);
+    if (value.is_nil ()) {
       //  name is not present in the property set
       return false;
     } else {
       //  check value
-      if (m_equal && i->second == m_value) {
+      if (m_equal && value == m_value) {
         return true;
-      } else if (! m_equal && i->second != m_value) {
+      } else if (! m_equal && value != m_value) {
         return true;
       } else {
         return false;
@@ -357,18 +351,10 @@ public:
     }
   }
 
-  bool selection (const db::PropertiesRepository &rep, std::set<db::properties_id_type> &ids) const 
+  bool selection (std::set<db::properties_id_type> &ids) const
   {
-    std::pair<bool, db::property_names_id_type> p = rep.get_id_of_name (m_name);
-    if (! p.first) {
-      //  name is not known at all.
-      return false;
-    }
-
-    const db::PropertiesRepository::properties_id_vector &idv = rep.properties_ids_by_name_value (std::make_pair (p.second, m_value));
-    for (db::PropertiesRepository::properties_id_vector::const_iterator id = idv.begin (); id != idv.end (); ++id) {
-      ids.insert (*id);
-    }
+    const db::PropertiesRepository::properties_id_set &idv = db::PropertiesRepository::instance ().properties_ids_by_name_value (db::property_names_id (m_name), db::property_values_id (m_value));
+    ids.insert (idv.begin (), idv.end ());
 
     return ! m_equal;
   }
@@ -594,22 +580,22 @@ PropertySelector::join (const PropertySelector &d)
 }
 
 bool 
-PropertySelector::check (const db::PropertiesRepository &rep, db::properties_id_type id) const
+PropertySelector::check (db::properties_id_type id) const
 {
   if (is_null ()) {
     return true;
   } else {
-    return mp_base->check (rep, rep.properties (id));
+    return mp_base->check (db::properties (id));
   }
 }
 
 bool 
-PropertySelector::matching (const db::PropertiesRepository &rep, std::set<db::properties_id_type> &ids) const
+PropertySelector::matching (std::set<db::properties_id_type> &ids) const
 {
   if (is_null ()) {
     return true;
   } else {
-    return mp_base->selection (rep, ids);
+    return mp_base->selection (ids);
   }
 }
 

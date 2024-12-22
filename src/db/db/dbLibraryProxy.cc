@@ -225,18 +225,16 @@ LibraryProxy::update (db::ImportLayerMapping *layer_mapping)
   clear_shapes ();
   clear_insts ();
 
-  PropertyMapper prop_id_map (layout (), &lib->layout ());
-
   for (unsigned int l = 0; l < lib->layout ().layers (); ++l) {
     if (layer_indices [l] >= 0) {
-      shapes ((unsigned int) layer_indices [l]).assign_transformed (source_cell.shapes (l), tr, prop_id_map);
+      shapes ((unsigned int) layer_indices [l]).assign_transformed (source_cell.shapes (l), tr);
     }
   }
 
   LibraryCellIndexMapper cell_index_mapper (*layout (), lib);
 
   for (Cell::const_iterator inst = source_cell.begin (); !inst.at_end (); ++inst) {
-    db::Instance new_inst = insert (*inst, cell_index_mapper, prop_id_map);
+    db::Instance new_inst = insert (*inst, cell_index_mapper);
     if (need_transform) {
       replace (new_inst, new_inst.cell_inst ().transformed_into (tr));
     }

@@ -49,30 +49,30 @@ public:
   void cell_meta_info_differs (const std::string &, const tl::Variant &, const tl::Variant &);
   void bbox_differs (const db::Box &ba, const db::Box &bb);
   void begin_inst_differences ();
-  void instances_in_a (const std::vector <db::CellInstArrayWithProperties> &insts_a, const std::vector <std::string> &cell_names, const db::PropertiesRepository &props);
-  void instances_in_b (const std::vector <db::CellInstArrayWithProperties> &insts_b, const std::vector <std::string> &cell_names, const db::PropertiesRepository &props);
+  void instances_in_a (const std::vector <db::CellInstArrayWithProperties> &insts_a, const std::vector <std::string> &cell_names);
+  void instances_in_b (const std::vector <db::CellInstArrayWithProperties> &insts_b, const std::vector <std::string> &cell_names);
   void instances_in_a_only (const std::vector <db::CellInstArrayWithProperties> &anotb, const db::Layout &a);
   void instances_in_b_only (const std::vector <db::CellInstArrayWithProperties> &bnota, const db::Layout &b);
   void end_inst_differences ();
   void begin_layer (const db::LayerProperties &layer, unsigned int layer_index_a, bool is_valid_a, unsigned int layer_index_b, bool is_valid_b);
   void per_layer_bbox_differs (const db::Box &ba, const db::Box &bb);
   void begin_polygon_differences ();
-  void detailed_diff (const db::PropertiesRepository &pr, const std::vector <std::pair <db::Polygon, db::properties_id_type> > &a, const std::vector <std::pair <db::Polygon, db::properties_id_type> > &b);
+  void detailed_diff (const std::vector <std::pair <db::Polygon, db::properties_id_type> > &a, const std::vector <std::pair <db::Polygon, db::properties_id_type> > &b);
   void end_polygon_differences ();
   void begin_path_differences ();
-  void detailed_diff (const db::PropertiesRepository &pr, const std::vector <std::pair <db::Path, db::properties_id_type> > &a, const std::vector <std::pair <db::Path, db::properties_id_type> > &b);
+  void detailed_diff (const std::vector <std::pair <db::Path, db::properties_id_type> > &a, const std::vector <std::pair <db::Path, db::properties_id_type> > &b);
   void end_path_differences ();
   void begin_box_differences ();
-  void detailed_diff (const db::PropertiesRepository &pr, const std::vector <std::pair <db::Box, db::properties_id_type> > &a, const std::vector <std::pair <db::Box, db::properties_id_type> > &b);
+  void detailed_diff (const std::vector <std::pair <db::Box, db::properties_id_type> > &a, const std::vector <std::pair <db::Box, db::properties_id_type> > &b);
   void end_box_differences ();
   void begin_edge_differences ();
-  void detailed_diff (const db::PropertiesRepository &pr, const std::vector <std::pair <db::Edge, db::properties_id_type> > &a, const std::vector <std::pair <db::Edge, db::properties_id_type> > &b);
+  void detailed_diff (const std::vector <std::pair <db::Edge, db::properties_id_type> > &a, const std::vector <std::pair <db::Edge, db::properties_id_type> > &b);
   void end_edge_differences ();
   void begin_edge_pair_differences ();
-  void detailed_diff (const db::PropertiesRepository &pr, const std::vector <std::pair <db::EdgePair, db::properties_id_type> > &a, const std::vector <std::pair <db::EdgePair, db::properties_id_type> > &b);
+  void detailed_diff (const std::vector <std::pair <db::EdgePair, db::properties_id_type> > &a, const std::vector <std::pair <db::EdgePair, db::properties_id_type> > &b);
   void end_edge_pair_differences ();
   void begin_text_differences ();
-  void detailed_diff (const db::PropertiesRepository &pr, const std::vector <std::pair <db::Text, db::properties_id_type> > &a, const std::vector <std::pair <db::Text, db::properties_id_type> > &b);
+  void detailed_diff (const std::vector <std::pair <db::Text, db::properties_id_type> > &a, const std::vector <std::pair <db::Text, db::properties_id_type> > &b);
   void end_text_differences ();
   void end_layer ();
   void end_cell ();
@@ -84,7 +84,7 @@ private:
 
   void print_cell_inst (const db::CellInstArrayWithProperties &ci, const std::vector <std::string> &cell_names);
   void print_cell_inst (const db::CellInstArrayWithProperties &ci, const db::Layout &l);
-  template <class SH> void print_diffs (const db::PropertiesRepository &pr, const std::vector <std::pair <SH, db::properties_id_type> > &a, const std::vector <std::pair <SH, db::properties_id_type> > &b);
+  template <class SH> void print_diffs (const std::vector <std::pair <SH, db::properties_id_type> > &a, const std::vector <std::pair <SH, db::properties_id_type> > &b);
 };
 
 TestDifferenceReceiver::TestDifferenceReceiver ()
@@ -133,7 +133,7 @@ TestDifferenceReceiver::print_cell_inst (const db::CellInstArrayWithProperties &
 
 template <class SH>
 void
-TestDifferenceReceiver::print_diffs (const db::PropertiesRepository & /*pr*/, const std::vector <std::pair <SH, db::properties_id_type> > &_a, const std::vector <std::pair <SH, db::properties_id_type> > &_b)
+TestDifferenceReceiver::print_diffs (const std::vector <std::pair <SH, db::properties_id_type> > &_a, const std::vector <std::pair <SH, db::properties_id_type> > &_b)
 {
   std::vector <std::pair <SH, db::properties_id_type> > a = _a;
   std::sort (a.begin (), a.end ());
@@ -225,7 +225,7 @@ TestDifferenceReceiver::begin_inst_differences ()
 }
 
 void
-TestDifferenceReceiver::instances_in_a (const std::vector <db::CellInstArrayWithProperties> &insts_a, const std::vector <std::string> &cell_names, const db::PropertiesRepository & /*props*/)
+TestDifferenceReceiver::instances_in_a (const std::vector <db::CellInstArrayWithProperties> &insts_a, const std::vector <std::string> &cell_names)
 {
   m_os << "list for a:" << std::endl;
   for (std::vector <db::CellInstArrayWithProperties>::const_iterator s = insts_a.begin (); s != insts_a.end (); ++s) {
@@ -234,7 +234,7 @@ TestDifferenceReceiver::instances_in_a (const std::vector <db::CellInstArrayWith
 }
 
 void
-TestDifferenceReceiver::instances_in_b (const std::vector <db::CellInstArrayWithProperties> &insts_b, const std::vector <std::string> &cell_names, const db::PropertiesRepository & /*props*/)
+TestDifferenceReceiver::instances_in_b (const std::vector <db::CellInstArrayWithProperties> &insts_b, const std::vector <std::string> &cell_names)
 {
   m_os << "list for b:" << std::endl;
   for (std::vector <db::CellInstArrayWithProperties>::const_iterator s = insts_b.begin (); s != insts_b.end (); ++s) {
@@ -285,12 +285,12 @@ TestDifferenceReceiver::begin_polygon_differences ()
 }
 
 void
-TestDifferenceReceiver::detailed_diff (const db::PropertiesRepository &pr, const std::vector <std::pair <db::Polygon, db::properties_id_type> > &a, const std::vector <std::pair <db::Polygon, db::properties_id_type> > &b)
+TestDifferenceReceiver::detailed_diff (const std::vector <std::pair <db::Polygon, db::properties_id_type> > &a, const std::vector <std::pair <db::Polygon, db::properties_id_type> > &b)
 {
   m_os << "Not in b but in a:" << std::endl;
-  print_diffs (pr, a, b);
+  print_diffs (a, b);
   m_os << "Not in a but in b:" << std::endl;
-  print_diffs (pr, b, a);
+  print_diffs (b, a);
 }
 
 void
@@ -305,12 +305,12 @@ TestDifferenceReceiver::begin_path_differences ()
 }
 
 void
-TestDifferenceReceiver::detailed_diff (const db::PropertiesRepository &pr, const std::vector <std::pair <db::Path, db::properties_id_type> > &a, const std::vector <std::pair <db::Path, db::properties_id_type> > &b)
+TestDifferenceReceiver::detailed_diff (const std::vector <std::pair <db::Path, db::properties_id_type> > &a, const std::vector <std::pair <db::Path, db::properties_id_type> > &b)
 {
   m_os << "Not in b but in a:" << std::endl;
-  print_diffs (pr, a, b);
+  print_diffs (a, b);
   m_os << "Not in a but in b:" << std::endl;
-  print_diffs (pr, b, a);
+  print_diffs (b, a);
 }
 
 void
@@ -325,12 +325,12 @@ TestDifferenceReceiver::begin_box_differences ()
 }
 
 void
-TestDifferenceReceiver::detailed_diff (const db::PropertiesRepository &pr, const std::vector <std::pair <db::Box, db::properties_id_type> > &a, const std::vector <std::pair <db::Box, db::properties_id_type> > &b)
+TestDifferenceReceiver::detailed_diff (const std::vector <std::pair <db::Box, db::properties_id_type> > &a, const std::vector <std::pair <db::Box, db::properties_id_type> > &b)
 {
   m_os << "Not in b but in a:" << std::endl;
-  print_diffs (pr, a, b);
+  print_diffs (a, b);
   m_os << "Not in a but in b:" << std::endl;
-  print_diffs (pr, b, a);
+  print_diffs (b, a);
 }
 
 void
@@ -345,12 +345,12 @@ TestDifferenceReceiver::begin_edge_differences ()
 }
 
 void
-TestDifferenceReceiver::detailed_diff (const db::PropertiesRepository &pr, const std::vector <std::pair <db::Edge, db::properties_id_type> > &a, const std::vector <std::pair <db::Edge, db::properties_id_type> > &b)
+TestDifferenceReceiver::detailed_diff (const std::vector <std::pair <db::Edge, db::properties_id_type> > &a, const std::vector <std::pair <db::Edge, db::properties_id_type> > &b)
 {
   m_os << "Not in b but in a:" << std::endl;
-  print_diffs (pr, a, b);
+  print_diffs (a, b);
   m_os << "Not in a but in b:" << std::endl;
-  print_diffs (pr, b, a);
+  print_diffs (b, a);
 }
 
 void
@@ -365,12 +365,12 @@ TestDifferenceReceiver::begin_edge_pair_differences ()
 }
 
 void
-TestDifferenceReceiver::detailed_diff (const db::PropertiesRepository &pr, const std::vector <std::pair <db::EdgePair, db::properties_id_type> > &a, const std::vector <std::pair <db::EdgePair, db::properties_id_type> > &b)
+TestDifferenceReceiver::detailed_diff (const std::vector <std::pair <db::EdgePair, db::properties_id_type> > &a, const std::vector <std::pair <db::EdgePair, db::properties_id_type> > &b)
 {
   m_os << "Not in b but in a:" << std::endl;
-  print_diffs (pr, a, b);
+  print_diffs (a, b);
   m_os << "Not in a but in b:" << std::endl;
-  print_diffs (pr, b, a);
+  print_diffs (b, a);
 }
 
 void
@@ -385,12 +385,12 @@ TestDifferenceReceiver::begin_text_differences ()
 }
 
 void
-TestDifferenceReceiver::detailed_diff (const db::PropertiesRepository &pr, const std::vector <std::pair <db::Text, db::properties_id_type> > &a, const std::vector <std::pair <db::Text, db::properties_id_type> > &b)
+TestDifferenceReceiver::detailed_diff (const std::vector <std::pair <db::Text, db::properties_id_type> > &a, const std::vector <std::pair <db::Text, db::properties_id_type> > &b)
 {
   m_os << "Not in b but in a:" << std::endl;
-  print_diffs (pr, a, b);
+  print_diffs (a, b);
   m_os << "Not in a but in b:" << std::endl;
-  print_diffs (pr, b, a);
+  print_diffs (b, a);
 }
 
 void
@@ -647,19 +647,9 @@ TEST(2)
   );
 }
 
-std::string ps2string (const db::PropertiesRepository &rep, db::properties_id_type pi)
+std::string ps2string (db::properties_id_type pi)
 {
-  std::string s;
-  db::PropertiesRepository::properties_set ps = rep.properties (pi);
-  for (db::PropertiesRepository::properties_set::const_iterator i = ps.begin (); i != ps.end (); ++i) {
-    if (!s.empty ()) {
-      s += ",";
-    }
-    s += rep.prop_name (i->first).to_string ();
-    s += ":";
-    s += i->second.to_string ();
-  }
-  return s;
+  return db::properties (pi).to_dict_var ().to_string ();
 }
 
 TEST(2P) 
@@ -715,32 +705,23 @@ TEST(2P)
   {
     db::properties_id_type pi1, pi2, pi3;
 
-    db::PropertiesRepository::properties_set ps;
-    ps.insert (std::make_pair (g.properties_repository ().prop_name_id ("A"), tl::Variant (1)));
-    pi1 = g.properties_repository ().properties_id (ps);
-    EXPECT_EQ (pi1, db::properties_id_type (1));
+    db::PropertiesSet ps;
+    ps.insert (tl::Variant ("A"), tl::Variant (1));
+    pi1 = db::properties_id (ps);
 
     ps.clear ();
-    ps.insert (std::make_pair (g.properties_repository ().prop_name_id ("B"), tl::Variant (2)));
-    pi2 = g.properties_repository ().properties_id (ps);
-    EXPECT_EQ (pi2, db::properties_id_type (2));
+    ps.insert (tl::Variant ("B"), tl::Variant (2));
+    pi2 = db::properties_id (ps);
 
-    ps.insert (std::make_pair (g.properties_repository ().prop_name_id ("C"), tl::Variant ("c")));
-    pi3 = g.properties_repository ().properties_id (ps);
-    EXPECT_EQ (pi3, db::properties_id_type (3));
+    ps.insert (tl::Variant ("C"), tl::Variant ("c"));
+    pi3 = db::properties_id (ps);
 
-    EXPECT_EQ (ps2string (g.properties_repository (), 1), "A:1");
-    EXPECT_EQ (ps2string (g.properties_repository (), 2), "B:2");
-    EXPECT_EQ (ps2string (g.properties_repository (), 3), "B:2,C:c");
+    EXPECT_EQ (ps2string (pi1), "A:1");
+    EXPECT_EQ (ps2string (pi2), "B:2");
+    EXPECT_EQ (ps2string (pi3), "B:2,C:c");
   }
 
   db::Layout h = g;
-
-  {
-    EXPECT_EQ (ps2string (h.properties_repository (), 1), "A:1");
-    EXPECT_EQ (ps2string (h.properties_repository (), 2), "B:2");
-    EXPECT_EQ (ps2string (h.properties_repository (), 3), "B:2,C:c");
-  }
 
   TestDifferenceReceiver r;
   bool eq;
@@ -805,12 +786,6 @@ TEST(2P)
   );
 
   h = hh;
-
-  {
-    EXPECT_EQ (ps2string (h.properties_repository (), 1), "A:1");
-    EXPECT_EQ (ps2string (h.properties_repository (), 2), "B:2");
-    EXPECT_EQ (ps2string (h.properties_repository (), 3), "B:2,C:c");
-  }
 
   //  Note: properties are "normalized" (mapped to a common layout). In order to maintain
   //  their meaning later, keep these inserts sorted by property ID:

@@ -939,89 +939,35 @@ static void delete_property (db::Shape *s, const tl::Variant &key)
     return;
   }
 
-  db::Layout *layout = layout_ptr (s);
-  if (! layout) {
-    throw tl::Exception (tl::to_string (tr ("Shape does not reside inside a layout - cannot delete properties")));
-  }
-
-  std::pair<bool, db::property_names_id_type> nid = layout->properties_repository ().get_id_of_name (key);
-  if (! nid.first) {
-    return;
-  }
-
-  db::PropertiesRepository::properties_set props = layout->properties_repository ().properties (id);
-  db::PropertiesRepository::properties_set::iterator p = props.find (nid.second);
-  if (p != props.end ()) {
-    props.erase (p);
-  }
-  set_prop_id (s, layout->properties_repository ().properties_id (props));
+  db::PropertiesSet props = db::properties (id);
+  props.erase (key);
+  set_prop_id (s, db::properties_id (props));
 }
 
 static void set_property (db::Shape *s, const tl::Variant &key, const tl::Variant &value)
 {
   db::properties_id_type id = s->prop_id ();
 
-  db::Layout *layout = layout_ptr (s);
-  if (! layout) {
-    throw tl::Exception (tl::to_string (tr ("Shape does not reside inside a layout - cannot set properties")));
-  }
-
-  db::property_names_id_type nid = layout->properties_repository ().prop_name_id (key);
-
-  db::PropertiesRepository::properties_set props = layout->properties_repository ().properties (id);
-  db::PropertiesRepository::properties_set::iterator p = props.find (nid);
-  if (p != props.end ()) {
-    p->second = value;
-  } else {
-    props.insert (std::make_pair (nid, value));
-  }
-  set_prop_id (s, layout->properties_repository ().properties_id (props));
+  db::PropertiesSet props = db::properties (id);
+  props.erase (key);
+  props.insert (key, value);
+  set_prop_id (s, db::properties_id (props));
 }
 
 static tl::Variant get_property (const db::Shape *s, const tl::Variant &key)
 {
   db::properties_id_type id = s->prop_id ();
-  if (id == 0) {
-    return tl::Variant ();
-  }
 
-  const db::Layout *layout = layout_ptr_const (s);
-  if (! layout) {
-    throw tl::Exception (tl::to_string (tr ("Shape does not reside inside a layout - cannot retrieve properties")));
-  }
-
-  std::pair<bool, db::property_names_id_type> nid = layout->properties_repository ().get_id_of_name (key);
-  if (! nid.first) {
-    return tl::Variant ();
-  }
-
-  const db::PropertiesRepository::properties_set &props = layout->properties_repository ().properties (id);
-  db::PropertiesRepository::properties_set::const_iterator p = props.find (nid.second);
-  if (p != props.end ()) {
-    return p->second;
-  } else {
-    return tl::Variant ();
-  }
+  const db::PropertiesSet &props = db::properties (id);
+  return props.value (key);
 }
 
 static tl::Variant get_properties (const db::Shape *s)
 {
   db::properties_id_type id = s->prop_id ();
-  if (id == 0) {
-    return tl::Variant::empty_array ();
-  }
 
-  const db::Layout *layout = layout_ptr_const (s);
-  if (! layout) {
-    throw tl::Exception (tl::to_string (tr ("Shape does not reside inside a layout - cannot retrieve properties")));
-  }
-
-  tl::Variant res = tl::Variant::empty_array ();
-  const db::PropertiesRepository::properties_set &props = layout->properties_repository ().properties (id);
-  for (auto i = props.begin (); i != props.end (); ++i) {
-    res.insert (layout->properties_repository ().prop_name (i->first), i->second);
-  }
-  return res;
+  const db::PropertiesSet &props = db::properties (id);
+  return props.to_dict_var ();
 }
 
 namespace

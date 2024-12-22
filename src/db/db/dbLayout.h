@@ -605,22 +605,6 @@ public:
   }
 
   /**
-   *  @brief Accessor to the properties repository
-   */
-  PropertiesRepository &properties_repository ()
-  {
-    return m_properties_repository;
-  }
-
-  /**
-   *  @brief Accessor to the properties repository
-   */
-  const PropertiesRepository &properties_repository () const
-  {
-    return m_properties_repository;
-  }
-
-  /**
    *  @brief Gets the lock for the layout object
    *  This is a generic lock that can be used to lock modifications against multiple threads.
    */
@@ -2139,7 +2123,6 @@ private:
   double m_dbu;
   db::properties_id_type m_prop_id;
   GenericRepository m_shape_repository;
-  PropertiesRepository m_properties_repository;
   ArrayRepository m_array_repository;
   std::vector<pcell_header_type *> m_pcells;
   pcell_name_map m_pcell_ids;

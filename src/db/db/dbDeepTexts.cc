@@ -343,16 +343,6 @@ void DeepTexts::apply_property_translator (const db::PropertiesTranslator &pt)
   DeepShapeCollectionDelegateBase::apply_property_translator (pt);
 }
 
-db::PropertiesRepository *DeepTexts::properties_repository ()
-{
-  return &deep_layer ().layout ().properties_repository ();
-}
-
-const db::PropertiesRepository *DeepTexts::properties_repository () const
-{
-  return &deep_layer ().layout ().properties_repository ();
-}
-
 TextsDelegate *
 DeepTexts::add_in_place (const Texts &other)
 {

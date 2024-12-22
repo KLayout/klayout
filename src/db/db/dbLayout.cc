@@ -445,7 +445,6 @@ Layout::Layout (db::Manager *manager)
     m_top_cells (0),
     m_dbu (0.001),
     m_prop_id (0),
-    m_properties_repository (),
     m_do_cleanup (false),
     m_editable (db::default_editable_mode ())
 {
@@ -461,7 +460,6 @@ Layout::Layout (bool editable, db::Manager *manager)
     m_top_cells (0),
     m_dbu (0.001),
     m_prop_id (0),
-    m_properties_repository (),
     m_do_cleanup (false),
     m_editable (editable)
 {
@@ -481,7 +479,6 @@ Layout::Layout (const db::Layout &layout)
     m_top_cells (0),
     m_dbu (0.001),
     m_prop_id (0),
-    m_properties_repository (),
     m_do_cleanup (false),
     m_editable (layout.m_editable)
 {
@@ -534,8 +531,6 @@ Layout::clear ()
   m_cell_map.clear ();
 
   m_shape_repository = db::GenericRepository ();
-  db::PropertiesRepository empty_pr;
-  m_properties_repository = empty_pr;
   m_array_repository = db::ArrayRepository ();
 
   for (std::vector<pcell_header_type *>::const_iterator pc = m_pcells.begin (); pc != m_pcells.end (); ++pc) {
@@ -583,7 +578,6 @@ Layout::operator= (const Layout &d)
       m_cell_ptrs [new_cell->cell_index ()] = new_cell;
     }
 
-    m_properties_repository = d.m_properties_repository; // because the cell assign operator does not map property ID's ..
     m_top_down_list = d.m_top_down_list;
     m_top_cells = d.m_top_cells;
 
@@ -817,7 +811,6 @@ Layout::mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat
   db::mem_stat (stat, purpose, cat, m_lib_proxy_map, true, (void *) this);
   db::mem_stat (stat, purpose, cat, m_meta_info, true, (void *) this);
   db::mem_stat (stat, purpose, cat, m_shape_repository, true, (void *) this);
-  db::mem_stat (stat, purpose, cat, m_properties_repository, true, (void *) this);
   db::mem_stat (stat, purpose, cat, m_array_repository, true, (void *) this);
 
   for (std::vector<const char *>::const_iterator i = m_cell_names.begin (); i != m_cell_names.end (); ++i) {

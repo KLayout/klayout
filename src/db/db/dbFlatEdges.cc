@@ -33,7 +33,7 @@ namespace db
 //  FlatEdges implementation
 
 FlatEdges::FlatEdges ()
-  : MutableEdges (), mp_edges (new db::Shapes (false)), mp_merged_edges (new db::Shapes (false)), mp_properties_repository (new db::PropertiesRepository ())
+  : MutableEdges (), mp_edges (new db::Shapes (false)), mp_merged_edges (new db::Shapes (false))
 {
   init ();
 }
@@ -44,7 +44,7 @@ FlatEdges::~FlatEdges ()
 }
 
 FlatEdges::FlatEdges (const FlatEdges &other)
-  : MutableEdges (other), mp_edges (other.mp_edges), mp_merged_edges (other.mp_merged_edges), mp_properties_repository (other.mp_properties_repository)
+  : MutableEdges (other), mp_edges (other.mp_edges), mp_merged_edges (other.mp_merged_edges)
 {
   init ();
 
@@ -53,7 +53,7 @@ FlatEdges::FlatEdges (const FlatEdges &other)
 }
 
 FlatEdges::FlatEdges (const db::Shapes &edges, bool is_merged)
-  : MutableEdges (), mp_edges (new db::Shapes (edges)), mp_merged_edges (new db::Shapes (false)), mp_properties_repository (new db::PropertiesRepository ())
+  : MutableEdges (), mp_edges (new db::Shapes (edges)), mp_merged_edges (new db::Shapes (false))
 {
   init ();
 
@@ -61,7 +61,7 @@ FlatEdges::FlatEdges (const db::Shapes &edges, bool is_merged)
 }
 
 FlatEdges::FlatEdges (bool is_merged)
-  : MutableEdges (), mp_edges (new db::Shapes (false)), mp_merged_edges (new db::Shapes (false)), mp_properties_repository (new db::PropertiesRepository ())
+  : MutableEdges (), mp_edges (new db::Shapes (false)), mp_merged_edges (new db::Shapes (false))
 {
   init ();
 
@@ -88,8 +88,7 @@ void FlatEdges::init ()
 
 void FlatEdges::insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
 {
-  db::PropertyMapper pm (&layout->properties_repository (), mp_properties_repository.get_const ());
-  layout->cell (into_cell).shapes (into_layer).insert (*mp_edges, pm);
+  layout->cell (into_cell).shapes (into_layer).insert (*mp_edges);
 }
 
 void FlatEdges::merged_semantics_changed ()
@@ -395,16 +394,6 @@ void FlatEdges::apply_property_translator (const db::PropertiesTranslator &pt)
     invalidate_cache ();
 
   }
-}
-
-db::PropertiesRepository *FlatEdges::properties_repository ()
-{
-  return mp_properties_repository.get_non_const ();
-}
-
-const db::PropertiesRepository *FlatEdges::properties_repository () const
-{
-  return mp_properties_repository.get_const ();
 }
 
 void

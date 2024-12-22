@@ -306,10 +306,10 @@ void create_item_from_shape (rdb::Database *db, rdb::id_type cell_id, rdb::id_ty
     const db::Layout *layout = shape.shapes ()->cell ()->layout ();
     if (layout) {
 
-      auto ps = layout->properties_repository ().properties (shape.prop_id ());
+      auto ps = db::properties (shape.prop_id ());
       for (auto i = ps.begin (); i != ps.end (); ++i) {
-        id_type tag_id = db->tags ().tag (layout->properties_repository ().prop_name (i->first).to_string (), true /*user tag*/).id ();
-        add_item_value (item, i->second, trans, tag_id);
+        id_type tag_id = db->tags ().tag (db::property_name (i->first).to_string (), true /*user tag*/).id ();
+        add_item_value (item, db::property_value (i->second), trans, tag_id);
       }
 
     }

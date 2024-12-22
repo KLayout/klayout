@@ -491,16 +491,6 @@ void DeepRegion::apply_property_translator (const db::PropertiesTranslator &pt)
   m_merged_polygons = db::DeepLayer ();
 }
 
-db::PropertiesRepository *DeepRegion::properties_repository ()
-{
-  return &deep_layer ().layout ().properties_repository ();
-}
-
-const db::PropertiesRepository *DeepRegion::properties_repository () const
-{
-  return &deep_layer ().layout ().properties_repository ();
-}
-
 bool
 DeepRegion::equals (const Region &other) const
 {
@@ -893,7 +883,7 @@ DeepRegion::and_with_impl (const DeepRegion *other, db::PropertyConstraint prope
 
   } else {
 
-    db::BoolAndOrNotLocalOperationWithProperties op (true, &dl_out.layout ().properties_repository (), &deep_layer ().layout ().properties_repository (), &other->deep_layer ().layout ().properties_repository (), property_constraint);
+    db::BoolAndOrNotLocalOperationWithProperties op (true, property_constraint);
 
     db::local_processor<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties> proc (const_cast<db::Layout *> (&deep_layer ().layout ()), const_cast<db::Cell *> (&deep_layer ().initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell (), deep_layer ().breakout_cells (), other->deep_layer ().breakout_cells ());
     configure_proc (proc);
@@ -996,7 +986,7 @@ DeepRegion::not_with_impl (const DeepRegion *other, db::PropertyConstraint prope
 
   } else {
 
-    db::BoolAndOrNotLocalOperationWithProperties op (false, &dl_out.layout ().properties_repository (), &deep_layer ().layout ().properties_repository (), &other->deep_layer ().layout ().properties_repository (), property_constraint);
+    db::BoolAndOrNotLocalOperationWithProperties op (false, property_constraint);
 
     db::local_processor<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties> proc (const_cast<db::Layout *> (&deep_layer ().layout ()), const_cast<db::Cell *> (&deep_layer ().initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell (), deep_layer ().breakout_cells (), other->deep_layer ().breakout_cells ());
     configure_proc (proc);
@@ -1038,10 +1028,7 @@ DeepRegion::and_and_not_with (const DeepRegion *other, PropertyConstraint proper
 
   } else {
 
-    db::PropertiesRepository *pr_out1 = &dl_out1.layout ().properties_repository ();
-    db::PropertiesRepository *pr_out2 = &dl_out2.layout ().properties_repository ();
-    const db::PropertiesRepository *pr = &deep_layer ().layout ().properties_repository ();
-    db::TwoBoolAndNotLocalOperationWithProperties op (pr_out1, pr_out2, pr, pr, property_constraint);
+    db::TwoBoolAndNotLocalOperationWithProperties op (property_constraint);
 
     db::local_processor<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties> proc (const_cast<db::Layout *> (&deep_layer ().layout ()), const_cast<db::Cell *> (&deep_layer ().initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell (), deep_layer ().breakout_cells (), other->deep_layer ().breakout_cells ());
     configure_proc (proc);
@@ -1473,7 +1460,7 @@ DeepRegion::edges (const EdgeFilterBase *filter, const PolygonToEdgeProcessorBas
 
     const db::DeepLayer &polygons = deep_layer ();
 
-    db::PolygonToEdgeLocalOperation op (res->properties_repository (), &polygons.layout ().properties_repository ());
+    db::PolygonToEdgeLocalOperation op;
 
     db::local_processor<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::EdgeWithProperties> proc (&res->deep_layer ().layout (), &res->deep_layer ().initial_cell (), polygons.breakout_cells ());
 
@@ -1488,7 +1475,6 @@ DeepRegion::edges (const EdgeFilterBase *filter, const PolygonToEdgeProcessorBas
   } else {
 
     const db::DeepLayer &polygons = merged_deep_layer ();
-    db::PropertyMapper pm (res->properties_repository (), &polygons.layout ().properties_repository ());
 
     std::unique_ptr<VariantsCollectorBase> vars;
     db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
@@ -1526,7 +1512,7 @@ DeepRegion::edges (const EdgeFilterBase *filter, const PolygonToEdgeProcessorBas
 
           for (auto e = heap.begin (); e != heap.end (); ++e) {
             if (! filter || filter->selected ((*e).transformed (tr))) {
-              st.insert (db::EdgeWithProperties (*e, pm (si->prop_id ())));
+              st.insert (db::EdgeWithProperties (*e, si->prop_id ()));
             }
           }
 
@@ -1534,7 +1520,7 @@ DeepRegion::edges (const EdgeFilterBase *filter, const PolygonToEdgeProcessorBas
 
           for (db::Polygon::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end (); ++e) {
             if (! filter || filter->selected ((*e).transformed (tr))) {
-              st.insert (db::EdgeWithProperties (*e, pm (si->prop_id ())));
+              st.insert (db::EdgeWithProperties (*e, si->prop_id ()));
             }
           }
 
@@ -2047,8 +2033,6 @@ Output *region_cop_with_properties_impl (DeepRegion *region, db::CompoundRegionO
   proc.set_threads (region->deep_layer ().store ()->threads ());
 
   std::vector<unsigned int> other_layers;
-  std::vector<const db::PropertiesRepository *> intruder_prs;
-  const db::PropertiesRepository *subject_pr = &polygons.layout ().properties_repository ();
 
   for (std::vector<db::Region *>::const_iterator i = inputs.begin (); i != inputs.end (); ++i) {
 
@@ -2058,7 +2042,6 @@ Output *region_cop_with_properties_impl (DeepRegion *region, db::CompoundRegionO
       } else {
         other_layers.push_back (foreign_idlayer ());
       }
-      intruder_prs.push_back (subject_pr);
     } else {
       const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> ((*i)->delegate ());
       tl_assert (other_deep != 0);
@@ -2066,12 +2049,11 @@ Output *region_cop_with_properties_impl (DeepRegion *region, db::CompoundRegionO
         throw tl::Exception (tl::to_string (tr ("Complex DeepRegion operations need to use the same layout and top cell for all inputs")));
       }
       other_layers.push_back (other_deep->deep_layer ().layer ());
-      intruder_prs.push_back (other_deep->properties_repository ());
     }
 
   }
 
-  compound_local_operation_with_properties<db::PolygonRef, db::PolygonRef, TR> op (&node, prop_constraint, res->properties_repository (), subject_pr, intruder_prs);
+  compound_local_operation_with_properties<db::PolygonRef, db::PolygonRef, TR> op (&node, prop_constraint);
   proc.run (&op, polygons.layer (), other_layers, res->deep_layer ().layer (), true /*make_variants*/);
 
   return res.release ();
@@ -2199,7 +2181,7 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
 
   } else {
 
-    db::check_local_operation_with_properties<db::PolygonRef, db::PolygonRef> op (check, different_polygons, primary_is_merged, other_deep != 0, other_is_merged, options, res->properties_repository (), properties_repository (), other_deep ? other_deep->properties_repository () : &polygons.layout ().properties_repository ());
+    db::check_local_operation_with_properties<db::PolygonRef, db::PolygonRef> op (check, different_polygons, primary_is_merged, other_deep != 0, other_is_merged, options);
 
     db::local_processor<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::EdgePairWithProperties> proc (subject_layout, subject_top,
                                                                                                                 intruder_layout, intruder_top,

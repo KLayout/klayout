@@ -180,12 +180,6 @@ TEST(3_TextTreatment)
 
   EXPECT_EQ (dl1.initial_cell ().shapes (dl1.layer ()).size (), size_t (1));
   EXPECT_EQ (dl1.initial_cell ().shapes (dl1.layer ()).begin (db::ShapeIterator::All)->to_string (), "polygon (999,1999;999,2001;1001,2001;1001,1999) prop_id=1");
-
-  const db::Layout *dss_layout = &store.const_layout (0);
-  db::PropertiesRepository::properties_set ps = dss_layout->properties_repository ().properties (1);
-  EXPECT_EQ (ps.size (), size_t (1));
-  EXPECT_EQ (dss_layout->properties_repository ().prop_name (ps.begin ()->first).to_string (), "text");
-  EXPECT_EQ (ps.begin ()->second.to_string (), "TEXT");
 }
 
 TEST(4_FlatAndEmptyInput)

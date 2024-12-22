@@ -871,11 +871,6 @@ struct map1
   db::cell_index_type operator() (db::cell_index_type i) const { return 3-i; }
 };
 
-struct map2
-{
-  db::Layout::properties_id_type operator() (db::Layout::properties_id_type i) const { return 3+i; }
-};
-
 TEST(4) 
 {
   ::pi = 0;
@@ -908,10 +903,9 @@ TEST(4)
   db::Cell &c4 (g.cell (g.add_cell ()));
   for (db::Cell::const_iterator i = c0.begin (); ! i.at_end (); ++i) {
     map1 m1;
-    map2 m2;
-    c4.insert (*i, m1, m2);
+    c4.insert (*i, m1);
   }
-  EXPECT_EQ (c2s_unsorted(c4), "2[r0 *1 0,0]#0,2[r0 *1 0,0]#4,1[r0 *1 100,-100]#13");
+  EXPECT_EQ (c2s_unsorted(c4), "2[r0 *1 0,0]#0,2[r0 *1 0,0]#1,1[r0 *1 100,-100]#10");
 
 }
 

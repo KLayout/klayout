@@ -122,7 +122,7 @@ bool DB_PUBLIC compare (const db::Box &box, const std::string &string);
 /**
  *  @brief Converts a property ID into a property key/value string representation
  */
-std::string DB_PUBLIC prop2string (const db::PropertiesRepository &pr, db::properties_id_type prop_id);
+std::string DB_PUBLIC prop2string (db::properties_id_type prop_id);
 
 }
 

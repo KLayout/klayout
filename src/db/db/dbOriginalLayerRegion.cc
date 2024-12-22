@@ -382,18 +382,6 @@ OriginalLayerRegion::apply_property_translator (const db::PropertiesTranslator &
   m_merged_polygons.clear ();
 }
 
-db::PropertiesRepository *
-OriginalLayerRegion::properties_repository ()
-{
-  return m_iter.layout () ? &const_cast<db::Layout * >(m_iter.layout ())->properties_repository () : 0;
-}
-
-const db::PropertiesRepository *
-OriginalLayerRegion::properties_repository () const
-{
-  return m_iter.layout () ? &m_iter.layout ()->properties_repository () : 0;
-}
-
 bool
 OriginalLayerRegion::equals (const Region &other) const
 {
@@ -445,18 +433,13 @@ OriginalLayerRegion::insert_into (Layout *layout, db::cell_index_type into_cell,
 
   db::Shapes &sh = layout->cell (into_cell).shapes (into_layer);
 
-  db::PropertyMapper pm;
-  if (m_iter.layout ()) {
-    pm = db::PropertyMapper (layout, m_iter.layout ());
-  }
-
   //  NOTE: if the source (r) is from the same layout than the shapes live in, we better
   //  lock the layout against updates while inserting
   db::LayoutLocker locker (layout);
   AssignProp ap;
   for (db::RecursiveShapeIterator i = m_iter; !i.at_end (); ++i) {
     db::properties_id_type prop_id = i.prop_id ();
-    ap.prop_id = (prop_id != 0 ? pm (prop_id) : 0);
+    ap.prop_id = (prop_id != 0 ? prop_id : 0);
     sh.insert (*i, i.trans (), ap);
   }
 }

@@ -29,7 +29,6 @@ namespace db
 ClipboardData::ClipboardData ()
   : m_layout (), m_incomplete_cells ()
 {
-  m_prop_id_map.set_target (&m_layout);
   m_container_cell_index = m_layout.add_cell ("");
 }
 
@@ -47,8 +46,7 @@ ClipboardData::add (const db::Layout &layout, unsigned int layer, const db::Shap
     m_layout.insert_layer (layer, layout.get_properties (layer));
   }
 
-  m_prop_id_map.set_source (&layout);
-  m_layout.cell (m_container_cell_index).shapes (layer).insert (shape, m_prop_id_map);
+  m_layout.cell (m_container_cell_index).shapes (layer).insert (shape);
 }
 
 void 
@@ -60,8 +58,7 @@ ClipboardData::add (const db::Layout &layout, unsigned int layer, const db::Shap
     m_layout.insert_layer (layer, layout.get_properties (layer));
   }
 
-  m_prop_id_map.set_source (&layout);
-  db::Shape new_shape = m_layout.cell (m_container_cell_index).shapes (layer).insert (shape, m_prop_id_map);
+  db::Shape new_shape = m_layout.cell (m_container_cell_index).shapes (layer).insert (shape);
   m_layout.cell (m_container_cell_index).shapes (layer).transform (new_shape, trans);
 }
 
@@ -80,9 +77,8 @@ ClipboardData::add (const db::Layout &layout, const db::Instance &inst, unsigned
   }
 
   //  Insert the instance mapping the cell to the target cell_index and the property ID using the map
-  m_prop_id_map.set_source (&layout);
   tl::const_map<db::cell_index_type> im (target_cell_index);
-  m_layout.cell (m_container_cell_index).insert (inst, im, m_prop_id_map);
+  m_layout.cell (m_container_cell_index).insert (inst, im);
 }
 
 void 
@@ -102,9 +98,8 @@ ClipboardData::add (const db::Layout &layout, const db::Instance &inst, unsigned
   }
 
   //  Insert the instance mapping the cell to the target cell_index and the property ID using the map
-  m_prop_id_map.set_source (&layout);
   tl::const_map<db::cell_index_type> im (target_cell_index);
-  db::Instance new_inst = m_layout.cell (m_container_cell_index).insert (inst, im, m_prop_id_map);
+  db::Instance new_inst = m_layout.cell (m_container_cell_index).insert (inst, im);
   m_layout.cell (m_container_cell_index).transform (new_inst, trans);
 }
 
@@ -123,8 +118,6 @@ ClipboardData::add (const db::Layout &layout, const db::Cell &cell, unsigned int
     m_context_info.erase (target_cell_index);
   } 
 
-  m_prop_id_map.set_source (&layout);
-
   //  copy the shapes
   for (unsigned int l = 0; l < layout.layers (); ++l) {
 
@@ -136,7 +129,7 @@ ClipboardData::add (const db::Layout &layout, const db::Cell &cell, unsigned int
 
       db::Shapes &shapes = m_layout.cell (target_cell_index).shapes (l);
       for (db::Shapes::shape_iterator sh = cell.shapes (l).begin (db::Shapes::shape_iterator::All); ! sh.at_end (); ++sh) {
-        shapes.insert (*sh, m_prop_id_map);
+        shapes.insert (*sh);
       }
 
     }
@@ -164,7 +157,6 @@ ClipboardData::do_insert (db::Layout &layout, const db::ICplxTrans *trans, db::C
   }
 
   std::vector <unsigned int> new_layers;
-  PropertyMapper prop_id_map (&layout, &m_layout);
 
   std::map <db::LayerProperties, unsigned int, db::LPLogicalLessFunc> layer_map;
   for (unsigned int l = 0; l < layout.layers (); ++l) {
@@ -258,7 +250,7 @@ ClipboardData::do_insert (db::Layout &layout, const db::ICplxTrans *trans, db::C
 
           for (db::Shapes::shape_iterator sh = c->shapes (l).begin (db::Shapes::shape_iterator::All); ! sh.at_end (); ++sh) {
 
-            db::Shape new_shape = t.insert (*sh, prop_id_map);
+            db::Shape new_shape = t.insert (*sh);
             if (trans) {
               new_shape = t.transform (new_shape, *trans);
             }
@@ -290,7 +282,7 @@ ClipboardData::do_insert (db::Layout &layout, const db::ICplxTrans *trans, db::C
         if (callers.find (inst_cell) == callers.end ()) {
 
           tl::const_map<db::cell_index_type> im (inst_cell);
-          db::Instance new_inst = t.insert (*inst, im, prop_id_map);
+          db::Instance new_inst = t.insert (*inst, im);
           if (trans) {
             new_inst = t.transform (new_inst, *trans);
           }

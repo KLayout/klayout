@@ -39,8 +39,6 @@
 namespace db
 {
 
-class PropertyMapper;
-
 template <class Trans>
 class polygon_transformation_filter
   : public PolygonSink
@@ -325,7 +323,7 @@ private:
 template <class TS, class TI>
 DB_PUBLIC_TEMPLATE
 std::map<db::properties_id_type, std::pair<std::vector<const TS *>, std::set<const TI *> > >
-separate_interactions_by_properties (const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, db::PropertyConstraint property_constraint, db::PropertyMapper &pms, db::PropertyMapper &pmi)
+separate_interactions_by_properties (const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, db::PropertyConstraint property_constraint)
 {
   std::map<db::properties_id_type, std::pair<std::vector<const TS *>, std::set<const TI *> > > by_prop_id;
 
@@ -333,7 +331,7 @@ separate_interactions_by_properties (const shape_interactions<db::object_with_pr
 
     const db::object_with_properties<TS> &subject = interactions.subject_shape (i->first);
 
-    db::properties_id_type prop_id = pms (subject.properties_id ());
+    db::properties_id_type prop_id = subject.properties_id ();
 
     std::pair<std::vector<const TS *>, std::set<const TI *> > &s2p = by_prop_id [prop_id];
     s2p.first.push_back (&subject);
@@ -342,7 +340,7 @@ separate_interactions_by_properties (const shape_interactions<db::object_with_pr
 
       const std::pair<unsigned int, db::object_with_properties<TI> > &intruder = interactions.intruder_shape (*ii);
 
-      if (pc_match (property_constraint, prop_id, pmi (intruder.second.properties_id ()))) {
+      if (pc_match (property_constraint, prop_id, intruder.second.properties_id ())) {
         s2p.second.insert (&intruder.second);
       }
 
@@ -363,7 +361,7 @@ separate_interactions_by_properties (const shape_interactions<db::object_with_pr
 template <class TS, class TI>
 DB_PUBLIC_TEMPLATE
 std::map<db::properties_id_type, db::shape_interactions<TS, TI> >
-separate_interactions_to_interactions_by_properties (const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, db::PropertyConstraint property_constraint, db::PropertyMapper &pms, std::vector<db::PropertyMapper> &pmis)
+separate_interactions_to_interactions_by_properties (const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, db::PropertyConstraint property_constraint)
 {
   std::map<db::properties_id_type, db::shape_interactions<TS, TI> > by_prop_id;
   std::map<db::properties_id_type, std::set<unsigned int> > intruder_ids_by_prop_id;
@@ -371,7 +369,7 @@ separate_interactions_to_interactions_by_properties (const shape_interactions<db
   for (auto i = interactions.begin (); i != interactions.end (); ++i) {
 
     const db::object_with_properties<TS> &subject = interactions.subject_shape (i->first);
-    db::properties_id_type prop_id = pms (subject.properties_id ());
+    db::properties_id_type prop_id = subject.properties_id ();
 
     db::shape_interactions<TS, TI> &s2p = by_prop_id [prop_id];
     std::set<unsigned int> &intruder_ids = intruder_ids_by_prop_id [prop_id];
@@ -380,9 +378,8 @@ separate_interactions_to_interactions_by_properties (const shape_interactions<db
     for (auto ii = i->second.begin (); ii != i->second.end (); ++ii) {
 
       const std::pair<unsigned int, db::object_with_properties<TI> > &intruder = interactions.intruder_shape (*ii);
-      tl_assert (intruder.first < (unsigned int) pmis.size ());
 
-      if (pc_match (property_constraint, prop_id, pmis[intruder.first] (intruder.second.properties_id ()))) {
+      if (pc_match (property_constraint, prop_id, intruder.second.properties_id ())) {
         s2p.add_interaction (i->first, *ii);
         intruder_ids.insert (*ii);
       }

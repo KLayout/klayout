@@ -590,6 +590,11 @@ typedef size_t properties_id_type;
 typedef size_t property_names_id_type;
 
 /**
+ *  @brief The type of a properties value id
+ */
+typedef size_t property_values_id_type;
+
+/**
  *  @brief The type of the PCell id
  */
 typedef unsigned int pcell_id_type;

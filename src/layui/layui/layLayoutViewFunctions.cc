@@ -1665,9 +1665,8 @@ LayoutViewFunctions::cm_copy_layer ()
         if (! same_layout) {
 
           //  flat mode (different layouts)
-          db::PropertyMapper pm (&view ()->cellview (m_copy_cvr)->layout (), &view ()->cellview (m_copy_cva)->layout ());
           for (db::RecursiveShapeIterator si (view ()->cellview (m_copy_cva)->layout (), *view ()->cellview (m_copy_cva).cell (), m_copy_layera); ! si.at_end (); ++si) {
-            target_cell.shapes (m_copy_layerr).insert (*si, si.trans (), pm);
+            target_cell.shapes (m_copy_layerr).insert_transformed (*si, si.trans ());
           }
 
         } else {
@@ -1708,14 +1707,6 @@ LayoutViewFunctions::cm_copy_layer ()
 
           //  current cell only mode: identical cell
           cell.copy (m_copy_layera, m_copy_layerr);
-
-        } else if (! same_layout) {
-
-          //  current cell only mode (different layouts)
-          db::PropertyMapper pm (&view ()->cellview (m_copy_cvr)->layout (), &view ()->cellview (m_copy_cva)->layout ());
-          for (db::Shapes::shape_iterator si = view ()->cellview (m_copy_cva).cell ()->shapes (m_copy_layera).begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
-            target_cell.shapes (m_copy_layerr).insert (*si, pm);
-          }
 
         } else {
 

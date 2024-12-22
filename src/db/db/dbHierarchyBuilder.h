@@ -164,7 +164,7 @@ class DB_PUBLIC PolygonReferenceHierarchyBuilderShapeReceiver
   : public HierarchyBuilderShapeReceiver
 {
 public:
-  PolygonReferenceHierarchyBuilderShapeReceiver (db::Layout *layout, const Layout *source_layout, int text_enlargement = -1, const tl::Variant &text_prop_name = tl::Variant ());
+  PolygonReferenceHierarchyBuilderShapeReceiver (db::Layout *layout, int text_enlargement = -1, const tl::Variant &text_prop_name = tl::Variant ());
 
   virtual void push (const db::Shape &shape, db::properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target);
   virtual void push (const db::Box &shape, db::properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target);
@@ -177,7 +177,6 @@ private:
   int m_text_enlargement;
   bool m_make_text_prop;
   db::property_names_id_type m_text_prop_id;
-  db::PropertyMapper m_pm;
 };
 
 /**
@@ -187,7 +186,7 @@ class DB_PUBLIC EdgeBuildingHierarchyBuilderShapeReceiver
   : public HierarchyBuilderShapeReceiver
 {
 public:
-  EdgeBuildingHierarchyBuilderShapeReceiver (db::Layout *layout, const Layout *source_layout, bool as_edges);
+  EdgeBuildingHierarchyBuilderShapeReceiver (bool as_edges);
 
   virtual void push (const db::Shape &shape, properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target);
   virtual void push (const db::Box &shape, db::properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target);
@@ -195,7 +194,6 @@ public:
 
 private:
   bool m_as_edges;
-  db::PropertyMapper m_pm;
 };
 
 /**
@@ -205,14 +203,11 @@ class DB_PUBLIC EdgePairBuildingHierarchyBuilderShapeReceiver
   : public HierarchyBuilderShapeReceiver
 {
 public:
-  EdgePairBuildingHierarchyBuilderShapeReceiver (db::Layout *layout, const Layout *source_layout);
+  EdgePairBuildingHierarchyBuilderShapeReceiver ();
 
   virtual void push (const db::Shape &shape, properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target);
   virtual void push (const db::Box &, db::properties_id_type, const db::ICplxTrans &, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *) { }
   virtual void push (const db::Polygon &, db::properties_id_type, const db::ICplxTrans &, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *) { }
-
-private:
-  db::PropertyMapper m_pm;
 };
 
 /**
@@ -222,7 +217,7 @@ class DB_PUBLIC TextBuildingHierarchyBuilderShapeReceiver
   : public HierarchyBuilderShapeReceiver
 {
 public:
-  TextBuildingHierarchyBuilderShapeReceiver (db::Layout *layout, const Layout *source_layout);
+  TextBuildingHierarchyBuilderShapeReceiver (db::Layout *layout);
 
   virtual void push (const db::Shape &shape, properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target);
   virtual void push (const db::Box &, db::properties_id_type, const db::ICplxTrans &, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *) { }
@@ -230,7 +225,6 @@ public:
 
 private:
   db::Layout *mp_layout;
-  db::PropertyMapper m_pm;
 };
 
 /**

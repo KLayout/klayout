@@ -623,7 +623,7 @@ LayerProperties::do_realize (const LayoutViewBase *view) const
 
       //  retrieve the property selector, if one is present
       if (! m_source_real.property_selector ().is_null ()) {
-        m_inv_prop_set = m_source_real.property_selector ().matching (cv->layout ().properties_repository (), m_prop_set);
+        m_inv_prop_set = m_source_real.property_selector ().matching (m_prop_set);
       }
 
       //  compute the effective transformation in database units

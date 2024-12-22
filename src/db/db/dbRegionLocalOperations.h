@@ -224,7 +224,7 @@ class check_local_operation_with_properties
   : public local_operation<db::object_with_properties<TS>, db::object_with_properties<TI>, db::EdgePairWithProperties>, public check_local_operation_base<TS, TI>
 {
 public:
-  check_local_operation_with_properties (const EdgeRelationFilter &check, bool different_polygons, bool is_merged, bool has_other, bool other_is_merged, const db::RegionCheckOptions &options, db::PropertiesRepository *target_pr, const db::PropertiesRepository *subject_pr, const db::PropertiesRepository *intruder_pr);
+  check_local_operation_with_properties (const EdgeRelationFilter &check, bool different_polygons, bool is_merged, bool has_other, bool other_is_merged, const db::RegionCheckOptions &options);
 
   virtual db::Coord dist () const;
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
@@ -236,7 +236,6 @@ public:
   virtual const db::TransformationReducer *vars () const { return &m_vars; }
 
 private:
-  mutable db::PropertyMapper m_pms, m_pmi;
   db::MagnificationReducer m_vars;
 };
 
@@ -405,7 +404,7 @@ class DB_PUBLIC bool_and_or_not_local_operation_with_properties
   : public local_operation<db::object_with_properties<TS>, db::object_with_properties<TI>, db::object_with_properties<TR> >
 {
 public:
-  bool_and_or_not_local_operation_with_properties (bool is_and, db::PropertiesRepository *target_pr, const db::PropertiesRepository *subject_pr, const db::PropertiesRepository *intruder_pr, db::PropertyConstraint property_constraint);
+  bool_and_or_not_local_operation_with_properties (bool is_and, db::PropertyConstraint property_constraint);
 
   virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, std::vector<std::unordered_set<db::object_with_properties<TR> > > &result, const db::LocalProcessorBase *proc) const;
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
@@ -414,8 +413,6 @@ public:
 private:
   bool m_is_and;
   db::PropertyConstraint m_property_constraint;
-  mutable db::PropertyMapper m_pms;
-  mutable db::PropertyMapper m_pmi;
 };
 
 typedef bool_and_or_not_local_operation_with_properties<db::PolygonRef, db::PolygonRef, db::PolygonRef> BoolAndOrNotLocalOperationWithProperties;
@@ -451,14 +448,13 @@ class DB_PUBLIC two_bool_and_not_local_operation_with_properties
   : public local_operation<db::object_with_properties<TS>, db::object_with_properties<TI>, db::object_with_properties<TR> >
 {
 public:
-  two_bool_and_not_local_operation_with_properties (db::PropertiesRepository *target1_pr, db::PropertiesRepository *target2_pr, const db::PropertiesRepository *subject_pr, const db::PropertiesRepository *intruder_pr, db::PropertyConstraint property_constraint);
+  two_bool_and_not_local_operation_with_properties (db::PropertyConstraint property_constraint);
 
   virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, std::vector<std::unordered_set<db::object_with_properties<TR> > > &result, const db::LocalProcessorBase *proc) const;
   virtual std::string description () const;
 
 private:
   db::PropertyConstraint m_property_constraint;
-  mutable db::PropertyMapper m_pms, m_pmi, m_pm12;
 };
 
 typedef two_bool_and_not_local_operation_with_properties<db::PolygonRef, db::PolygonRef, db::PolygonRef> TwoBoolAndNotLocalOperationWithProperties;
@@ -521,16 +517,13 @@ class DB_PUBLIC PolygonToEdgeLocalOperation
   : public local_operation<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::EdgeWithProperties>
 {
 public:
-  PolygonToEdgeLocalOperation (db::PropertiesRepository *target_pr, const db::PropertiesRepository *source_pr);
+  PolygonToEdgeLocalOperation ();
 
   virtual db::Coord dist () const { return 1; }
   virtual bool requests_single_subjects () const { return true; }
   virtual std::string description () const;
 
   virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties> &interactions, std::vector<std::unordered_set<db::EdgeWithProperties> > &results, const db::LocalProcessorBase *proc) const;
-
-private:
-  mutable db::PropertyMapper m_pm;
 };
 
 } // namespace db

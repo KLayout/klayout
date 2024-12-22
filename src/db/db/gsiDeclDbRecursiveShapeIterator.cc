@@ -206,14 +206,14 @@ static void filter_properties (db::RecursiveShapeIterator *c, const std::vector<
   if (c->layout ()) {
     std::set<tl::Variant> kf;
     kf.insert (keys.begin (), keys.end ());
-    c->apply_property_translator (db::PropertiesTranslator::make_filter (const_cast<db::Layout *> (c->layout ())->properties_repository (), kf));
+    c->apply_property_translator (db::PropertiesTranslator::make_filter (kf));
   }
 }
 
 static void map_properties (db::RecursiveShapeIterator *c, const std::map<tl::Variant, tl::Variant> &map)
 {
   if (c->layout ()) {
-    c->apply_property_translator (db::PropertiesTranslator::make_key_mapper (const_cast<db::Layout *> (c->layout ())->properties_repository (), map));
+    c->apply_property_translator (db::PropertiesTranslator::make_key_mapper (map));
   }
 }
 

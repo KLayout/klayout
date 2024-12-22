@@ -260,18 +260,6 @@ OriginalLayerEdges::apply_property_translator (const db::PropertiesTranslator &p
   m_merged_edges.clear ();
 }
 
-db::PropertiesRepository *
-OriginalLayerEdges::properties_repository ()
-{
-  return m_iter.layout () ? &const_cast<db::Layout * >(m_iter.layout ())->properties_repository () : 0;
-}
-
-const db::PropertiesRepository *
-OriginalLayerEdges::properties_repository () const
-{
-  return m_iter.layout () ? &m_iter.layout ()->properties_repository () : 0;
-}
-
 bool
 OriginalLayerEdges::equals (const Edges &other) const
 {

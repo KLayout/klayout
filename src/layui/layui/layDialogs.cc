@@ -1065,7 +1065,7 @@ FlattenInstOptionsDialog::exec_dialog (int &levels, bool &prune)
 //  UserPropertiesForm implementation
 
 UserPropertiesForm::UserPropertiesForm (QWidget *parent)
-  : QDialog (parent), m_editable (false), mp_prep (0)
+  : QDialog (parent), m_editable (false)
 {
   setObjectName (QString::fromUtf8 ("user_properties_form"));
 
@@ -1109,10 +1109,10 @@ UserPropertiesForm::~UserPropertiesForm ()
   mp_ui = 0;
 }
 
-db::PropertiesRepository::properties_set
+db::PropertiesSet
 UserPropertiesForm::get_properties (int tab)
 {
-  db::PropertiesRepository::properties_set props;
+  db::PropertiesSet props;
 
   if (tab == 0) {
 
@@ -1131,7 +1131,7 @@ UserPropertiesForm::get_properties (int tab)
       kex.read (k);
       kex.expect_end ();
 
-      props.insert (std::make_pair (mp_prep->prop_name_id (k), v));
+      props.insert (k, v);
 
       ++it;
 
@@ -1155,7 +1155,7 @@ UserPropertiesForm::get_properties (int tab)
         ex.read (v);
         ex.expect_end ();
 
-        props.insert (std::make_pair (mp_prep->prop_name_id (k), v));
+        props.insert (k, v);
 
       }
 
@@ -1167,19 +1167,21 @@ UserPropertiesForm::get_properties (int tab)
 }
 
 void
-UserPropertiesForm::set_properties (const db::PropertiesRepository::properties_set &props)
+UserPropertiesForm::set_properties (const db::PropertiesSet &props)
 {
   mp_ui->prop_list->clear ();
 
-  for (db::PropertiesRepository::properties_set::const_iterator p = props.begin (); p != props.end (); ++p) {
+  auto map = props.to_map ();
+
+  for (auto p = map.begin (); p != map.end (); ++p) {
     QTreeWidgetItem *entry = new QTreeWidgetItem (mp_ui->prop_list);
-    entry->setText (0, tl::to_qstring (mp_prep->prop_name (p->first).to_parsable_string ()));
+    entry->setText (0, tl::to_qstring (p->first.to_parsable_string ()));
     entry->setText (1, tl::to_qstring (p->second.to_parsable_string ()));
   }
 
   std::string text;
-  for (db::PropertiesRepository::properties_set::const_iterator p = props.begin (); p != props.end (); ++p) {
-    text += mp_prep->prop_name (p->first).to_parsable_string ();
+  for (auto p = map.begin (); p != map.end (); ++p) {
+    text += p->first.to_parsable_string ();
     text += ": ";
     text += p->second.to_parsable_string ();
     text += "\n";
@@ -1223,7 +1225,6 @@ UserPropertiesForm::show (LayoutViewBase *view, unsigned int cv_index, db::prope
 BEGIN_PROTECTED
 
   const lay::CellView &cv = view->cellview (cv_index);
-  mp_prep = &cv->layout ().properties_repository ();
 
   m_editable = cv->layout ().is_editable ();
   if (m_editable) {
@@ -1235,7 +1236,7 @@ BEGIN_PROTECTED
   mp_ui->text_edit->setReadOnly (! m_editable);
   mp_ui->prop_list->clear ();
 
-  const db::PropertiesRepository::properties_set &props = mp_prep->properties (prop_id);
+  const db::PropertiesSet &props = db::properties (prop_id);
   set_properties (props);
 
   set_meta_info (begin_meta, end_meta, cv->layout ());
@@ -1243,8 +1244,8 @@ BEGIN_PROTECTED
   if (exec ()) {
 
     if (m_editable) {
-      db::PropertiesRepository::properties_set props = get_properties (mp_ui->mode_tab->currentIndex ());
-      prop_id = mp_prep->properties_id (props);
+      db::PropertiesSet props = get_properties (mp_ui->mode_tab->currentIndex ());
+      prop_id = db::properties_id (props);
     }
 
     ret = true;
@@ -1252,8 +1253,6 @@ BEGIN_PROTECTED
   } else {
     ret = false;
   }
-
-  mp_prep = 0;
 
 END_PROTECTED
 

@@ -92,8 +92,6 @@ public:
 
   virtual const db::RecursiveShapeIterator *iter () const { return 0; }
   virtual void apply_property_translator (const db::PropertiesTranslator &) { }
-  virtual db::PropertiesRepository *properties_repository () { return 0; }
-  virtual const db::PropertiesRepository *properties_repository () const { return 0; }
 
   virtual bool equals (const EdgePairs &other) const;
   virtual bool less (const EdgePairs &other) const;

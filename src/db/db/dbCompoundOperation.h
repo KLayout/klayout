@@ -1794,13 +1794,10 @@ public:
    *  Creates a local operation which utilizes the operation tree. "node" is the root of the operation tree.
    *  Ownership of the node is *not* transferred to the local operation.
    */
-  compound_local_operation_with_properties<TS, TI, TR> (CompoundRegionOperationNode *node, db::PropertyConstraint prop_constraint, db::PropertiesRepository *target_pr, const db::PropertiesRepository *subject_pr, const std::vector<const db::PropertiesRepository *> &intruder_prs)
-    : mp_node (node), m_prop_constraint (prop_constraint), m_pms (target_pr, subject_pr)
+  compound_local_operation_with_properties<TS, TI, TR> (CompoundRegionOperationNode *node, db::PropertyConstraint prop_constraint)
+    : mp_node (node), m_prop_constraint (prop_constraint)
   {
-    m_pmis.reserve (intruder_prs.size ());
-    for (auto i = intruder_prs.begin (); i != intruder_prs.end (); ++i) {
-      m_pmis.push_back (db::PropertyMapper (target_pr, *i));
-    }
+    //  .. nothing yet ..
   }
 
   virtual const TransformationReducer *vars () const
@@ -1811,7 +1808,7 @@ public:
 protected:
   virtual void do_compute_local (db::Layout *layout, db::Cell *cell, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, std::vector<std::unordered_set<db::object_with_properties<TR> > > &results, const db::LocalProcessorBase *proc) const
   {
-    auto interactions_by_prop_id = separate_interactions_to_interactions_by_properties (interactions, m_prop_constraint, m_pms, m_pmis);
+    auto interactions_by_prop_id = separate_interactions_to_interactions_by_properties (interactions, m_prop_constraint);
     for (auto s2p = interactions_by_prop_id.begin (); s2p != interactions_by_prop_id.end (); ++s2p) {
 
       std::vector<std::unordered_set<TR> > results_wo_props;
@@ -1839,8 +1836,6 @@ protected:
 private:
   tl::weak_ptr<CompoundRegionOperationNode> mp_node;
   db::PropertyConstraint m_prop_constraint;
-  mutable db::PropertyMapper m_pms;
-  mutable std::vector<db::PropertyMapper> m_pmis;
 };
 
 }

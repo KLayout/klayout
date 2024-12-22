@@ -655,7 +655,7 @@ ShapeMarker::render (const Viewport &vp, ViewObjectCanvas &canvas)
         }
       }
       r.draw (m_shape, t, fill, contour, vertex, text);
-      r.draw_propstring (m_shape, &ly->properties_repository (), text, t);
+      r.draw_propstring (m_shape, text, t);
     }
   } else {
     db::CplxTrans t = vp.trans () * trans ();
@@ -670,7 +670,7 @@ ShapeMarker::render (const Viewport &vp, ViewObjectCanvas &canvas)
       }
     }
     r.draw (m_shape, t, fill, contour, vertex, text);
-    r.draw_propstring (m_shape, &ly->properties_repository (), text, t);
+    r.draw_propstring (m_shape, text, t);
   }
 }
 

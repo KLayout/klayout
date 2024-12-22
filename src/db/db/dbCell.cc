@@ -801,10 +801,9 @@ Cell::copy_shapes (const db::Cell &source_cell, const db::LayerMapping &layer_ma
   }
 
   if (target_layout != source_layout) {
-    db::PropertyMapper pm (target_layout, source_layout);
     db::ICplxTrans trans (source_layout->dbu () / target_layout->dbu ());
     for (std::map<unsigned int, unsigned int>::const_iterator lm = layer_mapping.begin (); lm != layer_mapping.end (); ++lm) {
-      shapes (lm->second).insert_transformed (source_cell.shapes (lm->first), trans, pm);
+      shapes (lm->second).insert_transformed (source_cell.shapes (lm->first), trans);
     }
   } else {
     for (std::map<unsigned int, unsigned int>::const_iterator lm = layer_mapping.begin (); lm != layer_mapping.end (); ++lm) {
@@ -950,10 +949,9 @@ Cell::move_shapes (db::Cell &source_cell, const db::LayerMapping &layer_mapping)
   }
 
   if (target_layout != source_layout) {
-    db::PropertyMapper pm (target_layout, source_layout);
     db::ICplxTrans trans (source_layout->dbu () / target_layout->dbu ());
     for (std::map<unsigned int, unsigned int>::const_iterator lm = layer_mapping.begin (); lm != layer_mapping.end (); ++lm) {
-      shapes (lm->second).insert_transformed (source_cell.shapes (lm->first), trans, pm);
+      shapes (lm->second).insert_transformed (source_cell.shapes (lm->first), trans);
       source_cell.shapes (lm->first).clear ();
     }
   } else {
@@ -1023,7 +1021,6 @@ Cell::move_tree (db::Cell &source_cell)
     throw tl::Exception (tl::to_string (tr ("Source cell does not reside in a layout")));
   }
 
-  db::PropertyMapper pm (target_layout, source_layout);
   db::ICplxTrans trans (source_layout->dbu () / target_layout->dbu ());
 
   db::CellMapping cm;
@@ -1057,7 +1054,6 @@ Cell::move_tree_shapes (db::Cell &source_cell, const db::CellMapping &cm)
     throw tl::Exception (tl::to_string (tr ("Source cell does not reside in a layout")));
   }
 
-  db::PropertyMapper pm (target_layout, source_layout);
   db::ICplxTrans trans (source_layout->dbu () / target_layout->dbu ());
 
   db::LayerMapping lm;
@@ -1084,7 +1080,6 @@ Cell::move_tree_shapes (db::Cell &source_cell, const db::CellMapping &cm, const 
     throw tl::Exception (tl::to_string (tr ("Source cell does not reside in a layout")));
   }
 
-  db::PropertyMapper pm (target_layout, source_layout);
   db::ICplxTrans trans (source_layout->dbu () / target_layout->dbu ());
 
   std::vector <db::cell_index_type> source_cells;

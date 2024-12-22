@@ -139,19 +139,20 @@ TextWriter::endl_str ()
 }
 
 void
-TextWriter::write_props (const db::Layout &layout, size_t prop_id)
+TextWriter::write_props (const db::Layout & /*layout*/, size_t prop_id)
 {
   *this << "set props {" << endl_str ();
 
-  const db::PropertiesRepository::properties_set &props = layout.properties_repository ().properties (prop_id);
-  for (db::PropertiesRepository::properties_set::const_iterator p = props.begin (); p != props.end (); ++p) {
+  const db::PropertiesSet &props = db::properties (prop_id);
+  for (db::PropertiesSet::iterator p = props.begin (); p != props.end (); ++p) {
 
-    const tl::Variant &name = layout.properties_repository ().prop_name (p->first);
+    const tl::Variant &name = db::property_name (p->first);
+    const tl::Variant &value = db::property_value (p->second);
 
     if (name.is_long () || name.is_ulong ()) {
-      *this << "  {" << int (name.to_long ()) << " {" << p->second.to_string () << "}}" << endl_str ();
+      *this << "  {" << int (name.to_long ()) << " {" << value.to_string () << "}}" << endl_str ();
     } else if (name.is_a_string ()) {
-      *this << "  {{" << name.to_string () << "} {" << p->second.to_string () << "}}" << endl_str ();
+      *this << "  {{" << name.to_string () << "} {" << value.to_string () << "}}" << endl_str ();
     }
 
   }

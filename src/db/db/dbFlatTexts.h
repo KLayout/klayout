@@ -80,8 +80,6 @@ public:
 
   virtual const db::RecursiveShapeIterator *iter () const;
   virtual void apply_property_translator (const db::PropertiesTranslator &pt);
-  virtual db::PropertiesRepository *properties_repository ();
-  virtual const db::PropertiesRepository *properties_repository () const;
 
   virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const;
   virtual void insert_into_as_polygons (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer, db::Coord enl) const;
@@ -123,7 +121,6 @@ private:
   FlatTexts &operator= (const FlatTexts &other);
 
   mutable tl::copy_on_write_ptr<db::Shapes> mp_texts;
-  mutable tl::copy_on_write_ptr<db::PropertiesRepository> mp_properties_repository;
 
   template <class Trans>
   void transform_generic (const Trans &trans)

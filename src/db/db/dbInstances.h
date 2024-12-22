@@ -1465,8 +1465,7 @@ public:
   instance_type insert (const instance_type &ref)
   {
     tl::ident_map<cell_index_type> im;
-    tl::ident_map<db::properties_id_type> pm;
-    return insert (ref, im, pm);
+    return insert (ref, im);
   }
 
   /**
@@ -1480,12 +1479,11 @@ public:
    *  @param im The mapper to new cell index to use (for mapping to a different layout for example)
    *  @param pm The mapper to new cell property ID use (for mapping to a different layout for example)
    */
-  template <class IndexMap, class PropIdMap>
-  instance_type insert (const instance_type &ref, IndexMap &im, PropIdMap &pm)
+  template <class IndexMap>
+  instance_type insert (const instance_type &ref, IndexMap &im)
   {
     tl::func_delegate <IndexMap, db::cell_index_type> im_delegate (im);
-    tl::func_delegate <PropIdMap, db::properties_id_type> pm_delegate (pm);
-    return do_insert (ref, im_delegate, pm_delegate);
+    return do_insert (ref, im_delegate);
   }
 
   /** 
@@ -1937,8 +1935,7 @@ private:
   Instances (const Instances &d);
 
   instance_type do_insert (const instance_type &ref, 
-                           tl::func_delegate_base <db::cell_index_type> &im,
-                           tl::func_delegate_base <db::properties_id_type> &pm);
+                           tl::func_delegate_base <db::cell_index_type> &im);
 
   void do_clear_insts ();
 

@@ -74,8 +74,6 @@ public:
   virtual bool has_valid_texts () const;
   virtual const db::RecursiveShapeIterator *iter () const;
   virtual void apply_property_translator (const db::PropertiesTranslator &pt);
-  virtual db::PropertiesRepository *properties_repository ();
-  virtual const db::PropertiesRepository *properties_repository () const;
 
   virtual TextsDelegate *filter_in_place (const TextFilterBase &filter);
   virtual TextsDelegate *filtered (const TextFilterBase &) const;

@@ -39,7 +39,190 @@
 namespace db
 {
 
-class LayoutStateModel;
+/**
+ *  @brief Gets a name entry from the property name ID
+ */
+const tl::Variant &property_name (db::property_names_id_type id);
+
+/**
+ *  @brief Gets the property name ID from a property name
+ */
+db::property_names_id_type property_names_id (const tl::Variant &pn);
+
+/**
+ *  @brief Gets a value entry from the property value ID
+ */
+const tl::Variant &property_value (db::property_values_id_type id);
+
+/**
+ *  @brief Gets the property value ID from a property value
+ */
+db::property_values_id_type property_values_id (const tl::Variant &pv);
+
+
+/**
+ *  @brief A properties set
+ *
+ *  The properties set is
+ */
+
+class DB_PUBLIC PropertiesSet
+{
+public:
+  typedef std::multimap<db::property_names_id_type, db::property_values_id_type> map_type;
+  typedef map_type::const_iterator iterator;
+
+  /**
+   *  @brief The default constructor
+   *
+   *  This will create an empty properties set.
+   */
+  PropertiesSet ();
+
+  /**
+   *  @brief Copy constructor
+   */
+  PropertiesSet (const PropertiesSet &other);
+
+  /**
+   *  @brief Move constructor
+   */
+  PropertiesSet (const PropertiesSet &&other);
+
+  /**
+   *  @brief Assignment
+   */
+  PropertiesSet &operator= (const PropertiesSet &other);
+
+  /**
+   *  @brief Move assignment
+   */
+  PropertiesSet &operator= (const PropertiesSet &&other);
+
+  /**
+   *  @brief Equality
+   */
+  bool operator== (const PropertiesSet &other) const;
+
+  /**
+   *  @brief Inequality
+   */
+  bool operator!= (const PropertiesSet &other) const
+  {
+    return ! operator== (other);
+  }
+
+  /**
+   *  @brief Less operator
+   */
+  bool operator< (const PropertiesSet &other) const;
+
+  /**
+   *  @brief Gets a value indicating whether the properties set is empty
+   */
+  bool empty () const
+  {
+    return m_map.empty ();
+  }
+
+  /**
+   *  @brief Gets a value indicating whether the given name is contained in the set
+   */
+  bool has_value (const tl::Variant &name) const;
+
+  /**
+   *  @brief Gets the value for the given name or a nil variant if there is no value for this name
+   */
+  const tl::Variant &value (const tl::Variant &name) const;
+
+  /**
+   *  @brief operator[] as alias for "value"
+   */
+  const tl::Variant &operator[] (const tl::Variant &name) const
+  {
+    return value (name);
+  }
+
+  /**
+   *  @brief Clears the properties set
+   */
+  void clear ();
+
+  /**
+   *  @brief Deletes a value for the given name
+   */
+  void erase (const tl::Variant &name);
+
+  /**
+   *  @brief Deletes a value for the given name
+   */
+  void erase (db::property_names_id_type name_id);
+
+  /**
+   *  @brief Inserts a value for the given name
+   */
+  void insert (const tl::Variant &name, const tl::Variant &value);
+
+  /**
+   *  @brief Inserts a value for the given name ID
+   */
+  void insert (db::property_names_id_type name_id, const tl::Variant &value);
+
+  /**
+   *  @brief Gets the properties as a map
+   */
+  std::multimap<tl::Variant, tl::Variant> to_map () const;
+
+  /**
+   *  @brief Gets the properties as a dict variant
+   */
+  tl::Variant to_dict_var () const;
+
+  /**
+   *  @brief Gets the properties as an array of pairs
+   *
+   *  In contrast to the dict version, this variant allows delivery of
+   *  property set with multiple values for the same name.
+   */
+  tl::Variant to_list_var () const;
+
+  /**
+   *  @brief Iterator (begin)
+   *
+   *  This iterator delivers key/value pairs in the ID form.
+   *  The order is basically undefined.
+   */
+  iterator begin () const
+  {
+    return m_map.begin ();
+  }
+
+  /**
+   *  @brief Iterator (end)
+   */
+  iterator end () const
+  {
+    return m_map.end ();
+  }
+
+private:
+  map_type m_map;
+
+  friend class PropertiesRepository;
+
+  void change_name (property_names_id_type from, property_names_id_type to);
+  void change_value (property_values_id_type from, property_values_id_type to);
+};
+
+/**
+ *  @brief Gets the properties set from a properties set ID
+ */
+const PropertiesSet &properties (db::properties_id_type id);
+
+/**
+ *  @brief Gets the properties ID from a properties set
+ */
+db::properties_id_type properties_id (const PropertiesSet &ps);
 
 /**
  *  @brief The properties repository
@@ -53,76 +236,73 @@ class LayoutStateModel;
 class DB_PUBLIC PropertiesRepository
 {
 public:
-  typedef std::multimap <property_names_id_type, tl::Variant> properties_set;
-  typedef std::map <properties_id_type, properties_set> properties_map;
-  typedef std::map <properties_id_type, properties_set>::const_iterator iterator;
-  typedef std::map <properties_id_type, properties_set>::iterator non_const_iterator;
-  typedef std::pair <property_names_id_type, tl::Variant> name_value_pair;
-  typedef std::vector <properties_id_type> properties_id_vector;
+  typedef std::set <properties_id_type> properties_id_set;
 
   /**
-   *  @brief Default constructor
+   *  @brief Gets the singleton instance of the properties repository
    */
-  PropertiesRepository ();
+  static PropertiesRepository &instance ();
 
   /**
-   *  @brief Copy constructor
-   */
-  PropertiesRepository (const PropertiesRepository &d);
-
-  /**
-   *  @brief Assignment
-   */
-  PropertiesRepository &operator= (const PropertiesRepository &d);
-
-  /**
-   *  @brief Associate a name with a name Id
+   *  @brief Gets the name ID for a property name
    * 
-   *  A name of a property can be either a integer or a string as specified
-   *  with the tl::Variant variant. In principle it could even be a list or void.
-   *  This method will assign a new Id to the given name if required and
-   *  return the Id associated with it.
+   *  This method will assign a new ID to the given name if required and
+   *  return the ID associated with it.
    */
   property_names_id_type prop_name_id (const tl::Variant &name);
   
   /**
-   *  @brief Change the name associated with a given name Id to another name
+   *  @brief Gets the value ID for a property value
+   *
+   *  This method will assign a new ID to the given value if required and
+   *  return the ID associated with it.
+   */
+  property_names_id_type prop_value_id (const tl::Variant &name);
+
+  /**
+   *  @brief Change the name associated with a given name ID to another name
    * 
-   *  All properties with the given name Id will get the new name. This method is
+   *  All properties with the given name ID will get the new name. This method is
    *  particular useful for the OASIS reader, which may associate a name with an Id 
-   *  at a late stage. The new name must not be associated with an Id already.
-   *  The old name will stay associated with the Id.
+   *  at a late stage. The ID must have been obtained by "allocate_name".
+   *
+   *  This method will change the definition of property sets. The ID of the
+   *  sets will stay the same. Basically this can lead to a situation where
+   *  identical property sets have different IDs. In other words, ID identity
+   *  is a guarantee for property set identity, but different IDs do not
+   *  mean different property sets.
+   *
+   *  The original ID is still valid, but not associated with the new name.
    */
   void change_name (property_names_id_type id, const tl::Variant &new_name);
   
   /**
-   *  @brief Change the properties for a given Id
-   * 
-   *  This method will change the properties for a given Id. The properties
-   *  set for Id 0 cannot be changed.
+   *  @brief Change the name associated with a given name Id to another name
    *
-   *  This method is intended for special applications, i.e. the OASIS reader
-   *  in forware references mode.
+   *  See "change_name" for more details. This method will change the definition
+   *  of the value behind ID to the new value. The ID must have been obtained
+   *  through "allocate_value".
    */
-  void change_properties (properties_id_type id, const properties_set &new_props);
+  void change_value (property_values_id_type id, const tl::Variant &new_value);
 
   /**
-   *  @brief Get the id for a name 
+   *  @brief Get the ID for a name
    * 
    *  This method checks whether the given name is present as a name and returns the 
-   *  id in the second member of the pair. The first member is true, if the name is
+   *  ID in the second member of the pair. The first member is true, if the name is
    *  present.
    */
   std::pair<bool, property_names_id_type> get_id_of_name (const tl::Variant &name) const;
   
   /**
-   *  @brief Associate a name with a name Id
-   * 
-   *  This method will return the name associated with the given Id.
-   *  It will assert if the Id is not a valid one.
+   *  @brief Get the ID for a value
+   *
+   *  This method checks whether the given name is present as a name and returns the
+   *  ID in the second member of the pair. The first member is true, if the name is
+   *  present.
    */
-  const tl::Variant &prop_name (property_names_id_type id) const;
-  
+  std::pair<bool, property_values_id_type> get_id_of_value (const tl::Variant &value) const;
+
   /**
    *  @brief Associate a properties set with a properties Id
    * 
@@ -130,7 +310,7 @@ public:
    *  return the Id associated with it.
    *  An empty property set is associated with property Id 0.
    */
-  properties_id_type properties_id (const properties_set &props);
+  properties_id_type properties_id (const PropertiesSet &props);
   
   /**
    *  @brief Associate a properties set with a properties Id
@@ -138,61 +318,56 @@ public:
    *  This method will return the properties set associated with the given Id.
    *  Id 0 always delivers an empty property set.
    */
-  const properties_set &properties (properties_id_type id) const;
+  const PropertiesSet &properties (properties_id_type id) const;
 
   /**
-   *  @brief Determine if the given Id is a valid one
+   *  @brief Determine if the given ID is a valid properties ID
+   *
+   *  Caution: this operation is slow!
    */
   bool is_valid_properties_id (properties_id_type id) const;
 
   /**
-   *  @brief Iterate over Id/Properties sets (non-const)
+   *  @brief Determine if the given ID is a valid name ID
+   *
+   *  Caution: this operation is slow!
    */
-  non_const_iterator begin_non_const () 
-  {
-    return m_properties_by_id.begin ();
-  }
+  bool is_valid_property_names_id (property_names_id_type id) const;
 
   /**
-   *  @brief Iterate over Id/Properties sets: end iterator (non-const)
+   *  @brief Determine if the given ID is a valid value ID
+   *
+   *  Caution: this operation is slow!
    */
-  non_const_iterator end_non_const () 
-  {
-    return m_properties_by_id.end ();
-  }
+  bool is_valid_property_values_id (property_values_id_type id) const;
 
   /**
-   *  @brief Iterate over Id/Properties sets
+   *  @brief Allocates a new properties ID
+   *
+   *  This method is intended for filling the properties later, i.e. with "change_properties".
+   *  Only after using "change_properties", the properties ID will be found when
+   *  looking it up.
    */
-  iterator begin () const
-  {
-    return m_properties_by_id.begin ();
-  }
+  properties_id_type allocate_properties ();
 
   /**
-   *  @brief Iterate over Id/Properties sets: end iterator
+   *  @brief Allocates a new properties name ID
+   *
+   *  This method is intended for filling the properties later, i.e. with "change_name".
+   *  Only after using "change_name", a property names ID will be found when
+   *  looking up the name.
    */
-  iterator end () const
-  {
-    return m_properties_by_id.end ();
-  }
+  property_names_id_type allocate_property_names_id ();
 
   /**
-   *  @brief Obtain the first properties id in the repository
+   *  @brief Allocates a new properties value ID
+   *
+   *  This method is intended for filling the properties later, i.e. with "change_value".
+   *  Only after using "change_value", the property value ID will be found when
+   *  looking up the value.
    */
-  properties_id_type begin_id () 
-  {
-    return 0;
-  }
-  
-  /**
-   *  @brief Obtain the last properties id in the repository plus 1
-   */
-  properties_id_type end_id () 
-  {
-    return m_properties_by_id.size ();
-  }
-  
+  property_names_id_type allocate_property_values_id ();
+
   /**
    *  @brief Lookup a table of properties id's by a name value pair
    *
@@ -200,19 +375,7 @@ public:
    *  of property sets that contain the given name/value pair. This method
    *  is intended for use with the properties_id resolution algorithm.
    */
-  const properties_id_vector &properties_ids_by_name_value (const name_value_pair &nv) const;
-
-  /**
-   *  @brief Translate a properties id from one repository to this one
-   *
-   *  Take the given properties set from one repository and map it to this one.
-   *  Inserts the properties set into this repository if necessary.
-   *
-   *  @param rep The source repository
-   *  @param id The source properties id
-   *  @return id The id in *this
-   */
-  properties_id_type translate (const PropertiesRepository &rep, properties_id_type id);
+  properties_id_set properties_ids_by_name_value (db::property_names_id_type name, db::property_values_id_type value) const;
 
   /**
    *  @brief Collect memory statistics
@@ -223,27 +386,56 @@ public:
       stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
     }
 
-    db::mem_stat (stat, purpose, cat, m_propnames_by_id, true, parent);
-    db::mem_stat (stat, purpose, cat, m_propname_ids_by_name, true, parent);
-    db::mem_stat (stat, purpose, cat, m_properties_by_id, true, parent);
-    db::mem_stat (stat, purpose, cat, m_properties_ids_by_set, true, parent);
-    db::mem_stat (stat, purpose, cat, m_properties_component_table, true, parent);
+    db::mem_stat (stat, purpose, cat, m_propnames, true, parent);
+    db::mem_stat (stat, purpose, cat, m_property_names_heap, true, parent);
+    db::mem_stat (stat, purpose, cat, m_propvalues, true, parent);
+    db::mem_stat (stat, purpose, cat, m_property_values_heap, true, parent);
+    db::mem_stat (stat, purpose, cat, m_properties, true, parent);
+    db::mem_stat (stat, purpose, cat, m_properties_heap, true, parent);
+    db::mem_stat (stat, purpose, cat, m_properties_by_name_table, true, parent);
+    db::mem_stat (stat, purpose, cat, m_properties_by_value_table, true, parent);
   }
 
   /**
    *  @brief An event indicating a change in the properties IDs
+   *
+   *  @@@ That is too global! Should be an event when a prop_id is changed on a Shape etc.
    */
   tl::Event prop_ids_changed_event;
 
 private:
-  std::map <property_names_id_type, tl::Variant> m_propnames_by_id;
-  std::map <tl::Variant, property_names_id_type> m_propname_ids_by_name;
+  struct CompareNamePtrByValue
+  {
+    bool operator() (const tl::Variant *a, const tl::Variant *b) const
+    {
+      return *a < *b;
+    }
+  };
 
-  std::map <properties_id_type, properties_set> m_properties_by_id;
-  std::map <properties_set, properties_id_type> m_properties_ids_by_set;
-  std::map <name_value_pair, properties_id_vector> m_properties_component_table;
+  struct ComparePropertiesPtrByValue
+  {
+    bool operator() (const PropertiesSet *a, const PropertiesSet *b) const
+    {
+      return *a < *b;
+    }
+  };
+
+  std::set <const tl::Variant *, CompareNamePtrByValue> m_propnames;
+  std::list <tl::Variant> m_property_names_heap;
+  std::set <const tl::Variant *, CompareNamePtrByValue> m_propvalues;
+  std::list <tl::Variant> m_property_values_heap;
+  std::set <const PropertiesSet *, ComparePropertiesPtrByValue> m_properties;
+  std::list <PropertiesSet> m_properties_heap;
+
+  std::map <property_names_id_type, properties_id_set> m_properties_by_name_table;
+  std::map <property_values_id_type, properties_id_set> m_properties_by_value_table;
 
   mutable tl::Mutex m_lock;
+
+  /**
+   *  @brief Default constructor
+   */
+  PropertiesRepository ();
 };
 
 /**
@@ -342,7 +534,7 @@ public:
    *
    *  The translator delivered by this function will leave only the given keys in the properties.
    */
-  static PropertiesTranslator make_filter (db::PropertiesRepository &repo, const std::set<tl::Variant> &keys);
+  static PropertiesTranslator make_filter (const std::set<tl::Variant> &keys);
 
   /**
    *  @brief Factory: create a key mapper translator
@@ -350,7 +542,7 @@ public:
    *  The translator delivered by this function will translate the given keys to new ones
    *  and remove non-listed keys.
    */
-  static PropertiesTranslator make_key_mapper (db::PropertiesRepository &repo, const std::map<tl::Variant, tl::Variant> &keys);
+  static PropertiesTranslator make_key_mapper (const std::map<tl::Variant, tl::Variant> &keys);
 
 private:
   std::map<db::properties_id_type, db::properties_id_type> m_map;

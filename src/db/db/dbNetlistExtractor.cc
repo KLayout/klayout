@@ -65,6 +65,7 @@ build_net_name_equivalence (const db::Layout *layout, const db::Connectivity &co
 {
   std::map<std::string, std::set<size_t> > prop_by_name;
 
+#if 0 // @@@
   for (db::PropertiesRepository::iterator i = layout->properties_repository ().begin (); i != layout->properties_repository ().end (); ++i) {
     for (db::PropertiesRepository::properties_set::const_iterator p = i->second.begin (); p != i->second.end (); ++p) {
       if (p->first == net_name_id) {
@@ -77,6 +78,7 @@ build_net_name_equivalence (const db::Layout *layout, const db::Connectivity &co
       }
     }
   }
+#endif
 
   //  include pseudo-attributes for global nets to implement "join_with" for global nets
   for (size_t gid = 0; gid < conn.global_nets (); ++gid) {
@@ -113,6 +115,7 @@ build_net_name_equivalence_for_explicit_connections (const db::Layout *layout, c
 {
   std::map<std::string, std::set<size_t> > prop_by_name;
 
+#if 0 // @@@
   for (db::PropertiesRepository::iterator i = layout->properties_repository ().begin (); i != layout->properties_repository ().end (); ++i) {
     for (db::PropertiesRepository::properties_set::const_iterator p = i->second.begin (); p != i->second.end (); ++p) {
       if (p->first == net_name_id) {
@@ -123,6 +126,7 @@ build_net_name_equivalence_for_explicit_connections (const db::Layout *layout, c
       }
     }
   }
+#endif
 
   //  include pseudo-attributes for global nets to implement "join_with" for global nets
   for (size_t gid = 0; gid < conn.global_nets (); ++gid) {
@@ -171,11 +175,11 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
   //  this is how the texts are passed for annotating the net names
   m_text_annot_name_id = std::pair<bool, db::property_names_id_type> (false, 0);
   if (! dss.text_property_name ().is_nil ()) {
-    m_text_annot_name_id = mp_layout->properties_repository ().get_id_of_name (dss.text_property_name ());
+    m_text_annot_name_id = db::PropertiesRepository::instance ().get_id_of_name (dss.text_property_name ());
   }
 
-  m_terminal_annot_name_id = mp_layout->properties_repository ().get_id_of_name (db::NetlistDeviceExtractor::terminal_id_property_name ());
-  m_device_annot_name_id = mp_layout->properties_repository ().get_id_of_name (db::NetlistDeviceExtractor::device_id_property_name ());
+  m_terminal_annot_name_id = db::PropertiesRepository::instance ().get_id_of_name (db::NetlistDeviceExtractor::terminal_id_property_name ());
+  m_device_annot_name_id = db::PropertiesRepository::instance ().get_id_of_name (db::NetlistDeviceExtractor::device_id_property_name ());
 
   //  build an attribute equivalence map which lists the "attribute IDs" which are identical in terms of net names
   //  TODO: this feature is not really used as must-connect nets now are handled in the LayoutToNetlist class on netlist level.
@@ -409,12 +413,12 @@ NetlistExtractor::make_device_abstract_connections (db::DeviceAbstract *dm, conn
 
           db::properties_id_type pi = db::prop_id_from_attr (*a);
 
-          const db::PropertiesRepository::properties_set &ps = mp_layout->properties_repository ().properties (pi);
-          for (db::PropertiesRepository::properties_set::const_iterator j = ps.begin (); j != ps.end (); ++j) {
+          const db::PropertiesSet &ps = db::properties (pi);
+          for (db::PropertiesSet::iterator j = ps.begin (); j != ps.end (); ++j) {
 
             if (j->first == m_terminal_annot_name_id.second) {
 
-              size_t terminal_id = j->second.to<size_t> ();
+              size_t terminal_id = db::property_value (j->second).to<size_t> ();
               if (*id != dc->id ()) {
                 tl::warn << tl::sprintf (tl::to_string (tr ("Ignoring soft connection at device terminal %s for device %s")), dm->device_class ()->terminal_definition (terminal_id)->name (), dm->device_class ()->name ());
                 join = true;
@@ -462,11 +466,11 @@ void NetlistExtractor::collect_labels (const connected_clusters_type &clusters,
 
       db::properties_id_type pi = db::prop_id_from_attr (*a);
 
-      const db::PropertiesRepository::properties_set &ps = mp_layout->properties_repository ().properties (pi);
-      for (db::PropertiesRepository::properties_set::const_iterator j = ps.begin (); j != ps.end (); ++j) {
+      const db::PropertiesSet &ps = db::properties (pi);
+      for (db::PropertiesSet::iterator j = ps.begin (); j != ps.end (); ++j) {
 
         if (m_text_annot_name_id.first && j->first == m_text_annot_name_id.second) {
-          net_names.insert (j->second.to_string ());
+          net_names.insert (db::property_value (j->second).to_string ());
         }
 
       }
@@ -486,8 +490,8 @@ bool NetlistExtractor::instance_is_device (db::properties_id_type prop_id) const
     return false;
   }
 
-  const db::PropertiesRepository::properties_set &ps = mp_layout->properties_repository ().properties (prop_id);
-  for (db::PropertiesRepository::properties_set::const_iterator j = ps.begin (); j != ps.end (); ++j) {
+  const db::PropertiesSet &ps = db::properties (prop_id);
+  for (db::PropertiesSet::iterator j = ps.begin (); j != ps.end (); ++j) {
     if (j->first == m_device_annot_name_id.second) {
       return true;
     }
@@ -502,10 +506,10 @@ db::Device *NetlistExtractor::device_from_instance (db::properties_id_type prop_
     return 0;
   }
 
-  const db::PropertiesRepository::properties_set &ps = mp_layout->properties_repository ().properties (prop_id);
-  for (db::PropertiesRepository::properties_set::const_iterator j = ps.begin (); j != ps.end (); ++j) {
+  const db::PropertiesSet &ps = db::properties (prop_id);
+  for (db::PropertiesSet::iterator j = ps.begin (); j != ps.end (); ++j) {
     if (j->first == m_device_annot_name_id.second) {
-      return circuit->device_by_id (j->second.to<size_t> ());
+      return circuit->device_by_id (db::property_value (j->second).to<size_t> ());
     }
   }
 
@@ -541,12 +545,12 @@ void NetlistExtractor::connect_devices (db::Circuit *circuit,
 
       db::properties_id_type pi = db::prop_id_from_attr (*a);
 
-      const db::PropertiesRepository::properties_set &ps = mp_layout->properties_repository ().properties (pi);
-      for (db::PropertiesRepository::properties_set::const_iterator j = ps.begin (); j != ps.end (); ++j) {
+      const db::PropertiesSet &ps = db::properties (pi);
+      for (db::PropertiesSet::iterator j = ps.begin (); j != ps.end (); ++j) {
 
         if (m_terminal_annot_name_id.first && j->first == m_terminal_annot_name_id.second) {
 
-          size_t tid = j->second.to<size_t> ();
+          size_t tid = db::property_value (j->second).to<size_t> ();
           device->connect_terminal (tid, net);
 
         }

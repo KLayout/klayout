@@ -465,16 +465,6 @@ void DeepEdges::apply_property_translator (const db::PropertiesTranslator &pt)
   m_merged_edges = db::DeepLayer ();
 }
 
-db::PropertiesRepository *DeepEdges::properties_repository ()
-{
-  return &deep_layer ().layout ().properties_repository ();
-}
-
-const db::PropertiesRepository *DeepEdges::properties_repository () const
-{
-  return &deep_layer ().layout ().properties_repository ();
-}
-
 bool DeepEdges::equals (const Edges &other) const
 {
   const DeepEdges *other_delegate = dynamic_cast<const DeepEdges *> (other.delegate ());

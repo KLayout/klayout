@@ -183,7 +183,7 @@ public:
     begin_polygon_differences_event ();
   }
 
-  virtual void detailed_diff (const db::PropertiesRepository & /*pr*/, const std::vector <std::pair <db::Polygon, db::properties_id_type> > &a, const std::vector <std::pair <db::Polygon, db::properties_id_type> > &b)
+  virtual void detailed_diff (const std::vector <std::pair <db::Polygon, db::properties_id_type> > &a, const std::vector <std::pair <db::Polygon, db::properties_id_type> > &b)
   {
     for (std::vector <std::pair <db::Polygon, db::properties_id_type> >::const_iterator i = a.begin (); i != a.end (); ++i) {
       polygon_in_a_only_event (i->first, i->second);
@@ -203,7 +203,7 @@ public:
     begin_path_differences_event ();
   }
 
-  virtual void detailed_diff (const db::PropertiesRepository & /*pr*/, const std::vector <std::pair <db::Path, db::properties_id_type> > &a, const std::vector <std::pair <db::Path, db::properties_id_type> > &b)
+  virtual void detailed_diff (const std::vector <std::pair <db::Path, db::properties_id_type> > &a, const std::vector <std::pair <db::Path, db::properties_id_type> > &b)
   {
     for (std::vector <std::pair <db::Path, db::properties_id_type> >::const_iterator i = a.begin (); i != a.end (); ++i) {
       path_in_a_only_event (i->first, i->second);
@@ -223,7 +223,7 @@ public:
     begin_box_differences_event ();
   }
 
-  virtual void detailed_diff (const db::PropertiesRepository & /*pr*/, const std::vector <std::pair <db::Box, db::properties_id_type> > &a, const std::vector <std::pair <db::Box, db::properties_id_type> > &b)
+  virtual void detailed_diff (const std::vector <std::pair <db::Box, db::properties_id_type> > &a, const std::vector <std::pair <db::Box, db::properties_id_type> > &b)
   {
     for (std::vector <std::pair <db::Box, db::properties_id_type> >::const_iterator i = a.begin (); i != a.end (); ++i) {
       box_in_a_only_event (i->first, i->second);
@@ -243,7 +243,7 @@ public:
     begin_edge_differences_event ();
   }
 
-  virtual void detailed_diff (const db::PropertiesRepository & /*pr*/, const std::vector <std::pair <db::Edge, db::properties_id_type> > &a, const std::vector <std::pair <db::Edge, db::properties_id_type> > &b)
+  virtual void detailed_diff (const std::vector <std::pair <db::Edge, db::properties_id_type> > &a, const std::vector <std::pair <db::Edge, db::properties_id_type> > &b)
   {
     for (std::vector <std::pair <db::Edge, db::properties_id_type> >::const_iterator i = a.begin (); i != a.end (); ++i) {
       edge_in_a_only_event (i->first, i->second);
@@ -263,7 +263,7 @@ public:
     begin_edge_pair_differences_event ();
   }
 
-  virtual void detailed_diff (const db::PropertiesRepository & /*pr*/, const std::vector <std::pair <db::EdgePair, db::properties_id_type> > &a, const std::vector <std::pair <db::EdgePair, db::properties_id_type> > &b)
+  virtual void detailed_diff (const std::vector <std::pair <db::EdgePair, db::properties_id_type> > &a, const std::vector <std::pair <db::EdgePair, db::properties_id_type> > &b)
   {
     for (std::vector <std::pair <db::EdgePair, db::properties_id_type> >::const_iterator i = a.begin (); i != a.end (); ++i) {
       edge_pair_in_a_only_event (i->first, i->second);
@@ -283,7 +283,7 @@ public:
     begin_text_differences_event ();
   }
 
-  virtual void detailed_diff (const db::PropertiesRepository & /*pr*/, const std::vector <std::pair <db::Text, db::properties_id_type> > &a, const std::vector <std::pair <db::Text, db::properties_id_type> > &b)
+  virtual void detailed_diff (const std::vector <std::pair <db::Text, db::properties_id_type> > &a, const std::vector <std::pair <db::Text, db::properties_id_type> > &b)
   {
     for (std::vector <std::pair <db::Text, db::properties_id_type> >::const_iterator i = a.begin (); i != a.end (); ++i) {
       text_in_a_only_event (i->first, i->second);

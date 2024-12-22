@@ -307,83 +307,40 @@ static void delete_layout_property (db::Layout *l, const tl::Variant &key)
   //  TODO: check if is editable
 
   db::properties_id_type id = l->prop_id ();
-  if (id == 0) {
-    return;
-  }
 
-  std::pair<bool, db::property_names_id_type> nid = l->properties_repository ().get_id_of_name (key);
-  if (! nid.first) {
-    return;
-  }
-
-  db::PropertiesRepository::properties_set props = l->properties_repository ().properties (id);
-  db::PropertiesRepository::properties_set::iterator p = props.find (nid.second);
-  if (p != props.end ()) {
-    props.erase (p);
-  }
-
-  l->prop_id (l->properties_repository ().properties_id (props));
+  db::PropertiesSet props = db::properties (id);
+  props.erase (key);
+  l->prop_id (db::properties_id (props));
 }
 
 static void set_layout_property (db::Layout *l, const tl::Variant &key, const tl::Variant &value)
 {
-  //  TODO: check if is editable
-
   db::properties_id_type id = l->prop_id ();
 
-  db::property_names_id_type nid = l->properties_repository ().prop_name_id (key);
-
-  db::PropertiesRepository::properties_set props = l->properties_repository ().properties (id);
-  db::PropertiesRepository::properties_set::iterator p = props.find (nid);
-  if (p != props.end ()) {
-    p->second = value;
-  } else {
-    props.insert (std::make_pair (nid, value));
-  }
-
-  l->prop_id (l->properties_repository ().properties_id (props));
+  db::PropertiesSet props = db::properties (id);
+  props.erase (key);
+  props.insert (key, value);
+  l->prop_id (db::properties_id (props));
 }
 
 static tl::Variant get_layout_property (const db::Layout *l, const tl::Variant &key)
 {
-  //  TODO: check if is editable
-  
   db::properties_id_type id = l->prop_id ();
-  if (id == 0) {
-    return tl::Variant ();
-  }
 
-  std::pair<bool, db::property_names_id_type> nid = l->properties_repository ().get_id_of_name (key);
-  if (! nid.first) {
-    return tl::Variant ();
-  }
-
-  const db::PropertiesRepository::properties_set &props = l->properties_repository ().properties (id);
-  db::PropertiesRepository::properties_set::const_iterator p = props.find (nid.second);
-  if (p != props.end ()) {
-    return p->second;
-  } else {
-    return tl::Variant ();
-  }
+  const db::PropertiesSet &props = db::properties (id);
+  return props.value (key);
 }
 
-static tl::Variant get_properties_hash (const db::Layout *layout, db::properties_id_type id)
+//  @@@ should not be needed
+static tl::Variant get_properties_hash (const db::Layout * /*layout*/, db::properties_id_type id)
 {
-  if (id == 0) {
-    return tl::Variant::empty_array ();
-  }
-
-  tl::Variant res = tl::Variant::empty_array ();
-  const db::PropertiesRepository::properties_set &props = layout->properties_repository ().properties (id);
-  for (auto i = props.begin (); i != props.end (); ++i) {
-    res.insert (layout->properties_repository ().prop_name (i->first), i->second);
-  }
-  return res;
+  return db::properties (id).to_dict_var ();
 }
 
 static tl::Variant get_layout_properties (const db::Layout *layout)
 {
-  return get_properties_hash (layout, layout->prop_id ());
+  const db::PropertiesSet &props = db::properties (layout->prop_id ());
+  return props.to_dict_var ();
 }
 
 static db::cell_index_type cell_by_name (db::Layout *l, const char *name)
@@ -608,52 +565,37 @@ static std::vector<db::LayerProperties> layer_infos (const db::Layout *l)
   return layers;
 }
 
-static db::properties_id_type properties_id (db::Layout *layout, const std::vector<tl::Variant> &properties)
+//  @@@ Should be static
+static db::properties_id_type properties_id (db::Layout * /*layout*/, const std::vector<tl::Variant> &properties)
 {
-  db::PropertiesRepository::properties_set props;
+  db::PropertiesSet props;
 
   for (std::vector<tl::Variant>::const_iterator v = properties.begin (); v != properties.end (); ++v) {
     if (! v->is_list () || v->get_list ().size () != 2) {
       throw tl::Exception (tl::to_string (tr ("Expected a list of pairs of variants (found at least one that is not a pair)")));
     }
-    db::property_names_id_type name_id = layout->properties_repository ().prop_name_id (v->get_list ()[0]);
-    props.insert (std::make_pair (name_id, v->get_list () [1]));
+    props.insert (v->get_list ()[0], v->get_list () [1]);
   }
 
-  return layout->properties_repository ().properties_id (props);
+  return db::properties_id (props);
 }
 
-static db::properties_id_type properties_id_from_hash (db::Layout *layout, const std::map<tl::Variant, tl::Variant> &properties)
+//  @@@ Should be static
+static db::properties_id_type properties_id_from_hash (db::Layout * /*layout*/, const std::map<tl::Variant, tl::Variant> &properties)
 {
-  db::PropertiesRepository::properties_set props;
+  db::PropertiesSet props;
 
   for (std::map<tl::Variant, tl::Variant>::const_iterator v = properties.begin (); v != properties.end (); ++v) {
-    db::property_names_id_type name_id = layout->properties_repository ().prop_name_id (v->first);
-    props.insert (std::make_pair (name_id, v->second));
+    props.insert (v->first, v->second);
   }
 
-  return layout->properties_repository ().properties_id (props);
+  return db::properties_id (props);
 }
 
-static std::vector<tl::Variant> properties (const db::Layout *layout, db::properties_id_type id)
+//  @@@ Should be static
+static tl::Variant properties (const db::Layout * /*layout*/, db::properties_id_type id)
 {
-  std::vector<tl::Variant> ret;
-
-  if (layout->properties_repository ().is_valid_properties_id (id)) {
-
-    const db::PropertiesRepository::properties_set &props = layout->properties_repository ().properties (id);
-    ret.reserve (props.size ());
-
-    for (db::PropertiesRepository::properties_set::const_iterator p = props.begin (); p != props.end (); ++p) {
-      ret.push_back (tl::Variant::empty_list ());
-      ret.back ().get_list ().reserve (2);
-      ret.back ().get_list ().push_back (layout->properties_repository ().prop_name (p->first));
-      ret.back ().get_list ().push_back (p->second);
-    }
-
-  }
-
-  return ret;
+  return db::properties (id).to_list_var ();
 }
 
 static void 

@@ -350,7 +350,7 @@ public:
    *  This method draws the properties if "draw_properties" is set to true and/or the 
    *  "description" property when "draw_description_property" is set to true.
    */
-  void draw_propstring (const db::Shape &shape, const db::PropertiesRepository *prep, lay::CanvasPlane *text, const db::CplxTrans &trans);
+  void draw_propstring (const db::Shape &shape, lay::CanvasPlane *text, const db::CplxTrans &trans);
 
   /**
    *  @brief Draw a properties string at the given position
@@ -358,8 +358,7 @@ public:
    *  The transformation is not used to transform the point (it must be given in micron units
    *  already) but to compute the position of the text, given the text height.
    */
-  void draw_propstring (db::properties_id_type id, 
-                        const db::PropertiesRepository *prep, const db::DPoint &pref, 
+  void draw_propstring (db::properties_id_type id, const db::DPoint &pref,
                         lay::CanvasPlane *text, const db::CplxTrans &trans);
 
   /**
@@ -368,8 +367,7 @@ public:
    *  The transformation is not used to transform the point (it must be given in micron units
    *  already) but to compute the position of the text, given the text height.
    */
-  void draw_description_propstring (db::properties_id_type id, 
-                                    const db::PropertiesRepository *prep, const db::DPoint &pref, 
+  void draw_description_propstring (db::properties_id_type id, const db::DPoint &pref,
                                     lay::CanvasPlane *text, const db::CplxTrans &trans);
 
   /**

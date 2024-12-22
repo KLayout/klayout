@@ -81,8 +81,6 @@ public:
   virtual DeepShapeCollectionDelegateBase *deep () { return 0; }
 
   virtual void apply_property_translator (const db::PropertiesTranslator & /*pt*/) = 0;
-  virtual db::PropertiesRepository *properties_repository () = 0;
-  virtual const db::PropertiesRepository *properties_repository () const = 0;
 
   void remove_properties (bool remove = true)
   {
@@ -113,25 +111,6 @@ public:
    *  delivered by "properties_repository".
    */
   void apply_property_translator (const db::PropertiesTranslator &pt);
-
-  /**
-   *  @brief Gets the property repository
-   *
-   *  Use this object to decode and encode property IDs.
-   */
-  db::PropertiesRepository &properties_repository ();
-
-  /**
-   *  @brief Gets the property repository (const version)
-   *
-   *  Use this object to decode property IDs.
-   */
-  const db::PropertiesRepository &properties_repository () const;
-
-  /**
-   *  @brief Gets a value indicating whether a properties repository is available
-   */
-  bool has_properties_repository () const;
 };
 
 }

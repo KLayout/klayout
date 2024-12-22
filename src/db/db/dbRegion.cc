@@ -459,7 +459,7 @@ static void fill_texts (const Iter &iter, const std::string &pat, bool pattern, 
     layout = &org_deep->deep_layer ().layout ();
     const db::DeepShapeStore *store = org_deep->deep_layer ().store ();
     if (! store->text_property_name ().is_nil ()) {
-      text_annot_name_id = layout->properties_repository ().get_id_of_name (store->text_property_name ());
+      text_annot_name_id = db::PropertiesRepository::instance ().get_id_of_name (store->text_property_name ());
     }
   }
 
@@ -487,11 +487,11 @@ static void fill_texts (const Iter &iter, const std::string &pat, bool pattern, 
     } else if (layout && text_annot_name_id.first && si->prop_id () > 0) {
 
       //  a text marker
-      const db::PropertiesRepository::properties_set &ps = layout->properties_repository ().properties (si->prop_id ());
+      const db::PropertiesSet &ps = db::properties (si->prop_id ());
 
-      for (db::PropertiesRepository::properties_set::const_iterator j = ps.begin (); j != ps.end () && ! is_text; ++j) {
+      for (db::PropertiesSet::iterator j = ps.begin (); j != ps.end () && ! is_text; ++j) {
         if (j->first == text_annot_name_id.second) {
-          text_string = j->second.to_string ();
+          text_string = db::property_value (j->second).to_string ();
           is_text = true;
         }
       }
@@ -518,7 +518,7 @@ public:
       mp_layout = & org_deep->deep_layer ().layout ();
       const db::DeepShapeStore *store = org_deep->deep_layer ().store ();
       if (! store->text_property_name ().is_nil ()) {
-        m_text_annot_name_id = mp_layout->properties_repository ().get_id_of_name (store->text_property_name ());
+        m_text_annot_name_id = db::PropertiesRepository::instance ().get_id_of_name (store->text_property_name ());
       }
     }
 
@@ -545,11 +545,11 @@ public:
     } else if (mp_layout && m_text_annot_name_id.first && shape.prop_id () > 0) {
 
       //  a text marker
-      const db::PropertiesRepository::properties_set &ps = mp_layout->properties_repository ().properties (shape.prop_id ());
+      const db::PropertiesSet &ps = db::properties (shape.prop_id ());
 
-      for (db::PropertiesRepository::properties_set::const_iterator j = ps.begin (); j != ps.end () && ! is_text; ++j) {
+      for (db::PropertiesSet::iterator j = ps.begin (); j != ps.end () && ! is_text; ++j) {
         if (j->first == m_text_annot_name_id.second) {
-          text_string = j->second.to_string ();
+          text_string = db::property_value (j->second).to_string ();
           is_text = true;
         }
       }

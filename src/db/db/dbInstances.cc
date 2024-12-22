@@ -1651,8 +1651,7 @@ Instances::redo (db::Op *op)
 
 Instances::instance_type 
 Instances::do_insert (const Instances::instance_type &ref, 
-                      tl::func_delegate_base <db::cell_index_type> &im,
-                      tl::func_delegate_base <db::properties_id_type> &pm)
+                      tl::func_delegate_base <db::cell_index_type> &im)
 {
   if (ref.instances () == this) {
 
@@ -1667,7 +1666,7 @@ Instances::do_insert (const Instances::instance_type &ref,
 
       cell_inst_wp_array_type inst_wp = *ref.basic_ptr (cell_inst_wp_array_type::tag ());
       inst_wp.object () = cell_inst_type (im (ref.cell_index ()));
-      inst_wp.properties_id (pm (ref.prop_id ()));
+      inst_wp.properties_id (ref.prop_id ());
 
       return insert (inst_wp);
 
@@ -1687,7 +1686,7 @@ Instances::do_insert (const Instances::instance_type &ref,
       cell_inst_array_type inst (*ref.basic_ptr (cell_inst_wp_array_type::tag ()), layout () ? &layout ()->array_repository () : 0);
       inst.object () = cell_inst_type (im (ref.cell_index ()));
 
-      return insert (cell_inst_wp_array_type (inst, pm (ref.prop_id ())));
+      return insert (cell_inst_wp_array_type (inst, ref.prop_id ()));
 
     }
 

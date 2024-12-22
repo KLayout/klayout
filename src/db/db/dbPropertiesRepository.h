@@ -29,6 +29,7 @@
 #include "dbMemStatistics.h"
 
 #include "tlVariant.h"
+#include "tlThreads.h"
 
 #include <vector>
 #include <string>
@@ -237,6 +238,7 @@ private:
   std::map <name_value_pair, properties_id_vector> m_properties_component_table;
 
   db::LayoutStateModel *mp_state_model;
+  mutable tl::Mutex m_lock;
 };
 
 /**

@@ -64,6 +64,8 @@ PropertiesRepository::operator= (const PropertiesRepository &d)
 std::pair<bool, property_names_id_type>
 PropertiesRepository::get_id_of_name (const tl::Variant &name) const
 {
+  tl::MutexLocker locker (&m_lock);
+
   std::map <tl::Variant, property_names_id_type>::const_iterator pi = m_propname_ids_by_name.find (name);
   if (pi == m_propname_ids_by_name.end ()) {
     return std::make_pair (false, property_names_id_type (0));
@@ -75,6 +77,8 @@ PropertiesRepository::get_id_of_name (const tl::Variant &name) const
 property_names_id_type 
 PropertiesRepository::prop_name_id (const tl::Variant &name)
 {
+  tl::MutexLocker locker (&m_lock);
+
   std::map <tl::Variant, property_names_id_type>::const_iterator pi = m_propname_ids_by_name.find (name);
   if (pi == m_propname_ids_by_name.end ()) {
     property_names_id_type id = m_propnames_by_id.size ();
@@ -89,6 +93,8 @@ PropertiesRepository::prop_name_id (const tl::Variant &name)
 void 
 PropertiesRepository::change_properties (property_names_id_type id, const properties_set &new_props)
 {
+  tl_assert (id != 0);
+
   //  NOTE: change_properties MAY put the property map into a state where there is
   //  more than one property ID per set. For example, 1 and 5 may be valid property
   //  ids for the same set. "properties(1)" and "properties(5)" returns the same
@@ -96,45 +102,57 @@ PropertiesRepository::change_properties (property_names_id_type id, const proper
 
   const properties_set &old_props = properties (id);
 
-  std::map <properties_set, properties_id_type>::const_iterator pi = m_properties_ids_by_set.find (old_props);
-  if (pi != m_properties_ids_by_set.end ()) {
+  bool changed = false;
 
-    //  erase the id from the component table
-    for (properties_set::const_iterator nv = old_props.begin (); nv != old_props.end (); ++nv) {
-      if (m_properties_component_table.find (*nv) != m_properties_component_table.end ()) {
-        properties_id_vector &v = m_properties_component_table [*nv];
-        for (size_t i = 0; i < v.size (); ) {
-          if (v[i] == id) {
-            v.erase (v.begin () + i);
-          } else {
-            ++i;
+  {
+    tl::MutexLocker locker (&m_lock);
+
+    std::map <properties_set, properties_id_type>::const_iterator pi = m_properties_ids_by_set.find (old_props);
+    if (pi != m_properties_ids_by_set.end ()) {
+
+      //  erase the id from the component table
+      for (properties_set::const_iterator nv = old_props.begin (); nv != old_props.end (); ++nv) {
+        if (m_properties_component_table.find (*nv) != m_properties_component_table.end ()) {
+          properties_id_vector &v = m_properties_component_table [*nv];
+          for (size_t i = 0; i < v.size (); ) {
+            if (v[i] == id) {
+              v.erase (v.begin () + i);
+            } else {
+              ++i;
+            }
           }
         }
       }
+
+      //  and insert again
+      m_properties_ids_by_set.erase (old_props);
+      m_properties_ids_by_set.insert (std::make_pair (new_props, id));
+
+      m_properties_by_id [id] = new_props;
+
+      for (properties_set::const_iterator nv = new_props.begin (); nv != new_props.end (); ++nv) {
+        m_properties_component_table.insert (std::make_pair (*nv, properties_id_vector ())).first->second.push_back (id);
+      }
+
+      changed = true;
     }
 
-    //  and insert again
-    m_properties_ids_by_set.erase (old_props);
-    m_properties_ids_by_set.insert (std::make_pair (new_props, id));
+  }
 
-    m_properties_by_id [id] = new_props;
-
-    for (properties_set::const_iterator nv = new_props.begin (); nv != new_props.end (); ++nv) {
-      m_properties_component_table.insert (std::make_pair (*nv, properties_id_vector ())).first->second.push_back (id);
-    }
-
+  if (changed) {
     //  signal the change of the properties ID's. This way for example, the layer views
     //  can recompute the property selectors
     if (mp_state_model) {
       mp_state_model->prop_ids_changed ();
     }
-
   }
 }
 
 void 
 PropertiesRepository::change_name (property_names_id_type id, const tl::Variant &new_name)
 {
+  tl::MutexLocker locker (&m_lock);
+
   std::map <property_names_id_type, tl::Variant>::iterator pi = m_propnames_by_id.find (id);
   tl_assert (pi != m_propnames_by_id.end ());
   pi->second = new_name;
@@ -145,46 +163,64 @@ PropertiesRepository::change_name (property_names_id_type id, const tl::Variant 
 const tl::Variant &
 PropertiesRepository::prop_name (property_names_id_type id) const
 {
+  tl::MutexLocker locker (&m_lock);
   return m_propnames_by_id.find (id)->second;
 }
 
 properties_id_type 
 PropertiesRepository::properties_id (const properties_set &props)
 {
-  std::map <properties_set, properties_id_type>::const_iterator pi = m_properties_ids_by_set.find (props);
-  if (pi == m_properties_ids_by_set.end ()) {
+  properties_id_type result;
+  bool changed = false;
 
-    properties_id_type id = 0;
-    if (! m_properties_by_id.empty ()) {
-      id = (--m_properties_by_id.end ())->first + 1;
-    }
-    m_properties_ids_by_set.insert (std::make_pair (props, id));
-    m_properties_by_id.insert (std::make_pair (id, props));
-    for (properties_set::const_iterator nv = props.begin (); nv != props.end (); ++nv) {
-      m_properties_component_table.insert (std::make_pair (*nv, properties_id_vector ())).first->second.push_back (id);
-    }
+  {
+    tl::MutexLocker locker (&m_lock);
 
+    std::map <properties_set, properties_id_type>::const_iterator pi = m_properties_ids_by_set.find (props);
+    if (pi == m_properties_ids_by_set.end ()) {
+
+      properties_id_type id = 0;
+      if (! m_properties_by_id.empty ()) {
+        id = (--m_properties_by_id.end ())->first + 1;
+      }
+      m_properties_ids_by_set.insert (std::make_pair (props, id));
+      m_properties_by_id.insert (std::make_pair (id, props));
+      for (properties_set::const_iterator nv = props.begin (); nv != props.end (); ++nv) {
+        m_properties_component_table.insert (std::make_pair (*nv, properties_id_vector ())).first->second.push_back (id);
+      }
+
+      changed = true;
+      result = id;
+
+    } else {
+      result = pi->second;
+    }
+  }
+
+  if (changed) {
     //  signal the change of the properties ID's. This way for example, the layer views
     //  can recompute the property selectors
     if (mp_state_model) {
       mp_state_model->prop_ids_changed ();
     }
-
-    return id;
-
-  } else {
-    return pi->second;
   }
+
+  return result;
 }
 
 const PropertiesRepository::properties_set &
 PropertiesRepository::properties (properties_id_type id) const
 {
+  static PropertiesRepository::properties_set empty_set;
+  if (id == 0) {
+    return empty_set;
+  }
+
+  tl::MutexLocker locker (&m_lock);
   iterator p = m_properties_by_id.find (id);
   if (p != m_properties_by_id.end ()) {
     return p->second;
   } else {
-    static PropertiesRepository::properties_set empty_set;
     return empty_set;
   }
 }
@@ -192,12 +228,19 @@ PropertiesRepository::properties (properties_id_type id) const
 bool
 PropertiesRepository::is_valid_properties_id (properties_id_type id) const
 {
+  if (id == 0) {
+    return true;
+  }
+
+  tl::MutexLocker locker (&m_lock);
   return m_properties_by_id.find (id) != m_properties_by_id.end ();
 }
 
 const PropertiesRepository::properties_id_vector &
 PropertiesRepository::properties_ids_by_name_value (const name_value_pair &nv) const
 {
+  tl::MutexLocker locker (&m_lock);
+
   std::map <name_value_pair, properties_id_vector>::const_iterator idv = m_properties_component_table.find (nv);
   if (idv == m_properties_component_table.end ()) {
     static properties_id_vector empty;
@@ -210,6 +253,10 @@ PropertiesRepository::properties_ids_by_name_value (const name_value_pair &nv) c
 properties_id_type 
 PropertiesRepository::translate (const PropertiesRepository &rep, properties_id_type id)
 {
+  if (id == 0) {
+    return id;
+  }
+
   const properties_set &pset = rep.properties (id);
 
   //  create a new set by mapping the names

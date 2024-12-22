@@ -180,6 +180,7 @@ private:
 
   std::map <unsigned long, db::property_names_id_type> m_propname_forward_references;
   std::map <unsigned long, std::string> m_propvalue_forward_references;
+  std::set <db::properties_id_type> m_prop_ids;
   db::property_names_id_type m_s_gds_property_name_id;
   db::property_names_id_type m_klayout_context_property_name_id;
 

@@ -703,6 +703,11 @@ OASISReader::do_read (db::Layout &layout)
   m_instances.clear ();
   m_instances_with_props.clear ();
 
+  m_propname_forward_references.clear ();
+  m_propvalue_forward_references.clear ();
+  m_text_forward_references.clear ();
+  m_prop_ids.clear ();
+
   db::PropertiesRepository::properties_set layout_properties;
   std::vector <tl::Variant> context_properties;
 
@@ -731,12 +736,6 @@ OASISReader::do_read (db::Layout &layout)
         warn (tl::to_string (tr ("CELLNAME outside table in strict mode")));
       }
       m_in_table = InCELLNAME;
-
-      //  there cannot be more file level properties .. store what we have
-      if (! layout_properties.empty ()) {
-        layout.prop_id (layout.properties_repository ().properties_id (layout_properties));
-        layout_properties.clear ();
-      }
 
       //  read a cell name
       std::string name = get_str ();
@@ -776,12 +775,6 @@ OASISReader::do_read (db::Layout &layout)
       m_in_table = InTEXTSTRING;
 
 
-      //  there cannot be more file level properties .. store what we have
-      if (! layout_properties.empty ()) {
-        layout.prop_id (layout.properties_repository ().properties_id (layout_properties));
-        layout_properties.clear ();
-      }
-
       //  read a text string
       std::string name = get_str ();
 
@@ -818,12 +811,6 @@ OASISReader::do_read (db::Layout &layout)
         warn (tl::to_string (tr ("PROPNAME outside table in strict mode")));
       }
       m_in_table = InPROPNAME;
-
-      //  there cannot be more file level properties .. store what we have
-      if (! layout_properties.empty ()) {
-        layout.prop_id (layout.properties_repository ().properties_id (layout_properties));
-        layout_properties.clear ();
-      }
 
       //  read a property name
       std::string name = get_str ();
@@ -899,30 +886,34 @@ OASISReader::do_read (db::Layout &layout)
 
           //  exchange the properties in the repository
 
-          //  first locate all property sets that are affected
           std::map<db::properties_id_type, std::vector<db::cell_index_type> > cells_by_pid;
-          for (auto p = rep.begin (); p != rep.end (); ++p) {
-            if (p->second.find (pf->second) != p->second.end ()) {
-              cells_by_pid.insert (std::make_pair (p->first, std::vector<db::cell_index_type> ()));
+
+          if (is_klayout_context_property) {
+
+            //  need a table of cells by prop_id in that case
+
+            for (auto pid = m_prop_ids.begin (); pid != m_prop_ids.end (); ++pid) {
+              cells_by_pid.insert (std::make_pair (*pid, std::vector<db::cell_index_type> ()));
             }
+
+            for (auto i = layout.begin (); i != layout.end (); ++i) {
+              auto pid2c = cells_by_pid.find (i->prop_id ());
+              if (pid2c != cells_by_pid.end ()) {
+                pid2c->second.push_back (i->cell_index ());
+              }
+            }
+
           }
 
-          //  find cells using a specific pid
-          for (auto i = layout.begin (); i != layout.end (); ++i) {
-            auto cc = cells_by_pid.find (i->prop_id ());
-            if (cc != cells_by_pid.end ()) {
-              cc->second.push_back (i->cell_index ());
-            }
-          }
+          //  create new property sets for the ones where a name needs substitution
 
-          //  create new property sets for the ones we found
-          for (auto pid = cells_by_pid.begin (); pid != cells_by_pid.end (); ++pid) {
+          for (auto pid = m_prop_ids.begin (); pid != m_prop_ids.end (); ++pid) {
 
-            const db::PropertiesRepository::properties_set &old_set = rep.properties (pid->first);
+            const db::PropertiesRepository::properties_set &old_set = rep.properties (*pid);
             db::PropertiesRepository::properties_set new_set;
 
             for (auto s = old_set.begin (); s != old_set.end (); ++s) {
-              if (s->first == pf->second && is_s_gds_property) {
+              if (is_s_gds_property && s->first == pf->second) {
 
                 //  S_GDS_PROPERTY translation
                 if (!s->second.is_list () || s->second.get_list ().size () != 2) {
@@ -931,20 +922,10 @@ OASISReader::do_read (db::Layout &layout)
 
                 new_set.insert (std::make_pair (rep.prop_name_id (s->second.get_list () [0]), s->second.get_list () [1]));
 
-              } else if (s->first == pf->second && is_klayout_context_property) {
+              } else if (is_klayout_context_property && s->first == pf->second) {
 
-                auto pid2c = cells_by_pid.find (pid->first);
-
-                if (pid->first == layout.prop_id ()) {
-                  //  feed context strings from klayout context property
-                  if (s->second.is_list ()) {
-                    for (auto l = s->second.begin (); l != s->second.end (); ++l) {
-                      context_properties.push_back (*l);
-                    }
-                  } else {
-                    context_properties.push_back (s->second);
-                  }
-                }
+                auto pid2c = cells_by_pid.find (*pid);
+                tl_assert (pid2c != cells_by_pid.end ());
 
                 //  feed cell-specific context strings from klayout context property
                 for (auto c = pid2c->second.begin (); c != pid2c->second.end (); ++c) {
@@ -963,7 +944,9 @@ OASISReader::do_read (db::Layout &layout)
               }
             }
 
-            rep.change_properties (pid->first, new_set);
+            if (old_set != new_set) {
+              rep.change_properties (*pid, new_set);
+            }
 
           }
 
@@ -987,12 +970,6 @@ OASISReader::do_read (db::Layout &layout)
         warn (tl::to_string (tr ("PROPSTRING outside table in strict mode")));
       }
       m_in_table = InPROPSTRING;
-
-      //  there cannot be more file level properties .. store what we have
-      if (! layout_properties.empty ()) {
-        layout.prop_id (layout.properties_repository ().properties_id (layout_properties));
-        layout_properties.clear ();
-      }
 
       //  read a property string
       std::string name = get_str ();
@@ -1035,12 +1012,6 @@ OASISReader::do_read (db::Layout &layout)
         warn (tl::to_string (tr ("LAYERNAME outside table in strict mode")));
       }
       m_in_table = InLAYERNAME;
-
-      //  there cannot be more file level properties .. store what we have
-      if (! layout_properties.empty ()) {
-        layout.prop_id (layout.properties_repository ().properties_id (layout_properties));
-        layout_properties.clear ();
-      }
 
       //  read a layer name
       std::string name = get_str ();
@@ -1119,12 +1090,6 @@ OASISReader::do_read (db::Layout &layout)
 
     } else if (r == 30 || r == 31 /*XNAME*/) {
 
-      //  there cannot be more file level properties .. store what we have
-      if (! layout_properties.empty ()) {
-        layout.prop_id (layout.properties_repository ().properties_id (layout_properties));
-        layout_properties.clear ();
-      }
-
       //  read a XNAME: it is simply ignored
       get_ulong ();
       get_str ();
@@ -1140,12 +1105,6 @@ OASISReader::do_read (db::Layout &layout)
     } else if (r == 13 || r == 14 /*CELL*/) {
 
       m_in_table = NotInTable;
-
-      //  there cannot be more file level properties .. store what we have
-      if (! layout_properties.empty ()) {
-        layout.prop_id (layout.properties_repository ().properties_id (layout_properties));
-        layout_properties.clear ();
-      }
 
       db::cell_index_type cell_index = 0;
 
@@ -1211,8 +1170,11 @@ OASISReader::do_read (db::Layout &layout)
 
   }
 
+  //  store file (layout) level properties
   if (! layout_properties.empty ()) {
-    layout.prop_id (layout.properties_repository ().properties_id (layout_properties));
+    db::properties_id_type prop_id = layout.properties_repository ().properties_id (layout_properties);
+    m_prop_ids.insert (prop_id);
+    layout.prop_id (prop_id);
     layout_properties.clear ();
   }
 
@@ -1248,7 +1210,7 @@ OASISReader::do_read (db::Layout &layout)
     error (tl::sprintf (tl::to_string (tr ("No property name defined for property name id %ld")), fw->first));
   }
 
-  //  resolve all propvalue forward referenced
+  //  resolve all propvalue forward references
   if (! m_propvalue_forward_references.empty ()) {
 
     for (auto i = context_properties.begin (); i != context_properties.end (); ++i) {
@@ -1260,9 +1222,14 @@ OASISReader::do_read (db::Layout &layout)
       }
     }
 
-    for (db::PropertiesRepository::non_const_iterator pi = layout.properties_repository ().begin_non_const (); pi != layout.properties_repository ().end_non_const (); ++pi) {
-      for (db::PropertiesRepository::properties_set::iterator ps = pi->second.begin (); ps != pi->second.end (); ++ps) {
+    for (auto pid = m_prop_ids.begin (); pid != m_prop_ids.end (); ++pid) {
+      const db::PropertiesRepository::properties_set &prop_set_org = layout.properties_repository ().properties (*pid);
+      db::PropertiesRepository::properties_set prop_set_new = prop_set_org;
+      for (auto ps = prop_set_new.begin (); ps != prop_set_new.end (); ++ps) {
         replace_forward_references_in_variant (ps->second);
+      }
+      if (prop_set_org != prop_set_new) {
+        layout.properties_repository ().change_properties (*pid, prop_set_new);
       }
     }
 
@@ -1285,7 +1252,9 @@ OASISReader::do_read (db::Layout &layout)
         cnp.insert (cp.begin (), cp.end ());
       }
 
-      cell.prop_id (layout.properties_repository ().properties_id (cnp));
+      db::properties_id_type prop_id = layout.properties_repository ().properties_id (cnp);
+      m_prop_ids.insert (prop_id);
+      cell.prop_id (prop_id);
 
     }
 
@@ -1456,7 +1425,9 @@ OASISReader::read_element_properties (db::PropertiesRepository &rep, bool ignore
   }
 
   if (! properties.empty ()) {
-    return std::make_pair (true, rep.properties_id (properties));
+    db::properties_id_type prop_id = rep.properties_id (properties);
+    m_prop_ids.insert (prop_id);
+    return std::make_pair (true, prop_id);
   } else {
     return std::make_pair (false, 0);
   }
@@ -3469,7 +3440,9 @@ OASISReader::do_read_cell (db::cell_index_type cell_index, db::Layout &layout)
   }
 
   if (! cell_properties.empty ()) {
-    layout.cell (cell_index).prop_id (layout.properties_repository ().properties_id (cell_properties));
+    db::properties_id_type prop_id = layout.properties_repository ().properties_id (cell_properties);
+    m_prop_ids.insert (prop_id);
+    layout.cell (cell_index).prop_id (prop_id);
   }
 
   //  insert all instances collected (inserting them once is

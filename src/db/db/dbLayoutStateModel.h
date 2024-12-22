@@ -175,14 +175,6 @@ protected:
   /**
    *  @brief Issue a "prop id's changed event"
    */
-  void prop_ids_changed ()
-  {
-    prop_ids_changed_event ();
-  }
-
-  /**
-   *  @brief Issue a "prop id's changed event"
-   */
   void cell_name_changed ()
   {
     cell_name_changed_event ();
@@ -202,7 +194,6 @@ public:
   tl::Event bboxes_changed_any_event;
   tl::Event dbu_changed_event;
   tl::Event cell_name_changed_event;
-  tl::Event prop_ids_changed_event;
   tl::Event layer_properties_changed_event;
 
 private:

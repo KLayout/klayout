@@ -437,7 +437,7 @@ TEST(4)
 
   g.dbu_changed_event.add (&el, &EventListener::dbu_changed);
   g.cell_name_changed_event.add (&el, &EventListener::cell_name_changed);
-  g.prop_ids_changed_event.add (&el, &EventListener::property_ids_changed);
+  g.properties_repository ().prop_ids_changed_event.add (&el, &EventListener::property_ids_changed);
   g.layer_properties_changed_event.add (&el, &EventListener::layer_properties_changed);
 
   EXPECT_EQ (el.dbu_dirty, false);

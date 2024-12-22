@@ -445,7 +445,7 @@ Layout::Layout (db::Manager *manager)
     m_top_cells (0),
     m_dbu (0.001),
     m_prop_id (0),
-    m_properties_repository (this),
+    m_properties_repository (),
     m_do_cleanup (false),
     m_editable (db::default_editable_mode ())
 {
@@ -461,7 +461,7 @@ Layout::Layout (bool editable, db::Manager *manager)
     m_top_cells (0),
     m_dbu (0.001),
     m_prop_id (0),
-    m_properties_repository (this),
+    m_properties_repository (),
     m_do_cleanup (false),
     m_editable (editable)
 {
@@ -481,7 +481,7 @@ Layout::Layout (const db::Layout &layout)
     m_top_cells (0),
     m_dbu (0.001),
     m_prop_id (0),
-    m_properties_repository (this),
+    m_properties_repository (),
     m_do_cleanup (false),
     m_editable (layout.m_editable)
 {
@@ -534,7 +534,7 @@ Layout::clear ()
   m_cell_map.clear ();
 
   m_shape_repository = db::GenericRepository ();
-  db::PropertiesRepository empty_pr (this);
+  db::PropertiesRepository empty_pr;
   m_properties_repository = empty_pr;
   m_array_repository = db::ArrayRepository ();
 

@@ -537,7 +537,7 @@ void LayoutViewBase::update_event_handlers ()
     cellview (i)->layout ().hier_changed_event.add (this, &LayoutViewBase::signal_hier_changed);
     cellview (i)->layout ().bboxes_changed_event.add (this, &LayoutViewBase::signal_bboxes_from_layer_changed, i);
     cellview (i)->layout ().dbu_changed_event.add (this, &LayoutViewBase::signal_bboxes_changed);
-    cellview (i)->layout ().prop_ids_changed_event.add (this, &LayoutViewBase::signal_prop_ids_changed);
+    cellview (i)->layout ().properties_repository ().prop_ids_changed_event.add (this, &LayoutViewBase::signal_prop_ids_changed);
     cellview (i)->layout ().layer_properties_changed_event.add (this, &LayoutViewBase::signal_layer_properties_changed);
     cellview (i)->layout ().cell_name_changed_event.add (this, &LayoutViewBase::signal_cell_name_changed);
     cellview (i)->apply_technology_with_sender_event.add (this, &LayoutViewBase::signal_apply_technology);

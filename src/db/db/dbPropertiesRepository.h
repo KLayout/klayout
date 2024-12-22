@@ -30,6 +30,7 @@
 
 #include "tlVariant.h"
 #include "tlThreads.h"
+#include "tlEvents.h"
 
 #include <vector>
 #include <string>
@@ -62,7 +63,7 @@ public:
   /**
    *  @brief Default constructor
    */
-  PropertiesRepository (db::LayoutStateModel *state_model = 0);
+  PropertiesRepository ();
 
   /**
    *  @brief Copy constructor
@@ -229,6 +230,11 @@ public:
     db::mem_stat (stat, purpose, cat, m_properties_component_table, true, parent);
   }
 
+  /**
+   *  @brief An event indicating a change in the properties IDs
+   */
+  tl::Event prop_ids_changed_event;
+
 private:
   std::map <property_names_id_type, tl::Variant> m_propnames_by_id;
   std::map <tl::Variant, property_names_id_type> m_propname_ids_by_name;
@@ -237,7 +243,6 @@ private:
   std::map <properties_set, properties_id_type> m_properties_ids_by_set;
   std::map <name_value_pair, properties_id_vector> m_properties_component_table;
 
-  db::LayoutStateModel *mp_state_model;
   mutable tl::Mutex m_lock;
 };
 

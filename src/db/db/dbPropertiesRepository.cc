@@ -33,8 +33,7 @@ namespace db
 // ----------------------------------------------------------------------------------
 //  PropertiesRepository implementation
 
-PropertiesRepository::PropertiesRepository (db::LayoutStateModel *state_model)
-  : mp_state_model (state_model)
+PropertiesRepository::PropertiesRepository ()
 {
   //  install empty property set
   properties_set empty_set;
@@ -43,7 +42,6 @@ PropertiesRepository::PropertiesRepository (db::LayoutStateModel *state_model)
 }
 
 PropertiesRepository::PropertiesRepository (const PropertiesRepository &d)
-  : mp_state_model (0)
 {
   operator= (d);
 }
@@ -142,9 +140,7 @@ PropertiesRepository::change_properties (property_names_id_type id, const proper
   if (changed) {
     //  signal the change of the properties ID's. This way for example, the layer views
     //  can recompute the property selectors
-    if (mp_state_model) {
-      mp_state_model->prop_ids_changed ();
-    }
+    prop_ids_changed_event ();
   }
 }
 
@@ -200,9 +196,7 @@ PropertiesRepository::properties_id (const properties_set &props)
   if (changed) {
     //  signal the change of the properties ID's. This way for example, the layer views
     //  can recompute the property selectors
-    if (mp_state_model) {
-      mp_state_model->prop_ids_changed ();
-    }
+    prop_ids_changed_event ();
   }
 
   return result;
@@ -250,6 +244,7 @@ PropertiesRepository::properties_ids_by_name_value (const name_value_pair &nv) c
   }
 }
 
+//  @@@ should not be needed at all
 properties_id_type 
 PropertiesRepository::translate (const PropertiesRepository &rep, properties_id_type id)
 {
@@ -352,7 +347,7 @@ PropertiesTranslator::make_filter (db::PropertiesRepository &repo, const std::se
     names_selected.insert (repo.prop_name_id (*k));
   }
 
-  db::PropertiesRepository org_repo = repo;
+  db::PropertiesRepository org_repo = repo; // @@@ should not be available
 
   for (auto p = org_repo.begin (); p != org_repo.end (); ++p) {
     db::PropertiesRepository::properties_set new_set;
@@ -379,7 +374,7 @@ PropertiesTranslator::make_key_mapper (db::PropertiesRepository &repo, const std
     name_map.insert (std::make_pair (repo.prop_name_id (k->first), repo.prop_name_id (k->second)));
   }
 
-  db::PropertiesRepository org_repo = repo;
+  db::PropertiesRepository org_repo = repo; // @@@ should not be available
 
   for (auto p = org_repo.begin (); p != org_repo.end (); ++p) {
     db::PropertiesRepository::properties_set new_set;

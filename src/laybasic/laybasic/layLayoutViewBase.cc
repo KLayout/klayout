@@ -2349,7 +2349,7 @@ LayoutViewBase::signal_layer_properties_changed ()
     m_layer_properties_lists [i]->attach_view (this, i);
   }
 
-  //  schedule a redraw request - since the layer views might not have changed, this is necessary
+  //  schedule a redraw request - since the layer views might have changed, this is necessary
   redraw_later ();
 }
 
@@ -2364,6 +2364,9 @@ LayoutViewBase::signal_prop_ids_changed ()
   for (unsigned int i = 0; i < layer_lists (); ++i) {
     m_layer_properties_lists [i]->attach_view (this, i);
   }
+
+  //  schedule a redraw request - since the layer views might have changed, this is necessary
+  redraw_later ();
 }
 
 void

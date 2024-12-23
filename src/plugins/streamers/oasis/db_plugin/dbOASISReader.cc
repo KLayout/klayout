@@ -629,8 +629,8 @@ OASISReader::do_read (db::Layout &layout)
   char *mb;
 
   //  prepare
-  m_s_gds_property_name_id = layout.properties_repository ().prop_name_id (s_gds_property_propname);
-  m_klayout_context_property_name_id = layout.properties_repository ().prop_name_id (klayout_context_propname);
+  m_s_gds_property_name_id = db::property_names_id (s_gds_property_propname);
+  m_klayout_context_property_name_id = db::property_names_id (klayout_context_propname);
 
   //  read magic bytes
   mb = (char *) m_stream.get (sizeof (magic_bytes) - 1);
@@ -705,11 +705,14 @@ OASISReader::do_read (db::Layout &layout)
 
   m_propname_forward_references.clear ();
   m_propvalue_forward_references.clear ();
+  m_forward_properties_for_shapes.clear ();
+  m_forward_properties_for_instances.clear ();
+  m_future_cell_properties.clear ();
+  m_fwd_properties.clear ();
   m_text_forward_references.clear ();
-  m_prop_ids.clear ();
 
-  db::PropertiesRepository::properties_set layout_properties;
-  std::vector <tl::Variant> context_properties;
+  db::PropertiesSet layout_properties;
+  std::vector <tl::Variant> context_strings;
 
   mark_start_table ();
 
@@ -760,7 +763,7 @@ OASISReader::do_read (db::Layout &layout)
 
       reset_modal_variables ();
 
-      std::pair<bool, db::properties_id_type> pp = read_element_properties (layout.properties_repository (), true);
+      std::pair<bool, db::properties_id_type> pp = read_element_properties (true);
       if (pp.first) {
         m_cellname_properties.insert (std::make_pair (id, pp.second));
       }
@@ -801,7 +804,7 @@ OASISReader::do_read (db::Layout &layout)
       reset_modal_variables ();
 
       //  ignore properties attached to this name item
-      read_element_properties (layout.properties_repository (), true);
+      read_element_properties (true);
 
     } else if (r == 7 || r == 8 /*PROPNAME*/) {
 
@@ -835,132 +838,10 @@ OASISReader::do_read (db::Layout &layout)
         error (tl::sprintf (tl::to_string (tr ("A PROPNAME with id %ld is present already")), id));
       }
 
-      //  resolve forward references to property names
-      std::map <unsigned long, db::property_names_id_type>::iterator pf = m_propname_forward_references.find (id);
-      if (pf != m_propname_forward_references.end ()) {
-
-        bool is_s_gds_property = false;
-        bool is_klayout_context_property = false;
-
-        if (name == s_gds_property_propname) {
-          is_s_gds_property = true;
-        } else if (name == klayout_context_propname) {
-          is_klayout_context_property = true;
-        }
-
-        //  handle special case of forward references to S_GDS_PROPERTY and KLAYOUT_CONTEXT
-        if (is_s_gds_property || is_klayout_context_property) {
-
-          db::PropertiesRepository &rep = layout.properties_repository ();
-
-          //  exchange properties in layout_properties
-          db::PropertiesRepository::properties_set new_set;
-
-          for (db::PropertiesRepository::properties_set::const_iterator s = layout_properties.begin (); s != layout_properties.end (); ++s) {
-            if (s->first == pf->second && is_s_gds_property) {
-
-              //  S_GDS_PROPERTY translation
-              if (!s->second.is_list () || s->second.get_list ().size () != 2) {
-                error (tl::to_string (tr ("S_GDS_PROPERTY must have a value list with exactly two elements")));
-              }
-
-              new_set.insert (std::make_pair (rep.prop_name_id (s->second.get_list () [0]), s->second.get_list () [1]));
-
-            } else if (s->first == pf->second && is_klayout_context_property) {
-
-              //  feed context strings from klayout context property
-              if (s->second.is_list ()) {
-                for (auto l = s->second.begin (); l != s->second.end (); ++l) {
-                  context_properties.push_back (*l);
-                }
-              } else {
-                context_properties.push_back (s->second);
-              }
-
-            } else {
-              new_set.insert (*s);
-            }
-          }
-
-          new_set.swap (layout_properties);
-
-          //  exchange the properties in the repository
-
-          std::map<db::properties_id_type, std::vector<db::cell_index_type> > cells_by_pid;
-
-          if (is_klayout_context_property) {
-
-            //  need a table of cells by prop_id in that case
-
-            for (auto pid = m_prop_ids.begin (); pid != m_prop_ids.end (); ++pid) {
-              cells_by_pid.insert (std::make_pair (*pid, std::vector<db::cell_index_type> ()));
-            }
-
-            for (auto i = layout.begin (); i != layout.end (); ++i) {
-              auto pid2c = cells_by_pid.find (i->prop_id ());
-              if (pid2c != cells_by_pid.end ()) {
-                pid2c->second.push_back (i->cell_index ());
-              }
-            }
-
-          }
-
-          //  create new property sets for the ones where a name needs substitution
-
-          for (auto pid = m_prop_ids.begin (); pid != m_prop_ids.end (); ++pid) {
-
-            const db::PropertiesRepository::properties_set &old_set = rep.properties (*pid);
-            db::PropertiesRepository::properties_set new_set;
-
-            for (auto s = old_set.begin (); s != old_set.end (); ++s) {
-              if (is_s_gds_property && s->first == pf->second) {
-
-                //  S_GDS_PROPERTY translation
-                if (!s->second.is_list () || s->second.get_list ().size () != 2) {
-                  error (tl::to_string (tr ("S_GDS_PROPERTY must have a value list with exactly two elements")));
-                }
-
-                new_set.insert (std::make_pair (rep.prop_name_id (s->second.get_list () [0]), s->second.get_list () [1]));
-
-              } else if (is_klayout_context_property && s->first == pf->second) {
-
-                auto pid2c = cells_by_pid.find (*pid);
-                tl_assert (pid2c != cells_by_pid.end ());
-
-                //  feed cell-specific context strings from klayout context property
-                for (auto c = pid2c->second.begin (); c != pid2c->second.end (); ++c) {
-                  std::vector<tl::Variant> &vl = m_context_strings_per_cell [*c];
-                  if (s->second.is_list ()) {
-                    for (auto l = s->second.begin (); l != s->second.end (); ++l) {
-                      vl.push_back (*l);
-                    }
-                  } else {
-                    vl.push_back (s->second);
-                  }
-                }
-
-              } else {
-                new_set.insert (*s);
-              }
-            }
-
-            if (old_set != new_set) {
-              rep.change_properties (*pid, new_set);
-            }
-
-          }
-
-        }
-
-        layout.properties_repository ().change_name (pf->second, tl::Variant (name));
-        m_propname_forward_references.erase (pf);
-
-      }
-
       reset_modal_variables ();
 
       //  ignore properties attached to this name item
-      read_element_properties (layout.properties_repository (), true);
+      read_element_properties (true);
 
     } else if (r == 9 || r == 10 /*PROPSTRING*/) {
 
@@ -1002,7 +883,7 @@ OASISReader::do_read (db::Layout &layout)
       reset_modal_variables ();
 
       //  ignore properties attached to this name item
-      read_element_properties (layout.properties_repository (), true);
+      read_element_properties (true);
 
     } else if (r == 11 || r == 12 /*LAYERNAME*/) {
 
@@ -1070,21 +951,17 @@ OASISReader::do_read (db::Layout &layout)
       reset_modal_variables ();
 
       //  ignore properties attached to this name item
-      read_element_properties (layout.properties_repository (), true);
+      read_element_properties (true);
 
     } else if (r == 28 || r == 29 /*PROPERTY*/) {
 
       //  unrecognized property: store in layout properties
       if (r == 28) {
-        read_properties (layout.properties_repository ());
+        read_properties ();
       }
 
-      if (! mm_last_property_is_sprop.get () && mm_last_property_name.get () == m_klayout_context_property_name_id) {
-        context_properties.insert (context_properties.end (), mm_last_value_list.get ().begin (), mm_last_value_list.get ().end ());
-      } else {
-        //  store cell properties
-        store_last_properties (layout.properties_repository (), layout_properties, true);
-      }
+      //  store layout properties
+      store_last_properties (layout_properties, true, true);
 
       mark_start_table ();
 
@@ -1100,7 +977,7 @@ OASISReader::do_read (db::Layout &layout)
       reset_modal_variables ();
 
       //  ignore properties attached to this name item
-      read_element_properties (layout.properties_repository (), true);
+      read_element_properties (true);
 
     } else if (r == 13 || r == 14 /*CELL*/) {
 
@@ -1170,12 +1047,64 @@ OASISReader::do_read (db::Layout &layout)
 
   }
 
+  //  Resolve forward references for stored shape and instance prop_ids.
+  //  This makes these shape and instance property IDs valid
+
+  for (auto p = m_forward_properties_for_instances.begin (); p != m_forward_properties_for_instances.end (); ++p) {
+
+    db::PropertiesSet props = forward_properties (p->first);
+    resolve_forward_references (props);
+
+    db::properties_id_type pid = db::properties_id (props);
+    for (auto i = p->second.begin (); i != p->second.end (); ++i) {
+      if (i->instances ()) {
+        i->instances ()->replace_prop_id (*i, pid);
+      }
+    }
+
+  }
+
+  for (auto p = m_forward_properties_for_shapes.begin (); p != m_forward_properties_for_shapes.end (); ++p) {
+
+    db::PropertiesSet props = forward_properties (p->first);
+    resolve_forward_references (props);
+
+    db::properties_id_type pid = db::properties_id (props);
+    for (auto i = p->second.begin (); i != p->second.end (); ++i) {
+      if (i->shapes ()) {
+        i->shapes ()-> replace_prop_id (*i, pid);
+      }
+    }
+
+  }
+
+  //  Resolve forward cell properties and extract context strings
+
+  for (auto p = m_future_cell_properties.begin (); p != m_future_cell_properties.end (); ++p) {
+
+    db::PropertiesSet props = p->second;
+    resolve_forward_references (props);
+
+    std::vector <tl::Variant> context_strings;
+    extract_context_strings (props, context_strings);
+    if (context_strings.empty ()) {
+      m_context_strings_per_cell [p->first].swap (context_strings);
+    }
+
+    layout.cell (p->first).prop_id (db::properties_id (props));
+
+  }
+
   //  store file (layout) level properties
   if (! layout_properties.empty ()) {
-    db::properties_id_type prop_id = layout.properties_repository ().properties_id (layout_properties);
-    m_prop_ids.insert (prop_id);
+
+    resolve_forward_references (layout_properties);
+    extract_context_strings (layout_properties, context_strings);
+
+    db::properties_id_type prop_id = db::properties_id (layout_properties);
     layout.prop_id (prop_id);
     layout_properties.clear ();
+
   }
 
   size_t pt = m_stream.pos ();
@@ -1210,50 +1139,29 @@ OASISReader::do_read (db::Layout &layout)
     error (tl::sprintf (tl::to_string (tr ("No property name defined for property name id %ld")), fw->first));
   }
 
-  //  resolve all propvalue forward references
-  if (! m_propvalue_forward_references.empty ()) {
-
-    for (auto i = context_properties.begin (); i != context_properties.end (); ++i) {
-      replace_forward_references_in_variant (*i);
-    }
-    for (auto c = m_context_strings_per_cell.begin (); c != m_context_strings_per_cell.end (); ++c) {
-      for (auto i = c->second.begin (); i != c->second.end (); ++i) {
-        replace_forward_references_in_variant (*i);
-      }
-    }
-
-    for (auto pid = m_prop_ids.begin (); pid != m_prop_ids.end (); ++pid) {
-      const db::PropertiesRepository::properties_set &prop_set_org = layout.properties_repository ().properties (*pid);
-      db::PropertiesRepository::properties_set prop_set_new = prop_set_org;
-      for (auto ps = prop_set_new.begin (); ps != prop_set_new.end (); ++ps) {
-        replace_forward_references_in_variant (ps->second);
-      }
-      if (prop_set_org != prop_set_new) {
-        layout.properties_repository ().change_properties (*pid, prop_set_new);
-      }
-    }
-
-    m_propvalue_forward_references.clear ();
-
-  }
-
   //  attach the properties found in CELLNAME to the cells (which may have other properties)
   for (std::map<unsigned long, db::properties_id_type>::const_iterator p = m_cellname_properties.begin (); p != m_cellname_properties.end (); ++p) {
+
+    //  The cellname properties ID may be a forward properties ID, resolve it first
 
     std::pair<bool, db::cell_index_type> c = cell_by_id (p->first);
     if (c.first) {
 
-      db::PropertiesRepository::properties_set cnp = layout.properties_repository ().properties (p->second);
+      db::PropertiesSet cnp;
+      if (is_forward_properties_id (p->second)) {
+        cnp = forward_properties (p->second);
+        resolve_forward_references (cnp);
+      } else {
+        cnp = db::properties (p->second);
+      }
 
       //  Merge existing properties with the ones from CELLNAME
       db::Cell &cell = layout.cell (c.second);
       if (cell.prop_id () != 0) {
-        db::PropertiesRepository::properties_set cp = layout.properties_repository ().properties (cell.prop_id ());
-        cnp.insert (cp.begin (), cp.end ());
+        cnp.merge (db::properties (cell.prop_id ()));
       }
 
-      db::properties_id_type prop_id = layout.properties_repository ().properties_id (cnp);
-      m_prop_ids.insert (prop_id);
+      db::properties_id_type prop_id = db::properties_id (cnp);
       cell.prop_id (prop_id);
 
     }
@@ -1261,8 +1169,8 @@ OASISReader::do_read (db::Layout &layout)
   }
 
   //  Restore layout meta info
-  if (! context_properties.empty ()) {
-    LayoutOrCellContextInfo info = make_context_info (context_properties);
+  if (! context_strings.empty ()) {
+    LayoutOrCellContextInfo info = make_context_info (context_strings);
     layout.fill_meta_info_from_context (info);
   }
 
@@ -1294,6 +1202,144 @@ OASISReader::do_read (db::Layout &layout)
   if (m_first_textstring != 0 && m_first_textstring != m_table_textstring && m_expect_strict_mode == 1) {
     warn (tl::sprintf (tl::to_string (tr ("TEXTSTRING table offset does not match first occurrence of TEXTSTRING in strict mode - %s vs. %s")), m_table_textstring, m_first_textstring));
   }
+}
+
+bool
+OASISReader::has_forward_refs (const db::PropertiesSet &properties)
+{
+  //  A properties set is a forward referenced set if one of the components is an ID
+  //  NOTE: we assume there is a single level of lists max.
+
+  for (auto p = properties.begin (); p != properties.end (); ++p) {
+
+    const tl::Variant &name = db::property_name (p->first);
+    if (name.is_id ()) {
+      return true;
+    }
+
+    const tl::Variant &value = db::property_value (p->second);
+    if (value.is_list ()) {
+      for (auto l = value.begin (); l != value.end (); ++l) {
+        if (l->is_id ()) {
+          return true;
+        }
+      }
+    } else if (value.is_id ()) {
+      return true;
+    }
+
+  }
+
+  return false;
+}
+
+properties_id_type OASISReader::make_forward_properties_id (const db::PropertiesSet &properties)
+{
+  //  NOTE: the forward properties ID scheme makes use of the fact that IDs
+  //  are basically pointers and aligned to words. So the bit 0 is always 0
+  //  for true properties IDs.
+
+  m_fwd_properties.push_back (properties);
+  return db::properties_id_type (& m_fwd_properties.back ()) + 1;
+}
+
+bool
+OASISReader::is_forward_properties_id (properties_id_type id) const
+{
+  return (id & 1) != 0;
+}
+
+const db::PropertiesSet &
+OASISReader::forward_properties (properties_id_type id) const
+{
+  id = id & ~db::properties_id_type (1);
+  return *reinterpret_cast<const db::PropertiesSet *> (id);
+}
+
+void
+OASISReader::register_forward_property_for_shape (const db::Shape &shape)
+{
+  m_forward_properties_for_shapes [shape.prop_id ()].push_back (shape);
+}
+
+void
+OASISReader::register_forward_property_for_instance (const db::Instance &instance)
+{
+  m_forward_properties_for_instances [instance.prop_id ()].push_back (instance);
+}
+
+void
+OASISReader::extract_context_strings (db::PropertiesSet &properties, std::vector<tl::Variant> &context_strings)
+{
+  db::PropertiesSet new_set;
+
+  for (auto p = properties.begin (); p != properties.end (); ++p) {
+
+    const tl::Variant &value = db::property_value (p->second);
+
+    //  name ID 0 is reserved for context property strings
+    if (p->first == 0) {
+      //  feed context strings from klayout context property
+      if (value.is_list ()) {
+        for (auto l = value.begin (); l != value.end (); ++l) {
+          context_strings.push_back (*l);
+        }
+      } else {
+        context_strings.push_back (value);
+      }
+    } else {
+      new_set.insert (p->first, value);
+    }
+
+  }
+
+  properties.swap (new_set);
+}
+
+void
+OASISReader::resolve_forward_references (db::PropertiesSet &properties)
+{
+  db::PropertiesSet new_props;
+
+  for (auto p = properties.begin (); p != properties.end (); ++p) {
+
+    tl::Variant value = db::property_value (p->second);
+    replace_forward_references_in_variant (value);
+
+    //  NOTE: property names ID 0 is reserved for context strings
+    if (! p->first) {
+      new_props.insert (p->first, value);
+      continue;
+    }
+
+    const tl::Variant &name = db::property_name (p->first);
+    if (name.is_id ()) {
+
+      std::map <unsigned long, db::property_names_id_type>::iterator pf = m_propname_forward_references.find (name.to_id ());
+      if (pf != m_propname_forward_references.end ()) {
+
+        if (pf->second == m_s_gds_property_name_id) {
+
+          //  S_GDS_PROPERTY translation
+          if (value.is_list () && value.get_list ().size () >= 2) {
+            new_props.insert (value.get_list () [0], value.get_list () [1]);
+          }
+
+        } else if (pf->second == m_klayout_context_property_name_id) {
+          //  NOTE: property names ID 0 is reserved for context strings
+          new_props.insert (property_names_id (0), value);
+        } else {
+          new_props.insert (pf->second, value);
+        }
+
+      }
+
+    } else {
+      new_props.insert (p->first, value);
+    }
+  }
+
+  properties.swap (new_props);
 }
 
 void
@@ -1343,9 +1389,15 @@ OASISReader::replace_forward_references_in_variant (tl::Variant &v)
 }
 
 void
-OASISReader::store_last_properties (db::PropertiesRepository &rep, db::PropertiesRepository::properties_set &properties, bool ignore_special)
+OASISReader::store_last_properties (db::PropertiesSet &properties, bool ignore_special, bool with_context_props)
 {
-  if (! m_read_properties) {
+  if (with_context_props && mm_last_property_is_sprop.get () && mm_last_property_name.get () == m_klayout_context_property_name_id) {
+
+    //  Context properties are stored with a special property name ID of 0
+
+    properties.insert (db::property_names_id (0), tl::Variant (mm_last_value_list.get ().begin (), mm_last_value_list.get ().end ()));
+
+  } else if (! m_read_properties) {
 
     //  All properties are ignored
 
@@ -1355,7 +1407,7 @@ OASISReader::store_last_properties (db::PropertiesRepository &rep, db::Propertie
       error (tl::to_string (tr ("S_GDS_PROPERTY must have a value list with exactly two elements")));
     }
 
-    properties.insert (std::make_pair (rep.prop_name_id (mm_last_value_list.get () [0]), mm_last_value_list.get () [1]));
+    properties.insert (mm_last_value_list.get () [0], mm_last_value_list.get () [1]);
 
   } else if (ignore_special && ! m_read_all_properties && mm_last_property_is_sprop.get ()) {
 
@@ -1364,18 +1416,18 @@ OASISReader::store_last_properties (db::PropertiesRepository &rep, db::Propertie
     //  For shapes we need to keep the special ones since they may be forward-references S_GDS_PROPERTY names.
 
   } else if (mm_last_value_list.get ().size () == 0) {
-    properties.insert (std::make_pair (mm_last_property_name.get (), tl::Variant ()));
+    properties.insert (mm_last_property_name.get (), tl::Variant ());
   } else if (mm_last_value_list.get ().size () == 1) {
-    properties.insert (std::make_pair (mm_last_property_name.get (), tl::Variant (mm_last_value_list.get () [0])));
+    properties.insert (mm_last_property_name.get (), tl::Variant (mm_last_value_list.get () [0]));
   } else if (mm_last_value_list.get ().size () > 1) {
-    properties.insert (std::make_pair (mm_last_property_name.get (), tl::Variant (mm_last_value_list.get ().begin (), mm_last_value_list.get ().end ())));
+    properties.insert (mm_last_property_name.get (), tl::Variant (mm_last_value_list.get ().begin (), mm_last_value_list.get ().end ()));
   }
 }
 
 std::pair <bool, db::properties_id_type>
-OASISReader::read_element_properties (db::PropertiesRepository &rep, bool ignore_special)
+OASISReader::read_element_properties (bool ignore_special)
 {
-  db::PropertiesRepository::properties_set properties;
+  db::PropertiesSet properties;
 
   mark_start_table ();
 
@@ -1404,14 +1456,14 @@ OASISReader::read_element_properties (db::PropertiesRepository &rep, bool ignore
 
     } else if (m == 28 /*PROPERTY*/) {
 
-      read_properties (rep);
-      store_last_properties (rep, properties, ignore_special);
+      read_properties ();
+      store_last_properties (properties, ignore_special);
 
       mark_start_table ();
 
     } else if (m == 29 /*PROPERTY*/) {
 
-      store_last_properties (rep, properties, ignore_special);
+      store_last_properties (properties, ignore_special);
 
       mark_start_table ();
 
@@ -1425,18 +1477,23 @@ OASISReader::read_element_properties (db::PropertiesRepository &rep, bool ignore
   }
 
   if (! properties.empty ()) {
-    db::properties_id_type prop_id = rep.properties_id (properties);
-    m_prop_ids.insert (prop_id);
-    return std::make_pair (true, prop_id);
+    if (has_forward_refs (properties)) {
+      return std::make_pair (true, make_forward_properties_id (properties));
+    } else {
+      return std::make_pair (true, db::properties_id (properties));
+    }
   } else {
     return std::make_pair (false, 0);
   }
 }
 
 void
-OASISReader::read_properties (db::PropertiesRepository &rep)
+OASISReader::read_properties ()
 {
   unsigned char m = get_byte ();
+
+  bool is_sprop = ((m & 0x01) != 0);
+  mm_last_property_is_sprop = is_sprop;
 
   if (m & 0x04) {
     if (m & 0x02) {
@@ -1446,10 +1503,10 @@ OASISReader::read_properties (db::PropertiesRepository &rep)
 
       std::map <unsigned long, std::string>::const_iterator cid = m_propnames.find (id);
       if (cid == m_propnames.end ()) {
-        mm_last_property_name = rep.prop_name_id (tl::Variant (id, true /*dummy for id type*/));
+        mm_last_property_name = db::property_names_id (tl::Variant (id, true /*dummy for id type*/));
         m_propname_forward_references.insert (std::make_pair (id, mm_last_property_name.get ()));
       } else {
-        mm_last_property_name = rep.prop_name_id (tl::Variant (cid->second));
+        mm_last_property_name = db::property_names_id (tl::Variant (cid->second));
       }
 
     } else {
@@ -1458,12 +1515,10 @@ OASISReader::read_properties (db::PropertiesRepository &rep)
         warn (tl::to_string (tr ("PROPERTY names must be references to PROPNAME ids in strict mode")));
       }
 
-      mm_last_property_name = rep.prop_name_id (tl::Variant (get_str ()));
+      mm_last_property_name = db::property_names_id (tl::Variant (get_str ()));
 
     }
   }
-
-  mm_last_property_is_sprop = ((m & 0x01) != 0);
 
   if (! (m & 0x08)) {
 
@@ -1868,7 +1923,7 @@ OASISReader::do_read_placement (unsigned char r,
 
   if ((m & 0x8) && read_repetition ()) {
 
-    std::pair<bool, db::properties_id_type> pp = read_element_properties (layout.properties_repository (), false);
+    std::pair<bool, db::properties_id_type> pp = read_element_properties (false);
 
     db::Vector a, b;
     size_t na, nb;
@@ -1953,7 +2008,7 @@ OASISReader::do_read_placement (unsigned char r,
 
   } else {
 
-    std::pair<bool, db::properties_id_type> pp = read_element_properties (layout.properties_repository (), false);
+    std::pair<bool, db::properties_id_type> pp = read_element_properties (false);
 
     db::CellInstArray inst;
 
@@ -2058,7 +2113,7 @@ OASISReader::do_read_text (bool xy_absolute,
   if ((m & 0x4) && read_repetition ()) {
 
     //  TODO: should not read properties if layer is not enabled!
-    std::pair<bool, db::properties_id_type> pp = read_element_properties (layout.properties_repository (), false);
+    std::pair<bool, db::properties_id_type> pp = read_element_properties (false);
 
     if (ll.first) {
 
@@ -2082,7 +2137,10 @@ OASISReader::do_read_text (bool xy_absolute,
         db::TextPtr text_ptr (text, layout.shape_repository ());
 
         if (pp.first) {
-          cell.shapes (ll.second).insert (db::object_with_properties<db::Shape::text_ptr_array_type> (db::Shape::text_ptr_array_type (text_ptr, db::Disp (pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb), pp.second));
+          auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::Shape::text_ptr_array_type> (db::Shape::text_ptr_array_type (text_ptr, db::Disp (pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb), pp.second));
+          if (is_forward_properties_id (pp.second)) {
+            register_forward_property_for_shape (shape);
+          }
         } else {
           cell.shapes (ll.second).insert (db::Shape::text_ptr_array_type (text_ptr, db::Disp (pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb));
         }
@@ -2099,7 +2157,10 @@ OASISReader::do_read_text (bool xy_absolute,
         array.sort ();
 
         if (pp.first) {
-          cell.shapes (ll.second).insert (db::object_with_properties<db::Shape::text_ptr_array_type> (db::Shape::text_ptr_array_type (text_ptr, db::Disp (pos), layout.array_repository ().insert (array)), pp.second));
+          auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::Shape::text_ptr_array_type> (db::Shape::text_ptr_array_type (text_ptr, db::Disp (pos), layout.array_repository ().insert (array)), pp.second));
+          if (is_forward_properties_id (pp.second)) {
+            register_forward_property_for_shape (shape);
+          }
         } else {
           cell.shapes (ll.second).insert (db::Shape::text_ptr_array_type (text_ptr, db::Disp (pos), layout.array_repository ().insert (array)));
         }
@@ -2110,7 +2171,10 @@ OASISReader::do_read_text (bool xy_absolute,
         db::TextRef text_ref (text, layout.shape_repository ());
         while (! p.at_end ()) {
           if (pp.first) {
-            cell.shapes (ll.second).insert (db::TextRefWithProperties (text_ref.transformed (db::Disp (pos + *p)), pp.second));
+            auto shape = cell.shapes (ll.second).insert (db::TextRefWithProperties (text_ref.transformed (db::Disp (pos + *p)), pp.second));
+            if (is_forward_properties_id (pp.second)) {
+              register_forward_property_for_shape (shape);
+            }
           } else {
             cell.shapes (ll.second).insert (text_ref.transformed (db::Disp (pos + *p)));
           }
@@ -2123,7 +2187,7 @@ OASISReader::do_read_text (bool xy_absolute,
 
   } else {
 
-    std::pair<bool, db::properties_id_type> pp = read_element_properties (layout.properties_repository (), false);
+    std::pair<bool, db::properties_id_type> pp = read_element_properties (false);
 
     if (ll.first) {
 
@@ -2135,7 +2199,10 @@ OASISReader::do_read_text (bool xy_absolute,
       }
 
       if (pp.first) {
-        layout.cell (cell_index).shapes (ll.second).insert (db::TextRefWithProperties (db::TextRef (text, layout.shape_repository ()), pp.second));
+        auto shape = layout.cell (cell_index).shapes (ll.second).insert (db::TextRefWithProperties (db::TextRef (text, layout.shape_repository ()), pp.second));
+        if (is_forward_properties_id (pp.second)) {
+          register_forward_property_for_shape (shape);
+        }
       } else {
         layout.cell (cell_index).shapes (ll.second).insert (db::TextRef (text, layout.shape_repository ()));
       }
@@ -2198,7 +2265,7 @@ OASISReader::do_read_rectangle (bool xy_absolute,
 
   if ((m & 0x4) && read_repetition ()) {
 
-    std::pair<bool, db::properties_id_type> pp = read_element_properties (layout.properties_repository (), false);
+    std::pair<bool, db::properties_id_type> pp = read_element_properties (false);
 
     if (ll.first) {
 
@@ -2214,7 +2281,10 @@ OASISReader::do_read_rectangle (bool xy_absolute,
 
         //  Create a box array
         if (pp.first) {
-          cell.shapes (ll.second).insert (db::object_with_properties<db::Shape::box_array_type> (db::Shape::box_array_type (box, db::UnitTrans (), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb), pp.second));
+          auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::Shape::box_array_type> (db::Shape::box_array_type (box, db::UnitTrans (), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb), pp.second));
+          if (is_forward_properties_id (pp.second)) {
+            register_forward_property_for_shape (shape);
+          }
         } else {
           cell.shapes (ll.second).insert (db::Shape::box_array_type (box, db::UnitTrans (), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb));
         }
@@ -2229,7 +2299,10 @@ OASISReader::do_read_rectangle (bool xy_absolute,
         array.sort ();
 
         if (pp.first) {
-          cell.shapes (ll.second).insert (db::object_with_properties<db::Shape::box_array_type> (db::Shape::box_array_type (box, db::UnitTrans (), layout.array_repository ().insert (array)), pp.second));
+          auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::Shape::box_array_type> (db::Shape::box_array_type (box, db::UnitTrans (), layout.array_repository ().insert (array)), pp.second));
+          if (is_forward_properties_id (pp.second)) {
+            register_forward_property_for_shape (shape);
+          }
         } else {
           cell.shapes (ll.second).insert (db::Shape::box_array_type (box, db::UnitTrans (), layout.array_repository ().insert (array)));
         }
@@ -2240,7 +2313,10 @@ OASISReader::do_read_rectangle (bool xy_absolute,
         RepetitionIterator p = mm_repetition.get ().begin ();
         while (! p.at_end ()) {
           if (pp.first) {
-            cell.shapes (ll.second).insert (db::BoxWithProperties (box.moved (*p), pp.second));
+            auto shape = cell.shapes (ll.second).insert (db::BoxWithProperties (box.moved (*p), pp.second));
+            if (is_forward_properties_id (pp.second)) {
+              register_forward_property_for_shape (shape);
+            }
           } else {
             cell.shapes (ll.second).insert (box.moved (*p));
           }
@@ -2253,13 +2329,16 @@ OASISReader::do_read_rectangle (bool xy_absolute,
 
   } else {
 
-    std::pair<bool, db::properties_id_type> pp = read_element_properties (layout.properties_repository (), false);
+    std::pair<bool, db::properties_id_type> pp = read_element_properties (false);
 
     if (ll.first) {
 
       db::Cell &cell = layout.cell (cell_index);
       if (pp.first) {
-        cell.shapes (ll.second).insert (db::BoxWithProperties (box, pp.second));
+        auto shape = cell.shapes (ll.second).insert (db::BoxWithProperties (box, pp.second));
+        if (is_forward_properties_id (pp.second)) {
+          register_forward_property_for_shape (shape);
+        }
       } else {
         cell.shapes (ll.second).insert (box);
       }
@@ -2312,7 +2391,7 @@ OASISReader::do_read_polygon (bool xy_absolute, db::cell_index_type cell_index, 
 
   if ((m & 0x4) && read_repetition ()) {
 
-    std::pair<bool, db::properties_id_type> pp = read_element_properties (layout.properties_repository (), false);
+    std::pair<bool, db::properties_id_type> pp = read_element_properties (false);
 
     if (ll.first) {
 
@@ -2340,7 +2419,10 @@ OASISReader::do_read_polygon (bool xy_absolute, db::cell_index_type cell_index, 
           db::SimplePolygonPtr poly_ptr (poly, layout.shape_repository ());
 
           if (pp.first) {
-            cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::SimplePolygonPtr, db::Disp> > (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb), pp.second));
+            auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::SimplePolygonPtr, db::Disp> > (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb), pp.second));
+            if (is_forward_properties_id (pp.second)) {
+              register_forward_property_for_shape (shape);
+            }
           } else {
             cell.shapes (ll.second).insert (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb));
           }
@@ -2359,7 +2441,10 @@ OASISReader::do_read_polygon (bool xy_absolute, db::cell_index_type cell_index, 
           array.sort ();
 
           if (pp.first) {
-            cell.shapes (ll.second).insert (db::object_with_properties<db::Shape::simple_polygon_ptr_array_type> (db::Shape::simple_polygon_ptr_array_type (poly_ptr, db::Disp (d + pos), layout.array_repository ().insert (array)), pp.second));
+            auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::Shape::simple_polygon_ptr_array_type> (db::Shape::simple_polygon_ptr_array_type (poly_ptr, db::Disp (d + pos), layout.array_repository ().insert (array)), pp.second));
+            if (is_forward_properties_id (pp.second)) {
+              register_forward_property_for_shape (shape);
+            }
           } else {
             cell.shapes (ll.second).insert (db::Shape::simple_polygon_ptr_array_type (poly_ptr, db::Disp (d + pos), layout.array_repository ().insert (array)));
           }
@@ -2371,7 +2456,10 @@ OASISReader::do_read_polygon (bool xy_absolute, db::cell_index_type cell_index, 
           RepetitionIterator p = mm_repetition.get ().begin ();
           while (! p.at_end ()) {
             if (pp.first) {
-              cell.shapes (ll.second).insert (db::SimplePolygonRefWithProperties (poly_ref.transformed (db::Disp (pos + *p)), pp.second));
+              auto shape = cell.shapes (ll.second).insert (db::SimplePolygonRefWithProperties (poly_ref.transformed (db::Disp (pos + *p)), pp.second));
+              if (is_forward_properties_id (pp.second)) {
+                register_forward_property_for_shape (shape);
+              }
             } else {
               cell.shapes (ll.second).insert (poly_ref.transformed (db::Disp (pos + *p)));
             }
@@ -2386,7 +2474,7 @@ OASISReader::do_read_polygon (bool xy_absolute, db::cell_index_type cell_index, 
 
   } else {
 
-    std::pair<bool, db::properties_id_type> pp = read_element_properties (layout.properties_repository (), false);
+    std::pair<bool, db::properties_id_type> pp = read_element_properties (false);
 
     if (ll.first) {
 
@@ -2400,7 +2488,10 @@ OASISReader::do_read_polygon (bool xy_absolute, db::cell_index_type cell_index, 
         db::SimplePolygonRef poly_ref (poly, layout.shape_repository ());
 
         if (pp.first) {
-          layout.cell (cell_index).shapes (ll.second).insert (db::SimplePolygonRefWithProperties (poly_ref.transformed (db::Disp (pos)), pp.second));
+          auto shape = layout.cell (cell_index).shapes (ll.second).insert (db::SimplePolygonRefWithProperties (poly_ref.transformed (db::Disp (pos)), pp.second));
+          if (is_forward_properties_id (pp.second)) {
+            register_forward_property_for_shape (shape);
+          }
         } else {
           layout.cell (cell_index).shapes (ll.second).insert (poly_ref.transformed (db::Disp (pos)));
         }
@@ -2479,7 +2570,7 @@ OASISReader::do_read_path (bool xy_absolute, db::cell_index_type cell_index, db:
 
   if ((m & 0x4) && read_repetition ()) {
 
-    std::pair<bool, db::properties_id_type> pp = read_element_properties (layout.properties_repository (), false);
+    std::pair<bool, db::properties_id_type> pp = read_element_properties (false);
 
     if (ll.first) {
 
@@ -2509,7 +2600,10 @@ OASISReader::do_read_path (bool xy_absolute, db::cell_index_type cell_index, db:
           db::PathPtr path_ptr (path, layout.shape_repository ());
 
           if (pp.first) {
-            cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::PathPtr, db::Disp> > (db::array<db::PathPtr, db::Disp> (path_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb), pp.second));
+            auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::PathPtr, db::Disp> > (db::array<db::PathPtr, db::Disp> (path_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb), pp.second));
+            if (is_forward_properties_id (pp.second)) {
+              register_forward_property_for_shape (shape);
+            }
           } else {
             cell.shapes (ll.second).insert (db::array<db::PathPtr, db::Disp> (path_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb));
           }
@@ -2528,7 +2622,10 @@ OASISReader::do_read_path (bool xy_absolute, db::cell_index_type cell_index, db:
           array.sort ();
 
           if (pp.first) {
-            cell.shapes (ll.second).insert (db::object_with_properties<db::Shape::path_ptr_array_type> (db::Shape::path_ptr_array_type (path_ptr, db::Disp (d + pos), layout.array_repository ().insert (array)), pp.second));
+            auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::Shape::path_ptr_array_type> (db::Shape::path_ptr_array_type (path_ptr, db::Disp (d + pos), layout.array_repository ().insert (array)), pp.second));
+            if (is_forward_properties_id (pp.second)) {
+              register_forward_property_for_shape (shape);
+            }
           } else {
             cell.shapes (ll.second).insert (db::Shape::path_ptr_array_type (path_ptr, db::Disp (d + pos), layout.array_repository ().insert (array)));
           }
@@ -2540,7 +2637,10 @@ OASISReader::do_read_path (bool xy_absolute, db::cell_index_type cell_index, db:
           RepetitionIterator p = mm_repetition.get ().begin ();
           while (! p.at_end ()) {
             if (pp.first) {
-              cell.shapes (ll.second).insert (db::PathRefWithProperties (path_ref.transformed (db::Disp (pos + *p)), pp.second));
+              auto shape = cell.shapes (ll.second).insert (db::PathRefWithProperties (path_ref.transformed (db::Disp (pos + *p)), pp.second));
+              if (is_forward_properties_id (pp.second)) {
+                register_forward_property_for_shape (shape);
+              }
             } else {
               cell.shapes (ll.second).insert (path_ref.transformed (db::Disp (pos + *p)));
             }
@@ -2555,7 +2655,7 @@ OASISReader::do_read_path (bool xy_absolute, db::cell_index_type cell_index, db:
 
   } else {
 
-    std::pair<bool, db::properties_id_type> pp = read_element_properties (layout.properties_repository (), false);
+    std::pair<bool, db::properties_id_type> pp = read_element_properties (false);
 
     if (ll.first) {
 
@@ -2571,7 +2671,10 @@ OASISReader::do_read_path (bool xy_absolute, db::cell_index_type cell_index, db:
         db::PathRef path_ref (path, layout.shape_repository ());
 
         if (pp.first) {
-          layout.cell (cell_index).shapes (ll.second).insert (db::PathRefWithProperties (path_ref.transformed (db::Disp (pos)), pp.second));
+          auto shape = layout.cell (cell_index).shapes (ll.second).insert (db::PathRefWithProperties (path_ref.transformed (db::Disp (pos)), pp.second));
+          if (is_forward_properties_id (pp.second)) {
+            register_forward_property_for_shape (shape);
+          }
         } else {
           layout.cell (cell_index).shapes (ll.second).insert (path_ref.transformed (db::Disp (pos)));
         }
@@ -2654,7 +2757,7 @@ OASISReader::do_read_trapezoid (unsigned char r, bool xy_absolute,db::cell_index
 
   if ((m & 0x4) && read_repetition ()) {
 
-    std::pair<bool, db::properties_id_type> pp = read_element_properties (layout.properties_repository (), false);
+    std::pair<bool, db::properties_id_type> pp = read_element_properties (false);
 
     if (ll.first) {
 
@@ -2678,7 +2781,10 @@ OASISReader::do_read_trapezoid (unsigned char r, bool xy_absolute,db::cell_index
         db::SimplePolygonPtr poly_ptr (poly, layout.shape_repository ());
 
         if (pp.first) {
-          cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::SimplePolygonPtr, db::Disp> > (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb), pp.second));
+          auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::SimplePolygonPtr, db::Disp> > (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb), pp.second));
+          if (is_forward_properties_id (pp.second)) {
+            register_forward_property_for_shape (shape);
+          }
         } else {
           cell.shapes (ll.second).insert (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb));
         }
@@ -2697,7 +2803,10 @@ OASISReader::do_read_trapezoid (unsigned char r, bool xy_absolute,db::cell_index
         array.sort ();
 
         if (pp.first) {
-          cell.shapes (ll.second).insert (db::object_with_properties<db::Shape::simple_polygon_ptr_array_type> (db::Shape::simple_polygon_ptr_array_type (poly_ptr, db::Disp (d + pos), layout.array_repository ().insert (array)), pp.second));
+          auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::Shape::simple_polygon_ptr_array_type> (db::Shape::simple_polygon_ptr_array_type (poly_ptr, db::Disp (d + pos), layout.array_repository ().insert (array)), pp.second));
+          if (is_forward_properties_id (pp.second)) {
+            register_forward_property_for_shape (shape);
+          }
         } else {
           cell.shapes (ll.second).insert (db::Shape::simple_polygon_ptr_array_type (poly_ptr, db::Disp (d + pos), layout.array_repository ().insert (array)));
         }
@@ -2709,7 +2818,10 @@ OASISReader::do_read_trapezoid (unsigned char r, bool xy_absolute,db::cell_index
         RepetitionIterator p = mm_repetition.get ().begin ();
         while (! p.at_end ()) {
           if (pp.first) {
-            cell.shapes (ll.second).insert (db::SimplePolygonRefWithProperties (poly_ref.transformed (db::Disp (pos + *p)), pp.second));
+            auto shape = cell.shapes (ll.second).insert (db::SimplePolygonRefWithProperties (poly_ref.transformed (db::Disp (pos + *p)), pp.second));
+            if (is_forward_properties_id (pp.second)) {
+              register_forward_property_for_shape (shape);
+            }
           } else {
             cell.shapes (ll.second).insert (poly_ref.transformed (db::Disp (pos + *p)));
           }
@@ -2722,7 +2834,7 @@ OASISReader::do_read_trapezoid (unsigned char r, bool xy_absolute,db::cell_index
 
   } else {
 
-    std::pair<bool, db::properties_id_type> pp = read_element_properties (layout.properties_repository (), false);
+    std::pair<bool, db::properties_id_type> pp = read_element_properties (false);
 
     if (ll.first) {
 
@@ -2732,7 +2844,10 @@ OASISReader::do_read_trapezoid (unsigned char r, bool xy_absolute,db::cell_index
       db::SimplePolygonRef poly_ref (poly, layout.shape_repository ());
 
       if (pp.first) {
-        layout.cell (cell_index).shapes (ll.second).insert (SimplePolygonRefWithProperties (poly_ref.transformed (db::Disp (pos)), pp.second));
+        auto shape = layout.cell (cell_index).shapes (ll.second).insert (SimplePolygonRefWithProperties (poly_ref.transformed (db::Disp (pos)), pp.second));
+        if (is_forward_properties_id (pp.second)) {
+          register_forward_property_for_shape (shape);
+        }
       } else {
         layout.cell (cell_index).shapes (ll.second).insert (poly_ref.transformed (db::Disp (pos)));
       }
@@ -3014,7 +3129,7 @@ OASISReader::do_read_ctrapezoid (bool xy_absolute,db::cell_index_type cell_index
 
   if ((m & 0x4) && read_repetition ()) {
 
-    std::pair<bool, db::properties_id_type> pp = read_element_properties (layout.properties_repository (), false);
+    std::pair<bool, db::properties_id_type> pp = read_element_properties (false);
 
     if (ll.first) {
 
@@ -3037,7 +3152,10 @@ OASISReader::do_read_ctrapezoid (bool xy_absolute,db::cell_index_type cell_index
         db::SimplePolygonPtr poly_ptr (poly, layout.shape_repository ());
 
         if (pp.first) {
-          cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::SimplePolygonPtr, db::Disp> > (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb), pp.second));
+          auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::SimplePolygonPtr, db::Disp> > (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb), pp.second));
+          if (is_forward_properties_id (pp.second)) {
+            register_forward_property_for_shape (shape);
+          }
         } else {
           cell.shapes (ll.second).insert (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb));
         }
@@ -3056,7 +3174,10 @@ OASISReader::do_read_ctrapezoid (bool xy_absolute,db::cell_index_type cell_index
         array.sort ();
 
         if (pp.first) {
-          cell.shapes (ll.second).insert (db::object_with_properties<db::Shape::simple_polygon_ptr_array_type> (db::Shape::simple_polygon_ptr_array_type (poly_ptr, db::Disp (d + pos), layout.array_repository ().insert (array)), pp.second));
+          auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::Shape::simple_polygon_ptr_array_type> (db::Shape::simple_polygon_ptr_array_type (poly_ptr, db::Disp (d + pos), layout.array_repository ().insert (array)), pp.second));
+          if (is_forward_properties_id (pp.second)) {
+            register_forward_property_for_shape (shape);
+          }
         } else {
           cell.shapes (ll.second).insert (db::Shape::simple_polygon_ptr_array_type (poly_ptr, db::Disp (d + pos), layout.array_repository ().insert (array)));
         }
@@ -3068,7 +3189,10 @@ OASISReader::do_read_ctrapezoid (bool xy_absolute,db::cell_index_type cell_index
         RepetitionIterator p = mm_repetition.get ().begin ();
         while (! p.at_end ()) {
           if (pp.first) {
-            cell.shapes (ll.second).insert (db::SimplePolygonRefWithProperties (poly_ref.transformed (db::Disp (pos + *p)), pp.second));
+            auto shape = cell.shapes (ll.second).insert (db::SimplePolygonRefWithProperties (poly_ref.transformed (db::Disp (pos + *p)), pp.second));
+            if (is_forward_properties_id (pp.second)) {
+              register_forward_property_for_shape (shape);
+            }
           } else {
             cell.shapes (ll.second).insert (poly_ref.transformed (db::Disp (pos + *p)));
           }
@@ -3081,7 +3205,7 @@ OASISReader::do_read_ctrapezoid (bool xy_absolute,db::cell_index_type cell_index
 
   } else {
 
-    std::pair<bool, db::properties_id_type> pp = read_element_properties (layout.properties_repository (), false);
+    std::pair<bool, db::properties_id_type> pp = read_element_properties (false);
 
     if (ll.first) {
 
@@ -3091,7 +3215,10 @@ OASISReader::do_read_ctrapezoid (bool xy_absolute,db::cell_index_type cell_index
       db::SimplePolygonRef poly_ref (poly, layout.shape_repository ());
 
       if (pp.first) {
-        layout.cell (cell_index).shapes (ll.second).insert (db::SimplePolygonRefWithProperties (poly_ref.transformed (db::Disp (pos)), pp.second));
+        auto shape = layout.cell (cell_index).shapes (ll.second).insert (db::SimplePolygonRefWithProperties (poly_ref.transformed (db::Disp (pos)), pp.second));
+        if (is_forward_properties_id (pp.second)) {
+          register_forward_property_for_shape (shape);
+        }
       } else {
         layout.cell (cell_index).shapes (ll.second).insert (poly_ref.transformed (db::Disp (pos)));
       }
@@ -3149,7 +3276,7 @@ OASISReader::do_read_circle (bool xy_absolute, db::cell_index_type cell_index, d
 
   if ((m & 0x4) && read_repetition ()) {
 
-    std::pair<bool, db::properties_id_type> pp = read_element_properties (layout.properties_repository (), false);
+    std::pair<bool, db::properties_id_type> pp = read_element_properties (false);
 
     if (ll.first) {
 
@@ -3175,7 +3302,10 @@ OASISReader::do_read_circle (bool xy_absolute, db::cell_index_type cell_index, d
         db::PathPtr path_ptr (path, layout.shape_repository ());
 
         if (pp.first) {
-          cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::PathPtr, db::Disp> > (db::array<db::PathPtr, db::Disp> (path_ptr, db::Disp (pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb), pp.second));
+          auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::PathPtr, db::Disp> > (db::array<db::PathPtr, db::Disp> (path_ptr, db::Disp (pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb), pp.second));
+          if (is_forward_properties_id (pp.second)) {
+            register_forward_property_for_shape (shape);
+          }
         } else {
           cell.shapes (ll.second).insert (db::array<db::PathPtr, db::Disp> (path_ptr, db::Disp (pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb));
         }
@@ -3192,7 +3322,10 @@ OASISReader::do_read_circle (bool xy_absolute, db::cell_index_type cell_index, d
         array.sort ();
 
         if (pp.first) {
-          cell.shapes (ll.second).insert (db::object_with_properties<db::Shape::path_ptr_array_type> (db::Shape::path_ptr_array_type (path_ptr, db::Disp (pos), layout.array_repository ().insert (array)), pp.second));
+          auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::Shape::path_ptr_array_type> (db::Shape::path_ptr_array_type (path_ptr, db::Disp (pos), layout.array_repository ().insert (array)), pp.second));
+          if (is_forward_properties_id (pp.second)) {
+            register_forward_property_for_shape (shape);
+          }
         } else {
           cell.shapes (ll.second).insert (db::Shape::path_ptr_array_type (path_ptr, db::Disp (pos), layout.array_repository ().insert (array)));
         }
@@ -3204,7 +3337,10 @@ OASISReader::do_read_circle (bool xy_absolute, db::cell_index_type cell_index, d
         RepetitionIterator p = mm_repetition.get ().begin ();
         while (! p.at_end ()) {
           if (pp.first) {
-            cell.shapes (ll.second).insert (db::PathRefWithProperties (path_ref.transformed (db::Disp (pos + *p)), pp.second));
+            auto shape = cell.shapes (ll.second).insert (db::PathRefWithProperties (path_ref.transformed (db::Disp (pos + *p)), pp.second));
+            if (is_forward_properties_id (pp.second)) {
+              register_forward_property_for_shape (shape);
+            }
           } else {
             cell.shapes (ll.second).insert (path_ref.transformed (db::Disp (pos + *p)));
           }
@@ -3217,7 +3353,7 @@ OASISReader::do_read_circle (bool xy_absolute, db::cell_index_type cell_index, d
 
   } else {
 
-    std::pair<bool, db::properties_id_type> pp = read_element_properties (layout.properties_repository (), false);
+    std::pair<bool, db::properties_id_type> pp = read_element_properties (false);
 
     if (ll.first) {
 
@@ -3231,7 +3367,10 @@ OASISReader::do_read_circle (bool xy_absolute, db::cell_index_type cell_index, d
       db::PathRef path_ref (path, layout.shape_repository ());
 
       if (pp.first) {
-        layout.cell (cell_index).shapes (ll.second).insert (db::PathRefWithProperties (path_ref.transformed (db::Disp (pos)), pp.second));
+        auto shape = layout.cell (cell_index).shapes (ll.second).insert (db::PathRefWithProperties (path_ref.transformed (db::Disp (pos)), pp.second));
+        if (is_forward_properties_id (pp.second)) {
+          register_forward_property_for_shape (shape);
+        }
       } else {
         layout.cell (cell_index).shapes (ll.second).insert (path_ref.transformed (db::Disp (pos)));
       }
@@ -3284,9 +3423,7 @@ OASISReader::do_read_cell (db::cell_index_type cell_index, db::Layout &layout)
 
   bool xy_absolute = true;
 
-  bool has_context = false;
-  std::vector <tl::Variant> context_strings;
-  db::PropertiesRepository::properties_set cell_properties;
+  db::PropertiesSet cell_properties;
 
   //  read next record
   while (true) {
@@ -3349,19 +3486,10 @@ OASISReader::do_read_cell (db::cell_index_type cell_index, db::Layout &layout)
     } else if (r == 28 || r == 29 /*PROPERTY*/) {
 
       if (r == 28 /*PROPERTY*/) {
-        read_properties (layout.properties_repository ());
+        read_properties ();
       }
 
-      if (! mm_last_property_is_sprop.get () && mm_last_property_name.get () == m_klayout_context_property_name_id) {
-        has_context = true;
-        context_strings.reserve (mm_last_value_list.get ().size ());
-        for (std::vector<tl::Variant>::const_iterator v = mm_last_value_list.get ().begin (); v != mm_last_value_list.get ().end (); ++v) {
-          context_strings.push_back (*v);
-        }
-      } else {
-        //  store layout properties
-        store_last_properties (layout.properties_repository (), cell_properties, true);
-      }
+      store_last_properties (cell_properties, true, true);
 
       mark_start_table ();
 
@@ -3371,7 +3499,7 @@ OASISReader::do_read_cell (db::cell_index_type cell_index, db::Layout &layout)
       get_ulong ();
       get_str ();
 
-      read_element_properties (layout.properties_repository (), true);
+      read_element_properties (true);
 
     } else if (r == 33 /*XGEOMETRY*/) {
 
@@ -3415,7 +3543,7 @@ OASISReader::do_read_cell (db::cell_index_type cell_index, db::Layout &layout)
         //  later: handle XGEOMETRY with repetition
       }
 
-      read_element_properties (layout.properties_repository (), true);
+      read_element_properties (true);
 
     } else if (r == 34 /*CBLOCK*/) {
 
@@ -3440,28 +3568,49 @@ OASISReader::do_read_cell (db::cell_index_type cell_index, db::Layout &layout)
   }
 
   if (! cell_properties.empty ()) {
-    db::properties_id_type prop_id = layout.properties_repository ().properties_id (cell_properties);
-    m_prop_ids.insert (prop_id);
-    layout.cell (cell_index).prop_id (prop_id);
+
+    if (has_forward_refs (cell_properties)) {
+
+      m_future_cell_properties [cell_index] = cell_properties;
+
+    } else {
+
+      std::vector <tl::Variant> context_strings;
+      extract_context_strings (cell_properties, context_strings);
+      //  store the context strings for later
+      if (context_strings.empty ()) {
+        m_context_strings_per_cell [cell_index].swap (context_strings);
+      }
+
+      layout.cell (cell_index).prop_id (db::properties_id (cell_properties));
+
+    }
   }
 
   //  insert all instances collected (inserting them once is
   //  more effective than doing this every time)
   if (! m_instances.empty ()) {
+
     layout.cell (cell_index).insert (m_instances.begin (), m_instances.end ());
+
     //  clear immediately, because if the cell is cleared before the instances are deleted, the
     //  array pointers (living in the repository) may no longer be valid
     m_instances.clear ();
-  }
-  if (! m_instances_with_props.empty ()) {
-    layout.cell (cell_index).insert (m_instances_with_props.begin (), m_instances_with_props.end ());
-    //  see above.
-    m_instances_with_props.clear ();
+
   }
 
-  //  store the context strings for later
-  if (has_context) {
-    m_context_strings_per_cell [cell_index].swap (context_strings);
+  if (! m_instances_with_props.empty ()) {
+
+    for (auto i = m_instances_with_props.begin (); i != m_instances_with_props.end (); ++i) {
+      auto instance = layout.cell (cell_index).insert (*i);
+      if (is_forward_properties_id (i->properties_id ())) {
+        register_forward_property_for_instance (instance);
+      }
+    }
+
+    //  see above.
+    m_instances_with_props.clear ();
+
   }
 
   m_cellname = "";

@@ -1898,15 +1898,14 @@ Service::handle_guiding_shape_changes (const lay::ObjectInstPath &obj) const
     parent_inst = obj.back ().inst_ptr;
   }
 
-  db::property_names_id_type pn = layout->properties_repository ().prop_name_id ("name");
+  db::property_names_id_type pn = db::property_names_id ("name");
 
-  const db::PropertiesRepository::properties_set &input_props = layout->properties_repository ().properties (obj.shape ().prop_id ());
-  db::PropertiesRepository::properties_set::const_iterator input_pv = input_props.find (pn);
-  if (input_pv == input_props.end ()) {
+  const db::PropertiesSet &input_props = db::properties (obj.shape ().prop_id ());
+  if (! input_props.has_value (pn)) {
     return std::make_pair (false, lay::ObjectInstPath ());
   }
 
-  std::string shape_name = input_pv->second.to_string ();
+  std::string shape_name = input_props.value (pn).to_string ();
 
   //  Hint: get_parameters_from_pcell_and_guiding_shapes invalidates the shapes because it resets the changed
   //  guiding shapes. We must not access s->shape after that.
@@ -1924,15 +1923,12 @@ Service::handle_guiding_shape_changes (const lay::ObjectInstPath &obj) const
     //  try to identify the selected shape in the new shapes and select this one
     db::Shapes::shape_iterator sh = layout->cell (new_inst.cell_index ()).shapes (layout->guiding_shape_layer ()).begin (db::ShapeIterator::All);
     while (! sh.at_end () && !found) {
-      const db::PropertiesRepository::properties_set &props = layout->properties_repository ().properties (sh->prop_id ());
-      db::PropertiesRepository::properties_set::const_iterator pv = props.find (pn);
-      if (pv != props.end ()) {
-        if (pv->second.to_string () == shape_name) {
-          new_obj.back ().inst_ptr = new_inst;
-          new_obj.back ().array_inst = new_inst.begin ();
-          new_obj.set_shape (*sh);
-          found = true;
-        }
+      const db::PropertiesSet &props = db::properties (sh->prop_id ());
+      if (props.has_value (pn) && props.value (pn).to_string () == shape_name) {
+        new_obj.back ().inst_ptr = new_inst;
+        new_obj.back ().array_inst = new_inst.begin ();
+        new_obj.set_shape (*sh);
+        found = true;
       }
       ++sh;
     }

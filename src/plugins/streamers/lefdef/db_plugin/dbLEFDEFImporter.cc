@@ -2032,7 +2032,7 @@ LEFDEFImporter::read (tl::InputStream &stream, db::Layout &layout, LEFDEFReaderS
 
   if (m_options.produce_net_names ()) {
     m_produce_net_props = true;
-    m_net_prop_name_id = layout.properties_repository ().prop_name_id (m_options.net_property_name ());
+    m_net_prop_name_id = db::property_names_id (m_options.net_property_name ());
   }
 
   m_produce_inst_props = false;
@@ -2040,7 +2040,7 @@ LEFDEFImporter::read (tl::InputStream &stream, db::Layout &layout, LEFDEFReaderS
 
   if (m_options.produce_inst_names ()) {
     m_produce_inst_props = true;
-    m_inst_prop_name_id = layout.properties_repository ().prop_name_id (m_options.inst_property_name ());
+    m_inst_prop_name_id = db::property_names_id (m_options.inst_property_name ());
   }
 
   m_produce_pin_props = false;
@@ -2048,7 +2048,7 @@ LEFDEFImporter::read (tl::InputStream &stream, db::Layout &layout, LEFDEFReaderS
 
   if (m_options.produce_pin_names ()) {
     m_produce_pin_props = true;
-    m_pin_prop_name_id = layout.properties_repository ().prop_name_id (m_options.pin_property_name ());
+    m_pin_prop_name_id = db::property_names_id (m_options.pin_property_name ());
   }
 
   try {

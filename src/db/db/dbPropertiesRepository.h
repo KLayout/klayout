@@ -42,22 +42,22 @@ namespace db
 /**
  *  @brief Gets a name entry from the property name ID
  */
-const tl::Variant &property_name (db::property_names_id_type id);
+DB_PUBLIC const tl::Variant &property_name (db::property_names_id_type id);
 
 /**
  *  @brief Gets the property name ID from a property name
  */
-db::property_names_id_type property_names_id (const tl::Variant &pn);
+DB_PUBLIC db::property_names_id_type property_names_id (const tl::Variant &pn);
 
 /**
  *  @brief Gets a value entry from the property value ID
  */
-const tl::Variant &property_value (db::property_values_id_type id);
+DB_PUBLIC const tl::Variant &property_value (db::property_values_id_type id);
 
 /**
  *  @brief Gets the property value ID from a property value
  */
-db::property_values_id_type property_values_id (const tl::Variant &pv);
+DB_PUBLIC db::property_values_id_type property_values_id (const tl::Variant &pv);
 
 
 /**
@@ -71,6 +71,7 @@ class DB_PUBLIC PropertiesSet
 public:
   typedef std::multimap<db::property_names_id_type, db::property_values_id_type> map_type;
   typedef map_type::const_iterator iterator;
+  typedef map_type::iterator non_const_iterator;
 
   /**
    *  @brief The default constructor
@@ -118,6 +119,14 @@ public:
   bool operator< (const PropertiesSet &other) const;
 
   /**
+   *  @brief Swaps with another properties set
+   */
+  void swap (PropertiesSet &other)
+  {
+    m_map.swap (other.m_map);
+  }
+
+  /**
    *  @brief Gets a value indicating whether the properties set is empty
    */
   bool empty () const
@@ -126,9 +135,22 @@ public:
   }
 
   /**
+   *  @brief Gets the size of the properties set
+   */
+  size_t size () const
+  {
+    return m_map.size ();
+  }
+
+  /**
    *  @brief Gets a value indicating whether the given name is contained in the set
    */
   bool has_value (const tl::Variant &name) const;
+
+  /**
+   *  @brief Gets a value indicating whether the given name is contained in the set
+   */
+  bool has_value (db::property_names_id_type name_id) const;
 
   /**
    *  @brief Gets the value for the given name or a nil variant if there is no value for this name
@@ -136,11 +158,24 @@ public:
   const tl::Variant &value (const tl::Variant &name) const;
 
   /**
+   *  @brief Gets the value for the given name or a nil variant if there is no value for this name
+   */
+  const tl::Variant &value (db::property_names_id_type name_id) const;
+
+  /**
    *  @brief operator[] as alias for "value"
    */
   const tl::Variant &operator[] (const tl::Variant &name) const
   {
     return value (name);
+  }
+
+  /**
+   *  @brief operator[] as alias for "value"
+   */
+  const tl::Variant &operator[] (db::property_names_id_type name_id) const
+  {
+    return value (name_id);
   }
 
   /**
@@ -167,6 +202,11 @@ public:
    *  @brief Inserts a value for the given name ID
    */
   void insert (db::property_names_id_type name_id, const tl::Variant &value);
+
+  /**
+   *  @brief Merge another properties set into self
+   */
+  void merge (const db::PropertiesSet &other);
 
   /**
    *  @brief Gets the properties as a map
@@ -205,24 +245,38 @@ public:
     return m_map.end ();
   }
 
+  /**
+   *  @brief Non-const iterator (begin)
+   *
+   *  This iterator delivers key/value pairs in the ID form.
+   *  The order is basically undefined.
+   */
+  non_const_iterator begin_non_const ()
+  {
+    return m_map.begin ();
+  }
+
+  /**
+   *  @brief Non-const iterator (end)
+   */
+  non_const_iterator end_non_const ()
+  {
+    return m_map.end ();
+  }
+
 private:
   map_type m_map;
-
-  friend class PropertiesRepository;
-
-  void change_name (property_names_id_type from, property_names_id_type to);
-  void change_value (property_values_id_type from, property_values_id_type to);
 };
 
 /**
  *  @brief Gets the properties set from a properties set ID
  */
-const PropertiesSet &properties (db::properties_id_type id);
+DB_PUBLIC const PropertiesSet &properties (db::properties_id_type id);
 
 /**
  *  @brief Gets the properties ID from a properties set
  */
-db::properties_id_type properties_id (const PropertiesSet &ps);
+DB_PUBLIC db::properties_id_type properties_id (const PropertiesSet &ps);
 
 /**
  *  @brief The properties repository
@@ -258,32 +312,6 @@ public:
    *  return the ID associated with it.
    */
   property_names_id_type prop_value_id (const tl::Variant &name);
-
-  /**
-   *  @brief Change the name associated with a given name ID to another name
-   * 
-   *  All properties with the given name ID will get the new name. This method is
-   *  particular useful for the OASIS reader, which may associate a name with an Id 
-   *  at a late stage. The ID must have been obtained by "allocate_name".
-   *
-   *  This method will change the definition of property sets. The ID of the
-   *  sets will stay the same. Basically this can lead to a situation where
-   *  identical property sets have different IDs. In other words, ID identity
-   *  is a guarantee for property set identity, but different IDs do not
-   *  mean different property sets.
-   *
-   *  The original ID is still valid, but not associated with the new name.
-   */
-  void change_name (property_names_id_type id, const tl::Variant &new_name);
-  
-  /**
-   *  @brief Change the name associated with a given name Id to another name
-   *
-   *  See "change_name" for more details. This method will change the definition
-   *  of the value behind ID to the new value. The ID must have been obtained
-   *  through "allocate_value".
-   */
-  void change_value (property_values_id_type id, const tl::Variant &new_value);
 
   /**
    *  @brief Get the ID for a name
@@ -340,33 +368,6 @@ public:
    *  Caution: this operation is slow!
    */
   bool is_valid_property_values_id (property_values_id_type id) const;
-
-  /**
-   *  @brief Allocates a new properties ID
-   *
-   *  This method is intended for filling the properties later, i.e. with "change_properties".
-   *  Only after using "change_properties", the properties ID will be found when
-   *  looking it up.
-   */
-  properties_id_type allocate_properties ();
-
-  /**
-   *  @brief Allocates a new properties name ID
-   *
-   *  This method is intended for filling the properties later, i.e. with "change_name".
-   *  Only after using "change_name", a property names ID will be found when
-   *  looking up the name.
-   */
-  property_names_id_type allocate_property_names_id ();
-
-  /**
-   *  @brief Allocates a new properties value ID
-   *
-   *  This method is intended for filling the properties later, i.e. with "change_value".
-   *  Only after using "change_value", the property value ID will be found when
-   *  looking up the value.
-   */
-  property_names_id_type allocate_property_values_id ();
 
   /**
    *  @brief Lookup a table of properties id's by a name value pair

@@ -95,12 +95,12 @@ GDS2ReaderBase::finish_element ()
 
 
 std::pair <bool, db::properties_id_type> 
-GDS2ReaderBase::finish_element (db::PropertiesRepository &rep)
+GDS2ReaderBase::finish_element_with_props ()
 {
   bool any = false;
   long attr = 0;
 
-  db::PropertiesRepository::properties_set properties;
+  db::PropertiesSet properties;
 
   while (true) {
 
@@ -114,9 +114,7 @@ GDS2ReaderBase::finish_element (db::PropertiesRepository &rep)
 
       const char *value = get_string ();
       if (m_read_properties) {
-        properties.insert (std::make_pair (rep.prop_name_id (tl::Variant (attr)), 
-                                           tl::Variant (value)));
-
+        properties.insert (tl::Variant (attr), tl::Variant (value));
         any = true;
       }
 
@@ -132,7 +130,7 @@ GDS2ReaderBase::finish_element (db::PropertiesRepository &rep)
   } 
 
   if (any) {
-    return std::make_pair (true, rep.properties_id (properties));
+    return std::make_pair (true, db::properties_id (properties));
   } else {
     return std::make_pair (false, 0);
   }
@@ -189,7 +187,7 @@ GDS2ReaderBase::do_read (db::Layout &layout)
   layout.add_meta_info ("access_time", MetaInfo (tl::to_string (tr ("Access Time")), tl::sprintf ("%d/%d/%d %d:%02d:%02d", access_time[1], access_time[2], access_time[0], access_time[3], access_time[4], access_time[5])));
 
   long attr = 0;
-  db::PropertiesRepository::properties_set layout_properties;
+  db::PropertiesSet layout_properties;
 
   //  read until 
   short rec_id = 0;
@@ -225,7 +223,7 @@ GDS2ReaderBase::do_read (db::Layout &layout)
 
       const char *value = get_string ();
       if (m_read_properties) {
-        layout_properties.insert (std::make_pair (layout.properties_repository ().prop_name_id (tl::Variant (attr)), tl::Variant (value)));
+        layout_properties.insert (tl::Variant (attr), tl::Variant (value));
       }
 
     } else if (rec_id == sUNITS) {
@@ -250,7 +248,7 @@ GDS2ReaderBase::do_read (db::Layout &layout)
 
   //  set the layout properties
   if (! layout_properties.empty ()) {
-    layout.prop_id (layout.properties_repository ().properties_id (layout_properties));
+    layout.prop_id (db::properties_id (layout_properties));
   }
 
   //  this container has been found to grow quite a lot.
@@ -314,7 +312,7 @@ GDS2ReaderBase::do_read (db::Layout &layout)
       }
 
       long attr = 0;
-      db::PropertiesRepository::properties_set cell_properties;
+      db::PropertiesSet cell_properties;
 
       //  read cell content
       while ((rec_id = get_record ()) != sENDSTR) { 
@@ -333,7 +331,7 @@ GDS2ReaderBase::do_read (db::Layout &layout)
 
           const char *value = get_string ();
           if (m_read_properties) {
-            cell_properties.insert (std::make_pair (layout.properties_repository ().prop_name_id (tl::Variant (attr)), tl::Variant (value)));
+            cell_properties.insert (tl::Variant (attr), tl::Variant (value));
           }
 
         } else if (rec_id == sBOUNDARY) {
@@ -386,7 +384,7 @@ GDS2ReaderBase::do_read (db::Layout &layout)
 
       //  set the cell properties
       if (! cell_properties.empty ()) {
-        cell->prop_id (layout.properties_repository ().properties_id (cell_properties));
+        cell->prop_id (db::properties_id (cell_properties));
       }
 
     }
@@ -603,7 +601,7 @@ GDS2ReaderBase::read_boundary (db::Layout &layout, db::Cell &cell, bool from_box
         }
       }
 
-      std::pair<bool, db::properties_id_type> pp = finish_element (layout.properties_repository ());
+      std::pair<bool, db::properties_id_type> pp = finish_element_with_props ();
       if (pp.first) {
         cell.shapes (ll.second).insert (db::BoxWithProperties (db::Box (p1, p2), pp.second));
       } else {
@@ -662,7 +660,7 @@ GDS2ReaderBase::read_boundary (db::Layout &layout, db::Cell &cell, bool from_box
         finish_element ();
       } else {
         //  this will copy the polyon:
-        std::pair<bool, db::properties_id_type> pp = finish_element (layout.properties_repository ());
+        std::pair<bool, db::properties_id_type> pp = finish_element_with_props ();
         if (pp.first) {
           cell.shapes (ll.second).insert (db::SimplePolygonRefWithProperties (db::SimplePolygonRef (poly, layout.shape_repository ()), pp.second));
         } else {
@@ -799,7 +797,7 @@ GDS2ReaderBase::read_path (db::Layout &layout, db::Cell &cell)
       if (path.points () < 2 && type != 1) {
         warn (tl::to_string (tr ("PATH with less than two points encountered - interpretation may be different in other tools")));
       }
-      std::pair<bool, db::properties_id_type> pp = finish_element (layout.properties_repository ());
+      std::pair<bool, db::properties_id_type> pp = finish_element_with_props ();
       if (pp.first) {
         cell.shapes (ll.second).insert (db::PathRefWithProperties (db::PathRef (path, layout.shape_repository ()), pp.second));
       } else {
@@ -935,7 +933,7 @@ GDS2ReaderBase::read_text (db::Layout &layout, db::Cell &cell)
     //  Create the text
     db::Text text (get_string (), t, size, font, ha, va);
 
-    std::pair<bool, db::properties_id_type> pp = finish_element (layout.properties_repository ());
+    std::pair<bool, db::properties_id_type> pp = finish_element_with_props ();
     if (pp.first) {
       cell.shapes (ll.second).insert (db::TextRefWithProperties (db::TextRef (text, layout.shape_repository ()), pp.second));
     } else {
@@ -982,7 +980,7 @@ GDS2ReaderBase::read_box (db::Layout &layout, db::Cell &cell)
       box += pt_conv (*xy++);
     }
 
-    std::pair<bool, db::properties_id_type> pp = finish_element (layout.properties_repository ());
+    std::pair<bool, db::properties_id_type> pp = finish_element_with_props ();
     if (! box.empty ()) {
       if (pp.first) {
         cell.shapes (ll.second).insert (db::BoxWithProperties (box, pp.second));
@@ -1095,7 +1093,7 @@ GDS2ReaderBase::read_ref (db::Layout &layout, db::Cell & /*cell*/, bool array, t
       rows = 1;
     }
 
-    std::pair<bool, db::properties_id_type> pp = finish_element (layout.properties_repository ());
+    std::pair<bool, db::properties_id_type> pp = finish_element_with_props ();
 
     bool split_cols = false, split_rows = false;
 
@@ -1234,7 +1232,7 @@ GDS2ReaderBase::read_ref (db::Layout &layout, db::Cell & /*cell*/, bool array, t
       inst = db::CellInstArray (db::CellInst (ci), db::Trans (angle, mirror, xy));
     }
 
-    std::pair<bool, db::properties_id_type> pp = finish_element (layout.properties_repository ());
+    std::pair<bool, db::properties_id_type> pp = finish_element_with_props ();
     if (pp.first) {
       instances_with_props.push_back (db::CellInstArrayWithProperties (inst, pp.second));
     } else {

@@ -827,9 +827,9 @@ DEFImporter::read_nets (db::Layout &layout, db::Cell &design, double scale, bool
 
     db::properties_id_type prop_id = 0;
     if (produce_net_props ()) {
-      db::PropertiesRepository::properties_set props;
-      props.insert (std::make_pair (net_prop_name_id (), tl::Variant (net)));
-      prop_id = layout.properties_repository ().properties_id (props);
+      db::PropertiesSet props;
+      props.insert (net_prop_name_id (), tl::Variant (net));
+      prop_id = db::properties_id (props);
     }
 
     while (test ("(")) {
@@ -865,9 +865,9 @@ DEFImporter::read_nets (db::Layout &layout, db::Cell &design, double scale, bool
         net = stored_netname + "/" + subnetname;
 
         if (produce_net_props ()) {
-          db::PropertiesRepository::properties_set props;
-          props.insert (std::make_pair (net_prop_name_id (), tl::Variant (net)));
-          prop_id = layout.properties_repository ().properties_id (props);
+          db::PropertiesSet props;
+          props.insert (net_prop_name_id (), tl::Variant (net));
+          prop_id = db::properties_id (props);
         }
 
       } else if (! specialnets && test ("NONDEFAULTRULE")) {
@@ -1371,14 +1371,14 @@ DEFImporter::read_pins (db::Layout &layout, db::Cell &design, double scale)
 
             db::properties_id_type prop_id = 0;
             if (produce_pin_props () || produce_net_props ()) {
-              db::PropertiesRepository::properties_set props;
+              db::PropertiesSet props;
               if (produce_pin_props ()) {
-                props.insert (std::make_pair (pin_prop_name_id (), tl::Variant (label)));
+                props.insert (pin_prop_name_id (), tl::Variant (label));
               }
               if (produce_net_props ()) {
-                props.insert (std::make_pair (net_prop_name_id (), tl::Variant (net)));
+                props.insert (net_prop_name_id (), tl::Variant (net));
               }
-              prop_id = layout.properties_repository ().properties_id (props);
+              prop_id = db::properties_id (props);
             }
 
             for (std::vector<db::Polygon>::const_iterator p = g->second.begin (); p != g->second.end (); ++p) {
@@ -1944,9 +1944,9 @@ DEFImporter::do_read (db::Layout &layout)
           if (g->comp_matches (ii->first)) {
 
             if (produce_inst_props ()) {
-              db::PropertiesRepository::properties_set props;
-              props.insert (std::make_pair (inst_prop_name_id (), tl::Variant (ii->first)));
-              group_cell->insert (db::CellInstArrayWithProperties (ii->second, layout.properties_repository ().properties_id (props)));
+              db::PropertiesSet props;
+              props.insert (inst_prop_name_id (), tl::Variant (ii->first));
+              group_cell->insert (db::CellInstArrayWithProperties (ii->second, db::properties_id (props)));
             } else {
               group_cell->insert (ii->second);
             }
@@ -1993,9 +1993,9 @@ DEFImporter::do_read (db::Layout &layout)
   for (std::list<std::pair<std::string, db::CellInstArray> >::iterator ii = instances.begin (); ii != instances.end (); ++ii) {
 
     if (produce_inst_props ()) {
-      db::PropertiesRepository::properties_set props;
-      props.insert (std::make_pair (inst_prop_name_id (), tl::Variant (ii->first)));
-      others_cell->insert (db::CellInstArrayWithProperties (ii->second, layout.properties_repository ().properties_id (props)));
+      db::PropertiesSet props;
+      props.insert (inst_prop_name_id (), tl::Variant (ii->first));
+      others_cell->insert (db::CellInstArrayWithProperties (ii->second, db::properties_id (props)));
     } else {
       others_cell->insert (ii->second);
     }

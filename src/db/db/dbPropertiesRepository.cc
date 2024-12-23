@@ -117,10 +117,28 @@ PropertiesSet::has_value (const tl::Variant &name) const
   return m_map.find (nid) != m_map.end ();
 }
 
+bool
+PropertiesSet::has_value (db::property_names_id_type nid) const
+{
+  return m_map.find (nid) != m_map.end ();
+}
+
 const tl::Variant &
 PropertiesSet::value (const tl::Variant &name) const
 {
   db::property_names_id_type nid = db::property_names_id (name);
+  auto i = m_map.find (nid);
+  if (i == m_map.end () || i->second != nid) {
+    static tl::Variant nil;
+    return nil;
+  } else {
+    return property_value (i->second);
+  }
+}
+
+const tl::Variant &
+PropertiesSet::value (db::property_names_id_type nid) const
+{
   auto i = m_map.find (nid);
   if (i == m_map.end () || i->second != nid) {
     static tl::Variant nil;
@@ -169,6 +187,12 @@ PropertiesSet::insert (db::property_names_id_type nid, const tl::Variant &value)
   m_map.insert (std::make_pair (nid, db::property_values_id (value)));
 }
 
+void
+PropertiesSet::merge (const db::PropertiesSet &other)
+{
+  m_map.insert (other.m_map.begin (), other.m_map.end ());
+}
+
 std::multimap<tl::Variant, tl::Variant>
 PropertiesSet::to_map () const
 {
@@ -203,38 +227,14 @@ PropertiesSet::to_list_var () const
   return var;
 }
 
-void
-PropertiesSet::change_name (property_names_id_type from, property_names_id_type to)
-{
-  map_type org_map;
-  org_map.swap (m_map);
-
-  for (auto i = org_map.begin (); i != org_map.end (); ++i) {
-    if (i->first == from) {
-      m_map.insert (std::make_pair (to, i->second));
-    } else {
-      m_map.insert (*i);
-    }
-  }
-}
-
-void
-PropertiesSet::change_value (property_values_id_type from, property_values_id_type to)
-{
-  map_type org_map;
-  org_map.swap (m_map);
-
-  for (auto i = org_map.begin (); i != org_map.end (); ++i) {
-    if (i->second == from) {
-      m_map.insert (std::make_pair (i->first, to));
-    } else {
-      m_map.insert (*i);
-    }
-  }
-}
-
 // ----------------------------------------------------------------------------------
 //  PropertiesRepository implementation
+
+PropertiesRepository &PropertiesRepository::instance ()
+{
+  static PropertiesRepository s_instance;
+  return s_instance;
+}
 
 PropertiesRepository::PropertiesRepository ()
 {
@@ -300,55 +300,7 @@ PropertiesRepository::prop_value_id (const tl::Variant &value)
 }
 
 
-void
-PropertiesRepository::change_name (property_names_id_type id, const tl::Variant &new_name)
-{
-  db::property_names_id_type new_id = property_names_id (new_name);
-  if (new_id == id) {
-    return;
-  }
-
-  auto &new_pids = m_properties_by_name_table [new_id];
-
-  auto pids = m_properties_by_name_table.find (id);
-  if (pids != m_properties_by_name_table.end ()) {
-    for (auto pid = pids->second.begin (); pid != pids->second.end (); ++pid) {
-      PropertiesSet *ps = reinterpret_cast<PropertiesSet *> (*pid);
-      m_properties.erase (ps);
-      ps->change_name (id, new_id);
-      m_properties.insert (ps);
-      new_pids.insert (*pid);
-    }
-  }
-
-  m_properties_by_name_table.erase (id);
-}
-
-void
-PropertiesRepository::change_value (property_values_id_type id, const tl::Variant &new_value)
-{
-  db::property_values_id_type new_id = property_values_id (new_value);
-  if (new_id == id) {
-    return;
-  }
-
-  auto &new_pids = m_properties_by_value_table [new_id];
-
-  auto pids = m_properties_by_value_table.find (id);
-  if (pids != m_properties_by_value_table.end ()) {
-    for (auto pid = pids->second.begin (); pid != pids->second.end (); ++pid) {
-      PropertiesSet *ps = reinterpret_cast<PropertiesSet *> (*pid);
-      m_properties.erase (ps);
-      ps->change_value (id, new_id);
-      m_properties.insert (ps);
-      new_pids.insert (*pid);
-    }
-  }
-
-  m_properties_by_value_table.erase (id);
-}
-
-properties_id_type 
+properties_id_type
 PropertiesRepository::properties_id (const PropertiesSet &props)
 {
   if (props.empty ()) {
@@ -450,33 +402,6 @@ PropertiesRepository::properties_ids_by_name_value (db::property_names_id_type n
   properties_id_set result;
   std::set_intersection (vi->second.begin (), vi->second.end (), ni->second.begin (), ni->second.end (), std::inserter (result, result.begin ()));
   return result;
-}
-
-properties_id_type
-PropertiesRepository::allocate_properties ()
-{
-  tl::MutexLocker locker (&m_lock);
-
-  m_properties_heap.push_back (PropertiesSet ());
-  return db::properties_id_type (& m_properties_heap.back ());
-}
-
-property_names_id_type
-PropertiesRepository::allocate_property_names_id ()
-{
-  tl::MutexLocker locker (&m_lock);
-
-  m_property_names_heap.push_back (tl::Variant ());
-  return db::property_names_id_type (& m_property_names_heap.back ());
-}
-
-property_names_id_type
-PropertiesRepository::allocate_property_values_id ()
-{
-  tl::MutexLocker locker (&m_lock);
-
-  m_property_values_heap.push_back (tl::Variant ());
-  return db::property_values_id_type (& m_property_values_heap.back ());
 }
 
 // ----------------------------------------------------------------------------------

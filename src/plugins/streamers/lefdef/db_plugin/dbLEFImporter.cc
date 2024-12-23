@@ -956,9 +956,9 @@ LEFImporter::read_macro (Layout &layout)
 
             db::properties_id_type prop_id = 0;
             if (produce_pin_props ()) {
-              db::PropertiesRepository::properties_set props;
-              props.insert (std::make_pair (pin_prop_name_id (), tl::Variant (label)));
-              prop_id = layout.properties_repository ().properties_id (props);
+              db::PropertiesSet props;
+              props.insert (pin_prop_name_id (), tl::Variant (label));
+              prop_id = db::properties_id (props);
             }
 
             std::map <std::string, db::Box> boxes_for_labels;

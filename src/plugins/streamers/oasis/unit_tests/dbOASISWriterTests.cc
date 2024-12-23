@@ -1207,19 +1207,19 @@ TEST(115)
   db::Layout g (&m);
 
   db::property_names_id_type n1, n2, n3;
-  n1 = g.properties_repository ().prop_name_id (tl::Variant (17));
-  n2 = g.properties_repository ().prop_name_id (tl::Variant ("name"));
-  n3 = g.properties_repository ().prop_name_id (tl::Variant ((unsigned int) 42));
+  n1 = db::property_names_id (tl::Variant (17));
+  n2 = db::property_names_id (tl::Variant ("name"));
+  n3 = db::property_names_id (tl::Variant ((unsigned int) 42));
 
-  db::PropertiesRepository::properties_set s1;
-  s1.insert (std::make_pair (n1, tl::Variant ("17value")));
-  s1.insert (std::make_pair (n2, tl::Variant (117)));
+  db::PropertiesSet s1;
+  s1.insert (n1, tl::Variant ("17value"));
+  s1.insert (n2, tl::Variant (117));
 
-  db::PropertiesRepository::properties_set s2;
-  s2.insert (std::make_pair (n3, tl::Variant (42)));
+  db::PropertiesSet s2;
+  s2.insert (n3, tl::Variant (42));
 
-  db::properties_id_type p1 = g.properties_repository ().properties_id (s1);
-  db::properties_id_type p2 = g.properties_repository ().properties_id (s2);
+  db::properties_id_type p1 = db::properties_id (s1);
+  db::properties_id_type p2 = db::properties_id (s2);
 
   g.prop_id (p1);
 
@@ -1288,19 +1288,19 @@ TEST(116)
   db::Layout g (&m);
 
   db::property_names_id_type n1, n2, n3;
-  n1 = g.properties_repository ().prop_name_id (tl::Variant (17));
-  n2 = g.properties_repository ().prop_name_id (tl::Variant ("name"));
-  n3 = g.properties_repository ().prop_name_id (tl::Variant ((unsigned int) 42));
+  n1 = db::property_names_id (tl::Variant (17));
+  n2 = db::property_names_id (tl::Variant ("name"));
+  n3 = db::property_names_id (tl::Variant ((unsigned int) 42));
 
-  db::PropertiesRepository::properties_set s1;
-  s1.insert (std::make_pair (n1, tl::Variant ("17value")));
-  s1.insert (std::make_pair (n2, tl::Variant (117)));
+  db::PropertiesSet s1;
+  s1.insert (n1, tl::Variant ("17value"));
+  s1.insert (n2, tl::Variant (117));
 
-  db::PropertiesRepository::properties_set s2;
-  s2.insert (std::make_pair (n3, tl::Variant (42)));
+  db::PropertiesSet s2;
+  s2.insert (n3, tl::Variant (42));
 
-  db::properties_id_type p1 = g.properties_repository ().properties_id (s1);
-  db::properties_id_type p2 = g.properties_repository ().properties_id (s2);
+  db::properties_id_type p1 = db::properties_id (s1);
+  db::properties_id_type p2 = db::properties_id (s2);
 
   g.prop_id (p1);
 

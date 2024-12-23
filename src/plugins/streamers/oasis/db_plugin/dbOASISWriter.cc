@@ -997,10 +997,10 @@ OASISWriter::write_ucoord (db::Coord c)
 void
 OASISWriter::emit_propname_def (db::properties_id_type prop_id)
 {
-  const db::PropertiesRepository::properties_set &props = mp_layout->properties_repository ().properties (prop_id);
-  for (db::PropertiesRepository::properties_set::const_iterator p = props.begin (); p != props.end (); ++p) {
+  auto props = db::properties (prop_id).to_map ();
+  for (auto p = props.begin (); p != props.end (); ++p) {
 
-    const tl::Variant &name = mp_layout->properties_repository ().prop_name (p->first);
+    const tl::Variant &name = p->first;
     const char *name_str = s_gds_property_name;
     if (! make_gds_property (name)) {
       name_str = name.to_string ();
@@ -1019,13 +1019,13 @@ OASISWriter::emit_propstring_def (db::properties_id_type prop_id)
 {
   std::vector<tl::Variant> pv_list;
 
-  const db::PropertiesRepository::properties_set &props = mp_layout->properties_repository ().properties (prop_id);
-  for (db::PropertiesRepository::properties_set::const_iterator p = props.begin (); p != props.end (); ++p) {
+  auto props = db::properties (prop_id).to_map ();
+  for (auto p = props.begin (); p != props.end (); ++p) {
 
     pv_list.clear ();
     const std::vector<tl::Variant> *pvl = &pv_list;
 
-    const tl::Variant &name = mp_layout->properties_repository ().prop_name (p->first);
+    const tl::Variant &name = p->first;
     if (! make_gds_property (name)) {
 
       if (p->second.is_list ()) {
@@ -2117,13 +2117,13 @@ OASISWriter::write_props (db::properties_id_type prop_id)
 {
   std::vector<tl::Variant> pv_list; 
 
-  const db::PropertiesRepository::properties_set &props = mp_layout->properties_repository ().properties (prop_id);
+  auto props = db::properties (prop_id).to_map ();
 
-  for (db::PropertiesRepository::properties_set::const_iterator p = props.begin (); p != props.end (); ++p) {
+  for (auto p = props.begin (); p != props.end (); ++p) {
 
     m_progress.set (mp_stream->pos ());
 
-    const tl::Variant &name = mp_layout->properties_repository ().prop_name (p->first);
+    const tl::Variant &name = p->first;
 
     const char *name_str = s_gds_property_name;
     bool sflag = true;

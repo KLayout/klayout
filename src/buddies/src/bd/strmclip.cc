@@ -82,7 +82,6 @@ void clip (ClipData &data)
   }
 
   //  copy the properties repository in order to have the same ID mapping
-  target_layout.properties_repository () = layout.properties_repository ();
   target_layout.dbu (layout.dbu ());
 
   //  look for the clip layer

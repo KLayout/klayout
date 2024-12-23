@@ -176,8 +176,8 @@ get_parameters_from_pcell_and_guiding_shapes (db::Layout *layout, db::cell_index
     pname_map.insert (std::make_pair (pcp [i].get_name (), i));
   }
 
-  db::property_names_id_type pn = layout->properties_repository ().prop_name_id ("name");
-  db::property_names_id_type dn = layout->properties_repository ().prop_name_id (tl::Variant ("description"));
+  db::property_names_id_type pn = db::property_names_id ("name");
+  db::property_names_id_type dn = db::property_names_id ("description");
 
   db::Shapes &guiding_shapes = layout->cell (cell_index).shapes (layout->guiding_shape_layer ());
 
@@ -186,11 +186,10 @@ get_parameters_from_pcell_and_guiding_shapes (db::Layout *layout, db::cell_index
 
     if (sh->has_prop_id ()) {
 
-      const db::PropertiesRepository::properties_set &props = layout->properties_repository ().properties (sh->prop_id ());
-      db::PropertiesRepository::properties_set::const_iterator pv = props.find (pn);
-      if (pv != props.end ()) {
+      const db::PropertiesSet &props = db::properties (sh->prop_id ());
+      if (props.has_value (pn)) {
 
-        std::map <std::string, size_t>::const_iterator pnm = pname_map.find (pv->second.to_string ());
+        std::map <std::string, size_t>::const_iterator pnm = pname_map.find (props.value (pn).to_string ());
         if (pnm != pname_map.end ()) {
 
           db::CplxTrans dbu_trans (layout->dbu ());
@@ -230,37 +229,37 @@ get_parameters_from_pcell_and_guiding_shapes (db::Layout *layout, db::cell_index
     if (pd.get_type () == db::PCellParameterDeclaration::t_shape && ! pd.is_hidden ()) {
 
       //  use property with name "name" to indicate the parameter name
-      db::PropertiesRepository::properties_set props;
-      props.insert (std::make_pair (pn, tl::Variant (pd.get_name ())));
+      db::PropertiesSet props;
+      props.insert (pn, tl::Variant (pd.get_name ()));
 
       if (! pd.get_description ().empty ()) {
-        props.insert (std::make_pair (dn, tl::Variant (pd.get_description ())));
+        props.insert (dn, tl::Variant (pd.get_description ()));
       }
 
       if (org_parameters[i].is_user<db::DBox> ()) {
 
-        guiding_shapes.insert (db::BoxWithProperties(db::Box (org_parameters[i].to_user<db::DBox> () * (1.0 / layout->dbu ())), layout->properties_repository ().properties_id (props)));
+        guiding_shapes.insert (db::BoxWithProperties (db::Box (org_parameters[i].to_user<db::DBox> () * (1.0 / layout->dbu ())), db::properties_id (props)));
 
       } else if (org_parameters[i].is_user<db::DEdge> ()) {
 
-        guiding_shapes.insert (db::EdgeWithProperties(db::Edge (org_parameters[i].to_user<db::DEdge> () * (1.0 / layout->dbu ())), layout->properties_repository ().properties_id (props)));
+        guiding_shapes.insert (db::EdgeWithProperties (db::Edge (org_parameters[i].to_user<db::DEdge> () * (1.0 / layout->dbu ())), db::properties_id (props)));
 
       } else if (org_parameters[i].is_user<db::DPoint> ()) {
 
         db::DPoint p = org_parameters[i].to_user<db::DPoint> ();
-        guiding_shapes.insert (db::PointWithProperties(db::Point (p * (1.0 / layout->dbu ())), layout->properties_repository ().properties_id (props)));
+        guiding_shapes.insert (db::PointWithProperties (db::Point (p * (1.0 / layout->dbu ())), db::properties_id (props)));
 
       } else if (org_parameters[i].is_user<db::DPolygon> ()) {
 
         db::complex_trans<db::DCoord, db::Coord> dbu_trans (1.0 / layout->dbu ());
         //  Hint: we don't compress the polygon since we don't want to loose information
         db::Polygon poly = org_parameters[i].to_user<db::DPolygon> ().transformed (dbu_trans, false);
-        guiding_shapes.insert (db::PolygonWithProperties(poly, layout->properties_repository ().properties_id (props)));
+        guiding_shapes.insert (db::PolygonWithProperties (poly, db::properties_id (props)));
 
       } else if (org_parameters[i].is_user<db::DPath> ()) {
 
         db::complex_trans<db::DCoord, db::Coord> dbu_trans (1.0 / layout->dbu ());
-        guiding_shapes.insert (db::PathWithProperties(dbu_trans * org_parameters[i].to_user<db::DPath> (), layout->properties_repository ().properties_id (props)));
+        guiding_shapes.insert (db::PathWithProperties (dbu_trans * org_parameters[i].to_user<db::DPath> (), db::properties_id (props)));
 
       }
 

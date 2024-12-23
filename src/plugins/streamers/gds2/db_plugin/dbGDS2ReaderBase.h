@@ -97,7 +97,7 @@ private:
   void read_box (db::Layout &layout, db::Cell &cell);
   void read_ref (db::Layout &layout, db::Cell &cell, bool array, tl::vector<db::CellInstArray> &instances, tl::vector<db::CellInstArrayWithProperties> &insts_wp);
 
-  std::pair <bool, db::properties_id_type> finish_element (db::PropertiesRepository &rep);
+  std::pair <bool, db::properties_id_type> finish_element_with_props ();
   void finish_element ();
 
   virtual void common_reader_error (const std::string &msg) { error (msg); }

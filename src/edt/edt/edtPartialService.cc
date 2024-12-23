@@ -3406,15 +3406,14 @@ PartialService::handle_guiding_shape_changes ()
     parent_inst = s->first.back ().inst_ptr;
   }
 
-  db::property_names_id_type pn = layout->properties_repository ().prop_name_id ("name");
-
-  const db::PropertiesRepository::properties_set &input_props = layout->properties_repository ().properties (s->first.shape ().prop_id ());
-  db::PropertiesRepository::properties_set::const_iterator input_pv = input_props.find (pn);
-  if (input_pv == input_props.end ()) {
+  //  @@@ name by id, don't repeat key
+  const db::PropertiesSet &input_props = db::properties (s->first.shape ().prop_id ());
+  tl::Variant name_value = input_props.value (tl::Variant ("name"));
+  if (name_value.is_nil ()) {
     return false;
   }
 
-  std::string shape_name = input_pv->second.to_string ();
+  std::string shape_name = name_value.to_string ();
 
   //  Hint: get_parameters_from_pcell_and_guiding_shapes invalidates the shapes because it resets the changed
   //  guiding shapes. We must not access s->shape after that.
@@ -3431,17 +3430,14 @@ PartialService::handle_guiding_shape_changes ()
     //  try to identify the selected shape in the new shapes and select this one
     db::Shapes::shape_iterator sh = layout->cell (new_inst.cell_index ()).shapes (layout->guiding_shape_layer ()).begin (db::ShapeIterator::All);
     while (! sh.at_end ()) {
-      const db::PropertiesRepository::properties_set &props = layout->properties_repository ().properties (sh->prop_id ());
-      db::PropertiesRepository::properties_set::const_iterator pv = props.find (pn);
-      if (pv != props.end ()) {
-        if (pv->second.to_string () == shape_name) {
-          lay::ObjectInstPath inst_path = s->first;
-          inst_path.back ().inst_ptr = new_inst;
-          inst_path.back ().array_inst = new_inst.begin ();
-          inst_path.set_shape (*sh);
-          new_sel.insert (std::make_pair (inst_path, s->second));
-          break;
-        }
+      const db::PropertiesSet &props = db::properties (sh->prop_id ());
+      if (props.value (tl::Variant ("name")) == shape_name) {
+        lay::ObjectInstPath inst_path = s->first;
+        inst_path.back ().inst_ptr = new_inst;
+        inst_path.back ().array_inst = new_inst.begin ();
+        inst_path.set_shape (*sh);
+        new_sel.insert (std::make_pair (inst_path, s->second));
+        break;
       }
       ++sh;
     }

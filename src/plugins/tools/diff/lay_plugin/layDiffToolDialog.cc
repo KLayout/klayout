@@ -111,9 +111,9 @@ private:
   size_t m_obj_index;
 
   void produce_cell_inst (const db::CellInstArrayWithProperties &ci, const db::Layout *layout, const rdb::Category *cat);
-  template <class SH> void produce_diffs_for_xor (const db::PropertiesRepository &pr, const std::vector <std::pair <SH, db::properties_id_type> > &a, const std::vector <std::pair <SH, db::properties_id_type> > &b, double dbu_a, db::Shapes &shapes);
-  template <class SH> void produce_diffs (const db::PropertiesRepository &pr, const std::vector <std::pair <SH, db::properties_id_type> > &a, const std::vector <std::pair <SH, db::properties_id_type> > &b, double dbu_a, const rdb::Category *cat);
-  template <class SH> void shape_diffs (const db::PropertiesRepository &pr, const std::vector <std::pair <SH, db::properties_id_type> > &a, const std::vector <std::pair <SH, db::properties_id_type> > &b);
+  template <class SH> void produce_diffs_for_xor (const std::vector <std::pair <SH, db::properties_id_type> > &a, const std::vector <std::pair <SH, db::properties_id_type> > &b, double dbu_a, db::Shapes &shapes);
+  template <class SH> void produce_diffs (const std::vector <std::pair <SH, db::properties_id_type> > &a, const std::vector <std::pair <SH, db::properties_id_type> > &b, double dbu_a, const rdb::Category *cat);
+  template <class SH> void shape_diffs (const std::vector <std::pair <SH, db::properties_id_type> > &a, const std::vector <std::pair <SH, db::properties_id_type> > &b);
   void shape_diffs_found ();
 };
 
@@ -200,12 +200,12 @@ RdbDifferenceReceiver::RdbDifferenceReceiver (const db::Layout &layout_a, const 
 }
 
 static void 
-add_property_text (rdb::Item *item, const db::PropertiesRepository &pr, db::properties_id_type prop_id) 
+add_property_text (rdb::Item *item, db::properties_id_type prop_id)
 {
   if (prop_id != 0) {
-    const db::PropertiesRepository::properties_set &p = pr.properties (prop_id);
-    for (db::PropertiesRepository::properties_set::const_iterator pp = p.begin (); pp != p.end (); ++pp) {
-      const tl::Variant &name = pr.prop_name (pp->first);
+    auto p = db::properties (prop_id).to_map ();
+    for (auto pp = p.begin (); pp != p.end (); ++pp) {
+      const tl::Variant &name = pp->first;
       std::string r = std::string ("property: ") + name.to_string () + " = " + pp->second.to_string ();
       item->add_value (r);
     }
@@ -237,7 +237,7 @@ RdbDifferenceReceiver::produce_cell_inst (const db::CellInstArrayWithProperties 
   item->add_value (box * layout->dbu ());
 
   if (m_with_properties) {
-    add_property_text (item, layout->properties_repository (), ci.properties_id ()); 
+    add_property_text (item, ci.properties_id ());
   }
 }
 
@@ -315,13 +315,13 @@ RdbDifferenceReceiver::begin_inst_differences ()
 }
 
 void
-RdbDifferenceReceiver::instances_in_a (const std::vector <db::CellInstArrayWithProperties> & /*insts_a*/, const std::vector <std::string> & /*cell_names*/, const db::PropertiesRepository & /*props*/)
+RdbDifferenceReceiver::instances_in_a (const std::vector <db::CellInstArrayWithProperties> & /*insts_a*/, const std::vector <std::string> & /*cell_names*/)
 {
   // .. nothing ..
 }
 
 void
-RdbDifferenceReceiver::instances_in_b (const std::vector <db::CellInstArrayWithProperties> & /*insts_b*/, const std::vector <std::string> & /*cell_names*/, const db::PropertiesRepository & /*props*/)
+RdbDifferenceReceiver::instances_in_b (const std::vector <db::CellInstArrayWithProperties> & /*insts_b*/, const std::vector <std::string> & /*cell_names*/)
 {
   // .. nothing ..
 }
@@ -469,7 +469,7 @@ inline std::string shape_type (const db::Box &)
 
 template <class SH>
 void
-RdbDifferenceReceiver::produce_diffs_for_xor (const db::PropertiesRepository & /*pr*/, const std::vector <std::pair <SH, db::properties_id_type> > &a, const std::vector <std::pair <SH, db::properties_id_type> > &b, double dbu_a, db::Shapes &shapes)
+RdbDifferenceReceiver::produce_diffs_for_xor (const std::vector <std::pair <SH, db::properties_id_type> > &a, const std::vector <std::pair <SH, db::properties_id_type> > &b, double dbu_a, db::Shapes &shapes)
 {
   db::CplxTrans t (dbu_a);
   std::vector <std::pair <SH, db::properties_id_type> > anotb;
@@ -481,7 +481,7 @@ RdbDifferenceReceiver::produce_diffs_for_xor (const db::PropertiesRepository & /
 
 template <class SH>
 void
-RdbDifferenceReceiver::produce_diffs (const db::PropertiesRepository &pr, const std::vector <std::pair <SH, db::properties_id_type> > &a, const std::vector <std::pair <SH, db::properties_id_type> > &b, double dbu_a, const rdb::Category *cat)
+RdbDifferenceReceiver::produce_diffs (const std::vector <std::pair <SH, db::properties_id_type> > &a, const std::vector <std::pair <SH, db::properties_id_type> > &b, double dbu_a, const rdb::Category *cat)
 {
   db::CplxTrans t (dbu_a);
   std::vector <std::pair <SH, db::properties_id_type> > anotb;
@@ -499,7 +499,7 @@ RdbDifferenceReceiver::produce_diffs (const db::PropertiesRepository &pr, const 
     item->add_value (t * s->first);
 
     if (s->second && m_with_properties) {
-      add_property_text (item, pr, s->second); 
+      add_property_text (item, s->second);
     }
 
   }
@@ -507,15 +507,15 @@ RdbDifferenceReceiver::produce_diffs (const db::PropertiesRepository &pr, const 
 
 template <class SH> 
 void 
-RdbDifferenceReceiver::shape_diffs (const db::PropertiesRepository &pr, const std::vector <std::pair <SH, db::properties_id_type> > &a, const std::vector <std::pair <SH, db::properties_id_type> > &b)
+RdbDifferenceReceiver::shape_diffs (const std::vector <std::pair <SH, db::properties_id_type> > &a, const std::vector <std::pair <SH, db::properties_id_type> > &b)
 {
   if (m_detailed && m_is_valid_layer_index_a && mp_a_only_per_layer_cat [m_layer_index_a] != 0) {
-    produce_diffs (pr, a, b, mp_layout_a->dbu (), mp_a_only_per_layer_cat [m_layer_index_a]);
+    produce_diffs (a, b, mp_layout_a->dbu (), mp_a_only_per_layer_cat [m_layer_index_a]);
   }
 
   if (m_run_xor && m_is_valid_layer_index_a) {
     db::Shapes shapes;
-    produce_diffs_for_xor (pr, a, b, mp_layout_a->dbu (), shapes);
+    produce_diffs_for_xor (a, b, mp_layout_a->dbu (), shapes);
     for (db::Shapes::shape_iterator s = shapes.begin (db::Shapes::shape_iterator::All); ! s.at_end (); ++s) {
       m_ep.insert (*s, m_obj_index * 2);
       ++m_obj_index;
@@ -523,12 +523,12 @@ RdbDifferenceReceiver::shape_diffs (const db::PropertiesRepository &pr, const st
   }
 
   if (m_detailed && m_is_valid_layer_index_b && mp_b_only_per_layer_cat [m_layer_index_b] != 0) {
-    produce_diffs (pr, b, a, mp_layout_b->dbu (), mp_b_only_per_layer_cat [m_layer_index_b]);
+    produce_diffs (b, a, mp_layout_b->dbu (), mp_b_only_per_layer_cat [m_layer_index_b]);
   }
 
   if (m_run_xor && m_is_valid_layer_index_b) {
     db::Shapes shapes;
-    produce_diffs_for_xor (pr, b, a, mp_layout_b->dbu (), shapes);
+    produce_diffs_for_xor (b, a, mp_layout_b->dbu (), shapes);
     for (db::Shapes::shape_iterator s = shapes.begin (db::Shapes::shape_iterator::All); ! s.at_end (); ++s) {
       m_ep.insert (*s, m_obj_index * 2 + 1);
       ++m_obj_index;

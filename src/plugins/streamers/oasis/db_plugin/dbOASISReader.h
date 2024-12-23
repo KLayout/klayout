@@ -180,7 +180,10 @@ private:
 
   std::map <unsigned long, db::property_names_id_type> m_propname_forward_references;
   std::map <unsigned long, std::string> m_propvalue_forward_references;
-  std::set <db::properties_id_type> m_prop_ids;
+  std::map <db::properties_id_type, std::list<db::Shape> > m_forward_properties_for_shapes;
+  std::map <db::properties_id_type, std::list<db::Instance> > m_forward_properties_for_instances;
+  std::map <db::cell_index_type, db::PropertiesSet> m_future_cell_properties;
+  std::list<db::PropertiesSet> m_fwd_properties;
   db::property_names_id_type m_s_gds_property_name_id;
   db::property_names_id_type m_klayout_context_property_name_id;
 
@@ -207,10 +210,18 @@ private:
   void read_offset_table ();
   bool read_repetition ();
   void read_pointlist (modal_variable <std::vector <db::Point> > &pointlist, bool for_polygon);
-  void read_properties (db::PropertiesRepository &rep);
-  void store_last_properties (db::PropertiesRepository &rep, db::PropertiesRepository::properties_set &properties, bool ignore_special);
-  std::pair <bool, db::properties_id_type> read_element_properties (db::PropertiesRepository &rep, bool ignore_special);
+  void read_properties ();
+  void store_last_properties (db::PropertiesSet &properties, bool ignore_special, bool with_context_props = false);
+  std::pair <bool, db::properties_id_type> read_element_properties (bool ignore_special);
   void replace_forward_references_in_variant (tl::Variant &v);
+  void extract_context_strings (db::PropertiesSet &properties, std::vector<tl::Variant> &context_strings);
+  bool has_forward_refs (const db::PropertiesSet &properties);
+  db::properties_id_type make_forward_properties_id (const db::PropertiesSet &properties);
+  const db::PropertiesSet &forward_properties (db::properties_id_type id) const;
+  bool is_forward_properties_id (db::properties_id_type id) const;
+  void register_forward_property_for_shape (const db::Shape &shape);
+  void register_forward_property_for_instance (const db::Instance &instance);
+  void resolve_forward_references (db::PropertiesSet &properties);
 
   unsigned char get_byte ()
   {

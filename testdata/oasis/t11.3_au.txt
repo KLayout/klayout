@@ -2,6 +2,11 @@ begin_lib 0.001
 begin_cell {A}
 set props {
   {10 {Property string value for ID 13}}
+  {25 {PROP_VALUE2}}
+}
+boxp $props 1 2 {0 5000} {100 5200}
+set props {
+  {10 {Property string value for ID 13}}
 }
 boxp $props 1 2 {0 2000} {100 2200}
 set props {
@@ -12,11 +17,6 @@ set props {
   {10 {Property string value for ID 13}}
 }
 boxp $props 1 2 {0 4000} {100 4200}
-set props {
-  {25 {PROP_VALUE2}}
-  {10 {Property string value for ID 13}}
-}
-boxp $props 1 2 {0 5000} {100 5200}
 set props {
   {25 {PROP_VALUE2}}
 }

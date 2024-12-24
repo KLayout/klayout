@@ -838,6 +838,11 @@ OASISReader::do_read (db::Layout &layout)
         error (tl::sprintf (tl::to_string (tr ("A PROPNAME with id %ld is present already")), id));
       }
 
+      auto fw = m_propname_forward_references.find (id);
+      if (fw != m_propname_forward_references.end ()) {
+        fw->second = db::property_names_id (name);
+      }
+
       reset_modal_variables ();
 
       //  ignore properties attached to this name item
@@ -1047,6 +1052,40 @@ OASISReader::do_read (db::Layout &layout)
 
   }
 
+  size_t pt = m_stream.pos ();
+
+  if (table_offsets_at_end) {
+    read_offset_table ();
+  }
+
+  //  read over tail and discard
+  mb = (char *) m_stream.get (pt + 254 - m_stream.pos ());
+  if (! mb) {
+    error (tl::to_string (tr ("Format error (too few bytes after END record)")));
+  }
+
+  //  check if there are no more bytes
+  mb = (char *) m_stream.get (254);
+  if (mb) {
+    error (tl::to_string (tr ("Format error (too many bytes after END record)")));
+  }
+
+  for (std::map <unsigned long, const db::StringRef *>::const_iterator fw = m_text_forward_references.begin (); fw != m_text_forward_references.end (); ++fw) {
+    auto ts = m_textstrings.find (fw->first);
+    if (ts == m_textstrings.end ()) {
+      error (tl::sprintf (tl::to_string (tr ("No text string defined for text string id %ld")), fw->first));
+    } else {
+      StringRepository::change_string_ref (fw->second, ts->second);
+    }
+  }
+
+  //  all forward references to property names must be resolved
+  for (std::map <unsigned long, db::property_names_id_type>::const_iterator fw = m_propname_forward_references.begin (); fw != m_propname_forward_references.end (); ++fw) {
+    if (fw->second == 0) {
+      error (tl::sprintf (tl::to_string (tr ("No property name defined for property name id %ld")), fw->first));
+    }
+  }
+
   //  Resolve forward references for stored shape and instance prop_ids.
   //  This makes these shape and instance property IDs valid
 
@@ -1087,7 +1126,7 @@ OASISReader::do_read (db::Layout &layout)
 
     std::vector <tl::Variant> context_strings;
     extract_context_strings (props, context_strings);
-    if (context_strings.empty ()) {
+    if (! context_strings.empty ()) {
       m_context_strings_per_cell [p->first].swap (context_strings);
     }
 
@@ -1105,38 +1144,6 @@ OASISReader::do_read (db::Layout &layout)
     layout.prop_id (prop_id);
     layout_properties.clear ();
 
-  }
-
-  size_t pt = m_stream.pos ();
-
-  if (table_offsets_at_end) {
-    read_offset_table ();
-  }
-
-  //  read over tail and discard
-  mb = (char *) m_stream.get (pt + 254 - m_stream.pos ());
-  if (! mb) {
-    error (tl::to_string (tr ("Format error (too few bytes after END record)")));
-  }
-
-  //  check if there are no more bytes
-  mb = (char *) m_stream.get (254);
-  if (mb) {
-    error (tl::to_string (tr ("Format error (too many bytes after END record)")));
-  }
-
-  for (std::map <unsigned long, const db::StringRef *>::const_iterator fw = m_text_forward_references.begin (); fw != m_text_forward_references.end (); ++fw) {
-    std::map <unsigned long, std::string>::const_iterator ts = m_textstrings.find (fw->first);
-    if (ts == m_textstrings.end ()) {
-      error (tl::sprintf (tl::to_string (tr ("No text string defined for text string id %ld")), fw->first));
-    } else {
-      StringRepository::change_string_ref (fw->second, ts->second);
-    }
-  }
-
-  //  all forward references to property names must be resolved
-  for (std::map <unsigned long, db::property_names_id_type>::const_iterator fw = m_propname_forward_references.begin (); fw != m_propname_forward_references.end (); ++fw) {
-    error (tl::sprintf (tl::to_string (tr ("No property name defined for property name id %ld")), fw->first));
   }
 
   //  attach the properties found in CELLNAME to the cells (which may have other properties)
@@ -1391,11 +1398,11 @@ OASISReader::replace_forward_references_in_variant (tl::Variant &v)
 void
 OASISReader::store_last_properties (db::PropertiesSet &properties, bool ignore_special, bool with_context_props)
 {
-  if (with_context_props && mm_last_property_is_sprop.get () && mm_last_property_name.get () == m_klayout_context_property_name_id) {
+  if (with_context_props && mm_last_property_name.get () == m_klayout_context_property_name_id) {
 
     //  Context properties are stored with a special property name ID of 0
 
-    properties.insert (db::property_names_id (0), tl::Variant (mm_last_value_list.get ().begin (), mm_last_value_list.get ().end ()));
+    properties.insert (db::property_names_id_type (0), tl::Variant (mm_last_value_list.get ().begin (), mm_last_value_list.get ().end ()));
 
   } else if (! m_read_properties) {
 
@@ -1504,7 +1511,7 @@ OASISReader::read_properties ()
       std::map <unsigned long, std::string>::const_iterator cid = m_propnames.find (id);
       if (cid == m_propnames.end ()) {
         mm_last_property_name = db::property_names_id (tl::Variant (id, true /*dummy for id type*/));
-        m_propname_forward_references.insert (std::make_pair (id, mm_last_property_name.get ()));
+        m_propname_forward_references.insert (std::make_pair (id, db::property_names_id_type (0)));
       } else {
         mm_last_property_name = db::property_names_id (tl::Variant (cid->second));
       }
@@ -3578,7 +3585,7 @@ OASISReader::do_read_cell (db::cell_index_type cell_index, db::Layout &layout)
       std::vector <tl::Variant> context_strings;
       extract_context_strings (cell_properties, context_strings);
       //  store the context strings for later
-      if (context_strings.empty ()) {
+      if (! context_strings.empty ()) {
         m_context_strings_per_cell [cell_index].swap (context_strings);
       }
 

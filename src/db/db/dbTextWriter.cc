@@ -143,11 +143,11 @@ TextWriter::write_props (const db::Layout & /*layout*/, size_t prop_id)
 {
   *this << "set props {" << endl_str ();
 
-  const db::PropertiesSet &props = db::properties (prop_id);
-  for (db::PropertiesSet::iterator p = props.begin (); p != props.end (); ++p) {
+  auto props = db::properties (prop_id).to_map ();
+  for (auto p = props.begin (); p != props.end (); ++p) {
 
-    const tl::Variant &name = db::property_name (p->first);
-    const tl::Variant &value = db::property_value (p->second);
+    const tl::Variant &name = p->first;
+    const tl::Variant &value = p->second;
 
     if (name.is_long () || name.is_ulong ()) {
       *this << "  {" << int (name.to_long ()) << " {" << value.to_string () << "}}" << endl_str ();

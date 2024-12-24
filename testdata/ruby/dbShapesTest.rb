@@ -734,6 +734,9 @@ class DBShapes_TestClass < TestBase
 
     ly = RBA::Layout::new
 
+    pid5 = ly.properties_id( { "id" => 5 } )
+    pid8 = ly.properties_id( { "id" => 8 } )
+
     ci1 = ly.add_cell( "c1" )
     ci2 = ly.add_cell( "c2" )
 
@@ -746,29 +749,27 @@ class DBShapes_TestClass < TestBase
     c2 = ly.cell( ci2 )
 
     c1.shapes( lindex ).insert( RBA::Box::new( 10, -10, 50, 40 ) )
-    c1.shapes( lindex ).insert( RBA::Box::new( 100, -10, 150, 40 ), 5 )
-    c1.shapes( lindex ).insert( RBA::Box::new( 200, -10, 250, 40 ), 8 )
+    c1.shapes( lindex ).insert( RBA::Box::new( 100, -10, 150, 40 ), pid5 )
+    c1.shapes( lindex ).insert( RBA::Box::new( 200, -10, 250, 40 ), pid8 )
 
     shapes = c1.shapes( lindex )
 
     arr = []
-    shapes.each( RBA::Shapes::SAll ) { |s| arr.push( s.box.to_s ); arr.push( s.prop_id ) } 
-    assert_equal( arr, [ "(10,-10;50,40)", 0, "(100,-10;150,40)", 5, "(200,-10;250,40)", 8 ] )
+    shapes.each( RBA::Shapes::SAll ) { |s| arr.push( s.box.to_s ); arr.push( s.properties.to_s ) } 
+    assert_equal( arr, [ "(10,-10;50,40)", "{}", "(100,-10;150,40)", "{\"id\"=>5}", "(200,-10;250,40)", "{\"id\"=>8}" ] )
 
-    assert_equal( ly.properties( 17 ), [] )
-    assert_equal( ly.properties_id( { 17 => "a", "b" => [ 1, 5, 7 ] }.to_a ), 1 )
-    assert_equal( ly.properties_id( { 17 => "a", "b" => [ 1, 5, 7 ] }.to_a ), 1 )
-    assert_equal( ly.properties_id( { 17 => "a", "b" => [ 1, 5, 8 ] }.to_a ), 2 )
-    assert_equal( ly.properties_id( { [1,2] => "hallo", 5 => nil }.to_a ), 3 )
+    pid1 = ly.properties_id( { 17 => "a", "b" => [ 1, 5, 7 ] }.to_a )
+    pid2 = ly.properties_id( { 17 => "a", "b" => [ 1, 5, 8 ] }.to_a )
+    pid3 = ly.properties_id( { [1,2] => "hallo", 5 => nil }.to_a )
 
     h = {}
-    ly.properties( 1 ).each { |p| h[p[0]] = p[1] }
+    ly.properties( pid1 ).each { |p| h[p[0]] = p[1] }
     assert_equal( h, { 17 => "a", "b" => [ 1, 5, 7 ] } )
     h = {}
-    ly.properties( 2 ).each { |p| h[p[0]] = p[1] }
+    ly.properties( pid2 ).each { |p| h[p[0]] = p[1] }
     assert_equal( h, { 17 => "a", "b" => [ 1, 5, 8 ] } )
     h = {}
-    ly.properties( 3 ).each { |p| h[p[0]] = p[1] }
+    ly.properties( pid3 ).each { |p| h[p[0]] = p[1] }
     assert_equal( h, { [1,2] => "hallo", 5 => nil } )
 
   end 
@@ -777,6 +778,8 @@ class DBShapes_TestClass < TestBase
   def test_7_LayoutEdit
 
     ly = RBA::Layout::new(true)
+
+    pid17 = ly.properties_id( { "id" => 17 } )
 
     ci1 = ly.add_cell( "c1" )
     ci2 = ly.add_cell( "c2" )
@@ -892,29 +895,29 @@ class DBShapes_TestClass < TestBase
     shapes.each( RBA::Shapes::SAll ) { |s| arr.push( s.to_s ) } 
     assert_equal( arr, ["simple_polygon (14,0;-21,35;7,64;42,28)", "simple_polygon (14,0;-21,35;7,64;42,28)"] )
 
-    s2 = shapes.replace_prop_id( s2, 17 )
+    s2 = shapes.replace_prop_id( s2, pid17 )
 
     arr = []
     shapes.each( RBA::Shapes::SAll ) { |s| arr.push( s.to_s ) } 
-    assert_equal( arr, ["simple_polygon (14,0;-21,35;7,64;42,28)", "simple_polygon (14,0;-21,35;7,64;42,28) prop_id=17"] )
+    assert_equal( arr, ["simple_polygon (14,0;-21,35;7,64;42,28)", "simple_polygon (14,0;-21,35;7,64;42,28) props={id=>17}"] )
 
     s2 = shapes.replace( s2, RBA::Box::new( 10, -10, 50, 40 ) )
 
     arr = []
     shapes.each( RBA::Shapes::SAll ) { |s| arr.push( s.to_s ) } 
-    assert_equal( arr, ["simple_polygon (14,0;-21,35;7,64;42,28)", "box (10,-10;50,40) prop_id=17"] )
+    assert_equal( arr, ["simple_polygon (14,0;-21,35;7,64;42,28)", "box (10,-10;50,40) props={id=>17}"] )
 
     s2 = shapes.replace( s2, RBA::Edge::new( 10, -10, 50, 40 ) )
 
     arr = []
     shapes.each( RBA::Shapes::SAll ) { |s| arr.push( s.to_s ) } 
-    assert_equal( arr, ["simple_polygon (14,0;-21,35;7,64;42,28)", "edge (10,-10;50,40) prop_id=17"] )
+    assert_equal( arr, ["simple_polygon (14,0;-21,35;7,64;42,28)", "edge (10,-10;50,40) props={id=>17}"] )
 
     s2 = shapes.replace( s2, RBA::EdgePair::new( RBA::Edge::new( 10, -10, 50, 40 ), RBA::Edge::new( 10, 0, 50, 30 ) ) )
 
     arr = []
     shapes.each( RBA::Shapes::SAll ) { |s| arr.push( s.to_s ) } 
-    assert_equal( arr, ["simple_polygon (14,0;-21,35;7,64;42,28)", "edge_pair (10,-10;50,40)/(10,0;50,30) prop_id=17"] )
+    assert_equal( arr, ["simple_polygon (14,0;-21,35;7,64;42,28)", "edge_pair (10,-10;50,40)/(10,0;50,30) props={id=>17}"] )
 
     shapes.erase( s2 )
 
@@ -934,6 +937,8 @@ class DBShapes_TestClass < TestBase
   def test_7_LayoutEdit2
 
     ly = RBA::Layout::new(true)
+
+    pid1 = ly.properties_id( { "id" => 1 } )
 
     ci1 = ly.add_cell( "c1" )
     ci2 = ly.add_cell( "c2" )
@@ -1016,70 +1021,70 @@ class DBShapes_TestClass < TestBase
 
     assert_equal( s1.prop_id, 0 )
     assert_equal( s1.has_prop_id?, false )
-    s1.prop_id = 1
-    assert_equal( s1.prop_id, 1 )
+    s1.prop_id = pid1
+    assert_equal( s1.prop_id, pid1 )
     assert_equal( s1.has_prop_id?, true )
 
     shapes = c1.shapes( lindex )
 
     arr = []
     shapes.each( RBA::Shapes::SAll ) { |s| arr.push( s.to_s ) } 
-    assert_equal( arr, ["polygon (100,200;500,600;400,300) prop_id=1", "edge (1,2;3,4)", "text ('text',r0 100,200)"] )
+    assert_equal( arr, ["polygon (100,200;500,600;400,300) props={id=>1}", "edge (1,2;3,4)", "text ('text',r0 100,200)"] )
 
     s1.path = RBA::Path::new( [ RBA::Point::new( 0, 10 ), RBA::Point::new( 10, 50 ) ], 25 )
-    assert_equal( s1.to_s, "path (0,10;10,50) w=25 bx=0 ex=0 r=false prop_id=1" )
+    assert_equal( s1.to_s, "path (0,10;10,50) w=25 bx=0 ex=0 r=false props={id=>1}" )
     s1.path_width = 12
-    assert_equal( s1.to_s, "path (0,10;10,50) w=12 bx=0 ex=0 r=false prop_id=1" )
+    assert_equal( s1.to_s, "path (0,10;10,50) w=12 bx=0 ex=0 r=false props={id=>1}" )
     assert_equal( s1.path_width, 12 )
     s1.path_bgnext = 1
-    assert_equal( s1.to_s, "path (0,10;10,50) w=12 bx=1 ex=0 r=false prop_id=1" )
+    assert_equal( s1.to_s, "path (0,10;10,50) w=12 bx=1 ex=0 r=false props={id=>1}" )
     assert_equal( s1.path_bgnext, 1 )
     s1.path_endext = 2
-    assert_equal( s1.to_s, "path (0,10;10,50) w=12 bx=1 ex=2 r=false prop_id=1" )
+    assert_equal( s1.to_s, "path (0,10;10,50) w=12 bx=1 ex=2 r=false props={id=>1}" )
     assert_equal( s1.path_endext, 2 )
     s1.round_path = true
-    assert_equal( s1.to_s, "path (0,10;10,50) w=12 bx=1 ex=2 r=true prop_id=1" )
+    assert_equal( s1.to_s, "path (0,10;10,50) w=12 bx=1 ex=2 r=true props={id=>1}" )
     assert_equal( s1.round_path?, true )
 
     shapes = c1.shapes( lindex )
 
     arr = []
     shapes.each( RBA::Shapes::SAll ) { |s| arr.push( s.to_s ) } 
-    assert_equal( arr, ["edge (1,2;3,4)", "path (0,10;10,50) w=12 bx=1 ex=2 r=true prop_id=1", "text ('text',r0 100,200)"] )
+    assert_equal( arr, ["edge (1,2;3,4)", "path (0,10;10,50) w=12 bx=1 ex=2 r=true props={id=>1}", "text ('text',r0 100,200)"] )
 
     s1.box = RBA::Box::new(0, 10, 20, 40)
-    assert_equal( s1.to_s, "box (0,10;20,40) prop_id=1" )
+    assert_equal( s1.to_s, "box (0,10;20,40) props={id=>1}" )
 
     assert_equal( s1.box_width.to_s, "20" )
     s1.box_width = 30
-    assert_equal( s1.to_s, "box (-5,10;25,40) prop_id=1" )
+    assert_equal( s1.to_s, "box (-5,10;25,40) props={id=>1}" )
     assert_equal( s1.box_width.to_s, "30" )
 
     assert_equal( s1.box_height.to_s, "30" )
     s1.box_height = 40
-    assert_equal( s1.to_s, "box (-5,5;25,45) prop_id=1" )
+    assert_equal( s1.to_s, "box (-5,5;25,45) props={id=>1}" )
     assert_equal( s1.box_height.to_s, "40" )
 
     assert_equal( s1.box_p1.to_s, "-5,5" )
     s1.box_p1 = RBA::Point::new(0, 0)
-    assert_equal( s1.to_s, "box (0,0;25,45) prop_id=1" )
+    assert_equal( s1.to_s, "box (0,0;25,45) props={id=>1}" )
     assert_equal( s1.box_p1.to_s, "0,0" )
 
     assert_equal( s1.box_p2.to_s, "25,45" )
     s1.box_p2 = RBA::Point::new(10, 20)
-    assert_equal( s1.to_s, "box (0,0;10,20) prop_id=1" )
+    assert_equal( s1.to_s, "box (0,0;10,20) props={id=>1}" )
     assert_equal( s1.box_p2.to_s, "10,20" )
 
     assert_equal( s1.box_center.to_s, "5,10" )
     s1.box_center = RBA::Point::new(-10, -20)
-    assert_equal( s1.to_s, "box (-15,-30;-5,-10) prop_id=1" )
+    assert_equal( s1.to_s, "box (-15,-30;-5,-10) props={id=>1}" )
     assert_equal( s1.box_center.to_s, "-10,-20" )
 
     s1.text = RBA::Text::new( "text", RBA::Trans::new( RBA::Point::new( 100, 200 ) ) )
-    assert_equal( s1.to_s, "text ('text',r0 100,200) prop_id=1" )
+    assert_equal( s1.to_s, "text ('text',r0 100,200) props={id=>1}" )
 
     s1.text_string = "blabla"
-    assert_equal( s1.to_s, "text ('blabla',r0 100,200) prop_id=1" )
+    assert_equal( s1.to_s, "text ('blabla',r0 100,200) props={id=>1}" )
     assert_equal( s1.text_string, "blabla" )
 
     s1.text_halign = 1
@@ -1106,7 +1111,7 @@ class DBShapes_TestClass < TestBase
 
     arr = []
     shapes.each( RBA::Shapes::SAll ) { |s| arr.push( s.to_s ) } 
-    assert_equal( arr, ["edge (1,2;3,4)", "text ('text',r0 100,200)", "text ('blabla',m0 100,200) f=3 ha=c va=b prop_id=1"] )
+    assert_equal( arr, ["edge (1,2;3,4)", "text ('text',r0 100,200)", "text ('blabla',m0 100,200) f=3 ha=c va=b props={id=>1}"] )
 
     assert_equal( s1.is_valid?, true )
     assert_equal( s1.shapes.is_valid?(s1), true )
@@ -1157,6 +1162,8 @@ class DBShapes_TestClass < TestBase
   def test_7_DLayoutEdit2
 
     ly = RBA::Layout::new(true)
+
+    pid1 = ly.properties_id( { 1 => "one" } )
 
     ci1 = ly.add_cell( "c1" )
     ci2 = ly.add_cell( "c2" )
@@ -1230,70 +1237,70 @@ class DBShapes_TestClass < TestBase
 
     assert_equal( s1.prop_id, 0 )
     assert_equal( s1.has_prop_id?, false )
-    s1.prop_id = 1
-    assert_equal( s1.prop_id, 1 )
+    s1.prop_id = pid1
+    assert_equal( s1.prop_id, pid1 )
     assert_equal( s1.has_prop_id?, true )
 
     shapes = c1.shapes( lindex )
 
     arr = []
     shapes.each( RBA::Shapes::SAll ) { |s| arr.push( s.to_s ) } 
-    assert_equal( arr, ["polygon (100,200;500,600;400,300) prop_id=1", "edge (1,2;3,4)", "text ('text',r0 100,200)"] )
+    assert_equal( arr, ["polygon (100,200;500,600;400,300) props={1=>one}", "edge (1,2;3,4)", "text ('text',r0 100,200)"] )
 
     s1.path = RBA::DPath::new( [ RBA::DPoint::new( 0, 0.010 ), RBA::DPoint::new( 0.010, 0.050 ) ], 0.025 )
-    assert_equal( s1.to_s, "path (0,10;10,50) w=25 bx=0 ex=0 r=false prop_id=1" )
+    assert_equal( s1.to_s, "path (0,10;10,50) w=25 bx=0 ex=0 r=false props={1=>one}" )
     s1.path_dwidth = 0.012
-    assert_equal( s1.to_s, "path (0,10;10,50) w=12 bx=0 ex=0 r=false prop_id=1" )
+    assert_equal( s1.to_s, "path (0,10;10,50) w=12 bx=0 ex=0 r=false props={1=>one}" )
     assert_equal( "%.12g" % s1.path_dwidth, "0.012" )
     s1.path_dbgnext = 0.001
-    assert_equal( s1.to_s, "path (0,10;10,50) w=12 bx=1 ex=0 r=false prop_id=1" )
+    assert_equal( s1.to_s, "path (0,10;10,50) w=12 bx=1 ex=0 r=false props={1=>one}" )
     assert_equal( "%.12g" % s1.path_dbgnext, "0.001" )
     s1.path_dendext = 0.002
-    assert_equal( s1.to_s, "path (0,10;10,50) w=12 bx=1 ex=2 r=false prop_id=1" )
+    assert_equal( s1.to_s, "path (0,10;10,50) w=12 bx=1 ex=2 r=false props={1=>one}" )
     assert_equal( "%.12g" % s1.path_dendext, "0.002" )
     s1.round_path = true
-    assert_equal( s1.to_s, "path (0,10;10,50) w=12 bx=1 ex=2 r=true prop_id=1" )
+    assert_equal( s1.to_s, "path (0,10;10,50) w=12 bx=1 ex=2 r=true props={1=>one}" )
     assert_equal( s1.round_path?, true )
 
     shapes = c1.shapes( lindex )
 
     arr = []
     shapes.each( RBA::Shapes::SAll ) { |s| arr.push( s.to_s ) } 
-    assert_equal( arr, ["edge (1,2;3,4)", "path (0,10;10,50) w=12 bx=1 ex=2 r=true prop_id=1", "text ('text',r0 100,200)"] )
+    assert_equal( arr, ["edge (1,2;3,4)", "path (0,10;10,50) w=12 bx=1 ex=2 r=true props={1=>one}", "text ('text',r0 100,200)"] )
 
     s1.box = RBA::DBox::new(0, 0.010, 0.020, 0.040)
-    assert_equal( s1.to_s, "box (0,10;20,40) prop_id=1" )
+    assert_equal( s1.to_s, "box (0,10;20,40) props={1=>one}" )
 
     assert_equal( s1.box_dwidth.to_s, "0.02" )
     s1.box_dwidth = 0.03
-    assert_equal( s1.to_s, "box (-5,10;25,40) prop_id=1" )
+    assert_equal( s1.to_s, "box (-5,10;25,40) props={1=>one}" )
     assert_equal( s1.box_dwidth.to_s, "0.03" )
 
     assert_equal( s1.box_dheight.to_s, "0.03" )
     s1.box_dheight = 0.04
-    assert_equal( s1.to_s, "box (-5,5;25,45) prop_id=1" )
+    assert_equal( s1.to_s, "box (-5,5;25,45) props={1=>one}" )
     assert_equal( s1.box_dheight.to_s, "0.04" )
 
     assert_equal( s1.box_dp1.to_s, "-0.005,0.005" )
     s1.box_dp1 = RBA::DPoint::new(0, 0)
-    assert_equal( s1.to_s, "box (0,0;25,45) prop_id=1" )
+    assert_equal( s1.to_s, "box (0,0;25,45) props={1=>one}" )
     assert_equal( s1.box_dp1.to_s, "0,0" )
 
     assert_equal( s1.box_dp2.to_s, "0.025,0.045" )
     s1.box_dp2 = RBA::DPoint::new(0.010, 0.020)
-    assert_equal( s1.to_s, "box (0,0;10,20) prop_id=1" )
+    assert_equal( s1.to_s, "box (0,0;10,20) props={1=>one}" )
     assert_equal( s1.box_dp2.to_s, "0.01,0.02" )
 
     assert_equal( s1.box_dcenter.to_s, "0.005,0.01" )
     s1.box_dcenter = RBA::DPoint::new(-0.010, -0.020)
-    assert_equal( s1.to_s, "box (-15,-30;-5,-10) prop_id=1" )
+    assert_equal( s1.to_s, "box (-15,-30;-5,-10) props={1=>one}" )
     assert_equal( s1.box_dcenter.to_s, "-0.01,-0.02" )
 
     s1.text = RBA::DText::new( "text", RBA::DTrans::new( RBA::DPoint::new( 0.100, 0.200 ) ) )
-    assert_equal( s1.to_s, "text ('text',r0 100,200) prop_id=1" )
+    assert_equal( s1.to_s, "text ('text',r0 100,200) props={1=>one}" )
 
     s1.text_string = "blabla"
-    assert_equal( s1.to_s, "text ('blabla',r0 100,200) prop_id=1" )
+    assert_equal( s1.to_s, "text ('blabla',r0 100,200) props={1=>one}" )
     assert_equal( s1.text_string, "blabla" )
 
     s1.text_halign = 1
@@ -1320,7 +1327,7 @@ class DBShapes_TestClass < TestBase
 
     arr = []
     shapes.each( RBA::Shapes::SAll ) { |s| arr.push( s.to_s ) } 
-    assert_equal( arr, ["edge (1,2;3,4)", "text ('text',r0 100,200)", "text ('blabla',m0 100,200) f=3 ha=c va=b prop_id=1"] )
+    assert_equal( arr, ["edge (1,2;3,4)", "text ('text',r0 100,200)", "text ('blabla',m0 100,200) f=3 ha=c va=b props={1=>one}"] )
 
     assert_equal( s1.is_valid?, true )
     assert_equal( s1.shapes.is_valid?(s1), true )

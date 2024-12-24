@@ -1,36 +1,36 @@
 begin_lib 0.001
 begin_cell {A}
 set props {
-  {{PROP0} {-5}}
-}
-boxp $props 1 2 {0 1000} {100 1200}
-set props {
-  {{PROP0} {25,-124,PROP_VALUE2,PropStringId12}}
+  {{PROP0} {(25,-124,PROP_VALUE2,PropStringId12)}}
 }
 boxp $props 1 2 {0 2000} {100 2200}
 set props {
-  {{PROP0} {25,-124,Property string value for ID 13}}
+  {{PROP0} {(25,-124,Property string value for ID 13)}}
   {{PROP1} {nil}}
 }
 boundaryp $props 1 2 {3000 0} {3000 100} {3100 100} {3100 50} {3150 50} {3150 0} {3000 0}
 set props {
-  {{PROP0} {25,-124,Property string value for ID 13}}
+  {{PROP0} {(25,-124,Property string value for ID 13)}}
 }
 boxp $props 1 2 {0 3000} {100 3200}
 set props {
-  {{PROP0} {25,-124,Property string value for ID 13}}
+  {{PROP0} {(25,-124,Property string value for ID 13)}}
 }
 boxp $props 1 2 {0 4000} {100 4200}
 set props {
-  {{PROP0} {25,-124,Property string value for ID 13}}
+  {{PROP0} {(25,-124,Property string value for ID 13)}}
 }
 pathp $props 1 2 20 5 -5 {2000 0} {2150 0} {2150 50} {2100 50}
+set props {
+  {{PROP0} {-5}}
+}
+boxp $props 1 2 {0 1000} {100 1200}
 set props {
   {{PROPX} {nil}}
 }
 boxp $props 1 2 {0 0} {100 200}
 set props {
-  {{PROP0} {25,-124,Property string value for ID 13}}
+  {{PROP0} {(25,-124,Property string value for ID 13)}}
 }
 textp $props 2 1 0 0 {1000 0} {A}
 end_cell

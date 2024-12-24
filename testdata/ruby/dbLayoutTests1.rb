@@ -1752,19 +1752,22 @@ class DBLayoutTests1_TestClass < TestBase
 
     ly = RBA::Layout::new
 
+    pid1 = ly.properties_id({ "x" => 1 })
+    pid2 = ly.properties_id({ "x" => 17 })
+
     cell = ly.create_cell("X")
 
     assert_equal(cell.prop_id, 0)
-    cell.prop_id = 1
-    assert_equal(cell.prop_id, 1)
+    cell.prop_id = pid1
+    assert_equal(cell.prop_id, pid1)
     cell.prop_id = 0
     assert_equal(cell.prop_id, 0)
 
     cell.set_property("x", 1)
-    assert_equal(cell.prop_id, 1)
+    assert_equal(cell.prop_id, pid1)
     assert_equal(cell.property("x"), 1)
     cell.set_property("x", 17)
-    assert_equal(cell.prop_id, 2)
+    assert_equal(cell.prop_id, pid2)
     assert_equal(cell.property("x"), 17)
     assert_equal(cell.property("y"), nil)
 

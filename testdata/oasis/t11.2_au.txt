@@ -1,6 +1,132 @@
 begin_lib 0.001
 begin_cell {A}
 set props {
+  {{PROP0} {(25,-124,PROP_VALUE2,PropStringId12)}}
+}
+boxp $props 1 2 {0 2000} {100 2200}
+set props {
+  {{PROP0} {(25,-124,PROP_VALUE2,PropStringId12)}}
+}
+boxp $props 1 2 {0 2320} {100 2520}
+set props {
+  {{PROP0} {(25,-124,PROP_VALUE2,PropStringId12)}}
+}
+boxp $props 1 2 {300 2000} {400 2200}
+set props {
+  {{PROP0} {(25,-124,PROP_VALUE2,PropStringId12)}}
+}
+boxp $props 1 2 {300 2320} {400 2520}
+set props {
+  {{PROP0} {(25,-124,PROP_VALUE2,PropStringId12)}}
+}
+boxp $props 1 2 {600 2000} {700 2200}
+set props {
+  {{PROP0} {(25,-124,PROP_VALUE2,PropStringId12)}}
+}
+boxp $props 1 2 {600 2320} {700 2520}
+set props {
+  {{PROP0} {(25,-124,Property string value for ID 13)}}
+  {{PROP1} {nil}}
+}
+boundaryp $props 1 2 {3000 0} {3000 100} {3100 100} {3100 50} {3150 50} {3150 0} {3000 0}
+set props {
+  {{PROP0} {(25,-124,Property string value for ID 13)}}
+  {{PROP1} {nil}}
+}
+boundaryp $props 1 2 {3000 320} {3000 420} {3100 420} {3100 370} {3150 370} {3150 320} {3000 320}
+set props {
+  {{PROP0} {(25,-124,Property string value for ID 13)}}
+  {{PROP1} {nil}}
+}
+boundaryp $props 1 2 {3300 0} {3300 100} {3400 100} {3400 50} {3450 50} {3450 0} {3300 0}
+set props {
+  {{PROP0} {(25,-124,Property string value for ID 13)}}
+  {{PROP1} {nil}}
+}
+boundaryp $props 1 2 {3300 320} {3300 420} {3400 420} {3400 370} {3450 370} {3450 320} {3300 320}
+set props {
+  {{PROP0} {(25,-124,Property string value for ID 13)}}
+  {{PROP1} {nil}}
+}
+boundaryp $props 1 2 {3600 0} {3600 100} {3700 100} {3700 50} {3750 50} {3750 0} {3600 0}
+set props {
+  {{PROP0} {(25,-124,Property string value for ID 13)}}
+  {{PROP1} {nil}}
+}
+boundaryp $props 1 2 {3600 320} {3600 420} {3700 420} {3700 370} {3750 370} {3750 320} {3600 320}
+set props {
+  {{PROP0} {(25,-124,Property string value for ID 13)}}
+}
+boxp $props 1 2 {0 3000} {100 3200}
+set props {
+  {{PROP0} {(25,-124,Property string value for ID 13)}}
+}
+boxp $props 1 2 {0 3320} {100 3520}
+set props {
+  {{PROP0} {(25,-124,Property string value for ID 13)}}
+}
+boxp $props 1 2 {0 4000} {100 4200}
+set props {
+  {{PROP0} {(25,-124,Property string value for ID 13)}}
+}
+boxp $props 1 2 {0 4320} {100 4520}
+set props {
+  {{PROP0} {(25,-124,Property string value for ID 13)}}
+}
+boxp $props 1 2 {300 3000} {400 3200}
+set props {
+  {{PROP0} {(25,-124,Property string value for ID 13)}}
+}
+boxp $props 1 2 {300 3320} {400 3520}
+set props {
+  {{PROP0} {(25,-124,Property string value for ID 13)}}
+}
+boxp $props 1 2 {300 4000} {400 4200}
+set props {
+  {{PROP0} {(25,-124,Property string value for ID 13)}}
+}
+boxp $props 1 2 {300 4320} {400 4520}
+set props {
+  {{PROP0} {(25,-124,Property string value for ID 13)}}
+}
+boxp $props 1 2 {600 3000} {700 3200}
+set props {
+  {{PROP0} {(25,-124,Property string value for ID 13)}}
+}
+boxp $props 1 2 {600 3320} {700 3520}
+set props {
+  {{PROP0} {(25,-124,Property string value for ID 13)}}
+}
+boxp $props 1 2 {600 4000} {700 4200}
+set props {
+  {{PROP0} {(25,-124,Property string value for ID 13)}}
+}
+boxp $props 1 2 {600 4320} {700 4520}
+set props {
+  {{PROP0} {(25,-124,Property string value for ID 13)}}
+}
+pathp $props 1 2 20 5 -5 {2000 0} {2150 0} {2150 50} {2100 50}
+set props {
+  {{PROP0} {(25,-124,Property string value for ID 13)}}
+}
+pathp $props 1 2 20 5 -5 {2000 320} {2150 320} {2150 370} {2100 370}
+set props {
+  {{PROP0} {(25,-124,Property string value for ID 13)}}
+}
+pathp $props 1 2 20 5 -5 {2300 0} {2450 0} {2450 50} {2400 50}
+set props {
+  {{PROP0} {(25,-124,Property string value for ID 13)}}
+}
+pathp $props 1 2 20 5 -5 {2300 320} {2450 320} {2450 370} {2400 370}
+set props {
+  {{PROP0} {(25,-124,Property string value for ID 13)}}
+}
+pathp $props 1 2 20 5 -5 {2600 0} {2750 0} {2750 50} {2700 50}
+set props {
+  {{PROP0} {(25,-124,Property string value for ID 13)}}
+}
+pathp $props 1 2 20 5 -5 {2600 320} {2750 320} {2750 370} {2700 370}
+set props {
   {{PROP0} {-5}}
 }
 boxp $props 1 2 {0 1000} {100 1200}
@@ -24,132 +150,6 @@ set props {
   {{PROP0} {-5}}
 }
 boxp $props 1 2 {600 1320} {700 1520}
-set props {
-  {{PROP0} {25,-124,PROP_VALUE2,PropStringId12}}
-}
-boxp $props 1 2 {0 2000} {100 2200}
-set props {
-  {{PROP0} {25,-124,PROP_VALUE2,PropStringId12}}
-}
-boxp $props 1 2 {0 2320} {100 2520}
-set props {
-  {{PROP0} {25,-124,PROP_VALUE2,PropStringId12}}
-}
-boxp $props 1 2 {300 2000} {400 2200}
-set props {
-  {{PROP0} {25,-124,PROP_VALUE2,PropStringId12}}
-}
-boxp $props 1 2 {300 2320} {400 2520}
-set props {
-  {{PROP0} {25,-124,PROP_VALUE2,PropStringId12}}
-}
-boxp $props 1 2 {600 2000} {700 2200}
-set props {
-  {{PROP0} {25,-124,PROP_VALUE2,PropStringId12}}
-}
-boxp $props 1 2 {600 2320} {700 2520}
-set props {
-  {{PROP0} {25,-124,Property string value for ID 13}}
-  {{PROP1} {nil}}
-}
-boundaryp $props 1 2 {3000 0} {3000 100} {3100 100} {3100 50} {3150 50} {3150 0} {3000 0}
-set props {
-  {{PROP0} {25,-124,Property string value for ID 13}}
-  {{PROP1} {nil}}
-}
-boundaryp $props 1 2 {3000 320} {3000 420} {3100 420} {3100 370} {3150 370} {3150 320} {3000 320}
-set props {
-  {{PROP0} {25,-124,Property string value for ID 13}}
-  {{PROP1} {nil}}
-}
-boundaryp $props 1 2 {3300 0} {3300 100} {3400 100} {3400 50} {3450 50} {3450 0} {3300 0}
-set props {
-  {{PROP0} {25,-124,Property string value for ID 13}}
-  {{PROP1} {nil}}
-}
-boundaryp $props 1 2 {3300 320} {3300 420} {3400 420} {3400 370} {3450 370} {3450 320} {3300 320}
-set props {
-  {{PROP0} {25,-124,Property string value for ID 13}}
-  {{PROP1} {nil}}
-}
-boundaryp $props 1 2 {3600 0} {3600 100} {3700 100} {3700 50} {3750 50} {3750 0} {3600 0}
-set props {
-  {{PROP0} {25,-124,Property string value for ID 13}}
-  {{PROP1} {nil}}
-}
-boundaryp $props 1 2 {3600 320} {3600 420} {3700 420} {3700 370} {3750 370} {3750 320} {3600 320}
-set props {
-  {{PROP0} {25,-124,Property string value for ID 13}}
-}
-boxp $props 1 2 {0 3000} {100 3200}
-set props {
-  {{PROP0} {25,-124,Property string value for ID 13}}
-}
-boxp $props 1 2 {0 3320} {100 3520}
-set props {
-  {{PROP0} {25,-124,Property string value for ID 13}}
-}
-boxp $props 1 2 {0 4000} {100 4200}
-set props {
-  {{PROP0} {25,-124,Property string value for ID 13}}
-}
-boxp $props 1 2 {0 4320} {100 4520}
-set props {
-  {{PROP0} {25,-124,Property string value for ID 13}}
-}
-boxp $props 1 2 {300 3000} {400 3200}
-set props {
-  {{PROP0} {25,-124,Property string value for ID 13}}
-}
-boxp $props 1 2 {300 3320} {400 3520}
-set props {
-  {{PROP0} {25,-124,Property string value for ID 13}}
-}
-boxp $props 1 2 {300 4000} {400 4200}
-set props {
-  {{PROP0} {25,-124,Property string value for ID 13}}
-}
-boxp $props 1 2 {300 4320} {400 4520}
-set props {
-  {{PROP0} {25,-124,Property string value for ID 13}}
-}
-boxp $props 1 2 {600 3000} {700 3200}
-set props {
-  {{PROP0} {25,-124,Property string value for ID 13}}
-}
-boxp $props 1 2 {600 3320} {700 3520}
-set props {
-  {{PROP0} {25,-124,Property string value for ID 13}}
-}
-boxp $props 1 2 {600 4000} {700 4200}
-set props {
-  {{PROP0} {25,-124,Property string value for ID 13}}
-}
-boxp $props 1 2 {600 4320} {700 4520}
-set props {
-  {{PROP0} {25,-124,Property string value for ID 13}}
-}
-pathp $props 1 2 20 5 -5 {2000 0} {2150 0} {2150 50} {2100 50}
-set props {
-  {{PROP0} {25,-124,Property string value for ID 13}}
-}
-pathp $props 1 2 20 5 -5 {2000 320} {2150 320} {2150 370} {2100 370}
-set props {
-  {{PROP0} {25,-124,Property string value for ID 13}}
-}
-pathp $props 1 2 20 5 -5 {2300 0} {2450 0} {2450 50} {2400 50}
-set props {
-  {{PROP0} {25,-124,Property string value for ID 13}}
-}
-pathp $props 1 2 20 5 -5 {2300 320} {2450 320} {2450 370} {2400 370}
-set props {
-  {{PROP0} {25,-124,Property string value for ID 13}}
-}
-pathp $props 1 2 20 5 -5 {2600 0} {2750 0} {2750 50} {2700 50}
-set props {
-  {{PROP0} {25,-124,Property string value for ID 13}}
-}
-pathp $props 1 2 20 5 -5 {2600 320} {2750 320} {2750 370} {2700 370}
 set props {
   {{PROPX} {nil}}
 }
@@ -175,27 +175,27 @@ set props {
 }
 boxp $props 1 2 {600 320} {700 520}
 set props {
-  {{PROP0} {25,-124,Property string value for ID 13}}
+  {{PROP0} {(25,-124,Property string value for ID 13)}}
 }
 textp $props 2 1 0 0 {1000 0} {A}
 set props {
-  {{PROP0} {25,-124,Property string value for ID 13}}
+  {{PROP0} {(25,-124,Property string value for ID 13)}}
 }
 textp $props 2 1 0 0 {1000 320} {A}
 set props {
-  {{PROP0} {25,-124,Property string value for ID 13}}
+  {{PROP0} {(25,-124,Property string value for ID 13)}}
 }
 textp $props 2 1 0 0 {1300 0} {A}
 set props {
-  {{PROP0} {25,-124,Property string value for ID 13}}
+  {{PROP0} {(25,-124,Property string value for ID 13)}}
 }
 textp $props 2 1 0 0 {1300 320} {A}
 set props {
-  {{PROP0} {25,-124,Property string value for ID 13}}
+  {{PROP0} {(25,-124,Property string value for ID 13)}}
 }
 textp $props 2 1 0 0 {1600 0} {A}
 set props {
-  {{PROP0} {25,-124,Property string value for ID 13}}
+  {{PROP0} {(25,-124,Property string value for ID 13)}}
 }
 textp $props 2 1 0 0 {1600 320} {A}
 end_cell

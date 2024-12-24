@@ -808,16 +808,6 @@ class DBLayoutTests2_TestClass < TestBase
     shapes.each do |s|
       r == "" || (r += ";")
       r += s.to_s
-      if s.prop_id > 0
-        pr = ""
-        ly.properties(s.prop_id).each do |pp|
-          pr == "" || (pr += ",")
-          pr += pp[0].to_s + "=>" + pp[1].to_s
-        end
-        r += "["
-        r += pr
-        r += "]"
-      end
     end
     r
   end
@@ -838,9 +828,9 @@ class DBLayoutTests2_TestClass < TestBase
       
     ca1.copy(la1, lb1)
     cb1.copy(ca1, la1, lb1)
-    assert_equal(shapes_to_s(ly1, ca1.shapes(la1)), "box (0,500;1000,2000) prop_id=2[17=>hallo]")
-    assert_equal(shapes_to_s(ly1, ca1.shapes(lb1)), "box (0,500;1000,2000) prop_id=2[17=>hallo]")
-    assert_equal(shapes_to_s(ly1, cb1.shapes(lb1)), "box (0,500;1000,2000) prop_id=2[17=>hallo]")
+    assert_equal(shapes_to_s(ly1, ca1.shapes(la1)), "box (0,500;1000,2000) props={17=>hallo}")
+    assert_equal(shapes_to_s(ly1, ca1.shapes(lb1)), "box (0,500;1000,2000) props={17=>hallo}")
+    assert_equal(shapes_to_s(ly1, cb1.shapes(lb1)), "box (0,500;1000,2000) props={17=>hallo}")
     assert_equal(shapes_to_s(ly1, cb1.shapes(la1)), "")
 
     ly2 = RBA::Layout::new
@@ -851,8 +841,8 @@ class DBLayoutTests2_TestClass < TestBase
     cb2 = ly2.cell(ly2.add_cell("b"))
 
     ca2.copy(ca1, la1, lb2)
-    assert_equal(shapes_to_s(ly2, ca2.shapes(lb2)), "box (0,1000;2000,4000) prop_id=1[17=>hallo]")
-    assert_equal(shapes_to_s(ly1, ca1.shapes(la1)), "box (0,500;1000,2000) prop_id=2[17=>hallo]")
+    assert_equal(shapes_to_s(ly2, ca2.shapes(lb2)), "box (0,1000;2000,4000) props={17=>hallo}")
+    assert_equal(shapes_to_s(ly1, ca1.shapes(la1)), "box (0,500;1000,2000) props={17=>hallo}")
 
     # move
     ca1.clear
@@ -863,16 +853,16 @@ class DBLayoutTests2_TestClass < TestBase
     s1 = ca1.shapes(la1).insert(RBA::Box::new(0, 500, 1000, 2000))
     s1.set_property(17, 5.0)
     s1.set_property(17, "hallo")
-    assert_equal(shapes_to_s(ly1, ca1.shapes(la1)), "box (0,500;1000,2000) prop_id=2[17=>hallo]")
+    assert_equal(shapes_to_s(ly1, ca1.shapes(la1)), "box (0,500;1000,2000) props={17=>hallo}")
     assert_equal(shapes_to_s(ly1, ca1.shapes(lb1)), "")
     ca1.move(la1, lb1)
     assert_equal(shapes_to_s(ly1, ca1.shapes(la1)), "")
-    assert_equal(shapes_to_s(ly1, ca1.shapes(lb1)), "box (0,500;1000,2000) prop_id=2[17=>hallo]")
+    assert_equal(shapes_to_s(ly1, ca1.shapes(lb1)), "box (0,500;1000,2000) props={17=>hallo}")
 
     cb1.move(ca1, lb1, lb1)
     assert_equal(shapes_to_s(ly1, ca1.shapes(la1)), "")
     assert_equal(shapes_to_s(ly1, ca1.shapes(lb1)), "")
-    assert_equal(shapes_to_s(ly1, cb1.shapes(lb1)), "box (0,500;1000,2000) prop_id=2[17=>hallo]")
+    assert_equal(shapes_to_s(ly1, cb1.shapes(lb1)), "box (0,500;1000,2000) props={17=>hallo}")
     assert_equal(shapes_to_s(ly1, cb1.shapes(la1)), "")
 
     ly2 = RBA::Layout::new
@@ -887,7 +877,7 @@ class DBLayoutTests2_TestClass < TestBase
     assert_equal(shapes_to_s(ly1, ca1.shapes(lb1)), "")
     assert_equal(shapes_to_s(ly1, cb1.shapes(lb1)), "")
     assert_equal(shapes_to_s(ly1, cb1.shapes(la1)), "")
-    assert_equal(shapes_to_s(ly2, ca2.shapes(lb2)), "box (0,1000;2000,4000) prop_id=1[17=>hallo]")
+    assert_equal(shapes_to_s(ly2, ca2.shapes(lb2)), "box (0,1000;2000,4000) props={17=>hallo}")
     
   end
 
@@ -1042,14 +1032,17 @@ class DBLayoutTests2_TestClass < TestBase
     ly = RBA::Layout::new
     assert_equal(ly.properties, {})
 
+    pid1 = ly.properties_id({ "x" => 1 })
+    pid2 = ly.properties_id({ "x" => 17 })
+
     assert_equal(ly.prop_id, 0)
-    ly.prop_id = 1
-    assert_equal(ly.prop_id, 1)
+    ly.prop_id = pid1
+    assert_equal(ly.prop_id, pid1)
     ly.prop_id = 0
     assert_equal(ly.prop_id, 0)
 
     ly.set_property("x", 1)
-    assert_equal(ly.prop_id, 1)
+    assert_equal(ly.prop_id, pid1)
     assert_equal(ly.property("x"), 1)
     assert_equal(ly.properties, {"x" => 1})
     assert_equal(ly.properties_hash(ly.prop_id), {"x" => 1})
@@ -1057,7 +1050,7 @@ class DBLayoutTests2_TestClass < TestBase
     assert_equal(ly.properties_array(ly.prop_id), [["x", 1]])
     assert_equal(ly.properties_id(ly.properties_array(ly.prop_id)), ly.prop_id)
     ly.set_property("x", 17)
-    assert_equal(ly.prop_id, 2)
+    assert_equal(ly.prop_id, pid2)
     assert_equal(ly.property("x"), 17)
     assert_equal(ly.property("y"), nil)
 

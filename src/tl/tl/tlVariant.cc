@@ -1224,6 +1224,24 @@ Variant::operator< (const tl::Variant &d) const
   }
 }
 
+bool
+Variant::equal (const Variant &d) const
+{
+  if (m_type != d.m_type) {
+    return false;
+  }
+  return operator== (d);
+}
+
+bool
+Variant::less (const Variant &d) const
+{
+  if (m_type != d.m_type) {
+    return m_type < d.m_type;
+  }
+  return operator< (d);
+}
+
 bool 
 Variant::can_convert_to_float () const
 {
@@ -1834,13 +1852,16 @@ Variant::to_string () const
       r = tl::to_string (*m_var.m_qstring);
 #endif
     } else if (m_type == t_list) {
+      r += "(";
       for (std::vector<tl::Variant>::const_iterator v = m_var.m_list->begin (); v != m_var.m_list->end (); ++v) {
         if (v != m_var.m_list->begin ()) {
           r += ",";
         }
         r += v->to_string ();
       }
+      r += ")";
     } else if (m_type == t_array) {
+      r += "{";
       for (const_array_iterator v = m_var.m_array->begin (); v != m_var.m_array->end (); ++v) {
         if (v != m_var.m_array->begin ()) {
           r += ",";
@@ -1849,6 +1870,7 @@ Variant::to_string () const
         r += "=>";
         r += v->second.to_string ();
       }
+      r += "}";
     } else if (m_type == t_id)  {
       r = "[id" + tl::to_string (m_var.m_id) + "]";
     } else if (m_type == t_user) {

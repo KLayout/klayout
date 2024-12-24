@@ -726,6 +726,22 @@ public:
   bool operator< (const Variant &d) const;
 
   /**
+   *  @brief An exact compare
+   *
+   *  In constrast to operator==, this method compares the two variants exactly -
+   *  i.e. also the types have to be identical, not only the (normalized type) values.
+   */
+  bool equal (const Variant &d) const;
+
+  /**
+   *  @brief An exact less operator
+   *
+   *  This is the companion for "equal". It is also an exact compare - i.e.
+   *  the type codes are compared as well.
+   */
+  bool less (const Variant &d) const;
+
+  /**
    *  @brief Conversion to a string
    *
    *  This performs the conversion to a string as far as possible.

@@ -424,7 +424,17 @@ public:
   tl::Event prop_ids_changed_event;
 
 private:
-  struct CompareNamePtrByValue
+  struct CompareNamePtrByValueForValues
+  {
+    bool operator() (const tl::Variant *a, const tl::Variant *b) const
+    {
+      //  NOTE: for values, the type should matter, so 2.0 is different from 2 (integer).
+      //  Hence we use "less" here.
+      return a->less (*b);
+    }
+  };
+
+  struct CompareNamePtrByValueForNames
   {
     bool operator() (const tl::Variant *a, const tl::Variant *b) const
     {
@@ -440,9 +450,9 @@ private:
     }
   };
 
-  std::set <const tl::Variant *, CompareNamePtrByValue> m_propnames;
+  std::set <const tl::Variant *, CompareNamePtrByValueForNames> m_propnames;
   std::list <tl::Variant> m_property_names_heap;
-  std::set <const tl::Variant *, CompareNamePtrByValue> m_propvalues;
+  std::set <const tl::Variant *, CompareNamePtrByValueForValues> m_propvalues;
   std::list <tl::Variant> m_property_values_heap;
   std::set <const PropertiesSet *, ComparePropertiesPtrByValue> m_properties;
   std::list <PropertiesSet> m_properties_heap;

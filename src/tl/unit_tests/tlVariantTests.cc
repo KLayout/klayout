@@ -1164,10 +1164,15 @@ TEST(9)
   mi[-1] = 31;
 
   EXPECT_EQ (tl::Variant (vi).to_parsable_string (), "(#17,#1)");
+  EXPECT_EQ (tl::Variant (vi).to_string (), "(17,1)");
   EXPECT_EQ (tl::Variant (li).to_parsable_string (), "(#42,#-17)");
+  EXPECT_EQ (tl::Variant (li).to_string (), "(42,-17)");
   EXPECT_EQ (tl::Variant (si).to_parsable_string (), "(#31,#63)");
+  EXPECT_EQ (tl::Variant (si).to_string (), "(31,63)");
   EXPECT_EQ (tl::Variant (pi).to_parsable_string (), "(#1,#3)");
+  EXPECT_EQ (tl::Variant (pi).to_string (), "(1,3)");
   EXPECT_EQ (tl::Variant (mi).to_parsable_string (), "{#-1=>#31,#17=>#42}");
+  EXPECT_EQ (tl::Variant (mi).to_string (), "{-1=>31,17=>42}");
 }
 
 //  special numeric values
@@ -1324,6 +1329,22 @@ TEST(11)
   EXPECT_EQ (tl::Variant ("B") < v, false);
   EXPECT_EQ (tl::Variant ("A") < v, false);
   EXPECT_EQ (tl::Variant (" ") < v, true);
+
+  //  compare without type
+  EXPECT_EQ (tl::Variant (1l) == tl::Variant (1.0), true);
+  EXPECT_EQ (tl::Variant (1l) == tl::Variant (1.5), false);
+  EXPECT_EQ (tl::Variant (1l) < tl::Variant (1.0), false);
+  EXPECT_EQ (tl::Variant (1.0) < tl::Variant (1l), false);
+  EXPECT_EQ (tl::Variant (1l) < tl::Variant (1.5), true);
+  EXPECT_EQ (tl::Variant (1.5) < tl::Variant (1l), false);
+
+  //  compare with type
+  EXPECT_EQ (tl::Variant (1l).equal (tl::Variant (1.0)), false);
+  EXPECT_EQ (tl::Variant (1l).equal (tl::Variant (1.5)), false);
+  EXPECT_EQ (tl::Variant (1l).less (tl::Variant (1.0)), true);
+  EXPECT_EQ (tl::Variant (1.0).less (tl::Variant (1l)), false);
+  EXPECT_EQ (tl::Variant (1l).less (tl::Variant (1.5)), true);
+  EXPECT_EQ (tl::Variant (1l).less (tl::Variant (0.5)), true);
 }
 
 //  some tests originally from PropertiesRepositoryTests

@@ -1342,6 +1342,7 @@ TEST(116)
 
     const char *expected = 
       "set props {\n"
+      "  {17 {17value}}\n"
 #if defined(HAVE_64BIT_COORD)
       "  {{S_MAX_SIGNED_INTEGER_WIDTH} {8}}\n"
       "  {{S_MAX_UNSIGNED_INTEGER_WIDTH} {8}}\n"
@@ -1351,7 +1352,6 @@ TEST(116)
 #endif
       "  {{S_TOP_CELL} {$2}}\n"
       "  {{S_TOP_CELL} {$1}}\n"
-      "  {17 {17value}}\n"
       "  {{name} {117}}\n"
       "}\n"
       "begin_libp $props 0.001\n"
@@ -1451,6 +1451,8 @@ TEST(116)
 
     const char *expected = 
       "set props {\n"
+      "  {17 {17value}}\n"
+      "  {{S_BOUNDING_BOXES_AVAILABLE} {2}}\n"
 #if defined(HAVE_64BIT_COORD)
       "  {{S_MAX_SIGNED_INTEGER_WIDTH} {8}}\n"
       "  {{S_MAX_UNSIGNED_INTEGER_WIDTH} {8}}\n"
@@ -1460,8 +1462,6 @@ TEST(116)
 #endif
       "  {{S_TOP_CELL} {$2}}\n"
       "  {{S_TOP_CELL} {$1}}\n"
-      "  {{S_BOUNDING_BOXES_AVAILABLE} {2}}\n"
-      "  {17 {17value}}\n"
       "  {{name} {117}}\n"
       "}\n"
       "begin_libp $props 0.001\n"
@@ -1471,8 +1471,8 @@ TEST(116)
       "begin_cellp $props {$2}\n"
       "end_cell\n"
       "set props {\n"
-      "  {{S_BOUNDING_BOX} {0,0,100,1000,1100}}\n"
       "  {42 {42}}\n"
+      "  {{S_BOUNDING_BOX} {0,0,100,1000,1100}}\n"
       "}\n"
       "begin_cellp $props {$1}\n"
       "path 1 0 0 0 0 {0 100} {1000 1200}\n"
@@ -1516,6 +1516,8 @@ TEST(116)
 
     const char *expected = 
       "set props {\n"
+      "  {17 {17value}}\n"
+      "  {{S_BOUNDING_BOXES_AVAILABLE} {2}}\n"
 #if defined(HAVE_64BIT_COORD)
       "  {{S_MAX_SIGNED_INTEGER_WIDTH} {8}}\n"
       "  {{S_MAX_UNSIGNED_INTEGER_WIDTH} {8}}\n"
@@ -1525,9 +1527,7 @@ TEST(116)
 #endif
       "  {{S_TOP_CELL} {$2}}\n"
       "  {{S_TOP_CELL} {$1}}\n"
-      "  {{S_BOUNDING_BOXES_AVAILABLE} {2}}\n"
       "  {{name} {117}}\n"
-      "  {17 {17value}}\n"
       "}\n"
       "begin_libp $props 0.001\n"
       "set props {\n"
@@ -1583,6 +1583,7 @@ TEST(116)
 
     const char *expected =
       "set props {\n"
+      "  {17 {17value}}\n"
 #if defined(HAVE_64BIT_COORD)
       "  {{S_MAX_SIGNED_INTEGER_WIDTH} {8}}\n"
       "  {{S_MAX_UNSIGNED_INTEGER_WIDTH} {8}}\n"
@@ -1593,7 +1594,6 @@ TEST(116)
       "  {{S_TOP_CELL} {$2}}\n"
       "  {{S_TOP_CELL} {$1}}\n"
       "  {{name} {117}}\n"
-      "  {17 {17value}}\n"
       "}\n"
       "begin_libp $props 0.001\n"
       "set props {\n"
@@ -1644,6 +1644,7 @@ TEST(116)
 
     const char *expected = 
       "set props {\n"
+      "  {17 {17value}}\n"
 #if defined(HAVE_64BIT_COORD)
       "  {{S_MAX_SIGNED_INTEGER_WIDTH} {8}}\n"
       "  {{S_MAX_UNSIGNED_INTEGER_WIDTH} {8}}\n"
@@ -1652,7 +1653,6 @@ TEST(116)
       "  {{S_MAX_UNSIGNED_INTEGER_WIDTH} {4}}\n"
 #endif
       "  {{S_TOP_CELL} {$1}}\n"
-      "  {17 {17value}}\n"
       "  {{name} {117}}\n"
       "}\n"
       "begin_libp $props 0.001\n"
@@ -1700,6 +1700,7 @@ TEST(116)
 
     const char *expected = 
       "set props {\n"
+      "  {17 {17value}}\n"
 #if defined(HAVE_64BIT_COORD)
       "  {{S_MAX_SIGNED_INTEGER_WIDTH} {8}}\n"
       "  {{S_MAX_UNSIGNED_INTEGER_WIDTH} {8}}\n"
@@ -1708,7 +1709,6 @@ TEST(116)
       "  {{S_MAX_UNSIGNED_INTEGER_WIDTH} {4}}\n"
 #endif
       "  {{S_TOP_CELL} {$2}}\n"
-      "  {17 {17value}}\n"
       "  {{name} {117}}\n"
       "}\n"
       "begin_libp $props 0.001\n"

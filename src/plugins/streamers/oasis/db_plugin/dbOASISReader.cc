@@ -1334,7 +1334,7 @@ OASISReader::resolve_forward_references (db::PropertiesSet &properties)
 
         } else if (pf->second == m_klayout_context_property_name_id) {
           //  NOTE: property names ID 0 is reserved for context strings
-          new_props.insert (property_names_id (0), value);
+          new_props.insert (property_names_id_type (0), value);
         } else {
           new_props.insert (pf->second, value);
         }

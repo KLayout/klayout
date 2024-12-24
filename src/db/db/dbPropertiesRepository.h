@@ -204,6 +204,11 @@ public:
   void insert (db::property_names_id_type name_id, const tl::Variant &value);
 
   /**
+   *  @brief Inserts a value by ID for the given name ID
+   */
+  void insert_by_id (db::property_names_id_type name_id, db::property_values_id_type value_id);
+
+  /**
    *  @brief Merge another properties set into self
    */
   void merge (const db::PropertiesSet &other);
@@ -293,9 +298,24 @@ public:
   typedef std::set <properties_id_type> properties_id_set;
 
   /**
+   *  @brief Default constructor
+   *
+   *  This constructor is mainly provided for test purposes.
+   */
+  PropertiesRepository ();
+
+  /**
    *  @brief Gets the singleton instance of the properties repository
    */
   static PropertiesRepository &instance ();
+
+  /**
+   *  @brief Temporarily replace the singleton instance
+   *
+   *  This method is intended for testing purposes only. Passing 0 for the
+   *  repository argument resets back to the global singleton.
+   */
+  static void replace_instance_temporarily (db::PropertiesRepository *temp);
 
   /**
    *  @brief Gets the name ID for a property name
@@ -372,11 +392,18 @@ public:
   /**
    *  @brief Lookup a table of properties id's by a name value pair
    *
-   *  For a given name/value pair, this method returns a vector of ids
-   *  of property sets that contain the given name/value pair. This method
-   *  is intended for use with the properties_id resolution algorithm.
+   *  For a given name/value pair, this method returns a set of property IDs
+   *  of property sets that contain the given name/value pair.
    */
   properties_id_set properties_ids_by_name_value (db::property_names_id_type name, db::property_values_id_type value) const;
+
+  /**
+   *  @brief Lookup a table of properties id's by a name
+   *
+   *  For a given name, this method returns a set of property IDs
+   *  of property sets that contain the given name.
+   */
+  properties_id_set properties_ids_by_name (db::property_names_id_type name) const;
 
   /**
    *  @brief Collect memory statistics
@@ -432,11 +459,6 @@ private:
   std::map <property_values_id_type, properties_id_set> m_properties_by_value_table;
 
   mutable tl::Mutex m_lock;
-
-  /**
-   *  @brief Default constructor
-   */
-  PropertiesRepository ();
 };
 
 /**
@@ -534,16 +556,20 @@ public:
    *  @brief Factory: create a filter translator
    *
    *  The translator delivered by this function will leave only the given keys in the properties.
+   *
+   *  If no repository is given, the translator acts on the singleton instance.
    */
-  static PropertiesTranslator make_filter (const std::set<tl::Variant> &keys);
+  static PropertiesTranslator make_filter (const std::set<tl::Variant> &keys, db::PropertiesRepository &repo = db::PropertiesRepository::instance ());
 
   /**
    *  @brief Factory: create a key mapper translator
    *
    *  The translator delivered by this function will translate the given keys to new ones
    *  and remove non-listed keys.
+   *
+   *  If no repository is given, the translator acts on the singleton instance.
    */
-  static PropertiesTranslator make_key_mapper (const std::map<tl::Variant, tl::Variant> &keys);
+  static PropertiesTranslator make_key_mapper (const std::map<tl::Variant, tl::Variant> &keys, db::PropertiesRepository &repo = db::PropertiesRepository::instance ());
 
 private:
   std::map<db::properties_id_type, db::properties_id_type> m_map;

@@ -65,20 +65,18 @@ build_net_name_equivalence (const db::Layout *layout, const db::Connectivity &co
 {
   std::map<std::string, std::set<size_t> > prop_by_name;
 
-#if 0 // @@@
-  for (db::PropertiesRepository::iterator i = layout->properties_repository ().begin (); i != layout->properties_repository ().end (); ++i) {
-    for (db::PropertiesRepository::properties_set::const_iterator p = i->second.begin (); p != i->second.end (); ++p) {
-      if (p->first == net_name_id) {
-        std::string nn = p->second.to_string ();
-        for (std::list<tl::GlobPattern>::const_iterator jp = jn_pattern.begin (); jp != jn_pattern.end (); ++jp) {
-          if (jp->match (nn)) {
-            prop_by_name [nn].insert (db::prop_id_to_attr (i->first));
-          }
+  {
+    db::PropertiesRepository::properties_id_set with_name = db::PropertiesRepository::instance ().properties_ids_by_name (net_name_id);
+    for (auto i = with_name.begin (); i != with_name.end (); ++i) {
+      const db::PropertiesSet &props = db::properties (*i);
+      std::string nn = props.value (net_name_id).to_string ();
+      for (std::list<tl::GlobPattern>::const_iterator jp = jn_pattern.begin (); jp != jn_pattern.end (); ++jp) {
+        if (jp->match (nn)) {
+          prop_by_name [nn].insert (db::prop_id_to_attr (*i));
         }
       }
     }
   }
-#endif
 
   //  include pseudo-attributes for global nets to implement "join_with" for global nets
   for (size_t gid = 0; gid < conn.global_nets (); ++gid) {
@@ -115,18 +113,16 @@ build_net_name_equivalence_for_explicit_connections (const db::Layout *layout, c
 {
   std::map<std::string, std::set<size_t> > prop_by_name;
 
-#if 0 // @@@
-  for (db::PropertiesRepository::iterator i = layout->properties_repository ().begin (); i != layout->properties_repository ().end (); ++i) {
-    for (db::PropertiesRepository::properties_set::const_iterator p = i->second.begin (); p != i->second.end (); ++p) {
-      if (p->first == net_name_id) {
-        std::string nn = p->second.to_string ();
-        if (nets_to_join.find (nn) != nets_to_join.end ()) {
-          prop_by_name [nn].insert (db::prop_id_to_attr (i->first));
-        }
+  {
+    db::PropertiesRepository::properties_id_set with_name = db::PropertiesRepository::instance ().properties_ids_by_name (net_name_id);
+    for (auto i = with_name.begin (); i != with_name.end (); ++i) {
+      const db::PropertiesSet &props = db::properties (*i);
+      std::string nn = props.value (net_name_id).to_string ();
+      if (nets_to_join.find (nn) != nets_to_join.end ()) {
+        prop_by_name [nn].insert (db::prop_id_to_attr (*i));
       }
     }
   }
-#endif
 
   //  include pseudo-attributes for global nets to implement "join_with" for global nets
   for (size_t gid = 0; gid < conn.global_nets (); ++gid) {

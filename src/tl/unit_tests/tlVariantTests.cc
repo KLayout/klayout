@@ -1276,4 +1276,80 @@ TEST(10)
   EXPECT_EQ (vnan < vnan, false);
 }
 
+//  some tests originally from PropertiesRepositoryTests
+TEST(11)
+{
+  tl::Variant v;
+
+  EXPECT_EQ (std::string (v.to_parsable_string ()) == "nil", true);
+
+  v = 1l;
+  EXPECT_EQ (std::string (v.to_parsable_string ()) == "#1", true);
+  EXPECT_EQ (v.to_long () == 1, true);
+
+  v = "102";
+  EXPECT_EQ (std::string (v.to_parsable_string ()) == "'102'", true);
+
+  v = 2l;
+  EXPECT_EQ (std::string (v.to_parsable_string ()) == "#2", true);
+  EXPECT_EQ (v.is_long (), true);
+  EXPECT_EQ (v.is_double (), false);
+  EXPECT_EQ (v.is_a_string (), false);
+  EXPECT_EQ (v.to_long () == 2, true);
+  EXPECT_EQ (v.to_double () == 2, true);
+
+  v = tl::Variant ();
+  EXPECT_EQ (std::string (v.to_parsable_string ()) == "nil", true);
+  EXPECT_EQ (v.is_double (), false);
+  EXPECT_EQ (v.is_a_string (), false);
+  EXPECT_EQ (v.is_long (), false);
+  EXPECT_EQ (v.is_nil (), true);
+  EXPECT_EQ (v.is_list (), false);
+
+  v = tl::Variant ((long) 1);
+  EXPECT_EQ (std::string (v.to_parsable_string ()) == "#1", true);
+  EXPECT_EQ (v.to_long () == 1, true);
+  EXPECT_EQ (v.to_double () == 1, true);
+  EXPECT_EQ (v.is_double (), false);
+  EXPECT_EQ (v.is_a_string (), false);
+
+  v = tl::Variant ("A");
+  EXPECT_EQ (std::string (v.to_parsable_string ()) == "'A'", true);
+  EXPECT_EQ (v.is_double (), false);
+  EXPECT_EQ (v.is_a_string (), true);
+  EXPECT_EQ (v.is_long (), false);
+
+  EXPECT_EQ (v < tl::Variant (), false);
+  EXPECT_EQ (tl::Variant (1l) < v, true);
+  EXPECT_EQ (tl::Variant ("B") < v, false);
+  EXPECT_EQ (tl::Variant ("A") < v, false);
+  EXPECT_EQ (tl::Variant (" ") < v, true);
+}
+
+//  some tests originally from PropertiesRepositoryTests
+TEST(12)
+{
+  tl::Variant v;
+  tl::Extractor ex ("  #10 a");
+  ex.read (v);
+  ex.expect ("a");
+  EXPECT_EQ (v == tl::Variant ((long) 10), true);
+  ex = tl::Extractor ("  ##  12.5 a");
+  ex.read (v);
+  ex.expect ("a");
+  EXPECT_EQ (v == tl::Variant (12.5), true);
+  ex = tl::Extractor ("  Aber a");
+  ex.read (v);
+  ex.expect ("a");
+  EXPECT_EQ (v == tl::Variant ("Aber"), true);
+  ex = tl::Extractor ("  Aber  a");
+  ex.read (v);
+  ex.expect ("a");
+  EXPECT_EQ (v == tl::Variant ("Aber"), true);
+  ex = tl::Extractor (" (Aber_, ##2.500, (#05,x)  ,() )  a");
+  ex.read (v);
+  ex.expect ("a");
+  EXPECT_EQ (std::string (v.to_parsable_string ()), "('Aber_',##2.5,(#5,'x'),())");
+}
+
 }

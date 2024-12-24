@@ -188,6 +188,12 @@ PropertiesSet::insert (db::property_names_id_type nid, const tl::Variant &value)
 }
 
 void
+PropertiesSet::insert_by_id (db::property_names_id_type nid, db::property_values_id_type vid)
+{
+  m_map.insert (std::make_pair (nid, vid));
+}
+
+void
 PropertiesSet::merge (const db::PropertiesSet &other)
 {
   m_map.insert (other.m_map.begin (), other.m_map.end ());
@@ -230,10 +236,19 @@ PropertiesSet::to_list_var () const
 // ----------------------------------------------------------------------------------
 //  PropertiesRepository implementation
 
-PropertiesRepository &PropertiesRepository::instance ()
+static PropertiesRepository s_instance;
+static PropertiesRepository *sp_temp_instance = 0;
+
+PropertiesRepository &
+PropertiesRepository::instance ()
 {
-  static PropertiesRepository s_instance;
-  return s_instance;
+  return sp_temp_instance ? *sp_temp_instance : s_instance;
+}
+
+void
+PropertiesRepository::replace_instance_temporarily (db::PropertiesRepository *temp)
+{
+  sp_temp_instance = temp;
 }
 
 PropertiesRepository::PropertiesRepository ()
@@ -383,17 +398,28 @@ PropertiesRepository::is_valid_property_values_id (property_values_id_type id) c
 }
 
 PropertiesRepository::properties_id_set
-PropertiesRepository::properties_ids_by_name_value (db::property_names_id_type name, db::property_values_id_type value) const
+PropertiesRepository::properties_ids_by_name (db::property_names_id_type name_id) const
 {
   tl::MutexLocker locker (&m_lock);
 
-  db::property_names_id_type name_id = property_names_id (name);
+  auto ni = m_properties_by_name_table.find (name_id);
+  if (ni == m_properties_by_name_table.end ()) {
+    return properties_id_set ();
+  } else {
+    return ni->second;
+  }
+}
+
+PropertiesRepository::properties_id_set
+PropertiesRepository::properties_ids_by_name_value (db::property_names_id_type name_id, db::property_values_id_type value_id) const
+{
+  tl::MutexLocker locker (&m_lock);
+
   auto ni = m_properties_by_name_table.find (name_id);
   if (ni == m_properties_by_name_table.end ()) {
     return properties_id_set ();
   }
 
-  db::property_values_id_type value_id = property_values_id (value);
   auto vi = m_properties_by_value_table.find (value_id);
   if (vi == m_properties_by_value_table.end ()) {
     return properties_id_set ();
@@ -405,7 +431,7 @@ PropertiesRepository::properties_ids_by_name_value (db::property_names_id_type n
 }
 
 // ----------------------------------------------------------------------------------
-//  PropertiesRepository implementation
+//  PropertiesTranslator implementation
 
 PropertiesTranslator::PropertiesTranslator ()
   : m_pass (true), m_null (true)
@@ -478,64 +504,81 @@ PropertiesTranslator::make_pass_all ()
 }
 
 PropertiesTranslator
-PropertiesTranslator::make_filter (const std::set<tl::Variant> &keys)
+PropertiesTranslator::make_filter (const std::set<tl::Variant> &keys, db::PropertiesRepository &repo)
 {
-  std::map<db::properties_id_type, db::properties_id_type> map;
+  db::PropertiesRepository::properties_id_set ids;
   std::set<db::property_names_id_type> names_selected;
 
-#if 0 // @@@ later
   for (auto k = keys.begin (); k != keys.end (); ++k) {
-    names_selected.insert (repo.prop_name_id (*k));
+
+    db::property_names_id_type nid = repo.prop_name_id (*k);
+    names_selected.insert (nid);
+
+    db::PropertiesRepository::properties_id_set ids_with_name = repo.properties_ids_by_name (nid);
+    ids.insert (ids_with_name.begin (), ids_with_name.end ());
+
   }
 
-  db::PropertiesRepository org_repo = repo; // @@@ should not be available
+  std::map<db::properties_id_type, db::properties_id_type> map;
 
-  for (auto p = org_repo.begin (); p != org_repo.end (); ++p) {
-    db::PropertiesRepository::properties_set new_set;
-    for (auto i = p->second.begin (); i != p->second.end (); ++i) {
-      if (names_selected.find (i->first) != names_selected.end ()) {
-        new_set.insert (*i);
+  for (auto i = ids.begin (); i != ids.end (); ++i) {
+
+    const db::PropertiesSet &props = db::properties (*i);
+    db::PropertiesSet new_props;
+
+    for (auto p = props.begin (); p != props.end (); ++p) {
+      if (names_selected.find (p->first) != names_selected.end ()) {
+        new_props.insert_by_id (p->first, p->second);
       }
     }
-    if (! new_set.empty ()) {
-      map.insert (std::make_pair (p->first, repo.properties_id (new_set)));
+
+    if (! new_props.empty ()) {
+      map.insert (std::make_pair (*i, new_props == props ? *i : repo.properties_id (new_props)));
     }
+
   }
-#endif // @@@
 
   return PropertiesTranslator (map);
 }
 
 PropertiesTranslator
-PropertiesTranslator::make_key_mapper (const std::map<tl::Variant, tl::Variant> &keys)
+PropertiesTranslator::make_key_mapper (const std::map<tl::Variant, tl::Variant> &keys, db::PropertiesRepository &repo)
 {
-  std::map<db::properties_id_type, db::properties_id_type> map;
+  db::PropertiesRepository::properties_id_set ids;
   std::map<db::property_names_id_type, db::property_names_id_type> name_map;
 
-#if 0 // @@@ later
   for (auto k = keys.begin (); k != keys.end (); ++k) {
-    name_map.insert (std::make_pair (repo.prop_name_id (k->first), repo.prop_name_id (k->second)));
+
+    db::property_names_id_type nid = repo.prop_name_id (k->first);
+    name_map.insert (std::make_pair (nid, repo.prop_name_id (k->second)));
+
+    db::PropertiesRepository::properties_id_set ids_with_name = repo.properties_ids_by_name (nid);
+    ids.insert (ids_with_name.begin (), ids_with_name.end ());
+
   }
 
-  db::PropertiesRepository org_repo = repo; // @@@ should not be available
+  std::map<db::properties_id_type, db::properties_id_type> map;
 
-  for (auto p = org_repo.begin (); p != org_repo.end (); ++p) {
-    db::PropertiesRepository::properties_set new_set;
-    for (auto i = p->second.begin (); i != p->second.end (); ++i) {
-      auto nm = name_map.find (i->first);
+  for (auto i = ids.begin (); i != ids.end (); ++i) {
+
+    const db::PropertiesSet &props = db::properties (*i);
+    db::PropertiesSet new_props;
+
+    for (auto p = props.begin (); p != props.end (); ++p) {
+      auto nm = name_map.find (p->first);
       if (nm != name_map.end ()) {
-        new_set.insert (std::make_pair (nm->second, i->second));
+        new_props.insert_by_id (nm->second, p->second);
       }
     }
-    if (! new_set.empty ()) {
-      map.insert (std::make_pair (p->first, repo.properties_id (new_set)));
+
+    if (! new_props.empty ()) {
+      map.insert (std::make_pair (*i, new_props == props ? *i : repo.properties_id (new_props)));
     }
+
   }
-#endif
 
   return PropertiesTranslator (map);
 }
-
 
 } // namespace db
 

@@ -3406,9 +3406,10 @@ PartialService::handle_guiding_shape_changes ()
     parent_inst = s->first.back ().inst_ptr;
   }
 
-  //  @@@ name by id, don't repeat key
+  db::property_names_id_type name_id = db::property_names_id ("name");
+
   const db::PropertiesSet &input_props = db::properties (s->first.shape ().prop_id ());
-  tl::Variant name_value = input_props.value (tl::Variant ("name"));
+  tl::Variant name_value = input_props.value (name_id);
   if (name_value.is_nil ()) {
     return false;
   }
@@ -3431,7 +3432,7 @@ PartialService::handle_guiding_shape_changes ()
     db::Shapes::shape_iterator sh = layout->cell (new_inst.cell_index ()).shapes (layout->guiding_shape_layer ()).begin (db::ShapeIterator::All);
     while (! sh.at_end ()) {
       const db::PropertiesSet &props = db::properties (sh->prop_id ());
-      if (props.value (tl::Variant ("name")) == shape_name) {
+      if (props.value (name_id) == shape_name) {
         lay::ObjectInstPath inst_path = s->first;
         inst_path.back ().inst_ptr = new_inst;
         inst_path.back ().array_inst = new_inst.begin ();

@@ -298,7 +298,7 @@ TEST(1)
   EXPECT_EQ (v.to_string (), std::string ("1"));
 
   v = e.parse ("[1,2,3]").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("1,2,3"));
+  EXPECT_EQ (v.to_string (), std::string ("(1,2,3)"));
 
   v = e.parse ("1?2:3").execute ();
   EXPECT_EQ (v.to_string (), std::string ("2"));
@@ -821,9 +821,9 @@ TEST(6)
   v = e.parse ("item([1,2],2)").execute ();
   EXPECT_EQ (v.to_string (), std::string ("nil"));
   v = e.parse ("split('',':')").execute ();
-  EXPECT_EQ (v.to_string (), std::string (""));
+  EXPECT_EQ (v.to_string (), std::string ("()"));
   v = e.parse ("split('1:2',':')").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("1,2"));
+  EXPECT_EQ (v.to_string (), std::string ("(1,2)"));
   v = e.parse ("env('HJASK')").execute ();
   EXPECT_EQ (v.to_string (), std::string ("nil"));
   v = e.parse ("env('PATH')").execute ();
@@ -1120,15 +1120,15 @@ TEST(15)
   v = e.parse ("var x=[1,2,3]; x[6]").execute ();
   EXPECT_EQ (v.to_string (), std::string ("nil"));
   v = e.parse ("var x=[1,2,3]; x[1]=5; x").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("1,5,3"));
+  EXPECT_EQ (v.to_string (), std::string ("(1,5,3)"));
   v = e.parse ("var x=[1,2,3]; x.push('A'); x").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("1,2,3,A"));
+  EXPECT_EQ (v.to_string (), std::string ("(1,2,3,A)"));
   v = e.parse ("var x={1=>'A','B'=>5}; x[1]").execute ();
   EXPECT_EQ (v.to_string (), std::string ("A"));
   v = e.parse ("var x={1=>'A','B'=>5}; x.keys").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("1,B"));
+  EXPECT_EQ (v.to_string (), std::string ("(1,B)"));
   v = e.parse ("var x={1=>'A','B'=>5}; x.values").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("A,5"));
+  EXPECT_EQ (v.to_string (), std::string ("(A,5)"));
   v = e.parse ("var x={1=>'A','B'=>5}; x['B']").execute ();
   EXPECT_EQ (v.to_string (), std::string ("5"));
   v = e.parse ("var x={1=>'A','B'=>5}; x[0]").execute ();
@@ -1136,11 +1136,11 @@ TEST(15)
   v = e.parse ("{1=>'A','B'=>5}['B']").execute ();
   EXPECT_EQ (v.to_string (), std::string ("5"));
   v = e.parse ("var x={1=>'A','B'=>5}; x[1]=5; x").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("1=>5,B=>5"));
+  EXPECT_EQ (v.to_string (), std::string ("{1=>5,B=>5}"));
   v = e.parse ("var x={1=>'A','B'=>5}; x.size").execute ();
   EXPECT_EQ (v.to_string (), std::string ("2"));
   v = e.parse ("var x={1=>'A','B'=>5}; x.insert(17, 3); x").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("1=>A,17=>3,B=>5"));
+  EXPECT_EQ (v.to_string (), std::string ("{1=>A,17=>3,B=>5}"));
 }
 
 // match/nomatch

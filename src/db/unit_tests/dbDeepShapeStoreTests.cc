@@ -179,7 +179,7 @@ TEST(3_TextTreatment)
   EXPECT_EQ (store.layouts (), (unsigned int) 1);
 
   EXPECT_EQ (dl1.initial_cell ().shapes (dl1.layer ()).size (), size_t (1));
-  EXPECT_EQ (dl1.initial_cell ().shapes (dl1.layer ()).begin (db::ShapeIterator::All)->to_string (), "polygon (999,1999;999,2001;1001,2001;1001,1999) prop_id=1");
+  EXPECT_EQ (dl1.initial_cell ().shapes (dl1.layer ()).begin (db::ShapeIterator::All)->to_string (), "polygon (999,1999;999,2001;1001,2001;1001,1999) props={text=>TEXT}");
 }
 
 TEST(4_FlatAndEmptyInput)

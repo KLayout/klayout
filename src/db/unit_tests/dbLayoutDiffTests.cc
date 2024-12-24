@@ -716,9 +716,9 @@ TEST(2P)
     ps.insert (tl::Variant ("C"), tl::Variant ("c"));
     pi3 = db::properties_id (ps);
 
-    EXPECT_EQ (ps2string (pi1), "A:1");
-    EXPECT_EQ (ps2string (pi2), "B:2");
-    EXPECT_EQ (ps2string (pi3), "B:2,C:c");
+    EXPECT_EQ (ps2string (pi1), "{A=>1}");
+    EXPECT_EQ (ps2string (pi2), "{B=>2}");
+    EXPECT_EQ (ps2string (pi3), "{B=>2,C=>c}");
   }
 
   db::Layout h = g;

@@ -2373,11 +2373,11 @@ TEST(53_PropertiesDeepFromLayout)
   EXPECT_EQ (s->to_string (), "(10,20;10,220;110,220;110,20)");
   ++s;
   EXPECT_EQ (s.at_end (), false);
-  EXPECT_EQ (db::prop2string (s.prop_id ()), "VALUE=1");
+  EXPECT_EQ (db::prop2string (s.prop_id ()), "{VALUE=>1}");
   EXPECT_EQ (s->to_string (), "(1,2;1,202;101,202;101,2)");
   ++s;
   EXPECT_EQ (s.at_end (), false);
-  EXPECT_EQ (db::prop2string (s.prop_id ()), "VALUE=42");
+  EXPECT_EQ (db::prop2string (s.prop_id ()), "{VALUE=>42}");
   EXPECT_EQ (s->to_string (), "(11,12;11,212;111,212;111,12)");
   ++s;
   EXPECT_EQ (s.at_end (), true);
@@ -2390,13 +2390,13 @@ TEST(53_PropertiesDeepFromLayout)
   ++s;
 
   EXPECT_EQ (s.at_end (), false);
-  EXPECT_EQ (db::prop2string (s.prop_id ()), "VALUE=1");
+  EXPECT_EQ (db::prop2string (s.prop_id ()), "{VALUE=>1}");
   //  a single property #1 element
   EXPECT_EQ (s->to_string (), "(1,2;1,202;101,202;101,2)");
   ++s;
 
   EXPECT_EQ (s.at_end (), false);
-  EXPECT_EQ (db::prop2string (s.prop_id ()), "VALUE=42");
+  EXPECT_EQ (db::prop2string (s.prop_id ()), "{VALUE=>42}");
   //  a single property #42 element
   EXPECT_EQ (s->to_string (), "(11,12;11,212;111,212;111,12)");
   ++s;
@@ -2442,26 +2442,26 @@ TEST(54_PropertiesFilterDeep)
 
   db::Region::const_iterator s = rr.begin ();
   EXPECT_EQ (s.at_end (), false);
-  EXPECT_EQ (db::prop2string (s.prop_id ()), "1=100");
+  EXPECT_EQ (db::prop2string (s.prop_id ()), "{1=>100}");
   EXPECT_EQ (s->to_string (), "(1,2;1,202;101,202;101,2)");
   ++s;
   EXPECT_EQ (s.at_end (), false);
-  EXPECT_EQ (db::prop2string (s.prop_id ()), "1=0");
+  EXPECT_EQ (db::prop2string (s.prop_id ()), "{1=>0}");
   EXPECT_EQ (s->to_string (), "(10,12;10,212;111,212;111,12)");
   ++s;
   EXPECT_EQ (s.at_end (), false);
-  EXPECT_EQ (db::prop2string (s.prop_id ()), "1=100");
+  EXPECT_EQ (db::prop2string (s.prop_id ()), "{1=>100}");
   EXPECT_EQ (s->to_string (), "(20,22;20,222;121,222;121,22)");
   ++s;
   EXPECT_EQ (s.at_end (), false);
-  EXPECT_EQ (db::prop2string (s.prop_id ()), "1=100");
+  EXPECT_EQ (db::prop2string (s.prop_id ()), "{1=>100}");
   EXPECT_EQ (s->to_string (), "(30,32;30,232;131,232;131,32)");
   ++s;
   EXPECT_EQ (s.at_end (), true);
 
   s = r.begin ();
   EXPECT_EQ (s.at_end (), false);
-  EXPECT_EQ (db::prop2string (s.prop_id ()), "1=100\n2=101");
+  EXPECT_EQ (db::prop2string (s.prop_id ()), "{1=>100,2=>101}");
   EXPECT_EQ (s->to_string (), "(1,2;1,202;101,202;101,2)");
 }
 
@@ -2503,26 +2503,26 @@ TEST(55_PropertiesFilterFlat)
 
   db::Region::const_iterator s = rr.begin ();
   EXPECT_EQ (s.at_end (), false);
-  EXPECT_EQ (db::prop2string (s.prop_id ()), "1=100");
+  EXPECT_EQ (db::prop2string (s.prop_id ()), "{1=>100}");
   EXPECT_EQ (s->to_string (), "(1,2;1,202;101,202;101,2)");
   ++s;
   EXPECT_EQ (s.at_end (), false);
-  EXPECT_EQ (db::prop2string (s.prop_id ()), "1=0");
+  EXPECT_EQ (db::prop2string (s.prop_id ()), "{1=>0}");
   EXPECT_EQ (s->to_string (), "(10,12;10,212;111,212;111,12)");
   ++s;
   EXPECT_EQ (s.at_end (), false);
-  EXPECT_EQ (db::prop2string (s.prop_id ()), "1=100");
+  EXPECT_EQ (db::prop2string (s.prop_id ()), "{1=>100}");
   EXPECT_EQ (s->to_string (), "(20,22;20,222;121,222;121,22)");
   ++s;
   EXPECT_EQ (s.at_end (), false);
-  EXPECT_EQ (db::prop2string (s.prop_id ()), "1=100");
+  EXPECT_EQ (db::prop2string (s.prop_id ()), "{1=>100}");
   EXPECT_EQ (s->to_string (), "(30,32;30,232;131,232;131,32)");
   ++s;
   EXPECT_EQ (s.at_end (), true);
 
   s = r.begin ();
   EXPECT_EQ (s.at_end (), false);
-  EXPECT_EQ (db::prop2string (s.prop_id ()), "1=100\n2=101");
+  EXPECT_EQ (db::prop2string (s.prop_id ()), "{1=>100,2=>101}");
   EXPECT_EQ (s->to_string (), "(1,2;1,202;101,202;101,2)");
 }
 

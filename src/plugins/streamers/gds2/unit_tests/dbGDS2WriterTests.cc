@@ -1265,7 +1265,7 @@ TEST(130)
   EXPECT_EQ (layout_read.meta_info ("complex").value.is_list (), true);
   EXPECT_EQ (layout_read.meta_info ("complex").value.size (), size_t (2));
   EXPECT_EQ (layout_read.meta_info ("complex").value.begin () [1].is_array (), true);
-  EXPECT_EQ (layout_read.meta_info ("complex").value.to_string (), "-1.5,x=>value_for_x,y=>(1.5,2.5;3.5,4.5)");
+  EXPECT_EQ (layout_read.meta_info ("complex").value.to_string (), "(-1.5,{x=>value_for_x,y=>(1.5,2.5;3.5,4.5)})");
 
   db::cell_index_type ci2 = layout_read.cell_by_name ("X").second;
   db::cell_index_type cil2 = layout_read.cell_by_name ("TEXT").second;
@@ -1278,7 +1278,7 @@ TEST(130)
   EXPECT_EQ (layout_read.meta_info (ci2, "complex").value.is_list (), true);
   EXPECT_EQ (layout_read.meta_info (ci2, "complex").value.size (), size_t (2));
   EXPECT_EQ (layout_read.meta_info (ci2, "complex").value.begin () [1].is_array (), true);
-  EXPECT_EQ (layout_read.meta_info (ci2, "complex").value.to_string (), "-1.5,x=>value_for_x,y=>(1.5,2.5;3.5,4.5)");
+  EXPECT_EQ (layout_read.meta_info (ci2, "complex").value.to_string (), "(-1.5,{x=>value_for_x,y=>(1.5,2.5;3.5,4.5)})");
 
   EXPECT_EQ (layout_read.meta_info (cil2, "x").value.to_string (), "42");
   EXPECT_EQ (layout_read.meta_info (cil2, "y").value.to_string (), "-17");

@@ -266,7 +266,7 @@ Instance::to_string (bool resolve_cell_name) const
   }
 
   if (has_prop_id ()) {
-    r += " prop_id=" + tl::to_string (prop_id ());
+    r += std::string (" props=") + db::properties (prop_id ()).to_dict_var ().to_string ();
   }
 
   return r;

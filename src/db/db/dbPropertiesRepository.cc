@@ -35,7 +35,12 @@ namespace db
 
 const tl::Variant &property_name (db::property_names_id_type id)
 {
-  return *(reinterpret_cast <const tl::Variant *> (id));
+  if (id == 0) {
+    static tl::Variant nil;
+    return nil;
+  } else {
+    return *(reinterpret_cast <const tl::Variant *> (id));
+  }
 }
 
 db::property_names_id_type property_names_id (const tl::Variant &pn)
@@ -45,7 +50,12 @@ db::property_names_id_type property_names_id (const tl::Variant &pn)
 
 const tl::Variant &property_value (db::property_values_id_type id)
 {
-  return *(reinterpret_cast <const tl::Variant *> (id));
+  if (id == 0) {
+    static tl::Variant nil;
+    return nil;
+  } else {
+    return *(reinterpret_cast <const tl::Variant *> (id));
+  }
 }
 
 db::property_values_id_type property_values_id (const tl::Variant &pv)
@@ -55,7 +65,12 @@ db::property_values_id_type property_values_id (const tl::Variant &pv)
 
 const PropertiesSet &properties (db::properties_id_type id)
 {
-  return *(reinterpret_cast <const PropertiesSet *> (id));
+  if (id == 0) {
+    static db::PropertiesSet empty;
+    return empty;
+  } else {
+    return *(reinterpret_cast <const PropertiesSet *> (id));
+  }
 }
 
 db::properties_id_type properties_id (const PropertiesSet &ps)
@@ -128,7 +143,7 @@ PropertiesSet::value (const tl::Variant &name) const
 {
   db::property_names_id_type nid = db::property_names_id (name);
   auto i = m_map.find (nid);
-  if (i == m_map.end () || i->second != nid) {
+  if (i == m_map.end () || i->first != nid) {
     static tl::Variant nil;
     return nil;
   } else {
@@ -140,7 +155,7 @@ const tl::Variant &
 PropertiesSet::value (db::property_names_id_type nid) const
 {
   auto i = m_map.find (nid);
-  if (i == m_map.end () || i->second != nid) {
+  if (i == m_map.end () || i->first != nid) {
     static tl::Variant nil;
     return nil;
   } else {
@@ -159,9 +174,12 @@ PropertiesSet::erase (const tl::Variant &name)
 {
   db::property_names_id_type nid = db::property_names_id (name);
   auto i = m_map.find (nid);
-  while (i != m_map.end () && i->second == nid) {
-    m_map.erase (nid);
+  auto ii = i;
+  while (i != m_map.end () && i->first == nid) {
     ++i;
+  }
+  if (i != ii) {
+    m_map.erase (ii, i);
   }
 }
 
@@ -169,9 +187,12 @@ void
 PropertiesSet::erase (db::property_names_id_type nid)
 {
   auto i = m_map.find (nid);
-  while (i != m_map.end () && i->second == nid) {
-    m_map.erase (nid);
+  auto ii = i;
+  while (i != m_map.end () && i->first == nid) {
     ++i;
+  }
+  if (i != ii) {
+    m_map.erase (ii, i);
   }
 }
 
@@ -224,10 +245,11 @@ tl::Variant
 PropertiesSet::to_list_var () const
 {
   tl::Variant var = tl::Variant::empty_list ();
-  for (auto i = m_map.begin (); i != m_map.end (); ++i) {
+  auto map = to_map ();
+  for (auto i = map.begin (); i != map.end (); ++i) {
     tl::Variant el = tl::Variant::empty_list ();
-    el.push (db::property_name (i->first));
-    el.push (db::property_value (i->second));
+    el.push (i->first);
+    el.push (i->second);
     var.push (el);
   }
   return var;
@@ -344,7 +366,7 @@ PropertiesRepository::properties_id (const PropertiesSet &props)
       changed = true;
 
     } else {
-      pid = db::properties_id (**pi);
+      pid = db::properties_id_type (*pi);
     }
   }
 

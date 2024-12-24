@@ -361,14 +361,6 @@ public:
   properties_id_type properties_id (const PropertiesSet &props);
   
   /**
-   *  @brief Associate a properties set with a properties Id
-   * 
-   *  This method will return the properties set associated with the given Id.
-   *  Id 0 always delivers an empty property set.
-   */
-  const PropertiesSet &properties (properties_id_type id) const;
-
-  /**
    *  @brief Determine if the given ID is a valid properties ID
    *
    *  Caution: this operation is slow!

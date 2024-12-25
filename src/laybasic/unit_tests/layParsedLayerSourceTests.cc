@@ -26,6 +26,32 @@
 #include "dbCell.h"
 #include "tlUnitTest.h"
 
+namespace {
+
+/**
+ *  @brief Installs a temporary repository instance for testing
+ *
+ *  By using a temp instance, we do not disturb other tests.
+ */
+class TempPropertiesRepository
+{
+public:
+  TempPropertiesRepository ()
+  {
+    db::PropertiesRepository::replace_instance_temporarily (&m_temp);
+  }
+
+  ~TempPropertiesRepository ()
+  {
+    db::PropertiesRepository::replace_instance_temporarily (0);
+  }
+
+private:
+  db::PropertiesRepository m_temp;
+};
+
+}
+
 TEST (1)
 {
   lay::ParsedLayerSource ps1 (1, 2, -1);
@@ -165,6 +191,10 @@ TEST (4)
 
 TEST (5)
 {
+  //  Use a temporary singleton properties repo, so we have better control
+  //  over the results of property selectors.
+  TempPropertiesRepository tmp_prop_repo;
+
   lay::ParsedLayerSource ps0 ("@2");
 
   lay::ParsedLayerSource ps1 ("@2 [ X   == #2 ]");
@@ -279,8 +309,8 @@ TEST (5)
   inv = ps2.property_selector ().matching (ids);
   EXPECT_EQ (inv, false);
   EXPECT_EQ (ids.size (), size_t (2));
-  EXPECT_EQ (*ids.begin (), id1);
-  EXPECT_EQ (*(++ids.begin ()), id4);
+  EXPECT_EQ (ids.find (id1) != ids.end (), true);
+  EXPECT_EQ (ids.find (id4) != ids.end (), true);
   ps.clear ();
 
   ps.insert (tl::Variant ("X"), tl::Variant (2l));
@@ -291,27 +321,27 @@ TEST (5)
   inv = ps2.property_selector ().matching (ids);
   EXPECT_EQ (inv, false);
   EXPECT_EQ (ids.size (), size_t (3));
-  EXPECT_EQ (*ids.begin (), id1);
-  EXPECT_EQ (*(++ids.begin ()), id4);
-  EXPECT_EQ (*(++(++ids.begin ())), id5);
+  EXPECT_EQ (ids.find (id1) != ids.end (), true);
+  EXPECT_EQ (ids.find (id4) != ids.end (), true);
+  EXPECT_EQ (ids.find (id5) != ids.end (), true);
 
   EXPECT_EQ (ps2a.property_selector ().check (id5), false);
   ids.clear ();
   inv = ps2a.property_selector ().matching (ids);
   EXPECT_EQ (inv, true);
   EXPECT_EQ (ids.size (), size_t (3));
-  EXPECT_EQ (*ids.begin (), id1);
-  EXPECT_EQ (*(++ids.begin ()), id4);
-  EXPECT_EQ (*(++(++ids.begin ())), id5);
+  EXPECT_EQ (ids.find (id1) != ids.end (), true);
+  EXPECT_EQ (ids.find (id4) != ids.end (), true);
+  EXPECT_EQ (ids.find (id5) != ids.end (), true);
 
   EXPECT_EQ (ps2b.property_selector ().check (id5), false);
   ids.clear ();
   inv = ps2b.property_selector ().matching (ids);
   EXPECT_EQ (inv, true);
   EXPECT_EQ (ids.size (), size_t (3));
-  EXPECT_EQ (*ids.begin (), id1);
-  EXPECT_EQ (*(++ids.begin ()), id4);
-  EXPECT_EQ (*(++(++ids.begin ())), id5);
+  EXPECT_EQ (ids.find (id1) != ids.end (), true);
+  EXPECT_EQ (ids.find (id4) != ids.end (), true);
+  EXPECT_EQ (ids.find (id5) != ids.end (), true);
 
   ps.clear ();
 
@@ -321,9 +351,9 @@ TEST (5)
   inv = ps2.property_selector ().matching (ids);
   EXPECT_EQ (inv, false);
   EXPECT_EQ (ids.size (), size_t (3));
-  EXPECT_EQ (*ids.begin (), id1);
-  EXPECT_EQ (*(++ids.begin ()), id4);
-  EXPECT_EQ (*(++(++ids.begin ())), id5);
+  EXPECT_EQ (ids.find (id1) != ids.end (), true);
+  EXPECT_EQ (ids.find (id4) != ids.end (), true);
+  EXPECT_EQ (ids.find (id5) != ids.end (), true);
 
   EXPECT_EQ (ps0.property_selector ().check (id6), true);
   ids.clear ();

@@ -333,3 +333,121 @@ TEST(PropertiesTranslator)
   EXPECT_EQ (db::prop2string (t (prop2)), "{1=>102}");
   EXPECT_EQ (db::prop2string (t (prop3)), "{}");
 }
+
+static std::string ps2s (const db::PropertiesRepository::properties_id_set &ps)
+{
+  std::string res;
+  for (auto p = ps.begin (); p != ps.end (); ++p) {
+    if (! res.empty ()) {
+      res += ",";
+    }
+    res += db::properties (*p).to_dict_var ().to_string ();
+  }
+  return res;
+}
+
+TEST(PropertyIdsByNameAndValue)
+{
+  db::PropertiesRepository rp;
+
+  db::PropertiesSet ps;
+  ps.insert_by_id (rp.prop_name_id (1), rp.prop_value_id ("A"));
+
+  //  1=>"A"
+  db::properties_id_type pid1 = rp.properties_id (ps);
+
+  ps.insert_by_id (rp.prop_name_id (2), rp.prop_value_id ("A"));
+
+  //  1=>"A", 2=>"A"
+  db::properties_id_type pid2 = rp.properties_id (ps);
+
+  ps.clear ();
+  ps.insert_by_id (rp.prop_name_id (2), rp.prop_value_id ("B"));
+
+  //  2=>"B"
+  db::properties_id_type pid3 = rp.properties_id (ps);
+
+  ps.insert_by_id (rp.prop_name_id (2), rp.prop_value_id ("C"));
+
+  //  2=>"B",2=>"C"
+  db::properties_id_type pid4 = rp.properties_id (ps);
+
+  ps.insert_by_id (rp.prop_name_id (3), rp.prop_value_id ("C"));
+
+  //  2=>"B",2=>"C",3=>"C"
+  db::properties_id_type pid5 = rp.properties_id (ps);
+
+  db::PropertiesRepository::properties_id_set res, ref;
+
+  res = rp.properties_ids_by_name (rp.prop_name_id (1));
+  ref.clear ();
+  ref.insert (pid1);
+  ref.insert (pid2);
+  EXPECT_EQ (ps2s (res), ps2s (ref));
+
+  res = rp.properties_ids_by_name (rp.prop_name_id (2));
+  ref.clear ();
+  ref.insert (pid2);
+  ref.insert (pid3);
+  ref.insert (pid4);
+  ref.insert (pid5);
+  EXPECT_EQ (ps2s (res), ps2s (ref));
+
+  res = rp.properties_ids_by_name (rp.prop_name_id (3));
+  ref.clear ();
+  ref.insert (pid5);
+  EXPECT_EQ (ps2s (res), ps2s (ref));
+
+  res = rp.properties_ids_by_value (rp.prop_value_id ("A"));
+  ref.clear ();
+  ref.insert (pid1);
+  ref.insert (pid2);
+  EXPECT_EQ (ps2s (res), ps2s (ref));
+
+  res = rp.properties_ids_by_value (rp.prop_value_id ("B"));
+  ref.clear ();
+  ref.insert (pid3);
+  ref.insert (pid4);
+  ref.insert (pid5);
+  EXPECT_EQ (ps2s (res), ps2s (ref));
+
+  res = rp.properties_ids_by_value (rp.prop_value_id ("C"));
+  ref.clear ();
+  ref.insert (pid4);
+  ref.insert (pid5);
+  EXPECT_EQ (ps2s (res), ps2s (ref));
+
+  res = rp.properties_ids_by_name_value (rp.prop_name_id (1), rp.prop_value_id ("A"));
+  ref.clear ();
+  ref.insert (pid1);
+  ref.insert (pid2);
+  EXPECT_EQ (ps2s (res), ps2s (ref));
+
+  res = rp.properties_ids_by_name_value (rp.prop_name_id (1), rp.prop_value_id ("B"));
+  ref.clear ();
+  EXPECT_EQ (ps2s (res), ps2s (ref));
+
+  res = rp.properties_ids_by_name_value (rp.prop_name_id (2), rp.prop_value_id ("A"));
+  ref.clear ();
+  ref.insert (pid2);
+  EXPECT_EQ (ps2s (res), ps2s (ref));
+
+  res = rp.properties_ids_by_name_value (rp.prop_name_id (2), rp.prop_value_id ("B"));
+  ref.clear ();
+  ref.insert (pid3);
+  ref.insert (pid4);
+  ref.insert (pid5);
+  EXPECT_EQ (ps2s (res), ps2s (ref));
+
+  res = rp.properties_ids_by_name_value (rp.prop_name_id (2), rp.prop_value_id ("C"));
+  ref.clear ();
+  ref.insert (pid4);
+  ref.insert (pid5);
+  EXPECT_EQ (ps2s (res), ps2s (ref));
+
+  res = rp.properties_ids_by_name_value (rp.prop_name_id (3), rp.prop_value_id ("C"));
+  ref.clear ();
+  ref.insert (pid5);
+  EXPECT_EQ (ps2s (res), ps2s (ref));
+}
+

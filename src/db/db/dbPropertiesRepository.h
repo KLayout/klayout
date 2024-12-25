@@ -251,22 +251,11 @@ public:
   }
 
   /**
-   *  @brief Non-const iterator (begin)
-   *
-   *  This iterator delivers key/value pairs in the ID form.
-   *  The order is basically undefined.
+   *  @brief Finds and entry with the given name ID
    */
-  non_const_iterator begin_non_const ()
+  iterator find (db::property_names_id_type name_id) const
   {
-    return m_map.begin ();
-  }
-
-  /**
-   *  @brief Non-const iterator (end)
-   */
-  non_const_iterator end_non_const ()
-  {
-    return m_map.end ();
+    return m_map.find (name_id);
   }
 
 private:
@@ -396,6 +385,14 @@ public:
    *  of property sets that contain the given name.
    */
   properties_id_set properties_ids_by_name (db::property_names_id_type name) const;
+
+  /**
+   *  @brief Lookup a table of properties id's by a value
+   *
+   *  For a given name, this method returns a set of property IDs
+   *  of property sets that contain the given value.
+   */
+  properties_id_set properties_ids_by_value (db::property_values_id_type value) const;
 
   /**
    *  @brief Collect memory statistics

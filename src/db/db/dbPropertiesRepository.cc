@@ -360,7 +360,7 @@ PropertiesRepository::properties_id (const PropertiesSet &props)
       pid = db::properties_id_type (&new_props);
       for (auto nv = props.begin (); nv != props.end (); ++nv) {
         m_properties_by_name_table [nv->first].insert (pid);
-        m_properties_by_name_table [nv->second].insert (pid);
+        m_properties_by_value_table [nv->second].insert (pid);
       }
 
       changed = true;
@@ -433,6 +433,19 @@ PropertiesRepository::properties_ids_by_name (db::property_names_id_type name_id
 }
 
 PropertiesRepository::properties_id_set
+PropertiesRepository::properties_ids_by_value (db::property_values_id_type value_id) const
+{
+  tl::MutexLocker locker (&m_lock);
+
+  auto vi = m_properties_by_value_table.find (value_id);
+  if (vi == m_properties_by_value_table.end ()) {
+    return properties_id_set ();
+  } else {
+    return vi->second;
+  }
+}
+
+PropertiesRepository::properties_id_set
 PropertiesRepository::properties_ids_by_name_value (db::property_names_id_type name_id, db::property_values_id_type value_id) const
 {
   tl::MutexLocker locker (&m_lock);
@@ -448,7 +461,27 @@ PropertiesRepository::properties_ids_by_name_value (db::property_names_id_type n
   }
 
   properties_id_set result;
-  std::set_intersection (vi->second.begin (), vi->second.end (), ni->second.begin (), ni->second.end (), std::inserter (result, result.begin ()));
+
+  //  find the property sets in the intersection of ni->second and vi->second that contain the
+  //  combination of name and value.
+
+  for (auto n = ni->second.begin (); n != ni->second.end (); ++n) {
+
+    auto vv = vi->second.find (*n);
+    if (vv != vi->second.end ()) {
+
+      const db::PropertiesSet &props = db::properties (*n);
+      for (auto p = props.find (name_id); p != props.end () && p->first == name_id; ++p) {
+        if (p->second == value_id) {
+          result.insert (*n);
+          break;
+        }
+      }
+
+    }
+
+  }
+
   return result;
 }
 

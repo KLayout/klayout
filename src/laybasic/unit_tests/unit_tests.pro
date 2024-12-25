@@ -12,7 +12,7 @@ SOURCES = \
   layBitmapsToImage.cc \
   layLayerProperties.cc \
   layMarginTests.cc \
-  layParsedLayerSource.cc \
+  layParsedLayerSourceTests.cc \
   layRenderer.cc \
   layAbstractMenuTests.cc \
   layTextInfoTests.cc \

@@ -353,7 +353,7 @@ public:
 
   bool selection (std::set<db::properties_id_type> &ids) const
   {
-    const db::PropertiesRepository::properties_id_set &idv = db::PropertiesRepository::instance ().properties_ids_by_name_value (db::property_names_id (m_name), db::property_values_id (m_value));
+    db::PropertiesRepository::properties_id_set idv = db::PropertiesRepository::instance ().properties_ids_by_name_value (db::property_names_id (m_name), db::property_values_id (m_value));
     ids.insert (idv.begin (), idv.end ());
 
     return ! m_equal;

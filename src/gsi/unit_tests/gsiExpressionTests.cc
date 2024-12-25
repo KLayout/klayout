@@ -153,9 +153,9 @@ TEST(1)
   EXPECT_EQ (v.to_string (), std::string ("a"));
 #endif
   v = e.parse ("var a=A.new; a.ev").execute ();
-  EXPECT_EQ (v.to_string (), std::string (""));
+  EXPECT_EQ (v.to_string (), std::string ("()"));
   v = e.parse ("var a=A.new; a.push_ev(Enum.a); a.push_ev(Enum.new); a.push_ev(Enum.b); a.ev").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("a,#0,b"));
+  EXPECT_EQ (v.to_string (), std::string ("(a,#0,b)"));
 
 #if defined(HAVE_QT)
   v = e.parse ("var a=A.new; a.get_ef").execute ();
@@ -217,25 +217,25 @@ TEST(2)
   v = e.parse ("var b=B.new; b.always_5").execute ();
   EXPECT_EQ (v.to_string (), std::string ("5"));
   v = e.parse ("var b=B.new; var a1=A.new(-17); var a2=A.new(42); b.av = [ a1, a2 ]; to_s(b.av)").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("A: -17,A: 42"));
+  EXPECT_EQ (v.to_string (), std::string ("(A: -17,A: 42)"));
   v = e.parse ("var b=B.new; var a1=A.new(-17); var a2=A.new(42); b.av = []; b.push_a(a1); b.push_a(a2); to_s(b.av)").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("A: -17,A: 42"));
+  EXPECT_EQ (v.to_string (), std::string ("(A: -17,A: 42)"));
   v = e.parse ("var b=B.new; var a1=A.new(-17); var a2=A.new(42); b.av = []; b.push_a_cref(a1); b.push_a_cptr(a2); to_s(b.av)").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("A: -17,A: 42"));
+  EXPECT_EQ (v.to_string (), std::string ("(A: -17,A: 42)"));
   v = e.parse ("var b=B.new; var a1=A.new(-17); var a2=A.new(42); b.av = []; b.push_a_ref(a1); b.push_a_ptr(a2); to_s(b.av)").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("A: -17,A: 42"));
+  EXPECT_EQ (v.to_string (), std::string ("(A: -17,A: 42)"));
   v = e.parse ("var b=B.new; var a1=A.new(-17); var a2=A.new(1); b.av_cref = [ a1, a2 ]; to_s(b.av_cref)").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("A: -17,A: 1"));
+  EXPECT_EQ (v.to_string (), std::string ("(A: -17,A: 1)"));
   v = e.parse ("var b=B.new; b.av_cptr = [ A.new(-13) ]; to_s(b.av)").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("A: -13"));
+  EXPECT_EQ (v.to_string (), std::string ("(A: -13)"));
   v = e.parse ("var b=B.new; b.av_ptr = [ A.new(13) ]; to_s(b.av)").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("A: 13"));
+  EXPECT_EQ (v.to_string (), std::string ("(A: 13)"));
   v = e.parse ("var b=B.new; b.av = [ A.new(-13) ]; b.av_cptr = nil; to_s(b.av)").execute ();
-  EXPECT_EQ (v.to_string (), std::string (""));
+  EXPECT_EQ (v.to_string (), std::string ("()"));
   v = e.parse ("var b=B.new; b.av = [ A.new(13) ]; b.av_ptr = nil; to_s(b.av)").execute ();
-  EXPECT_EQ (v.to_string (), std::string (""));
+  EXPECT_EQ (v.to_string (), std::string ("()"));
   v = e.parse ("var b=B.new; var a1=A.new(17); b.av_ref = [ a1 ]; to_s(b.av_ref)").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("A: 17"));
+  EXPECT_EQ (v.to_string (), std::string ("(A: 17)"));
   v = e.parse ("var b=B.new; b.arg_is_not_nil(nil)").execute ();
   EXPECT_EQ (v.to_string (), std::string ("false"));
   v = e.parse ("var b=B.new; b.arg_is_not_nil(A.new)").execute ();
@@ -247,17 +247,17 @@ TEST(2)
 
   //  List to constructor call
   v = e.parse ("var b=B.new; b.av = [ [5, 6], [4, 6, 0.5], [42] ]; to_s(b.av)").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("A: 11,A: 5,A: 42"));
+  EXPECT_EQ (v.to_string (), std::string ("(A: 11,A: 5,A: 42)"));
   v = e.parse ("var b=B.new; b.av = []; b.push_a([ 1, 2 ]); b.push_a([ 17 ]); to_s(b.av)").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("A: 3,A: 17"));
+  EXPECT_EQ (v.to_string (), std::string ("(A: 3,A: 17)"));
   v = e.parse ("var b=B.new; b.av = []; b.push_a([ 1, 2 ]); b.push_a_cref([ 17 ]); to_s(b.av)").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("A: 3,A: 17"));
+  EXPECT_EQ (v.to_string (), std::string ("(A: 3,A: 17)"));
   v = e.parse ("var b=B.new; b.av = []; b.push_a([ 1, 2 ]); b.push_a_cptr([ 17 ]); to_s(b.av)").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("A: 3,A: 17"));
+  EXPECT_EQ (v.to_string (), std::string ("(A: 3,A: 17)"));
   v = e.parse ("var b=B.new; b.av = []; b.push_a([ 1, 2 ]); b.push_a_ref([ 17 ]); to_s(b.av)").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("A: 3,A: 17"));
+  EXPECT_EQ (v.to_string (), std::string ("(A: 3,A: 17)"));
   v = e.parse ("var b=B.new; b.av = []; b.push_a([ 1, 2 ]); b.push_a_ptr([ 17 ]); to_s(b.av)").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("A: 3,A: 17"));
+  EXPECT_EQ (v.to_string (), std::string ("(A: 3,A: 17)"));
 
   /*
   TODO: No detailed type analysis for ambiguity resolution so far:
@@ -273,21 +273,21 @@ TEST(2)
   v = e.parse ("var b=B.new; b.set_vars([])").execute ();
   EXPECT_EQ (v.to_string (), std::string ("0"));
   v = e.parse ("var b=B.new; b.set_vars([]); b.vars").execute ();
-  EXPECT_EQ (v.to_string (), std::string (""));
+  EXPECT_EQ (v.to_string (), std::string ("()"));
   v = e.parse ("var b=B.new; b.set_vars([true, 'hello']); b.vars").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("true,hello"));
+  EXPECT_EQ (v.to_string (), std::string ("(true,hello)"));
   v = e.parse ("var b=B.new; b.set_vars([1, 'hello']); b.vars_ref").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("1,hello"));
+  EXPECT_EQ (v.to_string (), std::string ("(1,hello)"));
   v = e.parse ("var b=B.new; b.set_vars([17, 1]); b.vars_cref").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("17,1"));
+  EXPECT_EQ (v.to_string (), std::string ("(17,1)"));
   v = e.parse ("var b=B.new; b.set_vars([nil,nil]); b.vars_cptr").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("nil,nil"));
+  EXPECT_EQ (v.to_string (), std::string ("(nil,nil)"));
   v = e.parse ("var b=B.new; b.set_vars([1,2,3]); b.vars_cptr_null").execute ();
   EXPECT_EQ (v.to_string (), std::string ("nil"));
   v = e.parse ("var b=B.new; b.set_vars([27, 1]); b.vars_ref").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("27,1"));
+  EXPECT_EQ (v.to_string (), std::string ("(27,1)"));
   v = e.parse ("var b=B.new; b.set_vars([1.5]); b.vars_ptr").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("1.5"));
+  EXPECT_EQ (v.to_string (), std::string ("(1.5)"));
   v = e.parse ("var b=B.new; b.set_vars([-1.5]); b.vars_ptr_null").execute ();
   EXPECT_EQ (v.to_string (), std::string ("nil"));
   v = e.parse ("var b=B.new; b.set_vars([nil])").execute ();
@@ -511,33 +511,33 @@ TEST(7)
   v = e.parse ("var o=B.new(); to_s(o.map1_ptr_null)").execute ();
   EXPECT_EQ (v.to_string (), std::string ("nil"));
   v = e.parse ("var o=B.new(); o.insert_map1(1, 'hello'); to_s(o.map1)").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("1=>hello"));
+  EXPECT_EQ (v.to_string (), std::string ("{1=>hello}"));
   v = e.parse ("var o=B.new(); o.insert_map1(2, 'hello'); to_s(o.map1_cref)").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("2=>hello"));
+  EXPECT_EQ (v.to_string (), std::string ("{2=>hello}"));
   v = e.parse ("var o=B.new(); o.insert_map1(3, 'hello'); to_s(o.map1_cptr)").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("3=>hello"));
+  EXPECT_EQ (v.to_string (), std::string ("{3=>hello}"));
   v = e.parse ("var o=B.new(); o.insert_map1(2, 'hello'); to_s(o.map1_ref)").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("2=>hello"));
+  EXPECT_EQ (v.to_string (), std::string ("{2=>hello}"));
   v = e.parse ("var o=B.new(); o.insert_map1(3, 'hello'); to_s(o.map1_ptr)").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("3=>hello"));
+  EXPECT_EQ (v.to_string (), std::string ("{3=>hello}"));
   v = e.parse ("var o=B.new(); o.map1 = { 42 => 1, -17 => true }; to_s(o.map1)").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("-17=>true,42=>1"));
+  EXPECT_EQ (v.to_string (), std::string ("{-17=>true,42=>1}"));
   v = e.parse ("var o=B.new(); o.set_map1({ 42 => 1, -17 => true }); to_s(o.map1)").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("-17=>true,42=>1"));
+  EXPECT_EQ (v.to_string (), std::string ("{-17=>true,42=>1}"));
   v = e.parse ("var o=B.new(); o.set_map1_cref({ 42 => 1, -17 => true }); to_s(o.map1)").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("-17=>true,42=>1"));
+  EXPECT_EQ (v.to_string (), std::string ("{-17=>true,42=>1}"));
   v = e.parse ("var o=B.new(); o.set_map1_cptr({ 42 => 1, -17 => true }); to_s(o.map1)").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("-17=>true,42=>1"));
+  EXPECT_EQ (v.to_string (), std::string ("{-17=>true,42=>1}"));
   v = e.parse ("var o=B.new(); o.set_map1_cptr(nil); to_s(o.map1)").execute ();
-  EXPECT_EQ (v.to_string (), std::string (""));
+  EXPECT_EQ (v.to_string (), std::string ("{}"));
   v = e.parse ("var o=B.new(); o.set_map1_ref({ 42 => 1, -17 => true }); to_s(o.map1)").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("-17=>true,42=>1"));
+  EXPECT_EQ (v.to_string (), std::string ("{-17=>true,42=>1}"));
   v = e.parse ("var o=B.new(); o.set_map1_ptr({ 42 => 1, -17 => true }); to_s(o.map1)").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("-17=>true,42=>1"));
+  EXPECT_EQ (v.to_string (), std::string ("{-17=>true,42=>1}"));
   v = e.parse ("var o=B.new(); o.set_map1_ptr(nil); to_s(o.map1)").execute ();
-  EXPECT_EQ (v.to_string (), std::string (""));
+  EXPECT_EQ (v.to_string (), std::string ("{}"));
   v = e.parse ("var o=B.new(); o.map2 = { 'xy' => 1, -17 => true }; to_s(o.map2)").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("-17=>true,xy=>1"));
+  EXPECT_EQ (v.to_string (), std::string ("{-17=>true,xy=>1}"));
   v = e.parse ("var o=B.new(); to_s(o.map2_null)").execute ();
   EXPECT_EQ (v.to_string (), std::string ("nil"));
 }
@@ -844,9 +844,9 @@ TEST(16)
     EXPECT_EQ (ex.msg (), "Cannot call non-const method set_str, class B on a const reference at position 44 (...set_str('abc'))");
   }
   v = e.parse ("var e=E.new(); var ec=e.dup; [e._is_const_object, ec._to_const_object._is_const_object]").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("false,true"));
+  EXPECT_EQ (v.to_string (), std::string ("(false,true)"));
   v = e.parse ("var e=E.new(); var ec=e._to_const_object; e.x=17; [e.x, ec.x]").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("17,17"));
+  EXPECT_EQ (v.to_string (), std::string ("(17,17)"));
   v = e.parse ("var e=E.new(); var ec=e._to_const_object; ec._is_const_object").execute ();
   EXPECT_EQ (v.to_string (), std::string ("true"));
   v = e.parse ("var e=E.new(); var ec=e._to_const_object; ec=ec._const_cast; ec._is_const_object").execute ();

@@ -316,7 +316,7 @@ TEST(6A)
     "Not in b but in a:\n"
     "  (-1720,1600;23160,2000)\n"
     "Not in a but in b:\n"
-    "  (-1720,1600;23160,2000) {1 {VALUE}}\n"
+    "  (-1720,1600;23160,2000) {1=>VALUE}\n"
     "Layouts differ\n"
   );
 }

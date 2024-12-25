@@ -376,7 +376,7 @@ Class<db::Path> decl_Path ("db", "Path",
   "and the end point can be pulled forward somewhat (by the 'end extension').\n"
   "\n"
   "A path may have round ends for special purposes. In particular, a round-ended path with a single point "
-  "can represent a circle. Round-ended paths should have being and end extensions equal to half the width. "
+  "can represent a circle. Round-ended paths should have begin and end extensions equal to half the width. "
   "Non-round-ended paths with a single point are allowed but the definition "
   "of the resulting shape in not well defined and may differ in other tools.\n"
   "\n"

@@ -871,7 +871,7 @@ TEST(4)
   EXPECT_EQ (v.can_convert_to_ulonglong (), true);
 
   v = tl::Variant (-1);
-  EXPECT_EQ (v.can_convert_to_char (), true);
+  EXPECT_EQ (v.can_convert_to_char (), std::numeric_limits<char>::min () < 0 ? true : false);
   EXPECT_EQ (v.can_convert_to_uchar (), false);
   EXPECT_EQ (v.can_convert_to_double (), true);
   EXPECT_EQ (v.can_convert_to_float (), true);
@@ -1332,6 +1332,8 @@ TEST(11)
 
   //  compare without type
   EXPECT_EQ (tl::Variant (1l) == tl::Variant (1.0), true);
+  EXPECT_EQ (tl::Variant (1l) == tl::Variant (1), true);
+  EXPECT_EQ (tl::Variant (1l) == tl::Variant (1u), false);
   EXPECT_EQ (tl::Variant (1l) == tl::Variant (1.5), false);
   EXPECT_EQ (tl::Variant (1l) < tl::Variant (1.0), false);
   EXPECT_EQ (tl::Variant (1.0) < tl::Variant (1l), false);
@@ -1340,6 +1342,8 @@ TEST(11)
 
   //  compare with type
   EXPECT_EQ (tl::Variant (1l).equal (tl::Variant (1.0)), false);
+  EXPECT_EQ (tl::Variant (1l).equal (tl::Variant (1)), true);
+  EXPECT_EQ (tl::Variant (1l).equal (tl::Variant (1u)), false);
   EXPECT_EQ (tl::Variant (1l).equal (tl::Variant (1.5)), false);
   EXPECT_EQ (tl::Variant (1l).less (tl::Variant (1.0)), true);
   EXPECT_EQ (tl::Variant (1.0).less (tl::Variant (1l)), false);

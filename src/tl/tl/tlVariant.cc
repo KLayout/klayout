@@ -1009,6 +1009,9 @@ is_integer_type (Variant::type type)
   }
 }
 
+/**
+ *  @brief normalized_type
+ */
 inline Variant::type 
 normalized_type (Variant::type type)
 {
@@ -1017,6 +1020,12 @@ normalized_type (Variant::type type)
   case Variant::t_double:
     return Variant::t_double;
   case Variant::t_char:
+    //  NOTE: char can be signed or unsigned
+    if (std::numeric_limits<char>::min () < 0) {
+      return Variant::t_longlong;
+    } else {
+      return Variant::t_ulonglong;
+    }
   case Variant::t_schar:
   case Variant::t_short:
   case Variant::t_int:
@@ -1048,7 +1057,7 @@ normalized_type (Variant::type type)
   }
 }
 
-inline std::pair<bool, Variant::type> 
+inline std::pair<bool, Variant::type>
 normalized_type (Variant::type type1, Variant::type type2)
 {
   type1 = normalized_type (type1);
@@ -1067,6 +1076,23 @@ normalized_type (Variant::type type1, Variant::type type2)
   } else {
     return std::make_pair (type1 == type2, type1);
   }
+}
+
+/**
+ *  @brief A more rigid definition of "normalized_type" with two arguments
+ *
+ *  The former version allows casting floats to integers while this version
+ *  treats floats differently.
+ *
+ *  This version is employed in Variant::less and Variant::equal.
+ */
+inline std::pair<bool, Variant::type>
+normalized_type_rigid (Variant::type type1, Variant::type type2)
+{
+  type1 = normalized_type (type1);
+  type2 = normalized_type (type2);
+
+  return std::make_pair (type1 == type2, type1);
 }
 
 static const double epsilon = 1e-13;
@@ -1106,14 +1132,8 @@ static inline bool fless (double a, double b)
 }
 
 bool 
-Variant::operator== (const tl::Variant &d) const
+Variant::equal_core (const tl::Variant &d, type t) const
 {
-  std::pair<bool, type> tt = normalized_type (m_type, d.m_type);
-  if (! tt.first) {
-    return false;
-  }
-  type t = tt.second;
-
   if (t == t_nil) {
     return true;
   } else if (t == t_bool) {
@@ -1161,15 +1181,8 @@ Variant::operator== (const tl::Variant &d) const
 }
 
 bool 
-Variant::operator< (const tl::Variant &d) const
+Variant::less_core (const tl::Variant &d, type t) const
 {
-  std::pair<bool, type> tt = normalized_type (m_type, d.m_type);
-  if (! tt.first) {
-    return normalized_type (m_type) < normalized_type (d.m_type);
-  }
-
-  type t = tt.second;
-
   if (t == t_nil) {
     return false;
   } else if (t == t_bool) {
@@ -1225,21 +1238,47 @@ Variant::operator< (const tl::Variant &d) const
 }
 
 bool
+Variant::operator== (const tl::Variant &d) const
+{
+  std::pair<bool, type> tt = normalized_type (m_type, d.m_type);
+  if (! tt.first) {
+    return false;
+  } else {
+    return equal_core (d, tt.second);
+  }
+}
+
+bool
+Variant::operator< (const tl::Variant &d) const
+{
+  std::pair<bool, type> tt = normalized_type (m_type, d.m_type);
+  if (! tt.first) {
+    return normalized_type (m_type) < normalized_type (d.m_type);
+  } else {
+    return less_core (d, tt.second);
+  }
+}
+
+bool
 Variant::equal (const Variant &d) const
 {
-  if (m_type != d.m_type) {
+  std::pair<bool, type> tt = normalized_type_rigid (m_type, d.m_type);
+  if (! tt.first) {
     return false;
+  } else {
+    return equal_core (d, tt.second);
   }
-  return operator== (d);
 }
 
 bool
 Variant::less (const Variant &d) const
 {
-  if (m_type != d.m_type) {
-    return m_type < d.m_type;
+  std::pair<bool, type> tt = normalized_type_rigid (m_type, d.m_type);
+  if (! tt.first) {
+    return normalized_type (m_type) < normalized_type (d.m_type);
+  } else {
+    return less_core (d, tt.second);
   }
-  return operator< (d);
 }
 
 bool 
@@ -1640,7 +1679,6 @@ Variant::can_convert_to_uint () const
   case t_long:
     return m_var.m_long >= (long) std::numeric_limits<unsigned int>::min () && (sizeof (long) == sizeof (unsigned int) || m_var.m_long <= (long) std::numeric_limits<unsigned int>::max ());
   case t_bool:
-  case t_char:
   case t_uchar:
   case t_schar:
   case t_short:
@@ -1648,6 +1686,8 @@ Variant::can_convert_to_uint () const
   case t_uint:
   case t_nil:
     return true;
+  case t_char:
+    return m_var.m_char >= 0;
   case t_string:
 #if defined(HAVE_QT)
   case t_qstring:

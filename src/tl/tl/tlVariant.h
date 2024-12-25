@@ -1720,6 +1720,8 @@ private:
   mutable char *m_string;
 
   void set_user_object (void *obj, bool shared);
+  bool equal_core (const Variant &d, type t) const;
+  bool less_core (const Variant &d, type t) const;
 };
 
 //  specializations of the to ... methods

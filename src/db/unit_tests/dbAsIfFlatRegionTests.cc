@@ -1744,7 +1744,7 @@ TEST(40_BoolWithProperties)
 
   db::Region clip_region_wp (new db::FlatRegion ());
   db::PropertiesSet ps;
-  ps.insert (tl::Variant (1), 42);
+  ps.insert (tl::Variant (1), "42");   //  "42" needs to be a string as GDS properties are strings as well
   db::properties_id_type pid42 = db::properties_id (ps);
   clip_region_wp.insert (db::BoxWithProperties (clip, pid42));
 

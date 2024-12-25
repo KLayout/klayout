@@ -157,7 +157,7 @@ public:
  *
  *  @return True, if the layouts are identical
  */
-bool DB_PUBLIC compare_layouts (const db::Layout &a, const db::Layout &b, unsigned int flags, db::Coord tolerance, size_t max_count = 0, bool print_properties = false);
+bool DB_PUBLIC compare_layouts (const db::Layout &a, const db::Layout &b, unsigned int flags, db::Coord tolerance, size_t max_count = 0, bool print_properties = true);
 
 /**
  *  @brief Compare two layout objects
@@ -176,7 +176,7 @@ bool DB_PUBLIC compare_layouts (const db::Layout &a, const db::Layout &b, unsign
  *
  *  @return True, if the layouts are identical
  */
-bool DB_PUBLIC compare_layouts (const db::Layout &a, db::cell_index_type top_a, const db::Layout &b, db::cell_index_type top_b, unsigned int flags, db::Coord tolerance, size_t max_count = 0, bool print_properties = false);
+bool DB_PUBLIC compare_layouts (const db::Layout &a, db::cell_index_type top_a, const db::Layout &b, db::cell_index_type top_b, unsigned int flags, db::Coord tolerance, size_t max_count = 0, bool print_properties = true);
 
 /**
  *  @brief Compare two layout objects with a custom receiver for the differences

@@ -1395,22 +1395,8 @@ PrintingDifferenceReceiver::print_diffs (const std::vector <std::pair <SH, db::p
   std::set_difference (a.begin (), a.end (), b.begin (), b.end (), std::back_inserter (anotb));
   for (typename std::vector <std::pair <SH, db::properties_id_type> >::const_iterator s = anotb.begin (); s != anotb.end (); ++s) {
     enough (tl::info) << "  " << s->first.to_string () << tl::noendl;
-    if (s->second != 0) {
-      if (m_print_properties) {
-        const db::PropertiesSet &props = db::properties (s->second);
-        for (db::PropertiesSet::iterator p = props.begin (); p != props.end (); ++p) {
-          const tl::Variant &name = property_name (p->first);
-          const tl::Variant &value = property_value (p->second);
-          if (name.is_long ()) {
-            tl::info << " {" << int (name.to_long ()) << " {" << value.to_string () << "}}" << tl::noendl;
-          } else {
-            tl::info << " {{" << name.to_string () << "} {" << value.to_string () << "}}" << tl::noendl;
-          }
-        }
-        tl::info << "";
-      } else {
-        tl::info << " [" << s->second << "]";
-      }
+    if (s->second != 0 && m_print_properties) {
+      tl::info << " " << db::properties (s->second).to_dict_var ().to_string ();
     } else {
       tl::info << "";
     }

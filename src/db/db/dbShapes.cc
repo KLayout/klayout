@@ -727,9 +727,6 @@ Shapes::shape_type
 Shapes::replace_prop_id (const Shapes::shape_type &ref, db::properties_id_type prop_id)
 {
   tl_assert (! ref.is_array_member ());
-  if (! is_editable ()) {
-    throw tl::Exception (tl::to_string (tr ("Function 'replace_prop_id' is permitted only in editable mode")));
-  }
 
   if (ref.has_prop_id ()) {
 
@@ -809,6 +806,10 @@ Shapes::replace_prop_id (const Shapes::shape_type &ref, db::properties_id_type p
     return ref;
 
   } else {
+
+    if (! is_editable ()) {
+      throw tl::Exception (tl::to_string (tr ("Function 'replace_prop_id' is permitted only in editable mode when going to property-less shapes to some with properties")));
+    }
 
     switch (ref.m_type) {
     case shape_type::Null:
@@ -1253,9 +1254,6 @@ void
 Shapes::replace_prop_id (const Sh *pos, db::properties_id_type prop_id)
 {
   if (pos->properties_id () != prop_id) {
-    if (! is_editable ()) {
-      throw tl::Exception (tl::to_string (tr ("Function 'replace' is permitted only in editable mode")));
-    }
     if (manager () && manager ()->transacting ()) {
       check_is_editable_for_undo_redo ();
       db::layer_op<Sh, db::stable_layer_tag>::queue_or_append (manager (), this, false /*not insert*/, *pos);
@@ -1272,10 +1270,6 @@ template <class Sh, class Iter>
 Shapes::shape_type
 Shapes::replace_prop_id_iter (typename db::object_tag<Sh>, const Iter &iter, db::properties_id_type prop_id)
 {
-  if (! is_editable ()) {
-    throw tl::Exception (tl::to_string (tr ("Function 'replace' is permitted only in editable mode")));
-  }
-
   if (manager () && manager ()->transacting ()) {
     check_is_editable_for_undo_redo ();
     db::layer_op<Sh, db::stable_layer_tag>::queue_or_append (manager (), this, false /*not insert*/, *iter);
@@ -1293,10 +1287,6 @@ template <class Sh1, class Sh2>
 Shapes::shape_type 
 Shapes::reinsert_member_with_props (typename db::object_tag<Sh1>, const shape_type &ref, const Sh2 &sh)
 {
-  if (! is_editable ()) {
-    throw tl::Exception (tl::to_string (tr ("Function 'replace' is permitted only in editable mode")));
-  }
-
   //  the shape types are not equal - resolve into erase and insert (of new)
   if (! ref.has_prop_id ()) {
     erase_shape (ref);
@@ -1312,10 +1302,6 @@ template <class Sh1, class Sh2>
 Shapes::shape_type 
 Shapes::replace_member_with_props (typename db::object_tag<Sh1>, const shape_type &ref, const Sh2 &sh)
 {
-  if (! is_editable ()) {
-    throw tl::Exception (tl::to_string (tr ("Function 'replace' is permitted only in editable mode")));
-  }
-
   //  the shape types are not equal - resolve into erase and insert (of new)
   if (! ref.has_prop_id ()) {
     erase_shape (ref);
@@ -1362,10 +1348,6 @@ Shapes::replace_member_with_props (typename db::object_tag<Sh> tag, const shape_
     }
 
   } else {
-
-    if (! is_editable ()) {
-      throw tl::Exception (tl::to_string (tr ("Function 'replace' is permitted only in editable mode")));
-    }
 
     if (! ref.has_prop_id ()) {
 

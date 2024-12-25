@@ -1089,32 +1089,66 @@ OASISReader::do_read (db::Layout &layout)
   //  Resolve forward references for stored shape and instance prop_ids.
   //  This makes these shape and instance property IDs valid
 
-  for (auto p = m_forward_properties_for_instances.begin (); p != m_forward_properties_for_instances.end (); ++p) {
+  {
+    std::map <db::properties_id_type, db::properties_id_type> replaced_prop_ids;
+    std::set <db::Instances *> instances_set;
 
-    db::PropertiesSet props = forward_properties (p->first);
-    resolve_forward_references (props);
+    for (auto p = m_forward_properties_for_instances.begin (); p != m_forward_properties_for_instances.end (); ++p) {
 
-    db::properties_id_type pid = db::properties_id (props);
-    for (auto i = p->second.begin (); i != p->second.end (); ++i) {
-      if (i->instances ()) {
-        i->instances ()->replace_prop_id (*i, pid);
-      }
+      db::PropertiesSet props = forward_properties (p->first);
+      resolve_forward_references (props);
+
+      replaced_prop_ids.insert (std::make_pair (p->first, db::properties_id (props)));
+
+      instances_set.insert (p->second.begin (), p->second.end ());
+
     }
 
+    for (auto i = instances_set.begin (); i != instances_set.end (); ++i) {
+
+      for (auto ii = (*i)->begin (); ! ii.at_end (); ++ii) {
+        auto pm = replaced_prop_ids.find (ii->prop_id ());
+        if (pm != replaced_prop_ids.end ()) {
+          (*i)->replace_prop_id (*ii, pm->second);
+        }
+      }
+
+    }
   }
 
-  for (auto p = m_forward_properties_for_shapes.begin (); p != m_forward_properties_for_shapes.end (); ++p) {
+  {
+    std::map <db::properties_id_type, db::properties_id_type> replaced_prop_ids;
+    std::set <db::Shapes *> shapes_set;
 
-    db::PropertiesSet props = forward_properties (p->first);
-    resolve_forward_references (props);
+    for (auto p = m_forward_properties_for_shapes.begin (); p != m_forward_properties_for_shapes.end (); ++p) {
 
-    db::properties_id_type pid = db::properties_id (props);
-    for (auto i = p->second.begin (); i != p->second.end (); ++i) {
-      if (i->shapes ()) {
-        i->shapes ()-> replace_prop_id (*i, pid);
-      }
+      db::PropertiesSet props = forward_properties (p->first);
+      resolve_forward_references (props);
+
+      replaced_prop_ids.insert (std::make_pair (p->first, db::properties_id (props)));
+
+      shapes_set.insert (p->second.begin (), p->second.end ());
+
     }
 
+    for (auto i = shapes_set.begin (); i != shapes_set.end (); ++i) {
+
+      for (auto ii = (*i)->begin (db::ShapeIterator::All); ! ii.at_end (); ) {
+        auto pm = replaced_prop_ids.find (ii->prop_id ());
+        if (ii.in_array ()) {
+          if (pm != replaced_prop_ids.end ()) {
+            (*i)->replace_prop_id (ii.array (), pm->second);
+          }
+          ii.finish_array ();
+        } else {
+          if (pm != replaced_prop_ids.end ()) {
+            (*i)->replace_prop_id (*ii, pm->second);
+          }
+          ++ii;
+        }
+      }
+
+    }
   }
 
   //  Resolve forward cell properties and extract context strings
@@ -1266,13 +1300,13 @@ OASISReader::forward_properties (properties_id_type id) const
 void
 OASISReader::register_forward_property_for_shape (const db::Shape &shape)
 {
-  m_forward_properties_for_shapes [shape.prop_id ()].push_back (shape);
+  m_forward_properties_for_shapes [shape.prop_id ()].insert (shape.shapes ());
 }
 
 void
 OASISReader::register_forward_property_for_instance (const db::Instance &instance)
 {
-  m_forward_properties_for_instances [instance.prop_id ()].push_back (instance);
+  m_forward_properties_for_instances [instance.prop_id ()].insert (instance.instances ());
 }
 
 void

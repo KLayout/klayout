@@ -180,8 +180,8 @@ private:
 
   std::map <unsigned long, db::property_names_id_type> m_propname_forward_references;
   std::map <unsigned long, std::string> m_propvalue_forward_references;
-  std::map <db::properties_id_type, std::list<db::Shape> > m_forward_properties_for_shapes;
-  std::map <db::properties_id_type, std::list<db::Instance> > m_forward_properties_for_instances;
+  std::map <db::properties_id_type, std::set<db::Shapes *> > m_forward_properties_for_shapes;
+  std::map <db::properties_id_type, std::set<db::Instances *> > m_forward_properties_for_instances;
   std::map <db::cell_index_type, db::PropertiesSet> m_future_cell_properties;
   std::list<db::PropertiesSet> m_fwd_properties;
   db::property_names_id_type m_s_gds_property_name_id;

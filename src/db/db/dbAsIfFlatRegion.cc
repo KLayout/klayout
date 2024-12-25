@@ -1494,19 +1494,20 @@ AsIfFlatRegion::and_with (const Region &other, PropertyConstraint property_const
 
   } else if (is_box () && ! other.strict_handling ()) {
 
-    db::properties_id_type self_prop_id = pc_skip (property_constraint) ? 0 : begin ()->prop_id ();
-
     //  map AND with box to clip ..
     db::Box b = bbox ();
     std::unique_ptr<FlatRegion> new_region (new FlatRegion (false));
     db::PropertyMapper pm (new_region->properties_repository (), properties_repository ());
 
-    db::properties_id_type prop_id_out = pm (pc_norm (property_constraint, self_prop_id));
+    db::PropertyMapper pm2 (new_region->properties_repository (), &other.properties_repository ());
+
+    db::properties_id_type self_prop_id = pm (pc_skip (property_constraint) ? 0 : begin ()->prop_id ());
+    db::properties_id_type prop_id_out = pc_norm (property_constraint, self_prop_id);
 
     std::vector<db::Polygon> clipped;
     for (RegionIterator p (other.begin ()); ! p.at_end (); ++p) {
 
-      db::properties_id_type prop_id = p.prop_id ();
+      db::properties_id_type prop_id = pm2 (p.prop_id ());
       if (pc_match (property_constraint, self_prop_id, prop_id)) {
 
         clipped.clear ();
@@ -1528,23 +1529,24 @@ AsIfFlatRegion::and_with (const Region &other, PropertyConstraint property_const
 
   } else if (other.is_box () && ! strict_handling ()) {
 
-    db::properties_id_type other_prop_id = pc_skip (property_constraint) ? 0 : other.begin ().prop_id ();
-
     //  map AND with box to clip ..
     db::Box b = other.bbox ();
     std::unique_ptr<FlatRegion> new_region (new FlatRegion (false));
     db::PropertyMapper pm (new_region->properties_repository (), properties_repository ());
 
+    db::PropertyMapper pm2 (new_region->properties_repository (), &other.properties_repository ());
+    db::properties_id_type other_prop_id = pc_skip (property_constraint) ? 0 : pm2 (other.begin ().prop_id ());
+
     std::vector<db::Polygon> clipped;
     for (RegionIterator p (begin ()); ! p.at_end (); ++p) {
 
-      db::properties_id_type prop_id = p.prop_id ();
+      db::properties_id_type prop_id = pm (p.prop_id ());
       if (pc_match (property_constraint, prop_id, other_prop_id)) {
 
         clipped.clear ();
         clip_poly (*p, b, clipped);
 
-        db::properties_id_type prop_id_out = pm (pc_norm (property_constraint, prop_id));
+        db::properties_id_type prop_id_out = pc_norm (property_constraint, prop_id);
         if (prop_id_out == 0) {
           new_region->raw_polygons ().insert (clipped.begin (), clipped.end ());
         } else {

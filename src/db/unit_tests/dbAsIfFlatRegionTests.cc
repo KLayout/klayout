@@ -1745,7 +1745,7 @@ TEST(40_BoolWithProperties)
   db::Region clip_region_wp (new db::FlatRegion ());
   db::property_names_id_type pn = clip_region_wp.properties_repository ().prop_name_id (1);
   db::PropertiesRepository::properties_set ps;
-  ps.insert (std::make_pair (pn, 42));
+  ps.insert (std::make_pair (pn, "42"));
   db::properties_id_type pid42 = clip_region_wp.properties_repository ().properties_id (ps);
   clip_region_wp.insert (db::BoxWithProperties (clip, pid42));
 

@@ -417,6 +417,9 @@ Cell::prop_id (db::properties_id_type id)
     if (manager () && manager ()->transacting ()) {
       manager ()->queue (this, new SetCellPropId (m_prop_id, id));
     }
+    if (layout ()) {
+      layout ()->invalidate_prop_ids ();
+    }
     m_prop_id = id;
   }
 }

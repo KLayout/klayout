@@ -1549,6 +1549,7 @@ private:
   db::Cell *mp_cell;  //  HINT: contains "dirty" in bit 0 and "editable" in bit 1
 
   void invalidate_state ();
+  void invalidate_prop_ids ();
   void do_insert (const Shapes &d, unsigned int flags = db::ShapeIterator::All);
   void check_is_editable_for_undo_redo () const;
 

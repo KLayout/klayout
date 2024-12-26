@@ -1041,6 +1041,16 @@ Instances::invalidate_insts ()
 
   set_instance_by_cell_index_needs_made (true);
   set_instance_tree_needs_sort (true);
+
+  invalidate_prop_ids ();
+}
+
+void
+Instances::invalidate_prop_ids ()
+{
+  if (layout ()) {
+    layout ()->invalidate_prop_ids ();
+  }
 }
 
 template <class Tag, class ET, class I>
@@ -1600,6 +1610,9 @@ Instances::replace_prop_id (const instance_type &ref, db::properties_id_type pro
   }
 
   if (! ref.is_null ()) {
+    if (ref.prop_id () != prop_id) {
+      invalidate_prop_ids ();
+    }
     cell_inst_wp_array_type new_inst (ref.cell_inst (), prop_id);
     return replace (ref, new_inst);
   } else {

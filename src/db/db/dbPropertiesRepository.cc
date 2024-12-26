@@ -398,7 +398,6 @@ PropertiesRepository::properties_id (const PropertiesSet &props)
   }
 
   properties_id_type pid;
-  bool changed = false;
 
   {
     tl::MutexLocker locker (&m_lock);
@@ -416,17 +415,9 @@ PropertiesRepository::properties_id (const PropertiesSet &props)
         m_properties_by_value_table [nv->second].insert (pid);
       }
 
-      changed = true;
-
     } else {
       pid = db::properties_id_type (*pi);
     }
-  }
-
-  if (changed) {
-    //  signal the change of the properties ID's. This way for example, the layer views
-    //  can recompute the property selectors
-    prop_ids_changed_event ();
   }
 
   return pid;

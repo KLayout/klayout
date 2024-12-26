@@ -29,14 +29,14 @@ namespace db
 {
 
 LayoutStateModel::LayoutStateModel (bool busy)
-  : m_hier_dirty (false), m_hier_generation_id (0), m_all_bboxes_dirty (false), m_some_bboxes_dirty (false), m_busy (busy)
+  : m_hier_dirty (false), m_hier_generation_id (0), m_all_bboxes_dirty (false), m_some_bboxes_dirty (false), m_prop_ids_dirty (false), m_busy (busy)
 {
   //  .. nothing yet ..
 }
 
 LayoutStateModel::LayoutStateModel (const LayoutStateModel &d)
   : m_hier_dirty (d.m_hier_dirty), m_hier_generation_id (d.m_hier_generation_id), m_bboxes_dirty (d.m_bboxes_dirty),
-    m_all_bboxes_dirty (d.m_all_bboxes_dirty), m_some_bboxes_dirty (d.m_some_bboxes_dirty), m_busy (d.m_busy)
+    m_all_bboxes_dirty (d.m_all_bboxes_dirty), m_some_bboxes_dirty (d.m_some_bboxes_dirty), m_prop_ids_dirty (d.m_prop_ids_dirty), m_busy (d.m_busy)
 {
   //  .. nothing yet ..
 }
@@ -49,6 +49,7 @@ LayoutStateModel::operator= (const LayoutStateModel &d)
   m_bboxes_dirty = d.m_bboxes_dirty;
   m_all_bboxes_dirty = d.m_all_bboxes_dirty;
   m_some_bboxes_dirty = d.m_some_bboxes_dirty;
+  m_prop_ids_dirty = d.m_prop_ids_dirty;
   m_busy = d.m_busy;
   return *this;
 }
@@ -58,7 +59,13 @@ LayoutStateModel::~LayoutStateModel ()
   //  .. nothing yet ..
 }
 
-void 
+void
+LayoutStateModel::do_invalidate_prop_ids ()
+{
+  prop_ids_changed_event ();
+}
+
+void
 LayoutStateModel::do_invalidate_hier ()
 {
   hier_changed_event ();
@@ -98,14 +105,24 @@ LayoutStateModel::bboxes_dirty () const
 }
 
 void
+LayoutStateModel::invalidate_prop_ids ()
+{
+  if (! m_prop_ids_dirty) {
+    do_invalidate_prop_ids ();
+    m_prop_ids_dirty = true;
+  }
+}
+
+void
 LayoutStateModel::update ()
 {
-  if (bboxes_dirty () || m_hier_dirty) {
+  if (bboxes_dirty () || m_hier_dirty || m_prop_ids_dirty) {
     do_update ();
     m_bboxes_dirty.clear ();
     m_some_bboxes_dirty = false;
     m_all_bboxes_dirty = false;
     m_hier_dirty = false;
+    m_prop_ids_dirty = false;
   }
 }
 

@@ -88,8 +88,7 @@ LayoutHandle::LayoutHandle (db::Layout *layout, const std::string &filename)
   mp_layout->hier_changed_event.add (this, &LayoutHandle::layout_changed);
   mp_layout->bboxes_changed_any_event.add (this, &LayoutHandle::layout_changed);
   mp_layout->cell_name_changed_event.add (this, &LayoutHandle::layout_changed);
-  // @@@
-  db::PropertiesRepository::instance ().prop_ids_changed_event.add (this, &LayoutHandle::layout_changed);
+  mp_layout->prop_ids_changed_event.add (this, &LayoutHandle::layout_changed);
   mp_layout->layer_properties_changed_event.add (this, &LayoutHandle::layout_changed);
 
   if (tl::verbosity () >= 30) {

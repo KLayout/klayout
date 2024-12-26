@@ -304,7 +304,17 @@ Shapes::invalidate_state ()
       if (index != std::numeric_limits<unsigned int>::max ()) {
         layout ()->invalidate_bboxes (index);
       }
+      //  property ID change is implied
+      layout ()->invalidate_prop_ids ();
     }
+  }
+}
+
+void
+Shapes::invalidate_prop_ids ()
+{
+  if (layout ()) {
+    layout ()->invalidate_prop_ids ();
   }
 }
 
@@ -729,6 +739,10 @@ Shapes::replace_prop_id (const Shapes::shape_type &ref, db::properties_id_type p
   tl_assert (! ref.is_array_member ());
 
   if (ref.has_prop_id ()) {
+
+    if (ref.prop_id () != prop_id) {
+      invalidate_prop_ids ();
+    }
 
     //  this assumes we can simply patch the properties ID ..
     switch (ref.m_type) {

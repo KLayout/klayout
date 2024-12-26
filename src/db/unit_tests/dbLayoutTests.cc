@@ -437,8 +437,7 @@ TEST(4)
 
   g.dbu_changed_event.add (&el, &EventListener::dbu_changed);
   g.cell_name_changed_event.add (&el, &EventListener::cell_name_changed);
-  // @@@
-  db::PropertiesRepository::instance ().prop_ids_changed_event.add (&el, &EventListener::property_ids_changed);
+  g.prop_ids_changed_event.add (&el, &EventListener::property_ids_changed);
   g.layer_properties_changed_event.add (&el, &EventListener::layer_properties_changed);
 
   EXPECT_EQ (el.dbu_dirty, false);
@@ -470,17 +469,46 @@ TEST(4)
   g.rename_cell (top, "TAP");
   EXPECT_EQ (el.cell_name_dirty, true);  //  but this is
 
-  // @@@ cannot be like that -> needs to trigger an event if some layout object has changed
   db::PropertiesSet ps;
   ps.insert (tl::Variant (1), tl::Variant ("XYZ"));
-  db::properties_id (ps);
+  db::properties_id_type pid1 = db::properties_id (ps);
+
+  auto boxwp = g.cell (top).shapes (0).insert (db::BoxWithProperties (db::Box (0, 0, 100, 100), pid1));
+
   EXPECT_EQ (el.property_ids_dirty, true);
   el.reset ();
+  g.update ();  //  needed to enable new events from the layout
 
-  // @@@ cannot be like that -> needs to trigger an event if some layout object has changed
   ps.clear ();
   ps.insert (tl::Variant (1), tl::Variant ("XXX"));
-  db::properties_id (ps);
+  db::properties_id_type pid2 = db::properties_id (ps);
+  EXPECT_NE (pid1, pid2);
+
+  boxwp.shapes ()->replace_prop_id (boxwp, pid2);
+
+  EXPECT_EQ (el.property_ids_dirty, true);
+
+  db::cell_index_type child = g.add_cell ("CHILD");
+  db::Instance inst = g.cell (top).insert (db::CellInstArray (db::CellInst (child), db::Trans ()));
+  el.reset ();
+  g.update ();  //  needed to enable new events from the layout
+
+  EXPECT_EQ (el.property_ids_dirty, false);
+  inst.instances ()->replace_prop_id (inst, pid2);
+  EXPECT_EQ (el.property_ids_dirty, true);
+
+  el.reset ();
+  g.update ();  //  needed to enable new events from the layout
+
+  EXPECT_EQ (el.property_ids_dirty, false);
+  g.cell (child).prop_id (pid1);
+  EXPECT_EQ (el.property_ids_dirty, true);
+
+  el.reset ();
+  g.update ();  //  needed to enable new events from the layout
+
+  EXPECT_EQ (el.property_ids_dirty, false);
+  g.prop_id (pid2);
   EXPECT_EQ (el.property_ids_dirty, true);
 
   el.layer_properties_dirty = false;
@@ -488,6 +516,7 @@ TEST(4)
   EXPECT_EQ (el.layer_properties_dirty, false);
   g.get_layer (db::LayerProperties (42, 17));
   EXPECT_EQ (el.layer_properties_dirty, true);  //  new layer got inserted
+
 }
 
 static std::string l2s (const db::Layout &layout)

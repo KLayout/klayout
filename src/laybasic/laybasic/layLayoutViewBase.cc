@@ -240,6 +240,7 @@ LayoutViewBase::LayoutViewBase (db::Manager *manager, bool editable, lay::Plugin
   : lay::Dispatcher (plugin_parent, false /*not standalone*/),
     mp_ui (0),
     dm_redraw (this, &LayoutViewBase::redraw),
+    dm_update_layer_sources (this, &LayoutViewBase::do_update_layer_sources),
     m_editable (editable),
     m_options (options),
     m_annotation_shapes (manager)
@@ -254,6 +255,7 @@ LayoutViewBase::LayoutViewBase (lay::LayoutView *ui, db::Manager *manager, bool 
   : lay::Dispatcher (plugin_parent, false /*not standalone*/),
     mp_ui (ui),
     dm_redraw (this, &LayoutViewBase::redraw),
+    dm_update_layer_sources (this, &LayoutViewBase::do_update_layer_sources),
     m_editable (editable),
     m_options (options),
     m_annotation_shapes (manager)
@@ -534,13 +536,13 @@ void LayoutViewBase::update_event_handlers ()
   }
 
   for (unsigned int i = 0; i < cellviews (); ++i) {
-    cellview (i)->layout ().hier_changed_event.add (this, &LayoutViewBase::signal_hier_changed);
-    cellview (i)->layout ().bboxes_changed_event.add (this, &LayoutViewBase::signal_bboxes_from_layer_changed, i);
-    cellview (i)->layout ().dbu_changed_event.add (this, &LayoutViewBase::signal_bboxes_changed);
-    // @@@
-    db::PropertiesRepository::instance ().prop_ids_changed_event.add (this, &LayoutViewBase::signal_prop_ids_changed);
-    cellview (i)->layout ().layer_properties_changed_event.add (this, &LayoutViewBase::signal_layer_properties_changed);
-    cellview (i)->layout ().cell_name_changed_event.add (this, &LayoutViewBase::signal_cell_name_changed);
+    db::Layout &ly = cellview (i)->layout ();
+    ly.hier_changed_event.add (this, &LayoutViewBase::signal_hier_changed);
+    ly.bboxes_changed_event.add (this, &LayoutViewBase::signal_bboxes_from_layer_changed, i);
+    ly.dbu_changed_event.add (this, &LayoutViewBase::signal_bboxes_changed);
+    ly.prop_ids_changed_event.add (this, &LayoutViewBase::signal_prop_ids_changed);
+    ly.layer_properties_changed_event.add (this, &LayoutViewBase::signal_layer_properties_changed);
+    ly.cell_name_changed_event.add (this, &LayoutViewBase::signal_cell_name_changed);
     cellview (i)->apply_technology_with_sender_event.add (this, &LayoutViewBase::signal_apply_technology);
   }
 
@@ -2344,18 +2346,17 @@ LayoutViewBase::signal_cell_name_changed ()
 void
 LayoutViewBase::signal_layer_properties_changed ()
 {
-  //  recompute the source 
-  //  TODO: this is a side effect of this method - provide a special method for this purpose
-  for (unsigned int i = 0; i < layer_lists (); ++i) {
-    m_layer_properties_lists [i]->attach_view (this, i);
-  }
-
-  //  schedule a redraw request - since the layer views might have changed, this is necessary
-  redraw_later ();
+  dm_update_layer_sources ();
 }
 
 void
 LayoutViewBase::signal_prop_ids_changed ()
+{
+  dm_update_layer_sources ();
+}
+
+void
+LayoutViewBase::do_update_layer_sources ()
 {
   //  inform the layer list observers that they need to recompute the property selectors
   layer_list_changed_event (1);

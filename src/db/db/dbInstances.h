@@ -1848,6 +1848,11 @@ private:
   void invalidate_insts ();
 
   /**
+   *  @brief Invalidates the properties IDs - called when some ID has changed
+   */
+  void invalidate_prop_ids ();
+
+  /**
    *  @brief Get the non-editable instance tree by instance type
    */
   const cell_inst_wp_tree_type &inst_tree (cell_inst_wp_array_type::tag, InstancesNonEditableTag) const

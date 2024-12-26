@@ -2845,6 +2845,7 @@ private:
 private:
   lay::LayoutView *mp_ui;
   tl::DeferredMethod<lay::LayoutViewBase> dm_redraw;
+  tl::DeferredMethod<lay::LayoutViewBase> dm_update_layer_sources;
   bool m_editable;
   int m_disabled_edits;
   unsigned int m_options;
@@ -2979,6 +2980,7 @@ private:
   void do_prop_changed ();
   void do_redraw (int layer);
   void do_redraw ();
+  void do_update_layer_sources ();
 
   void set_view_ops ();
   void background_color (tl::Color c);

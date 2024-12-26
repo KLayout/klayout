@@ -104,6 +104,14 @@ public:
   void invalidate_bboxes (unsigned int index);
 
   /**
+   *  @brief Invalidate the properties IDs
+   *
+   *  This method is supposed to be called by shape containers for example if
+   *  a property ID has been changed.
+   */
+  void invalidate_prop_ids ();
+
+  /**
    *  @brief Signal that the database unit has changed
    */
   void dbu_changed ()
@@ -145,6 +153,17 @@ public:
    *  This attribute is true, if the bounding boxes have changed since the last "update" call
    */
   bool bboxes_dirty () const;
+
+  /**
+   *  @brief The "dirty property IDs" attribute
+   *
+   *  This attribute is true, if a properties ID has been changed on a shape, instance, cell or
+   *  the layout itself.
+   */
+  bool prop_ids_dirty () const
+  {
+    return m_prop_ids_dirty;
+  }
 
   /**
    *  @brief Sets or resets busy mode
@@ -196,15 +215,28 @@ public:
   tl::Event cell_name_changed_event;
   tl::Event layer_properties_changed_event;
 
+  /**
+   *  @brief The "properties IDs change event"
+   *
+   *  This event is issued before a change of properties IDs
+   *  in shapes, instances, cells or the layout itself.
+   *  Inserting a shape or instance implies a properties ID change.
+   *
+   *  After such a change, "prop_ids_dirty" is true until "update" is called.
+   */
+  tl::Event prop_ids_changed_event;
+
 private:
   bool m_hier_dirty;
   size_t m_hier_generation_id;
   std::vector<bool> m_bboxes_dirty;
   bool m_all_bboxes_dirty, m_some_bboxes_dirty;
+  bool m_prop_ids_dirty;
   bool m_busy;
 
   void do_invalidate_hier ();
   void do_invalidate_bboxes (unsigned int index);
+  void do_invalidate_prop_ids ();
 };
 
 }

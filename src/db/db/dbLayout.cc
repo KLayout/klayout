@@ -831,6 +831,7 @@ Layout::prop_id (db::properties_id_type id)
     if (manager () && manager ()->transacting ()) {
       manager ()->queue (this, new SetLayoutPropId (m_prop_id, id));
     }
+    invalidate_prop_ids ();
     m_prop_id = id;
   }
 }
@@ -1786,7 +1787,7 @@ Layout::force_update ()
 void
 Layout::force_update_no_lock () const
 {
-  if (hier_dirty () || bboxes_dirty ()) {
+  if (hier_dirty () || bboxes_dirty () || prop_ids_dirty ()) {
 
     unsigned int invalid = m_invalid;
 
@@ -1813,7 +1814,7 @@ Layout::update () const
   //  NOTE: the assumption is that either one thread is writing or
   //  multiple threads are reading. Hence, we do not need to lock hier_dirty() or bboxes_dirty().
   //  We still do double checking as another thread might do the update as well.
-  if (under_construction () || (! hier_dirty () && ! bboxes_dirty ())) {
+  if (under_construction () || (! hier_dirty () && ! bboxes_dirty () && ! prop_ids_dirty ())) {
     return;
   }
 
@@ -1827,6 +1828,10 @@ Layout::update () const
 void 
 Layout::do_update ()
 {
+  if (! hier_dirty () && ! bboxes_dirty ()) {
+    return;
+  }
+
   tl::SelfTimer timer (tl::verbosity () > layout_base_verbosity, tl::to_string (tr ("Sorting")));
 
   //  establish a progress report since this operation can take some time.

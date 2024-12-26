@@ -439,13 +439,6 @@ public:
     db::mem_stat (stat, purpose, cat, m_properties_by_value_table, true, parent);
   }
 
-  /**
-   *  @brief An event indicating a change in the properties IDs
-   *
-   *  @@@ That is too global! Should be an event when a prop_id is changed on a Shape etc.
-   */
-  tl::Event prop_ids_changed_event;
-
 private:
   struct CompareNamePtrByValueForValues
   {

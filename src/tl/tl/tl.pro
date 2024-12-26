@@ -73,6 +73,7 @@ HEADERS = \
     tlEvents.h \
     tlFixedVector.h \
     tlGlobPattern.h \
+    tlHash.h \
     tlHeap.h \
     tlHttpStream.h \
     tlInclude.h \

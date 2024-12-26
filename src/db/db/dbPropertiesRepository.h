@@ -59,6 +59,26 @@ DB_PUBLIC const tl::Variant &property_value (db::property_values_id_type id);
  */
 DB_PUBLIC db::property_values_id_type property_values_id (const tl::Variant &pv);
 
+/**
+ *  @brief Computes the hash value for a properties_id
+ */
+DB_PUBLIC size_t hash_for_properties_id (properties_id_type id);
+
+/**
+ *  @brief A less compare function implementation that compares the properties IDs by value
+ */
+DB_PUBLIC bool properties_id_less (properties_id_type a, properties_id_type b);
+
+/**
+ *  @brief A compare function for property IDs
+ */
+struct ComparePropertiesIds
+{
+  bool operator() (properties_id_type a, properties_id_type b) const
+  {
+    return properties_id_less (a, b);
+  }
+};
 
 /**
  *  @brief A properties set
@@ -258,8 +278,14 @@ public:
     return m_map.find (name_id);
   }
 
+  /**
+   * @brief Gets the hash value for the properties ID set
+   */
+  size_t hash () const;
+
 private:
   map_type m_map;
+  mutable size_t m_hash;
 };
 
 /**

@@ -38,6 +38,7 @@
 #include <map>
 #include <list>
 #include <set>
+#include <cstring>
 
 namespace db
 {
@@ -411,6 +412,26 @@ template DB_PUBLIC bool Connectivity::interact<db::ICplxTrans> (const db::Cell &
 
 // ------------------------------------------------------------------------------
 //  local_cluster implementation
+
+template <class T>
+bool
+local_cluster<T>::AttrCompare::operator() (local_cluster<T>::attr_id a, local_cluster<T>::attr_id b) const
+{
+  size_t type_a = a & 3;
+  size_t type_b = b & 3;
+
+  if (type_a != type_b) {
+    return type_a < type_b;
+  } else if (is_prop_id_attr (a)) {
+    return properties_id_less (prop_id_from_attr (a), prop_id_from_attr (b));
+  } else if (is_text_ref_attr (a)) {
+    return strcmp (text_from_attr (a), text_from_attr (b)) < 0;
+  } else if (is_global_net_id_attr (a)) {
+    return global_net_id (a) < global_net_id (b);
+  } else {
+    return false;
+  }
+}
 
 template <class T>
 local_cluster<T>::local_cluster (size_t id)
@@ -1398,9 +1419,6 @@ struct attr_accessor<db::NetShape>
 {
   size_t operator() (const db::Shape &shape) const
   {
-    //  NOTE: the attribute is
-    //   * odd: a StringRef pointer's value
-    //   * even: a Property ID times 2
     if (shape.type () == db::Shape::TextRef) {
       return db::text_ref_to_attr (&shape.text_ref ().obj ());
     } else {

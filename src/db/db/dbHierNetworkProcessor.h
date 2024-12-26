@@ -277,11 +277,17 @@ public:
   typedef db::unstable_box_tree<box_type, T, db::box_convert<T> > tree_type;
   typedef typename tree_type::flat_iterator shape_iterator;
   typedef size_t attr_id;
-  typedef std::set<attr_id> attr_set;
-  typedef attr_set::const_iterator attr_iterator;
   typedef size_t global_net_id;
   typedef std::set<global_net_id> global_nets;
   typedef global_nets::const_iterator global_nets_iterator;
+
+  struct AttrCompare
+  {
+    bool operator() (attr_id a, attr_id b) const;
+  };
+
+  typedef std::set<attr_id, AttrCompare> attr_set;
+  typedef typename attr_set::const_iterator attr_iterator;
 
   /**
    *  @brief Creates an empty cluster
@@ -1709,7 +1715,9 @@ private:
  */
 inline size_t prop_id_to_attr (db::properties_id_type id)
 {
-  return size_t (id) * 4;
+  //  NOTE: properties ID are pointers, hence 32 bit aligned.
+  tl_assert ((id & 3) == 0);
+  return size_t (id);
 }
 
 /**
@@ -1725,7 +1733,7 @@ inline bool is_prop_id_attr (size_t attr)
  */
 inline db::properties_id_type prop_id_from_attr (size_t attr)
 {
-  return attr / 4;
+  return attr;
 }
 
 /**

@@ -1675,6 +1675,11 @@ public:
    */
   std::string to_parsable_string () const;
 
+  /**
+   *  @brief Gets a hash value for the variant
+   */
+  size_t hash () const;
+
 private:
   type m_type;
 
@@ -1814,6 +1819,21 @@ template<> TL_PUBLIC void extractor_impl<Variant> (tl::Extractor &ex, Variant &v
 template<> TL_PUBLIC bool test_extractor_impl<Variant> (tl::Extractor &ex, Variant &v);
 
 } // namespace tl
+
+namespace std
+{
+  /**
+   *  @brief That hash function for tl::Variant
+   */
+  template <>
+  struct hash <tl::Variant>
+  {
+    size_t operator() (const tl::Variant &o) const
+    {
+      return o.hash ();
+    }
+  };
+}
 
 #endif
 

@@ -242,7 +242,7 @@ subtract (std::unordered_set<db::PolygonRefWithProperties> &res, const std::unor
   std::unordered_set<db::PolygonRefWithProperties> first;
   first.swap (res);
 
-  std::map<db::properties_id_type, std::pair<std::vector<const db::PolygonRefWithProperties *>, std::vector<const db::PolygonRefWithProperties *> > > by_prop_id;
+  std::map<db::properties_id_type, std::pair<std::vector<const db::PolygonRefWithProperties *>, std::vector<const db::PolygonRefWithProperties *> >, ComparePropertiesIds> by_prop_id;
   for (auto i = first.begin (); i != first.end (); ++i)   {
     by_prop_id [i->properties_id ()].first.push_back (i.operator-> ());
   }
@@ -325,7 +325,7 @@ subtract (std::unordered_set<db::EdgeWithProperties> &res, const std::unordered_
   std::unordered_set<db::EdgeWithProperties> first;
   first.swap (res);
 
-  std::map<db::properties_id_type, std::pair<std::vector<const db::EdgeWithProperties *>, std::vector<const db::EdgeWithProperties *> > > by_prop_id;
+  std::map<db::properties_id_type, std::pair<std::vector<const db::EdgeWithProperties *>, std::vector<const db::EdgeWithProperties *> >, ComparePropertiesIds> by_prop_id;
   for (auto i = first.begin (); i != first.end (); ++i)   {
     by_prop_id [i->properties_id ()].first.push_back (i.operator-> ());
   }

@@ -306,6 +306,22 @@ void AsIfFlatRegion::invalidate_bbox ()
   m_bbox_valid = false;
 }
 
+namespace
+{
+
+struct ComparePolygonsWithProperties
+{
+  bool operator() (const std::pair<db::properties_id_type, const db::Polygon *> &a, const std::pair<db::properties_id_type, const db::Polygon *> &b) const
+  {
+    if (a.first != b.first) {
+      return db::properties_id_less (a.first, b.first);
+    }
+    return *a.second < *b.second;
+  }
+};
+
+}
+
 void AsIfFlatRegion::merge_polygons_to (db::Shapes &output, bool min_coherence, unsigned int min_wc) const
 {
   db::EdgeProcessor ep (report_progress (), progress_desc ());
@@ -336,7 +352,7 @@ void AsIfFlatRegion::merge_polygons_to (db::Shapes &output, bool min_coherence, 
       addressable_polygons.inc ();
     }
 
-    std::sort (polygons_by_prop_id.begin (), polygons_by_prop_id.end ());
+    std::sort (polygons_by_prop_id.begin (), polygons_by_prop_id.end (), ComparePolygonsWithProperties ());
 
     for (auto p = polygons_by_prop_id.begin (); p != polygons_by_prop_id.end (); ) {
 

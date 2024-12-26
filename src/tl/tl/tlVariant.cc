@@ -24,6 +24,7 @@
 #include "tlVariant.h"
 #include "tlInternational.h"
 #include "tlString.h"
+#include "tlHash.h"
 
 #include <string.h>
 #include <limits>
@@ -983,6 +984,74 @@ Variant::operator= (const Variant &v)
 
   } 
   return *this;
+}
+
+size_t
+Variant::hash () const
+{
+  size_t h = 0;
+
+  if (m_type == t_double) {
+    h = std::hfunc (m_var.m_double);
+  } else if (m_type == t_float) {
+    h = std::hfunc (m_var.m_float);
+  } else if (m_type == t_bool) {
+    h = std::hfunc (m_var.m_bool);
+  } else if (m_type == t_uchar) {
+    h = std::hfunc (m_var.m_uchar);
+  } else if (m_type == t_schar) {
+    h = std::hfunc (m_var.m_schar);
+  } else if (m_type == t_char) {
+    h = std::hfunc (m_var.m_char);
+  } else if (m_type == t_ushort) {
+    h = std::hfunc (m_var.m_ushort);
+  } else if (m_type == t_short) {
+    h = std::hfunc (m_var.m_short);
+  } else if (m_type == t_uint) {
+    h = std::hfunc (m_var.m_uint);
+  } else if (m_type == t_int) {
+    h = std::hfunc (m_var.m_int);
+  } else if (m_type == t_ulong) {
+    h = std::hfunc (m_var.m_ulong);
+  } else if (m_type == t_long) {
+    h = std::hfunc (m_var.m_long);
+  } else if (m_type == t_longlong) {
+    h = std::hfunc (m_var.m_longlong);
+  } else if (m_type == t_ulonglong) {
+    h = std::hfunc (m_var.m_ulonglong);
+#if defined(HAVE_64BIT_COORD)
+  } else if (m_type == t_int128) {
+    h = std::hfunc (m_var.m_int128);
+#endif
+  } else if (m_type == t_id) {
+    h = std::hfunc (m_var.m_id);
+  } else if (m_type == t_bytearray) {
+    h = std::hfunc (*m_var.m_bytearray);
+#if defined(HAVE_QT)
+  } else if (m_type == t_qstring) {
+    h = std::hfunc (*m_var.m_qstring);
+  } else if (m_type == t_qbytearray) {
+    h = std::hfunc (*m_var.m_qbytearray);
+#endif
+  } else if (m_type == t_stdstring) {
+    h = std::hfunc (*m_var.m_stdstring);
+  } else if (m_type == t_string) {
+    for (const char *cp = m_string; *cp; ++cp) {
+      h = std::hfunc (*cp, h);
+    }
+  } else if (m_type == t_list) {
+    h = std::hfunc (*m_var.m_list);
+  } else if (m_type == t_array) {
+    h = std::hfunc (*m_var.m_array);
+  } else if (m_type == t_user) {
+    //  NOTE: this involves pointers ...
+    h = std::hfunc (m_var.mp_user.object, std::hfunc (m_var.mp_user.cls, 0));
+  } else if (m_type == t_user_ref) {
+    const WeakOrSharedPtr *ptr = reinterpret_cast<const WeakOrSharedPtr *> (m_var.mp_user_ref.ptr);
+    h = std::hfunc (ptr->get (), std::hfunc (m_var.mp_user_ref.cls, 0));
+  }
+
+  return h;
 }
 
 inline bool

@@ -1651,7 +1651,7 @@ bool_and_or_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (d
 
   db::EdgeProcessor ep;
 
-  std::map<db::properties_id_type, std::pair<tl::slist<TS>, std::set<TI> > > by_prop_id;
+  std::map<db::properties_id_type, std::pair<tl::slist<TS>, std::set<TI> >, ComparePropertiesIds> by_prop_id;
 
   for (auto i = interactions.begin (); i != interactions.end (); ++i) {
 
@@ -1841,7 +1841,7 @@ two_bool_and_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (
 
   db::EdgeProcessor ep;
 
-  std::map<db::properties_id_type, std::pair<tl::slist<TS>, std::set<TI> > > by_prop_id;
+  std::map<db::properties_id_type, std::pair<tl::slist<TS>, std::set<TI> >, ComparePropertiesIds> by_prop_id;
 
   for (auto i = interactions.begin (); i != interactions.end (); ++i) {
 

@@ -451,3 +451,24 @@ TEST(PropertyIdsByNameAndValue)
   EXPECT_EQ (ps2s (res), ps2s (ref));
 }
 
+TEST(PropertiesSetHash)
+{
+  db::PropertiesRepository rp;
+
+  db::PropertiesSet ps;
+  EXPECT_EQ (ps.hash (), size_t (0));
+  EXPECT_EQ (db::hash_for_properties_id (0), size_t (0));
+
+  ps.insert_by_id (rp.prop_name_id (1), rp.prop_value_id ("A"));
+  ps.insert_by_id (rp.prop_name_id (2), rp.prop_value_id ("B"));
+
+  size_t h1 = ps.hash ();
+  EXPECT_EQ (db::hash_for_properties_id (rp.properties_id (ps)), h1);
+
+  db::PropertiesSet ps2;
+  ps2.insert_by_id (rp.prop_name_id (2), rp.prop_value_id ("B"));
+  ps2.insert_by_id (rp.prop_name_id (1), rp.prop_value_id ("A"));
+
+  EXPECT_EQ (ps2.hash (), h1);
+  EXPECT_EQ (db::hash_for_properties_id (rp.properties_id (ps2)), h1);
+}

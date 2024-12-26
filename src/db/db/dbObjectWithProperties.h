@@ -41,6 +41,8 @@ namespace db
 
 class ArrayRepository;
 
+DB_PUBLIC bool properties_id_less (properties_id_type a, properties_id_type b);
+
 /**
  *  @brief A object with properties template
  *
@@ -157,7 +159,7 @@ public:
     if (! Obj::operator== (d)) {
       return Obj::operator< (d);
     } 
-    return m_id < d.m_id;
+    return db::properties_id_less (m_id, d.m_id);
   }
 
   /**

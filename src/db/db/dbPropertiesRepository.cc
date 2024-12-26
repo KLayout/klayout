@@ -26,6 +26,7 @@
 #include "tlException.h"
 #include "tlString.h"
 #include "tlAssert.h"
+#include "tlHash.h"
 
 namespace db
 {
@@ -78,23 +79,48 @@ db::properties_id_type properties_id (const PropertiesSet &ps)
   return PropertiesRepository::instance ().properties_id (ps);
 }
 
+size_t hash_for_properties_id (properties_id_type id)
+{
+  return id == 0 ? 0 : db::properties (id).hash ();
+}
+
+bool properties_id_less (properties_id_type a, properties_id_type b)
+{
+  if (a == b) {
+    return false;
+  }
+
+  if (a == 0 || b == 0) {
+    return a < b;
+  }
+
+  size_t ha = hash_for_properties_id (a);
+  size_t hb = hash_for_properties_id (b);
+  if (ha != hb) {
+    return ha < hb;
+  }
+
+  //  This is the unlikely case of identical hash, but different value
+  return db::properties (a).to_map () < db::properties (b).to_map ();
+}
+
 // ----------------------------------------------------------------------------------
 //  PropertiesSet implementation
 
 PropertiesSet::PropertiesSet ()
-  : m_map ()
+  : m_map (), m_hash (0)
 {
   //  .. nothing yet ..
 }
 
 PropertiesSet::PropertiesSet (const PropertiesSet &other)
-  : m_map (other.m_map)
+  : m_map (other.m_map), m_hash (other.m_hash)
 {
   //  .. nothing yet ..
 }
 
 PropertiesSet::PropertiesSet (const PropertiesSet &&other)
-  : m_map (std::move (other.m_map))
+  : m_map (std::move (other.m_map)), m_hash (other.m_hash)
 {
   //  .. nothing yet ..
 }
@@ -103,6 +129,7 @@ PropertiesSet &
 PropertiesSet::operator= (const PropertiesSet &other)
 {
   m_map = other.m_map;
+  m_hash = other.m_hash;
   return *this;
 }
 
@@ -110,6 +137,7 @@ PropertiesSet &
 PropertiesSet::operator= (const PropertiesSet &&other)
 {
   m_map = std::move (other.m_map);
+  m_hash = other.m_hash;
   return *this;
 }
 
@@ -253,6 +281,31 @@ PropertiesSet::to_list_var () const
     var.push (el);
   }
   return var;
+}
+
+size_t
+PropertiesSet::hash () const
+{
+  if (empty ()) {
+    return 0;
+  }
+
+  if (! m_hash) {
+
+    static tl::Mutex lock;
+    tl::MutexLocker locker (&lock);
+
+    if (! m_hash) {
+      m_hash = std::hfunc (to_map ());
+      if (! m_hash) {
+        //  avoid 0 value as this is reserved for "not computed yet"
+        m_hash = size_t (1);
+      }
+    }
+
+  }
+
+  return m_hash;
 }
 
 // ----------------------------------------------------------------------------------

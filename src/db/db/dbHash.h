@@ -26,6 +26,8 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#include "tlHash.h"
+
 #include "dbPoint.h"
 #include "dbVector.h"
 #include "dbBox.h"
@@ -36,39 +38,25 @@
 #include "dbEdgePair.h"
 #include "dbInstances.h"
 #include "dbLayout.h"
+#include "dbTypes.h"
 
 #include <string>
 #include <functional>
 #include <stdint.h>
 
+
+namespace db
+{
+  DB_PUBLIC size_t hash_for_properties_id (properties_id_type id);
+}
+
 /**
  *  This header defines some hash functions for various database objects 
  *  for use with std::unordered_map and std::unordered_set
- *
- *  It also provides namespace abstraction for the std_ext namespace
  */
 
 namespace std
 {
-  inline size_t hcombine (size_t h1, size_t h2)
-  {
-    return (h1 << 4) ^ (h1 >> 4) ^ h2;
-  }
-
-  template <class T>
-  inline size_t hfunc (const T &t)
-  {
-    hash <T> hf;
-    return hf (t);
-  }
-
-  template <class T>
-  inline size_t hfunc (const T &t, size_t h)
-  {
-    hash <T> hf;
-    return hcombine (h, hf (t));
-  }
-
   inline size_t hfunc_coord (db::DCoord d)
   {
     return hfunc (int64_t (floor (0.5 + d / db::coord_traits<db::DCoord>::prec ())));
@@ -510,13 +498,13 @@ namespace std
   template <class O>
   size_t hfunc (const db::object_with_properties<O> &o, size_t h)
   {
-    return hfunc ((const O &) o, hfunc (o.properties_id (), h));
+    return hfunc ((const O &) o, hcombine (db::hash_for_properties_id (o.properties_id ()), h));
   }
 
   template <class O>
   size_t hfunc (const db::object_with_properties<O> &o)
   {
-    return hfunc ((const O &) o, hfunc (o.properties_id ()));
+    return hfunc ((const O &) o, db::hash_for_properties_id (o.properties_id ()));
   }
 
   template <class O>
@@ -657,156 +645,6 @@ namespace std
       return hfunc (o);
     }
   };
-
-  /**
-   *  @brief Generic hash for a pair of objects
-   */
-
-  template <class T1, class T2>
-  size_t hfunc (const std::pair <T1, T2> &o, size_t h)
-  {
-    return hfunc (o.first, hfunc (o.second, h));
-  }
-
-  template <class T1, class T2>
-  size_t hfunc (const std::pair <T1, T2> &o)
-  {
-    return hfunc (o.first, hfunc (o.second));
-  }
-
-  template <class T1, class T2>
-  struct hash <std::pair <T1, T2> > 
-  {
-    size_t operator() (const std::pair<T1, T2> &o) const
-    {
-      return hfunc (o);
-    }
-  };
-
-  /**
-   *  @brief Generic hash for an unordered set
-   */
-
-  template <class T>
-  size_t hfunc (const std::unordered_set <T> &o, size_t h)
-  {
-    for (typename std::unordered_set<T>::const_iterator i = o.begin (); i != o.end (); ++i) {
-      h = hfunc (*i, h);
-    }
-    return h;
-  }
-
-  template <class T>
-  size_t hfunc (const std::unordered_set <T> &o)
-  {
-    return hfunc (o, size_t (0));
-  }
-
-  template <class T>
-  struct hash <std::unordered_set <T> >
-  {
-    size_t operator() (const std::unordered_set<T> &o) const
-    {
-      return hfunc (o);
-    }
-  };
-
-  /**
-   *  @brief Generic hash for an ordered set
-   */
-
-  template <class T>
-  size_t hfunc (const std::set <T> &o, size_t h)
-  {
-    for (typename std::set<T>::const_iterator i = o.begin (); i != o.end (); ++i) {
-      h = hfunc (*i, h);
-    }
-    return h;
-  }
-
-  template <class T>
-  size_t hfunc (const std::set <T> &o)
-  {
-    return hfunc (o, size_t (0));
-  }
-
-  template <class T>
-  struct hash <std::set <T> >
-  {
-    size_t operator() (const std::set<T> &o) const
-    {
-      return hfunc (o);
-    }
-  };
-
-  /**
-   *  @brief Generic hash for an unordered map
-   */
-
-  template <class T1, class T2>
-  size_t hfunc (const std::unordered_map<T1, T2> &o, size_t h)
-  {
-    for (typename std::unordered_map<T1, T2>::const_iterator i = o.begin (); i != o.end (); ++i) {
-      h = hfunc (i->first, hfunc (i->second, h));
-    }
-    return h;
-  }
-
-  template <class T1, class T2>
-  size_t hfunc (const std::unordered_map<T1, T2> &o)
-  {
-    return hfunc (o, size_t (0));
-  }
-
-  template <class T1, class T2>
-  struct hash <std::unordered_map<T1, T2> >
-  {
-    size_t operator() (const std::unordered_map<T1, T2> &o) const
-    {
-      return hfunc (o);
-    }
-  };
-
-  /**
-   *  @brief Generic hash for an ordered map
-   */
-
-  template <class T1, class T2>
-  size_t hfunc (const std::map<T1, T2> &o, size_t h)
-  {
-    for (typename std::map<T1, T2>::const_iterator i = o.begin (); i != o.end (); ++i) {
-      h = hfunc (i->first, hfunc (i->second, h));
-    }
-    return h;
-  }
-
-  template <class T1, class T2>
-  size_t hfunc (const std::map<T1, T2> &o)
-  {
-    return hfunc (o, size_t (0));
-  }
-
-  template <class T1, class T2>
-  struct hash <std::map<T1, T2> >
-  {
-    size_t operator() (const std::map<T1, T2> &o) const
-    {
-      return hfunc (o);
-    }
-  };
-
-  /**
-   *  @brief Create a pointer hash from the pointer's value
-   */
-  template <class X>
-  struct ptr_hash_from_value
-  {
-    size_t operator() (const X *ptr) const
-    {
-      return ptr ? hash<X> () (*ptr) : 0;
-    }
-  };
-
 }
 
 #endif

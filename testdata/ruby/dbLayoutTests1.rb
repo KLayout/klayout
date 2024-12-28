@@ -2334,6 +2334,38 @@ class DBLayoutTests1_TestClass < TestBase
 
   end
 
+  # Properties IDs
+  def test_issue1549
+
+    ly = RBA::Layout::new
+
+    ps1 = { 1 => "one", "key" => 17 }
+    ps2 = [ [ 2, "two" ], [ "key", 42 ] ]
+
+    pid1 = RBA::Layout::properties_id(ps1)
+    # deprecated, for backward compatibility:
+    assert_equal(ly.properties_array(pid1).inspect, "[[1, \"one\"], [\"key\", 17]]")
+    assert_equal(ly.properties_hash(pid1).inspect, "{1=>\"one\", \"key\"=>17}")
+    assert_equal(pid1, ly.properties_id(ps1))
+    # static method versions
+    assert_equal(RBA::Layout::properties_array(pid1).inspect, "[[1, \"one\"], [\"key\", 17]]")
+    assert_equal(RBA::Layout::properties_hash(pid1).inspect, "{1=>\"one\", \"key\"=>17}")
+    assert_equal(RBA::Layout::property(pid1, 42).inspect, "nil")
+    assert_equal(RBA::Layout::property(pid1, 1).inspect, "\"one\"")
+
+    pid2 = RBA::Layout::properties_id(ps2)
+    # deprecated, for backward compatibility:
+    assert_equal(pid2, ly.properties_id(ps2))
+    assert_equal(ly.properties_array(pid2).inspect, "[[2, \"two\"], [\"key\", 42]]")
+    assert_equal(ly.properties_hash(pid2).inspect, "{2=>\"two\", \"key\"=>42}")
+    # static method versions
+    assert_equal(RBA::Layout::properties_array(pid2).inspect, "[[2, \"two\"], [\"key\", 42]]")
+    assert_equal(RBA::Layout::properties_hash(pid2).inspect, "{2=>\"two\", \"key\"=>42}")
+    assert_equal(RBA::Layout::property(pid2, 42).inspect, "nil")
+    assert_equal(RBA::Layout::property(pid2, 2).inspect, "\"two\"")
+
+  end
+
 end
 
 load("test_epilogue.rb")

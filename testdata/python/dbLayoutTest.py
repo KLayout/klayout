@@ -1229,6 +1229,35 @@ class DBLayoutTest(unittest.TestCase):
     l2 = ly2.layer(1, 0)
     self.assertEqual(ly2.top_cell().bbox().to_s(), "(0,10;20,30)")
 
+  # Properties IDs
+  def test_issue1549(self):
+
+    ly = pya.Layout.new()
+
+    ps1 = { 1: "one", "key": 17 }
+    ps2 = [ ( 2, "two" ), ( "key", 42 ) ]
+
+    pid1 = pya.Layout.properties_id(ps1)
+    # deprecated, for backward compatibility:
+    self.assertEqual(ly.properties_array(pid1).__repr__(), "[[1, 'one'], ['key', 17]]")
+    self.assertEqual(ly.properties_hash(pid1).__repr__(), "{1: 'one', 'key': 17}")
+    self.assertEqual(pid1, ly.properties_id(ps1))
+    # static method versions
+    self.assertEqual(pya.Layout.properties_array(pid1).__repr__(), "[[1, 'one'], ['key', 17]]")
+    self.assertEqual(pya.Layout.properties_hash(pid1).__repr__(), "{1: 'one', 'key': 17}")
+    self.assertEqual(pya.Layout.property(pid1, 42).__repr__(), "None")
+    self.assertEqual(pya.Layout.property(pid1, 1).__repr__(), "'one'")
+
+    pid2 = pya.Layout.properties_id(ps2)
+    # deprecated, for backward compatibility:
+    self.assertEqual(pid2, ly.properties_id(ps2))
+    self.assertEqual(ly.properties_array(pid2).__repr__(), "[[2, 'two'], ['key', 42]]")
+    self.assertEqual(ly.properties_hash(pid2).__repr__(), "{2: 'two', 'key': 42}")
+    # static method versions
+    self.assertEqual(pya.Layout.properties_array(pid2).__repr__(), "[[2, 'two'], ['key', 42]]")
+    self.assertEqual(pya.Layout.properties_hash(pid2).__repr__(), "{2: 'two', 'key': 42}")
+    self.assertEqual(pya.Layout.property(pid2, 42).__repr__(), "None")
+    self.assertEqual(pya.Layout.property(pid2, 2).__repr__(), "'two'")
 
 # run unit tests
 if __name__ == '__main__':

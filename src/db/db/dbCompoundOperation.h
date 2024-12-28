@@ -201,6 +201,11 @@ public:
    */
   virtual bool wants_variants () const { return false; }
 
+  /**
+   *  @brief Indicates that the node expects calls through do_compute_local in the properties flavor
+   */
+  virtual bool wants_properties () const { return false; }
+
   void compute_local (CompoundRegionOperationCache *cache, db::Layout *layout, db::Cell *cell, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::Polygon> > &results, const db::LocalProcessorBase *proc) const
   {
     implement_compute_local (cache, layout, cell, interactions, results, proc);
@@ -348,11 +353,6 @@ protected:
 
   virtual std::string generated_description () const;
   virtual bool wants_caching () const { return true; }
-
-  /**
-   *  @brief Indicates that the node expects calls through do_compute_local in the properties flavor
-   */
-  virtual bool wants_properties () const { return false; }
 
 private:
   std::string m_description;

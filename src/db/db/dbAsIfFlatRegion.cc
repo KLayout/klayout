@@ -1067,7 +1067,7 @@ EdgePairsDelegate *
 AsIfFlatRegion::cop_to_edge_pairs (db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint)
 {
   std::unique_ptr<FlatEdgePairs> output (new FlatEdgePairs ());
-  if (pc_skip (prop_constraint)) {
+  if (pc_skip (prop_constraint) && ! node.wants_properties ()) {
     region_cop_impl<db::EdgePair> (this, &output->raw_edge_pairs (), node);
   } else {
     region_cop_with_properties_impl<db::EdgePair> (this, &output->raw_edge_pairs (), node, prop_constraint);
@@ -1079,7 +1079,7 @@ RegionDelegate *
 AsIfFlatRegion::cop_to_region (db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint)
 {
   std::unique_ptr<FlatRegion> output (new FlatRegion ());
-  if (pc_skip (prop_constraint)) {
+  if (pc_skip (prop_constraint) && ! node.wants_properties ()) {
     region_cop_impl<db::Polygon> (this, &output->raw_polygons (), node);
   } else {
     region_cop_with_properties_impl<db::Polygon> (this, &output->raw_polygons (), node, prop_constraint);
@@ -1091,7 +1091,7 @@ EdgesDelegate *
 AsIfFlatRegion::cop_to_edges (db::CompoundRegionOperationNode &node, PropertyConstraint prop_constraint)
 {
   std::unique_ptr<FlatEdges> output (new FlatEdges ());
-  if (pc_skip (prop_constraint)) {
+  if (pc_skip (prop_constraint) && ! node.wants_properties ()) {
     region_cop_impl<db::Edge> (this, &output->raw_edges (), node);
   } else {
     region_cop_with_properties_impl<db::Edge> (this, &output->raw_edges (), node, prop_constraint);

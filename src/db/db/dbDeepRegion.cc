@@ -2063,7 +2063,7 @@ EdgePairsDelegate *
 DeepRegion::cop_to_edge_pairs (db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint)
 {
   DeepEdgePairs *output = 0;
-  if (pc_skip (prop_constraint)) {
+  if (pc_skip (prop_constraint) && ! node.wants_properties ()) {
     output = region_cop_impl<db::EdgePair, DeepEdgePairs> (this, node);
   } else {
     output = region_cop_with_properties_impl<db::EdgePair, DeepEdgePairs> (this, node, prop_constraint);
@@ -2079,7 +2079,7 @@ RegionDelegate *
 DeepRegion::cop_to_region (db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint)
 {
   DeepRegion *output = 0;
-  if (pc_skip (prop_constraint)) {
+  if (pc_skip (prop_constraint) && ! node.wants_properties ()) {
     output = region_cop_impl<db::PolygonRef, db::DeepRegion> (this, node);
   } else {
     output = region_cop_with_properties_impl<db::PolygonRef, DeepRegion> (this, node, prop_constraint);
@@ -2095,7 +2095,7 @@ EdgesDelegate *
 DeepRegion::cop_to_edges (db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint)
 {
   DeepEdges *output = 0;
-  if (pc_skip (prop_constraint)) {
+  if (pc_skip (prop_constraint) && ! node.wants_properties ()) {
     output = region_cop_impl<db::Edge, DeepEdges> (this, node);
   } else {
     output = region_cop_with_properties_impl<db::Edge, DeepEdges> (this, node, prop_constraint);

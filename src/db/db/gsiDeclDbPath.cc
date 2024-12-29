@@ -22,6 +22,7 @@
 
 
 #include "gsiDecl.h"
+#include "gsiDeclDbPropertiesSupport.h"
 #include "dbPoint.h"
 #include "dbPath.h"
 #include "dbHash.h"
@@ -384,6 +385,25 @@ Class<db::Path> decl_Path ("db", "Path",
   "database objects."
 );
 
+static db::PathWithProperties *new_path_with_properties (const db::Path &poly, db::properties_id_type pid)
+{
+  return new db::PathWithProperties (poly, pid);
+}
+
+Class<db::PathWithProperties> decl_PathWithProperties (decl_Path, "db", "PathWithProperties",
+  gsi::properties_support_methods<db::PathWithProperties> () +
+  constructor ("new", &new_path_with_properties, gsi::arg ("polygon"), gsi::arg ("properties_id"),
+    "@brief Creates a new object from a property-less object and a properties ID."
+  )
+  ,
+  "@brief A Path object with properties attached.\n"
+  "This class represents a combination of a Path object an user properties. User properties are "
+  "stored in form of a properties ID. Convenience methods are provided to manipulate or retrieve "
+  "user properties directly.\n"
+  "\n"
+  "This class has been introduced in version 0.30."
+);
+
 static db::DPath *dpath_from_ipath (const db::Path &p)
 {
   return new db::DPath (p);
@@ -450,6 +470,25 @@ Class<db::DPath> decl_DPath ("db", "DPath",
   "\n"
   "See @<a href=\"/programming/database_api.xml\">The Database API@</a> for more details about the "
   "database objects."
+);
+
+static db::DPathWithProperties *new_dpath_with_properties (const db::DPath &poly, db::properties_id_type pid)
+{
+  return new db::DPathWithProperties (poly, pid);
+}
+
+Class<db::DPathWithProperties> decl_DPathWithProperties (decl_DPath, "db", "DPathWithProperties",
+  gsi::properties_support_methods<db::DPathWithProperties> () +
+  constructor ("new", &new_dpath_with_properties, gsi::arg ("polygon"), gsi::arg ("properties_id"),
+    "@brief Creates a new object from a property-less object and a properties ID."
+  )
+  ,
+  "@brief A DPath object with properties attached.\n"
+  "This class represents a combination of a DPath object an user properties. User properties are "
+  "stored in form of a properties ID. Convenience methods are provided to manipulate or retrieve "
+  "user properties directly.\n"
+  "\n"
+  "This class has been introduced in version 0.30."
 );
 
 }

@@ -22,6 +22,7 @@
 
 
 #include "gsiDecl.h"
+#include "gsiDeclDbPropertiesSupport.h"
 #include "dbPoint.h"
 #include "dbPolygon.h"
 #include "dbPolygonTools.h"
@@ -785,6 +786,25 @@ Class<db::SimplePolygon> decl_SimplePolygon ("db", "SimplePolygon",
   "database objects."
 );
 
+static db::SimplePolygonWithProperties *new_simple_polygon_with_properties (const db::SimplePolygon &poly, db::properties_id_type pid)
+{
+  return new db::SimplePolygonWithProperties (poly, pid);
+}
+
+Class<db::SimplePolygonWithProperties> decl_SimplePolygonWithProperties (decl_SimplePolygon, "db", "SimplePolygonWithProperties",
+  gsi::properties_support_methods<db::SimplePolygonWithProperties> () +
+  constructor ("new", &new_simple_polygon_with_properties, gsi::arg ("polygon"), gsi::arg ("properties_id"),
+    "@brief Creates a new object from a property-less object and a properties ID."
+  )
+  ,
+  "@brief A SimplePolygon object with properties attached.\n"
+  "This class represents a combination of a SimplePolygon object an user properties. User properties are "
+  "stored in form of a properties ID. Convenience methods are provided to manipulate or retrieve "
+  "user properties directly.\n"
+  "\n"
+  "This class has been introduced in version 0.30."
+);
+
 static db::DSimplePolygon *dspolygon_from_ispolygon (const db::SimplePolygon &p)
 {
   return new db::DSimplePolygon (p, false);
@@ -851,6 +871,25 @@ Class<db::DSimplePolygon> decl_DSimplePolygon ("db", "DSimplePolygon",
   "\n"
   "See @<a href=\"/programming/database_api.xml\">The Database API@</a> for more details about the "
   "database objects."
+);
+
+static db::DSimplePolygonWithProperties *new_dsimple_polygon_with_properties (const db::DSimplePolygon &poly, db::properties_id_type pid)
+{
+  return new db::DSimplePolygonWithProperties (poly, pid);
+}
+
+Class<db::DSimplePolygonWithProperties> decl_DSimplePolygonWithProperties (decl_DSimplePolygon, "db", "DSimplePolygonWithProperties",
+  gsi::properties_support_methods<db::DSimplePolygonWithProperties> () +
+  constructor ("new", &new_dsimple_polygon_with_properties, gsi::arg ("polygon"), gsi::arg ("properties_id"),
+    "@brief Creates a new object from a property-less object and a properties ID."
+  )
+  ,
+  "@brief A DSimplePolygon object with properties attached.\n"
+  "This class represents a combination of a DSimplePolygon object an user properties. User properties are "
+  "stored in form of a properties ID. Convenience methods are provided to manipulate or retrieve "
+  "user properties directly.\n"
+  "\n"
+  "This class has been introduced in version 0.30."
 );
 
 // ---------------------------------------------------------------
@@ -2026,6 +2065,25 @@ Class<db::Polygon> decl_Polygon ("db", "Polygon",
   "database objects."
 );
 
+static db::PolygonWithProperties *new_polygon_with_properties (const db::Polygon &poly, db::properties_id_type pid)
+{
+  return new db::PolygonWithProperties (poly, pid);
+}
+
+Class<db::PolygonWithProperties> decl_PolygonWithProperties (decl_Polygon, "db", "PolygonWithProperties",
+  gsi::properties_support_methods<db::PolygonWithProperties> () +
+  constructor ("new", &new_polygon_with_properties, gsi::arg ("polygon"), gsi::arg ("properties_id"),
+    "@brief Creates a new object from a property-less object and a properties ID."
+  )
+  ,
+  "@brief A Polygon object with properties attached.\n"
+  "This class represents a combination of a Polygon object an user properties. User properties are "
+  "stored in form of a properties ID. Convenience methods are provided to manipulate or retrieve "
+  "user properties directly.\n"
+  "\n"
+  "This class has been introduced in version 0.30."
+);
+
 static db::DPolygon *dpolygon_from_ipolygon (const db::Polygon &p)
 {
   return new db::DPolygon (p, false);
@@ -2119,6 +2177,25 @@ Class<db::DPolygon> decl_DPolygon ("db", "DPolygon",
   "\n"
   "See @<a href=\"/programming/database_api.xml\">The Database API@</a> for more details about the "
   "database objects."
+);
+
+static db::DPolygonWithProperties *new_dpolygon_with_properties (const db::DPolygon &poly, db::properties_id_type pid)
+{
+  return new db::DPolygonWithProperties (poly, pid);
+}
+
+Class<db::DPolygonWithProperties> decl_DPolygonWithProperties (decl_DPolygon, "db", "DPolygonWithProperties",
+  gsi::properties_support_methods<db::DPolygonWithProperties> () +
+  constructor ("new", &new_dpolygon_with_properties, gsi::arg ("polygon"), gsi::arg ("properties_id"),
+    "@brief Creates a new object from a property-less object and a properties ID."
+  )
+  ,
+  "@brief A DPolygon object with properties attached.\n"
+  "This class represents a combination of a DPolygon object an user properties. User properties are "
+  "stored in form of a properties ID. Convenience methods are provided to manipulate or retrieve "
+  "user properties directly.\n"
+  "\n"
+  "This class has been introduced in version 0.30."
 );
 
 }

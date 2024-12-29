@@ -894,6 +894,66 @@ class DBPolygon_TestClass < TestBase
 
   end
 
+  def test_polygonWithProperties
+
+    s = RBA::PolygonWithProperties::new
+    assert_equal(s.to_s, "() props={}")
+
+    pid = RBA::Layout::properties_id({ 1 => "one" })
+    s = RBA::PolygonWithProperties::new(RBA::Polygon::new(RBA::Box::new(0, 0, 100, 200)), pid)
+    assert_equal(s.to_s, "(0,0;0,200;100,200;100,0) props={1=>one}")
+    assert_equal(s.property(1), "one")
+    assert_equal(s.properties, { 1 => "one" })
+    s.set_property(1, "xxx")
+    assert_equal(s.to_s, "(0,0;0,200;100,200;100,0) props={1=>xxx}")
+    s.delete_property(1)
+    assert_equal(s.to_s, "(0,0;0,200;100,200;100,0) props={}")
+    assert_equal(s.property(1), nil)
+
+    s = RBA::DPolygonWithProperties::new
+    assert_equal(s.to_s, "() props={}")
+
+    pid = RBA::Layout::properties_id({ 1 => "one" })
+    s = RBA::DPolygonWithProperties::new(RBA::DPolygon::new(RBA::DBox::new(0, 0, 100, 200)), pid)
+    assert_equal(s.to_s, "(0,0;0,200;100,200;100,0) props={1=>one}")
+    assert_equal(s.property(1), "one")
+    assert_equal(s.properties, { 1 => "one" })
+    s.set_property(1, "xxx")
+    assert_equal(s.to_s, "(0,0;0,200;100,200;100,0) props={1=>xxx}")
+    s.delete_property(1)
+    assert_equal(s.to_s, "(0,0;0,200;100,200;100,0) props={}")
+    assert_equal(s.property(1), nil)
+
+    s = RBA::SimplePolygonWithProperties::new
+    assert_equal(s.to_s, "() props={}")
+
+    pid = RBA::Layout::properties_id({ 1 => "one" })
+    s = RBA::SimplePolygonWithProperties::new(RBA::SimplePolygon::new(RBA::Box::new(0, 0, 100, 200)), pid)
+    assert_equal(s.to_s, "(0,0;0,200;100,200;100,0) props={1=>one}")
+    assert_equal(s.property(1), "one")
+    assert_equal(s.properties, { 1 => "one" })
+    s.set_property(1, "xxx")
+    assert_equal(s.to_s, "(0,0;0,200;100,200;100,0) props={1=>xxx}")
+    s.delete_property(1)
+    assert_equal(s.to_s, "(0,0;0,200;100,200;100,0) props={}")
+    assert_equal(s.property(1), nil)
+
+    s = RBA::DSimplePolygonWithProperties::new
+    assert_equal(s.to_s, "() props={}")
+
+    pid = RBA::Layout::properties_id({ 1 => "one" })
+    s = RBA::DSimplePolygonWithProperties::new(RBA::DSimplePolygon::new(RBA::DBox::new(0, 0, 100, 200)), pid)
+    assert_equal(s.to_s, "(0,0;0,200;100,200;100,0) props={1=>one}")
+    assert_equal(s.property(1), "one")
+    assert_equal(s.properties, { 1 => "one" })
+    s.set_property(1, "xxx")
+    assert_equal(s.to_s, "(0,0;0,200;100,200;100,0) props={1=>xxx}")
+    s.delete_property(1)
+    assert_equal(s.to_s, "(0,0;0,200;100,200;100,0) props={}")
+    assert_equal(s.property(1), nil)
+
+  end
+
 end
 
 load("test_epilogue.rb")

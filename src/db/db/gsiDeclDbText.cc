@@ -22,6 +22,7 @@
 
 
 #include "gsiDecl.h"
+#include "gsiDeclDbPropertiesSupport.h"
 #include "gsiEnums.h"
 #include "dbPoint.h"
 #include "dbText.h"
@@ -448,6 +449,25 @@ Class<db::Text> decl_Text ("db", "Text",
   "database objects."
 );
 
+static db::TextWithProperties *new_text_with_properties (const db::Text &poly, db::properties_id_type pid)
+{
+  return new db::TextWithProperties (poly, pid);
+}
+
+Class<db::TextWithProperties> decl_TextWithProperties (decl_Text, "db", "TextWithProperties",
+  gsi::properties_support_methods<db::TextWithProperties> () +
+  constructor ("new", &new_text_with_properties, gsi::arg ("polygon"), gsi::arg ("properties_id"),
+    "@brief Creates a new object from a property-less object and a properties ID."
+  )
+  ,
+  "@brief A Text object with properties attached.\n"
+  "This class represents a combination of a Text object an user properties. User properties are "
+  "stored in form of a properties ID. Convenience methods are provided to manipulate or retrieve "
+  "user properties directly.\n"
+  "\n"
+  "This class has been introduced in version 0.30."
+);
+
 static db::DText *dtext_from_itext (const db::Text &t)
 {
   return new db::DText (t);
@@ -495,6 +515,25 @@ Class<db::DText> decl_DText ("db", "DText",
   "\n"
   "See @<a href=\"/programming/database_api.xml\">The Database API@</a> for more details about the "
   "database objects."
+);
+
+static db::DTextWithProperties *new_dtext_with_properties (const db::DText &poly, db::properties_id_type pid)
+{
+  return new db::DTextWithProperties (poly, pid);
+}
+
+Class<db::DTextWithProperties> decl_DTextWithProperties (decl_DText, "db", "DTextWithProperties",
+  gsi::properties_support_methods<db::DTextWithProperties> () +
+  constructor ("new", &new_dtext_with_properties, gsi::arg ("polygon"), gsi::arg ("properties_id"),
+    "@brief Creates a new object from a property-less object and a properties ID."
+  )
+  ,
+  "@brief A DText object with properties attached.\n"
+  "This class represents a combination of a DText object an user properties. User properties are "
+  "stored in form of a properties ID. Convenience methods are provided to manipulate or retrieve "
+  "user properties directly.\n"
+  "\n"
+  "This class has been introduced in version 0.30."
 );
 
 gsi::Enum<db::HAlign> decl_HAlign ("db", "HAlign",

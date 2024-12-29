@@ -22,6 +22,7 @@
 
 
 #include "gsiDecl.h"
+#include "gsiDeclDbPropertiesSupport.h"
 #include "dbPoint.h"
 #include "dbBox.h"
 #include "dbHash.h"
@@ -590,6 +591,25 @@ Class<db::Box> decl_Box ("db", "Box",
   "database objects."
 );
 
+static db::BoxWithProperties *new_box_with_properties (const db::Box &poly, db::properties_id_type pid)
+{
+  return new db::BoxWithProperties (poly, pid);
+}
+
+Class<db::BoxWithProperties> decl_BoxWithProperties (decl_Box, "db", "BoxWithProperties",
+  gsi::properties_support_methods<db::BoxWithProperties> () +
+  constructor ("new", &new_box_with_properties, gsi::arg ("polygon"), gsi::arg ("properties_id"),
+    "@brief Creates a new object from a property-less object and a properties ID."
+  )
+  ,
+  "@brief A Box object with properties attached.\n"
+  "This class represents a combination of a Box object an user properties. User properties are "
+  "stored in form of a properties ID. Convenience methods are provided to manipulate or retrieve "
+  "user properties directly.\n"
+  "\n"
+  "This class has been introduced in version 0.30."
+);
+
 static db::DBox *dbox_from_ibox (const db::Box &b)
 {
   return new db::DBox (b);
@@ -643,6 +663,25 @@ Class<db::DBox> decl_DBox ("db", "DBox",
   "\n"
   "See @<a href=\"/programming/database_api.xml\">The Database API@</a> for more details about the "
   "database objects."
+);
+
+static db::DBoxWithProperties *new_dbox_with_properties (const db::DBox &poly, db::properties_id_type pid)
+{
+  return new db::DBoxWithProperties (poly, pid);
+}
+
+Class<db::DBoxWithProperties> decl_DBoxWithProperties (decl_DBox, "db", "DBoxWithProperties",
+  gsi::properties_support_methods<db::DBoxWithProperties> () +
+  constructor ("new", &new_dbox_with_properties, gsi::arg ("polygon"), gsi::arg ("properties_id"),
+    "@brief Creates a new object from a property-less object and a properties ID."
+  )
+  ,
+  "@brief A DBox object with properties attached.\n"
+  "This class represents a combination of a DBox object an user properties. User properties are "
+  "stored in form of a properties ID. Convenience methods are provided to manipulate or retrieve "
+  "user properties directly.\n"
+  "\n"
+  "This class has been introduced in version 0.30."
 );
 
 }

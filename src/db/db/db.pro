@@ -420,7 +420,8 @@ HEADERS = \
   dbOriginalLayerTexts.h \
   dbNetShape.h \
   dbShapeCollection.h \
-  dbShapeCollectionUtils.h
+  dbShapeCollectionUtils.h \
+  gsiDeclDbPropertiesSupport.h
 
 RESOURCES = \
   dbResources.qrc \

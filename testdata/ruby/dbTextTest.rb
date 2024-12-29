@@ -254,6 +254,38 @@ class DBText_TestClass < TestBase
 
   end
 
+  def test_textWithProperties
+
+    s = RBA::TextWithProperties::new
+    assert_equal(s.to_s, "('',r0 0,0) props={}")
+
+    pid = RBA::Layout::properties_id({ 1 => "one" })
+    s = RBA::TextWithProperties::new(RBA::Text::new("text", RBA::Trans::R90), pid)
+    assert_equal(s.to_s, "('text',r90 0,0) props={1=>one}")
+    assert_equal(s.property(1), "one")
+    assert_equal(s.properties, { 1 => "one" })
+    s.set_property(1, "xxx")
+    assert_equal(s.to_s, "('text',r90 0,0) props={1=>xxx}")
+    s.delete_property(1)
+    assert_equal(s.to_s, "('text',r90 0,0) props={}")
+    assert_equal(s.property(1), nil)
+
+    s = RBA::DTextWithProperties::new
+    assert_equal(s.to_s, "('',r0 0,0) props={}")
+
+    pid = RBA::Layout::properties_id({ 1 => "one" })
+    s = RBA::DTextWithProperties::new(RBA::DText::new("text", RBA::Trans::R90), pid)
+    assert_equal(s.to_s, "('text',r90 0,0) props={1=>one}")
+    assert_equal(s.property(1), "one")
+    assert_equal(s.properties, { 1 => "one" })
+    s.set_property(1, "xxx")
+    assert_equal(s.to_s, "('text',r90 0,0) props={1=>xxx}")
+    s.delete_property(1)
+    assert_equal(s.to_s, "('text',r90 0,0) props={}")
+    assert_equal(s.property(1), nil)
+
+  end
+
 end
 
 load("test_epilogue.rb")

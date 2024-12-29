@@ -187,6 +187,17 @@ public:
     return object_with_properties<Obj> (Obj::transformed (tr), m_id);
   }
 
+  /**
+   *  @brief Returns a string describing the object
+   */
+  std::string to_string () const
+  {
+    std::string s = Obj::to_string ();
+    s += " props=";
+    s += db::properties (properties_id ()).to_dict_var ().to_string ();
+    return s;
+  }
+
 private:
   properties_id_type m_id;
 };
@@ -224,6 +235,16 @@ typedef object_with_properties<DBox> DBoxWithProperties;
 
 typedef object_with_properties<db::array<db::CellInst, db::Trans> > CellInstArrayWithProperties;
 typedef object_with_properties<db::array<db::CellInst, db::DTrans> > DCellInstArrayWithProperties;
+
+/**
+ *  @brief Output stream insertion operator
+ */
+template <class T>
+inline std::ostream &
+operator<< (std::ostream &os, const object_with_properties<T> &p)
+{
+  return (os << p.to_string ());
+}
 
 } // namespace db
 

@@ -489,6 +489,7 @@ public:
   ~StrangePolygonCheckProcessor ();
 
   virtual void process (const db::Polygon &poly, std::vector<db::Polygon> &res) const;
+  virtual void process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &res) const;
 
   virtual const TransformationReducer *vars () const { return 0; }
   virtual bool result_is_merged () const { return false; }
@@ -508,6 +509,7 @@ public:
   ~SmoothingProcessor ();
 
   virtual void process (const db::Polygon &poly, std::vector<db::Polygon> &res) const;
+  virtual void process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &res) const;
 
   virtual const TransformationReducer *vars () const { return &m_vars; }
   virtual bool result_is_merged () const { return false; }
@@ -532,6 +534,7 @@ public:
   ~RoundedCornersProcessor ();
 
   virtual void process (const db::Polygon &poly, std::vector<db::Polygon> &res) const;
+  virtual void process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &res) const;
 
   virtual const TransformationReducer *vars () const { return &m_vars; }
   virtual bool result_is_merged () const { return true; }   //  we believe so ...
@@ -556,6 +559,7 @@ public:
   ~HolesExtractionProcessor ();
 
   virtual void process (const db::Polygon &poly, std::vector<db::Polygon> &res) const;
+  virtual void process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &res) const;
 
   virtual const TransformationReducer *vars () const { return 0; }
   virtual bool result_is_merged () const { return false; }  //  isn't merged for nested holes :(
@@ -575,6 +579,7 @@ public:
   ~HullExtractionProcessor ();
 
   virtual void process (const db::Polygon &poly, std::vector<db::Polygon> &res) const;
+  virtual void process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &res) const;
 
   virtual const TransformationReducer *vars () const { return 0; }
   virtual bool result_is_merged () const { return false; }   //  isn't merged for nested hulls :(
@@ -593,6 +598,7 @@ public:
   SinglePolygonCheck (db::edge_relation_type rel, db::Coord d, const RegionCheckOptions &options);
 
   virtual void process (const db::Polygon &polygon, std::vector<db::EdgePair> &res) const;
+  virtual void process (const db::PolygonWithProperties &polygon, std::vector<db::EdgePairWithProperties> &res) const;
   virtual const TransformationReducer *vars () const { return &m_vars; }
   virtual bool wants_variants () const { return true; }
 

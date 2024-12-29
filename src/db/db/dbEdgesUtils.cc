@@ -212,6 +212,34 @@ EdgeSegmentSelector::process (const db::Edge &edge, std::vector<db::Edge> &res) 
   }
 }
 
+void
+EdgeSegmentSelector::process (const db::EdgeWithProperties &edge, std::vector<db::EdgeWithProperties> &res) const
+{
+  double l = std::max (edge.double_length () * m_fraction, double (m_length));
+
+  db::DVector ds;
+  if (! edge.is_degenerate ()) {
+    ds = db::DVector (edge.d ()) * (l / edge.double_length ());
+  }
+
+  if (m_mode < 0) {
+
+    res.push_back (db::EdgeWithProperties (db::Edge (edge.p1 (), db::Point (db::DPoint (edge.p1 ()) + ds)), edge.properties_id ()));
+
+  } else if (m_mode > 0) {
+
+    res.push_back (db::EdgeWithProperties (db::Edge (db::Point (db::DPoint (edge.p2 ()) - ds), edge.p2 ()), edge.properties_id ()));
+
+  } else {
+
+    db::DVector dl = ds * 0.5;
+    db::DPoint center = db::DPoint (edge.p1 ()) + db::DVector (edge.p2 () - edge.p1 ()) * 0.5;
+
+    res.push_back (db::EdgeWithProperties (db::Edge (db::Point (center - dl), db::Point (center + dl)), edge.properties_id ()));
+
+  }
+}
+
 // -------------------------------------------------------------------------------------------------------------
 //  EdgeAngleChecker implementation
 

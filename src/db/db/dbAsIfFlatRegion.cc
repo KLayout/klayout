@@ -1003,37 +1003,6 @@ AsIfFlatRegion::scaled_and_snapped (db::Coord gx, db::Coord mx, db::Coord dx, db
 
 template <class TR>
 static
-void region_cop_impl (AsIfFlatRegion *region, db::Shapes *output_to, db::CompoundRegionOperationNode &node)
-{
-  db::local_processor<db::Polygon, db::Polygon, TR> proc;
-  proc.set_base_verbosity (region->base_verbosity ());
-  proc.set_description (region->progress_desc ());
-  proc.set_report_progress (region->report_progress ());
-
-  db::RegionIterator polygons (region->begin_merged ());
-
-  std::vector<generic_shape_iterator<db::Polygon> > others;
-  std::vector<bool> foreign;
-  std::vector<db::Region *> inputs = node.inputs ();
-  for (std::vector<db::Region *>::const_iterator i = inputs.begin (); i != inputs.end (); ++i) {
-    if (*i == subject_regionptr () || *i == foreign_regionptr ()) {
-      others.push_back (region->begin_merged ());
-      foreign.push_back (*i == foreign_regionptr ());
-    } else {
-      others.push_back ((*i)->begin ());
-      foreign.push_back (false);
-    }
-  }
-
-  std::vector<db::Shapes *> results;
-  results.push_back (output_to);
-
-  compound_local_operation<db::Polygon, db::Polygon, TR> op (&node);
-  proc.run_flat (polygons, others, foreign, &op, results);
-}
-
-template <class TR>
-static
 void region_cop_with_properties_impl (AsIfFlatRegion *region, db::Shapes *output_to, db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint)
 {
   db::local_processor<db::PolygonWithProperties, db::PolygonWithProperties, db::object_with_properties<TR> > proc;
@@ -1067,11 +1036,7 @@ EdgePairsDelegate *
 AsIfFlatRegion::cop_to_edge_pairs (db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint)
 {
   std::unique_ptr<FlatEdgePairs> output (new FlatEdgePairs ());
-  if (pc_skip (prop_constraint) && ! node.wants_properties ()) {
-    region_cop_impl<db::EdgePair> (this, &output->raw_edge_pairs (), node);
-  } else {
-    region_cop_with_properties_impl<db::EdgePair> (this, &output->raw_edge_pairs (), node, prop_constraint);
-  }
+  region_cop_with_properties_impl<db::EdgePair> (this, &output->raw_edge_pairs (), node, prop_constraint);
   return output.release ();
 }
 
@@ -1079,11 +1044,7 @@ RegionDelegate *
 AsIfFlatRegion::cop_to_region (db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint)
 {
   std::unique_ptr<FlatRegion> output (new FlatRegion ());
-  if (pc_skip (prop_constraint) && ! node.wants_properties ()) {
-    region_cop_impl<db::Polygon> (this, &output->raw_polygons (), node);
-  } else {
-    region_cop_with_properties_impl<db::Polygon> (this, &output->raw_polygons (), node, prop_constraint);
-  }
+  region_cop_with_properties_impl<db::Polygon> (this, &output->raw_polygons (), node, prop_constraint);
   return output.release ();
 }
 
@@ -1091,11 +1052,7 @@ EdgesDelegate *
 AsIfFlatRegion::cop_to_edges (db::CompoundRegionOperationNode &node, PropertyConstraint prop_constraint)
 {
   std::unique_ptr<FlatEdges> output (new FlatEdges ());
-  if (pc_skip (prop_constraint) && ! node.wants_properties ()) {
-    region_cop_impl<db::Edge> (this, &output->raw_edges (), node);
-  } else {
-    region_cop_with_properties_impl<db::Edge> (this, &output->raw_edges (), node, prop_constraint);
-  }
+  region_cop_with_properties_impl<db::Edge> (this, &output->raw_edges (), node, prop_constraint);
   return output.release ();
 }
 

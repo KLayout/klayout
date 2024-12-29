@@ -31,6 +31,7 @@
 #include "dbEdge.h"
 #include "dbEdgeProcessor.h"
 #include "dbPolygon.h"
+#include "dbObjectWithProperties.h"
 
 #include <vector>
 
@@ -396,6 +397,74 @@ private:
 };
 
 /**
+ *  @brief A simple polygon receiver collecting the simple polygons in a vector with common properties
+ *
+ *  This class implements the SimplePolygonSink interface.
+ *  Like EdgeContainer, this receiver collects the objects either in an external
+ *  or an internal vector of polygons.
+ */
+class DB_PUBLIC SimplePolygonContainerWithProperties
+  : public SimplePolygonSink
+{
+public:
+  /**
+   *  @brief Constructor specifying an external vector for storing the polygons
+   */
+  SimplePolygonContainerWithProperties (std::vector<db::SimplePolygonWithProperties> &polygons, db::properties_id_type prop_id, bool clear = false)
+    : SimplePolygonSink (), mp_polygons (&polygons), m_prop_id (prop_id), m_clear (clear)
+  { }
+
+  /**
+   *  @brief Constructor which tells the container to use the internal vector for storing the polygons
+   */
+  SimplePolygonContainerWithProperties ()
+    : SimplePolygonSink (), mp_polygons (&m_polygons), m_prop_id (0), m_clear (false)
+  { }
+
+  /**
+   *  @brief Start the sequence
+   */
+  virtual void start ()
+  {
+    if (m_clear) {
+      mp_polygons->clear ();
+      //  The single-shot scheme is a easy way to overcome problems with multiple start/flush brackets (i.e. on size filter)
+      m_clear = false;
+    }
+  }
+
+  /**
+   *  @brief The polygons collected so far (const version)
+   */
+  const std::vector<db::SimplePolygonWithProperties> &polygons () const
+  {
+    return *mp_polygons;
+  }
+
+  /**
+   *  @brief The polygons collected so far (non-const version)
+   */
+  std::vector<db::SimplePolygonWithProperties> &polygons ()
+  {
+    return *mp_polygons;
+  }
+
+  /**
+   *  @brief Implementation of the PolygonSink interface
+   */
+  virtual void put (const db::SimplePolygon &polygon)
+  {
+    mp_polygons->push_back (db::SimplePolygonWithProperties (polygon, m_prop_id));
+  }
+
+private:
+  std::vector<db::SimplePolygonWithProperties> m_polygons;
+  std::vector<db::SimplePolygonWithProperties> *mp_polygons;
+  db::properties_id_type m_prop_id;
+  bool m_clear;
+};
+
+/**
  *  @brief Declaration of the polygon sink interface
  */
 class DB_PUBLIC PolygonSink
@@ -500,6 +569,74 @@ public:
 private:
   std::vector<db::Polygon> m_polygons;
   std::vector<db::Polygon> *mp_polygons;
+  bool m_clear;
+};
+
+/**
+ *  @brief A polygon receiver collecting the polygons in a vector with a common properties ID
+ *
+ *  This class implements the PolygonSink interface.
+ *  Like EdgeContainer, this receiver collects the objects either in an external
+ *  or an internal vector of polygons.
+ */
+class DB_PUBLIC PolygonContainerWithProperties
+  : public PolygonSink
+{
+public:
+  /**
+   *  @brief Constructor specifying an external vector for storing the polygons
+   */
+  PolygonContainerWithProperties (std::vector<db::PolygonWithProperties> &polygons, db::properties_id_type prop_id, bool clear = false)
+    : PolygonSink (), mp_polygons (&polygons), m_prop_id (prop_id), m_clear (clear)
+  { }
+
+  /**
+   *  @brief Constructor which tells the container to use the internal vector for storing the polygons
+   */
+  PolygonContainerWithProperties ()
+    : PolygonSink (), mp_polygons (&m_polygons), m_prop_id (0), m_clear (false)
+  { }
+
+  /**
+   *  @brief The polygons collected so far (const version)
+   */
+  const std::vector<db::PolygonWithProperties> &polygons () const
+  {
+    return *mp_polygons;
+  }
+
+  /**
+   *  @brief The polygons collected so far (non-const version)
+   */
+  std::vector<db::PolygonWithProperties> &polygons ()
+  {
+    return *mp_polygons;
+  }
+
+  /**
+   *  @brief Start the sequence
+   */
+  virtual void start ()
+  {
+    if (m_clear) {
+      mp_polygons->clear ();
+      //  The single-shot scheme is a easy way to overcome problems with multiple start/flush brackets (i.e. on size filter)
+      m_clear = false;
+    }
+  }
+
+  /**
+   *  @brief Implementation of the PolygonSink interface
+   */
+  virtual void put (const db::Polygon &polygon)
+  {
+    mp_polygons->push_back (db::PolygonWithProperties (polygon, m_prop_id));
+  }
+
+private:
+  std::vector<db::PolygonWithProperties> m_polygons;
+  std::vector<db::PolygonWithProperties> *mp_polygons;
+  db::properties_id_type m_prop_id;
   bool m_clear;
 };
 

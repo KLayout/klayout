@@ -44,7 +44,7 @@ public:
     set_result_type (db::CompoundRegionOperationNode::ResultType::Region);
   }
 
-  void begin_polygon (const db::Layout *, const db::Cell *, const db::Polygon &polygon)
+  void begin_polygon (const db::Layout *, const db::Cell *, const db::PolygonWithProperties &polygon)
   {
     output_polygon (polygon);
   }
@@ -60,7 +60,7 @@ public:
     m_input = input;
   }
 
-  void on_edge (const db::Layout * /*layout*/, const db::Cell * /*cell*/, const db::Edge &edge, const neighbors_type &neighbors)
+  void on_edge (const db::Layout * /*layout*/, const db::Cell * /*cell*/, const db::EdgeWithProperties &edge, const neighbors_type &neighbors)
   {
     db::IMatrix3d trans = to_original_trans (edge);
 

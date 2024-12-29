@@ -718,6 +718,20 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, db::Cell *s
   results.front ().insert (result.begin (), result.end ());
 }
 
+template <class TS, class TI>
+void
+check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<db::EdgePairWithProperties> > &results, const db::LocalProcessorBase *proc) const
+{
+  std::vector<std::unordered_set<db::EdgePair> > tmp_results;
+  tmp_results.push_back (std::unordered_set<db::EdgePair> ());
+
+  do_compute_local (layout, subject_cell, interactions, tmp_results, proc);
+
+  //  NOTE: there is no specific property support currently, so we just set to "no properties"
+  for (auto i = tmp_results.front ().begin (); i != tmp_results.front ().end (); ++i) {
+    results.front ().insert (db::EdgePairWithProperties (*i, db::properties_id_type (0)));
+  }
+}
 
 template <class TS, class TI>
 db::Coord

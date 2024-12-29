@@ -30,6 +30,7 @@
 #include "dbTypes.h"
 #include "dbBox.h"
 #include "dbPolygon.h"
+#include "dbObjectWithProperties.h"
 
 #include <vector>
 
@@ -71,6 +72,30 @@ DB_PUBLIC void clip_poly (const db::SimplePolygon &poly, const db::Box &box, std
  *  @param clipped_poly Where the clip results are stored. The clip results are appended to this vector
  */
 DB_PUBLIC void clip_poly (const db::Polygon &poly, const db::Box &box, std::vector <db::Polygon> &clipped_poly, bool resolve_holes = true);
+
+/**
+ *  @brief Clip a given simple polygon with the given box
+ *
+ *  In the generic case, multiple polygons may be created.
+ *  This version copies the properties of the input polygon to the output container.
+ *
+ *  @param poly The input polygon to clip
+ *  @param box The box at which to clip
+ *  @param clipped_poly Where the clip results are stored. The clip results are appended to this vector
+ */
+DB_PUBLIC void clip_poly (const db::SimplePolygonWithProperties &poly, const db::Box &box, std::vector <db::SimplePolygonWithProperties> &clipped_poly, bool resolve_holes = true);
+
+/**
+ *  @brief Clip a given polygon with the given box
+ *
+ *  In the generic case, multiple polygons may be created.
+ *  This version copies the properties of the input polygon to the output container.
+ *
+ *  @param poly The input polygon to clip
+ *  @param box The box at which to clip
+ *  @param clipped_poly Where the clip results are stored. The clip results are appended to this vector
+ */
+DB_PUBLIC void clip_poly (const db::PolygonWithProperties &poly, const db::Box &box, std::vector <db::PolygonWithProperties> &clipped_poly, bool resolve_holes = true);
 
 /**
  *  @brief Clip a layout

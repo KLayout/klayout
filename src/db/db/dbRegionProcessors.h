@@ -44,6 +44,7 @@ class DB_PUBLIC CornerPointDelivery
 {
 public:
   virtual void make_point (const db::Point &pt, const db::Edge &e1, const db::Edge &e2) const = 0;
+  virtual void make_point (const db::Point &pt, const db::Edge &e1, const db::Edge &e2, db::properties_id_type prop_id) const = 0;
 };
 
 /**
@@ -54,17 +55,31 @@ class DB_PUBLIC CornerRectDelivery
 {
 public:
   CornerRectDelivery (db::Coord dim, std::vector<db::Polygon> &result)
-    : m_d (dim, dim), mp_result (&result)
+    : m_d (dim, dim), mp_result (&result), mp_result_wp (0)
+  { }
+
+  CornerRectDelivery (db::Coord dim, std::vector<db::PolygonWithProperties> &result_wp)
+    : m_d (dim, dim), mp_result (0), mp_result_wp (&result_wp)
   { }
 
   virtual void make_point (const db::Point &pt, const db::Edge &, const db::Edge &) const
   {
-    mp_result->push_back (db::Polygon (db::Box (pt - m_d, pt + m_d)));
+    if (mp_result) {
+      mp_result->push_back (db::Polygon (db::Box (pt - m_d, pt + m_d)));
+    }
+  }
+
+  virtual void make_point (const db::Point &pt, const db::Edge &, const db::Edge &, db::properties_id_type prop_id) const
+  {
+    if (mp_result_wp) {
+      mp_result_wp->push_back (db::PolygonWithProperties (db::Polygon (db::Box (pt - m_d, pt + m_d)), prop_id));
+    }
   }
 
 private:
   db::Vector m_d;
   std::vector<db::Polygon> *mp_result;
+  std::vector<db::PolygonWithProperties> *mp_result_wp;
 };
 
 /**
@@ -75,17 +90,31 @@ class DB_PUBLIC CornerDotDelivery
 {
 public:
   CornerDotDelivery (std::vector<db::Edge> &result)
-    : mp_result (&result)
+    : mp_result (&result), mp_result_wp (0)
+  { }
+
+  CornerDotDelivery (std::vector<db::EdgeWithProperties> &result)
+    : mp_result (0), mp_result_wp (&result)
   { }
 
   virtual void make_point (const db::Point &pt, const db::Edge &, const db::Edge &) const
   {
-    mp_result->push_back (db::Edge (pt, pt));
+    if (mp_result) {
+      mp_result->push_back (db::Edge (pt, pt));
+    }
+  }
+
+  virtual void make_point (const db::Point &pt, const db::Edge &, const db::Edge &, db::properties_id_type prop_id) const
+  {
+    if (mp_result_wp) {
+      mp_result_wp->push_back (db::EdgeWithProperties (db::Edge (pt, pt), prop_id));
+    }
   }
 
 private:
   db::Vector m_d;
   std::vector<db::Edge> *mp_result;
+  std::vector<db::EdgeWithProperties> *mp_result_wp;
 };
 
 /**
@@ -96,16 +125,30 @@ class DB_PUBLIC CornerEdgePairDelivery
 {
 public:
   CornerEdgePairDelivery (std::vector<db::EdgePair> &result)
-    : mp_result (&result)
+    : mp_result (&result), mp_result_wp (0)
+  { }
+
+  CornerEdgePairDelivery (std::vector<db::EdgePairWithProperties> &result)
+    : mp_result (0), mp_result_wp (&result)
   { }
 
   virtual void make_point (const db::Point &, const db::Edge &e1, const db::Edge &e2) const
   {
-    mp_result->push_back (db::EdgePair (e1, e2));
+    if (mp_result) {
+      mp_result->push_back (db::EdgePair (e1, e2));
+    }
+  }
+
+  virtual void make_point (const db::Point &, const db::Edge &e1, const db::Edge &e2, db::properties_id_type prop_id) const
+  {
+    if (mp_result_wp) {
+      mp_result_wp->push_back (db::EdgePairWithProperties (db::EdgePair (e1, e2), prop_id));
+    }
   }
 
 private:
   std::vector<db::EdgePair> *mp_result;
+  std::vector<db::EdgePairWithProperties> *mp_result_wp;
 };
 
 /**
@@ -118,6 +161,7 @@ public:
   virtual ~CornerDetectorCore () { }
 
   void detect_corners (const db::Polygon &poly, const CornerPointDelivery &delivery) const;
+  void detect_corners (const db::PolygonWithProperties &poly, const CornerPointDelivery &delivery) const;
 
 private:
   db::EdgeAngleChecker m_checker;
@@ -137,6 +181,11 @@ public:
   }
 
   void process (const db::Polygon &poly, std::vector<db::Polygon> &result) const
+  {
+    detect_corners (poly, CornerRectDelivery (m_dim, result));
+  }
+
+  void process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &result) const
   {
     detect_corners (poly, CornerRectDelivery (m_dim, result));
   }
@@ -170,6 +219,11 @@ public:
     detect_corners (poly, CornerDotDelivery (result));
   }
 
+  void process (const db::PolygonWithProperties &poly, std::vector<db::EdgeWithProperties> &result) const
+  {
+    detect_corners (poly, CornerDotDelivery (result));
+  }
+
   virtual const TransformationReducer *vars () const { return 0; }
   virtual bool result_is_merged () const { return false; }
   virtual bool result_must_not_be_merged () const { return true; }  //  to preserve dots
@@ -191,6 +245,11 @@ public:
   }
 
   void process (const db::Polygon &poly, std::vector<db::EdgePair> &result) const
+  {
+    detect_corners (poly, CornerEdgePairDelivery (result));
+  }
+
+  void process (const db::PolygonWithProperties &poly, std::vector<db::EdgePairWithProperties> &result) const
   {
     detect_corners (poly, CornerEdgePairDelivery (result));
   }
@@ -218,6 +277,7 @@ public:
   }
 
   void process (const db::Polygon &poly, std::vector<db::Polygon> &result) const;
+  void process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &result) const;
 
   virtual const TransformationReducer *vars () const { return 0; }
   virtual bool result_is_merged () const { return false; }
@@ -242,6 +302,7 @@ public:
   }
 
   void process (const db::Polygon &poly, std::vector<db::Polygon> &result) const;
+  void process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &result) const;
 
   virtual const TransformationReducer *vars () const;
   virtual bool result_is_merged () const { return false; }
@@ -274,6 +335,7 @@ public:
   }
 
   void process (const db::Polygon &poly, std::vector<db::Edge> &result) const;
+  void process (const db::PolygonWithProperties &poly, std::vector<db::EdgeWithProperties> &result) const;
 
   virtual const TransformationReducer *vars () const;
   virtual bool result_is_merged () const { return false; }
@@ -300,6 +362,7 @@ public:
   PolygonToEdgeProcessor (EdgeMode mode = All);
 
   void process (const db::Polygon &poly, std::vector<db::Edge> &result) const;
+  void process (const db::PolygonWithProperties &poly, std::vector<db::EdgeWithProperties> &result) const;
 
 private:
   EdgeMode m_mode;
@@ -319,6 +382,7 @@ public:
   }
 
   void process (const db::Polygon &poly, std::vector<db::Polygon> &result) const;
+  void process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &result) const;
 
   virtual const TransformationReducer *vars () const { return &m_vars; }
   virtual bool result_is_merged () const { return false; }
@@ -345,6 +409,7 @@ public:
   }
 
   void process (const db::Polygon &poly, std::vector<db::Polygon> &result) const;
+  void process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &result) const;
 
   virtual const TransformationReducer *vars () const { return &m_vars; }
   virtual bool result_is_merged () const { return false; }
@@ -374,6 +439,7 @@ public:
   }
 
   void process (const db::Polygon &poly, std::vector<db::Polygon> &result) const;
+  void process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &result) const;
 
   virtual const TransformationReducer *vars () const { return 0; }
   virtual bool result_is_merged () const { return false; }
@@ -399,6 +465,7 @@ public:
   virtual const TransformationReducer *vars () const { return m_vars; }
 
   void process (const db::Polygon &poly, std::vector<db::Polygon> &result) const;
+  void process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &result) const;
 
   virtual bool result_is_merged () const;
   virtual bool result_must_not_be_merged () const { return false; }
@@ -421,6 +488,7 @@ public:
   TriangulationProcessor (double max_area = 0.0, double min_b = 1.0);
 
   void process (const db::Polygon &poly, std::vector<db::Polygon> &result) const;
+  void process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &result) const;
 
   virtual const TransformationReducer *vars () const { return &m_vars; }
   virtual bool result_is_merged () const { return false; }
@@ -453,6 +521,11 @@ public:
     result.push_back (db::minkowski_sum (poly, m_q, false));
   }
 
+  void process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &result) const
+  {
+    result.push_back (db::PolygonWithProperties (db::minkowski_sum (poly, m_q, false), poly.properties_id ()));
+  }
+
   //  TODO: could be less if the object is symmetric
   virtual const TransformationReducer *vars () const { return &m_vars; }
   virtual bool result_is_merged () const { return false; }
@@ -475,11 +548,14 @@ public:
   DRCHullProcessor (db::Coord d, db::metrics_type metrics, size_t n_circle = 64);
 
   void process (const db::Polygon &poly, std::vector<db::Polygon> &result) const;
+  void process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &result) const;
 
 private:
   db::Coord m_d;
   db::metrics_type m_metrics;
   size_t m_n_circle;
+
+  void do_process (const db::Polygon &poly, db::PolygonSink &sink) const;
 };
 
 

@@ -61,14 +61,14 @@ private:
 
 //  TODO: check, if the clip can be implemented by subsequent "cut" operations using all four borders
 //  Is that more efficient?
-template <class P, class PC> static void 
-clip_poly (const P &poly, const db::Box &box, std::vector <P> &clipped_poly, bool resolve_holes)
+template <class P, class Sink> static void
+clip_poly (const P &poly, const db::Box &box, Sink &psink, bool resolve_holes)
 {
   db::Box pbox = poly.box ();
 
   //  Polygon completely inside the clip box -> return the polygon
   if (pbox.inside (box)) {
-    clipped_poly.push_back (poly);
+    psink.put (poly);
     return;
   }
 
@@ -261,9 +261,7 @@ clip_poly (const P &poly, const db::Box &box, std::vector <P> &clipped_poly, boo
   ep.insert_sequence (edges.begin (), edges.end ());
   edges.clear ();
 
-  PC poly_cont (clipped_poly);
-
-  db::PolygonGenerator poly_gen (poly_cont);
+  db::PolygonGenerator poly_gen (psink);
   poly_gen.min_coherence (false);
   poly_gen.resolve_holes (resolve_holes);
 
@@ -275,13 +273,29 @@ clip_poly (const P &poly, const db::Box &box, std::vector <P> &clipped_poly, boo
 void 
 clip_poly (const db::Polygon &poly, const db::Box &box, std::vector <db::Polygon> &clipped_poly, bool resolve_holes)
 {
-  clip_poly<db::Polygon, db::PolygonContainer> (poly, box, clipped_poly, resolve_holes);
+  db::PolygonContainer pc (clipped_poly);
+  clip_poly (poly, box, pc, resolve_holes);
 }
 
 void 
 clip_poly (const db::SimplePolygon &poly, const db::Box &box, std::vector <db::SimplePolygon> &clipped_poly, bool resolve_holes)
 {
-  clip_poly<db::SimplePolygon, db::SimplePolygonContainer> (poly, box, clipped_poly, resolve_holes);
+  db::SimplePolygonContainer pc (clipped_poly);
+  clip_poly (poly, box, pc, resolve_holes);
+}
+
+void
+clip_poly (const db::PolygonWithProperties &poly, const db::Box &box, std::vector <db::PolygonWithProperties> &clipped_poly, bool resolve_holes)
+{
+  db::PolygonContainerWithProperties pc (clipped_poly, poly.properties_id ());
+  clip_poly (poly, box, pc, resolve_holes);
+}
+
+void
+clip_poly (const db::SimplePolygonWithProperties &poly, const db::Box &box, std::vector <db::SimplePolygonWithProperties> &clipped_poly, bool resolve_holes)
+{
+  db::SimplePolygonContainerWithProperties pc (clipped_poly, poly.properties_id ());
+  clip_poly (poly, box, pc, resolve_holes);
 }
 
 // ------------------------------------------------------------------------------

@@ -246,6 +246,16 @@ operator<< (std::ostream &os, const object_with_properties<T> &p)
   return (os << p.to_string ());
 }
 
+/**
+ *  @brief Transformation of an object with properties
+ */
+template <class Tr, class T>
+inline db::object_with_properties<T>
+operator* (const Tr &t, const db::object_with_properties<T> &s)
+{
+  return db::object_with_properties<T> (s.transformed (t), s.properties_id ());
+}
+
 } // namespace db
 
 #endif

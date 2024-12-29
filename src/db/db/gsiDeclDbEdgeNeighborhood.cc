@@ -39,12 +39,12 @@ class EdgeNeighborhoodVisitorImpl
 public:
   EdgeNeighborhoodVisitorImpl () { }
 
-  void issue_on_edge (const db::Layout *, const db::Cell *, const db::Edge &, const tl::Variant &)
+  void issue_on_edge (const db::Layout *, const db::Cell *, const db::EdgeWithProperties &, const tl::Variant &)
   {
     //  just for signature
   }
 
-  void on_edge (const db::Layout *layout, const db::Cell *cell, const db::Edge &edge, const db::EdgeNeighborhoodVisitor::neighbors_type &neighbors)
+  void on_edge (const db::Layout *layout, const db::Cell *cell, const db::EdgeWithProperties &edge, const db::EdgeNeighborhoodVisitor::neighbors_type &neighbors)
   {
     if (f_on_edge.can_issue ()) {
 
@@ -52,24 +52,24 @@ public:
 
       //  NOTE: as scripts are potentially thread unsafe, we lock here
       tl::MutexLocker locker (&m_lock);
-      return f_on_edge.issue<EdgeNeighborhoodVisitorImpl, const db::Layout *, const db::Cell *, const db::Edge &, const tl::Variant &> (&EdgeNeighborhoodVisitorImpl::issue_on_edge, layout, cell, edge, neighborhood);
+      return f_on_edge.issue<EdgeNeighborhoodVisitorImpl, const db::Layout *, const db::Cell *, const db::EdgeWithProperties &, const tl::Variant &> (&EdgeNeighborhoodVisitorImpl::issue_on_edge, layout, cell, edge, neighborhood);
 
     }
   }
 
   gsi::Callback f_on_edge;
 
-  void issue_begin_polygon (const db::Layout *, const db::Cell *, const db::Polygon &)
+  void issue_begin_polygon (const db::Layout *, const db::Cell *, const db::PolygonWithProperties &)
   {
     //  just for signature
   }
 
-  void begin_polygon (const db::Layout *layout, const db::Cell *cell, const db::Polygon &poly)
+  void begin_polygon (const db::Layout *layout, const db::Cell *cell, const db::PolygonWithProperties &poly)
   {
     if (f_begin_polygon.can_issue ()) {
       //  NOTE: as scripts are potentially thread unsafe, we lock here
       tl::MutexLocker locker (&m_lock);
-      return f_begin_polygon.issue<EdgeNeighborhoodVisitorImpl, const db::Layout *, const db::Cell *, const db::Polygon &> (&EdgeNeighborhoodVisitorImpl::begin_polygon, layout, cell, poly);
+      return f_begin_polygon.issue<EdgeNeighborhoodVisitorImpl, const db::Layout *, const db::Cell *, const db::PolygonWithProperties &> (&EdgeNeighborhoodVisitorImpl::begin_polygon, layout, cell, poly);
     }
   }
 

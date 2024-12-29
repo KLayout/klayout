@@ -69,6 +69,13 @@ public:
   virtual void process (const Shape &shape, std::vector<Result> &res) const = 0;
 
   /**
+   *  @brief Performs the actual processing with properties
+   *  This method will take the input edge from "edge" and puts the results into "res".
+   *  "res" can be empty - in this case, the edge will be skipped.
+   */
+  virtual void process (const db::object_with_properties<Shape> &shape, std::vector<db::object_with_properties<Result> > &res) const = 0;
+
+  /**
    *  @brief Returns the transformation reducer for building cell variants
    *  This method may return 0. In this case, not cell variants are built.
    */
@@ -286,6 +293,15 @@ public:
     db::Box box = bc (s).enlarged (db::Vector (m_dx, m_dy));
     if (! box.empty ()) {
       res.push_back (db::Polygon (box));
+    }
+  }
+
+  virtual void process (const db::object_with_properties<Shape> &s, std::vector<db::PolygonWithProperties> &res) const
+  {
+    db::box_convert<db::object_with_properties<Shape> > bc;
+    db::Box box = bc (s).enlarged (db::Vector (m_dx, m_dy));
+    if (! box.empty ()) {
+      res.push_back (db::PolygonWithProperties (db::Polygon (box), s.properties_id ()));
     }
   }
 

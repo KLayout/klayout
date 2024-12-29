@@ -626,6 +626,11 @@ public:
     res.push_back (extended_edge (edge, m_ext_b, m_ext_e, m_ext_o, m_ext_i));
   }
 
+  virtual void process (const EdgeWithProperties &edge, std::vector<db::PolygonWithProperties> &res) const
+  {
+    res.push_back (db::PolygonWithProperties (extended_edge (edge, m_ext_b, m_ext_e, m_ext_o, m_ext_i), edge.properties_id ()));
+  }
+
 private:
   db::Coord m_ext_b, m_ext_e, m_ext_o, m_ext_i;
 };
@@ -641,6 +646,7 @@ public:
   ~EdgeSegmentSelector ();
 
   virtual void process (const db::Edge &edge, std::vector<db::Edge> &res) const;
+  virtual void process (const db::EdgeWithProperties &edge, std::vector<db::EdgeWithProperties> &res) const;
 
   virtual const TransformationReducer *vars () const { return &m_vars; }
   virtual bool result_is_merged () const { return false; }

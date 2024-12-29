@@ -1005,29 +1005,6 @@ private:
   bool m_owns_filter;
   bool m_sum_of_set;
 
-  /* @@@
-  template <class T>
-  void implement_compute_local (db::CompoundRegionOperationCache *cache, db::Layout *layout, db::Cell *cell, const shape_interactions<T, T> &interactions, std::vector<std::unordered_set<T> > &results, const db::LocalProcessorBase *proc) const
-  {
-    std::vector<std::unordered_set<T> > one;
-    one.push_back (std::unordered_set<T> ());
-
-    child (0)->compute_local (cache, layout, cell, interactions, one, proc);
-
-    if (m_sum_of_set) {
-      if (mp_filter->selected_set (one.front ())) {
-        results.front ().insert (one.front ().begin (), one.front ().end ());
-      }
-    } else {
-      for (typename std::unordered_set<T>::const_iterator p = one.front ().begin (); p != one.front ().end (); ++p) {
-        if (mp_filter->selected (*p)) {
-          results.front ().insert (*p);
-        }
-      }
-    }
-  }
-  @@@ */
-
   template <class T>
   void implement_compute_local (db::CompoundRegionOperationCache *cache, db::Layout *layout, db::Cell *cell, const shape_interactions<db::object_with_properties<T>, db::object_with_properties<T> > &interactions, std::vector<std::unordered_set<db::object_with_properties<T> > > &results, const db::LocalProcessorBase *proc) const
   {
@@ -1078,29 +1055,6 @@ private:
   EdgeFilterBase *mp_filter;
   bool m_owns_filter;
   bool m_sum_of;
-
-  /* @@@
-  template <class T>
-  void implement_compute_local (db::CompoundRegionOperationCache *cache, db::Layout *layout, db::Cell *cell, const shape_interactions<T, T> &interactions, std::vector<std::unordered_set<db::Edge> > &results, const db::LocalProcessorBase *proc) const
-  {
-    std::vector<std::unordered_set<db::Edge> > one;
-    one.push_back (std::unordered_set<Edge> ());
-
-    child (0)->compute_local (cache, layout, cell, interactions, one, proc);
-
-    if (m_sum_of) {
-      if (mp_filter->selected (one.front ())) {
-        results.front ().insert (one.front ().begin (), one.front ().end ());
-      }
-    } else {
-      for (typename std::unordered_set<db::Edge>::const_iterator p = one.front ().begin (); p != one.front ().end (); ++p) {
-        if (mp_filter->selected (*p)) {
-          results.front ().insert (*p);
-        }
-      }
-    }
-  }
-  @@@ */
 
   template <class T>
   void implement_compute_local (db::CompoundRegionOperationCache *cache, db::Layout *layout, db::Cell *cell, const shape_interactions<db::object_with_properties<T>, db::object_with_properties<T> > &interactions, std::vector<std::unordered_set<db::EdgeWithProperties> > &results, const db::LocalProcessorBase *proc) const

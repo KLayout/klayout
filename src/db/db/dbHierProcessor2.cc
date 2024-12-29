@@ -544,6 +544,8 @@ template class DB_PUBLIC local_processor_cell_context<db::PolygonWithProperties,
 template class DB_PUBLIC local_processor_cell_context<db::PolygonWithProperties, db::PolygonWithProperties, db::EdgeWithProperties>;
 template class DB_PUBLIC local_processor_cell_context<db::PolygonWithProperties, db::PolygonWithProperties, db::EdgePairWithProperties>;
 template class DB_PUBLIC local_processor_cell_context<db::PolygonWithProperties, db::PolygonWithProperties, db::EdgePair>;
+template class DB_PUBLIC local_processor_cell_context<db::PolygonWithProperties, db::EdgeWithProperties, db::PolygonWithProperties>;
+template class DB_PUBLIC local_processor_cell_context<db::PolygonWithProperties, db::EdgeWithProperties, db::EdgeWithProperties>;
 template class DB_PUBLIC local_processor_cell_context<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC local_processor_cell_context<db::PolygonRef, db::Edge, db::PolygonRef>;
 template class DB_PUBLIC local_processor_cell_context<db::PolygonRef, db::PolygonRef, db::EdgePair>;
@@ -581,6 +583,8 @@ template class DB_PUBLIC local_processor_cell_contexts<db::PolygonWithProperties
 template class DB_PUBLIC local_processor_cell_contexts<db::PolygonWithProperties, db::PolygonWithProperties, db::EdgeWithProperties>;
 template class DB_PUBLIC local_processor_cell_contexts<db::PolygonWithProperties, db::PolygonWithProperties, db::EdgePairWithProperties>;
 template class DB_PUBLIC local_processor_cell_contexts<db::PolygonWithProperties, db::PolygonWithProperties, db::EdgePair>;
+template class DB_PUBLIC local_processor_cell_contexts<db::PolygonWithProperties, db::EdgeWithProperties, db::PolygonWithProperties>;
+template class DB_PUBLIC local_processor_cell_contexts<db::PolygonWithProperties, db::EdgeWithProperties, db::EdgeWithProperties>;
 template class DB_PUBLIC local_processor_cell_contexts<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC local_processor_cell_contexts<db::PolygonRef, db::Edge, db::PolygonRef>;
 template class DB_PUBLIC local_processor_cell_contexts<db::PolygonRef, db::PolygonRef, db::EdgePair>;

@@ -40,9 +40,21 @@ static inline const db::Polygon *push_polygon_to_heap (db::Layout *, const db::P
   return &p;
 }
 
+static inline const db::PolygonWithProperties *push_polygon_to_heap (db::Layout *, const db::PolygonWithProperties &p, std::list<db::PolygonWithProperties> &)
+{
+  return &p;
+}
+
 static inline const db::PolygonRef *push_polygon_to_heap (db::Layout *layout, const db::PolygonRef &p, std::list<db::PolygonRef> &heap)
 {
   db::PolygonRef ref = db::PolygonRef (p, layout->shape_repository ());
+  heap.push_back (ref);
+  return &heap.back ();
+}
+
+static inline const db::PolygonRefWithProperties *push_polygon_to_heap (db::Layout *layout, const db::PolygonRefWithProperties &p, std::list<db::PolygonRefWithProperties> &heap)
+{
+  db::PolygonRefWithProperties ref = db::PolygonRefWithProperties (db::PolygonRef (p, layout->shape_repository ()), p.properties_id ());
   heap.push_back (ref);
   return &heap.back ();
 }
@@ -758,6 +770,8 @@ check_local_operation<TS, TI>::description () const
 //  explicit instantiations
 template class DB_PUBLIC check_local_operation<db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC check_local_operation<db::Polygon, db::Polygon>;
+template class DB_PUBLIC check_local_operation<db::PolygonRefWithProperties, db::PolygonRefWithProperties>;
+template class DB_PUBLIC check_local_operation<db::PolygonWithProperties, db::PolygonWithProperties>;
 
 // ---------------------------------------------------------------------------------------------------------------
 
@@ -831,6 +845,8 @@ check_local_operation_with_properties<TS, TI>::description () const
 //  explicit instantiations
 template class DB_PUBLIC check_local_operation_with_properties<db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC check_local_operation_with_properties<db::Polygon, db::Polygon>;
+template class DB_PUBLIC check_local_operation_with_properties<db::PolygonRefWithProperties, db::PolygonRefWithProperties>;
+template class DB_PUBLIC check_local_operation_with_properties<db::PolygonWithProperties, db::PolygonWithProperties>;
 
 // ---------------------------------------------------------------------------------------------------------------
 
@@ -1032,6 +1048,8 @@ std::string interacting_local_operation<TS, TI, TR>::description () const
 //  explicit instantiations
 template class DB_PUBLIC interacting_local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC interacting_local_operation<db::Polygon, db::Polygon, db::Polygon>;
+template class DB_PUBLIC interacting_local_operation<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties>;
+template class DB_PUBLIC interacting_local_operation<db::PolygonWithProperties, db::PolygonWithProperties, db::PolygonWithProperties>;
 
 // ---------------------------------------------------------------------------------------------------------------
 
@@ -1107,6 +1125,9 @@ std::string contained_local_operation<TS, TI, TR>::description () const
 template class DB_PUBLIC contained_local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC contained_local_operation<db::Polygon, db::Polygon, db::Polygon>;
 template class DB_PUBLIC contained_local_operation<db::Edge, db::Edge, db::Edge>;
+template class DB_PUBLIC contained_local_operation<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties>;
+template class DB_PUBLIC contained_local_operation<db::PolygonWithProperties, db::PolygonWithProperties, db::PolygonWithProperties>;
+template class DB_PUBLIC contained_local_operation<db::EdgeWithProperties, db::EdgeWithProperties, db::EdgeWithProperties>;
 
 // ---------------------------------------------------------------------------------------------------------------
 
@@ -1186,6 +1207,8 @@ std::string pull_local_operation<TS, TI, TR>::description () const
 
 template class DB_PUBLIC pull_local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC pull_local_operation<db::Polygon, db::Polygon, db::Polygon>;
+template class DB_PUBLIC pull_local_operation<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties>;
+template class DB_PUBLIC pull_local_operation<db::PolygonWithProperties, db::PolygonWithProperties, db::PolygonWithProperties>;
 
 // ---------------------------------------------------------------------------------------------------------------
 
@@ -1244,7 +1267,7 @@ void interacting_with_edge_local_operation<TS, TI, TR>::do_compute_local (db::La
       }
     }
 
-    merge_scanner.process (cluster_collector, 1, db::box_convert<db::Edge> ());
+    merge_scanner.process (cluster_collector, 1, db::box_convert<TI> ());
 
     for (typename std::unordered_set<TI>::const_iterator e = merged_heap.begin (); e != merged_heap.end (); ++e) {
       scanner.insert2 (e.operator-> (), 0);
@@ -1314,6 +1337,8 @@ std::string interacting_with_edge_local_operation<TS, TI, TR>::description () co
 
 template class DB_PUBLIC interacting_with_edge_local_operation<db::PolygonRef, db::Edge, db::PolygonRef>;
 template class DB_PUBLIC interacting_with_edge_local_operation<db::Polygon, db::Edge, db::Polygon>;
+template class DB_PUBLIC interacting_with_edge_local_operation<db::PolygonRefWithProperties, db::EdgeWithProperties, db::PolygonRefWithProperties>;
+template class DB_PUBLIC interacting_with_edge_local_operation<db::PolygonWithProperties, db::EdgeWithProperties, db::PolygonWithProperties>;
 
 // ---------------------------------------------------------------------------------------------------------------
 
@@ -1375,6 +1400,8 @@ std::string pull_with_edge_local_operation<TS, TI, TR>::description () const
 
 template class DB_PUBLIC pull_with_edge_local_operation<db::PolygonRef, db::Edge, db::Edge>;
 template class DB_PUBLIC pull_with_edge_local_operation<db::Polygon, db::Edge, db::Edge>;
+template class DB_PUBLIC pull_with_edge_local_operation<db::PolygonRefWithProperties, db::EdgeWithProperties, db::EdgeWithProperties>;
+template class DB_PUBLIC pull_with_edge_local_operation<db::PolygonWithProperties, db::EdgeWithProperties, db::EdgeWithProperties>;
 
 // ---------------------------------------------------------------------------------------------------------------
 
@@ -1442,6 +1469,8 @@ std::string pull_with_text_local_operation<TS, TI, TR>::description () const
 
 template class DB_PUBLIC pull_with_text_local_operation<db::PolygonRef, db::TextRef, db::TextRef>;
 template class DB_PUBLIC pull_with_text_local_operation<db::Polygon, db::Text, db::Text>;
+template class DB_PUBLIC pull_with_text_local_operation<db::PolygonRefWithProperties, db::TextRefWithProperties, db::TextRefWithProperties>;
+template class DB_PUBLIC pull_with_text_local_operation<db::PolygonWithProperties, db::TextWithProperties, db::TextWithProperties>;
 
 // ---------------------------------------------------------------------------------------------------------------
 
@@ -1546,6 +1575,8 @@ std::string interacting_with_text_local_operation<TS, TI, TR>::description () co
 //  explicit instantiations
 template class DB_PUBLIC interacting_with_text_local_operation<db::PolygonRef, db::TextRef, db::PolygonRef>;
 template class DB_PUBLIC interacting_with_text_local_operation<db::Polygon, db::Text, db::Polygon>;
+template class DB_PUBLIC interacting_with_text_local_operation<db::PolygonRefWithProperties, db::TextRefWithProperties, db::PolygonRefWithProperties>;
+template class DB_PUBLIC interacting_with_text_local_operation<db::PolygonWithProperties, db::TextWithProperties, db::PolygonWithProperties>;
 
 // ---------------------------------------------------------------------------------------------
 //  BoolAndOrNotLocalOperation implementation
@@ -1631,6 +1662,8 @@ bool_and_or_not_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layou
 
 template class DB_PUBLIC bool_and_or_not_local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC bool_and_or_not_local_operation<db::Polygon, db::Polygon, db::Polygon>;
+template class DB_PUBLIC bool_and_or_not_local_operation<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties>;
+template class DB_PUBLIC bool_and_or_not_local_operation<db::PolygonWithProperties, db::PolygonWithProperties, db::PolygonWithProperties>;
 
 // ---------------------------------------------------------------------------------------------
 //  BoolAndOrNotLocalOperationWithProperties implementation

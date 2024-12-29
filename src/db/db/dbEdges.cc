@@ -218,6 +218,11 @@ template DB_PUBLIC void Edges::insert (const db::SimplePolygon &);
 template DB_PUBLIC void Edges::insert (const db::Polygon &);
 template DB_PUBLIC void Edges::insert (const db::Path &);
 template DB_PUBLIC void Edges::insert (const db::Edge &);
+template DB_PUBLIC void Edges::insert (const db::BoxWithProperties &);
+template DB_PUBLIC void Edges::insert (const db::SimplePolygonWithProperties &);
+template DB_PUBLIC void Edges::insert (const db::PolygonWithProperties &);
+template DB_PUBLIC void Edges::insert (const db::PathWithProperties &);
+template DB_PUBLIC void Edges::insert (const db::EdgeWithProperties &);
 
 void Edges::insert (const db::Shape &shape)
 {

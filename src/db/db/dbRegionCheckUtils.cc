@@ -525,6 +525,8 @@ poly2poly_check<PolygonType>::process ()
 //  explicit instantiations
 template class poly2poly_check<db::Polygon>;
 template class poly2poly_check<db::PolygonRef>;
+template class poly2poly_check<db::PolygonWithProperties>;
+template class poly2poly_check<db::PolygonRefWithProperties>;
 
 // -------------------------------------------------------------------------------------
 //  RegionToEdgeInteractionFilterBase implementation
@@ -593,6 +595,10 @@ template class region_to_edge_interaction_filter_base<db::Polygon, db::Edge, db:
 template class region_to_edge_interaction_filter_base<db::PolygonRef, db::Edge, db::PolygonRef>;
 template class region_to_edge_interaction_filter_base<db::Polygon, db::Edge, db::Edge>;
 template class region_to_edge_interaction_filter_base<db::PolygonRef, db::Edge, db::Edge>;
+template class region_to_edge_interaction_filter_base<db::PolygonWithProperties, db::EdgeWithProperties, db::PolygonWithProperties>;
+template class region_to_edge_interaction_filter_base<db::PolygonRefWithProperties, db::EdgeWithProperties, db::PolygonRefWithProperties>;
+template class region_to_edge_interaction_filter_base<db::PolygonWithProperties, db::EdgeWithProperties, db::EdgeWithProperties>;
+template class region_to_edge_interaction_filter_base<db::PolygonRefWithProperties, db::EdgeWithProperties, db::EdgeWithProperties>;
 
 // -------------------------------------------------------------------------------------
 //  RegionToTextInteractionFilterBase implementation
@@ -652,5 +658,10 @@ template class region_to_text_interaction_filter_base<db::Polygon, db::Text, db:
 template class region_to_text_interaction_filter_base<db::Polygon, db::Text, db::Text>;
 template class region_to_text_interaction_filter_base<db::Polygon, db::TextRef, db::TextRef>;
 template class region_to_text_interaction_filter_base<db::PolygonRef, db::TextRef, db::TextRef>;
+template class region_to_text_interaction_filter_base<db::PolygonRefWithProperties, db::TextRefWithProperties, db::PolygonRefWithProperties>;
+template class region_to_text_interaction_filter_base<db::PolygonWithProperties, db::TextWithProperties, db::PolygonWithProperties>;
+template class region_to_text_interaction_filter_base<db::PolygonWithProperties, db::TextWithProperties, db::TextWithProperties>;
+template class region_to_text_interaction_filter_base<db::PolygonWithProperties, db::TextRefWithProperties, db::TextRefWithProperties>;
+template class region_to_text_interaction_filter_base<db::PolygonRefWithProperties, db::TextRefWithProperties, db::TextRefWithProperties>;
 
 }

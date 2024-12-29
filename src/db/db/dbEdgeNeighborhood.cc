@@ -217,13 +217,20 @@ private:
     db::SimplePolygon per_edge_clip_box (db::Box (xmin, -m_din - 1, xmax, m_dout + 1));
 
     //  compute the merged neighbors
+    //  NOTE: we first separate by layer and properties ID before we merge. Hence
+    //  shapes with different properties IDs are kept separate.
+
     std::map<unsigned int, std::vector<db::PolygonWithProperties> > merged_neighbors;
 
-    db::EdgeProcessor ep;
+    std::map<std::pair<unsigned int, db::properties_id_type>, std::vector<const db::Polygon *> > neighbors_by_prop_ids;
     for (auto n = neighbors.begin (); n != neighbors.end (); ++n) {
+      for (auto p = n->second.begin (); p != n->second.end (); ++p) {
+        neighbors_by_prop_ids [std::make_pair (n->first, (*p)->properties_id ())].push_back (*p);
+      }
+    }
 
-      //  @@@ TODO: separate by properties ID and feed individually ...
-      db::properties_id_type prop_id = 0;
+    db::EdgeProcessor ep;
+    for (auto n = neighbors_by_prop_ids.begin (); n != neighbors_by_prop_ids.end (); ++n) {
 
       ep.clear ();
 
@@ -238,7 +245,7 @@ private:
       ep.insert (per_edge_clip_box, size_t (1));
 
       db::BooleanOp and_op (db::BooleanOp::And);
-      db::PolygonContainerWithProperties pc (merged_neighbors [n->first], prop_id);
+      db::PolygonContainerWithProperties pc (merged_neighbors [n->first.first], n->first.second);
       db::PolygonGenerator pg (pc, false);
       ep.process (pg, and_op);
 

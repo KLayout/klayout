@@ -89,6 +89,8 @@ template class DB_PUBLIC local_operation<db::PolygonWithProperties, db::PolygonW
 template class DB_PUBLIC local_operation<db::PolygonWithProperties, db::PolygonWithProperties, db::EdgeWithProperties>;
 template class DB_PUBLIC local_operation<db::PolygonWithProperties, db::PolygonWithProperties, db::EdgePairWithProperties>;
 template class DB_PUBLIC local_operation<db::PolygonWithProperties, db::PolygonWithProperties, db::EdgePair>;
+template class DB_PUBLIC local_operation<db::PolygonWithProperties, db::EdgeWithProperties, db::EdgeWithProperties>;
+template class DB_PUBLIC local_operation<db::PolygonWithProperties, db::EdgeWithProperties, db::PolygonWithProperties>;
 template class DB_PUBLIC local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC local_operation<db::PolygonRef, db::Text, db::PolygonRef>;
 template class DB_PUBLIC local_operation<db::PolygonRef, db::TextRef, db::PolygonRef>;

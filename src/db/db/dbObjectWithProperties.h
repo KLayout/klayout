@@ -80,6 +80,16 @@ public:
   }
 
   /**
+   *  @brief Create myself from a object
+   *  The properties ID is initialized with zero (= no properties)
+   */
+  object_with_properties (const Obj &obj)
+    : Obj (obj), m_id (0)
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
    *  @brief Create myself from a object and an id
    */
   object_with_properties (const Obj &obj, properties_id_type id)

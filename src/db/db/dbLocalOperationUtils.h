@@ -98,6 +98,34 @@ private:
 };
 
 template <>
+class DB_PUBLIC polygon_ref_generator<db::PolygonRefWithProperties>
+  : public PolygonSink
+{
+public:
+  /**
+   *  @brief Constructor
+   */
+  polygon_ref_generator (db::Layout *layout, std::unordered_set<db::PolygonRefWithProperties> &polyrefs)
+    : PolygonSink (), mp_layout (layout), mp_polyrefs (&polyrefs)
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief Implementation of the PolygonSink interface
+   */
+  void put (const db::Polygon &polygon)
+  {
+    tl::MutexLocker locker (&mp_layout->lock ());
+    mp_polyrefs->insert (db::PolygonRefWithProperties (db::PolygonRef (polygon, mp_layout->shape_repository ()), db::properties_id_type (0)));
+  }
+
+private:
+  db::Layout *mp_layout;
+  std::unordered_set<db::PolygonRefWithProperties> *mp_polyrefs;
+};
+
+template <>
 class DB_PUBLIC polygon_ref_generator<db::Polygon>
   : public PolygonSink
 {
@@ -121,6 +149,32 @@ public:
 
 private:
   std::unordered_set<db::Polygon> *mp_polygons;
+};
+
+template <>
+class DB_PUBLIC polygon_ref_generator<db::PolygonWithProperties>
+  : public PolygonSink
+{
+public:
+  /**
+   *  @brief Constructor
+   */
+  polygon_ref_generator (db::Layout *, std::unordered_set<db::PolygonWithProperties> &polygons)
+    : mp_polygons (&polygons)
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief Implementation of the PolygonSink interface
+   */
+  virtual void put (const db::Polygon &polygon)
+  {
+    mp_polygons->insert (db::PolygonWithProperties (polygon, db::properties_id_type (0)));
+  }
+
+private:
+  std::unordered_set<db::PolygonWithProperties> *mp_polygons;
 };
 
 typedef polygon_ref_generator<db::PolygonRef> PolygonRefGenerator;

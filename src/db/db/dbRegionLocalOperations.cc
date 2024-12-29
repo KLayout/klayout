@@ -845,8 +845,6 @@ check_local_operation_with_properties<TS, TI>::description () const
 //  explicit instantiations
 template class DB_PUBLIC check_local_operation_with_properties<db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC check_local_operation_with_properties<db::Polygon, db::Polygon>;
-template class DB_PUBLIC check_local_operation_with_properties<db::PolygonRefWithProperties, db::PolygonRefWithProperties>;
-template class DB_PUBLIC check_local_operation_with_properties<db::PolygonWithProperties, db::PolygonWithProperties>;
 
 // ---------------------------------------------------------------------------------------------------------------
 

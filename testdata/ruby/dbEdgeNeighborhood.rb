@@ -93,10 +93,13 @@ class DBEdgeNeighborhood_TestClass < TestBase
     l1 = ly.layer(1, 0)
     cell = ly.create_cell("TOP")
 
-    cell.shapes(l1).insert(RBA::Box::new(0, 0, 1000, 1000))
+    pid1 = RBA::Layout::properties_id({ 1 => "one" })
+
+    cell.shapes(l1).insert(RBA::Box::new(0, 0, 1000, 1000), pid1)
     cell.shapes(l1).insert(RBA::Box::new(-1100, 0, -100, 1000))
 
     prim = RBA::Region::new(cell.begin_shapes_rec(l1))
+    prim.enable_properties
 
     visitor = MyVisitor::new
 
@@ -116,19 +119,19 @@ class DBEdgeNeighborhood_TestClass < TestBase
     res = prim.complex_op(node)
 
     assert_equal(visitor.log, 
-      "Polygon: (-1100,0;-1100,1000;-100,1000;-100,0)\n" +
-      "edge = (-1100,0;-1100,1000)\n" +
-      "edge = (-1100,1000;-100,1000)\n" +
-      "edge = (-100,1000;-100,0)\n" +
-      "  0.0,1000.0 -> 0: (0,100;0,101;1000,101;1000,100)\n" +
-      "edge = (-100,0;-1100,0)\n" +
+      "Polygon: (-1100,0;-1100,1000;-100,1000;-100,0) props={}\n" +
+      "edge = (-1100,0;-1100,1000) props={}\n" +
+      "edge = (-1100,1000;-100,1000) props={}\n" +
+      "edge = (-100,1000;-100,0) props={}\n" +
+      "  0.0,1000.0 -> 0: (0,100;0,101;1000,101;1000,100) props={1=>one}\n" +
+      "edge = (-100,0;-1100,0) props={}\n" +
       "/Polygon\n" +
-      "Polygon: (0,0;0,1000;1000,1000;1000,0)\n" +
-      "edge = (0,0;0,1000)\n" +
-      "  0.0,1000.0 -> 0: (0,100;0,101;1000,101;1000,100)\n" +
-      "edge = (0,1000;1000,1000)\n" +
-      "edge = (1000,1000;1000,0)\n" +
-      "edge = (1000,0;0,0)\n" +
+      "Polygon: (0,0;0,1000;1000,1000;1000,0) props={1=>one}\n" +
+      "edge = (0,0;0,1000) props={1=>one}\n" +
+      "  0.0,1000.0 -> 0: (0,100;0,101;1000,101;1000,100) props={}\n" +
+      "edge = (0,1000;1000,1000) props={1=>one}\n" +
+      "edge = (1000,1000;1000,0) props={1=>one}\n" +
+      "edge = (1000,0;0,0) props={1=>one}\n" +
       "/Polygon\n"
     )
 

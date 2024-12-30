@@ -385,14 +385,14 @@ Class<db::Path> decl_Path ("db", "Path",
   "database objects."
 );
 
-static db::PathWithProperties *new_path_with_properties (const db::Path &poly, db::properties_id_type pid)
+static db::PathWithProperties *new_path_with_properties (const db::Path &path, db::properties_id_type pid)
 {
-  return new db::PathWithProperties (poly, pid);
+  return new db::PathWithProperties (path, pid);
 }
 
 Class<db::PathWithProperties> decl_PathWithProperties (decl_Path, "db", "PathWithProperties",
   gsi::properties_support_methods<db::PathWithProperties> () +
-  constructor ("new", &new_path_with_properties, gsi::arg ("polygon"), gsi::arg ("properties_id"),
+  constructor ("new", &new_path_with_properties, gsi::arg ("path"), gsi::arg ("properties_id", db::properties_id_type (0)),
     "@brief Creates a new object from a property-less object and a properties ID."
   )
   ,
@@ -472,14 +472,14 @@ Class<db::DPath> decl_DPath ("db", "DPath",
   "database objects."
 );
 
-static db::DPathWithProperties *new_dpath_with_properties (const db::DPath &poly, db::properties_id_type pid)
+static db::DPathWithProperties *new_dpath_with_properties (const db::DPath &path, db::properties_id_type pid)
 {
-  return new db::DPathWithProperties (poly, pid);
+  return new db::DPathWithProperties (path, pid);
 }
 
 Class<db::DPathWithProperties> decl_DPathWithProperties (decl_DPath, "db", "DPathWithProperties",
   gsi::properties_support_methods<db::DPathWithProperties> () +
-  constructor ("new", &new_dpath_with_properties, gsi::arg ("polygon"), gsi::arg ("properties_id"),
+  constructor ("new", &new_dpath_with_properties, gsi::arg ("path"), gsi::arg ("properties_id", db::properties_id_type (0)),
     "@brief Creates a new object from a property-less object and a properties ID."
   )
   ,

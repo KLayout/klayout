@@ -591,14 +591,14 @@ Class<db::Box> decl_Box ("db", "Box",
   "database objects."
 );
 
-static db::BoxWithProperties *new_box_with_properties (const db::Box &poly, db::properties_id_type pid)
+static db::BoxWithProperties *new_box_with_properties (const db::Box &box, db::properties_id_type pid)
 {
-  return new db::BoxWithProperties (poly, pid);
+  return new db::BoxWithProperties (box, pid);
 }
 
 Class<db::BoxWithProperties> decl_BoxWithProperties (decl_Box, "db", "BoxWithProperties",
   gsi::properties_support_methods<db::BoxWithProperties> () +
-  constructor ("new", &new_box_with_properties, gsi::arg ("polygon"), gsi::arg ("properties_id"),
+  constructor ("new", &new_box_with_properties, gsi::arg ("box"), gsi::arg ("properties_id", db::properties_id_type (0)),
     "@brief Creates a new object from a property-less object and a properties ID."
   )
   ,
@@ -665,14 +665,14 @@ Class<db::DBox> decl_DBox ("db", "DBox",
   "database objects."
 );
 
-static db::DBoxWithProperties *new_dbox_with_properties (const db::DBox &poly, db::properties_id_type pid)
+static db::DBoxWithProperties *new_dbox_with_properties (const db::DBox &box, db::properties_id_type pid)
 {
-  return new db::DBoxWithProperties (poly, pid);
+  return new db::DBoxWithProperties (box, pid);
 }
 
 Class<db::DBoxWithProperties> decl_DBoxWithProperties (decl_DBox, "db", "DBoxWithProperties",
   gsi::properties_support_methods<db::DBoxWithProperties> () +
-  constructor ("new", &new_dbox_with_properties, gsi::arg ("polygon"), gsi::arg ("properties_id"),
+  constructor ("new", &new_dbox_with_properties, gsi::arg ("box"), gsi::arg ("properties_id", db::properties_id_type (0)),
     "@brief Creates a new object from a property-less object and a properties ID."
   )
   ,

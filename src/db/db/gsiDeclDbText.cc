@@ -449,14 +449,14 @@ Class<db::Text> decl_Text ("db", "Text",
   "database objects."
 );
 
-static db::TextWithProperties *new_text_with_properties (const db::Text &poly, db::properties_id_type pid)
+static db::TextWithProperties *new_text_with_properties (const db::Text &text, db::properties_id_type pid)
 {
-  return new db::TextWithProperties (poly, pid);
+  return new db::TextWithProperties (text, pid);
 }
 
 Class<db::TextWithProperties> decl_TextWithProperties (decl_Text, "db", "TextWithProperties",
   gsi::properties_support_methods<db::TextWithProperties> () +
-  constructor ("new", &new_text_with_properties, gsi::arg ("polygon"), gsi::arg ("properties_id"),
+  constructor ("new", &new_text_with_properties, gsi::arg ("text"), gsi::arg ("properties_id", db::properties_id_type (0)),
     "@brief Creates a new object from a property-less object and a properties ID."
   )
   ,
@@ -517,14 +517,14 @@ Class<db::DText> decl_DText ("db", "DText",
   "database objects."
 );
 
-static db::DTextWithProperties *new_dtext_with_properties (const db::DText &poly, db::properties_id_type pid)
+static db::DTextWithProperties *new_dtext_with_properties (const db::DText &text, db::properties_id_type pid)
 {
-  return new db::DTextWithProperties (poly, pid);
+  return new db::DTextWithProperties (text, pid);
 }
 
 Class<db::DTextWithProperties> decl_DTextWithProperties (decl_DText, "db", "DTextWithProperties",
   gsi::properties_support_methods<db::DTextWithProperties> () +
-  constructor ("new", &new_dtext_with_properties, gsi::arg ("polygon"), gsi::arg ("properties_id"),
+  constructor ("new", &new_dtext_with_properties, gsi::arg ("text"), gsi::arg ("properties_id", db::properties_id_type (0)),
     "@brief Creates a new object from a property-less object and a properties ID."
   )
   ,

@@ -22,6 +22,7 @@
 
 
 #include "gsiDecl.h"
+#include "gsiDeclDbPropertiesSupport.h"
 #include "dbPoint.h"
 #include "dbEdge.h"
 #include "dbHash.h"
@@ -694,6 +695,25 @@ Class<db::Edge> decl_Edge ("db", "Edge",
   "database objects like the Edge class."
 );
 
+static db::EdgeWithProperties *new_edge_with_properties (const db::Edge &edge, db::properties_id_type pid)
+{
+  return new db::EdgeWithProperties (edge, pid);
+}
+
+Class<db::EdgeWithProperties> decl_EdgeWithProperties (decl_Edge, "db", "EdgeWithProperties",
+  gsi::properties_support_methods<db::EdgeWithProperties> () +
+  constructor ("new", &new_edge_with_properties, gsi::arg ("edge"), gsi::arg ("properties_id", db::properties_id_type (0)),
+    "@brief Creates a new object from a property-less object and a properties ID."
+  )
+  ,
+  "@brief A Edge object with properties attached.\n"
+  "This class represents a combination of a Edge object an user properties. User properties are "
+  "stored in form of a properties ID. Convenience methods are provided to manipulate or retrieve "
+  "user properties directly.\n"
+  "\n"
+  "This class has been introduced in version 0.30."
+);
+
 static db::DEdge *dedge_from_iedge (const db::Edge &e)
 {
   return new db::DEdge (e);
@@ -738,6 +758,25 @@ Class<db::DEdge> decl_DEdge ("db", "DEdge",
   "\n"
   "See @<a href=\"/programming/database_api.xml\">The Database API@</a> for more details about the "
   "database objects like the Edge class."
+);
+
+static db::DEdgeWithProperties *new_dedge_with_properties (const db::DEdge &edge, db::properties_id_type pid)
+{
+  return new db::DEdgeWithProperties (edge, pid);
+}
+
+Class<db::DEdgeWithProperties> decl_DEdgeWithProperties (decl_DEdge, "db", "DEdgeWithProperties",
+  gsi::properties_support_methods<db::DEdgeWithProperties> () +
+  constructor ("new", &new_dedge_with_properties, gsi::arg ("edge"), gsi::arg ("properties_id", db::properties_id_type (0)),
+    "@brief Creates a new object from a property-less object and a properties ID."
+  )
+  ,
+  "@brief A DEdge object with properties attached.\n"
+  "This class represents a combination of a DEdge object an user properties. User properties are "
+  "stored in form of a properties ID. Convenience methods are provided to manipulate or retrieve "
+  "user properties directly.\n"
+  "\n"
+  "This class has been introduced in version 0.30."
 );
 
 }

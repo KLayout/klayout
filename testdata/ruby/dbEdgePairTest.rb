@@ -246,6 +246,38 @@ class DBEdgePair_TestClass < TestBase
 
   end
 
+  def test_edgePairWithProperties
+
+    s = RBA::EdgePairWithProperties::new
+    assert_equal(s.to_s, "(0,0;0,0)/(0,0;0,0) props={}")
+
+    pid = RBA::Layout::properties_id({ 1 => "one" })
+    s = RBA::EdgePairWithProperties::new(RBA::EdgePair::new(RBA::Edge::new(0, 0, 100, 200), RBA::Edge::new(10, 10, 110, 210)), pid)
+    assert_equal(s.to_s, "(0,0;100,200)/(10,10;110,210) props={1=>one}")
+    assert_equal(s.property(1), "one")
+    assert_equal(s.properties, { 1 => "one" })
+    s.set_property(1, "xxx")
+    assert_equal(s.to_s, "(0,0;100,200)/(10,10;110,210) props={1=>xxx}")
+    s.delete_property(1)
+    assert_equal(s.to_s, "(0,0;100,200)/(10,10;110,210) props={}")
+    assert_equal(s.property(1), nil)
+
+    s = RBA::DEdgePairWithProperties::new
+    assert_equal(s.to_s, "(0,0;0,0)/(0,0;0,0) props={}")
+
+    pid = RBA::Layout::properties_id({ 1 => "one" })
+    s = RBA::DEdgePairWithProperties::new(RBA::DEdgePair::new(RBA::DEdge::new(0, 0, 100, 200), RBA::DEdge::new(10, 10, 110, 210)), pid)
+    assert_equal(s.to_s, "(0,0;100,200)/(10,10;110,210) props={1=>one}")
+    assert_equal(s.property(1), "one")
+    assert_equal(s.properties, { 1 => "one" })
+    s.set_property(1, "xxx")
+    assert_equal(s.to_s, "(0,0;100,200)/(10,10;110,210) props={1=>xxx}")
+    s.delete_property(1)
+    assert_equal(s.to_s, "(0,0;100,200)/(10,10;110,210) props={}")
+    assert_equal(s.property(1), nil)
+
+  end
+
 end
 
 load("test_epilogue.rb")

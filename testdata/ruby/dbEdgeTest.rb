@@ -333,6 +333,38 @@ class DBEdge_TestClass < TestBase
 
   end
 
+  def test_edgeWithProperties
+
+    s = RBA::EdgeWithProperties::new
+    assert_equal(s.to_s, "(0,0;0,0) props={}")
+
+    pid = RBA::Layout::properties_id({ 1 => "one" })
+    s = RBA::EdgeWithProperties::new(RBA::Edge::new(0, 0, 100, 200), pid)
+    assert_equal(s.to_s, "(0,0;100,200) props={1=>one}")
+    assert_equal(s.property(1), "one")
+    assert_equal(s.properties, { 1 => "one" })
+    s.set_property(1, "xxx")
+    assert_equal(s.to_s, "(0,0;100,200) props={1=>xxx}")
+    s.delete_property(1)
+    assert_equal(s.to_s, "(0,0;100,200) props={}")
+    assert_equal(s.property(1), nil)
+
+    s = RBA::DEdgeWithProperties::new
+    assert_equal(s.to_s, "(0,0;0,0) props={}")
+
+    pid = RBA::Layout::properties_id({ 1 => "one" })
+    s = RBA::DEdgeWithProperties::new(RBA::DEdge::new(0, 0, 100, 200), pid)
+    assert_equal(s.to_s, "(0,0;100,200) props={1=>one}")
+    assert_equal(s.property(1), "one")
+    assert_equal(s.properties, { 1 => "one" })
+    s.set_property(1, "xxx")
+    assert_equal(s.to_s, "(0,0;100,200) props={1=>xxx}")
+    s.delete_property(1)
+    assert_equal(s.to_s, "(0,0;100,200) props={}")
+    assert_equal(s.property(1), nil)
+
+  end
+
 end
 
 load("test_epilogue.rb")

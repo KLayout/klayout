@@ -386,7 +386,7 @@ SinglePolygonCheck::process (const db::PolygonWithProperties &polygon, std::vect
   } while (edge_check.prepare_next_pass ());
 
   for (auto ep = result.begin (); ep != result.end (); ++ep) {
-    res.push_back (db::EdgePairWithProperties (*ep, polygon.properties_id ()));
+    res.push_back (db::EdgePairWithProperties (*ep, pc_skip (m_options.prop_constraint) ? 0 : polygon.properties_id ()));
   }
 }
 

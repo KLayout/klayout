@@ -1155,6 +1155,8 @@ CODE
           values.push(v)
         elsif a.is_a?(DRCSizingMode)
           mode = a.value
+        else
+          raise("sized: Argument ##{ia+1} needs to be a numerical value or a sizing mode")
         end
       end
       

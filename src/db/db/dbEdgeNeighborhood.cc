@@ -190,6 +190,20 @@ private:
   const db::Cell *mp_cell;
   db::Coord m_bext, m_eext, m_din, m_dout;
 
+  /**
+   *  @brief A compare function that compares a pair of layer and properties ID using the properties values
+   */
+  struct CompareLayerAndPropertiesId
+  {
+    bool operator() (const std::pair<unsigned int, db::properties_id_type> &a, const std::pair<unsigned int, db::properties_id_type> &b) const
+    {
+      if (a.first != b.first) {
+        return a.first < b.first;
+      }
+      return db::properties_id_less (a.second, b.second);
+    }
+  };
+
   void enter_edge (const db::EdgeWithProperties *o1, const unsigned int &p1)
   {
     while (size_t (p1) >= m_edges.size ()) {
@@ -222,7 +236,8 @@ private:
 
     std::map<unsigned int, std::vector<db::PolygonWithProperties> > merged_neighbors;
 
-    std::map<std::pair<unsigned int, db::properties_id_type>, std::vector<const db::Polygon *> > neighbors_by_prop_ids;
+    //  NOTE: using a by-value compare for the properties ID makes the result order predictable
+    std::map<std::pair<unsigned int, db::properties_id_type>, std::vector<const db::Polygon *>, CompareLayerAndPropertiesId> neighbors_by_prop_ids;
     for (auto n = neighbors.begin (); n != neighbors.end (); ++n) {
       for (auto p = n->second.begin (); p != n->second.end (); ++p) {
         neighbors_by_prop_ids [std::make_pair (n->first, (*p)->properties_id ())].push_back (*p);

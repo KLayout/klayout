@@ -202,7 +202,7 @@ get_parameters_from_pcell_and_guiding_shapes (db::Layout *layout, db::cell_index
             parameters_for_pcell [pnm->second] = tl::Variant (dbu_trans * sh->point ());
           } else if (sh->is_polygon ()) {
             //  Hint: we don't compress since we don't want to loose information
-            parameters_for_pcell [pnm->second] = tl::Variant (sh->polygon ().transformed (dbu_trans, false));
+            parameters_for_pcell [pnm->second] = tl::Variant (sh->polygon ().transformed_ext (dbu_trans, false));
           } else if (sh->is_path ()) {
             parameters_for_pcell [pnm->second] = tl::Variant (dbu_trans * sh->path ());
           }
@@ -253,7 +253,7 @@ get_parameters_from_pcell_and_guiding_shapes (db::Layout *layout, db::cell_index
 
         db::complex_trans<db::DCoord, db::Coord> dbu_trans (1.0 / layout->dbu ());
         //  Hint: we don't compress the polygon since we don't want to loose information
-        db::Polygon poly = org_parameters[i].to_user<db::DPolygon> ().transformed (dbu_trans, false);
+        db::Polygon poly = org_parameters[i].to_user<db::DPolygon> ().transformed_ext (dbu_trans, false);
         guiding_shapes.insert (db::PolygonWithProperties (poly, db::properties_id (props)));
 
       } else if (org_parameters[i].is_user<db::DPath> ()) {

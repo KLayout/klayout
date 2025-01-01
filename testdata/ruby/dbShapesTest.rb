@@ -1685,6 +1685,49 @@ class DBShapes_TestClass < TestBase
 
   end
 
+  # Shape objects with properties
+  
+  def test_14
+
+    ly = RBA::Layout::new
+    l1 = ly.layer(1, 0)
+    tc = ly.create_cell("TOP")
+    shapes = tc.shapes(l1)
+
+    ps1 = RBA::Layout::properties_id({ 1 => "one" })
+
+    sh = shapes.insert(RBA::BoxWithProperties::new(RBA::Box::new(0, 0, 100, 200), ps1))
+    assert_equal(sh.to_s, "box (0,0;100,200) props={1=>one}")
+
+    sh = shapes.insert(RBA::PolygonWithProperties::new(RBA::Box::new(0, 0, 100, 200), ps1))
+    assert_equal(sh.to_s, "polygon (0,0;0,200;100,200;100,0) props={1=>one}")
+
+    sh = shapes.insert(RBA::SimplePolygonWithProperties::new(RBA::Box::new(0, 0, 100, 200), ps1))
+    assert_equal(sh.to_s, "simple_polygon (0,0;0,200;100,200;100,0) props={1=>one}")
+
+    sh = shapes.insert(RBA::PathWithProperties::new(RBA::Path::new([ [0, 0], [100, 200] ], 100), ps1))
+    assert_equal(sh.to_s, "path (0,0;100,200) w=100 bx=0 ex=0 r=false props={1=>one}")
+
+    sh = shapes.insert(RBA::TextWithProperties::new(RBA::Text::new("text", RBA::Trans::R90), ps1))
+    assert_equal(sh.to_s, "text ('text',r90 0,0) props={1=>one}")
+
+    sh = shapes.insert(RBA::DBoxWithProperties::new(RBA::DBox::new(0, 0, 0.1, 0.2), ps1))
+    assert_equal(sh.to_s, "box (0,0;100,200) props={1=>one}")
+
+    sh = shapes.insert(RBA::DPolygonWithProperties::new(RBA::DBox::new(0, 0, 0.1, 0.2), ps1))
+    assert_equal(sh.to_s, "polygon (0,0;0,200;100,200;100,0) props={1=>one}")
+
+    sh = shapes.insert(RBA::DSimplePolygonWithProperties::new(RBA::DBox::new(0, 0, 0.1, 0.2), ps1))
+    assert_equal(sh.to_s, "simple_polygon (0,0;0,200;100,200;100,0) props={1=>one}")
+
+    sh = shapes.insert(RBA::DPathWithProperties::new(RBA::DPath::new([ [0, 0], [0.1, 0.2] ], 0.1), ps1))
+    assert_equal(sh.to_s, "path (0,0;100,200) w=100 bx=0 ex=0 r=false props={1=>one}")
+
+    sh = shapes.insert(RBA::DTextWithProperties::new(RBA::DText::new("text", RBA::Trans::R90), ps1))
+    assert_equal(sh.to_s, "text ('text',r90 0,0) props={1=>one}")
+
+  end
+
 end
 
 load("test_epilogue.rb")

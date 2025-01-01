@@ -570,7 +570,7 @@ namespace
 
     virtual void put (const IPolygonType &p)
     {
-      PolygonType pp = p.transformed (m_tr, false);
+      PolygonType pp = p.transformed_ext (m_tr, false);
       mp_next->put (pp);
     }
 
@@ -607,7 +607,7 @@ namespace
     rec.set_trans (tr);
     rec.set_next (right_of_line);
 
-    cut_polygon_internal_int (input.transformed (tr.inverted (), false), line.transformed (tr.inverted ()), &rec);
+    cut_polygon_internal_int (input.transformed_ext (tr.inverted (), false), line.transformed (tr.inverted ()), &rec);
   }
 
 }

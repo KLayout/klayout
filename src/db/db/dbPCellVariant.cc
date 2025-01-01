@@ -226,7 +226,7 @@ PCellVariant::update (ImportLayerMapping *layer_mapping)
         } else if (m_parameters[i].is_user<db::DPolygon> ()) {
 
           db::complex_trans<db::DCoord, db::Coord> dbu_trans (1.0 / layout ()->dbu ());
-          db::Polygon poly = m_parameters[i].to_user<db::DPolygon> ().transformed (dbu_trans, false);
+          db::Polygon poly = m_parameters[i].to_user<db::DPolygon> ().transformed_ext (dbu_trans, false);
           //  Hint: we don't compress the polygon since we don't want to loose information
           shapes (layout ()->guiding_shape_layer ()).insert (db::PolygonWithProperties (poly, db::properties_id (props)));
 

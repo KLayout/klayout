@@ -134,7 +134,7 @@ bool NetShape::interacts_with (const db::NetShape &other) const
       //  Polygon vs. polygon
       db::PolygonRef pr_other = other.polygon_ref ();
       db::PolygonRef pr = polygon_ref ();
-      db::Polygon p = pr_other.obj ().transformed (pr.trans ().inverted () * pr_other.trans (), false);
+      db::Polygon p = pr_other.obj ().transformed_ext (pr.trans ().inverted () * pr_other.trans (), false);
       return db::interact_pp (pr.obj (), p);
 
     } else {

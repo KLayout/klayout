@@ -1928,7 +1928,7 @@ public:
    *  @return The transformed polygon.
    */
   template <class Tr>
-  polygon<typename Tr::target_coord_type> transformed (const Tr &t, bool compress = default_compression<typename Tr::target_coord_type> (), bool remove_reflected = false) const
+  polygon<typename Tr::target_coord_type> transformed_ext (const Tr &t, bool compress = default_compression<typename Tr::target_coord_type> (), bool remove_reflected = false) const
   {
     typedef typename Tr::target_coord_type target_coord_type;
     polygon<target_coord_type> poly;
@@ -1940,6 +1940,22 @@ public:
     }
 
     return poly;
+  }
+
+  /**
+   *  @brief Transform the polygon.
+   *
+   *  Transforms the polygon with the given transformation.
+   *  Does not modify the polygon but returns the transformed polygon.
+   *
+   *  @param t The transformation to apply.
+   *
+   *  @return The transformed polygon.
+   */
+  template <class Tr>
+  polygon<typename Tr::target_coord_type> transformed (const Tr &t) const
+  {
+    return this->transformed_ext<Tr> (t);
   }
 
   /**
@@ -2821,7 +2837,7 @@ public:
    *  @return The transformed polygon.
    */
   template <class Tr>
-  simple_polygon<typename Tr::target_coord_type> transformed (const Tr &t, bool compress = default_compression<typename Tr::target_coord_type> (), bool remove_reflected = false) const
+  simple_polygon<typename Tr::target_coord_type> transformed_ext (const Tr &t, bool compress = default_compression<typename Tr::target_coord_type> (), bool remove_reflected = false) const
   {
     typedef typename Tr::target_coord_type target_coord_type;
     simple_polygon<target_coord_type> poly;
@@ -2830,6 +2846,22 @@ public:
     poly.assign_hull (begin_hull (), end_hull (), t, compress, remove_reflected);
 
     return poly;
+  }
+
+  /**
+   *  @brief Transform the polygon.
+   *
+   *  Transforms the polygon with the given transformation.
+   *  Does not modify the polygon but returns the transformed polygon.
+   *
+   *  @param t The transformation to apply.
+   *
+   *  @return The transformed polygon.
+   */
+  template <class Tr>
+  simple_polygon<typename Tr::target_coord_type> transformed (const Tr &t) const
+  {
+    return this->transformed_ext<Tr> (t);
   }
 
   /**

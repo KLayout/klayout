@@ -183,7 +183,7 @@ struct simple_polygon_defs
 
   static C scale (const C *p, double s)
   {
-    return C (p->transformed (icomplex_trans_type (s), false /*don't compress*/));
+    return C (p->transformed_ext (icomplex_trans_type (s), false /*don't compress*/));
   }
 
   static C *transform (C *poly, const simple_trans_type &t)
@@ -194,12 +194,12 @@ struct simple_polygon_defs
 
   static C transformed (const C *poly, const simple_trans_type &t)
   {
-    return poly->transformed (t, false /*don't compress*/);
+    return poly->transformed_ext (t, false /*don't compress*/);
   }
 
   static db::simple_polygon<double> transformed_cplx (const C *poly, const complex_trans_type &t)
   {
-    return poly->transformed (t, false /*don't compress*/);
+    return poly->transformed_ext (t, false /*don't compress*/);
   }
 
 #if defined(HAVE_64BIT_COORD)
@@ -677,7 +677,7 @@ static db::SimplePolygon *transform_icplx_sp (db::SimplePolygon *p, const db::IC
 
 static db::SimplePolygon transformed_icplx_sp (const db::SimplePolygon *p, const db::ICplxTrans &t)
 {
-  return p->transformed (t, false /*no compression*/);
+  return p->transformed_ext (t, false /*no compression*/);
 }
 
 static db::SimplePolygon *spolygon_from_dspolygon (const db::DSimplePolygon &p)
@@ -817,7 +817,7 @@ static db::SimplePolygon dspolygon_to_spolygon (const db::DSimplePolygon *p, dou
 
 static db::SimplePolygon transformed_vplx_sp (const db::DSimplePolygon *p, const db::VCplxTrans &t)
 {
-  return p->transformed (t, false /*no compression*/);
+  return p->transformed_ext (t, false /*no compression*/);
 }
 
 Class<db::DSimplePolygon> decl_DSimplePolygon ("db", "DSimplePolygon",
@@ -1111,7 +1111,7 @@ struct polygon_defs
 
   static C scale (const C *p, double s)
   {
-    return C (p->transformed (icomplex_trans_type (s), false /*no compression*/));
+    return C (p->transformed_ext (icomplex_trans_type (s), false /*no compression*/));
   }
 
   static void compress (C *poly, bool remove_reflected)
@@ -1127,12 +1127,12 @@ struct polygon_defs
 
   static C transformed (const C *poly, const simple_trans_type &t)
   {
-    return poly->transformed (t, false /*no compression*/);
+    return poly->transformed_ext (t, false /*no compression*/);
   }
 
   static db::polygon<double> transformed_cplx (const C *poly, const complex_trans_type &t)
   {
-    return poly->transformed (t, false /*no compression*/);
+    return poly->transformed_ext (t, false /*no compression*/);
   }
 
 #if defined(HAVE_64BIT_COORD)
@@ -1751,7 +1751,7 @@ static db::Polygon *transform_icplx_dp (db::Polygon *p, const db::ICplxTrans &t)
 
 static db::Polygon transformed_icplx_dp (const db::Polygon *p, const db::ICplxTrans &t)
 {
-  return p->transformed (t, false /*don't compress*/);
+  return p->transformed_ext (t, false /*don't compress*/);
 }
 
 static db::Polygon smooth (const db::Polygon *p, db::Coord d, bool keep_hv)
@@ -2096,7 +2096,7 @@ static db::Polygon dpolygon_to_polygon (const db::DPolygon *p, double dbu)
 
 static db::Polygon transformed_vcplx_dp (const db::DPolygon *p, const db::VCplxTrans &t)
 {
-  return p->transformed (t, false /*don't compress*/);
+  return p->transformed_ext (t, false /*don't compress*/);
 }
 
 Class<db::DPolygon> decl_DPolygon ("db", "DPolygon",

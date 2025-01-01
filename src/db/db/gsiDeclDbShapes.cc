@@ -1195,6 +1195,118 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "\n"
     "This variant has been introduced in version 0.25."
   ) +
+  gsi::method_ext ("insert", &insert<db::BoxWithProperties>, gsi::arg ("box"),
+    "@brief Inserts a box with properties into the shapes list\n"
+    "@return A reference to the new shape (a \\Shape object)\n"
+    "The property Id must be obtained from the \\Layout object's property_id method which "
+    "associates a property set with a property Id."
+    "\n"
+    "This variant has been introduced in version 0.30."
+  ) +
+  gsi::method_ext ("insert", &dinsert<db::DBoxWithProperties>, gsi::arg ("box"),
+    "@brief Inserts a micrometer-unit box with properties into the shapes list\n"
+    "@return A reference to the new shape (a \\Shape object)\n"
+    "This method behaves like the \\insert version with a \\BoxWithProperties argument, except that it will "
+    "internally translate the box from micrometer to database units.\n"
+    "\n"
+    "This variant has been introduced in version 0.30."
+  ) +
+  gsi::method_ext ("insert", &insert<db::PathWithProperties>, gsi::arg ("path"),
+    "@brief Inserts a path with properties into the shapes list\n"
+    "@return A reference to the new shape (a \\Shape object)\n"
+    "The property Id must be obtained from the \\Layout object's property_id method which "
+    "associates a property set with a property Id."
+    "\n"
+    "This variant has been introduced in version 0.30."
+  ) +
+  gsi::method_ext ("insert", &dinsert<db::DPathWithProperties>, gsi::arg ("path"),
+    "@brief Inserts a micrometer-unit path with properties into the shapes list\n"
+    "@return A reference to the new shape (a \\Shape object)\n"
+    "This method behaves like the \\insert version with a \\PathWithProperties argument, except that it will "
+    "internally translate the path from micrometer to database units.\n"
+    "\n"
+    "This variant has been introduced in version 0.30."
+  ) +
+  gsi::method_ext ("insert", &insert<db::EdgeWithProperties>, gsi::arg ("edge"),
+    "@brief Inserts an edge with properties into the shapes list\n"
+    "@return A reference to the new shape (a \\Shape object)\n"
+    "The property Id must be obtained from the \\Layout object's property_id method which "
+    "associates a property set with a property Id."
+    "\n"
+    "This variant has been introduced in version 0.30."
+  ) +
+  gsi::method_ext ("insert", &dinsert<db::DEdgeWithProperties>, gsi::arg ("edge"),
+    "@brief Inserts a micrometer-unit edge with properties into the shapes list\n"
+    "@return A reference to the new shape (a \\Shape object)\n"
+    "This method behaves like the \\insert version with a \\EdgeWithProperties argument, except that it will "
+    "internally translate the edge from micrometer to database units.\n"
+    "\n"
+    "This variant has been introduced in version 0.30."
+  ) +
+  gsi::method_ext ("insert", &insert<db::EdgePairWithProperties>, gsi::arg ("edge_pair"),
+    "@brief Inserts an edge pair with properties into the shapes list\n"
+    "@return A reference to the new shape (a \\Shape object)\n"
+    "The property Id must be obtained from the \\Layout object's property_id method which "
+    "associates a property set with a property Id."
+    "\n"
+    "This variant has been introduced in version 0.30."
+  ) +
+  gsi::method_ext ("insert", &dinsert<db::DEdgePairWithProperties>, gsi::arg ("edge_pair"),
+    "@brief Inserts a micrometer-unit edge pair with properties into the shapes list\n"
+    "@return A reference to the new shape (a \\Shape object)\n"
+    "This method behaves like the \\insert version with a \\EdgePairWithProperties argument, except that it will "
+    "internally translate the edge pair from micrometer to database units.\n"
+    "\n"
+    "This variant has been introduced in version 0.30."
+  ) +
+  gsi::method_ext ("insert", &insert<db::TextWithProperties>, gsi::arg ("text"),
+    "@brief Inserts a text with properties into the shapes list\n"
+    "@return A reference to the new shape (a \\Shape object)\n"
+    "The property Id must be obtained from the \\Layout object's property_id method which "
+    "associates a property set with a property Id."
+    "\n"
+    "This variant has been introduced in version 0.30."
+  ) +
+  gsi::method_ext ("insert", &dinsert<db::DTextWithProperties>, gsi::arg ("text"),
+    "@brief Inserts a micrometer-unit text with properties into the shapes list\n"
+    "@return A reference to the new shape (a \\Shape object)\n"
+    "This method behaves like the \\insert version with a \\TextWithProperties argument, except that it will "
+    "internally translate the text from micrometer to database units.\n"
+    "\n"
+    "This variant has been introduced in version 0.30."
+  ) +
+  gsi::method_ext ("insert", &insert<db::SimplePolygonWithProperties>, gsi::arg ("simple_polygon"),
+    "@brief Inserts a simple polygon with properties into the shapes list\n"
+    "@return A reference to the new shape (a \\Shape object)\n"
+    "The property Id must be obtained from the \\Layout object's property_id method which "
+    "associates a property set with a property Id."
+    "\n"
+    "This variant has been introduced in version 0.30."
+  ) +
+  gsi::method_ext ("insert", &dinsert<db::DSimplePolygonWithProperties>, gsi::arg ("simple_polygon"),
+    "@brief Inserts a micrometer-unit simple polygon with properties into the shapes list\n"
+    "@return A reference to the new shape (a \\Shape object)\n"
+    "This method behaves like the \\insert version with a \\SimplePolygonWithProperties argument, except that it will "
+    "internally translate the simple polygon from micrometer to database units.\n"
+    "\n"
+    "This variant has been introduced in version 0.30."
+  ) +
+  gsi::method_ext ("insert", &insert<db::PolygonWithProperties>, gsi::arg ("polygon"),
+    "@brief Inserts a polygon with properties into the shapes list\n"
+    "@return A reference to the new shape (a \\Shape object)\n"
+    "The property Id must be obtained from the \\Layout object's property_id method which "
+    "associates a property set with a property Id."
+    "\n"
+    "This variant has been introduced in version 0.30."
+  ) +
+  gsi::method_ext ("insert", &dinsert<db::DPolygonWithProperties>, gsi::arg ("polygon"),
+    "@brief Inserts a micrometer-unit polygon with properties into the shapes list\n"
+    "@return A reference to the new shape (a \\Shape object)\n"
+    "This method behaves like the \\insert version with a \\PolygonWithProperties argument, except that it will "
+    "internally translate the polygon from micrometer to database units.\n"
+    "\n"
+    "This variant has been introduced in version 0.30."
+  ) +
   gsi::iterator_ext ("each", &begin, gsi::arg ("flags"),
     "@brief Gets all shapes\n"
     "\n"

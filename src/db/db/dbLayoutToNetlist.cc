@@ -1688,7 +1688,7 @@ compute_area_and_perimeter_of_net_shapes (const db::hier_clusters<db::NetShape> 
 
   size_t p = 0;
   for (db::recursive_cluster_shape_iterator<db::NetShape> rci (clusters, layer_id, ci, cid); !rci.at_end (); ++rci) {
-    ep.insert (rci.trans () * rci->polygon_ref (), ++p);
+    ep.insert_with_trans (rci->polygon_ref (), rci.trans (), ++p);
   }
 
   PolygonAreaAndPerimeterCollector ap_collector;
@@ -1743,15 +1743,16 @@ get_merged_shapes_of_net (const db::hier_clusters<db::NetShape> &clusters, db::c
 
   size_t p = 0;
   for (db::recursive_cluster_shape_iterator<db::NetShape> rci (clusters, layer_id, ci, cid); !rci.at_end (); ++rci) {
-    db::PolygonRef pr = (rci.trans () * rci->polygon_ref ());
+    db::PolygonRef pr = rci->polygon_ref ();
     db::PolygonRef::polygon_edge_iterator e = pr.begin_edge ();
     if (! e.at_end ()) {
       //  pick one reference point for the label
-      if (! any_ref || (*e).p1 () < ref) {
-        ref = (*e).p1 ();
+      auto p1 = (rci.trans () * *e).p1 ();
+      if (! any_ref || p1 < ref) {
+        ref = p1;
         any_ref = true;
       }
-      ep.insert (pr, ++p);
+      ep.insert_with_trans (pr, rci.trans (), ++p);
     }
   }
 

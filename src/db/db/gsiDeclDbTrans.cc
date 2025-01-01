@@ -158,6 +158,11 @@ struct trans_defs
     return edge.transformed (*t);
   }
 
+  static db::edge_pair<coord_type> trans_edge_pair (const C *t, const db::edge_pair<coord_type> &edge_pair)
+  {
+    return edge_pair.transformed (*t);
+  }
+
   static db::box<coord_type> trans_box (const C *t, const db::box<coord_type> &box)
   {
     return box.transformed (*t);
@@ -168,12 +173,52 @@ struct trans_defs
     return polygon.transformed (*t);
   }
 
+  static db::simple_polygon<coord_type> trans_simple_polygon (const C *t, const db::simple_polygon<coord_type> &polygon)
+  {
+    return polygon.transformed (*t);
+  }
+
   static db::path<coord_type> trans_path (const C *t, const db::path<coord_type> &path)
   {
     return path.transformed (*t);
   }
 
   static db::text<coord_type> trans_text (const C *t, const db::text<coord_type> &text)
+  {
+    return text.transformed (*t);
+  }
+
+  static db::object_with_properties<db::edge<coord_type> > trans_edge_wp (const C *t, const db::object_with_properties<db::edge<coord_type> > &edge)
+  {
+    return edge.transformed (*t);
+  }
+
+  static db::object_with_properties<db::edge_pair<coord_type> > trans_edge_pair_wp (const C *t, const db::object_with_properties<db::edge_pair<coord_type> > &edge_pair)
+  {
+    return edge_pair.transformed (*t);
+  }
+
+  static db::object_with_properties<db::box<coord_type> > trans_box_wp (const C *t, const db::object_with_properties<db::box<coord_type> > &box)
+  {
+    return box.transformed (*t);
+  }
+
+  static db::object_with_properties<db::polygon<coord_type> > trans_polygon_wp (const C *t, const db::object_with_properties<db::polygon<coord_type> > &polygon)
+  {
+    return polygon.transformed (*t);
+  }
+
+  static db::object_with_properties<db::simple_polygon<coord_type> > trans_simple_polygon_wp (const C *t, const db::object_with_properties<db::simple_polygon<coord_type> > &polygon)
+  {
+    return polygon.transformed (*t);
+  }
+
+  static db::object_with_properties<db::path<coord_type> > trans_path_wp (const C *t, const db::object_with_properties<db::path<coord_type> > &path)
+  {
+    return path.transformed (*t);
+  }
+
+  static db::object_with_properties<db::text<coord_type> > trans_text_wp (const C *t, const db::object_with_properties<db::text<coord_type> > &text)
   {
     return text.transformed (*t);
   }
@@ -316,6 +361,16 @@ struct trans_defs
       "\n"
       "This convenience method has been introduced in version 0.25."
     ) +
+    method_ext ("trans|*", &trans_edge_pair, arg ("edge_pair"),
+      "@brief Transforms an edge pair\n"
+      "\n"
+      "'t*edge_pair' or 't.trans(edge_pair)' is equivalent to edge_pair.transformed(t).\n"
+      "\n"
+      "@param edge_pair The edge pair to transform\n"
+      "@return The transformed edge pair\n"
+      "\n"
+      "This convenience method has been introduced in version 0.30."
+    ) +
     method_ext ("trans|*", &trans_polygon, arg ("polygon"),
       "@brief Transforms a polygon\n"
       "\n"
@@ -325,6 +380,16 @@ struct trans_defs
       "@return The transformed polygon\n"
       "\n"
       "This convenience method has been introduced in version 0.25."
+    ) +
+    method_ext ("trans|*", &trans_simple_polygon, arg ("simple_polygon"),
+      "@brief Transforms a simple polygon\n"
+      "\n"
+      "'t*polygon' or 't.trans(simple_polygon)' is equivalent to simple_polygon.transformed(t).\n"
+      "\n"
+      "@param simple_polygon The simple polygon to transform\n"
+      "@return The transformed simple polygon\n"
+      "\n"
+      "This convenience method has been introduced in version 0.30."
     ) +
     method_ext ("trans|*", &trans_path, arg ("path"),
       "@brief Transforms a path\n"
@@ -345,6 +410,76 @@ struct trans_defs
       "@return The transformed text\n"
       "\n"
       "This convenience method has been introduced in version 0.25."
+    ) +
+    method_ext ("trans|*", &trans_box_wp, arg ("box"),
+      "@brief Transforms a box with properties\n"
+      "\n"
+      "'t*box' or 't.trans(box)' is equivalent to box.transformed(t).\n"
+      "\n"
+      "@param box The box to transform\n"
+      "@return The transformed box\n"
+      "\n"
+      "This convenience method has been introduced in version 0.30."
+    ) +
+    method_ext ("trans|*", &trans_edge_wp, arg ("edge"),
+      "@brief Transforms an edge with properties\n"
+      "\n"
+      "'t*edge' or 't.trans(edge)' is equivalent to edge.transformed(t).\n"
+      "\n"
+      "@param edge The edge to transform\n"
+      "@return The transformed edge\n"
+      "\n"
+      "This convenience method has been introduced in version 0.30."
+    ) +
+    method_ext ("trans|*", &trans_edge_pair_wp, arg ("edge_pair"),
+      "@brief Transforms an edge pair with properties\n"
+      "\n"
+      "'t*edge_pair' or 't.trans(edge_pair)' is equivalent to edge_pair.transformed(t).\n"
+      "\n"
+      "@param edge_pair The edge pair to transform\n"
+      "@return The transformed edge pair\n"
+      "\n"
+      "This convenience method has been introduced in version 0.30."
+    ) +
+    method_ext ("trans|*", &trans_polygon_wp, arg ("polygon"),
+      "@brief Transforms a polygon with properties\n"
+      "\n"
+      "'t*polygon' or 't.trans(polygon)' is equivalent to polygon.transformed(t).\n"
+      "\n"
+      "@param polygon The polygon to transform\n"
+      "@return The transformed polygon\n"
+      "\n"
+      "This convenience method has been introduced in version 0.30."
+    ) +
+    method_ext ("trans|*", &trans_simple_polygon_wp, arg ("simple_polygon"),
+      "@brief Transforms a simple polygon with properties\n"
+      "\n"
+      "'t*polygon' or 't.trans(simple_polygon)' is equivalent to simple_polygon.transformed(t).\n"
+      "\n"
+      "@param simple_polygon The simple polygon to transform\n"
+      "@return The transformed simple polygon\n"
+      "\n"
+      "This convenience method has been introduced in version 0.30."
+    ) +
+    method_ext ("trans|*", &trans_path_wp, arg ("path"),
+      "@brief Transforms a path with properties\n"
+      "\n"
+      "'t*path' or 't.trans(path)' is equivalent to path.transformed(t).\n"
+      "\n"
+      "@param path The path to transform\n"
+      "@return The transformed path\n"
+      "\n"
+      "This convenience method has been introduced in version 0.30."
+    ) +
+    method_ext ("trans|*", &trans_text_wp, arg ("text"),
+      "@brief Transforms a text with properties\n"
+      "\n"
+      "'t*text' or 't.trans(text)' is equivalent to text.transformed(t).\n"
+      "\n"
+      "@param text The text to transform\n"
+      "@return The transformed text\n"
+      "\n"
+      "This convenience method has been introduced in version 0.30."
     ) +
     method ("*!", &C::concat, arg ("t"),
       "@brief Returns the concatenated transformation\n"

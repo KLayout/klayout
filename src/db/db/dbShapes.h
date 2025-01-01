@@ -863,7 +863,7 @@ public:
 
       //  expand arrays in editable mode
       if (! arr.begin ().at_end ()) {
-        insert_array_typeof (*arr.begin () * Obj () /*for typeof*/, arr);
+        insert_array_typeof (Obj ().transformed (*arr.begin ()) /*for typeof*/, arr);
       }
 
       return shape_type ();

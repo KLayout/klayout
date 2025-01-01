@@ -257,6 +257,18 @@ public:
   }
 };
 
+template <class Trans>
+class shape_reference_translator_with_trans<db::TextRef, Trans>
+  : public shape_reference_translator_with_trans_from_shape_ref<db::TextRef, Trans>
+{
+public:
+  shape_reference_translator_with_trans (db::Layout *target_layout)
+    : shape_reference_translator_with_trans_from_shape_ref<db::TextRef, Trans> (target_layout)
+  {
+    //  .. nothing yet ..
+  }
+};
+
 template <class Sh, class Trans>
 class shape_reference_translator_with_trans
 {

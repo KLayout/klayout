@@ -972,7 +972,7 @@ TEST(100_UndoOfDeleteLayer)
 {
   db::Manager m;
   db::Layout l (&m);
-  db::Cell &top = l.cell (l.add_cell ("TOP"));
+  l.cell (l.add_cell ("TOP"));
 
   unsigned int li = 0, li2 = 0;
 

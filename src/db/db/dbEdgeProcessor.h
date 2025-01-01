@@ -706,19 +706,76 @@ public:
   void insert (const db::Edge &e, property_type p = 0);
 
   /**
+   *  @brief Insert an edge with transformation
+   */
+  template <class Trans>
+  void insert_with_trans (const db::Edge &e, const Trans &tr, property_type p = 0)
+  {
+    insert (tr * e, p);
+  }
+
+  /**
    *  @brief Insert a polygon
    */
-  void insert (const db::Polygon &q, property_type p = 0);
+  void insert (const db::Polygon &q, property_type p = 0)
+  {
+    for (db::Polygon::polygon_edge_iterator e = q.begin_edge (); ! e.at_end (); ++e) {
+      insert (*e, p);
+    }
+  }
+
+  /**
+   *  @brief Insert a polygon with transformation
+   */
+  template <class Trans>
+  void insert_with_trans (const db::Polygon &q, const Trans &tr, property_type p = 0)
+  {
+    for (db::Polygon::polygon_edge_iterator e = q.begin_edge (); ! e.at_end (); ++e) {
+      insert (tr * *e, p);
+    }
+  }
 
   /**
    *  @brief Insert a simple polygon
    */
-  void insert (const db::SimplePolygon &q, property_type p = 0);
+  void insert (const db::SimplePolygon &q, property_type p = 0)
+  {
+    for (db::SimplePolygon::polygon_edge_iterator e = q.begin_edge (); ! e.at_end (); ++e) {
+      insert (*e, p);
+    }
+  }
+
+  /**
+   *  @brief Insert a simple polygon with transformation
+   */
+  template <class Trans>
+  void insert_with_trans (const db::SimplePolygon &q, const Trans &tr, property_type p = 0)
+  {
+    for (db::SimplePolygon::polygon_edge_iterator e = q.begin_edge (); ! e.at_end (); ++e) {
+      insert (tr * *e, p);
+    }
+  }
 
   /**
    *  @brief Insert a polygon reference
    */
-  void insert (const db::PolygonRef &q, property_type p = 0);
+  void insert (const db::PolygonRef &q, property_type p = 0)
+  {
+    for (db::PolygonRef::polygon_edge_iterator e = q.begin_edge (); ! e.at_end (); ++e) {
+      insert (*e, p);
+    }
+  }
+
+  /**
+   *  @brief Insert a polygon reference with transformation
+   */
+  template <class Trans>
+  void insert_with_trans (const db::PolygonRef &q, const Trans &tr, property_type p = 0)
+  {
+    for (db::PolygonRef::polygon_edge_iterator e = q.begin_edge (); ! e.at_end (); ++e) {
+      insert (tr * *e, p);
+    }
+  }
 
   /**
    *  @brief Insert a sequence of edges

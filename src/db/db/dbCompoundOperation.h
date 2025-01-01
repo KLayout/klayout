@@ -26,6 +26,7 @@
 #include "dbCommon.h"
 #include "dbLocalOperation.h"
 #include "dbHierProcessor.h"
+#include "dbHierProcessorUtils.h"
 #include "dbEdgeProcessor.h"
 #include "dbRegionDelegate.h"
 #include "dbRegion.h"
@@ -1331,8 +1332,10 @@ private:
 
         if (! res.empty ()) {
           db::ICplxTrans tri = tr.inverted ();
+          db::shape_reference_translator_with_trans<T, db::ICplxTrans> trans_op (layout);
+          trans_op.set_trans (tri);
           for (auto r = res.begin (); r != res.end (); ++r) {
-            results.front ().insert (tri * *r);
+            results.front ().insert (trans_op (*r));
           }
         }
 
@@ -1466,8 +1469,10 @@ private:
 
         if (! res.empty ()) {
           db::ICplxTrans tri = tr.inverted ();
+          db::shape_reference_translator_with_trans<T, db::ICplxTrans> trans_op (layout);
+          trans_op.set_trans (tri);
           for (auto r = res.begin (); r != res.end (); ++r) {
-            results.front ().insert (tri * *r);
+            results.front ().insert (trans_op (*r));
           }
         }
 

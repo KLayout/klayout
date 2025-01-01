@@ -69,6 +69,7 @@ SOURCES = \
   dbNetlistSpiceReaderDelegate.cc \
   dbNetlistSpiceReaderExpressionParser.cc \
   dbObject.cc \
+  dbObjectWithProperties.cc \
   dbPath.cc \
   dbPCellDeclaration.cc \
   dbPCellHeader.cc \

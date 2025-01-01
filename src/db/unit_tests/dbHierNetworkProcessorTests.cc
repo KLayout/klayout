@@ -264,7 +264,7 @@ TEST(10_LocalClusterBasic)
   EXPECT_EQ (cluster.bbox ().to_string (), "(0,0;1000,1000)");
 
   db::local_cluster<db::PolygonRef> cluster2;
-  cluster2.add (db::PolygonRef (poly, repo).transformed (db::Trans (db::Vector (10, 20))), 1);
+  cluster2.add (db::PolygonRef (poly, repo).transformed (db::Disp (db::Vector (10, 20))), 1);
   cluster2.add_attr (2);
 
   cluster.join_with (cluster2);

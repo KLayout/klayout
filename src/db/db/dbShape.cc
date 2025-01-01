@@ -333,7 +333,7 @@ Shape::polygon_ref_type Shape::polygon_ref () const
     return *basic_ptr (polygon_ref_type::tag ());
   } else if (m_type == PolygonPtrArrayMember) {
     tl_assert (m_trans.rot () == 0);
-    return polygon_ref_type (&basic_ptr (polygon_ptr_array_type::tag ())->object ().obj (), m_trans.disp ());
+    return polygon_ref_type (&basic_ptr (polygon_ptr_array_type::tag ())->object ().obj (), db::Disp (m_trans.disp ()));
   } else {
     raise_no_general_polygon ();
   }
@@ -345,7 +345,7 @@ Shape::simple_polygon_ref_type Shape::simple_polygon_ref () const
     return *basic_ptr (simple_polygon_ref_type::tag ());
   } else if (m_type == SimplePolygonPtrArrayMember) {
     tl_assert (m_trans.rot () == 0);
-    return simple_polygon_ref_type (&basic_ptr (simple_polygon_ptr_array_type::tag ())->object ().obj (), m_trans.disp ());
+    return simple_polygon_ref_type (&basic_ptr (simple_polygon_ptr_array_type::tag ())->object ().obj (), db::Disp (m_trans.disp ()));
   } else {
     raise_no_simple_polygon ();
   }
@@ -423,7 +423,7 @@ Shape::path_ref_type Shape::path_ref () const
     return *basic_ptr (path_ref_type::tag ());
   } else if (m_type == PathPtrArrayMember) {
     tl_assert (m_trans.rot () == 0);
-    return path_ref_type (&basic_ptr (path_ptr_array_type::tag ())->object ().obj (), m_trans.disp ());
+    return path_ref_type (&basic_ptr (path_ptr_array_type::tag ())->object ().obj (), db::Disp (m_trans.disp ()));
   } else {
     raise_no_path ();
   }

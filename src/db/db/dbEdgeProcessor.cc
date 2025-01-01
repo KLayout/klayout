@@ -1070,35 +1070,11 @@ EdgeProcessor::count () const
   return mp_work_edges->size ();
 }
 
-void 
-EdgeProcessor::insert (const db::Edge &e, EdgeProcessor::property_type p)
+void
+EdgeProcessor::insert (const db::Edge &e, property_type p)
 {
   if (e.p1 () != e.p2 ()) {
     mp_work_edges->push_back (WorkEdge (e, p));
-  }
-}
-
-void
-EdgeProcessor::insert (const db::SimplePolygon &q, EdgeProcessor::property_type p)
-{
-  for (db::SimplePolygon::polygon_edge_iterator e = q.begin_edge (); ! e.at_end (); ++e) {
-    insert (*e, p);
-  }
-}
-
-void
-EdgeProcessor::insert (const db::Polygon &q, EdgeProcessor::property_type p)
-{
-  for (db::Polygon::polygon_edge_iterator e = q.begin_edge (); ! e.at_end (); ++e) {
-    insert (*e, p);
-  }
-}
-
-void
-EdgeProcessor::insert (const db::PolygonRef &q, EdgeProcessor::property_type p)
-{
-  for (db::PolygonRef::polygon_edge_iterator e = q.begin_edge (); ! e.at_end (); ++e) {
-    insert (*e, p);
   }
 }
 

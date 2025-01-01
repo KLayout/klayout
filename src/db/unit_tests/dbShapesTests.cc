@@ -251,17 +251,17 @@ unsigned int read_testdata (db::Layout &layout, unsigned int what = 0xff)
     shapes.insert (p1);
     shapes.insert (p2);
     shapes.insert (p3);
-    shapes.insert (db::Shape::simple_polygon_ref_type (&p1, db::Trans (db::Vector (-10, 15))));
-    shapes.insert (db::Shape::simple_polygon_ref_type (&p2, db::Trans (db::Vector (-110, 115))));
-    shapes.insert (db::Shape::simple_polygon_ref_type (&p3, db::Trans (db::Vector (-210, 215))));
+    shapes.insert (db::Shape::simple_polygon_ref_type (&p1, db::Disp (db::Vector (-10, 15))));
+    shapes.insert (db::Shape::simple_polygon_ref_type (&p2, db::Disp (db::Vector (-110, 115))));
+    shapes.insert (db::Shape::simple_polygon_ref_type (&p3, db::Disp (db::Vector (-210, 215))));
     if (with_arrays) shapes.insert (db::Shape::simple_polygon_ptr_array_type (db::Shape::simple_polygon_ptr_type (&p1, db::UnitTrans ()), db::Disp (db::Vector (0, 5)), db::Vector (0, 10000), db::Vector (11000, 0), 3, 4));
     
     shapes.insert (db::object_with_properties<db::SimplePolygon> (p1, 1));
     shapes.insert (db::object_with_properties<db::SimplePolygon> (p2, 2));
     shapes.insert (db::object_with_properties<db::SimplePolygon> (p3, 3));
-    shapes.insert (db::object_with_properties<db::Shape::simple_polygon_ref_type> (db::Shape::simple_polygon_ref_type (&p1, db::Trans (db::Vector (-10, 15))), 5));
-    shapes.insert (db::object_with_properties<db::Shape::simple_polygon_ref_type> (db::Shape::simple_polygon_ref_type (&p2, db::Trans (db::Vector (-110, 115))), 6));
-    shapes.insert (db::object_with_properties<db::Shape::simple_polygon_ref_type> (db::Shape::simple_polygon_ref_type (&p3, db::Trans (db::Vector (-210, 215))), 7));
+    shapes.insert (db::object_with_properties<db::Shape::simple_polygon_ref_type> (db::Shape::simple_polygon_ref_type (&p1, db::Disp (db::Vector (-10, 15))), 5));
+    shapes.insert (db::object_with_properties<db::Shape::simple_polygon_ref_type> (db::Shape::simple_polygon_ref_type (&p2, db::Disp (db::Vector (-110, 115))), 6));
+    shapes.insert (db::object_with_properties<db::Shape::simple_polygon_ref_type> (db::Shape::simple_polygon_ref_type (&p3, db::Disp (db::Vector (-210, 215))), 7));
     if (with_arrays) shapes.insert (db::object_with_properties<db::Shape::simple_polygon_ptr_array_type> (db::Shape::simple_polygon_ptr_array_type (db::Shape::simple_polygon_ptr_type (&p1, db::UnitTrans ()), db::Disp (db::Vector (0, 5)), db::Vector (0, 10000), db::Vector (11000, 0), 3, 4), 8));
   }
 
@@ -273,17 +273,17 @@ unsigned int read_testdata (db::Layout &layout, unsigned int what = 0xff)
     shapes.insert (q1);
     shapes.insert (q2);
     shapes.insert (q3);
-    shapes.insert (db::Shape::polygon_ref_type (&q1, db::Trans (db::Vector (-10, 15))));
-    shapes.insert (db::Shape::polygon_ref_type (&q2, db::Trans (db::Vector (-110, 115))));
-    shapes.insert (db::Shape::polygon_ref_type (&q3, db::Trans (db::Vector (-210, 215))));
+    shapes.insert (db::Shape::polygon_ref_type (&q1, db::Disp (db::Vector (-10, 15))));
+    shapes.insert (db::Shape::polygon_ref_type (&q2, db::Disp (db::Vector (-110, 115))));
+    shapes.insert (db::Shape::polygon_ref_type (&q3, db::Disp (db::Vector (-210, 215))));
     if (with_arrays) shapes.insert (db::Shape::polygon_ptr_array_type (db::Shape::polygon_ptr_type (&q1, db::UnitTrans ()), db::Disp (db::Vector (0, 5)), db::Vector (0, 10000), db::Vector (11000, 0), 3, 4));
     
     shapes.insert (db::object_with_properties<db::Polygon> (q1, 1));
     shapes.insert (db::object_with_properties<db::Polygon> (q2, 2));
     shapes.insert (db::object_with_properties<db::Polygon> (q3, 3));
-    shapes.insert (db::object_with_properties<db::Shape::polygon_ref_type> (db::Shape::polygon_ref_type (&q1, db::Trans (db::Vector (-10, 15))), 5));
-    shapes.insert (db::object_with_properties<db::Shape::polygon_ref_type> (db::Shape::polygon_ref_type (&q2, db::Trans (db::Vector (-110, 115))), 6));
-    shapes.insert (db::object_with_properties<db::Shape::polygon_ref_type> (db::Shape::polygon_ref_type (&q3, db::Trans (db::Vector (-210, 215))), 7));
+    shapes.insert (db::object_with_properties<db::Shape::polygon_ref_type> (db::Shape::polygon_ref_type (&q1, db::Disp (db::Vector (-10, 15))), 5));
+    shapes.insert (db::object_with_properties<db::Shape::polygon_ref_type> (db::Shape::polygon_ref_type (&q2, db::Disp (db::Vector (-110, 115))), 6));
+    shapes.insert (db::object_with_properties<db::Shape::polygon_ref_type> (db::Shape::polygon_ref_type (&q3, db::Disp (db::Vector (-210, 215))), 7));
     if (with_arrays) shapes.insert (db::object_with_properties<db::Shape::polygon_ptr_array_type> (db::Shape::polygon_ptr_array_type (db::Shape::polygon_ptr_type (&q1, db::UnitTrans ()), db::Disp (db::Vector (0, 5)), db::Vector (0, 10000), db::Vector (11000, 0), 3, 4), 8));
   }
 
@@ -301,17 +301,17 @@ unsigned int read_testdata (db::Layout &layout, unsigned int what = 0xff)
     shapes.insert (r1);
     shapes.insert (r2);
     shapes.insert (r3);
-    shapes.insert (db::Shape::path_ref_type (&r1, db::Trans (db::Vector (-10, 15))));
-    shapes.insert (db::Shape::path_ref_type (&r2, db::Trans (db::Vector (-110, 115))));
-    shapes.insert (db::Shape::path_ref_type (&r3, db::Trans (db::Vector (-210, 215))));
+    shapes.insert (db::Shape::path_ref_type (&r1, db::Disp (db::Vector (-10, 15))));
+    shapes.insert (db::Shape::path_ref_type (&r2, db::Disp (db::Vector (-110, 115))));
+    shapes.insert (db::Shape::path_ref_type (&r3, db::Disp (db::Vector (-210, 215))));
     if (with_arrays) shapes.insert (db::Shape::path_ptr_array_type (db::Shape::path_ptr_type (&r1, db::UnitTrans ()), db::Disp (db::Vector (0, 5)), db::Vector (0, 10000), db::Vector (11000, 0), 3, 4));
     
     shapes.insert (db::object_with_properties<db::Path> (r1, 1));
     shapes.insert (db::object_with_properties<db::Path> (r2, 2));
     shapes.insert (db::object_with_properties<db::Path> (r3, 3));
-    shapes.insert (db::object_with_properties<db::Shape::path_ref_type> (db::Shape::path_ref_type (&r1, db::Trans (db::Vector (-10, 15))), 5));
-    shapes.insert (db::object_with_properties<db::Shape::path_ref_type> (db::Shape::path_ref_type (&r2, db::Trans (db::Vector (-110, 115))), 6));
-    shapes.insert (db::object_with_properties<db::Shape::path_ref_type> (db::Shape::path_ref_type (&r3, db::Trans (db::Vector (-210, 215))), 7));
+    shapes.insert (db::object_with_properties<db::Shape::path_ref_type> (db::Shape::path_ref_type (&r1, db::Disp (db::Vector (-10, 15))), 5));
+    shapes.insert (db::object_with_properties<db::Shape::path_ref_type> (db::Shape::path_ref_type (&r2, db::Disp (db::Vector (-110, 115))), 6));
+    shapes.insert (db::object_with_properties<db::Shape::path_ref_type> (db::Shape::path_ref_type (&r3, db::Disp (db::Vector (-210, 215))), 7));
     if (with_arrays) shapes.insert (db::object_with_properties<db::Shape::path_ptr_array_type> (db::Shape::path_ptr_array_type (db::Shape::path_ptr_type (&r1, db::UnitTrans ()), db::Disp (db::Vector (0, 5)), db::Vector (0, 10000), db::Vector (11000, 0), 3, 4), 8));
   }
 

@@ -25,6 +25,7 @@
 #define HDR_dbObjectWithProperties
 
 #include "tlException.h"
+#include "tlTypeTraits.h"
 #include "dbTypes.h"
 #include "dbPolygon.h"
 #include "dbPath.h"
@@ -42,6 +43,17 @@ namespace db
 class ArrayRepository;
 
 DB_PUBLIC bool properties_id_less (properties_id_type a, properties_id_type b);
+
+template <class Obj> class object_with_properties;
+
+/**
+ *  @brief A helper method to create an object with properties
+ */
+template <class Obj>
+inline db::object_with_properties<Obj> make_object_with_properties (const Obj &obj, db::properties_id_type pid)
+{
+  return db::object_with_properties<Obj> (obj, pid);
+}
 
 /**
  *  @brief A object with properties template
@@ -192,9 +204,36 @@ public:
    *  @brief Returns the transformed object
    */
   template <class Trans>
-  object_with_properties<Obj> transformed (const Trans &tr) const
+  auto transformed (const Trans &tr) const
   {
-    return object_with_properties<Obj> (Obj::transformed (tr), m_id);
+    return make_object_with_properties (Obj::transformed (tr), m_id);
+  }
+
+  /**
+   *  @brief In-place transformation
+   */
+  template <class Trans>
+  db::object_with_properties<Obj> &transform (const Trans &tr)
+  {
+    Obj::transform (tr);
+    return *this;
+  }
+
+  /**
+   *  @brief Returns the transformed object
+   */
+  db::object_with_properties<Obj> moved (const typename Obj::vector_type &v) const
+  {
+    return make_object_with_properties (Obj::moved (v), m_id);
+  }
+
+  /**
+   *  @brief In-place move
+   */
+  db::object_with_properties<Obj> &move (const typename Obj::vector_type &v)
+  {
+    Obj::move (v);
+    return *this;
   }
 
   /**
@@ -247,6 +286,48 @@ typedef object_with_properties<db::array<db::CellInst, db::Trans> > CellInstArra
 typedef object_with_properties<db::array<db::CellInst, db::DTrans> > DCellInstArrayWithProperties;
 
 /**
+ *  @brief Binary * operator (transformation)
+ *
+ *  Transforms the object with the given transformation and
+ *  returns the result.
+ *
+ *  @param t The transformation to apply
+ *  @param obj The object to transform
+ *  @return t * obj
+ */
+
+template <class R>
+struct result_of_transformation;
+
+template <class R, class Obj, class Tr>
+struct result_of_transformation<R (Obj::*) (const Tr &) const>
+{
+  typedef R type;
+};
+
+template <class Tr, class Obj>
+inline db::object_with_properties<typename result_of_transformation<decltype (& Obj::template transformed<Tr>)>::type>
+operator* (const Tr &t, const db::object_with_properties<Obj> &obj)
+{
+  return db::object_with_properties<typename result_of_transformation<decltype (& Obj::template transformed<Tr>)>::type> (obj.Obj::transformed (t), obj.properties_id ());
+}
+
+/**
+ *  @brief Binary * operator (scaling)
+ *
+ *  @param obj The object to scale.
+ *  @param s The scaling factor
+ *
+ *  @return The scaled object
+ */
+template <class Obj>
+inline db::object_with_properties<Obj>
+operator* (const db::object_with_properties<Obj> &obj, double s)
+{
+  return db::object_with_properties<Obj> (((const Obj &) obj) * s, obj.properties_id ());
+}
+
+/**
  *  @brief Output stream insertion operator
  */
 template <class T>
@@ -254,16 +335,6 @@ inline std::ostream &
 operator<< (std::ostream &os, const object_with_properties<T> &p)
 {
   return (os << p.to_string ());
-}
-
-/**
- *  @brief Transformation of an object with properties
- */
-template <class Tr, class T>
-inline db::object_with_properties<T>
-operator* (const Tr &t, const db::object_with_properties<T> &s)
-{
-  return db::object_with_properties<T> (s.transformed (t), s.properties_id ());
 }
 
 } // namespace db

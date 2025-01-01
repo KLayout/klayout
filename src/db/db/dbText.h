@@ -924,19 +924,6 @@ struct text_ref
     // .. nothing yet ..
   }
 
-  /**
-   *  @brief The transformation translation constructor
-   *  
-   *  This constructor allows one to copy a text reference with a certain transformation
-   *  to one with another transformation
-   */
-  template <class TransIn>
-  text_ref (const text_ref<Text, TransIn> &ref)
-    : shape_ref<Text, Trans> (ref.ptr (), Trans (ref.trans ()))
-  {
-    // .. nothing yet ..
-  }
-
   /** 
    *  @brief Return the transformed object
    * 
@@ -945,7 +932,7 @@ struct text_ref
   template <class TargetTrans>
   text_ref<Text, TargetTrans> transformed (const TargetTrans &t) const
   {
-    text_ref<Text, TargetTrans> tref (*this);
+    text_ref<Text, TargetTrans> tref (this->ptr (), this->trans ());
     tref.transform (t);
     return tref;
   }

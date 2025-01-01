@@ -32,6 +32,7 @@
 #include "dbTrans.h"
 #include "dbObjectTag.h"
 #include "dbBox.h"
+#include "dbVector.h"
 #include "dbMemStatistics.h"
 #include "tlClassRegistry.h"
 
@@ -170,6 +171,7 @@ public:
   typedef C coord_type;
   typedef db::box<C> box_type;
   typedef db::point<C> point_type;
+  typedef db::vector<C> vector_type;
   typedef db::object_tag< user_object<C> > tag;
 
   /**
@@ -348,17 +350,18 @@ public:
   }
 
   /**
-   *  @brief Transform the object with the given transformation
+   *  @brief Transforms the object with the given transformation
    *
    *  @param t The transformation to apply.
    *  The actual behaviour is implemented by the base object.
    */
   template <class Trans>
-  void transform (const Trans &t)
+  db::user_object<C> &transform (const Trans &t)
   {
     if (mp_obj) {
       mp_obj->transform (t);
     }
+    return *this;
   }
 
   /**
@@ -366,6 +369,7 @@ public:
    *
    *  @param t The transformation to apply.
    *  The actual behaviour is implemented by the base object.
+   *  NOTE: user object can't be transformed into a different coordinate type as of now.
    */
   template <class Trans>
   db::user_object<C> transformed (const Trans &t) const
@@ -373,6 +377,39 @@ public:
     user_object o (*this);
     o.transform (t);
     return o;
+  }
+
+  /**
+   *  @brief Moves the object
+   *
+   *  @param v The move vector to apply.
+   */
+  db::user_object<C> &move (const vector_type &v)
+  {
+    if (mp_obj) {
+      mp_obj->transform (db::simple_trans<C> (v));
+    }
+    return *this;
+  }
+
+  /**
+   *  @brief Returns the moved object
+   *
+   *  @param v The move vector to apply.
+   */
+  db::user_object<C> moved (const vector_type &v) const
+  {
+    user_object o (*this);
+    o.move (v);
+    return o;
+  }
+
+  /**
+   *  @brief Returns a string describing the object
+   */
+  std::string to_string () const
+  {
+    return mp_obj ? mp_obj->to_string () : std::string ();
   }
 
   /**

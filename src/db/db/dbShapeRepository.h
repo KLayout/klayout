@@ -217,6 +217,7 @@ struct shape_ref
 {
   typedef Sh shape_type;
   typedef typename Sh::coord_type coord_type;
+  typedef typename Sh::vector_type vector_type;
   typedef Trans trans_type;
   typedef db::generic_repository<coord_type> repository_type;
   typedef db::object_tag<shape_ref<Sh, Trans> > tag;

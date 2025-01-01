@@ -3309,9 +3309,8 @@ public:
    *
    *  The polygon pointer passed is assumed to reside in a proper repository.
    */
-  template <class TransIn>
-  polygon_ref (const polygon_type *p, const TransIn &t)
-    : shape_ref<Poly, Trans> (p, Trans (t))
+  polygon_ref (const polygon_type *p, const Trans &t)
+    : shape_ref<Poly, Trans> (p, t)
   {
     // .. nothing yet ..
   }
@@ -3329,19 +3328,6 @@ public:
   }
 
   /**
-   *  @brief The transformation translation constructor
-   *  
-   *  This constructor allows one to copy a polygon reference with a certain transformation
-   *  to one with another transformation
-   */
-  template <class TransIn>
-  polygon_ref (const polygon_ref<Poly, TransIn> &ref)
-    : shape_ref<Poly, Trans> (ref.ptr (), Trans (ref.trans ()))
-  {
-    // .. nothing yet ..
-  }
-
-  /** 
    *  @brief The edge iterator 
    *
    *  The edge iterator delivers all edges of the polygon.
@@ -3480,7 +3466,7 @@ public:
   template <class TargetTrans>
   polygon_ref<Poly, TargetTrans> transformed (const TargetTrans &t) const
   {
-    polygon_ref<Poly, TargetTrans> pref (*this);
+    polygon_ref<Poly, TargetTrans> pref (this->ptr (), this->trans ());
     pref.transform (t);
     return pref;
   }

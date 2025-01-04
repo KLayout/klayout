@@ -632,6 +632,16 @@ public:
   }
 
   /**
+   *  @brief Returns the scaled path
+   */
+  db::path<db::DCoord>
+  scaled (double s) const
+  {
+    db::complex_trans<C, db::DCoord> ct (s);
+    return this->transformed (ct);
+  }
+
+  /**
    *  @brief Returns the moved path
    *
    *  Moves the path by the given offset and returns the 
@@ -944,11 +954,10 @@ operator* (const Tr &t, const path<typename Tr::coord_type> &p)
  *  @return The scaled path
  */
 template <class C>
-inline path<double>
+inline path<db::DCoord>
 operator* (const path<C> &p, double s)
 {
-  db::complex_trans<C, double> ct (s);
-  return ct * p;
+  return p.scaled (s);
 }
 
 /**

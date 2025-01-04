@@ -160,6 +160,14 @@ public:
   }
 
   /**
+   *  @brief Returns the scaled point
+   */
+  point<db::DCoord> scaled (double s) const
+  {
+    return point<db::DCoord> (m_x * s, m_y * s);
+  }
+
+  /**
    *  @brief Moved point (equivalent to add)
    *  This alias is needed for compatibility with other shapes
    */

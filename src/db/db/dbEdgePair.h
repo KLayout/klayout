@@ -588,10 +588,10 @@ private:
  *  @return The scaled edge pair
  */ 
 template <class C>
-inline edge_pair<double> 
+inline edge_pair<db::DCoord>
 operator* (const edge_pair<C> &e, double s)
 {
-  return edge_pair<double> (e.first () * s, e.second () * s);
+  return edge_pair<db::DCoord> (e.first () * s, e.second () * s);
 }
 
 /**

@@ -647,6 +647,16 @@ public:
   }
 
   /**
+   *  @brief Returns the scaled path
+   */
+  db::text<db::DCoord>
+  scaled (double s) const
+  {
+    db::complex_trans<C, db::DCoord> ct (s);
+    return this->transformed (ct);
+  }
+
+  /**
    *  @brief Return the moved text
    *
    *  @param p The distance to move the text.
@@ -964,11 +974,10 @@ operator* (const TargetTr &t, const text_ref<Text, Tr> &p)
  *  @return The scaled text
  */
 template <class C>
-inline text<double>
+inline text<db::DCoord>
 operator* (const text<C> &t, double s)
 {
-  db::complex_trans<C, double> ct (s);
-  return ct * t;
+  return t.scaled (s);
 }
 
 /**

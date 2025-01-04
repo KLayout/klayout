@@ -380,6 +380,15 @@ public:
   }
 
   /**
+   *  @brief Returns the scaled object
+   */
+  db::user_object<C> scaled (double s) const
+  {
+    db::complex_trans<C, C> ct (s);
+    return this->transformed (ct);
+  }
+
+  /**
    *  @brief Moves the object
    *
    *  @param v The move vector to apply.

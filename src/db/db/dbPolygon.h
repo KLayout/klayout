@@ -1959,6 +1959,16 @@ public:
   }
 
   /**
+   *  @brief Returns the scaled polygon
+   */
+  db::polygon<db::DCoord>
+  scaled (double s) const
+  {
+    db::complex_trans<C, db::DCoord> ct (s);
+    return this->transformed (ct);
+  }
+
+  /**
    *  @brief Returns the moved polyon
    *
    *  Moves the polygon by the given offset and returns the 
@@ -2865,6 +2875,16 @@ public:
   }
 
   /**
+   *  @brief Returns the scaled polygon
+   */
+  db::simple_polygon<db::DCoord>
+  scaled (double s) const
+  {
+    db::complex_trans<C, db::DCoord> ct (s);
+    return this->transformed (ct);
+  }
+
+  /**
    *  @brief Returns the moved polyon
    *
    *  Moves the polygon by the given offset and returns the 
@@ -3564,11 +3584,10 @@ operator* (const Tr &t, const simple_polygon<typename Tr::coord_type> &p)
  *  @return The scaled polygon
  */
 template <class C>
-inline polygon<double>
+inline polygon<db::DCoord>
 operator* (const polygon<C> &p, double s)
 {
-  db::complex_trans<C, double> ct (s);
-  return ct * p;
+  return p.scaled (s);
 }
 
 /**
@@ -3580,11 +3599,10 @@ operator* (const polygon<C> &p, double s)
  *  @return The scaled polygon
  */
 template <class C>
-inline simple_polygon<double>
+inline simple_polygon<db::DCoord>
 operator* (const simple_polygon<C> &p, double s)
 {
-  db::complex_trans<C, double> ct (s);
-  return ct * p;
+  return p.scaled (s);
 }
 
 /**

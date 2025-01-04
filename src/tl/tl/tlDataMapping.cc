@@ -404,13 +404,13 @@ DataMappingLookupTable::update_table (double xmin, double xmax, double delta_y, 
       double dx = fabs (t->first - t[-1].first);
       double dy = fabs (t->second - t[-1].second);
   
-      if (dx * delta_y < delta_x * dy) {
+      if (dx > 1e-10 && dy > 1e-10 && dx * delta_y < delta_x * dy) {
         delta_x = dx / dy * delta_y;
       }
 
     }
 
-    size_t nsteps = size_t (ceil((xmax - xmin) / delta_x - 1e-6));
+    size_t nsteps = size_t (ceil ((xmax - xmin) / delta_x - 1e-6));
 
     //  Limit the number of interpolation points (this is an arbitrary number - it could be somewhat else)
     nsteps = std::min (size_t (16384), nsteps);
@@ -422,7 +422,9 @@ DataMappingLookupTable::update_table (double xmin, double xmax, double delta_y, 
 
     std::vector< std::pair<double, double> >::const_iterator t = table.begin ();
     size_t i = 0;
-    for (double x = xmin; i < nsteps; ++i, x += delta_x) {
+    double x;
+    for ( ; i < nsteps; ++i) {
+      x = xmin + i * delta_x;
       while (t != table.end () && t->first <= x) {
         ++t;
       }

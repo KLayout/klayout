@@ -293,7 +293,8 @@ public:
 
     }
 
-  END_PROTECTED
+  //  Note: Qt does not like popups during drag-and-drop operations ...
+  END_PROTECTED_SILENT
   }
 
   void dragLeaveEvent (QDragLeaveEvent * /*event*/)
@@ -309,7 +310,8 @@ public:
       svc = next;
     }
 
-  END_PROTECTED
+  //  Note: Qt does not like popups during drag-and-drop operations ...
+  END_PROTECTED_SILENT
   }
 
   void dragMoveEvent (QDragMoveEvent *event)
@@ -332,7 +334,8 @@ public:
 
     }
 
-  END_PROTECTED
+  //  Note: Qt does not like popups during drag-and-drop operations ...
+  END_PROTECTED_SILENT
   }
 
   void dropEvent (QDropEvent *event)
@@ -355,7 +358,8 @@ public:
 
     }
 
-  END_PROTECTED
+  //  Note: Qt does not like popups during drag-and-drop operations ...
+  END_PROTECTED_SILENT
   }
 
   void mouseMoveEvent (QMouseEvent *e)

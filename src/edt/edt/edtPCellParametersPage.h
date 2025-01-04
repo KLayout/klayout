@@ -177,7 +177,7 @@ private:
   bool lazy_evaluation ();
   void set_parameters_internal (const db::ParameterStates &states, bool tentatively);
   bool update_current_parameters ();
-  void update_widgets_from_states (const db::ParameterStates &states);
+  void update_widgets_from_states (const db::ParameterStates &states, bool tentatively);
   void get_parameters_internal (db::ParameterStates &states, bool &edit_error);
   std::vector<tl::Variant> parameter_from_states (const db::ParameterStates &states) const;
   void states_from_parameters (db::ParameterStates &states, const std::vector<tl::Variant> &parameters);

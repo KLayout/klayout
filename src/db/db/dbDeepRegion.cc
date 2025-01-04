@@ -784,7 +784,6 @@ RegionDelegate *
 DeepRegion::and_with (const Region &other, PropertyConstraint property_constraint) const
 {
   const DeepRegion *other_deep = dynamic_cast <const DeepRegion *> (other.delegate ());
-
   if (empty ()) {
 
     return clone ()->remove_properties (pc_remove (property_constraint));

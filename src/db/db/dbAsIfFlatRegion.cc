@@ -1298,7 +1298,7 @@ AsIfFlatRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
 
     //  simplified handling for a box
     db::Box b = bbox ().enlarged (db::Vector (dx, dy));
-    return region_from_box (b, properties_repository (), begin ()->prop_id ());
+    return region_from_box (b, properties_repository (), db::RegionIterator (begin ()).prop_id ());
 
   } else if (! merged_semantics () || is_merged ()) {
 
@@ -1478,13 +1478,13 @@ AsIfFlatRegion::and_with (const Region &other, PropertyConstraint property_const
 
   } else if (is_box () && other.is_box ()) {
 
-    if (pc_skip (property_constraint) || pc_match (property_constraint, begin ()->prop_id (), other.begin ().prop_id ())) {
+    if (pc_skip (property_constraint) || pc_match (property_constraint, db::RegionIterator (begin ()).prop_id (), other.begin ().prop_id ())) {
 
       //  Simplified handling for boxes
       db::Box b = bbox ();
       b &= other.bbox ();
 
-      db::properties_id_type prop_id_out = pc_norm (property_constraint, begin ()->prop_id ());
+      db::properties_id_type prop_id_out = pc_norm (property_constraint, db::RegionIterator (begin ()).prop_id ());
 
       return region_from_box (b, properties_repository (), prop_id_out);
 
@@ -1494,7 +1494,7 @@ AsIfFlatRegion::and_with (const Region &other, PropertyConstraint property_const
 
   } else if (is_box () && ! other.strict_handling ()) {
 
-    db::properties_id_type self_prop_id = pc_skip (property_constraint) ? 0 : begin ()->prop_id ();
+    db::properties_id_type self_prop_id = pc_skip (property_constraint) ? 0 : db::RegionIterator (begin ()).prop_id ();
 
     //  map AND with box to clip ..
     db::Box b = bbox ();

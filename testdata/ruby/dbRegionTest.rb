@@ -1498,6 +1498,36 @@ class DBRegion_TestClass < TestBase
 
   end
 
+  # issue #1955 (locking of layout object inside DSS)
+  def test_issue1955
+
+    ly = RBA::Layout::new
+    top = ly.create_cell("TOP")
+    l1 = ly.layer(1, 0)
+
+    dss = RBA::DeepShapeStore::new
+
+    rr = RBA::Region::new(RBA::Box::new(100, 100, 1100, 1100))
+
+    r = RBA::Region::new(top.begin_shapes_rec(l1), dss)
+    r += RBA::Region::new(RBA::Box::new(0, 0, 1000, 1000))
+
+    # this spoils the dss object, if 
+    # 1. the first region is a deep region
+    # 2. the second region is a flat region
+    # 3. both regions are boxes
+    # after this operation, bounding boxes are no
+    # longer updated inside the DSS.
+    randrr = r & rr
+    assert_equal(randrr.to_s, "(100,100;100,1000;1000,1000;1000,100)")
+
+    r += RBA::Region::new(RBA::Box::new(1000, 1000, 2000, 2000))
+
+    assert_equal(r.to_s, "(0,0;0,1000;1000,1000;1000,0);(1000,1000;1000,2000;2000,2000;2000,1000)")
+    assert_equal(r.bbox.to_s, "(0,0;2000,2000)")
+
+  end
+
 end
 
 load("test_epilogue.rb")

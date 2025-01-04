@@ -25,6 +25,9 @@
 
 #include "gsiDecl.h"
 #include "dbPropertiesRepository.h"
+#include "dbObjectWithProperties.h"
+#include "dbTrans.h"
+#include "dbEdge.h"
 
 namespace gsi
 {
@@ -72,6 +75,63 @@ static tl::Variant get_properties_meth_impl (const T *s)
 }
 
 template <class T>
+static typename db::result_of_method<decltype (& T::scaled)>::type
+scaled_meth_impl (const T *s, double scale)
+{
+  typename db::result_of_method<decltype (& T::scaled)>::type res (s->scaled (scale), s->properties_id ());
+  return res;
+}
+
+template <class T>
+static T
+transformed_meth_impl0 (const T *s, const db::simple_trans<typename T::coord_type> &tr)
+{
+  return s->transformed (tr);
+}
+
+template <class T>
+static typename db::result_of_method<decltype (& T::template transformed<db::complex_trans<typename T::coord_type, db::DCoord> >)>::type
+transformed_meth_impl1 (const T *s, const db::complex_trans<typename T::coord_type, db::DCoord> &tr)
+{
+  typename db::result_of_method<decltype (& T::template transformed<db::complex_trans<typename T::coord_type, db::DCoord> >)>::type res (s->transformed (tr), s->properties_id ());
+  return res;
+}
+
+template <class T>
+static typename db::result_of_method<decltype (& T::template transformed<db::complex_trans<typename T::coord_type, db::Coord> >)>::type
+transformed_meth_impl2 (const T *s, const db::complex_trans<typename T::coord_type, db::Coord> &tr)
+{
+  typename db::result_of_method<decltype (& T::template transformed<db::complex_trans<typename T::coord_type, db::Coord> >)>::type res (s->transformed (tr), s->properties_id ());
+  return res;
+}
+
+template <class T>
+static void
+transform_meth_impl0 (T *s, const db::simple_trans<typename T::coord_type> &tr)
+{
+  s->transform (tr);
+}
+
+template <class T>
+static void
+transform_meth_impl1 (T *s, const db::complex_trans<typename T::coord_type, typename T::coord_type> &tr)
+{
+  s->transform (tr);
+}
+
+template <class T>
+static T &move_xy_meth_impl (T *s, typename T::coord_type dx, typename T::coord_type dy)
+{
+  return s->move (typename T::vector_type (dx, dy));
+}
+
+template <class T>
+static T moved_xy_meth_impl (const T *s, typename T::coord_type dx, typename T::coord_type dy)
+{
+  return s->moved (typename T::vector_type (dx, dy));
+}
+
+template <class T>
 static gsi::Methods properties_support_methods ()
 {
   return
@@ -80,6 +140,78 @@ static gsi::Methods properties_support_methods ()
   ) +
   gsi::method ("prop_id=", (void (T::*) (db::properties_id_type)) &T::properties_id, gsi::arg ("id"),
     "@brief Sets the properties ID of the object\n"
+  ) +
+  gsi::method_ext ("*", &scaled_meth_impl<T>, gsi::arg ("f"),
+    "@brief Scales the object by some factor\n"
+    "\n"
+    "Returns the scaled object. All coordinates are multiplied with the given factor and, if "
+    "necessary, rounded."
+  ) +
+  gsi::method_ext ("transform", &transform_meth_impl0<T>, gsi::arg ("t"),
+    "@brief Transforms the object (in-place version)\n"
+  ) +
+  gsi::method_ext ("transform", &transform_meth_impl1<T>, gsi::arg ("t"),
+    "@brief Transforms the object (in-place version)\n"
+  ) +
+  gsi::method_ext ("transformed", &transformed_meth_impl0<T>, gsi::arg ("t"),
+    "@brief Returns the transformed object\n"
+    "\n"
+    "Returns a copy of the object, transformed by the given transformation. "
+    "The result is equivalent to 'tr * self'."
+  ) +
+  gsi::method_ext ("transformed", &transformed_meth_impl1<T>, gsi::arg ("t"),
+    "@brief Returns the transformed object\n"
+    "\n"
+    "Returns a copy of the object, transformed by the given transformation. "
+    "The result is equivalent to 'tr * self'."
+  ) +
+  gsi::method_ext ("transformed", &transformed_meth_impl2<T>, gsi::arg ("t"),
+    "@brief Returns the transformed object\n"
+    "\n"
+    "Returns a copy of the object, transformed by the given transformation. "
+    "The result is equivalent to 'tr * self'."
+  ) +
+  gsi::method ("move", &T::move, gsi::arg ("v"),
+    "@brief Moves the object.\n"
+    "\n"
+    "Moves the object by the given offset and returns the \n"
+    "moved object. The object is overwritten.\n"
+    "\n"
+    "@param v The distance to move the object.\n"
+    "\n"
+    "@return The moved object (self).\n"
+  ) +
+  gsi::method_ext ("move", &move_xy_meth_impl<T>, gsi::arg ("dx", 0), gsi::arg ("dy", 0),
+    "@brief Moves the object.\n"
+    "\n"
+    "Moves the object by the given offset and returns the \n"
+    "moved object. The object is overwritten.\n"
+    "\n"
+    "@param dx The x distance to move the object.\n"
+    "@param dy The y distance to move the object.\n"
+    "\n"
+    "@return The moved object (self).\n"
+  ) +
+  gsi::method ("moved", &T::moved, gsi::arg ("v"),
+    "@brief Returns the moved object\n"
+    "\n"
+    "Moves the object by the given offset and returns the \n"
+    "moved object. The object is not modified.\n"
+    "\n"
+    "@param v The distance to move the object.\n"
+    "\n"
+    "@return The moved object.\n"
+  ) +
+  gsi::method_ext ("moved", &moved_xy_meth_impl<T>, gsi::arg ("dx", 0), gsi::arg ("dy", 0),
+    "@brief Returns the moved object (does not modify self)\n"
+    "\n"
+    "Moves the object by the given offset and returns the \n"
+    "moved object. The object is not modified.\n"
+    "\n"
+    "@param dx The x distance to move the object.\n"
+    "@param dy The y distance to move the object.\n"
+    "\n"
+    "@return The moved object.\n"
   ) +
   gsi::method_ext ("delete_property", &delete_property_meth_impl<T>, gsi::arg ("key"),
     "@brief Deletes the user property with the given key\n"

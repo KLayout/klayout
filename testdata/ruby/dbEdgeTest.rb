@@ -342,6 +342,21 @@ class DBEdge_TestClass < TestBase
     s = RBA::EdgeWithProperties::new(RBA::Edge::new(0, 0, 100, 200), pid)
     assert_equal(s.to_s, "(0,0;100,200) props={1=>one}")
     assert_equal((RBA::CplxTrans::new(0.001) * s).to_s, "(0,0;0.1,0.2) props={1=>one}")
+    assert_equal(s.transformed(RBA::CplxTrans::new(0.001)).to_s, "(0,0;0.1,0.2) props={1=>one}")
+    assert_equal(s.transformed(RBA::ICplxTrans::new(2.5)).to_s, "(0,0;250,500) props={1=>one}")
+    assert_equal(s.transformed(RBA::Trans::R90).to_s, "(0,0;-200,100) props={1=>one}")
+    s2 = s.dup
+    s2.transform(RBA::Trans::R90)
+    assert_equal(s2.to_s, "(0,0;-200,100) props={1=>one}")
+    assert_equal((s * 0.001).to_s, "(0,0;0.1,0.2) props={1=>one}")
+    assert_equal(s.moved(10, 20).to_s, "(10,20;110,220) props={1=>one}")
+    assert_equal(s.moved(RBA::Vector::new(10, 20)).to_s, "(10,20;110,220) props={1=>one}")
+    s2 = s.dup
+    s2.move(10, 20)
+    assert_equal(s2.to_s, "(10,20;110,220) props={1=>one}")
+    s2 = s.dup
+    s2.move(RBA::Vector::new(10, 20))
+    assert_equal(s2.to_s, "(10,20;110,220) props={1=>one}")
     assert_equal(s.property(1), "one")
     assert_equal(s.properties, { 1 => "one" })
     s.set_property(1, "xxx")
@@ -357,6 +372,21 @@ class DBEdge_TestClass < TestBase
     s = RBA::DEdgeWithProperties::new(RBA::DEdge::new(0, 0, 100, 200), pid)
     assert_equal(s.to_s, "(0,0;100,200) props={1=>one}")
     assert_equal((RBA::VCplxTrans::new(2.5) * s).to_s, "(0,0;250,500) props={1=>one}")
+    assert_equal(s.transformed(RBA::DCplxTrans::new(0.001)).to_s, "(0,0;0.1,0.2) props={1=>one}")
+    assert_equal(s.transformed(RBA::VCplxTrans::new(2.5)).to_s, "(0,0;250,500) props={1=>one}")
+    assert_equal(s.transformed(RBA::DTrans::R90).to_s, "(0,0;-200,100) props={1=>one}")
+    s2 = s.dup
+    s2.transform(RBA::DTrans::R90)
+    assert_equal(s2.to_s, "(0,0;-200,100) props={1=>one}")
+    assert_equal((s * 0.001).to_s, "(0,0;0.1,0.2) props={1=>one}")
+    assert_equal(s.moved(10, 20).to_s, "(10,20;110,220) props={1=>one}")
+    assert_equal(s.moved(RBA::DVector::new(10, 20)).to_s, "(10,20;110,220) props={1=>one}")
+    s2 = s.dup
+    s2.move(10, 20)
+    assert_equal(s2.to_s, "(10,20;110,220) props={1=>one}")
+    s2 = s.dup
+    s2.move(RBA::DVector::new(10, 20))
+    assert_equal(s2.to_s, "(10,20;110,220) props={1=>one}")
     assert_equal(s.property(1), "one")
     assert_equal(s.properties, { 1 => "one" })
     s.set_property(1, "xxx")

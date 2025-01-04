@@ -32,6 +32,9 @@ namespace db
 {
 
 template <class T>
+class generic_shape_iterator;
+
+template <class T>
 class DB_PUBLIC generic_shape_iterator_delegate_base
 {
 public:
@@ -39,6 +42,9 @@ public:
 
   generic_shape_iterator_delegate_base () { }
   virtual ~generic_shape_iterator_delegate_base () { }
+
+protected:
+  friend class generic_shape_iterator<T>;
 
   virtual void do_reset (const db::Box & /*region*/, bool /*overlapping*/) { }
   virtual db::Box bbox () const { return db::Box::world (); }
@@ -62,6 +68,7 @@ public:
     : m_iter (from), m_from (from), m_to (to)
   { }
 
+protected:
   virtual bool is_addressable () const
   {
     return addressable;
@@ -122,6 +129,7 @@ public:
     : m_iter (from), m_from (from)
   { }
 
+protected:
   virtual bool is_addressable () const
   {
     return addressable;
@@ -185,6 +193,7 @@ public:
     set ();
   }
 
+protected:
   virtual bool is_addressable () const
   {
     return m_is_addressable;

@@ -614,7 +614,7 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
   m_initial_states = m_states;
   mp_error_frame->hide ();
 
-  update_widgets_from_states (m_states);
+  update_widgets_from_states (m_states, lazy_evaluation ());
 
   mp_parameters_area->setWidget (mp_main_frame);
   mp_main_frame->show ();
@@ -713,7 +713,7 @@ PCellParametersPage::do_parameter_changed ()
   db::ParameterStates states = m_states;
   get_parameters (states, &ok);   //  includes coerce
   if (ok) {
-    update_widgets_from_states (states);
+    update_widgets_from_states (states, lazy_evaluation ());
     if (! lazy_evaluation ()) {
       emit edited ();
     }
@@ -959,11 +959,11 @@ PCellParametersPage::set_parameters (const std::vector<tl::Variant> &parameters)
   m_initial_states = m_states;
   mp_error_frame->hide ();
 
-  set_parameters_internal (m_states, false);
+  update_widgets_from_states (m_states, false);
 }
 
 void
-PCellParametersPage::update_widgets_from_states (const db::ParameterStates &states)
+PCellParametersPage::update_widgets_from_states (const db::ParameterStates &states, bool tentatively)
 {
   if (! mp_pcell_decl) {
     return;
@@ -1031,7 +1031,7 @@ PCellParametersPage::update_widgets_from_states (const db::ParameterStates &stat
 
   }
 
-  set_parameters_internal (states, lazy_evaluation ());
+  set_parameters_internal (states, tentatively);
 
   //  QGridLayouts are bad in handling nested QFrame (or QGroupBox) with their own layouts,
   //  so we help a little here:

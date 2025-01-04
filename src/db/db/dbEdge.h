@@ -211,9 +211,9 @@ public:
   /**
    *  @brief A method binding of operator* (mainly for automation purposes)
    */
-  edge<C> scaled (double s) const
+  edge<db::DCoord> scaled (double s) const
   {
-    return edge<C> (point_type (p1 () * s), point_type (p2 () * s));
+    return edge<db::DCoord> (db::point<db::DCoord> (p1 ()) * s, db::point<db::DCoord> (p2 ()) * s);
   }
 
   /**
@@ -1204,10 +1204,10 @@ struct edges_intersect
  *  @return The scaled edge
  */ 
 template <class C>
-inline edge<double> 
+inline edge<db::DCoord>
 operator* (const edge<C> &e, double s)
 {
-  return edge<double> (e.p1 () * s, e.p2 () * s);
+  return edge<db::DCoord> (e.p1 () * s, e.p2 () * s);
 }
 
 /**

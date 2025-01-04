@@ -1035,8 +1035,10 @@ Instances::layout () const
 void
 Instances::invalidate_insts ()
 {
-  if (cell ()) {
-    cell ()->invalidate_insts ();
+  db::Cell *cp = cell ();
+  if (cp) {
+    cp->check_locked ();
+    cp->invalidate_insts ();
   }
 
   set_instance_by_cell_index_needs_made (true);

@@ -394,3 +394,15 @@ TEST(9)
   run_test (_this, file, tc, db::LayerProperties (8, 0), db::Point (3000, 6800), file_au, "A");
 }
 
+//  issue #1967
+TEST(10)
+{
+  std::string file = "t10.oas.gz";
+  std::string file_au = "t10_net.oas.gz";
+
+  db::NetTracerConnectivity tc;
+  tc.add (connection ("1", "2"));
+
+  run_test (_this, file, tc, db::LayerProperties (1, 0), db::Point (300000, 7000), file_au, "");
+}
+

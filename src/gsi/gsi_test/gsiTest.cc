@@ -375,6 +375,18 @@ A *A::a20_get ()
   return a_inst.get (); 
 }
 
+static int s_sp = 0;
+
+int A::sp_i_get ()
+{
+  return s_sp;
+}
+
+void A::sp_i_set (int v)
+{
+  s_sp = v + 1;
+}
+
 // ----------------------------------------------------------------
 //  Implementation of B
 
@@ -1253,6 +1265,8 @@ static gsi::Class<A> decl_a ("", "A",
   gsi::method ("a9b", &A::a9b) +
   gsi::method ("a20", &A::a20) +
   gsi::method ("a20_get", &A::a20_get) +
+  gsi::method ("sp_i", &A::sp_i_get) +
+  gsi::method ("sp_i=", &A::sp_i_set) +
   gsi::method ("to_s", &A::to_s) +
   gsi::iterator ("a6", &A::a6b, &A::a6e) +
   gsi::iterator ("a7", &A::a7b, &A::a7e) +

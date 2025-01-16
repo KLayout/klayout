@@ -24,6 +24,12 @@ class Basic_TestClass < TestBase
     # for testing the ut logger:
     puts "Special chars: <&>"
 
+    # static (class) properties
+    RBA::A.sp_i = 17
+    assert_equal( RBA::A.sp_i, 18 )
+    RBA::A.sp_i = -1
+    assert_equal( RBA::A.sp_i, 0 )
+
     GC.start 
     
     # all references of A are released now:

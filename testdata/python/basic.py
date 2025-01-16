@@ -149,6 +149,15 @@ class BasicTest(unittest.TestCase):
 
   def test_00(self):
 
+    # does not work with all Python versions
+    # (debugging shows that Python calls the setter on the metaclass,
+    # not on the class itself at least on 3.12)
+    # # static (class) properties
+    # pya.A.sp_i = 17
+    # self.assertEqual(pya.A.sp_i, 18)
+    # pya.A.sp_i = -1
+    # self.assertEqual(pya.A.sp_i, 0)
+
     # all references of PA are released now:
     ic0 = pya.A.instance_count()
 

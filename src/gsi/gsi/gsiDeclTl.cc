@@ -105,11 +105,14 @@ Class<Logger> decl_Logger ("tl", "Logger",
     "Level 0 is silent, levels 10, 20, 30 etc. denote levels with increasing verbosity. "
     "11, 21, 31 .. are sublevels which also enable timing logs in addition to messages."
   ) +
-  gsi::method ("verbosity=", &Logger::set_verbosity, gsi::arg ("v"),
+  gsi::method ("verbosity=|set_verbosity", &Logger::set_verbosity, gsi::arg ("v"),
     "@brief Sets the verbosity level for the application\n"
     "\n"
     "See \\verbosity for a definition of the verbosity levels. Please note that this method "
     "changes the verbosity level for the whole application.\n"
+    "\n"
+    "The 'set_verbosity' alias has been introduced in version 0.29.11 as class attributes "
+    "are not always available in Python."
   ),
   "@brief A logger\n"
   "\n"

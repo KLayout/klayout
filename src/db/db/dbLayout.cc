@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2024 Matthias Koefferlein
+  Copyright (C) 2006-2025 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -873,6 +873,7 @@ Layout::delete_cells (const std::set<cell_index_type> &cells_to_delete)
   std::set <cell_index_type> pcs;
   for (std::set<cell_index_type>::const_iterator c = cells_to_delete.begin (); c != cells_to_delete.end (); ++c) {
     const db::Cell &cref = cell (*c);
+    cref.check_locked ();
     for (db::Cell::parent_cell_iterator pc = cref.begin_parent_cells (); pc != cref.end_parent_cells (); ++pc) {
       pcs.insert (*pc);
     }
@@ -950,6 +951,7 @@ void
 Layout::delete_cell (cell_index_type id)
 {
   db::Cell &cref = cell (id);
+  cref.check_locked ();
 
   std::vector <cell_index_type> pcs;
   for (db::Cell::parent_cell_iterator pc = cref.begin_parent_cells (); pc != cref.end_parent_cells (); ++pc) {
@@ -1140,6 +1142,8 @@ Layout::flatten (const db::Cell &source_cell, db::Cell &target_cell, const db::I
 void 
 Layout::flatten (db::Cell &cell_to_flatten, int levels, bool prune) 
 {
+  cell_to_flatten.check_locked ();
+
   std::set<db::cell_index_type> direct_children;
   if (prune) {
     //  save direct children

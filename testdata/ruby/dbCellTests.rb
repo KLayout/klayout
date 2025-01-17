@@ -1,7 +1,7 @@
 # encoding: UTF-8
 
 # KLayout Layout Viewer
-# Copyright (C) 2006-2024 Matthias Koefferlein
+# Copyright (C) 2006-2025 Matthias Koefferlein
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -121,6 +121,230 @@ class DBCellTests_TestClass < TestBase
     assert_equal(ly.layer_infos, [ RBA::LayerInfo::new(1, 0) ])
     top.shapes(RBA::LayerInfo::new(2, 0)).insert(RBA::Box::new(0, 0, 100, 200))
     assert_equal(ly.layer_infos, [ RBA::LayerInfo::new(1, 0), RBA::LayerInfo::new(2, 0) ])
+
+  end
+
+  # locking
+  def test_4
+
+    ly = RBA::Layout::new
+    top = ly.create_cell("TOP")
+    other = ly.create_cell("OTHER")
+    child = ly.create_cell("CHILD")
+
+    l1 = ly.layer(1, 0)
+    l2 = ly.layer(2, 0)
+    shape = top.shapes(l1).insert(RBA::Box::new(0, 0, 100, 200))
+    inst = top.insert(RBA::CellInstArray::new(child, RBA::Trans::new(RBA::Vector::new(100, 200))))
+    other.insert(RBA::CellInstArray::new(child, RBA::Trans::new(RBA::Vector::new(10, 20))))
+
+    assert_equal(top.is_locked?, false)
+    top.locked = false
+    assert_equal(top.is_locked?, false)
+    top.locked = true
+    assert_equal(top.is_locked?, true)
+
+    # rename is still possible
+    top.name = "TOP2"
+
+    # instances of the cell can still be created
+    toptop = ly.create_cell("TOPTOP")
+    toptop.insert(RBA::CellInstArray::new(top, RBA::Trans::new))
+    assert_equal(top.each_parent_inst.to_a[0].child_inst.to_s, "cell_index=0 r0 0,0")
+
+    begin
+      # forbidden now
+      top.shapes(l2).insert(RBA::Box::new(0, 0, 100, 200))
+      assert_equal(true, false)
+    rescue => ex
+      assert_equal(ex.to_s, "Cell 'TOP2' cannot be modified as it is locked in Shapes::insert")
+    end
+
+    begin
+      # forbidden now
+      shape.box = RBA::Box::new(1, 2, 101, 202)
+      assert_equal(true, false)
+    rescue => ex
+      assert_equal(ex.to_s, "Cell 'TOP2' cannot be modified as it is locked in Shape::box=")
+    end
+
+    begin
+      # forbidden now
+      shape.prop_id = 1
+      assert_equal(true, false)
+    rescue => ex
+      assert_equal(ex.to_s, "Cell 'TOP2' cannot be modified as it is locked in Shape::prop_id=")
+    end
+
+    begin
+      # forbidden now
+      shape.polygon = RBA::Polygon::new(RBA::Box::new(0, 0, 200, 100))
+      assert_equal(true, false)
+    rescue => ex
+      assert_equal(ex.to_s, "Cell 'TOP2' cannot be modified as it is locked in Shape::polygon=")
+    end
+
+    begin
+      # forbidden now
+      inst.cell_index = other.cell_index
+      assert_equal(true, false)
+    rescue => ex
+      assert_equal(ex.to_s, "Cell 'TOP2' cannot be modified as it is locked in Instance::cell_index=")
+    end
+
+    begin
+      # forbidden now
+      inst.prop_id = 1
+      assert_equal(true, false)
+    rescue => ex
+      assert_equal(ex.to_s, "Cell 'TOP2' cannot be modified as it is locked in Instance::prop_id=")
+    end
+
+    begin
+      # also forbidden
+      top.insert(RBA::CellInstArray::new(child, RBA::Trans::new))
+      assert_equal(true, false)
+    rescue => ex
+      assert_equal(ex.to_s, "Cell 'TOP2' cannot be modified as it is locked in Cell::insert")
+    end
+
+    begin
+      # clear is forbidding
+      top.clear
+      assert_equal(true, false)
+    rescue => ex
+      assert_equal(ex.to_s, "Cell 'TOP2' cannot be modified as it is locked in Cell::clear")
+    end
+
+    begin
+      # clear layer is forbidden
+      top.shapes(l1).clear
+      assert_equal(true, false)
+    rescue => ex
+      assert_equal(ex.to_s, "Cell 'TOP2' cannot be modified as it is locked in Shapes::clear")
+    end
+
+    begin
+      # clear layer is forbidden
+      top.clear(l1)
+      assert_equal(true, false)
+    rescue => ex
+      assert_equal(ex.to_s, "Cell 'TOP2' cannot be modified as it is locked in Cell::clear")
+    end
+
+    begin
+      # layer copy is forbidden
+      top.copy(l1, l2)
+      assert_equal(true, false)
+    rescue => ex
+      assert_equal(ex.to_s, "Cell 'TOP2' cannot be modified as it is locked in Cell::copy")
+    end
+
+    begin
+      # layer move is forbidden
+      top.move(l1, l2)
+      assert_equal(true, false)
+    rescue => ex
+      assert_equal(ex.to_s, "Cell 'TOP2' cannot be modified as it is locked in Cell::move")
+    end
+
+    begin
+      # layer swap is forbidden
+      top.swap(l1, l2)
+      assert_equal(true, false)
+    rescue => ex
+      assert_equal(ex.to_s, "Cell 'TOP2' cannot be modified as it is locked in Cell::swap")
+    end
+
+    begin
+      # copy_instances is forbidden
+      top.copy_instances(other)
+      assert_equal(true, false)
+    rescue => ex
+      assert_equal(ex.to_s, "Cell 'TOP2' cannot be modified as it is locked in Cell::copy_instances")
+    end
+
+    begin
+      # move_instances is forbidden
+      top.move_instances(other)
+      assert_equal(true, false)
+    rescue => ex
+      assert_equal(ex.to_s, "Cell 'TOP2' cannot be modified as it is locked in Cell::move_instances")
+    end
+
+    begin
+      # copy_tree is forbidden
+      top.copy_tree(other)
+      assert_equal(true, false)
+    rescue => ex
+      assert_equal(ex.to_s, "Cell 'TOP2' cannot be modified as it is locked in Cell::copy_tree")
+    end
+
+    begin
+      # move_tree is forbidden
+      top.move_tree(other)
+      assert_equal(true, false)
+    rescue => ex
+      assert_equal(ex.to_s, "Cell 'TOP2' cannot be modified as it is locked in Cell::move_tree")
+    end
+
+    begin
+      # copy_shapes is forbidden
+      top.copy_shapes(other)
+      assert_equal(true, false)
+    rescue => ex
+      assert_equal(ex.to_s, "Cell 'TOP2' cannot be modified as it is locked in Cell::copy_shapes")
+    end
+
+    begin
+      # move_shapes is forbidden
+      top.move_shapes(other)
+      assert_equal(true, false)
+    rescue => ex
+      assert_equal(ex.to_s, "Cell 'TOP2' cannot be modified as it is locked in Cell::move_shapes")
+    end
+
+    begin
+      # flatten is forbidden
+      top.flatten(true)
+      assert_equal(true, false)
+    rescue => ex
+      assert_equal(ex.to_s, "Cell 'TOP2' cannot be modified as it is locked in Cell::flatten")
+    end
+
+    begin
+      # cell cannot be deleted
+      top.delete
+      assert_equal(true, false)
+    rescue => ex
+      assert_equal(ex.to_s, "Cell 'TOP2' cannot be modified as it is locked in Cell::delete")
+    end
+
+    # locked attribute is copied
+    ly2 = ly.dup
+    assert_equal(ly2.cell("TOP2").is_locked?, true)
+
+    begin
+      # cell cannot be deleted
+      ly2.cell("TOP2").delete
+      assert_equal(true, false)
+    rescue => ex
+      assert_equal(ex.to_s, "Cell 'TOP2' cannot be modified as it is locked in Cell::delete")
+    end
+
+    # clear and _destroy is always possible
+    ly2.clear
+
+    ly2 = ly.dup
+    ly2._destroy
+
+    # resetting the locked flag enables things again (not all tested here)
+    top.locked = false
+
+    inst.cell_index = other.cell_index
+    top.shapes(l2).insert(RBA::Box::new(0, 0, 100, 200))
+    shape.box = RBA::Box::new(1, 2, 101, 202)
+    top.delete
 
   end
 

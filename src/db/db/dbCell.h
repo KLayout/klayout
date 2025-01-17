@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2024 Matthias Koefferlein
+  Copyright (C) 2006-2025 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -833,6 +833,13 @@ public:
   virtual void update (ImportLayerMapping * /*layer_mapping*/ = 0) { }
 
   /**
+   *  @brief Checks if the cell is locked
+   *
+   *  This method throws an exception if the cell is locked.
+   */
+  void check_locked () const;
+
+  /**
    *  @brief Tell, if this cell is a proxy cell
    *
    *  Proxy cells are such whose layout represents a snapshot of another entity.
@@ -901,6 +908,27 @@ public:
   void set_ghost_cell (bool g)
   {
     m_ghost_cell = g;
+  }
+
+  /**
+   *  @brief Gets a value indicating whether the cell is locked
+   *
+   *  A locked cell cannot be modified in terms of instances or shapes.
+   *  The name of a locked cell can be changed though.
+   */
+  bool is_locked () const
+  {
+    return m_locked;
+  }
+
+  /**
+   *  @brief Sets the locked state of the cell
+   *
+   *  See \is_locked for details about locked state.
+   */
+  void set_locked (bool f)
+  {
+    m_locked = f;
   }
 
   /**
@@ -1076,8 +1104,9 @@ private:
   db::properties_id_type m_prop_id;
 
   // packed fields
-  unsigned int m_hier_levels : 30;
+  unsigned int m_hier_levels : 29;
   bool m_bbox_needs_update : 1;
+  bool m_locked : 1;
   bool m_ghost_cell : 1;
 
   static box_type ms_empty_box;

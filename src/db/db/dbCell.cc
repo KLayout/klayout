@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2024 Matthias Koefferlein
+  Copyright (C) 2006-2025 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -93,7 +93,7 @@ Cell::box_type Cell::ms_empty_box = Cell::box_type ();
 Cell::Cell (cell_index_type ci, db::Layout &l) 
   : db::Object (l.manager ()), 
     m_cell_index (ci), mp_layout (&l), m_instances (this), m_prop_id (0), m_hier_levels (0),
-    m_bbox_needs_update (false), m_ghost_cell (false),
+    m_bbox_needs_update (false), m_locked (false), m_ghost_cell (false),
     mp_last (0), mp_next (0)
 {
   //  .. nothing yet 
@@ -125,6 +125,7 @@ Cell::operator= (const Cell &d)
     }
 
     m_ghost_cell = d.m_ghost_cell;
+    m_locked = d.m_locked;
     m_instances = d.m_instances;
     m_bbox = d.m_bbox;
     m_bboxes = d.m_bboxes;
@@ -138,6 +139,7 @@ Cell::operator= (const Cell &d)
 
 Cell::~Cell ()
 {
+  m_locked = false;
   clear_shapes ();
 }
 
@@ -180,6 +182,8 @@ Cell::empty () const
 void 
 Cell::clear (unsigned int index)
 {
+  check_locked ();
+
   shapes_map::iterator s = m_shapes_map.find(index);
   if (s != m_shapes_map.end() && ! s->second.empty ()) {
     mp_layout->invalidate_bboxes (index);  //  HINT: must come before the change is done!
@@ -191,6 +195,8 @@ Cell::clear (unsigned int index)
 void
 Cell::clear (unsigned int index, unsigned int types)
 {
+  check_locked ();
+
   shapes_map::iterator s = m_shapes_map.find(index);
   if (s != m_shapes_map.end() && ! s->second.empty ()) {
     mp_layout->invalidate_bboxes (index);  //  HINT: must come before the change is done!
@@ -241,6 +247,8 @@ Cell::index_of_shapes (const Cell::shapes_type *shapes) const
 void
 Cell::clear_shapes ()
 {
+  check_locked ();
+
   mp_layout->invalidate_bboxes (std::numeric_limits<unsigned int>::max ());  //  HINT: must come before the change is done!
   clear_shapes_no_invalidate ();
 }
@@ -345,6 +353,8 @@ Cell::update_bbox (unsigned int layers)
 void
 Cell::copy (unsigned int src, unsigned int dest)
 {
+  check_locked ();
+
   if (src != dest) {
     shapes (dest).insert (shapes (src));
   } else {
@@ -359,6 +369,8 @@ Cell::copy (unsigned int src, unsigned int dest)
 void
 Cell::copy (unsigned int src, unsigned int dest, unsigned int types)
 {
+  check_locked ();
+
   if (src != dest) {
     shapes (dest).insert (shapes (src), types);
   } else {
@@ -373,6 +385,8 @@ Cell::copy (unsigned int src, unsigned int dest, unsigned int types)
 void
 Cell::move (unsigned int src, unsigned int dest)
 {
+  check_locked ();
+
   if (src != dest) {
     copy (src, dest);
     clear (src);
@@ -382,6 +396,8 @@ Cell::move (unsigned int src, unsigned int dest)
 void
 Cell::move (unsigned int src, unsigned int dest, unsigned int types)
 {
+  check_locked ();
+
   if (src != dest) {
     copy (src, dest, types);
     clear (src, types);
@@ -391,6 +407,8 @@ Cell::move (unsigned int src, unsigned int dest, unsigned int types)
 void
 Cell::swap (unsigned int i1, unsigned int i2)
 {
+  check_locked ();
+
   if (i1 != i2) {
 
     if (manager () && manager ()->transacting ()) {
@@ -785,6 +803,14 @@ Cell::set_name (const std::string &name)
 }
 
 void
+Cell::check_locked () const
+{
+  if (m_locked) {
+    throw tl::Exception (tl::to_string (tr ("Cell '%s' cannot be modified as it is locked")), get_basic_name ());
+  }
+}
+
+void
 Cell::copy_shapes (const db::Cell &source_cell, const db::LayerMapping &layer_mapping)
 {
   if (this == &source_cell) {
@@ -799,6 +825,8 @@ Cell::copy_shapes (const db::Cell &source_cell, const db::LayerMapping &layer_ma
   if (! source_layout) {
     throw tl::Exception (tl::to_string (tr ("Source cell does not reside in a layout")));
   }
+
+  check_locked ();
 
   if (target_layout != source_layout) {
     db::PropertyMapper pm (target_layout, source_layout);
@@ -824,6 +852,8 @@ Cell::copy_shapes (const db::Cell &source_cell)
     throw tl::Exception (tl::to_string (tr ("Cell does not reside in a layout")));
   }
 
+  check_locked ();
+
   if (target_layout != source_cell.layout ()) {
     if (! source_cell.layout ()) {
       throw tl::Exception (tl::to_string (tr ("Source cell does not reside in a layout")));
@@ -848,6 +878,8 @@ Cell::copy_instances (const db::Cell &source_cell)
     throw tl::Exception (tl::to_string (tr ("Cells do not reside in the same layout")));
   }
 
+  check_locked ();
+
   for (db::Cell::const_iterator i = source_cell.begin (); ! i.at_end (); ++i) {
     insert (*i);
   }
@@ -868,6 +900,8 @@ Cell::copy_tree (const db::Cell &source_cell)
   if (! source_layout) {
     throw tl::Exception (tl::to_string (tr ("Source cell does not reside in a layout")));
   }
+
+  check_locked ();
 
   db::ICplxTrans trans (source_layout->dbu () / target_layout->dbu ());
 
@@ -900,6 +934,8 @@ Cell::copy_tree_shapes (const db::Cell &source_cell, const db::CellMapping &cm)
     throw tl::Exception (tl::to_string (tr ("Source cell does not reside in a layout")));
   }
 
+  check_locked ();
+
   db::ICplxTrans trans (source_layout->dbu () / target_layout->dbu ());
 
   db::LayerMapping lm;
@@ -926,6 +962,8 @@ Cell::copy_tree_shapes (const db::Cell &source_cell, const db::CellMapping &cm, 
     throw tl::Exception (tl::to_string (tr ("Source cell does not reside in a layout")));
   }
 
+  check_locked ();
+
   db::ICplxTrans trans (source_layout->dbu () / target_layout->dbu ());
 
   std::vector <db::cell_index_type> source_cells;
@@ -948,6 +986,8 @@ Cell::move_shapes (db::Cell &source_cell, const db::LayerMapping &layer_mapping)
   if (! source_layout) {
     throw tl::Exception (tl::to_string (tr ("Source cell does not reside in a layout")));
   }
+
+  check_locked ();
 
   if (target_layout != source_layout) {
     db::PropertyMapper pm (target_layout, source_layout);
@@ -975,6 +1015,8 @@ Cell::move_shapes (db::Cell &source_cell)
     throw tl::Exception (tl::to_string (tr ("Cell does not reside in a layout")));
   }
 
+  check_locked ();
+
   if (target_layout != source_cell.layout ()) {
     if (! source_cell.layout ()) {
       throw tl::Exception (tl::to_string (tr ("Source cell does not reside in a layout")));
@@ -1000,6 +1042,8 @@ Cell::move_instances (db::Cell &source_cell)
     throw tl::Exception (tl::to_string (tr ("Cells do not reside in the same layout")));
   }
 
+  check_locked ();
+
   for (db::Cell::const_iterator i = source_cell.begin (); ! i.at_end (); ++i) {
     insert (*i);
   }
@@ -1022,6 +1066,8 @@ Cell::move_tree (db::Cell &source_cell)
   if (! source_layout) {
     throw tl::Exception (tl::to_string (tr ("Source cell does not reside in a layout")));
   }
+
+  check_locked ();
 
   db::PropertyMapper pm (target_layout, source_layout);
   db::ICplxTrans trans (source_layout->dbu () / target_layout->dbu ());
@@ -1057,6 +1103,8 @@ Cell::move_tree_shapes (db::Cell &source_cell, const db::CellMapping &cm)
     throw tl::Exception (tl::to_string (tr ("Source cell does not reside in a layout")));
   }
 
+  check_locked ();
+
   db::PropertyMapper pm (target_layout, source_layout);
   db::ICplxTrans trans (source_layout->dbu () / target_layout->dbu ());
 
@@ -1083,6 +1131,8 @@ Cell::move_tree_shapes (db::Cell &source_cell, const db::CellMapping &cm, const 
   if (! source_layout) {
     throw tl::Exception (tl::to_string (tr ("Source cell does not reside in a layout")));
   }
+
+  check_locked ();
 
   db::PropertyMapper pm (target_layout, source_layout);
   db::ICplxTrans trans (source_layout->dbu () / target_layout->dbu ());

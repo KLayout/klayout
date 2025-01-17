@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2024 Matthias Koefferlein
+  Copyright (C) 2006-2025 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -2922,6 +2922,28 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "This method has been introduced in version 0.19.\n"
     "\n"
     "@return A list of cell indices.\n"
+  ) +
+  gsi::method ("is_locked?", &db::Cell::is_locked,
+    "@brief Gets a value indicating whether the cell is locked\n"
+    "\n"
+    "Locked cells cannot be modified in terms of instances (children) and shapes. "
+    "Locked cells can still be renamed, but cannot be deleted or cleared.\n"
+    "Among other things, these features are disabled too: layer operations, copy of instances or shapes, "
+    "flattening or pruning.\n"
+    "\n"
+    "However, wiping the layout entirely with \\Layout#clear is always possible, even if cells are locked.\n"
+    "\n"
+    "Use \\locked= to set the locked state of the cell.\n"
+    "\n"
+    "The lock feature has been introduced in version 0.29.11."
+  ) +
+  gsi::method ("locked=", &db::Cell::set_locked, gsi::arg ("l"),
+    "@brief Locks or unlocks the cell\n"
+    "\n"
+    "Set this predicate to 'true' to lock the cell and to 'false' to unlock it.\n"
+    "See \\is_locked? for details about the lock feature.\n"
+    "\n"
+    "The lock feature has been introduced in version 0.29.11."
   ) +
   gsi::method ("bbox", (const db::Cell::box_type &(db::Cell::*) () const) &db::Cell::bbox,
     "@brief Gets the bounding box of the cell\n"

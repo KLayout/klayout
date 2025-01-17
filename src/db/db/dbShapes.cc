@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2024 Matthias Koefferlein
+  Copyright (C) 2006-2025 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -297,12 +297,16 @@ Shapes::array_repository () const
 void
 Shapes::invalidate_state ()
 {
+  db::Cell *cp = cell ();
+  if (cp) {
+    cp->check_locked ();
+  }
   if (! is_dirty ()) {
     set_dirty (true);
-    if (layout () && cell ()) {
-      unsigned int index = cell ()->index_of_shapes (this);
+    if (cp && cp->layout ()) {
+      unsigned int index = cp->index_of_shapes (this);
       if (index != std::numeric_limits<unsigned int>::max ()) {
-        layout ()->invalidate_bboxes (index);
+        cp->layout ()->invalidate_bboxes (index);
       }
     }
   }

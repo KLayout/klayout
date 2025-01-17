@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2024 Matthias Koefferlein
+  Copyright (C) 2006-2025 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -1035,8 +1035,10 @@ Instances::layout () const
 void
 Instances::invalidate_insts ()
 {
-  if (cell ()) {
-    cell ()->invalidate_insts ();
+  db::Cell *cp = cell ();
+  if (cp) {
+    cp->check_locked ();
+    cp->invalidate_insts ();
   }
 
   set_instance_by_cell_index_needs_made (true);

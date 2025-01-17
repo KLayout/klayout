@@ -832,6 +832,27 @@ class Cell:
 
     This method has been introduced in version 0.20.
     """
+    locked: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the cell is locked
+
+    Locked cells cannot be modified in terms of instances (children) and shapes. Locked cells can still be renamed, but cannot be deleted or cleared.
+    Among other things, these features are disabled too: layer operations, copy of instances or shapes, flattening or pruning.
+
+    However, wiping the layout entirely with \Layout#clear is always possible, even if cells are locked.
+
+    Use \locked= to set the locked state of the cell.
+
+    The lock feature has been introduced in version 0.29.11.
+    Setter:
+    @brief Locks or unlocks the cell
+
+    Set this predicate to 'true' to lock the cell and to 'false' to unlock it.
+    See \is_locked? for details about the lock feature.
+
+    The lock feature has been introduced in version 0.29.11.
+    """
     name: str
     r"""
     Getter:
@@ -1910,6 +1931,20 @@ class Cell:
         a library.
 
         This method has been introduced in version 0.22.
+        """
+        ...
+    def is_locked(self) -> bool:
+        r"""
+        @brief Gets a value indicating whether the cell is locked
+
+        Locked cells cannot be modified in terms of instances (children) and shapes. Locked cells can still be renamed, but cannot be deleted or cleared.
+        Among other things, these features are disabled too: layer operations, copy of instances or shapes, flattening or pruning.
+
+        However, wiping the layout entirely with \Layout#clear is always possible, even if cells are locked.
+
+        Use \locked= to set the locked state of the cell.
+
+        The lock feature has been introduced in version 0.29.11.
         """
         ...
     @overload
@@ -30230,11 +30265,11 @@ class Instance:
 
     Starting with version 0.25 the displacement is of vector type.
     Setter:
-    @brief Sets the displacement vector for the 'b' axis
+    @brief Sets the displacement vector for the 'b' axis in micrometer units
 
-    If the instance was not an array instance before it is made one.
+    Like \b= with an integer displacement, this method will set the displacement vector but it accepts a vector in micrometer units that is of \DVector type. The vector will be translated to database units internally.
 
-    This method has been introduced in version 0.23. Starting with version 0.25 the displacement is of vector type.
+    This method has been introduced in version 0.25.
     """
     cell: Cell
     r"""
@@ -30408,9 +30443,10 @@ class Instance:
     @brief Gets the transformation of the instance or the first instance in the array
     The transformation returned is only valid if the array does not represent a complex transformation array
     Setter:
-    @brief Sets the transformation of the instance or the first instance in the array
+    @brief Sets the transformation of the instance or the first instance in the array (in micrometer units)
+    This method sets the transformation the same way as \cplx_trans=, but the displacement of this transformation is given in micrometer units. It is internally translated into database units.
 
-    This method has been introduced in version 0.23.
+    This method has been introduced in version 0.25.
     """
     @classmethod
     def new(cls) -> Instance:
@@ -41367,15 +41403,15 @@ class NetPinRef:
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this pin reference is attached to.
+        @brief Gets the net this pin reference is attached to (non-const version).
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this pin reference is attached to (non-const version).
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the net this pin reference is attached to.
         """
         ...
     def pin(self) -> Pin:
@@ -41665,17 +41701,17 @@ class NetTerminalRef:
     @overload
     def device(self) -> Device:
         r"""
-        @brief Gets the device reference (non-const version).
+        @brief Gets the device reference.
         Gets the device object that this connection is made to.
-
-        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def device(self) -> Device:
         r"""
-        @brief Gets the device reference.
+        @brief Gets the device reference (non-const version).
         Gets the device object that this connection is made to.
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     def device_class(self) -> DeviceClass:
@@ -42687,17 +42723,26 @@ class Netlist:
     @overload
     def circuit_by_name(self, name: str) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given name.
+        @brief Gets the circuit object for a given name (const version).
         If the name is not a valid circuit name, nil is returned.
+
+        This constness variant has been introduced in version 0.26.8.
         """
         ...
     @overload
     def circuit_by_name(self, name: str) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given name (const version).
+        @brief Gets the circuit object for a given name.
         If the name is not a valid circuit name, nil is returned.
+        """
+        ...
+    @overload
+    def circuits_by_name(self, name_pattern: str) -> List[Circuit]:
+        r"""
+        @brief Gets the circuit objects for a given name filter.
+        The name filter is a glob pattern. This method will return all \Circuit objects matching the glob pattern.
 
-        This constness variant has been introduced in version 0.26.8.
+        This method has been introduced in version 0.26.4.
         """
         ...
     @overload
@@ -42708,15 +42753,6 @@ class Netlist:
 
 
         This constness variant has been introduced in version 0.26.8.
-        """
-        ...
-    @overload
-    def circuits_by_name(self, name_pattern: str) -> List[Circuit]:
-        r"""
-        @brief Gets the circuit objects for a given name filter.
-        The name filter is a glob pattern. This method will return all \Circuit objects matching the glob pattern.
-
-        This method has been introduced in version 0.26.4.
         """
         ...
     def combine_devices(self) -> None:
@@ -60838,17 +60874,17 @@ class SubCircuit(NetlistObject):
     @overload
     def circuit(self) -> Circuit:
         r"""
-        @brief Gets the circuit the subcircuit lives in.
+        @brief Gets the circuit the subcircuit lives in (non-const version).
         This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def circuit(self) -> Circuit:
         r"""
-        @brief Gets the circuit the subcircuit lives in (non-const version).
+        @brief Gets the circuit the subcircuit lives in.
         This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
-
-        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload

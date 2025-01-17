@@ -1673,6 +1673,16 @@ class Logger:
         """
         ...
     @classmethod
+    def set_verbosity(cls, v: int) -> None:
+        r"""
+        @brief Sets the verbosity level for the application
+
+        See \verbosity for a definition of the verbosity levels. Please note that this method changes the verbosity level for the whole application.
+
+        The 'set_verbosity' alias has been introduced in version 0.29.11 as class attributes are not always available in Python.
+        """
+        ...
+    @classmethod
     def warn(cls, msg: str) -> None:
         r"""
         @brief Writes the given string to the warning channel

@@ -2,10 +2,10 @@
 # This script is sourced to define the main version parameters
 
 # The main version
-KLAYOUT_VERSION="0.29.10"
+KLAYOUT_VERSION="0.29.11"
 
 # The version used for PyPI (don't use variables here!)
-KLAYOUT_PYPI_VERSION="0.29.10"
+KLAYOUT_PYPI_VERSION="0.29.11"
 
 # The build date
 KLAYOUT_VERSION_DATE=$(date "+%Y-%m-%d")

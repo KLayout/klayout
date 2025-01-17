@@ -1,3 +1,12 @@
+0.29.11          (2025-01-17):
+* Bug: %GITHUB%/issues/1948 Crash by instantiate a Cell in a Library-Cell 
+* Bug: %GITHUB%/issues/1953 Callback_impl & coerce_parameters_impl parameter display issue
+* Bug: %GITHUB%/issues/1955 Locked layout after certain operations
+* Bug: %GITHUB%/issues/1959 Color corrections not working properly for images with color mapping / float values
+* Enhancement: %GITHUB%/issues/1963 Add lock to Cell
+* Bug: %GITHUB%/issues/1967 Possible net tracer bug in point-and-click net trace
+* Enhancement: %GITHUB%/issues/1971 Suppress warnings written with tl::warn from Python
+
 0.29.10          (2024-12-03):
 * Bug: %GITHUB%/issues/1941 Crash with the navigator open
 * Bug: %GITHUB%/issues/1942 Syntax error in pyi stubs

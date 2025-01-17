@@ -392,34 +392,42 @@ WarningChannel::~WarningChannel ()
 void
 WarningChannel::puts (const char *s)
 {
-  fputs (s, stdout);
+  if (verbosity () >= 0) {
+    fputs (s, stdout);
+  }
 }
 
 void
 WarningChannel::endl ()
 {
-  fputs ("\n", stdout);
-  m_new_line = true;
+  if (verbosity () >= 0) {
+    fputs ("\n", stdout);
+    m_new_line = true;
+  }
 }
 
 void
 WarningChannel::end ()
 {
-  if (m_colorized) {
-    fputs (ANSI_RESET, stdout);
+  if (verbosity () >= 0) {
+    if (m_colorized) {
+      fputs (ANSI_RESET, stdout);
+    }
+    fflush (stdout);
   }
-  fflush (stdout);
 }
 
 void
 WarningChannel::begin ()
 {
-  if (m_colorized) {
-    fputs (ANSI_BLUE, stdout);
-  }
-  if (m_new_line) {
-    fputs ("Warning: ", stdout);
-    m_new_line = false;
+  if (verbosity () >= 0) {
+    if (m_colorized) {
+      fputs (ANSI_BLUE, stdout);
+    }
+    if (m_new_line) {
+      fputs ("Warning: ", stdout);
+      m_new_line = false;
+    }
   }
 }
 
@@ -463,34 +471,42 @@ ErrorChannel::~ErrorChannel ()
 void
 ErrorChannel::puts (const char *s)
 {
-  fputs (s, stderr);
+  if (verbosity () >= -10) {
+    fputs (s, stderr);
+  }
 }
 
 void
 ErrorChannel::endl ()
 {
-  fputs ("\n", stderr);
-  m_new_line = true;
+  if (verbosity () >= -10) {
+    fputs ("\n", stderr);
+    m_new_line = true;
+  }
 }
 
 void
 ErrorChannel::end ()
 {
-  if (m_colorized) {
-    fputs (ANSI_RESET, stderr);
+  if (verbosity () >= -10) {
+    if (m_colorized) {
+      fputs (ANSI_RESET, stderr);
+    }
+    fflush (stderr);
   }
-  fflush (stderr);
 }
 
 void
 ErrorChannel::begin ()
 {
-  if (m_colorized) {
-    fputs (ANSI_RED, stderr);
-  }
-  if (m_new_line) {
-    fputs ("ERROR: ", stderr);
-    m_new_line = false;
+  if (verbosity () >= -10) {
+    if (m_colorized) {
+      fputs (ANSI_RED, stderr);
+    }
+    if (m_new_line) {
+      fputs ("ERROR: ", stderr);
+      m_new_line = false;
+    }
   }
 }
 

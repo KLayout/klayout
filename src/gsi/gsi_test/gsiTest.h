@@ -415,6 +415,10 @@ struct A
 
   std::string to_s () const;
 
+  //  static (class) properties
+  static int sp_i_get ();
+  static void sp_i_set (int v);
+
   //  members
   std::vector<double> m_d;
   int n;

@@ -6,7 +6,7 @@
 #
 # Here are dictionaries of ...
 #  different modules for building KLayout (http://www.klayout.de/index.php)
-#  version 0.29.7 or later on different Apple Mac OSX platforms.
+#  version 0.29.11 or later on different Apple Mac OSX platforms.
 #
 # This file is imported by 'build4mac.py' script.
 #===============================================================================
@@ -130,7 +130,7 @@ Qt56Dictionary  = { 'Qt5MacPorts': Qt5MacPorts,
 #-----------------------------------------------------
 RubyNil  = [ 'nil' ]
 RubySys  = [ 'RubyMonterey', 'RubyVentura', 'RubySonoma', 'RubySequoia' ]
-RubyExt  = [ 'Ruby33MacPorts', 'Ruby33Brew', 'RubyAnaconda3' ]
+RubyExt  = [ 'Ruby33MacPorts', 'Ruby34Brew', 'RubyAnaconda3' ]
 Rubies   = RubyNil + RubySys + RubyExt
 
 #-----------------------------------------------------
@@ -196,13 +196,13 @@ Ruby33MacPorts  = { 'exe': '/opt/local/bin/ruby3.3',
                     'lib': '/opt/local/lib/libruby.3.3.dylib'
                   }
 
-# Ruby 3.3 from Homebrew
-#   install with 'brew install ruby@3.3'
-# [Key Type Name] = 'HB33'
-HBRuby33Path    = '%s/opt/ruby@3.3' % DefaultHomebrewRoot
-Ruby33Brew      = { 'exe': '%s/bin/ruby' % HBRuby33Path,
-                    'inc': '%s/include/ruby-3.3.0' % HBRuby33Path,
-                    'lib': '%s/lib/libruby.3.3.dylib' % HBRuby33Path
+# Ruby 3.4 from Homebrew
+#   install with 'brew install ruby@3.4'
+# [Key Type Name] = 'HB34'
+HBRuby34Path    = '%s/opt/ruby@3.4' % DefaultHomebrewRoot
+Ruby34Brew      = { 'exe': '%s/bin/ruby' % HBRuby34Path,
+                    'inc': '%s/include/ruby-3.4.0' % HBRuby34Path,
+                    'lib': '%s/lib/libruby.3.4.dylib' % HBRuby34Path
                   }
 
 # Ruby 3.2 bundled with anaconda3 installed under /Applications/anaconda3/
@@ -221,7 +221,7 @@ RubyDictionary  = { 'nil'           : None,
                     'RubySonoma'    : RubySonoma,
                     'RubySequoia'   : RubySequoia,
                     'Ruby33MacPorts': Ruby33MacPorts,
-                    'Ruby33Brew'    : Ruby33Brew,
+                    'Ruby34Brew'    : Ruby34Brew,
                     'RubyAnaconda3' : RubyAnaconda3
                   }
 

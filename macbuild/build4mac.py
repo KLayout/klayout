@@ -5,7 +5,7 @@
 # File: "macbuild/build4mac.py"
 #
 #  The top Python script for building KLayout (http://www.klayout.de/index.php)
-#  version 0.29.7 or later on different Apple Mac OSX platforms.
+#  version 0.29.11 or later on different Apple Mac OSX platforms.
 #===============================================================================
 import sys
 import os
@@ -45,7 +45,7 @@ def GenerateUsage(platform):
     usage  = "\n"
     usage += "-----------------------------------------------------------------------------------------------------------\n"
     usage += "<< Usage of 'build4mac.py' >>\n"
-    usage += "       for building KLayout 0.29.7 or later on different Apple macOS platforms.\n"
+    usage += "       for building KLayout 0.29.11 or later on different Apple macOS platforms.\n"
     usage += "\n"
     usage += "$ [python] ./build4mac.py\n"
     usage += "   option & argument    : descriptions (refer to 'macbuild/build4mac_env.py' for details)  | default value\n"
@@ -58,11 +58,11 @@ def GenerateUsage(platform):
     usage += "                        :   Qt6MacPorts: use Qt6 from MacPorts (*)                         |\n"
     usage += "                        :       Qt6Brew: use Qt6 from Homebrew (*)                         |\n"
     usage += "                        :                        (*) migration to Qt6 is ongoing           |\n"
-    usage += "   [-r|--ruby <type>]   : case-insensitive type=['nil', 'Sys', 'MP33', 'HB33', 'Ana3']     | %s\n" % myRuby
+    usage += "   [-r|--ruby <type>]   : case-insensitive type=['nil', 'Sys', 'MP33', 'HB34', 'Ana3']     | %s\n" % myRuby
     usage += "                        :    nil: don't bind Ruby                                          |\n"
     usage += "                        :    Sys: use [Sequoia|Sonoma|Ventura|Monterey]-bundled Ruby 2.6   |\n"
     usage += "                        :   MP33: use Ruby 3.3 from MacPorts                               |\n"
-    usage += "                        :   HB33: use Ruby 3.3 from Homebrew                               |\n"
+    usage += "                        :   HB34: use Ruby 3.4 from Homebrew                               |\n"
     usage += "                        :   Ana3: use Ruby 3.2 from Anaconda3                              |\n"
     usage += "   [-p|--python <type>] : case-insensitive type=['nil', 'Sys', 'MP312', 'HB312', 'Ana3',   | %s\n" % myPython
     usage += "                        :                        'MP311', 'HB311', 'HBAuto']               |\n"
@@ -271,7 +271,7 @@ def Parse_CLI_Args(config):
 
     p.add_option( '-r', '--ruby',
                     dest='type_ruby',
-                    help="Ruby type=['nil', 'Sys', 'MP33', 'HB33', 'Ana3']" )
+                    help="Ruby type=['nil', 'Sys', 'MP33', 'HB34', 'Ana3']" )
 
     p.add_option( '-p', '--python',
                     dest='type_python',
@@ -405,7 +405,7 @@ def Parse_CLI_Args(config):
     candidates['NIL']  = 'nil'
     candidates['SYS']  = 'Sys'
     candidates['MP33'] = 'MP33'
-    candidates['HB33'] = 'HB33'
+    candidates['HB34'] = 'HB34'
     candidates['ANA3'] = 'Ana3'
     try:
         choiceRuby = candidates[ opt.type_ruby.upper() ]
@@ -428,8 +428,8 @@ def Parse_CLI_Args(config):
         elif choiceRuby == "MP33":
             ModuleRuby   = 'Ruby33MacPorts'
             NonOSStdLang = True
-        elif choiceRuby == "HB33":
-            ModuleRuby   = 'Ruby33Brew'
+        elif choiceRuby == "HB34":
+            ModuleRuby   = 'Ruby34Brew'
             NonOSStdLang = True
         elif choiceRuby == "Ana3":
             ModuleRuby   = 'RubyAnaconda3'
@@ -730,7 +730,7 @@ def Get_Build_Parameters(config):
     #     <pymod> will be built if:
     #       BuildPymodWhl = True
     #       Platform      = [ 'Sequoia', 'Sonoma', 'Ventura', 'Monterey']
-    #       ModuleRuby    = [ 'Ruby33MacPorts', 'Ruby33Brew', 'RubyAnaconda3' ]
+    #       ModuleRuby    = [ 'Ruby33MacPorts', 'Ruby34Brew', 'RubyAnaconda3' ]
     #       ModulePython  = [ 'Python312MacPorts', 'Python311MacPorts',
     #                         'Python311Brew',
     #                         'PythonAnaconda3' ]
@@ -741,7 +741,7 @@ def Get_Build_Parameters(config):
 
     PymodDistDir = dict()
     if Platform in [ 'Sequoia', 'Sonoma', 'Ventura', 'Monterey' ]:
-        if ModuleRuby in [ 'Ruby33MacPorts', 'Ruby33Brew', 'RubyAnaconda3' ]:
+        if ModuleRuby in [ 'Ruby33MacPorts', 'Ruby34Brew', 'RubyAnaconda3' ]:
             if ModulePython in [ 'Python312MacPorts', 'Python311MacPorts' ]:
                 PymodDistDir[ModulePython] = 'dist-MP3-%s' % ModuleQt
             elif ModulePython in [ 'Python311Brew' ]:
@@ -764,7 +764,7 @@ def Build_pymod_wheel(parameters):
     # [1] <pymod> will be built if:
     #       BuildPymodWhl = True
     #       Platform      = [ 'Sequoia', 'Sonoma', 'Ventura', 'Monterey']
-    #       ModuleRuby    = [ 'Ruby33MacPorts', 'Ruby33Brew', 'RubyAnaconda3' ]
+    #       ModuleRuby    = [ 'Ruby33MacPorts', 'Ruby34Brew', 'RubyAnaconda3' ]
     #       ModulePython  = [ 'Python312MacPorts', 'Python311MacPorts',
     #                         'Python311Brew',
     #                         'PythonAnaconda3' ]
@@ -777,7 +777,7 @@ def Build_pymod_wheel(parameters):
         return 0
     if not Platform in [ 'Sequoia', 'Sonoma', 'Ventura', 'Monterey' ]:
         return 0
-    elif not ModuleRuby in [ 'Ruby33MacPorts', 'Ruby33Brew', 'RubyAnaconda3' ]:
+    elif not ModuleRuby in [ 'Ruby33MacPorts', 'Ruby34Brew', 'RubyAnaconda3' ]:
         return 0
     elif not ModulePython in [ 'Python312MacPorts', 'Python311MacPorts', \
                                'Python311Brew', \
@@ -2158,11 +2158,11 @@ def Deploy_Binaries_For_Bundle(config, parameters):
         #-------------------------------------------------------------
         # [10] Special deployment of Ruby3.3 from Homebrew?
         #-------------------------------------------------------------
-        deploymentRuby33HB = (ModuleRuby == 'Ruby33Brew')
+        deploymentRuby33HB = (ModuleRuby == 'Ruby34Brew')
         if deploymentRuby33HB and NonOSStdLang:
 
             print( "" )
-            print( " [10] You have reached optional deployment of Ruby from %s ..." % HBRuby33Path )
+            print( " [10] You have reached optional deployment of Ruby from %s ..." % HBRuby34Path )
             print( "   [!!!] Sorry, the deployed package will not work properly since deployment of" )
             print( "         Ruby3.3 from Homebrew is not yet supported." )
             print( "         Since you have Homebrew development environment, there two options:" )

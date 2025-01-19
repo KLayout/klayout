@@ -1285,7 +1285,14 @@ property_setter_impl (int mid, PyObject *self, PyObject *value)
 
     meth->call (obj, arglist, retlist);
 
-    return get_return_value (p, retlist, meth, heap);
+    PyObject *ret = get_return_value (p, retlist, meth, heap);
+
+    if (ret == NULL) {
+      Py_INCREF (Py_None);
+      ret = Py_None;
+    }
+
+    return ret;
 
   }
 }

@@ -107,9 +107,9 @@ LogReceiver::begin ()
 //  LogFile implementation
 
 LogFile::LogFile (size_t max_entries, bool register_global)
-  : m_error_receiver (this, 0, &LogFile::add_error),
+  : m_error_receiver (this, -10, &LogFile::add_error),
     m_warn_receiver (this, 0, &LogFile::add_warn),
-    m_log_receiver (this, 0, &LogFile::add_info),
+    m_log_receiver (this, 10, &LogFile::add_info),
     m_info_receiver (this, 0, &LogFile::add_info),
     m_max_entries (max_entries),
     m_generation_id (0), 
@@ -347,7 +347,7 @@ LogViewerDialog::LogViewerDialog (QWidget *parent, bool register_global, bool in
     verbosity_cbx->hide ();
     verbosity_label->hide ();
   } else {
-    verbosity_cbx->setCurrentIndex (std::min (4, tl::verbosity () / 10));
+    verbosity_cbx->setCurrentIndex (std::max (-2, std::min (4, tl::verbosity () / 10)) + 2);
     connect (verbosity_cbx, SIGNAL (currentIndexChanged (int)), this, SLOT (verbosity_changed (int)));
   }
 
@@ -371,7 +371,7 @@ LogViewerDialog::LogViewerDialog (QWidget *parent, bool register_global, bool in
 void
 LogViewerDialog::verbosity_changed (int index)
 {
-  tl::verbosity (index * 10 + 1);
+  tl::verbosity ((index - 2) * 10 + 1);
 }
 
 // -----------------------------------------------------------------

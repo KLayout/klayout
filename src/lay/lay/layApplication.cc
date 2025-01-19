@@ -312,9 +312,6 @@ ApplicationBase::parse_cmd (int &argc, char **argv)
 
       int v = 0;
       tl::from_string (args [++i], v);
-      if (v < 0) {
-        v = 0;
-      }
       tl::verbosity (v);
 
     } else if (a == "-k" && (i + 1) < argc) {
@@ -1065,7 +1062,7 @@ ApplicationBase::usage ()
   r += tl::to_string (QObject::tr ("  -b                  Batch mode (same as -zz -nc -rx)")) + "\n";
   r += tl::to_string (QObject::tr ("  -c <config file>    Use this configuration file")) + "\n";
   r += tl::to_string (QObject::tr ("  -nc                 Don't use a configuration file (implies -t)")) + "\n";
-  r += tl::to_string (QObject::tr ("  -d <debug level>    Set debug level")) + "\n";
+  r += tl::to_string (QObject::tr ("  -d <log level>      Set log level")) + "\n";
   r += tl::to_string (QObject::tr ("  -e                  Editable mode (allow editing of files)")) + "\n";
   r += tl::to_string (QObject::tr ("  -ne                 Readonly mode (editing of files is disabled)")) + "\n";
   r += tl::to_string (QObject::tr ("  -gr <file name>     Record GUI test file")) + "\n";

@@ -33,6 +33,16 @@
     <widget class="QComboBox" name="verbosity_cbx">
      <item>
       <property name="text">
+       <string>No warnings, no errors</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>No warnings</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
        <string>Silent</string>
       </property>
      </item>

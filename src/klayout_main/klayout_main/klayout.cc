@@ -322,9 +322,6 @@ klayout_main (int &argc, char **argv)
 
       int v = 0;
       tl::from_string (argv [++i], v);
-      if (v < 0) {
-        v = 0;
-      }
       tl::verbosity (v);
 
     }

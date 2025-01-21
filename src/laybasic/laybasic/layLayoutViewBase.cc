@@ -1745,13 +1745,21 @@ LayoutViewBase::icon_for_layer (const LayerPropertiesConstIterator &iter, unsign
 
     frame.fill (i, w - 1 - p0, w - p0);
     frame.fill (i, w - 1 - (wp - p1), w - (wp - p1));
-    frame.fill (i, w - 1 - p0x, w - p0x);
-    frame.fill (i, w - 1 - (wp - p1x), w - (wp - p1x));
+    if ((unsigned int) p0x < w) {
+      frame.fill (i, w - 1 - p0x, w - p0x);
+    }
+    if ((unsigned int) (wp - p1x) < w) {
+      frame.fill (i, w - 1 - (wp - p1x), w - (wp - p1x));
+    }
 
     while (d < ddx) {
       d += ddy;
-      frame.fill (i, w - 1 - p0x, w - p0x);
-      frame.fill (i, w - 1 - (wp - p1x), w - (wp - p1x));
+      if ((unsigned int) p0x < w) {
+        frame.fill (i, w - 1 - p0x, w - p0x);
+      }
+      if ((unsigned int) (wp - p1x) < w) {
+        frame.fill (i, w - 1 - (wp - p1x), w - (wp - p1x));
+      }
       ++p0x;
       ++p1x;
     }

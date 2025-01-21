@@ -946,6 +946,15 @@ struct text_ref
     tref.transform (t);
     return tref;
   }
+
+  /**
+   *  @brief A dummy implementation of the "scaled" function for API compatibility
+   */
+  text_ref<Text, Trans> scaled (double) const
+  {
+    tl_assert (false); // not implemented
+    return *this;
+  }
 };
 
 /**

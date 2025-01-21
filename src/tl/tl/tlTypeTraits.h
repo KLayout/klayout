@@ -155,6 +155,43 @@ struct has_swap
   static constexpr bool value = sizeof (__test_swap_func<T> (nullptr)) == sizeof (__yes_type);
 };
 
+
+/**
+ *  @brief Delivers the return type for a method
+ *
+ *  class Foo {
+ *    int func(const std::string &s);
+ *  };
+ *
+ *  typedef typename tl::result_of_method<decltype (& Foo::func)>::type return_type;  // int
+ */
+template <class R>
+struct result_of_method;
+
+template <class R, class Obj, class A1>
+struct result_of_method<R (Obj::*) (A1) const>
+{
+  typedef R type;
+};
+
+template <class R, class Obj, class A1, class A2>
+struct result_of_method<R (Obj::*) (A1, A2) const>
+{
+  typedef R type;
+};
+
+template <class R, class Obj, class A1, class A2, class A3>
+struct result_of_method<R (Obj::*) (A1, A2, A3) const>
+{
+  typedef R type;
+};
+
+template <class R, class Obj, class A1, class A2, class A3, class A4>
+struct result_of_method<R (Obj::*) (A1, A2, A3, A4) const>
+{
+  typedef R type;
+};
+
 }
 
 #endif

@@ -3522,6 +3522,15 @@ public:
     pref.transform (t);
     return pref;
   }
+
+  /**
+   *  @brief A dummy implementation of the "scaled" function for API compatibility
+   */
+  polygon_ref<Poly, Trans> scaled (double) const
+  {
+    tl_assert (false); // not implemented
+    return *this;
+  }
 };
 
 /**

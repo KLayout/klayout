@@ -24,6 +24,7 @@
 #define HDR_dbPropertiesSupport
 
 #include "gsiDecl.h"
+#include "tlTypeTraits.h"
 #include "dbPropertiesRepository.h"
 #include "dbObjectWithProperties.h"
 #include "dbTrans.h"
@@ -75,10 +76,10 @@ static tl::Variant get_properties_meth_impl (const T *s)
 }
 
 template <class T>
-static typename db::result_of_method<decltype (& T::scaled)>::type
+static typename tl::result_of_method<decltype (& T::scaled)>::type
 scaled_meth_impl (const T *s, double scale)
 {
-  typename db::result_of_method<decltype (& T::scaled)>::type res (s->scaled (scale), s->properties_id ());
+  typename tl::result_of_method<decltype (& T::scaled)>::type res (s->scaled (scale), s->properties_id ());
   return res;
 }
 
@@ -90,18 +91,18 @@ transformed_meth_impl0 (const T *s, const db::simple_trans<typename T::coord_typ
 }
 
 template <class T>
-static typename db::result_of_method<decltype (& T::template transformed<db::complex_trans<typename T::coord_type, db::DCoord> >)>::type
+static typename tl::result_of_method<decltype (& T::template transformed<db::complex_trans<typename T::coord_type, db::DCoord> >)>::type
 transformed_meth_impl1 (const T *s, const db::complex_trans<typename T::coord_type, db::DCoord> &tr)
 {
-  typename db::result_of_method<decltype (& T::template transformed<db::complex_trans<typename T::coord_type, db::DCoord> >)>::type res (s->transformed (tr), s->properties_id ());
+  typename tl::result_of_method<decltype (& T::template transformed<db::complex_trans<typename T::coord_type, db::DCoord> >)>::type res (s->transformed (tr), s->properties_id ());
   return res;
 }
 
 template <class T>
-static typename db::result_of_method<decltype (& T::template transformed<db::complex_trans<typename T::coord_type, db::Coord> >)>::type
+static typename tl::result_of_method<decltype (& T::template transformed<db::complex_trans<typename T::coord_type, db::Coord> >)>::type
 transformed_meth_impl2 (const T *s, const db::complex_trans<typename T::coord_type, db::Coord> &tr)
 {
-  typename db::result_of_method<decltype (& T::template transformed<db::complex_trans<typename T::coord_type, db::Coord> >)>::type res (s->transformed (tr), s->properties_id ());
+  typename tl::result_of_method<decltype (& T::template transformed<db::complex_trans<typename T::coord_type, db::Coord> >)>::type res (s->transformed (tr), s->properties_id ());
   return res;
 }
 

@@ -203,7 +203,8 @@ public:
   /**
    *  @brief Returns the scaled object
    */
-  auto scaled (double f) const
+  db::object_with_properties<typename tl::result_of_method<decltype (& Obj::scaled)>::type>
+  scaled (double f) const
   {
     return make_object_with_properties (Obj::scaled (f), m_id);
   }
@@ -212,7 +213,8 @@ public:
    *  @brief Returns the transformed object
    */
   template <class Trans>
-  auto transformed (const Trans &tr) const
+  db::object_with_properties<typename tl::result_of_method<decltype (& Obj::template transformed<Trans>)>::type>
+  transformed (const Trans &tr) const
   {
     return make_object_with_properties (Obj::transformed (tr), m_id);
   }
@@ -304,20 +306,11 @@ typedef object_with_properties<db::array<db::CellInst, db::DTrans> > DCellInstAr
  *  @return t * obj
  */
 
-template <class R>
-struct result_of_method;
-
-template <class R, class Obj, class A1>
-struct result_of_method<R (Obj::*) (A1) const>
-{
-  typedef R type;
-};
-
 template <class Tr, class Obj>
-inline db::object_with_properties<typename result_of_method<decltype (& Obj::template transformed<Tr>)>::type>
+inline db::object_with_properties<typename tl::result_of_method<decltype (& Obj::template transformed<Tr>)>::type>
 operator* (const Tr &t, const db::object_with_properties<Obj> &obj)
 {
-  return db::object_with_properties<typename result_of_method<decltype (& Obj::template transformed<Tr>)>::type> (obj.Obj::transformed (t), obj.properties_id ());
+  return db::object_with_properties<typename tl::result_of_method<decltype (& Obj::template transformed<Tr>)>::type> (obj.Obj::transformed (t), obj.properties_id ());
 }
 
 /**
@@ -329,10 +322,10 @@ operator* (const Tr &t, const db::object_with_properties<Obj> &obj)
  *  @return The scaled object
  */
 template <class Obj>
-inline db::object_with_properties<typename result_of_method<decltype (& Obj::operator*)>::type>
+inline db::object_with_properties<typename tl::result_of_method<decltype (& Obj::operator*)>::type>
 operator* (const db::object_with_properties<Obj> &obj, double s)
 {
-  return db::object_with_properties<typename result_of_method<decltype (& Obj::operator*)>::type> (obj * s, obj.properties_id ());
+  return db::object_with_properties<typename tl::result_of_method<decltype (& Obj::operator*)>::type> (obj * s, obj.properties_id ());
 }
 
 /**

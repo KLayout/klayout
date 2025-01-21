@@ -2483,6 +2483,14 @@ struct array
   }
 
   /**
+   *  @brief A dummy implementation of the "scaled" function for API compatibility
+   */
+  array scaled (double f) const
+  {
+    return transformed (db::complex_trans<coord_type, coord_type> (f));
+  }
+
+  /**
    *  @brief Transformation of an array into a new system
    *
    *  See the "transform_into" method for details about this transformation.

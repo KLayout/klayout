@@ -1079,6 +1079,15 @@ struct path_ref
     pref.transform (t);
     return pref;
   }
+
+  /**
+   *  @brief A dummy implementation of the "scaled" function for API compatibility
+   */
+  path_ref<Path, Trans> scaled (double) const
+  {
+    tl_assert (false); // not implemented
+    return *this;
+  }
 };
 
 /**

@@ -78,7 +78,7 @@ def SetGlobals():
     Usage  = "\n"
     Usage += "---------------------------------------------------------------------------------------------------------\n"
     Usage += "<< Usage of 'makeDMG4mac.py' >>\n"
-    Usage += "       for making a DMG file of KLayout 0.29.7 or later on different Apple macOS platforms.\n"
+    Usage += "       for making a DMG file of KLayout 0.29.11 or later on different Apple macOS platforms.\n"
     Usage += "\n"
     Usage += "$ [python] ./makeDMG4mac.py\n"
     Usage += "   option & argument    : descriptions                                               | default value\n"
@@ -220,7 +220,7 @@ def SetGlobals():
 # The package directory name should look like:
 #     * ST-qt5MP.pkg.macos-Sonoma-release-RsysPsys
 #     * LW-qt5Ana3.pkg.macos-Sonoma-release-Rana3Pana3
-#     * LW-qt6Brew.pkg.macos-Sonoma-release-Rhb33Phb312  --- (1)
+#     * LW-qt6Brew.pkg.macos-Sonoma-release-Rhb34Phb312  --- (1)
 #     * LW-qt5MP.pkg.macos-Sonoma-release-Rmp33Pmp312
 #     * HW-qt6Brew.pkg.macos-Sonoma-release-RsysPhb311
 #
@@ -228,7 +228,7 @@ def SetGlobals():
 #     * LW-qt6MP.pkg.macos-Sonoma-release-Rmp33Pmp312
 #
 # Generated DMG will be, for example,
-#     (1) ---> LW-klayout-0.29.7-macOS-Sonoma-1-qt6Brew-Rhb33Phb312.dmg
+#     (1) ---> LW-klayout-0.29.7-macOS-Sonoma-1-qt6Brew-Rhb34Phb312.dmg
 #
 # @return on success, positive integer in [MB] that tells approx. occupied disc space;
 #         on failure, -1
@@ -270,10 +270,10 @@ def CheckPkgDirectory():
     # [2] Identify (Qt, Ruby, Python) from PkgDir
     #     * ST-qt5MP.pkg.macos-Sonoma-release-RsysPsys
     #     * LW-qt5Ana3.pkg.macos-Sonoma-release-Rana3Pana3
-    #     * LW-qt6Brew.pkg.macos-Sonoma-release-Rhb33Phb312
+    #     * LW-qt6Brew.pkg.macos-Sonoma-release-Rhb34Phb312
     #     * LW-qt5MP.pkg.macos-Sonoma-release-Rmp33Pmp312
     #     * HW-qt6Brew.pkg.macos-Sonoma-release-RsysPhb311
-    #     * EX-qt5MP.pkg.macos-Sonoma-release-Rhb33Pmp312
+    #     * EX-qt5MP.pkg.macos-Sonoma-release-Rhb34Pmp312
     #
     #     * ST-qt6MP.pkg.macos-Sonoma-release-RsysPsys
     #     * LW-qt6MP.pkg.macos-Sonoma-release-Rmp33Pmp312
@@ -324,7 +324,7 @@ def CheckPkgDirectory():
         LatestOSHomebrew   = Platform == LatestOS
         LatestOSHomebrew  &= PackagePrefix == "LW"
         LatestOSHomebrew  &= QtIdentification in [ "qt5Brew", "qt6Brew", "qt5MP", "qt6MP" ] # "qt[5|6]MP" are the alternatives
-        LatestOSHomebrew  &= RubyPythonID in [ "Rhb33Phb312", "Rhb33Phb311", "Rhb33Phbauto" ]
+        LatestOSHomebrew  &= RubyPythonID in [ "Rhb34Phb312", "Rhb34Phb311", "Rhb34Phbauto" ]
 
         LatestOSAnaconda3  = Platform == LatestOS
         LatestOSAnaconda3 &= PackagePrefix == "LW"

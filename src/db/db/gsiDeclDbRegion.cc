@@ -250,7 +250,17 @@ static db::Region *new_a (const std::vector <db::Polygon> &a)
   return new db::Region (a.begin (), a.end ());
 }
 
+static db::Region *new_ap (const std::vector <db::PolygonWithProperties> &a)
+{
+  return new db::Region (a.begin (), a.end ());
+}
+
 static db::Region *new_b (const db::Box &o)
+{
+  return new db::Region (o);
+}
+
+static db::Region *new_bp (const db::BoxWithProperties &o)
 {
   return new db::Region (o);
 }
@@ -260,12 +270,27 @@ static db::Region *new_p (const db::Polygon &o)
   return new db::Region (o);
 }
 
+static db::Region *new_pp (const db::PolygonWithProperties &o)
+{
+  return new db::Region (o);
+}
+
 static db::Region *new_ps (const db::SimplePolygon &o)
 {
   return new db::Region (o);
 }
 
+static db::Region *new_psp (const db::SimplePolygonWithProperties &o)
+{
+  return new db::Region (o);
+}
+
 static db::Region *new_path (const db::Path &o)
+{
+  return new db::Region (o);
+}
+
+static db::Region *new_pathp (const db::PathWithProperties &o)
 {
   return new db::Region (o);
 }
@@ -378,6 +403,13 @@ static db::Region::perimeter_type perimeter2 (const db::Region *r, const db::Box
 static void insert_a (db::Region *r, const std::vector <db::Polygon> &a)
 {
   for (std::vector <db::Polygon>::const_iterator p = a.begin (); p != a.end (); ++p) {
+    r->insert (*p);
+  }
+}
+
+static void insert_ap (db::Region *r, const std::vector <db::PolygonWithProperties> &a)
+{
+  for (std::vector <db::PolygonWithProperties>::const_iterator p = a.begin (); p != a.end (); ++p) {
     r->insert (*p);
   }
 }
@@ -1170,25 +1202,60 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This constructor creates a region from an array of polygons.\n"
   ) +
+  constructor ("new", &new_ap, gsi::arg ("array"),
+    "@brief Constructor from an array of polygons with properties\n"
+    "\n"
+    "This constructor creates a region from an array of polygons with properties.\n"
+    "\n"
+    "This variant has been introduced in version 0.30."
+  ) +
   constructor ("new", &new_b, gsi::arg ("box"),
     "@brief Box constructor\n"
     "\n"
     "This constructor creates a region from a box.\n"
+  ) +
+  constructor ("new", &new_bp, gsi::arg ("box"),
+    "@brief Box constructor\n"
+    "\n"
+    "This constructor creates a region from a box with properties.\n"
+    "\n"
+    "This variant has been introduced in version 0.30."
   ) +
   constructor ("new", &new_p, gsi::arg ("polygon"),
     "@brief Polygon constructor\n"
     "\n"
     "This constructor creates a region from a polygon.\n"
   ) +
+  constructor ("new", &new_pp, gsi::arg ("polygon"),
+    "@brief Polygon constructor\n"
+    "\n"
+    "This constructor creates a region from a polygon with properties.\n"
+    "\n"
+    "This variant has been introduced in version 0.30."
+  ) +
   constructor ("new", &new_ps, gsi::arg ("polygon"),
     "@brief Simple polygon constructor\n"
     "\n"
     "This constructor creates a region from a simple polygon.\n"
   ) +
+  constructor ("new", &new_psp, gsi::arg ("polygon"),
+    "@brief Simple polygon constructor\n"
+    "\n"
+    "This constructor creates a region from a simple polygon with properties.\n"
+    "\n"
+    "This variant has been introduced in version 0.30."
+  ) +
   constructor ("new", &new_path, gsi::arg ("path"),
     "@brief Path constructor\n"
     "\n"
     "This constructor creates a region from a path.\n"
+  ) +
+  constructor ("new", &new_pathp, gsi::arg ("path"),
+    "@brief Path constructor\n"
+    "\n"
+    "This constructor creates a region from a path with properties.\n"
+    "\n"
+    "This variant has been introduced in version 0.30."
   ) +
   constructor ("new", &new_si, gsi::arg ("shape_iterator"),
     "@brief Constructor from a hierarchical shape set\n"
@@ -1697,20 +1764,48 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Inserts a box into the region.\n"
   ) +
+  method ("insert", (void (db::Region::*)(const db::BoxWithProperties &)) &db::Region::insert, gsi::arg ("box"),
+    "@brief Inserts a box\n"
+    "\n"
+    "Inserts a box with properties into the region.\n"
+    "\n"
+    "This variant has been introduced in version 0.30."
+  ) +
   method ("insert", (void (db::Region::*)(const db::Polygon &)) &db::Region::insert, gsi::arg ("polygon"),
     "@brief Inserts a polygon\n"
     "\n"
     "Inserts a polygon into the region.\n"
+  ) +
+  method ("insert", (void (db::Region::*)(const db::PolygonWithProperties &)) &db::Region::insert, gsi::arg ("polygon"),
+    "@brief Inserts a polygon\n"
+    "\n"
+    "Inserts a polygon with properties into the region.\n"
+    "\n"
+    "This variant has been introduced in version 0.30."
   ) +
   method ("insert", (void (db::Region::*)(const db::SimplePolygon &)) &db::Region::insert, gsi::arg ("polygon"),
     "@brief Inserts a simple polygon\n"
     "\n"
     "Inserts a simple polygon into the region.\n"
   ) +
+  method ("insert", (void (db::Region::*)(const db::SimplePolygonWithProperties &)) &db::Region::insert, gsi::arg ("polygon"),
+    "@brief Inserts a simple polygon\n"
+    "\n"
+    "Inserts a simple polygon with properties into the region.\n"
+    "\n"
+    "This variant has been introduced in version 0.30."
+  ) +
   method ("insert", (void (db::Region::*)(const db::Path &)) &db::Region::insert, gsi::arg ("path"),
     "@brief Inserts a path\n"
     "\n"
     "Inserts a path into the region.\n"
+  ) +
+  method ("insert", (void (db::Region::*)(const db::PathWithProperties &)) &db::Region::insert, gsi::arg ("path"),
+    "@brief Inserts a path\n"
+    "\n"
+    "Inserts a path with properties into the region.\n"
+    "\n"
+    "This variant has been introduced in version 0.30."
   ) +
   method_ext ("insert", &insert_si, gsi::arg ("shape_iterator"),
     "@brief Inserts all shapes delivered by the recursive shape iterator into this region\n"
@@ -1728,6 +1823,11 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   ) +
   method_ext ("insert", &insert_a, gsi::arg ("array"),
     "@brief Inserts all polygons from the array into this region\n"
+  ) +
+  method_ext ("insert", &insert_ap, gsi::arg ("array"),
+    "@brief Inserts all polygons with properties from the array into this region\n"
+    "\n"
+    "This variant has been introduced in version 0.30."
   ) +
   method_ext ("insert", &insert_r, gsi::arg ("region"),
     "@brief Inserts all polygons from the other region into this region\n"

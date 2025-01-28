@@ -1280,12 +1280,12 @@ class DBRegion_TestClass < TestBase
 
     assert_equal(csort((r & rr).to_s), csort("(0,0;0,100;100,100;100,0);(200,0;200,100;300,100;300,0);(400,0;400,100;500,100;500,0)"))
     assert_equal(csort(r.and(rr).to_s), csort("(0,0;0,100;100,100;100,0);(200,0;200,100;300,100;300,0);(400,0;400,100;500,100;500,0)"))
-    assert_equal(csort(r.and(rr, RBA::Region::NoPropertyConstraint).to_s), csort("(0,0;0,100;100,100;100,0);(200,0;200,100;300,100;300,0);(400,0;400,100;500,100;500,0)"))
-    assert_equal(csort(r.and(rr, RBA::Region::SamePropertiesConstraint).to_s), csort("(0,0;0,50;100,50;100,0);(400,50;400,100;500,100;500,50)"))
-    assert_equal(csort(r.and(rr, RBA::Region::DifferentPropertiesConstraint).to_s), csort("(0,50;0,100;100,100;100,50);(200,0;200,100;300,100;300,0);(400,0;400,50;500,50;500,0)"))
+    assert_equal(csort(r.and(rr, RBA::Region::NoPropertyConstraint).to_s), csort("(200,0;200,100;300,100;300,0){1=>42};(0,0;0,100;100,100;100,0){1=>17};(400,0;400,100;500,100;500,0)"))
+    assert_equal(csort(r.and(rr, RBA::Region::SamePropertiesConstraint).to_s), csort("(0,0;0,50;100,50;100,0){1=>17};(400,50;400,100;500,100;500,50)"))
+    assert_equal(csort(r.and(rr, RBA::Region::DifferentPropertiesConstraint).to_s), csort("(200,0;200,100;300,100;300,0){1=>42};(0,50;0,100;100,100;100,50){1=>17};(400,0;400,50;500,50;500,0)"))
 
     assert_equal(csort(r.not(rr).to_s), csort("(0,100;0,200;100,200;100,100);(200,100;200,200;300,200;300,100);(400,100;400,200;500,200;500,100)"))
-    assert_equal(csort(r.not(rr, RBA::Region::SamePropertiesConstraint).to_s), csort("(0,50;0,200;100,200;100,50);(400,100;400,200;500,200;500,100);(200,0;200,200;300,200;300,0);(400,0;400,50;500,50;500,0)"))
+    assert_equal(csort(r.not(rr, RBA::Region::SamePropertiesConstraint).to_s), csort("(200,0;200,200;300,200;300,0){1=>42};(0,50;0,200;100,200;100,50){1=>17};(400,100;400,200;500,200;500,100);(400,0;400,50;500,50;500,0)"))
 
     r.remove_properties
     rr.remove_properties
@@ -1525,6 +1525,42 @@ class DBRegion_TestClass < TestBase
 
     assert_equal(r.to_s, "(0,0;0,1000;1000,1000;1000,0);(1000,1000;1000,2000;2000,2000;2000,1000)")
     assert_equal(r.bbox.to_s, "(0,0;2000,2000)")
+
+  end
+
+  # properties
+  def test_props
+
+    r = RBA::Region::new([ RBA::PolygonWithProperties::new(RBA::Box::new(0, 0, 100, 200), { 1 => "one" }) ])
+    assert_equal(r.to_s, "(0,0;0,200;100,200;100,0){1=>one}")
+
+    r = RBA::Region::new
+    r.insert([ RBA::PolygonWithProperties::new(RBA::Box::new(0, 0, 100, 200), { 1 => "one" }) ])
+    assert_equal(r.to_s, "(0,0;0,200;100,200;100,0){1=>one}")
+
+    r = RBA::Region::new(RBA::PolygonWithProperties::new(RBA::Box::new(0, 0, 100, 200), { 1 => "one" }))
+    assert_equal(r.to_s, "(0,0;0,200;100,200;100,0){1=>one}")
+
+    r = RBA::Region::new
+    r.insert(RBA::PolygonWithProperties::new(RBA::Box::new(0, 0, 100, 200), { 1 => "one" }))
+    assert_equal(r.to_s, "(0,0;0,200;100,200;100,0){1=>one}")
+
+    r = RBA::Region::new(RBA::SimplePolygonWithProperties::new(RBA::Box::new(0, 0, 100, 200), { 1 => "one" }))
+    assert_equal(r.to_s, "(0,0;0,200;100,200;100,0){1=>one}")
+
+    r = RBA::Region::new
+    r.insert(RBA::SimplePolygonWithProperties::new(RBA::Box::new(0, 0, 100, 200), { 1 => "one" }))
+    assert_equal(r.to_s, "(0,0;0,200;100,200;100,0){1=>one}")
+
+    r = RBA::Region::new(RBA::BoxWithProperties::new(RBA::Box::new(0, 0, 100, 200), { 1 => "one" }))
+    assert_equal(r.to_s, "(0,0;0,200;100,200;100,0){1=>one}")
+
+    r = RBA::Region::new
+    r.insert(RBA::BoxWithProperties::new(RBA::Box::new(0, 0, 100, 200), { 1 => "one" }))
+    assert_equal(r.to_s, "(0,0;0,200;100,200;100,0){1=>one}")
+
+    r = RBA::Region::new(RBA::PathWithProperties::new(RBA::Path::new([ RBA::Point::new(0, 0), RBA::Point::new(100, 0) ], 20), { 1 => "one" }))
+    assert_equal(r.to_s, "(0,-10;0,10;100,10;100,-10){1=>one}")
 
   end
 

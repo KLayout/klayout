@@ -791,10 +791,18 @@ static db::SimplePolygonWithProperties *new_simple_polygon_with_properties (cons
   return new db::SimplePolygonWithProperties (poly, pid);
 }
 
+static db::SimplePolygonWithProperties *new_simple_polygon_with_properties2 (const db::SimplePolygon &poly, const std::map<tl::Variant, tl::Variant> &properties)
+{
+  return new db::SimplePolygonWithProperties (poly, db::properties_id (db::PropertiesSet (properties.begin (), properties.end ())));
+}
+
 Class<db::SimplePolygonWithProperties> decl_SimplePolygonWithProperties (decl_SimplePolygon, "db", "SimplePolygonWithProperties",
   gsi::properties_support_methods<db::SimplePolygonWithProperties> () +
   constructor ("new", &new_simple_polygon_with_properties, gsi::arg ("polygon"), gsi::arg ("properties_id", db::properties_id_type (0)),
     "@brief Creates a new object from a property-less object and a properties ID."
+  ) +
+  constructor ("new", &new_simple_polygon_with_properties2, gsi::arg ("polygon"), gsi::arg ("properties"),
+    "@brief Creates a new object from a property-less object and a properties hash."
   )
   ,
   "@brief A SimplePolygon object with properties attached.\n"
@@ -878,10 +886,18 @@ static db::DSimplePolygonWithProperties *new_dsimple_polygon_with_properties (co
   return new db::DSimplePolygonWithProperties (poly, pid);
 }
 
+static db::DSimplePolygonWithProperties *new_dsimple_polygon_with_properties2 (const db::DSimplePolygon &poly, const std::map<tl::Variant, tl::Variant> &properties)
+{
+  return new db::DSimplePolygonWithProperties (poly, db::properties_id (db::PropertiesSet (properties.begin (), properties.end ())));
+}
+
 Class<db::DSimplePolygonWithProperties> decl_DSimplePolygonWithProperties (decl_DSimplePolygon, "db", "DSimplePolygonWithProperties",
   gsi::properties_support_methods<db::DSimplePolygonWithProperties> () +
   constructor ("new", &new_dsimple_polygon_with_properties, gsi::arg ("polygon"), gsi::arg ("properties_id", db::properties_id_type (0)),
     "@brief Creates a new object from a property-less object and a properties ID."
+  ) +
+  constructor ("new", &new_dsimple_polygon_with_properties2, gsi::arg ("polygon"), gsi::arg ("properties"),
+    "@brief Creates a new object from a property-less object and a properties hash."
   )
   ,
   "@brief A DSimplePolygon object with properties attached.\n"
@@ -2070,10 +2086,18 @@ static db::PolygonWithProperties *new_polygon_with_properties (const db::Polygon
   return new db::PolygonWithProperties (poly, pid);
 }
 
+static db::PolygonWithProperties *new_polygon_with_properties2 (const db::Polygon &poly, const std::map<tl::Variant, tl::Variant> &properties)
+{
+  return new db::PolygonWithProperties (poly, db::properties_id (db::PropertiesSet (properties.begin (), properties.end ())));
+}
+
 Class<db::PolygonWithProperties> decl_PolygonWithProperties (decl_Polygon, "db", "PolygonWithProperties",
   gsi::properties_support_methods<db::PolygonWithProperties> () +
   constructor ("new", &new_polygon_with_properties, gsi::arg ("polygon"), gsi::arg ("properties_id", db::properties_id_type (0)),
     "@brief Creates a new object from a property-less object and a properties ID."
+  ) +
+  constructor ("new", &new_polygon_with_properties2, gsi::arg ("polygon"), gsi::arg ("properties"),
+    "@brief Creates a new object from a property-less object and a properties hash."
   )
   ,
   "@brief A Polygon object with properties attached.\n"
@@ -2184,10 +2208,18 @@ static db::DPolygonWithProperties *new_dpolygon_with_properties (const db::DPoly
   return new db::DPolygonWithProperties (poly, pid);
 }
 
+static db::DPolygonWithProperties *new_dpolygon_with_properties2 (const db::DPolygon &poly, const std::map<tl::Variant, tl::Variant> &properties)
+{
+  return new db::DPolygonWithProperties (poly, db::properties_id (db::PropertiesSet (properties.begin (), properties.end ())));
+}
+
 Class<db::DPolygonWithProperties> decl_DPolygonWithProperties (decl_DPolygon, "db", "DPolygonWithProperties",
   gsi::properties_support_methods<db::DPolygonWithProperties> () +
   constructor ("new", &new_dpolygon_with_properties, gsi::arg ("polygon"), gsi::arg ("properties_id", db::properties_id_type (0)),
     "@brief Creates a new object from a property-less object and a properties ID."
+  ) +
+  constructor ("new", &new_dpolygon_with_properties2, gsi::arg ("polygon"), gsi::arg ("properties"),
+    "@brief Creates a new object from a property-less object and a properties hash."
   )
   ,
   "@brief A DPolygon object with properties attached.\n"

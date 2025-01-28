@@ -290,10 +290,18 @@ static db::EdgePairWithProperties *new_edge_pair_with_properties (const db::Edge
   return new db::EdgePairWithProperties (edge_pair, pid);
 }
 
+static db::EdgePairWithProperties *new_edge_pair_with_properties2 (const db::EdgePair &edge_pair, const std::map<tl::Variant, tl::Variant> &properties)
+{
+  return new db::EdgePairWithProperties (edge_pair, db::properties_id (db::PropertiesSet (properties.begin (), properties.end ())));
+}
+
 Class<db::EdgePairWithProperties> decl_EdgePairWithProperties (decl_EdgePair, "db", "EdgePairWithProperties",
   gsi::properties_support_methods<db::EdgePairWithProperties> () +
   constructor ("new", &new_edge_pair_with_properties, gsi::arg ("edge_pair"), gsi::arg ("properties_id", db::properties_id_type (0)),
     "@brief Creates a new object from a property-less object and a properties ID."
+  ) +
+  constructor ("new", &new_edge_pair_with_properties2, gsi::arg ("edge_pair"), gsi::arg ("properties"),
+    "@brief Creates a new object from a property-less object and a properties hash."
   )
   ,
   "@brief A EdgePair object with properties attached.\n"
@@ -357,10 +365,18 @@ static db::DEdgePairWithProperties *new_dedge_pair_with_properties (const db::DE
   return new db::DEdgePairWithProperties (edge_pair, pid);
 }
 
+static db::DEdgePairWithProperties *new_dedge_pair_with_properties2 (const db::DEdgePair &edge_pair, const std::map<tl::Variant, tl::Variant> &properties)
+{
+  return new db::DEdgePairWithProperties (edge_pair, db::properties_id (db::PropertiesSet (properties.begin (), properties.end ())));
+}
+
 Class<db::DEdgePairWithProperties> decl_DEdgePairWithProperties (decl_EdgePair, "db", "DEdgePairWithProperties",
   gsi::properties_support_methods<db::DEdgePairWithProperties> () +
   constructor ("new", &new_dedge_pair_with_properties, gsi::arg ("edge_pair"), gsi::arg ("properties_id", db::properties_id_type (0)),
     "@brief Creates a new object from a property-less object and a properties ID."
+  ) +
+  constructor ("new", &new_dedge_pair_with_properties2, gsi::arg ("edge_pair"), gsi::arg ("properties"),
+    "@brief Creates a new object from a property-less object and a properties hash."
   )
   ,
   "@brief A DEdgePair object with properties attached.\n"

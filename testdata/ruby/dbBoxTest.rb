@@ -517,6 +517,9 @@ class DBBox_TestClass < TestBase
     s = RBA::BoxWithProperties::new
     assert_equal(s.to_s, "() props={}")
 
+    s = RBA::BoxWithProperties::new(RBA::Box::new(0, 0, 100, 200), { 1 => "one" })
+    assert_equal(s.to_s, "(0,0;100,200) props={1=>one}")
+
     pid = RBA::Layout::properties_id({ 1 => "one" })
     s = RBA::BoxWithProperties::new(RBA::Box::new(0, 0, 100, 200), pid)
     assert_equal(s.to_s, "(0,0;100,200) props={1=>one}")
@@ -531,6 +534,9 @@ class DBBox_TestClass < TestBase
 
     s = RBA::DBoxWithProperties::new
     assert_equal(s.to_s, "() props={}")
+
+    s = RBA::DBoxWithProperties::new(RBA::DBox::new(0, 0, 100, 200), { 1 => "one" })
+    assert_equal(s.to_s, "(0,0;100,200) props={1=>one}")
 
     pid = RBA::Layout::properties_id({ 1 => "one" })
     s = RBA::DBoxWithProperties::new(RBA::DBox::new(0, 0, 100, 200), pid)

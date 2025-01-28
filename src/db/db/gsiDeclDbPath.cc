@@ -390,10 +390,18 @@ static db::PathWithProperties *new_path_with_properties (const db::Path &path, d
   return new db::PathWithProperties (path, pid);
 }
 
+static db::PathWithProperties *new_path_with_properties2 (const db::Path &path, const std::map<tl::Variant, tl::Variant> &properties)
+{
+  return new db::PathWithProperties (path, db::properties_id (db::PropertiesSet (properties.begin (), properties.end ())));
+}
+
 Class<db::PathWithProperties> decl_PathWithProperties (decl_Path, "db", "PathWithProperties",
   gsi::properties_support_methods<db::PathWithProperties> () +
   constructor ("new", &new_path_with_properties, gsi::arg ("path"), gsi::arg ("properties_id", db::properties_id_type (0)),
     "@brief Creates a new object from a property-less object and a properties ID."
+  ) +
+  constructor ("new", &new_path_with_properties2, gsi::arg ("path"), gsi::arg ("properties"),
+    "@brief Creates a new object from a property-less object and a properties hash."
   )
   ,
   "@brief A Path object with properties attached.\n"
@@ -477,10 +485,18 @@ static db::DPathWithProperties *new_dpath_with_properties (const db::DPath &path
   return new db::DPathWithProperties (path, pid);
 }
 
+static db::DPathWithProperties *new_dpath_with_properties2 (const db::DPath &path, const std::map<tl::Variant, tl::Variant> &properties)
+{
+  return new db::DPathWithProperties (path, db::properties_id (db::PropertiesSet (properties.begin (), properties.end ())));
+}
+
 Class<db::DPathWithProperties> decl_DPathWithProperties (decl_DPath, "db", "DPathWithProperties",
   gsi::properties_support_methods<db::DPathWithProperties> () +
   constructor ("new", &new_dpath_with_properties, gsi::arg ("path"), gsi::arg ("properties_id", db::properties_id_type (0)),
     "@brief Creates a new object from a property-less object and a properties ID."
+  ) +
+  constructor ("new", &new_dpath_with_properties2, gsi::arg ("path"), gsi::arg ("properties"),
+     "@brief Creates a new object from a property-less object and a properties hash."
   )
   ,
   "@brief A DPath object with properties attached.\n"

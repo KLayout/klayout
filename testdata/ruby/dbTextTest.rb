@@ -259,6 +259,9 @@ class DBText_TestClass < TestBase
     s = RBA::TextWithProperties::new
     assert_equal(s.to_s, "('',r0 0,0) props={}")
 
+    s = RBA::TextWithProperties::new(RBA::Text::new("text", RBA::Trans::R90), { 1 => "one" })
+    assert_equal(s.to_s, "('text',r90 0,0) props={1=>one}")
+
     pid = RBA::Layout::properties_id({ 1 => "one" })
     s = RBA::TextWithProperties::new(RBA::Text::new("text", RBA::Trans::R90), pid)
     assert_equal(s.to_s, "('text',r90 0,0) props={1=>one}")
@@ -273,6 +276,9 @@ class DBText_TestClass < TestBase
 
     s = RBA::DTextWithProperties::new
     assert_equal(s.to_s, "('',r0 0,0) props={}")
+
+    s = RBA::DTextWithProperties::new(RBA::DText::new("text", RBA::Trans::R90), { 1 => "one" })
+    assert_equal(s.to_s, "('text',r90 0,0) props={1=>one}")
 
     pid = RBA::Layout::properties_id({ 1 => "one" })
     s = RBA::DTextWithProperties::new(RBA::DText::new("text", RBA::Trans::R90), pid)

@@ -899,6 +899,9 @@ class DBPolygon_TestClass < TestBase
     s = RBA::PolygonWithProperties::new
     assert_equal(s.to_s, "() props={}")
 
+    s = RBA::PolygonWithProperties::new(RBA::Polygon::new(RBA::Box::new(0, 0, 100, 200)), { 1 => "one" })
+    assert_equal(s.to_s, "(0,0;0,200;100,200;100,0) props={1=>one}")
+
     pid = RBA::Layout::properties_id({ 1 => "one" })
     s = RBA::PolygonWithProperties::new(RBA::Polygon::new(RBA::Box::new(0, 0, 100, 200)), pid)
     assert_equal(s.to_s, "(0,0;0,200;100,200;100,0) props={1=>one}")
@@ -913,6 +916,9 @@ class DBPolygon_TestClass < TestBase
 
     s = RBA::DPolygonWithProperties::new
     assert_equal(s.to_s, "() props={}")
+
+    s = RBA::DPolygonWithProperties::new(RBA::DPolygon::new(RBA::DBox::new(0, 0, 100, 200)), { 1 => "one" })
+    assert_equal(s.to_s, "(0,0;0,200;100,200;100,0) props={1=>one}")
 
     pid = RBA::Layout::properties_id({ 1 => "one" })
     s = RBA::DPolygonWithProperties::new(RBA::DPolygon::new(RBA::DBox::new(0, 0, 100, 200)), pid)
@@ -929,6 +935,9 @@ class DBPolygon_TestClass < TestBase
     s = RBA::SimplePolygonWithProperties::new
     assert_equal(s.to_s, "() props={}")
 
+    s = RBA::SimplePolygonWithProperties::new(RBA::SimplePolygon::new(RBA::Box::new(0, 0, 100, 200)), { 1 => "one" })
+    assert_equal(s.to_s, "(0,0;0,200;100,200;100,0) props={1=>one}")
+
     pid = RBA::Layout::properties_id({ 1 => "one" })
     s = RBA::SimplePolygonWithProperties::new(RBA::SimplePolygon::new(RBA::Box::new(0, 0, 100, 200)), pid)
     assert_equal(s.to_s, "(0,0;0,200;100,200;100,0) props={1=>one}")
@@ -943,6 +952,9 @@ class DBPolygon_TestClass < TestBase
 
     s = RBA::DSimplePolygonWithProperties::new
     assert_equal(s.to_s, "() props={}")
+
+    s = RBA::DSimplePolygonWithProperties::new(RBA::DSimplePolygon::new(RBA::DBox::new(0, 0, 100, 200)), { 1 => "one" })
+    assert_equal(s.to_s, "(0,0;0,200;100,200;100,0) props={1=>one}")
 
     pid = RBA::Layout::properties_id({ 1 => "one" })
     s = RBA::DSimplePolygonWithProperties::new(RBA::DSimplePolygon::new(RBA::DBox::new(0, 0, 100, 200)), pid)

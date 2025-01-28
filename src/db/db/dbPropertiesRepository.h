@@ -111,6 +111,18 @@ public:
   PropertiesSet (const PropertiesSet &&other);
 
   /**
+   *  @brief Constructor from tl::Variant pair iterator
+   */
+  template <class Iter>
+  PropertiesSet (const Iter &from, const Iter &to)
+    : m_map (), m_hash (0)
+  {
+    for (auto i = from; i != to; ++i) {
+      insert (i->first, i->second);
+    }
+  }
+
+  /**
    *  @brief Assignment
    */
   PropertiesSet &operator= (const PropertiesSet &other);

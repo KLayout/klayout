@@ -495,7 +495,11 @@ private:
 
   void set ()
   {
-    m_object = db::object_with_properties<T> (*m_basic, m_basic.prop_id ());
+    if (! at_end ()) {
+      m_object = db::object_with_properties<T> (*m_basic, m_basic.prop_id ());
+    } else {
+      m_object = db::object_with_properties<T> ();
+    }
   }
 };
 

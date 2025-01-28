@@ -107,6 +107,7 @@ SOURCES = \
   dbUserObject.cc \
   dbUtils.cc \
   dbVector.cc \
+  dbVia.cc \
   dbWriter.cc \
   dbWriterTools.cc \
   dbVariableWidthPath.cc \
@@ -232,7 +233,8 @@ SOURCES = \
   dbNetShape.cc \
   dbShapeCollection.cc \
   gsiDeclDbShapeCollection.cc \
-  dbShapeCollectionUtils.cc
+  dbShapeCollectionUtils.cc \
+  gsiDeclDbVia.cc
 
 HEADERS = \
   dbArray.h \
@@ -342,6 +344,7 @@ HEADERS = \
   dbUserObject.h \
   dbUtils.h \
   dbVector.h \
+  dbVia.h \
   dbWriter.h \
   dbWriterTools.h \
   dbGlyphs.h \

@@ -206,9 +206,9 @@ TEST(10_MOS3DeviceExtractorTest)
     "  device MOS3 $1 (S=(null),G=(null),D=(null)) (L=0.3,W=0.8,AS=0.4,AD=0.16,PS=2.6,PD=2);\n"
     "end;\n"
   );
-  EXPECT_EQ (o1.to_string (), "(-600,-200;-600,600;-100,600;-100,-200)");
-  EXPECT_EQ (o2.to_string (), "(200,-200;200,600;400,600;400,-200)");
-  EXPECT_EQ (o3.to_string (), "(-100,-200;-100,600;200,600;200,-200)");
+  EXPECT_EQ (o1.to_string (), "(-600,-200;-600,600;-100,600;-100,-200){TERMINAL_ID=>0}");
+  EXPECT_EQ (o2.to_string (), "(200,-200;200,600;400,600;400,-200){TERMINAL_ID=>2}");
+  EXPECT_EQ (o3.to_string (), "(-100,-200;-100,600;200,600;200,-200){TERMINAL_ID=>1}");
 }
 
 TEST(11_MOS3DeviceExtractorTestNotRectangularGate)
@@ -261,9 +261,9 @@ TEST(11_MOS3DeviceExtractorTestNotRectangularGate)
     "  device MOS3 $1 (S=(null),G=(null),D=(null)) (L=0.3,W=1,AS=0.32,AD=0.18,PS=2.6,PD=2.4);\n"
     "end;\n"
   );
-  EXPECT_EQ (o1.to_string (), "(-600,-200;-600,600;-300,600;-300,200;-100,200;-100,-200)");
-  EXPECT_EQ (o2.to_string (), "(200,-200;200,500;0,500;0,600;400,600;400,-200)");
-  EXPECT_EQ (o3.to_string (), "(-100,-200;-100,200;-300,200;-300,600;0,600;0,500;200,500;200,-200)");
+  EXPECT_EQ (o1.to_string (), "(-600,-200;-600,600;-300,600;-300,200;-100,200;-100,-200){TERMINAL_ID=>0}");
+  EXPECT_EQ (o2.to_string (), "(200,-200;200,500;0,500;0,600;400,600;400,-200){TERMINAL_ID=>2}");
+  EXPECT_EQ (o3.to_string (), "(-100,-200;-100,200;-300,200;-300,600;0,600;0,500;200,500;200,-200){TERMINAL_ID=>1}");
 }
 
 TEST(12_MOS3DeviceExtractorTestCircular)
@@ -316,9 +316,9 @@ TEST(12_MOS3DeviceExtractorTestCircular)
     "  device MOS3 $1 (S=(null),G=(null),D=(null)) (L=0.3,W=3.8,AS=0.4,AD=4.18,PS=2.6,PD=14.6);\n"
     "end;\n"
   );
-  EXPECT_EQ (o1.to_string (), "(200,-200;200,600;700,600;700,-200)");
-  EXPECT_EQ (o2.to_string (), "(-600,-1200;-600,1400;1600,1400;1600,-1200/-100,-500;1000,-500;1000,900;-100,900)");
-  EXPECT_EQ (o3.to_string (), "(-100,-500;-100,900;1000,900;1000,-500/200,-200;700,-200;700,600;200,600)");
+  EXPECT_EQ (o1.to_string (), "(200,-200;200,600;700,600;700,-200){TERMINAL_ID=>0}");
+  EXPECT_EQ (o2.to_string (), "(-600,-1200;-600,1400;1600,1400;1600,-1200/-100,-500;1000,-500;1000,900;-100,900){TERMINAL_ID=>2}");
+  EXPECT_EQ (o3.to_string (), "(-100,-500;-100,900;1000,900;1000,-500/200,-200;700,-200;700,600;200,600){TERMINAL_ID=>1}");
 }
 
 TEST(20_MOS4DeviceExtractorTest)
@@ -375,10 +375,10 @@ TEST(20_MOS4DeviceExtractorTest)
     "  device MOS4 $1 (S=(null),G=(null),D=(null),B=(null)) (L=0.3,W=0.8,AS=0.4,AD=0.16,PS=2.6,PD=2);\n"
     "end;\n"
   );
-  EXPECT_EQ (o1.to_string (), "(-600,-200;-600,600;-100,600;-100,-200)");
-  EXPECT_EQ (o2.to_string (), "(200,-200;200,600;400,600;400,-200)");
-  EXPECT_EQ (o3.to_string (), "(-100,-200;-100,600;200,600;200,-200)");
-  EXPECT_EQ (o4.to_string (), "(-100,-200;-100,600;200,600;200,-200)");
+  EXPECT_EQ (o1.to_string (), "(-600,-200;-600,600;-100,600;-100,-200){TERMINAL_ID=>0}");
+  EXPECT_EQ (o2.to_string (), "(200,-200;200,600;400,600;400,-200){TERMINAL_ID=>2}");
+  EXPECT_EQ (o3.to_string (), "(-100,-200;-100,600;200,600;200,-200){TERMINAL_ID=>1}");
+  EXPECT_EQ (o4.to_string (), "(-100,-200;-100,600;200,600;200,-200){TERMINAL_ID=>3}");
 }
 
 TEST(21_MOS4DeviceExtractorTestNotRectangularGate)
@@ -435,10 +435,10 @@ TEST(21_MOS4DeviceExtractorTestNotRectangularGate)
     "  device MOS4 $1 (S=(null),G=(null),D=(null),B=(null)) (L=0.3,W=1,AS=0.32,AD=0.18,PS=2.6,PD=2.4);\n"
     "end;\n"
   );
-  EXPECT_EQ (o1.to_string (), "(-600,-200;-600,600;-300,600;-300,200;-100,200;-100,-200)");
-  EXPECT_EQ (o2.to_string (), "(200,-200;200,500;0,500;0,600;400,600;400,-200)");
-  EXPECT_EQ (o3.to_string (), "(-100,-200;-100,200;-300,200;-300,600;0,600;0,500;200,500;200,-200)");
-  EXPECT_EQ (o4.to_string (), "(-100,-200;-100,200;-300,200;-300,600;0,600;0,500;200,500;200,-200)");
+  EXPECT_EQ (o1.to_string (), "(-600,-200;-600,600;-300,600;-300,200;-100,200;-100,-200){TERMINAL_ID=>0}");
+  EXPECT_EQ (o2.to_string (), "(200,-200;200,500;0,500;0,600;400,600;400,-200){TERMINAL_ID=>2}");
+  EXPECT_EQ (o3.to_string (), "(-100,-200;-100,200;-300,200;-300,600;0,600;0,500;200,500;200,-200){TERMINAL_ID=>1}");
+  EXPECT_EQ (o4.to_string (), "(-100,-200;-100,200;-300,200;-300,600;0,600;0,500;200,500;200,-200){TERMINAL_ID=>3}");
 }
 
 TEST(22_MOS4DeviceExtractorTestCircular)
@@ -495,10 +495,10 @@ TEST(22_MOS4DeviceExtractorTestCircular)
     "  device MOS4 $1 (S=(null),G=(null),D=(null),B=(null)) (L=0.3,W=3.8,AS=0.4,AD=4.18,PS=2.6,PD=14.6);\n"
     "end;\n"
   );
-  EXPECT_EQ (o1.to_string (), "(200,-200;200,600;700,600;700,-200)");
-  EXPECT_EQ (o2.to_string (), "(-600,-1200;-600,1400;1600,1400;1600,-1200/-100,-500;1000,-500;1000,900;-100,900)");
-  EXPECT_EQ (o3.to_string (), "(-100,-500;-100,900;1000,900;1000,-500/200,-200;700,-200;700,600;200,600)");
-  EXPECT_EQ (o4.to_string (), "(-100,-500;-100,900;1000,900;1000,-500/200,-200;700,-200;700,600;200,600)");
+  EXPECT_EQ (o1.to_string (), "(200,-200;200,600;700,600;700,-200){TERMINAL_ID=>0}");
+  EXPECT_EQ (o2.to_string (), "(-600,-1200;-600,1400;1600,1400;1600,-1200/-100,-500;1000,-500;1000,900;-100,900){TERMINAL_ID=>2}");
+  EXPECT_EQ (o3.to_string (), "(-100,-500;-100,900;1000,900;1000,-500/200,-200;700,-200;700,600;200,600){TERMINAL_ID=>1}");
+  EXPECT_EQ (o4.to_string (), "(-100,-500;-100,900;1000,900;1000,-500/200,-200;700,-200;700,600;200,600){TERMINAL_ID=>3}");
 }
 
 TEST(30_DMOS3DeviceExtractorTest)
@@ -553,9 +553,9 @@ TEST(30_DMOS3DeviceExtractorTest)
     "  device DMOS3 $1 (S=(null),G=(null),D=(null)) (L=0.3,W=0.8,AS=0.4,AD=0.16,PS=2.6,PD=2);\n"
     "end;\n"
   );
-  EXPECT_EQ (o1.to_string (), "(-600,-200;-600,600;-100,600;-100,-200)");
-  EXPECT_EQ (o2.to_string (), "(200,-200;200,600;400,600;400,-200)");
-  EXPECT_EQ (o3.to_string (), "(-100,-200;-100,600;200,600;200,-200)");
+  EXPECT_EQ (o1.to_string (), "(-600,-200;-600,600;-100,600;-100,-200){TERMINAL_ID=>0}");
+  EXPECT_EQ (o2.to_string (), "(200,-200;200,600;400,600;400,-200){TERMINAL_ID=>2}");
+  EXPECT_EQ (o3.to_string (), "(-100,-200;-100,600;200,600;200,-200){TERMINAL_ID=>1}");
 }
 
 TEST(31_DMOS3DeviceExtractorTestNotRectangularGate)
@@ -610,9 +610,9 @@ TEST(31_DMOS3DeviceExtractorTestNotRectangularGate)
     "  device DMOS3 $1 (S=(null),G=(null),D=(null)) (L=0.3,W=1,AS=0.32,AD=0.18,PS=2.6,PD=2.4);\n"
     "end;\n"
   );
-  EXPECT_EQ (o1.to_string (), "(-600,-200;-600,600;-300,600;-300,200;-100,200;-100,-200)");
-  EXPECT_EQ (o2.to_string (), "(200,-200;200,500;0,500;0,600;400,600;400,-200)");
-  EXPECT_EQ (o3.to_string (), "(-100,-200;-100,200;-300,200;-300,600;0,600;0,500;200,500;200,-200)");
+  EXPECT_EQ (o1.to_string (), "(-600,-200;-600,600;-300,600;-300,200;-100,200;-100,-200){TERMINAL_ID=>0}");
+  EXPECT_EQ (o2.to_string (), "(200,-200;200,500;0,500;0,600;400,600;400,-200){TERMINAL_ID=>2}");
+  EXPECT_EQ (o3.to_string (), "(-100,-200;-100,200;-300,200;-300,600;0,600;0,500;200,500;200,-200){TERMINAL_ID=>1}");
 }
 
 TEST(32_DMOS3DeviceExtractorTestCircular)
@@ -667,9 +667,9 @@ TEST(32_DMOS3DeviceExtractorTestCircular)
     "  device DMOS3 $1 (S=(null),G=(null),D=(null)) (L=0.3,W=3.8,AS=0.4,AD=4.18,PS=2.6,PD=14.6);\n"
     "end;\n"
   );
-  EXPECT_EQ (o1.to_string (), "(200,-200;200,600;700,600;700,-200)");
-  EXPECT_EQ (o2.to_string (), "(-600,-1200;-600,1400;1600,1400;1600,-1200/-100,-500;1000,-500;1000,900;-100,900)");
-  EXPECT_EQ (o3.to_string (), "(-100,-500;-100,900;1000,900;1000,-500/200,-200;700,-200;700,600;200,600)");
+  EXPECT_EQ (o1.to_string (), "(200,-200;200,600;700,600;700,-200){TERMINAL_ID=>0}");
+  EXPECT_EQ (o2.to_string (), "(-600,-1200;-600,1400;1600,1400;1600,-1200/-100,-500;1000,-500;1000,900;-100,900){TERMINAL_ID=>2}");
+  EXPECT_EQ (o3.to_string (), "(-100,-500;-100,900;1000,900;1000,-500/200,-200;700,-200;700,600;200,600){TERMINAL_ID=>1}");
 }
 
 TEST(40_DMOS4DeviceExtractorTest)
@@ -728,10 +728,10 @@ TEST(40_DMOS4DeviceExtractorTest)
     "  device DMOS4 $1 (S=(null),G=(null),D=(null),B=(null)) (L=0.3,W=0.8,AS=0.4,AD=0.16,PS=2.6,PD=2);\n"
     "end;\n"
   );
-  EXPECT_EQ (o1.to_string (), "(-600,-200;-600,600;-100,600;-100,-200)");
-  EXPECT_EQ (o2.to_string (), "(200,-200;200,600;400,600;400,-200)");
-  EXPECT_EQ (o3.to_string (), "(-100,-200;-100,600;200,600;200,-200)");
-  EXPECT_EQ (o4.to_string (), "(-100,-200;-100,600;200,600;200,-200)");
+  EXPECT_EQ (o1.to_string (), "(-600,-200;-600,600;-100,600;-100,-200){TERMINAL_ID=>0}");
+  EXPECT_EQ (o2.to_string (), "(200,-200;200,600;400,600;400,-200){TERMINAL_ID=>2}");
+  EXPECT_EQ (o3.to_string (), "(-100,-200;-100,600;200,600;200,-200){TERMINAL_ID=>1}");
+  EXPECT_EQ (o4.to_string (), "(-100,-200;-100,600;200,600;200,-200){TERMINAL_ID=>3}");
 }
 
 TEST(41_DMOS4DeviceExtractorTestNotRectangularGate)
@@ -790,10 +790,10 @@ TEST(41_DMOS4DeviceExtractorTestNotRectangularGate)
     "  device DMOS4 $1 (S=(null),G=(null),D=(null),B=(null)) (L=0.3,W=1,AS=0.32,AD=0.18,PS=2.6,PD=2.4);\n"
     "end;\n"
   );
-  EXPECT_EQ (o1.to_string (), "(-600,-200;-600,600;-300,600;-300,200;-100,200;-100,-200)");
-  EXPECT_EQ (o2.to_string (), "(200,-200;200,500;0,500;0,600;400,600;400,-200)");
-  EXPECT_EQ (o3.to_string (), "(-100,-200;-100,200;-300,200;-300,600;0,600;0,500;200,500;200,-200)");
-  EXPECT_EQ (o4.to_string (), "(-100,-200;-100,200;-300,200;-300,600;0,600;0,500;200,500;200,-200)");
+  EXPECT_EQ (o1.to_string (), "(-600,-200;-600,600;-300,600;-300,200;-100,200;-100,-200){TERMINAL_ID=>0}");
+  EXPECT_EQ (o2.to_string (), "(200,-200;200,500;0,500;0,600;400,600;400,-200){TERMINAL_ID=>2}");
+  EXPECT_EQ (o3.to_string (), "(-100,-200;-100,200;-300,200;-300,600;0,600;0,500;200,500;200,-200){TERMINAL_ID=>1}");
+  EXPECT_EQ (o4.to_string (), "(-100,-200;-100,200;-300,200;-300,600;0,600;0,500;200,500;200,-200){TERMINAL_ID=>3}");
 }
 
 TEST(42_DMOS4DeviceExtractorTestCircular)
@@ -852,10 +852,10 @@ TEST(42_DMOS4DeviceExtractorTestCircular)
     "  device DMOS4 $1 (S=(null),G=(null),D=(null),B=(null)) (L=0.3,W=3.8,AS=0.4,AD=4.18,PS=2.6,PD=14.6);\n"
     "end;\n"
   );
-  EXPECT_EQ (o1.to_string (), "(200,-200;200,600;700,600;700,-200)");
-  EXPECT_EQ (o2.to_string (), "(-600,-1200;-600,1400;1600,1400;1600,-1200/-100,-500;1000,-500;1000,900;-100,900)");
-  EXPECT_EQ (o3.to_string (), "(-100,-500;-100,900;1000,900;1000,-500/200,-200;700,-200;700,600;200,600)");
-  EXPECT_EQ (o4.to_string (), "(-100,-500;-100,900;1000,900;1000,-500/200,-200;700,-200;700,600;200,600)");
+  EXPECT_EQ (o1.to_string (), "(200,-200;200,600;700,600;700,-200){TERMINAL_ID=>0}");
+  EXPECT_EQ (o2.to_string (), "(-600,-1200;-600,1400;1600,1400;1600,-1200/-100,-500;1000,-500;1000,900;-100,900){TERMINAL_ID=>2}");
+  EXPECT_EQ (o3.to_string (), "(-100,-500;-100,900;1000,900;1000,-500/200,-200;700,-200;700,600;200,600){TERMINAL_ID=>1}");
+  EXPECT_EQ (o4.to_string (), "(-100,-500;-100,900;1000,900;1000,-500/200,-200;700,-200;700,600;200,600){TERMINAL_ID=>3}");
 }
 
 TEST(50_BJT3DeviceExtractorTest)
@@ -910,9 +910,9 @@ TEST(50_BJT3DeviceExtractorTest)
     "  device BJT3 $1 (C=(null),B=(null),E=(null)) (AE=0.81,PE=3.6,AB=5,PB=9,AC=5,PC=9,NE=1);\n"
     "end;\n"
   );
-  EXPECT_EQ (o1.to_string (), "(700,400;700,1300;1600,1300;1600,400)");
-  EXPECT_EQ (o2.to_string (), "(0,0;0,2000;2500,2000;2500,0/700,400;1600,400;1600,1300;700,1300)");
-  EXPECT_EQ (o3.to_string (), "(0,0;0,2000;2500,2000;2500,0/700,400;1600,400;1600,1300;700,1300)");
+  EXPECT_EQ (o1.to_string (), "(700,400;700,1300;1600,1300;1600,400){TERMINAL_ID=>2}");
+  EXPECT_EQ (o2.to_string (), "(0,0;0,2000;2500,2000;2500,0/700,400;1600,400;1600,1300;700,1300){TERMINAL_ID=>1}");
+  EXPECT_EQ (o3.to_string (), "(0,0;0,2000;2500,2000;2500,0/700,400;1600,400;1600,1300;700,1300){TERMINAL_ID=>0}");
 }
 
 TEST(51_BJT3DeviceExtractorTest)
@@ -967,9 +967,9 @@ TEST(51_BJT3DeviceExtractorTest)
     "  device BJT3 $1 (C=(null),B=(null),E=(null)) (AE=0.81,PE=3.6,AB=5,PB=9,AC=5,PC=9,NE=1);\n"
     "end;\n"
   );
-  EXPECT_EQ (o1.to_string (), "(700,400;700,1300;1600,1300;1600,400)");
-  EXPECT_EQ (o2.to_string (), "(0,0;0,2000;2500,2000;2500,0/700,400;1600,400;1600,1300;700,1300)");
-  EXPECT_EQ (o3.to_string (), "(-1000,-500;-1000,2500;3000,2500;3000,-500/0,0;2500,0;2500,2000;0,2000)");
+  EXPECT_EQ (o1.to_string (), "(700,400;700,1300;1600,1300;1600,400){TERMINAL_ID=>2}");
+  EXPECT_EQ (o2.to_string (), "(0,0;0,2000;2500,2000;2500,0/700,400;1600,400;1600,1300;700,1300){TERMINAL_ID=>1}");
+  EXPECT_EQ (o3.to_string (), "(-1000,-500;-1000,2500;3000,2500;3000,-500/0,0;2500,0;2500,2000;0,2000){TERMINAL_ID=>0}");
 }
 
 TEST(52_BJT3DeviceExtractorTestLateral)
@@ -1024,9 +1024,9 @@ TEST(52_BJT3DeviceExtractorTestLateral)
     "  device BJT3 $1 (C=(null),B=(null),E=(null)) (AE=0.81,PE=3.6,AB=5,PB=9,AC=0.8,PC=4.8,NE=1);\n"
     "end;\n"
   );
-  EXPECT_EQ (o1.to_string (), "(700,400;700,1300;1600,1300;1600,400)");
-  EXPECT_EQ (o2.to_string (), "(0,0;0,2000;2100,2000;2100,0/700,400;1600,400;1600,1300;700,1300)");
-  EXPECT_EQ (o3.to_string (), "(2100,0;2100,2000;2500,2000;2500,0)");
+  EXPECT_EQ (o1.to_string (), "(700,400;700,1300;1600,1300;1600,400){TERMINAL_ID=>2}");
+  EXPECT_EQ (o2.to_string (), "(0,0;0,2000;2100,2000;2100,0/700,400;1600,400;1600,1300;700,1300){TERMINAL_ID=>1}");
+  EXPECT_EQ (o3.to_string (), "(2100,0;2100,2000;2500,2000;2500,0){TERMINAL_ID=>0}");
 }
 
 TEST(53_BJT3DeviceExtractorTestMultEmitter)
@@ -1082,9 +1082,9 @@ TEST(53_BJT3DeviceExtractorTestMultEmitter)
     "  device BJT3 $2 (C=(null),B=(null),E=(null)) (AE=0.5,PE=3,AB=10,PB=14,AC=10,PC=14,NE=1);\n"
     "end;\n"
   );
-  EXPECT_EQ (o1.to_string (), "(1000,500;1000,1500;1500,1500;1500,500);(3500,500;3500,1500;4000,1500;4000,500)");
-  EXPECT_EQ (o2.to_string (), "(0,0;0,2000;5000,2000;5000,0/1000,500;1500,500;1500,1500;1000,1500/3500,500;4000,500;4000,1500;3500,1500);(0,0;0,2000;5000,2000;5000,0/1000,500;1500,500;1500,1500;1000,1500/3500,500;4000,500;4000,1500;3500,1500)");
-  EXPECT_EQ (o3.to_string (), "(-500,-500;-500,2500;5500,2500;5500,-500/0,0;5000,0;5000,2000;0,2000);(-500,-500;-500,2500;5500,2500;5500,-500/0,0;5000,0;5000,2000;0,2000)");
+  EXPECT_EQ (o1.to_string (), "(1000,500;1000,1500;1500,1500;1500,500){TERMINAL_ID=>2};(3500,500;3500,1500;4000,1500;4000,500){TERMINAL_ID=>2}");
+  EXPECT_EQ (o2.to_string (), "(0,0;0,2000;5000,2000;5000,0/1000,500;1500,500;1500,1500;1000,1500/3500,500;4000,500;4000,1500;3500,1500){TERMINAL_ID=>1};(0,0;0,2000;5000,2000;5000,0/1000,500;1500,500;1500,1500;1000,1500/3500,500;4000,500;4000,1500;3500,1500){TERMINAL_ID=>1}");
+  EXPECT_EQ (o3.to_string (), "(-500,-500;-500,2500;5500,2500;5500,-500/0,0;5000,0;5000,2000;0,2000){TERMINAL_ID=>0};(-500,-500;-500,2500;5500,2500;5500,-500/0,0;5000,0;5000,2000;0,2000){TERMINAL_ID=>0}");
 }
 
 TEST(54_BJT4DeviceExtractorTest)
@@ -1143,9 +1143,9 @@ TEST(54_BJT4DeviceExtractorTest)
     "  device BJT4 $1 (C=(null),B=(null),E=(null),S=(null)) (AE=0.81,PE=3.6,AB=5,PB=9,AC=5,PC=9,NE=1);\n"
     "end;\n"
   );
-  EXPECT_EQ (o1.to_string (), "(700,400;700,1300;1600,1300;1600,400)");
-  EXPECT_EQ (o2.to_string (), "(0,0;0,2000;2500,2000;2500,0/700,400;1600,400;1600,1300;700,1300)");
-  EXPECT_EQ (o3.to_string (), "(-1000,-500;-1000,2500;3000,2500;3000,-500/0,0;2500,0;2500,2000;0,2000)");
-  EXPECT_EQ (o4.to_string (), "(0,0;0,2000;2500,2000;2500,0)");
+  EXPECT_EQ (o1.to_string (), "(700,400;700,1300;1600,1300;1600,400){TERMINAL_ID=>2}");
+  EXPECT_EQ (o2.to_string (), "(0,0;0,2000;2500,2000;2500,0/700,400;1600,400;1600,1300;700,1300){TERMINAL_ID=>1}");
+  EXPECT_EQ (o3.to_string (), "(-1000,-500;-1000,2500;3000,2500;3000,-500/0,0;2500,0;2500,2000;0,2000){TERMINAL_ID=>0}");
+  EXPECT_EQ (o4.to_string (), "(0,0;0,2000;2500,2000;2500,0){TERMINAL_ID=>3}");
 }
 

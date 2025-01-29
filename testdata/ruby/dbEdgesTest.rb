@@ -955,6 +955,69 @@ class DBEdges_TestClass < TestBase
 
   end
 
+  # properties
+  def test_props
+
+    r = RBA::Edges::new([ RBA::EdgeWithProperties::new(RBA::Edge::new(0, 0, 100, 100), { 1 => "one" }) ])
+    assert_equal(r.to_s, "(0,0;100,100){1=>one}")
+
+    r = RBA::Edges::new
+    r.insert([ RBA::EdgeWithProperties::new(RBA::Edge::new(0, 0, 100, 100), { 1 => "one" }) ])
+    assert_equal(r.to_s, "(0,0;100,100){1=>one}")
+
+    r = RBA::Edges::new(RBA::EdgeWithProperties::new(RBA::Edge::new(0, 0, 100, 100), { 1 => "one" }))
+    assert_equal(r.to_s, "(0,0;100,100){1=>one}")
+
+    r = RBA::Edges::new
+    r.insert(RBA::EdgeWithProperties::new(RBA::Edge::new(0, 0, 100, 100), { 1 => "one" }))
+    assert_equal(r.to_s, "(0,0;100,100){1=>one}")
+
+    r = RBA::Edges::new([ RBA::PolygonWithProperties::new(RBA::Box::new(0, 0, 100, 200), { 1 => "one" }) ])
+    assert_equal(r.to_s, "(0,0;0,200){1=>one};(0,200;100,200){1=>one};(100,200;100,0){1=>one};(100,0;0,0){1=>one}")
+
+    r = RBA::Edges::new
+    r.insert([ RBA::PolygonWithProperties::new(RBA::Box::new(0, 0, 100, 200), { 1 => "one" }) ])
+    assert_equal(r.to_s, "(0,0;0,200){1=>one};(0,200;100,200){1=>one};(100,200;100,0){1=>one};(100,0;0,0){1=>one}")
+
+    r = RBA::Edges::new(RBA::PolygonWithProperties::new(RBA::Box::new(0, 0, 100, 200), { 1 => "one" }))
+    assert_equal(r.to_s, "(0,0;0,200){1=>one};(0,200;100,200){1=>one};(100,200;100,0){1=>one};(100,0;0,0){1=>one}")
+
+    r = RBA::Edges::new
+    r.insert(RBA::PolygonWithProperties::new(RBA::Box::new(0, 0, 100, 200), { 1 => "one" }))
+    assert_equal(r.to_s, "(0,0;0,200){1=>one};(0,200;100,200){1=>one};(100,200;100,0){1=>one};(100,0;0,0){1=>one}")
+
+    r = RBA::Edges::new(RBA::SimplePolygonWithProperties::new(RBA::Box::new(0, 0, 100, 200), { 1 => "one" }))
+    assert_equal(r.to_s, "(0,0;0,200){1=>one};(0,200;100,200){1=>one};(100,200;100,0){1=>one};(100,0;0,0){1=>one}")
+
+    r = RBA::Edges::new
+    r.insert(RBA::SimplePolygonWithProperties::new(RBA::Box::new(0, 0, 100, 200), { 1 => "one" }))
+    assert_equal(r.to_s, "(0,0;0,200){1=>one};(0,200;100,200){1=>one};(100,200;100,0){1=>one};(100,0;0,0){1=>one}")
+
+    r = RBA::Edges::new(RBA::BoxWithProperties::new(RBA::Box::new(0, 0, 100, 200), { 1 => "one" }))
+    assert_equal(r.to_s, "(0,0;0,200){1=>one};(0,200;100,200){1=>one};(100,200;100,0){1=>one};(100,0;0,0){1=>one}")
+
+    r = RBA::Edges::new
+    r.insert(RBA::BoxWithProperties::new(RBA::Box::new(0, 0, 100, 200), { 1 => "one" }))
+    assert_equal(r.to_s, "(0,0;0,200){1=>one};(0,200;100,200){1=>one};(100,200;100,0){1=>one};(100,0;0,0){1=>one}")
+
+    r = RBA::Edges::new
+    r.insert(RBA::Region::new(RBA::BoxWithProperties::new(RBA::Box::new(0, 0, 100, 200), { 1 => "one" })))
+    assert_equal(r.to_s, "(0,0;0,200){1=>one};(0,200;100,200){1=>one};(100,200;100,0){1=>one};(100,0;0,0){1=>one}")
+
+    r = RBA::Edges::new
+    s = RBA::Shapes::new
+    s.insert(RBA::BoxWithProperties::new(RBA::Box::new(0, 0, 100, 200), { 1 => "one" }))
+    r.insert(s)
+    assert_equal(r.to_s, "(0,0;0,200){1=>one};(0,200;100,200){1=>one};(100,200;100,0){1=>one};(100,0;0,0){1=>one}")
+
+    r = RBA::Edges::new
+    s = RBA::Shapes::new
+    s.insert(RBA::EdgeWithProperties::new(RBA::Edge::new(0, 0, 100, 100), { 1 => "one" }))
+    r.insert(s)
+    assert_equal(r.to_s, "(0,0;100,100){1=>one}")
+
+  end
+
 end
 
 load("test_epilogue.rb")

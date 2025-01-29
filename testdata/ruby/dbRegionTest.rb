@@ -1562,6 +1562,12 @@ class DBRegion_TestClass < TestBase
     r = RBA::Region::new(RBA::PathWithProperties::new(RBA::Path::new([ RBA::Point::new(0, 0), RBA::Point::new(100, 0) ], 20), { 1 => "one" }))
     assert_equal(r.to_s, "(0,-10;0,10;100,10;100,-10){1=>one}")
 
+    r = RBA::Region::new
+    s = RBA::Shapes::new
+    s.insert(RBA::BoxWithProperties::new(RBA::Box::new(0, 0, 100, 200), { 1 => "one" }))
+    r.insert(s)
+    assert_equal(r.to_s, "(0,0;0,200;100,200;100,0){1=>one}")
+
   end
 
 end

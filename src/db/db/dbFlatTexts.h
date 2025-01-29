@@ -86,7 +86,7 @@ public:
 
   virtual void flatten () { }
 
-  void do_insert (const db::Text &text);
+  void do_insert (const db::Text &text, properties_id_type prop_id);
 
   virtual void do_transform (const db::Trans &t)
   {

@@ -50,7 +50,7 @@ public:
 
   EdgePairsDelegate *clone () const;
 
-  virtual void do_insert (const db::EdgePair &edge_pair);
+  virtual void do_insert (const db::EdgePair &edge_pair, db::properties_id_type prop_id);
 
   virtual void do_transform (const db::Trans &t);
   virtual void do_transform (const db::ICplxTrans &t);

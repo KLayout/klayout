@@ -178,12 +178,16 @@ TextsDelegate *DeepTexts::clone () const
   return new DeepTexts (*this);
 }
 
-void DeepTexts::do_insert (const db::Text &text)
+void DeepTexts::do_insert (const db::Text &text, db::properties_id_type prop_id)
 {
   db::Layout &layout = deep_layer ().layout ();
   if (layout.begin_top_down () != layout.end_top_down ()) {
     db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
-    top_cell.shapes (deep_layer ().layer ()).insert (db::TextRef (text, layout.shape_repository ()));
+    if (prop_id != 0) {
+      top_cell.shapes (deep_layer ().layer ()).insert (db::TextRef (text, layout.shape_repository ()));
+    } else {
+      top_cell.shapes (deep_layer ().layer ()).insert (db::TextRefWithProperties (db::TextRef (text, layout.shape_repository ()), prop_id));
+    }
   }
 
   invalidate_bbox ();

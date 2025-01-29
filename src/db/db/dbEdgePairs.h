@@ -129,6 +129,17 @@ public:
   }
 
   /**
+   *  @brief Constructor from an object with properties
+   *
+   *  Creates an edge pair set representing a single instance of that object
+   */
+  explicit EdgePairs (const db::EdgePairWithProperties &s)
+    : mp_delegate (0)
+  {
+    insert (s);
+  }
+
+  /**
    *  @brief Constructor from an object
    *
    *  Creates an edge pair set representing a single instance of that object

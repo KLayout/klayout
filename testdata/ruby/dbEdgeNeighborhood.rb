@@ -135,7 +135,7 @@ class DBEdgeNeighborhood_TestClass < TestBase
       "/Polygon\n"
     )
 
-    assert_equal(res.to_s, "(-1100,0;-1100,1000;-100,1000;-100,0);(0,0;0,1000;1000,1000;1000,0)")
+    assert_equal(res.to_s, "(-1100,0;-1100,1000;-100,1000;-100,0);(0,0;0,1000;1000,1000;1000,0){1=>one}")
 
   end
 

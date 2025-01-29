@@ -81,6 +81,9 @@ AsIfFlatEdgePairs::to_string (size_t nmax) const
     }
     first = false;
     os << p->to_string ();
+    if (p.prop_id () != 0) {
+      os << db::properties (p.prop_id ()).to_dict_var ().to_string ();
+    }
   }
   if (! p.at_end ()) {
     os << "...";

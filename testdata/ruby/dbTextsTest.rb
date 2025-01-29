@@ -443,6 +443,21 @@ class DBTexts_TestClass < TestBase
 
   end
 
+  # properties
+  def test_props
+
+    r = RBA::Texts::new([ RBA::TextWithProperties::new(RBA::Text::new("abc", RBA::Trans::new), { 1 => "one" }) ])
+    assert_equal(r.to_s, "('abc',r0 0,0){1=>one}")
+
+    r = RBA::Texts::new(RBA::TextWithProperties::new(RBA::Text::new("abc", RBA::Trans::new), { 1 => "one" }))
+    assert_equal(r.to_s, "('abc',r0 0,0){1=>one}")
+
+    r = RBA::Texts::new
+    r.insert(RBA::TextWithProperties::new(RBA::Text::new("abc", RBA::Trans::new), { 1 => "one" }))
+    assert_equal(r.to_s, "('abc',r0 0,0){1=>one}")
+
+  end
+
 end
 
 

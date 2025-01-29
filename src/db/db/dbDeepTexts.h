@@ -51,7 +51,7 @@ public:
 
   TextsDelegate *clone () const;
 
-  virtual void do_insert (const db::Text &text);
+  virtual void do_insert (const db::Text &text, properties_id_type prop_id);
 
   virtual void do_transform (const db::Trans &t);
   virtual void do_transform (const db::ICplxTrans &t);

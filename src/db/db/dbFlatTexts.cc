@@ -219,9 +219,13 @@ FlatTexts::insert_into (Layout *layout, db::cell_index_type into_cell, unsigned 
 }
 
 void
-FlatTexts::do_insert (const db::Text &t)
+FlatTexts::do_insert (const db::Text &t, db::properties_id_type prop_id)
 {
-  mp_texts->insert (t);
+  if (prop_id != 0) {
+    mp_texts->insert (db::TextWithProperties (t, prop_id));
+  } else {
+    mp_texts->insert (t);
+  }
   invalidate_cache ();
 }
 

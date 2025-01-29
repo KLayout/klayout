@@ -161,12 +161,16 @@ EdgePairsDelegate *DeepEdgePairs::clone () const
   return new DeepEdgePairs (*this);
 }
 
-void DeepEdgePairs::do_insert (const db::EdgePair &edge_pair)
+void DeepEdgePairs::do_insert (const db::EdgePair &edge_pair, db::properties_id_type prop_id)
 {
   db::Layout &layout = deep_layer ().layout ();
   if (layout.begin_top_down () != layout.end_top_down ()) {
     db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
-    top_cell.shapes (deep_layer ().layer ()).insert (edge_pair);
+    if (prop_id != 0) {
+      top_cell.shapes (deep_layer ().layer ()).insert (edge_pair);
+    } else {
+      top_cell.shapes (deep_layer ().layer ()).insert (db::EdgePairWithProperties (edge_pair, prop_id));
+    }
   }
 
   invalidate_bbox ();

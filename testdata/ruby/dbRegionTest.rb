@@ -1314,9 +1314,9 @@ class DBRegion_TestClass < TestBase
     rr = RBA::Region::new(tc.begin_shapes_rec(l2)).enable_properties
 
     assert_equal(csort(r.separation_check(rr, 100, false, RBA::Region::Projection, nil, nil, nil, false, RBA::Region::NoOppositeFilter, RBA::Region::NoRectFilter, false).to_s), csort("(400,200;500,200)/(500,250;400,250);(0,200;100,200)/(100,250;0,250);(200,200;300,200)/(300,250;200,250)"))
-    assert_equal(csort(r.separation_check(rr, 100, false, RBA::Region::Projection, nil, nil, nil, false, RBA::Region::NoOppositeFilter, RBA::Region::NoRectFilter, false, RBA::Region::NoPropertyConstraint).to_s), csort("(400,200;500,200)/(500,250;400,250);(0,200;100,200)/(100,250;0,250);(200,200;300,200)/(300,250;200,250)"))
-    assert_equal(csort(r.separation_check(rr, 100, false, RBA::Region::Projection, nil, nil, nil, false, RBA::Region::NoOppositeFilter, RBA::Region::NoRectFilter, false, RBA::Region::SamePropertiesConstraint).to_s), csort("(0,200;100,200)/(100,250;0,250)"))
-    assert_equal(csort(r.separation_check(rr, 100, false, RBA::Region::Projection, nil, nil, nil, false, RBA::Region::NoOppositeFilter, RBA::Region::NoRectFilter, false, RBA::Region::DifferentPropertiesConstraint).to_s), csort("(400,200;500,200)/(500,250;400,250);(200,200;300,200)/(300,250;200,250)"))
+    assert_equal(csort(r.separation_check(rr, 100, false, RBA::Region::Projection, nil, nil, nil, false, RBA::Region::NoOppositeFilter, RBA::Region::NoRectFilter, false, RBA::Region::NoPropertyConstraint).to_s), csort("(0,200;100,200)/(100,250;0,250){1=>17};(200,200;300,200)/(300,250;200,250){1=>42};(400,200;500,200)/(500,250;400,250)"))
+    assert_equal(csort(r.separation_check(rr, 100, false, RBA::Region::Projection, nil, nil, nil, false, RBA::Region::NoOppositeFilter, RBA::Region::NoRectFilter, false, RBA::Region::SamePropertiesConstraint).to_s), csort("(0,200;100,200)/(100,250;0,250){1=>17}"))
+    assert_equal(csort(r.separation_check(rr, 100, false, RBA::Region::Projection, nil, nil, nil, false, RBA::Region::NoOppositeFilter, RBA::Region::NoRectFilter, false, RBA::Region::DifferentPropertiesConstraint).to_s), csort("(200,200;300,200)/(300,250;200,250){1=>42};(400,200;500,200)/(500,250;400,250)"))
 
     r.remove_properties
     rr.remove_properties

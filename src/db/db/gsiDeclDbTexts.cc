@@ -197,7 +197,17 @@ static db::Texts *new_a (const std::vector<db::Text> &t)
   return new db::Texts (t.begin (), t.end ());
 }
 
+static db::Texts *new_ap (const std::vector<db::TextWithProperties> &t)
+{
+  return new db::Texts (t.begin (), t.end ());
+}
+
 static db::Texts *new_text (const db::Text &t)
+{
+  return new db::Texts (t);
+}
+
+static db::Texts *new_textp (const db::TextWithProperties &t)
 {
   return new db::Texts (t);
 }
@@ -361,14 +371,28 @@ Class<db::Texts> decl_Texts (decl_dbShapeCollection, "db", "Texts",
     "This constructor creates an empty text collection.\n"
   ) + 
   constructor ("new", &new_a, gsi::arg ("array"),
-    "@brief Constructor from an text array\n"
+    "@brief Constructor from a text array\n"
     "\n"
     "This constructor creates an text collection from an array of \\Text objects.\n"
   ) +
+  constructor ("new", &new_ap, gsi::arg ("array"),
+    "@brief Constructor from an array with texts with properties\n"
+    "\n"
+    "This constructor creates an text collection from an array of \\TextWithProperties objects.\n"
+    "\n"
+    "This variant has been introduced in version 0.30."
+  ) +
   constructor ("new", &new_text, gsi::arg ("text"),
-    "@brief Constructor from a single edge pair object\n"
+    "@brief Constructor from a single text object\n"
     "\n"
     "This constructor creates an text collection with a single text.\n"
+  ) +
+  constructor ("new", &new_textp, gsi::arg ("text"),
+    "@brief Constructor from a single text object\n"
+    "\n"
+    "This constructor creates an text collection with a single text with properties.\n"
+    "\n"
+    "This variant has been introduced in version 0.30."
   ) +
   constructor ("new", &new_shapes, gsi::arg ("shapes"),
     "@brief Shapes constructor\n"
@@ -456,6 +480,11 @@ Class<db::Texts> decl_Texts (decl_dbShapeCollection, "db", "Texts",
   ) +
   method ("insert", (void (db::Texts::*) (const db::Text &)) &db::Texts::insert, gsi::arg ("text"),
     "@brief Inserts a text into the collection\n"
+  ) +
+  method ("insert", (void (db::Texts::*) (const db::TextWithProperties &)) &db::Texts::insert, gsi::arg ("text"),
+    "@brief Inserts a text into the collection\n"
+    "\n"
+    "This variant accepting a text with properties has been introduced in version 0.30."
   ) +
   method_ext ("is_deep?", &is_deep,
     "@brief Returns true if the edge pair collection is a deep (hierarchical) one\n"

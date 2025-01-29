@@ -120,6 +120,7 @@ void EdgePairs::insert (const Sh &shape)
 }
 
 template DB_PUBLIC void EdgePairs::insert (const db::EdgePair &);
+template DB_PUBLIC void EdgePairs::insert (const db::EdgePairWithProperties &);
 
 void EdgePairs::insert (const db::Shape &shape)
 {

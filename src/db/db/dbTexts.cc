@@ -116,6 +116,7 @@ void Texts::insert (const Sh &shape)
 }
 
 template DB_PUBLIC void Texts::insert (const db::Text &);
+template DB_PUBLIC void Texts::insert (const db::TextWithProperties &);
 
 void Texts::insert (const db::Shape &shape)
 {

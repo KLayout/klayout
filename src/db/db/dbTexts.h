@@ -125,6 +125,17 @@ public:
   }
 
   /**
+   *  @brief Constructor from an object with properties
+   *
+   *  Creates an text set representing a single instance of that object
+   */
+  explicit Texts (const db::TextWithProperties &s)
+    : mp_delegate (0)
+  {
+    insert (s);
+  }
+
+  /**
    *  @brief Constructor from an object
    *
    *  Creates an text set representing a single instance of that object

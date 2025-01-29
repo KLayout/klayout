@@ -221,9 +221,13 @@ FlatEdgePairs::insert_into (Layout *layout, db::cell_index_type into_cell, unsig
 }
 
 void
-FlatEdgePairs::do_insert (const db::EdgePair &ep)
+FlatEdgePairs::do_insert (const db::EdgePair &ep, db::properties_id_type prop_id)
 {
-  mp_edge_pairs->insert (ep);
+  if (prop_id != 0) {
+    mp_edge_pairs->insert (db::EdgePairWithProperties (ep, prop_id));
+  } else {
+    mp_edge_pairs->insert (ep);
+  }
   invalidate_cache ();
 }
 

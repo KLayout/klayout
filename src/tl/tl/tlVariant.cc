@@ -1309,22 +1309,40 @@ Variant::less_core (const tl::Variant &d, type t) const
 bool
 Variant::operator== (const tl::Variant &d) const
 {
-  std::pair<bool, type> tt = normalized_type (m_type, d.m_type);
-  if (! tt.first) {
+  type type1 = normalized_type (m_type);
+  type type2 = normalized_type (d.m_type);
+
+  if (is_integer_type (type1)) {
+    type1 = Variant::t_double;
+  }
+  if (is_integer_type (type2)) {
+    type2 = Variant::t_double;
+  }
+
+  if (type1 != type2) {
     return false;
   } else {
-    return equal_core (d, tt.second);
+    return equal_core (d, type1);
   }
 }
 
 bool
 Variant::operator< (const tl::Variant &d) const
 {
-  std::pair<bool, type> tt = normalized_type (m_type, d.m_type);
-  if (! tt.first) {
-    return normalized_type (m_type) < normalized_type (d.m_type);
+  type type1 = normalized_type (m_type);
+  type type2 = normalized_type (d.m_type);
+
+  if (is_integer_type (type1)) {
+    type1 = Variant::t_double;
+  }
+  if (is_integer_type (type2)) {
+    type2 = Variant::t_double;
+  }
+
+  if (type1 != type2) {
+    return type1 < type2;
   } else {
-    return less_core (d, tt.second);
+    return less_core (d, type1);
   }
 }
 

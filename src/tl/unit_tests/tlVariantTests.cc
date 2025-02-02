@@ -1377,4 +1377,62 @@ TEST(12)
   EXPECT_EQ (std::string (v.to_parsable_string ()), "('Aber_',##2.5,(#5,'x'),())");
 }
 
+//  tl::Variant sorting with different numericals
+TEST(13)
+{
+  tl::Variant v1 ((long) 2);
+  tl::Variant v2 ((int) 2);
+  tl::Variant v3 ((unsigned int) 2);
+  tl::Variant v4 (2.0);
+  tl::Variant v5 ("2");
+  tl::Variant v6 (2, true); // ID
+
+  EXPECT_EQ (v1 == v2, true);
+  EXPECT_EQ (v2 == v1, true);
+  EXPECT_EQ (v1 < v2, false);
+  EXPECT_EQ (v2 < v1, false);
+
+  EXPECT_EQ (v1 == v3, true);  //  signed compares to unsigned
+  EXPECT_EQ (v3 == v1, true);
+  EXPECT_EQ (v3 < v1, false);
+  EXPECT_EQ (v1 < v3, false);
+
+  EXPECT_EQ (v1 == v4, true);
+  EXPECT_EQ (v2 == v1, true);
+  EXPECT_EQ (v1 < v2, false);
+  EXPECT_EQ (v2 < v1, false);
+
+  EXPECT_EQ (v1 == v5, false);  //  string != value
+  EXPECT_EQ (v5 == v1, false);
+  EXPECT_EQ (v1 < v5, true);
+  EXPECT_EQ (v5 < v1, false);
+
+  //  IDs are treated differently
+  EXPECT_EQ (v1 == v6, false);
+  EXPECT_EQ (v6 == v1, false);
+  EXPECT_EQ (v1 < v6, false);
+  EXPECT_EQ (v6 < v1, true);
+
+  //  Use of tl::Variant as map keys
+  std::map<tl::Variant, int> vm;
+
+  vm.insert (std::make_pair (tl::Variant (2), 1));
+  EXPECT_EQ (vm[tl::Variant (2)], 1);
+
+  vm.insert (std::make_pair (tl::Variant (2.0), 2));
+  EXPECT_EQ (vm[tl::Variant (2)], 1);
+  EXPECT_EQ (vm[tl::Variant (2.0)], 1);
+
+  vm.insert (std::make_pair (tl::Variant (2, true), 3));
+  EXPECT_EQ (vm[tl::Variant (2)], 1);
+  EXPECT_EQ (vm[tl::Variant (2.0)], 1);
+  EXPECT_EQ (vm[tl::Variant (2, true)], 3);
+
+  vm.insert (std::make_pair (tl::Variant ("2"), 4));
+  EXPECT_EQ (vm[tl::Variant (2)], 1);
+  EXPECT_EQ (vm[tl::Variant (2.0)], 1);
+  EXPECT_EQ (vm[tl::Variant (2, true)], 3);
+  EXPECT_EQ (vm[tl::Variant ("2")], 4);
+}
+
 }

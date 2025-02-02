@@ -1211,6 +1211,21 @@ void create_items_from_edge_pair_array (rdb::Database *db, rdb::id_type cell_id,
   rdb::create_items_from_sequence (db, cell_id, cat_id, trans, collection.begin (), collection.end ());
 }
 
+void create_items_from_polygon_array_with_properties (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id, const db::CplxTrans &trans, const std::vector<db::PolygonWithProperties> &collection, bool with_properties)
+{
+  rdb::create_items_from_sequence_with_properties (db, cell_id, cat_id, trans, collection.begin (), collection.end (), with_properties);
+}
+
+void create_items_from_edge_array_with_properties (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id, const db::CplxTrans &trans, const std::vector<db::EdgeWithProperties> &collection, bool with_properties)
+{
+  rdb::create_items_from_sequence_with_properties (db, cell_id, cat_id, trans, collection.begin (), collection.end (), with_properties);
+}
+
+void create_items_from_edge_pair_array_with_properties (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id, const db::CplxTrans &trans, const std::vector<db::EdgePairWithProperties> &collection, bool with_properties)
+{
+  rdb::create_items_from_sequence_with_properties (db, cell_id, cat_id, trans, collection.begin (), collection.end (), with_properties);
+}
+
 static rdb::Item *create_item (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id)
 {
   if (! db->cell_by_id (cell_id)) {
@@ -1548,6 +1563,18 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
     "@param trans The transformation to apply\n"
     "@param edges The list of edge pairs (an \\EdgePairs object) for which the items are created\n"
   ) +
+  gsi::method_ext ("create_items", &create_items_from_polygon_array_with_properties, gsi::arg ("cell_id"), gsi::arg ("category_id"), gsi::arg ("trans"), gsi::arg ("array"), gsi::arg ("with_properties", true),
+    "@brief Creates new polygon items for the given cell/category combination\n"
+    "This version takes \\PolygonWithProperties objects. If \\with_properties is true (the default), the\n"
+    "properties are added to the item as tagged values.\n"
+    "@param cell_id The ID of the cell to which the item is associated\n"
+    "@param category_id The ID of the category to which the item is associated\n"
+    "@param trans The transformation to apply\n"
+    "@param polygons The list of polygons (with properties) for which the items are created\n"
+    "@param with_properties If true, the properties are transferred into the item as well"
+    "\n"
+    "This variant has been introduced in version 0.30."
+  ) +
   gsi::method_ext ("create_items", &create_items_from_polygon_array, gsi::arg ("cell_id"), gsi::arg ("category_id"), gsi::arg ("trans"), gsi::arg ("array"),
     "@brief Creates new polygon items for the given cell/category combination\n"
     "For each polygon a single item will be created. The value of the item will be this "
@@ -1562,6 +1589,18 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
     "@param trans The transformation to apply\n"
     "@param polygons The list of polygons for which the items are created\n"
   ) +
+  gsi::method_ext ("create_items", &create_items_from_edge_array_with_properties, gsi::arg ("cell_id"), gsi::arg ("category_id"), gsi::arg ("trans"), gsi::arg ("array"), gsi::arg ("with_properties", true),
+    "@brief Creates new edge items for the given cell/category combination\n"
+    "This version takes \\EdgeWithProperties objects. If \\with_properties is true (the default), the\n"
+    "properties are added to the item as tagged values.\n"
+    "@param cell_id The ID of the cell to which the item is associated\n"
+    "@param category_id The ID of the category to which the item is associated\n"
+    "@param trans The transformation to apply\n"
+    "@param polygons The list of edges (with properties) for which the items are created\n"
+    "@param with_properties If true, the properties are transferred into the item as well"
+    "\n"
+    "This variant has been introduced in version 0.30."
+  ) +
   gsi::method_ext ("create_items", &create_items_from_edge_array, gsi::arg ("cell_id"), gsi::arg ("category_id"), gsi::arg ("trans"), gsi::arg ("array"),
     "@brief Creates new edge items for the given cell/category combination\n"
     "For each edge a single item will be created. The value of the item will be this "
@@ -1575,6 +1614,18 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
     "@param category_id The ID of the category to which the item is associated\n"
     "@param trans The transformation to apply\n"
     "@param edges The list of edges for which the items are created\n"
+  ) +
+  gsi::method_ext ("create_items", &create_items_from_edge_pair_array_with_properties, gsi::arg ("cell_id"), gsi::arg ("category_id"), gsi::arg ("trans"), gsi::arg ("array"), gsi::arg ("with_properties", true),
+    "@brief Creates new edge pair items for the given cell/category combination\n"
+    "This version takes \\EdgePairWithProperties objects. If \\with_properties is true (the default), the\n"
+    "properties are added to the item as tagged values.\n"
+    "@param cell_id The ID of the cell to which the item is associated\n"
+    "@param category_id The ID of the category to which the item is associated\n"
+    "@param trans The transformation to apply\n"
+    "@param polygons The list of edge pairs (with properties) for which the items are created\n"
+    "@param with_properties If true, the properties are transferred into the item as well"
+    "\n"
+    "This variant has been introduced in version 0.30."
   ) +
   gsi::method_ext ("create_items", &create_items_from_edge_pair_array, gsi::arg ("cell_id"), gsi::arg ("category_id"), gsi::arg ("trans"), gsi::arg ("array"),
     "@brief Creates new edge pair items for the given cell/category combination\n"

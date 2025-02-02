@@ -133,9 +133,24 @@ static T moved_xy_meth_impl (const T *s, typename T::coord_type dx, typename T::
 }
 
 template <class T>
+struct downcast_impl_helper;
+
+template <class T>
+struct downcast_impl_helper<db::object_with_properties<T> >
+{
+  static T impl (const db::object_with_properties<T> *obj)
+  {
+    return *obj;
+  }
+};
+
+template <class T>
 static gsi::Methods properties_support_methods ()
 {
   return
+  gsi::method_ext ("downcast", &downcast_impl_helper<T>::impl,
+    "@brief Gets the corresponding object without the properties\n"
+  ) +
   gsi::method ("prop_id", (db::properties_id_type (T::*) () const) &T::properties_id,
     "@brief Gets the properties ID associated with the object\n"
   ) +

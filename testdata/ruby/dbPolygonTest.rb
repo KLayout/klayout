@@ -914,6 +914,10 @@ class DBPolygon_TestClass < TestBase
     assert_equal(s.to_s, "(0,0;0,200;100,200;100,0) props={}")
     assert_equal(s.property(1), nil)
 
+    # Test downcast
+    assert_equal(s.class.to_s, "RBA::PolygonWithProperties")
+    assert_equal(s.downcast.class.to_s, "RBA::Polygon")
+
     s = RBA::DPolygonWithProperties::new
     assert_equal(s.to_s, "() props={}")
 
@@ -931,6 +935,10 @@ class DBPolygon_TestClass < TestBase
     s.delete_property(1)
     assert_equal(s.to_s, "(0,0;0,200;100,200;100,0) props={}")
     assert_equal(s.property(1), nil)
+
+    # Test downcast
+    assert_equal(s.class.to_s, "RBA::DPolygonWithProperties")
+    assert_equal(s.downcast.class.to_s, "RBA::DPolygon")
 
     s = RBA::SimplePolygonWithProperties::new
     assert_equal(s.to_s, "() props={}")
@@ -950,6 +958,10 @@ class DBPolygon_TestClass < TestBase
     assert_equal(s.to_s, "(0,0;0,200;100,200;100,0) props={}")
     assert_equal(s.property(1), nil)
 
+    # Test downcast
+    assert_equal(s.class.to_s, "RBA::SimplePolygonWithProperties")
+    assert_equal(s.downcast.class.to_s, "RBA::SimplePolygon")
+
     s = RBA::DSimplePolygonWithProperties::new
     assert_equal(s.to_s, "() props={}")
 
@@ -967,6 +979,10 @@ class DBPolygon_TestClass < TestBase
     s.delete_property(1)
     assert_equal(s.to_s, "(0,0;0,200;100,200;100,0) props={}")
     assert_equal(s.property(1), nil)
+
+    # Test downcast
+    assert_equal(s.class.to_s, "RBA::DSimplePolygonWithProperties")
+    assert_equal(s.downcast.class.to_s, "RBA::DSimplePolygon")
 
   end
 

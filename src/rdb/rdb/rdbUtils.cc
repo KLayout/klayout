@@ -290,6 +290,19 @@ void create_items_from_shapes (rdb::Database *db, rdb::id_type cell_id, rdb::id_
   }
 }
 
+void add_properties_to_item (rdb::Item *item, db::properties_id_type prop_id)
+{
+  if (! item->database ()) {
+    return;
+  }
+
+  auto ps = db::properties (prop_id);
+  for (auto i = ps.begin (); i != ps.end (); ++i) {
+    id_type tag_id = item->database ()->tags ().tag (db::property_name (i->first).to_string (), true /*user tag*/).id ();
+    add_item_value (item, db::property_value (i->second), db::CplxTrans (), tag_id);
+  }
+}
+
 void create_item_from_shape (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id, const db::CplxTrans &trans, const db::Shape &shape, bool with_properties)
 {
   std::unique_ptr<rdb::ValueBase> value (rdb::ValueBase::create_from_shape (shape, trans));
@@ -301,19 +314,8 @@ void create_item_from_shape (rdb::Database *db, rdb::id_type cell_id, rdb::id_ty
   item->values ().add (value.release ());
 
   //  translate properties
-  if (with_properties && shape.has_prop_id () && shape.shapes () && shape.shapes ()->cell ()) {
-
-    const db::Layout *layout = shape.shapes ()->cell ()->layout ();
-    if (layout) {
-
-      auto ps = db::properties (shape.prop_id ());
-      for (auto i = ps.begin (); i != ps.end (); ++i) {
-        id_type tag_id = db->tags ().tag (db::property_name (i->first).to_string (), true /*user tag*/).id ();
-        add_item_value (item, db::property_value (i->second), trans, tag_id);
-      }
-
-    }
-
+  if (with_properties && shape.has_prop_id ()) {
+    add_properties_to_item (item, shape.prop_id ());
   }
 }
 

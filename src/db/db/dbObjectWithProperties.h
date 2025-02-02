@@ -26,7 +26,9 @@
 
 #include "tlException.h"
 #include "tlTypeTraits.h"
+#include "tlString.h"
 #include "dbTypes.h"
+#include "dbUserObject.h"
 #include "dbPolygon.h"
 #include "dbPath.h"
 #include "dbEdge.h"
@@ -339,6 +341,56 @@ operator<< (std::ostream &os, const object_with_properties<T> &p)
 }
 
 } // namespace db
+
+
+namespace tl
+{
+
+/**
+ *  @brief Special extractors
+ */
+
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::object_with_properties<db::Box> &p);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::object_with_properties<db::UserObject> &p);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::object_with_properties<db::Polygon> &p);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::object_with_properties<db::SimplePolygon> &p);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::object_with_properties<db::Path> &p);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::object_with_properties<db::Text> &p);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::object_with_properties<db::Point> &p);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::object_with_properties<db::Edge> &p);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::object_with_properties<db::EdgePair> &p);
+
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::object_with_properties<db::DBox> &p);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::object_with_properties<db::DUserObject> &p);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::object_with_properties<db::DPolygon> &p);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::object_with_properties<db::DSimplePolygon> &p);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::object_with_properties<db::DPath> &p);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::object_with_properties<db::DText> &p);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::object_with_properties<db::DPoint> &p);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::object_with_properties<db::DEdge> &p);
+template <> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::object_with_properties<db::DEdgePair> &p);
+
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::object_with_properties<db::Box> &p);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::object_with_properties<db::UserObject> &p);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::object_with_properties<db::Polygon> &p);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::object_with_properties<db::SimplePolygon> &p);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::object_with_properties<db::Path> &p);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::object_with_properties<db::Text> &p);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::object_with_properties<db::Point> &p);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::object_with_properties<db::Edge> &p);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::object_with_properties<db::EdgePair> &p);
+
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::object_with_properties<db::DBox> &p);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::object_with_properties<db::DUserObject> &p);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::object_with_properties<db::DPolygon> &p);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::object_with_properties<db::DSimplePolygon> &p);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::object_with_properties<db::DPath> &p);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::object_with_properties<db::DText> &p);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::object_with_properties<db::DPoint> &p);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::object_with_properties<db::DEdge> &p);
+template <> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::object_with_properties<db::DEdgePair> &p);
+
+} // namespace tl
 
 #endif
 

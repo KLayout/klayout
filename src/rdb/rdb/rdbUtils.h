@@ -110,6 +110,13 @@ RDB_PUBLIC void create_items_from_shapes (rdb::Database *db, rdb::id_type cell_i
 RDB_PUBLIC void create_item_from_shape (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id, const db::CplxTrans &trans, const db::Shape &shape, bool with_properties = true);
 
 /**
+ *  @brief Adds properties to a RDB item
+ *
+ *  The properties will be added as values with "tags"
+ */
+RDB_PUBLIC void add_properties_to_item (rdb::Item *item, db::properties_id_type prop_id);
+
+/**
  *  @brief Creates RDB items from a region
  *
  *  This function will flatten the region and store the resulting items under the given cell.
@@ -151,6 +158,24 @@ RDB_PUBLIC_TEMPLATE void create_items_from_sequence (rdb::Database *db, rdb::id_
   for (Iter o = begin; o != end; ++o) {
     rdb::Item *item = db->create_item (cell_id, cat_id);
     item->values ().add (rdb::make_value (o->transformed (trans)));
+  }
+}
+
+/**
+ *  @brief Creates RDB items from a sequence of integer-type objects
+ *
+ *  An arbitrary transformation can be applied to translate the shapes before turning them to items.
+ *  This transformation is useful for providing the DBU-to-micron conversion.
+ */
+template <class Trans, class Iter>
+RDB_PUBLIC_TEMPLATE void create_items_from_sequence_with_properties (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id, const Trans &trans, Iter begin, Iter end, bool with_properties = true)
+{
+  for (Iter o = begin; o != end; ++o) {
+    rdb::Item *item = db->create_item (cell_id, cat_id);
+    item->values ().add (rdb::make_value (o->transformed (trans)));
+    if (with_properties && o->properties_id () != 0) {
+      add_properties_to_item (item, o->properties_id ());
+    }
   }
 }
 

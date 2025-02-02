@@ -943,6 +943,103 @@ class RDB_TestClass < TestBase
     rdb.each_cell { |c| cn << c.to_s_items }
     assert_equal(cn.join(";"), "c1[label: ('Hello, world!',r0 0,0),edge: (0.01,0.021;0.031,0.051),polygon: (0.021,0.042;0.021,0.073;0.043,0.073;0.043,0.042)]")
 
+    rdb = RBA::ReportDatabase.new("neu")
+    cat1 = rdb.create_category("l1")
+    cell1 = rdb.create_cell("c1")
+    rdb.create_items(cell1.rdb_id, cat1.rdb_id, RBA::CplxTrans::new(ly.dbu), [ RBA::Polygon::new(RBA::Box::new(0, 0, 100, 200)), RBA::Polygon::new(RBA::Box::new(100, 200, 110, 210)) ])
+    assert_equal(cat1.num_items, 2)
+    cn = []
+    rdb.each_cell { |c| cn << c.to_s_items }
+    assert_equal(cn.join(";"), "c1[polygon: (0,0;0,0.2;0.1,0.2;0.1,0),polygon: (0.1,0.2;0.1,0.21;0.11,0.21;0.11,0.2)]")
+
+    rdb = RBA::ReportDatabase.new("neu")
+    cat1 = rdb.create_category("l1")
+    cell1 = rdb.create_cell("c1")
+    rdb.create_items(cell1.rdb_id, cat1.rdb_id, RBA::CplxTrans::new(ly.dbu), [ RBA::Edge::new(0, 0, 100, 200), RBA::Edge::new(100, 200, 110, 210) ])
+    assert_equal(cat1.num_items, 2)
+    cn = []
+    rdb.each_cell { |c| cn << c.to_s_items }
+    assert_equal(cn.join(";"), "c1[edge: (0,0;0.1,0.2),edge: (0.1,0.2;0.11,0.21)]")
+
+    rdb = RBA::ReportDatabase.new("neu")
+    cat1 = rdb.create_category("l1")
+    cell1 = rdb.create_cell("c1")
+    rdb.create_items(cell1.rdb_id, cat1.rdb_id, RBA::CplxTrans::new(ly.dbu), [ RBA::EdgePair::new(RBA::Edge::new(0, 0, 100, 200), RBA::Edge::new(100, 200, 110, 210)) ])
+    assert_equal(cat1.num_items, 1)
+    cn = []
+    rdb.each_cell { |c| cn << c.to_s_items }
+    assert_equal(cn.join(";"), "c1[edge-pair: (0,0;0.1,0.2)/(0.1,0.2;0.11,0.21)]")
+
+    rdb = RBA::ReportDatabase.new("neu")
+    cat1 = rdb.create_category("l1")
+    cell1 = rdb.create_cell("c1")
+    rdb.create_items(cell1.rdb_id, cat1.rdb_id, RBA::CplxTrans::new(ly.dbu), [ 
+        RBA::PolygonWithProperties::new(RBA::Polygon::new(RBA::Box::new(0, 0, 100, 200)), { 1 => "one" }),
+        RBA::PolygonWithProperties::new(RBA::Polygon::new(RBA::Box::new(100, 200, 110, 210)), { 42 => 17 }) 
+    ])
+    assert_equal(cat1.num_items, 2)
+    cn = []
+    rdb.each_cell { |c| cn << c.to_s_items }
+    assert_equal(cn.join(";"), "c1[polygon: (0,0;0,0.2;0.1,0.2;0.1,0)/text: one,polygon: (0.1,0.2;0.1,0.21;0.11,0.21;0.11,0.2)/float: 17]")
+
+    rdb = RBA::ReportDatabase.new("neu")
+    cat1 = rdb.create_category("l1")
+    cell1 = rdb.create_cell("c1")
+    rdb.create_items(cell1.rdb_id, cat1.rdb_id, RBA::CplxTrans::new(ly.dbu), [ 
+        RBA::PolygonWithProperties::new(RBA::Polygon::new(RBA::Box::new(0, 0, 100, 200)), { 1 => "one" }),
+        RBA::PolygonWithProperties::new(RBA::Polygon::new(RBA::Box::new(100, 200, 110, 210)), { 42 => 17 }) 
+    ], false)
+    assert_equal(cat1.num_items, 2)
+    cn = []
+    rdb.each_cell { |c| cn << c.to_s_items }
+    assert_equal(cn.join(";"), "c1[polygon: (0,0;0,0.2;0.1,0.2;0.1,0),polygon: (0.1,0.2;0.1,0.21;0.11,0.21;0.11,0.2)]")
+
+    rdb = RBA::ReportDatabase.new("neu")
+    cat1 = rdb.create_category("l1")
+    cell1 = rdb.create_cell("c1")
+    rdb.create_items(cell1.rdb_id, cat1.rdb_id, RBA::CplxTrans::new(ly.dbu), [ 
+        RBA::EdgeWithProperties::new(RBA::Edge::new(0, 0, 100, 200), { 1 => "one" }),
+        RBA::EdgeWithProperties::new(RBA::Edge::new(100, 200, 110, 210), { 42 => 17 }) 
+    ])
+    assert_equal(cat1.num_items, 2)
+    cn = []
+    rdb.each_cell { |c| cn << c.to_s_items }
+    assert_equal(cn.join(";"), "c1[edge: (0,0;0.1,0.2)/text: one,edge: (0.1,0.2;0.11,0.21)/float: 17]")
+
+    rdb = RBA::ReportDatabase.new("neu")
+    cat1 = rdb.create_category("l1")
+    cell1 = rdb.create_cell("c1")
+    rdb.create_items(cell1.rdb_id, cat1.rdb_id, RBA::CplxTrans::new(ly.dbu), [ 
+        RBA::EdgeWithProperties::new(RBA::Edge::new(0, 0, 100, 200), { 1 => "one" }),
+        RBA::EdgeWithProperties::new(RBA::Edge::new(100, 200, 110, 210), { 42 => 17 }) 
+    ], false)
+    assert_equal(cat1.num_items, 2)
+    cn = []
+    rdb.each_cell { |c| cn << c.to_s_items }
+    assert_equal(cn.join(";"), "c1[edge: (0,0;0.1,0.2),edge: (0.1,0.2;0.11,0.21)]")
+
+    rdb = RBA::ReportDatabase.new("neu")
+    cat1 = rdb.create_category("l1")
+    cell1 = rdb.create_cell("c1")
+    rdb.create_items(cell1.rdb_id, cat1.rdb_id, RBA::CplxTrans::new(ly.dbu), [ 
+        RBA::EdgePairWithProperties::new(RBA::EdgePair::new(RBA::Edge::new(0, 0, 100, 200), RBA::Edge::new(100, 200, 110, 210)), { 1 => "one" })
+    ])
+    assert_equal(cat1.num_items, 1)
+    cn = []
+    rdb.each_cell { |c| cn << c.to_s_items }
+    assert_equal(cn.join(";"), "c1[edge-pair: (0,0;0.1,0.2)/(0.1,0.2;0.11,0.21)/text: one]")
+
+    rdb = RBA::ReportDatabase.new("neu")
+    cat1 = rdb.create_category("l1")
+    cell1 = rdb.create_cell("c1")
+    rdb.create_items(cell1.rdb_id, cat1.rdb_id, RBA::CplxTrans::new(ly.dbu), [ 
+        RBA::EdgePairWithProperties::new(RBA::EdgePair::new(RBA::Edge::new(0, 0, 100, 200), RBA::Edge::new(100, 200, 110, 210)), { 1 => "one" })
+    ], false)
+    assert_equal(cat1.num_items, 1)
+    cn = []
+    rdb.each_cell { |c| cn << c.to_s_items }
+    assert_equal(cn.join(";"), "c1[edge-pair: (0,0;0.1,0.2)/(0.1,0.2;0.11,0.21)]")
+
   end
 
   def test_13

@@ -1040,7 +1040,7 @@ TEST(5)
   EXPECT_EQ (m [1.0], 17);
   //  non-members of that category
   EXPECT_EQ (m [1.25], 0);
-  EXPECT_EQ (m [(unsigned int) 1], 0);
+  EXPECT_EQ (m [(unsigned int) 1], 17);
   EXPECT_EQ (m ["1"], 0);
 
   //  unsigned int category
@@ -1051,7 +1051,7 @@ TEST(5)
   EXPECT_EQ (m [2.0], 42);
   //  non-members of that category
   EXPECT_EQ (m [2.25], 0);
-  EXPECT_EQ (m [2], 0);
+  EXPECT_EQ (m [2], 42);
   EXPECT_EQ (m ["2"], 0);
 
   //  float category
@@ -1333,7 +1333,7 @@ TEST(11)
   //  compare without type
   EXPECT_EQ (tl::Variant (1l) == tl::Variant (1.0), true);
   EXPECT_EQ (tl::Variant (1l) == tl::Variant (1), true);
-  EXPECT_EQ (tl::Variant (1l) == tl::Variant (1u), false);
+  EXPECT_EQ (tl::Variant (1l) == tl::Variant (1u), true);
   EXPECT_EQ (tl::Variant (1l) == tl::Variant (1.5), false);
   EXPECT_EQ (tl::Variant (1l) < tl::Variant (1.0), false);
   EXPECT_EQ (tl::Variant (1.0) < tl::Variant (1l), false);

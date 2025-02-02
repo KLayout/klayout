@@ -22,8 +22,8 @@
 
 
 
-#ifndef HDR_dbEdgeNeighborhood
-#define HDR_dbEdgeNeighborhood
+#ifndef HDR_dbPolygonNeighborhood
+#define HDR_dbPolygonNeighborhood
 
 #include "dbCommon.h"
 #include "dbCompoundOperation.h"
@@ -36,25 +36,24 @@ namespace db
 /**
  *  @brief A visitor for the neighbors of an edge
  */
-class DB_PUBLIC EdgeNeighborhoodVisitor
+class DB_PUBLIC PolygonNeighborhoodVisitor
   : public gsi::ObjectBase, public tl::Object
 {
 public:
   typedef std::pair<double, double> position_interval_type;
   typedef unsigned int input_key_type;
   typedef std::vector<db::PolygonWithProperties> neighbor_shapes_type;
-  typedef std::map<input_key_type, neighbor_shapes_type> neighbors_per_interval_type;
-  typedef std::vector<std::pair<position_interval_type, neighbors_per_interval_type> > neighbors_type;
+  typedef std::map<input_key_type, neighbor_shapes_type> neighbors_type;
 
   /**
    *  @brief Constructor
    */
-  EdgeNeighborhoodVisitor ();
+  PolygonNeighborhoodVisitor ();
 
   /**
    *  @brief Destructor
    */
-  virtual ~EdgeNeighborhoodVisitor () { }
+  virtual ~PolygonNeighborhoodVisitor () { }
 
   /**
    *  @brief Configure the polygon output
@@ -83,30 +82,9 @@ public:
 
   /**
    *  @brief Event handler called when a new polygon is encountered
-   *  Following this event, the edges with their neighborhood are reported.
-   *  After the edges are reported, "end_polygon" is called.
+   *  This will report the central polygon and the neighbors.
    */
-  virtual void begin_polygon (const db::Layout * /*layout*/, const db::Cell * /*cell*/, const db::PolygonWithProperties & /*polygon*/) { }
-
-  /**
-   *  @brief Event handler called after the polygon was processed
-   */
-  virtual void end_polygon () { }
-
-  /**
-   *  @brief Event handler for each edge plus it's neighborhood
-   */
-  virtual void on_edge (const db::Layout * /*layout*/, const db::Cell * /*cell*/, const db::EdgeWithProperties & /*edge*/, const neighbors_type & /*neighbors*/) { }
-
-  /**
-   *  @brief Gets a transformation to transform from edge-local space to original space
-   */
-  static db::IMatrix3d to_original_trans (const db::Edge &edge);
-
-  /**
-   *  @brief Gets a transformation to transform from original space into edge-local space
-   */
-  static db::IMatrix3d to_edge_local_trans (const db::Edge &edge);
+  virtual void neighbors (const db::Layout * /*layout*/, const db::Cell * /*cell*/, const db::PolygonWithProperties & /*polygon*/, const neighbors_type & /*neighbors*/) { }
 
   /**
    *  @brief Sets the result type
@@ -154,11 +132,11 @@ private:
 /**
  *  @brief A local operation for implementation of the neighborhood visitor
  */
-class DB_PUBLIC EdgeNeighborhoodCompoundOperationNode
+class DB_PUBLIC PolygonNeighborhoodCompoundOperationNode
   : public CompoundRegionMultiInputOperationNode
 {
 public:
-  EdgeNeighborhoodCompoundOperationNode (const std::vector<CompoundRegionOperationNode *> &children, EdgeNeighborhoodVisitor *visitor, db::Coord bext, db::Coord eext, db::Coord din, db::Coord dout);
+  PolygonNeighborhoodCompoundOperationNode (const std::vector<CompoundRegionOperationNode *> &children, PolygonNeighborhoodVisitor *visitor, db::Coord dist);
 
   virtual ResultType result_type () const
   {
@@ -182,10 +160,8 @@ protected:
   virtual void do_compute_local (CompoundRegionOperationCache * /*cache*/, db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties> & /*interactions*/, std::vector<std::unordered_set<db::EdgePairWithProperties> > & /*results*/,    const db::LocalProcessorBase * /*proc*/) const;
 
 private:
-  db::Coord m_bext, m_eext, m_din, m_dout;
-  tl::weak_ptr<EdgeNeighborhoodVisitor> mp_visitor;
-
-  void do_collect_neighbors (db::box_scanner2<db::EdgeWithProperties, unsigned int, db::PolygonWithProperties, unsigned int> &scanner, const db::Layout *layout, const db::Cell *cell) const;
+  db::Coord m_dist;
+  tl::weak_ptr<PolygonNeighborhoodVisitor> mp_visitor;
 
   template <class T, class TR>
   void compute_local_impl (CompoundRegionOperationCache * /*cache*/, db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<T, T> & /*interactions*/, std::vector<std::unordered_set<TR> > & /*results*/, const db::LocalProcessorBase * /*proc*/) const;

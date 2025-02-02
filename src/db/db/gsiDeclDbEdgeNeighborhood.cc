@@ -224,7 +224,7 @@ Class<gsi::EdgeNeighborhoodVisitorImpl> decl_EdgeNeighborhoodVisitorImpl (decl_E
 );
 
 // ---------------------------------------------------------------------------------
-//  EdgeProcessor binding
+//  PolygonNeighborhoodCompoundOperationNode binding
 
 static db::CompoundRegionOperationNode *new_edge_neighborhood (const std::vector<db::CompoundRegionOperationNode *> &children, db::EdgeNeighborhoodVisitor *visitor, const db::Coord bext, db::Coord eext, db::Coord din, db::Coord dout)
 {

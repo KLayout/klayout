@@ -76,6 +76,7 @@ SOURCES = \
   dbPCellVariant.cc \
   dbPoint.cc \
   dbPolygon.cc \
+  dbPolygonNeighborhood.cc \
   dbPolygonTools.cc \
   dbPolygonGenerators.cc \
   dbPropertiesRepository.cc \
@@ -139,6 +140,7 @@ SOURCES = \
   gsiDeclDbPath.cc \
   gsiDeclDbPoint.cc \
   gsiDeclDbPolygon.cc \
+  gsiDeclDbPolygonNeighborhood.cc \
   gsiDeclDbReader.cc \
   gsiDeclDbRecursiveInstanceIterator.cc \
   gsiDeclDbRecursiveShapeIterator.cc \
@@ -310,6 +312,7 @@ HEADERS = \
   dbPCellVariant.h \
   dbPoint.h \
   dbPolygon.h \
+  dbPolygonNeighborhood.h \
   dbPolygonTools.h \
   dbPolygonGenerators.h \
   dbPropertiesRepository.h \

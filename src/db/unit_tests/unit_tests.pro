@@ -12,6 +12,7 @@ SOURCES = \
   dbFillToolTests.cc \
   dbLogTests.cc \
   dbObjectWithPropertiesTests.cc \
+  dbPolygonNeighborhoodTests.cc \
   dbRecursiveInstanceIteratorTests.cc \
   dbRegionCheckUtilsTests.cc \
   dbTriangleTests.cc \

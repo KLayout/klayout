@@ -123,17 +123,17 @@ Class<gsi::PolygonNeighborhoodVisitorImpl> decl_PolygonNeighborhoodVisitorImpl (
 // ---------------------------------------------------------------------------------
 //  PolygonNeighborhoodCompoundOperationNode binding
 
-static db::CompoundRegionOperationNode *new_edge_neighborhood (const std::vector<db::CompoundRegionOperationNode *> &children, db::PolygonNeighborhoodVisitor *visitor, const db::Coord dist)
+static db::CompoundRegionOperationNode *new_polygon_neighborhood (const std::vector<db::CompoundRegionOperationNode *> &children, db::PolygonNeighborhoodVisitor *visitor, const db::Coord dist)
 {
   return new db::PolygonNeighborhoodCompoundOperationNode (children, visitor, dist);
 }
 
-gsi::ClassExt<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode_ext (
-  gsi::constructor ("new_polygon_neighborhood", &new_edge_neighborhood, gsi::arg ("children"), gsi::arg ("visitor"), gsi::arg ("dist", 0),
-    "@brief Creates a new edge neighborhood collector\n"
+gsi::ClassExt<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode_ext_PolygonNeighborhood (
+  gsi::constructor ("new_polygon_neighborhood", &new_polygon_neighborhood, gsi::arg ("children"), gsi::arg ("visitor"), gsi::arg ("dist", 0),
+    "@brief Creates a new polygon neighborhood collector\n"
     "\n"
-    "@param children The inputs to use. The inputs are enumrated by base zero indexes in the visitor callback.\n"
-    "@param visitor The visitor object (see \\PolygonNeighborhoodVisitor) receiving the edge events.\n"
+    "@param children The inputs to use. The inputs are enumerated by base zero indexes in the visitor callback.\n"
+    "@param visitor The visitor object (see \\PolygonNeighborhoodVisitor) receiving the polygon events.\n"
     "@param dist The search distance in which to look up neighbors.\n"
     "\n"
     "This constructor has been introduced in version 0.30.0.\n"

@@ -231,11 +231,11 @@ static db::CompoundRegionOperationNode *new_edge_neighborhood (const std::vector
   return new db::EdgeNeighborhoodCompoundOperationNode (children, visitor, bext, eext, din, dout);
 }
 
-gsi::ClassExt<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode_ext (
+gsi::ClassExt<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode_ext_EdgeNeighborhood (
   gsi::constructor ("new_edge_neighborhood", &new_edge_neighborhood, gsi::arg ("children"), gsi::arg ("visitor"), gsi::arg ("bext", 0), gsi::arg ("eext", 0), gsi::arg ("din", 0), gsi::arg ("dout", 0),
     "@brief Creates a new edge neighborhood collector\n"
     "\n"
-    "@param children The inputs to use. The inputs are enumrated by base zero indexes in the visitor callback.\n"
+    "@param children The inputs to use. The inputs are enumerated by base zero indexes in the visitor callback.\n"
     "@param visitor The visitor object (see \\EdgeNeighborhoodVisitor) receiving the edge events.\n"
     "@param bext The search window extension to use at the edge beginning.\n"
     "@param eext The search window extension to use at the edge end.\n"

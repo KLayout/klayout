@@ -265,12 +265,12 @@ static db::Edges *new_ep (const db::EdgeWithProperties &e)
   return ee;
 }
 
-static db::Edges *new_a1 (const std::vector <db::Polygon> &a)
+static db::Edges *new_a1 (const std::vector <db::Polygon> &a, bool)
 {
   return new db::Edges (a.begin (), a.end ());
 }
 
-static db::Edges *new_a1p (const std::vector <db::PolygonWithProperties> &a)
+static db::Edges *new_a1p (const std::vector <db::PolygonWithProperties> &a, bool)
 {
   return new db::Edges (a.begin (), a.end ());
 }
@@ -280,7 +280,7 @@ static db::Edges *new_a2 (const std::vector <db::Edge> &a)
   return new db::Edges (a.begin (), a.end ());
 }
 
-static db::Edges *new_a2p (const std::vector <db::EdgeWithProperties> &a)
+static db::Edges *new_a2p (const std::vector <db::EdgeWithProperties> &a, bool)
 {
   return new db::Edges (a.begin (), a.end ());
 }
@@ -768,31 +768,32 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "\n"
     "This variant has been introduced in version 0.30."
   ) +
-  constructor ("new", &new_a1, gsi::arg ("array"),
+  constructor ("new", &new_a1, gsi::arg ("array"), gsi::arg ("dummy", true),
     "@brief Constructor from a polygon array\n"
     "\n"
     "This constructor creates an edge collection from an array of polygons.\n"
     "The edges form the contours of the polygons.\n"
+    "\n"
+    "The dummy argument is needed internally to differentiate the constructors "
+    "taking arrays of polygons and edges in case of empty arrays. Do not specify "
+    "this argument."
   ) +
-  constructor ("new", &new_a1p, gsi::arg ("array"),
-    "@brief Constructor from a polygon array\n"
-    "\n"
-    "This constructor creates an edge collection from an array of polygons with properties.\n"
-    "The edges form the contours of the polygons.\n"
-    "\n"
-    "This variant has been introduced in version 0.30."
+  //  This is a dummy constructor that allows creating an Edges collection from an array
+  //  of PolygonWithProperties objects too. GSI needs the dummy argument to
+  //  differentiate between the cases when an empty array is passed.
+  constructor ("new", &new_a1p, gsi::arg ("array"), gsi::arg ("dummy", true),
+    "@hide"
   ) +
   constructor ("new", &new_a2, gsi::arg ("array"),
     "@brief Constructor from an edge array\n"
     "\n"
     "This constructor creates an edge collection from an array of edges.\n"
   ) +
-  constructor ("new", &new_a2p, gsi::arg ("array"),
-    "@brief Constructor from an edge array\n"
-    "\n"
-    "This constructor creates an edge collection from an array of edges with properties.\n"
-    "\n"
-    "This variant has been introduced in version 0.30."
+  //  This is a dummy constructor that allows creating an Edges collection from an array
+  //  of EdgeWithProperties objects too. GSI needs the dummy argument to
+  //  differentiate between the cases when an empty array is passed.
+  constructor ("new", &new_a2p, gsi::arg ("array"), gsi::arg ("dummy", true),
+    "@hide"
   ) +
   constructor ("new", &new_b, gsi::arg ("box"),
     "@brief Box constructor\n"

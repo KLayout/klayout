@@ -580,6 +580,9 @@ class DBEdgePairs_TestClass < TestBase
     r = RBA::EdgePairs::new([ RBA::EdgePairWithProperties::new(RBA::EdgePair::new(RBA::Edge::new(0, 0, 100, 100), RBA::Edge::new(200, 300, 200, 500)), { 1 => "one" }) ])
     assert_equal(r.to_s, "(0,0;100,100)/(200,300;200,500){1=>one}")
 
+    r = RBA::EdgePairs::new([])
+    assert_equal(r.to_s, "")
+
     r = RBA::EdgePairs::new(RBA::EdgePairWithProperties::new(RBA::EdgePair::new(RBA::Edge::new(0, 0, 100, 100), RBA::Edge::new(200, 300, 200, 500)), { 1 => "one" }))
     assert_equal(r.to_s, "(0,0;100,100)/(200,300;200,500){1=>one}")
 

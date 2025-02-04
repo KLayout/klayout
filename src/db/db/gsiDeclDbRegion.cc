@@ -250,7 +250,7 @@ static db::Region *new_a (const std::vector <db::Polygon> &a)
   return new db::Region (a.begin (), a.end ());
 }
 
-static db::Region *new_ap (const std::vector <db::PolygonWithProperties> &a)
+static db::Region *new_ap (const std::vector <db::PolygonWithProperties> &a, bool)
 {
   return new db::Region (a.begin (), a.end ());
 }
@@ -1206,12 +1206,11 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This constructor creates a region from an array of polygons.\n"
   ) +
-  constructor ("new", &new_ap, gsi::arg ("array"),
-    "@brief Constructor from an array of polygons with properties\n"
-    "\n"
-    "This constructor creates a region from an array of polygons with properties.\n"
-    "\n"
-    "This variant has been introduced in version 0.30."
+  //  This is a dummy constructor that allows creating a Region from an array
+  //  of PolygonWithProperties objects too. GSI needs the dummy argument to
+  //  differentiate between the cases when an empty array is passed.
+  constructor ("new", &new_ap, gsi::arg ("array"), gsi::arg ("dummy", true),
+    "@hide"
   ) +
   constructor ("new", &new_b, gsi::arg ("box"),
     "@brief Box constructor\n"

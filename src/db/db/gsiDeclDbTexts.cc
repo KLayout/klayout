@@ -197,7 +197,7 @@ static db::Texts *new_a (const std::vector<db::Text> &t)
   return new db::Texts (t.begin (), t.end ());
 }
 
-static db::Texts *new_ap (const std::vector<db::TextWithProperties> &t)
+static db::Texts *new_ap (const std::vector<db::TextWithProperties> &t, bool)
 {
   return new db::Texts (t.begin (), t.end ());
 }
@@ -375,12 +375,11 @@ Class<db::Texts> decl_Texts (decl_dbShapeCollection, "db", "Texts",
     "\n"
     "This constructor creates an text collection from an array of \\Text objects.\n"
   ) +
-  constructor ("new", &new_ap, gsi::arg ("array"),
-    "@brief Constructor from an array with texts with properties\n"
-    "\n"
-    "This constructor creates an text collection from an array of \\TextWithProperties objects.\n"
-    "\n"
-    "This variant has been introduced in version 0.30."
+  //  This is a dummy constructor that allows creating a Texts collection from an array
+  //  of TextWithProperties objects too. GSI needs the dummy argument to
+  //  differentiate between the cases when an empty array is passed.
+  constructor ("new", &new_ap, gsi::arg ("array"), gsi::arg ("dummy", true),
+    "@hide"
   ) +
   constructor ("new", &new_text, gsi::arg ("text"),
     "@brief Constructor from a single text object\n"

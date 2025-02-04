@@ -230,7 +230,7 @@ static db::EdgePairs *new_a (const std::vector<db::EdgePair> &pairs)
   return new db::EdgePairs (pairs.begin (), pairs.end ());
 }
 
-static db::EdgePairs *new_ap (const std::vector<db::EdgePairWithProperties> &pairs)
+static db::EdgePairs *new_ap (const std::vector<db::EdgePairWithProperties> &pairs, bool)
 {
   return new db::EdgePairs (pairs.begin (), pairs.end ());
 }
@@ -592,12 +592,11 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "\n"
     "This constructor has been introduced in version 0.26."
   ) +
-  constructor ("new", &new_ap, gsi::arg ("array"),
-    "@brief Constructor from an array of edge pairs with properties\n"
-    "\n"
-    "This constructor creates an edge pair collection from an array of \\EdgePairWithProperties objects.\n"
-    "\n"
-    "This constructor has been introduced in version 0.30."
+  //  This is a dummy constructor that allows creating a EdgePairs collection from an array
+  //  of EdgePairWithProperties objects too. GSI needs the dummy argument to
+  //  differentiate between the cases when an empty array is passed.
+  constructor ("new", &new_ap, gsi::arg ("array"), gsi::arg ("dummy", true),
+    "@hide"
   ) +
   constructor ("new", &new_ep, gsi::arg ("edge_pair"),
     "@brief Constructor from a single edge pair object\n"

@@ -961,6 +961,9 @@ class DBEdges_TestClass < TestBase
     r = RBA::Edges::new([ RBA::EdgeWithProperties::new(RBA::Edge::new(0, 0, 100, 100), { 1 => "one" }) ])
     assert_equal(r.to_s, "(0,0;100,100){1=>one}")
 
+    r = RBA::Edges::new([])
+    assert_equal(r.to_s, "")
+
     r = RBA::Edges::new
     r.insert([ RBA::EdgeWithProperties::new(RBA::Edge::new(0, 0, 100, 100), { 1 => "one" }) ])
     assert_equal(r.to_s, "(0,0;100,100){1=>one}")

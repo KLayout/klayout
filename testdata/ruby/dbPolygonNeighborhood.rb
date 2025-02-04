@@ -23,7 +23,7 @@ end
 
 load("test_prologue.rb")
 
-class MyVisitor < RBA::PolygonNeighborhoodVisitor
+class PMyVisitor < RBA::PolygonNeighborhoodVisitor
 
   def initialize
     @log = {}
@@ -48,7 +48,7 @@ class MyVisitor < RBA::PolygonNeighborhoodVisitor
     
 end
     
-class MyVisitor2 < RBA::PolygonNeighborhoodVisitor
+class PMyVisitor2 < RBA::PolygonNeighborhoodVisitor
 
   def initialize
     self.result_type = RBA::CompoundRegionOperationNode::ResultType::Edges
@@ -83,7 +83,7 @@ class DBPolygonNeighborhood_TestClass < TestBase
     prim = RBA::Region::new(cell.begin_shapes_rec(l1))
     prim.enable_properties
 
-    visitor = MyVisitor::new
+    visitor = PMyVisitor::new
 
     visitor.result_type = RBA::CompoundRegionOperationNode::ResultType::Region
     assert_equal(visitor.result_type, RBA::CompoundRegionOperationNode::ResultType::Region)
@@ -121,7 +121,7 @@ class DBPolygonNeighborhood_TestClass < TestBase
 
     prim = RBA::Region::new(cell.begin_shapes_rec(l1))
 
-    visitor = MyVisitor2::new
+    visitor = PMyVisitor2::new
 
     dist = 101
 

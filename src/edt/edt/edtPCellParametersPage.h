@@ -139,6 +139,11 @@ public:
    */
   void set_parameters (const  std::vector<tl::Variant> &values);
 
+  /**
+   *  @brief Reimplementation of deleteLater
+   */
+  void deleteLater ();
+
 signals:
   void edited ();
 

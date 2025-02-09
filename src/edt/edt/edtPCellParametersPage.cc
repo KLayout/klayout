@@ -707,6 +707,13 @@ PCellParametersPage::parameter_changed ()
 }
 
 void
+PCellParametersPage::deleteLater ()
+{
+  dm_parameter_changed.cancel ();
+  QFrame::deleteLater ();
+}
+
+void
 PCellParametersPage::do_parameter_changed ()
 {
   bool ok = true;

@@ -129,12 +129,8 @@ class DBEdges_TestClass < TestBase
 
     r.assign(RBA::Edges::new(RBA::Box::new(10, 20, 100, 200)))
     assert_equal(csort(r.to_s), csort("(10,20;10,200);(10,200;100,200);(100,200;100,20);(100,20;10,20)"))
-    s = "" 
-    r.each do |e|
-      s.empty? || s += ";"
-      s += e.to_s
-    end
-    assert_equal(s, "(10,20;10,200);(10,200;100,200);(100,200;100,20);(100,20;10,20)")
+    s = r.each.collect(&:to_s).join(";")
+    assert_equal(s, "(10,20;10,200) props={};(10,200;100,200) props={};(100,200;100,20) props={};(100,20;10,20) props={}")
     assert_equal(r.is_empty?, false)
     assert_equal(r.count, 4)
     assert_equal(r.hier_count, 4)
@@ -1018,6 +1014,26 @@ class DBEdges_TestClass < TestBase
     s.insert(RBA::EdgeWithProperties::new(RBA::Edge::new(0, 0, 100, 100), { 1 => "one" }))
     r.insert(s)
     assert_equal(r.to_s, "(0,0;100,100){1=>one}")
+
+    r = RBA::Edges::new
+    s = RBA::Shapes::new
+    s.insert(RBA::EdgeWithProperties::new(RBA::Edge::new(0, 0, 100, 100), { 1 => "one" }))
+    r.insert(s)
+    assert_equal(r.to_s, "(0,0;100,100){1=>one}")
+
+    r = RBA::Edges::new
+    r.insert(RBA::EdgeWithProperties::new(RBA::Edge::new(0, 0, 100, 0), { 1 => "one" }))
+    r.insert(RBA::Edge::new(10, 0, 110, 0))
+    s = r.each.collect(&:to_s).join(";")
+    assert_equal(s, "(10,0;110,0) props={};(0,0;100,0) props={1=>one}")
+    s = r.each_merged.collect(&:to_s).join(";")
+    assert_equal(s, "(10,0;110,0) props={};(0,0;100,0) props={1=>one}")
+
+    r = RBA::Edges::new
+    r.insert(RBA::EdgeWithProperties::new(RBA::Edge::new(0, 0, 100, 0), { 1 => "one" }))
+    r.insert(RBA::EdgeWithProperties::new(RBA::Edge::new(10, 0, 110, 0), { 1 => "one" }))
+    s = r.each_merged.collect(&:to_s).join(";")
+    assert_equal(s, "(0,0;110,0) props={1=>one}")
 
   end
 

@@ -745,6 +745,15 @@ static std::vector<db::Edges> split_interacting_with_region (const db::Edges *r,
   return as_2edges_vector (r->selected_interacting_differential (other, min_count, max_count));
 }
 
+static db::generic_shape_iterator<db::EdgeWithProperties> begin_edges (const db::Edges *edges)
+{
+  return db::generic_shape_iterator<db::EdgeWithProperties> (db::make_wp_iter (edges->delegate ()->begin ()));
+}
+
+static db::generic_shape_iterator<db::EdgeWithProperties> begin_edges_merged (const db::Edges *edges)
+{
+  return db::generic_shape_iterator<db::EdgeWithProperties> (db::make_wp_iter (edges->delegate ()->begin_merged ()));
+}
 
 extern Class<db::ShapeCollection> decl_dbShapeCollection;
 
@@ -2266,15 +2275,18 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "\n"
     "This method has been introduced in version 0.27."
   ) +
-  gsi::iterator ("each", &db::Edges::begin,
+  gsi::iterator_ext ("each", &begin_edges,
     "@brief Returns each edge of the region\n"
+    "\n"
+    "Starting with version 0.30, the iterator delivers an EdgeWithProperties object."
   ) +
-  gsi::iterator ("each_merged", &db::Edges::begin_merged,
+  gsi::iterator_ext ("each_merged", &begin_edges_merged,
     "@brief Returns each edge of the region\n"
     "\n"
     "In contrast to \\each, this method delivers merged edges if merge semantics applies while \\each delivers the original edges only.\n"
     "\n"
     "This method has been introduced in version 0.25."
+    "Starting with version 0.30, the iterator delivers an EdgeWithProperties object."
   ) +
   method ("[]", &db::Edges::nth, gsi::arg ("n"),
     "@brief Returns the nth edge of the collection\n"

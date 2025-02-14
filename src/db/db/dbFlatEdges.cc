@@ -127,7 +127,7 @@ FlatEdges::ensure_merged_edges_valid () const
 
     if (! need_split_props) {
 
-      EdgeBooleanClusterCollectorToShapes cluster_collector (&tmp, EdgeOr);
+      EdgeBooleanClusterCollectorToShapes cluster_collector (&tmp, EdgeOr, prop_id);
 
       scanner.reserve (mp_edges->size ());
 

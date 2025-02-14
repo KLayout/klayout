@@ -362,6 +362,11 @@ static db::Region pull_interacting (const db::Texts *r, const db::Region &other)
   return out;
 }
 
+static db::generic_shape_iterator<db::TextWithProperties> begin_texts (const db::Texts *texts)
+{
+  return db::generic_shape_iterator<db::TextWithProperties> (db::make_wp_iter (texts->delegate ()->begin ()));
+}
+
 extern Class<db::ShapeCollection> decl_dbShapeCollection;
 
 Class<db::Texts> decl_Texts (decl_dbShapeCollection, "db", "Texts",
@@ -721,8 +726,10 @@ Class<db::Texts> decl_Texts (decl_dbShapeCollection, "db", "Texts",
     "\n"
     "This method has been introduced in version 0.27."
   ) +
-  gsi::iterator ("each", &db::Texts::begin,
+  gsi::iterator_ext ("each", &begin_texts,
     "@brief Returns each text of the text collection\n"
+    "\n"
+    "Starting with version 0.30, the iterator delivers TextWithProperties objects."
   ) +
   method ("[]", &db::Texts::nth, gsi::arg ("n"),
     "@brief Returns the nth text\n"

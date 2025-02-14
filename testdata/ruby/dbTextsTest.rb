@@ -459,6 +459,12 @@ class DBTexts_TestClass < TestBase
     r.insert(RBA::TextWithProperties::new(RBA::Text::new("abc", RBA::Trans::new), { 1 => "one" }))
     assert_equal(r.to_s, "('abc',r0 0,0){1=>one}")
 
+    r = RBA::Texts::new
+    r.insert(RBA::TextWithProperties::new(RBA::Text::new("abc", RBA::Trans::new), { 1 => "one" }))
+    r.insert(RBA::Text::new("xuv", RBA::Trans::new))
+    s = r.each.collect(&:to_s).join(";")
+    assert_equal(s, "('xuv',r0 0,0) props={};('abc',r0 0,0) props={1=>one}")
+
   end
 
 end

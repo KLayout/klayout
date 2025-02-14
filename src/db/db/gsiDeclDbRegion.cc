@@ -1168,6 +1168,16 @@ rasterize1 (const db::Region *region, const db::Point &origin, const db::Vector 
   return rasterize2 (region, origin, pixel_size, pixel_size, nx, ny);
 }
 
+static db::generic_shape_iterator<db::PolygonWithProperties> begin_region (const db::Region *region)
+{
+  return db::generic_shape_iterator<db::PolygonWithProperties> (db::make_wp_iter (region->delegate ()->begin ()));
+}
+
+static db::generic_shape_iterator<db::PolygonWithProperties> begin_region_merged (const db::Region *region)
+{
+  return db::generic_shape_iterator<db::PolygonWithProperties> (db::make_wp_iter (region->delegate ()->begin_merged ()));
+}
+
 static tl::Variant begin_shapes_rec (const db::Region *region)
 {
   auto res = region->begin_iter ();
@@ -3725,15 +3735,18 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method has been introduced in version 0.27."
   ) +
-  iterator ("each", &db::Region::begin,
+  iterator_ext ("each", &begin_region,
     "@brief Returns each polygon of the region\n"
     "\n"
     "This returns the raw polygons (not merged polygons if merged semantics is enabled).\n"
+    "\n"
+    "Starting with version 0.30, the iterator delivers a RegionWithProperties object."
   ) +
-  iterator ("each_merged", &db::Region::begin_merged,
+  iterator_ext ("each_merged", &begin_region_merged,
     "@brief Returns each merged polygon of the region\n"
     "\n"
     "This returns the raw polygons if merged semantics is disabled or the merged ones if merged semantics is enabled.\n"
+    "Starting with version 0.30, the iterator delivers a RegionWithProperties object."
   ) +
   method ("[]", &db::Region::nth, gsi::arg ("n"),
     "@brief Returns the nth polygon of the region\n"

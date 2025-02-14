@@ -180,12 +180,8 @@ class DBRegion_TestClass < TestBase
         RBA::Polygon::new(RBA::Box::new(20, 50, 120, 250))
     ] )
     assert_equal(csort(r.to_s), csort("(10,20;10,200;100,200;100,20);(20,50;20,250;120,250;120,50)"))
-    s = "" 
-    r.each do |p|
-      s.empty? || s += ";"
-      s += p.to_s
-    end
-    assert_equal(s, "(10,20;10,200;100,200;100,20);(20,50;20,250;120,250;120,50)")
+    s = r.each.collect(&:to_s).join(";")
+    assert_equal(s, "(10,20;10,200;100,200;100,20) props={};(20,50;20,250;120,250;120,50) props={}")
     assert_equal(r.merged.to_s, "(10,20;10,200;20,200;20,250;120,250;120,50;100,50;100,20)")
     assert_equal(r.merged(false, 1).to_s, "(10,20;10,200;20,200;20,250;120,250;120,50;100,50;100,20)")
     assert_equal(r.merged(1).to_s, "(10,20;10,200;20,200;20,250;120,250;120,50;100,50;100,20)")
@@ -1570,6 +1566,20 @@ class DBRegion_TestClass < TestBase
     s.insert(RBA::BoxWithProperties::new(RBA::Box::new(0, 0, 100, 200), { 1 => "one" }))
     r.insert(s)
     assert_equal(r.to_s, "(0,0;0,200;100,200;100,0){1=>one}")
+
+    r = RBA::Region::new
+    r.insert(RBA::BoxWithProperties::new(RBA::Box::new(0, 0, 100, 200), { 1 => "one" }))
+    r.insert(RBA::Box::new(10, 20, 110, 220))
+    s = r.each.collect(&:to_s).join(";")
+    assert_equal(s, "(10,20;10,220;110,220;110,20) props={};(0,0;0,200;100,200;100,0) props={1=>one}")
+    s = r.each_merged.collect(&:to_s).join(";")
+    assert_equal(s, "(10,20;10,220;110,220;110,20) props={};(0,0;0,200;100,200;100,0) props={1=>one}")
+
+    r = RBA::Region::new
+    r.insert(RBA::BoxWithProperties::new(RBA::Box::new(0, 0, 100, 200), { 1 => "one" }))
+    r.insert(RBA::BoxWithProperties::new(RBA::Box::new(10, 20, 110, 220), { 1 => "one" }))
+    s = r.each_merged.collect(&:to_s).join(";")
+    assert_equal(s, "(0,0;0,200;10,200;10,220;110,220;110,20;100,20;100,0) props={1=>one}")
 
   end
 

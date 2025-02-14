@@ -577,6 +577,11 @@ static db::EdgePairs with_area2 (const db::EdgePairs *r, db::EdgePair::area_type
   return r->filtered (f);
 }
 
+static db::generic_shape_iterator<db::EdgePairWithProperties> begin_edge_pairs (const db::EdgePairs *edge_pairs)
+{
+  return db::generic_shape_iterator<db::EdgePairWithProperties> (db::make_wp_iter (edge_pairs->delegate ()->begin ()));
+}
+
 extern Class<db::ShapeCollection> decl_dbShapeCollection;
 
 Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
@@ -1499,8 +1504,10 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "\n"
     "This method has been introduced in version 0.27."
   ) +
-  gsi::iterator ("each", &db::EdgePairs::begin,
+  gsi::iterator_ext ("each", &begin_edge_pairs,
     "@brief Returns each edge pair of the edge pair collection\n"
+    "\n"
+    "Starting with version 0.30, the iterator delivers EdgePairWithProperties objects."
   ) +
   method ("[]", &db::EdgePairs::nth, gsi::arg ("n"),
     "@brief Returns the nth edge pair\n"

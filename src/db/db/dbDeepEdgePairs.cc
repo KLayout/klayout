@@ -166,7 +166,7 @@ void DeepEdgePairs::do_insert (const db::EdgePair &edge_pair, db::properties_id_
   db::Layout &layout = deep_layer ().layout ();
   if (layout.begin_top_down () != layout.end_top_down ()) {
     db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
-    if (prop_id != 0) {
+    if (prop_id == 0) {
       top_cell.shapes (deep_layer ().layer ()).insert (edge_pair);
     } else {
       top_cell.shapes (deep_layer ().layer ()).insert (db::EdgePairWithProperties (edge_pair, prop_id));
@@ -344,9 +344,12 @@ DeepEdgePairs::add_in_place (const EdgePairs &other)
 
     db::Shapes &shapes = deep_layer ().initial_cell ().shapes (deep_layer ().layer ());
     for (db::EdgePairs::const_iterator p = other.begin (); ! p.at_end (); ++p) {
-      shapes.insert (*p);
+      if (p.prop_id () == 0) {
+        shapes.insert (*p);
+      } else {
+        shapes.insert (db::EdgePairWithProperties (*p, p.prop_id ()));
+      }
     }
-
   }
 
   return this;

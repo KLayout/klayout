@@ -92,6 +92,13 @@ Texts::Texts (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::I
   mp_delegate = new DeepTexts (si, dss, trans);
 }
 
+Texts::Texts (DeepShapeStore &dss)
+{
+  tl_assert (dss.is_singular ());
+  unsigned int layout_index = 0; // singular layout index
+  mp_delegate = new DeepTexts (DeepLayer (&dss, layout_index, dss.layout (layout_index).insert_layer ()));
+}
+
 void
 Texts::write (const std::string &fn) const
 {

@@ -314,18 +314,16 @@ EdgesDelegate *FlatEdges::add (const Edges &other) const
   if (other_flat) {
 
     new_region->raw_edges ().insert (other_flat->raw_edges ().get_layer<db::Edge, db::unstable_layer_tag> ().begin (), other_flat->raw_edges ().get_layer<db::Edge, db::unstable_layer_tag> ().end ());
+    new_region->raw_edges ().insert (other_flat->raw_edges ().get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().begin (), other_flat->raw_edges ().get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().end ());
 
   } else {
 
-    size_t n = new_region->raw_edges ().size ();
     for (EdgesIterator p (other.begin ()); ! p.at_end (); ++p) {
-      ++n;
-    }
-
-    new_region->raw_edges ().reserve (db::Edge::tag (), n);
-
-    for (EdgesIterator p (other.begin ()); ! p.at_end (); ++p) {
-      new_region->raw_edges ().insert (*p);
+      if (p.prop_id () == 0) {
+        new_region->raw_edges ().insert (*p);
+      } else {
+        new_region->raw_edges ().insert (db::EdgeWithProperties (*p, p.prop_id ()));
+      }
     }
 
   }
@@ -344,18 +342,16 @@ EdgesDelegate *FlatEdges::add_in_place (const Edges &other)
   if (other_flat) {
 
     e.insert (other_flat->raw_edges ().get_layer<db::Edge, db::unstable_layer_tag> ().begin (), other_flat->raw_edges ().get_layer<db::Edge, db::unstable_layer_tag> ().end ());
+    e.insert (other_flat->raw_edges ().get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().begin (), other_flat->raw_edges ().get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().end ());
 
   } else {
 
-    size_t n = e.size ();
     for (EdgesIterator p (other.begin ()); ! p.at_end (); ++p) {
-      ++n;
-    }
-
-    e.reserve (db::Edge::tag (), n);
-
-    for (EdgesIterator p (other.begin ()); ! p.at_end (); ++p) {
-      e.insert (*p);
+      if (p.prop_id () == 0) {
+        e.insert (*p);
+      } else {
+        e.insert (db::EdgeWithProperties (*p, p.prop_id ()));
+      }
     }
 
   }

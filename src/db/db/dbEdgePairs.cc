@@ -96,6 +96,13 @@ EdgePairs::EdgePairs (const RecursiveShapeIterator &si, DeepShapeStore &dss, con
   mp_delegate = new DeepEdgePairs (si, dss, trans);
 }
 
+EdgePairs::EdgePairs (DeepShapeStore &dss)
+{
+  tl_assert (dss.is_singular ());
+  unsigned int layout_index = 0; // singular layout index
+  mp_delegate = new DeepEdgePairs (DeepLayer (&dss, layout_index, dss.layout (layout_index).insert_layer ()));
+}
+
 void
 EdgePairs::write (const std::string &fn) const
 {

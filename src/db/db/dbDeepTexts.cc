@@ -183,7 +183,7 @@ void DeepTexts::do_insert (const db::Text &text, db::properties_id_type prop_id)
   db::Layout &layout = deep_layer ().layout ();
   if (layout.begin_top_down () != layout.end_top_down ()) {
     db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
-    if (prop_id != 0) {
+    if (prop_id == 0) {
       top_cell.shapes (deep_layer ().layer ()).insert (db::TextRef (text, layout.shape_repository ()));
     } else {
       top_cell.shapes (deep_layer ().layer ()).insert (db::TextRefWithProperties (db::TextRef (text, layout.shape_repository ()), prop_id));
@@ -365,7 +365,11 @@ DeepTexts::add_in_place (const Texts &other)
 
     db::Shapes &shapes = deep_layer ().initial_cell ().shapes (deep_layer ().layer ());
     for (db::Texts::const_iterator p = other.begin (); ! p.at_end (); ++p) {
-      shapes.insert (*p);
+      if (p.prop_id () == 0) {
+        shapes.insert (*p);
+      } else {
+        shapes.insert (db::TextWithProperties (*p, p.prop_id ()));
+      }
     }
 
   }

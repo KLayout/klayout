@@ -247,12 +247,12 @@ AsIfFlatTexts::add (const Texts &other) const
     std::unique_ptr<FlatTexts> new_texts (new FlatTexts (*other_flat));
     new_texts->invalidate_cache ();
 
-    size_t n = new_texts->raw_texts ().size () + count ();
-
-    new_texts->reserve (n);
-
     for (TextsIterator p (begin ()); ! p.at_end (); ++p) {
-      new_texts->raw_texts ().insert (*p);
+      if (p.prop_id () == 0) {
+        new_texts->raw_texts ().insert (*p);
+      } else {
+        new_texts->raw_texts ().insert (TextWithProperties (*p, p.prop_id ()));
+      }
     }
 
     return new_texts.release ();
@@ -261,15 +261,19 @@ AsIfFlatTexts::add (const Texts &other) const
 
     std::unique_ptr<FlatTexts> new_texts (new FlatTexts ());
 
-    size_t n = count () + other.count ();
-
-    new_texts->reserve (n);
-
     for (TextsIterator p (begin ()); ! p.at_end (); ++p) {
-      new_texts->raw_texts ().insert (*p);
+      if (p.prop_id () == 0) {
+        new_texts->raw_texts ().insert (*p);
+      } else {
+        new_texts->raw_texts ().insert (db::TextWithProperties (*p, p.prop_id ()));
+      }
     }
     for (TextsIterator p (other.begin ()); ! p.at_end (); ++p) {
-      new_texts->raw_texts ().insert (*p);
+      if (p.prop_id () == 0) {
+        new_texts->raw_texts ().insert (*p);
+      } else {
+        new_texts->raw_texts ().insert (db::TextWithProperties (*p, p.prop_id ()));
+      }
     }
 
     return new_texts.release ();

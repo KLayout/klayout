@@ -630,10 +630,6 @@ AsIfFlatEdgePairs::add (const EdgePairs &other) const
     std::unique_ptr<FlatEdgePairs> new_edge_pairs (new FlatEdgePairs (*other_flat));
     new_edge_pairs->invalidate_cache ();
 
-    size_t n = new_edge_pairs->raw_edge_pairs ().size () + count ();
-
-    new_edge_pairs->reserve (n);
-
     for (EdgePairsIterator p (begin ()); ! p.at_end (); ++p) {
       db::properties_id_type prop_id = p.prop_id ();
       if (prop_id) {
@@ -648,10 +644,6 @@ AsIfFlatEdgePairs::add (const EdgePairs &other) const
   } else {
 
     std::unique_ptr<FlatEdgePairs> new_edge_pairs (new FlatEdgePairs ());
-
-    size_t n = count () + other.count ();
-
-    new_edge_pairs->reserve (n);
 
     for (EdgePairsIterator p (begin ()); ! p.at_end (); ++p) {
       db::properties_id_type prop_id = p.prop_id ();

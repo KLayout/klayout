@@ -197,6 +197,12 @@ public:
   explicit EdgePairs (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans);
 
   /**
+   *  @brief Creates a new empty layer inside the dss
+   *  This method requires the DSS to be singular.
+   */
+  explicit EdgePairs (DeepShapeStore &dss);
+
+  /**
    *  @brief Writes the edge pair collection to a file
    *
    *  This method is provided for debugging purposes. A flat image of the

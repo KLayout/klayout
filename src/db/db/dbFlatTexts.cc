@@ -125,18 +125,16 @@ TextsDelegate *FlatTexts::add (const Texts &other) const
   if (other_flat) {
 
     new_texts->raw_texts ().insert (other_flat->raw_texts ().get_layer<db::Text, db::unstable_layer_tag> ().begin (), other_flat->raw_texts ().get_layer<db::Text, db::unstable_layer_tag> ().end ());
+    new_texts->raw_texts ().insert (other_flat->raw_texts ().get_layer<db::TextWithProperties, db::unstable_layer_tag> ().begin (), other_flat->raw_texts ().get_layer<db::TextWithProperties, db::unstable_layer_tag> ().end ());
 
   } else {
 
-    size_t n = new_texts->raw_texts ().size ();
     for (TextsIterator p (other.begin ()); ! p.at_end (); ++p) {
-      ++n;
-    }
-
-    new_texts->raw_texts ().reserve (db::Text::tag (), n);
-
-    for (TextsIterator p (other.begin ()); ! p.at_end (); ++p) {
-      new_texts->raw_texts ().insert (*p);
+      if (p.prop_id () == 0) {
+        new_texts->raw_texts ().insert (*p);
+      } else {
+        new_texts->raw_texts ().insert (db::TextWithProperties (*p, p.prop_id ()));
+      }
     }
 
   }
@@ -154,18 +152,16 @@ TextsDelegate *FlatTexts::add_in_place (const Texts &other)
   if (other_flat) {
 
     texts.insert (other_flat->raw_texts ().get_layer<db::Text, db::unstable_layer_tag> ().begin (), other_flat->raw_texts ().get_layer<db::Text, db::unstable_layer_tag> ().end ());
+    texts.insert (other_flat->raw_texts ().get_layer<db::TextWithProperties, db::unstable_layer_tag> ().begin (), other_flat->raw_texts ().get_layer<db::TextWithProperties, db::unstable_layer_tag> ().end ());
 
   } else {
 
-    size_t n = texts.size ();
     for (TextsIterator p (other.begin ()); ! p.at_end (); ++p) {
-      ++n;
-    }
-
-    texts.reserve (db::Text::tag (), n);
-
-    for (TextsIterator p (other.begin ()); ! p.at_end (); ++p) {
-      texts.insert (*p);
+      if (p.prop_id () == 0) {
+        texts.insert (*p);
+      } else {
+        texts.insert (db::TextWithProperties (*p, p.prop_id ()));
+      }
     }
 
   }

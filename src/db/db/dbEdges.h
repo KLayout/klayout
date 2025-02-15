@@ -259,6 +259,12 @@ public:
   explicit Edges (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans, bool as_edges = true, bool merged_semantics = true);
 
   /**
+   *  @brief Creates a new empty layer inside the dss
+   *  This method requires the DSS to be singular.
+   */
+  explicit Edges (DeepShapeStore &dss);
+
+  /**
    *  @brief Implementation of the ShapeCollection interface
    */
   ShapeCollectionDelegateBase *get_delegate () const

@@ -1125,6 +1125,7 @@ DeepRegion::add_in_place (const Region &other)
     db::Shapes &shapes = deep_layer ().initial_cell ().shapes (deep_layer ().layer ());
     db::PolygonRefToShapesGenerator pr (const_cast<db::Layout *> (& deep_layer ().layout ()), &shapes);
     for (db::Region::const_iterator p = other.begin (); ! p.at_end (); ++p) {
+      pr.set_prop_id (p.prop_id ());
       pr.put (*p);
     }
 

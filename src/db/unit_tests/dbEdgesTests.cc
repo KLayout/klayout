@@ -1375,6 +1375,74 @@ TEST(31)
   db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_edges_au3_flat.gds");
 }
 
+TEST(32_add_with_properties)
+{
+  db::DeepShapeStore dss ("TOP", 0.001);
+  db::Edges rd1 (dss), rd2 (dss);
+  db::Edges rf1, rf2;
+
+  db::PropertiesSet ps;
+  ps.insert ("net", 17);
+  db::properties_id_type pid = db::properties_id (ps);
+
+  rf1.insert (db::EdgeWithProperties (db::Edge (-10, 20, 20, 60), pid));
+  rd1.insert (db::EdgeWithProperties (db::Edge (-10, 20, 20, 60), pid));
+
+  rf2.insert (db::EdgeWithProperties (db::Edge (10, 20, 40, 60), pid));
+  rd2.insert (db::EdgeWithProperties (db::Edge (10, 20, 40, 60), pid));
+
+  db::Layout ly;
+  db::Cell &top_cell = ly.cell (ly.add_cell ("TOP"));
+  unsigned int l1 = ly.insert_layer ();
+  unsigned int l2 = ly.insert_layer ();
+
+  top_cell.shapes (l1).insert (db::EdgeWithProperties (db::Edge (-10, 20, 20, 60), pid));
+  top_cell.shapes (l2).insert (db::EdgeWithProperties (db::Edge (10, 20, 40, 60), pid));
+
+  db::Edges ro1 (db::RecursiveShapeIterator (ly, top_cell, l1), false);
+  db::Edges ro2 (db::RecursiveShapeIterator (ly, top_cell, l2), false);
+
+  //  enable properties
+  ro1.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
+  ro2.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
+
+  db::Edges r;
+  r += rf1;
+  r += rf2;
+  EXPECT_EQ (r.to_string (), "(-10,20;20,60){net=>17};(10,20;40,60){net=>17}");
+  EXPECT_EQ ((rf1 + rf2).to_string (), "(-10,20;20,60){net=>17};(10,20;40,60){net=>17}");
+
+  r = db::Edges ();
+  r += rd1;
+  r += rf2;
+  EXPECT_EQ (r.to_string (), "(-10,20;20,60){net=>17};(10,20;40,60){net=>17}");
+  EXPECT_EQ ((rd1 + rf2).to_string (), "(-10,20;20,60){net=>17};(10,20;40,60){net=>17}");
+
+  r = db::Edges ();
+  r += rf1;
+  r += rd2;
+  EXPECT_EQ (r.to_string (), "(-10,20;20,60){net=>17};(10,20;40,60){net=>17}");
+  EXPECT_EQ ((rf1 + rd2).to_string (), "(-10,20;20,60){net=>17};(10,20;40,60){net=>17}");
+
+  r = db::Edges ();
+  r += rd1;
+  r += rd2;
+  EXPECT_EQ (r.to_string (), "(-10,20;20,60){net=>17};(10,20;40,60){net=>17}");
+  EXPECT_EQ ((rd1 + rd2).to_string (), "(-10,20;20,60){net=>17};(10,20;40,60){net=>17}");
+
+  r = db::Edges ();
+  r += ro1;
+  r += ro2;
+  EXPECT_EQ (r.to_string (), "(-10,20;20,60){net=>17};(10,20;40,60){net=>17}");
+  EXPECT_EQ ((ro1 + ro2).to_string (), "(-10,20;20,60){net=>17};(10,20;40,60){net=>17}");
+
+  r = db::Edges ();
+  r += ro1;
+  r += rf2;
+  EXPECT_EQ (r.to_string (), "(10,20;40,60){net=>17};(-10,20;20,60){net=>17}");
+  EXPECT_EQ ((ro1 + rf2).to_string (), "(10,20;40,60){net=>17};(-10,20;20,60){net=>17}");
+}
+
 //  GitHub issue #72 (Edges/Region NOT issue)
 TEST(100)
 {

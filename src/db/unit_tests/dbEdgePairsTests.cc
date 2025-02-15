@@ -210,3 +210,72 @@ TEST(5_InternalAngleFilter)
   EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, true).selected (ep45), false);
   EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, true).selected (ep45inv), false);
 }
+
+TEST(6_add_with_properties)
+{
+  db::DeepShapeStore dss ("TOP", 0.001);
+  db::EdgePairs rd1 (dss), rd2 (dss);
+  db::EdgePairs rf1, rf2;
+
+  db::PropertiesSet ps;
+  ps.insert ("net", 17);
+  db::properties_id_type pid = db::properties_id (ps);
+
+  rf1.insert (db::EdgePairWithProperties (db::EdgePair (db::Edge (-10, 20, 20, 60), db::Edge (-10, 30, 20, 70)), pid));
+  rd1.insert (db::EdgePairWithProperties (db::EdgePair (db::Edge (-10, 20, 20, 60), db::Edge (-10, 30, 20, 70)), pid));
+
+  rf2.insert (db::EdgePairWithProperties (db::EdgePair (db::Edge (10, 20, -20, 60), db::Edge (10, 30, -20, 70)), pid));
+  rd2.insert (db::EdgePairWithProperties (db::EdgePair (db::Edge (10, 20, -20, 60), db::Edge (10, 30, -20, 70)), pid));
+
+  db::Layout ly;
+  db::Cell &top_cell = ly.cell (ly.add_cell ("TOP"));
+  unsigned int l1 = ly.insert_layer ();
+  unsigned int l2 = ly.insert_layer ();
+
+  top_cell.shapes (l1).insert (db::EdgePairWithProperties (db::EdgePair (db::Edge (-10, 20, 20, 60), db::Edge (-10, 30, 20, 70)), pid));
+  top_cell.shapes (l2).insert (db::EdgePairWithProperties (db::EdgePair (db::Edge (10, 20, -20, 60), db::Edge (10, 30, -20, 70)), pid));
+
+  db::EdgePairs ro1 (db::RecursiveShapeIterator (ly, top_cell, l1));
+  db::EdgePairs ro2 (db::RecursiveShapeIterator (ly, top_cell, l2));
+
+  //  enable properties
+  ro1.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
+  ro2.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
+
+  db::EdgePairs r;
+  r += rf1;
+  r += rf2;
+  EXPECT_EQ (r.to_string (), "(-10,20;20,60)/(-10,30;20,70){net=>17};(10,20;-20,60)/(10,30;-20,70){net=>17}");
+  EXPECT_EQ ((rf1 + rf2).to_string (), "(-10,20;20,60)/(-10,30;20,70){net=>17};(10,20;-20,60)/(10,30;-20,70){net=>17}");
+
+  r = db::EdgePairs ();
+  r += rd1;
+  r += rf2;
+  EXPECT_EQ (r.to_string (), "(-10,20;20,60)/(-10,30;20,70){net=>17};(10,20;-20,60)/(10,30;-20,70){net=>17}");
+  EXPECT_EQ ((rd1 + rf2).to_string (), "(-10,20;20,60)/(-10,30;20,70){net=>17};(10,20;-20,60)/(10,30;-20,70){net=>17}");
+
+  r = db::EdgePairs ();
+  r += rf1;
+  r += rd2;
+  EXPECT_EQ (r.to_string (), "(-10,20;20,60)/(-10,30;20,70){net=>17};(10,20;-20,60)/(10,30;-20,70){net=>17}");
+  EXPECT_EQ ((rf1 + rd2).to_string (), "(-10,20;20,60)/(-10,30;20,70){net=>17};(10,20;-20,60)/(10,30;-20,70){net=>17}");
+
+  r = db::EdgePairs ();
+  r += rd1;
+  r += rd2;
+  EXPECT_EQ (r.to_string (), "(-10,20;20,60)/(-10,30;20,70){net=>17};(10,20;-20,60)/(10,30;-20,70){net=>17}");
+  EXPECT_EQ ((rd1 + rd2).to_string (), "(-10,20;20,60)/(-10,30;20,70){net=>17};(10,20;-20,60)/(10,30;-20,70){net=>17}");
+
+  r = db::EdgePairs ();
+  r += ro1;
+  r += ro2;
+  EXPECT_EQ (r.to_string (), "(-10,20;20,60)/(-10,30;20,70){net=>17};(10,20;-20,60)/(10,30;-20,70){net=>17}");
+  EXPECT_EQ ((ro1 + ro2).to_string (), "(-10,20;20,60)/(-10,30;20,70){net=>17};(10,20;-20,60)/(10,30;-20,70){net=>17}");
+
+  r = db::EdgePairs ();
+  r += ro1;
+  r += rf2;
+  EXPECT_EQ (r.to_string (), "(10,20;-20,60)/(10,30;-20,70){net=>17};(-10,20;20,60)/(-10,30;20,70){net=>17}");
+  EXPECT_EQ ((ro1 + rf2).to_string (), "(10,20;-20,60)/(10,30;-20,70){net=>17};(-10,20;20,60)/(-10,30;20,70){net=>17}");
+}
+

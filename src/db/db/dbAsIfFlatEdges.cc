@@ -1012,12 +1012,12 @@ AsIfFlatEdges::add (const Edges &other) const
     new_edges->set_is_merged (false);
     new_edges->invalidate_cache ();
 
-    size_t n = new_edges->raw_edges ().size () + count ();
-
-    new_edges->reserve (n);
-
     for (EdgesIterator p (begin ()); ! p.at_end (); ++p) {
-      new_edges->raw_edges ().insert (*p);
+      if (p.prop_id () == 0) {
+        new_edges->raw_edges ().insert (*p);
+      } else {
+        new_edges->raw_edges ().insert (db::EdgeWithProperties (*p, p.prop_id ()));
+      }
     }
 
     return new_edges.release ();
@@ -1026,15 +1026,19 @@ AsIfFlatEdges::add (const Edges &other) const
 
     std::unique_ptr<FlatEdges> new_edges (new FlatEdges (false /*not merged*/));
 
-    size_t n = count () + other.count ();
-
-    new_edges->reserve (n);
-
     for (EdgesIterator p (begin ()); ! p.at_end (); ++p) {
-      new_edges->raw_edges ().insert (*p);
+      if (p.prop_id () == 0) {
+        new_edges->raw_edges ().insert (*p);
+      } else {
+        new_edges->raw_edges ().insert (db::EdgeWithProperties (*p, p.prop_id ()));
+      }
     }
     for (EdgesIterator p (other.begin ()); ! p.at_end (); ++p) {
-      new_edges->raw_edges ().insert (*p);
+      if (p.prop_id () == 0) {
+        new_edges->raw_edges ().insert (*p);
+      } else {
+        new_edges->raw_edges ().insert (db::EdgeWithProperties (*p, p.prop_id ()));
+      }
     }
 
     return new_edges.release ();

@@ -1821,12 +1821,12 @@ AsIfFlatRegion::add (const Region &other) const
     new_region->set_is_merged (false);
     new_region->invalidate_cache ();
 
-    size_t n = new_region->raw_polygons ().size () + count ();
-
-    new_region->reserve (n);
-
     for (RegionIterator p (begin ()); ! p.at_end (); ++p) {
-      new_region->raw_polygons ().insert (*p);
+      if (p.prop_id () == 0) {
+        new_region->raw_polygons ().insert (*p);
+      } else {
+        new_region->raw_polygons ().insert (db::PolygonWithProperties (*p, p.prop_id ()));
+      }
     }
 
     return new_region.release ();
@@ -1835,15 +1835,19 @@ AsIfFlatRegion::add (const Region &other) const
 
     std::unique_ptr<FlatRegion> new_region (new FlatRegion (false /*not merged*/));
 
-    size_t n = count () + other.count ();
-
-    new_region->reserve (n);
-
     for (RegionIterator p (begin ()); ! p.at_end (); ++p) {
-      new_region->raw_polygons ().insert (*p);
+      if (p.prop_id () == 0) {
+        new_region->raw_polygons ().insert (*p);
+      } else {
+        new_region->raw_polygons ().insert (db::PolygonWithProperties (*p, p.prop_id ()));
+      }
     }
     for (RegionIterator p (other.begin ()); ! p.at_end (); ++p) {
-      new_region->raw_polygons ().insert (*p);
+      if (p.prop_id () == 0) {
+        new_region->raw_polygons ().insert (*p);
+      } else {
+        new_region->raw_polygons ().insert (db::PolygonWithProperties (*p, p.prop_id ()));
+      }
     }
 
     return new_region.release ();

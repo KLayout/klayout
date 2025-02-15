@@ -208,3 +208,71 @@ TEST(7)
   texts.pull_interacting (region_out, region);
   EXPECT_EQ (region_out.to_string (), "(50,-300;50,-100;150,-100;150,-300)");
 }
+
+TEST(8_add_with_properties)
+{
+  db::DeepShapeStore dss ("TOP", 0.001);
+  db::Texts rd1 (dss), rd2 (dss);
+  db::Texts rf1, rf2;
+
+  db::PropertiesSet ps;
+  ps.insert ("net", 17);
+  db::properties_id_type pid = db::properties_id (ps);
+
+  rf1.insert (db::TextWithProperties (db::Text ("abc", db::Trans (db::Vector (10, 20))), pid));
+  rd1.insert (db::TextWithProperties (db::Text ("abc", db::Trans (db::Vector (10, 20))), pid));
+
+  rf2.insert (db::TextWithProperties (db::Text ("uvw", db::Trans (db::Vector (-10, 20))), pid));
+  rd2.insert (db::TextWithProperties (db::Text ("uvw", db::Trans (db::Vector (-10, 20))), pid));
+
+  db::Layout ly;
+  db::Cell &top_cell = ly.cell (ly.add_cell ("TOP"));
+  unsigned int l1 = ly.insert_layer ();
+  unsigned int l2 = ly.insert_layer ();
+
+  top_cell.shapes (l1).insert (db::TextWithProperties (db::Text ("abc", db::Trans (db::Vector (10, 20))), pid));
+  top_cell.shapes (l2).insert (db::TextWithProperties (db::Text ("uvw", db::Trans (db::Vector (-10, 20))), pid));
+
+  db::Texts ro1 (db::RecursiveShapeIterator (ly, top_cell, l1));
+  db::Texts ro2 (db::RecursiveShapeIterator (ly, top_cell, l2));
+
+  //  enable properties
+  ro1.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
+  ro2.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
+
+  db::Texts r;
+  r += rf1;
+  r += rf2;
+  EXPECT_EQ (r.to_string (), "('abc',r0 10,20){net=>17};('uvw',r0 -10,20){net=>17}");
+  EXPECT_EQ ((rf1 + rf2).to_string (), "('abc',r0 10,20){net=>17};('uvw',r0 -10,20){net=>17}");
+
+  r = db::Texts ();
+  r += rd1;
+  r += rf2;
+  EXPECT_EQ (r.to_string (), "('uvw',r0 -10,20){net=>17};('abc',r0 10,20){net=>17}");
+  EXPECT_EQ ((rd1 + rf2).to_string (), "('uvw',r0 -10,20){net=>17};('abc',r0 10,20){net=>17}");
+
+  r = db::Texts ();
+  r += rf1;
+  r += rd2;
+  EXPECT_EQ (r.to_string (), "('abc',r0 10,20){net=>17};('uvw',r0 -10,20){net=>17}");
+  EXPECT_EQ ((rf1 + rd2).to_string (), "('abc',r0 10,20){net=>17};('uvw',r0 -10,20){net=>17}");
+
+  r = db::Texts ();
+  r += rd1;
+  r += rd2;
+  EXPECT_EQ (r.to_string (), "('abc',r0 10,20){net=>17};('uvw',r0 -10,20){net=>17}");
+  EXPECT_EQ ((rd1 + rd2).to_string (), "('abc',r0 10,20){net=>17};('uvw',r0 -10,20){net=>17}");
+
+  r = db::Texts ();
+  r += ro1;
+  r += ro2;
+  EXPECT_EQ (r.to_string (), "('abc',r0 10,20){net=>17};('uvw',r0 -10,20){net=>17}");
+  EXPECT_EQ ((ro1 + ro2).to_string (), "('abc',r0 10,20){net=>17};('uvw',r0 -10,20){net=>17}");
+
+  r = db::Texts ();
+  r += ro1;
+  r += rf2;
+  EXPECT_EQ (r.to_string (), "('uvw',r0 -10,20){net=>17};('abc',r0 10,20){net=>17}");
+  EXPECT_EQ ((ro1 + rf2).to_string (), "('uvw',r0 -10,20){net=>17};('abc',r0 10,20){net=>17}");
+}

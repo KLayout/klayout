@@ -2804,6 +2804,74 @@ TEST(63_sized_outside_deep)
   }
 }
 
+TEST(64_add_with_properties)
+{
+  db::DeepShapeStore dss ("TOP", 0.001);
+  db::Region rd1 (dss), rd2 (dss);
+  db::Region rf1, rf2;
+
+  db::PropertiesSet ps;
+  ps.insert ("net", 17);
+  db::properties_id_type pid = db::properties_id (ps);
+
+  rf1.insert (db::BoxWithProperties (db::Box (-10, 20, 20, 60), pid));
+  rd1.insert (db::BoxWithProperties (db::Box (-10, 20, 20, 60), pid));
+
+  rf2.insert (db::BoxWithProperties (db::Box (10, 20, 40, 60), pid));
+  rd2.insert (db::BoxWithProperties (db::Box (10, 20, 40, 60), pid));
+
+  db::Layout ly;
+  db::Cell &top_cell = ly.cell (ly.add_cell ("TOP"));
+  unsigned int l1 = ly.insert_layer ();
+  unsigned int l2 = ly.insert_layer ();
+
+  top_cell.shapes (l1).insert (db::BoxWithProperties (db::Box (-10, 20, 20, 60), pid));
+  top_cell.shapes (l2).insert (db::BoxWithProperties (db::Box (10, 20, 40, 60), pid));
+
+  db::Region ro1 (db::RecursiveShapeIterator (ly, top_cell, l1));
+  db::Region ro2 (db::RecursiveShapeIterator (ly, top_cell, l2));
+
+  //  enable properties
+  ro1.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
+  ro2.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
+
+  db::Region r;
+  r += rf1;
+  r += rf2;
+  EXPECT_EQ (r.to_string (), "(-10,20;-10,60;20,60;20,20){net=>17};(10,20;10,60;40,60;40,20){net=>17}");
+  EXPECT_EQ ((rf1 + rf2).to_string (), "(-10,20;-10,60;20,60;20,20){net=>17};(10,20;10,60;40,60;40,20){net=>17}");
+
+  r = db::Region ();
+  r += rd1;
+  r += rf2;
+  EXPECT_EQ (r.to_string (), "(-10,20;-10,60;20,60;20,20){net=>17};(10,20;10,60;40,60;40,20){net=>17}");
+  EXPECT_EQ ((rd1 + rf2).to_string (), "(-10,20;-10,60;20,60;20,20){net=>17};(10,20;10,60;40,60;40,20){net=>17}");
+
+  r = db::Region ();
+  r += rf1;
+  r += rd2;
+  EXPECT_EQ (r.to_string (), "(-10,20;-10,60;20,60;20,20){net=>17};(10,20;10,60;40,60;40,20){net=>17}");
+  EXPECT_EQ ((rf1 + rd2).to_string (), "(-10,20;-10,60;20,60;20,20){net=>17};(10,20;10,60;40,60;40,20){net=>17}");
+
+  r = db::Region ();
+  r += rd1;
+  r += rd2;
+  EXPECT_EQ (r.to_string (), "(-10,20;-10,60;20,60;20,20){net=>17};(10,20;10,60;40,60;40,20){net=>17}");
+  EXPECT_EQ ((rd1 + rd2).to_string (), "(-10,20;-10,60;20,60;20,20){net=>17};(10,20;10,60;40,60;40,20){net=>17}");
+
+  r = db::Region ();
+  r += ro1;
+  r += ro2;
+  EXPECT_EQ (r.to_string (), "(-10,20;-10,60;20,60;20,20){net=>17};(10,20;10,60;40,60;40,20){net=>17}");
+  EXPECT_EQ ((ro1 + ro2).to_string (), "(-10,20;-10,60;20,60;20,20){net=>17};(10,20;10,60;40,60;40,20){net=>17}");
+
+  r = db::Region ();
+  r += ro1;
+  r += rf2;
+  EXPECT_EQ (r.to_string (), "(10,20;10,60;40,60;40,20){net=>17};(-10,20;-10,60;20,60;20,20){net=>17}");
+  EXPECT_EQ ((ro1 + rf2).to_string (), "(10,20;10,60;40,60;40,20){net=>17};(-10,20;-10,60;20,60;20,20){net=>17}");
+}
+
 TEST(100_Processors)
 {
   db::Region r;
@@ -2895,3 +2963,4 @@ TEST(issue_909)
   db::Region r = r1 + r2;
   EXPECT_EQ (r.to_string (), "(0,0;0,100;100,100;100,0);(0,0;0,300;200,300;200,0)");
 }
+

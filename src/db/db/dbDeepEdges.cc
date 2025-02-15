@@ -1236,7 +1236,11 @@ DeepEdges::add_in_place (const Edges &other)
 
     db::Shapes &shapes = deep_layer ().initial_cell ().shapes (deep_layer ().layer ());
     for (db::Edges::const_iterator p = other.begin (); ! p.at_end (); ++p) {
-      shapes.insert (*p);
+      if (p.prop_id () == 0) {
+        shapes.insert (*p);
+      } else {
+        shapes.insert (db::EdgeWithProperties (*p, p.prop_id ()));
+      }
     }
 
   }

@@ -323,15 +323,12 @@ RegionDelegate *FlatRegion::add (const Region &other) const
 
   } else {
 
-    size_t n = new_region->raw_polygons ().size ();
     for (RegionIterator p (other.begin ()); ! p.at_end (); ++p) {
-      ++n;
-    }
-
-    new_region->raw_polygons ().reserve (db::Polygon::tag (), n);
-
-    for (RegionIterator p (other.begin ()); ! p.at_end (); ++p) {
-      new_region->raw_polygons ().insert (*p);
+      if (p.prop_id () == 0) {
+        new_region->raw_polygons ().insert (*p);
+      } else {
+        new_region->raw_polygons ().insert (db::PolygonWithProperties (*p, p.prop_id ()));
+      }
     }
 
   }
@@ -354,15 +351,12 @@ RegionDelegate *FlatRegion::add_in_place (const Region &other)
 
   } else {
 
-    size_t n = polygons.size ();
     for (RegionIterator p (other.begin ()); ! p.at_end (); ++p) {
-      ++n;
-    }
-
-    polygons.reserve (db::Polygon::tag (), n);
-
-    for (RegionIterator p (other.begin ()); ! p.at_end (); ++p) {
-      polygons.insert (*p);
+      if (p.prop_id () == 0) {
+        polygons.insert (*p);
+      } else {
+        polygons.insert (db::PolygonWithProperties (*p, p.prop_id ()));
+      }
     }
 
   }

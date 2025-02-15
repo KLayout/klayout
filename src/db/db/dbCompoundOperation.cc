@@ -1260,7 +1260,13 @@ CompoundRegionEdgePairFilterOperationNode::do_compute_local (CompoundRegionOpera
 bool
 CompoundRegionEdgePairFilterOperationNode::is_selected (const db::EdgePair &p) const
 {
-  return mp_filter->selected (p);
+  return mp_filter->selected (p, db::properties_id_type (0));
+}
+
+bool
+CompoundRegionEdgePairFilterOperationNode::is_selected (const db::EdgePairWithProperties &p) const
+{
+  return mp_filter->selected (p, p.properties_id ());
 }
 
 // ---------------------------------------------------------------------------------------------

@@ -167,7 +167,7 @@ AsIfFlatRegion::edges (const EdgeFilterBase *filter, const PolygonToEdgeProcesso
       proc->process (*p, heap);
 
       for (auto e = heap.begin (); e != heap.end (); ++e) {
-        if (! filter || filter->selected (*e)) {
+        if (! filter || filter->selected (*e, prop_id)) {
           if (prop_id != 0) {
             result->insert (db::EdgeWithProperties (*e, prop_id));
           } else {
@@ -179,7 +179,7 @@ AsIfFlatRegion::edges (const EdgeFilterBase *filter, const PolygonToEdgeProcesso
     } else {
 
       for (db::Polygon::polygon_edge_iterator e = p->begin_edge (); ! e.at_end (); ++e) {
-        if (! filter || filter->selected (*e)) {
+        if (! filter || filter->selected (*e, prop_id)) {
           if (prop_id != 0) {
             result->insert (db::EdgeWithProperties (*e, prop_id));
           } else {
@@ -420,8 +420,12 @@ AsIfFlatRegion::filtered (const PolygonFilterBase &filter) const
   std::unique_ptr<FlatRegion> new_region (new FlatRegion ());
 
   for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
-    if (filter.selected (*p)) {
-      new_region->insert (*p);
+    if (filter.selected (*p, p.prop_id ())) {
+      if (p.prop_id () != 0) {
+        new_region->insert (db::PolygonWithProperties (*p, p.prop_id ()));
+      } else {
+        new_region->insert (*p);
+      }
     }
   }
 

@@ -711,8 +711,12 @@ AsIfFlatEdges::filtered (const EdgeFilterBase &filter) const
   std::unique_ptr<FlatEdges> new_region (new FlatEdges ());
 
   for (EdgesIterator p (begin_merged ()); ! p.at_end (); ++p) {
-    if (filter.selected (*p)) {
-      new_region->insert (*p);
+    if (filter.selected (*p, p.prop_id ())) {
+      if (p.prop_id () != 0) {
+        new_region->insert (db::EdgeWithProperties (*p, p.prop_id ()));
+      } else {
+        new_region->insert (*p);
+      }
     }
   }
 

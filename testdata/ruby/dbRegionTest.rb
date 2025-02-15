@@ -1583,6 +1583,52 @@ class DBRegion_TestClass < TestBase
 
   end
 
+  # properties
+  def test_prop_filters
+
+    r = RBA::Region::new
+    r.insert(RBA::PolygonWithProperties::new(RBA::Box::new(0, 0, 100, 200), { "one" => -1 }))
+    r.insert(RBA::PolygonWithProperties::new(RBA::Box::new(1, 1, 101, 201), { "one" => 17 }))
+    r.insert(RBA::PolygonWithProperties::new(RBA::Box::new(2, 2, 102, 202), { "one" => 42 }))
+
+    assert_equal(r.filtered(RBA::PolygonFilter::property_filter("one", 11)).to_s, "")
+    assert_equal(r.filtered(RBA::PolygonFilter::property_filter("two", 17)).to_s, "")
+    assert_equal(r.filtered(RBA::PolygonFilter::property_filter("one", 17)).to_s, "(1,1;1,201;101,201;101,1){one=>17}")
+    assert_equal(r.filtered(RBA::PolygonFilter::property_filter("one", 17, true)).to_s, "(2,2;2,202;102,202;102,2){one=>42};(0,0;0,200;100,200;100,0){one=>-1}")
+    assert_equal(r.filtered(RBA::PolygonFilter::property_filter_bounded("one", 17, nil)).to_s, "(1,1;1,201;101,201;101,1){one=>17};(2,2;2,202;102,202;102,2){one=>42}")
+    assert_equal(r.filtered(RBA::PolygonFilter::property_filter_bounded("one", 17, 18)).to_s, "(1,1;1,201;101,201;101,1){one=>17}")
+    assert_equal(r.filtered(RBA::PolygonFilter::property_filter_bounded("one", 17, 18, true)).to_s, "(2,2;2,202;102,202;102,2){one=>42};(0,0;0,200;100,200;100,0){one=>-1}")
+    assert_equal(r.filtered(RBA::PolygonFilter::property_filter_bounded("one", nil, 18)).to_s, "(1,1;1,201;101,201;101,1){one=>17};(0,0;0,200;100,200;100,0){one=>-1}")
+    assert_equal(r.filtered(RBA::PolygonFilter::property_glob("one", "1*")).to_s, "(1,1;1,201;101,201;101,1){one=>17}")
+    assert_equal(r.filtered(RBA::PolygonFilter::property_glob("one", "1*", true)).to_s, "(2,2;2,202;102,202;102,2){one=>42};(0,0;0,200;100,200;100,0){one=>-1}")
+
+    ly = RBA::Layout::new
+    top = ly.create_cell("TOP")
+    l1 = ly.layer(1, 0)
+
+    s = top.shapes(l1)
+    s.insert(RBA::PolygonWithProperties::new(RBA::Box::new(0, 0, 100, 200), { "one" => -1 }))
+    s.insert(RBA::PolygonWithProperties::new(RBA::Box::new(1, 1, 101, 201), { "one" => 17 }))
+    s.insert(RBA::PolygonWithProperties::new(RBA::Box::new(2, 2, 102, 202), { "one" => 42 }))
+
+    dss = RBA::DeepShapeStore::new
+    iter = top.begin_shapes_rec(l1)
+    iter.enable_properties()
+    r = RBA::Region::new(iter, dss)
+
+    assert_equal(r.filtered(RBA::PolygonFilter::property_filter("one", 11)).to_s, "")
+    assert_equal(r.filtered(RBA::PolygonFilter::property_filter("two", 17)).to_s, "")
+    assert_equal(r.filtered(RBA::PolygonFilter::property_filter("one", 17)).to_s, "(1,1;1,201;101,201;101,1){one=>17}")
+    assert_equal(r.filtered(RBA::PolygonFilter::property_filter("one", 17, true)).to_s, "(0,0;0,200;100,200;100,0){one=>-1};(2,2;2,202;102,202;102,2){one=>42}")
+    assert_equal(r.filtered(RBA::PolygonFilter::property_filter_bounded("one", 17, nil)).to_s, "(1,1;1,201;101,201;101,1){one=>17};(2,2;2,202;102,202;102,2){one=>42}")
+    assert_equal(r.filtered(RBA::PolygonFilter::property_filter_bounded("one", 17, 18)).to_s, "(1,1;1,201;101,201;101,1){one=>17}")
+    assert_equal(r.filtered(RBA::PolygonFilter::property_filter_bounded("one", 17, 18, true)).to_s, "(0,0;0,200;100,200;100,0){one=>-1};(2,2;2,202;102,202;102,2){one=>42}")
+    assert_equal(r.filtered(RBA::PolygonFilter::property_filter_bounded("one", nil, 18)).to_s, "(0,0;0,200;100,200;100,0){one=>-1};(1,1;1,201;101,201;101,1){one=>17}")
+    assert_equal(r.filtered(RBA::PolygonFilter::property_glob("one", "1*")).to_s, "(1,1;1,201;101,201;101,1){one=>17}")
+    assert_equal(r.filtered(RBA::PolygonFilter::property_glob("one", "1*", true)).to_s, "(0,0;0,200;100,200;100,0){one=>-1};(2,2;2,202;102,202;102,2){one=>42}")
+
+  end
+
 end
 
 load("test_epilogue.rb")

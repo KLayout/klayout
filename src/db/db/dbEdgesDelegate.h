@@ -56,13 +56,13 @@ public:
    *  @brief Filters the edge
    *  If this method returns true, the edge is kept. Otherwise it's discarded.
    */
-  virtual bool selected (const db::Edge &edge) const = 0;
+  virtual bool selected (const db::Edge &edge, db::properties_id_type prop_id) const = 0;
 
   /**
    *  @brief Filters the edge set
    *  If this method returns true, the edges are kept. Otherwise they are discarded.
    */
-  virtual bool selected (const std::unordered_set<db::Edge> &edge) const = 0;
+  virtual bool selected (const std::unordered_set<db::EdgeWithProperties> &edge) const = 0;
 
   /**
    *  @brief Returns the transformation reducer for building cell variants

@@ -159,8 +159,12 @@ AsIfFlatTexts::filtered (const TextFilterBase &filter) const
   std::unique_ptr<FlatTexts> new_texts (new FlatTexts ());
 
   for (TextsIterator p (begin ()); ! p.at_end (); ++p) {
-    if (filter.selected (*p)) {
-      new_texts->insert (*p);
+    if (filter.selected (*p, p.prop_id ())) {
+      if (p.prop_id () != 0) {
+        new_texts->insert (db::TextWithProperties (*p, p.prop_id ()));
+      } else {
+        new_texts->insert (*p);
+      }
     }
   }
 

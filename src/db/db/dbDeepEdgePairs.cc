@@ -423,7 +423,7 @@ DeepEdgePairs::apply_filter (const EdgePairFilterBase &filter) const
         const db::ICplxTrans &tr = *v;
 
         for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::EdgePairs); ! si.at_end (); ++si) {
-          if (filter.selected (si->edge_pair ().transformed (tr))) {
+          if (filter.selected (si->edge_pair ().transformed (tr), si->prop_id ())) {
             st->insert (*si);
           }
         }
@@ -435,7 +435,7 @@ DeepEdgePairs::apply_filter (const EdgePairFilterBase &filter) const
       db::Shapes &st = c->shapes (res->deep_layer ().layer ());
 
       for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::EdgePairs); ! si.at_end (); ++si) {
-        if (filter.selected (si->edge_pair ())) {
+        if (filter.selected (si->edge_pair (), si->prop_id ())) {
           st.insert (*si);
         }
       }

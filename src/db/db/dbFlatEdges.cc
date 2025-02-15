@@ -276,7 +276,7 @@ FlatEdges::filter_in_place (const EdgeFilterBase &filter)
   edge_iterator_wp_type pw_wp = e.get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().begin ();
 
   for (EdgesIterator p (begin_merged ()); ! p.at_end (); ++p) {
-    if (filter.selected (*p)) {
+    if (filter.selected (*p, p.prop_id ())) {
       if (p.prop_id () != 0) {
         if (pw_wp == e.get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().end ()) {
           e.get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().insert (db::EdgeWithProperties (*p, p.prop_id ()));

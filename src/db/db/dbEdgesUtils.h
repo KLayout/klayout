@@ -71,7 +71,7 @@ struct DB_PUBLIC EdgeLengthFilter
   /**
    *  @brief Returns true if the edge length matches the criterion
    */
-  virtual bool selected (const db::Edge &edge) const
+  virtual bool selected (const db::Edge &edge, db::properties_id_type) const
   {
     return check (edge.length ());
   }
@@ -79,10 +79,10 @@ struct DB_PUBLIC EdgeLengthFilter
   /**
    *  @brief Returns true if the total edge length matches the criterion
    */
-  bool selected (const std::unordered_set<db::Edge> &edges) const
+  bool selected (const std::unordered_set<db::EdgeWithProperties> &edges) const
   {
     length_type l = 0;
-    for (std::unordered_set<db::Edge>::const_iterator e = edges.begin (); e != edges.end (); ++e) {
+    for (std::unordered_set<db::EdgeWithProperties>::const_iterator e = edges.begin (); e != edges.end (); ++e) {
       l += e->length ();
     }
     return check (l);
@@ -204,15 +204,15 @@ struct DB_PUBLIC EdgeOrientationFilter
   /**
    *  @brief Returns true if the edge orientation matches the criterion
    */
-  virtual bool selected (const db::Edge &edge) const;
+  virtual bool selected (const db::Edge &edge, properties_id_type) const;
 
   /**
    *  @brief Returns true if all edge orientations match the criterion
    */
-  virtual bool selected (const std::unordered_set<db::Edge> &edges) const
+  virtual bool selected (const std::unordered_set<db::EdgeWithProperties> &edges) const
   {
-    for (std::unordered_set<db::Edge>::const_iterator e = edges.begin (); e != edges.end (); ++e) {
-      if (! selected (*e)) {
+    for (std::unordered_set<db::EdgeWithProperties>::const_iterator e = edges.begin (); e != edges.end (); ++e) {
+      if (! selected (*e, e->properties_id ())) {
         return false;
       }
     }
@@ -274,15 +274,15 @@ struct DB_PUBLIC SpecialEdgeOrientationFilter
   /**
    *  @brief Returns true if the edge orientation matches the criterion
    */
-  virtual bool selected (const db::Edge &edge) const;
+  virtual bool selected (const db::Edge &edge, db::properties_id_type) const;
 
   /**
    *  @brief Returns true if all edge orientations match the criterion
    */
-  virtual bool selected (const std::unordered_set<db::Edge> &edges) const
+  virtual bool selected (const std::unordered_set<db::EdgeWithProperties> &edges) const
   {
-    for (std::unordered_set<db::Edge>::const_iterator e = edges.begin (); e != edges.end (); ++e) {
-      if (! selected (*e)) {
+    for (std::unordered_set<db::EdgeWithProperties>::const_iterator e = edges.begin (); e != edges.end (); ++e) {
+      if (! selected (*e, e->properties_id ())) {
         return false;
       }
     }

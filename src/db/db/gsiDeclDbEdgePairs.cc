@@ -45,17 +45,17 @@ class EdgePairFilterImpl
 public:
   EdgePairFilterImpl () { }
 
-  bool issue_selected (const db::EdgePair &) const
+  bool issue_selected (const db::EdgePairWithProperties &) const
   {
     return false;
   }
 
-  virtual bool selected (const db::EdgePair &edge_pair) const
+  virtual bool selected (const db::EdgePair &edge_pair, db::properties_id_type prop_id) const
   {
     if (f_selected.can_issue ()) {
-      return f_selected.issue<EdgePairFilterImpl, bool, const db::EdgePair &> (&EdgePairFilterImpl::issue_selected, edge_pair);
+      return f_selected.issue<EdgePairFilterImpl, bool, const db::EdgePairWithProperties &> (&EdgePairFilterImpl::issue_selected, db::EdgePairWithProperties (edge_pair, prop_id));
     } else {
-      return issue_selected (edge_pair);
+      return issue_selected (db::EdgePairWithProperties (edge_pair, prop_id));
     }
   }
 
@@ -73,6 +73,8 @@ Class<gsi::EdgePairFilterImpl> decl_EdgePairFilterImpl ("db", "EdgePairFilter",
     "@brief Selects an edge pair\n"
     "This method is the actual payload. It needs to be reimplemented in a derived class.\n"
     "It needs to analyze the edge pair and return 'true' if it should be kept and 'false' if it should be discarded."
+    "\n"
+    "Since version 0.30, the edge pair carries properties."
   ),
   "@brief A generic edge pair filter adaptor\n"
   "\n"

@@ -36,6 +36,7 @@
 #include "dbRegionProcessors.h"
 #include "dbCompoundOperation.h"
 #include "dbLayoutToNetlist.h"
+#include "dbPropertiesRepository.h"
 #include "tlGlobPattern.h"
 
 #include "gsiDeclDbContainerHelpers.h"
@@ -50,31 +51,38 @@ namespace gsi
 // ---------------------------------------------------------------------------------
 //  PolygonFilter binding
 
-class PolygonFilterImpl
+class PolygonFilterBase
   : public shape_filter_impl<db::AllMustMatchFilter>
+{
+public:
+  PolygonFilterBase () { }
+};
+
+class PolygonFilterImpl
+  : public PolygonFilterBase
 {
 public:
   PolygonFilterImpl () { }
 
-  bool issue_selected (const db::Polygon &) const
+  bool issue_selected (const db::PolygonWithProperties &) const
   {
     return false;
   }
 
-  virtual bool selected (const db::Polygon &polygon) const
+  virtual bool selected (const db::Polygon &polygon, db::properties_id_type prop_id) const
   {
     if (f_selected.can_issue ()) {
-      return f_selected.issue<PolygonFilterImpl, bool, const db::Polygon &> (&PolygonFilterImpl::issue_selected, polygon);
+      return f_selected.issue<PolygonFilterImpl, bool, const db::PolygonWithProperties &> (&PolygonFilterImpl::issue_selected, db::PolygonWithProperties (polygon, prop_id));
     } else {
       return issue_selected (polygon);
     }
   }
 
-  virtual bool selected (const db::PolygonRef &polygon) const
+  virtual bool selected (const db::PolygonRef &polygon, db::properties_id_type prop_id) const
   {
     db::Polygon p;
     polygon.instantiate (p);
-    return selected (p);
+    return selected (p, prop_id);
   }
 
   gsi::Callback f_selected;
@@ -85,12 +93,164 @@ private:
   PolygonFilterImpl (const PolygonFilterImpl &);
 };
 
-Class<gsi::PolygonFilterImpl> decl_PolygonFilterImpl ("db", "PolygonFilter",
+/**
+ *  @brief A properties filter
+ */
+class PropertiesFilter
+{
+public:
+  PropertiesFilter (const tl::Variant &name, const tl::Variant &value, bool inverse)
+    : m_name_id (db::property_names_id (name)), m_value_from (value), m_exact (true), m_glob (false), m_inverse (inverse)
+  {
+    //  .. nothing yet ..
+  }
+
+  PropertiesFilter (const tl::Variant &name, const tl::Variant &from, const tl::Variant &to, bool inverse)
+    : m_name_id (db::property_names_id (name)), m_value_from (from), m_value_to (to), m_exact (false), m_glob (false), m_inverse (inverse)
+  {
+    //  .. nothing yet ..
+  }
+
+  PropertiesFilter (const tl::Variant &name, const std::string &pattern, bool inverse)
+    : m_name_id (db::property_names_id (name)), m_pattern (pattern), m_exact (true), m_glob (true), m_inverse (inverse)
+  {
+    //  .. nothing yet ..
+  }
+
+  bool prop_selected (db::properties_id_type prop_id) const
+  {
+    auto c = m_cache.find (prop_id);
+    if (c != m_cache.end ()) {
+      return c->second;
+    }
+
+    bool res = prop_selected_impl (prop_id);
+    m_cache.insert (std::make_pair (prop_id, res));
+    return res;
+  }
+
+private:
+  bool prop_selected_impl (db::properties_id_type prop_id) const
+  {
+    const db::PropertiesSet &ps = db::properties (prop_id);
+    if (ps.has_value (m_name_id)) {
+
+      const tl::Variant &value = ps.value (m_name_id);
+
+      if (m_glob) {
+        return m_pattern.match (value.to_string ()) != m_inverse;
+      } else if (m_exact) {
+        return (value == m_value_from) != m_inverse;
+      } else {
+        return ((m_value_from.is_nil () || ! (value < m_value_from)) && (m_value_to.is_nil () || value < m_value_to)) != m_inverse;
+      }
+
+    } else {
+      return m_inverse;
+    }
+  }
+
+  mutable std::map<db::properties_id_type, bool> m_cache;
+  db::property_names_id_type m_name_id;
+  tl::Variant m_value_from, m_value_to;
+  tl::GlobPattern m_pattern;
+  bool m_exact;
+  bool m_glob;
+  bool m_inverse;
+};
+
+class PolygonPropertiesFilter
+  : public PolygonFilterBase, public PropertiesFilter
+{
+public:
+  PolygonPropertiesFilter (const tl::Variant &name, const std::string &pattern, bool inverse)
+    : PropertiesFilter (name, pattern, inverse)
+  {
+    //  .. nothing yet ..
+  }
+
+  PolygonPropertiesFilter (const tl::Variant &name, const tl::Variant &value, bool inverse)
+    : PropertiesFilter (name, value, inverse)
+  {
+    //  .. nothing yet ..
+  }
+
+  PolygonPropertiesFilter (const tl::Variant &name, const tl::Variant &from, const tl::Variant &to, bool inverse)
+    : PropertiesFilter (name, from, to, inverse)
+  {
+    //  .. nothing yet ..
+  }
+
+  bool selected (const db::Polygon &, db::properties_id_type prop_id) const
+  {
+    return PropertiesFilter::prop_selected (prop_id);
+  }
+
+  bool selected (const db::PolygonRef &, db::properties_id_type prop_id) const
+  {
+    return PropertiesFilter::prop_selected (prop_id);
+  }
+};
+
+static PolygonFilterBase *make_ppf1 (const tl::Variant &name, const tl::Variant &value, bool inverse)
+{
+  return new PolygonPropertiesFilter (name, value, inverse);
+}
+
+static PolygonFilterBase *make_ppf2 (const tl::Variant &name, const tl::Variant &from, const tl::Variant &to, bool inverse)
+{
+  return new PolygonPropertiesFilter (name, from, to, inverse);
+}
+
+static PolygonFilterBase *make_pg (const tl::Variant &name, const std::string &glob, bool inverse)
+{
+  return new PolygonPropertiesFilter (name, glob, inverse);
+}
+
+Class<gsi::PolygonFilterBase> decl_PolygonFilterBase ("db", "PolygonFilterBase",
+  gsi::constructor ("property_glob", &make_pg, gsi::arg ("name"), gsi::arg ("pattern"), gsi::arg ("inverse", false),
+    "@brief Creates a single-valued property filter\n"
+    "@param name The name of the property to use.\n"
+    "@param value The glob pattern to match the property value against.\n"
+    "@param inverse If true, inverts the selection - i.e. all polygons without a matching property are selected.\n"
+    "\n"
+    "Apply this filter with \\Region#filtered.\n"
+    "\n"
+    "This feature has been introduced in version 0.30."
+  ) +
+  gsi::constructor ("property_filter", &make_ppf1, gsi::arg ("name"), gsi::arg ("value"), gsi::arg ("inverse", false),
+    "@brief Creates a single-valued property filter\n"
+    "@param name The name of the property to use.\n"
+    "@param value The value against which the property is checked (exact match).\n"
+    "@param inverse If true, inverts the selection - i.e. all polygons without a property with the given name and value are selected.\n"
+    "\n"
+    "Apply this filter with \\Region#filtered.\n"
+    "\n"
+    "This feature has been introduced in version 0.30."
+  ) +
+  gsi::constructor ("property_filter_bounded", &make_ppf2, gsi::arg ("name"), gsi::arg ("from"), gsi::arg ("to"), gsi::arg ("inverse", false),
+    "@brief Creates a single-valued property filter\n"
+    "@param name The name of the property to use.\n"
+    "@param from The lower value against which the property is checked or 'nil' if no lower bound shall be used.\n"
+    "@param to The upper value against which the property is checked or 'nil' if no upper bound shall be used.\n"
+    "@param inverse If true, inverts the selection - i.e. all polygons without a property with the given name and value range are selected.\n"
+    "\n"
+    "This version does a bounded match. The value of the propery needs to be larger or equal to 'from' and less than 'to'.\n"
+    "Apply this filter with \\Region#filtered.\n"
+    "\n"
+    "This feature has been introduced in version 0.30."
+  ),
+  "@hide"
+);
+
+Class<gsi::PolygonFilterImpl> decl_PolygonFilterImpl (decl_PolygonFilterBase, "db", "PolygonFilter",
   PolygonFilterImpl::method_decls (true) +
   callback ("selected", &PolygonFilterImpl::issue_selected, &PolygonFilterImpl::f_selected, gsi::arg ("polygon"),
     "@brief Selects a polygon\n"
     "This method is the actual payload. It needs to be reimplemented in a derived class.\n"
-    "It needs to analyze the polygon and return 'true' if it should be kept and 'false' if it should be discarded."
+    "It needs to analyze the polygon and return 'true' if it should be kept and 'false' if it should be discarded.\n"
+    "\n"
+    "Since version 0.30, the polygon carries properties."
   ),
   "@brief A generic polygon filter adaptor\n"
   "\n"
@@ -544,12 +704,12 @@ static db::Edges extent_refs_edges (const db::Region *r, double fx1, double fy1,
   return r->processed (db::RelativeExtentsAsEdges (fx1, fy1, fx2, fy2));
 }
 
-static db::Region filtered (const db::Region *r, const PolygonFilterImpl *f)
+static db::Region filtered (const db::Region *r, const PolygonFilterBase *f)
 {
   return r->filtered (*f);
 }
 
-static void filter (db::Region *r, const PolygonFilterImpl *f)
+static void filter (db::Region *r, const PolygonFilterBase *f)
 {
   r->filter (*f);
 }

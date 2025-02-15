@@ -101,7 +101,7 @@ FlatTexts::filter_in_place (const TextFilterBase &filter)
 
   text_iterator_type pw = texts.get_layer<db::Text, db::unstable_layer_tag> ().begin ();
   for (TextsIterator p (begin ()); ! p.at_end (); ++p) {
-    if (filter.selected (*p)) {
+    if (filter.selected (*p, p.prop_id ())) {
       if (pw == texts.get_layer<db::Text, db::unstable_layer_tag> ().end ()) {
         texts.get_layer<db::Text, db::unstable_layer_tag> ().insert (*p);
         pw = texts.get_layer<db::Text, db::unstable_layer_tag> ().end ();

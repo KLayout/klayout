@@ -47,7 +47,7 @@ public:
   EdgeFilterBasedEdgePairFilter (EdgeFilterBase *edge_filter, bool one_must_match);
   virtual ~EdgeFilterBasedEdgePairFilter ();
 
-  virtual bool selected (const db::EdgePair &edge_pair) const;
+  virtual bool selected (const db::EdgePair &edge_pair, properties_id_type prop_id) const;
   virtual const TransformationReducer *vars () const;
   virtual bool wants_variants () const;
 
@@ -69,7 +69,7 @@ public:
 
   EdgePairFilterByDistance (distance_type min_distance, distance_type max_distance, bool inverted);
 
-  virtual bool selected (const db::EdgePair &edge_pair) const;
+  virtual bool selected (const db::EdgePair &edge_pair, properties_id_type) const;
   virtual const TransformationReducer *vars () const { return &m_vars; }
   virtual bool wants_variants () const { return true; }
 
@@ -92,7 +92,7 @@ public:
 
   EdgePairFilterByArea (area_type min_area, area_type max_area, bool inverted);
 
-  virtual bool selected (const db::EdgePair &edge_pair) const;
+  virtual bool selected (const db::EdgePair &edge_pair, properties_id_type) const;
   virtual const TransformationReducer *vars () const { return &m_vars; }
   virtual bool wants_variants () const { return true; }
 
@@ -114,7 +114,7 @@ public:
   InternalAngleEdgePairFilter (double a, bool inverted);
   InternalAngleEdgePairFilter (double amin, bool include_amin, double amax, bool include_amax, bool inverted);
 
-  virtual bool selected (const db::EdgePair &edge_pair) const;
+  virtual bool selected (const db::EdgePair &edge_pair, properties_id_type) const;
   virtual const TransformationReducer *vars () const { return 0; }
   virtual bool wants_variants () const { return false; }
 

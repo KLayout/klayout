@@ -233,7 +233,7 @@ AsIfFlatEdgePairs::filtered (const EdgePairFilterBase &filter) const
   std::unique_ptr<FlatEdgePairs> new_edge_pairs (new FlatEdgePairs ());
 
   for (EdgePairsIterator p (begin ()); ! p.at_end (); ++p) {
-    if (filter.selected (*p)) {
+    if (filter.selected (*p, p.prop_id ())) {
       db::properties_id_type prop_id = p.prop_id ();
       if (prop_id != 0) {
         new_edge_pairs->insert (db::EdgePairWithProperties (*p, prop_id));

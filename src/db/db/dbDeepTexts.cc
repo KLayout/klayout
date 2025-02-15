@@ -442,7 +442,7 @@ DeepTexts *DeepTexts::apply_filter (const TextFilterBase &filter) const
         for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Texts); ! si.at_end (); ++si) {
           db::Text text;
           si->text (text);
-          if (filter.selected (text.transformed (*v))) {
+          if (filter.selected (text.transformed (*v), si->prop_id ())) {
             st->insert (*si);
           }
         }
@@ -456,7 +456,7 @@ DeepTexts *DeepTexts::apply_filter (const TextFilterBase &filter) const
       for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Texts); ! si.at_end (); ++si) {
         db::Text text;
         si->text (text);
-        if (filter.selected (text)) {
+        if (filter.selected (text, si->prop_id ())) {
           st.insert (*si);
         }
       }

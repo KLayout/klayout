@@ -58,7 +58,7 @@ public:
   EdgePairFilterBase () { }
   virtual ~EdgePairFilterBase () { }
 
-  virtual bool selected (const db::EdgePair &edge_pair) const = 0;
+  virtual bool selected (const db::EdgePair &edge_pair, db::properties_id_type prop_id) const = 0;
   virtual const TransformationReducer *vars () const = 0;
   virtual bool wants_variants () const = 0;
 };

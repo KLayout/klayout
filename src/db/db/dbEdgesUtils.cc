@@ -304,7 +304,7 @@ EdgeOrientationFilter::EdgeOrientationFilter (double a, bool inverse, bool absol
 }
 
 bool
-EdgeOrientationFilter::selected (const db::Edge &edge) const
+EdgeOrientationFilter::selected (const db::Edge &edge, db::properties_id_type) const
 {
   //  NOTE: this edge normalization confines the angle to a range between (-90 .. 90] (-90 excluded).
   //  A horizontal edge has 0 degree, a vertical one has 90 degree.
@@ -342,7 +342,7 @@ static EdgeAngleChecker s_orthodiagonal_checkers [] = {
 };
 
 bool
-SpecialEdgeOrientationFilter::selected (const db::Edge &edge) const
+SpecialEdgeOrientationFilter::selected (const db::Edge &edge, properties_id_type) const
 {
   const EdgeAngleChecker *eb, *ee;
 

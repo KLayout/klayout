@@ -103,7 +103,7 @@ FlatEdgePairs::filter_in_place (const EdgePairFilterBase &filter)
 
   edge_pair_iterator_type pw = ep.get_layer<db::EdgePair, db::unstable_layer_tag> ().begin ();
   for (EdgePairsIterator p (begin ()); ! p.at_end (); ++p) {
-    if (filter.selected (*p)) {
+    if (filter.selected (*p, p.prop_id ())) {
       if (pw == ep.get_layer<db::EdgePair, db::unstable_layer_tag> ().end ()) {
         ep.get_layer<db::EdgePair, db::unstable_layer_tag> ().insert (*p);
         pw = ep.get_layer<db::EdgePair, db::unstable_layer_tag> ().end ();

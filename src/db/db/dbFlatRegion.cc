@@ -184,7 +184,7 @@ RegionDelegate *FlatRegion::filter_in_place (const PolygonFilterBase &filter)
   polygon_iterator_wp_type pw_wp = poly_layer_wp.begin ();
 
   for (RegionIterator p (filter.requires_raw_input () ? begin () : begin_merged ()); ! p.at_end (); ++p) {
-    if (filter.selected (*p)) {
+    if (filter.selected (*p, p.prop_id ())) {
       if (p.prop_id () != 0) {
         if (pw_wp == poly_layer_wp.end ()) {
           poly_layer_wp.insert (db::PolygonWithProperties (*p, p.prop_id ()));

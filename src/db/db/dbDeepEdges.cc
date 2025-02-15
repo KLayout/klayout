@@ -848,7 +848,7 @@ DeepEdges::apply_filter (const EdgeFilterBase &filter) const
         }
 
         for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Edges); ! si.at_end (); ++si) {
-          if (filter.selected (si->edge ().transformed (*v))) {
+          if (filter.selected (si->edge ().transformed (*v), si->prop_id ())) {
             st->insert (*si);
           }
         }
@@ -860,7 +860,7 @@ DeepEdges::apply_filter (const EdgeFilterBase &filter) const
       db::Shapes &st = c->shapes (res->deep_layer ().layer ());
 
       for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Edges); ! si.at_end (); ++si) {
-        if (filter.selected (si->edge ())) {
+        if (filter.selected (si->edge (), si->prop_id ())) {
           st.insert (*si);
         }
       }

@@ -42,17 +42,17 @@ class TextFilterImpl
 public:
   TextFilterImpl () { }
 
-  bool issue_selected (const db::Text &) const
+  bool issue_selected (const db::TextWithProperties &) const
   {
     return false;
   }
 
-  virtual bool selected (const db::Text &text) const
+  virtual bool selected (const db::Text &text, db::properties_id_type prop_id) const
   {
     if (f_selected.can_issue ()) {
-      return f_selected.issue<TextFilterImpl, bool, const db::Text &> (&TextFilterImpl::issue_selected, text);
+      return f_selected.issue<TextFilterImpl, bool, const db::TextWithProperties &> (&TextFilterImpl::issue_selected, db::TextWithProperties (text, prop_id));
     } else {
-      return issue_selected (text);
+      return issue_selected (db::TextWithProperties (text, prop_id));
     }
   }
 
@@ -70,6 +70,8 @@ Class<gsi::TextFilterImpl> decl_TextFilterImpl ("db", "TextFilter",
     "@brief Selects a text\n"
     "This method is the actual payload. It needs to be reimplemented in a derived class.\n"
     "It needs to analyze the text and return 'true' if it should be kept and 'false' if it should be discarded."
+    "\n"
+    "Since version 0.30, the text carries properties."
   ),
   "@brief A generic text filter adaptor\n"
   "\n"

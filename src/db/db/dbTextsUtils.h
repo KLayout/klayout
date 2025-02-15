@@ -58,7 +58,7 @@ struct DB_PUBLIC TextStringFilter
   /**
    *  @brief Returns true if the text matches the criterion
    */
-  virtual bool selected (const db::Text &text) const
+  virtual bool selected (const db::Text &text, db::properties_id_type) const
   {
     return (text.string () == m_text) != m_inverse;
   }
@@ -118,7 +118,7 @@ struct DB_PUBLIC TextPatternFilter
   /**
    *  @brief Returns true if the text matches the criterion
    */
-  virtual bool selected (const db::Text &text) const
+  virtual bool selected (const db::Text &text, db::properties_id_type) const
   {
     return m_pattern.match (text.string ()) != m_inverse;
   }

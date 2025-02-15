@@ -46,26 +46,34 @@ class EdgeFilterImpl
 public:
   EdgeFilterImpl () { }
 
-  bool issue_selected (const db::Edge &) const
+  bool issue_selected (const db::EdgeWithProperties &) const
   {
     return false;
   }
 
-  virtual bool selected (const db::Edge &edge) const
+  virtual bool selected (const db::Edge &edge, db::properties_id_type prop_id) const
   {
     if (f_selected.can_issue ()) {
-      return f_selected.issue<EdgeFilterImpl, bool, const db::Edge &> (&EdgeFilterImpl::issue_selected, edge);
+      return f_selected.issue<EdgeFilterImpl, bool, const db::EdgeWithProperties &> (&EdgeFilterImpl::issue_selected, db::EdgeWithProperties (edge, prop_id));
     } else {
-      return issue_selected (edge);
+      return issue_selected (db::EdgeWithProperties (edge, prop_id));
     }
   }
 
   //  Returns true if all edges match the criterion
-  virtual bool selected (const std::unordered_set<db::Edge> &edges) const
+  virtual bool selected (const std::unordered_set<db::EdgeWithProperties> &edges) const
   {
-    for (std::unordered_set<db::Edge>::const_iterator e = edges.begin (); e != edges.end (); ++e) {
-      if (! selected (*e)) {
-        return false;
+    if (f_selected.can_issue ()) {
+      for (std::unordered_set<db::EdgeWithProperties>::const_iterator e = edges.begin (); e != edges.end (); ++e) {
+        if (! f_selected.issue<EdgeFilterImpl, bool, const db::EdgeWithProperties &> (&EdgeFilterImpl::issue_selected, *e)) {
+          return false;
+        }
+      }
+    } else {
+      for (std::unordered_set<db::EdgeWithProperties>::const_iterator e = edges.begin (); e != edges.end (); ++e) {
+        if (! issue_selected (*e)) {
+          return false;
+        }
       }
     }
     return true;
@@ -85,6 +93,8 @@ Class<gsi::EdgeFilterImpl> decl_EdgeFilterImpl ("db", "EdgeFilter",
     "@brief Selects an edge\n"
     "This method is the actual payload. It needs to be reimplemented in a derived class.\n"
     "It needs to analyze the edge and return 'true' if it should be kept and 'false' if it should be discarded."
+    "\n"
+    "Since version 0.30, the edge carries properties."
   ),
   "@brief A generic edge filter adaptor\n"
   "\n"

@@ -35,6 +35,12 @@
 
 // -----------------------------------------------------------------------
 // class QUrlQuery
+  static bool QUrlQuery_operator_eq(const QUrlQuery *a, const QUrlQuery &b) {
+    return *a == b;
+  }
+  static bool QUrlQuery_operator_ne(const QUrlQuery *a, const QUrlQuery &b) {
+    return !(*a == b);
+  }
 
 //  Constructor QUrlQuery::QUrlQuery()
 
@@ -218,25 +224,6 @@ static void _call_f_isEmpty_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// bool QUrlQuery::operator!=(const QUrlQuery &other)
-
-
-static void _init_f_operator_excl__eq__c2235 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("other");
-  decl->add_arg<const QUrlQuery & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_excl__eq__c2235 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QUrlQuery &arg1 = gsi::arg_reader<const QUrlQuery & >() (args, heap);
-  ret.write<bool > ((bool)((QUrlQuery *)cls)->operator!= (arg1));
-}
-
-
 // QUrlQuery &QUrlQuery::operator=(const QUrlQuery &other)
 
 
@@ -253,25 +240,6 @@ static void _call_f_operator_eq__2235 (const qt_gsi::GenericMethod * /*decl*/, v
   tl::Heap heap;
   const QUrlQuery &arg1 = gsi::arg_reader<const QUrlQuery & >() (args, heap);
   ret.write<QUrlQuery & > ((QUrlQuery &)((QUrlQuery *)cls)->operator= (arg1));
-}
-
-
-// bool QUrlQuery::operator==(const QUrlQuery &other)
-
-
-static void _init_f_operator_eq__eq__c2235 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("other");
-  decl->add_arg<const QUrlQuery & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_eq__eq__c2235 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QUrlQuery &arg1 = gsi::arg_reader<const QUrlQuery & >() (args, heap);
-  ret.write<bool > ((bool)((QUrlQuery *)cls)->operator== (arg1));
 }
 
 
@@ -553,9 +521,7 @@ static gsi::Methods methods_QUrlQuery () {
   methods += new qt_gsi::GenericMethod ("hasQueryItem", "@brief Method bool QUrlQuery::hasQueryItem(const QString &key)\n", true, &_init_f_hasQueryItem_c2025, &_call_f_hasQueryItem_c2025);
   methods += new qt_gsi::GenericMethod ("isDetached?", "@brief Method bool QUrlQuery::isDetached()\n", true, &_init_f_isDetached_c0, &_call_f_isDetached_c0);
   methods += new qt_gsi::GenericMethod ("isEmpty?", "@brief Method bool QUrlQuery::isEmpty()\n", true, &_init_f_isEmpty_c0, &_call_f_isEmpty_c0);
-  methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QUrlQuery::operator!=(const QUrlQuery &other)\n", true, &_init_f_operator_excl__eq__c2235, &_call_f_operator_excl__eq__c2235);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QUrlQuery &QUrlQuery::operator=(const QUrlQuery &other)\n", false, &_init_f_operator_eq__2235, &_call_f_operator_eq__2235);
-  methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QUrlQuery::operator==(const QUrlQuery &other)\n", true, &_init_f_operator_eq__eq__c2235, &_call_f_operator_eq__eq__c2235);
   methods += new qt_gsi::GenericMethod ("query", "@brief Method QString QUrlQuery::query(QFlags<QUrl::ComponentFormattingOption> encoding)\n", true, &_init_f_query_c4267, &_call_f_query_c4267);
   methods += new qt_gsi::GenericMethod ("queryItemValue", "@brief Method QString QUrlQuery::queryItemValue(const QString &key, QFlags<QUrl::ComponentFormattingOption> encoding)\n", true, &_init_f_queryItemValue_c6184, &_call_f_queryItemValue_c6184);
   methods += new qt_gsi::GenericMethod ("queryItems", "@brief Method QList<QPair<QString, QString> > QUrlQuery::queryItems(QFlags<QUrl::ComponentFormattingOption> encoding)\n", true, &_init_f_queryItems_c4267, &_call_f_queryItems_c4267);
@@ -574,6 +540,9 @@ static gsi::Methods methods_QUrlQuery () {
 }
 
 gsi::Class<QUrlQuery> decl_QUrlQuery ("QtCore", "QUrlQuery",
+  gsi::method_ext("==", &QUrlQuery_operator_eq, gsi::arg ("other"), "@brief Method bool QUrlQuery::operator==(const QUrlQuery &) const") +
+  gsi::method_ext("!=", &QUrlQuery_operator_ne, gsi::arg ("other"), "@brief Method bool QUrlQuery::operator!=(const QUrlQuery &) const") 
++
   methods_QUrlQuery (),
   "@qt\n@brief Binding of QUrlQuery");
 

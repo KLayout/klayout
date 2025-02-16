@@ -35,6 +35,12 @@
 
 // -----------------------------------------------------------------------
 // class QDir
+  static bool QDir_operator_eq(const QDir *a, const QDir &b) {
+    return *a == b;
+  }
+  static bool QDir_operator_ne(const QDir *a, const QDir &b) {
+    return !(*a == b);
+  }
 
 //  Constructor QDir::QDir(const QDir &)
 
@@ -524,25 +530,6 @@ static void _call_f_nameFilters_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// bool QDir::operator!=(const QDir &dir)
-
-
-static void _init_f_operator_excl__eq__c1681 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("dir");
-  decl->add_arg<const QDir & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_excl__eq__c1681 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QDir &arg1 = gsi::arg_reader<const QDir & >() (args, heap);
-  ret.write<bool > ((bool)((QDir *)cls)->operator!= (arg1));
-}
-
-
 // QDir &QDir::operator=(const QDir &)
 
 
@@ -559,25 +546,6 @@ static void _call_f_operator_eq__1681 (const qt_gsi::GenericMethod * /*decl*/, v
   tl::Heap heap;
   const QDir &arg1 = gsi::arg_reader<const QDir & >() (args, heap);
   ret.write<QDir & > ((QDir &)((QDir *)cls)->operator= (arg1));
-}
-
-
-// bool QDir::operator==(const QDir &dir)
-
-
-static void _init_f_operator_eq__eq__c1681 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("dir");
-  decl->add_arg<const QDir & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_eq__eq__c1681 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QDir &arg1 = gsi::arg_reader<const QDir & >() (args, heap);
-  ret.write<bool > ((bool)((QDir *)cls)->operator== (arg1));
 }
 
 
@@ -1299,9 +1267,7 @@ static gsi::Methods methods_QDir () {
   methods += new qt_gsi::GenericMethod ("mkdir", "@brief Method bool QDir::mkdir(const QString &dirName)\n", true, &_init_f_mkdir_c2025, &_call_f_mkdir_c2025);
   methods += new qt_gsi::GenericMethod ("mkpath", "@brief Method bool QDir::mkpath(const QString &dirPath)\n", true, &_init_f_mkpath_c2025, &_call_f_mkpath_c2025);
   methods += new qt_gsi::GenericMethod (":nameFilters", "@brief Method QStringList QDir::nameFilters()\n", true, &_init_f_nameFilters_c0, &_call_f_nameFilters_c0);
-  methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QDir::operator!=(const QDir &dir)\n", true, &_init_f_operator_excl__eq__c1681, &_call_f_operator_excl__eq__c1681);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QDir &QDir::operator=(const QDir &)\n", false, &_init_f_operator_eq__1681, &_call_f_operator_eq__1681);
-  methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QDir::operator==(const QDir &dir)\n", true, &_init_f_operator_eq__eq__c1681, &_call_f_operator_eq__eq__c1681);
   methods += new qt_gsi::GenericMethod ("[]", "@brief Method QString QDir::operator[](int)\n", true, &_init_f_operator_index__c767, &_call_f_operator_index__c767);
   methods += new qt_gsi::GenericMethod (":path", "@brief Method QString QDir::path()\n", true, &_init_f_path_c0, &_call_f_path_c0);
   methods += new qt_gsi::GenericMethod ("refresh", "@brief Method void QDir::refresh()\n", true, &_init_f_refresh_c0, &_call_f_refresh_c0);
@@ -1344,6 +1310,9 @@ static gsi::Methods methods_QDir () {
 }
 
 gsi::Class<QDir> decl_QDir ("QtCore", "QDir",
+  gsi::method_ext("==", &QDir_operator_eq, gsi::arg ("other"), "@brief Method bool QDir::operator==(const QDir &) const") +
+  gsi::method_ext("!=", &QDir_operator_ne, gsi::arg ("other"), "@brief Method bool QDir::operator!=(const QDir &) const") 
++
   methods_QDir (),
   "@qt\n@brief Binding of QDir");
 

@@ -34,6 +34,12 @@
 
 // -----------------------------------------------------------------------
 // class QMimeType
+  static bool QMimeType_operator_eq(const QMimeType *a, const QMimeType &b) {
+    return *a == b;
+  }
+  static bool QMimeType_operator_ne(const QMimeType *a, const QMimeType &b) {
+    return !(*a == b);
+  }
 
 //  Constructor QMimeType::QMimeType()
 
@@ -238,25 +244,6 @@ static void _call_f_name_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
-// bool QMimeType::operator!=(const QMimeType &other)
-
-
-static void _init_f_operator_excl__eq__c2204 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("other");
-  decl->add_arg<const QMimeType & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_excl__eq__c2204 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QMimeType &arg1 = gsi::arg_reader<const QMimeType & >() (args, heap);
-  ret.write<bool > ((bool)((QMimeType *)cls)->operator!= (arg1));
-}
-
-
 // QMimeType &QMimeType::operator=(const QMimeType &other)
 
 
@@ -273,25 +260,6 @@ static void _call_f_operator_eq__2204 (const qt_gsi::GenericMethod * /*decl*/, v
   tl::Heap heap;
   const QMimeType &arg1 = gsi::arg_reader<const QMimeType & >() (args, heap);
   ret.write<QMimeType & > ((QMimeType &)((QMimeType *)cls)->operator= (arg1));
-}
-
-
-// bool QMimeType::operator==(const QMimeType &other)
-
-
-static void _init_f_operator_eq__eq__c2204 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("other");
-  decl->add_arg<const QMimeType & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_eq__eq__c2204 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QMimeType &arg1 = gsi::arg_reader<const QMimeType & >() (args, heap);
-  ret.write<bool > ((bool)((QMimeType *)cls)->operator== (arg1));
 }
 
 
@@ -379,9 +347,7 @@ static gsi::Methods methods_QMimeType () {
   methods += new qt_gsi::GenericMethod ("isDefault?", "@brief Method bool QMimeType::isDefault()\n", true, &_init_f_isDefault_c0, &_call_f_isDefault_c0);
   methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QMimeType::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
   methods += new qt_gsi::GenericMethod ("name", "@brief Method QString QMimeType::name()\n", true, &_init_f_name_c0, &_call_f_name_c0);
-  methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QMimeType::operator!=(const QMimeType &other)\n", true, &_init_f_operator_excl__eq__c2204, &_call_f_operator_excl__eq__c2204);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QMimeType &QMimeType::operator=(const QMimeType &other)\n", false, &_init_f_operator_eq__2204, &_call_f_operator_eq__2204);
-  methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QMimeType::operator==(const QMimeType &other)\n", true, &_init_f_operator_eq__eq__c2204, &_call_f_operator_eq__eq__c2204);
   methods += new qt_gsi::GenericMethod ("parentMimeTypes", "@brief Method QStringList QMimeType::parentMimeTypes()\n", true, &_init_f_parentMimeTypes_c0, &_call_f_parentMimeTypes_c0);
   methods += new qt_gsi::GenericMethod ("preferredSuffix", "@brief Method QString QMimeType::preferredSuffix()\n", true, &_init_f_preferredSuffix_c0, &_call_f_preferredSuffix_c0);
   methods += new qt_gsi::GenericMethod ("suffixes", "@brief Method QStringList QMimeType::suffixes()\n", true, &_init_f_suffixes_c0, &_call_f_suffixes_c0);
@@ -390,6 +356,9 @@ static gsi::Methods methods_QMimeType () {
 }
 
 gsi::Class<QMimeType> decl_QMimeType ("QtCore", "QMimeType",
+  gsi::method_ext("==", &QMimeType_operator_eq, gsi::arg ("other"), "@brief Method bool QMimeType::operator==(const QMimeType &) const") +
+  gsi::method_ext("!=", &QMimeType_operator_ne, gsi::arg ("other"), "@brief Method bool QMimeType::operator!=(const QMimeType &) const") 
++
   methods_QMimeType (),
   "@qt\n@brief Binding of QMimeType");
 

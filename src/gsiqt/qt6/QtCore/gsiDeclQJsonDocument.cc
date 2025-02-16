@@ -38,6 +38,12 @@
 
 // -----------------------------------------------------------------------
 // class QJsonDocument
+  static bool QJsonDocument_operator_eq(const QJsonDocument *a, const QJsonDocument &b) {
+    return *a == b;
+  }
+  static bool QJsonDocument_operator_ne(const QJsonDocument *a, const QJsonDocument &b) {
+    return !(*a == b);
+  }
 
 //  Constructor QJsonDocument::QJsonDocument()
 
@@ -217,44 +223,6 @@ static void _call_f_operator_eq__2635 (const qt_gsi::GenericMethod * /*decl*/, v
   tl::Heap heap;
   const QJsonDocument &arg1 = gsi::arg_reader<const QJsonDocument & >() (args, heap);
   ret.write<QJsonDocument & > ((QJsonDocument &)((QJsonDocument *)cls)->operator = (arg1));
-}
-
-
-// bool QJsonDocument::operator!=(const QJsonDocument &other)
-
-
-static void _init_f_operator_excl__eq__c2635 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("other");
-  decl->add_arg<const QJsonDocument & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_excl__eq__c2635 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QJsonDocument &arg1 = gsi::arg_reader<const QJsonDocument & >() (args, heap);
-  ret.write<bool > ((bool)((QJsonDocument *)cls)->operator!= (arg1));
-}
-
-
-// bool QJsonDocument::operator==(const QJsonDocument &other)
-
-
-static void _init_f_operator_eq__eq__c2635 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("other");
-  decl->add_arg<const QJsonDocument & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_eq__eq__c2635 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QJsonDocument &arg1 = gsi::arg_reader<const QJsonDocument & >() (args, heap);
-  ret.write<bool > ((bool)((QJsonDocument *)cls)->operator== (arg1));
 }
 
 
@@ -448,8 +416,6 @@ static gsi::Methods methods_QJsonDocument () {
   methods += new qt_gsi::GenericMethod ("isObject?", "@brief Method bool QJsonDocument::isObject()\n", true, &_init_f_isObject_c0, &_call_f_isObject_c0);
   methods += new qt_gsi::GenericMethod ("object", "@brief Method QJsonObject QJsonDocument::object()\n", true, &_init_f_object_c0, &_call_f_object_c0);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QJsonDocument &QJsonDocument::operator =(const QJsonDocument &other)\n", false, &_init_f_operator_eq__2635, &_call_f_operator_eq__2635);
-  methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QJsonDocument::operator!=(const QJsonDocument &other)\n", true, &_init_f_operator_excl__eq__c2635, &_call_f_operator_excl__eq__c2635);
-  methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QJsonDocument::operator==(const QJsonDocument &other)\n", true, &_init_f_operator_eq__eq__c2635, &_call_f_operator_eq__eq__c2635);
   methods += new qt_gsi::GenericMethod ("[]", "@brief Method const QJsonValue QJsonDocument::operator[](const QString &key)\n", true, &_init_f_operator_index__c2025, &_call_f_operator_index__c2025);
   methods += new qt_gsi::GenericMethod ("[]", "@brief Method const QJsonValue QJsonDocument::operator[](qsizetype i)\n", true, &_init_f_operator_index__c1442, &_call_f_operator_index__c1442);
   methods += new qt_gsi::GenericMethod ("setArray|array=", "@brief Method void QJsonDocument::setArray(const QJsonArray &array)\n", false, &_init_f_setArray_2315, &_call_f_setArray_2315);
@@ -463,6 +429,9 @@ static gsi::Methods methods_QJsonDocument () {
 }
 
 gsi::Class<QJsonDocument> decl_QJsonDocument ("QtCore", "QJsonDocument",
+  gsi::method_ext("==", &QJsonDocument_operator_eq, gsi::arg ("other"), "@brief Method bool QJsonDocument::operator==(const QJsonDocument &) const") +
+  gsi::method_ext("!=", &QJsonDocument_operator_ne, gsi::arg ("other"), "@brief Method bool QJsonDocument::operator!=(const QJsonDocument &) const") 
++
   methods_QJsonDocument (),
   "@qt\n@brief Binding of QJsonDocument");
 

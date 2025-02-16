@@ -37,6 +37,12 @@
 
 // -----------------------------------------------------------------------
 // class QFileInfo
+  static bool QFileInfo_operator_eq(const QFileInfo *a, const QFileInfo &b) {
+    return *a == b;
+  }
+  static bool QFileInfo_operator_ne(const QFileInfo *a, const QFileInfo &b) {
+    return !(*a == b);
+  }
 
 //  Constructor QFileInfo::QFileInfo()
 
@@ -706,25 +712,6 @@ static void _call_f_metadataChangeTime_c0 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// bool QFileInfo::operator!=(const QFileInfo &fileinfo)
-
-
-static void _init_f_operator_excl__eq__c2174 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("fileinfo");
-  decl->add_arg<const QFileInfo & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_excl__eq__c2174 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QFileInfo &arg1 = gsi::arg_reader<const QFileInfo & >() (args, heap);
-  ret.write<bool > ((bool)((QFileInfo *)cls)->operator!= (arg1));
-}
-
-
 // QFileInfo &QFileInfo::operator=(const QFileInfo &fileinfo)
 
 
@@ -741,25 +728,6 @@ static void _call_f_operator_eq__2174 (const qt_gsi::GenericMethod * /*decl*/, v
   tl::Heap heap;
   const QFileInfo &arg1 = gsi::arg_reader<const QFileInfo & >() (args, heap);
   ret.write<QFileInfo & > ((QFileInfo &)((QFileInfo *)cls)->operator= (arg1));
-}
-
-
-// bool QFileInfo::operator==(const QFileInfo &fileinfo)
-
-
-static void _init_f_operator_eq__eq__c2174 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("fileinfo");
-  decl->add_arg<const QFileInfo & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_eq__eq__c2174 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QFileInfo &arg1 = gsi::arg_reader<const QFileInfo & >() (args, heap);
-  ret.write<bool > ((bool)((QFileInfo *)cls)->operator== (arg1));
 }
 
 
@@ -1090,9 +1058,7 @@ static gsi::Methods methods_QFileInfo () {
   methods += new qt_gsi::GenericMethod ("lastRead", "@brief Method QDateTime QFileInfo::lastRead()\n", true, &_init_f_lastRead_c0, &_call_f_lastRead_c0);
   methods += new qt_gsi::GenericMethod ("makeAbsolute", "@brief Method bool QFileInfo::makeAbsolute()\n", false, &_init_f_makeAbsolute_0, &_call_f_makeAbsolute_0);
   methods += new qt_gsi::GenericMethod ("metadataChangeTime", "@brief Method QDateTime QFileInfo::metadataChangeTime()\n", true, &_init_f_metadataChangeTime_c0, &_call_f_metadataChangeTime_c0);
-  methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QFileInfo::operator!=(const QFileInfo &fileinfo)\n", true, &_init_f_operator_excl__eq__c2174, &_call_f_operator_excl__eq__c2174);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QFileInfo &QFileInfo::operator=(const QFileInfo &fileinfo)\n", false, &_init_f_operator_eq__2174, &_call_f_operator_eq__2174);
-  methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QFileInfo::operator==(const QFileInfo &fileinfo)\n", true, &_init_f_operator_eq__eq__c2174, &_call_f_operator_eq__eq__c2174);
   methods += new qt_gsi::GenericMethod ("owner", "@brief Method QString QFileInfo::owner()\n", true, &_init_f_owner_c0, &_call_f_owner_c0);
   methods += new qt_gsi::GenericMethod ("ownerId", "@brief Method unsigned int QFileInfo::ownerId()\n", true, &_init_f_ownerId_c0, &_call_f_ownerId_c0);
   methods += new qt_gsi::GenericMethod ("path", "@brief Method QString QFileInfo::path()\n", true, &_init_f_path_c0, &_call_f_path_c0);
@@ -1113,6 +1079,9 @@ static gsi::Methods methods_QFileInfo () {
 }
 
 gsi::Class<QFileInfo> decl_QFileInfo ("QtCore", "QFileInfo",
+  gsi::method_ext("==", &QFileInfo_operator_eq, gsi::arg ("other"), "@brief Method bool QFileInfo::operator==(const QFileInfo &) const") +
+  gsi::method_ext("!=", &QFileInfo_operator_ne, gsi::arg ("other"), "@brief Method bool QFileInfo::operator!=(const QFileInfo &) const") 
++
   methods_QFileInfo (),
   "@qt\n@brief Binding of QFileInfo");
 

@@ -79,7 +79,7 @@ struct DB_PUBLIC EdgeLengthFilter
   /**
    *  @brief Returns true if the total edge length matches the criterion
    */
-  bool selected (const std::unordered_set<db::EdgeWithProperties> &edges) const
+  bool selected_set (const std::unordered_set<db::EdgeWithProperties> &edges) const
   {
     length_type l = 0;
     for (std::unordered_set<db::EdgeWithProperties>::const_iterator e = edges.begin (); e != edges.end (); ++e) {
@@ -209,7 +209,7 @@ struct DB_PUBLIC EdgeOrientationFilter
   /**
    *  @brief Returns true if all edge orientations match the criterion
    */
-  virtual bool selected (const std::unordered_set<db::EdgeWithProperties> &edges) const
+  virtual bool selected_set (const std::unordered_set<db::EdgeWithProperties> &edges) const
   {
     for (std::unordered_set<db::EdgeWithProperties>::const_iterator e = edges.begin (); e != edges.end (); ++e) {
       if (! selected (*e, e->properties_id ())) {
@@ -279,7 +279,7 @@ struct DB_PUBLIC SpecialEdgeOrientationFilter
   /**
    *  @brief Returns true if all edge orientations match the criterion
    */
-  virtual bool selected (const std::unordered_set<db::EdgeWithProperties> &edges) const
+  virtual bool selected_set (const std::unordered_set<db::EdgeWithProperties> &edges) const
   {
     for (std::unordered_set<db::EdgeWithProperties>::const_iterator e = edges.begin (); e != edges.end (); ++e) {
       if (! selected (*e, e->properties_id ())) {
@@ -317,6 +317,29 @@ private:
   FilterType m_type;
   bool m_inverse;
   db::OrthogonalTransformationReducer m_vars;
+};
+
+/**
+ *  @brief A filter implementation which implements the set filters through "all must match"
+ */
+
+struct DB_PUBLIC AllEdgesMustMatchFilter
+  : public EdgeFilterBase
+{
+  /**
+   *  @brief Constructor
+   */
+  AllEdgesMustMatchFilter () { }
+
+  virtual bool selected_set (const std::unordered_set<db::EdgeWithProperties> &edges) const
+  {
+    for (std::unordered_set<db::EdgeWithProperties>::const_iterator p = edges.begin (); p != edges.end (); ++p) {
+      if (! selected (*p, p->properties_id ())) {
+        return false;
+      }
+    }
+    return true;
+  }
 };
 
 /**

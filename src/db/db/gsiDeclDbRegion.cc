@@ -37,6 +37,7 @@
 #include "dbCompoundOperation.h"
 #include "dbLayoutToNetlist.h"
 #include "dbPropertiesRepository.h"
+#include "dbPropertiesFilter.h"
 #include "tlGlobPattern.h"
 
 #include "gsiDeclDbContainerHelpers.h"
@@ -51,12 +52,7 @@ namespace gsi
 // ---------------------------------------------------------------------------------
 //  PolygonFilter binding
 
-class PolygonFilterBase
-  : public shape_filter_impl<db::AllMustMatchFilter>
-{
-public:
-  PolygonFilterBase () { }
-};
+typedef shape_filter_impl<db::AllMustMatchFilter> PolygonFilterBase;
 
 class PolygonFilterImpl
   : public PolygonFilterBase
@@ -93,128 +89,41 @@ private:
   PolygonFilterImpl (const PolygonFilterImpl &);
 };
 
-/**
- *  @brief A properties filter
- */
-class PropertiesFilter
-{
-public:
-  PropertiesFilter (const tl::Variant &name, const tl::Variant &value, bool inverse)
-    : m_name_id (db::property_names_id (name)), m_value_from (value), m_exact (true), m_glob (false), m_inverse (inverse)
-  {
-    //  .. nothing yet ..
-  }
+typedef db::polygon_properties_filter<gsi::PolygonFilterBase> PolygonPropertiesFilter;
 
-  PropertiesFilter (const tl::Variant &name, const tl::Variant &from, const tl::Variant &to, bool inverse)
-    : m_name_id (db::property_names_id (name)), m_value_from (from), m_value_to (to), m_exact (false), m_glob (false), m_inverse (inverse)
-  {
-    //  .. nothing yet ..
-  }
-
-  PropertiesFilter (const tl::Variant &name, const std::string &pattern, bool inverse)
-    : m_name_id (db::property_names_id (name)), m_pattern (pattern), m_exact (true), m_glob (true), m_inverse (inverse)
-  {
-    //  .. nothing yet ..
-  }
-
-  bool prop_selected (db::properties_id_type prop_id) const
-  {
-    auto c = m_cache.find (prop_id);
-    if (c != m_cache.end ()) {
-      return c->second;
-    }
-
-    bool res = prop_selected_impl (prop_id);
-    m_cache.insert (std::make_pair (prop_id, res));
-    return res;
-  }
-
-private:
-  bool prop_selected_impl (db::properties_id_type prop_id) const
-  {
-    const db::PropertiesSet &ps = db::properties (prop_id);
-    if (ps.has_value (m_name_id)) {
-
-      const tl::Variant &value = ps.value (m_name_id);
-
-      if (m_glob) {
-        return m_pattern.match (value.to_string ()) != m_inverse;
-      } else if (m_exact) {
-        return (value == m_value_from) != m_inverse;
-      } else {
-        return ((m_value_from.is_nil () || ! (value < m_value_from)) && (m_value_to.is_nil () || value < m_value_to)) != m_inverse;
-      }
-
-    } else {
-      return m_inverse;
-    }
-  }
-
-  mutable std::map<db::properties_id_type, bool> m_cache;
-  db::property_names_id_type m_name_id;
-  tl::Variant m_value_from, m_value_to;
-  tl::GlobPattern m_pattern;
-  bool m_exact;
-  bool m_glob;
-  bool m_inverse;
-};
-
-class PolygonPropertiesFilter
-  : public PolygonFilterBase, public PropertiesFilter
-{
-public:
-  PolygonPropertiesFilter (const tl::Variant &name, const std::string &pattern, bool inverse)
-    : PropertiesFilter (name, pattern, inverse)
-  {
-    //  .. nothing yet ..
-  }
-
-  PolygonPropertiesFilter (const tl::Variant &name, const tl::Variant &value, bool inverse)
-    : PropertiesFilter (name, value, inverse)
-  {
-    //  .. nothing yet ..
-  }
-
-  PolygonPropertiesFilter (const tl::Variant &name, const tl::Variant &from, const tl::Variant &to, bool inverse)
-    : PropertiesFilter (name, from, to, inverse)
-  {
-    //  .. nothing yet ..
-  }
-
-  bool selected (const db::Polygon &, db::properties_id_type prop_id) const
-  {
-    return PropertiesFilter::prop_selected (prop_id);
-  }
-
-  bool selected (const db::PolygonRef &, db::properties_id_type prop_id) const
-  {
-    return PropertiesFilter::prop_selected (prop_id);
-  }
-};
-
-static PolygonFilterBase *make_ppf1 (const tl::Variant &name, const tl::Variant &value, bool inverse)
+static gsi::PolygonFilterBase *make_ppf1 (const tl::Variant &name, const tl::Variant &value, bool inverse)
 {
   return new PolygonPropertiesFilter (name, value, inverse);
 }
 
-static PolygonFilterBase *make_ppf2 (const tl::Variant &name, const tl::Variant &from, const tl::Variant &to, bool inverse)
+static gsi::PolygonFilterBase *make_ppf2 (const tl::Variant &name, const tl::Variant &from, const tl::Variant &to, bool inverse)
 {
   return new PolygonPropertiesFilter (name, from, to, inverse);
 }
 
-static PolygonFilterBase *make_pg (const tl::Variant &name, const std::string &glob, bool inverse)
+static gsi::PolygonFilterBase *make_pg (const tl::Variant &name, const std::string &glob, bool inverse, bool case_sensitive)
 {
-  return new PolygonPropertiesFilter (name, glob, inverse);
+  tl::GlobPattern pattern (glob);
+  pattern.set_case_sensitive (case_sensitive);
+  return new PolygonPropertiesFilter (name, pattern, inverse);
 }
 
 Class<gsi::PolygonFilterBase> decl_PolygonFilterBase ("db", "PolygonFilterBase",
-  gsi::constructor ("property_glob", &make_pg, gsi::arg ("name"), gsi::arg ("pattern"), gsi::arg ("inverse", false),
+  gsi::PolygonFilterBase::method_decls (true) +
+  gsi::constructor ("property_glob", &make_pg, gsi::arg ("name"), gsi::arg ("pattern"), gsi::arg ("inverse", false), gsi::arg ("case_sensitive", true),
     "@brief Creates a single-valued property filter\n"
     "@param name The name of the property to use.\n"
     "@param value The glob pattern to match the property value against.\n"
     "@param inverse If true, inverts the selection - i.e. all polygons without a matching property are selected.\n"
+    "@param case_sensitive If true, the match is case sensitive (the default), if false, the match is not case sensitive.\n"
     "\n"
-    "Apply this filter with \\Region#filtered.\n"
+    "Apply this filter with \\Region#filtered:\n"
+    "\n"
+    "@code\n"
+    "# region is a Region object\n"
+    "# filtered_region contains all polygons where the 'net' property starts with 'C':\n"
+    "filtered_region = region.filtered(RBA::PolygonFilterBase::property_glob('net', 'C*'))\n"
+    "@/code\n"
     "\n"
     "This feature has been introduced in version 0.30."
   ) +
@@ -224,7 +133,7 @@ Class<gsi::PolygonFilterBase> decl_PolygonFilterBase ("db", "PolygonFilterBase",
     "@param value The value against which the property is checked (exact match).\n"
     "@param inverse If true, inverts the selection - i.e. all polygons without a property with the given name and value are selected.\n"
     "\n"
-    "Apply this filter with \\Region#filtered.\n"
+    "Apply this filter with \\Region#filtered. See \\property_glob for an example.\n"
     "\n"
     "This feature has been introduced in version 0.30."
   ) +
@@ -236,7 +145,7 @@ Class<gsi::PolygonFilterBase> decl_PolygonFilterBase ("db", "PolygonFilterBase",
     "@param inverse If true, inverts the selection - i.e. all polygons without a property with the given name and value range are selected.\n"
     "\n"
     "This version does a bounded match. The value of the propery needs to be larger or equal to 'from' and less than 'to'.\n"
-    "Apply this filter with \\Region#filtered.\n"
+    "Apply this filter with \\Region#filtered. See \\property_glob for an example.\n"
     "\n"
     "This feature has been introduced in version 0.30."
   ),
@@ -244,7 +153,6 @@ Class<gsi::PolygonFilterBase> decl_PolygonFilterBase ("db", "PolygonFilterBase",
 );
 
 Class<gsi::PolygonFilterImpl> decl_PolygonFilterImpl (decl_PolygonFilterBase, "db", "PolygonFilter",
-  PolygonFilterImpl::method_decls (true) +
   callback ("selected", &PolygonFilterImpl::issue_selected, &PolygonFilterImpl::f_selected, gsi::arg ("polygon"),
     "@brief Selects a polygon\n"
     "This method is the actual payload. It needs to be reimplemented in a derived class.\n"

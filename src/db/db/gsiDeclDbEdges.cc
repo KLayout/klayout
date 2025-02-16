@@ -31,6 +31,7 @@
 #include "dbRegion.h"
 #include "dbOriginalLayerRegion.h"
 #include "dbLayoutUtils.h"
+#include "dbPropertiesFilter.h"
 
 #include "gsiDeclDbContainerHelpers.h"
 
@@ -40,8 +41,10 @@ namespace gsi
 // ---------------------------------------------------------------------------------
 //  EdgeFilter binding
 
+typedef shape_filter_impl<db::AllEdgesMustMatchFilter> EdgeFilterBase;
+
 class EdgeFilterImpl
-  : public shape_filter_impl<db::EdgeFilterBase>
+  : public gsi::EdgeFilterBase
 {
 public:
   EdgeFilterImpl () { }
@@ -60,25 +63,6 @@ public:
     }
   }
 
-  //  Returns true if all edges match the criterion
-  virtual bool selected (const std::unordered_set<db::EdgeWithProperties> &edges) const
-  {
-    if (f_selected.can_issue ()) {
-      for (std::unordered_set<db::EdgeWithProperties>::const_iterator e = edges.begin (); e != edges.end (); ++e) {
-        if (! f_selected.issue<EdgeFilterImpl, bool, const db::EdgeWithProperties &> (&EdgeFilterImpl::issue_selected, *e)) {
-          return false;
-        }
-      }
-    } else {
-      for (std::unordered_set<db::EdgeWithProperties>::const_iterator e = edges.begin (); e != edges.end (); ++e) {
-        if (! issue_selected (*e)) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-
   gsi::Callback f_selected;
 
 private:
@@ -87,8 +71,70 @@ private:
   EdgeFilterImpl (const EdgeFilterImpl &);
 };
 
-Class<gsi::EdgeFilterImpl> decl_EdgeFilterImpl ("db", "EdgeFilter",
-  EdgeFilterImpl::method_decls (true) +
+typedef db::generic_properties_filter<gsi::EdgeFilterBase, db::Edge> EdgePropertiesFilter;
+
+static gsi::EdgeFilterBase *make_ppf1 (const tl::Variant &name, const tl::Variant &value, bool inverse)
+{
+  return new EdgePropertiesFilter (name, value, inverse);
+}
+
+static gsi::EdgeFilterBase *make_ppf2 (const tl::Variant &name, const tl::Variant &from, const tl::Variant &to, bool inverse)
+{
+  return new EdgePropertiesFilter (name, from, to, inverse);
+}
+
+static gsi::EdgeFilterBase *make_pg (const tl::Variant &name, const std::string &glob, bool inverse, bool case_sensitive)
+{
+  tl::GlobPattern pattern (glob);
+  pattern.set_case_sensitive (case_sensitive);
+  return new EdgePropertiesFilter (name, pattern, inverse);
+}
+
+Class<gsi::EdgeFilterBase> decl_EdgeFilterBase ("db", "EdgeFilterBase",
+  gsi::EdgeFilterBase::method_decls (true) +
+  gsi::constructor ("property_glob", &make_pg, gsi::arg ("name"), gsi::arg ("pattern"), gsi::arg ("inverse", false), gsi::arg ("case_sensitive", true),
+    "@brief Creates a single-valued property filter\n"
+    "@param name The name of the property to use.\n"
+    "@param value The glob pattern to match the property value against.\n"
+    "@param inverse If true, inverts the selection - i.e. all edges without a matching property are selected.\n"
+    "@param case_sensitive If true, the match is case sensitive (the default), if false, the match is not case sensitive.\n"
+    "\n"
+    "Apply this filter with \\Edges#filtered:\n"
+    "\n"
+    "@code\n"
+    "# edges is a Edges object\n"
+    "# filtered_edges contains all edges where the 'net' property starts with 'C':\n"
+    "filtered_edges = edges.filtered(RBA::EdgeFilterBase::property_glob('net', 'C*'))\n"
+    "@/code\n"
+    "\n"
+    "This feature has been introduced in version 0.30."
+  ) +
+  gsi::constructor ("property_filter", &make_ppf1, gsi::arg ("name"), gsi::arg ("value"), gsi::arg ("inverse", false),
+    "@brief Creates a single-valued property filter\n"
+    "@param name The name of the property to use.\n"
+    "@param value The value against which the property is checked (exact match).\n"
+    "@param inverse If true, inverts the selection - i.e. all edges without a property with the given name and value are selected.\n"
+    "\n"
+    "Apply this filter with \\Edges#filtered. See \\property_glob for an example.\n"
+    "\n"
+    "This feature has been introduced in version 0.30."
+  ) +
+  gsi::constructor ("property_filter_bounded", &make_ppf2, gsi::arg ("name"), gsi::arg ("from"), gsi::arg ("to"), gsi::arg ("inverse", false),
+    "@brief Creates a single-valued property filter\n"
+    "@param name The name of the property to use.\n"
+    "@param from The lower value against which the property is checked or 'nil' if no lower bound shall be used.\n"
+    "@param to The upper value against which the property is checked or 'nil' if no upper bound shall be used.\n"
+    "@param inverse If true, inverts the selection - i.e. all edges without a property with the given name and value range are selected.\n"
+    "\n"
+    "This version does a bounded match. The value of the propery needs to be larger or equal to 'from' and less than 'to'.\n"
+    "Apply this filter with \\Edges#filtered. See \\property_glob for an example.\n"
+    "\n"
+    "This feature has been introduced in version 0.30."
+  ),
+  "@hide"
+);
+
+Class<gsi::EdgeFilterImpl> decl_EdgeFilterImpl (decl_EdgeFilterBase, "db", "EdgeFilter",
   callback ("selected", &EdgeFilterImpl::issue_selected, &EdgeFilterImpl::f_selected, gsi::arg ("edge"),
     "@brief Selects an edge\n"
     "This method is the actual payload. It needs to be reimplemented in a derived class.\n"
@@ -455,12 +501,12 @@ static db::Edges moved_xy (const db::Edges *r, db::Coord x, db::Coord y)
   return r->transformed (db::Disp (db::Vector (x, y)));
 }
 
-static db::Edges filtered (const db::Edges *r, const EdgeFilterImpl *f)
+static db::Edges filtered (const db::Edges *r, const gsi::EdgeFilterBase *f)
 {
   return r->filtered (*f);
 }
 
-static void filter (db::Edges *r, const EdgeFilterImpl *f)
+static void filter (db::Edges *r, const gsi::EdgeFilterBase *f)
 {
   r->filter (*f);
 }

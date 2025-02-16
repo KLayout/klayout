@@ -79,6 +79,7 @@ SOURCES = \
   dbPolygonNeighborhood.cc \
   dbPolygonTools.cc \
   dbPolygonGenerators.cc \
+  dbPropertiesFilter.cc \
   dbPropertiesRepository.cc \
   dbReader.cc \
   dbRecursiveInstanceIterator.cc \
@@ -315,6 +316,7 @@ HEADERS = \
   dbPolygonNeighborhood.h \
   dbPolygonTools.h \
   dbPolygonGenerators.h \
+  dbPropertiesFilter.h \
   dbPropertiesRepository.h \
   dbPropertyConstraint.h \
   dbReader.h \

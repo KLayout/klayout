@@ -62,7 +62,7 @@ public:
    *  @brief Filters the edge set
    *  If this method returns true, the edges are kept. Otherwise they are discarded.
    */
-  virtual bool selected (const std::unordered_set<db::EdgeWithProperties> &edge) const = 0;
+  virtual bool selected_set (const std::unordered_set<db::EdgeWithProperties> &edge) const = 0;
 
   /**
    *  @brief Returns the transformation reducer for building cell variants

@@ -1064,7 +1064,7 @@ private:
     child (0)->compute_local (cache, layout, cell, interactions, one, proc);
 
     if (m_sum_of) {
-      if (mp_filter->selected (one.front ())) {
+      if (mp_filter->selected_set (one.front ())) {
         results.front ().insert (one.front ().begin (), one.front ().end ());
       }
     } else {

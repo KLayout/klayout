@@ -26,8 +26,8 @@ load("test_prologue.rb")
 # normalizes a specification string for region, edges etc.
 # such that the order of the objects becomes irrelevant
 def csort(s)
-  # splits at ");(" without consuming the brackets
-  s.split(/(?<=\));(?=\()/).sort.join(";")
+  # splits at ");(" or "};(" without consuming the brackets
+  s.split(/(?<=[\)\}]);(?=\()/).sort.join(";")
 end
 
 class TriangleFilter < RBA::PolygonFilter
@@ -1593,14 +1593,14 @@ class DBRegion_TestClass < TestBase
 
     assert_equal(r.filtered(RBA::PolygonFilter::property_filter("one", 11)).to_s, "")
     assert_equal(r.filtered(RBA::PolygonFilter::property_filter("two", 17)).to_s, "")
-    assert_equal(r.filtered(RBA::PolygonFilter::property_filter("one", 17)).to_s, "(1,1;1,201;101,201;101,1){one=>17}")
-    assert_equal(r.filtered(RBA::PolygonFilter::property_filter("one", 17, true)).to_s, "(2,2;2,202;102,202;102,2){one=>42};(0,0;0,200;100,200;100,0){one=>-1}")
-    assert_equal(r.filtered(RBA::PolygonFilter::property_filter_bounded("one", 17, nil)).to_s, "(1,1;1,201;101,201;101,1){one=>17};(2,2;2,202;102,202;102,2){one=>42}")
-    assert_equal(r.filtered(RBA::PolygonFilter::property_filter_bounded("one", 17, 18)).to_s, "(1,1;1,201;101,201;101,1){one=>17}")
-    assert_equal(r.filtered(RBA::PolygonFilter::property_filter_bounded("one", 17, 18, true)).to_s, "(2,2;2,202;102,202;102,2){one=>42};(0,0;0,200;100,200;100,0){one=>-1}")
-    assert_equal(r.filtered(RBA::PolygonFilter::property_filter_bounded("one", nil, 18)).to_s, "(1,1;1,201;101,201;101,1){one=>17};(0,0;0,200;100,200;100,0){one=>-1}")
-    assert_equal(r.filtered(RBA::PolygonFilter::property_glob("one", "1*")).to_s, "(1,1;1,201;101,201;101,1){one=>17}")
-    assert_equal(r.filtered(RBA::PolygonFilter::property_glob("one", "1*", true)).to_s, "(2,2;2,202;102,202;102,2){one=>42};(0,0;0,200;100,200;100,0){one=>-1}")
+    assert_equal(csort(r.filtered(RBA::PolygonFilter::property_filter("one", 17)).to_s), csort("(1,1;1,201;101,201;101,1){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::PolygonFilter::property_filter("one", 17, true)).to_s), csort("(2,2;2,202;102,202;102,2){one=>42};(0,0;0,200;100,200;100,0){one=>-1}"))
+    assert_equal(csort(r.filtered(RBA::PolygonFilter::property_filter_bounded("one", 17, nil)).to_s), csort("(1,1;1,201;101,201;101,1){one=>17};(2,2;2,202;102,202;102,2){one=>42}"))
+    assert_equal(csort(r.filtered(RBA::PolygonFilter::property_filter_bounded("one", 17, 18)).to_s), csort("(1,1;1,201;101,201;101,1){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::PolygonFilter::property_filter_bounded("one", 17, 18, true)).to_s), csort("(2,2;2,202;102,202;102,2){one=>42};(0,0;0,200;100,200;100,0){one=>-1}"))
+    assert_equal(csort(r.filtered(RBA::PolygonFilter::property_filter_bounded("one", nil, 18)).to_s), csort("(1,1;1,201;101,201;101,1){one=>17};(0,0;0,200;100,200;100,0){one=>-1}"))
+    assert_equal(csort(r.filtered(RBA::PolygonFilter::property_glob("one", "1*")).to_s), csort("(1,1;1,201;101,201;101,1){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::PolygonFilter::property_glob("one", "1*", true)).to_s), csort("(2,2;2,202;102,202;102,2){one=>42};(0,0;0,200;100,200;100,0){one=>-1}"))
 
     ly = RBA::Layout::new
     top = ly.create_cell("TOP")
@@ -1618,14 +1618,18 @@ class DBRegion_TestClass < TestBase
 
     assert_equal(r.filtered(RBA::PolygonFilter::property_filter("one", 11)).to_s, "")
     assert_equal(r.filtered(RBA::PolygonFilter::property_filter("two", 17)).to_s, "")
-    assert_equal(r.filtered(RBA::PolygonFilter::property_filter("one", 17)).to_s, "(1,1;1,201;101,201;101,1){one=>17}")
-    assert_equal(r.filtered(RBA::PolygonFilter::property_filter("one", 17, true)).to_s, "(0,0;0,200;100,200;100,0){one=>-1};(2,2;2,202;102,202;102,2){one=>42}")
-    assert_equal(r.filtered(RBA::PolygonFilter::property_filter_bounded("one", 17, nil)).to_s, "(1,1;1,201;101,201;101,1){one=>17};(2,2;2,202;102,202;102,2){one=>42}")
-    assert_equal(r.filtered(RBA::PolygonFilter::property_filter_bounded("one", 17, 18)).to_s, "(1,1;1,201;101,201;101,1){one=>17}")
-    assert_equal(r.filtered(RBA::PolygonFilter::property_filter_bounded("one", 17, 18, true)).to_s, "(0,0;0,200;100,200;100,0){one=>-1};(2,2;2,202;102,202;102,2){one=>42}")
-    assert_equal(r.filtered(RBA::PolygonFilter::property_filter_bounded("one", nil, 18)).to_s, "(0,0;0,200;100,200;100,0){one=>-1};(1,1;1,201;101,201;101,1){one=>17}")
-    assert_equal(r.filtered(RBA::PolygonFilter::property_glob("one", "1*")).to_s, "(1,1;1,201;101,201;101,1){one=>17}")
-    assert_equal(r.filtered(RBA::PolygonFilter::property_glob("one", "1*", true)).to_s, "(0,0;0,200;100,200;100,0){one=>-1};(2,2;2,202;102,202;102,2){one=>42}")
+    assert_equal(csort(r.filtered(RBA::PolygonFilter::property_filter("one", 17)).to_s), csort("(1,1;1,201;101,201;101,1){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::PolygonFilter::property_filter("one", 17, true)).to_s), csort("(0,0;0,200;100,200;100,0){one=>-1};(2,2;2,202;102,202;102,2){one=>42}"))
+    assert_equal(csort(r.filtered(RBA::PolygonFilter::property_filter_bounded("one", 17, nil)).to_s), csort("(1,1;1,201;101,201;101,1){one=>17};(2,2;2,202;102,202;102,2){one=>42}"))
+    assert_equal(csort(r.filtered(RBA::PolygonFilter::property_filter_bounded("one", 17, 18)).to_s), csort("(1,1;1,201;101,201;101,1){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::PolygonFilter::property_filter_bounded("one", 17, 18, true)).to_s), csort("(0,0;0,200;100,200;100,0){one=>-1};(2,2;2,202;102,202;102,2){one=>42}"))
+    assert_equal(csort(r.filtered(RBA::PolygonFilter::property_filter_bounded("one", nil, 18)).to_s), csort("(0,0;0,200;100,200;100,0){one=>-1};(1,1;1,201;101,201;101,1){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::PolygonFilter::property_glob("one", "1*")).to_s), csort("(1,1;1,201;101,201;101,1){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::PolygonFilter::property_glob("one", "1*", true)).to_s), csort("(0,0;0,200;100,200;100,0){one=>-1};(2,2;2,202;102,202;102,2){one=>42}"))
+
+    rr = r.dup
+    rr.filter(RBA::PolygonFilter::property_filter("one", 17))
+    assert_equal(csort(rr.to_s), csort("(1,1;1,201;101,201;101,1){one=>17}"))
 
   end
 

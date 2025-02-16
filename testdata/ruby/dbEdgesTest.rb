@@ -26,8 +26,8 @@ load("test_prologue.rb")
 # normalizes a specification string for region, edges etc.
 # such that the order of the objects becomes irrelevant
 def csort(s)
-  # splits at ");(" without consuming the brackets
-  s.split(/(?<=\));(?=\()/).sort.join(";")
+  # splits at ");(" or "};(" without consuming the brackets
+  s.split(/(?<=[\)\}]);(?=\()/).sort.join(";")
 end
 
 class ParallelFilter < RBA::EdgeFilter
@@ -1034,6 +1034,56 @@ class DBEdges_TestClass < TestBase
     r.insert(RBA::EdgeWithProperties::new(RBA::Edge::new(10, 0, 110, 0), { 1 => "one" }))
     s = r.each_merged.collect(&:to_s).join(";")
     assert_equal(s, "(0,0;110,0) props={1=>one}")
+
+  end
+
+  # properties
+  def test_prop_filters
+
+    r = RBA::Edges::new
+    r.insert(RBA::EdgeWithProperties::new(RBA::Edge::new(0, 0, 100, 200), { "one" => -1 }))
+    r.insert(RBA::EdgeWithProperties::new(RBA::Edge::new(1, 1, 101, 201), { "one" => 17 }))
+    r.insert(RBA::EdgeWithProperties::new(RBA::Edge::new(2, 2, 102, 202), { "one" => 42 }))
+
+    assert_equal(r.filtered(RBA::EdgeFilter::property_filter("one", 11)).to_s, "")
+    assert_equal(r.filtered(RBA::EdgeFilter::property_filter("two", 17)).to_s, "")
+    assert_equal(csort(r.filtered(RBA::EdgeFilter::property_filter("one", 17)).to_s), csort("(1,1;101,201){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::EdgeFilter::property_filter("one", 17, true)).to_s), csort("(0,0;100,200){one=>-1};(2,2;102,202){one=>42}"))
+    assert_equal(csort(r.filtered(RBA::EdgeFilter::property_filter_bounded("one", 17, nil)).to_s), csort("(2,2;102,202){one=>42};(1,1;101,201){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::EdgeFilter::property_filter_bounded("one", 17, 18)).to_s), csort("(1,1;101,201){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::EdgeFilter::property_filter_bounded("one", 17, 18, true)).to_s), csort("(2,2;102,202){one=>42};(0,0;100,200){one=>-1}"))
+    assert_equal(csort(r.filtered(RBA::EdgeFilter::property_filter_bounded("one", nil, 18)).to_s), csort("(1,1;101,201){one=>17};(0,0;100,200){one=>-1}"))
+    assert_equal(csort(r.filtered(RBA::EdgeFilter::property_glob("one", "1*")).to_s), csort("(1,1;101,201){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::EdgeFilter::property_glob("one", "1*", true)).to_s), csort("(2,2;102,202){one=>42};(0,0;100,200){one=>-1}"))
+
+    ly = RBA::Layout::new
+    top = ly.create_cell("TOP")
+    l1 = ly.layer(1, 0)
+
+    s = top.shapes(l1)
+    s.insert(RBA::EdgeWithProperties::new(RBA::Edge::new(0, 0, 100, 200), { "one" => -1 }))
+    s.insert(RBA::EdgeWithProperties::new(RBA::Edge::new(1, 1, 101, 201), { "one" => 17 }))
+    s.insert(RBA::EdgeWithProperties::new(RBA::Edge::new(2, 2, 102, 202), { "one" => 42 }))
+
+    dss = RBA::DeepShapeStore::new
+    iter = top.begin_shapes_rec(l1)
+    iter.enable_properties()
+    r = RBA::Edges::new(iter, dss)
+
+    assert_equal(r.filtered(RBA::EdgeFilter::property_filter("one", 11)).to_s, "")
+    assert_equal(r.filtered(RBA::EdgeFilter::property_filter("two", 17)).to_s, "")
+    assert_equal(csort(r.filtered(RBA::EdgeFilter::property_filter("one", 17)).to_s), csort("(1,1;101,201){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::EdgeFilter::property_filter("one", 17, true)).to_s), csort("(0,0;100,200){one=>-1};(2,2;102,202){one=>42}"))
+    assert_equal(csort(r.filtered(RBA::EdgeFilter::property_filter_bounded("one", 17, nil)).to_s), csort("(2,2;102,202){one=>42};(1,1;101,201){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::EdgeFilter::property_filter_bounded("one", 17, 18)).to_s), csort("(1,1;101,201){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::EdgeFilter::property_filter_bounded("one", 17, 18, true)).to_s), csort("(2,2;102,202){one=>42};(0,0;100,200){one=>-1}"))
+    assert_equal(csort(r.filtered(RBA::EdgeFilter::property_filter_bounded("one", nil, 18)).to_s), csort("(1,1;101,201){one=>17};(0,0;100,200){one=>-1}"))
+    assert_equal(csort(r.filtered(RBA::EdgeFilter::property_glob("one", "1*")).to_s), csort("(1,1;101,201){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::EdgeFilter::property_glob("one", "1*", true)).to_s), csort("(2,2;102,202){one=>42};(0,0;100,200){one=>-1}"))
+
+    rr = r.dup
+    rr.filter(RBA::EdgeFilter::property_filter("one", 17))
+    assert_equal(csort(rr.to_s), csort("(1,1;101,201){one=>17}"))
 
   end
 

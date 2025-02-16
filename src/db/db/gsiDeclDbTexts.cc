@@ -27,6 +27,7 @@
 #include "dbRegion.h"
 #include "dbDeepTexts.h"
 #include "dbTextsUtils.h"
+#include "dbPropertiesFilter.h"
 
 #include "gsiDeclDbContainerHelpers.h"
 
@@ -36,8 +37,10 @@ namespace gsi
 // ---------------------------------------------------------------------------------
 //  TextFilter binding
 
+typedef shape_filter_impl<db::TextFilterBase> TextFilterBase;
+
 class TextFilterImpl
-  : public shape_filter_impl<db::TextFilterBase>
+  : public TextFilterBase
 {
 public:
   TextFilterImpl () { }
@@ -64,8 +67,70 @@ private:
   TextFilterImpl (const TextFilterImpl &);
 };
 
-Class<gsi::TextFilterImpl> decl_TextFilterImpl ("db", "TextFilter",
-  TextFilterImpl::method_decls (false) +
+typedef db::generic_properties_filter<gsi::TextFilterBase, db::Text> TextPropertiesFilter;
+
+static gsi::TextFilterBase *make_ppf1 (const tl::Variant &name, const tl::Variant &value, bool inverse)
+{
+  return new TextPropertiesFilter (name, value, inverse);
+}
+
+static gsi::TextFilterBase *make_ppf2 (const tl::Variant &name, const tl::Variant &from, const tl::Variant &to, bool inverse)
+{
+  return new TextPropertiesFilter (name, from, to, inverse);
+}
+
+static gsi::TextFilterBase *make_pg (const tl::Variant &name, const std::string &glob, bool inverse, bool case_sensitive)
+{
+  tl::GlobPattern pattern (glob);
+  pattern.set_case_sensitive (case_sensitive);
+  return new TextPropertiesFilter (name, pattern, inverse);
+}
+
+Class<gsi::TextFilterBase> decl_TextFilterBase ("db", "TextFilterBase",
+  gsi::TextFilterBase::method_decls (false) +
+  gsi::constructor ("property_glob", &make_pg, gsi::arg ("name"), gsi::arg ("pattern"), gsi::arg ("inverse", false), gsi::arg ("case_sensitive", true),
+    "@brief Creates a single-valued property filter\n"
+    "@param name The name of the property to use.\n"
+    "@param value The glob pattern to match the property value against.\n"
+    "@param inverse If true, inverts the selection - i.e. all texts without a matching property are selected.\n"
+    "@param case_sensitive If true, the match is case sensitive (the default), if false, the match is not case sensitive.\n"
+    "\n"
+    "Apply this filter with \\Texts#filtered:\n"
+    "\n"
+    "@code\n"
+    "# texts is a Texts object\n"
+    "# filtered_texts contains all texts where the 'net' property starts with 'C':\n"
+    "filtered_texts = texts.filtered(RBA::TextFilterBase::property_glob('net', 'C*'))\n"
+    "@/code\n"
+    "\n"
+    "This feature has been introduced in version 0.30."
+  ) +
+  gsi::constructor ("property_filter", &make_ppf1, gsi::arg ("name"), gsi::arg ("value"), gsi::arg ("inverse", false),
+    "@brief Creates a single-valued property filter\n"
+    "@param name The name of the property to use.\n"
+    "@param value The value against which the property is checked (exact match).\n"
+    "@param inverse If true, inverts the selection - i.e. all texts without a property with the given name and value are selected.\n"
+    "\n"
+    "Apply this filter with \\Texts#filtered. See \\property_glob for an example.\n"
+    "\n"
+    "This feature has been introduced in version 0.30."
+  ) +
+  gsi::constructor ("property_filter_bounded", &make_ppf2, gsi::arg ("name"), gsi::arg ("from"), gsi::arg ("to"), gsi::arg ("inverse", false),
+    "@brief Creates a single-valued property filter\n"
+    "@param name The name of the property to use.\n"
+    "@param from The lower value against which the property is checked or 'nil' if no lower bound shall be used.\n"
+    "@param to The upper value against which the property is checked or 'nil' if no upper bound shall be used.\n"
+    "@param inverse If true, inverts the selection - i.e. all texts without a property with the given name and value range are selected.\n"
+    "\n"
+    "This version does a bounded match. The value of the propery needs to be larger or equal to 'from' and less than 'to'.\n"
+    "Apply this filter with \\Texts#filtered. See \\property_glob for an example.\n"
+    "\n"
+    "This feature has been introduced in version 0.30."
+  ),
+  "@hide"
+);
+
+Class<gsi::TextFilterImpl> decl_TextFilterImpl (decl_TextFilterBase, "db", "TextFilter",
   callback ("selected", &TextFilterImpl::issue_selected, &TextFilterImpl::f_selected, gsi::arg ("text"),
     "@brief Selects a text\n"
     "This method is the actual payload. It needs to be reimplemented in a derived class.\n"
@@ -318,12 +383,12 @@ static size_t id (const db::Texts *t)
   return tl::id_of (t->delegate ());
 }
 
-static db::Texts filtered (const db::Texts *r, const TextFilterImpl *f)
+static db::Texts filtered (const db::Texts *r, const gsi::TextFilterBase *f)
 {
   return r->filtered (*f);
 }
 
-static void filter (db::Texts *r, const TextFilterImpl *f)
+static void filter (db::Texts *r, const gsi::TextFilterBase *f)
 {
   r->filter (*f);
 }

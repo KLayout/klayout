@@ -26,8 +26,8 @@ load("test_prologue.rb")
 # normalizes a specification string for region, edges etc.
 # such that the order of the objects becomes irrelevant
 def csort(s)
-  # splits at ");(" without consuming the brackets
-  s.split(/(?<=\));(?=\()/).sort.join(";")
+  # splits at ");(" or "};(" without consuming the brackets
+  s.split(/(?<=[\)\}]);(?=\()/).sort.join(";")
 end
  
 class TextStringLengthFilter < RBA::TextFilter
@@ -464,6 +464,56 @@ class DBTexts_TestClass < TestBase
     r.insert(RBA::Text::new("xuv", RBA::Trans::new))
     s = r.each.collect(&:to_s).join(";")
     assert_equal(s, "('xuv',r0 0,0) props={};('abc',r0 0,0) props={1=>one}")
+
+  end
+
+  # properties
+  def test_prop_filters
+
+    r = RBA::Texts::new
+    r.insert(RBA::TextWithProperties::new(RBA::Text::new("abc", RBA::Trans::R0), { "one" => -1 }))
+    r.insert(RBA::TextWithProperties::new(RBA::Text::new("uvw", RBA::Trans::R0), { "one" => 17 }))
+    r.insert(RBA::TextWithProperties::new(RBA::Text::new("xyz", RBA::Trans::R0), { "one" => 42 }))
+
+    assert_equal(r.filtered(RBA::TextFilter::property_filter("one", 11)).to_s, "")
+    assert_equal(r.filtered(RBA::TextFilter::property_filter("two", 17)).to_s, "")
+    assert_equal(csort(r.filtered(RBA::TextFilter::property_filter("one", 17)).to_s), csort("('uvw',r0 0,0){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::TextFilter::property_filter("one", 17, true)).to_s), csort("('abc',r0 0,0){one=>-1};('xyz',r0 0,0){one=>42}"))
+    assert_equal(csort(r.filtered(RBA::TextFilter::property_filter_bounded("one", 17, nil)).to_s), csort("('xyz',r0 0,0){one=>42};('uvw',r0 0,0){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::TextFilter::property_filter_bounded("one", 17, 18)).to_s), csort("('uvw',r0 0,0){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::TextFilter::property_filter_bounded("one", 17, 18, true)).to_s), csort("('xyz',r0 0,0){one=>42};('abc',r0 0,0){one=>-1}"))
+    assert_equal(csort(r.filtered(RBA::TextFilter::property_filter_bounded("one", nil, 18)).to_s), csort("('uvw',r0 0,0){one=>17};('abc',r0 0,0){one=>-1}"))
+    assert_equal(csort(r.filtered(RBA::TextFilter::property_glob("one", "1*")).to_s), csort("('uvw',r0 0,0){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::TextFilter::property_glob("one", "1*", true)).to_s), csort("('xyz',r0 0,0){one=>42};('abc',r0 0,0){one=>-1}"))
+
+    ly = RBA::Layout::new
+    top = ly.create_cell("TOP")
+    l1 = ly.layer(1, 0)
+
+    s = top.shapes(l1)
+    s.insert(RBA::TextWithProperties::new(RBA::Text::new("abc", RBA::Trans::R0), { "one" => -1 }))
+    s.insert(RBA::TextWithProperties::new(RBA::Text::new("uvw", RBA::Trans::R0), { "one" => 17 }))
+    s.insert(RBA::TextWithProperties::new(RBA::Text::new("xyz", RBA::Trans::R0), { "one" => 42 }))
+
+    dss = RBA::DeepShapeStore::new
+    iter = top.begin_shapes_rec(l1)
+    iter.enable_properties()
+    r = RBA::Texts::new(iter, dss)
+
+    assert_equal(r.filtered(RBA::TextFilter::property_filter("one", 11)).to_s, "")
+    assert_equal(r.filtered(RBA::TextFilter::property_filter("two", 17)).to_s, "")
+    assert_equal(csort(r.filtered(RBA::TextFilter::property_filter("one", 17)).to_s), csort("('uvw',r0 0,0){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::TextFilter::property_filter("one", 17, true)).to_s), csort("('abc',r0 0,0){one=>-1};('xyz',r0 0,0){one=>42}"))
+    assert_equal(csort(r.filtered(RBA::TextFilter::property_filter_bounded("one", 17, nil)).to_s), csort("('xyz',r0 0,0){one=>42};('uvw',r0 0,0){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::TextFilter::property_filter_bounded("one", 17, 18)).to_s), csort("('uvw',r0 0,0){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::TextFilter::property_filter_bounded("one", 17, 18, true)).to_s), csort("('xyz',r0 0,0){one=>42};('abc',r0 0,0){one=>-1}"))
+    assert_equal(csort(r.filtered(RBA::TextFilter::property_filter_bounded("one", nil, 18)).to_s), csort("('uvw',r0 0,0){one=>17};('abc',r0 0,0){one=>-1}"))
+    assert_equal(csort(r.filtered(RBA::TextFilter::property_glob("one", "1*")).to_s), csort("('uvw',r0 0,0){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::TextFilter::property_glob("one", "1*", true)).to_s), csort("('xyz',r0 0,0){one=>42};('abc',r0 0,0){one=>-1}"))
+
+    rr = r.dup
+    rr.filter(RBA::TextFilter::property_filter("one", 17))
+    assert_equal(csort(rr.to_s), csort("('uvw',r0 0,0){one=>17}"))
 
   end
 

@@ -30,6 +30,7 @@
 #include "dbDeepEdgePairs.h"
 #include "dbEdgesUtils.h"
 #include "dbEdgePairFilters.h"
+#include "dbPropertiesFilter.h"
 
 #include "gsiDeclDbContainerHelpers.h"
 
@@ -39,8 +40,10 @@ namespace gsi
 // ---------------------------------------------------------------------------------
 //  EdgePairFilter binding
 
+typedef shape_filter_impl<db::EdgePairFilterBase> EdgePairFilterBase;
+
 class EdgePairFilterImpl
-  : public shape_filter_impl<db::EdgePairFilterBase>
+  : public EdgePairFilterBase
 {
 public:
   EdgePairFilterImpl () { }
@@ -67,8 +70,70 @@ private:
   EdgePairFilterImpl (const EdgePairFilterImpl &);
 };
 
-Class<gsi::EdgePairFilterImpl> decl_EdgePairFilterImpl ("db", "EdgePairFilter",
-  EdgePairFilterImpl::method_decls (false) +
+typedef db::generic_properties_filter<gsi::EdgePairFilterBase, db::EdgePair> EdgePairPropertiesFilter;
+
+static gsi::EdgePairFilterBase *make_ppf1 (const tl::Variant &name, const tl::Variant &value, bool inverse)
+{
+  return new EdgePairPropertiesFilter (name, value, inverse);
+}
+
+static gsi::EdgePairFilterBase *make_ppf2 (const tl::Variant &name, const tl::Variant &from, const tl::Variant &to, bool inverse)
+{
+  return new EdgePairPropertiesFilter (name, from, to, inverse);
+}
+
+static gsi::EdgePairFilterBase *make_pg (const tl::Variant &name, const std::string &glob, bool inverse, bool case_sensitive)
+{
+  tl::GlobPattern pattern (glob);
+  pattern.set_case_sensitive (case_sensitive);
+  return new EdgePairPropertiesFilter (name, pattern, inverse);
+}
+
+Class<gsi::EdgePairFilterBase> decl_EdgePairFilterBase ("db", "EdgePairFilterBase",
+  gsi::EdgePairFilterBase::method_decls (true) +
+  gsi::constructor ("property_glob", &make_pg, gsi::arg ("name"), gsi::arg ("pattern"), gsi::arg ("inverse", false), gsi::arg ("case_sensitive", true),
+    "@brief Creates a single-valued property filter\n"
+    "@param name The name of the property to use.\n"
+    "@param value The glob pattern to match the property value against.\n"
+    "@param inverse If true, inverts the selection - i.e. all edge pairs without a matching property are selected.\n"
+    "@param case_sensitive If true, the match is case sensitive (the default), if false, the match is not case sensitive.\n"
+    "\n"
+    "Apply this filter with \\EdgePairs#filtered:\n"
+    "\n"
+    "@code\n"
+    "# edge_pairs is a EdgePairs object\n"
+    "# filtered_edge_pairs contains all edge pairs where the 'net' property starts with 'C':\n"
+    "filtered_edge_pairs = edge_pairs.filtered(RBA::EdgePairFilterBase::property_glob('net', 'C*'))\n"
+    "@/code\n"
+    "\n"
+    "This feature has been introduced in version 0.30."
+  ) +
+  gsi::constructor ("property_filter", &make_ppf1, gsi::arg ("name"), gsi::arg ("value"), gsi::arg ("inverse", false),
+    "@brief Creates a single-valued property filter\n"
+    "@param name The name of the property to use.\n"
+    "@param value The value against which the property is checked (exact match).\n"
+    "@param inverse If true, inverts the selection - i.e. all edge pairs without a property with the given name and value are selected.\n"
+    "\n"
+    "Apply this filter with \\EdgePairs#filtered. See \\property_glob for an example.\n"
+    "\n"
+    "This feature has been introduced in version 0.30."
+  ) +
+  gsi::constructor ("property_filter_bounded", &make_ppf2, gsi::arg ("name"), gsi::arg ("from"), gsi::arg ("to"), gsi::arg ("inverse", false),
+    "@brief Creates a single-valued property filter\n"
+    "@param name The name of the property to use.\n"
+    "@param from The lower value against which the property is checked or 'nil' if no lower bound shall be used.\n"
+    "@param to The upper value against which the property is checked or 'nil' if no upper bound shall be used.\n"
+    "@param inverse If true, inverts the selection - i.e. all edge pairs without a property with the given name and value range are selected.\n"
+    "\n"
+    "This version does a bounded match. The value of the propery needs to be larger or equal to 'from' and less than 'to'.\n"
+    "Apply this filter with \\EdgePairs#filtered. See \\property_glob for an example.\n"
+    "\n"
+    "This feature has been introduced in version 0.30."
+  ),
+  "@hide"
+);
+
+Class<gsi::EdgePairFilterImpl> decl_EdgePairFilterImpl (decl_EdgePairFilterBase, "db", "EdgePairFilter",
   callback ("selected", &EdgePairFilterImpl::issue_selected, &EdgePairFilterImpl::f_selected, gsi::arg ("text"),
     "@brief Selects an edge pair\n"
     "This method is the actual payload. It needs to be reimplemented in a derived class.\n"
@@ -411,12 +476,12 @@ static size_t id (const db::EdgePairs *ep)
   return tl::id_of (ep->delegate ());
 }
 
-static db::EdgePairs filtered (const db::EdgePairs *r, const EdgePairFilterImpl *f)
+static db::EdgePairs filtered (const db::EdgePairs *r, const gsi::EdgePairFilterBase *f)
 {
   return r->filtered (*f);
 }
 
-static void filter (db::EdgePairs *r, const EdgePairFilterImpl *f)
+static void filter (db::EdgePairs *r, const gsi::EdgePairFilterBase *f)
 {
   r->filter (*f);
 }

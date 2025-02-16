@@ -43,6 +43,9 @@
   static bool QPersistentModelIndex_operator_ne(const QPersistentModelIndex *a, const QPersistentModelIndex &b) {
     return !(*a == b);
   }
+  static bool QPersistentModelIndex_operator_lt(const QPersistentModelIndex *a, const QPersistentModelIndex &b) {
+    return *a < b;
+  }
 #if QT_VERSION < 0x60000
   static const QModelIndex &castToQModelIndex(const QPersistentModelIndex *m)
   {
@@ -252,25 +255,6 @@ static void _call_f_multiData_c2196 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// bool QPersistentModelIndex::operator<(const QPersistentModelIndex &other)
-
-
-static void _init_f_operator_lt__c3468 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("other");
-  decl->add_arg<const QPersistentModelIndex & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_lt__c3468 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QPersistentModelIndex &arg1 = gsi::arg_reader<const QPersistentModelIndex & >() (args, heap);
-  ret.write<bool > ((bool)((QPersistentModelIndex *)cls)->operator< (arg1));
-}
-
-
 // QPersistentModelIndex &QPersistentModelIndex::operator=(const QPersistentModelIndex &other)
 
 
@@ -399,7 +383,6 @@ static gsi::Methods methods_QPersistentModelIndex () {
   methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QPersistentModelIndex::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
   methods += new qt_gsi::GenericMethod ("model", "@brief Method const QAbstractItemModel *QPersistentModelIndex::model()\n", true, &_init_f_model_c0, &_call_f_model_c0);
   methods += new qt_gsi::GenericMethod ("multiData", "@brief Method void QPersistentModelIndex::multiData(QModelRoleDataSpan roleDataSpan)\n", true, &_init_f_multiData_c2196, &_call_f_multiData_c2196);
-  methods += new qt_gsi::GenericMethod ("<", "@brief Method bool QPersistentModelIndex::operator<(const QPersistentModelIndex &other)\n", true, &_init_f_operator_lt__c3468, &_call_f_operator_lt__c3468);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QPersistentModelIndex &QPersistentModelIndex::operator=(const QPersistentModelIndex &other)\n", false, &_init_f_operator_eq__3468, &_call_f_operator_eq__3468);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QPersistentModelIndex &QPersistentModelIndex::operator=(const QModelIndex &other)\n", false, &_init_f_operator_eq__2395, &_call_f_operator_eq__2395);
   methods += new qt_gsi::GenericMethod ("parent", "@brief Method QModelIndex QPersistentModelIndex::parent()\n", true, &_init_f_parent_c0, &_call_f_parent_c0);
@@ -411,7 +394,8 @@ static gsi::Methods methods_QPersistentModelIndex () {
 
 gsi::Class<QPersistentModelIndex> decl_QPersistentModelIndex ("QtCore", "QPersistentModelIndex",
   gsi::method_ext("==", &QPersistentModelIndex_operator_eq, gsi::arg ("other"), "@brief Method bool QPersistentModelIndex::operator==(const QPersistentModelIndex &) const") +
-  gsi::method_ext("!=", &QPersistentModelIndex_operator_ne, gsi::arg ("other"), "@brief Method bool QPersistentModelIndex::operator!=(const QPersistentModelIndex &) const") 
+  gsi::method_ext("!=", &QPersistentModelIndex_operator_ne, gsi::arg ("other"), "@brief Method bool QPersistentModelIndex::operator!=(const QPersistentModelIndex &) const") +
+  gsi::method_ext("<", &QPersistentModelIndex_operator_lt, gsi::arg ("other"), "@brief Method bool QPersistentModelIndex::operator<(const QPersistentModelIndex &) const") 
 +
   gsi::method_ext("castToQModelIndex", &castToQModelIndex, "@brief Binding for \"operator const QModelIndex &\".")
 +

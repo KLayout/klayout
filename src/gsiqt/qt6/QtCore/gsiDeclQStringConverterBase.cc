@@ -35,28 +35,12 @@
 // -----------------------------------------------------------------------
 // class QStringConverterBase
 
-//  Constructor QStringConverterBase::QStringConverterBase()
-
-
-static void _init_ctor_QStringConverterBase_0 (qt_gsi::GenericStaticMethod *decl)
-{
-  decl->set_return_new<QStringConverterBase> ();
-}
-
-static void _call_ctor_QStringConverterBase_0 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QStringConverterBase *> (new QStringConverterBase ());
-}
-
-
 
 namespace gsi
 {
 
 static gsi::Methods methods_QStringConverterBase () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QStringConverterBase::QStringConverterBase()\nThis method creates an object of class QStringConverterBase.", &_init_ctor_QStringConverterBase_0, &_call_ctor_QStringConverterBase_0);
   return methods;
 }
 

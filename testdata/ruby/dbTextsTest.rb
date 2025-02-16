@@ -242,6 +242,8 @@ class DBTexts_TestClass < TestBase
 
     assert_equal(r.is_deep?, true)
 
+    dss._destroy
+
   end
 
   def test_4
@@ -341,6 +343,8 @@ class DBTexts_TestClass < TestBase
     assert_equal(RBA::Region::new(target.cell("TOP").shapes(target_li)).to_s, "")
     assert_equal(RBA::Texts::new(target.cell("C2").shapes(target_li)).to_s, "('abc',r0 100,-200)")
     assert_equal(RBA::Region::new(target.cell("C2").shapes(target_li)).to_s, "")
+
+    dss._destroy
 
   end
 
@@ -514,6 +518,8 @@ class DBTexts_TestClass < TestBase
     rr = r.dup
     rr.filter(RBA::TextFilter::property_filter("one", 17))
     assert_equal(csort(rr.to_s), csort("('uvw',r0 0,0){one=>17}"))
+
+    dss._destroy
 
   end
 

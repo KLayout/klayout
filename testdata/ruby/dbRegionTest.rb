@@ -1049,6 +1049,8 @@ class DBRegion_TestClass < TestBase
     assert_equal(t.to_s, "(99,199;99,201;101,201;101,199)")
     assert_equal(t.is_deep?, true)
 
+    dss._destroy
+
     r = RBA::Region::new(top.begin_shapes_rec(l1))
     t = r.texts_dots("*", true)
     assert_equal(t.to_s, "(100,200;100,200)")
@@ -1059,6 +1061,8 @@ class DBRegion_TestClass < TestBase
     t = r.texts_dots(dss, "A*", true)
     assert_equal(t.to_s, "(100,200;100,200)")
     assert_equal(t.is_deep?, true)
+
+    dss._destroy
 
   end
 
@@ -1522,6 +1526,8 @@ class DBRegion_TestClass < TestBase
     assert_equal(r.to_s, "(0,0;0,1000;1000,1000;1000,0);(1000,1000;1000,2000;2000,2000;2000,1000)")
     assert_equal(r.bbox.to_s, "(0,0;2000,2000)")
 
+    dss._destroy
+
   end
 
   # properties
@@ -1630,6 +1636,8 @@ class DBRegion_TestClass < TestBase
     rr = r.dup
     rr.filter(RBA::PolygonFilter::property_filter("one", 17))
     assert_equal(csort(rr.to_s), csort("(1,1;1,201;101,201;101,1){one=>17}"))
+
+    dss._destroy
 
   end
 

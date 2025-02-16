@@ -780,6 +780,8 @@ class DBEdges_TestClass < TestBase
     assert_equal(r.hier_count, 12)
     assert_equal(r.to_s, "(-10,-20;-10,20);(-10,20;10,20);(10,20;10,-20);(10,-20;-10,-20);(-10,80;-10,120);(-10,120;10,120);(10,120;10,80);(10,80;-10,80);(190,80;190,120);(190,120;210,120)...")
 
+    dss._destroy
+
   end
 
   # inside
@@ -1084,6 +1086,8 @@ class DBEdges_TestClass < TestBase
     rr = r.dup
     rr.filter(RBA::EdgeFilter::property_filter("one", 17))
     assert_equal(csort(rr.to_s), csort("(1,1;101,201){one=>17}"))
+
+    dss._destroy
 
   end
 

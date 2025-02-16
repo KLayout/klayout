@@ -244,6 +244,8 @@ class DBEdgePairs_TestClass < TestBase
 
     assert_equal(r.is_deep?, true)
 
+    dss._destroy
+    
   end
 
   def test_4
@@ -281,6 +283,8 @@ class DBEdgePairs_TestClass < TestBase
     assert_equal(cells.join(","), "TOP,C2")
     assert_equal(RBA::Region::new(target.cell("TOP").shapes(target_li)).to_s, "")
     assert_equal(RBA::Region::new(target.cell("C2").shapes(target_li)).to_s, "(-1,-1;-1,11;11,11;11,-1)")
+
+    dss._destroy
 
   end
 
@@ -645,6 +649,8 @@ class DBEdgePairs_TestClass < TestBase
     rr = r.dup
     rr.filter(RBA::EdgePairFilter::property_filter("one", 17))
     assert_equal(csort(rr.to_s), csort("(1,1;101,201)/(1,11;101,211){one=>17}"))
+
+    dss._destroy
 
   end
 

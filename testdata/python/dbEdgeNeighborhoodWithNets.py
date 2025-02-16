@@ -41,7 +41,7 @@ class EdgeNeighborhoodWithNetsVisitor(pya.EdgeNeighborhoodVisitor):
     self.poly[str(edge)] = edge_data
     for (x1, x2), polygons in neighborhood:
       for inp, poly in polygons.items():
-        poly_str = "/".join([ str(p) for p in poly ])
+        poly_str = "/".join(sorted([ str(p) for p in poly ]))
         edge_data.append(f"{x1},{x2} -> {inp}: {poly_str}")
 
   def dump(self):
@@ -282,7 +282,7 @@ Polygon: (-9500,0;-9500,15000;0,15000;0,0;-5000,0;-5000,12000;-6500,12000;-6500,
   0.0,2500.0 -> 3: (0,-11;0,0;2500,0;2500,-11) props={net=>net1}
   2500.0,3000.0 -> 0: (2500,-11;2500,0;3000,0;3000,-11) props={net=>net1}
   2500.0,3000.0 -> 1: (2500,1500;2500,5000;3000,5000;3000,1500) props={net=>net3}
-  2500.0,3000.0 -> 3: (2500,1500;2500,5000;3000,5000;3000,1500) props={net=>net2}/(2500,-11;2500,0;3000,0;3000,-11) props={net=>net1}
+  2500.0,3000.0 -> 3: (2500,-11;2500,0;3000,0;3000,-11) props={net=>net1}/(2500,1500;2500,5000;3000,5000;3000,1500) props={net=>net2}
   3000.0,9500.0 -> 0: (3000,-11;3000,0;9500,0;9500,-11) props={net=>net1}
   3000.0,9500.0 -> 1: (3000,1500;3000,5000;9500,5000;9500,1500) props={net=>net3}
   3000.0,9500.0 -> 3: (3000,1500;3000,5000;9500,5000;9500,1500) props={net=>net2}

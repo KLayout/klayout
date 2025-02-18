@@ -144,10 +144,12 @@ signals:
 
 public slots:
   void show_parameter_names (bool f);
+  void lazy_eval_mode (int);
 
 private slots:
   void parameter_changed ();
   void update_button_pressed ();
+  void lazy_eval_mode_slot ();
 
 private:
   lay::Dispatcher *mp_dispatcher;
@@ -160,7 +162,10 @@ private:
   QLabel *mp_changed_icon;
   QToolButton *mp_update_button;
   QFrame *mp_error_frame, *mp_update_frame;
-  QCheckBox *mp_show_parameter_names_cb;
+  QAction *mp_show_parameter_names_action;
+  QAction *mp_auto_lazy_eval_action;
+  QAction *mp_always_lazy_eval_action;
+  QAction *mp_never_lazy_eval_action;
   tl::weak_ptr<db::PCellDeclaration> mp_pcell_decl;
   std::vector<QWidget *> m_widgets;
   std::vector<QLabel *> m_icon_widgets;
@@ -168,6 +173,7 @@ private:
   lay::LayoutViewBase *mp_view;
   int m_cv_index;
   bool m_dense, m_show_parameter_names;
+  int m_lazy_evaluation;
   tl::DeferredMethod<PCellParametersPage> dm_parameter_changed;
   db::ParameterStates m_current_states, m_initial_states;
   db::ParameterStates m_states;

@@ -154,10 +154,11 @@ static void set_value (const db::PCellParameterDeclaration &p, QWidget *widget, 
 }
 
 PCellParametersPage::PCellParametersPage (QWidget *parent, lay::Dispatcher *dispatcher, bool dense)
-  : QFrame (parent), mp_dispatcher (dispatcher), m_dense (dense), m_show_parameter_names (false), dm_parameter_changed (this, &PCellParametersPage::do_parameter_changed)
+  : QFrame (parent), mp_dispatcher (dispatcher), m_dense (dense), m_show_parameter_names (false), m_lazy_evaluation (-1), dm_parameter_changed (this, &PCellParametersPage::do_parameter_changed)
 {
   if (mp_dispatcher) {
     mp_dispatcher->config_get (cfg_edit_pcell_show_parameter_names, m_show_parameter_names);
+    mp_dispatcher->config_get (cfg_edit_pcell_lazy_eval_mode, m_lazy_evaluation);
   }
 
   init ();
@@ -236,28 +237,99 @@ PCellParametersPage::init ()
 
   error_frame_layout->setColumnStretch (2, 1);
 
-  QFrame *show_parameter_names_frame = new QFrame (this);
-  show_parameter_names_frame->setFrameShape (QFrame::NoFrame);
-  frame_layout->addWidget (show_parameter_names_frame, 3, 0, 1, 1);
+  QFrame *options_frame = new QFrame (this);
+  options_frame->setFrameShape (QFrame::NoFrame);
+  frame_layout->addWidget (options_frame, 3, 0, 1, 1);
 
-  QHBoxLayout *show_parameter_names_frame_layout = new QHBoxLayout (show_parameter_names_frame);
-  show_parameter_names_frame->setLayout (show_parameter_names_frame_layout);
+  QHBoxLayout *options_frame_layout = new QHBoxLayout (options_frame);
+  options_frame->setLayout (options_frame_layout);
   if (m_dense) {
-    show_parameter_names_frame_layout->setContentsMargins (4, 4, 4, 4);
+    options_frame_layout->setContentsMargins (4, 4, 4, 4);
   }
 
-  mp_show_parameter_names_cb = new QCheckBox (show_parameter_names_frame);
-  mp_show_parameter_names_cb->setText (tr ("Show parameter names"));
-  mp_show_parameter_names_cb->setChecked (m_show_parameter_names);
-  show_parameter_names_frame_layout->addWidget (mp_show_parameter_names_cb);
+  QToolButton *dot_menu_button = new QToolButton (options_frame);
+  dot_menu_button->setText (tr ("Options "));
+  dot_menu_button->setAutoRaise (true);
+  dot_menu_button->setPopupMode (QToolButton::InstantPopup);
+  dot_menu_button->setToolButtonStyle (Qt::ToolButtonTextOnly);
+  options_frame_layout->addWidget (dot_menu_button);
+  options_frame_layout->addStretch ();
 
-  connect (mp_show_parameter_names_cb, SIGNAL (clicked (bool)), this, SLOT (show_parameter_names (bool)));
+  QMenu *dot_menu = new QMenu (dot_menu_button);
+  dot_menu_button->setMenu (dot_menu);
+  mp_show_parameter_names_action = new QAction (dot_menu);
+  dot_menu->addAction (mp_show_parameter_names_action);
+  mp_show_parameter_names_action->setText (tr ("Show parameter names"));
+  mp_show_parameter_names_action->setCheckable (true);
+  mp_show_parameter_names_action->setChecked (m_show_parameter_names);
+  connect (mp_show_parameter_names_action, SIGNAL (triggered (bool)), this, SLOT (show_parameter_names (bool)));
+
+  QMenu *lazy_eval_menu = new QMenu (dot_menu);
+  lazy_eval_menu->setTitle (tr ("Lazy PCell evaluation"));
+  dot_menu->addMenu (lazy_eval_menu);
+
+  mp_auto_lazy_eval_action = new QAction (lazy_eval_menu);
+  lazy_eval_menu->addAction (mp_auto_lazy_eval_action);
+  mp_auto_lazy_eval_action->setText (tr ("As requested by PCell"));
+  mp_auto_lazy_eval_action->setCheckable (true);
+  mp_auto_lazy_eval_action->setChecked (m_lazy_evaluation < 0);
+  connect (mp_auto_lazy_eval_action, SIGNAL (triggered ()), this, SLOT (lazy_eval_mode_slot ()));
+
+  mp_always_lazy_eval_action = new QAction (lazy_eval_menu);
+  lazy_eval_menu->addAction (mp_always_lazy_eval_action);
+  mp_always_lazy_eval_action->setText (tr ("Always"));
+  mp_always_lazy_eval_action->setCheckable (true);
+  mp_always_lazy_eval_action->setChecked (m_lazy_evaluation > 0);
+  connect (mp_always_lazy_eval_action, SIGNAL (triggered ()), this, SLOT (lazy_eval_mode_slot ()));
+
+  mp_never_lazy_eval_action = new QAction (lazy_eval_menu);
+  lazy_eval_menu->addAction (mp_never_lazy_eval_action);
+  mp_never_lazy_eval_action->setText (tr ("Never"));
+  mp_never_lazy_eval_action->setCheckable (true);
+  mp_never_lazy_eval_action->setChecked (m_lazy_evaluation == 0);
+  connect (mp_never_lazy_eval_action, SIGNAL (triggered ()), this, SLOT (lazy_eval_mode_slot ()));
 }
 
 bool
 PCellParametersPage::lazy_evaluation ()
 {
-  return mp_pcell_decl.get () && mp_pcell_decl->wants_lazy_evaluation ();
+  if (m_lazy_evaluation < 0) {
+    return mp_pcell_decl.get () && mp_pcell_decl->wants_lazy_evaluation ();
+  } else {
+    return m_lazy_evaluation > 0;
+  }
+}
+
+void
+PCellParametersPage::lazy_eval_mode_slot ()
+{
+  if (sender () == mp_always_lazy_eval_action) {
+    lazy_eval_mode (1);
+  } else if (sender () == mp_never_lazy_eval_action) {
+    lazy_eval_mode (0);
+  } else if (sender () == mp_auto_lazy_eval_action) {
+    lazy_eval_mode (-1);
+  }
+}
+
+void
+PCellParametersPage::lazy_eval_mode (int mode)
+{
+  if (mode == m_lazy_evaluation) {
+    return;
+  }
+
+  mp_never_lazy_eval_action->setChecked (mode == 0);
+  mp_always_lazy_eval_action->setChecked (mode > 0);
+  mp_auto_lazy_eval_action->setChecked (mode < 0);
+
+  m_lazy_evaluation = mode;
+
+  if (mp_dispatcher) {
+    mp_dispatcher->config_set (cfg_edit_pcell_lazy_eval_mode, m_lazy_evaluation);
+  }
+
+  setup (mp_view, m_cv_index, mp_pcell_decl.get (), get_parameters ());
 }
 
 void
@@ -268,7 +340,7 @@ PCellParametersPage::show_parameter_names (bool f)
   }
 
   m_show_parameter_names = f;
-  mp_show_parameter_names_cb->setChecked (f);
+  mp_show_parameter_names_action->setChecked (f);
 
   if (mp_dispatcher) {
     mp_dispatcher->config_set (cfg_edit_pcell_show_parameter_names, m_show_parameter_names);

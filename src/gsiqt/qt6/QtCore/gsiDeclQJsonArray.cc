@@ -36,6 +36,12 @@
 
 // -----------------------------------------------------------------------
 // class QJsonArray
+  static bool QJsonArray_operator_eq(const QJsonArray *a, const QJsonArray &b) {
+    return *a == b;
+  }
+  static bool QJsonArray_operator_ne(const QJsonArray *a, const QJsonArray &b) {
+    return !(*a == b);
+  }
 
 //  Constructor QJsonArray::QJsonArray()
 
@@ -317,25 +323,6 @@ static void _call_f_operator_eq__2315 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// bool QJsonArray::operator!=(const QJsonArray &other)
-
-
-static void _init_f_operator_excl__eq__c2315 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("other");
-  decl->add_arg<const QJsonArray & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_excl__eq__c2315 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QJsonArray &arg1 = gsi::arg_reader<const QJsonArray & >() (args, heap);
-  ret.write<bool > ((bool)((QJsonArray *)cls)->operator!= (arg1));
-}
-
-
 // QJsonArray QJsonArray::operator+(const QJsonValue &v)
 
 
@@ -390,25 +377,6 @@ static void _call_f_operator_lt__lt__2313 (const qt_gsi::GenericMethod * /*decl*
   tl::Heap heap;
   const QJsonValue &arg1 = gsi::arg_reader<const QJsonValue & >() (args, heap);
   ret.write<QJsonArray & > ((QJsonArray &)((QJsonArray *)cls)->operator<< (arg1));
-}
-
-
-// bool QJsonArray::operator==(const QJsonArray &other)
-
-
-static void _init_f_operator_eq__eq__c2315 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("other");
-  decl->add_arg<const QJsonArray & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_eq__eq__c2315 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QJsonArray &arg1 = gsi::arg_reader<const QJsonArray & >() (args, heap);
-  ret.write<bool > ((bool)((QJsonArray *)cls)->operator== (arg1));
 }
 
 
@@ -727,11 +695,9 @@ static gsi::Methods methods_QJsonArray () {
   methods += new qt_gsi::GenericMethod ("isEmpty?", "@brief Method bool QJsonArray::isEmpty()\n", true, &_init_f_isEmpty_c0, &_call_f_isEmpty_c0);
   methods += new qt_gsi::GenericMethod ("last", "@brief Method QJsonValue QJsonArray::last()\n", true, &_init_f_last_c0, &_call_f_last_c0);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QJsonArray &QJsonArray::operator =(const QJsonArray &other)\n", false, &_init_f_operator_eq__2315, &_call_f_operator_eq__2315);
-  methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QJsonArray::operator!=(const QJsonArray &other)\n", true, &_init_f_operator_excl__eq__c2315, &_call_f_operator_excl__eq__c2315);
   methods += new qt_gsi::GenericMethod ("+", "@brief Method QJsonArray QJsonArray::operator+(const QJsonValue &v)\n", true, &_init_f_operator_plus__c2313, &_call_f_operator_plus__c2313);
   methods += new qt_gsi::GenericMethod ("+=", "@brief Method QJsonArray &QJsonArray::operator+=(const QJsonValue &v)\n", false, &_init_f_operator_plus__eq__2313, &_call_f_operator_plus__eq__2313);
   methods += new qt_gsi::GenericMethod ("<<", "@brief Method QJsonArray &QJsonArray::operator<<(const QJsonValue &v)\n", false, &_init_f_operator_lt__lt__2313, &_call_f_operator_lt__lt__2313);
-  methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QJsonArray::operator==(const QJsonArray &other)\n", true, &_init_f_operator_eq__eq__c2315, &_call_f_operator_eq__eq__c2315);
   methods += new qt_gsi::GenericMethod ("[]", "@brief Method QJsonValueRef QJsonArray::operator[](qsizetype i)\n", false, &_init_f_operator_index__1442, &_call_f_operator_index__1442);
   methods += new qt_gsi::GenericMethod ("pop_back", "@brief Method void QJsonArray::pop_back()\n", false, &_init_f_pop_back_0, &_call_f_pop_back_0);
   methods += new qt_gsi::GenericMethod ("pop_front", "@brief Method void QJsonArray::pop_front()\n", false, &_init_f_pop_front_0, &_call_f_pop_front_0);
@@ -752,6 +718,9 @@ static gsi::Methods methods_QJsonArray () {
 }
 
 gsi::Class<QJsonArray> decl_QJsonArray ("QtCore", "QJsonArray",
+  gsi::method_ext("==", &QJsonArray_operator_eq, gsi::arg ("other"), "@brief Method bool QJsonArray::operator==(const QJsonArray &) const") +
+  gsi::method_ext("!=", &QJsonArray_operator_ne, gsi::arg ("other"), "@brief Method bool QJsonArray::operator!=(const QJsonArray &) const") 
++
   methods_QJsonArray (),
   "@qt\n@brief Binding of QJsonArray");
 

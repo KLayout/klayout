@@ -36,6 +36,12 @@
 
 // -----------------------------------------------------------------------
 // class QTimeZone
+  static bool QTimeZone_operator_eq(const QTimeZone *a, const QTimeZone &b) {
+    return *a == b;
+  }
+  static bool QTimeZone_operator_ne(const QTimeZone *a, const QTimeZone &b) {
+    return !(*a == b);
+  }
 
 //  Constructor QTimeZone::QTimeZone()
 
@@ -776,6 +782,9 @@ static gsi::Methods methods_QTimeZone () {
 }
 
 gsi::Class<QTimeZone> decl_QTimeZone ("QtCore", "QTimeZone",
+  gsi::method_ext("==", &QTimeZone_operator_eq, gsi::arg ("other"), "@brief Method bool QTimeZone::operator==(const QTimeZone &) const") +
+  gsi::method_ext("!=", &QTimeZone_operator_ne, gsi::arg ("other"), "@brief Method bool QTimeZone::operator!=(const QTimeZone &) const") 
++
   methods_QTimeZone (),
   "@qt\n@brief Binding of QTimeZone");
 

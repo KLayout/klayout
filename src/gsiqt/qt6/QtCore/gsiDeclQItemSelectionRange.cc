@@ -37,6 +37,12 @@
 
 // -----------------------------------------------------------------------
 // class QItemSelectionRange
+  static bool QItemSelectionRange_operator_eq(const QItemSelectionRange *a, const QItemSelectionRange &b) {
+    return *a == b;
+  }
+  static bool QItemSelectionRange_operator_ne(const QItemSelectionRange *a, const QItemSelectionRange &b) {
+    return !(*a == b);
+  }
 
 //  Constructor QItemSelectionRange::QItemSelectionRange()
 
@@ -296,44 +302,6 @@ static void _call_f_model_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// bool QItemSelectionRange::operator!=(const QItemSelectionRange &other)
-
-
-static void _init_f_operator_excl__eq__c3220 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("other");
-  decl->add_arg<const QItemSelectionRange & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_excl__eq__c3220 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QItemSelectionRange &arg1 = gsi::arg_reader<const QItemSelectionRange & >() (args, heap);
-  ret.write<bool > ((bool)((QItemSelectionRange *)cls)->operator!= (arg1));
-}
-
-
-// bool QItemSelectionRange::operator==(const QItemSelectionRange &other)
-
-
-static void _init_f_operator_eq__eq__c3220 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("other");
-  decl->add_arg<const QItemSelectionRange & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_eq__eq__c3220 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QItemSelectionRange &arg1 = gsi::arg_reader<const QItemSelectionRange & >() (args, heap);
-  ret.write<bool > ((bool)((QItemSelectionRange *)cls)->operator== (arg1));
-}
-
-
 // QModelIndex QItemSelectionRange::parent()
 
 
@@ -450,8 +418,6 @@ static gsi::Methods methods_QItemSelectionRange () {
   methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QItemSelectionRange::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
   methods += new qt_gsi::GenericMethod ("left", "@brief Method int QItemSelectionRange::left()\n", true, &_init_f_left_c0, &_call_f_left_c0);
   methods += new qt_gsi::GenericMethod ("model", "@brief Method const QAbstractItemModel *QItemSelectionRange::model()\n", true, &_init_f_model_c0, &_call_f_model_c0);
-  methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QItemSelectionRange::operator!=(const QItemSelectionRange &other)\n", true, &_init_f_operator_excl__eq__c3220, &_call_f_operator_excl__eq__c3220);
-  methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QItemSelectionRange::operator==(const QItemSelectionRange &other)\n", true, &_init_f_operator_eq__eq__c3220, &_call_f_operator_eq__eq__c3220);
   methods += new qt_gsi::GenericMethod ("parent", "@brief Method QModelIndex QItemSelectionRange::parent()\n", true, &_init_f_parent_c0, &_call_f_parent_c0);
   methods += new qt_gsi::GenericMethod ("right", "@brief Method int QItemSelectionRange::right()\n", true, &_init_f_right_c0, &_call_f_right_c0);
   methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QItemSelectionRange::swap(QItemSelectionRange &other)\n", false, &_init_f_swap_2525, &_call_f_swap_2525);
@@ -462,6 +428,9 @@ static gsi::Methods methods_QItemSelectionRange () {
 }
 
 gsi::Class<QItemSelectionRange> decl_QItemSelectionRange ("QtCore", "QItemSelectionRange",
+  gsi::method_ext("==", &QItemSelectionRange_operator_eq, gsi::arg ("other"), "@brief Method bool QItemSelectionRange::operator==(const QItemSelectionRange &) const") +
+  gsi::method_ext("!=", &QItemSelectionRange_operator_ne, gsi::arg ("other"), "@brief Method bool QItemSelectionRange::operator!=(const QItemSelectionRange &) const") 
++
   methods_QItemSelectionRange (),
   "@qt\n@brief Binding of QItemSelectionRange");
 

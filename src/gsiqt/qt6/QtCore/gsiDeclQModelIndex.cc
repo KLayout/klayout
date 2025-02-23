@@ -36,6 +36,15 @@
 
 // -----------------------------------------------------------------------
 // class QModelIndex
+  static bool QModelIndex_operator_eq(const QModelIndex *a, const QModelIndex &b) {
+    return *a == b;
+  }
+  static bool QModelIndex_operator_ne(const QModelIndex *a, const QModelIndex &b) {
+    return !(*a == b);
+  }
+  static bool QModelIndex_operator_lt(const QModelIndex *a, const QModelIndex &b) {
+    return *a < b;
+  }
 
 //  Constructor QModelIndex::QModelIndex()
 
@@ -196,63 +205,6 @@ static void _call_f_multiData_c2196 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// bool QModelIndex::operator!=(const QModelIndex &other)
-
-
-static void _init_f_operator_excl__eq__c2395 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("other");
-  decl->add_arg<const QModelIndex & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_excl__eq__c2395 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
-  ret.write<bool > ((bool)((QModelIndex *)cls)->operator!= (arg1));
-}
-
-
-// bool QModelIndex::operator<(const QModelIndex &other)
-
-
-static void _init_f_operator_lt__c2395 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("other");
-  decl->add_arg<const QModelIndex & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_lt__c2395 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
-  ret.write<bool > ((bool)((QModelIndex *)cls)->operator< (arg1));
-}
-
-
-// bool QModelIndex::operator==(const QModelIndex &other)
-
-
-static void _init_f_operator_eq__eq__c2395 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("other");
-  decl->add_arg<const QModelIndex & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_eq__eq__c2395 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
-  ret.write<bool > ((bool)((QModelIndex *)cls)->operator== (arg1));
-}
-
-
 // QModelIndex QModelIndex::parent()
 
 
@@ -359,9 +311,6 @@ static gsi::Methods methods_QModelIndex () {
   methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QModelIndex::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
   methods += new qt_gsi::GenericMethod ("model", "@brief Method const QAbstractItemModel *QModelIndex::model()\n", true, &_init_f_model_c0, &_call_f_model_c0);
   methods += new qt_gsi::GenericMethod ("multiData", "@brief Method void QModelIndex::multiData(QModelRoleDataSpan roleDataSpan)\n", true, &_init_f_multiData_c2196, &_call_f_multiData_c2196);
-  methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QModelIndex::operator!=(const QModelIndex &other)\n", true, &_init_f_operator_excl__eq__c2395, &_call_f_operator_excl__eq__c2395);
-  methods += new qt_gsi::GenericMethod ("<", "@brief Method bool QModelIndex::operator<(const QModelIndex &other)\n", true, &_init_f_operator_lt__c2395, &_call_f_operator_lt__c2395);
-  methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QModelIndex::operator==(const QModelIndex &other)\n", true, &_init_f_operator_eq__eq__c2395, &_call_f_operator_eq__eq__c2395);
   methods += new qt_gsi::GenericMethod ("parent", "@brief Method QModelIndex QModelIndex::parent()\n", true, &_init_f_parent_c0, &_call_f_parent_c0);
   methods += new qt_gsi::GenericMethod ("row", "@brief Method int QModelIndex::row()\n", true, &_init_f_row_c0, &_call_f_row_c0);
   methods += new qt_gsi::GenericMethod ("sibling", "@brief Method QModelIndex QModelIndex::sibling(int row, int column)\n", true, &_init_f_sibling_c1426, &_call_f_sibling_c1426);
@@ -371,6 +320,10 @@ static gsi::Methods methods_QModelIndex () {
 }
 
 gsi::Class<QModelIndex> decl_QModelIndex ("QtCore", "QModelIndex",
+  gsi::method_ext("==", &QModelIndex_operator_eq, gsi::arg ("other"), "@brief Method bool QModelIndex::operator==(const QModelIndex &) const") +
+  gsi::method_ext("!=", &QModelIndex_operator_ne, gsi::arg ("other"), "@brief Method bool QModelIndex::operator!=(const QModelIndex &) const") +
+  gsi::method_ext("<", &QModelIndex_operator_lt, gsi::arg ("other"), "@brief Method bool QModelIndex::operator<(const QModelIndex &) const") 
++
   methods_QModelIndex (),
   "@qt\n@brief Binding of QModelIndex");
 

@@ -35,6 +35,15 @@
 
 // -----------------------------------------------------------------------
 // class QUrl
+  static bool QUrl_operator_eq(const QUrl *a, const QUrl &b) {
+    return *a == b;
+  }
+  static bool QUrl_operator_ne(const QUrl *a, const QUrl &b) {
+    return !(*a == b);
+  }
+  static bool QUrl_operator_lt(const QUrl *a, const QUrl &b) {
+    return *a < b;
+  }
 
 //  Constructor QUrl::QUrl()
 
@@ -380,44 +389,6 @@ static void _call_f_matches_c9164 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// bool QUrl::operator !=(const QUrl &url)
-
-
-static void _init_f_operator_excl__eq__c1701 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("url");
-  decl->add_arg<const QUrl & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_excl__eq__c1701 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
-  ret.write<bool > ((bool)((QUrl *)cls)->operator != (arg1));
-}
-
-
-// bool QUrl::operator <(const QUrl &url)
-
-
-static void _init_f_operator_lt__c1701 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("url");
-  decl->add_arg<const QUrl & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_lt__c1701 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
-  ret.write<bool > ((bool)((QUrl *)cls)->operator < (arg1));
-}
-
-
 // QUrl &QUrl::operator =(const QUrl &copy)
 
 
@@ -434,25 +405,6 @@ static void _call_f_operator_eq__1701 (const qt_gsi::GenericMethod * /*decl*/, v
   tl::Heap heap;
   const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
   ret.write<QUrl & > ((QUrl &)((QUrl *)cls)->operator = (arg1));
-}
-
-
-// bool QUrl::operator ==(const QUrl &url)
-
-
-static void _init_f_operator_eq__eq__c1701 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("url");
-  decl->add_arg<const QUrl & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_eq__eq__c1701 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
-  ret.write<bool > ((bool)((QUrl *)cls)->operator == (arg1));
 }
 
 
@@ -1254,10 +1206,7 @@ static gsi::Methods methods_QUrl () {
   methods += new qt_gsi::GenericMethod ("isRelative?", "@brief Method bool QUrl::isRelative()\n", true, &_init_f_isRelative_c0, &_call_f_isRelative_c0);
   methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QUrl::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
   methods += new qt_gsi::GenericMethod ("matches", "@brief Method bool QUrl::matches(const QUrl &url, QUrlTwoFlags<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> options)\n", true, &_init_f_matches_c9164, &_call_f_matches_c9164);
-  methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QUrl::operator !=(const QUrl &url)\n", true, &_init_f_operator_excl__eq__c1701, &_call_f_operator_excl__eq__c1701);
-  methods += new qt_gsi::GenericMethod ("<", "@brief Method bool QUrl::operator <(const QUrl &url)\n", true, &_init_f_operator_lt__c1701, &_call_f_operator_lt__c1701);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QUrl &QUrl::operator =(const QUrl &copy)\n", false, &_init_f_operator_eq__1701, &_call_f_operator_eq__1701);
-  methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QUrl::operator ==(const QUrl &url)\n", true, &_init_f_operator_eq__eq__c1701, &_call_f_operator_eq__eq__c1701);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QUrl &QUrl::operator=(const QString &url)\n", false, &_init_f_operator_eq__2025, &_call_f_operator_eq__2025);
   methods += new qt_gsi::GenericMethod ("password", "@brief Method QString QUrl::password(QFlags<QUrl::ComponentFormattingOption>)\n", true, &_init_f_password_c4267, &_call_f_password_c4267);
   methods += new qt_gsi::GenericMethod ("path", "@brief Method QString QUrl::path(QFlags<QUrl::ComponentFormattingOption> options)\n", true, &_init_f_path_c4267, &_call_f_path_c4267);
@@ -1300,6 +1249,10 @@ static gsi::Methods methods_QUrl () {
 }
 
 gsi::Class<QUrl> decl_QUrl ("QtCore", "QUrl",
+  gsi::method_ext("==", &QUrl_operator_eq, gsi::arg ("other"), "@brief Method bool QUrl::operator==(const QUrl &) const") +
+  gsi::method_ext("!=", &QUrl_operator_ne, gsi::arg ("other"), "@brief Method bool QUrl::operator!=(const QUrl &) const") +
+  gsi::method_ext("<", &QUrl_operator_lt, gsi::arg ("other"), "@brief Method bool QUrl::operator<(const QUrl &) const") 
++
   methods_QUrl (),
   "@qt\n@brief Binding of QUrl");
 

@@ -1006,15 +1006,19 @@ public:
 
       db::Instance inst;
       if (m_reading) {
-        inst = mp_parent->sorted_inst_ptr (std::distance (mp_parent->begin_sorted_insts (), m_inst));
+        if (mp_parent) {
+          inst = mp_parent->sorted_inst_ptr (std::distance (mp_parent->begin_sorted_insts (), m_inst));
+        }
       } else {
         inst = m_i;
       }
 
-      if (m_instance_mode == ArrayInstances) {
-        v.push (tl::Variant (db::InstElement (inst)));
-      } else {
-        v.push (tl::Variant (db::InstElement (inst, m_array_iter)));
+      if (! inst.is_null ()) {
+        if (m_instance_mode == ArrayInstances) {
+          v.push (tl::Variant (db::InstElement (inst)));
+        } else {
+          v.push (tl::Variant (db::InstElement (inst, m_array_iter)));
+        }
       }
       return true;
 

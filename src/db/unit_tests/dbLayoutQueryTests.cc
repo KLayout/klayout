@@ -1578,3 +1578,20 @@ TEST(64)
     EXPECT_EQ (s, "(0.01,-0.02),(-0.01,0.02),(-0.01,0.02),(-0.01,0.02),(0.01,-0.02),(-0.01,0.02)");
   }
 }
+
+TEST(65)
+{
+  db::Layout g;
+  init_layout (g);
+
+  {
+    db::LayoutQuery q ("instances of cell .*.* where inst.trans.rot == 0");
+    db::LayoutQueryIterator iq (q, &g);
+    std::string s = q2s_var (iq, "data");
+    EXPECT_EQ (s, "nil,nil");
+    s = q2s_var (iq, "cell_name");
+    EXPECT_EQ (s, "c1,c5x");
+    s = q2s_var (iq, "inst_elements");
+    EXPECT_EQ (s, "(cell_index=0 r0 *1 10,-20),(cell_index=4 r0 *1 10,-20)");
+  }
+}

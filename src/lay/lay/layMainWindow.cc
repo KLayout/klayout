@@ -2365,7 +2365,7 @@ MainWindow::cm_save_all ()
         }
 
         view (view_index)->save_as (cv_index, fn, om, options, true, m_keep_backups);
-        add_mru (fn, current_view ()->cellview (cv_index)->tech_name ());
+        add_mru (fn, cv->tech_name ());
 
       }
 

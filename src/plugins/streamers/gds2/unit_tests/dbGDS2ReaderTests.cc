@@ -417,9 +417,8 @@ TEST(3_AdvancedMapping)
   }
 
   EXPECT_EQ (lm_read.to_string_file_format (),
-    "1/10 : 1/0\n"
+    "1/0,10 : 1/0\n"
     "2/0-1 : 2/0\n"
-    "1/0 : 1/0\n"
     "1/1 : 1/1\n"
     "1/20 : 1/1020\n"
     "1/21 : 1/1021\n"

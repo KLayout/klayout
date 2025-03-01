@@ -284,8 +284,17 @@ std::vector<db::cell_index_type> CellMapping::source_cells () const
   return s;
 }
 
+std::vector<db::cell_index_type> CellMapping::target_cells () const
+{
+  std::vector<db::cell_index_type> s;
+  s.reserve (m_b2a_mapping.size ());
+  for (iterator m = begin (); m != end (); ++m) {
+    s.push_back (m->second);
+  }
+  return s;
+}
 
-void 
+void
 CellMapping::create_single_mapping (const db::Layout & /*layout_a*/, db::cell_index_type cell_index_a, const db::Layout & /*layout_b*/, db::cell_index_type cell_index_b)
 {
   clear ();
@@ -374,7 +383,7 @@ CellMapping::do_create_missing_mapping (db::Layout &layout_a, const db::Layout &
     db::PropertyMapper pm (&layout_a, &layout_b);
 
     //  Note: this avoids frequent cell index table rebuilds if source and target layout are identical
-    layout_a.start_changes ();
+    db::LayoutLocker locker (&layout_a);
 
     //  Create instances for the new cells in layout A according to their instantiation in layout B 
     double mag = layout_b.dbu () / layout_a.dbu ();
@@ -404,9 +413,6 @@ CellMapping::do_create_missing_mapping (db::Layout &layout_a, const db::Layout &
       }
 
     }
-
-    //  Note: must be there because of start_changes
-    layout_a.end_changes ();
 
   }
 }

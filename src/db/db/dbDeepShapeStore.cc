@@ -1172,62 +1172,69 @@ DeepShapeStore::cell_mapping_to_original (unsigned int layout_index, db::Layout 
   DeliveryMappingCacheKey key (layout_index, tl::id_of (into_layout), into_cell);
 
   std::map<DeliveryMappingCacheKey, CellMappingWithGenerationIds>::iterator cm = m_delivery_mapping_cache.find (key);
-  if (cm == m_delivery_mapping_cache.end () || ! cm->second.is_valid (*into_layout, *source_layout)) {
+  if (cm != m_delivery_mapping_cache.end () && cm->second.is_valid (*into_layout, *source_layout)) {
+    return cm->second;
+  }
 
-    cm = m_delivery_mapping_cache.insert (std::make_pair (key, CellMappingWithGenerationIds ())).first;
-    cm->second.clear ();
+  cm = m_delivery_mapping_cache.insert (std::make_pair (key, CellMappingWithGenerationIds ())).first;
+  cm->second.clear ();
 
-    //  collects the cell mappings we skip because they are variants (variant building or box variants)
-    std::map<db::cell_index_type, db::HierarchyBuilder::CellMapKey> cm_skipped_variants;
+  //  Not found in cache - compute a fresh mapping
 
-    if (into_layout == original_builder.source ().layout () && &into_layout->cell (into_cell) == original_builder.source ().top_cell () && original_builder.source ().global_trans ().is_unity ()) {
+  //  collects the cell mappings we skip because they are variants (variant building or box variants)
+  std::map<db::cell_index_type, db::HierarchyBuilder::CellMapKey> cm_skipped_variants;
 
-      //  This is the case of mapping back to the original. In this case we can use the information
-      //  provided inside the original hierarchy builders. They list the source cells and the target cells
-      //  create from them. We need to consider however, that the hierarchy builder is allowed to create
-      //  variants which we cannot map.
+  if (into_layout == original_builder.source ().layout () && &into_layout->cell (into_cell) == original_builder.source ().top_cell () && original_builder.source ().global_trans ().is_unity ()) {
 
-      for (HierarchyBuilder::cell_map_type::const_iterator m = original_builder.begin_cell_map (); m != original_builder.end_cell_map (); ) {
+    //  This is the case of mapping back to the original. In this case we can use the information
+    //  provided inside the original hierarchy builders. They list the source cells and the target cells
+    //  create from them. We need to consider however, that the hierarchy builder is allowed to create
+    //  variants which we cannot map.
 
-        HierarchyBuilder::cell_map_type::const_iterator mm = m;
+    for (HierarchyBuilder::cell_map_type::const_iterator m = original_builder.begin_cell_map (); m != original_builder.end_cell_map (); ) {
+
+      HierarchyBuilder::cell_map_type::const_iterator mm = m;
+      ++mm;
+      bool skip = original_builder.is_variant (m->second);   //  skip variant cells
+      while (mm != original_builder.end_cell_map () && mm->first.original_cell == m->first.original_cell) {
+        //  we have cell (box) variants and cannot simply map
         ++mm;
-        bool skip = original_builder.is_variant (m->second);   //  skip variant cells
-        while (mm != original_builder.end_cell_map () && mm->first.original_cell == m->first.original_cell) {
-          //  we have cell (box) variants and cannot simply map
-          ++mm;
-          skip = true;
-        }
-
-        if (! skip) {
-          cm->second.map (m->second, m->first.original_cell);
-        } else {
-          for (HierarchyBuilder::cell_map_type::const_iterator n = m; n != mm; ++n) {
-            tl_assert (cm_skipped_variants.find (n->second) == cm_skipped_variants.end ());
-            cm_skipped_variants [n->second] = n->first;
-          }
-        }
-
-        m = mm;
-
+        skip = true;
       }
 
-    } else if (into_layout->cells () == 1) {
+      if (! skip) {
+        cm->second.map (m->second, m->first.original_cell);
+      } else {
+        for (HierarchyBuilder::cell_map_type::const_iterator n = m; n != mm; ++n) {
+          tl_assert (cm_skipped_variants.find (n->second) == cm_skipped_variants.end ());
+          cm_skipped_variants [n->second] = n->first;
+        }
+      }
 
-      //  Another simple case is mapping into an empty (or single-top-cell-only) layout, where we can use "create_from_single_full".
-      cm->second.create_single_mapping (*into_layout, into_cell, *source_layout, source_top);
-
-    } else {
-
-      cm->second.create_from_geometry (*into_layout, into_cell, *source_layout, source_top);
+      m = mm;
 
     }
 
-    //  Add new cells for the variants and (possible) devices which are cells added during the device
-    //  extraction process
-    std::vector<std::pair<db::cell_index_type, db::cell_index_type> > new_pairs = cm->second.create_missing_mapping2 (*into_layout, *source_layout, source_top, excluded_cells, included_cells);
+  } else if (into_layout->cells () == 1) {
+
+    //  Another simple case is mapping into an empty (or single-top-cell-only) layout, where we can use "create_from_single_full".
+    cm->second.create_single_mapping (*into_layout, into_cell, *source_layout, source_top);
+
+  } else {
+
+    cm->second.create_from_geometry (*into_layout, into_cell, *source_layout, source_top);
+
+  }
+
+  //  Add new cells for the variants and (possible) devices which are cells added during the device
+  //  extraction process
+  std::vector<std::pair<db::cell_index_type, db::cell_index_type> > new_pairs = cm->second.create_missing_mapping2 (*into_layout, *source_layout, source_top, excluded_cells, included_cells);
+
+  if (! new_pairs.empty ()) {
 
     //  the variant's originals we are going to delete
     std::set<db::cell_index_type> cells_to_delete;
+    std::vector<std::pair <db::cell_index_type, db::cell_index_type> > new_variants;
 
     //  We now need to fix the cell map from the hierarchy builder, so we can import back from the modified layout.
     //  This is in particular important if we created new cells for known variants.
@@ -1240,6 +1247,7 @@ DeepShapeStore::cell_mapping_to_original (unsigned int layout_index, db::Layout 
 
         //  create the variant clone in the original layout too and delete this cell
         VariantsCollectorBase::copy_shapes (*into_layout, np->second, icm->second.original_cell);
+        new_variants.push_back (std::make_pair (np->second, icm->second.original_cell));
         cells_to_delete.insert (icm->second.original_cell);
 
         //  forget the original cell (now separated into variants) and map the variants back into the
@@ -1259,15 +1267,43 @@ DeepShapeStore::cell_mapping_to_original (unsigned int layout_index, db::Layout 
 
     }
 
-    //  delete the variant's original cell
+    if (! new_variants.empty ()) {
+
+      //  copy cell instances for the new variants
+
+      //  collect the cells that are handled during cell mapping -
+      //  we do not need to take care of them when creating variants,
+      //  but there may be others inside "into_layout" which are
+      //  not present in the DSS and for which we need to copy the
+      //  instances.
+      std::vector<db::cell_index_type> mapped = cm->second.target_cells ();
+      std::sort (mapped.begin (), mapped.end ());
+
+      //  Copy the variant instances - but only those for cells which are not going to be
+      //  deleted and those not handled by the cell mapping object.
+      for (auto vv = new_variants.begin (); vv != new_variants.end (); ++vv) {
+        const db::Cell &from = into_layout->cell (vv->second);
+        db::Cell &to = into_layout->cell (vv->first);
+        for (db::Cell::const_iterator i = from.begin (); ! i.at_end (); ++i) {
+          if (cells_to_delete.find (i->cell_index ()) == cells_to_delete.end ()) {
+            auto m = std::lower_bound (mapped.begin (), mapped.end (), i->cell_index ());
+            if (m == mapped.end () || *m != i->cell_index ()) {
+              to.insert (*i);
+            }
+          }
+        }
+      }
+
+    }
+
     if (! cells_to_delete.empty ()) {
+      //  delete the variant original cells
       into_layout->delete_cells (cells_to_delete);
     }
 
-    cm->second.set_generation_ids (*into_layout, *source_layout);
-
   }
 
+  cm->second.set_generation_ids (*into_layout, *source_layout);
   return cm->second;
 }
 

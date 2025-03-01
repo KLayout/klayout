@@ -24,6 +24,8 @@
 #include "dbDeepShapeStore.h"
 #include "dbRegion.h"
 #include "dbDeepRegion.h"
+#include "dbReader.h"
+#include "dbTestSupport.h"
 #include "tlUnitTest.h"
 #include "tlStream.h"
 
@@ -266,3 +268,36 @@ TEST(5_State)
   EXPECT_EQ (store.breakout_cells (0)->find (5) != store.breakout_cells (0)->end (), true);
   EXPECT_EQ (store.breakout_cells (0)->find (3) != store.breakout_cells (0)->end (), true);
 }
+
+TEST(6_RestoreWithCellSelection)
+{
+  db::Layout ly;
+
+  {
+    std::string fn (tl::testdata ());
+    fn += "/algo/dss_bug.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+
+  db::Cell &top_cell = ly.cell (*ly.begin_top_down ());
+
+  db::RecursiveShapeIterator in_it (ly, top_cell, l1);
+
+  std::set<db::cell_index_type> us;
+  us.insert (ly.cell_by_name ("X").second);
+  in_it.unselect_cells (us);
+
+  db::DeepShapeStore dss;
+
+  db::Region in_region (in_it, dss);
+  ly.clear_layer (l1);
+
+  in_region.insert_into (&ly, top_cell.cell_index (), l1);
+
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/dss_bug_au.gds");
+}
+

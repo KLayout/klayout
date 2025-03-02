@@ -142,6 +142,7 @@ void get_inst_options (std::vector < std::pair<std::string, std::string> > &opti
   options.push_back (std::pair<std::string, std::string> (cfg_edit_inst_column_y, "0.0"));
   options.push_back (std::pair<std::string, std::string> (cfg_edit_inst_place_origin, "false"));
   options.push_back (std::pair<std::string, std::string> (cfg_edit_pcell_show_parameter_names, "false"));
+  options.push_back (std::pair<std::string, std::string> (cfg_edit_pcell_lazy_eval_mode, "-1"));
   options.push_back (std::pair<std::string, std::string> (cfg_edit_max_shapes_of_instances, "1000"));
   options.push_back (std::pair<std::string, std::string> (cfg_edit_show_shapes_of_instances, "true"));
 }

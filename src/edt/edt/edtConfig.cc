@@ -62,6 +62,7 @@ std::string cfg_edit_hier_copy_mode ("edit-hier-copy-mode");
 std::string cfg_edit_show_shapes_of_instances ("edit-show-shapes-of-instances");
 std::string cfg_edit_max_shapes_of_instances ("edit-max-shapes-of-instances");
 std::string cfg_edit_pcell_show_parameter_names ("edit-pcell-show-parameter-names");
+std::string cfg_edit_pcell_lazy_eval_mode ("edit-pcell-lazy-eval-mode");
 std::string cfg_edit_global_grid ("grid-micron");
 std::string cfg_edit_combine_mode ("combine-mode");
 

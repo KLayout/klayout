@@ -469,9 +469,9 @@ static db::EdgePairs with_length1 (const db::EdgePairs *r, db::EdgePairs::distan
   return r->filtered (ef);
 }
 
-static std::vector<db::EdgePairs> split_with_length1 (const db::EdgePairs *r, db::EdgePairs::distance_type length)
+static std::vector<db::EdgePairs> split_with_length1 (const db::EdgePairs *r, db::EdgePairs::distance_type length, bool inverse)
 {
-  db::EdgeLengthFilter f (length, length + 1, false);
+  db::EdgeLengthFilter f (length, length + 1, inverse);
   db::EdgeFilterBasedEdgePairFilter ef (&f, true /*one must match*/);
   return as_2edge_pairs_vector (r->split_filter (ef));
 }
@@ -483,9 +483,9 @@ static db::EdgePairs with_length2 (const db::EdgePairs *r, const tl::Variant &mi
   return r->filtered (ef);
 }
 
-static std::vector<db::EdgePairs> split_with_length2 (const db::EdgePairs *r, const tl::Variant &min, const tl::Variant &max)
+static std::vector<db::EdgePairs> split_with_length2 (const db::EdgePairs *r, const tl::Variant &min, const tl::Variant &max, bool inverse)
 {
-  db::EdgeLengthFilter f (min.is_nil () ? db::Edges::distance_type (0) : min.to<db::Edges::distance_type> (), max.is_nil () ? std::numeric_limits <db::Edges::distance_type>::max () : max.to<db::Edges::distance_type> (), false);
+  db::EdgeLengthFilter f (min.is_nil () ? db::Edges::distance_type (0) : min.to<db::Edges::distance_type> (), max.is_nil () ? std::numeric_limits <db::Edges::distance_type>::max () : max.to<db::Edges::distance_type> (), inverse);
   db::EdgeFilterBasedEdgePairFilter ef (&f, true /*one must match*/);
   return as_2edge_pairs_vector (r->split_filter (ef));
 }
@@ -497,9 +497,9 @@ static db::EdgePairs with_length_both1 (const db::EdgePairs *r, db::EdgePairs::d
   return r->filtered (ef);
 }
 
-static std::vector<db::EdgePairs> split_with_length_both1 (const db::EdgePairs *r, db::EdgePairs::distance_type length)
+static std::vector<db::EdgePairs> split_with_length_both1 (const db::EdgePairs *r, db::EdgePairs::distance_type length, bool inverse)
 {
-  db::EdgeLengthFilter f (length, length + 1, false);
+  db::EdgeLengthFilter f (length, length + 1, inverse);
   db::EdgeFilterBasedEdgePairFilter ef (&f, false /*both must match*/);
   return as_2edge_pairs_vector (r->split_filter (ef));
 }
@@ -511,9 +511,9 @@ static db::EdgePairs with_length_both2 (const db::EdgePairs *r, const tl::Varian
   return r->filtered (ef);
 }
 
-static std::vector<db::EdgePairs> split_with_length_both2 (const db::EdgePairs *r, const tl::Variant &min, const tl::Variant &max)
+static std::vector<db::EdgePairs> split_with_length_both2 (const db::EdgePairs *r, const tl::Variant &min, const tl::Variant &max, bool inverse)
 {
-  db::EdgeLengthFilter f (min.is_nil () ? db::Edges::distance_type (0) : min.to<db::Edges::distance_type> (), max.is_nil () ? std::numeric_limits <db::Edges::distance_type>::max () : max.to<db::Edges::distance_type> (), false);
+  db::EdgeLengthFilter f (min.is_nil () ? db::Edges::distance_type (0) : min.to<db::Edges::distance_type> (), max.is_nil () ? std::numeric_limits <db::Edges::distance_type>::max () : max.to<db::Edges::distance_type> (), inverse);
   db::EdgeFilterBasedEdgePairFilter ef (&f, false /*both must match*/);
   return as_2edge_pairs_vector (r->split_filter (ef));
 }
@@ -525,9 +525,9 @@ static db::EdgePairs with_angle1 (const db::EdgePairs *r, double a, bool inverse
   return r->filtered (ef);
 }
 
-static std::vector<db::EdgePairs> split_with_angle1 (const db::EdgePairs *r, double a)
+static std::vector<db::EdgePairs> split_with_angle1 (const db::EdgePairs *r, double a, bool inverse)
 {
-  db::EdgeOrientationFilter f (a, false, false);
+  db::EdgeOrientationFilter f (a, inverse, false);
   db::EdgeFilterBasedEdgePairFilter ef (&f, true /*one must match*/);
   return as_2edge_pairs_vector (r->split_filter (ef));
 }
@@ -539,9 +539,9 @@ static db::EdgePairs with_angle2 (const db::EdgePairs *r, double amin, double am
   return r->filtered (ef);
 }
 
-static std::vector<db::EdgePairs> split_with_angle2 (const db::EdgePairs *r, double amin, double amax, bool include_amin, bool include_amax)
+static std::vector<db::EdgePairs> split_with_angle2 (const db::EdgePairs *r, double amin, double amax, bool inverse, bool include_amin, bool include_amax)
 {
-  db::EdgeOrientationFilter f (amin, include_amin, amax, include_amax, false, false);
+  db::EdgeOrientationFilter f (amin, include_amin, amax, include_amax, inverse, false);
   db::EdgeFilterBasedEdgePairFilter ef (&f, true /*one must match*/);
   return as_2edge_pairs_vector (r->split_filter (ef));
 }
@@ -553,9 +553,9 @@ static db::EdgePairs with_abs_angle1 (const db::EdgePairs *r, double a, bool inv
   return r->filtered (ef);
 }
 
-static std::vector<db::EdgePairs> split_with_abs_angle1 (const db::EdgePairs *r, double a)
+static std::vector<db::EdgePairs> split_with_abs_angle1 (const db::EdgePairs *r, double a, bool inverse)
 {
-  db::EdgeOrientationFilter f (a, false, true);
+  db::EdgeOrientationFilter f (a, inverse, true);
   db::EdgeFilterBasedEdgePairFilter ef (&f, true /*one must match*/);
   return as_2edge_pairs_vector (r->split_filter (ef));
 }
@@ -567,9 +567,9 @@ static db::EdgePairs with_abs_angle2 (const db::EdgePairs *r, double amin, doubl
   return r->filtered (ef);
 }
 
-static std::vector<db::EdgePairs> split_with_abs_angle2 (const db::EdgePairs *r, double amin, double amax, bool include_amin, bool include_amax)
+static std::vector<db::EdgePairs> split_with_abs_angle2 (const db::EdgePairs *r, double amin, double amax, bool inverse, bool include_amin, bool include_amax)
 {
-  db::EdgeOrientationFilter f (amin, include_amin, amax, include_amax, false, true);
+  db::EdgeOrientationFilter f (amin, include_amin, amax, include_amax, inverse, true);
   db::EdgeFilterBasedEdgePairFilter ef (&f, true /*one must match*/);
   return as_2edge_pairs_vector (r->split_filter (ef));
 }
@@ -581,9 +581,9 @@ static db::EdgePairs with_angle3 (const db::EdgePairs *r, db::SpecialEdgeOrienta
   return r->filtered (ef);
 }
 
-static std::vector<db::EdgePairs> split_with_angle3 (const db::EdgePairs *r, db::SpecialEdgeOrientationFilter::FilterType type)
+static std::vector<db::EdgePairs> split_with_angle3 (const db::EdgePairs *r, db::SpecialEdgeOrientationFilter::FilterType type, bool inverse)
 {
-  db::SpecialEdgeOrientationFilter f (type, false);
+  db::SpecialEdgeOrientationFilter f (type, inverse);
   db::EdgeFilterBasedEdgePairFilter ef (&f, true /*one must match*/);
   return as_2edge_pairs_vector (r->split_filter (ef));
 }
@@ -595,9 +595,9 @@ static db::EdgePairs with_angle_both1 (const db::EdgePairs *r, double a, bool in
   return r->filtered (ef);
 }
 
-static std::vector<db::EdgePairs> split_with_angle_both1 (const db::EdgePairs *r, double a)
+static std::vector<db::EdgePairs> split_with_angle_both1 (const db::EdgePairs *r, double a, bool inverse)
 {
-  db::EdgeOrientationFilter f (a, false, false);
+  db::EdgeOrientationFilter f (a, inverse, false);
   db::EdgeFilterBasedEdgePairFilter ef (&f, false /*both must match*/);
   return as_2edge_pairs_vector (r->split_filter (ef));
 }
@@ -609,9 +609,9 @@ static db::EdgePairs with_angle_both2 (const db::EdgePairs *r, double amin, doub
   return r->filtered (ef);
 }
 
-static std::vector<db::EdgePairs> split_with_angle_both2 (const db::EdgePairs *r, double amin, double amax, bool include_amin, bool include_amax)
+static std::vector<db::EdgePairs> split_with_angle_both2 (const db::EdgePairs *r, double amin, double amax, bool inverse, bool include_amin, bool include_amax)
 {
-  db::EdgeOrientationFilter f (amin, include_amin, amax, include_amax, false, false);
+  db::EdgeOrientationFilter f (amin, include_amin, amax, include_amax, inverse, false);
   db::EdgeFilterBasedEdgePairFilter ef (&f, false /*both must match*/);
   return as_2edge_pairs_vector (r->split_filter (ef));
 }
@@ -623,9 +623,9 @@ static db::EdgePairs with_abs_angle_both1 (const db::EdgePairs *r, double a, boo
   return r->filtered (ef);
 }
 
-static std::vector<db::EdgePairs> split_with_abs_angle_both1 (const db::EdgePairs *r, double a)
+static std::vector<db::EdgePairs> split_with_abs_angle_both1 (const db::EdgePairs *r, double a, bool inverse)
 {
-  db::EdgeOrientationFilter f (a, false, true);
+  db::EdgeOrientationFilter f (a, inverse, true);
   db::EdgeFilterBasedEdgePairFilter ef (&f, false /*both must match*/);
   return as_2edge_pairs_vector (r->split_filter (ef));
 }
@@ -637,9 +637,9 @@ static db::EdgePairs with_abs_angle_both2 (const db::EdgePairs *r, double amin, 
   return r->filtered (ef);
 }
 
-static std::vector<db::EdgePairs> split_with_abs_angle_both2 (const db::EdgePairs *r, double amin, double amax, bool include_amin, bool include_amax)
+static std::vector<db::EdgePairs> split_with_abs_angle_both2 (const db::EdgePairs *r, double amin, double amax, bool inverse, bool include_amin, bool include_amax)
 {
-  db::EdgeOrientationFilter f (amin, include_amin, amax, include_amax, false, true);
+  db::EdgeOrientationFilter f (amin, include_amin, amax, include_amax, inverse, true);
   db::EdgeFilterBasedEdgePairFilter ef (&f, false /*both must match*/);
   return as_2edge_pairs_vector (r->split_filter (ef));
 }
@@ -651,9 +651,9 @@ static db::EdgePairs with_angle_both3 (const db::EdgePairs *r, db::SpecialEdgeOr
   return r->filtered (ef);
 }
 
-static std::vector<db::EdgePairs> split_with_angle_both3 (const db::EdgePairs *r, db::SpecialEdgeOrientationFilter::FilterType type)
+static std::vector<db::EdgePairs> split_with_angle_both3 (const db::EdgePairs *r, db::SpecialEdgeOrientationFilter::FilterType type, bool inverse)
 {
-  db::SpecialEdgeOrientationFilter f (type, false);
+  db::SpecialEdgeOrientationFilter f (type, inverse);
   db::EdgeFilterBasedEdgePairFilter ef (&f, false /*both must match*/);
   return as_2edge_pairs_vector (r->split_filter (ef));
 }
@@ -1104,15 +1104,17 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "\n"
     "This method has been added in version 0.27.1.\n"
   ) +
-  method_ext ("split_with_length", split_with_length1, gsi::arg ("length"),
+  method_ext ("split_with_length", split_with_length1, gsi::arg ("length"), gsi::arg ("inverse"),
     "@brief Like \\with_length, but returning two edge pair collections\n"
     "The first edge pair collection will contain all matching shapes, the other the non-matching ones.\n"
+    "Note that 'inverse' controls the way each edge is checked, not overall.\n"
     "\n"
     "This method has been introduced in version 0.29.12.\n"
   ) +
-  method_ext ("split_with_length", split_with_length2, gsi::arg ("min_length"), gsi::arg ("max_length"),
+  method_ext ("split_with_length", split_with_length2, gsi::arg ("min_length"), gsi::arg ("max_length"), gsi::arg ("inverse"),
     "@brief Like \\with_length, but returning two edge pair collections\n"
     "The first edge pair collection will contain all matching shapes, the other the non-matching ones.\n"
+    "Note that 'inverse' controls the way each edge is checked, not overall.\n"
     "\n"
     "This method has been introduced in version 0.29.12.\n"
   ) +
@@ -1134,15 +1136,17 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "\n"
     "This method has been added in version 0.27.1.\n"
   ) +
-  method_ext ("split_with_length_both", split_with_length_both1, gsi::arg ("length"),
+  method_ext ("split_with_length_both", split_with_length_both1, gsi::arg ("length"), gsi::arg ("inverse"),
     "@brief Like \\with_length_both, but returning two edge pair collections\n"
     "The first edge pair collection will contain all matching shapes, the other the non-matching ones.\n"
+    "Note that 'inverse' controls the way each edge is checked, not overall.\n"
     "\n"
     "This method has been introduced in version 0.29.12.\n"
   ) +
-  method_ext ("split_with_length_both", split_with_length_both2, gsi::arg ("min_length"), gsi::arg ("max_length"),
+  method_ext ("split_with_length_both", split_with_length_both2, gsi::arg ("min_length"), gsi::arg ("max_length"), gsi::arg ("inverse"),
     "@brief Like \\with_length_both, but returning two edge pair collections\n"
     "The first edge pair collection will contain all matching shapes, the other the non-matching ones.\n"
+    "Note that 'inverse' controls the way each edge is checked, not overall.\n"
     "\n"
     "This method has been introduced in version 0.29.12.\n"
   ) +
@@ -1238,21 +1242,24 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "\n"
     "This method has been added in version 0.28.\n"
   ) +
-  method_ext ("split_with_angle", split_with_angle1, gsi::arg ("angle"),
+  method_ext ("split_with_angle", split_with_angle1, gsi::arg ("angle"), gsi::arg ("inverse"),
     "@brief Like \\with_angle, but returning two edge pair collections\n"
     "The first edge pair collection will contain all matching shapes, the other the non-matching ones.\n"
+    "Note that 'inverse' controls the way each edge is checked, not overall.\n"
     "\n"
     "This method has been introduced in version 0.29.12.\n"
   ) +
-  method_ext ("split_with_angle", split_with_angle2, gsi::arg ("min_angle"), gsi::arg ("max_angle"), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", false),
+  method_ext ("split_with_angle", split_with_angle2, gsi::arg ("min_angle"), gsi::arg ("max_angle"), gsi::arg ("inverse"), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", false),
     "@brief Like \\with_angle, but returning two edge pair collections\n"
     "The first edge pair collection will contain all matching shapes, the other the non-matching ones.\n"
+    "Note that 'inverse' controls the way each edge is checked, not overall.\n"
     "\n"
     "This method has been introduced in version 0.29.12.\n"
   ) +
-  method_ext ("split_with_angle", split_with_angle3, gsi::arg ("type"),
+  method_ext ("split_with_angle", split_with_angle3, gsi::arg ("type"), gsi::arg ("inverse"),
     "@brief Like \\with_angle, but returning two edge pair collections\n"
     "The first edge pair collection will contain all matching shapes, the other the non-matching ones.\n"
+    "Note that 'inverse' controls the way each edge is checked, not overall.\n"
     "\n"
     "This method has been introduced in version 0.29.12.\n"
   ) +
@@ -1272,15 +1279,17 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "\n"
     "This method has been added in version 0.29.1.\n"
   ) +
-  method_ext ("split_with_abs_angle", split_with_abs_angle1, gsi::arg ("angle"),
+  method_ext ("split_with_abs_angle", split_with_abs_angle1, gsi::arg ("angle"), gsi::arg ("inverse"),
     "@brief Like \\with_abs_angle, but returning two edge pair collections\n"
     "The first edge pair collection will contain all matching shapes, the other the non-matching ones.\n"
+    "Note that 'inverse' controls the way each edge is checked, not overall.\n"
     "\n"
     "This method has been introduced in version 0.29.12.\n"
   ) +
-  method_ext ("split_with_abs_angle", split_with_abs_angle2, gsi::arg ("min_angle"), gsi::arg ("max_angle"), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", false),
+  method_ext ("split_with_abs_angle", split_with_abs_angle2, gsi::arg ("min_angle"), gsi::arg ("max_angle"), gsi::arg ("inverse"), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", false),
     "@brief Like \\with_abs_angle, but returning two edge pair collections\n"
     "The first edge pair collection will contain all matching shapes, the other the non-matching ones.\n"
+    "Note that 'inverse' controls the way each edge is checked, not overall.\n"
     "\n"
     "This method has been introduced in version 0.29.12.\n"
   ) +
@@ -1344,21 +1353,24 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "\n"
     "This method has been added in version 0.28.\n"
   ) +
-  method_ext ("split_with_angle_both", split_with_angle_both1, gsi::arg ("angle"),
+  method_ext ("split_with_angle_both", split_with_angle_both1, gsi::arg ("angle"), gsi::arg ("inverse"),
     "@brief Like \\with_angle_both, but returning two edge pair collections\n"
     "The first edge pair collection will contain all matching shapes, the other the non-matching ones.\n"
+    "Note that 'inverse' controls the way each edge is checked, not overall.\n"
     "\n"
     "This method has been introduced in version 0.29.12.\n"
   ) +
-  method_ext ("split_with_angle_both", split_with_angle_both2, gsi::arg ("min_angle"), gsi::arg ("max_angle"), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", false),
+  method_ext ("split_with_angle_both", split_with_angle_both2, gsi::arg ("min_angle"), gsi::arg ("max_angle"), gsi::arg ("inverse"), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", false),
     "@brief Like \\with_angle_both, but returning two edge pair collections\n"
     "The first edge pair collection will contain all matching shapes, the other the non-matching ones.\n"
+    "Note that 'inverse' controls the way each edge is checked, not overall.\n"
     "\n"
     "This method has been introduced in version 0.29.12.\n"
   ) +
-  method_ext ("split_with_angle_both", split_with_angle_both3, gsi::arg ("type"),
+  method_ext ("split_with_angle_both", split_with_angle_both3, gsi::arg ("type"), gsi::arg ("inverse"),
     "@brief Like \\with_angle_both, but returning two edge pair collections\n"
     "The first edge pair collection will contain all matching shapes, the other the non-matching ones.\n"
+    "Note that 'inverse' controls the way each edge is checked, not overall.\n"
     "\n"
     "This method has been introduced in version 0.29.12.\n"
   ) +
@@ -1377,15 +1389,17 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "\n"
     "This method has been added in version 0.29.1.\n"
   ) +
-  method_ext ("split_with_abs_angle_both", split_with_abs_angle_both1, gsi::arg ("angle"),
+  method_ext ("split_with_abs_angle_both", split_with_abs_angle_both1, gsi::arg ("angle"), gsi::arg ("inverse"),
     "@brief Like \\with_abs_angle_both, but returning two edge pair collections\n"
     "The first edge pair collection will contain all matching shapes, the other the non-matching ones.\n"
+    "Note that 'inverse' controls the way each edge is checked, not overall.\n"
     "\n"
     "This method has been introduced in version 0.29.12.\n"
   ) +
-  method_ext ("split_with_abs_angle_both", split_with_abs_angle_both2, gsi::arg ("min_angle"), gsi::arg ("max_angle"), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", false),
+  method_ext ("split_with_abs_angle_both", split_with_abs_angle_both2, gsi::arg ("min_angle"), gsi::arg ("max_angle"), gsi::arg ("inverse"), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", false),
     "@brief Like \\with_abs_angle_both, but returning two edge pair collections\n"
     "The first edge pair collection will contain all matching shapes, the other the non-matching ones.\n"
+    "Note that 'inverse' controls the way each edge is checked, not overall.\n"
     "\n"
     "This method has been introduced in version 0.29.12.\n"
   ) +

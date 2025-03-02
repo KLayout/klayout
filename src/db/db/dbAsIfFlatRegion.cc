@@ -424,7 +424,7 @@ AsIfFlatRegion::filtered_pair (const PolygonFilterBase &filter) const
     if (filter.selected (*p)) {
       new_region_true->insert (*p);
     } else {
-      new_region_true->insert (*p);
+      new_region_false->insert (*p);
     }
   }
 

@@ -187,6 +187,15 @@ Class<shape_processor_impl<db::TextToPolygonProcessorBase> > decl_TextToPolygonP
 // ---------------------------------------------------------------------------------
 //  Texts binding
 
+static inline std::vector<db::Texts> as_2texts_vector (const std::pair<db::Texts, db::Texts> &rp)
+{
+  std::vector<db::Texts> res;
+  res.reserve (2);
+  res.push_back (db::Texts (const_cast<db::Texts &> (rp.first).take_delegate ()));
+  res.push_back (db::Texts (const_cast<db::Texts &> (rp.second).take_delegate ()));
+  return res;
+}
+
 static db::Texts *new_v ()
 {
   return new db::Texts ();
@@ -316,6 +325,11 @@ static void filter (db::Texts *r, const TextFilterImpl *f)
   r->filter (*f);
 }
 
+static std::vector<db::Texts> split_filter (const db::Texts *r, const TextFilterImpl *f)
+{
+  return as_2texts_vector (r->split_filter (*f));
+}
+
 static db::Texts processed_tt (const db::Texts *r, const shape_processor_impl<db::TextProcessorBase> *f)
 {
   return r->processed (*f);
@@ -339,10 +353,22 @@ static db::Texts with_text (const db::Texts *r, const std::string &text, bool in
   return r->filtered (f);
 }
 
+static std::vector<db::Texts> split_with_text (const db::Texts *r, const std::string &text)
+{
+  db::TextStringFilter f (text, false);
+  return as_2texts_vector (r->split_filter (f));
+}
+
 static db::Texts with_match (const db::Texts *r, const std::string &pattern, bool inverse)
 {
   db::TextPatternFilter f (pattern, inverse);
   return r->filtered (f);
+}
+
+static std::vector<db::Texts> split_with_match (const db::Texts *r, const std::string &pattern)
+{
+  db::TextPatternFilter f (pattern, false);
+  return as_2texts_vector (r->split_filter (f));
 }
 
 static db::Region pull_interacting (const db::Texts *r, const db::Region &other)
@@ -600,6 +626,12 @@ Class<db::Texts> decl_Texts (decl_dbShapeCollection, "db", "Texts",
     "\n"
     "This method has been introduced in version 0.29.\n"
   ) +
+  method_ext ("split_filter", &split_filter, gsi::arg ("filter"),
+    "@brief Applies a generic filter and returns a copy with all matching shapes and one with the non-matching ones\n"
+    "See \\TextFilter for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
   method_ext ("process", &process_tt, gsi::arg ("process"),
     "@brief Applies a generic text processor in place (replacing the texts from the text collection)\n"
     "See \\TextProcessor for a description of this feature.\n"
@@ -623,11 +655,23 @@ Class<db::Texts> decl_Texts (decl_dbShapeCollection, "db", "Texts",
     "If \"inverse\" is false, this method returns the texts with the given string.\n"
     "If \"inverse\" is true, this method returns the texts not having the given string.\n"
   ) +
+  method_ext ("split_with_text", split_with_text, gsi::arg ("text"),
+    "@brief Like \\with_text, but returning two text collections\n"
+    "The first text collection will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
   method_ext ("with_match", with_match, gsi::arg ("pattern"), gsi::arg ("inverse"),
     "@brief Filter the text by glob pattern\n"
     "\"pattern\" is a glob-style pattern (e.g. \"A*\" will select all texts starting with a capital \"A\").\n"
     "If \"inverse\" is false, this method returns the texts matching the pattern.\n"
     "If \"inverse\" is true, this method returns the texts not matching the pattern.\n"
+  ) +
+  method_ext ("split_with_match", split_with_match, gsi::arg ("pattern"),
+    "@brief Like \\with_match, but returning two text collections\n"
+    "The first text collection will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
   ) +
   method ("interacting|&", (db::Texts (db::Texts::*) (const db::Region &) const)  &db::Texts::selected_interacting, gsi::arg ("other"),
     "@brief Returns the texts from this text collection which are inside or on the edge of polygons from the given region\n"

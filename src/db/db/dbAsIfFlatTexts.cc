@@ -164,6 +164,23 @@ AsIfFlatTexts::filtered (const TextFilterBase &filter) const
   return new_texts.release ();
 }
 
+std::pair<TextsDelegate *, TextsDelegate *>
+AsIfFlatTexts::filtered_pair (const TextFilterBase &filter) const
+{
+  std::unique_ptr<FlatTexts> new_texts_true (new FlatTexts ());
+  std::unique_ptr<FlatTexts> new_texts_false (new FlatTexts ());
+
+  for (TextsIterator p (begin ()); ! p.at_end (); ++p) {
+    if (filter.selected (*p)) {
+      new_texts_true->insert (*p);
+    } else {
+      new_texts_false->insert (*p);
+    }
+  }
+
+  return std::make_pair (new_texts_true.release (), new_texts_false.release ());
+}
+
 TextsDelegate *
 AsIfFlatTexts::processed (const TextProcessorBase &filter) const
 {

@@ -399,6 +399,11 @@ static db::Edges filtered (const db::Edges *r, const EdgeFilterImpl *f)
   return r->filtered (*f);
 }
 
+static std::vector<db::Edges> split_filter (const db::Edges *r, const EdgeFilterImpl *f)
+{
+  return as_2edges_vector (r->split_filter (*f));
+}
+
 static void filter (db::Edges *r, const EdgeFilterImpl *f)
 {
   r->filter (*f);
@@ -432,10 +437,22 @@ static db::Edges with_length1 (const db::Edges *r, db::Edges::distance_type leng
   return r->filtered (f);
 }
 
+static std::vector<db::Edges> split_with_length1 (const db::Edges *r, db::Edges::distance_type length)
+{
+  db::EdgeLengthFilter f (length, length + 1, false);
+  return as_2edges_vector (r->split_filter (f));
+}
+
 static db::Edges with_length2 (const db::Edges *r, const tl::Variant &min, const tl::Variant &max, bool inverse)
 {
   db::EdgeLengthFilter f (min.is_nil () ? db::Edges::distance_type (0) : min.to<db::Edges::distance_type> (), max.is_nil () ? std::numeric_limits <db::Edges::distance_type>::max () : max.to<db::Edges::distance_type> (), inverse);
   return r->filtered (f);
+}
+
+static std::vector<db::Edges> split_with_length2 (const db::Edges *r, const tl::Variant &min, const tl::Variant &max)
+{
+  db::EdgeLengthFilter f (min.is_nil () ? db::Edges::distance_type (0) : min.to<db::Edges::distance_type> (), max.is_nil () ? std::numeric_limits <db::Edges::distance_type>::max () : max.to<db::Edges::distance_type> (), false);
+  return as_2edges_vector (r->split_filter (f));
 }
 
 static db::Edges with_angle1 (const db::Edges *r, double a, bool inverse)
@@ -444,10 +461,22 @@ static db::Edges with_angle1 (const db::Edges *r, double a, bool inverse)
   return r->filtered (f);
 }
 
+static std::vector<db::Edges> split_with_angle1 (const db::Edges *r, double a)
+{
+  db::EdgeOrientationFilter f (a, false, false);
+  return as_2edges_vector (r->split_filter (f));
+}
+
 static db::Edges with_angle2 (const db::Edges *r, double amin, double amax, bool inverse, bool include_amin, bool include_amax)
 {
   db::EdgeOrientationFilter f (amin, include_amin, amax, include_amax, inverse, false);
   return r->filtered (f);
+}
+
+static std::vector<db::Edges> split_with_angle2 (const db::Edges *r, double amin, double amax, bool include_amin, bool include_amax)
+{
+  db::EdgeOrientationFilter f (amin, include_amin, amax, include_amax, false, false);
+  return as_2edges_vector (r->split_filter (f));
 }
 
 static db::Edges with_abs_angle1 (const db::Edges *r, double a, bool inverse)
@@ -456,16 +485,34 @@ static db::Edges with_abs_angle1 (const db::Edges *r, double a, bool inverse)
   return r->filtered (f);
 }
 
+static std::vector<db::Edges> split_with_abs_angle1 (const db::Edges *r, double a)
+{
+  db::EdgeOrientationFilter f (a, false, true);
+  return as_2edges_vector (r->split_filter (f));
+}
+
 static db::Edges with_abs_angle2 (const db::Edges *r, double amin, double amax, bool inverse, bool include_amin, bool include_amax)
 {
   db::EdgeOrientationFilter f (amin, include_amin, amax, include_amax, inverse, true);
   return r->filtered (f);
 }
 
+static std::vector<db::Edges> split_with_abs_angle2 (const db::Edges *r, double amin, double amax, bool include_amin, bool include_amax)
+{
+  db::EdgeOrientationFilter f (amin, include_amin, amax, include_amax, false, true);
+  return as_2edges_vector (r->split_filter (f));
+}
+
 static db::Edges with_angle3 (const db::Edges *r, db::SpecialEdgeOrientationFilter::FilterType type, bool inverse)
 {
   db::SpecialEdgeOrientationFilter f (type, inverse);
   return r->filtered (f);
+}
+
+static std::vector<db::Edges> split_with_angle3 (const db::Edges *r, db::SpecialEdgeOrientationFilter::FilterType type)
+{
+  db::SpecialEdgeOrientationFilter f (type, false);
+  return as_2edges_vector (r->split_filter (f));
 }
 
 static db::EdgePairs width2 (const db::Edges *r, db::Edges::coord_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, db::zero_distance_mode zd_mode)
@@ -867,11 +914,17 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "\n"
     "This method has been introduced in version 0.29.\n"
   ) +
-  method_ext ("filtered", &filtered, gsi::arg ("filtered"),
+  method_ext ("filtered", &filtered, gsi::arg ("filter"),
     "@brief Applies a generic filter and returns a filtered copy\n"
     "See \\EdgeFilter for a description of this feature.\n"
     "\n"
     "This method has been introduced in version 0.29.\n"
+  ) +
+  method_ext ("split_filter", &split_filter, gsi::arg ("filter"),
+    "@brief Applies a generic filter and returns a copy with all matching shapes and one with the non-matching ones\n"
+    "See \\EdgeFilter for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
   ) +
   method_ext ("process", &process_ee, gsi::arg ("process"),
     "@brief Applies a generic edge processor in place (replacing the edges from the Edges collection)\n"
@@ -913,6 +966,18 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "\n"
     "If you don't want to specify a lower or upper limit, pass nil to that parameter.\n"
   ) +
+  method_ext ("split_with_length", split_with_length1, gsi::arg ("length"),
+    "@brief Like \\with_length, but returning two edge collections\n"
+    "The first edge collection will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
+  method_ext ("split_with_length", split_with_length2, gsi::arg ("min_length"), gsi::arg ("max_length"),
+    "@brief Like \\with_length, but returning two edge collections\n"
+    "The first edge collection will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
   method_ext ("with_angle", with_angle1, gsi::arg ("angle"), gsi::arg ("inverse"),
     "@brief Filters the edges by orientation\n"
     "Filters the edges in the edge collection by orientation. If \"inverse\" is false, only "
@@ -937,6 +1002,35 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "\n"
     "The two \"include..\" arguments have been added in version 0.27.\n"
   ) +
+  method_ext ("with_angle", with_angle3, gsi::arg ("type"), gsi::arg ("inverse"),
+    "@brief Filters the edges by orientation type\n"
+    "Filters the edges in the edge collection by orientation. If \"inverse\" is false, only "
+    "edges which have an angle of the given type are returned. If \"inverse\" is true, "
+    "edges which do not conform to this criterion are returned.\n"
+    "\n"
+    "This version allows specifying an edge type instead of an angle. Edge types include multiple distinct orientations "
+    "and are specified using one of the \\OrthoEdges, \\DiagonalEdges or \\OrthoDiagonalEdges types.\n"
+    "\n"
+    "This method has been added in version 0.28.\n"
+  ) +
+  method_ext ("split_with_angle", split_with_angle1, gsi::arg ("angle"),
+    "@brief Like \\with_angle, but returning two edge collections\n"
+    "The first edge collection will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
+  method_ext ("split_with_angle", split_with_angle2, gsi::arg ("min_angle"), gsi::arg ("max_angle"), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", false),
+    "@brief Like \\with_angle, but returning two edge collections\n"
+    "The first edge collection will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
+  method_ext ("split_with_angle", split_with_angle3, gsi::arg ("type"),
+    "@brief Like \\with_angle, but returning two edge collections\n"
+    "The first edge collection will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
   method_ext ("with_abs_angle", with_abs_angle1, gsi::arg ("angle"), gsi::arg ("inverse"),
     "@brief Filter the edges by orientation\n"
     "\n"
@@ -953,16 +1047,17 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "\n"
     "This method has been added in version 0.29.1.\n"
   ) +
-  method_ext ("with_angle", with_angle3, gsi::arg ("type"), gsi::arg ("inverse"),
-    "@brief Filters the edges by orientation type\n"
-    "Filters the edges in the edge collection by orientation. If \"inverse\" is false, only "
-    "edges which have an angle of the given type are returned. If \"inverse\" is true, "
-    "edges which do not conform to this criterion are returned.\n"
+  method_ext ("split_with_abs_angle", split_with_abs_angle1, gsi::arg ("angle"),
+    "@brief Like \\with_abs_angle, but returning two edge collections\n"
+    "The first edge collection will contain all matching shapes, the other the non-matching ones.\n"
     "\n"
-    "This version allows specifying an edge type instead of an angle. Edge types include multiple distinct orientations "
-    "and are specified using one of the \\OrthoEdges, \\DiagonalEdges or \\OrthoDiagonalEdges types.\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
+  method_ext ("split_with_abs_angle", split_with_abs_angle2, gsi::arg ("min_angle"), gsi::arg ("max_angle"), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", false),
+    "@brief Like \\with_abs_angle, but returning two edge collections\n"
+    "The first edge collection will contain all matching shapes, the other the non-matching ones.\n"
     "\n"
-    "This method has been added in version 0.28.\n"
+    "This method has been introduced in version 0.29.12.\n"
   ) +
   method ("insert", (void (db::Edges::*)(const db::Edge &)) &db::Edges::insert, gsi::arg ("edge"),
     "@brief Inserts an edge\n"

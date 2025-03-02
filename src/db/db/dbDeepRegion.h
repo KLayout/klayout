@@ -127,6 +127,7 @@ public:
   virtual EdgePairsDelegate *processed_to_edge_pairs (const PolygonToEdgePairProcessorBase &filter) const;
   virtual RegionDelegate *filter_in_place (const PolygonFilterBase &filter);
   virtual RegionDelegate *filtered (const PolygonFilterBase &filter) const;
+  virtual std::pair<RegionDelegate *, RegionDelegate *> filtered_pair (const PolygonFilterBase &filter) const;
 
   virtual RegionDelegate *merged_in_place ();
   virtual RegionDelegate *merged_in_place (bool min_coherence, unsigned int min_wc);
@@ -183,8 +184,7 @@ private:
   DeepLayer not_with_impl (const DeepRegion *other, PropertyConstraint property_constraint) const;
   DeepLayer and_with_impl (const DeepRegion *other, PropertyConstraint property_constraint) const;
   std::pair<DeepLayer, DeepLayer> and_and_not_with (const DeepRegion *other, PropertyConstraint property_constraint) const;
-  DeepRegion *apply_filter (const PolygonFilterBase &filter) const;
-
+  std::pair<DeepRegion *, DeepRegion *> apply_filter (const PolygonFilterBase &filter, bool with_true, bool with_false) const;
   template <class Proc>
   void configure_proc (Proc &proc) const
   {

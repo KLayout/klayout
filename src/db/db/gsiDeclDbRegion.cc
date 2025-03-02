@@ -513,6 +513,11 @@ static db::Region filtered (const db::Region *r, const PolygonFilterImpl *f)
   return r->filtered (*f);
 }
 
+static std::vector<db::Region> split_filter (const db::Region *r, const PolygonFilterImpl *f)
+{
+  return as_2region_vector (r->split_filter (*f));
+}
+
 static void filter (db::Region *r, const PolygonFilterImpl *f)
 {
   r->filter (*f);
@@ -544,10 +549,22 @@ static db::Region with_perimeter1 (const db::Region *r, db::Region::perimeter_ty
   return r->filtered (f);
 }
 
+static std::vector<db::Region> split_with_perimeter1 (const db::Region *r, db::Region::perimeter_type perimeter)
+{
+  db::RegionPerimeterFilter f (perimeter, perimeter + 1, false);
+  return as_2region_vector (r->split_filter (f));
+}
+
 static db::Region with_perimeter2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool inverse)
 {
   db::RegionPerimeterFilter f (min.is_nil () ? db::Region::perimeter_type (0) : min.to<db::Region::perimeter_type> (), max.is_nil () ? std::numeric_limits <db::Region::distance_type>::max () : max.to<db::Region::distance_type> (), inverse);
   return r->filtered (f);
+}
+
+static std::vector<db::Region> split_with_perimeter2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max)
+{
+  db::RegionPerimeterFilter f (min.is_nil () ? db::Region::perimeter_type (0) : min.to<db::Region::perimeter_type> (), max.is_nil () ? std::numeric_limits <db::Region::distance_type>::max () : max.to<db::Region::distance_type> (), false);
+  return as_2region_vector (r->split_filter (f));
 }
 
 static db::Region with_area1 (const db::Region *r, db::Region::area_type area, bool inverse)
@@ -556,10 +573,22 @@ static db::Region with_area1 (const db::Region *r, db::Region::area_type area, b
   return r->filtered (f);
 }
 
+static std::vector<db::Region> split_with_area1 (const db::Region *r, db::Region::area_type area)
+{
+  db::RegionAreaFilter f (area, area + 1, false);
+  return as_2region_vector (r->split_filter (f));
+}
+
 static db::Region with_area2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool inverse)
 {
   db::RegionAreaFilter f (min.is_nil () ? db::Region::area_type (0) : min.to<db::Region::area_type> (), max.is_nil () ? std::numeric_limits <db::Region::area_type>::max () : max.to<db::Region::area_type> (), inverse);
   return r->filtered (f);
+}
+
+static std::vector<db::Region> split_with_area2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max)
+{
+  db::RegionAreaFilter f (min.is_nil () ? db::Region::area_type (0) : min.to<db::Region::area_type> (), max.is_nil () ? std::numeric_limits <db::Region::area_type>::max () : max.to<db::Region::area_type> (), false);
+  return as_2region_vector (r->split_filter (f));
 }
 
 static db::Region with_holes1 (const db::Region *r, size_t n, bool inverse)
@@ -568,10 +597,22 @@ static db::Region with_holes1 (const db::Region *r, size_t n, bool inverse)
   return r->filtered (f);
 }
 
+static std::vector<db::Region> split_with_holes1 (const db::Region *r, size_t n)
+{
+  db::HoleCountFilter f (n, n + 1, false);
+  return as_2region_vector (r->split_filter (f));
+}
+
 static db::Region with_holes2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool inverse)
 {
   db::HoleCountFilter f (min.is_nil () ? size_t (0) : min.to<size_t> (), max.is_nil () ? std::numeric_limits <size_t>::max () : max.to<size_t> (), inverse);
   return r->filtered (f);
+}
+
+static std::vector<db::Region> split_with_holes2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max)
+{
+  db::HoleCountFilter f (min.is_nil () ? size_t (0) : min.to<size_t> (), max.is_nil () ? std::numeric_limits <size_t>::max () : max.to<size_t> (), false);
+  return as_2region_vector (r->split_filter (f));
 }
 
 static db::Region with_bbox_width1 (const db::Region *r, db::Region::distance_type bbox_width, bool inverse)
@@ -580,10 +621,22 @@ static db::Region with_bbox_width1 (const db::Region *r, db::Region::distance_ty
   return r->filtered (f);
 }
 
+static std::vector<db::Region> split_with_bbox_width1 (const db::Region *r, db::Region::distance_type bbox_width)
+{
+  db::RegionBBoxFilter f (bbox_width, bbox_width + 1, false, db::RegionBBoxFilter::BoxWidth);
+  return as_2region_vector (r->split_filter (f));
+}
+
 static db::Region with_bbox_width2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool inverse)
 {
   db::RegionBBoxFilter f (min.is_nil () ? db::Region::distance_type (0) : min.to<db::Region::distance_type> (), max.is_nil () ? std::numeric_limits <db::Region::distance_type>::max () : max.to<db::Region::distance_type> (), inverse, db::RegionBBoxFilter::BoxWidth);
   return r->filtered (f);
+}
+
+static std::vector<db::Region> split_with_bbox_width2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max)
+{
+  db::RegionBBoxFilter f (min.is_nil () ? db::Region::distance_type (0) : min.to<db::Region::distance_type> (), max.is_nil () ? std::numeric_limits <db::Region::distance_type>::max () : max.to<db::Region::distance_type> (), false, db::RegionBBoxFilter::BoxWidth);
+  return as_2region_vector (r->split_filter (f));
 }
 
 static db::Region with_bbox_height1 (const db::Region *r, db::Region::distance_type bbox_height, bool inverse)
@@ -592,10 +645,22 @@ static db::Region with_bbox_height1 (const db::Region *r, db::Region::distance_t
   return r->filtered (f);
 }
 
+static std::vector<db::Region> split_with_bbox_height1 (const db::Region *r, db::Region::distance_type bbox_height)
+{
+  db::RegionBBoxFilter f (bbox_height, bbox_height + 1, false, db::RegionBBoxFilter::BoxHeight);
+  return as_2region_vector (r->split_filter (f));
+}
+
 static db::Region with_bbox_height2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool inverse)
 {
   db::RegionBBoxFilter f (min.is_nil () ? db::Region::distance_type (0) : min.to<db::Region::distance_type> (), max.is_nil () ? std::numeric_limits <db::Region::distance_type>::max () : max.to<db::Region::distance_type> (), inverse, db::RegionBBoxFilter::BoxHeight);
   return r->filtered (f);
+}
+
+static std::vector<db::Region> split_with_bbox_height2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max)
+{
+  db::RegionBBoxFilter f (min.is_nil () ? db::Region::distance_type (0) : min.to<db::Region::distance_type> (), max.is_nil () ? std::numeric_limits <db::Region::distance_type>::max () : max.to<db::Region::distance_type> (), false, db::RegionBBoxFilter::BoxHeight);
+  return as_2region_vector (r->split_filter (f));
 }
 
 static db::Region with_bbox_min1 (const db::Region *r, db::Region::distance_type bbox_min, bool inverse)
@@ -604,10 +669,22 @@ static db::Region with_bbox_min1 (const db::Region *r, db::Region::distance_type
   return r->filtered (f);
 }
 
+static std::vector<db::Region> split_with_bbox_min1 (const db::Region *r, db::Region::distance_type bbox_min)
+{
+  db::RegionBBoxFilter f (bbox_min, bbox_min + 1, false, db::RegionBBoxFilter::BoxMinDim);
+  return as_2region_vector (r->split_filter (f));
+}
+
 static db::Region with_bbox_min2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool inverse)
 {
   db::RegionBBoxFilter f (min.is_nil () ? db::Region::distance_type (0) : min.to<db::Region::distance_type> (), max.is_nil () ? std::numeric_limits <db::Region::distance_type>::max () : max.to<db::Region::distance_type> (), inverse, db::RegionBBoxFilter::BoxMinDim);
   return r->filtered (f);
+}
+
+static std::vector<db::Region> split_with_bbox_min2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max)
+{
+  db::RegionBBoxFilter f (min.is_nil () ? db::Region::distance_type (0) : min.to<db::Region::distance_type> (), max.is_nil () ? std::numeric_limits <db::Region::distance_type>::max () : max.to<db::Region::distance_type> (), false, db::RegionBBoxFilter::BoxMinDim);
+  return as_2region_vector (r->split_filter (f));
 }
 
 static db::Region with_bbox_max1 (const db::Region *r, db::Region::distance_type bbox_max, bool inverse)
@@ -616,10 +693,94 @@ static db::Region with_bbox_max1 (const db::Region *r, db::Region::distance_type
   return r->filtered (f);
 }
 
+static std::vector<db::Region> split_with_bbox_max1 (const db::Region *r, db::Region::distance_type bbox_max)
+{
+  db::RegionBBoxFilter f (bbox_max, bbox_max + 1, false, db::RegionBBoxFilter::BoxMaxDim);
+  return as_2region_vector (r->split_filter (f));
+}
+
 static db::Region with_bbox_max2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool inverse)
 {
   db::RegionBBoxFilter f (min.is_nil () ? db::Region::distance_type (0) : min.to<db::Region::distance_type> (), max.is_nil () ? std::numeric_limits <db::Region::distance_type>::max () : max.to<db::Region::distance_type> (), inverse, db::RegionBBoxFilter::BoxMaxDim);
   return r->filtered (f);
+}
+
+static std::vector<db::Region> split_with_bbox_max2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max)
+{
+  db::RegionBBoxFilter f (min.is_nil () ? db::Region::distance_type (0) : min.to<db::Region::distance_type> (), max.is_nil () ? std::numeric_limits <db::Region::distance_type>::max () : max.to<db::Region::distance_type> (), false, db::RegionBBoxFilter::BoxMaxDim);
+  return as_2region_vector (r->split_filter (f));
+}
+
+static db::Region with_bbox_aspect_ratio1 (const db::Region *r, double v, bool inverse)
+{
+  db::RegionRatioFilter f (v, true, v, true, inverse, db::RegionRatioFilter::AspectRatio);
+  return r->filtered (f);
+}
+
+static std::vector<db::Region> split_with_bbox_aspect_ratio1 (const db::Region *r, double v)
+{
+  db::RegionRatioFilter f (v, true, v, true, false, db::RegionRatioFilter::AspectRatio);
+  return as_2region_vector (r->split_filter (f));
+}
+
+static db::Region with_bbox_aspect_ratio2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool inverse, bool min_included, bool max_included)
+{
+  db::RegionRatioFilter f (min.is_nil () ? 0.0 : min.to<double> (), min_included, max.is_nil () ? std::numeric_limits <double>::max () : max.to<double> (), max_included, inverse, db::RegionRatioFilter::AspectRatio);
+  return r->filtered (f);
+}
+
+static std::vector<db::Region> split_with_bbox_aspect_ratio2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool min_included, bool max_included)
+{
+  db::RegionRatioFilter f (min.is_nil () ? 0.0 : min.to<double> (), min_included, max.is_nil () ? std::numeric_limits <double>::max () : max.to<double> (), max_included, false, db::RegionRatioFilter::AspectRatio);
+  return as_2region_vector (r->split_filter (f));
+}
+
+static db::Region with_area_ratio1 (const db::Region *r, double v, bool inverse)
+{
+  db::RegionRatioFilter f (v, true, v, true, inverse, db::RegionRatioFilter::AreaRatio);
+  return r->filtered (f);
+}
+
+static std::vector<db::Region> split_with_area_ratio1 (const db::Region *r, double v)
+{
+  db::RegionRatioFilter f (v, true, v, true, false, db::RegionRatioFilter::AreaRatio);
+  return as_2region_vector (r->split_filter (f));
+}
+
+static db::Region with_area_ratio2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool inverse, bool min_included, bool max_included)
+{
+  db::RegionRatioFilter f (min.is_nil () ? 0.0 : min.to<double> (), min_included, max.is_nil () ? std::numeric_limits <double>::max () : max.to<double> (), max_included, inverse, db::RegionRatioFilter::AreaRatio);
+  return r->filtered (f);
+}
+
+static std::vector<db::Region> split_with_area_ratio2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool min_included, bool max_included)
+{
+  db::RegionRatioFilter f (min.is_nil () ? 0.0 : min.to<double> (), min_included, max.is_nil () ? std::numeric_limits <double>::max () : max.to<double> (), max_included, false, db::RegionRatioFilter::AreaRatio);
+  return as_2region_vector (r->split_filter (f));
+}
+
+static db::Region with_relative_height1 (const db::Region *r, double v, bool inverse)
+{
+  db::RegionRatioFilter f (v, true, v, true, inverse, db::RegionRatioFilter::RelativeHeight);
+  return r->filtered (f);
+}
+
+static std::vector<db::Region> split_with_relative_height1 (const db::Region *r, double v)
+{
+  db::RegionRatioFilter f (v, true, v, true, false, db::RegionRatioFilter::RelativeHeight);
+  return as_2region_vector (r->split_filter (f));
+}
+
+static db::Region with_relative_height2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool inverse, bool min_included, bool max_included)
+{
+  db::RegionRatioFilter f (min.is_nil () ? 0.0 : min.to<double> (), min_included, max.is_nil () ? std::numeric_limits <double>::max () : max.to<double> (), max_included, inverse, db::RegionRatioFilter::RelativeHeight);
+  return r->filtered (f);
+}
+
+static std::vector<db::Region> split_with_relative_height2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool min_included, bool max_included)
+{
+  db::RegionRatioFilter f (min.is_nil () ? 0.0 : min.to<double> (), min_included, max.is_nil () ? std::numeric_limits <double>::max () : max.to<double> (), max_included, false, db::RegionRatioFilter::RelativeHeight);
+  return as_2region_vector (r->split_filter (f));
 }
 
 static db::EdgePairs angle_check1 (const db::Region *r, double angle, bool inverse)
@@ -630,42 +791,6 @@ static db::EdgePairs angle_check1 (const db::Region *r, double angle, bool inver
 static db::EdgePairs angle_check2 (const db::Region *r, double amin, double amax, bool inverse)
 {
   return r->angle_check (amin, amax, inverse);
-}
-
-static db::Region with_bbox_aspect_ratio1 (const db::Region *r, double v, bool inverse)
-{
-  db::RegionRatioFilter f (v, true, v, true, inverse, db::RegionRatioFilter::AspectRatio);
-  return r->filtered (f);
-}
-
-static db::Region with_bbox_aspect_ratio2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool inverse, bool min_included, bool max_included)
-{
-  db::RegionRatioFilter f (min.is_nil () ? 0.0 : min.to<double> (), min_included, max.is_nil () ? std::numeric_limits <double>::max () : max.to<double> (), max_included, inverse, db::RegionRatioFilter::AspectRatio);
-  return r->filtered (f);
-}
-
-static db::Region with_area_ratio1 (const db::Region *r, double v, bool inverse)
-{
-  db::RegionRatioFilter f (v, true, v, true, inverse, db::RegionRatioFilter::AreaRatio);
-  return r->filtered (f);
-}
-
-static db::Region with_area_ratio2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool inverse, bool min_included, bool max_included)
-{
-  db::RegionRatioFilter f (min.is_nil () ? 0.0 : min.to<double> (), min_included, max.is_nil () ? std::numeric_limits <double>::max () : max.to<double> (), max_included, inverse, db::RegionRatioFilter::AreaRatio);
-  return r->filtered (f);
-}
-
-static db::Region with_relative_height1 (const db::Region *r, double v, bool inverse)
-{
-  db::RegionRatioFilter f (v, true, v, true, inverse, db::RegionRatioFilter::RelativeHeight);
-  return r->filtered (f);
-}
-
-static db::Region with_relative_height2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool inverse, bool min_included, bool max_included)
-{
-  db::RegionRatioFilter f (min.is_nil () ? 0.0 : min.to<double> (), min_included, max.is_nil () ? std::numeric_limits <double>::max () : max.to<double> (), max_included, inverse, db::RegionRatioFilter::RelativeHeight);
-  return r->filtered (f);
 }
 
 static db::Region in (const db::Region *r, const db::Region &other)
@@ -695,6 +820,12 @@ static db::Region non_rectangles (const db::Region *r)
   return r->filtered (f);
 }
 
+static std::vector<db::Region> split_rectangles (const db::Region *r)
+{
+  db::RectangleFilter f (false, false);
+  return as_2region_vector (r->split_filter (f));
+}
+
 static db::Region squares (const db::Region *r)
 {
   db::RectangleFilter f (true, false);
@@ -707,6 +838,12 @@ static db::Region non_squares (const db::Region *r)
   return r->filtered (f);
 }
 
+static std::vector<db::Region> split_squares (const db::Region *r)
+{
+  db::RectangleFilter f (true, false);
+  return as_2region_vector (r->split_filter (f));
+}
+
 static db::Region rectilinear (const db::Region *r)
 {
   db::RectilinearFilter f (false);
@@ -717,6 +854,12 @@ static db::Region non_rectilinear (const db::Region *r)
 {
   db::RectilinearFilter f (true);
   return r->filtered (f);
+}
+
+static std::vector<db::Region> split_rectilinear (const db::Region *r)
+{
+  db::RectilinearFilter f (false);
+  return as_2region_vector (r->split_filter (f));
 }
 
 static void break_polygons (db::Region *r, size_t max_vertex_count, double max_area_ratio)
@@ -1416,6 +1559,18 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
+  method_ext ("split_with_perimeter", split_with_perimeter1, gsi::arg ("perimeter"),
+    "@brief Like \\with_perimeter, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
+  method_ext ("split_with_perimeter", split_with_perimeter2, gsi::arg ("min_perimeter"), gsi::arg ("max_perimeter"),
+    "@brief Like \\with_perimeter, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
   method_ext ("with_area", with_area1, gsi::arg ("area"), gsi::arg ("inverse"),
     "@brief Filter the polygons by area\n"
     "Filters the polygons of the region by area. If \"inverse\" is false, only "
@@ -1436,6 +1591,18 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
+  method_ext ("split_with_area", split_with_area1, gsi::arg ("area"),
+    "@brief Like \\with_area, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
+  method_ext ("split_with_area", split_with_area2, gsi::arg ("min_area"), gsi::arg ("max_area"),
+    "@brief Like \\with_area, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
   method_ext ("with_holes", with_holes1, gsi::arg ("nholes"), gsi::arg ("inverse"),
     "@brief Filters the polygons by their number of holes\n"
     "Filters the polygons of the region by number of holes. If \"inverse\" is false, only "
@@ -1446,7 +1613,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method has been introduced in version 0.27.\n"
   ) +
-  method_ext ("with_holes", with_holes2, gsi::arg ("min_bholes"), gsi::arg ("max_nholes"), gsi::arg ("inverse"),
+  method_ext ("with_holes", with_holes2, gsi::arg ("min_nholes"), gsi::arg ("max_nholes"), gsi::arg ("inverse"),
     "@brief Filter the polygons by their number of holes\n"
     "Filters the polygons of the region by number of holes. If \"inverse\" is false, only "
     "polygons which have a hole count larger or equal to \"min_nholes\" and less than \"max_nholes\" are "
@@ -1459,6 +1626,18 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "This method has been introduced in version 0.27.\n"
+  ) +
+  method_ext ("split_with_holes", split_with_holes1, gsi::arg ("nholes"),
+    "@brief Like \\with_holes, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
+  method_ext ("split_with_holes", split_with_holes2, gsi::arg ("min_nholes"), gsi::arg ("max_nholes"),
+    "@brief Like \\with_holes, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
   ) +
   method_ext ("with_bbox_width", with_bbox_width1, gsi::arg ("width"), gsi::arg ("inverse"),
     "@brief Filter the polygons by bounding box width\n"
@@ -1478,6 +1657,18 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
+  method_ext ("split_with_bbox_width", split_with_bbox_width1, gsi::arg ("width"),
+    "@brief Like \\with_bbox_width, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
+  method_ext ("split_with_bbox_width", split_with_bbox_width2, gsi::arg ("min_width"), gsi::arg ("max_width"),
+    "@brief Like \\with_bbox_width, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
   method_ext ("with_bbox_height", with_bbox_height1, gsi::arg ("height"), gsi::arg ("inverse"),
     "@brief Filter the polygons by bounding box height\n"
     "Filters the polygons of the region by the height of their bounding box. If \"inverse\" is false, only "
@@ -1495,6 +1686,18 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "If you don't want to specify a lower or upper limit, pass nil to that parameter.\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
+  ) +
+  method_ext ("split_with_bbox_height", split_with_bbox_height1, gsi::arg ("height"),
+    "@brief Like \\with_bbox_height, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
+  method_ext ("split_with_bbox_height", split_with_bbox_height2, gsi::arg ("min_height"), gsi::arg ("max_height"),
+    "@brief Like \\with_bbox_height, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
   ) +
   method_ext ("with_bbox_min", with_bbox_min1, gsi::arg ("dim"), gsi::arg ("inverse"),
     "@brief Filter the polygons by bounding box width or height, whichever is smaller\n"
@@ -1516,6 +1719,18 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
+  method_ext ("split_with_bbox_min", split_with_bbox_min1, gsi::arg ("dim"),
+    "@brief Like \\with_bbox_min, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
+  method_ext ("split_with_bbox_min", split_with_bbox_min2, gsi::arg ("min_dim"), gsi::arg ("max_dim"),
+    "@brief Like \\with_bbox_min, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
   method_ext ("with_bbox_max", with_bbox_max1, gsi::arg ("dim"), gsi::arg ("inverse"),
     "@brief Filter the polygons by bounding box width or height, whichever is larger\n"
     "Filters the polygons of the region by the maximum dimension of their bounding box. "
@@ -1535,6 +1750,18 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "If you don't want to specify a lower or upper limit, pass nil to that parameter.\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
+  ) +
+  method_ext ("split_with_bbox_max", split_with_bbox_max1, gsi::arg ("dim"),
+    "@brief Like \\with_bbox_max, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
+  method_ext ("split_with_bbox_max", split_with_bbox_max2, gsi::arg ("min_dim"), gsi::arg ("max_dim"),
+    "@brief Like \\with_bbox_max, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
   ) +
   method_ext ("with_bbox_aspect_ratio", with_bbox_aspect_ratio1, gsi::arg ("ratio"), gsi::arg ("inverse"),
     "@brief Filters the polygons by the aspect ratio of their bounding boxes\n"
@@ -1565,6 +1792,18 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method has been introduced in version 0.27.\n"
   ) +
+  method_ext ("split_with_bbox_aspect_ratio", split_with_bbox_aspect_ratio1, gsi::arg ("ratio"),
+    "@brief Like \\with_bbox_aspect_ratio, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
+  method_ext ("split_with_bbox_aspect_ratio", split_with_bbox_aspect_ratio2, gsi::arg ("min_ratio"), gsi::arg ("max_ratio"), gsi::arg ("min_included", true), gsi::arg ("max_included", true),
+    "@brief Like \\with_bbox_aspect_ratio, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
   method_ext ("with_area_ratio", with_area_ratio1, gsi::arg ("ratio"), gsi::arg ("inverse"),
     "@brief Filters the polygons by the bounding box area to polygon area ratio\n"
     "The area ratio is defined by the ratio of bounding box area to polygon area. It's a measure "
@@ -1593,6 +1832,18 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "This method has been introduced in version 0.27.\n"
+  ) +
+  method_ext ("split_with_area_ratio", split_with_area_ratio1, gsi::arg ("ratio"),
+    "@brief Like \\with_area_ratio, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
+  method_ext ("split_with_area_ratio", split_with_area_ratio2, gsi::arg ("min_ratio"), gsi::arg ("max_ratio"), gsi::arg ("min_included", true), gsi::arg ("max_included", true),
+    "@brief Like \\with_area_ratio, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
   ) +
   method_ext ("with_relative_height", with_relative_height1, gsi::arg ("ratio"), gsi::arg ("inverse"),
     "@brief Filters the polygons by the ratio of height to width\n"
@@ -1624,6 +1875,18 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "This method has been introduced in version 0.27.\n"
+  ) +
+  method_ext ("split_with_relative_height", split_with_relative_height1, gsi::arg ("ratio"),
+    "@brief Like \\with_relative_height, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
+  method_ext ("split_with_relative_height", split_with_relative_height2, gsi::arg ("min_ratio"), gsi::arg ("max_ratio"), gsi::arg ("min_included", true), gsi::arg ("max_included", true),
+    "@brief Like \\with_relative_height, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
   ) +
   method ("strange_polygon_check", &db::Region::strange_polygon_check,
     "@brief Returns a region containing those parts of polygons which are \"strange\"\n"
@@ -2849,11 +3112,17 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method has been introduced in version 0.29.\n"
   ) +
-  method_ext ("filtered", &filtered, gsi::arg ("filtered"),
+  method_ext ("filtered", &filtered, gsi::arg ("filter"),
     "@brief Applies a generic filter and returns a filtered copy\n"
     "See \\PolygonFilter for a description of this feature.\n"
     "\n"
     "This method has been introduced in version 0.29.\n"
+  ) +
+  method_ext ("split_filter", &split_filter, gsi::arg ("filter"),
+    "@brief Applies a generic filter and returns a copy with all matching shapes and one with the non-matching ones\n"
+    "See \\PolygonFilter for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
   ) +
   method_ext ("process", &process_pp, gsi::arg ("process"),
     "@brief Applies a generic polygon processor in place (replacing the polygons from the Region)\n"
@@ -2889,6 +3158,12 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "This method returns all polygons in self which are not rectangles."
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
+  method_ext ("split_rectangles", &split_rectangles,
+    "@brief Combined results of \\rectangles and \\non_rectangles\n"
+    "This method returns a list with two Regions, the first is the result of \\rectangles, the second the result of \\non_rectangles. "
+    "Using this method is faster when you need both.\n\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
   method_ext ("squares", &squares,
     "@brief Returns all polygons which are squares\n"
     "This method returns all polygons in self which are squares."
@@ -2903,6 +3178,12 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method has been introduced in version 0.27.\n"
   ) +
+  method_ext ("split_squares", &split_squares,
+    "@brief Combined results of \\squares and \\non_squares\n"
+    "This method returns a list with two Regions, the first is the result of \\squares, the second the result of \\non_squares. "
+    "Using this method is faster when you need both.\n\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
   method_ext ("rectilinear", &rectilinear,
     "@brief Returns all polygons which are rectilinear\n"
     "This method returns all polygons in self which are rectilinear."
@@ -2912,6 +3193,12 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@brief Returns all polygons which are not rectilinear\n"
     "This method returns all polygons in self which are not rectilinear."
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
+  ) +
+  method_ext ("split_rectilinear", &split_rectilinear,
+    "@brief Combined results of \\rectilinear and \\non_rectilinear\n"
+    "This method returns a list with two Regions, the first is the result of \\rectilinear, the second the result of \\non_rectilinear. "
+    "Using this method is faster when you need both.\n\n"
+    "This method has been introduced in version 0.29.12.\n"
   ) +
   method_ext ("break_polygons|#break", &break_polygons, gsi::arg ("max_vertex_count"), gsi::arg ("max_area_ratio", 0.0),
     "@brief Breaks the polygons of the region into smaller ones\n"

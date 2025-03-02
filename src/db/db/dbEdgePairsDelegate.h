@@ -201,6 +201,7 @@ public:
 
   virtual EdgePairsDelegate *filter_in_place (const EdgePairFilterBase &filter) = 0;
   virtual EdgePairsDelegate *filtered (const EdgePairFilterBase &filter) const = 0;
+  virtual std::pair<EdgePairsDelegate *, EdgePairsDelegate *> filtered_pair (const EdgePairFilterBase &filter) const = 0;
   virtual EdgePairsDelegate *process_in_place (const EdgePairProcessorBase &proc) = 0;
   virtual EdgePairsDelegate *processed (const EdgePairProcessorBase &proc) const = 0;
   virtual RegionDelegate *processed_to_polygons (const EdgePairToPolygonProcessorBase &proc) const = 0;

@@ -395,16 +395,23 @@ TextsDelegate *DeepTexts::add (const Texts &other) const
 TextsDelegate *DeepTexts::filter_in_place (const TextFilterBase &filter)
 {
   //  TODO: implement as really in place
-  *this = *apply_filter (filter);
+  *this = *apply_filter (filter, true, false).first;
   return this;
 }
 
 TextsDelegate *DeepTexts::filtered (const TextFilterBase &filter) const
 {
-  return apply_filter (filter);
+  return apply_filter (filter, true, false).first;
 }
 
-DeepTexts *DeepTexts::apply_filter (const TextFilterBase &filter) const
+std::pair<TextsDelegate *, TextsDelegate *>
+DeepTexts::filtered_pair (const TextFilterBase &filter) const
+{
+  return apply_filter (filter, true, true);
+}
+
+std::pair<DeepTexts *, DeepTexts *>
+DeepTexts::apply_filter (const TextFilterBase &filter, bool with_true, bool with_false) const
 {
   const db::DeepLayer &texts = deep_layer ();
   db::Layout &layout = const_cast<db::Layout &> (texts.layout ());
@@ -422,9 +429,10 @@ DeepTexts *DeepTexts::apply_filter (const TextFilterBase &filter) const
 
   }
 
-  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
+  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit_true, to_commit_false;
 
-  std::unique_ptr<db::DeepTexts> res (new db::DeepTexts (texts.derived ()));
+  std::unique_ptr<db::DeepTexts> res_true (with_true ? new db::DeepTexts (texts.derived ()) : 0);
+  std::unique_ptr<db::DeepTexts> res_false (with_false ? new db::DeepTexts (texts.derived ()) : 0);
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
     const db::Shapes &s = c->shapes (texts.layer ());
@@ -434,18 +442,36 @@ DeepTexts *DeepTexts::apply_filter (const TextFilterBase &filter) const
       const std::set<db::ICplxTrans> &vv = vars->variants (c->cell_index ());
       for (auto v = vv.begin (); v != vv.end (); ++v) {
 
-        db::Shapes *st;
+        db::Shapes *st_true = 0, *st_false = 0;
         if (vv.size () == 1) {
-          st = & c->shapes (res->deep_layer ().layer ());
+          if (with_true) {
+            st_true = & c->shapes (res_true->deep_layer ().layer ());
+          }
+          if (with_false) {
+            st_false = & c->shapes (res_false->deep_layer ().layer ());
+          }
         } else {
-          st = & to_commit [c->cell_index ()] [*v];
+          if (with_true) {
+            st_true = & to_commit_true [c->cell_index ()] [*v];
+          }
+          if (with_false) {
+            st_false = & to_commit_false [c->cell_index ()] [*v];
+          }
         }
+
+        const db::ICplxTrans &tr = *v;
 
         for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Texts); ! si.at_end (); ++si) {
           db::Text text;
           si->text (text);
-          if (filter.selected (text.transformed (*v))) {
-            st->insert (*si);
+          if (filter.selected (text.transformed (tr))) {
+            if (st_true) {
+              st_true->insert (*si);
+            }
+          } else {
+            if (st_false) {
+              st_false->insert (*si);
+            }
           }
         }
 
@@ -453,13 +479,20 @@ DeepTexts *DeepTexts::apply_filter (const TextFilterBase &filter) const
 
     } else {
 
-      db::Shapes &st = c->shapes (res->deep_layer ().layer ());
+      db::Shapes *st_true = with_true ? &c->shapes (res_true->deep_layer ().layer ()) : 0;
+      db::Shapes *st_false = with_false ? &c->shapes (res_false->deep_layer ().layer ()) : 0;
 
       for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Texts); ! si.at_end (); ++si) {
         db::Text text;
         si->text (text);
         if (filter.selected (text)) {
-          st.insert (*si);
+          if (with_true) {
+            st_true->insert (*si);
+          }
+        } else {
+          if (with_false) {
+            st_false->insert (*si);
+          }
         }
       }
 
@@ -467,11 +500,16 @@ DeepTexts *DeepTexts::apply_filter (const TextFilterBase &filter) const
 
   }
 
-  if (! to_commit.empty () && vars.get ()) {
-    vars->commit_shapes (res->deep_layer ().layer (), to_commit);
+  if (! to_commit_true.empty () && vars.get ()) {
+    tl_assert (res_true.get () != 0);
+    vars->commit_shapes (res_true->deep_layer ().layer (), to_commit_true);
+  }
+  if (! to_commit_false.empty () && vars.get ()) {
+    tl_assert (res_false.get () != 0);
+    vars->commit_shapes (res_false->deep_layer ().layer (), to_commit_false);
   }
 
-  return res.release ();
+  return std::make_pair (res_true.release (), res_false.release ());
 }
 
 TextsDelegate *DeepTexts::process_in_place (const TextProcessorBase &filter)

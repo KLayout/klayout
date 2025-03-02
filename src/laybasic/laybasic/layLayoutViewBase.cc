@@ -3788,21 +3788,25 @@ LayoutViewBase::timer ()
     emit_dirty_changed ();
   }
 
-  if (m_prop_changed) {
-    do_prop_changed ();
-    m_prop_changed = false;
-  }
+  if (is_activated ()) {
 
-  tl::Clock current_time = tl::Clock::current ();
-  if ((current_time - m_last_checked).seconds () > animation_interval) {
-    m_last_checked = current_time;
-    if (m_animated) {
-      set_view_ops ();
-      do_set_phase (int (m_phase));
+    if (m_prop_changed) {
+      do_prop_changed ();
+      m_prop_changed = false;
+    }
+
+    tl::Clock current_time = tl::Clock::current ();
+    if ((current_time - m_last_checked).seconds () > animation_interval) {
+      m_last_checked = current_time;
       if (m_animated) {
-        ++m_phase;
+        set_view_ops ();
+        do_set_phase (int (m_phase));
+        if (m_animated) {
+          ++m_phase;
+        }
       }
     }
+
   }
 }
 

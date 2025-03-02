@@ -1459,7 +1459,6 @@ LayoutView::activate ()
         (*p)->browser_interface ()->show ();
       }
     }
-    mp_timer->start (timer_interval);
     m_activated = true;
     update_content ();
   }
@@ -1479,7 +1478,6 @@ LayoutView::deactivate ()
   }
 
   free_resources ();
-  mp_timer->stop ();
   m_activated = false;
 }
 

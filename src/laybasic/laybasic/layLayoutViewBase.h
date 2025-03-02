@@ -2614,7 +2614,7 @@ public:
   /**
    *  @brief Gets the window title of the view
    */
-  std::string title () const;
+  const std::string &title () const;
 
   /**
    *  @brief Sets the window title to an explicit string
@@ -2837,7 +2837,7 @@ private:
   void signal_bboxes_changed ();
   void signal_prop_ids_changed ();
   void signal_layer_properties_changed ();
-  void signal_cell_name_changed ();
+  void signal_cell_name_changed (unsigned int cv_index);
   void signal_annotations_changed ();
   void signal_plugin_enabled_changed ();
   void signal_apply_technology (lay::LayoutHandle *layout_handle);
@@ -2853,6 +2853,7 @@ private:
   lay::AnnotationShapes m_annotation_shapes;
   std::vector <std::set <cell_index_type> > m_hidden_cells;
   std::string m_title;
+  std::string m_current_title;
   tl::vector <rdb::Database *> m_rdbs;
   tl::vector <db::LayoutToNetlist *> m_l2ndbs;
   std::string m_def_lyp_file;
@@ -3004,6 +3005,8 @@ private:
   void finish_cellviews_changed ();
   void init_layer_properties (LayerProperties &props, const LayerPropertiesList &lp_list) const;
   void merge_dither_pattern (lay::LayerPropertiesList &props);
+
+  void update_title ();
 
 protected:
   /**

@@ -607,7 +607,7 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase ("lay", "LayoutVi
     "\n"
     "See \\set_title and \\title for a description about how titles are handled."
   ) +
-  gsi::method ("title", static_cast<std::string (lay::LayoutViewBase::*) () const> (&lay::LayoutViewBase::title),
+  gsi::method ("title", static_cast<const std::string &(lay::LayoutViewBase::*) () const> (&lay::LayoutViewBase::title),
     "@brief Returns the view's title string\n"
     "\n"
     "@return The title string\n"

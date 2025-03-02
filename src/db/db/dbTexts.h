@@ -342,7 +342,7 @@ public:
   std::pair<Texts, Texts> split_filter (const TextFilterBase &filter) const
   {
     std::pair<db::TextsDelegate *, db::TextsDelegate *> p = mp_delegate->filtered_pair (filter);
-    return std::pair (Texts (p.first), Texts (p.second));
+    return std::make_pair (Texts (p.first), Texts (p.second));
   }
 
   /**

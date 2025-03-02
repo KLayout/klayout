@@ -355,7 +355,7 @@ public:
   std::pair<EdgePairs, EdgePairs> split_filter (const EdgePairFilterBase &filter) const
   {
     std::pair<db::EdgePairsDelegate *, db::EdgePairsDelegate *> p = mp_delegate->filtered_pair (filter);
-    return std::pair (EdgePairs (p.first), EdgePairs (p.second));
+    return std::make_pair (EdgePairs (p.first), EdgePairs (p.second));
   }
 
   /**

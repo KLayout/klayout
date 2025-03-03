@@ -78,6 +78,7 @@ jobs:
           ccache -s
       - uses: actions/upload-artifact@v4
         with:
+          name: artifact-${{ matrix.os }}-${{ matrix.cibw_arch }}-${{ strategy.job-index }}
           path: ./wheelhouse/*.whl
 
   # The following was taken from https://cibuildwheel.readthedocs.io/en/stable/deliver-to-pypi/
@@ -92,15 +93,16 @@ jobs:
 
     - uses: actions/upload-artifact@v4
       with:
+        name: artifact-${{ matrix.os }}-${{ matrix.cibw_arch }}-${{ strategy.job-index }}
         path: dist/*.tar.gz
 
   upload_to_test_pypy:
     needs: [build, make_sdist]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/download-artifact@v3
+    - uses: actions/download-artifact@v4
       with:
-        name: artifact
+        name: artifact-${{ matrix.os }}-${{ matrix.cibw_arch }}-${{ strategy.job-index }}
         path: dist
 
     - uses: pypa/gh-action-pypi-publish@v1.12.4
@@ -115,9 +117,9 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'release' && github.event.action == 'published'
     steps:
-    - uses: actions/download-artifact@v3
+    - uses: actions/download-artifact@v4
       with:
-        name: artifact
+        name: artifact-${{ matrix.os }}-${{ matrix.cibw_arch }}-${{ strategy.job-index }}
         path: dist
 
     - uses: pypa/gh-action-pypi-publish@v1.12.4

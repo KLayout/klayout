@@ -4,6 +4,7 @@
 * Enhancement: %GITHUB%/issues/1989 API enhancements: several new split_... methods
   on Edges, Region, EdgePairs and Texts, delivering a pair of containers with 
   selected and unselected objects.
+* Bug: %GITHUB%/issues/1993 Tiling processor kept layout locks, causing DRC issues with "with_density"
 * Bugfix: 'Save All' was not updating the dirty flag in the inactive tabs
 * Bugfix: Fixing a crash when editing PCell parameters while the macro editor is open
 * Bugfix: Fixed a potential Crash on "save all"

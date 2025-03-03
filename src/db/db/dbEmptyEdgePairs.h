@@ -56,6 +56,7 @@ public:
 
   virtual EdgePairsDelegate *filter_in_place (const EdgePairFilterBase &) { return this; }
   virtual EdgePairsDelegate *filtered (const EdgePairFilterBase &) const { return new EmptyEdgePairs (); }
+  virtual std::pair<EdgePairsDelegate *, EdgePairsDelegate *> filtered_pair (const EdgePairFilterBase &) const { return std::make_pair (new EmptyEdgePairs (), new EmptyEdgePairs ()); }
   virtual EdgePairsDelegate *process_in_place (const EdgePairProcessorBase &) { return this; }
   virtual EdgePairsDelegate *processed (const EdgePairProcessorBase &) const { return new EmptyEdgePairs (); }
   virtual RegionDelegate *processed_to_polygons (const EdgePairToPolygonProcessorBase &filter) const;

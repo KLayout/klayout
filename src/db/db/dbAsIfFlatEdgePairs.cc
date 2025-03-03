@@ -226,6 +226,16 @@ AsIfFlatEdgePairs::processed_to_edges (const EdgePairToEdgeProcessorBase &filter
   return edges.release ();
 }
 
+static void
+insert_ep (FlatEdgePairs *dest, const db::EdgePair &ep, db::properties_id_type prop_id)
+{
+  if (prop_id != 0) {
+    dest->insert (db::EdgePairWithProperties (ep, prop_id));
+  } else {
+    dest->insert (ep);
+  }
+}
+
 EdgePairsDelegate *
 AsIfFlatEdgePairs::filtered (const EdgePairFilterBase &filter) const
 {
@@ -234,16 +244,26 @@ AsIfFlatEdgePairs::filtered (const EdgePairFilterBase &filter) const
 
   for (EdgePairsIterator p (begin ()); ! p.at_end (); ++p) {
     if (filter.selected (*p)) {
-      db::properties_id_type prop_id = pm (p.prop_id ());
-      if (prop_id != 0) {
-        new_edge_pairs->insert (db::EdgePairWithProperties (*p, prop_id));
-      } else {
-        new_edge_pairs->insert (*p);
-      }
+      insert_ep (new_edge_pairs.get (), *p, pm (p.prop_id ()));
     }
   }
 
   return new_edge_pairs.release ();
+}
+
+std::pair <EdgePairsDelegate *, EdgePairsDelegate *>
+AsIfFlatEdgePairs::filtered_pair (const EdgePairFilterBase &filter) const
+{
+  std::unique_ptr<FlatEdgePairs> new_edge_pairs_true (new FlatEdgePairs ());
+  std::unique_ptr<FlatEdgePairs> new_edge_pairs_false (new FlatEdgePairs ());
+  db::PropertyMapper pm (new_edge_pairs_true->properties_repository (), properties_repository ());
+
+  for (EdgePairsIterator p (begin ()); ! p.at_end (); ++p) {
+    FlatEdgePairs *dest = filter.selected (*p) ? new_edge_pairs_true.get () : new_edge_pairs_false.get ();
+    insert_ep (dest, *p, pm (p.prop_id ()));
+  }
+
+  return std::make_pair (new_edge_pairs_true.release (), new_edge_pairs_false.release ());
 }
 
 RegionDelegate *

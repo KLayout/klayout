@@ -179,9 +179,13 @@ class DBTexts_TestClass < TestBase
     r1 = RBA::Texts::new([ text1, text2 ])
     assert_equal(csort(r1.to_s), csort("('abc',r0 100,-200);('uvm',r0 110,210)"))
     assert_equal(r1.with_text("abc", false).to_s, "('abc',r0 100,-200)")
+    assert_equal(r1.split_with_text("abc")[0].to_s, "('abc',r0 100,-200)")
     assert_equal(r1.with_text("abc", true).to_s, "('uvm',r0 110,210)")
+    assert_equal(r1.split_with_text("abc")[1].to_s, "('uvm',r0 110,210)")
     assert_equal(r1.with_match("*b*", false).to_s, "('abc',r0 100,-200)")
+    assert_equal(r1.split_with_match("*b*")[0].to_s, "('abc',r0 100,-200)")
     assert_equal(r1.with_match("*b*", true).to_s, "('uvm',r0 110,210)")
+    assert_equal(r1.split_with_match("*b*")[1].to_s, "('uvm',r0 110,210)")
 
     r1 = RBA::Texts::new(text1)
     assert_equal(r1.to_s, "('abc',r0 100,-200)")
@@ -394,6 +398,8 @@ class DBTexts_TestClass < TestBase
     texts.insert(RBA::Text::new("00", [ RBA::Trans::R90, 0, 20 ]))
 
     assert_equal(texts.filtered(f).to_s, "('tla',r0 0,0)")
+    assert_equal(texts.split_filter(f)[0].to_s, "('tla',r0 0,0)")
+    assert_equal(texts.split_filter(f)[1].to_s, "('long',m45 10,0);('00',r90 0,20)")
     assert_equal(texts.to_s, "('long',m45 10,0);('tla',r0 0,0);('00',r90 0,20)")
     texts.filter(f)
     assert_equal(texts.to_s, "('tla',r0 0,0)")

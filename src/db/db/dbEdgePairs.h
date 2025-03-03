@@ -347,6 +347,18 @@ public:
   }
 
   /**
+   *  @brief Returns the filtered edge pairs and the others
+   *
+   *  This method will return a new edge pair collection with only those edge pairs which
+   *  conform to the filter criterion and another for those which don't.
+   */
+  std::pair<EdgePairs, EdgePairs> split_filter (const EdgePairFilterBase &filter) const
+  {
+    std::pair<db::EdgePairsDelegate *, db::EdgePairsDelegate *> p = mp_delegate->filtered_pair (filter);
+    return std::make_pair (EdgePairs (p.first), EdgePairs (p.second));
+  }
+
+  /**
    *  @brief Processes the edge pairs in-place
    *
    *  This method will run the processor over all edge pairs and replace the collection by the results.

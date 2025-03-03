@@ -79,6 +79,7 @@ public:
 
   virtual TextsDelegate *filter_in_place (const TextFilterBase &filter);
   virtual TextsDelegate *filtered (const TextFilterBase &) const;
+  virtual std::pair<TextsDelegate *, TextsDelegate *> filtered_pair (const TextFilterBase &filter) const;
 
   virtual TextsDelegate *process_in_place (const TextProcessorBase &);
   virtual TextsDelegate *processed (const TextProcessorBase &) const;
@@ -107,7 +108,7 @@ private:
   DeepTexts &operator= (const DeepTexts &other);
 
   void init ();
-  DeepTexts *apply_filter (const TextFilterBase &filter) const;
+  std::pair<DeepTexts *, DeepTexts *> apply_filter (const TextFilterBase &filter, bool with_true, bool with_false) const;
 
   virtual TextsDelegate *selected_interacting_generic (const Region &other, bool inverse) const;
   virtual RegionDelegate *pull_generic (const Region &other) const;

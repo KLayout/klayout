@@ -95,6 +95,7 @@ public:
 
   virtual TextsDelegate *filter_in_place (const TextFilterBase &filter) = 0;
   virtual TextsDelegate *filtered (const TextFilterBase &filter) const = 0;
+  virtual std::pair<TextsDelegate *, TextsDelegate *> filtered_pair (const TextFilterBase &filter) const = 0;
   virtual TextsDelegate *process_in_place (const TextProcessorBase &proc) = 0;
   virtual TextsDelegate *processed (const TextProcessorBase &proc) const = 0;
   virtual RegionDelegate *processed_to_polygons (const TextToPolygonProcessorBase &proc) const = 0;

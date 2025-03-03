@@ -53,6 +53,7 @@ public:
   }
 
   virtual EdgePairsDelegate *filtered (const EdgePairFilterBase &) const;
+  virtual std::pair<EdgePairsDelegate *, EdgePairsDelegate *> filtered_pair (const EdgePairFilterBase &filter) const;
 
   virtual EdgePairsDelegate *process_in_place (const EdgePairProcessorBase &proc)
   {

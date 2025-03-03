@@ -414,6 +414,25 @@ AsIfFlatRegion::filtered (const PolygonFilterBase &filter) const
   return new_region.release ();
 }
 
+std::pair<RegionDelegate *, RegionDelegate *>
+AsIfFlatRegion::filtered_pair (const PolygonFilterBase &filter) const
+{
+  std::unique_ptr<FlatRegion> new_region_true (new FlatRegion ());
+  std::unique_ptr<FlatRegion> new_region_false (new FlatRegion ());
+
+  for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
+    if (filter.selected (*p)) {
+      new_region_true->insert (*p);
+    } else {
+      new_region_false->insert (*p);
+    }
+  }
+
+  new_region_true->set_is_merged (true);
+  new_region_false->set_is_merged (true);
+  return std::make_pair (new_region_true.release (), new_region_false.release ());
+}
+
 RegionDelegate *
 AsIfFlatRegion::processed (const PolygonProcessorBase &filter) const
 {

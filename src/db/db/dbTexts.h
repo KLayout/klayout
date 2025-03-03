@@ -214,6 +214,16 @@ public:
   }
 
   /**
+   *  @brief Takes the underlying delegate object
+   */
+  TextsDelegate *take_delegate ()
+  {
+    TextsDelegate *delegate = mp_delegate;
+    mp_delegate = 0;
+    return delegate;
+  }
+
+  /**
    *  @brief Iterator of the text set
    *
    *  The iterator delivers the edges of the text set.
@@ -321,6 +331,18 @@ public:
   Texts filtered (const TextFilterBase &filter) const
   {
     return Texts (mp_delegate->filtered (filter));
+  }
+
+  /**
+   *  @brief Returns the filtered texts and the others
+   *
+   *  This method will return a new text collection with only those texts which
+   *  conform to the filter criterion and another for those which don't.
+   */
+  std::pair<Texts, Texts> split_filter (const TextFilterBase &filter) const
+  {
+    std::pair<db::TextsDelegate *, db::TextsDelegate *> p = mp_delegate->filtered_pair (filter);
+    return std::make_pair (Texts (p.first), Texts (p.second));
   }
 
   /**

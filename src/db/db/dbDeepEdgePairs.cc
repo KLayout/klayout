@@ -375,18 +375,24 @@ EdgePairsDelegate *
 DeepEdgePairs::filter_in_place (const EdgePairFilterBase &filter)
 {
   //  TODO: implement to be really in-place
-  *this = *apply_filter (filter);
+  *this = *apply_filter (filter, true, false).first;
   return this;
 }
 
 EdgePairsDelegate *
 DeepEdgePairs::filtered (const EdgePairFilterBase &filter) const
 {
-  return apply_filter (filter);
+  return apply_filter (filter, true, false).first;
 }
 
-DeepEdgePairs *
-DeepEdgePairs::apply_filter (const EdgePairFilterBase &filter) const
+std::pair<EdgePairsDelegate *, EdgePairsDelegate *>
+DeepEdgePairs::filtered_pair (const EdgePairFilterBase &filter) const
+{
+  return apply_filter (filter, true, true);
+}
+
+std::pair<DeepEdgePairs *, DeepEdgePairs *>
+DeepEdgePairs::apply_filter (const EdgePairFilterBase &filter, bool with_true, bool with_false) const
 {
   const db::DeepLayer &edge_pairs = deep_layer ();
   db::Layout &layout = const_cast<db::Layout &> (edge_pairs.layout ());
@@ -404,9 +410,10 @@ DeepEdgePairs::apply_filter (const EdgePairFilterBase &filter) const
 
   }
 
-  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
+  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit_true, to_commit_false;
 
-  std::unique_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (edge_pairs.derived ()));
+  std::unique_ptr<db::DeepEdgePairs> res_true (with_true ? new db::DeepEdgePairs (edge_pairs.derived ()) : 0);
+  std::unique_ptr<db::DeepEdgePairs> res_false (with_false ? new db::DeepEdgePairs (edge_pairs.derived ()) : 0);
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
     const db::Shapes &s = c->shapes (edge_pairs.layer ());
@@ -416,18 +423,34 @@ DeepEdgePairs::apply_filter (const EdgePairFilterBase &filter) const
       const std::set<db::ICplxTrans> &vv = vars->variants (c->cell_index ());
       for (auto v = vv.begin (); v != vv.end (); ++v) {
 
-        db::Shapes *st;
+        db::Shapes *st_true = 0, *st_false = 0;
         if (vv.size () == 1) {
-          st = & c->shapes (res->deep_layer ().layer ());
+          if (with_true) {
+            st_true = & c->shapes (res_true->deep_layer ().layer ());
+          }
+          if (with_false) {
+            st_false = & c->shapes (res_false->deep_layer ().layer ());
+          }
         } else {
-          st = & to_commit [c->cell_index ()] [*v];
+          if (with_true) {
+            st_true = & to_commit_true [c->cell_index ()] [*v];
+          }
+          if (with_false) {
+            st_false = & to_commit_false [c->cell_index ()] [*v];
+          }
         }
 
         const db::ICplxTrans &tr = *v;
 
         for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::EdgePairs); ! si.at_end (); ++si) {
           if (filter.selected (si->edge_pair ().transformed (tr))) {
-            st->insert (*si);
+            if (st_true) {
+              st_true->insert (*si);
+            }
+          } else {
+            if (st_false) {
+              st_false->insert (*si);
+            }
           }
         }
 
@@ -435,11 +458,18 @@ DeepEdgePairs::apply_filter (const EdgePairFilterBase &filter) const
 
     } else {
 
-      db::Shapes &st = c->shapes (res->deep_layer ().layer ());
+      db::Shapes *st_true = with_true ? &c->shapes (res_true->deep_layer ().layer ()) : 0;
+      db::Shapes *st_false = with_false ? &c->shapes (res_false->deep_layer ().layer ()) : 0;
 
       for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::EdgePairs); ! si.at_end (); ++si) {
         if (filter.selected (si->edge_pair ())) {
-          st.insert (*si);
+          if (with_true) {
+            st_true->insert (*si);
+          }
+        } else {
+          if (with_false) {
+            st_false->insert (*si);
+          }
         }
       }
 
@@ -447,11 +477,16 @@ DeepEdgePairs::apply_filter (const EdgePairFilterBase &filter) const
 
   }
 
-  if (! to_commit.empty () && vars.get ()) {
-    vars->commit_shapes (res->deep_layer ().layer (), to_commit);
+  if (! to_commit_true.empty () && vars.get ()) {
+    tl_assert (res_true.get () != 0);
+    vars->commit_shapes (res_true->deep_layer ().layer (), to_commit_true);
+  }
+  if (! to_commit_false.empty () && vars.get ()) {
+    tl_assert (res_false.get () != 0);
+    vars->commit_shapes (res_false->deep_layer ().layer (), to_commit_false);
   }
 
-  return res.release ();
+  return std::make_pair (res_true.release (), res_false.release ());
 }
 
 EdgePairsDelegate *DeepEdgePairs::process_in_place (const EdgePairProcessorBase &filter)

@@ -717,6 +717,23 @@ AsIfFlatEdges::filtered (const EdgeFilterBase &filter) const
   return new_region.release ();
 }
 
+std::pair<EdgesDelegate *, EdgesDelegate *>
+AsIfFlatEdges::filtered_pair (const EdgeFilterBase &filter) const
+{
+  std::unique_ptr<FlatEdges> new_region_true (new FlatEdges ());
+  std::unique_ptr<FlatEdges> new_region_false (new FlatEdges ());
+
+  for (EdgesIterator p (begin_merged ()); ! p.at_end (); ++p) {
+    if (filter.selected (*p)) {
+      new_region_true->insert (*p);
+    } else {
+      new_region_false->insert (*p);
+    }
+  }
+
+  return std::make_pair (new_region_true.release (), new_region_false.release ());
+}
+
 EdgePairsDelegate *
 AsIfFlatEdges::run_check (db::edge_relation_type rel, const Edges *other, db::Coord d, const db::EdgesCheckOptions &options) const
 {

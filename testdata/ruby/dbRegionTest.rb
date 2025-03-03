@@ -485,46 +485,68 @@ class DBRegion_TestClass < TestBase
     r.merged_semantics = false
 
     assert_equal(r.with_area(20000, false).to_s, "(0,0;0,200;100,200;100,0)")
+    assert_equal(r.split_with_area(20000)[0].to_s, "(0,0;0,200;100,200;100,0)")
     assert_equal(r.with_area(20000, true).to_s, "(0,0;0,100;400,100;400,0)")
+    assert_equal(r.split_with_area(20000)[1].to_s, "(0,0;0,100;400,100;400,0)")
     assert_equal(csort(r.with_area(10000, nil, false).to_s), csort("(0,0;0,200;100,200;100,0);(0,0;0,100;400,100;400,0)"))
     assert_equal(r.with_area(10000, 20000, false).to_s, "")
     assert_equal(r.with_area(nil, 20001, false).to_s, "(0,0;0,200;100,200;100,0)")
     assert_equal(csort(r.with_area(10000, 20000, true).to_s), csort("(0,0;0,200;100,200;100,0);(0,0;0,100;400,100;400,0)"))
     
     assert_equal(r.with_perimeter(600, false).to_s, "(0,0;0,200;100,200;100,0)")
+    assert_equal(r.split_with_perimeter(600)[0].to_s, "(0,0;0,200;100,200;100,0)")
     assert_equal(r.with_perimeter(600, true).to_s, "(0,0;0,100;400,100;400,0)")
+    assert_equal(r.split_with_perimeter(600)[1].to_s, "(0,0;0,100;400,100;400,0)")
     assert_equal(csort(r.with_perimeter(600, nil, false).to_s), csort("(0,0;0,200;100,200;100,0);(0,0;0,100;400,100;400,0)"))
     assert_equal(r.with_perimeter(600, 1000, false).to_s, "(0,0;0,200;100,200;100,0)")
     assert_equal(r.with_perimeter(nil, 1000, false).to_s, "(0,0;0,200;100,200;100,0)")
+    assert_equal(r.split_with_perimeter(nil, 1000)[0].to_s, "(0,0;0,200;100,200;100,0)")
     assert_equal(r.with_perimeter(600, 1000, true).to_s, "(0,0;0,100;400,100;400,0)")
+    assert_equal(r.split_with_perimeter(600, 1000)[1].to_s, "(0,0;0,100;400,100;400,0)")
     
     assert_equal(r.with_bbox_height(200, false).to_s, "(0,0;0,200;100,200;100,0)")
+    assert_equal(r.split_with_bbox_height(200)[0].to_s, "(0,0;0,200;100,200;100,0)")
     assert_equal(r.with_bbox_height(200, true).to_s, "(0,0;0,100;400,100;400,0)")
+    assert_equal(r.split_with_bbox_height(200)[1].to_s, "(0,0;0,100;400,100;400,0)")
     assert_equal(csort(r.with_bbox_height(100, nil, false).to_s), csort("(0,0;0,200;100,200;100,0);(0,0;0,100;400,100;400,0)"))
     assert_equal(r.with_bbox_height(100, 200, false).to_s, "(0,0;0,100;400,100;400,0)")
     assert_equal(csort(r.with_bbox_height(nil, 201, false).to_s), csort("(0,0;0,200;100,200;100,0);(0,0;0,100;400,100;400,0)"))
+    assert_equal(csort(r.split_with_bbox_height(nil, 201)[0].to_s), csort("(0,0;0,200;100,200;100,0);(0,0;0,100;400,100;400,0)"))
     assert_equal(r.with_bbox_height(100, 200, true).to_s, "(0,0;0,200;100,200;100,0)")
+    assert_equal(r.split_with_bbox_height(100, 200)[1].to_s, "(0,0;0,200;100,200;100,0)")
     
     assert_equal(r.with_bbox_width(400, false).to_s, "(0,0;0,100;400,100;400,0)")
+    assert_equal(r.split_with_bbox_width(400)[0].to_s, "(0,0;0,100;400,100;400,0)")
     assert_equal(r.with_bbox_width(400, true).to_s, "(0,0;0,200;100,200;100,0)")
+    assert_equal(r.split_with_bbox_width(400)[1].to_s, "(0,0;0,200;100,200;100,0)")
     assert_equal(csort(r.with_bbox_width(100, nil, false).to_s), csort("(0,0;0,200;100,200;100,0);(0,0;0,100;400,100;400,0)"))
     assert_equal(r.with_bbox_width(100, 400, false).to_s, "(0,0;0,200;100,200;100,0)")
     assert_equal(csort(r.with_bbox_width(nil, 401, false).to_s), csort("(0,0;0,200;100,200;100,0);(0,0;0,100;400,100;400,0)"))
+    assert_equal(csort(r.split_with_bbox_width(nil, 401)[0].to_s), csort("(0,0;0,200;100,200;100,0);(0,0;0,100;400,100;400,0)"))
     assert_equal(r.with_bbox_width(100, 400, true).to_s, "(0,0;0,100;400,100;400,0)")
+    assert_equal(r.split_with_bbox_width(100, 400)[1].to_s, "(0,0;0,100;400,100;400,0)")
     
     assert_equal(csort(r.with_bbox_min(100, false).to_s), csort("(0,0;0,200;100,200;100,0);(0,0;0,100;400,100;400,0)"))
+    assert_equal(csort(r.split_with_bbox_min(100)[0].to_s), csort("(0,0;0,200;100,200;100,0);(0,0;0,100;400,100;400,0)"))
     assert_equal(r.with_bbox_min(100, true).to_s, "")
+    assert_equal(r.split_with_bbox_min(100)[1].to_s, "")
     assert_equal(csort(r.with_bbox_min(100, nil, false).to_s), csort("(0,0;0,200;100,200;100,0);(0,0;0,100;400,100;400,0)"))
     assert_equal(csort(r.with_bbox_min(100, 101, false).to_s), csort("(0,0;0,200;100,200;100,0);(0,0;0,100;400,100;400,0)"))
     assert_equal(csort(r.with_bbox_min(nil, 101, false).to_s), csort("(0,0;0,200;100,200;100,0);(0,0;0,100;400,100;400,0)"))
+    assert_equal(csort(r.split_with_bbox_min(nil, 101)[0].to_s), csort("(0,0;0,200;100,200;100,0);(0,0;0,100;400,100;400,0)"))
     assert_equal(r.with_bbox_min(100, 101, true).to_s, "")
+    assert_equal(r.split_with_bbox_min(100, 101)[1].to_s, "")
     
     assert_equal(r.with_bbox_max(200, false).to_s, "(0,0;0,200;100,200;100,0)")
+    assert_equal(r.split_with_bbox_max(200)[0].to_s, "(0,0;0,200;100,200;100,0)")
     assert_equal(r.with_bbox_max(200, true).to_s, "(0,0;0,100;400,100;400,0)")
+    assert_equal(r.split_with_bbox_max(200)[1].to_s, "(0,0;0,100;400,100;400,0)")
     assert_equal(csort(r.with_bbox_max(200, nil, false).to_s), csort("(0,0;0,200;100,200;100,0);(0,0;0,100;400,100;400,0)"))
     assert_equal(r.with_bbox_max(200, 400, false).to_s, "(0,0;0,200;100,200;100,0)")
     assert_equal(r.with_bbox_max(nil, 400, false).to_s, "(0,0;0,200;100,200;100,0)")
+    assert_equal(r.split_with_bbox_max(nil, 400)[0].to_s, "(0,0;0,200;100,200;100,0)")
     assert_equal(r.with_bbox_max(200, 400, true).to_s, "(0,0;0,100;400,100;400,0)")
+    assert_equal(r.split_with_bbox_max(200, 400)[1].to_s, "(0,0;0,100;400,100;400,0)")
     
   end
 
@@ -840,15 +862,23 @@ class DBRegion_TestClass < TestBase
 
     r1.merged_semantics = false
     assert_equal(csort(r1.rectangles.to_s), csort("(10,20;10,200;100,200;100,20);(50,70;50,270;150,270;150,70)"))
+    assert_equal(csort(r1.split_rectangles[0].to_s), csort("(10,20;10,200;100,200;100,20);(50,70;50,270;150,270;150,70)"))
     assert_equal(csort(r1.non_rectangles.to_s), csort("(0,0;100,100;100,0);(0,0;0,100;50,100;50,200;100,200;100,0)"))
+    assert_equal(csort(r1.split_rectangles[1].to_s), csort("(0,0;100,100;100,0);(0,0;0,100;50,100;50,200;100,200;100,0)"))
     assert_equal(csort(r1.rectilinear.to_s), csort("(10,20;10,200;100,200;100,20);(50,70;50,270;150,270;150,70);(0,0;0,100;50,100;50,200;100,200;100,0)"))
+    assert_equal(csort(r1.split_rectilinear[0].to_s), csort("(10,20;10,200;100,200;100,20);(50,70;50,270;150,270;150,70);(0,0;0,100;50,100;50,200;100,200;100,0)"))
     assert_equal(r1.non_rectilinear.to_s, "(0,0;100,100;100,0)")
+    assert_equal(r1.split_rectilinear[1].to_s, "(0,0;100,100;100,0)")
 
     r1.merged_semantics = true
     assert_equal(r1.rectangles.to_s, "")
+    assert_equal(r1.split_rectangles[0].to_s, "")
     assert_equal(r1.non_rectangles.to_s, "(0,0;0,100;10,100;10,200;50,200;50,270;150,270;150,70;100,70;100,0)")
+    assert_equal(r1.split_rectangles[1].to_s, "(0,0;0,100;10,100;10,200;50,200;50,270;150,270;150,70;100,70;100,0)")
     assert_equal(r1.rectilinear.to_s, "(0,0;0,100;10,100;10,200;50,200;50,270;150,270;150,70;100,70;100,0)")
+    assert_equal(r1.split_rectilinear[0].to_s, "(0,0;0,100;10,100;10,200;50,200;50,270;150,270;150,70;100,70;100,0)")
     assert_equal(r1.non_rectilinear.to_s, "")
+    assert_equal(r1.split_rectilinear[1].to_s, "")
 
   end
 
@@ -1188,19 +1218,25 @@ class DBRegion_TestClass < TestBase
     r.insert(RBA::Box::new(0, 10000, 2000, 12000))
 
     assert_equal(r.with_bbox_width(1000, false).to_s, "(0,0;0,5000;1000,5000;1000,0)")
+    assert_equal(r.split_with_bbox_width(1000)[0].to_s, "(0,0;0,5000;1000,5000;1000,0)")
     assert_equal(csort(r.with_bbox_width(1000, true).to_s), csort("(3000,0;3000,1000;7000,1000;7000,0);(0,10000;0,12000;2000,12000;2000,10000)"))
+    assert_equal(csort(r.split_with_bbox_width(1000)[1].to_s), csort("(3000,0;3000,1000;7000,1000;7000,0);(0,10000;0,12000;2000,12000;2000,10000)"))
     assert_equal(csort(r.with_bbox_width(1000, 2001, false).to_s), csort("(0,0;0,5000;1000,5000;1000,0);(0,10000;0,12000;2000,12000;2000,10000)"))
     assert_equal(r.with_bbox_width(1000, 2000, false).to_s, "(0,0;0,5000;1000,5000;1000,0)")
     assert_equal(r.with_bbox_width(1000, 2001, true).to_s, "(3000,0;3000,1000;7000,1000;7000,0)")
 
     assert_equal(r.with_bbox_height(5000, false).to_s, "(0,0;0,5000;1000,5000;1000,0)")
+    assert_equal(r.split_with_bbox_height(5000)[0].to_s, "(0,0;0,5000;1000,5000;1000,0)")
     assert_equal(csort(r.with_bbox_height(5000, true).to_s), csort("(3000,0;3000,1000;7000,1000;7000,0);(0,10000;0,12000;2000,12000;2000,10000)"))
+    assert_equal(csort(r.split_with_bbox_height(5000)[1].to_s), csort("(3000,0;3000,1000;7000,1000;7000,0);(0,10000;0,12000;2000,12000;2000,10000)"))
     assert_equal(csort(r.with_bbox_height(1000, 2001, false).to_s), csort("(3000,0;3000,1000;7000,1000;7000,0);(0,10000;0,12000;2000,12000;2000,10000)"))
     assert_equal(r.with_bbox_height(1000, 1001, false).to_s, "(3000,0;3000,1000;7000,1000;7000,0)")
     assert_equal(csort(r.with_bbox_height(1000, 1001, true).to_s), csort("(0,0;0,5000;1000,5000;1000,0);(0,10000;0,12000;2000,12000;2000,10000)"))
 
     assert_equal(r.with_bbox_aspect_ratio(1.0, false).to_s, "(0,10000;0,12000;2000,12000;2000,10000)")
+    assert_equal(r.split_with_bbox_aspect_ratio(1.0)[0].to_s, "(0,10000;0,12000;2000,12000;2000,10000)")
     assert_equal(csort(r.with_bbox_aspect_ratio(1.0, true).to_s), csort("(3000,0;3000,1000;7000,1000;7000,0);(0,0;0,5000;1000,5000;1000,0)"))
+    assert_equal(csort(r.split_with_bbox_aspect_ratio(1.0)[1].to_s), csort("(3000,0;3000,1000;7000,1000;7000,0);(0,0;0,5000;1000,5000;1000,0)"))
     assert_equal(r.with_bbox_aspect_ratio(0.9, 1.0, false).to_s, "(0,10000;0,12000;2000,12000;2000,10000)")
     assert_equal(r.with_bbox_aspect_ratio(1.0, 1.1, false).to_s, "(0,10000;0,12000;2000,12000;2000,10000)")
     assert_equal(r.with_bbox_aspect_ratio(0.9, 0.95, false).to_s, "")
@@ -1208,7 +1244,9 @@ class DBRegion_TestClass < TestBase
     assert_equal(r.with_bbox_aspect_ratio(1.0, 1.1, false, false, true).to_s, "")
 
     assert_equal(r.with_relative_height(1.0, false).to_s, "(0,10000;0,12000;2000,12000;2000,10000)")
+    assert_equal(r.split_with_relative_height(1.0)[0].to_s, "(0,10000;0,12000;2000,12000;2000,10000)")
     assert_equal(csort(r.with_relative_height(1.0, true).to_s), csort("(3000,0;3000,1000;7000,1000;7000,0);(0,0;0,5000;1000,5000;1000,0)"))
+    assert_equal(csort(r.split_with_relative_height(1.0)[1].to_s), csort("(3000,0;3000,1000;7000,1000;7000,0);(0,0;0,5000;1000,5000;1000,0)"))
     assert_equal(r.with_relative_height(0.9, 1.0, false).to_s, "(0,10000;0,12000;2000,12000;2000,10000)")
     assert_equal(r.with_relative_height(1.0, 1.1, false).to_s, "(0,10000;0,12000;2000,12000;2000,10000)")
     assert_equal(r.with_relative_height(0.9, 0.95, false).to_s, "")
@@ -1216,9 +1254,13 @@ class DBRegion_TestClass < TestBase
     assert_equal(r.with_relative_height(1.0, 1.1, false, false, true).to_s, "")
 
     assert_equal(csort(r.rectangles.to_s), csort("(3000,0;3000,1000;7000,1000;7000,0);(0,0;0,5000;1000,5000;1000,0);(0,10000;0,12000;2000,12000;2000,10000)"))
+    assert_equal(csort(r.split_rectangles[0].to_s), csort("(3000,0;3000,1000;7000,1000;7000,0);(0,0;0,5000;1000,5000;1000,0);(0,10000;0,12000;2000,12000;2000,10000)"))
     assert_equal(r.non_rectangles.to_s, "")
+    assert_equal(r.split_rectangles[1].to_s, "")
     assert_equal(r.squares.to_s, "(0,10000;0,12000;2000,12000;2000,10000)")
+    assert_equal(r.split_squares[0].to_s, "(0,10000;0,12000;2000,12000;2000,10000)")
     assert_equal(csort(r.non_squares.to_s), csort("(3000,0;3000,1000;7000,1000;7000,0);(0,0;0,5000;1000,5000;1000,0)"))
+    assert_equal(csort(r.split_squares[1].to_s), csort("(3000,0;3000,1000;7000,1000;7000,0);(0,0;0,5000;1000,5000;1000,0)"))
 
     r = RBA::Region::new
     r.insert(RBA::Box::new(0, 0, 1000, 2000))
@@ -1226,7 +1268,9 @@ class DBRegion_TestClass < TestBase
     r.insert(RBA::Box::new(0, 10000, 2000, 12000))
 
     assert_equal(r.with_area_ratio(1.0, false).to_s, "(0,10000;0,12000;2000,12000;2000,10000)")
+    assert_equal(r.split_with_area_ratio(1.0)[0].to_s, "(0,10000;0,12000;2000,12000;2000,10000)")
     assert_equal(r.with_area_ratio(1.0, true).to_s, "(0,0;0,2000;1000,2000;1000,1000;2000,1000;2000,0)")
+    assert_equal(r.split_with_area_ratio(1.0)[1].to_s, "(0,0;0,2000;1000,2000;1000,1000;2000,1000;2000,0)")
     assert_equal(r.with_area_ratio(4.0 / 3.0, false).to_s, "(0,0;0,2000;1000,2000;1000,1000;2000,1000;2000,0)")
     assert_equal(r.with_area_ratio(1.3, 1.4, false).to_s, "(0,0;0,2000;1000,2000;1000,1000;2000,1000;2000,0)")
     assert_equal(r.with_area_ratio(1.3, 4.0 / 3.0, false, false, true).to_s, "(0,0;0,2000;1000,2000;1000,1000;2000,1000;2000,0)")
@@ -1247,11 +1291,17 @@ class DBRegion_TestClass < TestBase
     r -= rr
 
     assert_equal(r.with_holes(0, false).to_s, "")
+    assert_equal(r.split_with_holes(0)[0].to_s, "")
     assert_equal(r.with_holes(0, true).to_s, "(0,0;0,200;100,200;100,0/10,10;20,10;20,20;10,20/30,30;40,30;40,40;30,40)")
+    assert_equal(r.split_with_holes(0)[1].to_s, "(0,0;0,200;100,200;100,0/10,10;20,10;20,20;10,20/30,30;40,30;40,40;30,40)")
     assert_equal(rr.with_holes(0, false).to_s, "(10,10;10,20;20,20;20,10);(30,30;30,40;40,40;40,30)")
+    assert_equal(rr.split_with_holes(0)[0].to_s, "(10,10;10,20;20,20;20,10);(30,30;30,40;40,40;40,30)")
     assert_equal(rr.with_holes(0, true).to_s, "")
+    assert_equal(rr.split_with_holes(0)[1].to_s, "")
     assert_equal(rr.with_holes(2, false).to_s, "")
+    assert_equal(rr.split_with_holes(2)[0].to_s, "")
     assert_equal(r.with_holes(1, 3, false).to_s, "(0,0;0,200;100,200;100,0/10,10;20,10;20,20;10,20/30,30;40,30;40,40;30,40)")
+    assert_equal(r.split_with_holes(1, 3)[0].to_s, "(0,0;0,200;100,200;100,0/10,10;20,10;20,20;10,20/30,30;40,30;40,40;30,40)")
     assert_equal(r.with_holes(2, 3, false).to_s, "(0,0;0,200;100,200;100,0/10,10;20,10;20,20;10,20/30,30;40,30;40,40;30,40)")
     assert_equal(r.with_holes(1, 2, false).to_s, "")
 
@@ -1349,6 +1399,8 @@ class DBRegion_TestClass < TestBase
     region.insert(RBA::Box::new(200, 0, 300, 100))
 
     assert_equal(region.filtered(TriangleFilter::new).to_s, "(0,0;100,100;100,0)")
+    assert_equal(region.split_filter(TriangleFilter::new)[0].to_s, "(0,0;100,100;100,0)")
+    assert_equal(region.split_filter(TriangleFilter::new)[1].to_s, "(200,0;200,100;300,100;300,0)")
     assert_equal(region.to_s, "(0,0;100,100;100,0);(200,0;200,100;300,100;300,0)")
     region.filter(TriangleFilter::new)
     assert_equal(region.to_s, "(0,0;100,100;100,0)")

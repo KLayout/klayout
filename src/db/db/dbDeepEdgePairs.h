@@ -78,6 +78,7 @@ public:
 
   virtual EdgePairsDelegate *filter_in_place (const EdgePairFilterBase &filter);
   virtual EdgePairsDelegate *filtered (const EdgePairFilterBase &) const;
+  virtual std::pair<EdgePairsDelegate *, EdgePairsDelegate *> filtered_pair (const EdgePairFilterBase &filter) const;
   virtual EdgePairsDelegate *process_in_place (const EdgePairProcessorBase &);
   virtual EdgePairsDelegate *processed (const EdgePairProcessorBase &) const;
   virtual RegionDelegate *processed_to_polygons (const EdgePairToPolygonProcessorBase &filter) const;
@@ -117,7 +118,7 @@ private:
 
   void init ();
   EdgesDelegate *generic_edges (bool first, bool second) const;
-  DeepEdgePairs *apply_filter (const EdgePairFilterBase &filter) const;
+  std::pair<DeepEdgePairs *, DeepEdgePairs *> apply_filter (const EdgePairFilterBase &filter, bool with_true, bool with_false) const;
 };
 
 }

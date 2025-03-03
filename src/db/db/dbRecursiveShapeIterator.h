@@ -710,6 +710,16 @@ public:
   bool at_end () const;
 
   /**
+   *  @brief End of iterator predicate
+   *
+   *  Returns true, if the iterator is at the end of the sequence
+   *
+   *  This version does not lock the layout and can be used after initialization
+   *  to detect empty sequences.
+   */
+  bool at_end_no_lock () const;
+
+  /**
    *  @brief Gets the translated property ID
    *
    *  This version employs the property translator to deliver the real property ID.

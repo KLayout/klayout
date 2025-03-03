@@ -218,7 +218,7 @@ OriginalLayerEdges::begin_merged_iter () const
 bool
 OriginalLayerEdges::empty () const
 {
-  return m_iter.at_end ();
+  return m_iter.at_end_no_lock ();
 }
 
 bool

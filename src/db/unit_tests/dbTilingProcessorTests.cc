@@ -148,7 +148,9 @@ TEST(2)
     tp.queue ("_output(o1, _tile ? (i1 & i2 & _tile) : (i1 & i2), false)");
     tp.queue ("!_tile && _output(o2, i1.outside(i2), false)");
     tp.queue ("_tile && _output(o3, _tile, false)");
+    EXPECT_EQ (ly.under_construction (), false);
     tp.execute ("test");
+    EXPECT_EQ (ly.under_construction (), false);
 
     EXPECT_EQ (to_s (ly, top, o1), "box (60,10;70,20);box (10,10;30,30)");
     EXPECT_EQ (to_s (ly, top, o2), "box (50,40;80,70)");

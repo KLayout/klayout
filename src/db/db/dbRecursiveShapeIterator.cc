@@ -598,6 +598,13 @@ RecursiveShapeIterator::at_end () const
   return m_shape.at_end () || is_inactive ();
 }
 
+bool
+RecursiveShapeIterator::at_end_no_lock () const
+{
+  RecursiveShapeIterator copy (*this);
+  return copy.at_end ();
+}
+
 std::vector<db::InstElement>
 RecursiveShapeIterator::path () const
 {

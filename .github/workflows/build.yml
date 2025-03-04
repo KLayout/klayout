@@ -22,14 +22,18 @@ jobs:
         include:
           - os: "macos-13"  # intel runner
             cibuild: "*macosx*"
+            cibw_arch: "macos_x86_64"
             macos-arch: "x86_64"
           - os: "macos-14"  # M1 runner
             cibuild: "*macosx*"
+            cibw_arch: "macos_arm64"
             macos-arch: "arm64"
           - os: "ubuntu-latest"
             cibuild: "*manylinux*"
+            cibw_arch: "manylinux"
           - os: "ubuntu-latest"
             cibuild: "*musllinux*"
+            cibw_arch: "musllinux"
     steps:
       - name: Free Disk Space (Ubuntu)
         if: matrix.os == 'ubuntu-latest'

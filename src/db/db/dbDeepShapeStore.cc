@@ -1320,10 +1320,28 @@ DeepShapeStore::cell_mapping_to_original (unsigned int layout_index, db::Layout 
 
       into_layout->force_update ();
 
-      std::set<db::cell_index_type> cells_to_delete;
+      std::set<db::cell_index_type> vars;
       for (auto vv = new_variants.begin (); vv != new_variants.end (); ++vv) {
-        if (into_layout->cell (vv->second).parent_cells () == 0) {
-          cells_to_delete.insert (vv->second);
+        vars.insert (vv->second);
+      }
+
+      std::set<db::cell_index_type> cells_to_delete;
+
+      bool more = true;
+      while (more) {
+        more = false;
+        for (auto v = vars.begin (); v != vars.end (); ++v) {
+          if (cells_to_delete.find (*v) == cells_to_delete.end ()) {
+            const db::Cell &vc = into_layout->cell (*v);
+            bool used = false;
+            for (auto p = vc.begin_parent_cells (); p != vc.end_parent_cells () && ! used; ++p) {
+              used = (cells_to_delete.find (*p) == cells_to_delete.end ());
+            }
+            if (! used) {
+              cells_to_delete.insert (*v);
+              more = true;
+            }
+          }
         }
       }
 

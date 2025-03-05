@@ -702,7 +702,8 @@ inline char unescape_char (const char * &cp)
 {
   if (safe_isdigit (*cp)) {
     int c = 0;
-    while (*cp && safe_isdigit (*cp)) {
+    unsigned int n = 0;
+    while (*cp && safe_isdigit (*cp) && n++ < 3) {
       c = c * 8 + int (*cp - '0');
       ++cp;
     }

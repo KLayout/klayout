@@ -5,6 +5,7 @@
   on Edges, Region, EdgePairs and Texts, delivering a pair of containers with 
   selected and unselected objects.
 * Bug: %GITHUB%/issues/1993 Tiling processor kept layout locks, causing DRC issues with "with_density"
+* Bug: %GITHUB%/issues/1997 Can not find a file in Open Recent menu (a string unescaping bug)
 * Bugfix: 'Save All' was not updating the dirty flag in the inactive tabs
 * Bugfix: Fixing a crash when editing PCell parameters while the macro editor is open
 * Bugfix: Fixed a potential Crash on "save all"

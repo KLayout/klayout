@@ -341,3 +341,44 @@ TEST(7_RestoreWithCellSelection2)
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/dss_bug2_au.gds");
 }
 
+TEST(8_RestoreWithCellSelection3)
+{
+  db::Layout ly;
+
+  {
+    std::string fn (tl::testdata ());
+    fn += "/algo/dss_bug3.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+
+  db::Cell &top_cell = ly.cell (*ly.begin_top_down ());
+
+  db::RecursiveShapeIterator in_it (ly, top_cell, l2);
+  db::RecursiveShapeIterator other_it (ly, top_cell, l2);
+
+  std::set<db::cell_index_type> us;
+  us.insert (ly.cell_by_name ("X").second);
+  us.insert (ly.cell_by_name ("C3").second);
+  in_it.unselect_cells (us);
+
+  std::set<db::cell_index_type> us2;
+  us2.insert (top_cell.cell_index ());
+  other_it.unselect_cells (us2);
+  other_it.select_cells (us);
+
+  db::DeepShapeStore dss;
+
+  db::Region in_region (in_it, dss);
+  db::Region other_region (other_it, dss);
+  in_region += other_region;
+
+  ly.clear_layer (l2);
+  in_region.insert_into (&ly, top_cell.cell_index (), l2);
+
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/dss_bug3_au.gds");
+}
+

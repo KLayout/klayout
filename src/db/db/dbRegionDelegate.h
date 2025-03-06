@@ -214,6 +214,7 @@ public:
   virtual EdgesDelegate *edges (const EdgeFilterBase *filter, const db::PolygonToEdgeProcessorBase *proc) const = 0;
   virtual RegionDelegate *filter_in_place (const PolygonFilterBase &filter) = 0;
   virtual RegionDelegate *filtered (const PolygonFilterBase &filter) const = 0;
+  virtual std::pair<RegionDelegate *, RegionDelegate *> filtered_pair (const PolygonFilterBase &filter) const = 0;
   virtual RegionDelegate *process_in_place (const PolygonProcessorBase &filter) = 0;
   virtual RegionDelegate *processed (const PolygonProcessorBase &filter) const = 0;
   virtual EdgesDelegate *processed_to_edges (const PolygonToEdgeProcessorBase &filter) const = 0;

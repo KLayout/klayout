@@ -22,14 +22,18 @@ jobs:
         include:
           - os: "macos-13"  # intel runner
             cibuild: "*macosx*"
+            cibw_arch: "macos_x86_64"
             macos-arch: "x86_64"
           - os: "macos-14"  # M1 runner
             cibuild: "*macosx*"
+            cibw_arch: "macos_arm64"
             macos-arch: "arm64"
           - os: "ubuntu-latest"
             cibuild: "*manylinux*"
+            cibw_arch: "manylinux"
           - os: "ubuntu-latest"
             cibuild: "*musllinux*"
+            cibw_arch: "musllinux"
     steps:
       - name: Free Disk Space (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
@@ -56,7 +60,7 @@ jobs:
           HOST_CCACHE_DIR="$(ccache -k cache_dir)"
           mkdir -p $HOST_CCACHE_DIR
       - name: Build wheels  # check https://cibuildwheel.readthedocs.io/en/stable/setup/#github-actions
-        uses: pypa/cibuildwheel@v2.22.0
+        uses: pypa/cibuildwheel@v2.23.0
         # to supply options, put them in 'env', like:
         # env:
         #   CIBW_SOME_OPTION: value
@@ -76,8 +80,9 @@ jobs:
           mv ./wheelhouse/.ccache $HOST_CCACHE_DIR
           ls -la $HOST_CCACHE_DIR
           ccache -s
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
+          name: artifact-${{ matrix.os }}-${{ matrix.cibw_arch }}-${{ strategy.job-index }}
           path: ./wheelhouse/*.whl
 
   # The following was taken from https://cibuildwheel.readthedocs.io/en/stable/deliver-to-pypi/
@@ -90,20 +95,21 @@ jobs:
     - name: Build SDist
       run: pipx run build --sdist
 
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
+        name: artifact-${{ matrix.os }}-${{ matrix.cibw_arch }}-${{ strategy.job-index }}
         path: dist/*.tar.gz
 
   upload_to_test_pypy:
     needs: [build, make_sdist]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/download-artifact@v3
+    - uses: actions/download-artifact@v4
       with:
-        name: artifact
+        name: artifact-${{ matrix.os }}-${{ matrix.cibw_arch }}-${{ strategy.job-index }}
         path: dist
 
-    - uses: pypa/gh-action-pypi-publish@v1.12.3
+    - uses: pypa/gh-action-pypi-publish@v1.12.4
       continue-on-error: true   # might fail if we don't bump the version
       with:
         user: __token__
@@ -115,12 +121,12 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'release' && github.event.action == 'published'
     steps:
-    - uses: actions/download-artifact@v3
+    - uses: actions/download-artifact@v4
       with:
-        name: artifact
+        name: artifact-${{ matrix.os }}-${{ matrix.cibw_arch }}-${{ strategy.job-index }}
         path: dist
 
-    - uses: pypa/gh-action-pypi-publish@v1.12.3
+    - uses: pypa/gh-action-pypi-publish@v1.12.4
       with:
         user: __token__
         password: ${{ secrets.pypi_password }}

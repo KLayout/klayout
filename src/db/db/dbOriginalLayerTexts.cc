@@ -181,7 +181,7 @@ OriginalLayerTexts::begin_iter () const
 bool
 OriginalLayerTexts::empty () const
 {
-  return m_iter.at_end ();
+  return m_iter.at_end_no_lock ();
 }
 
 const db::Text *

@@ -54,6 +54,7 @@ public:
   }
 
   virtual TextsDelegate *filtered (const TextFilterBase &) const;
+  virtual std::pair<TextsDelegate *, TextsDelegate *> filtered_pair (const TextFilterBase &filter) const;
 
   virtual TextsDelegate *process_in_place (const TextProcessorBase &proc)
   {

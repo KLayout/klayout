@@ -36,6 +36,12 @@
 
 // -----------------------------------------------------------------------
 // class QLineF
+  static bool QLineF_operator_eq(const QLineF *a, const QLineF &b) {
+    return *a == b;
+  }
+  static bool QLineF_operator_ne(const QLineF *a, const QLineF &b) {
+    return !(*a == b);
+  }
 
 //  Constructor QLineF::QLineF()
 
@@ -264,44 +270,6 @@ static void _call_f_normalVector_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QLineF > ((QLineF)((QLineF *)cls)->normalVector ());
-}
-
-
-// bool QLineF::operator!=(const QLineF &d)
-
-
-static void _init_f_operator_excl__eq__c1856 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("d");
-  decl->add_arg<const QLineF & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_excl__eq__c1856 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QLineF &arg1 = gsi::arg_reader<const QLineF & >() (args, heap);
-  ret.write<bool > ((bool)((QLineF *)cls)->operator!= (arg1));
-}
-
-
-// bool QLineF::operator==(const QLineF &d)
-
-
-static void _init_f_operator_eq__eq__c1856 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("d");
-  decl->add_arg<const QLineF & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_eq__eq__c1856 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QLineF &arg1 = gsi::arg_reader<const QLineF & >() (args, heap);
-  ret.write<bool > ((bool)((QLineF *)cls)->operator== (arg1));
 }
 
 
@@ -701,8 +669,6 @@ static gsi::Methods methods_QLineF () {
   methods += new qt_gsi::GenericMethod ("isNull?", "@brief Method bool QLineF::isNull()\n", true, &_init_f_isNull_c0, &_call_f_isNull_c0);
   methods += new qt_gsi::GenericMethod (":length", "@brief Method double QLineF::length()\n", true, &_init_f_length_c0, &_call_f_length_c0);
   methods += new qt_gsi::GenericMethod ("normalVector", "@brief Method QLineF QLineF::normalVector()\n", true, &_init_f_normalVector_c0, &_call_f_normalVector_c0);
-  methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QLineF::operator!=(const QLineF &d)\n", true, &_init_f_operator_excl__eq__c1856, &_call_f_operator_excl__eq__c1856);
-  methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QLineF::operator==(const QLineF &d)\n", true, &_init_f_operator_eq__eq__c1856, &_call_f_operator_eq__eq__c1856);
   methods += new qt_gsi::GenericMethod (":p1", "@brief Method QPointF QLineF::p1()\n", true, &_init_f_p1_c0, &_call_f_p1_c0);
   methods += new qt_gsi::GenericMethod (":p2", "@brief Method QPointF QLineF::p2()\n", true, &_init_f_p2_c0, &_call_f_p2_c0);
   methods += new qt_gsi::GenericMethod ("pointAt", "@brief Method QPointF QLineF::pointAt(double t)\n", true, &_init_f_pointAt_c1071, &_call_f_pointAt_c1071);
@@ -727,6 +693,9 @@ static gsi::Methods methods_QLineF () {
 }
 
 gsi::Class<QLineF> decl_QLineF ("QtCore", "QLineF",
+  gsi::method_ext("==", &QLineF_operator_eq, gsi::arg ("other"), "@brief Method bool QLineF::operator==(const QLineF &) const") +
+  gsi::method_ext("!=", &QLineF_operator_ne, gsi::arg ("other"), "@brief Method bool QLineF::operator!=(const QLineF &) const") 
++
   methods_QLineF (),
   "@qt\n@brief Binding of QLineF");
 

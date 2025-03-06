@@ -876,7 +876,7 @@ TilingProcessor::execute (const std::string &desc)
 
   if (tot_box.empty ()) {
     for (std::vector<InputSpec>::const_iterator i = m_inputs.begin (); i != m_inputs.end (); ++i) {
-      if (! i->iter.at_end ()) {
+      if (! i->iter.at_end_no_lock ()) {
         if (scale_to_dbu ()) {
           double dbu_value = i->iter.layout () ? i->iter.layout ()->dbu () : dbu ();
           tot_box += i->iter.bbox ().transformed (db::CplxTrans (dbu_value) * db::CplxTrans (i->trans));

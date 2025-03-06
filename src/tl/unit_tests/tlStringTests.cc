@@ -504,6 +504,7 @@ TEST(10)
   EXPECT_EQ (escape_string ("'a\n\003"), "'a\\n\\003");
   EXPECT_EQ (escape_string ("'a\n\003"), "'a\\n\\003");
   EXPECT_EQ (unescape_string (escape_string ("'a\n\003")), "'a\n\003");
+  EXPECT_EQ (unescape_string (escape_string ("'a\n\0031")), "'a\n\0031");
 }
 
 TEST(11)

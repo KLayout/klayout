@@ -34,6 +34,12 @@
 
 // -----------------------------------------------------------------------
 // class QXmlStreamNotationDeclaration
+  static bool QXmlStreamNotationDeclaration_operator_eq(const QXmlStreamNotationDeclaration *a, const QXmlStreamNotationDeclaration &b) {
+    return *a == b;
+  }
+  static bool QXmlStreamNotationDeclaration_operator_ne(const QXmlStreamNotationDeclaration *a, const QXmlStreamNotationDeclaration &b) {
+    return !(*a == b);
+  }
 
 //  Constructor QXmlStreamNotationDeclaration::QXmlStreamNotationDeclaration()
 
@@ -50,44 +56,6 @@ static void _call_ctor_QXmlStreamNotationDeclaration_0 (const qt_gsi::GenericSta
 }
 
 
-// bool QXmlStreamNotationDeclaration::operator!=(const QXmlStreamNotationDeclaration &other)
-
-
-static void _init_f_operator_excl__eq__c4289 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("other");
-  decl->add_arg<const QXmlStreamNotationDeclaration & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_excl__eq__c4289 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QXmlStreamNotationDeclaration &arg1 = gsi::arg_reader<const QXmlStreamNotationDeclaration & >() (args, heap);
-  ret.write<bool > ((bool)((QXmlStreamNotationDeclaration *)cls)->operator!= (arg1));
-}
-
-
-// bool QXmlStreamNotationDeclaration::operator==(const QXmlStreamNotationDeclaration &other)
-
-
-static void _init_f_operator_eq__eq__c4289 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("other");
-  decl->add_arg<const QXmlStreamNotationDeclaration & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_eq__eq__c4289 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QXmlStreamNotationDeclaration &arg1 = gsi::arg_reader<const QXmlStreamNotationDeclaration & >() (args, heap);
-  ret.write<bool > ((bool)((QXmlStreamNotationDeclaration *)cls)->operator== (arg1));
-}
-
-
 
 namespace gsi
 {
@@ -95,12 +63,13 @@ namespace gsi
 static gsi::Methods methods_QXmlStreamNotationDeclaration () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QXmlStreamNotationDeclaration::QXmlStreamNotationDeclaration()\nThis method creates an object of class QXmlStreamNotationDeclaration.", &_init_ctor_QXmlStreamNotationDeclaration_0, &_call_ctor_QXmlStreamNotationDeclaration_0);
-  methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QXmlStreamNotationDeclaration::operator!=(const QXmlStreamNotationDeclaration &other)\n", true, &_init_f_operator_excl__eq__c4289, &_call_f_operator_excl__eq__c4289);
-  methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QXmlStreamNotationDeclaration::operator==(const QXmlStreamNotationDeclaration &other)\n", true, &_init_f_operator_eq__eq__c4289, &_call_f_operator_eq__eq__c4289);
   return methods;
 }
 
 gsi::Class<QXmlStreamNotationDeclaration> decl_QXmlStreamNotationDeclaration ("QtCore", "QXmlStreamNotationDeclaration",
+  gsi::method_ext("==", &QXmlStreamNotationDeclaration_operator_eq, gsi::arg ("other"), "@brief Method bool QXmlStreamNotationDeclaration::operator==(const QXmlStreamNotationDeclaration &) const") +
+  gsi::method_ext("!=", &QXmlStreamNotationDeclaration_operator_ne, gsi::arg ("other"), "@brief Method bool QXmlStreamNotationDeclaration::operator!=(const QXmlStreamNotationDeclaration &) const") 
++
   methods_QXmlStreamNotationDeclaration (),
   "@qt\n@brief Binding of QXmlStreamNotationDeclaration");
 

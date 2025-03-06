@@ -101,6 +101,7 @@ public:
   }
 
   virtual RegionDelegate *filtered (const PolygonFilterBase &filter) const;
+  virtual std::pair<RegionDelegate *, RegionDelegate *> filtered_pair (const PolygonFilterBase &filter) const;
 
   virtual RegionDelegate *merged_in_place ()
   {

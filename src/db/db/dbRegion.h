@@ -573,6 +573,18 @@ public:
   }
 
   /**
+   *  @brief Returns the filtered polygons and the others
+   *
+   *  This method will return a new region with only those polygons which
+   *  conform to the filter criterion and another for those which don't.
+   */
+  std::pair<Region, Region> split_filter (const PolygonFilterBase &filter) const
+  {
+    std::pair<db::RegionDelegate *, db::RegionDelegate *> p = mp_delegate->filtered_pair (filter);
+    return std::make_pair (Region (p.first), Region (p.second));
+  }
+
+  /**
    *  @brief Processes the (merged) polygons
    *
    *  This method will keep all polygons which the processor returns.

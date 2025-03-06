@@ -56,6 +56,7 @@ public:
 
   virtual TextsDelegate *filter_in_place (const TextFilterBase &) { return this; }
   virtual TextsDelegate *filtered (const TextFilterBase &) const { return new EmptyTexts (); }
+  virtual std::pair<TextsDelegate *, TextsDelegate *> filtered_pair (const TextFilterBase &) const { return std::make_pair (new EmptyTexts (), new EmptyTexts ()); }
 
   virtual TextsDelegate *process_in_place (const TextProcessorBase &) { return this; }
   virtual TextsDelegate *processed (const TextProcessorBase &) const { return new EmptyTexts (); }

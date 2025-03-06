@@ -1,3 +1,24 @@
+0.29.12          (2025-03-02):
+* Bug: %GITHUB%/issues/1976 Crash on cross mode, lw > 1 and oversampling
+* Bug: %GITHUB%/issues/1987 Build failure against Qt6.8
+* Enhancement: %GITHUB%/issues/1989 API enhancements: several new split_... methods
+  on Edges, Region, EdgePairs and Texts, delivering a pair of containers with 
+  selected and unselected objects.
+* Bug: %GITHUB%/issues/1993 Tiling processor kept layout locks, causing DRC issues with "with_density"
+* Bug: %GITHUB%/issues/1997 Can not find a file in Open Recent menu (a string unescaping bug)
+* Bugfix: 'Save All' was not updating the dirty flag in the inactive tabs
+* Bugfix: Fixing a crash when editing PCell parameters while the macro editor is open
+* Bugfix: Fixed a potential Crash on "save all"
+* Bugfix: Fixed a bug when returning a Region into a layout with cells unselected
+* Bugfix: Tab title were not updated on cell rename
+* Bugfix: Fixed a crash on certain layout queries
+  - For example "instances of cell .*.* where inst.trans.rot == 2" was crashing
+* Bugfix: Fixing two problems with layer mapping
+  - Mapping "[*/*] 100/0:0/0" (for example) created 0/0 two times when the input contains 100/0 and 0/0. Now
+    it is a single layer only
+  - The mapping table generated from strings now uses layer indexes from a range that should not collide
+    with existing layer indexes.
+
 0.29.11          (2025-01-17):
 * Bug: %GITHUB%/issues/1948 Crash by instantiate a Cell in a Library-Cell 
 * Bug: %GITHUB%/issues/1953 Callback_impl & coerce_parameters_impl parameter display issue

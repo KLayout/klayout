@@ -34,6 +34,12 @@
 
 // -----------------------------------------------------------------------
 // class QProcessEnvironment
+  static bool QProcessEnvironment_operator_eq(const QProcessEnvironment *a, const QProcessEnvironment &b) {
+    return *a == b;
+  }
+  static bool QProcessEnvironment_operator_ne(const QProcessEnvironment *a, const QProcessEnvironment &b) {
+    return !(*a == b);
+  }
 
 //  Constructor QProcessEnvironment::QProcessEnvironment()
 
@@ -177,25 +183,6 @@ static void _call_f_keys_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
-// bool QProcessEnvironment::operator!=(const QProcessEnvironment &other)
-
-
-static void _init_f_operator_excl__eq__c3302 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("other");
-  decl->add_arg<const QProcessEnvironment & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_excl__eq__c3302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QProcessEnvironment &arg1 = gsi::arg_reader<const QProcessEnvironment & >() (args, heap);
-  ret.write<bool > ((bool)((QProcessEnvironment *)cls)->operator!= (arg1));
-}
-
-
 // QProcessEnvironment &QProcessEnvironment::operator=(const QProcessEnvironment &other)
 
 
@@ -212,25 +199,6 @@ static void _call_f_operator_eq__3302 (const qt_gsi::GenericMethod * /*decl*/, v
   tl::Heap heap;
   const QProcessEnvironment &arg1 = gsi::arg_reader<const QProcessEnvironment & >() (args, heap);
   ret.write<QProcessEnvironment & > ((QProcessEnvironment &)((QProcessEnvironment *)cls)->operator= (arg1));
-}
-
-
-// bool QProcessEnvironment::operator==(const QProcessEnvironment &other)
-
-
-static void _init_f_operator_eq__eq__c3302 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("other");
-  decl->add_arg<const QProcessEnvironment & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_eq__eq__c3302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QProcessEnvironment &arg1 = gsi::arg_reader<const QProcessEnvironment & >() (args, heap);
-  ret.write<bool > ((bool)((QProcessEnvironment *)cls)->operator== (arg1));
 }
 
 
@@ -340,9 +308,7 @@ static gsi::Methods methods_QProcessEnvironment () {
   methods += new qt_gsi::GenericMethod ("insert", "@brief Method void QProcessEnvironment::insert(const QProcessEnvironment &e)\n", false, &_init_f_insert_3302, &_call_f_insert_3302);
   methods += new qt_gsi::GenericMethod ("isEmpty?", "@brief Method bool QProcessEnvironment::isEmpty()\n", true, &_init_f_isEmpty_c0, &_call_f_isEmpty_c0);
   methods += new qt_gsi::GenericMethod ("keys", "@brief Method QStringList QProcessEnvironment::keys()\n", true, &_init_f_keys_c0, &_call_f_keys_c0);
-  methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QProcessEnvironment::operator!=(const QProcessEnvironment &other)\n", true, &_init_f_operator_excl__eq__c3302, &_call_f_operator_excl__eq__c3302);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QProcessEnvironment &QProcessEnvironment::operator=(const QProcessEnvironment &other)\n", false, &_init_f_operator_eq__3302, &_call_f_operator_eq__3302);
-  methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QProcessEnvironment::operator==(const QProcessEnvironment &other)\n", true, &_init_f_operator_eq__eq__c3302, &_call_f_operator_eq__eq__c3302);
   methods += new qt_gsi::GenericMethod ("remove", "@brief Method void QProcessEnvironment::remove(const QString &name)\n", false, &_init_f_remove_2025, &_call_f_remove_2025);
   methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QProcessEnvironment::swap(QProcessEnvironment &other)\n", false, &_init_f_swap_2607, &_call_f_swap_2607);
   methods += new qt_gsi::GenericMethod ("toStringList", "@brief Method QStringList QProcessEnvironment::toStringList()\n", true, &_init_f_toStringList_c0, &_call_f_toStringList_c0);
@@ -352,6 +318,9 @@ static gsi::Methods methods_QProcessEnvironment () {
 }
 
 gsi::Class<QProcessEnvironment> decl_QProcessEnvironment ("QtCore", "QProcessEnvironment",
+  gsi::method_ext("==", &QProcessEnvironment_operator_eq, gsi::arg ("other"), "@brief Method bool QProcessEnvironment::operator==(const QProcessEnvironment &) const") +
+  gsi::method_ext("!=", &QProcessEnvironment_operator_ne, gsi::arg ("other"), "@brief Method bool QProcessEnvironment::operator!=(const QProcessEnvironment &) const") 
++
   methods_QProcessEnvironment (),
   "@qt\n@brief Binding of QProcessEnvironment");
 

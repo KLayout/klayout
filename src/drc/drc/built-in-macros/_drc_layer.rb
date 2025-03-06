@@ -4624,6 +4624,8 @@ TP_SCRIPT
         res
       end
 
+      tp._destroy
+
       DRCLayer::new(@engine, res)
 
     end

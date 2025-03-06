@@ -13186,7 +13186,8 @@ class DText:
     Setter:
     @brief Sets the horizontal alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     size: float
     r"""
@@ -22113,7 +22114,7 @@ class EdgePairs(ShapeCollection):
         This method has been introduced in version 0.28.4.
         """
         ...
-    def filtered(self, filtered: EdgePairFilter) -> EdgePairs:
+    def filtered(self, filter: EdgePairFilter) -> EdgePairs:
         r"""
         @brief Applies a generic filter and returns a filtered copy
         See \EdgePairFilter for a description of this feature.
@@ -22596,6 +22597,14 @@ class EdgePairs(ShapeCollection):
         Starting with version 0.27, the method is called 'count' for consistency with \Region. 'size' is still provided as an alias.
         """
         ...
+    def split_filter(self, filter: EdgePairFilter) -> List[EdgePairs]:
+        r"""
+        @brief Applies a generic filter and returns a copy with all matching shapes and one with the non-matching ones
+        See \EdgePairFilter for a description of this feature.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
     def split_inside(self, other: Region) -> List[EdgePairs]:
         r"""
         @brief Selects the edge pairs from this edge pair collection which are and are not inside (completely covered by) polygons from the other region
@@ -22633,6 +22642,200 @@ class EdgePairs(ShapeCollection):
 
         This method provides a faster way to compute both outside and non-outside edges compared to using separate methods. 
         This method has been introduced in version 0.29.6
+        """
+        ...
+    @overload
+    def split_with_abs_angle(self, angle: float, inverse: bool) -> List[EdgePairs]:
+        r"""
+        @brief Like \with_abs_angle, but returning two edge pair collections
+        The first edge pair collection will contain all matching shapes, the other the non-matching ones.
+        Note that 'inverse' controls the way each edge is checked, not overall.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_abs_angle(self, min_angle: float, max_angle: float, inverse: bool, include_min_angle: Optional[bool] = ..., include_max_angle: Optional[bool] = ...) -> List[EdgePairs]:
+        r"""
+        @brief Like \with_abs_angle, but returning two edge pair collections
+        The first edge pair collection will contain all matching shapes, the other the non-matching ones.
+        Note that 'inverse' controls the way each edge is checked, not overall.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_abs_angle_both(self, angle: float, inverse: bool) -> List[EdgePairs]:
+        r"""
+        @brief Like \with_abs_angle_both, but returning two edge pair collections
+        The first edge pair collection will contain all matching shapes, the other the non-matching ones.
+        Note that 'inverse' controls the way each edge is checked, not overall.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_abs_angle_both(self, min_angle: float, max_angle: float, inverse: bool, include_min_angle: Optional[bool] = ..., include_max_angle: Optional[bool] = ...) -> List[EdgePairs]:
+        r"""
+        @brief Like \with_abs_angle_both, but returning two edge pair collections
+        The first edge pair collection will contain all matching shapes, the other the non-matching ones.
+        Note that 'inverse' controls the way each edge is checked, not overall.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_angle(self, angle: float, inverse: bool) -> List[EdgePairs]:
+        r"""
+        @brief Like \with_angle, but returning two edge pair collections
+        The first edge pair collection will contain all matching shapes, the other the non-matching ones.
+        Note that 'inverse' controls the way each edge is checked, not overall.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_angle(self, min_angle: float, max_angle: float, inverse: bool, include_min_angle: Optional[bool] = ..., include_max_angle: Optional[bool] = ...) -> List[EdgePairs]:
+        r"""
+        @brief Like \with_angle, but returning two edge pair collections
+        The first edge pair collection will contain all matching shapes, the other the non-matching ones.
+        Note that 'inverse' controls the way each edge is checked, not overall.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_angle(self, type: Edges.EdgeType, inverse: bool) -> List[EdgePairs]:
+        r"""
+        @brief Like \with_angle, but returning two edge pair collections
+        The first edge pair collection will contain all matching shapes, the other the non-matching ones.
+        Note that 'inverse' controls the way each edge is checked, not overall.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_angle_both(self, angle: float, inverse: bool) -> List[EdgePairs]:
+        r"""
+        @brief Like \with_angle_both, but returning two edge pair collections
+        The first edge pair collection will contain all matching shapes, the other the non-matching ones.
+        Note that 'inverse' controls the way each edge is checked, not overall.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_angle_both(self, min_angle: float, max_angle: float, inverse: bool, include_min_angle: Optional[bool] = ..., include_max_angle: Optional[bool] = ...) -> List[EdgePairs]:
+        r"""
+        @brief Like \with_angle_both, but returning two edge pair collections
+        The first edge pair collection will contain all matching shapes, the other the non-matching ones.
+        Note that 'inverse' controls the way each edge is checked, not overall.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_angle_both(self, type: Edges.EdgeType, inverse: bool) -> List[EdgePairs]:
+        r"""
+        @brief Like \with_angle_both, but returning two edge pair collections
+        The first edge pair collection will contain all matching shapes, the other the non-matching ones.
+        Note that 'inverse' controls the way each edge is checked, not overall.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_area(self, area: int) -> List[EdgePairs]:
+        r"""
+        @brief Like \with_area, but returning two edge pair collections
+        The first edge pair collection will contain all matching shapes, the other the non-matching ones.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_area(self, min_area: int, max_area: int) -> List[EdgePairs]:
+        r"""
+        @brief Like \with_area, but returning two edge pair collections
+        The first edge pair collection will contain all matching shapes, the other the non-matching ones.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_distance(self, distance: int) -> List[EdgePairs]:
+        r"""
+        @brief Like \with_distance, but returning two edge pair collections
+        The first edge pair collection will contain all matching shapes, the other the non-matching ones.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_distance(self, min_distance: Any, max_distance: Any) -> List[EdgePairs]:
+        r"""
+        @brief Like \with_distance, but returning two edge pair collections
+        The first edge pair collection will contain all matching shapes, the other the non-matching ones.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_internal_angle(self, angle: float) -> List[EdgePairs]:
+        r"""
+        @brief Like \with_internal_angle, but returning two edge pair collections
+        The first edge pair collection will contain all matching shapes, the other the non-matching ones.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_internal_angle(self, min_angle: float, max_angle: float, include_min_angle: Optional[bool] = ..., include_max_angle: Optional[bool] = ...) -> List[EdgePairs]:
+        r"""
+        @brief Like \with_internal_angle, but returning two edge pair collections
+        The first edge pair collection will contain all matching shapes, the other the non-matching ones.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_length(self, length: int, inverse: bool) -> List[EdgePairs]:
+        r"""
+        @brief Like \with_length, but returning two edge pair collections
+        The first edge pair collection will contain all matching shapes, the other the non-matching ones.
+        Note that 'inverse' controls the way each edge is checked, not overall.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_length(self, min_length: Any, max_length: Any, inverse: bool) -> List[EdgePairs]:
+        r"""
+        @brief Like \with_length, but returning two edge pair collections
+        The first edge pair collection will contain all matching shapes, the other the non-matching ones.
+        Note that 'inverse' controls the way each edge is checked, not overall.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_length_both(self, length: int, inverse: bool) -> List[EdgePairs]:
+        r"""
+        @brief Like \with_length_both, but returning two edge pair collections
+        The first edge pair collection will contain all matching shapes, the other the non-matching ones.
+        Note that 'inverse' controls the way each edge is checked, not overall.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_length_both(self, min_length: Any, max_length: Any, inverse: bool) -> List[EdgePairs]:
+        r"""
+        @brief Like \with_length_both, but returning two edge pair collections
+        The first edge pair collection will contain all matching shapes, the other the non-matching ones.
+        Note that 'inverse' controls the way each edge is checked, not overall.
+
+        This method has been introduced in version 0.29.12.
         """
         ...
     def swap(self, other: EdgePairs) -> None:
@@ -25741,7 +25944,7 @@ class Edges(ShapeCollection):
         This method has been introduced in version 0.28.4.
         """
         ...
-    def filtered(self, filtered: EdgeFilter) -> Edges:
+    def filtered(self, filter: EdgeFilter) -> Edges:
         r"""
         @brief Applies a generic filter and returns a filtered copy
         See \EdgeFilter for a description of this feature.
@@ -26678,6 +26881,14 @@ class Edges(ShapeCollection):
         'zero_distance_mode' has been added in version 0.29.
         """
         ...
+    def split_filter(self, filter: EdgeFilter) -> List[Edges]:
+        r"""
+        @brief Applies a generic filter and returns a copy with all matching shapes and one with the non-matching ones
+        See \EdgeFilter for a description of this feature.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
     @overload
     def split_inside(self, other: Edges) -> List[Edges]:
         r"""
@@ -26738,6 +26949,69 @@ class Edges(ShapeCollection):
         @return A two-element list of edge collections (first: outside, second: non-outside)
 
         This method provides a faster way to compute both outside and non-outside edges compared to using separate methods. It has been introduced in version 0.28.
+        """
+        ...
+    @overload
+    def split_with_abs_angle(self, angle: float) -> List[Edges]:
+        r"""
+        @brief Like \with_abs_angle, but returning two edge collections
+        The first edge collection will contain all matching shapes, the other the non-matching ones.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_abs_angle(self, min_angle: float, max_angle: float, include_min_angle: Optional[bool] = ..., include_max_angle: Optional[bool] = ...) -> List[Edges]:
+        r"""
+        @brief Like \with_abs_angle, but returning two edge collections
+        The first edge collection will contain all matching shapes, the other the non-matching ones.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_angle(self, angle: float) -> List[Edges]:
+        r"""
+        @brief Like \with_angle, but returning two edge collections
+        The first edge collection will contain all matching shapes, the other the non-matching ones.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_angle(self, min_angle: float, max_angle: float, include_min_angle: Optional[bool] = ..., include_max_angle: Optional[bool] = ...) -> List[Edges]:
+        r"""
+        @brief Like \with_angle, but returning two edge collections
+        The first edge collection will contain all matching shapes, the other the non-matching ones.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_angle(self, type: Edges.EdgeType) -> List[Edges]:
+        r"""
+        @brief Like \with_angle, but returning two edge collections
+        The first edge collection will contain all matching shapes, the other the non-matching ones.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_length(self, length: int) -> List[Edges]:
+        r"""
+        @brief Like \with_length, but returning two edge collections
+        The first edge collection will contain all matching shapes, the other the non-matching ones.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_length(self, min_length: Any, max_length: Any) -> List[Edges]:
+        r"""
+        @brief Like \with_length, but returning two edge collections
+        The first edge collection will contain all matching shapes, the other the non-matching ones.
+
+        This method has been introduced in version 0.29.12.
         """
         ...
     def start_segments(self, length: int, fraction: float) -> Edges:
@@ -30301,10 +30575,10 @@ class Instance:
     Getter:
     @brief Gets the basic \CellInstArray object associated with this instance reference.
     Setter:
-    @brief Changes the \CellInstArray object to the given one.
-    This method replaces the instance by the given CellInstArray object.
+    @brief Returns the basic cell instance array object by giving a micrometer unit object.
+    This method replaces the instance by the given CellInstArray object and it internally transformed into database units.
 
-    This method has been introduced in version 0.22
+    This method has been introduced in version 0.25
     """
     cplx_trans: ICplxTrans
     r"""
@@ -30312,9 +30586,10 @@ class Instance:
     @brief Gets the complex transformation of the instance or the first instance in the array
     This method is always valid compared to \trans, since simple transformations can be expressed as complex transformations as well.
     Setter:
-    @brief Sets the complex transformation of the instance or the first instance in the array
+    @brief Sets the complex transformation of the instance or the first instance in the array (in micrometer units)
+    This method sets the transformation the same way as \cplx_trans=, but the displacement of this transformation is given in micrometer units. It is internally translated into database units.
 
-    This method has been introduced in version 0.23.
+    This method has been introduced in version 0.25.
     """
     da: DVector
     r"""
@@ -30443,10 +30718,9 @@ class Instance:
     @brief Gets the transformation of the instance or the first instance in the array
     The transformation returned is only valid if the array does not represent a complex transformation array
     Setter:
-    @brief Sets the transformation of the instance or the first instance in the array (in micrometer units)
-    This method sets the transformation the same way as \cplx_trans=, but the displacement of this transformation is given in micrometer units. It is internally translated into database units.
+    @brief Sets the transformation of the instance or the first instance in the array
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.23.
     """
     @classmethod
     def new(cls) -> Instance:
@@ -41403,15 +41677,15 @@ class NetPinRef:
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this pin reference is attached to (non-const version).
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the net this pin reference is attached to.
         """
         ...
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this pin reference is attached to.
+        @brief Gets the net this pin reference is attached to (non-const version).
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     def pin(self) -> Pin:
@@ -41701,17 +41975,17 @@ class NetTerminalRef:
     @overload
     def device(self) -> Device:
         r"""
-        @brief Gets the device reference.
+        @brief Gets the device reference (non-const version).
         Gets the device object that this connection is made to.
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def device(self) -> Device:
         r"""
-        @brief Gets the device reference (non-const version).
+        @brief Gets the device reference.
         Gets the device object that this connection is made to.
-
-        This constness variant has been introduced in version 0.26.8
         """
         ...
     def device_class(self) -> DeviceClass:
@@ -53329,7 +53603,7 @@ class Region(ShapeCollection):
         This method has been introduced in version 0.28.4.
         """
         ...
-    def filtered(self, filtered: PolygonFilter) -> Region:
+    def filtered(self, filter: PolygonFilter) -> Region:
         r"""
         @brief Applies a generic filter and returns a filtered copy
         See \PolygonFilter for a description of this feature.
@@ -55005,6 +55279,14 @@ class Region(ShapeCollection):
         This method has been introduced in version 0.27.
         """
         ...
+    def split_filter(self, filter: PolygonFilter) -> List[Region]:
+        r"""
+        @brief Applies a generic filter and returns a copy with all matching shapes and one with the non-matching ones
+        See \PolygonFilter for a description of this feature.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
     def split_inside(self, other: Region) -> List[Region]:
         r"""
         @brief Returns the polygons of this region which are completely inside polygons from the other region and the ones which are not at the same time
@@ -55078,6 +55360,210 @@ class Region(ShapeCollection):
         Merged semantics applies for this method (see \merged_semantics= for a description of this concept).
 
         This method has been introduced in version 0.27.
+        """
+        ...
+    def split_rectangles(self) -> List[Region]:
+        r"""
+        @brief Combined results of \rectangles and \non_rectangles
+        This method returns a list with two Regions, the first is the result of \rectangles, the second the result of \non_rectangles. Using this method is faster when you need both.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    def split_rectilinear(self) -> List[Region]:
+        r"""
+        @brief Combined results of \rectilinear and \non_rectilinear
+        This method returns a list with two Regions, the first is the result of \rectilinear, the second the result of \non_rectilinear. Using this method is faster when you need both.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    def split_squares(self) -> List[Region]:
+        r"""
+        @brief Combined results of \squares and \non_squares
+        This method returns a list with two Regions, the first is the result of \squares, the second the result of \non_squares. Using this method is faster when you need both.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_area(self, area: int) -> List[Region]:
+        r"""
+        @brief Like \with_area, but returning two regions
+        The first region will contain all matching shapes, the other the non-matching ones.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_area(self, min_area: Any, max_area: Any) -> List[Region]:
+        r"""
+        @brief Like \with_area, but returning two regions
+        The first region will contain all matching shapes, the other the non-matching ones.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_area_ratio(self, min_ratio: Any, max_ratio: Any, min_included: Optional[bool] = ..., max_included: Optional[bool] = ...) -> List[Region]:
+        r"""
+        @brief Like \with_area_ratio, but returning two regions
+        The first region will contain all matching shapes, the other the non-matching ones.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_area_ratio(self, ratio: float) -> List[Region]:
+        r"""
+        @brief Like \with_area_ratio, but returning two regions
+        The first region will contain all matching shapes, the other the non-matching ones.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_bbox_aspect_ratio(self, min_ratio: Any, max_ratio: Any, min_included: Optional[bool] = ..., max_included: Optional[bool] = ...) -> List[Region]:
+        r"""
+        @brief Like \with_bbox_aspect_ratio, but returning two regions
+        The first region will contain all matching shapes, the other the non-matching ones.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_bbox_aspect_ratio(self, ratio: float) -> List[Region]:
+        r"""
+        @brief Like \with_bbox_aspect_ratio, but returning two regions
+        The first region will contain all matching shapes, the other the non-matching ones.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_bbox_height(self, height: int) -> List[Region]:
+        r"""
+        @brief Like \with_bbox_height, but returning two regions
+        The first region will contain all matching shapes, the other the non-matching ones.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_bbox_height(self, min_height: Any, max_height: Any) -> List[Region]:
+        r"""
+        @brief Like \with_bbox_height, but returning two regions
+        The first region will contain all matching shapes, the other the non-matching ones.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_bbox_max(self, dim: int) -> List[Region]:
+        r"""
+        @brief Like \with_bbox_max, but returning two regions
+        The first region will contain all matching shapes, the other the non-matching ones.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_bbox_max(self, min_dim: Any, max_dim: Any) -> List[Region]:
+        r"""
+        @brief Like \with_bbox_max, but returning two regions
+        The first region will contain all matching shapes, the other the non-matching ones.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_bbox_min(self, dim: int) -> List[Region]:
+        r"""
+        @brief Like \with_bbox_min, but returning two regions
+        The first region will contain all matching shapes, the other the non-matching ones.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_bbox_min(self, min_dim: Any, max_dim: Any) -> List[Region]:
+        r"""
+        @brief Like \with_bbox_min, but returning two regions
+        The first region will contain all matching shapes, the other the non-matching ones.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_bbox_width(self, min_width: Any, max_width: Any) -> List[Region]:
+        r"""
+        @brief Like \with_bbox_width, but returning two regions
+        The first region will contain all matching shapes, the other the non-matching ones.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_bbox_width(self, width: int) -> List[Region]:
+        r"""
+        @brief Like \with_bbox_width, but returning two regions
+        The first region will contain all matching shapes, the other the non-matching ones.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_holes(self, min_nholes: Any, max_nholes: Any) -> List[Region]:
+        r"""
+        @brief Like \with_holes, but returning two regions
+        The first region will contain all matching shapes, the other the non-matching ones.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_holes(self, nholes: int) -> List[Region]:
+        r"""
+        @brief Like \with_holes, but returning two regions
+        The first region will contain all matching shapes, the other the non-matching ones.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_perimeter(self, min_perimeter: Any, max_perimeter: Any) -> List[Region]:
+        r"""
+        @brief Like \with_perimeter, but returning two regions
+        The first region will contain all matching shapes, the other the non-matching ones.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_perimeter(self, perimeter: int) -> List[Region]:
+        r"""
+        @brief Like \with_perimeter, but returning two regions
+        The first region will contain all matching shapes, the other the non-matching ones.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_relative_height(self, min_ratio: Any, max_ratio: Any, min_included: Optional[bool] = ..., max_included: Optional[bool] = ...) -> List[Region]:
+        r"""
+        @brief Like \with_relative_height, but returning two regions
+        The first region will contain all matching shapes, the other the non-matching ones.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    @overload
+    def split_with_relative_height(self, ratio: float) -> List[Region]:
+        r"""
+        @brief Like \with_relative_height, but returning two regions
+        The first region will contain all matching shapes, the other the non-matching ones.
+
+        This method has been introduced in version 0.29.12.
         """
         ...
     def squares(self) -> Region:
@@ -55487,7 +55973,7 @@ class Region(ShapeCollection):
         """
         ...
     @overload
-    def with_holes(self, min_bholes: Any, max_nholes: Any, inverse: bool) -> Region:
+    def with_holes(self, min_nholes: Any, max_nholes: Any, inverse: bool) -> Region:
         r"""
         @brief Filter the polygons by their number of holes
         Filters the polygons of the region by number of holes. If "inverse" is false, only polygons which have a hole count larger or equal to "min_nholes" and less than "max_nholes" are returned. If "inverse" is true, polygons having a hole count less than "min_nholes" or larger or equal than "max_nholes" are returned.
@@ -56911,11 +57397,10 @@ class Shape:
 
     Starting with version 0.23, this method returns nil, if the shape does not represent an edge.
     Setter:
-    @brief Replaces the shape by the given edge
-    This method replaces the shape by the given edge. This method can only be called for editable layouts. It does not change the user properties of the shape.
-    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
+    @brief Replaces the shape by the given edge (in micrometer units)
+    This method replaces the shape by the given edge, like \edge= with a \Edge argument does. This version translates the edge from micrometer units to database units internally.
 
-    This method has been introduced in version 0.22.
+    This method has been introduced in version 0.25.
     """
     edge_pair: Any
     r"""
@@ -56964,11 +57449,10 @@ class Shape:
 
     Starting with version 0.23, this method returns nil, if the shape does not represent a path.
     Setter:
-    @brief Replaces the shape by the given path object
-    This method replaces the shape by the given path object. This method can only be called for editable layouts. It does not change the user properties of the shape.
-    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
+    @brief Replaces the shape by the given path (in micrometer units)
+    This method replaces the shape by the given path, like \path= with a \Path argument does. This version translates the path from micrometer units to database units internally.
 
-    This method has been introduced in version 0.22.
+    This method has been introduced in version 0.25.
     """
     path_bgnext: int
     r"""
@@ -60874,23 +61358,17 @@ class SubCircuit(NetlistObject):
     @overload
     def circuit(self) -> Circuit:
         r"""
-        @brief Gets the circuit the subcircuit lives in (non-const version).
-        This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
-
-        This constness variant has been introduced in version 0.26.8
-        """
-        ...
-    @overload
-    def circuit(self) -> Circuit:
-        r"""
         @brief Gets the circuit the subcircuit lives in.
         This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
         """
         ...
     @overload
-    def circuit_ref(self) -> Circuit:
+    def circuit(self) -> Circuit:
         r"""
-        @brief Gets the circuit referenced by the subcircuit.
+        @brief Gets the circuit the subcircuit lives in (non-const version).
+        This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
@@ -60900,6 +61378,12 @@ class SubCircuit(NetlistObject):
 
 
         This constness variant has been introduced in version 0.26.8
+        """
+        ...
+    @overload
+    def circuit_ref(self) -> Circuit:
+        r"""
+        @brief Gets the circuit referenced by the subcircuit.
         """
         ...
     @overload
@@ -61569,7 +62053,8 @@ class Text:
     Setter:
     @brief Sets the horizontal alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     size: int
     r"""
@@ -63546,6 +64031,30 @@ class Texts(ShapeCollection):
         The count is computed 'as if flat', i.e. texts inside a cell are multiplied by the number of times a cell is instantiated.
 
         Starting with version 0.27, the method is called 'count' for consistency with \Region. 'size' is still provided as an alias.
+        """
+        ...
+    def split_filter(self, filter: TextFilter) -> List[Texts]:
+        r"""
+        @brief Applies a generic filter and returns a copy with all matching shapes and one with the non-matching ones
+        See \TextFilter for a description of this feature.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    def split_with_match(self, pattern: str) -> List[Texts]:
+        r"""
+        @brief Like \with_match, but returning two text collections
+        The first text collection will contain all matching shapes, the other the non-matching ones.
+
+        This method has been introduced in version 0.29.12.
+        """
+        ...
+    def split_with_text(self, text: str) -> List[Texts]:
+        r"""
+        @brief Like \with_text, but returning two text collections
+        The first text collection will contain all matching shapes, the other the non-matching ones.
+
+        This method has been introduced in version 0.29.12.
         """
         ...
     def swap(self, other: Texts) -> None:

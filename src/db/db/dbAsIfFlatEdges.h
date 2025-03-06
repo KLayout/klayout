@@ -101,6 +101,7 @@ public:
   }
 
   virtual EdgesDelegate *filtered (const EdgeFilterBase &) const;
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> filtered_pair (const EdgeFilterBase &filter) const;
 
   virtual EdgesDelegate *merged_in_place ()
   {

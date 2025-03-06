@@ -35,6 +35,12 @@
 
 // -----------------------------------------------------------------------
 // class QLine
+  static bool QLine_operator_eq(const QLine *a, const QLine &b) {
+    return *a == b;
+  }
+  static bool QLine_operator_ne(const QLine *a, const QLine &b) {
+    return !(*a == b);
+  }
 
 //  Constructor QLine::QLine()
 
@@ -158,44 +164,6 @@ static void _call_f_isNull_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<bool > ((bool)((QLine *)cls)->isNull ());
-}
-
-
-// bool QLine::operator!=(const QLine &d)
-
-
-static void _init_f_operator_excl__eq__c1786 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("d");
-  decl->add_arg<const QLine & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_excl__eq__c1786 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QLine &arg1 = gsi::arg_reader<const QLine & >() (args, heap);
-  ret.write<bool > ((bool)((QLine *)cls)->operator!= (arg1));
-}
-
-
-// bool QLine::operator==(const QLine &d)
-
-
-static void _init_f_operator_eq__eq__c1786 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("d");
-  decl->add_arg<const QLine & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_eq__eq__c1786 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QLine &arg1 = gsi::arg_reader<const QLine & >() (args, heap);
-  ret.write<bool > ((bool)((QLine *)cls)->operator== (arg1));
 }
 
 
@@ -478,8 +446,6 @@ static gsi::Methods methods_QLine () {
   methods += new qt_gsi::GenericMethod ("dx", "@brief Method int QLine::dx()\n", true, &_init_f_dx_c0, &_call_f_dx_c0);
   methods += new qt_gsi::GenericMethod ("dy", "@brief Method int QLine::dy()\n", true, &_init_f_dy_c0, &_call_f_dy_c0);
   methods += new qt_gsi::GenericMethod ("isNull?", "@brief Method bool QLine::isNull()\n", true, &_init_f_isNull_c0, &_call_f_isNull_c0);
-  methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QLine::operator!=(const QLine &d)\n", true, &_init_f_operator_excl__eq__c1786, &_call_f_operator_excl__eq__c1786);
-  methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QLine::operator==(const QLine &d)\n", true, &_init_f_operator_eq__eq__c1786, &_call_f_operator_eq__eq__c1786);
   methods += new qt_gsi::GenericMethod (":p1", "@brief Method QPoint QLine::p1()\n", true, &_init_f_p1_c0, &_call_f_p1_c0);
   methods += new qt_gsi::GenericMethod (":p2", "@brief Method QPoint QLine::p2()\n", true, &_init_f_p2_c0, &_call_f_p2_c0);
   methods += new qt_gsi::GenericMethod ("setLine", "@brief Method void QLine::setLine(int x1, int y1, int x2, int y2)\n", false, &_init_f_setLine_2744, &_call_f_setLine_2744);
@@ -498,6 +464,9 @@ static gsi::Methods methods_QLine () {
 }
 
 gsi::Class<QLine> decl_QLine ("QtCore", "QLine",
+  gsi::method_ext("==", &QLine_operator_eq, gsi::arg ("other"), "@brief Method bool QLine::operator==(const QLine &) const") +
+  gsi::method_ext("!=", &QLine_operator_ne, gsi::arg ("other"), "@brief Method bool QLine::operator!=(const QLine &) const") 
++
   methods_QLine (),
   "@qt\n@brief Binding of QLine");
 

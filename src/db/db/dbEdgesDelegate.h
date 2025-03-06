@@ -228,6 +228,7 @@ public:
 
   virtual EdgesDelegate *filter_in_place (const EdgeFilterBase &filter) = 0;
   virtual EdgesDelegate *filtered (const EdgeFilterBase &filter) const = 0;
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> filtered_pair (const EdgeFilterBase &filter) const = 0;
   virtual EdgesDelegate *process_in_place (const EdgeProcessorBase &filter) = 0;
   virtual EdgesDelegate *processed (const EdgeProcessorBase &filter) const = 0;
   virtual EdgePairsDelegate *processed_to_edge_pairs (const EdgeToEdgePairProcessorBase &filter) const = 0;

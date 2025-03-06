@@ -1226,8 +1226,6 @@ DeepShapeStore::cell_mapping_to_original (unsigned int layout_index, db::Layout 
 
   if (! new_pairs.empty ()) {
 
-    //  the variant's originals we are going to delete
-    std::set<db::cell_index_type> cells_to_delete;
     std::vector<std::pair <db::cell_index_type, db::cell_index_type> > new_variants;
 
     //  We now need to fix the cell map from the hierarchy builder, so we can import back from the modified layout.
@@ -1239,10 +1237,9 @@ DeepShapeStore::cell_mapping_to_original (unsigned int layout_index, db::Layout 
       std::map<db::cell_index_type, db::HierarchyBuilder::CellMapKey>::const_iterator icm = cm_skipped_variants.find (var_org);
       if (icm != cm_skipped_variants.end ()) {
 
-        //  create the variant clone in the original layout too and delete this cell
+        //  create the variant clone in the original layout too
         VariantsCollectorBase::copy_shapes (*into_layout, np->second, icm->second.original_cell);
         new_variants.push_back (std::make_pair (np->second, icm->second.original_cell));
-        cells_to_delete.insert (icm->second.original_cell);
 
         //  forget the original cell (now separated into variants) and map the variants back into the
         //  DSS layout
@@ -1265,34 +1262,96 @@ DeepShapeStore::cell_mapping_to_original (unsigned int layout_index, db::Layout 
 
       //  copy cell instances for the new variants
 
-      //  collect the cells that are handled during cell mapping -
-      //  we do not need to take care of them when creating variants,
-      //  but there may be others inside "into_layout" which are
-      //  not present in the DSS and for which we need to copy the
-      //  instances.
-      std::vector<db::cell_index_type> mapped = cm->second.target_cells ();
-      std::sort (mapped.begin (), mapped.end ());
-
-      //  Copy the variant instances - but only those for cells which are not going to be
-      //  deleted and those not handled by the cell mapping object.
+      std::map<db::cell_index_type, db::cell_index_type> variant_to_org;
       for (auto vv = new_variants.begin (); vv != new_variants.end (); ++vv) {
-        const db::Cell &from = into_layout->cell (vv->second);
-        db::Cell &to = into_layout->cell (vv->first);
+        variant_to_org.insert (std::make_pair (vv->first, vv->second));
+      }
+
+      //  Copy the variant instances - but only those for cells which are not handled by the cell mapping object.
+      for (auto vv = new_variants.begin (); vv != new_variants.end (); ++vv) {
+
+        const db::Cell &from = into_layout->cell (vv->second);  //  original
+        db::Cell &to = into_layout->cell (vv->first);           //  variant
+
+        //  Collect and copy the cells which are not mapped already.
+        //  Skip variant original cells if their variants are included.
+        std::set<db::cell_index_type> dont_copy;
+
+        for (auto c = to.begin_child_cells (); ! c.at_end (); ++c) {
+          auto v2o = variant_to_org.find (*c);
+          if (v2o != variant_to_org.end ()) {
+            dont_copy.insert (v2o->second);
+          } else {
+            dont_copy.insert (*c);
+          }
+        }
+          
         for (db::Cell::const_iterator i = from.begin (); ! i.at_end (); ++i) {
-          if (cells_to_delete.find (i->cell_index ()) == cells_to_delete.end ()) {
-            auto m = std::lower_bound (mapped.begin (), mapped.end (), i->cell_index ());
-            if (m == mapped.end () || *m != i->cell_index ()) {
-              to.insert (*i);
+          if (dont_copy.find (i->cell_index ()) == dont_copy.end ()) {
+            to.insert (*i);
+          }
+        }
+
+      }
+
+      //  clean up instances of variant original cells
+
+      std::map<db::cell_index_type, std::set<db::cell_index_type> > delete_instances_of;
+
+      into_layout->force_update ();
+
+      for (auto vv = new_variants.begin (); vv != new_variants.end (); ++vv) {
+        const db::Cell &to = into_layout->cell (vv->first);
+        for (auto p = to.begin_parent_cells (); p != to.end_parent_cells (); ++p) {
+          delete_instances_of [*p].insert (vv->second);
+        }
+      }
+
+      std::vector<db::Instance> insts_to_delete;
+      for (auto di = delete_instances_of.begin (); di != delete_instances_of.end (); ++di) {
+        db::Cell &in = into_layout->cell (di->first);
+        insts_to_delete.clear ();
+        for (auto i = in.begin (); ! i.at_end (); ++i) {
+          if (di->second.find (i->cell_index ()) != di->second.end ()) {
+            insts_to_delete.push_back (*i);
+          }
+        }
+        in.erase_insts (insts_to_delete);
+      }
+
+      //  remove variant original cells unless they are still used
+
+      into_layout->force_update ();
+
+      std::set<db::cell_index_type> vars;
+      for (auto vv = new_variants.begin (); vv != new_variants.end (); ++vv) {
+        vars.insert (vv->second);
+      }
+
+      std::set<db::cell_index_type> cells_to_delete;
+
+      bool more = true;
+      while (more) {
+        more = false;
+        for (auto v = vars.begin (); v != vars.end (); ++v) {
+          if (cells_to_delete.find (*v) == cells_to_delete.end ()) {
+            const db::Cell &vc = into_layout->cell (*v);
+            bool used = false;
+            for (auto p = vc.begin_parent_cells (); p != vc.end_parent_cells () && ! used; ++p) {
+              used = (cells_to_delete.find (*p) == cells_to_delete.end ());
+            }
+            if (! used) {
+              cells_to_delete.insert (*v);
+              more = true;
             }
           }
         }
       }
 
-    }
+      if (! cells_to_delete.empty ()) {
+        into_layout->delete_cells (cells_to_delete);
+      }
 
-    if (! cells_to_delete.empty ()) {
-      //  delete the variant original cells
-      into_layout->delete_cells (cells_to_delete);
     }
 
   }

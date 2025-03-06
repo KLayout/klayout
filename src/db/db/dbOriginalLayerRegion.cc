@@ -330,11 +330,7 @@ OriginalLayerRegion::begin_merged_iter () const
 bool
 OriginalLayerRegion::empty () const
 {
-  //  NOTE: we should to make sure the iterator isn't validated as this would spoil the usability or OriginalLayerRegion upon
-  //  layout changes
-  db::RecursiveShapeIterator iter = m_iter;
-
-  return iter.at_end ();
+  return m_iter.at_end_no_lock ();
 }
 
 bool

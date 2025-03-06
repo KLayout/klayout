@@ -440,7 +440,7 @@ AsIfFlatRegion::filtered_pair (const PolygonFilterBase &filter) const
   std::unique_ptr<FlatRegion> new_region_false (new FlatRegion ());
 
   for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
-    if (filter.selected (*p)) {
+    if (filter.selected (*p, p.prop_id ())) {
       new_region_true->insert (*p);
     } else {
       new_region_false->insert (*p);

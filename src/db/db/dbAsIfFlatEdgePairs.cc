@@ -256,11 +256,10 @@ AsIfFlatEdgePairs::filtered_pair (const EdgePairFilterBase &filter) const
 {
   std::unique_ptr<FlatEdgePairs> new_edge_pairs_true (new FlatEdgePairs ());
   std::unique_ptr<FlatEdgePairs> new_edge_pairs_false (new FlatEdgePairs ());
-  db::PropertyMapper pm (new_edge_pairs_true->properties_repository (), properties_repository ());
 
   for (EdgePairsIterator p (begin ()); ! p.at_end (); ++p) {
-    FlatEdgePairs *dest = filter.selected (*p) ? new_edge_pairs_true.get () : new_edge_pairs_false.get ();
-    insert_ep (dest, *p, pm (p.prop_id ()));
+    FlatEdgePairs *dest = filter.selected (*p, p.prop_id ()) ? new_edge_pairs_true.get () : new_edge_pairs_false.get ();
+    insert_ep (dest, *p, p.prop_id ());
   }
 
   return std::make_pair (new_edge_pairs_true.release (), new_edge_pairs_false.release ());

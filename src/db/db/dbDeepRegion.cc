@@ -1660,7 +1660,7 @@ DeepRegion::apply_filter (const PolygonFilterBase &filter, bool with_true, bool 
         for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
           db::Polygon poly;
           si->polygon (poly);
-          if (filter.selected (poly.transformed (*v), si->prop_id ())) {
+          if (filter.selected (poly.transformed (tr), si->prop_id ())) {
             if (st_true) {
               st_true->insert (*si);
             }

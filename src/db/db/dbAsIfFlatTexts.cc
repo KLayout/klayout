@@ -178,7 +178,7 @@ AsIfFlatTexts::filtered_pair (const TextFilterBase &filter) const
   std::unique_ptr<FlatTexts> new_texts_false (new FlatTexts ());
 
   for (TextsIterator p (begin ()); ! p.at_end (); ++p) {
-    if (filter.selected (*p)) {
+    if (filter.selected (*p, p.prop_id ())) {
       new_texts_true->insert (*p);
     } else {
       new_texts_false->insert (*p);

@@ -433,7 +433,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "\n"
     "This method has been introduced in version 0.29.3.\n"
   ) +
-  gsi::method_ext ("layer_index", &l2n_layer_index_by_name,
+  gsi::method_ext ("layer_index", &l2n_layer_index_by_name, gsi::arg ("name"),
     "@brief Gets the layer index for a given name or nil if the name is not valid.\n"
     "\n"
     "This method has been introduced in version 0.30."

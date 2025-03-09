@@ -94,11 +94,14 @@ static std::map<unsigned int, unsigned int> layer_map_from_var (const db::Layout
     std::map<unsigned int, unsigned int> res;
 
     for (auto kv = lmap.begin_array (); kv != lmap.end_array (); ++kv) {
+
       const tl::Variant &k = kv->first;
       const tl::Variant &v = kv->second;
+
       unsigned int ki = k.to_uint ();
-      unsigned int vi = 0;
       if (v.is_user ()) {
+
+        unsigned int vi = 0;
         if (dynamic_cast<const tl::VariantUserClass<db::Region> *> (v.user_cls ()) != 0) {
           vi = l2n->layer_of<db::ShapeCollection> (v.to_user<db::Region> ());
         } else if (dynamic_cast<const tl::VariantUserClass<db::Texts> *> (v.user_cls ()) != 0) {
@@ -106,10 +109,14 @@ static std::map<unsigned int, unsigned int> layer_map_from_var (const db::Layout
         } else {
           throw tl::Exception (tl::to_string (tr ("'lmap' argument hash values need to be ints, Region or Texts objects")));
         }
-      } else {
-        vi = v.to_uint ();
+        res.insert (std::make_pair (ki, vi));
+
+      } else if (! v.is_nil ()) {
+
+        res.insert (std::make_pair (ki, v.to_uint ()));
+
       }
-      res.insert (std::make_pair (ki, vi));
+
     }
 
     return res;

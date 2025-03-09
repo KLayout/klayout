@@ -558,6 +558,58 @@ END
 
   end
 
+  def shape_to_s(s)
+    if s.is_box || s.is_polygon
+      s.polygon.to_s
+    elsif s.is_text
+      s.text.to_s
+    else
+      "nn"
+    end
+  end
+
+  def compare_layouts(ly, au_file, tmp_file = nil)
+
+    ret = true
+
+    begin
+      ly_au = RBA::Layout::new
+      ly_au.read(au_file)
+    rescue
+      ly.write(tmp_file)
+      puts "Actual layout written to: #{tmp_file}"
+      raise
+    end
+
+    lmap = {}
+
+    [ ly, ly_au ].each_with_index do |l,i|
+      l.layer_indexes.each do |li|
+        info = l.get_info(li)
+        lmap[info] ||= [ nil, nil ]
+        lmap[info][i] = li
+      end
+    end
+
+    lmap.each do |info,lis|
+      s    = !lis[0] ? "" : ly   .top_cell.begin_shapes_rec(lis[0]).each.collect { |i| shape_to_s(i.shape) }.sort.join("\n")
+      s_au = !lis[1] ? "" : ly_au.top_cell.begin_shapes_rec(lis[1]).each.collect { |i| shape_to_s(i.shape) }.sort.join("\n")
+      if s != s_au
+        puts "Layer #{info}:\nActual shapes:\n#{s}\nGolden layout shapes:\n#{s_au}"
+        ret = false
+      end
+    end
+
+    if !ret && tmp_file
+      ly.write(tmp_file)
+      puts "Golden: #{au_file}"
+      puts "Actual: #{tmp_file}"
+    end
+
+    return ret
+
+  end
+
   def test_14_BuildNets
 
     l2n = RBA::LayoutToNetlist::new
@@ -585,17 +637,49 @@ END
 
     l2n.build_all_nets(cm, ly, lmap, "NET_", nil, RBA::LayoutToNetlist::BNH_Disconnected, nil, "DEVICE_")
 
-    ly_au = RBA::Layout::new
     au_file = File.join($ut_testsrc, "testdata", "algo", "l2n_reader_au_1.gds")
-    ly_au.read(au_file)
+    tmp_file = File.join($ut_testtmp, "l2n_reader_1.gds")
 
-    lmap.each do |li,v|
-      li_au = ly_au.layer(ly.get_info(li))
-      ly_region = RBA::Region::new(ly.top_cell.begin_shapes_rec(li))
-      ly_au_region = RBA::Region::new(ly_au.top_cell.begin_shapes_rec(li_au))
-      info = ly.get_info(li).to_s + ":"
-      assert_equal(info + (ly_region ^ ly_au_region).to_s, info)
-    end  
+    assert_equal(true, compare_layouts(ly, au_file, tmp_file))
+
+    # build_all_nets with int-to-int layer map
+
+    ly = RBA::Layout::new
+    ly.create_cell("TOP")
+
+    cm = l2n.cell_mapping_into(ly, ly.top_cell)
+
+    lmap = { 
+      ly.insert_layer(RBA::LayerInfo::new(10, 0)) => l2n.layer_index("psd"),
+      ly.insert_layer(RBA::LayerInfo::new(11, 0)) => l2n.layer_index("nsd"),
+      ly.insert_layer(RBA::LayerInfo::new(3, 0)) => l2n.layer_index("poly"),
+      ly.insert_layer(RBA::LayerInfo::new(4, 0)) => l2n.layer_index("diff_cont"),
+      ly.insert_layer(RBA::LayerInfo::new(5, 0)) => l2n.layer_index("poly_cont"),
+      ly.insert_layer(RBA::LayerInfo::new(6, 0)) => l2n.layer_index("metal1"),
+      ly.insert_layer(RBA::LayerInfo::new(7, 0)) => l2n.layer_index("via1"),
+      ly.insert_layer(RBA::LayerInfo::new(8, 0)) => l2n.layer_index("metal2")
+    }
+
+    l2n.build_all_nets(cm, ly, lmap, "NET_", nil, RBA::LayoutToNetlist::BNH_Disconnected, nil, "DEVICE_")
+
+    au_file = File.join($ut_testsrc, "testdata", "algo", "l2n_reader_au_1.gds")
+    tmp_file = File.join($ut_testtmp, "l2n_reader_1.gds")
+
+    assert_equal(true, compare_layouts(ly, au_file, tmp_file))
+
+    # build_all_nets with auto layer map
+
+    ly = RBA::Layout::new
+    ly.create_cell("TOP")
+
+    cm = l2n.cell_mapping_into(ly, ly.top_cell)
+
+    l2n.build_all_nets(cm, ly, nil, "NET_", nil, RBA::LayoutToNetlist::BNH_Disconnected, nil, "DEVICE_")
+
+    au_file = File.join($ut_testsrc, "testdata", "algo", "l2n_lmap_au.gds")
+    tmp_file = File.join($ut_testtmp, "l2n_lmap.gds")
+
+    assert_equal(true, compare_layouts(ly, au_file, tmp_file))
 
     # build_nets
 
@@ -622,17 +706,29 @@ END
 
     l2n.build_nets(nets, cm, ly, lmap, "NET_", nil, RBA::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_")
 
-    ly_au = RBA::Layout::new
     au_file = File.join($ut_testsrc, "testdata", "algo", "l2n_reader_au_1d.gds")
-    ly_au.read(au_file)
+    tmp_file = File.join($ut_testtmp, "l2n_reader_1d.gds")
 
-    lmap.each do |li,v|
-      li_au = ly_au.layer(ly.get_info(li))
-      ly_region = RBA::Region::new(ly.top_cell.begin_shapes_rec(li))
-      ly_au_region = RBA::Region::new(ly_au.top_cell.begin_shapes_rec(li_au))
-      info = ly.get_info(li).to_s + ":"
-      assert_equal(info + (ly_region ^ ly_au_region).to_s, info)
-    end  
+    assert_equal(true, compare_layouts(ly, au_file, tmp_file))
+
+    # build_nets
+
+    ly = RBA::Layout::new
+    ly.create_cell("TOP")
+
+    cm = l2n.cell_mapping_into(ly, ly.top_cell)
+
+    nets = [
+      l2n.netlist.circuit_by_name("RINGO").net_by_name("VSS"),
+      l2n.netlist.circuit_by_name("RINGO").net_by_name("VDD")
+    ]
+
+    l2n.build_nets(nets, cm, ly, nil, "NET_", nil, RBA::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_")
+
+    au_file = File.join($ut_testsrc, "testdata", "algo", "l2n_lmap_au_2.gds")
+    tmp_file = File.join($ut_testtmp, "l2n_lmap_2.gds")
+
+    assert_equal(true, compare_layouts(ly, au_file, tmp_file))
 
   end
 
@@ -1024,6 +1120,132 @@ END
     assert_equal(le[1].to_s, "[cat description] In cell cell_name: info, shape: (1,1;2,2;3,1)")
     assert_equal(le[2].to_s, "warning")
     assert_equal(le[3].to_s, "error")
+
+  end
+
+  def test_22_Layers
+
+    ly = RBA::Layout::new
+    ly.read(File.join($ut_testsrc, "testdata", "algo", "device_extract_l1.gds"))
+
+    l2n = RBA::LayoutToNetlist::new(RBA::RecursiveShapeIterator::new(ly, ly.top_cell, []))
+    assert_equal(l2n.original_layout.object_id, ly.object_id) 
+    assert_equal(l2n.original_top_cell.cell_index, ly.top_cell.cell_index) 
+
+    # only plain connectivity
+
+    ractive     = l2n.make_layer(         ly.layer(2, 0), "active" )
+    rpoly       = l2n.make_polygon_layer( ly.layer(3, 0), "poly" )
+    rlabels     = l2n.make_text_layer(    ly.layer(6, 1), "labels" )
+    rptemp      = l2n.make_polygon_layer( "poly_temp" )
+    rltemp      = l2n.make_text_layer   ( "labels_temp" )
+    
+    rsd         = ractive - rpoly
+    l2n.register(rsd, "sd")
+
+    li_ptemp = l2n.layer_index(rptemp)
+    assert_equal(l2n.layer_name(li_ptemp), "poly_temp")
+    assert_equal(l2n.polygons_by_index(li_ptemp).to_s, "")
+
+    li_ltemp = l2n.layer_index(rltemp)
+    assert_equal(l2n.layer_name(li_ltemp), "labels_temp")
+    assert_equal(l2n.texts_by_index(li_ltemp).to_s, "")
+
+    assert_equal(l2n.layer_name(ractive), "active")
+    assert_equal(l2n.layer_name(rpoly),   "poly")
+    assert_equal(l2n.layer_name(rsd),     "sd")
+    assert_equal(l2n.layer_name(rlabels), "labels")
+
+    li_active = l2n.layer_index("active")
+    li_labels = l2n.layer_index("labels")
+    assert_equal(l2n.layer_index(ractive), li_active)
+
+    ractive2 = l2n.layer_by_index(li_active)
+    assert_equal(ractive.to_s, ractive2.to_s)
+
+    ractive2 = l2n.layer_by_name("active")
+    assert_equal(ractive.to_s, ractive2.to_s)
+
+    ractive2 = l2n.polygons_by_index(li_active)
+    assert_equal(ractive.to_s, ractive2.to_s)
+
+    ractive2 = l2n.polygons_by_name("active")
+    assert_equal(ractive.to_s, ractive2.to_s)
+
+    rlabels2 = l2n.texts_by_index(li_labels)
+    assert_equal(rlabels.to_s, rlabels2.to_s)
+
+    rlabels2 = l2n.texts_by_name("labels")
+    assert_equal(rlabels.to_s, rlabels2.to_s)
+
+  end
+
+  def test_23_ShapesOfNet
+
+    ly = RBA::Layout::new
+    top = ly.create_cell("TOP")
+
+    l1 = ly.layer(1, 0)
+    l2 = ly.layer(2, 0)
+    l3 = ly.layer(3, 0)
+
+    top.shapes(l1).insert(RBA::DBox::new(0, 0, 1000, 10))
+    top.shapes(l2).insert(RBA::DBox::new(0, 0, 10, 10))
+    top.shapes(l2).insert(RBA::DBox::new(990, 0, 1000, 10))
+    top.shapes(l3).insert(RBA::DText::new("A", RBA::DTrans::new(5, 5)))
+    top.shapes(l3).insert(RBA::DText::new("B", RBA::DTrans::new(995, 5)))
+
+    l2n = RBA::LayoutToNetlist::new(RBA::RecursiveShapeIterator::new(ly, top, []))
+    l1r = l2n.make_polygon_layer(l1, "L1")
+    l2r = l2n.make_polygon_layer(l2, "L1.pin")
+    l3r = l2n.make_text_layer(l3, "L1.label")
+
+    l2n.connect(l1r)
+    l2n.connect(l1r, l2r)
+    l2n.connect(l2r)
+    l2n.connect(l2r, l3r)
+
+    l2n.extract_netlist
+
+    nl = l2n.netlist
+    net = nl.top_circuit.net_by_name("A,B")
+
+    assert_equal(l2n.shapes_of_net(net, l1r).to_s, "(0,0;0,10000;1000000,10000;1000000,0)")
+    assert_equal(l2n.shapes_of_net(net, l2r).to_s, "(0,0;0,10000;10000,10000;10000,0);(990000,0;990000,10000;1000000,10000;1000000,0)")
+    assert_equal(l2n.shapes_of_net(net, l3r).to_s, "('A',m45 0,0);('B',m135 0,0)")
+
+    assert_equal(l2n.polygons_of_net(net, l2n.layer_index(l1r)).to_s, "(0,0;0,10000;1000000,10000;1000000,0)")
+    assert_equal(l2n.polygons_of_net(net, l2n.layer_index(l2r)).to_s, "(0,0;0,10000;10000,10000;10000,0);(990000,0;990000,10000;1000000,10000;1000000,0)")
+    assert_equal(l2n.polygons_of_net(net, l2n.layer_index(l3r)).to_s, "")
+
+    assert_equal(l2n.texts_of_net(net, l2n.layer_index(l1r)).to_s, "")
+    assert_equal(l2n.texts_of_net(net, l2n.layer_index(l2r)).to_s, "")
+    assert_equal(l2n.texts_of_net(net, l2n.layer_index(l3r)).to_s, "('A',m45 0,0);('B',m135 0,0)")
+
+    shapes = RBA::Shapes::new
+    l2n.shapes_of_net(net, l1r, true, shapes)
+    assert_equal(shapes.each.collect(&:to_s).join("/"), "box (0,0;1000000,10000)")
+
+    shapes = RBA::Shapes::new
+    l2n.shapes_of_net(net, l2r, true, shapes)
+    assert_equal(shapes.each.collect(&:to_s).join("/"), "box (0,0;10000,10000)/box (990000,0;1000000,10000)")
+
+    shapes = RBA::Shapes::new
+    l2n.shapes_of_net(net, l2n.layer_index(l2r), true, shapes)
+    assert_equal(shapes.each.collect(&:to_s).join("/"), "box (0,0;10000,10000)/box (990000,0;1000000,10000)")
+
+    shapes = RBA::Shapes::new
+    l2n.shapes_of_net(net, l3r, true, shapes)
+    assert_equal(shapes.each.collect(&:to_s).join("/"), "text ('A',m45 0,0)/text ('B',m135 0,0)")
+
+    shapes = RBA::Shapes::new
+    # wrong container type, correct content (layer_by_index gives a Region)
+    l2n.shapes_of_net(net, l2n.layer_by_index(l2n.layer_index(l3r)), true, shapes)
+    assert_equal(shapes.each.collect(&:to_s).join("/"), "text ('A',m45 0,0)/text ('B',m135 0,0)")
+
+    shapes = RBA::Shapes::new
+    l2n.shapes_of_net(net, l2n.layer_index(l3r), true, shapes)
+    assert_equal(shapes.each.collect(&:to_s).join("/"), "text ('A',m45 0,0)/text ('B',m135 0,0)")
 
   end
 

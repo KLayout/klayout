@@ -2360,9 +2360,7 @@ NetBuilder::build_net_rec (db::cell_index_type ci, size_t cid, db::Cell &tc, con
       StopOnFirst sof;
       std::map<unsigned int, StopOnFirst *> sof_lmap;
       for (std::map<unsigned int, unsigned int>::const_iterator l = lmap.begin (); l != lmap.end (); ++l) {
-        if (l->second) {
-          sof_lmap.insert (std::make_pair (l->second, &sof));
-        }
+        sof_lmap.insert (std::make_pair (l->second, &sof));
       }
 
       bool consider_cell = ! deliver_shapes_of_net (m_hier_mode == BNH_Flatten, mp_source->netlist (), mp_source->net_clusters (), ci, cid, sof_lmap, tr, 0);
@@ -2382,9 +2380,7 @@ NetBuilder::build_net_rec (db::cell_index_type ci, size_t cid, db::Cell &tc, con
 
   std::map<unsigned int, db::Shapes *> target_lmap;
   for (std::map<unsigned int, unsigned int>::const_iterator l = lmap.begin (); l != lmap.end (); ++l) {
-    if (l->second) {
-      target_lmap.insert (std::make_pair (l->second, &target_cell->shapes (l->first)));
-    }
+    target_lmap.insert (std::make_pair (l->second, &target_cell->shapes (l->first)));
   }
 
   deliver_shapes_of_net (m_hier_mode == BNH_Flatten, mp_source->netlist (), mp_source->net_clusters (), ci, cid, target_lmap, tr, netname_propid);

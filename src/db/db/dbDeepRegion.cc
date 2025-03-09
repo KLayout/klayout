@@ -757,13 +757,13 @@ DeepRegion::nets (LayoutToNetlist *l2n, NetPropertyMode prop_mode, const tl::Var
 
   DeepLayer result = deep_layer ().derived ();
 
-  std::unique_ptr<db::Region> region_for_layer (l2n->layer_by_original (this));
-  if (! region_for_layer) {
+  tl::optional<unsigned int> li = l2n->layer_by_original (this);
+  if (! li.has_value ()) {
     throw tl::Exception (tl::to_string (tr ("The given layer is not an original layer used in netlist extraction")));
   }
 
-  std::map<unsigned int, const db::Region *> lmap;
-  lmap.insert (std::make_pair (result.layer (), region_for_layer.get ()));
+  std::map<unsigned int, unsigned int> lmap;
+  lmap.insert (std::make_pair (result.layer (), li.value ()));
 
   net_builder.build_nets (nets, lmap, prop_mode, net_prop_name);
 

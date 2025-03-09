@@ -93,7 +93,7 @@ LayoutToNetlist::LayoutToNetlist ()
 LayoutToNetlist::~LayoutToNetlist ()
 {
   //  NOTE: do this in this order because of unregistration of the layers
-  m_named_regions.clear ();
+  m_named_dls.clear ();
   m_dlrefs.clear ();
   mp_internal_dss.reset (0);
   mp_netlist.reset (0);
@@ -175,6 +175,16 @@ db::Region *LayoutToNetlist::make_layer (unsigned int layer_index, const std::st
   return region.release ();
 }
 
+db::Texts *LayoutToNetlist::make_text_layer (const std::string &n)
+{
+  db::RecursiveShapeIterator si (m_iter);
+  si.shape_flags (db::ShapeIterator::Nothing);
+
+  std::unique_ptr <db::Texts> texts (new db::Texts (si, dss ()));
+  register_layer (*texts, n);
+  return texts.release ();
+}
+
 db::Texts *LayoutToNetlist::make_text_layer (unsigned int layer_index, const std::string &n)
 {
   db::RecursiveShapeIterator si (m_iter);
@@ -190,7 +200,7 @@ db::Region *LayoutToNetlist::make_polygon_layer (unsigned int layer_index, const
 {
   db::RecursiveShapeIterator si (m_iter);
   si.set_layer (layer_index);
-  si.shape_flags (db::ShapeIterator::Paths | db::ShapeIterator::Polygons | db::ShapeIterator::Boxes);
+  si.shape_flags (db::ShapeIterator::Regions);
 
   std::unique_ptr <db::Region> region (new db::Region (si, dss ()));
   register_layer (*region, n);
@@ -850,10 +860,10 @@ void LayoutToNetlist::mem_stat (MemStatistics *stat, MemStatistics::purpose_t pu
   db::mem_stat (stat, purpose, cat, m_net_clusters, true, (void *) this);
   db::mem_stat (stat, purpose, cat, mp_netlist, true, (void *) this);
   db::mem_stat (stat, purpose, cat, m_dlrefs, true, (void *) this);
-  db::mem_stat (stat, purpose, cat, m_named_regions, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_named_dls, true, (void *) this);
   db::mem_stat (stat, purpose, cat, m_name_of_layer, true, (void *) this);
-  db::mem_stat (stat, purpose, cat, m_region_by_original, true, (void *) this);
-  db::mem_stat (stat, purpose, cat, m_region_of_layer, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_dl_by_original, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_dl_of_layer, true, (void *) this);
   db::mem_stat (stat, purpose, cat, m_joined_net_names, true, (void *) this);
   db::mem_stat (stat, purpose, cat, m_joined_net_names_per_cell, true, (void *) this);
   db::mem_stat (stat, purpose, cat, m_joined_nets, true, (void *) this);
@@ -899,6 +909,26 @@ db::Cell *LayoutToNetlist::internal_top_cell ()
   return &dss ().initial_cell (m_layout_index);
 }
 
+const db::Layout *LayoutToNetlist::original_layout () const
+{
+  return m_iter.layout ();
+}
+
+const db::Cell *LayoutToNetlist::original_top_cell () const
+{
+  return m_iter.top_cell ();
+}
+
+db::Layout *LayoutToNetlist::original_layout ()
+{
+  return const_cast<db::Layout *> (m_iter.layout ());
+}
+
+db::Cell *LayoutToNetlist::original_top_cell ()
+{
+  return const_cast<db::Cell *> (m_iter.top_cell ());
+}
+
 void LayoutToNetlist::ensure_layout () const
 {
   if (! dss ().is_valid_layout_index (m_layout_index)) {
@@ -927,7 +957,7 @@ std::string LayoutToNetlist::make_new_name (const std::string &stem)
     name += std::string ("$");
     name += tl::to_string (n - m);
 
-    if (m_named_regions.find (name) == m_named_regions.end ()) {
+    if (m_named_dls.find (name) == m_named_dls.end ()) {
       n -= m;
     }
 
@@ -948,39 +978,69 @@ std::string LayoutToNetlist::name (unsigned int l) const
 
 db::Region *LayoutToNetlist::layer_by_name (const std::string &name)
 {
-  std::map<std::string, db::DeepLayer>::const_iterator l = m_named_regions.find (name);
-  if (l == m_named_regions.end ()) {
+  std::map<std::string, db::DeepLayer>::const_iterator l = m_named_dls.find (name);
+  if (l == m_named_dls.end ()) {
     return 0;
   } else {
     return new db::Region (new db::DeepRegion (l->second));
   }
 }
 
+db::Texts *LayoutToNetlist::texts_by_name (const std::string &name)
+{
+  std::map<std::string, db::DeepLayer>::const_iterator l = m_named_dls.find (name);
+  if (l == m_named_dls.end ()) {
+    return 0;
+  } else {
+    return new db::Texts (new db::DeepTexts (l->second));
+  }
+}
+
+tl::optional<unsigned int> LayoutToNetlist::layer_index_by_name (const std::string &name) const
+{
+  std::map<std::string, db::DeepLayer>::const_iterator l = m_named_dls.find (name);
+  if (l == m_named_dls.end ()) {
+    return tl::optional<unsigned int> ();
+  } else {
+    return tl::optional<unsigned int> (l->second.layer ());
+  }
+}
+
 db::Region *LayoutToNetlist::layer_by_index (unsigned int index)
 {
-  auto n = m_region_of_layer.find (index);
-  if (n == m_region_of_layer.end ()) {
+  auto n = m_dl_of_layer.find (index);
+  if (n == m_dl_of_layer.end ()) {
     return 0;
   } else {
     return new db::Region (new db::DeepRegion (n->second));
   }
 }
 
-db::Region *LayoutToNetlist::layer_by_original (const ShapeCollectionDelegateBase *original_delegate)
+db::Texts *LayoutToNetlist::texts_by_index (unsigned int index)
 {
-  auto n = m_region_by_original.find (tl::id_of (original_delegate));
-  if (n == m_region_by_original.end ()) {
+  auto n = m_dl_of_layer.find (index);
+  if (n == m_dl_of_layer.end ()) {
+    return 0;
+  } else {
+    return new db::Texts (new db::DeepTexts (n->second));
+  }
+}
+
+tl::optional<unsigned int> LayoutToNetlist::layer_by_original (const ShapeCollectionDelegateBase *original_delegate)
+{
+  auto n = m_dl_by_original.find (tl::id_of (original_delegate));
+  if (n == m_dl_by_original.end ()) {
 
     DeepShapeCollectionDelegateBase *dl = const_cast<ShapeCollectionDelegateBase *> (original_delegate)->deep ();
     if (dl && dl->deep_layer ().store () == mp_dss.get ()) {
       //  implicitly original because the collection is inside our DSS
-      return new db::Region (new db::DeepRegion (dl->deep_layer ()));
+      return tl::optional<unsigned int> (dl->deep_layer ().layer ());
     } else {
-      return 0;
+      return tl::optional<unsigned int> ();
     }
 
   } else {
-    return new db::Region (new db::DeepRegion (n->second));
+    return tl::optional<unsigned int> (n->second.layer ());
   }
 }
 
@@ -1009,11 +1069,11 @@ std::string LayoutToNetlist::name (const ShapeCollection &coll) const
 
 unsigned int LayoutToNetlist::register_layer (const ShapeCollection &collection, const std::string &n_in)
 {
-  if (m_region_by_original.find (tl::id_of (collection.get_delegate ())) != m_region_by_original.end ()) {
+  if (m_dl_by_original.find (tl::id_of (collection.get_delegate ())) != m_dl_by_original.end ()) {
     throw tl::Exception (tl::to_string (tr ("The layer is already registered")));
   }
 
-  if (! n_in.empty () && m_named_regions.find (n_in) != m_named_regions.end ()) {
+  if (! n_in.empty () && m_named_dls.find (n_in) != m_named_dls.end ()) {
     throw tl::Exception (tl::to_string (tr ("Layer name is already used: ")) + n_in);
   }
 
@@ -1043,9 +1103,9 @@ unsigned int LayoutToNetlist::register_layer (const ShapeCollection &collection,
 
   unsigned int layer = dl.layer ();
 
-  m_region_by_original [tl::id_of (collection.get_delegate ())] = dl;
-  m_region_of_layer [layer] = dl;
-  m_named_regions [n] = dl;
+  m_dl_by_original [tl::id_of (collection.get_delegate ())] = dl;
+  m_dl_of_layer [layer] = dl;
+  m_named_dls [n] = dl;
   m_name_of_layer [layer] = n;
 
   return layer;
@@ -1075,7 +1135,7 @@ bool LayoutToNetlist::is_persisted_impl (const db::ShapeCollection &coll) const
     return true;
   } else {
     //  explicitly persisted through "register"
-    return m_region_by_original.find (tl::id_of (coll.get_delegate ())) != m_region_by_original.end ();
+    return m_dl_by_original.find (tl::id_of (coll.get_delegate ())) != m_dl_by_original.end ();
   }
 }
 
@@ -1126,10 +1186,10 @@ db::CellMapping LayoutToNetlist::const_cell_mapping_into (const db::Layout &layo
   return cm;
 }
 
-std::map<unsigned int, const db::Region *>
+std::map<unsigned int, unsigned int>
 LayoutToNetlist::create_layermap (db::Layout &target_layout, int ln) const
 {
-  std::map<unsigned int, const db::Region *> lm;
+  std::map<unsigned int, unsigned int> lm;
   if (! internal_layout ()) {
     return lm;
   }
@@ -1144,13 +1204,13 @@ LayoutToNetlist::create_layermap (db::Layout &target_layout, int ln) const
 
   for (std::set<unsigned int>::const_iterator l = layers_to_copy.begin (); l != layers_to_copy.end (); ++l) {
     const db::LayerProperties &lp = source_layout.get_properties (*l);
-    unsigned int tl;
     if (! lp.is_null ()) {
-      tl = target_layout.insert_layer (lp);
-    } else {
-      tl = target_layout.insert_layer (db::LayerProperties (ln++, 0, name (*l)));
+      unsigned int tl = target_layout.insert_layer (lp);
+      lm.insert (std::make_pair (tl, *l));
+    } else if (ln >= 0) {
+      unsigned int tl = target_layout.insert_layer (db::LayerProperties (ln++, 0, name (*l)));
+      lm.insert (std::make_pair (tl, *l));
     }
-    lm.insert (std::make_pair (tl, const_cast<LayoutToNetlist *> (this)->layer_by_index (*l)));
   }
 
   return lm;
@@ -1179,16 +1239,43 @@ static bool deliver_shape (const db::NetShape &, StopOnFirst, const Tr &, db::pr
 }
 
 template <class Tr>
-static bool deliver_shape (const db::NetShape &s, db::Region &region, const Tr &tr, db::properties_id_type /*propid*/)
+static bool deliver_shape (const db::NetShape &s, db::Region &region, const Tr &tr, db::properties_id_type propid)
 {
   if (s.type () == db::NetShape::Polygon) {
 
     db::PolygonRef pr = s.polygon_ref ();
 
     if (pr.obj ().is_box ()) {
-      region.insert (pr.obj ().box ().transformed (pr.trans ()).transformed (tr));
+      if (propid) {
+        region.insert (db::BoxWithProperties (pr.obj ().box ().transformed (pr.trans ()).transformed (tr), propid));
+      } else {
+        region.insert (pr.obj ().box ().transformed (pr.trans ()).transformed (tr));
+      }
     } else {
-      region.insert (pr.obj ().transformed (pr.trans ()).transformed (tr));
+      if (propid) {
+        region.insert (db::PolygonWithProperties (pr.obj ().transformed (pr.trans ()).transformed (tr), propid));
+      } else {
+        region.insert (pr.obj ().transformed (pr.trans ()).transformed (tr));
+      }
+    }
+
+  }
+
+  return true;
+}
+
+template <class Tr>
+static bool deliver_shape (const db::NetShape &s, db::Texts &texts, const Tr &tr, db::properties_id_type propid)
+{
+  if (s.type () == db::NetShape::Text) {
+
+    db::TextRef pr = s.text_ref ();
+
+    db::Text text (pr.obj ().transformed (pr.trans ()).transformed (tr));
+    if (propid) {
+      texts.insert (db::TextWithProperties (text, propid));
+    } else {
+      texts.insert (text);
     }
 
   }
@@ -1407,9 +1494,14 @@ LayoutToNetlist::shapes_of_terminal (const db::NetTerminalRef &terminal, const d
   return result;
 }
 
-void LayoutToNetlist::shapes_of_net (const db::Net &net, const db::Region &of_layer, bool recursive, db::Shapes &to, db::properties_id_type propid, const ICplxTrans &trans) const
+void LayoutToNetlist::shapes_of_net (const db::Net &net, const db::ShapeCollection &of_layer, bool recursive, db::Shapes &to, db::properties_id_type propid, const ICplxTrans &trans) const
 {
   unsigned int lid = layer_of (of_layer);
+  shapes_of_net (net, lid, recursive, to, propid, trans);
+}
+
+void LayoutToNetlist::shapes_of_net (const db::Net &net, unsigned int lid, bool recursive, db::Shapes &to, db::properties_id_type propid, const ICplxTrans &trans) const
+{
   const db::Circuit *circuit = net.circuit ();
   tl_assert (circuit != 0);
 
@@ -1419,14 +1511,14 @@ void LayoutToNetlist::shapes_of_net (const db::Net &net, const db::Region &of_la
   deliver_shapes_of_net (recursive, mp_netlist.get (), m_net_clusters, circuit->cell_index (), net.cluster_id (), lmap, trans, propid);
 }
 
-db::Region *LayoutToNetlist::shapes_of_net (const db::Net &net, const db::Region &of_layer, bool recursive, const db::ICplxTrans &trans) const
+template<class Coll>
+Coll *LayoutToNetlist::shapes_of_net_with_layer_index (const db::Net &net, unsigned int lid, bool recursive, const db::ICplxTrans &trans) const
 {
-  unsigned int lid = layer_of (of_layer);
   const db::Circuit *circuit = net.circuit ();
   tl_assert (circuit != 0);
 
-  std::unique_ptr<db::Region> res (new db::Region ());
-  std::map<unsigned int, db::Region *> lmap;
+  std::unique_ptr<Coll> res (new Coll ());
+  std::map<unsigned int, Coll *> lmap;
   lmap [lid] = res.get ();
 
   deliver_shapes_of_net (recursive, mp_netlist.get (), m_net_clusters, circuit->cell_index (), net.cluster_id (), lmap, trans, 0);
@@ -1434,8 +1526,14 @@ db::Region *LayoutToNetlist::shapes_of_net (const db::Net &net, const db::Region
   return res.release ();
 }
 
+//  explicit instantiations
+template
+DB_PUBLIC db::Region *LayoutToNetlist::shapes_of_net_with_layer_index<db::Region> (const db::Net &net, unsigned int lid, bool recursive, const db::ICplxTrans &trans) const;
+template
+DB_PUBLIC db::Texts *LayoutToNetlist::shapes_of_net_with_layer_index<db::Texts> (const db::Net &net, unsigned int lid, bool recursive, const db::ICplxTrans &trans) const;
+
 void
-LayoutToNetlist::build_net (const db::Net &net, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, NetPropertyMode net_prop_mode, const tl::Variant &netname_prop, BuildNetHierarchyMode hier_mode, const char *cell_name_prefix, const char *device_cell_name_prefix) const
+LayoutToNetlist::build_net (const db::Net &net, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, unsigned int> &lmap, NetPropertyMode net_prop_mode, const tl::Variant &netname_prop, BuildNetHierarchyMode hier_mode, const char *cell_name_prefix, const char *device_cell_name_prefix) const
 {
   NetBuilder builder (&target, this);
   builder.set_hier_mode (hier_mode);
@@ -1446,7 +1544,7 @@ LayoutToNetlist::build_net (const db::Net &net, db::Layout &target, db::Cell &ta
 }
 
 void
-LayoutToNetlist::build_all_nets (const db::CellMapping &cmap, db::Layout &target, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, NetPropertyMode net_prop_mode, const tl::Variant &netname_prop, BuildNetHierarchyMode hier_mode, const char *circuit_cell_name_prefix, const char *device_cell_name_prefix) const
+LayoutToNetlist::build_all_nets (const db::CellMapping &cmap, db::Layout &target, const std::map<unsigned int, unsigned int> &lmap, const char *net_cell_name_prefix, NetPropertyMode net_prop_mode, const tl::Variant &netname_prop, BuildNetHierarchyMode hier_mode, const char *circuit_cell_name_prefix, const char *device_cell_name_prefix) const
 {
   NetBuilder builder (&target, cmap, this);
   builder.set_hier_mode (hier_mode);
@@ -1458,7 +1556,7 @@ LayoutToNetlist::build_all_nets (const db::CellMapping &cmap, db::Layout &target
 }
 
 void
-LayoutToNetlist::build_nets (const std::vector<const db::Net *> *nets, const db::CellMapping &cmap, db::Layout &target, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, NetPropertyMode net_prop_mode, const tl::Variant &netname_prop, BuildNetHierarchyMode hier_mode, const char *circuit_cell_name_prefix, const char *device_cell_name_prefix) const
+LayoutToNetlist::build_nets (const std::vector<const db::Net *> *nets, const db::CellMapping &cmap, db::Layout &target, const std::map<unsigned int, unsigned int> &lmap, const char *net_cell_name_prefix, NetPropertyMode net_prop_mode, const tl::Variant &netname_prop, BuildNetHierarchyMode hier_mode, const char *circuit_cell_name_prefix, const char *device_cell_name_prefix) const
 {
   NetBuilder builder (&target, cmap, this);
   builder.set_hier_mode (hier_mode);
@@ -2152,7 +2250,7 @@ NetBuilder::prepare_build_nets () const
 }
 
 void
-NetBuilder::build_net (db::Cell &target_cell, const db::Net &net, const std::map<unsigned int, const db::Region *> &lmap, NetPropertyMode net_prop_mode, const tl::Variant &netname_prop) const
+NetBuilder::build_net (db::Cell &target_cell, const db::Net &net, const std::map<unsigned int, unsigned int> &lmap, NetPropertyMode net_prop_mode, const tl::Variant &netname_prop) const
 {
   prepare_build_nets ();
 
@@ -2163,13 +2261,13 @@ NetBuilder::build_net (db::Cell &target_cell, const db::Net &net, const std::map
 }
 
 void
-NetBuilder::build_all_nets (const std::map<unsigned int, const db::Region *> &lmap, NetPropertyMode net_prop_mode, const tl::Variant &netname_prop) const
+NetBuilder::build_all_nets (const std::map<unsigned int, unsigned int> &lmap, NetPropertyMode net_prop_mode, const tl::Variant &netname_prop) const
 {
   build_nets (0, lmap, net_prop_mode, netname_prop);
 }
 
 void
-NetBuilder::build_nets (const std::vector<const Net *> *nets, const std::map<unsigned int, const db::Region *> &lmap, NetPropertyMode prop_mode, const tl::Variant &netname_prop) const
+NetBuilder::build_nets (const std::vector<const Net *> *nets, const std::map<unsigned int, unsigned int> &lmap, NetPropertyMode prop_mode, const tl::Variant &netname_prop) const
 {
   prepare_build_nets ();
 
@@ -2239,7 +2337,7 @@ NetBuilder::build_nets (const std::vector<const Net *> *nets, const std::map<uns
 }
 
 void
-NetBuilder::build_net_rec (const db::Net &net, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const std::string &add_net_cell_name_prefix, db::properties_id_type netname_propid, const db::ICplxTrans &tr) const
+NetBuilder::build_net_rec (const db::Net &net, db::Cell &target_cell, const std::map<unsigned int, unsigned int> &lmap, const std::string &add_net_cell_name_prefix, db::properties_id_type netname_propid, const db::ICplxTrans &tr) const
 {
   const db::Circuit *circuit = net.circuit ();
   tl_assert (circuit != 0);
@@ -2248,7 +2346,7 @@ NetBuilder::build_net_rec (const db::Net &net, db::Cell &target_cell, const std:
 }
 
 void
-NetBuilder::build_net_rec (db::cell_index_type ci, size_t cid, db::Cell &tc, const std::map<unsigned int, const db::Region *> &lmap, const db::Net *net, const std::string &add_net_cell_name_prefix, db::properties_id_type netname_propid, const db::ICplxTrans &tr) const
+NetBuilder::build_net_rec (db::cell_index_type ci, size_t cid, db::Cell &tc, const std::map<unsigned int, unsigned int> &lmap, const db::Net *net, const std::string &add_net_cell_name_prefix, db::properties_id_type netname_propid, const db::ICplxTrans &tr) const
 {
   db::Cell *target_cell = &tc;
 
@@ -2261,9 +2359,9 @@ NetBuilder::build_net_rec (db::cell_index_type ci, size_t cid, db::Cell &tc, con
 
       StopOnFirst sof;
       std::map<unsigned int, StopOnFirst *> sof_lmap;
-      for (std::map<unsigned int, const db::Region *>::const_iterator l = lmap.begin (); l != lmap.end (); ++l) {
+      for (std::map<unsigned int, unsigned int>::const_iterator l = lmap.begin (); l != lmap.end (); ++l) {
         if (l->second) {
-          sof_lmap.insert (std::make_pair (mp_source->layer_of (*l->second), &sof));
+          sof_lmap.insert (std::make_pair (l->second, &sof));
         }
       }
 
@@ -2283,9 +2381,9 @@ NetBuilder::build_net_rec (db::cell_index_type ci, size_t cid, db::Cell &tc, con
   }
 
   std::map<unsigned int, db::Shapes *> target_lmap;
-  for (std::map<unsigned int, const db::Region *>::const_iterator l = lmap.begin (); l != lmap.end (); ++l) {
+  for (std::map<unsigned int, unsigned int>::const_iterator l = lmap.begin (); l != lmap.end (); ++l) {
     if (l->second) {
-      target_lmap.insert (std::make_pair (mp_source->layer_of (*l->second), &target_cell->shapes (l->first)));
+      target_lmap.insert (std::make_pair (l->second, &target_cell->shapes (l->first)));
     }
   }
 
@@ -2354,7 +2452,7 @@ NetBuilder::build_net_rec (db::cell_index_type ci, size_t cid, db::Cell &tc, con
 }
 
 void
-NetBuilder::build_net_rec (const db::Net &net, db::cell_index_type circuit_cell, const std::map<unsigned int, const db::Region *> &lmap, const std::string &add_net_cell_name_prefix, db::properties_id_type netname_propid, const ICplxTrans &tr) const
+NetBuilder::build_net_rec (const db::Net &net, db::cell_index_type circuit_cell, const std::map<unsigned int, unsigned int> &lmap, const std::string &add_net_cell_name_prefix, db::properties_id_type netname_propid, const ICplxTrans &tr) const
 {
   if (! m_cmap.has_mapping (circuit_cell)) {
 

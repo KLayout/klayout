@@ -829,12 +829,12 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "This method has been introduced in version 0.28.13."
   ) +
   gsi::method_ext ("original_layout", &l2n_original_layout,
-    "@brief Gets the original layout or nil is the LayoutToNetlist object is not attached to one.\n"
+    "@brief Gets the original layout or nil if the LayoutToNetlist object is not attached to one.\n"
     "\n"
     "This method has been introduced in version 0.30."
   ) +
   gsi::method_ext ("original_top_cell", &l2n_original_top_cell,
-    "@brief Gets the original top cell or nil is the LayoutToNetlist object is not attached to an original layout.\n"
+    "@brief Gets the original top cell or nil if the LayoutToNetlist object is not attached to an original layout.\n"
     "\n"
     "This method has been introduced in version 0.30."
   ) +
@@ -987,7 +987,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "\n"
     "The 'of_layer' argument has been generalized in version 0.30 and can be a layer index, a \\Region layer or a \\Texts layer."
   ) +
-  gsi::method_ext ("build_net", &build_net, gsi::arg ("net"), gsi::arg ("target"), gsi::arg ("target_cell"), gsi::arg ("lmap"), gsi::arg ("netname_prop", tl::Variant (), "nil"), gsi::arg ("hier_mode", db::BNH_Flatten, "BNH_Flatten"), gsi::arg ("circuit_cell_name_prefix", tl::Variant (), "nil"), gsi::arg ("device_cell_name_prefix", tl::Variant (), "nil"),
+  gsi::method_ext ("build_net", &build_net, gsi::arg ("net"), gsi::arg ("target"), gsi::arg ("target_cell"), gsi::arg ("lmap", tl::Variant (), "nil"), gsi::arg ("netname_prop", tl::Variant (), "nil"), gsi::arg ("hier_mode", db::BNH_Flatten, "BNH_Flatten"), gsi::arg ("circuit_cell_name_prefix", tl::Variant (), "nil"), gsi::arg ("device_cell_name_prefix", tl::Variant (), "nil"),
     "@brief Builds a net representation in the given layout and cell\n"
     "\n"
     "This method puts the shapes of a net into the given target cell using a variety of options\n"
@@ -1017,7 +1017,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "\n"
     "The 'lmap' argument has been generalized in version 0.30 and became optional."
   ) +
-  gsi::method_ext ("build_all_nets", &build_all_nets, gsi::arg ("cmap"), gsi::arg ("target"), gsi::arg ("lmap", tl::Variant (), "auto"), gsi::arg ("net_cell_name_prefix", tl::Variant (), "nil"), gsi::arg ("netname_prop", tl::Variant (), "nil"), gsi::arg ("hier_mode", db::BNH_Flatten, "BNH_Flatten"), gsi::arg ("circuit_cell_name_prefix", tl::Variant (), "nil"), gsi::arg ("device_cell_name_prefix", tl::Variant (), "nil"),
+  gsi::method_ext ("build_all_nets", &build_all_nets, gsi::arg ("cmap"), gsi::arg ("target"), gsi::arg ("lmap", tl::Variant (), "nil"), gsi::arg ("net_cell_name_prefix", tl::Variant (), "nil"), gsi::arg ("netname_prop", tl::Variant (), "nil"), gsi::arg ("hier_mode", db::BNH_Flatten, "BNH_Flatten"), gsi::arg ("circuit_cell_name_prefix", tl::Variant (), "nil"), gsi::arg ("device_cell_name_prefix", tl::Variant (), "nil"),
     "@brief Builds a full hierarchical representation of the nets\n"
     "\n"
     "This method copies all nets into cells corresponding to the circuits. It uses the 'cmap'\n"
@@ -1072,8 +1072,10 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "\n"
     "The 'lmap' argument has been generalized in version 0.30 and became optional."
   ) +
-  gsi::method_ext ("build_nets", &build_nets, gsi::arg ("nets"), gsi::arg ("cmap"), gsi::arg ("target"), gsi::arg ("lmap"), gsi::arg ("net_cell_name_prefix", tl::Variant (), "nil"), gsi::arg ("netname_prop", tl::Variant (), "nil"), gsi::arg ("hier_mode", db::BNH_Flatten, "BNH_Flatten"), gsi::arg ("circuit_cell_name_prefix", tl::Variant (), "nil"), gsi::arg ("device_cell_name_prefix", tl::Variant (), "nil"),
+  gsi::method_ext ("build_nets", &build_nets, gsi::arg ("nets"), gsi::arg ("cmap"), gsi::arg ("target"), gsi::arg ("lmap", tl::Variant (), "nil"), gsi::arg ("net_cell_name_prefix", tl::Variant (), "nil"), gsi::arg ("netname_prop", tl::Variant (), "nil"), gsi::arg ("hier_mode", db::BNH_Flatten, "BNH_Flatten"), gsi::arg ("circuit_cell_name_prefix", tl::Variant (), "nil"), gsi::arg ("device_cell_name_prefix", tl::Variant (), "nil"),
     "@brief Like \\build_all_nets, but with the ability to select some nets."
+    "\n"
+    "The 'lmap' argument has been generalized in version 0.30 and became optional."
   ) +
   gsi::method ("probe_net", (db::Net *(db::LayoutToNetlist::*) (const db::Region &, const db::DPoint &, std::vector<db::SubCircuit *> *, db::Circuit *)) &db::LayoutToNetlist::probe_net, gsi::arg ("of_layer"), gsi::arg ("point"), gsi::arg ("sc_path_out", (std::vector<db::SubCircuit *> *) 0, "nil"), gsi::arg ("initial_circuit", (db::Circuit *) 0, "nil"),
     "@brief Finds the net by probing a specific location on the given layer\n"
@@ -1310,14 +1312,15 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   "@li Through a name: Alternatively to the layer index, a layer can be addressed by name, provided one was "
   "    assigned. To assign a name, specify one when creating a layer with \\register, \\make_layer, \\make_polygon_layer "
   "    or \\make_text_layer. To get the layer index of a named layer, use \\layer_index. To get the name "
-  "    of a layer use \\layer_name. To get all names of layers, use \\layer_names. @/li\n"
+  "    of a layer use \\layer_name. To get the names of all layers, use \\layer_names. @/li\n"
   "@li As a shape collection: a layer can also be represented by a shape collection. A shape collection is "
   "    either a \\Region or a \\Texts object. These objects do not only represent a layer, but can be used "
-  "    to derive new layers. In order to assign names, use \\register. To create a new layer and a "
+  "    to derive new layers or do computations on layers. "
+  "    In order to assign names to derived shape collections, use \\register. To create a new layer and a "
   "    corresponding shape collection object, use \\make_layer, \\make_polygon_layer or \\make_text_layer. "
-  "    The get the shape collection for a given layer index, use \\layer_index, to get layer name from "
+  "    To get the shape collection for a given layer index, use \\layer_index, to get layer name from "
   "    a shape collection, use \\layer_name. To get a shape collection from a layer index, use "
-  "    \\layer_by_index, \\polygons_by_index or \\texts_by_index. @li\n"
+  "    \\layer_by_index, \\polygons_by_index or \\texts_by_index. @/li\n"
   "@/ul\n"
   "\n"
   "This class has been introduced in version 0.26."

@@ -28,6 +28,7 @@
 #include "dbLayout.h"
 #include "dbLibrary.h"
 #include "dbPCellDeclaration.h"
+#include "layBusy.h"
 
 #include <QLineEdit>
 
@@ -630,6 +631,10 @@ ChangeTargetPCellApplicator::ChangeTargetPCellApplicator (db::pcell_id_type pcel
 db::Instance
 ChangeTargetPCellApplicator::do_apply_inst (db::Cell &cell, const db::Instance &instance, double /*dbu*/, bool /*relative*/) const
 {
+  //  Prevent recursion due to processEvents produced by macro code when
+  //  executing inside the IDE
+  lay::BusySection busy;
+
   tl_assert (cell.layout ());
 
   db::Layout *layout = cell.layout ();

@@ -38,6 +38,7 @@
 #include "layMarker.h"
 #include "layLayerProperties.h"
 #include "layLayoutViewBase.h"
+#include "layBusy.h"
 
 #if defined(HAVE_QT)
 #  include "layLayoutView.h"
@@ -1721,6 +1722,9 @@ InstService::make_cell (const lay::CellView &cv)
   if (m_has_valid_cell) {
     return std::make_pair (true, m_current_cell);
   }
+
+  //  prevents recursion
+  lay::BusySection busy;
 
   //  NOTE: do this at the beginning: creating a transaction might delete transactions behind the
   //  head transaction, hence releasing (thus: deleting) cells. To prevert interference, create

@@ -35,6 +35,7 @@
 #include "layLayoutViewBase.h"
 #include "layCellSelectionForm.h"
 #include "layQtTools.h"
+#include "layBusy.h"
 #include "tlExceptions.h"
 #include "tlString.h"
 
@@ -870,19 +871,21 @@ InstPropertiesPage::do_apply (bool current_only, bool relative)
       db::Instance new_inst = pos->back ().inst_ptr;
 
       //  Don't apply the same change twice
-      std::map<db::Instance, db::Instance>::const_iterator i = insts_seen.find (pos->back ().inst_ptr);
+      std::map<db::Instance, db::Instance>::const_iterator i = insts_seen.find (new_inst);
       if (i == insts_seen.end ()) {
+
+        db::Instance org_inst = new_inst;
 
         const lay::CellView &cv = mp_service->view ()->cellview (pos->cv_index ());
 
         db::Cell &cell = cv->layout ().cell (pos->cell_index ());
         double dbu = cv->layout ().dbu ();
 
-        if (!current_only || pos->back ().inst_ptr == current) {
-          new_inst = applicator->do_apply_inst (cell, pos->back ().inst_ptr, dbu, relative_mode);
+        if (!current_only || org_inst == current) {
+          new_inst = applicator->do_apply_inst (cell, org_inst, dbu, relative_mode);
         }
 
-        insts_seen.insert (std::make_pair (pos->back ().inst_ptr, new_inst));
+        insts_seen.insert (std::make_pair (org_inst, new_inst));
 
       } else {
         new_inst = i->second;

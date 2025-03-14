@@ -347,6 +347,11 @@ class DBNetlist_TestClass < TestBase
     assert_equal(d1.net_for_terminal("X").inspect, "nil")
     assert_equal(d1.net_for_terminal(0).inspect, "nil")
 
+    assert_equal(d1.terminal_ref(1).net.name, "NET")
+    assert_equal(d1.terminal_ref("B").net.name, "NET")
+    assert_equal(d1.terminal_ref("X").inspect, "nil")
+    assert_equal(d1.terminal_ref(0).inspect, "nil")
+
     d1.disconnect_terminal("B")
     assert_equal(net.terminal_count, 0)
     assert_equal(d1.net_for_terminal(1).inspect, "nil")

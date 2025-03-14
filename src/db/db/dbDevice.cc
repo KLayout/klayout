@@ -133,6 +133,17 @@ const Net *Device::net_for_terminal (size_t terminal_id) const
   return 0;
 }
 
+const NetTerminalRef *Device::terminal_ref_for_terminal (size_t terminal_id) const
+{
+  if (terminal_id < m_terminal_refs.size ()) {
+    Net::terminal_iterator p = m_terminal_refs [terminal_id];
+    if (! tl::is_null_iterator (p)) {
+      return p.operator-> ();
+    }
+  }
+  return 0;
+}
+
 void Device::connect_terminal (size_t terminal_id, Net *net)
 {
   if (net_for_terminal (terminal_id) == net) {

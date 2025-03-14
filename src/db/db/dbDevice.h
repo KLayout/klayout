@@ -255,6 +255,22 @@ public:
   }
 
   /**
+   *  @brief Gets the terminal reference for the given terminal on a device
+   *  Returns 0 if no net is attached or the device is not embedded into a netlist.
+   *  A terminal ref is the connector between a net and a device. It is useful for example
+   *  to get the shapes of a terminal.
+   */
+  const NetTerminalRef *terminal_ref_for_terminal (size_t terminal_id) const;
+
+  /**
+   *  @brief Gets the terminal reference for the given terminal on a device (non-const version)
+   */
+  NetTerminalRef *terminal_ref_for_terminal (size_t terminal_id)
+  {
+    return const_cast<NetTerminalRef *> (((const Device *) this)->terminal_ref_for_terminal (terminal_id));
+  }
+
+  /**
    *  @brief Connects the given terminal to the given net
    *  If the net is 0 the terminal is disconnected.
    *  If non-null, a NetTerminalRef object will be inserted into the

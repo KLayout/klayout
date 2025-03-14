@@ -268,6 +268,24 @@ static db::Net *net_for_terminal_by_name (db::Device *device, const std::string 
   }
 }
 
+static const db::NetTerminalRef *terminal_ref_by_name_const (const db::Device *device, const std::string &name)
+{
+  if (! device->device_class () || ! device->device_class ()->has_terminal_with_name (name)) {
+    return 0;
+  } else {
+    return device->terminal_ref_for_terminal (device->device_class ()->terminal_id_for_name (name));
+  }
+}
+
+static db::NetTerminalRef *terminal_ref_by_name (db::Device *device, const std::string &name)
+{
+  if (! device->device_class () || ! device->device_class ()->has_terminal_with_name (name)) {
+    return 0;
+  } else {
+    return device->terminal_ref_for_terminal (device->device_class ()->terminal_id_for_name (name));
+  }
+}
+
 Class<db::Device> decl_dbDevice (decl_dbNetlistObject, "db", "Device",
   gsi::method ("device_class", &db::Device::device_class,
     "@brief Gets the device class the device belongs to.\n"
@@ -354,17 +372,49 @@ Class<db::Device> decl_dbDevice (decl_dbNetlistObject, "db", "Device",
     "\n\n"
     "This constness variant has been introduced in version 0.26.8"
   ) +
-  gsi::method_ext ("net_for_terminal", net_for_terminal_by_name_const, gsi::arg ("terminal_name"),
+  gsi::method_ext ("net_for_terminal", &net_for_terminal_by_name_const, gsi::arg ("terminal_name"),
     "@brief Gets the net connected to the specified terminal.\n"
     "If the terminal is not connected, nil is returned for the net."
     "\n\n"
     "This convenience method has been introduced in version 0.27.3.\n"
   ) +
-  gsi::method_ext ("net_for_terminal", net_for_terminal_by_name, gsi::arg ("terminal_name"),
+  gsi::method_ext ("net_for_terminal", &net_for_terminal_by_name, gsi::arg ("terminal_name"),
     "@brief Gets the net connected to the specified terminal (non-const version).\n"
     "If the terminal is not connected, nil is returned for the net."
     "\n\n"
     "This convenience method has been introduced in version 0.27.3.\n"
+  ) +
+  gsi::method ("terminal_ref", (const db::NetTerminalRef *(db::Device::*) (size_t) const) &db::Device::terminal_ref_for_terminal, gsi::arg ("terminal_id"),
+    "@brief Gets the terminal refeference for a specific terminal.\n"
+    "The terminal ref is the connector between a net and a device terminal. "
+    "It knows the net the terminal is connected to and is useful to obtain the shapes making the terminal of the device. "
+    "If the terminal is not connected, nil is returned for the net.\n"
+    "\n"
+    "This method has been introduced in version 0.30."
+  ) +
+  gsi::method ("terminal_ref", (db::NetTerminalRef *(db::Device::*) (size_t)) &db::Device::terminal_ref_for_terminal, gsi::arg ("terminal_id"),
+    "@brief Gets the terminal refeference for a specific terminal (non-const version).\n"
+    "The terminal ref is the connector between a net and a device terminal. "
+    "It knows the net the terminal is connected to and is useful to obtain the shapes making the terminal of the device. "
+    "If the terminal is not connected, nil is returned for the net.\n"
+    "\n"
+    "This method has been introduced in version 0.30."
+  ) +
+  gsi::method_ext ("terminal_ref", &terminal_ref_by_name_const, gsi::arg ("terminal_name"),
+    "@brief Gets the terminal refeference for a specific terminal where the terminal is given by name.\n"
+    "The terminal ref is the connector between a net and a device terminal. "
+    "It knows the net the terminal is connected to and is useful to obtain the shapes making the terminal of the device. "
+    "If the terminal is not connected, nil is returned for the net.\n"
+    "\n"
+    "This method has been introduced in version 0.30."
+  ) +
+  gsi::method_ext ("terminal_ref", &terminal_ref_by_name, gsi::arg ("terminal_name"),
+    "@brief Gets the terminal refeference for a specific terminal where the terminal is given by name (non-const version).\n"
+    "The terminal ref is the connector between a net and a device terminal. "
+    "It knows the net the terminal is connected to and is useful to obtain the shapes making the terminal of the device. "
+    "If the terminal is not connected, nil is returned for the net.\n"
+    "\n"
+    "This method has been introduced in version 0.30."
   ) +
   gsi::method ("connect_terminal", &db::Device::connect_terminal, gsi::arg ("terminal_id"), gsi::arg ("net"),
     "@brief Connects the given terminal to the specified net.\n"

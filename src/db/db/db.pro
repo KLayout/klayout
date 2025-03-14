@@ -8,6 +8,7 @@ DEFINES += MAKE_DB_LIBRARY
 
 SOURCES = \
   dbArray.cc \
+  dbBinnedAreaCollector.cc \
   dbBox.cc \
   dbBoxConvert.cc \
   dbBoxScanner.cc \
@@ -235,6 +236,7 @@ SOURCES = \
 
 HEADERS = \
   dbArray.h \
+  dbBinnedAreaCollector.h \
   dbBoxConvert.h \
   dbBox.h \
   dbBoxScanner.h \

@@ -507,15 +507,23 @@ Triangle::common_edge (const Triangle *other) const
 int
 Triangle::contains (const db::DPoint &point) const
 {
+  //  the relative distance of the point from the edge
+  double alpha = db::epsilon;
+
+  double d = db::vprod (*mp_v[2] - *mp_v[0], *mp_v[1] - *mp_v[0]);
+  if (fabs (d) < db::epsilon * db::epsilon) {
+    return -1;
+  }
+
   int res = 1;
-  const Vertex *vl = mp_v[2];;
+  const Vertex *vl = mp_v[2];
   for (int i = 0; i < 3; ++i) {
-    const Vertex *v = mp_v[i];;
-    int s = db::DEdge (*vl, *v).side_of (point);
-    if (s == 0) {
-      res = 0;
-    } else if (s > 0) {
+    const Vertex *v = mp_v[i];
+    double n = db::vprod (point - *vl, *v - *vl) / d;
+    if (n < -alpha) {
       return -1;
+    } else if (n < alpha) {
+      res = 0;
     }
     vl = v;
   }

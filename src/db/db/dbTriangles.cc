@@ -355,6 +355,7 @@ Triangles::insert_point (db::DCoord x, db::DCoord y, std::list<tl::weak_ptr<db::
 db::Vertex *
 Triangles::insert (db::Vertex *vertex, std::list<tl::weak_ptr<db::Triangle> > *new_triangles)
 {
+  // @@@ printf("@@@ insert %d\n", (int)mp_triangles.size ()); fflush(stdout);
   std::vector<db::Triangle *> tris = find_triangle_for_point (*vertex);
 
   //  the new vertex is outside the domain
@@ -412,7 +413,24 @@ Triangles::find_closest_edge (const db::DPoint &p, db::Vertex *vstart, bool insi
 {
   if (!vstart) {
 
-    if (! mp_triangles.empty ()) {
+    if (m_is_constrained && ! m_initial_segments.empty ()) {
+
+      //  Use the closest initial segment for the starting point
+      //  TODO: m_initial_segments should be some search tree
+
+      double d = -1;
+      for (auto i = m_initial_segments.begin (); i != m_initial_segments.end (); ++i) {
+        if (db::sprod_sign (p - i->first.p1 (), i->first.d ()) >= 0 &&
+            db::sprod_sign (p - i->first.p2 (), i->first.d ()) < 0) {
+          double ds = std::abs (i->first.distance (p));
+          if (d < 0.0 || ds < d) {
+            vstart = i->second;
+            d = ds;
+          }
+        }
+      }
+
+    } else if (! mp_triangles.empty ()) {
 
       unsigned int ls = 0;
       size_t n = m_vertex_heap.size ();
@@ -1319,6 +1337,7 @@ void
 Triangles::constrain (const std::vector<std::vector<db::Vertex *> > &contours)
 {
   tl_assert (! m_is_constrained);
+  m_initial_segments.clear ();
 
   std::vector<std::pair<db::DEdge, std::vector<db::TriangleEdge *> > > resolved_edges;
 
@@ -1329,8 +1348,10 @@ Triangles::constrain (const std::vector<std::vector<db::Vertex *> > &contours)
       if (vv == c->end ()) {
         vv = c->begin ();
       }
-      resolved_edges.push_back (std::make_pair (db::DEdge (**v, **vv), std::vector<db::TriangleEdge *> ()));
+      db::DEdge e (**v, **vv);
+      resolved_edges.push_back (std::make_pair (e, std::vector<db::TriangleEdge *> ()));
       resolved_edges.back ().second = ensure_edge (*v, *vv);
+      m_initial_segments.push_back (std::make_pair (e, *v));
     }
   }
 
@@ -1606,6 +1627,7 @@ Triangles::refine (const TriangulateParameters &parameters)
       auto cr = (*t)->circumcircle();
       auto center = cr.first;
 
+      // printf("@@@ %s -- %s\n", (*t)->to_string().c_str(), center.to_string ().c_str()); fflush(stdout);
       if ((*t)->contains (center) >= 0) {
 
         if (tl::verbosity () >= parameters.base_verbosity + 20) {

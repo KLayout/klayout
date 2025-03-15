@@ -311,6 +311,7 @@ private:
   std::vector<db::TriangleEdge *> m_returned_edges;
   tl::stable_vector<db::Vertex> m_vertex_heap;
   bool m_is_constrained;
+  std::vector<std::pair<db::DEdge, db::Vertex *> > m_initial_segments;
   size_t m_level;
   size_t m_id;
   size_t m_flips, m_hops;

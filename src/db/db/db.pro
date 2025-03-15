@@ -81,6 +81,7 @@ SOURCES = \
   dbPolygonGenerators.cc \
   dbPropertiesFilter.cc \
   dbPropertiesRepository.cc \
+  dbQuadTree.cc \
   dbReader.cc \
   dbRecursiveInstanceIterator.cc \
   dbRecursiveShapeIterator.cc \
@@ -319,6 +320,7 @@ HEADERS = \
   dbPropertiesFilter.h \
   dbPropertiesRepository.h \
   dbPropertyConstraint.h \
+  dbQuadTree.h \
   dbReader.h \
   dbRecursiveInstanceIterator.h \
   dbRecursiveShapeIterator.h \

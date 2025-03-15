@@ -23,6 +23,7 @@
 
 #include "dbTriangles.h"
 #include "dbWriter.h"
+#include "dbRegionProcessors.h"
 #include "tlUnitTest.h"
 #include "tlStream.h"
 #include "tlFileUtils.h"
@@ -917,3 +918,39 @@ TEST(triangulate_problematic)
   EXPECT_LT (tri.num_triangles (), size_t (490));
 }
 
+TEST(triangulate_thin)
+{
+  db::DPoint contour[] = {
+    db::DPoint (18790, 58090),
+    db::DPoint (18790, 58940),
+    db::DPoint (29290, 58940),
+    db::DPoint (29290, 58090)
+  };
+
+  db::DPoint hole[] = {
+    db::DPoint (18791, 58091),
+    db::DPoint (29289, 58091),
+    db::DPoint (29289, 58939),
+    db::DPoint (18791, 58939)
+  };
+
+  db::DPolygon poly;
+  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour[0]));
+  poly.insert_hole (hole + 0, hole + sizeof (hole) / sizeof (hole[0]));
+
+  double dbu = 0.001;
+
+  db::Triangles::TriangulateParameters param;
+  param.min_b = 0.5;
+  param.max_area = 0.0;
+  param.min_length = 2 * dbu;
+
+  TestableTriangles tri;
+  db::DCplxTrans trans = db::DCplxTrans (dbu) * db::DCplxTrans (db::DTrans (db::DPoint () - poly.box ().center ()));
+  tri.triangulate (trans * poly, param);
+
+  EXPECT_EQ (tri.check (false), true);
+
+  // for debugging:
+  tri.dump ("debug.gds");
+}

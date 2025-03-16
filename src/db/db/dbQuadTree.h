@@ -24,6 +24,7 @@
 #define HDR_dbQuadTree
 
 #include "dbBox.h"
+#include "tlLog.h"
 #include <vector>
 
 namespace db
@@ -38,6 +39,7 @@ public:
   typedef db::point<coord_type> point_type;
   typedef db::vector<coord_type> vector_type;
   typedef std::vector<T> objects_vector;
+  typedef db::coord_traits<coord_type> coord_traits;
 
   quad_tree_node (const point_type &center)
     : m_split (false), m_center (center)
@@ -65,23 +67,31 @@ public:
     insert (value, propose_ucenter (total_box));
   }
 
-  bool remove (const T &value)
+  bool erase (const T &value)
   {
     box_type b = BC () (value);
 
-    if (! m_split || b.contains (m_center)) {
+    int n = quad_for (b);
+
+    if (! m_split || n < 0) {
+
       for (auto i = m_objects.begin (); i != m_objects.end (); ++i) {
         if (*i == value) {
           m_objects.erase (i);
           return true;
         }
       }
-    }
 
-    for (unsigned int i = 0; i < 4; ++i) {
-      if (m_q[i] && b.inside (m_q[i]->box (m_center))) {
-        return b.remove (value);
+    } else if (m_q[n]) {
+
+      if (m_q[n]->erase (value)) {
+        if (m_q[n]->empty ()) {
+          delete m_q[n];
+          m_q[n] = 0;
+        }
+        return true;
       }
+
     }
 
     return false;
@@ -131,11 +141,38 @@ public:
     return count;
   }
 
+  size_t levels () const
+  {
+    size_t l = 1;
+    for (unsigned int n = 0; n < 4; ++n) {
+      if (m_q[n]) {
+        l = std::max (l, m_q[n]->levels () + 1);
+      }
+    }
+    return l;
+  }
+
+  bool check_top (const box_type &total_box) const
+  {
+    return check (propose_ucenter (total_box));
+  }
+
 private:
   bool m_split;
   point_type m_center;
   quad_tree_node *m_q [4];
   objects_vector m_objects;
+
+  int quad_for (const box_type &box) const
+  {
+    int sx = coord_traits::less (box.right (), m_center.x ()) ? 0 : (coord_traits::less (m_center.x (), box.left ()) ? 1 : -1);
+    int sy = coord_traits::less (box.top (), m_center.y ()) ? 0 : (coord_traits::less (m_center.y (), box.bottom ()) ? 2 : -1);
+    if (sx < 0 || sy < 0) {
+      return -1;
+    } else {
+      return sx + sy;
+    }
+  }
 
   box_type box (const point_type &ucenter) const
   {
@@ -185,32 +222,23 @@ private:
       }
 
       box_type b = BC () (value);
-      //  @@@ should exclude m_center on box
-      if (b.contains (m_center)) {
+      int n = quad_for (b);
+
+      if (n < 0) {
         m_objects.push_back (value);
         return;
       }
 
-      for (unsigned int i = 0; i < 4; ++i) {
-        box_type bq = q (i, ucenter);
-        if (b.inside (bq)) {
-          if (! m_q[i]) {
-            m_q[i] = new quad_tree_node (bq.center ());
-          }
-          m_q[i]->insert (value, m_center);
-          return;
+      if (b.inside (box (ucenter))) {
+        if (! m_q[n]) {
+          box_type bq = q (n, ucenter);
+          m_q[n] = new quad_tree_node (bq.center ());
         }
+        m_q[n]->insert (value, m_center);
+      } else {
+        grow (m_center - (m_center - ucenter) * 2.0);
+        insert (value, ucenter);
       }
-
-      for (unsigned int i = 0; i < 4; ++i) {
-        if (m_q[i]) {
-          grow (m_center - (m_center - m_q[i]->center ()) * 2.0);
-          insert (value, ucenter);
-          return;
-        }
-      }
-
-      tl_assert (false);
 
     }
   }
@@ -237,6 +265,61 @@ private:
     coord_type dx = std::max (std::abs (total_box.left () - m_center.x ()), std::abs (total_box.right () - m_center.y ()));
     coord_type dy = std::max (std::abs (total_box.bottom () - m_center.y ()), std::abs (total_box.top () - m_center.y ()));
     return m_center - vector_type (dx, dy);
+  }
+
+  bool check (const point_type &ucenter) const
+  {
+    bool result = true;
+
+    box_type bq = box (ucenter);
+
+    for (auto i = m_objects.begin (); i != m_objects.end (); ++i) {
+      box_type b = BC () (*i);
+      if (! b.inside (bq)) {
+        tl::error << "Box " << b.to_string () << " not inside quad box " << bq.to_string ();
+        result = false;
+      }
+    }
+
+    if (m_split) {
+
+      for (auto i = m_objects.begin (); i != m_objects.end (); ++i) {
+        box_type b = BC () (*i);
+        int n = quad_for (b);
+        if (n >= 0) {
+          tl::error << "Box " << b.to_string () << " on quad level not overlapping multiple quads";
+          result = false;
+        }
+      }
+
+      for (unsigned int n = 0; n < 4; ++n) {
+        if (m_q[n]) {
+          m_q[n]->check (m_center);
+          box_type bbq = m_q[n]->box (m_center);
+          if (bbq != q (n, ucenter)) {
+            tl::error << "Quad not centered (quad box is " << bbq.to_string () << ", should be " << q (n, ucenter).to_string ();
+            result = false;
+          }
+        }
+      }
+
+    } else {
+
+      if (m_objects.size () > thr) {
+        tl::error << "Non-split object count exceeds threshold " << m_objects.size () << " > " << thr;
+        result = false;
+      }
+
+      for (unsigned int n = 0; n < 4; ++n) {
+        if (m_q[n]) {
+          tl::error << "Non-split node has child nodes";
+          result = false;
+        }
+      }
+
+    }
+
+    return result;
   }
 };
 
@@ -315,9 +398,9 @@ public:
       }
     }
 
-    while (! m_stack.empty ()) {
+    m_stack.pop_back ();
 
-      m_stack.pop_back ();
+    while (! m_stack.empty ()) {
 
       int &n = m_stack.back ().second;
       while (++n < 4) {
@@ -328,6 +411,8 @@ public:
           return;
         }
       }
+
+      m_stack.pop_back ();
 
     }
   }
@@ -415,6 +500,7 @@ private:
   box_type m_box;
 };
 
+// @@@ TODO: copy, assignment, move, swap
 template <class T, class BC, size_t thr>
 class quad_tree
 {
@@ -445,6 +531,16 @@ public:
     return m_root.size ();
   }
 
+  size_t levels () const
+  {
+    return m_root.levels ();
+  }
+
+  bool check () const
+  {
+    return m_root.check_top (m_total_box);
+  }
+
   void insert (const T &value)
   {
     box_type b = BC () (value);
@@ -456,9 +552,9 @@ public:
     m_root.insert_top (value, m_total_box);
   }
 
-  void erase (const T &value)
+  bool erase (const T &value)
   {
-    m_root.remove (value);
+    return m_root.erase (value);
   }
 
   quad_tree_flat_iterator begin () const

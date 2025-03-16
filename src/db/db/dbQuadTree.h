@@ -44,16 +44,77 @@ public:
   quad_tree_node (const point_type &center)
     : m_split (false), m_center (center)
   {
-    for (unsigned int i = 0; i < 4; ++i) {
-      m_q [i] = 0;
-    }
+    init ();
   }
 
   ~quad_tree_node ()
   {
+    clear ();
+  }
+
+  quad_tree_node (const quad_tree_node &other)
+    : m_split (false), m_center (center)
+  {
+    init ();
+    operator= (other);
+  }
+
+  quad_tree_node &operator= (const quad_tree_node &other)
+  {
+    if (this != &other) {
+      clear ();
+      m_split = other.m_split;
+      m_center = other.m_center;
+      m_objects = other.m_objects;
+      for (unsigned int i = 0; i < 4; ++i) {
+        if (other.m_q[i]) {
+          m_q[i] = other.m_q[i]->clone ();
+        }
+      }
+    }
+    return *this;
+  }
+
+  quad_tree_node (quad_tree_node &&other)
+  {
+    init ();
+    swap (other);
+  }
+
+  quad_tree_node &operator= (quad_tree_node &&other)
+  {
+    swap (other);
+    return *this;
+  }
+
+  void swap (quad_tree_node &other)
+  {
+    if (this != &other) {
+      std::swap (m_center, other.m_center);
+      std::swap (m_split, other.m_split);
+      m_objects.swap (other.m_objects);
+      for (unsigned int i = 0; i < 4; ++i) {
+        std::swap (m_q[i], other.m_q[i]);
+      }
+    }
+  }
+
+  quad_tree_node *clone () const
+  {
+    quad_tree_node *node = new quad_tree_node (m_center);
+    *node = *this;
+    return node;
+  }
+
+  void clear ()
+  {
+    m_objects.clear ();
+    m_split = false;
     for (unsigned int i = 0; i < 4; ++i) {
-      delete m_q [i];
-      m_q [i] = 0;
+      if (m_q[i]) {
+        delete m_q[i];
+      }
+      m_q[i] = 0;
     }
   }
 
@@ -162,6 +223,13 @@ private:
   point_type m_center;
   quad_tree_node *m_q [4];
   objects_vector m_objects;
+
+  void init ()
+  {
+    for (unsigned int i = 0; i < 4; ++i) {
+      m_q[i] = 0;
+    }
+  }
 
   int quad_for (const box_type &box) const
   {
@@ -519,6 +587,47 @@ public:
     : m_root (point_type ())
   {
     //  .. nothing yet ..
+  }
+
+  quad_tree (const quad_tree &other)
+    : m_root (point_type ())
+  {
+    operator= (other);
+  }
+
+  quad_tree &operator= (const quad_tree &other)
+  {
+    if (this != &other) {
+      m_root = other.m_root;
+      m_total_box = other.m_total_box;
+    }
+    return *this;
+  }
+
+  quad_tree (quad_tree &&other)
+    : m_root (point_type ())
+  {
+    swap (other);
+  }
+
+  quad_tree &operator= (quad_tree &&other)
+  {
+    swap (other);
+    return *this;
+  }
+
+  void clear ()
+  {
+    m_root.clear ();
+    m_total_box = box_type ();
+  }
+
+  void swap (quad_tree &other)
+  {
+    if (this != &other) {
+      m_root.swap (other.m_root);
+      std::swap (m_total_box, m_total_box);
+    }
   }
 
   bool empty () const

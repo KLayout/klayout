@@ -256,3 +256,138 @@ TEST(remove)
   EXPECT_EQ (tree.levels (), size_t (1));
 }
 
+TEST(clear)
+{
+  my_quad_tree tree;
+  tree.insert (db::DBox (-1, -2, 3, 4));
+  tree.insert (db::DBox (-1, -3, 3, 0));
+  tree.insert (db::DBox (-1, -3, -0.5, -2));
+  tree.insert (db::DBox (-1, -3, -0.5, 2));
+
+  EXPECT_EQ (tree.check (), true);
+  EXPECT_EQ (find_all (tree), "(-1,-2;3,4)/(-1,-3;-0.5,-2)/(-1,-3;-0.5,2)/(-1,-3;3,0)");
+
+  tree.clear ();
+
+  EXPECT_EQ (tree.check (), true);
+  EXPECT_EQ (tree.empty (), true);
+  EXPECT_EQ (tree.size (), size_t (0));
+  EXPECT_EQ (tree.levels (), size_t (1));
+  EXPECT_EQ (find_all (tree), "");
+}
+
+TEST(copy)
+{
+  my_quad_tree tree;
+  tree.insert (db::DBox (-1, -2, 3, 4));
+  tree.insert (db::DBox (-1, -3, 3, 0));
+  tree.insert (db::DBox (-1, -3, -0.5, -2));
+  tree.insert (db::DBox (-1, -3, -0.5, 2));
+
+  EXPECT_EQ (tree.check (), true);
+  EXPECT_EQ (find_all (tree), "(-1,-2;3,4)/(-1,-3;-0.5,-2)/(-1,-3;-0.5,2)/(-1,-3;3,0)");
+  EXPECT_EQ (tree.levels (), size_t (2));
+
+  my_quad_tree tree2 (tree);
+  tree.clear ();
+
+  EXPECT_EQ (tree2.check (), true);
+  EXPECT_EQ (find_all (tree2), "(-1,-2;3,4)/(-1,-3;-0.5,-2)/(-1,-3;-0.5,2)/(-1,-3;3,0)");
+  EXPECT_EQ (tree2.levels (), size_t (2));
+}
+
+TEST(assign)
+{
+  my_quad_tree tree;
+  tree.insert (db::DBox (-1, -2, 3, 4));
+  tree.insert (db::DBox (-1, -3, 3, 0));
+  tree.insert (db::DBox (-1, -3, -0.5, -2));
+  tree.insert (db::DBox (-1, -3, -0.5, 2));
+
+  EXPECT_EQ (tree.check (), true);
+  EXPECT_EQ (find_all (tree), "(-1,-2;3,4)/(-1,-3;-0.5,-2)/(-1,-3;-0.5,2)/(-1,-3;3,0)");
+  EXPECT_EQ (tree.levels (), size_t (2));
+
+  my_quad_tree tree2;
+  tree2 = tree;
+  tree.clear ();
+
+  EXPECT_EQ (tree2.check (), true);
+  EXPECT_EQ (find_all (tree2), "(-1,-2;3,4)/(-1,-3;-0.5,-2)/(-1,-3;-0.5,2)/(-1,-3;3,0)");
+  EXPECT_EQ (tree2.levels (), size_t (2));
+}
+
+TEST(swap)
+{
+  my_quad_tree tree;
+  tree.insert (db::DBox (-1, -2, 3, 4));
+  tree.insert (db::DBox (-1, -3, 3, 0));
+  tree.insert (db::DBox (-1, -3, -0.5, -2));
+  tree.insert (db::DBox (-1, -3, -0.5, 2));
+
+  EXPECT_EQ (tree.check (), true);
+  EXPECT_EQ (find_all (tree), "(-1,-2;3,4)/(-1,-3;-0.5,-2)/(-1,-3;-0.5,2)/(-1,-3;3,0)");
+  EXPECT_EQ (tree.levels (), size_t (2));
+
+  my_quad_tree tree2;
+  tree2.swap (tree);
+
+  EXPECT_EQ (tree.check (), true);
+  EXPECT_EQ (tree.empty (), true);
+  EXPECT_EQ (find_all (tree), "");
+  EXPECT_EQ (tree.levels (), size_t (1));
+
+  EXPECT_EQ (tree2.check (), true);
+  EXPECT_EQ (find_all (tree2), "(-1,-2;3,4)/(-1,-3;-0.5,-2)/(-1,-3;-0.5,2)/(-1,-3;3,0)");
+  EXPECT_EQ (tree2.levels (), size_t (2));
+}
+
+TEST(move)
+{
+  my_quad_tree tree;
+  tree.insert (db::DBox (-1, -2, 3, 4));
+  tree.insert (db::DBox (-1, -3, 3, 0));
+  tree.insert (db::DBox (-1, -3, -0.5, -2));
+  tree.insert (db::DBox (-1, -3, -0.5, 2));
+
+  EXPECT_EQ (tree.check (), true);
+  EXPECT_EQ (find_all (tree), "(-1,-2;3,4)/(-1,-3;-0.5,-2)/(-1,-3;-0.5,2)/(-1,-3;3,0)");
+  EXPECT_EQ (tree.levels (), size_t (2));
+
+  my_quad_tree tree2;
+  tree2 = std::move (tree);
+
+  EXPECT_EQ (tree.check (), true);
+  EXPECT_EQ (tree.empty (), true);
+  EXPECT_EQ (find_all (tree), "");
+  EXPECT_EQ (tree.levels (), size_t (1));
+
+  EXPECT_EQ (tree2.check (), true);
+  EXPECT_EQ (find_all (tree2), "(-1,-2;3,4)/(-1,-3;-0.5,-2)/(-1,-3;-0.5,2)/(-1,-3;3,0)");
+  EXPECT_EQ (tree2.levels (), size_t (2));
+}
+
+TEST(move_ctor)
+{
+  my_quad_tree tree;
+  tree.insert (db::DBox (-1, -2, 3, 4));
+  tree.insert (db::DBox (-1, -3, 3, 0));
+  tree.insert (db::DBox (-1, -3, -0.5, -2));
+  tree.insert (db::DBox (-1, -3, -0.5, 2));
+
+  EXPECT_EQ (tree.check (), true);
+  EXPECT_EQ (find_all (tree), "(-1,-2;3,4)/(-1,-3;-0.5,-2)/(-1,-3;-0.5,2)/(-1,-3;3,0)");
+  EXPECT_EQ (tree.levels (), size_t (2));
+
+  my_quad_tree tree2 (std::move (tree));
+
+  EXPECT_EQ (tree.check (), true);
+  EXPECT_EQ (tree.empty (), true);
+  EXPECT_EQ (find_all (tree), "");
+  EXPECT_EQ (tree.levels (), size_t (1));
+
+  EXPECT_EQ (tree2.check (), true);
+  EXPECT_EQ (find_all (tree2), "(-1,-2;3,4)/(-1,-3;-0.5,-2)/(-1,-3;-0.5,2)/(-1,-3;3,0)");
+  EXPECT_EQ (tree2.levels (), size_t (2));
+}
+

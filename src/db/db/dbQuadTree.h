@@ -30,6 +30,9 @@
 namespace db
 {
 
+/**
+ *  @brief The quad tree node implementation class
+ */
 template <class T, class BC, size_t thr, class CMP>
 class quad_tree_node
 {
@@ -42,9 +45,9 @@ public:
   typedef db::coord_traits<coord_type> coord_traits;
 
   quad_tree_node (const point_type &center)
-    : m_split (false), m_center (center)
+    : m_center (center)
   {
-    init ();
+    init (true);
   }
 
   ~quad_tree_node ()
@@ -53,9 +56,9 @@ public:
   }
 
   quad_tree_node (const quad_tree_node &other)
-    : m_split (false), m_center (center)
+    : m_center (center)
   {
-    init ();
+    init (true);
     operator= (other);
   }
 
@@ -63,12 +66,14 @@ public:
   {
     if (this != &other) {
       clear ();
-      m_split = other.m_split;
       m_center = other.m_center;
       m_objects = other.m_objects;
-      for (unsigned int i = 0; i < 4; ++i) {
-        if (other.m_q[i]) {
-          m_q[i] = other.m_q[i]->clone ();
+      if (! other.is_leaf ()) {
+        init (false);
+        for (unsigned int i = 0; i < 4; ++i) {
+          if (other.m_q[i]) {
+            m_q[i] = other.m_q[i]->clone ();
+          }
         }
       }
     }
@@ -77,7 +82,7 @@ public:
 
   quad_tree_node (quad_tree_node &&other)
   {
-    init ();
+    init (true);
     swap (other);
   }
 
@@ -91,7 +96,6 @@ public:
   {
     if (this != &other) {
       std::swap (m_center, other.m_center);
-      std::swap (m_split, other.m_split);
       m_objects.swap (other.m_objects);
       for (unsigned int i = 0; i < 4; ++i) {
         std::swap (m_q[i], other.m_q[i]);
@@ -109,12 +113,14 @@ public:
   void clear ()
   {
     m_objects.clear ();
-    m_split = false;
-    for (unsigned int i = 0; i < 4; ++i) {
-      if (m_q[i]) {
-        delete m_q[i];
+    if (! is_leaf ()) {
+      for (unsigned int i = 0; i < 4; ++i) {
+        if (m_q[i]) {
+          delete m_q[i];
+        }
+        m_q[i] = 0;
       }
-      m_q[i] = 0;
+      init (true);
     }
   }
 
@@ -134,7 +140,7 @@ public:
 
     int n = quad_for (b);
 
-    if (! m_split || n < 0) {
+    if (is_leaf () || n < 0) {
 
       for (auto i = m_objects.begin (); i != m_objects.end (); ++i) {
         if (CMP () (*i, value)) {
@@ -165,7 +171,7 @@ public:
 
   box_type q_box (unsigned int n) const
   {
-    if (m_q[n]) {
+    if (! is_leaf () && m_q[n]) {
       return m_q[n]->box (m_center);
     } else {
       return box_type ();
@@ -174,15 +180,18 @@ public:
 
   quad_tree_node *node (unsigned int n) const
   {
+    tl_assert (! is_leaf ());
     return m_q [n];
   }
 
   bool empty () const
   {
     if (m_objects.empty ()) {
-      for (unsigned int n = 0; n < 4; ++n) {
-        if (m_q[n] && ! m_q[n]->empty ()) {
-          return false;
+      if (! is_leaf ()) {
+        for (unsigned int n = 0; n < 4; ++n) {
+          if (m_q[n] && ! m_q[n]->empty ()) {
+            return false;
+          }
         }
       }
       return true;
@@ -194,9 +203,11 @@ public:
   size_t size () const
   {
     size_t count = m_objects.size ();
-    for (unsigned int n = 0; n < 4; ++n) {
-      if (m_q[n]) {
-        count += m_q[n]->size ();
+    if (! is_leaf ()) {
+      for (unsigned int n = 0; n < 4; ++n) {
+        if (m_q[n]) {
+          count += m_q[n]->size ();
+        }
       }
     }
     return count;
@@ -205,9 +216,11 @@ public:
   size_t levels () const
   {
     size_t l = 1;
-    for (unsigned int n = 0; n < 4; ++n) {
-      if (m_q[n]) {
-        l = std::max (l, m_q[n]->levels () + 1);
+    if (! is_leaf ()) {
+      for (unsigned int n = 0; n < 4; ++n) {
+        if (m_q[n]) {
+          l = std::max (l, m_q[n]->levels () + 1);
+        }
       }
     }
     return l;
@@ -219,16 +232,23 @@ public:
   }
 
 private:
-  bool m_split;
   point_type m_center;
   quad_tree_node *m_q [4];
   objects_vector m_objects;
 
-  void init ()
+  void init (bool is_leaf)
   {
     for (unsigned int i = 0; i < 4; ++i) {
       m_q[i] = 0;
     }
+    if (is_leaf) {
+      m_q[0] = reinterpret_cast<quad_tree_node *> (1);
+    }
+  }
+
+  bool is_leaf () const
+  {
+    return m_q[0] == reinterpret_cast<quad_tree_node *> (1);
   }
 
   int quad_for (const box_type &box) const
@@ -267,7 +287,7 @@ private:
 
   void split (const point_type &ucenter)
   {
-    m_split = true;
+    init (false);
 
     objects_vector ov;
     ov.swap (m_objects);
@@ -279,13 +299,13 @@ private:
 
   void insert (const T &value, const point_type &ucenter)
   {
-    if (! m_split && m_objects.size () + 1 < thr) {
+    if (is_leaf () && m_objects.size () + 1 < thr) {
 
       m_objects.push_back (value);
 
     } else {
 
-      if (! m_split) {
+      if (is_leaf ()) {
         split (ucenter);
       }
 
@@ -321,7 +341,7 @@ private:
       if (m_q[i]) {
         quad_tree_node *n = m_q[i];
         m_q[i] = new quad_tree_node (q (i, ucenter).center ());
-        m_q[i]->m_split = true;
+        m_q[i]->init (false);
         m_q[i]->m_q[3 - i] = n;
       }
     }
@@ -329,9 +349,11 @@ private:
 
   point_type propose_ucenter (const box_type &total_box) const
   {
-    for (unsigned int i = 0; i < 4; ++i) {
-      if (m_q[i]) {
-        return m_center - (m_center - m_q[i]->center ()) * 2.0;
+    if (! is_leaf ()) {
+      for (unsigned int i = 0; i < 4; ++i) {
+        if (m_q[i]) {
+          return m_center - (m_center - m_q[i]->center ()) * 2.0;
+        }
       }
     }
 
@@ -359,7 +381,7 @@ private:
       }
     }
 
-    if (m_split) {
+    if (! is_leaf ()) {
 
       for (auto i = m_objects.begin (); i != m_objects.end (); ++i) {
         box_type b = BC () (*i);
@@ -390,13 +412,6 @@ private:
         result = false;
       }
 
-      for (unsigned int n = 0; n < 4; ++n) {
-        if (m_q[n]) {
-          tl::error << "Non-split node has child nodes";
-          result = false;
-        }
-      }
-
     }
 
     return result;
@@ -413,6 +428,9 @@ private:
   }
 };
 
+/**
+ *  @brief The iterator implementation class
+ */
 template <class T, class BC, size_t thr, class CMP, class S>
 class quad_tree_iterator
 {
@@ -510,6 +528,9 @@ public:
   }
 };
 
+/**
+ *  @brief The selector for implementing the all-iterator
+ */
 template <class T, class BC>
 class quad_tree_always_sel
 {
@@ -528,6 +549,9 @@ public:
   }
 };
 
+/**
+ *  @brief The selector for implementing the touching iterator
+ */
 template <class T, class BC>
 class quad_tree_touching_sel
 {
@@ -560,6 +584,9 @@ private:
   box_type m_box;
 };
 
+/**
+ *  @brief The selector for implementing the overlapping iterator
+ */
 template <class T, class BC>
 class quad_tree_overlapping_sel
 {
@@ -592,6 +619,9 @@ private:
   box_type m_box;
 };
 
+/**
+ *  @brief The default compare function
+ */
 template <class T>
 struct quad_tree_default_cmp
 {
@@ -601,7 +631,22 @@ struct quad_tree_default_cmp
   }
 };
 
-template <class T, class BC, size_t thr, class CMP = quad_tree_default_cmp<T>>
+/**
+ *  @brief A generic quad tree implementation
+ *
+ *  In contrast to the box_tree implementation, this is a self-sorting implementation
+ *  which is more generic.
+ *
+ *  @param T The value to be stored
+ *  @param BC The box converter
+ *  @param thr The number of items per leaf node before splitting
+ *  @param CMP The compare function (equality)
+ *
+ *  T needs to have a type member named "coord_type".
+ *  BC is a function of T and delivers a db::box<coord_type> for T
+ *  CMP is a function that delivers a bool value for a pair of T (equality)
+ */
+template <class T, class BC, size_t thr = 10, class CMP = quad_tree_default_cmp<T>>
 class quad_tree
 {
 public:
@@ -615,18 +660,29 @@ public:
   typedef db::vector<coord_type> vector_type;
   typedef std::vector<T> objects_vector;
 
+  /**
+   *  @brief Default constructor
+   *
+   *  This creates an empty tree.
+   */
   quad_tree ()
     : m_root (point_type ())
   {
     //  .. nothing yet ..
   }
 
+  /**
+   *  @brief Copy constructor
+   */
   quad_tree (const quad_tree &other)
     : m_root (point_type ())
   {
     operator= (other);
   }
 
+  /**
+   *  @brief Assignment
+   */
   quad_tree &operator= (const quad_tree &other)
   {
     if (this != &other) {
@@ -636,52 +692,79 @@ public:
     return *this;
   }
 
+  /**
+   *  @brief Move constructor
+   */
   quad_tree (quad_tree &&other)
     : m_root (point_type ())
   {
     swap (other);
   }
 
+  /**
+   *  @brief Move assignment
+   */
   quad_tree &operator= (quad_tree &&other)
   {
     swap (other);
     return *this;
   }
 
+  /**
+   *  @brief Empties the tree
+   */
   void clear ()
   {
     m_root.clear ();
     m_total_box = box_type ();
   }
 
+  /**
+   *  @brief Swaps the tree with another
+   */
   void swap (quad_tree &other)
   {
     if (this != &other) {
       m_root.swap (other.m_root);
-      std::swap (m_total_box, m_total_box);
+      std::swap (m_total_box, other.m_total_box);
     }
   }
 
+  /**
+   *  @brief Returns a value indicating whether the tree is empty
+   */
   bool empty () const
   {
     return m_root.empty ();
   }
 
+  /**
+   *  @brief Returns the number of items stored in the tree
+   */
   size_t size () const
   {
     return m_root.size ();
   }
 
+  /**
+   *  @brief Returns the number of quad levels (for testing)
+   */
   size_t levels () const
   {
     return m_root.levels ();
   }
 
+  /**
+   *  @brief Checks the tree for consistency (for testing)
+   */
   bool check () const
   {
     return m_root.check_top (m_total_box);
   }
 
+  /**
+   *  @brief Inserts an object into the tree
+   */
   void insert (const T &value)
   {
     box_type b = BC () (value);
@@ -693,16 +776,30 @@ public:
     m_root.insert_top (value, m_total_box);
   }
 
+  /**
+   *  @brief Erases the given element from the tree
+   *
+   *  @return true, if the element was found and erased.
+   *
+   *  If multiple elements of the same kind are stored, the
+   *  first one is erased.
+   */
   bool erase (const T &value)
   {
     return m_root.erase (value);
   }
 
+  /**
+   *  @brief begin iterator for all elements
+   */
   quad_tree_flat_iterator begin () const
   {
     return quad_tree_flat_iterator (&m_root, quad_tree_always_sel<T, BC> ());
   }
 
+  /**
+   *  @brief begin iterator for all elements overlapping the given box
+   */
   quad_tree_overlapping_iterator begin_overlapping (const box_type &box) const
   {
     if (m_total_box.overlaps (box)) {
@@ -712,6 +809,9 @@ public:
     }
   }
 
+  /**
+   *  @brief begin iterator for all elements touching the given box
+   */
   quad_tree_touching_iterator begin_touching (const box_type &box) const
   {
     if (m_total_box.touches (box)) {

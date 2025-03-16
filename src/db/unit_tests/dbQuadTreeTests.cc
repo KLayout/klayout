@@ -530,6 +530,7 @@ TEST(timing_insert)
     for (unsigned int i = 0; i < n; ++i) {
       tree.insert (rbox ());
     }
+    tl::info << "Quad levels: " << tree.levels ();
   }
 
   tree.clear ();
@@ -540,6 +541,7 @@ TEST(timing_insert)
     for (unsigned int i = 0; i < n; ++i) {
       tree.insert (rbox ());
     }
+    tl::info << "Quad levels: " << tree.levels ();
   }
 }
 
@@ -547,16 +549,16 @@ TEST(timing_lookup)
 {
   MyQuadTree tree;
 
-  unsigned int n = 250000;
+  unsigned int n = 1000000;
   for (unsigned int i = 0; i < n; ++i) {
-    tree.insert (rbox (10.0));
+    tree.insert (rbox (5.0));
   }
 
-  unsigned int ntests = 100;
+  unsigned int ntests = 1000;
 
   std::vector<std::pair<db::DBox, std::pair<size_t, size_t> > > tests;
   for (unsigned int i = 0; i < ntests; ++i) {
-    db::DBox bx = rbox (10.0);
+    db::DBox bx = rbox (5.0);
     tests.push_back (std::make_pair (bx, std::make_pair (size_t (0), size_t (0))));
   }
 

@@ -26,6 +26,8 @@
 #include "tlUnitTest.h"
 #include "tlString.h"
 
+#include <stdlib.h>
+
 typedef db::quad_tree<db::DBox, db::box_convert<db::DBox>, size_t (1)> my_quad_tree;
 
 std::string find_all (const my_quad_tree &qt)
@@ -256,6 +258,58 @@ TEST(remove)
   EXPECT_EQ (tree.levels (), size_t (1));
 }
 
+TEST(grow)
+{
+  my_quad_tree tree;
+  tree.insert (db::DBox (-1, -2, 3, 4));
+  tree.insert (db::DBox (-1, -3, 3, 0));
+  tree.insert (db::DBox (-1, -3, -0.5, -2));
+  tree.insert (db::DBox (-1, -3, -0.5, 2));
+  EXPECT_EQ (tree.levels (), size_t (2));
+  tree.insert (db::DBox (-100, -3, -99, 2));
+  EXPECT_EQ (tree.levels (), size_t (8));
+
+  EXPECT_EQ (tree.check (), true);
+  EXPECT_EQ (find_all (tree), "(-1,-2;3,4)/(-1,-3;-0.5,-2)/(-1,-3;-0.5,2)/(-1,-3;3,0)/(-100,-3;-99,2)");
+  EXPECT_EQ (find_overlapping (tree, db::DBox (-100, -100, -90, 100)), "(-100,-3;-99,2)");
+
+  bool r = true;
+  while (r && ! tree.empty ()) {
+    r = tree.erase (*tree.begin ());
+    EXPECT_EQ (r, true);
+    EXPECT_EQ (tree.check (), true);
+  }
+
+  EXPECT_EQ (tree.size (), size_t (0));
+  EXPECT_EQ (tree.levels (), size_t (1));
+}
+
+TEST(grow2)
+{
+  my_quad_tree tree;
+  tree.insert (db::DBox (-1, -2, 3, 4));
+  tree.insert (db::DBox (-1, -3, 3, 0));
+  tree.insert (db::DBox (-1, -3, -0.5, -2));
+  tree.insert (db::DBox (-1, -3, -0.5, 2));
+  EXPECT_EQ (tree.levels (), size_t (2));
+  tree.insert (db::DBox (-100, -3, -99, -1));
+  EXPECT_EQ (tree.levels (), size_t (8));
+
+  EXPECT_EQ (tree.check (), true);
+  EXPECT_EQ (find_all (tree), "(-1,-2;3,4)/(-1,-3;-0.5,-2)/(-1,-3;-0.5,2)/(-1,-3;3,0)/(-100,-3;-99,-1)");
+  EXPECT_EQ (find_overlapping (tree, db::DBox (-100, -100, -90, 100)), "(-100,-3;-99,-1)");
+
+  bool r = true;
+  while (r && ! tree.empty ()) {
+    r = tree.erase (*tree.begin ());
+    EXPECT_EQ (r, true);
+    EXPECT_EQ (tree.check (), true);
+  }
+
+  EXPECT_EQ (tree.size (), size_t (0));
+  EXPECT_EQ (tree.levels (), size_t (1));
+}
+
 TEST(clear)
 {
   my_quad_tree tree;
@@ -391,3 +445,33 @@ TEST(move_ctor)
   EXPECT_EQ (tree2.levels (), size_t (2));
 }
 
+static double rvalue ()
+{
+  return ((rand () % 1000000) - 5000) * 0.001;
+}
+
+static db::DBox rbox ()
+{
+  return db::DBox (db::DPoint (rvalue (), rvalue ()), db::DPoint (rvalue (), rvalue ()));
+}
+
+TEST(many)
+{
+  return; // @@@
+  my_quad_tree tree;
+
+  unsigned int n = 1000;
+
+  for (unsigned int i = 0; i < n; ++i) {
+    tree.insert (rbox ());
+  }
+
+  EXPECT_EQ (tree.check (), true);
+
+  bool r = true;
+  while (r && ! tree.empty ()) {
+    r = tree.erase (*tree.begin ());
+    EXPECT_EQ (r, true);
+    EXPECT_EQ (tree.check (), true);
+  }
+}

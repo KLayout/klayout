@@ -290,22 +290,26 @@ private:
       }
 
       box_type b = BC () (value);
-      int n = quad_for (b);
-
-      if (n < 0) {
-        m_objects.push_back (value);
-        return;
-      }
-
       if (b.inside (box (ucenter))) {
-        if (! m_q[n]) {
-          box_type bq = q (n, ucenter);
-          m_q[n] = new quad_tree_node (bq.center ());
+
+        int n = quad_for (b);
+        if (n < 0) {
+          m_objects.push_back (value);
+        } else {
+          if (! m_q[n]) {
+            box_type bq = q (n, ucenter);
+            m_q[n] = new quad_tree_node (bq.center ());
+          }
+          m_q[n]->insert (value, m_center);
         }
-        m_q[n]->insert (value, m_center);
+
       } else {
-        grow (m_center - (m_center - ucenter) * 2.0);
-        insert (value, ucenter);
+
+        tl_assert (m_q[0] || m_q[1] || m_q[2] || m_q[3]);
+        point_type new_ucenter = m_center - (m_center - ucenter) * 2.0;
+        grow (new_ucenter);
+        insert (value, new_ucenter);
+
       }
 
     }
@@ -317,6 +321,7 @@ private:
       if (m_q[i]) {
         quad_tree_node *n = m_q[i];
         m_q[i] = new quad_tree_node (q (i, ucenter).center ());
+        m_q[i]->m_split = true;
         m_q[i]->m_q[3 - i] = n;
       }
     }
@@ -469,6 +474,8 @@ public:
     m_stack.pop_back ();
 
     while (! m_stack.empty ()) {
+
+      qn = m_stack.back ().first;
 
       int &n = m_stack.back ().second;
       while (++n < 4) {

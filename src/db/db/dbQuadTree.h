@@ -37,12 +37,11 @@ template <class T, class BC, size_t thr, class CMP>
 class quad_tree_node
 {
 public:
-  typedef typename T::coord_type coord_type;
-  typedef db::box<coord_type> box_type;
-  typedef db::point<coord_type> point_type;
-  typedef db::vector<coord_type> vector_type;
+  typedef typename BC::box_type box_type;
+  typedef typename box_type::point_type point_type;
+  typedef typename box_type::vector_type vector_type;
   typedef std::vector<T> objects_vector;
-  typedef db::coord_traits<coord_type> coord_traits;
+  typedef db::coord_traits<typename box_type::coord_type> coord_traits;
 
   quad_tree_node (const point_type &center)
     : m_center (center)
@@ -357,8 +356,8 @@ private:
       }
     }
 
-    coord_type dx = std::max (std::abs (total_box.left () - m_center.x ()), std::abs (total_box.right () - m_center.y ()));
-    coord_type dy = std::max (std::abs (total_box.bottom () - m_center.y ()), std::abs (total_box.top () - m_center.y ()));
+    typename box_type::coord_type dx = std::max (std::abs (total_box.left () - m_center.x ()), std::abs (total_box.right () - m_center.y ()));
+    typename box_type::coord_type dy = std::max (std::abs (total_box.bottom () - m_center.y ()), std::abs (total_box.top () - m_center.y ()));
     return m_center - vector_type (dx * 2, dy * 2);
   }
 
@@ -436,8 +435,7 @@ class quad_tree_iterator
 {
 public:
   typedef quad_tree_node<T, BC, thr, CMP> quad_tree_node_type;
-  typedef typename T::coord_type coord_type;
-  typedef db::box<coord_type> box_type;
+  typedef typename BC::box_type box_type;
 
   quad_tree_iterator ()
     : m_s (), m_i (0)
@@ -535,8 +533,7 @@ template <class T, class BC>
 class quad_tree_always_sel
 {
 public:
-  typedef typename T::coord_type coord_type;
-  typedef db::box<coord_type> box_type;
+  typedef typename BC::box_type box_type;
 
   bool select (const T &) const
   {
@@ -556,8 +553,7 @@ template <class T, class BC>
 class quad_tree_touching_sel
 {
 public:
-  typedef typename T::coord_type coord_type;
-  typedef db::box<coord_type> box_type;
+  typedef typename BC::box_type box_type;
 
   quad_tree_touching_sel ()
   {
@@ -591,8 +587,7 @@ template <class T, class BC>
 class quad_tree_overlapping_sel
 {
 public:
-  typedef typename T::coord_type coord_type;
-  typedef db::box<coord_type> box_type;
+  typedef typename BC::box_type box_type;
 
   quad_tree_overlapping_sel ()
   {
@@ -654,10 +649,9 @@ public:
   typedef quad_tree_iterator<T, BC, thr, CMP, quad_tree_always_sel<T, BC> > quad_tree_flat_iterator;
   typedef quad_tree_iterator<T, BC, thr, CMP, quad_tree_touching_sel<T, BC> > quad_tree_touching_iterator;
   typedef quad_tree_iterator<T, BC, thr, CMP, quad_tree_overlapping_sel<T, BC> > quad_tree_overlapping_iterator;
-  typedef typename T::coord_type coord_type;
-  typedef db::box<coord_type> box_type;
-  typedef db::point<coord_type> point_type;
-  typedef db::vector<coord_type> vector_type;
+  typedef typename BC::box_type box_type;
+  typedef typename box_type::point_type point_type;
+  typedef typename box_type::vector_type vector_type;
   typedef std::vector<T> objects_vector;
 
   /**

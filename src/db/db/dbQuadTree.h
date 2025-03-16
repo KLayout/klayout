@@ -30,7 +30,7 @@
 namespace db
 {
 
-template <class T, class BC, size_t thr>
+template <class T, class BC, size_t thr, class CMP>
 class quad_tree_node
 {
 public:
@@ -137,7 +137,7 @@ public:
     if (! m_split || n < 0) {
 
       for (auto i = m_objects.begin (); i != m_objects.end (); ++i) {
-        if (*i == value) {
+        if (CMP () (*i, value)) {
           m_objects.erase (i);
           return true;
         }
@@ -290,7 +290,7 @@ private:
       }
 
       box_type b = BC () (value);
-      if (b.inside (box (ucenter))) {
+      if (inside (b, box (ucenter))) {
 
         int n = quad_for (b);
         if (n < 0) {
@@ -337,7 +337,7 @@ private:
 
     coord_type dx = std::max (std::abs (total_box.left () - m_center.x ()), std::abs (total_box.right () - m_center.y ()));
     coord_type dy = std::max (std::abs (total_box.bottom () - m_center.y ()), std::abs (total_box.top () - m_center.y ()));
-    return m_center - vector_type (dx, dy);
+    return m_center - vector_type (dx * 2, dy * 2);
   }
 
   bool check (const point_type &ucenter) const
@@ -348,8 +348,13 @@ private:
 
     for (auto i = m_objects.begin (); i != m_objects.end (); ++i) {
       box_type b = BC () (*i);
-      if (! b.inside (bq)) {
+      if (! inside (b, bq)) {
         tl::error << "Box " << b.to_string () << " not inside quad box " << bq.to_string ();
+        result = false;
+      }
+      if (coord_traits::equal (b.left (), ucenter.x ()) || coord_traits::equal (b.right (), ucenter.x ()) ||
+          coord_traits::equal (b.bottom (), ucenter.y ()) || coord_traits::equal (b.top (), ucenter.y ())) {
+        tl::error << "Box " << b.to_string () << " touches center of upper-level quad " << ucenter.to_string ();
         result = false;
       }
     }
@@ -367,9 +372,11 @@ private:
 
       for (unsigned int n = 0; n < 4; ++n) {
         if (m_q[n]) {
-          m_q[n]->check (m_center);
+          if (! m_q[n]->check (m_center)) {
+            result = false;
+          }
           box_type bbq = m_q[n]->box (m_center);
-          if (bbq != q (n, ucenter)) {
+          if (! bbq.equal (q (n, ucenter))) {
             tl::error << "Quad not centered (quad box is " << bbq.to_string () << ", should be " << q (n, ucenter).to_string ();
             result = false;
           }
@@ -394,13 +401,23 @@ private:
 
     return result;
   }
+
+  static bool inside (const box_type &box, const box_type &in)
+  {
+    if (box.empty () || in.empty ()) {
+      return false;
+    } else {
+      return ! coord_traits::less (box.left (), in.left ()) && ! coord_traits::less (in.right (), box.right ()) &&
+             ! coord_traits::less (box.bottom (), in.bottom ()) && ! coord_traits::less (in.top (), box.top ());
+    }
+  }
 };
 
-template <class T, class BC, size_t thr, class S>
+template <class T, class BC, size_t thr, class CMP, class S>
 class quad_tree_iterator
 {
 public:
-  typedef quad_tree_node<T, BC, thr> quad_tree_node_type;
+  typedef quad_tree_node<T, BC, thr, CMP> quad_tree_node_type;
   typedef typename T::coord_type coord_type;
   typedef db::box<coord_type> box_type;
 
@@ -575,15 +592,23 @@ private:
   box_type m_box;
 };
 
-// @@@ TODO: copy, assignment, move, swap
-template <class T, class BC, size_t thr>
+template <class T>
+struct quad_tree_default_cmp
+{
+  bool operator() (const T &a, const T &b) const
+  {
+    return a == b;
+  }
+};
+
+template <class T, class BC, size_t thr, class CMP = quad_tree_default_cmp<T>>
 class quad_tree
 {
 public:
-  typedef quad_tree_node<T, BC, thr> quad_tree_node_type;
-  typedef quad_tree_iterator<T, BC, thr, quad_tree_always_sel<T, BC> > quad_tree_flat_iterator;
-  typedef quad_tree_iterator<T, BC, thr, quad_tree_touching_sel<T, BC> > quad_tree_touching_iterator;
-  typedef quad_tree_iterator<T, BC, thr, quad_tree_overlapping_sel<T, BC> > quad_tree_overlapping_iterator;
+  typedef quad_tree_node<T, BC, thr, CMP> quad_tree_node_type;
+  typedef quad_tree_iterator<T, BC, thr, CMP, quad_tree_always_sel<T, BC> > quad_tree_flat_iterator;
+  typedef quad_tree_iterator<T, BC, thr, CMP, quad_tree_touching_sel<T, BC> > quad_tree_touching_iterator;
+  typedef quad_tree_iterator<T, BC, thr, CMP, quad_tree_overlapping_sel<T, BC> > quad_tree_overlapping_iterator;
   typedef typename T::coord_type coord_type;
   typedef db::box<coord_type> box_type;
   typedef db::point<coord_type> point_type;

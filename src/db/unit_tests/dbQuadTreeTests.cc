@@ -28,9 +28,17 @@
 
 #include <stdlib.h>
 
-typedef db::quad_tree<db::DBox, db::box_convert<db::DBox>, size_t (1)> my_quad_tree;
+struct MyQuadTreeCMP
+{
+  bool operator() (const db::DBox &a, const db::DBox &b) const
+  {
+    return a.equal (b);
+  }
+};
 
-std::string find_all (const my_quad_tree &qt)
+typedef db::quad_tree<db::DBox, db::box_convert<db::DBox>, size_t (1), MyQuadTreeCMP> MyQuadTree;
+
+std::string find_all (const MyQuadTree &qt)
 {
   std::vector<std::string> v;
   auto i = qt.begin ();
@@ -42,7 +50,7 @@ std::string find_all (const my_quad_tree &qt)
   return tl::join (v, "/");
 }
 
-std::string find_touching (const my_quad_tree &qt, const db::DBox &box)
+std::string find_touching (const MyQuadTree &qt, const db::DBox &box)
 {
   std::vector<std::string> v;
   auto i = qt.begin_touching (box);
@@ -54,7 +62,7 @@ std::string find_touching (const my_quad_tree &qt, const db::DBox &box)
   return tl::join (v, "/");
 }
 
-std::string find_touching_from_all (const my_quad_tree &qt, const db::DBox &box)
+std::string find_touching_from_all (const MyQuadTree &qt, const db::DBox &box)
 {
   std::vector<std::string> v;
   auto i = qt.begin ();
@@ -68,7 +76,7 @@ std::string find_touching_from_all (const my_quad_tree &qt, const db::DBox &box)
   return tl::join (v, "/");
 }
 
-std::string find_overlapping (const my_quad_tree &qt, const db::DBox &box)
+std::string find_overlapping (const MyQuadTree &qt, const db::DBox &box)
 {
   std::vector<std::string> v;
   auto i = qt.begin_overlapping (box);
@@ -80,7 +88,7 @@ std::string find_overlapping (const my_quad_tree &qt, const db::DBox &box)
   return tl::join (v, "/");
 }
 
-std::string find_overlapping_from_all (const my_quad_tree &qt, const db::DBox &box)
+std::string find_overlapping_from_all (const MyQuadTree &qt, const db::DBox &box)
 {
   std::vector<std::string> v;
   auto i = qt.begin ();
@@ -96,7 +104,7 @@ std::string find_overlapping_from_all (const my_quad_tree &qt, const db::DBox &b
 
 TEST(basic)
 {
-  my_quad_tree tree;
+  MyQuadTree tree;
   EXPECT_EQ (tree.empty (), true);
   EXPECT_EQ (tree.size (), size_t (0));
   EXPECT_EQ (tree.check (), true);
@@ -174,7 +182,7 @@ TEST(basic)
   EXPECT_EQ (tree.empty (), false);
   EXPECT_EQ (tree.size (), size_t (3));
   EXPECT_EQ (tree.check (), true);
-  EXPECT_EQ (tree.levels (), size_t (2));
+  EXPECT_EQ (tree.levels (), size_t (3));
 
   EXPECT_EQ (find_all (tree), "(-1,-2;3,4)/(-1,-3;-0.5,-2)/(-1,-3;3,0)");
 
@@ -204,7 +212,7 @@ TEST(basic)
   EXPECT_EQ (tree.empty (), false);
   EXPECT_EQ (tree.size (), size_t (4));
   EXPECT_EQ (tree.check (), true);
-  EXPECT_EQ (tree.levels (), size_t (2));
+  EXPECT_EQ (tree.levels (), size_t (3));
 
   EXPECT_EQ (find_all (tree), "(-1,-2;3,4)/(-1,-3;-0.5,-2)/(-1,-3;-0.5,2)/(-1,-3;3,0)");
 
@@ -233,7 +241,7 @@ TEST(basic)
 
 TEST(remove)
 {
-  my_quad_tree tree;
+  MyQuadTree tree;
   tree.insert (db::DBox (-1, -2, 3, 4));
   tree.insert (db::DBox (-1, -3, 3, 0));
   tree.insert (db::DBox (-1, -3, -0.5, -2));
@@ -260,12 +268,12 @@ TEST(remove)
 
 TEST(grow)
 {
-  my_quad_tree tree;
+  MyQuadTree tree;
   tree.insert (db::DBox (-1, -2, 3, 4));
   tree.insert (db::DBox (-1, -3, 3, 0));
   tree.insert (db::DBox (-1, -3, -0.5, -2));
   tree.insert (db::DBox (-1, -3, -0.5, 2));
-  EXPECT_EQ (tree.levels (), size_t (2));
+  EXPECT_EQ (tree.levels (), size_t (3));
   tree.insert (db::DBox (-100, -3, -99, 2));
   EXPECT_EQ (tree.levels (), size_t (8));
 
@@ -286,12 +294,12 @@ TEST(grow)
 
 TEST(grow2)
 {
-  my_quad_tree tree;
+  MyQuadTree tree;
   tree.insert (db::DBox (-1, -2, 3, 4));
   tree.insert (db::DBox (-1, -3, 3, 0));
   tree.insert (db::DBox (-1, -3, -0.5, -2));
   tree.insert (db::DBox (-1, -3, -0.5, 2));
-  EXPECT_EQ (tree.levels (), size_t (2));
+  EXPECT_EQ (tree.levels (), size_t (3));
   tree.insert (db::DBox (-100, -3, -99, -1));
   EXPECT_EQ (tree.levels (), size_t (8));
 
@@ -312,7 +320,7 @@ TEST(grow2)
 
 TEST(clear)
 {
-  my_quad_tree tree;
+  MyQuadTree tree;
   tree.insert (db::DBox (-1, -2, 3, 4));
   tree.insert (db::DBox (-1, -3, 3, 0));
   tree.insert (db::DBox (-1, -3, -0.5, -2));
@@ -332,7 +340,7 @@ TEST(clear)
 
 TEST(copy)
 {
-  my_quad_tree tree;
+  MyQuadTree tree;
   tree.insert (db::DBox (-1, -2, 3, 4));
   tree.insert (db::DBox (-1, -3, 3, 0));
   tree.insert (db::DBox (-1, -3, -0.5, -2));
@@ -340,19 +348,19 @@ TEST(copy)
 
   EXPECT_EQ (tree.check (), true);
   EXPECT_EQ (find_all (tree), "(-1,-2;3,4)/(-1,-3;-0.5,-2)/(-1,-3;-0.5,2)/(-1,-3;3,0)");
-  EXPECT_EQ (tree.levels (), size_t (2));
+  EXPECT_EQ (tree.levels (), size_t (3));
 
-  my_quad_tree tree2 (tree);
+  MyQuadTree tree2 (tree);
   tree.clear ();
 
   EXPECT_EQ (tree2.check (), true);
   EXPECT_EQ (find_all (tree2), "(-1,-2;3,4)/(-1,-3;-0.5,-2)/(-1,-3;-0.5,2)/(-1,-3;3,0)");
-  EXPECT_EQ (tree2.levels (), size_t (2));
+  EXPECT_EQ (tree2.levels (), size_t (3));
 }
 
 TEST(assign)
 {
-  my_quad_tree tree;
+  MyQuadTree tree;
   tree.insert (db::DBox (-1, -2, 3, 4));
   tree.insert (db::DBox (-1, -3, 3, 0));
   tree.insert (db::DBox (-1, -3, -0.5, -2));
@@ -360,20 +368,20 @@ TEST(assign)
 
   EXPECT_EQ (tree.check (), true);
   EXPECT_EQ (find_all (tree), "(-1,-2;3,4)/(-1,-3;-0.5,-2)/(-1,-3;-0.5,2)/(-1,-3;3,0)");
-  EXPECT_EQ (tree.levels (), size_t (2));
+  EXPECT_EQ (tree.levels (), size_t (3));
 
-  my_quad_tree tree2;
+  MyQuadTree tree2;
   tree2 = tree;
   tree.clear ();
 
   EXPECT_EQ (tree2.check (), true);
   EXPECT_EQ (find_all (tree2), "(-1,-2;3,4)/(-1,-3;-0.5,-2)/(-1,-3;-0.5,2)/(-1,-3;3,0)");
-  EXPECT_EQ (tree2.levels (), size_t (2));
+  EXPECT_EQ (tree2.levels (), size_t (3));
 }
 
 TEST(swap)
 {
-  my_quad_tree tree;
+  MyQuadTree tree;
   tree.insert (db::DBox (-1, -2, 3, 4));
   tree.insert (db::DBox (-1, -3, 3, 0));
   tree.insert (db::DBox (-1, -3, -0.5, -2));
@@ -381,9 +389,9 @@ TEST(swap)
 
   EXPECT_EQ (tree.check (), true);
   EXPECT_EQ (find_all (tree), "(-1,-2;3,4)/(-1,-3;-0.5,-2)/(-1,-3;-0.5,2)/(-1,-3;3,0)");
-  EXPECT_EQ (tree.levels (), size_t (2));
+  EXPECT_EQ (tree.levels (), size_t (3));
 
-  my_quad_tree tree2;
+  MyQuadTree tree2;
   tree2.swap (tree);
 
   EXPECT_EQ (tree.check (), true);
@@ -393,12 +401,12 @@ TEST(swap)
 
   EXPECT_EQ (tree2.check (), true);
   EXPECT_EQ (find_all (tree2), "(-1,-2;3,4)/(-1,-3;-0.5,-2)/(-1,-3;-0.5,2)/(-1,-3;3,0)");
-  EXPECT_EQ (tree2.levels (), size_t (2));
+  EXPECT_EQ (tree2.levels (), size_t (3));
 }
 
 TEST(move)
 {
-  my_quad_tree tree;
+  MyQuadTree tree;
   tree.insert (db::DBox (-1, -2, 3, 4));
   tree.insert (db::DBox (-1, -3, 3, 0));
   tree.insert (db::DBox (-1, -3, -0.5, -2));
@@ -406,9 +414,9 @@ TEST(move)
 
   EXPECT_EQ (tree.check (), true);
   EXPECT_EQ (find_all (tree), "(-1,-2;3,4)/(-1,-3;-0.5,-2)/(-1,-3;-0.5,2)/(-1,-3;3,0)");
-  EXPECT_EQ (tree.levels (), size_t (2));
+  EXPECT_EQ (tree.levels (), size_t (3));
 
-  my_quad_tree tree2;
+  MyQuadTree tree2;
   tree2 = std::move (tree);
 
   EXPECT_EQ (tree.check (), true);
@@ -418,12 +426,12 @@ TEST(move)
 
   EXPECT_EQ (tree2.check (), true);
   EXPECT_EQ (find_all (tree2), "(-1,-2;3,4)/(-1,-3;-0.5,-2)/(-1,-3;-0.5,2)/(-1,-3;3,0)");
-  EXPECT_EQ (tree2.levels (), size_t (2));
+  EXPECT_EQ (tree2.levels (), size_t (3));
 }
 
 TEST(move_ctor)
 {
-  my_quad_tree tree;
+  MyQuadTree tree;
   tree.insert (db::DBox (-1, -2, 3, 4));
   tree.insert (db::DBox (-1, -3, 3, 0));
   tree.insert (db::DBox (-1, -3, -0.5, -2));
@@ -431,9 +439,9 @@ TEST(move_ctor)
 
   EXPECT_EQ (tree.check (), true);
   EXPECT_EQ (find_all (tree), "(-1,-2;3,4)/(-1,-3;-0.5,-2)/(-1,-3;-0.5,2)/(-1,-3;3,0)");
-  EXPECT_EQ (tree.levels (), size_t (2));
+  EXPECT_EQ (tree.levels (), size_t (3));
 
-  my_quad_tree tree2 (std::move (tree));
+  MyQuadTree tree2 (std::move (tree));
 
   EXPECT_EQ (tree.check (), true);
   EXPECT_EQ (tree.empty (), true);
@@ -442,7 +450,7 @@ TEST(move_ctor)
 
   EXPECT_EQ (tree2.check (), true);
   EXPECT_EQ (find_all (tree2), "(-1,-2;3,4)/(-1,-3;-0.5,-2)/(-1,-3;-0.5,2)/(-1,-3;3,0)");
-  EXPECT_EQ (tree2.levels (), size_t (2));
+  EXPECT_EQ (tree2.levels (), size_t (3));
 }
 
 static double rvalue ()
@@ -452,13 +460,16 @@ static double rvalue ()
 
 static db::DBox rbox ()
 {
-  return db::DBox (db::DPoint (rvalue (), rvalue ()), db::DPoint (rvalue (), rvalue ()));
+  db::DBox box;
+  while ((box = db::DBox (db::DPoint (rvalue (), rvalue ()), db::DPoint (rvalue (), rvalue ()))).empty ()) {
+    ;
+  }
+  return box;
 }
 
 TEST(many)
 {
-  return; // @@@
-  my_quad_tree tree;
+  MyQuadTree tree;
 
   unsigned int n = 1000;
 
@@ -467,6 +478,7 @@ TEST(many)
   }
 
   EXPECT_EQ (tree.check (), true);
+  EXPECT_EQ (tree.size (), size_t (n));
 
   bool r = true;
   while (r && ! tree.empty ()) {

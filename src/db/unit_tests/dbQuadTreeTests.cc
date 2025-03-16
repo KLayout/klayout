@@ -25,6 +25,7 @@
 #include "dbBoxConvert.h"
 #include "tlUnitTest.h"
 #include "tlString.h"
+#include "tlTimer.h"
 
 #include <stdlib.h>
 
@@ -473,6 +474,13 @@ static db::DBox rbox ()
   return box;
 }
 
+static db::DBox rbox (double dim)
+{
+  db::DBox box;
+  db::DPoint c (rvalue (), rvalue ());
+  return box = db::DBox (c, c).enlarged (db::DVector (dim * 0.5, dim * 0.5));
+}
+
 TEST(many)
 {
   MyQuadTree tree;
@@ -511,3 +519,73 @@ TEST(many)
   EXPECT_EQ (tree.levels (), size_t (1));
   EXPECT_EQ (tree.size (), size_t (0));
 }
+
+TEST(timing_insert)
+{
+  MyQuadTree tree;
+
+  {
+    unsigned int n = 1000000;
+    tl::SelfTimer timer (tl::sprintf ("%d inserts ..", int (n)));
+    for (unsigned int i = 0; i < n; ++i) {
+      tree.insert (rbox ());
+    }
+  }
+
+  tree.clear ();
+
+  {
+    unsigned int n = 2000000;
+    tl::SelfTimer timer (tl::sprintf ("%d inserts ..", int (n)));
+    for (unsigned int i = 0; i < n; ++i) {
+      tree.insert (rbox ());
+    }
+  }
+}
+
+TEST(timing_lookup)
+{
+  MyQuadTree tree;
+
+  unsigned int n = 250000;
+  for (unsigned int i = 0; i < n; ++i) {
+    tree.insert (rbox (10.0));
+  }
+
+  unsigned int ntests = 100;
+
+  std::vector<std::pair<db::DBox, std::pair<size_t, size_t> > > tests;
+  for (unsigned int i = 0; i < ntests; ++i) {
+    db::DBox bx = rbox (10.0);
+    tests.push_back (std::make_pair (bx, std::make_pair (size_t (0), size_t (0))));
+  }
+
+  {
+    tl::SelfTimer timer (tl::sprintf ("%d tests (lookup) ..", int (ntests)));
+    for (auto t = tests.begin (); t != tests.end (); ++t) {
+      size_t n = 0;
+      for (auto i = tree.begin_touching (t->first); ! i.at_end (); ++i) {
+        ++n;
+      }
+      t->second.first = n;
+    }
+  }
+
+  {
+    tl::SelfTimer timer (tl::sprintf ("%d tests (brute force) ..", int (ntests)));
+    for (auto t = tests.begin (); t != tests.end (); ++t) {
+      size_t n = 0;
+      for (auto i = tree.begin (); ! i.at_end (); ++i) {
+        if (i->touches (t->first)) {
+          ++n;
+        }
+      }
+      t->second.second = n;
+    }
+  }
+
+  for (auto t = tests.begin (); t != tests.end (); ++t) {
+    EXPECT_EQ (t->second.first, t->second.second);
+  }
+}
+

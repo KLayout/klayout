@@ -50,13 +50,16 @@ std::string find_all (const MyQuadTree &qt)
   return tl::join (v, "/");
 }
 
-std::string find_touching (const MyQuadTree &qt, const db::DBox &box)
+std::string find_touching (const MyQuadTree &qt, const db::DBox &box, bool report = false)
 {
   std::vector<std::string> v;
   auto i = qt.begin_touching (box);
   while (! i.at_end ()) {
     v.push_back (i->to_string ());
     ++i;
+  }
+  if (report) {
+    tl::info << v.size () << " items found.";
   }
   std::sort (v.begin (), v.end ());
   return tl::join (v, "/");
@@ -76,13 +79,16 @@ std::string find_touching_from_all (const MyQuadTree &qt, const db::DBox &box)
   return tl::join (v, "/");
 }
 
-std::string find_overlapping (const MyQuadTree &qt, const db::DBox &box)
+std::string find_overlapping (const MyQuadTree &qt, const db::DBox &box, bool report = false)
 {
   std::vector<std::string> v;
   auto i = qt.begin_overlapping (box);
   while (! i.at_end ()) {
     v.push_back (i->to_string ());
     ++i;
+  }
+  if (report) {
+    tl::info << v.size () << " items found.";
   }
   std::sort (v.begin (), v.end ());
   return tl::join (v, "/");
@@ -472,6 +478,7 @@ TEST(many)
   MyQuadTree tree;
 
   unsigned int n = 1000;
+  unsigned int ntests = 100;
 
   for (unsigned int i = 0; i < n; ++i) {
     tree.insert (rbox ());
@@ -480,10 +487,27 @@ TEST(many)
   EXPECT_EQ (tree.check (), true);
   EXPECT_EQ (tree.size (), size_t (n));
 
+  bool report = false;
+  for (unsigned int i = 0; i < ntests; ++i) {
+    if (report) {
+      tl::info << "Test iteration " << i << " ...";
+    }
+    auto bx = rbox ();
+    EXPECT_EQ (find_overlapping (tree, bx, report), find_overlapping_from_all (tree, bx));
+    EXPECT_EQ (find_touching (tree, bx, report), find_touching_from_all (tree, bx));
+    bx = db::DBox (bx.center (), bx.center ());
+    EXPECT_EQ (find_touching (tree, bx, report), find_touching_from_all (tree, bx));
+  }
+
   bool r = true;
   while (r && ! tree.empty ()) {
     r = tree.erase (*tree.begin ());
     EXPECT_EQ (r, true);
     EXPECT_EQ (tree.check (), true);
   }
+
+  EXPECT_EQ (tree.empty (), true);
+  EXPECT_EQ (tree.check (), true);
+  EXPECT_EQ (tree.levels (), size_t (1));
+  EXPECT_EQ (tree.size (), size_t (0));
 }

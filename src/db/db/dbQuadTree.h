@@ -373,9 +373,12 @@ private:
         tl::error << "Box " << b.to_string () << " not inside quad box " << bq.to_string ();
         result = false;
       }
+      point_type ucenter_opp = m_center + (m_center - ucenter);
       if (coord_traits::equal (b.left (), ucenter.x ()) || coord_traits::equal (b.right (), ucenter.x ()) ||
-          coord_traits::equal (b.bottom (), ucenter.y ()) || coord_traits::equal (b.top (), ucenter.y ())) {
-        tl::error << "Box " << b.to_string () << " touches center of upper-level quad " << ucenter.to_string ();
+          coord_traits::equal (b.bottom (), ucenter.y ()) || coord_traits::equal (b.top (), ucenter.y ()) ||
+          coord_traits::equal (b.left (), ucenter_opp.x ()) || coord_traits::equal (b.right (), ucenter_opp.x ()) ||
+          coord_traits::equal (b.bottom (), ucenter_opp.y ()) || coord_traits::equal (b.top (), ucenter_opp.y ())) {
+        tl::error << "Box " << b.to_string () << " touches quad boundary " << ucenter.to_string () << " .. " << ucenter_opp.to_string ();
         result = false;
       }
     }
@@ -421,8 +424,8 @@ private:
     if (box.empty () || in.empty ()) {
       return false;
     } else {
-      return ! coord_traits::less (box.left (), in.left ()) && ! coord_traits::less (in.right (), box.right ()) &&
-             ! coord_traits::less (box.bottom (), in.bottom ()) && ! coord_traits::less (in.top (), box.top ());
+      return coord_traits::less (in.left (), box.left ()) && coord_traits::less (box.right (), in.right ()) &&
+             coord_traits::less (in.bottom (), box.bottom ()) && coord_traits::less (box.top (), in.top ());
     }
   }
 };

@@ -128,15 +128,13 @@ public:
     return m_center;
   }
 
-  void insert_top (const T &value, const box_type &total_box)
+  void insert_top (const T &value, const box_type &total_box, const box_type &b)
   {
-    insert (value, propose_ucenter (total_box));
+    insert (value, propose_ucenter (total_box), b);
   }
 
-  bool erase (const T &value)
+  bool erase (const T &value, const box_type &b)
   {
-    box_type b = BC () (value);
-
     int n = quad_for (b);
 
     if (is_leaf () || n < 0) {
@@ -150,7 +148,7 @@ public:
 
     } else if (m_q[n]) {
 
-      if (m_q[n]->erase (value)) {
+      if (m_q[n]->erase (value, b)) {
         if (m_q[n]->empty ()) {
           delete m_q[n];
           m_q[n] = 0;
@@ -292,11 +290,11 @@ private:
     ov.swap (m_objects);
 
     for (auto o = ov.begin (); o != ov.end (); ++o) {
-      insert (*o, ucenter);
+      insert (*o, ucenter, BC () (*o));
     }
   }
 
-  void insert (const T &value, const point_type &ucenter)
+  void insert (const T &value, const point_type &ucenter, const box_type &b)
   {
     if (is_leaf () && m_objects.size () + 1 < thr) {
 
@@ -308,7 +306,6 @@ private:
         split (ucenter);
       }
 
-      box_type b = BC () (value);
       if (inside (b, box (ucenter))) {
 
         int n = quad_for (b);
@@ -319,7 +316,7 @@ private:
             box_type bq = q (n, ucenter);
             m_q[n] = new quad_tree_node (bq.center ());
           }
-          m_q[n]->insert (value, m_center);
+          m_q[n]->insert (value, m_center, b);
         }
 
       } else {
@@ -327,7 +324,7 @@ private:
         tl_assert (m_q[0] || m_q[1] || m_q[2] || m_q[3]);
         point_type new_ucenter = m_center - (m_center - ucenter) * 2.0;
         grow (new_ucenter);
-        insert (value, new_ucenter);
+        insert (value, new_ucenter, b);
 
       }
 
@@ -770,7 +767,7 @@ public:
     }
 
     m_total_box += b;
-    m_root.insert_top (value, m_total_box);
+    m_root.insert_top (value, m_total_box, b);
   }
 
   /**
@@ -783,7 +780,7 @@ public:
    */
   bool erase (const T &value)
   {
-    return m_root.erase (value);
+    return m_root.erase (value, BC () (value));
   }
 
   /**

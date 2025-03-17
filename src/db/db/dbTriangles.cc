@@ -87,18 +87,6 @@ Triangles::create_triangle (TriangleEdge *e1, TriangleEdge *e2, TriangleEdge *e3
   res->set_id (++m_id);
   mp_triangles.push_back (res);
 
-  m_triangle_qt.insert (res);
-
-  // @@@
-#if 0
-  if (mp_triangles.size () != m_triangle_qt.size ()) {
-    size_t a = mp_triangles.size ();
-    size_t b = m_triangle_qt.size ();
-    printf("@@@ %ld -- %ld\n", a, b); fflush(stdout);
-  }
-  tl_assert (mp_triangles.size () == m_triangle_qt.size ()); // @@@
-#endif
-  // @@@
   return res;
 }
 
@@ -110,20 +98,7 @@ Triangles::remove_triangle (db::Triangle *tri)
     edges [i] = tri->edge (i);
   }
 
-  bool removed = m_triangle_qt.erase (tri);
-  tl_assert (removed);
-
   delete tri;
-  // @@@
-#if 0
-  if (mp_triangles.size () != m_triangle_qt.size ()) {
-    size_t a = mp_triangles.size ();
-    size_t b = m_triangle_qt.size ();
-    printf("@@@ %ld -- %ld\n", a, b); fflush(stdout);
-  }
-  tl_assert (mp_triangles.size () == m_triangle_qt.size ()); // @@@
-#endif
-  // @@@
 
   //  clean up edges we do no longer need
   for (int i = 0; i < 3; ++i) {
@@ -379,7 +354,6 @@ Triangles::insert_point (db::DCoord x, db::DCoord y, std::list<tl::weak_ptr<db::
 db::Vertex *
 Triangles::insert (db::Vertex *vertex, std::list<tl::weak_ptr<db::Triangle> > *new_triangles)
 {
-  // @@@ printf("@@@ insert %d\n", (int)mp_triangles.size ()); fflush(stdout);
   std::vector<db::Triangle *> tris = find_triangle_for_point (*vertex);
 
   //  the new vertex is outside the domain
@@ -400,7 +374,7 @@ Triangles::insert (db::Vertex *vertex, std::list<tl::weak_ptr<db::Triangle> > *n
 
   if (! on_edges.empty ()) {
     if (on_edges.size () == size_t (1)) {
-      split_triangles_on_edge (tris, vertex, on_edges.front (), new_triangles);
+      split_triangles_on_edge (vertex, on_edges.front (), new_triangles);
       return vertex;
     } else {
       //  the vertex is already present
@@ -419,8 +393,6 @@ Triangles::insert (db::Vertex *vertex, std::list<tl::weak_ptr<db::Triangle> > *n
 std::vector<db::Triangle *>
 Triangles::find_triangle_for_point (const db::DPoint &point)
 {
-// @@@
-#if 1   //  minimize distance search
   db::TriangleEdge *edge = find_closest_edge (point);
 
   std::vector<db::Triangle *> res;
@@ -432,28 +404,7 @@ Triangles::find_triangle_for_point (const db::DPoint &point)
     }
   }
 
-  // @@@
-  std::set<db::Triangle *> setb;
-  for (auto i = m_triangle_qt.begin_touching (db::DBox (point, point)); ! i.at_end (); ++i) {
-    if ((*i)->contains (point) >= 0) {
-      setb.insert (*i);
-    }
-  }
-  std::set<db::Triangle *> seta (res.begin (), res.end ());
-  if (seta != setb) {
-    tl_assert (false);
-  }
-  // @@@
   return res;
-#else
-  std::vector<db::Triangle *> res;
-  for (auto i = m_triangle_qt.begin_touching (db::DBox (point, point)); ! i.at_end (); ++i) {
-    if ((*i)->contains (point) >= 0) {
-      res.push_back (*i);
-    }
-  }
-  return res;
-#endif
 }
 
 db::TriangleEdge *
@@ -691,7 +642,7 @@ Triangles::split_triangle (db::Triangle *t, db::Vertex *vertex, std::list<tl::we
 }
 
 void
-Triangles::split_triangles_on_edge (const std::vector<db::Triangle *> &_tris /*@@@*/, db::Vertex *vertex, db::TriangleEdge *split_edge, std::list<tl::weak_ptr<db::Triangle> > *new_triangles_out)
+Triangles::split_triangles_on_edge (db::Vertex *vertex, db::TriangleEdge *split_edge, std::list<tl::weak_ptr<db::Triangle> > *new_triangles_out)
 {
   TriangleEdge *s1 = create_edge (split_edge->v1 (), vertex);
   TriangleEdge *s2 = create_edge (split_edge->v2 (), vertex);
@@ -1220,8 +1171,6 @@ Triangles::search_edges_crossing (Vertex *from, Vertex *to)
 db::Vertex *
 Triangles::find_vertex_for_point (const db::DPoint &point)
 {
-// @@@
-#if 1  //  minimize distance search
   db::TriangleEdge *edge = find_closest_edge (point);
   if (!edge) {
     return 0;
@@ -1232,33 +1181,7 @@ Triangles::find_vertex_for_point (const db::DPoint &point)
   } else if (edge->v2 ()->equal (point)) {
     v = edge->v2 ();
   }
-  // @@@
-  db::Vertex *vv = 0;
-  for (auto i = m_triangle_qt.begin_touching (db::DBox (point, point)); ! i.at_end () && ! vv; ++i) {
-    db::Triangle *t = *i;
-    for (unsigned int i = 0; i < 3 && ! vv; ++i) {
-      if (t->vertex (i)->equal (point)) {
-        vv = t->vertex (i);
-      }
-    }
-  }
-  if (vv != v) {
-    tl_assert (false); // @@@
-  }
-  // @@@
   return v;
-#else
-  for (auto i = m_triangle_qt.begin_touching (db::DBox (point, point)); ! i.at_end (); ++i) {
-    db::Triangle *t = *i;
-    for (unsigned int i = 0; i < 3; ++i) {
-      if (t->vertex (i)->equal (point)) {
-        return t->vertex (i);
-      }
-    }
-  }
-  return 0;
-#endif
-// @@@
 }
 
 db::TriangleEdge *
@@ -1499,7 +1422,6 @@ void
 Triangles::clear ()
 {
   mp_triangles.clear ();
-  m_triangle_qt.clear ();
   m_edges_heap.clear ();
   m_vertex_heap.clear ();
   m_returned_edges.clear ();
@@ -1691,7 +1613,6 @@ Triangles::refine (const TriangulateParameters &parameters)
       auto cr = (*t)->circumcircle();
       auto center = cr.first;
 
-      // printf("@@@ %s -- %s\n", (*t)->to_string().c_str(), center.to_string ().c_str()); fflush(stdout);
       if ((*t)->contains (center) >= 0) {
 
         if (tl::verbosity () >= parameters.base_verbosity + 20) {

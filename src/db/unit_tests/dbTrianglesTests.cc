@@ -951,6 +951,48 @@ TEST(triangulate_thin)
 
   EXPECT_EQ (tri.check (false), true);
 
-  // for debugging:
-  tri.dump ("debug.gds");
+  //  for debugging:
+  //  tri.dump ("debug.gds");
+
+  for (auto t = tri.begin (); t != tri.end (); ++t) {
+    EXPECT_GE (t->b (), param.min_b);
+  }
+
+  EXPECT_GT (tri.num_triangles (), size_t (13000));
+  EXPECT_LT (tri.num_triangles (), size_t (13200));
+}
+
+TEST(triangulate_issue1996)
+{
+  db::DPoint contour[] = {
+    db::DPoint (-8000, -8075),
+    db::DPoint (-8000, 8075),
+    db::DPoint (18000, 8075),
+    db::DPoint (18000, -8075)
+  };
+
+  db::DPolygon poly;
+  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour[0]));
+
+  double dbu = 0.001;
+
+  db::Triangles::TriangulateParameters param;
+  param.min_b = 0.5;
+  param.max_area = 500.0 * dbu * dbu;
+
+  TestableTriangles tri;
+  db::DCplxTrans trans = db::DCplxTrans (dbu) * db::DCplxTrans (db::DTrans (db::DPoint () - poly.box ().center ()));
+  tri.triangulate (trans * poly, param);
+
+  EXPECT_EQ (tri.check (false), true);
+
+  //  for debugging:
+  //  tri.dump ("debug.gds");
+
+  for (auto t = tri.begin (); t != tri.end (); ++t) {
+    EXPECT_GE (t->b (), param.min_b);
+  }
+
+  EXPECT_GT (tri.num_triangles (), size_t (13000));
+  EXPECT_LT (tri.num_triangles (), size_t (13200));
 }

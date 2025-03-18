@@ -937,13 +937,15 @@ Triangles::is_illegal_edge (db::TriangleEdge *edge)
     return false;
   }
 
-  auto lr = left->circumcircle ();
-  if (right->opposite (edge)->in_circle (lr.first, lr.second) > 0) {
+  bool ok = false;
+
+  auto lr = left->circumcircle (&ok);
+  if (! ok || right->opposite (edge)->in_circle (lr.first, lr.second) > 0) {
     return true;
   }
 
-  auto rr = right->circumcircle();
-  if (left->opposite (edge)->in_circle (rr.first, rr.second) > 0) {
+  auto rr = right->circumcircle(&ok);
+  if (! ok || left->opposite (edge)->in_circle (rr.first, rr.second) > 0) {
     return true;
   }
 

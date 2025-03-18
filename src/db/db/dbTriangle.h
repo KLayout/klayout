@@ -483,8 +483,10 @@ public:
 
   /**
    *  @brief Gets the center point and radius of the circumcircle
+   *  If ok is non-null, it will receive a boolean value indicating whether the circumcircle is valid.
+   *  An invalid circumcircle is an indicator for a degenerated triangle with area 0 (or close to).
    */
-  std::pair<db::DPoint, double> circumcircle () const;
+  std::pair<db::DPoint, double> circumcircle (bool *ok = 0) const;
 
   /**
    *  @brief Gets the vertex opposite of the given edge

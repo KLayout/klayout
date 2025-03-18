@@ -547,6 +547,8 @@ TEST(timing_insert)
 
 TEST(timing_lookup)
 {
+  test_is_long_runner ();
+
   MyQuadTree tree;
 
   unsigned int n = 1000000;

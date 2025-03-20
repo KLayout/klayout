@@ -36,6 +36,12 @@
 namespace db
 {
 
+static inline bool is_equal (const db::DPoint &a, const db::DPoint &b)
+{
+  return std::abs (a.x () - b.x ()) < std::max (1.0, (std::abs (a.x ()) + std::abs (b.x ()))) * db::epsilon &&
+         std::abs (a.y () - b.y ()) < std::max (1.0, (std::abs (a.y ()) + std::abs (b.y ()))) * db::epsilon;
+}
+
 Triangles::Triangles ()
   : m_is_constrained (false), m_level (0), m_id (0), m_flips (0), m_hops (0)
 {
@@ -358,6 +364,12 @@ Triangles::insert (db::Vertex *vertex, std::list<tl::weak_ptr<db::Triangle> > *n
 
   //  the new vertex is outside the domain
   if (tris.empty ()) {
+    // @@@
+    if (m_is_constrained) {
+      dump("debug.gds");  // @@@
+      find_triangle_for_point (*vertex);
+    }
+    // @@@
     tl_assert (! m_is_constrained);
     insert_new_vertex (vertex, new_triangles);
     return vertex;
@@ -365,26 +377,65 @@ Triangles::insert (db::Vertex *vertex, std::list<tl::weak_ptr<db::Triangle> > *n
 
   //  check, if the new vertex is on an edge (may be edge between triangles or edge on outside)
   std::vector<db::TriangleEdge *> on_edges;
+  std::vector<db::TriangleEdge *> on_vertex;
   for (int i = 0; i < 3; ++i) {
     db::TriangleEdge *e = tris.front ()->edge (i);
     if (e->side_of (*vertex) == 0) {
-      on_edges.push_back (e);
+      if (is_equal (*vertex, *e->v1 ()) || is_equal (*vertex, *e->v2 ())) {
+        on_vertex.push_back (e);
+      } else {
+        on_edges.push_back (e);
+      }
     }
   }
 
-  if (! on_edges.empty ()) {
-    if (on_edges.size () == size_t (1)) {
-      split_triangles_on_edge (vertex, on_edges.front (), new_triangles);
-      return vertex;
-    } else {
-      //  the vertex is already present
-      tl_assert (on_edges.size () == size_t (2));
-      return on_edges.front ()->common_vertex (on_edges [1]);
-    }
+  if (! on_vertex.empty ()) {
+
+    tl_assert (on_vertex.size () == size_t (2));
+    return on_vertex.front ()->common_vertex (on_vertex [1]);
+
+  } else if (! on_edges.empty ()) {
+
+    tl_assert (on_edges.size () == size_t (1));
+// @@@
+auto v1 = on_edges.front()->v1();
+auto v2 = on_edges.front()->v2();
+unsigned int ns1 = 0, ns2 = 0;
+for (auto e = v1->begin_edges (); e != v1->end_edges (); ++e) {
+  if ((*e)->is_segment()) { ++ns1; }
+}
+for (auto e = v2->begin_edges (); e != v2->end_edges (); ++e) {
+  if ((*e)->is_segment()) { ++ns2; }
+}
+std::string vs = vertex->to_string();
+std::string es = on_edges.front()->to_string();
+if (vs == "(-12.9999999999, 3.50126953125)" && es == "((-13, 3.5328125), (-12.9999999998, 3.4697265625))") {
+  printf("@@@ BANG!\n"); fflush(stdout);
+}
+// @@@
+    split_triangles_on_edge (vertex, on_edges.front (), new_triangles);
+// @@@
+unsigned int ns1p = 0, ns2p = 0;
+for (auto e = v1->begin_edges (); e != v1->end_edges (); ++e) {
+  if ((*e)->is_segment()) { ++ns1p; }
+}
+for (auto e = v2->begin_edges (); e != v2->end_edges (); ++e) {
+  if ((*e)->is_segment()) { ++ns2p; }
+}
+if (ns1 != ns1p || ns2 != ns2p) {
+  printf("@@@ on '%s' '%s' - BANG!\n", vs.c_str(), es.c_str()); fflush(stdout);
+}
+tl_assert(ns1 == ns1p);
+tl_assert(ns2 == ns2p);
+// @@@
+    return vertex;
+
   } else if (tris.size () == size_t (1)) {
+
     //  the new vertex is inside one triangle
     split_triangle (tris.front (), vertex, new_triangles);
     return vertex;
+
   }
 
   tl_assert (false);
@@ -1178,9 +1229,9 @@ Triangles::find_vertex_for_point (const db::DPoint &point)
     return 0;
   }
   db::Vertex *v = 0;
-  if (edge->v1 ()->equal (point)) {
+  if (is_equal (*edge->v1 (), point)) {
     v = edge->v1 ();
-  } else if (edge->v2 ()->equal (point)) {
+  } else if (is_equal (*edge->v2 (), point)) {
     v = edge->v2 ();
   }
   return v;
@@ -1194,7 +1245,7 @@ Triangles::find_edge_for_points (const db::DPoint &p1, const db::DPoint &p2)
     return 0;
   }
   for (auto e = v->begin_edges (); e != v->end_edges (); ++e) {
-    if ((*e)->other (v)->equal (p2)) {
+    if (is_equal (*(*e)->other (v), p2)) {
       return *e;
     }
   }
@@ -1587,6 +1638,7 @@ Triangles::refine (const TriangulateParameters &parameters)
     if (tl::verbosity () >= parameters.base_verbosity + 10) {
       tl::info << "Iteration " << nloop << " ..";
     }
+    printf("@@@ iteration %d ..\n", (int)nloop); fflush(stdout);
 
     std::list<tl::weak_ptr<db::Triangle> > to_consider;
     for (auto t = new_triangles.begin (); t != new_triangles.end (); ++t) {

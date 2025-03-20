@@ -525,7 +525,13 @@ Triangle::common_edge (const Triangle *other) const
 int
 Triangle::contains (const db::DPoint &point) const
 {
-  int vps = db::vprod_sign (*mp_v[2] - *mp_v[0], *mp_v[1] - *mp_v[0]);
+  auto c = *mp_v[2] - *mp_v[0];
+  auto b = *mp_v[1] - *mp_v[0];
+
+  int vps = db::vprod_sign (c, b);
+  if (vps == 0) {
+    return db::vprod_sign (point - *mp_v[0], b) == 0 && db::vprod_sign (point - *mp_v[0], c) == 0 ? 0 : -1;
+  }
 
   int res = 1;
 

@@ -92,7 +92,8 @@ jobs:
     displayName: 'Download and Extract KLayout bits'
 
   - script: |
-      python -m pip install --upgrade pip setuptools wheel
+      # setuptools 67.0.0 is not working as of now (pypa/setuptools#4885)
+      python -m pip install --upgrade pip "setuptools<76.0.0" wheel
     displayName: 'Update pip, setuptools and wheel'
 
   - script: |

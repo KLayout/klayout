@@ -34,6 +34,12 @@
 #include <functional>
 #include <stdint.h>
 
+//  for std::hash of QString and QByteArray
+#if defined(HAVE_QT)
+# include <QString>
+# include <QByteArray>
+#endif
+
 #include "tlSList.h"
 
 /**
@@ -341,6 +347,60 @@ namespace std
       return ptr ? hash<X> () (*ptr) : 0;
     }
   };
+
+#if defined(HAVE_QT) && QT_VERSION < 0x050000
+
+  /**
+   *  @brief Generic hash for QString
+   */
+
+  template <>
+  size_t hfunc (const QString &o, size_t h)
+  {
+    return hfunc_iterable (o, h);
+  }
+
+  template <>
+  size_t hfunc (const QString &o)
+  {
+    return hfunc (o, size_t (0));
+  }
+
+  template <>
+  struct hash <QString>
+  {
+    size_t operator() (const QString &o) const
+    {
+      return hfunc (o);
+    }
+  };
+
+  /**
+   *  @brief Generic hash for QByteArray
+   */
+
+  template <>
+  size_t hfunc (const QByteArray &o, size_t h)
+  {
+    return hfunc_iterable (o, h);
+  }
+
+  template <>
+  size_t hfunc (const QByteArray &o)
+  {
+    return hfunc (o, size_t (0));
+  }
+
+  template <>
+  struct hash <QByteArray>
+  {
+    size_t operator() (const QString &o) const
+    {
+      return hfunc (o);
+    }
+  };
+
+#endif
 
 }
 

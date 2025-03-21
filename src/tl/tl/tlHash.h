@@ -355,6 +355,15 @@ namespace std
    */
 
   template <>
+  struct hash <QChar>
+  {
+    size_t operator() (const QChar &o) const
+    {
+      return hfunc (o.unicode ());
+    }
+  };
+
+  template <>
   size_t hfunc (const QString &o, size_t h)
   {
     return hfunc_iterable (o, h);

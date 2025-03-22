@@ -42,7 +42,7 @@ class EdgeNeighborhoodWithNetsVisitor(pya.EdgeNeighborhoodVisitor):
     for (x1, x2), polygons in neighborhood:
       for inp, poly in polygons.items():
         poly_str = "/".join(sorted([ str(p) for p in poly ]))
-        edge_data.append(f"{x1},{x2} -> {inp}: {poly_str}")
+        edge_data.append(str(x1) + "," + str(x2) + " -> " + str(inp) + ": " + poly_str)
 
   def dump(self):
     res = ""

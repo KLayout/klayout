@@ -1,3 +1,36 @@
+0.30.0           (2025-03-25):
+* Enhancement: Better support for user properties
+  The property management has been overhauled. Properties are not globally 
+  scoped. The "Layout" class now provides class methods to convert property IDs
+  to property hashes and back. It is no longer required to know the origin of
+  a property ID.
+  Other changes are:
+  - New classes "BoxWithProperties", "EdgeWithProperties", "PolygonWithProperties",
+    "SimplePolygonWithProperties", "PathWithProperties", "EdgePairWithProperties", 
+    "TextWithProperties" and corresponding "D..." classes. 
+    Many functions accept these objects now in addition to the property-less "Box", 
+    "Edge" etc. objects. Many functions now deliver property-annotated objects 
+    instead of the plain ones.
+  - "EdgePairFilter#property_glob", "EdgePairFilter#property_filter", "EdgePairFilter#property_filter_bounded"
+    creates filters for edge pair objects, which can be used on "EdgePairs" containers to 
+    filter by properties.
+  - The same is available for "EdgeFilter" (for filtering edges in "Edges" containers), 
+    "PolygonFilter" (for filtering polygons in "Region" containers), and 
+    "TextFilter" (for filtering texts in "Texts" containers)
+  - New method "process_with_properties" for "PolygonOperator", "EdgeOperator",
+    "EdgePairOperator" and "TextOperator"
+* Enhancement: New class "PolygonNeighborhood"
+  This is a visitor to obtain all "neighboring" polygons for each polygon
+  in a Region. Currently, neighborhood is defined by the bounding box of 
+  the primary polygons.
+* Enhancement: New methods: 
+  - "LayoutToNetlist#build_net", "build_nets" and "build_all_nets" do not 
+  - "LayoutToNetlist#layer_index" from a name
+  - "LayoutToNetlist#texts_by_index" and "LayoutToNetlist#texts_by_name"
+  - "LayoutToNetlist#original_layout" and "LayoutToNetlist#original_top_cell"
+  - "LayoutToNetlist#polygons_of_net" and "LayoutToNetlist#texts_of_net"
+  - "Device#terminal_ref"
+
 0.29.12          (2025-03-02):
 * Bug: %GITHUB%/issues/1976 Crash on cross mode, lw > 1 and oversampling
 * Bug: %GITHUB%/issues/1987 Build failure against Qt6.8

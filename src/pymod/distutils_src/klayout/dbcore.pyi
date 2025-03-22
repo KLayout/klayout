@@ -794,6 +794,265 @@ class Box:
         ...
     ...
 
+class BoxWithProperties(Box):
+    r"""
+    @brief A Box object with properties attached.
+    This class represents a combination of a Box object an user properties. User properties are stored in form of a properties ID. Convenience methods are provided to manipulate or retrieve user properties directly.
+
+    This class has been introduced in version 0.30.
+    """
+    prop_id: int
+    r"""
+    Getter:
+    @brief Gets the properties ID associated with the object
+
+    Setter:
+    @brief Sets the properties ID of the object
+    """
+    @overload
+    @classmethod
+    def new(cls, box: Box, properties: Dict[Any, Any]) -> BoxWithProperties:
+        r"""
+        @brief Creates a new object from a property-less object and a properties hash.
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, box: Box, properties_id: Optional[int] = ...) -> BoxWithProperties:
+        r"""
+        @brief Creates a new object from a property-less object and a properties ID.
+        """
+        ...
+    @overload
+    def __init__(self, box: Box, properties: Dict[Any, Any]) -> None:
+        r"""
+        @brief Creates a new object from a property-less object and a properties hash.
+        """
+        ...
+    @overload
+    def __init__(self, box: Box, properties_id: Optional[int] = ...) -> None:
+        r"""
+        @brief Creates a new object from a property-less object and a properties ID.
+        """
+        ...
+    def __mul__(self, f: float) -> BoxWithProperties:
+        r"""
+        @brief Scales the object by some factor
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and, if necessary, rounded.
+        """
+        ...
+    def __repr__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    def __rmul__(self, f: float) -> BoxWithProperties:
+        r"""
+        @brief Scales the object by some factor
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and, if necessary, rounded.
+        """
+        ...
+    def __str__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    def _assign(self, other: Box) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+        ...
+    def _const_cast(self) -> BoxWithProperties:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _dup(self) -> BoxWithProperties:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> BoxWithProperties:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def delete_property(self, key: Any) -> None:
+        r"""
+        @brief Deletes the user property with the given key
+        This method is a convenience method that deletes the property with the given key. It does nothing if no property with that key exists. Using that method is more convenient than creating a new property set with a new ID and assigning that properties ID.
+        This method may change the properties ID.
+        """
+        ...
+    def downcast(self) -> Box:
+        r"""
+        @brief Gets the corresponding object without the properties
+        """
+        ...
+    @overload
+    def move(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> BoxWithProperties:
+        r"""
+        @brief Moves the object.
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is overwritten.
+
+        @param dx The x distance to move the object.
+        @param dy The y distance to move the object.
+
+        @return The moved object (self).
+        """
+        ...
+    @overload
+    def move(self, v: Vector) -> BoxWithProperties:
+        r"""
+        @brief Moves the object.
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is overwritten.
+
+        @param v The distance to move the object.
+
+        @return The moved object (self).
+        """
+        ...
+    @overload
+    def moved(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> BoxWithProperties:
+        r"""
+        @brief Returns the moved object (does not modify self)
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is not modified.
+
+        @param dx The x distance to move the object.
+        @param dy The y distance to move the object.
+
+        @return The moved object.
+        """
+        ...
+    @overload
+    def moved(self, v: Vector) -> BoxWithProperties:
+        r"""
+        @brief Returns the moved object
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is not modified.
+
+        @param v The distance to move the object.
+
+        @return The moved object.
+        """
+        ...
+    def properties(self) -> Any:
+        r"""
+        @brief Gets the user properties
+        This method is a convenience method that gets the properties of the shape as a single hash.
+        """
+        ...
+    def property(self, key: Any) -> Any:
+        r"""
+        @brief Gets the user property with the given key
+        This method is a convenience method that gets the user property with the given key. If no property with that key does not exist, it will return nil. Using that method is more convenient than using the layout object and the properties ID to retrieve the property value. 
+        """
+        ...
+    def set_property(self, key: Any, value: Any) -> None:
+        r"""
+        @brief Sets the user property with the given key to the given value
+        This method is a convenience method that sets the user property with the given key to the given value. If no property with that key exists, it will create one. Using that method is more convenient than creating a new property set with a new ID and assigning that properties ID.
+        This method may change the properties ID. Note: GDS only supports integer keys. OASIS supports numeric and string keys.
+        """
+        ...
+    def to_s(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    @overload
+    def transform(self, t: ICplxTrans) -> None:
+        r"""
+        @brief Transforms the object (in-place version)
+        """
+        ...
+    @overload
+    def transform(self, t: Trans) -> None:
+        r"""
+        @brief Transforms the object (in-place version)
+        """
+        ...
+    @overload
+    def transformed(self, t: CplxTrans) -> DBoxWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    @overload
+    def transformed(self, t: ICplxTrans) -> BoxWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    @overload
+    def transformed(self, t: Trans) -> BoxWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    ...
+
 class Cell:
     r"""
     @brief A cell
@@ -5203,7 +5462,7 @@ class CompoundRegionOperationNode:
         r"""
         @brief Creates a new edge neighborhood collector
 
-        @param children The inputs to use. The first one in the primary input, the others are neighbors.
+        @param children The inputs to use. The inputs are enumerated by base zero indexes in the visitor callback.
         @param visitor The visitor object (see \EdgeNeighborhoodVisitor) receiving the edge events.
         @param bext The search window extension to use at the edge beginning.
         @param eext The search window extension to use at the edge end.
@@ -5474,6 +5733,18 @@ class CompoundRegionOperationNode:
     def new_polygon_breaker(cls, input: CompoundRegionOperationNode, max_vertex_count: int, max_area_ratio: float) -> CompoundRegionOperationNode:
         r"""
         @brief Creates a node providing a composition into parts with less than the given number of points and a smaller area ratio.
+        """
+        ...
+    @classmethod
+    def new_polygon_neighborhood(cls, children: Sequence[CompoundRegionOperationNode], visitor: PolygonNeighborhoodVisitorBase, dist: Optional[int] = ...) -> CompoundRegionOperationNode:
+        r"""
+        @brief Creates a new polygon neighborhood collector
+
+        @param children The inputs to use. The inputs are enumerated by base zero indexes in the visitor callback.
+        @param visitor The visitor object (see \PolygonNeighborhoodVisitor) receiving the polygon events.
+        @param dist The search distance in which to look up neighbors.
+
+        This constructor has been introduced in version 0.30.0.
         """
         ...
     @classmethod
@@ -6302,6 +6573,19 @@ class CplxTrans:
         """
         ...
     @overload
+    def __mul__(self, box: BoxWithProperties) -> DBoxWithProperties:
+        r"""
+        @brief Transforms a box with properties
+
+        't*box' or 't.trans(box)' is equivalent to box.transformed(t).
+
+        @param box The box to transform
+        @return The transformed box
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def __mul__(self, d: int) -> float:
         r"""
         @brief Transforms a single distance
@@ -6327,6 +6611,32 @@ class CplxTrans:
         @return The transformed edge
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def __mul__(self, edge: EdgeWithProperties) -> DEdgeWithProperties:
+        r"""
+        @brief Transforms an edge with properties
+
+        't*edge' or 't.trans(edge)' is equivalent to edge.transformed(t).
+
+        @param edge The edge to transform
+        @return The transformed edge
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def __mul__(self, edge_pair: EdgePairWithProperties) -> DEdgePairWithProperties:
+        r"""
+        @brief Transforms an edge pair with properties
+
+        't*edge_pair' or 't.trans(edge_pair)' is equivalent to edge_pair.transformed(t).
+
+        @param edge_pair The edge pair to transform
+        @return The transformed edge pair
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     @overload
@@ -6371,6 +6681,19 @@ class CplxTrans:
         """
         ...
     @overload
+    def __mul__(self, path: PathWithProperties) -> DPathWithProperties:
+        r"""
+        @brief Transforms a path with properties
+
+        't*path' or 't.trans(path)' is equivalent to path.transformed(t).
+
+        @param path The path to transform
+        @return The transformed path
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def __mul__(self, polygon: Polygon) -> DPolygon:
         r"""
         @brief Transforms a polygon
@@ -6381,6 +6704,32 @@ class CplxTrans:
         @return The transformed polygon
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def __mul__(self, polygon: PolygonWithProperties) -> DPolygonWithProperties:
+        r"""
+        @brief Transforms a polygon with properties
+
+        't*polygon' or 't.trans(polygon)' is equivalent to polygon.transformed(t).
+
+        @param polygon The polygon to transform
+        @return The transformed polygon
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def __mul__(self, simple_polygon: SimplePolygonWithProperties) -> DSimplePolygonWithProperties:
+        r"""
+        @brief Transforms a simple polygon with properties
+
+        't*polygon' or 't.trans(simple_polygon)' is equivalent to simple_polygon.transformed(t).
+
+        @param simple_polygon The simple polygon to transform
+        @return The transformed simple polygon
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     @overload
@@ -6429,6 +6778,19 @@ class CplxTrans:
         This convenience method has been introduced in version 0.25.
         """
         ...
+    @overload
+    def __mul__(self, text: TextWithProperties) -> DTextWithProperties:
+        r"""
+        @brief Transforms a text with properties
+
+        't*text' or 't.trans(text)' is equivalent to text.transformed(t).
+
+        @param text The text to transform
+        @return The transformed text
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
     def __ne__(self, other: object) -> bool:
         r"""
         @brief Tests for inequality
@@ -6457,6 +6819,19 @@ class CplxTrans:
         """
         ...
     @overload
+    def __rmul__(self, box: BoxWithProperties) -> DBoxWithProperties:
+        r"""
+        @brief Transforms a box with properties
+
+        't*box' or 't.trans(box)' is equivalent to box.transformed(t).
+
+        @param box The box to transform
+        @return The transformed box
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def __rmul__(self, d: int) -> float:
         r"""
         @brief Transforms a single distance
@@ -6482,6 +6857,32 @@ class CplxTrans:
         @return The transformed edge
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def __rmul__(self, edge: EdgeWithProperties) -> DEdgeWithProperties:
+        r"""
+        @brief Transforms an edge with properties
+
+        't*edge' or 't.trans(edge)' is equivalent to edge.transformed(t).
+
+        @param edge The edge to transform
+        @return The transformed edge
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def __rmul__(self, edge_pair: EdgePairWithProperties) -> DEdgePairWithProperties:
+        r"""
+        @brief Transforms an edge pair with properties
+
+        't*edge_pair' or 't.trans(edge_pair)' is equivalent to edge_pair.transformed(t).
+
+        @param edge_pair The edge pair to transform
+        @return The transformed edge pair
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     @overload
@@ -6526,6 +6927,19 @@ class CplxTrans:
         """
         ...
     @overload
+    def __rmul__(self, path: PathWithProperties) -> DPathWithProperties:
+        r"""
+        @brief Transforms a path with properties
+
+        't*path' or 't.trans(path)' is equivalent to path.transformed(t).
+
+        @param path The path to transform
+        @return The transformed path
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def __rmul__(self, polygon: Polygon) -> DPolygon:
         r"""
         @brief Transforms a polygon
@@ -6539,6 +6953,32 @@ class CplxTrans:
         """
         ...
     @overload
+    def __rmul__(self, polygon: PolygonWithProperties) -> DPolygonWithProperties:
+        r"""
+        @brief Transforms a polygon with properties
+
+        't*polygon' or 't.trans(polygon)' is equivalent to polygon.transformed(t).
+
+        @param polygon The polygon to transform
+        @return The transformed polygon
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def __rmul__(self, simple_polygon: SimplePolygonWithProperties) -> DSimplePolygonWithProperties:
+        r"""
+        @brief Transforms a simple polygon with properties
+
+        't*polygon' or 't.trans(simple_polygon)' is equivalent to simple_polygon.transformed(t).
+
+        @param simple_polygon The simple polygon to transform
+        @return The transformed simple polygon
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def __rmul__(self, text: Text) -> DText:
         r"""
         @brief Transforms a text
@@ -6549,6 +6989,19 @@ class CplxTrans:
         @return The transformed text
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def __rmul__(self, text: TextWithProperties) -> DTextWithProperties:
+        r"""
+        @brief Transforms a text with properties
+
+        't*text' or 't.trans(text)' is equivalent to text.transformed(t).
+
+        @param text The text to transform
+        @return The transformed text
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     def __str__(self, lazy: Optional[bool] = ..., dbu: Optional[float] = ...) -> str:
@@ -6812,6 +7265,19 @@ class CplxTrans:
         """
         ...
     @overload
+    def trans(self, box: BoxWithProperties) -> DBoxWithProperties:
+        r"""
+        @brief Transforms a box with properties
+
+        't*box' or 't.trans(box)' is equivalent to box.transformed(t).
+
+        @param box The box to transform
+        @return The transformed box
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def trans(self, edge: Edge) -> DEdge:
         r"""
         @brief Transforms an edge
@@ -6822,6 +7288,32 @@ class CplxTrans:
         @return The transformed edge
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def trans(self, edge: EdgeWithProperties) -> DEdgeWithProperties:
+        r"""
+        @brief Transforms an edge with properties
+
+        't*edge' or 't.trans(edge)' is equivalent to edge.transformed(t).
+
+        @param edge The edge to transform
+        @return The transformed edge
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def trans(self, edge_pair: EdgePairWithProperties) -> DEdgePairWithProperties:
+        r"""
+        @brief Transforms an edge pair with properties
+
+        't*edge_pair' or 't.trans(edge_pair)' is equivalent to edge_pair.transformed(t).
+
+        @param edge_pair The edge pair to transform
+        @return The transformed edge pair
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     @overload
@@ -6866,6 +7358,19 @@ class CplxTrans:
         """
         ...
     @overload
+    def trans(self, path: PathWithProperties) -> DPathWithProperties:
+        r"""
+        @brief Transforms a path with properties
+
+        't*path' or 't.trans(path)' is equivalent to path.transformed(t).
+
+        @param path The path to transform
+        @return The transformed path
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def trans(self, polygon: Polygon) -> DPolygon:
         r"""
         @brief Transforms a polygon
@@ -6879,6 +7384,32 @@ class CplxTrans:
         """
         ...
     @overload
+    def trans(self, polygon: PolygonWithProperties) -> DPolygonWithProperties:
+        r"""
+        @brief Transforms a polygon with properties
+
+        't*polygon' or 't.trans(polygon)' is equivalent to polygon.transformed(t).
+
+        @param polygon The polygon to transform
+        @return The transformed polygon
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def trans(self, simple_polygon: SimplePolygonWithProperties) -> DSimplePolygonWithProperties:
+        r"""
+        @brief Transforms a simple polygon with properties
+
+        't*polygon' or 't.trans(simple_polygon)' is equivalent to simple_polygon.transformed(t).
+
+        @param simple_polygon The simple polygon to transform
+        @return The transformed simple polygon
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def trans(self, text: Text) -> DText:
         r"""
         @brief Transforms a text
@@ -6889,6 +7420,19 @@ class CplxTrans:
         @return The transformed text
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def trans(self, text: TextWithProperties) -> DTextWithProperties:
+        r"""
+        @brief Transforms a text with properties
+
+        't*text' or 't.trans(text)' is equivalent to text.transformed(t).
+
+        @param text The text to transform
+        @return The transformed text
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     ...
@@ -7679,6 +8223,265 @@ class DBox:
     def width(self) -> float:
         r"""
         @brief Gets the width of the box
+        """
+        ...
+    ...
+
+class DBoxWithProperties(DBox):
+    r"""
+    @brief A DBox object with properties attached.
+    This class represents a combination of a DBox object an user properties. User properties are stored in form of a properties ID. Convenience methods are provided to manipulate or retrieve user properties directly.
+
+    This class has been introduced in version 0.30.
+    """
+    prop_id: int
+    r"""
+    Getter:
+    @brief Gets the properties ID associated with the object
+
+    Setter:
+    @brief Sets the properties ID of the object
+    """
+    @overload
+    @classmethod
+    def new(cls, box: DBox, properties: Dict[Any, Any]) -> DBoxWithProperties:
+        r"""
+        @brief Creates a new object from a property-less object and a properties hash.
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, box: DBox, properties_id: Optional[int] = ...) -> DBoxWithProperties:
+        r"""
+        @brief Creates a new object from a property-less object and a properties ID.
+        """
+        ...
+    @overload
+    def __init__(self, box: DBox, properties: Dict[Any, Any]) -> None:
+        r"""
+        @brief Creates a new object from a property-less object and a properties hash.
+        """
+        ...
+    @overload
+    def __init__(self, box: DBox, properties_id: Optional[int] = ...) -> None:
+        r"""
+        @brief Creates a new object from a property-less object and a properties ID.
+        """
+        ...
+    def __mul__(self, f: float) -> DBoxWithProperties:
+        r"""
+        @brief Scales the object by some factor
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and, if necessary, rounded.
+        """
+        ...
+    def __repr__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    def __rmul__(self, f: float) -> DBoxWithProperties:
+        r"""
+        @brief Scales the object by some factor
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and, if necessary, rounded.
+        """
+        ...
+    def __str__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    def _assign(self, other: DBox) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+        ...
+    def _const_cast(self) -> DBoxWithProperties:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _dup(self) -> DBoxWithProperties:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DBoxWithProperties:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def delete_property(self, key: Any) -> None:
+        r"""
+        @brief Deletes the user property with the given key
+        This method is a convenience method that deletes the property with the given key. It does nothing if no property with that key exists. Using that method is more convenient than creating a new property set with a new ID and assigning that properties ID.
+        This method may change the properties ID.
+        """
+        ...
+    def downcast(self) -> DBox:
+        r"""
+        @brief Gets the corresponding object without the properties
+        """
+        ...
+    @overload
+    def move(self, dx: Optional[float] = ..., dy: Optional[float] = ...) -> DBoxWithProperties:
+        r"""
+        @brief Moves the object.
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is overwritten.
+
+        @param dx The x distance to move the object.
+        @param dy The y distance to move the object.
+
+        @return The moved object (self).
+        """
+        ...
+    @overload
+    def move(self, v: DVector) -> DBoxWithProperties:
+        r"""
+        @brief Moves the object.
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is overwritten.
+
+        @param v The distance to move the object.
+
+        @return The moved object (self).
+        """
+        ...
+    @overload
+    def moved(self, dx: Optional[float] = ..., dy: Optional[float] = ...) -> DBoxWithProperties:
+        r"""
+        @brief Returns the moved object (does not modify self)
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is not modified.
+
+        @param dx The x distance to move the object.
+        @param dy The y distance to move the object.
+
+        @return The moved object.
+        """
+        ...
+    @overload
+    def moved(self, v: DVector) -> DBoxWithProperties:
+        r"""
+        @brief Returns the moved object
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is not modified.
+
+        @param v The distance to move the object.
+
+        @return The moved object.
+        """
+        ...
+    def properties(self) -> Any:
+        r"""
+        @brief Gets the user properties
+        This method is a convenience method that gets the properties of the shape as a single hash.
+        """
+        ...
+    def property(self, key: Any) -> Any:
+        r"""
+        @brief Gets the user property with the given key
+        This method is a convenience method that gets the user property with the given key. If no property with that key does not exist, it will return nil. Using that method is more convenient than using the layout object and the properties ID to retrieve the property value. 
+        """
+        ...
+    def set_property(self, key: Any, value: Any) -> None:
+        r"""
+        @brief Sets the user property with the given key to the given value
+        This method is a convenience method that sets the user property with the given key to the given value. If no property with that key exists, it will create one. Using that method is more convenient than creating a new property set with a new ID and assigning that properties ID.
+        This method may change the properties ID. Note: GDS only supports integer keys. OASIS supports numeric and string keys.
+        """
+        ...
+    def to_s(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    @overload
+    def transform(self, t: DCplxTrans) -> None:
+        r"""
+        @brief Transforms the object (in-place version)
+        """
+        ...
+    @overload
+    def transform(self, t: DTrans) -> None:
+        r"""
+        @brief Transforms the object (in-place version)
+        """
+        ...
+    @overload
+    def transformed(self, t: DCplxTrans) -> DBoxWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    @overload
+    def transformed(self, t: DTrans) -> DBoxWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    @overload
+    def transformed(self, t: VCplxTrans) -> BoxWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
         """
         ...
     ...
@@ -8731,6 +9534,19 @@ class DCplxTrans:
         """
         ...
     @overload
+    def __mul__(self, box: DBoxWithProperties) -> DBoxWithProperties:
+        r"""
+        @brief Transforms a box with properties
+
+        't*box' or 't.trans(box)' is equivalent to box.transformed(t).
+
+        @param box The box to transform
+        @return The transformed box
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def __mul__(self, d: float) -> float:
         r"""
         @brief Transforms a single distance
@@ -8756,6 +9572,32 @@ class DCplxTrans:
         @return The transformed edge
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def __mul__(self, edge: DEdgeWithProperties) -> DEdgeWithProperties:
+        r"""
+        @brief Transforms an edge with properties
+
+        't*edge' or 't.trans(edge)' is equivalent to edge.transformed(t).
+
+        @param edge The edge to transform
+        @return The transformed edge
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def __mul__(self, edge_pair: DEdgePairWithProperties) -> DEdgePairWithProperties:
+        r"""
+        @brief Transforms an edge pair with properties
+
+        't*edge_pair' or 't.trans(edge_pair)' is equivalent to edge_pair.transformed(t).
+
+        @param edge_pair The edge pair to transform
+        @return The transformed edge pair
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     @overload
@@ -8800,6 +9642,19 @@ class DCplxTrans:
         """
         ...
     @overload
+    def __mul__(self, path: DPathWithProperties) -> DPathWithProperties:
+        r"""
+        @brief Transforms a path with properties
+
+        't*path' or 't.trans(path)' is equivalent to path.transformed(t).
+
+        @param path The path to transform
+        @return The transformed path
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def __mul__(self, polygon: DPolygon) -> DPolygon:
         r"""
         @brief Transforms a polygon
@@ -8810,6 +9665,32 @@ class DCplxTrans:
         @return The transformed polygon
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def __mul__(self, polygon: DPolygonWithProperties) -> DPolygonWithProperties:
+        r"""
+        @brief Transforms a polygon with properties
+
+        't*polygon' or 't.trans(polygon)' is equivalent to polygon.transformed(t).
+
+        @param polygon The polygon to transform
+        @return The transformed polygon
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def __mul__(self, simple_polygon: DSimplePolygonWithProperties) -> DSimplePolygonWithProperties:
+        r"""
+        @brief Transforms a simple polygon with properties
+
+        't*polygon' or 't.trans(simple_polygon)' is equivalent to simple_polygon.transformed(t).
+
+        @param simple_polygon The simple polygon to transform
+        @return The transformed simple polygon
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     @overload
@@ -8847,6 +9728,19 @@ class DCplxTrans:
         This convenience method has been introduced in version 0.25.
         """
         ...
+    @overload
+    def __mul__(self, text: DTextWithProperties) -> DTextWithProperties:
+        r"""
+        @brief Transforms a text with properties
+
+        't*text' or 't.trans(text)' is equivalent to text.transformed(t).
+
+        @param text The text to transform
+        @return The transformed text
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
     def __ne__(self, other: object) -> bool:
         r"""
         @brief Tests for inequality
@@ -8875,6 +9769,19 @@ class DCplxTrans:
         """
         ...
     @overload
+    def __rmul__(self, box: DBoxWithProperties) -> DBoxWithProperties:
+        r"""
+        @brief Transforms a box with properties
+
+        't*box' or 't.trans(box)' is equivalent to box.transformed(t).
+
+        @param box The box to transform
+        @return The transformed box
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def __rmul__(self, d: float) -> float:
         r"""
         @brief Transforms a single distance
@@ -8900,6 +9807,32 @@ class DCplxTrans:
         @return The transformed edge
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def __rmul__(self, edge: DEdgeWithProperties) -> DEdgeWithProperties:
+        r"""
+        @brief Transforms an edge with properties
+
+        't*edge' or 't.trans(edge)' is equivalent to edge.transformed(t).
+
+        @param edge The edge to transform
+        @return The transformed edge
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def __rmul__(self, edge_pair: DEdgePairWithProperties) -> DEdgePairWithProperties:
+        r"""
+        @brief Transforms an edge pair with properties
+
+        't*edge_pair' or 't.trans(edge_pair)' is equivalent to edge_pair.transformed(t).
+
+        @param edge_pair The edge pair to transform
+        @return The transformed edge pair
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     @overload
@@ -8944,6 +9877,19 @@ class DCplxTrans:
         """
         ...
     @overload
+    def __rmul__(self, path: DPathWithProperties) -> DPathWithProperties:
+        r"""
+        @brief Transforms a path with properties
+
+        't*path' or 't.trans(path)' is equivalent to path.transformed(t).
+
+        @param path The path to transform
+        @return The transformed path
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def __rmul__(self, polygon: DPolygon) -> DPolygon:
         r"""
         @brief Transforms a polygon
@@ -8957,6 +9903,32 @@ class DCplxTrans:
         """
         ...
     @overload
+    def __rmul__(self, polygon: DPolygonWithProperties) -> DPolygonWithProperties:
+        r"""
+        @brief Transforms a polygon with properties
+
+        't*polygon' or 't.trans(polygon)' is equivalent to polygon.transformed(t).
+
+        @param polygon The polygon to transform
+        @return The transformed polygon
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def __rmul__(self, simple_polygon: DSimplePolygonWithProperties) -> DSimplePolygonWithProperties:
+        r"""
+        @brief Transforms a simple polygon with properties
+
+        't*polygon' or 't.trans(simple_polygon)' is equivalent to simple_polygon.transformed(t).
+
+        @param simple_polygon The simple polygon to transform
+        @return The transformed simple polygon
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def __rmul__(self, text: DText) -> DText:
         r"""
         @brief Transforms a text
@@ -8967,6 +9939,19 @@ class DCplxTrans:
         @return The transformed text
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def __rmul__(self, text: DTextWithProperties) -> DTextWithProperties:
+        r"""
+        @brief Transforms a text with properties
+
+        't*text' or 't.trans(text)' is equivalent to text.transformed(t).
+
+        @param text The text to transform
+        @return The transformed text
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     def __str__(self, lazy: Optional[bool] = ..., dbu: Optional[float] = ...) -> str:
@@ -9234,6 +10219,19 @@ class DCplxTrans:
         """
         ...
     @overload
+    def trans(self, box: DBoxWithProperties) -> DBoxWithProperties:
+        r"""
+        @brief Transforms a box with properties
+
+        't*box' or 't.trans(box)' is equivalent to box.transformed(t).
+
+        @param box The box to transform
+        @return The transformed box
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def trans(self, edge: DEdge) -> DEdge:
         r"""
         @brief Transforms an edge
@@ -9244,6 +10242,32 @@ class DCplxTrans:
         @return The transformed edge
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def trans(self, edge: DEdgeWithProperties) -> DEdgeWithProperties:
+        r"""
+        @brief Transforms an edge with properties
+
+        't*edge' or 't.trans(edge)' is equivalent to edge.transformed(t).
+
+        @param edge The edge to transform
+        @return The transformed edge
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def trans(self, edge_pair: DEdgePairWithProperties) -> DEdgePairWithProperties:
+        r"""
+        @brief Transforms an edge pair with properties
+
+        't*edge_pair' or 't.trans(edge_pair)' is equivalent to edge_pair.transformed(t).
+
+        @param edge_pair The edge pair to transform
+        @return The transformed edge pair
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     @overload
@@ -9288,6 +10312,19 @@ class DCplxTrans:
         """
         ...
     @overload
+    def trans(self, path: DPathWithProperties) -> DPathWithProperties:
+        r"""
+        @brief Transforms a path with properties
+
+        't*path' or 't.trans(path)' is equivalent to path.transformed(t).
+
+        @param path The path to transform
+        @return The transformed path
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def trans(self, polygon: DPolygon) -> DPolygon:
         r"""
         @brief Transforms a polygon
@@ -9301,6 +10338,32 @@ class DCplxTrans:
         """
         ...
     @overload
+    def trans(self, polygon: DPolygonWithProperties) -> DPolygonWithProperties:
+        r"""
+        @brief Transforms a polygon with properties
+
+        't*polygon' or 't.trans(polygon)' is equivalent to polygon.transformed(t).
+
+        @param polygon The polygon to transform
+        @return The transformed polygon
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def trans(self, simple_polygon: DSimplePolygonWithProperties) -> DSimplePolygonWithProperties:
+        r"""
+        @brief Transforms a simple polygon with properties
+
+        't*polygon' or 't.trans(simple_polygon)' is equivalent to simple_polygon.transformed(t).
+
+        @param simple_polygon The simple polygon to transform
+        @return The transformed simple polygon
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def trans(self, text: DText) -> DText:
         r"""
         @brief Transforms a text
@@ -9311,6 +10374,19 @@ class DCplxTrans:
         @return The transformed text
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def trans(self, text: DTextWithProperties) -> DTextWithProperties:
+        r"""
+        @brief Transforms a text with properties
+
+        't*text' or 't.trans(text)' is equivalent to text.transformed(t).
+
+        @param text The text to transform
+        @return The transformed text
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     ...
@@ -10544,6 +11620,524 @@ class DEdgePair:
         ...
     ...
 
+class DEdgePairWithProperties(EdgePair):
+    r"""
+    @brief A DEdgePair object with properties attached.
+    This class represents a combination of a DEdgePair object an user properties. User properties are stored in form of a properties ID. Convenience methods are provided to manipulate or retrieve user properties directly.
+
+    This class has been introduced in version 0.30.
+    """
+    prop_id: int
+    r"""
+    Getter:
+    @brief Gets the properties ID associated with the object
+
+    Setter:
+    @brief Sets the properties ID of the object
+    """
+    @overload
+    @classmethod
+    def new(cls, edge_pair: DEdgePair, properties: Dict[Any, Any]) -> DEdgePairWithProperties:
+        r"""
+        @brief Creates a new object from a property-less object and a properties hash.
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, edge_pair: DEdgePair, properties_id: Optional[int] = ...) -> DEdgePairWithProperties:
+        r"""
+        @brief Creates a new object from a property-less object and a properties ID.
+        """
+        ...
+    @overload
+    def __init__(self, edge_pair: DEdgePair, properties: Dict[Any, Any]) -> None:
+        r"""
+        @brief Creates a new object from a property-less object and a properties hash.
+        """
+        ...
+    @overload
+    def __init__(self, edge_pair: DEdgePair, properties_id: Optional[int] = ...) -> None:
+        r"""
+        @brief Creates a new object from a property-less object and a properties ID.
+        """
+        ...
+    def __mul__(self, f: float) -> DEdgePairWithProperties:
+        r"""
+        @brief Scales the object by some factor
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and, if necessary, rounded.
+        """
+        ...
+    def __repr__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    def __rmul__(self, f: float) -> DEdgePairWithProperties:
+        r"""
+        @brief Scales the object by some factor
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and, if necessary, rounded.
+        """
+        ...
+    def __str__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    def _assign(self, other: EdgePair) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+        ...
+    def _const_cast(self) -> DEdgePairWithProperties:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _dup(self) -> DEdgePairWithProperties:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DEdgePairWithProperties:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def delete_property(self, key: Any) -> None:
+        r"""
+        @brief Deletes the user property with the given key
+        This method is a convenience method that deletes the property with the given key. It does nothing if no property with that key exists. Using that method is more convenient than creating a new property set with a new ID and assigning that properties ID.
+        This method may change the properties ID.
+        """
+        ...
+    def downcast(self) -> DEdgePair:
+        r"""
+        @brief Gets the corresponding object without the properties
+        """
+        ...
+    @overload
+    def move(self, dx: Optional[float] = ..., dy: Optional[float] = ...) -> DEdgePairWithProperties:
+        r"""
+        @brief Moves the object.
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is overwritten.
+
+        @param dx The x distance to move the object.
+        @param dy The y distance to move the object.
+
+        @return The moved object (self).
+        """
+        ...
+    @overload
+    def move(self, v: DVector) -> DEdgePairWithProperties:
+        r"""
+        @brief Moves the object.
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is overwritten.
+
+        @param v The distance to move the object.
+
+        @return The moved object (self).
+        """
+        ...
+    @overload
+    def moved(self, dx: Optional[float] = ..., dy: Optional[float] = ...) -> DEdgePairWithProperties:
+        r"""
+        @brief Returns the moved object (does not modify self)
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is not modified.
+
+        @param dx The x distance to move the object.
+        @param dy The y distance to move the object.
+
+        @return The moved object.
+        """
+        ...
+    @overload
+    def moved(self, v: DVector) -> DEdgePairWithProperties:
+        r"""
+        @brief Returns the moved object
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is not modified.
+
+        @param v The distance to move the object.
+
+        @return The moved object.
+        """
+        ...
+    def properties(self) -> Any:
+        r"""
+        @brief Gets the user properties
+        This method is a convenience method that gets the properties of the shape as a single hash.
+        """
+        ...
+    def property(self, key: Any) -> Any:
+        r"""
+        @brief Gets the user property with the given key
+        This method is a convenience method that gets the user property with the given key. If no property with that key does not exist, it will return nil. Using that method is more convenient than using the layout object and the properties ID to retrieve the property value. 
+        """
+        ...
+    def set_property(self, key: Any, value: Any) -> None:
+        r"""
+        @brief Sets the user property with the given key to the given value
+        This method is a convenience method that sets the user property with the given key to the given value. If no property with that key exists, it will create one. Using that method is more convenient than creating a new property set with a new ID and assigning that properties ID.
+        This method may change the properties ID. Note: GDS only supports integer keys. OASIS supports numeric and string keys.
+        """
+        ...
+    def to_s(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    @overload
+    def transform(self, t: DCplxTrans) -> None:
+        r"""
+        @brief Transforms the object (in-place version)
+        """
+        ...
+    @overload
+    def transform(self, t: DTrans) -> None:
+        r"""
+        @brief Transforms the object (in-place version)
+        """
+        ...
+    @overload
+    def transformed(self, t: DCplxTrans) -> DEdgePairWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    @overload
+    def transformed(self, t: DTrans) -> DEdgePairWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    @overload
+    def transformed(self, t: VCplxTrans) -> EdgePairWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    ...
+
+class DEdgeWithProperties(DEdge):
+    r"""
+    @brief A DEdge object with properties attached.
+    This class represents a combination of a DEdge object an user properties. User properties are stored in form of a properties ID. Convenience methods are provided to manipulate or retrieve user properties directly.
+
+    This class has been introduced in version 0.30.
+    """
+    prop_id: int
+    r"""
+    Getter:
+    @brief Gets the properties ID associated with the object
+
+    Setter:
+    @brief Sets the properties ID of the object
+    """
+    @overload
+    @classmethod
+    def new(cls, edge: DEdge, properties: Dict[Any, Any]) -> DEdgeWithProperties:
+        r"""
+        @brief Creates a new object from a property-less object and a properties hash.
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, edge: DEdge, properties_id: Optional[int] = ...) -> DEdgeWithProperties:
+        r"""
+        @brief Creates a new object from a property-less object and a properties ID.
+        """
+        ...
+    @overload
+    def __init__(self, edge: DEdge, properties: Dict[Any, Any]) -> None:
+        r"""
+        @brief Creates a new object from a property-less object and a properties hash.
+        """
+        ...
+    @overload
+    def __init__(self, edge: DEdge, properties_id: Optional[int] = ...) -> None:
+        r"""
+        @brief Creates a new object from a property-less object and a properties ID.
+        """
+        ...
+    def __mul__(self, f: float) -> DEdgeWithProperties:
+        r"""
+        @brief Scales the object by some factor
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and, if necessary, rounded.
+        """
+        ...
+    def __repr__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    def __rmul__(self, f: float) -> DEdgeWithProperties:
+        r"""
+        @brief Scales the object by some factor
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and, if necessary, rounded.
+        """
+        ...
+    def __str__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    def _assign(self, other: DEdge) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+        ...
+    def _const_cast(self) -> DEdgeWithProperties:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _dup(self) -> DEdgeWithProperties:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DEdgeWithProperties:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def delete_property(self, key: Any) -> None:
+        r"""
+        @brief Deletes the user property with the given key
+        This method is a convenience method that deletes the property with the given key. It does nothing if no property with that key exists. Using that method is more convenient than creating a new property set with a new ID and assigning that properties ID.
+        This method may change the properties ID.
+        """
+        ...
+    def downcast(self) -> DEdge:
+        r"""
+        @brief Gets the corresponding object without the properties
+        """
+        ...
+    @overload
+    def move(self, dx: Optional[float] = ..., dy: Optional[float] = ...) -> DEdgeWithProperties:
+        r"""
+        @brief Moves the object.
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is overwritten.
+
+        @param dx The x distance to move the object.
+        @param dy The y distance to move the object.
+
+        @return The moved object (self).
+        """
+        ...
+    @overload
+    def move(self, v: DVector) -> DEdgeWithProperties:
+        r"""
+        @brief Moves the object.
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is overwritten.
+
+        @param v The distance to move the object.
+
+        @return The moved object (self).
+        """
+        ...
+    @overload
+    def moved(self, dx: Optional[float] = ..., dy: Optional[float] = ...) -> DEdgeWithProperties:
+        r"""
+        @brief Returns the moved object (does not modify self)
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is not modified.
+
+        @param dx The x distance to move the object.
+        @param dy The y distance to move the object.
+
+        @return The moved object.
+        """
+        ...
+    @overload
+    def moved(self, v: DVector) -> DEdgeWithProperties:
+        r"""
+        @brief Returns the moved object
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is not modified.
+
+        @param v The distance to move the object.
+
+        @return The moved object.
+        """
+        ...
+    def properties(self) -> Any:
+        r"""
+        @brief Gets the user properties
+        This method is a convenience method that gets the properties of the shape as a single hash.
+        """
+        ...
+    def property(self, key: Any) -> Any:
+        r"""
+        @brief Gets the user property with the given key
+        This method is a convenience method that gets the user property with the given key. If no property with that key does not exist, it will return nil. Using that method is more convenient than using the layout object and the properties ID to retrieve the property value. 
+        """
+        ...
+    def set_property(self, key: Any, value: Any) -> None:
+        r"""
+        @brief Sets the user property with the given key to the given value
+        This method is a convenience method that sets the user property with the given key to the given value. If no property with that key exists, it will create one. Using that method is more convenient than creating a new property set with a new ID and assigning that properties ID.
+        This method may change the properties ID. Note: GDS only supports integer keys. OASIS supports numeric and string keys.
+        """
+        ...
+    def to_s(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    @overload
+    def transform(self, t: DCplxTrans) -> None:
+        r"""
+        @brief Transforms the object (in-place version)
+        """
+        ...
+    @overload
+    def transform(self, t: DTrans) -> None:
+        r"""
+        @brief Transforms the object (in-place version)
+        """
+        ...
+    @overload
+    def transformed(self, t: DCplxTrans) -> DEdgeWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    @overload
+    def transformed(self, t: DTrans) -> DEdgeWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    @overload
+    def transformed(self, t: VCplxTrans) -> EdgeWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    ...
+
 class DPath:
     r"""
     @brief A path class
@@ -11101,6 +12695,265 @@ class DPath:
         @param t The transformation to apply.
 
         @return The transformed path.
+        """
+        ...
+    ...
+
+class DPathWithProperties(DPath):
+    r"""
+    @brief A DPath object with properties attached.
+    This class represents a combination of a DPath object an user properties. User properties are stored in form of a properties ID. Convenience methods are provided to manipulate or retrieve user properties directly.
+
+    This class has been introduced in version 0.30.
+    """
+    prop_id: int
+    r"""
+    Getter:
+    @brief Gets the properties ID associated with the object
+
+    Setter:
+    @brief Sets the properties ID of the object
+    """
+    @overload
+    @classmethod
+    def new(cls, path: DPath, properties: Dict[Any, Any]) -> DPathWithProperties:
+        r"""
+        @brief Creates a new object from a property-less object and a properties hash.
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, path: DPath, properties_id: Optional[int] = ...) -> DPathWithProperties:
+        r"""
+        @brief Creates a new object from a property-less object and a properties ID.
+        """
+        ...
+    @overload
+    def __init__(self, path: DPath, properties: Dict[Any, Any]) -> None:
+        r"""
+        @brief Creates a new object from a property-less object and a properties hash.
+        """
+        ...
+    @overload
+    def __init__(self, path: DPath, properties_id: Optional[int] = ...) -> None:
+        r"""
+        @brief Creates a new object from a property-less object and a properties ID.
+        """
+        ...
+    def __mul__(self, f: float) -> DPathWithProperties:
+        r"""
+        @brief Scales the object by some factor
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and, if necessary, rounded.
+        """
+        ...
+    def __repr__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    def __rmul__(self, f: float) -> DPathWithProperties:
+        r"""
+        @brief Scales the object by some factor
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and, if necessary, rounded.
+        """
+        ...
+    def __str__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    def _assign(self, other: DPath) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+        ...
+    def _const_cast(self) -> DPathWithProperties:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _dup(self) -> DPathWithProperties:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DPathWithProperties:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def delete_property(self, key: Any) -> None:
+        r"""
+        @brief Deletes the user property with the given key
+        This method is a convenience method that deletes the property with the given key. It does nothing if no property with that key exists. Using that method is more convenient than creating a new property set with a new ID and assigning that properties ID.
+        This method may change the properties ID.
+        """
+        ...
+    def downcast(self) -> DPath:
+        r"""
+        @brief Gets the corresponding object without the properties
+        """
+        ...
+    @overload
+    def move(self, dx: Optional[float] = ..., dy: Optional[float] = ...) -> DPathWithProperties:
+        r"""
+        @brief Moves the object.
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is overwritten.
+
+        @param dx The x distance to move the object.
+        @param dy The y distance to move the object.
+
+        @return The moved object (self).
+        """
+        ...
+    @overload
+    def move(self, v: DVector) -> DPathWithProperties:
+        r"""
+        @brief Moves the object.
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is overwritten.
+
+        @param v The distance to move the object.
+
+        @return The moved object (self).
+        """
+        ...
+    @overload
+    def moved(self, dx: Optional[float] = ..., dy: Optional[float] = ...) -> DPathWithProperties:
+        r"""
+        @brief Returns the moved object (does not modify self)
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is not modified.
+
+        @param dx The x distance to move the object.
+        @param dy The y distance to move the object.
+
+        @return The moved object.
+        """
+        ...
+    @overload
+    def moved(self, v: DVector) -> DPathWithProperties:
+        r"""
+        @brief Returns the moved object
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is not modified.
+
+        @param v The distance to move the object.
+
+        @return The moved object.
+        """
+        ...
+    def properties(self) -> Any:
+        r"""
+        @brief Gets the user properties
+        This method is a convenience method that gets the properties of the shape as a single hash.
+        """
+        ...
+    def property(self, key: Any) -> Any:
+        r"""
+        @brief Gets the user property with the given key
+        This method is a convenience method that gets the user property with the given key. If no property with that key does not exist, it will return nil. Using that method is more convenient than using the layout object and the properties ID to retrieve the property value. 
+        """
+        ...
+    def set_property(self, key: Any, value: Any) -> None:
+        r"""
+        @brief Sets the user property with the given key to the given value
+        This method is a convenience method that sets the user property with the given key to the given value. If no property with that key exists, it will create one. Using that method is more convenient than creating a new property set with a new ID and assigning that properties ID.
+        This method may change the properties ID. Note: GDS only supports integer keys. OASIS supports numeric and string keys.
+        """
+        ...
+    def to_s(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    @overload
+    def transform(self, t: DCplxTrans) -> None:
+        r"""
+        @brief Transforms the object (in-place version)
+        """
+        ...
+    @overload
+    def transform(self, t: DTrans) -> None:
+        r"""
+        @brief Transforms the object (in-place version)
+        """
+        ...
+    @overload
+    def transformed(self, t: DCplxTrans) -> DPathWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    @overload
+    def transformed(self, t: DTrans) -> DPathWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    @overload
+    def transformed(self, t: VCplxTrans) -> PathWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
         """
         ...
     ...
@@ -12462,6 +14315,265 @@ class DPolygon:
         ...
     ...
 
+class DPolygonWithProperties(DPolygon):
+    r"""
+    @brief A DPolygon object with properties attached.
+    This class represents a combination of a DPolygon object an user properties. User properties are stored in form of a properties ID. Convenience methods are provided to manipulate or retrieve user properties directly.
+
+    This class has been introduced in version 0.30.
+    """
+    prop_id: int
+    r"""
+    Getter:
+    @brief Gets the properties ID associated with the object
+
+    Setter:
+    @brief Sets the properties ID of the object
+    """
+    @overload
+    @classmethod
+    def new(cls, polygon: DPolygon, properties: Dict[Any, Any]) -> DPolygonWithProperties:
+        r"""
+        @brief Creates a new object from a property-less object and a properties hash.
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, polygon: DPolygon, properties_id: Optional[int] = ...) -> DPolygonWithProperties:
+        r"""
+        @brief Creates a new object from a property-less object and a properties ID.
+        """
+        ...
+    @overload
+    def __init__(self, polygon: DPolygon, properties: Dict[Any, Any]) -> None:
+        r"""
+        @brief Creates a new object from a property-less object and a properties hash.
+        """
+        ...
+    @overload
+    def __init__(self, polygon: DPolygon, properties_id: Optional[int] = ...) -> None:
+        r"""
+        @brief Creates a new object from a property-less object and a properties ID.
+        """
+        ...
+    def __mul__(self, f: float) -> DPolygonWithProperties:
+        r"""
+        @brief Scales the object by some factor
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and, if necessary, rounded.
+        """
+        ...
+    def __repr__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    def __rmul__(self, f: float) -> DPolygonWithProperties:
+        r"""
+        @brief Scales the object by some factor
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and, if necessary, rounded.
+        """
+        ...
+    def __str__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    def _assign(self, other: DPolygon) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+        ...
+    def _const_cast(self) -> DPolygonWithProperties:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _dup(self) -> DPolygonWithProperties:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DPolygonWithProperties:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def delete_property(self, key: Any) -> None:
+        r"""
+        @brief Deletes the user property with the given key
+        This method is a convenience method that deletes the property with the given key. It does nothing if no property with that key exists. Using that method is more convenient than creating a new property set with a new ID and assigning that properties ID.
+        This method may change the properties ID.
+        """
+        ...
+    def downcast(self) -> DPolygon:
+        r"""
+        @brief Gets the corresponding object without the properties
+        """
+        ...
+    @overload
+    def move(self, dx: Optional[float] = ..., dy: Optional[float] = ...) -> DPolygonWithProperties:
+        r"""
+        @brief Moves the object.
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is overwritten.
+
+        @param dx The x distance to move the object.
+        @param dy The y distance to move the object.
+
+        @return The moved object (self).
+        """
+        ...
+    @overload
+    def move(self, v: DVector) -> DPolygonWithProperties:
+        r"""
+        @brief Moves the object.
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is overwritten.
+
+        @param v The distance to move the object.
+
+        @return The moved object (self).
+        """
+        ...
+    @overload
+    def moved(self, dx: Optional[float] = ..., dy: Optional[float] = ...) -> DPolygonWithProperties:
+        r"""
+        @brief Returns the moved object (does not modify self)
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is not modified.
+
+        @param dx The x distance to move the object.
+        @param dy The y distance to move the object.
+
+        @return The moved object.
+        """
+        ...
+    @overload
+    def moved(self, v: DVector) -> DPolygonWithProperties:
+        r"""
+        @brief Returns the moved object
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is not modified.
+
+        @param v The distance to move the object.
+
+        @return The moved object.
+        """
+        ...
+    def properties(self) -> Any:
+        r"""
+        @brief Gets the user properties
+        This method is a convenience method that gets the properties of the shape as a single hash.
+        """
+        ...
+    def property(self, key: Any) -> Any:
+        r"""
+        @brief Gets the user property with the given key
+        This method is a convenience method that gets the user property with the given key. If no property with that key does not exist, it will return nil. Using that method is more convenient than using the layout object and the properties ID to retrieve the property value. 
+        """
+        ...
+    def set_property(self, key: Any, value: Any) -> None:
+        r"""
+        @brief Sets the user property with the given key to the given value
+        This method is a convenience method that sets the user property with the given key to the given value. If no property with that key exists, it will create one. Using that method is more convenient than creating a new property set with a new ID and assigning that properties ID.
+        This method may change the properties ID. Note: GDS only supports integer keys. OASIS supports numeric and string keys.
+        """
+        ...
+    def to_s(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    @overload
+    def transform(self, t: DCplxTrans) -> None:
+        r"""
+        @brief Transforms the object (in-place version)
+        """
+        ...
+    @overload
+    def transform(self, t: DTrans) -> None:
+        r"""
+        @brief Transforms the object (in-place version)
+        """
+        ...
+    @overload
+    def transformed(self, t: DCplxTrans) -> DPolygonWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    @overload
+    def transformed(self, t: DTrans) -> DPolygonWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    @overload
+    def transformed(self, t: VCplxTrans) -> PolygonWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    ...
+
 class DSimplePolygon:
     r"""
     @brief A simple polygon class
@@ -13122,6 +15234,265 @@ class DSimplePolygon:
         ...
     ...
 
+class DSimplePolygonWithProperties(DSimplePolygon):
+    r"""
+    @brief A DSimplePolygon object with properties attached.
+    This class represents a combination of a DSimplePolygon object an user properties. User properties are stored in form of a properties ID. Convenience methods are provided to manipulate or retrieve user properties directly.
+
+    This class has been introduced in version 0.30.
+    """
+    prop_id: int
+    r"""
+    Getter:
+    @brief Gets the properties ID associated with the object
+
+    Setter:
+    @brief Sets the properties ID of the object
+    """
+    @overload
+    @classmethod
+    def new(cls, polygon: DSimplePolygon, properties: Dict[Any, Any]) -> DSimplePolygonWithProperties:
+        r"""
+        @brief Creates a new object from a property-less object and a properties hash.
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, polygon: DSimplePolygon, properties_id: Optional[int] = ...) -> DSimplePolygonWithProperties:
+        r"""
+        @brief Creates a new object from a property-less object and a properties ID.
+        """
+        ...
+    @overload
+    def __init__(self, polygon: DSimplePolygon, properties: Dict[Any, Any]) -> None:
+        r"""
+        @brief Creates a new object from a property-less object and a properties hash.
+        """
+        ...
+    @overload
+    def __init__(self, polygon: DSimplePolygon, properties_id: Optional[int] = ...) -> None:
+        r"""
+        @brief Creates a new object from a property-less object and a properties ID.
+        """
+        ...
+    def __mul__(self, f: float) -> DSimplePolygonWithProperties:
+        r"""
+        @brief Scales the object by some factor
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and, if necessary, rounded.
+        """
+        ...
+    def __repr__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    def __rmul__(self, f: float) -> DSimplePolygonWithProperties:
+        r"""
+        @brief Scales the object by some factor
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and, if necessary, rounded.
+        """
+        ...
+    def __str__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    def _assign(self, other: DSimplePolygon) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+        ...
+    def _const_cast(self) -> DSimplePolygonWithProperties:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _dup(self) -> DSimplePolygonWithProperties:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DSimplePolygonWithProperties:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def delete_property(self, key: Any) -> None:
+        r"""
+        @brief Deletes the user property with the given key
+        This method is a convenience method that deletes the property with the given key. It does nothing if no property with that key exists. Using that method is more convenient than creating a new property set with a new ID and assigning that properties ID.
+        This method may change the properties ID.
+        """
+        ...
+    def downcast(self) -> DSimplePolygon:
+        r"""
+        @brief Gets the corresponding object without the properties
+        """
+        ...
+    @overload
+    def move(self, dx: Optional[float] = ..., dy: Optional[float] = ...) -> DSimplePolygonWithProperties:
+        r"""
+        @brief Moves the object.
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is overwritten.
+
+        @param dx The x distance to move the object.
+        @param dy The y distance to move the object.
+
+        @return The moved object (self).
+        """
+        ...
+    @overload
+    def move(self, v: DVector) -> DSimplePolygonWithProperties:
+        r"""
+        @brief Moves the object.
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is overwritten.
+
+        @param v The distance to move the object.
+
+        @return The moved object (self).
+        """
+        ...
+    @overload
+    def moved(self, dx: Optional[float] = ..., dy: Optional[float] = ...) -> DSimplePolygonWithProperties:
+        r"""
+        @brief Returns the moved object (does not modify self)
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is not modified.
+
+        @param dx The x distance to move the object.
+        @param dy The y distance to move the object.
+
+        @return The moved object.
+        """
+        ...
+    @overload
+    def moved(self, v: DVector) -> DSimplePolygonWithProperties:
+        r"""
+        @brief Returns the moved object
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is not modified.
+
+        @param v The distance to move the object.
+
+        @return The moved object.
+        """
+        ...
+    def properties(self) -> Any:
+        r"""
+        @brief Gets the user properties
+        This method is a convenience method that gets the properties of the shape as a single hash.
+        """
+        ...
+    def property(self, key: Any) -> Any:
+        r"""
+        @brief Gets the user property with the given key
+        This method is a convenience method that gets the user property with the given key. If no property with that key does not exist, it will return nil. Using that method is more convenient than using the layout object and the properties ID to retrieve the property value. 
+        """
+        ...
+    def set_property(self, key: Any, value: Any) -> None:
+        r"""
+        @brief Sets the user property with the given key to the given value
+        This method is a convenience method that sets the user property with the given key to the given value. If no property with that key exists, it will create one. Using that method is more convenient than creating a new property set with a new ID and assigning that properties ID.
+        This method may change the properties ID. Note: GDS only supports integer keys. OASIS supports numeric and string keys.
+        """
+        ...
+    def to_s(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    @overload
+    def transform(self, t: DCplxTrans) -> None:
+        r"""
+        @brief Transforms the object (in-place version)
+        """
+        ...
+    @overload
+    def transform(self, t: DTrans) -> None:
+        r"""
+        @brief Transforms the object (in-place version)
+        """
+        ...
+    @overload
+    def transformed(self, t: DCplxTrans) -> DSimplePolygonWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    @overload
+    def transformed(self, t: DTrans) -> DSimplePolygonWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    @overload
+    def transformed(self, t: VCplxTrans) -> SimplePolygonWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    ...
+
 class DText:
     r"""
     @brief A text object
@@ -13642,6 +16013,265 @@ class DText:
         ...
     ...
 
+class DTextWithProperties(DText):
+    r"""
+    @brief A DText object with properties attached.
+    This class represents a combination of a DText object an user properties. User properties are stored in form of a properties ID. Convenience methods are provided to manipulate or retrieve user properties directly.
+
+    This class has been introduced in version 0.30.
+    """
+    prop_id: int
+    r"""
+    Getter:
+    @brief Gets the properties ID associated with the object
+
+    Setter:
+    @brief Sets the properties ID of the object
+    """
+    @overload
+    @classmethod
+    def new(cls, text: DText, properties: Dict[Any, Any]) -> DTextWithProperties:
+        r"""
+        @brief Creates a new object from a property-less object and a properties hash.
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, text: DText, properties_id: Optional[int] = ...) -> DTextWithProperties:
+        r"""
+        @brief Creates a new object from a property-less object and a properties ID.
+        """
+        ...
+    @overload
+    def __init__(self, text: DText, properties: Dict[Any, Any]) -> None:
+        r"""
+        @brief Creates a new object from a property-less object and a properties hash.
+        """
+        ...
+    @overload
+    def __init__(self, text: DText, properties_id: Optional[int] = ...) -> None:
+        r"""
+        @brief Creates a new object from a property-less object and a properties ID.
+        """
+        ...
+    def __mul__(self, f: float) -> DTextWithProperties:
+        r"""
+        @brief Scales the object by some factor
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and, if necessary, rounded.
+        """
+        ...
+    def __repr__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    def __rmul__(self, f: float) -> DTextWithProperties:
+        r"""
+        @brief Scales the object by some factor
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and, if necessary, rounded.
+        """
+        ...
+    def __str__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    def _assign(self, other: DText) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+        ...
+    def _const_cast(self) -> DTextWithProperties:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _dup(self) -> DTextWithProperties:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> DTextWithProperties:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def delete_property(self, key: Any) -> None:
+        r"""
+        @brief Deletes the user property with the given key
+        This method is a convenience method that deletes the property with the given key. It does nothing if no property with that key exists. Using that method is more convenient than creating a new property set with a new ID and assigning that properties ID.
+        This method may change the properties ID.
+        """
+        ...
+    def downcast(self) -> DText:
+        r"""
+        @brief Gets the corresponding object without the properties
+        """
+        ...
+    @overload
+    def move(self, dx: Optional[float] = ..., dy: Optional[float] = ...) -> DTextWithProperties:
+        r"""
+        @brief Moves the object.
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is overwritten.
+
+        @param dx The x distance to move the object.
+        @param dy The y distance to move the object.
+
+        @return The moved object (self).
+        """
+        ...
+    @overload
+    def move(self, v: DVector) -> DTextWithProperties:
+        r"""
+        @brief Moves the object.
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is overwritten.
+
+        @param v The distance to move the object.
+
+        @return The moved object (self).
+        """
+        ...
+    @overload
+    def moved(self, dx: Optional[float] = ..., dy: Optional[float] = ...) -> DTextWithProperties:
+        r"""
+        @brief Returns the moved object (does not modify self)
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is not modified.
+
+        @param dx The x distance to move the object.
+        @param dy The y distance to move the object.
+
+        @return The moved object.
+        """
+        ...
+    @overload
+    def moved(self, v: DVector) -> DTextWithProperties:
+        r"""
+        @brief Returns the moved object
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is not modified.
+
+        @param v The distance to move the object.
+
+        @return The moved object.
+        """
+        ...
+    def properties(self) -> Any:
+        r"""
+        @brief Gets the user properties
+        This method is a convenience method that gets the properties of the shape as a single hash.
+        """
+        ...
+    def property(self, key: Any) -> Any:
+        r"""
+        @brief Gets the user property with the given key
+        This method is a convenience method that gets the user property with the given key. If no property with that key does not exist, it will return nil. Using that method is more convenient than using the layout object and the properties ID to retrieve the property value. 
+        """
+        ...
+    def set_property(self, key: Any, value: Any) -> None:
+        r"""
+        @brief Sets the user property with the given key to the given value
+        This method is a convenience method that sets the user property with the given key to the given value. If no property with that key exists, it will create one. Using that method is more convenient than creating a new property set with a new ID and assigning that properties ID.
+        This method may change the properties ID. Note: GDS only supports integer keys. OASIS supports numeric and string keys.
+        """
+        ...
+    def to_s(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    @overload
+    def transform(self, t: DCplxTrans) -> None:
+        r"""
+        @brief Transforms the object (in-place version)
+        """
+        ...
+    @overload
+    def transform(self, t: DTrans) -> None:
+        r"""
+        @brief Transforms the object (in-place version)
+        """
+        ...
+    @overload
+    def transformed(self, t: DCplxTrans) -> DTextWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    @overload
+    def transformed(self, t: DTrans) -> DTextWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    @overload
+    def transformed(self, t: VCplxTrans) -> TextWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    ...
+
 class DTrans:
     r"""
     @brief A simple transformation
@@ -13992,6 +16622,19 @@ class DTrans:
         """
         ...
     @overload
+    def __mul__(self, box: DBoxWithProperties) -> DBoxWithProperties:
+        r"""
+        @brief Transforms a box with properties
+
+        't*box' or 't.trans(box)' is equivalent to box.transformed(t).
+
+        @param box The box to transform
+        @return The transformed box
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def __mul__(self, d: float) -> float:
         r"""
         @brief Transforms a single distance
@@ -14017,6 +16660,45 @@ class DTrans:
         @return The transformed edge
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def __mul__(self, edge: DEdgeWithProperties) -> DEdgeWithProperties:
+        r"""
+        @brief Transforms an edge with properties
+
+        't*edge' or 't.trans(edge)' is equivalent to edge.transformed(t).
+
+        @param edge The edge to transform
+        @return The transformed edge
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def __mul__(self, edge_pair: DEdgePair) -> DEdgePair:
+        r"""
+        @brief Transforms an edge pair
+
+        't*edge_pair' or 't.trans(edge_pair)' is equivalent to edge_pair.transformed(t).
+
+        @param edge_pair The edge pair to transform
+        @return The transformed edge pair
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def __mul__(self, edge_pair: DEdgePairWithProperties) -> DEdgePairWithProperties:
+        r"""
+        @brief Transforms an edge pair with properties
+
+        't*edge_pair' or 't.trans(edge_pair)' is equivalent to edge_pair.transformed(t).
+
+        @param edge_pair The edge pair to transform
+        @return The transformed edge pair
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     @overload
@@ -14047,6 +16729,19 @@ class DTrans:
         """
         ...
     @overload
+    def __mul__(self, path: DPathWithProperties) -> DPathWithProperties:
+        r"""
+        @brief Transforms a path with properties
+
+        't*path' or 't.trans(path)' is equivalent to path.transformed(t).
+
+        @param path The path to transform
+        @return The transformed path
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def __mul__(self, polygon: DPolygon) -> DPolygon:
         r"""
         @brief Transforms a polygon
@@ -14057,6 +16752,45 @@ class DTrans:
         @return The transformed polygon
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def __mul__(self, polygon: DPolygonWithProperties) -> DPolygonWithProperties:
+        r"""
+        @brief Transforms a polygon with properties
+
+        't*polygon' or 't.trans(polygon)' is equivalent to polygon.transformed(t).
+
+        @param polygon The polygon to transform
+        @return The transformed polygon
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def __mul__(self, simple_polygon: DSimplePolygon) -> DSimplePolygon:
+        r"""
+        @brief Transforms a simple polygon
+
+        't*polygon' or 't.trans(simple_polygon)' is equivalent to simple_polygon.transformed(t).
+
+        @param simple_polygon The simple polygon to transform
+        @return The transformed simple polygon
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def __mul__(self, simple_polygon: DSimplePolygonWithProperties) -> DSimplePolygonWithProperties:
+        r"""
+        @brief Transforms a simple polygon with properties
+
+        't*polygon' or 't.trans(simple_polygon)' is equivalent to simple_polygon.transformed(t).
+
+        @param simple_polygon The simple polygon to transform
+        @return The transformed simple polygon
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     @overload
@@ -14081,6 +16815,19 @@ class DTrans:
         @return The transformed text
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def __mul__(self, text: DTextWithProperties) -> DTextWithProperties:
+        r"""
+        @brief Transforms a text with properties
+
+        't*text' or 't.trans(text)' is equivalent to text.transformed(t).
+
+        @param text The text to transform
+        @return The transformed text
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     @overload
@@ -14124,6 +16871,19 @@ class DTrans:
         """
         ...
     @overload
+    def __rmul__(self, box: DBoxWithProperties) -> DBoxWithProperties:
+        r"""
+        @brief Transforms a box with properties
+
+        't*box' or 't.trans(box)' is equivalent to box.transformed(t).
+
+        @param box The box to transform
+        @return The transformed box
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def __rmul__(self, d: float) -> float:
         r"""
         @brief Transforms a single distance
@@ -14149,6 +16909,45 @@ class DTrans:
         @return The transformed edge
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def __rmul__(self, edge: DEdgeWithProperties) -> DEdgeWithProperties:
+        r"""
+        @brief Transforms an edge with properties
+
+        't*edge' or 't.trans(edge)' is equivalent to edge.transformed(t).
+
+        @param edge The edge to transform
+        @return The transformed edge
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def __rmul__(self, edge_pair: DEdgePair) -> DEdgePair:
+        r"""
+        @brief Transforms an edge pair
+
+        't*edge_pair' or 't.trans(edge_pair)' is equivalent to edge_pair.transformed(t).
+
+        @param edge_pair The edge pair to transform
+        @return The transformed edge pair
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def __rmul__(self, edge_pair: DEdgePairWithProperties) -> DEdgePairWithProperties:
+        r"""
+        @brief Transforms an edge pair with properties
+
+        't*edge_pair' or 't.trans(edge_pair)' is equivalent to edge_pair.transformed(t).
+
+        @param edge_pair The edge pair to transform
+        @return The transformed edge pair
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     @overload
@@ -14179,6 +16978,19 @@ class DTrans:
         """
         ...
     @overload
+    def __rmul__(self, path: DPathWithProperties) -> DPathWithProperties:
+        r"""
+        @brief Transforms a path with properties
+
+        't*path' or 't.trans(path)' is equivalent to path.transformed(t).
+
+        @param path The path to transform
+        @return The transformed path
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def __rmul__(self, polygon: DPolygon) -> DPolygon:
         r"""
         @brief Transforms a polygon
@@ -14192,6 +17004,45 @@ class DTrans:
         """
         ...
     @overload
+    def __rmul__(self, polygon: DPolygonWithProperties) -> DPolygonWithProperties:
+        r"""
+        @brief Transforms a polygon with properties
+
+        't*polygon' or 't.trans(polygon)' is equivalent to polygon.transformed(t).
+
+        @param polygon The polygon to transform
+        @return The transformed polygon
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def __rmul__(self, simple_polygon: DSimplePolygon) -> DSimplePolygon:
+        r"""
+        @brief Transforms a simple polygon
+
+        't*polygon' or 't.trans(simple_polygon)' is equivalent to simple_polygon.transformed(t).
+
+        @param simple_polygon The simple polygon to transform
+        @return The transformed simple polygon
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def __rmul__(self, simple_polygon: DSimplePolygonWithProperties) -> DSimplePolygonWithProperties:
+        r"""
+        @brief Transforms a simple polygon with properties
+
+        't*polygon' or 't.trans(simple_polygon)' is equivalent to simple_polygon.transformed(t).
+
+        @param simple_polygon The simple polygon to transform
+        @return The transformed simple polygon
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def __rmul__(self, text: DText) -> DText:
         r"""
         @brief Transforms a text
@@ -14202,6 +17053,19 @@ class DTrans:
         @return The transformed text
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def __rmul__(self, text: DTextWithProperties) -> DTextWithProperties:
+        r"""
+        @brief Transforms a text with properties
+
+        't*text' or 't.trans(text)' is equivalent to text.transformed(t).
+
+        @param text The text to transform
+        @return The transformed text
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     @overload
@@ -14397,6 +17261,19 @@ class DTrans:
         """
         ...
     @overload
+    def trans(self, box: DBoxWithProperties) -> DBoxWithProperties:
+        r"""
+        @brief Transforms a box with properties
+
+        't*box' or 't.trans(box)' is equivalent to box.transformed(t).
+
+        @param box The box to transform
+        @return The transformed box
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def trans(self, edge: DEdge) -> DEdge:
         r"""
         @brief Transforms an edge
@@ -14407,6 +17284,45 @@ class DTrans:
         @return The transformed edge
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def trans(self, edge: DEdgeWithProperties) -> DEdgeWithProperties:
+        r"""
+        @brief Transforms an edge with properties
+
+        't*edge' or 't.trans(edge)' is equivalent to edge.transformed(t).
+
+        @param edge The edge to transform
+        @return The transformed edge
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def trans(self, edge_pair: DEdgePair) -> DEdgePair:
+        r"""
+        @brief Transforms an edge pair
+
+        't*edge_pair' or 't.trans(edge_pair)' is equivalent to edge_pair.transformed(t).
+
+        @param edge_pair The edge pair to transform
+        @return The transformed edge pair
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def trans(self, edge_pair: DEdgePairWithProperties) -> DEdgePairWithProperties:
+        r"""
+        @brief Transforms an edge pair with properties
+
+        't*edge_pair' or 't.trans(edge_pair)' is equivalent to edge_pair.transformed(t).
+
+        @param edge_pair The edge pair to transform
+        @return The transformed edge pair
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     @overload
@@ -14437,6 +17353,19 @@ class DTrans:
         """
         ...
     @overload
+    def trans(self, path: DPathWithProperties) -> DPathWithProperties:
+        r"""
+        @brief Transforms a path with properties
+
+        't*path' or 't.trans(path)' is equivalent to path.transformed(t).
+
+        @param path The path to transform
+        @return The transformed path
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def trans(self, polygon: DPolygon) -> DPolygon:
         r"""
         @brief Transforms a polygon
@@ -14450,6 +17379,45 @@ class DTrans:
         """
         ...
     @overload
+    def trans(self, polygon: DPolygonWithProperties) -> DPolygonWithProperties:
+        r"""
+        @brief Transforms a polygon with properties
+
+        't*polygon' or 't.trans(polygon)' is equivalent to polygon.transformed(t).
+
+        @param polygon The polygon to transform
+        @return The transformed polygon
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def trans(self, simple_polygon: DSimplePolygon) -> DSimplePolygon:
+        r"""
+        @brief Transforms a simple polygon
+
+        't*polygon' or 't.trans(simple_polygon)' is equivalent to simple_polygon.transformed(t).
+
+        @param simple_polygon The simple polygon to transform
+        @return The transformed simple polygon
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def trans(self, simple_polygon: DSimplePolygonWithProperties) -> DSimplePolygonWithProperties:
+        r"""
+        @brief Transforms a simple polygon with properties
+
+        't*polygon' or 't.trans(simple_polygon)' is equivalent to simple_polygon.transformed(t).
+
+        @param simple_polygon The simple polygon to transform
+        @return The transformed simple polygon
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def trans(self, text: DText) -> DText:
         r"""
         @brief Transforms a text
@@ -14460,6 +17428,19 @@ class DTrans:
         @return The transformed text
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def trans(self, text: DTextWithProperties) -> DTextWithProperties:
+        r"""
+        @brief Transforms a text with properties
+
+        't*text' or 't.trans(text)' is equivalent to text.transformed(t).
+
+        @param text The text to transform
+        @return The transformed text
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     @overload
@@ -15453,7 +18434,7 @@ class Device(NetlistObject):
     @overload
     def net_for_terminal(self, terminal_name: str) -> Net:
         r"""
-        @brief Gets the net connected to the specified terminal (non-const version).
+        @brief Gets the net connected to the specified terminal.
         If the terminal is not connected, nil is returned for the net.
 
         This convenience method has been introduced in version 0.27.3.
@@ -15462,7 +18443,7 @@ class Device(NetlistObject):
     @overload
     def net_for_terminal(self, terminal_name: str) -> Net:
         r"""
-        @brief Gets the net connected to the specified terminal.
+        @brief Gets the net connected to the specified terminal (non-const version).
         If the terminal is not connected, nil is returned for the net.
 
         This convenience method has been introduced in version 0.27.3.
@@ -15492,6 +18473,42 @@ class Device(NetlistObject):
         r"""
         @brief Sets the parameter value for the given parameter name.
         If the parameter name is not valid, an exception is thrown.
+        """
+        ...
+    @overload
+    def terminal_ref(self, terminal_id: int) -> NetTerminalRef:
+        r"""
+        @brief Gets the terminal refeference for a specific terminal.
+        The terminal ref is the connector between a net and a device terminal. It knows the net the terminal is connected to and is useful to obtain the shapes making the terminal of the device. If the terminal is not connected, nil is returned for the net.
+
+        This method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def terminal_ref(self, terminal_id: int) -> NetTerminalRef:
+        r"""
+        @brief Gets the terminal refeference for a specific terminal (non-const version).
+        The terminal ref is the connector between a net and a device terminal. It knows the net the terminal is connected to and is useful to obtain the shapes making the terminal of the device. If the terminal is not connected, nil is returned for the net.
+
+        This method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def terminal_ref(self, terminal_name: str) -> NetTerminalRef:
+        r"""
+        @brief Gets the terminal refeference for a specific terminal where the terminal is given by name.
+        The terminal ref is the connector between a net and a device terminal. It knows the net the terminal is connected to and is useful to obtain the shapes making the terminal of the device. If the terminal is not connected, nil is returned for the net.
+
+        This method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def terminal_ref(self, terminal_name: str) -> NetTerminalRef:
+        r"""
+        @brief Gets the terminal refeference for a specific terminal where the terminal is given by name (non-const version).
+        The terminal ref is the connector between a net and a device terminal. It knows the net the terminal is connected to and is useful to obtain the shapes making the terminal of the device. If the terminal is not connected, nil is returned for the net.
+
+        This method has been introduced in version 0.30.
         """
         ...
     ...
@@ -19005,7 +22022,7 @@ class Edge:
         @return True, if the edge is 'less' as the other edge with respect to first and second point
         """
         ...
-    def __mul__(self, scale_factor: float) -> Edge:
+    def __mul__(self, scale_factor: float) -> DEdge:
         r"""
         @brief Scale edge
 
@@ -19032,7 +22049,7 @@ class Edge:
         The DBU argument has been added in version 0.27.6.
         """
         ...
-    def __rmul__(self, scale_factor: float) -> Edge:
+    def __rmul__(self, scale_factor: float) -> DEdge:
         r"""
         @brief Scale edge
 
@@ -19654,7 +22671,7 @@ class Edge:
         ...
     ...
 
-class EdgeFilter:
+class EdgeFilter(EdgeFilterBase):
     r"""
     @brief A generic edge filter adaptor
 
@@ -19691,47 +22708,6 @@ class EdgeFilter:
 
     This class has been introduced in version 0.29.
     """
-    requires_raw_input: bool
-    r"""
-    Getter:
-    @brief Gets a value indicating whether the filter needs raw (unmerged) input
-    See \requires_raw_input= for details.
-
-    Setter:
-    @brief Sets a value indicating whether the filter needs raw (unmerged) input
-    This flag must be set before using this filter. It tells the filter implementation whether the filter wants to have raw input (unmerged). The default value is 'false', meaning that
-    the filter will receive merged polygons ('merged semantics').
-
-    Setting this value to false potentially saves some CPU time needed for merging the polygons.
-    Also, raw input means that strange shapes such as dot-like edges, self-overlapping polygons, empty or degenerated polygons are preserved.
-    """
-    wants_variants: bool
-    r"""
-    Getter:
-    @brief Gets a value indicating whether the filter prefers cell variants
-    See \wants_variants= for details.
-
-    Setter:
-    @brief Sets a value indicating whether the filter prefers cell variants
-    This flag must be set before using this filter for hierarchical applications (deep mode). It tells the filter implementation whether cell variants should be created (true, the default) or shape propagation will be applied (false).
-
-    This decision needs to be made, if the filter indicates that it will deliver different results
-    for scaled or rotated versions of the shape (see \is_isotropic and the other hints). If a cell
-    is present with different qualities - as seen from the top cell - the respective instances
-    need to be differentiated. Cell variant formation is one way, shape propagation the other way.
-    Typically, cell variant formation is less expensive, but the hierarchy will be modified.
-    """
-    @classmethod
-    def new(cls) -> EdgeFilter:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
-    def __init__(self) -> None:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
     def _const_cast(self) -> EdgeFilter:
         r"""
         @brief Returns a non-const reference to self.
@@ -19776,6 +22752,157 @@ class EdgeFilter:
         """
         ...
     def _to_const_object(self) -> EdgeFilter:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    ...
+
+class EdgeFilterBase:
+    r"""
+    @hide
+    """
+    requires_raw_input: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the filter needs raw (unmerged) input
+    See \requires_raw_input= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the filter needs raw (unmerged) input
+    This flag must be set before using this filter. It tells the filter implementation whether the filter wants to have raw input (unmerged). The default value is 'false', meaning that
+    the filter will receive merged polygons ('merged semantics').
+
+    Setting this value to false potentially saves some CPU time needed for merging the polygons.
+    Also, raw input means that strange shapes such as dot-like edges, self-overlapping polygons, empty or degenerated polygons are preserved.
+    """
+    wants_variants: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the filter prefers cell variants
+    See \wants_variants= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the filter prefers cell variants
+    This flag must be set before using this filter for hierarchical applications (deep mode). It tells the filter implementation whether cell variants should be created (true, the default) or shape propagation will be applied (false).
+
+    This decision needs to be made, if the filter indicates that it will deliver different results
+    for scaled or rotated versions of the shape (see \is_isotropic and the other hints). If a cell
+    is present with different qualities - as seen from the top cell - the respective instances
+    need to be differentiated. Cell variant formation is one way, shape propagation the other way.
+    Typically, cell variant formation is less expensive, but the hierarchy will be modified.
+    """
+    @classmethod
+    def new(cls) -> EdgeFilterBase:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    @classmethod
+    def property_filter(cls, name: Any, value: Any, inverse: Optional[bool] = ...) -> EdgeFilterBase:
+        r"""
+        @brief Creates a single-valued property filter
+        @param name The name of the property to use.
+        @param value The value against which the property is checked (exact match).
+        @param inverse If true, inverts the selection - i.e. all edges without a property with the given name and value are selected.
+
+        Apply this filter with \Edges#filtered. See \property_glob for an example.
+
+        This feature has been introduced in version 0.30.
+        """
+        ...
+    @classmethod
+    def property_filter_bounded(cls, name: Any, from_: Any, to: Any, inverse: Optional[bool] = ...) -> EdgeFilterBase:
+        r"""
+        @brief Creates a single-valued property filter
+        @param name The name of the property to use.
+        @param from The lower value against which the property is checked or 'nil' if no lower bound shall be used.
+        @param to The upper value against which the property is checked or 'nil' if no upper bound shall be used.
+        @param inverse If true, inverts the selection - i.e. all edges without a property with the given name and value range are selected.
+
+        This version does a bounded match. The value of the propery needs to be larger or equal to 'from' and less than 'to'.
+        Apply this filter with \Edges#filtered. See \property_glob for an example.
+
+        This feature has been introduced in version 0.30.
+        """
+        ...
+    @classmethod
+    def property_glob(cls, name: Any, pattern: str, inverse: Optional[bool] = ..., case_sensitive: Optional[bool] = ...) -> EdgeFilterBase:
+        r"""
+        @brief Creates a single-valued property filter
+        @param name The name of the property to use.
+        @param value The glob pattern to match the property value against.
+        @param inverse If true, inverts the selection - i.e. all edges without a matching property are selected.
+        @param case_sensitive If true, the match is case sensitive (the default), if false, the match is not case sensitive.
+
+        Apply this filter with \Edges#filtered:
+
+        @code
+        # edges is a Edges object
+        # filtered_edges contains all edges where the 'net' property starts with 'C':
+        filtered_edges = edges.filtered(RBA::EdgeFilterBase::property_glob('net', 'C*'))
+        @/code
+
+        This feature has been introduced in version 0.30.
+        """
+        ...
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def _const_cast(self) -> EdgeFilterBase:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> EdgeFilterBase:
         r"""
         @hide
         """
@@ -20187,7 +23314,7 @@ class EdgeNeighborhoodVisitor(EdgeNeighborhoodVisitorBase):
         """
         ...
     @overload
-    def output(self, edge: Edge) -> None:
+    def output(self, edge: EdgeWithProperties) -> None:
         r"""
         @brief Outputs an edge
         Use this method from one of the callbacks (\on_edge, \begin_polygon, \end_polygon) to deliver a polygon. Note that you have to configure the result type as 'Edges' on construction of the visitor before being able to do so.
@@ -20195,7 +23322,7 @@ class EdgeNeighborhoodVisitor(EdgeNeighborhoodVisitorBase):
         """
         ...
     @overload
-    def output(self, edge_pair: EdgePair) -> None:
+    def output(self, edge_pair: EdgePairWithProperties) -> None:
         r"""
         @brief Outputs an edge pair
         Use this method from one of the callbacks (\on_edge, \begin_polygon, \end_polygon) to deliver a polygon. Note that you have to configure the result type as 'EdgePairs' on construction of the visitor before being able to do so.
@@ -20203,7 +23330,7 @@ class EdgeNeighborhoodVisitor(EdgeNeighborhoodVisitorBase):
         """
         ...
     @overload
-    def output(self, polygon: Polygon) -> None:
+    def output(self, polygon: PolygonWithProperties) -> None:
         r"""
         @brief Outputs a polygon
         Use this method from one of the callbacks (\on_edge, \begin_polygon, \end_polygon) to deliver a polygon. Note that you have to configure the result type as 'Region' on construction of the visitor before being able to do so.
@@ -20940,7 +24067,7 @@ class EdgePair:
         ...
     ...
 
-class EdgePairFilter:
+class EdgePairFilter(EdgePairFilterBase):
     r"""
     @brief A generic edge pair filter adaptor
 
@@ -20975,33 +24102,6 @@ class EdgePairFilter:
 
     This class has been introduced in version 0.29.
     """
-    wants_variants: bool
-    r"""
-    Getter:
-    @brief Gets a value indicating whether the filter prefers cell variants
-    See \wants_variants= for details.
-
-    Setter:
-    @brief Sets a value indicating whether the filter prefers cell variants
-    This flag must be set before using this filter for hierarchical applications (deep mode). It tells the filter implementation whether cell variants should be created (true, the default) or shape propagation will be applied (false).
-
-    This decision needs to be made, if the filter indicates that it will deliver different results
-    for scaled or rotated versions of the shape (see \is_isotropic and the other hints). If a cell
-    is present with different qualities - as seen from the top cell - the respective instances
-    need to be differentiated. Cell variant formation is one way, shape propagation the other way.
-    Typically, cell variant formation is less expensive, but the hierarchy will be modified.
-    """
-    @classmethod
-    def new(cls) -> EdgePairFilter:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
-    def __init__(self) -> None:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
     def _const_cast(self) -> EdgePairFilter:
         r"""
         @brief Returns a non-const reference to self.
@@ -21046,6 +24146,157 @@ class EdgePairFilter:
         """
         ...
     def _to_const_object(self) -> EdgePairFilter:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    ...
+
+class EdgePairFilterBase:
+    r"""
+    @hide
+    """
+    requires_raw_input: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the filter needs raw (unmerged) input
+    See \requires_raw_input= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the filter needs raw (unmerged) input
+    This flag must be set before using this filter. It tells the filter implementation whether the filter wants to have raw input (unmerged). The default value is 'false', meaning that
+    the filter will receive merged polygons ('merged semantics').
+
+    Setting this value to false potentially saves some CPU time needed for merging the polygons.
+    Also, raw input means that strange shapes such as dot-like edges, self-overlapping polygons, empty or degenerated polygons are preserved.
+    """
+    wants_variants: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the filter prefers cell variants
+    See \wants_variants= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the filter prefers cell variants
+    This flag must be set before using this filter for hierarchical applications (deep mode). It tells the filter implementation whether cell variants should be created (true, the default) or shape propagation will be applied (false).
+
+    This decision needs to be made, if the filter indicates that it will deliver different results
+    for scaled or rotated versions of the shape (see \is_isotropic and the other hints). If a cell
+    is present with different qualities - as seen from the top cell - the respective instances
+    need to be differentiated. Cell variant formation is one way, shape propagation the other way.
+    Typically, cell variant formation is less expensive, but the hierarchy will be modified.
+    """
+    @classmethod
+    def new(cls) -> EdgePairFilterBase:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    @classmethod
+    def property_filter(cls, name: Any, value: Any, inverse: Optional[bool] = ...) -> EdgePairFilterBase:
+        r"""
+        @brief Creates a single-valued property filter
+        @param name The name of the property to use.
+        @param value The value against which the property is checked (exact match).
+        @param inverse If true, inverts the selection - i.e. all edge pairs without a property with the given name and value are selected.
+
+        Apply this filter with \EdgePairs#filtered. See \property_glob for an example.
+
+        This feature has been introduced in version 0.30.
+        """
+        ...
+    @classmethod
+    def property_filter_bounded(cls, name: Any, from_: Any, to: Any, inverse: Optional[bool] = ...) -> EdgePairFilterBase:
+        r"""
+        @brief Creates a single-valued property filter
+        @param name The name of the property to use.
+        @param from The lower value against which the property is checked or 'nil' if no lower bound shall be used.
+        @param to The upper value against which the property is checked or 'nil' if no upper bound shall be used.
+        @param inverse If true, inverts the selection - i.e. all edge pairs without a property with the given name and value range are selected.
+
+        This version does a bounded match. The value of the propery needs to be larger or equal to 'from' and less than 'to'.
+        Apply this filter with \EdgePairs#filtered. See \property_glob for an example.
+
+        This feature has been introduced in version 0.30.
+        """
+        ...
+    @classmethod
+    def property_glob(cls, name: Any, pattern: str, inverse: Optional[bool] = ..., case_sensitive: Optional[bool] = ...) -> EdgePairFilterBase:
+        r"""
+        @brief Creates a single-valued property filter
+        @param name The name of the property to use.
+        @param value The glob pattern to match the property value against.
+        @param inverse If true, inverts the selection - i.e. all edge pairs without a matching property are selected.
+        @param case_sensitive If true, the match is case sensitive (the default), if false, the match is not case sensitive.
+
+        Apply this filter with \EdgePairs#filtered:
+
+        @code
+        # edge_pairs is a EdgePairs object
+        # filtered_edge_pairs contains all edge pairs where the 'net' property starts with 'C':
+        filtered_edge_pairs = edge_pairs.filtered(RBA::EdgePairFilterBase::property_glob('net', 'C*'))
+        @/code
+
+        This feature has been introduced in version 0.30.
+        """
+        ...
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def _const_cast(self) -> EdgePairFilterBase:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> EdgePairFilterBase:
         r"""
         @hide
         """
@@ -21591,6 +24842,265 @@ class EdgePairToPolygonOperator:
         ...
     ...
 
+class EdgePairWithProperties(EdgePair):
+    r"""
+    @brief A EdgePair object with properties attached.
+    This class represents a combination of a EdgePair object an user properties. User properties are stored in form of a properties ID. Convenience methods are provided to manipulate or retrieve user properties directly.
+
+    This class has been introduced in version 0.30.
+    """
+    prop_id: int
+    r"""
+    Getter:
+    @brief Gets the properties ID associated with the object
+
+    Setter:
+    @brief Sets the properties ID of the object
+    """
+    @overload
+    @classmethod
+    def new(cls, edge_pair: EdgePair, properties: Dict[Any, Any]) -> EdgePairWithProperties:
+        r"""
+        @brief Creates a new object from a property-less object and a properties hash.
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, edge_pair: EdgePair, properties_id: Optional[int] = ...) -> EdgePairWithProperties:
+        r"""
+        @brief Creates a new object from a property-less object and a properties ID.
+        """
+        ...
+    @overload
+    def __init__(self, edge_pair: EdgePair, properties: Dict[Any, Any]) -> None:
+        r"""
+        @brief Creates a new object from a property-less object and a properties hash.
+        """
+        ...
+    @overload
+    def __init__(self, edge_pair: EdgePair, properties_id: Optional[int] = ...) -> None:
+        r"""
+        @brief Creates a new object from a property-less object and a properties ID.
+        """
+        ...
+    def __mul__(self, f: float) -> EdgePairWithProperties:
+        r"""
+        @brief Scales the object by some factor
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and, if necessary, rounded.
+        """
+        ...
+    def __repr__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    def __rmul__(self, f: float) -> EdgePairWithProperties:
+        r"""
+        @brief Scales the object by some factor
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and, if necessary, rounded.
+        """
+        ...
+    def __str__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    def _assign(self, other: EdgePair) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+        ...
+    def _const_cast(self) -> EdgePairWithProperties:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _dup(self) -> EdgePairWithProperties:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> EdgePairWithProperties:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def delete_property(self, key: Any) -> None:
+        r"""
+        @brief Deletes the user property with the given key
+        This method is a convenience method that deletes the property with the given key. It does nothing if no property with that key exists. Using that method is more convenient than creating a new property set with a new ID and assigning that properties ID.
+        This method may change the properties ID.
+        """
+        ...
+    def downcast(self) -> EdgePair:
+        r"""
+        @brief Gets the corresponding object without the properties
+        """
+        ...
+    @overload
+    def move(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> EdgePairWithProperties:
+        r"""
+        @brief Moves the object.
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is overwritten.
+
+        @param dx The x distance to move the object.
+        @param dy The y distance to move the object.
+
+        @return The moved object (self).
+        """
+        ...
+    @overload
+    def move(self, v: Vector) -> EdgePairWithProperties:
+        r"""
+        @brief Moves the object.
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is overwritten.
+
+        @param v The distance to move the object.
+
+        @return The moved object (self).
+        """
+        ...
+    @overload
+    def moved(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> EdgePairWithProperties:
+        r"""
+        @brief Returns the moved object (does not modify self)
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is not modified.
+
+        @param dx The x distance to move the object.
+        @param dy The y distance to move the object.
+
+        @return The moved object.
+        """
+        ...
+    @overload
+    def moved(self, v: Vector) -> EdgePairWithProperties:
+        r"""
+        @brief Returns the moved object
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is not modified.
+
+        @param v The distance to move the object.
+
+        @return The moved object.
+        """
+        ...
+    def properties(self) -> Any:
+        r"""
+        @brief Gets the user properties
+        This method is a convenience method that gets the properties of the shape as a single hash.
+        """
+        ...
+    def property(self, key: Any) -> Any:
+        r"""
+        @brief Gets the user property with the given key
+        This method is a convenience method that gets the user property with the given key. If no property with that key does not exist, it will return nil. Using that method is more convenient than using the layout object and the properties ID to retrieve the property value. 
+        """
+        ...
+    def set_property(self, key: Any, value: Any) -> None:
+        r"""
+        @brief Sets the user property with the given key to the given value
+        This method is a convenience method that sets the user property with the given key to the given value. If no property with that key exists, it will create one. Using that method is more convenient than creating a new property set with a new ID and assigning that properties ID.
+        This method may change the properties ID. Note: GDS only supports integer keys. OASIS supports numeric and string keys.
+        """
+        ...
+    def to_s(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    @overload
+    def transform(self, t: ICplxTrans) -> None:
+        r"""
+        @brief Transforms the object (in-place version)
+        """
+        ...
+    @overload
+    def transform(self, t: Trans) -> None:
+        r"""
+        @brief Transforms the object (in-place version)
+        """
+        ...
+    @overload
+    def transformed(self, t: CplxTrans) -> DEdgePairWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    @overload
+    def transformed(self, t: ICplxTrans) -> EdgePairWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    @overload
+    def transformed(self, t: Trans) -> EdgePairWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    ...
+
 class EdgePairs(ShapeCollection):
     r"""
     @brief EdgePairs (a collection of edge pairs)
@@ -21606,6 +25116,13 @@ class EdgePairs(ShapeCollection):
         @brief Default constructor
 
         This constructor creates an empty edge pair collection.
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, array: Sequence[EdgePairWithProperties], dummy: Optional[bool] = ...) -> EdgePairs:
+        r"""
+        @hide
         """
         ...
     @overload
@@ -21628,6 +25145,17 @@ class EdgePairs(ShapeCollection):
         This constructor creates an edge pair collection with a single edge pair.
 
         This constructor has been introduced in version 0.26.
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, edge_pair: EdgePairWithProperties) -> EdgePairs:
+        r"""
+        @brief Constructor from a single edge pair object with properties
+
+        This constructor creates an edge pair collection with a single edge pair.
+
+        This constructor has been introduced in version 0.30.
         """
         ...
     @overload
@@ -21785,6 +25313,12 @@ class EdgePairs(ShapeCollection):
         """
         ...
     @overload
+    def __init__(self, array: Sequence[EdgePairWithProperties], dummy: Optional[bool] = ...) -> None:
+        r"""
+        @hide
+        """
+        ...
+    @overload
     def __init__(self, array: Sequence[EdgePair]) -> None:
         r"""
         @brief Constructor from an edge pair array
@@ -21802,6 +25336,16 @@ class EdgePairs(ShapeCollection):
         This constructor creates an edge pair collection with a single edge pair.
 
         This constructor has been introduced in version 0.26.
+        """
+        ...
+    @overload
+    def __init__(self, edge_pair: EdgePairWithProperties) -> None:
+        r"""
+        @brief Constructor from a single edge pair object with properties
+
+        This constructor creates an edge pair collection with a single edge pair.
+
+        This constructor has been introduced in version 0.30.
         """
         ...
     @overload
@@ -21899,9 +25443,11 @@ class EdgePairs(ShapeCollection):
         This constructor has been introduced in version 0.26.
         """
         ...
-    def __iter__(self) -> Iterator[EdgePair]:
+    def __iter__(self) -> Iterator[EdgePairWithProperties]:
         r"""
         @brief Returns each edge pair of the edge pair collection
+
+        Starting with version 0.30, the iterator delivers EdgePairWithProperties objects.
         """
         ...
     def __len__(self) -> int:
@@ -22044,9 +25590,11 @@ class EdgePairs(ShapeCollection):
         @brief Creates a copy of self
         """
         ...
-    def each(self) -> Iterator[EdgePair]:
+    def each(self) -> Iterator[EdgePairWithProperties]:
         r"""
         @brief Returns each edge pair of the edge pair collection
+
+        Starting with version 0.30, the iterator delivers EdgePairWithProperties objects.
         """
         ...
     def edges(self) -> Edges:
@@ -22097,7 +25645,7 @@ class EdgePairs(ShapeCollection):
         The boxes will not be merged, so it is possible to determine overlaps of these boxes for example.
         """
         ...
-    def filter(self, filter: EdgePairFilter) -> None:
+    def filter(self, filter: EdgePairFilterBase) -> None:
         r"""
         @brief Applies a generic filter in place (replacing the edge pairs from the EdgePair collection)
         See \EdgePairFilter for a description of this feature.
@@ -22114,7 +25662,7 @@ class EdgePairs(ShapeCollection):
         This method has been introduced in version 0.28.4.
         """
         ...
-    def filtered(self, filter: EdgePairFilter) -> EdgePairs:
+    def filtered(self, filter: EdgePairFilterBase) -> EdgePairs:
         r"""
         @brief Applies a generic filter and returns a filtered copy
         See \EdgePairFilter for a description of this feature.
@@ -22157,6 +25705,14 @@ class EdgePairs(ShapeCollection):
     def insert(self, edge_pair: EdgePair) -> None:
         r"""
         @brief Inserts an edge pair into the collection
+        """
+        ...
+    @overload
+    def insert(self, edge_pair: EdgePairWithProperties) -> None:
+        r"""
+        @brief Inserts an edge pair with properties into the collection
+
+        This variant has been introduced in version 0.30.
         """
         ...
     @overload
@@ -24638,6 +28194,265 @@ class EdgeToPolygonOperator:
         ...
     ...
 
+class EdgeWithProperties(Edge):
+    r"""
+    @brief A Edge object with properties attached.
+    This class represents a combination of a Edge object an user properties. User properties are stored in form of a properties ID. Convenience methods are provided to manipulate or retrieve user properties directly.
+
+    This class has been introduced in version 0.30.
+    """
+    prop_id: int
+    r"""
+    Getter:
+    @brief Gets the properties ID associated with the object
+
+    Setter:
+    @brief Sets the properties ID of the object
+    """
+    @overload
+    @classmethod
+    def new(cls, edge: Edge, properties: Dict[Any, Any]) -> EdgeWithProperties:
+        r"""
+        @brief Creates a new object from a property-less object and a properties hash.
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, edge: Edge, properties_id: Optional[int] = ...) -> EdgeWithProperties:
+        r"""
+        @brief Creates a new object from a property-less object and a properties ID.
+        """
+        ...
+    @overload
+    def __init__(self, edge: Edge, properties: Dict[Any, Any]) -> None:
+        r"""
+        @brief Creates a new object from a property-less object and a properties hash.
+        """
+        ...
+    @overload
+    def __init__(self, edge: Edge, properties_id: Optional[int] = ...) -> None:
+        r"""
+        @brief Creates a new object from a property-less object and a properties ID.
+        """
+        ...
+    def __mul__(self, f: float) -> DEdgeWithProperties:
+        r"""
+        @brief Scales the object by some factor
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and, if necessary, rounded.
+        """
+        ...
+    def __repr__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    def __rmul__(self, f: float) -> DEdgeWithProperties:
+        r"""
+        @brief Scales the object by some factor
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and, if necessary, rounded.
+        """
+        ...
+    def __str__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    def _assign(self, other: Edge) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+        ...
+    def _const_cast(self) -> EdgeWithProperties:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _dup(self) -> EdgeWithProperties:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> EdgeWithProperties:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def delete_property(self, key: Any) -> None:
+        r"""
+        @brief Deletes the user property with the given key
+        This method is a convenience method that deletes the property with the given key. It does nothing if no property with that key exists. Using that method is more convenient than creating a new property set with a new ID and assigning that properties ID.
+        This method may change the properties ID.
+        """
+        ...
+    def downcast(self) -> Edge:
+        r"""
+        @brief Gets the corresponding object without the properties
+        """
+        ...
+    @overload
+    def move(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> EdgeWithProperties:
+        r"""
+        @brief Moves the object.
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is overwritten.
+
+        @param dx The x distance to move the object.
+        @param dy The y distance to move the object.
+
+        @return The moved object (self).
+        """
+        ...
+    @overload
+    def move(self, v: Vector) -> EdgeWithProperties:
+        r"""
+        @brief Moves the object.
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is overwritten.
+
+        @param v The distance to move the object.
+
+        @return The moved object (self).
+        """
+        ...
+    @overload
+    def moved(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> EdgeWithProperties:
+        r"""
+        @brief Returns the moved object (does not modify self)
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is not modified.
+
+        @param dx The x distance to move the object.
+        @param dy The y distance to move the object.
+
+        @return The moved object.
+        """
+        ...
+    @overload
+    def moved(self, v: Vector) -> EdgeWithProperties:
+        r"""
+        @brief Returns the moved object
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is not modified.
+
+        @param v The distance to move the object.
+
+        @return The moved object.
+        """
+        ...
+    def properties(self) -> Any:
+        r"""
+        @brief Gets the user properties
+        This method is a convenience method that gets the properties of the shape as a single hash.
+        """
+        ...
+    def property(self, key: Any) -> Any:
+        r"""
+        @brief Gets the user property with the given key
+        This method is a convenience method that gets the user property with the given key. If no property with that key does not exist, it will return nil. Using that method is more convenient than using the layout object and the properties ID to retrieve the property value. 
+        """
+        ...
+    def set_property(self, key: Any, value: Any) -> None:
+        r"""
+        @brief Sets the user property with the given key to the given value
+        This method is a convenience method that sets the user property with the given key to the given value. If no property with that key exists, it will create one. Using that method is more convenient than creating a new property set with a new ID and assigning that properties ID.
+        This method may change the properties ID. Note: GDS only supports integer keys. OASIS supports numeric and string keys.
+        """
+        ...
+    def to_s(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    @overload
+    def transform(self, t: ICplxTrans) -> None:
+        r"""
+        @brief Transforms the object (in-place version)
+        """
+        ...
+    @overload
+    def transform(self, t: Trans) -> None:
+        r"""
+        @brief Transforms the object (in-place version)
+        """
+        ...
+    @overload
+    def transformed(self, t: CplxTrans) -> DEdgeWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    @overload
+    def transformed(self, t: ICplxTrans) -> EdgeWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    @overload
+    def transformed(self, t: Trans) -> EdgeWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    ...
+
 class Edges(ShapeCollection):
     r"""
     @brief A collection of edges (Not necessarily describing closed contours)
@@ -24895,6 +28710,13 @@ class Edges(ShapeCollection):
         ...
     @overload
     @classmethod
+    def new(cls, array: Sequence[EdgeWithProperties], dummy: Optional[bool] = ...) -> Edges:
+        r"""
+        @hide
+        """
+        ...
+    @overload
+    @classmethod
     def new(cls, array: Sequence[Edge]) -> Edges:
         r"""
         @brief Constructor from an edge array
@@ -24904,12 +28726,21 @@ class Edges(ShapeCollection):
         ...
     @overload
     @classmethod
-    def new(cls, array: Sequence[Polygon]) -> Edges:
+    def new(cls, array: Sequence[PolygonWithProperties], dummy: Optional[bool] = ...) -> Edges:
+        r"""
+        @hide
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, array: Sequence[Polygon], dummy: Optional[bool] = ...) -> Edges:
         r"""
         @brief Constructor from a polygon array
 
         This constructor creates an edge collection from an array of polygons.
         The edges form the contours of the polygons.
+
+        The dummy argument is needed internally to differentiate the constructors taking arrays of polygons and edges in case of empty arrays. Do not specify this argument.
         """
         ...
     @overload
@@ -24924,11 +28755,34 @@ class Edges(ShapeCollection):
         ...
     @overload
     @classmethod
+    def new(cls, box: BoxWithProperties) -> Edges:
+        r"""
+        @brief Box constructor
+
+        This constructor creates an edge collection from a box with properties.
+        The edges form the contour of the box.
+
+        This variant has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    @classmethod
     def new(cls, edge: Edge) -> Edges:
         r"""
         @brief Constructor from a single edge
 
         This constructor creates an edge collection with a single edge.
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, edge: EdgeWithProperties) -> Edges:
+        r"""
+        @brief Constructor from a single edge with properties
+
+        This constructor creates an edge collection with a single edge.
+
+        This variant has been introduced in version 0.30.
         """
         ...
     @overload
@@ -24943,6 +28797,18 @@ class Edges(ShapeCollection):
         ...
     @overload
     @classmethod
+    def new(cls, path: PathWithProperties) -> Edges:
+        r"""
+        @brief Path constructor
+
+        This constructor creates an edge collection from a path with properties.
+        The edges form the contour of the path.
+
+        This variant has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    @classmethod
     def new(cls, polygon: Polygon) -> Edges:
         r"""
         @brief Polygon constructor
@@ -24953,12 +28819,36 @@ class Edges(ShapeCollection):
         ...
     @overload
     @classmethod
+    def new(cls, polygon: PolygonWithProperties) -> Edges:
+        r"""
+        @brief Polygon constructor
+
+        This constructor creates an edge collection from a polygon with properties.
+        The edges form the contour of the polygon.
+
+        This variant has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    @classmethod
     def new(cls, polygon: SimplePolygon) -> Edges:
         r"""
         @brief Simple polygon constructor
 
         This constructor creates an edge collection from a simple polygon.
         The edges form the contour of the polygon.
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, polygon: SimplePolygonWithProperties) -> Edges:
+        r"""
+        @brief Simple polygon constructor
+
+        This constructor creates an edge collection from a simple polygon with properties.
+        The edges form the contour of the polygon.
+
+        This variant has been introduced in version 0.30.
         """
         ...
     @overload
@@ -25217,6 +29107,12 @@ class Edges(ShapeCollection):
         """
         ...
     @overload
+    def __init__(self, array: Sequence[EdgeWithProperties], dummy: Optional[bool] = ...) -> None:
+        r"""
+        @hide
+        """
+        ...
+    @overload
     def __init__(self, array: Sequence[Edge]) -> None:
         r"""
         @brief Constructor from an edge array
@@ -25225,12 +29121,20 @@ class Edges(ShapeCollection):
         """
         ...
     @overload
-    def __init__(self, array: Sequence[Polygon]) -> None:
+    def __init__(self, array: Sequence[PolygonWithProperties], dummy: Optional[bool] = ...) -> None:
+        r"""
+        @hide
+        """
+        ...
+    @overload
+    def __init__(self, array: Sequence[Polygon], dummy: Optional[bool] = ...) -> None:
         r"""
         @brief Constructor from a polygon array
 
         This constructor creates an edge collection from an array of polygons.
         The edges form the contours of the polygons.
+
+        The dummy argument is needed internally to differentiate the constructors taking arrays of polygons and edges in case of empty arrays. Do not specify this argument.
         """
         ...
     @overload
@@ -25243,11 +29147,32 @@ class Edges(ShapeCollection):
         """
         ...
     @overload
+    def __init__(self, box: BoxWithProperties) -> None:
+        r"""
+        @brief Box constructor
+
+        This constructor creates an edge collection from a box with properties.
+        The edges form the contour of the box.
+
+        This variant has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def __init__(self, edge: Edge) -> None:
         r"""
         @brief Constructor from a single edge
 
         This constructor creates an edge collection with a single edge.
+        """
+        ...
+    @overload
+    def __init__(self, edge: EdgeWithProperties) -> None:
+        r"""
+        @brief Constructor from a single edge with properties
+
+        This constructor creates an edge collection with a single edge.
+
+        This variant has been introduced in version 0.30.
         """
         ...
     @overload
@@ -25260,6 +29185,17 @@ class Edges(ShapeCollection):
         """
         ...
     @overload
+    def __init__(self, path: PathWithProperties) -> None:
+        r"""
+        @brief Path constructor
+
+        This constructor creates an edge collection from a path with properties.
+        The edges form the contour of the path.
+
+        This variant has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def __init__(self, polygon: Polygon) -> None:
         r"""
         @brief Polygon constructor
@@ -25269,12 +29205,34 @@ class Edges(ShapeCollection):
         """
         ...
     @overload
+    def __init__(self, polygon: PolygonWithProperties) -> None:
+        r"""
+        @brief Polygon constructor
+
+        This constructor creates an edge collection from a polygon with properties.
+        The edges form the contour of the polygon.
+
+        This variant has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def __init__(self, polygon: SimplePolygon) -> None:
         r"""
         @brief Simple polygon constructor
 
         This constructor creates an edge collection from a simple polygon.
         The edges form the contour of the polygon.
+        """
+        ...
+    @overload
+    def __init__(self, polygon: SimplePolygonWithProperties) -> None:
+        r"""
+        @brief Simple polygon constructor
+
+        This constructor creates an edge collection from a simple polygon with properties.
+        The edges form the contour of the polygon.
+
+        This variant has been introduced in version 0.30.
         """
         ...
     @overload
@@ -25457,9 +29415,11 @@ class Edges(ShapeCollection):
         This method has been introduced in version 0.24.The 'not_with' alias has been introduced in version 0.28.12.
         """
         ...
-    def __iter__(self) -> Iterator[Edge]:
+    def __iter__(self) -> Iterator[EdgeWithProperties]:
         r"""
         @brief Returns each edge of the region
+
+        Starting with version 0.30, the iterator delivers an EdgeWithProperties object.
         """
         ...
     def __ixor__(self, other: Edges) -> Edges:
@@ -25767,18 +29727,20 @@ class Edges(ShapeCollection):
         @brief Creates a copy of self
         """
         ...
-    def each(self) -> Iterator[Edge]:
+    def each(self) -> Iterator[EdgeWithProperties]:
         r"""
         @brief Returns each edge of the region
+
+        Starting with version 0.30, the iterator delivers an EdgeWithProperties object.
         """
         ...
-    def each_merged(self) -> Iterator[Edge]:
+    def each_merged(self) -> Iterator[EdgeWithProperties]:
         r"""
         @brief Returns each edge of the region
 
         In contrast to \each, this method delivers merged edges if merge semantics applies while \each delivers the original edges only.
 
-        This method has been introduced in version 0.25.
+        This method has been introduced in version 0.25.Starting with version 0.30, the iterator delivers an EdgeWithProperties object.
         """
         ...
     def enable_progress(self, label: str) -> None:
@@ -25927,7 +29889,7 @@ class Edges(ShapeCollection):
         The boxes will not be merged, so it is possible to determine overlaps of these boxes for example.
         """
         ...
-    def filter(self, filter: EdgeFilter) -> None:
+    def filter(self, filter: EdgeFilterBase) -> None:
         r"""
         @brief Applies a generic filter in place (replacing the edges from the Edges collection)
         See \EdgeFilter for a description of this feature.
@@ -25944,7 +29906,7 @@ class Edges(ShapeCollection):
         This method has been introduced in version 0.28.4.
         """
         ...
-    def filtered(self, filter: EdgeFilter) -> Edges:
+    def filtered(self, filter: EdgeFilterBase) -> Edges:
         r"""
         @brief Applies a generic filter and returns a filtered copy
         See \EdgeFilter for a description of this feature.
@@ -26001,6 +29963,16 @@ class Edges(ShapeCollection):
         """
         ...
     @overload
+    def insert(self, box: BoxWithProperties) -> None:
+        r"""
+        @brief Inserts a box
+
+        Inserts the edges that form the contour of the box into the edge collection with the boxes properties.
+
+        This variant has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def insert(self, edge: Edge) -> None:
         r"""
         @brief Inserts an edge
@@ -26009,10 +29981,28 @@ class Edges(ShapeCollection):
         """
         ...
     @overload
+    def insert(self, edge: EdgeWithProperties) -> None:
+        r"""
+        @brief Inserts an edge
+
+        Inserts the edge with properties into the edge collection.
+
+        This variant has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def insert(self, edges: Edges) -> None:
         r"""
         @brief Inserts all edges from the other edge collection into this one
         This method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def insert(self, edges: Sequence[EdgeWithProperties]) -> None:
+        r"""
+        @brief Inserts all edges from the array into this edge collection
+
+        This variant accepting edges with properties has been introduced in version 0.30.
         """
         ...
     @overload
@@ -26030,6 +30020,16 @@ class Edges(ShapeCollection):
         """
         ...
     @overload
+    def insert(self, path: PathWithProperties) -> None:
+        r"""
+        @brief Inserts a path
+
+        Inserts the edges that form the contour of the path into the edge collection with the properties of the path.
+
+        This variant has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def insert(self, polygon: Polygon) -> None:
         r"""
         @brief Inserts a polygon
@@ -26038,11 +30038,39 @@ class Edges(ShapeCollection):
         """
         ...
     @overload
+    def insert(self, polygon: PolygonWithProperties) -> None:
+        r"""
+        @brief Inserts a polygon
+
+        Inserts the edges that form the contour of the polygon into the edge collection with the properties of the polygon.
+
+        This variant has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def insert(self, polygon: SimplePolygon) -> None:
         r"""
         @brief Inserts a simple polygon
 
         Inserts the edges that form the contour of the simple polygon into the edge collection.
+        """
+        ...
+    @overload
+    def insert(self, polygon: SimplePolygonWithProperties) -> None:
+        r"""
+        @brief Inserts a simple polygon
+
+        Inserts the edges that form the contour of the simple polygon into the edge collection with the properties of the polygon.
+
+        This variant has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def insert(self, polygons: Sequence[PolygonWithProperties]) -> None:
+        r"""
+        @brief Inserts all polygons from the array into this edge collection
+
+        This variant accepting polygons with properties has been introduced in version 0.30.
         """
         ...
     @overload
@@ -26881,7 +30909,7 @@ class Edges(ShapeCollection):
         'zero_distance_mode' has been added in version 0.29.
         """
         ...
-    def split_filter(self, filter: EdgeFilter) -> List[Edges]:
+    def split_filter(self, filter: EdgeFilterBase) -> List[Edges]:
         r"""
         @brief Applies a generic filter and returns a copy with all matching shapes and one with the non-matching ones
         See \EdgeFilter for a description of this feature.
@@ -27820,9 +31848,23 @@ class GenericDeviceExtractor(DeviceExtractorBase):
         """
         ...
     @overload
+    def error(self, message: str, geometry: DPolygonWithProperties) -> None:
+        r"""
+        @brief Issues an error with the given message and micrometer-units polygon geometry with properties
+        This flavor has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def error(self, message: str, geometry: Polygon) -> None:
         r"""
         @brief Issues an error with the given message and database-unit polygon geometry
+        """
+        ...
+    @overload
+    def error(self, message: str, geometry: PolygonWithProperties) -> None:
+        r"""
+        @brief Issues an error with the given message and database-units polygon geometry with properties
+        This flavor has been introduced in version 0.30.
         """
         ...
     def register_device_class(self, device_class: DeviceClass) -> None:
@@ -27878,10 +31920,24 @@ class GenericDeviceExtractor(DeviceExtractorBase):
         """
         ...
     @overload
+    def warn(self, message: str, geometry: DPolygonWithProperties) -> None:
+        r"""
+        @brief Issues a warning with the given message and micrometer-units polygon geometry with properties
+        This flavor has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def warn(self, message: str, geometry: Polygon) -> None:
         r"""
         @brief Issues a warning with the given message and database-unit polygon geometry
         Warnings have been introduced in version 0.28.13.
+        """
+        ...
+    @overload
+    def warn(self, message: str, geometry: PolygonWithProperties) -> None:
+        r"""
+        @brief Issues a warning with the given message and database-unit polygon geometry
+        This flavor has been introduced in version 0.30.
         """
         ...
     ...
@@ -28710,6 +32766,19 @@ class ICplxTrans:
         """
         ...
     @overload
+    def __mul__(self, box: BoxWithProperties) -> BoxWithProperties:
+        r"""
+        @brief Transforms a box with properties
+
+        't*box' or 't.trans(box)' is equivalent to box.transformed(t).
+
+        @param box The box to transform
+        @return The transformed box
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def __mul__(self, d: int) -> int:
         r"""
         @brief Transforms a single distance
@@ -28735,6 +32804,32 @@ class ICplxTrans:
         @return The transformed edge
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def __mul__(self, edge: EdgeWithProperties) -> EdgeWithProperties:
+        r"""
+        @brief Transforms an edge with properties
+
+        't*edge' or 't.trans(edge)' is equivalent to edge.transformed(t).
+
+        @param edge The edge to transform
+        @return The transformed edge
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def __mul__(self, edge_pair: EdgePairWithProperties) -> EdgePairWithProperties:
+        r"""
+        @brief Transforms an edge pair with properties
+
+        't*edge_pair' or 't.trans(edge_pair)' is equivalent to edge_pair.transformed(t).
+
+        @param edge_pair The edge pair to transform
+        @return The transformed edge pair
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     @overload
@@ -28779,6 +32874,19 @@ class ICplxTrans:
         """
         ...
     @overload
+    def __mul__(self, path: PathWithProperties) -> PathWithProperties:
+        r"""
+        @brief Transforms a path with properties
+
+        't*path' or 't.trans(path)' is equivalent to path.transformed(t).
+
+        @param path The path to transform
+        @return The transformed path
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def __mul__(self, polygon: Polygon) -> Polygon:
         r"""
         @brief Transforms a polygon
@@ -28789,6 +32897,32 @@ class ICplxTrans:
         @return The transformed polygon
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def __mul__(self, polygon: PolygonWithProperties) -> PolygonWithProperties:
+        r"""
+        @brief Transforms a polygon with properties
+
+        't*polygon' or 't.trans(polygon)' is equivalent to polygon.transformed(t).
+
+        @param polygon The polygon to transform
+        @return The transformed polygon
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def __mul__(self, simple_polygon: SimplePolygonWithProperties) -> SimplePolygonWithProperties:
+        r"""
+        @brief Transforms a simple polygon with properties
+
+        't*polygon' or 't.trans(simple_polygon)' is equivalent to simple_polygon.transformed(t).
+
+        @param simple_polygon The simple polygon to transform
+        @return The transformed simple polygon
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     @overload
@@ -28826,6 +32960,19 @@ class ICplxTrans:
         This convenience method has been introduced in version 0.25.
         """
         ...
+    @overload
+    def __mul__(self, text: TextWithProperties) -> TextWithProperties:
+        r"""
+        @brief Transforms a text with properties
+
+        't*text' or 't.trans(text)' is equivalent to text.transformed(t).
+
+        @param text The text to transform
+        @return The transformed text
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
     def __ne__(self, other: object) -> bool:
         r"""
         @brief Tests for inequality
@@ -28854,6 +33001,19 @@ class ICplxTrans:
         """
         ...
     @overload
+    def __rmul__(self, box: BoxWithProperties) -> BoxWithProperties:
+        r"""
+        @brief Transforms a box with properties
+
+        't*box' or 't.trans(box)' is equivalent to box.transformed(t).
+
+        @param box The box to transform
+        @return The transformed box
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def __rmul__(self, d: int) -> int:
         r"""
         @brief Transforms a single distance
@@ -28879,6 +33039,32 @@ class ICplxTrans:
         @return The transformed edge
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def __rmul__(self, edge: EdgeWithProperties) -> EdgeWithProperties:
+        r"""
+        @brief Transforms an edge with properties
+
+        't*edge' or 't.trans(edge)' is equivalent to edge.transformed(t).
+
+        @param edge The edge to transform
+        @return The transformed edge
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def __rmul__(self, edge_pair: EdgePairWithProperties) -> EdgePairWithProperties:
+        r"""
+        @brief Transforms an edge pair with properties
+
+        't*edge_pair' or 't.trans(edge_pair)' is equivalent to edge_pair.transformed(t).
+
+        @param edge_pair The edge pair to transform
+        @return The transformed edge pair
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     @overload
@@ -28923,6 +33109,19 @@ class ICplxTrans:
         """
         ...
     @overload
+    def __rmul__(self, path: PathWithProperties) -> PathWithProperties:
+        r"""
+        @brief Transforms a path with properties
+
+        't*path' or 't.trans(path)' is equivalent to path.transformed(t).
+
+        @param path The path to transform
+        @return The transformed path
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def __rmul__(self, polygon: Polygon) -> Polygon:
         r"""
         @brief Transforms a polygon
@@ -28936,6 +33135,32 @@ class ICplxTrans:
         """
         ...
     @overload
+    def __rmul__(self, polygon: PolygonWithProperties) -> PolygonWithProperties:
+        r"""
+        @brief Transforms a polygon with properties
+
+        't*polygon' or 't.trans(polygon)' is equivalent to polygon.transformed(t).
+
+        @param polygon The polygon to transform
+        @return The transformed polygon
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def __rmul__(self, simple_polygon: SimplePolygonWithProperties) -> SimplePolygonWithProperties:
+        r"""
+        @brief Transforms a simple polygon with properties
+
+        't*polygon' or 't.trans(simple_polygon)' is equivalent to simple_polygon.transformed(t).
+
+        @param simple_polygon The simple polygon to transform
+        @return The transformed simple polygon
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def __rmul__(self, text: Text) -> Text:
         r"""
         @brief Transforms a text
@@ -28946,6 +33171,19 @@ class ICplxTrans:
         @return The transformed text
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def __rmul__(self, text: TextWithProperties) -> TextWithProperties:
+        r"""
+        @brief Transforms a text with properties
+
+        't*text' or 't.trans(text)' is equivalent to text.transformed(t).
+
+        @param text The text to transform
+        @return The transformed text
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     def __str__(self, lazy: Optional[bool] = ..., dbu: Optional[float] = ...) -> str:
@@ -29213,6 +33451,19 @@ class ICplxTrans:
         """
         ...
     @overload
+    def trans(self, box: BoxWithProperties) -> BoxWithProperties:
+        r"""
+        @brief Transforms a box with properties
+
+        't*box' or 't.trans(box)' is equivalent to box.transformed(t).
+
+        @param box The box to transform
+        @return The transformed box
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def trans(self, edge: Edge) -> Edge:
         r"""
         @brief Transforms an edge
@@ -29223,6 +33474,32 @@ class ICplxTrans:
         @return The transformed edge
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def trans(self, edge: EdgeWithProperties) -> EdgeWithProperties:
+        r"""
+        @brief Transforms an edge with properties
+
+        't*edge' or 't.trans(edge)' is equivalent to edge.transformed(t).
+
+        @param edge The edge to transform
+        @return The transformed edge
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def trans(self, edge_pair: EdgePairWithProperties) -> EdgePairWithProperties:
+        r"""
+        @brief Transforms an edge pair with properties
+
+        't*edge_pair' or 't.trans(edge_pair)' is equivalent to edge_pair.transformed(t).
+
+        @param edge_pair The edge pair to transform
+        @return The transformed edge pair
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     @overload
@@ -29267,6 +33544,19 @@ class ICplxTrans:
         """
         ...
     @overload
+    def trans(self, path: PathWithProperties) -> PathWithProperties:
+        r"""
+        @brief Transforms a path with properties
+
+        't*path' or 't.trans(path)' is equivalent to path.transformed(t).
+
+        @param path The path to transform
+        @return The transformed path
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def trans(self, polygon: Polygon) -> Polygon:
         r"""
         @brief Transforms a polygon
@@ -29280,6 +33570,32 @@ class ICplxTrans:
         """
         ...
     @overload
+    def trans(self, polygon: PolygonWithProperties) -> PolygonWithProperties:
+        r"""
+        @brief Transforms a polygon with properties
+
+        't*polygon' or 't.trans(polygon)' is equivalent to polygon.transformed(t).
+
+        @param polygon The polygon to transform
+        @return The transformed polygon
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def trans(self, simple_polygon: SimplePolygonWithProperties) -> SimplePolygonWithProperties:
+        r"""
+        @brief Transforms a simple polygon with properties
+
+        't*polygon' or 't.trans(simple_polygon)' is equivalent to simple_polygon.transformed(t).
+
+        @param simple_polygon The simple polygon to transform
+        @return The transformed simple polygon
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def trans(self, text: Text) -> Text:
         r"""
         @brief Transforms a text
@@ -29290,6 +33606,19 @@ class ICplxTrans:
         @return The transformed text
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def trans(self, text: TextWithProperties) -> TextWithProperties:
+        r"""
+        @brief Transforms a text with properties
+
+        't*text' or 't.trans(text)' is equivalent to text.transformed(t).
+
+        @param text The text to transform
+        @return The transformed text
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     ...
@@ -30526,11 +34855,11 @@ class Instance:
 
     Starting with version 0.25 the displacement is of vector type.
     Setter:
-    @brief Sets the displacement vector for the 'a' axis in micrometer units
+    @brief Sets the displacement vector for the 'a' axis
 
-    Like \a= with an integer displacement, this method will set the displacement vector but it accepts a vector in micrometer units that is of \DVector type. The vector will be translated to database units internally.
+    If the instance was not an array instance before it is made one.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.23. Starting with version 0.25 the displacement is of vector type.
     """
     b: Vector
     r"""
@@ -31074,7 +35403,7 @@ class Instance:
         r"""
         @brief Gets the layout this instance is contained in
 
-        This method has been introduced in version 0.22.
+        This const version of the method has been introduced in version 0.25.
         """
         ...
     @overload
@@ -31082,7 +35411,7 @@ class Instance:
         r"""
         @brief Gets the layout this instance is contained in
 
-        This const version of the method has been introduced in version 0.25.
+        This method has been introduced in version 0.22.
         """
         ...
     def pcell_declaration(self) -> PCellDeclaration_Native:
@@ -33331,6 +37660,94 @@ class Layout:
 
     This method has been introduced in version 0.27.
     """
+    @classmethod
+    def _class_properties_array(cls, properties_id: int) -> Any:
+        r"""
+        @brief Gets the properties set for a given properties ID
+
+        Basically this method performs the backward conversion of the 'properties_id' method. Given a properties ID, it returns the properties set as an array. In this array, each key and the value is stored as a pair (an array with two elements).
+        If the properties ID is not valid, an empty array is returned.
+        A version that returns a hash instead of pairs of key/values, is \properties_hash.
+
+        For details about the properties ID concept see \properties_id.
+
+        @param properties_id The properties ID to get the properties for
+        @return An array of key/value pairs (see \properties_id)
+
+        The 'properties_array' alias was introduced in version 0.29.7 and the plain 'properties' alias was deprecated. In version 0.30, this method was turned into a static (class method), providing universal conversions without need for a Layout object.
+        """
+        ...
+    @classmethod
+    def _class_properties_hash(cls, properties_id: int) -> Any:
+        r"""
+        @brief Gets the properties set for a given properties ID as a hash
+
+        Returns the properties for a given properties ID as a hash.
+        It is a convenient alternative to \properties_array, which returns an array of key/value pairs.
+
+        For details about the properties ID concept see \properties_id.
+
+        @param properties_id The properties ID to get the properties for
+        @return The hash representing the properties for the given ID (values vs. key)
+
+        This method has been introduced in version 0.29.7. In version 0.30, this method was turned into a static (class method), providing universal conversions without need for a Layout object.
+        """
+        ...
+    @overload
+    @classmethod
+    def _class_properties_id(cls, properties: Dict[Any, Any]) -> int:
+        r"""
+        @brief Gets the properties ID for a given properties set
+
+        This variant accepts a hash of value vs. key for the properties instead of array of key/value pairs. Apart from this, it behaves like the other \properties_id variant.
+
+        @param properties A hash of property keys/values (both keys and values can be integer, double or string)
+        @return The unique properties ID for that set
+
+        This variant has been introduced in version 0.29.7 and was turned in a static (class) method in 0.30.
+        """
+        ...
+    @overload
+    @classmethod
+    def _class_properties_id(cls, properties: Sequence[Any]) -> int:
+        r"""
+        @brief Gets the properties ID for a given properties set
+
+        In most places within the system, properties are stored as properties IDs. These are numbers representative for a specific set of properties. This method allows deriving a properties ID from a list of key/value pairs.
+        It delivers a unique number for this set. A variant exists that takes a dict object instead of a list of key/value pairs.
+
+        The \properties_array and \properties_hash methods allow converting the properties ID back into a list or dict object.
+        Individual values for a given key can be extracted using \property in the static (class) method variant.
+
+        @code
+        pid = RBA::Layout::properties_id([[1, "one"], ["key", "value"]])
+        # same as:
+        # pid = RBA::Layout::properties_id({ 1 => "one", "key" => "value" })
+
+        RBA::Layout::properties_hash(pid)  # -> { 1 => "one", "key" => "value" }
+        RBA::Layout::property(pid, 1)      # -> "one"
+        @/code
+
+        In previous versions, these function were methods of the Layout object. Since version 0.30, they are static (class) methods. This means, that they provide a universal way of converting property sets into IDs and back, without need for a Layout object.
+
+        @param properties The array of pairs of variants (both elements can be integer, double or string)
+        @return The unique properties ID for that set
+        """
+        ...
+    @classmethod
+    def _class_property(cls, properties_id: int, key: Any) -> Any:
+        r"""
+        @brief Extracts a property value for a given key from the properties ID
+
+        From a given properties ID, retrieves the value for a given key. If no value for this particular key exists, 'nil' is returned.
+
+        For details about the properties ID concept see \properties_id.
+
+        Note, that this is a static (class) method that provides a universal way of extracting property values from IDs without need for a Layout object.
+
+        This method has been introduced in version 0.30.
+        """
+        ...
     @overload
     @classmethod
     def new(cls) -> Layout:
@@ -33371,6 +37788,94 @@ class Layout:
         This constructor specifies a manager object which is used to store undo information for example.
 
         Starting with version 0.25, layouts created with the default constructor are always editable. Before that version, they inherited the editable flag from the application.
+        """
+        ...
+    @classmethod
+    def properties_array(cls, properties_id: int) -> Any:
+        r"""
+        @brief Gets the properties set for a given properties ID
+
+        Basically this method performs the backward conversion of the 'properties_id' method. Given a properties ID, it returns the properties set as an array. In this array, each key and the value is stored as a pair (an array with two elements).
+        If the properties ID is not valid, an empty array is returned.
+        A version that returns a hash instead of pairs of key/values, is \properties_hash.
+
+        For details about the properties ID concept see \properties_id.
+
+        @param properties_id The properties ID to get the properties for
+        @return An array of key/value pairs (see \properties_id)
+
+        The 'properties_array' alias was introduced in version 0.29.7 and the plain 'properties' alias was deprecated. In version 0.30, this method was turned into a static (class method), providing universal conversions without need for a Layout object.
+        """
+        ...
+    @classmethod
+    def properties_hash(cls, properties_id: int) -> Any:
+        r"""
+        @brief Gets the properties set for a given properties ID as a hash
+
+        Returns the properties for a given properties ID as a hash.
+        It is a convenient alternative to \properties_array, which returns an array of key/value pairs.
+
+        For details about the properties ID concept see \properties_id.
+
+        @param properties_id The properties ID to get the properties for
+        @return The hash representing the properties for the given ID (values vs. key)
+
+        This method has been introduced in version 0.29.7. In version 0.30, this method was turned into a static (class method), providing universal conversions without need for a Layout object.
+        """
+        ...
+    @overload
+    @classmethod
+    def properties_id(cls, properties: Dict[Any, Any]) -> int:
+        r"""
+        @brief Gets the properties ID for a given properties set
+
+        This variant accepts a hash of value vs. key for the properties instead of array of key/value pairs. Apart from this, it behaves like the other \properties_id variant.
+
+        @param properties A hash of property keys/values (both keys and values can be integer, double or string)
+        @return The unique properties ID for that set
+
+        This variant has been introduced in version 0.29.7 and was turned in a static (class) method in 0.30.
+        """
+        ...
+    @overload
+    @classmethod
+    def properties_id(cls, properties: Sequence[Any]) -> int:
+        r"""
+        @brief Gets the properties ID for a given properties set
+
+        In most places within the system, properties are stored as properties IDs. These are numbers representative for a specific set of properties. This method allows deriving a properties ID from a list of key/value pairs.
+        It delivers a unique number for this set. A variant exists that takes a dict object instead of a list of key/value pairs.
+
+        The \properties_array and \properties_hash methods allow converting the properties ID back into a list or dict object.
+        Individual values for a given key can be extracted using \property in the static (class) method variant.
+
+        @code
+        pid = RBA::Layout::properties_id([[1, "one"], ["key", "value"]])
+        # same as:
+        # pid = RBA::Layout::properties_id({ 1 => "one", "key" => "value" })
+
+        RBA::Layout::properties_hash(pid)  # -> { 1 => "one", "key" => "value" }
+        RBA::Layout::property(pid, 1)      # -> "one"
+        @/code
+
+        In previous versions, these function were methods of the Layout object. Since version 0.30, they are static (class) methods. This means, that they provide a universal way of converting property sets into IDs and back, without need for a Layout object.
+
+        @param properties The array of pairs of variants (both elements can be integer, double or string)
+        @return The unique properties ID for that set
+        """
+        ...
+    @classmethod
+    def property(cls, properties_id: int, key: Any) -> Any:
+        r"""
+        @brief Extracts a property value for a given key from the properties ID
+
+        From a given properties ID, retrieves the value for a given key. If no value for this particular key exists, 'nil' is returned.
+
+        For details about the properties ID concept see \properties_id.
+
+        Note, that this is a static (class) method that provides a universal way of extracting property values from IDs without need for a Layout object.
+
+        This method has been introduced in version 0.30.
         """
         ...
     def __copy__(self) -> Layout:
@@ -33447,6 +37952,35 @@ class Layout:
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _inst_properties_array(self, properties_id: int) -> Any:
+        r"""
+        @hide
+        """
+        ...
+    def _inst_properties_hash(self, properties_id: int) -> Any:
+        r"""
+        @hide
+        """
+        ...
+    @overload
+    def _inst_properties_id(self, properties: Dict[Any, Any]) -> int:
+        r"""
+        @hide
+        """
+        ...
+    @overload
+    def _inst_properties_id(self, properties: Sequence[Any]) -> int:
+        r"""
+        @hide
+        """
+        ...
+    def _inst_property(self, key: Any) -> Any:
+        r"""
+        @brief Gets the Layout's user property with the given key
+        This method is a convenience method that gets the property with the given key. If no property with that key exists, it will return nil. Using that method is more convenient than using the properties ID to retrieve the property value. 
+        This method has been introduced in version 0.24.
         """
         ...
     def _is_const_object(self) -> bool:
@@ -34945,70 +39479,31 @@ class Layout:
         """
         ...
     @overload
-    def properties(self, properties_id: int) -> List[Any]:
+    def properties(self, properties_id: int) -> Any:
         r"""
-        @brief Gets the properties set for a given properties ID
-
-        Basically this method performs the backward conversion of the 'properties_id' method. Given a properties ID, it returns the properties set as an array. In this array, each key and the value is stored as a pair (an array with two elements).
-        If the properties ID is not valid, an empty array is returned.
-        A version that returns a hash instead of pairs of key/values, is \properties_hash.
-
-        @param properties_id The properties ID to get the properties for
-        @return An array of key/value pairs (see \properties_id)
-
-        The 'properties_array' alias was introduced in version 0.29.7 and the plain 'properties' alias was deprecated.
+        @hide
         """
         ...
-    def properties_array(self, properties_id: int) -> List[Any]:
+    def properties_array(self, properties_id: int) -> Any:
         r"""
-        @brief Gets the properties set for a given properties ID
-
-        Basically this method performs the backward conversion of the 'properties_id' method. Given a properties ID, it returns the properties set as an array. In this array, each key and the value is stored as a pair (an array with two elements).
-        If the properties ID is not valid, an empty array is returned.
-        A version that returns a hash instead of pairs of key/values, is \properties_hash.
-
-        @param properties_id The properties ID to get the properties for
-        @return An array of key/value pairs (see \properties_id)
-
-        The 'properties_array' alias was introduced in version 0.29.7 and the plain 'properties' alias was deprecated.
+        @hide
         """
         ...
     def properties_hash(self, properties_id: int) -> Any:
         r"""
-        @brief Gets the properties set for a given properties ID as a hash
-
-        Returns the properties for a given properties ID as a hash.
-        It is a convenient alternative to \properties_array, which returns an array of key/value pairs.
-
-        @param properties_id The properties ID to get the properties for
-        @return The hash representing the properties for the given ID (values vs. key)
-
-        This method has been introduced in version 0.29.7.
+        @hide
         """
         ...
     @overload
     def properties_id(self, properties: Dict[Any, Any]) -> int:
         r"""
-        @brief Gets the properties ID for a given properties set
-
-        This variant accepts a hash of value vs. key for the properties instead of array of key/value pairs. Apart from this, it behaves like the other \properties_id variant.
-
-        @param properties A hash of property keys/values (both keys and values can be integer, double or string)
-        @return The unique properties ID for that set
-
-        This variant has been introduced in version 0.29.7.
+        @hide
         """
         ...
     @overload
     def properties_id(self, properties: Sequence[Any]) -> int:
         r"""
-        @brief Gets the properties ID for a given properties set
-
-        Before a set of properties can be attached to a shape, it must be converted into an ID that is unique for that set. The properties set must be given as a list of pairs of variants, each pair describing a name and a value. The name acts as the key for the property and does not need to be a string (it can be an integer or double value as well).
-        The backward conversion can be performed with the 'properties' method.
-
-        @param properties The array of pairs of variants (both elements can be integer, double or string)
-        @return The unique properties ID for that set
+        @hide
         """
         ...
     def property(self, key: Any) -> Any:
@@ -36589,7 +41084,7 @@ class LayoutToNetlist:
 
     The LayoutToNetlist object can be persisted into a 'Layout to netlist database' file. This database is a storage for both the netlist and the net or circuit geometries. When reading such file into a new LayoutToNetlist object, there will be no connection to any external layout, but all the essential netlist and geometry information will be available.
 
-    The LayoutToNetlist object is also the entry point for netlist-driven algorithms such as antenna checks.
+    The \LayoutToNetlist object is also the entry point for netlist-driven algorithms such as antenna checks.
 
     The use model of the LayoutToNetlist object consists of five steps which need to be executed in this order.
 
@@ -36647,7 +41142,13 @@ class LayoutToNetlist:
     @li Helper functions: \cell_mapping_into, \const_cell_mapping_into @/li
     @/ul
 
-    The \LayoutToNetlist object is also the entry point for connectivity-aware DRC checks, such as antenna checks.
+    Layers stored inside the LayoutToNetlist object are addressed in three ways:
+
+    @ul
+    @li Through a layer index: this is an integer number that addresses the layer. Technically this is     the layer index inside the internal layout (see \internal_layout). To get a layer index from     a shape collection or name use \layer_index. To get all layer indexes available, use \layer_indexes.     Note, that \make_layer, \make_polygon_layer and \make_text_layer also take a layer index, but     this the layer index of layer in the \original_layout. @/li
+    @li Through a name: Alternatively to the layer index, a layer can be addressed by name, provided one was     assigned. To assign a name, specify one when creating a layer with \register, \make_layer, \make_polygon_layer     or \make_text_layer. To get the layer index of a named layer, use \layer_index. To get the name     of a layer use \layer_name. To get the names of all layers, use \layer_names. @/li
+    @li As a shape collection: a layer can also be represented by a shape collection. A shape collection is     either a \Region or a \Texts object. These objects do not only represent a layer, but can be used     to derive new layers or do computations on layers.     In order to assign names to derived shape collections, use \register. To create a new layer and a     corresponding shape collection object, use \make_layer, \make_polygon_layer or \make_text_layer.     To get the shape collection for a given layer index, use \layer_index, to get layer name from     a shape collection, use \layer_name. To get a shape collection from a layer index, use     \layer_by_index, \polygons_by_index or \texts_by_index. @/li
+    @/ul
 
     This class has been introduced in version 0.26.
     """
@@ -36897,6 +41398,7 @@ class LayoutToNetlist:
         r"""
         @brief Creates a new and empty extractor object
         The main objective for this constructor is to create an object suitable for reading an annotated netlist.
+        A default-created LayoutToNetlist object is not very useful for other purposes.
         """
         ...
     @overload
@@ -36920,7 +41422,7 @@ class LayoutToNetlist:
 
         The shape iterator does not need to be an actual shape iterator. It is merely used to identify the original layout and provides additional parameters such as the top cell to use and advanced options such as subtree pruning.
 
-        You can construct a dummy iteraor usable for this purpose without layers using an empty layer set:
+        You can construct a dummy iterator usable for this purpose without layers using an empty layer set:
 
         @code
         ly = ...  # external layout
@@ -36964,6 +41466,7 @@ class LayoutToNetlist:
         r"""
         @brief Creates a new and empty extractor object
         The main objective for this constructor is to create an object suitable for reading an annotated netlist.
+        A default-created LayoutToNetlist object is not very useful for other purposes.
         """
         ...
     @overload
@@ -36985,7 +41488,7 @@ class LayoutToNetlist:
 
         The shape iterator does not need to be an actual shape iterator. It is merely used to identify the original layout and provides additional parameters such as the top cell to use and advanced options such as subtree pruning.
 
-        You can construct a dummy iteraor usable for this purpose without layers using an empty layer set:
+        You can construct a dummy iterator usable for this purpose without layers using an empty layer set:
 
         @code
         ly = ...  # external layout
@@ -37155,7 +41658,7 @@ class LayoutToNetlist:
         The 'texts' parameter has been added in version 0.27.11.
         """
         ...
-    def build_all_nets(self, cmap: CellMapping, target: Layout, lmap: Dict[int, Region], net_cell_name_prefix: Optional[Any] = ..., netname_prop: Optional[Any] = ..., hier_mode: Optional[LayoutToNetlist.BuildNetHierarchyMode] = ..., circuit_cell_name_prefix: Optional[Any] = ..., device_cell_name_prefix: Optional[Any] = ...) -> None:
+    def build_all_nets(self, cmap: CellMapping, target: Layout, lmap: Optional[Any] = ..., net_cell_name_prefix: Optional[Any] = ..., netname_prop: Optional[Any] = ..., hier_mode: Optional[LayoutToNetlist.BuildNetHierarchyMode] = ..., circuit_cell_name_prefix: Optional[Any] = ..., device_cell_name_prefix: Optional[Any] = ...) -> None:
         r"""
         @brief Builds a full hierarchical representation of the nets
 
@@ -37165,7 +41668,9 @@ class LayoutToNetlist:
 
         If 'netname_prop' is not nil, a property with the given name is created and attached to shapes. The value of the property is the net name.
 
-        'lmap' defines which layers are to be produced. It is map, where the keys are layer indexes in the target layout and the values are Region objects indicating the layer where shapes are to be taken from. Use \layer_by_name or \layer_by_index to get the Region object corresponding to a layer stored inside the LayoutToNetlist database.
+        'lmap' defines which layers are to be produced. It is map, where the keys are layer indexes in the target layout and the values are Region or Texts objects or layer indexes, indicating the layer where shapes are to be taken from. 'lmap' can also be left nil, in which case, a layer mapping will be provided based on the layer info attributes of the layers (see \layer_info).
+
+        'cmap' specifies the cell mapping. Use \create_cell_mapping or \const_create_cell_mapping to define the target cells in the target layout and to derive a cell mapping.
 
         The method has three net annotation modes:
         @ul
@@ -37192,17 +41697,19 @@ class LayoutToNetlist:
         using a name like device_cell_name_prefix + device name. Otherwise the device shapes are
         treated as part of the net.
 
-        @param cmap The mapping of internal layout to target layout for the circuit mapping
+        @param cmap The cell mapping (see description of this method)
         @param target The target layout
-        @param lmap Target layer indexes (keys) and net regions (values)
+        @param lmap The layer mapping (see description of this method)
         @param hier_mode See description of this method
         @param netname_prop An (optional) property name to which to attach the net name
         @param circuit_cell_name_prefix See method description
         @param net_cell_name_prefix See method description
         @param device_cell_name_prefix See above
+
+        The 'lmap' argument has been generalized in version 0.30 and became optional.
         """
         ...
-    def build_net(self, net: Net, target: Layout, target_cell: Cell, lmap: Dict[int, Region], netname_prop: Optional[Any] = ..., hier_mode: Optional[LayoutToNetlist.BuildNetHierarchyMode] = ..., circuit_cell_name_prefix: Optional[Any] = ..., device_cell_name_prefix: Optional[Any] = ...) -> None:
+    def build_net(self, net: Net, target: Layout, target_cell: Cell, lmap: Optional[Any] = ..., netname_prop: Optional[Any] = ..., hier_mode: Optional[LayoutToNetlist.BuildNetHierarchyMode] = ..., circuit_cell_name_prefix: Optional[Any] = ..., device_cell_name_prefix: Optional[Any] = ...) -> None:
         r"""
         @brief Builds a net representation in the given layout and cell
 
@@ -37211,33 +41718,29 @@ class LayoutToNetlist:
 
         If 'netname_prop' is not nil, a property with the given name is created and attached to shapes. The value of the property is the net name.
 
-        'lmap' defines which layers are to be produced. It is map, where the keys are layer indexes in the target layout and the values are Region objects indicating the layer where shapes are to be taken from. Use \layer_by_name or \layer_by_index to get the Region object corresponding to a layer stored inside the LayoutToNetlist database.
+        'lmap' defines which layers are to be produced. It is map, where the keys are layer indexes in the target layout and the values are Region or Texts objects or layer indexes, indicating the layer where shapes are to be taken from. 'lmap' can also be left nil, in which case, a layer mapping will be provided based on the layer info attributes of the layers (see \layer_info).
 
-        Net hierarchy is covered in three ways:
-        @ul
-         @li No connection indicated (hier_mode == \BNH_Disconnected: the net shapes are simply put into their
-             respective circuits. The connections are not indicated. @/li
-         @li Subnet hierarchy (hier_mode == \BNH_SubcircuitCells): for each root net, a full hierarchy is built
-             to accommodate the subnets (see build_net in recursive mode). @/li
-         @li Flat (hier_mode == \BNH_Flatten): each net is flattened and put into the circuit it
-             belongs to. @/li
-        @/ul
+        Also see \build_all_nets for a description of the 'hier_mode' argument.
+
         If a device cell name prefix is given, cells will be produced for each device abstract
         using a name like device_cell_name_prefix + device name. Otherwise the device shapes are
         treated as part of the net.
 
         @param target The target layout
         @param target_cell The target cell
-        @param lmap Target layer indexes (keys) and net regions (values)
+        @param lmap The layer mapping (see description of this method)
         @param hier_mode See description of this method
         @param netname_prop An (optional) property name to which to attach the net name
         @param cell_name_prefix Chooses recursive mode if non-null
         @param device_cell_name_prefix See above
+
+        The 'lmap' argument has been generalized in version 0.30 and became optional.
         """
         ...
-    def build_nets(self, nets: Sequence[Net], cmap: CellMapping, target: Layout, lmap: Dict[int, Region], net_cell_name_prefix: Optional[Any] = ..., netname_prop: Optional[Any] = ..., hier_mode: Optional[LayoutToNetlist.BuildNetHierarchyMode] = ..., circuit_cell_name_prefix: Optional[Any] = ..., device_cell_name_prefix: Optional[Any] = ...) -> None:
+    def build_nets(self, nets: Sequence[Net], cmap: CellMapping, target: Layout, lmap: Optional[Any] = ..., net_cell_name_prefix: Optional[Any] = ..., netname_prop: Optional[Any] = ..., hier_mode: Optional[LayoutToNetlist.BuildNetHierarchyMode] = ..., circuit_cell_name_prefix: Optional[Any] = ..., device_cell_name_prefix: Optional[Any] = ...) -> None:
         r"""
         @brief Like \build_all_nets, but with the ability to select some nets.
+        The 'lmap' argument has been generalized in version 0.30 and became optional.
         """
         ...
     @overload
@@ -37344,7 +41847,7 @@ class LayoutToNetlist:
         r"""
         @brief Creates a cell mapping for copying shapes from the internal layout to the given target layout.
         This version will not create new cells in the target layout.
-        If the required cells do not exist there yet, flatting will happen.
+        If some required cells do not exist there, they will be flattened into the first existing parent.
         """
         ...
     def create(self) -> None:
@@ -37540,7 +42043,7 @@ class LayoutToNetlist:
         @ul
         @li "" no implicit connections.@/li
         @li "*" to make all labels candidates for implicit connections.@/li
-        @li "VDD" to make all 'VDD'' nets candidates for implicit connections.@/li
+        @li "VDD" to make all 'VDD' nets candidates for implicit connections.@/li
         @li "VDD" to make all 'VDD'+suffix nets candidates for implicit connections.@/li
         @li "{VDD,VSS}" to all VDD and VSS nets candidates for implicit connections.@/li
         @/ul
@@ -37581,9 +42084,13 @@ class LayoutToNetlist:
         ...
     def layer_by_index(self, index: int) -> Region:
         r"""
-        @brief Gets a layer object for the given index.
+        @brief Gets a \Region object for the given index.
         The returned object is a new Region object representing the layer with the given index. It will refer to a layer inside the internal layout, or more specifically inside the \DeepShapeStorage object (see \dss and \internal_layout).
         The method returns 'nil' if the index is not a valid layer index.
+
+        It is in the responsibility of the user to use \texts_by_index or \polygons_by_index on the right layers. A layer created for text purpose should not be used with \polygons_by_index or vice versa.
+
+        Starting with version 0.30, the preferred name for this method is \polygons_by_index to differentiate from \texts_by_index.
         """
         ...
     def layer_by_name(self, name: str) -> Region:
@@ -37592,8 +42099,13 @@ class LayoutToNetlist:
         The returned object is a new Region object representing the named layer. It will refer to a layer inside the internal layout, or more specifically inside the \DeepShapeStorage object (see \dss and \internal_layout).
         The method returns 'nil' if the name is not a valid layer name.
         See \register and the make_... methods for a description of layer naming.
+
+        It is in the responsibility of the user to use \texts_by_index or \polygons_by_index on the right layers. A layer created for text purpose should not be used with \polygons_by_index or vice versa.
+
+        Starting with version 0.30, the preferred name for this method is \polygons_by_index to differentiate from \texts_by_index.
         """
         ...
+    @overload
     def layer_index(self, l: ShapeCollection) -> int:
         r"""
         @brief Gets the layer index for the given data object
@@ -37605,6 +42117,14 @@ class LayoutToNetlist:
         You can use \layer_by_index to retrieve the \Region object of a layer from the layer index.
 
         This method has been introduced in version 0.29.3.
+        """
+        ...
+    @overload
+    def layer_index(self, name: str) -> Any:
+        r"""
+        @brief Gets the layer index for a given name or nil if the name is not valid.
+
+        This method has been introduced in version 0.30.
         """
         ...
     def layer_indexes(self) -> List[int]:
@@ -37654,6 +42174,8 @@ class LayoutToNetlist:
         @brief Gets the internal layer for a given extraction layer
         This method is required to derive the internal layer index - for example for
         investigating the cluster tree.
+
+        A generalized version of this method is \layer_index.
         """
         ...
     @overload
@@ -37664,6 +42186,7 @@ class LayoutToNetlist:
         investigating the cluster tree.
 
         The variant for Texts collections has been added in version 0.27.
+        A generalized version of this method is \layer_index.
         """
         ...
     @overload
@@ -37688,23 +42211,91 @@ class LayoutToNetlist:
         The name is optional. If given, the layer will already be named accordingly (see \register).
         """
         ...
+    @overload
     def make_polygon_layer(self, layer_index: int, name: Optional[str] = ...) -> Region:
         r"""
         @brief Creates a new region representing an original layer taking polygons only
         See \make_layer for details.
         """
         ...
+    @overload
+    def make_polygon_layer(self, name: Optional[str] = ...) -> Region:
+        r"""
+        @brief Creates a new, empty hierarchical region
+        See \make_layer for details.
+
+        Starting with version 0.30, the original layer index is optional for consistency with \make_layer.
+        """
+        ...
+    @overload
     def make_text_layer(self, layer_index: int, name: Optional[str] = ...) -> Texts:
         r"""
-        @brief Creates a new region representing an original layer taking texts only
+        @brief Creates a new text collection representing an original layer taking texts only
         See \make_layer for details.
 
         Starting with version 0.27, this method returns a \Texts object.
         """
         ...
+    @overload
+    def make_text_layer(self, name: Optional[str] = ...) -> Texts:
+        r"""
+        @brief Creates a new, empty hierarchical text collection
+        See \make_layer for details.
+
+        Starting with version 0.30, the original layer index is optional, allowing to create empty, internal text layers.
+        """
+        ...
     def netlist(self) -> Netlist:
         r"""
         @brief gets the netlist extracted (0 if no extraction happened yet)
+        """
+        ...
+    def original_layout(self) -> Layout:
+        r"""
+        @brief Gets the original layout or nil if the LayoutToNetlist object is not attached to one.
+
+        This method has been introduced in version 0.30.
+        """
+        ...
+    def original_top_cell(self) -> Cell:
+        r"""
+        @brief Gets the original top cell or nil if the LayoutToNetlist object is not attached to an original layout.
+
+        This method has been introduced in version 0.30.
+        """
+        ...
+    def polygons_by_index(self, index: int) -> Region:
+        r"""
+        @brief Gets a \Region object for the given index.
+        The returned object is a new Region object representing the layer with the given index. It will refer to a layer inside the internal layout, or more specifically inside the \DeepShapeStorage object (see \dss and \internal_layout).
+        The method returns 'nil' if the index is not a valid layer index.
+
+        It is in the responsibility of the user to use \texts_by_index or \polygons_by_index on the right layers. A layer created for text purpose should not be used with \polygons_by_index or vice versa.
+
+        Starting with version 0.30, the preferred name for this method is \polygons_by_index to differentiate from \texts_by_index.
+        """
+        ...
+    def polygons_by_name(self, name: str) -> Region:
+        r"""
+        @brief Gets a layer object for the given name.
+        The returned object is a new Region object representing the named layer. It will refer to a layer inside the internal layout, or more specifically inside the \DeepShapeStorage object (see \dss and \internal_layout).
+        The method returns 'nil' if the name is not a valid layer name.
+        See \register and the make_... methods for a description of layer naming.
+
+        It is in the responsibility of the user to use \texts_by_index or \polygons_by_index on the right layers. A layer created for text purpose should not be used with \polygons_by_index or vice versa.
+
+        Starting with version 0.30, the preferred name for this method is \polygons_by_index to differentiate from \texts_by_index.
+        """
+        ...
+    def polygons_of_net(self, net: Net, of_layer: int, recursive: Optional[bool] = ..., trans: Optional[ICplxTrans] = ...) -> Region:
+        r"""
+        @brief Returns all polygons of a specific net and layer.
+        If 'recursive' is true, the returned region will contain the shapes of
+        all subcircuits too.
+
+        The optional 'trans' parameter allows applying a transformation to all shapes.
+
+        This method is similar to \shapes_of_net, but takes a layer index for the layer. It was introduced in version 0.30.
         """
         ...
     @overload
@@ -37786,21 +42377,47 @@ class LayoutToNetlist:
     @overload
     def shapes_of_net(self, net: Net, of_layer: Region, recursive: Optional[bool] = ..., trans: Optional[ICplxTrans] = ...) -> Region:
         r"""
-        @brief Returns all shapes of a specific net and layer.
-        If 'recursive'' is true, the returned region will contain the shapes of
+        @brief Returns all polygons of a specific net and layer.
+        If 'recursive' is true, the returned region will contain the shapes of
         all subcircuits too.
 
         The optional 'trans' parameter allows applying a transformation to all shapes. It has been introduced in version 0.28.4.
         """
         ...
     @overload
-    def shapes_of_net(self, net: Net, of_layer: Region, recursive: bool, to: Shapes, propid: Optional[int] = ..., trans: Optional[ICplxTrans] = ...) -> None:
+    def shapes_of_net(self, net: Net, of_layer: ShapeCollection, recursive: bool, to: Shapes, propid: Optional[int] = ..., trans: Optional[ICplxTrans] = ...) -> None:
         r"""
         @brief Sends all shapes of a specific net and layer to the given Shapes container.
-        If 'recursive'' is true, the returned region will contain the shapes of
+        If 'recursive' is true, the returned region will contain the shapes of
         all subcircuits too.
-        "prop_id" is an optional properties ID. If given, this property set will be attached to the shapes.
+
+        'prop_id' is an optional properties ID. If given, this property set will be attached to the shapes.
         The optional 'trans' parameter allows applying a transformation to all shapes. It has been introduced in version 0.28.4.
+        The 'of_layer' argument has been generalized in version 0.30 and can be a layer index, a \Region layer or a \Texts layer.
+        """
+        ...
+    @overload
+    def shapes_of_net(self, net: Net, of_layer: Texts, recursive: Optional[bool] = ..., trans: Optional[ICplxTrans] = ...) -> Texts:
+        r"""
+        @brief Returns all texts of a specific net and layer.
+        If 'recursive' is true, the returned text collection will contain the shapes of
+        all subcircuits too.
+
+        The optional 'trans' parameter allows applying a transformation to all shapes.
+
+        This variant has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def shapes_of_net(self, net: Net, of_layer: int, recursive: bool, to: Shapes, propid: Optional[int] = ..., trans: Optional[ICplxTrans] = ...) -> None:
+        r"""
+        @brief Sends all shapes of a specific net and layer to the given Shapes container.
+        If 'recursive' is true, the returned region will contain the shapes of
+        all subcircuits too.
+
+        'prop_id' is an optional properties ID. If given, this property set will be attached to the shapes.
+        The optional 'trans' parameter allows applying a transformation to all shapes. It has been introduced in version 0.28.4.
+        The 'of_layer' argument has been generalized in version 0.30 and can be a layer index, a \Region layer or a \Texts layer.
         """
         ...
     def shapes_of_pin(self, pin: NetSubcircuitPinRef, trans: Optional[ICplxTrans] = ...) -> Dict[int, Region]:
@@ -37896,6 +42513,40 @@ class LayoutToNetlist:
         Soft connections are directional, where the global net is the 'lower' layer (typically high-ohmic substrate or diffusion).
 
         Soft connections have been introduced in version 0.29.
+        """
+        ...
+    def texts_by_index(self, index: int) -> Texts:
+        r"""
+        @brief Gets a \Texts object for the given index.
+        The returned object is a new Texts object representing the layer with the given index. It will refer to a layer inside the internal layout, or more specifically inside the \DeepShapeStorage object (see \dss and \internal_layout).
+        The method returns 'nil' if the index is not a valid layer index.
+
+        It is in the responsibility of the user to use \texts_by_index or \polygons_by_index on the right layers. A layer created for text purpose should not be used with \polygons_by_index or vice versa.
+
+        This method has been introduced in version 0.30.
+        """
+        ...
+    def texts_by_name(self, name: str) -> Texts:
+        r"""
+        @brief Gets a layer object for the given name.
+        The returned object is a new Texts object representing the named layer. It will refer to a layer inside the internal layout, or more specifically inside the \DeepShapeStorage object (see \dss and \internal_layout).
+        The method returns 'nil' if the name is not a valid layer name.
+        See \register and the make_... methods for a description of layer naming.
+
+        It is in the responsibility of the user to use \texts_by_name or \polygons_by_name on the right layers. A layer created for text purpose should not be used with \polygons_by_name or vice versa.
+
+        This method has been introduced in version 0.30.
+        """
+        ...
+    def texts_of_net(self, net: Net, of_layer: int, recursive: Optional[bool] = ..., trans: Optional[ICplxTrans] = ...) -> Texts:
+        r"""
+        @brief Returns all texts of a specific net and layer.
+        If 'recursive' is true, the returned region will contain the shapes of
+        all subcircuits too.
+
+        The optional 'trans' parameter allows applying a transformation to all shapes.
+
+        This method is similar to \shapes_of_net, but takes a layer index for the layer. It was introduced in version 0.30.
         """
         ...
     def write(self, path: str, short_format: Optional[bool] = ...) -> None:
@@ -39025,204 +43676,6 @@ class LoadLayoutOptions:
 
     This method has been added in version 0.26.2.
     """
-    mebes_boundary_datatype: int
-    r"""
-    Getter:
-    @brief Gets the datatype number of the boundary layer to produce
-    See \mebes_produce_boundary= for a description of this attribute.
-
-    This property has been added in version 0.23.10.
-
-    Setter:
-    @brief Sets the datatype number of the boundary layer to produce
-    See \mebes_produce_boundary= for a description of this attribute.
-
-    This property has been added in version 0.23.10.
-    """
-    mebes_boundary_layer: int
-    r"""
-    Getter:
-    @brief Gets the layer number of the boundary layer to produce
-    See \mebes_produce_boundary= for a description of this attribute.
-
-    This property has been added in version 0.23.10.
-
-    Setter:
-    @brief Sets the layer number of the boundary layer to produce
-    See \mebes_produce_boundary= for a description of this attribute.
-
-    This property has been added in version 0.23.10.
-    """
-    mebes_boundary_name: str
-    r"""
-    Getter:
-    @brief Gets the name of the boundary layer to produce
-    See \mebes_produce_boundary= for a description of this attribute.
-
-    This property has been added in version 0.23.10.
-
-    Setter:
-    @brief Sets the name of the boundary layer to produce
-    See \mebes_produce_boundary= for a description of this attribute.
-
-    This property has been added in version 0.23.10.
-    """
-    mebes_create_other_layers: bool
-    r"""
-    Getter:
-    @brief Gets a value indicating whether other layers shall be created
-    @return True, if other layers will be created.
-    This attribute acts together with a layer map (see \mebes_layer_map=). Layers not listed in this map are created as well when \mebes_create_other_layers? is true. Otherwise they are ignored.
-
-    This method has been added in version 0.25 and replaces the respective global option in \LoadLayoutOptions in a format-specific fashion.
-    Setter:
-    @brief Specifies whether other layers shall be created
-    @param create True, if other layers will be created.
-    See \mebes_create_other_layers? for a description of this attribute.
-
-    This method has been added in version 0.25 and replaces the respective global option in \LoadLayoutOptions in a format-specific fashion.
-    """
-    mebes_data_datatype: int
-    r"""
-    Getter:
-    @brief Gets the datatype number of the data layer to produce
-
-    This property has been added in version 0.23.10.
-
-    Setter:
-    @brief Sets the datatype number of the data layer to produce
-
-    This property has been added in version 0.23.10.
-    """
-    mebes_data_layer: int
-    r"""
-    Getter:
-    @brief Gets the layer number of the data layer to produce
-
-    This property has been added in version 0.23.10.
-
-    Setter:
-    @brief Sets the layer number of the data layer to produce
-
-    This property has been added in version 0.23.10.
-    """
-    mebes_data_name: str
-    r"""
-    Getter:
-    @brief Gets the name of the data layer to produce
-
-    This property has been added in version 0.23.10.
-
-    Setter:
-    @brief Sets the name of the data layer to produce
-
-    This property has been added in version 0.23.10.
-    """
-    mebes_invert: bool
-    r"""
-    Getter:
-    @brief Gets a value indicating whether to invert the MEBES pattern
-    If this property is set to true, the pattern will be inverted.
-
-    This property has been added in version 0.22.
-
-    Setter:
-    @brief Specify whether to invert the MEBES pattern
-    If this property is set to true, the pattern will be inverted.
-
-    This property has been added in version 0.22.
-    """
-    mebes_layer_map: LayerMap
-    r"""
-    Getter:
-    @brief Gets the layer map
-    @return The layer map.
-
-    This method has been added in version 0.25 and replaces the respective global option in \LoadLayoutOptions in a format-specific fashion.
-    Setter:
-    @brief Sets the layer map
-    This sets a layer mapping for the reader. Unlike \mebes_set_layer_map, the 'create_other_layers' flag is not changed.
-    @param map The layer map to set.
-
-    This convenience method has been added in version 0.26.2.
-    """
-    mebes_num_shapes_per_cell: int
-    r"""
-    Getter:
-    @brief Gets the number of stripes collected per cell
-    See \mebes_num_stripes_per_cell= for details about this property.
-
-    This property has been added in version 0.24.5.
-
-    Setter:
-    @brief Specify the number of stripes collected per cell
-    See \mebes_num_stripes_per_cell= for details about this property.
-
-    This property has been added in version 0.24.5.
-    """
-    mebes_num_stripes_per_cell: int
-    r"""
-    Getter:
-    @brief Gets the number of stripes collected per cell
-    See \mebes_num_stripes_per_cell= for details about this property.
-
-    This property has been added in version 0.23.10.
-
-    Setter:
-    @brief Specify the number of stripes collected per cell
-    This property specifies how many stripes will be collected into one cell.
-    A smaller value means less but bigger cells. The default value is 64.
-    New cells will be formed whenever more than this number of stripes has been read
-    or a new segment is started and the number of shapes given by \mebes_num_shapes_per_cell
-    is exceeded.
-
-    This property has been added in version 0.23.10.
-    """
-    mebes_produce_boundary: bool
-    r"""
-    Getter:
-    @brief Gets a value indicating whether a boundary layer will be produced
-    See \mebes_produce_boundary= for details about this property.
-
-    This property has been added in version 0.23.10.
-
-    Setter:
-    @brief Specify whether to produce a boundary layer
-    If this property is set to true, the pattern boundary will be written to the layer and datatype specified with \mebes_boundary_name, \mebes_boundary_layer and \mebes_boundary_datatype.
-    By default, the boundary layer is produced.
-
-    This property has been added in version 0.23.10.
-    """
-    mebes_subresolution: bool
-    r"""
-    Getter:
-    @brief Gets a value indicating whether to invert the MEBES pattern
-    See \subresolution= for details about this property.
-
-    This property has been added in version 0.23.10.
-
-    Setter:
-    @brief Specify whether subresolution trapezoids are supported
-    If this property is set to true, subresolution trapezoid vertices are supported.
-    In order to implement support, the reader will create magnified instances with a magnification of 1/16.
-    By default this property is enabled.
-
-    This property has been added in version 0.23.10.
-    """
-    mebes_top_cell_index: int
-    r"""
-    Getter:
-    @brief Gets the cell index for the top cell to use
-    See \mebes_top_cell_index= for a description of this property.
-
-    This property has been added in version 0.23.10.
-
-    Setter:
-    @brief Specify the cell index for the top cell to use
-    If this property is set to a valid cell index, the MEBES reader will put the subcells and shapes into this cell.
-
-    This property has been added in version 0.23.10.
-    """
     oasis_expect_strict_mode: int
     r"""
     Getter:
@@ -39460,26 +43913,6 @@ class LoadLayoutOptions:
         @param create_other_layers The flag indicating whether other layers will be created as well. Set to false to read only the layers in the layer map.
 
         This method has been added in version 0.26.2.
-        """
-        ...
-    def mebes_select_all_layers(self) -> None:
-        r"""
-        @brief Selects all layers and disables the layer map
-
-        This disables any layer map and enables reading of all layers.
-        New layers will be created when required.
-
-        This method has been added in version 0.25 and replaces the respective global option in \LoadLayoutOptions in a format-specific fashion.
-        """
-        ...
-    def mebes_set_layer_map(self, map: LayerMap, create_other_layers: bool) -> None:
-        r"""
-        @brief Sets the layer map
-        This sets a layer mapping for the reader. The layer map allows selection and translation of the original layers.
-        @param map The layer map to set.
-        @param create_other_layers The flag indicating whether other layers will be created as well. Set to false to read only the layers in the layer map.
-
-        This method has been added in version 0.25 and replaces the respective global option in \LoadLayoutOptions in a format-specific fashion.
         """
         ...
     def select_all_layers(self) -> None:
@@ -42981,17 +47414,24 @@ class Netlist:
     @overload
     def circuit_by_cell_index(self, cell_index: int) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given cell index.
+        @brief Gets the circuit object for a given cell index (const version).
         If the cell index is not valid or no circuit is registered with this index, nil is returned.
+
+        This constness variant has been introduced in version 0.26.8.
         """
         ...
     @overload
     def circuit_by_cell_index(self, cell_index: int) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given cell index (const version).
+        @brief Gets the circuit object for a given cell index.
         If the cell index is not valid or no circuit is registered with this index, nil is returned.
-
-        This constness variant has been introduced in version 0.26.8.
+        """
+        ...
+    @overload
+    def circuit_by_name(self, name: str) -> Circuit:
+        r"""
+        @brief Gets the circuit object for a given name.
+        If the name is not a valid circuit name, nil is returned.
         """
         ...
     @overload
@@ -43001,13 +47441,6 @@ class Netlist:
         If the name is not a valid circuit name, nil is returned.
 
         This constness variant has been introduced in version 0.26.8.
-        """
-        ...
-    @overload
-    def circuit_by_name(self, name: str) -> Circuit:
-        r"""
-        @brief Gets the circuit object for a given name.
-        If the name is not a valid circuit name, nil is returned.
         """
         ...
     @overload
@@ -47024,7 +51457,7 @@ class Path:
 
     A path consists of an sequence of line segments forming the 'spine' of the path and a width. In addition, the starting point can be drawn back by a certain extent (the 'begin extension') and the end point can be pulled forward somewhat (by the 'end extension').
 
-    A path may have round ends for special purposes. In particular, a round-ended path with a single point can represent a circle. Round-ended paths should have being and end extensions equal to half the width. Non-round-ended paths with a single point are allowed but the definition of the resulting shape in not well defined and may differ in other tools.
+    A path may have round ends for special purposes. In particular, a round-ended path with a single point can represent a circle. Round-ended paths should have begin and end extensions equal to half the width. Non-round-ended paths with a single point are allowed, but the definition of the resulting shape is not well defined and may differ in other tools.
 
     See @<a href="/programming/database_api.xml">The Database API@</a> for more details about the database objects.
     """
@@ -47575,6 +52008,265 @@ class Path:
         @param t The transformation to apply.
 
         @return The transformed path.
+        """
+        ...
+    ...
+
+class PathWithProperties(Path):
+    r"""
+    @brief A Path object with properties attached.
+    This class represents a combination of a Path object an user properties. User properties are stored in form of a properties ID. Convenience methods are provided to manipulate or retrieve user properties directly.
+
+    This class has been introduced in version 0.30.
+    """
+    prop_id: int
+    r"""
+    Getter:
+    @brief Gets the properties ID associated with the object
+
+    Setter:
+    @brief Sets the properties ID of the object
+    """
+    @overload
+    @classmethod
+    def new(cls, path: Path, properties: Dict[Any, Any]) -> PathWithProperties:
+        r"""
+        @brief Creates a new object from a property-less object and a properties hash.
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, path: Path, properties_id: Optional[int] = ...) -> PathWithProperties:
+        r"""
+        @brief Creates a new object from a property-less object and a properties ID.
+        """
+        ...
+    @overload
+    def __init__(self, path: Path, properties: Dict[Any, Any]) -> None:
+        r"""
+        @brief Creates a new object from a property-less object and a properties hash.
+        """
+        ...
+    @overload
+    def __init__(self, path: Path, properties_id: Optional[int] = ...) -> None:
+        r"""
+        @brief Creates a new object from a property-less object and a properties ID.
+        """
+        ...
+    def __mul__(self, f: float) -> DPathWithProperties:
+        r"""
+        @brief Scales the object by some factor
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and, if necessary, rounded.
+        """
+        ...
+    def __repr__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    def __rmul__(self, f: float) -> DPathWithProperties:
+        r"""
+        @brief Scales the object by some factor
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and, if necessary, rounded.
+        """
+        ...
+    def __str__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    def _assign(self, other: Path) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+        ...
+    def _const_cast(self) -> PathWithProperties:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _dup(self) -> PathWithProperties:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> PathWithProperties:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def delete_property(self, key: Any) -> None:
+        r"""
+        @brief Deletes the user property with the given key
+        This method is a convenience method that deletes the property with the given key. It does nothing if no property with that key exists. Using that method is more convenient than creating a new property set with a new ID and assigning that properties ID.
+        This method may change the properties ID.
+        """
+        ...
+    def downcast(self) -> Path:
+        r"""
+        @brief Gets the corresponding object without the properties
+        """
+        ...
+    @overload
+    def move(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> PathWithProperties:
+        r"""
+        @brief Moves the object.
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is overwritten.
+
+        @param dx The x distance to move the object.
+        @param dy The y distance to move the object.
+
+        @return The moved object (self).
+        """
+        ...
+    @overload
+    def move(self, v: Vector) -> PathWithProperties:
+        r"""
+        @brief Moves the object.
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is overwritten.
+
+        @param v The distance to move the object.
+
+        @return The moved object (self).
+        """
+        ...
+    @overload
+    def moved(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> PathWithProperties:
+        r"""
+        @brief Returns the moved object (does not modify self)
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is not modified.
+
+        @param dx The x distance to move the object.
+        @param dy The y distance to move the object.
+
+        @return The moved object.
+        """
+        ...
+    @overload
+    def moved(self, v: Vector) -> PathWithProperties:
+        r"""
+        @brief Returns the moved object
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is not modified.
+
+        @param v The distance to move the object.
+
+        @return The moved object.
+        """
+        ...
+    def properties(self) -> Any:
+        r"""
+        @brief Gets the user properties
+        This method is a convenience method that gets the properties of the shape as a single hash.
+        """
+        ...
+    def property(self, key: Any) -> Any:
+        r"""
+        @brief Gets the user property with the given key
+        This method is a convenience method that gets the user property with the given key. If no property with that key does not exist, it will return nil. Using that method is more convenient than using the layout object and the properties ID to retrieve the property value. 
+        """
+        ...
+    def set_property(self, key: Any, value: Any) -> None:
+        r"""
+        @brief Sets the user property with the given key to the given value
+        This method is a convenience method that sets the user property with the given key to the given value. If no property with that key exists, it will create one. Using that method is more convenient than creating a new property set with a new ID and assigning that properties ID.
+        This method may change the properties ID. Note: GDS only supports integer keys. OASIS supports numeric and string keys.
+        """
+        ...
+    def to_s(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    @overload
+    def transform(self, t: ICplxTrans) -> None:
+        r"""
+        @brief Transforms the object (in-place version)
+        """
+        ...
+    @overload
+    def transform(self, t: Trans) -> None:
+        r"""
+        @brief Transforms the object (in-place version)
+        """
+        ...
+    @overload
+    def transformed(self, t: CplxTrans) -> DPathWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    @overload
+    def transformed(self, t: ICplxTrans) -> PathWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    @overload
+    def transformed(self, t: Trans) -> PathWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
         """
         ...
     ...
@@ -49264,7 +53956,7 @@ class Polygon:
         ...
     ...
 
-class PolygonFilter:
+class PolygonFilter(PolygonFilterBase):
     r"""
     @brief A generic polygon filter adaptor
 
@@ -49299,47 +53991,6 @@ class PolygonFilter:
 
     This class has been introduced in version 0.29.
     """
-    requires_raw_input: bool
-    r"""
-    Getter:
-    @brief Gets a value indicating whether the filter needs raw (unmerged) input
-    See \requires_raw_input= for details.
-
-    Setter:
-    @brief Sets a value indicating whether the filter needs raw (unmerged) input
-    This flag must be set before using this filter. It tells the filter implementation whether the filter wants to have raw input (unmerged). The default value is 'false', meaning that
-    the filter will receive merged polygons ('merged semantics').
-
-    Setting this value to false potentially saves some CPU time needed for merging the polygons.
-    Also, raw input means that strange shapes such as dot-like edges, self-overlapping polygons, empty or degenerated polygons are preserved.
-    """
-    wants_variants: bool
-    r"""
-    Getter:
-    @brief Gets a value indicating whether the filter prefers cell variants
-    See \wants_variants= for details.
-
-    Setter:
-    @brief Sets a value indicating whether the filter prefers cell variants
-    This flag must be set before using this filter for hierarchical applications (deep mode). It tells the filter implementation whether cell variants should be created (true, the default) or shape propagation will be applied (false).
-
-    This decision needs to be made, if the filter indicates that it will deliver different results
-    for scaled or rotated versions of the shape (see \is_isotropic and the other hints). If a cell
-    is present with different qualities - as seen from the top cell - the respective instances
-    need to be differentiated. Cell variant formation is one way, shape propagation the other way.
-    Typically, cell variant formation is less expensive, but the hierarchy will be modified.
-    """
-    @classmethod
-    def new(cls) -> PolygonFilter:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
-    def __init__(self) -> None:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
     def _const_cast(self) -> PolygonFilter:
         r"""
         @brief Returns a non-const reference to self.
@@ -49384,6 +54035,157 @@ class PolygonFilter:
         """
         ...
     def _to_const_object(self) -> PolygonFilter:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    ...
+
+class PolygonFilterBase:
+    r"""
+    @hide
+    """
+    requires_raw_input: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the filter needs raw (unmerged) input
+    See \requires_raw_input= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the filter needs raw (unmerged) input
+    This flag must be set before using this filter. It tells the filter implementation whether the filter wants to have raw input (unmerged). The default value is 'false', meaning that
+    the filter will receive merged polygons ('merged semantics').
+
+    Setting this value to false potentially saves some CPU time needed for merging the polygons.
+    Also, raw input means that strange shapes such as dot-like edges, self-overlapping polygons, empty or degenerated polygons are preserved.
+    """
+    wants_variants: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the filter prefers cell variants
+    See \wants_variants= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the filter prefers cell variants
+    This flag must be set before using this filter for hierarchical applications (deep mode). It tells the filter implementation whether cell variants should be created (true, the default) or shape propagation will be applied (false).
+
+    This decision needs to be made, if the filter indicates that it will deliver different results
+    for scaled or rotated versions of the shape (see \is_isotropic and the other hints). If a cell
+    is present with different qualities - as seen from the top cell - the respective instances
+    need to be differentiated. Cell variant formation is one way, shape propagation the other way.
+    Typically, cell variant formation is less expensive, but the hierarchy will be modified.
+    """
+    @classmethod
+    def new(cls) -> PolygonFilterBase:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    @classmethod
+    def property_filter(cls, name: Any, value: Any, inverse: Optional[bool] = ...) -> PolygonFilterBase:
+        r"""
+        @brief Creates a single-valued property filter
+        @param name The name of the property to use.
+        @param value The value against which the property is checked (exact match).
+        @param inverse If true, inverts the selection - i.e. all polygons without a property with the given name and value are selected.
+
+        Apply this filter with \Region#filtered. See \property_glob for an example.
+
+        This feature has been introduced in version 0.30.
+        """
+        ...
+    @classmethod
+    def property_filter_bounded(cls, name: Any, from_: Any, to: Any, inverse: Optional[bool] = ...) -> PolygonFilterBase:
+        r"""
+        @brief Creates a single-valued property filter
+        @param name The name of the property to use.
+        @param from The lower value against which the property is checked or 'nil' if no lower bound shall be used.
+        @param to The upper value against which the property is checked or 'nil' if no upper bound shall be used.
+        @param inverse If true, inverts the selection - i.e. all polygons without a property with the given name and value range are selected.
+
+        This version does a bounded match. The value of the propery needs to be larger or equal to 'from' and less than 'to'.
+        Apply this filter with \Region#filtered. See \property_glob for an example.
+
+        This feature has been introduced in version 0.30.
+        """
+        ...
+    @classmethod
+    def property_glob(cls, name: Any, pattern: str, inverse: Optional[bool] = ..., case_sensitive: Optional[bool] = ...) -> PolygonFilterBase:
+        r"""
+        @brief Creates a single-valued property filter
+        @param name The name of the property to use.
+        @param value The glob pattern to match the property value against.
+        @param inverse If true, inverts the selection - i.e. all polygons without a matching property are selected.
+        @param case_sensitive If true, the match is case sensitive (the default), if false, the match is not case sensitive.
+
+        Apply this filter with \Region#filtered:
+
+        @code
+        # region is a Region object
+        # filtered_region contains all polygons where the 'net' property starts with 'C':
+        filtered_region = region.filtered(RBA::PolygonFilterBase::property_glob('net', 'C*'))
+        @/code
+
+        This feature has been introduced in version 0.30.
+        """
+        ...
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def _const_cast(self) -> PolygonFilterBase:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> PolygonFilterBase:
         r"""
         @hide
         """
@@ -49445,6 +54247,227 @@ class PolygonFilter:
         Call this method before using the filter to indicate that the selection is independent of the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
 
         An example for a scale invariant (polygon) filter is the bounding box aspect ratio (height/width) filter. The definition of heigh and width depends on the orientation, but the ratio is independent on scale.
+        """
+        ...
+    ...
+
+class PolygonNeighborhoodVisitor(PolygonNeighborhoodVisitorBase):
+    r"""
+    @brief A visitor for the neighborhood of polygons in the input
+
+    Objects of this class are passed to \PolygonNeighborhoodCompoundOperationNode constructor to handle events on each edge of the primary input along with the neighborhood taken from the additional inputs.
+
+    See \neighbors for the description of the events delivered.
+    This class has been introduced in version 0.30.0.
+    """
+    result_type: CompoundRegionOperationNode.ResultType
+    r"""
+    Getter:
+    @brief Gets the result type
+
+    Setter:
+    @brief Configures the result type
+    Use this method to indicate what type of result you want to deliver. You can use the corresponding 'output' method then to deliver result shapes from one the callbacks (\on_edge, \begin_polygon, \end_polygon). Set this attribute when you create the visitor object. This attribute does not need to be set if no output is indended to be delivered.
+    """
+    def _const_cast(self) -> PolygonNeighborhoodVisitor:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> PolygonNeighborhoodVisitor:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    @overload
+    def output(self, edge: EdgeWithProperties) -> None:
+        r"""
+        @brief Outputs an edge
+        Use this method from one of the callbacks (\on_edge, \begin_polygon, \end_polygon) to deliver a polygon. Note that you have to configure the result type as 'Edges' on construction of the visitor before being able to do so.
+        'output' expects an object in original space - i.e. of the input edge. \to_original_trans gives you a suitable transformation to bring objects from 'edge is horizontal' space into the original space.
+        """
+        ...
+    @overload
+    def output(self, edge_pair: EdgePairWithProperties) -> None:
+        r"""
+        @brief Outputs an edge pair
+        Use this method from one of the callbacks (\on_edge, \begin_polygon, \end_polygon) to deliver a polygon. Note that you have to configure the result type as 'EdgePairs' on construction of the visitor before being able to do so.
+        'output' expects an object in original space - i.e. of the input edge. \to_original_trans gives you a suitable transformation to bring objects from 'edge is horizontal' space into the original space.
+        """
+        ...
+    @overload
+    def output(self, polygon: PolygonWithProperties) -> None:
+        r"""
+        @brief Outputs a polygon
+        Use this method from one of the callbacks (\on_edge, \begin_polygon, \end_polygon) to deliver a polygon. Note that you have to configure the result type as 'Region' on construction of the visitor before being able to do so.
+
+        'output' expects an object in original space - i.e. of the input edge. \to_original_trans gives you a suitable transformation to bring objects from 'edge is horizontal' space into the original space.
+        """
+        ...
+    ...
+
+class PolygonNeighborhoodVisitorBase:
+    r"""
+    @hide
+    """
+    @classmethod
+    def new(cls) -> PolygonNeighborhoodVisitorBase:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def __copy__(self) -> PolygonNeighborhoodVisitorBase:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def __deepcopy__(self) -> PolygonNeighborhoodVisitorBase:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def _const_cast(self) -> PolygonNeighborhoodVisitorBase:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> PolygonNeighborhoodVisitorBase:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def assign(self, other: PolygonNeighborhoodVisitorBase) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+        ...
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def dup(self) -> PolygonNeighborhoodVisitorBase:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
         """
         ...
     ...
@@ -50047,6 +55070,265 @@ class PolygonToEdgePairOperator:
         Call this method before using the filter to indicate that the selection is independent of the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
 
         An example for a scale invariant (polygon) processor is the rotation operator. Rotation is not depending on scale, but on the original orientation as mirrored versions need to be rotated differently.
+        """
+        ...
+    ...
+
+class PolygonWithProperties(Polygon):
+    r"""
+    @brief A Polygon object with properties attached.
+    This class represents a combination of a Polygon object an user properties. User properties are stored in form of a properties ID. Convenience methods are provided to manipulate or retrieve user properties directly.
+
+    This class has been introduced in version 0.30.
+    """
+    prop_id: int
+    r"""
+    Getter:
+    @brief Gets the properties ID associated with the object
+
+    Setter:
+    @brief Sets the properties ID of the object
+    """
+    @overload
+    @classmethod
+    def new(cls, polygon: Polygon, properties: Dict[Any, Any]) -> PolygonWithProperties:
+        r"""
+        @brief Creates a new object from a property-less object and a properties hash.
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, polygon: Polygon, properties_id: Optional[int] = ...) -> PolygonWithProperties:
+        r"""
+        @brief Creates a new object from a property-less object and a properties ID.
+        """
+        ...
+    @overload
+    def __init__(self, polygon: Polygon, properties: Dict[Any, Any]) -> None:
+        r"""
+        @brief Creates a new object from a property-less object and a properties hash.
+        """
+        ...
+    @overload
+    def __init__(self, polygon: Polygon, properties_id: Optional[int] = ...) -> None:
+        r"""
+        @brief Creates a new object from a property-less object and a properties ID.
+        """
+        ...
+    def __mul__(self, f: float) -> DPolygonWithProperties:
+        r"""
+        @brief Scales the object by some factor
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and, if necessary, rounded.
+        """
+        ...
+    def __repr__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    def __rmul__(self, f: float) -> DPolygonWithProperties:
+        r"""
+        @brief Scales the object by some factor
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and, if necessary, rounded.
+        """
+        ...
+    def __str__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    def _assign(self, other: Polygon) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+        ...
+    def _const_cast(self) -> PolygonWithProperties:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _dup(self) -> PolygonWithProperties:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> PolygonWithProperties:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def delete_property(self, key: Any) -> None:
+        r"""
+        @brief Deletes the user property with the given key
+        This method is a convenience method that deletes the property with the given key. It does nothing if no property with that key exists. Using that method is more convenient than creating a new property set with a new ID and assigning that properties ID.
+        This method may change the properties ID.
+        """
+        ...
+    def downcast(self) -> Polygon:
+        r"""
+        @brief Gets the corresponding object without the properties
+        """
+        ...
+    @overload
+    def move(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> PolygonWithProperties:
+        r"""
+        @brief Moves the object.
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is overwritten.
+
+        @param dx The x distance to move the object.
+        @param dy The y distance to move the object.
+
+        @return The moved object (self).
+        """
+        ...
+    @overload
+    def move(self, v: Vector) -> PolygonWithProperties:
+        r"""
+        @brief Moves the object.
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is overwritten.
+
+        @param v The distance to move the object.
+
+        @return The moved object (self).
+        """
+        ...
+    @overload
+    def moved(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> PolygonWithProperties:
+        r"""
+        @brief Returns the moved object (does not modify self)
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is not modified.
+
+        @param dx The x distance to move the object.
+        @param dy The y distance to move the object.
+
+        @return The moved object.
+        """
+        ...
+    @overload
+    def moved(self, v: Vector) -> PolygonWithProperties:
+        r"""
+        @brief Returns the moved object
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is not modified.
+
+        @param v The distance to move the object.
+
+        @return The moved object.
+        """
+        ...
+    def properties(self) -> Any:
+        r"""
+        @brief Gets the user properties
+        This method is a convenience method that gets the properties of the shape as a single hash.
+        """
+        ...
+    def property(self, key: Any) -> Any:
+        r"""
+        @brief Gets the user property with the given key
+        This method is a convenience method that gets the user property with the given key. If no property with that key does not exist, it will return nil. Using that method is more convenient than using the layout object and the properties ID to retrieve the property value. 
+        """
+        ...
+    def set_property(self, key: Any, value: Any) -> None:
+        r"""
+        @brief Sets the user property with the given key to the given value
+        This method is a convenience method that sets the user property with the given key to the given value. If no property with that key exists, it will create one. Using that method is more convenient than creating a new property set with a new ID and assigning that properties ID.
+        This method may change the properties ID. Note: GDS only supports integer keys. OASIS supports numeric and string keys.
+        """
+        ...
+    def to_s(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    @overload
+    def transform(self, t: ICplxTrans) -> None:
+        r"""
+        @brief Transforms the object (in-place version)
+        """
+        ...
+    @overload
+    def transform(self, t: Trans) -> None:
+        r"""
+        @brief Transforms the object (in-place version)
+        """
+        ...
+    @overload
+    def transformed(self, t: CplxTrans) -> DPolygonWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    @overload
+    def transformed(self, t: ICplxTrans) -> PolygonWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    @overload
+    def transformed(self, t: Trans) -> PolygonWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
         """
         ...
     ...
@@ -52491,6 +57773,13 @@ class Region(ShapeCollection):
         ...
     @overload
     @classmethod
+    def new(cls, array: Sequence[PolygonWithProperties], dummy: Optional[bool] = ...) -> Region:
+        r"""
+        @hide
+        """
+        ...
+    @overload
+    @classmethod
     def new(cls, array: Sequence[Polygon]) -> Region:
         r"""
         @brief Constructor from a polygon array
@@ -52509,11 +57798,33 @@ class Region(ShapeCollection):
         ...
     @overload
     @classmethod
+    def new(cls, box: BoxWithProperties) -> Region:
+        r"""
+        @brief Box constructor
+
+        This constructor creates a region from a box with properties.
+
+        This variant has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    @classmethod
     def new(cls, path: Path) -> Region:
         r"""
         @brief Path constructor
 
         This constructor creates a region from a path.
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, path: PathWithProperties) -> Region:
+        r"""
+        @brief Path constructor
+
+        This constructor creates a region from a path with properties.
+
+        This variant has been introduced in version 0.30.
         """
         ...
     @overload
@@ -52527,11 +57838,33 @@ class Region(ShapeCollection):
         ...
     @overload
     @classmethod
+    def new(cls, polygon: PolygonWithProperties) -> Region:
+        r"""
+        @brief Polygon constructor
+
+        This constructor creates a region from a polygon with properties.
+
+        This variant has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    @classmethod
     def new(cls, polygon: SimplePolygon) -> Region:
         r"""
         @brief Simple polygon constructor
 
         This constructor creates a region from a simple polygon.
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, polygon: SimplePolygonWithProperties) -> Region:
+        r"""
+        @brief Simple polygon constructor
+
+        This constructor creates a region from a simple polygon with properties.
+
+        This variant has been introduced in version 0.30.
         """
         ...
     @overload
@@ -52754,6 +58087,12 @@ class Region(ShapeCollection):
         """
         ...
     @overload
+    def __init__(self, array: Sequence[PolygonWithProperties], dummy: Optional[bool] = ...) -> None:
+        r"""
+        @hide
+        """
+        ...
+    @overload
     def __init__(self, array: Sequence[Polygon]) -> None:
         r"""
         @brief Constructor from a polygon array
@@ -52770,11 +58109,31 @@ class Region(ShapeCollection):
         """
         ...
     @overload
+    def __init__(self, box: BoxWithProperties) -> None:
+        r"""
+        @brief Box constructor
+
+        This constructor creates a region from a box with properties.
+
+        This variant has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def __init__(self, path: Path) -> None:
         r"""
         @brief Path constructor
 
         This constructor creates a region from a path.
+        """
+        ...
+    @overload
+    def __init__(self, path: PathWithProperties) -> None:
+        r"""
+        @brief Path constructor
+
+        This constructor creates a region from a path with properties.
+
+        This variant has been introduced in version 0.30.
         """
         ...
     @overload
@@ -52786,11 +58145,31 @@ class Region(ShapeCollection):
         """
         ...
     @overload
+    def __init__(self, polygon: PolygonWithProperties) -> None:
+        r"""
+        @brief Polygon constructor
+
+        This constructor creates a region from a polygon with properties.
+
+        This variant has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def __init__(self, polygon: SimplePolygon) -> None:
         r"""
         @brief Simple polygon constructor
 
         This constructor creates a region from a simple polygon.
+        """
+        ...
+    @overload
+    def __init__(self, polygon: SimplePolygonWithProperties) -> None:
+        r"""
+        @brief Simple polygon constructor
+
+        This constructor creates a region from a simple polygon with properties.
+
+        This variant has been introduced in version 0.30.
         """
         ...
     @overload
@@ -52955,11 +58334,13 @@ class Region(ShapeCollection):
         Note that in Ruby, the '-=' operator actually does not exist, but is emulated by '-' followed by an assignment. This is less efficient than the in-place operation, so it is recommended to use 'not_with' instead.
         """
         ...
-    def __iter__(self) -> Iterator[Polygon]:
+    def __iter__(self) -> Iterator[PolygonWithProperties]:
         r"""
         @brief Returns each polygon of the region
 
         This returns the raw polygons (not merged polygons if merged semantics is enabled).
+
+        Starting with version 0.30, the iterator delivers a RegionWithProperties object.
         """
         ...
     def __ixor__(self, other: Region) -> Region:
@@ -53388,18 +58769,21 @@ class Region(ShapeCollection):
         @brief Creates a copy of self
         """
         ...
-    def each(self) -> Iterator[Polygon]:
+    def each(self) -> Iterator[PolygonWithProperties]:
         r"""
         @brief Returns each polygon of the region
 
         This returns the raw polygons (not merged polygons if merged semantics is enabled).
+
+        Starting with version 0.30, the iterator delivers a RegionWithProperties object.
         """
         ...
-    def each_merged(self) -> Iterator[Polygon]:
+    def each_merged(self) -> Iterator[PolygonWithProperties]:
         r"""
         @brief Returns each merged polygon of the region
 
         This returns the raw polygons if merged semantics is disabled or the merged ones if merged semantics is enabled.
+        Starting with version 0.30, the iterator delivers a RegionWithProperties object.
         """
         ...
     def edges(self, mode: Optional[EdgeMode] = ...) -> Edges:
@@ -53586,7 +58970,7 @@ class Region(ShapeCollection):
         This method has been introduced in version 0.27.
         """
         ...
-    def filter(self, filter: PolygonFilter) -> None:
+    def filter(self, filter: PolygonFilterBase) -> None:
         r"""
         @brief Applies a generic filter in place (replacing the polygons from the Region)
         See \PolygonFilter for a description of this feature.
@@ -53603,7 +58987,7 @@ class Region(ShapeCollection):
         This method has been introduced in version 0.28.4.
         """
         ...
-    def filtered(self, filter: PolygonFilter) -> Region:
+    def filtered(self, filter: PolygonFilterBase) -> Region:
         r"""
         @brief Applies a generic filter and returns a filtered copy
         See \PolygonFilter for a description of this feature.
@@ -53681,6 +59065,14 @@ class Region(ShapeCollection):
         """
         ...
     @overload
+    def insert(self, array: Sequence[PolygonWithProperties]) -> None:
+        r"""
+        @brief Inserts all polygons with properties from the array into this region
+
+        This variant has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def insert(self, array: Sequence[Polygon]) -> None:
         r"""
         @brief Inserts all polygons from the array into this region
@@ -53695,11 +59087,31 @@ class Region(ShapeCollection):
         """
         ...
     @overload
+    def insert(self, box: BoxWithProperties) -> None:
+        r"""
+        @brief Inserts a box
+
+        Inserts a box with properties into the region.
+
+        This variant has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def insert(self, path: Path) -> None:
         r"""
         @brief Inserts a path
 
         Inserts a path into the region.
+        """
+        ...
+    @overload
+    def insert(self, path: PathWithProperties) -> None:
+        r"""
+        @brief Inserts a path
+
+        Inserts a path with properties into the region.
+
+        This variant has been introduced in version 0.30.
         """
         ...
     @overload
@@ -53711,11 +59123,31 @@ class Region(ShapeCollection):
         """
         ...
     @overload
+    def insert(self, polygon: PolygonWithProperties) -> None:
+        r"""
+        @brief Inserts a polygon
+
+        Inserts a polygon with properties into the region.
+
+        This variant has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def insert(self, polygon: SimplePolygon) -> None:
         r"""
         @brief Inserts a simple polygon
 
         Inserts a simple polygon into the region.
+        """
+        ...
+    @overload
+    def insert(self, polygon: SimplePolygonWithProperties) -> None:
+        r"""
+        @brief Inserts a simple polygon
+
+        Inserts a simple polygon with properties into the region.
+
+        This variant has been introduced in version 0.30.
         """
         ...
     @overload
@@ -55279,7 +60711,7 @@ class Region(ShapeCollection):
         This method has been introduced in version 0.27.
         """
         ...
-    def split_filter(self, filter: PolygonFilter) -> List[Region]:
+    def split_filter(self, filter: PolygonFilterBase) -> List[Region]:
         r"""
         @brief Applies a generic filter and returns a copy with all matching shapes and one with the non-matching ones
         See \PolygonFilter for a description of this feature.
@@ -57397,10 +62829,11 @@ class Shape:
 
     Starting with version 0.23, this method returns nil, if the shape does not represent an edge.
     Setter:
-    @brief Replaces the shape by the given edge (in micrometer units)
-    This method replaces the shape by the given edge, like \edge= with a \Edge argument does. This version translates the edge from micrometer units to database units internally.
+    @brief Replaces the shape by the given edge
+    This method replaces the shape by the given edge. This method can only be called for editable layouts. It does not change the user properties of the shape.
+    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.22.
     """
     edge_pair: Any
     r"""
@@ -57449,10 +62882,11 @@ class Shape:
 
     Starting with version 0.23, this method returns nil, if the shape does not represent a path.
     Setter:
-    @brief Replaces the shape by the given path (in micrometer units)
-    This method replaces the shape by the given path, like \path= with a \Path argument does. This version translates the path from micrometer units to database units internally.
+    @brief Replaces the shape by the given path object
+    This method replaces the shape by the given path object. This method can only be called for editable layouts. It does not change the user properties of the shape.
+    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.22.
     """
     path_bgnext: int
     r"""
@@ -58473,8 +63907,8 @@ class Shape:
 
 class ShapeCollection:
     r"""
-    @brief A base class for the shape collections (\Region, \Edges, \EdgePairs and \Texts)
-
+    @brief A base class for the shape collections
+    This class is the common base class of \Region, \Edges, \EdgePairs and \Texts.
     This class has been introduced in version 0.27.
     """
     @classmethod
@@ -59459,6 +64893,15 @@ class Shapes:
         """
         ...
     @overload
+    def insert(self, box: BoxWithProperties) -> Shape:
+        r"""
+        @brief Inserts a box with properties into the shapes list
+        @return A reference to the new shape (a \Shape object)
+        The property Id must be obtained from the \Layout object's property_id method which associates a property set with a property Id.
+        This variant has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def insert(self, box: DBox) -> Shape:
         r"""
         @brief Inserts a micrometer-unit box into the shapes list
@@ -59476,6 +64919,16 @@ class Shapes:
         This method behaves like the \insert version with a \Box argument and a property ID, except that it will internally translate the box from micrometer to database units.
 
         This variant has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def insert(self, box: DBoxWithProperties) -> Shape:
+        r"""
+        @brief Inserts a micrometer-unit box with properties into the shapes list
+        @return A reference to the new shape (a \Shape object)
+        This method behaves like the \insert version with a \BoxWithProperties argument, except that it will internally translate the box from micrometer to database units.
+
+        This variant has been introduced in version 0.30.
         """
         ...
     @overload
@@ -59499,6 +64952,16 @@ class Shapes:
         """
         ...
     @overload
+    def insert(self, edge: DEdgeWithProperties) -> Shape:
+        r"""
+        @brief Inserts a micrometer-unit edge with properties into the shapes list
+        @return A reference to the new shape (a \Shape object)
+        This method behaves like the \insert version with a \EdgeWithProperties argument, except that it will internally translate the edge from micrometer to database units.
+
+        This variant has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def insert(self, edge: Edge) -> Shape:
         r"""
         @brief Inserts an edge into the shapes list
@@ -59513,6 +64976,15 @@ class Shapes:
         @return A reference to the new shape (a \Shape object)
         The property Id must be obtained from the \Layout object's property_id method which associates a property set with a property Id.
         Starting with version 0.16, this method returns a reference to the newly created shape.
+        """
+        ...
+    @overload
+    def insert(self, edge: EdgeWithProperties) -> Shape:
+        r"""
+        @brief Inserts an edge with properties into the shapes list
+        @return A reference to the new shape (a \Shape object)
+        The property Id must be obtained from the \Layout object's property_id method which associates a property set with a property Id.
+        This variant has been introduced in version 0.30.
         """
         ...
     @overload
@@ -59536,6 +65008,16 @@ class Shapes:
         """
         ...
     @overload
+    def insert(self, edge_pair: DEdgePairWithProperties) -> Shape:
+        r"""
+        @brief Inserts a micrometer-unit edge pair with properties into the shapes list
+        @return A reference to the new shape (a \Shape object)
+        This method behaves like the \insert version with a \EdgePairWithProperties argument, except that it will internally translate the edge pair from micrometer to database units.
+
+        This variant has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def insert(self, edge_pair: EdgePair) -> Shape:
         r"""
         @brief Inserts an edge pair into the shapes list
@@ -59550,6 +65032,15 @@ class Shapes:
         @return A reference to the new shape (a \Shape object)
         The property Id must be obtained from the \Layout object's property_id method which associates a property set with a property Id.
         This method has been introduced in version 0.26.
+        """
+        ...
+    @overload
+    def insert(self, edge_pair: EdgePairWithProperties) -> Shape:
+        r"""
+        @brief Inserts an edge pair with properties into the shapes list
+        @return A reference to the new shape (a \Shape object)
+        The property Id must be obtained from the \Layout object's property_id method which associates a property set with a property Id.
+        This variant has been introduced in version 0.30.
         """
         ...
     @overload
@@ -59671,6 +65162,16 @@ class Shapes:
         """
         ...
     @overload
+    def insert(self, path: DPathWithProperties) -> Shape:
+        r"""
+        @brief Inserts a micrometer-unit path with properties into the shapes list
+        @return A reference to the new shape (a \Shape object)
+        This method behaves like the \insert version with a \PathWithProperties argument, except that it will internally translate the path from micrometer to database units.
+
+        This variant has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def insert(self, path: Path) -> Shape:
         r"""
         @brief Inserts a path into the shapes list
@@ -59686,6 +65187,15 @@ class Shapes:
         @return A reference to the new shape (a \Shape object)
         The property Id must be obtained from the \Layout object's property_id method which associates a property set with a property Id.
         Starting with version 0.16, this method returns a reference to the newly created shape
+        """
+        ...
+    @overload
+    def insert(self, path: PathWithProperties) -> Shape:
+        r"""
+        @brief Inserts a path with properties into the shapes list
+        @return A reference to the new shape (a \Shape object)
+        The property Id must be obtained from the \Layout object's property_id method which associates a property set with a property Id.
+        This variant has been introduced in version 0.30.
         """
         ...
     @overload
@@ -59727,6 +65237,16 @@ class Shapes:
         """
         ...
     @overload
+    def insert(self, polygon: DPolygonWithProperties) -> Shape:
+        r"""
+        @brief Inserts a micrometer-unit polygon with properties into the shapes list
+        @return A reference to the new shape (a \Shape object)
+        This method behaves like the \insert version with a \PolygonWithProperties argument, except that it will internally translate the polygon from micrometer to database units.
+
+        This variant has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def insert(self, polygon: Polygon) -> Shape:
         r"""
         @brief Inserts a polygon into the shapes list
@@ -59742,6 +65262,15 @@ class Shapes:
         @return A reference to the new shape (a \Shape object)
         The property Id must be obtained from the \Layout object's property_id method which associates a property set with a property Id.
         Starting with version 0.16, this method returns a reference to the newly created shape
+        """
+        ...
+    @overload
+    def insert(self, polygon: PolygonWithProperties) -> Shape:
+        r"""
+        @brief Inserts a polygon with properties into the shapes list
+        @return A reference to the new shape (a \Shape object)
+        The property Id must be obtained from the \Layout object's property_id method which associates a property set with a property Id.
+        This variant has been introduced in version 0.30.
         """
         ...
     @overload
@@ -59898,6 +65427,16 @@ class Shapes:
         """
         ...
     @overload
+    def insert(self, simple_polygon: DSimplePolygonWithProperties) -> Shape:
+        r"""
+        @brief Inserts a micrometer-unit simple polygon with properties into the shapes list
+        @return A reference to the new shape (a \Shape object)
+        This method behaves like the \insert version with a \SimplePolygonWithProperties argument, except that it will internally translate the simple polygon from micrometer to database units.
+
+        This variant has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def insert(self, simple_polygon: SimplePolygon) -> Shape:
         r"""
         @brief Inserts a simple polygon into the shapes list
@@ -59913,6 +65452,15 @@ class Shapes:
         @return A reference to the new shape (a \Shape object)
         The property Id must be obtained from the \Layout object's property_id method which associates a property set with a property Id.
         Starting with version 0.16, this method returns a reference to the newly created shape
+        """
+        ...
+    @overload
+    def insert(self, simple_polygon: SimplePolygonWithProperties) -> Shape:
+        r"""
+        @brief Inserts a simple polygon with properties into the shapes list
+        @return A reference to the new shape (a \Shape object)
+        The property Id must be obtained from the \Layout object's property_id method which associates a property set with a property Id.
+        This variant has been introduced in version 0.30.
         """
         ...
     @overload
@@ -59936,6 +65484,16 @@ class Shapes:
         """
         ...
     @overload
+    def insert(self, text: DTextWithProperties) -> Shape:
+        r"""
+        @brief Inserts a micrometer-unit text with properties into the shapes list
+        @return A reference to the new shape (a \Shape object)
+        This method behaves like the \insert version with a \TextWithProperties argument, except that it will internally translate the text from micrometer to database units.
+
+        This variant has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def insert(self, text: Text) -> Shape:
         r"""
         @brief Inserts a text into the shapes list
@@ -59951,6 +65509,15 @@ class Shapes:
         @return A reference to the new shape (a \Shape object)
         The property Id must be obtained from the \Layout object's property_id method which associates a property set with a property Id.
         Starting with version 0.16, this method returns a reference to the newly created shape
+        """
+        ...
+    @overload
+    def insert(self, text: TextWithProperties) -> Shape:
+        r"""
+        @brief Inserts a text with properties into the shapes list
+        @return A reference to the new shape (a \Shape object)
+        The property Id must be obtained from the \Layout object's property_id method which associates a property set with a property Id.
+        This variant has been introduced in version 0.30.
         """
         ...
     @overload
@@ -61254,6 +66821,265 @@ class SimplePolygon:
         ...
     ...
 
+class SimplePolygonWithProperties(SimplePolygon):
+    r"""
+    @brief A SimplePolygon object with properties attached.
+    This class represents a combination of a SimplePolygon object an user properties. User properties are stored in form of a properties ID. Convenience methods are provided to manipulate or retrieve user properties directly.
+
+    This class has been introduced in version 0.30.
+    """
+    prop_id: int
+    r"""
+    Getter:
+    @brief Gets the properties ID associated with the object
+
+    Setter:
+    @brief Sets the properties ID of the object
+    """
+    @overload
+    @classmethod
+    def new(cls, polygon: SimplePolygon, properties: Dict[Any, Any]) -> SimplePolygonWithProperties:
+        r"""
+        @brief Creates a new object from a property-less object and a properties hash.
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, polygon: SimplePolygon, properties_id: Optional[int] = ...) -> SimplePolygonWithProperties:
+        r"""
+        @brief Creates a new object from a property-less object and a properties ID.
+        """
+        ...
+    @overload
+    def __init__(self, polygon: SimplePolygon, properties: Dict[Any, Any]) -> None:
+        r"""
+        @brief Creates a new object from a property-less object and a properties hash.
+        """
+        ...
+    @overload
+    def __init__(self, polygon: SimplePolygon, properties_id: Optional[int] = ...) -> None:
+        r"""
+        @brief Creates a new object from a property-less object and a properties ID.
+        """
+        ...
+    def __mul__(self, f: float) -> DSimplePolygonWithProperties:
+        r"""
+        @brief Scales the object by some factor
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and, if necessary, rounded.
+        """
+        ...
+    def __repr__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    def __rmul__(self, f: float) -> DSimplePolygonWithProperties:
+        r"""
+        @brief Scales the object by some factor
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and, if necessary, rounded.
+        """
+        ...
+    def __str__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    def _assign(self, other: SimplePolygon) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+        ...
+    def _const_cast(self) -> SimplePolygonWithProperties:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _dup(self) -> SimplePolygonWithProperties:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> SimplePolygonWithProperties:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def delete_property(self, key: Any) -> None:
+        r"""
+        @brief Deletes the user property with the given key
+        This method is a convenience method that deletes the property with the given key. It does nothing if no property with that key exists. Using that method is more convenient than creating a new property set with a new ID and assigning that properties ID.
+        This method may change the properties ID.
+        """
+        ...
+    def downcast(self) -> SimplePolygon:
+        r"""
+        @brief Gets the corresponding object without the properties
+        """
+        ...
+    @overload
+    def move(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> SimplePolygonWithProperties:
+        r"""
+        @brief Moves the object.
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is overwritten.
+
+        @param dx The x distance to move the object.
+        @param dy The y distance to move the object.
+
+        @return The moved object (self).
+        """
+        ...
+    @overload
+    def move(self, v: Vector) -> SimplePolygonWithProperties:
+        r"""
+        @brief Moves the object.
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is overwritten.
+
+        @param v The distance to move the object.
+
+        @return The moved object (self).
+        """
+        ...
+    @overload
+    def moved(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> SimplePolygonWithProperties:
+        r"""
+        @brief Returns the moved object (does not modify self)
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is not modified.
+
+        @param dx The x distance to move the object.
+        @param dy The y distance to move the object.
+
+        @return The moved object.
+        """
+        ...
+    @overload
+    def moved(self, v: Vector) -> SimplePolygonWithProperties:
+        r"""
+        @brief Returns the moved object
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is not modified.
+
+        @param v The distance to move the object.
+
+        @return The moved object.
+        """
+        ...
+    def properties(self) -> Any:
+        r"""
+        @brief Gets the user properties
+        This method is a convenience method that gets the properties of the shape as a single hash.
+        """
+        ...
+    def property(self, key: Any) -> Any:
+        r"""
+        @brief Gets the user property with the given key
+        This method is a convenience method that gets the user property with the given key. If no property with that key does not exist, it will return nil. Using that method is more convenient than using the layout object and the properties ID to retrieve the property value. 
+        """
+        ...
+    def set_property(self, key: Any, value: Any) -> None:
+        r"""
+        @brief Sets the user property with the given key to the given value
+        This method is a convenience method that sets the user property with the given key to the given value. If no property with that key exists, it will create one. Using that method is more convenient than creating a new property set with a new ID and assigning that properties ID.
+        This method may change the properties ID. Note: GDS only supports integer keys. OASIS supports numeric and string keys.
+        """
+        ...
+    def to_s(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    @overload
+    def transform(self, t: ICplxTrans) -> None:
+        r"""
+        @brief Transforms the object (in-place version)
+        """
+        ...
+    @overload
+    def transform(self, t: Trans) -> None:
+        r"""
+        @brief Transforms the object (in-place version)
+        """
+        ...
+    @overload
+    def transformed(self, t: CplxTrans) -> DSimplePolygonWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    @overload
+    def transformed(self, t: ICplxTrans) -> SimplePolygonWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    @overload
+    def transformed(self, t: Trans) -> SimplePolygonWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    ...
+
 class SubCircuit(NetlistObject):
     r"""
     @brief A subcircuit inside a circuit.
@@ -61358,17 +67184,17 @@ class SubCircuit(NetlistObject):
     @overload
     def circuit(self) -> Circuit:
         r"""
-        @brief Gets the circuit the subcircuit lives in.
+        @brief Gets the circuit the subcircuit lives in (non-const version).
         This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def circuit(self) -> Circuit:
         r"""
-        @brief Gets the circuit the subcircuit lives in (non-const version).
+        @brief Gets the circuit the subcircuit lives in.
         This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
-
-        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
@@ -62053,8 +67879,7 @@ class Text:
     Setter:
     @brief Sets the horizontal alignment
 
-    This property specifies how the text is aligned relative to the anchor point. 
-    This property has been introduced in version 0.22 and extended to enums in 0.28.
+    This is the version accepting integer values. It's provided for backward compatibility.
     """
     size: int
     r"""
@@ -62090,7 +67915,8 @@ class Text:
     Setter:
     @brief Sets the vertical alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     x: int
     r"""
@@ -62505,7 +68331,7 @@ class Text:
         ...
     ...
 
-class TextFilter:
+class TextFilter(TextFilterBase):
     r"""
     @brief A generic text filter adaptor
 
@@ -62541,33 +68367,6 @@ class TextFilter:
 
     This class has been introduced in version 0.29.
     """
-    wants_variants: bool
-    r"""
-    Getter:
-    @brief Gets a value indicating whether the filter prefers cell variants
-    See \wants_variants= for details.
-
-    Setter:
-    @brief Sets a value indicating whether the filter prefers cell variants
-    This flag must be set before using this filter for hierarchical applications (deep mode). It tells the filter implementation whether cell variants should be created (true, the default) or shape propagation will be applied (false).
-
-    This decision needs to be made, if the filter indicates that it will deliver different results
-    for scaled or rotated versions of the shape (see \is_isotropic and the other hints). If a cell
-    is present with different qualities - as seen from the top cell - the respective instances
-    need to be differentiated. Cell variant formation is one way, shape propagation the other way.
-    Typically, cell variant formation is less expensive, but the hierarchy will be modified.
-    """
-    @classmethod
-    def new(cls) -> TextFilter:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
-    def __init__(self) -> None:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
     def _const_cast(self) -> TextFilter:
         r"""
         @brief Returns a non-const reference to self.
@@ -62612,6 +68411,143 @@ class TextFilter:
         """
         ...
     def _to_const_object(self) -> TextFilter:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    ...
+
+class TextFilterBase:
+    r"""
+    @hide
+    """
+    wants_variants: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the filter prefers cell variants
+    See \wants_variants= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the filter prefers cell variants
+    This flag must be set before using this filter for hierarchical applications (deep mode). It tells the filter implementation whether cell variants should be created (true, the default) or shape propagation will be applied (false).
+
+    This decision needs to be made, if the filter indicates that it will deliver different results
+    for scaled or rotated versions of the shape (see \is_isotropic and the other hints). If a cell
+    is present with different qualities - as seen from the top cell - the respective instances
+    need to be differentiated. Cell variant formation is one way, shape propagation the other way.
+    Typically, cell variant formation is less expensive, but the hierarchy will be modified.
+    """
+    @classmethod
+    def new(cls) -> TextFilterBase:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    @classmethod
+    def property_filter(cls, name: Any, value: Any, inverse: Optional[bool] = ...) -> TextFilterBase:
+        r"""
+        @brief Creates a single-valued property filter
+        @param name The name of the property to use.
+        @param value The value against which the property is checked (exact match).
+        @param inverse If true, inverts the selection - i.e. all texts without a property with the given name and value are selected.
+
+        Apply this filter with \Texts#filtered. See \property_glob for an example.
+
+        This feature has been introduced in version 0.30.
+        """
+        ...
+    @classmethod
+    def property_filter_bounded(cls, name: Any, from_: Any, to: Any, inverse: Optional[bool] = ...) -> TextFilterBase:
+        r"""
+        @brief Creates a single-valued property filter
+        @param name The name of the property to use.
+        @param from The lower value against which the property is checked or 'nil' if no lower bound shall be used.
+        @param to The upper value against which the property is checked or 'nil' if no upper bound shall be used.
+        @param inverse If true, inverts the selection - i.e. all texts without a property with the given name and value range are selected.
+
+        This version does a bounded match. The value of the propery needs to be larger or equal to 'from' and less than 'to'.
+        Apply this filter with \Texts#filtered. See \property_glob for an example.
+
+        This feature has been introduced in version 0.30.
+        """
+        ...
+    @classmethod
+    def property_glob(cls, name: Any, pattern: str, inverse: Optional[bool] = ..., case_sensitive: Optional[bool] = ...) -> TextFilterBase:
+        r"""
+        @brief Creates a single-valued property filter
+        @param name The name of the property to use.
+        @param value The glob pattern to match the property value against.
+        @param inverse If true, inverts the selection - i.e. all texts without a matching property are selected.
+        @param case_sensitive If true, the match is case sensitive (the default), if false, the match is not case sensitive.
+
+        Apply this filter with \Texts#filtered:
+
+        @code
+        # texts is a Texts object
+        # filtered_texts contains all texts where the 'net' property starts with 'C':
+        filtered_texts = texts.filtered(RBA::TextFilterBase::property_glob('net', 'C*'))
+        @/code
+
+        This feature has been introduced in version 0.30.
+        """
+        ...
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def _const_cast(self) -> TextFilterBase:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> TextFilterBase:
         r"""
         @hide
         """
@@ -63318,6 +69254,265 @@ class TextToPolygonOperator:
         ...
     ...
 
+class TextWithProperties(Text):
+    r"""
+    @brief A Text object with properties attached.
+    This class represents a combination of a Text object an user properties. User properties are stored in form of a properties ID. Convenience methods are provided to manipulate or retrieve user properties directly.
+
+    This class has been introduced in version 0.30.
+    """
+    prop_id: int
+    r"""
+    Getter:
+    @brief Gets the properties ID associated with the object
+
+    Setter:
+    @brief Sets the properties ID of the object
+    """
+    @overload
+    @classmethod
+    def new(cls, text: Text, properties: Dict[Any, Any]) -> TextWithProperties:
+        r"""
+        @brief Creates a new object from a property-less object and a properties hash.
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, text: Text, properties_id: Optional[int] = ...) -> TextWithProperties:
+        r"""
+        @brief Creates a new object from a property-less object and a properties ID.
+        """
+        ...
+    @overload
+    def __init__(self, text: Text, properties: Dict[Any, Any]) -> None:
+        r"""
+        @brief Creates a new object from a property-less object and a properties hash.
+        """
+        ...
+    @overload
+    def __init__(self, text: Text, properties_id: Optional[int] = ...) -> None:
+        r"""
+        @brief Creates a new object from a property-less object and a properties ID.
+        """
+        ...
+    def __mul__(self, f: float) -> DTextWithProperties:
+        r"""
+        @brief Scales the object by some factor
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and, if necessary, rounded.
+        """
+        ...
+    def __repr__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    def __rmul__(self, f: float) -> DTextWithProperties:
+        r"""
+        @brief Scales the object by some factor
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and, if necessary, rounded.
+        """
+        ...
+    def __str__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    def _assign(self, other: Text) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+        ...
+    def _const_cast(self) -> TextWithProperties:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _dup(self) -> TextWithProperties:
+        r"""
+        @brief Creates a copy of self
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> TextWithProperties:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def delete_property(self, key: Any) -> None:
+        r"""
+        @brief Deletes the user property with the given key
+        This method is a convenience method that deletes the property with the given key. It does nothing if no property with that key exists. Using that method is more convenient than creating a new property set with a new ID and assigning that properties ID.
+        This method may change the properties ID.
+        """
+        ...
+    def downcast(self) -> Text:
+        r"""
+        @brief Gets the corresponding object without the properties
+        """
+        ...
+    @overload
+    def move(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> TextWithProperties:
+        r"""
+        @brief Moves the object.
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is overwritten.
+
+        @param dx The x distance to move the object.
+        @param dy The y distance to move the object.
+
+        @return The moved object (self).
+        """
+        ...
+    @overload
+    def move(self, v: Vector) -> TextWithProperties:
+        r"""
+        @brief Moves the object.
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is overwritten.
+
+        @param v The distance to move the object.
+
+        @return The moved object (self).
+        """
+        ...
+    @overload
+    def moved(self, dx: Optional[int] = ..., dy: Optional[int] = ...) -> TextWithProperties:
+        r"""
+        @brief Returns the moved object (does not modify self)
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is not modified.
+
+        @param dx The x distance to move the object.
+        @param dy The y distance to move the object.
+
+        @return The moved object.
+        """
+        ...
+    @overload
+    def moved(self, v: Vector) -> TextWithProperties:
+        r"""
+        @brief Returns the moved object
+
+        Moves the object by the given offset and returns the 
+        moved object. The object is not modified.
+
+        @param v The distance to move the object.
+
+        @return The moved object.
+        """
+        ...
+    def properties(self) -> Any:
+        r"""
+        @brief Gets the user properties
+        This method is a convenience method that gets the properties of the shape as a single hash.
+        """
+        ...
+    def property(self, key: Any) -> Any:
+        r"""
+        @brief Gets the user property with the given key
+        This method is a convenience method that gets the user property with the given key. If no property with that key does not exist, it will return nil. Using that method is more convenient than using the layout object and the properties ID to retrieve the property value. 
+        """
+        ...
+    def set_property(self, key: Any, value: Any) -> None:
+        r"""
+        @brief Sets the user property with the given key to the given value
+        This method is a convenience method that sets the user property with the given key to the given value. If no property with that key exists, it will create one. Using that method is more convenient than creating a new property set with a new ID and assigning that properties ID.
+        This method may change the properties ID. Note: GDS only supports integer keys. OASIS supports numeric and string keys.
+        """
+        ...
+    def to_s(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+        ...
+    @overload
+    def transform(self, t: ICplxTrans) -> None:
+        r"""
+        @brief Transforms the object (in-place version)
+        """
+        ...
+    @overload
+    def transform(self, t: Trans) -> None:
+        r"""
+        @brief Transforms the object (in-place version)
+        """
+        ...
+    @overload
+    def transformed(self, t: CplxTrans) -> DTextWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    @overload
+    def transformed(self, t: ICplxTrans) -> TextWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    @overload
+    def transformed(self, t: Trans) -> TextWithProperties:
+        r"""
+        @brief Returns the transformed object
+
+        Returns a copy of the object, transformed by the given transformation. The result is equivalent to 'tr * self'.
+        """
+        ...
+    ...
+
 class Texts(ShapeCollection):
     r"""
     @brief Texts (a collection of texts)
@@ -63343,9 +69538,16 @@ class Texts(ShapeCollection):
         ...
     @overload
     @classmethod
+    def new(cls, array: Sequence[TextWithProperties], dummy: Optional[bool] = ...) -> Texts:
+        r"""
+        @hide
+        """
+        ...
+    @overload
+    @classmethod
     def new(cls, array: Sequence[Text]) -> Texts:
         r"""
-        @brief Constructor from an text array
+        @brief Constructor from a text array
 
         This constructor creates an text collection from an array of \Text objects.
         """
@@ -63440,9 +69642,20 @@ class Texts(ShapeCollection):
     @classmethod
     def new(cls, text: Text) -> Texts:
         r"""
-        @brief Constructor from a single edge pair object
+        @brief Constructor from a single text object
 
         This constructor creates an text collection with a single text.
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, text: TextWithProperties) -> Texts:
+        r"""
+        @brief Constructor from a single text object
+
+        This constructor creates an text collection with a single text with properties.
+
+        This variant has been introduced in version 0.30.
         """
         ...
     def __add__(self, other: Texts) -> Texts:
@@ -63504,9 +69717,15 @@ class Texts(ShapeCollection):
         """
         ...
     @overload
+    def __init__(self, array: Sequence[TextWithProperties], dummy: Optional[bool] = ...) -> None:
+        r"""
+        @hide
+        """
+        ...
+    @overload
     def __init__(self, array: Sequence[Text]) -> None:
         r"""
-        @brief Constructor from an text array
+        @brief Constructor from a text array
 
         This constructor creates an text collection from an array of \Text objects.
         """
@@ -63595,14 +69814,26 @@ class Texts(ShapeCollection):
     @overload
     def __init__(self, text: Text) -> None:
         r"""
-        @brief Constructor from a single edge pair object
+        @brief Constructor from a single text object
 
         This constructor creates an text collection with a single text.
         """
         ...
-    def __iter__(self) -> Iterator[Text]:
+    @overload
+    def __init__(self, text: TextWithProperties) -> None:
+        r"""
+        @brief Constructor from a single text object
+
+        This constructor creates an text collection with a single text with properties.
+
+        This variant has been introduced in version 0.30.
+        """
+        ...
+    def __iter__(self) -> Iterator[TextWithProperties]:
         r"""
         @brief Returns each text of the text collection
+
+        Starting with version 0.30, the iterator delivers TextWithProperties objects.
         """
         ...
     def __len__(self) -> int:
@@ -63730,9 +69961,11 @@ class Texts(ShapeCollection):
         @brief Creates a copy of self
         """
         ...
-    def each(self) -> Iterator[Text]:
+    def each(self) -> Iterator[TextWithProperties]:
         r"""
         @brief Returns each text of the text collection
+
+        Starting with version 0.30, the iterator delivers TextWithProperties objects.
         """
         ...
     def edges(self) -> Edges:
@@ -63773,7 +70006,7 @@ class Texts(ShapeCollection):
         This method acts like the other version of \extents, but allows giving different enlargements for x and y direction.
         """
         ...
-    def filter(self, filter: TextFilter) -> None:
+    def filter(self, filter: TextFilterBase) -> None:
         r"""
         @brief Applies a generic filter in place (replacing the texts from the Texts collection)
         See \TextFilter for a description of this feature.
@@ -63790,7 +70023,7 @@ class Texts(ShapeCollection):
         This method has been introduced in version 0.28.4.
         """
         ...
-    def filtered(self, filtered: TextFilter) -> Texts:
+    def filtered(self, filtered: TextFilterBase) -> Texts:
         r"""
         @brief Applies a generic filter and returns a filtered copy
         See \TextFilter for a description of this feature.
@@ -63823,6 +70056,14 @@ class Texts(ShapeCollection):
     def insert(self, text: Text) -> None:
         r"""
         @brief Inserts a text into the collection
+        """
+        ...
+    @overload
+    def insert(self, text: TextWithProperties) -> None:
+        r"""
+        @brief Inserts a text into the collection
+
+        This variant accepting a text with properties has been introduced in version 0.30.
         """
         ...
     @overload
@@ -65308,6 +71549,19 @@ class Trans:
         """
         ...
     @overload
+    def __mul__(self, box: BoxWithProperties) -> BoxWithProperties:
+        r"""
+        @brief Transforms a box with properties
+
+        't*box' or 't.trans(box)' is equivalent to box.transformed(t).
+
+        @param box The box to transform
+        @return The transformed box
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def __mul__(self, d: int) -> int:
         r"""
         @brief Transforms a single distance
@@ -65333,6 +71587,45 @@ class Trans:
         @return The transformed edge
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def __mul__(self, edge: EdgeWithProperties) -> EdgeWithProperties:
+        r"""
+        @brief Transforms an edge with properties
+
+        't*edge' or 't.trans(edge)' is equivalent to edge.transformed(t).
+
+        @param edge The edge to transform
+        @return The transformed edge
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def __mul__(self, edge_pair: EdgePair) -> EdgePair:
+        r"""
+        @brief Transforms an edge pair
+
+        't*edge_pair' or 't.trans(edge_pair)' is equivalent to edge_pair.transformed(t).
+
+        @param edge_pair The edge pair to transform
+        @return The transformed edge pair
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def __mul__(self, edge_pair: EdgePairWithProperties) -> EdgePairWithProperties:
+        r"""
+        @brief Transforms an edge pair with properties
+
+        't*edge_pair' or 't.trans(edge_pair)' is equivalent to edge_pair.transformed(t).
+
+        @param edge_pair The edge pair to transform
+        @return The transformed edge pair
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     @overload
@@ -65363,6 +71656,19 @@ class Trans:
         """
         ...
     @overload
+    def __mul__(self, path: PathWithProperties) -> PathWithProperties:
+        r"""
+        @brief Transforms a path with properties
+
+        't*path' or 't.trans(path)' is equivalent to path.transformed(t).
+
+        @param path The path to transform
+        @return The transformed path
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def __mul__(self, polygon: Polygon) -> Polygon:
         r"""
         @brief Transforms a polygon
@@ -65373,6 +71679,45 @@ class Trans:
         @return The transformed polygon
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def __mul__(self, polygon: PolygonWithProperties) -> PolygonWithProperties:
+        r"""
+        @brief Transforms a polygon with properties
+
+        't*polygon' or 't.trans(polygon)' is equivalent to polygon.transformed(t).
+
+        @param polygon The polygon to transform
+        @return The transformed polygon
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def __mul__(self, simple_polygon: SimplePolygon) -> SimplePolygon:
+        r"""
+        @brief Transforms a simple polygon
+
+        't*polygon' or 't.trans(simple_polygon)' is equivalent to simple_polygon.transformed(t).
+
+        @param simple_polygon The simple polygon to transform
+        @return The transformed simple polygon
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def __mul__(self, simple_polygon: SimplePolygonWithProperties) -> SimplePolygonWithProperties:
+        r"""
+        @brief Transforms a simple polygon with properties
+
+        't*polygon' or 't.trans(simple_polygon)' is equivalent to simple_polygon.transformed(t).
+
+        @param simple_polygon The simple polygon to transform
+        @return The transformed simple polygon
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     @overload
@@ -65397,6 +71742,19 @@ class Trans:
         @return The transformed text
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def __mul__(self, text: TextWithProperties) -> TextWithProperties:
+        r"""
+        @brief Transforms a text with properties
+
+        't*text' or 't.trans(text)' is equivalent to text.transformed(t).
+
+        @param text The text to transform
+        @return The transformed text
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     @overload
@@ -65440,6 +71798,19 @@ class Trans:
         """
         ...
     @overload
+    def __rmul__(self, box: BoxWithProperties) -> BoxWithProperties:
+        r"""
+        @brief Transforms a box with properties
+
+        't*box' or 't.trans(box)' is equivalent to box.transformed(t).
+
+        @param box The box to transform
+        @return The transformed box
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def __rmul__(self, d: int) -> int:
         r"""
         @brief Transforms a single distance
@@ -65465,6 +71836,45 @@ class Trans:
         @return The transformed edge
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def __rmul__(self, edge: EdgeWithProperties) -> EdgeWithProperties:
+        r"""
+        @brief Transforms an edge with properties
+
+        't*edge' or 't.trans(edge)' is equivalent to edge.transformed(t).
+
+        @param edge The edge to transform
+        @return The transformed edge
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def __rmul__(self, edge_pair: EdgePair) -> EdgePair:
+        r"""
+        @brief Transforms an edge pair
+
+        't*edge_pair' or 't.trans(edge_pair)' is equivalent to edge_pair.transformed(t).
+
+        @param edge_pair The edge pair to transform
+        @return The transformed edge pair
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def __rmul__(self, edge_pair: EdgePairWithProperties) -> EdgePairWithProperties:
+        r"""
+        @brief Transforms an edge pair with properties
+
+        't*edge_pair' or 't.trans(edge_pair)' is equivalent to edge_pair.transformed(t).
+
+        @param edge_pair The edge pair to transform
+        @return The transformed edge pair
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     @overload
@@ -65495,6 +71905,19 @@ class Trans:
         """
         ...
     @overload
+    def __rmul__(self, path: PathWithProperties) -> PathWithProperties:
+        r"""
+        @brief Transforms a path with properties
+
+        't*path' or 't.trans(path)' is equivalent to path.transformed(t).
+
+        @param path The path to transform
+        @return The transformed path
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def __rmul__(self, polygon: Polygon) -> Polygon:
         r"""
         @brief Transforms a polygon
@@ -65508,6 +71931,45 @@ class Trans:
         """
         ...
     @overload
+    def __rmul__(self, polygon: PolygonWithProperties) -> PolygonWithProperties:
+        r"""
+        @brief Transforms a polygon with properties
+
+        't*polygon' or 't.trans(polygon)' is equivalent to polygon.transformed(t).
+
+        @param polygon The polygon to transform
+        @return The transformed polygon
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def __rmul__(self, simple_polygon: SimplePolygon) -> SimplePolygon:
+        r"""
+        @brief Transforms a simple polygon
+
+        't*polygon' or 't.trans(simple_polygon)' is equivalent to simple_polygon.transformed(t).
+
+        @param simple_polygon The simple polygon to transform
+        @return The transformed simple polygon
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def __rmul__(self, simple_polygon: SimplePolygonWithProperties) -> SimplePolygonWithProperties:
+        r"""
+        @brief Transforms a simple polygon with properties
+
+        't*polygon' or 't.trans(simple_polygon)' is equivalent to simple_polygon.transformed(t).
+
+        @param simple_polygon The simple polygon to transform
+        @return The transformed simple polygon
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def __rmul__(self, text: Text) -> Text:
         r"""
         @brief Transforms a text
@@ -65518,6 +71980,19 @@ class Trans:
         @return The transformed text
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def __rmul__(self, text: TextWithProperties) -> TextWithProperties:
+        r"""
+        @brief Transforms a text with properties
+
+        't*text' or 't.trans(text)' is equivalent to text.transformed(t).
+
+        @param text The text to transform
+        @return The transformed text
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     @overload
@@ -65713,6 +72188,19 @@ class Trans:
         """
         ...
     @overload
+    def trans(self, box: BoxWithProperties) -> BoxWithProperties:
+        r"""
+        @brief Transforms a box with properties
+
+        't*box' or 't.trans(box)' is equivalent to box.transformed(t).
+
+        @param box The box to transform
+        @return The transformed box
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def trans(self, edge: Edge) -> Edge:
         r"""
         @brief Transforms an edge
@@ -65723,6 +72211,45 @@ class Trans:
         @return The transformed edge
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def trans(self, edge: EdgeWithProperties) -> EdgeWithProperties:
+        r"""
+        @brief Transforms an edge with properties
+
+        't*edge' or 't.trans(edge)' is equivalent to edge.transformed(t).
+
+        @param edge The edge to transform
+        @return The transformed edge
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def trans(self, edge_pair: EdgePair) -> EdgePair:
+        r"""
+        @brief Transforms an edge pair
+
+        't*edge_pair' or 't.trans(edge_pair)' is equivalent to edge_pair.transformed(t).
+
+        @param edge_pair The edge pair to transform
+        @return The transformed edge pair
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def trans(self, edge_pair: EdgePairWithProperties) -> EdgePairWithProperties:
+        r"""
+        @brief Transforms an edge pair with properties
+
+        't*edge_pair' or 't.trans(edge_pair)' is equivalent to edge_pair.transformed(t).
+
+        @param edge_pair The edge pair to transform
+        @return The transformed edge pair
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     @overload
@@ -65753,6 +72280,19 @@ class Trans:
         """
         ...
     @overload
+    def trans(self, path: PathWithProperties) -> PathWithProperties:
+        r"""
+        @brief Transforms a path with properties
+
+        't*path' or 't.trans(path)' is equivalent to path.transformed(t).
+
+        @param path The path to transform
+        @return The transformed path
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def trans(self, polygon: Polygon) -> Polygon:
         r"""
         @brief Transforms a polygon
@@ -65766,6 +72306,45 @@ class Trans:
         """
         ...
     @overload
+    def trans(self, polygon: PolygonWithProperties) -> PolygonWithProperties:
+        r"""
+        @brief Transforms a polygon with properties
+
+        't*polygon' or 't.trans(polygon)' is equivalent to polygon.transformed(t).
+
+        @param polygon The polygon to transform
+        @return The transformed polygon
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def trans(self, simple_polygon: SimplePolygon) -> SimplePolygon:
+        r"""
+        @brief Transforms a simple polygon
+
+        't*polygon' or 't.trans(simple_polygon)' is equivalent to simple_polygon.transformed(t).
+
+        @param simple_polygon The simple polygon to transform
+        @return The transformed simple polygon
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def trans(self, simple_polygon: SimplePolygonWithProperties) -> SimplePolygonWithProperties:
+        r"""
+        @brief Transforms a simple polygon with properties
+
+        't*polygon' or 't.trans(simple_polygon)' is equivalent to simple_polygon.transformed(t).
+
+        @param simple_polygon The simple polygon to transform
+        @return The transformed simple polygon
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def trans(self, text: Text) -> Text:
         r"""
         @brief Transforms a text
@@ -65776,6 +72355,19 @@ class Trans:
         @return The transformed text
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def trans(self, text: TextWithProperties) -> TextWithProperties:
+        r"""
+        @brief Transforms a text with properties
+
+        't*text' or 't.trans(text)' is equivalent to text.transformed(t).
+
+        @param text The text to transform
+        @return The transformed text
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     @overload
@@ -66840,6 +73432,19 @@ class VCplxTrans:
         """
         ...
     @overload
+    def __mul__(self, box: DBoxWithProperties) -> BoxWithProperties:
+        r"""
+        @brief Transforms a box with properties
+
+        't*box' or 't.trans(box)' is equivalent to box.transformed(t).
+
+        @param box The box to transform
+        @return The transformed box
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def __mul__(self, d: float) -> int:
         r"""
         @brief Transforms a single distance
@@ -66865,6 +73470,32 @@ class VCplxTrans:
         @return The transformed edge
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def __mul__(self, edge: DEdgeWithProperties) -> EdgeWithProperties:
+        r"""
+        @brief Transforms an edge with properties
+
+        't*edge' or 't.trans(edge)' is equivalent to edge.transformed(t).
+
+        @param edge The edge to transform
+        @return The transformed edge
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def __mul__(self, edge_pair: DEdgePairWithProperties) -> EdgePairWithProperties:
+        r"""
+        @brief Transforms an edge pair with properties
+
+        't*edge_pair' or 't.trans(edge_pair)' is equivalent to edge_pair.transformed(t).
+
+        @param edge_pair The edge pair to transform
+        @return The transformed edge pair
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     @overload
@@ -66909,6 +73540,19 @@ class VCplxTrans:
         """
         ...
     @overload
+    def __mul__(self, path: DPathWithProperties) -> PathWithProperties:
+        r"""
+        @brief Transforms a path with properties
+
+        't*path' or 't.trans(path)' is equivalent to path.transformed(t).
+
+        @param path The path to transform
+        @return The transformed path
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def __mul__(self, polygon: DPolygon) -> Polygon:
         r"""
         @brief Transforms a polygon
@@ -66919,6 +73563,32 @@ class VCplxTrans:
         @return The transformed polygon
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def __mul__(self, polygon: DPolygonWithProperties) -> PolygonWithProperties:
+        r"""
+        @brief Transforms a polygon with properties
+
+        't*polygon' or 't.trans(polygon)' is equivalent to polygon.transformed(t).
+
+        @param polygon The polygon to transform
+        @return The transformed polygon
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def __mul__(self, simple_polygon: DSimplePolygonWithProperties) -> SimplePolygonWithProperties:
+        r"""
+        @brief Transforms a simple polygon with properties
+
+        't*polygon' or 't.trans(simple_polygon)' is equivalent to simple_polygon.transformed(t).
+
+        @param simple_polygon The simple polygon to transform
+        @return The transformed simple polygon
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     @overload
@@ -66967,6 +73637,19 @@ class VCplxTrans:
         This convenience method has been introduced in version 0.25.
         """
         ...
+    @overload
+    def __mul__(self, text: DTextWithProperties) -> TextWithProperties:
+        r"""
+        @brief Transforms a text with properties
+
+        't*text' or 't.trans(text)' is equivalent to text.transformed(t).
+
+        @param text The text to transform
+        @return The transformed text
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
     def __ne__(self, other: object) -> bool:
         r"""
         @brief Tests for inequality
@@ -66995,6 +73678,19 @@ class VCplxTrans:
         """
         ...
     @overload
+    def __rmul__(self, box: DBoxWithProperties) -> BoxWithProperties:
+        r"""
+        @brief Transforms a box with properties
+
+        't*box' or 't.trans(box)' is equivalent to box.transformed(t).
+
+        @param box The box to transform
+        @return The transformed box
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def __rmul__(self, d: float) -> int:
         r"""
         @brief Transforms a single distance
@@ -67020,6 +73716,32 @@ class VCplxTrans:
         @return The transformed edge
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def __rmul__(self, edge: DEdgeWithProperties) -> EdgeWithProperties:
+        r"""
+        @brief Transforms an edge with properties
+
+        't*edge' or 't.trans(edge)' is equivalent to edge.transformed(t).
+
+        @param edge The edge to transform
+        @return The transformed edge
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def __rmul__(self, edge_pair: DEdgePairWithProperties) -> EdgePairWithProperties:
+        r"""
+        @brief Transforms an edge pair with properties
+
+        't*edge_pair' or 't.trans(edge_pair)' is equivalent to edge_pair.transformed(t).
+
+        @param edge_pair The edge pair to transform
+        @return The transformed edge pair
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     @overload
@@ -67064,6 +73786,19 @@ class VCplxTrans:
         """
         ...
     @overload
+    def __rmul__(self, path: DPathWithProperties) -> PathWithProperties:
+        r"""
+        @brief Transforms a path with properties
+
+        't*path' or 't.trans(path)' is equivalent to path.transformed(t).
+
+        @param path The path to transform
+        @return The transformed path
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def __rmul__(self, polygon: DPolygon) -> Polygon:
         r"""
         @brief Transforms a polygon
@@ -67077,6 +73812,32 @@ class VCplxTrans:
         """
         ...
     @overload
+    def __rmul__(self, polygon: DPolygonWithProperties) -> PolygonWithProperties:
+        r"""
+        @brief Transforms a polygon with properties
+
+        't*polygon' or 't.trans(polygon)' is equivalent to polygon.transformed(t).
+
+        @param polygon The polygon to transform
+        @return The transformed polygon
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def __rmul__(self, simple_polygon: DSimplePolygonWithProperties) -> SimplePolygonWithProperties:
+        r"""
+        @brief Transforms a simple polygon with properties
+
+        't*polygon' or 't.trans(simple_polygon)' is equivalent to simple_polygon.transformed(t).
+
+        @param simple_polygon The simple polygon to transform
+        @return The transformed simple polygon
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def __rmul__(self, text: DText) -> Text:
         r"""
         @brief Transforms a text
@@ -67087,6 +73848,19 @@ class VCplxTrans:
         @return The transformed text
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def __rmul__(self, text: DTextWithProperties) -> TextWithProperties:
+        r"""
+        @brief Transforms a text with properties
+
+        't*text' or 't.trans(text)' is equivalent to text.transformed(t).
+
+        @param text The text to transform
+        @return The transformed text
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     def __str__(self, lazy: Optional[bool] = ..., dbu: Optional[float] = ...) -> str:
@@ -67354,6 +74128,19 @@ class VCplxTrans:
         """
         ...
     @overload
+    def trans(self, box: DBoxWithProperties) -> BoxWithProperties:
+        r"""
+        @brief Transforms a box with properties
+
+        't*box' or 't.trans(box)' is equivalent to box.transformed(t).
+
+        @param box The box to transform
+        @return The transformed box
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def trans(self, edge: DEdge) -> Edge:
         r"""
         @brief Transforms an edge
@@ -67364,6 +74151,32 @@ class VCplxTrans:
         @return The transformed edge
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def trans(self, edge: DEdgeWithProperties) -> EdgeWithProperties:
+        r"""
+        @brief Transforms an edge with properties
+
+        't*edge' or 't.trans(edge)' is equivalent to edge.transformed(t).
+
+        @param edge The edge to transform
+        @return The transformed edge
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def trans(self, edge_pair: DEdgePairWithProperties) -> EdgePairWithProperties:
+        r"""
+        @brief Transforms an edge pair with properties
+
+        't*edge_pair' or 't.trans(edge_pair)' is equivalent to edge_pair.transformed(t).
+
+        @param edge_pair The edge pair to transform
+        @return The transformed edge pair
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     @overload
@@ -67408,6 +74221,19 @@ class VCplxTrans:
         """
         ...
     @overload
+    def trans(self, path: DPathWithProperties) -> PathWithProperties:
+        r"""
+        @brief Transforms a path with properties
+
+        't*path' or 't.trans(path)' is equivalent to path.transformed(t).
+
+        @param path The path to transform
+        @return The transformed path
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def trans(self, polygon: DPolygon) -> Polygon:
         r"""
         @brief Transforms a polygon
@@ -67421,6 +74247,32 @@ class VCplxTrans:
         """
         ...
     @overload
+    def trans(self, polygon: DPolygonWithProperties) -> PolygonWithProperties:
+        r"""
+        @brief Transforms a polygon with properties
+
+        't*polygon' or 't.trans(polygon)' is equivalent to polygon.transformed(t).
+
+        @param polygon The polygon to transform
+        @return The transformed polygon
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def trans(self, simple_polygon: DSimplePolygonWithProperties) -> SimplePolygonWithProperties:
+        r"""
+        @brief Transforms a simple polygon with properties
+
+        't*polygon' or 't.trans(simple_polygon)' is equivalent to simple_polygon.transformed(t).
+
+        @param simple_polygon The simple polygon to transform
+        @return The transformed simple polygon
+
+        This convenience method has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def trans(self, text: DText) -> Text:
         r"""
         @brief Transforms a text
@@ -67431,6 +74283,19 @@ class VCplxTrans:
         @return The transformed text
 
         This convenience method has been introduced in version 0.25.
+        """
+        ...
+    @overload
+    def trans(self, text: DTextWithProperties) -> TextWithProperties:
+        r"""
+        @brief Transforms a text with properties
+
+        't*text' or 't.trans(text)' is equivalent to text.transformed(t).
+
+        @param text The text to transform
+        @return The transformed text
+
+        This convenience method has been introduced in version 0.30.
         """
         ...
     ...

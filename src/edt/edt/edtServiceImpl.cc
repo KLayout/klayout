@@ -38,12 +38,12 @@
 #include "layMarker.h"
 #include "layLayerProperties.h"
 #include "layLayoutViewBase.h"
-#include "layBusy.h"
 
 #if defined(HAVE_QT)
 #  include "layLayoutView.h"
 #  include "layTipDialog.h"
 #  include "layDragDropData.h"
+#  include "layBusy.h"
 #endif
 
 #if defined(HAVE_QT)
@@ -1723,8 +1723,10 @@ InstService::make_cell (const lay::CellView &cv)
     return std::make_pair (true, m_current_cell);
   }
 
+#if defined(HAVE_QT)
   //  prevents recursion
   lay::BusySection busy;
+#endif
 
   //  NOTE: do this at the beginning: creating a transaction might delete transactions behind the
   //  head transaction, hence releasing (thus: deleting) cells. To prevert interference, create

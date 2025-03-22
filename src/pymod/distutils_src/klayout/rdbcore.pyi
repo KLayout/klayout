@@ -1627,6 +1627,20 @@ class ReportDatabase:
         """
         ...
     @overload
+    def create_items(self, cell_id: int, category_id: int, trans: db.CplxTrans, array: Sequence[db.EdgePairWithProperties], with_properties: Optional[bool] = ...) -> None:
+        r"""
+        @brief Creates new edge pair items for the given cell/category combination
+        This version takes \EdgePairWithProperties objects. If \with_properties is true (the default), the
+        properties are added to the item as tagged values.
+        @param cell_id The ID of the cell to which the item is associated
+        @param category_id The ID of the category to which the item is associated
+        @param trans The transformation to apply
+        @param polygons The list of edge pairs (with properties) for which the items are created
+        @param with_properties If true, the properties are transferred into the item as well
+        This variant has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def create_items(self, cell_id: int, category_id: int, trans: db.CplxTrans, array: Sequence[db.EdgePair]) -> None:
         r"""
         @brief Creates new edge pair items for the given cell/category combination
@@ -1642,6 +1656,20 @@ class ReportDatabase:
         """
         ...
     @overload
+    def create_items(self, cell_id: int, category_id: int, trans: db.CplxTrans, array: Sequence[db.EdgeWithProperties], with_properties: Optional[bool] = ...) -> None:
+        r"""
+        @brief Creates new edge items for the given cell/category combination
+        This version takes \EdgeWithProperties objects. If \with_properties is true (the default), the
+        properties are added to the item as tagged values.
+        @param cell_id The ID of the cell to which the item is associated
+        @param category_id The ID of the category to which the item is associated
+        @param trans The transformation to apply
+        @param polygons The list of edges (with properties) for which the items are created
+        @param with_properties If true, the properties are transferred into the item as well
+        This variant has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def create_items(self, cell_id: int, category_id: int, trans: db.CplxTrans, array: Sequence[db.Edge]) -> None:
         r"""
         @brief Creates new edge items for the given cell/category combination
@@ -1654,6 +1682,20 @@ class ReportDatabase:
         @param category_id The ID of the category to which the item is associated
         @param trans The transformation to apply
         @param edges The list of edges for which the items are created
+        """
+        ...
+    @overload
+    def create_items(self, cell_id: int, category_id: int, trans: db.CplxTrans, array: Sequence[db.PolygonWithProperties], with_properties: Optional[bool] = ...) -> None:
+        r"""
+        @brief Creates new polygon items for the given cell/category combination
+        This version takes \PolygonWithProperties objects. If \with_properties is true (the default), the
+        properties are added to the item as tagged values.
+        @param cell_id The ID of the cell to which the item is associated
+        @param category_id The ID of the category to which the item is associated
+        @param trans The transformation to apply
+        @param polygons The list of polygons (with properties) for which the items are created
+        @param with_properties If true, the properties are transferred into the item as well
+        This variant has been introduced in version 0.30.
         """
         ...
     @overload

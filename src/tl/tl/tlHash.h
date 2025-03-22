@@ -348,20 +348,27 @@ namespace std
     }
   };
 
-#if defined(HAVE_QT) && QT_VERSION < 0x050000
+#if defined(HAVE_QT)
+
+  /**
+   *  @brief Generic hash for QChar
+   */
+
+  template <>
+  inline size_t hfunc (const QChar &o, size_t h)
+  {
+    return hcombine (h, size_t (o.unicode ()));
+  }
+
+  template <>
+  inline size_t hfunc (const QChar &o)
+  {
+    return size_t (o.unicode ());
+  }
 
   /**
    *  @brief Generic hash for QString
    */
-
-  template <>
-  struct hash <QChar>
-  {
-    size_t operator() (const QChar &o) const
-    {
-      return hfunc (o.unicode ());
-    }
-  };
 
   template <>
   inline size_t hfunc (const QString &o, size_t h)
@@ -374,15 +381,6 @@ namespace std
   {
     return hfunc (o, size_t (0));
   }
-
-  template <>
-  struct hash <QString>
-  {
-    size_t operator() (const QString &o) const
-    {
-      return hfunc (o);
-    }
-  };
 
   /**
    *  @brief Generic hash for QByteArray
@@ -399,15 +397,6 @@ namespace std
   {
     return hfunc (o, size_t (0));
   }
-
-  template <>
-  struct hash <QByteArray>
-  {
-    size_t operator() (const QString &o) const
-    {
-      return hfunc (o);
-    }
-  };
 
 #endif
 

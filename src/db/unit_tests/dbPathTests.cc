@@ -362,3 +362,15 @@ TEST(11)
   EXPECT_EQ (to_string (pts), "(-100,10;1010,10;1010,-10;0,-10;0,10;1010,10;1010,-10;-100,-10)");
 }
 
+//  issue #2002
+TEST(12)
+{
+  db::Path path;
+  db::Path::pointlist_type pts;
+
+  tl::Extractor ("(143,381;262,260;381,141) w=400 bx=0 ex=0 r=false").read (path);
+
+  path.hull (pts, 4);
+  EXPECT_EQ (to_string (pts), "(286,521;454,350;522,282;240,0;70,170;0,241)");
+}
+

@@ -372,14 +372,7 @@ void path<C>::create_shifted_points (C start, C end, C width, bool forward, Iter
         double l1 = db::vprod (nnd - nd, eed) / dv;
         double l2 = db::vprod (nd - nnd, ed) / dv;
 
-        if ((l1 < -db::epsilon) != (l2 < -db::epsilon)) {
-
-          //  No well-formed intersection (reflecting edge) ->
-          //  create a direct connection
-          *pts++ = *pp + vector<C> (nd);
-          *pts++ = *pp + vector<C> (nnd);
-
-        } else if (l1 < l1min - db::epsilon || l2 < l2min - db::epsilon) {
+        if (l1 < l1min - db::epsilon || l2 < l2min - db::epsilon) {
 
           //  Segments are too short - the won't intersect: In this case we create a loop of three 
           //  points which define the area in self-overlapping way but confined to the path within

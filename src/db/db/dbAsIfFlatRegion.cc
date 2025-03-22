@@ -53,7 +53,7 @@ struct ResultCountingInserter
 {
   typedef db::Polygon value_type;
 
-  ResultCountingInserter (std::unordered_map<const db::Polygon *, size_t, std::ptr_hash_from_value<db::Polygon> > &result)
+  ResultCountingInserter (std::unordered_map<const db::Polygon *, size_t, tl::ptr_hash_from_value<db::Polygon> > &result)
     : mp_result (&result)
   {
     //  .. nothing yet ..
@@ -70,7 +70,7 @@ struct ResultCountingInserter
   }
 
 private:
-  std::unordered_map<const db::Polygon *, size_t, std::ptr_hash_from_value<db::Polygon> > *mp_result;
+  std::unordered_map<const db::Polygon *, size_t, tl::ptr_hash_from_value<db::Polygon> > *mp_result;
 };
 
 }

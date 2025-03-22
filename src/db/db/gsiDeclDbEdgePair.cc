@@ -62,7 +62,7 @@ struct edge_pair_defs
 
   static size_t hash_value (const C *ep)
   {
-    return std::hfunc (*ep);
+    return tl::hfunc (*ep);
   }
 
   static gsi::Methods methods ()

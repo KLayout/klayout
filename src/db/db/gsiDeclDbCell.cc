@@ -448,7 +448,7 @@ struct cell_inst_array_defs
 
   static size_t hash_value (const C *i)
   {
-    return std::hfunc (*i);
+    return tl::hfunc (*i);
   }
 
   static bool less (const C *i, const C &other)

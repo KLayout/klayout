@@ -126,7 +126,7 @@ db::LayerProperties li_from_string (const char *s, bool as_target)
 static
 size_t hash_value (const db::LayerProperties *l)
 {
-  return std::hfunc (*l);
+  return tl::hfunc (*l);
 }
 
 static bool log_equal_ext (const db::LayerProperties *lp1, const db::LayerProperties &lp2)

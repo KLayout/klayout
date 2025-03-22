@@ -225,7 +225,7 @@ struct trans_defs
 
   static size_t hash_value (const C *t)
   {
-    return std::hfunc (*t);
+    return tl::hfunc (*t);
   }
 
   static gsi::Methods methods ()
@@ -853,7 +853,7 @@ struct cplx_trans_defs
 
   static size_t hash_value (const C *t)
   {
-    return std::hfunc (*t);
+    return tl::hfunc (*t);
   }
 
   static gsi::Methods methods ()

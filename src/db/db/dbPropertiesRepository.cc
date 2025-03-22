@@ -296,7 +296,7 @@ PropertiesSet::hash () const
     tl::MutexLocker locker (&lock);
 
     if (! m_hash) {
-      m_hash = std::hfunc (to_map ());
+      m_hash = tl::hfunc (to_map ());
       if (! m_hash) {
         //  avoid 0 value as this is reserved for "not computed yet"
         m_hash = size_t (1);

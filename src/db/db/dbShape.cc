@@ -867,15 +867,15 @@ size_t
 Shape::hash_value () const
 {
   size_t h = size_t (m_type);
-  h = std::hcombine (h, std::hfunc (m_trans));
+  h = tl::hcombine (h, tl::hfunc (m_trans));
 
   if (m_stable) {
     //  Use the bytes of the iterator binary pattern (see operator<)
     for (unsigned int i = 0; i < sizeof (tl::reuse_vector<box_type>::const_iterator); ++i) {
-      h = std::hcombine (h, size_t (m_generic.iter[i]));
+      h = tl::hcombine (h, size_t (m_generic.iter[i]));
     }
   } else {
-    h = std::hcombine (h, size_t (m_generic.any));
+    h = tl::hcombine (h, size_t (m_generic.any));
   }
 
   return h;

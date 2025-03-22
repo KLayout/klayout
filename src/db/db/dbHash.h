@@ -55,7 +55,7 @@ namespace db
  *  for use with std::unordered_map and std::unordered_set
  */
 
-namespace std
+namespace tl
 {
   inline size_t hfunc_coord (db::DCoord d)
   {
@@ -89,15 +89,6 @@ namespace std
     return hfunc_coord (o.x (), hfunc_coord (o.y ()));
   }
 
-  template <class C>
-  struct hash <db::point<C> >
-  {
-    size_t operator() (const db::point<C> &o) const
-    {
-      return hfunc (o);
-    }
-  };
-
   /**
    *  @brief Hash value for a vector
    */
@@ -113,15 +104,6 @@ namespace std
   {
     return hfunc_coord (o.x (), hfunc_coord (o.y ()));
   }
-
-  template <class C>
-  struct hash <db::vector<C> >
-  {
-    size_t operator() (const db::vector<C> &o) const
-    {
-      return hfunc (o);
-    }
-  };
 
   /**
    *  @brief Hash value for a box
@@ -139,15 +121,6 @@ namespace std
     return hfunc (o.p1 (), hfunc (o.p2 ()));
   }
 
-  template <class C>
-  struct hash <db::box<C> >
-  {
-    size_t operator() (const db::box<C> &o) const
-    {
-      return hfunc (o);
-    }
-  };
-
   /**
    *  @brief Hash value for an edge
    */
@@ -164,15 +137,6 @@ namespace std
     return hfunc (o.p1 (), hfunc (o.p2 ()));
   }
 
-  template <class C>
-  struct hash <db::edge<C> >
-  {
-    size_t operator() (const db::edge<C> &o) const
-    {
-      return hfunc (o);
-    }
-  };
-
   /**
    *  @brief Hash value for an edge pair
    */
@@ -188,15 +152,6 @@ namespace std
   {
     return hfunc (o.lesser (), hfunc (o.greater (), hfunc (int (o.is_symmetric ()))));
   }
-
-  template <class C>
-  struct hash <db::edge_pair<C> >
-  {
-    size_t operator() (const db::edge_pair<C> &o) const
-    {
-      return hfunc (o);
-    }
-  };
 
   /**
    *  @brief Hash value for a text object
@@ -219,15 +174,6 @@ namespace std
   {
     return hfunc (o, size_t (0));
   }
-
-  template <class C>
-  struct hash <db::text<C> >
-  {
-    size_t operator() (const db::text<C> &o) const
-    {
-      return hfunc (o);
-    }
-  };
 
   /**
    *  @brief Hash value for a path
@@ -259,15 +205,6 @@ namespace std
     return hfunc (o, size_t (0));
   }
 
-  template <class C>
-  struct hash <db::path<C> >
-  {
-    size_t operator() (const db::path<C> &o) const
-    {
-      return hfunc (o);
-    }
-  };
-
   /**
    *  @brief Hash value for a polygon contour
    */
@@ -293,15 +230,6 @@ namespace std
   {
     return hfunc (o, size_t (0));
   }
-
-  template <class C>
-  struct hash <db::polygon_contour<C> >
-  {
-    size_t operator() (const db::path<C> &o) const
-    {
-      return hfunc (o);
-    }
-  };
 
   /**
    *  @brief Hash value for a polygon
@@ -330,15 +258,6 @@ namespace std
     return hfunc (o, size_t (0));
   }
 
-  template <class C>
-  struct hash <db::polygon<C> >
-  {
-    size_t operator() (const db::polygon<C> &o) const
-    {
-      return hfunc (o);
-    }
-  };
-
   /**
    *  @brief Hash value for a simple polygon
    */
@@ -354,15 +273,6 @@ namespace std
   {
     return hfunc (o, size_t (0));
   }
-
-  template <class C>
-  struct hash <db::simple_polygon<C> >
-  {
-    size_t operator() (const db::simple_polygon<C> &o) const
-    {
-      return hfunc (o);
-    }
-  };
 
   /**
    *  @brief Hash value for a simple transformation
@@ -380,15 +290,6 @@ namespace std
     return hfunc (o, size_t (0));
   }
 
-  template <class C>
-  struct hash <db::simple_trans<C> >
-  {
-    size_t operator() (const db::simple_trans<C> &o) const
-    {
-      return hfunc (o);
-    }
-  };
-
   /**
    *  @brief A hash function for a displacement transformation
    */
@@ -404,15 +305,6 @@ namespace std
   {
     return hfunc (o, size_t (0));
   }
-
-  template <class C>
-  struct hash <db::disp_trans<C> >
-  {
-    size_t operator() (const db::disp_trans<C> &o) const
-    {
-      return hfunc (o);
-    }
-  };
 
   /**
    *  @brief Hash value for a complex transformation
@@ -433,15 +325,6 @@ namespace std
   {
     return hfunc (o, size_t (0));
   }
-
-  template <class I, class F, class R>
-  struct hash <db::complex_trans<I, F, R> >
-  {
-    size_t operator() (const db::complex_trans<I, F, R> &o) const
-    {
-      return hfunc (o);
-    }
-  };
 
   /**
    *  @brief A hash value for a db::CellInstArray and db::DCellInstArray
@@ -482,15 +365,6 @@ namespace std
     return hfunc (o, size_t (0));
   }
 
-  template <class C>
-  struct hash <db::array <db::CellInst, db::simple_trans<C> > >
-  {
-    size_t operator() (const db::array <db::CellInst, db::simple_trans<C> > &o) const
-    {
-      return hfunc (o);
-    }
-  };
-
   /**
    *  @brief Hash value for an object with properties
    */
@@ -506,15 +380,6 @@ namespace std
   {
     return hfunc ((const O &) o, db::hash_for_properties_id (o.properties_id ()));
   }
-
-  template <class O>
-  struct hash <db::object_with_properties<O> >
-  {
-    size_t operator() (const db::object_with_properties<O> &o) const
-    {
-      return hfunc (o);
-    }
-  };
 
   /**
    *  @brief A hash function for a shape reference
@@ -532,15 +397,6 @@ namespace std
     return hfunc (*o.ptr (), hfunc (o.trans ()));
   }
 
-  template <class Shape, class Trans>
-  struct hash <db::shape_ref<Shape, Trans> >
-  {
-    size_t operator() (const db::shape_ref<Shape, Trans> &o) const
-    {
-      return hfunc (o);
-    }
-  };
-
   /**
    *  @brief A hash function for a polygon reference
    */
@@ -556,15 +412,6 @@ namespace std
   {
     return hfunc (*o.ptr (), hfunc (o.trans ()));
   }
-
-  template <class Shape, class Trans>
-  struct hash <db::polygon_ref<Shape, Trans> >
-  {
-    size_t operator() (const db::polygon_ref<Shape, Trans> &o) const
-    {
-      return hfunc (o);
-    }
-  };
 
   /**
    *  @brief A hash function for a path reference
@@ -582,15 +429,6 @@ namespace std
     return hfunc (*o.ptr (), hfunc (o.trans ()));
   }
 
-  template <class Shape, class Trans>
-  struct hash <db::path_ref<Shape, Trans> >
-  {
-    size_t operator() (const db::path_ref<Shape, Trans> &o) const
-    {
-      return hfunc (o);
-    }
-  };
-
   /**
    *  @brief A hash function for a text reference
    */
@@ -606,15 +444,6 @@ namespace std
   {
     return hfunc (*o.ptr (), hfunc (o.trans ()));
   }
-
-  template <class Shape, class Trans>
-  struct hash <db::text_ref<Shape, Trans> >
-  {
-    size_t operator() (const db::text_ref<Shape, Trans> &o) const
-    {
-      return hfunc (o);
-    }
-  };
 
   /**
    *  @brief A hash value for a db::LayerProperties object
@@ -637,14 +466,191 @@ namespace std
     return hfunc (o, size_t (0));
   }
 
+}
+
+namespace std
+{
+
+  template <class C>
+  struct hash <db::point<C> >
+  {
+    size_t operator() (const db::point<C> &o) const
+    {
+      return tl::hfunc (o);
+    }
+  };
+
+  template <class C>
+  struct hash <db::vector<C> >
+  {
+    size_t operator() (const db::vector<C> &o) const
+    {
+      return tl::hfunc (o);
+    }
+  };
+
+  template <class C>
+  struct hash <db::box<C> >
+  {
+    size_t operator() (const db::box<C> &o) const
+    {
+      return tl::hfunc (o);
+    }
+  };
+
+  template <class C>
+  struct hash <db::edge<C> >
+  {
+    size_t operator() (const db::edge<C> &o) const
+    {
+      return tl::hfunc (o);
+    }
+  };
+
+  template <class C>
+  struct hash <db::edge_pair<C> >
+  {
+    size_t operator() (const db::edge_pair<C> &o) const
+    {
+      return tl::hfunc (o);
+    }
+  };
+
+  template <class C>
+  struct hash <db::text<C> >
+  {
+    size_t operator() (const db::text<C> &o) const
+    {
+      return tl::hfunc (o);
+    }
+  };
+
+  template <class C>
+  struct hash <db::path<C> >
+  {
+    size_t operator() (const db::path<C> &o) const
+    {
+      return tl::hfunc (o);
+    }
+  };
+
+  template <class C>
+  struct hash <db::polygon_contour<C> >
+  {
+    size_t operator() (const db::path<C> &o) const
+    {
+      return tl::hfunc (o);
+    }
+  };
+
+  template <class C>
+  struct hash <db::polygon<C> >
+  {
+    size_t operator() (const db::polygon<C> &o) const
+    {
+      return tl::hfunc (o);
+    }
+  };
+
+  template <class C>
+  struct hash <db::simple_polygon<C> >
+  {
+    size_t operator() (const db::simple_polygon<C> &o) const
+    {
+      return tl::hfunc (o);
+    }
+  };
+
+  template <class C>
+  struct hash <db::simple_trans<C> >
+  {
+    size_t operator() (const db::simple_trans<C> &o) const
+    {
+      return tl::hfunc (o);
+    }
+  };
+
+  template <class C>
+  struct hash <db::disp_trans<C> >
+  {
+    size_t operator() (const db::disp_trans<C> &o) const
+    {
+      return tl::hfunc (o);
+    }
+  };
+
+  template <class I, class F, class R>
+  struct hash <db::complex_trans<I, F, R> >
+  {
+    size_t operator() (const db::complex_trans<I, F, R> &o) const
+    {
+      return tl::hfunc (o);
+    }
+  };
+
+  template <class C>
+  struct hash <db::array <db::CellInst, db::simple_trans<C> > >
+  {
+    size_t operator() (const db::array <db::CellInst, db::simple_trans<C> > &o) const
+    {
+      return tl::hfunc (o);
+    }
+  };
+
+  template <class O>
+  struct hash <db::object_with_properties<O> >
+  {
+    size_t operator() (const db::object_with_properties<O> &o) const
+    {
+      return tl::hfunc (o);
+    }
+  };
+
+  template <class Shape, class Trans>
+  struct hash <db::shape_ref<Shape, Trans> >
+  {
+    size_t operator() (const db::shape_ref<Shape, Trans> &o) const
+    {
+      return tl::hfunc (o);
+    }
+  };
+
+  template <class Shape, class Trans>
+  struct hash <db::polygon_ref<Shape, Trans> >
+  {
+    size_t operator() (const db::polygon_ref<Shape, Trans> &o) const
+    {
+      return tl::hfunc (o);
+    }
+  };
+
+  template <class Shape, class Trans>
+  struct hash <db::path_ref<Shape, Trans> >
+  {
+    size_t operator() (const db::path_ref<Shape, Trans> &o) const
+    {
+      return tl::hfunc (o);
+    }
+  };
+
+  template <class Shape, class Trans>
+  struct hash <db::text_ref<Shape, Trans> >
+  {
+    size_t operator() (const db::text_ref<Shape, Trans> &o) const
+    {
+      return tl::hfunc (o);
+    }
+  };
+
   template <>
   struct hash <db::LayerProperties>
   {
     size_t operator() (const db::LayerProperties &o) const
     {
-      return hfunc (o);
+      return tl::hfunc (o);
     }
   };
+
 }
 
 #endif

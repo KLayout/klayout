@@ -170,7 +170,7 @@ struct edge_defs
 
   static size_t hash_value (const C *e)
   {
-    return std::hfunc (*e);
+    return tl::hfunc (*e);
   }
 
   static gsi::Methods methods ()

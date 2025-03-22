@@ -47,7 +47,7 @@
  *  for use with std::unordered_map and std::unordered_set
  */
 
-namespace std
+namespace tl
 {
   inline size_t hcombine (size_t h1, size_t h2)
   {
@@ -57,14 +57,14 @@ namespace std
   template <class T>
   inline size_t hfunc (const T &t)
   {
-    hash <T> hf;
+    std::hash <T> hf;
     return hf (t);
   }
 
   template <class T>
   inline size_t hfunc (const T &t, size_t h)
   {
-    hash <T> hf;
+    std::hash <T> hf;
     return hcombine (h, hf (t));
   }
 
@@ -93,15 +93,6 @@ namespace std
     return hfunc (o.first, hfunc (o.second));
   }
 
-  template <class T1, class T2>
-  struct hash <std::pair <T1, T2> >
-  {
-    size_t operator() (const std::pair<T1, T2> &o) const
-    {
-      return hfunc (o);
-    }
-  };
-
   /**
    *  @brief Generic hash for an unordered set
    */
@@ -117,15 +108,6 @@ namespace std
   {
     return hfunc (o, size_t (0));
   }
-
-  template <class T>
-  struct hash <std::unordered_set <T> >
-  {
-    size_t operator() (const std::unordered_set<T> &o) const
-    {
-      return hfunc (o);
-    }
-  };
 
   /**
    *  @brief Generic hash for a vector
@@ -143,15 +125,6 @@ namespace std
     return hfunc (o, size_t (0));
   }
 
-  template <class T>
-  struct hash <std::vector <T> >
-  {
-    size_t operator() (const std::vector<T> &o) const
-    {
-      return hfunc (o);
-    }
-  };
-
   /**
    *  @brief Generic hash for a list
    */
@@ -167,15 +140,6 @@ namespace std
   {
     return hfunc (o, size_t (0));
   }
-
-  template <class T>
-  struct hash <std::list <T> >
-  {
-    size_t operator() (const std::list<T> &o) const
-    {
-      return hfunc (o);
-    }
-  };
 
   /**
    *  @brief Generic hash for a tl::slist
@@ -193,15 +157,6 @@ namespace std
     return hfunc (o, size_t (0));
   }
 
-  template <class T>
-  struct hash <tl::slist <T> >
-  {
-    size_t operator() (const tl::slist<T> &o) const
-    {
-      return hfunc (o);
-    }
-  };
-
   /**
    *  @brief Generic hash for an ordered set
    */
@@ -218,15 +173,6 @@ namespace std
     return hfunc (o, size_t (0));
   }
 
-  template <class T>
-  struct hash <std::set <T> >
-  {
-    size_t operator() (const std::set<T> &o) const
-    {
-      return hfunc (o);
-    }
-  };
-
   /**
    *  @brief Generic hash for std::multiset
    */
@@ -242,15 +188,6 @@ namespace std
   {
     return hfunc (o, size_t (0));
   }
-
-  template <class T>
-  struct hash <std::multiset <T> >
-  {
-    size_t operator() (const std::multiset<T> &o) const
-    {
-      return hfunc (o);
-    }
-  };
 
   /**
    *  @brief Generic hash for an unordered map
@@ -271,15 +208,6 @@ namespace std
     return hfunc (o, size_t (0));
   }
 
-  template <class T1, class T2>
-  struct hash <std::unordered_map<T1, T2> >
-  {
-    size_t operator() (const std::unordered_map<T1, T2> &o) const
-    {
-      return hfunc (o);
-    }
-  };
-
   /**
    *  @brief Generic hash for an ordered map
    */
@@ -298,15 +226,6 @@ namespace std
   {
     return hfunc (o, size_t (0));
   }
-
-  template <class T1, class T2>
-  struct hash <std::map<T1, T2> >
-  {
-    size_t operator() (const std::map<T1, T2> &o) const
-    {
-      return hfunc (o);
-    }
-  };
 
   /**
    *  @brief Generic hash for std::multimap
@@ -327,15 +246,6 @@ namespace std
     return hfunc (o, size_t (0));
   }
 
-  template <class T1, class T2>
-  struct hash <std::multimap<T1, T2> >
-  {
-    size_t operator() (const std::multimap<T1, T2> &o) const
-    {
-      return hfunc (o);
-    }
-  };
-
   /**
    *  @brief Create a pointer hash from the pointer's value
    */
@@ -344,7 +254,7 @@ namespace std
   {
     size_t operator() (const X *ptr) const
     {
-      return ptr ? hash<X> () (*ptr) : 0;
+      return ptr ? std::hash<X> () (*ptr) : 0;
     }
   };
 
@@ -399,6 +309,117 @@ namespace std
   }
 
 #endif
+
+#if defined(HAVE_64BIT_COORD)
+
+  inline size_t hfunc (__int128 v)
+  {
+    return hcombine (hfunc (uint64_t (v)), hfunc (uint64_t (v >> 64)));
+  }
+
+  inline size_t hfunc (__int128 v, size_t h)
+  {
+    return hcombine (hfunc (v), h);
+  }
+
+#endif
+
+}
+
+//  provide some missing std::hash implementations based on our tl::hfunc
+
+namespace std
+{
+
+  template <class T1, class T2>
+  struct hash <std::pair <T1, T2> >
+  {
+    size_t operator() (const std::pair<T1, T2> &o) const
+    {
+      return tl::hfunc (o);
+    }
+  };
+
+  template <class T>
+  struct hash <std::unordered_set <T> >
+  {
+    size_t operator() (const std::unordered_set<T> &o) const
+    {
+      return tl::hfunc (o);
+    }
+  };
+
+  template <class T>
+  struct hash <std::vector <T> >
+  {
+    size_t operator() (const std::vector<T> &o) const
+    {
+      return tl::hfunc (o);
+    }
+  };
+
+  template <class T>
+  struct hash <std::list <T> >
+  {
+    size_t operator() (const std::list<T> &o) const
+    {
+      return tl::hfunc (o);
+    }
+  };
+
+  template <class T>
+  struct hash <tl::slist <T> >
+  {
+    size_t operator() (const tl::slist<T> &o) const
+    {
+      return tl::hfunc (o);
+    }
+  };
+
+  template <class T>
+  struct hash <std::set <T> >
+  {
+    size_t operator() (const std::set<T> &o) const
+    {
+      return tl::hfunc (o);
+    }
+  };
+
+  template <class T>
+  struct hash <std::multiset <T> >
+  {
+    size_t operator() (const std::multiset<T> &o) const
+    {
+      return tl::hfunc (o);
+    }
+  };
+
+  template <class T1, class T2>
+  struct hash <std::unordered_map<T1, T2> >
+  {
+    size_t operator() (const std::unordered_map<T1, T2> &o) const
+    {
+      return tl::hfunc (o);
+    }
+  };
+
+  template <class T1, class T2>
+  struct hash <std::map<T1, T2> >
+  {
+    size_t operator() (const std::map<T1, T2> &o) const
+    {
+      return tl::hfunc (o);
+    }
+  };
+
+  template <class T1, class T2>
+  struct hash <std::multimap<T1, T2> >
+  {
+    size_t operator() (const std::multimap<T1, T2> &o) const
+    {
+      return tl::hfunc (o);
+    }
+  };
 
 }
 

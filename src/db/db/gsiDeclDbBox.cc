@@ -124,7 +124,7 @@ struct box_defs
 
   static size_t hash_value (const C *box)
   {
-    return std::hfunc (*box);
+    return tl::hfunc (*box);
   }
 
   static const C &bbox (const C *box)

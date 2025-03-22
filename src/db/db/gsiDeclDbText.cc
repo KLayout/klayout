@@ -169,7 +169,7 @@ struct text_defs
 
   static size_t hash_value (const C *box)
   {
-    return std::hfunc (*box);
+    return tl::hfunc (*box);
   }
 
   static gsi::Methods methods ()

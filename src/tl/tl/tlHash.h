@@ -364,13 +364,13 @@ namespace std
   };
 
   template <>
-  size_t hfunc (const QString &o, size_t h)
+  inline size_t hfunc (const QString &o, size_t h)
   {
     return hfunc_iterable (o, h);
   }
 
   template <>
-  size_t hfunc (const QString &o)
+  inline size_t hfunc (const QString &o)
   {
     return hfunc (o, size_t (0));
   }
@@ -389,13 +389,13 @@ namespace std
    */
 
   template <>
-  size_t hfunc (const QByteArray &o, size_t h)
+  inline size_t hfunc (const QByteArray &o, size_t h)
   {
     return hfunc_iterable (o, h);
   }
 
   template <>
-  size_t hfunc (const QByteArray &o)
+  inline size_t hfunc (const QByteArray &o)
   {
     return hfunc (o, size_t (0));
   }

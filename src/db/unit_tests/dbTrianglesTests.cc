@@ -700,6 +700,9 @@ TEST(triangulate_basic)
   EXPECT_GT (tri.num_triangles (), size_t (100));
   EXPECT_LT (tri.num_triangles (), size_t (150));
 
+  //  for debugging:
+  //  tri.dump ("debug.gds");
+
   param.min_b = 1.0;
   param.max_area = 0.1;
 
@@ -914,8 +917,8 @@ TEST(triangulate_problematic)
     EXPECT_GE (t->b (), param.min_b);
   }
 
-  EXPECT_GT (tri.num_triangles (), size_t (470));
-  EXPECT_LT (tri.num_triangles (), size_t (490));
+  EXPECT_GT (tri.num_triangles (), size_t (540));
+  EXPECT_LT (tri.num_triangles (), size_t (560));
 }
 
 TEST(triangulate_thin)
@@ -978,7 +981,7 @@ TEST(triangulate_issue1996)
 
   db::Triangles::TriangulateParameters param;
   param.min_b = 0.5;
-  param.max_area = 500.0 * dbu * dbu;
+  param.max_area = 5000.0 * dbu * dbu;
 
   TestableTriangles tri;
   db::DCplxTrans trans = db::DCplxTrans (dbu) * db::DCplxTrans (db::DTrans (db::DPoint () - poly.box ().center ()));
@@ -990,9 +993,10 @@ TEST(triangulate_issue1996)
   //  tri.dump ("debug.gds");
 
   for (auto t = tri.begin (); t != tri.end (); ++t) {
+    EXPECT_LE (t->area (), param.max_area);
     EXPECT_GE (t->b (), param.min_b);
   }
 
-  EXPECT_GT (tri.num_triangles (), size_t (13000));
-  EXPECT_LT (tri.num_triangles (), size_t (13200));
+  EXPECT_GT (tri.num_triangles (), size_t (128000));
+  EXPECT_LT (tri.num_triangles (), size_t (132000));
 }

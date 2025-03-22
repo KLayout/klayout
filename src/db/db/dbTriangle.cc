@@ -363,21 +363,33 @@ Triangle::Triangle (TriangleEdge *e1, TriangleEdge *e2, TriangleEdge *e3)
   }
   mp_v[2] = mp_e[1]->other (mp_v[1]);
 
-  //  establish link to edges
-  for (int i = 0; i < 3; ++i) {
-    TriangleEdge *e = mp_e[i];
-    int side_of = e->side_of (*mp_v[i == 0 ? 2 : i - 1]);
-    //  NOTE: in the degenerated case, the triangle is not attached to an edge!
-    if (side_of < 0) {
-      e->set_left (this);
-    } else if (side_of > 0) {
-      e->set_right (this);
-    }
+  //  enforce clockwise orientation
+  int s = db::vprod_sign (*mp_v[2] - *mp_v[0], *mp_v[1] - *mp_v[0]);
+  if (s < 0) {
+    std::swap (mp_v[2], mp_v[1]);
+  } else if (s == 0) {
+    //  Triangle is not orientable
+    tl_assert (false);
   }
 
-  //  enforce clockwise orientation
-  if (db::vprod_sign (*mp_v[2] - *mp_v[0], *mp_v[1] - *mp_v[0]) < 0) {
-    std::swap (mp_v[2], mp_v[1]);
+  //  establish link to edges
+  for (int i = 0; i < 3; ++i) {
+
+    TriangleEdge *e = mp_e[i];
+
+    unsigned int i1 = 0;
+    for ( ; e->v1 () != mp_v[i1] && i1 < 3; ++i1)
+      ;
+    unsigned int i2 = 0;
+    for ( ; e->v2 () != mp_v[i2] && i2 < 3; ++i2)
+      ;
+
+    if ((i1 + 1) % 3 == i2) {
+      e->set_right (this);
+    } else {
+      e->set_left (this);
+    }
+
   }
 }
 

@@ -364,12 +364,6 @@ Triangles::insert (db::Vertex *vertex, std::list<tl::weak_ptr<db::Triangle> > *n
 
   //  the new vertex is outside the domain
   if (tris.empty ()) {
-    // @@@
-    if (m_is_constrained) {
-      dump("debug.gds");  // @@@
-      find_triangle_for_point (*vertex);
-    }
-    // @@@
     tl_assert (! m_is_constrained);
     insert_new_vertex (vertex, new_triangles);
     return vertex;
@@ -397,37 +391,7 @@ Triangles::insert (db::Vertex *vertex, std::list<tl::weak_ptr<db::Triangle> > *n
   } else if (! on_edges.empty ()) {
 
     tl_assert (on_edges.size () == size_t (1));
-// @@@
-auto v1 = on_edges.front()->v1();
-auto v2 = on_edges.front()->v2();
-unsigned int ns1 = 0, ns2 = 0;
-for (auto e = v1->begin_edges (); e != v1->end_edges (); ++e) {
-  if ((*e)->is_segment()) { ++ns1; }
-}
-for (auto e = v2->begin_edges (); e != v2->end_edges (); ++e) {
-  if ((*e)->is_segment()) { ++ns2; }
-}
-std::string vs = vertex->to_string();
-std::string es = on_edges.front()->to_string();
-if (vs == "(-12.9999999999, 3.50126953125)" && es == "((-13, 3.5328125), (-12.9999999998, 3.4697265625))") {
-  printf("@@@ BANG!\n"); fflush(stdout);
-}
-// @@@
     split_triangles_on_edge (vertex, on_edges.front (), new_triangles);
-// @@@
-unsigned int ns1p = 0, ns2p = 0;
-for (auto e = v1->begin_edges (); e != v1->end_edges (); ++e) {
-  if ((*e)->is_segment()) { ++ns1p; }
-}
-for (auto e = v2->begin_edges (); e != v2->end_edges (); ++e) {
-  if ((*e)->is_segment()) { ++ns2p; }
-}
-if (ns1 != ns1p || ns2 != ns2p) {
-  printf("@@@ on '%s' '%s' - BANG!\n", vs.c_str(), es.c_str()); fflush(stdout);
-}
-tl_assert(ns1 == ns1p);
-tl_assert(ns2 == ns2p);
-// @@@
     return vertex;
 
   } else if (tris.size () == size_t (1)) {
@@ -1638,7 +1602,6 @@ Triangles::refine (const TriangulateParameters &parameters)
     if (tl::verbosity () >= parameters.base_verbosity + 10) {
       tl::info << "Iteration " << nloop << " ..";
     }
-    printf("@@@ iteration %d ..\n", (int)nloop); fflush(stdout);
 
     std::list<tl::weak_ptr<db::Triangle> > to_consider;
     for (auto t = new_triangles.begin (); t != new_triangles.end (); ++t) {
@@ -1667,7 +1630,28 @@ Triangles::refine (const TriangulateParameters &parameters)
       auto cr = (*t)->circumcircle();
       auto center = cr.first;
 
-      if ((*t)->contains (center) >= 0) {
+      int s = (*t)->contains (center);
+      if (s >= 0) {
+
+        if (s > 0) {
+
+          double snap = 1e-3;
+
+          //  Snap the center to a segment center if "close" to it.
+          //  This avoids generating very skinny triangles that can't be fixed as the
+          //  segment cannot be flipped. This a part of the issue #1996 problem.
+          for (unsigned int i = 0; i < 3; ++i) {
+            if ((*t)->edge (i)->is_segment ()) {
+              auto e = (*t)->edge (i)->edge ();
+              auto c = e.p1 () + e.d () * 0.5;
+              if (c.distance (center) < e.length () * 0.5 * snap - db::epsilon) {
+                center = c;
+                break;
+              }
+            }
+          }
+
+        }
 
         if (tl::verbosity () >= parameters.base_verbosity + 20) {
           tl::info << "Inserting in-triangle center " << center.to_string () << " of " << (*t)->to_string (true);
@@ -1677,7 +1661,7 @@ Triangles::refine (const TriangulateParameters &parameters)
       } else {
 
         db::Vertex *vstart = 0;
-        for (int i = 0; i < 3; ++i) {
+        for (unsigned int i = 0; i < 3; ++i) {
           db::TriangleEdge *edge = (*t)->edge (i);
           vstart = (*t)->opposite (edge);
           if (edge->side_of (*vstart) * edge->side_of (center) < 0) {

@@ -1007,6 +1007,8 @@ void MacroEditorPage::cursor_position_changed ()
     }
 
   }
+
+  emit edit_trace (false);
 }
 
 void MacroEditorPage::text_changed () 
@@ -1116,9 +1118,13 @@ void MacroEditorPage::connect_macro (lym::Macro *macro)
 void
 MacroEditorPage::find_reset ()
 {
+  /*
+  Editor gets too jumpy if we try to reset after search:
+
   m_ignore_cursor_changed_event = true;
   mp_text->setTextCursor (m_edit_cursor);
   m_ignore_cursor_changed_event = false;
+  */
 }
 
 bool
@@ -1199,7 +1205,6 @@ MacroEditorPage::find_next ()
       m_ignore_cursor_changed_event = true;
       mp_text->setTextCursor (newc);
       m_ignore_cursor_changed_event = false;
-      emit edit_trace (false);
       return true;
     }
 
@@ -1242,7 +1247,6 @@ MacroEditorPage::select_match_here ()
     m_ignore_cursor_changed_event = true;
     mp_text->setTextCursor (newc);
     m_ignore_cursor_changed_event = false;
-    emit edit_trace (false);
     return true;
   } else {
     return false;

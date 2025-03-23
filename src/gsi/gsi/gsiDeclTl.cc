@@ -147,7 +147,11 @@ Class<tl::Timer> decl_Timer ("tl", "Timer",
   gsi::method ("memory_size", &tl::Timer::memory_size,
     "@brief Gets the current memory usage of the process in Bytes\n"
     "\n"
-    "This method has been introduced in version 0.27."
+    "The returned value is the resident memory size on Linux and MacOS and "
+    "the working set size on Windows.\n"
+    "\n"
+    "This method has been introduced in version 0.27. The value has been changed "
+    "to be resident size (instead of virtual size) on Linux in version 0.30."    
   ) +
   gsi::method ("user", &tl::Timer::sec_user, 
     "@brief Returns the elapsed CPU time in user mode from start to stop in seconds\n"

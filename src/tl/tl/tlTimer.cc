@@ -245,8 +245,8 @@ Timer::memory_size ()
                               "%*d " // 0
                               "%*d " // itrealvalue
                               "%*u " // starttime
-                              "%lu " // vsize
-                              "%*d " // rss
+                              "%*u " // vsize
+                              "%lu " // rss
                               "%*u " // rlim
                               "%*u " // startcode
                               "%*u " // endcode
@@ -270,7 +270,8 @@ Timer::memory_size ()
       memsize = 0;
     }
   }
-  return size_t (memsize);
+
+  return size_t (memsize) * size_t (getpagesize ());
 
 #else
 #  error Unsupported platform

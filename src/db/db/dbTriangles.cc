@@ -36,6 +36,12 @@
 namespace db
 {
 
+static inline bool is_equal (const db::DPoint &a, const db::DPoint &b)
+{
+  return std::abs (a.x () - b.x ()) < std::max (1.0, (std::abs (a.x ()) + std::abs (b.x ()))) * db::epsilon &&
+         std::abs (a.y () - b.y ()) < std::max (1.0, (std::abs (a.y ()) + std::abs (b.y ()))) * db::epsilon;
+}
+
 Triangles::Triangles ()
   : m_is_constrained (false), m_level (0), m_id (0), m_flips (0), m_hops (0)
 {
@@ -44,9 +50,7 @@ Triangles::Triangles ()
 
 Triangles::~Triangles ()
 {
-  while (! mp_triangles.empty ()) {
-    remove_triangle (mp_triangles.begin ().operator-> ());
-  }
+  clear ();
 }
 
 db::Vertex *
@@ -88,6 +92,7 @@ Triangles::create_triangle (TriangleEdge *e1, TriangleEdge *e2, TriangleEdge *e3
   db::Triangle *res = new db::Triangle (e1, e2, e3);
   res->set_id (++m_id);
   mp_triangles.push_back (res);
+
   return res;
 }
 
@@ -366,26 +371,35 @@ Triangles::insert (db::Vertex *vertex, std::list<tl::weak_ptr<db::Triangle> > *n
 
   //  check, if the new vertex is on an edge (may be edge between triangles or edge on outside)
   std::vector<db::TriangleEdge *> on_edges;
+  std::vector<db::TriangleEdge *> on_vertex;
   for (int i = 0; i < 3; ++i) {
     db::TriangleEdge *e = tris.front ()->edge (i);
     if (e->side_of (*vertex) == 0) {
-      on_edges.push_back (e);
+      if (is_equal (*vertex, *e->v1 ()) || is_equal (*vertex, *e->v2 ())) {
+        on_vertex.push_back (e);
+      } else {
+        on_edges.push_back (e);
+      }
     }
   }
 
-  if (! on_edges.empty ()) {
-    if (on_edges.size () == size_t (1)) {
-      split_triangles_on_edge (tris, vertex, on_edges.front (), new_triangles);
-      return vertex;
-    } else {
-      //  the vertex is already present
-      tl_assert (on_edges.size () == size_t (2));
-      return on_edges.front ()->common_vertex (on_edges [1]);
-    }
+  if (! on_vertex.empty ()) {
+
+    tl_assert (on_vertex.size () == size_t (2));
+    return on_vertex.front ()->common_vertex (on_vertex [1]);
+
+  } else if (! on_edges.empty ()) {
+
+    tl_assert (on_edges.size () == size_t (1));
+    split_triangles_on_edge (vertex, on_edges.front (), new_triangles);
+    return vertex;
+
   } else if (tris.size () == size_t (1)) {
+
     //  the new vertex is inside one triangle
     split_triangle (tris.front (), vertex, new_triangles);
     return vertex;
+
   }
 
   tl_assert (false);
@@ -404,6 +418,7 @@ Triangles::find_triangle_for_point (const db::DPoint &point)
       }
     }
   }
+
   return res;
 }
 
@@ -642,7 +657,7 @@ Triangles::split_triangle (db::Triangle *t, db::Vertex *vertex, std::list<tl::we
 }
 
 void
-Triangles::split_triangles_on_edge (const std::vector<db::Triangle *> &tris, db::Vertex *vertex, db::TriangleEdge *split_edge, std::list<tl::weak_ptr<db::Triangle> > *new_triangles_out)
+Triangles::split_triangles_on_edge (db::Vertex *vertex, db::TriangleEdge *split_edge, std::list<tl::weak_ptr<db::Triangle> > *new_triangles_out)
 {
   TriangleEdge *s1 = create_edge (split_edge->v1 (), vertex);
   TriangleEdge *s2 = create_edge (split_edge->v2 (), vertex);
@@ -650,6 +665,12 @@ Triangles::split_triangles_on_edge (const std::vector<db::Triangle *> &tris, db:
   s2->set_is_segment (split_edge->is_segment ());
 
   std::vector<db::Triangle *> new_triangles;
+
+  std::vector<db::Triangle *> tris;
+  tris.reserve (2);
+  for (auto t = split_edge->begin_triangles (); t != split_edge->end_triangles (); ++t) {
+    tris.push_back (t.operator-> ());
+  }
 
   for (auto t = tris.begin (); t != tris.end (); ++t) {
 
@@ -931,13 +952,15 @@ Triangles::is_illegal_edge (db::TriangleEdge *edge)
     return false;
   }
 
-  auto lr = left->circumcircle ();
-  if (right->opposite (edge)->in_circle (lr.first, lr.second) > 0) {
+  bool ok = false;
+
+  auto lr = left->circumcircle (&ok);
+  if (! ok || right->opposite (edge)->in_circle (lr.first, lr.second) > 0) {
     return true;
   }
 
-  auto rr = right->circumcircle();
-  if (left->opposite (edge)->in_circle (rr.first, rr.second) > 0) {
+  auto rr = right->circumcircle(&ok);
+  if (! ok || left->opposite (edge)->in_circle (rr.first, rr.second) > 0) {
     return true;
   }
 
@@ -1163,16 +1186,16 @@ Triangles::search_edges_crossing (Vertex *from, Vertex *to)
 }
 
 db::Vertex *
-Triangles::find_vertex_for_point (const db::DPoint &pt)
+Triangles::find_vertex_for_point (const db::DPoint &point)
 {
-  db::TriangleEdge *edge = find_closest_edge (pt);
+  db::TriangleEdge *edge = find_closest_edge (point);
   if (!edge) {
     return 0;
   }
   db::Vertex *v = 0;
-  if (edge->v1 ()->equal (pt)) {
+  if (is_equal (*edge->v1 (), point)) {
     v = edge->v1 ();
-  } else if (edge->v2 ()->equal (pt)) {
+  } else if (is_equal (*edge->v2 (), point)) {
     v = edge->v2 ();
   }
   return v;
@@ -1186,7 +1209,7 @@ Triangles::find_edge_for_points (const db::DPoint &p1, const db::DPoint &p2)
     return 0;
   }
   for (auto e = v->begin_edges (); e != v->end_edges (); ++e) {
-    if ((*e)->other (v)->equal (p2)) {
+    if (is_equal (*(*e)->other (v), p2)) {
       return *e;
     }
   }
@@ -1329,7 +1352,8 @@ Triangles::constrain (const std::vector<std::vector<db::Vertex *> > &contours)
       if (vv == c->end ()) {
         vv = c->begin ();
       }
-      resolved_edges.push_back (std::make_pair (db::DEdge (**v, **vv), std::vector<db::TriangleEdge *> ()));
+      db::DEdge e (**v, **vv);
+      resolved_edges.push_back (std::make_pair (e, std::vector<db::TriangleEdge *> ()));
       resolved_edges.back ().second = ensure_edge (*v, *vv);
     }
   }
@@ -1632,7 +1656,28 @@ Triangles::refine (const TriangulateParameters &parameters)
       auto cr = (*t)->circumcircle();
       auto center = cr.first;
 
-      if ((*t)->contains (center) >= 0) {
+      int s = (*t)->contains (center);
+      if (s >= 0) {
+
+        if (s > 0) {
+
+          double snap = 1e-3;
+
+          //  Snap the center to a segment center if "close" to it.
+          //  This avoids generating very skinny triangles that can't be fixed as the
+          //  segment cannot be flipped. This a part of the issue #1996 problem.
+          for (unsigned int i = 0; i < 3; ++i) {
+            if ((*t)->edge (i)->is_segment ()) {
+              auto e = (*t)->edge (i)->edge ();
+              auto c = e.p1 () + e.d () * 0.5;
+              if (c.distance (center) < e.length () * 0.5 * snap - db::epsilon) {
+                center = c;
+                break;
+              }
+            }
+          }
+
+        }
 
         if (tl::verbosity () >= parameters.base_verbosity + 20) {
           tl::info << "Inserting in-triangle center " << center.to_string () << " of " << (*t)->to_string (true);
@@ -1642,7 +1687,7 @@ Triangles::refine (const TriangulateParameters &parameters)
       } else {
 
         db::Vertex *vstart = 0;
-        for (int i = 0; i < 3; ++i) {
+        for (unsigned int i = 0; i < 3; ++i) {
           db::TriangleEdge *edge = (*t)->edge (i);
           vstart = (*t)->opposite (edge);
           if (edge->side_of (*vstart) * edge->side_of (center) < 0) {

@@ -363,21 +363,33 @@ Triangle::Triangle (TriangleEdge *e1, TriangleEdge *e2, TriangleEdge *e3)
   }
   mp_v[2] = mp_e[1]->other (mp_v[1]);
 
-  //  establish link to edges
-  for (int i = 0; i < 3; ++i) {
-    TriangleEdge *e = mp_e[i];
-    int side_of = e->side_of (*mp_v[i == 0 ? 2 : i - 1]);
-    //  NOTE: in the degenerated case, the triangle is not attached to an edge!
-    if (side_of < 0) {
-      e->set_left (this);
-    } else if (side_of > 0) {
-      e->set_right (this);
-    }
+  //  enforce clockwise orientation
+  int s = db::vprod_sign (*mp_v[2] - *mp_v[0], *mp_v[1] - *mp_v[0]);
+  if (s < 0) {
+    std::swap (mp_v[2], mp_v[1]);
+  } else if (s == 0) {
+    //  Triangle is not orientable
+    tl_assert (false);
   }
 
-  //  enforce clockwise orientation
-  if (db::vprod_sign (*mp_v[2] - *mp_v[0], *mp_v[1] - *mp_v[0]) < 0) {
-    std::swap (mp_v[2], mp_v[1]);
+  //  establish link to edges
+  for (int i = 0; i < 3; ++i) {
+
+    TriangleEdge *e = mp_e[i];
+
+    unsigned int i1 = 0;
+    for ( ; e->v1 () != mp_v[i1] && i1 < 3; ++i1)
+      ;
+    unsigned int i2 = 0;
+    for ( ; e->v2 () != mp_v[i2] && i2 < 3; ++i2)
+      ;
+
+    if ((i1 + 1) % 3 == i2) {
+      e->set_right (this);
+    } else {
+      e->set_left (this);
+    }
+
   }
 }
 
@@ -436,22 +448,40 @@ Triangle::bbox () const
 
 
 std::pair<db::DPoint, double>
-Triangle::circumcircle () const
+Triangle::circumcircle (bool *ok) const
 {
-  db::DVector v1 = *mp_v[0] - *mp_v[1];
-  db::DVector v2 = *mp_v[0] - *mp_v[2];
-  db::DVector n1 = db::DVector (v1.y (), -v1.x ());
-  db::DVector n2 = db::DVector (v2.y (), -v2.x ());
+  //  see https://en.wikipedia.org/wiki/Circumcircle
+  //  we set A=(0,0), so the formulas simplify
 
-  double p1s = v1.sq_length ();
-  double p2s = v2.sq_length ();
+  if (ok) {
+    *ok = true;
+  }
 
-  double s = db::vprod (v1, v2);
-  tl_assert (fabs (s) > db::epsilon);
+  db::DVector b = *mp_v[1] - *mp_v[0];
+  db::DVector c = *mp_v[2] - *mp_v[0];
 
-  db::DVector r = (n1 * p2s - n2 * p1s) * (0.5 / s);
-  db::DPoint center = *mp_v[0] + r;
-  double radius = r.length ();
+  double b2 = b.sq_length ();
+  double c2 = c.sq_length ();
+
+  double sx = 0.5 * (b2 * c.y () - c2 * b.y ());
+  double sy = 0.5 * (b.x () * c2 - c.x() * b2);
+
+  double a1 = b.x() * c.y();
+  double a2 = c.x() * b.y();
+  double a = a1 - a2;
+  double a_abs = std::abs (a);
+
+  if (a_abs < (std::abs (a1) + std::abs (a2)) * db::epsilon) {
+    if (ok) {
+      *ok = false;
+      return std::make_pair (db::DPoint (), 0.0);
+    } else {
+      tl_assert (false);
+    }
+  }
+
+  double radius = sqrt (sx * sx + sy * sy) / a_abs;
+  db::DPoint center = *mp_v[0] + db::DVector (sx / a, sy / a);
 
   return std::make_pair (center, radius);
 }
@@ -507,18 +537,28 @@ Triangle::common_edge (const Triangle *other) const
 int
 Triangle::contains (const db::DPoint &point) const
 {
+  auto c = *mp_v[2] - *mp_v[0];
+  auto b = *mp_v[1] - *mp_v[0];
+
+  int vps = db::vprod_sign (c, b);
+  if (vps == 0) {
+    return db::vprod_sign (point - *mp_v[0], b) == 0 && db::vprod_sign (point - *mp_v[0], c) == 0 ? 0 : -1;
+  }
+
   int res = 1;
-  const Vertex *vl = mp_v[2];;
+
+  const Vertex *vl = mp_v[2];
   for (int i = 0; i < 3; ++i) {
-    const Vertex *v = mp_v[i];;
-    int s = db::DEdge (*vl, *v).side_of (point);
-    if (s == 0) {
-      res = 0;
-    } else if (s > 0) {
+    const Vertex *v = mp_v[i];
+    int n = db::vprod_sign (point - *vl, *v - *vl) * vps;
+    if (n < 0) {
       return -1;
+    } else if (n == 0) {
+      res = 0;
     }
     vl = v;
   }
+
   return res;
 }
 
@@ -536,8 +576,9 @@ double
 Triangle::b () const
 {
   double lmin = min_edge_length ();
-  auto cr = circumcircle ();
-  return lmin / cr.second;
+  bool ok = false;
+  auto cr = circumcircle (&ok);
+  return ok ? lmin / cr.second : 0.0;
 }
 
 bool

@@ -20,8 +20,6 @@
 
 */
 
-
-
 #ifndef HDR_dbTriangles
 #define HDR_dbTriangles
 
@@ -309,6 +307,15 @@ protected:
   std::vector<db::Vertex *> find_inside_circle (const db::DPoint &center, double radius) const;
 
 private:
+  struct TriangleBoxConvert
+  {
+    typedef db::DBox box_type;
+    box_type operator() (db::Triangle *t) const
+    {
+      return t ? t->bbox () : box_type ();
+    }
+  };
+
   tl::list<db::Triangle> mp_triangles;
   tl::stable_vector<db::TriangleEdge> m_edges_heap;
   std::vector<db::TriangleEdge *> m_returned_edges;
@@ -332,7 +339,7 @@ private:
   db::TriangleEdge *find_closest_edge (const db::DPoint &p, db::Vertex *vstart = 0, bool inside_only = false);
   db::Vertex *insert (db::Vertex *vertex, std::list<tl::weak_ptr<db::Triangle> > *new_triangles = 0);
   void split_triangle (db::Triangle *t, db::Vertex *vertex, std::list<tl::weak_ptr<db::Triangle> > *new_triangles_out);
-  void split_triangles_on_edge (const std::vector<db::Triangle *> &tris, db::Vertex *vertex, db::TriangleEdge *split_edge, std::list<tl::weak_ptr<db::Triangle> > *new_triangles_out);
+  void split_triangles_on_edge (db::Vertex *vertex, db::TriangleEdge *split_edge, std::list<tl::weak_ptr<db::Triangle> > *new_triangles_out);
   void add_more_triangles (std::vector<Triangle *> &new_triangles,
                                  db::TriangleEdge *incoming_edge,
                                  db::Vertex *from_vertex, db::Vertex *to_vertex,

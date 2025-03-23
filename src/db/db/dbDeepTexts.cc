@@ -462,7 +462,7 @@ DeepTexts::apply_filter (const TextFilterBase &filter, bool with_true, bool with
         for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Texts); ! si.at_end (); ++si) {
           db::Text text;
           si->text (text);
-          if (filter.selected (text.transformed (*v), si->prop_id ())) {
+          if (filter.selected (text.transformed (tr), si->prop_id ())) {
             if (st_true) {
               st_true->insert (*si);
             }

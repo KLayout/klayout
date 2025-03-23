@@ -100,7 +100,7 @@ public:
   virtual TextsDelegate *processed (const TextProcessorBase &proc) const = 0;
   virtual RegionDelegate *processed_to_polygons (const TextToPolygonProcessorBase &proc) const = 0;
 
-  virtual RegionDelegate *polygons (db::Coord e) const = 0;
+  virtual RegionDelegate *polygons (db::Coord e, const tl::Variant &text_prop) const = 0;
   virtual EdgesDelegate *edges () const = 0;
 
   virtual TextsDelegate *add_in_place (const Texts &other) = 0;

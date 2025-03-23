@@ -276,3 +276,34 @@ TEST(8_add_with_properties)
   EXPECT_EQ (r.to_string (), "('uvw',r0 -10,20){net=>17};('abc',r0 10,20){net=>17}");
   EXPECT_EQ ((ro1 + rf2).to_string (), "('uvw',r0 -10,20){net=>17};('abc',r0 10,20){net=>17}");
 }
+
+TEST(9_polygons)
+{
+  db::DeepShapeStore dss ("TOP", 0.001);
+  db::Texts rf;
+  db::Texts rd (dss);
+
+  rf.insert (db::Text ("ABC", db::Trans (db::Vector (10, 20))));
+  rf.insert (db::Text ("XZY", db::Trans (db::Vector (-10, -20))));
+
+  rd.insert (db::Text ("ABC", db::Trans (db::Vector (10, 20))));
+  rd.insert (db::Text ("XZY", db::Trans (db::Vector (-10, -20))));
+
+  db::Region r;
+
+  rf.polygons (r, 1);
+  EXPECT_EQ (r.to_string (), "(9,19;9,21;11,21;11,19);(-11,-21;-11,-19;-9,-19;-9,-21)");
+
+  rf.polygons (r, 2);
+  EXPECT_EQ (r.to_string (), "(8,18;8,22;12,22;12,18);(-12,-22;-12,-18;-8,-18;-8,-22)");
+
+  rd.polygons (r, 1);
+  EXPECT_EQ (r.to_string (), "(9,19;9,21;11,21;11,19);(-11,-21;-11,-19;-9,-19;-9,-21)");
+
+  rf.polygons (r, 1, tl::Variant (17));
+  EXPECT_EQ (r.to_string (), "(9,19;9,21;11,21;11,19){17=>ABC};(-11,-21;-11,-19;-9,-19;-9,-21){17=>XZY}");
+
+  rd.polygons (r, 1, tl::Variant (17));
+  EXPECT_EQ (r.to_string (), "(9,19;9,21;11,21;11,19){17=>ABC};(-11,-21;-11,-19;-9,-19;-9,-21){17=>XZY}");
+}
+

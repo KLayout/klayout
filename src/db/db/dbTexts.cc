@@ -177,9 +177,9 @@ Texts::iter () const
   return *(i ? i : &def_iter);
 }
 
-void Texts::polygons (Region &output, db::Coord e) const
+void Texts::polygons (Region &output, db::Coord e, const tl::Variant &text_prop) const
 {
-  output.set_delegate (mp_delegate->polygons (e));
+  output.set_delegate (mp_delegate->polygons (e, text_prop));
 }
 
 void Texts::edges (Edges &output) const

@@ -71,7 +71,7 @@ public:
 
   virtual TextsDelegate *add (const Texts &other) const;
 
-  virtual RegionDelegate *polygons (db::Coord e) const;
+  virtual RegionDelegate *polygons (db::Coord e, const tl::Variant &text_prop) const;
   virtual EdgesDelegate *edges () const;
 
   virtual TextsDelegate *in (const Texts &, bool) const;

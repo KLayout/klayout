@@ -529,6 +529,19 @@ class DBTexts_TestClass < TestBase
 
   end
 
+  # polygons
+  def test_polygons
+
+    r = RBA::Texts::new
+    r.insert(RBA::Text::new("abc", RBA::Trans::new(10, 20)))
+    r.insert(RBA::Text::new("uvw", RBA::Trans::new(-10, -20)))
+
+    assert_equal(r.polygons.to_s, "(9,19;9,21;11,21;11,19);(-11,-21;-11,-19;-9,-19;-9,-21)")
+    assert_equal(r.polygons(2).to_s, "(8,18;8,22;12,22;12,18);(-12,-22;-12,-18;-8,-18;-8,-22)")
+    assert_equal(r.polygons(1, 17).to_s, "(9,19;9,21;11,21;11,19){17=>abc};(-11,-21;-11,-19;-9,-19;-9,-21){17=>uvw}")
+
+  end
+
 end
 
 

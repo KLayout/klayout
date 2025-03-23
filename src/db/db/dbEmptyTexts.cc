@@ -49,7 +49,7 @@ EmptyTexts::clone () const
 }
 
 RegionDelegate *
-EmptyTexts::polygons (db::Coord) const
+EmptyTexts::polygons (db::Coord, const tl::Variant &) const
 {
   return new EmptyRegion ();
 }

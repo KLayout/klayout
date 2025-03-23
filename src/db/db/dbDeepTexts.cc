@@ -528,8 +528,15 @@ DeepTexts::processed_to_polygons (const TextToPolygonProcessorBase &filter) cons
   return shape_collection_processed_impl<db::Text, db::Polygon, db::DeepRegion> (deep_layer (), filter);
 }
 
-RegionDelegate *DeepTexts::polygons (db::Coord e) const
+RegionDelegate *DeepTexts::polygons (db::Coord e, const tl::Variant &text_prop) const
 {
+  db::property_names_id_type key_id = 0;
+  if (! text_prop.is_nil ()) {
+    key_id = db::property_names_id (text_prop);
+  }
+
+  std::map<std::string, db::properties_id_type> value_ids;
+
   db::DeepLayer new_layer = deep_layer ().derived ();
   db::Layout &layout = const_cast<db::Layout &> (deep_layer ().layout ());
 
@@ -539,7 +546,18 @@ RegionDelegate *DeepTexts::polygons (db::Coord e) const
       db::Box box = s->bbox ();
       box.enlarge (db::Vector (e, e));
       db::Polygon poly (box);
-      output.insert (db::PolygonRef (poly, layout.shape_repository ()));
+      if (key_id == 0) {
+        output.insert (db::PolygonRef (poly, layout.shape_repository ()));
+      } else {
+        std::string value (s->text_string ());
+        auto v = value_ids.find (value);
+        if (v == value_ids.end ()) {
+          db::PropertiesSet ps;
+          ps.insert_by_id (key_id, db::property_values_id (value));
+          v = value_ids.insert (std::make_pair (value, db::properties_id (ps))).first;
+        }
+        output.insert (db::PolygonRefWithProperties (db::PolygonRef (poly, layout.shape_repository ()), v->second));
+      }
     }
   }
 

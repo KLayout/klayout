@@ -349,10 +349,10 @@ static db::Texts moved_xy (const db::Texts *r, db::Coord x, db::Coord y)
   return r->transformed (db::Disp (db::Vector (x, y)));
 }
 
-static db::Region polygons0 (const db::Texts *e, db::Coord d)
+static db::Region polygons0 (const db::Texts *e, db::Coord d, const tl::Variant &text_prop)
 {
   db::Region r;
-  e->polygons (r, d);
+  e->polygons (r, d, text_prop);
   return r;
 }
 
@@ -710,9 +710,13 @@ Class<db::Texts> decl_Texts (decl_dbShapeCollection, "db", "Texts",
     "@brief Returns a region with the enlarged bounding boxes of the texts\n"
     "This method acts like the other version of \\extents, but allows giving different enlargements for x and y direction.\n"
   ) + 
-  method_ext ("polygons", &polygons0, gsi::arg ("e", db::Coord (1)),
+  method_ext ("polygons", &polygons0, gsi::arg ("e", db::Coord (1)), gsi::arg ("text_prop", tl::Variant (), "nil"),
     "@brief Converts the edge pairs to polygons\n"
-    "This method creates polygons from the texts. This is equivalent to calling \\extents."
+    "This method creates polygons from the texts. This is basically equivalent to calling \\extents. "
+    "In addition, a user property with the key given by 'text_prop' can be attached. The value of that "
+    "user property will be the text string. If 'text_prop' is nil, no user property is attached.\n"
+    "\n"
+    "The 'text_prop' argument has been added in version 0.30."
   ) +
   method_ext ("filter", &filter, gsi::arg ("filter"),
     "@brief Applies a generic filter in place (replacing the texts from the Texts collection)\n"

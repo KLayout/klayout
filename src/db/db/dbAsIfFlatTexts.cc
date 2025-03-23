@@ -233,14 +233,32 @@ AsIfFlatTexts::processed_to_polygons (const TextToPolygonProcessorBase &filter) 
 }
 
 RegionDelegate *
-AsIfFlatTexts::polygons (db::Coord e) const
+AsIfFlatTexts::polygons (db::Coord e, const tl::Variant &text_prop) const
 {
+  db::property_names_id_type key_id = 0;
+  if (! text_prop.is_nil ()) {
+    key_id = db::property_names_id (text_prop);
+  }
+
+  std::map<std::string, db::properties_id_type> value_ids;
+
   std::unique_ptr<FlatRegion> output (new FlatRegion ());
 
   for (TextsIterator tp (begin ()); ! tp.at_end (); ++tp) {
     db::Box box = tp->box ();
     box.enlarge (db::Vector (e, e));
-    output->insert (db::Polygon (box));
+    if (key_id == 0) {
+      output->insert (db::Polygon (box));
+    } else {
+      std::string value (tp->string ());
+      auto v = value_ids.find (value);
+      if (v == value_ids.end ()) {
+        db::PropertiesSet ps;
+        ps.insert_by_id (key_id, db::property_values_id (value));
+        v = value_ids.insert (std::make_pair (value, db::properties_id (ps))).first;
+      }
+      output->insert (db::PolygonWithProperties (db::Polygon (box), v->second));
+    }
   }
 
   return output.release ();

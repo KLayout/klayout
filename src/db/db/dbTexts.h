@@ -590,7 +590,7 @@ public:
    *  The given extension is applied in all directions rendering a square of 2*e
    *  width and height. The center of the boxes will be the position of the texts.
    */
-  void polygons (Region &output, db::Coord e = 1) const;
+  void polygons (Region &output, db::Coord e = 1, const tl::Variant &text_prop = tl::Variant ()) const;
 
   /**
    *  @brief Returns individual, dot-like edges

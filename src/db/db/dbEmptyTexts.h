@@ -62,7 +62,7 @@ public:
   virtual TextsDelegate *processed (const TextProcessorBase &) const { return new EmptyTexts (); }
   virtual RegionDelegate *processed_to_polygons (const TextToPolygonProcessorBase &) const;
 
-  virtual RegionDelegate *polygons (db::Coord e) const;
+  virtual RegionDelegate *polygons (db::Coord e, const tl::Variant &text_prop) const;
   virtual EdgesDelegate *edges () const;
 
   virtual TextsDelegate *add_in_place (const Texts &other);

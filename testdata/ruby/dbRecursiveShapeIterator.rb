@@ -354,6 +354,25 @@ END
 
   end
 
+  def test_4
+
+    ly = RBA::Layout::new
+    top = ly.create_cell("TOP")
+    l1 = ly.layer(1, 0)
+
+    shape = top.shapes(l1).insert(RBA::BoxWithProperties::new(RBA::Box::new(1000, 2000), { 1 => 'A', 'X' => 17 }))
+
+    iter = top.begin_shapes_rec(l1)
+    iter.enable_properties
+    
+    assert_equal(iter.at_end, false)
+    assert_equal(iter.prop_id, shape.prop_id)
+    assert_equal(iter.property('Y'), nil)
+    assert_equal(iter.property('X'), 17)
+    assert_equal(iter.properties, { 1 => 'A', 'X' => 17 })
+
+  end
+
 end
 
 load("test_epilogue.rb")

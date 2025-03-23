@@ -1315,8 +1315,8 @@ Class<db::Shape> decl_Shape ("db", "Shape",
   gsi::method_ext ("property", &get_property, gsi::arg ("key"),
     "@brief Gets the user property with the given key\n"
     "This method is a convenience method that gets the property with the given key. "
-    "If no property with that key does not exist, it will return nil. Using that method is more "
-    "convenient than using the layout object and the properties ID to retrieve the property value. "
+    "If no property with that key exists, it will return nil. Using that method is more "
+    "convenient than using the layout object and the properties ID to retrieve the property value.\n"
     "\n"
     "This method has been introduced in version 0.22."
   ) + 

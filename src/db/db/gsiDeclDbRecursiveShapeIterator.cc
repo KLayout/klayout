@@ -217,6 +217,22 @@ static void map_properties (db::RecursiveShapeIterator *c, const std::map<tl::Va
   }
 }
 
+static tl::Variant get_property (const db::RecursiveShapeIterator *s, const tl::Variant &key)
+{
+  db::properties_id_type id = s->prop_id ();
+
+  const db::PropertiesSet &props = db::properties (id);
+  return props.value (key);
+}
+
+static tl::Variant get_properties (const db::RecursiveShapeIterator *s)
+{
+  db::properties_id_type id = s->prop_id ();
+
+  const db::PropertiesSet &props = db::properties (id);
+  return props.to_dict_var ();
+}
+
 Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("db", "RecursiveShapeIterator",
   gsi::constructor ("new", &new_si1, gsi::arg ("layout"), gsi::arg ("cell"), gsi::arg ("layer"),
     "@brief Creates a recursive, single-layer shape iterator.\n"
@@ -621,6 +637,21 @@ Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("db", "RecursiveS
     "details on this feature.\n"
     "\n"
     "This attribute has been introduced in version 0.28.4."
+  ) +
+  gsi::method_ext ("property", &get_property, gsi::arg ("key"),
+    "@brief Gets the effective user property with the given key\n"
+    "See \\prop_id for the definition of 'effective user property'.\n\n"
+    "This method is a convenience method that gets the effective property of the current shape with the given key. "
+    "If no property with that key exists, it will return nil.\n"
+    "\n"
+    "This method has been introduced in version 0.30."
+  ) +
+  gsi::method_ext ("properties", &get_properties,
+    "@brief Gets the effective user properties\n"
+    "See \\prop_id for the definition of 'effective user properties'.\n\n"
+    "This method is a convenience method that gets the effective properties of the current shape as a single hash.\n"
+    "\n"
+    "This method has been introduced in version 0.30."
   ) +
   gsi::method ("shape", &db::RecursiveShapeIterator::shape,
     "@brief Gets the current shape\n"

@@ -1484,7 +1484,7 @@ Triangles::create_constrained_delaunay (const db::Polygon &p, const std::vector<
   clear ();
 
   for (auto v = vertexes.begin (); v != vertexes.end (); ++v) {
-    insert_point (trans * *v);
+    insert_point (trans * *v)->set_is_precious (true);
   }
 
   std::vector<std::vector<db::Vertex *> > edge_contours;
@@ -1499,7 +1499,7 @@ Triangles::create_constrained_delaunay (const db::DPolygon &p, const std::vector
   clear ();
 
   for (auto v = vertexes.begin (); v != vertexes.end (); ++v) {
-    insert_point (trans * *v);
+    insert_point (trans * *v)->set_is_precious (true);
   }
 
   std::vector<std::vector<db::Vertex *> > edge_contours;
@@ -1724,7 +1724,7 @@ Triangles::refine (const TriangulateParameters &parameters)
               for (auto e = (*v)->begin_edges (); e != (*v)->end_edges () && ! has_segment; ++e) {
                 has_segment = (*e)->is_segment ();
               }
-              if (! has_segment) {
+              if (! has_segment && ! (*v)->is_precious ()) {
                 to_delete.push_back (*v);
               }
             }

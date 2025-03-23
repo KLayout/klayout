@@ -1000,3 +1000,79 @@ TEST(triangulate_issue1996)
   EXPECT_GT (tri.num_triangles (), size_t (128000));
   EXPECT_LT (tri.num_triangles (), size_t (132000));
 }
+
+TEST(triangulate_with_vertexes)
+{
+  db::Point contour[] = {
+    db::Point (0, 0),
+    db::Point (0, 100),
+    db::Point (1000, 100),
+    db::Point (1000, 0)
+  };
+
+  db::Polygon poly;
+  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour[0]));
+
+  double dbu = 0.001;
+
+  db::Triangles::TriangulateParameters param;
+  param.min_b = 0.0;
+  param.max_area = 0.0;
+
+  std::vector<db::Point> vertexes;
+
+  TestableTriangles tri;
+  db::CplxTrans trans = db::DCplxTrans (dbu) * db::CplxTrans (db::Trans (db::Point () - poly.box ().center ()));
+  tri.triangulate (poly, param, trans);
+
+  EXPECT_EQ (tri.to_string (), "((-0.5, -0.05), (-0.5, 0.05), (0.5, 0.05)), ((0.5, -0.05), (-0.5, -0.05), (0.5, 0.05))");
+
+  vertexes.clear ();
+
+  //  outside vertexes are ignored, but lead to a different triangulation
+  vertexes.push_back (db::Point (50, 150));
+  tri.triangulate (poly, vertexes, param, trans);
+
+  EXPECT_EQ (tri.to_string (), "((-0.5, -0.05), (-0.133333333333, 0.05), (0.5, -0.05)), ((0.5, 0.05), (0.5, -0.05), (-0.133333333333, 0.05)), ((-0.133333333333, 0.05), (-0.5, -0.05), (-0.5, 0.05))");
+
+  for (auto v = vertexes.begin (); v != vertexes.end (); ++v) {
+    auto *vp = tri.find_vertex_for_point (trans * *v);
+    EXPECT_EQ (vp, 0);
+  }
+
+  vertexes.clear ();
+  vertexes.push_back (db::Point (50, 50));
+  tri.triangulate (poly, vertexes, param, trans);
+
+  EXPECT_EQ (tri.to_string (), "((-0.45, 0), (-0.5, -0.05), (-0.5, 0.05)), ((0.5, 0.05), (-0.45, 0), (-0.5, 0.05)), ((-0.45, 0), (0.5, -0.05), (-0.5, -0.05)), ((-0.45, 0), (0.5, 0.05), (0.5, -0.05))");
+
+  for (auto v = vertexes.begin (); v != vertexes.end (); ++v) {
+    auto *vp = tri.find_vertex_for_point (trans * *v);
+    if (! vp) {
+      tl::warn << "Vertex not present in output: " << v->to_string ();
+      EXPECT_EQ (1, 0);
+    }
+  }
+
+  //  aggressive triangulation
+  param.min_b = 1.0;
+  param.max_area = 20 * 20 * dbu * dbu;
+
+  tri.triangulate (poly, vertexes, param, trans);
+
+  EXPECT_GT (tri.num_triangles (), size_t (380));
+  EXPECT_LT (tri.num_triangles (), size_t (400));
+
+  for (auto t = tri.begin (); t != tri.end (); ++t) {
+    EXPECT_LE (t->area (), param.max_area);
+    EXPECT_GE (t->b (), param.min_b);
+  }
+
+  for (auto v = vertexes.begin (); v != vertexes.end (); ++v) {
+    auto *vp = tri.find_vertex_for_point (trans * *v);
+    if (! vp) {
+      tl::warn << "Vertex not present in output: " << v->to_string ();
+      EXPECT_EQ (1, 0);
+    }
+  }
+}

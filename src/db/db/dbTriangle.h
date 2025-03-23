@@ -74,8 +74,8 @@ public:
 
   bool has_edge (const TriangleEdge *edge) const;
 
-  size_t level () const { return m_level; }
-  void set_level (size_t l) { m_level = l; }
+  void set_is_precious (bool f) { m_is_precious = f; }
+  bool is_precious () const { return m_is_precious; }
 
   std::string to_string (bool with_id = false) const;
 
@@ -102,7 +102,7 @@ private:
   }
 
   edges_type mp_edges;
-  size_t m_level;
+  bool m_is_precious;
 };
 
 /**

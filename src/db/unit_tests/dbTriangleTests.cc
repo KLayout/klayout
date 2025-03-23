@@ -54,9 +54,6 @@ TEST(Vertex_basic)
 
   v = db::Vertex (db::DPoint (2, 3));
   EXPECT_EQ (v.to_string (), "(2, 3)");
-
-  v.set_level (42);
-  EXPECT_EQ (v.level (), size_t (42));
 }
 
 static std::string edges_from_vertex (const db::Vertex &v)

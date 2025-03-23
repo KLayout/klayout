@@ -32,19 +32,19 @@ namespace db
 //  Vertex implementation
 
 Vertex::Vertex ()
-  : DPoint (), m_level (0)
+  : DPoint (), m_is_precious (false)
 {
   //  .. nothing yet ..
 }
 
 Vertex::Vertex (const db::DPoint &p)
-  : DPoint (p), m_level (0)
+  : DPoint (p), m_is_precious (false)
 {
   //  .. nothing yet ..
 }
 
 Vertex::Vertex (const Vertex &v)
-  : DPoint (), m_level (0)
+  : DPoint (), m_is_precious (false)
 {
   operator= (v);
 }
@@ -54,13 +54,13 @@ Vertex &Vertex::operator= (const Vertex &v)
   if (this != &v) {
     //  NOTE: edges are not copied!
     db::DPoint::operator= (v);
-    m_level = v.m_level;
+    m_is_precious = v.m_is_precious;
   }
   return *this;
 }
 
 Vertex::Vertex (db::DCoord x, db::DCoord y)
-  : DPoint (x, y), m_level (0)
+  : DPoint (x, y), m_is_precious (false)
 {
   //  .. nothing yet ..
 }

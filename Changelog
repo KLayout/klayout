@@ -1,4 +1,6 @@
 0.30.0           (2025-03-25):
+* Bug: %GITHUB%/issues/1996 More robust triangulation
+* Bug: %GITHUB%/issues/2002 Path to polygon conversion issue
 * Enhancement: Better support for user properties
   The property management has been overhauled. Properties are not globally 
   scoped. The "Layout" class now provides class methods to convert property IDs
@@ -23,6 +25,7 @@
   This is a visitor to obtain all "neighboring" polygons for each polygon
   in a Region. Currently, neighborhood is defined by the bounding box of 
   the primary polygons.
+* Enhancement: Layout queries can use "$_" to refer to the current cell now  
 * Enhancement: New methods: 
   - "LayoutToNetlist#build_net", "build_nets" and "build_all_nets" do not 
   - "LayoutToNetlist#layer_index" from a name
@@ -30,6 +33,10 @@
   - "LayoutToNetlist#original_layout" and "LayoutToNetlist#original_top_cell"
   - "LayoutToNetlist#polygons_of_net" and "LayoutToNetlist#texts_of_net"
   - "Device#terminal_ref"
+  - New "text_prop" argument in Texts#polygons (texts can transfer their
+    string to the generated polygons as user properties)
+  - New methods "Polygon#delaunay", "DPolygon#delaunay", "SimplePolygon#delaunay"
+    and "DSimplePolygon#delaunay"
 
 0.29.12          (2025-03-02):
 * Bug: %GITHUB%/issues/1976 Crash on cross mode, lw > 1 and oversampling

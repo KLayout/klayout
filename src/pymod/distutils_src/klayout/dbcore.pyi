@@ -13802,6 +13802,32 @@ class DPolygon:
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
         ...
+    @overload
+    def delaunay(self, max_area: Optional[float] = ..., min_b: Optional[float] = ...) -> List[DPolygon]:
+        r"""
+        @brief Performs a Delaunay triangulation of the polygon.
+
+        @return An array of triangular polygons of the refined, constrained Delaunay triangulation.
+
+        Refinement is implemented by Chew's second algorithm. A maximum area can be given. Triangles larger than this area will be split. In addition 'skinny' triangles will be resolved where possible. 'skinny' is defined in terms of shortest edge to circumcircle radius ratio (b). A minimum number for b can be given. A value of 1.0 corresponds to a minimum angle of 30 degree and is usually a good choice. The algorithm is stable up to roughly 1.2 which corresponds to a minimum angle of abouth 37 degree.
+
+        The minimum angle of the resulting triangles relates to the 'b' parameter as: @t min_angle = arcsin(B/2) @/t.
+
+        Picking a value of 0.0 for max area and min b will make the implementation skip the refinement step. In that case, the results are identical to the standard constrained Delaunay triangulation.
+
+        This method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def delaunay(self, vertexes: Sequence[DPoint], max_area: Optional[float] = ..., min_b: Optional[float] = ...) -> List[DPolygon]:
+        r"""
+        @brief Performs a Delaunay triangulation of the polygon.
+
+        This variant of the triangulation function accepts an array of additional vertexes for the triangulation.
+
+        This method has been introduced in version 0.30.
+        """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
@@ -14887,6 +14913,32 @@ class DSimplePolygon:
         r"""
         @brief Ensures the C++ object is created
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    @overload
+    def delaunay(self, max_area: Optional[float] = ..., min_b: Optional[float] = ...) -> List[DSimplePolygon]:
+        r"""
+        @brief Performs a Delaunay triangulation of the polygon.
+
+        @return An array of triangular polygons of the refined, constrained Delaunay triangulation.
+
+        Refinement is implemented by Chew's second algorithm. A maximum area can be given. Triangles larger than this area will be split. In addition 'skinny' triangles will be resolved where possible. 'skinny' is defined in terms of shortest edge to circumcircle radius ratio (b). A minimum number for b can be given. A value of 1.0 corresponds to a minimum angle of 30 degree and is usually a good choice. The algorithm is stable up to roughly 1.2 which corresponds to a minimum angle of abouth 37 degree.
+
+        The minimum angle of the resulting triangles relates to the 'b' parameter as: @t min_angle = arcsin(B/2) @/t.
+
+        Picking a value of 0.0 for max area and min b will make the implementation skip the refinement step. In that case, the results are identical to the standard constrained Delaunay triangulation.
+
+        This method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def delaunay(self, vertexes: Sequence[DPoint], max_area: Optional[float] = ..., min_b: Optional[float] = ...) -> List[DSimplePolygon]:
+        r"""
+        @brief Performs a Delaunay triangulation of the polygon.
+
+        This variant of the triangulation function accepts an array of additional vertexes for the triangulation.
+
+        This method has been introduced in version 0.30.
         """
         ...
     def destroy(self) -> None:
@@ -34855,11 +34907,11 @@ class Instance:
 
     Starting with version 0.25 the displacement is of vector type.
     Setter:
-    @brief Sets the displacement vector for the 'a' axis
+    @brief Sets the displacement vector for the 'a' axis in micrometer units
 
-    If the instance was not an array instance before it is made one.
+    Like \a= with an integer displacement, this method will set the displacement vector but it accepts a vector in micrometer units that is of \DVector type. The vector will be translated to database units internally.
 
-    This method has been introduced in version 0.23. Starting with version 0.25 the displacement is of vector type.
+    This method has been introduced in version 0.25.
     """
     b: Vector
     r"""
@@ -34904,10 +34956,10 @@ class Instance:
     Getter:
     @brief Gets the basic \CellInstArray object associated with this instance reference.
     Setter:
-    @brief Returns the basic cell instance array object by giving a micrometer unit object.
-    This method replaces the instance by the given CellInstArray object and it internally transformed into database units.
+    @brief Changes the \CellInstArray object to the given one.
+    This method replaces the instance by the given CellInstArray object.
 
-    This method has been introduced in version 0.25
+    This method has been introduced in version 0.22
     """
     cplx_trans: ICplxTrans
     r"""
@@ -35403,7 +35455,7 @@ class Instance:
         r"""
         @brief Gets the layout this instance is contained in
 
-        This const version of the method has been introduced in version 0.25.
+        This method has been introduced in version 0.22.
         """
         ...
     @overload
@@ -35411,7 +35463,7 @@ class Instance:
         r"""
         @brief Gets the layout this instance is contained in
 
-        This method has been introduced in version 0.22.
+        This const version of the method has been introduced in version 0.25.
         """
         ...
     def pcell_declaration(self) -> PCellDeclaration_Native:
@@ -40839,6 +40891,17 @@ class LayoutQuery:
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
         ...
+    @overload
+    def each(self, layout: Layout, cell: Cell, context: Optional[tl.ExpressionContext] = ...) -> Iterator[LayoutQueryIterator]:
+        r"""
+        @brief Executes the query and delivered the results iteratively.
+
+        This version allows specifying a context cell. This cell can be used as a default cell for cell expressions.
+
+        This variant has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def each(self, layout: Layout, context: Optional[tl.ExpressionContext] = ...) -> Iterator[LayoutQueryIterator]:
         r"""
         @brief Executes the query and delivered the results iteratively.
@@ -40847,6 +40910,17 @@ class LayoutQuery:
         The context argument allows supplying an expression execution context. This context can be used for example to supply variables for the execution. It has been added in version 0.26.
         """
         ...
+    @overload
+    def execute(self, layout: Layout, cell: Cell, context: Optional[tl.ExpressionContext] = ...) -> None:
+        r"""
+        @brief Executes the query
+
+        This version allows specifying a context cell. This cell can be used as a default cell for cell expressions.
+
+        This variant has been introduced in version 0.30.
+        """
+        ...
+    @overload
     def execute(self, layout: Layout, context: Optional[tl.ExpressionContext] = ...) -> None:
         r"""
         @brief Executes the query
@@ -43676,6 +43750,204 @@ class LoadLayoutOptions:
 
     This method has been added in version 0.26.2.
     """
+    mebes_boundary_datatype: int
+    r"""
+    Getter:
+    @brief Gets the datatype number of the boundary layer to produce
+    See \mebes_produce_boundary= for a description of this attribute.
+
+    This property has been added in version 0.23.10.
+
+    Setter:
+    @brief Sets the datatype number of the boundary layer to produce
+    See \mebes_produce_boundary= for a description of this attribute.
+
+    This property has been added in version 0.23.10.
+    """
+    mebes_boundary_layer: int
+    r"""
+    Getter:
+    @brief Gets the layer number of the boundary layer to produce
+    See \mebes_produce_boundary= for a description of this attribute.
+
+    This property has been added in version 0.23.10.
+
+    Setter:
+    @brief Sets the layer number of the boundary layer to produce
+    See \mebes_produce_boundary= for a description of this attribute.
+
+    This property has been added in version 0.23.10.
+    """
+    mebes_boundary_name: str
+    r"""
+    Getter:
+    @brief Gets the name of the boundary layer to produce
+    See \mebes_produce_boundary= for a description of this attribute.
+
+    This property has been added in version 0.23.10.
+
+    Setter:
+    @brief Sets the name of the boundary layer to produce
+    See \mebes_produce_boundary= for a description of this attribute.
+
+    This property has been added in version 0.23.10.
+    """
+    mebes_create_other_layers: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether other layers shall be created
+    @return True, if other layers will be created.
+    This attribute acts together with a layer map (see \mebes_layer_map=). Layers not listed in this map are created as well when \mebes_create_other_layers? is true. Otherwise they are ignored.
+
+    This method has been added in version 0.25 and replaces the respective global option in \LoadLayoutOptions in a format-specific fashion.
+    Setter:
+    @brief Specifies whether other layers shall be created
+    @param create True, if other layers will be created.
+    See \mebes_create_other_layers? for a description of this attribute.
+
+    This method has been added in version 0.25 and replaces the respective global option in \LoadLayoutOptions in a format-specific fashion.
+    """
+    mebes_data_datatype: int
+    r"""
+    Getter:
+    @brief Gets the datatype number of the data layer to produce
+
+    This property has been added in version 0.23.10.
+
+    Setter:
+    @brief Sets the datatype number of the data layer to produce
+
+    This property has been added in version 0.23.10.
+    """
+    mebes_data_layer: int
+    r"""
+    Getter:
+    @brief Gets the layer number of the data layer to produce
+
+    This property has been added in version 0.23.10.
+
+    Setter:
+    @brief Sets the layer number of the data layer to produce
+
+    This property has been added in version 0.23.10.
+    """
+    mebes_data_name: str
+    r"""
+    Getter:
+    @brief Gets the name of the data layer to produce
+
+    This property has been added in version 0.23.10.
+
+    Setter:
+    @brief Sets the name of the data layer to produce
+
+    This property has been added in version 0.23.10.
+    """
+    mebes_invert: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether to invert the MEBES pattern
+    If this property is set to true, the pattern will be inverted.
+
+    This property has been added in version 0.22.
+
+    Setter:
+    @brief Specify whether to invert the MEBES pattern
+    If this property is set to true, the pattern will be inverted.
+
+    This property has been added in version 0.22.
+    """
+    mebes_layer_map: LayerMap
+    r"""
+    Getter:
+    @brief Gets the layer map
+    @return The layer map.
+
+    This method has been added in version 0.25 and replaces the respective global option in \LoadLayoutOptions in a format-specific fashion.
+    Setter:
+    @brief Sets the layer map
+    This sets a layer mapping for the reader. Unlike \mebes_set_layer_map, the 'create_other_layers' flag is not changed.
+    @param map The layer map to set.
+
+    This convenience method has been added in version 0.26.2.
+    """
+    mebes_num_shapes_per_cell: int
+    r"""
+    Getter:
+    @brief Gets the number of stripes collected per cell
+    See \mebes_num_stripes_per_cell= for details about this property.
+
+    This property has been added in version 0.24.5.
+
+    Setter:
+    @brief Specify the number of stripes collected per cell
+    See \mebes_num_stripes_per_cell= for details about this property.
+
+    This property has been added in version 0.24.5.
+    """
+    mebes_num_stripes_per_cell: int
+    r"""
+    Getter:
+    @brief Gets the number of stripes collected per cell
+    See \mebes_num_stripes_per_cell= for details about this property.
+
+    This property has been added in version 0.23.10.
+
+    Setter:
+    @brief Specify the number of stripes collected per cell
+    This property specifies how many stripes will be collected into one cell.
+    A smaller value means less but bigger cells. The default value is 64.
+    New cells will be formed whenever more than this number of stripes has been read
+    or a new segment is started and the number of shapes given by \mebes_num_shapes_per_cell
+    is exceeded.
+
+    This property has been added in version 0.23.10.
+    """
+    mebes_produce_boundary: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether a boundary layer will be produced
+    See \mebes_produce_boundary= for details about this property.
+
+    This property has been added in version 0.23.10.
+
+    Setter:
+    @brief Specify whether to produce a boundary layer
+    If this property is set to true, the pattern boundary will be written to the layer and datatype specified with \mebes_boundary_name, \mebes_boundary_layer and \mebes_boundary_datatype.
+    By default, the boundary layer is produced.
+
+    This property has been added in version 0.23.10.
+    """
+    mebes_subresolution: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether to invert the MEBES pattern
+    See \subresolution= for details about this property.
+
+    This property has been added in version 0.23.10.
+
+    Setter:
+    @brief Specify whether subresolution trapezoids are supported
+    If this property is set to true, subresolution trapezoid vertices are supported.
+    In order to implement support, the reader will create magnified instances with a magnification of 1/16.
+    By default this property is enabled.
+
+    This property has been added in version 0.23.10.
+    """
+    mebes_top_cell_index: int
+    r"""
+    Getter:
+    @brief Gets the cell index for the top cell to use
+    See \mebes_top_cell_index= for a description of this property.
+
+    This property has been added in version 0.23.10.
+
+    Setter:
+    @brief Specify the cell index for the top cell to use
+    If this property is set to a valid cell index, the MEBES reader will put the subcells and shapes into this cell.
+
+    This property has been added in version 0.23.10.
+    """
     oasis_expect_strict_mode: int
     r"""
     Getter:
@@ -43913,6 +44185,26 @@ class LoadLayoutOptions:
         @param create_other_layers The flag indicating whether other layers will be created as well. Set to false to read only the layers in the layer map.
 
         This method has been added in version 0.26.2.
+        """
+        ...
+    def mebes_select_all_layers(self) -> None:
+        r"""
+        @brief Selects all layers and disables the layer map
+
+        This disables any layer map and enables reading of all layers.
+        New layers will be created when required.
+
+        This method has been added in version 0.25 and replaces the respective global option in \LoadLayoutOptions in a format-specific fashion.
+        """
+        ...
+    def mebes_set_layer_map(self, map: LayerMap, create_other_layers: bool) -> None:
+        r"""
+        @brief Sets the layer map
+        This sets a layer mapping for the reader. The layer map allows selection and translation of the original layers.
+        @param map The layer map to set.
+        @param create_other_layers The flag indicating whether other layers will be created as well. Set to false to read only the layers in the layer map.
+
+        This method has been added in version 0.25 and replaces the respective global option in \LoadLayoutOptions in a format-specific fashion.
         """
         ...
     def select_all_layers(self) -> None:
@@ -46110,15 +46402,15 @@ class NetPinRef:
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this pin reference is attached to.
+        @brief Gets the net this pin reference is attached to (non-const version).
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this pin reference is attached to (non-const version).
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the net this pin reference is attached to.
         """
         ...
     def pin(self) -> Pin:
@@ -46441,15 +46733,15 @@ class NetTerminalRef:
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this terminal reference is attached to (non-const version).
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the net this terminal reference is attached to.
         """
         ...
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this terminal reference is attached to.
+        @brief Gets the net this terminal reference is attached to (non-const version).
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     def terminal_def(self) -> DeviceTerminalDefinition:
@@ -47446,20 +47738,20 @@ class Netlist:
     @overload
     def circuits_by_name(self, name_pattern: str) -> List[Circuit]:
         r"""
-        @brief Gets the circuit objects for a given name filter.
-        The name filter is a glob pattern. This method will return all \Circuit objects matching the glob pattern.
-
-        This method has been introduced in version 0.26.4.
-        """
-        ...
-    @overload
-    def circuits_by_name(self, name_pattern: str) -> List[Circuit]:
-        r"""
         @brief Gets the circuit objects for a given name filter (const version).
         The name filter is a glob pattern. This method will return all \Circuit objects matching the glob pattern.
 
 
         This constness variant has been introduced in version 0.26.8.
+        """
+        ...
+    @overload
+    def circuits_by_name(self, name_pattern: str) -> List[Circuit]:
+        r"""
+        @brief Gets the circuit objects for a given name filter.
+        The name filter is a glob pattern. This method will return all \Circuit objects matching the glob pattern.
+
+        This method has been introduced in version 0.26.4.
         """
         ...
     def combine_devices(self) -> None:
@@ -53278,6 +53570,34 @@ class Polygon:
         This method was introduced in version 0.25.
         """
         ...
+    @overload
+    def delaunay(self, max_area: Optional[float] = ..., min_b: Optional[float] = ..., dbu: Optional[float] = ...) -> Region:
+        r"""
+        @brief Performs a Delaunay triangulation of the polygon.
+
+        @return A \Region holding the triangles of the refined, constrained Delaunay triangulation.
+
+        Refinement is implemented by Chew's second algorithm. A maximum area can be given. Triangles larger than this area will be split. In addition 'skinny' triangles will be resolved where possible. 'skinny' is defined in terms of shortest edge to circumcircle radius ratio (b). A minimum number for b can be given. A value of 1.0 corresponds to a minimum angle of 30 degree and is usually a good choice. The algorithm is stable up to roughly 1.2 which corresponds to a minimum angle of abouth 37 degree.
+
+        The minimum angle of the resulting triangles relates to the 'b' parameter as: @t min_angle = arcsin(B/2) @/t.
+
+        The area value is given in terms of DBU units. Picking a value of 0.0 for area and min b will make the implementation skip the refinement step. In that case, the results are identical to the standard constrained Delaunay triangulation.
+
+        The 'dbu' parameter a numerical scaling parameter. It should be choosen in a way that the polygon dimensions are "in the order of 1" (very roughly) after multiplication with the dbu parameter. A value of 0.001 is suitable for polygons with typical dimensions in the order to 1000 DBU. Usually the default value is good enough.
+
+        This method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def delaunay(self, vertexes: Sequence[Point], max_area: Optional[float] = ..., min_b: Optional[float] = ..., dbu: Optional[float] = ...) -> Region:
+        r"""
+        @brief Performs a Delaunay triangulation of the polygon.
+
+        This variant of the triangulation function accepts an array of additional vertexes for the triangulation.
+
+        This method has been introduced in version 0.30.
+        """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
@@ -57103,6 +57423,26 @@ class RecursiveShapeIterator:
         See \enable_properties, \filter_properties, \remove_properties and \map_properties for details on this feature.
 
         This attribute has been introduced in version 0.28.4.
+        """
+        ...
+    def properties(self) -> Any:
+        r"""
+        @brief Gets the effective user properties
+        See \prop_id for the definition of 'effective user properties'.
+
+        This method is a convenience method that gets the effective properties of the current shape as a single hash.
+
+        This method has been introduced in version 0.30.
+        """
+        ...
+    def property(self, key: Any) -> Any:
+        r"""
+        @brief Gets the effective user property with the given key
+        See \prop_id for the definition of 'effective user property'.
+
+        This method is a convenience method that gets the effective property of the current shape with the given key. If no property with that key exists, it will return nil.
+
+        This method has been introduced in version 0.30.
         """
         ...
     def remove_properties(self) -> None:
@@ -63037,11 +63377,10 @@ class Shape:
     Starting with version 0.23, this method returns nil, if the shape does not represent a geometrical primitive that can be converted to a simple polygon.
 
     Setter:
-    @brief Replaces the shape by the given simple polygon object
-    This method replaces the shape by the given simple polygon object. This method can only be called for editable layouts. It does not change the user properties of the shape.
-    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
+    @brief Replaces the shape by the given simple polygon (in micrometer units)
+    This method replaces the shape by the given text, like \simple_polygon= with a \SimplePolygon argument does. This version translates the polygon from micrometer units to database units internally.
 
-    This method has been introduced in version 0.22.
+    This method has been introduced in version 0.25.
     """
     text: Any
     r"""
@@ -63830,7 +64169,8 @@ class Shape:
     def property(self, key: Any) -> Any:
         r"""
         @brief Gets the user property with the given key
-        This method is a convenience method that gets the property with the given key. If no property with that key does not exist, it will return nil. Using that method is more convenient than using the layout object and the properties ID to retrieve the property value. 
+        This method is a convenience method that gets the property with the given key. If no property with that key exists, it will return nil. Using that method is more convenient than using the layout object and the properties ID to retrieve the property value.
+
         This method has been introduced in version 0.22.
         """
         ...
@@ -66367,6 +66707,34 @@ class SimplePolygon:
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
         ...
+    @overload
+    def delaunay(self, max_area: Optional[float] = ..., min_b: Optional[float] = ..., dbu: Optional[float] = ...) -> Region:
+        r"""
+        @brief Performs a Delaunay triangulation of the polygon.
+
+        @return A \Region holding the triangles of the refined, constrained Delaunay triangulation.
+
+        Refinement is implemented by Chew's second algorithm. A maximum area can be given. Triangles larger than this area will be split. In addition 'skinny' triangles will be resolved where possible. 'skinny' is defined in terms of shortest edge to circumcircle radius ratio (b). A minimum number for b can be given. A value of 1.0 corresponds to a minimum angle of 30 degree and is usually a good choice. The algorithm is stable up to roughly 1.2 which corresponds to a minimum angle of abouth 37 degree.
+
+        The minimum angle of the resulting triangles relates to the 'b' parameter as: @t min_angle = arcsin(B/2) @/t.
+
+        The area value is given in terms of DBU units. Picking a value of 0.0 for area and min b will make the implementation skip the refinement step. In that case, the results are identical to the standard constrained Delaunay triangulation.
+
+        The 'dbu' parameter a numerical scaling parameter. It should be choosen in a way that the polygon dimensions are "in the order of 1" (very roughly) after multiplication with the dbu parameter. A value of 0.001 is suitable for polygons with typical dimensions in the order to 1000 DBU. Usually the default value is good enough.
+
+        This method has been introduced in version 0.30.
+        """
+        ...
+    @overload
+    def delaunay(self, vertexes: Sequence[Point], max_area: Optional[float] = ..., min_b: Optional[float] = ..., dbu: Optional[float] = ...) -> Region:
+        r"""
+        @brief Performs a Delaunay triangulation of the polygon.
+
+        This variant of the triangulation function accepts an array of additional vertexes for the triangulation.
+
+        This method has been introduced in version 0.30.
+        """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
@@ -67184,17 +67552,17 @@ class SubCircuit(NetlistObject):
     @overload
     def circuit(self) -> Circuit:
         r"""
-        @brief Gets the circuit the subcircuit lives in (non-const version).
+        @brief Gets the circuit the subcircuit lives in.
         This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
-
-        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def circuit(self) -> Circuit:
         r"""
-        @brief Gets the circuit the subcircuit lives in.
+        @brief Gets the circuit the subcircuit lives in (non-const version).
         This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
@@ -67879,7 +68247,8 @@ class Text:
     Setter:
     @brief Sets the horizontal alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     size: int
     r"""
@@ -67915,8 +68284,7 @@ class Text:
     Setter:
     @brief Sets the vertical alignment
 
-    This property specifies how the text is aligned relative to the anchor point. 
-    This property has been introduced in version 0.22 and extended to enums in 0.28.
+    This is the version accepting integer values. It's provided for backward compatibility.
     """
     x: int
     r"""
@@ -70197,10 +70565,12 @@ class Texts(ShapeCollection):
         @return A new text collection containing the texts not inside or on the edge of polygons from the region
         """
         ...
-    def polygons(self, e: Optional[int] = ...) -> Region:
+    def polygons(self, e: Optional[int] = ..., text_prop: Optional[Any] = ...) -> Region:
         r"""
         @brief Converts the edge pairs to polygons
-        This method creates polygons from the texts. This is equivalent to calling \extents.
+        This method creates polygons from the texts. This is basically equivalent to calling \extents. In addition, a user property with the key given by 'text_prop' can be attached. The value of that user property will be the text string. If 'text_prop' is nil, no user property is attached.
+
+        The 'text_prop' argument has been added in version 0.30.
         """
         ...
     def process(self, process: TextOperator) -> None:

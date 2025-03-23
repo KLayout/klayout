@@ -1455,9 +1455,13 @@ Triangles::create_constrained_delaunay (const db::Region &region, const CplxTran
 }
 
 void
-Triangles::create_constrained_delaunay (const db::Polygon &p, const CplxTrans &trans)
+Triangles::create_constrained_delaunay (const db::Polygon &p, const std::vector<Point> &vertexes, const CplxTrans &trans)
 {
   clear ();
+
+  for (auto v = vertexes.begin (); v != vertexes.end (); ++v) {
+    insert_point (trans * *v);
+  }
 
   std::vector<std::vector<db::Vertex *> > edge_contours;
   make_contours (p, trans, edge_contours);
@@ -1466,12 +1470,16 @@ Triangles::create_constrained_delaunay (const db::Polygon &p, const CplxTrans &t
 }
 
 void
-Triangles::create_constrained_delaunay (const db::DPolygon &p)
+Triangles::create_constrained_delaunay (const db::DPolygon &p, const std::vector<DPoint> &vertexes, const DCplxTrans &trans)
 {
   clear ();
 
+  for (auto v = vertexes.begin (); v != vertexes.end (); ++v) {
+    insert_point (trans * *v);
+  }
+
   std::vector<std::vector<db::Vertex *> > edge_contours;
-  make_contours (p, db::DUnitTrans (), edge_contours);
+  make_contours (p, trans, edge_contours);
 
   constrain (edge_contours);
 }
@@ -1530,27 +1538,45 @@ Triangles::triangulate (const db::Region &region, const TriangulateParameters &p
 void
 Triangles::triangulate (const db::Polygon &poly, const TriangulateParameters &parameters, double dbu)
 {
+  triangulate (poly, std::vector<db::Point> (), parameters, dbu);
+}
+
+void
+Triangles::triangulate (const db::Polygon &poly, const std::vector<db::Point> &vertexes, const TriangulateParameters &parameters, double dbu)
+{
   tl::SelfTimer timer (tl::verbosity () > parameters.base_verbosity, "Triangles::triangulate");
 
-  create_constrained_delaunay (poly, db::CplxTrans (dbu));
+  create_constrained_delaunay (poly, vertexes, db::CplxTrans (dbu));
   refine (parameters);
 }
 
 void
 Triangles::triangulate (const db::Polygon &poly, const TriangulateParameters &parameters, const db::CplxTrans &trans)
 {
+  triangulate (poly, std::vector<db::Point> (), parameters, trans);
+}
+
+void
+Triangles::triangulate (const db::Polygon &poly, const std::vector<db::Point> &vertexes, const TriangulateParameters &parameters, const db::CplxTrans &trans)
+{
   tl::SelfTimer timer (tl::verbosity () > parameters.base_verbosity, "Triangles::triangulate");
 
-  create_constrained_delaunay (poly, trans);
+  create_constrained_delaunay (poly, vertexes, trans);
   refine (parameters);
 }
 
 void
-Triangles::triangulate (const db::DPolygon &poly, const TriangulateParameters &parameters)
+Triangles::triangulate (const db::DPolygon &poly, const TriangulateParameters &parameters, const DCplxTrans &trans)
+{
+  triangulate (poly, std::vector<db::DPoint> (), parameters, trans);
+}
+
+void
+Triangles::triangulate (const db::DPolygon &poly, const std::vector<db::DPoint> &vertexes, const TriangulateParameters &parameters, const DCplxTrans &trans)
 {
   tl::SelfTimer timer (tl::verbosity () > parameters.base_verbosity, "Triangles::triangulate");
 
-  create_constrained_delaunay (poly);
+  create_constrained_delaunay (poly, vertexes, trans);
   refine (parameters);
 }
 

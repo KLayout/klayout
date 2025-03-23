@@ -160,14 +160,17 @@ public:
   void triangulate (const db::Region &region, const TriangulateParameters &parameters, double dbu = 1.0);
 
   //  more versions
-  void triangulate (const db::Polygon &poly, const TriangulateParameters &parameters, double dbu = 1.0);
   void triangulate (const db::Region &region, const TriangulateParameters &parameters, const db::CplxTrans &trans = db::CplxTrans ());
+  void triangulate (const db::Polygon &poly, const TriangulateParameters &parameters, double dbu = 1.0);
+  void triangulate (const db::Polygon &poly, const std::vector<db::Point> &vertexes, const TriangulateParameters &parameters, double dbu = 1.0);
   void triangulate (const db::Polygon &poly, const TriangulateParameters &parameters, const db::CplxTrans &trans = db::CplxTrans ());
+  void triangulate (const db::Polygon &poly, const std::vector<db::Point> &vertexes, const TriangulateParameters &parameters, const db::CplxTrans &trans = db::CplxTrans ());
 
   /**
    *  @brief Triangulates a floating-point polygon
    */
-  void triangulate (const db::DPolygon &poly, const TriangulateParameters &parameters);
+  void triangulate (const db::DPolygon &poly, const TriangulateParameters &parameters, const db::DCplxTrans &trans = db::DCplxTrans ());
+  void triangulate (const db::DPolygon &poly, const std::vector<db::DPoint> &vertexes, const TriangulateParameters &parameters, const db::DCplxTrans &trans = db::DCplxTrans ());
 
   /**
    *  @brief Statistics: number of flips (fixing)
@@ -289,12 +292,12 @@ protected:
   /**
    *  @brief Creates a constrained Delaunay triangulation from the given Polygon
    */
-  void create_constrained_delaunay (const db::Polygon &poly, const db::CplxTrans &trans = db::CplxTrans ());
+  void create_constrained_delaunay (const db::Polygon &poly, const std::vector<db::Point> &vertexes, const db::CplxTrans &trans = db::CplxTrans ());
 
   /**
    *  @brief Creates a constrained Delaunay triangulation from the given DPolygon
    */
-  void create_constrained_delaunay (const db::DPolygon &poly);
+  void create_constrained_delaunay (const db::DPolygon &poly, const std::vector<DPoint> &vertexes, const DCplxTrans &trans);
 
   /**
    *  @brief Returns a value indicating whether the edge is "illegal" (violates the Delaunay criterion)

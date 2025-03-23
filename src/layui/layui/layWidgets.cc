@@ -781,6 +781,18 @@ LayerSelectionComboBox::set_current_layer (const db::LayerProperties &props)
 void 
 LayerSelectionComboBox::set_current_layer (int l)
 {
+  const db::Layout *layout = mp_private->layout;
+  if (! layout && mp_private->view) {
+    const CellView &cv = mp_private->view->cellview (mp_private->cv_index);
+    if (cv.is_valid ()) {
+      layout = & cv->layout ();
+    }
+  }
+
+  if (l >= 0 && layout && layout->is_valid_layer ((unsigned int) l)) {
+    mp_private->last_props = layout->get_properties ((unsigned int) l);
+  }
+
   if (l < 0) {
     setCurrentIndex (-1);
   } else {

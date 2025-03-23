@@ -281,6 +281,14 @@ select cell_name of cells TOP.. sorted by cell_name unique
 cells *.$("A"+cell_name)
 </pre>
 
+  <p>
+  The "$_" placeholder is the name of the cell selected in the view as the current cell.
+  The following selects all child cells of the current cell:
+  </p>
+
+  <pre>
+cells $_.*
+</pre>
 
   <h2>Building queries: instances</h2>
 

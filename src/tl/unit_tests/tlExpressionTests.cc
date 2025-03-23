@@ -1084,9 +1084,14 @@ TEST(13)
   tl::Eval e, ee;
   e.set_var ("L", tl::Variant((long) 89));
   ee.set_var ("L", tl::Variant((long) 123));
+  ee.set_var ("$", tl::Variant("dollar"));
+  ee.set_var ("_", tl::Variant("underscore"));
 
-  EXPECT_EQ (e.interpolate("A$L B$(L+100)C"), std::string ("A89 B189C"));
-  EXPECT_EQ (ee.interpolate("123*11=$(L*11)."), std::string ("123*11=1353."));
+  EXPECT_EQ (e.interpolate ("A$L B$(L+100)C"), std::string ("A89 B189C"));
+  EXPECT_EQ (ee.interpolate ("123*11=$(L*11)."), std::string ("123*11=1353."));
+  EXPECT_EQ (ee.interpolate ("A$$C"), std::string ("A$C"));
+  EXPECT_EQ (ee.interpolate ("A$_ C"), std::string ("Aunderscore C"));
+  EXPECT_EQ (ee.interpolate ("A$($)C"), std::string ("AdollarC"));
 }
 
 // assignment

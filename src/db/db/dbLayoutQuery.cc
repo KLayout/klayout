@@ -2282,7 +2282,7 @@ private:
 // --------------------------------------------------------------------------------
 //  LayoutQueryIterator implementation
 
-LayoutQueryIterator::LayoutQueryIterator (const LayoutQuery &q, db::Layout *layout, tl::Eval *parent_eval, tl::AbsoluteProgress *progress)
+LayoutQueryIterator::LayoutQueryIterator (const LayoutQuery &q, db::Layout *layout, db::Cell *cell, tl::Eval *parent_eval, tl::AbsoluteProgress *progress)
   : mp_q (const_cast<db::LayoutQuery *> (&q)), mp_layout (layout), m_eval (parent_eval), m_layout_ctx (layout, true /*can modify*/), mp_progress (progress), m_initialized (false)
 {
   m_eval.set_ctx_handler (&m_layout_ctx);
@@ -2290,13 +2290,16 @@ LayoutQueryIterator::LayoutQueryIterator (const LayoutQuery &q, db::Layout *layo
   for (unsigned int i = 0; i < mp_q->properties (); ++i) {
     m_eval.define_function (mp_q->property_name (i), new FilterStateFunction (i, &m_state));
   }
+  if (cell && cell->layout ()) {
+    m_eval.set_var ("_", cell->layout ()->cell_name (cell->cell_index ()));
+  }
 
   //  Avoid update() calls while iterating in modifying mode
   mp_layout->update ();
   mp_layout->start_changes ();
 }
 
-LayoutQueryIterator::LayoutQueryIterator (const LayoutQuery &q, const db::Layout *layout, tl::Eval *parent_eval, tl::AbsoluteProgress *progress)
+LayoutQueryIterator::LayoutQueryIterator (const LayoutQuery &q, const db::Layout *layout, const Cell *cell, tl::Eval *parent_eval, tl::AbsoluteProgress *progress)
   : mp_q (const_cast<db::LayoutQuery *> (&q)), mp_layout (const_cast <db::Layout *> (layout)), m_eval (parent_eval), m_layout_ctx (layout), mp_progress (progress), m_initialized (false)
 {
   //  TODO: check whether the query is a modifying one (with .. do, delete)
@@ -2305,6 +2308,9 @@ LayoutQueryIterator::LayoutQueryIterator (const LayoutQuery &q, const db::Layout
   m_eval.set_var ("layout", tl::Variant::make_variant_ref (layout));
   for (unsigned int i = 0; i < mp_q->properties (); ++i) {
     m_eval.define_function (mp_q->property_name (i), new FilterStateFunction (i, &m_state));
+  }
+  if (cell && cell->layout ()) {
+    m_eval.set_var ("_", cell->layout ()->cell_name (cell->cell_index ()));
   }
 
   //  Avoid update() calls while iterating in modifying mode
@@ -2850,9 +2856,9 @@ LayoutQuery::dump () const
 }
 
 void
-LayoutQuery::execute (db::Layout &layout, tl::Eval *context)
+LayoutQuery::execute (db::Layout &layout, db::Cell *cell, tl::Eval *context)
 {
-  LayoutQueryIterator iq (*this, &layout, context);
+  LayoutQueryIterator iq (*this, &layout, cell, context);
   while (! iq.at_end ()) {
     ++iq;
   }

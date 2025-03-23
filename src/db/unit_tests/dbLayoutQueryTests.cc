@@ -516,6 +516,14 @@ TEST(1)
   }
 
   {
+    //  $_ is a placeholder for the current cell
+    db::LayoutQuery q ("$_.*");
+    db::LayoutQueryIterator iq (q, &g, &g.cell (g.cell_by_name ("c4").second));
+    std::string s = q2s_var (iq, "cell_name");
+    EXPECT_EQ (s, "c1,c3"); // child cells of "c4"
+  }
+
+  {
     //  Another way of saying "c2x.*"
     db::LayoutQuery q ("*.$(cell_name=='c2x'?'*':'')");
     db::LayoutQueryIterator iq (q, &g);

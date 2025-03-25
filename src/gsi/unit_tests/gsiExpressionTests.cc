@@ -898,4 +898,3 @@ TEST(17)
                "it.add_value(17.5)").execute ();
 }
 
-

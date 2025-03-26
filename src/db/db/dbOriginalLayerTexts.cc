@@ -190,6 +190,12 @@ OriginalLayerTexts::nth (size_t) const
   throw tl::Exception (tl::to_string (tr ("Random access to texts is available only for flat collections")));
 }
 
+db::properties_id_type
+OriginalLayerTexts::nth_prop_id (size_t) const
+{
+  throw tl::Exception (tl::to_string (tr ("Random access to texts is available only for flat collections")));
+}
+
 bool
 OriginalLayerTexts::has_valid_texts () const
 {

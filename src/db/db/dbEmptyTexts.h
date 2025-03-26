@@ -71,6 +71,7 @@ public:
   virtual TextsDelegate *in (const Texts &, bool) const { return new EmptyTexts (); }
 
   virtual const db::Text *nth (size_t) const { tl_assert (false); }
+  virtual db::properties_id_type nth_prop_id (size_t) const { tl_assert (false); }
   virtual bool has_valid_texts () const { return true; }
 
   virtual const db::RecursiveShapeIterator *iter () const { return 0; }

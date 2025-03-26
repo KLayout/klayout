@@ -109,6 +109,7 @@ public:
   virtual TextsDelegate *in (const Texts &other, bool invert) const = 0;
 
   virtual const db::Text *nth (size_t n) const = 0;
+  virtual db::properties_id_type nth_prop_id (size_t n) const = 0;
   virtual bool has_valid_texts () const = 0;
 
   virtual const db::RecursiveShapeIterator *iter () const = 0;

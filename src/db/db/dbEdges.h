@@ -1440,11 +1440,22 @@ public:
   /**
    *  @brief Returns the nth edge
    *
-   *  This operation is available only for flat regions - i.e. such for which "has_valid_edges" is true.
+   *  This operation is available only for flat edge collections - i.e. such for which "has_valid_edges" is true.
    */
   const db::Edge *nth (size_t n) const
   {
     return mp_delegate->nth (n);
+  }
+
+  /**
+   *  @brief Returns the nth edge's property ID
+   *
+   *  This operation is available only for flat edge collections - i.e. such for which
+   *  "has_valid_edges" is true.
+   */
+  db::properties_id_type nth_prop_id (size_t n) const
+  {
+    return mp_delegate->nth_prop_id (n);
   }
 
   /**

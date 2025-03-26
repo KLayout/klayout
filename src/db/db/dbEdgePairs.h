@@ -678,12 +678,23 @@ public:
   /**
    *  @brief Returns the nth edge pair
    *
-   *  This operation is available only for flat regions - i.e. such for which
+   *  This operation is available only for flat edge pair collections - i.e. such for which
    *  "has_valid_edge_pairs" is true.
    */
   const db::EdgePair *nth (size_t n) const
   {
     return mp_delegate->nth (n);
+  }
+
+  /**
+   *  @brief Returns the nth edge pair's property ID
+   *
+   *  This operation is available only for flat edge pair collections - i.e. such for which
+   *  "has_valid_edge_pairs" is true.
+   */
+  db::properties_id_type nth_prop_id (size_t n) const
+  {
+    return mp_delegate->nth_prop_id (n);
   }
 
   /**

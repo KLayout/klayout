@@ -789,8 +789,7 @@ static tl::Variant nth (const db::EdgePairs *edge_pairs, size_t n)
   if (! ep) {
     return tl::Variant ();
   } else {
-    // @@@ return tl::Variant (db::EdgePairWithProperties (*ep, edge_pairs->nth_prop_id (n)));
-    return tl::Variant (); // @@@
+    return tl::Variant (db::EdgePairWithProperties (*ep, edge_pairs->nth_prop_id (n)));
   }
 }
 

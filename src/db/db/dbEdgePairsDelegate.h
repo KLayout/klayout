@@ -273,6 +273,7 @@ public:
   virtual EdgePairsDelegate *in (const EdgePairs &other, bool invert) const = 0;
 
   virtual const db::EdgePair *nth (size_t n) const = 0;
+  virtual db::properties_id_type nth_prop_id (size_t n) const = 0;
   virtual bool has_valid_edge_pairs () const = 0;
 
   virtual const db::RecursiveShapeIterator *iter () const = 0;

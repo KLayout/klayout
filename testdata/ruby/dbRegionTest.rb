@@ -234,7 +234,7 @@ class DBRegion_TestClass < TestBase
     r = RBA::Region::new
     r.insert(RBA::PolygonWithProperties::new(RBA::Box::new(0, 0, 10, 20), { 1 => 'value' }))
     r.insert(RBA::Box::new(1, 2, 11, 22))
-    assert_equal(r[0].to_s, "@@@")
+    assert_equal(r[0].to_s, "(1,2;1,22;11,22;11,2) props={}")
     assert_equal(r[1].to_s, "(0,0;0,20;10,20;10,0) props={1=>value}")
     
     r = RBA::Region::new(ly.begin_shapes(c1.cell_index, l2), "*")

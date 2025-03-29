@@ -111,7 +111,7 @@ class DBEdgePairs_TestClass < TestBase
     assert_equal(csort(r.edges.to_s), csort("(0,0;0,100);(-10,0;-20,50)"))
     assert_equal(r.is_empty?, false)
     assert_equal(r.size, 1)
-    assert_equal(r[0].to_s, "(0,0;0,100)/(-10,0;-20,50)")
+    assert_equal(r[0].to_s, "(0,0;0,100)/(-10,0;-20,50) props={}")
     assert_equal(r[1].to_s, "")
     assert_equal(r.bbox.to_s, "(-20,0;0,100)")
 
@@ -221,7 +221,7 @@ class DBEdgePairs_TestClass < TestBase
 
     r.flatten
     assert_equal(r.has_valid_edge_pairs?, true)
-    assert_equal(r[1].to_s, "(0,101;2,103)/(10,111;12,113)")
+    assert_equal(r[1].to_s, "(0,101;2,103)/(10,111;12,113) props={}")
     assert_equal(r[100].inspect, "nil")
     assert_equal(r.bbox.to_s, "(0,1;212,113)")
     
@@ -622,6 +622,7 @@ class DBEdgePairs_TestClass < TestBase
 
     r = RBA::EdgePairs::new([ RBA::EdgePairWithProperties::new(RBA::EdgePair::new(RBA::Edge::new(0, 0, 100, 100), RBA::Edge::new(200, 300, 200, 500)), { 1 => "one" }) ])
     assert_equal(r.to_s, "(0,0;100,100)/(200,300;200,500){1=>one}")
+    assert_equal(r[0].to_s, "(0,0;100,100)/(200,300;200,500) props={1=>one}")
 
     r = RBA::EdgePairs::new([])
     assert_equal(r.to_s, "")

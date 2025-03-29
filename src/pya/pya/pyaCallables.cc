@@ -413,6 +413,8 @@ match_method (int mid, PyObject *self, PyObject *args, PyObject *kwargs, bool st
           if (! arg) {
             is_valid = a->spec ()->has_default ();
           } else if (test_arg (*a, arg.get (), false /*strict*/, false /*object substitution*/)) {
+            sc += 100;
+          } else if (test_arg (*a, arg.get (), true /*loose*/, false /*object substitution*/)) {
             ++sc;
           } else if (test_arg (*a, arg.get (), true /*loose*/, true /*object substitution*/)) {
             //  non-scoring match

@@ -171,7 +171,46 @@ TextsDelegate *FlatTexts::add_in_place (const Texts &other)
 
 const db::Text *FlatTexts::nth (size_t n) const
 {
-  return n < mp_texts->size () ? &mp_texts->get_layer<db::Text, db::unstable_layer_tag> ().begin () [n] : 0;
+  //  NOTE: this assumes that we iterate over non-property texts first and then over texts with properties
+
+  if (n >= mp_texts->size ()) {
+    return 0;
+  }
+
+  const db::layer<db::Text, db::unstable_layer_tag> &l = mp_texts->get_layer<db::Text, db::unstable_layer_tag> ();
+  if (n < l.size ()) {
+    return &l.begin () [n];
+  }
+  n -= l.size ();
+
+  const db::layer<db::TextWithProperties, db::unstable_layer_tag> &lp = mp_texts->get_layer<db::TextWithProperties, db::unstable_layer_tag> ();
+  if (n < lp.size ()) {
+    return &lp.begin () [n];
+  }
+
+  return 0;
+}
+
+db::properties_id_type FlatTexts::nth_prop_id (size_t n) const
+{
+  //  NOTE: this assumes that we iterate over non-property polygons first and then over polygons with properties
+
+  if (n >= mp_texts->size ()) {
+    return 0;
+  }
+
+  const db::layer<db::Text, db::unstable_layer_tag> &l = mp_texts->get_layer<db::Text, db::unstable_layer_tag> ();
+  if (n < l.size ()) {
+    return 0;
+  }
+  n -= l.size ();
+
+  const db::layer<db::TextWithProperties, db::unstable_layer_tag> &lp = mp_texts->get_layer<db::TextWithProperties, db::unstable_layer_tag> ();
+  if (n < lp.size ()) {
+    return lp.begin () [n].properties_id ();
+  }
+
+  return 0;
 }
 
 bool FlatTexts::has_valid_texts () const

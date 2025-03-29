@@ -783,6 +783,16 @@ static std::vector<db::EdgePairs> split_with_area2 (const db::EdgePairs *r, db::
   return as_2edge_pairs_vector (r->split_filter (f));
 }
 
+static tl::Variant nth (const db::EdgePairs *edge_pairs, size_t n)
+{
+  const db::EdgePair *ep = edge_pairs->nth (n);
+  if (! ep) {
+    return tl::Variant ();
+  } else {
+    return tl::Variant (db::EdgePairWithProperties (*ep, edge_pairs->nth_prop_id (n)));
+  }
+}
+
 static db::generic_shape_iterator<db::EdgePairWithProperties> begin_edge_pairs (const db::EdgePairs *edge_pairs)
 {
   return db::generic_shape_iterator<db::EdgePairWithProperties> (db::make_wp_iter (edge_pairs->delegate ()->begin ()));
@@ -1855,13 +1865,15 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "\n"
     "Starting with version 0.30, the iterator delivers EdgePairWithProperties objects."
   ) +
-  method ("[]", &db::EdgePairs::nth, gsi::arg ("n"),
+  method_ext ("[]", &nth, gsi::arg ("n"),
     "@brief Returns the nth edge pair\n"
     "\n"
     "This method returns nil if the index is out of range. It is available for flat edge pairs only - i.e. "
     "those for which \\has_valid_edge_pairs? is true. Use \\flatten to explicitly flatten an edge pair collection.\n"
     "\n"
-    "The \\each iterator is the more general approach to access the edge pairs."
+    "The \\each iterator is the more general approach to access the edge pairs.\n"
+    "\n"
+    "Since version 0.30.1, this method returns a \\EdgePairWithProperties object."
   ) +
   method ("flatten", &db::EdgePairs::flatten,
     "@brief Explicitly flattens an edge pair collection\n"

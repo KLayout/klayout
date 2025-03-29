@@ -311,6 +311,11 @@ const db::EdgePair *DeepEdgePairs::nth (size_t) const
   throw tl::Exception (tl::to_string (tr ("Random access to edge pairs is available only for flat edge pair collections")));
 }
 
+db::properties_id_type DeepEdgePairs::nth_prop_id (size_t) const
+{
+  throw tl::Exception (tl::to_string (tr ("Random access to edge pairs is available only for flat edge pair collections")));
+}
+
 bool DeepEdgePairs::has_valid_edge_pairs () const
 {
   return false;

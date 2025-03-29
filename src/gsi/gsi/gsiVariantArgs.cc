@@ -46,12 +46,12 @@ inline void *get_object (tl::Variant &var)
 // -------------------------------------------------------------------
 //  Test if an argument can be converted to the given type
 
-bool test_arg (const gsi::ArgType &atype, const tl::Variant &arg, bool loose);
+bool test_arg (const gsi::ArgType &atype, const tl::Variant &arg, bool loose, bool object_substitution);
 
 template <class R>
 struct test_arg_func
 {
-  void operator () (bool *ret, const tl::Variant &arg, const gsi::ArgType & /*atype*/, bool /*loose*/)
+  void operator () (bool *ret, const tl::Variant &arg, const gsi::ArgType & /*atype*/, bool /*loose*/, bool /*object_substitution*/)
   {
     *ret = arg.can_convert_to<R> ();
   }
@@ -60,7 +60,16 @@ struct test_arg_func
 template <>
 struct test_arg_func<gsi::VoidType>
 {
-  void operator () (bool *ret, const tl::Variant & /*arg*/, const gsi::ArgType & /*atype*/, bool /*loose*/)
+  void operator () (bool *ret, const tl::Variant & /*arg*/, const gsi::ArgType & /*atype*/, bool /*loose*/, bool /*object_substitution*/)
+  {
+    *ret = true;
+  }
+};
+
+template <>
+struct test_arg_func<gsi::VariantType>
+{
+  void operator () (bool *ret, const tl::Variant & /*arg*/, const gsi::ArgType & /*atype*/, bool /*loose*/, bool /*object_substitution*/)
   {
     *ret = true;
   }
@@ -69,7 +78,7 @@ struct test_arg_func<gsi::VoidType>
 template <>
 struct test_arg_func<gsi::ObjectType>
 {
-  void operator () (bool *ret, const tl::Variant &arg, const gsi::ArgType &atype, bool loose)
+  void operator () (bool *ret, const tl::Variant &arg, const gsi::ArgType &atype, bool loose, bool object_substitution)
   {
     //  allow nil of pointers
     if ((atype.is_ptr () || atype.is_cptr ()) && arg.is_nil ()) {
@@ -77,7 +86,7 @@ struct test_arg_func<gsi::ObjectType>
       return;
     }
 
-    if (arg.is_list ()) {
+    if (object_substitution && arg.is_list ()) {
 
       //  we may implicitly convert an array into a constructor call of a target object -
       //  for now we only check whether the number of arguments is compatible with the array given.
@@ -104,9 +113,9 @@ struct test_arg_func<gsi::ObjectType>
     const tl::VariantUserClassBase *cls = arg.user_cls ();
     if (! cls) {
       *ret = false;
-    } else if (! cls->gsi_cls ()->is_derived_from (atype.cls ()) && (! loose || ! cls->gsi_cls ()->can_convert_to(atype.cls ()))) {
-      *ret = false;
-    } else if ((atype.is_ref () || atype.is_ptr ()) && cls->is_const ()) {
+    } else if (! (cls->gsi_cls () == atype.cls () ||
+                    (loose && (cls->gsi_cls ()->is_derived_from (atype.cls ()) ||
+                       (object_substitution && cls->gsi_cls ()->can_convert_to (atype.cls ())))))) {
       *ret = false;
     } else {
       *ret = true;
@@ -117,7 +126,7 @@ struct test_arg_func<gsi::ObjectType>
 template <>
 struct test_arg_func<gsi::VectorType>
 {
-  void operator () (bool *ret, const tl::Variant &arg, const gsi::ArgType &atype, bool loose)
+  void operator () (bool *ret, const tl::Variant &arg, const gsi::ArgType &atype, bool loose, bool /*object_substitution*/)
   {
     if (! arg.is_list ()) {
       *ret = false;
@@ -129,7 +138,7 @@ struct test_arg_func<gsi::VectorType>
 
     *ret = true;
     for (tl::Variant::const_iterator v = arg.begin (); v != arg.end () && *ret; ++v) {
-      if (! test_arg (ainner, *v, loose)) {
+      if (! test_arg (ainner, *v, loose, true)) {
         *ret = false;
       }
     }
@@ -139,7 +148,7 @@ struct test_arg_func<gsi::VectorType>
 template <>
 struct test_arg_func<gsi::MapType>
 {
-  void operator () (bool *ret, const tl::Variant &arg, const gsi::ArgType &atype, bool loose)
+  void operator () (bool *ret, const tl::Variant &arg, const gsi::ArgType &atype, bool loose, bool /*object_substitution*/)
   {
     //  Note: delegating that to the function avoids "injected class name used as template template expression" warning
     if (! arg.is_array ()) {
@@ -152,16 +161,11 @@ struct test_arg_func<gsi::MapType>
     const ArgType &ainner = *atype.inner ();
     const ArgType &ainner_k = *atype.inner_k ();
 
-    if (! arg.is_list ()) {
-      *ret = false;
-      return;
-    }
-
     *ret = true;
     for (tl::Variant::const_array_iterator a = arg.begin_array (); a != arg.end_array () && *ret; ++a) {
-      if (! test_arg (ainner_k, a->first, loose)) {
+      if (! test_arg (ainner_k, a->first, loose, true)) {
         *ret = false;
-      } else if (! test_arg (ainner, a->second, loose)) {
+      } else if (! test_arg (ainner, a->second, loose, true)) {
         *ret = false;
       }
     }
@@ -169,7 +173,7 @@ struct test_arg_func<gsi::MapType>
 };
 
 bool
-test_arg (const gsi::ArgType &atype, const tl::Variant &arg, bool loose)
+test_arg (const gsi::ArgType &atype, const tl::Variant &arg, bool loose, bool object_substitution)
 {
   //  for const X * or X *, nil is an allowed value
   if ((atype.is_cptr () || atype.is_ptr ()) && arg.is_nil ()) {
@@ -177,7 +181,7 @@ test_arg (const gsi::ArgType &atype, const tl::Variant &arg, bool loose)
   }
 
   bool ret = false;
-  gsi::do_on_type<test_arg_func> () (atype.type (), &ret, arg, atype, loose);
+  gsi::do_on_type<test_arg_func> () (atype.type (), &ret, arg, atype, loose, object_substitution);
   return ret;
 }
 

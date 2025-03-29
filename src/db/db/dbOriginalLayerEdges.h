@@ -58,6 +58,7 @@ public:
   virtual bool is_merged () const;
 
   virtual const db::Edge *nth (size_t n) const;
+  virtual db::properties_id_type nth_prop_id (size_t n) const;
   virtual bool has_valid_edges () const;
   virtual bool has_valid_merged_edges () const;
 

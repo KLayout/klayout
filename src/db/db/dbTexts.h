@@ -495,12 +495,23 @@ public:
   /**
    *  @brief Returns the nth text
    *
-   *  This operation is available only for flat regions - i.e. such for which
+   *  This operation is available only for flat text collections - i.e. such for which
    *  "has_valid_texts" is true.
    */
   const db::Text *nth (size_t n) const
   {
     return mp_delegate->nth (n);
+  }
+
+  /**
+   *  @brief Returns the nth text's property ID
+   *
+   *  This operation is available only for flat text collections - i.e. such for which
+   *  "has_valid_texts" is true.
+   */
+  db::properties_id_type nth_prop_id (size_t n) const
+  {
+    return mp_delegate->nth_prop_id (n);
   }
 
   /**

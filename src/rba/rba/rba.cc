@@ -539,6 +539,8 @@ private:
             if (arg == Qundef) {
               is_valid = a->spec ()->has_default ();
             } else if (test_arg (*a, arg, false /*strict*/, false /*with object substitution*/)) {
+              sc += 100;
+            } else if (test_arg (*a, arg, true /*loose*/, false /*with object substitution*/)) {
               ++sc;
             } else if (test_arg (*a, arg, true /*loose*/, true /*with object substitution*/)) {
               //  non-scoring match

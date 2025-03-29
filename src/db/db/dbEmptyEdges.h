@@ -119,6 +119,7 @@ public:
   virtual std::pair<EdgesDelegate *, EdgesDelegate *> in_and_out (const Edges &) const { return std::make_pair (new EmptyEdges (), new EmptyEdges ()); }
 
   virtual const db::Edge *nth (size_t) const { tl_assert (false); }
+  virtual db::properties_id_type nth_prop_id (size_t) const { tl_assert (false); }
   virtual bool has_valid_edges () const { return true; }
   virtual bool has_valid_merged_edges () const { return true; }
 

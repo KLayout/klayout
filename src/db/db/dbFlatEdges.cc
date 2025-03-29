@@ -361,7 +361,46 @@ EdgesDelegate *FlatEdges::add_in_place (const Edges &other)
 
 const db::Edge *FlatEdges::nth (size_t n) const
 {
-  return n < mp_edges->size () ? &mp_edges->get_layer<db::Edge, db::unstable_layer_tag> ().begin () [n] : 0;
+  //  NOTE: this assumes that we iterate over non-property edges first and then over edges with properties
+
+  if (n >= mp_edges->size ()) {
+    return 0;
+  }
+
+  const db::layer<db::Edge, db::unstable_layer_tag> &l = mp_edges->get_layer<db::Edge, db::unstable_layer_tag> ();
+  if (n < l.size ()) {
+    return &l.begin () [n];
+  }
+  n -= l.size ();
+
+  const db::layer<db::EdgeWithProperties, db::unstable_layer_tag> &lp = mp_edges->get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ();
+  if (n < lp.size ()) {
+    return &lp.begin () [n];
+  }
+
+  return 0;
+}
+
+db::properties_id_type FlatEdges::nth_prop_id (size_t n) const
+{
+  //  NOTE: this assumes that we iterate over non-property polygons first and then over polygons with properties
+
+  if (n >= mp_edges->size ()) {
+    return 0;
+  }
+
+  const db::layer<db::Edge, db::unstable_layer_tag> &l = mp_edges->get_layer<db::Edge, db::unstable_layer_tag> ();
+  if (n < l.size ()) {
+    return 0;
+  }
+  n -= l.size ();
+
+  const db::layer<db::EdgeWithProperties, db::unstable_layer_tag> &lp = mp_edges->get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ();
+  if (n < lp.size ()) {
+    return lp.begin () [n].properties_id ();
+  }
+
+  return 0;
 }
 
 bool FlatEdges::has_valid_edges () const

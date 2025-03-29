@@ -863,3 +863,38 @@ TEST(16)
   }
 }
 
+//  implicit conversions
+TEST(17)
+{
+  tl::Eval e;
+  tl::Variant v;
+
+  //  smoke test
+  v = e.parse ("var rdb=ReportDatabase.new();"
+               "var cat=rdb.create_category('name');"
+               "var cell=rdb.create_cell('TOP');"
+               "var it=rdb.create_item(cell,cat);"
+               "var bwp=BoxWithProperties.new(Box.new(0,0,1,2), {1=>'value'});"
+               "it.add_value(bwp)").execute ();
+
+  v = e.parse ("var rdb=ReportDatabase.new();"
+               "var cat=rdb.create_category('name');"
+               "var cell=rdb.create_cell('TOP');"
+               "var it=rdb.create_item(cell,cat);"
+               "var bwp=DBoxWithProperties.new(DBox.new(0,0,1,2), {1=>'value'});"
+               "it.add_value(bwp)").execute ();
+
+  v = e.parse ("var rdb=ReportDatabase.new();"
+               "var cat=rdb.create_category('name');"
+               "var cell=rdb.create_cell('TOP');"
+               "var it=rdb.create_item(cell,cat);"
+               "var b=DBox.new(0,0,1,2);"
+               "it.add_value(b)").execute ();
+
+  v = e.parse ("var rdb=ReportDatabase.new();"
+               "var cat=rdb.create_category('name');"
+               "var cell=rdb.create_cell('TOP');"
+               "var it=rdb.create_item(cell,cat);"
+               "it.add_value(17.5)").execute ();
+}
+

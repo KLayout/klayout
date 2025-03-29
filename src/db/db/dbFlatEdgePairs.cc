@@ -173,7 +173,46 @@ EdgePairsDelegate *FlatEdgePairs::add_in_place (const EdgePairs &other)
 
 const db::EdgePair *FlatEdgePairs::nth (size_t n) const
 {
-  return n < mp_edge_pairs->size () ? &mp_edge_pairs->get_layer<db::EdgePair, db::unstable_layer_tag> ().begin () [n] : 0;
+  //  NOTE: this assumes that we iterate over non-property edge pairs first and then over edges with properties
+
+  if (n >= mp_edge_pairs->size ()) {
+    return 0;
+  }
+
+  const db::layer<db::EdgePair, db::unstable_layer_tag> &l = mp_edge_pairs->get_layer<db::EdgePair, db::unstable_layer_tag> ();
+  if (n < l.size ()) {
+    return &l.begin () [n];
+  }
+  n -= l.size ();
+
+  const db::layer<db::EdgePairWithProperties, db::unstable_layer_tag> &lp = mp_edge_pairs->get_layer<db::EdgePairWithProperties, db::unstable_layer_tag> ();
+  if (n < lp.size ()) {
+    return &lp.begin () [n];
+  }
+
+  return 0;
+}
+
+db::properties_id_type FlatEdgePairs::nth_prop_id (size_t n) const
+{
+  //  NOTE: this assumes that we iterate over non-property edge pairs first and then over edges with properties
+
+  if (n >= mp_edge_pairs->size ()) {
+    return 0;
+  }
+
+  const db::layer<db::EdgePair, db::unstable_layer_tag> &l = mp_edge_pairs->get_layer<db::EdgePair, db::unstable_layer_tag> ();
+  if (n < l.size ()) {
+    return 0;
+  }
+  n -= l.size ();
+
+  const db::layer<db::EdgePairWithProperties, db::unstable_layer_tag> &lp = mp_edge_pairs->get_layer<db::EdgePairWithProperties, db::unstable_layer_tag> ();
+  if (n < lp.size ()) {
+    return lp.begin () [n].properties_id ();
+  }
+
+  return 0;
 }
 
 bool FlatEdgePairs::has_valid_edge_pairs () const

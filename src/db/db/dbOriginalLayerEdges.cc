@@ -233,6 +233,12 @@ OriginalLayerEdges::nth (size_t) const
   throw tl::Exception (tl::to_string (tr ("Random access to edges is available only for flat collections")));
 }
 
+db::properties_id_type
+OriginalLayerEdges::nth_prop_id (size_t) const
+{
+  throw tl::Exception (tl::to_string (tr ("Random access to edges is available only for flat collections")));
+}
+
 bool
 OriginalLayerEdges::has_valid_edges () const
 {

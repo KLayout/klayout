@@ -70,10 +70,11 @@ GSI_PUBLIC void pull_arg (gsi::SerialArgs &retlist, const gsi::ArgType &atype, t
  *  @param atype The argument type
  *  @param arg The value to pass to it
  *  @param loose true for loose checking
+ *  @param object_substitution true to substitute object arguments by lists (using constructor) or employing conversion constructors
  *
  *  @return True, if the argument can be passed
  */
-GSI_PUBLIC bool test_arg (const gsi::ArgType &atype, const tl::Variant &arg, bool loose);
+GSI_PUBLIC bool test_arg (const gsi::ArgType &atype, const tl::Variant &arg, bool loose, bool object_substitution);
 
 }
 

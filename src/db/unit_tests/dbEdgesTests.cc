@@ -1443,6 +1443,25 @@ TEST(32_add_with_properties)
   EXPECT_EQ ((ro1 + rf2).to_string (), "(10,20;40,60){net=>17};(-10,20;20,60){net=>17}");
 }
 
+TEST(33_properties)
+{
+  db::PropertiesSet ps;
+
+  ps.insert (tl::Variant ("id"), 1);
+  db::properties_id_type pid1 = db::properties_id (ps);
+
+  db::Edges edges;
+  edges.insert (db::EdgeWithProperties (db::Edge (db::Point (0, 0), db::Point (10, 20)), pid1));
+  edges.insert (db::Edge (db::Point (0, 0), db::Point (10, 20)));
+
+  EXPECT_EQ (edges.nth (0)->to_string (), "(0,0;10,20)");
+  EXPECT_EQ (edges.nth (1)->to_string (), "(0,0;10,20)");
+  EXPECT_EQ (edges.nth (2) == 0, true);
+
+  EXPECT_EQ (edges.nth_prop_id (0), db::properties_id_type (0));
+  EXPECT_EQ (edges.nth_prop_id (1), pid1);
+}
+
 //  GitHub issue #72 (Edges/Region NOT issue)
 TEST(100)
 {

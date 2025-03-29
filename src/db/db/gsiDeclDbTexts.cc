@@ -455,6 +455,16 @@ static db::Region pull_interacting (const db::Texts *r, const db::Region &other)
   return out;
 }
 
+static tl::Variant nth (const db::Texts *texts, size_t n)
+{
+  const db::Text *t = texts->nth (n);
+  if (! t) {
+    return tl::Variant ();
+  } else {
+    return tl::Variant (db::TextWithProperties (*t, texts->nth_prop_id (n)));
+  }
+}
+
 static db::generic_shape_iterator<db::TextWithProperties> begin_texts (const db::Texts *texts)
 {
   return db::generic_shape_iterator<db::TextWithProperties> (db::make_wp_iter (texts->delegate ()->begin ()));
@@ -846,13 +856,15 @@ Class<db::Texts> decl_Texts (decl_dbShapeCollection, "db", "Texts",
     "\n"
     "Starting with version 0.30, the iterator delivers TextWithProperties objects."
   ) +
-  method ("[]", &db::Texts::nth, gsi::arg ("n"),
+  method_ext ("[]", &nth, gsi::arg ("n"),
     "@brief Returns the nth text\n"
     "\n"
     "This method returns nil if the index is out of range. It is available for flat texts only - i.e. "
     "those for which \\has_valid_texts? is true. Use \\flatten to explicitly flatten an text collection.\n"
     "\n"
-    "The \\each iterator is the more general approach to access the texts."
+    "The \\each iterator is the more general approach to access the texts.\n"
+    "\n"
+    "Since version 0.30.1, this method returns a \\TextWithProperties object."
   ) +
   method ("flatten", &db::Texts::flatten,
     "@brief Explicitly flattens an text collection\n"

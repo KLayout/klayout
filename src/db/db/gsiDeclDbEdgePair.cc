@@ -370,7 +370,7 @@ static db::DEdgePairWithProperties *new_dedge_pair_with_properties2 (const db::D
   return new db::DEdgePairWithProperties (edge_pair, db::properties_id (db::PropertiesSet (properties.begin (), properties.end ())));
 }
 
-Class<db::DEdgePairWithProperties> decl_DEdgePairWithProperties (decl_EdgePair, "db", "DEdgePairWithProperties",
+Class<db::DEdgePairWithProperties> decl_DEdgePairWithProperties (decl_DEdgePair, "db", "DEdgePairWithProperties",
   gsi::properties_support_methods<db::DEdgePairWithProperties> () +
   constructor ("new", &new_dedge_pair_with_properties, gsi::arg ("edge_pair"), gsi::arg ("properties_id", db::properties_id_type (0)),
     "@brief Creates a new object from a property-less object and a properties ID."

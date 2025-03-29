@@ -1379,6 +1379,16 @@ rasterize1 (const db::Region *region, const db::Point &origin, const db::Vector 
   return rasterize2 (region, origin, pixel_size, pixel_size, nx, ny);
 }
 
+static tl::Variant nth (const db::Region *region, size_t n)
+{
+  const db::Polygon *poly = region->nth (n);
+  if (! poly) {
+    return tl::Variant ();
+  } else {
+    return tl::Variant (db::PolygonWithProperties (*poly, region->nth_prop_id (n)));
+  }
+}
+
 static db::generic_shape_iterator<db::PolygonWithProperties> begin_region (const db::Region *region)
 {
   return db::generic_shape_iterator<db::PolygonWithProperties> (db::make_wp_iter (region->delegate ()->begin ()));
@@ -4103,14 +4113,16 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "This returns the raw polygons if merged semantics is disabled or the merged ones if merged semantics is enabled.\n"
     "Starting with version 0.30, the iterator delivers a RegionWithProperties object."
   ) +
-  method ("[]", &db::Region::nth, gsi::arg ("n"),
+  method_ext ("[]", &nth, gsi::arg ("n"),
     "@brief Returns the nth polygon of the region\n"
     "\n"
     "This method returns nil if the index is out of range. It is available for flat regions only - i.e. "
     "those for which \\has_valid_polygons? is true. Use \\flatten to explicitly flatten a region.\n"
     "This method returns the raw polygon (not merged polygons, even if merged semantics is enabled).\n"
     "\n"
-    "The \\each iterator is the more general approach to access the polygons."
+    "The \\each iterator is the more general approach to access the polygons.\n"
+    "\n"
+    "Since version 0.30.1, this method returns a \\PolygonWithProperties object."
   ) +
   method ("flatten", &db::Region::flatten,
     "@brief Explicitly flattens a region\n"

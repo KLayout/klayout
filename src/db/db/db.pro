@@ -76,6 +76,7 @@ SOURCES = \
   dbPCellVariant.cc \
   dbPoint.cc \
   dbPolygon.cc \
+  dbPolygonGraph.cc \
   dbPolygonNeighborhood.cc \
   dbPolygonTools.cc \
   dbPolygonGenerators.cc \
@@ -314,6 +315,7 @@ HEADERS = \
   dbPCellVariant.h \
   dbPoint.h \
   dbPolygon.h \
+  dbPolygonGraph.h \
   dbPolygonNeighborhood.h \
   dbPolygonTools.h \
   dbPolygonGenerators.h \

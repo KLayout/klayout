@@ -238,9 +238,16 @@ PYAObjectBase::object_destroyed ()
 
     detach ();
 
-    //  NOTE: this may delete "this"!
-    if (!prev_owner) {
-      Py_DECREF (py_object ());
+    if (! prev_owner) {
+      const gsi::ClassBase *cls = cls_decl ();
+      if (cls && cls->is_managed ()) {
+        //  If the object was owned on C++ side before, we need to decrement the
+        //  reference count to reflect the fact, that there no longer is an external
+        //  owner.
+        //  NOTE: this may delete "this", hence we return
+        Py_DECREF (py_object ());
+        return;
+      }
     }
 
   }
@@ -249,31 +256,44 @@ PYAObjectBase::object_destroyed ()
 void 
 PYAObjectBase::release ()
 {
+  //  "release" means to release ownership of the C++ object on the C++ side.
+  //  In other words: to transfer ownership to the script side. Specifically to
+  //  transfer it to the Python domain.
+
   //  If the object is managed we first reset the ownership of all other clients
   //  and then make us the owner
   const gsi::ClassBase *cls = cls_decl ();
   if (cls && cls->is_managed ()) {
     void *o = obj ();
     if (o) {
+      //  NOTE: "keep" means "move ownership of the C++ object to C++". In other words,
+      //  release ownership of the C++ object on script side.
       cls->gsi_object (o)->keep ();
+      if (! m_owned) {
+        //  We have to *decrement* the reference count as now there is no other entity
+        //  holding a reference to this Python object.
+        //  NOTE: this may delete "this", hence we return
+        m_owned = true;
+        Py_DECREF (py_object ());
+        return;
+      }
     }
   }
 
-  //  NOTE: this is fairly dangerous
-  if (!m_owned) {
-    m_owned = true;
-    //  NOTE: this may delete "this"! TODO: this should not happen. Can we assert that somehow?
-    Py_DECREF (py_object ());
-  }
+  m_owned = true;
 }
 
 void
 PYAObjectBase::keep_internal ()
 {
   if (m_owned) {
+    //  "keep" means to transfer ownership of the C++ object to C++ side, while
+    //  "m_owned" refers to ownership on the Python side. So if we perform this
+    //  transfer, we need to reflect the fact that there is another entity holding
+    //  a reference.
     Py_INCREF (py_object ());
-    m_owned = false;
   }
+  m_owned = false;
 }
 
 void 
@@ -284,9 +304,11 @@ PYAObjectBase::keep ()
     void *o = obj ();
     if (o) {
       if (cls->is_managed ()) {
+        //  dispatch the keep notification - this will call "keep_internal" through the
+        //  event handler (StatusChangedListener)
         cls->gsi_object (o)->keep ();
       } else {
-        keep_internal ();
+        m_owned = false;
       }
     }
   }
@@ -341,15 +363,17 @@ PYAObjectBase::set (void *obj, bool owned, bool const_ref, bool can_destroy)
 
   if (cls->is_managed ()) {
     gsi::ObjectBase *gsi_object = cls->gsi_object (m_obj);
-    //  Consider the case of "keep inside constructor"
     if (gsi_object->already_kept ()) {
-      keep_internal ();
+      //  Consider the case of "keep inside constructor"
+      m_owned = false;
+    }
+    if (! m_owned) {
+      //  "m_owned = false" means ownership of the C++ object is on C++ side,
+      //  and not on script side. In that case, we need to increment the
+      //  reference count to reflect the fact that there is an external owner.
+      Py_INCREF (py_object ());
     }
     gsi_object->status_changed_event ().add (mp_listener, &StatusChangedListener::object_status_changed);
-  }
-
-  if (!m_owned) {
-    Py_INCREF (py_object ());
   }
 }
 
@@ -587,7 +611,7 @@ PYAObjectBase::obj ()
       throw tl::Exception (tl::to_string (tr ("Object has been destroyed already")));
     } else {
       //  delayed creation of a detached C++ object ..
-      set(cls_decl ()->create (), true, false, true);
+      set (cls_decl ()->create (), true, false, true);
     }
   }
 

@@ -684,7 +684,7 @@ class DBLayoutTest(unittest.TestCase):
     ly = pya.Layout(True)
     pv = [ [ 17, "a" ], [ "b", [ 1, 5, 7 ] ] ]
     pid = ly.properties_id( pv )
-    # does not work? @@@
+    # does not work? 
     # pv = { 17: "a", "b": [ 1, 5, 7 ] }
     # pid2 = ly.properties_id( pv )
     # self.assertEqual( pid, pid2 )

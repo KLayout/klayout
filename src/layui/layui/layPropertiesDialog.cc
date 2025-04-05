@@ -197,7 +197,7 @@ PropertiesDialog::PropertiesDialog (QWidget * /*parent*/, db::Manager *manager, 
   }
   for (size_t i = 0; i < mp_properties_pages.size (); ++i) {
     mp_stack->addWidget (mp_properties_pages [i]);
-    connect (mp_properties_pages [i], SIGNAL (edited ()), this, SLOT (apply ()));
+    connect (mp_properties_pages [i], SIGNAL (edited ()), this, SLOT (properties_edited ()));
   }
 
   //  Necessary to maintain the page order for UI regression testing of 0.18 vs. 0.19 (because tl::Collection has changed to order) ..
@@ -314,7 +314,7 @@ PropertiesDialog::current_index_changed (const QModelIndex &index, const QModelI
 
         db::Transaction t (mp_manager, tl::to_string (QObject::tr ("Apply changes")), m_transaction_id);
 
-        mp_properties_pages [m_index]->apply ();
+        mp_properties_pages [m_index]->apply (true);
 
         if (! t.is_empty ()) {
           m_transaction_id = t.id ();
@@ -437,7 +437,7 @@ BEGIN_PROTECTED
 
   if (! mp_properties_pages [m_index]->readonly ()) {
     db::Transaction t (mp_manager, tl::to_string (QObject::tr ("Apply changes")), m_transaction_id);
-    mp_properties_pages [m_index]->apply ();
+    mp_properties_pages [m_index]->apply (true);
     if (! t.is_empty ()) {
       m_transaction_id = t.id ();
     }
@@ -485,7 +485,7 @@ BEGIN_PROTECTED
 
   if (! mp_properties_pages [m_index]->readonly ()) {
     db::Transaction t (mp_manager, tl::to_string (QObject::tr ("Apply changes")), m_transaction_id);
-    mp_properties_pages [m_index]->apply ();
+    mp_properties_pages [m_index]->apply (true);
     if (! t.is_empty ()) {
       m_transaction_id = t.id ();
     }
@@ -567,7 +567,7 @@ PropertiesDialog::any_prev () const
 }
 
 void
-PropertiesDialog::apply ()
+PropertiesDialog::properties_edited ()
 {
 BEGIN_PROTECTED
 
@@ -580,9 +580,9 @@ BEGIN_PROTECTED
   try {
 
     if (mp_ui->apply_to_all_cbx->isChecked () && mp_properties_pages [m_index]->can_apply_to_all ()) {
-      mp_properties_pages [m_index]->apply_to_all (mp_ui->relative_cbx->isChecked ());
+      mp_properties_pages [m_index]->apply_to_all (mp_ui->relative_cbx->isChecked (), false);
     } else {
-      mp_properties_pages [m_index]->apply ();
+      mp_properties_pages [m_index]->apply (false);
     }
     mp_properties_pages [m_index]->update ();
 
@@ -632,7 +632,7 @@ BEGIN_PROTECTED
 
     db::Transaction t (mp_manager, tl::to_string (QObject::tr ("Apply changes")), m_transaction_id);
 
-    mp_properties_pages [m_index]->apply ();
+    mp_properties_pages [m_index]->apply (true);
     mp_properties_pages [m_index]->update ();
 
     if (! t.is_empty ()) {

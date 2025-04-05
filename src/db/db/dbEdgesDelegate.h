@@ -280,6 +280,7 @@ public:
   virtual std::pair<EdgesDelegate *, EdgesDelegate *> in_and_out (const Edges &) const = 0;
 
   virtual const db::Edge *nth (size_t n) const = 0;
+  virtual db::properties_id_type nth_prop_id (size_t n) const = 0;
   virtual bool has_valid_edges () const = 0;
   virtual bool has_valid_merged_edges () const = 0;
 

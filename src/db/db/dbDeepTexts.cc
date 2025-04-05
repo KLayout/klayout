@@ -332,6 +332,12 @@ const db::Text *DeepTexts::nth (size_t) const
   throw tl::Exception (tl::to_string (tr ("Random access to texts is available only for flat text collections")));
 }
 
+db::properties_id_type
+DeepTexts::nth_prop_id (size_t) const
+{
+  throw tl::Exception (tl::to_string (tr ("Random access to texts is available only for flat collections")));
+}
+
 bool DeepTexts::has_valid_texts () const
 {
   return false;

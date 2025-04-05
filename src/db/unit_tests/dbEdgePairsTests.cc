@@ -279,3 +279,24 @@ TEST(6_add_with_properties)
   EXPECT_EQ ((ro1 + rf2).to_string (), "(10,20;-20,60)/(10,30;-20,70){net=>17};(-10,20;20,60)/(-10,30;20,70){net=>17}");
 }
 
+TEST(7_properties)
+{
+  db::PropertiesSet ps;
+
+  ps.insert (tl::Variant ("id"), 1);
+  db::properties_id_type pid1 = db::properties_id (ps);
+
+  db::EdgePairs edge_pairs;
+  db::Edge e1 (db::Point (0, 0), db::Point (10, 20));
+  db::Edge e2 (db::Point (1, 2), db::Point (11, 22));
+  edge_pairs.insert (db::EdgePairWithProperties (db::EdgePair (e1, e2), pid1));
+  edge_pairs.insert (db::EdgePair (e1, e2));
+
+  EXPECT_EQ (edge_pairs.nth (0)->to_string (), "(0,0;10,20)/(1,2;11,22)");
+  EXPECT_EQ (edge_pairs.nth (1)->to_string (), "(0,0;10,20)/(1,2;11,22)");
+  EXPECT_EQ (edge_pairs.nth (2) == 0, true);
+
+  EXPECT_EQ (edge_pairs.nth_prop_id (0), db::properties_id_type (0));
+  EXPECT_EQ (edge_pairs.nth_prop_id (1), pid1);
+}
+

@@ -89,6 +89,7 @@ public:
   virtual EdgePairsDelegate *in (const EdgePairs &, bool) const { return new EmptyEdgePairs (); }
 
   virtual const db::EdgePair *nth (size_t) const { tl_assert (false); }
+  virtual db::properties_id_type nth_prop_id (size_t) const { tl_assert (false); }
   virtual bool has_valid_edge_pairs () const { return true; }
 
   virtual const db::RecursiveShapeIterator *iter () const { return 0; }

@@ -572,14 +572,22 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
   if (! silent && ! no_summary) {
 
     if (result) {
-      tl::info << "No differences found";
+      tl::info << tl::to_string (tr ("No differences found"));
     } else {
 
       const char *line_format = "  %-10s %-12s %s";
-      const char *sep = "  -------------------------------------------------------";
 
-      tl::info << "Result summary (layers without differences are not shown):" << tl::endl;
-      tl::info << tl::sprintf (line_format, "Layer", "Output", "Differences (shape count)") << tl::endl << sep;
+      std::string headline;
+      if (deep) {
+        headline = tl::sprintf (line_format, tl::to_string (tr ("Layer")), tl::to_string (tr ("Output")), tl::to_string (tr ("Differences (hierarchical shape count)")));
+      } else {
+        headline = tl::sprintf (line_format, tl::to_string (tr ("Layer")), tl::to_string (tr ("Output")), tl::to_string (tr ("Differences (shape count)")));
+      }
+
+      const char *sep = "  ----------------------------------------------------------------";
+
+      tl::info << tl::to_string (tr ("Result summary (layers without differences are not shown):")) << tl::endl;
+      tl::info << headline << tl::endl << sep;
 
       int ti = -1;
       for (std::map<std::pair<int, db::LayerProperties>, ResultDescriptor>::const_iterator r = results.begin (); r != results.end (); ++r) {
@@ -587,17 +595,17 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
         if (r->first.first != ti) {
           ti = r->first.first;
           if (tolerances[ti] > db::epsilon) {
-            tl::info << tl::endl << "Tolerance " << tl::micron_to_string (tolerances[ti]) << ":" << tl::endl;
-            tl::info << tl::sprintf (line_format, "Layer", "Output", "Differences (shape count)") << tl::endl << sep;
+            tl::info << tl::endl << tl::to_string (tr ("Tolerance ")) << tl::micron_to_string (tolerances[ti]) << ":" << tl::endl;
+            tl::info << headline << tl::endl << sep;
           }
         }
 
         std::string out ("-");
         std::string value;
         if (r->second.layer_a < 0 && ! dont_summarize_missing_layers) {
-          value = "(no such layer in first layout)";
+          value = tl::to_string (tr ("(no such layer in first layout)"));
         } else if (r->second.layer_b < 0 && ! dont_summarize_missing_layers) {
-          value = "(no such layer in second layout)";
+          value = tl::to_string (tr ("(no such layer in second layout)"));
         } else if (! r->second.is_empty ()) {
           if (r->second.layer_output >= 0 && r->second.layout) {
             out = r->second.layout->get_properties (r->second.layer_output).to_string ();
@@ -857,7 +865,7 @@ bool run_deep_xor (const XORData &xor_data)
           result.layer_output = result.layout->insert_layer (lp);
           xor_res.insert_into (xor_data.output_layout, xor_data.output_cell, result.layer_output);
         } else {
-          result.shape_count = xor_res.count ();
+          result.shape_count = xor_res.hier_count ();
         }
 
         ++tol_index;

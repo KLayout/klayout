@@ -1671,6 +1671,7 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
 
     //  skip cell body if the cell is not to be written
     if (skip_cell_body (cref)) {
+      tl::warn << tl::to_string (tr ("Cannot write ghost cell to OASIS - skipping cell: ")) << layout.cell_name (*cell);
       continue;
     }
 

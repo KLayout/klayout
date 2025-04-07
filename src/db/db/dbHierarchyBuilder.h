@@ -249,16 +249,16 @@ public:
   struct CellMapKey
   {
     CellMapKey ()
-      : original_cell (0), inactive (false), skip_shapes (false)
+      : original_cell (0), inactive (false)
     { }
 
-    CellMapKey (db::cell_index_type _original_cell, bool _inactive, const std::set<db::Box> &_clip_region, bool _skip_shapes)
-      : original_cell (_original_cell), inactive (_inactive), clip_region (_clip_region), skip_shapes (_skip_shapes)
+    CellMapKey (db::cell_index_type _original_cell, bool _inactive, const std::set<db::Box> &_clip_region)
+      : original_cell (_original_cell), inactive (_inactive), clip_region (_clip_region)
     { }
 
     bool operator== (const CellMapKey &other) const
     {
-      return original_cell == other.original_cell && inactive == other.inactive && clip_region == other.clip_region && skip_shapes == other.skip_shapes;
+      return original_cell == other.original_cell && inactive == other.inactive && clip_region == other.clip_region;
     }
 
     bool operator< (const CellMapKey &other) const
@@ -266,14 +266,12 @@ public:
       if (original_cell != other.original_cell) { return original_cell < other.original_cell; }
       if (inactive != other.inactive) { return inactive < other.inactive; }
       if (clip_region != other.clip_region) { return clip_region < other.clip_region; }
-      if (skip_shapes != other.skip_shapes) { return skip_shapes < other.skip_shapes; }
       return false;
     }
 
     db::cell_index_type original_cell;
     bool inactive;
     std::set<db::Box> clip_region;
-    bool skip_shapes;
   };
 
 

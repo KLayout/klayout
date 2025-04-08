@@ -278,7 +278,7 @@ LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &opti
 
     //  Warn about cells that could not be resolved
     for (std::map<std::string, db::cell_index_type>::iterator f = foreign_cells.begin (); f != foreign_cells.end (); ++f) {
-      if (f->second != seen) {
+      if (f->second != seen && layout.cell (f->second).is_ghost_cell ()) {
         importer.warn (tl::sprintf (tl::to_string (tr ("Could not find a substitution layout for foreign cell '%s'")),
                                     f->first));
       }

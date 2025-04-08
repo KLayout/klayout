@@ -32,6 +32,7 @@
 #include "gsiExpression.h"
 #include "tlCommandLineParser.h"
 #include "tlThreads.h"
+#include "tlTimer.h"
 
 namespace {
 
@@ -454,6 +455,8 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
       }
     }
   }
+
+  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Total")));
 
   db::Layout layout_a;
   db::Layout layout_b;

@@ -105,7 +105,7 @@ TEST(1A_Flat)
     "Result summary (layers without differences are not shown):\n"
     "\n"
     "  Layer      Output       Differences (shape count)\n"
-    "  -------------------------------------------------------\n"
+    "  ----------------------------------------------------------------\n"
     "  3/0        3/0          30\n"
     "  6/0        6/0          41\n"
     "  8/1        8/1          1\n"
@@ -146,8 +146,8 @@ TEST(1A_Deep)
     "Layer 10/0 is not present in first layout, but in second\n"
     "Result summary (layers without differences are not shown):\n"
     "\n"
-    "  Layer      Output       Differences (shape count)\n"
-    "  -------------------------------------------------------\n"
+    "  Layer      Output       Differences (hierarchical shape count)\n"
+    "  ----------------------------------------------------------------\n"
     "  3/0        3/0          3\n"
     "  6/0        6/0          314\n"
     "  8/1        8/1          1\n"
@@ -177,7 +177,7 @@ TEST(1B_Flat)
     "Result summary (layers without differences are not shown):\n"
     "\n"
     "  Layer      Output       Differences (shape count)\n"
-    "  -------------------------------------------------------\n"
+    "  ----------------------------------------------------------------\n"
     "  3/0        -            30\n"
     "  6/0        -            41\n"
     "  8/1        -            1\n"
@@ -206,9 +206,9 @@ TEST(1B_Deep)
     "Layer 10/0 is not present in first layout, but in second\n"
     "Result summary (layers without differences are not shown):\n"
     "\n"
-    "  Layer      Output       Differences (shape count)\n"
-    "  -------------------------------------------------------\n"
-    "  3/0        -            30\n"
+    "  Layer      Output       Differences (hierarchical shape count)\n"
+    "  ----------------------------------------------------------------\n"
+    "  3/0        -            3\n"
     "  6/0        -            314\n"
     "  8/1        -            1\n"
     "  10/0       -            (no such layer in first layout)\n"
@@ -417,7 +417,7 @@ TEST(3_FlatCount)
     "Result summary (layers without differences are not shown):\n"
     "\n"
     "  Layer      Output       Differences (shape count)\n"
-    "  -------------------------------------------------------\n"
+    "  ----------------------------------------------------------------\n"
     "  3/0        -            31\n"
     "  6/0        -            217\n"
     "  8/1        -            168\n"
@@ -483,7 +483,7 @@ TEST(3_FlatCountHeal)
     "Result summary (layers without differences are not shown):\n"
     "\n"
     "  Layer      Output       Differences (shape count)\n"
-    "  -------------------------------------------------------\n"
+    "  ----------------------------------------------------------------\n"
     "  3/0        -            30\n"
     "  6/0        -            41\n"
     "  8/1        -            1\n"
@@ -754,5 +754,44 @@ TEST(6_Deep)
   db::compare_layouts (this, layout, au, db::NormalizationMode (db::NoNormalization | db::AsPolygons));
   EXPECT_EQ (cap.captured_text (),
     "Layer 10/0 is not present in first layout, but in second\n"
+  );
+}
+
+TEST(7_OptimizeDeep)
+{
+  tl::CaptureChannel cap;
+
+  std::string input_a = tl::testdata ();
+  input_a += "/bd/strmxor_covered1.gds";
+
+  std::string input_b = tl::testdata ();
+  input_b += "/bd/strmxor_covered2.gds";
+
+  std::string au = tl::testdata ();
+  au += "/bd/strmxor_au7d.oas";
+
+  std::string output = this->tmp_file ("tmp.oas");
+
+  const char *argv[] = { "x", "-u", input_a.c_str (), input_b.c_str (), output.c_str () };
+
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
+
+  db::Layout layout;
+
+  {
+    tl::InputStream stream (output);
+    db::Reader reader (stream);
+    reader.read (layout);
+  }
+
+  db::compare_layouts (this, layout, au, db::NormalizationMode (db::NoNormalization | db::AsPolygons));
+  EXPECT_EQ (cap.captured_text (),
+    "Result summary (layers without differences are not shown):\n"
+    "\n"
+    "  Layer      Output       Differences (hierarchical shape count)\n"
+    "  ----------------------------------------------------------------\n"
+    "  2/0        2/0          1\n"
+    "  3/0        3/0          8\n"
+    "\n"
   );
 }

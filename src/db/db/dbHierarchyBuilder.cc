@@ -152,15 +152,17 @@ static std::pair<bool, std::set<db::Box> > compute_clip_variant (const db::Box &
 }
 
 HierarchyBuilder::HierarchyBuilder (db::Layout *target, unsigned int target_layer, const db::ICplxTrans &trans, HierarchyBuilderShapeReceiver *pipe)
-  : mp_target (target), m_initial_pass (true), m_cm_new_entry (false), m_target_layer (target_layer), m_wants_all_cells (false), m_trans (trans)
+  : mp_target (target), m_target_layer (target_layer), m_wants_all_cells (false), m_trans (trans)
 {
   set_shape_receiver (pipe);
+  reset ();
 }
 
 HierarchyBuilder::HierarchyBuilder (db::Layout *target, const db::ICplxTrans &trans, HierarchyBuilderShapeReceiver *pipe)
-  : mp_target (target), m_initial_pass (true), m_cm_new_entry (false), m_target_layer (0), m_wants_all_cells (false), m_trans (trans)
+  : mp_target (target), m_target_layer (0), m_wants_all_cells (false), m_trans (trans)
 {
   set_shape_receiver (pipe);
+  reset ();
 }
 
 HierarchyBuilder::~HierarchyBuilder ()
@@ -178,6 +180,8 @@ void
 HierarchyBuilder::reset ()
 {
   m_initial_pass = true;
+  m_cm_new_entry = false;
+
   mp_initial_cell = 0;
 
   m_cells_to_be_filled.clear ();
@@ -186,7 +190,6 @@ HierarchyBuilder::reset ()
   m_cells_seen.clear ();
   m_cell_stack.clear ();
   m_cm_entry = null_iterator;
-  m_cm_new_entry = false;
 }
 
 const std::pair<db::cell_index_type, std::string> &
@@ -351,7 +354,6 @@ HierarchyBuilder::make_cell_variant (const HierarchyBuilder::CellMapKey &key, co
     if (! key.clip_region.empty ()) {
       cn += "$CLIP_VAR";
       description += "CLIP";
-
     }
     if (key.inactive) {
       cn += "$DIS";
@@ -383,7 +385,7 @@ HierarchyBuilder::make_cell_variant (const HierarchyBuilder::CellMapKey &key, co
 }
 
 HierarchyBuilder::new_inst_mode
-HierarchyBuilder::new_inst (const RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::ICplxTrans &always_apply, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool all)
+HierarchyBuilder::new_inst (const RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::ICplxTrans &always_apply, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool all, bool skip_shapes)
 {
   if (all) {
 
@@ -402,7 +404,7 @@ HierarchyBuilder::new_inst (const RecursiveShapeIterator *iter, const db::CellIn
     }
 
     //  To see the cell once, use NI_single. If we did see the cell already, skip the whole instance array.
-    return (m_cells_seen.find (key) == m_cells_seen.end ()) ? NI_single : NI_skip;
+    return (! skip_shapes && m_cells_seen.find (key) == m_cells_seen.end ()) ? NI_single : NI_skip;
 
   } else {
 
@@ -413,7 +415,7 @@ HierarchyBuilder::new_inst (const RecursiveShapeIterator *iter, const db::CellIn
 }
 
 bool
-HierarchyBuilder::new_inst_member (const RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::ICplxTrans &always_apply, const db::ICplxTrans &trans, const db::Box &region, const box_tree_type *complex_region, bool all)
+HierarchyBuilder::new_inst_member (const RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::ICplxTrans &always_apply, const db::ICplxTrans &trans, const db::Box &region, const box_tree_type *complex_region, bool all, bool skip_shapes)
 {
   if (all) {
 
@@ -441,7 +443,7 @@ HierarchyBuilder::new_inst_member (const RecursiveShapeIterator *iter, const db:
       }
     }
 
-    return (m_cells_seen.find (key) == m_cells_seen.end ());
+    return ! skip_shapes && m_cells_seen.find (key) == m_cells_seen.end ();
 
   }
 }

@@ -42,7 +42,7 @@ TEST(basic)
   db::DBox box (0, 0, 100.0, 200.0);
 
   TestablePolygonGraph pg;
-  pg.insert_polygon (db::DPolygon (box));
+  // @@@ pg.insert_polygon (db::DSimplePolygon (box));
 
   // @@@
   tl::info << pg.to_string ();

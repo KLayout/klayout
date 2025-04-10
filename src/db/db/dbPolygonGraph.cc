@@ -348,8 +348,6 @@ GPolygon::init ()
 
   mp_e.reserve (e.size ());
   mp_e.push_back (e.front ());
-  //  NOTE: we assume the edges follow the clockwise orientation
-  mp_e.back ()->set_right (this);
 
   mp_v.reserve (e.size ());
   mp_v.push_back (mp_e.back ()->v1 ());
@@ -365,8 +363,6 @@ GPolygon::init ()
     tl_assert (i != v2e.end () && i->first == v && i->second != mp_e.back ());
     v2e.erase (i);
     mp_e.push_back (i->second);
-    //  NOTE: we assume the edges follow the clockwise orientation
-    mp_e.back ()->set_right (this);
 
     v = i->second->other (v);
     i = v2e.find (v);
@@ -378,6 +374,33 @@ GPolygon::init ()
       ++i;
     }
 
+  }
+
+  //  establish clockwise order of the vertexes
+
+  double area = 0.0;
+  const db::GVertex *vm1 = vertex (-1), *v0;
+  for (auto i = mp_v.begin (); i != mp_v.end (); ++i) {
+    v0 = *i;
+    area += db::vprod (*vm1 - db::DPoint (), *v0 - *vm1);
+    vm1 = v0;
+  }
+
+  if (area > db::epsilon) {
+    std::reverse (mp_v.begin (), mp_v.end ());
+    std::reverse (mp_e.begin (), mp_e.end ());
+  }
+
+  //  link the polygon to the edges
+
+  for (size_t i = 0; i < size (); ++i) {
+    db::GVertex *v = mp_v[i];
+    db::GPolygonEdge *e = mp_e[i];
+    if (e->v1 () == v) {
+      e->set_right (this);
+    } else {
+      e->set_left (this);
+    }
   }
 }
 
@@ -602,9 +625,12 @@ PolygonGraph::remove_polygon (db::GPolygon *poly)
   }
 }
 
+#if 0 // @@@
 void
-PolygonGraph::insert_polygon (const db::DPolygon &polygon)
+PolygonGraph::convex_decompose (const db::DPolygon &polygon)
 {
+  clear ();
+
   if (polygon.begin_edge ().at_end ()) {
     return;
   }
@@ -612,23 +638,46 @@ PolygonGraph::insert_polygon (const db::DPolygon &polygon)
   std::vector<db::GPolygonEdge *> edges;
 
   for (unsigned int c = 0; c < polygon.holes () + 1; ++c) {
-    const db::DPolygon::contour_type &ctr = polygon.contour (c);
+
+    const db::DSimplePolygon::contour_type &ctr = polygon.contour (c);
+
     db::GVertex *v0 = 0, *vv, *v;
-    for (auto p = ctr.begin (); p != ctr.end (); ++p) {
-      v = create_vertex ((*p).x (), (*p).y ());
+    size_t n = ctr.size ();
+    for (size_t i = 0; i < n; ++i) {
+
+      db::DPoint pm1 = ctr [i > 0 ? i - 1 : n - 1];
+      db::DPoint pp1 = ctr [i + 1 < n ? i + 1 : 0];
+      db::DPoint p = ctr [i];
+
+      bool is_convex = db::vprod_sign (p - pm1, pp1 - p);
+      // @@@
+
+      v = create_vertex (p.x (), p.y ());
       if (! v0) {
         v0 = v;
       } else {
         edges.push_back (create_edge (vv, v));
       }
+
       vv = v;
+
     }
+
     if (v0 && v0 != v) {
       edges.push_back (create_edge (v, v0));
     }
-  }
 
-  create_polygon (edges.begin (), edges.end ());
+  }
+}
+#endif
+
+void
+PolygonGraph::convex_decompose (const db::DPolygon &poly)
+{
+
+  // @@@
+
+
 }
 
 std::string

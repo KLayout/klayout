@@ -1076,3 +1076,293 @@ TEST(triangulate_with_vertexes)
     }
   }
 }
+
+// @@@@@@@@@@q
+
+//  Hertel-Mehlhorn :)
+TEST(JoinTriangles)
+{
+  db::Point contour[] = {
+    db::Point (0, 0),
+    db::Point (0, 100),
+    db::Point (1000, 100),
+    db::Point (1000, 500),
+    db::Point (1100, 500),
+    db::Point (1100, 100),
+    db::Point (2100, 100),
+    db::Point (2100, -1000),
+    db::Point (1050, -1000),
+    db::Point (1050, 0)
+  };
+
+  db::Polygon poly;
+  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour[0]));
+
+  double dbu = 0.001;
+
+  db::Triangles::TriangulateParameters param;
+  param.min_b = 0.0;
+
+  TestableTriangles tri;
+  db::CplxTrans trans = db::DCplxTrans (dbu) * db::CplxTrans (db::Trans (db::Point () - poly.box ().center ()));
+  trans = db::CplxTrans (dbu); // @@@
+  tri.triangulate (poly, param, trans);
+
+  //  @@@ use edge "level"
+  //  @@@ use edges from heap
+  std::unordered_set<db::TriangleEdge *> left;
+
+  for (auto it = tri.begin (); it != tri.end (); ++it) {
+    for (unsigned int i = 0; i < 3; ++i) {
+      db::TriangleEdge *e = it->edge (i);
+      if (e->is_segment ()) {
+        left.insert (e);
+      }
+    }
+  }
+
+  std::unordered_map<db::Vertex *, std::pair<db::DEdge, db::DEdge> > concave_corners; // @@@
+
+  while (! left.empty ()) {
+
+    //  First segment for a new loop
+    db::TriangleEdge *segment = *left.begin ();
+
+    //  walk along the segments in clockwise direction. Find concave
+    //  vertexes and create new vertexes perpendicular to the incoming
+    //  and outgoing edge.
+
+    db::TriangleEdge *start_segment = segment;
+
+    db::Vertex *vfrom = segment->v1 ();
+    db::Vertex *vto = segment->v2 ();
+    if (! segment->right ()) {
+      std::swap (vfrom, vto);
+    }
+
+    do {
+
+      left.erase (segment);
+
+      double vp_max = 0.0;
+      int vp_max_sign = 0;
+      std::pair<db::DEdge, db::DEdge> edges;
+
+      db::TriangleEdge *prev_segment = segment;
+      segment = 0;
+      db::Vertex *vn = 0;
+
+      //  Look for the outgoing edge. We pick the one which bends "most", favoring
+      //  convex corners. Multiple edges per vertex are possible is corner cases such as the
+      //  "hourglass" configuration.
+
+      for (auto e = vto->begin_edges (); e != vto->end_edges (); ++e) {
+
+        db::TriangleEdge *en = *e;
+        if (en != prev_segment && en->is_segment ()) {
+
+          tl_assert (left.find (en) != left.end () || en == start_segment);  // @@@
+          db::Vertex *v = en->other (vto);
+          db::DEdge e1 (*vfrom, *vto);
+          db::DEdge e2 (*vto, *v);
+          double vp = double (db::vprod (e1, e2)) / (e1.double_length () * e2.double_length ());
+
+          //  vp > 0: concave, vp < 0: convex
+
+          if (! segment || vp > vp_max) {
+            vp_max_sign = db::vprod_sign (e1, e2);
+            edges.first = e1;
+            edges.second = e2;
+            vp_max = vp;
+            segment = en;
+            vn = v;
+          }
+
+        }
+
+      }
+
+      tl_assert (segment != 0); // @@@
+
+      if (vp_max_sign > 0) {
+        //  concave corner
+        concave_corners.insert (std::make_pair (vto, edges));
+      }
+
+      vfrom = vto;
+      vto = vn;
+
+    } while (segment != start_segment);
+
+  }
+
+  //  @@@ sort convex vertexes
+
+  std::vector<std::pair<db::DPoint, db::Vertex *> > new_points;
+
+  //  Cut off pieces from convex corners by creating connections to points perpendicular
+  //  to the incoming and outgoing edges
+
+  for (auto cc = concave_corners.begin (); cc != concave_corners.end (); ++cc) {
+
+    auto vtri = cc->first->triangles (); //  @@@ slow?
+
+    std::vector<db::Vertex *> nvv, nvv_next;
+
+    for (unsigned int ei = 0; ei < 2; ++ei) {
+
+      db::DEdge ee = (ei == 0 ? cc->second.first : cc->second.second);
+      db::Vertex *v0 = cc->first;
+
+      for (auto it = vtri.begin (); it != vtri.end (); ++it) {
+
+        //  Search for a segment in the direction perpendicular to the edge
+        nvv.clear ();
+        nvv.push_back (v0);
+        db::Triangle *t = *it;
+
+        while (! nvv.empty ()) {
+
+          nvv_next.clear ();
+
+          for (auto iv = nvv.begin (); iv != nvv.end (); ++iv) {
+
+            db::Vertex *v = *iv;
+            db::TriangleEdge *oe = t->opposite (v);
+            db::Triangle *tt = oe->other (t);
+            db::Vertex *v1 = oe->v1 ();
+            db::Vertex *v2 = oe->v2 ();
+
+            if (db::vprod_sign (*v2 - *v, ee.d ()) >= 0 && db::vprod_sign (*v1 - *v, ee.d ()) >= 0 &&
+                db::sprod_sign (*v2 - *v, ee.d ()) * db::sprod_sign (*v1 - *v, ee.d ()) < 0) {
+
+              //  this triangle covers the normal vector of e1 -> stop here or continue searching in that direction
+              if (oe->is_segment ()) {
+                auto cp = oe->edge ().cut_point (db::DEdge (*v0, *v0 + db::DVector (ee.dy (), -ee.dx ())));
+                if (cp.first) {
+                  new_points.push_back (std::make_pair (cp.second, v0));
+                }
+              } else {
+                //  continue searching in that direction
+                nvv_next.push_back (v1);
+                nvv_next.push_back (v2);
+                t = tt;
+              }
+
+              break;
+
+            }
+
+          }
+
+          nvv.swap (nvv_next);
+
+        }
+
+      }
+
+    }
+
+  }
+
+  //  Insert the new points and make connections
+
+  std::unordered_set<std::pair<db::Vertex *, db::Vertex *> > clip_pairs;
+
+  // @@@ TODO: what to do in case of equal new_points?
+  for (auto p = new_points.begin (); p != new_points.end (); ++p) {
+    auto v = tri.insert_point (p->first);
+    clip_pairs.insert (std::make_pair (v, p->second));
+  }
+
+  //  Combine triangles, but don't cross clip edges
+
+  db::Region result;
+
+  std::unordered_set<const db::Triangle *> left_triangles;
+  for (auto it = tri.begin (); it != tri.end (); ++it) {
+    left_triangles.insert (it.operator-> ());
+  }
+
+  while (! left_triangles.empty ()) {
+
+    std::unordered_map<const db::Vertex *, const db::Vertex *> edges;
+
+    const db::Triangle *tri = *left_triangles.begin ();
+    std::vector<const db::Triangle *> queue, next_queue;
+    queue.push_back (tri);
+
+    while (! queue.empty ()) {
+
+      next_queue.clear ();
+
+      for (auto q = queue.begin (); q != queue.end (); ++q) {
+
+        left_triangles.erase (*q);
+
+        for (unsigned int i = 0; i < 3; ++i) {
+
+          const db::TriangleEdge *e = (*q)->edge (i);
+          const db::Triangle *qq = e->other (*q);
+
+          bool is_outer_edge = false;
+          if (! qq) {
+            is_outer_edge = true;
+          } else if (clip_pairs.find (std::make_pair (e->v1 (), e->v2 ())) != clip_pairs.end () || clip_pairs.find (std::make_pair (e->v2 (), e->v1 ())) != clip_pairs.end ()) {
+            is_outer_edge = true;
+          } else if (concave_corners.find (e->v1 ()) != concave_corners.end () && concave_corners.find (e->v2 ()) != concave_corners.end ()) {
+            is_outer_edge = true;
+          }
+
+          if (is_outer_edge) {
+            if (e->right () == *q) {
+              edges.insert (std::make_pair (e->v1 (), e->v2 ()));
+            } else {
+              edges.insert (std::make_pair (e->v2 (), e->v1 ()));
+            }
+          } else if (left_triangles.find (qq) != left_triangles.end ()) {
+            next_queue.push_back (qq);
+          }
+        }
+
+      }
+
+      queue.swap (next_queue);
+
+    }
+
+    //  stitch the loop points into a polygon
+
+    tl_assert (! edges.empty ());
+
+    const db::Vertex *v = edges.begin ()->first;
+    const db::Vertex *v0 = v;
+    const db::Vertex *vv = edges.begin ()->second;
+
+    std::vector<db::DPoint> polygon_points;
+
+    do {
+
+      polygon_points.push_back (*v);
+
+      auto i = edges.find (vv);
+      tl_assert (i != edges.end ());
+
+      v = i->first;
+      vv = i->second;
+
+    } while (v != v0);
+
+    db::DPolygon poly;
+    poly.assign_hull (polygon_points.begin (), polygon_points.end ());
+    result.insert (trans.inverted () * poly);
+
+  }
+
+  // @@@
+  // tri.dump ("debug.gds");
+  result.write ("debug.gds");
+
+}
+
+// @@@@@@@@@@q

@@ -1081,7 +1081,7 @@ TEST(triangulate_with_vertexes)
 
 struct SortAngleAndEdgesByEdgeLength
 {
-  typedef std::list<std::pair<double, db::TriangleEdge *> > angle_and_edges_list;
+  typedef std::list<std::pair<double, const db::TriangleEdge *> > angle_and_edges_list;
 
   bool operator() (const angle_and_edges_list::iterator &a, const angle_and_edges_list::iterator &b) const
   {
@@ -1092,6 +1092,26 @@ struct SortAngleAndEdgesByEdgeLength
     } else {
       return a->second->edge ().less (b->second->edge ());
     }
+  }
+};
+
+//  TODO: move to some generic header
+template <class T>
+struct less_compare_func
+{
+  bool operator() (const T &a, const T &b) const
+  {
+    return a.less (b);
+  }
+};
+
+//  TODO: move to some generic header
+template <class T>
+struct equal_compare_func
+{
+  bool operator() (const T &a, const T &b) const
+  {
+    return a.equal (b);
   }
 };
 
@@ -1113,13 +1133,13 @@ struct ConcaveCorner
   db::TriangleEdge *incoming, *outgoing;
 };
 
-db::TriangleEdge *find_outgoing_segment (db::Vertex *vertex, db::TriangleEdge *incoming, bool &is_concave)
+db::TriangleEdge *find_outgoing_segment (db::Vertex *vertex, db::TriangleEdge *incoming, int &vp_max_sign)
 {
   db::Vertex *vfrom = incoming->other (vertex);
   db::DEdge e1 (*vfrom, *vertex);
 
   double vp_max = 0.0;
-  int vp_max_sign = 0;
+  vp_max_sign = 0;
   db::TriangleEdge *outgoing = 0;
 
   //  Look for the outgoing edge. We pick the one which bends "most", favoring
@@ -1146,8 +1166,6 @@ db::TriangleEdge *find_outgoing_segment (db::Vertex *vertex, db::TriangleEdge *i
     }
 
   }
-
-  is_concave = (vp_max_sign > 0);
 
   tl_assert (outgoing != 0);
   return outgoing;
@@ -1188,10 +1206,10 @@ void collect_concave_vertexes (db::Triangles &tris, std::vector<ConcaveCorner> &
 
       db::TriangleEdge *prev_segment = segment;
 
-      bool is_concave = false;
-      segment = find_outgoing_segment (vto, prev_segment, is_concave);
+      int vp_sign = 0;
+      segment = find_outgoing_segment (vto, prev_segment, vp_sign);
 
-      if (is_concave) {
+      if (vp_sign > 0) {
         concave_vertexes.push_back (ConcaveCorner (vto, prev_segment, segment));
       }
 
@@ -1202,122 +1220,94 @@ void collect_concave_vertexes (db::Triangles &tris, std::vector<ConcaveCorner> &
   }
 }
 
-//  Hertel-Mehlhorn :)
-TEST(JoinTriangles)
+std::pair<bool, db::DPoint>
+search_crossing_with_next_segment (const db::Vertex *v0, const db::DVector &direction)
 {
-#if 1
-  db::Point contour[] = {
-    db::Point (0, 0),
-    db::Point (0, 100),
-    db::Point (1000, 100),
-    db::Point (1000, 500),
-    db::Point (1100, 500),
-    db::Point (1100, 100),
-    db::Point (2100, 100),
-    db::Point (2100, 0)
-  };
-#else
+  auto vtri = v0->triangles ();  //  TODO: slow?
+  std::vector<const db::Vertex *> nvv, nvv_next;
 
-  db::Point contour[] = {
-    db::Point (0, 0),
-    db::Point (0, 100),
-    db::Point (1000, 100),
-    db::Point (1000, 500),
-    db::Point (1100, 500),
-    db::Point (1100, 100),
-    db::Point (2100, 100),
-    db::Point (2100, -1000),
-    db::Point (1050, -1000),
-    db::Point (1050, 0)
-  };
-#endif
+  for (auto it = vtri.begin (); it != vtri.end (); ++it) {
 
-  db::Polygon poly;
-  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour[0]));
+    //  Search for a segment in the direction perpendicular to the edge
+    nvv.clear ();
+    nvv.push_back (v0);
+    const db::Triangle *t = *it;
 
-  //  @@@ don't to anything if already convex
+    while (! nvv.empty ()) {
 
-  double dbu = 0.001;
+      nvv_next.clear ();
 
-  db::Triangles::TriangulateParameters param;
-  param.min_b = 0.0;
+      for (auto iv = nvv.begin (); iv != nvv.end (); ++iv) {
 
-  TestableTriangles tri;
-  db::CplxTrans trans = db::DCplxTrans (dbu) * db::CplxTrans (db::Trans (db::Point () - poly.box ().center ()));
-  trans = db::CplxTrans (dbu); // @@@
-  tri.triangulate (poly, param, trans);
+        const db::Vertex *v = *iv;
+        const db::TriangleEdge *oe = t->opposite (v);
+        const db::Triangle *tt = oe->other (t);
+        const db::Vertex *v1 = oe->v1 ();
+        const db::Vertex *v2 = oe->v2 ();
 
+        if (db::sprod_sign (*v2 - *v, direction) >= 0 && db::sprod_sign (*v1 - *v, direction) >= 0 &&
+            db::vprod_sign (*v2 - *v, direction) * db::vprod_sign (*v1 - *v, direction) < 0) {
+
+          //  this triangle covers the normal vector of e1 -> stop here or continue searching in that direction
+          if (oe->is_segment ()) {
+            auto cp = oe->edge ().cut_point (db::DEdge (*v0, *v0 + direction));
+            if (cp.first) {
+              return std::make_pair (true, cp.second);
+            }
+          } else {
+            //  continue searching in that direction
+            nvv_next.push_back (v1);
+            nvv_next.push_back (v2);
+            t = tt;
+          }
+
+          break;
+
+        }
+
+      }
+
+      nvv.swap (nvv_next);
+
+    }
+
+  }
+
+  return std::make_pair (false, db::DPoint ());
+}
+
+void
+hertel_mehlhorn_decomposition (db::Triangles &tri, bool diagonals_only, bool no_collinear_edges, std::list<db::DPolygon> &polygons)
+{
   std::vector<ConcaveCorner> concave_vertexes;
   collect_concave_vertexes (tri, concave_vertexes);
 
   //  @@@ return if no concave corners
 
-  //  @@@ sort convex vertexes
+  //  @@@ sort concave vertexes
 
   std::vector<db::DPoint> new_points;
 
-  //  Cut off pieces from convex corners by creating connections to points perpendicular
-  //  to the incoming and outgoing edges
+  if (! diagonals_only) {
 
-  for (auto cc = concave_vertexes.begin (); cc != concave_vertexes.end (); ++cc) {
+    //  Create internal segments cutting off pieces orthogonal to the edges
+    //  connecting the concave vertex.
 
-    auto vtri = cc->corner->triangles (); //  @@@ slow?
+    for (auto cc = concave_vertexes.begin (); cc != concave_vertexes.end (); ++cc) {
 
-    std::vector<db::Vertex *> nvv, nvv_next;
+      for (unsigned int ei = 0; ei < 2; ++ei) {
 
-    for (unsigned int ei = 0; ei < 2; ++ei) {
+        db::DEdge ee;
+        const db::Vertex *v0 = cc->corner;
+        if (ei == 0) {
+          ee = db::DEdge (*cc->incoming->other (v0), *v0);
+        } else {
+          ee = db::DEdge (*v0, *cc->outgoing->other (v0));
+        }
 
-      db::DEdge ee;
-      db::Vertex *v0 = cc->corner;
-      if (ei == 0) {
-        ee = db::DEdge (*cc->incoming->other (v0), *v0);
-      } else {
-        ee = db::DEdge (*v0, *cc->outgoing->other (v0));
-      }
-
-      for (auto it = vtri.begin (); it != vtri.end (); ++it) {
-
-        //  Search for a segment in the direction perpendicular to the edge
-        nvv.clear ();
-        nvv.push_back (v0);
-        db::Triangle *t = *it;
-
-        while (! nvv.empty ()) {
-
-          nvv_next.clear ();
-
-          for (auto iv = nvv.begin (); iv != nvv.end (); ++iv) {
-
-            db::Vertex *v = *iv;
-            db::TriangleEdge *oe = t->opposite (v);
-            db::Triangle *tt = oe->other (t);
-            db::Vertex *v1 = oe->v1 ();
-            db::Vertex *v2 = oe->v2 ();
-
-            if (db::vprod_sign (*v2 - *v, ee.d ()) >= 0 && db::vprod_sign (*v1 - *v, ee.d ()) >= 0 &&
-                db::sprod_sign (*v2 - *v, ee.d ()) * db::sprod_sign (*v1 - *v, ee.d ()) < 0) {
-
-              //  this triangle covers the normal vector of e1 -> stop here or continue searching in that direction
-              if (oe->is_segment ()) {
-                auto cp = oe->edge ().cut_point (db::DEdge (*v0, *v0 + db::DVector (ee.dy (), -ee.dx ())));
-                if (cp.first) {
-                  new_points.push_back (cp.second);
-                }
-              } else {
-                //  continue searching in that direction
-                nvv_next.push_back (v1);
-                nvv_next.push_back (v2);
-                t = tt;
-              }
-
-              break;
-
-            }
-
-          }
-
-          nvv.swap (nvv_next);
-
+        auto cp = search_crossing_with_next_segment (v0, db::DVector (ee.dy (), -ee.dx ()));
+        if (cp.first) {
+          new_points.push_back (cp.second);
         }
 
       }
@@ -1326,16 +1316,21 @@ TEST(JoinTriangles)
 
   }
 
-  //  Insert the new points and make connections
-
-  // @@@ TODO: what to do in case of equal new_points?
-  //  -> sort, remove duplicates
-  for (auto p = new_points.begin (); p != new_points.end (); ++p) {
-    tri.insert_point (*p);
-  }
+  //  eliminate duplicates and put the new points in some order
 
   if (! new_points.empty ()) {
+
+    std::sort (new_points.begin (), new_points.end (), less_compare_func<db::DPoint> ());
+    new_points.erase (std::unique (new_points.begin (), new_points.end (), equal_compare_func<db::DPoint> ()), new_points.end ());
+
+    //  Insert the new points and make connections
+    for (auto p = new_points.begin (); p != new_points.end (); ++p) {
+      tri.insert_point (*p);
+    }
+
+    //  As the insertion invalidates the edges, we need to collect the concave vertexes again
     collect_concave_vertexes (tri, concave_vertexes);
+
   }
 
   //  Collect essential edges
@@ -1345,27 +1340,25 @@ TEST(JoinTriangles)
 
   std::unordered_set<const db::TriangleEdge *> essential_edges;
 
-  typedef std::list<std::pair<double, db::TriangleEdge *> > angles_and_edges_list;
+  typedef std::list<std::pair<double, const db::TriangleEdge *> > angles_and_edges_list;
   angles_and_edges_list angles_and_edges;
   std::vector<angles_and_edges_list::iterator> sorted_edges;
 
   for (auto cc = concave_vertexes.begin (); cc != concave_vertexes.end (); ++cc) {
 
-    std::cout << "@@@ cc=" << cc->corner->to_string () << ", in: " << cc->incoming->to_string () << ", out: " << cc->outgoing->to_string () << std::endl; // @@@
-
     angles_and_edges.clear ();
-    db::Vertex *v0 = cc->corner;
+    const db::Vertex *v0 = cc->corner;
 
-    db::TriangleEdge *e = cc->incoming;
+    const db::TriangleEdge *e = cc->incoming;
     while (e) {
 
-      db::Triangle *t = e->v2 () == v0 ? e->right () : e->left ();
+      const db::Triangle *t = e->v2 () == v0 ? e->right () : e->left ();
       tl_assert (t != 0);
 
       //  @@@ make a method of triangle
-      db::TriangleEdge *en = 0;
+      const db::TriangleEdge *en = 0;
       for (unsigned int i = 0; i < 3; ++i) {
-        db::TriangleEdge *ee = t->edge (i);
+        const db::TriangleEdge *ee = t->edge (i);
         if (ee != e && (ee->v1 () == v0 || ee->v2 () == v0)) {
           en = ee;
           break;
@@ -1379,7 +1372,6 @@ TEST(JoinTriangles)
 
       e = (en == cc->outgoing) ? 0 : en;
       angles_and_edges.push_back (std::make_pair (angle, e));
-      std::cout << "@@@ [a,e] =" << angle << "," << (e ? e->to_string () : std::string ("ENDL")) << std::endl; // @@@
 
     }
 
@@ -1398,13 +1390,10 @@ TEST(JoinTriangles)
       angles_and_edges_list::iterator ii = *i;
       angles_and_edges_list::iterator iin = ii;
       ++iin;
-      std::cout << "@@@ checking [a,e] =" << ii->first << "," << iin->first << "," << ii->second->to_string () << std::endl; // @@@
-      if (ii->first + iin->first < M_PI - db::epsilon) {
-        printf("@@@ %.12g, %.12g\n", ii->first + iin->first, M_PI); // @@@
+      if (ii->first + iin->first < (no_collinear_edges ? M_PI - db::epsilon : M_PI + db::epsilon)) {
         //  not an essential edge -> remove
         iin->first += ii->first;
         angles_and_edges.erase (ii);
-        std::cout << "@@@ -> not essential" << std::endl; // @@@
       }
     }
 
@@ -1415,8 +1404,6 @@ TEST(JoinTriangles)
   }
 
   //  Combine triangles, but don't cross essential edges
-
-  db::Region result;
 
   std::unordered_set<const db::Triangle *> left_triangles;
   for (auto it = tri.begin (); it != tri.end (); ++it) {
@@ -1483,10 +1470,63 @@ TEST(JoinTriangles)
 
     } while (v != v0);
 
-    db::DPolygon poly;
-    poly.assign_hull (polygon_points.begin (), polygon_points.end ());
-    result.insert (trans.inverted () * poly);
+    polygons.push_back (db::DPolygon ());
+    polygons.back ().assign_hull (polygon_points.begin (), polygon_points.end ());
 
+  }
+}
+
+
+//  Hertel-Mehlhorn :)
+TEST(JoinTriangles)
+{
+#if 0
+  db::Point contour[] = {
+    db::Point (0, 0),
+    db::Point (0, 100),
+    db::Point (1000, 100),
+    db::Point (1000, 500),
+    db::Point (1100, 500),
+    db::Point (1100, 100),
+    db::Point (2100, 100),
+    db::Point (2100, 0)
+  };
+#else
+
+  db::Point contour[] = {
+    db::Point (0, 0),
+    db::Point (0, 100),
+    db::Point (1000, 100),
+    db::Point (1000, 500),
+    db::Point (1100, 500),
+    db::Point (1100, 100),
+    db::Point (2100, 100),
+    db::Point (2100, -1000),
+    db::Point (150, -1000),
+    db::Point (150, 0)
+  };
+#endif
+
+  db::Polygon poly;
+  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour[0]));
+
+  //  @@@ don't to anything if already convex
+
+  double dbu = 0.001;
+
+  db::Triangles::TriangulateParameters param;
+  param.min_b = 0.0;
+
+  TestableTriangles tri;
+  db::CplxTrans trans = db::CplxTrans (dbu);
+  tri.triangulate (poly, param, trans);
+
+  std::list<db::DPolygon> polygons;
+  hertel_mehlhorn_decomposition (tri, false, true, polygons);
+
+  db::Region result;
+  for (auto p = polygons.begin (); p != polygons.end (); ++p) {
+    result.insert (trans.inverted () * *p);
   }
 
   // @@@

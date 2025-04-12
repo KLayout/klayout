@@ -171,6 +171,17 @@ public:
   void triangulate (const db::DPolygon &poly, const std::vector<db::DPoint> &vertexes, const TriangulateParameters &parameters, const db::DCplxTrans &trans = db::DCplxTrans ());
 
   /**
+   *  @brief Inserts a new vertex as the given point
+   *
+   *  If "new_triangles" is not null, it will receive the list of new triangles created during
+   *  the remove step.
+   *
+   *  This method can be called after "triangulate" to add new points and adjust the triangulation.
+   *  Inserting new points will maintain the (constrained) Delaunay condition.
+   */
+  db::Vertex *insert_point (const db::DPoint &point, std::list<tl::weak_ptr<db::Triangle> > *new_triangles = 0);
+
+  /**
    *  @brief Statistics: number of flips (fixing)
    */
   size_t flips () const
@@ -213,14 +224,6 @@ protected:
    *  @brief Finds the points within (not "on") a circle of radius "radius" around the given vertex.
    */
   std::vector<db::Vertex *> find_points_around (Vertex *vertex, double radius);
-
-  /**
-   *  @brief Inserts a new vertex as the given point
-   *
-   *  If "new_triangles" is not null, it will receive the list of new triangles created during
-   *  the remove step.
-   */
-  db::Vertex *insert_point (const db::DPoint &point, std::list<tl::weak_ptr<db::Triangle> > *new_triangles = 0);
 
   /**
    *  @brief Inserts a new vertex as the given point

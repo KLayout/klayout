@@ -24,7 +24,6 @@
 #define HDR_dbPLC
 
 #include "dbCommon.h"
-#include "dbTriangle.h"
 #include "dbBox.h"
 #include "dbRegion.h"
 

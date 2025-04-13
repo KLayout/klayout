@@ -28,13 +28,13 @@
 #include "dbPolygonTools.h"
 #include "dbPolygonGenerators.h"
 #include "dbHash.h"
-#include "dbTriangles.h"
+#include "dbPLCTriangulation.h"
 
 namespace gsi
 {
 
 template <class T>
-static db::Region region_from_triangles (const db::Triangles &tri, const T &trans)
+static db::Region region_from_triangles (const db::plc::Graph &tri, const T &trans)
 {
   db::Region result;
 
@@ -53,10 +53,10 @@ static db::Region region_from_triangles (const db::Triangles &tri, const T &tran
 }
 
 template <class P, class T>
-static std::vector<P> polygons_from_triangles (const db::Triangles &tri, const T &trans)
+static std::vector<P> polygons_from_triangles (const db::plc::Graph &tri, const T &trans)
 {
   std::vector<P> result;
-  result.reserve (tri.num_triangles ());
+  result.reserve (tri.num_polygons ());
 
   typename P::point_type pts [3];
 
@@ -89,14 +89,15 @@ static db::polygon<C> to_polygon (const db::polygon<C> &p)
 template <class P>
 static db::Region triangulate_ipolygon (const P *p, double max_area = 0.0, double min_b = 0.0, double dbu = 0.001)
 {
-  db::Triangles tris;
-  db::Triangles::TriangulateParameters param;
+  db::plc::Graph tris;
+  db::plc::Triangulation triangulation (&tris);
+  db::plc::TriangulationParameters param;
   param.min_b = min_b;
   param.max_area = max_area * dbu * dbu;
 
   db::CplxTrans trans = db::CplxTrans (dbu) * db::ICplxTrans (db::Trans (db::Point () - p->box ().center ()));
 
-  tris.triangulate (to_polygon (*p), param, trans);
+  triangulation.triangulate (to_polygon (*p), param, trans);
 
   return region_from_triangles (tris, trans.inverted ());
 }
@@ -104,14 +105,15 @@ static db::Region triangulate_ipolygon (const P *p, double max_area = 0.0, doubl
 template <class P>
 static db::Region triangulate_ipolygon_v (const P *p, const std::vector<db::Point> &vertexes, double max_area = 0.0, double min_b = 0.0, double dbu = 0.001)
 {
-  db::Triangles tris;
-  db::Triangles::TriangulateParameters param;
+  db::plc::Graph tris;
+  db::plc::Triangulation triangulation (&tris);
+  db::plc::TriangulationParameters param;
   param.min_b = min_b;
   param.max_area = max_area * dbu * dbu;
 
   db::CplxTrans trans = db::CplxTrans (dbu) * db::ICplxTrans (db::Trans (db::Point () - p->box ().center ()));
 
-  tris.triangulate (to_polygon (*p), vertexes, param, trans);
+  triangulation.triangulate (to_polygon (*p), vertexes, param, trans);
 
   return region_from_triangles (tris, trans.inverted ());
 }
@@ -119,14 +121,15 @@ static db::Region triangulate_ipolygon_v (const P *p, const std::vector<db::Poin
 template <class P>
 static std::vector<P> triangulate_dpolygon (const P *p, double max_area = 0.0, double min_b = 0.0)
 {
-  db::Triangles tris;
-  db::Triangles::TriangulateParameters param;
+  db::plc::Graph tris;
+  db::plc::Triangulation triangulation (&tris);
+  db::plc::TriangulationParameters param;
   param.min_b = min_b;
   param.max_area = max_area;
 
   db::DCplxTrans trans = db::DCplxTrans (db::DTrans (db::DPoint () - p->box ().center ()));
 
-  tris.triangulate (to_polygon (*p), param, trans);
+  triangulation.triangulate (to_polygon (*p), param, trans);
 
   return polygons_from_triangles<P, db::DCplxTrans> (tris, trans.inverted ());
 }
@@ -134,14 +137,15 @@ static std::vector<P> triangulate_dpolygon (const P *p, double max_area = 0.0, d
 template <class P>
 static std::vector<P> triangulate_dpolygon_v (const P *p, const std::vector<db::DPoint> &vertexes, double max_area = 0.0, double min_b = 0.0)
 {
-  db::Triangles tris;
-  db::Triangles::TriangulateParameters param;
+  db::plc::Graph tris;
+  db::plc::Triangulation triangulation (&tris);
+  db::plc::TriangulationParameters param;
   param.min_b = min_b;
   param.max_area = max_area;
 
   db::DCplxTrans trans = db::DCplxTrans (db::DTrans (db::DPoint () - p->box ().center ()));
 
-  tris.triangulate (to_polygon (*p), vertexes, param, trans);
+  triangulation.triangulate (to_polygon (*p), vertexes, param, trans);
 
   return polygons_from_triangles<P, db::DCplxTrans> (tris, trans.inverted ());
 }

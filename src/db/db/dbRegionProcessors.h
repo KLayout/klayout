@@ -28,7 +28,7 @@
 #include "dbRegionDelegate.h"
 #include "dbPolygonTools.h"
 #include "dbEdgesUtils.h"
-#include "dbTriangles.h"
+#include "dbPLCTriangulation.h"
 #include "dbEdgePairRelations.h"
 
 namespace db
@@ -497,7 +497,7 @@ public:
   virtual bool wants_variants () const { return true; }
 
 private:
-  db::Triangles::TriangulateParameters m_param;
+  db::plc::TriangulationParameters m_param;
   db::MagnificationReducer m_vars;
 };
 

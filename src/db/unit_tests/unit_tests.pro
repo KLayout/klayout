@@ -12,7 +12,8 @@ SOURCES = \
   dbFillToolTests.cc \
   dbLogTests.cc \
   dbObjectWithPropertiesTests.cc \
-  dbPLCGraphTest.cc \
+  dbPLCGraphTests.cc \
+  dbPLCTests.cc \
   dbPLCTriangulationTests.cc \
   dbPolygonNeighborhoodTests.cc \
   dbPropertiesFilterTests.cc \

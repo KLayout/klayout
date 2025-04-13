@@ -157,14 +157,15 @@ public:
     return in_circle (*this, center, radius);
   }
 
-private:
-  friend class Edge;
-  friend class Graph;
-
+protected:
   Vertex (Graph *graph);
   Vertex (Graph *graph, const DPoint &p);
   Vertex (Graph *graph, const Vertex &v);
   Vertex (Graph *graph, db::DCoord x, db::DCoord y);
+
+private:
+  friend class Edge;
+  friend class Graph;
 
   void remove_edge (const edges_iterator_non_const &ec)
   {
@@ -491,20 +492,19 @@ protected:
   void unlink ();
   void link ();
 
-private:
-  friend class Polygon;
-  friend class Graph;
-  friend class Triangulation;
-
   void set_level (size_t l) { m_level = l; }
   size_t level () const { return m_level; }
 
   void set_id (size_t id) { m_id = id; }
-
   void set_is_segment (bool is_seg) { m_is_segment = is_seg; }
 
   Edge (Graph *graph);
   Edge (Graph *graph, Vertex *v1, Vertex *v2);
+
+private:
+  friend class Polygon;
+  friend class Graph;
+  friend class Triangulation;
 
   Graph *mp_graph;
   Vertex *mp_v1, *mp_v2;
@@ -538,9 +538,6 @@ class DB_PUBLIC Polygon
   : public tl::list_node<Polygon>, public tl::Object
 {
 public:
-  Polygon (Graph *graph);
-  Polygon (Graph *graph, Edge *e1, Edge *e2, Edge *e3);
-
   template<class Iter>
   Polygon (Graph *graph, Iter from, Iter to)
     : mp_graph (graph), mp_e (from, to)
@@ -695,7 +692,13 @@ public:
    */
   unsigned int num_segments () const;
 
+protected:
+  Polygon (Graph *graph);
+  Polygon (Graph *graph, Edge *e1, Edge *e2, Edge *e3);
+
 private:
+  friend class Graph;
+
   Graph *mp_graph;
   bool m_is_outside;
   std::vector<Edge *> mp_e;

@@ -21,22 +21,55 @@
 */
 
 
-#include "dbTriangle.h"
+#include "dbPLC.h"
 #include "tlUnitTest.h"
 
 #include <list>
 #include <memory>
 
 class TestableEdge
-  : public db::TriangleEdge
+  : public db::plc::Edge
 {
 public:
-  using db::TriangleEdge::TriangleEdge;
-  using db::TriangleEdge::link;
-  using db::TriangleEdge::unlink;
+  using db::plc::Edge::Edge;
+  using db::plc::Edge::link;
+  using db::plc::Edge::unlink;
+  using db::plc::Edge::set_is_segment;
+  using db::plc::Edge::set_level;
+  using db::plc::Edge::level;
 
-  TestableEdge (db::Vertex *v1, db::Vertex *v2)
-    : db::TriangleEdge (v1, v2)
+  TestableEdge (db::plc::Vertex *v1, db::plc::Vertex *v2)
+    : db::plc::Edge (0, v1, v2)
+  { }
+};
+
+class TestableVertex
+  : public db::plc::Vertex
+{
+public:
+  TestableVertex ()
+    : db::plc::Vertex (0)
+  { }
+
+  TestableVertex (double x, double y)
+    : db::plc::Vertex (0, x, y)
+  { }
+
+  TestableVertex (const db::DPoint &pt)
+    : db::plc::Vertex (0, pt)
+  { }
+};
+
+class TestablePolygon
+  : public db::plc::Polygon
+{
+public:
+  TestablePolygon ()
+    : db::plc::Polygon (0)
+  { }
+
+  TestablePolygon (db::plc::Edge *e1, db::plc::Edge *e2, db::plc::Edge *e3)
+    : db::plc::Polygon (0, e1, e2, e3)
   { }
 };
 
@@ -44,7 +77,7 @@ public:
 
 TEST(Vertex_basic)
 {
-  db::Vertex v;
+  TestableVertex v;
 
   v.set_x (1.5);
   v.set_y (0.5);
@@ -52,11 +85,11 @@ TEST(Vertex_basic)
   EXPECT_EQ (v.x (), 1.5);
   EXPECT_EQ (v.y (), 0.5);
 
-  v = db::Vertex (db::DPoint (2, 3));
+  v = TestableVertex (db::DPoint (2, 3));
   EXPECT_EQ (v.to_string (), "(2, 3)");
 }
 
-static std::string edges_from_vertex (const db::Vertex &v)
+static std::string edges_from_vertex (const TestableVertex &v)
 {
   std::string res;
   for (auto e = v.begin_edges (); e != v.end_edges (); ++e) {
@@ -68,9 +101,9 @@ static std::string edges_from_vertex (const db::Vertex &v)
   return res;
 }
 
-static std::string triangles_from_vertex (const db::Vertex &v)
+static std::string triangles_from_vertex (const TestableVertex &v)
 {
-  auto tri = v.triangles ();
+  auto tri = v.polygons ();
   std::string res;
   for (auto t = tri.begin (); t != tri.end (); ++t) {
     if (! res.empty ()) {
@@ -83,9 +116,9 @@ static std::string triangles_from_vertex (const db::Vertex &v)
 
 TEST(Vertex_edge_registration)
 {
-  db::Vertex v1 (0, 0);
-  db::Vertex v2 (1, 2);
-  db::Vertex v3 (2, 1);
+  TestableVertex v1 (0, 0);
+  TestableVertex v2 (1, 2);
+  TestableVertex v3 (2, 1);
 
   std::unique_ptr<TestableEdge> e1 (new TestableEdge (&v1, &v2));
   e1->link ();
@@ -114,10 +147,10 @@ TEST(Vertex_edge_registration)
 
 TEST(Vertex_triangles)
 {
-  db::Vertex v1 (0, 0);
-  db::Vertex v2 (1, 2);
-  db::Vertex v3 (2, 1);
-  db::Vertex v4 (-1, 2);
+  TestableVertex v1 (0, 0);
+  TestableVertex v2 (1, 2);
+  TestableVertex v3 (2, 1);
+  TestableVertex v4 (-1, 2);
   EXPECT_EQ (triangles_from_vertex (v1), "");
 
   std::unique_ptr<TestableEdge> e1 (new TestableEdge (&v1, &v2));
@@ -127,7 +160,7 @@ TEST(Vertex_triangles)
   std::unique_ptr<TestableEdge> e3 (new TestableEdge (&v3, &v1));
   e3->link ();
 
-  std::unique_ptr<db::Triangle> tri (new db::Triangle (e1.get (), e2.get (), e3.get ()));
+  std::unique_ptr<TestablePolygon> tri (new TestablePolygon (e1.get (), e2.get (), e3.get ()));
   EXPECT_EQ (triangles_from_vertex (v1), "((0, 0), (1, 2), (2, 1))");
   EXPECT_EQ (triangles_from_vertex (v2), "((0, 0), (1, 2), (2, 1))");
   EXPECT_EQ (triangles_from_vertex (v3), "((0, 0), (1, 2), (2, 1))");
@@ -136,7 +169,7 @@ TEST(Vertex_triangles)
   e4->link ();
   std::unique_ptr<TestableEdge> e5 (new TestableEdge (&v2, &v4));
   e5->link ();
-  std::unique_ptr<db::Triangle> tri2 (new db::Triangle (e1.get (), e4.get (), e5.get ()));
+  std::unique_ptr<TestablePolygon> tri2 (new TestablePolygon (e1.get (), e4.get (), e5.get ()));
   EXPECT_EQ (triangles_from_vertex (v1), "((0, 0), (-1, 2), (1, 2)), ((0, 0), (1, 2), (2, 1))");
   EXPECT_EQ (triangles_from_vertex (v2), "((0, 0), (-1, 2), (1, 2)), ((0, 0), (1, 2), (2, 1))");
   EXPECT_EQ (triangles_from_vertex (v3), "((0, 0), (1, 2), (2, 1))");
@@ -153,9 +186,9 @@ TEST(Vertex_triangles)
 
 TEST(Triangle_basic)
 {
-  db::Vertex v1;
-  db::Vertex v2 (1, 2);
-  db::Vertex v3 (2, 1);
+  TestableVertex v1;
+  TestableVertex v2 (1, 2);
+  TestableVertex v3 (2, 1);
 
   TestableEdge s1 (&v1, &v2);
   TestableEdge s2 (&v2, &v3);
@@ -164,7 +197,7 @@ TEST(Triangle_basic)
   EXPECT_EQ (s1.v1 () == &v1, true);
   EXPECT_EQ (s2.v2 () == &v3, true);
 
-  db::Triangle tri (&s1, &s2, &s3);
+  TestablePolygon tri (&s1, &s2, &s3);
   EXPECT_EQ (tri.to_string (), "((0, 0), (1, 2), (2, 1))");
   EXPECT_EQ (tri.edge (-1) == &s3, true);
   EXPECT_EQ (tri.edge (0) == &s1, true);
@@ -176,7 +209,7 @@ TEST(Triangle_basic)
   TestableEdge s12 (&v3, &v2);
   TestableEdge s13 (&v1, &v3);
 
-  db::Triangle tri2 (&s11, &s12, &s13);
+  TestablePolygon tri2 (&s11, &s12, &s13);
   EXPECT_EQ (tri2.to_string (), "((0, 0), (1, 2), (2, 1))");
 
   //  triangle registration
@@ -201,15 +234,15 @@ TEST(Triangle_basic)
 
 TEST(Triangle_find_segment_with)
 {
-  db::Vertex v1;
-  db::Vertex v2 (1, 2);
-  db::Vertex v3 (2, 1);
+  TestableVertex v1;
+  TestableVertex v2 (1, 2);
+  TestableVertex v3 (2, 1);
 
   TestableEdge s1 (&v1, &v2);
   TestableEdge s2 (&v2, &v3);
   TestableEdge s3 (&v3, &v1);
 
-  db::Triangle tri (&s1, &s2, &s3);
+  TestablePolygon tri (&s1, &s2, &s3);
 
   EXPECT_EQ (tri.find_edge_with (&v1, &v2)->to_string (), "((0, 0), (1, 2))");
   EXPECT_EQ (tri.find_edge_with (&v2, &v1)->to_string (), "((0, 0), (1, 2))");
@@ -217,15 +250,15 @@ TEST(Triangle_find_segment_with)
 
 TEST(Triangle_ext_vertex)
 {
-  db::Vertex v1;
-  db::Vertex v2 (1, 2);
-  db::Vertex v3 (2, 1);
+  TestableVertex v1;
+  TestableVertex v2 (1, 2);
+  TestableVertex v3 (2, 1);
 
   TestableEdge s1 (&v1, &v2);
   TestableEdge s2 (&v2, &v3);
   TestableEdge s3 (&v3, &v1);
 
-  db::Triangle tri (&s1, &s2, &s3);
+  TestablePolygon tri (&s1, &s2, &s3);
 
   EXPECT_EQ (tri.opposite (&s1)->to_string (), "(2, 1)");
   EXPECT_EQ (tri.opposite (&s3)->to_string (), "(1, 2)");
@@ -233,15 +266,15 @@ TEST(Triangle_ext_vertex)
 
 TEST(Triangle_opposite_vertex)
 {
-  db::Vertex v1;
-  db::Vertex v2 (1, 2);
-  db::Vertex v3 (2, 1);
+  TestableVertex v1;
+  TestableVertex v2 (1, 2);
+  TestableVertex v3 (2, 1);
 
   TestableEdge s1 (&v1, &v2);
   TestableEdge s2 (&v2, &v3);
   TestableEdge s3 (&v3, &v1);
 
-  db::Triangle tri (&s1, &s2, &s3);
+  TestablePolygon tri (&s1, &s2, &s3);
 
   EXPECT_EQ (tri.opposite (&s1)->to_string (), "(2, 1)");
   EXPECT_EQ (tri.opposite (&s3)->to_string (), "(1, 2)");
@@ -249,15 +282,15 @@ TEST(Triangle_opposite_vertex)
 
 TEST(Triangle_opposite_edge)
 {
-  db::Vertex v1;
-  db::Vertex v2 (1, 2);
-  db::Vertex v3 (2, 1);
+  TestableVertex v1;
+  TestableVertex v2 (1, 2);
+  TestableVertex v3 (2, 1);
 
   TestableEdge s1 (&v1, &v2);
   TestableEdge s2 (&v2, &v3);
   TestableEdge s3 (&v3, &v1);
 
-  db::Triangle tri (&s1, &s2, &s3);
+  TestablePolygon tri (&s1, &s2, &s3);
 
   EXPECT_EQ (tri.opposite (&v1)->to_string (), "((1, 2), (2, 1))");
   EXPECT_EQ (tri.opposite (&v3)->to_string (), "((0, 0), (1, 2))");
@@ -265,16 +298,16 @@ TEST(Triangle_opposite_edge)
 
 TEST(Triangle_contains)
 {
-  db::Vertex v1;
-  db::Vertex v2 (1, 2);
-  db::Vertex v3 (2, 1);
+  TestableVertex v1;
+  TestableVertex v2 (1, 2);
+  TestableVertex v3 (2, 1);
 
   TestableEdge s1 (&v1, &v2);
   TestableEdge s2 (&v2, &v3);
   TestableEdge s3 (&v3, &v1);
 
   {
-    db::Triangle tri (&s1, &s2, &s3);
+    TestablePolygon tri (&s1, &s2, &s3);
     EXPECT_EQ (tri.contains (db::DPoint (0, 0)), 0);
     EXPECT_EQ (tri.contains (db::DPoint (-1, -2)), -1);
     EXPECT_EQ (tri.contains (db::DPoint (0.5, 1)), 0);
@@ -289,7 +322,7 @@ TEST(Triangle_contains)
   s3.reverse ();
 
   {
-    db::Triangle tri2 (&s3, &s2, &s1);
+    TestablePolygon tri2 (&s3, &s2, &s1);
     EXPECT_EQ (tri2.contains(db::DPoint(0, 0)), 0);
     EXPECT_EQ (tri2.contains(db::DPoint(0.5, 1)), 0);
     EXPECT_EQ (tri2.contains(db::DPoint(0.5, 2)), -1);
@@ -301,16 +334,16 @@ TEST(Triangle_contains)
 
 TEST(Triangle_contains_small)
 {
-  db::Vertex v1;
-  db::Vertex v2 (0.001, 0.002);
-  db::Vertex v3 (0.002, 0.001);
+  TestableVertex v1;
+  TestableVertex v2 (0.001, 0.002);
+  TestableVertex v3 (0.002, 0.001);
 
   TestableEdge s1 (&v1, &v2);
   TestableEdge s2 (&v2, &v3);
   TestableEdge s3 (&v3, &v1);
 
   {
-    db::Triangle tri (&s1, &s2, &s3);
+    TestablePolygon tri (&s1, &s2, &s3);
     EXPECT_EQ (tri.contains (db::DPoint (0, 0)), 0);
     EXPECT_EQ (tri.contains (db::DPoint (-0.001, -0.002)), -1);
     EXPECT_EQ (tri.contains (db::DPoint (0.0005, 0.001)), 0);
@@ -325,7 +358,7 @@ TEST(Triangle_contains_small)
   s3.reverse ();
 
   {
-    db::Triangle tri2 (&s3, &s2, &s1);
+    TestablePolygon tri2 (&s3, &s2, &s1);
     EXPECT_EQ (tri2.contains(db::DPoint(0, 0)), 0);
     EXPECT_EQ (tri2.contains(db::DPoint(0.0005, 0.001)), 0);
     EXPECT_EQ (tri2.contains(db::DPoint(0.0005, 0.002)), -1);
@@ -337,15 +370,15 @@ TEST(Triangle_contains_small)
 
 TEST(Triangle_circumcircle)
 {
-  db::Vertex v1;
-  db::Vertex v2 (1, 2);
-  db::Vertex v3 (2, 1);
+  TestableVertex v1;
+  TestableVertex v2 (1, 2);
+  TestableVertex v3 (2, 1);
 
   TestableEdge s1 (&v1, &v2);
   TestableEdge s2 (&v2, &v3);
   TestableEdge s3 (&v3, &v1);
 
-  db::Triangle tri (&s1, &s2, &s3);
+  TestablePolygon tri (&s1, &s2, &s3);
 
   auto cc = tri.circumcircle ();
   auto center = cc.first;
@@ -354,8 +387,8 @@ TEST(Triangle_circumcircle)
   EXPECT_EQ (tl::to_string (center), "0.833333333333,0.833333333333");
   EXPECT_EQ (tl::to_string (radius), "1.17851130198");
 
-  EXPECT_EQ (db::Vertex::in_circle (center, center, radius), 1);
-  EXPECT_EQ (db::Vertex::in_circle (db::DPoint (-1, -1), center, radius), -1);
+  EXPECT_EQ (TestableVertex::in_circle (center, center, radius), 1);
+  EXPECT_EQ (TestableVertex::in_circle (db::DPoint (-1, -1), center, radius), -1);
   EXPECT_EQ (v1.in_circle (center, radius), 0);
   EXPECT_EQ (v2.in_circle (center, radius), 0);
   EXPECT_EQ (v3.in_circle (center, radius), 0);
@@ -365,8 +398,8 @@ TEST(Triangle_circumcircle)
 
 TEST(TriangleEdge_basic)
 {
-  db::Vertex v1;
-  db::Vertex v2 (1, 0.5);
+  TestableVertex v1;
+  TestableVertex v2 (1, 0.5);
 
   TestableEdge edge (&v1, &v2);
   EXPECT_EQ (edge.to_string (), "((0, 0), (1, 0.5))");
@@ -385,20 +418,20 @@ TEST(TriangleEdge_basic)
 
 TEST(TriangleEdge_triangles)
 {
-  db::Vertex v1 (0, 0);
-  db::Vertex v2 (1, 2);
-  db::Vertex v3 (2, 1);
-  db::Vertex v4 (-1, 2);
+  TestableVertex v1 (0, 0);
+  TestableVertex v2 (1, 2);
+  TestableVertex v3 (2, 1);
+  TestableVertex v4 (-1, 2);
 
   std::unique_ptr<TestableEdge> e1 (new TestableEdge (&v1, &v2));
   std::unique_ptr<TestableEdge> e2 (new TestableEdge (&v2, &v3));
   std::unique_ptr<TestableEdge> e3 (new TestableEdge (&v3, &v1));
 
-  std::unique_ptr<db::Triangle> tri (new db::Triangle (e1.get (), e2.get (), e3.get ()));
+  std::unique_ptr<TestablePolygon> tri (new TestablePolygon (e1.get (), e2.get (), e3.get ()));
 
   std::unique_ptr<TestableEdge> e4 (new TestableEdge (&v1, &v4));
   std::unique_ptr<TestableEdge> e5 (new TestableEdge (&v2, &v4));
-  std::unique_ptr<db::Triangle> tri2 (new db::Triangle (e1.get (), e4.get (), e5.get ()));
+  std::unique_ptr<TestablePolygon> tri2 (new TestablePolygon (e1.get (), e4.get (), e5.get ()));
 
   EXPECT_EQ (e1->is_outside (), false);
   EXPECT_EQ (e2->is_outside (), true);
@@ -408,10 +441,10 @@ TEST(TriangleEdge_triangles)
   tri->set_outside (true);
   EXPECT_EQ (e1->is_for_outside_triangles (), true);
 
-  EXPECT_EQ (e1->has_triangle (tri.get ()), true);
-  EXPECT_EQ (e1->has_triangle (tri2.get ()), true);
-  EXPECT_EQ (e4->has_triangle (tri.get ()), false);
-  EXPECT_EQ (e4->has_triangle (tri2.get ()), true);
+  EXPECT_EQ (e1->has_polygon (tri.get ()), true);
+  EXPECT_EQ (e1->has_polygon (tri2.get ()), true);
+  EXPECT_EQ (e4->has_polygon (tri.get ()), false);
+  EXPECT_EQ (e4->has_polygon (tri2.get ()), true);
 
   EXPECT_EQ (e1->other (tri.get ()) == tri2.get (), true);
   EXPECT_EQ (e1->other (tri2.get ()) == tri.get (), true);
@@ -420,43 +453,43 @@ TEST(TriangleEdge_triangles)
   EXPECT_EQ (e2->common_vertex (e4.get ()) == 0, true);
 
   tri->unlink ();
-  EXPECT_EQ (e1->has_triangle (tri.get ()), false);
-  EXPECT_EQ (e1->has_triangle (tri2.get ()), true);
+  EXPECT_EQ (e1->has_polygon (tri.get ()), false);
+  EXPECT_EQ (e1->has_polygon (tri2.get ()), true);
 }
 
 TEST(TriangleEdge_side_of)
 {
-  db::Vertex v1;
-  db::Vertex v2 (1, 0.5);
+  TestableVertex v1;
+  TestableVertex v2 (1, 0.5);
 
   TestableEdge edge (&v1, &v2);
   EXPECT_EQ (edge.to_string (), "((0, 0), (1, 0.5))");
 
-  EXPECT_EQ (edge.side_of (db::Vertex (0, 0)), 0)
-  EXPECT_EQ (edge.side_of (db::Vertex (0.5, 0.25)), 0)
-  EXPECT_EQ (edge.side_of (db::Vertex (0, 1)), -1)
-  EXPECT_EQ (edge.side_of (db::Vertex (0, -1)), 1)
-  EXPECT_EQ (edge.side_of (db::Vertex (0.5, 0.5)), -1)
-  EXPECT_EQ (edge.side_of (db::Vertex (0.5, 0)), 1)
+  EXPECT_EQ (edge.side_of (TestableVertex (0, 0)), 0)
+  EXPECT_EQ (edge.side_of (TestableVertex (0.5, 0.25)), 0)
+  EXPECT_EQ (edge.side_of (TestableVertex (0, 1)), -1)
+  EXPECT_EQ (edge.side_of (TestableVertex (0, -1)), 1)
+  EXPECT_EQ (edge.side_of (TestableVertex (0.5, 0.5)), -1)
+  EXPECT_EQ (edge.side_of (TestableVertex (0.5, 0)), 1)
 
-  db::Vertex v3 (1, 0);
-  db::Vertex v4 (0, 1);
+  TestableVertex v3 (1, 0);
+  TestableVertex v4 (0, 1);
   TestableEdge edge2 (&v3, &v4);
 
-  EXPECT_EQ (edge2.side_of (db::Vertex(0.2, 0.2)), -1);
+  EXPECT_EQ (edge2.side_of (TestableVertex(0.2, 0.2)), -1);
 }
 
 namespace {
   class VertexHeap
   {
   public:
-    db::Vertex *make_vertex (double x, double y)
+    TestableVertex *make_vertex (double x, double y)
     {
-      m_heap.push_back (db::Vertex (x, y));
+      m_heap.push_back (TestableVertex (x, y));
       return &m_heap.back ();
     }
   private:
-    std::list<db::Vertex> m_heap;
+    std::list<TestableVertex> m_heap;
   };
 }
 
@@ -503,17 +536,17 @@ TEST(TriangleEdge_intersection_point)
 
 TEST(TriangleEdge_can_flip)
 {
-  db::Vertex v1 (2, -1);
-  db::Vertex v2 (0, 0);
-  db::Vertex v3 (1, 0);
-  db::Vertex v4 (0.5, 1);
+  TestableVertex v1 (2, -1);
+  TestableVertex v2 (0, 0);
+  TestableVertex v3 (1, 0);
+  TestableVertex v4 (0.5, 1);
   TestableEdge s1 (&v1, &v2);
   TestableEdge s2 (&v1, &v3);
   TestableEdge s3 (&v2, &v3);
   TestableEdge s4 (&v2, &v4);
   TestableEdge s5 (&v3, &v4);
-  db::Triangle t1 (&s1, &s2, &s3);
-  db::Triangle t2 (&s3, &s4, &s5);
+  TestablePolygon t1 (&s1, &s2, &s3);
+  TestablePolygon t2 (&s3, &s4, &s5);
   EXPECT_EQ (s3.left () == &t2, true);
   EXPECT_EQ (s3.right () == &t1, true);
   EXPECT_EQ (s3.can_flip(), false);
@@ -529,8 +562,8 @@ TEST(TriangleEdge_can_flip)
 
 TEST(TriangleEdge_distance)
 {
-  db::Vertex v1 (0, 0);
-  db::Vertex v2 (1, 0);
+  TestableVertex v1 (0, 0);
+  TestableVertex v2 (1, 0);
 
   TestableEdge seg (&v1, &v2);
   EXPECT_EQ (seg.distance (db::DPoint (0, 0)), 0);

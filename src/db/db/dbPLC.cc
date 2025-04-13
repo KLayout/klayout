@@ -21,7 +21,7 @@
 */
 
 
-#include "dbPolygonGraph.h"
+#include "dbPLC.h"
 #include "dbLayout.h"
 #include "dbWriter.h"
 #include "tlStream.h"
@@ -36,28 +36,43 @@
 namespace db
 {
 
+namespace plc
+{
+
 // -------------------------------------------------------------------------------------
-//  GVertex implementation
+//  Vertex implementation
 
-GVertex::GVertex ()
-  : DPoint (), m_is_precious (false)
+Vertex::Vertex (Graph *graph)
+  : DPoint (), mp_graph (graph), m_is_precious (false)
 {
   //  .. nothing yet ..
 }
 
-GVertex::GVertex (const db::DPoint &p)
-  : DPoint (p), m_is_precious (false)
+Vertex::Vertex (Graph *graph, const db::DPoint &p)
+  : DPoint (p), mp_graph (graph), m_is_precious (false)
 {
   //  .. nothing yet ..
 }
 
-GVertex::GVertex (const GVertex &v)
-  : DPoint (), m_is_precious (false)
+Vertex::Vertex (Graph *graph, const Vertex &v)
+  : DPoint (), mp_graph (graph), m_is_precious (false)
 {
   operator= (v);
 }
 
-GVertex &GVertex::operator= (const GVertex &v)
+Vertex::Vertex (Graph *graph, db::DCoord x, db::DCoord y)
+  : DPoint (x, y), mp_graph (graph), m_is_precious (false)
+{
+  //  .. nothing yet ..
+}
+
+Vertex::Vertex (const Vertex &v)
+  : DPoint (v), mp_graph (v.mp_graph), m_is_precious (v.m_is_precious)
+{
+  //  NOTE: edges are not copied!
+}
+
+Vertex &Vertex::operator= (const Vertex &v)
 {
   if (this != &v) {
     //  NOTE: edges are not copied!
@@ -67,15 +82,8 @@ GVertex &GVertex::operator= (const GVertex &v)
   return *this;
 }
 
-GVertex::GVertex (db::DCoord x, db::DCoord y)
-  : DPoint (x, y), m_is_precious (false)
-{
-  //  .. nothing yet ..
-}
-
-#if 0 // @@@
 bool
-GVertex::is_outside () const
+Vertex::is_outside () const
 {
   for (auto e = mp_edges.begin (); e != mp_edges.end (); ++e) {
     if ((*e)->is_outside ()) {
@@ -84,13 +92,12 @@ GVertex::is_outside () const
   }
   return false;
 }
-#endif
 
-std::vector<db::GPolygon *>
-GVertex::polygons () const
+std::vector<Polygon *>
+Vertex::polygons () const
 {
-  std::set<db::GPolygon *> seen;
-  std::vector<db::GPolygon *> res;
+  std::set<Polygon *> seen;
+  std::vector<Polygon *> res;
   for (auto e = mp_edges.begin (); e != mp_edges.end (); ++e) {
     for (auto t = (*e)->begin_polygons (); t != (*e)->end_polygons (); ++t) {
       if (seen.insert (t.operator-> ()).second) {
@@ -102,7 +109,7 @@ GVertex::polygons () const
 }
 
 bool
-GVertex::has_edge (const GPolygonEdge *edge) const
+Vertex::has_edge (const Edge *edge) const
 {
   for (auto e = mp_edges.begin (); e != mp_edges.end (); ++e) {
     if (*e == edge) {
@@ -113,7 +120,7 @@ GVertex::has_edge (const GPolygonEdge *edge) const
 }
 
 size_t
-GVertex::num_edges (int max_count) const
+Vertex::num_edges (int max_count) const
 {
   if (max_count < 0) {
     //  NOTE: this can be slow for a std::list, so we have max_count to limit this effort
@@ -128,7 +135,7 @@ GVertex::num_edges (int max_count) const
 }
 
 std::string
-GVertex::to_string (bool with_id) const
+Vertex::to_string (bool with_id) const
 {
   std::string res = tl::sprintf ("(%.12g, %.12g)", x (), y());
   if (with_id) {
@@ -138,7 +145,7 @@ GVertex::to_string (bool with_id) const
 }
 
 int
-GVertex::in_circle (const DPoint &point, const DPoint &center, double radius)
+Vertex::in_circle (const DPoint &point, const DPoint &center, double radius)
 {
   double dx = point.x () - center.x ();
   double dy = point.y () - center.y ();
@@ -155,34 +162,34 @@ GVertex::in_circle (const DPoint &point, const DPoint &center, double radius)
 }
 
 // -------------------------------------------------------------------------------------
-//  GPolygonEdge implementation
+//  Edge implementation
 
-GPolygonEdge::GPolygonEdge ()
-  : mp_v1 (0), mp_v2 (0), mp_left (), mp_right (), m_level (0), m_id (0), m_is_segment (false)
+Edge::Edge (Graph *graph)
+  : mp_graph (graph), mp_v1 (0), mp_v2 (0), mp_left (), mp_right (), m_level (0), m_id (0), m_is_segment (false)
 {
   // .. nothing yet ..
 }
 
-GPolygonEdge::GPolygonEdge (GVertex *v1, GVertex *v2)
-  : mp_v1 (v1), mp_v2 (v2), mp_left (), mp_right (), m_level (0), m_id (0), m_is_segment (false)
+Edge::Edge (Graph *graph, Vertex *v1, Vertex *v2)
+  : mp_graph (graph), mp_v1 (v1), mp_v2 (v2), mp_left (), mp_right (), m_level (0), m_id (0), m_is_segment (false)
 {
   //  .. nothing yet ..
 }
 
 void
-GPolygonEdge::set_left  (GPolygon *t)
+Edge::set_left  (Polygon *t)
 {
   mp_left = t;
 }
 
 void
-GPolygonEdge::set_right (GPolygon *t)
+Edge::set_right (Polygon *t)
 {
   mp_right = t;
 }
 
 void
-GPolygonEdge::link ()
+Edge::link ()
 {
   mp_v1->mp_edges.push_back (this);
   m_ec_v1 = --mp_v1->mp_edges.end ();
@@ -192,7 +199,7 @@ GPolygonEdge::link ()
 }
 
 void
-GPolygonEdge::unlink ()
+Edge::unlink ()
 {
   if (mp_v1) {
     mp_v1->remove_edge (m_ec_v1);
@@ -203,8 +210,8 @@ GPolygonEdge::unlink ()
   mp_v1 = mp_v2 = 0;
 }
 
-GPolygon *
-GPolygonEdge::other (const GPolygon *t) const
+Polygon *
+Edge::other (const Polygon *t) const
 {
   if (t == mp_left) {
     return mp_right;
@@ -216,8 +223,8 @@ GPolygonEdge::other (const GPolygon *t) const
   return 0;
 }
 
-GVertex *
-GPolygonEdge::other (const GVertex *t) const
+Vertex *
+Edge::other (const Vertex *t) const
 {
   if (t == mp_v1) {
     return mp_v2;
@@ -230,13 +237,13 @@ GPolygonEdge::other (const GVertex *t) const
 }
 
 bool
-GPolygonEdge::has_vertex (const GVertex *v) const
+Edge::has_vertex (const Vertex *v) const
 {
   return mp_v1 == v || mp_v2 == v;
 }
 
-GVertex *
-GPolygonEdge::common_vertex (const GPolygonEdge *other) const
+Vertex *
+Edge::common_vertex (const Edge *other) const
 {
   if (has_vertex (other->v1 ())) {
     return (other->v1 ());
@@ -248,7 +255,7 @@ GPolygonEdge::common_vertex (const GPolygonEdge *other) const
 }
 
 std::string
-GPolygonEdge::to_string (bool with_id) const
+Edge::to_string (bool with_id) const
 {
   std::string res = std::string ("(") + mp_v1->to_string (with_id) + ", " + mp_v2->to_string (with_id) + ")";
   if (with_id) {
@@ -258,7 +265,7 @@ GPolygonEdge::to_string (bool with_id) const
 }
 
 double
-GPolygonEdge::distance (const db::DEdge &e, const db::DPoint &p)
+Edge::distance (const db::DEdge &e, const db::DPoint &p)
 {
   double l = db::sprod (p - e.p1 (), e.d ()) / e.d ().sq_length ();
   db::DPoint pp;
@@ -273,27 +280,27 @@ GPolygonEdge::distance (const db::DEdge &e, const db::DPoint &p)
 }
 
 bool
-GPolygonEdge::crosses (const db::DEdge &e, const db::DEdge &other)
+Edge::crosses (const db::DEdge &e, const db::DEdge &other)
 {
   return e.side_of (other.p1 ()) * e.side_of (other.p2 ()) < 0 &&
          other.side_of (e.p1 ()) * other.side_of (e.p2 ()) < 0;
 }
 
 bool
-GPolygonEdge::crosses_including (const db::DEdge &e, const db::DEdge &other)
+Edge::crosses_including (const db::DEdge &e, const db::DEdge &other)
 {
   return e.side_of (other.p1 ()) * e.side_of (other.p2 ()) <= 0 &&
          other.side_of (e.p1 ()) * other.side_of (e.p2 ()) <= 0;
 }
 
 db::DPoint
-GPolygonEdge::intersection_point (const db::DEdge &e, const db::DEdge &other)
+Edge::intersection_point (const db::DEdge &e, const db::DEdge &other)
 {
   return e.intersect_point (other).second;
 }
 
 bool
-GPolygonEdge::point_on (const db::DEdge &edge, const db::DPoint &point)
+Edge::point_on (const db::DEdge &edge, const db::DPoint &point)
 {
   if (edge.side_of (point) != 0) {
     return false;
@@ -302,42 +309,72 @@ GPolygonEdge::point_on (const db::DEdge &edge, const db::DPoint &point)
   }
 }
 
-#if 0 // @@@
 bool
-GPolygonEdge::is_for_outside_polygons () const
+Edge::can_flip () const
+{
+  if (! left () || ! right ()) {
+    return false;
+  }
+
+  const Vertex *v1 = left ()->opposite (this);
+  const Vertex *v2 = right ()->opposite (this);
+  return crosses (db::DEdge (*v1, *v2));
+}
+
+bool
+Edge::can_join_via (const Vertex *vertex) const
+{
+  if (! left () || ! right ()) {
+    return false;
+  }
+
+  tl_assert (has_vertex (vertex));
+  const Vertex *v1 = left ()->opposite (this);
+  const Vertex *v2 = right ()->opposite (this);
+  return db::DEdge (*v1, *v2).side_of (*vertex) == 0;
+}
+
+bool
+Edge::is_outside () const
+{
+  return left () == 0 || right () == 0;
+}
+
+bool
+Edge::is_for_outside_triangles () const
 {
   return (left () && left ()->is_outside ()) || (right () && right ()->is_outside ());
 }
-#endif
 
 bool
-GPolygonEdge::has_polygon (const GPolygon *t) const
+Edge::has_polygon (const Polygon *t) const
 {
   return t != 0 && (left () == t || right () == t);
 }
 
 // -------------------------------------------------------------------------------------
-//  GPolygon implementation
+//  Polygon implementation
 
-GPolygon::GPolygon ()
-  : m_id (0)
+Polygon::Polygon (Graph *graph)
+  : mp_graph (graph), m_is_outside (false), m_id (0)
 {
   //  .. nothing yet ..
 }
 
 void
-GPolygon::init ()
+Polygon::init ()
 {
   m_id = 0;
+  m_is_outside = false;
 
   if (mp_e.empty ()) {
     return;
   }
 
-  std::vector<GPolygonEdge *> e;
+  std::vector<Edge *> e;
   e.swap (mp_e);
 
-  std::multimap<db::GVertex *, GPolygonEdge *> v2e;
+  std::multimap<Vertex *, Edge *> v2e;
 
   for (auto i = e.begin (); i != e.end (); ++i) {
     if (i != e.begin ()) {
@@ -379,7 +416,7 @@ GPolygon::init ()
   //  establish clockwise order of the vertexes
 
   double area = 0.0;
-  const db::GVertex *vm1 = vertex (-1), *v0;
+  const Vertex *vm1 = vertex (-1), *v0;
   for (auto i = mp_v.begin (); i != mp_v.end (); ++i) {
     v0 = *i;
     area += db::vprod (*vm1 - db::DPoint (), *v0 - *vm1);
@@ -394,8 +431,8 @@ GPolygon::init ()
   //  link the polygon to the edges
 
   for (size_t i = 0; i < size (); ++i) {
-    db::GVertex *v = mp_v[i];
-    db::GPolygonEdge *e = mp_e[i];
+    Vertex *v = mp_v[i];
+    Edge *e = mp_e[i];
     if (e->v1 () == v) {
       e->set_right (this);
     } else {
@@ -404,13 +441,62 @@ GPolygon::init ()
   }
 }
 
-GPolygon::~GPolygon ()
+Polygon::Polygon (Graph *graph, Edge *e1, Edge *e2, Edge *e3)
+  : mp_graph (graph), m_is_outside (false), m_id (0)
+{
+  mp_e.resize (3, 0);
+  mp_v.resize (3, 0);
+
+  mp_e[0] = e1;
+  mp_v[0] = e1->v1 ();
+  mp_v[1] = e1->v2 ();
+
+  if (e2->has_vertex (mp_v[1])) {
+    mp_e[1] = e2;
+    mp_e[2] = e3;
+  } else {
+    mp_e[1] = e3;
+    mp_e[2] = e2;
+  }
+  mp_v[2] = mp_e[1]->other (mp_v[1]);
+
+  //  enforce clockwise orientation
+  int s = db::vprod_sign (*mp_v[2] - *mp_v[0], *mp_v[1] - *mp_v[0]);
+  if (s < 0) {
+    std::swap (mp_v[2], mp_v[1]);
+  } else if (s == 0) {
+    //  Triangle is not orientable
+    tl_assert (false);
+  }
+
+  //  establish link to edges
+  for (int i = 0; i < 3; ++i) {
+
+    Edge *e = mp_e[i];
+
+    unsigned int i1 = 0;
+    for ( ; e->v1 () != mp_v[i1] && i1 < 3; ++i1)
+      ;
+    unsigned int i2 = 0;
+    for ( ; e->v2 () != mp_v[i2] && i2 < 3; ++i2)
+      ;
+
+    if ((i1 + 1) % 3 == i2) {
+      e->set_right (this);
+    } else {
+      e->set_left (this);
+    }
+
+  }
+}
+
+Polygon::~Polygon ()
 {
   unlink ();
 }
 
 void
-GPolygon::unlink ()
+Polygon::unlink ()
 {
   for (auto e = mp_e.begin (); e != mp_e.end (); ++e) {
     if ((*e)->left () == this) {
@@ -423,7 +509,7 @@ GPolygon::unlink ()
 }
 
 std::string
-GPolygon::to_string (bool with_id) const
+Polygon::to_string (bool with_id) const
 {
   std::string res = "(";
   for (int i = 0; i < int (size ()); ++i) {
@@ -441,13 +527,13 @@ GPolygon::to_string (bool with_id) const
 }
 
 double
-GPolygon::area () const
+Polygon::area () const
 {
   return fabs (db::vprod (mp_e[0]->d (), mp_e[1]->d ())) * 0.5;
 }
 
 db::DBox
-GPolygon::bbox () const
+Polygon::bbox () const
 {
   db::DBox box;
   for (auto i = mp_v.begin (); i != mp_v.end (); ++i) {
@@ -456,8 +542,77 @@ GPolygon::bbox () const
   return box;
 }
 
-GPolygonEdge *
-GPolygon::find_edge_with (const GVertex *v1, const GVertex *v2) const
+std::pair<db::DPoint, double>
+Polygon::circumcircle (bool *ok) const
+{
+  tl_assert (mp_v.size () == 3);
+
+  //  see https://en.wikipedia.org/wiki/Circumcircle
+  //  we set A=(0,0), so the formulas simplify
+
+  if (ok) {
+    *ok = true;
+  }
+
+  db::DVector b = *mp_v[1] - *mp_v[0];
+  db::DVector c = *mp_v[2] - *mp_v[0];
+
+  double b2 = b.sq_length ();
+  double c2 = c.sq_length ();
+
+  double sx = 0.5 * (b2 * c.y () - c2 * b.y ());
+  double sy = 0.5 * (b.x () * c2 - c.x() * b2);
+
+  double a1 = b.x() * c.y();
+  double a2 = c.x() * b.y();
+  double a = a1 - a2;
+  double a_abs = std::abs (a);
+
+  if (a_abs < (std::abs (a1) + std::abs (a2)) * db::epsilon) {
+    if (ok) {
+      *ok = false;
+      return std::make_pair (db::DPoint (), 0.0);
+    } else {
+      tl_assert (false);
+    }
+  }
+
+  double radius = sqrt (sx * sx + sy * sy) / a_abs;
+  db::DPoint center = *mp_v[0] + db::DVector (sx / a, sy / a);
+
+  return std::make_pair (center, radius);
+}
+
+Vertex *
+Polygon::opposite (const Edge *edge) const
+{
+  tl_assert (mp_v.size () == 3);
+
+  for (int i = 0; i < 3; ++i) {
+    Vertex *v = mp_v[i];
+    if (! edge->has_vertex (v)) {
+      return v;
+    }
+  }
+  tl_assert (false);
+}
+
+Edge *
+Polygon::opposite (const Vertex *vertex) const
+{
+  tl_assert (mp_v.size () == 3);
+
+  for (int i = 0; i < 3; ++i) {
+    Edge *e = mp_e[i];
+    if (! e->has_vertex (vertex)) {
+      return e;
+    }
+  }
+  tl_assert (false);
+}
+
+Edge *
+Polygon::find_edge_with (const Vertex *v1, const Vertex *v2) const
 {
   for (auto e = mp_e.begin (); e != mp_e.end (); ++e) {
     if ((*e)->has_vertex (v1) && (*e)->has_vertex (v2)) {
@@ -467,8 +622,8 @@ GPolygon::find_edge_with (const GVertex *v1, const GVertex *v2) const
   tl_assert (false);
 }
 
-GPolygonEdge *
-GPolygon::common_edge (const GPolygon *other) const
+Edge *
+Polygon::common_edge (const Polygon *other) const
 {
   for (auto e = mp_e.begin (); e != mp_e.end (); ++e) {
     if ((*e)->other (this) == other) {
@@ -478,10 +633,11 @@ GPolygon::common_edge (const GPolygon *other) const
   return 0;
 }
 
-#if 0 // @@@
 int
-GPolygon::contains (const db::DPoint &point) const
+Polygon::contains (const db::DPoint &point) const
 {
+  tl_assert (mp_v.size () == 3);
+
   auto c = *mp_v[2] - *mp_v[0];
   auto b = *mp_v[1] - *mp_v[0];
 
@@ -492,9 +648,9 @@ GPolygon::contains (const db::DPoint &point) const
 
   int res = 1;
 
-  const GVertex *vl = mp_v[2];
+  const Vertex *vl = mp_v[2];
   for (int i = 0; i < 3; ++i) {
-    const GVertex *v = mp_v[i];
+    const Vertex *v = mp_v[i];
     int n = db::vprod_sign (point - *vl, *v - *vl) * vps;
     if (n < 0) {
       return -1;
@@ -506,10 +662,9 @@ GPolygon::contains (const db::DPoint &point) const
 
   return res;
 }
-#endif
 
 double
-GPolygon::min_edge_length () const
+Polygon::min_edge_length () const
 {
   double lmin = mp_e[0]->d ().length ();
   for (auto e = mp_e.begin (); e != mp_e.end (); ++e) {
@@ -518,19 +673,17 @@ GPolygon::min_edge_length () const
   return lmin;
 }
 
-#if 0 // @@@
 double
-GPolygon::b () const
+Polygon::b () const
 {
   double lmin = min_edge_length ();
   bool ok = false;
   auto cr = circumcircle (&ok);
   return ok ? lmin / cr.second : 0.0;
 }
-#endif
 
 bool
-GPolygon::has_segment () const
+Polygon::has_segment () const
 {
   for (auto e = mp_e.begin (); e != mp_e.end (); ++e) {
     if ((*e)->is_segment ()) {
@@ -541,7 +694,7 @@ GPolygon::has_segment () const
 }
 
 unsigned int
-GPolygon::num_segments () const
+Polygon::num_segments () const
 {
   unsigned int n = 0;
   for (auto e = mp_e.begin (); e != mp_e.end (); ++e) {
@@ -554,49 +707,42 @@ GPolygon::num_segments () const
 
 // -----------------------------------------------------------------------------------
 
-static inline bool is_equal (const db::DPoint &a, const db::DPoint &b)
-{
-  return std::abs (a.x () - b.x ()) < std::max (1.0, (std::abs (a.x ()) + std::abs (b.x ()))) * db::epsilon &&
-         std::abs (a.y () - b.y ()) < std::max (1.0, (std::abs (a.y ()) + std::abs (b.y ()))) * db::epsilon;
-}
-
-PolygonGraph::PolygonGraph ()
+Graph::Graph ()
   : m_id (0)
-  // @@@: m_is_constrained (false), m_level (0), m_id (0), m_flips (0), m_hops (0)
 {
   //  .. nothing yet ..
 }
 
-PolygonGraph::~PolygonGraph ()
+Graph::~Graph ()
 {
   clear ();
 }
 
-db::GVertex *
-PolygonGraph::create_vertex (double x, double y)
+Vertex *
+Graph::create_vertex (double x, double y)
 {
-  m_vertex_heap.push_back (db::GVertex (x, y));
+  m_vertex_heap.push_back (Vertex (this, x, y));
   return &m_vertex_heap.back ();
 }
 
-db::GVertex *
-PolygonGraph::create_vertex (const db::DPoint &pt)
+Vertex *
+Graph::create_vertex (const db::DPoint &pt)
 {
-  m_vertex_heap.push_back (pt);
+  m_vertex_heap.push_back (Vertex (this, pt));
   return &m_vertex_heap.back ();
 }
 
-db::GPolygonEdge *
-PolygonGraph::create_edge (db::GVertex *v1, db::GVertex *v2)
+Edge *
+Graph::create_edge (Vertex *v1, Vertex *v2)
 {
-  db::GPolygonEdge *edge = 0;
+  Edge *edge = 0;
 
   if (! m_returned_edges.empty ()) {
     edge = m_returned_edges.back ();
     m_returned_edges.pop_back ();
-    *edge = db::GPolygonEdge (v1, v2);
+    *edge = Edge (this, v1, v2);
   } else {
-    m_edges_heap.push_back (db::GPolygonEdge (v1, v2));
+    m_edges_heap.push_back (Edge (this, v1, v2));
     edge = &m_edges_heap.back ();
   }
 
@@ -605,11 +751,21 @@ PolygonGraph::create_edge (db::GVertex *v1, db::GVertex *v2)
   return edge;
 }
 
-void
-PolygonGraph::remove_polygon (db::GPolygon *poly)
+Polygon *
+Graph::create_triangle (Edge *e1, Edge *e2, Edge *e3)
 {
-  std::vector<db::GPolygonEdge *> edges;
-  edges.reserve (poly->size ());
+  Polygon *res = new Polygon (this, e1, e2, e3);
+  res->set_id (++m_id);
+  mp_polygons.push_back (res);
+
+  return res;
+}
+
+void
+Graph::remove_polygon (Polygon *poly)
+{
+  std::vector<Edge *> edges;
+  edges.resize (poly->size (), 0);
   for (int i = 0; i < int (poly->size ()); ++i) {
     edges [i] = poly->edge (i);
   }
@@ -625,63 +781,8 @@ PolygonGraph::remove_polygon (db::GPolygon *poly)
   }
 }
 
-#if 0 // @@@
-void
-PolygonGraph::convex_decompose (const db::DPolygon &polygon)
-{
-  clear ();
-
-  if (polygon.begin_edge ().at_end ()) {
-    return;
-  }
-
-  std::vector<db::GPolygonEdge *> edges;
-
-  for (unsigned int c = 0; c < polygon.holes () + 1; ++c) {
-
-    const db::DSimplePolygon::contour_type &ctr = polygon.contour (c);
-
-    db::GVertex *v0 = 0, *vv, *v;
-    size_t n = ctr.size ();
-    for (size_t i = 0; i < n; ++i) {
-
-      db::DPoint pm1 = ctr [i > 0 ? i - 1 : n - 1];
-      db::DPoint pp1 = ctr [i + 1 < n ? i + 1 : 0];
-      db::DPoint p = ctr [i];
-
-      bool is_convex = db::vprod_sign (p - pm1, pp1 - p);
-      // @@@
-
-      v = create_vertex (p.x (), p.y ());
-      if (! v0) {
-        v0 = v;
-      } else {
-        edges.push_back (create_edge (vv, v));
-      }
-
-      vv = v;
-
-    }
-
-    if (v0 && v0 != v) {
-      edges.push_back (create_edge (v, v0));
-    }
-
-  }
-}
-#endif
-
-void
-PolygonGraph::convex_decompose (const db::DPolygon &poly)
-{
-
-  // @@@
-
-
-}
-
 std::string
-PolygonGraph::to_string ()
+Graph::to_string ()
 {
   std::string res;
   for (auto t = mp_polygons.begin (); t != mp_polygons.end (); ++t) {
@@ -694,7 +795,7 @@ PolygonGraph::to_string ()
 }
 
 db::DBox
-PolygonGraph::bbox () const
+Graph::bbox () const
 {
   db::DBox box;
   for (auto t = mp_polygons.begin (); t != mp_polygons.end (); ++t) {
@@ -705,7 +806,7 @@ PolygonGraph::bbox () const
 
 #if 0 // @@@
 bool
-PolygonGraph::check (bool check_delaunay) const
+Graph::check (bool check_delaunay) const
 {
   bool res = true;
 
@@ -759,7 +860,7 @@ PolygonGraph::check (bool check_delaunay) const
         tl::error << "(check error) edges " << e->to_string (true) << " vertex 2 not found in adjacent polygon " << t->to_string (true);
         res = false;
       }
-      db::GVertex *vopp = t->opposite (e.operator-> ());
+      Vertex *vopp = t->opposite (e.operator-> ());
       double sgn = (e->left () == t.operator-> ()) ? 1.0 : -1.0;
       double vp = db::vprod (e->d(), *vopp - *e->v1 ());  //  positive if on left side
       if (vp * sgn <= 0.0) {
@@ -803,7 +904,7 @@ PolygonGraph::check (bool check_delaunay) const
 #endif
 
 db::Layout *
-PolygonGraph::to_layout (bool decompose_by_id) const
+Graph::to_layout (bool decompose_by_id) const
 {
   db::Layout *layout = new db::Layout ();
   layout->dbu (0.001);
@@ -850,7 +951,7 @@ PolygonGraph::to_layout (bool decompose_by_id) const
 }
 
 void
-PolygonGraph::dump (const std::string &path, bool decompose_by_id) const
+Graph::dump (const std::string &path, bool decompose_by_id) const
 {
   std::unique_ptr<db::Layout> ly (to_layout (decompose_by_id));
 
@@ -860,36 +961,19 @@ PolygonGraph::dump (const std::string &path, bool decompose_by_id) const
   db::Writer writer (opt);
   writer.write (*ly, stream);
 
-  tl::info << "PolygonGraph written to " << path;
+  tl::info << "Graph written to " << path;
 }
 
 void
-PolygonGraph::clear ()
+Graph::clear ()
 {
   mp_polygons.clear ();
   m_edges_heap.clear ();
   m_vertex_heap.clear ();
   m_returned_edges.clear ();
-  // @@@m_is_constrained = false;
-  // @@@m_level = 0;
   m_id = 0;
 }
 
-template<class Poly, class Trans>
-void
-PolygonGraph::make_contours (const Poly &poly, const Trans &trans, std::vector<std::vector<db::GVertex *> > &edge_contours)
-{
-  edge_contours.push_back (std::vector<db::GVertex *> ());
-  for (auto pt = poly.begin_hull (); pt != poly.end_hull (); ++pt) {
-    edge_contours.back ().push_back (insert_point (trans * *pt));
-  }
+}  // namespace plc
 
-  for (unsigned int h = 0; h < poly.holes (); ++h) {
-    edge_contours.push_back (std::vector<db::GVertex *> ());
-    for (auto pt = poly.begin_hole (h); pt != poly.end_hole (h); ++pt) {
-      edge_contours.back ().push_back (insert_point (trans * *pt));
-    }
-  }
-}
-
-}
+}  // namespace db

@@ -21,31 +21,21 @@
 */
 
 
-#include "dbPolygonGraph.h"
+#include "dbPLC.h"
 #include "tlUnitTest.h"
 
 #include <list>
 #include <memory>
 
-class TestablePolygonGraph
-  : public db::PolygonGraph
-{
-public:
-  using db::PolygonGraph::PolygonGraph;
-  // @@@ using db::PolygonGraph::check;
-  using db::PolygonGraph::dump;
-};
-
-
 TEST(basic)
 {
   db::DBox box (0, 0, 100.0, 200.0);
 
-  TestablePolygonGraph pg;
+  db::plc::Graph plc;
   // @@@ pg.insert_polygon (db::DSimplePolygon (box));
 
   // @@@
-  tl::info << pg.to_string ();
-  pg.dump ("debug.gds"); // @@@
+  tl::info << plc.to_string ();
+  plc.dump ("debug.gds"); // @@@
 }
 

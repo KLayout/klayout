@@ -20,8 +20,8 @@
 
 */
 
-#ifndef HDR_dbPolygonGraph
-#define HDR_dbPolygonGraph
+#ifndef HDR_dbPLC
+#define HDR_dbPLC
 
 #include "dbCommon.h"
 #include "dbTriangle.h"
@@ -41,8 +41,38 @@ namespace db
 
 class Layout;
 
-class GPolygon;
-class GPolygonEdge;
+namespace plc
+{
+
+/**
+ *  @brief A framework for piecewise linear curves
+ *
+ *  This framework implements classes for dealing with piecewise linear
+ *  curves. It is the basis for triangulation and polygon decomposition
+ *  algorithms.
+ *
+ *  The core class is the PLCGraph which is a collection of vertices,
+ *  edges and edge loops (polygons). Vertices, edges and polygons form
+ *  graphs.
+ *
+ *  A "vertex" (db::plc::Vertex) is a point. A point connects two or
+ *  more edges.
+ *  A vertex has some attributes:
+ *  * 'precious': if set, the vertex is not removed during triangulation
+ *                for example.
+ *
+ *  An "edge" (db::plc::Edge) is a line connecting two vertexes. The
+ *  edge runs from vertex v1 to vertex v2. An edge separates two
+ *  polygons (left and right, as seen in the run direction).
+ *
+ *  A "segment" as an edge that is part of an original polygon outline.
+ *
+ *  A "polygon" (db::plc::Polygon) is a loop of edges.
+ */
+
+class Polygon;
+class Edge;
+class Graph;
 
 /**
  *  @brief A class representing a vertex in a Delaunay triangulation graph
@@ -51,40 +81,71 @@ class GPolygonEdge;
  *  an integer value that can be used in traversal algorithms
  *  ("level")
  */
-class DB_PUBLIC GVertex
+class DB_PUBLIC Vertex
   : public db::DPoint
 {
 public:
-  typedef std::list<GPolygonEdge *> edges_type;
+  typedef std::list<Edge *> edges_type;
   typedef edges_type::const_iterator edges_iterator;
   typedef edges_type::iterator edges_iterator_non_const;
 
-  GVertex ();
-  GVertex (const DPoint &p);
-  GVertex (const GVertex &v);
-  GVertex (db::DCoord x, db::DCoord y);
+  Vertex (const Vertex &v);
+  Vertex &operator= (const Vertex &v);
 
-  GVertex &operator= (const GVertex &v);
-
-#if 0 // @@@
+  /**
+   *  @brief Gets a value indicating whether any of the attached edges is "outside"
+   */
   bool is_outside () const;
-#endif
-  std::vector<db::GPolygon *> polygons () const;
 
+  /**
+   *  @brief Gets a list of polygons that are attached to this vertex
+   */
+  std::vector<Polygon *> polygons() const;
+
+  /**
+   *  @brief Gets the graph object this vertex belongs to
+   */
+  Graph *graph () const { return mp_graph; }
+
+  /**
+   *  @brief Iterates the edges on this vertex (begin)
+   */
   edges_iterator begin_edges () const { return mp_edges.begin (); }
+
+  /**
+   *  @brief Iterates the edges on this vertex (end)
+   */
   edges_iterator end_edges () const { return mp_edges.end (); }
+
+  /**
+   *  @brief Returns the number of edges attached to this vertex
+   */
   size_t num_edges (int max_count = -1) const;
 
-  bool has_edge (const GPolygonEdge *edge) const;
+  /**
+   *  @brief Returns a value indicating whether the given edge is attached to this vertex
+   */
+  bool has_edge (const Edge *edge) const;
 
+  /**
+   *  @brief Sets a valid indicating whether the vertex is precious
+   *
+   *  "precious" vertexes are not removed during triangulation for example.
+   */
   void set_is_precious (bool f) { m_is_precious = f; }
+
+  /**
+   *  @brief Gets a valid indicating whether the vertex is precious
+   */
   bool is_precious () const { return m_is_precious; }
 
+  /**
+   *  @brief Returns a string representation of the vertex
+   */
   std::string to_string (bool with_id = false) const;
 
   /**
    *  @brief Returns 1 is the point is inside the circle, 0 if on the circle and -1 if outside
-   *  TODO: Move to db::DPoint
    */
   static int in_circle (const db::DPoint &point, const db::DPoint &center, double radius);
 
@@ -97,13 +158,20 @@ public:
   }
 
 private:
-  friend class GPolygonEdge;
+  friend class Edge;
+  friend class Graph;
+
+  Vertex (Graph *graph);
+  Vertex (Graph *graph, const DPoint &p);
+  Vertex (Graph *graph, const Vertex &v);
+  Vertex (Graph *graph, db::DCoord x, db::DCoord y);
 
   void remove_edge (const edges_iterator_non_const &ec)
   {
     mp_edges.erase (ec);
   }
 
+  Graph *mp_graph;
   edges_type mp_edges;
   bool m_is_precious;
 };
@@ -111,15 +179,15 @@ private:
 /**
  *  @brief A class representing an edge in the Delaunay triangulation graph
  */
-class DB_PUBLIC GPolygonEdge
+class DB_PUBLIC Edge
 {
 public:
-  class GPolygonIterator
+  class PolygonIterator
   {
   public:
-    typedef GPolygon value_type;
-    typedef GPolygon &reference;
-    typedef GPolygon *pointer;
+    typedef Polygon value_type;
+    typedef Polygon &reference;
+    typedef Polygon *pointer;
 
     reference operator*() const
     {
@@ -131,17 +199,17 @@ public:
       return m_index ? mp_edge->right () : mp_edge->left ();
     }
 
-    bool operator== (const GPolygonIterator &other) const
+    bool operator== (const PolygonIterator &other) const
     {
       return m_index == other.m_index;
     }
 
-    bool operator!= (const GPolygonIterator &other) const
+    bool operator!= (const PolygonIterator &other) const
     {
       return !operator== (other);
     }
 
-    GPolygonIterator &operator++ ()
+    PolygonIterator &operator++ ()
     {
       while (++m_index < 2 && operator-> () == 0)
         ;
@@ -149,9 +217,9 @@ public:
     }
 
   private:
-    friend class GPolygonEdge;
+    friend class Edge;
 
-    GPolygonIterator (const GPolygonEdge *edge)
+    PolygonIterator (const Edge *edge)
       : mp_edge (edge), m_index (0)
     {
       if (! edge) {
@@ -162,48 +230,72 @@ public:
       }
     }
 
-    const GPolygonEdge *mp_edge;
+    const Edge *mp_edge;
     unsigned int m_index;
   };
 
-  GPolygonEdge ();
-  GPolygonEdge (GVertex *v1, GVertex *v2);
+  /**
+   *  @brief Gets the first vertex ("from")
+   */
+  Vertex *v1 () const { return mp_v1; }
 
-  GVertex *v1 () const { return mp_v1; }
-  GVertex *v2 () const { return mp_v2; }
+  /**
+   *  @brief Gets the first vertex ("to")
+   */
+  Vertex *v2 () const { return mp_v2; }
 
+  /**
+   *  @brief Reverses the edge
+   */
   void reverse ()
   {
     std::swap (mp_v1, mp_v2);
     std::swap (mp_left, mp_right);
   }
 
-  GPolygon *left  () const { return mp_left; }
-  GPolygon *right () const { return mp_right; }
+  /**
+   *  @brief Gets the polygon on the left side (can be null)
+   */
+  Polygon *left  () const { return mp_left; }
 
-  GPolygonIterator begin_polygons () const
+  /**
+   *  @brief Gets the polygon on the right side (can be null)
+   */
+  Polygon *right () const { return mp_right; }
+
+  /**
+   *  @brief Iterates the polygons (one or two, begin iterator)
+   */
+  PolygonIterator begin_polygons () const
   {
-    return GPolygonIterator (this);
+    return PolygonIterator (this);
   }
 
-  GPolygonIterator end_polygons () const
+  /**
+   *  @brief Iterates the polygons (end iterator)
+   */
+  PolygonIterator end_polygons () const
   {
-    return GPolygonIterator (0);
+    return PolygonIterator (0);
   }
 
-  void set_level (size_t l) { m_level = l; }
-  size_t level () const { return m_level; }
-
-  void set_id (size_t id) { m_id = id; }
-  size_t id () const { return m_id; }
-
-  void set_is_segment (bool is_seg) { m_is_segment = is_seg; }
+  /**
+   *  @brief Gets a value indicating whether the edge is a segment
+   */
   bool is_segment () const { return m_is_segment; }
 
+  /**
+   *  @brief Gets the edge ID (a unique identifier)
+   */
+  size_t id () const { return m_id; }
+
+  /**
+   *  @brief Gets a string representation of the edge
+   */
   std::string to_string (bool with_id = false) const;
 
   /**
-   *  @brief Converts to an db::DEdge
+   *  @brief Converts to a db::DEdge
    */
   db::DEdge edge () const
   {
@@ -254,7 +346,7 @@ public:
    *  "crosses" is true, if both edges share at least one point which is not an endpoint
    *  of one of the edges.
    */
-  bool crosses (const db::GPolygonEdge &other) const
+  bool crosses (const Edge &other) const
   {
     return crosses (edge (), other.edge ());
   }
@@ -279,7 +371,7 @@ public:
    *  @brief Returns a value indicating whether this edge crosses the other one
    *  "crosses" is true, if both edges share at least one point.
    */
-  bool crosses_including (const db::GPolygonEdge &other) const
+  bool crosses_including (const Edge &other) const
   {
     return crosses_including (edge (), other.edge ());
   }
@@ -301,7 +393,7 @@ public:
   /**
    *  @brief Gets the intersection point
    */
-  db::DPoint intersection_point (const GPolygonEdge &other) const
+  db::DPoint intersection_point (const Edge &other) const
   {
     return intersection_point (edge (), other.edge ());
   }
@@ -353,24 +445,23 @@ public:
   /**
    *  @brief Gets the other triangle for the given one
    */
-  GPolygon *other (const GPolygon *) const;
+  Polygon *other (const Polygon *) const;
 
   /**
    *  @brief Gets the other vertex for the given one
    */
-  GVertex *other (const GVertex *) const;
+  Vertex *other (const Vertex *) const;
 
   /**
    *  @brief Gets a value indicating whether the edge has the given vertex
    */
-  bool has_vertex (const GVertex *) const;
+  bool has_vertex (const Vertex *) const;
 
   /**
    *  @brief Gets the common vertex of the other edge and this edge or null if there is no common vertex
    */
-  GVertex *common_vertex (const GPolygonEdge *other) const;
+  Vertex *common_vertex (const Edge *other) const;
 
-#if 0 // @@@
   /**
    *  @brief Returns a value indicating whether this edge can be flipped
    */
@@ -379,7 +470,12 @@ public:
   /**
    *  @brief Returns a value indicating whether the edge separates two triangles that can be joined into one (via the given vertex)
    */
-  bool can_join_via (const GVertex *vertex) const;
+  bool can_join_via (const Vertex *vertex) const;
+
+  /**
+   *  @brief Returns a value indicating whether this edge belongs to outside triangles
+   */
+  bool is_for_outside_triangles () const;
 
   /**
    *  @brief Returns a value indicating whether this edge is an outside edge (no other triangles)
@@ -387,73 +483,80 @@ public:
   bool is_outside () const;
 
   /**
-   *  @brief Returns a value indicating whether this edge belongs to outside triangles
-   */
-  bool is_for_outside_triangles () const;
-#endif // @@@
-
-  /**
    *  @brief Returns a value indicating whether t is attached to this edge
    */
-  bool has_polygon (const GPolygon *t) const;
+  bool has_polygon (const Polygon *t) const;
 
 protected:
   void unlink ();
   void link ();
 
 private:
-  friend class GPolygon;
-  friend class PolygonGraph;
+  friend class Polygon;
+  friend class Graph;
+  friend class Triangulation;
 
-  GVertex *mp_v1, *mp_v2;
-  GPolygon *mp_left, *mp_right;
-  GVertex::edges_iterator_non_const m_ec_v1, m_ec_v2;
+  void set_level (size_t l) { m_level = l; }
+  size_t level () const { return m_level; }
+
+  void set_id (size_t id) { m_id = id; }
+
+  void set_is_segment (bool is_seg) { m_is_segment = is_seg; }
+
+  Edge (Graph *graph);
+  Edge (Graph *graph, Vertex *v1, Vertex *v2);
+
+  Graph *mp_graph;
+  Vertex *mp_v1, *mp_v2;
+  Polygon *mp_left, *mp_right;
+  Vertex::edges_iterator_non_const m_ec_v1, m_ec_v2;
   size_t m_level;
   size_t m_id;
   bool m_is_segment;
 
-  void set_left  (GPolygon *t);
-  void set_right (GPolygon *t);
+  void set_left  (Polygon *t);
+  void set_right (Polygon *t);
 };
 
 /**
- *  @brief A compare function that compares triangles by ID
+ *  @brief A compare function that compares edges by ID
  *
  *  The ID acts as a more predicable unique ID for the object in sets and maps.
  */
-struct GPolygonEdgeLessFunc
+struct EdgeLessFunc
 {
-  bool operator () (GPolygonEdge *a, GPolygonEdge *b) const
+  bool operator () (Edge *a, Edge *b) const
   {
     return a->id () < b->id ();
   }
 };
 
 /**
- *  @brief A class representing a triangle
+ *  @brief A class representing a polygon
  */
-class DB_PUBLIC GPolygon
-  : public tl::list_node<GPolygon>, public tl::Object
+class DB_PUBLIC Polygon
+  : public tl::list_node<Polygon>, public tl::Object
 {
 public:
-  GPolygon ();
+  Polygon (Graph *graph);
+  Polygon (Graph *graph, Edge *e1, Edge *e2, Edge *e3);
 
   template<class Iter>
-  GPolygon (Iter from, Iter to)
-    : mp_e (from, to)
+  Polygon (Graph *graph, Iter from, Iter to)
+    : mp_graph (graph), mp_e (from, to)
   {
     init ();
   }
 
-  ~GPolygon ();
+  ~Polygon ();
 
   void unlink ();
 
   void set_id (size_t id) { m_id = id; }
   size_t id () const { return m_id; }
 
-  // @@@bool is_outside () const { return m_is_outside; }
-  // @@@void set_outside (bool o) { m_is_outside = o; }
+  bool is_outside () const { return m_is_outside; }
+  void set_outside (bool o) { m_is_outside = o; }
 
   std::string to_string (bool with_id = false) const;
 
@@ -469,7 +572,7 @@ public:
    *  @brief Gets the nth vertex (n wraps around and can be negative)
    *  The vertexes are oriented clockwise.
    */
-  inline GVertex *vertex (int n) const
+  inline Vertex *vertex (int n) const
   {
     size_t sz = size ();
     tl_assert (sz > 0);
@@ -483,7 +586,7 @@ public:
   /**
    *  @brief Gets the nth edge (n wraps around and can be negative)
    */
-  inline GPolygonEdge *edge (int n) const
+  inline Edge *edge (int n) const
   {
     size_t sz = size ();
     tl_assert (sz > 0);
@@ -504,46 +607,50 @@ public:
    */
   db::DBox bbox () const;
 
-#if 0 // @@@
   /**
    *  @brief Gets the center point and radius of the circumcircle
    *  If ok is non-null, it will receive a boolean value indicating whether the circumcircle is valid.
    *  An invalid circumcircle is an indicator for a degenerated triangle with area 0 (or close to).
+   *
+   *  This method only applies to triangles.
    */
   std::pair<db::DPoint, double> circumcircle (bool *ok = 0) const;
 
   /**
    *  @brief Gets the vertex opposite of the given edge
+   *
+   *  This method only applies to triangles.
    */
-  GVertex *opposite (const GPolygonEdge *edge) const;
+  Vertex *opposite (const Edge *edge) const;
 
   /**
    *  @brief Gets the edge opposite of the given vertex
+   *
+   *  This method only applies to triangles.
    */
-  GPolygonEdge *opposite (const GVertex *vertex) const;
-#endif
+  Edge *opposite (const Vertex *vertex) const;
 
   /**
    *  @brief Gets the edge with the given vertexes
    */
-  GPolygonEdge *find_edge_with (const GVertex *v1, const GVertex *v2) const;
+  Edge *find_edge_with (const Vertex *v1, const Vertex *v2) const;
 
   /**
    *  @brief Finds the common edge for both polygons
    */
-  GPolygonEdge *common_edge (const GPolygon *other) const;
+  Edge *common_edge (const Polygon *other) const;
 
-#if 0 // @@@
   /**
    *  @brief Returns a value indicating whether the point is inside (1), on the polygon (0) or outside (-1)
+   *
+   *  This method only applies to triangles currently.
    */
   int contains (const db::DPoint &point) const;
-#endif
 
   /**
    *  @brief Gets a value indicating whether the triangle has the given vertex
    */
-  inline bool has_vertex (const db::GVertex *v) const
+  inline bool has_vertex (const Vertex *v) const
   {
     for (auto i = mp_v.begin (); i != mp_v.end (); ++i) {
       if (*i == v) {
@@ -556,7 +663,7 @@ public:
   /**
    *  @brief Gets a value indicating whether the triangle has the given edge
    */
-  inline bool has_edge (const db::GPolygonEdge *e) const
+  inline bool has_edge (const Edge *e) const
   {
     for (auto i = mp_e.begin (); i != mp_e.end (); ++i) {
       if (*i == e) {
@@ -571,12 +678,12 @@ public:
    */
   double min_edge_length () const;
 
-#if 0 // @@@
   /**
    *  @brief Returns the min edge length to circumcircle radius ratio
+   *
+   *  This method only applies to triangles currently.
    */
   double b () const;
-#endif
 
   /**
    *  @brief Returns a value indicating whether the polygon borders to a segment
@@ -589,16 +696,17 @@ public:
   unsigned int num_segments () const;
 
 private:
-  // @@@ bool m_is_outside;
-  std::vector<GPolygonEdge *> mp_e;
-  std::vector<db::GVertex *> mp_v;
+  Graph *mp_graph;
+  bool m_is_outside;
+  std::vector<Edge *> mp_e;
+  std::vector<Vertex *> mp_v;
   size_t m_id;
 
   void init ();
 
   //  no copying
-  GPolygon &operator= (const GPolygon &);
-  GPolygon (const GPolygon &);
+  Polygon &operator= (const Polygon &);
+  Polygon (const Polygon &);
 };
 
 /**
@@ -606,87 +714,29 @@ private:
  *
  *  The ID acts as a more predicable unique ID for the object in sets and maps.
  */
-struct GPolygonLessFunc
+struct PolygonLessFunc
 {
-  bool operator () (GPolygon *a, GPolygon *b) const
+  bool operator () (Polygon *a, Polygon *b) const
   {
     return a->id () < b->id ();
   }
 };
 
-class DB_PUBLIC PolygonGraph
+/**
+ *  @brief A class representing the polygon graph
+ *
+ *  A polygon graph is the main container, holding vertexes, edges and polygons.
+ *  The graph can be of "triangles" type, in which case it is guaranteed to only
+ *  hold triangles (polygons with 3 vertexes).
+ */
+class DB_PUBLIC Graph
 {
 public:
-#if 0 // @@@
-  struct TriangulateParameters
-  {
-    TriangulateParameters ()
-      : min_b (1.0),
-        min_length (0.0),
-        max_area (0.0),
-        max_area_border (0.0),
-        max_iterations (std::numeric_limits<size_t>::max ()),
-        base_verbosity (30),
-        mark_triangles (false)
-    { }
-
-    /**
-     *  @brief Min. readius-to-shortest edge ratio
-     */
-    double min_b;
-
-    /**
-     *  @brief Min. edge length
-     *
-     *  This parameter does not provide a guarantee about a minimume edge length, but
-     *  helps avoiding ever-reducing triangle splits in acute corners of the input polygon.
-     *  Splitting of edges stops when the edge is less than the min length.
-     */
-    double min_length;
-
-    /**
-     *  @brief Max area or zero for "no constraint"
-     */
-    double max_area;
-
-    /**
-     *  @brief Max area for border triangles or zero for "use max_area"
-     */
-    double max_area_border;
-
-    /**
-     *  @brief Max number of iterations
-     */
-    size_t max_iterations;
-
-    /**
-     *  @brief The verbosity level above which triangulation reports details
-     */
-    int base_verbosity;
-
-    /**
-     *  @brief If true, final triangles are marked using the "id" integer as a bit field
-     *
-     *  This provides information about the result quality.
-     *
-     *  Bit 0: skinny triangle
-     *  Bit 1: bad-quality (skinny or area too large)
-     *  Bit 2: non-Delaunay (in the strict sense)
-     */
-    bool mark_triangles;
-  };
-#endif
-
-  typedef tl::list<db::GPolygon> polygons_type;
+  typedef tl::list<Polygon> polygons_type;
   typedef polygons_type::const_iterator polygon_iterator;
 
-  PolygonGraph ();
-  ~PolygonGraph ();
-
-  /**
-   *  @brief Creates a convex decomposition for the given polygon
-   */
-  void convex_decompose (const DPolygon &poly);
+  Graph ();
+  ~Graph ();
 
   /**
    *  @brief Returns a string representation of the polygon graph.
@@ -718,15 +768,6 @@ public:
    */
   void clear ();
 
-protected:
-#if 0 // @@@
-  /**
-   *  @brief Checks the polygon graph for consistency
-   *  This method is for testing purposes mainly.
-   */
-  bool check (bool check_delaunay = true) const;
-#endif
-
   /**
    *  @brief Dumps the polygon graph to a GDS file at the given path
    *  This method is for testing purposes mainly.
@@ -743,35 +784,43 @@ protected:
    */
   db::Layout *to_layout (bool decompose_by_id = false) const;
 
-private:
-  tl::list<db::GPolygon> mp_polygons;
-  tl::stable_vector<db::GPolygonEdge> m_edges_heap;
-  std::vector<db::GPolygonEdge *> m_returned_edges;
-  tl::stable_vector<db::GVertex> m_vertex_heap;
-// @@@  bool m_is_constrained;
-// @@@    size_t m_level;
-  size_t m_id;
-// @@@    size_t m_flips, m_hops;
-
-  db::GVertex *create_vertex (double x, double y);
-  db::GVertex *create_vertex (const db::DPoint &pt);
-  db::GPolygonEdge *create_edge (db::GVertex *v1, db::GVertex *v2);
+protected:
+  Vertex *create_vertex (double x, double y);
+  Vertex *create_vertex (const db::DPoint &pt);
+  Edge *create_edge (Vertex *v1, Vertex *v2);
 
   template <class Iter>
-  db::GPolygon *
+  Polygon *
   create_polygon (Iter from, Iter to)
   {
-    db::GPolygon *res = new db::GPolygon (from ,to);
+    Polygon *res = new Polygon (this, from ,to);
     res->set_id (++m_id);
     mp_polygons.push_back (res);
     return res;
   }
 
-  void remove_polygon (db::GPolygon *tri);
-  template<class Poly, class Trans> void make_contours (const Poly &poly, const Trans &trans, std::vector<std::vector<db::GVertex *> > &contours);
+  Polygon *create_triangle (Edge *e1, Edge *e2, Edge *e3);
+
+  void remove_polygon (Polygon *p);
+
+private:
+  friend class Triangulation;
+  friend class ConvexDecomposition;
+
+  tl::list<Polygon> mp_polygons;
+  tl::stable_vector<Edge> m_edges_heap;
+  std::vector<Edge *> m_returned_edges;
+  tl::stable_vector<Vertex> m_vertex_heap;
+  size_t m_id;
+
+  tl::list<Polygon> &polygons () { return mp_polygons; }
+  tl::stable_vector<Edge> &edges () { return m_edges_heap; }
+  tl::stable_vector<Vertex> &vertexes () { return m_vertex_heap; }
 };
 
-}
+} //  namespace plc
+
+} //  namespace db
 
 #endif
 

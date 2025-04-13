@@ -21,7 +21,7 @@
 */
 
 
-#include "dbTriangles.h"
+#include "dbPLCTriangulation.h"
 #include "dbWriter.h"
 #include "dbRegionProcessors.h"
 #include "tlUnitTest.h"
@@ -33,56 +33,68 @@
 #include <cstdlib>
 #include <cmath>
 
-class TestableTriangles
-  : public db::Triangles
+class TestableTriangulation
+  : public db::plc::Triangulation
 {
 public:
-  using db::Triangles::Triangles;
-  using db::Triangles::check;
-  using db::Triangles::dump;
-  using db::Triangles::flip;
-  using db::Triangles::insert_point;
-  using db::Triangles::search_edges_crossing;
-  using db::Triangles::find_edge_for_points;
-  using db::Triangles::find_points_around;
-  using db::Triangles::find_inside_circle;
-  using db::Triangles::create_constrained_delaunay;
-  using db::Triangles::is_illegal_edge;
-  using db::Triangles::find_vertex_for_point;
-  using db::Triangles::remove;
-  using db::Triangles::ensure_edge;
-  using db::Triangles::constrain;
-  using db::Triangles::remove_outside_triangles;
+  using db::plc::Triangulation::Triangulation;
+  using db::plc::Triangulation::check;
+  using db::plc::Triangulation::flip;
+  using db::plc::Triangulation::insert_point;
+  using db::plc::Triangulation::search_edges_crossing;
+  using db::plc::Triangulation::find_edge_for_points;
+  using db::plc::Triangulation::find_points_around;
+  using db::plc::Triangulation::find_inside_circle;
+  using db::plc::Triangulation::create_constrained_delaunay;
+  using db::plc::Triangulation::is_illegal_edge;
+  using db::plc::Triangulation::find_vertex_for_point;
+  using db::plc::Triangulation::remove;
+  using db::plc::Triangulation::ensure_edge;
+  using db::plc::Triangulation::constrain;
+  using db::plc::Triangulation::remove_outside_triangles;
+};
+
+class TestableGraph
+  : public db::plc::Graph
+{
+public:
+  using db::plc::Graph::Graph;
+  using db::plc::Graph::create_vertex;
+  using db::plc::Graph::create_edge;
+  using db::plc::Graph::create_triangle;
 };
 
 TEST(basic)
 {
-  TestableTriangles tris;
+  db::plc::Graph plc;
+  TestableTriangulation tris (&plc);
   tris.init_box (db::DBox (1, 0, 5, 4));
 
-  EXPECT_EQ (tris.bbox ().to_string (), "(1,0;5,4)");
-  EXPECT_EQ (tris.to_string (), "((1, 0), (1, 4), (5, 0)), ((1, 4), (5, 4), (5, 0))");
+  EXPECT_EQ (plc.bbox ().to_string (), "(1,0;5,4)");
+  EXPECT_EQ (plc.to_string (), "((1, 0), (1, 4), (5, 0)), ((1, 4), (5, 4), (5, 0))");
 
   EXPECT_EQ (tris.check (), true);
 
   tris.clear ();
 
-  EXPECT_EQ (tris.bbox ().to_string (), "()");
-  EXPECT_EQ (tris.to_string (), "");
+  EXPECT_EQ (plc.bbox ().to_string (), "()");
+  EXPECT_EQ (plc.to_string (), "");
 
   EXPECT_EQ (tris.check (), true);
 }
 
 TEST(flip)
 {
-  TestableTriangles tris;
+  db::plc::Graph plc;
+  TestableTriangulation tris (&plc);
   tris.init_box (db::DBox (0, 0, 1, 1));
-  EXPECT_EQ (tris.to_string (), "((0, 0), (0, 1), (1, 0)), ((0, 1), (1, 1), (1, 0))");
+  EXPECT_EQ (plc.to_string (), "((0, 0), (0, 1), (1, 0)), ((0, 1), (1, 1), (1, 0))");
 
-  EXPECT_EQ (tris.num_triangles (), size_t (2));
+  EXPECT_EQ (plc.num_polygons (), size_t (2));
+  EXPECT_EQ (tris.check (), true);
 
-  const db::Triangle &t1 = *tris.begin ();
-  db::TriangleEdge *diag_segment;
+  const db::plc::Polygon &t1 = *plc.begin ();
+  db::plc::Edge *diag_segment;
   for (int i = 0; i < 3; ++i) {
     diag_segment = t1.edge (i);
     if (diag_segment->side_of (db::DPoint (0.5, 0.5)) == 0) {
@@ -90,85 +102,92 @@ TEST(flip)
     }
   }
   tris.flip (diag_segment);
-  EXPECT_EQ (tris.to_string (), "((1, 1), (0, 0), (0, 1)), ((1, 1), (1, 0), (0, 0))");
+  EXPECT_EQ (plc.to_string (), "((1, 1), (0, 0), (0, 1)), ((1, 1), (1, 0), (0, 0))");
   EXPECT_EQ (tris.check (), true);
 }
 
 TEST(insert)
 {
-  TestableTriangles tris;
+  db::plc::Graph plc;
+  TestableTriangulation tris (&plc);
   tris.init_box (db::DBox (0, 0, 1, 1));
 
   tris.insert_point (0.2, 0.2);
-  EXPECT_EQ (tris.to_string (), "((0, 0), (0, 1), (0.2, 0.2)), ((1, 0), (0, 0), (0.2, 0.2)), ((1, 1), (0.2, 0.2), (0, 1)), ((1, 1), (1, 0), (0.2, 0.2))");
+  EXPECT_EQ (plc.to_string (), "((0, 0), (0, 1), (0.2, 0.2)), ((1, 0), (0, 0), (0.2, 0.2)), ((1, 1), (0.2, 0.2), (0, 1)), ((1, 1), (1, 0), (0.2, 0.2))");
   EXPECT_EQ (tris.check (), true);
 }
 
 TEST(split_segment)
 {
-  TestableTriangles tris;
+  db::plc::Graph plc;
+  TestableTriangulation tris (&plc);
   tris.init_box (db::DBox (0, 0, 1, 1));
 
   tris.insert_point (0.5, 0.5);
-  EXPECT_EQ (tris.to_string (), "((1, 1), (1, 0), (0.5, 0.5)), ((1, 1), (0.5, 0.5), (0, 1)), ((0, 0), (0, 1), (0.5, 0.5)), ((0, 0), (0.5, 0.5), (1, 0))");
+  EXPECT_EQ (plc.to_string (), "((1, 1), (1, 0), (0.5, 0.5)), ((1, 1), (0.5, 0.5), (0, 1)), ((0, 0), (0, 1), (0.5, 0.5)), ((0, 0), (0.5, 0.5), (1, 0))");
   EXPECT_EQ (tris.check(), true);
 }
 
 TEST(insert_vertex_twice)
 {
-  TestableTriangles tris;
+  db::plc::Graph plc;
+  TestableTriangulation tris (&plc);
   tris.init_box (db::DBox (0, 0, 1, 1));
 
   tris.insert_point (0.5, 0.5);
   //  inserted a vertex twice does not change anything
   tris.insert_point (0.5, 0.5);
-  EXPECT_EQ (tris.to_string (), "((1, 1), (1, 0), (0.5, 0.5)), ((1, 1), (0.5, 0.5), (0, 1)), ((0, 0), (0, 1), (0.5, 0.5)), ((0, 0), (0.5, 0.5), (1, 0))");
+  EXPECT_EQ (plc.to_string (), "((1, 1), (1, 0), (0.5, 0.5)), ((1, 1), (0.5, 0.5), (0, 1)), ((0, 0), (0, 1), (0.5, 0.5)), ((0, 0), (0.5, 0.5), (1, 0))");
   EXPECT_EQ (tris.check(), true);
 }
 
 TEST(insert_vertex_convex)
 {
-  TestableTriangles tris;
+  db::plc::Graph plc;
+  TestableTriangulation tris (&plc);
   tris.insert_point (0.2, 0.2);
   tris.insert_point (0.2, 0.8);
   tris.insert_point (0.6, 0.5);
   tris.insert_point (0.7, 0.5);
   tris.insert_point (0.6, 0.4);
-  EXPECT_EQ (tris.to_string (), "((0.2, 0.2), (0.2, 0.8), (0.6, 0.5)), ((0.2, 0.8), (0.7, 0.5), (0.6, 0.5)), ((0.6, 0.4), (0.6, 0.5), (0.7, 0.5)), ((0.6, 0.4), (0.2, 0.2), (0.6, 0.5))");
+  EXPECT_EQ (plc.to_string (), "((0.2, 0.2), (0.2, 0.8), (0.6, 0.5)), ((0.2, 0.8), (0.7, 0.5), (0.6, 0.5)), ((0.6, 0.4), (0.6, 0.5), (0.7, 0.5)), ((0.6, 0.4), (0.2, 0.2), (0.6, 0.5))");
   EXPECT_EQ (tris.check(), true);
 }
 
 TEST(insert_vertex_convex2)
 {
-  TestableTriangles tris;
+  db::plc::Graph plc;
+  TestableTriangulation tris (&plc);
   tris.insert_point (0.25, 0.1);
   tris.insert_point (0.1, 0.4);
   tris.insert_point (0.4, 0.15);
   tris.insert_point (1, 0.7);
-  EXPECT_EQ (tris.to_string (), "((0.25, 0.1), (0.1, 0.4), (0.4, 0.15)), ((1, 0.7), (0.4, 0.15), (0.1, 0.4))");
+  EXPECT_EQ (plc.to_string (), "((0.25, 0.1), (0.1, 0.4), (0.4, 0.15)), ((1, 0.7), (0.4, 0.15), (0.1, 0.4))");
   EXPECT_EQ (tris.check(), true);
 }
 
 TEST(insert_vertex_convex3)
 {
-  TestableTriangles tris;
+  db::plc::Graph plc;
+  TestableTriangulation tris (&plc);
   tris.insert_point (0.25, 0.5);
   tris.insert_point (0.25, 0.55);
   tris.insert_point (0.15, 0.8);
   tris.insert_point (1, 0.4);
-  EXPECT_EQ (tris.to_string (), "((0.25, 0.5), (0.15, 0.8), (0.25, 0.55)), ((1, 0.4), (0.25, 0.5), (0.25, 0.55)), ((0.15, 0.8), (1, 0.4), (0.25, 0.55))");
+  EXPECT_EQ (plc.to_string (), "((0.25, 0.5), (0.15, 0.8), (0.25, 0.55)), ((1, 0.4), (0.25, 0.5), (0.25, 0.55)), ((0.15, 0.8), (1, 0.4), (0.25, 0.55))");
   EXPECT_EQ (tris.check(), true);
 }
 
 TEST(search_edges_crossing)
 {
-  TestableTriangles tris;
-  db::Vertex *v1 = tris.insert_point (0.2, 0.2);
-  db::Vertex *v2 = tris.insert_point (0.2, 0.8);
-  db::Vertex *v3 = tris.insert_point (0.6, 0.5);
-  /*db::Vertex *v4 =*/ tris.insert_point (0.7, 0.5);
-  db::Vertex *v5 = tris.insert_point (0.6, 0.4);
-  db::Vertex *v6 = tris.insert_point (0.7, 0.2);
+  db::plc::Graph plc;
+  TestableTriangulation tris (&plc);
+  db::plc::Vertex *v1 = tris.insert_point (0.2, 0.2);
+  db::plc::Vertex *v2 = tris.insert_point (0.2, 0.8);
+  db::plc::Vertex *v3 = tris.insert_point (0.6, 0.5);
+  /*db::plc::Vertex *v4 =*/ tris.insert_point (0.7, 0.5);
+  db::plc::Vertex *v5 = tris.insert_point (0.6, 0.4);
+  db::plc::Vertex *v6 = tris.insert_point (0.7, 0.2);
   EXPECT_EQ (tris.check(), true);
 
   auto xedges = tris.search_edges_crossing (v2, v6);
@@ -182,80 +201,84 @@ TEST(search_edges_crossing)
 
 TEST(illegal_edge1)
 {
-  db::Vertex v1 (0, 0);
-  db::Vertex v2 (1.6, 1.6);
-  db::Vertex v3 (1, 2);
-  db::Vertex v4 (2, 1);
+  TestableGraph plc;
+
+  db::plc::Vertex *v1 = plc.create_vertex (0, 0);
+  db::plc::Vertex *v2 = plc.create_vertex (1.6, 1.6);
+  db::plc::Vertex *v3 = plc.create_vertex (1, 2);
+  db::plc::Vertex *v4 = plc.create_vertex (2, 1);
 
   {
-    db::TriangleEdge e1 (&v1, &v3);
-    db::TriangleEdge e2 (&v3, &v4);
-    db::TriangleEdge e3 (&v4, &v1);
+    db::plc::Edge *e1 = plc.create_edge (v1, v3);
+    db::plc::Edge *e2 = plc.create_edge (v3, v4);
+    db::plc::Edge *e3 = plc.create_edge (v4, v1);
 
-    db::Triangle t1 (&e1, &e2, &e3);
+    plc.create_triangle (e1, e2, e3);
 
-    db::TriangleEdge ee1 (&v2, &v3);
-    db::TriangleEdge ee2 (&v4, &v2);
+    db::plc::Edge *ee1 = plc.create_edge (v2, v3);
+    db::plc::Edge *ee2 = plc.create_edge (v4, v2);
 
-    db::Triangle t2 (&ee1, &e2, &ee2);
+    plc.create_triangle (ee1, e2, ee2);
 
-    EXPECT_EQ (TestableTriangles::is_illegal_edge (&e2), true);
+    EXPECT_EQ (TestableTriangulation::is_illegal_edge (e2), true);
   }
 
   {
     //  flipped
-    db::TriangleEdge e1 (&v1, &v2);
-    db::TriangleEdge e2 (&v2, &v3);
-    db::TriangleEdge e3 (&v3, &v1);
+    db::plc::Edge *e1 = plc.create_edge (v1, v2);
+    db::plc::Edge *e2 = plc.create_edge  (v2, v3);
+    db::plc::Edge *e3 = plc.create_edge  (v3, v1);
 
-    db::Triangle t1 (&e1, &e2, &e3);
+    plc.create_triangle  (e1, e2, e3);
 
-    db::TriangleEdge ee1 (&v1, &v4);
-    db::TriangleEdge ee2 (&v4, &v2);
+    db::plc::Edge *ee1 = plc.create_edge (v1, v4);
+    db::plc::Edge *ee2 = plc.create_edge  (v4, v2);
 
-    db::Triangle t2 (&ee1, &ee2, &e1);
+    plc.create_triangle (ee1, ee2, e1);
 
-    EXPECT_EQ (TestableTriangles::is_illegal_edge (&e2), false);
+    EXPECT_EQ (TestableTriangulation::is_illegal_edge (e2), false);
   }
 }
 
 TEST(illegal_edge2)
 {
+  TestableGraph plc;
+
   //  numerical border case
-  db::Vertex v1 (773.94756216690905, 114.45875269431208);
-  db::Vertex v2 (773.29574734131643, 113.47402096138073);
-  db::Vertex v3 (773.10652961562653, 114.25497975904504);
-  db::Vertex v4 (774.08856345337881, 113.60495072750861);
+  db::plc::Vertex *v1 = plc.create_vertex (773.94756216690905, 114.45875269431208);
+  db::plc::Vertex *v2 = plc.create_vertex (773.29574734131643, 113.47402096138073);
+  db::plc::Vertex *v3 = plc.create_vertex (773.10652961562653, 114.25497975904504);
+  db::plc::Vertex *v4 = plc.create_vertex (774.08856345337881, 113.60495072750861);
 
   {
-    db::TriangleEdge e1 (&v1, &v2);
-    db::TriangleEdge e2 (&v2, &v4);
-    db::TriangleEdge e3 (&v4, &v1);
+    db::plc::Edge *e1 = plc.create_edge (v1, v2);
+    db::plc::Edge *e2 = plc.create_edge (v2, v4);
+    db::plc::Edge *e3 = plc.create_edge (v4, v1);
 
-    db::Triangle t1 (&e1, &e2, &e3);
+    plc.create_triangle (e1, e2, e3);
 
-    db::TriangleEdge ee1 (&v2, &v3);
-    db::TriangleEdge ee2 (&v3, &v4);
+    db::plc::Edge *ee1 = plc.create_edge (v2, v3);
+    db::plc::Edge *ee2 = plc.create_edge (v3, v4);
 
-    db::Triangle t2 (&ee1, &ee2, &e2);
+    plc.create_triangle (ee1, ee2, e2);
 
-    EXPECT_EQ (TestableTriangles::is_illegal_edge (&e2), false);
+    EXPECT_EQ (TestableTriangulation::is_illegal_edge (e2), false);
   }
 
   {
     //  flipped
-    db::TriangleEdge e1 (&v1, &v2);
-    db::TriangleEdge e2 (&v2, &v3);
-    db::TriangleEdge e3 (&v3, &v1);
+    db::plc::Edge *e1 = plc.create_edge (v1, v2);
+    db::plc::Edge *e2 = plc.create_edge (v2, v3);
+    db::plc::Edge *e3 = plc.create_edge (v3, v1);
 
-    db::Triangle t1 (&e1, &e2, &e3);
+    plc.create_triangle (e1, e2, e3);
 
-    db::TriangleEdge ee1 (&v1, &v4);
-    db::TriangleEdge ee2 (&v4, &v2);
+    db::plc::Edge *ee1 = plc.create_edge (v1, v4);
+    db::plc::Edge *ee2 = plc.create_edge (v4, v2);
 
-    db::Triangle t2 (&ee1, &ee2, &e1);
+    plc.create_triangle (ee1, ee2, e1);
 
-    EXPECT_EQ (TestableTriangles::is_illegal_edge (&e1), false);
+    EXPECT_EQ (TestableTriangulation::is_illegal_edge (e1), false);
   }
 }
 
@@ -279,7 +302,8 @@ TEST(insert_many)
 {
   srand (0);
 
-  TestableTriangles tris;
+  db::plc::Graph plc;
+  TestableTriangulation tris (&plc);
   double res = 65536.0;
 
   db::DBox bbox;
@@ -291,6 +315,7 @@ TEST(insert_many)
     tris.insert_point (x, y);
   }
 
+  //  slow: EXPECT_EQ (tris.check (), true);
   EXPECT_LT (double (tris.flips ()) / double (n), 3.1);
   EXPECT_LT (double (tris.hops ()) / double (n), 23.0);
 }
@@ -304,7 +329,8 @@ TEST(heavy_insert)
     srand (l);
     tl::info << "." << tl::noendl;
 
-    TestableTriangles tris;
+    db::plc::Graph plc;
+    TestableTriangulation tris (&plc);
     double res = 128.0;
 
     unsigned int n = rand () % 190 + 10;
@@ -315,17 +341,17 @@ TEST(heavy_insert)
     for (unsigned int i = 0; i < n; ++i) {
       double x = round (flt_rand () * res) * (1.0 / res);
       double y = round (flt_rand () * res) * (1.0 / res);
-      db::Vertex *v = tris.insert_point (x, y);
+      db::plc::Vertex *v = tris.insert_point (x, y);
       bbox += db::DPoint (x, y);
       vmap.insert (std::make_pair (*v, false));
     }
 
     //  not strictly true, but very likely with at least 10 vertexes:
-    EXPECT_GT (tris.num_triangles (), size_t (0));
-    EXPECT_EQ (tris.bbox ().to_string (), bbox.to_string ());
+    EXPECT_GT (plc.num_polygons (), size_t (0));
+    EXPECT_EQ (plc.bbox ().to_string (), bbox.to_string ());
 
     bool ok = true;
-    for (auto t = tris.begin (); t != tris.end (); ++t) {
+    for (auto t = plc.begin (); t != plc.end (); ++t) {
       for (int i = 0; i < 3; ++i) {
         auto f = vmap.find (*t->vertex (i));
         if (f == vmap.end ()) {
@@ -360,7 +386,8 @@ TEST(heavy_remove)
     srand (l);
     tl::info << "." << tl::noendl;
 
-    TestableTriangles tris;
+    db::plc::Graph plc;
+    TestableTriangulation tris (&plc);
     double res = 128.0;
 
     unsigned int n = rand () % 190 + 10;
@@ -373,11 +400,11 @@ TEST(heavy_remove)
 
     EXPECT_EQ (tris.check(), true);
 
-    std::set<db::Vertex *> vset;
-    std::vector<db::Vertex *> vertexes;
-    for (auto t = tris.begin (); t != tris.end (); ++t) {
+    std::set<db::plc::Vertex *> vset;
+    std::vector<db::plc::Vertex *> vertexes;
+    for (auto t = plc.begin (); t != plc.end (); ++t) {
       for (int i = 0; i < 3; ++i) {
-        db::Vertex *v = t->vertex (i);
+        db::plc::Vertex *v = t->vertex (i);
         if (vset.insert (v).second) {
           vertexes.push_back (v);
         }
@@ -387,7 +414,7 @@ TEST(heavy_remove)
     while (! vertexes.empty ()) {
 
       unsigned int n = rand () % (unsigned int) vertexes.size ();
-      db::Vertex *v = vertexes [n];
+      db::plc::Vertex *v = vertexes [n];
       tris.remove (v);
       vertexes.erase (vertexes.begin () + n);
 
@@ -398,7 +425,7 @@ TEST(heavy_remove)
 
     }
 
-    EXPECT_EQ (tris.num_triangles (), size_t (0));
+    EXPECT_EQ (plc.num_polygons (), size_t (0));
 
   }
 
@@ -409,7 +436,8 @@ TEST(ensure_edge)
 {
   srand (0);
 
-  TestableTriangles tris;
+  db::plc::Graph plc;
+  TestableTriangulation tris (&plc);
   double res = 128.0;
 
   db::DEdge ee[] = {
@@ -451,7 +479,7 @@ TEST(ensure_edge)
   for (unsigned int i = 0; i < sizeof (ee) / sizeof (ee[0]); ++i) {
     clip_box += ee[i].p1 ();
   }
-  for (auto t = tris.begin (); t != tris.end (); ++t) {
+  for (auto t = plc.begin (); t != plc.end (); ++t) {
     if (clip_box.overlaps (t->bbox ())) {
       EXPECT_EQ (t->bbox ().inside (clip_box), true);
       area_in += t->area ();
@@ -475,7 +503,8 @@ TEST(constrain)
 {
   srand (0);
 
-  TestableTriangles tris;
+  db::plc::Graph plc;
+  TestableTriangulation tris (&plc);
   double res = 128.0;
 
   db::DEdge ee[] = {
@@ -500,11 +529,11 @@ TEST(constrain)
     }
   }
 
-  std::vector<db::Vertex *> contour;
+  std::vector<db::plc::Vertex *> contour;
   for (unsigned int i = 0; i < sizeof (ee) / sizeof (ee[0]); ++i) {
     contour.push_back (tris.insert_point (ee[i].p1 ()));
   }
-  std::vector<std::vector<db::Vertex *> > contours;
+  std::vector<std::vector<db::plc::Vertex *> > contours;
   contours.push_back (contour);
 
   EXPECT_EQ (tris.check (), true);
@@ -521,7 +550,7 @@ TEST(constrain)
   for (unsigned int i = 0; i < sizeof (ee) / sizeof (ee[0]); ++i) {
     clip_box += ee[i].p1 ();
   }
-  for (auto t = tris.begin (); t != tris.end (); ++t) {
+  for (auto t = plc.begin (); t != plc.end (); ++t) {
     EXPECT_EQ (clip_box.overlaps (t->bbox ()), true);
     EXPECT_EQ (safe_inside (t->bbox (), clip_box), true);
     area_in += t->area ();
@@ -539,7 +568,8 @@ TEST(heavy_constrain)
     srand (l);
     tl::info << "." << tl::noendl;
 
-    TestableTriangles tris;
+    db::plc::Graph plc;
+    TestableTriangulation tris (&plc);
     double res = 128.0;
 
     db::DEdge ee[] = {
@@ -566,11 +596,11 @@ TEST(heavy_constrain)
       }
     }
 
-    std::vector<db::Vertex *> contour;
+    std::vector<db::plc::Vertex *> contour;
     for (unsigned int i = 0; i < sizeof (ee) / sizeof (ee[0]); ++i) {
       contour.push_back (tris.insert_point (ee[i].p1 ()));
     }
-    std::vector<std::vector<db::Vertex *> > contours;
+    std::vector<std::vector<db::plc::Vertex *> > contours;
     contours.push_back (contour);
 
     EXPECT_EQ (tris.check (), true);
@@ -587,7 +617,7 @@ TEST(heavy_constrain)
     for (unsigned int i = 0; i < sizeof (ee) / sizeof (ee[0]); ++i) {
       clip_box += ee[i].p1 ();
     }
-    for (auto t = tris.begin (); t != tris.end (); ++t) {
+    for (auto t = plc.begin (); t != plc.end (); ++t) {
       EXPECT_EQ (clip_box.overlaps (t->bbox ()), true);
       EXPECT_EQ (safe_inside (t->bbox (), clip_box), true);
       area_in += t->area ();
@@ -609,12 +639,13 @@ TEST(heavy_find_point_around)
     srand (l);
     tl::info << "." << tl::noendl;
 
-    TestableTriangles tris;
+    db::plc::Graph plc;
+    TestableTriangulation tris (&plc);
     double res = 128.0;
 
     unsigned int n = rand () % 190 + 10;
 
-    std::vector<db::Vertex *> vertexes;
+    std::vector<db::plc::Vertex *> vertexes;
 
     for (unsigned int i = 0; i < n; ++i) {
       double x = round (flt_rand () * res) * (1.0 / res);
@@ -633,8 +664,8 @@ TEST(heavy_find_point_around)
       auto p1 = tris.find_points_around (vertex, r);
       auto p2 = tris.find_inside_circle (*vertex, r);
 
-      std::set<db::Vertex *> sp1 (p1.begin (), p1.end ());
-      std::set<db::Vertex *> sp2 (p2.begin (), p2.end ());
+      std::set<db::plc::Vertex *> sp1 (p1.begin (), p1.end ());
+      std::set<db::plc::Vertex *> sp2 (p2.begin (), p2.end ());
       sp2.erase (vertex);
 
       EXPECT_EQ (sp1 == sp2, true);
@@ -656,13 +687,14 @@ TEST(create_constrained_delaunay)
 
   r -= r2;
 
-  TestableTriangles tri;
-  tri.create_constrained_delaunay (r);
-  tri.remove_outside_triangles ();
+  db::plc::Graph plc;
+  TestableTriangulation tris (&plc);
+  tris.create_constrained_delaunay (r);
+  tris.remove_outside_triangles ();
 
-  EXPECT_EQ (tri.check (), true);
+  EXPECT_EQ (tris.check (), true);
 
-  EXPECT_EQ (tri.to_string (),
+  EXPECT_EQ (plc.to_string (),
              "((1000, 0), (0, 0), (200, 200)), "
              "((0, 1000), (200, 200), (0, 0)), "
              "((1000, 0), (200, 200), (800, 200)), "
@@ -683,22 +715,23 @@ TEST(triangulate_basic)
 
   r -= r2;
 
-  db::Triangles::TriangulateParameters param;
+  db::plc::TriangulationParameters param;
   param.min_b = 1.2;
   param.max_area = 1.0;
 
-  TestableTriangles tri;
+  db::plc::Graph plc;
+  TestableTriangulation tri (&plc);
   tri.triangulate (r, param, 0.001);
 
   EXPECT_EQ (tri.check (), true);
 
-  for (auto t = tri.begin (); t != tri.end (); ++t) {
+  for (auto t = plc.begin (); t != plc.end (); ++t) {
     EXPECT_LE (t->area (), param.max_area);
     EXPECT_GE (t->b (), param.min_b);
   }
 
-  EXPECT_GT (tri.num_triangles (), size_t (100));
-  EXPECT_LT (tri.num_triangles (), size_t (150));
+  EXPECT_GT (plc.num_polygons (), size_t (100));
+  EXPECT_LT (plc.num_polygons (), size_t (150));
 
   //  for debugging:
   //  tri.dump ("debug.gds");
@@ -710,16 +743,16 @@ TEST(triangulate_basic)
 
   EXPECT_EQ (tri.check (), true);
 
-  for (auto t = tri.begin (); t != tri.end (); ++t) {
+  for (auto t = plc.begin (); t != plc.end (); ++t) {
     EXPECT_LE (t->area (), param.max_area);
     EXPECT_GE (t->b (), param.min_b);
   }
 
-  EXPECT_GT (tri.num_triangles (), size_t (900));
-  EXPECT_LT (tri.num_triangles (), size_t (1000));
+  EXPECT_GT (plc.num_polygons (), size_t (900));
+  EXPECT_LT (plc.num_polygons (), size_t (1000));
 }
 
-void read_polygons (const std::string &path, db::Region &region, double dbu)
+static void read_polygons (const std::string &path, db::Region &region, double dbu)
 {
   tl::InputStream is (path);
   tl::TextInputStream ti (is);
@@ -801,12 +834,13 @@ TEST(triangulate_geo)
 
   }
 
-  db::Triangles::TriangulateParameters param;
+  db::plc::TriangulationParameters param;
   param.min_b = 1.0;
   param.max_area = 0.1;
   param.min_length = 0.001;
 
-  TestableTriangles tri;
+  db::plc::Graph plc;
+  TestableTriangulation tri (&plc);
   tri.triangulate (r, param, dbu);
 
   EXPECT_EQ (tri.check (false), true);
@@ -815,7 +849,7 @@ TEST(triangulate_geo)
   //  tri.dump ("debug.gds");
 
   size_t n_skinny = 0;
-  for (auto t = tri.begin (); t != tri.end (); ++t) {
+  for (auto t = plc.begin (); t != plc.end (); ++t) {
     EXPECT_LE (t->area (), param.max_area);
     if (t->b () < param.min_b) {
       ++n_skinny;
@@ -823,8 +857,8 @@ TEST(triangulate_geo)
   }
 
   EXPECT_LT (n_skinny, size_t (20));
-  EXPECT_GT (tri.num_triangles (), size_t (29000));
-  EXPECT_LT (tri.num_triangles (), size_t (30000));
+  EXPECT_GT (plc.num_polygons (), size_t (29000));
+  EXPECT_LT (plc.num_polygons (), size_t (30000));
 }
 
 TEST(triangulate_analytic)
@@ -860,11 +894,12 @@ TEST(triangulate_analytic)
 
   rg = db::Region (sp1) - db::Region (sp2);
 
-  db::Triangles::TriangulateParameters param;
+  db::plc::TriangulationParameters param;
   param.min_b = 1.0;
   param.max_area = 0.01;
 
-  TestableTriangles tri;
+  db::plc::Graph plc;
+  TestableTriangulation tri (&plc);
   tri.triangulate (rg, param, dbu);
 
   EXPECT_EQ (tri.check (false), true);
@@ -872,13 +907,13 @@ TEST(triangulate_analytic)
   //  for debugging:
   //  tri.dump ("debug.gds");
 
-  for (auto t = tri.begin (); t != tri.end (); ++t) {
+  for (auto t = plc.begin (); t != plc.end (); ++t) {
     EXPECT_LE (t->area (), param.max_area);
     EXPECT_GE (t->b (), param.min_b);
   }
 
-  EXPECT_GT (tri.num_triangles (), size_t (1250));
-  EXPECT_LT (tri.num_triangles (), size_t (1300));
+  EXPECT_GT (plc.num_polygons (), size_t (1250));
+  EXPECT_LT (plc.num_polygons (), size_t (1300));
 }
 
 TEST(triangulate_problematic)
@@ -899,12 +934,13 @@ TEST(triangulate_problematic)
   db::DPolygon poly;
   poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour[0]));
 
-  db::Triangles::TriangulateParameters param;
+  db::plc::TriangulationParameters param;
   param.min_b = 1.0;
   param.max_area = 100000.0;
   param.min_length = 0.002;
 
-  TestableTriangles tri;
+  db::plc::Graph plc;
+  TestableTriangulation tri (&plc);
   tri.triangulate (poly, param);
 
   EXPECT_EQ (tri.check (false), true);
@@ -912,13 +948,13 @@ TEST(triangulate_problematic)
   //  for debugging:
   //  tri.dump ("debug.gds");
 
-  for (auto t = tri.begin (); t != tri.end (); ++t) {
+  for (auto t = plc.begin (); t != plc.end (); ++t) {
     EXPECT_LE (t->area (), param.max_area);
     EXPECT_GE (t->b (), param.min_b);
   }
 
-  EXPECT_GT (tri.num_triangles (), size_t (540));
-  EXPECT_LT (tri.num_triangles (), size_t (560));
+  EXPECT_GT (plc.num_polygons (), size_t (540));
+  EXPECT_LT (plc.num_polygons (), size_t (560));
 }
 
 TEST(triangulate_thin)
@@ -943,12 +979,13 @@ TEST(triangulate_thin)
 
   double dbu = 0.001;
 
-  db::Triangles::TriangulateParameters param;
+  db::plc::TriangulationParameters param;
   param.min_b = 0.5;
   param.max_area = 0.0;
   param.min_length = 2 * dbu;
 
-  TestableTriangles tri;
+  db::plc::Graph plc;
+  TestableTriangulation tri (&plc);
   db::DCplxTrans trans = db::DCplxTrans (dbu) * db::DCplxTrans (db::DTrans (db::DPoint () - poly.box ().center ()));
   tri.triangulate (trans * poly, param);
 
@@ -957,12 +994,12 @@ TEST(triangulate_thin)
   //  for debugging:
   //  tri.dump ("debug.gds");
 
-  for (auto t = tri.begin (); t != tri.end (); ++t) {
+  for (auto t = plc.begin (); t != plc.end (); ++t) {
     EXPECT_GE (t->b (), param.min_b);
   }
 
-  EXPECT_GT (tri.num_triangles (), size_t (13000));
-  EXPECT_LT (tri.num_triangles (), size_t (13200));
+  EXPECT_GT (plc.num_polygons (), size_t (13000));
+  EXPECT_LT (plc.num_polygons (), size_t (13200));
 }
 
 TEST(triangulate_issue1996)
@@ -979,11 +1016,12 @@ TEST(triangulate_issue1996)
 
   double dbu = 0.001;
 
-  db::Triangles::TriangulateParameters param;
+  db::plc::TriangulationParameters param;
   param.min_b = 0.5;
   param.max_area = 5000.0 * dbu * dbu;
 
-  TestableTriangles tri;
+  db::plc::Graph plc;
+  TestableTriangulation tri (&plc);
   db::DCplxTrans trans = db::DCplxTrans (dbu) * db::DCplxTrans (db::DTrans (db::DPoint () - poly.box ().center ()));
   tri.triangulate (trans * poly, param);
 
@@ -992,13 +1030,13 @@ TEST(triangulate_issue1996)
   //  for debugging:
   //  tri.dump ("debug.gds");
 
-  for (auto t = tri.begin (); t != tri.end (); ++t) {
+  for (auto t = plc.begin (); t != plc.end (); ++t) {
     EXPECT_LE (t->area (), param.max_area);
     EXPECT_GE (t->b (), param.min_b);
   }
 
-  EXPECT_GT (tri.num_triangles (), size_t (128000));
-  EXPECT_LT (tri.num_triangles (), size_t (132000));
+  EXPECT_GT (plc.num_polygons (), size_t (128000));
+  EXPECT_LT (plc.num_polygons (), size_t (132000));
 }
 
 TEST(triangulate_with_vertexes)
@@ -1015,17 +1053,18 @@ TEST(triangulate_with_vertexes)
 
   double dbu = 0.001;
 
-  db::Triangles::TriangulateParameters param;
+  db::plc::TriangulationParameters param;
   param.min_b = 0.0;
   param.max_area = 0.0;
 
   std::vector<db::Point> vertexes;
 
-  TestableTriangles tri;
+  db::plc::Graph plc;
+  TestableTriangulation tri (&plc);
   db::CplxTrans trans = db::DCplxTrans (dbu) * db::CplxTrans (db::Trans (db::Point () - poly.box ().center ()));
   tri.triangulate (poly, param, trans);
 
-  EXPECT_EQ (tri.to_string (), "((-0.5, -0.05), (-0.5, 0.05), (0.5, 0.05)), ((0.5, -0.05), (-0.5, -0.05), (0.5, 0.05))");
+  EXPECT_EQ (plc.to_string (), "((-0.5, -0.05), (-0.5, 0.05), (0.5, 0.05)), ((0.5, -0.05), (-0.5, -0.05), (0.5, 0.05))");
 
   vertexes.clear ();
 
@@ -1033,7 +1072,7 @@ TEST(triangulate_with_vertexes)
   vertexes.push_back (db::Point (50, 150));
   tri.triangulate (poly, vertexes, param, trans);
 
-  EXPECT_EQ (tri.to_string (), "((-0.5, -0.05), (-0.133333333333, 0.05), (0.5, -0.05)), ((0.5, 0.05), (0.5, -0.05), (-0.133333333333, 0.05)), ((-0.133333333333, 0.05), (-0.5, -0.05), (-0.5, 0.05))");
+  EXPECT_EQ (plc.to_string (), "((-0.5, -0.05), (-0.133333333333, 0.05), (0.5, -0.05)), ((0.5, 0.05), (0.5, -0.05), (-0.133333333333, 0.05)), ((-0.133333333333, 0.05), (-0.5, -0.05), (-0.5, 0.05))");
 
   for (auto v = vertexes.begin (); v != vertexes.end (); ++v) {
     auto *vp = tri.find_vertex_for_point (trans * *v);
@@ -1044,7 +1083,7 @@ TEST(triangulate_with_vertexes)
   vertexes.push_back (db::Point (50, 50));
   tri.triangulate (poly, vertexes, param, trans);
 
-  EXPECT_EQ (tri.to_string (), "((-0.45, 0), (-0.5, -0.05), (-0.5, 0.05)), ((0.5, 0.05), (-0.45, 0), (-0.5, 0.05)), ((-0.45, 0), (0.5, -0.05), (-0.5, -0.05)), ((-0.45, 0), (0.5, 0.05), (0.5, -0.05))");
+  EXPECT_EQ (plc.to_string (), "((-0.45, 0), (-0.5, -0.05), (-0.5, 0.05)), ((0.5, 0.05), (-0.45, 0), (-0.5, 0.05)), ((-0.45, 0), (0.5, -0.05), (-0.5, -0.05)), ((-0.45, 0), (0.5, 0.05), (0.5, -0.05))");
 
   for (auto v = vertexes.begin (); v != vertexes.end (); ++v) {
     auto *vp = tri.find_vertex_for_point (trans * *v);
@@ -1060,10 +1099,10 @@ TEST(triangulate_with_vertexes)
 
   tri.triangulate (poly, vertexes, param, trans);
 
-  EXPECT_GT (tri.num_triangles (), size_t (380));
-  EXPECT_LT (tri.num_triangles (), size_t (400));
+  EXPECT_GT (plc.num_polygons (), size_t (380));
+  EXPECT_LT (plc.num_polygons (), size_t (400));
 
-  for (auto t = tri.begin (); t != tri.end (); ++t) {
+  for (auto t = plc.begin (); t != plc.end (); ++t) {
     EXPECT_LE (t->area (), param.max_area);
     EXPECT_GE (t->b (), param.min_b);
   }
@@ -1076,463 +1115,3 @@ TEST(triangulate_with_vertexes)
     }
   }
 }
-
-// @@@@@@@@@@@
-
-struct SortAngleAndEdgesByEdgeLength
-{
-  typedef std::list<std::pair<double, const db::TriangleEdge *> > angle_and_edges_list;
-
-  bool operator() (const angle_and_edges_list::iterator &a, const angle_and_edges_list::iterator &b) const
-  {
-    double la = a->second->edge ().double_sq_length ();
-    double lb = b->second->edge ().double_sq_length ();
-    if (fabs (la - lb) > db::epsilon) {
-      return la < lb;
-    } else {
-      return a->second->edge ().less (b->second->edge ());
-    }
-  }
-};
-
-//  TODO: move to some generic header
-template <class T>
-struct less_compare_func
-{
-  bool operator() (const T &a, const T &b) const
-  {
-    return a.less (b);
-  }
-};
-
-//  TODO: move to some generic header
-template <class T>
-struct equal_compare_func
-{
-  bool operator() (const T &a, const T &b) const
-  {
-    return a.equal (b);
-  }
-};
-
-struct ConcaveCorner
-{
-  ConcaveCorner ()
-    : corner (0), incoming (0), outgoing (0)
-  {
-    //  .. nothing yet ..
-  }
-
-  ConcaveCorner (db::Vertex *_corner, db::TriangleEdge *_incoming, db::TriangleEdge *_outgoing)
-    : corner (_corner), incoming (_incoming), outgoing (_outgoing)
-  {
-    //  .. nothing yet ..
-  }
-
-  db::Vertex *corner;
-  db::TriangleEdge *incoming, *outgoing;
-};
-
-db::TriangleEdge *find_outgoing_segment (db::Vertex *vertex, db::TriangleEdge *incoming, int &vp_max_sign)
-{
-  db::Vertex *vfrom = incoming->other (vertex);
-  db::DEdge e1 (*vfrom, *vertex);
-
-  double vp_max = 0.0;
-  vp_max_sign = 0;
-  db::TriangleEdge *outgoing = 0;
-
-  //  Look for the outgoing edge. We pick the one which bends "most", favoring
-  //  convex corners. Multiple edges per vertex are possible is corner cases such as the
-  //  "hourglass" configuration.
-
-  for (auto e = vertex->begin_edges (); e != vertex->end_edges (); ++e) {
-
-    db::TriangleEdge *en = *e;
-    if (en != incoming && en->is_segment ()) {
-
-      db::Vertex *v = en->other (vertex);
-      db::DEdge e2 (*vertex, *v);
-      double vp = double (db::vprod (e1, e2)) / (e1.double_length () * e2.double_length ());
-
-      //  vp > 0: concave, vp < 0: convex
-
-      if (! outgoing || vp > vp_max) {
-        vp_max_sign = db::vprod_sign (e1, e2);
-        vp_max = vp;
-        outgoing = en;
-      }
-
-    }
-
-  }
-
-  tl_assert (outgoing != 0);
-  return outgoing;
-}
-
-void collect_concave_vertexes (db::Triangles &tris, std::vector<ConcaveCorner> &concave_vertexes)
-{
-  concave_vertexes.clear ();
-
-  //  @@@ use edge "level"
-  //  @@@ use edges from heap
-  std::unordered_set<db::TriangleEdge *> left;
-
-  for (auto it = tris.begin (); it != tris.end (); ++it) {
-    for (unsigned int i = 0; i < 3; ++i) {
-      db::TriangleEdge *e = it->edge (i);
-      if (e->is_segment ()) {
-        left.insert (e);
-      }
-    }
-  }
-
-  while (! left.empty ()) {
-
-    //  First segment for a new loop
-    db::TriangleEdge *segment = *left.begin ();
-
-    //  walk along the segments in clockwise direction. Find concave
-    //  vertexes and create new vertexes perpendicular to the incoming
-    //  and outgoing edge.
-
-    db::TriangleEdge *start_segment = segment;
-    db::Vertex *vto = segment->right () ? segment->v2 () : segment->v1 ();
-
-    do {
-
-      left.erase (segment);
-
-      db::TriangleEdge *prev_segment = segment;
-
-      int vp_sign = 0;
-      segment = find_outgoing_segment (vto, prev_segment, vp_sign);
-
-      if (vp_sign > 0) {
-        concave_vertexes.push_back (ConcaveCorner (vto, prev_segment, segment));
-      }
-
-      vto = segment->other (vto);
-
-    } while (segment != start_segment);
-
-  }
-}
-
-std::pair<bool, db::DPoint>
-search_crossing_with_next_segment (const db::Vertex *v0, const db::DVector &direction)
-{
-  auto vtri = v0->triangles ();  //  TODO: slow?
-  std::vector<const db::Vertex *> nvv, nvv_next;
-
-  for (auto it = vtri.begin (); it != vtri.end (); ++it) {
-
-    //  Search for a segment in the direction perpendicular to the edge
-    nvv.clear ();
-    nvv.push_back (v0);
-    const db::Triangle *t = *it;
-
-    while (! nvv.empty ()) {
-
-      nvv_next.clear ();
-
-      for (auto iv = nvv.begin (); iv != nvv.end (); ++iv) {
-
-        const db::Vertex *v = *iv;
-        const db::TriangleEdge *oe = t->opposite (v);
-        const db::Triangle *tt = oe->other (t);
-        const db::Vertex *v1 = oe->v1 ();
-        const db::Vertex *v2 = oe->v2 ();
-
-        if (db::sprod_sign (*v2 - *v, direction) >= 0 && db::sprod_sign (*v1 - *v, direction) >= 0 &&
-            db::vprod_sign (*v2 - *v, direction) * db::vprod_sign (*v1 - *v, direction) < 0) {
-
-          //  this triangle covers the normal vector of e1 -> stop here or continue searching in that direction
-          if (oe->is_segment ()) {
-            auto cp = oe->edge ().cut_point (db::DEdge (*v0, *v0 + direction));
-            if (cp.first) {
-              return std::make_pair (true, cp.second);
-            }
-          } else {
-            //  continue searching in that direction
-            nvv_next.push_back (v1);
-            nvv_next.push_back (v2);
-            t = tt;
-          }
-
-          break;
-
-        }
-
-      }
-
-      nvv.swap (nvv_next);
-
-    }
-
-  }
-
-  return std::make_pair (false, db::DPoint ());
-}
-
-void
-hertel_mehlhorn_decomposition (db::Triangles &tri, bool diagonals_only, bool no_collinear_edges, std::list<db::DPolygon> &polygons)
-{
-  std::vector<ConcaveCorner> concave_vertexes;
-  collect_concave_vertexes (tri, concave_vertexes);
-
-  //  @@@ return if no concave corners
-
-  //  @@@ sort concave vertexes
-
-  std::vector<db::DPoint> new_points;
-
-  if (! diagonals_only) {
-
-    //  Create internal segments cutting off pieces orthogonal to the edges
-    //  connecting the concave vertex.
-
-    for (auto cc = concave_vertexes.begin (); cc != concave_vertexes.end (); ++cc) {
-
-      for (unsigned int ei = 0; ei < 2; ++ei) {
-
-        db::DEdge ee;
-        const db::Vertex *v0 = cc->corner;
-        if (ei == 0) {
-          ee = db::DEdge (*cc->incoming->other (v0), *v0);
-        } else {
-          ee = db::DEdge (*v0, *cc->outgoing->other (v0));
-        }
-
-        auto cp = search_crossing_with_next_segment (v0, db::DVector (ee.dy (), -ee.dx ()));
-        if (cp.first) {
-          new_points.push_back (cp.second);
-        }
-
-      }
-
-    }
-
-  }
-
-  //  eliminate duplicates and put the new points in some order
-
-  if (! new_points.empty ()) {
-
-    std::sort (new_points.begin (), new_points.end (), less_compare_func<db::DPoint> ());
-    new_points.erase (std::unique (new_points.begin (), new_points.end (), equal_compare_func<db::DPoint> ()), new_points.end ());
-
-    //  Insert the new points and make connections
-    for (auto p = new_points.begin (); p != new_points.end (); ++p) {
-      tri.insert_point (*p);
-    }
-
-    //  As the insertion invalidates the edges, we need to collect the concave vertexes again
-    collect_concave_vertexes (tri, concave_vertexes);
-
-  }
-
-  //  Collect essential edges
-  //  Every concave vertex can have up to two essential edges.
-  //  Other then suggested by Hertel-Mehlhorn we don't pick
-  //  them one-by-one, but using them in length order, from the
-
-  std::unordered_set<const db::TriangleEdge *> essential_edges;
-
-  typedef std::list<std::pair<double, const db::TriangleEdge *> > angles_and_edges_list;
-  angles_and_edges_list angles_and_edges;
-  std::vector<angles_and_edges_list::iterator> sorted_edges;
-
-  for (auto cc = concave_vertexes.begin (); cc != concave_vertexes.end (); ++cc) {
-
-    angles_and_edges.clear ();
-    const db::Vertex *v0 = cc->corner;
-
-    const db::TriangleEdge *e = cc->incoming;
-    while (e) {
-
-      const db::Triangle *t = e->v2 () == v0 ? e->right () : e->left ();
-      tl_assert (t != 0);
-
-      //  @@@ make a method of triangle
-      const db::TriangleEdge *en = 0;
-      for (unsigned int i = 0; i < 3; ++i) {
-        const db::TriangleEdge *ee = t->edge (i);
-        if (ee != e && (ee->v1 () == v0 || ee->v2 () == v0)) {
-          en = ee;
-          break;
-        }
-      }
-
-      db::DVector v1 = e->edge ().d () * (e->v1 () == v0 ? 1.0 : -1.0);
-      db::DVector v2 = en->edge ().d () * (en->v1 () == v0 ? 1.0 : -1.0);
-
-      double angle = atan2 (db::vprod (v1, v2), db::sprod (v1, v2));
-
-      e = (en == cc->outgoing) ? 0 : en;
-      angles_and_edges.push_back (std::make_pair (angle, e));
-
-    }
-
-    sorted_edges.clear ();
-
-    for (auto i = angles_and_edges.begin (); i != angles_and_edges.end (); ++i) {
-      if (i->second) {
-        sorted_edges.push_back (i);
-      }
-    }
-
-    std::sort (sorted_edges.begin (), sorted_edges.end (), SortAngleAndEdgesByEdgeLength ());
-
-    for (auto i = sorted_edges.end (); i != sorted_edges.begin (); ) {
-      --i;
-      angles_and_edges_list::iterator ii = *i;
-      angles_and_edges_list::iterator iin = ii;
-      ++iin;
-      if (ii->first + iin->first < (no_collinear_edges ? M_PI - db::epsilon : M_PI + db::epsilon)) {
-        //  not an essential edge -> remove
-        iin->first += ii->first;
-        angles_and_edges.erase (ii);
-      }
-    }
-
-    for (auto i = angles_and_edges.begin (); i != angles_and_edges.end (); ++i) {
-      essential_edges.insert (i->second);
-    }
-
-  }
-
-  //  Combine triangles, but don't cross essential edges
-
-  std::unordered_set<const db::Triangle *> left_triangles;
-  for (auto it = tri.begin (); it != tri.end (); ++it) {
-    left_triangles.insert (it.operator-> ());
-  }
-
-  while (! left_triangles.empty ()) {
-
-    std::unordered_map<const db::Vertex *, const db::Vertex *> edges;
-
-    const db::Triangle *tri = *left_triangles.begin ();
-    std::vector<const db::Triangle *> queue, next_queue;
-    queue.push_back (tri);
-
-    while (! queue.empty ()) {
-
-      next_queue.clear ();
-
-      for (auto q = queue.begin (); q != queue.end (); ++q) {
-
-        left_triangles.erase (*q);
-
-        for (unsigned int i = 0; i < 3; ++i) {
-
-          const db::TriangleEdge *e = (*q)->edge (i);
-          const db::Triangle *qq = e->other (*q);
-
-          if (! qq || essential_edges.find (e) != essential_edges.end ()) {
-            if (e->right () == *q) {
-              edges.insert (std::make_pair (e->v1 (), e->v2 ()));
-            } else {
-              edges.insert (std::make_pair (e->v2 (), e->v1 ()));
-            }
-          } else if (left_triangles.find (qq) != left_triangles.end ()) {
-            next_queue.push_back (qq);
-          }
-        }
-
-      }
-
-      queue.swap (next_queue);
-
-    }
-
-    //  stitch the loop points into a polygon
-
-    tl_assert (! edges.empty ());
-
-    const db::Vertex *v = edges.begin ()->first;
-    const db::Vertex *v0 = v;
-    const db::Vertex *vv = edges.begin ()->second;
-
-    std::vector<db::DPoint> polygon_points;
-
-    do {
-
-      polygon_points.push_back (*v);
-
-      auto i = edges.find (vv);
-      tl_assert (i != edges.end ());
-
-      v = i->first;
-      vv = i->second;
-
-    } while (v != v0);
-
-    polygons.push_back (db::DPolygon ());
-    polygons.back ().assign_hull (polygon_points.begin (), polygon_points.end ());
-
-  }
-}
-
-
-//  Hertel-Mehlhorn :)
-TEST(JoinTriangles)
-{
-#if 0
-  db::Point contour[] = {
-    db::Point (0, 0),
-    db::Point (0, 100),
-    db::Point (1000, 100),
-    db::Point (1000, 500),
-    db::Point (1100, 500),
-    db::Point (1100, 100),
-    db::Point (2100, 100),
-    db::Point (2100, 0)
-  };
-#else
-
-  db::Point contour[] = {
-    db::Point (0, 0),
-    db::Point (0, 100),
-    db::Point (1000, 100),
-    db::Point (1000, 500),
-    db::Point (1100, 500),
-    db::Point (1100, 100),
-    db::Point (2100, 100),
-    db::Point (2100, -1000),
-    db::Point (150, -1000),
-    db::Point (150, 0)
-  };
-#endif
-
-  db::Polygon poly;
-  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour[0]));
-
-  //  @@@ don't to anything if already convex
-
-  double dbu = 0.001;
-
-  db::Triangles::TriangulateParameters param;
-  param.min_b = 0.0;
-
-  TestableTriangles tri;
-  db::CplxTrans trans = db::CplxTrans (dbu);
-  tri.triangulate (poly, param, trans);
-
-  std::list<db::DPolygon> polygons;
-  hertel_mehlhorn_decomposition (tri, false, true, polygons);
-
-  db::Region result;
-  for (auto p = polygons.begin (); p != polygons.end (); ++p) {
-    result.insert (trans.inverted () * *p);
-  }
-
-  // @@@
-  tri.dump ("debugt.gds");
-  result.write ("debug.gds");
-
-}
-
-// @@@@@@@@@@q

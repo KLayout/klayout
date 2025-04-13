@@ -70,13 +70,14 @@ SOURCES = \
   dbNetlistSpiceReaderExpressionParser.cc \
   dbObject.cc \
   dbObjectWithProperties.cc \
+  dbPLC.cc \
+  dbPLCTriangulation.cc \
   dbPath.cc \
   dbPCellDeclaration.cc \
   dbPCellHeader.cc \
   dbPCellVariant.cc \
   dbPoint.cc \
   dbPolygon.cc \
-  dbPolygonGraph.cc \
   dbPolygonNeighborhood.cc \
   dbPolygonTools.cc \
   dbPolygonGenerators.cc \
@@ -309,13 +310,14 @@ HEADERS = \
   dbObject.h \
   dbObjectTag.h \
   dbObjectWithProperties.h \
+  dbPLC.h \
+  dbPLCTriangulation.h \
   dbPath.h \
   dbPCellDeclaration.h \
   dbPCellHeader.h \
   dbPCellVariant.h \
   dbPoint.h \
   dbPolygon.h \
-  dbPolygonGraph.h \
   dbPolygonNeighborhood.h \
   dbPolygonTools.h \
   dbPolygonGenerators.h \

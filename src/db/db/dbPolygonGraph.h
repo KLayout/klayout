@@ -684,9 +684,9 @@ public:
   ~PolygonGraph ();
 
   /**
-   *  @brief Inserts the given polygon
+   *  @brief Creates a convex decomposition for the given polygon
    */
-  void insert_polygon (const db::DPolygon &box);
+  void convex_decompose (const DPolygon &poly);
 
   /**
    *  @brief Returns a string representation of the polygon graph.

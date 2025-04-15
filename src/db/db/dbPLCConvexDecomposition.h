@@ -1,0 +1,132 @@
+
+/*
+
+  KLayout Layout Viewer
+  Copyright (C) 2006-2025 Matthias Koefferlein
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+*/
+
+#ifndef HDR_dbPLCConvexDecomposition
+#define HDR_dbPLCConvexDecomposition
+
+#include "dbCommon.h"
+#include "dbPLC.h"
+
+#include <limits>
+#include <list>
+#include <vector>
+#include <algorithm>
+
+namespace db
+{
+
+namespace plc
+{
+
+class Triangulation;
+
+struct DB_PUBLIC ConvexDecompositionParameters
+{
+  ConvexDecompositionParameters ()
+    : with_segments (false),
+      split_edges (false),
+      base_verbosity (30)
+  { }
+
+  /**
+   *  @brief Introduce new segments
+   *
+   *  If true, new segments will be introduced.
+   *  New segments are constructed perpendicular to the edges forming
+   *  a concave corner.
+   */
+  bool with_segments;
+
+  /**
+   *  @brief Split edges
+   *
+   *  If true, edges in the resulting polygons may be split.
+   *  This will produce edge sections that correlate with
+   *  other polygon edges, but may be collinear with neighbor
+   *  edges.
+   */
+  double split_edges;
+
+  /**
+   *  @brief The verbosity level above which triangulation reports details
+   */
+  int base_verbosity;
+};
+
+/**
+ *  @brief A convex decomposition algorithm
+ *
+ *  This class implements a variant of the Hertel-Mehlhorn decomposition.
+ */
+class DB_PUBLIC ConvexDecomposition
+{
+public:
+  /**
+   *  @brief The constructor
+   *
+   *  The graph will be one filled by the decomposition.
+   */
+  ConvexDecomposition (Graph *graph);
+
+  /**
+   *  @brief Clears the triangulation
+   */
+  void clear ();
+
+  /**
+   *  @brief Creates a decomposition for the given region
+   *
+   *  The database unit should be chosen in a way that target area values are "in the order of 1".
+   *  For inputs featuring acute angles (angles < ~25 degree), the parameters should defined a min
+   *  edge length ("min_length").
+   *  "min_length" should be at least 1e-4. If a min edge length is given, the max area constaints
+   *  may not be satisfied.
+   *
+   *  Edges in the input should not be shorter than 1e-4.
+   */
+  void decompose (const db::Region &region, const ConvexDecompositionParameters &parameters, double dbu = 1.0);
+
+  //  more versions
+  void decompose (const db::Region &region, const ConvexDecompositionParameters &parameters, const db::CplxTrans &trans = db::CplxTrans ());
+  void decompose (const db::Polygon &poly, const ConvexDecompositionParameters &parameters, double dbu = 1.0);
+  void decompose (const db::Polygon &poly, const std::vector<db::Point> &vertexes, const ConvexDecompositionParameters &parameters, double dbu = 1.0);
+  void decompose (const db::Polygon &poly, const ConvexDecompositionParameters &parameters, const db::CplxTrans &trans = db::CplxTrans ());
+  void decompose (const db::Polygon &poly, const std::vector<db::Point> &vertexes, const ConvexDecompositionParameters &parameters, const db::CplxTrans &trans = db::CplxTrans ());
+
+  /**
+   *  @brief Decomposes a floating-point polygon
+   */
+  void decompose (const db::DPolygon &poly, const ConvexDecompositionParameters &parameters, const db::DCplxTrans &trans = db::DCplxTrans ());
+  void decompose (const db::DPolygon &poly, const std::vector<db::DPoint> &vertexes, const ConvexDecompositionParameters &parameters, const db::DCplxTrans &trans = db::DCplxTrans ());
+
+private:
+  Graph *mp_graph;
+
+  void hertel_mehlhorn_decomposition (Triangulation &tris, const ConvexDecompositionParameters &param);
+};
+
+} //  namespace plc
+
+} //  namespace db
+
+#endif
+

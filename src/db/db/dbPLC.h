@@ -504,6 +504,7 @@ private:
   friend class Polygon;
   friend class Graph;
   friend class Triangulation;
+  friend class ConvexDecomposition;
 
   Graph *mp_graph;
   Vertex *mp_v1, *mp_v2;

@@ -804,105 +804,6 @@ Graph::bbox () const
   return box;
 }
 
-#if 0 // @@@
-bool
-Graph::check (bool check_delaunay) const
-{
-  bool res = true;
-
-  if (check_delaunay) {
-    for (auto t = mp_polygons.begin (); t != mp_polygons.end (); ++t) {
-      auto cp = t->circumcircle ();
-      auto vi = find_inside_circle (cp.first, cp.second);
-      if (! vi.empty ()) {
-        res = false;
-        tl::error << "(check error) polygon does not meet Delaunay criterion: " << t->to_string ();
-        for (auto v = vi.begin (); v != vi.end (); ++v) {
-          tl::error << "  vertex inside circumcircle: " << (*v)->to_string (true);
-        }
-      }
-    }
-  }
-
-  for (auto t = mp_polygons.begin (); t != mp_polygons.end (); ++t) {
-    for (int i = 0; i < 3; ++i) {
-      if (! t->edge (i)->has_polygon (t.operator-> ())) {
-        tl::error << "(check error) edges " << t->edge (i)->to_string (true)
-                  << " attached to polygon " << t->to_string (true) << " does not refer to this polygon";
-        res = false;
-      }
-    }
-  }
-
-  for (auto e = m_edges_heap.begin (); e != m_edges_heap.end (); ++e) {
-
-    if (!e->left () && !e->right ()) {
-      continue;
-    }
-
-    if (e->left () && e->right ()) {
-      if (e->left ()->is_outside () != e->right ()->is_outside () && ! e->is_segment ()) {
-        tl::error << "(check error) edge " << e->to_string (true) << " splits an outside and inside polygon, but is not a segment";
-        res = false;
-      }
-    }
-
-    for (auto t = e->begin_polygons (); t != e->end_polygons (); ++t) {
-      if (! t->has_edge (e.operator-> ())) {
-        tl::error << "(check error) edge " << e->to_string (true) << " not found in adjacent polygon " << t->to_string (true);
-        res = false;
-      }
-      if (! t->has_vertex (e->v1 ())) {
-        tl::error << "(check error) edges " << e->to_string (true) << " vertex 1 not found in adjacent polygon " << t->to_string (true);
-        res = false;
-      }
-      if (! t->has_vertex (e->v2 ())) {
-        tl::error << "(check error) edges " << e->to_string (true) << " vertex 2 not found in adjacent polygon " << t->to_string (true);
-        res = false;
-      }
-      Vertex *vopp = t->opposite (e.operator-> ());
-      double sgn = (e->left () == t.operator-> ()) ? 1.0 : -1.0;
-      double vp = db::vprod (e->d(), *vopp - *e->v1 ());  //  positive if on left side
-      if (vp * sgn <= 0.0) {
-        const char * side_str = sgn > 0.0 ? "left" : "right";
-        tl::error << "(check error) external point " << vopp->to_string (true) << " not on " << side_str << " side of edge " << e->to_string (true);
-        res = false;
-      }
-    }
-
-    if (! e->v1 ()->has_edge (e.operator-> ())) {
-      tl::error << "(check error) edge " << e->to_string (true) << " vertex 1 does not list this edge";
-      res = false;
-    }
-    if (! e->v2 ()->has_edge (e.operator-> ())) {
-      tl::error << "(check error) edge " << e->to_string (true) << " vertex 2 does not list this edge";
-      res = false;
-    }
-
-  }
-
-  for (auto v = m_vertex_heap.begin (); v != m_vertex_heap.end (); ++v) {
-    unsigned int num_outside_edges = 0;
-    for (auto e = v->begin_edges (); e != v->end_edges (); ++e) {
-      if ((*e)->is_outside ()) {
-        ++num_outside_edges;
-      }
-    }
-    if (num_outside_edges > 0 && num_outside_edges != 2) {
-      tl::error << "(check error) vertex " << v->to_string (true) << " has " << num_outside_edges << " outside edges (can only be 2)";
-      res = false;
-      for (auto e = v->begin_edges (); e != v->end_edges (); ++e) {
-        if ((*e)->is_outside ()) {
-          tl::error << "  Outside edge is " << (*e)->to_string (true);
-        }
-      }
-    }
-  }
-
-  return res;
-}
-#endif
-
 db::Layout *
 Graph::to_layout (bool decompose_by_id) const
 {
@@ -913,7 +814,7 @@ Graph::to_layout (bool decompose_by_id) const
 
   db::Cell &top = layout->cell (layout->add_cell ("DUMP"));
   unsigned int l1 = layout->insert_layer (db::LayerProperties (1, 0));
-  // @@@ unsigned int l2 = layout->insert_layer (db::LayerProperties (2, 0));
+  unsigned int l2 = layout->insert_layer (db::LayerProperties (2, 0));
   unsigned int l10 = layout->insert_layer (db::LayerProperties (10, 0));
   unsigned int l20 = layout->insert_layer (db::LayerProperties (20, 0));
   unsigned int l21 = layout->insert_layer (db::LayerProperties (21, 0));
@@ -927,7 +828,7 @@ Graph::to_layout (bool decompose_by_id) const
     }
     db::DPolygon poly;
     poly.assign_hull (pts.begin (), pts.end ());
-    top.shapes (/*@@@t->is_outside () ? l2 :*/ l1).insert (dbu_trans * poly);
+    top.shapes (t->is_outside () ? l2 : l1).insert (dbu_trans * poly);
     if (decompose_by_id) {
       if ((t->id () & 1) != 0) {
         top.shapes (l20).insert (dbu_trans * poly);

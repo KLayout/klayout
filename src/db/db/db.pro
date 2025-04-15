@@ -71,6 +71,7 @@ SOURCES = \
   dbObject.cc \
   dbObjectWithProperties.cc \
   dbPLC.cc \
+  dbPLCConvexDecomposition.cc \
   dbPLCTriangulation.cc \
   dbPath.cc \
   dbPCellDeclaration.cc \
@@ -309,6 +310,7 @@ HEADERS = \
   dbObjectTag.h \
   dbObjectWithProperties.h \
   dbPLC.h \
+  dbPLCConvexDecomposition.h \
   dbPLCTriangulation.h \
   dbPath.h \
   dbPCellDeclaration.h \

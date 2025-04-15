@@ -22,9 +22,6 @@
 
 
 #include "dbPLCTriangulation.h"
-#include "dbLayout.h"
-#include "dbWriter.h"
-#include "tlStream.h"
 #include "tlLog.h"
 #include "tlTimer.h"
 

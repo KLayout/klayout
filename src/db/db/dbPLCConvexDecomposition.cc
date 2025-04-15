@@ -383,12 +383,16 @@ ConvexDecomposition::hertel_mehlhorn_decomposition (Triangulation &tris, const C
     left_triangles.insert (it.operator-> ());
   }
 
-  std::list<std::vector<Edge *> > polygons;
+  std::list<std::unordered_set<Edge *> > polygons;
+  std::list<std::unordered_set<Vertex *> > internal_vertexes;
 
   while (! left_triangles.empty ()) {
 
-    polygons.push_back (std::vector<Edge *> ());
-    std::vector<Edge *> &edges = polygons.back ();
+    polygons.push_back (std::unordered_set<Edge *> ());
+    std::unordered_set<Edge *> &edges = polygons.back ();
+
+    internal_vertexes.push_back (std::unordered_set<Vertex *> ());
+    std::unordered_set<Vertex *> &ivs = internal_vertexes.back ();
 
     const Polygon *tri = *left_triangles.begin ();
     std::vector<const Polygon *> queue, next_queue;
@@ -407,8 +411,15 @@ ConvexDecomposition::hertel_mehlhorn_decomposition (Triangulation &tris, const C
           const Edge *e = (*q)->edge (i);
           const Polygon *qq = e->other (*q);
 
+          if (e->v1 ()->is_precious ()) {
+            ivs.insert (e->v1 ());
+          }
+          if (e->v2 ()->is_precious ()) {
+            ivs.insert (e->v2 ());
+          }
+
           if (! qq || essential_edges.find (e) != essential_edges.end ()) {
-            edges.push_back (const_cast<Edge *> (e));  // @@@ const_cast
+            edges.insert (const_cast<Edge *> (e));  // @@@ const_cast
           } else if (left_triangles.find (qq) != left_triangles.end ()) {
             next_queue.push_back (qq);
           }
@@ -430,8 +441,12 @@ ConvexDecomposition::hertel_mehlhorn_decomposition (Triangulation &tris, const C
 
   //  create the polygons
 
+  auto iv = internal_vertexes.begin ();
   for (auto p = polygons.begin (); p != polygons.end (); ++p) {
-    mp_graph->create_polygon (p->begin (), p->end ());
+    Polygon *poly = mp_graph->create_polygon (p->begin (), p->end ());
+    for (auto i = iv->begin (); i != iv->end (); ++i) {
+      poly->add_internal_vertex (*i); // @@@ reserve?
+    }
   }
 }
 
@@ -472,7 +487,6 @@ ConvexDecomposition::decompose (const db::Polygon &poly, const std::vector<db::P
   Triangulation tri (mp_graph);
   tri.triangulate (poly, vertexes, param, trans);
 
-  //  @@@ consider vertexes
   hertel_mehlhorn_decomposition (tri, parameters);
 }
 
@@ -501,7 +515,6 @@ ConvexDecomposition::decompose (const db::DPolygon &poly, const std::vector<db::
   Triangulation tri (mp_graph);
   tri.triangulate (poly, vertexes, param, trans);
 
-  //  @@@ consider vertexes
   hertel_mehlhorn_decomposition (tri, parameters);
 }
 

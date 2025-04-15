@@ -110,3 +110,36 @@ TEST(basic)
   db::compare_layouts (_this, *ly, tl::testdata () + "/algo/hm_decomposition_au4.gds");
 }
 
+TEST(internal_vertex)
+{
+  db::plc::Graph plc;
+  TestableConvexDecomposition decomp (&plc);
+
+  db::Point contour[] = {
+    db::Point (0, 0),
+    db::Point (0, 100),
+    db::Point (1000, 100),
+    db::Point (1000, 0)
+  };
+
+  std::vector<db::Point> vertexes;
+  vertexes.push_back (db::Point (10, 50));
+  vertexes.push_back (db::Point (200, 70));
+
+  db::Polygon poly;
+  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour[0]));
+
+  double dbu = 0.001;
+
+  db::plc::ConvexDecompositionParameters param;
+  decomp.decompose (poly, vertexes, param, dbu);
+
+  for (auto p = plc.begin (); p != plc.end (); ++p) {
+    std::cout << p->polygon ().to_string () << std::endl; // @@@
+    for (size_t i = 0; i < p->internal_vertexes (); ++i) {
+      std::cout << "  " << p->internal_vertex (i)->to_string () << std::endl; // @@@
+    }
+  }
+
+}
+

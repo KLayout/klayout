@@ -542,6 +542,19 @@ Polygon::bbox () const
   return box;
 }
 
+db::DPolygon
+Polygon::polygon () const
+{
+  std::vector<db::DPoint> pts;
+  for (int i = 0; i < int (size ()); ++i) {
+    pts.push_back (*vertex (i));
+  }
+
+  db::DPolygon poly;
+  poly.assign_hull (pts.begin (), pts.end ());
+  return poly;
+}
+
 std::pair<db::DPoint, double>
 Polygon::circumcircle (bool *ok) const
 {

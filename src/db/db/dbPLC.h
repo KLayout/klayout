@@ -562,7 +562,25 @@ public:
    */
   size_t size () const
   {
-    return mp_v.size ();
+    return mp_e.size ();
+  }
+
+  /**
+   *  @brief Gets the internal vertexes
+   *
+   *  Internal vertexes are special points inside the polygons.
+   */
+  size_t internal_vertexes () const
+  {
+    return mp_v.size () - mp_e.size ();
+  }
+
+  /**
+   *  @brief Adds a vertex as an internal vertex
+   */
+  void add_internal_vertex (Vertex *v)
+  {
+    mp_v.push_back (v);
   }
 
   /**
@@ -578,6 +596,14 @@ public:
     } else {
       return mp_v[(n + sz) % sz];
     }
+  }
+
+  /**
+   *  @brief Gets the nth internal vertex
+   */
+  inline Vertex *internal_vertex (size_t n) const
+  {
+    return mp_v[mp_e.size () + n];
   }
 
   /**
@@ -603,6 +629,11 @@ public:
    *  @brief Returns the bounding box of the triangle
    */
   db::DBox bbox () const;
+
+  /**
+   *  @brief Returns a DPolygon object for this polygon
+   */
+  db::DPolygon polygon () const;
 
   /**
    *  @brief Gets the center point and radius of the circumcircle

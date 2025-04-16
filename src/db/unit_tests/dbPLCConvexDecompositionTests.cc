@@ -123,7 +123,7 @@ TEST(internal_vertex)
   };
 
   std::vector<db::Point> vertexes;
-  vertexes.push_back (db::Point (10, 50));
+  vertexes.push_back (db::Point (0, 50));  // on edge
   vertexes.push_back (db::Point (200, 70));
 
   db::Polygon poly;
@@ -134,12 +134,21 @@ TEST(internal_vertex)
   db::plc::ConvexDecompositionParameters param;
   decomp.decompose (poly, vertexes, param, dbu);
 
-  for (auto p = plc.begin (); p != plc.end (); ++p) {
-    std::cout << p->polygon ().to_string () << std::endl; // @@@
-    for (size_t i = 0; i < p->internal_vertexes (); ++i) {
-      std::cout << "  " << p->internal_vertex (i)->to_string () << std::endl; // @@@
-    }
+  EXPECT_EQ (plc.begin () == plc.end (), false);
+  if (plc.begin () == plc.end ()) {
+    return;
   }
 
+  auto p = plc.begin ();
+  EXPECT_EQ (p->polygon ().to_string (), "(0,0;0,0.05;0,0.1;1,0.1;1,0)");
+
+  std::vector<std::string> ip;
+  for (size_t i = 0; i < p->internal_vertexes (); ++i) {
+    ip.push_back (p->internal_vertex (i)->to_string ());
+  }
+  std::sort (ip.begin (), ip.end ());
+  EXPECT_EQ (tl::join (ip, "/"), "(0, 0.05)/(0.2, 0.07)");
+
+  EXPECT_EQ (++p == plc.end (), true);
 }
 

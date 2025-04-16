@@ -551,7 +551,7 @@ Polygon::polygon () const
   }
 
   db::DPolygon poly;
-  poly.assign_hull (pts.begin (), pts.end ());
+  poly.assign_hull (pts.begin (), pts.end (), false);
   return poly;
 }
 

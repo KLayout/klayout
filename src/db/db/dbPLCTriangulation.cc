@@ -1017,7 +1017,7 @@ Triangulation::search_edges_crossing (Vertex *from, Vertex *to)
       if (os->has_vertex (vv)) {
         return result;
       }
-      if (os->crosses (edge)) {
+      if (os->crosses_including (edge)) {
         result.push_back (os);
         current_triangle = t.operator-> ();
         next_edge = os;
@@ -1087,11 +1087,18 @@ Triangulation::find_edge_for_points (const db::DPoint &p1, const db::DPoint &p2)
   return 0;
 }
 
+static bool is_touching (const db::DEdge &a, const db::DEdge &b)
+{
+  return (a.side_of (b.p1 ()) == 0 || a.side_of (b.p2 ()) == 0);
+}
+
 std::vector<Edge *>
 Triangulation::ensure_edge_inner (Vertex *from, Vertex *to)
 {
   auto crossed_edges = search_edges_crossing (from, to);
   std::vector<Edge *> result;
+
+  db::DEdge dedge (*from , *to);
 
   if (crossed_edges.empty ()) {
 
@@ -1100,7 +1107,7 @@ Triangulation::ensure_edge_inner (Vertex *from, Vertex *to)
     tl_assert (res != 0);
     result.push_back (res);
 
-  } else if (crossed_edges.size () == 1) {
+  } else if (crossed_edges.size () == 1 && ! is_touching (dedge, crossed_edges.front ()->edge ())) {
 
     //  can be solved by flipping
     auto pp = flip (crossed_edges.front ());
@@ -1112,18 +1119,29 @@ Triangulation::ensure_edge_inner (Vertex *from, Vertex *to)
 
     //  split edge close to center
     db::DPoint split_point;
+    Edge *split_edge = 0;
     double d = -1.0;
     double l_half = 0.25 * (*to - *from).sq_length ();
     for (auto e = crossed_edges.begin (); e != crossed_edges.end (); ++e) {
-      db::DPoint p = (*e)->intersection_point (db::DEdge (*from, *to));
+      db::DPoint p = (*e)->intersection_point (dedge);
       double dp = fabs ((p - *from).sq_length () - l_half);
       if (d < 0.0 || dp < d) {
         dp = d;
         split_point = p;
+        split_edge = *e;
       }
     }
 
-    Vertex *split_vertex = insert_point (split_point);
+    Vertex *split_vertex;
+    if (dedge.side_of (split_point) == 0) {
+      if (dedge.side_of (*split_edge->v1 ()) == 0) {
+        split_vertex = split_edge->v1 ();
+      } else {
+        split_vertex = split_edge->v2 ();
+      }
+    } else {
+      split_vertex = insert_point (split_point);
+    }
 
     result = ensure_edge_inner (from, split_vertex);
 
@@ -1167,15 +1185,20 @@ Triangulation::join_edges (std::vector<Edge *> &edges)
     tl_assert (cp != 0);
 
     std::vector<Edge *> join_edges;
-    for (auto e = cp->begin_edges (); e != cp->end_edges (); ++e) {
-      if (*e != s1 && *e != s2) {
-        if ((*e)->can_join_via (cp)) {
-          join_edges.push_back (*e);
-        } else {
-          join_edges.clear ();
-          break;
+
+    if (! cp->is_precious ()) {
+
+      for (auto e = cp->begin_edges (); e != cp->end_edges (); ++e) {
+        if (*e != s1 && *e != s2) {
+          if ((*e)->can_join_via (cp)) {
+            join_edges.push_back (*e);
+          } else {
+            join_edges.clear ();
+            break;
+          }
         }
       }
+
     }
 
     if (! join_edges.empty ()) {

@@ -54,8 +54,9 @@ TEST(basic)
   EXPECT_EQ (v1->to_string (), "(2, 1)");
 
   EXPECT_EQ (v1->is_precious (), false);
-  v1->set_is_precious (true);
+  v1->set_is_precious (true, 17);
   EXPECT_EQ (v1->is_precious (), true);
+  EXPECT_EQ (v1->id (), 17u);
 }
 
 TEST(edge)

@@ -233,10 +233,6 @@ ConvexDecomposition::hertel_mehlhorn_decomposition (Triangulation &tris, const C
   std::vector<ConcaveCorner> concave_vertexes;
   collect_concave_vertexes (concave_vertexes);
 
-  //  @@@ return if no concave corners
-
-  //  @@@ sort concave vertexes
-
   std::vector<db::DPoint> new_points;
 
   if (with_segments) {
@@ -306,15 +302,8 @@ ConvexDecomposition::hertel_mehlhorn_decomposition (Triangulation &tris, const C
       const Polygon *t = e->v2 () == v0 ? e->right () : e->left ();
       tl_assert (t != 0);
 
-      //  @@@ make a method of Polygon -> next_edge(Edge *e, Vertex *at)
-      const Edge *en = 0;
-      for (unsigned int i = 0; i < 3; ++i) {
-        const Edge *ee = t->edge (i);
-        if (ee != e && (ee->v1 () == v0 || ee->v2 () == v0)) {
-          en = ee;
-          break;
-        }
-      }
+      const Edge *en = t->next_edge (e, v0);
+      tl_assert (en != 0);
 
       db::DVector v1 = e->edge ().d () * (e->v1 () == v0 ? 1.0 : -1.0);
       db::DVector v2 = en->edge ().d () * (en->v1 () == v0 ? 1.0 : -1.0);
@@ -397,7 +386,7 @@ ConvexDecomposition::hertel_mehlhorn_decomposition (Triangulation &tris, const C
           }
 
           if (! qq || essential_edges.find (e) != essential_edges.end ()) {
-            edges.insert (const_cast<Edge *> (e));  // @@@ const_cast
+            edges.insert (const_cast<Edge *> (e));  //  TODO: ugly const_cast
           } else if (left_triangles.find (qq) != left_triangles.end ()) {
             next_queue.push_back (qq);
           }
@@ -422,8 +411,9 @@ ConvexDecomposition::hertel_mehlhorn_decomposition (Triangulation &tris, const C
   auto iv = internal_vertexes.begin ();
   for (auto p = polygons.begin (); p != polygons.end (); ++p) {
     Polygon *poly = mp_graph->create_polygon (p->begin (), p->end ());
+    poly->reserve_internal_vertexes (iv->size ());
     for (auto i = iv->begin (); i != iv->end (); ++i) {
-      poly->add_internal_vertex (*i); // @@@ reserve?
+      poly->add_internal_vertex (*i);
     }
   }
 }

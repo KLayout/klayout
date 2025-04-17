@@ -55,19 +55,19 @@ Vertex::Vertex (Graph *graph, const db::DPoint &p)
 }
 
 Vertex::Vertex (Graph *graph, const Vertex &v)
-  : DPoint (), mp_graph (graph), m_is_precious (false)
+  : DPoint (), mp_graph (graph), m_is_precious (false), m_id (0)
 {
   operator= (v);
 }
 
 Vertex::Vertex (Graph *graph, db::DCoord x, db::DCoord y)
-  : DPoint (x, y), mp_graph (graph), m_is_precious (false)
+  : DPoint (x, y), mp_graph (graph), m_is_precious (false), m_id (0)
 {
   //  .. nothing yet ..
 }
 
 Vertex::Vertex (const Vertex &v)
-  : DPoint (v), mp_graph (v.mp_graph), m_is_precious (v.m_is_precious)
+  : DPoint (v), mp_graph (v.mp_graph), m_is_precious (v.m_is_precious), m_id (v.m_id)
 {
   //  NOTE: edges are not copied!
 }
@@ -83,6 +83,7 @@ Vertex &Vertex::operator= (const Vertex &v)
     //  NOTE: edges are not copied!
     db::DPoint::operator= (v);
     m_is_precious = v.m_is_precious;
+    m_id = v.m_id;
   }
   return *this;
 }
@@ -684,6 +685,17 @@ Polygon::contains (const db::DPoint &point) const
   }
 
   return res;
+}
+
+Edge *
+Polygon::next_edge (const Edge *edge, const Vertex *vertex) const
+{
+  for (auto e = mp_e.begin (); e != mp_e.end (); ++e) {
+    if (*e != edge && ((*e)->v1 () == vertex || (*e)->v2 () == vertex)) {
+      return *e;
+    }
+  }
+  return 0;
 }
 
 double

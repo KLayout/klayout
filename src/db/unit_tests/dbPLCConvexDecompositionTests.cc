@@ -125,6 +125,7 @@ TEST(internal_vertex)
   std::vector<db::Point> vertexes;
   vertexes.push_back (db::Point (0, 50));  // on edge
   vertexes.push_back (db::Point (200, 70));
+  vertexes.push_back (db::Point (0, 0));  //  on vertex
 
   db::Polygon poly;
   poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour[0]));
@@ -144,10 +145,10 @@ TEST(internal_vertex)
 
   std::vector<std::string> ip;
   for (size_t i = 0; i < p->internal_vertexes (); ++i) {
-    ip.push_back (p->internal_vertex (i)->to_string ());
+    ip.push_back (p->internal_vertex (i)->to_string () + "#" + tl::to_string (p->internal_vertex (i)->id ()));
   }
   std::sort (ip.begin (), ip.end ());
-  EXPECT_EQ (tl::join (ip, "/"), "(0, 0.05)/(0.2, 0.07)");
+  EXPECT_EQ (tl::join (ip, "/"), "(0, 0)#2/(0, 0.05)#0/(0.2, 0.07)#1");
 
   EXPECT_EQ (++p == plc.end (), true);
 }

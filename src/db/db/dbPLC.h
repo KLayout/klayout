@@ -127,16 +127,28 @@ public:
   bool has_edge (const Edge *edge) const;
 
   /**
-   *  @brief Sets a valid indicating whether the vertex is precious
+   *  @brief Sets a value indicating whether the vertex is precious
    *
    *  "precious" vertexes are not removed during triangulation for example.
    */
-  void set_is_precious (bool f) { m_is_precious = f; }
+  void set_is_precious (bool f, unsigned int id)
+  {
+    m_is_precious = f;
+    m_id = id;
+  }
 
   /**
-   *  @brief Gets a valid indicating whether the vertex is precious
+   *  @brief Gets a value indicating whether the vertex is precious
    */
   bool is_precious () const { return m_is_precious; }
+
+  /**
+   *  @brief Gets the ID passed to "set_is_precious"
+   *
+   *  This ID can be used to identify the vertex in the context it came from (e.g.
+   *  index in point vector).
+   */
+  unsigned int id () const { return m_id; }
 
   /**
    *  @brief Returns a string representation of the vertex
@@ -175,7 +187,8 @@ private:
 
   Graph *mp_graph;
   edges_type mp_edges;
-  bool m_is_precious;
+  bool m_is_precious : 1;
+  unsigned int m_id : 31;
 };
 
 /**
@@ -599,6 +612,14 @@ public:
   }
 
   /**
+   *  @brief Reserves for n internal vertexes
+   */
+  void reserve_internal_vertexes (size_t n)
+  {
+    mp_v.reserve (mp_v.size () + n);
+  }
+
+  /**
    *  @brief Gets the nth vertex (n wraps around and can be negative)
    *  The vertexes are oriented clockwise.
    */
@@ -715,6 +736,11 @@ public:
     }
     return false;
   }
+
+  /**
+   *  @brief Coming from an edge e and the vertex v, gets the next edge
+   */
+  Edge *next_edge (const Edge *e, const Vertex *v) const;
 
   /**
    *  @brief Returns the minimum edge length

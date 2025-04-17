@@ -1364,8 +1364,9 @@ Triangulation::create_constrained_delaunay (const db::Polygon &p, const std::vec
 {
   clear ();
 
+  unsigned int id = 0;
   for (auto v = vertexes.begin (); v != vertexes.end (); ++v) {
-    insert_point (trans * *v)->set_is_precious (true);
+    insert_point (trans * *v)->set_is_precious (true, id++);
   }
 
   std::vector<std::vector<Vertex *> > edge_contours;
@@ -1379,8 +1380,9 @@ Triangulation::create_constrained_delaunay (const db::DPolygon &p, const std::ve
 {
   clear ();
 
+  unsigned int id = 0;
   for (auto v = vertexes.begin (); v != vertexes.end (); ++v) {
-    insert_point (trans * *v)->set_is_precious (true);
+    insert_point (trans * *v)->set_is_precious (true, id++);
   }
 
   std::vector<std::vector<Vertex *> > edge_contours;

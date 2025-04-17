@@ -159,6 +159,23 @@ public:
   Vertex *insert_point (const db::DPoint &point, std::list<tl::weak_ptr<Polygon> > *new_triangles = 0);
 
   /**
+   *  @brief Finds the edge for two given points
+   */
+  Edge *find_edge_for_points (const db::DPoint &p1, const db::DPoint &p2) const;
+
+  /**
+   *  @brief Finds the vertex for a point
+   */
+  Vertex *find_vertex_for_point (const db::DPoint &pt) const;
+
+  /**
+   *  @brief Finds the vertexes along the line given from p1 and p2
+   *
+   *  At least one of the points p1 and p2 must be existing vertexes.
+   */
+  std::vector<Vertex *> find_vertexes_along_line (const db::DPoint &p1, const db::DPoint &p2) const;
+
+  /**
    *  @brief Statistics: number of flips (fixing)
    */
   size_t flips () const
@@ -217,16 +234,6 @@ protected:
   std::vector<Edge *> search_edges_crossing (Vertex *from, Vertex *to);
 
   /**
-   *  @brief Finds the edge for two given points
-   */
-  Edge *find_edge_for_points (const db::DPoint &p1, const db::DPoint &p2);
-
-  /**
-   *  @brief Finds the vertex for a point
-   */
-  Vertex *find_vertex_for_point (const db::DPoint &pt);
-
-  /**
    *  @brief Ensures all points between from an to are connected by edges and makes these segments
    */
   std::vector<Edge *> ensure_edge (Vertex *from, Vertex *to);
@@ -275,7 +282,7 @@ private:
   bool m_is_constrained;
   size_t m_level;
   size_t m_id;
-  size_t m_flips, m_hops;
+  mutable size_t m_flips, m_hops;
 
   template<class Poly, class Trans> void make_contours (const Poly &poly, const Trans &trans, std::vector<std::vector<Vertex *> > &contours);
 
@@ -284,7 +291,7 @@ private:
   std::vector<Polygon *> fill_concave_corners (const std::vector<Edge *> &edges);
   void fix_triangles (const std::vector<Polygon *> &tris, const std::vector<Edge *> &fixed_edges, std::list<tl::weak_ptr<Polygon> > *new_triangles);
   std::vector<Polygon *> find_triangle_for_point (const db::DPoint &point);
-  Edge *find_closest_edge (const db::DPoint &p, Vertex *vstart = 0, bool inside_only = false);
+  Edge *find_closest_edge (const db::DPoint &p, Vertex *vstart = 0, bool inside_only = false) const;
   Vertex *insert (Vertex *vertex, std::list<tl::weak_ptr<Polygon> > *new_triangles = 0);
   void split_triangle (Polygon *t, Vertex *vertex, std::list<tl::weak_ptr<Polygon> > *new_triangles_out);
   void split_triangles_on_edge (Vertex *vertex, Edge *split_edge, std::list<tl::weak_ptr<Polygon> > *new_triangles_out);

@@ -294,7 +294,7 @@ Triangulation::find_triangle_for_point (const db::DPoint &point)
 }
 
 Edge *
-Triangulation::find_closest_edge (const db::DPoint &p, Vertex *vstart, bool inside_only)
+Triangulation::find_closest_edge (const db::DPoint &p, Vertex *vstart, bool inside_only) const
 {
   if (!vstart) {
 
@@ -1057,7 +1057,7 @@ Triangulation::search_edges_crossing (Vertex *from, Vertex *to)
 }
 
 Vertex *
-Triangulation::find_vertex_for_point (const db::DPoint &point)
+Triangulation::find_vertex_for_point (const db::DPoint &point) const
 {
   Edge *edge = find_closest_edge (point);
   if (!edge) {
@@ -1073,7 +1073,7 @@ Triangulation::find_vertex_for_point (const db::DPoint &point)
 }
 
 Edge *
-Triangulation::find_edge_for_points (const db::DPoint &p1, const db::DPoint &p2)
+Triangulation::find_edge_for_points (const db::DPoint &p1, const db::DPoint &p2) const
 {
   Vertex *v = find_vertex_for_point (p1);
   if (!v) {
@@ -1085,6 +1085,35 @@ Triangulation::find_edge_for_points (const db::DPoint &p1, const db::DPoint &p2)
     }
   }
   return 0;
+}
+
+std::vector<Vertex *>
+Triangulation::find_vertexes_along_line (const db::DPoint &p1, const db::DPoint &p2) const
+{
+  db::DEdge e12 (p1, p2);
+
+  Vertex *v = find_vertex_for_point (p1);
+  if (!v) {
+    v = find_vertex_for_point (p2);
+    e12.swap_points ();
+  }
+
+  std::vector<Vertex *> result;
+
+  while (v) {
+    Vertex *vn = 0;
+    for (auto e = v->begin_edges (); e != v->end_edges (); ++e) {
+      Vertex *vv = (*e)->other (v);
+      if (db::vprod_sign (e12.d (), *vv - *v) == 0 && db::sprod_sign (e12.d (), *vv - *v) > 0 && db::sprod_sign (e12.d (), *vv - e12.p2 ()) < 0) {
+        result.push_back (vv);
+        vn = vv;
+        break;
+      }
+    }
+    v = vn;
+  }
+
+  return result;
 }
 
 static bool is_touching (const db::DEdge &a, const db::DEdge &b)

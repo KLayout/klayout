@@ -121,7 +121,27 @@ public:
 private:
   Graph *mp_graph;
 
+  struct ConcaveCorner
+  {
+    ConcaveCorner ()
+      : corner (0), incoming (0), outgoing (0)
+    {
+      //  .. nothing yet ..
+    }
+
+    ConcaveCorner (Vertex *_corner, Edge *_incoming, Edge *_outgoing)
+      : corner (_corner), incoming (_incoming), outgoing (_outgoing)
+    {
+      //  .. nothing yet ..
+    }
+
+    Vertex *corner;
+    Edge *incoming, *outgoing;
+  };
+
   void hertel_mehlhorn_decomposition (Triangulation &tris, const ConvexDecompositionParameters &param);
+  void collect_concave_vertexes (std::vector<ConcaveCorner> &concave_vertexes);
+  std::pair<bool, db::DPoint> search_crossing_with_next_segment (const Vertex *v0, const db::DVector &direction);
 };
 
 } //  namespace plc

@@ -33,6 +33,9 @@
 #include <cstdlib>
 #include <cmath>
 
+namespace
+{
+
 class TestableTriangulation
   : public db::plc::Triangulation
 {
@@ -63,6 +66,8 @@ public:
   using db::plc::Graph::create_edge;
   using db::plc::Graph::create_triangle;
 };
+
+}
 
 TEST(basic)
 {
@@ -343,7 +348,7 @@ TEST(heavy_insert)
       double y = round (flt_rand () * res) * (1.0 / res);
       db::plc::Vertex *v = tris.insert_point (x, y);
       bbox += db::DPoint (x, y);
-      vmap.insert (std::make_pair (*v, false));
+      vmap.insert (std::pair<db::DPoint, bool> (*v, false));
     }
 
     //  not strictly true, but very likely with at least 10 vertexes:

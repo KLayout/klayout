@@ -161,10 +161,12 @@ protected:
   Vertex (Graph *graph, const DPoint &p);
   Vertex (Graph *graph, const Vertex &v);
   Vertex (Graph *graph, db::DCoord x, db::DCoord y);
+  ~Vertex ();
 
 private:
   friend class Edge;
   friend class Graph;
+  friend class tl::stable_vector<Vertex>;
 
   void remove_edge (const edges_iterator_non_const &ec)
   {
@@ -499,12 +501,14 @@ protected:
 
   Edge (Graph *graph);
   Edge (Graph *graph, Vertex *v1, Vertex *v2);
+  ~Edge ();
 
 private:
   friend class Polygon;
   friend class Graph;
   friend class Triangulation;
   friend class ConvexDecomposition;
+  friend class tl::stable_vector<Edge>;
 
   Graph *mp_graph;
   Vertex *mp_v1, *mp_v2;
@@ -538,23 +542,34 @@ class DB_PUBLIC Polygon
   : public tl::list_node<Polygon>, public tl::Object
 {
 public:
-  template<class Iter>
-  Polygon (Graph *graph, Iter from, Iter to)
-    : mp_graph (graph), mp_e (from, to)
-  {
-    init ();
-  }
 
+  /**
+   *  @brief Destructor
+   *
+   *  It is legal to delete a polygon object to remove it.
+   */
   ~Polygon ();
 
+  /**
+   *  @brief Detaches a polygon object from the edges
+   */
   void unlink ();
 
-  void set_id (size_t id) { m_id = id; }
+  /**
+   *  @brief Gets the polygon's unique ID
+   */
   size_t id () const { return m_id; }
 
+  /**
+   *  @brief Gets a value indicating whether the polygon is an outside polygon
+   *
+   *  Outside polygons are polygons that fill concave parts in a triangulation for example.
+   */
   bool is_outside () const { return m_is_outside; }
-  void set_outside (bool o) { m_is_outside = o; }
 
+  /**
+   *  @brief Returns a string representation
+   */
   std::string to_string (bool with_id = false) const;
 
   /**
@@ -727,8 +742,19 @@ protected:
   Polygon (Graph *graph);
   Polygon (Graph *graph, Edge *e1, Edge *e2, Edge *e3);
 
+  template<class Iter>
+  Polygon (Graph *graph, Iter from, Iter to)
+    : mp_graph (graph), mp_e (from, to)
+  {
+    init ();
+  }
+
+  void set_outside (bool o) { m_is_outside = o; }
+  void set_id (size_t id) { m_id = id; }
+
 private:
   friend class Graph;
+  friend class Triangulation;
 
   Graph *mp_graph;
   bool m_is_outside;
@@ -764,6 +790,7 @@ struct PolygonLessFunc
  *  hold triangles (polygons with 3 vertexes).
  */
 class DB_PUBLIC Graph
+  : public tl::Object
 {
 public:
   typedef tl::list<Polygon> polygons_type;

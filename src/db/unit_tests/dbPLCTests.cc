@@ -71,6 +71,8 @@ public:
   TestablePolygon (db::plc::Edge *e1, db::plc::Edge *e2, db::plc::Edge *e3)
     : db::plc::Polygon (0, e1, e2, e3)
   { }
+
+  using db::plc::Polygon::set_outside;
 };
 
 //  Tests for Vertex class

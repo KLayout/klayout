@@ -72,6 +72,11 @@ Vertex::Vertex (const Vertex &v)
   //  NOTE: edges are not copied!
 }
 
+Vertex::~Vertex ()
+{
+  //  .. nothing yet ..
+}
+
 Vertex &Vertex::operator= (const Vertex &v)
 {
   if (this != &v) {
@@ -172,6 +177,11 @@ Edge::Edge (Graph *graph)
 
 Edge::Edge (Graph *graph, Vertex *v1, Vertex *v2)
   : mp_graph (graph), mp_v1 (v1), mp_v2 (v2), mp_left (), mp_right (), m_level (0), m_id (0), m_is_segment (false)
+{
+  //  .. nothing yet ..
+}
+
+Edge::~Edge ()
 {
   //  .. nothing yet ..
 }

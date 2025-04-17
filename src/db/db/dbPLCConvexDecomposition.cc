@@ -85,24 +85,6 @@ struct equal_compare_func
   }
 };
 
-struct ConcaveCorner
-{
-  ConcaveCorner ()
-    : corner (0), incoming (0), outgoing (0)
-  {
-    //  .. nothing yet ..
-  }
-
-  ConcaveCorner (Vertex *_corner, Edge *_incoming, Edge *_outgoing)
-    : corner (_corner), incoming (_incoming), outgoing (_outgoing)
-  {
-    //  .. nothing yet ..
-  }
-
-  Vertex *corner;
-  Edge *incoming, *outgoing;
-};
-
 Edge *find_outgoing_segment (Vertex *vertex, Edge *incoming, int &vp_max_sign)
 {
   Vertex *vfrom = incoming->other (vertex);
@@ -141,20 +123,16 @@ Edge *find_outgoing_segment (Vertex *vertex, Edge *incoming, int &vp_max_sign)
   return outgoing;
 }
 
-void collect_concave_vertexes (Graph &tris, std::vector<ConcaveCorner> &concave_vertexes)
+void
+ConvexDecomposition::collect_concave_vertexes (std::vector<ConcaveCorner> &concave_vertexes)
 {
   concave_vertexes.clear ();
 
-  //  @@@ use edge "level"
-  //  @@@ use edges from heap
   std::unordered_set<Edge *> left;
 
-  for (auto it = tris.begin (); it != tris.end (); ++it) {
-    for (unsigned int i = 0; i < 3; ++i) {
-      Edge *e = it->edge (i);
-      if (e->is_segment ()) {
-        left.insert (e);
-      }
+  for (auto e = mp_graph->edges ().begin (); e != mp_graph->edges ().end (); ++e) {
+    if (e->is_segment () && (e->left () != 0 || e->right () != 0)) {
+      left.insert (e.operator-> ());
     }
   }
 
@@ -191,7 +169,7 @@ void collect_concave_vertexes (Graph &tris, std::vector<ConcaveCorner> &concave_
 }
 
 std::pair<bool, db::DPoint>
-search_crossing_with_next_segment (const Vertex *v0, const db::DVector &direction)
+ConvexDecomposition::search_crossing_with_next_segment (const Vertex *v0, const db::DVector &direction)
 {
   auto vtri = v0->polygons ();  //  TODO: slow?
   std::vector<const Vertex *> nvv, nvv_next;
@@ -253,7 +231,7 @@ ConvexDecomposition::hertel_mehlhorn_decomposition (Triangulation &tris, const C
   bool split_edges = param.split_edges;
 
   std::vector<ConcaveCorner> concave_vertexes;
-  collect_concave_vertexes (*mp_graph, concave_vertexes);
+  collect_concave_vertexes (concave_vertexes);
 
   //  @@@ return if no concave corners
 
@@ -302,7 +280,7 @@ ConvexDecomposition::hertel_mehlhorn_decomposition (Triangulation &tris, const C
     }
 
     //  As the insertion invalidates the edges, we need to collect the concave vertexes again
-    collect_concave_vertexes (*mp_graph, concave_vertexes);
+    collect_concave_vertexes (concave_vertexes);
 
   }
 

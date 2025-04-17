@@ -27,15 +27,97 @@
 #include <list>
 #include <memory>
 
-TEST(basic)
+namespace
 {
-  db::DBox box (0, 0, 100.0, 200.0);
 
-  db::plc::Graph plc;
-  // @@@ pg.insert_polygon (db::DSimplePolygon (box));
+class TestableGraph
+  : public db::plc::Graph
+{
+public:
+  using db::plc::Graph::Graph;
+  using db::plc::Graph::create_vertex;
+  using db::plc::Graph::create_edge;
+  using db::plc::Graph::create_triangle;
+  using db::plc::Graph::create_polygon;
+};
 
-  // @@@
-  tl::info << plc.to_string ();
-  plc.dump ("debug.gds"); // @@@
 }
 
+TEST(basic)
+{
+  TestableGraph plc;
+
+  db::plc::Vertex *v1 = plc.create_vertex (db::DPoint (1, 2));
+  EXPECT_EQ (v1->to_string (), "(1, 2)");
+
+  v1 = plc.create_vertex (db::DPoint (2, 1));
+  EXPECT_EQ (v1->to_string (), "(2, 1)");
+
+  EXPECT_EQ (v1->is_precious (), false);
+  v1->set_is_precious (true);
+  EXPECT_EQ (v1->is_precious (), true);
+}
+
+TEST(edge)
+{
+  TestableGraph plc;
+
+  db::plc::Vertex *v1 = plc.create_vertex (db::DPoint (1, 2));
+  db::plc::Vertex *v2 = plc.create_vertex (db::DPoint (3, 4));
+
+  db::plc::Edge *e = plc.create_edge (v1, v2);
+  EXPECT_EQ (e->to_string (), "((1, 2), (3, 4))");
+
+  EXPECT_EQ (v1->num_edges (), size_t (1));
+  EXPECT_EQ (v2->num_edges (), size_t (1));
+
+  EXPECT_EQ ((*v1->begin_edges ())->edge ().to_string (), "(1,2;3,4)");
+  EXPECT_EQ ((*v2->begin_edges ())->edge ().to_string (), "(1,2;3,4)");
+}
+
+TEST(polygon)
+{
+  TestableGraph plc;
+  EXPECT_EQ (plc.num_polygons (), size_t (0));
+  EXPECT_EQ (plc.bbox ().to_string (), "()");
+
+  db::plc::Vertex *v1 = plc.create_vertex (db::DPoint (1, 2));
+  db::plc::Vertex *v2 = plc.create_vertex (db::DPoint (3, 4));
+  db::plc::Vertex *v3 = plc.create_vertex (db::DPoint (3, 2));
+
+  db::plc::Edge *e1 = plc.create_edge (v1, v2);
+  db::plc::Edge *e2 = plc.create_edge (v1, v3);
+  db::plc::Edge *e3 = plc.create_edge (v2, v3);
+
+  db::plc::Polygon *tri = plc.create_triangle (e1, e2, e3);
+  EXPECT_EQ (tri->to_string (), "((1, 2), (3, 4), (3, 2))");
+  EXPECT_EQ (tri->polygon ().to_string (), "(1,2;3,4;3,2)");
+  EXPECT_EQ (plc.bbox ().to_string (), "(1,2;3,4)");
+  EXPECT_EQ (plc.num_polygons (), size_t (1));
+
+  EXPECT_EQ (v1->num_edges (), size_t (2));
+  EXPECT_EQ (v2->num_edges (), size_t (2));
+  EXPECT_EQ (v3->num_edges (), size_t (2));
+
+  EXPECT_EQ (tri->edge (0) == e1, true);
+  EXPECT_EQ (tri->edge (3) == e1, true);
+  EXPECT_EQ (tri->edge (1) == e3, true);
+  EXPECT_EQ (tri->edge (2) == e2, true);
+  EXPECT_EQ (tri->edge (-1) == e2, true);
+
+  EXPECT_EQ (e1->left () == 0, true);
+  EXPECT_EQ (e1->right () == tri, true);
+  EXPECT_EQ (e2->left () == tri, true);
+  EXPECT_EQ (e2->right () == 0, true);
+  EXPECT_EQ (e3->left () == 0, true);
+  EXPECT_EQ (e3->right () == tri, true);
+
+  delete tri;
+
+  EXPECT_EQ (e1->left () == 0, true);
+  EXPECT_EQ (e1->right () == 0, true);
+  EXPECT_EQ (e2->left () == 0, true);
+  EXPECT_EQ (e2->right () == 0, true);
+  EXPECT_EQ (e3->left () == 0, true);
+  EXPECT_EQ (e3->right () == 0, true);
+}

@@ -7,6 +7,7 @@ SUBDIRS = \
   tl \
   gsi \
   db \
+  pex \
   rdb \
   lib \
   plugins \
@@ -62,6 +63,7 @@ equals(HAVE_PYTHON, "1") {
 
 gsi.depends += tl
 db.depends += gsi
+pex.depends += db
 rdb.depends += db
 lib.depends += db
 

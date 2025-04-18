@@ -4,6 +4,7 @@ include($$PWD/../klayout.pri)
 TEMPLATE = subdirs
 SUBDIRS = \
   db \
+  pex \
   tl \
   rdb \
   lib \

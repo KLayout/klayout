@@ -25,6 +25,7 @@
 
 #include "dbCommon.h"
 #include "dbPLC.h"
+#include "dbPLCTriangulation.h"
 
 #include <limits>
 #include <list>
@@ -37,15 +38,21 @@ namespace db
 namespace plc
 {
 
-class Triangulation;
-
 struct DB_PUBLIC ConvexDecompositionParameters
 {
   ConvexDecompositionParameters ()
     : with_segments (false),
       split_edges (false),
       base_verbosity (30)
-  { }
+  {
+    tri_param.max_area = 0.0;
+    tri_param.min_b = 0.0;
+  }
+
+  /**
+   *  @brief The parameters used for the triangulation
+   */
+  TriangulationParameters tri_param;
 
   /**
    *  @brief Introduce new segments

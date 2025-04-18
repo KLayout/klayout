@@ -433,13 +433,8 @@ ConvexDecomposition::decompose (const db::Polygon &poly, const std::vector<db::P
 void
 ConvexDecomposition::decompose (const db::Polygon &poly, const ConvexDecompositionParameters &parameters, const db::CplxTrans &trans)
 {
-  //  start with a triangulation
-  TriangulationParameters param;
-  param.max_area = 0.0;
-  param.min_b = 0.0;
-
   Triangulation tri (mp_graph);
-  tri.triangulate (poly, param, trans);
+  tri.triangulate (poly, parameters.tri_param, trans);
 
   hertel_mehlhorn_decomposition (tri, parameters);
 }
@@ -447,13 +442,8 @@ ConvexDecomposition::decompose (const db::Polygon &poly, const ConvexDecompositi
 void
 ConvexDecomposition::decompose (const db::Polygon &poly, const std::vector<db::Point> &vertexes, const ConvexDecompositionParameters &parameters, const db::CplxTrans &trans)
 {
-  //  start with a triangulation
-  TriangulationParameters param;
-  param.max_area = 0.0;
-  param.min_b = 0.0;
-
   Triangulation tri (mp_graph);
-  tri.triangulate (poly, vertexes, param, trans);
+  tri.triangulate (poly, vertexes, parameters.tri_param, trans);
 
   hertel_mehlhorn_decomposition (tri, parameters);
 }
@@ -461,13 +451,8 @@ ConvexDecomposition::decompose (const db::Polygon &poly, const std::vector<db::P
 void
 ConvexDecomposition::decompose (const db::DPolygon &poly, const ConvexDecompositionParameters &parameters, const db::DCplxTrans &trans)
 {
-  //  start with a triangulation
-  TriangulationParameters param;
-  param.max_area = 0.0;
-  param.min_b = 0.0;
-
   Triangulation tri (mp_graph);
-  tri.triangulate (poly, param, trans);
+  tri.triangulate (poly, parameters.tri_param, trans);
 
   hertel_mehlhorn_decomposition (tri, parameters);
 }
@@ -475,13 +460,8 @@ ConvexDecomposition::decompose (const db::DPolygon &poly, const ConvexDecomposit
 void
 ConvexDecomposition::decompose (const db::DPolygon &poly, const std::vector<db::DPoint> &vertexes, const ConvexDecompositionParameters &parameters, const db::DCplxTrans &trans)
 {
-  //  start with a triangulation
-  TriangulationParameters param;
-  param.max_area = 0.0;
-  param.min_b = 0.0;
-
   Triangulation tri (mp_graph);
-  tri.triangulate (poly, vertexes, param, trans);
+  tri.triangulate (poly, vertexes, parameters.tri_param, trans);
 
   hertel_mehlhorn_decomposition (tri, parameters);
 }
@@ -495,13 +475,8 @@ ConvexDecomposition::decompose (const db::Region &region, const ConvexDecomposit
 void
 ConvexDecomposition::decompose (const db::Region &region, const ConvexDecompositionParameters &parameters, const db::CplxTrans &trans)
 {
-  //  start with a triangulation
-  TriangulationParameters param;
-  param.max_area = 0.0;
-  param.min_b = 0.0;
-
   Triangulation tri (mp_graph);
-  tri.triangulate (region, param, trans);
+  tri.triangulate (region, parameters.tri_param, trans);
 
   hertel_mehlhorn_decomposition (tri, parameters);
 }

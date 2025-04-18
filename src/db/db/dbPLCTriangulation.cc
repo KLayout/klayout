@@ -1522,7 +1522,9 @@ Triangulation::refine (const TriangulationParameters &parameters)
   if (parameters.min_b < db::epsilon && parameters.max_area < db::epsilon && parameters.max_area_border < db::epsilon) {
 
     //  no refinement requested - we're done.
-    remove_outside_triangles ();
+    if (parameters.remove_outside_triangles) {
+      remove_outside_triangles ();
+    }
     return;
 
   }
@@ -1690,7 +1692,9 @@ Triangulation::refine (const TriangulationParameters &parameters)
 
   }
 
-  remove_outside_triangles ();
+  if (parameters.remove_outside_triangles) {
+    remove_outside_triangles ();
+  }
 }
 
 }  //  namespace plc

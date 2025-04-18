@@ -28,13 +28,13 @@ namespace gsi
 {
 
 // @@@
-static pex::RExtractor *new_sqc_rextractor ()
+static pex::RExtractor *new_sqc_rextractor (double dbu)
 {
-  return new pex::RExtractor ();
+  return new pex::SquareCountingRExtractor (dbu);
 }
 
 Class<pex::RExtractor> decl_RExtractor ("pex", "RExtractor",
-  gsi::constructor ("square_counting", &new_sqc_rextractor,
+  gsi::constructor ("square_counting", &new_sqc_rextractor, gsi::arg ("dbu"),
     "@brief Creates a square counting R extractor\n"
   ),
   "@brief A base class for the R extractor\n"

@@ -46,7 +46,8 @@ struct DB_PUBLIC TriangulationParameters
       max_area_border (0.0),
       max_iterations (std::numeric_limits<size_t>::max ()),
       base_verbosity (30),
-      mark_triangles (false)
+      mark_triangles (false),
+      remove_outside_triangles (true)
   { }
 
   /**
@@ -93,6 +94,11 @@ struct DB_PUBLIC TriangulationParameters
    *  Bit 2: non-Delaunay (in the strict sense)
    */
   bool mark_triangles;
+
+  /**
+   *  @brief If false, the outside triangles are not removed after triangulation
+   */
+  bool remove_outside_triangles;
 };
 
 /**

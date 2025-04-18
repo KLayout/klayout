@@ -47,6 +47,9 @@ struct DB_PUBLIC ConvexDecompositionParameters
   {
     tri_param.max_area = 0.0;
     tri_param.min_b = 0.0;
+
+    //  Needed for the algorithm - don't change this
+    tri_param.remove_outside_triangles = false;
   }
 
   /**

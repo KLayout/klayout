@@ -153,3 +153,37 @@ TEST(internal_vertex)
   EXPECT_EQ (++p == plc.end (), true);
 }
 
+TEST(problematic_polygon)
+{
+  db::Point contour[] = {
+    db::Point (14590, 990),
+    db::Point (6100, 990),
+    db::Point (7360, 4450),
+    db::Point (2280, 4450),
+    db::Point (2280, 6120),
+    db::Point (7360, 6120),
+    db::Point (8760, 7490),
+    db::Point (13590, 17100),
+    db::Point (10280, 6120),
+    db::Point (26790, 13060),
+    db::Point (41270, 970)
+  };
+
+  db::Polygon poly;
+  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour[0]));
+
+  double dbu = 0.001;
+
+  db::plc::ConvexDecompositionParameters param;
+  param.with_segments = true;
+  param.split_edges = false;
+
+  db::plc::Graph plc;
+  TestableConvexDecomposition decomp (&plc);
+
+  decomp.decompose (poly, param, dbu);
+
+  std::unique_ptr<db::Layout> ly (plc.to_layout ());
+  db::compare_layouts (_this, *ly, tl::testdata () + "/algo/hm_decomposition_au5.gds");
+}
+

@@ -146,7 +146,7 @@ ConvexDecomposition::collect_concave_vertexes (std::vector<ConcaveCorner> &conca
     //  and outgoing edge.
 
     Edge *start_segment = segment;
-    Vertex *vto = segment->right () ? segment->v2 () : segment->v1 ();
+    Vertex *vto = (segment->right () && ! segment->right ()->is_outside ()) ? segment->v2 () : segment->v1 ();
 
     do {
 
@@ -338,7 +338,9 @@ ConvexDecomposition::hertel_mehlhorn_decomposition (Triangulation &tris, const C
     }
 
     for (auto i = angles_and_edges.begin (); i != angles_and_edges.end (); ++i) {
-      essential_edges.insert (i->second);
+      if (i->second) {
+        essential_edges.insert (i->second);
+      }
     }
 
   }
@@ -347,7 +349,9 @@ ConvexDecomposition::hertel_mehlhorn_decomposition (Triangulation &tris, const C
 
   std::unordered_set<const Polygon *> left_triangles;
   for (auto it = mp_graph->begin (); it != mp_graph->end (); ++it) {
-    left_triangles.insert (it.operator-> ());
+    if (! it->is_outside ()) {
+      left_triangles.insert (it.operator-> ());
+    }
   }
 
   std::list<std::unordered_set<Edge *> > polygons;
@@ -385,7 +389,7 @@ ConvexDecomposition::hertel_mehlhorn_decomposition (Triangulation &tris, const C
             ivs.insert (e->v2 ());
           }
 
-          if (! qq || essential_edges.find (e) != essential_edges.end ()) {
+          if (! qq || qq->is_outside () || essential_edges.find (e) != essential_edges.end ()) {
             edges.insert (const_cast<Edge *> (e));  //  TODO: ugly const_cast
           } else if (left_triangles.find (qq) != left_triangles.end ()) {
             next_queue.push_back (qq);

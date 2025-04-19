@@ -29,14 +29,6 @@
 namespace pex
 {
 
-SquareCountingRExtractor::SquareCountingRExtractor (double dbu)
-{
-  m_dbu = dbu;
-
-  m_decomp_param.split_edges = true;
-  m_decomp_param.with_segments = false;
-}
-
 namespace
 {
 
@@ -66,37 +58,6 @@ private:
   std::map<size_t, std::set<size_t> > m_interactions;
 };
 
-struct PortDefinition
-{
-  PortDefinition ()
-    : type (pex::RNode::Internal), port_index (0)
-  { }
-
-  PortDefinition (pex::RNode::node_type _type, const db::Point &_location, unsigned int _port_index)
-    : type (_type), location (_location), port_index (_port_index)
-  { }
-
-  bool operator< (const PortDefinition &other) const
-  {
-    if (type != other.type) {
-      return type < other.type;
-    }
-    if (port_index != other.port_index) {
-      return port_index < other.port_index;
-    }
-    return false;
-  }
-
-  bool operator== (const PortDefinition &other) const
-  {
-    return type == other.type && port_index == other.port_index;
-  }
-
-  pex::RNode::node_type type;
-  db::Point location;
-  unsigned int port_index;
-};
-
 struct JoinEdgeSets
 {
   void operator() (std::set<db::Edge> &a, const std::set<db::Edge> &b) const
@@ -105,6 +66,14 @@ struct JoinEdgeSets
   }
 };
 
+}
+
+SquareCountingRExtractor::SquareCountingRExtractor (double dbu)
+{
+  m_dbu = dbu;
+
+  m_decomp_param.split_edges = true;
+  m_decomp_param.with_segments = false;
 }
 
 static
@@ -141,8 +110,8 @@ double calculate_squares (db::Coord x1, db::Coord x2, const std::set<db::Edge> &
   }
 }
 
-static
-void rextract_square_counting (const db::Polygon &db_poly, const std::vector<std::pair<PortDefinition, pex::RNode *> > &ports, pex::RNetwork &rnetwork, double /*dbu*/)
+void
+SquareCountingRExtractor::do_extract (const db::Polygon &db_poly, const std::vector<std::pair<PortDefinition, pex::RNode *> > &ports, pex::RNetwork &rnetwork)
 {
   //  "trans" will orient the polygon to be flat rather than tall
   db::Trans trans;
@@ -189,7 +158,7 @@ void rextract_square_counting (const db::Polygon &db_poly, const std::vector<std
 
     auto em = edges.find (c);
     while (em != edges.end () && em->first.first < cc) {
-      r += calculate_squares (em->first.first, std::min (cc, em->first.second), em->second);
+      r += calculate_squares (std::max (c, em->first.first), std::min (cc, em->first.second), em->second);
       ++em;
     }
 
@@ -320,7 +289,7 @@ SquareCountingRExtractor::extract (const db::Polygon &polygon, const std::vector
       p->second = n4p->second;
     }
 
-    rextract_square_counting (db_poly, ports, rnetwork, dbu ());
+    do_extract (db_poly, ports, rnetwork);
 
   }
 

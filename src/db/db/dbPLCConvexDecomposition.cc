@@ -419,6 +419,7 @@ ConvexDecomposition::hertel_mehlhorn_decomposition (Triangulation &tris, const C
     for (auto i = iv->begin (); i != iv->end (); ++i) {
       poly->add_internal_vertex (*i);
     }
+    ++iv;
   }
 }
 

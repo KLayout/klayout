@@ -55,6 +55,43 @@ public:
 
   virtual void extract (const db::Polygon &polygon, const std::vector<db::Point> &vertex_ports, const std::vector<db::Polygon> &polygon_ports, RNetwork &rnetwork);
 
+protected:
+  /**
+   *  @brief A helper structure defining a port
+   */
+  struct PortDefinition
+  {
+    PortDefinition ()
+      : type (pex::RNode::Internal), port_index (0)
+    { }
+
+    PortDefinition (pex::RNode::node_type _type, const db::Point &_location, unsigned int _port_index)
+      : type (_type), location (_location), port_index (_port_index)
+    { }
+
+    bool operator< (const PortDefinition &other) const
+    {
+      if (type != other.type) {
+        return type < other.type;
+      }
+      if (port_index != other.port_index) {
+        return port_index < other.port_index;
+      }
+      return false;
+    }
+
+    bool operator== (const PortDefinition &other) const
+    {
+      return type == other.type && port_index == other.port_index;
+    }
+
+    pex::RNode::node_type type;
+    db::Point location;
+    unsigned int port_index;
+  };
+
+  void do_extract (const db::Polygon &db_poly, const std::vector<std::pair<PortDefinition, pex::RNode *> > &ports, pex::RNetwork &rnetwork);
+
 private:
   db::plc::ConvexDecompositionParameters m_decomp_param;
   double m_dbu;

@@ -26,6 +26,50 @@
 namespace pex
 {
 
+// -----------------------------------------------------------------------------
+
+std::string
+RNode::to_string () const
+{
+  std::string res;
+  switch (type) {
+  default:
+    res += "$" + tl::to_string (port_index);
+    break;
+  case VertexPort:
+    res += "V" + tl::to_string (port_index);
+    break;
+  case PolygonPort:
+    res += "P" + tl::to_string (port_index);
+    break;
+  }
+  return res;
+}
+
+// -----------------------------------------------------------------------------
+
+std::string
+RElement::to_string () const
+{
+  std::string res = "R ";
+  if (a ()) {
+    res += a ()->to_string ();
+  } else {
+    res += "(nil)";
+  }
+  res += " ";
+  if (b ()) {
+    res += b ()->to_string ();
+  } else {
+    res += "(nil)";
+  }
+  res += " ";
+  res += tl::sprintf ("%.6g", resistance ());
+  return res;
+}
+
+// -----------------------------------------------------------------------------
+
 RNetwork::RNetwork ()
 {
   //  .. nothing yet ..
@@ -36,10 +80,23 @@ RNetwork::~RNetwork ()
   clear ();
 }
 
+std::string
+RNetwork::to_string () const
+{
+  std::string res;
+  for (auto e = m_elements.begin (); e != m_elements.end (); ++e) {
+    if (! res.empty ()) {
+      res += "\n";
+    }
+    res += e->to_string ();
+  }
+  return res;
+}
+
 void
 RNetwork::clear ()
 {
-  m_elements.clear ();   //  must come before m_nodes
+  m_elements.clear ();   //  must happen before m_nodes
   m_nodes.clear ();
   m_elements_by_nodes.clear ();
   m_nodes_by_type.clear ();
@@ -51,7 +108,7 @@ std::map<std::pair<RNode::node_type, unsigned int>, RNode *> m_nodes;
 RNode *
 RNetwork::create_node (RNode::node_type type, unsigned int port_index)
 {
-  if (type != RNode::INTERNAL) {
+  if (type != RNode::Internal) {
 
     auto i = m_nodes_by_type.find (std::make_pair (type, port_index));
     if (i != m_nodes_by_type.end ()) {
@@ -60,7 +117,7 @@ RNetwork::create_node (RNode::node_type type, unsigned int port_index)
 
     } else {
 
-      RNode *new_node = new RNode (type, db::DBox (), port_index);
+      RNode *new_node = new RNode (this, type, db::DBox (), port_index);
       m_nodes.push_back (new_node);
       m_nodes_by_type.insert (std::make_pair (std::make_pair (type, port_index), new_node));
 
@@ -69,7 +126,7 @@ RNetwork::create_node (RNode::node_type type, unsigned int port_index)
 
   } else {
 
-    RNode *new_node = new RNode (type, db::DBox (), port_index);
+    RNode *new_node = new RNode (this, type, db::DBox (), port_index);
     m_nodes.push_back (new_node);
     return new_node;
 
@@ -87,13 +144,15 @@ RNetwork::create_element (double conductivity, RNode *a, RNode *b)
 
   } else {
 
-    RElement *element = new RElement (conductivity, a, b);
-    a->elements.push_back (element);
-    element->m_ia = --a->elements.end ();
-    b->elements.push_back (element);
-    element->m_ia = --b->elements.end ();
-
+    RElement *element = new RElement (this, conductivity, a, b);
+    m_elements.push_back (element);
     m_elements_by_nodes.insert (std::make_pair (std::make_pair (a, b), element));
+
+    a->m_elements.push_back (element);
+    element->m_ia = --a->m_elements.end ();
+    b->m_elements.push_back (element);
+    element->m_ib = --b->m_elements.end ();
+
     return element;
 
   }
@@ -102,9 +161,9 @@ RNetwork::create_element (double conductivity, RNode *a, RNode *b)
 void
 RNetwork::remove_node (RNode *node)
 {
-  tl_assert (node->type == RNode::INTERNAL);
-  while (! node->elements.empty ()) {
-    remove_element (const_cast<RElement *> (node->elements.front ()));
+  tl_assert (node->type == RNode::Internal);
+  while (! node->m_elements.empty ()) {
+    delete const_cast<RElement *> (node->m_elements.front ());
   }
   delete node;
 }
@@ -112,19 +171,20 @@ RNetwork::remove_node (RNode *node)
 void
 RNetwork::remove_element (RElement *element)
 {
-  RNode *a = const_cast<RNode *> (element->a);
-  RNode *b = const_cast<RNode *> (element->b);
+  RNode *a = const_cast<RNode *> (element->a ());
+  RNode *b = const_cast<RNode *> (element->b ());
 
   delete element;
 
-  if (a && a->type == RNode::INTERNAL && a->elements.empty ()) {
+  if (a && a->type == RNode::Internal && a->m_elements.empty ()) {
     delete a;
   }
-  if (b && b->type == RNode::INTERNAL && b->elements.empty ()) {
+  if (b && b->type == RNode::Internal && b->m_elements.empty ()) {
     delete b;
   }
 }
 
+// -----------------------------------------------------------------------------
 
 RExtractor::RExtractor ()
 {

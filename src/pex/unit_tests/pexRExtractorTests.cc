@@ -24,8 +24,53 @@
 #include "pexRExtractor.h"
 #include "tlUnitTest.h"
 
-TEST(1) 
+TEST(network_basic)
 {
-  // @@@
+  pex::RNetwork rn;
+  EXPECT_EQ (rn.to_string (), "");
+
+  pex::RNode *n1 = rn.create_node (pex::RNode::Internal, 1);
+  pex::RNode *n2 = rn.create_node (pex::RNode::Internal, 2);
+  /* pex::RElement *e12 = */ rn.create_element (0.5, n1, n2);
+
+  EXPECT_EQ (rn.to_string (),
+    "R $1 $2 2"
+  );
+
+  pex::RNode *n3 = rn.create_node (pex::RNode::Internal, 3);
+  /* pex::RElement *e13 = */ rn.create_element (0.25, n1, n3);
+  pex::RElement *e23 = rn.create_element (1.0, n2, n3);
+
+  EXPECT_EQ (rn.to_string (),
+    "R $1 $2 2\n"
+    "R $1 $3 4\n"
+    "R $2 $3 1"
+  );
+
+  pex::RElement *e23b = rn.create_element (4.0, n2, n3);
+  EXPECT_EQ (e23 == e23b, true);
+
+  EXPECT_EQ (rn.to_string (),
+    "R $1 $2 2\n"
+    "R $1 $3 4\n"
+    "R $2 $3 0.2"
+  );
+
+  rn.remove_element (e23);
+
+  EXPECT_EQ (rn.to_string (),
+    "R $1 $2 2\n"
+    "R $1 $3 4"
+  );
+
+  rn.remove_node (n3);
+
+  EXPECT_EQ (rn.to_string (),
+    "R $1 $2 2"
+  );
+
+  rn.clear ();
+
+  EXPECT_EQ (rn.to_string (), "");
 }
 

@@ -39,28 +39,36 @@ namespace pex
 
 class RElement;
 class RNode;
+class RNetwork;
 
 struct PEX_PUBLIC RNode
   : public tl::list_node<RNode>
 {
 public:
   enum node_type {
-    INTERNAL,
-    VERTEX_PORT,
-    POLYGON_PORT
+    Internal,
+    VertexPort,
+    PolygonPort
   };
 
   node_type type;
   db::DBox location;
   unsigned int port_index;
-  mutable std::list<const RElement *> elements;
+
+  const std::list<const RElement *> &elements () const
+  {
+    return m_elements;
+  }
+
+  std::string to_string () const;
 
 protected:
   friend class RNetwork;
+  friend class RElement;
   friend class tl::list_impl<RNode, false>;
 
-  RNode (node_type _type, const db::DBox &_location, unsigned int _port_index)
-    : type (_type), location (_location), port_index (_port_index)
+  RNode (RNetwork *network, node_type _type, const db::DBox &_location, unsigned int _port_index)
+    : type (_type), location (_location), port_index (_port_index), mp_network (network)
   { }
 
   ~RNode () { }
@@ -68,39 +76,48 @@ protected:
 private:
   RNode (const RNode &other);
   RNode &operator= (const RNode &other);
+
+  RNetwork *mp_network;
+  mutable std::list<const RElement *> m_elements;
 };
 
 struct PEX_PUBLIC RElement
   : public tl::list_node<RElement>
 {
   double conductivity;
-  const RNode *a, *b;
+
+  const RNode *a () const { return mp_a; }
+  const RNode *b () const { return mp_b; }
 
   double resistance () const
   {
     return 1.0 / conductivity;
   }
 
+  std::string to_string () const;
+
 protected:
   friend class RNetwork;
   friend class tl::list_impl<RElement, false>;
 
-  RElement (double _conductivity, const RNode *_a, const RNode *_b)
-    : conductivity (_conductivity), a (_a), b (_b)
+  RElement (RNetwork *network, double _conductivity, const RNode *a, const RNode *b)
+    : conductivity (_conductivity), mp_network (network), mp_a (a), mp_b (b)
   { }
 
   ~RElement ()
   {
-    if (a) {
-      a->elements.erase (m_ia);
+    if (mp_a) {
+      mp_a->m_elements.erase (m_ia);
     }
-    if (b) {
-      b->elements.erase (m_ib);
+    if (mp_b) {
+      mp_b->m_elements.erase (m_ib);
     }
-    a = b = 0;
+    mp_a = mp_b = 0;
   }
 
   std::list<const RElement *>::iterator m_ia, m_ib;
+  RNetwork *mp_network;
+  const RNode *mp_a, *mp_b;
 
 private:
   RElement (const RElement &other);
@@ -108,6 +125,7 @@ private:
 };
 
 class PEX_PUBLIC RNetwork
+  : public tl::Object
 {
 public:
   RNetwork ();
@@ -118,6 +136,8 @@ public:
   void remove_element (RElement *element);
   void remove_node (RNode *node);
   void clear ();
+
+  std::string to_string () const;
 
 private:
   tl::list<RNode, false> m_nodes;

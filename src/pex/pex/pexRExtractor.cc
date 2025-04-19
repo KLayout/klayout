@@ -197,6 +197,7 @@ RNetwork::join_nodes (RNode *a, RNode *b)
     }
   }
 
+  a->location += b->location;
   remove_node (b);
 }
 

@@ -27,8 +27,6 @@
 
 #include "dbPolygon.h"
 #include "dbPLC.h"
-#include "dbPLCConvexDecomposition.h" // @@@
-#include "dbPLCTriangulation.h"  // @@@
 #include "tlList.h"
 
 #include <string>
@@ -166,35 +164,6 @@ public:
   virtual ~RExtractor ();
 
   virtual void extract (const db::Polygon &polygon, const std::vector<db::Point> &vertex_ports, const std::vector<db::Polygon> &polygon_ports, RNetwork &rnetwork) = 0;
-};
-
-// @@@
-class PEX_PUBLIC SquareCountingRExtractor
-  : public RExtractor
-{
-public:
-  SquareCountingRExtractor (double dbu);
-
-  db::plc::ConvexDecompositionParameters &decomposition_parameters ()
-  {
-    return m_decomp_param;
-  }
-
-  void set_dbu (double dbu)
-  {
-    m_dbu = dbu;
-  }
-
-  double dbu () const
-  {
-    return m_dbu;
-  }
-
-  virtual void extract (const db::Polygon &polygon, const std::vector<db::Point> &vertex_ports, const std::vector<db::Polygon> &polygon_ports, RNetwork &rnetwork);
-
-private:
-  db::plc::ConvexDecompositionParameters m_decomp_param;
-  double m_dbu;
 };
 
 }

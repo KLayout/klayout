@@ -21,24 +21,40 @@
 */
 
 
-#include "gsiDecl.h"
 #include "pexSquareCountingRExtractor.h"
+#include "tlUnitTest.h"
 
-namespace gsi
+TEST(basic)
 {
+  db::Point contour[] = {
+    db::Point (0, 0),
+    db::Point (0, 100),
+    db::Point (1000, 100),
+    db::Point (1000, 1000),
+    db::Point (1100, 1000),
+    db::Point (1100, 100),
+    db::Point (1700, 100),
+    db::Point (1700, 0)
+  };
 
-// @@@
-static pex::RExtractor *new_sqc_rextractor (double dbu)
-{
-  return new pex::SquareCountingRExtractor (dbu);
+  db::Polygon poly;
+  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour[0]));
+
+  double dbu = 0.001;
+
+  pex::RNetwork rn;
+  pex::SquareCountingRExtractor rex (dbu);
+
+  std::vector<db::Point> vertex_ports;
+  vertex_ports.push_back (db::Point (0, 50));
+  vertex_ports.push_back (db::Point (1650, 50));
+
+  std::vector<db::Polygon> polygon_ports;
+  polygon_ports.push_back (db::Polygon (db::Box (1000, 900, 1100, 1000)));
+
+  rex.extract (poly, vertex_ports, polygon_ports, rn);
+
+  EXPECT_EQ (rn.to_string (),
+    ""
+  )
 }
-
-Class<pex::RExtractor> decl_RExtractor ("pex", "RExtractor",
-  gsi::constructor ("square_counting", &new_sqc_rextractor, gsi::arg ("dbu"),
-    "@brief Creates a square counting R extractor\n"
-  ),
-  "@brief A base class for the R extractor\n"
-);
-
-}
-

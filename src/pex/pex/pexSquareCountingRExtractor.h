@@ -20,25 +20,47 @@
 
 */
 
+#ifndef HDR_pexSquareCountingRExtractor
+#define HDR_pexSquareCountingRExtractor
 
-#include "gsiDecl.h"
-#include "pexSquareCountingRExtractor.h"
+#include "pexCommon.h"
+#include "pexRExtractor.h"
 
-namespace gsi
+#include "dbPLCConvexDecomposition.h"
+
+namespace pex
 {
 
-// @@@
-static pex::RExtractor *new_sqc_rextractor (double dbu)
+// @@@ doc
+class PEX_PUBLIC SquareCountingRExtractor
+  : public RExtractor
 {
-  return new pex::SquareCountingRExtractor (dbu);
+public:
+  SquareCountingRExtractor (double dbu);
+
+  db::plc::ConvexDecompositionParameters &decomposition_parameters ()
+  {
+    return m_decomp_param;
+  }
+
+  void set_dbu (double dbu)
+  {
+    m_dbu = dbu;
+  }
+
+  double dbu () const
+  {
+    return m_dbu;
+  }
+
+  virtual void extract (const db::Polygon &polygon, const std::vector<db::Point> &vertex_ports, const std::vector<db::Polygon> &polygon_ports, RNetwork &rnetwork);
+
+private:
+  db::plc::ConvexDecompositionParameters m_decomp_param;
+  double m_dbu;
+};
+
 }
 
-Class<pex::RExtractor> decl_RExtractor ("pex", "RExtractor",
-  gsi::constructor ("square_counting", &new_sqc_rextractor, gsi::arg ("dbu"),
-    "@brief Creates a square counting R extractor\n"
-  ),
-  "@brief A base class for the R extractor\n"
-);
-
-}
+#endif
 

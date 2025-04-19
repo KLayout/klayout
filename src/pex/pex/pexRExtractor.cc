@@ -22,6 +22,7 @@
 
 
 #include "pexRExtractor.h"
+#include "tlEquivalenceClusters.h"
 
 namespace pex
 {
@@ -101,9 +102,6 @@ RNetwork::clear ()
   m_elements_by_nodes.clear ();
   m_nodes_by_type.clear ();
 }
-
-std::map<std::pair<RNode *, RNode *>, RElement *> m_elements_by_nodes;
-std::map<std::pair<RNode::node_type, unsigned int>, RNode *> m_nodes;
 
 RNode *
 RNetwork::create_node (RNode::node_type type, unsigned int port_index)
@@ -187,6 +185,113 @@ RNetwork::remove_element (RElement *element)
   if (b && b->type == RNode::Internal && b->m_elements.empty ()) {
     delete b;
   }
+}
+
+void
+RNetwork::join_nodes (RNode *a, RNode *b)
+{
+  for (auto e = b->elements ().begin (); e != b->elements ().end (); ++e) {
+    RNode *on = const_cast<RNode *> ((*e)->other (b));
+    if (on != a) {
+      create_element ((*e)->conductivity, on, a);
+    }
+  }
+
+  remove_node (b);
+}
+
+void
+RNetwork::simplify ()
+{
+  bool any_change = true;
+
+  while (any_change) {
+
+    any_change = false;
+
+    //  join shorted clusters - we take care to remove internal nodes only
+
+    tl::equivalence_clusters<const RNode *> clusters;
+    for (auto e = m_elements.begin (); e != m_elements.end (); ++e) {
+      if (e->conductivity == pex::RElement::short_value () && (e->a ()->type == pex::RNode::Internal || e->b ()->type == pex::RNode::Internal)) {
+        clusters.same (e->a (), e->b ());
+      }
+    }
+
+    for (size_t ic = 1; ic <= clusters.size (); ++ic) {
+
+      RNode *remaining = 0;
+      RNode *first_node = 0;
+      for (auto c = clusters.begin_cluster (ic); c != clusters.end_cluster (ic); ++c) {
+        RNode *n = const_cast<RNode *> ((*c)->first);
+        if (! first_node) {
+          first_node = n;
+        }
+        if (n->type != pex::RNode::Internal) {
+          remaining = n;
+          break;
+        }
+      }
+
+      if (! remaining) {
+        //  Only internal nodes
+        remaining = first_node;
+      }
+
+      for (auto c = clusters.begin_cluster (ic); c != clusters.end_cluster (ic); ++c) {
+        RNode *n = const_cast<RNode *> ((*c)->first);
+        if (n != remaining && n->type == pex::RNode::Internal) {
+          any_change = true;
+          join_nodes (remaining, n);
+        }
+      }
+
+    }
+
+    //  combine serial resistors if connected through an internal node
+
+    std::vector<RNode *> nodes_to_remove;
+
+    for (auto n = m_nodes.begin (); n != m_nodes.end (); ++n) {
+
+      size_t nres = n->elements ().size ();
+
+      if (n->type == pex::RNode::Internal && nres <= 2) {
+
+        any_change = true;
+
+        if (nres == 2) {
+
+          auto e = n->elements ().begin ();
+
+          RNode *n1 = const_cast<RNode *> ((*e)->other (n.operator-> ()));
+          double r1 = (*e)->resistance ();
+
+          ++e;
+          RNode *n2 = const_cast<RNode *> ((*e)->other (n.operator-> ()));
+          double r2 = (*e)->resistance ();
+
+          double r = r1 + r2;
+          if (r == 0.0) {
+            create_element (pex::RElement::short_value (), n1, n2);
+          } else {
+            create_element (1.0 / r, n1, n2);
+          }
+
+        }
+
+        nodes_to_remove.push_back (n.operator-> ());
+
+      }
+
+    }
+
+    for (auto n = nodes_to_remove.begin (); n != nodes_to_remove.end (); ++n) {
+      remove_node (*n);
+    }
+
+  }
+
 }
 
 // -----------------------------------------------------------------------------

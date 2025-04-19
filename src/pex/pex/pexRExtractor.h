@@ -88,6 +88,16 @@ struct PEX_PUBLIC RElement
   const RNode *a () const { return mp_a; }
   const RNode *b () const { return mp_b; }
 
+  const RNode *other (const RNode *n) const
+  {
+    if (mp_a == n) {
+      return mp_b;
+    } else if (mp_b == n) {
+      return mp_a;
+    }
+    tl_assert (false);
+  }
+
   static double short_value ()
   {
     return std::numeric_limits<double>::infinity ();
@@ -140,6 +150,7 @@ public:
   void remove_element (RElement *element);
   void remove_node (RNode *node);
   void clear ();
+  void simplify ();
 
   std::string to_string () const;
 
@@ -151,6 +162,8 @@ private:
 
   RNetwork (const RNetwork &);
   RNetwork &operator= (const RNetwork &);
+
+  void join_nodes (RNode *a, RNode *b);
 };
 
 

@@ -66,6 +66,10 @@ protected:
     { }
 
     PortDefinition (pex::RNode::node_type _type, const db::Point &_location, unsigned int _port_index)
+      : type (_type), location (_location, _location), port_index (_port_index)
+    { }
+
+    PortDefinition (pex::RNode::node_type _type, const db::Box &_location, unsigned int _port_index)
       : type (_type), location (_location), port_index (_port_index)
     { }
 
@@ -86,7 +90,7 @@ protected:
     }
 
     pex::RNode::node_type type;
-    db::Point location;
+    db::Box location;
     unsigned int port_index;
   };
 

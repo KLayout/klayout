@@ -74,3 +74,114 @@ TEST(network_basic)
   EXPECT_EQ (rn.to_string (), "");
 }
 
+TEST(network_simplify1)
+{
+  pex::RNetwork rn;
+  EXPECT_EQ (rn.to_string (), "");
+
+  pex::RNode *n1 = rn.create_node (pex::RNode::VertexPort, 1);
+  pex::RNode *n2 = rn.create_node (pex::RNode::Internal, 2);
+  pex::RNode *n3 = rn.create_node (pex::RNode::VertexPort, 3);
+
+  rn.create_element (1, n1, n2);
+  rn.create_element (pex::RElement::short_value (), n2, n3);
+  rn.create_element (1, n1, n3);
+
+  EXPECT_EQ (rn.to_string (),
+    "R V1 $2 1\n"
+    "R $2 V3 0\n"
+    "R V1 V3 1"
+  );
+
+  rn.simplify ();
+
+  EXPECT_EQ (rn.to_string (),
+    "R V1 V3 0.5"
+  );
+}
+
+TEST(network_simplify2)
+{
+  pex::RNetwork rn;
+  EXPECT_EQ (rn.to_string (), "");
+
+  pex::RNode *n1 = rn.create_node (pex::RNode::VertexPort, 1);
+  pex::RNode *n2 = rn.create_node (pex::RNode::Internal, 2);
+  pex::RNode *n3 = rn.create_node (pex::RNode::Internal, 3);
+  pex::RNode *n4 = rn.create_node (pex::RNode::VertexPort, 4);
+  pex::RNode *n5 = rn.create_node (pex::RNode::VertexPort, 5);
+
+  rn.create_element (1, n1, n2);
+  rn.create_element (pex::RElement::short_value (), n2, n3);
+  rn.create_element (1, n3, n4);
+  rn.create_element (1, n3, n5);
+
+  EXPECT_EQ (rn.to_string (),
+    "R V1 $2 1\n"
+    "R $2 $3 0\n"
+    "R $3 V4 1\n"
+    "R $3 V5 1"
+  );
+
+  rn.simplify ();
+
+  EXPECT_EQ (rn.to_string (),
+    "R V1 $2 1\n"
+    "R V4 $2 1\n"
+    "R V5 $2 1"
+  );
+}
+
+TEST(network_simplify3)
+{
+  pex::RNetwork rn;
+  EXPECT_EQ (rn.to_string (), "");
+
+  pex::RNode *n1 = rn.create_node (pex::RNode::VertexPort, 1);
+  pex::RNode *n2 = rn.create_node (pex::RNode::Internal, 2);
+  pex::RNode *n3 = rn.create_node (pex::RNode::Internal, 3);
+  pex::RNode *n4 = rn.create_node (pex::RNode::VertexPort, 4);
+
+  rn.create_element (1, n1, n2);
+  rn.create_element (pex::RElement::short_value (), n2, n3);
+  rn.create_element (1, n3, n4);
+
+  EXPECT_EQ (rn.to_string (),
+    "R V1 $2 1\n"
+    "R $2 $3 0\n"
+    "R $3 V4 1"
+  );
+
+  rn.simplify ();
+
+  EXPECT_EQ (rn.to_string (),
+    "R V1 V4 2"
+  );
+}
+
+TEST(network_simplify4)
+{
+  pex::RNetwork rn;
+  EXPECT_EQ (rn.to_string (), "");
+
+  pex::RNode *n1 = rn.create_node (pex::RNode::VertexPort, 1);
+  pex::RNode *n2 = rn.create_node (pex::RNode::Internal, 2);
+  pex::RNode *n3 = rn.create_node (pex::RNode::Internal, 3);
+  pex::RNode *n4 = rn.create_node (pex::RNode::VertexPort, 4);
+
+  rn.create_element (1, n1, n4);
+  rn.create_element (1, n2, n1);
+  rn.create_element (1, n4, n3);
+
+  EXPECT_EQ (rn.to_string (),
+    "R V1 V4 1\n"
+    "R $2 V1 1\n"
+    "R V4 $3 1"
+  );
+
+  rn.simplify ();
+
+  EXPECT_EQ (rn.to_string (),
+    "R V1 V4 1"
+  );
+}

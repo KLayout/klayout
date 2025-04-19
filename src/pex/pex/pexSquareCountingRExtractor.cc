@@ -133,11 +133,11 @@ SquareCountingRExtractor::do_extract (const db::Polygon &db_poly, const std::vec
     }
   }
 
-  //  sort the port locations
+  //  sort the port locations - note that we take the port box centers for the location!
 
   std::multimap<db::Coord, pex::RNode *> port_locations;
   for (auto p = ports.begin (); p != ports.end (); ++p) {
-    db::Coord c = (trans * p->first.location).x ();
+    db::Coord c = (trans * p->first.location).center ().x ();
     port_locations.insert (std::make_pair (c, p->second));
   }
 
@@ -258,7 +258,7 @@ SquareCountingRExtractor::extract (const db::Polygon &polygon, const std::vector
 
     //  1. internal ports
     for (auto i = ip_indexes.begin (); i != ip_indexes.end (); ++i) {
-      db::Point loc = (inv_trans * internal_port_edges [*i]->edge ()).bbox ().center ();
+      db::Box loc = (inv_trans * internal_port_edges [*i]->edge ()).bbox ();
       ports.push_back (std::make_pair (PortDefinition (pex::RNode::Internal, loc, *i), (pex::RNode *) 0));
     }
 
@@ -271,7 +271,7 @@ SquareCountingRExtractor::extract (const db::Polygon &polygon, const std::vector
     //  3. polygon ports
     //  (NOTE: here we only take the center of the bounding box)
     for (auto i = pp_indexes.begin (); i != pp_indexes.end (); ++i) {
-      db::Point loc = polygon_ports [*i].box ().center ();
+      db::Box loc = polygon_ports [*i].box ();
       ports.push_back (std::make_pair (PortDefinition (pex::RNode::PolygonPort, loc, *i), (pex::RNode *) 0));
     }
 
@@ -282,8 +282,7 @@ SquareCountingRExtractor::extract (const db::Polygon &polygon, const std::vector
       auto n4p = nodes_for_ports.find (p->first);
       if (n4p == nodes_for_ports.end ()) {
         pex::RNode *node = rnetwork.create_node (p->first.type, p->first.port_index);
-        db::DPoint loc = trans * p->first.location;
-        node->location = db::DBox (loc, loc);
+        node->location = trans * p->first.location;
         n4p = nodes_for_ports.insert (std::make_pair (p->first, node)).first;
       }
       p->second = n4p->second;

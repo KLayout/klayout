@@ -139,7 +139,12 @@ RNetwork::create_element (double conductivity, RNode *a, RNode *b)
   auto i = m_elements_by_nodes.find (std::make_pair (a, b));
   if (i != m_elements_by_nodes.end ()) {
 
-    i->second->conductivity += conductivity;
+    if (conductivity == pex::RElement::short_value () || i->second->conductivity == pex::RElement::short_value ()) {
+      i->second->conductivity = pex::RElement::short_value ();
+    } else {
+      i->second->conductivity += conductivity;
+    }
+
     return i->second;
 
   } else {

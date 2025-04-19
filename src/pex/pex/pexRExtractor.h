@@ -31,6 +31,7 @@
 
 #include <string>
 #include <list>
+#include <limits>
 
 namespace pex
 {
@@ -87,9 +88,14 @@ struct PEX_PUBLIC RElement
   const RNode *a () const { return mp_a; }
   const RNode *b () const { return mp_b; }
 
+  static double short_value ()
+  {
+    return std::numeric_limits<double>::infinity ();
+  }
+
   double resistance () const
   {
-    return 1.0 / conductivity;
+    return conductivity == short_value () ? 0.0 : 1.0 / conductivity;
   }
 
   std::string to_string () const;

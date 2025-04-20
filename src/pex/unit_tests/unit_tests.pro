@@ -8,7 +8,8 @@ include($$PWD/../../lib_ut.pri)
 
 SOURCES = \
   pexRExtractorTests.cc \
-  pexSquareCountingRExtractorTests.cc
+  pexSquareCountingRExtractorTests.cc \
+  pexTriangulationRExtractorTests.cc
 
 INCLUDEPATH += $$TL_INC $$DB_INC $$GSI_INC $$PEX_INC
 DEPENDPATH += $$TL_INC $$DB_INC $$GSI_INC $$PEX_INC

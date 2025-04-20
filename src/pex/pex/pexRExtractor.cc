@@ -134,7 +134,12 @@ RNetwork::create_node (RNode::node_type type, unsigned int port_index)
 RElement *
 RNetwork::create_element (double conductivity, RNode *a, RNode *b)
 {
-  auto i = m_elements_by_nodes.find (std::make_pair (a, b));
+  std::pair<RNode *, RNode *> key (a, b);
+  if (size_t (b) < size_t (a)) {
+    std::swap (key.first, key.second);
+  }
+
+  auto i = m_elements_by_nodes.find (key);
   if (i != m_elements_by_nodes.end ()) {
 
     if (conductivity == pex::RElement::short_value () || i->second->conductivity == pex::RElement::short_value ()) {
@@ -149,7 +154,7 @@ RNetwork::create_element (double conductivity, RNode *a, RNode *b)
 
     RElement *element = new RElement (this, conductivity, a, b);
     m_elements.push_back (element);
-    m_elements_by_nodes.insert (std::make_pair (std::make_pair (a, b), element));
+    m_elements_by_nodes.insert (std::make_pair (key, element));
 
     a->m_elements.push_back (element);
     element->m_ia = --a->m_elements.end ();

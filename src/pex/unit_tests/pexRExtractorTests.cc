@@ -56,6 +56,15 @@ TEST(network_basic)
     "R $2 $3 0.2"
   );
 
+  pex::RElement *e23c = rn.create_element (5.0, n3, n2);
+  EXPECT_EQ (e23 == e23c, true);
+
+  EXPECT_EQ (rn.to_string (),
+    "R $1 $2 2\n"
+    "R $1 $3 4\n"
+    "R $2 $3 0.1"
+  );
+
   rn.remove_element (e23);
 
   EXPECT_EQ (rn.to_string (),

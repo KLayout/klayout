@@ -142,6 +142,11 @@ class PEX_PUBLIC RNetwork
   : public tl::Object
 {
 public:
+  typedef tl::list<RNode, false> node_list;
+  typedef node_list::const_iterator node_iterator;
+  typedef tl::list<RElement, false> element_list;
+  typedef element_list::const_iterator element_iterator;
+
   RNetwork ();
   ~RNetwork ();
 
@@ -154,9 +159,50 @@ public:
 
   std::string to_string () const;
 
+  node_iterator begin_nodes () const
+  {
+    return m_nodes.begin ();
+  }
+
+  node_iterator end_nodes () const
+  {
+    return m_nodes.end ();
+  }
+
+  size_t num_nodes () const
+  {
+    return m_nodes.size ();
+  }
+
+  size_t num_internal_nodes () const
+  {
+    size_t count = 0;
+    for (auto n = m_nodes.begin (); n != m_nodes.end (); ++n) {
+      if (n->type == pex::RNode::Internal) {
+        ++count;
+      }
+    }
+    return count;
+  }
+
+  element_iterator begin_elements () const
+  {
+    return m_elements.begin ();
+  }
+
+  element_iterator end_elements () const
+  {
+    return m_elements.end ();
+  }
+
+  size_t num_elements () const
+  {
+    return m_elements.size ();
+  }
+
 private:
-  tl::list<RNode, false> m_nodes;
-  tl::list<RElement, false> m_elements;
+  node_list m_nodes;
+  element_list m_elements;
   std::map<std::pair<RNode *, RNode *>, RElement *> m_elements_by_nodes;
   std::map<std::pair<RNode::node_type, unsigned int>, RNode *> m_nodes_by_type;
 

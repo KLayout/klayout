@@ -1043,7 +1043,7 @@ Triangulation::search_edges_crossing (Vertex *from, Vertex *to)
         if (e->has_vertex (vv)) {
           return result;
         }
-        if (e->crosses (edge)) {
+        if (e->crosses_including (edge)) {
           result.push_back (e);
           next_edge = e;
           break;

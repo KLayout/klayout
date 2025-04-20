@@ -10,12 +10,14 @@ SOURCES = \
   pexForceLink.cc \
   pexRExtractor.cc \
   gsiDeclRExtractor.cc \
-  pexSquareCountingRExtractor.cc
+  pexSquareCountingRExtractor.cc \
+  pexTriangulationRExtractor.cc
 
 HEADERS = \
   pexForceLink.h \
   pexRExtractor.h \
-  pexSquareCountingRExtractor.h
+  pexSquareCountingRExtractor.h \
+  pexTriangulationRExtractor.h
 
 RESOURCES = \
 

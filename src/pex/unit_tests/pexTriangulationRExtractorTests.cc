@@ -313,3 +313,51 @@ TEST(extraction_analytic_disc)
   )
 }
 
+TEST(extraction_meander)
+{
+  db::Point contour[] = {
+    db::Point (0, 0),
+    db::Point (0, 1000),
+    db::Point (1600, 1000),
+    db::Point (1600, 600),
+    db::Point (2000, 600),
+    db::Point (2000, 1000),
+    db::Point (3600, 1000),
+    db::Point (3600, 600),
+    db::Point (4000, 600),
+    db::Point (4000, 1000),
+    db::Point (4600, 1000),
+    db::Point (4600, 0),
+    db::Point (3000, 0),
+    db::Point (3000, 400),
+    db::Point (2600, 400),
+    db::Point (2600, 0),
+    db::Point (1000, 0),
+    db::Point (1000, 400),
+    db::Point (600, 400),
+    db::Point (600, 0)
+  };
+
+  db::Polygon poly;
+  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour[0]));
+
+  double dbu = 0.001;
+
+  pex::RNetwork rn;
+  pex::TriangulationRExtractor rex (dbu);
+  rex.triangulation_parameters ().max_area = 10000 * dbu * dbu;
+  rex.triangulation_parameters ().min_b = 0.3;
+
+  std::vector<db::Point> vertex_ports;
+  vertex_ports.push_back (db::Point (300, 0));      //  V0
+  vertex_ports.push_back (db::Point (4300, 1000));  //  V1
+
+  std::vector<db::Polygon> polygon_ports;
+
+  rex.extract (poly, vertex_ports, polygon_ports, rn);
+
+  EXPECT_EQ (rn.to_string (),
+    "R V0 V1 8.75751"          //  what is the "real" value?
+  )
+}
+

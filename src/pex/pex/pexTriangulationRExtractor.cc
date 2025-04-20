@@ -55,6 +55,8 @@ TriangulationRExtractor::extract (const db::Polygon &polygon, const std::vector<
 
     tri.triangulate (polygon, vertex_ports, m_tri_param, trans);
 
+    plc.dump ("debug.gds");
+
   } else {
 
     tl::SelfTimer timer_tri (tl::verbosity () >= m_tri_param.base_verbosity + 11, "Triangulation step");

@@ -167,7 +167,7 @@ SquareCountingRExtractor::do_extract (const db::Polygon &db_poly, const std::vec
     if (r == 0) {
       rnetwork.create_element (pex::RElement::short_value (), pl->second, pl_next->second);
     } else {
-      rnetwork.create_element (r, pl->second, pl_next->second);
+      rnetwork.create_element (1.0 / r, pl->second, pl_next->second);
     }
 
   }

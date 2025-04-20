@@ -521,7 +521,7 @@ struct trans_defs
     method ("disp", (const vector_type &(C::*) () const) &C::disp,
       "@brief Gets to the displacement vector\n"
       "\n"
-      "Staring with version 0.25 the displacement type is a vector."
+      "Starting with version 0.25 the displacement type is a vector."
     ) +
     method ("rot", &C::rot,
       "@brief Gets the angle/mirror code\n"
@@ -553,7 +553,7 @@ struct trans_defs
       "@param u The new displacement\n"
       "\n"
       "This method was introduced in version 0.20.\n"
-      "Staring with version 0.25 the displacement type is a vector."
+      "Starting with version 0.25 the displacement type is a vector."
     ) +
     method_ext ("mirror=", &set_mirror, arg ("m"),
       "@brief Sets the mirror flag\n"

@@ -64,7 +64,7 @@ TEST(extraction)
   rex.extract (poly, vertex_ports, polygon_ports, rn);
 
   EXPECT_EQ (rn.to_string (),
-    "R V1 V0 10.0938"
+    "R V0 V1 10.0938"
   )
 }
 
@@ -94,7 +94,7 @@ TEST(extraction_with_polygon_ports)
   rex.extract (poly, vertex_ports, polygon_ports, rn);
 
   EXPECT_EQ (rn.to_string (),
-    "R P1 P0 10"
+    "R P0 P1 10"
   )
 }
 
@@ -124,7 +124,7 @@ TEST(extraction_with_polygon_ports_inside)
   rex.extract (poly, vertex_ports, polygon_ports, rn);
 
   EXPECT_EQ (rn.to_string (),
-    "R P1 P0 10"
+    "R P0 P1 10"
   )
 }
 
@@ -155,7 +155,7 @@ TEST(extraction_split_by_ports)
   rex.extract (poly, vertex_ports, polygon_ports, rn);
 
   EXPECT_EQ (rn.to_string (),
-    "R P2 P0 5\n"
+    "R P0 P2 5\n"
     "R P1 P2 5"
   )
 }
@@ -187,7 +187,7 @@ TEST(extraction_split_by_butting_port)
   rex.extract (poly, vertex_ports, polygon_ports, rn);
 
   EXPECT_EQ (rn.to_string (),
-    "R P2 P0 4.84211\n"
+    "R P0 P2 4.84211\n"
     "R P1 P2 4.84211\n"
     "R P0 P1 281.111"
   )
@@ -220,7 +220,7 @@ TEST(extraction_with_outside_polygon_port)
   rex.extract (poly, vertex_ports, polygon_ports, rn);
 
   EXPECT_EQ (rn.to_string (),
-    "R P1 P0 11"
+    "R P0 P1 11"
   )
 }
 
@@ -251,7 +251,65 @@ TEST(extraction_with_polygon_ports_and_vertex_port_inside)
   rex.extract (poly, vertex_ports, polygon_ports, rn);
 
   EXPECT_EQ (rn.to_string (),
-    "R V0 P0 0\n"    //  shorted because V0 is inside P0
-    "R P1 P0 10"
+    "R P0 V0 0\n"    //  shorted because V0 is inside P0
+    "R P0 P1 10"
   )
 }
+
+static db::Polygon ellipse (const db::Box &box, int npoints)
+{
+  npoints = std::max (3, std::min (10000000, npoints));
+
+  std::vector<db::Point> pts;
+  pts.reserve (npoints);
+
+  double da = M_PI * 2.0 / npoints;
+  for (int i = 0; i < npoints; ++i) {
+    double x = box.center ().x () - box.width () * 0.5 * cos (da * i);
+    double y = box.center ().y () + box.height () * 0.5 * sin (da * i);
+    pts.push_back (db::Point (x, y));
+  }
+
+  db::Polygon c;
+  c.assign_hull (pts.begin (), pts.end (), false);
+  return c;
+}
+
+TEST(extraction_analytic_disc)
+{
+  db::Coord r1 = 2000;
+  db::Coord r2 = 10000;
+  db::Coord r2pin = 10000 + 1000;
+
+  db::Polygon outer = ellipse (db::Box (-r2pin, -r2pin, r2pin, r2pin), 64);
+  db::Polygon disc = ellipse (db::Box (-r2, -r2, r2, r2), 64);
+  db::Polygon inner = ellipse (db::Box (-r1, -r1, r1, r1), 64);
+
+  db::Polygon outer_port = *(db::Region (outer) - db::Region (disc)).nth (0);
+
+  double dbu = 0.001;
+
+  pex::RNetwork rn;
+  pex::TriangulationRExtractor rex (dbu);
+
+  std::vector<db::Point> vertex_ports;
+
+  std::vector<db::Polygon> polygon_ports;
+  polygon_ports.push_back (inner);
+  polygon_ports.push_back (outer_port);
+
+  rex.extract (disc, vertex_ports, polygon_ports, rn);
+
+  EXPECT_EQ (rn.to_string (),
+    "R P0 P1 0.245379"    //  theoretical: 1/(2*PI)*log(r2/r1) = 0.25615 with r2=10000, r1=2000
+  )
+
+  rex.triangulation_parameters ().max_area = 100000 * dbu * dbu;
+
+  rex.extract (disc, vertex_ports, polygon_ports, rn);
+
+  EXPECT_EQ (rn.to_string (),
+    "R P0 P1 0.255614"    //  theoretical: 1/(2*PI)*log(r2/r1) = 0.25615 with r2=10000, r1=2000
+  )
+}
+

@@ -42,6 +42,8 @@ TriangulationRExtractor::extract (const db::Polygon &polygon, const std::vector<
 {
   rnetwork.clear ();
 
+  tl::SelfTimer timer (tl::verbosity () >= m_tri_param.base_verbosity + 1, "Extracting resistor network from polygon (TriangulationRExtractor)");
+
   db::CplxTrans trans = db::CplxTrans (m_dbu) * db::ICplxTrans (db::Trans (db::Point () - polygon.box ().center ()));
 
   db::plc::Graph plc;
@@ -54,6 +56,8 @@ TriangulationRExtractor::extract (const db::Polygon &polygon, const std::vector<
     tri.triangulate (polygon, vertex_ports, m_tri_param, trans);
 
   } else {
+
+    tl::SelfTimer timer_tri (tl::verbosity () >= m_tri_param.base_verbosity + 11, "Triangulation step");
 
     //  Subtract the polygon ports from the original polygon and compute the intersection.
     //  Hence we have coincident edges that we can use to identify the nodes that are
@@ -238,7 +242,7 @@ void
 TriangulationRExtractor::eliminate_all (RNetwork &rnetwork)
 {
   if (tl::verbosity () >= m_tri_param.base_verbosity + 10) {
-    tl::info << "Staring elimination with " << rnetwork.num_internal_nodes () << " internal nodes and " << rnetwork.num_elements () << " resistors";
+    tl::info << "Starting elimination with " << rnetwork.num_internal_nodes () << " internal nodes and " << rnetwork.num_elements () << " resistors";
   }
 
   unsigned int niter = 0;

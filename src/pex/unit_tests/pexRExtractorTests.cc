@@ -97,7 +97,7 @@ TEST(network_simplify1)
   rn.create_element (1, n1, n3);
 
   EXPECT_EQ (rn.to_string (),
-    "R V1 $2 1\n"
+    "R $2 V1 1\n"
     "R $2 V3 0\n"
     "R V1 V3 1"
   );
@@ -126,7 +126,7 @@ TEST(network_simplify2)
   rn.create_element (1, n3, n5);
 
   EXPECT_EQ (rn.to_string (),
-    "R V1 $2 1\n"
+    "R $2 V1 1\n"
     "R $2 $3 0\n"
     "R $3 V4 1\n"
     "R $3 V5 1"
@@ -135,9 +135,9 @@ TEST(network_simplify2)
   rn.simplify ();
 
   EXPECT_EQ (rn.to_string (),
-    "R V1 $2 1\n"
-    "R V4 $2 1\n"
-    "R V5 $2 1"
+    "R $2 V1 1\n"
+    "R $2 V4 1\n"
+    "R $2 V5 1"
   );
 }
 
@@ -156,7 +156,7 @@ TEST(network_simplify3)
   rn.create_element (1, n3, n4);
 
   EXPECT_EQ (rn.to_string (),
-    "R V1 $2 1\n"
+    "R $2 V1 1\n"
     "R $2 $3 0\n"
     "R $3 V4 1"
   );
@@ -185,7 +185,7 @@ TEST(network_simplify4)
   EXPECT_EQ (rn.to_string (),
     "R V1 V4 1\n"
     "R $2 V1 1\n"
-    "R V4 $3 1"
+    "R $3 V4 1"
   );
 
   rn.simplify ();

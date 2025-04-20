@@ -52,19 +52,25 @@ RNode::to_string () const
 std::string
 RElement::to_string () const
 {
-  std::string res = "R ";
+  std::string na;
   if (a ()) {
-    res += a ()->to_string ();
+    na = a ()->to_string ();
   } else {
-    res += "(nil)";
+    na = "(nil)";
   }
-  res += " ";
+
+  std::string nb;
   if (b ()) {
-    res += b ()->to_string ();
+    nb = b ()->to_string ();
   } else {
-    res += "(nil)";
+    nb = "(nil)";
   }
-  res += " ";
+
+  if (nb < na) {
+    std::swap (na, nb);
+  }
+
+  std::string res = "R " + na + " " + nb + " ";
   res += tl::sprintf ("%.6g", resistance ());
   return res;
 }

@@ -98,9 +98,9 @@ TEST(basic)
 
   //  Same network, but opposite order. $1 and $2 are shorted, hence can be swapped.
   EXPECT_EQ (rn.to_string (),
-    "R $3 $1 1\n"
+    "R $1 $3 1\n"
     "R $1 $2 0\n"
-    "R $2 $0 0.390865"
+    "R $0 $2 0.390865"
   );
 }
 
@@ -135,8 +135,8 @@ TEST(extraction)
   rex.extract (poly, vertex_ports, polygon_ports, rn);
 
   EXPECT_EQ (rn.to_string (),
-    "R V0 $0 0.0952381\n"
+    "R $0 V0 0.0952381\n"
     "R $0 V1 0.166667\n"
-    "R P0 $0 0.117647"
+    "R $0 P0 0.117647"
   )
 }

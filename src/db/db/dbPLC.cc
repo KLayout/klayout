@@ -443,6 +443,7 @@ Polygon::init ()
   if (area > db::epsilon) {
     std::reverse (mp_v.begin (), mp_v.end ());
     std::reverse (mp_e.begin (), mp_e.end ());
+    std::rotate (mp_e.begin (), ++mp_e.begin (), mp_e.end ());
   }
 
   //  link the polygon to the edges

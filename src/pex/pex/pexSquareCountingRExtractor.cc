@@ -264,8 +264,9 @@ SquareCountingRExtractor::extract (const db::Polygon &polygon, const std::vector
 
     //  2. vertex ports
     for (size_t i = 0; i < plc_poly->internal_vertexes (); ++i) {
-      db::Point loc = inv_trans * *plc_poly->internal_vertex (i);
-      ports.push_back (std::make_pair (PortDefinition (pex::RNode::VertexPort, loc, i), (pex::RNode *) 0));
+      auto v = plc_poly->internal_vertex (i);
+      db::Point loc = inv_trans * *v;
+      ports.push_back (std::make_pair (PortDefinition (pex::RNode::VertexPort, loc, v->id ()), (pex::RNode *) 0));
     }
 
     //  3. polygon ports

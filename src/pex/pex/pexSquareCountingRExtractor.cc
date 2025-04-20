@@ -165,7 +165,6 @@ SquareCountingRExtractor::do_extract (const db::Polygon &db_poly, const std::vec
     //  @@@ TODO: multiply with sheet rho!
     //  @@@ TODO: width dependency
     if (r == 0) {
-      // @@@ TODO: join nodes later!
       rnetwork.create_element (pex::RElement::short_value (), pl->second, pl_next->second);
     } else {
       rnetwork.create_element (r, pl->second, pl_next->second);
@@ -293,6 +292,7 @@ SquareCountingRExtractor::extract (const db::Polygon &polygon, const std::vector
 
   }
 
+  rnetwork.simplify ();
 }
 
 }

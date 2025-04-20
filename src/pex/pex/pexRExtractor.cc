@@ -138,7 +138,7 @@ RNetwork::create_node (RNode::node_type type, unsigned int port_index)
 }
 
 RElement *
-RNetwork::create_element (double conductivity, RNode *a, RNode *b)
+RNetwork::create_element (double conductance, RNode *a, RNode *b)
 {
   std::pair<RNode *, RNode *> key (a, b);
   if (size_t (b) < size_t (a)) {
@@ -148,17 +148,17 @@ RNetwork::create_element (double conductivity, RNode *a, RNode *b)
   auto i = m_elements_by_nodes.find (key);
   if (i != m_elements_by_nodes.end ()) {
 
-    if (conductivity == pex::RElement::short_value () || i->second->conductivity == pex::RElement::short_value ()) {
-      i->second->conductivity = pex::RElement::short_value ();
+    if (conductance == pex::RElement::short_value () || i->second->conductance == pex::RElement::short_value ()) {
+      i->second->conductance = pex::RElement::short_value ();
     } else {
-      i->second->conductivity += conductivity;
+      i->second->conductance += conductance;
     }
 
     return i->second;
 
   } else {
 
-    RElement *element = new RElement (this, conductivity, a, b);
+    RElement *element = new RElement (this, conductance, a, b);
     m_elements.push_back (element);
     m_elements_by_nodes.insert (std::make_pair (key, element));
 
@@ -204,7 +204,7 @@ RNetwork::join_nodes (RNode *a, RNode *b)
   for (auto e = b->elements ().begin (); e != b->elements ().end (); ++e) {
     RNode *on = const_cast<RNode *> ((*e)->other (b));
     if (on != a) {
-      create_element ((*e)->conductivity, on, a);
+      create_element ((*e)->conductance, on, a);
     }
   }
 
@@ -225,7 +225,7 @@ RNetwork::simplify ()
 
     tl::equivalence_clusters<const RNode *> clusters;
     for (auto e = m_elements.begin (); e != m_elements.end (); ++e) {
-      if (e->conductivity == pex::RElement::short_value () && (e->a ()->type == pex::RNode::Internal || e->b ()->type == pex::RNode::Internal)) {
+      if (e->conductance == pex::RElement::short_value () && (e->a ()->type == pex::RNode::Internal || e->b ()->type == pex::RNode::Internal)) {
         clusters.same (e->a (), e->b ());
       }
     }

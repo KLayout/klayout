@@ -301,7 +301,7 @@ TriangulationRExtractor::eliminate_node (pex::RNode *node, RNetwork &rnetwork)
 {
   double s_sum = 0.0;
   for (auto e = node->elements ().begin (); e != node->elements ().end (); ++e) {
-    s_sum += (*e)->conductivity;
+    s_sum += (*e)->conductance;
   }
 
   if (fabs (s_sum) > 1e-10) {
@@ -311,7 +311,7 @@ TriangulationRExtractor::eliminate_node (pex::RNode *node, RNetwork &rnetwork)
       for ( ; ee != node->elements ().end (); ++ee) {
         pex::RNode *n1 = const_cast <pex::RNode *> ((*e)->other (node));
         pex::RNode *n2 = const_cast <pex::RNode *> ((*ee)->other (node));
-        double c = (*e)->conductivity * (*ee)->conductivity / s_sum;
+        double c = (*e)->conductance * (*ee)->conductance / s_sum;
         rnetwork.create_element (c, n1, n2);
       }
     }

@@ -31,28 +31,58 @@
 namespace pex
 {
 
-// @@@ doc
+/**
+ *  @brief The Square Counting R Extractor
+ *
+ *  The idea of that extractor is to first decompose the polygon into
+ *  convex parts. Each convex part is taken as "thin" and the current
+ *  flow being parallel and homogeneous to the long axis.
+ *
+ *  Internal ports are created between the partial polygons where
+ *  they touch.
+ *
+ *  The ports are considered point-like (polygon ports are replaced
+ *  by points in their bounding box centers) and inject current
+ *  at their specific position only. The resistance is accumulated
+ *  between ports by integrating the squares (length along
+ *  the long axis / width).
+ */
 class PEX_PUBLIC SquareCountingRExtractor
   : public RExtractor
 {
 public:
+  /**
+   *  @brief The constructor
+   */
   SquareCountingRExtractor (double dbu);
 
+  /**
+   *  @brief Gets the decomposition parameters
+   */
   db::plc::ConvexDecompositionParameters &decomposition_parameters ()
   {
     return m_decomp_param;
   }
 
+  /**
+   *  @brief Sets the database unit
+   */
   void set_dbu (double dbu)
   {
     m_dbu = dbu;
   }
 
+  /**
+   *  @brief Gets the database unit
+   */
   double dbu () const
   {
     return m_dbu;
   }
 
+  /**
+   *  @brief Implementation of the extraction function
+   */
   virtual void extract (const db::Polygon &polygon, const std::vector<db::Point> &vertex_ports, const std::vector<db::Polygon> &polygon_ports, RNetwork &rnetwork);
 
 protected:

@@ -40,25 +40,57 @@ class RElement;
 class RNode;
 class RNetwork;
 
+/**
+ *  @brief Represents a node in the R graph
+ *
+ *  A node connects to multiple elements (resistors).
+ *  Every element has two nodes. The nodes and elements form
+ *  a graph.
+ *
+ *  RNode object cannot be created directly. Use "create_node"
+ *  from RNetwork.
+ */
 struct PEX_PUBLIC RNode
   : public tl::list_node<RNode>
 {
 public:
+  /**
+   *  @brief The type of the node
+   */
   enum node_type {
-    Internal,
-    VertexPort,
-    PolygonPort
+    Internal,      //  an internal node, not related to a port
+    VertexPort,    //  a node related to a vertex port
+    PolygonPort    //  a node related to a polygon port
   };
 
+  /**
+   *  @brief The node type
+   */
   node_type type;
+
+  /**
+   *  @brief The location + extension of the node
+   */
   db::DBox location;
+
+  /**
+   *  @brief An index locating the node in the vertex or polygon port lists
+   *
+   *  For internal nodes, the index is a unique numbers.
+   */
   unsigned int port_index;
 
+  /**
+   *  @brief Gets the R elements connected to this node
+   */
   const std::list<const RElement *> &elements () const
   {
     return m_elements;
   }
 
+  /**
+   *  @brief Returns a string representation of the node
+   */
   std::string to_string () const;
 
 protected:
@@ -80,14 +112,35 @@ private:
   mutable std::list<const RElement *> m_elements;
 };
 
+/**
+ *  @brief Represents an R element in the graph (an edge)
+ *
+ *  An element has two nodes that form the ends of the edge and
+ *  a conductance value (given in Siemens).
+ *
+ *  The value can be RElement::short_value() indicating
+ *  "infinite" conductance (a short).
+ *
+ *  RElement objects cannot be created directly. Use "create_element"
+ *  from RNetwork.
+ */
 struct PEX_PUBLIC RElement
   : public tl::list_node<RElement>
 {
-  double conductivity;
+  /**
+   *  @brief The conductance value
+   */
+  double conductance;
 
+  /**
+   *  @brief The nodes the resistor connects
+   */
   const RNode *a () const { return mp_a; }
   const RNode *b () const { return mp_b; }
 
+  /**
+   *  @brief Gets the other node for n
+   */
   const RNode *other (const RNode *n) const
   {
     if (mp_a == n) {
@@ -98,16 +151,27 @@ struct PEX_PUBLIC RElement
     tl_assert (false);
   }
 
+  /**
+   *  @brief Represents the conductance value for a short
+   */
   static double short_value ()
   {
     return std::numeric_limits<double>::infinity ();
   }
 
+  /**
+   *  @brief Gets the resistance value
+   *
+   *  The resistance value is the inverse of the conducance.
+   */
   double resistance () const
   {
-    return conductivity == short_value () ? 0.0 : 1.0 / conductivity;
+    return conductance == short_value () ? 0.0 : 1.0 / conductance;
   }
 
+  /**
+   *  @brief Returns a string representation of the element
+   */
   std::string to_string () const;
 
 protected:
@@ -115,7 +179,7 @@ protected:
   friend class tl::list_impl<RElement, false>;
 
   RElement (RNetwork *network, double _conductivity, const RNode *a, const RNode *b)
-    : conductivity (_conductivity), mp_network (network), mp_a (a), mp_b (b)
+    : conductance (_conductivity), mp_network (network), mp_a (a), mp_b (b)
   { }
 
   ~RElement ()
@@ -138,6 +202,9 @@ private:
   RElement &operator= (const RElement &other);
 };
 
+/**
+ *  @brief Represents a R network (a graph of RNode and RElement)
+ */
 class PEX_PUBLIC RNetwork
   : public tl::Object
 {
@@ -147,33 +214,95 @@ public:
   typedef tl::list<RElement, false> element_list;
   typedef element_list::const_iterator element_iterator;
 
+  /**
+   *  @brief Constructor
+   */
   RNetwork ();
+
+  /**
+   *  @brief Destructor
+   */
   ~RNetwork ();
 
+  /**
+   *  @brief Creates a node with the given type and port index
+   *
+   *  If the node type is Internal, a new node is created always.
+   *  If the node type is VertexPort or PolygonPort, an existing
+   *  node is returned if one way created with the same type
+   *  or port index already. This avoids creating duplicates
+   *  for the same port.
+   */
   RNode *create_node (RNode::node_type type, unsigned int port_index);
-  RElement *create_element (double conductivity, RNode *a, RNode *b);
+
+  /**
+   *  @brief Creates a new element between the given nodes
+   *
+   *  If an element already exists between the specified nodes, the
+   *  given value is added to the existing element and the existing
+   *  object is returned.
+   */
+  RElement *create_element (double conductance, RNode *a, RNode *b);
+
+  /**
+   *  @brief Removes the given element
+   *
+   *  Removing the element will also remove any orphan nodes
+   *  at the ends if they are of type Internal.
+   */
   void remove_element (RElement *element);
+
+  /**
+   *  @brief Removes the node and the attached elements.
+   *
+   *  Only nodes of type Internal can be removed.
+   */
   void remove_node (RNode *node);
+
+  /**
+   *  @brief Clears the network
+   */
   void clear ();
+
+  /**
+   *  @brief Simplifies the network
+   *
+   *  This will:
+   *  - Join serial resistors if connected by an internal node
+   *  - Remove shorts and join the nodes, if one of them is
+   *    an internal node. The non-internal node will persist.
+   *  - Remove "dangling" resistors if the dangling node is
+   *    an internal one
+   */
   void simplify ();
 
-  std::string to_string () const;
-
+  /**
+   *  @brief Iterate the nodes (begin)
+   */
   node_iterator begin_nodes () const
   {
     return m_nodes.begin ();
   }
 
+  /**
+   *  @brief Iterate the nodes (end)
+   */
   node_iterator end_nodes () const
   {
     return m_nodes.end ();
   }
 
+  /**
+   *  @brief Gets the number of nodes
+   */
   size_t num_nodes () const
   {
     return m_nodes.size ();
   }
 
+  /**
+   *  @brief Gets the number of internal nodes
+   */
   size_t num_internal_nodes () const
   {
     size_t count = 0;
@@ -185,20 +314,34 @@ public:
     return count;
   }
 
+  /**
+   *  @brief Iterate the elements (begin)
+   */
   element_iterator begin_elements () const
   {
     return m_elements.begin ();
   }
 
+  /**
+   *  @brief Iterate the elements (end)
+   */
   element_iterator end_elements () const
   {
     return m_elements.end ();
   }
 
+  /**
+   *  @brief Gets the number of elements
+   */
   size_t num_elements () const
   {
     return m_elements.size ();
   }
+
+  /**
+   *  @brief Returns a string representation of the graph
+   */
+  std::string to_string () const;
 
 private:
   node_list m_nodes;
@@ -225,9 +368,24 @@ private:
 class PEX_PUBLIC RExtractor
 {
 public:
+  /**
+   *  @brief Constructor
+   */
   RExtractor ();
+
+  /**
+   *  @brief Destructor
+   */
   virtual ~RExtractor ();
 
+  /**
+   *  @brief Extracts the resistance network from the given polygon and ports
+   *
+   *  The ports define specific locations where to connect to the resistance network.
+   *  The network will contain corresponding nodes with the VertexPort for vertex ports
+   *  and PolygonPort for polygon port. The node index is the index in the respective
+   *  lists.
+   */
   virtual void extract (const db::Polygon &polygon, const std::vector<db::Point> &vertex_ports, const std::vector<db::Polygon> &polygon_ports, RNetwork &rnetwork) = 0;
 };
 

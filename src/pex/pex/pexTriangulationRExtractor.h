@@ -31,28 +31,59 @@
 namespace pex
 {
 
-// @@@ doc
+/**
+ *  @brief An R extractor based on a triangulation of the resistor area
+ *
+ *  This resistor extractor starts with a triangulation of the
+ *  polygon area and substitutes each triangle by a 3-resistor network.
+ *
+ *  After this, it will eliminate nodes where possible.
+ *
+ *  This extractor delivers a resistor matrix (there is a resistor
+ *  between every specified port).
+ *
+ *  Polygon ports are considered to be perfectly conductive and cover
+ *  their given area, shorting all nodes at their boundary.
+ *
+ *  This extractor delivers higher quality results than the square
+ *  counting extractor, but is slower in general.
+ */
 class PEX_PUBLIC TriangulationRExtractor
   : public RExtractor
 {
 public:
+  /**
+   *  @brief The constructor
+   */
   TriangulationRExtractor (double dbu);
 
+  /**
+   *  @brief Gets the triangulation parameters
+   */
   db::plc::TriangulationParameters &triangulation_parameters ()
   {
     return m_tri_param;
   }
 
+  /**
+   *  @brief Sets the database unit
+   */
   void set_dbu (double dbu)
   {
     m_dbu = dbu;
   }
 
+  /**
+   *  @brief Gets the database unit
+   */
   double dbu () const
   {
     return m_dbu;
   }
 
+  /**
+   *  @brief Implementation of the extraction function
+   */
   virtual void extract (const db::Polygon &polygon, const std::vector<db::Point> &vertex_ports, const std::vector<db::Polygon> &polygon_ports, RNetwork &rnetwork);
 
 private:

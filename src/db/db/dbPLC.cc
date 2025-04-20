@@ -300,8 +300,14 @@ Edge::crosses (const db::DEdge &e, const db::DEdge &other)
 bool
 Edge::crosses_including (const db::DEdge &e, const db::DEdge &other)
 {
-  return e.side_of (other.p1 ()) * e.side_of (other.p2 ()) <= 0 &&
-         other.side_of (e.p1 ()) * other.side_of (e.p2 ()) <= 0;
+  int sa = e.side_of (other.p1 ());
+  int sb = e.side_of (other.p2 ());
+  int s1 = sa * sb;
+
+  int s2 = other.side_of (e.p1 ()) * other.side_of (e.p2 ());
+
+  //  e can end on other and so can other end on e, but both may not be coincident
+  return s1 <= 0 && s2 <= 0 && ! (sa == 0 && sb == 0);
 }
 
 db::DPoint

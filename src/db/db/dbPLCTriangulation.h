@@ -142,6 +142,7 @@ public:
 
   //  more versions
   void triangulate (const db::Region &region, const TriangulationParameters &parameters, const db::CplxTrans &trans = db::CplxTrans ());
+  void triangulate (const db::Region &region, const std::vector<db::Point> &vertexes, const TriangulationParameters &parameters, const db::CplxTrans &trans = db::CplxTrans ());
   void triangulate (const db::Polygon &poly, const TriangulationParameters &parameters, double dbu = 1.0);
   void triangulate (const db::Polygon &poly, const std::vector<db::Point> &vertexes, const TriangulationParameters &parameters, double dbu = 1.0);
   void triangulate (const db::Polygon &poly, const TriangulationParameters &parameters, const db::CplxTrans &trans = db::CplxTrans ());
@@ -182,6 +183,17 @@ public:
   std::vector<Vertex *> find_vertexes_along_line (const db::DPoint &p1, const db::DPoint &p2) const;
 
   /**
+   *  @brief Removes the outside triangles.
+   *
+   *  This method is useful in combination with the "remove_outside_triangles = false" triangulation
+   *  parameter. In this mode, outside triangles are not removed after triangulation (the
+   *  triangulated area is convex). This enables use of the "find" functions.
+   *
+   *  This method can be used to finally remove the outside triangles if no longer needed.
+   */
+  void remove_outside_triangles ();
+
+  /**
    *  @brief Statistics: number of flips (fixing)
    */
   size_t flips () const
@@ -196,6 +208,37 @@ public:
   {
     return m_hops;
   }
+
+  /**
+   *  @brief Creates a constrained Delaunay triangulation from the given Region
+   *
+   *  This method is used internally by the "triangulation" method to create the basic triangulation,
+   *  followed by a "refine" step.
+   */
+  void create_constrained_delaunay (const db::Region &region, const db::CplxTrans &trans = db::CplxTrans ());
+
+  /**
+   *  @brief Creates a constrained Delaunay triangulation from the given Polygon
+   *
+   *  This method is used internally by the "triangulation" method to create the basic triangulation,
+   *  followed by a "refine" step.
+   */
+  void create_constrained_delaunay (const db::Polygon &poly, const db::CplxTrans &trans = db::CplxTrans ());
+
+  /**
+   *  @brief Creates a constrained Delaunay triangulation from the given DPolygon
+   *
+   *  This method is used internally by the "triangulation" method to create the basic triangulation,
+   *  followed by a "refine" step.
+   */
+  void create_constrained_delaunay (const db::DPolygon &poly, const DCplxTrans &trans = db::DCplxTrans ());
+
+  /**
+   *  @brief Refines the triangulation using the given parameters
+   *
+   *  This method is used internally by the "triangulation" method after creating the basic triangulation.
+   */
+  void refine (const TriangulationParameters &param);
 
 protected:
   /**
@@ -255,26 +298,6 @@ protected:
   void constrain (const std::vector<std::vector<Vertex *> > &contours);
 
   /**
-   *  @brief Removes the outside triangles.
-   */
-  void remove_outside_triangles ();
-
-  /**
-   *  @brief Creates a constrained Delaunay triangulation from the given Region
-   */
-  void create_constrained_delaunay (const db::Region &region, const db::CplxTrans &trans = db::CplxTrans ());
-
-  /**
-   *  @brief Creates a constrained Delaunay triangulation from the given Polygon
-   */
-  void create_constrained_delaunay (const db::Polygon &poly, const std::vector<db::Point> &vertexes, const db::CplxTrans &trans = db::CplxTrans ());
-
-  /**
-   *  @brief Creates a constrained Delaunay triangulation from the given DPolygon
-   */
-  void create_constrained_delaunay (const db::DPolygon &poly, const std::vector<DPoint> &vertexes, const DCplxTrans &trans);
-
-  /**
    *  @brief Returns a value indicating whether the edge is "illegal" (violates the Delaunay criterion)
    */
   static bool is_illegal_edge (Edge *edge);
@@ -308,7 +331,6 @@ private:
   void insert_new_vertex(Vertex *vertex, std::list<tl::weak_ptr<Polygon> > *new_triangles_out);
   std::vector<Edge *> ensure_edge_inner (Vertex *from, Vertex *to);
   void join_edges (std::vector<Edge *> &edges);
-  void refine (const TriangulationParameters &param);
 };
 
 } //  namespace plc

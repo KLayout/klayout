@@ -43,24 +43,74 @@ TriangulationRExtractor::extract (const db::Polygon &polygon, const std::vector<
   rnetwork.clear ();
 
   db::CplxTrans trans = db::CplxTrans (m_dbu) * db::ICplxTrans (db::Trans (db::Point () - polygon.box ().center ()));
-  auto inv_trans = trans.inverted ();
-
-  //  NOTE: currently we treat polygon ports and points where the location is the center of the bounding box
-  std::vector<db::Point> vp = vertex_ports;
-  vp.reserve (vertex_ports.size () + polygon_ports.size ());
-  for (auto pp = polygon_ports.begin (); pp != polygon_ports.end (); ++pp) {
-    vp.push_back (pp->box ().center ());
-  }
-
 
   db::plc::Graph plc;
   db::plc::Triangulation tri (&plc);
 
-  tri.triangulate (polygon, vp, m_tri_param, trans);
+  std::unordered_map <const db::plc::Vertex *, size_t> pp_vertexes;
 
-  //  create a network node for each triangle node
+  if (polygon_ports.empty ()) {
+
+    tri.triangulate (polygon, vertex_ports, m_tri_param, trans);
+
+  } else {
+
+    //  Subtract the polygon ports from the original polygon and compute the intersection.
+    //  Hence we have coincident edges that we can use to identify the nodes that are
+    //  connected for the polygon ports
+
+    db::Region org (polygon);
+    db::Region pp (polygon_ports.begin (), polygon_ports.end ());
+
+    db::Region residual_poly = org - pp;
+
+    //  We must not remove outside triangles yet, as we need them for "find_vertexes_along_line"
+    db::plc::TriangulationParameters param = m_tri_param;
+    param.remove_outside_triangles = false;
+
+    tri.clear ();
+
+    unsigned int id = 0;
+    for (auto v = vertex_ports.begin (); v != vertex_ports.end (); ++v) {
+      tri.insert_point (trans * *v)->set_is_precious (true, id++);
+    }
+
+    for (auto p = polygon_ports.begin (); p != polygon_ports.end (); ++p) {
+      //  create vertexes for the port polygon vertexes - this ensures we will find vertexes
+      //  on the edges of the polygons - yet, they may be outside of the original polygon.
+      //  In that case they will not be considered
+      for (auto e = p->begin_edge (); !e.at_end (); ++e) {
+        tri.insert_point (trans * (*e).p1 ())->set_is_precious (true, id);
+      }
+    }
+
+    //  perform the triangulation
+
+    tri.create_constrained_delaunay (residual_poly, trans);
+    tri.refine (param);
+
+    //  identify the vertexes present for the polygon port -> store them inside pp_vertexes
+
+    for (auto p = polygon_ports.begin (); p != polygon_ports.end (); ++p) {
+      for (auto e = p->begin_edge (); !e.at_end (); ++e) {
+        //  NOTE: this currently only works if one of the end points is an actual
+        //  vertex.
+        auto vport = tri.find_vertexes_along_line (trans * (*e).p1 (), trans * (*e).p2 ());
+        for (auto v = vport.begin (); v != vport.end (); ++v) {
+          pp_vertexes.insert (std::make_pair (*v, p - polygon_ports.begin ()));
+        }
+      }
+    }
+
+    tri.remove_outside_triangles ();
+
+  }
+
+  //  Create a network node for each triangle node.
 
   std::unordered_map<const db::plc::Vertex *, pex::RNode *> vertex2node;
+  std::unordered_set<size_t> vports_present;
+  std::map<size_t, pex::RNode *> pport_nodes;
 
   size_t internal_node_id = 0;
 
@@ -73,28 +123,71 @@ TriangulationRExtractor::extract (const db::Polygon &polygon, const std::vector<
         continue;
       }
 
-      pex::RNode::node_type type = pex::RNode::Internal;
-      size_t port_index = 0;
+      pex::RNode *n = 0;
 
-      if (vertex->is_precious ()) {
-        size_t idx = vertex->id ();
-        if (idx >= vertex_ports.size ()) {
-          type = pex::RNode::PolygonPort;
-          port_index = size_t (idx) - vertex_ports.size ();
+      auto ipp = pp_vertexes.find (vertex);
+      if (ipp != pp_vertexes.end ()) {
+
+        size_t port_index = ipp->second;
+        auto pn = pport_nodes.find (port_index);
+        if (pn != pport_nodes.end ()) {
+          n = pn->second;
         } else {
-          type = pex::RNode::VertexPort;
-          port_index = size_t (idx);
+          n = rnetwork.create_node (pex::RNode::PolygonPort, port_index);
+          pport_nodes.insert (std::make_pair (port_index, n));
+          n->location = trans * polygon_ports [port_index].box ();
         }
+
+      } else if (vertex->is_precious ()) {
+
+        size_t port_index = size_t (vertex->id ());
+        if (port_index < vertex_ports.size ()) {
+          n = rnetwork.create_node (pex::RNode::VertexPort, port_index);
+          n->location = db::DBox (*vertex, *vertex);
+          vports_present.insert (port_index);
+        }
+
       } else {
-        port_index = internal_node_id++;
+
+        n = rnetwork.create_node (pex::RNode::Internal, internal_node_id++);
+        n->location = db::DBox (*vertex, *vertex);
+
       }
 
-      pex::RNode *n = rnetwork.create_node (type, port_index);
-      db::DPoint loc = *vertex;
-      n->location = db::DBox (loc, loc);
+      if (n) {
+        vertex2node.insert (std::make_pair (vertex, n));
+      }
 
-      vertex2node.insert (std::make_pair (vertex, n));
+    }
 
+  }
+
+  //  check for vertex ports not assigned to a node
+  //  -> this may be an indication for a vertex port inside a polygon port
+
+  for (size_t iv = 0; iv < vertex_ports.size (); ++iv) {
+
+    if (vports_present.find (iv) != vports_present.end ()) {
+      continue;
+    }
+
+    db::Point vp = vertex_ports [iv];
+
+    for (auto p = polygon_ports.begin (); p != polygon_ports.end (); ++p) {
+
+      if (p->box ().contains (vp) && db::inside_poly_test<db::Polygon> (*p) (vp) >= 0) {
+
+        auto ip = pport_nodes.find (p - polygon_ports.begin ());
+        if (ip != pport_nodes.end ()) {
+
+          //  create a new vertex port and short it to the polygon port
+          auto n = rnetwork.create_node (pex::RNode::VertexPort, iv);
+          n->location = db::DBox (trans * vp, trans * vp);
+          rnetwork.create_element (pex::RElement::short_value (), n, ip->second);
+
+        }
+
+      }
     }
 
   }
@@ -121,17 +214,22 @@ TriangulationRExtractor::create_conductances (const db::plc::Polygon &tri, const
     const db::plc::Vertex *p0 = tri.vertex (i + 1);
     const db::plc::Vertex *p1 = tri.vertex (i + 2);
 
-    double a = fabs (db::vprod (*pm1 - *p0, *p1 - *p0) * 0.5);
-
-    double lm1 = (*p0 - *pm1).sq_length ();
-    double l0 = (*p1 - *p0).sq_length ();
-    double l1 = (*pm1 - *p1).sq_length ();
-
-    double s = (l0 + l1 - lm1) / (8.0 * a);
-
     auto i0 = vertex2node.find (p0);
     auto im1 = vertex2node.find (pm1);
-    rnetwork.create_element (s, i0->second, im1->second);
+
+    if (i0->second != im1->second) {
+
+      double a = fabs (db::vprod (*pm1 - *p0, *p1 - *p0) * 0.5);
+
+      double lm1 = (*p0 - *pm1).sq_length ();
+      double l0 = (*p1 - *p0).sq_length ();
+      double l1 = (*pm1 - *p1).sq_length ();
+
+      double s = (l0 + l1 - lm1) / (8.0 * a);
+
+      rnetwork.create_element (s, i0->second, im1->second);
+
+    }
 
   }
 }

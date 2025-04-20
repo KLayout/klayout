@@ -1099,14 +1099,19 @@ Triangulation::find_vertexes_along_line (const db::DPoint &p1, const db::DPoint 
   }
 
   std::vector<Vertex *> result;
+  result.push_back (v);
 
   while (v) {
     Vertex *vn = 0;
     for (auto e = v->begin_edges (); e != v->end_edges (); ++e) {
       Vertex *vv = (*e)->other (v);
-      if (db::vprod_sign (e12.d (), *vv - *v) == 0 && db::sprod_sign (e12.d (), *vv - *v) > 0 && db::sprod_sign (e12.d (), *vv - e12.p2 ()) < 0) {
+      int cs = 0;
+      if (db::vprod_sign (e12.d (), *vv - *v) == 0 && db::sprod_sign (e12.d (), *vv - *v) > 0 && (cs = db::sprod_sign (e12.d (), *vv - e12.p2 ())) <= 0) {
         result.push_back (vv);
-        vn = vv;
+        if (cs < 0) {
+          //  continue searching
+          vn = vv;
+        }
         break;
       }
     }
@@ -1377,8 +1382,6 @@ Triangulation::make_contours (const Poly &poly, const Trans &trans, std::vector<
 void
 Triangulation::create_constrained_delaunay (const db::Region &region, const CplxTrans &trans)
 {
-  clear ();
-
   std::vector<std::vector<Vertex *> > edge_contours;
 
   for (auto p = region.begin_merged (); ! p.at_end (); ++p) {
@@ -1389,15 +1392,8 @@ Triangulation::create_constrained_delaunay (const db::Region &region, const Cplx
 }
 
 void
-Triangulation::create_constrained_delaunay (const db::Polygon &p, const std::vector<Point> &vertexes, const CplxTrans &trans)
+Triangulation::create_constrained_delaunay (const db::Polygon &p, const CplxTrans &trans)
 {
-  clear ();
-
-  unsigned int id = 0;
-  for (auto v = vertexes.begin (); v != vertexes.end (); ++v) {
-    insert_point (trans * *v)->set_is_precious (true, id++);
-  }
-
   std::vector<std::vector<Vertex *> > edge_contours;
   make_contours (p, trans, edge_contours);
 
@@ -1405,15 +1401,8 @@ Triangulation::create_constrained_delaunay (const db::Polygon &p, const std::vec
 }
 
 void
-Triangulation::create_constrained_delaunay (const db::DPolygon &p, const std::vector<DPoint> &vertexes, const DCplxTrans &trans)
+Triangulation::create_constrained_delaunay (const db::DPolygon &p, const DCplxTrans &trans)
 {
-  clear ();
-
-  unsigned int id = 0;
-  for (auto v = vertexes.begin (); v != vertexes.end (); ++v) {
-    insert_point (trans * *v)->set_is_precious (true, id++);
-  }
-
   std::vector<std::vector<Vertex *> > edge_contours;
   make_contours (p, trans, edge_contours);
 
@@ -1458,6 +1447,8 @@ Triangulation::triangulate (const db::Region &region, const TriangulationParamet
 {
   tl::SelfTimer timer (tl::verbosity () > parameters.base_verbosity, "Triangles::triangulate");
 
+  clear ();
+
   create_constrained_delaunay (region, db::CplxTrans (dbu));
   refine (parameters);
 }
@@ -1466,6 +1457,24 @@ void
 Triangulation::triangulate (const db::Region &region, const TriangulationParameters &parameters, const db::CplxTrans &trans)
 {
   tl::SelfTimer timer (tl::verbosity () > parameters.base_verbosity, "Triangles::triangulate");
+
+  clear ();
+
+  create_constrained_delaunay (region, trans);
+  refine (parameters);
+}
+
+void
+Triangulation::triangulate (const db::Region &region, const std::vector<db::Point> &vertexes, const TriangulationParameters &parameters, const db::CplxTrans &trans)
+{
+  tl::SelfTimer timer (tl::verbosity () > parameters.base_verbosity, "Triangles::triangulate");
+
+  clear ();
+
+  unsigned int id = 0;
+  for (auto v = vertexes.begin (); v != vertexes.end (); ++v) {
+    insert_point (trans * *v)->set_is_precious (true, id++);
+  }
 
   create_constrained_delaunay (region, trans);
   refine (parameters);
@@ -1482,7 +1491,16 @@ Triangulation::triangulate (const db::Polygon &poly, const std::vector<db::Point
 {
   tl::SelfTimer timer (tl::verbosity () > parameters.base_verbosity, "Triangles::triangulate");
 
-  create_constrained_delaunay (poly, vertexes, db::CplxTrans (dbu));
+  db::CplxTrans trans (dbu);
+
+  clear ();
+
+  unsigned int id = 0;
+  for (auto v = vertexes.begin (); v != vertexes.end (); ++v) {
+    insert_point (trans * *v)->set_is_precious (true, id++);
+  }
+
+  create_constrained_delaunay (poly, trans);
   refine (parameters);
 }
 
@@ -1497,7 +1515,14 @@ Triangulation::triangulate (const db::Polygon &poly, const std::vector<db::Point
 {
   tl::SelfTimer timer (tl::verbosity () > parameters.base_verbosity, "Triangles::triangulate");
 
-  create_constrained_delaunay (poly, vertexes, trans);
+  clear ();
+
+  unsigned int id = 0;
+  for (auto v = vertexes.begin (); v != vertexes.end (); ++v) {
+    insert_point (trans * *v)->set_is_precious (true, id++);
+  }
+
+  create_constrained_delaunay (poly, trans);
   refine (parameters);
 }
 
@@ -1512,7 +1537,14 @@ Triangulation::triangulate (const db::DPolygon &poly, const std::vector<db::DPoi
 {
   tl::SelfTimer timer (tl::verbosity () > parameters.base_verbosity, "Triangles::triangulate");
 
-  create_constrained_delaunay (poly, vertexes, trans);
+  clear ();
+
+  unsigned int id = 0;
+  for (auto v = vertexes.begin (); v != vertexes.end (); ++v) {
+    insert_point (trans * *v)->set_is_precious (true, id++);
+  }
+
+  create_constrained_delaunay (poly, trans);
   refine (parameters);
 }
 

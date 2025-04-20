@@ -155,24 +155,28 @@ TEST(collect_vertexes)
   tris.insert_point (0.5, 0.5);
 
   std::vector<db::plc::Vertex *> vertexes = tris.find_vertexes_along_line (db::DPoint (0, 0), db::DPoint (1.5, 1.5));
-  EXPECT_EQ (vertexes.size (), size_t (3));
-  if (vertexes.size () >= size_t (3)) {
-    EXPECT_EQ (vertexes [0]->to_string (), "(0.2, 0.2)");
-    EXPECT_EQ (vertexes [1]->to_string (), "(0.5, 0.5)");
-    EXPECT_EQ (vertexes [2]->to_string (), "(1, 1)");
+  EXPECT_EQ (vertexes.size (), size_t (4));
+  if (vertexes.size () >= size_t (4)) {
+    EXPECT_EQ (vertexes [0]->to_string (), "(0, 0)");
+    EXPECT_EQ (vertexes [1]->to_string (), "(0.2, 0.2)");
+    EXPECT_EQ (vertexes [2]->to_string (), "(0.5, 0.5)");
+    EXPECT_EQ (vertexes [3]->to_string (), "(1, 1)");
   }
 
   vertexes = tris.find_vertexes_along_line (db::DPoint (0, 0), db::DPoint (1.0, 1.0));
-  EXPECT_EQ (vertexes.size (), size_t (2));
-  if (vertexes.size () >= size_t (2)) {
-    EXPECT_EQ (vertexes [0]->to_string (), "(0.2, 0.2)");
-    EXPECT_EQ (vertexes [1]->to_string (), "(0.5, 0.5)");
+  EXPECT_EQ (vertexes.size (), size_t (4));
+  if (vertexes.size () >= size_t (4)) {
+    EXPECT_EQ (vertexes [0]->to_string (), "(0, 0)");
+    EXPECT_EQ (vertexes [1]->to_string (), "(0.2, 0.2)");
+    EXPECT_EQ (vertexes [2]->to_string (), "(0.5, 0.5)");
+    EXPECT_EQ (vertexes [3]->to_string (), "(1, 1)");
   }
 
   vertexes = tris.find_vertexes_along_line (db::DPoint (1, 1), db::DPoint (0.25, 0.25));
-  EXPECT_EQ (vertexes.size (), size_t (1));
-  if (vertexes.size () >= size_t (1)) {
-    EXPECT_EQ (vertexes [0]->to_string (), "(0.5, 0.5)");
+  EXPECT_EQ (vertexes.size (), size_t (2));
+  if (vertexes.size () >= size_t (2)) {
+    EXPECT_EQ (vertexes [0]->to_string (), "(1, 1)");
+    EXPECT_EQ (vertexes [1]->to_string (), "(0.5, 0.5)");
   }
 }
 

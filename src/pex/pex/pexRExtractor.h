@@ -93,6 +93,14 @@ public:
    */
   std::string to_string () const;
 
+  /**
+   *  @brief Gets the network the node lives in
+   */
+  RNetwork *graph () const
+  {
+    return mp_network;
+  }
+
 protected:
   friend class RNetwork;
   friend class RElement;
@@ -173,6 +181,14 @@ struct PEX_PUBLIC RElement
    *  @brief Returns a string representation of the element
    */
   std::string to_string () const;
+
+  /**
+   *  @brief Gets the network the node lives in
+   */
+  RNetwork *graph () const
+  {
+    return mp_network;
+  }
 
 protected:
   friend class RNetwork;

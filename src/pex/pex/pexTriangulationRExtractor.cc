@@ -32,6 +32,7 @@ namespace pex
 TriangulationRExtractor::TriangulationRExtractor (double dbu)
 {
   m_dbu = dbu;
+  m_skip_reduction = false;
 
   m_tri_param.min_b = 0.3;
   m_tri_param.max_area = 0.0;
@@ -206,7 +207,9 @@ TriangulationRExtractor::extract (const db::Polygon &polygon, const std::vector<
 
   //  eliminate internal nodes
 
-  eliminate_all (rnetwork);
+  if (! m_skip_reduction) {
+    eliminate_all (rnetwork);
+  }
 }
 
 void

@@ -65,6 +65,22 @@ public:
   }
 
   /**
+   *  @brief Sets a value indicating whether to skip the simplify step
+   */
+  void set_skip_simplfy (bool f)
+  {
+    m_skip_simplify = f;
+  }
+
+  /**
+   *  @brief Gets a value indicating whether to skip the simplify step
+   */
+  bool skip_simplify () const
+  {
+    return m_skip_simplify;
+  }
+
+  /**
    *  @brief Sets the database unit
    */
   void set_dbu (double dbu)
@@ -129,6 +145,7 @@ protected:
 private:
   db::plc::ConvexDecompositionParameters m_decomp_param;
   double m_dbu;
+  bool m_skip_simplify;
 };
 
 }

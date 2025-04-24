@@ -66,6 +66,22 @@ public:
   }
 
   /**
+   *  @brief Sets a value indicating whether to skip the reduction step
+   */
+  void set_skip_reduction (bool f)
+  {
+    m_skip_reduction = f;
+  }
+
+  /**
+   *  @brief Gets a value indicating whether to skip the reduction step
+   */
+  bool skip_reduction () const
+  {
+    return m_skip_reduction;
+  }
+
+  /**
    *  @brief Sets the database unit
    */
   void set_dbu (double dbu)
@@ -89,6 +105,7 @@ public:
 private:
   db::plc::TriangulationParameters m_tri_param;
   double m_dbu;
+  bool m_skip_reduction;
 
   void create_conductances (const db::plc::Polygon &tri, const std::unordered_map<const db::plc::Vertex *, RNode *> &vertex2node, RNetwork &rnetwork);
   void eliminate_node (pex::RNode *node, RNetwork &rnetwork);

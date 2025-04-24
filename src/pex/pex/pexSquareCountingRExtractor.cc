@@ -71,6 +71,7 @@ struct JoinEdgeSets
 SquareCountingRExtractor::SquareCountingRExtractor (double dbu)
 {
   m_dbu = dbu;
+  m_skip_simplify = false;
 
   m_decomp_param.split_edges = true;
   m_decomp_param.with_segments = false;
@@ -162,8 +163,7 @@ SquareCountingRExtractor::do_extract (const db::Polygon &db_poly, const std::vec
       ++em;
     }
 
-    //  @@@ TODO: multiply with sheet rho!
-    //  @@@ TODO: width dependency
+    //  TODO: width dependency?
     if (r == 0) {
       rnetwork.create_element (pex::RElement::short_value (), pl->second, pl_next->second);
     } else {
@@ -292,7 +292,9 @@ SquareCountingRExtractor::extract (const db::Polygon &polygon, const std::vector
 
   }
 
-  rnetwork.simplify ();
+  if (! m_skip_simplify) {
+    rnetwork.simplify ();
+  }
 }
 
 }

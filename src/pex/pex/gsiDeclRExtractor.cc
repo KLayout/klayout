@@ -400,16 +400,19 @@ Class<pex::RNetwork> decl_RNetwork ("pex", "RNetwork",
   "This class has been introduced in version 0.30.1\n"
 );
 
-static pex::RExtractor *new_sqc_rextractor (double dbu)
+static pex::RExtractor *new_sqc_rextractor (double dbu, bool skip_simplify)
 {
-  return new pex::SquareCountingRExtractor (dbu);
+  auto res = new pex::SquareCountingRExtractor (dbu);
+  res->set_skip_simplfy (skip_simplify);
+  return res;
 }
 
-static pex::RExtractor *new_tesselation_rextractor (double dbu, double min_b, double max_area)
+static pex::RExtractor *new_tesselation_rextractor (double dbu, double min_b, double max_area, bool skip_reduction)
 {
   auto res = new pex::TriangulationRExtractor (dbu);
   res->triangulation_parameters ().min_b = min_b;
   res->triangulation_parameters ().max_area = max_area;
+  res->set_skip_reduction (skip_reduction);
   return res;
 }
 
@@ -421,7 +424,7 @@ static pex::RNetwork *extract_ipolygon (pex::RExtractor *rex, const db::Polygon 
 }
 
 Class<pex::RExtractor> decl_RExtractor ("pex", "RExtractor",
-  gsi::constructor ("square_counting_extractor", &new_sqc_rextractor, gsi::arg ("dbu"),
+  gsi::constructor ("square_counting_extractor", &new_sqc_rextractor, gsi::arg ("dbu"), gsi::arg ("skip_simplify", false),
     "@brief Creates a square counting R extractor\n"
     "The square counting extractor extracts resistances from a polygon with ports using the following approach:\n"
     "\n"
@@ -440,9 +443,10 @@ Class<pex::RExtractor> decl_RExtractor ("pex", "RExtractor",
     "values, multiply the element resistance values by the sheet resistance.\n"
     "\n"
     "@param dbu The database unit of the polygons the extractor will work on\n"
+    "@param skip_simplify If true, the final step to simplify the netlist will be skipped. This feature is for testing mainly.\n"
     "@return A new \\RExtractor object that implements the square counting extractor\n"
   ) +
-  gsi::constructor ("tesselation_extractor", &new_tesselation_rextractor, gsi::arg ("dbu"), gsi::arg ("min_b", 0.3), gsi::arg ("max_area", 0.0),
+  gsi::constructor ("tesselation_extractor", &new_tesselation_rextractor, gsi::arg ("dbu"), gsi::arg ("min_b", 0.3), gsi::arg ("max_area", 0.0), gsi::arg ("skip_reduction", false),
     "@brief Creates a tesselation R extractor\n"
     "The tesselation extractor starts with a triangulation of the original polygon. The triangulation is "
     "turned into a resistor network and simplified.\n"
@@ -464,6 +468,7 @@ Class<pex::RExtractor> decl_RExtractor ("pex", "RExtractor",
     "@param dbu The database unit of the polygons the extractor will work on\n"
     "@param min_b Defines the min 'b' value of the refined Delaunay triangulation (see \\Polygon#delaunay)\n"
     "@param max_area Defines maximum area value of the refined Delaunay triangulation (see \\Polygon#delaunay). The value is given in square micrometer units.\n"
+    "@param skip_reduction If true, the reduction step for the netlist will be skipped. This feature is for testing mainly. The resulting R graph will contain all the original triangles and the internal nodes representing the vertexes.\n"
     "@return A new \\RExtractor object that implements the square counting extractor\n"
   ) +
   gsi::factory_ext ("extract", &extract_ipolygon, gsi::arg ("polygon"), gsi::arg ("vertex_ports", std::vector<db::Point> (), "[]"), gsi::arg ("polygon_ports", std::vector<db::Polygon> (), "[]"),

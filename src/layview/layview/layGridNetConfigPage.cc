@@ -94,6 +94,10 @@ GridNetConfigPage::setup (lay::Dispatcher *root)
   style = lay::GridNet::Invisible;
   root->config_get (cfg_grid_style2, style, GridNetStyleConverter ());
   mp_ui->style2_cbx->setCurrentIndex (int (style));
+
+  int density = 0;
+  root->config_get (cfg_grid_density, density, GridNetDensityConverter ());
+  mp_ui->grid_density_sb->setValue (density);
 }
 
 void
@@ -108,6 +112,7 @@ GridNetConfigPage::commit (lay::Dispatcher *root)
   root->config_set (cfg_grid_style0, lay::GridNet::GridStyle (mp_ui->style0_cbx->currentIndex ()), GridNetStyleConverter ());
   root->config_set (cfg_grid_style1, lay::GridNet::GridStyle (mp_ui->style1_cbx->currentIndex ()), GridNetStyleConverter ());
   root->config_set (cfg_grid_style2, lay::GridNet::GridStyle (mp_ui->style2_cbx->currentIndex ()), GridNetStyleConverter ());
+  root->config_set (cfg_grid_density, mp_ui->grid_density_sb->value (), GridNetDensityConverter ());
 }
 
 } // namespace lay

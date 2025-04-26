@@ -848,13 +848,17 @@ public:
 
       if (m_la >= 0) {
         ri_a = db::RecursiveShapeIterator (*mp_xor_data->layout_a, mp_xor_data->layout_a->cell (mp_xor_data->cell_a), m_la);
-        ri_a.set_for_merged_input (true);
+      } else {
+        ri_a = db::RecursiveShapeIterator (*mp_xor_data->layout_a, mp_xor_data->layout_a->cell (mp_xor_data->cell_a), std::vector<unsigned int> ());
       }
+      ri_a.set_for_merged_input (true);
 
       if (m_lb >= 0) {
         ri_b = db::RecursiveShapeIterator (*mp_xor_data->layout_b, mp_xor_data->layout_b->cell (mp_xor_data->cell_b), m_lb);
-        ri_b.set_for_merged_input (true);
+      } else {
+        ri_b = db::RecursiveShapeIterator (*mp_xor_data->layout_b, mp_xor_data->layout_b->cell (mp_xor_data->cell_b), std::vector<unsigned int> ());
       }
+      ri_b.set_for_merged_input (true);
 
       db::Region in_a (ri_a, worker->dss (), db::ICplxTrans (mp_xor_data->layout_a->dbu () / m_dbu));
       db::Region in_b (ri_b, worker->dss (), db::ICplxTrans (mp_xor_data->layout_b->dbu () / m_dbu));

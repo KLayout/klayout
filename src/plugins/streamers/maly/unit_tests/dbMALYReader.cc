@@ -1,0 +1,108 @@
+
+/*
+
+  KLayout Layout Viewer
+  Copyright (C) 2006-2025 Matthias Koefferlein
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+*/
+
+
+#include "dbMALYReader.h"
+#include "dbLayoutDiff.h"
+#include "dbWriter.h"
+#include "tlUnitTest.h"
+
+#include <stdlib.h>
+
+static void run_test (tl::TestBase *_this, const std::string &base, const char *file, const char *file_au, const char *map = 0, double lambda = 0.1, double dbu = 0.001, const std::vector<std::string> *lib_paths = 0)
+{
+  db::MALYReaderOptions *opt = new db::MALYReaderOptions();
+  opt->dbu = dbu;
+
+  db::LayerMap lm;
+  if (map) {
+    unsigned int ln = 0;
+    tl::Extractor ex (map);
+    while (! ex.at_end ()) {
+      std::string n;
+      int l;
+      ex.read_word_or_quoted (n);
+      ex.test (":");
+      ex.read (l);
+      ex.test (",");
+      lm.map (n, ln++, db::LayerProperties (l, 0));
+    }
+    opt->layer_map = lm;
+    opt->create_other_layers = true;
+  }
+
+  db::LoadLayoutOptions options;
+  options.set_options (opt);
+
+  db::Manager m (false);
+  db::Layout layout (&m), layout2 (&m), layout2_mag (&m), layout_au (&m);
+
+  {
+    std::string fn (base);
+    fn += "/maly/";
+    fn += file;
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (layout, options);
+  }
+
+  std::string tc_name = layout.cell_name (*layout.begin_top_down ());
+
+  //  normalize the layout by writing to OASIS and reading from ..
+
+  std::string tmp_oas_file = _this->tmp_file (tl::sprintf ("%s.oas", tc_name));
+  std::string tmp_maly_file = _this->tmp_file (tl::sprintf ("%s.mag", tc_name));
+
+  {
+    tl::OutputStream stream (tmp_oas_file);
+    db::SaveLayoutOptions options;
+    options.set_format ("OASIS");
+    db::Writer writer (options);
+    writer.write (layout, stream);
+  }
+
+  {
+    tl::InputStream stream (tmp_oas_file);
+    db::Reader reader (stream);
+    reader.read (layout2);
+  }
+
+  {
+    std::string fn (base);
+    fn += "/maly/";
+    fn += file_au;
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (layout_au);
+  }
+
+  bool equal = db::compare_layouts (layout2, layout_au, db::layout_diff::f_boxes_as_polygons | db::layout_diff::f_verbose | db::layout_diff::f_flatten_array_insts, 1);
+  if (! equal) {
+    _this->raise (tl::sprintf ("Compare failed after reading - see %s vs %s\n", tmp_oas_file, file_au));
+  }
+}
+
+TEST(1)
+{
+  run_test (_this, tl::testdata (), "MALY_TEST.maly", "mag_test_au.oas");
+}
+

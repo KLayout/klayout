@@ -87,6 +87,7 @@ private:
   GridStyle m_style0;
   GridStyle m_style1;
   GridStyle m_style2;
+  int m_density;
 };
 
 class GridNetStyleConverter
@@ -94,6 +95,13 @@ class GridNetStyleConverter
 public:
   void from_string (const std::string &value, lay::GridNet::GridStyle &style);
   std::string to_string (lay::GridNet::GridStyle style);
+};
+
+class GridNetDensityConverter
+{
+public:
+  void from_string (const std::string &value, int &density);
+  std::string to_string (int density);
 };
 
 }

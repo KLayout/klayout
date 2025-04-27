@@ -41,6 +41,8 @@ namespace lay
 // ------------------------------------------------------------
 //  Helper functions to get and set the configuration
 
+int default_density = 4;
+
 static struct {
   lay::GridNet::GridStyle style;
   const char *string;
@@ -79,6 +81,20 @@ GridNetStyleConverter::to_string (lay::GridNet::GridStyle style)
   return "";
 }
 
+void
+GridNetDensityConverter::from_string (const std::string &value, int &density)
+{
+  density = default_density;  //  original default
+  tl::Extractor ex (value.c_str ());
+  ex.try_read (density);
+}
+
+std::string
+GridNetDensityConverter::to_string (int density)
+{
+  return tl::to_string (density);
+}
+
 // ------------------------------------------------------------
 //  Implementation of the GridNetPluginDeclaration 
 
@@ -92,6 +108,7 @@ GridNetPluginDeclaration::get_options (std::vector < std::pair<std::string, std:
   options.push_back (std::pair<std::string, std::string> (cfg_grid_style0, GridNetStyleConverter ().to_string (lay::GridNet::Invisible)));
   options.push_back (std::pair<std::string, std::string> (cfg_grid_style1, GridNetStyleConverter ().to_string (lay::GridNet::Dots)));
   options.push_back (std::pair<std::string, std::string> (cfg_grid_style2, GridNetStyleConverter ().to_string (lay::GridNet::TenthDottedLines)));
+  options.push_back (std::pair<std::string, std::string> (cfg_grid_density, ""));
   options.push_back (std::pair<std::string, std::string> (cfg_grid_visible, tl::to_string (true)));
   options.push_back (std::pair<std::string, std::string> (cfg_grid_show_ruler, tl::to_string (true)));
   //  grid-micron is not configured here since some other entity is supposed to do this.
@@ -122,7 +139,8 @@ GridNet::GridNet (LayoutViewBase *view)
     lay::Plugin (view),
     mp_view (view),
     m_visible (false), m_show_ruler (true), m_grid (1.0),
-    m_style0 (Invisible), m_style1 (Invisible), m_style2 (Invisible)
+    m_style0 (Invisible), m_style1 (Invisible), m_style2 (Invisible),
+    m_density (default_density)
 { 
   // .. nothing yet ..
 }
@@ -174,6 +192,12 @@ GridNet::configure (const std::string &name, const std::string &value)
     lay::GridNet::GridStyle style;
     GridNetStyleConverter ().from_string (value, style);
     need_update = test_and_set (m_style2, style);
+
+  } else if (name == cfg_grid_density) {
+
+    int density = 0;
+    GridNetDensityConverter ().from_string (value, density);
+    need_update = test_and_set (m_density, density);
 
   } else if (name == cfg_grid_show_ruler) {
 
@@ -246,13 +270,14 @@ GridNet::render_bg (const lay::Viewport &vp, ViewObjectCanvas &canvas)
 
     //  fw is the basic unit of the ruler geometry
     int fwr = lay::FixedFont::get_font (bmp_canvas->font_resolution ()).width ();
+    int threshold = std::min (1000, m_density * fwr);
 
     double dgrid = trans.ctrans (m_grid);
     GridStyle style = m_style1;
 
     //  compute major grid and switch to secondary style if necessary
     int s = 0;
-    while (dgrid < fwr * 4) {
+    while (dgrid < threshold) {
       if (s == 0) {
         dgrid *= 2.0;
       } else if (s == 1) {
@@ -278,56 +303,6 @@ GridNet::render_bg (const lay::Viewport &vp, ViewObjectCanvas &canvas)
 
     int nx = int (dbworld.width () / grid + eps) + 2;
     int ny = int (dbworld.height () / grid + eps) + 2;
-
-    if (m_show_ruler && dgrid < vp.width () * 0.2) {
-
-      int rh = int (floor (0.5 + fwr * 0.8));
-      int xoffset = int (floor (0.5 + fwr * 2.5));
-      int yoffset = int (floor (0.5 + fwr * 2.5));
-
-      painter.fill_rect (db::Point (xoffset, vp.height () - yoffset - rh / 2),
-                         db::Point (xoffset + int (floor (0.5 + dgrid)), vp.height () - yoffset + rh / 2),
-                         ruler_color);
-
-      painter.draw_rect (db::Point (xoffset + int (floor (0.5 + dgrid)), vp.height () - yoffset - rh / 2),
-                         db::Point (xoffset + int (floor (0.5 + 2 * dgrid)), vp.height () - yoffset + rh / 2),
-                         ruler_color);
-
-      painter.draw_text (tl::sprintf ("%g \265m", grid * 2).c_str (), 
-                         db::Point (xoffset + int (floor (0.5 + trans.ctrans (2 * grid))), vp.height () - yoffset - rh / 2 - 2),
-                         ruler_color, -1, 1);
-
-      if (mp_view->global_trans ().fp_trans () != db::DFTrans ()) {
-
-        //  draw a small "F" indicating any global transformation
-        db::Point pts[] = {
-          db::Point (-4, -5),
-          db::Point (-4, 5),
-          db::Point (4, 5),
-          db::Point (4, 3),
-          db::Point (-2, 3),
-          db::Point (-2, 1),
-          db::Point (3, 1),
-          db::Point (3, -1),
-          db::Point (-2, -1),
-          db::Point (-2, -5),
-          db::Point (-4, -5)
-        };
-
-        db::Polygon poly;
-        poly.assign_hull (&pts[0], &pts[0] + (sizeof (pts) / sizeof (pts[0])));
-        poly.transform (db::FTrans (mp_view->global_trans ().fp_trans ()));
-
-        for (db::Polygon::polygon_edge_iterator e = poly.begin_edge (); !e.at_end (); ++e) {
-          db::Point p0 (xoffset + 2 * rh, vp.height () - yoffset - rh * 5);
-          db::Point p1 = p0 + db::Vector (int (floor (0.5 + (*e).p1 ().x () * 0.1 * rh * 4)), -int (floor (0.5 + (*e).p1 ().y () * 0.1 * rh * 4)));
-          db::Point p2 = p0 + db::Vector (int (floor (0.5 + (*e).p2 ().x () * 0.1 * rh * 4)), -int (floor (0.5 + (*e).p2 ().y () * 0.1 * rh * 4)));
-          painter.draw_line (p1, p2, ruler_color);
-        }
-
-      }
-
-    }
 
     //  draw grid
     if (style == Dots || style == TenthDottedLines || 
@@ -543,6 +518,56 @@ GridNet::render_bg (const lay::Viewport &vp, ViewObjectCanvas &canvas)
             db::Point p (draw_round (trans * db::DPoint (x, 0.0), vp.height ()));
             painter.draw_line (p - db::Vector (0, 2), p + db::Vector (0, 2), axis_color);
           }
+        }
+
+      }
+
+    }
+
+    if (m_show_ruler && dgrid < vp.width () * 0.4) {
+
+      int rh = int (floor (0.5 + fwr * 0.8));
+      int xoffset = int (floor (0.5 + fwr * 2.5));
+      int yoffset = int (floor (0.5 + fwr * 2.5));
+
+      painter.fill_rect (db::Point (xoffset, vp.height () - yoffset - rh / 2),
+                         db::Point (xoffset + int (floor (0.5 + dgrid)), vp.height () - yoffset + rh / 2),
+                         ruler_color);
+
+      painter.draw_rect (db::Point (xoffset + int (floor (0.5 + dgrid)), vp.height () - yoffset - rh / 2),
+                         db::Point (xoffset + int (floor (0.5 + 2 * dgrid)), vp.height () - yoffset + rh / 2),
+                         ruler_color);
+
+      painter.draw_text (tl::sprintf ("%g \265m", grid * 2).c_str (),
+                         db::Point (xoffset + int (floor (0.5 + trans.ctrans (2 * grid))), vp.height () - yoffset - rh / 2 - 2),
+                         ruler_color, -1, 1);
+
+      if (mp_view->global_trans ().fp_trans () != db::DFTrans ()) {
+
+        //  draw a small "F" indicating any global transformation
+        db::Point pts[] = {
+          db::Point (-4, -5),
+          db::Point (-4, 5),
+          db::Point (4, 5),
+          db::Point (4, 3),
+          db::Point (-2, 3),
+          db::Point (-2, 1),
+          db::Point (3, 1),
+          db::Point (3, -1),
+          db::Point (-2, -1),
+          db::Point (-2, -5),
+          db::Point (-4, -5)
+        };
+
+        db::Polygon poly;
+        poly.assign_hull (&pts[0], &pts[0] + (sizeof (pts) / sizeof (pts[0])));
+        poly.transform (db::FTrans (mp_view->global_trans ().fp_trans ()));
+
+        for (db::Polygon::polygon_edge_iterator e = poly.begin_edge (); !e.at_end (); ++e) {
+          db::Point p0 (xoffset + 2 * rh, vp.height () - yoffset - rh * 5);
+          db::Point p1 = p0 + db::Vector (int (floor (0.5 + (*e).p1 ().x () * 0.1 * rh * 4)), -int (floor (0.5 + (*e).p1 ().y () * 0.1 * rh * 4)));
+          db::Point p2 = p0 + db::Vector (int (floor (0.5 + (*e).p2 ().x () * 0.1 * rh * 4)), -int (floor (0.5 + (*e).p2 ().y () * 0.1 * rh * 4)));
+          painter.draw_line (p1, p2, ruler_color);
         }
 
       }

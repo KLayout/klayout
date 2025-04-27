@@ -1585,7 +1585,8 @@ module DRC
       self._context("report") do
 
         # finish what we got so far
-        _finish(false)
+        view = RBA::LayoutView::current
+        @def_output && @def_output.finish(false, view)
 
         @def_output = nil
         @def_output = _make_report(description, filename, cellname)

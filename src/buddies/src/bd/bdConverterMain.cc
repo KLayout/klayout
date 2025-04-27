@@ -27,6 +27,7 @@
 #include "dbReader.h"
 #include "dbWriter.h"
 #include "tlCommandLineParser.h"
+#include "tlTimer.h"
 
 namespace bd
 {
@@ -52,6 +53,8 @@ int converter_main (int argc, char *argv[], const std::string &format)
   cmd.parse (argc, argv);
 
   db::Layout layout;
+
+  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Total")));
 
   {
     db::LoadLayoutOptions load_options;

@@ -38,7 +38,7 @@ namespace db
 // -----------------------------------------------------------------------------------
 //  Path resolution utility
 
-std::string correct_path (const std::string &fn_in, const db::Layout &layout, const std::string &base_path)
+std::vector<std::string> correct_path (const std::string &fn_in, const db::Layout &layout, const std::string &base_path, bool glob)
 {
   const db::Technology *tech = layout.technology ();
 
@@ -64,19 +64,28 @@ std::string correct_path (const std::string &fn_in, const db::Layout &layout, co
     if (tech && ! tech->base_path ().empty ()) {
       std::string new_fn = tl::combine_path (tech->base_path (), fn);
       if (tl::file_exists (new_fn)) {
-        return new_fn;
+        std::vector<std::string> res;
+        res.push_back (new_fn);
+        return res;
+      } else if (glob) {
+        return tl::glob_expand (new_fn);
       }
     }
 
     if (! base_path.empty ()) {
-      return tl::combine_path (base_path, fn);
-    } else {
-      return fn;
+      fn = tl::combine_path (base_path, fn);
     }
 
-  } else {
-    return fn;
   }
+
+  if (tl::file_exists (fn) || ! glob) {
+    std::vector<std::string> res;
+    res.push_back (fn);
+    return res;
+  } else {
+    return tl::glob_expand (fn);
+  }
+
 }
 
 // -----------------------------------------------------------------------------------
@@ -1059,7 +1068,7 @@ LEFDEFReaderState::read_map_file (const std::string &filename, db::Layout &layou
   std::map<std::pair<std::string, LayerDetailsKey>, std::vector<db::LayerProperties> > layer_map;
 
   for (std::vector<std::string>::const_iterator p = paths.begin (); p != paths.end (); ++p) {
-    read_single_map_file (correct_path (*p, layout, base_path), layer_map);
+    read_single_map_file (correct_path (*p, layout, base_path, false).front (), layer_map);
   }
 
   //  build an explicit layer mapping now.

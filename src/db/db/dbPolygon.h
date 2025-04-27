@@ -1772,6 +1772,14 @@ public:
   }
 
   /**
+   *  @brief Returns a value indicating that the polygon is an empty one
+   */
+  bool is_empty () const
+  {
+    return m_ctrs.size () == size_t (1) && m_ctrs[0].size () == 0;
+  }
+
+  /**
    *  @brief Returns the number of points in the polygon
    */
   size_t vertices () const
@@ -1879,6 +1887,7 @@ public:
     for (typename contour_list_type::iterator h = m_ctrs.begin (); h != m_ctrs.end (); ++h) {
       h->transform (db::unit_trans<C> (), true /*compress*/, remove_reflected);
     }
+    m_bbox = m_ctrs [0].bbox ();
     return *this;
   }
 
@@ -2804,6 +2813,7 @@ public:
   {
     //  compress the polygon by employing the transform method 
     m_hull.transform (db::unit_trans<C> (), true, remove_reflected);
+    m_bbox = m_hull.bbox ();
     return *this;
   }
 
@@ -3020,6 +3030,14 @@ public:
   bool is_halfmanhattan () const
   {
     return m_hull.is_halfmanhattan ();
+  }
+
+  /**
+   *  @brief Returns a value indicating that the polygon is an empty one
+   */
+  bool is_empty () const
+  {
+    return m_hull.size () == 0;
   }
 
   /**

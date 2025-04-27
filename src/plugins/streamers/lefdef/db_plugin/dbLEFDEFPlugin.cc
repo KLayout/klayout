@@ -141,11 +141,12 @@ LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &opti
 
     for (std::vector<std::string>::const_iterator l = effective_options.begin_lef_files (); l != effective_options.end_lef_files (); ++l) {
 
-      std::string lp = correct_path (*l, layout, base_path);
-
-      tl::InputStream lef_stream (lp);
-      tl::log << tl::to_string (tr ("Reading")) << " " << lp;
-      importer.read (lef_stream, layout, state);
+      auto paths = correct_path (*l, layout, base_path, true);
+      for (auto lp = paths.begin (); lp != paths.end (); ++lp) {
+        tl::InputStream lef_stream (*lp);
+        tl::log << tl::to_string (tr ("Reading")) << " " << *lp;
+        importer.read (lef_stream, layout, state);
+      }
 
     }
 
@@ -164,14 +165,20 @@ LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &opti
 
     for (std::vector<std::string>::const_iterator l = effective_options.begin_lef_files (); l != effective_options.end_lef_files (); ++l) {
 
-      std::string lp = correct_path (*l, layout, base_path);
-      lef_files_read.insert (tl::normalize_path (lp));
+      auto paths = correct_path (*l, layout, base_path, true);
+      for (auto lp = paths.begin (); lp != paths.end (); ++lp) {
 
-      tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading LEF file: ")) + lp);
+        if (lef_files_read.insert (tl::normalize_path (*lp)).second) {
 
-      tl::InputStream lef_stream (lp);
-      tl::log << tl::to_string (tr ("Reading")) << " " << lp;
-      importer.read_lef (lef_stream, layout, state);
+          tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading LEF file: ")) + *lp);
+
+          tl::InputStream lef_stream (*lp);
+          tl::log << tl::to_string (tr ("Reading")) << " " << *lp;
+          importer.read_lef (lef_stream, layout, state);
+
+        }
+
+      }
 
     }
 
@@ -223,22 +230,25 @@ LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &opti
     tl::shared_collection<db::Layout> macro_layout_object_holder;
     for (std::vector<std::string>::const_iterator l = effective_options.begin_macro_layout_files (); l != effective_options.end_macro_layout_files (); ++l) {
 
-      std::string lp = correct_path (*l, layout, base_path);
+      auto paths = correct_path (*l, layout, base_path, true);
+      for (auto lp = paths.begin (); lp != paths.end (); ++lp) {
 
-      tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading LEF macro layout file: ")) + lp);
+        tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading LEF macro layout file: ")) + *lp);
 
-      tl::InputStream macro_layout_stream (lp);
-      tl::log << tl::to_string (tr ("Reading")) << " " << lp;
-      db::Layout *new_layout = new db::Layout (false);
-      macro_layout_object_holder.push_back (new_layout);
-      macro_layouts.push_back (new_layout);
+        tl::InputStream macro_layout_stream (*lp);
+        tl::log << tl::to_string (tr ("Reading")) << " " << *lp;
+        db::Layout *new_layout = new db::Layout (false);
+        macro_layout_object_holder.push_back (new_layout);
+        macro_layouts.push_back (new_layout);
 
-      db::Reader reader (macro_layout_stream);
-      reader.read (*new_layout, options);
+        db::Reader reader (macro_layout_stream);
+        reader.read (*new_layout, options);
 
-      if (fabs (new_layout->dbu () / layout.dbu () - 1.0) > db::epsilon) {
-        importer.warn (tl::sprintf (tl::to_string (tr ("DBU of macro layout file '%s' does not match reader DBU (layout DBU is %.12g, reader DBU is set to %.12g)")),
-                                    lp, new_layout->dbu (), layout.dbu ()));
+        if (fabs (new_layout->dbu () / layout.dbu () - 1.0) > db::epsilon) {
+          importer.warn (tl::sprintf (tl::to_string (tr ("DBU of macro layout file '%s' does not match reader DBU (layout DBU is %.12g, reader DBU is set to %.12g)")),
+                                      *lp, new_layout->dbu (), layout.dbu ()));
+        }
+
       }
 
     }
@@ -264,6 +274,14 @@ LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &opti
       cm.create_multi_mapping_full (layout, target_cells, **m, source_cells);
       layout.copy_tree_shapes (**m, cm);
 
+    }
+
+    //  Warn about cells that could not be resolved
+    for (std::map<std::string, db::cell_index_type>::iterator f = foreign_cells.begin (); f != foreign_cells.end (); ++f) {
+      if (f->second != seen && layout.cell (f->second).is_ghost_cell ()) {
+        importer.warn (tl::sprintf (tl::to_string (tr ("Could not find a substitution layout for foreign cell '%s'")),
+                                    f->first));
+      }
     }
 
   }

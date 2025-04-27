@@ -146,7 +146,7 @@ public:
     m_cell_stack.pop_back ();
   }
 
-  virtual new_inst_mode new_inst (const db::RecursiveShapeIterator * /*iter*/, const db::CellInstArray &inst, const db::ICplxTrans & /*always_apply*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool /*all*/)
+  virtual new_inst_mode new_inst (const db::RecursiveShapeIterator * /*iter*/, const db::CellInstArray &inst, const db::ICplxTrans & /*always_apply*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool /*all*/, bool /*skip_shapes*/)
   {
     db::cell_index_type ci = inst.object ().cell_index ();
     if (m_id_to_cell.find (ci) != m_id_to_cell.end ()) {

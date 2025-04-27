@@ -29,6 +29,7 @@
 #include "dbSaveLayoutOptions.h"
 #include "tlLog.h"
 #include "tlCommandLineParser.h"
+#include "tlTimer.h"
 
 
 struct ClipData
@@ -199,6 +200,8 @@ BD_PUBLIC int strmclip (int argc, char *argv[])
   cmd.brief ("This program will produce clips from an input layout and writes them to another layout");
 
   cmd.parse (argc, argv);
+
+  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Total")));
 
   clip (data);
 

@@ -1,3 +1,20 @@
+0.30.1           (2025-04-27):
+* Bugfix: %GITHUB%/issues/2011 Some DRC bugs fixed
+* Bug: %GITHUB%/issues/2014 Bug fixes in LEF/DEF reader
+* Enhancement: %GITHUB%/issues/2016 Lazy evaluation of PCell also when changing guiding shape properties
+* Enhancement: %GITHUB%/issues/2019 Support for Qt 6.9
+* Bugfix: %GITHUB%/issues/2020 String weak ordering issue fixed in edge processor
+* Enhancement: %GITHUB%/issues/2024 Option to configure grid density
+* Bugfix: %GITHUB%/issues/2025 Brackets get added in List type PCell parameter edit field
+* Bugfix: %GITHUB%/issues/2026 Display is dead after opening 2.5d view
+* Bugfix/Enhancement: some updates of "strmxor" tool
+  - strmxor was giving wrong results if cell variants are
+    present where one variant is covered entirely by a large shape
+  - parallelization now happens on a per-layer basis (same as for 
+    XOR tool in KLayout)
+  - Shape count was not consistent in deep mode
+  - All buddy tools print total runtime with -d11
+
 0.30.0           (2025-03-25):
 * Bug: %GITHUB%/issues/1996 More robust triangulation
 * Bug: %GITHUB%/issues/2002 Path to polygon conversion issue

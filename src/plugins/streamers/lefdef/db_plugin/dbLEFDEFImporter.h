@@ -52,7 +52,7 @@ struct MacroDesc;
  *  @brief Correct a path relative to the stream and technology
  */
 DB_PLUGIN_PUBLIC
-std::string correct_path (const std::string &fn, const db::Layout &layout, const std::string &base_path);
+std::vector<std::string> correct_path (const std::string &fn, const db::Layout &layout, const std::string &base_path, bool glob);
 
 /**
  *  @brief Convers a string to a MASKSHIFT index list

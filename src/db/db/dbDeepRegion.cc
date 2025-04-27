@@ -1054,12 +1054,7 @@ DeepRegion::xor_with (const Region &other, db::PropertyConstraint property_const
 {
   const DeepRegion *other_deep = dynamic_cast <const DeepRegion *> (other.delegate ());
 
-  if (empty ()) {
-
-    //  Nothing to do
-    return other.delegate ()->clone ();
-
-  } else if (other.empty ()) {
+  if (other.empty ()) {
 
     //  Nothing to do
     return clone ();
@@ -1067,6 +1062,18 @@ DeepRegion::xor_with (const Region &other, db::PropertyConstraint property_const
   } else if (! other_deep) {
 
     return AsIfFlatRegion::xor_with (other, property_constraint);
+
+  } else if (empty ()) {
+
+    //  Nothing to do, but to maintain the normal behavior, we have to map the other
+    //  input to our layout if neccessary
+    if (&other_deep->deep_layer ().layout () == &deep_layer ().layout ()) {
+      return other.delegate ()->clone ();
+    } else {
+      std::unique_ptr<DeepRegion> other_deep_mapped (dynamic_cast<DeepRegion *> (clone ()));
+      other_deep_mapped->deep_layer ().add_from (other_deep->deep_layer ());
+      return other_deep_mapped.release ();
+    }
 
   } else if (other_deep->deep_layer () == deep_layer () && pc_skip (property_constraint)) {
 

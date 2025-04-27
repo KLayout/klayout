@@ -25,6 +25,7 @@
 #include "dbLayoutDiff.h"
 #include "dbReader.h"
 #include "tlCommandLineParser.h"
+#include "tlTimer.h"
 
 BD_PUBLIC int strmcmp (int argc, char *argv[])
 {
@@ -140,6 +141,8 @@ BD_PUBLIC int strmcmp (int argc, char *argv[])
   if (top_a.empty () != top_b.empty ()) {
     throw tl::Exception ("Both -ta|--top-a and -tb|--top-b top cells must be given");
   }
+
+  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Total")));
 
   db::Layout layout_a;
   db::Layout layout_b;

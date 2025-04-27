@@ -756,15 +756,25 @@ namespace {
     : public db::RecursiveShapeReceiver
   {
   public:
-    FlatPusher (std::set<db::Box> *boxes) : mp_boxes (boxes) { }
+    FlatPusher (std::set<db::Box> *boxes = 0) : mp_boxes (boxes ? boxes : &m_boxes) { }
 
     void shape (const db::RecursiveShapeIterator * /*iter*/, const db::Shape &shape, const db::ICplxTrans & /*always_apply*/, const db::ICplxTrans &trans, const db::Box & /*region*/, const box_tree_type * /*complex_region*/)
     {
       mp_boxes->insert (trans * shape.bbox ());
     }
 
+    std::string to_string () const
+    {
+      std::vector<std::string> s;
+      for (auto i = mp_boxes->begin (); i != mp_boxes->end (); ++i) {
+        s.push_back (i->to_string ());
+      }
+      return tl::join (s.begin (), s.end (), ";");
+    }
+
   private:
     std::set<db::Box> *mp_boxes;
+    std::set<db::Box> m_boxes;
   };
 
 }
@@ -1038,7 +1048,7 @@ public:
     m_text += std::string ("leave_cell(") + iter->layout ()->cell_name (cell->cell_index ()) + ")\n";
   }
 
-  virtual new_inst_mode new_inst (const db::RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::ICplxTrans & /*always_apply*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool all)
+  virtual new_inst_mode new_inst (const db::RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::ICplxTrans & /*always_apply*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool all, bool /*skip_shapes*/)
   {
     m_text += std::string ("new_inst(") + iter->layout ()->cell_name (inst.object ().cell_index ());
     if (all) {
@@ -1048,7 +1058,7 @@ public:
     return NI_all;
   }
 
-  virtual bool new_inst_member (const db::RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::ICplxTrans &always_apply, const db::ICplxTrans &trans, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool all)
+  virtual bool new_inst_member (const db::RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::ICplxTrans &always_apply, const db::ICplxTrans &trans, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool all, bool /*skip_shapes*/)
   {
     m_text += std::string ("new_inst_member(") + iter->layout ()->cell_name (inst.object ().cell_index ()) + "," + tl::to_string (always_apply * trans);
     if (all) {
@@ -1073,9 +1083,9 @@ class ReceiverRejectingACellInstanceArray
 public:
   ReceiverRejectingACellInstanceArray (db::cell_index_type rejected) : m_rejected (rejected) { }
 
-  virtual new_inst_mode new_inst (const db::RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::ICplxTrans &always_apply, const db::Box &region, const box_tree_type *complex_region, bool all)
+  virtual new_inst_mode new_inst (const db::RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::ICplxTrans &always_apply, const db::Box &region, const box_tree_type *complex_region, bool all, bool skip_shapes)
   {
-    LoggingReceiver::new_inst (iter, inst, always_apply, region, complex_region, all);
+    LoggingReceiver::new_inst (iter, inst, always_apply, region, complex_region, all, skip_shapes);
     return inst.object ().cell_index () != m_rejected ? NI_all : NI_skip;
   }
 
@@ -1089,9 +1099,9 @@ class ReceiverRejectingACellInstanceArrayExceptOne
 public:
   ReceiverRejectingACellInstanceArrayExceptOne (db::cell_index_type rejected) : m_rejected (rejected) { }
 
-  virtual new_inst_mode new_inst (const db::RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::ICplxTrans &always_apply, const db::Box &region, const box_tree_type *complex_region, bool all)
+  virtual new_inst_mode new_inst (const db::RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::ICplxTrans &always_apply, const db::Box &region, const box_tree_type *complex_region, bool all, bool skip_shapes)
   {
-    LoggingReceiver::new_inst (iter, inst, always_apply, region, complex_region, all);
+    LoggingReceiver::new_inst (iter, inst, always_apply, region, complex_region, all, skip_shapes);
     return inst.object ().cell_index () != m_rejected ? NI_all : NI_single;
   }
 
@@ -1105,9 +1115,9 @@ class ReceiverRejectingACellInstance
 public:
   ReceiverRejectingACellInstance (db::cell_index_type rejected, const db::ICplxTrans &trans_rejected) : m_rejected (rejected), m_trans_rejected (trans_rejected) { }
 
-  virtual bool new_inst_member (const db::RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::ICplxTrans &always_apply, const db::ICplxTrans &trans, const db::Box &region, const box_tree_type *complex_region, bool all)
+  virtual bool new_inst_member (const db::RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::ICplxTrans &always_apply, const db::ICplxTrans &trans, const db::Box &region, const box_tree_type *complex_region, bool all, bool skip_shapes)
   {
-    LoggingReceiver::new_inst_member (iter, inst, always_apply, trans, region, complex_region, all);
+    LoggingReceiver::new_inst_member (iter, inst, always_apply, trans, region, complex_region, all, skip_shapes);
     return inst.object ().cell_index () != m_rejected || trans != m_trans_rejected;
   }
 
@@ -1586,49 +1596,174 @@ TEST(12_ForMerged)
   db::RecursiveShapeIterator i1 (*g, c0, 0);
   x = collect(i1, *g);
   EXPECT_EQ (x, "[$1](0,0;3000,2000)/[$2](0,100;1000,1200)/[$3](100,0;1100,1100)/[$4](1200,0;2200,1100)/[$4](-1200,0;-100,1000)");
+  EXPECT_EQ (collect_with_copy(i1, *g), x);
 
   i1.set_for_merged_input (true);
   x = collect(i1, *g);
   EXPECT_EQ (x, "[$1](0,0;3000,2000)/[$4](-1200,0;-100,1000)");
+  EXPECT_EQ (collect_with_copy(i1, *g), x);
 
   std::vector<unsigned int> lv;
   lv.push_back (0);
   i1 = db::RecursiveShapeIterator (*g, c0, lv);
   x = collect(i1, *g);
   EXPECT_EQ (x, "[$1](0,0;3000,2000)/[$2](0,100;1000,1200)/[$3](100,0;1100,1100)/[$4](1200,0;2200,1100)/[$4](-1200,0;-100,1000)");
+  EXPECT_EQ (collect_with_copy(i1, *g), x);
 
   i1.set_for_merged_input (true);
   x = collect(i1, *g);
   EXPECT_EQ (x, "[$1](0,0;3000,2000)/[$4](-1200,0;-100,1000)");
+  EXPECT_EQ (collect_with_copy(i1, *g), x);
 
   lv.push_back (1); //  empty, but kills "for merged" optimization
   i1 = db::RecursiveShapeIterator (*g, c0, lv);
   x = collect(i1, *g);
   EXPECT_EQ (x, "[$1](0,0;3000,2000)/[$2](0,100;1000,1200)/[$3](100,0;1100,1100)/[$4](1200,0;2200,1100)/[$4](-1200,0;-100,1000)");
+  EXPECT_EQ (collect_with_copy(i1, *g), x);
+
+  {
+    FlatPusher f;
+    i1.reset ();
+    i1.push (&f);
+    EXPECT_EQ (f.to_string (), "(-1200,0;-100,1000);(0,0;3000,2000);(100,0;1100,1100);(1200,0;2200,1100);(0,100;1000,1200)");
+  }
 
   i1.set_for_merged_input (true);
   x = collect(i1, *g);
   //  no longer optimized
   EXPECT_EQ (x, "[$1](0,0;3000,2000)/[$2](0,100;1000,1200)/[$3](100,0;1100,1100)/[$4](1200,0;2200,1100)/[$4](-1200,0;-100,1000)");
+  EXPECT_EQ (collect_with_copy(i1, *g), x);
+
+  {
+    FlatPusher f;
+    i1.reset ();
+    i1.push (&f);
+    EXPECT_EQ (f.to_string (), "(-1200,0;-100,1000);(0,0;3000,2000);(100,0;1100,1100);(1200,0;2200,1100);(0,100;1000,1200)");
+  }
 
   i1 = db::RecursiveShapeIterator (*g, c0, 0, db::Box (-100, 0, 100, 50));
   x = collect(i1, *g);
   EXPECT_EQ (x, "[$1](0,0;3000,2000)/[$3](100,0;1100,1100)/[$4](-1200,0;-100,1000)");
 
+  {
+    FlatPusher f;
+    i1.reset ();
+    i1.push (&f);
+    EXPECT_EQ (f.to_string (), "(-1200,0;-100,1000);(0,0;3000,2000);(100,0;1100,1100)");
+  }
+
   i1.set_for_merged_input (true);
   x = collect(i1, *g);
   EXPECT_EQ (x, "[$1](0,0;3000,2000)/[$4](-1200,0;-100,1000)");
+  EXPECT_EQ (collect_with_copy(i1, *g), x);
+
+  {
+    FlatPusher f;
+    i1.reset ();
+    i1.push (&f);
+    EXPECT_EQ (f.to_string (), "(-1200,0;-100,1000);(0,0;3000,2000)");
+  }
 
   i1 = db::RecursiveShapeIterator (*g, c0, 0, db::Box (-101, 0, 100, 50));
   i1.set_overlapping (true);
   x = collect(i1, *g);
   EXPECT_EQ (x, "[$1](0,0;3000,2000)/[$4](-1200,0;-100,1000)");
+  EXPECT_EQ (collect_with_copy(i1, *g), x);
+
+  {
+    FlatPusher f;
+    i1.reset ();
+    i1.push (&f);
+    EXPECT_EQ (f.to_string (), "(-1200,0;-100,1000);(0,0;3000,2000)");
+  }
 
   i1.set_for_merged_input (true);
   x = collect(i1, *g);
   EXPECT_EQ (x, "[$1](0,0;3000,2000)/[$4](-1200,0;-100,1000)");
+  EXPECT_EQ (collect_with_copy(i1, *g), x);
+
+  {
+    FlatPusher f;
+    i1.reset ();
+    i1.push (&f);
+    EXPECT_EQ (f.to_string (), "(-1200,0;-100,1000);(0,0;3000,2000)");
+  }
 }
 
+TEST(12b_ForMerged)
+{
+  std::unique_ptr<db::Layout> g (new db::Layout ());
+  g->insert_layer (0);
+  g->insert_layer (1);
+  db::Cell &c0 (g->cell (g->add_cell ()));
+  db::Cell &c1 (g->cell (g->add_cell ()));
+
+  db::Box b (0, 100, 1000, 1200);
+  c0.shapes (0).insert (db::Box (0, 0, 3000, 2200));
+  c1.shapes (0).insert (b);
+
+  db::Trans tt;
+  c0.insert (db::CellInstArray (db::CellInst (c1.cell_index ()), tt));
+  c0.insert (db::CellInstArray (db::CellInst (c1.cell_index ()), db::Trans (db::Vector (2000, 1000)), db::Vector (0, 2000), db::Vector (2000, 0), 2l, 2l));
+
+  std::string x;
+
+  db::RecursiveShapeIterator i1 (*g, c0, 0);
+  x = collect(i1, *g);
+  EXPECT_EQ (x, "[$1](0,0;3000,2200)/[$2](0,100;1000,1200)/[$2](2000,1100;3000,2200)/[$2](2000,3100;3000,4200)/[$2](4000,1100;5000,2200)/[$2](4000,3100;5000,4200)");
+  EXPECT_EQ (collect_with_copy(i1, *g), x);
+
+  {
+    FlatPusher f;
+    i1.reset ();
+    i1.push (&f);
+    EXPECT_EQ (f.to_string (), "(0,0;3000,2200);(0,100;1000,1200);(2000,1100;3000,2200);(4000,1100;5000,2200);(2000,3100;3000,4200);(4000,3100;5000,4200)");
+  }
+
+  i1.set_for_merged_input (true);
+  x = collect(i1, *g);
+  EXPECT_EQ (x, "[$1](0,0;3000,2200)/[$2](2000,3100;3000,4200)/[$2](4000,1100;5000,2200)/[$2](4000,3100;5000,4200)");
+  EXPECT_EQ (collect_with_copy(i1, *g), x);
+
+  {
+    FlatPusher f;
+    i1.reset ();
+    i1.push (&f);
+    EXPECT_EQ (f.to_string (), "(0,0;3000,2200);(4000,1100;5000,2200);(2000,3100;3000,4200);(4000,3100;5000,4200)");
+  }
+
+  i1.set_for_merged_input (false);
+  x = collect(i1, *g);
+  EXPECT_EQ (x, "[$1](0,0;3000,2200)/[$2](0,100;1000,1200)/[$2](2000,1100;3000,2200)/[$2](2000,3100;3000,4200)/[$2](4000,1100;5000,2200)/[$2](4000,3100;5000,4200)");
+  EXPECT_EQ (collect_with_copy(i1, *g), x);
+
+  c0.insert (db::CellInstArray (db::CellInst (c1.cell_index ()), db::Trans (db::Vector (0, 2000))));
+
+  db::RecursiveShapeIterator i2 (*g, c0, 0);
+
+  x = collect(i2, *g);
+  EXPECT_EQ (x, "[$1](0,0;3000,2200)/[$2](0,100;1000,1200)/[$2](2000,1100;3000,2200)/[$2](2000,3100;3000,4200)/[$2](4000,1100;5000,2200)/[$2](4000,3100;5000,4200)/[$2](0,2100;1000,3200)");
+  EXPECT_EQ (collect_with_copy(i2, *g), x);
+
+  {
+    FlatPusher f;
+    i2.reset ();
+    i2.push (&f);
+    EXPECT_EQ (f.to_string (), "(0,0;3000,2200);(0,100;1000,1200);(2000,1100;3000,2200);(4000,1100;5000,2200);(0,2100;1000,3200);(2000,3100;3000,4200);(4000,3100;5000,4200)");
+  }
+
+  i2.set_for_merged_input (true);
+  x = collect(i2, *g);
+  EXPECT_EQ (x, "[$1](0,0;3000,2200)/[$2](2000,3100;3000,4200)/[$2](4000,1100;5000,2200)/[$2](4000,3100;5000,4200)/[$2](0,2100;1000,3200)");
+  EXPECT_EQ (collect_with_copy(i2, *g), x);
+
+  {
+    FlatPusher f;
+    i2.reset ();
+    i2.push (&f);
+    EXPECT_EQ (f.to_string (), "(0,0;3000,2200);(4000,1100;5000,2200);(0,2100;1000,3200);(2000,3100;3000,4200);(4000,3100;5000,4200)");
+  }
+}
 
 TEST(13_ForMergedPerformance)
 {

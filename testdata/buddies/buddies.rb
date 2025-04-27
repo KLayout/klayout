@@ -113,7 +113,7 @@ Warning: Layer 2/0 is not present in first layout, but in second
 Result summary (layers without differences are not shown):
 
   Layer      Output       Differences (shape count)
-  -------------------------------------------------------
+  ----------------------------------------------------------------
   1/0        -            (no such layer in second layout)
   2/0        -            (no such layer in first layout)
 

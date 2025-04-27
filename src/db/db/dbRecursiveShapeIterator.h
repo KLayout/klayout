@@ -868,6 +868,7 @@ private:
   mutable unsigned int m_layer;
   mutable const cell_type *mp_cell;
   mutable size_t m_current_layer;
+  mutable bool m_skip_shapes, m_skip_shapes_member;
   mutable shape_iterator m_shape;
   mutable cplx_trans_type m_trans;
   mutable std::vector<cplx_trans_type> m_trans_stack;
@@ -876,7 +877,7 @@ private:
   mutable std::vector<const cell_type *> m_cells;
   mutable std::vector<box_tree_type> m_local_complex_region_stack;
   mutable std::vector<box_type> m_local_region_stack;
-  mutable std::vector<bool> m_skip_shapes_stack;
+  mutable std::vector<bool> m_skip_shapes_stack, m_skip_shapes_member_stack;
   mutable bool m_needs_reinit;
   mutable size_t m_inst_quad_id;
   mutable std::vector<size_t> m_inst_quad_id_stack;
@@ -899,6 +900,8 @@ private:
   bool down (RecursiveShapeReceiver *receiver) const;
   void pop () const;
 
+  bool instance_is_covered (const box_type &inst_bx, unsigned int layer) const;
+  bool skip_shapes () const;
   bool is_outside_complex_region (const db::Box &box) const;
 
   void set_inactive (bool a) const 
@@ -1013,8 +1016,11 @@ public:
    *   - NI_all: iterate all members through "new_inst_member"
    *   - NI_single: iterate a single member (the first one)
    *   - NI_skip: skips the whole array (not a single instance is iterated)
+   *
+   *  The "skip_shapes" parameter indicates that the instance is visited with the
+   *  purpose of skipping all shapes. This is used to implement the "for_merged" optimization.
    */
-  virtual new_inst_mode new_inst (const RecursiveShapeIterator * /*iter*/, const db::CellInstArray & /*inst*/, const db::ICplxTrans & /*always_apply*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool /*all*/) { return NI_all; }
+  virtual new_inst_mode new_inst (const RecursiveShapeIterator * /*iter*/, const db::CellInstArray & /*inst*/, const db::ICplxTrans & /*always_apply*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool /*all*/, bool /*skip_shapes*/) { return NI_all; }
 
   /**
    *  @brief Enters a new array member of the instance
@@ -1026,8 +1032,11 @@ public:
    *  "all" is true, if an instance array is iterated in "all" mode (see new_inst).
    *
    *  If this method returns false, this array instance (but not the whole array) is skipped and the cell is not entered.
+   *
+   *  The "skip_shapes" parameter indicates that the instance member is visited with the
+   *  purpose of skipping all shapes. This is used to implement the "for_merged" optimization.
    */
-  virtual bool new_inst_member (const RecursiveShapeIterator * /*iter*/, const db::CellInstArray & /*inst*/, const db::ICplxTrans & /*always_apply*/, const db::ICplxTrans & /*trans*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool /*all*/) { return true; }
+  virtual bool new_inst_member (const RecursiveShapeIterator * /*iter*/, const db::CellInstArray & /*inst*/, const db::ICplxTrans & /*always_apply*/, const db::ICplxTrans & /*trans*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool /*all*/, bool /*skip_shapes*/) { return true; }
 
   /**
    *  @brief Delivers a shape

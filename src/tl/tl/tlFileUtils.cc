@@ -458,6 +458,16 @@ static void glob_partial (const std::string &where, std::vector<std::string>::co
     ++pfrom;
   }
 
+#if defined(_WIN32)
+  if (where.empty ()) {
+    //  On Windows, we cannot iterate the drives
+    std::string root = *pfrom;
+    ++pfrom;
+    glob_partial (root, pfrom, pto, res);
+    return;
+  }
+#endif  
+
   tl::GlobPattern glob (tl::trimmed_part (*pfrom));
   ++pfrom;
   auto entries = dir_entries (where, true, true, true);

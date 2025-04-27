@@ -57,7 +57,8 @@ public:
 
   virtual bool detect (tl::InputStream &s) const 
   {
-    return false; // @@@
+    db::MALYReader reader (s);
+    return reader.test ();
   }
 
   virtual ReaderBase *create_reader (tl::InputStream &s) const 
@@ -68,7 +69,6 @@ public:
   virtual WriterBase *create_writer () const
   {
     return 0;
-    // @@@ return new db::MALYWriter ();
   }
 
   virtual bool can_read () const
@@ -79,36 +79,16 @@ public:
   virtual bool can_write () const
   {
     return false;
-    // @@@ return true;
   }
 
   virtual tl::XMLElementBase *xml_reader_options_element () const
   {
     return new db::ReaderOptionsXMLElement<db::MALYReaderOptions> ("mag",
-      tl::make_member (&db::MALYReaderOptions::dbu, "dbu") 
-        /* @@@
-      tl::make_member (&db::MALYReaderOptions::lambda, "lambda") +
+      tl::make_member (&db::MALYReaderOptions::dbu, "dbu") +
       tl::make_member (&db::MALYReaderOptions::layer_map, "layer-map") +
-      tl::make_member (&db::MALYReaderOptions::create_other_layers, "create-other-layers") +
-      tl::make_member (&db::MALYReaderOptions::keep_layer_names, "keep-layer-names") +
-      tl::make_member (&db::MALYReaderOptions::merge, "merge") +
-      tl::make_element<std::vector<std::string>, db::MALYReaderOptions> (&db::MALYReaderOptions::lib_paths, "lib-paths",
-        tl::make_member<std::string, std::vector<std::string>::const_iterator, std::vector<std::string> > (&std::vector<std::string>::begin, &std::vector<std::string>::end, &std::vector<std::string>::push_back, "lib-path")
-      )
-      */
+      tl::make_member (&db::MALYReaderOptions::create_other_layers, "create-other-layers")
     );
   }
-
-  /* @@@
-  virtual tl::XMLElementBase *xml_writer_options_element () const
-  {
-    return new db::WriterOptionsXMLElement<db::MALYWriterOptions> ("mag",
-      tl::make_member (&db::MALYWriterOptions::lambda, "lambda") +
-      tl::make_member (&db::MALYWriterOptions::tech, "tech") +
-      tl::make_member (&db::MALYWriterOptions::write_timestamp, "write-timestamp")
-    );
-  }
-  @@@ */
 };
 
 //  NOTE: Because MALY has such a high degree of syntactic freedom, the detection is somewhat

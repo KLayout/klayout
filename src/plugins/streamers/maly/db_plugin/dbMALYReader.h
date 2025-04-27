@@ -76,10 +76,17 @@ public:
    */
   MALYReader (tl::InputStream &s);
 
-  /**  
+  /**
    *  @brief Destructor
    */
   ~MALYReader ();
+
+  /**
+   *  @brief Tests, if the stream is a valid MALY file
+   *
+   *  This method can be used for the format detection
+   */
+  bool test ();
 
   /** 
    *  @brief The basic read method 
@@ -140,6 +147,9 @@ private:
 
   void do_read (db::Layout &layout, db::cell_index_type to_cell, tl::TextInputStream &stream);
   std::string resolve_path(const std::string &path);
+  MALYData read_maly_file ();
+  std::string read_record ();
+  std::string read_record_internal ();
 };
 
 }

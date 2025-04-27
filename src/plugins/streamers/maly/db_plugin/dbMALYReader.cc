@@ -61,6 +61,22 @@ MALYReader::~MALYReader ()
   //  .. nothing yet ..
 }
 
+bool
+MALYReader::test ()
+{
+  return true; // @@@
+  try {
+
+    std::string rec = read_record ();
+
+    tl::Extractor ex (rec.c_str ());
+    return ex.test ("BEGIN") && ex.test ("MALY");
+
+  } catch (...) {
+    return false;
+  }
+}
+
 const LayerMap &
 MALYReader::read (db::Layout &layout)
 {
@@ -74,10 +90,133 @@ MALYReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
 
   prepare_layers (layout);
 
+  const db::MALYReaderOptions &specific_options = options.get_options<db::MALYReaderOptions> ();
+  m_dbu = specific_options.dbu;
+
+  set_layer_map (specific_options.layer_map);
+  set_create_layers (specific_options.create_other_layers);
+  // @@@ set_keep_layer_names (specific_options.keep_layer_names);
+  set_keep_layer_names (true);
+
+  MALYData data = read_maly_file ();
+
   // @@@
 
   finish_layers (layout);
   return layer_map_out ();
+}
+
+std::string
+MALYReader::read_record ()
+{
+  while (! m_stream.at_end ()) {
+    std::string r = read_record_internal ();
+    tl::Extractor ex (r.c_str ());
+    if (ex.test ("+")) {
+      error (tl::to_string (tr ("'+' character past first column - did you mean to continue a line?")));
+    } else if (! ex.at_end ()) {
+      return r;
+    }
+  }
+
+  return std::string ();
+}
+
+std::string
+MALYReader::read_record_internal ()
+{
+  std::string rec;
+
+  while (! m_stream.at_end ()) {
+
+    char c = m_stream.get_char ();
+
+    //  skip comments
+    if (c == '/') {
+      char cc = m_stream.peek_char ();
+      if (cc == '/') {
+        while (! m_stream.at_end () && (c = m_stream.get_char ()) != '\n')
+          ;
+        if (m_stream.at_end ()) {
+          break;
+        }
+      } else if (cc == '*') {
+        m_stream.get_char ();  //  eat leading "*"
+        while (! m_stream.at_end () && (m_stream.get_char () != '*' || m_stream.peek_char () != '/'))
+          ;
+        if (m_stream.at_end ()) {
+          error (tl::to_string (tr ("/*...*/ comment not closed")));
+        }
+        m_stream.get_char ();  //  eat trailing "/"
+        if (m_stream.at_end ()) {
+          break;
+        }
+        c = m_stream.get_char ();
+      }
+    }
+
+    if (c == '\n') {
+      if (m_stream.peek_char () == '+') {
+        //  continuation line
+        m_stream.get_char ();  //  eat "+"
+        if (m_stream.at_end ()) {
+          break;
+        }
+        c = m_stream.get_char ();
+      } else {
+        break;
+      }
+    }
+
+    if (c == '"' || c == '\'') {
+
+      rec += c;
+
+      //  skip quoted string
+      char quote = c;
+      while (! m_stream.at_end ()) {
+        c = m_stream.get_char ();
+        rec += c;
+        if (c == quote) {
+          quote = 0;
+          break;
+        } else if (c == '\\') {
+          if (m_stream.at_end ()) {
+            error (tl::to_string (tr ("Unexpected end of file inside quotee string")));
+          }
+          c = m_stream.get_char ();
+          rec += c;
+        } else if (c == '\n') {
+          error (tl::to_string (tr ("Line break inside quoted string")));
+        }
+      }
+
+      if (quote) {
+        error (tl::to_string (tr ("Unexpected end of file inside quotee string")));
+      }
+
+    } else {
+      rec += c;
+    }
+
+  }
+
+  return rec;
+}
+
+MALYData
+MALYReader::read_maly_file ()
+{
+  // @@@
+  std::cout << "@@@ BEGIN_MALY" << std::endl;
+  std::string rec;
+  while (! (rec = read_record ()).empty ()) {
+    std::cout << rec << std::endl;
+  }
+  std::cout << "@@@ END_MALY" << std::endl;
+  // @@@
+
+  return MALYData (); // @@@
 }
 
 void 

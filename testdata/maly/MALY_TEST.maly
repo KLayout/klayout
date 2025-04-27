@@ -1,0 +1,15 @@
+
+// a comment
+
+BEGIN /* a multiline comment
+
+
+*/ MALY
+
+//  a comment 
+
+SREF " \"//  /*hello*/ " SIZE 
++ 10,10
+
+
+  

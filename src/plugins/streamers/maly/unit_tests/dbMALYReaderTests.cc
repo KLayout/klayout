@@ -28,7 +28,7 @@
 
 #include <stdlib.h>
 
-static void run_test (tl::TestBase *_this, const std::string &base, const char *file, const char *file_au, const char *map = 0, double lambda = 0.1, double dbu = 0.001, const std::vector<std::string> *lib_paths = 0)
+static void run_test (tl::TestBase *_this, const std::string &base, const char *file, const char *file_au, const char *map = 0, double dbu = 0.001)
 {
   db::MALYReaderOptions *opt = new db::MALYReaderOptions();
   opt->dbu = dbu;
@@ -54,7 +54,7 @@ static void run_test (tl::TestBase *_this, const std::string &base, const char *
   options.set_options (opt);
 
   db::Manager m (false);
-  db::Layout layout (&m), layout2 (&m), layout2_mag (&m), layout_au (&m);
+  db::Layout layout (&m), layout2 (&m), layout_au (&m);
 
   {
     std::string fn (base);
@@ -65,12 +65,12 @@ static void run_test (tl::TestBase *_this, const std::string &base, const char *
     reader.read (layout, options);
   }
 
+  tl_assert (layout.begin_top_down () != layout.end_top_down ());
   std::string tc_name = layout.cell_name (*layout.begin_top_down ());
 
   //  normalize the layout by writing to OASIS and reading from ..
 
   std::string tmp_oas_file = _this->tmp_file (tl::sprintf ("%s.oas", tc_name));
-  std::string tmp_maly_file = _this->tmp_file (tl::sprintf ("%s.mag", tc_name));
 
   {
     tl::OutputStream stream (tmp_oas_file);

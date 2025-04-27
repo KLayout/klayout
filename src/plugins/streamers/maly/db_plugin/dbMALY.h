@@ -134,6 +134,7 @@ public:
  */
 class MALYStructure
 {
+public:
   /**
    *  @brief Default constructor
    */
@@ -210,6 +211,7 @@ class MALYStructure
  */
 class MALYMask
 {
+public:
   /**
    *  @brief Default constructor
    */
@@ -245,6 +247,7 @@ class MALYMask
  */
 class MALYData
 {
+public:
   /**
    *  @brief Default constructor
    */

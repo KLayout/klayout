@@ -43,8 +43,82 @@ namespace db
 {
 
 // ---------------------------------------------------------------
-//  MALYReader
+//  Some helper structures to collect data
 
+struct MALYReaderTitleSpec
+{
+  MALYReaderTitleSpec ()
+    : enabled (false), width (1.0), height (1.0), pitch (1.0)
+  { }
+
+  bool enabled;
+  db::DTrans trans;
+  double width, height, pitch;
+};
+
+struct MALYReaderTitleData
+{
+  MALYReaderTitleData ()
+  { }
+
+  MALYReaderTitleSpec date_spec;
+  MALYReaderTitleSpec serial_spec;
+  std::list<std::pair<std::string, MALYReaderTitleSpec> > string_titles;
+};
+
+struct MALYReaderParametersData
+{
+  MALYReaderParametersData ()
+    : base (Center), array_base (Center), masksize (0.0), maskmirror (false), font (MALYTitle::Standard)
+  { }
+
+  enum Base
+  {
+    Origin,
+    Center,
+    LowerLeft
+  };
+
+  Base base;
+  Base array_base;
+  double masksize;
+  bool maskmirror;
+  MALYTitle::Font font;
+  std::list<std::pair<std::string, std::string> > roots;
+};
+
+struct MALYReaderStrRefData
+{
+  MALYReaderStrRefData ()
+    : layer (-1), scale (1.0), nx (1), ny (1), dx (0.0), dy (0.0)
+  { }
+
+  std::string file;
+  std::string name;
+  int layer;
+  db::DVector org;
+  db::DBox size;
+  double scale;
+  int nx, ny;
+  double dx, dy;
+};
+
+struct MALYReaderStrGroupData
+{
+  std::string name;
+  std::list<MALYReaderStrRefData> refs;
+};
+
+struct MALYReaderMaskData
+{
+  MALYReaderParametersData parameters;
+  MALYReaderTitleData title;
+  std::list<MALYReaderStrGroupData> strgroups;
+};
+
+
+// ---------------------------------------------------------------
+//  MALYReader
 
 MALYReader::MALYReader (tl::InputStream &s)
   : m_stream (s),
@@ -64,12 +138,9 @@ MALYReader::~MALYReader ()
 bool
 MALYReader::test ()
 {
-  return true; // @@@
   try {
 
-    std::string rec = read_record ();
-
-    tl::Extractor ex (rec.c_str ());
+    tl::Extractor ex = read_record ();
     return ex.test ("BEGIN") && ex.test ("MALY");
 
   } catch (...) {
@@ -106,20 +177,31 @@ MALYReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
   return layer_map_out ();
 }
 
-std::string
+void
+MALYReader::unget_record ()
+{
+  m_record_returned = m_record;
+}
+
+tl::Extractor
 MALYReader::read_record ()
 {
+  if (! m_record_returned.empty ()) {
+    m_record = m_record_returned;
+    return tl::Extractor (m_record.c_str ());
+  }
+
   while (! m_stream.at_end ()) {
-    std::string r = read_record_internal ();
-    tl::Extractor ex (r.c_str ());
+    m_record = read_record_internal ();
+    tl::Extractor ex (m_record.c_str ());
     if (ex.test ("+")) {
       error (tl::to_string (tr ("'+' character past first column - did you mean to continue a line?")));
     } else if (! ex.at_end ()) {
-      return r;
+      return ex;
     }
   }
 
-  return std::string ();
+  return tl::Extractor ();
 }
 
 std::string
@@ -207,16 +289,362 @@ MALYReader::read_record_internal ()
 MALYData
 MALYReader::read_maly_file ()
 {
-  // @@@
-  std::cout << "@@@ BEGIN_MALY" << std::endl;
-  std::string rec;
-  while (! (rec = read_record ()).empty ()) {
-    std::cout << rec << std::endl;
+  MALYData data;
+  try {
+    do_read_maly_file (data);
+  } catch (tl::Exception &ex) {
+    error (ex.msg ());
   }
-  std::cout << "@@@ END_MALY" << std::endl;
-  // @@@
+  return data;
+}
 
-  return MALYData (); // @@@
+void
+MALYReader::extract_title_trans (tl::Extractor &ex, MALYReaderTitleSpec &spec)
+{
+  double x = 0.0, y = 0.0;
+  bool ymirror = false;
+  int rot = 0;
+
+  ex.read (x);
+  ex.read (y);
+
+  if (ex.test ("SIZE")) {
+    ex.read (spec.width);
+    ex.read (spec.height);
+    ex.read (spec.pitch);
+  }
+
+  if (ex.test ("MIRROR")) {
+    if (ex.test ("Y")) {
+      ymirror = true;
+    } else if (ex.test ("OFF")) { // @@@
+      ymirror = false;
+    } else {
+      error (tl::to_string (tr ("Expected 'Y' or 'OFF' for MIRROR spec")));
+    }
+  }
+
+  if (ex.test ("ROTATE")) {
+    unsigned int a = 0;
+    ex.read (a);
+    rot = (a / 90) % 4;
+  }
+
+  spec.trans = db::DTrans (rot, ymirror, db::DVector (x, y));
+}
+
+static
+MALYReaderParametersData::Base string_to_base (const std::string &string)
+{
+  if (string == "ORIGIN") {
+    return MALYReaderParametersData::Origin;
+  } else if (string == "LOWERLEFT") { // @@@?
+    return MALYReaderParametersData::LowerLeft;
+  } else if (string == "CENTER") {
+    return MALYReaderParametersData::Center;
+  } else {
+    // @@@ error
+    return MALYReaderParametersData::Center;
+  }
+}
+
+void
+MALYReader::read_parameter (MALYReaderParametersData &data)
+{
+  while (true) {
+
+    tl::Extractor ex = read_record ();
+    if (ex.test ("MASKMIRROR")) {
+
+      if (ex.test ("NONE")) {
+        data.maskmirror = false;
+      } else if (ex.test ("Y")) {
+        data.maskmirror = true;
+      } else {
+        error (tl::to_string (tr ("Expected value Y or NONE for MASKMIRROR")));
+      }
+
+    } else if (ex.test ("MASKSIZE")) {
+
+      data.masksize = 0.0;
+      ex.read (data.masksize);
+
+    } else if (ex.test ("FONT")) {
+
+      if (ex.test ("STANDARD")) {
+        data.font = MALYTitle::Standard;
+      } else if (ex.test ("NATIVE")) {
+        data.font = MALYTitle::Native;
+      } else {
+        error (tl::to_string (tr ("Expected value STANDARD or NATIVE for FONT")));
+      }
+
+    } else if (ex.test ("BASE")) {
+
+      std::string base;
+      ex.read_word (base);
+      data.base = string_to_base (base);
+
+    } else if (ex.test ("ARYBASE")) {
+
+      std::string base;
+      ex.read_word (base);
+      data.array_base = string_to_base (base);
+
+    } else if (ex.test ("REFERENCE")) {
+
+      ex.expect ("TOOL");
+
+      std::string para;
+      ex.read_word_or_quoted (para);
+      //  @@@ TODO: what to do with "para"
+
+      ex.expect_end ();
+
+    } else if (ex.test ("ROOT")) {
+
+      std::string format, path;
+      ex.read_word_or_quoted (format);
+      ex.read_word_or_quoted (path, ".\\/+-");
+      ex.expect_end ();
+
+      data.roots.push_back (std::make_pair (format, path));
+
+    } else if (ex.test ("END")) {
+
+      ex.expect ("PARAMETER");
+      return;
+
+    } else {
+      error (tl::to_string (tr ("Parameter spec expected or END PARAMETER")));
+    }
+
+  }
+}
+
+void
+MALYReader::read_title (MALYReaderTitleData &data)
+{
+  while (true) {
+
+    tl::Extractor ex = read_record ();
+    if (ex.test ("DATE")) {
+
+      if (ex.test ("OFF")) {
+        data.date_spec.enabled = false;
+      } else {
+        data.date_spec.enabled = true;
+        extract_title_trans (ex, data.date_spec);
+        ex.expect_end ();
+      }
+
+    } else if (ex.test ("SERIAL")) {
+
+      if (ex.test ("OFF")) {
+        data.serial_spec.enabled = false;
+      } else {
+        data.serial_spec.enabled = true;
+        extract_title_trans (ex, data.serial_spec);
+        ex.expect_end ();
+      }
+
+    } else if (ex.test ("STRING")) {
+
+      std::string text;
+      ex.read_word_or_quoted (text);
+
+      data.string_titles.push_back (std::make_pair (text, MALYReaderTitleSpec ()));
+      data.string_titles.back ().second.enabled = true;
+      extract_title_trans (ex, data.string_titles.back ().second);
+
+      ex.expect_end ();
+
+    } else if (ex.test ("END")) {
+
+      ex.expect ("TITLE");
+      return;
+
+    } else {
+      error (tl::to_string (tr ("Title spec expected or END TITLE")));
+    }
+
+  }
+}
+
+void
+MALYReader::read_strgroup (MALYReaderStrGroupData &data)
+{
+  while (true) {
+
+    bool is_sref = false;
+
+    tl::Extractor ex = read_record ();
+    if ((is_sref = ex.test ("SREF")) || ex.test ("AREF")) {
+
+      data.refs.push_back (MALYReaderStrRefData ());
+      MALYReaderStrRefData &ref = data.refs.back ();
+
+      ex.read_word_or_quoted (ref.file);
+      ex.read_word_or_quoted (ref.name);
+      ex.read (ref.layer);
+
+      if (ex.test ("ORG")) {
+        double x = 0.0, y = 0.0;
+        ex.read (x);
+        ex.read (y);
+        ref.org = db::DVector (x, y);
+      }
+
+      if (ex.test ("SIZE")) {
+        double l = 0.0, b = 0.0, r = 0.0, t = 0.0;
+        ex.read (l);
+        ex.read (b);
+        ex.read (r);
+        ex.read (t);
+        ref.size = db::DBox (l, b, r, t);
+      }
+
+      if (ex.test ("SCALE")) {
+        ex.read (ref.scale);
+      }
+
+      if (! is_sref && ex.test ("ITERATION")) {
+        ex.read (ref.nx);
+        ex.read (ref.ny);
+        ex.read (ref.dx);
+        ex.read (ref.dy);
+      }
+
+      ex.expect_end ();
+
+    } else if (ex.test ("END")) {
+
+      ex.expect ("STRGROUP");
+      return;
+
+    } else {
+      error (tl::to_string (tr ("SREF or AREF spec expected or END STRGROUP")));
+    }
+
+  }
+}
+
+void
+MALYReader::read_mask (MALYReaderMaskData &mask, bool cmask)
+{
+  while (true) {
+
+    tl::Extractor ex = read_record ();
+    if (ex.test ("BEGIN")) {
+
+      if (ex.test ("PARAMETER")) {
+
+        ex.expect_end ();
+        read_parameter (mask.parameters);
+
+      } else if (ex.test ("TITLE")) {
+
+        ex.expect_end ();
+        read_title (mask.title);
+
+      } else if (ex.test ("STRGROUP")) {
+
+        mask.strgroups.push_back (MALYReaderStrGroupData ());
+
+        ex.read_word_or_quoted (mask.strgroups.back ().name);
+        ex.expect_end ();
+
+        read_strgroup (mask.strgroups.back ());
+
+      } else {
+        error (tl::to_string (tr ("Mask component expected (PARAMETER, TITLE, STRGROUP)")));
+      }
+
+    } else if (ex.test ("END")) {
+
+      ex.expect (cmask ? "CMASK" : "MASK");
+      break;
+
+    } else {
+      error (tl::to_string (tr ("Mask component expected (PARAMETER, TITLE, STRGROUP)")));
+    }
+
+  }
+}
+
+bool
+MALYReader::read_maskset (MALYData &data)
+{
+  tl::Extractor ex = read_record ();
+  if (! ex.test ("BEGIN") || ! ex.test ("MASKSET")) {
+    unget_record ();
+    return false;
+  }
+
+  MALYReaderMaskData cmask;
+  std::list<MALYReaderMaskData> masks;
+
+  while (true) {
+
+    ex = read_record ();
+
+    if (ex.test ("END")) {
+
+      ex.expect ("MASKSET");
+      ex.expect_end ();
+      // @@@ create_masks (cmask, masks, data);
+      return true;
+
+    } else if (ex.test ("BEGIN")) {
+
+      MALYReaderMaskData *mm = 0;
+      bool cm = false;
+      if (ex.test ("MASK")) {
+        masks.push_back (MALYReaderMaskData ());
+        mm = &masks.back ();
+      } else if (ex.test ("CMASK")) {
+        mm = &cmask;
+        cm = true;
+      } else {
+        error (tl::to_string (tr ("'BEGIN MASK' or 'BEGIN CMASK' record expected")));
+      }
+
+      ex.expect_end ();
+      read_mask (*mm, cm);
+
+    } else {
+      error (tl::to_string (tr ("'BEGIN MASK' or 'BEGIN CMASK' record expected")));
+    }
+
+  }
+}
+
+void
+MALYReader::do_read_maly_file (MALYData &data)
+{
+  tl::Extractor ex = read_record ();
+  if (! ex.test ("BEGIN") || ! ex.test ("MALY")) {
+    error (tl::to_string (tr ("Header expected ('BEGIN MALY')")));
+  }
+
+  std::string version;
+  ex.read (version, ".");
+  //  @@@ TODO: what to do with version string?
+
+  ex.expect_end ();
+
+  while (read_maskset (data))
+    ;
+
+  ex = read_record ();
+  if (! ex.test ("END") || ! ex.test ("MALY")) {
+    error (tl::to_string (tr ("Terminator expected ('END MALY')")));
+  }
+
+  ex = read_record ();
+  if (! ex.at_end ()) {
+    error (tl::to_string (tr ("Records found past end of file")));
+  }
 }
 
 void 

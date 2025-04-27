@@ -45,7 +45,11 @@
 namespace db
 {
 
-class Technology;
+class MALYReaderMaskData;
+class MALYReaderTitleData;
+class MALYReaderParametersData;
+class MALYReaderStrGroupData;
+class MALYReaderTitleSpec;
 
 /**
  *  @brief Generic base class of MALY reader exceptions
@@ -144,12 +148,23 @@ private:
   tl::TextInputStream m_stream;
   tl::AbsoluteProgress m_progress;
   double m_dbu;
+  std::string m_record;
+  std::string m_record_returned;
 
   void do_read (db::Layout &layout, db::cell_index_type to_cell, tl::TextInputStream &stream);
   std::string resolve_path(const std::string &path);
   MALYData read_maly_file ();
-  std::string read_record ();
+  tl::Extractor read_record ();
+  void unget_record ();
   std::string read_record_internal ();
+  void do_read_maly_file (MALYData &data);
+  bool read_maskset (MALYData &data);
+  void read_mask (MALYReaderMaskData &mask, bool cmask);
+  void read_title (MALYReaderTitleData &mask);
+  void read_parameter (MALYReaderParametersData &mask);
+  void read_strgroup (MALYReaderStrGroupData &mask);
+  db::DTrans extract_title_trans (tl::Extractor &ex);
+  void extract_title_trans (tl::Extractor &ex, MALYReaderTitleSpec &spec);
 };
 
 }

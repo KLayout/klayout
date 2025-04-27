@@ -1053,7 +1053,7 @@ TEST (25)
 
   std::sort (res.begin (), res.end ());
   std::sort (au.begin (), au.end ());
-  EXPECT_EQ (res == au, true);
+  EXPECT_EQ (tl::join (res, "\n"), tl::join (au, "\n"));
 
   res = tl::glob_expand (tl::combine_path (tl::combine_path (p, "**"), "*.txt"));
   au.clear ();
@@ -1066,7 +1066,7 @@ TEST (25)
 
   std::sort (res.begin (), res.end ());
   std::sort (au.begin (), au.end ());
-  EXPECT_EQ (res == au, true);
+  EXPECT_EQ (tl::join (res, "\n"), tl::join (au, "\n"));
 
   res = tl::glob_expand (tl::combine_path (tl::combine_path (p, "**"), "*2.txt"));
   au.clear ();
@@ -1075,7 +1075,7 @@ TEST (25)
 
   std::sort (res.begin (), res.end ());
   std::sort (au.begin (), au.end ());
-  EXPECT_EQ (res == au, true);
+  EXPECT_EQ (tl::join (res, "\n"), tl::join (au, "\n"));
 
   res = tl::glob_expand (tl::combine_path (tl::combine_path (tl::combine_path (p, "**"), "a"), "*2.txt"));
   au.clear ();
@@ -1083,6 +1083,6 @@ TEST (25)
 
   std::sort (res.begin (), res.end ());
   std::sort (au.begin (), au.end ());
-  EXPECT_EQ (res == au, true);
+  EXPECT_EQ (tl::join (res, "\n"), tl::join (au, "\n"));
 }
 

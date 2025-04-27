@@ -1321,7 +1321,7 @@ struct edge_xmin_at_yinterval_double_compare
   {
     if (edge_xmax (a) < edge_xmin (b)) {
       return true;
-    } else if (edge_xmin (a) >= edge_xmax (b)) {
+    } else if (edge_xmin (a) > edge_xmax (b)) {
       return false;
     } else {
       C xa = edge_xmin_at_yinterval_double (a, m_y1, m_y2);

@@ -47,6 +47,31 @@
 namespace edt
 {
 
+static std::string variant_list_to_string (const tl::Variant &value)
+{
+  if (! value.is_list ()) {
+    tl::Variant v = tl::Variant::empty_list ();
+    v.push (value);
+    return v.to_parsable_string ();
+  }
+
+  for (auto i = value.begin (); i != value.end (); ++i) {
+    if (! i->is_a_string () || std::string (i->to_string ()).find (",") != std::string::npos) {
+      return value.to_parsable_string ();
+    }
+  }
+
+  //  otherwise we can plainly combine the strings with ","
+  std::string res;
+  for (auto i = value.begin (); i != value.end (); ++i) {
+    if (i != value.begin ()) {
+      res += ",";
+    }
+    res += i->to_string ();
+  }
+  return res;
+}
+
 static void set_value (const db::PCellParameterDeclaration &p, QWidget *widget, const tl::Variant &value)
 {
   if (p.get_choices ().empty ()) {
@@ -91,7 +116,7 @@ static void set_value (const db::PCellParameterDeclaration &p, QWidget *widget, 
         QLineEdit *le = dynamic_cast<QLineEdit *> (widget);
         if (le) {
           le->blockSignals (true);
-          le->setText (value.to_qstring ());
+          le->setText (tl::to_qstring (variant_list_to_string (value)));
           le->blockSignals (false);
         }
       }
@@ -905,8 +930,29 @@ PCellParametersPage::get_parameters_internal (db::ParameterStates &states, bool 
         {
           QLineEdit *le = dynamic_cast<QLineEdit *> (m_widgets [r]);
           if (le) {
-            std::vector<std::string> values = tl::split (tl::to_string (le->text ()), ",");
+
+            std::string s = tl::to_string (le->text ());
+
+            //  try parsing a bracketed expression
+            tl::Extractor ex (s.c_str ());
+            if (*ex.skip () == '(') {
+              tl::Variant v;
+              try {
+                ex.read (v);
+                ps.set_value (v);
+                break;
+              } catch (...) {
+                //  ignore errors
+              }
+            } else if (ex.at_end ()) {
+              ps.set_value (tl::Variant::empty_list ());
+              break;
+            }
+
+            //  otherwise: plain splitting at comma
+            std::vector<std::string> values = tl::split (s, ",");
             ps.set_value (tl::Variant (values.begin (), values.end ()));
+
           }
         }
         break;

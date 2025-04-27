@@ -28,6 +28,7 @@
 #include "tlLog.h"
 #include "tlCommandLineParser.h"
 #include "tlFileUtils.h"
+#include "tlTimer.h"
 #include "rba.h"
 #include "pya.h"
 #include "gsi.h"
@@ -97,5 +98,8 @@ BD_PUBLIC int strmrun (int argc, char *argv[])
   lym::Macro macro;
   macro.load_from (script);
   macro.set_file_path (script);
+
+  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Total")));
+
   return macro.run ();
 }

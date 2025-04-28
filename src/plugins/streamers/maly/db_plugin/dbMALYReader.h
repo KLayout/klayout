@@ -150,6 +150,7 @@ private:
   double m_dbu;
   std::string m_record;
   std::string m_record_returned;
+  std::list<std::string> m_sections;
 
   void do_read (db::Layout &layout, db::cell_index_type to_cell, tl::TextInputStream &stream);
   std::string resolve_path(const std::string &path);
@@ -159,12 +160,15 @@ private:
   std::string read_record_internal ();
   void do_read_maly_file (MALYData &data);
   bool read_maskset (MALYData &data);
-  void read_mask (MALYReaderMaskData &mask, bool cmask);
+  void read_mask (MALYReaderMaskData &mask);
   void read_title (MALYReaderTitleData &mask);
   void read_parameter (MALYReaderParametersData &mask);
   void read_strgroup (MALYReaderStrGroupData &mask);
   db::DTrans extract_title_trans (tl::Extractor &ex);
   void extract_title_trans (tl::Extractor &ex, MALYReaderTitleSpec &spec);
+  bool begin_section (tl::Extractor &ex, const std::string &name = std::string ());
+  bool end_section (tl::Extractor &ex);
+  void skip_section ();
 };
 
 }

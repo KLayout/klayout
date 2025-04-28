@@ -348,13 +348,71 @@ MALYReaderParametersData::Base string_to_base (const std::string &string)
   }
 }
 
+bool
+MALYReader::begin_section (tl::Extractor &ex, const std::string &name)
+{
+  tl::Extractor ex_saved = ex;
+
+  if (ex.test ("BEGIN")) {
+    if (name.empty ()) {
+      m_sections.push_back (std::string ());
+      ex.read_word (m_sections.back ());
+      return true;
+    } else if (ex.test (name.c_str ())) {
+      m_sections.push_back (name);
+      return true;
+    }
+  }
+
+  ex = ex_saved;
+  return false;
+}
+
+bool
+MALYReader::end_section (tl::Extractor &ex)
+{
+  tl_assert (! m_sections.empty ());
+  if (ex.at_end ()) {
+
+    error (tl::to_string (tr ("Unexpected end of file during section")));
+    return false;
+
+  } else if (ex.test ("END")) {
+
+    ex.expect (m_sections.back ().c_str ());
+    m_sections.pop_back ();
+    return true;
+
+  } else {
+
+    return false;
+
+  }
+}
+
+void
+MALYReader::skip_section ()
+{
+  while (true) {
+    tl::Extractor ex = read_record ();
+    if (begin_section (ex)) {
+      skip_section ();
+    } else if (end_section (ex)) {
+      break;
+    }
+  }
+}
+
 void
 MALYReader::read_parameter (MALYReaderParametersData &data)
 {
   while (true) {
 
     tl::Extractor ex = read_record ();
-    if (ex.test ("MASKMIRROR")) {
+
+    if (end_section (ex)) {
+      break;
+    } else if (ex.test ("MASKMIRROR")) {
 
       if (ex.test ("NONE")) {
         data.maskmirror = false;
@@ -410,13 +468,8 @@ MALYReader::read_parameter (MALYReaderParametersData &data)
 
       data.roots.push_back (std::make_pair (format, path));
 
-    } else if (ex.test ("END")) {
-
-      ex.expect ("PARAMETER");
-      return;
-
     } else {
-      error (tl::to_string (tr ("Parameter spec expected or END PARAMETER")));
+      warn (tl::to_string (tr ("Unknown record ignored")));
     }
 
   }
@@ -428,7 +481,10 @@ MALYReader::read_title (MALYReaderTitleData &data)
   while (true) {
 
     tl::Extractor ex = read_record ();
-    if (ex.test ("DATE")) {
+
+    if (end_section (ex)) {
+      break;
+    } else if (ex.test ("DATE")) {
 
       if (ex.test ("OFF")) {
         data.date_spec.enabled = false;
@@ -459,13 +515,8 @@ MALYReader::read_title (MALYReaderTitleData &data)
 
       ex.expect_end ();
 
-    } else if (ex.test ("END")) {
-
-      ex.expect ("TITLE");
-      return;
-
     } else {
-      error (tl::to_string (tr ("Title spec expected or END TITLE")));
+      warn (tl::to_string (tr ("Unknown record ignored")));
     }
 
   }
@@ -479,7 +530,9 @@ MALYReader::read_strgroup (MALYReaderStrGroupData &data)
     bool is_sref = false;
 
     tl::Extractor ex = read_record ();
-    if ((is_sref = ex.test ("SREF")) || ex.test ("AREF")) {
+    if (end_section (ex)) {
+      break;
+    } else if ((is_sref = ex.test ("SREF")) || ex.test ("AREF")) {
 
       data.refs.push_back (MALYReaderStrRefData ());
       MALYReaderStrRefData &ref = data.refs.back ();
@@ -517,56 +570,44 @@ MALYReader::read_strgroup (MALYReaderStrGroupData &data)
 
       ex.expect_end ();
 
-    } else if (ex.test ("END")) {
-
-      ex.expect ("STRGROUP");
-      return;
-
     } else {
-      error (tl::to_string (tr ("SREF or AREF spec expected or END STRGROUP")));
+      warn (tl::to_string (tr ("Unknown record ignored")));
     }
 
   }
 }
 
 void
-MALYReader::read_mask (MALYReaderMaskData &mask, bool cmask)
+MALYReader::read_mask (MALYReaderMaskData &mask)
 {
   while (true) {
 
     tl::Extractor ex = read_record ();
-    if (ex.test ("BEGIN")) {
-
-      if (ex.test ("PARAMETER")) {
-
-        ex.expect_end ();
-        read_parameter (mask.parameters);
-
-      } else if (ex.test ("TITLE")) {
-
-        ex.expect_end ();
-        read_title (mask.title);
-
-      } else if (ex.test ("STRGROUP")) {
-
-        mask.strgroups.push_back (MALYReaderStrGroupData ());
-
-        ex.read_word_or_quoted (mask.strgroups.back ().name);
-        ex.expect_end ();
-
-        read_strgroup (mask.strgroups.back ());
-
-      } else {
-        error (tl::to_string (tr ("Mask component expected (PARAMETER, TITLE, STRGROUP)")));
-      }
-
-    } else if (ex.test ("END")) {
-
-      ex.expect (cmask ? "CMASK" : "MASK");
+    if (end_section (ex)) {
       break;
+    } else if (begin_section (ex, "PARAMETER")) {
 
+      ex.expect_end ();
+      read_parameter (mask.parameters);
+
+    } else if (begin_section (ex, "TITLE")) {
+
+      ex.expect_end ();
+      read_title (mask.title);
+
+    } else if (begin_section (ex, "STRGROUP")) {
+
+      mask.strgroups.push_back (MALYReaderStrGroupData ());
+
+      ex.read_word_or_quoted (mask.strgroups.back ().name);
+      ex.expect_end ();
+
+      read_strgroup (mask.strgroups.back ());
+
+    } else if (begin_section (ex)) {
+      skip_section ();
     } else {
-      error (tl::to_string (tr ("Mask component expected (PARAMETER, TITLE, STRGROUP)")));
+      warn (tl::to_string (tr ("Unknown record ignored")));
     }
 
   }
@@ -576,7 +617,8 @@ bool
 MALYReader::read_maskset (MALYData &data)
 {
   tl::Extractor ex = read_record ();
-  if (! ex.test ("BEGIN") || ! ex.test ("MASKSET")) {
+
+  if (! begin_section (ex, "MASKSET")) {
     unget_record ();
     return false;
   }
@@ -588,32 +630,25 @@ MALYReader::read_maskset (MALYData &data)
 
     ex = read_record ();
 
-    if (ex.test ("END")) {
+    if (end_section (ex)) {
 
-      ex.expect ("MASKSET");
       ex.expect_end ();
       // @@@ create_masks (cmask, masks, data);
       return true;
 
-    } else if (ex.test ("BEGIN")) {
-
-      MALYReaderMaskData *mm = 0;
-      bool cm = false;
-      if (ex.test ("MASK")) {
-        masks.push_back (MALYReaderMaskData ());
-        mm = &masks.back ();
-      } else if (ex.test ("CMASK")) {
-        mm = &cmask;
-        cm = true;
-      } else {
-        error (tl::to_string (tr ("'BEGIN MASK' or 'BEGIN CMASK' record expected")));
-      }
+    } else if (begin_section (ex, "MASK")) {
 
       ex.expect_end ();
-      read_mask (*mm, cm);
+      masks.push_back (MALYReaderMaskData ());
+      read_mask (masks.back ());
+
+    } else if (begin_section (ex, "CMASK")) {
+
+      ex.expect_end ();
+      read_mask (cmask);
 
     } else {
-      error (tl::to_string (tr ("'BEGIN MASK' or 'BEGIN CMASK' record expected")));
+      warn (tl::to_string (tr ("Unknown record ignored")));
     }
 
   }
@@ -623,7 +658,7 @@ void
 MALYReader::do_read_maly_file (MALYData &data)
 {
   tl::Extractor ex = read_record ();
-  if (! ex.test ("BEGIN") || ! ex.test ("MALY")) {
+  if (! begin_section (ex, "MALY")) {
     error (tl::to_string (tr ("Header expected ('BEGIN MALY')")));
   }
 
@@ -637,7 +672,7 @@ MALYReader::do_read_maly_file (MALYData &data)
     ;
 
   ex = read_record ();
-  if (! ex.test ("END") || ! ex.test ("MALY")) {
+  if (! end_section (ex)) {
     error (tl::to_string (tr ("Terminator expected ('END MALY')")));
   }
 

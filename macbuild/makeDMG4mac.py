@@ -424,7 +424,7 @@ def CheckPkgDirectory():
     #------------------------------------------------------
     # [5] Check the occupied disk space
     #------------------------------------------------------
-    command = "\du -sm %s" % DefaultBundleName
+    command = r"\du -sm %s" % DefaultBundleName
     sizeApp = int( os.popen(command).read().strip("\n").split("\t")[0] )
 
     #------------------------------------------------------
@@ -671,14 +671,14 @@ def MakeTargetDMGFile(msg=""):
     imageDest = "%s/.background" % MountDir
     if not os.path.isdir(imageDest):
         os.mkdir(imageDest)
-    command = "\cp -p %s %s/%s" % (imageSrc, imageDest, BackgroundPNG)
+    command = r"\cp -p %s %s/%s" % (imageSrc, imageDest, BackgroundPNG)
     os.system(command)
 
     #--------------------------------------------------------
     # (6) Create a symbolic link to /Applications
     #--------------------------------------------------------
     print( ">>> (6) Creating a symbolic link to /Applications..." )
-    command = "\ln -s %s %s/%s" % (RootApplications, MountDir, RootApplications)
+    command = r"\ln -s %s %s/%s" % (RootApplications, MountDir, RootApplications)
     os.system(command)
 
     #--------------------------------------------------------
@@ -702,7 +702,7 @@ def MakeTargetDMGFile(msg=""):
     print( ">>> (8) Copying the volume icon..." )
     iconsSrc  = "macbuild/Resources/%s" % VolumeIcons
     iconsDest = "%s/.VolumeIcon.icns" % MountDir
-    command1  = "\cp -p %s %s" % (iconsSrc, iconsDest)
+    command1  = r"\cp -p %s %s" % (iconsSrc, iconsDest)
     command2  = "SetFile -c icnC %s" % iconsDest
     os.system(command1)
     sleep(2)
@@ -713,7 +713,7 @@ def MakeTargetDMGFile(msg=""):
     # (9) Change the permission
     #--------------------------------------------------------
     print( ">>> (9) Changing permission to 755..." )
-    command = "\chmod -Rf 755 %s &> /dev/null" % MountDir
+    command = r"\chmod -Rf 755 %s &> /dev/null" % MountDir
     os.system(command)
 
     #--------------------------------------------------------

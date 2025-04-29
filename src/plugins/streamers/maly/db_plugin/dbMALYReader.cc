@@ -279,7 +279,7 @@ MALYReader::string_to_base (const std::string &string)
   } else if (string == "CENTER") {
     return MALYReaderParametersData::Center;
   } else {
-    error (tl::to_string (tr ("Unknown base specification: ")) + string);
+    throw tl::Exception (tl::to_string (tr ("Unknown base specification: ")) + string);
   }
 }
 
@@ -627,7 +627,7 @@ MALYReader::create_masks (const MALYReaderMaskData &cmask, const std::list<MALYR
     }
     if (m.size_um < db::epsilon) {
       m.size_um = 7.0 * 25400.0;
-      warn (tl::to_string (tr ("No mask size given for mask " + m.name + " - using default of 7 inch")));
+      warn (tl::to_string (tr ("No mask size given for - using default of 7 inch for mask: ")) + m.name);
     }
 
     MALYTitle::Font font = i->parameters.font;
@@ -671,7 +671,7 @@ MALYReader::create_masks (const MALYReaderMaskData &cmask, const std::list<MALYR
     }
     if (base == MALYReaderParametersData::BaseNotSet) {
       base = MALYReaderParametersData::Center;
-      warn (tl::to_string (tr ("No structure placement given for mask " + m.name + " - using 'center'")));
+      warn (tl::to_string (tr ("No structure placement given - using 'center' for mask: ")) + m.name);
     }
 
     MALYReaderParametersData::Base array_base = MALYReaderParametersData::BaseNotSet;
@@ -680,7 +680,7 @@ MALYReader::create_masks (const MALYReaderMaskData &cmask, const std::list<MALYR
     }
     if (array_base == MALYReaderParametersData::BaseNotSet) {
       array_base = MALYReaderParametersData::Center;
-      warn (tl::to_string (tr ("No array structure placement given for mask " + m.name + " - using 'center'")));
+      warn (tl::to_string (tr ("No array structure placement given - using 'center' for mask: ")) + m.name);
     }
 
     for (auto sg = cmask.strgroups.begin (); sg != cmask.strgroups.end (); ++sg) {

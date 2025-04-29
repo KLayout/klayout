@@ -45,12 +45,6 @@
 namespace db
 {
 
-class MALYReaderMaskData;
-class MALYReaderTitleData;
-class MALYReaderParametersData;
-class MALYReaderStrGroupData;
-class MALYReaderTitleSpec;
-
 /**
  *  @brief Generic base class of MALY reader exceptions
  */
@@ -145,15 +139,89 @@ public:
   virtual void warn (const std::string &txt, int wl = 1);
 
 private:
+  struct MALYReaderTitleSpec
+  {
+    MALYReaderTitleSpec ()
+      : enabled (false), width (1.0), height (1.0), pitch (1.0)
+    { }
+
+    bool enabled;
+    db::DTrans trans;
+    double width, height, pitch;
+  };
+
+  struct MALYReaderTitleData
+  {
+    MALYReaderTitleData ()
+    { }
+
+    MALYReaderTitleSpec date_spec;
+    MALYReaderTitleSpec serial_spec;
+    std::list<std::pair<std::string, MALYReaderTitleSpec> > string_titles;
+  };
+
+  struct MALYReaderParametersData
+  {
+    MALYReaderParametersData ()
+      : base (BaseNotSet), array_base (BaseNotSet), masksize (0.0), maskmirror (false), font (MALYTitle::FontNotSet)
+    { }
+
+    enum Base
+    {
+      BaseNotSet,
+      Origin,
+      Center,
+      LowerLeft
+    };
+
+    Base base;
+    Base array_base;
+    double masksize;
+    bool maskmirror;
+    MALYTitle::Font font;
+    std::list<std::pair<std::string, std::string> > roots;
+  };
+
+  struct MALYReaderStrRefData
+  {
+    MALYReaderStrRefData ()
+      : layer (-1), scale (1.0), nx (1), ny (1), dx (0.0), dy (0.0)
+    { }
+
+    std::string file;
+    std::string name;
+    std::string dname, ename, mname;
+    int layer;
+    db::DVector org;
+    db::DBox size;
+    double scale;
+    int nx, ny;
+    double dx, dy;
+  };
+
+  struct MALYReaderStrGroupData
+  {
+    std::string name;
+    std::list<MALYReaderStrRefData> refs;
+  };
+
+  struct MALYReaderMaskData
+  {
+    std::string name;
+    MALYReaderParametersData parameters;
+    MALYReaderTitleData title;
+    std::list<MALYReaderStrGroupData> strgroups;
+  };
+
   tl::TextInputStream m_stream;
   tl::AbsoluteProgress m_progress;
   double m_dbu;
+  unsigned int m_last_record_line;
   std::string m_record;
   std::string m_record_returned;
   std::list<std::string> m_sections;
 
   void do_read (db::Layout &layout, db::cell_index_type to_cell, tl::TextInputStream &stream);
-  std::string resolve_path(const std::string &path);
   MALYData read_maly_file ();
   tl::Extractor read_record ();
   void unget_record ();
@@ -169,6 +237,11 @@ private:
   bool begin_section (tl::Extractor &ex, const std::string &name = std::string ());
   bool end_section (tl::Extractor &ex);
   void skip_section ();
+  MALYTitle create_title (MALYTitle::Type type, const MALYReaderTitleSpec &data, MALYTitle::Font font, const std::string &string);
+  void create_masks (const MALYReaderMaskData &cmask, const std::list<MALYReaderMaskData> &masks, MALYData &data);
+  MALYStructure create_structure (const MALYReaderParametersData &mparam, const MALYReaderParametersData &cparam, const MALYReaderStrRefData &data, const std::string &strgroup_name, MALYReaderParametersData::Base base, MALYReaderParametersData::Base array_base);
+  std::string resolve_path (const MALYReaderParametersData &param, const std::string &path);
+  static MALYReaderParametersData::Base string_to_base (const std::string &string);
 };
 
 }

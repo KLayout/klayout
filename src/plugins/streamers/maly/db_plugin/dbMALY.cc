@@ -39,6 +39,86 @@ MALYDiagnostics::~MALYDiagnostics ()
 }
 
 // ---------------------------------------------------------------
+//  MALYData implementation
+
+std::string
+MALYTitle::to_string () const
+{
+  std::string res;
+  res += "\"" + string + "\" " + transformation.to_string ();
+  res += tl::sprintf (" %g,%g,%g", width, height, pitch);
+  if (font == Standard) {
+    res += " [Standard]";
+  } else if (font == Native) {
+    res += " [Native]";
+  }
+  return res;
+}
+
+std::string
+MALYStructure::to_string () const
+{
+  std::string res;
+  res += path + "{" + topcell + "}";
+  if (layer < 0) {
+    res += "(*)";
+  } else {
+    res += tl::sprintf ("(%d)", layer);
+  }
+
+  if (! mname.empty ()) {
+    res += " mname(" + mname + ")";
+  }
+  if (! ename.empty ()) {
+    res += " ename(" + ename + ")";
+  }
+  if (! dname.empty ()) {
+    res += " dname(" + dname + ")";
+  }
+
+  res += " ";
+  res += size.to_string ();
+
+  res += " ";
+  res += transformation.to_string ();
+
+  if (nx > 1 || ny > 1) {
+    res += tl::sprintf (" [%.12gx%d,%.12gx%d]", dx, nx, dy, ny);
+  }
+
+  return res;
+}
+
+std::string
+MALYMask::to_string () const
+{
+  std::string res;
+  res += "Mask " + name + "\n";
+  res += "  Size " + tl::to_string (size_um);
+
+  for (auto t = titles.begin (); t != titles.end (); ++t) {
+    res += "\n    Title " + t->to_string ();
+  }
+  for (auto s = structures.begin (); s != structures.end (); ++s) {
+    res += "\n    Ref " + s->to_string ();
+  }
+  return res;
+}
+
+std::string
+MALYData::to_string () const
+{
+  std::string res;
+  for (auto m = masks.begin (); m != masks.end (); ++m) {
+    if (m != masks.begin ()) {
+      res += "\n";
+    }
+    res += m->to_string ();
+  }
+  return res;
+}
+
+// ---------------------------------------------------------------
 //  MALY format declaration
 
 class MALYFormatDeclaration

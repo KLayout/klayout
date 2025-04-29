@@ -76,9 +76,9 @@ public:
    */
   enum Type
   {
-    String = 0,   //  A user-defined string
-    Date = 1,     //  The date
-    Serial = 2    //  A serial number
+    String = 0,     //  A user-defined string
+    Date = 1,       //  The date
+    Serial = 2      //  A serial number
   };
 
   /**
@@ -86,8 +86,9 @@ public:
    */
   enum Font
   {
-    Standard = 0, //  Standard font
-    Native = 1    //  Native tool font
+    FontNotSet = 0, //  Undef
+    Standard = 1,   //  Standard font
+    Native = 2      //  Native tool font
   };
 
   /**
@@ -127,6 +128,11 @@ public:
    *  @brief The font to be used
    */
   Font font;
+
+  /**
+   *  @brief Returns a string representing the structure
+   */
+  std::string to_string () const;
 };
 
 /**
@@ -204,6 +210,11 @@ public:
    *  A value of -1 means "all".
    */
   int layer;
+
+  /**
+   *  @brief Returns a string representing the structure
+   */
+  std::string to_string () const;
 };
 
 /**
@@ -240,6 +251,11 @@ public:
    *  @brief The list of titles
    */
   std::list<MALYTitle> titles;
+
+  /**
+   *  @brief Returns a string representing the mask
+   */
+  std::string to_string () const;
 };
 
 /**
@@ -258,6 +274,11 @@ public:
    *  @brief The masks defined by the file
    */
   std::list<MALYMask> masks;
+
+  /**
+   *  @brief Returns a string representing the data set
+   */
+  std::string to_string () const;
 };
 
 }

@@ -60,7 +60,7 @@ jobs:
           HOST_CCACHE_DIR="$(ccache -k cache_dir)"
           mkdir -p $HOST_CCACHE_DIR
       - name: Build wheels  # check https://cibuildwheel.readthedocs.io/en/stable/setup/#github-actions
-        uses: pypa/cibuildwheel@v2.23.2
+        uses: pypa/cibuildwheel@v2.23.3
         # to supply options, put them in 'env', like:
         # env:
         #   CIBW_SOME_OPTION: value

@@ -221,7 +221,7 @@ private:
   std::string m_record_returned;
   std::list<std::string> m_sections;
 
-  void do_read (db::Layout &layout, db::cell_index_type to_cell, tl::TextInputStream &stream);
+  void import_data (db::Layout &layout, const MALYData &data);
   MALYData read_maly_file ();
   tl::Extractor read_record ();
   void unget_record ();

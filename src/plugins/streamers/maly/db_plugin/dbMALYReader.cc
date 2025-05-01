@@ -29,6 +29,8 @@
 #include "dbStatic.h"
 #include "dbShapeProcessor.h"
 #include "dbTechnology.h"
+#include "dbCellMapping.h"
+#include "dbLayerMapping.h"
 
 #include "tlException.h"
 #include "tlString.h"
@@ -92,17 +94,129 @@ MALYReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
 
   set_layer_map (specific_options.layer_map);
   set_create_layers (specific_options.create_other_layers);
-  // @@@ set_keep_layer_names (specific_options.keep_layer_names);
   set_keep_layer_names (true);
 
   MALYData data = read_maly_file ();
-
-  // @@@
-  std::cout << data.to_string () << std::endl;
-  // @@@
+  import_data (layout, data);
 
   finish_layers (layout);
   return layer_map_out ();
+}
+
+void
+MALYReader::import_data (db::Layout &layout, const MALYData &data)
+{
+  db::LayoutLocker locker (&layout);
+
+  //  create a new top cell
+  db::Cell &top_cell = layout.cell (layout.add_cell ("MALY_JOBDECK"));
+
+  //  count the number of files to read
+  size_t n = 0;
+  for (auto m = data.masks.begin (); m != data.masks.end (); ++m) {
+    n += m->structures.size ();
+  }
+
+  tl::RelativeProgress progress (tl::to_string (tr ("Reading layouts")), n, size_t (1));
+
+  for (auto m = data.masks.begin (); m != data.masks.end (); ++m, ++progress) {
+
+    db::Cell &mask_cell = layout.cell (layout.add_cell (("MASK_" + m->name).c_str ()));
+    top_cell.insert (db::CellInstArray (mask_cell.cell_index (), db::Trans ()));
+
+    auto lp = open_layer (layout, m->name);
+    if (! lp.first) {
+      continue;
+    }
+    unsigned int target_layer = lp.second;
+
+    for (auto s = m->structures.begin (); s != m->structures.end (); ++s) {
+
+      db::LoadLayoutOptions options;
+
+      tl::InputStream is (s->path);
+      db::Layout temp_layout;
+      db::Reader reader (is);
+      reader.read (temp_layout, options);
+
+      //  configure MEBES reader for compatibility with OASIS.Mask
+      try {
+        options.set_option_by_name ("mebes_produce_boundary", false);
+        options.set_option_by_name ("mebes_data_layer", s->layer);
+        options.set_option_by_name ("mebes_data_datatype", int (0));
+      } catch (...) {
+        //  ignore if there is no MEBES support
+      }
+
+      db::cell_index_type source_cell;
+
+      if (s->topcell.empty ()) {
+
+        auto t = temp_layout.begin_top_down ();
+        if (t == temp_layout.end_top_down ()) {
+          throw tl::Exception (tl::to_string (tr ("Mask pattern file '%s' does not have a top cell")), s->path);
+        }
+
+        source_cell = *t;
+        ++t;
+        if (t != temp_layout.end_top_down ()) {
+          throw tl::Exception (tl::to_string (tr ("Mask pattern file '%s' does not have a single top cell")), s->path);
+        }
+
+      } else {
+
+        auto cbm = layout.cell_by_name (s->topcell.c_str ());
+        if (! cbm.first) {
+          throw tl::Exception (tl::to_string (tr ("Mask pattern file '%s' does not have a cell named '%s' as required by mask '%s'")), s->path, s->topcell, m->name);
+        }
+
+        source_cell = cbm.second;
+
+      }
+
+      int source_layer = layout.get_layer_maybe (db::LayerProperties (s->layer, 0));
+      if (source_layer >= 0) {
+
+        //  create a host cell for the pattern
+
+        std::string cn = m->name;
+        if (s->mname.empty ()) {
+          cn += ".PATTERN";
+        } else {
+          cn += "." + s->mname;
+        }
+        db::cell_index_type target_cell = layout.add_cell (cn.c_str ());
+
+        //  create the pattern instance
+
+        db::ICplxTrans trans = db::CplxTrans (layout.dbu ()).inverted () * s->transformation * db::CplxTrans (temp_layout.dbu ());
+        db::CellInstArray array;
+        if (s->nx > 1 || s->ny > 1) {
+          db::Coord idx = db::coord_traits<db::Coord>::rounded (s->dx / layout.dbu ());
+          db::Coord idy = db::coord_traits<db::Coord>::rounded (s->dy / layout.dbu ());
+          array = db::CellInstArray (target_cell, trans, db::Vector (idx, 0), db::Vector (0, idy), s->nx, s->ny);
+        } else {
+          array = db::CellInstArray (target_cell, trans);
+        }
+        mask_cell.insert (array);
+
+        //  move over the shapes from the pattern layout to the target layout
+
+        db::CellMapping cm;
+        cm.create_single_mapping_full (layout, target_cell, temp_layout, source_cell);
+
+        db::LayerMapping lm;
+        lm.map (source_layer, target_layer);
+
+        layout.cell (target_cell).move_tree_shapes (temp_layout.cell (source_cell), cm, lm);
+
+      }
+
+    }
+
+  }
+
+  //  @@@ TODO: generate titles
 }
 
 void
@@ -755,7 +869,7 @@ MALYReader::create_structure (const MALYReaderParametersData &mparam, const MALY
   }
 
   db::DCplxTrans mirr (mparam.maskmirror != cparam.maskmirror ? db::DFTrans::m90 : db::DFTrans::r0);
-  str.transformation = mirr * db::DCplxTrans (data.scale, 0.0, false, data.org + (db::DPoint () - rp));
+  str.transformation = mirr * db::DCplxTrans (data.scale, 0.0, false, data.org) * db::DCplxTrans (db::DPoint () - rp);
 
   return str;
 }
@@ -844,18 +958,6 @@ MALYReader::warn (const std::string &msg, int wl)
              << ")";
   } else if (ws == 0) {
     tl::warn << tl::to_string (tr ("... further warnings of this kind are not shown"));
-  }
-}
-
-void
-MALYReader::do_read (db::Layout &layout, db::cell_index_type cell_index, tl::TextInputStream &stream)
-{
-  try {
-
-    // @@@
-
-  } catch (tl::Exception &ex) {
-    error (ex.msg ());
   }
 }
 

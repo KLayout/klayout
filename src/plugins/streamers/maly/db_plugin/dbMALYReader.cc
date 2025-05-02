@@ -88,14 +88,14 @@ MALYReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
 {
   init (options);
 
-  prepare_layers (layout);
-
   const db::MALYReaderOptions &specific_options = options.get_options<db::MALYReaderOptions> ();
   m_dbu = specific_options.dbu;
 
   set_layer_map (specific_options.layer_map);
   set_create_layers (specific_options.create_other_layers);
   set_keep_layer_names (true);
+
+  prepare_layers (layout);
 
   MALYData data = read_maly_file ();
   import_data (layout, data);

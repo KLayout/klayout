@@ -86,10 +86,9 @@ TEST(1_Basic)
   EXPECT_EQ (data.to_string (),
     "Mask A\n"
     "  Size 127000\n"
-    "    Title \"<SERIAL>\" m90 50,-50 1,1,1 [Standard]\n"
-    "    Title \"<DATE>\" r0 0,-50 1,1,1 [Standard]\n"
-    "    Title \"MaskA1\" r0 -50,50 1,1,1 [Standard]\n"
-    "    Title \"WITH \"QUOTES\"\" m45 50,0 1,1,1 [Standard]\n"
+    "    Title \"<SERIAL>\" m90 0,-50 1,1,1 [Standard]\n"
+    "    Title \"MaskA1\" m90 50,50 1,1,1 [Standard]\n"
+    "    Title \"WITH \"QUOTES\"\" r270 -50,0 1,1,1 [Standard]\n"
     "    Ref A1.oas{CHIP_A}(1) (0,0;10,10) m90 *1 20,0\n"
     "    Ref A2.oas{CHIP_A}(2) ename(e001) dname(d001) (0,0;50,50) m90 *0.8 20,0 [2x5,1x2]\n"
     "    Ref B3.oas{CHIP_A}(2) (0,0;12,12) m90 *1 20,0"
@@ -135,5 +134,10 @@ TEST(2_Errors)
 TEST(10_BasicLayout)
 {
   run_test (_this, tl::testdata (), "MALY_test10.maly", "maly_test10_au.oas");
+}
+
+TEST(11_Titles)
+{
+  run_test (_this, tl::testdata (), "MALY_test11.maly", "maly_test11_au.oas");
 }
 

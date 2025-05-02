@@ -31,6 +31,7 @@
 #include "dbTechnology.h"
 #include "dbCellMapping.h"
 #include "dbLayerMapping.h"
+#include "dbGlyphs.h"
 
 #include "tlException.h"
 #include "tlString.h"
@@ -218,9 +219,30 @@ MALYReader::import_data (db::Layout &layout, const MALYData &data)
 
     }
 
+    //  produce the titles
+
+    for (auto t = m->titles.begin (); t != m->titles.end (); ++t) {
+
+      const double one_mm = 1000.0;
+
+      auto gen = db::TextGenerator::default_generator ();
+      double scale = std::min (t->width * one_mm / (gen->width () * gen->dbu ()), t->height * one_mm / (gen->height () * gen->dbu ()));
+
+      auto &s = t->string;
+      int len = int (s.size ());
+      db::DVector shift (-t->width * one_mm * len * 0.5, -t->height * one_mm * 0.5);
+      double char_spacing = t->width * one_mm - gen->width () * gen->dbu () * scale;
+
+      db::Region text = gen->text_as_region (s, layout.dbu (), scale, false, 0.0, char_spacing, 0.0);
+      text.transform (db::Trans (db::CplxTrans (layout.dbu ()).inverted () * shift));
+      text.transform (db::CplxTrans (layout.dbu ()).inverted () * db::DCplxTrans (t->transformation) * db::CplxTrans (layout.dbu ()));
+
+      text.insert_into (&layout, mask_cell.cell_index (), target_layer);
+
+    }
+
   }
 
-  //  @@@ TODO: generate titles
 }
 
 void
@@ -376,6 +398,10 @@ MALYReader::extract_title_trans (tl::Extractor &ex, MALYReaderTitleSpec &spec)
     ex.read (spec.width);
     ex.read (spec.height);
     ex.read (spec.pitch);
+  } else {
+    spec.width  = 1.0;
+    spec.height = 1.0;
+    spec.pitch  = 1.0;
   }
 
   if (ex.test ("MIRROR")) {
@@ -394,7 +420,7 @@ MALYReader::extract_title_trans (tl::Extractor &ex, MALYReaderTitleSpec &spec)
     rot = (a / 90) % 4;
   }
 
-  spec.trans = db::DTrans (rot, ymirror, db::DVector (x, y));
+  spec.trans = db::DTrans (rot, false, db::DVector (x, y)) * db::DTrans (ymirror ? db::DFTrans::m90 : db::DFTrans::r0);
 }
 
 MALYReader::MALYReaderParametersData::Base
@@ -552,6 +578,8 @@ MALYReader::read_title (MALYReaderTitleData &data)
       break;
     } else if (ex.test ("DATE")) {
 
+      data.date_spec.given = true;
+
       if (ex.test ("OFF")) {
         data.date_spec.enabled = false;
       } else {
@@ -561,6 +589,8 @@ MALYReader::read_title (MALYReaderTitleData &data)
       }
 
     } else if (ex.test ("SERIAL")) {
+
+      data.serial_spec.given = true;
 
       if (ex.test ("OFF")) {
         data.serial_spec.enabled = false;
@@ -779,31 +809,33 @@ MALYReader::create_masks (const MALYReaderMaskData &cmask, const std::list<MALYR
       font = MALYTitle::Standard;
     }
 
+    bool maskmirror = (i->parameters.maskmirror != cmask.parameters.maskmirror);
+
     const MALYReaderTitleSpec *date_spec = 0;
-    if (i->title.date_spec.enabled) {
+    if (i->title.date_spec.given) {
       date_spec = &i->title.date_spec;
-    } else if (cmask.title.date_spec.enabled) {
+    } else if (cmask.title.date_spec.given) {
       date_spec = &cmask.title.date_spec;
     }
-    if (date_spec) {
-      m.titles.push_back (create_title (MALYTitle::Date, *date_spec, font, std::string ("<SERIAL>")));
+    if (date_spec && date_spec->enabled) {
+      m.titles.push_back (create_title (MALYTitle::Date, *date_spec, font, maskmirror, std::string ("<DATE>")));
     }
 
     const MALYReaderTitleSpec *serial_spec = 0;
-    if (i->title.serial_spec.enabled) {
+    if (i->title.serial_spec.given) {
       serial_spec = &i->title.serial_spec;
-    } else if (cmask.title.serial_spec.enabled) {
+    } else if (cmask.title.serial_spec.given) {
       serial_spec = &cmask.title.serial_spec;
     }
-    if (date_spec) {
-      m.titles.push_back (create_title (MALYTitle::Serial, *serial_spec, font, std::string ("<DATE>")));
+    if (serial_spec && serial_spec->enabled) {
+      m.titles.push_back (create_title (MALYTitle::Serial, *serial_spec, font, maskmirror, std::string ("<SERIAL>")));
     }
 
     for (auto t = i->title.string_titles.begin (); t != i->title.string_titles.end (); ++t) {
-      m.titles.push_back (create_title (MALYTitle::String, t->second, font, t->first));
+      m.titles.push_back (create_title (MALYTitle::String, t->second, font, maskmirror, t->first));
     }
     for (auto t = cmask.title.string_titles.begin (); t != cmask.title.string_titles.end (); ++t) {
-      m.titles.push_back (create_title (MALYTitle::String, t->second, font, t->first));
+      m.titles.push_back (create_title (MALYTitle::String, t->second, font, maskmirror, t->first));
     }
 
     MALYReaderParametersData::Base base = i->parameters.base;
@@ -839,11 +871,11 @@ MALYReader::create_masks (const MALYReaderMaskData &cmask, const std::list<MALYR
 }
 
 MALYTitle
-MALYReader::create_title (MALYTitle::Type type, const MALYReaderTitleSpec &data, MALYTitle::Font font, const std::string &string)
+MALYReader::create_title (MALYTitle::Type type, const MALYReaderTitleSpec &data, MALYTitle::Font font, bool maskmirror, const std::string &string)
 {
   MALYTitle title;
 
-  title.transformation = data.trans;
+  title.transformation = db::DTrans (maskmirror ? db::DFTrans::m90 : db::DFTrans::r0) * data.trans;
   title.width = data.width;
   title.height = data.height;
   title.pitch = data.pitch;

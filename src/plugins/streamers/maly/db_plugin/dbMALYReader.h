@@ -149,9 +149,10 @@ private:
   struct MALYReaderTitleSpec
   {
     MALYReaderTitleSpec ()
-      : enabled (false), width (1.0), height (1.0), pitch (1.0)
+      : given (false), enabled (false), width (1.0), height (1.0), pitch (1.0)
     { }
 
+    bool given;
     bool enabled;
     db::DTrans trans;
     double width, height, pitch;
@@ -243,7 +244,7 @@ private:
   bool begin_section (tl::Extractor &ex, const std::string &name = std::string ());
   bool end_section (tl::Extractor &ex);
   void skip_section ();
-  MALYTitle create_title (MALYTitle::Type type, const MALYReaderTitleSpec &data, MALYTitle::Font font, const std::string &string);
+  MALYTitle create_title (MALYTitle::Type type, const MALYReaderTitleSpec &data, MALYTitle::Font font, bool maskmirror, const std::string &string);
   void create_masks (const MALYReaderMaskData &cmask, const std::list<MALYReaderMaskData> &masks, MALYData &data);
   MALYStructure create_structure (const MALYReaderParametersData &mparam, const MALYReaderParametersData &cparam, const MALYReaderStrRefData &data, const std::string &strgroup_name, MALYReaderParametersData::Base base, MALYReaderParametersData::Base array_base);
   std::string resolve_path (const MALYReaderParametersData &param, const std::string &path);

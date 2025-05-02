@@ -138,6 +138,13 @@ public:
    */
   virtual void warn (const std::string &txt, int wl = 1);
 
+  /**
+   *  @brief Reads the MALY file into a MALYData structure
+   *
+   *  This method is provided for test purposes mainly.
+   */
+  MALYData read_maly_file ();
+
 private:
   struct MALYReaderTitleSpec
   {
@@ -222,7 +229,6 @@ private:
   std::list<std::string> m_sections;
 
   void import_data (db::Layout &layout, const MALYData &data);
-  MALYData read_maly_file ();
   tl::Extractor read_record ();
   void unget_record ();
   std::string read_record_internal ();

@@ -165,7 +165,7 @@ MALYReader::import_data (db::Layout &layout, const MALYData &data)
 
       } else {
 
-        auto cbm = layout.cell_by_name (s->topcell.c_str ());
+        auto cbm = temp_layout.cell_by_name (s->topcell.c_str ());
         if (! cbm.first) {
           throw tl::Exception (tl::to_string (tr ("Mask pattern file '%s' does not have a cell named '%s' as required by mask '%s'")), s->path, s->topcell, m->name);
         }
@@ -174,27 +174,31 @@ MALYReader::import_data (db::Layout &layout, const MALYData &data)
 
       }
 
-      int source_layer = layout.get_layer_maybe (db::LayerProperties (s->layer, 0));
+      int source_layer = temp_layout.get_layer_maybe (db::LayerProperties (s->layer, 0));
       if (source_layer >= 0) {
 
         //  create a host cell for the pattern
 
         std::string cn = m->name;
-        if (s->mname.empty ()) {
-          cn += ".PATTERN";
+        if (s->topcell.empty ()) {
+          if (s->mname.empty ()) {
+            cn += ".PATTERN";
+          } else {
+            cn += "." + s->mname;
+          }
         } else {
-          cn += "." + s->mname;
+          cn += "." + s->topcell;
         }
         db::cell_index_type target_cell = layout.add_cell (cn.c_str ());
 
         //  create the pattern instance
 
-        db::ICplxTrans trans = db::CplxTrans (layout.dbu ()).inverted () * s->transformation * db::CplxTrans (temp_layout.dbu ());
+        db::ICplxTrans trans = db::CplxTrans (layout.dbu ()).inverted () * s->transformation * db::CplxTrans (layout.dbu ());
         db::CellInstArray array;
         if (s->nx > 1 || s->ny > 1) {
           db::Coord idx = db::coord_traits<db::Coord>::rounded (s->dx / layout.dbu ());
           db::Coord idy = db::coord_traits<db::Coord>::rounded (s->dy / layout.dbu ());
-          array = db::CellInstArray (target_cell, trans, db::Vector (idx, 0), db::Vector (0, idy), s->nx, s->ny);
+          array = db::CellInstArray (target_cell, trans, trans.fp_trans () * db::Vector (idx, 0), trans.fp_trans () * db::Vector (0, idy), s->nx, s->ny);
         } else {
           array = db::CellInstArray (target_cell, trans);
         }
@@ -277,6 +281,7 @@ MALYReader::read_record_internal ()
         while (! m_stream.at_end () && (m_stream.get_char () != '*' || m_stream.peek_char () != '/'))
           ;
         if (m_stream.at_end ()) {
+          m_last_record_line = m_stream.line_number ();
           error (tl::to_string (tr ("/*...*/ comment not closed")));
         }
         m_stream.get_char ();  //  eat trailing "/"
@@ -288,19 +293,25 @@ MALYReader::read_record_internal ()
     }
 
     if (c == '\n') {
+
       if (m_stream.peek_char () == '+') {
+
+        if (tl::Extractor (rec.c_str ()).at_end ()) {
+          m_last_record_line = m_stream.line_number ();
+          error (tl::to_string (tr ("'+' character at beginning of new record - did you mean to continue a line?")));
+        }
+
         //  continuation line
         m_stream.get_char ();  //  eat "+"
         if (m_stream.at_end ()) {
           break;
         }
-        c = m_stream.get_char ();
+
       } else {
         break;
       }
-    }
 
-    if (c == '"' || c == '\'') {
+    } else if (c == '"' || c == '\'') {
 
       rec += c;
 
@@ -314,16 +325,19 @@ MALYReader::read_record_internal ()
           break;
         } else if (c == '\\') {
           if (m_stream.at_end ()) {
-            error (tl::to_string (tr ("Unexpected end of file inside quotee string")));
+            m_last_record_line = m_stream.line_number ();
+            error (tl::to_string (tr ("Unexpected end of file inside quoted string")));
           }
           c = m_stream.get_char ();
           rec += c;
         } else if (c == '\n') {
+          m_last_record_line = m_stream.line_number ();
           error (tl::to_string (tr ("Line break inside quoted string")));
         }
       }
 
       if (quote) {
+        m_last_record_line = m_stream.line_number ();
         error (tl::to_string (tr ("Unexpected end of file inside quotee string")));
       }
 
@@ -512,11 +526,14 @@ MALYReader::read_parameter (MALYReaderParametersData &data)
 
       std::string format, path;
       ex.read_word_or_quoted (format);
-      ex.read_word_or_quoted (path, ".\\/+-");
+      ex.read_word_or_quoted (path, ".\\/+-_");
       ex.expect_end ();
 
       data.roots.push_back (std::make_pair (format, path));
 
+    } else if (begin_section (ex)) {
+      warn (tl::to_string (tr ("Unknown section ignored")));
+      skip_section ();
     } else {
       warn (tl::to_string (tr ("Unknown record ignored")));
     }
@@ -564,6 +581,9 @@ MALYReader::read_title (MALYReaderTitleData &data)
 
       ex.expect_end ();
 
+    } else if (begin_section (ex)) {
+      warn (tl::to_string (tr ("Unknown section ignored")));
+      skip_section ();
     } else {
       warn (tl::to_string (tr ("Unknown record ignored")));
     }
@@ -639,6 +659,9 @@ MALYReader::read_strgroup (MALYReaderStrGroupData &data)
 
       ex.expect_end ();
 
+    } else if (begin_section (ex)) {
+      warn (tl::to_string (tr ("Unknown section ignored")));
+      skip_section ();
     } else {
       warn (tl::to_string (tr ("Unknown record ignored")));
     }
@@ -674,6 +697,7 @@ MALYReader::read_mask (MALYReaderMaskData &mask)
       read_strgroup (mask.strgroups.back ());
 
     } else if (begin_section (ex)) {
+      warn (tl::to_string (tr ("Unknown section ignored")));
       skip_section ();
     } else {
       warn (tl::to_string (tr ("Unknown record ignored")));
@@ -718,6 +742,9 @@ MALYReader::read_maskset (MALYData &data)
       ex.expect_end ();
       read_mask (cmask);
 
+    } else if (begin_section (ex)) {
+      warn (tl::to_string (tr ("Unknown section ignored")));
+      skip_section ();
     } else {
       warn (tl::to_string (tr ("Unknown record ignored")));
     }
@@ -788,9 +815,9 @@ MALYReader::create_masks (const MALYReaderMaskData &cmask, const std::list<MALYR
       warn (tl::to_string (tr ("No structure placement given - using 'center' for mask: ")) + m.name);
     }
 
-    MALYReaderParametersData::Base array_base = MALYReaderParametersData::BaseNotSet;
+    MALYReaderParametersData::Base array_base = i->parameters.array_base;
     if (array_base == MALYReaderParametersData::BaseNotSet) {
-      array_base = cmask.parameters.base;
+      array_base = cmask.parameters.array_base;
     }
     if (array_base == MALYReaderParametersData::BaseNotSet) {
       array_base = MALYReaderParametersData::Center;

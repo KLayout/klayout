@@ -61,7 +61,7 @@ public:
 /**
  *  @brief A class representing a title field on a mask
  */
-class MALYTitle
+class DB_PUBLIC MALYTitle
 {
 public:
   /**
@@ -138,7 +138,7 @@ public:
 /**
  *  @brief A class representing a structure (pattern) on a mask
  */
-class MALYStructure
+class DB_PUBLIC MALYStructure
 {
 public:
   /**
@@ -220,7 +220,7 @@ public:
 /**
  *  @brief A class representing one mask
  */
-class MALYMask
+class DB_PUBLIC MALYMask
 {
 public:
   /**
@@ -261,7 +261,7 @@ public:
 /**
  *  @brief A class representing the MALY file
  */
-class MALYData
+class DB_PUBLIC MALYData
 {
 public:
   /**

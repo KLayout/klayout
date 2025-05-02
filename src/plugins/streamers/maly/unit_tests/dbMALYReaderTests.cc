@@ -24,6 +24,7 @@
 #include "dbMALYReader.h"
 #include "dbLayoutDiff.h"
 #include "dbWriter.h"
+#include "dbTestSupport.h"
 #include "tlUnitTest.h"
 
 #include <stdlib.h>
@@ -54,7 +55,7 @@ static void run_test (tl::TestBase *_this, const std::string &base, const char *
   options.set_options (opt);
 
   db::Manager m (false);
-  db::Layout layout (&m), layout2 (&m), layout_au (&m);
+  db::Layout layout (&m);
 
   {
     std::string fn (base);
@@ -65,44 +66,74 @@ static void run_test (tl::TestBase *_this, const std::string &base, const char *
     reader.read (layout, options);
   }
 
-  tl_assert (layout.begin_top_down () != layout.end_top_down ());
-  std::string tc_name = layout.cell_name (*layout.begin_top_down ());
+  std::string fn_au (base);
+  fn_au += "/maly/";
+  fn_au += file_au;
 
-  //  normalize the layout by writing to OASIS and reading from ..
+  db::compare_layouts (_this, layout, fn_au, db::WriteOAS);
+}
 
-  std::string tmp_oas_file = _this->tmp_file (tl::sprintf ("%s.oas", tc_name));
+TEST(1_Basic)
+{
+  std::string fn (tl::testdata ());
+  fn += "/maly/MALY_test1.maly";
 
-  {
-    tl::OutputStream stream (tmp_oas_file);
-    db::SaveLayoutOptions options;
-    options.set_format ("OASIS");
-    db::Writer writer (options);
-    writer.write (layout, stream);
-  }
+  tl::InputStream stream (fn);
+  db::MALYReader reader (stream);
 
-  {
-    tl::InputStream stream (tmp_oas_file);
-    db::Reader reader (stream);
-    reader.read (layout2);
-  }
+  db::MALYData data = reader.read_maly_file ();
 
-  {
-    std::string fn (base);
-    fn += "/maly/";
-    fn += file_au;
-    tl::InputStream stream (fn);
-    db::Reader reader (stream);
-    reader.read (layout_au);
-  }
+  EXPECT_EQ (data.to_string (),
+    "Mask A\n"
+    "  Size 127000\n"
+    "    Title \"<SERIAL>\" m90 50,-50 1,1,1 [Standard]\n"
+    "    Title \"<DATE>\" r0 0,-50 1,1,1 [Standard]\n"
+    "    Title \"MaskA1\" r0 -50,50 1,1,1 [Standard]\n"
+    "    Title \"WITH \"QUOTES\"\" m45 50,0 1,1,1 [Standard]\n"
+    "    Ref A1.oas{CHIP_A}(1) (0,0;10,10) m90 *1 20,0\n"
+    "    Ref A2.oas{CHIP_A}(2) ename(e001) dname(d001) (0,0;50,50) m90 *0.8 20,0 [2x5,1x2]\n"
+    "    Ref B3.oas{CHIP_A}(2) (0,0;12,12) m90 *1 20,0"
+  )
+}
 
-  bool equal = db::compare_layouts (layout2, layout_au, db::layout_diff::f_boxes_as_polygons | db::layout_diff::f_verbose | db::layout_diff::f_flatten_array_insts, 1);
-  if (! equal) {
-    _this->raise (tl::sprintf ("Compare failed after reading - see %s vs %s\n", tmp_oas_file, file_au));
+static std::string run_test_with_error (tl::TestBase * /*_this*/, const std::string &file)
+{
+  std::string fn (tl::testdata ());
+  fn += "/maly/";
+  fn += file;
+
+  tl::InputStream stream (fn);
+  db::MALYReader reader (stream);
+
+  try {
+    reader.read_maly_file ();
+    tl_assert (false);
+  } catch (tl::Exception &ex) {
+    tl::error << ex.msg ();
+    return ex.msg ();
   }
 }
 
-TEST(1)
+TEST(2_Errors)
 {
-  run_test (_this, tl::testdata (), "MALY_TEST.maly", "mag_test_au.oas");
+  EXPECT_EQ (run_test_with_error (_this, "MALY_test2a.maly").find ("Line break inside quoted string (line=17,"), size_t (0));
+  EXPECT_EQ (run_test_with_error (_this, "MALY_test2b.maly").find ("/*...*/ comment not closed (line=43,"), size_t (0));
+  EXPECT_EQ (run_test_with_error (_this, "MALY_test2c.maly").find ("Expected value STANDARD or NATIVE for FONT (line=7,"), size_t (0));
+  EXPECT_EQ (run_test_with_error (_this, "MALY_test2d.maly").find ("Unknown base specification: NOVALIDBASE (line=8,"), size_t (0));
+  EXPECT_EQ (run_test_with_error (_this, "MALY_test2e.maly").find ("Expected end of text here: NOVALIDKEY .. (line=15,"), size_t (0));
+  EXPECT_EQ (run_test_with_error (_this, "MALY_test2f.maly").find ("Expected 'Y' or 'NONE' for MIRROR spec (line=15,"), size_t (0));
+  EXPECT_EQ (run_test_with_error (_this, "MALY_test2g.maly").find ("Expected end of text here: UNEXPECTED (line=20,"), size_t (0));
+  EXPECT_EQ (run_test_with_error (_this, "MALY_test2h.maly").find ("Expected value Y or NONE for MASKMIRROR (line=23,"), size_t (0));
+  EXPECT_EQ (run_test_with_error (_this, "MALY_test2i.maly").find ("Expected end of text here: UNEXPECTED (line=29,"), size_t (0));
+  EXPECT_EQ (run_test_with_error (_this, "MALY_test2j.maly").find ("Expected end of text here: NOVALIDKEY .. (line=30,"), size_t (0));
+  EXPECT_EQ (run_test_with_error (_this, "MALY_test2k.maly").find ("Expected a real number here: SCALE 0.80 .. (line=31,"), size_t (0));
+  EXPECT_EQ (run_test_with_error (_this, "MALY_test2l.maly").find ("Expected 'PARAMETER' here: CMASK (line=19,"), size_t (0));
+  EXPECT_EQ (run_test_with_error (_this, "MALY_test2m.maly").find ("Expected 'CMASK' here: TITLE (line=18,"), size_t (0));
+  EXPECT_EQ (run_test_with_error (_this, "MALY_test2n.maly").find ("Header expected ('BEGIN MALY') (line=2, "), size_t (0));
+}
+
+TEST(10_BasicLayout)
+{
+  run_test (_this, tl::testdata (), "MALY_test10.maly", "maly_test10_au.oas");
 }
 

@@ -163,7 +163,7 @@ public:
 
   virtual tl::XMLElementBase *xml_reader_options_element () const
   {
-    return new db::ReaderOptionsXMLElement<db::MALYReaderOptions> ("mag",
+    return new db::ReaderOptionsXMLElement<db::MALYReaderOptions> ("maly",
       tl::make_member (&db::MALYReaderOptions::dbu, "dbu") +
       tl::make_member (&db::MALYReaderOptions::layer_map, "layer-map") +
       tl::make_member (&db::MALYReaderOptions::create_other_layers, "create-other-layers")

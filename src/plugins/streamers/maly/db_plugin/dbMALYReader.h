@@ -230,6 +230,7 @@ private:
   std::list<std::string> m_sections;
 
   void import_data (db::Layout &layout, const MALYData &data);
+  void create_metadata (db::Layout &layout, const MALYData &data);
   tl::Extractor read_record ();
   void unget_record ();
   std::string read_record_internal ();

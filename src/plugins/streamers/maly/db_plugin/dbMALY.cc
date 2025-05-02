@@ -133,7 +133,7 @@ public:
   virtual std::string format_name () const { return "MALY"; }
   virtual std::string format_desc () const { return "MALY jobdeck"; }
   virtual std::string format_title () const { return "MALY (MALY jobdeck format)"; }
-  virtual std::string file_format () const { return "MALY jobdeck files (*.maly *.MALY)"; }
+  virtual std::string file_format () const { return "MALY jobdeck files (*.maly *.MALY *.mly *.MLY)"; }
 
   virtual bool detect (tl::InputStream &s) const 
   {

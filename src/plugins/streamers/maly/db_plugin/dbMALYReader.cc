@@ -99,9 +99,24 @@ MALYReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
 
   MALYData data = read_maly_file ();
   import_data (layout, data);
+  create_metadata (layout, data);
 
   finish_layers (layout);
   return layer_map_out ();
+}
+
+void
+MALYReader::create_metadata (db::Layout &layout, const MALYData &data)
+{
+  tl::Variant boundary_per_mask = tl::Variant::empty_array ();
+
+  for (auto m = data.masks.begin (); m != data.masks.end (); ++m) {
+    double ms = m->size_um;
+    db::DBox box (-0.5 * ms, -0.5 * ms, 0.5 * ms, 0.5 * ms);
+    boundary_per_mask.insert (m->name, box);
+  }
+
+  layout.add_meta_info ("boundary_per_mask", MetaInfo (tl::to_string (tr ("Physical mask boundary per mask name")), boundary_per_mask));
 }
 
 void

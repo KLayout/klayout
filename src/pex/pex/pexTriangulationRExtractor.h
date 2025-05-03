@@ -24,6 +24,7 @@
 #define HDR_pexTriangulationRExtractor
 
 #include "pexCommon.h"
+#include "pexRNetwork.h"
 #include "pexRExtractor.h"
 
 #include "dbPLCTriangulation.h"

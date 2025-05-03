@@ -21,19 +21,9 @@
 */
 
 
-#include "pexRExtractor.h"
+#include "pexRExtractorTech.h"
 
 namespace pex
 {
-
-RExtractor::RExtractor ()
-{
   //  .. nothing yet ..
-}
-
-RExtractor::~RExtractor ()
-{
-  //  .. nothing yet ..
-}
-
 }

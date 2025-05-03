@@ -22,6 +22,7 @@
 
 
 #include "pexRExtractor.h"
+#include "pexRNetwork.h"
 #include "tlUnitTest.h"
 
 TEST(network_basic)

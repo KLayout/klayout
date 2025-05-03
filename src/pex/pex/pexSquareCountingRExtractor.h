@@ -24,6 +24,7 @@
 #define HDR_pexSquareCountingRExtractor
 
 #include "pexCommon.h"
+#include "pexRNetwork.h"
 #include "pexRExtractor.h"
 
 #include "dbPLCConvexDecomposition.h"

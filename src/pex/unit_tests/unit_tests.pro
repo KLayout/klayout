@@ -8,6 +8,7 @@ include($$PWD/../../lib_ut.pri)
 
 SOURCES = \
   pexRExtractorTests.cc \
+  pexRNetExtractorTests.cc \
   pexSquareCountingRExtractorTests.cc \
   pexTriangulationRExtractorTests.cc
 

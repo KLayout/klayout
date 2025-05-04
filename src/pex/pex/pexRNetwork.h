@@ -91,7 +91,7 @@ public:
   /**
    *  @brief Returns a string representation of the node
    */
-  std::string to_string () const;
+  std::string to_string (bool with_coords = false) const;
 
   /**
    *  @brief Gets the network the node lives in
@@ -180,7 +180,7 @@ struct PEX_PUBLIC RElement
   /**
    *  @brief Returns a string representation of the element
    */
-  std::string to_string () const;
+  std::string to_string (bool with_coords = false) const;
 
   /**
    *  @brief Gets the network the node lives in
@@ -357,7 +357,7 @@ public:
   /**
    *  @brief Returns a string representation of the graph
    */
-  std::string to_string () const;
+  std::string to_string (bool with_coords = false) const;
 
 private:
   node_list m_nodes;

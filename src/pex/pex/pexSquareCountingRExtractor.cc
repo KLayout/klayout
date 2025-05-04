@@ -29,6 +29,9 @@
 namespace pex
 {
 
+//  Value used for number of squares for width 0 (should not happen)
+const double infinite_squares = 1e10;
+
 namespace
 {
 
@@ -103,7 +106,7 @@ double calculate_squares (db::Coord x1, db::Coord x2, const std::set<db::Edge> &
   //  integrate the resistance along the axis x1->x2 with w=w1->w2
 
   if (w1 < db::epsilon) {
-    return 1e9; // @@@
+    return infinite_squares;
   } else if (fabs (w1 - w2) < db::epsilon) {
     return (x2 - x1) / w1;
   } else {

@@ -358,7 +358,7 @@ public:
    *  This method will assign a new ID to the given value if required and
    *  return the ID associated with it.
    */
-  property_names_id_type prop_value_id (const tl::Variant &name);
+  property_values_id_type prop_value_id (const tl::Variant &name);
 
   /**
    *  @brief Get the ID for a name

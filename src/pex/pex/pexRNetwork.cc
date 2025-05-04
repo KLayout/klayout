@@ -30,9 +30,10 @@ namespace pex
 // -----------------------------------------------------------------------------
 
 std::string
-RNode::to_string () const
+RNode::to_string (bool with_coords) const
 {
   std::string res;
+
   switch (type) {
   default:
     res += "$" + tl::to_string (port_index);
@@ -44,24 +45,29 @@ RNode::to_string () const
     res += "P" + tl::to_string (port_index);
     break;
   }
+
+  if (with_coords) {
+    res += location.to_string ();
+  }
+
   return res;
 }
 
 // -----------------------------------------------------------------------------
 
 std::string
-RElement::to_string () const
+RElement::to_string (bool with_coords) const
 {
   std::string na;
   if (a ()) {
-    na = a ()->to_string ();
+    na = a ()->to_string (with_coords);
   } else {
     na = "(nil)";
   }
 
   std::string nb;
   if (b ()) {
-    nb = b ()->to_string ();
+    nb = b ()->to_string (with_coords);
   } else {
     nb = "(nil)";
   }
@@ -88,14 +94,14 @@ RNetwork::~RNetwork ()
 }
 
 std::string
-RNetwork::to_string () const
+RNetwork::to_string (bool with_coords) const
 {
   std::string res;
   for (auto e = m_elements.begin (); e != m_elements.end (); ++e) {
     if (! res.empty ()) {
       res += "\n";
     }
-    res += e->to_string ();
+    res += e->to_string (with_coords);
   }
   return res;
 }

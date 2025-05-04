@@ -30,6 +30,7 @@ namespace pex
 {
 
 class RExtractorTech;
+class RExtractorTechVia;
 class RExtractorTechConductor;
 class RNetwork;
 class RNode;
@@ -37,7 +38,7 @@ class RNode;
 /**
  *  @brief Implementation of the R extractor for a multi-polygon/multi-layer net
  */
-class RNetExtractor
+class PEX_PUBLIC RNetExtractor
 {
 public:
   /**
@@ -74,9 +75,7 @@ public:
     RNode *node;
   };
 
-private:
-  double m_dbu;
-
+protected:
   void create_via_ports (const RExtractorTech &tech,
                          const std::map<unsigned int, db::Region> &geo,
                          std::map<unsigned int, std::vector<ViaPort> > &vias,
@@ -90,6 +89,16 @@ private:
                           unsigned int polygon_ports_index_offset,
                           const std::vector<ViaPort> &via_ports,
                           RNetwork &rnetwork);
+
+private:
+  double m_dbu;
+
+  void create_via_port (const RExtractorTechVia &tech,
+                        double conductance,
+                        const db::Polygon &poly,
+                        unsigned int &port_index,
+                        std::map<unsigned int, std::vector<ViaPort> > &vias,
+                        RNetwork &rnetwork);
 };
 
 }

@@ -33,6 +33,7 @@
 #include "dbRegionProcessors.h"
 #include "dbCompoundOperation.h"
 #include "dbPolygonNeighborhood.h"
+#include "dbPropertiesRepository.h"
 
 namespace pex
 {
@@ -121,10 +122,11 @@ class ViaAggregationVisitor
   : public db::PolygonNeighborhoodVisitor
 {
 public:
-  ViaAggregationVisitor (const RExtractorTechVia *via_tech, std::vector<std::pair<double, db::Point> > *conductances, double dbu)
-    : mp_via_tech (via_tech), mp_conductances (conductances), m_dbu (dbu)
+  ViaAggregationVisitor (const RExtractorTechVia *via_tech, double dbu)
+    : mp_via_tech (via_tech), m_dbu (dbu)
   {
-    //  .. nothing yet ..
+    //  this is just for consistency - we actually do not produce output
+    set_result_type (db::CompoundRegionCheckOperationNode::Region);
   }
 
   virtual void neighbors (const db::Layout * /*layout*/, const db::Cell * /*cell*/, const db::PolygonWithProperties &polygon, const neighbors_type &neighbors)
@@ -145,15 +147,44 @@ public:
       }
     }
 
-    mp_conductances->push_back (std::make_pair (c, polygon.box ().center ()));
+    db::PropertiesSet ps;
+    ps.insert (prop_name_id, tl::Variant (c));
+
+    output_polygon (db::PolygonWithProperties (polygon, db::properties_id (ps)));
   }
+
+  static db::property_names_id_type prop_name_id;
 
 private:
   const RExtractorTechVia *mp_via_tech;
   std::vector<std::pair<double, db::Point> > *mp_conductances;
+  db::property_names_id_type m_prop_name_id;
   double m_dbu;
 };
 
+db::property_names_id_type ViaAggregationVisitor::prop_name_id = db::property_names_id (tl::Variant ());
+
+}
+
+void
+RNetExtractor::create_via_port (const pex::RExtractorTechVia &tech,
+                                double conductance,
+                                const db::Polygon &poly,
+                                unsigned int &port_index,
+                                std::map<unsigned int, std::vector<ViaPort> > &vias,
+                                RNetwork &rnetwork)
+{
+  RNode *a = rnetwork.create_node (RNode::Internal, port_index++);
+  RNode *b = rnetwork.create_node (RNode::Internal, port_index++);
+
+  db::CplxTrans to_um (m_dbu);
+  db::Box box = poly.box ();
+  b->location = a->location = to_um * box;
+
+  rnetwork.create_element (conductance, a, b);
+
+  vias[tech.bottom_conductor].push_back (ViaPort (box.center (), a));
+  vias[tech.top_conductor].push_back (ViaPort (box.center (), b));
 }
 
 void
@@ -162,7 +193,7 @@ RNetExtractor::create_via_ports (const RExtractorTech &tech,
                                  std::map<unsigned int, std::vector<ViaPort> > &vias,
                                  RNetwork &rnetwork)
 {
-  std::vector<std::pair<double, db::Point> > via_conductances;
+  unsigned int port_index = 0;
 
   for (auto v = tech.vias.begin (); v != tech.vias.end (); ++v) {
 
@@ -170,8 +201,6 @@ RNetExtractor::create_via_ports (const RExtractorTech &tech,
     if (g == geo.end ()) {
       continue;
     }
-
-    via_conductances.clear ();
 
     if (v->merge_distance > db::epsilon) {
 
@@ -189,29 +218,20 @@ RNetExtractor::create_via_ports (const RExtractorTech &tech,
       children.push_back (new db::CompoundRegionOperationPrimaryNode ());
       children.push_back (new db::CompoundRegionOperationSecondaryNode (const_cast<db::Region *> (&g->second)));
 
-      ViaAggregationVisitor visitor (v.operator-> (), &via_conductances, m_dbu);
+      ViaAggregationVisitor visitor (v.operator-> (), m_dbu);
       db::PolygonNeighborhoodCompoundOperationNode en_node (children, &visitor, 0);
-      merged_vias.cop_to_region (en_node);
+      auto aggregated = merged_vias.cop_to_region (en_node);
+
+      for (auto p = aggregated.begin (); ! p.at_end (); ++p) {
+        double c = db::properties (p.prop_id ()).value (ViaAggregationVisitor::prop_name_id).to_double ();
+        create_via_port (*v, c, *p, port_index, vias, rnetwork);
+      }
 
     } else {
 
       for (auto p = g->second.begin_merged (); ! p.at_end (); ++p) {
-        via_conductances.push_back (std::make_pair (via_conductance (*v, *p, m_dbu), p->box ().center ()));
+        create_via_port (*v, via_conductance (*v, *p, m_dbu), *p, port_index, vias, rnetwork);
       }
-
-    }
-
-    //  create the via resistor elements
-    unsigned int port_index = 0;
-    for (auto vc = via_conductances.begin (); vc != via_conductances.end (); ++vc) {
-
-      RNode *a = rnetwork.create_node (RNode::Internal, port_index++);
-      RNode *b = rnetwork.create_node (RNode::Internal, port_index++);
-
-      rnetwork.create_element (vc->first, a, b);
-
-      vias[v->bottom_conductor].push_back (ViaPort (vc->second, a));
-      vias[v->top_conductor].push_back (ViaPort (vc->second, b));
 
     }
 

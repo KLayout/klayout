@@ -373,7 +373,7 @@ PropertiesRepository::prop_name_id (const tl::Variant &name)
   }
 }
 
-property_names_id_type
+property_values_id_type
 PropertiesRepository::prop_value_id (const tl::Variant &value)
 {
   tl::MutexLocker locker (&m_lock);
@@ -383,9 +383,9 @@ PropertiesRepository::prop_value_id (const tl::Variant &value)
     m_property_values_heap.push_back (value);
     const tl::Variant &new_value = m_property_values_heap.back ();
     m_propvalues.insert (&new_value);
-    return property_names_id_type (&new_value);
+    return property_values_id_type (&new_value);
   } else {
-    return property_names_id_type (*pi);
+    return property_values_id_type (*pi);
   }
 }
 

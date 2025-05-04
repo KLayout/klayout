@@ -38,7 +38,7 @@ public:
   pex::RNode::node_type type () const { return checked_pointer ()->type; }
   db::DBox location () const { return checked_pointer ()->location; }
   unsigned int port_index () const { return checked_pointer ()->port_index; }
-  std::string to_string () const { return checked_pointer ()->to_string (); }
+  std::string to_string (bool with_coords = false) const { return checked_pointer ()->to_string (with_coords); }
 
   size_t obj_id () const
   {
@@ -89,7 +89,7 @@ public:
   RNode *a () const { return RNode::make_node_object (checked_pointer ()->a ()); }
   RNode *b () const { return RNode::make_node_object (checked_pointer ()->b ()); }
 
-  std::string to_string () const { return checked_pointer ()->to_string (); }
+  std::string to_string (bool with_coords = false) const { return checked_pointer ()->to_string (with_coords); }
 
   size_t obj_id () const
   {
@@ -193,8 +193,9 @@ Class<RNode> decl_RNode ("pex", "RNode",
     "ones may represent the same internal object. The 'object_id' is a ID that "
     "indicates the internal object. Same object_id means same node."
   ) +
-  gsi::method ("to_s", &RNode::to_string,
+  gsi::method ("to_s", &RNode::to_string, gsi::arg ("with_coords", false),
     "@brief Returns a string representation of this object\n"
+    "Nodes are printed with coordinates with 'with_coords' is true."
   ) +
   gsi::iterator_ext ("each_element", gsi::return_new_object (), &begin_node_elements, &end_network_elements,
     "@brief Iterates the \\RElement objects attached to the node\n"
@@ -226,8 +227,9 @@ Class<RElement> decl_RElement ("pex", "RElement",
     "ones may represent the same internal object. The 'object_id' is a ID that "
     "indicates the internal object. Same object_id means same element."
   ) +
-  gsi::method ("to_s", &RElement::to_string,
+  gsi::method ("to_s", &RElement::to_string, gsi::arg ("with_coords", false),
     "@brief Returns a string representation of this object\n"
+    "Nodes are printed with coordinates with 'with_coords' is true."
   ) +
   gsi::method ("resistance", &RElement::resistance,
     "@brief Gets the resistance value of the object\n"
@@ -387,8 +389,9 @@ Class<pex::RNetwork> decl_RNetwork ("pex", "RNetwork",
   gsi::method ("num_elements", &pex::RNetwork::num_elements,
     "@brief Gets the number of elements in the network\n"
   ) +
-  gsi::method ("to_s", &pex::RNetwork::to_string,
+  gsi::method ("to_s", &pex::RNetwork::to_string, gsi::arg ("with_coords", false),
     "@brief Returns a string representation of the network\n"
+    "Nodes are printed with coordinates with 'with_coords' is true."
   ),
   "@brief Represents a network of resistors\n"
   "\n"

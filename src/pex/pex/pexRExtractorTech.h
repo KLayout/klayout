@@ -36,7 +36,7 @@ namespace pex
  *  Note that the layers are generic IDs. These are usigned ints specifying
  *  a layer.
  */
-class RExtractorTechVia
+class PEX_PUBLIC RExtractorTechVia
 {
 public:
   RExtractorTechVia ()
@@ -82,7 +82,7 @@ public:
  *  Note that the layers are generic IDs. These are usigned ints specifying
  *  a layer.
  */
-class RExtractorTechConductor
+class PEX_PUBLIC RExtractorTechConductor
 {
 public:
   /**
@@ -147,9 +147,14 @@ public:
 /**
  *  @brief Specifies the extraction parameters
  */
-class RExtractorTech
+class PEX_PUBLIC RExtractorTech
 {
 public:
+  /**
+   *  @brief Constructor
+   */
+  RExtractorTech ();
+
   /**
    *  @brief A list of via definitions
    */
@@ -159,6 +164,11 @@ public:
    *  @brief A list of conductor definitions
    */
   std::list<RExtractorTechConductor> conductors;
+
+  /**
+   *  @brief A flag indicating to skip the simplify step after extraction
+   */
+  bool skip_simplify;
 };
 
 }

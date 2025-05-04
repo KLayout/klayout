@@ -170,6 +170,7 @@ TEST(netex_2layer)
   pex::RNetwork network;
 
   pex::RExtractorTech tech;
+  tech.skip_simplify = true;
 
   pex::RExtractorTechVia via1;
   via1.bottom_conductor = l1;
@@ -228,5 +229,18 @@ TEST(netex_2layer)
     "R $8(10,-3.5;10,-2.7) P1(12.9,-3.4;13.5,-2.8) 1\n"
     "R $7(0.1,0.1;0.7,0.7) V1(0.4,-5.6;0.4,-5.6) 1.875\n"
     "R $1(0.3,-5.7;0.5,-5.5) V1(0.4,-5.6;0.4,-5.6) 0"
+  );
+
+  tech.skip_simplify = false;
+
+  rex.extract (tech, geo, vertex_ports, polygon_ports, network);
+
+  EXPECT_EQ (network.to_string (true),
+    "R $2(9.3,-5.9;9.9,-5.3) P0(12.9,-5.9;13.5,-5.3) 2.25\n"
+    "R $8(10,-3.5;10,-2.7) P1(12.9,-3.4;13.5,-2.8) 1\n"
+    "R $2(9.3,-5.9;9.9,-5.3) V1(0.3,-5.7;0.5,-5.5) 55.75\n"
+    "R $2(9.3,-5.9;9.9,-5.3) $8(10,-3.5;10,-2.7) 13.2813\n"
+    "R $8(10,-3.5;10,-2.7) V0(5.2,0.4;5.2,0.4) 28.7812\n"
+    "R V0(5.2,0.4;5.2,0.4) V1(0.3,-5.7;0.5,-5.5) 17.375"
   );
 }

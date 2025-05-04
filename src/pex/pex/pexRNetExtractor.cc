@@ -101,6 +101,10 @@ RNetExtractor::extract (const RExtractorTech &tech,
     extract_conductor (*cond, g->second, vp, vp_offset, pp, pp_offset, viap, rnetwork);
 
   }
+
+  if (! tech.skip_simplify) {
+    rnetwork.simplify ();
+  }
 }
 
 static double

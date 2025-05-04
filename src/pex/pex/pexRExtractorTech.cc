@@ -25,5 +25,11 @@
 
 namespace pex
 {
+
+RExtractorTech::RExtractorTech ()
+  : skip_simplify (false)
+{
   //  .. nothing yet ..
+}
+
 }

@@ -61,7 +61,7 @@ TEST(basic)
   v1->set_is_precious (true, 1);
   EXPECT_EQ (v1->is_precious (), true);
   EXPECT_EQ (v1->ids ().size (), 2u);
-  EXPECT_EQ (*v1->ids ().begin (), 2u);
+  EXPECT_EQ (*v1->ids ().begin (), 1u);
 }
 
 TEST(edge)

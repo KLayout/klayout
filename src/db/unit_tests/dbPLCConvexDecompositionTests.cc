@@ -145,7 +145,7 @@ TEST(internal_vertex)
 
   std::vector<std::string> ip;
   for (size_t i = 0; i < p->internal_vertexes (); ++i) {
-    ip.push_back (p->internal_vertex (i)->to_string () + "#" + tl::to_string (p->internal_vertex (i)->ids ()));
+    ip.push_back (p->internal_vertex (i)->to_string () + "#" + tl::join (p->internal_vertex (i)->ids ().begin (), p->internal_vertex (i)->ids ().end (), ","));
   }
   std::sort (ip.begin (), ip.end ());
   EXPECT_EQ (tl::join (ip, "/"), "(0, 0)#2/(0, 0.05)#0/(0.2, 0.07)#1");

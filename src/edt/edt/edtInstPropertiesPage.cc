@@ -925,7 +925,7 @@ InstPropertiesPage::do_apply (bool current_only, bool relative)
 }
 
 void 
-InstPropertiesPage::apply ()
+InstPropertiesPage::apply (bool /*commit*/)
 {
   do_apply (true, false);
 }
@@ -937,7 +937,7 @@ InstPropertiesPage::can_apply_to_all () const
 }
 
 void 
-InstPropertiesPage::apply_to_all (bool relative)
+InstPropertiesPage::apply_to_all (bool relative, bool /*commit*/)
 {
   do_apply (false, relative);
 }

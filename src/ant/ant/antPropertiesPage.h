@@ -50,7 +50,7 @@ public:
   virtual void update ();
   virtual void leave ();
   virtual bool readonly ();
-  virtual void apply ();
+  virtual void apply (bool commit);
 
 private slots:
   void swap_points_clicked ();

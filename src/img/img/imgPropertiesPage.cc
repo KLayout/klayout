@@ -784,7 +784,7 @@ PropertiesPage::reverse_color_order ()
 }
 
 void 
-PropertiesPage::apply ()
+PropertiesPage::apply (bool /*commit*/)
 {
   bool has_error = false;
 
@@ -915,7 +915,7 @@ PropertiesPage::browse ()
 {
 BEGIN_PROTECTED
 
-  apply ();
+  apply (true);
 
   lay::FileDialog file_dialog (this, tl::to_string (QObject::tr ("Load Image File")), tl::to_string (QObject::tr ("All files (*)")));
 
@@ -941,7 +941,7 @@ PropertiesPage::save_pressed ()
 {
 BEGIN_PROTECTED
 
-  apply ();
+  apply (true);
 
   lay::FileDialog file_dialog (this, tl::to_string (QObject::tr ("Save As KLayout Image File")), tl::to_string (QObject::tr ("KLayout image files (*.lyimg);;All files (*)")));
 

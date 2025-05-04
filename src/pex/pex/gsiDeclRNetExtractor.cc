@@ -315,7 +315,7 @@ Class<pex::RExtractorTech> decl_RExtractorTech ("pex", "RExtractorTech",
     "@brief Sets a value indicating whether to skip the simplify step\n"
     "See \\skip_simplify for a description of this attribute."
   ) +
-  gsi::method_ext ("each_via", &tech_begin_vias, &tech_end_vias,
+  gsi::iterator_ext ("each_via", &tech_begin_vias, &tech_end_vias,
     "@brief Iterates the list of via definitions\n"
   ) +
   gsi::method_ext ("clear_vias", &tech_clear_vias,
@@ -324,7 +324,7 @@ Class<pex::RExtractorTech> decl_RExtractorTech ("pex", "RExtractorTech",
   gsi::method_ext ("add_via", &tech_add_via, gsi::arg ("via"),
     "@brief Adds the given via definition to the list of vias\n"
   ) +
-  gsi::method_ext ("each_conductor", &tech_begin_conductors, &tech_end_conductors,
+  gsi::iterator_ext ("each_conductor", &tech_begin_conductors, &tech_end_conductors,
     "@brief Iterates the list of conductor definitions\n"
   ) +
   gsi::method_ext ("clear_conductors", &tech_clear_conductors,

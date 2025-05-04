@@ -7,6 +7,8 @@ include($$PWD/../../lib.pri)
 DEFINES += MAKE_PEX_LIBRARY
 
 SOURCES = \
+  gsiDeclRNetExtractor.cc \
+  gsiDeclRNetwork.cc \
   pexForceLink.cc \
   pexRExtractor.cc \
   gsiDeclRExtractor.cc \

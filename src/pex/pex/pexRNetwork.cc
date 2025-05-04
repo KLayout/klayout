@@ -33,17 +33,22 @@ std::string
 RNode::to_string (bool with_coords) const
 {
   std::string res;
-
   switch (type) {
   default:
-    res += "$" + tl::to_string (port_index);
+    res += "$";
     break;
   case VertexPort:
-    res += "V" + tl::to_string (port_index);
+    res += "V";
     break;
   case PolygonPort:
-    res += "P" + tl::to_string (port_index);
+    res += "P";
     break;
+  }
+
+  res += tl::to_string (port_index);
+  if (layer > 0) {
+    res += ".";
+    res += tl::to_string (layer);
   }
 
   if (with_coords) {
@@ -116,27 +121,27 @@ RNetwork::clear ()
 }
 
 RNode *
-RNetwork::create_node (RNode::node_type type, unsigned int port_index)
+RNetwork::create_node (RNode::node_type type, unsigned int port_index, unsigned int layer)
 {
   if (type != RNode::Internal) {
 
-    auto i = m_nodes_by_type.find (std::make_pair (type, port_index));
+    auto i = m_nodes_by_type.find (std::make_pair (type, std::make_pair (port_index, layer)));
     if (i != m_nodes_by_type.end ()) {
 
       return i->second;
 
     } else {
 
-      RNode *new_node = new RNode (this, type, db::DBox (), port_index);
+      RNode *new_node = new RNode (this, type, db::DBox (), port_index, layer);
       m_nodes.push_back (new_node);
-      m_nodes_by_type.insert (std::make_pair (std::make_pair (type, port_index), new_node));
+      m_nodes_by_type.insert (std::make_pair (std::make_pair (type, std::make_pair (port_index, layer)), new_node));
 
       return new_node;
     }
 
   } else {
 
-    RNode *new_node = new RNode (this, type, db::DBox (), port_index);
+    RNode *new_node = new RNode (this, type, db::DBox (), port_index, layer);
     m_nodes.push_back (new_node);
     return new_node;
 

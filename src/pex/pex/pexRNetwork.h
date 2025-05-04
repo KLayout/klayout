@@ -81,6 +81,13 @@ public:
   unsigned int port_index;
 
   /**
+   *  @brief An index locating the node in a layer
+   *
+   *  For internal nodes, the layer is 0.
+   */
+  unsigned int layer;
+
+  /**
    *  @brief Gets the R elements connected to this node
    */
   const std::list<const RElement *> &elements () const
@@ -106,8 +113,8 @@ protected:
   friend class RElement;
   friend class tl::list_impl<RNode, false>;
 
-  RNode (RNetwork *network, node_type _type, const db::DBox &_location, unsigned int _port_index)
-    : type (_type), location (_location), port_index (_port_index), mp_network (network)
+  RNode (RNetwork *network, node_type _type, const db::DBox &_location, unsigned int _port_index, unsigned int _layer)
+    : type (_type), location (_location), port_index (_port_index), layer (_layer), mp_network (network)
   { }
 
   ~RNode () { }
@@ -249,7 +256,7 @@ public:
    *  or port index already. This avoids creating duplicates
    *  for the same port.
    */
-  RNode *create_node (RNode::node_type type, unsigned int port_index);
+  RNode *create_node (RNode::node_type type, unsigned int port_index, unsigned int layer);
 
   /**
    *  @brief Creates a new element between the given nodes
@@ -363,7 +370,7 @@ private:
   node_list m_nodes;
   element_list m_elements;
   std::map<std::pair<RNode *, RNode *>, RElement *> m_elements_by_nodes;
-  std::map<std::pair<RNode::node_type, unsigned int>, RNode *> m_nodes_by_type;
+  std::map<std::pair<RNode::node_type, std::pair<unsigned int, unsigned int> >, RNode *> m_nodes_by_type;
 
   RNetwork (const RNetwork &);
   RNetwork &operator= (const RNetwork &);

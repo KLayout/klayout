@@ -287,7 +287,7 @@ SquareCountingRExtractor::extract (const db::Polygon &polygon, const std::vector
     for (auto p = ports.begin (); p != ports.end (); ++p) {
       auto n4p = nodes_for_ports.find (p->first);
       if (n4p == nodes_for_ports.end ()) {
-        pex::RNode *node = rnetwork.create_node (p->first.type, p->first.port_index);
+        pex::RNode *node = rnetwork.create_node (p->first.type, p->first.port_index, 0);
         node->location = to_um * p->first.location;
         n4p = nodes_for_ports.insert (std::make_pair (p->first, node)).first;
       }

@@ -97,10 +97,10 @@ public:
     SquareCounting = 0,
 
     /**
-     *  @brief The triangulation algorithm
+     *  @brief The tesselation algorithm
      *  This algorithm is suitable to "large" sheets, specifically substrate.
      */
-    Triangulation = 1
+    Tesselation = 1
   };
 
   /**

@@ -84,9 +84,7 @@ protected:
   void extract_conductor (const RExtractorTechConductor &cond,
                           const db::Region &region,
                           const std::vector<db::Point> &vertex_ports,
-                          unsigned int vertex_ports_index_offset,
                           const std::vector<db::Polygon> &polygon_ports,
-                          unsigned int polygon_ports_index_offset,
                           const std::vector<ViaPort> &via_ports,
                           RNetwork &rnetwork);
 

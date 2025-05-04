@@ -69,7 +69,7 @@ TEST(basic)
 
   std::vector<std::pair<TestableSquareCountingRExtractor::PortDefinition, pex::RNode *> > ports;
   for (auto pd = pds.begin (); pd != pds.end (); ++pd) {
-    ports.push_back (std::make_pair (*pd, rn.create_node (pd->type, pd->port_index)));
+    ports.push_back (std::make_pair (*pd, rn.create_node (pd->type, pd->port_index, 0)));
   }
 
   rex.do_extract (poly, ports, rn);
@@ -90,7 +90,7 @@ TEST(basic)
 
   ports.clear ();
   for (auto pd = pds.begin (); pd != pds.end (); ++pd) {
-    ports.push_back (std::make_pair (*pd, rn.create_node (pd->type, pd->port_index)));
+    ports.push_back (std::make_pair (*pd, rn.create_node (pd->type, pd->port_index, 0)));
     ports.back ().first.location.transform (r90);
   }
 

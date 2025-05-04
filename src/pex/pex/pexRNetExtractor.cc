@@ -69,19 +69,6 @@ RNetExtractor::extract (const RExtractorTech &tech,
       continue;
     }
 
-    //  Compute the offsets for the port indexes
-    //  The port indexes are assigned incrementally, so the first index of a port
-    //  for layer n is:
-    //    size(ports for layer 0) + ... + size(ports for layer n-1)
-    //  (size is 0 for empty port list)
-    unsigned int vp_offset = 0, pp_offset = 0;
-    for (auto p = vertex_ports.begin (); p != vertex_ports.end () && p->first < g->first; ++p) {
-      vp_offset += p->second.size ();
-    }
-    for (auto p = polygon_ports.begin (); p != polygon_ports.end () && p->first < g->first; ++p) {
-      pp_offset += p->second.size ();
-    }
-
     //  fetch the port list for vertex ports
     auto ivp = vertex_ports.find (g->first);
     static std::vector<db::Point> empty_vertex_ports;
@@ -98,7 +85,7 @@ RNetExtractor::extract (const RExtractorTech &tech,
     const std::vector<ViaPort> &viap = iviap == via_ports.end () ? empty_via_ports : iviap->second;
 
     //  extract the conductor polygon and integrate the results into the target network
-    extract_conductor (*cond, g->second, vp, vp_offset, pp, pp_offset, viap, rnetwork);
+    extract_conductor (*cond, g->second, vp, pp, viap, rnetwork);
 
   }
 
@@ -178,8 +165,8 @@ RNetExtractor::create_via_port (const pex::RExtractorTechVia &tech,
                                 std::map<unsigned int, std::vector<ViaPort> > &vias,
                                 RNetwork &rnetwork)
 {
-  RNode *a = rnetwork.create_node (RNode::Internal, port_index++);
-  RNode *b = rnetwork.create_node (RNode::Internal, port_index++);
+  RNode *a = rnetwork.create_node (RNode::Internal, port_index++, tech.bottom_conductor);
+  RNode *b = rnetwork.create_node (RNode::Internal, port_index++, tech.top_conductor);
 
   db::CplxTrans to_um (m_dbu);
   db::Box box = poly.box ();
@@ -266,9 +253,7 @@ class ExtractingReceiver
 public:
   ExtractingReceiver (const RExtractorTechConductor *cond,
                       const std::vector<db::Point> *vertex_ports,
-                      unsigned int vertex_port_index_offset,
                       const std::vector<db::Polygon> *polygon_ports,
-                      unsigned int polygon_port_index_offset,
                       const std::vector<RNetExtractor::ViaPort> *via_ports,
                       double dbu,
                       RNetwork *rnetwork)
@@ -277,8 +262,6 @@ public:
       mp_polygon_ports (polygon_ports),
       mp_via_ports (via_ports),
       m_next_internal_port_index (0),
-      m_vertex_port_index_offset (vertex_port_index_offset),
-      m_polygon_port_index_offset (polygon_port_index_offset),
       m_dbu (dbu),
       mp_rnetwork (rnetwork)
   {
@@ -316,8 +299,6 @@ private:
   const std::vector<RNetExtractor::ViaPort> *mp_via_ports;
   std::map<size_t, RNode *> m_id_to_node;
   unsigned int m_next_internal_port_index;
-  unsigned int m_vertex_port_index_offset;
-  unsigned int m_polygon_port_index_offset;
   double m_dbu;
   RNetwork *mp_rnetwork;
 
@@ -355,7 +336,7 @@ private:
         rex.extract (poly, local_vertex_ports, local_polygon_ports, local_network);
       }
       break;
-    case RExtractorTechConductor::Triangulation:
+    case RExtractorTechConductor::Tesselation:
       {
         pex::TriangulationRExtractor rex (m_dbu);
         rex.extract (poly, local_vertex_ports, local_polygon_ports, local_network);
@@ -380,7 +361,7 @@ private:
       if (local->type == RNode::Internal) {
 
         //  for internal nodes always create a node in the target network
-        global = mp_rnetwork->create_node (local->type, ++m_next_internal_port_index);
+        global = mp_rnetwork->create_node (local->type, ++m_next_internal_port_index, mp_cond->layer);
         global->location = local->location;
 
       } else if (local->type == RNode::VertexPort) {
@@ -395,7 +376,7 @@ private:
           global = i2n->second;
         } else {
           if (type_from_id (id) == 0) {  // vertex port
-            global = mp_rnetwork->create_node (RNode::VertexPort, index_from_id (id) + m_vertex_port_index_offset);
+            global = mp_rnetwork->create_node (RNode::VertexPort, index_from_id (id), mp_cond->layer);
             global->location = local->location;
           } else if (type_from_id (id) == 1) {  // via port
             global = (*mp_via_ports) [index_from_id (id)].node;
@@ -414,7 +395,7 @@ private:
         if (i2n != m_id_to_node.end ()) {
           global = i2n->second;
         } else {
-          global = mp_rnetwork->create_node (RNode::PolygonPort, index_from_id (id) + m_polygon_port_index_offset);
+          global = mp_rnetwork->create_node (RNode::PolygonPort, index_from_id (id), mp_cond->layer);
           global->location = local->location;
           m_id_to_node.insert (std::make_pair (id, global));
         }
@@ -455,9 +436,7 @@ void
 RNetExtractor::extract_conductor (const RExtractorTechConductor &cond,
                                   const db::Region &region,
                                   const std::vector<db::Point> &vertex_ports,
-                                  unsigned int vertex_ports_index_offset,
                                   const std::vector<db::Polygon> &polygon_ports,
-                                  unsigned int polygon_ports_index_offset,
                                   const std::vector<ViaPort> &via_ports,
                                   RNetwork &rnetwork)
 {
@@ -490,7 +469,7 @@ RNetExtractor::extract_conductor (const RExtractorTechConductor &cond,
     scanner.insert2 (&box_heap.back (), make_id (i - polygon_ports.begin (), 2));
   }
 
-  ExtractingReceiver rec (&cond, &vertex_ports, vertex_ports_index_offset, &polygon_ports, polygon_ports_index_offset, &via_ports, m_dbu, &rnetwork);
+  ExtractingReceiver rec (&cond, &vertex_ports, &polygon_ports, &via_ports, m_dbu, &rnetwork);
   scanner.process (rec, 0, db::box_convert<db::Polygon> (), db::box_convert<db::Box> ());
 }
 

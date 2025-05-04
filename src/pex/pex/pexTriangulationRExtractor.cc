@@ -148,7 +148,7 @@ TriangulationRExtractor::extract (const db::Polygon &polygon, const std::vector<
         if (pn != pport_nodes.end ()) {
           n = pn->second;
         } else {
-          n = rnetwork.create_node (pex::RNode::PolygonPort, port_index);
+          n = rnetwork.create_node (pex::RNode::PolygonPort, port_index, 0);
           pport_nodes.insert (std::make_pair (port_index, n));
           n->location = trans * polygon_ports [port_index].box ();
         }
@@ -158,7 +158,7 @@ TriangulationRExtractor::extract (const db::Polygon &polygon, const std::vector<
         for (auto pi = vertex->ids ().begin (); pi != vertex->ids ().end (); ++pi) {
           size_t port_index = size_t (*pi);
           if (port_index < vertex_ports.size ()) {
-            RNode *nn = rnetwork.create_node (pex::RNode::VertexPort, port_index);
+            RNode *nn = rnetwork.create_node (pex::RNode::VertexPort, port_index, 0);
             nn->location = db::DBox (*vertex, *vertex);
             if (n) {
               //  in case of multiple vertexes on the same spot, short them
@@ -172,7 +172,7 @@ TriangulationRExtractor::extract (const db::Polygon &polygon, const std::vector<
 
       } else {
 
-        n = rnetwork.create_node (pex::RNode::Internal, internal_node_id++);
+        n = rnetwork.create_node (pex::RNode::Internal, internal_node_id++, 0);
         n->location = db::DBox (*vertex, *vertex);
 
       }
@@ -204,7 +204,7 @@ TriangulationRExtractor::extract (const db::Polygon &polygon, const std::vector<
         if (ip != pport_nodes.end ()) {
 
           //  create a new vertex port and short it to the polygon port
-          auto n = rnetwork.create_node (pex::RNode::VertexPort, iv);
+          auto n = rnetwork.create_node (pex::RNode::VertexPort, iv, 0);
           n->location = db::DBox (trans * vp, trans * vp);
           rnetwork.create_element (pex::RElement::short_value (), n, ip->second);
 

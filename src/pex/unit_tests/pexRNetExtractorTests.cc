@@ -137,3 +137,84 @@ TEST(netex_viagen2)
     "R $10(0.6,4.9;1.2,5.1) $11(0.6,4.9;1.2,5.1) 25"
   );
 }
+
+TEST(netex_2layer)
+{
+  db::Layout ly;
+
+  {
+    std::string fn = tl::testdata () + "/pex/netex_test1.gds";
+    tl::InputStream is (fn);
+    db::Reader reader (is);
+    reader.read (ly);
+  }
+
+  TestableRNetExtractor rex (ly.dbu ());
+
+  auto tc = ly.cell_by_name ("TOP");
+  tl_assert (tc.first);
+
+  unsigned int l1  = ly.get_layer (db::LayerProperties (1, 0));
+  unsigned int l1p = ly.get_layer (db::LayerProperties (1, 1));
+  unsigned int l1v = ly.get_layer (db::LayerProperties (1, 2));
+  unsigned int l2  = ly.get_layer (db::LayerProperties (2, 0));
+  unsigned int l3  = ly.get_layer (db::LayerProperties (3, 0));
+  unsigned int l3p = ly.get_layer (db::LayerProperties (3, 1));
+  unsigned int l3v = ly.get_layer (db::LayerProperties (3, 2));
+
+  std::map<unsigned int, db::Region> geo;
+  geo.insert (std::make_pair (l1, db::Region (db::RecursiveShapeIterator (ly, ly.cell (tc.second), l1))));
+  geo.insert (std::make_pair (l2, db::Region (db::RecursiveShapeIterator (ly, ly.cell (tc.second), l2))));
+  geo.insert (std::make_pair (l3, db::Region (db::RecursiveShapeIterator (ly, ly.cell (tc.second), l3))));
+
+  pex::RNetwork network;
+
+  pex::RExtractorTech tech;
+
+  pex::RExtractorTechVia via1;
+  via1.bottom_conductor = l1;
+  via1.cut_layer = l2;
+  via1.top_conductor = l3;
+  via1.resistance = 2.0;
+  via1.merge_distance = 0.2;
+  tech.vias.push_back (via1);
+
+  pex::RExtractorTechConductor cond1;
+  cond1.layer = l1;
+  cond1.resistance = 0.5;
+  tech.conductors.push_back (cond1);
+
+  pex::RExtractorTechConductor cond2;
+  cond2.layer = l3;
+  cond2.resistance = 0.25;
+  tech.conductors.push_back (cond2);
+
+  std::map<unsigned int, std::vector<db::Point> > vertex_ports;
+  std::map<unsigned int, std::vector<db::Polygon> > polygon_ports;
+
+  db::Region l1p_region (db::RecursiveShapeIterator (ly, ly.cell (tc.second), l1p));
+  for (auto p = l1p_region.begin_merged (); ! p.at_end (); ++p) {
+    polygon_ports[l1].push_back (*p);
+  }
+
+  db::Region l3p_region (db::RecursiveShapeIterator (ly, ly.cell (tc.second), l3p));
+  for (auto p = l3p_region.begin_merged (); ! p.at_end (); ++p) {
+    polygon_ports[l3].push_back (*p);
+  }
+
+  db::Region l1v_region (db::RecursiveShapeIterator (ly, ly.cell (tc.second), l1v));
+  for (auto p = l1v_region.begin_merged (); ! p.at_end (); ++p) {
+    vertex_ports[l1].push_back (p->box ().center ());
+  }
+
+  db::Region l3v_region (db::RecursiveShapeIterator (ly, ly.cell (tc.second), l3v));
+  for (auto p = l3v_region.begin_merged (); ! p.at_end (); ++p) {
+    vertex_ports[l3].push_back (p->box ().center ());
+  }
+
+  rex.extract (tech, geo, vertex_ports, polygon_ports, network);
+
+  EXPECT_EQ (network.to_string (true),
+    ""
+  );
+}

@@ -181,7 +181,8 @@ SquareCountingRExtractor::extract (const db::Polygon &polygon, const std::vector
 {
   rnetwork.clear ();
 
-  db::CplxTrans trans = db::CplxTrans (m_dbu) * db::ICplxTrans (db::Trans (db::Point () - polygon.box ().center ()));
+  db::CplxTrans to_um (m_dbu);
+  db::CplxTrans trans = to_um * db::ICplxTrans (db::Trans (db::Point () - polygon.box ().center ()));
   auto inv_trans = trans.inverted ();
 
   db::plc::Graph plc;
@@ -285,7 +286,7 @@ SquareCountingRExtractor::extract (const db::Polygon &polygon, const std::vector
       auto n4p = nodes_for_ports.find (p->first);
       if (n4p == nodes_for_ports.end ()) {
         pex::RNode *node = rnetwork.create_node (p->first.type, p->first.port_index);
-        node->location = trans * p->first.location;
+        node->location = to_um * p->first.location;
         n4p = nodes_for_ports.insert (std::make_pair (p->first, node)).first;
       }
       p->second = n4p->second;

@@ -79,7 +79,7 @@ RNetExtractor::extract (const RExtractorTech &tech,
       vp_offset += p->second.size ();
     }
     for (auto p = polygon_ports.begin (); p != polygon_ports.end () && p->first < g->first; ++p) {
-      vp_offset += p->second.size ();
+      pp_offset += p->second.size ();
     }
 
     //  fetch the port list for vertex ports
@@ -377,6 +377,7 @@ private:
 
         //  for internal nodes always create a node in the target network
         global = mp_rnetwork->create_node (local->type, ++m_next_internal_port_index);
+        global->location = local->location;
 
       } else if (local->type == RNode::VertexPort) {
 
@@ -409,7 +410,7 @@ private:
         if (i2n != m_id_to_node.end ()) {
           global = i2n->second;
         } else {
-          global = mp_rnetwork->create_node (RNode::VertexPort, index_from_id (id) + m_polygon_port_index_offset);
+          global = mp_rnetwork->create_node (RNode::PolygonPort, index_from_id (id) + m_polygon_port_index_offset);
           global->location = local->location;
           m_id_to_node.insert (std::make_pair (id, global));
         }
@@ -422,7 +423,7 @@ private:
     }
 
     //  create the R elements in the target network
-    for (auto e = local_network.begin_elements (); e != local_network.begin_elements (); ++e) {
+    for (auto e = local_network.begin_elements (); e != local_network.end_elements (); ++e) {
 
       const RElement *local = e.operator-> ();
 
@@ -431,7 +432,14 @@ private:
       tl_assert (ia != n2n.end ());
       tl_assert (ia != n2n.end ());
 
-      mp_rnetwork->create_element (local->conductance, ia->second, ib->second);
+      double c;
+      if (mp_cond->resistance < 1e-10) {
+        c = RElement::short_value ();
+      } else {
+        c = local->conductance / mp_cond->resistance;
+      }
+
+      mp_rnetwork->create_element (c, ia->second, ib->second);
 
     }
   }

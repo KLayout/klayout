@@ -1118,11 +1118,29 @@ TEST(triangulate_with_vertexes)
     EXPECT_EQ (vp, 0);
   }
 
+  //  normal triangulation
   vertexes.clear ();
   vertexes.push_back (db::Point (50, 50));
   tri.triangulate (poly, vertexes, param, trans);
 
-  EXPECT_EQ (plc.to_string (), "((-0.45, 0), (-0.5, -0.05), (-0.5, 0.05)), ((0.5, 0.05), (-0.45, 0), (-0.5, 0.05)), ((-0.45, 0), (0.5, -0.05), (-0.5, -0.05)), ((-0.45, 0), (0.5, 0.05), (0.5, -0.05))");
+  EXPECT_EQ (plc.to_string (), "((-0.5, -0.05), (-0.5, 0.05), (-0.45, 0)), ((-0.5, 0.05), (0.5, 0.05), (-0.45, 0)), ((0.5, -0.05), (-0.45, 0), (0.5, 0.05)), ((0.5, -0.05), (-0.5, -0.05), (-0.45, 0))");
+
+  for (auto v = vertexes.begin (); v != vertexes.end (); ++v) {
+    auto *vp = tri.find_vertex_for_point (trans * *v);
+    if (! vp) {
+      tl::warn << "Vertex not present in output: " << v->to_string ();
+      EXPECT_EQ (1, 0);
+    }
+  }
+
+  //  linear chain of vertexes must not break triangulation
+  vertexes.clear ();
+  vertexes.push_back (db::Point (50, 50));
+  vertexes.push_back (db::Point (100, 50));
+  vertexes.push_back (db::Point (150, 50));
+  tri.triangulate (poly, vertexes, param, trans);
+
+  EXPECT_EQ (plc.to_string (), "((-0.5, -0.05), (-0.5, 0.05), (-0.45, 0)), ((-0.4, 0), (-0.45, 0), (-0.5, 0.05)), ((-0.5, -0.05), (-0.45, 0), (-0.4, 0)), ((0.5, -0.05), (-0.35, 0), (0.5, 0.05)), ((-0.5, -0.05), (-0.35, 0), (0.5, -0.05)), ((-0.5, -0.05), (-0.4, 0), (-0.35, 0)), ((-0.35, 0), (-0.5, 0.05), (0.5, 0.05)), ((-0.35, 0), (-0.4, 0), (-0.5, 0.05))");
 
   for (auto v = vertexes.begin (); v != vertexes.end (); ++v) {
     auto *vp = tri.find_vertex_for_point (trans * *v);
@@ -1139,7 +1157,7 @@ TEST(triangulate_with_vertexes)
   tri.triangulate (poly, vertexes, param, trans);
 
   EXPECT_GT (plc.num_polygons (), size_t (380));
-  EXPECT_LT (plc.num_polygons (), size_t (400));
+  EXPECT_LT (plc.num_polygons (), size_t (420));
 
   for (auto t = plc.begin (); t != plc.end (); ++t) {
     EXPECT_LE (t->area (), param.max_area);

@@ -468,14 +468,14 @@ RNetExtractor::extract_conductor (const RExtractorTechConductor &cond,
 
   //  type 0 objects (vertex ports)
   for (auto i = vertex_ports.begin (); i != vertex_ports.end (); ++i) {
-    // @@@ could be without enlarge?
+    //  TODO: could be without enlarge?
     box_heap.push_back (db::Box (*i, *i).enlarged (db::Vector (1, 1)));
     scanner.insert2 (&box_heap.back (), make_id (i - vertex_ports.begin (), 0));
   }
 
   //  type 1 objects (via ports)
   for (auto i = via_ports.begin (); i != via_ports.end (); ++i) {
-    // @@@ could be without enlarge?
+    //  TODO: could be without enlarge?
     box_heap.push_back (db::Box (i->position, i->position).enlarged (db::Vector (1, 1)));
     scanner.insert2 (&box_heap.back (), make_id (i - via_ports.begin (), 1));
   }

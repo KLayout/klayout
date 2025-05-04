@@ -43,47 +43,58 @@ namespace plc
 //  Vertex implementation
 
 Vertex::Vertex (Graph *graph)
-  : DPoint (), mp_graph (graph), m_is_precious (false)
+  : DPoint (), mp_graph (graph), mp_ids (0)
 {
   //  .. nothing yet ..
 }
 
 Vertex::Vertex (Graph *graph, const db::DPoint &p)
-  : DPoint (p), mp_graph (graph), m_is_precious (false)
+  : DPoint (p), mp_graph (graph), mp_ids (0)
 {
   //  .. nothing yet ..
 }
 
 Vertex::Vertex (Graph *graph, const Vertex &v)
-  : DPoint (), mp_graph (graph), m_is_precious (false), m_id (0)
+  : DPoint (), mp_graph (graph), mp_ids (0)
 {
   operator= (v);
 }
 
 Vertex::Vertex (Graph *graph, db::DCoord x, db::DCoord y)
-  : DPoint (x, y), mp_graph (graph), m_is_precious (false), m_id (0)
+  : DPoint (x, y), mp_graph (graph), mp_ids (0)
 {
   //  .. nothing yet ..
 }
 
 Vertex::Vertex (const Vertex &v)
-  : DPoint (v), mp_graph (v.mp_graph), m_is_precious (v.m_is_precious), m_id (v.m_id)
+  : DPoint (), mp_graph (v.mp_graph), mp_ids (0)
 {
-  //  NOTE: edges are not copied!
+  operator= (v);
 }
 
 Vertex::~Vertex ()
 {
-  //  .. nothing yet ..
+  if (mp_ids) {
+    delete mp_ids;
+    mp_ids = 0;
+  }
 }
 
 Vertex &Vertex::operator= (const Vertex &v)
 {
   if (this != &v) {
+
     //  NOTE: edges are not copied!
     db::DPoint::operator= (v);
-    m_is_precious = v.m_is_precious;
-    m_id = v.m_id;
+
+    if (mp_ids) {
+      delete mp_ids;
+      mp_ids = 0;
+    }
+    if (v.mp_ids) {
+      mp_ids = new std::set<unsigned int> (*v.mp_ids);
+    }
+
   }
   return *this;
 }
@@ -97,6 +108,39 @@ Vertex::is_outside () const
     }
   }
   return false;
+}
+
+void
+Vertex::set_is_precious (bool f, unsigned int id)
+{
+  if (f) {
+    if (! mp_ids) {
+      mp_ids = new std::set<unsigned int> ();
+    }
+    mp_ids->insert (id);
+  } else {
+    if (mp_ids) {
+      delete mp_ids;
+      mp_ids = 0;
+    }
+  }
+}
+
+bool
+Vertex::is_precious () const
+{
+  return mp_ids != 0;
+}
+
+const std::set<unsigned int> &
+Vertex::ids () const
+{
+  if (mp_ids != 0) {
+    return *mp_ids;
+  } else {
+    static std::set<unsigned int> empty;
+    return empty;
+  }
 }
 
 std::vector<Polygon *>

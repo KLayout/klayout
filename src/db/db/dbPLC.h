@@ -131,16 +131,12 @@ public:
    *
    *  "precious" vertexes are not removed during triangulation for example.
    */
-  void set_is_precious (bool f, unsigned int id)
-  {
-    m_is_precious = f;
-    m_id = id;
-  }
+  void set_is_precious (bool f, unsigned int id);
 
   /**
    *  @brief Gets a value indicating whether the vertex is precious
    */
-  bool is_precious () const { return m_is_precious; }
+  bool is_precious () const;
 
   /**
    *  @brief Gets the ID passed to "set_is_precious"
@@ -148,7 +144,7 @@ public:
    *  This ID can be used to identify the vertex in the context it came from (e.g.
    *  index in point vector).
    */
-  unsigned int id () const { return m_id; }
+  const std::set<unsigned int> &ids () const;
 
   /**
    *  @brief Returns a string representation of the vertex
@@ -187,8 +183,7 @@ private:
 
   Graph *mp_graph;
   edges_type mp_edges;
-  bool m_is_precious : 1;
-  unsigned int m_id : 31;
+  std::set<unsigned int> *mp_ids;
 };
 
 /**

@@ -301,7 +301,7 @@ TEST(extraction_analytic_disc)
   rex.extract (disc, vertex_ports, polygon_ports, rn);
 
   EXPECT_EQ (rn.to_string (),
-    "R P0 P1 0.245379"    //  theoretical: 1/(2*PI)*log(r2/r1) = 0.25615 with r2=10000, r1=2000
+    "R P0 P1 0.245558"    //  theoretical: 1/(2*PI)*log(r2/r1) = 0.25615 with r2=10000, r1=2000
   )
 
   rex.triangulation_parameters ().max_area = 100000 * dbu * dbu;
@@ -309,7 +309,7 @@ TEST(extraction_analytic_disc)
   rex.extract (disc, vertex_ports, polygon_ports, rn);
 
   EXPECT_EQ (rn.to_string (),
-    "R P0 P1 0.255614"    //  theoretical: 1/(2*PI)*log(r2/r1) = 0.25615 with r2=10000, r1=2000
+    "R P0 P1 0.255609"    //  theoretical: 1/(2*PI)*log(r2/r1) = 0.25615 with r2=10000, r1=2000
   )
 }
 
@@ -357,7 +357,7 @@ TEST(extraction_meander)
   rex.extract (poly, vertex_ports, polygon_ports, rn);
 
   EXPECT_EQ (rn.to_string (),
-    "R V0 V1 8.75751"          //  what is the "real" value?
+    "R V0 V1 8.61417"          //  what is the "real" value?
   )
 }
 

@@ -77,6 +77,14 @@ TriangulationRExtractor::extract (const db::Polygon &polygon, const std::vector<
 
     tri.clear ();
 
+    std::vector<std::vector<db::plc::Vertex *> > edge_contours;
+
+    //  first step of the triangulation
+
+    for (auto p = residual_poly.begin_merged (); ! p.at_end (); ++p) {
+      tri.make_contours (*p, trans, edge_contours);
+    }
+
     unsigned int id = 0;
     for (auto v = vertex_ports.begin (); v != vertex_ports.end (); ++v) {
       tri.insert_point (trans * *v)->set_is_precious (true, id++);
@@ -91,9 +99,9 @@ TriangulationRExtractor::extract (const db::Polygon &polygon, const std::vector<
       }
     }
 
-    //  perform the triangulation
+    //  constrain and refine the triangulation
 
-    tri.create_constrained_delaunay (residual_poly, trans);
+    tri.constrain (edge_contours);
     tri.refine (param);
 
     //  identify the vertexes present for the polygon port -> store them inside pp_vertexes
@@ -147,11 +155,19 @@ TriangulationRExtractor::extract (const db::Polygon &polygon, const std::vector<
 
       } else if (vertex->is_precious ()) {
 
-        size_t port_index = size_t (vertex->id ());
-        if (port_index < vertex_ports.size ()) {
-          n = rnetwork.create_node (pex::RNode::VertexPort, port_index);
-          n->location = db::DBox (*vertex, *vertex);
-          vports_present.insert (port_index);
+        for (auto pi = vertex->ids ().begin (); pi != vertex->ids ().end (); ++pi) {
+          size_t port_index = size_t (*pi);
+          if (port_index < vertex_ports.size ()) {
+            RNode *nn = rnetwork.create_node (pex::RNode::VertexPort, port_index);
+            nn->location = db::DBox (*vertex, *vertex);
+            if (n) {
+              //  in case of multiple vertexes on the same spot, short them
+              rnetwork.create_element (RElement::short_value (), n, nn);
+            } else {
+              n = nn;
+            }
+            vports_present.insert (port_index);
+          }
         }
 
       } else {

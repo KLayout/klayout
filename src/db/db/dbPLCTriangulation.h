@@ -236,9 +236,37 @@ public:
   /**
    *  @brief Refines the triangulation using the given parameters
    *
-   *  This method is used internally by the "triangulation" method after creating the basic triangulation.
+   *  This method is used internally by the "triangulate" method after creating the basic triangulation.
+   *
+   *  This method is provided as a partial solution of a triangulation for special cases.
    */
   void refine (const TriangulationParameters &param);
+
+  /**
+   *  @brief Given a set of contours with edges, mark outer triangles
+   *
+   *  The edges must be made from existing vertexes. Edge orientation is
+   *  clockwise.
+   *
+   *  This will also mark triangles as outside ones.
+   *  This method is used internally by the "triangulate" method after creating the basic triangulation.
+   *
+   *  This method is provided as a partial solution of a triangulation for special cases.
+   */
+  void constrain (const std::vector<std::vector<Vertex *> > &contours);
+
+  /**
+   *  @brief Inserts a contours of a polygon
+   *
+   *  This method fills the contours of the given polygon by doint an "insert_point"
+   *  on all points and logging the outer edges ("segments") into the "contours"
+   *  array. The latter can be passed to "constrain" to create a constrained
+   *  triangulation.
+   *
+   *  This method is used internally by the "triangulate" method to create the basic triangulation.
+   *  This method is provided as a partial solution of a triangulation for special cases.
+   */
+  template<class Poly, class Trans> void make_contours (const Poly &poly, const Trans &trans, std::vector<std::vector<Vertex *> > &contours);
 
 protected:
   /**
@@ -288,16 +316,6 @@ protected:
   std::vector<Edge *> ensure_edge (Vertex *from, Vertex *to);
 
   /**
-   *  @brief Given a set of contours with edges, mark outer triangles
-   *
-   *  The edges must be made from existing vertexes. Edge orientation is
-   *  clockwise.
-   *
-   *  This will also mark triangles as outside ones.
-   */
-  void constrain (const std::vector<std::vector<Vertex *> > &contours);
-
-  /**
    *  @brief Returns a value indicating whether the edge is "illegal" (violates the Delaunay criterion)
    */
   static bool is_illegal_edge (Edge *edge);
@@ -312,8 +330,6 @@ private:
   size_t m_level;
   size_t m_id;
   mutable size_t m_flips, m_hops;
-
-  template<class Poly, class Trans> void make_contours (const Poly &poly, const Trans &trans, std::vector<std::vector<Vertex *> > &contours);
 
   void remove_outside_vertex (Vertex *vertex, std::list<tl::weak_ptr<Polygon> > *new_triangles = 0);
   void remove_inside_vertex (Vertex *vertex, std::list<tl::weak_ptr<Polygon> > *new_triangles_out = 0);

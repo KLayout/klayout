@@ -27,6 +27,7 @@
 #include "dbPoint.h"
 #include "dbTrans.h"
 #include "dbBox.h"
+#include "dbPluginCommon.h"
 
 #include "tlException.h"
 #include "tlInternational.h"
@@ -61,7 +62,7 @@ public:
 /**
  *  @brief A class representing a title field on a mask
  */
-class DB_PUBLIC MALYTitle
+class DB_PLUGIN_PUBLIC MALYTitle
 {
 public:
   /**
@@ -138,7 +139,7 @@ public:
 /**
  *  @brief A class representing a structure (pattern) on a mask
  */
-class DB_PUBLIC MALYStructure
+class DB_PLUGIN_PUBLIC MALYStructure
 {
 public:
   /**
@@ -220,7 +221,7 @@ public:
 /**
  *  @brief A class representing one mask
  */
-class DB_PUBLIC MALYMask
+class DB_PLUGIN_PUBLIC MALYMask
 {
 public:
   /**
@@ -261,7 +262,7 @@ public:
 /**
  *  @brief A class representing the MALY file
  */
-class DB_PUBLIC MALYData
+class DB_PLUGIN_PUBLIC MALYData
 {
 public:
   /**

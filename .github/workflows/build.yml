@@ -68,6 +68,7 @@ jobs:
           CIBW_BUILD: ${{ matrix.cibuild }}
           CIBW_ARCHS_MACOS: ${{ matrix.macos-arch }}
           CIBW_DEPENDENCY_VERSIONS_MACOS: cibw_constraints.txt
+          CIBW_ENABLE: cpython-prerelease cpython-freethreading
 
       - name: Download Cache from Docker (linux only)
         if: ${{ runner.os == 'Linux' }}

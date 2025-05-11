@@ -71,7 +71,7 @@ public:
     BEGIN_PROTECTED 
 
     properties_frame->set_direct_image (mp_image_object);
-    properties_frame->apply ();
+    properties_frame->apply (true);
 
     if (mp_image_object->is_empty ()) {
       throw tl::Exception (tl::to_string (tr ("No data loaded for that image")));

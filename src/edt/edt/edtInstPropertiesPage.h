@@ -66,8 +66,8 @@ protected:
   edt::PCellParametersPage *mp_pcell_parameters;
 
   virtual bool readonly ();
-  virtual void apply (); 
-  virtual void apply_to_all (bool relative);
+  virtual void apply (bool commit);
+  virtual void apply_to_all (bool relative, bool commit);
   virtual bool can_apply_to_all () const;
   void do_apply (bool current_only, bool relative);
   virtual ChangeApplicator *create_applicator (db::Cell &cell, const db::Instance &inst, double dbu);

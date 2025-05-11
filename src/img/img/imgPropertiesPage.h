@@ -57,7 +57,7 @@ public:
   virtual void update ();
   virtual void leave ();
   virtual bool readonly ();
-  virtual void apply (); 
+  virtual void apply (bool commit);
 
   void set_direct_image (img::Object *image);
 

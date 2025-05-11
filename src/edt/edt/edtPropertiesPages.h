@@ -63,10 +63,10 @@ protected:
 
 private:
   virtual void update ();
-  virtual void apply ();
-  virtual void apply_to_all (bool relative);
+  virtual void apply (bool commit);
+  virtual void apply_to_all (bool relative, bool commit);
   virtual bool can_apply_to_all () const;
-  virtual void do_apply (bool current_only, bool relative);
+  virtual void do_apply (bool current_only, bool relative, bool commit);
   void recompute_selection_ptrs (const std::vector<lay::ObjectInstPath> &new_sel);
 
 protected:

@@ -49,7 +49,7 @@ pya_object_deallocate (PyObject *self)
   //  may trigger a GC (https://github.com/KLayout/klayout/issues/1054).
   //  According to the comments this may be turned into a release mode assertion, so
   //  we better work around it.
-  ++self->ob_refcnt;
+  Py_IncRef(self);
 
   //  Mute Python warnings in debug case
   PyObject_GC_UnTrack (self);

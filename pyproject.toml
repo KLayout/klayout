@@ -10,6 +10,7 @@ test-command = [
 ]
 # Disable building PyPy wheels on all platforms
 skip = "pp* cp36-* cp37-*"
+enable = ["cpython-freethreading", "cpython-prerelease"]
 
 [tool.cibuildwheel.linux]
 # beware: the before-all script does not persist environment variables!

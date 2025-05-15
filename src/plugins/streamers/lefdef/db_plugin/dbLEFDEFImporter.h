@@ -960,6 +960,25 @@ public:
     m_macro_layout_files = lf;
   }
 
+  /**
+   *  @brief A hidden attribute to enable a LEF context
+   *  LEF context are used for chaining DEF readers. This method must be
+   *  called on local copy of the importer options. With this attribute
+   *  set to "true", the client code can store a LEFDEFReaderState object
+   *  in this object.
+   *  Initially, this attribute is set to false.
+   *  Note that this attribute is not copied.
+   */
+  void set_lef_context_enabled (bool context);
+
+  bool lef_context_enabled () const
+  {
+    return m_lef_context_enabled;
+  }
+
+  //  makes the reader state object if required
+  db::LEFDEFReaderState *reader_state (db::Layout &layout, const std::string &base_path, const LoadLayoutOptions &options) const;
+
 private:
   bool m_read_all_layers;
   db::LayerMap m_layer_map;
@@ -1028,6 +1047,8 @@ private:
   tl::weak_collection<db::Layout> m_macro_layouts;
   std::vector<std::string> m_macro_layout_files;
   bool m_paths_relative_to_cwd;
+  bool m_lef_context_enabled;
+  mutable std::unique_ptr<db::LEFDEFReaderState> mp_reader_state;
 };
 
 /**
@@ -1247,12 +1268,17 @@ public:
   /**
    *  @brief Constructor
    */
-  LEFDEFReaderState (const LEFDEFReaderOptions *tc, db::Layout &layout, const std::string &base_path = std::string ());
+  LEFDEFReaderState (const LEFDEFReaderOptions *tc);
 
   /**
    *  @brief Destructor
    */
   ~LEFDEFReaderState ();
+
+  /**
+   *  @brief Initialize with the layout and base path
+   */
+  void init (db::Layout &layout, const std::string &base_path, const LoadLayoutOptions &options);
 
   /**
    *  @brief Attaches to or detaches from an importer
@@ -1364,6 +1390,31 @@ public:
    */
   void warn (const std::string &msg, int warn_level = 1);
 
+  /**
+   *  @brief Gets a value indicating whether the given LEF file was already read
+   */
+  bool lef_file_already_read (const std::string &fn)
+  {
+    return m_lef_files_read.find (fn) != m_lef_files_read.end ();
+  }
+
+  /**
+   *  @brief Registers a LEF file
+   *  After registration, the same file will report "already_read"
+   */
+  void register_lef_file (const std::string &fn)
+  {
+    m_lef_files_read.insert (fn);
+  }
+
+  /**
+   *  @brief Gets the stored macro layouts
+   */
+  const std::vector<db::Layout *> &macro_layouts () const
+  {
+    return m_macro_layouts;
+  }
+
 protected:
   virtual void common_reader_error (const std::string &msg) { error (msg); }
   virtual void common_reader_warn (const std::string &msg, int warn_level) { warn (msg, warn_level); }
@@ -1456,6 +1507,9 @@ private:
   std::map<MacroKey, std::pair<db::Cell *, db::Trans> > m_macro_cells;
   std::map<std::string, LEFDEFLayoutGenerator *> m_macro_generators;
   std::map<std::string, db::cell_index_type> m_foreign_cells;
+  std::set<std::string> m_lef_files_read;
+  std::vector<db::Layout *> m_macro_layouts;
+  tl::shared_collection<db::Layout> m_macro_layout_object_holder;
 
   std::set<unsigned int> open_layer_uncached (db::Layout &layout, const std::string &name, LayerPurpose purpose, unsigned int mask);
   db::cell_index_type foreign_cell(Layout &layout, const std::string &name);

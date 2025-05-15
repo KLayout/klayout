@@ -113,23 +113,36 @@ LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &opti
   init (options);
 
   const db::LEFDEFReaderOptions *lefdef_options = dynamic_cast<const db::LEFDEFReaderOptions *> (options.get_options (format ()));
+
   db::LEFDEFReaderOptions effective_options;
   if (lefdef_options) {
     effective_options = *lefdef_options;
   }
+
+  layout.dbu (effective_options.dbu ());
 
   std::string base_path;
   if (! effective_options.paths_relative_to_cwd ()) {
     base_path = tl::dirname (m_stream.absolute_file_path ());
   }
 
-  db::LEFDEFReaderState state (&effective_options, layout, base_path);
+  //  If the LEF reader context (LEF caching) is enabled on the options,
+  //  pull the state from there, otherwise create a local state.
+  db::LEFDEFReaderState local_state (&effective_options);
+  db::LEFDEFReaderState *state = 0;
+  if (lefdef_options) {
+    state = lefdef_options->reader_state (layout, base_path, options);
+  }
+  if (! state) {
+    local_state.init (layout, base_path, options);
+    state = &local_state;
+  }
 
+  //  Configure the conflict resolution mode
   db::CommonReaderOptions common_options = options.get_options<db::CommonReaderOptions> ();
-  state.set_conflict_resolution_mode (common_options.cell_conflict_resolution);
+  state->set_conflict_resolution_mode (common_options.cell_conflict_resolution);
 
-  layout.dbu (effective_options.dbu ());
-
+  //  Import LEF
   if (import_lef) {
 
     //  Always produce LEF geometry when reading LEF
@@ -145,13 +158,13 @@ LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &opti
       for (auto lp = paths.begin (); lp != paths.end (); ++lp) {
         tl::InputStream lef_stream (*lp);
         tl::log << tl::to_string (tr ("Reading")) << " " << *lp;
-        importer.read (lef_stream, layout, state);
+        importer.read (lef_stream, layout, *state);
       }
 
     }
 
     tl::log << tl::to_string (tr ("Reading")) << " " << m_stream.source ();
-    importer.read (m_stream, layout, state);
+    importer.read (m_stream, layout, *state);
 
     importer.finish_lef (layout);
 
@@ -161,20 +174,21 @@ LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &opti
 
     DEFImporter importer (warn_level ());
 
-    std::set<std::string> lef_files_read;
-
     for (std::vector<std::string>::const_iterator l = effective_options.begin_lef_files (); l != effective_options.end_lef_files (); ++l) {
 
       auto paths = correct_path (*l, layout, base_path, true);
       for (auto lp = paths.begin (); lp != paths.end (); ++lp) {
 
-        if (lef_files_read.insert (tl::normalize_path (*lp)).second) {
+        std::string norm_lp = tl::normalize_path (*lp);
+        if (! state->lef_file_already_read (norm_lp)) {
 
           tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading LEF file: ")) + *lp);
 
-          tl::InputStream lef_stream (*lp);
+          tl::InputStream lef_stream (norm_lp);
           tl::log << tl::to_string (tr ("Reading")) << " " << *lp;
-          importer.read_lef (lef_stream, layout, state);
+          importer.read_lef (lef_stream, layout, *state);
+
+          state->register_lef_file (norm_lp);
 
         }
 
@@ -198,13 +212,16 @@ LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &opti
             std::string lp = tl::combine_path (input_dir, *e);
 
             //  skip if already read (issue-1724)
-            if (lef_files_read.find (tl::normalize_path (lp)) == lef_files_read.end ()) {
+            std::string norm_lp = tl::normalize_path (lp);
+            if (! state->lef_file_already_read (norm_lp)) {
 
               tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading LEF file: ")) + lp);
 
-              tl::InputStream lef_stream (lp);
+              tl::InputStream lef_stream (norm_lp);
               tl::log << tl::to_string (tr ("Reading")) << " " << lp;
-              importer.read_lef (lef_stream, layout, state);
+              importer.read_lef (lef_stream, layout, *state);
+
+              state->register_lef_file (norm_lp);
 
             }
 
@@ -217,43 +234,14 @@ LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &opti
     }
 
     tl::log << tl::to_string (tr ("Reading")) << " " << m_stream.source ();
-    importer.read (m_stream, layout, state);
+    importer.read (m_stream, layout, *state);
 
     //  Resolve unresolved COMPONENT cells
 
-    std::map<std::string, db::cell_index_type> foreign_cells = state.foreign_cells ();
+    std::map<std::string, db::cell_index_type> foreign_cells = state->foreign_cells ();
     db::cell_index_type seen = std::numeric_limits<db::cell_index_type>::max ();
 
-    std::vector<db::Layout *> macro_layouts = effective_options.macro_layouts ();
-
-    //  Additionally read the layouts from the given paths
-    tl::shared_collection<db::Layout> macro_layout_object_holder;
-    for (std::vector<std::string>::const_iterator l = effective_options.begin_macro_layout_files (); l != effective_options.end_macro_layout_files (); ++l) {
-
-      auto paths = correct_path (*l, layout, base_path, true);
-      for (auto lp = paths.begin (); lp != paths.end (); ++lp) {
-
-        tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading LEF macro layout file: ")) + *lp);
-
-        tl::InputStream macro_layout_stream (*lp);
-        tl::log << tl::to_string (tr ("Reading")) << " " << *lp;
-        db::Layout *new_layout = new db::Layout (false);
-        macro_layout_object_holder.push_back (new_layout);
-        macro_layouts.push_back (new_layout);
-
-        db::Reader reader (macro_layout_stream);
-        reader.read (*new_layout, options);
-
-        if (fabs (new_layout->dbu () / layout.dbu () - 1.0) > db::epsilon) {
-          importer.warn (tl::sprintf (tl::to_string (tr ("DBU of macro layout file '%s' does not match reader DBU (layout DBU is %.12g, reader DBU is set to %.12g)")),
-                                      *lp, new_layout->dbu (), layout.dbu ()));
-        }
-
-      }
-
-    }
-
-    for (std::vector<db::Layout *>::const_iterator m = macro_layouts.begin (); m != macro_layouts.end (); ++m) {
+    for (std::vector<db::Layout *>::const_iterator m = state->macro_layouts ().begin (); m != state->macro_layouts ().end (); ++m) {
 
       std::vector<db::cell_index_type> target_cells, source_cells;
 
@@ -286,9 +274,9 @@ LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &opti
 
   }
 
-  state.finish (layout);
+  state->finish (layout);
 
-  m_layer_map = state.layer_map ();
+  m_layer_map = state->layer_map ();
   return m_layer_map;
 }
 

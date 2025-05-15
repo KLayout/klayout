@@ -598,7 +598,8 @@ LEFDEFReaderOptions::LEFDEFReaderOptions ()
     m_map_file (),
     m_macro_resolution_mode (0),
     m_read_lef_with_def (true),
-    m_paths_relative_to_cwd (false)
+    m_paths_relative_to_cwd (false),
+    m_lef_context_enabled (false)
 {
   //  .. nothing yet ..
 }
@@ -951,26 +952,32 @@ LEFDEFReaderOptions::special_routing_datatype_str () const
   return get_datatypes (this, &LEFDEFReaderOptions::special_routing_datatype, &LEFDEFReaderOptions::special_routing_datatype_per_mask, max_mask_number ());
 }
 
+void
+LEFDEFReaderOptions::set_lef_context_enabled (bool f)
+{
+  if (f != m_lef_context_enabled) {
+    mp_reader_state.reset (0);
+  }
+}
+
+db::LEFDEFReaderState *
+LEFDEFReaderOptions::reader_state (db::Layout &layout, const std::string &base_path, const db::LoadLayoutOptions &options) const
+{
+  if (m_lef_context_enabled && ! mp_reader_state.get ()) {
+    mp_reader_state.reset (new db::LEFDEFReaderState (this));
+    mp_reader_state->init (layout, base_path, options);
+  }
+
+  return mp_reader_state.get ();
+}
+
 // -----------------------------------------------------------------------------------
 //  LEFDEFLayerDelegate implementation
 
-LEFDEFReaderState::LEFDEFReaderState (const LEFDEFReaderOptions *tc, db::Layout &layout, const std::string &base_path)
+LEFDEFReaderState::LEFDEFReaderState (const LEFDEFReaderOptions *tc)
   : mp_importer (0), m_create_layers (true), m_has_explicit_layer_mapping (false), m_laynum (1), mp_tech_comp (tc)
 {
-  if (! tc) {
-
-    //  use default options
-
-  } else if (! tc->map_file ().empty ()) {
-
-    read_map_file (tc->map_file (), layout, base_path);
-
-  } else {
-
-    m_layer_map = tc->layer_map ();
-    m_create_layers = tc->read_all_layers ();
-
-  }
+  //  .. nothing yet ..
 }
 
 LEFDEFReaderState::~LEFDEFReaderState ()
@@ -986,6 +993,57 @@ LEFDEFReaderState::~LEFDEFReaderState ()
   }
 
   m_macro_generators.clear ();
+}
+
+void
+LEFDEFReaderState::init (Layout &layout, const std::string &base_path, const LoadLayoutOptions &options)
+{
+  if (! mp_tech_comp) {
+
+    //  use default options
+
+  } else if (! mp_tech_comp->map_file ().empty ()) {
+
+    read_map_file (mp_tech_comp->map_file (), layout, base_path);
+
+  } else {
+
+    m_layer_map = mp_tech_comp->layer_map ();
+    m_create_layers = mp_tech_comp->read_all_layers ();
+
+  }
+
+  if (mp_tech_comp) {
+
+    m_macro_layouts = mp_tech_comp->macro_layouts ();
+
+    //  Additionally read the layouts from the given paths
+    for (std::vector<std::string>::const_iterator l = mp_tech_comp->begin_macro_layout_files (); l != mp_tech_comp->end_macro_layout_files (); ++l) {
+
+      auto paths = correct_path (*l, layout, base_path, true);
+      for (auto lp = paths.begin (); lp != paths.end (); ++lp) {
+
+        tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading LEF macro layout file: ")) + *lp);
+
+        tl::InputStream macro_layout_stream (*lp);
+        tl::log << tl::to_string (tr ("Reading")) << " " << *lp;
+        db::Layout *new_layout = new db::Layout (false);
+        m_macro_layout_object_holder.push_back (new_layout);
+        m_macro_layouts.push_back (new_layout);
+
+        db::Reader reader (macro_layout_stream);
+        reader.read (*new_layout, options);
+
+        if (fabs (new_layout->dbu () / layout.dbu () - 1.0) > db::epsilon) {
+          tl::warn << tl::sprintf (tl::to_string (tr ("DBU of macro layout file '%s' does not match reader DBU (layout DBU is %.12g, reader DBU is set to %.12g)")),
+                                                        *lp, new_layout->dbu (), layout.dbu ());
+        }
+
+      }
+
+    }
+
+  }
 }
 
 void

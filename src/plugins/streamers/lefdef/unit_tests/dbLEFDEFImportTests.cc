@@ -59,7 +59,9 @@ static db::LayerMap read (db::Layout &layout, const char *lef_dir, const char *f
 
   tl::Extractor ex (filename);
 
-  db::LEFDEFReaderState ld (&options, layout, fn_path);
+  db::LoadLayoutOptions other_options;
+  db::LEFDEFReaderState ld (&options);
+  ld.init (layout, fn_path, other_options);
   ld.set_conflict_resolution_mode (cc_mode);
 
   db::DEFImporter imp;

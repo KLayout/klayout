@@ -997,6 +997,10 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "See \\read_lef_with_def for details about this property.\n"
     "\n"
     "This property has been added in version 0.27.\n"
+  ) +
+  //  special attribute to implement LEF caching
+  gsi::method ("lef_context_enabled=", &db::LEFDEFReaderOptions::set_lef_context_enabled,
+    "@hide\n"
   ),
   "@brief Detailed LEF/DEF reader options\n"
   "This class is a aggregate belonging to the \\LoadLayoutOptions class. It provides options for the LEF/DEF reader. "

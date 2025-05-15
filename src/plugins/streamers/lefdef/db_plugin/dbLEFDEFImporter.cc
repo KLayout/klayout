@@ -605,7 +605,8 @@ LEFDEFReaderOptions::LEFDEFReaderOptions ()
 }
 
 LEFDEFReaderOptions::LEFDEFReaderOptions (const LEFDEFReaderOptions &d)
-  : db::FormatSpecificReaderOptions ()
+  : db::FormatSpecificReaderOptions (),
+    m_lef_context_enabled (false)
 {
   operator= (d);
 }

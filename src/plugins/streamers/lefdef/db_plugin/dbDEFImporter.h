@@ -48,26 +48,12 @@ public:
   /**
    *  @brief Default constructor
    */
-  DEFImporter (int warn_level = 1);
-
-  /**
-   *  @brief Read the given LEF file prior to the DEF file
-   *
-   *  This method reads the layout specified into the given layout.
-   *  Multiple LEF files can be read.
-   */
-  void read_lef (tl::InputStream &stream, db::Layout &layout, LEFDEFReaderState &state);
-
-  /**
-   *  @brief Provided for test purposes
-   */
-  void finish_lef (Layout &layout);
+  DEFImporter (int warn_level);
 
 protected:
   void do_read (db::Layout &layout);
 
 private:
-  LEFImporter m_lef_importer;
   std::map<std::string, std::map<std::string, db::Coord> > m_nondefault_widths;
   std::map<std::string, ViaDesc> m_via_desc;
   std::map<int, db::Polygon> m_styles;

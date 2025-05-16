@@ -46,6 +46,7 @@ namespace db
 
 class LEFDEFReaderState;
 class LEFDEFImporter;
+class LEFImporter;
 struct MacroDesc;
 
 /**
@@ -1326,7 +1327,14 @@ public:
   void register_layer (const std::string &l);
 
   /**
+   *  @brief Start reading a file
+   *  After the file is read, "finish" needs to be called.
+   */
+  void start ();
+
+  /**
    *  @brief Finish, i.e. assign GDS layer numbers to the layers
+   *  This is the counterpart for "start".
    */
   void finish (db::Layout &layout);
 
@@ -1389,6 +1397,28 @@ public:
    *  @brief Issues a warning
    */
   void warn (const std::string &msg, int warn_level = 1);
+
+  /**
+   *  @brief Ensures the LEF importer for DEF reading is available
+   */
+  void ensure_lef_importer (int warn_level);
+
+  /**
+   *  @brief Gets the LEF importer for DEF reading
+   */
+  db::LEFImporter &lef_importer ();
+
+  /**
+   *  @brief Reads a LEF file into the LEF importer
+   *
+   *  Multiple LEF files can be read.
+   */
+  void read_lef (tl::InputStream &stream, db::Layout &layout);
+
+  /**
+   *  @brief Provided for test purposes
+   */
+  void finish_lef (db::Layout &layout);
 
   /**
    *  @brief Gets a value indicating whether the given LEF file was already read
@@ -1510,6 +1540,7 @@ private:
   std::set<std::string> m_lef_files_read;
   std::vector<db::Layout *> m_macro_layouts;
   tl::shared_collection<db::Layout> m_macro_layout_object_holder;
+  std::unique_ptr<db::LEFImporter> mp_lef_importer;
 
   std::set<unsigned int> open_layer_uncached (db::Layout &layout, const std::string &name, LayerPurpose purpose, unsigned int mask);
   db::cell_index_type foreign_cell(Layout &layout, const std::string &name);

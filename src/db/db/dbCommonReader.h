@@ -207,7 +207,7 @@ public:
   /**
    *  @brief Re-initialize: clears the tables and caches
    */
-  void init ();
+  void start ();
 
   /**
    *  @brief Sets a value indicating whether to create layers

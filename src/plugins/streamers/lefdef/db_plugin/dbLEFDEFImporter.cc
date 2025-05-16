@@ -22,9 +22,11 @@
 
 
 #include "dbLEFDEFImporter.h"
+#include "dbLEFImporter.h"
 #include "dbLayoutUtils.h"
 #include "dbTechnology.h"
 #include "dbShapeProcessor.h"
+#include "dbCellMapping.h"
 
 #include "tlStream.h"
 #include "tlProgress.h"
@@ -958,6 +960,7 @@ LEFDEFReaderOptions::set_lef_context_enabled (bool f)
 {
   if (f != m_lef_context_enabled) {
     mp_reader_state.reset (0);
+    m_lef_context_enabled = f;
   }
 }
 
@@ -1036,8 +1039,8 @@ LEFDEFReaderState::init (Layout &layout, const std::string &base_path, const Loa
         reader.read (*new_layout, options);
 
         if (fabs (new_layout->dbu () / layout.dbu () - 1.0) > db::epsilon) {
-          tl::warn << tl::sprintf (tl::to_string (tr ("DBU of macro layout file '%s' does not match reader DBU (layout DBU is %.12g, reader DBU is set to %.12g)")),
-                                                        *lp, new_layout->dbu (), layout.dbu ());
+          warn (tl::sprintf (tl::to_string (tr ("DBU of macro layout file '%s' does not match reader DBU (layout DBU is %.12g, reader DBU is set to %.12g)")),
+                                                        *lp, new_layout->dbu (), layout.dbu ()));
         }
 
       }
@@ -1061,6 +1064,33 @@ LEFDEFReaderState::warn (const std::string &msg, int warn_level)
   if (mp_importer) {
     mp_importer->warn (msg, warn_level);
   }
+}
+
+void
+LEFDEFReaderState::ensure_lef_importer (int warn_level)
+{
+  if (! mp_lef_importer.get ()) {
+    mp_lef_importer.reset (new db::LEFImporter (warn_level));
+  }
+}
+
+db::LEFImporter &
+LEFDEFReaderState::lef_importer ()
+{
+  tl_assert (mp_lef_importer.get () != 0);
+  return *mp_lef_importer;
+}
+
+void
+LEFDEFReaderState::read_lef (tl::InputStream &stream, db::Layout &layout)
+{
+  lef_importer ().read (stream, layout, *this);
+}
+
+void
+LEFDEFReaderState::finish_lef (db::Layout &layout)
+{
+  lef_importer ().finish_lef (layout);
 }
 
 void
@@ -1775,9 +1805,54 @@ std::set<unsigned int> LEFDEFReaderState::open_layer_uncached(db::Layout &layout
 }
 
 void
+LEFDEFReaderState::start ()
+{
+  CommonReaderBase::start ();
+
+  m_foreign_cells.clear ();
+}
+
+void
 LEFDEFReaderState::finish (db::Layout &layout)
 {
   CommonReaderBase::finish (layout);
+
+  //  Resolve unresolved COMPONENT cells
+
+  db::cell_index_type seen = std::numeric_limits<db::cell_index_type>::max ();
+
+  for (std::vector<db::Layout *>::const_iterator m = macro_layouts ().begin (); m != macro_layouts ().end (); ++m) {
+
+    std::vector<db::cell_index_type> target_cells, source_cells;
+
+    //  collect the cells to pull in
+    for (std::map<std::string, db::cell_index_type>::iterator f = m_foreign_cells.begin (); f != m_foreign_cells.end (); ++f) {
+      if (f->second != seen) {
+        std::pair<bool, db::cell_index_type> cp = (*m)->cell_by_name (f->first.c_str ());
+        if (cp.first) {
+          target_cells.push_back (f->second);
+          source_cells.push_back (cp.second);
+          layout.cell (f->second).set_ghost_cell (false);
+          f->second = seen;
+        }
+      }
+    }
+
+    db::CellMapping cm;
+    cm.create_multi_mapping_full (layout, target_cells, **m, source_cells);
+    layout.copy_tree_shapes (**m, cm);
+
+  }
+
+  //  Warn about cells that could not be resolved
+  for (std::map<std::string, db::cell_index_type>::iterator f = m_foreign_cells.begin (); f != m_foreign_cells.end (); ++f) {
+    if (f->second != seen && layout.cell (f->second).is_ghost_cell ()) {
+      warn (tl::sprintf (tl::to_string (tr ("Could not find a substitution layout for foreign cell '%s'")),
+                                  f->first));
+    }
+  }
+
+  //  Create the layers
 
   int lnum = 0;
 

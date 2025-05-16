@@ -138,6 +138,9 @@ LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &opti
     state = &local_state;
   }
 
+  state->ensure_lef_importer (warn_level ());
+  state->start ();
+
   //  Configure the conflict resolution mode
   db::CommonReaderOptions common_options = options.get_options<db::CommonReaderOptions> ();
   state->set_conflict_resolution_mode (common_options.cell_conflict_resolution);
@@ -186,7 +189,7 @@ LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &opti
 
           tl::InputStream lef_stream (norm_lp);
           tl::log << tl::to_string (tr ("Reading")) << " " << *lp;
-          importer.read_lef (lef_stream, layout, *state);
+          state->read_lef (lef_stream, layout);
 
           state->register_lef_file (norm_lp);
 
@@ -219,7 +222,7 @@ LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &opti
 
               tl::InputStream lef_stream (norm_lp);
               tl::log << tl::to_string (tr ("Reading")) << " " << lp;
-              importer.read_lef (lef_stream, layout, *state);
+              state->read_lef (lef_stream, layout);
 
               state->register_lef_file (norm_lp);
 
@@ -235,42 +238,6 @@ LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &opti
 
     tl::log << tl::to_string (tr ("Reading")) << " " << m_stream.source ();
     importer.read (m_stream, layout, *state);
-
-    //  Resolve unresolved COMPONENT cells
-
-    std::map<std::string, db::cell_index_type> foreign_cells = state->foreign_cells ();
-    db::cell_index_type seen = std::numeric_limits<db::cell_index_type>::max ();
-
-    for (std::vector<db::Layout *>::const_iterator m = state->macro_layouts ().begin (); m != state->macro_layouts ().end (); ++m) {
-
-      std::vector<db::cell_index_type> target_cells, source_cells;
-
-      //  collect the cells to pull in
-      for (std::map<std::string, db::cell_index_type>::iterator f = foreign_cells.begin (); f != foreign_cells.end (); ++f) {
-        if (f->second != seen) {
-          std::pair<bool, db::cell_index_type> cp = (*m)->cell_by_name (f->first.c_str ());
-          if (cp.first) {
-            target_cells.push_back (f->second);
-            source_cells.push_back (cp.second);
-            layout.cell (f->second).set_ghost_cell (false);
-            f->second = seen;
-          }
-        }
-      }
-
-      db::CellMapping cm;
-      cm.create_multi_mapping_full (layout, target_cells, **m, source_cells);
-      layout.copy_tree_shapes (**m, cm);
-
-    }
-
-    //  Warn about cells that could not be resolved
-    for (std::map<std::string, db::cell_index_type>::iterator f = foreign_cells.begin (); f != foreign_cells.end (); ++f) {
-      if (f->second != seen && layout.cell (f->second).is_ghost_cell ()) {
-        importer.warn (tl::sprintf (tl::to_string (tr ("Could not find a substitution layout for foreign cell '%s'")),
-                                    f->first));
-      }
-    }
 
   }
 

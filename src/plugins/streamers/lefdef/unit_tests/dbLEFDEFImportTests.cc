@@ -61,10 +61,11 @@ static db::LayerMap read (db::Layout &layout, const char *lef_dir, const char *f
 
   db::LoadLayoutOptions other_options;
   db::LEFDEFReaderState ld (&options);
+  ld.ensure_lef_importer (1);
   ld.init (layout, fn_path, other_options);
   ld.set_conflict_resolution_mode (cc_mode);
 
-  db::DEFImporter imp;
+  db::DEFImporter imp (1);
   bool any_def = false;
   bool any_lef = false;
 
@@ -95,7 +96,7 @@ static db::LayerMap read (db::Layout &layout, const char *lef_dir, const char *f
       fn += f;
 
       tl::InputStream stream (fn);
-      imp.read_lef (stream, layout, ld);
+      ld.read_lef (stream, layout);
 
       any_lef = true;
 
@@ -136,7 +137,7 @@ static db::LayerMap read (db::Layout &layout, const char *lef_dir, const char *f
   }
 
   if (! any_def && any_lef) {
-    imp.finish_lef (layout);
+    ld.finish_lef (layout);
   }
 
   ld.finish (layout);

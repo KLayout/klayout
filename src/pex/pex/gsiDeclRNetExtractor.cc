@@ -264,12 +264,12 @@ static void tech_set_skip_simplify (pex::RExtractorTech *tech, bool f)
   tech->skip_simplify = f;
 }
 
-static auto tech_begin_vias (const pex::RExtractorTech *tech)
+static std::list<pex::RExtractorTechVia>::const_iterator tech_begin_vias (const pex::RExtractorTech *tech)
 {
   return tech->vias.begin ();
 }
 
-static auto tech_end_vias (const pex::RExtractorTech *tech)
+static std::list<pex::RExtractorTechVia>::const_iterator tech_end_vias (const pex::RExtractorTech *tech)
 {
   return tech->vias.end ();
 }
@@ -284,12 +284,12 @@ static void tech_add_via (pex::RExtractorTech *tech, const pex::RExtractorTechVi
   tech->vias.push_back (via);
 }
 
-static auto tech_begin_conductors (const pex::RExtractorTech *tech)
+static std::list<pex::RExtractorTechConductor>::const_iterator tech_begin_conductors (const pex::RExtractorTech *tech)
 {
   return tech->conductors.begin ();
 }
 
-static auto tech_end_conductors (const pex::RExtractorTech *tech)
+static std::list<pex::RExtractorTechConductor>::const_iterator tech_end_conductors (const pex::RExtractorTech *tech)
 {
   return tech->conductors.end ();
 }

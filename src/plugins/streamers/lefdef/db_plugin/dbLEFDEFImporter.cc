@@ -1082,9 +1082,12 @@ LEFDEFReaderState::lef_importer ()
 }
 
 void
-LEFDEFReaderState::read_lef (tl::InputStream &stream, db::Layout &layout)
+LEFDEFReaderState::read_lef (const std::string &fn, db::Layout &layout)
 {
+  tl::InputStream stream (fn);
   lef_importer ().read (stream, layout, *this);
+
+  m_lef_files_read.insert (fn);
 }
 
 void

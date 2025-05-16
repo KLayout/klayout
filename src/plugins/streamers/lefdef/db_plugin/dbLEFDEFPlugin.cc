@@ -187,11 +187,8 @@ LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &opti
 
           tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading LEF file: ")) + *lp);
 
-          tl::InputStream lef_stream (norm_lp);
           tl::log << tl::to_string (tr ("Reading")) << " " << *lp;
-          state->read_lef (lef_stream, layout);
-
-          state->register_lef_file (norm_lp);
+          state->read_lef (norm_lp, layout);
 
         }
 
@@ -220,11 +217,8 @@ LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &opti
 
               tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading LEF file: ")) + lp);
 
-              tl::InputStream lef_stream (norm_lp);
               tl::log << tl::to_string (tr ("Reading")) << " " << lp;
-              state->read_lef (lef_stream, layout);
-
-              state->register_lef_file (norm_lp);
+              state->read_lef (norm_lp, layout);
 
             }
 

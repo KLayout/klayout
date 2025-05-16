@@ -1413,7 +1413,7 @@ public:
    *
    *  Multiple LEF files can be read.
    */
-  void read_lef (tl::InputStream &stream, db::Layout &layout);
+  void read_lef (const std::string &fn, db::Layout &layout);
 
   /**
    *  @brief Provided for test purposes
@@ -1426,15 +1426,6 @@ public:
   bool lef_file_already_read (const std::string &fn)
   {
     return m_lef_files_read.find (fn) != m_lef_files_read.end ();
-  }
-
-  /**
-   *  @brief Registers a LEF file
-   *  After registration, the same file will report "already_read"
-   */
-  void register_lef_file (const std::string &fn)
-  {
-    m_lef_files_read.insert (fn);
   }
 
   /**

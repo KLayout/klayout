@@ -95,8 +95,7 @@ static db::LayerMap read (db::Layout &layout, const char *lef_dir, const char *f
       ex.read_word_or_quoted (f);
       fn += f;
 
-      tl::InputStream stream (fn);
-      ld.read_lef (stream, layout);
+      ld.read_lef (fn, layout);
 
       any_lef = true;
 

@@ -1379,6 +1379,9 @@ Triangulation::make_contours (const Poly &poly, const Trans &trans, std::vector<
   }
 }
 
+template DB_PUBLIC void Triangulation::make_contours (const db::Polygon &, const db::CplxTrans &, std::vector<std::vector<Vertex *> > &);
+template DB_PUBLIC void Triangulation::make_contours (const db::DPolygon &, const db::DCplxTrans &, std::vector<std::vector<Vertex *> > &);
+
 void
 Triangulation::create_constrained_delaunay (const db::Region &region, const CplxTrans &trans)
 {

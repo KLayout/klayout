@@ -846,6 +846,10 @@ static std::vector<std::string> split_file_list (const std::string &infile)
 
 void read_files (db::Layout &layout, const std::string &infile, const db::LoadLayoutOptions &options)
 {
+  //  We may do this:
+  //    db::LayoutLocker locker (&layout);
+  //  but there are yet unknown side effects
+
   //  enter a LEF caching context for chaining multiple DEF with the same LEF
   db::LoadLayoutOptions local_options (options);
   local_options.set_option_by_name ("lefdef_config.lef_context_enabled", true);

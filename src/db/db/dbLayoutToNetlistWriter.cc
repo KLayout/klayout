@@ -692,6 +692,8 @@ void std_writer_impl<Keys>::write (TokenizedOutput &stream, const db::Net &net, 
             *outp << tl::to_string (id);
             if (! net.name ().empty ()) {
               TokenizedOutput (*outp, Keys::name_key, true) << tl::to_word_or_quoted_string (net.name ());
+            } else if (net.id () != id) {
+              TokenizedOutput (*outp, Keys::name_key, true) << tl::to_word_or_quoted_string (net.expanded_name ());
             }
 
             *outp << endl;

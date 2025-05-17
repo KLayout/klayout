@@ -1141,12 +1141,14 @@ public:
 class DB_PLUGIN_PUBLIC LEFDEFLayoutGenerator
 {
 public:
-  LEFDEFLayoutGenerator () { }
+  LEFDEFLayoutGenerator () : def_local (false) { }
   virtual ~LEFDEFLayoutGenerator () { }
 
   virtual void create_cell (LEFDEFReaderState &reader, db::Layout &layout, db::Cell &cell, const std::vector<std::string> *maskshift_layers, const std::vector<unsigned int> &masks, const LEFDEFNumberOfMasks *nm) = 0;
   virtual std::vector<std::string> maskshift_layers () const = 0;
   virtual bool is_fixedmask () const = 0;
+
+  bool def_local;
 };
 
 /**

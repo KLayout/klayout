@@ -1182,8 +1182,10 @@ DEFImporter::read_vias (db::Layout &layout, db::Cell & /*design*/, double scale)
     if (rule_based_vg.get () && geo_based_vg.get ()) {
       error (tl::to_string (tr ("A via can only be defined through a VIARULE or geometry, not both ways")));
     } else if (rule_based_vg.get ()) {
+      rule_based_vg->def_local = true;
       reader_state ()->register_via_cell (n, std::string (), rule_based_vg.release ());
     } else if (geo_based_vg.get ()) {
+      geo_based_vg->def_local = true;
       reader_state ()->register_via_cell (n, std::string (), geo_based_vg.release ());
     } else {
       error (tl::to_string (tr ("Too little information to generate a via")));

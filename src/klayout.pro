@@ -121,8 +121,8 @@ equals(HAVE_RUBY, "1") {
 
 }
 
-buddies.depends += plugins lym $$LANG_DEPENDS
-unit_tests.depends += plugins lym $$MAIN_DEPENDS $$LANG_DEPENDS
+buddies.depends += plugins pex lym $$LANG_DEPENDS
+unit_tests.depends += plugins pex lym $$MAIN_DEPENDS $$LANG_DEPENDS
 
 !equals(HAVE_QT, "0") {
 

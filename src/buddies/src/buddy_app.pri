@@ -19,7 +19,7 @@ SOURCES = $$PWD/bd/main.cc
 
 INCLUDEPATH += $$BD_INC $$TL_INC $$GSI_INC
 DEPENDPATH += $$BD_INC $$TL_INC $$GSI_INC
-LIBS += -L$$DESTDIR -lklayout_bd -lklayout_db -lklayout_tl -lklayout_gsi -lklayout_lib -lklayout_rdb -lklayout_lym
+LIBS += -L$$DESTDIR -lklayout_bd -lklayout_db -lklayout_pex -lklayout_tl -lklayout_gsi -lklayout_lib -lklayout_rdb -lklayout_lym
 
 INCLUDEPATH += $$RBA_INC
 DEPENDPATH += $$RBA_INC

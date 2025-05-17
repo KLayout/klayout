@@ -226,7 +226,7 @@ SquareCountingRExtractor::extract (const db::Polygon &polygon, const std::vector
 
     for (size_t j = 0; j < p->size (); ++j) {
 
-      const db::plc::Edge *e = p->edge (j);
+      const db::plc::Edge *e = p->edge (int (j));
       if (e->left () && e->right ()) {
 
         auto ip = internal_ports.find (e);
@@ -262,7 +262,7 @@ SquareCountingRExtractor::extract (const db::Polygon &polygon, const std::vector
     //  1. internal ports
     for (auto i = ip_indexes.begin (); i != ip_indexes.end (); ++i) {
       db::Box loc = (inv_trans * internal_port_edges [*i]->edge ()).bbox ();
-      ports.push_back (std::make_pair (PortDefinition (pex::RNode::Internal, loc, *i), (pex::RNode *) 0));
+      ports.push_back (std::make_pair (PortDefinition (pex::RNode::Internal, loc, (unsigned int) *i), (pex::RNode *) 0));
     }
 
     //  2. vertex ports
@@ -278,7 +278,7 @@ SquareCountingRExtractor::extract (const db::Polygon &polygon, const std::vector
     //  (NOTE: here we only take the center of the bounding box)
     for (auto i = pp_indexes.begin (); i != pp_indexes.end (); ++i) {
       db::Box loc = polygon_ports [*i].box ();
-      ports.push_back (std::make_pair (PortDefinition (pex::RNode::PolygonPort, loc, *i), (pex::RNode *) 0));
+      ports.push_back (std::make_pair (PortDefinition (pex::RNode::PolygonPort, loc, (unsigned int) *i), (pex::RNode *) 0));
     }
 
     //  create nodes for the ports

@@ -50,7 +50,7 @@ class RNetwork;
  *  RNode object cannot be created directly. Use "create_node"
  *  from RNetwork.
  */
-struct PEX_PUBLIC RNode
+class PEX_PUBLIC RNode
   : public tl::list_node<RNode>
 {
 public:
@@ -139,9 +139,10 @@ private:
  *  RElement objects cannot be created directly. Use "create_element"
  *  from RNetwork.
  */
-struct PEX_PUBLIC RElement
+class PEX_PUBLIC RElement
   : public tl::list_node<RElement>
 {
+public:
   /**
    *  @brief The conductance value
    */

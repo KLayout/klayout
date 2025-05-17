@@ -229,19 +229,19 @@ RNetExtractor::create_via_ports (const RExtractorTech &tech,
   }
 }
 
-static inline size_t make_id (size_t index, unsigned int type)
+static inline size_t make_id (unsigned int index, unsigned int type)
 {
-  return (index << 2) + type;
+  return (size_t (index) << 2) + type;
 }
 
-static inline size_t index_from_id (size_t id)
+static inline unsigned int index_from_id (size_t id)
 {
-  return id >> 2;
+  return (unsigned int) (id >> 2);
 }
 
 static inline unsigned int type_from_id (size_t id)
 {
-  return id & 3;
+  return (unsigned int) (id & 3);
 }
 
 namespace

@@ -133,7 +133,7 @@ TriangulationRExtractor::extract (const db::Polygon &polygon, const std::vector<
 
     for (size_t iv = 0; iv < p->size (); ++iv) {
 
-      const db::plc::Vertex *vertex = p->vertex (iv);
+      const db::plc::Vertex *vertex = p->vertex (int (iv));
       if (vertex2node.find (vertex) != vertex2node.end ()) {
         continue;
       }
@@ -148,7 +148,7 @@ TriangulationRExtractor::extract (const db::Polygon &polygon, const std::vector<
         if (pn != pport_nodes.end ()) {
           n = pn->second;
         } else {
-          n = rnetwork.create_node (pex::RNode::PolygonPort, port_index, 0);
+          n = rnetwork.create_node (pex::RNode::PolygonPort, (unsigned int) port_index, 0);
           pport_nodes.insert (std::make_pair (port_index, n));
           n->location = trans * polygon_ports [port_index].box ();
         }
@@ -158,7 +158,7 @@ TriangulationRExtractor::extract (const db::Polygon &polygon, const std::vector<
         for (auto pi = vertex->ids ().begin (); pi != vertex->ids ().end (); ++pi) {
           size_t port_index = size_t (*pi);
           if (port_index < vertex_ports.size ()) {
-            RNode *nn = rnetwork.create_node (pex::RNode::VertexPort, port_index, 0);
+            RNode *nn = rnetwork.create_node (pex::RNode::VertexPort, (unsigned int) port_index, 0);
             nn->location = db::DBox (*vertex, *vertex);
             if (n) {
               //  in case of multiple vertexes on the same spot, short them
@@ -172,7 +172,7 @@ TriangulationRExtractor::extract (const db::Polygon &polygon, const std::vector<
 
       } else {
 
-        n = rnetwork.create_node (pex::RNode::Internal, internal_node_id++, 0);
+        n = rnetwork.create_node (pex::RNode::Internal, (unsigned int) internal_node_id++, 0);
         n->location = db::DBox (*vertex, *vertex);
 
       }
@@ -204,7 +204,7 @@ TriangulationRExtractor::extract (const db::Polygon &polygon, const std::vector<
         if (ip != pport_nodes.end ()) {
 
           //  create a new vertex port and short it to the polygon port
-          auto n = rnetwork.create_node (pex::RNode::VertexPort, iv, 0);
+          auto n = rnetwork.create_node (pex::RNode::VertexPort, (unsigned int) iv, 0);
           n->location = db::DBox (trans * vp, trans * vp);
           rnetwork.create_element (pex::RElement::short_value (), n, ip->second);
 
@@ -283,7 +283,7 @@ TriangulationRExtractor::eliminate_all (RNetwork &rnetwork)
           size_t nn = n->elements ().size ();
           if (nn <= nmax) {
             to_eliminate.push_back (const_cast<pex::RNode *> (n.operator-> ()));
-          } else if (nmax_next == 0 or nn < nmax_next) {
+          } else if (nmax_next == 0 || nn < nmax_next) {
             nmax_next = nn;
           }
         }

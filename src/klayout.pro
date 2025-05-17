@@ -69,7 +69,7 @@ lib.depends += db
 
 lym.depends += gsi $$LANG_DEPENDS
 
-laybasic.depends += rdb 
+laybasic.depends += rdb pex
 layview.depends += laybasic
 
 ant.depends += layview
@@ -117,7 +117,7 @@ equals(HAVE_RUBY, "1") {
 
 } else {
 
-  plugins.depends += layview ant img edt 
+  plugins.depends += layview ant img edt
 
 }
 

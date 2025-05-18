@@ -41,6 +41,33 @@ public:
 
 }
 
+static std::string network2s (const pex::RNetwork &network)
+{
+  std::vector<std::string> r;
+
+  for (auto e = network.begin_elements (); e != network.end_elements (); ++e) {
+
+    const pex::RElement &element = *e;
+
+    std::string na = (element.a ()->type != pex::RNode::Internal ? element.a ()->to_string () : "") +
+                        element.a ()->location.to_string ();
+    std::string nb = (element.b ()->type != pex::RNode::Internal ? element.b ()->to_string () : "") +
+                        element.b ()->location.to_string ();
+
+    if (nb < na) {
+      std::swap (na, nb);
+    }
+
+    std::string s = "R " + na + " " + nb + " " + tl::to_string (element.resistance ());
+    r.push_back (s);
+
+  }
+
+  std::sort (r.begin (), r.end ());
+
+  return tl::join (r, "\n");
+}
+
 TEST(basic)
 {
   db::Point contour[] = {
@@ -134,10 +161,10 @@ TEST(extraction)
 
   rex.extract (poly, vertex_ports, polygon_ports, rn);
 
-  EXPECT_EQ (rn.to_string (),
-    "R $0 V0 10.5\n"
-    "R $0 V1 6\n"
-    "R $0 P0 8.5"
+  EXPECT_EQ (network2s (rn),
+    "R (1,0.1;1.1,0.1) P0(1,0.9;1.1,1) 8.5\n"
+    "R (1,0.1;1.1,0.1) V0(0,0.05;0,0.05) 10.5\n"
+    "R (1,0.1;1.1,0.1) V1(1.65,0.05;1.65,0.05) 6"
   )
 }
 
@@ -182,7 +209,7 @@ TEST(extraction_meander)
 
   rex.extract (poly, vertex_ports, polygon_ports, rn);
 
-  EXPECT_EQ (rn.to_string (),
-    "R V0 V1 10.0544"          //  that is pretty much the length of the center line / width :)
+  EXPECT_EQ (network2s (rn),
+    "R V0(0.3,0;0.3,0) V1(4.3,1;4.3,1) 10.0543767445"          //  that is pretty much the length of the center line / width :)
   )
 }

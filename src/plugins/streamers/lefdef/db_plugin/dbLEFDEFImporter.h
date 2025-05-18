@@ -1526,7 +1526,7 @@ private:
   std::map<std::string, int> m_default_number;
   const LEFDEFReaderOptions *mp_tech_comp;
   std::map<ViaKey, db::Cell *> m_via_cells;
-  std::map<std::pair<std::string, std::string>, LEFDEFLayoutGenerator *> m_via_generators;
+  std::multimap<std::pair<std::string, std::string>, LEFDEFLayoutGenerator *> m_via_generators;
   std::map<MacroKey, std::pair<db::Cell *, db::Trans> > m_macro_cells;
   std::map<std::string, LEFDEFLayoutGenerator *> m_macro_generators;
   std::map<std::string, db::cell_index_type> m_foreign_cells;
@@ -1538,6 +1538,7 @@ private:
   std::set<unsigned int> open_layer_uncached (db::Layout &layout, const std::string &name, LayerPurpose purpose, unsigned int mask);
   db::cell_index_type foreign_cell(Layout &layout, const std::string &name);
   void read_single_map_file (const std::string &path, std::map<std::pair<std::string, LayerDetailsKey>, std::vector<db::LayerProperties> > &layer_map);
+  std::pair<LEFDEFLayoutGenerator *, std::string> via_generator_and_rule (const std::string &vn, const std::string &nondefaultrule);
 };
 
 /**

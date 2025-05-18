@@ -25,6 +25,7 @@
 #include "dbWriter.h"
 #include "dbDEFImporter.h"
 #include "dbLEFImporter.h"
+#include "dbCommonReader.h"
 
 #include "tlUnitTest.h"
 #include "dbTestSupport.h"
@@ -1102,3 +1103,35 @@ TEST(214_issue1877)
   db::compare_layouts (_this, ly, fn_path + "au.oas", db::WriteOAS);
 }
 
+//  multi-DEF reader support (issue-2014)
+TEST(215_multiDEF)
+{
+  std::string fn_path (tl::testdata ());
+  fn_path += "/lefdef/multi_def/";
+
+  db::Layout ly;
+
+  db::LoadLayoutOptions opt;
+  //  anything else will not make much sense
+  opt.get_options<db::CommonReaderOptions> ().cell_conflict_resolution = db::CellConflictResolution::RenameCell;
+
+  //  Test "set_option_by_name"
+  opt.set_option_by_name ("lefdef_config.lef_context_enabled", true);
+  opt.set_option_by_name ("lefdef_config.map_file", "layers.map");
+  opt.set_option_by_name ("lefdef_config.read_lef_with_def", true);
+
+  const char *files[] = {
+    "main.def",
+    "comp_a.def",
+    "comp_b.def",
+    "comp_c.def"
+  };
+
+  for (const char **fn = files; fn != files + sizeof (files) / sizeof (files[0]); ++fn) {
+    tl::InputStream is (fn_path + *fn);
+    db::Reader reader (is);
+    reader.read (ly, opt);
+  }
+
+  db::compare_layouts (_this, ly, fn_path + "au.oas", db::WriteOAS);
+}

@@ -898,6 +898,21 @@ TEST(132_issue1307_pin_names)
   run_test (_this, "issue-1307c", "lef:in.lef+def:in.def", "au.oas", opt, false);
 }
 
+/*
+TODO: need to clarify first, if invalid via specs should be errors
+TEST(133_unknown_vias_are_errors)
+{
+  db::LEFDEFReaderOptions opt = default_options ();
+
+  try {
+    run_test (_this, "invalid_via", "lef:tech.lef+def:comp_invalid_via.def", "au.oas", opt, false);
+    EXPECT_EQ (true, false);
+  } catch (db::LEFDEFReaderException &ex) {
+    EXPECT_EQ (ex.msg ().find ("Invalid via name"), size_t (0));
+  }
+}
+*/
+
 TEST(200_lefdef_plugin)
 {
   db::Layout ly;

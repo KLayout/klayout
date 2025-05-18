@@ -749,7 +749,12 @@ DEFImporter::read_single_net (std::string &nondefaultrule, Layout &layout, db::C
         }
 
         std::map<std::string, ViaDesc>::const_iterator vd = m_via_desc.find (vn);
-        if (vd != m_via_desc.end () && ! pts.empty ()) {
+
+        if (vd == m_via_desc.end ()) {
+
+          warn (tl::to_string (tr ("Invalid via name: ")) + vn);
+
+        } else if (! pts.empty ()) {
 
           //  For the via, the masks are encoded in a three-digit number (<mask-top> <mask-cut> <mask_bottom>)
           unsigned int mask_top = (mask / 100) % 10;

@@ -176,6 +176,15 @@ if ! [ -e $target/klayout.exe ]; then
 fi
 
 # ----------------------------------------------------------
+# FreeCAD
+if [ "$MSYSTEM" == "UCRT64" ]; then
+cp /ucrt64/bin/FreeCAD.exe  $target
+cp /ucrt64/bin/FreeCAD.pyd  $target
+cp /ucrt64/bin/FreeCADCmd.exe $target
+cp /ucrt64/bin/FreeCADGui.pyd $target
+fi
+
+# ----------------------------------------------------------
 # cert.pem
 
 echo "Installing cert.pem .."

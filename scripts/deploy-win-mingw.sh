@@ -175,14 +175,6 @@ if ! [ -e $target/klayout.exe ]; then
   exit 1
 fi
 
-# ----------------------------------------------------------
-# FreeCAD
-if [ "$MSYSTEM" == "UCRT64" ]; then
-cp /ucrt64/bin/FreeCAD.exe  $target
-cp /ucrt64/bin/FreeCAD.pyd  $target
-cp /ucrt64/bin/FreeCADCmd.exe $target
-cp /ucrt64/bin/FreeCADGui.pyd $target
-fi
 
 # ----------------------------------------------------------
 # cert.pem
@@ -292,6 +284,54 @@ done
 echo '' >>$target/.python-paths.txt
 echo ']' >>$target/.python-paths.txt
 
+
+# ----------------------------------------------------------
+# FreeCAD
+if [ "$MSYSTEM" == "UCRT64" ]; then
+  mkdir $target/bin
+  cp /ucrt64/bin/FreeCAD.exe  $target/bin
+  cp /ucrt64/bin/FreeCAD.pyd  $target/bin
+  cp /ucrt64/bin/FreeCADCmd.exe $target/bin
+  cp /ucrt64/bin/FreeCADGui.pyd $target/bin
+  cp -r /ucrt64/Ext $target/
+  cp -r /ucrt64/Mod $target/
+# ----------------------------------------------------------
+# FreeCAD Binary dependencies
+  pushd $target
+  pushd $bin
+  new_libs=$(find . -name "*.exe" -or -name "*.dll" -or -name "*.pyd" -or -name "*.so")
+
+  while [ "$new_libs" != "" ]; do
+    echo "Analyzing FreeCAD dependencies of $new_libs .."
+    # Analyze the dependencies of our components and add the corresponding libraries from $mingw_inst/bin
+    tmp_libs=.tmp-libs.txt
+    rm -f $tmp_libs
+    echo "" >$tmp_libs
+    for l in $new_libs; do
+      echo -n "."
+      objdump -p $l | grep "DLL Name:" | sed 's/.*DLL Name: *//' >>$tmp_libs
+    done
+    echo ""
+    libs=$(cat $tmp_libs | sort -u)
+    rm -f $tmp_libs
+    new_libs=""
+
+    for l in $libs; do
+      if [ -e $mingw_inst/bin/$l ] && ! [ -e $l ]; then
+        echo "Copying binary installation partial $mingw_inst/bin/$l -> $l .."
+        cp $mingw_inst/bin/$l $l
+        new_libs="$new_libs $l"
+      elif [ -e "${ucrt_vssdk}/$l" ] && ! [ -e $l ]; then
+        echo "Copying binary installation partial ${ucrt_vssdk}/${l} -> $l .."
+        cp "${ucrt_vssdk}/${l}" "$l"
+        new_libs="$new_libs $l"
+      fi  
+    done
+  done
+  popd
+  popd
+fi
+
 # ----------------------------------------------------------
 # Binary dependencies
 
@@ -351,8 +391,11 @@ echo "Making .zip file $zipname.zip .."
 rm -rf $zipname $zipname.zip
 mkdir $zipname
 cp -Rv strm*.exe *.dll cert.pem .*-paths.txt db_plugins lay_plugins pymod $plugins lib $zipname | sed -u 's/.*/echo -n ./' | sh
-cp klayout.exe $zipname/klayout_app.exe
-cp klayout.exe $zipname/klayout_vo_app.exe
+if [ "$MSYSTEM" == "UCRT64" ]; then
+  cp -r bin $zipname/
+  cp -r Ext $zipname/
+  cp -r Mod $zipname/
+fi
 echo ""
 
 zip -r $zipname.zip $zipname

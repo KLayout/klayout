@@ -298,7 +298,7 @@ if [ "$MSYSTEM" == "UCRT64" ]; then
 # ----------------------------------------------------------
 # FreeCAD Binary dependencies
   pushd $target
-  pushd $bin
+  pushd bin
   new_libs=$(find . -name "*.exe" -or -name "*.dll" -or -name "*.pyd" -or -name "*.so")
 
   while [ "$new_libs" != "" ]; do

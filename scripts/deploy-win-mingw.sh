@@ -391,6 +391,8 @@ echo "Making .zip file $zipname.zip .."
 rm -rf $zipname $zipname.zip
 mkdir $zipname
 cp -Rv strm*.exe *.dll cert.pem .*-paths.txt db_plugins lay_plugins pymod $plugins lib $zipname | sed -u 's/.*/echo -n ./' | sh
+cp klayout.exe $zipname/klayout_app.exe
+cp klayout.exe $zipname/klayout_vo_app.exe
 if [ "$MSYSTEM" == "UCRT64" ]; then
   cp -r bin $zipname/
   cp -r Ext $zipname/

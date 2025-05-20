@@ -72,6 +72,9 @@ section
   file /r db_plugins
   file /r lay_plugins
   file /r pymod
+  file /r bin
+  file /r Ext
+  file /r Mod
   file /nonfatal /r audio
   file /nonfatal /r generic
   file /nonfatal /r iconengines

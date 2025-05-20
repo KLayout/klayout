@@ -289,17 +289,21 @@ echo ']' >>$target/.python-paths.txt
 # FreeCAD
 if [ "$MSYSTEM" == "UCRT64" ]; then
   mkdir $target/bin
-  cp /ucrt64/bin/FreeCAD.exe  $target/bin
   cp /ucrt64/bin/FreeCAD.pyd  $target/bin
   cp /ucrt64/bin/FreeCADCmd.exe $target/bin
   cp /ucrt64/bin/FreeCADGui.pyd $target/bin
   cp -r /ucrt64/Ext $target/
-  cp -r /ucrt64/Mod $target/
+  mkdir $target/Mod
+  cp -r /ucrt64/Mod/Part $target/Mod
+  cp -r /ucrt64/Mod/PartDesign $target/Mod
+  cp -r /ucrt64/Mod/Sketcher $target/Mod
+  cp -r /ucrt64/Mod/Draft $target/Mod
+  cp -r /ucrt64/Mod/Import $target/Mod
 # ----------------------------------------------------------
 # FreeCAD Binary dependencies
   pushd $target
   pushd bin
-  new_libs=$(find . -name "*.exe" -or -name "*.dll" -or -name "*.pyd" -or -name "*.so")
+  new_libs=$(find . -name "*.dll" -or -name "*.pyd" -or -name "*.so")
 
   while [ "$new_libs" != "" ]; do
     echo "Analyzing FreeCAD dependencies of $new_libs .."

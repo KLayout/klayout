@@ -1118,6 +1118,14 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "@brief Reads the extracted netlist from the file.\n"
     "This method employs the native format of KLayout.\n"
   ) +
+  gsi::method ("clear_log_entries", &db::LayoutToNetlist::clear_log_entries,
+    "@brief Clears the log entries.\n"
+    "This method has been introduced in version 0.30.2"
+  ) +
+  gsi::method ("add_log_entry", &db::LayoutToNetlist::log_entry, gsi::arg ("entry"),
+    "@brief Adds a log entry.\n"
+    "This method has been introduced in version 0.30.2"
+  ) +
   gsi::iterator ("each_log_entry|#each_error", &db::LayoutToNetlist::begin_log_entries, &db::LayoutToNetlist::end_log_entries,
     "@brief Iterates over all log entries collected during device and netlist extraction.\n"
     "This method has been introduced in version 0.28.13."

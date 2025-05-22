@@ -287,12 +287,38 @@ static pair_data_iterator<db::NetlistCrossReference::NetPairData, db::NetlistCro
   }
 }
 
+static pair_data_iterator<db::NetlistCrossReference::NetPairData, db::NetlistCrossReference::PerCircuitData::net_pairs_const_iterator> each_net_pair1 (db::NetlistCrossReference *xref, const db::Circuit *circuit)
+{
+  tl_assert (xref->netlist_a () != 0 && xref->netlist_b () != 0);
+  typedef pair_data_iterator<db::NetlistCrossReference::NetPairData, db::NetlistCrossReference::PerCircuitData::net_pairs_const_iterator> iter_type;
+
+  const db::NetlistCrossReference::PerCircuitData *data = xref->per_circuit_data_for (std::make_pair (circuit, circuit));
+  if (! data) {
+    return iter_type ();
+  } else {
+    return iter_type (xref, data->nets.begin (), data->nets.end ());
+  }
+}
+
 static pair_data_iterator<db::NetlistCrossReference::DevicePairData, db::NetlistCrossReference::PerCircuitData::device_pairs_const_iterator> each_device_pair (db::NetlistCrossReference *xref, const CircuitPairData &circuit_pair)
 {
   tl_assert (xref->netlist_a () != 0 && xref->netlist_b () != 0);
   typedef pair_data_iterator<db::NetlistCrossReference::DevicePairData, db::NetlistCrossReference::PerCircuitData::device_pairs_const_iterator> iter_type;
 
   const db::NetlistCrossReference::PerCircuitData *data = xref->per_circuit_data_for (circuit_pair.pair);
+  if (! data) {
+    return iter_type ();
+  } else {
+    return iter_type (xref, data->devices.begin (), data->devices.end ());
+  }
+}
+
+static pair_data_iterator<db::NetlistCrossReference::DevicePairData, db::NetlistCrossReference::PerCircuitData::device_pairs_const_iterator> each_device_pair1 (db::NetlistCrossReference *xref, const db::Circuit *circuit)
+{
+  tl_assert (xref->netlist_a () != 0 && xref->netlist_b () != 0);
+  typedef pair_data_iterator<db::NetlistCrossReference::DevicePairData, db::NetlistCrossReference::PerCircuitData::device_pairs_const_iterator> iter_type;
+
+  const db::NetlistCrossReference::PerCircuitData *data = xref->per_circuit_data_for (std::make_pair (circuit, circuit));
   if (! data) {
     return iter_type ();
   } else {
@@ -313,12 +339,38 @@ static pair_data_iterator<db::NetlistCrossReference::PinPairData, db::NetlistCro
   }
 }
 
+static pair_data_iterator<db::NetlistCrossReference::PinPairData, db::NetlistCrossReference::PerCircuitData::pin_pairs_const_iterator> each_pin_pair1 (db::NetlistCrossReference *xref, const db::Circuit *circuit)
+{
+  tl_assert (xref->netlist_a () != 0 && xref->netlist_b () != 0);
+  typedef pair_data_iterator<db::NetlistCrossReference::PinPairData, db::NetlistCrossReference::PerCircuitData::pin_pairs_const_iterator> iter_type;
+
+  const db::NetlistCrossReference::PerCircuitData *data = xref->per_circuit_data_for (std::make_pair (circuit, circuit));
+  if (! data) {
+    return iter_type ();
+  } else {
+    return iter_type (xref, data->pins.begin (), data->pins.end ());
+  }
+}
+
 static pair_data_iterator<db::NetlistCrossReference::SubCircuitPairData, db::NetlistCrossReference::PerCircuitData::subcircuit_pairs_const_iterator> each_subcircuit_pair (db::NetlistCrossReference *xref, const CircuitPairData &circuit_pair)
 {
   tl_assert (xref->netlist_a () != 0 && xref->netlist_b () != 0);
   typedef pair_data_iterator<db::NetlistCrossReference::SubCircuitPairData, db::NetlistCrossReference::PerCircuitData::subcircuit_pairs_const_iterator> iter_type;
 
   const db::NetlistCrossReference::PerCircuitData *data = xref->per_circuit_data_for (circuit_pair.pair);
+  if (! data) {
+    return iter_type ();
+  } else {
+    return iter_type (xref, data->subcircuits.begin (), data->subcircuits.end ());
+  }
+}
+
+static pair_data_iterator<db::NetlistCrossReference::SubCircuitPairData, db::NetlistCrossReference::PerCircuitData::subcircuit_pairs_const_iterator> each_subcircuit_pair1 (db::NetlistCrossReference *xref, const db::Circuit *circuit)
+{
+  tl_assert (xref->netlist_a () != 0 && xref->netlist_b () != 0);
+  typedef pair_data_iterator<db::NetlistCrossReference::SubCircuitPairData, db::NetlistCrossReference::PerCircuitData::subcircuit_pairs_const_iterator> iter_type;
+
+  const db::NetlistCrossReference::PerCircuitData *data = xref->per_circuit_data_for (std::make_pair (circuit, circuit));
   if (! data) {
     return iter_type ();
   } else {
@@ -339,12 +391,38 @@ static pair_data_iterator<std::pair<const db::NetTerminalRef *, const db::NetTer
   }
 }
 
+static pair_data_iterator<std::pair<const db::NetTerminalRef *, const db::NetTerminalRef *>, db::NetlistCrossReference::PerNetData::terminal_pairs_const_iterator> each_net_terminal_pair1 (db::NetlistCrossReference *xref, const db::Net *net)
+{
+  tl_assert (xref->netlist_a () != 0 && xref->netlist_b () != 0);
+  typedef pair_data_iterator<std::pair<const db::NetTerminalRef *, const db::NetTerminalRef *>, db::NetlistCrossReference::PerNetData::terminal_pairs_const_iterator> iter_type;
+
+  const db::NetlistCrossReference::PerNetData *data = xref->per_net_data_for_net (net);
+  if (! data) {
+    return iter_type ();
+  } else {
+    return iter_type (xref, data->terminals.begin (), data->terminals.end ());
+  }
+}
+
 static pair_data_iterator<std::pair<const db::NetPinRef *, const db::NetPinRef *>, db::NetlistCrossReference::PerNetData::pin_pairs_const_iterator> each_net_pin_pair (db::NetlistCrossReference *xref, const db::NetlistCrossReference::NetPairData &net_pair)
 {
   tl_assert (xref->netlist_a () != 0 && xref->netlist_b () != 0);
   typedef pair_data_iterator<std::pair<const db::NetPinRef *, const db::NetPinRef *>, db::NetlistCrossReference::PerNetData::pin_pairs_const_iterator> iter_type;
 
   const db::NetlistCrossReference::PerNetData *data = xref->per_net_data_for (net_pair.pair);
+  if (! data) {
+    return iter_type ();
+  } else {
+    return iter_type (xref, data->pins.begin (), data->pins.end ());
+  }
+}
+
+static pair_data_iterator<std::pair<const db::NetPinRef *, const db::NetPinRef *>, db::NetlistCrossReference::PerNetData::pin_pairs_const_iterator> each_net_pin_pair1 (db::NetlistCrossReference *xref, const db::Net *net)
+{
+  tl_assert (xref->netlist_a () != 0 && xref->netlist_b () != 0);
+  typedef pair_data_iterator<std::pair<const db::NetPinRef *, const db::NetPinRef *>, db::NetlistCrossReference::PerNetData::pin_pairs_const_iterator> iter_type;
+
+  const db::NetlistCrossReference::PerNetData *data = xref->per_net_data_for_net (net);
   if (! data) {
     return iter_type ();
   } else {
@@ -365,6 +443,19 @@ static pair_data_iterator<std::pair<const db::NetSubcircuitPinRef *, const db::N
   }
 }
 
+static pair_data_iterator<std::pair<const db::NetSubcircuitPinRef *, const db::NetSubcircuitPinRef *>, db::NetlistCrossReference::PerNetData::subcircuit_pin_pairs_const_iterator> each_net_subcircuit_pin_pair1 (db::NetlistCrossReference *xref, const db::Net *net)
+{
+  tl_assert (xref->netlist_a () != 0 && xref->netlist_b () != 0);
+  typedef pair_data_iterator<std::pair<const db::NetSubcircuitPinRef *, const db::NetSubcircuitPinRef *>, db::NetlistCrossReference::PerNetData::subcircuit_pin_pairs_const_iterator> iter_type;
+
+  const db::NetlistCrossReference::PerNetData *data = xref->per_net_data_for_net (net);
+  if (! data) {
+    return iter_type ();
+  } else {
+    return iter_type (xref, data->subcircuit_pins.begin (), data->subcircuit_pins.end ());
+  }
+}
+
 Class<db::NetlistCrossReference> decl_dbNetlistCrossReference (decl_dbNetlistCompareLogger, "db", "NetlistCrossReference",
   gsi::iterator_ext ("each_circuit_pair", &each_circuit_pair,
     "@brief Delivers the circuit pairs and their status.\n"
@@ -374,29 +465,71 @@ Class<db::NetlistCrossReference> decl_dbNetlistCrossReference (decl_dbNetlistCom
     "@brief Delivers the net pairs and their status for the given circuit pair.\n"
     "See the class description for details."
   ) +
+  gsi::iterator_ext ("each_net_pair", &each_net_pair1, gsi::arg ("circuit"),
+    "@brief Delivers the net pairs and their status for the given circuit.\n"
+    "This convenience method looks up the circuit pair from the given circuit. This circuit can be "
+    "a schematic or layout circuit.\n"
+    "This method has been added in version 0.30.2.\n"
+  ) +
   gsi::iterator_ext ("each_device_pair", &each_device_pair, gsi::arg ("circuit_pair"),
     "@brief Delivers the device pairs and their status for the given circuit pair.\n"
     "See the class description for details."
+  ) +
+  gsi::iterator_ext ("each_device_pair", &each_device_pair1, gsi::arg ("circuit"),
+    "@brief Delivers the device pairs and their status for the given circuit pair.\n"
+    "This convenience method looks up the circuit pair from the given circuit. This circuit can be "
+    "a schematic or layout circuit.\n"
+    "This method has been added in version 0.30.2.\n"
   ) +
   gsi::iterator_ext ("each_pin_pair", &each_pin_pair, gsi::arg ("circuit_pair"),
     "@brief Delivers the pin pairs and their status for the given circuit pair.\n"
     "See the class description for details."
   ) +
+  gsi::iterator_ext ("each_pin_pair", &each_pin_pair1, gsi::arg ("circuit"),
+    "@brief Delivers the pin pairs and their status for the given circuit pair.\n"
+    "This convenience method looks up the circuit pair from the given circuit. This circuit can be "
+    "a schematic or layout circuit.\n"
+    "This method has been added in version 0.30.2.\n"
+  ) +
   gsi::iterator_ext ("each_subcircuit_pair", &each_subcircuit_pair, gsi::arg ("circuit_pair"),
     "@brief Delivers the subcircuit pairs and their status for the given circuit pair.\n"
     "See the class description for details."
+  ) +
+  gsi::iterator_ext ("each_subcircuit_pair", &each_subcircuit_pair1, gsi::arg ("circuit"),
+    "@brief Delivers the subcircuit pairs and their status for the given circuit pair.\n"
+    "This convenience method looks up the circuit pair from the given circuit. This circuit can be "
+    "a schematic or layout circuit.\n"
+    "This method has been added in version 0.30.2.\n"
   ) +
   gsi::iterator_ext ("each_net_terminal_pair", &each_net_terminal_pair, gsi::arg ("net_pair"),
     "@brief Delivers the device terminal pairs for the given net pair.\n"
     "For the net pair, lists the device terminal pairs identified on this net."
   ) +
+  gsi::iterator_ext ("each_net_terminal_pair", &each_net_terminal_pair1, gsi::arg ("net"),
+    "@brief Delivers the device terminal pairs for the given net pair.\n"
+    "This convenience method looks up the net pair from the given net. This net can be "
+    "a schematic or layout net.\n"
+    "This method has been added in version 0.30.2.\n"
+  ) +
   gsi::iterator_ext ("each_net_pin_pair", &each_net_pin_pair, gsi::arg ("net_pair"),
     "@brief Delivers the pin pairs for the given net pair.\n"
     "For the net pair, lists the pin pairs identified on this net."
   ) +
+  gsi::iterator_ext ("each_net_pin_pair", &each_net_pin_pair1, gsi::arg ("net"),
+    "@brief Delivers the pin pairs for the given net pair.\n"
+    "This convenience method looks up the net pair from the given net. This net can be "
+    "a schematic or layout net.\n"
+    "This method has been added in version 0.30.2.\n"
+  ) +
   gsi::iterator_ext ("each_net_subcircuit_pin_pair", &each_net_subcircuit_pin_pair, gsi::arg ("net_pair"),
     "@brief Delivers the subcircuit pin pairs for the given net pair.\n"
     "For the net pair, lists the subcircuit pin pairs identified on this net."
+  ) +
+  gsi::iterator_ext ("each_net_subcircuit_pin_pair", &each_net_subcircuit_pin_pair1, gsi::arg ("net"),
+    "@brief Delivers the subcircuit pin pairs for the given net pair.\n"
+    "This convenience method looks up the net pair from the given net. This net can be "
+    "a schematic or layout net.\n"
+    "This method has been added in version 0.30.2.\n"
   ) +
   gsi::method ("other_net_for", &db::NetlistCrossReference::other_net_for, gsi::arg ("net"),
     "@brief Gets the matching other net for a given primary net.\n"

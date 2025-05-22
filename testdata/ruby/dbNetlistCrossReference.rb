@@ -82,7 +82,31 @@ class DBNetlistCrossReference_TestClass < TestBase
     assert_equal(info.join(","), "/1:Match,BULK/6:Match,IN/2:Match,OUT/3:Match,VDD/5:Match,VSS/4:Match")
       
     info = []
+    xref.each_pin_pair(cp_inv2.first) do |p|
+      info << [ p.first, p.second ].collect { |s| s ? s.name : "(nil)" }.join("/") + ":" + p.status.to_s
+    end
+    assert_equal(info.join(","), "/1:Match,BULK/6:Match,IN/2:Match,OUT/3:Match,VDD/5:Match,VSS/4:Match")
+      
+    info = []
+    xref.each_pin_pair(cp_inv2.second) do |p|
+      info << [ p.first, p.second ].collect { |s| s ? s.name : "(nil)" }.join("/") + ":" + p.status.to_s
+    end
+    assert_equal(info.join(","), "/1:Match,BULK/6:Match,IN/2:Match,OUT/3:Match,VDD/5:Match,VSS/4:Match")
+      
+    info = []
     xref.each_net_pair(cp_inv2) do |p|
+      info << [ p.first, p.second ].collect { |s| s ? s.name : "(nil)" }.join("/") + ":" + p.status.to_s
+    end
+    assert_equal(info.join(","), "/1:Match,BULK/6:Match,IN/2:Match,OUT/3:Match,VDD/5:Match,VSS/4:Match")
+
+    info = []
+    xref.each_net_pair(cp_inv2.first) do |p|
+      info << [ p.first, p.second ].collect { |s| s ? s.name : "(nil)" }.join("/") + ":" + p.status.to_s
+    end
+    assert_equal(info.join(","), "/1:Match,BULK/6:Match,IN/2:Match,OUT/3:Match,VDD/5:Match,VSS/4:Match")
+
+    info = []
+    xref.each_net_pair(cp_inv2.second) do |p|
       info << [ p.first, p.second ].collect { |s| s ? s.name : "(nil)" }.join("/") + ":" + p.status.to_s
     end
     assert_equal(info.join(","), "/1:Match,BULK/6:Match,IN/2:Match,OUT/3:Match,VDD/5:Match,VSS/4:Match")
@@ -101,7 +125,31 @@ class DBNetlistCrossReference_TestClass < TestBase
     assert_equal(info.join(","), "B/B")
 
     info = []
+    xref.each_net_terminal_pair(netp_bulk.first) do |p|
+      info << [ p.first, p.second ].collect { |s| s ? s.terminal_def.name : "(nil)" }.join("/")
+    end
+    assert_equal(info.join(","), "B/B")
+
+    info = []
+    xref.each_net_terminal_pair(netp_bulk.second) do |p|
+      info << [ p.first, p.second ].collect { |s| s ? s.terminal_def.name : "(nil)" }.join("/")
+    end
+    assert_equal(info.join(","), "B/B")
+
+    info = []
     xref.each_net_pin_pair(netp_bulk) do |p|
+      info << [ p.first, p.second ].collect { |s| s ? s.pin.name : "(nil)" }.join("/")
+    end
+    assert_equal(info.join(","), "BULK/6")
+
+    info = []
+    xref.each_net_pin_pair(netp_bulk.first) do |p|
+      info << [ p.first, p.second ].collect { |s| s ? s.pin.name : "(nil)" }.join("/")
+    end
+    assert_equal(info.join(","), "BULK/6")
+
+    info = []
+    xref.each_net_pin_pair(netp_bulk.second) do |p|
       info << [ p.first, p.second ].collect { |s| s ? s.pin.name : "(nil)" }.join("/")
     end
     assert_equal(info.join(","), "BULK/6")
@@ -113,13 +161,49 @@ class DBNetlistCrossReference_TestClass < TestBase
     assert_equal(info.join(","), "")
 
     info = []
+    xref.each_net_subcircuit_pin_pair(netp_bulk.first) do |p|
+      info << [ p.first, p.second ].collect { |s| s ? s.pin.name : "(nil)" }.join("/")
+    end
+    assert_equal(info.join(","), "")
+
+    info = []
+    xref.each_net_subcircuit_pin_pair(netp_bulk.second) do |p|
+      info << [ p.first, p.second ].collect { |s| s ? s.pin.name : "(nil)" }.join("/")
+    end
+    assert_equal(info.join(","), "")
+
+    info = []
     xref.each_device_pair(cp_inv2) do |p|
       info << [ p.first, p.second ].collect { |s| s ? s.name : "(nil)" }.join("/") + ":" + p.status.to_s
     end
     assert_equal(info.join(","), "/$1:Match,/$3:Match")
       
     info = []
+    xref.each_device_pair(cp_inv2.first) do |p|
+      info << [ p.first, p.second ].collect { |s| s ? s.name : "(nil)" }.join("/") + ":" + p.status.to_s
+    end
+    assert_equal(info.join(","), "/$1:Match,/$3:Match")
+      
+    info = []
+    xref.each_device_pair(cp_inv2.second) do |p|
+      info << [ p.first, p.second ].collect { |s| s ? s.name : "(nil)" }.join("/") + ":" + p.status.to_s
+    end
+    assert_equal(info.join(","), "/$1:Match,/$3:Match")
+      
+    info = []
     xref.each_subcircuit_pair(cp_inv2) do |p|
+      info << [ p.first, p.second ].collect { |s| s ? s.name : "(nil)" }.join("/") + ":" + p.status.to_s
+    end
+    assert_equal(info.join(","), "")
+      
+    info = []
+    xref.each_subcircuit_pair(cp_inv2.first) do |p|
+      info << [ p.first, p.second ].collect { |s| s ? s.name : "(nil)" }.join("/") + ":" + p.status.to_s
+    end
+    assert_equal(info.join(","), "")
+      
+    info = []
+    xref.each_subcircuit_pair(cp_inv2.second) do |p|
       info << [ p.first, p.second ].collect { |s| s ? s.name : "(nil)" }.join("/") + ":" + p.status.to_s
     end
     assert_equal(info.join(","), "")

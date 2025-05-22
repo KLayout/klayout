@@ -280,6 +280,7 @@ public:
   const db::SubCircuit *other_subcircuit_for (const db::SubCircuit *subcircuit) const;
   const db::Circuit *other_circuit_for (const db::Circuit *circuit) const;
   const db::Net *other_net_for (const db::Net *net) const;
+  const PerNetData *per_net_data_for_net (const db::Net *net) const;
   const PerNetData *per_net_data_for (const std::pair<const db::Net *, const db::Net *> &nets) const;
 
   const db::Netlist *netlist_a () const

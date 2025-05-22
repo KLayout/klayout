@@ -1121,6 +1121,23 @@ END
     assert_equal(le[2].to_s, "warning")
     assert_equal(le[3].to_s, "error")
 
+    le = RBA::LogEntryData::new
+    le.severity = RBA::LogEntryData::Error
+    le.message = "A new entry"
+    le.geometry = RBA::DPolygon::new(RBA::DBox::new(0, 1, 2, 3))
+    le.cell_name = "MYCELL"
+    le.category_name = "CAT"
+    le.category_description = "Cat Desc"
+    l2n.add_log_entry(le)
+
+    le = l2n.each_log_entry.collect { |s| s.to_s }
+    assert_equal(le.size, 5)
+    assert_equal(le[4].to_s, "[Cat Desc] In cell MYCELL: A new entry, shape: (0,1;0,3;2,3;2,1)")
+
+    l2n.clear_log_entries
+    le = l2n.each_log_entry.collect { |s| s.to_s }
+    assert_equal(le.size, 0)
+
   end
 
   def test_22_Layers

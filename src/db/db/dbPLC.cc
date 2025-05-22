@@ -459,10 +459,11 @@ Polygon::init ()
 
     auto i = v2e.find (v);
     tl_assert (i != v2e.end () && i->first == v && i->second != mp_e.back ());
-    v2e.erase (i);
     mp_e.push_back (i->second);
-
     v = i->second->other (v);
+
+    v2e.erase (i);
+
     i = v2e.find (v);
     while (i != v2e.end () && i->first == v) {
       if (i->second == mp_e.back ()) {

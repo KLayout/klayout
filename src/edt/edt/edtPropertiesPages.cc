@@ -215,7 +215,7 @@ ShapePropertiesPage::recompute_selection_ptrs (const std::vector<lay::ObjectInst
 }
 
 void 
-ShapePropertiesPage::do_apply (bool current_only, bool relative)
+ShapePropertiesPage::do_apply (bool current_only, bool relative, bool commit)
 {
   if (m_indexes.empty ()) {
     return;
@@ -321,7 +321,7 @@ ShapePropertiesPage::do_apply (bool current_only, bool relative)
       }
 
       //  handle the case of guiding shape updates
-      std::pair<bool, lay::ObjectInstPath> gs = mp_service->handle_guiding_shape_changes (new_sel[index]);
+      std::pair<bool, lay::ObjectInstPath> gs = mp_service->handle_guiding_shape_changes (new_sel[index], commit);
       if (gs.first) {
 
         new_sel[index] = gs.second;
@@ -350,9 +350,9 @@ ShapePropertiesPage::do_apply (bool current_only, bool relative)
 }
 
 void 
-ShapePropertiesPage::apply ()
+ShapePropertiesPage::apply (bool commit)
 {
-  do_apply (true, false);
+  do_apply (true, false, commit);
 }
 
 bool
@@ -362,9 +362,9 @@ ShapePropertiesPage::can_apply_to_all () const
 }
 
 void 
-ShapePropertiesPage::apply_to_all (bool relative)
+ShapePropertiesPage::apply_to_all (bool relative, bool commit)
 {
-  do_apply (false, relative);
+  do_apply (false, relative, commit);
 }
 
 void 

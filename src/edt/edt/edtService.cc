@@ -76,6 +76,7 @@ Service::Service (db::Manager *manager, lay::LayoutViewBase *view, db::ShapeIter
     m_snap_to_objects (true),
     m_snap_objects_to_grid (true),
     m_top_level_sel (false), m_show_shapes_of_instances (true), m_max_shapes_of_instances (1000),
+    m_pcell_lazy_evaluation (0),
     m_hier_copy_mode (-1),
     m_indicate_secondary_selection (false),
     m_seq (0),
@@ -391,6 +392,10 @@ Service::configure (const std::string &name, const std::string &value)
     tl::from_string (value, m_hier_copy_mode);
     service_configuration_changed ();
 
+  } else if (name == cfg_edit_pcell_lazy_eval_mode) {
+
+    tl::from_string (value, m_pcell_lazy_evaluation);
+
   } else {
     lay::EditorServiceBase::configure (name, value);
   }
@@ -598,7 +603,7 @@ Service::end_move (const db::DPoint & /*p*/, lay::angle_constraint_type ac)
     transform (db::DCplxTrans (m_move_trans));
     move_cancel (); // formally this functionality fits here
     //  accept changes to guiding shapes
-    handle_guiding_shape_changes ();
+    handle_guiding_shape_changes (true);
   }
   m_alt_ac = lay::AC_Global;
 }
@@ -846,7 +851,7 @@ Service::transform (const db::DCplxTrans &trans, const std::vector<db::DCplxTran
 
   }
 
-  handle_guiding_shape_changes ();
+  handle_guiding_shape_changes (true);
   selection_to_view ();
 }
 
@@ -1860,7 +1865,7 @@ Service::add_selection (const lay::ObjectInstPath &sel)
 }
 
 std::pair<bool, lay::ObjectInstPath>
-Service::handle_guiding_shape_changes (const lay::ObjectInstPath &obj) const
+Service::handle_guiding_shape_changes (const lay::ObjectInstPath &obj, bool commit) const
 {
   unsigned int cv_index = obj.cv_index ();
   lay::CellView cv = view ()->cellview (cv_index);
@@ -1874,8 +1879,20 @@ Service::handle_guiding_shape_changes (const lay::ObjectInstPath &obj) const
     return std::make_pair (false, lay::ObjectInstPath ());
   }
 
-  if (! layout->is_pcell_instance (obj.cell_index ()).first) {
+  auto pcell_decl = layout->pcell_declaration_for_pcell_variant (obj.cell_index ());
+  if (! pcell_decl) {
     return std::make_pair (false, lay::ObjectInstPath ());
+  }
+
+  //  Don't update unless we're committing or not in lazy PCell update mode
+  if (! commit) {
+    if (m_pcell_lazy_evaluation < 0) {
+      if (pcell_decl->wants_lazy_evaluation ()) {
+        return std::make_pair (false, lay::ObjectInstPath ());
+      }
+    } else if (m_pcell_lazy_evaluation > 0) {
+      return std::make_pair (false, lay::ObjectInstPath ());
+    }
   }
 
   db::cell_index_type top_cell = std::numeric_limits<db::cell_index_type>::max ();
@@ -1944,7 +1961,7 @@ Service::handle_guiding_shape_changes (const lay::ObjectInstPath &obj) const
 }
 
 bool 
-Service::handle_guiding_shape_changes ()
+Service::handle_guiding_shape_changes (bool commit)
 {
   EditableSelectionIterator s = begin_selection ();
 
@@ -1953,7 +1970,7 @@ Service::handle_guiding_shape_changes ()
     return false;
   }
 
-  std::pair<bool, lay::ObjectInstPath> gs = handle_guiding_shape_changes (*s);
+  std::pair<bool, lay::ObjectInstPath> gs = handle_guiding_shape_changes (*s, commit);
   if (gs.first) {
 
     //  remove superfluous proxies

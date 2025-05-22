@@ -261,6 +261,19 @@ TEST(4)
     db::EdgeOrientationFilter f1 (89.0, true, 90.0, false, false, false);
     EXPECT_EQ (r.filtered (f1).to_string (), "");
   }
+
+  //  issue-2060
+  {
+    db::EdgeOrientationFilter f1 (90.0, true, false);
+
+    db::Edges rr;
+    rr.insert (db::Box (db::Point (0, 0), db::Point (1000, 4000000)));
+    EXPECT_EQ (db::compare (rr.filtered (f1), "(1000,0;0,0);(0,4000000;1000,4000000)"), true);
+
+    rr.clear ();
+    rr.insert (db::Box (db::Point (0, 0), db::Point (1000, 400000)));
+    EXPECT_EQ (db::compare (rr.filtered (f1), "(1000,0;0,0);(0,400000;1000,400000)"), true);
+  }
 }
 
 TEST(5) 

@@ -250,8 +250,8 @@ EdgeAngleChecker::EdgeAngleChecker (double angle_start, bool include_angle_start
     include_angle_start = true;
   }
 
-  m_t_start = db::CplxTrans(1.0, angle_start, false, db::DVector ());
-  m_t_end = db::CplxTrans(1.0, angle_end, false, db::DVector ());
+  m_t_start = db::ICplxTrans (1.0, angle_start, false, db::Vector ());
+  m_t_end = db::ICplxTrans (1.0, angle_end, false, db::Vector ());
 
   m_include_start = include_angle_start;
   m_include_end = include_angle_end;
@@ -266,10 +266,10 @@ EdgeAngleChecker::EdgeAngleChecker (double angle_start, bool include_angle_start
 bool
 EdgeAngleChecker::check (const db::Vector &a, const db::Vector &b) const
 {
-  db::DVector vout (b);
+  db::Vector vout (b);
 
-  db::DVector v1 = m_t_start * a;
-  db::DVector v2 = m_t_end * a;
+  db::Vector v1 = m_t_start * a;
+  db::Vector v2 = m_t_end * a;
 
   int vps1 = db::vprod_sign (v1, vout);
   int vps2 = db::vprod_sign (v2, vout);

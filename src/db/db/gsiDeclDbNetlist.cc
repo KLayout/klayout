@@ -1488,7 +1488,7 @@ nets_non_const (const std::vector<const db::Net *> &nc)
 }
 
 static std::vector<const db::Net *>
-nets_by_name_const (const db::Circuit *circuit, const std::string &name_pattern)
+nets_by_name_const (const db::Circuit *circuit, const std::string &name_pattern, const tl::Variant &cs)
 {
   std::vector<const db::Net *> res;
   if (! circuit) {
@@ -1496,7 +1496,9 @@ nets_by_name_const (const db::Circuit *circuit, const std::string &name_pattern)
   }
 
   tl::GlobPattern glob (name_pattern);
-  if (circuit->netlist ()) {
+  if (! cs.is_nil ()) {
+    glob.set_case_sensitive (cs.to_bool ());
+  } else if (circuit->netlist ()) {
     glob.set_case_sensitive (circuit->netlist ()->is_case_sensitive ());
   }
   for (db::Circuit::const_net_iterator n = circuit->begin_nets (); n != circuit->end_nets (); ++n) {
@@ -1510,13 +1512,13 @@ nets_by_name_const (const db::Circuit *circuit, const std::string &name_pattern)
 }
 
 static std::vector<db::Net *>
-nets_by_name (db::Circuit *circuit, const std::string &name_pattern)
+nets_by_name (db::Circuit *circuit, const std::string &name_pattern, const tl::Variant &cs)
 {
-  return nets_non_const (nets_by_name_const (circuit, name_pattern));
+  return nets_non_const (nets_by_name_const (circuit, name_pattern, cs));
 }
 
 static std::vector<const db::Net *>
-nets_by_name_const_from_netlist (const db::Netlist *netlist, const std::string &name_pattern)
+nets_by_name_const_from_netlist (const db::Netlist *netlist, const std::string &name_pattern, const tl::Variant &cs)
 {
   std::vector<const db::Net *> res;
   if (! netlist) {
@@ -1524,7 +1526,7 @@ nets_by_name_const_from_netlist (const db::Netlist *netlist, const std::string &
   }
 
   tl::GlobPattern glob (name_pattern);
-  glob.set_case_sensitive (netlist->is_case_sensitive ());
+  glob.set_case_sensitive (cs.is_nil () ? netlist->is_case_sensitive () : cs.to_bool ());
   for (auto c = netlist->begin_circuits (); c != netlist->end_circuits (); ++c) {
     bool is_top = (c->begin_parents () == c->end_parents ());
     for (auto n = c->begin_nets (); n != c->end_nets (); ++n) {
@@ -1540,9 +1542,9 @@ nets_by_name_const_from_netlist (const db::Netlist *netlist, const std::string &
 }
 
 static std::vector<db::Net *>
-nets_by_name_from_netlist (db::Netlist *netlist, const std::string &name_pattern)
+nets_by_name_from_netlist (db::Netlist *netlist, const std::string &name_pattern, const tl::Variant &cs)
 {
-  return nets_non_const (nets_by_name_const_from_netlist (netlist, name_pattern));
+  return nets_non_const (nets_by_name_const_from_netlist (netlist, name_pattern, cs));
 }
 
 Class<db::Circuit> decl_dbCircuit (decl_dbNetlistObject, "db", "Circuit",
@@ -1658,17 +1660,25 @@ Class<db::Circuit> decl_dbCircuit (decl_dbNetlistObject, "db", "Circuit",
     "\n\n"
     "This constness variant has been introduced in version 0.26.8"
   ) +
-  gsi::method_ext ("nets_by_name", &nets_by_name, gsi::arg ("name_pattern"),
+  gsi::method_ext ("nets_by_name", &nets_by_name, gsi::arg ("name_pattern"), gsi::arg ("case_sensitive", tl::Variant (), "default"),
     "@brief Gets the net objects for a given name filter.\n"
     "The name filter is a glob pattern. This method will return all \\Net objects matching the glob pattern.\n"
+    "The 'case_sensitive' argument will control whether the name is looked up in a case sensitive way or not. Note that "
+    "with case insensitive search on a netlist that is case sensitive, the same name may render more than one hit. By "
+    "default, case sensitivity is taken from the netlist.\n"
     "\n"
     "This method has been introduced in version 0.27.3.\n"
+    "The 'case_sensitive' argument has been added in version 0.30.2."
   ) +
-  gsi::method_ext ("nets_by_name", &nets_by_name_const, gsi::arg ("name_pattern"),
+  gsi::method_ext ("nets_by_name", &nets_by_name_const, gsi::arg ("name_pattern"), gsi::arg ("case_sensitive", tl::Variant (), "default"),
     "@brief Gets the net objects for a given name filter (const version).\n"
     "The name filter is a glob pattern. This method will return all \\Net objects matching the glob pattern.\n"
-    "\n\n"
-    "This constness variant has been introduced in version 0.27.3"
+    "The 'case_sensitive' argument will control whether the name is looked up in a case sensitive way or not. Note that "
+    "with case insensitive search on a netlist that is case sensitive, the same name may render more than one hit. By "
+    "default, case sensitivity is taken from the netlist.\n"
+    "\n"
+    "This constness variant has been introduced in version 0.27.3.\n"
+    "The 'case_sensitive' argument has been added in version 0.30.2."
   ) +
   gsi::method ("pin_by_id", (db::Pin *(db::Circuit::*) (size_t)) &db::Circuit::pin_by_id, gsi::arg ("id"),
     "@brief Gets the \\Pin object corresponding to a specific ID\n"
@@ -1964,7 +1974,7 @@ static void blank_circuit_by_name (db::Netlist *nl, const std::string &name_patt
 }
 
 static std::vector<db::Circuit *>
-circuits_by_name (db::Netlist *netlist, const std::string &name_pattern)
+circuits_by_name (db::Netlist *netlist, const std::string &name_pattern, const tl::Variant &cs)
 {
   std::vector<db::Circuit *> res;
   if (! netlist) {
@@ -1972,7 +1982,7 @@ circuits_by_name (db::Netlist *netlist, const std::string &name_pattern)
   }
 
   tl::GlobPattern glob (name_pattern);
-  glob.set_case_sensitive (netlist->is_case_sensitive ());
+  glob.set_case_sensitive (cs.is_nil () ? netlist->is_case_sensitive () : cs.to_bool ());
 
   for (db::Netlist::circuit_iterator c = netlist->begin_circuits (); c != netlist->end_circuits (); ++c) {
     db::Circuit *circuit = c.operator-> ();
@@ -1985,7 +1995,7 @@ circuits_by_name (db::Netlist *netlist, const std::string &name_pattern)
 }
 
 static std::vector<const db::Circuit *>
-circuits_by_name_const (const db::Netlist *netlist, const std::string &name_pattern)
+circuits_by_name_const (const db::Netlist *netlist, const std::string &name_pattern, const tl::Variant &cs)
 {
   std::vector<const db::Circuit *> res;
   if (! netlist) {
@@ -1993,7 +2003,7 @@ circuits_by_name_const (const db::Netlist *netlist, const std::string &name_patt
   }
 
   tl::GlobPattern glob (name_pattern);
-  glob.set_case_sensitive (netlist->is_case_sensitive ());
+  glob.set_case_sensitive (cs.is_nil () ? netlist->is_case_sensitive () : cs.to_bool ());
 
   for (db::Netlist::const_circuit_iterator c = netlist->begin_circuits (); c != netlist->end_circuits (); ++c) {
     const db::Circuit *circuit = c.operator-> ();
@@ -2082,23 +2092,45 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
     "\n\n"
     "This constness variant has been introduced in version 0.26.8."
   ) +
-  gsi::method_ext ("circuits_by_name", &circuits_by_name, gsi::arg ("name_pattern"),
+  gsi::method_ext ("circuits_by_name", &circuits_by_name, gsi::arg ("name_pattern"), gsi::arg ("case_sensitive", tl::Variant (), "default"),
     "@brief Gets the circuit objects for a given name filter.\n"
     "The name filter is a glob pattern. This method will return all \\Circuit objects matching the glob pattern.\n"
+    "The 'case_sensitive' argument will control whether the name is looked up in a case sensitive way or not. Note that "
+    "with case insensitive search on a netlist that is case sensitive, the same name may render more than one hit. By "
+    "default, case sensitivity is taken from the netlist.\n"
     "\n"
     "This method has been introduced in version 0.26.4.\n"
+    "The 'case_sensitive' argument has been added in version 0.30.2."
   ) +
-  gsi::method_ext ("circuits_by_name", &circuits_by_name_const, gsi::arg ("name_pattern"),
+  gsi::method_ext ("circuits_by_name", &circuits_by_name_const, gsi::arg ("name_pattern"), gsi::arg ("case_sensitive", tl::Variant (), "default"),
     "@brief Gets the circuit objects for a given name filter (const version).\n"
     "The name filter is a glob pattern. This method will return all \\Circuit objects matching the glob pattern.\n"
-    "\n\n"
+    "The 'case_sensitive' argument will control whether the name is looked up in a case sensitive way or not. Note that "
+    "with case insensitive search on a netlist that is case sensitive, the same name may render more than one hit. By "
+    "default, case sensitivity is taken from the netlist.\n"
+    "\n"
     "This constness variant has been introduced in version 0.26.8."
+    "The 'case_sensitive' argument has been added in version 0.30.2."
   ) +
-  gsi::method_ext ("nets_by_name", &nets_by_name_from_netlist, gsi::arg ("name_pattern"),
+  gsi::method_ext ("nets_by_name", &nets_by_name_from_netlist, gsi::arg ("name_pattern"), gsi::arg ("case_sensitive", tl::Variant (), "default"),
     "@brief Gets the net objects for a given name filter.\n"
     "The name filter is a glob pattern. This method will return all \\Net objects matching the glob pattern.\n"
+    "The 'case_sensitive' argument will control whether the name is looked up in a case sensitive way or not. Note that "
+    "with case insensitive search on a netlist that is case sensitive, the same name may render more than one hit. By "
+    "default, case sensitivity is taken from the netlist.\n"
     "\n"
     "This method has been introduced in version 0.28.4.\n"
+    "The 'case_sensitive' argument has been added in version 0.30.2."
+  ) +
+  gsi::method_ext ("nets_by_name", &nets_by_name_const_from_netlist, gsi::arg ("name_pattern"), gsi::arg ("case_sensitive", tl::Variant (), "default"),
+    "@brief Gets the net objects for a given name filter (const version).\n"
+    "The name filter is a glob pattern. This method will return all \\Net objects matching the glob pattern.\n"
+    "The 'case_sensitive' argument will control whether the name is looked up in a case sensitive way or not. Note that "
+    "with case insensitive search on a netlist that is case sensitive, the same name may render more than one hit. By "
+    "default, case sensitivity is taken from the netlist.\n"
+    "\n"
+    "This constness variant has been introduced in version 0.28.4."
+    "The 'case_sensitive' argument has been added in version 0.30.2."
   ) +
   gsi::method ("top_circuit", static_cast<db::Circuit *(db::Netlist::*) ()> (&db::Netlist::top_circuit),
     "@brief Gets the top circuit.\n"
@@ -2125,12 +2157,6 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
     "Returns a list of top circuits.\n"
     "\n"
     "This convenience method has been added in version 0.29.5."
-  ) +
-  gsi::method_ext ("nets_by_name", &nets_by_name_const_from_netlist, gsi::arg ("name_pattern"),
-    "@brief Gets the net objects for a given name filter (const version).\n"
-    "The name filter is a glob pattern. This method will return all \\Net objects matching the glob pattern.\n"
-    "\n\n"
-    "This constness variant has been introduced in version 0.28.4."
   ) +
   gsi::iterator ("each_circuit_top_down", (db::Netlist::top_down_circuit_iterator (db::Netlist::*) ()) &db::Netlist::begin_top_down, (db::Netlist::top_down_circuit_iterator (db::Netlist::*) ()) &db::Netlist::end_top_down,
     "@brief Iterates over the circuits top-down\n"

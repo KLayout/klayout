@@ -155,7 +155,7 @@ public:
   }
 
 private:
-  db::CplxTrans m_t_start, m_t_end;
+  db::ICplxTrans m_t_start, m_t_end;
   bool m_include_start, m_include_end;
   bool m_big_angle, m_all;
   bool m_inverse, m_absolute;

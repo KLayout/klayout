@@ -261,6 +261,37 @@ TEST(4)
     db::EdgeOrientationFilter f1 (89.0, true, 90.0, false, false, false);
     EXPECT_EQ (r.filtered (f1).to_string (), "");
   }
+
+  //  issue-2060
+  {
+    db::EdgeOrientationFilter f1 (90.0, true, false);
+    db::EdgeOrientationFilter f2 (90.0, false, false);
+    db::EdgeOrientationFilter f45 (45.0, false, false);
+    db::SpecialEdgeOrientationFilter fs (db::SpecialEdgeOrientationFilter::Diagonal, false);
+
+    db::Edges rr;
+    rr.insert (db::Box (db::Point (0, 0), db::Point (1000, 4000000)));
+    EXPECT_EQ (db::compare (rr.filtered (f1), "(1000,0;0,0);(0,4000000;1000,4000000)"), true);
+
+    rr.clear ();
+    rr.insert (db::Box (db::Point (0, 0), db::Point (1000, 400000)));
+    EXPECT_EQ (db::compare (rr.filtered (f1), "(1000,0;0,0);(0,400000;1000,400000)"), true);
+
+    rr.clear ();
+    rr.insert (db::Box (db::Point (0, -1000000000), db::Point (1000, 1000000000)));
+    EXPECT_EQ (db::compare (rr.filtered (f1), "(1000,-1000000000;0,-1000000000);(0,1000000000;1000,1000000000)"), true);
+
+    rr.clear ();
+    rr.insert (db::Box (db::Point (0, -1000000000), db::Point (1000, 1000000000)));
+    EXPECT_EQ (db::compare (rr.filtered (f2), "(0,-1000000000;0,1000000000);(1000,1000000000;1000,-1000000000)"), true);
+
+    EXPECT_EQ (f2.selected (db::Edge (db::Point (0, -1000000000), db::Point (0, 1000000000)), size_t (0)), true);
+    EXPECT_EQ (f2.selected (db::Edge (db::Point (0, -1000000000), db::Point (1, 1000000000)), size_t (0)), false);
+    EXPECT_EQ (f45.selected (db::Edge (db::Point (-1000000000, -1000000000), db::Point (1000000000, 1000000000)), size_t (0)), true);
+    EXPECT_EQ (f45.selected (db::Edge (db::Point (-1000000000, -1000000000), db::Point (1000000000, 1000000001)), size_t (0)), false);
+    EXPECT_EQ (fs.selected (db::Edge (db::Point (-1000000000, -1000000000), db::Point (1000000000, 1000000000)), size_t (0)), true);
+    EXPECT_EQ (fs.selected (db::Edge (db::Point (-1000000000, -1000000000), db::Point (1000000000, 1000000001)), size_t (0)), false);
+  }
 }
 
 TEST(5) 

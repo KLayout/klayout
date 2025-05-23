@@ -987,7 +987,7 @@ if __name__ == "__main__":
     setup(
         name=config.root,
         version=config.version(),
-        license="GNU GPLv3",
+        license="GPL-3.0-or-later",
         description="KLayout standalone Python package",
         long_description="This package is a standalone distribution of KLayout's Python API.\n\nFor more details see here: https://www.klayout.org/klayout-pypi",
         author="Matthias Koefferlein",
@@ -996,7 +996,6 @@ if __name__ == "__main__":
             # Recommended classifiers
             "Programming Language :: Python :: 2",
             "Programming Language :: Python :: 3",
-            "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
             "Operating System :: MacOS :: MacOS X",
             "Operating System :: Microsoft :: Windows",
             "Operating System :: POSIX :: Linux",

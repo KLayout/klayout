@@ -34,10 +34,6 @@ jobs:
           - os: "ubuntu-latest"
             cibuild: "*musllinux*"
             cibw_arch: "musllinux"
-          - os: "ubuntu-24.04-arm"  # aarch64 manylinux on ARM runner
-            cibuild: "*manylinux*"
-            cibw_arch: "manylinux"
-
     steps:
       - name: Free Disk Space (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
@@ -94,43 +90,43 @@ jobs:
     name: Make SDist
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - name: Build SDist
-        run: pipx run build --sdist
+    - name: Build SDist
+      run: pipx run build --sdist
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: artifact-sdist
-          path: dist/*.tar.gz
+    - uses: actions/upload-artifact@v4
+      with:
+        name: artifact-sdist
+        path: dist/*.tar.gz
 
   upload_to_test_pypy:
     needs: [build, make_sdist]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
-        with:
-          merge-multiple: true
-          path: dist
+    - uses: actions/download-artifact@v4
+      with:
+        merge-multiple: true
+        path: dist
 
-      - uses: pypa/gh-action-pypi-publish@v1.12.4
+    - uses: pypa/gh-action-pypi-publish@v1.12.4
       continue-on-error: true   # might fail if we don't bump the version
-        with:
-          user: __token__
-          password: ${{ secrets.test_pypi_password }}
-          repository-url: https://test.pypi.org/legacy/
+      with:
+        user: __token__
+        password: ${{ secrets.test_pypi_password }}
+        repository-url: https://test.pypi.org/legacy/
 
   upload_to_pypi:
     needs: [build, make_sdist]
     runs-on: ubuntu-latest
     if: github.event_name == 'release' && github.event.action == 'published'
     steps:
-      - uses: actions/download-artifact@v4
-        with:
-          merge-multiple: true
-          path: dist
+    - uses: actions/download-artifact@v4
+      with:
+        merge-multiple: true
+        path: dist
 
-      - uses: pypa/gh-action-pypi-publish@v1.12.4
-        with:
-          user: __token__
-          password: ${{ secrets.pypi_password }}
+    - uses: pypa/gh-action-pypi-publish@v1.12.4
+      with:
+        user: __token__
+        password: ${{ secrets.pypi_password }}

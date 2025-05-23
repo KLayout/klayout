@@ -70,6 +70,7 @@ jobs:
               curl-devel \
               expat-devel \
               libpng-devel
+          CIBW_BEFORE_BUILD_LINUX: "true"
           CIBW_BUILD: ${{ matrix.cibuild }}
           CIBW_ARCHS_LINUX: ${{ matrix.cibw_arch }}
 

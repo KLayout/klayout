@@ -2,8 +2,9 @@ name: Build Python Wheels
 # https://docs.github.com/en/free-pro-team@latest/actions/guides/building-and-testing-python
 
 on:
-    # we just want to test in this PR
-  pull_request:
+  push:
+    branches:
+      - support-arm-linux
 
 
 jobs:

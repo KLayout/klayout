@@ -34,6 +34,9 @@ jobs:
           - os: "ubuntu-latest"
             cibuild: "*musllinux*"
             cibw_arch: "musllinux"
+          - os: "ubuntu-24.04-arm"  # aarch64 manylinux on ARM runner
+            cibuild: "*manylinux*"
+            cibw_arch: "manylinux"
     steps:
       - name: Free Disk Space (Ubuntu)
         if: matrix.os == 'ubuntu-latest'

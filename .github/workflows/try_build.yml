@@ -31,7 +31,7 @@ jobs:
             cibw_arch: "musllinux"
           - os: "ubuntu-24.04-arm"  # aarch64 manylinux on ARM runner
             cibuild: "*manylinux*"
-            cibw_arch: "manylinux"
+            cibw_arch: "aarch64"
     steps:
       - name: Free Disk Space (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
@@ -72,7 +72,6 @@ jobs:
               libpng-devel
           CIBW_BUILD: ${{ matrix.cibuild }}
           CIBW_ARCHS_LINUX: ${{ matrix.cibw_arch }}
-          # … any other cibuildwheel env you already have …
 
       - name: Build wheels (all other platforms)
         if: matrix.os != 'ubuntu-24.04-arm'

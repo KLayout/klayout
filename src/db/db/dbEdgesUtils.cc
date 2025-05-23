@@ -306,12 +306,14 @@ EdgeOrientationFilter::EdgeOrientationFilter (double a, bool inverse, bool absol
 bool
 EdgeOrientationFilter::selected (const db::Edge &edge, db::properties_id_type) const
 {
+  db::Vector en = db::Vector (std::max (edge.dx_abs (), edge.dy_abs ()), 0);
+
   //  NOTE: this edge normalization confines the angle to a range between (-90 .. 90] (-90 excluded).
   //  A horizontal edge has 0 degree, a vertical one has 90 degree.
   if (edge.dx () < 0 || (edge.dx () == 0 && edge.dy () < 0)) {
-    return m_checker (db::Vector (edge.ortho_length (), 0), -edge.d ());
+    return m_checker (en, -edge.d ());
   } else {
-    return m_checker (db::Vector (edge.ortho_length (), 0), edge.d ());
+    return m_checker (en, edge.d ());
   }
 }
 
@@ -363,7 +365,7 @@ SpecialEdgeOrientationFilter::selected (const db::Edge &edge, properties_id_type
   }
 
   db::Vector en, ev;
-  en = db::Vector (edge.ortho_length (), 0);
+  en = db::Vector (std::max (edge.dx_abs (), edge.dy_abs ()), 0);
 
   //  NOTE: this edge normalization confines the angle to a range between (-90 .. 90] (-90 excluded).
   //  A horizontal edge has 0 degree, a vertical one has 90 degree.

@@ -46,11 +46,13 @@ jobs:
         uses: styfle/cancel-workflow-action@0.12.1
       - uses: actions/checkout@v4
       - name: ccache
+        if: matrix.os != 'ubuntu-24.04-arm'
         uses: hendrikmuhs/ccache-action@v1.2
         with:
           key: ${{ github.job }}-${{ matrix.os }}-${{ matrix.cibuild }}  # Make cache specific to OS
           max-size: "5G"
       - name: Install dependencies
+        if: matrix.os != 'ubuntu-24.04-arm'
         run: |
           env
           export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"

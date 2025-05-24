@@ -145,6 +145,22 @@ public:
   db::NetlistCrossReference *make_cross_ref ();
 
   /**
+   *  @brief Checks top-level port names
+   *
+   *  This method checks that every top-level pin has a corresponding
+   *  schematic pin and their names are equivalent. This verifies that
+   *  all pins are labelles properly.
+   *
+   *  Errors are placed in the log file. The return values indicates
+   *  if there are no errors.
+   *
+   *  The circuit is either a schematic or layout circuit.
+   *
+   *  See issue #2055.
+   */
+  bool flag_missing_ports (const db::Circuit *circuit);
+
+  /**
    *  @brief Saves the database to the given path
    *
    *  Currently, the internal format will be used. If "short_format" is true, the short version

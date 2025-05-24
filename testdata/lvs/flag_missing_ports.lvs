@@ -1,0 +1,76 @@
+
+source($lvs_test_source, "ND2X1")
+
+report_lvs($lvs_test_target_lvsdb, true)
+
+target_netlist($lvs_test_target_cir, write_spice, "Extracted by KLayout")
+
+schematic("flag_missing_ports.sch")
+
+deep
+
+# Drawing layers
+
+nwell       = input(1, 0)
+active      = input(2, 0)
+pplus       = input(3, 0)
+nplus       = input(4, 0)
+poly        = input(5, 0)
+contact     = input(8, 0)
+metal1      = input(9, 0)
+via1        = input(10, 0)
+metal2      = input(11, 0)
+
+# Bulk layer for terminal provisioning
+
+bulk        = polygon_layer
+
+# Computed layers
+
+active_in_nwell       = active & nwell
+pactive               = active_in_nwell & pplus
+pgate                 = pactive & poly
+psd                   = pactive - pgate
+ntie                  = active_in_nwell & nplus
+
+active_outside_nwell  = active - nwell
+nactive               = active_outside_nwell & nplus
+ngate                 = nactive & poly
+nsd                   = nactive - ngate
+ptie                  = active_outside_nwell & pplus
+
+# Device extraction
+
+# PMOS transistor device extraction
+extract_devices(mos4("PMOS"), { "SD" => psd, "G" => pgate, "W" => nwell, 
+                                "tS" => psd, "tD" => psd, "tG" => poly, "tW" => nwell })
+
+# NMOS transistor device extraction
+extract_devices(mos4("NMOS"), { "SD" => nsd, "G" => ngate, "W" => bulk, 
+                                "tS" => nsd, "tD" => nsd, "tG" => poly, "tW" => bulk })
+
+# Define connectivity for netlist extraction
+
+# Inter-layer
+connect(psd,        contact)
+connect(nsd,        contact)
+connect(poly,       contact)
+connect(ntie,       contact)
+connect(nwell,      ntie)
+connect(ptie,       contact)
+connect(contact,    metal1)
+connect(metal1,     via1)
+connect(via1,       metal2)
+
+# Global
+connect_global(bulk, "SUBSTRATE")
+connect_global(ptie, "SUBSTRATE")
+
+# Compare section
+
+netlist.simplify
+
+compare
+
+flag_missing_ports
+

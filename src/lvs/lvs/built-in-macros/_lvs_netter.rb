@@ -531,6 +531,33 @@ CODE
     end
 
     # %LVS%
+    # @name flag_missing_ports
+    # @brief Flags inconsistently labelled or missing ports in the current top circuit
+    # @synopsis flag_missing_ports
+    # This method must be called after "compare" was executed successfully and will 
+    # report errors if pins in the current top circuit's schematic are not labelled 
+    # correspondingly in the layout. This prevents swapping of port labels or 
+    # pads.
+    #
+    # @code
+    # success = compare
+    # success && flag_missing_ports
+    # @/code
+    #
+    # Note that in order to use this method, the top circuit from the schematic netlist
+    # needs to have pins. This may not be always the case - for example, if the top 
+    # level circuit is not a subcircuit in a Spice netlist.
+
+    def flag_missing_ports
+
+      lvs_data.netlist || raise("Netlist not extracted yet")
+      lvs_data.xref || raise("Compare step was not executed yet")
+
+      lvs_data.flag_missing_ports(lvs_data.netlist.top_circuit)
+
+    end
+
+    # %LVS%
     # @name same_nets
     # @brief Establishes an equivalence between the nets
     # @synopsis same_nets(circuit_pattern, net_pattern)

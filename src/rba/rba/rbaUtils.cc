@@ -32,10 +32,6 @@
 #  include <ruby/debug.h>
 #endif
 
-#if HAVE_RUBY_VERSION_CODE < 20200
-#  include <ruby/encoding.h>
-#endif
-
 static VALUE ruby_top_self = Qnil;
 
 VALUE rb_get_top_self ()
@@ -191,18 +187,6 @@ rba_check_error (int state)
     throw RubyError (lasterr, emsg.c_str (), eclass.c_str (), bt);
   }
 }
-
-#if HAVE_RUBY_VERSION_CODE < 20200
-
-//  Ruby <2.2 does not have this useful function
-VALUE rb_utf8_str_new (const char *ptr, long len)
-{
-  VALUE str = rb_str_new (ptr, len);
-  rb_enc_associate_index (str, rb_utf8_encindex ());
-  return str;
-}
-
-#endif
 
 /**
  *  @brief needed because StringValue is a macro:

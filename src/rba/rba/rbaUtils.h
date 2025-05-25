@@ -136,7 +136,17 @@ inline void rb_hash_clear(VALUE hash)
 #endif
 
 #if HAVE_RUBY_VERSION_CODE < 20200
-VALUE rb_utf8_str_new (const char *str, long len);
+
+#include <ruby/encoding.h>
+
+//  Ruby <2.2 does not have this useful function
+inline VALUE rb_utf8_str_new (const char *ptr, long len)
+{
+  VALUE str = rb_str_new (ptr, len);
+  rb_enc_associate_index (str, rb_utf8_encindex ());
+  return str;
+}
+
 #endif
 
 typedef VALUE (*ruby_func)(ANYARGS);

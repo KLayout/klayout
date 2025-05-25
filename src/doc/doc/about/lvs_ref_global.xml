@@ -82,6 +82,15 @@ See <a href="/about/lvs_ref_netter.xml#enable_parameter">Netter#enable_parameter
 <p>
 See <a href="/about/lvs_ref_netter.xml#equivalent_pins">Netter#equivalent_pins</a> for a description of that function.
 </p>
+<a name="flag_missing_ports"/><h2>"flag_missing_ports" - Checks if all top level ports are properly labelled</h2>
+<keyword name="flag_missing_ports"/>
+<p>Usage:</p>
+<ul>
+<li><tt>flag_missing_ports</tt></li>
+</ul>
+<p>
+See <a href="/about/lvs_ref_netter.xml#flag_missing_ports">Netter#flag_missing_ports</a> for a description of that function.
+</p>
 <a name="ignore_parameter"/><h2>"ignore_parameter" - Specifies whether to ignore a parameter from a given device class for the compare</h2>
 <keyword name="ignore_parameter"/>
 <p>Usage:</p>

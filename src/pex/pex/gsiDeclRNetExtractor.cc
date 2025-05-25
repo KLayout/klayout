@@ -81,6 +81,9 @@ static void via_set_merge_distance (pex::RExtractorTechVia *via, double dist)
 }
 
 Class<pex::RExtractorTechVia> decl_RExtractorTechVia ("pex", "RExtractorTechVia",
+  gsi::method ("to_s", &pex::RExtractorTechVia::to_string,
+    "@brief Returns a string describing this object"
+  ) +
   gsi::method_ext ("merge_distance", &via_get_merge_distance,
     "@brief Gets the merge distance\n"
     "If this value is not zero, it specifies the distance below (or equal) which "
@@ -186,6 +189,9 @@ static void cond_set_triangulation_max_area (pex::RExtractorTechConductor *cond,
 }
 
 Class<pex::RExtractorTechConductor> decl_RExtractorTechConductor ("pex", "RExtractorTechConductor",
+  gsi::method ("to_s", &pex::RExtractorTechConductor::to_string,
+    "@brief Returns a string describing this object"
+  ) +
   gsi::method_ext ("algorithm", &cond_get_algorithm,
     "@brief Gets the algorithm to use\n"
     "Specifies the algorithm to use. The default algorithm is 'SquareCounting'."
@@ -305,6 +311,9 @@ static void tech_add_conductor (pex::RExtractorTech *tech, const pex::RExtractor
 }
 
 Class<pex::RExtractorTech> decl_RExtractorTech ("pex", "RExtractorTech",
+  gsi::method ("to_s", &pex::RExtractorTech::to_string,
+    "@brief Returns a string describing this object"
+  ) +
   gsi::method_ext ("skip_simplify", &tech_get_skip_simplify,
     "@brief Gets a value indicating whether to skip the simplify step\n"
     "This values specifies to skip the simplify step of the network after the extraction has "

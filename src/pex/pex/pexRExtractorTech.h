@@ -26,6 +26,7 @@
 #include "pexCommon.h"
 
 #include <list>
+#include <string>
 
 namespace pex
 {
@@ -44,6 +45,11 @@ public:
   {
     //  .. nothing yet ..
   }
+
+  /**
+   *  @brief Returns a string describing this object
+   */
+  std::string to_string () const;
 
   /**
    *  @brief Specifies the cut layer
@@ -113,6 +119,11 @@ public:
   }
 
   /**
+   *  @brief Returns a string describing this object
+   */
+  std::string to_string () const;
+
+  /**
    *  @brief Specifies the layer
    *  The value is the generic ID of the layer.
    */
@@ -154,6 +165,11 @@ public:
    *  @brief Constructor
    */
   RExtractorTech ();
+
+  /**
+   *  @brief Returns a string describing this object
+   */
+  std::string to_string () const;
 
   /**
    *  @brief A list of via definitions

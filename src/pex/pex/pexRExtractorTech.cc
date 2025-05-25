@@ -23,13 +23,75 @@
 
 #include "pexRExtractorTech.h"
 
+#include "tlString.h"
+
 namespace pex
 {
+
+// ------------------------------------------------------------------
+
+std::string
+RExtractorTechVia::to_string () const
+{
+  std::string res = "Via(";
+  res += tl::sprintf ("bottom=L%u, cut=L%u, top=L%u, R=%.12gµm²*Ohm", bottom_conductor, cut_layer, top_conductor, resistance);
+  if (merge_distance > 1e-10) {
+    res += tl::sprintf(", d_merge=%.12gµm", merge_distance);
+  }
+  res += ")";
+  return res;
+}
+
+// ------------------------------------------------------------------
+
+std::string
+RExtractorTechConductor::to_string () const
+{
+  std::string res = "Conductor(";
+  res += tl::sprintf ("layer=L%u, R=%.12gOhm/sq", layer, resistance);
+
+  switch (algorithm) {
+  case SquareCounting:
+    res += ", algo=SquareCounting";
+    break;
+  case Tesselation:
+    res += ", algo=Tesselation";
+    break;
+  default:
+    break;
+  }
+
+  if (triangulation_min_b > 1e-10) {
+    res += tl::sprintf(", tri_min_b=%.12gµm", triangulation_min_b);
+  }
+
+  if (triangulation_max_area > 1e-10) {
+    res += tl::sprintf(", tri_max_area=%.12gµm", triangulation_max_area);
+  }
+
+  res += ")";
+  return res;
+}
+
+// ------------------------------------------------------------------
 
 RExtractorTech::RExtractorTech ()
   : skip_simplify (false)
 {
   //  .. nothing yet ..
+}
+
+std::string
+RExtractorTech::to_string () const
+{
+  std::string res;
+  if (skip_simplify) {
+    res += "skip_simplify=true\n";
+  }
+  res += tl::join (vias.begin (), vias.end (), "\n");
+  res += "\n";
+  res += tl::join (conductors.begin (), conductors.end (), "\n");
+  return res;
 }
 
 }

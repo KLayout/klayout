@@ -64,6 +64,45 @@ static std::string network2s (const pex::RNetwork &network)
   return tl::join (r, "\n");
 }
 
+TEST(basic)
+{
+  unsigned int l1 = 1;
+  unsigned int l2 = 1;
+  unsigned int l3 = 1;
+
+  pex::RExtractorTech tech;
+
+  pex::RExtractorTechVia via1;
+  via1.bottom_conductor = l1;
+  via1.cut_layer = l2;
+  via1.top_conductor = l3;
+  via1.resistance = 2.0;
+  via1.merge_distance = 0.2;
+  tech.vias.push_back (via1);
+
+  pex::RExtractorTechConductor cond1;
+  cond1.layer = l1;
+  cond1.resistance = 0.5;
+  tech.conductors.push_back (cond1);
+
+  pex::RExtractorTechConductor cond2;
+  cond2.layer = l3;
+  cond2.resistance = 0.25;
+  cond2.algorithm = pex::RExtractorTechConductor::Tesselation;
+  cond2.triangulation_max_area = 1.5;
+  cond2.triangulation_min_b = 0.5;
+  tech.conductors.push_back (cond2);
+
+  tech.skip_simplify = true;
+
+  EXPECT_EQ (tech.to_string (),
+    "skip_simplify=true\n"
+    "Via(bottom=L1, cut=L1, top=L1, R=2µm²*Ohm, d_merge=0.2µm)\n"
+    "Conductor(layer=L1, R=0.5Ohm/sq, algo=SquareCounting)\n"
+    "Conductor(layer=L1, R=0.25Ohm/sq, algo=Tesselation, tri_min_b=0.5µm, tri_max_area=1.5µm)"
+  );
+}
+
 TEST(netex_viagen1)
 {
   db::Layout ly;

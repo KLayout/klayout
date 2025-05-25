@@ -142,6 +142,7 @@ class PEX_TestClass < TestBase
     via1.top_conductor = l3
     via1.resistance = 2.0
     via1.merge_distance = 0.2
+    assert_equal(via1.to_s, "Via(bottom=L1, cut=L2, top=L3, R=2µm²*Ohm, d_merge=0.2µm)")
 
     assert_equal(via1.bottom_conductor, l1)
     assert_equal(via1.cut_layer, l2)
@@ -161,6 +162,7 @@ class PEX_TestClass < TestBase
     cond1 = RBA::RExtractorTechConductor::new
     cond1.layer = l1
     cond1.resistance = 0.5
+    assert_equal(cond1.to_s, "Conductor(layer=L1, R=0.5Ohm/sq, algo=SquareCounting)")
 
     assert_equal(cond1.layer, l1)
     assert_equal(cond1.resistance, 0.5)
@@ -171,6 +173,10 @@ class PEX_TestClass < TestBase
 
     tech.add_conductor(cond2)
     assert_equal(tech.each_conductor.collect { |c| c.layer }, [ l3 ])
+    assert_equal(tech.to_s, 
+        "Via(bottom=L1, cut=L2, top=L3, R=2µm²*Ohm, d_merge=0.2µm)\n" +
+        "Conductor(layer=L3, R=0.25Ohm/sq, algo=SquareCounting)"
+    )
 
     tech.clear_conductors
     assert_equal(tech.each_conductor.collect { |c| c.layer }, [])

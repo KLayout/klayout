@@ -105,7 +105,7 @@ private:
   void update_controls ();
 
 public slots:
-  void apply ();
+  void properties_edited ();
   void next_pressed ();
   void prev_pressed ();
   void cancel_pressed ();

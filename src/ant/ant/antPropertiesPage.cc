@@ -517,7 +517,7 @@ PropertiesPage::readonly ()
 }
 
 void 
-PropertiesPage::apply ()
+PropertiesPage::apply (bool /*commit*/)
 {
   ant::Object obj;
   get_object (obj);

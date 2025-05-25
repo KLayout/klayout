@@ -34,9 +34,9 @@ std::string
 RExtractorTechVia::to_string () const
 {
   std::string res = "Via(";
-  res += tl::sprintf ("bottom=L%u, cut=L%u, top=L%u, R=%.12gµm²*Ohm", bottom_conductor, cut_layer, top_conductor, resistance);
+  res += tl::sprintf ("bottom=L%u, cut=L%u, top=L%u, R=%.12g \xC2\xB5m\xC2\xB2*Ohm", bottom_conductor, cut_layer, top_conductor, resistance);
   if (merge_distance > 1e-10) {
-    res += tl::sprintf(", d_merge=%.12gµm", merge_distance);
+    res += tl::sprintf(", d_merge=%.12g \xC2\xB5m", merge_distance);
   }
   res += ")";
   return res;
@@ -48,7 +48,7 @@ std::string
 RExtractorTechConductor::to_string () const
 {
   std::string res = "Conductor(";
-  res += tl::sprintf ("layer=L%u, R=%.12gOhm/sq", layer, resistance);
+  res += tl::sprintf ("layer=L%u, R=%.12g Ohm/sq", layer, resistance);
 
   switch (algorithm) {
   case SquareCounting:
@@ -62,11 +62,11 @@ RExtractorTechConductor::to_string () const
   }
 
   if (triangulation_min_b > 1e-10) {
-    res += tl::sprintf(", tri_min_b=%.12gµm", triangulation_min_b);
+    res += tl::sprintf(", tri_min_b=%.12g \xC2\xB5m", triangulation_min_b);
   }
 
   if (triangulation_max_area > 1e-10) {
-    res += tl::sprintf(", tri_max_area=%.12gµm", triangulation_max_area);
+    res += tl::sprintf(", tri_max_area=%.12g \xC2\xB5m\xC2\xB2", triangulation_max_area);
   }
 
   res += ")";

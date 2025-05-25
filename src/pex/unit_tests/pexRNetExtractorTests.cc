@@ -96,10 +96,10 @@ TEST(basic)
   tech.skip_simplify = true;
 
   EXPECT_EQ (tech.to_string (),
-    "skip_simplify=true\n"
-    "Via(bottom=L1, cut=L1, top=L1, R=2µm²*Ohm, d_merge=0.2µm)\n"
-    "Conductor(layer=L1, R=0.5Ohm/sq, algo=SquareCounting)\n"
-    "Conductor(layer=L1, R=0.25Ohm/sq, algo=Tesselation, tri_min_b=0.5µm, tri_max_area=1.5µm)"
+    u8"skip_simplify=true\n"
+    u8"Via(bottom=L1, cut=L1, top=L1, R=2 \xC2\xB5m\xC2\xB2*Ohm, d_merge=0.2 \xC2\xB5m)\n"
+    u8"Conductor(layer=L1, R=0.5 Ohm/sq, algo=SquareCounting)\n"
+    u8"Conductor(layer=L1, R=0.25 Ohm/sq, algo=Tesselation, tri_min_b=0.5 \xC2\xB5m, tri_max_area=1.5 \xC2\xB5m\xC2\xB2)"
   );
 }
 

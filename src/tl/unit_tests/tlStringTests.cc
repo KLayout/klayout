@@ -57,6 +57,20 @@ TEST(1)
   EXPECT_EQ (tl::sprintf("%lu %llu %02x", 1, 2, 167), "1 2 a7");
   EXPECT_EQ (tl::sprintf("%lu %llu %02X", 1, 2, 761), "1 2 2F9");
   EXPECT_EQ (tl::sprintf("%c%c", 'a', 'X'), "aX");
+
+  //  64bit numbers
+  EXPECT_EQ (tl::sprintf("%x", 0x1000000000ll), "1000000000");
+  EXPECT_EQ (tl::sprintf("%lx", 0x1000000000ll), "1000000000");
+  EXPECT_EQ (tl::sprintf("%llx", 0x1000000000ll), "1000000000");
+  EXPECT_EQ (tl::sprintf("%d", 100000000000ll), "100000000000");
+  EXPECT_EQ (tl::sprintf("%ld", 100000000000ll), "100000000000");
+  EXPECT_EQ (tl::sprintf("%lld", 100000000000ll), "100000000000");
+  EXPECT_EQ (tl::sprintf("%d", -100000000000ll), "-100000000000");
+  EXPECT_EQ (tl::sprintf("%ld", -100000000000ll), "-100000000000");
+  EXPECT_EQ (tl::sprintf("%lld", -100000000000ll), "-100000000000");
+  EXPECT_EQ (tl::sprintf("%u", 100000000000ull), "100000000000");
+  EXPECT_EQ (tl::sprintf("%lu", 100000000000ull), "100000000000");
+  EXPECT_EQ (tl::sprintf("%llu", 100000000000ull), "100000000000");
 }
 
 TEST(1a)

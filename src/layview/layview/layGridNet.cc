@@ -538,7 +538,22 @@ GridNet::render_bg (const lay::Viewport &vp, ViewObjectCanvas &canvas)
                          db::Point (xoffset + int (floor (0.5 + 2 * dgrid)), vp.height () - yoffset + rh / 2),
                          ruler_color);
 
-      painter.draw_text (tl::sprintf ("%g \265m", grid * 2).c_str (),
+      double grid_value = grid * 2;
+      std::string fmt = "%g \265m";
+      if (grid_value < 0.1 * (1 + db::epsilon)) {
+        grid_value *= 1000.0;
+        fmt = "%g nm";
+      } else if (grid_value < 100.0 * (1 + db::epsilon)) {
+        fmt = "%g \265m";
+      } else if (grid_value < 100000.0 * (1 + db::epsilon)) {
+        grid_value *= 1e-3;
+        fmt = "%g mm";
+      } else {
+        grid_value *= 1e-6;
+        fmt = "%g m";
+      }
+
+      painter.draw_text (tl::sprintf (fmt, grid_value).c_str (),
                          db::Point (xoffset + int (floor (0.5 + trans.ctrans (2 * grid))), vp.height () - yoffset - rh / 2 - 2),
                          ruler_color, -1, 1);
 

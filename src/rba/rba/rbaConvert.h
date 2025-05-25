@@ -507,7 +507,7 @@ inline VALUE c2ruby<const char *> (const char * const & s)
 {
   if (! s) {
     static const char null_string[] = "(null)";
-    return rb_str_new (null_string, sizeof (null_string) - 1);
+    return rb_utf8_str_new (null_string, sizeof (null_string) - 1);
   } else {
     return rb_utf8_str_new (s, long (strlen (s)));
   }

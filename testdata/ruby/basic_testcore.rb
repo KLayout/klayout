@@ -3020,10 +3020,13 @@ class Basic_TestClass < TestBase
     if RBA::A.respond_to?(:ia_cref_to_qs)
 
       qs = RBA::A::ia_cref_to_qs([ 16, 42, 0, 8, 0x03a9 ])
-      assert_equal(qs.inspect, "\"\\u0010*\\u0000\\b\u03a9\"")
+      assert_equal(qs.encoding.name, "UTF-8")
+      assert_equal(qs, "\u0010*\u0000\b\u03a9")
       # full cycle must preserve encoding, also for var
-      assert_equal(RBA::A::ft_qs(qs).inspect, "\"\\u0010*\\u0000\\b\u03a9\"")
-      assert_equal(RBA::A::ft_var(qs).inspect, "\"\\u0010*\\u0000\\b\u03a9\"")
+      assert_equal(RBA::A::ft_qs(qs).encoding.name, "UTF-8")
+      assert_equal(RBA::A::ft_qs(qs), "\u0010*\u0000\b\u03a9")
+      assert_equal(RBA::A::ft_var(qs).encoding.name, "UTF-8")
+      assert_equal(RBA::A::ft_var(qs), "\u0010*\u0000\b\u03a9")
 
       assert_equal(RBA::A::qs_to_ia(qs), [ 16, 42, 0, 8, 0x03a9 ])
       assert_equal(RBA::A::qs_cref_to_ia(qs), [ 16, 42, 0, 8, 0x03a9 ])
@@ -3032,13 +3035,17 @@ class Basic_TestClass < TestBase
       assert_equal(RBA::A::qs_ptr_to_ia(qs), [ 16, 42, 0, 8, 0x03a9 ])
 
       qs = RBA::A::ia_cref_to_qs_cref([ 17, 42, 0, 8, 0x03a9 ])
-      assert_equal(qs.inspect, "\"\\u0011*\\u0000\\b\u03a9\"")
+      assert_equal(qs.encoding.name, "UTF-8")
+      assert_equal(qs, "\u0011*\u0000\b\u03a9")
       qs = RBA::A::ia_cref_to_qs_ref([ 18, 42, 0, 8, 0x03a9 ])
-      assert_equal(qs.inspect, "\"\\u0012*\\u0000\\b\u03a9\"")
+      assert_equal(qs.encoding.name, "UTF-8")
+      assert_equal(qs, "\u0012*\u0000\b\u03a9")
       qs = RBA::A::ia_cref_to_qs_cptr([ 19, 42, 0, 8, 0x03a9 ])
-      assert_equal(qs.inspect, "\"\\u0013*\\u0000\\b\u03a9\"")
+      assert_equal(qs.encoding.name, "UTF-8")
+      assert_equal(qs, "\u0013*\u0000\b\u03a9")
       qs = RBA::A::ia_cref_to_qs_ptr([ 20, 42, 0, 8, 0x03a9 ])
-      assert_equal(qs.inspect, "\"\\u0014*\\u0000\\b\u03a9\"")
+      assert_equal(qs.encoding.name, "UTF-8")
+      assert_equal(qs, "\u0014*\u0000\b\u03a9")
 
       assert_equal(RBA::A::qs_to_ia("\x00\x01\x02"), [ 0, 1, 2 ])
 
@@ -3053,7 +3060,8 @@ class Basic_TestClass < TestBase
     if RBA::A.respond_to?(:ia_cref_to_ql1s)
 
       ql1s = RBA::A::ia_cref_to_ql1s([ 16, 42, 0, 8, 0x03a9 ])
-      assert_equal(ql1s.inspect, "\"\\u0010*\\u0000\\b\u00a9\"")
+      assert_equal(ql1s.encoding.name, "UTF-8")
+      assert_equal(ql1s, "\u0010*\u0000\b\u00a9")
 
       assert_equal(RBA::A::ql1s_to_ia(ql1s), [ 16, 42, 0, 8, 0xa9 ])
       assert_equal(RBA::A::ql1s_cref_to_ia(ql1s), [ 16, 42, 0, 8, 0xa9 ])
@@ -3062,13 +3070,17 @@ class Basic_TestClass < TestBase
       assert_equal(RBA::A::ql1s_ptr_to_ia(ql1s), [ 16, 42, 0, 8, 0xa9 ])
 
       ql1s = RBA::A::ia_cref_to_ql1s_cref([ 17, 42, 0, 8, 0xa9 ])
-      assert_equal(ql1s.inspect, "\"\\u0011*\\u0000\\b\u00a9\"")
+      assert_equal(ql1s.encoding.name, "UTF-8")
+      assert_equal(ql1s, "\u0011*\u0000\b\u00a9")
       ql1s = RBA::A::ia_cref_to_ql1s_ref([ 18, 42, 0, 8, 0xa9 ])
-      assert_equal(ql1s.inspect, "\"\\u0012*\\u0000\\b\u00a9\"")
+      assert_equal(ql1s.encoding.name, "UTF-8")
+      assert_equal(ql1s, "\u0012*\u0000\b\u00a9")
       ql1s = RBA::A::ia_cref_to_ql1s_cptr([ 19, 42, 0, 8, 0xa9 ])
-      assert_equal(ql1s.inspect, "\"\\u0013*\\u0000\\b\u00a9\"")
+      assert_equal(ql1s.encoding.name, "UTF-8")
+      assert_equal(ql1s, "\u0013*\u0000\b\u00a9")
       ql1s = RBA::A::ia_cref_to_ql1s_ptr([ 20, 42, 0, 8, 0xa9 ])
-      assert_equal(ql1s.inspect, "\"\\u0014*\\u0000\\b\u00a9\"")
+      assert_equal(ql1s.encoding.name, "UTF-8")
+      assert_equal(ql1s, "\u0014*\u0000\b\u00a9")
 
       assert_equal(RBA::A::ql1s_to_ia("\x00\x01\x02"), [ 0, 1, 2 ])
 
@@ -3110,14 +3122,17 @@ class Basic_TestClass < TestBase
 
     # UTF8 strings (non-Qt)
     s = "\u0010*\u0000\b\u03a9"
-    assert_equal(s.inspect, "\"\\u0010*\\u0000\\b\u03a9\"")
+    assert_equal(s.encoding.name, "UTF-8")
 
     # full cycle must preserve encoding, also for var
-    assert_equal(RBA::A::ft_str(s).inspect, "\"\\u0010*\\u0000\\b\u03a9\"")
-    assert_equal(RBA::A::ft_var(s).inspect, "\"\\u0010*\\u0000\\b\u03a9\"")
+    assert_equal(RBA::A::ft_str(s).encoding.name, "UTF-8")
+    assert_equal(RBA::A::ft_str(s), "\u0010*\u0000\b\u03a9")
+    assert_equal(RBA::A::ft_var(s).encoding.name, "UTF-8")
+    assert_equal(RBA::A::ft_var(s), "\u0010*\u0000\b\u03a9")
 
     # NUL character terminates in const char * mode:
-    assert_equal(RBA::A::ft_cptr(s).inspect, "\"\\u0010*\"")
+    assert_equal(RBA::A::ft_cptr(s).encoding.name, "UTF-8")
+    assert_equal(RBA::A::ft_cptr(s), "\u0010*")
 
   end
 

@@ -135,6 +135,10 @@ inline void rb_hash_clear(VALUE hash)
 
 #endif
 
+#if HAVE_RUBY_VERSION_CODE < 20200
+VALUE rb_utf8_str_new (const char *str, long len);
+#endif
+
 typedef VALUE (*ruby_func)(ANYARGS);
 
 /**

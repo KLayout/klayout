@@ -712,6 +712,28 @@ VariantsCollectorBase::create_var_instances_tl_invariant (db::Cell &in_cell, std
 
 // ------------------------------------------------------------------------------------------
 
+TransformationReducer *
+make_reducer (ReducerType type)
+{
+
+  switch (type) {
+  case Orientation:
+    return new OrientationReducer ();
+  case Orthogonal:
+    return new OrthogonalTransformationReducer ();
+  case Magnification:
+    return new MagnificationReducer ();
+  case XYAnisotropyAndMagnification:
+    return new XYAnisotropyAndMagnificationReducer ();
+  case MagnificationAndOrientation:
+    return new MagnificationAndOrientationReducer ();
+  default:
+    return 0;
+  }
+}
+
+// ------------------------------------------------------------------------------------------
+
 VariantStatistics::VariantStatistics ()
   : mp_red ()
 {

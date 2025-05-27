@@ -22,6 +22,7 @@
 
 #include "gsiDecl.h"
 #include "gsiDeclDbMetaInfo.h"
+#include "gsiEnums.h"
 
 #include "gsiDeclDbHelpers.h"
 #include "dbLayout.h"
@@ -4653,6 +4654,40 @@ Class<db::DCellInstArray> decl_DCellInstArray ("db", "DCellInstArray",
   "This object is identical to \\CellInstArray, except that it holds coordinates in micron units instead of database units.\n"
   "\n"
   "This class has been introduced in version 0.25."
+);
+
+gsi::Enum<db::ReducerType> decl_VariantType ("db", "VariantType",
+  gsi::enum_const ("NoVariants", db::NoReducer,
+    "@brief No variants needed."
+  ) +
+  gsi::enum_const ("Orientation", db::Orientation,
+    "@brief Orientation variants needed.\n"
+    "For example, the edge orientation selection operation needs this variant type."
+  ) +
+  gsi::enum_const ("Orthogonal", db::Orthogonal,
+    "@brief Orthogonal transformations (rotations by multiples of 90 degree) need variants.\n"
+    "For example, the diagonal edge selection operation needs this variant type."
+  ) +
+  gsi::enum_const ("Magnification", db::Magnification,
+    "@brief Scaling variants needed.\n"
+    "For example, distance measurements or the isotropic sizing operations needs this variant type."
+  ) +
+  gsi::enum_const ("XYAnisotropyAndMagnification", db::XYAnisotropyAndMagnification,
+    "@brief Scaling and anisotropy variants needed.\n"
+    "For example, the anisotropic sizing operation needs this variant type."
+  ) +
+  gsi::enum_const ("MagnificationAndOrientation", db::MagnificationAndOrientation,
+    "@brief Scaling and orientation variants needed.\n"
+    "For example, the 'move' operation needs this variant type."
+  ),
+  "@brief This class represents the cell variant type for various methods.\n"
+  "\n"
+  "Cell variants are needed in hierarchical applications, when operations are to be "
+  "performed on cell level, but the operations are not transformation invariant.\n"
+  "In that case, a variant type needs to be specified in order to make the algorithm "
+  "separate the cells by their absolute orientation or by their accumulated magnification.\n"
+  "\n"
+  "This enum has been introduced in version 0.30.2."
 );
 
 }

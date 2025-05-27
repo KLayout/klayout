@@ -28,38 +28,42 @@ namespace db
 {
 
 PolygonNeighborhoodVisitor::PolygonNeighborhoodVisitor ()
-  : m_result_type (db::CompoundRegionOperationNode::ResultType::Edges)
+  : m_result_type (db::CompoundRegionOperationNode::ResultType::Edges), m_variant_type (db::NoReducer)
 {
   disconnect_outputs ();
 }
 
 void
-PolygonNeighborhoodVisitor::connect_output (Layout * /*layout*/, std::unordered_set<db::PolygonWithProperties> *polygons) const
+PolygonNeighborhoodVisitor::connect_output (Layout * /*layout*/, std::unordered_set<db::PolygonWithProperties> *polygons, const db::ICplxTrans &trans) const
 {
   disconnect_outputs ();
   mp_polygons = polygons;
+  m_trans = trans;
 }
 
 void
-PolygonNeighborhoodVisitor::connect_output (db::Layout *layout, std::unordered_set<db::PolygonRefWithProperties> *polygons) const
+PolygonNeighborhoodVisitor::connect_output (db::Layout *layout, std::unordered_set<db::PolygonRefWithProperties> *polygons, const db::ICplxTrans &trans) const
 {
   disconnect_outputs ();
   mp_layout = layout;
   mp_polygon_refs = polygons;
+  m_trans = trans;
 }
 
 void
-PolygonNeighborhoodVisitor::connect_output (db::Layout * /*layout*/, std::unordered_set<db::EdgeWithProperties> *edges) const
+PolygonNeighborhoodVisitor::connect_output (db::Layout * /*layout*/, std::unordered_set<db::EdgeWithProperties> *edges, const db::ICplxTrans &trans) const
 {
   disconnect_outputs ();
   mp_edges = edges;
+  m_trans = trans;
 }
 
 void
-PolygonNeighborhoodVisitor::connect_output (Layout * /*layout*/, std::unordered_set<db::EdgePairWithProperties> *edge_pairs) const
+PolygonNeighborhoodVisitor::connect_output (Layout * /*layout*/, std::unordered_set<db::EdgePairWithProperties> *edge_pairs, const db::ICplxTrans &trans) const
 {
   disconnect_outputs ();
   mp_edge_pairs = edge_pairs;
+  m_trans = trans;
 }
 
 void
@@ -76,10 +80,10 @@ void
 PolygonNeighborhoodVisitor::output_polygon (const db::PolygonWithProperties &poly)
 {
   if (mp_polygons) {
-    mp_polygons->insert (poly);
+    mp_polygons->insert (poly.transformed (m_trans));
   } else if (mp_polygon_refs) {
     tl_assert (mp_layout != 0);
-    mp_polygon_refs->insert (db::PolygonRefWithProperties (db::PolygonRef (poly, mp_layout->shape_repository ()), poly.properties_id ()));
+    mp_polygon_refs->insert (db::PolygonRefWithProperties (db::PolygonRef (poly.transformed (m_trans), mp_layout->shape_repository ()), poly.properties_id ()));
   } else {
     throw tl::Exception (tl::to_string (tr ("PolygonNeighborhoodVisitor is not configured for edge output (use 'result_type=Edges')")));
   }
@@ -91,7 +95,7 @@ PolygonNeighborhoodVisitor::output_edge (const db::EdgeWithProperties &edge)
   if (mp_edges == 0) {
     throw tl::Exception (tl::to_string (tr ("PolygonNeighborhoodVisitor is not configured for edge output (use 'result_type=Edges')")));
   }
-  mp_edges->insert (edge);
+  mp_edges->insert (edge.transformed (m_trans));
 }
 
 void
@@ -100,16 +104,22 @@ PolygonNeighborhoodVisitor::output_edge_pair (const db::EdgePairWithProperties &
   if (mp_edge_pairs == 0) {
     throw tl::Exception (tl::to_string (tr ("PolygonNeighborhoodVisitor is not configured for edge pair output (use 'result_type=EdgePairs')")));
   }
-  mp_edge_pairs->insert (edge_pair);
+  mp_edge_pairs->insert (edge_pair.transformed (m_trans));
 }
 
 // --------------------------------------------------------------------------------------------------
 
 PolygonNeighborhoodCompoundOperationNode::PolygonNeighborhoodCompoundOperationNode (const std::vector<CompoundRegionOperationNode *> &children, PolygonNeighborhoodVisitor *visitor, db::Coord dist)
-  : CompoundRegionMultiInputOperationNode (children), m_dist (dist), mp_visitor (visitor)
+  : CompoundRegionMultiInputOperationNode (children, true /*no implicit init()*/),
+    m_dist (dist), mp_visitor (visitor)
 {
   tl_assert (visitor != 0);
   visitor->keep ();
+
+  m_vars.reset (db::make_reducer (visitor->variant_type ()));
+
+  //  must be called after local_vars() is available
+  init ();
 }
 
 db::Coord
@@ -170,12 +180,19 @@ PolygonNeighborhoodCompoundOperationNode::compute_local_impl (CompoundRegionOper
   tl_assert (interactions.num_subjects () == 1);
   tl_assert (! results.empty ());
 
+  db::ICplxTrans var_trans, var_trans_inv;
+  if (proc->vars ()) {
+    var_trans_inv = proc->vars ()->single_variant_transformation (cell->cell_index ());
+    var_trans = var_trans_inv.inverted ();
+  }
+
   try {
 
-    mp_visitor->connect_output (layout, &results.front ());
+    mp_visitor->connect_output (layout, &results.front (), var_trans_inv);
 
     const T &pr = interactions.begin_subjects ()->second;
     db::PolygonWithProperties subject (pr.instantiate (), pr.properties_id ());
+    subject.transform (var_trans);
 
     PolygonNeighborhoodVisitor::neighbors_type neighbors;
 
@@ -191,6 +208,7 @@ PolygonNeighborhoodCompoundOperationNode::compute_local_impl (CompoundRegionOper
 
       for (auto p = others.front ().begin (); p != others.front ().end (); ++p) {
         n.push_back (db::PolygonWithProperties (p->instantiate (), p->properties_id ()));
+        n.back ().transform (var_trans);
       }
 
     }

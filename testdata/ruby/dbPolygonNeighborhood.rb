@@ -65,6 +65,29 @@ class PMyVisitor2 < RBA::PolygonNeighborhoodVisitor
 
 end
     
+class PMyVisitor4Deep < RBA::PolygonNeighborhoodVisitor
+
+  def initialize
+    self.result_type = RBA::CompoundRegionOperationNode::ResultType::Region
+    self.variant_type = RBA::VariantType::Orientation
+  end
+
+  def neighbors(layout, cell, polygon, neighborhood)
+    prim_box = polygon.bbox
+    neighborhood.each do |inp, others|
+      others.each do |other|
+        other_box = other.bbox
+        top_part = prim_box.top - other_box.top
+        bot_part = other_box.bottom - prim_box.bottom
+        if top_part > 0 && bot_part > 0 && top_part > 2 * bot_part
+          output(polygon)
+        end
+      end
+    end
+  end
+
+end
+    
 class DBPolygonNeighborhood_TestClass < TestBase
 
   # basic events
@@ -133,6 +156,46 @@ class DBPolygonNeighborhood_TestClass < TestBase
     res = prim.complex_op(node)
 
     assert_equal(res.to_s, "(-600,500;500,500);(500,500;-600,500)")
+
+  end
+
+  # full example with deep mode, variant building
+  def test_3
+
+    ly = RBA::Layout::new
+    l1 = ly.layer(1, 0)
+    l2 = ly.layer(2, 0)
+
+    top = ly.create_cell("TOP")
+    child = ly.create_cell("CHILD")
+
+    child.shapes(l1).insert(RBA::Box::new(-5000, -100, 5000, 100))
+    child.shapes(l2).insert(RBA::Box::new(-1100, -3000, -900, 1000))
+    child.shapes(l2).insert(RBA::Box::new(-100, -2000, 100, 2000))
+    child.shapes(l2).insert(RBA::Box::new(900, -1000, 1100, 3000))
+
+    top.insert(RBA::CellInstArray::new(child, RBA::Trans::new(RBA::Vector::new(0, -5000))))
+    top.insert(RBA::CellInstArray::new(child, RBA::Trans::new(RBA::Trans::M0, RBA::Vector::new(0, 5000))))
+    top.insert(RBA::CellInstArray::new(child, RBA::Trans::new(RBA::Trans::R90, RBA::Vector::new(-10000, 0))))
+
+    dss = RBA::DeepShapeStore::new
+    # Ruby does not like to be called from threads, so none given here:
+    dss.threads = 0
+    l1r = RBA::Region::new(RBA::RecursiveShapeIterator::new(ly, top, l1), dss)
+    l2r = RBA::Region::new(RBA::RecursiveShapeIterator::new(ly, top, l2), dss)
+
+    overlap = l1r & l2r
+    puts overlap.to_s
+
+    children = [
+      RBA::CompoundRegionOperationNode::new_secondary(overlap)
+    ] 
+    visitor = PMyVisitor4Deep::new
+    node = RBA::CompoundRegionOperationNode::new_polygon_neighborhood(children, visitor, -1)
+
+    errors = l2r.complex_op(node)
+
+    assert_equal(errors.to_s, "(900,-6000;900,-2000;1100,-2000;1100,-6000);(-1100,4000;-1100,8000;-900,8000;-900,4000)")
 
   end
 

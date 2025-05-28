@@ -999,6 +999,11 @@ Class<rdb::Item> decl_RdbItem ("rdb", "RdbItem",
     "@param value The box to add.\n"
     "This method has been introduced in version 0.25 as a convenience method."
   ) +
+  gsi::method_ext ("add_value", &add_value_t<db::DText>, gsi::arg ("value"),
+    "@brief Adds a text object to the values of this item\n"
+    "@param value The text to add.\n"
+    "This method has been introduced in version 0.30.1 to support text objects with properties."
+  ) +
   gsi::method_ext ("add_value", &add_value_t<db::DEdge>, gsi::arg ("value"),
     "@brief Adds an edge object to the values of this item\n"
     "@param value The edge to add.\n"

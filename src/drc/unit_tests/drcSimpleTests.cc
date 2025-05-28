@@ -1694,6 +1694,16 @@ TEST(93d_withAngle)
   run_test (_this, "93", true);
 }
 
+TEST(94_texts_in_region_xor)
+{
+  run_test (_this, "94", false);
+}
+
+TEST(94d_texts_in_region_xor)
+{
+  run_test (_this, "94", true);
+}
+
 TEST(100_edge_interaction_with_count)
 {
   run_test (_this, "100", false);

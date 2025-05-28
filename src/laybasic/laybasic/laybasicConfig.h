@@ -43,6 +43,7 @@ static const std::string cfg_grid_grid_color ("grid-grid-color");
 static const std::string cfg_grid_style0 ("grid-style0");
 static const std::string cfg_grid_style1 ("grid-style1");
 static const std::string cfg_grid_style2 ("grid-style2");
+static const std::string cfg_grid_density ("grid-density");
 static const std::string cfg_grid_visible ("grid-visible");
 static const std::string cfg_grid_micron ("grid-micron");
 static const std::string cfg_grid_show_ruler ("grid-show-ruler");

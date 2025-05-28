@@ -103,7 +103,7 @@ class DBTexts_TestClass < TestBase
     assert_equal(r.is_empty?, false)
     assert_equal(r.count, 1)
     assert_equal(r.hier_count, 1)
-    assert_equal(r[0].to_s, "('uvw',r0 110,210)")
+    assert_equal(r[0].to_s, "('uvw',r0 110,210) props={}")
     assert_equal(r[1].to_s, "")
     assert_equal(r.bbox.to_s, "(110,210;110,210)")
 
@@ -223,9 +223,13 @@ class DBTexts_TestClass < TestBase
 
     r.flatten
     assert_equal(r.has_valid_texts?, true)
-    assert_equal(r[1].to_s, "('abc',r0 100,-100)")
+    assert_equal(r[1].to_s, "('abc',r0 100,-100) props={}")
     assert_equal(r[100].inspect, "nil")
     assert_equal(r.bbox.to_s, "(100,-200;300,-100)")
+
+    r = RBA::Texts::new
+    r.insert(RBA::TextWithProperties::new(RBA::Text::new("string", RBA::Trans::new), { 1 => "value" }))
+    assert_equal(r[0].to_s, "('string',r0 0,0) props={1=>value}")
     
     dss = RBA::DeepShapeStore::new
     r = RBA::Texts::new(ly.begin_shapes(c1.cell_index, l1), dss)

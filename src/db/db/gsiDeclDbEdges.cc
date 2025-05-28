@@ -848,6 +848,16 @@ static std::vector<db::Edges> split_interacting_with_region (const db::Edges *r,
   return as_2edges_vector (r->selected_interacting_differential (other, min_count, max_count));
 }
 
+static tl::Variant nth (const db::Edges *edges, size_t n)
+{
+  const db::Edge *e = edges->nth (n);
+  if (! e) {
+    return tl::Variant ();
+  } else {
+    return tl::Variant (db::EdgeWithProperties (*e, edges->nth_prop_id (n)));
+  }
+}
+
 static db::generic_shape_iterator<db::EdgeWithProperties> begin_edges (const db::Edges *edges)
 {
   return db::generic_shape_iterator<db::EdgeWithProperties> (db::make_wp_iter (edges->delegate ()->begin ()));
@@ -2439,14 +2449,16 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "This method has been introduced in version 0.25."
     "Starting with version 0.30, the iterator delivers an EdgeWithProperties object."
   ) +
-  method ("[]", &db::Edges::nth, gsi::arg ("n"),
+  method_ext ("[]", &nth, gsi::arg ("n"),
     "@brief Returns the nth edge of the collection\n"
     "\n"
     "This method returns nil if the index is out of range. It is available for flat edge collections only - i.e. "
     "those for which \\has_valid_edges? is true. Use \\flatten to explicitly flatten an edge collection.\n"
     "This method returns the raw edge (not merged edges, even if merged semantics is enabled).\n"
     "\n"
-    "The \\each iterator is the more general approach to access the edges."
+    "The \\each iterator is the more general approach to access the edges.\n"
+    "\n"
+    "Since version 0.30.1, this method returns an \\EdgeWithProperties object."
   ) +
   method ("flatten", &db::Edges::flatten,
     "@brief Explicitly flattens an edge collection\n"

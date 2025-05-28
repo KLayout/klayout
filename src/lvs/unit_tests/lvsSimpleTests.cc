@@ -357,3 +357,8 @@ TEST(62_LayerNames)
   run_test (_this, "layer_names", "layer_names.gds", false, true, "TOP");
 }
 
+TEST(63_FlagMissingPorts)
+{
+  run_test (_this, "flag_missing_ports", "flag_missing_ports.gds", false, true, "TOP");
+}
+

@@ -35,6 +35,12 @@
 
 // -----------------------------------------------------------------------
 // class QDomNodeList
+  static bool QDomNodeList_operator_eq(const QDomNodeList *a, const QDomNodeList &b) {
+    return *a == b;
+  }
+  static bool QDomNodeList_operator_ne(const QDomNodeList *a, const QDomNodeList &b) {
+    return !(*a == b);
+  }
 
 //  Constructor QDomNodeList::QDomNodeList()
 
@@ -153,25 +159,6 @@ static void _call_f_length_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// bool QDomNodeList::operator!=(const QDomNodeList &)
-
-
-static void _init_f_operator_excl__eq__c2484 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<const QDomNodeList & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_excl__eq__c2484 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QDomNodeList &arg1 = gsi::arg_reader<const QDomNodeList & >() (args, heap);
-  ret.write<bool > ((bool)((QDomNodeList *)cls)->operator!= (arg1));
-}
-
-
 // QDomNodeList &QDomNodeList::operator=(const QDomNodeList &)
 
 
@@ -188,25 +175,6 @@ static void _call_f_operator_eq__2484 (const qt_gsi::GenericMethod * /*decl*/, v
   tl::Heap heap;
   const QDomNodeList &arg1 = gsi::arg_reader<const QDomNodeList & >() (args, heap);
   ret.write<QDomNodeList & > ((QDomNodeList &)((QDomNodeList *)cls)->operator= (arg1));
-}
-
-
-// bool QDomNodeList::operator==(const QDomNodeList &)
-
-
-static void _init_f_operator_eq__eq__c2484 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<const QDomNodeList & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_eq__eq__c2484 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QDomNodeList &arg1 = gsi::arg_reader<const QDomNodeList & >() (args, heap);
-  ret.write<bool > ((bool)((QDomNodeList *)cls)->operator== (arg1));
 }
 
 
@@ -238,14 +206,15 @@ static gsi::Methods methods_QDomNodeList () {
   methods += new qt_gsi::GenericMethod ("isEmpty?", "@brief Method bool QDomNodeList::isEmpty()\n", true, &_init_f_isEmpty_c0, &_call_f_isEmpty_c0);
   methods += new qt_gsi::GenericMethod ("item", "@brief Method QDomNode QDomNodeList::item(int index)\n", true, &_init_f_item_c767, &_call_f_item_c767);
   methods += new qt_gsi::GenericMethod ("length", "@brief Method int QDomNodeList::length()\n", true, &_init_f_length_c0, &_call_f_length_c0);
-  methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QDomNodeList::operator!=(const QDomNodeList &)\n", true, &_init_f_operator_excl__eq__c2484, &_call_f_operator_excl__eq__c2484);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QDomNodeList &QDomNodeList::operator=(const QDomNodeList &)\n", false, &_init_f_operator_eq__2484, &_call_f_operator_eq__2484);
-  methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QDomNodeList::operator==(const QDomNodeList &)\n", true, &_init_f_operator_eq__eq__c2484, &_call_f_operator_eq__eq__c2484);
   methods += new qt_gsi::GenericMethod ("size", "@brief Method int QDomNodeList::size()\n", true, &_init_f_size_c0, &_call_f_size_c0);
   return methods;
 }
 
 gsi::Class<QDomNodeList> decl_QDomNodeList ("QtXml", "QDomNodeList",
+  gsi::method_ext("==", &QDomNodeList_operator_eq, gsi::arg ("other"), "@brief Method bool QDomNodeList::operator==(const QDomNodeList &) const") +
+  gsi::method_ext("!=", &QDomNodeList_operator_ne, gsi::arg ("other"), "@brief Method bool QDomNodeList::operator!=(const QDomNodeList &) const") 
++
   methods_QDomNodeList (),
   "@qt\n@brief Binding of QDomNodeList");
 

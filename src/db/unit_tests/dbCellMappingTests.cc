@@ -485,8 +485,41 @@ TEST(7)
   cib.push_back (b1.cell_index ());
   cib.push_back (b2.cell_index ());
   cm.create_multi_mapping_full (h, cib, *g, cia);
-  EXPECT_EQ (m2s (cm, *g, h), "a0->b0;a1->b1;a2->b2;a3->a3;a4->a4;a5->a5");
+  EXPECT_EQ (m2s (cm, h, *g), "b0->a0;b1->a1;b2->a2;a3->a3;a4->a4;a5->a5");
 
   EXPECT_EQ (l2s (h), "b0#0:;b1#1:cell_index=3 r0 0,0,cell_index=4 r0 0,0;b2#2:cell_index=4 r0 0,0;a3#3:cell_index=4 r0 0,0,cell_index=5 r0 0,0;a4#4:;a5#5:");
 }
 
+//  Issue #2014
+TEST(8)
+{
+  std::unique_ptr<db::Layout> g (new db::Layout ());
+  db::Cell &a (g->cell (g->add_cell ("a")));
+  db::Cell &b (g->cell (g->add_cell ("b")));
+  db::Cell &b1 (g->cell (g->add_cell ("b1")));
+  db::Cell &b2 (g->cell (g->add_cell ("b2")));
+  db::Cell &c (g->cell (g->add_cell ("c")));
+
+  b.insert (db::CellInstArray (db::CellInst (a.cell_index ()), db::Trans ()));
+  b.insert (db::CellInstArray (db::CellInst (c.cell_index ()), db::Trans ()));
+  b.insert (db::CellInstArray (db::CellInst (b1.cell_index ()), db::Trans ()));
+  b.insert (db::CellInstArray (db::CellInst (b2.cell_index ()), db::Trans ()));
+
+  db::Layout h;
+  db::Cell &ha (h.cell (h.add_cell ("a")));
+  db::Cell &hb (h.cell (h.add_cell ("b")));
+  db::Cell &hc (h.cell (h.add_cell ("c")));
+
+  db::CellMapping cm;
+  std::vector<db::cell_index_type> cib, cia;
+  cia.push_back (a.cell_index ());
+  cia.push_back (b.cell_index ());
+  cia.push_back (c.cell_index ());
+  cib.push_back (ha.cell_index ());
+  cib.push_back (hb.cell_index ());
+  cib.push_back (hc.cell_index ());
+  cm.create_multi_mapping_full (h, cib, *g, cia);
+  EXPECT_EQ (m2s (cm, h, *g), "a->a;b->b;b1->b1;b2->b2;c->c");
+
+  EXPECT_EQ (l2s (h), "a#0:;b#1:cell_index=0 r0 0,0,cell_index=2 r0 0,0,cell_index=3 r0 0,0,cell_index=4 r0 0,0;c#2:;b1#3:;b2#4:");
+}

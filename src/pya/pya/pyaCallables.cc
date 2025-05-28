@@ -49,7 +49,7 @@ pya_object_deallocate (PyObject *self)
   //  may trigger a GC (https://github.com/KLayout/klayout/issues/1054).
   //  According to the comments this may be turned into a release mode assertion, so
   //  we better work around it.
-  ++self->ob_refcnt;
+  Py_IncRef(self);
 
   //  Mute Python warnings in debug case
   PyObject_GC_UnTrack (self);
@@ -413,6 +413,8 @@ match_method (int mid, PyObject *self, PyObject *args, PyObject *kwargs, bool st
           if (! arg) {
             is_valid = a->spec ()->has_default ();
           } else if (test_arg (*a, arg.get (), false /*strict*/, false /*object substitution*/)) {
+            sc += 100;
+          } else if (test_arg (*a, arg.get (), true /*loose*/, false /*object substitution*/)) {
             ++sc;
           } else if (test_arg (*a, arg.get (), true /*loose*/, true /*object substitution*/)) {
             //  non-scoring match

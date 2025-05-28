@@ -1571,6 +1571,17 @@ struct array_iterator
     }
   }
 
+  /**
+   *  @brief Gets a value indicating whether the iterator is a synthetic one
+   *
+   *  "is_singular" is true, if the iterator was default-created or with a single
+   *  transformation.
+   */
+  bool is_singular () const
+  {
+    return mp_base == 0;
+  }
+
 private:
   trans_type m_trans;
   basic_array_iterator <Coord> *mp_base;

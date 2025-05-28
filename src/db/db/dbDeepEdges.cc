@@ -438,6 +438,12 @@ DeepEdges::nth (size_t /*n*/) const
   throw tl::Exception (tl::to_string (tr ("Random access to edges is available only for flat edge collections")));
 }
 
+db::properties_id_type
+DeepEdges::nth_prop_id (size_t) const
+{
+  throw tl::Exception (tl::to_string (tr ("Random access to edges is available only for flat collections")));
+}
+
 bool
 DeepEdges::has_valid_edges () const
 {

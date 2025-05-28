@@ -307,3 +307,22 @@ TEST(9_polygons)
   EXPECT_EQ (r.to_string (), "(9,19;9,21;11,21;11,19){17=>ABC};(-11,-21;-11,-19;-9,-19;-9,-21){17=>XZY}");
 }
 
+TEST(10_properties)
+{
+  db::PropertiesSet ps;
+
+  ps.insert (tl::Variant ("id"), 1);
+  db::properties_id_type pid1 = db::properties_id (ps);
+
+  db::Texts texts;
+  texts.insert (db::TextWithProperties (db::Text ("string", db::Trans ()), pid1));
+  texts.insert (db::Text ("abc", db::Trans ()));
+
+  EXPECT_EQ (texts.nth (0)->to_string (), "('abc',r0 0,0)");
+  EXPECT_EQ (texts.nth (1)->to_string (), "('string',r0 0,0)");
+  EXPECT_EQ (texts.nth (2) == 0, true);
+
+  EXPECT_EQ (texts.nth_prop_id (0), db::properties_id_type (0));
+  EXPECT_EQ (texts.nth_prop_id (1), pid1);
+}
+

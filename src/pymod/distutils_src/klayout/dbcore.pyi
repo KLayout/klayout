@@ -11620,7 +11620,7 @@ class DEdgePair:
         ...
     ...
 
-class DEdgePairWithProperties(EdgePair):
+class DEdgePairWithProperties(DEdgePair):
     r"""
     @brief A DEdgePair object with properties attached.
     This class represents a combination of a DEdgePair object an user properties. User properties are stored in form of a properties ID. Convenience methods are provided to manipulate or retrieve user properties directly.
@@ -11685,7 +11685,7 @@ class DEdgePairWithProperties(EdgePair):
         @brief Returns a string representing the polygon
         """
         ...
-    def _assign(self, other: EdgePair) -> None:
+    def _assign(self, other: DEdgePair) -> None:
         r"""
         @brief Assigns another object to self
         """
@@ -15645,8 +15645,7 @@ class DText:
     Setter:
     @brief Sets the horizontal alignment
 
-    This property specifies how the text is aligned relative to the anchor point. 
-    This property has been introduced in version 0.22 and extended to enums in 0.28.
+    This is the version accepting integer values. It's provided for backward compatibility.
     """
     size: float
     r"""
@@ -15682,8 +15681,7 @@ class DText:
     Setter:
     @brief Sets the vertical alignment
 
-    This property specifies how the text is aligned relative to the anchor point. 
-    This property has been introduced in version 0.22 and extended to enums in 0.28.
+    This is the version accepting integer values. It's provided for backward compatibility.
     """
     x: float
     r"""
@@ -25368,13 +25366,15 @@ class EdgePairs(ShapeCollection):
         @brief Creates a copy of self
         """
         ...
-    def __getitem__(self, n: int) -> EdgePair:
+    def __getitem__(self, n: int) -> Any:
         r"""
         @brief Returns the nth edge pair
 
         This method returns nil if the index is out of range. It is available for flat edge pairs only - i.e. those for which \has_valid_edge_pairs? is true. Use \flatten to explicitly flatten an edge pair collection.
 
         The \each iterator is the more general approach to access the edge pairs.
+
+        Since version 0.30.1, this method returns a \EdgePairWithProperties object.
         """
         ...
     def __iadd__(self, other: EdgePairs) -> EdgePairs:
@@ -29131,7 +29131,7 @@ class Edges(ShapeCollection):
         @brief Creates a copy of self
         """
         ...
-    def __getitem__(self, n: int) -> Edge:
+    def __getitem__(self, n: int) -> Any:
         r"""
         @brief Returns the nth edge of the collection
 
@@ -29139,6 +29139,8 @@ class Edges(ShapeCollection):
         This method returns the raw edge (not merged edges, even if merged semantics is enabled).
 
         The \each iterator is the more general approach to access the edges.
+
+        Since version 0.30.1, this method returns an \EdgeWithProperties object.
         """
         ...
     def __iadd__(self, other: Edges) -> Edges:
@@ -34943,11 +34945,11 @@ class Instance:
 
     Starting with version 0.25 the displacement is of vector type.
     Setter:
-    @brief Sets the displacement vector for the 'a' axis in micrometer units
+    @brief Sets the displacement vector for the 'a' axis
 
-    Like \a= with an integer displacement, this method will set the displacement vector but it accepts a vector in micrometer units that is of \DVector type. The vector will be translated to database units internally.
+    If the instance was not an array instance before it is made one.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.23. Starting with version 0.25 the displacement is of vector type.
     """
     b: Vector
     r"""
@@ -35490,7 +35492,7 @@ class Instance:
         r"""
         @brief Gets the layout this instance is contained in
 
-        This method has been introduced in version 0.22.
+        This const version of the method has been introduced in version 0.25.
         """
         ...
     @overload
@@ -35498,7 +35500,7 @@ class Instance:
         r"""
         @brief Gets the layout this instance is contained in
 
-        This const version of the method has been introduced in version 0.25.
+        This method has been introduced in version 0.22.
         """
         ...
     def pcell_declaration(self) -> PCellDeclaration_Native:
@@ -47741,17 +47743,17 @@ class Netlist:
     @overload
     def circuit_by_cell_index(self, cell_index: int) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given cell index (const version).
+        @brief Gets the circuit object for a given cell index.
         If the cell index is not valid or no circuit is registered with this index, nil is returned.
-
-        This constness variant has been introduced in version 0.26.8.
         """
         ...
     @overload
     def circuit_by_cell_index(self, cell_index: int) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given cell index.
+        @brief Gets the circuit object for a given cell index (const version).
         If the cell index is not valid or no circuit is registered with this index, nil is returned.
+
+        This constness variant has been introduced in version 0.26.8.
         """
         ...
     @overload
@@ -47784,7 +47786,6 @@ class Netlist:
         r"""
         @brief Gets the circuit objects for a given name filter (const version).
         The name filter is a glob pattern. This method will return all \Circuit objects matching the glob pattern.
-
 
         This constness variant has been introduced in version 0.26.8.
         """
@@ -58443,7 +58444,7 @@ class Region(ShapeCollection):
         @brief Creates a copy of self
         """
         ...
-    def __getitem__(self, n: int) -> Polygon:
+    def __getitem__(self, n: int) -> Any:
         r"""
         @brief Returns the nth polygon of the region
 
@@ -58451,6 +58452,8 @@ class Region(ShapeCollection):
         This method returns the raw polygon (not merged polygons, even if merged semantics is enabled).
 
         The \each iterator is the more general approach to access the polygons.
+
+        Since version 0.30.1, this method returns a \PolygonWithProperties object.
         """
         ...
     def __iadd__(self, other: Region) -> Region:
@@ -63229,11 +63232,10 @@ class Shape:
 
     Starting with version 0.23, this method returns nil, if the shape does not represent an edge.
     Setter:
-    @brief Replaces the shape by the given edge
-    This method replaces the shape by the given edge. This method can only be called for editable layouts. It does not change the user properties of the shape.
-    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
+    @brief Replaces the shape by the given edge (in micrometer units)
+    This method replaces the shape by the given edge, like \edge= with a \Edge argument does. This version translates the edge from micrometer units to database units internally.
 
-    This method has been introduced in version 0.22.
+    This method has been introduced in version 0.25.
     """
     edge_pair: Any
     r"""
@@ -70138,13 +70140,15 @@ class Texts(ShapeCollection):
         @brief Creates a copy of self
         """
         ...
-    def __getitem__(self, n: int) -> Text:
+    def __getitem__(self, n: int) -> Any:
         r"""
         @brief Returns the nth text
 
         This method returns nil if the index is out of range. It is available for flat texts only - i.e. those for which \has_valid_texts? is true. Use \flatten to explicitly flatten an text collection.
 
         The \each iterator is the more general approach to access the texts.
+
+        Since version 0.30.1, this method returns a \TextWithProperties object.
         """
         ...
     def __iadd__(self, other: Texts) -> Texts:

@@ -226,10 +226,16 @@ class DBRegion_TestClass < TestBase
 
     r.flatten
     assert_equal(r.has_valid_polygons?, true)
-    assert_equal(r[1].to_s, "(-10,80;-10,120;10,120;10,80)")
+    assert_equal(r[1].to_s, "(-10,80;-10,120;10,120;10,80) props={}")
     assert_equal(r[4].to_s, "")
     assert_equal(r.bbox.to_s, "(-10,-20;210,120)")
     assert_equal(r.is_merged?, false)
+
+    r = RBA::Region::new
+    r.insert(RBA::PolygonWithProperties::new(RBA::Box::new(0, 0, 10, 20), { 1 => 'value' }))
+    r.insert(RBA::Box::new(1, 2, 11, 22))
+    assert_equal(r[0].to_s, "(1,2;1,22;11,22;11,2) props={}")
+    assert_equal(r[1].to_s, "(0,0;0,20;10,20;10,0) props={1=>value}")
     
     r = RBA::Region::new(ly.begin_shapes(c1.cell_index, l2), "*")
     assert_equal(csort(r.to_s), csort("(-11,-21;-11,-19;-9,-19;-9,-21);(9,19;9,21;11,21;11,19);(-11,79;-11,81;-9,81;-9,79);(9,119;9,121;11,121;11,119);(189,79;189,81;191,81;191,79);(209,119;209,121;211,121;211,119)"))

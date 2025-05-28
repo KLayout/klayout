@@ -1217,7 +1217,7 @@ struct test_arg_func<gsi::ObjectType>
 
         //  in loose mode (second pass) try to match the types via implicit constructors,
         //  in strict mode (first pass) require direct type match
-        if (p->cls_decl () == atype.cls () || (loose && (p->cls_decl ()->is_derived_from (atype.cls ()) || p->cls_decl ()->can_convert_to (atype.cls ())))) {
+        if (p->cls_decl () == atype.cls () || (loose && (p->cls_decl ()->is_derived_from (atype.cls ()) || (object_substitution && p->cls_decl ()->can_convert_to (atype.cls ()))))) {
           //  type matches: check constness
           if ((atype.is_ref () || atype.is_ptr ()) && p->const_ref ()) {
             *ret = false;

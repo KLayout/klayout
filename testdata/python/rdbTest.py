@@ -972,6 +972,78 @@ class RDB_TestClass(unittest.TestCase):
     _cat_same = None
     self.assertEqual(_subcat.rdb_id(), _subcat_same.rdb_id())
 
+  def test_15(self):
+
+    p = pya.DPolygon(pya.DBox(0.5, 1, 2, 3))
+    pwp = pya.DPolygonWithProperties(p, { 1: "value" })
+    e = pya.DEdge(pya.DPoint(0, 0), pya.DPoint(1, 2))
+    ewp = pya.DEdgeWithProperties(e, { 1: "value" })
+    ep = pya.DEdgePair(e, e.moved(10, 10))
+    epwp = pya.DEdgePairWithProperties(ep, { 1: "value" })
+    t = pya.DText("text", pya.DTrans.R0)
+    twp = pya.DTextWithProperties(t, { 1: "value" })
+    b = pya.DBox(0, 0, 1, 2)
+    bwp = pya.DBoxWithProperties(b, { 1: "value" })
+
+    ip = pya.Polygon(pya.Box(0, 1, 2, 3))
+    ipwp = pya.PolygonWithProperties(ip, { 1: "value" })
+    ie = pya.Edge(pya.Point(0, 0), pya.Point(1, 2))
+    iewp = pya.EdgeWithProperties(ie, { 1: "value" })
+    iep = pya.EdgePair(ie, ie.moved(10, 10))
+    iepwp = pya.EdgePairWithProperties(iep, { 1: "value" })
+    it = pya.Text("text", pya.Trans.R0)
+    itwp = pya.TextWithProperties(it, { 1: "value" })
+    ib = pya.Box(0, 0, 1, 2)
+    ibwp = pya.BoxWithProperties(ib, { 1: "value" })
+
+    rdb = pya.ReportDatabase()
+
+    cat = rdb.create_category("name")
+    cell = rdb.create_cell("TOP")
+    item = rdb.create_item(cell, cat)
+
+    item.add_value(p)
+    item.add_value(pwp)
+    item.add_value(b)
+    item.add_value(bwp)
+    item.add_value(t)
+    item.add_value(twp)
+    item.add_value(e)
+    item.add_value(ewp)
+    item.add_value(ep)
+    item.add_value(epwp)
+
+    item.add_value(ip)
+    item.add_value(ipwp)
+    item.add_value(ib)
+    item.add_value(ibwp)
+    item.add_value(it)
+    item.add_value(itwp)
+    item.add_value(ie)
+    item.add_value(iewp)
+    item.add_value(iep)
+    item.add_value(iepwp)
+
+    item.add_value("string")
+    item.add_value(17.5)
+
+    values = [ str(v) for v in item.each_value() ]
+
+    self.assertEqual(values, [
+      'polygon: (0.5,1;0.5,3;2,3;2,1)', 'polygon: (0.5,1;0.5,3;2,3;2,1)', 
+      'box: (0,0;1,2)', 'box: (0,0;1,2)', 
+      "label: ('text',r0 0,0)", "label: ('text',r0 0,0)", 
+      'edge: (0,0;1,2)', 'edge: (0,0;1,2)', 
+      'edge-pair: (0,0;1,2)/(10,10;11,12)', 'edge-pair: (0,0;1,2)/(10,10;11,12)', 
+      'polygon: (0,1;0,3;2,3;2,1)', 'polygon: (0,1;0,3;2,3;2,1)', 
+      'box: (0,0;1,2)', 'box: (0,0;1,2)', 
+      "label: ('text',r0 0,0)", "label: ('text',r0 0,0)", 
+      'edge: (0,0;1,2)', 'edge: (0,0;1,2)', 
+      'edge-pair: (0,0;1,2)/(10,10;11,12)', 'edge-pair: (0,0;1,2)/(10,10;11,12)', 
+      'text: string', 
+      'float: 17.5'
+    ])
+
 # run unit tests
 if __name__ == '__main__':
   suite = unittest.TestLoader().loadTestsFromTestCase(RDB_TestClass)

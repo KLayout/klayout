@@ -110,6 +110,18 @@ Class<db::LayoutVsSchematic> decl_dbLayoutVsSchematic (decl_dbLayoutToNetlist, "
     "\n"
     "See \\NetlistCrossReference for more details.\n"
   ) +
+  gsi::method ("flag_missing_ports", &db::LayoutVsSchematic::flag_missing_ports, gsi::arg ("circuit"),
+    "@brief Flags inconsistent port labels in the given circuit\n"
+    "@param circuit Either a layout or schematic circuit\n"
+    "@return True, if no errors were found\n"
+    "This method will check all schematic nets which have pins and tests whether the corresponding layout net "
+    "has the same name. This way, it is checked if the pins are properly labelled.\n"
+    "\n"
+    "The method must be called after the compare step was successful. Error messages will be added "
+    "to the log entries. If an error occured or the cross reference is not value, 'false' is returned.\n"
+    "\n"
+    "This method was introduced in version 0.30.2."
+  ) +
   gsi::method_ext ("write_l2n", &save_l2n, gsi::arg ("path"), gsi::arg ("short_format", false),
     "@brief Writes the \\LayoutToNetlist part of the object to a file.\n"
     "This method employs the native format of KLayout.\n"

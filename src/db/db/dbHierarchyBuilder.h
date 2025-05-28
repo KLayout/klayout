@@ -294,8 +294,8 @@ public:
   virtual void end (const RecursiveShapeIterator *iter);
   virtual void enter_cell (const RecursiveShapeIterator *iter, const db::Cell *cell, const db::Box &region, const box_tree_type *complex_region);
   virtual void leave_cell (const RecursiveShapeIterator *iter, const db::Cell *cell);
-  virtual new_inst_mode new_inst (const RecursiveShapeIterator *iter, const db::CellInstArray &inst, const ICplxTrans &always_apply, const db::Box &region, const box_tree_type *complex_region, bool all);
-  virtual bool new_inst_member (const RecursiveShapeIterator *iter, const db::CellInstArray &inst, const ICplxTrans &always_apply, const db::ICplxTrans &trans, const db::Box &region, const box_tree_type *complex_region, bool all);
+  virtual new_inst_mode new_inst (const RecursiveShapeIterator *iter, const db::CellInstArray &inst, const ICplxTrans &always_apply, const db::Box &region, const box_tree_type *complex_region, bool all, bool skip_shapes);
+  virtual bool new_inst_member (const RecursiveShapeIterator *iter, const db::CellInstArray &inst, const ICplxTrans &always_apply, const db::ICplxTrans &trans, const db::Box &region, const box_tree_type *complex_region, bool all, bool skip_shapes);
   virtual void shape (const RecursiveShapeIterator *iter, const db::Shape &shape, const db::ICplxTrans &always_apply, const db::ICplxTrans &trans, const db::Box &region, const box_tree_type *complex_region);
 
   /**

@@ -24,7 +24,7 @@ import os
 class DBShapesTest(unittest.TestCase):
 
   # Shape objects as hashes
-  def test_12(self):
+  def test_1(self):
 
     s = pya.Shapes()
     s1 = s.insert(pya.Box(1, 2, 3, 4))
@@ -49,6 +49,18 @@ class DBShapesTest(unittest.TestCase):
     self.assertEqual(h[s1], 1)
     self.assertEqual(h[s2], 2)
     self.assertEqual(h[s3], 3)
+
+  # Issue #2012 (reference count)
+  def test_2(self):
+
+    ly = pya.Layout()
+    top = ly.create_cell("TOP")
+    l1 = ly.layer(1, 0)
+    top.shapes(l1).insert(pya.Box(0, 0, 100, 200))
+
+    shapes = top.shapes(l1)
+    self.assertEqual(sys.getrefcount(shapes), 2)
+
 
 # run unit tests
 if __name__ == '__main__':

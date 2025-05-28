@@ -235,7 +235,7 @@ class DBEdges_TestClass < TestBase
     assert_equal(r.is_empty?, false)
     assert_equal(r.count, 12)
     assert_equal(r.hier_count, 12)
-    assert_equal(r[1].to_s, "(-10,20;10,20)")
+    assert_equal(r[1].to_s, "(-10,20;10,20) props={}")
     assert_equal(r[100].to_s, "")
     assert_equal(r.bbox.to_s, "(-10,-20;210,120)")
     assert_equal(r.is_merged?, false)
@@ -252,11 +252,11 @@ class DBEdges_TestClass < TestBase
 
     r.flatten
     assert_equal(r.has_valid_edges?, true)
-    assert_equal(r[1].to_s, "(-10,80;10,120)")
+    assert_equal(r[1].to_s, "(-10,80;10,120) props={}")
     assert_equal(r[100].to_s, "")
     assert_equal(r.bbox.to_s, "(-10,-20;210,120)")
     assert_equal(r.is_merged?, false)
-    
+
     r = RBA::Edges::new(ly.begin_shapes(c1.cell_index, l1), RBA::ICplxTrans::new(10, 20), true)
     assert_equal(r.to_s(30), "(0,0;0,40);(0,40;20,40);(20,40;20,0);(20,0;0,0);(0,100;0,140);(0,140;20,140);(20,140;20,100);(20,100;0,100);(200,100;200,140);(200,140;220,140);(220,140;220,100);(220,100;200,100)")
     assert_equal(r.is_empty?, false)
@@ -970,6 +970,7 @@ class DBEdges_TestClass < TestBase
 
     r = RBA::Edges::new([ RBA::EdgeWithProperties::new(RBA::Edge::new(0, 0, 100, 100), { 1 => "one" }) ])
     assert_equal(r.to_s, "(0,0;100,100){1=>one}")
+    assert_equal(r[0].to_s, "(0,0;100,100) props={1=>one}")
 
     r = RBA::Edges::new([])
     assert_equal(r.to_s, "")

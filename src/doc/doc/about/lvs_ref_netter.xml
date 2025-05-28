@@ -186,6 +186,27 @@ case pin names for SPICE netlists.
 </p><p>
 Use this method andwhere in the script before the <a href="#compare">compare</a> call.
 </p>
+<a name="flag_missing_ports"/><h2>"flag_missing_ports" - Flags inconsistently labelled or missing ports in the current top circuit</h2>
+<keyword name="flag_missing_ports"/>
+<p>Usage:</p>
+<ul>
+<li><tt>flag_missing_ports</tt></li>
+</ul>
+<p>
+This method must be called after "compare" was executed successfully and will 
+report errors if pins in the current top circuit's schematic are not labelled 
+correspondingly in the layout. This prevents swapping of port labels or 
+pads.
+</p><p>
+<pre>
+success = compare
+success &amp;&amp; flag_missing_ports
+</pre>
+</p><p>
+Note that in order to use this method, the top circuit from the schematic netlist
+needs to have pins. This may not be always the case - for example, if the top 
+level circuit is not a subcircuit in a Spice netlist.
+</p>
 <a name="ignore_parameter"/><h2>"ignore_parameter" - Skip a specific parameter for a given device class name during device compare</h2>
 <keyword name="ignore_parameter"/>
 <p>Usage:</p>

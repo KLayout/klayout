@@ -25,6 +25,7 @@
 #include "dbLayoutVsSchematic.h"
 #include "dbLayoutVsSchematicWriter.h"
 #include "dbLayoutVsSchematicReader.h"
+#include "dbNetlistCompareUtils.h"
 
 namespace db
 {
@@ -86,6 +87,53 @@ db::NetlistCrossReference *LayoutVsSchematic::make_cross_ref ()
   return mp_cross_ref.get ();
 }
 
+bool
+LayoutVsSchematic::flag_missing_ports (const db::Circuit *circuit)
+{
+  if (! mp_cross_ref.get ()) {
+    return false;
+  }
+
+  db::NetlistCrossReference::PerCircuitData *pcd = const_cast<db::NetlistCrossReference::PerCircuitData *> (mp_cross_ref->per_circuit_data_for (std::make_pair (circuit, circuit)));
+  if (! pcd) {
+    return false;
+  }
+
+  bool error = false;
+  bool any = false;
+
+  for (auto n = pcd->nets.begin (); n != pcd->nets.end (); ++n) {
+
+    const db::Net *schem = n->pair.second;
+    const db::Net *layout = n->pair.first;
+
+    if (schem && layout && schem->begin_pins () != schem->end_pins ()) {
+
+      any = true;
+
+      if (db::name_compare (layout, schem) != 0) {
+
+        std::string msg = tl::sprintf (tl::to_string (tr ("Port mismatch '%s' vs. '%s'")), layout->expanded_name (), schem->expanded_name ());
+        db::LogEntryData entry (db::Error, msg);
+        pcd->log_entries.push_back (entry);
+
+        error = true;
+
+      }
+    }
+
+  }
+
+  if (! any) {
+
+    std::string msg = tl::to_string (tr ("No pins found in circuit during 'flag_missing_ports'"));
+    db::LogEntryData entry (db::Warning, msg);
+    pcd->log_entries.push_back (entry);
+
+  }
+
+  return !error;
+}
 
 void LayoutVsSchematic::save (const std::string &path, bool short_format)
 {

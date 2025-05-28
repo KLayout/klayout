@@ -1618,18 +1618,34 @@ bool_and_or_not_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layou
     }
   }
 
+  db::polygon_ref_generator<TR> pr (layout, result);
+  db::PolygonSplitter splitter (pr, proc->area_ratio (), proc->max_vertex_count ());
+
   for (auto i = interactions.begin (); i != interactions.end (); ++i) {
 
     const TR &subject = interactions.subject_shape (i->first);
     if (others.find (subject) != others.end ()) {
+
+      //  shortcut (and: keep, not: drop)
+      //  Note that we still normalize and split the polygon, so we get a uniform
+      //  behavior.
       if (m_is_and) {
-        result.insert (subject);
+        db::Polygon poly;
+        subject.instantiate (poly);
+        splitter.put (poly);
       }
+
     } else if (i->second.empty ()) {
+
       //  shortcut (not: keep, and: drop)
+      //  Note that we still normalize and split the polygon, so we get a uniform
+      //  behavior.
       if (! m_is_and) {
-        result.insert (subject);
+        db::Polygon poly;
+        subject.instantiate (poly);
+        splitter.put (poly);
       }
+
     } else {
       for (auto e = subject.begin_edge (); ! e.at_end(); ++e) {
         ep.insert (*e, p1);
@@ -1649,8 +1665,6 @@ bool_and_or_not_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layou
     }
 
     db::BooleanOp op (m_is_and ? db::BooleanOp::And : db::BooleanOp::ANotB);
-    db::polygon_ref_generator<TR> pr (layout, result);
-    db::PolygonSplitter splitter (pr, proc->area_ratio (), proc->max_vertex_count ());
     db::PolygonGenerator pg (splitter, true, true);
     ep.set_base_verbosity (50);
     ep.process (pg, op);

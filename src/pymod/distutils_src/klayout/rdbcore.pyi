@@ -655,6 +655,14 @@ class RdbItem:
         """
         ...
     @overload
+    def add_value(self, value: db.DText) -> None:
+        r"""
+        @brief Adds a text object to the values of this item
+        @param value The text to add.
+        This method has been introduced in version 0.30.1 to support text objects with properties.
+        """
+        ...
+    @overload
     def add_value(self, value: float) -> None:
         r"""
         @brief Adds a numeric value to the values of this item

@@ -296,6 +296,69 @@ tolerance("NMOS", "L", :absolute => 0.05, :relative => 0.01)</pre>
 
   <pre>min_caps(1e-16)</pre>
 
+  <h2>Checking pin labels</h2>
+
+  <p>
+  LVS is basically name-agnostic, so except for resolving ambiguities, net names are
+  not considered. Topology matching has priority - if nets are not labelled
+  properly, LVS by default does not care.
+  </p>
+
+  <p>
+  This may have adverse effects in the case of outbound connections - for example
+  pads. It's a fatal error to connect the chip pads incorrectly. To mitigate this
+  issue, the "flag_missing_ports" function is provided.
+  </p>
+
+  <p>
+  You need to call this function after the compare step, i.e.
+  </p>
+
+  <pre>compare
+flag_missing_ports</pre>
+
+  <p>
+  Or, if you want to quench pseudo errors, only in case of successful compare:
+  </p>
+
+  <pre>success = compare
+success &amp;&amp; flag_missing_ports</pre>
+
+  <p>
+  This function takes the schematic top circuit and investigates all
+  nets that are connected to a pin. It will check the name (label) of the 
+  corresponding layout net and if names do not match, an error is written 
+  into the log section of the LVS report.
+  </p>
+
+  <p>
+  When you use this feature while working yourself bottom-up in the design,
+  it will make sure that all pins are properly labelled. If you use pins
+  in the top level circuit to describe the chip pads, this feature will make
+  sure that the correct nets are connected to the pads with the corresponding labels
+  on them.
+  </p>
+
+  <p>
+  Note that it is possible to have SPICE netlists which do not have pins 
+  at the top level circuit - e.g. if the top level circuit is not a SUBCKT.
+  In that case, the function will not report errors as there are not pin-carrying
+  nets. Only a warning is issues saying that no top level pins have been found.
+  </p>
+
+  <p>
+  You can use
+  </p>
+
+  <pre>schematic.make_top_level_pins</pre>
+
+  <p>
+  to create pins if none are provided. However, this method will turn every net into a pin
+  and force you to label every net in the top circuit then.
+  Hence, it is better to provide pins inside the schematic netlist.
+  Also note, that "make_top_level_pins" is implicitly included in "schematic.simplify".
+  </p>
+
   <h2>Compare and netlist hierarchy</h2>
 
   <p>

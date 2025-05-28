@@ -1594,6 +1594,7 @@ DEFImporter::read_styles (double scale)
   }
 }
 
+
 void
 DEFImporter::read_components (db::Layout &layout, std::list<std::pair<std::string, CellInstArray> > &instances, double scale)
 {
@@ -1607,9 +1608,26 @@ DEFImporter::read_components (db::Layout &layout, std::list<std::pair<std::strin
     bool is_placed = false;
     std::string maskshift;
 
-    std::map<std::string, MacroDesc>::const_iterator m = reader_state ()->lef_importer ().macros ().find (model);
-    if (m == reader_state ()->lef_importer ().macros ().end ()) {
-      error (tl::to_string (tr ("Macro not found in LEF file: ")) + model);
+    const MacroDesc *m = 0;
+
+    std::map<std::string, MacroDesc>::const_iterator im = reader_state ()->lef_importer ().macros ().find (model);
+    if (im == reader_state ()->lef_importer ().macros ().end ()) {
+
+      warn (tl::sprintf (tl::to_string (tr ("Macro not found in LEF file: %s - creating dummy macro")), model));
+
+      //  create a dummy macro definition (no FOREIGN, size 0x0 etc.)
+      GeometryBasedLayoutGenerator *mg = new GeometryBasedLayoutGenerator ();
+      reader_state ()->register_macro_cell (model, mg);
+
+      MacroDesc macro_desc;
+      macro_desc.bbox = db::Box (db::Point (), db::Point ());
+
+      m = reader_state ()->lef_importer ().insert_macro (model, macro_desc);
+
+    } else {
+
+      m = &im->second;
+
     }
 
     while (test ("+")) {
@@ -1621,7 +1639,7 @@ DEFImporter::read_components (db::Layout &layout, std::list<std::pair<std::strin
         test (")");
 
         ft = get_orient (false /*mandatory*/);
-        d = pt - m->second.bbox.transformed (ft).lower_left ();
+        d = pt - m->bbox.transformed (ft).lower_left ();
         is_placed = true;
 
       } else if (test ("UNPLACED")) {
@@ -1633,7 +1651,7 @@ DEFImporter::read_components (db::Layout &layout, std::list<std::pair<std::strin
           test (")");
 
           ft = get_orient (false /*mandatory*/);
-          d = pt - m->second.bbox.transformed (ft).lower_left ();
+          d = pt - m->bbox.transformed (ft).lower_left ();
           is_placed = true;
 
         }
@@ -1654,7 +1672,7 @@ DEFImporter::read_components (db::Layout &layout, std::list<std::pair<std::strin
 
     if (is_placed) {
 
-      std::pair<db::Cell *, db::Trans> ct = reader_state ()->macro_cell (model, layout, m_component_maskshift, string2masks (maskshift), m->second, &reader_state ()->lef_importer ());
+      std::pair<db::Cell *, db::Trans> ct = reader_state ()->macro_cell (model, layout, m_component_maskshift, string2masks (maskshift), *m, &reader_state ()->lef_importer ());
       if (ct.first) {
         db::CellInstArray inst (db::CellInst (ct.first->cell_index ()), db::Trans (ft.rot (), d) * ct.second);
         instances.push_back (std::make_pair (inst_name, inst));

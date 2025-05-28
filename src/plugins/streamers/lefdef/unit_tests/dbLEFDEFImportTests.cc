@@ -521,6 +521,9 @@ TEST(109_foreigncell)
   options.set_macro_resolution_mode (2);
 
   run_test (_this, "foreigncell", "gds:foreign.gds+lef:in_tech.lef+lef:in.lef+def:in.def", "au_always_foreign.oas.gz", options, false);
+
+  //  no macros -> warning
+  run_test (_this, "foreigncell", "gds:macros.gds+lef:in_tech.lef+def:in.def", "au_no_macros.oas.gz", options, false);
 }
 
 TEST(110_lefpins)

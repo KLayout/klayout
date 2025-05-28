@@ -1,8 +1,32 @@
-0.30.2           (2025-xx-xx):
+0.30.2           (2025-05-29):
 * Enhancement: %GITHUB%/issues/2016 Lazy evaluation of PCell also when changing guiding shape properties
+* Enhancement: %GITHUB%/issues/2041 strm2oas should read --lefdef-lefs and --lefdef-lef-layouts only once
+* Enhancement: %GITHUB%/issues/2055 Check ports feature for LVS
+* Enhancement: %GITHUB%/issues/2057 Feature request: nanometer scalebar
+* Bugfix: %GITHUB%/issues/2060 Edges#with_angle fails for long edges
+* Enhancement: Support for ARM Python packages (thanks, Troy!)
+* Enhancement: PolygonNeighborHood now allows specifying a variant type
+  for anisotropic applications
+* Bugfix: Lower case hex escapes in URI's were not handled correctly
+* Bugfix: internally handling "%ld" sprintf as 64bit compatible for 
+  better Linux/Windows compatibility (e.g. file position in error messages
+  was not printed correctly on Windows at positions >2G)
+* Bugfix: LVS DB internal net names now are preserved and not renumbered
+  This way, log entries are consistent with net names and the generated netlist
+  names are consistent with LVS reports.
+* Bugfix: "same_nets" net names are now case insensitive in both netlists
+  instead of schematic only. See https://github.com/IHP-GmbH/IHP-Open-PDK/issues/484
+* Feature: Ruby/Python API for adding and removing log entries in LVS DBs
+  LayoutToNetlist#clear_log_entries and LayoutToNetlist#add_log_entry
+* Feature: NetlistCrossReference#each_net_pair etc. functions take a single
+  Circuit or Net object instead of a pair (can be schematic or layout objects)
+* Feature: Support functions for parasitic extraction - experimental
+  Currently, pieces for R extraction are available in the pex Python module space.
+  These are just first bits - see https://martinjankoehler.github.io/klayout-pex-website/doc/doc.html
+  for ongoing work.                        
+* Feature: MALY jobdeck format support (reading) - experimental
 
 0.30.1           (2025-04-27):
-* Bugfix: %GITHUB%/issues/2038 DEdgePairWithProperties not working properly in scripts
 * Bugfix: %GITHUB%/issues/2011 Some DRC bugs fixed
 * Bug: %GITHUB%/issues/2014 Bug fixes in LEF/DEF reader
 * Enhancement: %GITHUB%/issues/2019 Support for Qt 6.9
@@ -10,6 +34,7 @@
 * Enhancement: %GITHUB%/issues/2024 Option to configure grid density
 * Bugfix: %GITHUB%/issues/2025 Brackets get added in List type PCell parameter edit field
 * Bugfix: %GITHUB%/issues/2026 Display is dead after opening 2.5d view
+* Bugfix: %GITHUB%/issues/2038 DEdgePairWithProperties not working properly in scripts
 * Bugfix/Enhancement: some updates of "strmxor" tool
   - strmxor was giving wrong results if cell variants are
     present where one variant is covered entirely by a large shape

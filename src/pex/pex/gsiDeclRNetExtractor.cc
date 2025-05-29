@@ -133,7 +133,7 @@ Class<pex::RExtractorTechVia> decl_RExtractorTechVia ("pex", "RExtractorTechVia"
   ),
   "@brief Describes a via for the network extraction.\n"
   "This class is used to describe a via type in the context of "
-  "the \\RExtractorTech#extract method.\n"
+  "the \\RExtractorTech class.\n"
   "\n"
   "This class has been introduced in version 0.30.2."
 );
@@ -239,7 +239,7 @@ Class<pex::RExtractorTechConductor> decl_RExtractorTechConductor ("pex", "RExtra
   ),
   "@brief Describes a conductor layer for the network extraction.\n"
   "This class is used to describe a conductor layer in the context of "
-  "the \\RExtractorTech#extract method.\n"
+  "the \\RExtractorTech class.\n"
   "\n"
   "This class has been introduced in version 0.30.2."
 );

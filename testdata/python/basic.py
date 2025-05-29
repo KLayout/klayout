@@ -2994,8 +2994,12 @@ class BasicTest(unittest.TestCase):
       qba = pya.A.ia_cref_to_qba([ 16, 42, 0, 8 ])
       if sys.version_info < (3, 0):
         self.assertEqual(repr(qba), "bytearray(b'\\x10*\\x00\\x08')")
+        self.assertEqual(repr(pya.A.ft_qba(qba)), "bytearray(b'\\x10*\\x00\\x08')")
+        self.assertEqual(repr(pya.A.ft_var(qba)), "bytearray(b'\\x10*\\x00\\x08')")
       else:
         self.assertEqual(repr(qba), "b'\\x10*\\x00\\x08'")
+        self.assertEqual(repr(pya.A.ft_qba(qba)), "b'\\x10*\\x00\\x08'")
+        self.assertEqual(repr(pya.A.ft_var(qba)), "b'\\x10*\\x00\\x08'")
 
       self.assertEqual(pya.A.qba_to_ia(qba), [ 16, 42, 0, 8 ])
       self.assertEqual(pya.A.qba_cref_to_ia(qba), [ 16, 42, 0, 8 ])
@@ -3079,26 +3083,29 @@ class BasicTest(unittest.TestCase):
 
     if "ia_cref_to_qs" in pya.A.__dict__:
 
-      qs = pya.A.ia_cref_to_qs([ 16, 42, 0, 8 ])
-      self.assertEqual(repr(qs), "'\\x10*\\x00\\x08'")
+      qs = pya.A.ia_cref_to_qs([ 16, 42, 0, 8, 0x03a9 ])
+      self.assertEqual(repr(qs), "'\\x10*\\x00\\x08\u03a9'")
+      # full cycle must preserve encoding, also for var
+      self.assertEqual(repr(pya.A.ft_qs(qs)), "'\\x10*\\x00\\x08\u03a9'")
+      self.assertEqual(repr(pya.A.ft_var(qs)), "'\\x10*\\x00\\x08\u03a9'")
 
-      self.assertEqual(pya.A.qs_to_ia(qs), [ 16, 42, 0, 8 ])
-      self.assertEqual(pya.A.qs_cref_to_ia(qs), [ 16, 42, 0, 8 ])
-      self.assertEqual(pya.A.qs_cptr_to_ia(qs), [ 16, 42, 0, 8 ])
-      self.assertEqual(pya.A.qs_ref_to_ia(qs), [ 16, 42, 0, 8 ])
-      self.assertEqual(pya.A.qs_ptr_to_ia(qs), [ 16, 42, 0, 8 ])
+      self.assertEqual(pya.A.qs_to_ia(qs), [ 16, 42, 0, 8, 0x03a9 ])
+      self.assertEqual(pya.A.qs_cref_to_ia(qs), [ 16, 42, 0, 8, 0x03a9 ])
+      self.assertEqual(pya.A.qs_cptr_to_ia(qs), [ 16, 42, 0, 8, 0x03a9 ])
+      self.assertEqual(pya.A.qs_ref_to_ia(qs), [ 16, 42, 0, 8, 0x03a9 ])
+      self.assertEqual(pya.A.qs_ptr_to_ia(qs), [ 16, 42, 0, 8, 0x03a9 ])
   
-      qs = pya.A.ia_cref_to_qs_cref([ 17, 42, 0, 8 ])
-      self.assertEqual(repr(qs), "'\\x11*\\x00\\x08'")
+      qs = pya.A.ia_cref_to_qs_cref([ 17, 42, 0, 8, 0x03a9 ])
+      self.assertEqual(repr(qs), "'\\x11*\\x00\\x08\u03a9'")
 
-      qs = pya.A.ia_cref_to_qs_ref([ 18, 42, 0, 8 ])
-      self.assertEqual(repr(qs), "'\\x12*\\x00\\x08'")
+      qs = pya.A.ia_cref_to_qs_ref([ 18, 42, 0, 8, 0x03a9 ])
+      self.assertEqual(repr(qs), "'\\x12*\\x00\\x08\u03a9'")
 
-      qs = pya.A.ia_cref_to_qs_cptr([ 19, 42, 0, 8 ])
-      self.assertEqual(repr(qs), "'\\x13*\\x00\\x08'")
+      qs = pya.A.ia_cref_to_qs_cptr([ 19, 42, 0, 8, 0x03a9 ])
+      self.assertEqual(repr(qs), "'\\x13*\\x00\\x08\u03a9'")
 
-      qs = pya.A.ia_cref_to_qs_ptr([ 20, 42, 0, 8 ])
-      self.assertEqual(repr(qs), "'\\x14*\\x00\\x08'")
+      qs = pya.A.ia_cref_to_qs_ptr([ 20, 42, 0, 8, 0x03a9 ])
+      self.assertEqual(repr(qs), "'\\x14*\\x00\\x08\u03a9'")
 
       self.assertEqual(pya.A.qs_to_ia('\x00\x01\x02'), [ 0, 1, 2 ])
 
@@ -3137,28 +3144,41 @@ class BasicTest(unittest.TestCase):
 
     if "ia_cref_to_ql1s" in pya.A.__dict__:
 
-      ql1s = pya.A.ia_cref_to_ql1s([ 16, 42, 0, 8 ])
-      self.assertEqual(repr(ql1s), "'\\x10*\\x00\\x08'")
+      ql1s = pya.A.ia_cref_to_ql1s([ 16, 42, 0, 8, 0x03a9 ])
+      self.assertEqual(repr(ql1s), "'\\x10*\\x00\\x08\u00a9'")
 
-      self.assertEqual(pya.A.ql1s_to_ia(ql1s), [ 16, 42, 0, 8 ])
-      self.assertEqual(pya.A.ql1s_cref_to_ia(ql1s), [ 16, 42, 0, 8 ])
-      self.assertEqual(pya.A.ql1s_cptr_to_ia(ql1s), [ 16, 42, 0, 8 ])
-      self.assertEqual(pya.A.ql1s_ref_to_ia(ql1s), [ 16, 42, 0, 8 ])
-      self.assertEqual(pya.A.ql1s_ptr_to_ia(ql1s), [ 16, 42, 0, 8 ])
+      self.assertEqual(pya.A.ql1s_to_ia(ql1s), [ 16, 42, 0, 8, 0xa9 ])
+      self.assertEqual(pya.A.ql1s_cref_to_ia(ql1s), [ 16, 42, 0, 8, 0xa9 ])
+      self.assertEqual(pya.A.ql1s_cptr_to_ia(ql1s), [ 16, 42, 0, 8, 0xa9 ])
+      self.assertEqual(pya.A.ql1s_ref_to_ia(ql1s), [ 16, 42, 0, 8, 0xa9 ])
+      self.assertEqual(pya.A.ql1s_ptr_to_ia(ql1s), [ 16, 42, 0, 8, 0xa9 ])
   
-      ql1s = pya.A.ia_cref_to_ql1s_cref([ 17, 42, 0, 8 ])
-      self.assertEqual(repr(ql1s), "'\\x11*\\x00\\x08'")
+      ql1s = pya.A.ia_cref_to_ql1s_cref([ 17, 42, 0, 8, 0x03a9 ])
+      self.assertEqual(repr(ql1s), "'\\x11*\\x00\\x08\u00a9'")
 
-      ql1s = pya.A.ia_cref_to_ql1s_ref([ 18, 42, 0, 8 ])
-      self.assertEqual(repr(ql1s), "'\\x12*\\x00\\x08'")
+      ql1s = pya.A.ia_cref_to_ql1s_ref([ 18, 42, 0, 8, 0x03a9 ])
+      self.assertEqual(repr(ql1s), "'\\x12*\\x00\\x08\u00a9'")
 
-      ql1s = pya.A.ia_cref_to_ql1s_cptr([ 19, 42, 0, 8 ])
-      self.assertEqual(repr(ql1s), "'\\x13*\\x00\\x08'")
+      ql1s = pya.A.ia_cref_to_ql1s_cptr([ 19, 42, 0, 8, 0x03a9 ])
+      self.assertEqual(repr(ql1s), "'\\x13*\\x00\\x08\u00a9'")
 
-      ql1s = pya.A.ia_cref_to_ql1s_ptr([ 20, 42, 0, 8 ])
-      self.assertEqual(repr(ql1s), "'\\x14*\\x00\\x08'")
+      ql1s = pya.A.ia_cref_to_ql1s_ptr([ 20, 42, 0, 8, 0x03a9 ])
+      self.assertEqual(repr(ql1s), "'\\x14*\\x00\\x08\u00a9'")
 
       self.assertEqual(pya.A.ql1s_to_ia('\x00\x01\x02'), [ 0, 1, 2 ])
+
+  def test_utf8Strings(self):
+
+    # UTF8 strings (non-Qt)
+    s = "\u0010*\u0000\b\u03a9"
+    self.assertEqual(repr(s), "'\\x10*\\x00\\x08\u03a9'")
+
+    # full cycle must preserve encoding, also for var
+    self.assertEqual(repr(pya.A.ft_str(s)), "'\\x10*\\x00\\x08\u03a9'")
+    self.assertEqual(repr(pya.A.ft_var(s)), "'\\x10*\\x00\\x08\u03a9'")
+
+    # NUL character terminates in const char * mode:
+    self.assertEqual(repr(pya.A.ft_cptr(s)), "'\\x10*'")
 
   def test_binaryStrings(self):
 
@@ -3167,8 +3187,13 @@ class BasicTest(unittest.TestCase):
     ba = pya.A.ia_cref_to_ba([ 17, 42, 0, 8 ])
     if sys.version_info < (3, 0):
       self.assertEqual(repr(ba), "bytearray(b'\\x11*\\x00\\x08')")
+      self.assertEqual(repr(pya.A.ft_cv(ba)), "bytearray(b'\\x11*\\x00\\x08')")
+      self.assertEqual(repr(pya.A.ft_var(ba)), "bytearray(b'\\x11*\\x00\\x08')")
     else:
       self.assertEqual(repr(ba), "b'\\x11*\\x00\\x08'")
+      self.assertEqual(repr(pya.A.ft_cv(ba)), "b'\\x11*\\x00\\x08'")
+      self.assertEqual(repr(pya.A.ft_var(ba)), "b'\\x11*\\x00\\x08'")
+
     self.assertEqual(pya.A.ba_to_ia(ba), [ 17, 42, 0, 8 ])
     self.assertEqual(pya.A.ba_cref_to_ia(ba), [ 17, 42, 0, 8 ])
     self.assertEqual(pya.A.ba_cptr_to_ia(ba), [ 17, 42, 0, 8 ])

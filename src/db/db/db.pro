@@ -70,6 +70,9 @@ SOURCES = \
   dbNetlistSpiceReaderExpressionParser.cc \
   dbObject.cc \
   dbObjectWithProperties.cc \
+  dbPLC.cc \
+  dbPLCConvexDecomposition.cc \
+  dbPLCTriangulation.cc \
   dbPath.cc \
   dbPCellDeclaration.cc \
   dbPCellHeader.cc \
@@ -105,8 +108,6 @@ SOURCES = \
   dbTextWriter.cc \
   dbTilingProcessor.cc \
   dbTrans.cc \
-  dbTriangle.cc \
-  dbTriangles.cc \
   dbUserObject.cc \
   dbUtils.cc \
   dbVector.cc \
@@ -308,6 +309,9 @@ HEADERS = \
   dbObject.h \
   dbObjectTag.h \
   dbObjectWithProperties.h \
+  dbPLC.h \
+  dbPLCConvexDecomposition.h \
+  dbPLCTriangulation.h \
   dbPath.h \
   dbPCellDeclaration.h \
   dbPCellHeader.h \
@@ -343,8 +347,6 @@ HEADERS = \
   dbTextWriter.h \
   dbTilingProcessor.h \
   dbTrans.h \
-  dbTriangle.h \
-  dbTriangles.h \
   dbTypes.h \
   dbUserObject.h \
   dbUtils.h \

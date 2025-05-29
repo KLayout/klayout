@@ -453,8 +453,8 @@ TriangulationProcessor::process (const db::Polygon &poly, std::vector<db::Polygo
   //  NOTE: we center the polygon for better numerical stability
   db::CplxTrans trans = db::CplxTrans (triangulation_dbu) * db::ICplxTrans (db::Trans (db::Point () - poly.box ().center ()));
 
-  db::Triangles tri;
-  tri.triangulate (poly, m_param, trans);
+  db::plc::Graph tri;
+  db::plc::Triangulation (&tri).triangulate (poly, m_param, trans);
 
   db::Point pts [3];
   auto trans_inv = trans.inverted ();
@@ -474,8 +474,8 @@ TriangulationProcessor::process (const db::PolygonWithProperties &poly, std::vec
   //  NOTE: we center the polygon for better numerical stability
   db::CplxTrans trans = db::CplxTrans (triangulation_dbu) * db::ICplxTrans (db::Trans (db::Point () - poly.box ().center ()));
 
-  db::Triangles tri;
-  tri.triangulate (poly, m_param, trans);
+  db::plc::Graph tri;
+  db::plc::Triangulation (&tri).triangulate (poly, m_param, trans);
 
   db::Point pts [3];
   auto trans_inv = trans.inverted ();

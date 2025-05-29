@@ -21,10 +21,7 @@
 */
 
 
-#include "dbTriangles.h"
-#include "dbLayout.h"
-#include "dbWriter.h"
-#include "tlStream.h"
+#include "dbPLCTriangulation.h"
 #include "tlLog.h"
 #include "tlTimer.h"
 
@@ -36,138 +33,72 @@
 namespace db
 {
 
+namespace plc
+{
+
 static inline bool is_equal (const db::DPoint &a, const db::DPoint &b)
 {
   return std::abs (a.x () - b.x ()) < std::max (1.0, (std::abs (a.x ()) + std::abs (b.x ()))) * db::epsilon &&
          std::abs (a.y () - b.y ()) < std::max (1.0, (std::abs (a.y ()) + std::abs (b.y ()))) * db::epsilon;
 }
 
-Triangles::Triangles ()
-  : m_is_constrained (false), m_level (0), m_id (0), m_flips (0), m_hops (0)
+Triangulation::Triangulation (Graph *graph)
 {
-  //  .. nothing yet ..
-}
-
-Triangles::~Triangles ()
-{
+  mp_graph = graph;
   clear ();
 }
 
-db::Vertex *
-Triangles::create_vertex (double x, double y)
+void
+Triangulation::clear ()
 {
-  m_vertex_heap.push_back (db::Vertex (x, y));
-  return &m_vertex_heap.back ();
-}
+  mp_graph->clear ();
 
-db::Vertex *
-Triangles::create_vertex (const db::DPoint &pt)
-{
-  m_vertex_heap.push_back (pt);
-  return &m_vertex_heap.back ();
-}
-
-db::TriangleEdge *
-Triangles::create_edge (db::Vertex *v1, db::Vertex *v2)
-{
-  db::TriangleEdge *edge = 0;
-
-  if (! m_returned_edges.empty ()) {
-    edge = m_returned_edges.back ();
-    m_returned_edges.pop_back ();
-    *edge = db::TriangleEdge (v1, v2);
-  } else {
-    m_edges_heap.push_back (db::TriangleEdge (v1, v2));
-    edge = &m_edges_heap.back ();
-  }
-
-  edge->link ();
-  edge->set_id (++m_id);
-  return edge;
-}
-
-db::Triangle *
-Triangles::create_triangle (TriangleEdge *e1, TriangleEdge *e2, TriangleEdge *e3)
-{
-  db::Triangle *res = new db::Triangle (e1, e2, e3);
-  res->set_id (++m_id);
-  mp_triangles.push_back (res);
-
-  return res;
+  m_is_constrained = false;
+  m_level = 0;
+  m_id = 0;
+  m_flips = m_hops = 0;
 }
 
 void
-Triangles::remove_triangle (db::Triangle *tri)
-{
-  db::TriangleEdge *edges [3];
-  for (int i = 0; i < 3; ++i) {
-    edges [i] = tri->edge (i);
-  }
-
-  delete tri;
-
-  //  clean up edges we do no longer need
-  for (int i = 0; i < 3; ++i) {
-    db::TriangleEdge *e = edges [i];
-    if (e && e->left () == 0 && e->right () == 0 && e->v1 ()) {
-      e->unlink ();
-      m_returned_edges.push_back (e);
-    }
-  }
-}
-
-void
-Triangles::init_box (const db::DBox &box)
+Triangulation::init_box (const db::DBox &box)
 {
   double xmin = box.left (), xmax = box.right ();
   double ymin = box.bottom (), ymax = box.top ();
 
-  db::Vertex *vbl = create_vertex (xmin, ymin);
-  db::Vertex *vtl = create_vertex (xmin, ymax);
-  db::Vertex *vbr = create_vertex (xmax, ymin);
-  db::Vertex *vtr = create_vertex (xmax, ymax);
+  Vertex *vbl = mp_graph->create_vertex (xmin, ymin);
+  Vertex *vtl = mp_graph->create_vertex (xmin, ymax);
+  Vertex *vbr = mp_graph->create_vertex (xmax, ymin);
+  Vertex *vtr = mp_graph->create_vertex (xmax, ymax);
 
-  db::TriangleEdge *sl = create_edge (vbl, vtl);
-  db::TriangleEdge *sd = create_edge (vtl, vbr);
-  db::TriangleEdge *sb = create_edge (vbr, vbl);
+  Edge *sl = mp_graph->create_edge (vbl, vtl);
+  Edge *sd = mp_graph->create_edge (vtl, vbr);
+  Edge *sb = mp_graph->create_edge (vbr, vbl);
 
-  db::TriangleEdge *sr = create_edge (vbr, vtr);
-  db::TriangleEdge *st = create_edge (vtr, vtl);
+  Edge *sr = mp_graph->create_edge (vbr, vtr);
+  Edge *st = mp_graph->create_edge (vtr, vtl);
 
-  create_triangle (sl, sd, sb);
-  create_triangle (sd, sr, st);
-}
-
-std::string
-Triangles::to_string ()
-{
-  std::string res;
-  for (auto t = mp_triangles.begin (); t != mp_triangles.end (); ++t) {
-    if (! res.empty ()) {
-      res += ", ";
-    }
-    res += t->to_string ();
-  }
-  return res;
-}
-
-db::DBox
-Triangles::bbox () const
-{
-  db::DBox box;
-  for (auto t = mp_triangles.begin (); t != mp_triangles.end (); ++t) {
-    box += t->bbox ();
-  }
-  return box;
+  mp_graph->create_triangle (sl, sd, sb);
+  mp_graph->create_triangle (sd, sr, st);
 }
 
 bool
-Triangles::check (bool check_delaunay) const
+Triangulation::check (bool check_delaunay) const
 {
   bool res = true;
 
+  for (auto t = mp_graph->polygons ().begin (); t != mp_graph->polygons ().end (); ++t) {
+    if (t->size () != 3) {
+      res = false;
+      tl::error << "(check error) not a triangle: " << t->to_string ();
+    }
+  }
+
+  if (! res) {
+    return false;
+  }
+
   if (check_delaunay) {
-    for (auto t = mp_triangles.begin (); t != mp_triangles.end (); ++t) {
+    for (auto t = mp_graph->polygons ().begin (); t != mp_graph->polygons ().end (); ++t) {
       auto cp = t->circumcircle ();
       auto vi = find_inside_circle (cp.first, cp.second);
       if (! vi.empty ()) {
@@ -180,9 +111,9 @@ Triangles::check (bool check_delaunay) const
     }
   }
 
-  for (auto t = mp_triangles.begin (); t != mp_triangles.end (); ++t) {
+  for (auto t = mp_graph->polygons ().begin (); t != mp_graph->polygons ().end (); ++t) {
     for (int i = 0; i < 3; ++i) {
-      if (! t->edge (i)->has_triangle (t.operator-> ())) {
+      if (! t->edge (i)->has_polygon (t.operator-> ())) {
         tl::error << "(check error) edges " << t->edge (i)->to_string (true)
                   << " attached to triangle " << t->to_string (true) << " does not refer to this triangle";
         res = false;
@@ -190,7 +121,7 @@ Triangles::check (bool check_delaunay) const
     }
   }
 
-  for (auto e = m_edges_heap.begin (); e != m_edges_heap.end (); ++e) {
+  for (auto e = mp_graph->edges ().begin (); e != mp_graph->edges ().end (); ++e) {
 
     if (!e->left () && !e->right ()) {
       continue;
@@ -203,7 +134,7 @@ Triangles::check (bool check_delaunay) const
       }
     }
 
-    for (auto t = e->begin_triangles (); t != e->end_triangles (); ++t) {
+    for (auto t = e->begin_polygons (); t != e->end_polygons (); ++t) {
       if (! t->has_edge (e.operator-> ())) {
         tl::error << "(check error) edge " << e->to_string (true) << " not found in adjacent triangle " << t->to_string (true);
         res = false;
@@ -216,7 +147,7 @@ Triangles::check (bool check_delaunay) const
         tl::error << "(check error) edges " << e->to_string (true) << " vertex 2 not found in adjacent triangle " << t->to_string (true);
         res = false;
       }
-      db::Vertex *vopp = t->opposite (e.operator-> ());
+      Vertex *vopp = t->opposite (e.operator-> ());
       double sgn = (e->left () == t.operator-> ()) ? 1.0 : -1.0;
       double vp = db::vprod (e->d(), *vopp - *e->v1 ());  //  positive if on left side
       if (vp * sgn <= 0.0) {
@@ -237,7 +168,7 @@ Triangles::check (bool check_delaunay) const
 
   }
 
-  for (auto v = m_vertex_heap.begin (); v != m_vertex_heap.end (); ++v) {
+  for (auto v = mp_graph->vertexes ().begin (); v != mp_graph->vertexes ().end (); ++v) {
     unsigned int num_outside_edges = 0;
     for (auto e = v->begin_edges (); e != v->end_edges (); ++e) {
       if ((*e)->is_outside ()) {
@@ -258,81 +189,21 @@ Triangles::check (bool check_delaunay) const
   return res;
 }
 
-db::Layout *
-Triangles::to_layout (bool decompose_by_id) const
+std::vector<Vertex *>
+Triangulation::find_points_around (Vertex *vertex, double radius)
 {
-  db::Layout *layout = new db::Layout ();
-  layout->dbu (0.001);
-
-  auto dbu_trans = db::CplxTrans (layout->dbu ()).inverted ();
-
-  db::Cell &top = layout->cell (layout->add_cell ("DUMP"));
-  unsigned int l1 = layout->insert_layer (db::LayerProperties (1, 0));
-  unsigned int l2 = layout->insert_layer (db::LayerProperties (2, 0));
-  unsigned int l10 = layout->insert_layer (db::LayerProperties (10, 0));
-  unsigned int l20 = layout->insert_layer (db::LayerProperties (20, 0));
-  unsigned int l21 = layout->insert_layer (db::LayerProperties (21, 0));
-  unsigned int l22 = layout->insert_layer (db::LayerProperties (22, 0));
-
-  for (auto t = mp_triangles.begin (); t != mp_triangles.end (); ++t) {
-    db::DPoint pts[3];
-    for (int i = 0; i < 3; ++i) {
-      pts[i] = *t->vertex (i);
-    }
-    db::DPolygon poly;
-    poly.assign_hull (pts + 0, pts + 3);
-    top.shapes (t->is_outside () ? l2 : l1).insert (dbu_trans * poly);
-    if (decompose_by_id) {
-      if ((t->id () & 1) != 0) {
-        top.shapes (l20).insert (dbu_trans * poly);
-      }
-      if ((t->id () & 2) != 0) {
-        top.shapes (l21).insert (dbu_trans * poly);
-      }
-      if ((t->id () & 4) != 0) {
-        top.shapes (l22).insert (dbu_trans * poly);
-      }
-    }
-  }
-
-  for (auto e = m_edges_heap.begin (); e != m_edges_heap.end (); ++e) {
-    if ((e->left () || e->right ()) && e->is_segment ()) {
-      top.shapes (l10).insert (dbu_trans * e->edge ());
-    }
-  }
-
-  return layout;
-}
-
-void
-Triangles::dump (const std::string &path, bool decompose_by_id) const
-{
-  std::unique_ptr<db::Layout> ly (to_layout (decompose_by_id));
-
-  tl::OutputStream stream (path);
-
-  db::SaveLayoutOptions opt;
-  db::Writer writer (opt);
-  writer.write (*ly, stream);
-
-  tl::info << "Triangles written to " << path;
-}
-
-std::vector<db::Vertex *>
-Triangles::find_points_around (db::Vertex *vertex, double radius)
-{
-  std::set<const db::Vertex *> seen;
+  std::set<const Vertex *> seen;
   seen.insert (vertex);
 
-  std::vector<db::Vertex *> res;
-  std::vector<db::Vertex *> new_vertexes, next_vertexes;
+  std::vector<Vertex *> res;
+  std::vector<Vertex *> new_vertexes, next_vertexes;
   new_vertexes.push_back (vertex);
 
   while (! new_vertexes.empty ()) {
     next_vertexes.clear ();
     for (auto v = new_vertexes.begin (); v != new_vertexes.end (); ++v) {
       for (auto e = (*v)->begin_edges (); e != (*v)->end_edges (); ++e) {
-        db::Vertex *ov = (*e)->other (*v);
+        Vertex *ov = (*e)->other (*v);
         if (ov->in_circle (*vertex, radius) == 1 && seen.insert (ov).second) {
           next_vertexes.push_back (ov);
           res.push_back (ov);
@@ -345,22 +216,22 @@ Triangles::find_points_around (db::Vertex *vertex, double radius)
   return res;
 }
 
-db::Vertex *
-Triangles::insert_point (const db::DPoint &point, std::list<tl::weak_ptr<db::Triangle> > *new_triangles)
+Vertex *
+Triangulation::insert_point (const db::DPoint &point, std::list<tl::weak_ptr<Polygon> > *new_triangles)
 {
-  return insert (create_vertex (point), new_triangles);
+  return insert (mp_graph->create_vertex (point), new_triangles);
 }
 
-db::Vertex *
-Triangles::insert_point (db::DCoord x, db::DCoord y, std::list<tl::weak_ptr<db::Triangle> > *new_triangles)
+Vertex *
+Triangulation::insert_point (db::DCoord x, db::DCoord y, std::list<tl::weak_ptr<Polygon> > *new_triangles)
 {
-  return insert (create_vertex (x, y), new_triangles);
+  return insert (mp_graph->create_vertex (x, y), new_triangles);
 }
 
-db::Vertex *
-Triangles::insert (db::Vertex *vertex, std::list<tl::weak_ptr<db::Triangle> > *new_triangles)
+Vertex *
+Triangulation::insert (Vertex *vertex, std::list<tl::weak_ptr<Polygon> > *new_triangles)
 {
-  std::vector<db::Triangle *> tris = find_triangle_for_point (*vertex);
+  std::vector<Polygon *> tris = find_triangle_for_point (*vertex);
 
   //  the new vertex is outside the domain
   if (tris.empty ()) {
@@ -370,10 +241,10 @@ Triangles::insert (db::Vertex *vertex, std::list<tl::weak_ptr<db::Triangle> > *n
   }
 
   //  check, if the new vertex is on an edge (may be edge between triangles or edge on outside)
-  std::vector<db::TriangleEdge *> on_edges;
-  std::vector<db::TriangleEdge *> on_vertex;
+  std::vector<Edge *> on_edges;
+  std::vector<Edge *> on_vertex;
   for (int i = 0; i < 3; ++i) {
-    db::TriangleEdge *e = tris.front ()->edge (i);
+    Edge *e = tris.front ()->edge (i);
     if (e->side_of (*vertex) == 0) {
       if (is_equal (*vertex, *e->v1 ()) || is_equal (*vertex, *e->v2 ())) {
         on_vertex.push_back (e);
@@ -405,14 +276,14 @@ Triangles::insert (db::Vertex *vertex, std::list<tl::weak_ptr<db::Triangle> > *n
   tl_assert (false);
 }
 
-std::vector<db::Triangle *>
-Triangles::find_triangle_for_point (const db::DPoint &point)
+std::vector<Polygon *>
+Triangulation::find_triangle_for_point (const db::DPoint &point)
 {
-  db::TriangleEdge *edge = find_closest_edge (point);
+  Edge *edge = find_closest_edge (point);
 
-  std::vector<db::Triangle *> res;
+  std::vector<Polygon *> res;
   if (edge) {
-    for (auto t = edge->begin_triangles (); t != edge->end_triangles (); ++t) {
+    for (auto t = edge->begin_polygons (); t != edge->end_polygons (); ++t) {
       if (t->contains (point) >= 0) {
         res.push_back (t.operator-> ());
       }
@@ -422,21 +293,21 @@ Triangles::find_triangle_for_point (const db::DPoint &point)
   return res;
 }
 
-db::TriangleEdge *
-Triangles::find_closest_edge (const db::DPoint &p, db::Vertex *vstart, bool inside_only)
+Edge *
+Triangulation::find_closest_edge (const db::DPoint &p, Vertex *vstart, bool inside_only) const
 {
   if (!vstart) {
 
-    if (! mp_triangles.empty ()) {
+    if (! mp_graph->polygons ().empty ()) {
 
       unsigned int ls = 0;
-      size_t n = m_vertex_heap.size ();
+      size_t n = mp_graph->vertexes ().size ();
       size_t m = n;
 
       //  A simple heuristics that takes a sqrt(N) sample from the
       //  vertexes to find a good starting point
 
-      vstart = mp_triangles.begin ()->vertex (0);
+      vstart = mp_graph->polygons ().begin ()->vertex (0);
       double dmin = vstart->distance (p);
 
       while (ls * ls < m) {
@@ -444,7 +315,7 @@ Triangles::find_closest_edge (const db::DPoint &p, db::Vertex *vstart, bool insi
         for (size_t i = m / 2; i < n; i += m) {
           ++ls;
           //  NOTE: this assumes the heap is not too loaded with orphan vertexes
-          db::Vertex *v = (m_vertex_heap.begin () + i).operator-> ();
+          Vertex *v = (mp_graph->vertexes ().begin () + i).operator-> ();
           if (v->begin_edges () != v->end_edges ()) {
             double d = v->distance (p);
             if (d < dmin) {
@@ -466,12 +337,12 @@ Triangles::find_closest_edge (const db::DPoint &p, db::Vertex *vstart, bool insi
   db::DEdge line (*vstart, p);
 
   double d = -1.0;
-  db::TriangleEdge *edge = 0;
-  db::Vertex *v = vstart;
+  Edge *edge = 0;
+  Vertex *v = vstart;
 
   while (v) {
 
-    db::Vertex *vnext = 0;
+    Vertex *vnext = 0;
 
     for (auto e = v->begin_edges (); e != v->end_edges (); ++e) {
 
@@ -499,7 +370,7 @@ Triangles::find_closest_edge (const db::DPoint &p, db::Vertex *vstart, bool insi
         //  this differentiation selects the edge which bends further towards
         //  the target point if both edges share a common point and that
         //  is the one the determines the distance.
-        db::Vertex *cv = edge->common_vertex (*e);
+        Vertex *cv = edge->common_vertex (*e);
         if (cv) {
           db::DVector edge_d = *edge->other (cv) - *cv;
           db::DVector e_d = *(*e)->other(cv) - *cv;
@@ -532,29 +403,29 @@ Triangles::find_closest_edge (const db::DPoint &p, db::Vertex *vstart, bool insi
 }
 
 void
-Triangles::insert_new_vertex (db::Vertex *vertex, std::list<tl::weak_ptr<db::Triangle> > *new_triangles_out)
+Triangulation::insert_new_vertex (Vertex *vertex, std::list<tl::weak_ptr<Polygon> > *new_triangles_out)
 {
-  if (mp_triangles.empty ()) {
+  if (mp_graph->polygons ().empty ()) {
 
-    tl_assert (m_vertex_heap.size () <= size_t (3));  //  fails if vertexes were created but not inserted.
+    tl_assert (mp_graph->vertexes ().size () <= size_t (3));  //  fails if vertexes were created but not inserted.
 
-    if (m_vertex_heap.size () == 3) {
+    if (mp_graph->vertexes ().size () == 3) {
 
-      std::vector<db::Vertex *> vv;
-      for (auto v = m_vertex_heap.begin (); v != m_vertex_heap.end (); ++v) {
+      std::vector<Vertex *> vv;
+      for (auto v = mp_graph->vertexes ().begin (); v != mp_graph->vertexes ().end (); ++v) {
         vv.push_back (v.operator-> ());
       }
 
       //  form the first triangle
-      db::TriangleEdge *s1 = create_edge (vv[0], vv[1]);
-      db::TriangleEdge *s2 = create_edge (vv[1], vv[2]);
-      db::TriangleEdge *s3 = create_edge (vv[2], vv[0]);
+      Edge *s1 = mp_graph->create_edge (vv[0], vv[1]);
+      Edge *s2 = mp_graph->create_edge (vv[1], vv[2]);
+      Edge *s3 = mp_graph->create_edge (vv[2], vv[0]);
 
       if (db::vprod_sign (s1->d (), s2->d ()) == 0) {
         //  avoid degenerate Triangles to happen here
         tl_assert (false);
       } else {
-        db::Triangle *t = create_triangle (s1, s2, s3);
+        Polygon *t = mp_graph->create_triangle (s1, s2, s3);
         if (new_triangles_out) {
           new_triangles_out->push_back (t);
         }
@@ -566,16 +437,16 @@ Triangles::insert_new_vertex (db::Vertex *vertex, std::list<tl::weak_ptr<db::Tri
 
   }
 
-  std::vector<db::Triangle *> new_triangles;
+  std::vector<Polygon *> new_triangles;
 
   //  Find closest edge
-  db::TriangleEdge *closest_edge = find_closest_edge (*vertex);
+  Edge *closest_edge = find_closest_edge (*vertex);
   tl_assert (closest_edge != 0);
 
-  db::TriangleEdge *s1 = create_edge (vertex, closest_edge->v1 ());
-  db::TriangleEdge *s2 = create_edge (vertex, closest_edge->v2 ());
+  Edge *s1 = mp_graph->create_edge (vertex, closest_edge->v1 ());
+  Edge *s2 = mp_graph->create_edge (vertex, closest_edge->v2 ());
 
-  db::Triangle *t = create_triangle (s1, closest_edge, s2);
+  Polygon *t = mp_graph->create_triangle (s1, closest_edge, s2);
   new_triangles.push_back (t);
 
   add_more_triangles (new_triangles, closest_edge, closest_edge->v1 (), vertex, s1);
@@ -585,18 +456,18 @@ Triangles::insert_new_vertex (db::Vertex *vertex, std::list<tl::weak_ptr<db::Tri
     new_triangles_out->insert (new_triangles_out->end (), new_triangles.begin (), new_triangles.end ());
   }
 
-  fix_triangles (new_triangles, std::vector<db::TriangleEdge *> (), new_triangles_out);
+  fix_triangles (new_triangles, std::vector<Edge *> (), new_triangles_out);
 }
 
 void
-Triangles::add_more_triangles (std::vector<db::Triangle *> &new_triangles,
-                               db::TriangleEdge *incoming_edge,
-                               db::Vertex *from_vertex, db::Vertex *to_vertex,
-                               db::TriangleEdge *conn_edge)
+Triangulation::add_more_triangles (std::vector<Polygon *> &new_triangles,
+                                   Edge *incoming_edge,
+                                   Vertex *from_vertex, Vertex *to_vertex,
+                                   Edge *conn_edge)
 {
   while (true) {
 
-    db::TriangleEdge *next_edge = 0;
+    Edge *next_edge = 0;
 
     for (auto e = from_vertex->begin_edges (); e != from_vertex->end_edges (); ++e) {
       if (! (*e)->has_vertex (to_vertex) && (*e)->is_outside ()) {
@@ -607,16 +478,16 @@ Triangles::add_more_triangles (std::vector<db::Triangle *> &new_triangles,
     }
 
     tl_assert (next_edge != 0);
-    db::Vertex *next_vertex = next_edge->other (from_vertex);
+    Vertex *next_vertex = next_edge->other (from_vertex);
 
     db::DVector d_from_to = *to_vertex - *from_vertex;
-    db::Vertex *incoming_vertex = incoming_edge->other (from_vertex);
+    Vertex *incoming_vertex = incoming_edge->other (from_vertex);
     if (db::vprod_sign(*from_vertex - *incoming_vertex, d_from_to) * db::vprod_sign(*from_vertex - *next_vertex, d_from_to) >= 0) {
       return;
     }
 
-    db::TriangleEdge *next_conn_edge = create_edge (next_vertex, to_vertex);
-    db::Triangle *t = create_triangle (next_conn_edge, next_edge, conn_edge);
+    Edge *next_conn_edge = mp_graph->create_edge (next_vertex, to_vertex);
+    Polygon *t = mp_graph->create_triangle (next_conn_edge, next_edge, conn_edge);
     new_triangles.push_back (t);
 
     incoming_edge = next_edge;
@@ -627,23 +498,23 @@ Triangles::add_more_triangles (std::vector<db::Triangle *> &new_triangles,
 }
 
 void
-Triangles::split_triangle (db::Triangle *t, db::Vertex *vertex, std::list<tl::weak_ptr<db::Triangle> > *new_triangles_out)
+Triangulation::split_triangle (Polygon *t, Vertex *vertex, std::list<tl::weak_ptr<Polygon> > *new_triangles_out)
 {
   t->unlink ();
 
-  std::map<db::Vertex *, TriangleEdge *> v2new_edges;
-  std::vector<TriangleEdge *> new_edges;
+  std::map<Vertex *, Edge *> v2new_edges;
+  std::vector<Edge *> new_edges;
   for (int i = 0; i < 3; ++i) {
-    db::Vertex *v = t->vertex (i);
-    db::TriangleEdge *e = create_edge (v, vertex);
+    Vertex *v = t->vertex (i);
+    Edge *e = mp_graph->create_edge (v, vertex);
     v2new_edges[v] = e;
     new_edges.push_back (e);
   }
 
-  std::vector<db::Triangle *> new_triangles;
+  std::vector<Polygon *> new_triangles;
   for (int i = 0; i < 3; ++i) {
-    db::TriangleEdge *e = t->edge (i);
-    db::Triangle *new_triangle = create_triangle (e, v2new_edges[e->v1 ()], v2new_edges[e->v2 ()]);
+    Edge *e = t->edge (i);
+    Polygon *new_triangle = mp_graph->create_triangle (e, v2new_edges[e->v1 ()], v2new_edges[e->v2 ()]);
     if (new_triangles_out) {
       new_triangles_out->push_back (new_triangle);
     }
@@ -651,24 +522,24 @@ Triangles::split_triangle (db::Triangle *t, db::Vertex *vertex, std::list<tl::we
     new_triangles.push_back (new_triangle);
   }
 
-  remove_triangle (t);
+  mp_graph->remove_polygon (t);
 
   fix_triangles (new_triangles, new_edges, new_triangles_out);
 }
 
 void
-Triangles::split_triangles_on_edge (db::Vertex *vertex, db::TriangleEdge *split_edge, std::list<tl::weak_ptr<db::Triangle> > *new_triangles_out)
+Triangulation::split_triangles_on_edge (Vertex *vertex, Edge *split_edge, std::list<tl::weak_ptr<Polygon> > *new_triangles_out)
 {
-  TriangleEdge *s1 = create_edge (split_edge->v1 (), vertex);
-  TriangleEdge *s2 = create_edge (split_edge->v2 (), vertex);
+  Edge *s1 = mp_graph->create_edge (split_edge->v1 (), vertex);
+  Edge *s2 = mp_graph->create_edge (split_edge->v2 (), vertex);
   s1->set_is_segment (split_edge->is_segment ());
   s2->set_is_segment (split_edge->is_segment ());
 
-  std::vector<db::Triangle *> new_triangles;
+  std::vector<Polygon *> new_triangles;
 
-  std::vector<db::Triangle *> tris;
+  std::vector<Polygon *> tris;
   tris.reserve (2);
-  for (auto t = split_edge->begin_triangles (); t != split_edge->end_triangles (); ++t) {
+  for (auto t = split_edge->begin_polygons (); t != split_edge->end_polygons (); ++t) {
     tris.push_back (t.operator-> ());
   }
 
@@ -676,16 +547,16 @@ Triangles::split_triangles_on_edge (db::Vertex *vertex, db::TriangleEdge *split_
 
     (*t)->unlink ();
 
-    db::Vertex *ext_vertex = (*t)->opposite (split_edge);
-    TriangleEdge *new_edge = create_edge (ext_vertex, vertex);
+    Vertex *ext_vertex = (*t)->opposite (split_edge);
+    Edge *new_edge = mp_graph->create_edge (ext_vertex, vertex);
 
     for (int i = 0; i < 3; ++i) {
 
-      db::TriangleEdge *e = (*t)->edge (i);
+      Edge *e = (*t)->edge (i);
       if (e->has_vertex (ext_vertex)) {
 
-        TriangleEdge *partial = e->has_vertex (split_edge->v1 ()) ? s1 : s2;
-        db::Triangle *new_triangle = create_triangle (new_edge, partial, e);
+        Edge *partial = e->has_vertex (split_edge->v1 ()) ? s1 : s2;
+        Polygon *new_triangle = mp_graph->create_triangle (new_edge, partial, e);
 
         if (new_triangles_out) {
           new_triangles_out->push_back (new_triangle);
@@ -700,39 +571,39 @@ Triangles::split_triangles_on_edge (db::Vertex *vertex, db::TriangleEdge *split_
   }
 
   for (auto t = tris.begin (); t != tris.end (); ++t) {
-    remove_triangle (*t);
+    mp_graph->remove_polygon (*t);
   }
 
-  std::vector<db::TriangleEdge *> fixed_edges;
+  std::vector<Edge *> fixed_edges;
   fixed_edges.push_back (s1);
   fixed_edges.push_back (s2);
   fix_triangles (new_triangles, fixed_edges, new_triangles_out);
 }
 
-std::vector<db::Vertex *>
-Triangles::find_touching (const db::DBox &box) const
+std::vector<Vertex *>
+Triangulation::find_touching (const db::DBox &box) const
 {
   //  NOTE: this is a naive, slow implementation for test purposes
-  std::vector<db::Vertex *> res;
-  for (auto v = m_vertex_heap.begin (); v != m_vertex_heap.end (); ++v) {
+  std::vector<Vertex *> res;
+  for (auto v = mp_graph->vertexes ().begin (); v != mp_graph->vertexes ().end (); ++v) {
     if (v->begin_edges () != v->end_edges ()) {
       if (box.contains (*v)) {
-        res.push_back (const_cast<db::Vertex *> (v.operator-> ()));
+        res.push_back (const_cast<Vertex *> (v.operator-> ()));
       }
     }
   }
   return res;
 }
 
-std::vector<db::Vertex *>
-Triangles::find_inside_circle (const db::DPoint &center, double radius) const
+std::vector<Vertex *>
+Triangulation::find_inside_circle (const db::DPoint &center, double radius) const
 {
   //  NOTE: this is a naive, slow implementation for test purposes
-  std::vector<db::Vertex *> res;
-  for (auto v = m_vertex_heap.begin (); v != m_vertex_heap.end (); ++v) {
+  std::vector<Vertex *> res;
+  for (auto v = mp_graph->vertexes ().begin (); v != mp_graph->vertexes ().end (); ++v) {
     if (v->begin_edges () != v->end_edges ()) {
       if (v->in_circle (center, radius) == 1) {
-        res.push_back (const_cast<db::Vertex *> (v.operator-> ()));
+        res.push_back (const_cast<Vertex *> (v.operator-> ()));
       }
     }
   }
@@ -740,7 +611,7 @@ Triangles::find_inside_circle (const db::DPoint &center, double radius) const
 }
 
 void
-Triangles::remove (db::Vertex *vertex, std::list<tl::weak_ptr<db::Triangle> > *new_triangles)
+Triangulation::remove (Vertex *vertex, std::list<tl::weak_ptr<Polygon> > *new_triangles)
 {
   if (vertex->begin_edges () == vertex->end_edges ()) {
     //  removing an orphan vertex -> ignore
@@ -752,11 +623,11 @@ Triangles::remove (db::Vertex *vertex, std::list<tl::weak_ptr<db::Triangle> > *n
 }
 
 void
-Triangles::remove_outside_vertex (db::Vertex *vertex, std::list<tl::weak_ptr<db::Triangle> > *new_triangles_out)
+Triangulation::remove_outside_vertex (Vertex *vertex, std::list<tl::weak_ptr<Polygon> > *new_triangles_out)
 {
-  auto to_remove = vertex->triangles ();
+  auto to_remove = vertex->polygons ();
 
-  std::vector<db::TriangleEdge *> outer_edges;
+  std::vector<Edge *> outer_edges;
   for (auto t = to_remove.begin (); t != to_remove.end (); ++t) {
     outer_edges.push_back ((*t)->opposite (vertex));
   }
@@ -768,22 +639,22 @@ Triangles::remove_outside_vertex (db::Vertex *vertex, std::list<tl::weak_ptr<db:
   auto new_triangles = fill_concave_corners (outer_edges);
 
   for (auto t = to_remove.begin (); t != to_remove.end (); ++t) {
-    remove_triangle (*t);
+    mp_graph->remove_polygon (*t);
   }
 
-  fix_triangles (new_triangles, std::vector<db::TriangleEdge *> (), new_triangles_out);
+  fix_triangles (new_triangles, std::vector<Edge *> (), new_triangles_out);
 }
 
 void
-Triangles::remove_inside_vertex (db::Vertex *vertex, std::list<tl::weak_ptr<db::Triangle> > *new_triangles_out)
+Triangulation::remove_inside_vertex (Vertex *vertex, std::list<tl::weak_ptr<Polygon> > *new_triangles_out)
 {
-  std::set<db::Triangle *, TriangleLessFunc> triangles_to_fix;
+  std::set<Polygon *, PolygonLessFunc> triangles_to_fix;
 
   bool make_new_triangle = true;
 
   while (vertex->num_edges (4) > 3) {
 
-    db::TriangleEdge *to_flip = 0;
+    Edge *to_flip = 0;
     for (auto e = vertex->begin_edges (); e != vertex->end_edges () && to_flip == 0; ++e) {
       if ((*e)->can_flip ()) {
         to_flip = *e;
@@ -809,7 +680,7 @@ Triangles::remove_inside_vertex (db::Vertex *vertex, std::list<tl::weak_ptr<db::
 
     //  This case can happen if two edges attached to the vertex are collinear
     //  in this case choose the "join" strategy
-    db::TriangleEdge *jseg = 0;
+    Edge *jseg = 0;
     for (auto e = vertex->begin_edges (); e != vertex->end_edges () && !jseg; ++e) {
       if ((*e)->can_join_via (vertex)) {
         jseg = *e;
@@ -817,24 +688,24 @@ Triangles::remove_inside_vertex (db::Vertex *vertex, std::list<tl::weak_ptr<db::
     }
     tl_assert (jseg != 0);
 
-    db::Vertex *v1 = jseg->left ()->opposite (jseg);
-    db::TriangleEdge *s1 = jseg->left ()->opposite (vertex);
-    db::Vertex *v2 = jseg->right ()->opposite (jseg);
-    db::TriangleEdge *s2 = jseg->right ()->opposite (vertex);
+    Vertex *v1 = jseg->left ()->opposite (jseg);
+    Edge *s1 = jseg->left ()->opposite (vertex);
+    Vertex *v2 = jseg->right ()->opposite (jseg);
+    Edge *s2 = jseg->right ()->opposite (vertex);
 
-    db::TriangleEdge *jseg_opp = 0;
+    Edge *jseg_opp = 0;
     for (auto e = vertex->begin_edges (); e != vertex->end_edges () && !jseg_opp; ++e) {
-      if (!(*e)->has_triangle (jseg->left ()) && !(*e)->has_triangle (jseg->right ())) {
+      if (!(*e)->has_polygon (jseg->left ()) && !(*e)->has_polygon (jseg->right ())) {
         jseg_opp = *e;
       }
     }
 
-    db::TriangleEdge *s1opp = jseg_opp->left ()->opposite (vertex);
-    db::TriangleEdge *s2opp = jseg_opp->right ()->opposite (vertex);
+    Edge *s1opp = jseg_opp->left ()->opposite (vertex);
+    Edge *s2opp = jseg_opp->right ()->opposite (vertex);
 
-    db::TriangleEdge *new_edge = create_edge (v1, v2);
-    db::Triangle *t1 = create_triangle (s1, s2, new_edge);
-    db::Triangle *t2 = create_triangle (s1opp, s2opp, new_edge);
+    Edge *new_edge = mp_graph->create_edge (v1, v2);
+    Polygon *t1 = mp_graph->create_triangle (s1, s2, new_edge);
+    Polygon *t2 = mp_graph->create_triangle (s1opp, s2opp, new_edge);
 
     triangles_to_fix.insert (t1);
     triangles_to_fix.insert (t2);
@@ -843,9 +714,9 @@ Triangles::remove_inside_vertex (db::Vertex *vertex, std::list<tl::weak_ptr<db::
 
   }
 
-  auto to_remove = vertex->triangles ();
+  auto to_remove = vertex->polygons ();
 
-  std::vector<db::TriangleEdge *> outer_edges;
+  std::vector<Edge *> outer_edges;
   for (auto t = to_remove.begin (); t != to_remove.end (); ++t) {
     outer_edges.push_back ((*t)->opposite (vertex));
   }
@@ -854,14 +725,14 @@ Triangles::remove_inside_vertex (db::Vertex *vertex, std::list<tl::weak_ptr<db::
 
     tl_assert (outer_edges.size () == size_t (3));
 
-    db::Triangle *nt = create_triangle (outer_edges[0], outer_edges[1], outer_edges[2]);
+    Polygon *nt = mp_graph->create_triangle (outer_edges[0], outer_edges[1], outer_edges[2]);
     triangles_to_fix.insert (nt);
 
   }
 
   for (auto t = to_remove.begin (); t != to_remove.end (); ++t) {
     triangles_to_fix.erase (*t);
-    remove_triangle (*t);
+    mp_graph->remove_polygon (*t);
   }
 
   if (new_triangles_out) {
@@ -870,23 +741,23 @@ Triangles::remove_inside_vertex (db::Vertex *vertex, std::list<tl::weak_ptr<db::
     }
   }
 
-  std::vector<db::Triangle *> to_fix_a (triangles_to_fix.begin (), triangles_to_fix.end ());
-  fix_triangles (to_fix_a, std::vector<db::TriangleEdge *> (), new_triangles_out);
+  std::vector<Polygon *> to_fix_a (triangles_to_fix.begin (), triangles_to_fix.end ());
+  fix_triangles (to_fix_a, std::vector<Edge *> (), new_triangles_out);
 }
 
 void
-Triangles::fix_triangles (const std::vector<db::Triangle *> &tris, const std::vector<db::TriangleEdge *> &fixed_edges, std::list<tl::weak_ptr<db::Triangle> > *new_triangles)
+Triangulation::fix_triangles (const std::vector<Polygon *> &tris, const std::vector<Edge *> &fixed_edges, std::list<tl::weak_ptr<Polygon> > *new_triangles)
 {
   m_level += 1;
   for (auto e = fixed_edges.begin (); e != fixed_edges.end (); ++e) {
     (*e)->set_level (m_level);
   }
 
-  std::set<db::TriangleEdge *, TriangleEdgeLessFunc> queue, todo;
+  std::set<Edge *, EdgeLessFunc> queue, todo;
 
   for (auto t = tris.begin (); t != tris.end (); ++t) {
     for (int i = 0; i < 3; ++i) {
-      db::TriangleEdge *e = (*t)->edge (i);
+      Edge *e = (*t)->edge (i);
       if (e->level () < m_level && ! e->is_segment ()) {
         queue.insert (e);
       }
@@ -923,14 +794,14 @@ Triangles::fix_triangles (const std::vector<db::Triangle *> &tris, const std::ve
         tl_assert (! is_illegal_edge (s12)); // TODO: remove later!
 
         for (int i = 0; i < 3; ++i) {
-          db::TriangleEdge *s1 = t1->edge (i);
+          Edge *s1 = t1->edge (i);
           if (s1->level () < m_level && ! s1->is_segment ()) {
             queue.insert (s1);
           }
         }
 
         for (int i = 0; i < 3; ++i) {
-          db::TriangleEdge *s2 = t2->edge (i);
+          Edge *s2 = t2->edge (i);
           if (s2->level () < m_level && ! s2->is_segment ()) {
             queue.insert (s2);
           }
@@ -944,10 +815,10 @@ Triangles::fix_triangles (const std::vector<db::Triangle *> &tris, const std::ve
 }
 
 bool
-Triangles::is_illegal_edge (db::TriangleEdge *edge)
+Triangulation::is_illegal_edge (Edge *edge)
 {
-  db::Triangle *left = edge->left ();
-  db::Triangle *right = edge->right ();
+  Polygon *left = edge->left ();
+  Polygon *right = edge->right ();
   if (!left || !right) {
     return false;
   }
@@ -967,11 +838,11 @@ Triangles::is_illegal_edge (db::TriangleEdge *edge)
   return false;
 }
 
-std::pair<std::pair<Triangle *, Triangle *>, TriangleEdge *>
-Triangles::flip (TriangleEdge *edge)
+std::pair<std::pair<Polygon *, Polygon *>, Edge *>
+Triangulation::flip (Edge *edge)
 {
-  db::Triangle *t1 = edge->left ();
-  db::Triangle *t2 = edge->right ();
+  Polygon *t1 = edge->left ();
+  Polygon *t2 = edge->right ();
 
   bool outside = t1->is_outside ();
   tl_assert (t1->is_outside () == outside);
@@ -980,43 +851,43 @@ Triangles::flip (TriangleEdge *edge)
   t1->unlink ();
   t2->unlink ();
 
-  db::Vertex *t1_vext = t1->opposite (edge);
-  db::TriangleEdge *t1_sext1 = t1->find_edge_with (t1_vext, edge->v1 ());
-  db::TriangleEdge *t1_sext2 = t1->find_edge_with (t1_vext, edge->v2 ());
+  Vertex *t1_vext = t1->opposite (edge);
+  Edge *t1_sext1 = t1->find_edge_with (t1_vext, edge->v1 ());
+  Edge *t1_sext2 = t1->find_edge_with (t1_vext, edge->v2 ());
 
-  db::Vertex *t2_vext = t2->opposite (edge);
-  db::TriangleEdge *t2_sext1 = t2->find_edge_with (t2_vext, edge->v1 ());
-  db::TriangleEdge *t2_sext2 = t2->find_edge_with (t2_vext, edge->v2 ());
+  Vertex *t2_vext = t2->opposite (edge);
+  Edge *t2_sext1 = t2->find_edge_with (t2_vext, edge->v1 ());
+  Edge *t2_sext2 = t2->find_edge_with (t2_vext, edge->v2 ());
 
-  db::TriangleEdge *s_new = create_edge (t1_vext, t2_vext);
+  Edge *s_new = mp_graph->create_edge (t1_vext, t2_vext);
 
-  db::Triangle *t1_new = create_triangle (s_new, t1_sext1, t2_sext1);
+  Polygon *t1_new = mp_graph->create_triangle (s_new, t1_sext1, t2_sext1);
   t1_new->set_outside (outside);
-  db::Triangle *t2_new = create_triangle (s_new, t1_sext2, t2_sext2);
+  Polygon *t2_new = mp_graph->create_triangle (s_new, t1_sext2, t2_sext2);
   t2_new->set_outside (outside);
 
-  remove_triangle (t1);
-  remove_triangle (t2);
+  mp_graph->remove_polygon (t1);
+  mp_graph->remove_polygon (t2);
 
   return std::make_pair (std::make_pair (t1_new, t2_new), s_new);
 }
 
-std::vector<db::Triangle *>
-Triangles::fill_concave_corners (const std::vector<db::TriangleEdge *> &edges)
+std::vector<Polygon *>
+Triangulation::fill_concave_corners (const std::vector<Edge *> &edges)
 {
-  std::vector<db::Triangle *> res;
-  std::vector<db::Vertex *> points, terminals;
+  std::vector<Polygon *> res;
+  std::vector<Vertex *> points, terminals;
 
-  std::map<db::Vertex *, std::vector<db::TriangleEdge *> > vertex2edge;
+  std::map<Vertex *, std::vector<Edge *> > vertex2edge;
   for (auto e = edges.begin (); e != edges.end (); ++e) {
 
-    auto i = vertex2edge.insert (std::make_pair ((*e)->v1 (), std::vector<db::TriangleEdge *> ()));
+    auto i = vertex2edge.insert (std::make_pair ((*e)->v1 (), std::vector<Edge *> ()));
     if (i.second) {
       points.push_back ((*e)->v1 ());
     }
     i.first->second.push_back (*e);
 
-    i = vertex2edge.insert (std::make_pair ((*e)->v2 (), std::vector<db::TriangleEdge *> ()));
+    i = vertex2edge.insert (std::make_pair ((*e)->v2 (), std::vector<Edge *> ()));
     if (i.second) {
       points.push_back ((*e)->v2 ());
     }
@@ -1033,17 +904,17 @@ Triangles::fill_concave_corners (const std::vector<db::TriangleEdge *> &edges)
       }
     }
     tl_assert (terminals.size () == size_t (2));
-    db::Vertex *v = terminals[0];
+    Vertex *v = terminals[0];
 
     bool any_connected = false;
-    db::Vertex *vp = 0;
+    Vertex *vp = 0;
 
-    std::set<db::Vertex *> to_remove;
+    std::set<Vertex *> to_remove;
 
     while (vertex2edge [v].size () >= size_t (2) || ! vp) {
 
-      db::TriangleEdge *seg = 0;
-      std::vector<db::TriangleEdge *> &ee = vertex2edge [v];
+      Edge *seg = 0;
+      std::vector<Edge *> &ee = vertex2edge [v];
       for (auto e = ee.begin (); e != ee.end (); ++e) {
         if (! (*e)->has_vertex (vp)) {
           seg = (*e);
@@ -1052,16 +923,16 @@ Triangles::fill_concave_corners (const std::vector<db::TriangleEdge *> &edges)
       }
 
       tl_assert (seg != 0);
-      db::Triangle *tri = seg->left () ? seg->left () : seg->right ();
-      db::Vertex *vn = seg->other (v);
+      Polygon *tri = seg->left () ? seg->left () : seg->right ();
+      Vertex *vn = seg->other (v);
 
-      std::vector<db::TriangleEdge *> &een = vertex2edge [vn];
+      std::vector<Edge *> &een = vertex2edge [vn];
       if (een.size () < size_t (2)) {
         break;
       }
       tl_assert (een.size () == size_t (2));
 
-      db::TriangleEdge *segn = 0;
+      Edge *segn = 0;
       for (auto e = een.begin (); e != een.end (); ++e) {
         if (! (*e)->has_vertex (v)) {
           segn = (*e);
@@ -1070,15 +941,15 @@ Triangles::fill_concave_corners (const std::vector<db::TriangleEdge *> &edges)
       }
 
       tl_assert (segn != 0);
-      db::Vertex *vnn = segn->other (vn);
-      std::vector<db::TriangleEdge *> &eenn = vertex2edge [vnn];
+      Vertex *vnn = segn->other (vn);
+      std::vector<Edge *> &eenn = vertex2edge [vnn];
 
       //  NOTE: tri can be None in case a lonely edge stays after removing
       //  attached triangles
       if (! tri || seg->side_of (*vnn) * seg->side_of (*tri->opposite (seg)) < 0) {
 
         //  is concave
-        db::TriangleEdge *new_edge = create_edge (v, vnn);
+        Edge *new_edge = mp_graph->create_edge (v, vnn);
         for (auto e = ee.begin (); e != ee.end (); ++e) {
           if (*e == seg) {
             ee.erase (e);
@@ -1098,7 +969,7 @@ Triangles::fill_concave_corners (const std::vector<db::TriangleEdge *> &edges)
         vertex2edge.erase (vn);
         to_remove.insert (vn);
 
-        db::Triangle *new_triangle = create_triangle (seg, segn, new_edge);
+        Polygon *new_triangle = mp_graph->create_triangle (seg, segn, new_edge);
         res.push_back (new_triangle);
         any_connected = true;
 
@@ -1115,7 +986,7 @@ Triangles::fill_concave_corners (const std::vector<db::TriangleEdge *> &edges)
       break;
     }
 
-    std::vector<db::Vertex *>::iterator wp = points.begin ();
+    std::vector<Vertex *>::iterator wp = points.begin ();
     for (auto p = points.begin (); p != points.end (); ++p) {
       if (to_remove.find (*p) == to_remove.end ()) {
         *wp++ = *p;
@@ -1128,25 +999,25 @@ Triangles::fill_concave_corners (const std::vector<db::TriangleEdge *> &edges)
   return res;
 }
 
-std::vector<db::TriangleEdge *>
-Triangles::search_edges_crossing (Vertex *from, Vertex *to)
+std::vector<Edge *>
+Triangulation::search_edges_crossing (Vertex *from, Vertex *to)
 {
-  db::Vertex *v = from;
-  db::Vertex *vv = to;
+  Vertex *v = from;
+  Vertex *vv = to;
   db::DEdge edge (*from, *to);
 
-  db::Triangle *current_triangle = 0;
-  db::TriangleEdge *next_edge = 0;
+  Polygon *current_triangle = 0;
+  Edge *next_edge = 0;
 
-  std::vector<db::TriangleEdge *> result;
+  std::vector<Edge *> result;
 
   for (auto e = v->begin_edges (); e != v->end_edges () && ! next_edge; ++e) {
-    for (auto t = (*e)->begin_triangles (); t != (*e)->end_triangles (); ++t) {
-      db::TriangleEdge *os = t->opposite (v);
+    for (auto t = (*e)->begin_polygons (); t != (*e)->end_polygons (); ++t) {
+      Edge *os = t->opposite (v);
       if (os->has_vertex (vv)) {
         return result;
       }
-      if (os->crosses (edge)) {
+      if (os->crosses_including (edge)) {
         result.push_back (os);
         current_triangle = t.operator-> ();
         next_edge = os;
@@ -1164,15 +1035,15 @@ Triangles::search_edges_crossing (Vertex *from, Vertex *to)
     //  Note that we're convex, so there has to be a path across triangles
     tl_assert (current_triangle != 0);
 
-    db::TriangleEdge *cs = next_edge;
+    Edge *cs = next_edge;
     next_edge = 0;
     for (int i = 0; i < 3; ++i) {
-      db::TriangleEdge *e = current_triangle->edge (i);
+      Edge *e = current_triangle->edge (i);
       if (e != cs) {
         if (e->has_vertex (vv)) {
           return result;
         }
-        if (e->crosses (edge)) {
+        if (e->crosses_including (edge)) {
           result.push_back (e);
           next_edge = e;
           break;
@@ -1185,14 +1056,14 @@ Triangles::search_edges_crossing (Vertex *from, Vertex *to)
   }
 }
 
-db::Vertex *
-Triangles::find_vertex_for_point (const db::DPoint &point)
+Vertex *
+Triangulation::find_vertex_for_point (const db::DPoint &point) const
 {
-  db::TriangleEdge *edge = find_closest_edge (point);
+  Edge *edge = find_closest_edge (point);
   if (!edge) {
     return 0;
   }
-  db::Vertex *v = 0;
+  Vertex *v = 0;
   if (is_equal (*edge->v1 (), point)) {
     v = edge->v1 ();
   } else if (is_equal (*edge->v2 (), point)) {
@@ -1201,10 +1072,10 @@ Triangles::find_vertex_for_point (const db::DPoint &point)
   return v;
 }
 
-db::TriangleEdge *
-Triangles::find_edge_for_points (const db::DPoint &p1, const db::DPoint &p2)
+Edge *
+Triangulation::find_edge_for_points (const db::DPoint &p1, const db::DPoint &p2) const
 {
-  db::Vertex *v = find_vertex_for_point (p1);
+  Vertex *v = find_vertex_for_point (p1);
   if (!v) {
     return 0;
   }
@@ -1216,24 +1087,65 @@ Triangles::find_edge_for_points (const db::DPoint &p1, const db::DPoint &p2)
   return 0;
 }
 
-std::vector<db::TriangleEdge *>
-Triangles::ensure_edge_inner (db::Vertex *from, db::Vertex *to)
+std::vector<Vertex *>
+Triangulation::find_vertexes_along_line (const db::DPoint &p1, const db::DPoint &p2) const
+{
+  db::DEdge e12 (p1, p2);
+
+  Vertex *v = find_vertex_for_point (p1);
+  if (!v) {
+    v = find_vertex_for_point (p2);
+    e12.swap_points ();
+  }
+
+  std::vector<Vertex *> result;
+  result.push_back (v);
+
+  while (v) {
+    Vertex *vn = 0;
+    for (auto e = v->begin_edges (); e != v->end_edges (); ++e) {
+      Vertex *vv = (*e)->other (v);
+      int cs = 0;
+      if (db::vprod_sign (e12.d (), *vv - *v) == 0 && db::sprod_sign (e12.d (), *vv - *v) > 0 && (cs = db::sprod_sign (e12.d (), *vv - e12.p2 ())) <= 0) {
+        result.push_back (vv);
+        if (cs < 0) {
+          //  continue searching
+          vn = vv;
+        }
+        break;
+      }
+    }
+    v = vn;
+  }
+
+  return result;
+}
+
+static bool is_touching (const db::DEdge &a, const db::DEdge &b)
+{
+  return (a.side_of (b.p1 ()) == 0 || a.side_of (b.p2 ()) == 0);
+}
+
+std::vector<Edge *>
+Triangulation::ensure_edge_inner (Vertex *from, Vertex *to)
 {
   auto crossed_edges = search_edges_crossing (from, to);
-  std::vector<db::TriangleEdge *> result;
+  std::vector<Edge *> result;
+
+  db::DEdge dedge (*from , *to);
 
   if (crossed_edges.empty ()) {
 
     //  no crossing edge - there should be a edge already
-    db::TriangleEdge *res = find_edge_for_points (*from, *to);
+    Edge *res = find_edge_for_points (*from, *to);
     tl_assert (res != 0);
     result.push_back (res);
 
-  } else if (crossed_edges.size () == 1) {
+  } else if (crossed_edges.size () == 1 && ! is_touching (dedge, crossed_edges.front ()->edge ())) {
 
     //  can be solved by flipping
     auto pp = flip (crossed_edges.front ());
-    db::TriangleEdge *res = pp.second;
+    Edge *res = pp.second;
     tl_assert (res->has_vertex (from) && res->has_vertex (to));
     result.push_back (res);
 
@@ -1241,18 +1153,27 @@ Triangles::ensure_edge_inner (db::Vertex *from, db::Vertex *to)
 
     //  split edge close to center
     db::DPoint split_point;
+    Edge *split_edge = 0;
     double d = -1.0;
     double l_half = 0.25 * (*to - *from).sq_length ();
     for (auto e = crossed_edges.begin (); e != crossed_edges.end (); ++e) {
-      db::DPoint p = (*e)->intersection_point (db::DEdge (*from, *to));
+      db::DPoint p = (*e)->intersection_point (dedge);
       double dp = fabs ((p - *from).sq_length () - l_half);
       if (d < 0.0 || dp < d) {
         dp = d;
         split_point = p;
+        split_edge = *e;
       }
     }
 
-    db::Vertex *split_vertex = insert_point (split_point);
+    Vertex *split_vertex;
+    if (dedge.side_of (*split_edge->v1 ()) == 0) {
+      split_vertex = split_edge->v1 ();
+    } else if (dedge.side_of (*split_edge->v2 ()) == 0) {
+      split_vertex = split_edge->v2 ();
+    } else {
+      split_vertex = insert_point (split_point);
+    }
 
     result = ensure_edge_inner (from, split_vertex);
 
@@ -1264,8 +1185,8 @@ Triangles::ensure_edge_inner (db::Vertex *from, db::Vertex *to)
   return result;
 }
 
-std::vector<db::TriangleEdge *>
-Triangles::ensure_edge (db::Vertex *from, db::Vertex *to)
+std::vector<Edge *>
+Triangulation::ensure_edge (Vertex *from, Vertex *to)
 {
 #if 0
   //  NOTE: this should not be required if the original segments are non-overlapping
@@ -1284,48 +1205,53 @@ Triangles::ensure_edge (db::Vertex *from, db::Vertex *to)
 }
 
 void
-Triangles::join_edges (std::vector<db::TriangleEdge *> &edges)
+Triangulation::join_edges (std::vector<Edge *> &edges)
 {
   //  edges are supposed to be ordered
   for (size_t i = 1; i < edges.size (); ) {
 
-    db::TriangleEdge *s1 = edges [i - 1];
-    db::TriangleEdge *s2 = edges [i];
+    Edge *s1 = edges [i - 1];
+    Edge *s2 = edges [i];
     tl_assert (s1->is_segment () == s2->is_segment ());
-    db::Vertex *cp = s1->common_vertex (s2);
+    Vertex *cp = s1->common_vertex (s2);
     tl_assert (cp != 0);
 
-    std::vector<db::TriangleEdge *> join_edges;
-    for (auto e = cp->begin_edges (); e != cp->end_edges (); ++e) {
-      if (*e != s1 && *e != s2) {
-        if ((*e)->can_join_via (cp)) {
-          join_edges.push_back (*e);
-        } else {
-          join_edges.clear ();
-          break;
+    std::vector<Edge *> join_edges;
+
+    if (! cp->is_precious ()) {
+
+      for (auto e = cp->begin_edges (); e != cp->end_edges (); ++e) {
+        if (*e != s1 && *e != s2) {
+          if ((*e)->can_join_via (cp)) {
+            join_edges.push_back (*e);
+          } else {
+            join_edges.clear ();
+            break;
+          }
         }
       }
+
     }
 
     if (! join_edges.empty ()) {
 
       tl_assert (join_edges.size () <= 2);
 
-      TriangleEdge *new_edge = create_edge (s1->other (cp), s2->other (cp));
+      Edge *new_edge = mp_graph->create_edge (s1->other (cp), s2->other (cp));
       new_edge->set_is_segment (s1->is_segment ());
 
       for (auto js = join_edges.begin (); js != join_edges.end (); ++js) {
 
-        db::Triangle *t1 = (*js)->left ();
-        db::Triangle *t2 = (*js)->right ();
-        db::TriangleEdge *tedge1 = t1->opposite (cp);
-        db::TriangleEdge *tedge2 = t2->opposite (cp);
+        Polygon *t1 = (*js)->left ();
+        Polygon *t2 = (*js)->right ();
+        Edge *tedge1 = t1->opposite (cp);
+        Edge *tedge2 = t2->opposite (cp);
         t1->unlink ();
         t2->unlink ();
-        db::Triangle *tri = create_triangle (tedge1, tedge2, new_edge);
+        Polygon *tri = mp_graph->create_triangle (tedge1, tedge2, new_edge);
         tri->set_outside (t1->is_outside ());
-        remove_triangle (t1);
-        remove_triangle (t2);
+        mp_graph->remove_polygon (t1);
+        mp_graph->remove_polygon (t2);
       }
 
       edges [i - 1] = new_edge;
@@ -1339,11 +1265,11 @@ Triangles::join_edges (std::vector<db::TriangleEdge *> &edges)
 }
 
 void
-Triangles::constrain (const std::vector<std::vector<db::Vertex *> > &contours)
+Triangulation::constrain (const std::vector<std::vector<Vertex *> > &contours)
 {
   tl_assert (! m_is_constrained);
 
-  std::vector<std::pair<db::DEdge, std::vector<db::TriangleEdge *> > > resolved_edges;
+  std::vector<std::pair<db::DEdge, std::vector<Edge *> > > resolved_edges;
 
   for (auto c = contours.begin (); c != contours.end (); ++c) {
     for (auto v = c->begin (); v != c->end (); ++v) {
@@ -1353,26 +1279,26 @@ Triangles::constrain (const std::vector<std::vector<db::Vertex *> > &contours)
         vv = c->begin ();
       }
       db::DEdge e (**v, **vv);
-      resolved_edges.push_back (std::make_pair (e, std::vector<db::TriangleEdge *> ()));
+      resolved_edges.push_back (std::make_pair (e, std::vector<Edge *> ()));
       resolved_edges.back ().second = ensure_edge (*v, *vv);
     }
   }
 
-  for (auto tri = mp_triangles.begin (); tri != mp_triangles.end (); ++tri) {
+  for (auto tri = mp_graph->polygons ().begin (); tri != mp_graph->polygons ().end (); ++tri) {
     tri->set_outside (false);
     for (int i = 0; i < 3; ++i) {
       tri->edge (i)->set_is_segment (false);
     }
   }
 
-  std::set<db::Triangle *, TriangleLessFunc> new_tri;
+  std::set<Polygon *, PolygonLessFunc> new_tri;
 
   for (auto re = resolved_edges.begin (); re != resolved_edges.end (); ++re) {
     auto edge = re->first;
     auto edges = re->second;
     for (auto e = edges.begin (); e != edges.end (); ++e) {
       (*e)->set_is_segment (true);
-      db::Triangle *outer_tri = 0;
+      Polygon *outer_tri = 0;
       int d = db::sprod_sign (edge.d (), (*e)->d ());
       if (d > 0) {
         outer_tri = (*e)->left ();
@@ -1389,7 +1315,7 @@ Triangles::constrain (const std::vector<std::vector<db::Vertex *> > &contours)
 
   while (! new_tri.empty ()) {
 
-    std::set<db::Triangle *, TriangleLessFunc> next_tris;
+    std::set<Polygon *, PolygonLessFunc> next_tris;
 
     for (auto tri = new_tri.begin (); tri != new_tri.end (); ++tri) {
       for (int i = 0; i < 3; ++i) {
@@ -1418,58 +1344,48 @@ Triangles::constrain (const std::vector<std::vector<db::Vertex *> > &contours)
 }
 
 void
-Triangles::remove_outside_triangles ()
+Triangulation::remove_outside_triangles ()
 {
   tl_assert (m_is_constrained);
 
   //  NOTE: don't remove while iterating
-  std::vector<db::Triangle *> to_remove;
-  for (auto tri = begin (); tri != end (); ++tri) {
+  std::vector<Polygon *> to_remove;
+  for (auto tri = mp_graph->begin (); tri != mp_graph->end (); ++tri) {
     if (tri->is_outside ()) {
-      to_remove.push_back (const_cast<db::Triangle *> (tri.operator-> ()));
+      to_remove.push_back (const_cast<Polygon *> (tri.operator-> ()));
     }
   }
 
   for (auto t = to_remove.begin (); t != to_remove.end (); ++t) {
-    remove_triangle (*t);
+    mp_graph->remove_polygon (*t);
   }
 }
 
-void
-Triangles::clear ()
-{
-  mp_triangles.clear ();
-  m_edges_heap.clear ();
-  m_vertex_heap.clear ();
-  m_returned_edges.clear ();
-  m_is_constrained = false;
-  m_level = 0;
-  m_id = 0;
-}
 
 template<class Poly, class Trans>
 void
-Triangles::make_contours (const Poly &poly, const Trans &trans, std::vector<std::vector<db::Vertex *> > &edge_contours)
+Triangulation::make_contours (const Poly &poly, const Trans &trans, std::vector<std::vector<Vertex *> > &edge_contours)
 {
-  edge_contours.push_back (std::vector<db::Vertex *> ());
+  edge_contours.push_back (std::vector<Vertex *> ());
   for (auto pt = poly.begin_hull (); pt != poly.end_hull (); ++pt) {
     edge_contours.back ().push_back (insert_point (trans * *pt));
   }
 
   for (unsigned int h = 0; h < poly.holes (); ++h) {
-    edge_contours.push_back (std::vector<db::Vertex *> ());
+    edge_contours.push_back (std::vector<Vertex *> ());
     for (auto pt = poly.begin_hole (h); pt != poly.end_hole (h); ++pt) {
       edge_contours.back ().push_back (insert_point (trans * *pt));
     }
   }
 }
 
-void
-Triangles::create_constrained_delaunay (const db::Region &region, const CplxTrans &trans)
-{
-  clear ();
+template DB_PUBLIC void Triangulation::make_contours (const db::Polygon &, const db::CplxTrans &, std::vector<std::vector<Vertex *> > &);
+template DB_PUBLIC void Triangulation::make_contours (const db::DPolygon &, const db::DCplxTrans &, std::vector<std::vector<Vertex *> > &);
 
-  std::vector<std::vector<db::Vertex *> > edge_contours;
+void
+Triangulation::create_constrained_delaunay (const db::Region &region, const CplxTrans &trans)
+{
+  std::vector<std::vector<Vertex *> > edge_contours;
 
   for (auto p = region.begin_merged (); ! p.at_end (); ++p) {
     make_contours (*p, trans, edge_contours);
@@ -1479,36 +1395,24 @@ Triangles::create_constrained_delaunay (const db::Region &region, const CplxTran
 }
 
 void
-Triangles::create_constrained_delaunay (const db::Polygon &p, const std::vector<Point> &vertexes, const CplxTrans &trans)
+Triangulation::create_constrained_delaunay (const db::Polygon &p, const CplxTrans &trans)
 {
-  clear ();
-
-  for (auto v = vertexes.begin (); v != vertexes.end (); ++v) {
-    insert_point (trans * *v)->set_is_precious (true);
-  }
-
-  std::vector<std::vector<db::Vertex *> > edge_contours;
+  std::vector<std::vector<Vertex *> > edge_contours;
   make_contours (p, trans, edge_contours);
 
   constrain (edge_contours);
 }
 
 void
-Triangles::create_constrained_delaunay (const db::DPolygon &p, const std::vector<DPoint> &vertexes, const DCplxTrans &trans)
+Triangulation::create_constrained_delaunay (const db::DPolygon &p, const DCplxTrans &trans)
 {
-  clear ();
-
-  for (auto v = vertexes.begin (); v != vertexes.end (); ++v) {
-    insert_point (trans * *v)->set_is_precious (true);
-  }
-
-  std::vector<std::vector<db::Vertex *> > edge_contours;
+  std::vector<std::vector<Vertex *> > edge_contours;
   make_contours (p, trans, edge_contours);
 
   constrain (edge_contours);
 }
 
-static bool is_skinny (const db::Triangle *tri, const Triangles::TriangulateParameters &param)
+static bool is_skinny (const Polygon *tri, const TriangulationParameters &param)
 {
   if (param.min_b < db::epsilon) {
     return false;
@@ -1519,7 +1423,7 @@ static bool is_skinny (const db::Triangle *tri, const Triangles::TriangulatePara
   }
 }
 
-static bool is_invalid (const db::Triangle *tri, const Triangles::TriangulateParameters &param)
+static bool is_invalid (const Polygon *tri, const TriangulationParameters &param)
 {
   if (is_skinny (tri, param)) {
     return true;
@@ -1542,82 +1446,141 @@ static bool is_invalid (const db::Triangle *tri, const Triangles::TriangulatePar
 }
 
 void
-Triangles::triangulate (const db::Region &region, const TriangulateParameters &parameters, double dbu)
+Triangulation::triangulate (const db::Region &region, const TriangulationParameters &parameters, double dbu)
 {
   tl::SelfTimer timer (tl::verbosity () > parameters.base_verbosity, "Triangles::triangulate");
+
+  clear ();
 
   create_constrained_delaunay (region, db::CplxTrans (dbu));
   refine (parameters);
 }
 
 void
-Triangles::triangulate (const db::Region &region, const TriangulateParameters &parameters, const db::CplxTrans &trans)
+Triangulation::triangulate (const db::Region &region, const TriangulationParameters &parameters, const db::CplxTrans &trans)
 {
   tl::SelfTimer timer (tl::verbosity () > parameters.base_verbosity, "Triangles::triangulate");
+
+  clear ();
 
   create_constrained_delaunay (region, trans);
   refine (parameters);
 }
 
 void
-Triangles::triangulate (const db::Polygon &poly, const TriangulateParameters &parameters, double dbu)
+Triangulation::triangulate (const db::Region &region, const std::vector<db::Point> &vertexes, const TriangulationParameters &parameters, const db::CplxTrans &trans)
+{
+  tl::SelfTimer timer (tl::verbosity () > parameters.base_verbosity, "Triangles::triangulate");
+
+  clear ();
+
+  std::vector<std::vector<Vertex *> > edge_contours;
+  for (auto p = region.begin_merged (); ! p.at_end (); ++p) {
+    make_contours (*p, trans, edge_contours);
+  }
+
+  unsigned int id = 0;
+  for (auto v = vertexes.begin (); v != vertexes.end (); ++v) {
+    insert_point (trans * *v)->set_is_precious (true, id++);
+  }
+
+  constrain (edge_contours);
+  refine (parameters);
+}
+
+void
+Triangulation::triangulate (const db::Polygon &poly, const TriangulationParameters &parameters, double dbu)
 {
   triangulate (poly, std::vector<db::Point> (), parameters, dbu);
 }
 
 void
-Triangles::triangulate (const db::Polygon &poly, const std::vector<db::Point> &vertexes, const TriangulateParameters &parameters, double dbu)
+Triangulation::triangulate (const db::Polygon &poly, const std::vector<db::Point> &vertexes, const TriangulationParameters &parameters, double dbu)
 {
   tl::SelfTimer timer (tl::verbosity () > parameters.base_verbosity, "Triangles::triangulate");
 
-  create_constrained_delaunay (poly, vertexes, db::CplxTrans (dbu));
+  db::CplxTrans trans (dbu);
+
+  clear ();
+
+  std::vector<std::vector<Vertex *> > edge_contours;
+  make_contours (poly, trans, edge_contours);
+
+  unsigned int id = 0;
+  for (auto v = vertexes.begin (); v != vertexes.end (); ++v) {
+    insert_point (trans * *v)->set_is_precious (true, id++);
+  }
+
+  constrain (edge_contours);
   refine (parameters);
 }
 
 void
-Triangles::triangulate (const db::Polygon &poly, const TriangulateParameters &parameters, const db::CplxTrans &trans)
+Triangulation::triangulate (const db::Polygon &poly, const TriangulationParameters &parameters, const db::CplxTrans &trans)
 {
   triangulate (poly, std::vector<db::Point> (), parameters, trans);
 }
 
 void
-Triangles::triangulate (const db::Polygon &poly, const std::vector<db::Point> &vertexes, const TriangulateParameters &parameters, const db::CplxTrans &trans)
+Triangulation::triangulate (const db::Polygon &poly, const std::vector<db::Point> &vertexes, const TriangulationParameters &parameters, const db::CplxTrans &trans)
 {
   tl::SelfTimer timer (tl::verbosity () > parameters.base_verbosity, "Triangles::triangulate");
 
-  create_constrained_delaunay (poly, vertexes, trans);
+  clear ();
+
+  std::vector<std::vector<Vertex *> > edge_contours;
+  make_contours (poly, trans, edge_contours);
+
+  unsigned int id = 0;
+  for (auto v = vertexes.begin (); v != vertexes.end (); ++v) {
+    insert_point (trans * *v)->set_is_precious (true, id++);
+  }
+
+  constrain (edge_contours);
   refine (parameters);
 }
 
 void
-Triangles::triangulate (const db::DPolygon &poly, const TriangulateParameters &parameters, const DCplxTrans &trans)
+Triangulation::triangulate (const db::DPolygon &poly, const TriangulationParameters &parameters, const DCplxTrans &trans)
 {
   triangulate (poly, std::vector<db::DPoint> (), parameters, trans);
 }
 
 void
-Triangles::triangulate (const db::DPolygon &poly, const std::vector<db::DPoint> &vertexes, const TriangulateParameters &parameters, const DCplxTrans &trans)
+Triangulation::triangulate (const db::DPolygon &poly, const std::vector<db::DPoint> &vertexes, const TriangulationParameters &parameters, const DCplxTrans &trans)
 {
   tl::SelfTimer timer (tl::verbosity () > parameters.base_verbosity, "Triangles::triangulate");
 
-  create_constrained_delaunay (poly, vertexes, trans);
+  clear ();
+
+  std::vector<std::vector<Vertex *> > edge_contours;
+  make_contours (poly, trans, edge_contours);
+
+  unsigned int id = 0;
+  for (auto v = vertexes.begin (); v != vertexes.end (); ++v) {
+    insert_point (trans * *v)->set_is_precious (true, id++);
+  }
+
+  constrain (edge_contours);
   refine (parameters);
 }
 
 void
-Triangles::refine (const TriangulateParameters &parameters)
+Triangulation::refine (const TriangulationParameters &parameters)
 {
   if (parameters.min_b < db::epsilon && parameters.max_area < db::epsilon && parameters.max_area_border < db::epsilon) {
 
     //  no refinement requested - we're done.
-    remove_outside_triangles ();
+    if (parameters.remove_outside_triangles) {
+      remove_outside_triangles ();
+    }
     return;
 
   }
 
   unsigned int nloop = 0;
-  std::list<tl::weak_ptr<db::Triangle> > new_triangles;
-  for (auto t = mp_triangles.begin (); t != mp_triangles.end (); ++t) {
+  std::list<tl::weak_ptr<Polygon> > new_triangles;
+  for (auto t = mp_graph->polygons ().begin (); t != mp_graph->polygons ().end (); ++t) {
     new_triangles.push_back (t.operator-> ());
   }
 
@@ -1629,7 +1592,7 @@ Triangles::refine (const TriangulateParameters &parameters)
       tl::info << "Iteration " << nloop << " ..";
     }
 
-    std::list<tl::weak_ptr<db::Triangle> > to_consider;
+    std::list<tl::weak_ptr<Polygon> > to_consider;
     for (auto t = new_triangles.begin (); t != new_triangles.end (); ++t) {
       if (t->get () && ! (*t)->is_outside () && is_invalid (t->get (), parameters)) {
         to_consider.push_back (*t);
@@ -1686,16 +1649,16 @@ Triangles::refine (const TriangulateParameters &parameters)
 
       } else {
 
-        db::Vertex *vstart = 0;
+        Vertex *vstart = 0;
         for (unsigned int i = 0; i < 3; ++i) {
-          db::TriangleEdge *edge = (*t)->edge (i);
+          Edge *edge = (*t)->edge (i);
           vstart = (*t)->opposite (edge);
           if (edge->side_of (*vstart) * edge->side_of (center) < 0) {
             break;
           }
         }
 
-        db::TriangleEdge *edge = find_closest_edge (center, vstart, true /*inside only*/);
+        Edge *edge = find_closest_edge (center, vstart, true /*inside only*/);
         tl_assert (edge != 0);
 
         if (! edge->is_segment () || edge->side_of (*vstart) * edge->side_of (center) >= 0) {
@@ -1715,10 +1678,10 @@ Triangles::refine (const TriangulateParameters &parameters)
             if (tl::verbosity () >= parameters.base_verbosity + 20) {
               tl::info << "Split edge " << edge->to_string (true) << " at " << pnew.to_string ();
             }
-            db::Vertex *vnew = insert_point (pnew, &new_triangles);
+            Vertex *vnew = insert_point (pnew, &new_triangles);
             auto vertexes_in_diametral_circle = find_points_around (vnew, sr);
 
-            std::vector<db::Vertex *> to_delete;
+            std::vector<Vertex *> to_delete;
             for (auto v = vertexes_in_diametral_circle.begin (); v != vertexes_in_diametral_circle.end (); ++v) {
               bool has_segment = false;
               for (auto e = (*v)->begin_edges (); e != (*v)->end_edges () && ! has_segment; ++e) {
@@ -1752,7 +1715,7 @@ Triangles::refine (const TriangulateParameters &parameters)
 
   if (parameters.mark_triangles) {
 
-    for (auto t = begin (); t != end (); ++t) {
+    for (auto t = mp_graph->begin (); t != mp_graph->end (); ++t) {
 
       size_t id = 0;
 
@@ -1772,13 +1735,17 @@ Triangles::refine (const TriangulateParameters &parameters)
 
       }
 
-      (const_cast<db::Triangle *> (t.operator->()))->set_id (id);
+      (const_cast<Polygon *> (t.operator->()))->set_id (id);
 
     }
 
   }
 
-  remove_outside_triangles ();
+  if (parameters.remove_outside_triangles) {
+    remove_outside_triangles ();
+  }
 }
 
-}
+}  //  namespace plc
+
+}  //  namespace db

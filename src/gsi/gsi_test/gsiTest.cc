@@ -218,7 +218,7 @@ A::ia_cref_to_qs (const std::vector<int> &ia)
 {
   QString s;
   for (std::vector<int>::const_iterator i = ia.begin (); i != ia.end (); ++i) {
-    s.push_back (char (*i));
+    s.push_back (QChar (*i));
   }
   return s;
 }
@@ -229,7 +229,7 @@ A::ia_cref_to_qs_ref (const std::vector<int> &ia)
   static QString s;
   s.clear ();
   for (std::vector<int>::const_iterator i = ia.begin (); i != ia.end (); ++i) {
-    s.push_back (char (*i));
+    s.push_back (QChar (*i));
   }
   return s;
 }
@@ -243,7 +243,7 @@ A::ql1s_cref_to_ia (const QLatin1String &ql1s)
   const char *cp = ql1s.data ();
   size_t n = ql1s.size ();
   for (size_t i = 0; i < n; ++i) {
-    ia.push_back (*cp++);
+    ia.push_back ((unsigned char) *cp++);
   }
   return ia;
 }
@@ -1270,7 +1270,15 @@ static gsi::Class<A> decl_a ("", "A",
   gsi::method ("to_s", &A::to_s) +
   gsi::iterator ("a6", &A::a6b, &A::a6e) +
   gsi::iterator ("a7", &A::a7b, &A::a7e) +
-  gsi::iterator ("a8", &A::a8b, &A::a8e)
+  gsi::iterator ("a8", &A::a8b, &A::a8e) +
+#if defined(HAVE_QT)
+  gsi::method ("ft_qba", &A::ft_qba) +
+  gsi::method ("ft_qs", &A::ft_qs) +
+#endif
+  gsi::method ("ft_str", &A::ft_str) +
+  gsi::method ("ft_cv", &A::ft_cv) +
+  gsi::method ("ft_cptr", &A::ft_cptr) +
+  gsi::method ("ft_var", &A::ft_var)
 );
 
 static gsi::Class<A_NC> decl_a_nc (decl_a, "", "A_NC");

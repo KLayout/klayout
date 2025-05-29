@@ -1033,7 +1033,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "'lmap' can also be left nil, in which case, a layer mapping will be provided based on the layer info attributes of "
     "the layers (see \\layer_info).\n"
     "\n"
-    "'cmap' specifies the cell mapping. Use \\create_cell_mapping or \\const_create_cell_mapping to "
+    "'cmap' specifies the cell mapping. Use \\cell_mapping_into or \\const_cell_mapping_into to "
     "define the target cells in the target layout and to derive a cell mapping.\n"
     "\n"
     "The method has three net annotation modes:\n"

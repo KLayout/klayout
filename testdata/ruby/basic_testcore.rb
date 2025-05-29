@@ -2958,6 +2958,9 @@ class Basic_TestClass < TestBase
 
       qba = RBA::A::ia_cref_to_qba([ 16, 42, 0, 8 ])
       assert_equal(qba.inspect, "\"\\x10*\\x00\\b\"")
+      # full cycle must preserve encoding, also for var
+      assert_equal(RBA::A::ft_qba(qba).inspect, "\"\\x10*\\x00\\b\"")
+      assert_equal(RBA::A::ft_var(qba).inspect, "\"\\x10*\\x00\\b\"")
 
       assert_equal(RBA::A::qba_to_ia(qba), [ 16, 42, 0, 8 ])
       assert_equal(RBA::A::qba_cref_to_ia(qba), [ 16, 42, 0, 8 ])
@@ -3016,23 +3019,33 @@ class Basic_TestClass < TestBase
 
     if RBA::A.respond_to?(:ia_cref_to_qs)
 
-      qs = RBA::A::ia_cref_to_qs([ 16, 42, 0, 8 ])
-      assert_equal(qs.inspect, "\"\\x10*\\x00\\b\"")
+      qs = RBA::A::ia_cref_to_qs([ 16, 42, 0, 8, 0x03a9 ])
+      assert_equal(qs.encoding.name, "UTF-8")
+      assert_equal(qs, "\u0010*\u0000\b\u03a9")
+      # full cycle must preserve encoding, also for var
+      assert_equal(RBA::A::ft_qs(qs).encoding.name, "UTF-8")
+      assert_equal(RBA::A::ft_qs(qs), "\u0010*\u0000\b\u03a9")
+      assert_equal(RBA::A::ft_var(qs).encoding.name, "UTF-8")
+      assert_equal(RBA::A::ft_var(qs), "\u0010*\u0000\b\u03a9")
 
-      assert_equal(RBA::A::qs_to_ia(qs), [ 16, 42, 0, 8 ])
-      assert_equal(RBA::A::qs_cref_to_ia(qs), [ 16, 42, 0, 8 ])
-      assert_equal(RBA::A::qs_cptr_to_ia(qs), [ 16, 42, 0, 8 ])
-      assert_equal(RBA::A::qs_ref_to_ia(qs), [ 16, 42, 0, 8 ])
-      assert_equal(RBA::A::qs_ptr_to_ia(qs), [ 16, 42, 0, 8 ])
+      assert_equal(RBA::A::qs_to_ia(qs), [ 16, 42, 0, 8, 0x03a9 ])
+      assert_equal(RBA::A::qs_cref_to_ia(qs), [ 16, 42, 0, 8, 0x03a9 ])
+      assert_equal(RBA::A::qs_cptr_to_ia(qs), [ 16, 42, 0, 8, 0x03a9 ])
+      assert_equal(RBA::A::qs_ref_to_ia(qs), [ 16, 42, 0, 8, 0x03a9 ])
+      assert_equal(RBA::A::qs_ptr_to_ia(qs), [ 16, 42, 0, 8, 0x03a9 ])
 
-      qs = RBA::A::ia_cref_to_qs_cref([ 17, 42, 0, 8 ])
-      assert_equal(qs.inspect, "\"\\x11*\\x00\\b\"")
-      qs = RBA::A::ia_cref_to_qs_ref([ 18, 42, 0, 8 ])
-      assert_equal(qs.inspect, "\"\\x12*\\x00\\b\"")
-      qs = RBA::A::ia_cref_to_qs_cptr([ 19, 42, 0, 8 ])
-      assert_equal(qs.inspect, "\"\\x13*\\x00\\b\"")
-      qs = RBA::A::ia_cref_to_qs_ptr([ 20, 42, 0, 8 ])
-      assert_equal(qs.inspect, "\"\\x14*\\x00\\b\"")
+      qs = RBA::A::ia_cref_to_qs_cref([ 17, 42, 0, 8, 0x03a9 ])
+      assert_equal(qs.encoding.name, "UTF-8")
+      assert_equal(qs, "\u0011*\u0000\b\u03a9")
+      qs = RBA::A::ia_cref_to_qs_ref([ 18, 42, 0, 8, 0x03a9 ])
+      assert_equal(qs.encoding.name, "UTF-8")
+      assert_equal(qs, "\u0012*\u0000\b\u03a9")
+      qs = RBA::A::ia_cref_to_qs_cptr([ 19, 42, 0, 8, 0x03a9 ])
+      assert_equal(qs.encoding.name, "UTF-8")
+      assert_equal(qs, "\u0013*\u0000\b\u03a9")
+      qs = RBA::A::ia_cref_to_qs_ptr([ 20, 42, 0, 8, 0x03a9 ])
+      assert_equal(qs.encoding.name, "UTF-8")
+      assert_equal(qs, "\u0014*\u0000\b\u03a9")
 
       assert_equal(RBA::A::qs_to_ia("\x00\x01\x02"), [ 0, 1, 2 ])
 
@@ -3046,23 +3059,28 @@ class Basic_TestClass < TestBase
 
     if RBA::A.respond_to?(:ia_cref_to_ql1s)
 
-      ql1s = RBA::A::ia_cref_to_ql1s([ 16, 42, 0, 8 ])
-      assert_equal(ql1s.inspect, "\"\\x10*\\x00\\b\"")
+      ql1s = RBA::A::ia_cref_to_ql1s([ 16, 42, 0, 8, 0x03a9 ])
+      assert_equal(ql1s.encoding.name, "UTF-8")
+      assert_equal(ql1s, "\u0010*\u0000\b\u00a9")
 
-      assert_equal(RBA::A::ql1s_to_ia(ql1s), [ 16, 42, 0, 8 ])
-      assert_equal(RBA::A::ql1s_cref_to_ia(ql1s), [ 16, 42, 0, 8 ])
-      assert_equal(RBA::A::ql1s_cptr_to_ia(ql1s), [ 16, 42, 0, 8 ])
-      assert_equal(RBA::A::ql1s_ref_to_ia(ql1s), [ 16, 42, 0, 8 ])
-      assert_equal(RBA::A::ql1s_ptr_to_ia(ql1s), [ 16, 42, 0, 8 ])
+      assert_equal(RBA::A::ql1s_to_ia(ql1s), [ 16, 42, 0, 8, 0xa9 ])
+      assert_equal(RBA::A::ql1s_cref_to_ia(ql1s), [ 16, 42, 0, 8, 0xa9 ])
+      assert_equal(RBA::A::ql1s_cptr_to_ia(ql1s), [ 16, 42, 0, 8, 0xa9 ])
+      assert_equal(RBA::A::ql1s_ref_to_ia(ql1s), [ 16, 42, 0, 8, 0xa9 ])
+      assert_equal(RBA::A::ql1s_ptr_to_ia(ql1s), [ 16, 42, 0, 8, 0xa9 ])
 
-      ql1s = RBA::A::ia_cref_to_ql1s_cref([ 17, 42, 0, 8 ])
-      assert_equal(ql1s.inspect, "\"\\x11*\\x00\\b\"")
-      ql1s = RBA::A::ia_cref_to_ql1s_ref([ 18, 42, 0, 8 ])
-      assert_equal(ql1s.inspect, "\"\\x12*\\x00\\b\"")
-      ql1s = RBA::A::ia_cref_to_ql1s_cptr([ 19, 42, 0, 8 ])
-      assert_equal(ql1s.inspect, "\"\\x13*\\x00\\b\"")
-      ql1s = RBA::A::ia_cref_to_ql1s_ptr([ 20, 42, 0, 8 ])
-      assert_equal(ql1s.inspect, "\"\\x14*\\x00\\b\"")
+      ql1s = RBA::A::ia_cref_to_ql1s_cref([ 17, 42, 0, 8, 0xa9 ])
+      assert_equal(ql1s.encoding.name, "UTF-8")
+      assert_equal(ql1s, "\u0011*\u0000\b\u00a9")
+      ql1s = RBA::A::ia_cref_to_ql1s_ref([ 18, 42, 0, 8, 0xa9 ])
+      assert_equal(ql1s.encoding.name, "UTF-8")
+      assert_equal(ql1s, "\u0012*\u0000\b\u00a9")
+      ql1s = RBA::A::ia_cref_to_ql1s_cptr([ 19, 42, 0, 8, 0xa9 ])
+      assert_equal(ql1s.encoding.name, "UTF-8")
+      assert_equal(ql1s, "\u0013*\u0000\b\u00a9")
+      ql1s = RBA::A::ia_cref_to_ql1s_ptr([ 20, 42, 0, 8, 0xa9 ])
+      assert_equal(ql1s.encoding.name, "UTF-8")
+      assert_equal(ql1s, "\u0014*\u0000\b\u00a9")
 
       assert_equal(RBA::A::ql1s_to_ia("\x00\x01\x02"), [ 0, 1, 2 ])
 
@@ -3077,7 +3095,7 @@ class Basic_TestClass < TestBase
     if RBA::A.respond_to?(:ia_cref_to_qsv)
 
       qsv = RBA::A::ia_cref_to_qsv([ 16, 42, 0, 8 ])
-      assert_equal(qsv.inspect, "\"\\x10*\\x00\\b\"")
+      assert_equal(qsv.inspect, "\"\\u0010*\\u0000\\b\"")
 
       assert_equal(RBA::A::qsv_to_ia(qsv), [ 16, 42, 0, 8 ])
       assert_equal(RBA::A::qsv_cref_to_ia(qsv), [ 16, 42, 0, 8 ])
@@ -3086,13 +3104,13 @@ class Basic_TestClass < TestBase
       assert_equal(RBA::A::qsv_ptr_to_ia(qsv), [ 16, 42, 0, 8 ])
 
       qsv = RBA::A::ia_cref_to_qsv_cref([ 17, 42, 0, 8 ])
-      assert_equal(qsv.inspect, "\"\\x11*\\x00\\b\"")
+      assert_equal(qsv.inspect, "\"\\u0011*\\u0000\\b\"")
       qsv = RBA::A::ia_cref_to_qsv_ref([ 18, 42, 0, 8 ])
-      assert_equal(qsv.inspect, "\"\\x12*\\x00\\b\"")
+      assert_equal(qsv.inspect, "\"\\u0012*\\u0000\\b\"")
       qsv = RBA::A::ia_cref_to_qsv_cptr([ 19, 42, 0, 8 ])
-      assert_equal(qsv.inspect, "\"\\x13*\\x00\\b\"")
+      assert_equal(qsv.inspect, "\"\\u0013*\\u0000\\b\"")
       qsv = RBA::A::ia_cref_to_qsv_ptr([ 20, 42, 0, 8 ])
-      assert_equal(qsv.inspect, "\"\\x14*\\x00\\b\"")
+      assert_equal(qsv.inspect, "\"\\u0014*\\u0000\\b\"")
 
       assert_equal(RBA::A::qsv_to_ia("\x00\x01\x02"), [ 0, 1, 2 ])
 
@@ -3100,18 +3118,39 @@ class Basic_TestClass < TestBase
 
   end
 
+  def test_utf8Strings
+
+    # UTF8 strings (non-Qt)
+    s = "\u0010*\u0000\b\u03a9"
+    assert_equal(s.encoding.name, "UTF-8")
+
+    # full cycle must preserve encoding, also for var
+    assert_equal(RBA::A::ft_str(s).encoding.name, "UTF-8")
+    assert_equal(RBA::A::ft_str(s), "\u0010*\u0000\b\u03a9")
+    assert_equal(RBA::A::ft_var(s).encoding.name, "UTF-8")
+    assert_equal(RBA::A::ft_var(s), "\u0010*\u0000\b\u03a9")
+
+    # NUL character terminates in const char * mode:
+    assert_equal(RBA::A::ft_cptr(s).encoding.name, "UTF-8")
+    assert_equal(RBA::A::ft_cptr(s), "\u0010*")
+
+  end
+
   def test_binaryStrings
 
     # binary strings (non-Qt)
 
-    ba = RBA::A::ia_cref_to_ba([ 16, 42, 1, 8 ])
-    assert_equal(ba.inspect, "\"\\x10*\\x01\\b\"")
+    ba = RBA::A::ia_cref_to_ba([ 16, 42, 0, 8 ])
+    assert_equal(ba.inspect, "\"\\x10*\\x00\\b\"")
+    # full cycle must preserve encoding, also for var
+    assert_equal(RBA::A::ft_cv(ba).inspect, "\"\\x10*\\x00\\b\"")
+    assert_equal(RBA::A::ft_var(ba).inspect, "\"\\x10*\\x00\\b\"")
 
-    assert_equal(RBA::A::ba_to_ia(ba), [ 16, 42, 1, 8 ])
-    assert_equal(RBA::A::ba_cref_to_ia(ba), [ 16, 42, 1, 8 ])
-    assert_equal(RBA::A::ba_cptr_to_ia(ba), [ 16, 42, 1, 8 ])
-    assert_equal(RBA::A::ba_ref_to_ia(ba), [ 16, 42, 1, 8 ])
-    assert_equal(RBA::A::ba_ptr_to_ia(ba), [ 16, 42, 1, 8 ])
+    assert_equal(RBA::A::ba_to_ia(ba), [ 16, 42, 0, 8 ])
+    assert_equal(RBA::A::ba_cref_to_ia(ba), [ 16, 42, 0, 8 ])
+    assert_equal(RBA::A::ba_cptr_to_ia(ba), [ 16, 42, 0, 8 ])
+    assert_equal(RBA::A::ba_ref_to_ia(ba), [ 16, 42, 0, 8 ])
+    assert_equal(RBA::A::ba_ptr_to_ia(ba), [ 16, 42, 0, 8 ])
 
     ba = RBA::A::ia_cref_to_ba_cref([ 17, 42, 0, 8 ])
     assert_equal(ba.inspect, "\"\\x11*\\x00\\b\"")

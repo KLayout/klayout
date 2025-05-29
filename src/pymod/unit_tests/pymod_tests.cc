@@ -84,6 +84,7 @@ PYMODTEST (bridge, "bridge.py")
 
 PYMODTEST (import_tl, "import_tl.py")
 PYMODTEST (import_db, "import_db.py")
+PYMODTEST (import_pex, "import_pex.py")
 PYMODTEST (klayout_db_tests, "klayout_db_tests.py")
 PYMODTEST (import_rdb, "import_rdb.py")
 PYMODTEST (import_lay, "import_lay.py")

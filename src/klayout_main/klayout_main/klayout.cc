@@ -38,8 +38,9 @@
 
 #include "version.h"
 
-//  required to force linking of the "ext" and "lib" module
+//  required to force linking of the "lib" and other modules
 #include "libForceLink.h"
+#include "pexForceLink.h"
 #include "antForceLink.h"
 #include "imgForceLink.h"
 #include "docForceLink.h"

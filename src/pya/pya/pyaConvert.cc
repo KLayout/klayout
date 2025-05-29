@@ -502,7 +502,7 @@ PyObject *c2python_func<const tl::Variant &>::operator() (const tl::Variant &c)
   } else if (c.is_bool ()) {
     return c2python (c.to_bool ());
   } else if (c.is_a_string ()) {
-    return c2python (c.to_string ());
+    return c2python (c.to_stdstring ());
   } else if (c.is_a_bytearray ()) {
     return c2python (c.to_bytearray ());
   } else if (c.is_long ()) {

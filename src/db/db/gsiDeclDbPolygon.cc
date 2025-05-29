@@ -28,45 +28,77 @@
 #include "dbPolygonTools.h"
 #include "dbPolygonGenerators.h"
 #include "dbHash.h"
-#include "dbTriangles.h"
+#include "dbPLCTriangulation.h"
+#include "dbPLCConvexDecomposition.h"
 
 namespace gsi
 {
 
+const std::string hm_docstring =
+  "The Hertel-Mehlhorn decomposition starts with a Delaunay triangulation of the polygons and recombines the "
+  "triangles into convex polygons.\n"
+  "\n"
+  "The decomposition is controlled by two parameters: 'with_segments' and 'split_edges'.\n"
+  "\n"
+  "If 'with_segments' is true (the default), new segments are introduced perpendicular to the edges forming "
+  "a concave corner. If false, only diagonals (edges connecting original vertexes) are used.\n"
+  "\n"
+  "If 'split_edges' is true, the algorithm is allowed to create collinear edges in the output. In this case, "
+  "the resulting polygons may contain edges that are split into collinear partial edges. Such edges usually recombine "
+  "into longer edges when processing the polygon further. When such a recombination happens, the edges no "
+  "longer correspond to original edges or diagonals. When 'split_edges' is false (the default), the resulting "
+  "polygons will not contain collinear edges, but the decomposition will be constrained to fewer cut lines."
+  "\n"
+  "'max_area' and 'min_b' are the corresponding parameters used for the triangulation (see \\delaunay).\n"
+;
+
+const std::string delaunay_docstring =
+  "Refinement is implemented by Chew's second algorithm. A maximum area can be given. Triangles "
+  "larger than this area will be split. In addition 'skinny' triangles will be resolved where "
+  "possible. 'skinny' is defined in terms of shortest edge to circumcircle radius ratio (b). "
+  "A minimum number for b can be given. A value of 1.0 corresponds to a minimum angle of 30 degree "
+  "and is usually a good choice. The algorithm is stable up to roughly 1.2 which corresponds to "
+  "a minimum angle of abouth 37 degree.\n"
+  "\n"
+  "The minimum angle of the resulting triangles relates to the 'b' parameter as: @t min_angle = arcsin(B/2) @/t.\n"
+  "\n"
+  "Picking a value of 0.0 for max_area and min_b will "
+  "make the implementation skip the refinement step. In that case, the results are identical to "
+  "the standard constrained Delaunay triangulation.\n"
+;
+
+const std::string dbu_docstring =
+  "The 'dbu' parameter a numerical scaling parameter. It should be choosen in a way that the polygon dimensions "
+  "are \"in the order of 1\" (very roughly) after multiplication with the dbu parameter. A value of 0.001 is suitable "
+  "for polygons with typical dimensions in the order to 1000 DBU. Usually the default value is good enough.\n"
+;
+
 template <class T>
-static db::Region region_from_triangles (const db::Triangles &tri, const T &trans)
+static db::Region region_from_graph (const db::plc::Graph &plc, const T &trans)
 {
   db::Region result;
+  result.set_merged_semantics (false);
 
-  db::Point pts [3];
-
-  for (auto t = tri.begin (); t != tri.end (); ++t) {
-    for (int i = 0; i < 3; ++i) {
-      pts [i] = trans * *t->vertex (i);
-    }
-    db::SimplePolygon poly;
-    poly.assign_hull (pts + 0, pts + 3);
-    result.insert (poly);
+  for (auto t = plc.begin (); t != plc.end (); ++t) {
+    db::DPolygon dp = t->polygon ();
+    db::SimplePolygon sp;
+    sp.assign_hull (dp.hull ().begin (), dp.hull ().end (), trans, false);
+    result.insert (sp);
   }
 
   return result;
 }
 
 template <class P, class T>
-static std::vector<P> polygons_from_triangles (const db::Triangles &tri, const T &trans)
+static std::vector<P> polygons_from_graph (const db::plc::Graph &plc, const T &trans)
 {
   std::vector<P> result;
-  result.reserve (tri.num_triangles ());
+  result.reserve (plc.num_polygons ());
 
-  typename P::point_type pts [3];
-
-  for (auto t = tri.begin (); t != tri.end (); ++t) {
-    for (int i = 0; i < 3; ++i) {
-      pts [i] = trans * *t->vertex (i);
-    }
-    P poly;
-    poly.assign_hull (pts + 0, pts + 3);
-    result.push_back (poly);
+  for (auto t = plc.begin (); t != plc.end (); ++t) {
+    db::DPolygon dp = t->polygon ();
+    result.push_back (P ());
+    result.back ().assign_hull (dp.hull ().begin (), dp.hull ().end (), trans, false);
   }
 
   return result;
@@ -87,63 +119,103 @@ static db::polygon<C> to_polygon (const db::polygon<C> &p)
 }
 
 template <class P>
-static db::Region triangulate_ipolygon (const P *p, double max_area = 0.0, double min_b = 0.0, double dbu = 0.001)
+static db::Region hm_decompose_ipolygon (const P *p, bool with_segments, bool split_edges, double max_area, double min_b, double dbu)
 {
-  db::Triangles tris;
-  db::Triangles::TriangulateParameters param;
-  param.min_b = min_b;
-  param.max_area = max_area * dbu * dbu;
+  db::plc::Graph plc;
+  db::plc::ConvexDecomposition decomp (&plc);
+  db::plc::ConvexDecompositionParameters param;
+  param.with_segments = with_segments;
+  param.split_edges = split_edges;
+  param.tri_param.max_area = max_area;
+  param.tri_param.min_b = min_b;
 
   db::CplxTrans trans = db::CplxTrans (dbu) * db::ICplxTrans (db::Trans (db::Point () - p->box ().center ()));
 
-  tris.triangulate (to_polygon (*p), param, trans);
+  decomp.decompose (to_polygon (*p), param, trans);
 
-  return region_from_triangles (tris, trans.inverted ());
+  return region_from_graph (plc, trans.inverted ());
 }
 
 template <class P>
-static db::Region triangulate_ipolygon_v (const P *p, const std::vector<db::Point> &vertexes, double max_area = 0.0, double min_b = 0.0, double dbu = 0.001)
+static std::vector<P> hm_decompose_dpolygon (const P *p, bool with_segments, bool split_edges, double max_area, double min_b)
 {
-  db::Triangles tris;
-  db::Triangles::TriangulateParameters param;
+  db::plc::Graph plc;
+  db::plc::ConvexDecomposition decomp (&plc);
+  db::plc::ConvexDecompositionParameters param;
+  param.with_segments = with_segments;
+  param.split_edges = split_edges;
+  param.tri_param.max_area = max_area;
+  param.tri_param.min_b = min_b;
+
+  db::DCplxTrans trans = db::DCplxTrans (db::DTrans (db::DPoint () - p->box ().center ()));
+
+  decomp.decompose (to_polygon (*p), param, trans);
+
+  return polygons_from_graph<P, db::DCplxTrans> (plc, trans.inverted ());
+}
+
+template <class P>
+static db::Region triangulate_ipolygon (const P *p, double max_area, double min_b, double dbu)
+{
+  db::plc::Graph tris;
+  db::plc::Triangulation triangulation (&tris);
+  db::plc::TriangulationParameters param;
   param.min_b = min_b;
   param.max_area = max_area * dbu * dbu;
 
   db::CplxTrans trans = db::CplxTrans (dbu) * db::ICplxTrans (db::Trans (db::Point () - p->box ().center ()));
 
-  tris.triangulate (to_polygon (*p), vertexes, param, trans);
+  triangulation.triangulate (to_polygon (*p), param, trans);
 
-  return region_from_triangles (tris, trans.inverted ());
+  return region_from_graph (tris, trans.inverted ());
+}
+
+template <class P>
+static db::Region triangulate_ipolygon_v (const P *p, const std::vector<db::Point> &vertexes, double max_area, double min_b, double dbu)
+{
+  db::plc::Graph tris;
+  db::plc::Triangulation triangulation (&tris);
+  db::plc::TriangulationParameters param;
+  param.min_b = min_b;
+  param.max_area = max_area * dbu * dbu;
+
+  db::CplxTrans trans = db::CplxTrans (dbu) * db::ICplxTrans (db::Trans (db::Point () - p->box ().center ()));
+
+  triangulation.triangulate (to_polygon (*p), vertexes, param, trans);
+
+  return region_from_graph (tris, trans.inverted ());
 }
 
 template <class P>
 static std::vector<P> triangulate_dpolygon (const P *p, double max_area = 0.0, double min_b = 0.0)
 {
-  db::Triangles tris;
-  db::Triangles::TriangulateParameters param;
+  db::plc::Graph tris;
+  db::plc::Triangulation triangulation (&tris);
+  db::plc::TriangulationParameters param;
   param.min_b = min_b;
   param.max_area = max_area;
 
   db::DCplxTrans trans = db::DCplxTrans (db::DTrans (db::DPoint () - p->box ().center ()));
 
-  tris.triangulate (to_polygon (*p), param, trans);
+  triangulation.triangulate (to_polygon (*p), param, trans);
 
-  return polygons_from_triangles<P, db::DCplxTrans> (tris, trans.inverted ());
+  return polygons_from_graph<P, db::DCplxTrans> (tris, trans.inverted ());
 }
 
 template <class P>
 static std::vector<P> triangulate_dpolygon_v (const P *p, const std::vector<db::DPoint> &vertexes, double max_area = 0.0, double min_b = 0.0)
 {
-  db::Triangles tris;
-  db::Triangles::TriangulateParameters param;
+  db::plc::Graph tris;
+  db::plc::Triangulation triangulation (&tris);
+  db::plc::TriangulationParameters param;
   param.min_b = min_b;
   param.max_area = max_area;
 
   db::DCplxTrans trans = db::DCplxTrans (db::DTrans (db::DPoint () - p->box ().center ()));
 
-  tris.triangulate (to_polygon (*p), vertexes, param, trans);
+  triangulation.triangulate (to_polygon (*p), vertexes, param, trans);
 
-  return polygons_from_triangles<P, db::DCplxTrans> (tris, trans.inverted ());
+  return polygons_from_graph<P, db::DCplxTrans> (tris, trans.inverted ());
 }
 
 template <class C>
@@ -880,36 +952,35 @@ Class<db::SimplePolygon> decl_SimplePolygon ("db", "SimplePolygon",
     "\n"
     "This method has been introduced in version 0.18.\n"
   ) +
+  method_ext ("hm_decomposition", &hm_decompose_ipolygon<db::SimplePolygon>,
+              gsi::arg ("with_segments", true), gsi::arg ("split_edges", false),
+              gsi::arg ("max_area", 0.0), gsi::arg ("min_b", 0.0),
+              gsi::arg ("dbu", 0.001),
+    "@brief Performs a Hertel-Mehlhorn convex decomposition.\n"
+    "\n"
+    "@return A \\Region holding the polygons of the decomposition.\n"
+    "The resulting region is in 'no merged semantics' mode, "
+    "to avoid re-merging of the polygons during following operations.\n"
+    "\n" + hm_docstring + "\n" + dbu_docstring + "\n"
+    "This method has been introduced in version 0.30.1."
+  ) +
   method_ext ("delaunay", &triangulate_ipolygon<db::SimplePolygon>, gsi::arg ("max_area", 0.0), gsi::arg ("min_b", 0.0), gsi::arg ("dbu", 0.001),
     "@brief Performs a Delaunay triangulation of the polygon.\n"
     "\n"
     "@return A \\Region holding the triangles of the refined, constrained Delaunay triangulation.\n"
-    "\n"
-    "Refinement is implemented by Chew's second algorithm. A maximum area can be given. Triangles "
-    "larger than this area will be split. In addition 'skinny' triangles will be resolved where "
-    "possible. 'skinny' is defined in terms of shortest edge to circumcircle radius ratio (b). "
-    "A minimum number for b can be given. A value of 1.0 corresponds to a minimum angle of 30 degree "
-    "and is usually a good choice. The algorithm is stable up to roughly 1.2 which corresponds to "
-    "a minimum angle of abouth 37 degree.\n"
-    "\n"
-    "The minimum angle of the resulting triangles relates to the 'b' parameter as: @t min_angle = arcsin(B/2) @/t.\n"
-    "\n"
-    "The area value is given in terms of DBU units. Picking a value of 0.0 for area and min b will "
-    "make the implementation skip the refinement step. In that case, the results are identical to "
-    "the standard constrained Delaunay triangulation.\n"
-    "\n"
-    "The 'dbu' parameter a numerical scaling parameter. It should be choosen in a way that the polygon dimensions "
-    "are \"in the order of 1\" (very roughly) after multiplication with the dbu parameter. A value of 0.001 is suitable "
-    "for polygons with typical dimensions in the order to 1000 DBU. Usually the default value is good enough.\n"
-    "\n"
-    "This method has been introduced in version 0.30."
+    "\n" + delaunay_docstring + "\n"
+    "The area value is given in terms of DBU units.\n"
+    "\n" + dbu_docstring + "\n"
+    "This method has been introduced in version 0.30. Since version 0.30.1, the resulting region is in 'no merged semantics' mode, "
+    "to avoid re-merging of the triangles during following operations."
   ) +
   method_ext ("delaunay", &triangulate_ipolygon_v<db::SimplePolygon>, gsi::arg ("vertexes"), gsi::arg ("max_area", 0.0), gsi::arg ("min_b", 0.0), gsi::arg ("dbu", 0.001),
     "@brief Performs a Delaunay triangulation of the polygon.\n"
     "\n"
     "This variant of the triangulation function accepts an array of additional vertexes for the triangulation.\n"
     "\n"
-    "This method has been introduced in version 0.30."
+    "This method has been introduced in version 0.30. Since version 0.30.1, the resulting region is in 'no merged semantics' mode, "
+    "to avoid re-merging of the triangles during following operations."
   ) +
   simple_polygon_defs<db::SimplePolygon>::methods (),
   "@brief A simple polygon class\n"
@@ -1006,24 +1077,20 @@ Class<db::DSimplePolygon> decl_DSimplePolygon ("db", "DSimplePolygon",
     "\n"
     "This method has been introduced in version 0.25.\n"
   ) +
+  method_ext ("hm_decomposition", &hm_decompose_dpolygon<db::DSimplePolygon>,
+              gsi::arg ("with_segments", true), gsi::arg ("split_edges", false),
+              gsi::arg ("max_area", 0.0), gsi::arg ("min_b", 0.0),
+    "@brief Performs a Hertel-Mehlhorn convex decomposition.\n"
+    "\n"
+    "@return An array holding the polygons of the decomposition.\n"
+    "\n" + hm_docstring + "\n"
+    "This method has been introduced in version 0.30.1."
+  ) +
   method_ext ("delaunay", &triangulate_dpolygon<db::DSimplePolygon>, gsi::arg ("max_area", 0.0), gsi::arg ("min_b", 0.0),
     "@brief Performs a Delaunay triangulation of the polygon.\n"
     "\n"
     "@return An array of triangular polygons of the refined, constrained Delaunay triangulation.\n"
-    "\n"
-    "Refinement is implemented by Chew's second algorithm. A maximum area can be given. Triangles "
-    "larger than this area will be split. In addition 'skinny' triangles will be resolved where "
-    "possible. 'skinny' is defined in terms of shortest edge to circumcircle radius ratio (b). "
-    "A minimum number for b can be given. A value of 1.0 corresponds to a minimum angle of 30 degree "
-    "and is usually a good choice. The algorithm is stable up to roughly 1.2 which corresponds to "
-    "a minimum angle of abouth 37 degree.\n"
-    "\n"
-    "The minimum angle of the resulting triangles relates to the 'b' parameter as: @t min_angle = arcsin(B/2) @/t.\n"
-    "\n"
-    "Picking a value of 0.0 for max area and min b will "
-    "make the implementation skip the refinement step. In that case, the results are identical to "
-    "the standard constrained Delaunay triangulation.\n"
-    "\n"
+    "\n" + delaunay_docstring + "\n"
     "This method has been introduced in version 0.30."
   ) +
   method_ext ("delaunay", &triangulate_dpolygon_v<db::DSimplePolygon>, gsi::arg ("vertexes"), gsi::arg ("max_area", 0.0), gsi::arg ("min_b", 0.0),
@@ -2207,36 +2274,36 @@ Class<db::Polygon> decl_Polygon ("db", "Polygon",
     "\n"
     "This method was introduced in version 0.18.\n"
   ) +
+  method_ext ("hm_decomposition", &hm_decompose_ipolygon<db::Polygon>,
+              gsi::arg ("with_segments", true), gsi::arg ("split_edges", false),
+              gsi::arg ("max_area", 0.0), gsi::arg ("min_b", 0.0),
+              gsi::arg ("dbu", 0.001),
+    "@brief Performs a Hertel-Mehlhorn convex decomposition.\n"
+    "\n"
+    "@return A \\Region holding the polygons of the decomposition.\n"
+    "\n"
+    "The resulting region is in 'no merged semantics' mode, "
+    "to avoid re-merging of the polygons during following operations.\n"
+    "\n" + hm_docstring + "\n" + dbu_docstring + "\n"
+    "This method has been introduced in version 0.30.1."
+  ) +
   method_ext ("delaunay", &triangulate_ipolygon<db::Polygon>, gsi::arg ("max_area", 0.0), gsi::arg ("min_b", 0.0), gsi::arg ("dbu", 0.001),
     "@brief Performs a Delaunay triangulation of the polygon.\n"
     "\n"
     "@return A \\Region holding the triangles of the refined, constrained Delaunay triangulation.\n"
-    "\n"
-    "Refinement is implemented by Chew's second algorithm. A maximum area can be given. Triangles "
-    "larger than this area will be split. In addition 'skinny' triangles will be resolved where "
-    "possible. 'skinny' is defined in terms of shortest edge to circumcircle radius ratio (b). "
-    "A minimum number for b can be given. A value of 1.0 corresponds to a minimum angle of 30 degree "
-    "and is usually a good choice. The algorithm is stable up to roughly 1.2 which corresponds to "
-    "a minimum angle of abouth 37 degree.\n"
-    "\n"
-    "The minimum angle of the resulting triangles relates to the 'b' parameter as: @t min_angle = arcsin(B/2) @/t.\n"
-    "\n"
-    "The area value is given in terms of DBU units. Picking a value of 0.0 for area and min b will "
-    "make the implementation skip the refinement step. In that case, the results are identical to "
-    "the standard constrained Delaunay triangulation.\n"
-    "\n"
-    "The 'dbu' parameter a numerical scaling parameter. It should be choosen in a way that the polygon dimensions "
-    "are \"in the order of 1\" (very roughly) after multiplication with the dbu parameter. A value of 0.001 is suitable "
-    "for polygons with typical dimensions in the order to 1000 DBU. Usually the default value is good enough.\n"
-    "\n"
-    "This method has been introduced in version 0.30."
+    "\n" + delaunay_docstring + "\n"
+    "The area value is given in terms of DBU units.\n"
+    "\n" + dbu_docstring + "\n"
+    "This method has been introduced in version 0.30. Since version 0.30.1, the resulting region is in 'no merged semantics' mode, "
+    "to avoid re-merging of the triangles during following operations."
   ) +
   method_ext ("delaunay", &triangulate_ipolygon_v<db::Polygon>, gsi::arg ("vertexes"), gsi::arg ("max_area", 0.0), gsi::arg ("min_b", 0.0), gsi::arg ("dbu", 0.001),
     "@brief Performs a Delaunay triangulation of the polygon.\n"
     "\n"
     "This variant of the triangulation function accepts an array of additional vertexes for the triangulation.\n"
     "\n"
-    "This method has been introduced in version 0.30."
+    "This method has been introduced in version 0.30. Since version 0.30.1, the resulting region is in 'no merged semantics' mode, "
+    "to avoid re-merging of the triangles during following operations."
   ) +
   polygon_defs<db::Polygon>::methods (),
   "@brief A polygon class\n"
@@ -2360,24 +2427,20 @@ Class<db::DPolygon> decl_DPolygon ("db", "DPolygon",
     "\n"
     "This method has been introduced in version 0.25.\n"
   ) +
+  method_ext ("hm_decomposition", &hm_decompose_dpolygon<db::DPolygon>,
+              gsi::arg ("with_segments", true), gsi::arg ("split_edges", false),
+              gsi::arg ("max_area", 0.0), gsi::arg ("min_b", 0.0),
+    "@brief Performs a Hertel-Mehlhorn convex decomposition.\n"
+    "\n"
+    "@return An array holding the polygons of the decomposition.\n"
+    "\n" + hm_docstring + "\n"
+    "This method has been introduced in version 0.30.1."
+  ) +
   method_ext ("delaunay", &triangulate_dpolygon<db::DPolygon>, gsi::arg ("max_area", 0.0), gsi::arg ("min_b", 0.0),
     "@brief Performs a Delaunay triangulation of the polygon.\n"
     "\n"
     "@return An array of triangular polygons of the refined, constrained Delaunay triangulation.\n"
-    "\n"
-    "Refinement is implemented by Chew's second algorithm. A maximum area can be given. Triangles "
-    "larger than this area will be split. In addition 'skinny' triangles will be resolved where "
-    "possible. 'skinny' is defined in terms of shortest edge to circumcircle radius ratio (b). "
-    "A minimum number for b can be given. A value of 1.0 corresponds to a minimum angle of 30 degree "
-    "and is usually a good choice. The algorithm is stable up to roughly 1.2 which corresponds to "
-    "a minimum angle of abouth 37 degree.\n"
-    "\n"
-    "The minimum angle of the resulting triangles relates to the 'b' parameter as: @t min_angle = arcsin(B/2) @/t.\n"
-    "\n"
-    "Picking a value of 0.0 for max area and min b will "
-    "make the implementation skip the refinement step. In that case, the results are identical to "
-    "the standard constrained Delaunay triangulation.\n"
-    "\n"
+    "\n" + delaunay_docstring + "\n"
     "This method has been introduced in version 0.30."
   ) +
   method_ext ("delaunay", &triangulate_dpolygon_v<db::DPolygon>, gsi::arg ("vertexes"), gsi::arg ("max_area", 0.0), gsi::arg ("min_b", 0.0),

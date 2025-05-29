@@ -109,6 +109,20 @@ Class<gsi::PolygonNeighborhoodVisitorImpl> decl_PolygonNeighborhoodVisitorImpl (
   ) +
   gsi::method ("result_type", &PolygonNeighborhoodVisitorImpl::result_type,
     "@brief Gets the result type\n"
+  ) +
+  gsi::method ("variant_type=", &PolygonNeighborhoodVisitorImpl::set_variant_type, gsi::arg ("variant_type"),
+    "@brief Configures the variant type\n"
+    "The variant type configures transformation variant formation. The polygons presented to the visitor are "
+    "normalized to the given variant type. For example, specify \\VariantType#Orientation to force orientation variants "
+    "in the cell tree. Polygons presented to the visitor are normalized to 'as if top' orientation with this variant type.\n"
+    "\n"
+    "This property was introduced in version 0.30.2."
+  ) +
+  gsi::method ("variant_type", &PolygonNeighborhoodVisitorImpl::variant_type,
+    "@brief Gets the variant type\n"
+    "See \\variant_type= for a description of this property.\n"
+    "\n"
+    "This property was introduced in version 0.30.2."
   ),
   "@brief A visitor for the neighborhood of polygons in the input\n"
   "\n"

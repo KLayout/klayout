@@ -453,7 +453,7 @@ class DB_PUBLIC CompoundRegionMultiInputOperationNode
   : public CompoundRegionOperationNode
 {
 public:
-  CompoundRegionMultiInputOperationNode (const std::vector<CompoundRegionOperationNode *> &children);
+  CompoundRegionMultiInputOperationNode (const std::vector<CompoundRegionOperationNode *> &children, bool no_init = false);
   CompoundRegionMultiInputOperationNode ();
   CompoundRegionMultiInputOperationNode (CompoundRegionOperationNode *child);
   CompoundRegionMultiInputOperationNode (CompoundRegionOperationNode *a, CompoundRegionOperationNode *b);
@@ -521,14 +521,16 @@ protected:
   CompoundRegionOperationNode *child (unsigned int index);
   const CompoundRegionOperationNode *child (unsigned int index) const;
 
+  virtual const TransformationReducer *local_vars () const { return 0; }
+
+  void init ();
+
 private:
   tl::shared_collection<CompoundRegionOperationNode> m_children;
   //  maps child#,layer# to layer# of child:
   std::map<std::pair<unsigned int, unsigned int>, unsigned int> m_map_layer_to_child;
   std::vector<db::Region *> m_inputs;
   CompoundTransformationReducer m_vars;
-
-  void init ();
 };
 
 

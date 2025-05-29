@@ -679,8 +679,8 @@ CODE
       if ca.is_a?(String) && (!cb || cb == "*")
 
         n2c = {}
-        nl_a.circuits_by_name(ca).each { |c| name = cs ? c.name.upcase : c.name; n2c[name] ||= [ nil, nil ]; n2c[name][0] = c }
-        nl_b.circuits_by_name(ca).each { |c| name = cs ? c.name.upcase : c.name; n2c[name] ||= [ nil, nil ]; n2c[name][1] = c }
+        nl_a.circuits_by_name(ca, cs).each { |c| name = cs ? c.name.upcase : c.name; n2c[name] ||= [ nil, nil ]; n2c[name][0] = c }
+        nl_b.circuits_by_name(ca, cs).each { |c| name = cs ? c.name.upcase : c.name; n2c[name] ||= [ nil, nil ]; n2c[name][1] = c }
 
         circuits = []
         n2c.keys.sort.each do |n|
@@ -706,8 +706,8 @@ CODE
         if a.is_a?(String) && (!b || b == "*")
 
           n2n = {}
-          circuit_a.nets_by_name(a).each { |n| name = cs ? n.name.upcase : n.name; n2n[name] ||= [ nil, nil ]; n2n[name][0] = n }
-          circuit_b.nets_by_name(a).each { |n| name = cs ? n.name.upcase : n.name; n2n[name] ||= [ nil, nil ]; n2n[name][1] = n }
+          circuit_a.nets_by_name(a, cs).each { |n| name = cs ? n.name.upcase : n.name; n2n[name] ||= [ nil, nil ]; n2n[name][0] = n }
+          circuit_b.nets_by_name(a, cs).each { |n| name = cs ? n.name.upcase : n.name; n2n[name] ||= [ nil, nil ]; n2n[name][1] = n }
 
           nets = []
           n2n.keys.sort.each do |n|

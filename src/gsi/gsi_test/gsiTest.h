@@ -419,6 +419,17 @@ struct A
   static int sp_i_get ();
   static void sp_i_set (int v);
 
+  //  feed-through values for full cycle tests
+  //  (mainly for string encoding and binary strings)
+  static std::string ft_str (const std::string &v) { return v; }
+  static std::vector<char> ft_cv (const std::vector<char> &v) { return v; }
+  static const char *ft_cptr (const char *v) { return v; }
+  static tl::Variant ft_var (const tl::Variant &v) { return v; }
+#if defined(HAVE_QT)
+  static QString ft_qs (const QString &v) { return v; }
+  static QByteArray ft_qba (const QByteArray &v) { return v; }
+#endif
+
   //  members
   std::vector<double> m_d;
   int n;

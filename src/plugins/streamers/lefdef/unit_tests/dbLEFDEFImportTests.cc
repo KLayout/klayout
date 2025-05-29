@@ -25,6 +25,7 @@
 #include "dbWriter.h"
 #include "dbDEFImporter.h"
 #include "dbLEFImporter.h"
+#include "dbCommonReader.h"
 
 #include "tlUnitTest.h"
 #include "dbTestSupport.h"
@@ -59,10 +60,13 @@ static db::LayerMap read (db::Layout &layout, const char *lef_dir, const char *f
 
   tl::Extractor ex (filename);
 
-  db::LEFDEFReaderState ld (&options, layout, fn_path);
+  db::LoadLayoutOptions other_options;
+  db::LEFDEFReaderState ld (&options);
+  ld.ensure_lef_importer (1);
+  ld.init (layout, fn_path, other_options);
   ld.set_conflict_resolution_mode (cc_mode);
 
-  db::DEFImporter imp;
+  db::DEFImporter imp (1);
   bool any_def = false;
   bool any_lef = false;
 
@@ -92,8 +96,7 @@ static db::LayerMap read (db::Layout &layout, const char *lef_dir, const char *f
       ex.read_word_or_quoted (f);
       fn += f;
 
-      tl::InputStream stream (fn);
-      imp.read_lef (stream, layout, ld);
+      ld.read_lef (fn, layout);
 
       any_lef = true;
 
@@ -134,7 +137,7 @@ static db::LayerMap read (db::Layout &layout, const char *lef_dir, const char *f
   }
 
   if (! any_def && any_lef) {
-    imp.finish_lef (layout);
+    ld.finish_lef (layout);
   }
 
   ld.finish (layout);
@@ -518,6 +521,9 @@ TEST(109_foreigncell)
   options.set_macro_resolution_mode (2);
 
   run_test (_this, "foreigncell", "gds:foreign.gds+lef:in_tech.lef+lef:in.lef+def:in.def", "au_always_foreign.oas.gz", options, false);
+
+  //  no macros -> warning
+  run_test (_this, "foreigncell", "gds:macros.gds+lef:in_tech.lef+def:in.def", "au_no_macros.oas.gz", options, false);
 }
 
 TEST(110_lefpins)
@@ -895,6 +901,21 @@ TEST(132_issue1307_pin_names)
   run_test (_this, "issue-1307c", "lef:in.lef+def:in.def", "au.oas", opt, false);
 }
 
+/*
+TODO: need to clarify first, if invalid via specs should be errors
+TEST(133_unknown_vias_are_errors)
+{
+  db::LEFDEFReaderOptions opt = default_options ();
+
+  try {
+    run_test (_this, "invalid_via", "lef:tech.lef+def:comp_invalid_via.def", "au.oas", opt, false);
+    EXPECT_EQ (true, false);
+  } catch (db::LEFDEFReaderException &ex) {
+    EXPECT_EQ (ex.msg ().find ("Invalid via name"), size_t (0));
+  }
+}
+*/
+
 TEST(200_lefdef_plugin)
 {
   db::Layout ly;
@@ -1100,3 +1121,35 @@ TEST(214_issue1877)
   db::compare_layouts (_this, ly, fn_path + "au.oas", db::WriteOAS);
 }
 
+//  multi-DEF reader support (issue-2014)
+TEST(215_multiDEF)
+{
+  std::string fn_path (tl::testdata ());
+  fn_path += "/lefdef/multi_def/";
+
+  db::Layout ly;
+
+  db::LoadLayoutOptions opt;
+  //  anything else will not make much sense
+  opt.get_options<db::CommonReaderOptions> ().cell_conflict_resolution = db::CellConflictResolution::RenameCell;
+
+  //  Test "set_option_by_name"
+  opt.set_option_by_name ("lefdef_config.lef_context_enabled", true);
+  opt.set_option_by_name ("lefdef_config.map_file", "layers.map");
+  opt.set_option_by_name ("lefdef_config.read_lef_with_def", true);
+
+  const char *files[] = {
+    "main.def",
+    "comp_a.def",
+    "comp_b.def",
+    "comp_c.def"
+  };
+
+  for (const char **fn = files; fn != files + sizeof (files) / sizeof (files[0]); ++fn) {
+    tl::InputStream is (fn_path + *fn);
+    db::Reader reader (is);
+    reader.read (ly, opt);
+  }
+
+  db::compare_layouts (_this, ly, fn_path + "au.oas", db::WriteOAS);
+}

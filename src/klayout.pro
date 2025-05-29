@@ -7,6 +7,7 @@ SUBDIRS = \
   tl \
   gsi \
   db \
+  pex \
   rdb \
   lib \
   plugins \
@@ -62,12 +63,13 @@ equals(HAVE_PYTHON, "1") {
 
 gsi.depends += tl
 db.depends += gsi
+pex.depends += db
 rdb.depends += db
 lib.depends += db
 
 lym.depends += gsi $$LANG_DEPENDS
 
-laybasic.depends += rdb 
+laybasic.depends += rdb pex
 layview.depends += laybasic
 
 ant.depends += layview
@@ -115,12 +117,12 @@ equals(HAVE_RUBY, "1") {
 
 } else {
 
-  plugins.depends += layview ant img edt 
+  plugins.depends += layview ant img edt
 
 }
 
-buddies.depends += plugins lym $$LANG_DEPENDS
-unit_tests.depends += plugins lym $$MAIN_DEPENDS $$LANG_DEPENDS
+buddies.depends += plugins pex lym $$LANG_DEPENDS
+unit_tests.depends += plugins pex lym $$MAIN_DEPENDS $$LANG_DEPENDS
 
 !equals(HAVE_QT, "0") {
 

@@ -58,22 +58,22 @@ public:
   /**
    *  @brief Configure the polygon output
    */
-  void connect_output (db::Layout * /*layout*/, std::unordered_set<db::PolygonWithProperties> *polygons) const;
+  void connect_output (db::Layout * /*layout*/, std::unordered_set<db::PolygonWithProperties> *polygons, const db::ICplxTrans &trans) const;
 
   /**
    *  @brief Configure the polygon ref output
    */
-  void connect_output (db::Layout *layout, std::unordered_set<db::PolygonRefWithProperties> *polygons) const;
+  void connect_output (db::Layout *layout, std::unordered_set<db::PolygonRefWithProperties> *polygons, const db::ICplxTrans &trans) const;
 
   /**
    *  @brief Configure the edge output
    */
-  void connect_output (db::Layout * /*layout*/, std::unordered_set<db::EdgeWithProperties> *edges) const;
+  void connect_output (db::Layout * /*layout*/, std::unordered_set<db::EdgeWithProperties> *edges, const db::ICplxTrans &trans) const;
 
   /**
    *  @brief Configure the edge pair output
    */
-  void connect_output (db::Layout * /*layout*/, std::unordered_set<db::EdgePairWithProperties> *edge_pairs) const;
+  void connect_output (db::Layout * /*layout*/, std::unordered_set<db::EdgePairWithProperties> *edge_pairs, const db::ICplxTrans &trans) const;
 
   /**
    *  @brief Disconnects output
@@ -103,6 +103,22 @@ public:
   }
 
   /**
+   *  @brief Sets the variant type
+   */
+  void set_variant_type (db::ReducerType variant_type)
+  {
+    m_variant_type = variant_type;
+  }
+
+  /**
+   *  @brief Gets the variant type
+   */
+  db::ReducerType variant_type () const
+  {
+    return m_variant_type;
+  }
+
+  /**
    *  @brief Delivers a polygon
    *  This function is only permitted if the result type is Region.
    */
@@ -122,11 +138,13 @@ public:
 
 private:
   db::CompoundRegionOperationNode::ResultType m_result_type;
+  db::ReducerType m_variant_type;
   mutable std::unordered_set<db::PolygonWithProperties> *mp_polygons;
   mutable std::unordered_set<db::PolygonRefWithProperties> *mp_polygon_refs;
   mutable std::unordered_set<db::EdgeWithProperties> *mp_edges;
   mutable std::unordered_set<db::EdgePairWithProperties> *mp_edge_pairs;
   mutable db::Layout *mp_layout;
+  mutable db::ICplxTrans m_trans;
 };
 
 /**
@@ -148,6 +166,11 @@ public:
     return false;
   }
 
+  virtual const TransformationReducer *local_vars () const
+  {
+    return m_vars.get ();
+  }
+
 protected:
   virtual db::Coord computed_dist () const;
   virtual std::string generated_description () const;
@@ -162,6 +185,7 @@ protected:
 private:
   db::Coord m_dist;
   tl::weak_ptr<PolygonNeighborhoodVisitor> mp_visitor;
+  std::unique_ptr<db::TransformationReducer> m_vars;
 
   template <class T, class TR>
   void compute_local_impl (CompoundRegionOperationCache * /*cache*/, db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<T, T> & /*interactions*/, std::vector<std::unordered_set<TR> > & /*results*/, const db::LocalProcessorBase * /*proc*/) const;

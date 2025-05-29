@@ -1033,7 +1033,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "'lmap' can also be left nil, in which case, a layer mapping will be provided based on the layer info attributes of "
     "the layers (see \\layer_info).\n"
     "\n"
-    "'cmap' specifies the cell mapping. Use \\create_cell_mapping or \\const_create_cell_mapping to "
+    "'cmap' specifies the cell mapping. Use \\cell_mapping_into or \\const_cell_mapping_into to "
     "define the target cells in the target layout and to derive a cell mapping.\n"
     "\n"
     "The method has three net annotation modes:\n"
@@ -1117,6 +1117,14 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   gsi::method ("read|read_l2n", &db::LayoutToNetlist::load, gsi::arg ("path"),
     "@brief Reads the extracted netlist from the file.\n"
     "This method employs the native format of KLayout.\n"
+  ) +
+  gsi::method ("clear_log_entries", &db::LayoutToNetlist::clear_log_entries,
+    "@brief Clears the log entries.\n"
+    "This method has been introduced in version 0.30.2"
+  ) +
+  gsi::method ("add_log_entry", &db::LayoutToNetlist::log_entry, gsi::arg ("entry"),
+    "@brief Adds a log entry.\n"
+    "This method has been introduced in version 0.30.2"
   ) +
   gsi::iterator ("each_log_entry|#each_error", &db::LayoutToNetlist::begin_log_entries, &db::LayoutToNetlist::end_log_entries,
     "@brief Iterates over all log entries collected during device and netlist extraction.\n"

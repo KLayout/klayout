@@ -679,7 +679,7 @@ struct reader<gsi::StringType>
     if (!a.get ()) {
       *ret = Qnil;
     } else {
-      *ret = rb_str_new (a->c_str (), long (a->size ()));
+      *ret = rb_utf8_str_new (a->c_str (), long (a->size ()));
     }
   }
 };

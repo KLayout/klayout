@@ -13813,7 +13813,7 @@ class DPolygon:
 
         The minimum angle of the resulting triangles relates to the 'b' parameter as: @t min_angle = arcsin(B/2) @/t.
 
-        Picking a value of 0.0 for max area and min b will make the implementation skip the refinement step. In that case, the results are identical to the standard constrained Delaunay triangulation.
+        Picking a value of 0.0 for max_area and min_b will make the implementation skip the refinement step. In that case, the results are identical to the standard constrained Delaunay triangulation.
 
         This method has been introduced in version 0.30.
         """
@@ -13910,6 +13910,24 @@ class DPolygon:
         Returns a hash value for the given polygon. This method enables polygons as hash keys.
 
         This method has been introduced in version 0.25.
+        """
+        ...
+    def hm_decomposition(self, with_segments: Optional[bool] = ..., split_edges: Optional[bool] = ..., max_area: Optional[float] = ..., min_b: Optional[float] = ...) -> List[DPolygon]:
+        r"""
+        @brief Performs a Hertel-Mehlhorn convex decomposition.
+
+        @return An array holding the polygons of the decomposition.
+
+        The Hertel-Mehlhorn decomposition starts with a Delaunay triangulation of the polygons and recombines the triangles into convex polygons.
+
+        The decomposition is controlled by two parameters: 'with_segments' and 'split_edges'.
+
+        If 'with_segments' is true (the default), new segments are introduced perpendicular to the edges forming a concave corner. If false, only diagonals (edges connecting original vertexes) are used.
+
+        If 'split_edges' is true, the algorithm is allowed to create collinear edges in the output. In this case, the resulting polygons may contain edges that are split into collinear partial edges. Such edges usually recombine into longer edges when processing the polygon further. When such a recombination happens, the edges no longer correspond to original edges or diagonals. When 'split_edges' is false (the default), the resulting polygons will not contain collinear edges, but the decomposition will be constrained to fewer cut lines.
+        'max_area' and 'min_b' are the corresponding parameters used for the triangulation (see \delaunay).
+
+        This method has been introduced in version 0.30.1.
         """
         ...
     def holes(self) -> int:
@@ -14926,7 +14944,7 @@ class DSimplePolygon:
 
         The minimum angle of the resulting triangles relates to the 'b' parameter as: @t min_angle = arcsin(B/2) @/t.
 
-        Picking a value of 0.0 for max area and min b will make the implementation skip the refinement step. In that case, the results are identical to the standard constrained Delaunay triangulation.
+        Picking a value of 0.0 for max_area and min_b will make the implementation skip the refinement step. In that case, the results are identical to the standard constrained Delaunay triangulation.
 
         This method has been introduced in version 0.30.
         """
@@ -15001,6 +15019,24 @@ class DSimplePolygon:
         Returns a hash value for the given polygon. This method enables polygons as hash keys.
 
         This method has been introduced in version 0.25.
+        """
+        ...
+    def hm_decomposition(self, with_segments: Optional[bool] = ..., split_edges: Optional[bool] = ..., max_area: Optional[float] = ..., min_b: Optional[float] = ...) -> List[DSimplePolygon]:
+        r"""
+        @brief Performs a Hertel-Mehlhorn convex decomposition.
+
+        @return An array holding the polygons of the decomposition.
+
+        The Hertel-Mehlhorn decomposition starts with a Delaunay triangulation of the polygons and recombines the triangles into convex polygons.
+
+        The decomposition is controlled by two parameters: 'with_segments' and 'split_edges'.
+
+        If 'with_segments' is true (the default), new segments are introduced perpendicular to the edges forming a concave corner. If false, only diagonals (edges connecting original vertexes) are used.
+
+        If 'split_edges' is true, the algorithm is allowed to create collinear edges in the output. In this case, the resulting polygons may contain edges that are split into collinear partial edges. Such edges usually recombine into longer edges when processing the polygon further. When such a recombination happens, the edges no longer correspond to original edges or diagonals. When 'split_edges' is false (the default), the resulting polygons will not contain collinear edges, but the decomposition will be constrained to fewer cut lines.
+        'max_area' and 'min_b' are the corresponding parameters used for the triangulation (see \delaunay).
+
+        This method has been introduced in version 0.30.1.
         """
         ...
     def inside(self, p: DPoint) -> bool:
@@ -34922,11 +34958,11 @@ class Instance:
 
     Starting with version 0.25 the displacement is of vector type.
     Setter:
-    @brief Sets the displacement vector for the 'b' axis in micrometer units
+    @brief Sets the displacement vector for the 'b' axis
 
-    Like \b= with an integer displacement, this method will set the displacement vector but it accepts a vector in micrometer units that is of \DVector type. The vector will be translated to database units internally.
+    If the instance was not an array instance before it is made one.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.23. Starting with version 0.25 the displacement is of vector type.
     """
     cell: Cell
     r"""
@@ -34969,10 +35005,9 @@ class Instance:
     @brief Gets the complex transformation of the instance or the first instance in the array
     This method is always valid compared to \trans, since simple transformations can be expressed as complex transformations as well.
     Setter:
-    @brief Sets the complex transformation of the instance or the first instance in the array (in micrometer units)
-    This method sets the transformation the same way as \cplx_trans=, but the displacement of this transformation is given in micrometer units. It is internally translated into database units.
+    @brief Sets the complex transformation of the instance or the first instance in the array
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.23.
     """
     da: DVector
     r"""
@@ -46702,17 +46737,17 @@ class NetTerminalRef:
     @overload
     def device(self) -> Device:
         r"""
-        @brief Gets the device reference (non-const version).
+        @brief Gets the device reference.
         Gets the device object that this connection is made to.
-
-        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def device(self) -> Device:
         r"""
-        @brief Gets the device reference.
+        @brief Gets the device reference (non-const version).
         Gets the device object that this connection is made to.
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     def device_class(self) -> DeviceClass:
@@ -47724,17 +47759,17 @@ class Netlist:
     @overload
     def circuit_by_name(self, name: str) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given name.
+        @brief Gets the circuit object for a given name (const version).
         If the name is not a valid circuit name, nil is returned.
+
+        This constness variant has been introduced in version 0.26.8.
         """
         ...
     @overload
     def circuit_by_name(self, name: str) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given name (const version).
+        @brief Gets the circuit object for a given name.
         If the name is not a valid circuit name, nil is returned.
-
-        This constness variant has been introduced in version 0.26.8.
         """
         ...
     @overload
@@ -47751,7 +47786,6 @@ class Netlist:
         r"""
         @brief Gets the circuit objects for a given name filter (const version).
         The name filter is a glob pattern. This method will return all \Circuit objects matching the glob pattern.
-
 
         This constness variant has been introduced in version 0.26.8.
         """
@@ -53583,11 +53617,13 @@ class Polygon:
 
         The minimum angle of the resulting triangles relates to the 'b' parameter as: @t min_angle = arcsin(B/2) @/t.
 
-        The area value is given in terms of DBU units. Picking a value of 0.0 for area and min b will make the implementation skip the refinement step. In that case, the results are identical to the standard constrained Delaunay triangulation.
+        Picking a value of 0.0 for max_area and min_b will make the implementation skip the refinement step. In that case, the results are identical to the standard constrained Delaunay triangulation.
+
+        The area value is given in terms of DBU units.
 
         The 'dbu' parameter a numerical scaling parameter. It should be choosen in a way that the polygon dimensions are "in the order of 1" (very roughly) after multiplication with the dbu parameter. A value of 0.001 is suitable for polygons with typical dimensions in the order to 1000 DBU. Usually the default value is good enough.
 
-        This method has been introduced in version 0.30.
+        This method has been introduced in version 0.30. Since version 0.30.1, the resulting region is in 'no merged semantics' mode, to avoid re-merging of the triangles during following operations.
         """
         ...
     @overload
@@ -53597,7 +53633,7 @@ class Polygon:
 
         This variant of the triangulation function accepts an array of additional vertexes for the triangulation.
 
-        This method has been introduced in version 0.30.
+        This method has been introduced in version 0.30. Since version 0.30.1, the resulting region is in 'no merged semantics' mode, to avoid re-merging of the triangles during following operations.
         """
         ...
     def destroy(self) -> None:
@@ -53682,6 +53718,28 @@ class Polygon:
         Returns a hash value for the given polygon. This method enables polygons as hash keys.
 
         This method has been introduced in version 0.25.
+        """
+        ...
+    def hm_decomposition(self, with_segments: Optional[bool] = ..., split_edges: Optional[bool] = ..., max_area: Optional[float] = ..., min_b: Optional[float] = ..., dbu: Optional[float] = ...) -> Region:
+        r"""
+        @brief Performs a Hertel-Mehlhorn convex decomposition.
+
+        @return A \Region holding the polygons of the decomposition.
+
+        The resulting region is in 'no merged semantics' mode, to avoid re-merging of the polygons during following operations.
+
+        The Hertel-Mehlhorn decomposition starts with a Delaunay triangulation of the polygons and recombines the triangles into convex polygons.
+
+        The decomposition is controlled by two parameters: 'with_segments' and 'split_edges'.
+
+        If 'with_segments' is true (the default), new segments are introduced perpendicular to the edges forming a concave corner. If false, only diagonals (edges connecting original vertexes) are used.
+
+        If 'split_edges' is true, the algorithm is allowed to create collinear edges in the output. In this case, the resulting polygons may contain edges that are split into collinear partial edges. Such edges usually recombine into longer edges when processing the polygon further. When such a recombination happens, the edges no longer correspond to original edges or diagonals. When 'split_edges' is false (the default), the resulting polygons will not contain collinear edges, but the decomposition will be constrained to fewer cut lines.
+        'max_area' and 'min_b' are the corresponding parameters used for the triangulation (see \delaunay).
+
+        The 'dbu' parameter a numerical scaling parameter. It should be choosen in a way that the polygon dimensions are "in the order of 1" (very roughly) after multiplication with the dbu parameter. A value of 0.001 is suitable for polygons with typical dimensions in the order to 1000 DBU. Usually the default value is good enough.
+
+        This method has been introduced in version 0.30.1.
         """
         ...
     def holes(self) -> int:
@@ -62999,11 +63057,12 @@ class Shape:
     This method has been introduced in version 0.23.
 
     Setter:
-    @brief Sets the lower left point of the box
+    @brief Sets the lower left corner of the box with the point being given in micrometer units
 
     Applies to boxes only. Changes the lower left point of the box and throws an exception if the shape is not a box.
+    Translation from micrometer units to database units is done internally.
 
-    This method has been introduced in version 0.23.
+    This method has been introduced in version 0.25.
     """
     box_p2: Point
     r"""
@@ -66722,11 +66781,13 @@ class SimplePolygon:
 
         The minimum angle of the resulting triangles relates to the 'b' parameter as: @t min_angle = arcsin(B/2) @/t.
 
-        The area value is given in terms of DBU units. Picking a value of 0.0 for area and min b will make the implementation skip the refinement step. In that case, the results are identical to the standard constrained Delaunay triangulation.
+        Picking a value of 0.0 for max_area and min_b will make the implementation skip the refinement step. In that case, the results are identical to the standard constrained Delaunay triangulation.
+
+        The area value is given in terms of DBU units.
 
         The 'dbu' parameter a numerical scaling parameter. It should be choosen in a way that the polygon dimensions are "in the order of 1" (very roughly) after multiplication with the dbu parameter. A value of 0.001 is suitable for polygons with typical dimensions in the order to 1000 DBU. Usually the default value is good enough.
 
-        This method has been introduced in version 0.30.
+        This method has been introduced in version 0.30. Since version 0.30.1, the resulting region is in 'no merged semantics' mode, to avoid re-merging of the triangles during following operations.
         """
         ...
     @overload
@@ -66736,7 +66797,7 @@ class SimplePolygon:
 
         This variant of the triangulation function accepts an array of additional vertexes for the triangulation.
 
-        This method has been introduced in version 0.30.
+        This method has been introduced in version 0.30. Since version 0.30.1, the resulting region is in 'no merged semantics' mode, to avoid re-merging of the triangles during following operations.
         """
         ...
     def destroy(self) -> None:
@@ -66799,6 +66860,27 @@ class SimplePolygon:
         Returns a hash value for the given polygon. This method enables polygons as hash keys.
 
         This method has been introduced in version 0.25.
+        """
+        ...
+    def hm_decomposition(self, with_segments: Optional[bool] = ..., split_edges: Optional[bool] = ..., max_area: Optional[float] = ..., min_b: Optional[float] = ..., dbu: Optional[float] = ...) -> Region:
+        r"""
+        @brief Performs a Hertel-Mehlhorn convex decomposition.
+
+        @return A \Region holding the polygons of the decomposition.
+        The resulting region is in 'no merged semantics' mode, to avoid re-merging of the polygons during following operations.
+
+        The Hertel-Mehlhorn decomposition starts with a Delaunay triangulation of the polygons and recombines the triangles into convex polygons.
+
+        The decomposition is controlled by two parameters: 'with_segments' and 'split_edges'.
+
+        If 'with_segments' is true (the default), new segments are introduced perpendicular to the edges forming a concave corner. If false, only diagonals (edges connecting original vertexes) are used.
+
+        If 'split_edges' is true, the algorithm is allowed to create collinear edges in the output. In this case, the resulting polygons may contain edges that are split into collinear partial edges. Such edges usually recombine into longer edges when processing the polygon further. When such a recombination happens, the edges no longer correspond to original edges or diagonals. When 'split_edges' is false (the default), the resulting polygons will not contain collinear edges, but the decomposition will be constrained to fewer cut lines.
+        'max_area' and 'min_b' are the corresponding parameters used for the triangulation (see \delaunay).
+
+        The 'dbu' parameter a numerical scaling parameter. It should be choosen in a way that the polygon dimensions are "in the order of 1" (very roughly) after multiplication with the dbu parameter. A value of 0.001 is suitable for polygons with typical dimensions in the order to 1000 DBU. Usually the default value is good enough.
+
+        This method has been introduced in version 0.30.1.
         """
         ...
     def inside(self, p: Point) -> bool:
@@ -67556,17 +67638,23 @@ class SubCircuit(NetlistObject):
     @overload
     def circuit(self) -> Circuit:
         r"""
-        @brief Gets the circuit the subcircuit lives in.
+        @brief Gets the circuit the subcircuit lives in (non-const version).
         This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def circuit(self) -> Circuit:
         r"""
-        @brief Gets the circuit the subcircuit lives in (non-const version).
+        @brief Gets the circuit the subcircuit lives in.
         This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
-
-        This constness variant has been introduced in version 0.26.8
+        """
+        ...
+    @overload
+    def circuit_ref(self) -> Circuit:
+        r"""
+        @brief Gets the circuit referenced by the subcircuit.
         """
         ...
     @overload
@@ -67576,12 +67664,6 @@ class SubCircuit(NetlistObject):
 
 
         This constness variant has been introduced in version 0.26.8
-        """
-        ...
-    @overload
-    def circuit_ref(self) -> Circuit:
-        r"""
-        @brief Gets the circuit referenced by the subcircuit.
         """
         ...
     @overload
@@ -68287,7 +68369,8 @@ class Text:
     Setter:
     @brief Sets the vertical alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     x: int
     r"""

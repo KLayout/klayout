@@ -83,7 +83,7 @@ MutableRegion::insert (const db::SimplePolygon &polygon)
 {
   if (polygon.vertices () > 0) {
     db::Polygon poly;
-    poly.assign_hull (polygon.begin_hull (), polygon.end_hull ());
+    poly.assign_hull (polygon.hull ());
     do_insert (poly, 0);
   }
 }
@@ -93,7 +93,7 @@ MutableRegion::insert (const db::SimplePolygonWithProperties &polygon)
 {
   if (polygon.vertices () > 0) {
     db::Polygon poly;
-    poly.assign_hull (polygon.begin_hull (), polygon.end_hull ());
+    poly.assign_hull (polygon.hull ());
     do_insert (poly, polygon.properties_id ());
   }
 }

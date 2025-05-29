@@ -461,7 +461,7 @@ inline VALUE c2ruby<float> (const float &c)
 template <>
 inline VALUE c2ruby<std::string> (const std::string &c)
 {
-  return rb_str_new (c.c_str (), long (c.size ()));
+  return rb_utf8_str_new (c.c_str (), long (c.size ()));
 }
 
 template <>
@@ -488,7 +488,7 @@ inline VALUE c2ruby<QString> (const QString &qs)
     return Qnil;
   } else {
     std::string c (tl::to_string (qs));
-    return rb_str_new (c.c_str (), long (c.size ()));
+    return rb_utf8_str_new (c.c_str (), long (c.size ()));
   }
 }
 #endif
@@ -507,9 +507,9 @@ inline VALUE c2ruby<const char *> (const char * const & s)
 {
   if (! s) {
     static const char null_string[] = "(null)";
-    return rb_str_new (null_string, sizeof (null_string) - 1);
+    return rb_utf8_str_new (null_string, sizeof (null_string) - 1);
   } else {
-    return rb_str_new (s, long (strlen (s)));
+    return rb_utf8_str_new (s, long (strlen (s)));
   }
 }
 

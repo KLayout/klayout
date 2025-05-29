@@ -35,6 +35,7 @@
 #include "gsiExpression.h"
 #include "libForceLink.h"
 #include "rdbForceLink.h"
+#include "pexForceLink.h"
 #include "lymMacro.h"
 #include "lymMacroCollection.h"
 

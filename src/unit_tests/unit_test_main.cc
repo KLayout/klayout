@@ -71,6 +71,7 @@
 //  and the plugins/auxiliary modules (some in non-Qt case)
 #include "libForceLink.h"
 #include "rdbForceLink.h"
+#include "pexForceLink.h"
 #include "antForceLink.h"
 #include "imgForceLink.h"
 #include "edtForceLink.h"

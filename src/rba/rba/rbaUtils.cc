@@ -450,6 +450,10 @@ VALUE rba_funcall2_checked (VALUE obj, ID id, int argc, VALUE *args)
   //  HINT: the ugly (VALUE) cast is required since there is only one form of rb_protect
   rb_protect_init (); // see above
 
+  if (! ruby_native_thread_p ()) {
+    throw tl::Exception (tl::to_string (tr ("Can't execute Ruby callbacks from non-Ruby threads")));
+  }
+
   RUBY_BEGIN_EXEC
     ret = rb_protect (&rb_funcall2_wrap, (VALUE) &p, &error);
   RUBY_END_EXEC

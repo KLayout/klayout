@@ -1,0 +1,13 @@
+VERSION 5.8 ;
+DIVIDERCHAR "/" ;
+BUSBITCHARS "[]" ;
+DESIGN caravel ;
+UNITS DISTANCE MICRONS 1000 ;
+DIEAREA ( 0 0 ) ( 10000 10000 ) ;
+COMPONENTS 4 ;
+- comp_a comp_a + PLACED ( 0 0 ) N ;
+- comp_b comp_b + PLACED ( 0 2000 ) N ;
+- comp_c comp_c + PLACED ( 0 4000 ) N ;
+#- comp_d comp_d + PLACED ( 0 4000 ) N ;
+END COMPONENTS
+END DESIGN

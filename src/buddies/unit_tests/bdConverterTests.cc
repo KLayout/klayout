@@ -199,7 +199,7 @@ TEST(10)
   std::string def_dir = input_dir + "/def";
   std::string gds_dir = input_dir + "/gds";
 
-  std::string input_au = input_dir + "/strm2oas_au.oas";
+  std::string input_au = input_dir + "/strm2oas_au_2.oas";
 
   std::string output = this->tmp_file ("strm2oas.oas");
   std::string map_arg = "--lefdef-map=" + input_dir + "/sky130.map";

@@ -46,6 +46,7 @@ namespace db
 
 class LEFDEFReaderState;
 class LEFDEFImporter;
+class LEFImporter;
 struct MacroDesc;
 
 /**
@@ -960,6 +961,25 @@ public:
     m_macro_layout_files = lf;
   }
 
+  /**
+   *  @brief A hidden attribute to enable a LEF context
+   *  LEF context are used for chaining DEF readers. This method must be
+   *  called on local copy of the importer options. With this attribute
+   *  set to "true", the client code can store a LEFDEFReaderState object
+   *  in this object.
+   *  Initially, this attribute is set to false.
+   *  Note that this attribute is not copied.
+   */
+  void set_lef_context_enabled (bool context);
+
+  bool lef_context_enabled () const
+  {
+    return m_lef_context_enabled;
+  }
+
+  //  makes the reader state object if required
+  db::LEFDEFReaderState *reader_state (db::Layout &layout, const std::string &base_path, const LoadLayoutOptions &options) const;
+
 private:
   bool m_read_all_layers;
   db::LayerMap m_layer_map;
@@ -1028,6 +1048,8 @@ private:
   tl::weak_collection<db::Layout> m_macro_layouts;
   std::vector<std::string> m_macro_layout_files;
   bool m_paths_relative_to_cwd;
+  bool m_lef_context_enabled;
+  mutable std::unique_ptr<db::LEFDEFReaderState> mp_reader_state;
 };
 
 /**
@@ -1119,12 +1141,14 @@ public:
 class DB_PLUGIN_PUBLIC LEFDEFLayoutGenerator
 {
 public:
-  LEFDEFLayoutGenerator () { }
+  LEFDEFLayoutGenerator () : def_local (false) { }
   virtual ~LEFDEFLayoutGenerator () { }
 
   virtual void create_cell (LEFDEFReaderState &reader, db::Layout &layout, db::Cell &cell, const std::vector<std::string> *maskshift_layers, const std::vector<unsigned int> &masks, const LEFDEFNumberOfMasks *nm) = 0;
   virtual std::vector<std::string> maskshift_layers () const = 0;
   virtual bool is_fixedmask () const = 0;
+
+  bool def_local;
 };
 
 /**
@@ -1247,12 +1271,17 @@ public:
   /**
    *  @brief Constructor
    */
-  LEFDEFReaderState (const LEFDEFReaderOptions *tc, db::Layout &layout, const std::string &base_path = std::string ());
+  LEFDEFReaderState (const LEFDEFReaderOptions *tc);
 
   /**
    *  @brief Destructor
    */
   ~LEFDEFReaderState ();
+
+  /**
+   *  @brief Initialize with the layout and base path
+   */
+  void init (db::Layout &layout, const std::string &base_path, const LoadLayoutOptions &options);
 
   /**
    *  @brief Attaches to or detaches from an importer
@@ -1300,7 +1329,14 @@ public:
   void register_layer (const std::string &l);
 
   /**
+   *  @brief Start reading a file
+   *  After the file is read, "finish" needs to be called.
+   */
+  void start ();
+
+  /**
    *  @brief Finish, i.e. assign GDS layer numbers to the layers
+   *  This is the counterpart for "start".
    */
   void finish (db::Layout &layout);
 
@@ -1363,6 +1399,44 @@ public:
    *  @brief Issues a warning
    */
   void warn (const std::string &msg, int warn_level = 1);
+
+  /**
+   *  @brief Ensures the LEF importer for DEF reading is available
+   */
+  void ensure_lef_importer (int warn_level);
+
+  /**
+   *  @brief Gets the LEF importer for DEF reading
+   */
+  db::LEFImporter &lef_importer ();
+
+  /**
+   *  @brief Reads a LEF file into the LEF importer
+   *
+   *  Multiple LEF files can be read.
+   */
+  void read_lef (const std::string &fn, db::Layout &layout);
+
+  /**
+   *  @brief Provided for test purposes
+   */
+  void finish_lef (db::Layout &layout);
+
+  /**
+   *  @brief Gets a value indicating whether the given LEF file was already read
+   */
+  bool lef_file_already_read (const std::string &fn)
+  {
+    return m_lef_files_read.find (fn) != m_lef_files_read.end ();
+  }
+
+  /**
+   *  @brief Gets the stored macro layouts
+   */
+  const std::vector<db::Layout *> &macro_layouts () const
+  {
+    return m_macro_layouts;
+  }
 
 protected:
   virtual void common_reader_error (const std::string &msg) { error (msg); }
@@ -1452,14 +1526,19 @@ private:
   std::map<std::string, int> m_default_number;
   const LEFDEFReaderOptions *mp_tech_comp;
   std::map<ViaKey, db::Cell *> m_via_cells;
-  std::map<std::pair<std::string, std::string>, LEFDEFLayoutGenerator *> m_via_generators;
+  std::multimap<std::pair<std::string, std::string>, LEFDEFLayoutGenerator *> m_via_generators;
   std::map<MacroKey, std::pair<db::Cell *, db::Trans> > m_macro_cells;
   std::map<std::string, LEFDEFLayoutGenerator *> m_macro_generators;
   std::map<std::string, db::cell_index_type> m_foreign_cells;
+  std::set<std::string> m_lef_files_read;
+  std::vector<db::Layout *> m_macro_layouts;
+  tl::shared_collection<db::Layout> m_macro_layout_object_holder;
+  std::unique_ptr<db::LEFImporter> mp_lef_importer;
 
   std::set<unsigned int> open_layer_uncached (db::Layout &layout, const std::string &name, LayerPurpose purpose, unsigned int mask);
   db::cell_index_type foreign_cell(Layout &layout, const std::string &name);
   void read_single_map_file (const std::string &path, std::map<std::pair<std::string, LayerDetailsKey>, std::vector<db::LayerProperties> > &layer_map);
+  std::pair<LEFDEFLayoutGenerator *, std::string> via_generator_and_rule (const std::string &vn, const std::string &nondefaultrule);
 };
 
 /**

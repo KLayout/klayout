@@ -122,13 +122,21 @@ public:
   }
 
   /**
-   *  @brief Gets the
+   *  @brief Gets the macros map
    *
    *  The map maps the macro name to the macro description.
    */
   const std::map<std::string, MacroDesc> &macros () const
   {
     return m_macros;
+  }
+
+  /**
+   *  @brief Inserts a macro description for a name
+   */
+  const MacroDesc *insert_macro (const std::string &mn, const MacroDesc &m)
+  {
+    return &m_macros.insert (std::make_pair (mn, m)).first->second;
   }
 
   /**

@@ -314,8 +314,13 @@ CommonReaderBase::merge_cell_without_instances (db::Layout &layout, db::cell_ind
 }
 
 void
-CommonReaderBase::init ()
+CommonReaderBase::start ()
 {
+  m_id_map.clear ();
+  m_name_map.clear ();
+  m_temp_cells.clear ();
+  m_name_for_id.clear ();
+
   m_layer_map_out.clear ();
   m_multi_mapping_placeholders.clear ();
   m_layer_cache.clear ();
@@ -621,7 +626,7 @@ void
 CommonReader::init (const LoadLayoutOptions &options)
 {
   ReaderBase::init (options);
-  CommonReaderBase::init ();
+  CommonReaderBase::start ();
 
   db::CommonReaderOptions common_options = options.get_options<db::CommonReaderOptions> ();
   set_conflict_resolution_mode (common_options.cell_conflict_resolution);

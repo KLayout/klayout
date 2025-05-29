@@ -22,9 +22,11 @@
 
 
 #include "dbLEFDEFImporter.h"
+#include "dbLEFImporter.h"
 #include "dbLayoutUtils.h"
 #include "dbTechnology.h"
 #include "dbShapeProcessor.h"
+#include "dbCellMapping.h"
 
 #include "tlStream.h"
 #include "tlProgress.h"
@@ -598,13 +600,15 @@ LEFDEFReaderOptions::LEFDEFReaderOptions ()
     m_map_file (),
     m_macro_resolution_mode (0),
     m_read_lef_with_def (true),
-    m_paths_relative_to_cwd (false)
+    m_paths_relative_to_cwd (false),
+    m_lef_context_enabled (false)
 {
   //  .. nothing yet ..
 }
 
 LEFDEFReaderOptions::LEFDEFReaderOptions (const LEFDEFReaderOptions &d)
-  : db::FormatSpecificReaderOptions ()
+  : db::FormatSpecificReaderOptions (),
+    m_lef_context_enabled (false)
 {
   operator= (d);
 }
@@ -951,26 +955,33 @@ LEFDEFReaderOptions::special_routing_datatype_str () const
   return get_datatypes (this, &LEFDEFReaderOptions::special_routing_datatype, &LEFDEFReaderOptions::special_routing_datatype_per_mask, max_mask_number ());
 }
 
+void
+LEFDEFReaderOptions::set_lef_context_enabled (bool f)
+{
+  if (f != m_lef_context_enabled) {
+    mp_reader_state.reset (0);
+    m_lef_context_enabled = f;
+  }
+}
+
+db::LEFDEFReaderState *
+LEFDEFReaderOptions::reader_state (db::Layout &layout, const std::string &base_path, const db::LoadLayoutOptions &options) const
+{
+  if (m_lef_context_enabled && ! mp_reader_state.get ()) {
+    mp_reader_state.reset (new db::LEFDEFReaderState (this));
+    mp_reader_state->init (layout, base_path, options);
+  }
+
+  return mp_reader_state.get ();
+}
+
 // -----------------------------------------------------------------------------------
 //  LEFDEFLayerDelegate implementation
 
-LEFDEFReaderState::LEFDEFReaderState (const LEFDEFReaderOptions *tc, db::Layout &layout, const std::string &base_path)
+LEFDEFReaderState::LEFDEFReaderState (const LEFDEFReaderOptions *tc)
   : mp_importer (0), m_create_layers (true), m_has_explicit_layer_mapping (false), m_laynum (1), mp_tech_comp (tc)
 {
-  if (! tc) {
-
-    //  use default options
-
-  } else if (! tc->map_file ().empty ()) {
-
-    read_map_file (tc->map_file (), layout, base_path);
-
-  } else {
-
-    m_layer_map = tc->layer_map ();
-    m_create_layers = tc->read_all_layers ();
-
-  }
+  //  .. nothing yet ..
 }
 
 LEFDEFReaderState::~LEFDEFReaderState ()
@@ -989,6 +1000,57 @@ LEFDEFReaderState::~LEFDEFReaderState ()
 }
 
 void
+LEFDEFReaderState::init (Layout &layout, const std::string &base_path, const LoadLayoutOptions &options)
+{
+  if (! mp_tech_comp) {
+
+    //  use default options
+
+  } else if (! mp_tech_comp->map_file ().empty ()) {
+
+    read_map_file (mp_tech_comp->map_file (), layout, base_path);
+
+  } else {
+
+    m_layer_map = mp_tech_comp->layer_map ();
+    m_create_layers = mp_tech_comp->read_all_layers ();
+
+  }
+
+  if (mp_tech_comp) {
+
+    m_macro_layouts = mp_tech_comp->macro_layouts ();
+
+    //  Additionally read the layouts from the given paths
+    for (std::vector<std::string>::const_iterator l = mp_tech_comp->begin_macro_layout_files (); l != mp_tech_comp->end_macro_layout_files (); ++l) {
+
+      auto paths = correct_path (*l, layout, base_path, true);
+      for (auto lp = paths.begin (); lp != paths.end (); ++lp) {
+
+        tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading LEF macro layout file: ")) + *lp);
+
+        tl::InputStream macro_layout_stream (*lp);
+        tl::log << tl::to_string (tr ("Reading")) << " " << *lp;
+        db::Layout *new_layout = new db::Layout (false);
+        m_macro_layout_object_holder.push_back (new_layout);
+        m_macro_layouts.push_back (new_layout);
+
+        db::Reader reader (macro_layout_stream);
+        reader.read (*new_layout, options);
+
+        if (fabs (new_layout->dbu () / layout.dbu () - 1.0) > db::epsilon) {
+          warn (tl::sprintf (tl::to_string (tr ("DBU of macro layout file '%s' does not match reader DBU (layout DBU is %.12g, reader DBU is set to %.12g)")),
+                                                        *lp, new_layout->dbu (), layout.dbu ()));
+        }
+
+      }
+
+    }
+
+  }
+}
+
+void
 LEFDEFReaderState::error (const std::string &msg)
 {
   if (mp_importer) {
@@ -1002,6 +1064,36 @@ LEFDEFReaderState::warn (const std::string &msg, int warn_level)
   if (mp_importer) {
     mp_importer->warn (msg, warn_level);
   }
+}
+
+void
+LEFDEFReaderState::ensure_lef_importer (int warn_level)
+{
+  if (! mp_lef_importer.get ()) {
+    mp_lef_importer.reset (new db::LEFImporter (warn_level));
+  }
+}
+
+db::LEFImporter &
+LEFDEFReaderState::lef_importer ()
+{
+  tl_assert (mp_lef_importer.get () != 0);
+  return *mp_lef_importer;
+}
+
+void
+LEFDEFReaderState::read_lef (const std::string &fn, db::Layout &layout)
+{
+  tl::InputStream stream (fn);
+  lef_importer ().read (stream, layout, *this);
+
+  m_lef_files_read.insert (fn);
+}
+
+void
+LEFDEFReaderState::finish_lef (db::Layout &layout)
+{
+  lef_importer ().finish_lef (layout);
 }
 
 void
@@ -1716,9 +1808,74 @@ std::set<unsigned int> LEFDEFReaderState::open_layer_uncached(db::Layout &layout
 }
 
 void
+LEFDEFReaderState::start ()
+{
+  //  Start over for a new DEF file - this function is used in LEF context mode
+  //  i.e. when LEFs are cached during multiple DEF reads. It is called when a new DEF is read.
+
+  CommonReaderBase::start ();
+
+  m_foreign_cells.clear ();
+
+  //  Remove the via generators that were added by DEF
+  //  TODO: there is no concept for "local LEFs" currently. Even LEFs stored along
+  //  with DEFs are considered "global".
+  for (auto vg = m_via_generators.begin (); vg != m_via_generators.end (); ) {
+    auto vg_here = vg;
+    ++vg;
+    if (vg_here->second->def_local) {
+      delete vg_here->second;
+      m_via_generators.erase (vg_here);
+    }
+  }
+
+  //  We always create fresh via cells for different DEFs to avoid potential
+  //  content conflicts. Problem is: vias can be generated by both LEF (global)
+  //  and DEF (local)
+  m_via_cells.clear ();
+}
+
+void
 LEFDEFReaderState::finish (db::Layout &layout)
 {
   CommonReaderBase::finish (layout);
+
+  //  Resolve unresolved COMPONENT cells
+
+  db::cell_index_type seen = std::numeric_limits<db::cell_index_type>::max ();
+
+  for (std::vector<db::Layout *>::const_iterator m = macro_layouts ().begin (); m != macro_layouts ().end (); ++m) {
+
+    std::vector<db::cell_index_type> target_cells, source_cells;
+
+    //  collect the cells to pull in
+    for (std::map<std::string, db::cell_index_type>::iterator f = m_foreign_cells.begin (); f != m_foreign_cells.end (); ++f) {
+      if (f->second != seen) {
+        std::pair<bool, db::cell_index_type> cp = (*m)->cell_by_name (f->first.c_str ());
+        if (cp.first) {
+          target_cells.push_back (f->second);
+          source_cells.push_back (cp.second);
+          layout.cell (f->second).set_ghost_cell (false);
+          f->second = seen;
+        }
+      }
+    }
+
+    db::CellMapping cm;
+    cm.create_multi_mapping_full (layout, target_cells, **m, source_cells);
+    layout.copy_tree_shapes (**m, cm);
+
+  }
+
+  //  Warn about cells that could not be resolved
+  for (std::map<std::string, db::cell_index_type>::iterator f = m_foreign_cells.begin (); f != m_foreign_cells.end (); ++f) {
+    if (f->second != seen && layout.cell (f->second).is_ghost_cell ()) {
+      warn (tl::sprintf (tl::to_string (tr ("Could not find a substitution layout for foreign cell '%s'")),
+                                  f->first));
+    }
+  }
+
+  //  Create the layers
 
   int lnum = 0;
 
@@ -1790,48 +1947,52 @@ LEFDEFReaderState::finish (db::Layout &layout)
 void
 LEFDEFReaderState::register_via_cell (const std::string &vn, const std::string &nondefaultrule, LEFDEFLayoutGenerator *generator)
 {
-  if (m_via_generators.find (std::make_pair (vn, nondefaultrule)) != m_via_generators.end ()) {
-    delete m_via_generators [std::make_pair (vn, nondefaultrule)];
-  }
-  m_via_generators [std::make_pair (vn, nondefaultrule)] = generator;
+  //  inserts at the end of the range
+  m_via_generators.insert (std::make_pair (std::make_pair (vn, nondefaultrule), generator));
 }
 
 LEFDEFLayoutGenerator *
 LEFDEFReaderState::via_generator (const std::string &vn, const std::string &nondefaultrule)
 {
-  std::map<std::pair<std::string, std::string>, LEFDEFLayoutGenerator *>::const_iterator g = m_via_generators.find (std::make_pair (vn, nondefaultrule));
-  if (g == m_via_generators.end () && ! nondefaultrule.empty ()) {
-    //  default rule is fallback
-    g = m_via_generators.find (std::make_pair (vn, std::string ()));
+  return via_generator_and_rule (vn, nondefaultrule).first;
+}
+
+std::pair<LEFDEFLayoutGenerator *, std::string>
+LEFDEFReaderState::via_generator_and_rule (const std::string &vn, const std::string &nondefaultrule)
+{
+  auto key = std::make_pair (vn, nondefaultrule);
+
+  auto g = m_via_generators.upper_bound (key);
+  if (g != m_via_generators.begin ()) {
+    --g;
   }
-  if (g != m_via_generators.end ()) {
-    return g->second;
+
+  if (g == m_via_generators.end () || g->first != key) {
+    if (nondefaultrule.empty ()) {
+      return std::pair<LEFDEFLayoutGenerator *, std::string> (0, std::string ());
+    } else {
+      //  default rule is fallback
+      return via_generator_and_rule (vn, std::string ());
+    }
   } else {
-    return 0;
+    return std::make_pair (g->second, nondefaultrule);
   }
 }
 
 db::Cell *
 LEFDEFReaderState::via_cell (const std::string &vn, const std::string &nondefaultrule, db::Layout &layout, unsigned int mask_bottom, unsigned int mask_cut, unsigned int mask_top, const LEFDEFNumberOfMasks *nm)
 {
-  ViaKey vk (vn, nondefaultrule, mask_bottom, mask_cut, mask_top);
+  auto gr = via_generator_and_rule (vn, nondefaultrule);
+  LEFDEFLayoutGenerator *vg = gr.first;
 
-  std::map<std::pair<std::string, std::string>, LEFDEFLayoutGenerator *>::const_iterator g = m_via_generators.find (std::make_pair (vn, nondefaultrule));
-
-  if (g == m_via_generators.end () && ! vk.nondefaultrule.empty ()) {
-    //  default rule is fallback
-    g = m_via_generators.find (std::make_pair (vn, std::string ()));
-    vk.nondefaultrule.clear ();
-  }
+  ViaKey vk (vn, gr.second, mask_bottom, mask_cut, mask_top);
 
   std::map<ViaKey, db::Cell *>::const_iterator i = m_via_cells.find (vk);
   if (i == m_via_cells.end ()) {
 
     db::Cell *cell = 0;
 
-    if (g != m_via_generators.end ()) {
-
-      LEFDEFLayoutGenerator *vg = g->second;
+    if (vg) {
 
       std::string n = vn;
 
@@ -1859,6 +2020,14 @@ LEFDEFReaderState::via_cell (const std::string &vn, const std::string &nondefaul
       masks.push_back (mask_top);
 
       vg->create_cell (*this, layout, *cell, 0, masks, nm);
+
+    } else {
+
+      std::string details;
+      if (! nondefaultrule.empty () && nondefaultrule != vk.nondefaultrule) {
+        details = tl::sprintf (tl::to_string (tr (" (trying with NONDEFAULTRULE '%s' and without)")), nondefaultrule);
+      }
+      error (tl::sprintf (tl::to_string (tr ("Could not find a via specification with name '%s'")) + details, vn));
 
     }
 

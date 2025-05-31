@@ -294,11 +294,29 @@ void std_writer_impl<Keys>::write_device_class (TokenizedOutput &stream, const d
   TokenizedOutput out (stream, Keys::class_key);
   out << tl::to_word_or_quoted_string (cls->name ()) << tl::to_word_or_quoted_string (temp_name);
 
+  //  we need to issue all specs if some are deleted
+  bool full_specs = false;
+
+  const std::vector<DeviceParameterDefinition> &pd_temp = temp_class->parameter_definitions ();
+  for (auto p = pd_temp.begin (); p != pd_temp.end () && ! full_specs; ++p) {
+    full_specs = ! cls->has_parameter_with_name (p->name ());
+  }
+
+  const std::vector<DeviceTerminalDefinition> &td_temp = temp_class->terminal_definitions ();
+  for (auto t = td_temp.begin (); t != td_temp.end () && ! full_specs; ++t) {
+    full_specs = ! cls->has_terminal_with_name (t->name ());
+  }
+
+  //  new token: indicates that all specs will be listed
+  if (full_specs) {
+    out << tl::to_string (1);
+  }
+
   bool any_def = false;
 
   const std::vector<DeviceParameterDefinition> &pd = cls->parameter_definitions ();
-  for (std::vector<DeviceParameterDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
-    if (! temp_class->has_parameter_with_name (p->name ()) || !same_parameter (*p, *temp_class->parameter_definition (temp_class->parameter_id_for_name (p->name ())))) {
+  for (auto p = pd.begin (); p != pd.end (); ++p) {
+    if (full_specs || ! temp_class->has_parameter_with_name (p->name ()) || !same_parameter (*p, *temp_class->parameter_definition (temp_class->parameter_id_for_name (p->name ())))) {
       if (! any_def) {
         out << endl;
       }
@@ -308,8 +326,8 @@ void std_writer_impl<Keys>::write_device_class (TokenizedOutput &stream, const d
   }
 
   const std::vector<DeviceTerminalDefinition> &td = cls->terminal_definitions ();
-  for (std::vector<DeviceTerminalDefinition>::const_iterator t = td.begin (); t != td.end (); ++t) {
-    if (! temp_class->has_terminal_with_name (t->name ())) {
+  for (auto t = td.begin (); t != td.end (); ++t) {
+    if (full_specs || ! temp_class->has_terminal_with_name (t->name ())) {
       if (! any_def) {
         out << endl;
       }

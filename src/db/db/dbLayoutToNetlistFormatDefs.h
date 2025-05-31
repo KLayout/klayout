@@ -79,7 +79,10 @@ namespace db
  *    circuit(<name> [circuit-def]) - circuit (cell) [short key: X]
  *
  *  [class]:
- *    class(<name> <template> [template-def])  - a device class definition (template: RES,CAP,...) [short key: K]
+ *    class(<name> <template> <full-specs>? [template-def])  - a device class definition (template: RES,CAP,...) [short key: K]
+ *                                    "fill_specs" is an optional value (0 or 1), indicating that all parameters and terminals
+ *                                    are listed. For "1", the reader will remove all specs from the template before rebuilding
+ *                                    them.
  *
  *  [device]:
  *    device(<name> <class> [device-abstract-terminal|any]*)
@@ -158,8 +161,8 @@ namespace db
  *    [template-param|template-terminal|any]*
  *
  *  [template-param]:
- *    param(<name> <primary>? <default-value>*)    - defines a template parameter [short key: E]
- *                                    ('primary' is a value: 0 or 1)
+ *    param(<name> <primary> <default-value>)    - defines a template parameter [short key: E]
+ *                                    ('primary' is a value: 0 or 1, 'default_value' is a float)
  *
  *  [template-terminal]:
  *    terminal(<name>)              - defines a terminal [short key: T]

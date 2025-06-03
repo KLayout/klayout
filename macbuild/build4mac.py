@@ -5,7 +5,7 @@
 # File: "macbuild/build4mac.py"
 #
 #  The top Python script for building KLayout (http://www.klayout.de/index.php)
-#  version 0.29.11 or later on different Apple Mac OSX platforms.
+#  version 0.30.2 or later on different Apple Mac OSX platforms.
 #===============================================================================
 import sys
 import os
@@ -45,7 +45,7 @@ def GenerateUsage(platform):
     usage  = "\n"
     usage += "-----------------------------------------------------------------------------------------------------------\n"
     usage += "<< Usage of 'build4mac.py' >>\n"
-    usage += "       for building KLayout 0.29.11 or later on different Apple macOS platforms.\n"
+    usage += "       for building KLayout 0.30.2 or later on different Apple macOS platforms.\n"
     usage += "\n"
     usage += "$ [python] ./build4mac.py\n"
     usage += "   option & argument    : descriptions (refer to 'macbuild/build4mac_env.py' for details)  | default value\n"
@@ -847,29 +847,30 @@ def Build_pymod_wheel(parameters):
     cmd3_args = "   <wheel file> \\\n"
     cmd4_args = "   -m setup  clean --all \\\n"
 
-    #--------------------------------------------------------------------
+    #-----------------------------------------------------------------------------------
     # [4] Make the consolidated command lines
-    #--------------------------------------------------------------------
+    #     "caffeinate" makes the CPU run at full speed even when the screen is locked.
+    #-----------------------------------------------------------------------------------
     command1  = "time"
-    command1 += " \\\n   %s \\\n" % parameters['python']
+    command1 += " \\\n   caffeinate -i %s \\\n" % parameters['python']
     command1 += cmd1_args
     command1 += "   2>&1 | tee -a %s; \\\n" % parameters['logfile']
     command1 += "   test ${PIPESTATUS[0]} -eq 0"  # tee always exits with 0
 
     command2  = "time"
-    command2 += " \\\n   %s \\\n" % parameters['python']
+    command2 += " \\\n   caffeinate -i %s \\\n" % parameters['python']
     command2 += cmd2_args
     command2 += "   2>&1 | tee -a %s; \\\n" % parameters['logfile']
     command2 += "   test ${PIPESTATUS[0]} -eq 0"  # tee always exits with 0
 
     command3  = "time"
-    command3 += " \\\n   %s \\\n" % deloc_cmd
+    command3 += " \\\n   caffeinate -i %s \\\n" % deloc_cmd
     command3 += cmd3_args
     command3 += "   2>&1 | tee -a %s; \\\n" % parameters['logfile']
     command3 += "   test ${PIPESTATUS[0]} -eq 0"  # tee always exits with 0
 
     command4  = "time"
-    command4 += " \\\n   %s \\\n" % parameters['python']
+    command4 += " \\\n   caffeinate -i %s \\\n" % parameters['python']
     command4 += cmd4_args
     command4 += "   2>&1 | tee -a %s; \\\n" % parameters['logfile']
     command4 += "   test ${PIPESTATUS[0]} -eq 0"  # tee always exits with 0
@@ -923,10 +924,10 @@ def Build_pymod_wheel(parameters):
     #       Refer to: https://github.com/Kazzz-S/klayout/issues/49#issuecomment-1432154118
     #                 https://pypi.org/project/delocate/
     #---------------------------------------------------------------------------------------------------------
-    cmd3_args = glob.glob( "dist/*.whl" )  # like ['dist/klayout-0.29.7-cp312-cp312-macosx_12_0_x86_64.whl']
+    cmd3_args = glob.glob( "dist/*.whl" )  # like ['dist/klayout-0.30.2-cp312-cp312-macosx_10_15_x86_64.whl']
     if len(cmd3_args) == 1:
         command3  = "time"
-        command3 += " \\\n   %s \\\n" % deloc_cmd
+        command3 += " \\\n   caffeinate -i %s \\\n" % deloc_cmd
         command3 += "  %s \\\n" % cmd3_args[0]
         command3 += "   2>&1 | tee -a %s; \\\n" % parameters['logfile']
         command3 += "   test ${PIPESTATUS[0]} -eq 0"  # tee always exits with 0
@@ -953,13 +954,13 @@ def Build_pymod_wheel(parameters):
     #------------------------------------------------------------------------
     # [5-C] Forcibly change the wheel file name for anaconda3
     #       Ref. https://github.com/Kazzz-S/klayout/issues/53
-    #         original: klayout-0.29.7-cp312-cp312-macosx_12_0_x86_64.whl
+    #         original: klayout-0.30.2-cp312-cp312-macosx_10_15_x86_64.whl
     #               |
     #               V
-    #              new: klayout-0.29.7-cp312-cp312-macosx_10_9_x86_64.whl
+    #              new: klayout-0.30.2-cp312-cp312-macosx_10_9_x86_64.whl
     #------------------------------------------------------------------------
     if whlTarget == "ana3":
-        wheels = glob.glob( "dist/*.whl" )  # like ['dist/klayout-0.29.7-cp312-cp312-macosx_12_0_x86_64.whl']
+        wheels = glob.glob( "dist/*.whl" )  # like ['dist/klayout-0.30.2-cp312-cp312-macosx_10_15_x86_64.whl']
         if not len(wheels) == 1:
             print( "", file=sys.stderr )
             print( "-------------------------------------------------------------", file=sys.stderr )
@@ -1114,11 +1115,12 @@ def Run_Build_Command(config, parameters):
         else:
             cmd_args += " \\\n  -nopython"
 
-        #-----------------------------------------------------
+        #-----------------------------------------------------------------------------------
         # [4] Make the consolidated command line
-        #-----------------------------------------------------
+        #     "caffeinate" makes the CPU run at full speed even when the screen is locked.
+        #-----------------------------------------------------------------------------------
         command  = "time"
-        command += " \\\n  %s" % parameters['build_cmd']
+        command += " \\\n  caffeinate -i %s" % parameters['build_cmd']
         command += cmd_args
         command += "  2>&1 | tee %s; \\\n" % parameters['logfile']
         command += "test ${PIPESTATUS[0]} -eq 0"  # tee always exits with 0
@@ -1831,33 +1833,33 @@ def Deploy_Binaries_For_Bundle(config, parameters):
 
         #-----------------------------------------------------------------------------------------------
         # [9] Special deployment of Python3.11 from Homebrew
-        #     To use Python3.1 from Homebrew on Sonoma...
+        #     To use Python3.11 from Homebrew on Sequoia...
         #       in "/usr/local/opt/python@3.11/lib/"
         #             Python.framework -> ../Frameworks/Python.framework/ <=== this symbolic was needed
         #             pkgconfig/
         #
         #     Use the "python3HB.py" tool to make different symbolic links [*] including the above one.
-        #        Sonoma{kazzz-s} lib (1)% pwd
+        #        Sequoia{kazzz-s} lib (1)% pwd
         #        /usr/local/opt/python@3.11/lib
-        #        Sonoma{kazzz-s} lib (2)% ll
+        #        Sequoia{kazzz-s} lib (2)% ll
         #        total 0
         #        drwxr-xr-x  4 kazzz-s admin 128  9 21 23:03 .
         #        drwxr-xr-x 14 kazzz-s admin 448  9 21 18:33 ..
         #    [*] lrwxr-xr-x  1 kazzz-s admin  31  9 21 23:03 Python.framework -> ../Frameworks/Python.framework/
         #        drwxr-xr-x  4 kazzz-s admin 128  9  7 10:03 pkgconfig
         #
-        #        Sonoma{kazzz-s} Python.framework (3)% pwd
+        #        Sequoia{kazzz-s} Python.framework (3)% pwd
         #        /usr/local/opt/python@3.11/Frameworks/Python.framework/Versions
-        #        Sonoma{kazzz-s} Versions (4)% ll
+        #        Sequoia{kazzz-s} Versions (4)% ll
         #        total 0
         #        drwxr-xr-x 4 kazzz-s admin 128  9 21 23:03 .
         #        drwxr-xr-x 6 kazzz-s admin 192  9 21 23:03 ..
         #        drwxr-xr-x 9 kazzz-s admin 288  9  7 10:03 3.11
         #    [*] lrwxr-xr-x 1 kazzz-s admin   5  9 21 23:03 Current -> 3.11/
         #
-        #        Sonoma{kazzz-s} Python.framework (5)% pwd
+        #        Sequoia{kazzz-s} Python.framework (5)% pwd
         #        /usr/local/opt/python@3.11/Frameworks/Python.framework
-        #        Sonoma{kazzz-s} Python.framework (6)% ll
+        #        Sequoia{kazzz-s} Python.framework (6)% ll
         #        total 0
         #        drwxr-xr-x 6 kazzz-s admin 192  9 21 23:03 .
         #        drwxr-xr-x 3 kazzz-s admin  96  9  7 10:03 ..

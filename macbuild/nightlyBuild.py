@@ -339,7 +339,7 @@ def Parse_CommandLine_Arguments():
     Usage += "          (3) $ ./nightlyBuild.py  --test                                    |\n"
     Usage += "          (4) $ ./nightlyBuild.py  --check (confirm the QA Test results)     |\n"
     Usage += "          (5) $ ./nightlyBuild.py  --makedmg  1                              |\n"
-    Usage += "          (6) $ ./nightlyBuild.py  --upload  '0.29.7'                        |\n"
+    Usage += "          (6) $ ./nightlyBuild.py  --upload  '0.30.2'                        |\n"
     Usage += "          (7) $ ./nightlyBuild.py  --cleandmg 1                              |\n"
     Usage += "-----------------------------------------------------------------------------+----------------------------\n"
 

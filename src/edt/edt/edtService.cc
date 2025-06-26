@@ -467,7 +467,7 @@ Service::copy_selected ()
     for (EditableSelectionIterator r = begin_selection (); ! r.at_end () && ! need_to_ask_for_copy_mode; ++r) {
       if (r->is_cell_inst ()) {
         const db::Cell &cell = view ()->cellview (r->cv_index ())->layout ().cell (r->back ().inst_ptr.cell_index ());
-        if (! cell.is_proxy () && ! cell.is_leaf ()) {
+        if (! cell.is_proxy ()) {
           need_to_ask_for_copy_mode = true;
         }
       }

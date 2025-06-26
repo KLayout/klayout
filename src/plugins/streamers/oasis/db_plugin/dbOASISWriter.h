@@ -232,8 +232,8 @@ private:
   modal_variable<std::string> mm_text_string;
   modal_variable<db::Coord> mm_geometry_x;
   modal_variable<db::Coord> mm_geometry_y;
-  modal_variable<db::Coord> mm_geometry_w;
-  modal_variable<db::Coord> mm_geometry_h;
+  modal_variable<db::coord_traits<db::Coord>::distance_type> mm_geometry_w;
+  modal_variable<db::coord_traits<db::Coord>::distance_type> mm_geometry_h;
   modal_variable< std::vector<db::Vector> > mm_polygon_point_list;
   modal_variable<db::Coord> mm_path_halfwidth;
   modal_variable<db::Coord> mm_path_start_extension;

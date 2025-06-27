@@ -1153,3 +1153,10 @@ TEST(215_multiDEF)
 
   db::compare_layouts (_this, ly, fn_path + "au.oas", db::WriteOAS);
 }
+
+//  issue-2075
+TEST(216_line_extensions)
+{
+  run_test (_this, "issue-2075", "map:test.map+lef:test.lef+def:test.def", "au.oas", default_options (), false);
+}
+

@@ -245,6 +245,11 @@ private:
     l = get_int64 ();
   }
 
+  void get_size (size_t &l)
+  {
+    l = get_uint64 ();
+  }
+
   void get (uint64_t &l)
   {
     l = get_uint64 ();

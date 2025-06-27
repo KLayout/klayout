@@ -820,7 +820,7 @@ void
 OASISWriter::write_bstring (const char *s)
 {
   size_t l = strlen (s);
-  write (l);
+  write ((uint64_t) l);
   write_bytes (s, l);
 }
 
@@ -839,7 +839,7 @@ void
 OASISWriter::write_astring (const char *s)
 {
   std::string nstr = make_astring (s);
-  write (nstr.size ());
+  write ((uint64_t) nstr.size ());
   write_bytes (nstr.c_str (), nstr.size ());
 }
 
@@ -858,7 +858,7 @@ void
 OASISWriter::write_nstring (const char *s)
 {
   std::string nstr = make_nstring (s);
-  write (nstr.size ());
+  write ((uint64_t) nstr.size ());
   write_bytes (nstr.c_str (), nstr.size ());
 }
 
@@ -1062,8 +1062,8 @@ OASISWriter::end_cblock ()
     //  RFC1951 compression:
     write_byte (0); 
 
-    write (m_cblock_buffer.size ());
-    write (m_cblock_compressed.size ());
+    write ((uint64_t) m_cblock_buffer.size ());
+    write ((uint64_t) m_cblock_compressed.size ());
 
     write_bytes (m_cblock_compressed.data (), m_cblock_compressed.size ());
 
@@ -1767,23 +1767,23 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
 
     //  cellnames
     write_byte (1); 
-    write (cellnames_table_pos);
+    write ((uint64_t) cellnames_table_pos);
 
     //  textstrings
     write_byte (1); 
-    write (textstrings_table_pos);
+    write ((uint64_t) textstrings_table_pos);
 
     //  propnames
     write_byte (1); 
-    write (propnames_table_pos);
+    write ((uint64_t) propnames_table_pos);
 
     //  propstrings
     write_byte (1); 
-    write (propstrings_table_pos);
+    write ((uint64_t) propstrings_table_pos);
 
     //  layernames
     write_byte (1); 
-    write (layernames_table_pos);
+    write ((uint64_t) layernames_table_pos);
 
     //  xnames (not used)
     write_byte (1); 
@@ -1847,11 +1847,11 @@ OASISWriter::write (const Repetition &rep)
 
       if (g <= 1) {
         write_byte (10);
-        write (iterated->size () - 1);
+        write ((uint64_t) iterated->size () - 1);
         g = 1;
       } else {
         write_byte (11);
-        write (iterated->size () - 1);
+        write ((uint64_t) iterated->size () - 1);
         write_ucoord (g, 1.0);
       }
 
@@ -1881,31 +1881,31 @@ OASISWriter::write (const Repetition &rep)
 
         if (b.x () == 0 && b.y () >= 0) {
           write_byte (3);
-          write (bmax - 2);
+          write ((uint64_t) bmax - 2);
           write_ucoord (b.y ());
         } else if (b.y () == 0 && b.x () >= 0) {
           write_byte (2);
-          write (bmax - 2);
+          write ((uint64_t) bmax - 2);
           write_ucoord (b.x ());
         } else {
           write_byte (9);
-          write (bmax - 2);
+          write ((uint64_t) bmax - 2);
           write_gdelta (b);
         }
 
       } else if (b.x () == 0 && b.y () >= 0 && a.y () == 0 && a.x () >= 0) {
 
         write_byte (1);
-        write (amax - 2);
-        write (bmax - 2);
+        write ((uint64_t) amax - 2);
+        write ((uint64_t) bmax - 2);
         write_ucoord (a.x ());
         write_ucoord (b.y ());
 
       } else if (b.y () == 0 && b.x () >= 0 && a.x () == 0 && a.y () >= 0) {
 
         write_byte (1);
-        write (bmax - 2);
-        write (amax - 2);
+        write ((uint64_t) bmax - 2);
+        write ((uint64_t) amax - 2);
         write_ucoord (b.x ());
         write_ucoord (a.y ());
 

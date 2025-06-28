@@ -242,12 +242,12 @@ protected:
   /**
    * @brief Merge (and delete) the src_cell into target_cell
    */
-  void merge_cell (db::Layout &layout, db::cell_index_type target_cell_index, db::cell_index_type src_cell_index, bool with_meta, bool no_duplicate_instances) const;
+  void merge_cell (db::Layout &layout, db::cell_index_type target_cell_index, db::cell_index_type src_cell_index, bool with_meta, bool no_duplicate_instances);
 
   /**
    * @brief Merge (and delete) the src_cell into target_cell without instances
    */
-  void merge_cell_without_instances (db::Layout &layout, db::cell_index_type target_cell_index, db::cell_index_type src_cell_index, bool with_meta) const;
+  void merge_cell_without_instances (db::Layout &layout, db::cell_index_type target_cell_index, db::cell_index_type src_cell_index, bool with_meta);
 
   /**
    *  @brief Gets the layer name map

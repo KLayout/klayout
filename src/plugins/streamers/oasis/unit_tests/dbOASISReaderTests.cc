@@ -679,3 +679,24 @@ TEST(DuplicateCellname)
     EXPECT_EQ (ex.msg ().find ("Same cell name TOP, but different IDs: 3 and 0 (position=1070, cell=)"), size_t (0));
   }
 }
+
+TEST(BlendCrash)
+{
+  db::Manager m (false);
+  db::Layout layout (&m);
+
+  {
+    tl::InputStream file (tl::testdata () + "/oasis/blend_crash1.oas");
+    db::OASISReader reader (file);
+    reader.read (layout);
+  }
+
+  {
+    tl::InputStream file (tl::testdata () + "/oasis/blend_crash2.oas");
+    db::OASISReader reader (file);
+    reader.read (layout);
+  }
+
+  std::string fn_au (tl::testdata () + "/oasis/blend_crash_au.gds.gz");
+  db::compare_layouts (_this, layout, fn_au, db::WriteGDS2, 1);
+}

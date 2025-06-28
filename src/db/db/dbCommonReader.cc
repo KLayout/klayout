@@ -240,7 +240,7 @@ CommonReaderBase::cell_for_instance (db::Layout &layout, const std::string &cn)
 }
 
 void
-CommonReaderBase::merge_cell (db::Layout &layout, db::cell_index_type target_cell_index, db::cell_index_type src_cell_index, bool with_meta, bool no_duplicate_instances) const
+CommonReaderBase::merge_cell (db::Layout &layout, db::cell_index_type target_cell_index, db::cell_index_type src_cell_index, bool with_meta, bool no_duplicate_instances)
 {
   const db::Cell &src_cell = layout.cell (src_cell_index);
   db::Cell &target_cell = layout.cell (target_cell_index);
@@ -284,7 +284,7 @@ CommonReaderBase::merge_cell (db::Layout &layout, db::cell_index_type target_cel
 }
 
 void
-CommonReaderBase::merge_cell_without_instances (db::Layout &layout, db::cell_index_type target_cell_index, db::cell_index_type src_cell_index, bool with_meta) const
+CommonReaderBase::merge_cell_without_instances (db::Layout &layout, db::cell_index_type target_cell_index, db::cell_index_type src_cell_index, bool with_meta)
 {
   const db::Cell &src_cell = layout.cell (src_cell_index);
   db::Cell &target_cell = layout.cell (target_cell_index);
@@ -311,6 +311,7 @@ CommonReaderBase::merge_cell_without_instances (db::Layout &layout, db::cell_ind
 
   //  finally delete the new cell
   layout.delete_cell (src_cell.cell_index ());
+  m_temp_cells.erase (src_cell.cell_index ());
 }
 
 void

@@ -240,7 +240,7 @@ template <class Tag> void create_repetition_by_type (const db::Shape &array_shap
 
   std::vector<db::Vector> pts;
   db::Vector a, b;
-  uint64_t amax = 0, bmax = 0;
+  unsigned long amax = 0, bmax = 0;
 
   if (array->is_iterated_array (&pts)) {
 
@@ -262,7 +262,7 @@ template <class Tag> void create_repetition_by_type (const db::Shape &array_shap
 
   } else if (array->is_regular_array (a, b, amax, bmax)) {
 
-    db::RegularRepetition *rep_base = new db::RegularRepetition (a, b, size_t (std::max ((uint64_t) 1, amax)), size_t (std::max ((uint64_t) 1, bmax)));
+    db::RegularRepetition *rep_base = new db::RegularRepetition (a, b, size_t (std::max ((unsigned long) 1, amax)), size_t (std::max ((unsigned long) 1, bmax)));
     rep.set_base (rep_base);
 
   } else {
@@ -1912,8 +1912,8 @@ OASISWriter::write (const Repetition &rep)
       } else {
 
         write_byte (8);
-        write (amax - 2);
-        write (bmax - 2);
+        write ((uint64_t) amax - 2);
+        write ((uint64_t) bmax - 2);
         write_gdelta (a);
         write_gdelta (b);
 
@@ -1990,7 +1990,7 @@ OASISWriter::write (const db::CellInstArray &inst, db::properties_id_type prop_i
 
   std::vector<db::Vector> pts;
   db::Vector a, b;
-  uint64_t amax, bmax;
+  unsigned long amax, bmax;
 
   if (inst.is_iterated_array (&pts) && pts.size () > 1) {
 

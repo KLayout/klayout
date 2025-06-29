@@ -149,7 +149,7 @@ TextWriter::write_props (const db::Layout & /*layout*/, size_t prop_id)
     const tl::Variant &name = p->first;
     const tl::Variant &value = p->second;
 
-    if (name.is_long () || name.is_ulong ()) {
+    if (name.can_convert_to_long ()) {
       *this << "  {" << int (name.to_long ()) << " {" << value.to_string () << "}}" << endl_str ();
     } else if (name.is_a_string ()) {
       *this << "  {{" << name.to_string () << "} {" << value.to_string () << "}}" << endl_str ();

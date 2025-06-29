@@ -297,21 +297,21 @@ CommonReaderBase::merge_cell_without_instances (db::Layout &layout, db::cell_ind
   }
 
   //  replace all instances of the new cell with the original one
-  layout.replace_instances_of (src_cell.cell_index (), target_cell.cell_index ());
+  layout.replace_instances_of (src_cell_index, target_cell_index);
 
   //  merge meta info
   if (with_meta) {
-    auto ib = layout.begin_meta (src_cell.cell_index ());
-    auto ie = layout.end_meta (src_cell.cell_index ());
+    auto ib = layout.begin_meta (src_cell_index);
+    auto ie = layout.end_meta (src_cell_index);
     for (auto i = ib; i != ie; ++i) {
-      layout.add_meta_info (target_cell.cell_index (), i->first, i->second);
+      layout.add_meta_info (target_cell_index, i->first, i->second);
     }
   }
-  layout.clear_meta (src_cell.cell_index ());
+  layout.clear_meta (src_cell_index);
 
   //  finally delete the new cell
-  layout.delete_cell (src_cell.cell_index ());
-  m_temp_cells.erase (src_cell.cell_index ());
+  m_temp_cells.erase (src_cell_index);
+  layout.delete_cell (src_cell_index);
 }
 
 void

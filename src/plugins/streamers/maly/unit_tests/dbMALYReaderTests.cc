@@ -135,6 +135,7 @@ TEST(10_BasicLayout)
 {
   run_test (_this, tl::testdata (), "MALY_test10.maly", "maly_test10_au.oas");
   run_test (_this, tl::testdata (), "MALY_test10.maly", "maly_test10_lm_au.oas", "A: 10, B: 11, C: 12, D: 13");
+  run_test (_this, tl::testdata (), "MALY_test10.maly", "maly_test10_dbu10nm_au.oas", 0, 0.01);
 }
 
 TEST(11_Titles)

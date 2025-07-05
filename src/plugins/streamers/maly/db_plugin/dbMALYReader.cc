@@ -51,7 +51,6 @@ namespace db
 MALYReader::MALYReader (tl::InputStream &s)
   : m_stream (s),
     m_progress (tl::to_string (tr ("Reading MALY file")), 1000),
-    m_dbu (0.001),
     m_last_record_line (0)
 {
   m_progress.set_format (tl::to_string (tr ("%.0fk lines")));
@@ -89,7 +88,10 @@ MALYReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
   init (options);
 
   const db::MALYReaderOptions &specific_options = options.get_options<db::MALYReaderOptions> ();
-  m_dbu = specific_options.dbu;
+  double dbu = specific_options.dbu;
+
+  check_dbu (dbu);
+  layout.dbu (dbu);
 
   set_layer_map (specific_options.layer_map);
   set_create_layers (specific_options.create_other_layers);

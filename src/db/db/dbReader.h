@@ -259,6 +259,22 @@ public:
     return mp_actual_reader->warnings_as_errors ();
   }
 
+  /**
+   *  @brief Sets the expected database unit (see ReaderBase)
+   */
+  void set_expected_dbu (double dbu)
+  {
+    return mp_actual_reader->set_expected_dbu (dbu);
+  }
+
+  /**
+   *  @brief Gets the expected database unit
+   */
+  double expected_dbu () const
+  {
+    return mp_actual_reader->expected_dbu ();
+  }
+
 private:
   ReaderBase *mp_actual_reader;
   tl::InputStream &m_stream;

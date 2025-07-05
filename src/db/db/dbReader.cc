@@ -82,7 +82,6 @@ ReaderBase::init (const db::LoadLayoutOptions &options)
   m_last_warning.clear ();
   m_warn_count_for_same_message = 0;
   m_first_warning = true;
-  m_expected_dbu = 0.0;
 }
 
 bool

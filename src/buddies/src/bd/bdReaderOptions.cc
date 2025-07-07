@@ -892,15 +892,41 @@ void read_files (db::Layout &layout, const std::string &infile, const db::LoadLa
 
       std::vector<db::cell_index_type> cells_target;
       std::vector<db::cell_index_type> cells_source;
+
       for (auto c = tmp.begin_top_down (); c != tmp.end_top_cells (); ++c) {
+
         cells_source.push_back (*c);
-        cells_target.push_back (layout.add_cell (tmp.cell_name (*c)));
+
+        //  as a special rule, join ghost cells if the source top cell fits into
+        //  a ghost cell of the target.
+        auto cell_target = layout.cell_by_name (tmp.cell_name (*c));
+        if (cell_target.first && layout.cell (cell_target.second).is_ghost_cell ()) {
+          cells_target.push_back (cell_target.second);
+        } else {
+          cells_target.push_back (layout.add_cell (tmp.cell_name (*c)));
+        }
+
       }
+
+      //  ghost cell joining also works the other way around: a top cell of destination
+      //  can match a ghost cell of the source
+      for (auto c = tmp.end_top_cells (); c != tmp.end_top_down (); ++c) {
+
+        const db::Cell &cell_source = tmp.cell (*c);
+        auto cell_target = layout.cell_by_name (tmp.cell_name (*c));
+
+        if (cell_source.is_ghost_cell () && cell_target.first) {
+          cells_source.push_back (*c);
+          cells_target.push_back (cell_target.second);
+        }
+
+      }
+
+      db::CellMapping cm;
+      cm.create_multi_mapping_full (layout, cells_target, tmp, cells_source);
 
       db::LayerMapping lm;
       lm.create_full (layout, tmp);
-      db::CellMapping cm;
-      cm.create_multi_mapping_full (layout, cells_target, tmp, cells_source);
 
       layout.move_tree_shapes (tmp, cm, lm);
 

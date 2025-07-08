@@ -77,14 +77,14 @@ public:
     }
 
     //  because the rasterizer can't handle overlapping cells we need to multiply the row and columns steps
-    //  with an integer until the effective rasterizer pitch get big enough.
+    //  with an integer until the effective rasterizer pitch gets big enough.
     m_row_steps *= (m_dim.x () - 1) / (m_row_steps * m_row_step.x ()) + 1;
     m_column_steps *= (m_dim.y () - 1) / (m_column_steps * m_column_step.y ()) + 1;
 
     db::Box fp_bbox = fp.box ();
 
     //  compensate for distortion by sheared kernel
-    fp_bbox.enlarge (db::Vector (db::coord_traits<db::Coord>::rounded (double (fp_bbox.height ()) * std::abs (m_column_step.x ()) / dy), db::coord_traits<db::Coord>::rounded (double (fp_bbox.width ()) * std::abs (m_row_step.y ()) / dx)));
+    fp_bbox.enlarge (db::Vector (m_column_step.x () * m_column_steps, m_row_step.y () * m_row_steps));
 
     int columns_per_rows = (int (m_row_steps) * m_row_step.y ()) / dy;
     int rows_per_columns = (int (m_column_steps) * m_column_step.x ()) / dx;

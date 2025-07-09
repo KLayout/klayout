@@ -284,10 +284,12 @@ fill_polygon_impl (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type f
 
             if (remaining_parts) {
               if (am1.d ().y () == am1.p ().y ()) {
-                filled_regions.push_back (db::Polygon (db::Box (db::Point (), db::Point (am1.p ().x (), am1.p ().y () * db::Coord (jj - j))).moved (kernel_origin + p0)));
+                db::Box fill_box (db::Point (), db::Point (am1.p ().x (), am1.p ().y () * db::Coord (jj - j)));
+                filled_regions.push_back (db::Polygon (fill_box.enlarged (fill_margin).moved (kernel_origin + p0)));
               } else {
                 for (size_t k = 0; k < jj - j; ++k) {
-                  filled_regions.push_back (db::Polygon (db::Box (db::Point (), db::Point () + am1.p ()).moved (kernel_origin + p0 + db::Vector (0, am1.d ().y () * db::Coord (k)))));
+                  db::Box fill_box (db::Point (), db::Point () + am1.p ());
+                  filled_regions.push_back (db::Polygon (fill_box.enlarged (fill_margin).moved (kernel_origin + p0 + db::Vector (0, am1.d ().y () * db::Coord (k)))));
                 }
               }
             }
@@ -314,19 +316,9 @@ fill_polygon_impl (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type f
   if (any_fill) {
 
     if (remaining_parts) {
-
       std::vector <db::Polygon> fp1;
-
-      if (fill_margin != db::Vector ()) {
-        ep.size (filled_regions, fill_margin.x (), fill_margin.y (), fp1, 3 /*mode*/, false /*=don't resolve holes*/);
-        filled_regions.swap (fp1);
-        fp1.clear ();
-      }
-
       fp1.push_back (fp0);
       ep.boolean (fp1, filled_regions, *remaining_parts, db::BooleanOp::ANotB, false /*=don't resolve holes*/);
-
-
     }
 
     return true;

@@ -84,7 +84,9 @@ public:
     db::Box fp_bbox = fp.box ();
 
     //  compensate for distortion by sheared kernel
-    fp_bbox.enlarge (db::Vector (std::abs (db::Coord (m_column_step.x () * m_column_steps)), std::abs (db::Coord (m_row_step.y () * m_row_steps))));
+    db::Coord ex = std::max (std::abs (db::Coord (m_column_step.x () * m_column_steps)), std::abs (db::Coord (m_row_step.x () * m_row_steps)));
+    db::Coord ey = std::max (std::abs (db::Coord (m_column_step.y () * m_column_steps)), std::abs (db::Coord (m_row_step.y () * m_row_steps)));
+    fp_bbox.enlarge (db::Vector (ex, ey));
 
     int columns_per_rows = (int (m_row_steps) * m_row_step.y ()) / dy;
     int rows_per_columns = (int (m_column_steps) * m_column_step.x ()) / dx;

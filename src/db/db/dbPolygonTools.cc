@@ -1918,7 +1918,7 @@ rasterize_impl (const db::polygon<C> &polygon, db::area_map<C> &am)
 
       area_type aa = a;
 
-      if (dx == py) {
+      if (dx == px) {
 
         box_type cell (x, y, xx, yy);
 

@@ -280,7 +280,8 @@ fill_polygon_impl (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type f
 
             {
               //  In case we run this from a tiling processor we need to lock against multithread races
-              tl::MutexLocker locker (&db::TilingProcessor::output_lock ());
+              tl_assert (cell->layout () != 0);
+              tl::MutexLocker locker (&cell->layout ()->lock ());
               cell->insert (array);
             }
 

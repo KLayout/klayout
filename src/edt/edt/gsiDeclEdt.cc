@@ -73,6 +73,13 @@ static db::Layout *layout_from_inst_path (const lay::ObjectInstPath *p)
   return cell ? cell->layout () : 0;
 }
 
+static db::Cell *cell_from_inst_path (const lay::ObjectInstPath *p)
+{
+  auto cell_index = p->cell_index_tot ();
+  db::Layout *layout = layout_from_inst_path (p);
+  return layout ? &layout->cell (cell_index) : 0;
+}
+
 static db::DCplxTrans source_dtrans (const lay::ObjectInstPath *p)
 {
   const db::Layout *layout = layout_from_inst_path (p);
@@ -203,6 +210,13 @@ gsi::Class<lay::ObjectInstPath> decl_ObjectInstPath ("lay", "ObjectInstPath",
     "This property is set implicitly by setting the top cell and adding elements to the instantiation path.\n"
     "To obtain the index of the container cell, use \\source.\n"
   ) + 
+  gsi::method_ext ("cell", &cell_from_inst_path,
+    "@brief Gets the cell object that the selection applies to.\n"
+    "\n"
+    "This is a convenience method that returns a \\Cell objeact instead of a cell index (see \\cell_index).\n"
+    "\n"
+    "This method has been introduced in version 0.30.3.\n"
+  ) +
   gsi::method_ext ("layout", &layout_from_inst_path,
     "@brief Gets the Layout object the selected object lives in.\n"
     "\n"

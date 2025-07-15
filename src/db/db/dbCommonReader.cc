@@ -146,8 +146,6 @@ CommonReaderBase::name_for_id (size_t id) const
 void
 CommonReaderBase::rename_cell (db::Layout &layout, size_t id, const std::string &cn)
 {
-  m_name_for_id.insert (std::make_pair (id, cn));
-
   std::map<size_t, std::pair<std::string, db::cell_index_type> >::iterator iid = m_id_map.find (id);
   std::map<std::string, std::pair<size_t, db::cell_index_type> >::iterator iname = m_name_map.find (cn);
 
@@ -156,8 +154,21 @@ CommonReaderBase::rename_cell (db::Layout &layout, size_t id, const std::string 
   }
 
   if (iname != m_name_map.end () && iname->second.first != null_id && iname->second.first != id) {
-    common_reader_error (tl::sprintf (tl::to_string (tr ("Same cell name %s, but different IDs: %ld and %ld")), cn, id, iname->second.first));
+
+    //  picking a different name on name clash (issue #2088)
+    std::string cn_new = cn + "_id$" + tl::to_string (id);
+    for (size_t i = 0; m_name_map.find (cn_new) != m_name_map.end (); ++i) {
+      cn_new = cn + "_id$" + tl::to_string (id) + "$" + tl::to_string (i);
+    }
+
+    common_reader_warn (tl::sprintf (tl::to_string (tr ("Same cell name %s, but different IDs: %ld and %ld, renaming first to %s")), cn, id, iname->second.first, cn_new));
+    rename_cell (layout, id, cn_new);
+
+    return;
+
   }
+
+  m_name_for_id.insert (std::make_pair (id, cn));
 
   if (iid != m_id_map.end () && iname != m_name_map.end ()) {
 

@@ -216,6 +216,7 @@ private:
   std::map <std::string, unsigned long> m_textstrings;
   std::map <std::string, unsigned long> m_propnames;
   std::map <std::string, unsigned long> m_propstrings;
+  std::map <db::cell_index_type, std::string> m_cell_nstrings;
 
   typedef std::vector<tl::Variant> property_value_list;
 
@@ -247,6 +248,9 @@ private:
 
   OASISWriterOptions m_options;
   tl::AbsoluteProgress m_progress;
+
+  void create_cell_nstrings (const db::Layout &layout, const std::set <db::cell_index_type> &cell_set);
+  const char *cell_nstring(db::cell_index_type cell_index);
 
   void write_record_id (char b);
   void write_byte (char b);

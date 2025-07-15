@@ -26,6 +26,7 @@
 
 #include "tlDeflate.h"
 #include "tlMath.h"
+#include "tlUniqueName.h"
 
 #include <math.h>
 
@@ -1334,7 +1335,7 @@ OASISWriter::write_cellname_table (size_t &cellnames_table_pos, const std::vecto
     begin_table (cellnames_table_pos);
 
     write_record_id (sequential ? 3 : 4);
-    write_nstring (layout.cell_name (*cell));
+    write_nstring (cell_nstring (*cell));
     if (! sequential) {
       write ((unsigned long) *cell);
     }
@@ -1476,6 +1477,31 @@ static bool skip_cell_body (const db::Cell &cref)
   return cref.is_ghost_cell () && cref.empty ();
 }
 
+void
+OASISWriter::create_cell_nstrings (const db::Layout &layout, const std::set <db::cell_index_type> &cell_set)
+{
+  m_cell_nstrings.clear ();
+
+  std::set<std::string> names;
+
+  for (auto c = cell_set.begin (); c != cell_set.end (); ++c) {
+
+    std::string cn = make_nstring (layout.cell_name (*c));
+    cn = tl::unique_name (cn, names);
+
+    m_cell_nstrings.insert (std::make_pair (*c, cn));
+    names.insert (cn);
+
+  }
+}
+
+const char *
+OASISWriter::cell_nstring (db::cell_index_type cell_index)
+{
+  auto n = m_cell_nstrings.find (cell_index);
+  tl_assert (n != m_cell_nstrings.end ());
+  return n->second.c_str ();
+}
 
 void 
 OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLayoutOptions &options)
@@ -1509,6 +1535,8 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
 
   std::set <db::cell_index_type> cell_set;
   options.get_cells (layout, cell_set, layers);
+
+  create_cell_nstrings (layout, cell_set);
 
   //  create a cell index vector sorted bottom-up
   std::vector <db::cell_index_type> cells, cells_by_index;
@@ -1602,7 +1630,7 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
         is_top = (cell_set.find (*p) == cell_set.end ());
       }
       if (is_top) {
-        write_property_def (s_top_cell_name, tl::Variant (make_nstring (layout.cell_name (*cell))), true);
+        write_property_def (s_top_cell_name, tl::Variant (cell_nstring (*cell)), true);
       }
     }
 

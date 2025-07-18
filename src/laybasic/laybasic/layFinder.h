@@ -236,7 +236,16 @@ public:
   typedef std::vector<lay::ObjectInstPath> founds_vector_type;
   typedef founds_vector_type::const_iterator iterator;
 
-  ShapeFinder (bool point_mode, bool top_level_sel, db::ShapeIterator::flags_type flags, const std::set<lay::ObjectInstPath> *excludes = 0);
+  /**
+   *  @brief Creates a shape finder object
+   *
+   *  @param point_mode If true, selects "point mode", where shapes are found relative to the (point-like) bounding box
+   *  @param top_level_sel If true, selects only top level objects
+   *  @param flags The shape types to look for
+   *  @param excludes Objects (by instance path) to exclude
+   *  @param capture_all_shapes Only valid in point mode. If true, all shapes are found. Otherwise only those which are not overlapping the view port entirely.
+   */
+  ShapeFinder (bool point_mode, bool top_level_sel, db::ShapeIterator::flags_type flags, const std::set<lay::ObjectInstPath> *excludes = 0, bool capture_all_shapes = false);
 
   bool find (LayoutViewBase *view, const lay::LayerProperties &lprops, const db::DBox &region_mu);
   bool find (LayoutViewBase *view, const db::DBox &region_mu);
@@ -313,6 +322,7 @@ private:
   tl::AbsoluteProgress *mp_progress;
   std::vector<int> m_context_layers;
   std::map<db::cell_index_type, bool> m_cells_with_context;
+  bool m_capture_all_shapes;
 };
 
 /**

@@ -1127,10 +1127,20 @@ void Shapes::reset_bbox_dirty ()
 
 void Shapes::update ()
 {
+  std::unique_ptr<tl::MutexLocker> locker;
+
+  //  If not in a layout context, we should lock here against multiple calls from different threads.
+  //  In a layout context, the Layout object will do that for us.
+  if (layout () == 0) {
+    static tl::Mutex lock;
+    locker.reset (new tl::MutexLocker (&lock));
+  }
+
   for (tl::vector<LayerBase *>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
     (*l)->sort ();
     (*l)->update_bbox ();
   }
+
   set_dirty (false);
 }
 

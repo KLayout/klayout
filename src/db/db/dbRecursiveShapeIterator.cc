@@ -500,15 +500,21 @@ RecursiveShapeIterator::validate (RecursiveShapeReceiver *receiver) const
   }
 
   if (mp_shapes) {
+
     //  Ensures the trees are built properly - this is important in MT contexts (i.e. TilingProcessor)
     //  TODO: get rid of that const cast
     (const_cast <db::Shapes *> (mp_shapes))->update ();
+
     start_shapes ();
+
   } else if (mp_layout && (! m_has_layers || m_current_layer < m_layers.size ())) {
+
     //  Ensures the trees are built properly - this is important in MT contexts (i.e. TilingProcessor)
     mp_layout->update ();
+
     new_cell (receiver);
     next_shape (receiver);
+
   }
 
   if (mp_layout && ! at_end ()) {

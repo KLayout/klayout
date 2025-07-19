@@ -43,8 +43,13 @@ int converter_main (int argc, char *argv[], const std::string &format)
   generic_reader_options.add_options (cmd);
 
   cmd << tl::arg ("input",  &infile,  "The input file (any format, may be gzip compressed)",
-                  "You can use '+' or ',' to supply multiple files which will be read after each other into the same layout. "
-                  "This provides some cheap, but risky way of merging files. Beware of cell name conflicts.")
+                  "Multiple files can be combined using '+' or ','. '+' will combine the files in 'blending' mode. "
+                  "In this mode it is possible to combine identically named cells into one cell for example. This mode "
+                  "needs to be used with care and there some constraints - e.g. the database unit of the involved "
+                  "layouts needs to be the same. When using ',' as a separator, blending is not used, but the layouts "
+                  "are merged by first creating two layouts and then combining them into one. This mode is more robust "
+                  "but does not allow cell merging. '+' combination has higher priority than ',' - i.e. 'a+b,c' is "
+                  "understood as '(a+b),c'.")
       << tl::arg ("output", &outfile, tl::sprintf ("The output file (%s format)", format))
     ;
 

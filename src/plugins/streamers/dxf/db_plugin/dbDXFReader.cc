@@ -350,6 +350,7 @@ DXFReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
 
   db::cell_index_type top = layout.add_cell("TOP"); // TODO: make variable ..
 
+  check_dbu (m_dbu);
   layout.dbu (m_dbu);
   do_read (layout, top);
   cleanup (layout, top);

@@ -662,20 +662,37 @@ TEST(Bug_1799)
   EXPECT_EQ (ps2.value (pn).to_string (), "hello, world!");
 }
 
+//  Modified in #2088 to give a warning
 TEST(DuplicateCellname)
 {
   db::Manager m (false);
   db::Layout layout (&m);
 
-  try {
-    tl::InputStream file (tl::testdata () + "/oasis/duplicate_cellname.oas");
+  tl::InputStream file (tl::testdata () + "/oasis/duplicate_cellname.oas");
+  db::OASISReader reader (file);
+  reader.read (layout);
+
+  std::string fn_au (tl::testdata () + "/oasis/duplicate_cellname_au.oas");
+  db::compare_layouts (_this, layout, fn_au, db::NoNormalization, 1);
+}
+
+TEST(BlendCrash)
+{
+  db::Manager m (false);
+  db::Layout layout (&m);
+
+  {
+    tl::InputStream file (tl::testdata () + "/oasis/blend_crash1.oas");
     db::OASISReader reader (file);
     reader.read (layout);
-    EXPECT_EQ (false, true);
-  } catch (tl::CancelException &ex) {
-    //  Seen when private test data is not installed
-    throw;
-  } catch (tl::Exception &ex) {
-    EXPECT_EQ (ex.msg ().find ("Same cell name TOP, but different IDs: 3 and 0 (position=1070, cell=)"), size_t (0));
   }
+
+  {
+    tl::InputStream file (tl::testdata () + "/oasis/blend_crash2.oas");
+    db::OASISReader reader (file);
+    reader.read (layout);
+  }
+
+  std::string fn_au (tl::testdata () + "/oasis/blend_crash_au.gds.gz");
+  db::compare_layouts (_this, layout, fn_au, db::WriteGDS2, 1);
 }

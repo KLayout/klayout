@@ -98,6 +98,7 @@ MAGReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
     top_cell = layout.add_cell (top_cellname.c_str ());
   }
 
+  check_dbu (m_dbu);
   layout.dbu (m_dbu);
 
   m_cells_to_read.clear ();

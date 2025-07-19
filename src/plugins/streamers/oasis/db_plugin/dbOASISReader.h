@@ -140,14 +140,14 @@ private:
   modal_variable<db::cell_index_type> mm_placement_cell;
   modal_variable<db::Coord> mm_placement_x;
   modal_variable<db::Coord> mm_placement_y;
-  modal_variable<unsigned int> mm_layer;
-  modal_variable<unsigned int> mm_datatype;
-  modal_variable<unsigned int> mm_textlayer;
-  modal_variable<unsigned int> mm_texttype;
+  modal_variable<uint32_t> mm_layer;
+  modal_variable<uint32_t> mm_datatype;
+  modal_variable<uint32_t> mm_textlayer;
+  modal_variable<uint32_t> mm_texttype;
   modal_variable<db::Coord> mm_text_x;
   modal_variable<db::Coord> mm_text_y;
   modal_variable<std::string> mm_text_string;
-  modal_variable<unsigned int> mm_text_string_id;
+  modal_variable<uint64_t> mm_text_string_id;
   modal_variable<db::Coord> mm_geometry_x;
   modal_variable<db::Coord> mm_geometry_y;
   modal_variable<distance_type> mm_geometry_w;
@@ -157,17 +157,17 @@ private:
   modal_variable<db::Coord> mm_path_start_extension;
   modal_variable<db::Coord> mm_path_end_extension;
   modal_variable< std::vector<db::Point> > mm_path_point_list;
-  modal_variable<unsigned int> mm_ctrapezoid_type;
+  modal_variable<uint32_t> mm_ctrapezoid_type;
   modal_variable<distance_type> mm_circle_radius;
   modal_variable<db::property_names_id_type> mm_last_property_name;
   modal_variable<bool> mm_last_property_is_sprop;
   modal_variable<property_value_list> mm_last_value_list;
 
-  std::map <unsigned long, db::properties_id_type> m_cellname_properties;
-  std::map <unsigned long, std::string> m_textstrings;
-  std::map <unsigned long, const db::StringRef *> m_text_forward_references;
-  std::map <unsigned long, std::string> m_propstrings;
-  std::map <unsigned long, std::string> m_propnames;
+  std::map <uint64_t, db::properties_id_type> m_cellname_properties;
+  std::map <uint64_t, std::string> m_textstrings;
+  std::map <uint64_t, const db::StringRef *> m_text_forward_references;
+  std::map <uint64_t, std::string> m_propstrings;
+  std::map <uint64_t, std::string> m_propnames;
 
   std::map <db::cell_index_type, std::vector<tl::Variant> > m_context_strings_per_cell;
 
@@ -178,8 +178,8 @@ private:
   bool m_read_properties;
   bool m_read_all_properties;
 
-  std::map <unsigned long, db::property_names_id_type> m_propname_forward_references;
-  std::map <unsigned long, std::string> m_propvalue_forward_references;
+  std::map <uint64_t, db::property_names_id_type> m_propname_forward_references;
+  std::map <uint64_t, std::string> m_propvalue_forward_references;
   std::map <db::properties_id_type, std::set<db::Shapes *> > m_forward_properties_for_shapes;
   std::map <db::properties_id_type, std::set<db::Instances *> > m_forward_properties_for_instances;
   std::map <db::cell_index_type, db::PropertiesSet> m_future_cell_properties;
@@ -234,42 +234,35 @@ private:
     }
   }
 
-  long long get_long_long ();
-  unsigned long long get_ulong_long ();
-  long get_long ();
-  unsigned long get_ulong ();
-  unsigned long get_ulong_for_divider ();
-  int get_int ();
-  unsigned int get_uint ();
+  int64_t get_int64 ();
+  uint64_t get_uint64 ();
+  uint64_t get_uint64_for_divider ();
+  int32_t get_int32 ();
+  uint32_t get_uint32 ();
 
-  void get (long long &l)
+  void get (int64_t &l)
   {
-    l = get_long_long ();
+    l = get_int64 ();
   }
 
-  void get (unsigned long long &l)
+  void get_size (size_t &l)
   {
-    l = get_ulong_long ();
+    l = get_uint64 ();
   }
 
-  void get (long &l)
+  void get (uint64_t &l)
   {
-    l = get_long ();
+    l = get_uint64 ();
   }
 
-  void get (unsigned long &l)
+  void get (int32_t &l)
   {
-    l = get_ulong ();
+    l = get_int32 ();
   }
 
-  void get (int &l)
+  void get (uint32_t &l)
   {
-    l = get_int ();
-  }
-
-  void get (unsigned int &l)
-  {
-    l = get_uint ();
+    l = get_uint32 ();
   }
 
   void get (double &d)
@@ -280,12 +273,12 @@ private:
   std::string get_str ();
   void get_str (std::string &s);
   double get_real ();
-  db::Vector get_gdelta (long grid = 1);
-  db::Vector get_3delta (long grid = 1);
-  db::Vector get_2delta (long grid = 1);
-  db::Coord get_coord (long grid = 1);
-  db::Coord get_ucoord (unsigned long grid = 1);
-  distance_type get_ucoord_as_distance (unsigned long grid = 1);
+  db::Vector get_gdelta (int64_t grid = 1);
+  db::Vector get_3delta (int64_t grid = 1);
+  db::Vector get_2delta (int64_t grid = 1);
+  db::Coord get_coord (int64_t grid = 1);
+  db::Coord get_ucoord (uint64_t grid = 1);
+  distance_type get_ucoord_as_distance (uint64_t grid = 1);
 };
 
 }

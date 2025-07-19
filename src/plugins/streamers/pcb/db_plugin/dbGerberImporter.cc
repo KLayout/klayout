@@ -1142,6 +1142,8 @@ public:
     db::GerberImporter importer (warn_level ());
     data.setup_importer (&importer);
 
+    check_dbu (data.dbu);
+
     importer.read (layout);
 
     std::string lyr_file = data.get_layer_properties_file ();

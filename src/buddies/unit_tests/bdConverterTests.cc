@@ -483,7 +483,7 @@ TEST(10)
   std::string input;
   for (size_t i = 0; i < sizeof (def_files) / sizeof (def_files[0]); ++i) {
     if (i > 0) {
-      input += ",";
+      input += "+";
     }
     input += def_dir + "/" + def_files[i];
   }
@@ -501,6 +501,204 @@ TEST(10)
 
   db::Layout layout;
 
+  {
+    tl::InputStream stream (output);
+    db::LoadLayoutOptions options;
+    db::Reader reader (stream);
+    reader.read (layout, options);
+  }
+
+  db::compare_layouts (this, layout, input_au, db::WriteOAS);
+}
+
+//  Merging with +
+TEST(11_1)
+{
+  std::string input_dir = tl::testdata ();
+  input_dir += "/bd";
+
+  std::string input_au = input_dir + "/strm2oas_au_1.oas";
+  std::string input = input_dir + "/strm2oas_1.oas+" + input_dir + "/strm2oas_2.oas";
+
+  std::string output = this->tmp_file ("strm2oas_1.oas");
+  const char *argv[] = { "x",
+                         "--blend-mode=0",
+                         input.c_str (),
+                         output.c_str ()
+                       };
+
+  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, bd::GenericWriterOptions::oasis_format_name), 0);
+
+  db::Layout layout;
+  {
+    tl::InputStream stream (output);
+    db::LoadLayoutOptions options;
+    db::Reader reader (stream);
+    reader.read (layout, options);
+  }
+
+  db::compare_layouts (this, layout, input_au, db::WriteOAS);
+}
+
+//  Merging with + not allowed on different DBUs
+TEST(11_2)
+{
+  std::string input_dir = tl::testdata ();
+  input_dir += "/bd";
+
+  std::string input_au = input_dir + "/strm2oas_au_1.oas";
+  std::string input = input_dir + "/strm2oas_1.oas+" + input_dir + "/strm2oas_2_10nm.oas";
+
+  std::string output = this->tmp_file ("strm2oas_1.oas");
+  const char *argv[] = { "x",
+                         "--blend-mode=0",
+                         input.c_str (),
+                         output.c_str ()
+                       };
+
+  try {
+    bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, bd::GenericWriterOptions::oasis_format_name);
+    EXPECT_EQ (1, 0);
+  } catch (tl::Exception &ex) {
+    EXPECT_EQ (ex.msg (), "Former and present database units are not compatible: 0.001 (former) vs. 0.01 (present)");
+  }
+}
+
+//  Merging with + not allowed on different DBUs
+TEST(11_3)
+{
+  std::string input_dir = tl::testdata ();
+  input_dir += "/bd";
+
+  std::string input_au = input_dir + "/strm2oas_au_3.oas";
+  std::string input = input_dir + "/strm2oas_1.oas," + input_dir + "/strm2oas_2_10nm.oas";
+
+  std::string output = this->tmp_file ("strm2oas_3.oas");
+  const char *argv[] = { "x",
+                         "--blend-mode=0",
+                         input.c_str (),
+                         output.c_str ()
+                       };
+
+  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, bd::GenericWriterOptions::oasis_format_name), 0);
+
+  db::Layout layout;
+  {
+    tl::InputStream stream (output);
+    db::LoadLayoutOptions options;
+    db::Reader reader (stream);
+    reader.read (layout, options);
+  }
+
+  db::compare_layouts (this, layout, input_au, db::WriteOAS);
+}
+
+//  Merging with + and , under the presence of ghost cells: test+test,top->(test)
+TEST(12_1)
+{
+  std::string input_dir = tl::testdata ();
+  input_dir += "/bd";
+
+  std::string input_au = input_dir + "/strm2oas_au_12_1.oas";
+  std::string input = input_dir + "/strm2oas_a.oas+" + input_dir + "/strm2oas_b.oas," + input_dir + "/strm2oas_c.oas";
+
+  std::string output = this->tmp_file ("strm2oas_12_1.oas");
+  const char *argv[] = { "x",
+                         "--blend-mode=0",
+                         input.c_str (),
+                         output.c_str ()
+                       };
+
+  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, bd::GenericWriterOptions::oasis_format_name), 0);
+
+  db::Layout layout;
+  {
+    tl::InputStream stream (output);
+    db::LoadLayoutOptions options;
+    db::Reader reader (stream);
+    reader.read (layout, options);
+  }
+
+  db::compare_layouts (this, layout, input_au, db::WriteOAS);
+}
+
+//  Merging with + and , under the presence of ghost cells: top->(test),test+test
+TEST(12_2)
+{
+  std::string input_dir = tl::testdata ();
+  input_dir += "/bd";
+
+  std::string input_au = input_dir + "/strm2oas_au_12_2.oas";
+  std::string input = input_dir + "/strm2oas_c.oas," + input_dir + "/strm2oas_a.oas+" + input_dir + "/strm2oas_b.oas";
+
+  std::string output = this->tmp_file ("strm2oas_12_2.oas");
+  const char *argv[] = { "x",
+                         "--blend-mode=0",
+                         input.c_str (),
+                         output.c_str ()
+                       };
+
+  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, bd::GenericWriterOptions::oasis_format_name), 0);
+
+  db::Layout layout;
+  {
+    tl::InputStream stream (output);
+    db::LoadLayoutOptions options;
+    db::Reader reader (stream);
+    reader.read (layout, options);
+  }
+
+  db::compare_layouts (this, layout, input_au, db::WriteOAS);
+}
+
+//  Merging with + and , under the presence of ghost cells: test+test,toptop->top->(test)
+TEST(12_3)
+{
+  std::string input_dir = tl::testdata ();
+  input_dir += "/bd";
+
+  std::string input_au = input_dir + "/strm2oas_au_12_3.oas";
+  std::string input = input_dir + "/strm2oas_a.oas+" + input_dir + "/strm2oas_b.oas," + input_dir + "/strm2oas_cc.oas";
+
+  std::string output = this->tmp_file ("strm2oas_12_3.oas");
+  const char *argv[] = { "x",
+                         "--blend-mode=0",
+                         input.c_str (),
+                         output.c_str ()
+                       };
+
+  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, bd::GenericWriterOptions::oasis_format_name), 0);
+
+  db::Layout layout;
+  {
+    tl::InputStream stream (output);
+    db::LoadLayoutOptions options;
+    db::Reader reader (stream);
+    reader.read (layout, options);
+  }
+
+  db::compare_layouts (this, layout, input_au, db::WriteOAS);
+}
+
+//  Merging with + and , under the presence of ghost cells: toptop->top->(test),test+test
+TEST(12_4)
+{
+  std::string input_dir = tl::testdata ();
+  input_dir += "/bd";
+
+  std::string input_au = input_dir + "/strm2oas_au_12_4.oas";
+  std::string input = input_dir + "/strm2oas_cc.oas," + input_dir + "/strm2oas_a.oas+" + input_dir + "/strm2oas_b.oas";
+
+  std::string output = this->tmp_file ("strm2oas_12_4.oas");
+  const char *argv[] = { "x",
+                         "--blend-mode=0",
+                         input.c_str (),
+                         output.c_str ()
+                       };
+
+  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, bd::GenericWriterOptions::oasis_format_name), 0);
+
+  db::Layout layout;
   {
     tl::InputStream stream (output);
     db::LoadLayoutOptions options;

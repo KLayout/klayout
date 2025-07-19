@@ -236,6 +236,7 @@ GDS2ReaderBase::do_read (db::Layout &layout)
 
       m_dbuu = dbuu;
       m_dbu = dbum * 1e6; /*in micron*/
+      check_dbu (m_dbu);
       layout.dbu (m_dbu);
 
     } else {

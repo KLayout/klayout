@@ -146,8 +146,6 @@ CommonReaderBase::name_for_id (size_t id) const
 void
 CommonReaderBase::rename_cell (db::Layout &layout, size_t id, const std::string &cn)
 {
-  m_name_for_id.insert (std::make_pair (id, cn));
-
   std::map<size_t, std::pair<std::string, db::cell_index_type> >::iterator iid = m_id_map.find (id);
   std::map<std::string, std::pair<size_t, db::cell_index_type> >::iterator iname = m_name_map.find (cn);
 
@@ -156,8 +154,21 @@ CommonReaderBase::rename_cell (db::Layout &layout, size_t id, const std::string 
   }
 
   if (iname != m_name_map.end () && iname->second.first != null_id && iname->second.first != id) {
-    common_reader_error (tl::sprintf (tl::to_string (tr ("Same cell name %s, but different IDs: %ld and %ld")), cn, id, iname->second.first));
+
+    //  picking a different name on name clash (issue #2088)
+    std::string cn_new = cn + "_id$" + tl::to_string (id);
+    for (size_t i = 0; m_name_map.find (cn_new) != m_name_map.end (); ++i) {
+      cn_new = cn + "_id$" + tl::to_string (id) + "$" + tl::to_string (i);
+    }
+
+    common_reader_warn (tl::sprintf (tl::to_string (tr ("Same cell name %s, but different IDs: %ld and %ld, renaming first to %s")), cn, id, iname->second.first, cn_new));
+    rename_cell (layout, id, cn_new);
+
+    return;
+
   }
+
+  m_name_for_id.insert (std::make_pair (id, cn));
 
   if (iid != m_id_map.end () && iname != m_name_map.end ()) {
 
@@ -240,7 +251,7 @@ CommonReaderBase::cell_for_instance (db::Layout &layout, const std::string &cn)
 }
 
 void
-CommonReaderBase::merge_cell (db::Layout &layout, db::cell_index_type target_cell_index, db::cell_index_type src_cell_index, bool with_meta, bool no_duplicate_instances) const
+CommonReaderBase::merge_cell (db::Layout &layout, db::cell_index_type target_cell_index, db::cell_index_type src_cell_index, bool with_meta, bool no_duplicate_instances)
 {
   const db::Cell &src_cell = layout.cell (src_cell_index);
   db::Cell &target_cell = layout.cell (target_cell_index);
@@ -284,7 +295,7 @@ CommonReaderBase::merge_cell (db::Layout &layout, db::cell_index_type target_cel
 }
 
 void
-CommonReaderBase::merge_cell_without_instances (db::Layout &layout, db::cell_index_type target_cell_index, db::cell_index_type src_cell_index, bool with_meta) const
+CommonReaderBase::merge_cell_without_instances (db::Layout &layout, db::cell_index_type target_cell_index, db::cell_index_type src_cell_index, bool with_meta)
 {
   const db::Cell &src_cell = layout.cell (src_cell_index);
   db::Cell &target_cell = layout.cell (target_cell_index);
@@ -297,20 +308,21 @@ CommonReaderBase::merge_cell_without_instances (db::Layout &layout, db::cell_ind
   }
 
   //  replace all instances of the new cell with the original one
-  layout.replace_instances_of (src_cell.cell_index (), target_cell.cell_index ());
+  layout.replace_instances_of (src_cell_index, target_cell_index);
 
   //  merge meta info
   if (with_meta) {
-    auto ib = layout.begin_meta (src_cell.cell_index ());
-    auto ie = layout.end_meta (src_cell.cell_index ());
+    auto ib = layout.begin_meta (src_cell_index);
+    auto ie = layout.end_meta (src_cell_index);
     for (auto i = ib; i != ie; ++i) {
-      layout.add_meta_info (target_cell.cell_index (), i->first, i->second);
+      layout.add_meta_info (target_cell_index, i->first, i->second);
     }
   }
-  layout.clear_meta (src_cell.cell_index ());
+  layout.clear_meta (src_cell_index);
 
   //  finally delete the new cell
-  layout.delete_cell (src_cell.cell_index ());
+  m_temp_cells.erase (src_cell_index);
+  layout.delete_cell (src_cell_index);
 }
 
 void

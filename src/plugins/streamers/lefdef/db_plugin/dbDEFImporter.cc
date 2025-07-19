@@ -30,6 +30,8 @@
 namespace db
 {
 
+static const std::pair<db::Coord, db::Coord> ext_not_set = std::make_pair (std::numeric_limits<db::Coord>::min (), std::numeric_limits<db::Coord>::min ());
+
 struct DEFImporterGroup
 {
   DEFImporterGroup (const std::string &n, const std::string &rn, const std::vector<tl::GlobPattern> &m)
@@ -133,7 +135,7 @@ DEFImporter::get_def_ext (const std::string & /*ln*/, const std::pair<db::Coord,
   return std::make_pair (de, de);
 #else
   //  This implementation follows the LEFDEF 5.8 spec saying the "default extension is half the wire width":
-  db::Coord de = std::min (wxy.first, wxy.second) / 2;
+  auto de = std::min (wxy.second, wxy.first) / 2;
   return std::make_pair (de, de);
 #endif
 }
@@ -355,28 +357,46 @@ DEFImporter::produce_routing_geometry (db::Cell &design, const Polygon *style, u
     bool was_path_before = false;
 
     std::vector<db::Point>::const_iterator pt = pts.begin ();
+    std::vector<std::pair<db::Coord, db::Coord> >::const_iterator ex = ext.begin ();
+
     while (pt != pts.end ()) {
 
-      std::vector<db::Point>::const_iterator pt0 = pt;
+      auto pt0 = pt;
+      auto ex0 = ex;
       ++pt;
+      ++ex;
       if (pt == pts.end ()) {
         break;
       }
 
       bool multipart = false;
       if (is_isotropic) {
-        while (pt != pts.end () && (pt[-1].x () == pt[0].x () || pt[-1].y () == pt[0].y())) {
+        while (pt != pts.end ()) {
+          if (! (pt[-1].x () == pt[0].x () || pt[-1].y () == pt[0].y())) {
+            //  non-orthogonal segments are treated otherwise, not by paths
+            break;
+          }
+          if (pt + 1 != pts.end () && ex[0] != ext_not_set) {
+            //  connection points feature non-default extensions and should not be represented by paths
+            break;
+          }
           ++pt;
+          ++ex;
           multipart = true;
         }
         if (multipart) {
           --pt;
+          --ex;
         }
       }
 
-      //  The next part is the interval [pt0..pt] (pt inclusive)
+      //  The next part is the interval [pt0..pt] (including pt)
 
-      if (multipart || (pt0->x () == pt0[1].x () || pt0->y () == pt0[1].y())) {
+      if (! multipart && (pt0->x () == pt0[1].x () && pt0->y () == pt0[1].y())) {
+
+        //  ignore single-point paths
+
+      } else if (multipart || (pt0->x () == pt0[1].x () || pt0->y () == pt0[1].y())) {
 
         db::Coord wxy, wxy_perp;
 
@@ -388,33 +408,27 @@ DEFImporter::produce_routing_geometry (db::Cell &design, const Polygon *style, u
           wxy_perp = w.second;
         }
 
-        //  compute begin extension
+        //  compute begin and end extensions
         db::Coord be = 0;
-        if (pt0 == pts.begin ()) {
-          if (pt0->x () == pt0 [1].x ()) {
-            be = ext.front ().second;
-          } else {
-            be = ext.front ().first;
-          }
+        if (*ex0 != ext_not_set) {
+          be = (pt0->x () == pt0 [1].x ()) ? ex0->second : ex0->first;
         } else if (was_path_before) {
           //  provides the overlap to the previous segment
           be = wxy_perp / 2;
         }
 
-        //  compute end extension
         db::Coord ee = 0;
-        if (pt + 1 == pts.end ()) {
-          if (pt [-1].x () == pt->x ()) {
-            ee = ext.back ().second;
-          } else {
-            ee = ext.back ().first;
-          }
+        if (*ex != ext_not_set) {
+          ee = (pt [-1].x () == pt->x ()) ? ex->second : ex->first;
         }
 
         auto pt_from = pt0;
         auto pt_to = pt + 1;
 
-        //  do not split away end segments if they are shorter than half the width
+        //  Pplit paths if "joined_paths" is off. Sorry for spending the effort before to
+        //  compute multipath chains.
+        //  But now we can keep end segments joined if they are shorter than half the width
+        //  to establish a proper path end in that case.
 
         auto pt_from_split = pt_from;
         auto pt_to_split = pt_to;
@@ -553,16 +567,15 @@ DEFImporter::read_single_net (std::string &nondefaultrule, Layout &layout, db::C
     const std::string *rulename = 0;
 
     std::pair<db::Coord, db::Coord> w (0, 0);
-    if (specialnets) {
-      db::Coord n = db::coord_traits<db::Coord>::rounded (get_double () * scale);
-      w = std::make_pair (n, n);
-    }
 
     const db::Polygon *style = 0;
 
     int sn = std::numeric_limits<int>::max ();
 
     if (specialnets) {
+
+      db::Coord n = db::coord_traits<db::Coord>::rounded (get_double () * scale);
+      w = std::make_pair (n, n);
 
       while (test ("+")) {
 
@@ -598,11 +611,17 @@ DEFImporter::read_single_net (std::string &nondefaultrule, Layout &layout, db::C
       rulename = &nondefaultrule;
     }
 
-    std::pair<db::Coord, db::Coord> def_ext (0, 0);
-
     if (! specialnets) {
       w = get_wire_width_for_rule (*rulename, ln, layout.dbu ());
-      def_ext = get_def_ext (ln, w, layout.dbu ());
+    }
+
+    //  default extension for first and last point
+    std::pair<db::Coord, db::Coord> def_ext (0, 0);
+    std::pair<db::Coord, db::Coord> def_ext_conn = get_def_ext (ln, w, layout.dbu ());
+
+    if (! specialnets) {
+      //  first and last extensions are half width by default for routed nets
+      def_ext = def_ext_conn;
     }
 
     std::map<int, db::Polygon>::const_iterator s = m_styles.find (sn);
@@ -694,7 +713,7 @@ DEFImporter::read_single_net (std::string &nondefaultrule, Layout &layout, db::C
             y = get_double ();
           }
           pts.push_back (db::Point (db::DPoint (x * scale, y * scale)));
-          std::pair<db::Coord, db::Coord> ee = def_ext;
+          std::pair<db::Coord, db::Coord> ee = ext_not_set;
           if (! peek (")")) {
             db::Coord e = db::coord_traits<db::Coord>::rounded (get_double () * scale);
             ee.first = ee.second = e;
@@ -706,10 +725,20 @@ DEFImporter::read_single_net (std::string &nondefaultrule, Layout &layout, db::C
         }
 
         if (pts.size () > 1) {
+
+          //  replace the default extensions
+          if (ext.front () == ext_not_set) {
+            ext.front () = def_ext;
+          }
+          if (ext.back () == ext_not_set) {
+            ext.back () = def_ext;
+          }
+
           std::set <unsigned int> dl = open_layer (layout, ln, specialnets ? SpecialRouting : Routing, mask);
           for (std::set<unsigned int>::const_iterator l = dl.begin (); l != dl.end (); ++l) {
             produce_routing_geometry (design, style, *l, prop_id, pts, ext, w);
           }
+
         }
 
         //  continue a segment with the current point and the new mask

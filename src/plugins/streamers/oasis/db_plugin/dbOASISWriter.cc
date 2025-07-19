@@ -26,6 +26,7 @@
 
 #include "tlDeflate.h"
 #include "tlMath.h"
+#include "tlUniqueName.h"
 
 #include <math.h>
 
@@ -411,7 +412,7 @@ Compressor<Obj>::flush (db::OASISWriter *writer)
             if (dd != displacements.end ()) {
 
               dxy = xrep ? db::Vector (safe_diff (dd->x (), d->x ()), 0) : db::Vector (0, safe_diff (dd->y (), d->y ()));
-              while (dd != displacements.end () && *dd == dd[-1] + dxy) {
+              while (dd != displacements.end () && *dd == dd[-1] + dxy && nxy < std::numeric_limits<int>::max ()) {
                 ++dd;
                 ++nxy;
               } 
@@ -453,7 +454,7 @@ Compressor<Obj>::flush (db::OASISWriter *writer)
               db::Vector dxy = xrep ? db::Vector (safe_diff (dd->x (), d->x ()), 0) : db::Vector (0, safe_diff (dd->y (), d->y ()));
 
               int nxy = 2;
-              while (dd != dwindow) {
+              while (dd != dwindow && nxy < std::numeric_limits<int>::max ()) {
                 disp_vector::iterator df = std::lower_bound (dd + 1, dwindow, *dd + dxy);
                 if (df == dwindow || *df != *dd + dxy) {
                   break;
@@ -717,45 +718,17 @@ OASISWriter::write_bytes (const char *b, size_t n)
 }
 
 void 
-OASISWriter::write (long long n)
+OASISWriter::write (int64_t n)
 {
   if (n < 0) {
-    write (((unsigned long long) (-n) << 1) | 1);
+    write (((uint64_t) (-n) << 1) | 1);
   } else {
-    write ((unsigned long long) n << 1);
+    write ((uint64_t) n << 1);
   }
 }
 
 void 
-OASISWriter::write (unsigned long long n)
-{
-  char buffer [50];
-  char *bptr = buffer;
-
-  do {
-    unsigned char b = n & 0x7f;
-    n >>= 7;
-    if (n > 0) {
-      b |= 0x80;
-    }
-    *bptr++ = (char) b;
-  } while (n > 0);
-
-  write_bytes (buffer, bptr - buffer);
-}
-
-void 
-OASISWriter::write (long n)
-{
-  if (n < 0) {
-    write (((unsigned long) (-n) << 1) | 1);
-  } else {
-    write ((unsigned long) n << 1);
-  }
-}
-
-void 
-OASISWriter::write (unsigned long n)
+OASISWriter::write (uint64_t n)
 {
   char buffer [50];
   char *bptr = buffer;
@@ -775,15 +748,15 @@ OASISWriter::write (unsigned long n)
 void
 OASISWriter::write (float d) 
 {
-  if (fabs (d) >= 0.5 && fabs (floor (d + 0.5) - d) < 1e-6 && fabs (d) < double (std::numeric_limits<long>::max ())) {
+  if (fabs (d) >= 0.5 && fabs (floor (d + 0.5) - d) < 1e-6 && fabs (d) < double (std::numeric_limits<int64_t>::max ())) {
 
     //  whole number (negative or positive)
     if (d < 0.0) {
       write_byte (1);
-      write ((unsigned long) floor (-d + 0.5));
+      write ((uint64_t) floor (-d + 0.5));
     } else { 
       write_byte (0);
-      write ((unsigned long) floor (d + 0.5));
+      write ((uint64_t) floor (d + 0.5));
     }
 
   } else {
@@ -799,7 +772,7 @@ OASISWriter::write (float d)
     f2i.d = d;
     uint32_t i = f2i.i;
     char b[sizeof (f2i.i)];
-    for (unsigned int n = 0; n < sizeof (f2i.i); n++) {
+    for (size_t n = 0; n < sizeof (f2i.i); n++) {
       b[n] = char (i & 0xff); 
       i >>= 8;
     }
@@ -811,15 +784,15 @@ OASISWriter::write (float d)
 void
 OASISWriter::write (double d) 
 {
-  if (fabs (d) >= 0.5 && fabs (floor (d + 0.5) - d) < 1e-10 && fabs (d) < double (std::numeric_limits<long>::max ())) {
+  if (fabs (d) >= 0.5 && fabs (floor (d + 0.5) - d) < 1e-10 && fabs (d) < double (std::numeric_limits<int64_t>::max ())) {
 
     //  whole number (negative or positive)
     if (d < 0.0) {
       write_byte (1);
-      write ((unsigned long) floor (-d + 0.5));
+      write ((uint64_t) floor (-d + 0.5));
     } else { 
       write_byte (0);
-      write ((unsigned long) floor (d + 0.5));
+      write ((uint64_t) floor (d + 0.5));
     }
 
   } else {
@@ -848,7 +821,7 @@ void
 OASISWriter::write_bstring (const char *s)
 {
   size_t l = strlen (s);
-  write (l);
+  write ((uint64_t) l);
   write_bytes (s, l);
 }
 
@@ -867,7 +840,7 @@ void
 OASISWriter::write_astring (const char *s)
 {
   std::string nstr = make_astring (s);
-  write (nstr.size ());
+  write ((uint64_t) nstr.size ());
   write_bytes (nstr.c_str (), nstr.size ());
 }
 
@@ -886,7 +859,7 @@ void
 OASISWriter::write_nstring (const char *s)
 {
   std::string nstr = make_nstring (s);
-  write (nstr.size ());
+  write ((uint64_t) nstr.size ());
   write_bytes (nstr.c_str (), nstr.size ());
 }
 
@@ -903,8 +876,8 @@ OASISWriter::write_gdelta (const db::Vector &p, double sf)
 
   if (x == -y || x == y || x == 0 || y == 0) {
 
-    unsigned long long dir = 0;
-    unsigned long long l = 0;
+    uint64_t dir = 0;
+    uint64_t l = 0;
 
     if (x > 0) {
       l = x;
@@ -938,11 +911,11 @@ OASISWriter::write_gdelta (const db::Vector &p, double sf)
 
   } else {
 
-    unsigned long long d;
+    uint64_t d;
     if (x < 0) {
-      d = ((unsigned long long) -x << 2) | 3;
+      d = ((uint64_t) -x << 2) | 3;
     } else {
-      d = ((unsigned long long) x << 2) | 1;
+      d = ((uint64_t) x << 2) | 1;
     }
     write (d);
     write (y);
@@ -1090,8 +1063,8 @@ OASISWriter::end_cblock ()
     //  RFC1951 compression:
     write_byte (0); 
 
-    write (m_cblock_buffer.size ());
-    write (m_cblock_compressed.size ());
+    write ((uint64_t) m_cblock_buffer.size ());
+    write ((uint64_t) m_cblock_compressed.size ());
 
     write_bytes (m_cblock_compressed.data (), m_cblock_compressed.size ());
 
@@ -1158,7 +1131,7 @@ OASISWriter::write_propname_table (size_t &propnames_table_pos, const std::vecto
 {
   //  write the property names collected so far in the order of the ID's.
 
-  std::vector<std::pair<unsigned long, std::string> > rev_pn;
+  std::vector<std::pair<uint64_t, std::string> > rev_pn;
   rev_pn.reserve (m_propnames.size ());
   for (auto p = m_propnames.begin (); p != m_propnames.end (); ++p) {
     rev_pn.push_back (std::make_pair (p->second, p->first));
@@ -1166,7 +1139,7 @@ OASISWriter::write_propname_table (size_t &propnames_table_pos, const std::vecto
   std::sort (rev_pn.begin (), rev_pn.end ());
 
   for (auto p = rev_pn.begin (); p != rev_pn.end (); ++p) {
-    tl_assert (p->first == (unsigned long)(p - rev_pn.begin ()));
+    tl_assert (p->first == (uint64_t)(p - rev_pn.begin ()));
     begin_table (propnames_table_pos);
     write_record_id (7);
     write_nstring (p->second.c_str ());
@@ -1236,7 +1209,7 @@ OASISWriter::write_propstring_table (size_t &propstrings_table_pos, const std::v
 {
   //  write the property strings collected so far in the order of the ID's.
 
-  std::vector<std::pair<unsigned long, const std::string *> > rev_ps;
+  std::vector<std::pair<uint64_t, const std::string *> > rev_ps;
   rev_ps.reserve (m_propstrings.size ());
   for (auto p = m_propstrings.begin (); p != m_propstrings.end (); ++p) {
     rev_ps.push_back (std::make_pair (p->second, &p->first));
@@ -1246,7 +1219,7 @@ OASISWriter::write_propstring_table (size_t &propstrings_table_pos, const std::v
   tl_assert (rev_ps.size () == size_t (m_propstring_id));
 
   for (auto p = rev_ps.begin (); p != rev_ps.end (); ++p) {
-    tl_assert (p->first == (unsigned long)(p - rev_ps.begin ()));
+    tl_assert (p->first == (uint64_t)(p - rev_ps.begin ()));
     begin_table (propstrings_table_pos);
     write_record_id (9);
     write_bstring (p->second->c_str ());
@@ -1334,9 +1307,9 @@ OASISWriter::write_cellname_table (size_t &cellnames_table_pos, const std::vecto
     begin_table (cellnames_table_pos);
 
     write_record_id (sequential ? 3 : 4);
-    write_nstring (layout.cell_name (*cell));
+    write_nstring (cell_nstring (*cell));
     if (! sequential) {
-      write ((unsigned long) *cell);
+      write ((uint64_t) *cell);
     }
 
     if (m_options.write_std_properties >= 1) {
@@ -1391,7 +1364,7 @@ OASISWriter::write_textstring_table (size_t &textstrings_table_pos, const std::v
   //  write present text strings
 
   //  collect present strings by ID
-  std::vector<std::pair<unsigned long, const std::string *> > rev_ts;
+  std::vector<std::pair<uint64_t, const std::string *> > rev_ts;
   rev_ts.reserve (m_textstrings.size ());
   for (auto p = m_textstrings.begin (); p != m_textstrings.end (); ++p) {
     rev_ts.push_back (std::make_pair (p->second, &p->first));
@@ -1401,7 +1374,7 @@ OASISWriter::write_textstring_table (size_t &textstrings_table_pos, const std::v
   tl_assert (rev_ts.size () == size_t (m_textstring_id));
 
   for (auto t = rev_ts.begin (); t != rev_ts.end (); ++t) {
-    tl_assert (t->first == (unsigned long)(t - rev_ts.begin ()));
+    tl_assert (t->first == (uint64_t)(t - rev_ts.begin ()));
     begin_table (textstrings_table_pos);
     write_record_id (5);
     write_nstring (t->second->c_str ());
@@ -1444,16 +1417,16 @@ OASISWriter::write_layername_table (size_t &layernames_table_pos, const std::vec
       write_record_id (11);
       write_nstring (l->second.name.c_str ());
       write_byte (3);
-      write ((unsigned long) l->second.layer);
+      write ((uint64_t) l->second.layer);
       write_byte (3);
-      write ((unsigned long) l->second.datatype);
+      write ((uint64_t) l->second.datatype);
 
       write_record_id (12);
       write_nstring (l->second.name.c_str ());
       write_byte (3);
-      write ((unsigned long) l->second.layer);
+      write ((uint64_t) l->second.layer);
       write_byte (3);
-      write ((unsigned long) l->second.datatype);
+      write ((uint64_t) l->second.datatype);
 
       m_progress.set (mp_stream->pos ());
 
@@ -1476,6 +1449,31 @@ static bool skip_cell_body (const db::Cell &cref)
   return cref.is_ghost_cell () && cref.empty ();
 }
 
+void
+OASISWriter::create_cell_nstrings (const db::Layout &layout, const std::set <db::cell_index_type> &cell_set)
+{
+  m_cell_nstrings.clear ();
+
+  std::set<std::string> names;
+
+  for (auto c = cell_set.begin (); c != cell_set.end (); ++c) {
+
+    std::string cn = make_nstring (layout.cell_name (*c));
+    cn = tl::unique_name (cn, names);
+
+    m_cell_nstrings.insert (std::make_pair (*c, cn));
+    names.insert (cn);
+
+  }
+}
+
+const char *
+OASISWriter::cell_nstring (db::cell_index_type cell_index)
+{
+  auto n = m_cell_nstrings.find (cell_index);
+  tl_assert (n != m_cell_nstrings.end ());
+  return n->second.c_str ();
+}
 
 void 
 OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLayoutOptions &options)
@@ -1509,6 +1507,8 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
 
   std::set <db::cell_index_type> cell_set;
   options.get_cells (layout, cell_set, layers);
+
+  create_cell_nstrings (layout, cell_set);
 
   //  create a cell index vector sorted bottom-up
   std::vector <db::cell_index_type> cells, cells_by_index;
@@ -1602,7 +1602,7 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
         is_top = (cell_set.find (*p) == cell_set.end ());
       }
       if (is_top) {
-        write_property_def (s_top_cell_name, tl::Variant (make_nstring (layout.cell_name (*cell))), true);
+        write_property_def (s_top_cell_name, tl::Variant (cell_nstring (*cell)), true);
       }
     }
 
@@ -1679,7 +1679,7 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
     cell_positions.insert (std::make_pair (*cell, mp_stream->pos ()));
 
     write_record_id (13);  // CELL
-    write ((unsigned long) *cell);
+    write ((uint64_t) *cell);
 
     reset_modal_variables ();
 
@@ -1696,8 +1696,8 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
 
         write_record_id (28);
         write_byte (char (0xf6));
-        unsigned long pnid = 0;
-        std::map <std::string, unsigned long>::const_iterator pni = m_propnames.find (klayout_context_name);
+        uint64_t pnid = 0;
+        std::map <std::string, uint64_t>::const_iterator pni = m_propnames.find (klayout_context_name);
         if (pni == m_propnames.end ()) {
           pnid = m_propname_id++;
           m_propnames.insert (std::make_pair (klayout_context_name, pnid));
@@ -1706,12 +1706,12 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
         }
         write (pnid);
 
-        write ((unsigned long) context_prop_strings.size ());
+        write ((uint64_t) context_prop_strings.size ());
 
         for (std::vector <std::string>::const_iterator c = context_prop_strings.begin (); c != context_prop_strings.end (); ++c) {
           write_byte (14); // b-string by reference number
-          unsigned long psid = 0;
-          std::map <std::string, unsigned long>::const_iterator psi = m_propstrings.find (*c);
+          uint64_t psid = 0;
+          std::map <std::string, uint64_t>::const_iterator psi = m_propstrings.find (*c);
           if (psi == m_propstrings.end ()) {
             psid = m_propstring_id++;
             m_propstrings.insert (std::make_pair (*c, psid)).second;
@@ -1795,23 +1795,23 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
 
     //  cellnames
     write_byte (1); 
-    write (cellnames_table_pos);
+    write ((uint64_t) cellnames_table_pos);
 
     //  textstrings
     write_byte (1); 
-    write (textstrings_table_pos);
+    write ((uint64_t) textstrings_table_pos);
 
     //  propnames
     write_byte (1); 
-    write (propnames_table_pos);
+    write ((uint64_t) propnames_table_pos);
 
     //  propstrings
     write_byte (1); 
-    write (propstrings_table_pos);
+    write ((uint64_t) propstrings_table_pos);
 
     //  layernames
     write_byte (1); 
-    write (layernames_table_pos);
+    write ((uint64_t) layernames_table_pos);
 
     //  xnames (not used)
     write_byte (1); 
@@ -1875,11 +1875,11 @@ OASISWriter::write (const Repetition &rep)
 
       if (g <= 1) {
         write_byte (10);
-        write (iterated->size () - 1);
+        write ((uint64_t) iterated->size () - 1);
         g = 1;
       } else {
         write_byte (11);
-        write (iterated->size () - 1);
+        write ((uint64_t) iterated->size () - 1);
         write_ucoord (g, 1.0);
       }
 
@@ -1909,39 +1909,39 @@ OASISWriter::write (const Repetition &rep)
 
         if (b.x () == 0 && b.y () >= 0) {
           write_byte (3);
-          write (bmax - 2);
+          write ((uint64_t) bmax - 2);
           write_ucoord (b.y ());
         } else if (b.y () == 0 && b.x () >= 0) {
           write_byte (2);
-          write (bmax - 2);
+          write ((uint64_t) bmax - 2);
           write_ucoord (b.x ());
         } else {
           write_byte (9);
-          write (bmax - 2);
+          write ((uint64_t) bmax - 2);
           write_gdelta (b);
         }
 
       } else if (b.x () == 0 && b.y () >= 0 && a.y () == 0 && a.x () >= 0) {
 
         write_byte (1);
-        write (amax - 2);
-        write (bmax - 2);
+        write ((uint64_t) amax - 2);
+        write ((uint64_t) bmax - 2);
         write_ucoord (a.x ());
         write_ucoord (b.y ());
 
       } else if (b.y () == 0 && b.x () >= 0 && a.x () == 0 && a.y () >= 0) {
 
         write_byte (1);
-        write (bmax - 2);
-        write (amax - 2);
+        write ((uint64_t) bmax - 2);
+        write ((uint64_t) amax - 2);
         write_ucoord (b.x ());
         write_ucoord (a.y ());
 
       } else {
 
         write_byte (8);
-        write (amax - 2);
-        write (bmax - 2);
+        write ((uint64_t) amax - 2);
+        write ((uint64_t) bmax - 2);
         write_gdelta (a);
         write_gdelta (b);
 
@@ -1985,7 +1985,7 @@ OASISWriter::write_inst_with_rep (const db::CellInstArray &inst, db::properties_
 
   if (info & 0x80) {
     mm_placement_cell = inst.object ().cell_index ();
-    write ((unsigned long) mm_placement_cell.get ());
+    write ((uint64_t) mm_placement_cell.get ());
   }
 
   if (inst.is_complex ()) {
@@ -2191,7 +2191,7 @@ OASISWriter::write_property_def (const char *name_str, const std::vector<tl::Var
 
     if (! same_name) {
 
-      std::map <std::string, unsigned long>::const_iterator pni = m_propnames.find (name_str);
+      std::map <std::string, uint64_t>::const_iterator pni = m_propnames.find (name_str);
 
       //  In strict mode always write property ID's: before we have issued the table we can 
       //  create new ID's.
@@ -2219,11 +2219,11 @@ OASISWriter::write_property_def (const char *name_str, const std::vector<tl::Var
     if (! same_value) {
 
       if (pvl.size () >= 15) {
-        write ((unsigned long) pvl.size ());
+        write ((uint64_t) pvl.size ());
       }
 
       //  write property values
-      for (unsigned long i = 0; i < pvl.size (); ++i) {
+      for (uint64_t i = 0; i < pvl.size (); ++i) {
 
         const tl::Variant &v = pvl[i];
 
@@ -2234,27 +2234,27 @@ OASISWriter::write_property_def (const char *name_str, const std::vector<tl::Var
         } else if (v.is_longlong ()) {
 
           write_byte (9);
-          write (v.to_longlong ());
+          write ((int64_t) v.to_longlong ());
 
         } else if (v.is_ulonglong ()) {
 
           write_byte (8);
-          write (v.to_ulonglong ());
+          write ((uint64_t) v.to_ulonglong ());
 
         } else if (v.is_long ()) {
 
           write_byte (9);
-          write (v.to_long ());
+          write ((int64_t) v.to_long ());
 
         } else if (v.is_ulong ()) {
 
           write_byte (8);
-          write (v.to_ulong ());
+          write ((uint64_t) v.to_ulong ());
 
         } else {
 
           const char *pvs = v.to_string ();
-          std::map <std::string, unsigned long>::const_iterator pvi = m_propstrings.find (pvs);
+          std::map <std::string, uint64_t>::const_iterator pvi = m_propstrings.find (pvs);
 
           //  In strict mode always write property string ID's: before we have issued the table we can 
           //  create new ID's.
@@ -2335,7 +2335,7 @@ OASISWriter::write_pointlist (const std::vector<db::Vector> &pointlist, bool for
     //  manhattan pointlist
     write_byte (type);
     size_t implicit = for_polygons ? 1 : 0;
-    write ((unsigned long) (pointlist.size () - implicit));
+    write ((uint64_t) (pointlist.size () - implicit));
 
     db::Vector plast (0, 0);
     for (std::vector<db::Vector>::const_iterator p = pointlist.begin (); p != pointlist.end () - implicit; ++p) {
@@ -2353,7 +2353,7 @@ OASISWriter::write_pointlist (const std::vector<db::Vector> &pointlist, bool for
 
     //  generic pointlist
     write_byte (4);
-    write ((unsigned long) pointlist.size ());
+    write ((uint64_t) pointlist.size ());
     db::Vector plast (0, 0);
     if (m_sf == 1.0) {
       for (std::vector<db::Vector>::const_iterator p = pointlist.begin (); p != pointlist.end (); ++p) {
@@ -2378,8 +2378,8 @@ OASISWriter::write (const db::Text &text, db::properties_id_type prop_id, const 
 
   db::Trans trans = text.trans ();
 
-  unsigned long text_id = 0;
-  std::map <std::string, unsigned long>::const_iterator ts = m_textstrings.find (text.string ());
+  uint64_t text_id = 0;
+  std::map <std::string, uint64_t>::const_iterator ts = m_textstrings.find (text.string ());
   if (ts == m_textstrings.end ()) {
     text_id = m_textstring_id++;
     m_textstrings.insert (std::make_pair (text.string (), text_id));
@@ -2412,15 +2412,15 @@ OASISWriter::write (const db::Text &text, db::properties_id_type prop_id, const 
   write_byte (info);
   if (info & 0x40) {
     mm_text_string = text.string ();
-    write ((unsigned long) text_id);
+    write ((uint64_t) text_id);
   }
   if (info & 0x01) {
     mm_textlayer = m_layer;
-    write ((unsigned long) m_layer);
+    write ((uint64_t) m_layer);
   }
   if (info & 0x02) {
     mm_texttype = m_datatype;
-    write ((unsigned long) m_datatype);
+    write ((uint64_t) m_datatype);
   }
   if (info & 0x10) {
     mm_text_x = trans.disp ().x ();
@@ -2496,11 +2496,11 @@ OASISWriter::write (const db::SimplePolygon &polygon, db::properties_id_type pro
 
   if (info & 0x01) {
     mm_layer = m_layer;
-    write ((unsigned long) m_layer);
+    write ((uint64_t) m_layer);
   }
   if (info & 0x02) {
     mm_datatype = m_datatype;
-    write ((unsigned long) m_datatype);
+    write ((uint64_t) m_datatype);
   }
   if (info & 0x20) {
     mm_polygon_point_list.swap (m_pointlist);
@@ -2597,11 +2597,11 @@ OASISWriter::write (const db::Polygon &polygon, db::properties_id_type prop_id, 
 
     if (info & 0x01) {
       mm_layer = m_layer;
-      write ((unsigned long) m_layer);
+      write ((uint64_t) m_layer);
     }
     if (info & 0x02) {
       mm_datatype = m_datatype;
-      write ((unsigned long) m_datatype);
+      write ((uint64_t) m_datatype);
     }
     if (info & 0x20) {
       mm_polygon_point_list.swap (m_pointlist);
@@ -2667,11 +2667,11 @@ OASISWriter::write (const db::Box &box, db::properties_id_type prop_id, const db
 
   if (info & 0x01) {
     mm_layer = m_layer;
-    write ((unsigned long) m_layer);
+    write ((uint64_t) m_layer);
   }
   if (info & 0x02) {
     mm_datatype = m_datatype;
-    write ((unsigned long) m_datatype);
+    write ((uint64_t) m_datatype);
   }
 
   mm_geometry_w = box.width ();
@@ -2772,11 +2772,11 @@ OASISWriter::write (const db::Path &path, db::properties_id_type prop_id, const 
 
       if (info & 0x01) {
         mm_layer = m_layer;
-        write ((unsigned long) m_layer);
+        write ((uint64_t) m_layer);
       }
       if (info & 0x02) {
         mm_datatype = m_datatype;
-        write ((unsigned long) m_datatype);
+        write ((uint64_t) m_datatype);
       }
       if (info & 0x20) {
         mm_circle_radius = hw;
@@ -2853,11 +2853,11 @@ OASISWriter::write (const db::Path &path, db::properties_id_type prop_id, const 
 
     if (info & 0x01) {
       mm_layer = m_layer;
-      write ((unsigned long) m_layer);
+      write ((uint64_t) m_layer);
     }
     if (info & 0x02) {
       mm_datatype = m_datatype;
-      write ((unsigned long) m_datatype);
+      write ((uint64_t) m_datatype);
     }
     if (info & 0x40) {
       mm_path_halfwidth = hw;
@@ -3046,11 +3046,11 @@ OASISWriter::write (const db::Edge &edge, db::properties_id_type prop_id, const 
 
   if (info & 0x01) {
     mm_layer = m_layer;
-    write ((unsigned long) m_layer);
+    write ((uint64_t) m_layer);
   }
   if (info & 0x02) {
     mm_datatype = m_datatype;
-    write ((unsigned long) m_datatype);
+    write ((uint64_t) m_datatype);
   }
   if (info & 0x40) {
     mm_path_halfwidth = 0;

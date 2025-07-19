@@ -22,6 +22,8 @@
 
 #include "bdReaderOptions.h"
 #include "dbLoadLayoutOptions.h"
+#include "dbLayerMapping.h"
+#include "dbCellMapping.h"
 #include "tlCommandLineParser.h"
 
 #include "tlStream.h"
@@ -831,15 +833,28 @@ static std::string::size_type find_file_sep (const std::string &s, std::string::
   }
 }
 
-static std::vector<std::string> split_file_list (const std::string &infile)
+static std::vector<std::vector<std::string> > split_file_list (const std::string &infile)
 {
-  std::vector<std::string> files;
+  std::vector<std::vector<std::string> > files;
+  files.push_back (std::vector<std::string> ());
 
   size_t p = 0;
-  for (size_t pp = 0; (pp = find_file_sep (infile, p)) != std::string::npos; p = pp + 1) {
-    files.push_back (std::string (infile, p, pp - p));
+  while (true) {
+
+    size_t sep = find_file_sep (infile, p);
+    if (sep == std::string::npos) {
+      files.back ().push_back (std::string (infile, p));
+      return files;
+    }
+
+    files.back ().push_back (std::string (infile, p, sep - p));
+    if (infile [sep] == ',') {
+      files.push_back (std::vector<std::string> ());
+    }
+
+    p = sep + 1;
+
   }
-  files.push_back (std::string (infile, p));
 
   return files;
 }
@@ -850,16 +865,73 @@ void read_files (db::Layout &layout, const std::string &infile, const db::LoadLa
   //    db::LayoutLocker locker (&layout);
   //  but there are yet unknown side effects
 
-  //  enter a LEF caching context for chaining multiple DEF with the same LEF
-  db::LoadLayoutOptions local_options (options);
-  local_options.set_option_by_name ("lefdef_config.lef_context_enabled", true);
+  std::vector<std::vector<std::string> > files = split_file_list (infile);
 
-  std::vector<std::string> files = split_file_list (infile);
+  for (auto ff = files.begin (); ff != files.end (); ++ff) {
 
-  for (std::vector<std::string>::const_iterator f = files.begin (); f != files.end (); ++f) {
-    tl::InputStream stream (*f);
-    db::Reader reader (stream);
-    reader.read (layout, local_options);
+    //  enter a LEF caching context for chaining multiple DEF with the same LEF
+    db::LoadLayoutOptions local_options (options);
+    local_options.set_option_by_name ("lefdef_config.lef_context_enabled", true);
+
+    db::Layout tmp;
+    db::Layout *ly = (ff == files.begin () ? &layout : &tmp);
+
+    for (auto f = ff->begin (); f != ff->end (); ++f) {
+      tl::InputStream stream (*f);
+      db::Reader reader (stream);
+      if (f != ff->begin ()) {
+        reader.set_expected_dbu (ly->dbu ());
+      }
+      reader.read (*ly, local_options);
+    }
+
+    if (ly != &layout) {
+
+      //  Move over cells from read layout to destination ("," separated blocks).
+      //  This path does not imply limitations in terms of DBU compatibility etc.
+
+      std::vector<db::cell_index_type> cells_target;
+      std::vector<db::cell_index_type> cells_source;
+
+      for (auto c = tmp.begin_top_down (); c != tmp.end_top_cells (); ++c) {
+
+        cells_source.push_back (*c);
+
+        //  as a special rule, join ghost cells if the source top cell fits into
+        //  a ghost cell of the target.
+        auto cell_target = layout.cell_by_name (tmp.cell_name (*c));
+        if (cell_target.first && layout.cell (cell_target.second).is_ghost_cell ()) {
+          cells_target.push_back (cell_target.second);
+        } else {
+          cells_target.push_back (layout.add_cell (tmp.cell_name (*c)));
+        }
+
+      }
+
+      //  ghost cell joining also works the other way around: a top cell of destination
+      //  can match a ghost cell of the source
+      for (auto c = tmp.end_top_cells (); c != tmp.end_top_down (); ++c) {
+
+        const db::Cell &cell_source = tmp.cell (*c);
+        auto cell_target = layout.cell_by_name (tmp.cell_name (*c));
+
+        if (cell_source.is_ghost_cell () && cell_target.first) {
+          cells_source.push_back (*c);
+          cells_target.push_back (cell_target.second);
+        }
+
+      }
+
+      db::CellMapping cm;
+      cm.create_multi_mapping_full (layout, cells_target, tmp, cells_source);
+
+      db::LayerMapping lm;
+      lm.create_full (layout, tmp);
+
+      layout.move_tree_shapes (tmp, cm, lm);
+
+    }
+
   }
 }
 

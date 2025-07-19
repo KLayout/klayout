@@ -432,7 +432,7 @@ TEST(def16)
   //  (complete example)
   db::LEFDEFReaderOptions opt = default_options ();
   opt.set_macro_resolution_mode (1);
-  run_test (_this, "def16", "lef:a.lef+lef:tech.lef+def:a.def", "au_4b.oas.gz", opt);
+  run_test (_this, "def16", "lef:a.lef+lef:tech.lef+def:a.def", "au_4c.oas.gz", opt);
 }
 
 TEST(100)
@@ -1153,3 +1153,10 @@ TEST(215_multiDEF)
 
   db::compare_layouts (_this, ly, fn_path + "au.oas", db::WriteOAS);
 }
+
+//  issue-2075
+TEST(216_line_extensions)
+{
+  run_test (_this, "issue-2075", "map:test.map+lef:test.lef+def:test.def", "au.oas", default_options (), false);
+}
+

@@ -11,8 +11,12 @@ l1 = input(1, 0)
 f1 = l1
 
 p1 = fill_pattern("PAT1").shape(100, 0, box(0, 0, 1.um, 1.um)).origin(-0.5.um, -0.5.um)
+p2 = fill_pattern("PAT1").shape(100, 1, box(0, 0, 1.um, 1.um)).dim(1.um, 1.um)
+p3 = fill_pattern("PAT1").shape(100, 2, box(0, 0, 1.um, 1.um)).dim(1.um, 1.um).margin(1.um, 2.um)
 
-f1.fill_with_left(p1, hstep(2.0, 1.0), vstep(-1.0, 2.0)).output(100, 0)
+f1.fill_with_left(p1, hstep(2.0, 1.0), vstep(-1.0, 2.0)).output(101, 0)
+f1.fill_with_left(p2, hstep(2.0, 1.0), vstep(-1.0, 2.0)).output(101, 1)
+f1.fill_with_left(p3, hstep(2.0, 1.0), vstep(-1.0, 2.0)).output(101, 2)
 
 l1.output(1, 0)
 f1.output(10, 0)

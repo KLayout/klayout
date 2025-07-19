@@ -5460,8 +5460,17 @@ CODE
     # as the reference point. The reference point will also defined the footprint of the fill cell - more precisely
     # the lower left corner. When step vectors are given, the fill cell's footprint is taken to be a rectangle
     # having the horizontal and vertical step pitch for width and height respectively. This way the fill cells 
-    # will be arrange seamlessly. However, the cell's dimensions can be changed, so that the fill cells
+    # will be arrange seamlessly. 
+    #
+    # However, the cell's dimensions can be changed, so that the fill cells
     # can overlap or there is a space between the cells. To change the dimensions use the "dim" method.
+    # This example will use a fill cell footprint of 1x1 micrometers, regardless of the step pitch:
+    #
+    # @code
+    # p = fill_pattern("FILL_CELL")
+    # p.shape(1, 0, box(0.0, 0.0, 1.0, 1.0))
+    # p.dim(1.0, 1.0)
+    # @/code
     #
     # The following example specifies a fill cell with an active area of -0.5 .. 1.5 in both directions
     # (2 micron width and height). With these dimensions the fill cell's footprint is independent of the
@@ -5472,6 +5481,18 @@ CODE
     # p.shape(1, 0, box(0.0, 0.0, 1.0, 1.0))
     # p.origin(-0.5, -0.5)
     # p.dim(2.0, 2.0)
+    # @/code
+    #
+    # Finally, the fill cell can be given a margin: this is a space around the fill cell which needs
+    # to be inside the fill region. Hence, the margin can be used to implement a distance, the fill
+    # cells (more precisely: their footprints) will maintain to the outside border of the fill region.
+    # The following example implements a margin of 200 nm in horizontal and 250 nm in vertical direction:
+    #
+    # @code
+    # p = fill_pattern("FILL_CELL")
+    # p.shape(1, 0, box(0.0, 0.0, 1.0, 1.0))
+    # p.dim(1.0, 1.0)
+    # p.margin(0.2, 0.25)
     # @/code
     #
     # With these ingredients will can use the fill function. The first example fills the polygons
@@ -5574,6 +5595,7 @@ CODE
       fill_cell = pattern.create_cell(@engine._output_layout, @engine)
       top_cell = @engine._output_cell
       fc_box = dbu_trans * pattern.cell_box(row_step.x, column_step.y)
+      fill_margin = dbu_trans * pattern.fill_margin
       rs = dbu_trans * row_step
       cs = dbu_trans * column_step
       origin = origin ? dbu_trans * origin : nil
@@ -5604,6 +5626,7 @@ CODE
         tp.var("rs", rs)
         tp.var("cs", cs)
         tp.var("origin", origin)
+        tp.var("fill_margin", fill_margin)
         tp.var("fc_index", fc_index)
         tp.var("repeat", repeat)
         tp.var("with_left", with_left)
@@ -5616,8 +5639,8 @@ CODE
             tile_box = tile_box & tc_box;
             var left = with_left ? Region.new : nil;
             repeat ? 
-              (region & tile_box).fill_multi(top_cell, fc_index, fc_box, rs, cs, Vector.new, left, _tile.bbox) :
-              (region & tile_box).fill(top_cell, fc_index, fc_box, rs, cs, origin, left, Vector.new, left, _tile.bbox);
+              (region & tile_box).fill_multi(top_cell, fc_index, fc_box, rs, cs, fill_margin, left, _tile.bbox) :
+              (region & tile_box).fill(top_cell, fc_index, fc_box, rs, cs, origin, left, fill_margin, left, _tile.bbox);
             with_left && _output(#{result_arg}, left)
           )
 END
@@ -5639,9 +5662,9 @@ END
 
         @engine.run_timed("\"#{m}\" in: #{@engine.src_line}", self.data) do
           if repeat
-            self.data.fill_multi(top_cell, fc_index, fc_box, rs, cs, RBA::Vector::new, result)
+            self.data.fill_multi(top_cell, fc_index, fc_box, rs, cs, fill_margin, result)
           else
-            self.data.fill(top_cell, fc_index, fc_box, rs, cs, origin, result, RBA::Vector::new, result)
+            self.data.fill(top_cell, fc_index, fc_box, rs, cs, origin, result, fill_margin, result)
           end
         end
 

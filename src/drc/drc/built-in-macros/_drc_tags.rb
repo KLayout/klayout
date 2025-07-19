@@ -335,6 +335,7 @@ module DRC
       @shapes = []
       @origin = nil
       @dim = nil
+      @margin = RBA::DVector::new
     end
 
     def create_cell(layout, engine)
@@ -350,7 +351,11 @@ module DRC
     def cell_box(def_w, def_h)
       o = @origin || self._computed_origin
       d = @dim || RBA::DVector::new(def_w, def_h)
-      RBA::DBox::new(o, o + d)
+      RBA::DBox::new(o, o + d).enlarged(@margin)
+    end
+
+    def fill_margin
+      -@margin
     end
 
     def default_xpitch
@@ -449,6 +454,20 @@ module DRC
         raise("h argument not numeric FillCell#dim")
       end
       @dim = RBA::DVector::new(w, h)
+
+      self
+
+    end
+
+    def margin(w, h)
+
+      if !w.is_a?(1.class) && !w.is_a?(1.0.class)
+        raise("w argument not numeric FillCell#dim")
+      end
+      if !h.is_a?(1.class) && !h.is_a?(1.0.class)
+        raise("h argument not numeric FillCell#dim")
+      end
+      @margin = RBA::DVector::new(w, h)
 
       self
 

@@ -5608,8 +5608,14 @@ CODE
         tp.frame = RBA::CplxTrans::new(@engine.dbu) * self.data.bbox
         tp.scale_to_dbu = false
         tp.tile_size(@engine._tx, @engine._ty)
-        bx = [ @engine._bx || 0.0, row_step.x ].max
-        by = [ @engine._by || 0.0, column_step.y ].max
+        if repeat || !origin
+          # can't use an overlap as the pattern may be shifted from tile to tile
+          bx = 0.0
+          by = 0.0
+        else
+          bx = [ fc_box.width, row_step.x ].max
+          by = [ fc_box.height, column_step.y ].max
+        end
         tp.tile_border(bx, by)
         tp.threads = (@engine.threads || 1)
 
@@ -5623,6 +5629,8 @@ CODE
         tp.input("region", self.data)
         tp.var("top_cell", top_cell)
         tp.var("fc_box", fc_box)
+        tp.var("bx", bx)
+        tp.var("by", by)
         tp.var("rs", rs)
         tp.var("cs", cs)
         tp.var("origin", origin)
@@ -5635,7 +5643,7 @@ CODE
           var tc_box = _frame.bbox;
           var tile_box = _tile ? (tc_box & _tile.bbox) : tc_box;
           !tile_box.empty && (
-            tile_box = tile_box.enlarged(Vector.new(max(rs.x, fc_box.width), max(cs.y, fc_box.height)));
+            tile_box = tile_box.enlarged(Vector.new(bx, by));
             tile_box = tile_box & tc_box;
             var left = with_left ? Region.new : nil;
             repeat ? 

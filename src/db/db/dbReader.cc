@@ -61,7 +61,7 @@ join_layer_names (std::string &s, const std::string &n)
 //  ReaderBase implementation
 
 ReaderBase::ReaderBase () 
-  : m_warnings_as_errors (false), m_warn_level (1), m_warn_count_for_same_message (0), m_first_warning (true)
+  : m_warnings_as_errors (false), m_warn_level (1), m_warn_count_for_same_message (0), m_first_warning (true), m_expected_dbu (0.0)
 { 
 }
 
@@ -111,6 +111,20 @@ ReaderBase::compress_warning (const std::string &msg)
     m_last_warning = msg;
     m_warn_count_for_same_message = 0;
     return -1;
+  }
+}
+
+void
+ReaderBase::set_expected_dbu (double dbu)
+{
+  m_expected_dbu = dbu;
+}
+
+void
+ReaderBase::check_dbu (double dbu) const
+{
+  if (m_expected_dbu > db::epsilon && fabs (dbu - m_expected_dbu) > db::epsilon) {
+    throw ReaderException (tl::sprintf (tl::to_string (tr ("Former and present database units are not compatible: %.12g (former) vs. %.12g (present)")), m_expected_dbu, dbu));
   }
 }
 

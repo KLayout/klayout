@@ -836,6 +836,7 @@ CIFReader::do_read (db::Layout &layout)
     db::LayoutLocker locker (&layout);
   
     double sf = 0.01 / m_dbu;
+    check_dbu (m_dbu);
     layout.dbu (m_dbu);
 
     m_cellname = "{CIF top level}";

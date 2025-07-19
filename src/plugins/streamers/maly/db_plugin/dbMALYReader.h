@@ -223,7 +223,6 @@ private:
 
   tl::TextInputStream m_stream;
   tl::AbsoluteProgress m_progress;
-  double m_dbu;
   unsigned int m_last_record_line;
   std::string m_record;
   std::string m_record_returned;

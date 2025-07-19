@@ -623,7 +623,9 @@ OASISReader::do_read (db::Layout &layout)
   }
 
   //  compute database unit in pixel per meter
-  layout.dbu (1.0 / res);
+  double dbu = 1.0 / res;
+  check_dbu (dbu);
+  layout.dbu (dbu);
 
   //  read over table offsets if required
   bool table_offsets_at_end = get_uint64 () != 0;

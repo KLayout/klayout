@@ -119,6 +119,7 @@ LEFDEFReader::read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &opti
     effective_options = *lefdef_options;
   }
 
+  check_dbu (effective_options.dbu ());
   layout.dbu (effective_options.dbu ());
 
   std::string base_path;

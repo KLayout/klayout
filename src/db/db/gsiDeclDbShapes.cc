@@ -223,213 +223,305 @@ static db::Shape insert_shape_with_dcplx_trans (db::Shapes *s, const db::Shape &
   return s->insert (shape, dbu_trans.inverted () * trans * dbu_trans, pm);
 }
 
+namespace {
+
+/**
+ *  @brief Provides protection against inserting shapes into a target that is also source
+ *
+ *  The strategy is to use an temporary Shapes container if needed.
+ */
+class ProtectedShapes
+{
+public:
+  ProtectedShapes (db::Shapes *target, const db::RecursiveShapeIterator &src)
+    : mp_target (target), mp_tmp_shapes ()
+  {
+    if (target == src.shapes () || target->layout () == src.layout ()) {
+      mp_tmp_shapes.reset (new db::Shapes ());
+    }
+  }
+
+  ProtectedShapes (db::Shapes *target, const db::Shapes &src)
+    : mp_target (target), mp_tmp_shapes ()
+  {
+    if (target == &src || target->layout () == src.layout ()) {
+      mp_tmp_shapes.reset (new db::Shapes ());
+    }
+  }
+
+  ProtectedShapes (db::Shapes *target, const db::Region &src)
+    : mp_target (target), mp_tmp_shapes ()
+  {
+    auto iter = src.begin_iter ();
+    if (target == iter.first.shapes () || target->layout () == iter.first.layout ()) {
+      mp_tmp_shapes.reset (new db::Shapes ());
+    }
+  }
+
+  ProtectedShapes (db::Shapes *target, const db::Texts &src)
+    : mp_target (target), mp_tmp_shapes ()
+  {
+    auto iter = src.begin_iter ();
+    if (target == iter.first.shapes () || target->layout () == iter.first.layout ()) {
+      mp_tmp_shapes.reset (new db::Shapes ());
+    }
+  }
+
+  ProtectedShapes (db::Shapes *target, const db::Edges &src)
+    : mp_target (target), mp_tmp_shapes ()
+  {
+    auto iter = src.begin_iter ();
+    if (target == iter.first.shapes () || target->layout () == iter.first.layout ()) {
+      mp_tmp_shapes.reset (new db::Shapes ());
+    }
+  }
+
+  ProtectedShapes (db::Shapes *target, const db::EdgePairs &src)
+    : mp_target (target), mp_tmp_shapes ()
+  {
+    auto iter = src.begin_iter ();
+    if (target == iter.first.shapes () || target->layout () == iter.first.layout ()) {
+      mp_tmp_shapes.reset (new db::Shapes ());
+    }
+  }
+
+  ~ProtectedShapes ()
+  {
+    if (mp_tmp_shapes.get ()) {
+      mp_target->insert (*mp_tmp_shapes.get ());
+    }
+  }
+
+  db::Shapes *operator-> () const
+  {
+    if (mp_tmp_shapes.get ()) {
+      return mp_tmp_shapes.get ();
+    } else {
+      return mp_target;
+    }
+  }
+
+private:
+  db::Shapes *mp_target;
+  std::unique_ptr<db::Shapes> mp_tmp_shapes;
+};
+
+}
+
 static void insert_iter (db::Shapes *sh, const db::RecursiveShapeIterator &r)
 {
-  //  NOTE: if the source (r) is from the same layout than the shapes live in, we better
-  //  lock the layout against updates while inserting
-  db::LayoutLocker locker (sh->layout ());
+  ProtectedShapes ps (sh, r);
   for (db::RecursiveShapeIterator i = r; !i.at_end (); ++i) {
     tl::ident_map<db::properties_id_type> pm;
-    sh->insert (*i, i.trans (), pm);
+    ps->insert (*i, i.trans (), pm);
   }
 }
 
 static void insert_iter_with_trans (db::Shapes *sh, const db::RecursiveShapeIterator &r, const db::ICplxTrans &trans)
 {
-  //  NOTE: if the source (r) is from the same layout than the shapes live in, we better
-  //  lock the layout against updates while inserting
-  db::LayoutLocker locker (sh->layout ());
+  ProtectedShapes ps (sh, r);
   for (db::RecursiveShapeIterator i = r; !i.at_end (); ++i) {
     tl::ident_map<db::properties_id_type> pm;
-    sh->insert (*i, trans * i.trans (), pm);
+    ps->insert (*i, trans * i.trans (), pm);
   }
 }
 
 static void insert_shapes (db::Shapes *sh, const db::Shapes &s)
 {
-  sh->insert (s);
+  ProtectedShapes ps (sh, s);
+  ps->insert (s);
 }
 
 static void insert_shapes_with_flags (db::Shapes *sh, const db::Shapes &s, unsigned int flags)
 {
-  sh->insert (s, flags);
+  ProtectedShapes ps (sh, s);
+  ps->insert (s, flags);
 }
 
 static void insert_shapes_with_trans (db::Shapes *sh, const db::Shapes &s, const db::ICplxTrans &trans)
 {
-  //  NOTE: if the source (r) is from the same layout than the shapes live in, we better
-  //  lock the layout against updates while inserting
-  db::LayoutLocker locker (sh->layout ());
+  ProtectedShapes ps (sh, s);
   for (db::Shapes::shape_iterator i = s.begin (db::ShapeIterator::All); !i.at_end(); ++i) {
     tl::ident_map<db::properties_id_type> pm;
-    sh->insert (*i, trans, pm);
+    ps->insert (*i, trans, pm);
   }
 }
 
 static void insert_shapes_with_flag_and_trans (db::Shapes *sh, const db::Shapes &s, unsigned int flags, const db::ICplxTrans &trans)
 {
-  //  NOTE: if the source (r) is from the same layout than the shapes live in, we better
-  //  lock the layout against updates while inserting
-  db::LayoutLocker locker (sh->layout ());
+  ProtectedShapes ps (sh, s);
   for (db::Shapes::shape_iterator i = s.begin (flags); !i.at_end(); ++i) {
     tl::ident_map<db::properties_id_type> pm;
-    sh->insert (*i, trans, pm);
+    ps->insert (*i, trans, pm);
   }
 }
 
 static void insert_region (db::Shapes *sh, const db::Region &r)
 {
-  //  NOTE: if the source (r) is from the same layout than the shapes live in, we better
-  //  lock the layout against updates while inserting
-  db::LayoutLocker locker (sh->layout ());
+  ProtectedShapes ps (sh, r);
   for (db::Region::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    sh->insert (*s);
+    ps->insert (*s);
   }
 }
 
 static void insert_region_with_trans (db::Shapes *sh, const db::Region &r, const db::ICplxTrans &trans)
 {
-  //  NOTE: if the source (r) is from the same layout than the shapes live in, we better
-  //  lock the layout against updates while inserting
-  db::LayoutLocker locker (sh->layout ());
+  ProtectedShapes ps (sh, r);
   for (db::Region::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    sh->insert (s->transformed (trans));
+    ps->insert (s->transformed (trans));
   }
 }
 
 static void insert_region_with_dtrans (db::Shapes *sh, const db::Region &r, const db::DCplxTrans &trans)
 {
+  ProtectedShapes ps (sh, r);
   db::CplxTrans dbu_trans (shapes_dbu (sh));
   db::ICplxTrans itrans = dbu_trans.inverted () * trans * dbu_trans;
   for (db::Region::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    sh->insert (s->transformed (itrans));
+    ps->insert (s->transformed (itrans));
   }
 }
 
 static void insert_edges (db::Shapes *sh, const db::Edges &r)
 {
+  ProtectedShapes ps (sh, r);
   for (db::Edges::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    sh->insert (*s);
+    ps->insert (*s);
   }
 }
 
 static void insert_edges_with_trans (db::Shapes *sh, const db::Edges &r, const db::ICplxTrans &trans)
 {
+  ProtectedShapes ps (sh, r);
   for (db::Edges::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    sh->insert (s->transformed (trans));
+    ps->insert (s->transformed (trans));
   }
 }
 
 static void insert_edges_with_dtrans (db::Shapes *sh, const db::Edges &r, const db::DCplxTrans &trans)
 {
+  ProtectedShapes ps (sh, r);
   db::CplxTrans dbu_trans (shapes_dbu (sh));
   db::ICplxTrans itrans = dbu_trans.inverted () * trans * dbu_trans;
   for (db::Edges::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    sh->insert (s->transformed (itrans));
+    ps->insert (s->transformed (itrans));
   }
 }
 
 static void insert_edge_pairs_as_polygons (db::Shapes *sh, const db::EdgePairs &r, db::Coord e)
 {
+  ProtectedShapes ps (sh, r);
   for (db::EdgePairs::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    sh->insert (s->normalized ().to_simple_polygon (e));
+    ps->insert (s->normalized ().to_simple_polygon (e));
   }
 }
 
 static void insert_edge_pairs_as_polygons_d (db::Shapes *sh, const db::EdgePairs &r, db::DCoord de)
 {
+  ProtectedShapes ps (sh, r);
   db::Coord e = db::coord_traits<db::Coord>::rounded (de / shapes_dbu (sh));
   for (db::EdgePairs::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    sh->insert (s->normalized ().to_simple_polygon (e));
+    ps->insert (s->normalized ().to_simple_polygon (e));
   }
 }
 
 static void insert_edge_pairs_as_polygons_with_trans (db::Shapes *sh, const db::EdgePairs &r, const db::ICplxTrans &trans, db::Coord e)
 {
+  ProtectedShapes ps (sh, r);
   for (db::EdgePairs::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    sh->insert (s->normalized ().to_simple_polygon (e).transformed (trans));
+    ps->insert (s->normalized ().to_simple_polygon (e).transformed (trans));
   }
 }
 
 static void insert_edge_pairs_as_polygons_with_dtrans (db::Shapes *sh, const db::EdgePairs &r, const db::DCplxTrans &trans, db::DCoord de)
 {
+  ProtectedShapes ps (sh, r);
   db::Coord e = db::coord_traits<db::Coord>::rounded (de / shapes_dbu (sh));
   db::CplxTrans dbu_trans (shapes_dbu (sh));
   db::ICplxTrans itrans = dbu_trans.inverted () * trans * dbu_trans;
   for (db::EdgePairs::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    sh->insert (s->normalized ().to_simple_polygon (e).transformed (itrans));
+    ps->insert (s->normalized ().to_simple_polygon (e).transformed (itrans));
   }
 }
 
 static void insert_edge_pairs_as_edges (db::Shapes *sh, const db::EdgePairs &r)
 {
+  ProtectedShapes ps (sh, r);
   for (db::EdgePairs::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    sh->insert (s->first ());
-    sh->insert (s->second ());
+    ps->insert (s->first ());
+    ps->insert (s->second ());
   }
 }
 
 static void insert_edge_pairs_as_edges_with_trans (db::Shapes *sh, const db::EdgePairs &r, const db::ICplxTrans &trans)
 {
+  ProtectedShapes ps (sh, r);
   for (db::EdgePairs::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    sh->insert (s->first ().transformed (trans));
-    sh->insert (s->second ().transformed (trans));
+    ps->insert (s->first ().transformed (trans));
+    ps->insert (s->second ().transformed (trans));
   }
 }
 
 static void insert_edge_pairs_as_edges_with_dtrans (db::Shapes *sh, const db::EdgePairs &r, const db::DCplxTrans &trans)
 {
+  ProtectedShapes ps (sh, r);
   db::CplxTrans dbu_trans (shapes_dbu (sh));
   db::ICplxTrans itrans = dbu_trans.inverted () * trans * dbu_trans;
   for (db::EdgePairs::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    sh->insert (s->first ().transformed (itrans));
-    sh->insert (s->second ().transformed (itrans));
+    ps->insert (s->first ().transformed (itrans));
+    ps->insert (s->second ().transformed (itrans));
   }
 }
 
 static void insert_edge_pairs (db::Shapes *sh, const db::EdgePairs &r)
 {
+  ProtectedShapes ps (sh, r);
   for (db::EdgePairs::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    sh->insert (*s);
+    ps->insert (*s);
   }
 }
 
 static void insert_edge_pairs_with_trans (db::Shapes *sh, const db::EdgePairs &r, const db::ICplxTrans &trans)
 {
+  ProtectedShapes ps (sh, r);
   for (db::EdgePairs::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    sh->insert (s->transformed (trans));
+    ps->insert (s->transformed (trans));
   }
 }
 
 static void insert_edge_pairs_with_dtrans (db::Shapes *sh, const db::EdgePairs &r, const db::DCplxTrans &trans)
 {
+  ProtectedShapes ps (sh, r);
   db::CplxTrans dbu_trans (shapes_dbu (sh));
   db::ICplxTrans itrans = dbu_trans.inverted () * trans * dbu_trans;
   for (db::EdgePairs::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    sh->insert (s->transformed (itrans));
+    ps->insert (s->transformed (itrans));
   }
 }
 
 static void insert_texts (db::Shapes *sh, const db::Texts &r)
 {
+  ProtectedShapes ps (sh, r);
   for (db::Texts::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    sh->insert (*s);
+    ps->insert (*s);
   }
 }
 
 static void insert_texts_with_trans (db::Shapes *sh, const db::Texts &r, const db::ICplxTrans &trans)
 {
+  ProtectedShapes ps (sh, r);
   for (db::Texts::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    sh->insert (s->transformed (trans));
+    ps->insert (s->transformed (trans));
   }
 }
 
 static void insert_texts_with_dtrans (db::Shapes *sh, const db::Texts &r, const db::DCplxTrans &trans)
 {
+  ProtectedShapes ps (sh, r);
   db::CplxTrans dbu_trans (shapes_dbu (sh));
   db::ICplxTrans itrans = dbu_trans.inverted () * trans * dbu_trans;
   for (db::Texts::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    sh->insert (s->transformed (itrans));
+    ps->insert (s->transformed (itrans));
   }
 }
 

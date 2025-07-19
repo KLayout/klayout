@@ -1728,6 +1728,181 @@ class DBShapes_TestClass < TestBase
 
   end
 
+  def test_15
+
+    # Various container insert methods
+
+    ly = RBA::Layout::new
+    l1 = ly.layer(1, 0)
+    top = ly.create_cell("TOP")
+    top.shapes(l1).insert(RBA::Box::new(2000))
+
+    shapes2 = RBA::Shapes::new
+    shapes2.insert(RBA::Box::new(4000))
+
+    shapes = RBA::Shapes::new
+    shapes.insert(shapes2)
+    assert_equal(shapes.each.collect { |s| s.to_s }.join(";"), "box (-2000,-2000;2000,2000)")
+
+    # self-insert
+    shapes.insert(shapes)
+    assert_equal(shapes.each.collect { |s| s.to_s }.join(";"), "box (-2000,-2000;2000,2000);box (-2000,-2000;2000,2000)")
+
+    shapes.clear
+
+    shapes.insert(shapes2, RBA::Shapes::SBoxes)
+    assert_equal(shapes.each.collect { |s| s.to_s }.join(";"), "box (-2000,-2000;2000,2000)")
+
+    shapes.clear
+
+    shapes.insert(shapes2, RBA::Shapes::SPolygons)
+    assert_equal(shapes.each.collect { |s| s.to_s }.join(";"), "")
+
+    shapes.clear
+
+    shapes.insert(shapes2, RBA::ICplxTrans::new(RBA::Vector::new(100, 200)))
+    assert_equal(shapes.each.collect { |s| s.to_s }.join(";"), "box (-1900,-1800;2100,2200)")
+
+    shapes.clear
+
+    shapes.insert(shapes2, RBA::Shapes::SBoxes, RBA::ICplxTrans::new(RBA::Vector::new(100, 200)))
+    assert_equal(shapes.each.collect { |s| s.to_s }.join(";"), "box (-1900,-1800;2100,2200)")
+
+    shapes.clear
+
+    shapes.insert(shapes2, RBA::Shapes::SPolygons, RBA::ICplxTrans::new(RBA::Vector::new(100, 200)))
+    assert_equal(shapes.each.collect { |s| s.to_s }.join(";"), "")
+
+    shapes.clear
+
+    shapes.insert(top.begin_shapes_rec(l1))
+    assert_equal(shapes.each.collect { |s| s.to_s }.join(";"), "box (-1000,-1000;1000,1000)")
+
+    shapes.clear
+
+    shapes.insert(top.begin_shapes_rec(l1), RBA::ICplxTrans::new(100, 200))
+    assert_equal(shapes.each.collect { |s| s.to_s }.join(";"), "box (-900,-800;1100,1200)")
+
+    top.shapes(l1).insert(top.begin_shapes_rec(l1))
+    assert_equal(top.shapes(l1).each.collect { |s| s.to_s }.join(";"), "box (-1000,-1000;1000,1000);box (-1000,-1000;1000,1000)")
+
+    shapes.clear
+
+    r = RBA::Region::new(RBA::Box::new(2000))
+    shapes.insert(r)
+    assert_equal(shapes.each.collect { |s| s.to_s }.join(";"), "polygon (-1000,-1000;-1000,1000;1000,1000;1000,-1000)")
+
+    shapes.clear
+
+    r = RBA::Region::new(RBA::Box::new(2000))
+    shapes.insert(r, RBA::ICplxTrans::new(100, 200))
+    assert_equal(shapes.each.collect { |s| s.to_s }.join(";"), "polygon (-900,-800;-900,1200;1100,1200;1100,-800)")
+
+    top.shapes(l1).clear
+    top.shapes(l1).insert(r, RBA::DCplxTrans::new(0.1, 0.2))
+    assert_equal(top.shapes(l1).each.collect { |s| s.to_s }.join(";"), "polygon (-900,-800;-900,1200;1100,1200;1100,-800)")
+
+    shapes.clear
+
+    r = RBA::Edges::new(RBA::Edge::new(0, 0, 1000, 2000))
+    shapes.insert(r)
+    assert_equal(shapes.each.collect { |s| s.to_s }.join(";"), "edge (0,0;1000,2000)")
+
+    shapes.clear
+
+    r = RBA::Edges::new(RBA::Edge::new(0, 0, 1000, 2000))
+    shapes.insert(r, RBA::ICplxTrans::new(100, 200))
+    assert_equal(shapes.each.collect { |s| s.to_s }.join(";"), "edge (100,200;1100,2200)")
+
+    top.shapes(l1).clear
+    top.shapes(l1).insert(r, RBA::DCplxTrans::new(0.1, 0.2))
+    assert_equal(top.shapes(l1).each.collect { |s| s.to_s }.join(";"), "edge (100,200;1100,2200)")
+
+    shapes.clear
+
+    r = RBA::EdgePairs::new(RBA::EdgePair::new(RBA::Edge::new(0, 0, 0, 2000), RBA::Edge::new(100, 0, 100, 2000)))
+    shapes.insert_as_polygons(r, 10)
+    assert_equal(shapes.each.collect { |s| s.to_s }.join(";"), "simple_polygon (-10,-10;-10,2010;110,2010;110,-10)")
+
+    shapes.clear
+
+    r = RBA::EdgePairs::new(RBA::EdgePair::new(RBA::Edge::new(0, 0, 0, 2000), RBA::Edge::new(100, 0, 100, 2000)))
+    shapes.insert_as_polygons(r, RBA::ICplxTrans::new(100, 200), 10)
+    assert_equal(shapes.each.collect { |s| s.to_s }.join(";"), "simple_polygon (90,190;90,2210;210,2210;210,190)")
+
+    top.shapes(l1).clear
+    top.shapes(l1).insert_as_polygons(r, RBA::DCplxTrans::new(0.1, 0.2), 0.01)
+    assert_equal(top.shapes(l1).each.collect { |s| s.to_s }.join(";"), "simple_polygon (90,190;90,2210;210,2210;210,190)")
+
+    shapes.clear
+
+    r = RBA::EdgePairs::new(RBA::EdgePair::new(RBA::Edge::new(0, 0, 0, 2000), RBA::Edge::new(100, 0, 100, 2000)))
+    shapes.insert_as_edges(r)
+    assert_equal(shapes.each.collect { |s| s.to_s }.join(";"), "edge (0,0;0,2000);edge (100,0;100,2000)")
+
+    shapes.clear
+
+    r = RBA::EdgePairs::new(RBA::EdgePair::new(RBA::Edge::new(0, 0, 0, 2000), RBA::Edge::new(100, 0, 100, 2000)))
+    shapes.insert_as_edges(r, RBA::ICplxTrans::new(100, 200))
+    assert_equal(shapes.each.collect { |s| s.to_s }.join(";"), "edge (100,200;100,2200);edge (200,200;200,2200)")
+
+    top.shapes(l1).clear
+    top.shapes(l1).insert_as_edges(r, RBA::DCplxTrans::new(0.1, 0.2))
+    assert_equal(top.shapes(l1).each.collect { |s| s.to_s }.join(";"), "edge (100,200;100,2200);edge (200,200;200,2200)")
+
+    shapes.clear
+
+    r = RBA::EdgePairs::new(RBA::EdgePair::new(RBA::Edge::new(0, 0, 0, 2000), RBA::Edge::new(100, 0, 100, 2000)))
+    shapes.insert(r)
+    assert_equal(shapes.each.collect { |s| s.to_s }.join(";"), "edge_pair (0,0;0,2000)/(100,0;100,2000)")
+
+    shapes.clear
+
+    r = RBA::EdgePairs::new(RBA::EdgePair::new(RBA::Edge::new(0, 0, 0, 2000), RBA::Edge::new(100, 0, 100, 2000)))
+    shapes.insert(r, RBA::ICplxTrans::new(100, 200))
+    assert_equal(shapes.each.collect { |s| s.to_s }.join(";"), "edge_pair (100,200;100,2200)/(200,200;200,2200)")
+
+    top.shapes(l1).clear
+    top.shapes(l1).insert(r, RBA::DCplxTrans::new(0.1, 0.2))
+    assert_equal(top.shapes(l1).each.collect { |s| s.to_s }.join(";"), "edge_pair (100,200;100,2200)/(200,200;200,2200)")
+
+    shapes.clear
+
+    r = RBA::Texts::new(RBA::Text::new("Text", RBA::Trans::new(100, 200)))
+    shapes.insert(r)
+    assert_equal(shapes.each.collect { |s| s.to_s }.join(";"), "text ('Text',r0 100,200)")
+
+    shapes.clear
+
+    r = RBA::Texts::new(RBA::Text::new("Text", RBA::Trans::new(100, 200)))
+    shapes.insert(r, RBA::ICplxTrans::new(100, 200))
+    assert_equal(shapes.each.collect { |s| s.to_s }.join(";"), "text ('Text',r0 200,400)")
+
+    top.shapes(l1).clear
+    top.shapes(l1).insert(r, RBA::DCplxTrans::new(0.1, 0.2))
+    assert_equal(top.shapes(l1).each.collect { |s| s.to_s }.join(";"), "text ('Text',r0 200,400)")
+
+  end
+
+  def test_16
+
+    # issue #2094
+    # speedy insert -> should not take more than a few seconds
+
+    ly = RBA::Layout::new
+    l1 = ly.layer(1, 0)
+    main = ly.create_cell("MAIN")
+
+    box = RBA::Region::new(RBA::Box::new(4000))
+
+    100000.times do 
+      main.shapes(l1).insert(box)
+    end
+
+    assert_equal(main.shapes(l1).size, 100000)
+
+  end
+
 end
 
 load("test_epilogue.rb")

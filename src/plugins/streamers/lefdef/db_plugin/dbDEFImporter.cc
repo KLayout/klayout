@@ -26,6 +26,7 @@
 #include "tlGlobPattern.h"
 
 #include <cmath>
+#include <cctype>
 
 namespace db
 {
@@ -1233,16 +1234,23 @@ DEFImporter::read_vias (db::Layout &layout, db::Cell & /*design*/, double scale)
 //  issue #1470
 static std::string fix_pin_name (const std::string &pin_name)
 {
-  auto pos = pin_name.find (".extra");
+  const std::string extra (".extra");
+  auto pos = pin_name.find (extra);
   if (pos == std::string::npos) {
     return pin_name;
   } else {
-    //  TODO: do we need to be more specific?
     //  Formally, the allowed specs are:
     //    pinname.extraN
     //    pinname.extraN[n]
     //    pinname.extraN[n][m]...
-    return std::string (pin_name.begin (), pin_name.begin () + pos);
+    //  where N = a sequence of digits -
+    //  we only remove the ".extraN".
+    std::string result (pin_name.begin (), pin_name.begin () + pos);
+    auto i = pos + extra.size ();
+    for ( ; i != pin_name.size () && isdigit (pin_name [i]); ++i)
+      ;
+    result += std::string (pin_name.begin () + i, pin_name.end ());
+    return result;
   }
 }
 

@@ -1993,3 +1993,13 @@ TEST(132d_sensitive_breaking)
 {
   run_test (_this, "132", true);
 }
+
+TEST(140_target_modification)
+{
+  run_test (_this, "140", false);
+}
+
+TEST(140d_target_modification)
+{
+  run_test (_this, "140", true);
+}

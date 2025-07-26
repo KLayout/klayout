@@ -1149,11 +1149,21 @@ public:
    *  of type object_with_properties<X>.
    *  This method is only allowed in editable mode.
    *
-   *  @param ref The shape reference which to replace the properties ID with
+   *  @param ref The shape reference for which to replace the properties ID with
    *  @param prop_id The properties Id to replace.
    *  @return The reference to the new object
    */
   shape_type replace_prop_id (const shape_type &ref, db::properties_id_type prop_id);
+
+  /**
+   *  @brief Clears the user properties
+   *
+   *  This method is only allowed in editable mode.
+   *
+   *  @param ref The shape reference for which to clear the properties
+   *  @return The reference to the new object
+   */
+  shape_type clear_properties (const shape_type &ref);
 
   /**
    *  @brief Replace an element by a given shape
@@ -1637,6 +1647,9 @@ private:
 
   template <class Sh, class Iter>
   shape_type replace_prop_id_iter (typename db::object_tag<Sh>, const Iter &iter, db::properties_id_type prop_id);
+
+  template <class Sh, class Iter>
+  shape_type clear_properties_iter (typename db::object_tag<Sh>, const Iter &iter);
 
   //  A helper function to replace a shape given by a generic reference by doing an erase & insert
   //  Sh2 must not be a shape with properties

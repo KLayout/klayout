@@ -323,6 +323,16 @@ static void set_layout_property (db::Layout *l, const tl::Variant &key, const tl
   l->prop_id (db::properties_id (props));
 }
 
+static void set_layout_properties (db::Layout *l, const std::map<tl::Variant, tl::Variant> &dict)
+{
+  l->prop_id (db::properties_id (dict));
+}
+
+static void clear_layout_properties (db::Layout *l)
+{
+  l->prop_id (0);
+}
+
 static tl::Variant get_layout_property (const db::Layout *l, const tl::Variant &key)
 {
   db::properties_id_type id = l->prop_id ();
@@ -579,21 +589,15 @@ static db::properties_id_type properties_id_from_list_meth (const db::Layout *, 
   return properties_id_from_list (properties);
 }
 
-static db::properties_id_type properties_id_from_hash (const std::map<tl::Variant, tl::Variant> &properties)
+static db::properties_id_type properties_id_from_dict (const std::map<tl::Variant, tl::Variant> &properties)
 {
-  db::PropertiesSet props;
-
-  for (std::map<tl::Variant, tl::Variant>::const_iterator v = properties.begin (); v != properties.end (); ++v) {
-    props.insert (v->first, v->second);
-  }
-
-  return db::properties_id (props);
+  return db::properties_id (properties);
 }
 
 //  for backward compatibility
-static db::properties_id_type properties_id_from_hash_meth (const db::Layout *, const std::map<tl::Variant, tl::Variant> &properties)
+static db::properties_id_type properties_id_from_dict_meth (const db::Layout *, const std::map<tl::Variant, tl::Variant> &properties)
 {
-  return properties_id_from_hash (properties);
+  return properties_id_from_dict (properties);
 }
 
 static tl::Variant get_properties_list (db::properties_id_type id)
@@ -607,13 +611,13 @@ static tl::Variant get_properties_list_meth (const db::Layout *, db::properties_
   return db::properties (id).to_list_var ();
 }
 
-static tl::Variant get_properties_hash (db::properties_id_type id)
+static tl::Variant get_properties_dict (db::properties_id_type id)
 {
   return db::properties (id).to_dict_var ();
 }
 
 //  for backward compatibility
-static tl::Variant get_properties_hash_meth (const db::Layout *, db::properties_id_type id)
+static tl::Variant get_properties_dict_meth (const db::Layout *, db::properties_id_type id)
 {
   return db::properties (id).to_dict_var ();
 }
@@ -1320,6 +1324,22 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "\n"
     "This method has been introduced in version 0.24."
   ) + 
+  gsi::method_ext ("set_properties", &set_layout_properties, gsi::arg ("dict"),
+    "@brief Sets all user properties from the given dict\n"
+    "This method is a convenience method that replaces all user properties of the layout object. Using that method is more "
+    "convenient than creating a new property set with a new ID and assigning that properties ID.\n"
+    "This method may change the properties ID. "
+    "Note: GDS only supports integer keys. OASIS supports numeric and string keys. "
+    "\n"
+    "This method has been introduced in version 0.30.3."
+  ) +
+  gsi::method_ext ("clear_properties", &clear_layout_properties,
+    "@brief Clears all user properties\n"
+    "This method will remove all user properties. After it has been called, \\has_prop_id? will return false.\n"
+    "It is equivalent to setting the properties ID to zero.\n"
+    "\n"
+    "This method has been introduced in version 0.30.3."
+  ) +
   gsi::method_ext ("property", &get_layout_property, gsi::arg ("key"),
     "@brief Gets the Layout's user property with the given key\n"
     "This method is a convenience method that gets the property with the given key. "
@@ -1364,10 +1384,10 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "@return The unique properties ID for that set"
   ) +
   //  backward-compatible version as method
-  gsi::method_ext ("properties_id", &properties_id_from_hash_meth, gsi::arg ("properties"),
+  gsi::method_ext ("properties_id", &properties_id_from_dict_meth, gsi::arg ("properties"),
     "@hide"
   ) +
-  gsi::method ("properties_id", &properties_id_from_hash, gsi::arg ("properties"),
+  gsi::method ("properties_id", &properties_id_from_dict, gsi::arg ("properties"),
     "@brief Gets the properties ID for a given properties set\n"
     "\n"
     "This variant accepts a hash of value vs. key for the properties instead of array of key/value pairs. "
@@ -1413,10 +1433,10 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "In version 0.30, this method was turned into a static (class method), providing universal conversions without need for a Layout object."
   ) +
   //  backward-compatible version as method
-  gsi::method_ext ("properties_hash", &get_properties_hash_meth, gsi::arg ("properties_id"),
+  gsi::method_ext ("properties_hash", &get_properties_dict_meth, gsi::arg ("properties_id"),
     "@hide"
   ) +
-  gsi::method ("properties_hash", &get_properties_hash, gsi::arg ("properties_id"),
+  gsi::method ("properties_hash", &get_properties_dict, gsi::arg ("properties_id"),
     "@brief Gets the properties set for a given properties ID as a hash\n"
     "\n"
     "Returns the properties for a given properties ID as a hash.\n"

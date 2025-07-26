@@ -311,6 +311,11 @@ DB_PUBLIC const PropertiesSet &properties (db::properties_id_type id);
 DB_PUBLIC db::properties_id_type properties_id (const PropertiesSet &ps);
 
 /**
+ *  @brief Gets the properties ID from a raw properties set
+ */
+DB_PUBLIC db::properties_id_type properties_id (const std::map<tl::Variant, tl::Variant> &dict);
+
+/**
  *  @brief The properties repository
  *
  *  This repository associates a set of property name/value pairs with 

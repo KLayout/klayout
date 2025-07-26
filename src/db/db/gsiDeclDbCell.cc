@@ -1076,6 +1076,16 @@ static void set_cell_property (db::Cell *c, const tl::Variant &key, const tl::Va
   c->prop_id (db::properties_id (props));
 }
 
+static void set_cell_properties (db::Cell *c, const std::map<tl::Variant, tl::Variant> &dict)
+{
+  c->prop_id (db::properties_id (dict));
+}
+
+static void clear_cell_properties (db::Cell *c)
+{
+  c->prop_id (0);
+}
+
 static tl::Variant get_cell_property (const db::Cell *c, const tl::Variant &key)
 {
   db::properties_id_type id = c->prop_id ();
@@ -1831,6 +1841,22 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This method has been introduced in version 0.23."
   ) + 
+  gsi::method_ext ("set_properties", &set_cell_properties, gsi::arg ("dict"),
+    "@brief Sets all user properties from the given dict\n"
+    "This method is a convenience method that replaces all user properties of the cell. Using that method is more "
+    "convenient than creating a new property set with a new ID and assigning that properties ID.\n"
+    "This method may change the properties ID. "
+    "Note: GDS only supports integer keys. OASIS supports numeric and string keys. "
+    "\n"
+    "This method has been introduced in version 0.30.3."
+  ) +
+  gsi::method_ext ("clear_properties", &clear_cell_properties,
+    "@brief Clears all user properties\n"
+    "This method will remove all user properties. After it has been called, \\has_prop_id? will return false.\n"
+    "It is equivalent to setting the properties ID to zero.\n"
+    "\n"
+    "This method has been introduced in version 0.30.3."
+  ) +
   gsi::method_ext ("property", &get_cell_property, gsi::arg ("key"),
     "@brief Gets the user property with the given key\n"
     "This method is a convenience method that gets the property with the given key. "
@@ -3539,6 +3565,18 @@ static void set_property (db::Instance *i, const tl::Variant &key, const tl::Var
   set_prop_id (i, db::properties_id (props));
 }
 
+static void set_properties (db::Instance *inst, const std::map<tl::Variant, tl::Variant> &dict)
+{
+  set_prop_id (inst, db::properties_id (dict));
+}
+
+static void clear_properties (db::Instance *inst)
+{
+  tl_assert (inst->instances () != 0);
+  check_is_editable (inst->instances ());
+  *inst = inst->instances ()->clear_properties (*inst);
+}
+
 static tl::Variant get_property (const db::Instance *i, const tl::Variant &key)
 {
   db::properties_id_type id = i->prop_id ();
@@ -4019,6 +4057,25 @@ Class<db::Instance> decl_Instance ("db", "Instance",
     "\n"
     "This method has been introduced in version 0.22."
   ) + 
+  gsi::method_ext ("set_properties", &set_properties, gsi::arg ("dict"),
+    "@brief Sets all user properties from the given dict\n"
+    "This method is a convenience method that replaces all user properties of the instance. Using that method is more "
+    "convenient than creating a new property set with a new ID and assigning that properties ID.\n"
+    "This method may change the properties ID. "
+    "Note: GDS only supports integer keys. OASIS supports numeric and string keys. "
+    "Calling this method may invalidate any iterators. It should not be called inside a "
+    "loop iterating over instances.\n"
+    "\n"
+    "This method has been introduced in version 0.30.3."
+  ) +
+  gsi::method_ext ("clear_properties", &clear_properties,
+    "@brief Clears all user properties\n"
+    "This method will remove all user properties. After it has been called, \\has_prop_id? will return false.\n"
+    "Calling this method may invalidate any iterators. It should not be called inside a "
+    "loop iterating over instances.\n"
+    "\n"
+    "This method has been introduced in version 0.30.3."
+  ) +
   gsi::method_ext ("property", &get_property, gsi::arg ("key"),
     "@brief Gets the user property with the given key\n"
     "This method is a convenience method that gets the property with the given key. "

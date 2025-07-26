@@ -715,6 +715,12 @@ class DBLayoutTests2_TestClass < TestBase
     c1.delete_property( 17 )
     assert_equal( c1.property( 17 ).inspect, "nil" )
     assert_equal( c1.property( 5 ).inspect, "23" )
+    c1.set_properties({ "a" => 17, 42 => "u" })
+    assert_equal(c1.properties, {42=>"u", "a"=>17})
+    assert_equal(c1.has_prop_id?, true)
+    c1.clear_properties
+    assert_equal(c1.properties, {})
+    assert_equal(c1.has_prop_id?, false)
 
   end
 
@@ -1056,6 +1062,13 @@ class DBLayoutTests2_TestClass < TestBase
 
     ly.delete_property("x")
     assert_equal(ly.property("x"), nil)
+
+    ly.set_properties({ "a" => 17, 42 => "u" })
+    assert_equal(ly.properties, {42=>"u", "a"=>17})
+    assert_equal(ly.has_prop_id?, true)
+    ly.clear_properties
+    assert_equal(ly.properties, {})
+    assert_equal(ly.has_prop_id?, false)
 
   end
 

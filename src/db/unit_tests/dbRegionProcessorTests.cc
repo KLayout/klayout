@@ -48,11 +48,11 @@ TEST(1_RegionToEdgesProcessor)
     db::Point (100, 900)
   };
 
-  db::Polygon poly;
+  db::PolygonWithProperties poly;
   poly.assign_hull (hull + 0, hull + sizeof (hull) / sizeof (hull[0]));
   poly.insert_hole (hole + 0, hole + sizeof (hole) / sizeof (hole[0]));
 
-  std::vector<db::Edge> result;
+  std::vector<db::EdgeWithProperties> result;
 
   result.clear ();
   db::PolygonToEdgeProcessor ().process (poly, result);

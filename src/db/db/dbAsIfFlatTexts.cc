@@ -193,13 +193,17 @@ AsIfFlatTexts::processed (const TextProcessorBase &filter) const
 {
   std::unique_ptr<FlatTexts> texts (new FlatTexts ());
 
-  std::vector<db::Text> res_texts;
+  std::vector<db::TextWithProperties> res_texts;
 
   for (TextsIterator e = begin (); ! e.at_end (); ++e) {
     res_texts.clear ();
-    filter.process (*e, res_texts);
-    for (std::vector<db::Text>::const_iterator er = res_texts.begin (); er != res_texts.end (); ++er) {
-      texts->insert (*er);
+    filter.process (e.wp (), res_texts);
+    for (auto er = res_texts.begin (); er != res_texts.end (); ++er) {
+      if (er->properties_id () != 0) {
+        texts->insert (*er);
+      } else {
+        texts->insert (er->base ());
+      }
     }
   }
 
@@ -215,16 +219,16 @@ AsIfFlatTexts::processed_to_polygons (const TextToPolygonProcessorBase &filter) 
     region->set_merged_semantics (false);
   }
 
-  std::vector<db::Polygon> res_polygons;
+  std::vector<db::PolygonWithProperties> res_polygons;
 
   for (TextsIterator e (begin ()); ! e.at_end (); ++e) {
     res_polygons.clear ();
-    filter.process (*e, res_polygons);
-    for (std::vector<db::Polygon>::const_iterator pr = res_polygons.begin (); pr != res_polygons.end (); ++pr) {
-      if (e.prop_id () != 0) {
-        region->insert (db::PolygonWithProperties (*pr, e.prop_id ()));
-      } else {
+    filter.process (e.wp (), res_polygons);
+    for (auto pr = res_polygons.begin (); pr != res_polygons.end (); ++pr) {
+      if (pr->properties_id () != 0) {
         region->insert (*pr);
+      } else {
+        region->insert (pr->base ());
       }
     }
   }

@@ -220,16 +220,16 @@ RegionDelegate *FlatRegion::process_in_place (const PolygonProcessorBase &filter
   db::layer<db::PolygonWithProperties, db::unstable_layer_tag> &poly_layer_wp = mp_polygons->get_layer<db::PolygonWithProperties, db::unstable_layer_tag> ();
   db::layer<db::PolygonWithProperties, db::unstable_layer_tag> out_wp;
 
-  std::vector<db::Polygon> poly_res;
+  std::vector<db::PolygonWithProperties> poly_res;
   for (RegionIterator p (filter.requires_raw_input () ? begin () : begin_merged ()); ! p.at_end (); ++p) {
     poly_res.clear ();
-    filter.process (*p, poly_res);
-    if (p.prop_id () != 0) {
-      for (auto r = poly_res.begin (); r != poly_res.end (); ++r) {
-        out_wp.insert (db::PolygonWithProperties (*r, p.prop_id ()));
+    filter.process (p.wp (), poly_res);
+    for (auto r = poly_res.begin (); r != poly_res.end (); ++r) {
+      if (r->properties_id () != 0) {
+        out_wp.insert (*r);
+      } else {
+        out_wp.insert (r->base ());
       }
-    } else {
-      out.insert (poly_res.begin (), poly_res.end ());
     }
   }
 

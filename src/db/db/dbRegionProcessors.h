@@ -180,11 +180,6 @@ public:
     //  .. nothing yet ..
   }
 
-  void process (const db::Polygon &poly, std::vector<db::Polygon> &result) const
-  {
-    detect_corners (poly, CornerRectDelivery (m_dim, result));
-  }
-
   void process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &result) const
   {
     detect_corners (poly, CornerRectDelivery (m_dim, result));
@@ -214,11 +209,6 @@ public:
     //  .. nothing yet ..
   }
 
-  void process (const db::Polygon &poly, std::vector<db::Edge> &result) const
-  {
-    detect_corners (poly, CornerDotDelivery (result));
-  }
-
   void process (const db::PolygonWithProperties &poly, std::vector<db::EdgeWithProperties> &result) const
   {
     detect_corners (poly, CornerDotDelivery (result));
@@ -242,11 +232,6 @@ public:
     : CornerDetectorCore (angle_start, include_angle_start, angle_end, include_angle_end, inverse, absolute)
   {
     //  .. nothing yet ..
-  }
-
-  void process (const db::Polygon &poly, std::vector<db::EdgePair> &result) const
-  {
-    detect_corners (poly, CornerEdgePairDelivery (result));
   }
 
   void process (const db::PolygonWithProperties &poly, std::vector<db::EdgePairWithProperties> &result) const
@@ -276,7 +261,6 @@ public:
     //  .. nothing yet ..
   }
 
-  void process (const db::Polygon &poly, std::vector<db::Polygon> &result) const;
   void process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &result) const;
 
   virtual const TransformationReducer *vars () const { return 0; }
@@ -301,7 +285,6 @@ public:
     //  .. nothing yet ..
   }
 
-  void process (const db::Polygon &poly, std::vector<db::Polygon> &result) const;
   void process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &result) const;
 
   virtual const TransformationReducer *vars () const;
@@ -334,7 +317,6 @@ public:
     //  .. nothing yet ..
   }
 
-  void process (const db::Polygon &poly, std::vector<db::Edge> &result) const;
   void process (const db::PolygonWithProperties &poly, std::vector<db::EdgeWithProperties> &result) const;
 
   virtual const TransformationReducer *vars () const;
@@ -361,7 +343,6 @@ public:
 
   PolygonToEdgeProcessor (EdgeMode mode = All);
 
-  void process (const db::Polygon &poly, std::vector<db::Edge> &result) const;
   void process (const db::PolygonWithProperties &poly, std::vector<db::EdgeWithProperties> &result) const;
 
 private:
@@ -381,7 +362,6 @@ public:
     //  .. nothing yet ..
   }
 
-  void process (const db::Polygon &poly, std::vector<db::Polygon> &result) const;
   void process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &result) const;
 
   virtual const TransformationReducer *vars () const { return &m_vars; }
@@ -408,7 +388,6 @@ public:
     //  .. nothing yet ..
   }
 
-  void process (const db::Polygon &poly, std::vector<db::Polygon> &result) const;
   void process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &result) const;
 
   virtual const TransformationReducer *vars () const { return &m_vars; }
@@ -438,7 +417,6 @@ public:
     //  .. nothing yet ..
   }
 
-  void process (const db::Polygon &poly, std::vector<db::Polygon> &result) const;
   void process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &result) const;
 
   virtual const TransformationReducer *vars () const { return 0; }
@@ -464,7 +442,6 @@ public:
 
   virtual const TransformationReducer *vars () const { return m_vars; }
 
-  void process (const db::Polygon &poly, std::vector<db::Polygon> &result) const;
   void process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &result) const;
 
   virtual bool result_is_merged () const;
@@ -487,7 +464,6 @@ class DB_PUBLIC TriangulationProcessor
 public:
   TriangulationProcessor (double max_area = 0.0, double min_b = 1.0);
 
-  void process (const db::Polygon &poly, std::vector<db::Polygon> &result) const;
   void process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &result) const;
 
   virtual const TransformationReducer *vars () const { return &m_vars; }
@@ -516,11 +492,6 @@ public:
     //  .. nothing yet ..
   }
 
-  void process (const db::Polygon &poly, std::vector<db::Polygon> &result) const
-  {
-    result.push_back (db::minkowski_sum (poly, m_q, false));
-  }
-
   void process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &result) const
   {
     result.push_back (db::PolygonWithProperties (db::minkowski_sum (poly, m_q, false), poly.properties_id ()));
@@ -547,7 +518,6 @@ class DB_PUBLIC_TEMPLATE DRCHullProcessor
 public:
   DRCHullProcessor (db::Coord d, db::metrics_type metrics, size_t n_circle = 64);
 
-  void process (const db::Polygon &poly, std::vector<db::Polygon> &result) const;
   void process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &result) const;
 
 private:

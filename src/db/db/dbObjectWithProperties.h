@@ -187,6 +187,22 @@ public:
   }
 
   /**
+   *  @brief Downcase to base object (non-const)
+   */
+  Obj &base ()
+  {
+    return *this;
+  }
+
+  /**
+   *  @brief Downcase to base object (const)
+   */
+  const Obj &base () const
+  {
+    return *this;
+  }
+
+  /**
    *  @brief Properties Id read accessor
    */
   properties_id_type properties_id () const

@@ -97,14 +97,6 @@ void CornerDetectorCore::detect_corners (const db::PolygonWithProperties &poly, 
 // -----------------------------------------------------------------------------------
 //  Extents implementation
 
-void Extents::process (const db::Polygon &poly, std::vector<db::Polygon> &result) const
-{
-  db::Box b = poly.box ();
-  if (! b.empty ()) {
-    result.push_back (db::Polygon (b));
-  }
-}
-
 void Extents::process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &result) const
 {
   db::Box b = poly.box ();
@@ -115,19 +107,6 @@ void Extents::process (const db::PolygonWithProperties &poly, std::vector<db::Po
 
 // -----------------------------------------------------------------------------------
 //  RelativeExtents implementation
-
-void RelativeExtents::process (const db::Polygon &poly, std::vector<db::Polygon> &result) const
-{
-  db::Box b = poly.box ();
-  db::Point p1 (b.left () + db::coord_traits<db::Coord>::rounded (m_fx1 * b.width ()),
-                b.bottom () + db::coord_traits<db::Coord>::rounded (m_fy1 * b.height ()));
-  db::Point p2 (b.left () + db::coord_traits<db::Coord>::rounded (m_fx2 * b.width ()),
-                b.bottom () + db::coord_traits<db::Coord>::rounded (m_fy2 * b.height ()));
-  db::Box box = db::Box (p1, p2).enlarged (db::Vector (m_dx, m_dy));
-  if (! box.empty ()) {
-    result.push_back (db::Polygon (box));
-  }
-}
 
 void RelativeExtents::process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &result) const
 {
@@ -155,16 +134,6 @@ const TransformationReducer *RelativeExtents::vars () const
 
 // -----------------------------------------------------------------------------------
 //  RelativeExtentsAsEdges implementation
-
-void RelativeExtentsAsEdges::process (const db::Polygon &poly, std::vector<db::Edge> &result) const
-{
-  db::Box b = poly.box ();
-  db::Point p1 (b.left () + db::coord_traits<db::Coord>::rounded (m_fx1 * b.width ()),
-                b.bottom () + db::coord_traits<db::Coord>::rounded (m_fy1 * b.height ()));
-  db::Point p2 (b.left () + db::coord_traits<db::Coord>::rounded (m_fx2 * b.width ()),
-                b.bottom () + db::coord_traits<db::Coord>::rounded (m_fy2 * b.height ()));
-  result.push_back (db::Edge (p1, p2));
-}
 
 void RelativeExtentsAsEdges::process (const db::PolygonWithProperties &poly, std::vector<db::EdgeWithProperties> &result) const
 {
@@ -280,23 +249,6 @@ contour_to_edges (const db::Polygon::contour_type &contour, PolygonToEdgeProcess
   }
 }
 
-void PolygonToEdgeProcessor::process (const db::Polygon &poly, std::vector<db::Edge> &result) const
-{
-  if (m_mode == All) {
-
-    for (db::Polygon::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end (); ++e) {
-      result.push_back (*e);
-    }
-
-  } else {
-
-    for (unsigned int i = 0; i < poly.holes () + 1; ++i) {
-      contour_to_edges (poly.contour (i), m_mode, result);
-    }
-
-  }
-}
-
 void PolygonToEdgeProcessor::process (const db::PolygonWithProperties &poly, std::vector<db::EdgeWithProperties> &result) const
 {
   if (m_mode == All) {
@@ -322,15 +274,6 @@ void PolygonToEdgeProcessor::process (const db::PolygonWithProperties &poly, std
 // -----------------------------------------------------------------------------------
 //  ConvexDecomposition implementation
 
-void ConvexDecomposition::process (const db::Polygon &poly, std::vector<db::Polygon> &result) const
-{
-  db::SimplePolygonContainer sp;
-  db::decompose_convex (poly, m_mode, sp);
-  for (std::vector <db::SimplePolygon>::const_iterator i = sp.polygons ().begin (); i != sp.polygons ().end (); ++i) {
-    result.push_back (db::simple_polygon_to_polygon (*i));
-  }
-}
-
 void ConvexDecomposition::process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &result) const
 {
   db::SimplePolygonContainer sp;
@@ -343,15 +286,6 @@ void ConvexDecomposition::process (const db::PolygonWithProperties &poly, std::v
 // -----------------------------------------------------------------------------------
 //  TrapezoidDecomposition implementation
 
-void TrapezoidDecomposition::process (const db::Polygon &poly, std::vector<db::Polygon> &result) const
-{
-  db::SimplePolygonContainer sp;
-  db::decompose_trapezoids (poly, m_mode, sp);
-  for (std::vector <db::SimplePolygon>::const_iterator i = sp.polygons ().begin (); i != sp.polygons ().end (); ++i) {
-    result.push_back (db::simple_polygon_to_polygon (*i));
-  }
-}
-
 void TrapezoidDecomposition::process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &result) const
 {
   db::SimplePolygonContainer sp;
@@ -363,21 +297,6 @@ void TrapezoidDecomposition::process (const db::PolygonWithProperties &poly, std
 
 // -----------------------------------------------------------------------------------
 //  PolygonBreaker implementation
-
-void PolygonBreaker::process (const db::Polygon &poly, std::vector<db::Polygon> &result) const
-{
-  if (db::suggest_split_polygon (poly, m_max_vertex_count, m_max_area_ratio)) {
-
-    std::vector<db::Polygon> split_polygons;
-    db::split_polygon (poly, split_polygons);
-    for (std::vector<db::Polygon>::const_iterator p = split_polygons.begin (); p != split_polygons.end (); ++p) {
-      process (*p, result);
-    }
-
-  } else {
-    result.push_back (poly);
-  }
-}
 
 void PolygonBreaker::process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &result) const
 {
@@ -412,14 +331,6 @@ PolygonSizer::~PolygonSizer ()
   delete m_vars;
 }
 
-void PolygonSizer::process (const db::Polygon &poly, std::vector<db::Polygon> &result) const
-{
-  db::PolygonContainer pr (result);
-  db::PolygonGenerator pg2 (pr, false /*don't resolve holes*/, true /*min. coherence*/);
-  db::SizingPolygonFilter siz (pg2, m_dx, m_dy, m_mode);
-  siz.put (poly);
-}
-
 void PolygonSizer::process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &result) const
 {
   db::PolygonContainerWithProperties pr (result, poly.properties_id ());
@@ -445,27 +356,6 @@ TriangulationProcessor::TriangulationProcessor (double max_area, double min_b)
   m_param.base_verbosity = 40;
   m_param.min_length = 2 * triangulation_dbu;
   m_param.min_b = min_b;
-}
-
-void
-TriangulationProcessor::process (const db::Polygon &poly, std::vector<db::Polygon> &result) const
-{
-  //  NOTE: we center the polygon for better numerical stability
-  db::CplxTrans trans = db::CplxTrans (triangulation_dbu) * db::ICplxTrans (db::Trans (db::Point () - poly.box ().center ()));
-
-  db::plc::Graph tri;
-  db::plc::Triangulation (&tri).triangulate (poly, m_param, trans);
-
-  db::Point pts [3];
-  auto trans_inv = trans.inverted ();
-
-  for (auto t = tri.begin (); t != tri.end (); ++t) {
-    for (int i = 0; i < 3; ++i) {
-      pts [i] = trans_inv * *t->vertex (i);
-    }
-    result.push_back (db::Polygon ());
-    result.back ().assign_hull (pts + 0, pts + 3);
-  }
 }
 
 void
@@ -597,13 +487,6 @@ void
 DRCHullProcessor::process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &result) const
 {
   db::PolygonContainerWithProperties psink (result, poly.properties_id ());
-  do_process (poly, psink);
-}
-
-void
-DRCHullProcessor::process (const db::Polygon &poly, std::vector<db::Polygon> &result) const
-{
-  db::PolygonContainer psink (result);
   do_process (poly, psink);
 }
 

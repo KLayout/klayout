@@ -160,13 +160,17 @@ AsIfFlatEdgePairs::processed (const EdgePairProcessorBase &filter) const
 {
   std::unique_ptr<FlatEdgePairs> edge_pairs (new FlatEdgePairs ());
 
-  std::vector<db::EdgePair> res_edge_pairs;
+  std::vector<db::EdgePairWithProperties> res_edge_pairs;
 
   for (EdgePairsIterator e = begin (); ! e.at_end (); ++e) {
     res_edge_pairs.clear ();
-    filter.process (*e, res_edge_pairs);
-    for (std::vector<db::EdgePair>::const_iterator er = res_edge_pairs.begin (); er != res_edge_pairs.end (); ++er) {
-      edge_pairs->insert (*er);
+    filter.process (e.wp (), res_edge_pairs);
+    for (auto er = res_edge_pairs.begin (); er != res_edge_pairs.end (); ++er) {
+      if (er->properties_id () != 0) {
+        edge_pairs->insert (*er);
+      } else {
+        edge_pairs->insert (er->base ());
+      }
     }
   }
 
@@ -182,17 +186,16 @@ AsIfFlatEdgePairs::processed_to_polygons (const EdgePairToPolygonProcessorBase &
     region->set_merged_semantics (false);
   }
 
-  std::vector<db::Polygon> res_polygons;
+  std::vector<db::PolygonWithProperties> res_polygons;
 
   for (EdgePairsIterator e (begin ()); ! e.at_end (); ++e) {
     res_polygons.clear ();
-    filter.process (*e, res_polygons);
-    for (std::vector<db::Polygon>::const_iterator pr = res_polygons.begin (); pr != res_polygons.end (); ++pr) {
-      db::properties_id_type prop_id = e.prop_id ();
-      if (prop_id != 0) {
-        region->insert (db::PolygonWithProperties (*pr, prop_id));
-      } else {
+    filter.process (e.wp (), res_polygons);
+    for (auto pr = res_polygons.begin (); pr != res_polygons.end (); ++pr) {
+      if (pr->properties_id () != 0) {
         region->insert (*pr);
+      } else {
+        region->insert (pr->base ());
       }
     }
   }
@@ -209,17 +212,16 @@ AsIfFlatEdgePairs::processed_to_edges (const EdgePairToEdgeProcessorBase &filter
     edges->set_merged_semantics (false);
   }
 
-  std::vector<db::Edge> res_edges;
+  std::vector<db::EdgeWithProperties> res_edges;
 
   for (EdgePairsIterator e (begin ()); ! e.at_end (); ++e) {
     res_edges.clear ();
-    filter.process (*e, res_edges);
-    for (std::vector<db::Edge>::const_iterator pr = res_edges.begin (); pr != res_edges.end (); ++pr) {
-      db::properties_id_type prop_id = e.prop_id ();
-      if (prop_id != 0) {
-        edges->insert (db::EdgeWithProperties (*pr, prop_id));
-      } else {
+    filter.process (e.wp (), res_edges);
+    for (auto pr = res_edges.begin (); pr != res_edges.end (); ++pr) {
+      if (pr->properties_id () != 0) {
         edges->insert (*pr);
+      } else {
+        edges->insert (pr->base ());
       }
     }
   }

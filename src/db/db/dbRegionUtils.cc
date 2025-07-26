@@ -355,23 +355,6 @@ SinglePolygonCheck::SinglePolygonCheck (db::edge_relation_type rel, db::Coord d,
 { }
 
 void
-SinglePolygonCheck::process (const db::Polygon &polygon, std::vector<db::EdgePair> &res) const
-{
-  std::unordered_set<db::EdgePair> result;
-
-  EdgeRelationFilter check (m_relation, m_d, m_options);
-
-  edge2edge_check_negative_or_positive <std::unordered_set<db::EdgePair> > edge_check (check, result, m_options.negative, false /*=same polygons*/, false /*=same layers*/, m_options.shielded, true /*=symmetric*/);
-  poly2poly_check<db::Polygon> poly_check (edge_check);
-
-  do {
-    poly_check.single (polygon, 0);
-  } while (edge_check.prepare_next_pass ());
-
-  res.insert (res.end (), result.begin (), result.end ());
-}
-
-void
 SinglePolygonCheck::process (const db::PolygonWithProperties &polygon, std::vector<db::EdgePairWithProperties> &res) const
 {
   std::unordered_set<db::EdgePair> result;
@@ -413,19 +396,6 @@ StrangePolygonCheckProcessor::StrangePolygonCheckProcessor () { }
 StrangePolygonCheckProcessor::~StrangePolygonCheckProcessor () { }
 
 void
-StrangePolygonCheckProcessor::process (const db::Polygon &poly, std::vector<db::Polygon> &res) const
-{
-  EdgeProcessor ep;
-  ep.insert (poly);
-
-  StrangePolygonInsideFunc inside;
-  db::GenericMerge<StrangePolygonInsideFunc> op (inside);
-  db::PolygonContainer pc (res, false);
-  db::PolygonGenerator pg (pc, false, false);
-  ep.process (pg, op);
-}
-
-void
 StrangePolygonCheckProcessor::process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &res) const
 {
   EdgeProcessor ep;
@@ -446,12 +416,6 @@ SmoothingProcessor::SmoothingProcessor (db::Coord d, bool keep_hv) : m_d (d), m_
 SmoothingProcessor::~SmoothingProcessor () { }
 
 void
-SmoothingProcessor::process (const db::Polygon &poly, std::vector<db::Polygon> &res) const
-{
-  res.push_back (db::smooth (poly, m_d, m_keep_hv));
-}
-
-void
 SmoothingProcessor::process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &res) const
 {
   res.push_back (db::PolygonWithProperties (db::smooth (poly, m_d, m_keep_hv), poly.properties_id ()));
@@ -468,12 +432,6 @@ RoundedCornersProcessor::~RoundedCornersProcessor ()
 { }
 
 void
-RoundedCornersProcessor::process (const db::Polygon &poly, std::vector<db::Polygon> &res) const
-{
-  res.push_back (db::compute_rounded (poly, m_rinner, m_router, m_n));
-}
-
-void
 RoundedCornersProcessor::process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &res) const
 {
   res.push_back (db::PolygonWithProperties (db::compute_rounded (poly, m_rinner, m_router, m_n), poly.properties_id ()));
@@ -488,15 +446,6 @@ HolesExtractionProcessor::HolesExtractionProcessor ()
 
 HolesExtractionProcessor::~HolesExtractionProcessor ()
 {
-}
-
-void
-HolesExtractionProcessor::process (const db::Polygon &poly, std::vector<db::Polygon> &res) const
-{
-  for (size_t i = 0; i < poly.holes (); ++i) {
-    res.push_back (db::Polygon ());
-    res.back ().assign_hull (poly.begin_hole ((unsigned int) i), poly.end_hole ((unsigned int) i));
-  }
 }
 
 void
@@ -518,13 +467,6 @@ HullExtractionProcessor::HullExtractionProcessor ()
 
 HullExtractionProcessor::~HullExtractionProcessor ()
 {
-}
-
-void
-HullExtractionProcessor::process (const db::Polygon &poly, std::vector<db::Polygon> &res) const
-{
-  res.push_back (db::Polygon ());
-  res.back ().assign_hull (poly.begin_hull (), poly.end_hull ());
 }
 
 void

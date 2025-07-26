@@ -488,7 +488,6 @@ public:
   StrangePolygonCheckProcessor ();
   ~StrangePolygonCheckProcessor ();
 
-  virtual void process (const db::Polygon &poly, std::vector<db::Polygon> &res) const;
   virtual void process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &res) const;
 
   virtual const TransformationReducer *vars () const { return 0; }
@@ -508,7 +507,6 @@ public:
   SmoothingProcessor (db::Coord d, bool keep_hv);
   ~SmoothingProcessor ();
 
-  virtual void process (const db::Polygon &poly, std::vector<db::Polygon> &res) const;
   virtual void process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &res) const;
 
   virtual const TransformationReducer *vars () const { return &m_vars; }
@@ -533,7 +531,6 @@ public:
   RoundedCornersProcessor (double rinner, double router, unsigned int n);
   ~RoundedCornersProcessor ();
 
-  virtual void process (const db::Polygon &poly, std::vector<db::Polygon> &res) const;
   virtual void process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &res) const;
 
   virtual const TransformationReducer *vars () const { return &m_vars; }
@@ -558,7 +555,6 @@ public:
   HolesExtractionProcessor ();
   ~HolesExtractionProcessor ();
 
-  virtual void process (const db::Polygon &poly, std::vector<db::Polygon> &res) const;
   virtual void process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &res) const;
 
   virtual const TransformationReducer *vars () const { return 0; }
@@ -578,7 +574,6 @@ public:
   HullExtractionProcessor ();
   ~HullExtractionProcessor ();
 
-  virtual void process (const db::Polygon &poly, std::vector<db::Polygon> &res) const;
   virtual void process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &res) const;
 
   virtual const TransformationReducer *vars () const { return 0; }
@@ -597,7 +592,6 @@ class DB_PUBLIC SinglePolygonCheck
 public:
   SinglePolygonCheck (db::edge_relation_type rel, db::Coord d, const RegionCheckOptions &options);
 
-  virtual void process (const db::Polygon &polygon, std::vector<db::EdgePair> &res) const;
   virtual void process (const db::PolygonWithProperties &polygon, std::vector<db::EdgePairWithProperties> &res) const;
   virtual const TransformationReducer *vars () const { return &m_vars; }
   virtual bool wants_variants () const { return true; }

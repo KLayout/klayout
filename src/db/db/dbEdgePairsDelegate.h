@@ -52,14 +52,6 @@ public:
     : m_e (e)
   { }
 
-  void process(const EdgePair &ep, std::vector<db::Polygon> &res) const
-  {
-    db::Polygon poly = ep.normalized ().to_polygon (m_e);
-    if (poly.vertices () >= 3) {
-      res.push_back (poly);
-    }
-  }
-
   void process(const EdgePairWithProperties &ep, std::vector<db::PolygonWithProperties> &res) const
   {
     db::Polygon poly = ep.normalized ().to_polygon (m_e);
@@ -80,12 +72,6 @@ public:
   EdgePairToEdgesProcessor ()
   { }
 
-  void process(const EdgePair &ep, std::vector<db::Edge> &res) const
-  {
-    res.push_back (ep.first ());
-    res.push_back (ep.second ());
-  }
-
   void process(const EdgePairWithProperties &ep, std::vector<db::EdgeWithProperties> &res) const
   {
     res.push_back (db::EdgeWithProperties (ep.first (), ep.properties_id ()));
@@ -100,14 +86,6 @@ EdgePairToFirstEdgesProcessor
 public:
   EdgePairToFirstEdgesProcessor ()
   { }
-
-  void process(const EdgePair &ep, std::vector<db::Edge> &res) const
-  {
-    res.push_back (ep.first ());
-    if (ep.is_symmetric ()) {
-      res.push_back (ep.second ());
-    }
-  }
 
   void process(const EdgePairWithProperties &ep, std::vector<db::EdgeWithProperties> &res) const
   {
@@ -126,13 +104,6 @@ public:
   EdgePairToSecondEdgesProcessor ()
   { }
 
-  void process(const EdgePair &ep, std::vector<db::Edge> &res) const
-  {
-    if (! ep.is_symmetric ()) {
-      res.push_back (ep.second ());
-    }
-  }
-
   void process(const EdgePairWithProperties &ep, std::vector<db::EdgeWithProperties> &res) const
   {
     if (! ep.is_symmetric ()) {
@@ -149,11 +120,6 @@ public:
   EdgePairToLesserEdgesProcessor ()
   { }
 
-  void process(const EdgePair &ep, std::vector<db::Edge> &res) const
-  {
-    res.push_back (ep.lesser ());
-  }
-
   void process(const EdgePairWithProperties &ep, std::vector<db::EdgeWithProperties> &res) const
   {
     res.push_back (db::EdgeWithProperties (ep.lesser (), ep.properties_id ()));
@@ -167,11 +133,6 @@ EdgePairToGreaterEdgesProcessor
 public:
   EdgePairToGreaterEdgesProcessor ()
   { }
-
-  void process(const EdgePair &ep, std::vector<db::Edge> &res) const
-  {
-    res.push_back (ep.greater ());
-  }
 
   void process(const EdgePairWithProperties &ep, std::vector<db::EdgeWithProperties> &res) const
   {

@@ -1505,12 +1505,13 @@ DeepRegion::edges (const EdgeFilterBase *filter, const PolygonToEdgeProcessorBas
       const db::Shapes &s = c->shapes (polygons.layer ());
       db::Shapes &st = c->shapes (res->deep_layer ().layer ());
 
-      std::vector<db::Edge> heap;
+      std::vector<db::EdgeWithProperties> heap;
 
       for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
 
-        db::Polygon poly;
+        db::PolygonWithProperties poly;
         si->polygon (poly);
+        poly.properties_id (si->prop_id ());
 
         if (proc) {
 
@@ -1518,16 +1519,16 @@ DeepRegion::edges (const EdgeFilterBase *filter, const PolygonToEdgeProcessorBas
           proc->process (poly, heap);
 
           for (auto e = heap.begin (); e != heap.end (); ++e) {
-            if (! filter || filter->selected ((*e).transformed (tr), si->prop_id ())) {
-              st.insert (db::EdgeWithProperties (*e, si->prop_id ()));
+            if (! filter || filter->selected ((*e).transformed (tr), e->properties_id ())) {
+              st.insert (*e);
             }
           }
 
         } else {
 
           for (db::Polygon::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end (); ++e) {
-            if (! filter || filter->selected ((*e).transformed (tr), si->prop_id ())) {
-              st.insert (db::EdgeWithProperties (*e, si->prop_id ()));
+            if (! filter || filter->selected ((*e).transformed (tr), poly.properties_id ())) {
+              st.insert (db::EdgeWithProperties (*e, poly.properties_id ()));
             }
           }
 

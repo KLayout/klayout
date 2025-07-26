@@ -284,6 +284,7 @@ class DB_PUBLIC generic_shape_iterator
 public:
   typedef T value_type;
   typedef const value_type &reference;
+  typedef const db::object_with_properties<value_type> with_properties_type;
   typedef const value_type *pointer;
   typedef std::forward_iterator_tag iterator_category;
   typedef void difference_type;
@@ -371,6 +372,11 @@ public:
   pointer operator-> () const
   {
     return mp_delegate->get ();
+  }
+
+  with_properties_type wp () const
+  {
+    return with_properties_type (*mp_delegate->get (), mp_delegate->prop_id ());
   }
 
   generic_shape_iterator &operator++ ()

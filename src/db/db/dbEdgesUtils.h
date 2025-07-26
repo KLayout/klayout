@@ -644,11 +644,6 @@ public:
     : m_ext_b (ext_b), m_ext_e (ext_e), m_ext_o (ext_o), m_ext_i (ext_i)
   { }
 
-  virtual void process (const Edge &edge, std::vector<db::Polygon> &res) const
-  {
-    res.push_back (extended_edge (edge, m_ext_b, m_ext_e, m_ext_o, m_ext_i));
-  }
-
   virtual void process (const EdgeWithProperties &edge, std::vector<db::PolygonWithProperties> &res) const
   {
     res.push_back (db::PolygonWithProperties (extended_edge (edge, m_ext_b, m_ext_e, m_ext_o, m_ext_i), edge.properties_id ()));
@@ -668,7 +663,6 @@ public:
   EdgeSegmentSelector (int mode, Edge::distance_type length, double fraction);
   ~EdgeSegmentSelector ();
 
-  virtual void process (const db::Edge &edge, std::vector<db::Edge> &res) const;
   virtual void process (const db::EdgeWithProperties &edge, std::vector<db::EdgeWithProperties> &res) const;
 
   virtual const TransformationReducer *vars () const { return &m_vars; }

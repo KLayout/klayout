@@ -58,6 +58,7 @@ SOURCES = \
   dbLog.cc \
   dbManager.cc \
   dbMatrix.cc \
+  dbMeasure.cc \
   dbMemStatistics.cc \
   dbMutableEdgePairs.cc \
   dbMutableEdges.cc \
@@ -295,6 +296,7 @@ HEADERS = \
   dbLog.h \
   dbManager.h \
   dbMatrix.h \
+  dbMeasure.h \
   dbMemStatistics.h \
   dbMetaInfo.h \
   dbMutableEdgePairs.h \

@@ -155,28 +155,28 @@ AsIfFlatRegion::edges (const EdgeFilterBase *filter, const PolygonToEdgeProcesso
   }
   result->reserve (n);
 
-  std::vector<db::Edge> heap;
+  std::vector<db::EdgeWithProperties> heap;
 
   for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
-
-    db::properties_id_type prop_id = p.prop_id ();
 
     if (proc) {
 
       heap.clear ();
-      proc->process (*p, heap);
+      proc->process (p.wp (), heap);
 
       for (auto e = heap.begin (); e != heap.end (); ++e) {
-        if (! filter || filter->selected (*e, prop_id)) {
-          if (prop_id != 0) {
-            result->insert (db::EdgeWithProperties (*e, prop_id));
-          } else {
+        if (! filter || filter->selected (*e, e->properties_id ())) {
+          if (e->properties_id () != 0) {
             result->insert (*e);
+          } else {
+            result->insert (e->base ());
           }
         }
       }
 
     } else {
+
+      auto prop_id = p.prop_id ();
 
       for (db::Polygon::polygon_edge_iterator e = p->begin_edge (); ! e.at_end (); ++e) {
         if (! filter || filter->selected (*e, prop_id)) {
@@ -460,17 +460,17 @@ AsIfFlatRegion::processed (const PolygonProcessorBase &filter) const
     new_region->set_merged_semantics (false);
   }
 
-  std::vector<db::Polygon> poly_res;
+  std::vector<db::PolygonWithProperties> poly_res;
 
   for (RegionIterator p (filter.requires_raw_input () ? begin () : begin_merged ()); ! p.at_end (); ++p) {
 
     poly_res.clear ();
-    filter.process (*p, poly_res);
-    for (std::vector<db::Polygon>::const_iterator pr = poly_res.begin (); pr != poly_res.end (); ++pr) {
-      if (p.prop_id () != 0) {
-        new_region->insert (db::PolygonWithProperties (*pr, p.prop_id ()));
-      } else {
+    filter.process (p.wp (), poly_res);
+    for (auto pr = poly_res.begin (); pr != poly_res.end (); ++pr) {
+      if (pr->properties_id () != 0) {
         new_region->insert (*pr);
+      } else {
+        new_region->insert (pr->base ());
       }
     }
 
@@ -487,17 +487,17 @@ AsIfFlatRegion::processed_to_edges (const PolygonToEdgeProcessorBase &filter) co
     new_edges->set_merged_semantics (false);
   }
 
-  std::vector<db::Edge> edge_res;
+  std::vector<db::EdgeWithProperties> edge_res;
 
   for (RegionIterator p (filter.requires_raw_input () ? begin () : begin_merged ()); ! p.at_end (); ++p) {
 
     edge_res.clear ();
-    filter.process (*p, edge_res);
-    for (std::vector<db::Edge>::const_iterator er = edge_res.begin (); er != edge_res.end (); ++er) {
-      if (p.prop_id () != 0) {
-        new_edges->insert (db::EdgeWithProperties (*er, p.prop_id ()));
-      } else {
+    filter.process (p.wp (), edge_res);
+    for (auto er = edge_res.begin (); er != edge_res.end (); ++er) {
+      if (er->properties_id () != 0) {
         new_edges->insert (*er);
+      } else {
+        new_edges->insert (er->base ());
       }
     }
 
@@ -514,17 +514,17 @@ AsIfFlatRegion::processed_to_edge_pairs (const PolygonToEdgePairProcessorBase &f
     new_edge_pairs->set_merged_semantics (false);
   }
 
-  std::vector<db::EdgePair> edge_pair_res;
+  std::vector<db::EdgePairWithProperties> edge_pair_res;
 
   for (RegionIterator p (filter.requires_raw_input () ? begin () : begin_merged ()); ! p.at_end (); ++p) {
 
     edge_pair_res.clear ();
-    filter.process (*p, edge_pair_res);
-    for (std::vector<db::EdgePair>::const_iterator epr = edge_pair_res.begin (); epr != edge_pair_res.end (); ++epr) {
-      if (p.prop_id () != 0) {
-        new_edge_pairs->insert (db::EdgePairWithProperties (*epr, p.prop_id ()));
-      } else {
+    filter.process (p.wp (), edge_pair_res);
+    for (auto epr = edge_pair_res.begin (); epr != edge_pair_res.end (); ++epr) {
+      if (epr->properties_id () != 0) {
         new_edge_pairs->insert (*epr);
+      } else {
+        new_edge_pairs->insert (epr->base ());
       }
     }
 

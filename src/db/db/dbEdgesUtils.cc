@@ -185,34 +185,6 @@ EdgeSegmentSelector::~EdgeSegmentSelector ()
 { }
 
 void
-EdgeSegmentSelector::process (const db::Edge &edge, std::vector<db::Edge> &res) const
-{
-  double l = std::max (edge.double_length () * m_fraction, double (m_length));
-
-  db::DVector ds;
-  if (! edge.is_degenerate ()) {
-    ds = db::DVector (edge.d ()) * (l / edge.double_length ());
-  }
-
-  if (m_mode < 0) {
-
-    res.push_back (db::Edge (edge.p1 (), db::Point (db::DPoint (edge.p1 ()) + ds)));
-
-  } else if (m_mode > 0) {
-
-    res.push_back (db::Edge (db::Point (db::DPoint (edge.p2 ()) - ds), edge.p2 ()));
-
-  } else {
-
-    db::DVector dl = ds * 0.5;
-    db::DPoint center = db::DPoint (edge.p1 ()) + db::DVector (edge.p2 () - edge.p1 ()) * 0.5;
-
-    res.push_back (db::Edge (db::Point (center - dl), db::Point (center + dl)));
-
-  }
-}
-
-void
 EdgeSegmentSelector::process (const db::EdgeWithProperties &edge, std::vector<db::EdgeWithProperties> &res) const
 {
   double l = std::max (edge.double_length () * m_fraction, double (m_length));

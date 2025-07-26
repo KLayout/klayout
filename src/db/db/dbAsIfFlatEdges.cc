@@ -648,13 +648,17 @@ AsIfFlatEdges::processed (const EdgeProcessorBase &filter) const
     edges->set_merged_semantics (false);
   }
 
-  std::vector<db::Edge> res_edges;
+  std::vector<db::EdgeWithProperties> res_edges;
 
   for (EdgesIterator e (filter.requires_raw_input () ? begin () : begin_merged ()); ! e.at_end (); ++e) {
     res_edges.clear ();
-    filter.process (*e, res_edges);
-    for (std::vector<db::Edge>::const_iterator er = res_edges.begin (); er != res_edges.end (); ++er) {
-      edges->insert (*er);
+    filter.process (e.wp (), res_edges);
+    for (auto er = res_edges.begin (); er != res_edges.end (); ++er) {
+      if (er->properties_id () != 0) {
+        edges->insert (*er);
+      } else {
+        edges->insert (er->base ());
+      }
     }
   }
 
@@ -670,13 +674,17 @@ AsIfFlatEdges::processed_to_edge_pairs (const EdgeToEdgePairProcessorBase &filte
     edge_pairs->set_merged_semantics (false);
   }
 
-  std::vector<db::EdgePair> res_edge_pairs;
+  std::vector<db::EdgePairWithProperties> res_edge_pairs;
 
   for (EdgesIterator e (filter.requires_raw_input () ? begin () : begin_merged ()); ! e.at_end (); ++e) {
     res_edge_pairs.clear ();
-    filter.process (*e, res_edge_pairs);
-    for (std::vector<db::EdgePair>::const_iterator epr = res_edge_pairs.begin (); epr != res_edge_pairs.end (); ++epr) {
-      edge_pairs->insert (*epr);
+    filter.process (e.wp (), res_edge_pairs);
+    for (auto epr = res_edge_pairs.begin (); epr != res_edge_pairs.end (); ++epr) {
+      if (epr->properties_id () != 0) {
+        edge_pairs->insert (*epr);
+      } else {
+        edge_pairs->insert (epr->base ());
+      }
     }
   }
 
@@ -692,13 +700,17 @@ AsIfFlatEdges::processed_to_polygons (const EdgeToPolygonProcessorBase &filter) 
     region->set_merged_semantics (false);
   }
 
-  std::vector<db::Polygon> res_polygons;
+  std::vector<db::PolygonWithProperties> res_polygons;
 
   for (EdgesIterator e (filter.requires_raw_input () ? begin () : begin_merged ()); ! e.at_end (); ++e) {
     res_polygons.clear ();
-    filter.process (*e, res_polygons);
-    for (std::vector<db::Polygon>::const_iterator pr = res_polygons.begin (); pr != res_polygons.end (); ++pr) {
-      region->insert (*pr);
+    filter.process (e.wp (), res_polygons);
+    for (auto pr = res_polygons.begin (); pr != res_polygons.end (); ++pr) {
+      if (pr->properties_id () != 0) {
+        region->insert (*pr);
+      } else {
+        region->insert (pr->base ());
+      }
     }
   }
 

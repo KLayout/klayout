@@ -226,7 +226,7 @@ Box FlatEdges::compute_bbox () const
 EdgesDelegate *
 FlatEdges::processed_in_place (const EdgeProcessorBase &filter)
 {
-  std::vector<db::Edge> edge_res;
+  std::vector<db::EdgeWithProperties> edge_res;
 
   db::Shapes &e = *mp_edges;
 
@@ -236,22 +236,22 @@ FlatEdges::processed_in_place (const EdgeProcessorBase &filter)
   for (EdgesIterator p (filter.requires_raw_input () ? begin () : begin_merged ()); ! p.at_end (); ++p) {
 
     edge_res.clear ();
-    filter.process (*p, edge_res);
+    filter.process (p.wp (), edge_res);
 
-    for (std::vector<db::Edge>::const_iterator pr = edge_res.begin (); pr != edge_res.end (); ++pr) {
-      if (p.prop_id () != 0) {
+    for (auto pr = edge_res.begin (); pr != edge_res.end (); ++pr) {
+      if (pr->properties_id () != 0) {
         if (pw_wp == e.get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().end ()) {
-          e.get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().insert (db::EdgeWithProperties (*pr, p.prop_id ()));
+          e.get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().insert (*pr);
           pw_wp = e.get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().end ();
         } else {
-          e.get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().replace (pw_wp++, db::EdgeWithProperties (*pr, p.prop_id ()));
+          e.get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().replace (pw_wp++, *pr);
         }
       } else {
         if (pw == e.get_layer<db::Edge, db::unstable_layer_tag> ().end ()) {
-          e.get_layer<db::Edge, db::unstable_layer_tag> ().insert (*pr);
+          e.get_layer<db::Edge, db::unstable_layer_tag> ().insert (pr->base ());
           pw = e.get_layer<db::Edge, db::unstable_layer_tag> ().end ();
         } else {
-          e.get_layer<db::Edge, db::unstable_layer_tag> ().replace (pw++, *pr);
+          e.get_layer<db::Edge, db::unstable_layer_tag> ().replace (pw++, pr->base ());
         }
       }
     }

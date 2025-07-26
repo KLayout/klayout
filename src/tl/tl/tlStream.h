@@ -418,14 +418,6 @@ public:
   virtual ~InputStream ();
 
   /** 
-   *  @brief This is the outer write method to call
-   *  
-   *  This implementation writes data through the 
-   *  protected write call.
-   */
-  void put (const char *b, size_t n);
-
-  /** 
    *  @brief This is the outer read method to call
    *  
    *  This implementation obtains data through the 

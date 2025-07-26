@@ -1065,8 +1065,48 @@ bool Macro::can_run () const
   }
 }
 
+static Macro *sp_current_macro = 0;
+
+Macro *
+Macro::current ()
+{
+  return sp_current_macro;
+}
+
+const tl::Variant &
+Macro::get_attribute (const std::string &name) const
+{
+  auto a = m_attributes.find (name);
+  if (a == m_attributes.end ()) {
+    static tl::Variant nil;
+    return nil;
+  } else {
+    return a->second;
+  }
+}
+
+bool
+Macro::has_attribute (const std::string &name) const
+{
+  return m_attributes.find (name) != m_attributes.end ();
+}
+
+void
+Macro::set_attribute (const std::string &name, const tl::Variant &value)
+{
+  m_attributes[name] = value;
+}
+
+void
+Macro::delete_attribute (const std::string &name)
+{
+  m_attributes.erase (name);
+}
+
 int Macro::run () const
 {
+  sp_current_macro = const_cast<Macro *> (this);
+
   if (tl::verbosity () >= 20) {
     tl::log << tl::to_string (tr ("Running macro ")) << path ();
   }
@@ -1097,7 +1137,10 @@ int Macro::run () const
       throw tl::Exception (tl::to_string (tr ("Can't run macro (no interpreter): ")) + path ());
     }
 
+    sp_current_macro = 0;
+
   } catch (tl::ExitException &ex) {
+    sp_current_macro = 0;
     return ex.status ();
   }
 

@@ -2421,7 +2421,7 @@ TEST(12A)
 
     shape = topcell.shapes (lindex).begin (db::Shapes::shape_iterator::All);
     while (! shape.at_end ()) {
-      if (shape->with_props ()) {
+      if (shape->has_prop_id ()) {
         topcell.shapes (lindex).replace_prop_id (*shape, shape->prop_id () + 100);
       }
       ++shape;
@@ -2494,7 +2494,7 @@ TEST(12C)
 
     shape = topcell.shapes (lindex).begin (db::Shapes::shape_iterator::All);
     while (! shape.at_end ()) {
-      if (shape->with_props ()) {
+      if (shape->has_prop_id ()) {
         topcell.shapes (lindex).replace_prop_id (*shape, shape->prop_id () + 100);
       }
       ++shape;
@@ -2578,7 +2578,7 @@ TEST(12E)
 
     shape = topcell.shapes (lindex).begin (db::Shapes::shape_iterator::All);
     while (! shape.at_end ()) {
-      if (shape->with_props ()) {
+      if (shape->has_prop_id ()) {
         topcell.shapes (lindex).replace_prop_id (*shape, shape->prop_id () + 100);
       }
       ++shape;
@@ -2677,7 +2677,7 @@ TEST(12G)
 
     shape = topcell.shapes (lindex).begin (db::Shapes::shape_iterator::All);
     while (! shape.at_end ()) {
-      if (shape->with_props ()) {
+      if (shape->has_prop_id ()) {
         topcell.shapes (lindex).replace_prop_id (*shape, shape->prop_id () + 100);
       }
       ++shape;
@@ -2774,7 +2774,7 @@ TEST(12I)
 
     shape = topcell.shapes (lindex).begin (db::Shapes::shape_iterator::All);
     while (! shape.at_end ()) {
-      if (shape->with_props ()) {
+      if (shape->has_prop_id ()) {
         topcell.shapes (lindex).replace_prop_id (*shape, shape->prop_id () + 100);
       }
       ++shape;
@@ -2834,7 +2834,7 @@ TEST(12J)
 
     shape = topcell.shapes (lindex).begin (db::Shapes::shape_iterator::All);
     while (! shape.at_end ()) {
-      if (shape->with_props ()) {
+      if (shape->has_prop_id ()) {
         topcell.shapes (lindex).replace_prop_id (*shape, shape->prop_id () + 100);
       }
       ++shape;

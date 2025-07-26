@@ -555,6 +555,62 @@ Class<lym::Macro> decl_Macro ("lay", "Macro",
     "\n"
     "This method has been introduced in version 0.27.5.\n"
   ) +
+  gsi::method ("current", &lym::Macro::current,
+    "@brief Gets the macro currently executed\n"
+    "\n"
+    "This method can be used inside scripts running in that macro "
+    "to identify the currently running macro. It returns nil outside the "
+    "'run' context. The Macro object can be used to pass information "
+    "in and out of the script using macro attributes (see \\set_attribute and "
+    "related methods).\n"
+    "\n"
+    "@code\n"
+    "macro = RBA::Macro::new\n"
+    "macro.interpreter = RBA::Macro::Ruby\n"
+    "\n"
+    "macro.text = <<\"END\"\n"
+    "  macro = RBA::Macro::current\n"
+    "  x = macro.get_attribute(\"x\")\n"
+    "  macro.set_attribute(\"y\", x + 1)\n"
+    "END\n"
+    "\n"
+    "macro.set_attribute(\"x\", 17)\n"
+    "macro.run\n"
+    "macro.get_attribute(\"y\")  # -> 18\n"
+    "@/code\n"
+    "\n"
+    "This method has been introduced in version 0.30.3.\n"
+  ) +
+  gsi::method ("set_attribute", &lym::Macro::set_attribute, gsi::arg ("name"), gsi::arg ("value"),
+    "@brief Gets the attribute with the given name\n"
+    "\n"
+    "Attributes are generic key/value pairs that can be added to the Macro object.\n"
+    "This allows passing information in and out of the macro run (see \\current).\n"
+    "\n"
+    "This method has been introduced in version 0.30.3.\n"
+  ) +
+  gsi::method ("has_attribute", &lym::Macro::has_attribute, gsi::arg ("name"),
+    "@brief Gets a value indicating whether the Macro has an attribute with the given name\n"
+    "\n"
+    "See \\set_attribute for a description of Macro attributes.\n"
+    "\n"
+    "This method has been introduced in version 0.30.3.\n"
+  ) +
+  gsi::method ("get_attribute", &lym::Macro::get_attribute, gsi::arg ("name"),
+    "@brief Gets the value of the attribute with the given name\n"
+    "\n"
+    "See \\set_attribute for a description of Macro attributes.\n"
+    "If no attribute is present with the given name, nil is returned.\n"
+    "\n"
+    "This method has been introduced in version 0.30.3.\n"
+  ) +
+  gsi::method ("delete_attribute", &lym::Macro::delete_attribute, gsi::arg ("name"),
+    "@brief Deletes the attribute with the given name\n"
+    "\n"
+    "See \\set_attribute for a description of Macro attributes.\n"
+    "\n"
+    "This method has been introduced in version 0.30.3.\n"
+  ) +
   gsi::method ("save_to", &lym::Macro::save_to, gsi::arg ("path"),
     "@brief Saves the macro to the given file\n"
     "\n"

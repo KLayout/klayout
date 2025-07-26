@@ -1212,12 +1212,12 @@ public:
           return true;
 
         } else {
-          v = tl::Variant::make_variant (db::ICplxTrans ());
+          v = tl::Variant::make_variant (db::DCplxTrans ());
           return true;
         }
 
       } else {
-        v = tl::Variant::make_variant (db::ICplxTrans ());
+        v = tl::Variant::make_variant (db::DCplxTrans ());
         return true;
       }
 

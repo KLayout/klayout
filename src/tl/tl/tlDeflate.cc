@@ -166,6 +166,7 @@ public:
       if (*l > 0) {
         unsigned int code = next_code [*l]++;
         code <<= (max_bits - *l);
+        tl_assert (code < (unsigned int) (1 << max_bits));
         mp_codes [code] = symbol;
         mp_bitmasks [code] = bitmasks [*l];
       } 

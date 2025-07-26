@@ -1498,6 +1498,13 @@ public:
   instance_type replace_prop_id (const instance_type &ref, db::properties_id_type prop_id);
 
   /**
+   *  @brief Clears the properties
+   *
+   *  @return The reference to the new instance
+   */
+  instance_type clear_properties (const instance_type &ref);
+
+  /**
    *  @brief Replace the instance pointed to by the iterator with the given instance
    *
    *  If the object pointed to by ref contains properties, the properties will remain.

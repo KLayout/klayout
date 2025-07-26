@@ -256,12 +256,13 @@ Finder::do_find (const db::Cell &cell, int level, const db::DCplxTrans &vp, cons
 // -------------------------------------------------------------
 //  ShapeFinder implementation
 
-ShapeFinder::ShapeFinder (bool point_mode, bool top_level_sel, db::ShapeIterator::flags_type flags, const std::set<lay::ObjectInstPath> *excludes)
+ShapeFinder::ShapeFinder (bool point_mode, bool top_level_sel, db::ShapeIterator::flags_type flags, const std::set<lay::ObjectInstPath> *excludes, bool capture_all_shapes)
   : Finder (point_mode, top_level_sel), 
     mp_excludes ((excludes && !excludes->empty ()) ? excludes : 0),
     m_flags (flags), m_cv_index (0), m_topcell (0), 
     mp_text_info (0),
-    mp_prop_sel (0), m_inv_prop_sel (false), mp_progress (0)
+    mp_prop_sel (0), m_inv_prop_sel (false), mp_progress (0),
+    m_capture_all_shapes (capture_all_shapes)
 {
   m_tries = point_sel_tests;
 }
@@ -579,7 +580,7 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db:
           //  in point mode, test the edges and use a "closest" criterion
           if (shape->is_polygon ()) {
 
-            bool any_valid_edge = false;
+            bool any_valid_edge = m_capture_all_shapes;
             for (db::Shape::polygon_edge_iterator e = shape->begin_edge (); ! e.at_end (); ++e) {
               if ((*e).clipped (viewport_box).first) {
                 any_valid_edge = true;
@@ -595,7 +596,7 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db:
 
           } else if (shape->is_path ()) {
 
-            bool any_valid_edge = false;
+            bool any_valid_edge = m_capture_all_shapes;
 
             //  test the "spine"
             db::Shape::point_iterator pt = shape->begin_point ();
@@ -644,7 +645,7 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db:
               match = true;
             } else {
 
-              bool any_valid_edge = false;
+              bool any_valid_edge = m_capture_all_shapes;
 
               //  convert to polygon and test those edges
               db::Polygon poly (box);

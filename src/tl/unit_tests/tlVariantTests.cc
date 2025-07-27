@@ -1435,4 +1435,60 @@ TEST(13)
   EXPECT_EQ (vm[tl::Variant ("2")], 4);
 }
 
+//  tl::Variant byte arrays vs. strings
+TEST(14)
+{
+  std::vector<char> ba1;
+  const char ba1_str[] = { 'A', 'B', 0, 'D' };
+  ba1.insert (ba1.end (), ba1_str, ba1_str + sizeof (ba1_str) / sizeof (ba1_str [0]));
+
+  std::vector<char> ba2;
+  const char ba2_str[] = { 'A', 'B', 'C', 'D' };
+  ba2.insert (ba2.end (), ba2_str, ba2_str + sizeof (ba2_str) / sizeof (ba2_str [0]));
+
+  tl::Variant ba1_var (ba1), ba2_var (ba2);
+
+  EXPECT_EQ (ba1_var.is_a_bytearray (), true);
+  EXPECT_EQ (ba1_var.to_string (), std::string ("AB"));
+  EXPECT_EQ (ba1_var.to_bytearray ().size (), size_t (4));
+
+  EXPECT_EQ (ba2_var.is_a_bytearray (), true);
+  EXPECT_EQ (ba2_var.to_string (), std::string ("ABCD"));
+  EXPECT_EQ (ba2_var.to_bytearray ().size (), size_t (4));
+
+  EXPECT_EQ (ba1_var == ba2_var, false);
+  EXPECT_EQ (ba1_var == ba1_var, true);
+  EXPECT_EQ (ba1_var < ba2_var, true);
+  EXPECT_EQ (ba2_var < ba1_var, false);
+  EXPECT_EQ (ba1_var != ba2_var, true);
+  EXPECT_EQ (ba1_var != ba1_var, false);
+
+  EXPECT_EQ (ba1_var == tl::Variant ("AB"), false);
+  EXPECT_EQ (ba1_var < tl::Variant ("AB"), false);
+  EXPECT_EQ (ba1_var < tl::Variant ("ABCD"), true);
+  EXPECT_EQ (tl::Variant ("AB") == ba1_var, false);
+  EXPECT_EQ (tl::Variant ("AB") < ba1_var, true);
+  EXPECT_EQ (tl::Variant ("ABCD") < ba1_var, false);
+  EXPECT_EQ (ba2_var == tl::Variant ("ABCD"), true);
+  EXPECT_EQ (ba2_var < tl::Variant ("ABCD"), false);
+  EXPECT_EQ (tl::Variant ("ABCD") == ba2_var, true);
+  EXPECT_EQ (tl::Variant ("ABCD") < ba2_var, false);
+
+  EXPECT_EQ (ba1_var.equal (ba2_var), false);
+  EXPECT_EQ (ba1_var.equal (ba1_var), true);
+  EXPECT_EQ (ba1_var.less (ba2_var), true);
+  EXPECT_EQ (ba2_var.less (ba1_var), false);
+
+  EXPECT_EQ (ba1_var.equal (tl::Variant ("AB")), false);
+  EXPECT_EQ (ba1_var.less (tl::Variant ("AB")), false);
+  EXPECT_EQ (ba1_var.less (tl::Variant ("ABCD")), false);
+  EXPECT_EQ (tl::Variant ("AB").equal (ba1_var), false);
+  EXPECT_EQ (tl::Variant ("AB").less (ba1_var), true);
+  EXPECT_EQ (tl::Variant ("ABCD").less (ba1_var), true);
+  EXPECT_EQ (ba2_var.equal (tl::Variant ("ABCD")), false);
+  EXPECT_EQ (ba2_var.less (tl::Variant ("ABCD")), false);
+  EXPECT_EQ (tl::Variant ("ABCD").equal (ba2_var), false);
+  EXPECT_EQ (tl::Variant ("ABCD").less (ba2_var), true);
+}
+
 }

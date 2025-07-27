@@ -1078,6 +1078,18 @@ is_integer_type (Variant::type type)
   }
 }
 
+inline bool
+is_string_type (Variant::type type)
+{
+  switch (type) {
+  case Variant::t_stdstring:
+  case Variant::t_string:
+    return true;
+  default:
+    return false;
+  }
+}
+
 /**
  *  @brief normalized_type
  */
@@ -1126,25 +1138,26 @@ normalized_type (Variant::type type)
   }
 }
 
-inline std::pair<bool, Variant::type>
-normalized_type (Variant::type type1, Variant::type type2)
+inline std::pair<Variant::type, Variant::type>
+normalized_types (Variant::type type1, Variant::type type2)
 {
   type1 = normalized_type (type1);
   type2 = normalized_type (type2);
 
-  if (type1 == type2) {
-    return std::make_pair (true, type1);
+  if (is_integer_type (type1)) {
+    type1 = Variant::t_double;
+  }
+  if (is_integer_type (type2)) {
+    type2 = Variant::t_double;
   }
 
-  if (type1 == Variant::t_double && is_integer_type (type2)) {
-    //  use double as common representation
-    return std::make_pair (true, Variant::t_double);
-  } else if (type2 == Variant::t_double && is_integer_type (type1)) {
-    //  use double as common representation
-    return std::make_pair (true, Variant::t_double);
-  } else {
-    return std::make_pair (type1 == type2, type1);
+  if (is_string_type (type1) && type2 == Variant::t_bytearray) {
+    type1 = Variant::t_bytearray;
+  } else if (is_string_type (type2) && type1 == Variant::t_bytearray) {
+    type2 = Variant::t_bytearray;
   }
+
+  return std::make_pair (type1, type2);
 }
 
 /**
@@ -1226,8 +1239,11 @@ Variant::equal_core (const tl::Variant &d, type t) const
   } else if (t == t_string) {
     return strcmp (to_string (), d.to_string ()) == 0;
   } else if (t == t_bytearray) {
-    //  TODO: can't compare std::vector<char> with QByteArray currently
-    return *m_var.m_bytearray == *d.m_var.m_bytearray;
+    if (m_type == t_bytearray && d.m_type == t_bytearray) {
+      return *m_var.m_bytearray == *d.m_var.m_bytearray;
+    } else {
+      return to_bytearray () == d.to_bytearray ();
+    }
 #if defined(HAVE_QT)
   } else if (t == t_qstring) {
     return *m_var.m_qstring == *d.m_var.m_qstring;
@@ -1275,8 +1291,11 @@ Variant::less_core (const tl::Variant &d, type t) const
   } else if (t == t_string) {
     return strcmp (to_string (), d.to_string ()) < 0;
   } else if (t == t_bytearray) {
-    //  TODO: can't compare std::vector<char> with QByteArray currently
-    return *m_var.m_bytearray < *d.m_var.m_bytearray;
+    if (m_type == t_bytearray && d.m_type == t_bytearray) {
+      return *m_var.m_bytearray < *d.m_var.m_bytearray;
+    } else {
+      return to_bytearray () < d.to_bytearray ();
+    }
 #if defined(HAVE_QT)
   } else if (t == t_qstring) {
     return *m_var.m_qstring < *d.m_var.m_qstring;
@@ -1309,40 +1328,22 @@ Variant::less_core (const tl::Variant &d, type t) const
 bool
 Variant::operator== (const tl::Variant &d) const
 {
-  type type1 = normalized_type (m_type);
-  type type2 = normalized_type (d.m_type);
-
-  if (is_integer_type (type1)) {
-    type1 = Variant::t_double;
-  }
-  if (is_integer_type (type2)) {
-    type2 = Variant::t_double;
-  }
-
-  if (type1 != type2) {
+  auto tt = normalized_types (m_type, d.m_type);
+  if (tt.first != tt.second) {
     return false;
   } else {
-    return equal_core (d, type1);
+    return equal_core (d, tt.first);
   }
 }
 
 bool
 Variant::operator< (const tl::Variant &d) const
 {
-  type type1 = normalized_type (m_type);
-  type type2 = normalized_type (d.m_type);
-
-  if (is_integer_type (type1)) {
-    type1 = Variant::t_double;
-  }
-  if (is_integer_type (type2)) {
-    type2 = Variant::t_double;
-  }
-
-  if (type1 != type2) {
-    return type1 < type2;
+  auto tt = normalized_types (m_type, d.m_type);
+  if (tt.first != tt.second) {
+    return tt.first < tt.second;
   } else {
-    return less_core (d, type1);
+    return less_core (d, tt.first);
   }
 }
 

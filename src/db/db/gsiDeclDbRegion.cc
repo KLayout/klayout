@@ -227,7 +227,9 @@ Class<gsi::PolygonFilterImpl> decl_PolygonFilterImpl (decl_PolygonFilterBase, "d
 // ---------------------------------------------------------------------------------
 //  PolygonProcessor binding
 
-Class<shape_processor_impl<db::PolygonProcessorBase> > decl_PolygonOperator ("db", "PolygonOperator",
+Class<db::PolygonProcessorBase> decl_PolygonProcessorBase ("db", "PolygonProcessorBase", "@hide");
+
+Class<shape_processor_impl<db::PolygonProcessorBase> > decl_PolygonOperator (decl_PolygonProcessorBase, "db", "PolygonOperator",
   shape_processor_impl<db::PolygonProcessorBase>::method_decls (true),
   "@brief A generic polygon operator\n"
   "\n"
@@ -279,7 +281,7 @@ new_pcp (const db::Region *container, const std::map<tl::Variant, std::string> &
   return new property_computation_processor<db::PolygonProcessorBase, db::Region> (container, expressions, copy_properties);
 }
 
-Class<property_computation_processor<db::PolygonProcessorBase, db::Region> > decl_PolygonPropertiesExpressions ("db", "PolygonPropertiesExpressions",
+Class<property_computation_processor<db::PolygonProcessorBase, db::Region> > decl_PolygonPropertiesExpressions (decl_PolygonProcessorBase, "db", "PolygonPropertiesExpressions",
   property_computation_processor<db::PolygonProcessorBase, db::Region>::method_decls (true) +
   gsi::constructor ("new", &new_pcp, gsi::arg ("region"), gsi::arg ("expressions"), gsi::arg ("copy_properties", false),
     "@brief Creates a new properties expressions operator\n"
@@ -307,7 +309,9 @@ Class<property_computation_processor<db::PolygonProcessorBase, db::Region> > dec
   "This class has been introduced in version 0.30.3.\n"
 );
 
-Class<shape_processor_impl<db::PolygonToEdgeProcessorBase> > decl_PolygonToEdgeProcessor ("db", "PolygonToEdgeOperator",
+Class<db::PolygonToEdgeProcessorBase> decl_PolygonToEdgeProcessorBase ("db", "PolygonToEdgeProcessorBase", "@hide");
+
+Class<shape_processor_impl<db::PolygonToEdgeProcessorBase> > decl_PolygonToEdgeProcessor (decl_PolygonToEdgeProcessorBase, "db", "PolygonToEdgeOperator",
   shape_processor_impl<db::PolygonToEdgeProcessorBase>::method_decls (true),
   "@brief A generic polygon-to-edge operator\n"
   "\n"
@@ -331,7 +335,9 @@ Class<shape_processor_impl<db::PolygonToEdgeProcessorBase> > decl_PolygonToEdgeP
   "This class has been introduced in version 0.29.\n"
 );
 
-Class<shape_processor_impl<db::PolygonToEdgePairProcessorBase> > decl_PolygonToEdgePairProcessor ("db", "PolygonToEdgePairOperator",
+Class<db::PolygonToEdgePairProcessorBase> decl_PolygonToEdgePairProcessorBase ("db", "PolygonToEdgePairProcessorBase", "@hide");
+
+Class<shape_processor_impl<db::PolygonToEdgePairProcessorBase> > decl_PolygonToEdgePairProcessor (decl_PolygonToEdgePairProcessorBase, "db", "PolygonToEdgePairOperator",
   shape_processor_impl<db::PolygonToEdgePairProcessorBase>::method_decls (true),
   "@brief A generic polygon-to-edge-pair operator\n"
   "\n"
@@ -686,22 +692,22 @@ static std::vector<db::Region> split_filter (const db::Region *r, const PolygonF
   return as_2region_vector (r->split_filter (*f));
 }
 
-static db::Region processed_pp (const db::Region *r, const shape_processor_impl<db::PolygonProcessorBase> *f)
+static db::Region processed_pp (const db::Region *r, const db::PolygonProcessorBase *f)
 {
   return r->processed (*f);
 }
 
-static void process_pp (db::Region *r, const shape_processor_impl<db::PolygonProcessorBase> *f)
+static void process_pp (db::Region *r, const db::PolygonProcessorBase *f)
 {
   r->process (*f);
 }
 
-static db::EdgePairs processed_pep (const db::Region *r, const shape_processor_impl<db::PolygonToEdgePairProcessorBase> *f)
+static db::EdgePairs processed_pep (const db::Region *r, const db::PolygonToEdgePairProcessorBase *f)
 {
   return r->processed (*f);
 }
 
-static db::Edges processed_pe (const db::Region *r, const shape_processor_impl<db::PolygonToEdgeProcessorBase> *f)
+static db::Edges processed_pe (const db::Region *r, const db::PolygonToEdgeProcessorBase *f)
 {
   return r->processed (*f);
 }

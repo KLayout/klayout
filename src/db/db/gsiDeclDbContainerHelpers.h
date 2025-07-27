@@ -453,24 +453,45 @@ public:
 
   virtual void process (const db::object_with_properties<shape_type> &shape, std::vector<db::object_with_properties<result_type> > &res) const
   {
-    res = do_process (shape);
+    res = do_process_wp (shape);
+
+    auto res_no_prop = do_process (shape.base ());
+    for (auto i = res_no_prop.begin (); i != res_no_prop.end (); ++i) {
+      res.push_back (db::object_with_properties<result_type> (*i, shape.properties_id ()));
+    }
   }
 
-  std::vector<db::object_with_properties<result_type> > issue_do_process (const db::object_with_properties<shape_type> &) const
+  std::vector<result_type> issue_do_process (const shape_type &) const
   {
-    return std::vector<db::object_with_properties<result_type> > ();
+    return std::vector<result_type> ();
   }
 
-  std::vector<db::object_with_properties<result_type> > do_process (const db::object_with_properties<shape_type> &shape) const
+  std::vector<result_type> do_process (const shape_type &shape) const
   {
     if (f_process.can_issue ()) {
-      return f_process.issue<shape_processor_impl, std::vector<db::object_with_properties<result_type> >, const db::object_with_properties<shape_type> &> (&shape_processor_impl::issue_do_process, shape);
+      return f_process.issue<shape_processor_impl, std::vector<result_type>, const shape_type &> (&shape_processor_impl::issue_do_process, shape);
     } else {
       return issue_do_process (shape);
     }
   }
 
   gsi::Callback f_process;
+
+  std::vector<db::object_with_properties<result_type> > issue_do_process_wp (const db::object_with_properties<shape_type> &) const
+  {
+    return std::vector<db::object_with_properties<result_type> > ();
+  }
+
+  std::vector<db::object_with_properties<result_type> > do_process_wp (const db::object_with_properties<shape_type> &shape) const
+  {
+    if (f_process_wp.can_issue ()) {
+      return f_process_wp.issue<shape_processor_impl, std::vector<db::object_with_properties<result_type> >, const db::object_with_properties<shape_type> &> (&shape_processor_impl::issue_do_process_wp, shape);
+    } else {
+      return issue_do_process_wp (shape);
+    }
+  }
+
+  gsi::Callback f_process_wp;
 
   static gsi::Methods method_decls (bool with_merged_options)
   {
@@ -482,9 +503,15 @@ public:
         "The output list may be empty to entirely discard the input shape. It may also contain more than a single shape.\n"
         "In that case, the number of total shapes may grow during application of the processor.\n"
         "\n"
-        "Since version 0.30.3, this method will always receive objects with properties and is also able to deliver them - "
-        "hence modify the properties.\n"
-        "'process_with_properties' is no longer supported."
+        "Instead of implementing 'process', you can also implement \\process_with_properties. The latter function "
+        "allows modifying the properties of an object."
+      ) +
+      callback ("process_witp_properties", &shape_processor_impl::issue_do_process_wp, &shape_processor_impl::f_process_wp, gsi::arg ("shape"),
+        "@brief Processes a shape with properties\n"
+        "This method is called in addition to \\process. If reimplemented it allows producing objects "
+        "with different properties than the input one.\n"
+        "\n"
+        "Modification of properties is supported since version 0.30.3.\n"
       );
 
     return decls + shape_processor_base<ProcessorBase>::method_decls (with_merged_options);

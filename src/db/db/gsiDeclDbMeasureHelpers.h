@@ -44,167 +44,30 @@ namespace gsi
  *
  *  This class provides the methods, functions and variables for the expressions.
  */
-class MeasureEval
+class DB_PUBLIC MeasureEval
   : public tl::Eval
 {
 public:
-  MeasureEval ()
-    : m_shape_type (None), m_prop_id (0)
-  {
-    mp_shape.any = 0;
-  }
+  MeasureEval ();
 
-  void init ()
-  {
-    define_function ("shape", new ShapesFunction (this));
-    define_function ("value", new ValueFunction (this));
-    define_function ("values", new ValuesFunction (this));
-  }
+  void init ();
 
-  void reset_shape () const
-  {
-    m_shape_type = None;
-    mp_shape.any = 0;
-    m_prop_id = 0;
-  }
-
-  void set_shape (const db::Polygon *poly) const
-  {
-    m_shape_type = Polygon;
-    mp_shape.poly = poly;
-  }
-
-  void set_shape (const db::PolygonRef *poly) const
-  {
-    m_shape_type = PolygonRef;
-    mp_shape.poly_ref = poly;
-  }
-
-  void set_shape (const db::Edge *edge) const
-  {
-    m_shape_type = Edge;
-    mp_shape.edge = edge;
-  }
-
-  void set_shape (const db::EdgePair *edge_pair) const
-  {
-    m_shape_type = EdgePair;
-    mp_shape.edge_pair = edge_pair;
-  }
-
-  void set_shape (const db::Text *text) const
-  {
-    m_shape_type = Text;
-    mp_shape.text = text;
-  }
-
-  void set_prop_id (db::properties_id_type prop_id) const
-  {
-    m_prop_id = prop_id;
-  }
+  void reset_shape () const;
+  void set_shape (const db::Polygon *poly) const;
+  void set_shape (const db::PolygonRef *poly) const;
+  void set_shape (const db::Edge *edge) const;
+  void set_shape (const db::EdgePair *edge_pair) const;
+  void set_shape (const db::Text *text) const;
+  void set_prop_id (db::properties_id_type prop_id) const;
 
 protected:
-  virtual void resolve_name (const std::string &name, const tl::EvalFunction *&function, const tl::Variant *&value, tl::Variant *&var)
-  {
-    tl::Eval::resolve_name (name, function, value, var);
-
-    if (!function && !value && !var) {
-      //  connect the name with a function getting the property value
-      tl::EvalFunction *f = new PropertyFunction (this, name);
-      define_function (name, f);
-      function = f;
-    }
-  }
+  virtual void resolve_name (const std::string &name, const tl::EvalFunction *&function, const tl::Variant *&value, tl::Variant *&var);
 
 private:
-  class ShapesFunction
-    : public tl::EvalFunction
-  {
-  public:
-    ShapesFunction (MeasureEval *eval)
-      : mp_eval (eval)
-    {
-      //  .. nothing yet ..
-    }
-
-    virtual void execute (const tl::ExpressionParserContext &context, tl::Variant &out, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> * /*kwargs*/) const
-    {
-      if (args.size () != 0) {
-        throw tl::EvalError (tl::to_string (tr ("'shape' function does not take arguments")), context);
-      }
-      out = mp_eval->shape_func ();
-    }
-
-  private:
-    MeasureEval *mp_eval;
-  };
-
-  class ValueFunction
-    : public tl::EvalFunction
-  {
-  public:
-    ValueFunction (MeasureEval *eval)
-      : mp_eval (eval)
-    {
-      //  .. nothing yet ..
-    }
-
-    virtual void execute (const tl::ExpressionParserContext &context, tl::Variant &out, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> * /*kwargs*/) const
-    {
-      if (args.size () != 1) {
-        throw tl::EvalError (tl::to_string (tr ("'value' function takes one argument")), context);
-      }
-      out = mp_eval->value_func (args [0]);
-    }
-
-  private:
-    MeasureEval *mp_eval;
-  };
-
-  class ValuesFunction
-    : public tl::EvalFunction
-  {
-  public:
-    ValuesFunction (MeasureEval *eval)
-      : mp_eval (eval)
-    {
-      //  .. nothing yet ..
-    }
-
-    virtual void execute (const tl::ExpressionParserContext &context, tl::Variant &out, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> * /*kwargs*/) const
-    {
-      if (args.size () != 1) {
-        throw tl::EvalError (tl::to_string (tr ("'values' function takes one argument")), context);
-      }
-      out = mp_eval->values_func (args [0]);
-    }
-
-  private:
-    MeasureEval *mp_eval;
-  };
-
-  class PropertyFunction
-    : public tl::EvalFunction
-  {
-  public:
-    PropertyFunction (MeasureEval *eval, const tl::Variant &name)
-      : mp_eval (eval), m_name (name)
-    {
-      //  .. nothing yet ..
-    }
-
-    virtual void execute (const tl::ExpressionParserContext &context, tl::Variant &out, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> * /*kwargs*/) const
-    {
-      if (args.size () != 0) {
-        throw tl::EvalError (tl::to_string (tr ("Property getter function does not take arguments")), context);
-      }
-      out = mp_eval->value_func (m_name);
-    }
-
-  private:
-    MeasureEval *mp_eval;
-    tl::Variant m_name;
-  };
+  friend class ShapeFunction;
+  friend class ValueFunction;
+  friend class ValuesFunction;
+  friend class PropertyFunction;
 
   union ShapeRef
   {
@@ -230,51 +93,10 @@ private:
   mutable ShapeRef mp_shape;
   mutable db::properties_id_type m_prop_id;
 
-  tl::Variant shape_func () const
-  {
-    switch (m_shape_type)
-    {
-    case None:
-    default:
-      return tl::Variant ();
-    case Polygon:
-      return tl::Variant (mp_shape.poly);
-    case PolygonRef:
-      return tl::Variant (mp_shape.poly_ref);
-    case Edge:
-      return tl::Variant (mp_shape.edge);
-    case EdgePair:
-      return tl::Variant (mp_shape.edge_pair);
-    case Text:
-      return tl::Variant (mp_shape.text);
-    }
-  }
-
-  tl::Variant value_func (const tl::Variant &name) const
-  {
-    const db::PropertiesSet &ps = db::properties (m_prop_id);
-    for (auto i = ps.begin (); i != ps.end (); ++i) {
-      if (db::property_name (i->first) == name) {
-        return db::property_value (i->second);
-      }
-    }
-
-    return tl::Variant ();
-  }
-
-  tl::Variant values_func (const tl::Variant &name) const
-  {
-    tl::Variant res = tl::Variant::empty_list ();
-
-    const db::PropertiesSet &ps = db::properties (m_prop_id);
-    for (auto i = ps.begin (); i != ps.end (); ++i) {
-      if (db::property_name (i->first) == name) {
-        res.push (db::property_value (i->second));
-      }
-    }
-
-    return res;
-  }
+  tl::Variant shape_func () const;
+  tl::Variant value_func (db::property_names_id_type name_id) const;
+  tl::Variant value_func (const tl::Variant &name) const;
+  tl::Variant values_func (const tl::Variant &name) const;
 };
 
 inline db::RecursiveShapeIterator
@@ -341,7 +163,7 @@ public:
   typedef typename ProcessorBase::result_type result_type;
 
   property_computation_processor (const Container *container, const std::map<tl::Variant, std::string> &expressions, bool copy_properties)
-    : m_eval (), m_copy_properties (copy_properties)
+    : m_eval (), m_copy_properties (copy_properties), m_expression_strings (expressions)
   {
     if (container) {
       this->set_result_is_merged (is_merged (container));
@@ -350,7 +172,7 @@ public:
     m_eval.init ();
 
     //  compile the expressions
-    for (auto e = expressions.begin (); e != expressions.end (); ++e) {
+    for (auto e = m_expression_strings.begin (); e != m_expression_strings.end (); ++e) {
       m_expressions.push_back (std::make_pair (db::property_names_id (e->first), tl::Expression ()));
       tl::Extractor ex (e->second.c_str ());
       m_eval.parse (m_expressions.back ().second, ex);
@@ -367,6 +189,9 @@ public:
     db::PropertiesSet ps;
     if (m_copy_properties) {
       ps = db::properties (shape.properties_id ());
+      for (auto e = m_expressions.begin (); e != m_expressions.end (); ++e) {
+        ps.erase (e->first);
+      }
     }
 
     for (auto e = m_expressions.begin (); e != m_expressions.end (); ++e) {
@@ -380,6 +205,7 @@ public:
   MeasureEval m_eval;
   std::vector<std::pair<db::property_names_id_type, tl::Expression> > m_expressions;
   bool m_copy_properties;
+  std::map<tl::Variant, std::string> m_expression_strings;
 };
 
 /**
@@ -397,12 +223,12 @@ public:
   typedef typename FilterBase::shape_type shape_type;
 
   expression_filter (const std::string &expression, bool inverse)
-    : m_eval (), m_inverse (inverse)
+    : m_eval (), m_inverse (inverse), m_expression_string (expression)
   {
     m_eval.init ();
 
     //  compile the expression
-    tl::Extractor ex (expression.c_str ());
+    tl::Extractor ex (m_expression_string.c_str ());
     m_eval.parse (m_expression, ex);
   }
 
@@ -429,6 +255,7 @@ public:
   MeasureEval m_eval;
   tl::Expression m_expression;
   bool m_inverse;
+  std::string m_expression_string;
 };
 
 }

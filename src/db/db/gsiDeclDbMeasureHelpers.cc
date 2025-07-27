@@ -25,104 +25,234 @@
 namespace gsi
 {
 
-/**
- *  @brief Provides methods to handle measurement functions on various containers
- */
-template <class Container, class ProcessorBase, class FilterBase>
-struct measure_methods
+class ShapeFunction
+  : public tl::EvalFunction
 {
-  /**
-   *  @brief Computes one or many properties from expressions
-   *
-   *  This method will use the shapes from the "input" container and compute properties from them using the
-   *  given expression from "expressions". This map specifies the name of the target property, the value
-   *  specifies the expression to execute.
-   *
-   *  The expressions can make use of the following variables and functions:
-   *  * "shape": the shape which is currently seen
-   *  * "<prop-name>": an existing property from the shape currently seen (or nil, if no such property is present).
-   *    This is a shortcut, only for properties with string names that are compatible with variable names
-   *  * "value(<name>)": the value of the property with the given name - if multiple properties with that
-   *    name are present, one value is returned
-   *  * "values(<name>)": a list of values for all properties with the given name
-   *
-   *  Returns the new container with the computed properties attached.
-   */
-  Container computed_properties (Container *input, const std::map<tl::Variant, std::string> &expressions, bool clear_properties);
+public:
+  ShapeFunction (MeasureEval *eval)
+    : mp_eval (eval)
+  {
+    //  .. nothing yet ..
+  }
 
-  /**
-   *  @brief Computes one or many properties from expressions
-   *
-   *  Like "computed_properties", this method computes properties, but attaches them to the existing shapes.
-   *  As a side effect, the shapes may be merged if "merged_semantics" applies. If "clear_properties" is true,
-   *  any existing properties will be removed. If not, the new properties are added to the existing ones.
-   */
-  void compute_properties_in_place (Container *container, const std::map<tl::Variant, std::string> &expressions, bool clear_properties);
+  virtual void execute (const tl::ExpressionParserContext &context, tl::Variant &out, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> * /*kwargs*/) const
+  {
+    if (args.size () != 0) {
+      throw tl::EvalError (tl::to_string (tr ("'shape' function does not take arguments")), context);
+    }
+    out = mp_eval->shape_func ();
+  }
 
-  /**
-   *  @brief Selects all shapes for which the condition expression renders true (or the inverse)
-   *
-   *  The condition expression can use the features as described for "computed_properties".
-   *  If inverse is false, all shapes are selected for which the condition renders true. If
-   *  inverse is true, all shapes are selected for which the condition renders false.
-   */
-  Container selected_if (const Container *container, const std::string &condition_expression, bool inverse);
-
-  /**
-   *  @brief In-place version of "selected_if"
-   */
-  void select_if (Container *container, const std::string &condition_expression, bool inverse);
-
-  /**
-   *  @brief Splits the container into one for which is the condition is true and one with the other shapes
-   */
-  std::pair<Container, Container> split_if (const Container *container, const std::string &condition_expression);
+private:
+  MeasureEval *mp_eval;
 };
 
-template <class Container, class ProcessorBase, class FilterBase>
-Container
-measure_methods<Container, ProcessorBase, FilterBase>::computed_properties (Container *container, const std::map<tl::Variant, std::string> &expressions, bool clear_properties)
+class ValueFunction
+  : public tl::EvalFunction
 {
-  property_computation_processor<ProcessorBase, Container> proc (container, expressions, !clear_properties);
-  return container->processed (proc);
+public:
+  ValueFunction (MeasureEval *eval)
+    : mp_eval (eval)
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual void execute (const tl::ExpressionParserContext &context, tl::Variant &out, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> * /*kwargs*/) const
+  {
+    if (args.size () != 1) {
+      throw tl::EvalError (tl::to_string (tr ("'value' function takes one argument")), context);
+    }
+    out = mp_eval->value_func (args [0]);
+  }
+
+private:
+  MeasureEval *mp_eval;
+};
+
+class ValuesFunction
+  : public tl::EvalFunction
+{
+public:
+  ValuesFunction (MeasureEval *eval)
+    : mp_eval (eval)
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual void execute (const tl::ExpressionParserContext &context, tl::Variant &out, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> * /*kwargs*/) const
+  {
+    if (args.size () != 1) {
+      throw tl::EvalError (tl::to_string (tr ("'values' function takes one argument")), context);
+    }
+    out = mp_eval->values_func (args [0]);
+  }
+
+private:
+  MeasureEval *mp_eval;
+};
+
+class PropertyFunction
+  : public tl::EvalFunction
+{
+public:
+  PropertyFunction (MeasureEval *eval, const tl::Variant &name)
+    : mp_eval (eval), m_name_id (db::property_names_id (name))
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual void execute (const tl::ExpressionParserContext &context, tl::Variant &out, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> * /*kwargs*/) const
+  {
+    if (args.size () != 0) {
+      throw tl::EvalError (tl::to_string (tr ("Property getter function does not take arguments")), context);
+    }
+    out = mp_eval->value_func (m_name_id);
+  }
+
+private:
+  MeasureEval *mp_eval;
+  db::property_names_id_type m_name_id;
+};
+
+// --------------------------------------------------------------------
+//  MeasureEval implementation
+
+MeasureEval::MeasureEval ()
+  : m_shape_type (None), m_prop_id (0)
+{
+  mp_shape.any = 0;
 }
 
-template <class Container, class ProcessorBase, class FilterBase>
 void
-measure_methods<Container, ProcessorBase, FilterBase>::compute_properties_in_place (Container *container, const std::map<tl::Variant, std::string> &expressions, bool clear_properties)
+MeasureEval::init ()
 {
-  property_computation_processor<ProcessorBase, Container> proc (container, expressions, !clear_properties);
-  container->process (proc);
+  define_function ("shape", new ShapeFunction (this));
+  define_function ("value", new ValueFunction (this));
+  define_function ("values", new ValuesFunction (this));
 }
 
-template <class Container, class ProcessorBase, class FilterBase>
-Container
-measure_methods<Container, ProcessorBase, FilterBase>::selected_if (const Container *container, const std::string &condition_expression, bool inverse)
-{
-  expression_filter<FilterBase, Container> filter (condition_expression, inverse);
-  return container->filtered (filter);
-}
-
-template <class Container, class ProcessorBase, class FilterBase>
 void
-measure_methods<Container, ProcessorBase, FilterBase>::select_if (Container *container, const std::string &condition_expression, bool inverse)
+MeasureEval::reset_shape () const
 {
-  expression_filter<FilterBase, Container> filter (condition_expression, inverse);
-  container->filter (filter);
+  m_shape_type = None;
+  mp_shape.any = 0;
+  m_prop_id = 0;
 }
 
-template <class Container, class ProcessorBase, class FilterBase>
-std::pair<Container, Container>
-measure_methods<Container, ProcessorBase, FilterBase>::split_if (const Container *container, const std::string &condition_expression)
+void
+MeasureEval::set_shape (const db::Polygon *poly) const
 {
-  expression_filter<FilterBase, Container> filter (condition_expression, false);
-  return container->split_filter (filter);
+  m_shape_type = Polygon;
+  mp_shape.poly = poly;
 }
 
-//  explicit instantiations
-template struct measure_methods<db::Region, db::shape_collection_processor<db::Polygon, db::Polygon>, db::AllMustMatchFilter>;
-template struct measure_methods<db::Edges, db::shape_collection_processor<db::Edge, db::Edge>, db::AllEdgesMustMatchFilter>;
-template struct measure_methods<db::EdgePairs, db::shape_collection_processor<db::EdgePair, db::EdgePair>, db::EdgePairFilterBase>;
-template struct measure_methods<db::Texts, db::shape_collection_processor<db::Text, db::Text>, db::TextFilterBase>;
+void
+MeasureEval::set_shape (const db::PolygonRef *poly) const
+{
+  m_shape_type = PolygonRef;
+  mp_shape.poly_ref = poly;
+}
+
+void
+MeasureEval::set_shape (const db::Edge *edge) const
+{
+  m_shape_type = Edge;
+  mp_shape.edge = edge;
+}
+
+void
+MeasureEval::set_shape (const db::EdgePair *edge_pair) const
+{
+  m_shape_type = EdgePair;
+  mp_shape.edge_pair = edge_pair;
+}
+
+void
+MeasureEval::set_shape (const db::Text *text) const
+{
+  m_shape_type = Text;
+  mp_shape.text = text;
+}
+
+void
+MeasureEval::set_prop_id (db::properties_id_type prop_id) const
+{
+  m_prop_id = prop_id;
+}
+
+void
+MeasureEval::resolve_name (const std::string &name, const tl::EvalFunction *&function, const tl::Variant *&value, tl::Variant *&var)
+{
+  tl::Eval::resolve_name (name, function, value, var);
+
+  if (!function && !value && !var) {
+    //  connect the name with a function getting the property value
+    tl::EvalFunction *f = new PropertyFunction (this, name);
+    define_function (name, f);
+    function = f;
+  }
+}
+
+tl::Variant
+MeasureEval::shape_func () const
+{
+  switch (m_shape_type)
+  {
+  case None:
+  default:
+    return tl::Variant ();
+  case Polygon:
+    return tl::Variant (mp_shape.poly);
+  case PolygonRef:
+    return tl::Variant (mp_shape.poly_ref);
+  case Edge:
+    return tl::Variant (mp_shape.edge);
+  case EdgePair:
+    return tl::Variant (mp_shape.edge_pair);
+  case Text:
+    return tl::Variant (mp_shape.text);
+  }
+}
+
+tl::Variant
+MeasureEval::value_func (db::property_names_id_type name_id) const
+{
+  const db::PropertiesSet &ps = db::properties (m_prop_id);
+  for (auto i = ps.begin (); i != ps.end (); ++i) {
+    if (i->first == name_id) {
+      return db::property_value (i->second);
+    }
+  }
+
+  return tl::Variant ();
+}
+
+tl::Variant
+MeasureEval::value_func (const tl::Variant &name) const
+{
+  const db::PropertiesSet &ps = db::properties (m_prop_id);
+  for (auto i = ps.begin (); i != ps.end (); ++i) {
+    if (db::property_name (i->first) == name) {
+      return db::property_value (i->second);
+    }
+  }
+
+  return tl::Variant ();
+}
+
+tl::Variant
+MeasureEval::values_func (const tl::Variant &name) const
+{
+  tl::Variant res = tl::Variant::empty_list ();
+
+  const db::PropertiesSet &ps = db::properties (m_prop_id);
+  for (auto i = ps.begin (); i != ps.end (); ++i) {
+    if (db::property_name (i->first) == name) {
+      res.push (db::property_value (i->second));
+    }
+  }
+
+  return res;
+}
 
 }

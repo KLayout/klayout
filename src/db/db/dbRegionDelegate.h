@@ -57,6 +57,8 @@ class Net;
 class DB_PUBLIC PolygonFilterBase
 {
 public:
+  typedef db::Polygon shape_type;
+
   /**
    *  @brief Constructor
    */

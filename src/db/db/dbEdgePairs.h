@@ -55,6 +55,8 @@ class EdgePairs;
 class DB_PUBLIC EdgePairFilterBase
 {
 public:
+  typedef db::EdgePair shape_type;
+
   EdgePairFilterBase () { }
   virtual ~EdgePairFilterBase () { }
 

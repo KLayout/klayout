@@ -54,6 +54,8 @@ class Texts;
 class DB_PUBLIC TextFilterBase
 {
 public:
+  typedef db::Text shape_type;
+
   TextFilterBase () { }
   virtual ~TextFilterBase () { }
 

@@ -45,6 +45,8 @@ namespace db {
 class DB_PUBLIC EdgeFilterBase
 {
 public:
+  typedef db::Edge shape_type;
+
   /**
    *  @brief Constructor
    */

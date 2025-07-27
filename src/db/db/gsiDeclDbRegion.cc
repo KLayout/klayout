@@ -41,6 +41,7 @@
 #include "tlGlobPattern.h"
 
 #include "gsiDeclDbContainerHelpers.h"
+#include "gsiDeclDbMeasureHelpers.h"
 
 #include <memory>
 #include <vector>
@@ -108,6 +109,11 @@ static gsi::PolygonFilterBase *make_pg (const tl::Variant &name, const std::stri
   return new PolygonPropertiesFilter (name, pattern, inverse);
 }
 
+static gsi::PolygonFilterBase *make_pe (const std::string &expression, bool inverse)
+{
+  return new gsi::expression_filter<gsi::PolygonFilterBase, db::Region> (expression, inverse);
+}
+
 Class<gsi::PolygonFilterBase> decl_PolygonFilterBase ("db", "PolygonFilterBase",
   gsi::PolygonFilterBase::method_decls (true) +
   gsi::constructor ("property_glob", &make_pg, gsi::arg ("name"), gsi::arg ("pattern"), gsi::arg ("inverse", false), gsi::arg ("case_sensitive", true),
@@ -148,6 +154,24 @@ Class<gsi::PolygonFilterBase> decl_PolygonFilterBase ("db", "PolygonFilterBase",
     "Apply this filter with \\Region#filtered. See \\property_glob for an example.\n"
     "\n"
     "This feature has been introduced in version 0.30."
+  ) +
+  gsi::constructor ("expression_filter", &make_pe, gsi::arg ("expression"), gsi::arg ("inverse", false),
+    "@brief Creates an expression-based filter\n"
+    "@param expression The expression to evaluate.\n"
+    "@param inverse If true, inverts the selection - i.e. all polygons without a property with the given name and value range are selected.\n"
+    "\n"
+    "Creates a filter that will evaluate the given expression on every shape and select the shape "
+    "when the expression renders a boolean true value. "
+    "The expression may use the following variables and functions:\n"
+    "\n"
+    "@ul\n"
+    "@li @b shape @/b: The current shape @/li\n"
+    "@li @b value(<name>) @/b: The value of the property with the given name (the first one if there are multiple properties with the same name) @/li\n"
+    "@li @b values(<name>) @/b: All values of the properties with the given name (returns a list) @/li\n"
+    "@li @b <name> @/b: A shortcut for 'value(<name>)' (<name> is used as a symbol) @/li\n"
+    "@/ul\n"
+    "\n"
+    "This feature has been introduced in version 0.30.3."
   ),
   "@hide"
 );
@@ -246,6 +270,41 @@ Class<shape_processor_impl<db::PolygonProcessorBase> > decl_PolygonOperator ("db
   "@/code\n"
   "\n"
   "This class has been introduced in version 0.29.\n"
+);
+
+static
+property_computation_processor<db::PolygonProcessorBase, db::Region> *
+new_pcp (const db::Region *container, const std::map<tl::Variant, std::string> &expressions, bool copy_properties)
+{
+  return new property_computation_processor<db::PolygonProcessorBase, db::Region> (container, expressions, copy_properties);
+}
+
+Class<property_computation_processor<db::PolygonProcessorBase, db::Region> > decl_PolygonPropertiesExpressions ("db", "PolygonPropertiesExpressions",
+  property_computation_processor<db::PolygonProcessorBase, db::Region>::method_decls (true) +
+  gsi::constructor ("new", &new_pcp, gsi::arg ("region"), gsi::arg ("expressions"), gsi::arg ("copy_properties", false),
+    "@brief Creates a new properties expressions operator\n"
+    "\n"
+    "@param region The region, the processor will be used on. Can be nil, but if given, allows some optimization.\n"
+    "@param expressions A map of property names and expressions used to generate the values of the properties (see class description for details).\n"
+    "@param copy_properties If true, new properties will be added to existing ones.\n"
+  ),
+  "@brief An operator attaching computed properties to the polygons\n"
+  "\n"
+  "This operator will execute a number of expressions and attach the results as new properties. "
+  "The expression inputs can be taken either from the polygons themselves or from existing properties.\n"
+  "\n"
+  "A number of expressions can be supplied with a name. The expressions will be evaluated and the result "
+  "is attached to the output polygons as user properties with the given names.\n"
+  "The expression may use the following variables and functions:\n"
+  "\n"
+  "@ul\n"
+  "@li @b shape @/b: The current shape @/li\n"
+  "@li @b value(<name>) @/b: The value of the property with the given name (the first one if there are multiple properties with the same name) @/li\n"
+  "@li @b values(<name>) @/b: All values of the properties with the given name (returns a list) @/li\n"
+  "@li @b <name> @/b: A shortcut for 'value(<name>)' (<name> is used as a symbol) @/li\n"
+  "@/ul\n"
+  "\n"
+  "This class has been introduced in version 0.30.3.\n"
 );
 
 Class<shape_processor_impl<db::PolygonToEdgeProcessorBase> > decl_PolygonToEdgeProcessor ("db", "PolygonToEdgeOperator",

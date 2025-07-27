@@ -162,7 +162,7 @@ public:
     create_item_from_shape (mp_rdb, m_cell_stack.back ()->id (), mp_cat->id (), m_trans, shape, m_with_properties);
   }
 
-public:
+private:
   rdb::Category *mp_cat;
   rdb::Database *mp_rdb;
   std::vector<const rdb::Cell *> m_cell_stack;

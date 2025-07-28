@@ -34,6 +34,7 @@
 #include "dbPropertiesFilter.h"
 
 #include "gsiDeclDbContainerHelpers.h"
+#include "gsiDeclDbMeasureHelpers.h"
 
 namespace gsi
 {
@@ -90,6 +91,11 @@ static gsi::EdgeFilterBase *make_pg (const tl::Variant &name, const std::string 
   return new EdgePropertiesFilter (name, pattern, inverse);
 }
 
+static gsi::EdgeFilterBase *make_pe (const std::string &expression, bool inverse, double dbu)
+{
+  return new gsi::expression_filter<gsi::EdgeFilterBase, db::Edges> (expression, inverse, dbu);
+}
+
 Class<gsi::EdgeFilterBase> decl_EdgeFilterBase ("db", "EdgeFilterBase",
   gsi::EdgeFilterBase::method_decls (true) +
   gsi::constructor ("property_glob", &make_pg, gsi::arg ("name"), gsi::arg ("pattern"), gsi::arg ("inverse", false), gsi::arg ("case_sensitive", true),
@@ -130,6 +136,25 @@ Class<gsi::EdgeFilterBase> decl_EdgeFilterBase ("db", "EdgeFilterBase",
     "Apply this filter with \\Edges#filtered. See \\property_glob for an example.\n"
     "\n"
     "This feature has been introduced in version 0.30."
+  ) +
+  gsi::constructor ("expression_filter", &make_pe, gsi::arg ("expression"), gsi::arg ("inverse", false), gsi::arg ("dbu", 0.0),
+    "@brief Creates an expression-based filter\n"
+    "@param expression The expression to evaluate.\n"
+    "@param inverse If true, inverts the selection - i.e. all edges without a property with the given name and value range are selected.\n"
+    "@param dbu If given and greater than zero, the shapes delivered by the 'shape' function will be in micrometer units.\n"
+    "\n"
+    "Creates a filter that will evaluate the given expression on every shape and select the shape "
+    "when the expression renders a boolean true value. "
+    "The expression may use the following variables and functions:\n"
+    "\n"
+    "@ul\n"
+    "@li @b shape @/b: The current shape (i.e. 'Edge' without DBU specified or 'DEdge' otherwise) @/li\n"
+    "@li @b value(<name>) @/b: The value of the property with the given name (the first one if there are multiple properties with the same name) @/li\n"
+    "@li @b values(<name>) @/b: All values of the properties with the given name (returns a list) @/li\n"
+    "@li @b <name> @/b: A shortcut for 'value(<name>)' (<name> is used as a symbol) @/li\n"
+    "@/ul\n"
+    "\n"
+    "This feature has been introduced in version 0.30.3."
   ),
   "@hide"
 );
@@ -187,7 +212,9 @@ Class<gsi::EdgeFilterImpl> decl_EdgeFilterImpl (decl_EdgeFilterBase, "db", "Edge
 // ---------------------------------------------------------------------------------
 //  EdgeProcessor binding
 
-Class<shape_processor_impl<db::EdgeProcessorBase> > decl_EdgeProcessorBase ("db", "EdgeOperator",
+Class<db::EdgeProcessorBase> decl_EdgeProcessorBase ("db", "EdgeProcessorBase", "@hide");
+
+Class<shape_processor_impl<db::EdgeProcessorBase> > decl_EdgeOperator (decl_EdgeProcessorBase, "db", "EdgeOperator",
   shape_processor_impl<db::EdgeProcessorBase>::method_decls (true),
   "@brief A generic edge-to-polygon operator\n"
   "\n"
@@ -232,7 +259,45 @@ Class<shape_processor_impl<db::EdgeProcessorBase> > decl_EdgeProcessorBase ("db"
   "This class has been introduced in version 0.29.\n"
 );
 
-Class<shape_processor_impl<db::EdgeToPolygonProcessorBase> > decl_EdgeToPolygonProcessor ("db", "EdgeToPolygonOperator",
+static
+property_computation_processor<db::EdgeProcessorBase, db::Edges> *
+new_pcp (const db::Edges *container, const std::map<tl::Variant, std::string> &expressions, bool copy_properties, double dbu)
+{
+  return new property_computation_processor<db::EdgeProcessorBase, db::Edges> (container, expressions, copy_properties, dbu);
+}
+
+Class<property_computation_processor<db::EdgeProcessorBase, db::Edges> > decl_EdgePropertiesExpressions (decl_EdgeProcessorBase, "db", "EdgePropertiesExpressions",
+  property_computation_processor<db::EdgeProcessorBase, db::Edges>::method_decls (true) +
+  gsi::constructor ("new", &new_pcp, gsi::arg ("edges"), gsi::arg ("expressions"), gsi::arg ("copy_properties", false), gsi::arg ("dbu", 0.0),
+    "@brief Creates a new properties expressions operator\n"
+    "\n"
+    "@param edges The edge collection, the processor will be used on. Can be nil, but if given, allows some optimization.\n"
+    "@param expressions A map of property names and expressions used to generate the values of the properties (see class description for details).\n"
+    "@param copy_properties If true, new properties will be added to existing ones.\n"
+    "@param dbu If not zero, this value specifies the database unit to use. If given, the shapes returned by the 'shape' function will be micrometer-unit objects.\n"
+  ),
+  "@brief An operator attaching computed properties to the edges\n"
+  "\n"
+  "This operator will execute a number of expressions and attach the results as new properties. "
+  "The expression inputs can be taken either from the edges themselves or from existing properties.\n"
+  "\n"
+  "A number of expressions can be supplied with a name. The expressions will be evaluated and the result "
+  "is attached to the output edges as user properties with the given names.\n"
+  "The expression may use the following variables and functions:\n"
+  "\n"
+  "@ul\n"
+  "@li @b shape @/b: The current shape (i.e. 'Edge' without DBU specified or 'DEdge' otherwise) @/li\n"
+  "@li @b value(<name>) @/b: The value of the property with the given name (the first one if there are multiple properties with the same name) @/li\n"
+  "@li @b values(<name>) @/b: All values of the properties with the given name (returns a list) @/li\n"
+  "@li @b <name> @/b: A shortcut for 'value(<name>)' (<name> is used as a symbol) @/li\n"
+  "@/ul\n"
+  "\n"
+  "This class has been introduced in version 0.30.3.\n"
+);
+
+Class<db::EdgeToPolygonProcessorBase> decl_EdgeToPolygonProcessorBase ("db", "EdgeToPolygonProcessorBase", "@hide");
+
+Class<shape_processor_impl<db::EdgeToPolygonProcessorBase> > decl_EdgeToPolygonProcessor (decl_EdgeToPolygonProcessorBase, "db", "EdgeToPolygonOperator",
   shape_processor_impl<db::EdgeToPolygonProcessorBase>::method_decls (true),
   "@brief A generic edge-to-polygon operator\n"
   "\n"
@@ -256,7 +321,9 @@ Class<shape_processor_impl<db::EdgeToPolygonProcessorBase> > decl_EdgeToPolygonP
   "This class has been introduced in version 0.29.\n"
 );
 
-Class<shape_processor_impl<db::EdgeToEdgePairProcessorBase> > decl_EdgeToEdgePairProcessor ("db", "EdgeToEdgePairOperator",
+Class<db::EdgeToEdgePairProcessorBase> decl_EdgeToEdgePairProcessorBase ("db", "EdgeToEdgePairProcessorBase", "@hide");
+
+Class<shape_processor_impl<db::EdgeToEdgePairProcessorBase> > decl_EdgeToEdgePairProcessor (decl_EdgeToEdgePairProcessorBase, "db", "EdgeToEdgePairOperator",
   shape_processor_impl<db::EdgeToEdgePairProcessorBase>::method_decls (true),
   "@brief A generic edge-to-edge-pair operator\n"
   "\n"
@@ -516,22 +583,22 @@ static std::vector<db::Edges> split_filter (const db::Edges *r, const gsi::EdgeF
   return as_2edges_vector (r->split_filter (*f));
 }
 
-static db::Edges processed_ee (const db::Edges *r, const shape_processor_impl<db::EdgeProcessorBase> *f)
+static db::Edges processed_ee (const db::Edges *r, const db::EdgeProcessorBase *f)
 {
   return r->processed (*f);
 }
 
-static void process_ee (db::Edges *r, const shape_processor_impl<db::EdgeProcessorBase> *f)
+static void process_ee (db::Edges *r, const db::EdgeProcessorBase *f)
 {
   r->process (*f);
 }
 
-static db::EdgePairs processed_eep (const db::Edges *r, const shape_processor_impl<db::EdgeToEdgePairProcessorBase> *f)
+static db::EdgePairs processed_eep (const db::Edges *r, const db::EdgeToEdgePairProcessorBase *f)
 {
   return r->processed (*f);
 }
 
-static db::Region processed_ep (const db::Edges *r, const shape_processor_impl<db::EdgeToPolygonProcessorBase> *f)
+static db::Region processed_ep (const db::Edges *r, const db::EdgeToPolygonProcessorBase *f)
 {
   db::Region out;
   r->processed (out, *f);

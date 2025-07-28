@@ -33,6 +33,7 @@
 #include "dbPropertiesFilter.h"
 
 #include "gsiDeclDbContainerHelpers.h"
+#include "gsiDeclDbMeasureHelpers.h"
 
 namespace gsi
 {
@@ -89,6 +90,11 @@ static gsi::EdgePairFilterBase *make_pg (const tl::Variant &name, const std::str
   return new EdgePairPropertiesFilter (name, pattern, inverse);
 }
 
+static gsi::EdgePairFilterBase *make_pe (const std::string &expression, bool inverse, double dbu)
+{
+  return new gsi::expression_filter<gsi::EdgePairFilterBase, db::EdgePairs> (expression, inverse, dbu);
+}
+
 Class<gsi::EdgePairFilterBase> decl_EdgePairFilterBase ("db", "EdgePairFilterBase",
   gsi::EdgePairFilterBase::method_decls (true) +
   gsi::constructor ("property_glob", &make_pg, gsi::arg ("name"), gsi::arg ("pattern"), gsi::arg ("inverse", false), gsi::arg ("case_sensitive", true),
@@ -129,6 +135,25 @@ Class<gsi::EdgePairFilterBase> decl_EdgePairFilterBase ("db", "EdgePairFilterBas
     "Apply this filter with \\EdgePairs#filtered. See \\property_glob for an example.\n"
     "\n"
     "This feature has been introduced in version 0.30."
+  ) +
+  gsi::constructor ("expression_filter", &make_pe, gsi::arg ("expression"), gsi::arg ("inverse", false), gsi::arg ("dbu", 0.0),
+    "@brief Creates an expression-based filter\n"
+    "@param expression The expression to evaluate.\n"
+    "@param inverse If true, inverts the selection - i.e. all edge pairs without a property with the given name and value range are selected.\n"
+    "@param dbu If given and greater than zero, the shapes delivered by the 'shape' function will be in micrometer units.\n"
+    "\n"
+    "Creates a filter that will evaluate the given expression on every shape and select the shape "
+    "when the expression renders a boolean true value. "
+    "The expression may use the following variables and functions:\n"
+    "\n"
+    "@ul\n"
+    "@li @b shape @/b: The current shape (i.e. 'EdgePair' without DBU specified or 'DEdgePair' otherwise) @/li\n"
+    "@li @b value(<name>) @/b: The value of the property with the given name (the first one if there are multiple properties with the same name) @/li\n"
+    "@li @b values(<name>) @/b: All values of the properties with the given name (returns a list) @/li\n"
+    "@li @b <name> @/b: A shortcut for 'value(<name>)' (<name> is used as a symbol) @/li\n"
+    "@/ul\n"
+    "\n"
+    "This feature has been introduced in version 0.30.3."
   ),
   "@hide"
 );
@@ -184,7 +209,9 @@ Class<gsi::EdgePairFilterImpl> decl_EdgePairFilterImpl (decl_EdgePairFilterBase,
 // ---------------------------------------------------------------------------------
 //  EdgePairProcessor binding
 
-Class<shape_processor_impl<db::EdgePairProcessorBase> > decl_EdgePairProcessor ("db", "EdgePairOperator",
+Class<db::EdgePairProcessorBase> decl_EdgePairProcessorBase ("db", "EdgePairProcessorBase", "@hide");
+
+Class<shape_processor_impl<db::EdgePairProcessorBase> > decl_EdgePairProcessor (decl_EdgePairProcessorBase, "db", "EdgePairOperator",
   shape_processor_impl<db::EdgePairProcessorBase>::method_decls (false),
   "@brief A generic edge-pair operator\n"
   "\n"
@@ -227,7 +254,45 @@ Class<shape_processor_impl<db::EdgePairProcessorBase> > decl_EdgePairProcessor (
   "This class has been introduced in version 0.29.\n"
 );
 
-Class<shape_processor_impl<db::EdgePairToPolygonProcessorBase> > decl_EdgePairToPolygonProcessor ("db", "EdgePairToPolygonOperator",
+static
+property_computation_processor<db::EdgePairProcessorBase, db::EdgePairs> *
+new_pcp (const db::EdgePairs *container, const std::map<tl::Variant, std::string> &expressions, bool copy_properties, double dbu)
+{
+  return new property_computation_processor<db::EdgePairProcessorBase, db::EdgePairs> (container, expressions, copy_properties, dbu);
+}
+
+Class<property_computation_processor<db::EdgePairProcessorBase, db::EdgePairs> > decl_EdgePairPropertiesExpressions (decl_EdgePairProcessorBase, "db", "EdgePairPropertiesExpressions",
+  property_computation_processor<db::EdgePairProcessorBase, db::EdgePairs>::method_decls (true) +
+  gsi::constructor ("new", &new_pcp, gsi::arg ("edge_pairs"), gsi::arg ("expressions"), gsi::arg ("copy_properties", false), gsi::arg ("dbu", 0.0),
+    "@brief Creates a new properties expressions operator\n"
+    "\n"
+    "@param edge_pairs The edge pair collection, the processor will be used on. Can be nil, but if given, allows some optimization.\n"
+    "@param expressions A map of property names and expressions used to generate the values of the properties (see class description for details).\n"
+    "@param copy_properties If true, new properties will be added to existing ones.\n"
+    "@param dbu If not zero, this value specifies the database unit to use. If given, the shapes returned by the 'shape' function will be micrometer-unit objects.\n"
+  ),
+  "@brief An operator attaching computed properties to the edge pairs\n"
+  "\n"
+  "This operator will execute a number of expressions and attach the results as new properties. "
+  "The expression inputs can be taken either from the edge pairs themselves or from existing properties.\n"
+  "\n"
+  "A number of expressions can be supplied with a name. The expressions will be evaluated and the result "
+  "is attached to the output edge pairs as user properties with the given names.\n"
+  "The expression may use the following variables and functions:\n"
+  "\n"
+  "@ul\n"
+  "@li @b shape @/b: The current shape (i.e. 'EdgePair' without DBU specified or 'DEdgePair' otherwise) @/li\n"
+  "@li @b value(<name>) @/b: The value of the property with the given name (the first one if there are multiple properties with the same name) @/li\n"
+  "@li @b values(<name>) @/b: All values of the properties with the given name (returns a list) @/li\n"
+  "@li @b <name> @/b: A shortcut for 'value(<name>)' (<name> is used as a symbol) @/li\n"
+  "@/ul\n"
+  "\n"
+  "This class has been introduced in version 0.30.3.\n"
+);
+
+Class<db::EdgePairToPolygonProcessorBase> decl_EdgePairToPolygonProcessorBase ("db", "EdgePairToPolygonProcessorBase", "@hide");
+
+Class<shape_processor_impl<db::EdgePairToPolygonProcessorBase> > decl_EdgePairToPolygonProcessor (decl_EdgePairToPolygonProcessorBase, "db", "EdgePairToPolygonOperator",
   shape_processor_impl<db::EdgePairToPolygonProcessorBase>::method_decls (false),
   "@brief A generic edge-pair-to-polygon operator\n"
   "\n"
@@ -251,7 +316,9 @@ Class<shape_processor_impl<db::EdgePairToPolygonProcessorBase> > decl_EdgePairTo
   "This class has been introduced in version 0.29.\n"
 );
 
-Class<shape_processor_impl<db::EdgePairToEdgeProcessorBase> > decl_EdgePairToEdgeProcessor ("db", "EdgePairToEdgeOperator",
+Class<db::EdgePairToEdgeProcessorBase> decl_EdgePairToEdgeProcessorBase ("db", "EdgePairProcessorBase", "@hide");
+
+Class<shape_processor_impl<db::EdgePairToEdgeProcessorBase> > decl_EdgePairToEdgeProcessor (decl_EdgePairToEdgeProcessorBase, "db", "EdgePairToEdgeOperator",
   shape_processor_impl<db::EdgePairToEdgeProcessorBase>::method_decls (false),
   "@brief A generic edge-pair-to-edge operator\n"
   "\n"
@@ -491,24 +558,24 @@ static std::vector<db::EdgePairs> split_filter (const db::EdgePairs *r, const Ed
   return as_2edge_pairs_vector (r->split_filter (*f));
 }
 
-static db::EdgePairs processed_epep (const db::EdgePairs *r, const shape_processor_impl<db::EdgePairProcessorBase> *f)
+static db::EdgePairs processed_epep (const db::EdgePairs *r, const db::EdgePairProcessorBase *f)
 {
   return r->processed (*f);
 }
 
-static void process_epep (db::EdgePairs *r, const shape_processor_impl<db::EdgePairProcessorBase> *f)
+static void process_epep (db::EdgePairs *r, const db::EdgePairProcessorBase *f)
 {
   r->process (*f);
 }
 
-static db::Edges processed_epe (const db::EdgePairs *r, const shape_processor_impl<db::EdgePairToEdgeProcessorBase> *f)
+static db::Edges processed_epe (const db::EdgePairs *r, const db::EdgePairToEdgeProcessorBase *f)
 {
   db::Edges out;
   r->processed (out, *f);
   return out;
 }
 
-static db::Region processed_epp (const db::EdgePairs *r, const shape_processor_impl<db::EdgePairToPolygonProcessorBase> *f)
+static db::Region processed_epp (const db::EdgePairs *r, const db::EdgePairToPolygonProcessorBase *f)
 {
   db::Region out;
   r->processed (out, *f);

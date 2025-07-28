@@ -30,6 +30,7 @@
 #include "dbPropertiesFilter.h"
 
 #include "gsiDeclDbContainerHelpers.h"
+#include "gsiDeclDbMeasureHelpers.h"
 
 namespace gsi
 {
@@ -86,6 +87,11 @@ static gsi::TextFilterBase *make_pg (const tl::Variant &name, const std::string 
   return new TextPropertiesFilter (name, pattern, inverse);
 }
 
+static gsi::TextFilterBase *make_pe (const std::string &expression, bool inverse, double dbu)
+{
+  return new gsi::expression_filter<gsi::TextFilterBase, db::Texts> (expression, inverse, dbu);
+}
+
 Class<gsi::TextFilterBase> decl_TextFilterBase ("db", "TextFilterBase",
   gsi::TextFilterBase::method_decls (false) +
   gsi::constructor ("property_glob", &make_pg, gsi::arg ("name"), gsi::arg ("pattern"), gsi::arg ("inverse", false), gsi::arg ("case_sensitive", true),
@@ -126,6 +132,25 @@ Class<gsi::TextFilterBase> decl_TextFilterBase ("db", "TextFilterBase",
     "Apply this filter with \\Texts#filtered. See \\property_glob for an example.\n"
     "\n"
     "This feature has been introduced in version 0.30."
+  ) +
+  gsi::constructor ("expression_filter", &make_pe, gsi::arg ("expression"), gsi::arg ("inverse", false), gsi::arg ("dbu", 0.0),
+    "@brief Creates an expression-based filter\n"
+    "@param expression The expression to evaluate.\n"
+    "@param inverse If true, inverts the selection - i.e. all texts without a property with the given name and value range are selected.\n"
+    "@param dbu If given and greater than zero, the shapes delivered by the 'shape' function will be in micrometer units.\n"
+    "\n"
+    "Creates a filter that will evaluate the given expression on every shape and select the shape "
+    "when the expression renders a boolean true value. "
+    "The expression may use the following variables and functions:\n"
+    "\n"
+    "@ul\n"
+    "@li @b shape @/b: The current shape (i.e. 'Text' without DBU specified or 'DText' otherwise) @/li\n"
+    "@li @b value(<name>) @/b: The value of the property with the given name (the first one if there are multiple properties with the same name) @/li\n"
+    "@li @b values(<name>) @/b: All values of the properties with the given name (returns a list) @/li\n"
+    "@li @b <name> @/b: A shortcut for 'value(<name>)' (<name> is used as a symbol) @/li\n"
+    "@/ul\n"
+    "\n"
+    "This feature has been introduced in version 0.30.3."
   ),
   "@hide"
 );
@@ -182,7 +207,9 @@ Class<gsi::TextFilterImpl> decl_TextFilterImpl (decl_TextFilterBase, "db", "Text
 // ---------------------------------------------------------------------------------
 //  TextProcessor binding
 
-Class<shape_processor_impl<db::TextProcessorBase> > decl_TextProcessor ("db", "TextOperator",
+Class<db::TextProcessorBase> decl_TextProcessorBase ("db", "TextProcessorBase", "@hide");
+
+Class<shape_processor_impl<db::TextProcessorBase> > decl_TextProcessor (decl_TextProcessorBase, "db", "TextOperator",
   shape_processor_impl<db::TextProcessorBase>::method_decls (false),
   "@brief A generic text operator\n"
   "\n"
@@ -227,7 +254,45 @@ Class<shape_processor_impl<db::TextProcessorBase> > decl_TextProcessor ("db", "T
   "This class has been introduced in version 0.29.\n"
 );
 
-Class<shape_processor_impl<db::TextToPolygonProcessorBase> > decl_TextToPolygonProcessor ("db", "TextToPolygonOperator",
+static
+property_computation_processor<db::TextProcessorBase, db::Texts> *
+new_pcp (const db::Texts *container, const std::map<tl::Variant, std::string> &expressions, bool copy_properties, double dbu)
+{
+  return new property_computation_processor<db::TextProcessorBase, db::Texts> (container, expressions, copy_properties, dbu);
+}
+
+Class<property_computation_processor<db::TextProcessorBase, db::Texts> > decl_TextPropertiesExpressions (decl_TextProcessorBase, "db", "TextPropertiesExpressions",
+  property_computation_processor<db::TextProcessorBase, db::Texts>::method_decls (true) +
+  gsi::constructor ("new", &new_pcp, gsi::arg ("texts"), gsi::arg ("expressions"), gsi::arg ("copy_properties", false), gsi::arg ("dbu", 0.0),
+    "@brief Creates a new properties expressions operator\n"
+    "\n"
+    "@param texts The text collection, the processor will be used on. Can be nil, but if given, allows some optimization.\n"
+    "@param expressions A map of property names and expressions used to generate the values of the properties (see class description for details).\n"
+    "@param copy_properties If true, new properties will be added to existing ones.\n"
+    "@param dbu If not zero, this value specifies the database unit to use. If given, the shapes returned by the 'shape' function will be micrometer-unit objects.\n"
+  ),
+  "@brief An operator attaching computed properties to the texts\n"
+  "\n"
+  "This operator will execute a number of expressions and attach the results as new properties. "
+  "The expression inputs can be taken either from the texts themselves or from existing properties.\n"
+  "\n"
+  "A number of expressions can be supplied with a name. The expressions will be evaluated and the result "
+  "is attached to the output texts as user properties with the given names.\n"
+  "The expression may use the following variables and functions:\n"
+  "\n"
+  "@ul\n"
+  "@li @b shape @/b: The current shape (i.e. 'Text' without DBU specified or 'DText' otherwise) @/li\n"
+  "@li @b value(<name>) @/b: The value of the property with the given name (the first one if there are multiple properties with the same name) @/li\n"
+  "@li @b values(<name>) @/b: All values of the properties with the given name (returns a list) @/li\n"
+  "@li @b <name> @/b: A shortcut for 'value(<name>)' (<name> is used as a symbol) @/li\n"
+  "@/ul\n"
+  "\n"
+  "This class has been introduced in version 0.30.3.\n"
+);
+
+Class<db::TextToPolygonProcessorBase> decl_TextToPolygonProcessorBase ("db", "TextToPolygonProcessorBase", "@hide");
+
+Class<shape_processor_impl<db::TextToPolygonProcessorBase> > decl_TextToPolygonProcessor (decl_TextToPolygonProcessorBase, "db", "TextToPolygonOperator",
   shape_processor_impl<db::TextToPolygonProcessorBase>::method_decls (false),
   "@brief A generic text-to-polygon operator\n"
   "\n"
@@ -407,17 +472,17 @@ static std::vector<db::Texts> split_filter (const db::Texts *r, const TextFilter
   return as_2texts_vector (r->split_filter (*f));
 }
 
-static db::Texts processed_tt (const db::Texts *r, const shape_processor_impl<db::TextProcessorBase> *f)
+static db::Texts processed_tt (const db::Texts *r, const db::TextProcessorBase *f)
 {
   return r->processed (*f);
 }
 
-static void process_tt (db::Texts *r, const shape_processor_impl<db::TextProcessorBase> *f)
+static void process_tt (db::Texts *r, const db::TextProcessorBase *f)
 {
   r->process (*f);
 }
 
-static db::Region processed_tp (const db::Texts *r, const shape_processor_impl<db::TextToPolygonProcessorBase> *f)
+static db::Region processed_tp (const db::Texts *r, const db::TextToPolygonProcessorBase *f)
 {
   db::Region out;
   r->processed (out, *f);

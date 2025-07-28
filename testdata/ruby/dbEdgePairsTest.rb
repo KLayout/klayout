@@ -694,6 +694,38 @@ class DBEdgePairs_TestClass < TestBase
 
   end
 
+  # properties
+  def test_prop_expressions
+
+    r = RBA::EdgePairs::new
+    e1 = RBA::Edge::new(0, 0, 1000, 2000)
+    e2 = RBA::Edge::new(-100, 200, 900, 2200)
+    r.insert(RBA::EdgePairWithProperties::new(RBA::EdgePair::new(e1, e2), { "PropA" => 17.0, 1 => 42 }))
+    assert_equal(r.to_s, "(0,0;1000,2000)/(-100,200;900,2200){1=>42,PropA=>17}")
+
+    # replace
+    pr = RBA::EdgePairPropertiesExpressions::new(r, { "X" => "PropA+1", "Y" => "shape.distance", "Z" => "value(1)+1" })
+    assert_equal(r.processed(pr).to_s, "(0,0;1000,2000)/(-100,200;900,2200){X=>18,Y=>179,Z=>43}")
+
+    # substitutions
+    pr = RBA::EdgePairPropertiesExpressions::new(r, { "PropA" => "0", "X" => "PropA+1", "Y" => "shape.distance", "Z" => "value(1)+1" }, true)
+    assert_equal(r.processed(pr).to_s, "(0,0;1000,2000)/(-100,200;900,2200){1=>42,PropA=>0,X=>18,Y=>179,Z=>43}")
+
+    # substitutions
+    pr = RBA::EdgePairPropertiesExpressions::new(r, { "PropA" => "0", "X" => "PropA+1", "Y" => "shape.distance", "Z" => "value(1)+1" }, true, dbu: 0.001)
+    assert_equal(r.processed(pr).to_s, "(0,0;1000,2000)/(-100,200;900,2200){1=>42,PropA=>0,X=>18,Y=>0.178885438199983,Z=>43}")
+
+    ef = RBA::EdgePairFilterBase::expression_filter("PropX==18")
+    assert_equal(r.filtered(ef).to_s, "")
+
+    ef = RBA::EdgePairFilterBase::expression_filter("PropA==17")
+    assert_equal(r.filtered(ef).to_s, "(0,0;1000,2000)/(-100,200;900,2200){1=>42,PropA=>17}")
+
+    ef = RBA::EdgePairFilterBase::expression_filter("value(1)>=40")
+    assert_equal(r.filtered(ef).to_s, "(0,0;1000,2000)/(-100,200;900,2200){1=>42,PropA=>17}")
+
+  end
+
 end
 
 

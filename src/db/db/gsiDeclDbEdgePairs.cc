@@ -316,7 +316,7 @@ Class<shape_processor_impl<db::EdgePairToPolygonProcessorBase> > decl_EdgePairTo
   "This class has been introduced in version 0.29.\n"
 );
 
-Class<db::EdgePairToEdgeProcessorBase> decl_EdgePairToEdgeProcessorBase ("db", "EdgePairProcessorBase", "@hide");
+Class<db::EdgePairToEdgeProcessorBase> decl_EdgePairToEdgeProcessorBase ("db", "EdgePairToEdgeProcessorBase", "@hide");
 
 Class<shape_processor_impl<db::EdgePairToEdgeProcessorBase> > decl_EdgePairToEdgeProcessor (decl_EdgePairToEdgeProcessorBase, "db", "EdgePairToEdgeOperator",
   shape_processor_impl<db::EdgePairToEdgeProcessorBase>::method_decls (false),

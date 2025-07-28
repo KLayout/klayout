@@ -1699,6 +1699,36 @@ class DBRegion_TestClass < TestBase
 
   end
 
+  # properties
+  def test_prop_expressions
+
+    r = RBA::Region::new
+    r.insert(RBA::BoxWithProperties::new(RBA::Box::new(0, 0, 1000, 2000), { "PropA" => 17.0, 1 => 42 }))
+    assert_equal(r.to_s, "(0,0;0,2000;1000,2000;1000,0){1=>42,PropA=>17}")
+
+    # replace
+    pr = RBA::PolygonPropertiesExpressions::new(r, { "X" => "PropA+1", "Y" => "shape.area", "Z" => "value(1)+1" })
+    assert_equal(r.processed(pr).to_s, "(0,0;0,2000;1000,2000;1000,0){X=>18,Y=>2000000,Z=>43}")
+
+    # substitutions
+    pr = RBA::PolygonPropertiesExpressions::new(r, { "PropA" => "0", "X" => "PropA+1", "Y" => "shape.area", "Z" => "value(1)+1" }, true)
+    assert_equal(r.processed(pr).to_s, "(0,0;0,2000;1000,2000;1000,0){1=>42,PropA=>0,X=>18,Y=>2000000,Z=>43}")
+
+    # substitutions
+    pr = RBA::PolygonPropertiesExpressions::new(r, { "PropA" => "0", "X" => "PropA+1", "Y" => "shape.area", "Z" => "value(1)+1" }, true, dbu: 0.001)
+    assert_equal(r.processed(pr).to_s, "(0,0;0,2000;1000,2000;1000,0){1=>42,PropA=>0,X=>18,Y=>2,Z=>43}")
+
+    ef = RBA::PolygonFilterBase::expression_filter("PropX==18")
+    assert_equal(r.filtered(ef).to_s, "")
+
+    ef = RBA::PolygonFilterBase::expression_filter("PropA==17")
+    assert_equal(r.filtered(ef).to_s, "(0,0;0,2000;1000,2000;1000,0){1=>42,PropA=>17}")
+
+    ef = RBA::PolygonFilterBase::expression_filter("value(1)>=40")
+    assert_equal(r.filtered(ef).to_s, "(0,0;0,2000;1000,2000;1000,0){1=>42,PropA=>17}")
+
+  end
+
 end
 
 load("test_epilogue.rb")

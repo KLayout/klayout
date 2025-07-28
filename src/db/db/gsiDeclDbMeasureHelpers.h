@@ -48,7 +48,7 @@ class DB_PUBLIC MeasureEval
   : public tl::Eval
 {
 public:
-  MeasureEval ();
+  MeasureEval (double dbu);
 
   void init ();
 
@@ -92,6 +92,7 @@ private:
   mutable ShapeType m_shape_type;
   mutable ShapeRef mp_shape;
   mutable db::properties_id_type m_prop_id;
+  double m_dbu;
 
   tl::Variant shape_func () const;
   tl::Variant value_func (db::property_names_id_type name_id) const;
@@ -162,8 +163,8 @@ public:
   typedef typename ProcessorBase::shape_type shape_type;
   typedef typename ProcessorBase::result_type result_type;
 
-  property_computation_processor (const Container *container, const std::map<tl::Variant, std::string> &expressions, bool copy_properties)
-    : m_eval (), m_copy_properties (copy_properties), m_expression_strings (expressions)
+  property_computation_processor (const Container *container, const std::map<tl::Variant, std::string> &expressions, bool copy_properties, double dbu)
+    : m_eval (dbu), m_copy_properties (copy_properties), m_expression_strings (expressions)
   {
     if (container) {
       this->set_result_is_merged (is_merged (container));
@@ -222,8 +223,8 @@ class expression_filter
 public:
   typedef typename FilterBase::shape_type shape_type;
 
-  expression_filter (const std::string &expression, bool inverse)
-    : m_eval (), m_inverse (inverse), m_expression_string (expression)
+  expression_filter (const std::string &expression, bool inverse, double dbu)
+    : m_eval (dbu), m_inverse (inverse), m_expression_string (expression)
   {
     m_eval.init ();
 

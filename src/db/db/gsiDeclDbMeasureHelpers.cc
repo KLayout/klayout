@@ -117,8 +117,8 @@ private:
 // --------------------------------------------------------------------
 //  MeasureEval implementation
 
-MeasureEval::MeasureEval ()
-  : m_shape_type (None), m_prop_id (0)
+MeasureEval::MeasureEval (double dbu)
+  : m_shape_type (None), m_prop_id (0), m_dbu (dbu)
 {
   mp_shape.any = 0;
 }
@@ -196,21 +196,54 @@ MeasureEval::resolve_name (const std::string &name, const tl::EvalFunction *&fun
 tl::Variant
 MeasureEval::shape_func () const
 {
-  switch (m_shape_type)
-  {
-  case None:
-  default:
-    return tl::Variant ();
-  case Polygon:
-    return tl::Variant (mp_shape.poly);
-  case PolygonRef:
-    return tl::Variant (mp_shape.poly_ref);
-  case Edge:
-    return tl::Variant (mp_shape.edge);
-  case EdgePair:
-    return tl::Variant (mp_shape.edge_pair);
-  case Text:
-    return tl::Variant (mp_shape.text);
+  if (m_dbu > 1e-10) {
+
+    db::CplxTrans tr (m_dbu);
+
+    switch (m_shape_type)
+    {
+    case None:
+    default:
+      return tl::Variant ();
+    case Polygon:
+      return tl::Variant (tr * *mp_shape.poly);
+    case PolygonRef:
+      {
+        db::Polygon poly;
+        mp_shape.poly_ref->instantiate (poly);
+        return tl::Variant (tr * poly);
+      }
+    case Edge:
+      return tl::Variant (tr * *mp_shape.edge);
+    case EdgePair:
+      return tl::Variant (tr * *mp_shape.edge_pair);
+    case Text:
+      return tl::Variant (tr * *mp_shape.text);
+    }
+
+  } else {
+
+    switch (m_shape_type)
+    {
+    case None:
+    default:
+      return tl::Variant ();
+    case Polygon:
+      return tl::Variant (*mp_shape.poly);
+    case PolygonRef:
+      {
+        db::Polygon poly;
+        mp_shape.poly_ref->instantiate (poly);
+        return tl::Variant (poly);
+      }
+    case Edge:
+      return tl::Variant (*mp_shape.edge);
+    case EdgePair:
+      return tl::Variant (*mp_shape.edge_pair);
+    case Text:
+      return tl::Variant (*mp_shape.text);
+    }
+
   }
 }
 

@@ -114,11 +114,34 @@ private:
   db::property_names_id_type m_name_id;
 };
 
+class PutFunction
+  : public tl::EvalFunction
+{
+public:
+  PutFunction (MeasureEval *eval)
+    : mp_eval (eval)
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual void execute (const tl::ExpressionParserContext &context, tl::Variant & /*out*/, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> * /*kwargs*/) const
+  {
+    if (args.size () != 2) {
+      throw tl::EvalError (tl::to_string (tr ("'put' function takes two arguments (name, value)")), context);
+    }
+    mp_eval->put_func (args [0], args [1]);
+  }
+
+private:
+  MeasureEval *mp_eval;
+  db::property_names_id_type m_name_id;
+};
+
 // --------------------------------------------------------------------
 //  MeasureEval implementation
 
-MeasureEval::MeasureEval (double dbu)
-  : m_shape_type (None), m_prop_id (0), m_dbu (dbu)
+MeasureEval::MeasureEval (double dbu, bool with_put)
+  : m_shape_type (None), m_prop_id (0), m_dbu (dbu), m_with_put (with_put)
 {
   mp_shape.any = 0;
 }
@@ -126,6 +149,10 @@ MeasureEval::MeasureEval (double dbu)
 void
 MeasureEval::init ()
 {
+  if (m_with_put) {
+    define_function ("put", new PutFunction (this));
+  }
+
   define_function ("shape", new ShapeFunction (this));
   define_function ("value", new ValueFunction (this));
   define_function ("values", new ValuesFunction (this));
@@ -286,6 +313,14 @@ MeasureEval::values_func (const tl::Variant &name) const
   }
 
   return res;
+}
+
+void
+MeasureEval::put_func (const tl::Variant &name, const tl::Variant &value) const
+{
+  auto prop_name_id = db::property_names_id (name);
+  m_prop_set_out.erase (prop_name_id);
+  m_prop_set_out.insert (prop_name_id, value);
 }
 
 }

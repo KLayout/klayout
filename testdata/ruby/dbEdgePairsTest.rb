@@ -707,6 +707,10 @@ class DBEdgePairs_TestClass < TestBase
     pr = RBA::EdgePairPropertiesExpressions::new(r, { "X" => "PropA+1", "Y" => "shape.distance", "Z" => "value(1)+1" })
     assert_equal(r.processed(pr).to_s, "(0,0;1000,2000)/(-100,200;900,2200){X=>18,Y=>179,Z=>43}")
 
+    # replace (with 'put')
+    pr = RBA::EdgePairPropertiesExpressions::new(r, "put('X', PropA+1); put('Y', shape.distance); put('Z', value(1)+1)")
+    assert_equal(r.processed(pr).to_s, "(0,0;1000,2000)/(-100,200;900,2200){X=>18,Y=>179,Z=>43}")
+
     # substitutions
     pr = RBA::EdgePairPropertiesExpressions::new(r, { "PropA" => "0", "X" => "PropA+1", "Y" => "shape.distance", "Z" => "value(1)+1" }, true)
     assert_equal(r.processed(pr).to_s, "(0,0;1000,2000)/(-100,200;900,2200){1=>42,PropA=>0,X=>18,Y=>179,Z=>43}")

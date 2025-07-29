@@ -1710,6 +1710,10 @@ class DBRegion_TestClass < TestBase
     pr = RBA::PolygonPropertiesExpressions::new(r, { "X" => "PropA+1", "Y" => "shape.area", "Z" => "value(1)+1" })
     assert_equal(r.processed(pr).to_s, "(0,0;0,2000;1000,2000;1000,0){X=>18,Y=>2000000,Z=>43}")
 
+    # replace (with 'put')
+    pr = RBA::PolygonPropertiesExpressions::new(r, "put('X', PropA+1); put('Y', shape.area); put('Z', value(1)+1)")
+    assert_equal(r.processed(pr).to_s, "(0,0;0,2000;1000,2000;1000,0){X=>18,Y=>2000000,Z=>43}")
+
     # substitutions
     pr = RBA::PolygonPropertiesExpressions::new(r, { "PropA" => "0", "X" => "PropA+1", "Y" => "shape.area", "Z" => "value(1)+1" }, true)
     assert_equal(r.processed(pr).to_s, "(0,0;0,2000;1000,2000;1000,0){1=>42,PropA=>0,X=>18,Y=>2000000,Z=>43}")

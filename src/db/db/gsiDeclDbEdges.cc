@@ -266,6 +266,15 @@ new_pcp (const db::Edges *container, const std::map<tl::Variant, std::string> &e
   return new property_computation_processor<db::EdgeProcessorBase, db::Edges> (container, expressions, copy_properties, dbu);
 }
 
+static
+property_computation_processor<db::EdgeProcessorBase, db::Edges> *
+new_pcps (const db::Edges *container, const std::string &expression, bool copy_properties, double dbu)
+{
+  std::map<tl::Variant, std::string> expressions;
+  expressions.insert (std::make_pair (tl::Variant (), expression));
+  return new property_computation_processor<db::EdgeProcessorBase, db::Edges> (container, expressions, copy_properties, dbu);
+}
+
 Class<property_computation_processor<db::EdgeProcessorBase, db::Edges> > decl_EdgePropertiesExpressions (decl_EdgeProcessorBase, "db", "EdgePropertiesExpressions",
   property_computation_processor<db::EdgeProcessorBase, db::Edges>::method_decls (true) +
   gsi::constructor ("new", &new_pcp, gsi::arg ("edges"), gsi::arg ("expressions"), gsi::arg ("copy_properties", false), gsi::arg ("dbu", 0.0),
@@ -275,18 +284,31 @@ Class<property_computation_processor<db::EdgeProcessorBase, db::Edges> > decl_Ed
     "@param expressions A map of property names and expressions used to generate the values of the properties (see class description for details).\n"
     "@param copy_properties If true, new properties will be added to existing ones.\n"
     "@param dbu If not zero, this value specifies the database unit to use. If given, the shapes returned by the 'shape' function will be micrometer-unit objects.\n"
+  ) +
+  gsi::constructor ("new", &new_pcps, gsi::arg ("edges"), gsi::arg ("expression"), gsi::arg ("copy_properties", false), gsi::arg ("dbu", 0.0),
+    "@brief Creates a new properties expressions operator\n"
+    "\n"
+    "@param edges The edge collection, the processor will be used on. Can be nil, but if given, allows some optimization.\n"
+    "@param expression A single expression evaluated for each shape (see class description for details).\n"
+    "@param copy_properties If true, new properties will be added to existing ones.\n"
+    "@param dbu If not zero, this value specifies the database unit to use. If given, the shapes returned by the 'shape' function will be micrometer-unit objects.\n"
   ),
-  "@brief An operator attaching computed properties to the edges\n"
+  "@brief An operator attaching computed properties to the edge pairs\n"
   "\n"
   "This operator will execute a number of expressions and attach the results as new properties. "
   "The expression inputs can be taken either from the edges themselves or from existing properties.\n"
   "\n"
   "A number of expressions can be supplied with a name. The expressions will be evaluated and the result "
-  "is attached to the output edges as user properties with the given names.\n"
+  "is attached to the output edge pairs as user properties with the given names.\n"
+  "\n"
+  "Alternatively, a single expression can be given. In that case, 'put' needs to be used to attach properties "
+  "to the output shape.\n"
+  "\n"
   "The expression may use the following variables and functions:\n"
   "\n"
   "@ul\n"
   "@li @b shape @/b: The current shape (i.e. 'Edge' without DBU specified or 'DEdge' otherwise) @/li\n"
+  "@li @b put(<name>, <value>) @/b: Attaches the given value as a property with name 'name' to the output shape @/li\n"
   "@li @b value(<name>) @/b: The value of the property with the given name (the first one if there are multiple properties with the same name) @/li\n"
   "@li @b values(<name>) @/b: All values of the properties with the given name (returns a list) @/li\n"
   "@li @b <name> @/b: A shortcut for 'value(<name>)' (<name> is used as a symbol) @/li\n"

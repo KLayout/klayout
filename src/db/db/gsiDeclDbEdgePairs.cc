@@ -261,6 +261,15 @@ new_pcp (const db::EdgePairs *container, const std::map<tl::Variant, std::string
   return new property_computation_processor<db::EdgePairProcessorBase, db::EdgePairs> (container, expressions, copy_properties, dbu);
 }
 
+static
+property_computation_processor<db::EdgePairProcessorBase, db::EdgePairs> *
+new_pcps (const db::EdgePairs *container, const std::string &expression, bool copy_properties, double dbu)
+{
+  std::map<tl::Variant, std::string> expressions;
+  expressions.insert (std::make_pair (tl::Variant (), expression));
+  return new property_computation_processor<db::EdgePairProcessorBase, db::EdgePairs> (container, expressions, copy_properties, dbu);
+}
+
 Class<property_computation_processor<db::EdgePairProcessorBase, db::EdgePairs> > decl_EdgePairPropertiesExpressions (decl_EdgePairProcessorBase, "db", "EdgePairPropertiesExpressions",
   property_computation_processor<db::EdgePairProcessorBase, db::EdgePairs>::method_decls (true) +
   gsi::constructor ("new", &new_pcp, gsi::arg ("edge_pairs"), gsi::arg ("expressions"), gsi::arg ("copy_properties", false), gsi::arg ("dbu", 0.0),
@@ -268,6 +277,14 @@ Class<property_computation_processor<db::EdgePairProcessorBase, db::EdgePairs> >
     "\n"
     "@param edge_pairs The edge pair collection, the processor will be used on. Can be nil, but if given, allows some optimization.\n"
     "@param expressions A map of property names and expressions used to generate the values of the properties (see class description for details).\n"
+    "@param copy_properties If true, new properties will be added to existing ones.\n"
+    "@param dbu If not zero, this value specifies the database unit to use. If given, the shapes returned by the 'shape' function will be micrometer-unit objects.\n"
+  ) +
+  gsi::constructor ("new", &new_pcps, gsi::arg ("edge_pairs"), gsi::arg ("expression"), gsi::arg ("copy_properties", false), gsi::arg ("dbu", 0.0),
+    "@brief Creates a new properties expressions operator\n"
+    "\n"
+    "@param edge_pairs The edge pair collection, the processor will be used on. Can be nil, but if given, allows some optimization.\n"
+    "@param expression A single expression evaluated for each shape (see class description for details).\n"
     "@param copy_properties If true, new properties will be added to existing ones.\n"
     "@param dbu If not zero, this value specifies the database unit to use. If given, the shapes returned by the 'shape' function will be micrometer-unit objects.\n"
   ),
@@ -278,10 +295,15 @@ Class<property_computation_processor<db::EdgePairProcessorBase, db::EdgePairs> >
   "\n"
   "A number of expressions can be supplied with a name. The expressions will be evaluated and the result "
   "is attached to the output edge pairs as user properties with the given names.\n"
+  "\n"
+  "Alternatively, a single expression can be given. In that case, 'put' needs to be used to attach properties "
+  "to the output shape.\n"
+  "\n"
   "The expression may use the following variables and functions:\n"
   "\n"
   "@ul\n"
   "@li @b shape @/b: The current shape (i.e. 'EdgePair' without DBU specified or 'DEdgePair' otherwise) @/li\n"
+  "@li @b put(<name>, <value>) @/b: Attaches the given value as a property with name 'name' to the output shape @/li\n"
   "@li @b value(<name>) @/b: The value of the property with the given name (the first one if there are multiple properties with the same name) @/li\n"
   "@li @b values(<name>) @/b: All values of the properties with the given name (returns a list) @/li\n"
   "@li @b <name> @/b: A shortcut for 'value(<name>)' (<name> is used as a symbol) @/li\n"

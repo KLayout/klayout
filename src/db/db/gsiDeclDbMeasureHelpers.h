@@ -48,7 +48,7 @@ class DB_PUBLIC MeasureEval
   : public tl::Eval
 {
 public:
-  MeasureEval (double dbu);
+  MeasureEval (double dbu, bool with_put);
 
   void init ();
 
@@ -60,6 +60,11 @@ public:
   void set_shape (const db::Text *text) const;
   void set_prop_id (db::properties_id_type prop_id) const;
 
+  db::PropertiesSet &prop_set_out () const
+  {
+    return m_prop_set_out;
+  }
+
 protected:
   virtual void resolve_name (const std::string &name, const tl::EvalFunction *&function, const tl::Variant *&value, tl::Variant *&var);
 
@@ -68,6 +73,7 @@ private:
   friend class ValueFunction;
   friend class ValuesFunction;
   friend class PropertyFunction;
+  friend class PutFunction;
 
   union ShapeRef
   {
@@ -92,12 +98,15 @@ private:
   mutable ShapeType m_shape_type;
   mutable ShapeRef mp_shape;
   mutable db::properties_id_type m_prop_id;
+  mutable db::PropertiesSet m_prop_set_out;
   double m_dbu;
+  bool m_with_put;
 
   tl::Variant shape_func () const;
   tl::Variant value_func (db::property_names_id_type name_id) const;
   tl::Variant value_func (const tl::Variant &name) const;
   tl::Variant values_func (const tl::Variant &name) const;
+  void put_func (const tl::Variant &name, const tl::Variant &value) const;
 };
 
 inline db::RecursiveShapeIterator
@@ -164,7 +173,7 @@ public:
   typedef typename ProcessorBase::result_type result_type;
 
   property_computation_processor (const Container *container, const std::map<tl::Variant, std::string> &expressions, bool copy_properties, double dbu)
-    : m_eval (dbu), m_copy_properties (copy_properties), m_expression_strings (expressions)
+    : m_eval (dbu, true /*with_put*/), m_copy_properties (copy_properties), m_expression_strings (expressions)
   {
     if (container) {
       this->set_result_is_merged (is_merged (container));
@@ -174,7 +183,7 @@ public:
 
     //  compile the expressions
     for (auto e = m_expression_strings.begin (); e != m_expression_strings.end (); ++e) {
-      m_expressions.push_back (std::make_pair (db::property_names_id (e->first), tl::Expression ()));
+      m_expressions.push_back (std::make_pair (e->first.is_nil () ? db::property_names_id_type (0) : db::property_names_id (e->first), tl::Expression ()));
       tl::Extractor ex (e->second.c_str ());
       m_eval.parse (m_expressions.back ().second, ex);
     }
@@ -187,19 +196,31 @@ public:
     m_eval.set_prop_id (shape.properties_id ());
     m_eval.set_shape (&shape);
 
-    db::PropertiesSet ps;
+    db::PropertiesSet &ps_out = m_eval.prop_set_out ();
     if (m_copy_properties) {
-      ps = db::properties (shape.properties_id ());
+      ps_out = db::properties (shape.properties_id ());
       for (auto e = m_expressions.begin (); e != m_expressions.end (); ++e) {
-        ps.erase (e->first);
+        if (e->first != db::property_names_id_type (0)) {
+          ps_out.erase (e->first);
+        }
+      }
+    } else {
+      ps_out.clear ();
+    }
+
+    for (auto e = m_expressions.begin (); e != m_expressions.end (); ++e) {
+      if (e->first != db::property_names_id_type (0)) {
+        ps_out.insert (e->first, e->second.execute ());
       }
     }
 
     for (auto e = m_expressions.begin (); e != m_expressions.end (); ++e) {
-      ps.insert (e->first, e->second.execute ());
+      if (e->first == db::property_names_id_type (0)) {
+        e->second.execute ();
+      }
     }
 
-    res.back ().properties_id (db::properties_id (ps));
+    res.back ().properties_id (db::properties_id (ps_out));
   }
 
 public:
@@ -224,7 +245,7 @@ public:
   typedef typename FilterBase::shape_type shape_type;
 
   expression_filter (const std::string &expression, bool inverse, double dbu)
-    : m_eval (dbu), m_inverse (inverse), m_expression_string (expression)
+    : m_eval (dbu, false /*without put func*/), m_inverse (inverse), m_expression_string (expression)
   {
     m_eval.init ();
 

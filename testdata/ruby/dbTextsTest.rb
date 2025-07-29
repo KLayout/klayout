@@ -557,6 +557,10 @@ class DBTexts_TestClass < TestBase
     pr = RBA::TextPropertiesExpressions::new(r, { "X" => "PropA+1", "Y" => "shape.bbox.center.x", "Z" => "value(1)+1" })
     assert_equal(r.processed(pr).to_s, "('T',r0 100,200){X=>18,Y=>100,Z=>43}")
 
+    # replace (with 'put')
+    pr = RBA::TextPropertiesExpressions::new(r, "put('X', PropA+1); put('Y', shape.bbox.center.x); put('Z', value(1)+1)")
+    assert_equal(r.processed(pr).to_s, "('T',r0 100,200){X=>18,Y=>100,Z=>43}")
+
     # substitutions
     pr = RBA::TextPropertiesExpressions::new(r, { "PropA" => "0", "X" => "PropA+1", "Y" => "shape.bbox.center.x", "Z" => "value(1)+1" }, true)
     assert_equal(r.processed(pr).to_s, "('T',r0 100,200){1=>42,PropA=>0,X=>18,Y=>100,Z=>43}")

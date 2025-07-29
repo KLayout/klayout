@@ -1115,6 +1115,10 @@ class DBEdges_TestClass < TestBase
     pr = RBA::EdgePropertiesExpressions::new(r, { "X" => "PropA+1", "Y" => "shape.length", "Z" => "value(1)+1" })
     assert_equal(r.processed(pr).to_s, "(0,0;1000,2000){X=>18,Y=>2236,Z=>43}")
 
+    # replace (with 'put')
+    pr = RBA::EdgePropertiesExpressions::new(r, "put('X', PropA+1); put('Y', shape.length); put('Z', value(1)+1)")
+    assert_equal(r.processed(pr).to_s, "(0,0;1000,2000){X=>18,Y=>2236,Z=>43}")
+
     # substitutions
     pr = RBA::EdgePropertiesExpressions::new(r, { "PropA" => "0", "X" => "PropA+1", "Y" => "shape.length", "Z" => "value(1)+1" }, true)
     assert_equal(r.processed(pr).to_s, "(0,0;1000,2000){1=>42,PropA=>0,X=>18,Y=>2236,Z=>43}")

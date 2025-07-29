@@ -63,8 +63,8 @@ TEST(extraction)
 
   rex.extract (poly, vertex_ports, polygon_ports, rn);
 
-  EXPECT_EQ (rn.to_string (),
-    "R V0 V1 10.0938"
+  EXPECT_EQ (rn.to_string (true),
+    "R V0(0,0.05;0,0.05) V1(1,0.05;1,0.05) 10.0938"
   )
 }
 
@@ -93,8 +93,8 @@ TEST(extraction_with_polygon_ports)
 
   rex.extract (poly, vertex_ports, polygon_ports, rn);
 
-  EXPECT_EQ (rn.to_string (),
-    "R P0 P1 10"
+  EXPECT_EQ (rn.to_string (true),
+    "R P0(-0.1,0;0,0.1) P1(1,0;1.1,0.1) 10"
   )
 }
 

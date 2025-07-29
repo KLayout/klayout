@@ -360,7 +360,11 @@ static void insert_region (db::Shapes *sh, const db::Region &r)
 {
   ProtectedShapes ps (sh, r);
   for (db::Region::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    ps->insert (*s);
+    if (s.prop_id () != 0) {
+      ps->insert (db::PolygonWithProperties (*s, s.prop_id ()));
+    } else {
+      ps->insert (*s);
+    }
   }
 }
 
@@ -368,7 +372,11 @@ static void insert_region_with_trans (db::Shapes *sh, const db::Region &r, const
 {
   ProtectedShapes ps (sh, r);
   for (db::Region::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    ps->insert (s->transformed (trans));
+    if (s.prop_id () != 0) {
+      ps->insert (db::PolygonWithProperties (s->transformed (trans), s.prop_id ()));
+    } else {
+      ps->insert (s->transformed (trans));
+    }
   }
 }
 
@@ -378,7 +386,11 @@ static void insert_region_with_dtrans (db::Shapes *sh, const db::Region &r, cons
   db::CplxTrans dbu_trans (shapes_dbu (sh));
   db::ICplxTrans itrans = dbu_trans.inverted () * trans * dbu_trans;
   for (db::Region::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    ps->insert (s->transformed (itrans));
+    if (s.prop_id () != 0) {
+      ps->insert (db::PolygonWithProperties (s->transformed (itrans), s.prop_id ()));
+    } else {
+      ps->insert (s->transformed (itrans));
+    }
   }
 }
 
@@ -386,7 +398,11 @@ static void insert_edges (db::Shapes *sh, const db::Edges &r)
 {
   ProtectedShapes ps (sh, r);
   for (db::Edges::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    ps->insert (*s);
+    if (s.prop_id () != 0) {
+      ps->insert (db::EdgeWithProperties (*s, s.prop_id ()));
+    } else {
+      ps->insert (*s);
+    }
   }
 }
 
@@ -394,7 +410,11 @@ static void insert_edges_with_trans (db::Shapes *sh, const db::Edges &r, const d
 {
   ProtectedShapes ps (sh, r);
   for (db::Edges::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    ps->insert (s->transformed (trans));
+    if (s.prop_id () != 0) {
+      ps->insert (db::EdgeWithProperties (s->transformed (trans), s.prop_id ()));
+    } else {
+      ps->insert (s->transformed (trans));
+    }
   }
 }
 
@@ -404,7 +424,11 @@ static void insert_edges_with_dtrans (db::Shapes *sh, const db::Edges &r, const 
   db::CplxTrans dbu_trans (shapes_dbu (sh));
   db::ICplxTrans itrans = dbu_trans.inverted () * trans * dbu_trans;
   for (db::Edges::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    ps->insert (s->transformed (itrans));
+    if (s.prop_id () != 0) {
+      ps->insert (db::EdgeWithProperties (s->transformed (itrans), s.prop_id ()));
+    } else {
+      ps->insert (s->transformed (itrans));
+    }
   }
 }
 
@@ -412,7 +436,11 @@ static void insert_edge_pairs_as_polygons (db::Shapes *sh, const db::EdgePairs &
 {
   ProtectedShapes ps (sh, r);
   for (db::EdgePairs::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    ps->insert (s->normalized ().to_simple_polygon (e));
+    if (s.prop_id () != 0) {
+      ps->insert (db::SimplePolygonWithProperties (s->normalized ().to_simple_polygon (e), s.prop_id ()));
+    } else {
+      ps->insert (s->normalized ().to_simple_polygon (e));
+    }
   }
 }
 
@@ -421,7 +449,11 @@ static void insert_edge_pairs_as_polygons_d (db::Shapes *sh, const db::EdgePairs
   ProtectedShapes ps (sh, r);
   db::Coord e = db::coord_traits<db::Coord>::rounded (de / shapes_dbu (sh));
   for (db::EdgePairs::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    ps->insert (s->normalized ().to_simple_polygon (e));
+    if (s.prop_id () != 0) {
+      ps->insert (db::SimplePolygonWithProperties (s->normalized ().to_simple_polygon (e), s.prop_id ()));
+    } else {
+      ps->insert (s->normalized ().to_simple_polygon (e));
+    }
   }
 }
 
@@ -429,7 +461,11 @@ static void insert_edge_pairs_as_polygons_with_trans (db::Shapes *sh, const db::
 {
   ProtectedShapes ps (sh, r);
   for (db::EdgePairs::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    ps->insert (s->normalized ().to_simple_polygon (e).transformed (trans));
+    if (s.prop_id () != 0) {
+      ps->insert (db::SimplePolygonWithProperties (s->normalized ().to_simple_polygon (e).transformed (trans), s.prop_id ()));
+    } else {
+      ps->insert (s->normalized ().to_simple_polygon (e).transformed (trans));
+    }
   }
 }
 
@@ -440,7 +476,11 @@ static void insert_edge_pairs_as_polygons_with_dtrans (db::Shapes *sh, const db:
   db::CplxTrans dbu_trans (shapes_dbu (sh));
   db::ICplxTrans itrans = dbu_trans.inverted () * trans * dbu_trans;
   for (db::EdgePairs::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    ps->insert (s->normalized ().to_simple_polygon (e).transformed (itrans));
+    if (s.prop_id () != 0) {
+      ps->insert (db::SimplePolygonWithProperties (s->normalized ().to_simple_polygon (e).transformed (itrans), s.prop_id ()));
+    } else {
+      ps->insert (s->normalized ().to_simple_polygon (e).transformed (itrans));
+    }
   }
 }
 
@@ -448,8 +488,13 @@ static void insert_edge_pairs_as_edges (db::Shapes *sh, const db::EdgePairs &r)
 {
   ProtectedShapes ps (sh, r);
   for (db::EdgePairs::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    ps->insert (s->first ());
-    ps->insert (s->second ());
+    if (s.prop_id () != 0) {
+      ps->insert (db::EdgeWithProperties (s->first (), s.prop_id ()));
+      ps->insert (db::EdgeWithProperties (s->second (), s.prop_id ()));
+    } else {
+      ps->insert (s->first ());
+      ps->insert (s->second ());
+    }
   }
 }
 
@@ -457,8 +502,13 @@ static void insert_edge_pairs_as_edges_with_trans (db::Shapes *sh, const db::Edg
 {
   ProtectedShapes ps (sh, r);
   for (db::EdgePairs::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    ps->insert (s->first ().transformed (trans));
-    ps->insert (s->second ().transformed (trans));
+    if (s.prop_id () != 0) {
+      ps->insert (db::EdgeWithProperties (s->first ().transformed (trans), s.prop_id ()));
+      ps->insert (db::EdgeWithProperties (s->second ().transformed (trans), s.prop_id ()));
+    } else {
+      ps->insert (s->first ().transformed (trans));
+      ps->insert (s->second ().transformed (trans));
+    }
   }
 }
 
@@ -468,8 +518,13 @@ static void insert_edge_pairs_as_edges_with_dtrans (db::Shapes *sh, const db::Ed
   db::CplxTrans dbu_trans (shapes_dbu (sh));
   db::ICplxTrans itrans = dbu_trans.inverted () * trans * dbu_trans;
   for (db::EdgePairs::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    ps->insert (s->first ().transformed (itrans));
-    ps->insert (s->second ().transformed (itrans));
+    if (s.prop_id () != 0) {
+      ps->insert (db::EdgeWithProperties (s->first ().transformed (itrans), s.prop_id ()));
+      ps->insert (db::EdgeWithProperties (s->second ().transformed (itrans), s.prop_id ()));
+    } else {
+      ps->insert (s->first ().transformed (itrans));
+      ps->insert (s->second ().transformed (itrans));
+    }
   }
 }
 
@@ -477,7 +532,11 @@ static void insert_edge_pairs (db::Shapes *sh, const db::EdgePairs &r)
 {
   ProtectedShapes ps (sh, r);
   for (db::EdgePairs::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    ps->insert (*s);
+    if (s.prop_id () != 0) {
+      ps->insert (db::EdgePairWithProperties (*s, s.prop_id ()));
+    } else {
+      ps->insert (*s);
+    }
   }
 }
 
@@ -485,7 +544,11 @@ static void insert_edge_pairs_with_trans (db::Shapes *sh, const db::EdgePairs &r
 {
   ProtectedShapes ps (sh, r);
   for (db::EdgePairs::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    ps->insert (s->transformed (trans));
+    if (s.prop_id () != 0) {
+      ps->insert (db::EdgePairWithProperties (s->transformed (trans), s.prop_id ()));
+    } else {
+      ps->insert (s->transformed (trans));
+    }
   }
 }
 
@@ -495,7 +558,11 @@ static void insert_edge_pairs_with_dtrans (db::Shapes *sh, const db::EdgePairs &
   db::CplxTrans dbu_trans (shapes_dbu (sh));
   db::ICplxTrans itrans = dbu_trans.inverted () * trans * dbu_trans;
   for (db::EdgePairs::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    ps->insert (s->transformed (itrans));
+    if (s.prop_id () != 0) {
+      ps->insert (db::EdgePairWithProperties (s->transformed (itrans), s.prop_id ()));
+    } else {
+      ps->insert (s->transformed (itrans));
+    }
   }
 }
 
@@ -503,7 +570,11 @@ static void insert_texts (db::Shapes *sh, const db::Texts &r)
 {
   ProtectedShapes ps (sh, r);
   for (db::Texts::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    ps->insert (*s);
+    if (s.prop_id () != 0) {
+      ps->insert (db::TextWithProperties (*s, s.prop_id ()));
+    } else {
+      ps->insert (*s);
+    }
   }
 }
 
@@ -511,7 +582,11 @@ static void insert_texts_with_trans (db::Shapes *sh, const db::Texts &r, const d
 {
   ProtectedShapes ps (sh, r);
   for (db::Texts::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    ps->insert (s->transformed (trans));
+    if (s.prop_id () != 0) {
+      ps->insert (db::TextWithProperties (s->transformed (trans), s.prop_id ()));
+    } else {
+      ps->insert (s->transformed (trans));
+    }
   }
 }
 
@@ -521,7 +596,11 @@ static void insert_texts_with_dtrans (db::Shapes *sh, const db::Texts &r, const 
   db::CplxTrans dbu_trans (shapes_dbu (sh));
   db::ICplxTrans itrans = dbu_trans.inverted () * trans * dbu_trans;
   for (db::Texts::const_iterator s = r.begin (); ! s.at_end (); ++s) {
-    ps->insert (s->transformed (itrans));
+    if (s.prop_id () != 0) {
+      ps->insert (db::TextWithProperties (s->transformed (itrans), s.prop_id ()));
+    } else {
+      ps->insert (s->transformed (itrans));
+    }
   }
 }
 

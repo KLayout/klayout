@@ -92,9 +92,9 @@ public:
   virtual EdgePairsDelegate *processed_to_edge_pairs (const PolygonToEdgePairProcessorBase &) const;
 
   virtual RegionDelegate *merged_in_place () { return this; }
-  virtual RegionDelegate *merged_in_place (bool, unsigned int) { return this; }
+  virtual RegionDelegate *merged_in_place (bool, unsigned int, bool) { return this; }
   virtual RegionDelegate *merged () const { return new EmptyRegion (); }
-  virtual RegionDelegate *merged (bool, unsigned int) const { return new EmptyRegion (); }
+  virtual RegionDelegate *merged (bool, unsigned int, bool) const { return new EmptyRegion (); }
 
   virtual RegionDelegate *sized (coord_type, unsigned int) const { return new EmptyRegion (); }
   virtual RegionDelegate *sized (coord_type, coord_type, unsigned int) const { return new EmptyRegion (); }

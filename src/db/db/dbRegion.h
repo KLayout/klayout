@@ -470,6 +470,28 @@ public:
   }
 
   /**
+   *  @brief Sets a flag indication whether to join properties on merge
+   *
+   *  When this flag is set to true (the default), properties are joined on "merge".
+   *  That is: shapes merging into bigger shapes will have their properties joined.
+   *  With the flag set to false, "merge" will not join properties and return merged
+   *  shapes only if the sub-shapes have the same properties - i.e. properties form
+   *  different classes on merge.
+   */
+  void set_join_properties_on_merge (bool f)
+  {
+    mp_delegate->set_join_properties_on_merge (f);
+  }
+
+  /**
+   *  @brief Gets a flag indication whether to join properties on merge
+   */
+  bool join_properties_on_merge () const
+  {
+    return mp_delegate->join_properties_on_merge ();
+  }
+
+  /**
    *  @brief Enables or disables strict handling
    *
    *  Strict handling means to leave away some optimizations. Specifically the
@@ -969,12 +991,14 @@ public:
    *  This method will always execute the merge, even if the region is already merged.
    *
    *  @param min_coherence Set this parameter to true to get minimum polygons (kissing corner problem)
-   *  @param min_wrapcount See the description above
+   *  @param min_wc See the description above
+   *  @param join_properties_on_merge If true, merged shapes carry the joined properties of the constituents. Otherwise, only shapes with same properties get merged.
+   *
    *  @return A reference to this region
    */
-  Region &merge (bool min_coherence, unsigned int min_wc = 0)
+  Region &merge (bool min_coherence, unsigned int min_wc = 0, bool join_properties_on_merge = true)
   {
-    set_delegate (mp_delegate->merged_in_place (min_coherence, min_wc));
+    set_delegate (mp_delegate->merged_in_place (min_coherence, min_wc, join_properties_on_merge));
     return *this;
   }
 
@@ -983,9 +1007,9 @@ public:
    *
    *  This is the out-of-place version of "merge" with options (see there).
    */
-  Region merged (bool min_coherence, unsigned int min_wc = 0) const
+  Region merged (bool min_coherence, unsigned int min_wc = 0, bool join_properties_on_merge = true) const
   {
-    return Region (mp_delegate->merged (min_coherence, min_wc));
+    return Region (mp_delegate->merged (min_coherence, min_wc, join_properties_on_merge));
   }
 
   /**

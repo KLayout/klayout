@@ -108,17 +108,17 @@ public:
     return merged ();
   }
 
-  virtual RegionDelegate *merged_in_place (bool min_coherence, unsigned int min_wc)
+  virtual RegionDelegate *merged_in_place (bool min_coherence, unsigned int min_wc, bool join_properties_on_merge)
   {
-    return merged (min_coherence, min_wc);
+    return merged (min_coherence, min_wc, join_properties_on_merge);
   }
 
   virtual RegionDelegate *merged () const
   {
-    return merged (min_coherence (), 0);
+    return merged (min_coherence (), 0, join_properties_on_merge ());
   }
 
-  virtual RegionDelegate *merged (bool min_coherence, unsigned int min_wc) const;
+  virtual RegionDelegate *merged (bool min_coherence, unsigned int min_wc, bool join_properties_on_merge) const;
 
   virtual RegionDelegate *sized (coord_type d, unsigned int mode) const;
   virtual RegionDelegate *sized (coord_type dx, coord_type dy, unsigned int mode) const;
@@ -288,7 +288,7 @@ public:
 protected:
   void update_bbox (const db::Box &box);
   void invalidate_bbox ();
-  void merge_polygons_to (db::Shapes &output, bool min_coherence, unsigned int min_wc) const;
+  void merge_polygons_to (db::Shapes &output, bool min_coherence, unsigned int min_wc, bool join_properties_on_merge) const;
   RegionDelegate *and_or_not_with (bool is_and, const Region &other, PropertyConstraint property_constraint) const;
 
   virtual EdgePairsDelegate *run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, const RegionCheckOptions &options) const;

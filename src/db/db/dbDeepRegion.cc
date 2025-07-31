@@ -231,6 +231,11 @@ void DeepRegion::min_coherence_changed ()
   set_is_merged (false);
 }
 
+void DeepRegion::join_properties_on_merge_changed ()
+{
+  set_is_merged (false);
+}
+
 void DeepRegion::do_insert (const db::Polygon &polygon, db::properties_id_type prop_id)
 {
   db::Layout &layout = deep_layer ().layout ();
@@ -1742,10 +1747,10 @@ DeepRegion::merged_in_place ()
 }
 
 RegionDelegate *
-DeepRegion::merged_in_place (bool min_coherence, unsigned int min_wc)
+DeepRegion::merged_in_place (bool min_coherence, unsigned int min_wc, bool join_properties_on_merge)
 {
   //  TODO: implement to be really in-place
-  return merged (min_coherence, min_wc);
+  return merged (min_coherence, min_wc, join_properties_on_merge);
 }
 
 RegionDelegate *
@@ -1770,8 +1775,9 @@ DeepRegion::merged () const
   return res.release ();
 }
 
+// @@@
 RegionDelegate *
-DeepRegion::merged (bool min_coherence, unsigned int min_wc) const
+DeepRegion::merged (bool min_coherence, unsigned int min_wc, bool join_properties_on_merge) const
 {
   if (empty ()) {
     return clone ();

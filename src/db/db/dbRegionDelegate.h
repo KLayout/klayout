@@ -169,6 +169,12 @@ public:
     return m_merged_semantics;
   }
 
+  void set_join_properties_on_merge (bool f);
+  bool join_properties_on_merge () const
+  {
+    return m_join_properties_on_merge;
+  }
+
   void set_strict_handling (bool f);
   bool strict_handling () const
   {
@@ -223,9 +229,9 @@ public:
   virtual EdgePairsDelegate *processed_to_edge_pairs (const PolygonToEdgePairProcessorBase &filter) const = 0;
 
   virtual RegionDelegate *merged_in_place () = 0;
-  virtual RegionDelegate *merged_in_place (bool min_coherence, unsigned int min_wc) = 0;
+  virtual RegionDelegate *merged_in_place (bool min_coherence, unsigned int min_wc, bool join_properties_on_merge) = 0;
   virtual RegionDelegate *merged () const = 0;
-  virtual RegionDelegate *merged (bool min_coherence, unsigned int min_wc) const = 0;
+  virtual RegionDelegate *merged (bool min_coherence, unsigned int min_wc, bool join_properties_on_merge) const = 0;
 
   virtual RegionDelegate *sized (coord_type d, unsigned int mode) const = 0;
   virtual RegionDelegate *sized (coord_type dx, coord_type dy, unsigned int mode) const = 0;
@@ -298,9 +304,11 @@ public:
 protected:
   virtual void merged_semantics_changed () { }
   virtual void min_coherence_changed () { }
+  virtual void join_properties_on_merge_changed () { }
 
 private:
   bool m_merged_semantics;
+  bool m_join_properties_on_merge;
   bool m_strict_handling;
   bool m_merge_min_coherence;
   bool m_report_progress;

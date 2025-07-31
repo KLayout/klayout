@@ -99,6 +99,12 @@ void FlatRegion::merged_semantics_changed ()
   m_merged_polygons_valid = false;
 }
 
+void FlatRegion::join_properties_on_merge_changed ()
+{
+  mp_merged_polygons->clear ();
+  m_merged_polygons_valid = false;
+}
+
 void FlatRegion::min_coherence_changed ()
 {
   m_is_merged = false;
@@ -115,7 +121,7 @@ void
 FlatRegion::ensure_merged_polygons_valid () const
 {
   if (! m_merged_polygons_valid) {
-    merge_polygons_to (*mp_merged_polygons, min_coherence (), 0);
+    merge_polygons_to (*mp_merged_polygons, min_coherence (), 0, join_properties_on_merge ());
     m_merged_polygons_valid = true;
   }
 }
@@ -260,7 +266,7 @@ RegionDelegate *FlatRegion::merged_in_place ()
       return this;
 
     } else {
-      return merged_in_place (min_coherence (), 0);
+      return merged_in_place (min_coherence (), 0, join_properties_on_merge ());
     }
 
   } else {
@@ -268,7 +274,8 @@ RegionDelegate *FlatRegion::merged_in_place ()
   }
 }
 
-RegionDelegate *FlatRegion::merged_in_place (bool min_coherence, unsigned int min_wc)
+// @@@
+RegionDelegate *FlatRegion::merged_in_place (bool min_coherence, unsigned int min_wc, bool join_properties_on_merge)
 {
   if (empty ()) {
 
@@ -285,7 +292,7 @@ RegionDelegate *FlatRegion::merged_in_place (bool min_coherence, unsigned int mi
   } else {
 
     invalidate_cache ();
-    merge_polygons_to (*mp_polygons, min_coherence, min_wc);
+    merge_polygons_to (*mp_polygons, min_coherence, min_wc, join_properties_on_merge);
 
     m_is_merged = true;
 
@@ -301,7 +308,7 @@ RegionDelegate *FlatRegion::merged () const
     if (m_merged_polygons_valid) {
       return new FlatRegion (*mp_merged_polygons, true);
     } else {
-      return AsIfFlatRegion::merged (min_coherence (), 0);
+      return AsIfFlatRegion::merged (min_coherence (), 0, join_properties_on_merge ());
     }
 
   } else {

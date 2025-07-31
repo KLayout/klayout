@@ -325,7 +325,8 @@ struct ComparePolygonsWithProperties
 
 }
 
-void AsIfFlatRegion::merge_polygons_to (db::Shapes &output, bool min_coherence, unsigned int min_wc) const
+// @@@
+void AsIfFlatRegion::merge_polygons_to (db::Shapes &output, bool min_coherence, unsigned int min_wc, bool join_properties_on_merge) const
 {
   db::EdgeProcessor ep (report_progress (), progress_desc ());
   ep.set_base_verbosity (base_verbosity ());
@@ -1241,7 +1242,7 @@ AsIfFlatRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord 
 }
 
 RegionDelegate *
-AsIfFlatRegion::merged (bool min_coherence, unsigned int min_wc) const
+AsIfFlatRegion::merged (bool min_coherence, unsigned int min_wc, bool join_properties_on_merge) const
 {
   if (empty ()) {
 
@@ -1259,7 +1260,7 @@ AsIfFlatRegion::merged (bool min_coherence, unsigned int min_wc) const
   } else {
 
     std::unique_ptr<FlatRegion> new_region (new FlatRegion (true));
-    merge_polygons_to (new_region->raw_polygons (), min_coherence, min_wc);
+    merge_polygons_to (new_region->raw_polygons (), min_coherence, min_wc, join_properties_on_merge);
 
     return new_region.release ();
 

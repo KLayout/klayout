@@ -274,7 +274,6 @@ RegionDelegate *FlatRegion::merged_in_place ()
   }
 }
 
-// @@@
 RegionDelegate *FlatRegion::merged_in_place (bool min_coherence, unsigned int min_wc, bool join_properties_on_merge)
 {
   if (empty ()) {

@@ -568,22 +568,56 @@ private:
       return s->second;
     }
 
-    s = m_property_id_per_cluster.insert (std::make_pair (std::make_pair (cid, ci), db::properties_id_type (0))).first;
-
     const db::connected_clusters<db::PolygonRef> &cc = mp_hc->clusters_per_cell (ci);
     const db::local_cluster<db::PolygonRef> &c = cc.cluster_by_id (cid);
 
-    if (c.begin_attr () != c.end_attr ()) {
+    //  collect attributes (aka properties) of the root and the child clusters and join them
 
-      s->second = *c.begin_attr ();
+    s = m_property_id_per_cluster.insert (std::make_pair (std::make_pair (cid, ci), db::properties_id_type (0))).first;
 
-    } else {
+    std::set<db::properties_id_type> attrs (c.begin_attr (), c.end_attr ());
 
-      const db::connected_clusters<db::PolygonRef>::connections_type &conn = cc.connections_for_cluster (cid);
-      for (db::connected_clusters<db::PolygonRef>::connections_type::const_iterator i = conn.begin (); i != conn.end () && s->second == db::properties_id_type (0); ++i) {
-        s->second = property_id (i->id (), i->inst_cell_index (), false);
+    const db::connected_clusters<db::PolygonRef>::connections_type &conn = cc.connections_for_cluster (cid);
+    for (db::connected_clusters<db::PolygonRef>::connections_type::const_iterator i = conn.begin (); i != conn.end (); ++i) {
+      auto prop_id = property_id (i->id (), i->inst_cell_index (), false);
+      if (prop_id != 0) {
+        attrs.insert (prop_id);
+      }
+    }
+
+    if (attrs.size () > 1) {
+
+      //  join the properties
+      db::PropertiesSet ps;
+      for (auto a = attrs.begin (); a != attrs.end (); ++a) {
+
+        if (ps.empty ()) {
+
+          ps = db::properties (*a);
+
+        } else {
+
+          //  merge in "larger one wins" mode - the advantage of this mode is that
+          //  it is independent on the order of the attribute sets (which in fact are pointers)
+          const db::PropertiesSet &ps2 = db::properties (*a);
+          for (auto i = ps2.begin (); i != ps2.end (); ++i) {
+            auto f = ps.find (i->first);
+            if (f == ps.end ()) {
+              ps.insert_by_id (i->first, i->second);
+            } else if (db::property_value (f->second) < db::property_value (i->second)) {
+              ps.erase (i->first);
+              ps.insert_by_id (i->first, i->second);
+            }
+          }
+
+        }
+
       }
 
+      s->second = db::properties_id (ps);
+
+    } else if (! attrs.empty ()) {
+      s->second = *attrs.begin ();
     }
 
     return s->second;
@@ -707,7 +741,7 @@ DeepRegion::ensure_merged_polygons_valid () const
       db::Connectivity conn;
       conn.connect (deep_layer ());
       hc.set_base_verbosity (base_verbosity () + 10);
-      hc.build (layout, deep_layer ().initial_cell (), conn, 0, deep_layer ().breakout_cells (), true /*separate_attributes*/);
+      hc.build (layout, deep_layer ().initial_cell (), conn, 0, deep_layer ().breakout_cells (), ! join_properties_on_merge ());
 
       //  collect the clusters and merge them into big polygons
       //  NOTE: using the ClusterMerger we merge bottom-up forming bigger and bigger polygons. This is
@@ -1775,7 +1809,6 @@ DeepRegion::merged () const
   return res.release ();
 }
 
-// @@@
 RegionDelegate *
 DeepRegion::merged (bool min_coherence, unsigned int min_wc, bool join_properties_on_merge) const
 {
@@ -1791,7 +1824,7 @@ DeepRegion::merged (bool min_coherence, unsigned int min_wc, bool join_propertie
   db::Connectivity conn;
   conn.connect (deep_layer ());
   hc.set_base_verbosity (base_verbosity () + 10);
-  hc.build (layout, deep_layer ().initial_cell (), conn);
+  hc.build (layout, deep_layer ().initial_cell (), conn, 0, 0, ! join_properties_on_merge);
 
   //  collect the clusters and merge them into big polygons
   //  NOTE: using the ClusterMerger we merge bottom-up forming bigger and bigger polygons. This is

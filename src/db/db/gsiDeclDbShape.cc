@@ -954,6 +954,17 @@ static void set_property (db::Shape *s, const tl::Variant &key, const tl::Varian
   set_prop_id (s, db::properties_id (props));
 }
 
+static void set_properties (db::Shape *shape, const std::map<tl::Variant, tl::Variant> &dict)
+{
+  set_prop_id (shape, db::properties_id (dict));
+}
+
+static void clear_properties (db::Shape *shape)
+{
+  db::Shapes *shapes = shapes_checked (shape);
+  *shape = shapes->clear_properties (*shape);
+}
+
 static tl::Variant get_property (const db::Shape *s, const tl::Variant &key)
 {
   db::properties_id_type id = s->prop_id ();
@@ -1312,6 +1323,25 @@ Class<db::Shape> decl_Shape ("db", "Shape",
     "\n"
     "This method has been introduced in version 0.22."
   ) + 
+  gsi::method_ext ("set_properties", &set_properties, gsi::arg ("dict"),
+    "@brief Sets all user properties from the given dict\n"
+    "This method is a convenience method that replaces all user properties of the shape. Using that method is more "
+    "convenient than creating a new property set with a new ID and assigning that properties ID.\n"
+    "This method may change the properties ID. "
+    "Note: GDS only supports integer keys. OASIS supports numeric and string keys. "
+    "Calling this method may invalidate any iterators. It should not be called inside a "
+    "loop iterating over instances.\n"
+    "\n"
+    "This method has been introduced in version 0.30.3."
+  ) +
+  gsi::method_ext ("clear_properties", &clear_properties,
+    "@brief Clears all user properties\n"
+    "This method will remove all user properties. After it has been called, \\has_prop_id? will return false.\n"
+    "Calling this method may invalidate any iterators. It should not be called inside a "
+    "loop iterating over instances.\n"
+    "\n"
+    "This method has been introduced in version 0.30.3."
+  ) +
   gsi::method_ext ("property", &get_property, gsi::arg ("key"),
     "@brief Gets the user property with the given key\n"
     "This method is a convenience method that gets the property with the given key. "

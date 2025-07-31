@@ -1233,8 +1233,17 @@ Without a reference point given, the lower left corner of the fill pattern's bou
 as the reference point. The reference point will also defined the footprint of the fill cell - more precisely
 the lower left corner. When step vectors are given, the fill cell's footprint is taken to be a rectangle
 having the horizontal and vertical step pitch for width and height respectively. This way the fill cells 
-will be arrange seamlessly. However, the cell's dimensions can be changed, so that the fill cells
+will be arrange seamlessly. 
+</p><p>
+However, the cell's dimensions can be changed, so that the fill cells
 can overlap or there is a space between the cells. To change the dimensions use the "dim" method.
+This example will use a fill cell footprint of 1x1 micrometers, regardless of the step pitch:
+</p><p>
+<pre>
+p = fill_pattern("FILL_CELL")
+p.shape(1, 0, box(0.0, 0.0, 1.0, 1.0))
+p.dim(1.0, 1.0)
+</pre>
 </p><p>
 The following example specifies a fill cell with an active area of -0.5 .. 1.5 in both directions
 (2 micron width and height). With these dimensions the fill cell's footprint is independent of the
@@ -1245,6 +1254,18 @@ p = fill_pattern("FILL_CELL")
 p.shape(1, 0, box(0.0, 0.0, 1.0, 1.0))
 p.origin(-0.5, -0.5)
 p.dim(2.0, 2.0)
+</pre>
+</p><p>
+Finally, the fill cell can be given a margin: this is a space around the fill cell which needs
+to be inside the fill region. Hence, the margin can be used to implement a distance, the fill
+cells (more precisely: their footprints) will maintain to the outside border of the fill region.
+The following example implements a margin of 200 nm in horizontal and 250 nm in vertical direction:
+</p><p>
+<pre>
+p = fill_pattern("FILL_CELL")
+p.shape(1, 0, box(0.0, 0.0, 1.0, 1.0))
+p.dim(1.0, 1.0)
+p.margin(0.2, 0.25)
 </pre>
 </p><p>
 With these ingredients will can use the fill function. The first example fills the polygons

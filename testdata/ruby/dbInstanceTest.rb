@@ -905,6 +905,41 @@ class DBInstance_TestClass < TestBase
 
   end
 
+  # User properties
+  def test_8_UserProperties
+
+    ly = RBA::Layout::new
+
+    ci1 = ly.add_cell("c1")
+    ci2 = ly.add_cell("c2")
+
+    c1 = ly.cell(ci1)
+    c2 = ly.cell(ci2)
+
+    inst = RBA::CellInstArray::new(c1.cell_index, RBA::Trans::new)
+    i = c2.insert(inst)
+
+    assert_equal(i.property("k").inspect, "nil")
+    assert_equal(i.properties.inspect, "{}")
+
+    i.set_property("k", 17)
+    
+    assert_equal(i.property("k").inspect, "17")
+    assert_equal(i.property("u").inspect, "nil")
+    assert_equal(i.properties.inspect, "{\"k\"=>17}")
+
+    i.set_property("u", "42")
+    assert_equal(i.properties.inspect, "{\"k\"=>17, \"u\"=>\"42\"}")
+
+    i.set_properties({ "a" => 17, 42 => "u" })
+    assert_equal(i.properties, {42=>"u", "a"=>17})
+    assert_equal(i.has_prop_id?, true)
+    i.clear_properties
+    assert_equal(i.properties, {})
+    assert_equal(i.has_prop_id?, false)
+    
+  end
+
 end
 
 load("test_epilogue.rb")

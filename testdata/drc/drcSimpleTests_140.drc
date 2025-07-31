@@ -1,0 +1,25 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+end
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+
+top_cell = def_output.cell
+
+# Separat 1/0 and 2/0 to two cells L1, L2
+
+output_cell("L1")
+top_cell.insert(RBA::DCellInstArray::new(def_output.cell, RBA::DTrans::new))
+
+l1.output(1, 0)
+
+output_cell("L2")
+top_cell.insert(RBA::DCellInstArray::new(def_output.cell, RBA::DTrans::new))
+
+l2.output(2, 0)
+

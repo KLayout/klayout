@@ -738,15 +738,86 @@ Shapes::find (const Shapes::shape_type &shape) const
 }
 
 Shapes::shape_type
-Shapes::replace_prop_id (const Shapes::shape_type &ref, db::properties_id_type prop_id)
+Shapes::clear_properties (const Shapes::shape_type &ref)
 {
   tl_assert (! ref.is_array_member ());
 
   if (ref.has_prop_id ()) {
 
-    if (ref.prop_id () != prop_id) {
-      invalidate_prop_ids ();
+    if (! is_editable ()) {
+      throw tl::Exception (tl::to_string (tr ("Function 'clear_properties' is permitted only in editable mode when going to property-less shapes from some with properties")));
     }
+
+    switch (ref.m_type) {
+    case shape_type::Null:
+      return ref;
+    case shape_type::Polygon:
+      return clear_properties_iter (shape_type::polygon_type::tag (), ref.basic_iter (object_with_properties<shape_type::polygon_type>::tag ()));
+    case shape_type::PolygonRef:
+      return clear_properties_iter (shape_type::polygon_ref_type::tag (), ref.basic_iter (object_with_properties<shape_type::polygon_ref_type>::tag ()));
+    case shape_type::PolygonPtrArray:
+      return clear_properties_iter (shape_type::polygon_ptr_array_type::tag (), ref.basic_iter (object_with_properties<shape_type::polygon_ptr_array_type>::tag ()));
+    case shape_type::SimplePolygon:
+      return clear_properties_iter (shape_type::simple_polygon_type::tag (), ref.basic_iter (object_with_properties<shape_type::simple_polygon_type>::tag ()));
+    case shape_type::SimplePolygonRef:
+      return clear_properties_iter (shape_type::simple_polygon_ref_type::tag (), ref.basic_iter (object_with_properties<shape_type::simple_polygon_ref_type>::tag ()));
+    case shape_type::SimplePolygonPtrArray:
+      //  HINT: since we are in editing mode, this type should not appear ..
+      return clear_properties_iter (shape_type::simple_polygon_ptr_array_type::tag (), ref.basic_iter (object_with_properties<shape_type::simple_polygon_ptr_array_type>::tag ()));
+    case shape_type::Edge:
+      return clear_properties_iter (shape_type::edge_type::tag (), ref.basic_iter (object_with_properties<shape_type::edge_type>::tag ()));
+    case shape_type::Point:
+      return clear_properties_iter (shape_type::point_type::tag (), ref.basic_iter (object_with_properties<shape_type::point_type>::tag ()));
+    case shape_type::EdgePair:
+      return clear_properties_iter (shape_type::edge_pair_type::tag (), ref.basic_iter (object_with_properties<shape_type::edge_pair_type>::tag ()));
+    case shape_type::Path:
+      return clear_properties_iter (shape_type::path_type::tag (), ref.basic_iter (object_with_properties<shape_type::path_type>::tag ()));
+    case shape_type::PathRef:
+      return clear_properties_iter (shape_type::path_ref_type::tag (), ref.basic_iter (object_with_properties<shape_type::path_ref_type>::tag ()));
+    case shape_type::PathPtrArray:
+      //  HINT: since we are in editing mode, this type should not appear ..
+      return clear_properties_iter (shape_type::path_ptr_array_type::tag (), ref.basic_iter (object_with_properties<shape_type::path_ptr_array_type>::tag ()));
+    case shape_type::Box:
+      return clear_properties_iter (shape_type::box_type::tag (), ref.basic_iter (object_with_properties<shape_type::box_type>::tag ()));
+    case shape_type::BoxArray:
+      //  HINT: since we are in editing mode, this type should not appear ..
+      return clear_properties_iter (shape_type::box_array_type::tag (), ref.basic_iter (object_with_properties<shape_type::box_array_type>::tag ()));
+    case shape_type::ShortBox:
+      return clear_properties_iter (shape_type::short_box_type::tag (), ref.basic_iter (object_with_properties<shape_type::short_box_type>::tag ()));
+    case shape_type::ShortBoxArray:
+      //  HINT: since we are in editing mode, this type should not appear ..
+      return clear_properties_iter (shape_type::short_box_array_type::tag (), ref.basic_iter (object_with_properties<shape_type::short_box_array_type>::tag ()));
+    case shape_type::Text:
+      return clear_properties_iter (shape_type::text_type::tag (), ref.basic_iter (object_with_properties<shape_type::text_type>::tag ()));
+    case shape_type::TextRef:
+      return clear_properties_iter (shape_type::text_ref_type::tag (), ref.basic_iter (object_with_properties<shape_type::text_ref_type>::tag ()));
+    case shape_type::TextPtrArray:
+      //  HINT: since we are in editing mode, this type should not appear ..
+      return clear_properties_iter (shape_type::text_ptr_array_type::tag (), ref.basic_iter (object_with_properties<shape_type::text_ptr_array_type>::tag ()));
+    case shape_type::UserObject:
+      return clear_properties_iter (shape_type::user_object_type::tag (), ref.basic_iter (object_with_properties<shape_type::user_object_type>::tag ()));
+    default:
+      return ref;
+    };
+
+  }
+
+  return ref;
+}
+
+Shapes::shape_type
+Shapes::replace_prop_id (const Shapes::shape_type &ref, db::properties_id_type prop_id)
+{
+  tl_assert (! ref.is_array_member ());
+
+  //  nothing to do?
+  if (ref.has_prop_id () && ref.prop_id () == prop_id) {
+    return ref;
+  }
+
+  if (ref.has_prop_id ()) {
+
+    invalidate_prop_ids ();
 
     //  this assumes we can simply patch the properties ID ..
     switch (ref.m_type) {
@@ -1309,6 +1380,23 @@ Shapes::replace_prop_id_iter (typename db::object_tag<Sh>, const Iter &iter, db:
     db::layer_op<db::object_with_properties <Sh>, db::stable_layer_tag>::queue_or_append (manager (), this, true /*insert*/, wp);
   }
   return shape_type (this, get_layer <db::object_with_properties <Sh>, db::stable_layer_tag> ().insert (wp)); 
+}
+
+template <class Sh, class Iter>
+Shapes::shape_type
+Shapes::clear_properties_iter (typename db::object_tag<Sh>, const Iter &iter)
+{
+  if (manager () && manager ()->transacting ()) {
+    check_is_editable_for_undo_redo ();
+    db::layer_op<db::object_with_properties <Sh>, db::stable_layer_tag>::queue_or_append (manager (), this, false /*not insert*/, *iter);
+  }
+  Sh wop (*iter);
+  invalidate_state ();  //  HINT: must come before the change is done!
+  get_layer<db::object_with_properties <Sh>, db::stable_layer_tag> ().erase (iter);
+  if (manager () && manager ()->transacting ()) {
+    db::layer_op<Sh, db::stable_layer_tag>::queue_or_append (manager (), this, true /*insert*/, wop);
+  }
+  return shape_type (this, get_layer <Sh, db::stable_layer_tag> ().insert (wop));
 }
 
 template <class Sh1, class Sh2>

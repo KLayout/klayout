@@ -1,0 +1,58 @@
+
+source($drc_test_source)
+target($drc_test_target)
+
+verbose
+
+ncpu = 4
+
+chip = input(189, 4)
+chip.output(189, 4)
+
+# NOTE: this must not happen in tiled mode as the sealring
+# is only visible as a whole in flat mode
+sealring = source.cell("sealring")
+
+metal1_seal = sealring.input(8, 0)
+metal1_seal_inner = metal1_seal.holes
+# NOTE: metal1_seal_outer is empty if there is no sealring ->
+# the full chip will be filled
+metal1_seal_outer = chip.interacting(metal1_seal_inner) - metal1_seal_inner
+
+# Everything else can be done in tiled mode
+
+tiles(500)
+tile_borders(2.0)
+threads(ncpu)
+
+metal1 = input(8, 0)
+metal1.output(8, 0)
+metal1_fill = input(8, 22)
+metal1_nofill = input(8, 23) + metal1_seal_outer
+
+metal1_dist = 0.42
+min_space_to_fill = 1.0
+
+pattern = fill_pattern("METAL1_FILL1")
+pattern.shape(8, 22, box(0.0, 0.0, 5.0, 5.0))
+pattern.dim(5.0, 5.0)
+pattern.margin(metal1_dist, metal1_dist)
+
+to_fill = chip - metal1_nofill - metal1
+
+to_fill = to_fill.fill_with_left(pattern, hstep(7.0, 0), vstep(1.5, 7.0), origin(0, 0))
+
+pattern = fill_pattern("METAL1_FILL2")
+pattern.shape(8, 22, box(0.0, 0.0, 2.0, 2.0))
+pattern.dim(2.0, 2.0)
+pattern.margin(metal1_dist, metal1_dist)
+
+to_fill = to_fill.fill_with_left(pattern, hstep(2.42, 0), vstep(0.65, 2.42), origin(0, 0))
+
+pattern = fill_pattern("METAL1_FILL3")
+pattern.shape(8, 22, box(0.0, 0.0, 1.2, 1.2))
+pattern.dim(1.2, 1.2)
+pattern.margin(metal1_dist, metal1_dist)
+
+to_fill = to_fill.fill_with_left(pattern, hstep(1.62, 0), vstep(0.3, 1.62), origin(0, 0))
+

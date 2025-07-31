@@ -1579,6 +1579,9 @@ module DRC
     # By default this is the cell name of the default source. If there
     # is no source layout you'll need to give the cell name in the 
     # third parameter.
+    #
+    # The return value of this method is a channel object of the same
+    # type that \global#new_report will return.
       
     def report(description, filename = nil, cellname = nil)
 
@@ -1592,7 +1595,9 @@ module DRC
         @def_output = _make_report(description, filename, cellname)
 
       end
-      
+
+      @def_output
+
     end
 
     # %DRC%
@@ -1713,6 +1718,7 @@ module DRC
     # %DRC%
     # @name target
     # @brief Specify the target layout
+    # @synopsis target
     # @synopsis target(what [, cellname])
     # This function can be used to specify a target layout for output.
     # Subsequent calls of "output" will send their results to that target
@@ -1733,12 +1739,14 @@ module DRC
     # Except if the argument is a RBA::Cell object, a cellname can be specified 
     # stating the cell name under which the results are saved. If no cellname is 
     # specified, either the current cell or "TOP" is used.
-    # 
+    #
+    # The return value of this method is a channel object of the same
+    # type that \global#new_target will return.
     
-    def target(arg, cellname = nil)
+    def target(arg = nil, cellname = nil)
 
       self._context("target") do
-    
+      
         # finish what we got so far
         _finish(false)
 
@@ -1746,6 +1754,41 @@ module DRC
         @def_output = _make_target(arg, cellname)
 
       end
+
+      @def_output
+
+    end
+            
+    # %DRC%
+    # @name def_output
+    # @brief Gets an object describing the default output channel
+    # @synopsis def_output
+    # 
+    # The function returns an object describing the current output channel. 
+    # This channel object can be used like the channels delivered by 
+    # \global#new_target or \global#new_report.
+    #
+    # These readonly attributes are supported by the channel object:
+    #
+    # @ul
+    # @li "layout": the RBA::Layout object if the output is a layout @/li
+    # @li "rdb": the RBA::ReportDatabase object if the output is a report @/li
+    # @li "cell": a RBA::Cell object or RBA::RdbCell object, depending on the type of channel @/li
+    # @/ul
+    #
+    # Note, that the channel object will be modified when you use \global#output_cell,
+    # \global#target or \global#report calls that change the target.
+    
+    def def_output
+
+      self._context("def_output") do
+        # establish an output channel if none was established so far
+        if ! @def_output
+          @def_output = LayoutOutputChannel::new(self, self._output_layout, self._output_cell, nil)
+        end
+      end
+
+      @def_output
 
     end
             

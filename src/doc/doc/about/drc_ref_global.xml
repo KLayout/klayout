@@ -434,6 +434,28 @@ By default the interpretation of such polygons is undefined - they may even vani
 By setting this flag to true, the deep mode layout processor will reject such polygons with 
 an error. 
 </p>
+<a name="def_output"/><h2>"def_output" - Gets an object describing the default output channel</h2>
+<keyword name="def_output"/>
+<p>Usage:</p>
+<ul>
+<li><tt>def_output</tt></li>
+</ul>
+<p>
+The function returns an object describing the current output channel. 
+This channel object can be used like the channels delivered by 
+<a href="/about/drc_ref_global.xml#new_target">new_target</a> or <a href="/about/drc_ref_global.xml#new_report">new_report</a>.
+</p><p>
+These readonly attributes are supported by the channel object:
+</p><p>
+<ul>
+<li>"layout": the <class_doc href="Layout">Layout</class_doc> object if the output is a layout </li>
+<li>"rdb": the <class_doc href="ReportDatabase">ReportDatabase</class_doc> object if the output is a report </li>
+<li>"cell": a <class_doc href="Cell">Cell</class_doc> object or <class_doc href="RdbCell">RdbCell</class_doc> object, depending on the type of channel </li>
+</ul>
+</p><p>
+Note, that the channel object will be modified when you use <a href="/about/drc_ref_global.xml#output_cell">output_cell</a>,
+<a href="/about/drc_ref_global.xml#target">target</a> or <a href="/about/drc_ref_global.xml#report">report</a> calls that change the target.
+</p>
 <a name="device_scaling"/><h2>"device_scaling" - Specifies a dimension scale factor for the geometrical device properties</h2>
 <keyword name="device_scaling"/>
 <p>Usage:</p>
@@ -1666,6 +1688,9 @@ The cellname specifies the top cell used for the report file.
 By default this is the cell name of the default source. If there
 is no source layout you'll need to give the cell name in the 
 third parameter.
+</p><p>
+The return value of this method is a channel object of the same
+type that <a href="/about/drc_ref_global.xml#new_report">new_report</a> will return.
 </p>
 <a name="report_netlist"/><h2>"report_netlist" - Specifies an extracted netlist report for output</h2>
 <keyword name="report_netlist"/>
@@ -2033,6 +2058,7 @@ needs to be the same - i.e. all need to render polygons or edges or edge pairs.
 <keyword name="target"/>
 <p>Usage:</p>
 <ul>
+<li><tt>target</tt></li>
 <li><tt>target(what [, cellname])</tt></li>
 </ul>
 <p>
@@ -2055,6 +2081,9 @@ a new target will be set up.
 Except if the argument is a <class_doc href="Cell">Cell</class_doc> object, a cellname can be specified 
 stating the cell name under which the results are saved. If no cellname is 
 specified, either the current cell or "TOP" is used.
+</p><p>
+The return value of this method is a channel object of the same
+type that <a href="/about/drc_ref_global.xml#new_target">new_target</a> will return.
 </p>
 <a name="target_netlist"/><h2>"target_netlist" - With this statement, an extracted netlist is finally written to a file</h2>
 <keyword name="target_netlist"/>

@@ -79,6 +79,17 @@ db::properties_id_type properties_id (const PropertiesSet &ps)
   return PropertiesRepository::instance ().properties_id (ps);
 }
 
+db::properties_id_type properties_id (const std::map<tl::Variant, tl::Variant> &dict)
+{
+  db::PropertiesSet props;
+
+  for (std::map<tl::Variant, tl::Variant>::const_iterator v = dict.begin (); v != dict.end (); ++v) {
+    props.insert (v->first, v->second);
+  }
+
+  return db::properties_id (props);
+}
+
 size_t hash_for_properties_id (properties_id_type id)
 {
   return id == 0 ? 0 : db::properties (id).hash ();

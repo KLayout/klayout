@@ -1620,3 +1620,17 @@ TEST(66)
     EXPECT_EQ (s, "(cell_index=0 r0 *1 10,-20),(cell_index=4 r0 *1 10,-20)");
   }
 }
+
+//  Bug: path_dtrans was ICplxTrans on top level
+TEST(67)
+{
+  db::Layout g;
+  init_layout (g);
+
+  {
+    db::LayoutQuery q ("select path_dtrans*shape.dbbox from shapes on layer l1 from instances of .*");
+    db::LayoutQueryIterator iq (q, &g);
+    std::string s = q2s_var (iq, "data");
+    EXPECT_EQ (s, "((0,0.001;0.002,0.003)),((0,0.001;0.002,0.003))");
+  }
+}

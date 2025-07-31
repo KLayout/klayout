@@ -26,6 +26,7 @@
 
 #include "lymCommon.h"
 #include "tlObject.h"
+#include "tlVariant.h"
 
 #include <string>
 #include <map>
@@ -383,6 +384,40 @@ public:
   void install_doc () const;
 
   /**
+   *  @brief Gets the attribute with the given name
+   *
+   *  If no such attribute exists, nil is returned.
+   *  Setting and getting attributes is a way to pass information in and
+   *  out of a script (also see "current")
+   */
+  const tl::Variant &get_attribute (const std::string &name) const;
+
+  /**
+   *  @brief Gets a value indicating whether there is an attribute with the given name
+   */
+  bool has_attribute (const std::string &name) const;
+
+  /**
+   *  @brief Sets the attribute with the given name
+   */
+  void set_attribute (const std::string &name, const tl::Variant &value);
+
+  /**
+   *  @brief Deletes the attribute with the given name
+   */
+  void delete_attribute (const std::string &name);
+
+  /**
+   *  @brief Gets the macro currently executing
+   *
+   *  This method returns the Macro currently executing during "run".
+   *  This provides a way to pass information between the script
+   *  running inside the macro and the outside execution context
+   *  by setting or getting attributes.
+   */
+  static Macro *current ();
+
+  /**
    *  @brief Executes the macro
    *
    *  On error, this method throws an exception.
@@ -642,6 +677,7 @@ private:
   Interpreter m_interpreter;
   std::string m_dsl_interpreter;
   Format m_format;
+  std::map<std::string, tl::Variant> m_attributes;
 
   void on_menu_needs_update ();
   void on_changed ();

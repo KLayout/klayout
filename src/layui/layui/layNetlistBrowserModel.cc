@@ -237,7 +237,9 @@ static
 std::string formatted_value (double v)
 {
   double va = fabs (v);
-  if (va < 100e-15) {
+  if (va < 1e-20) {
+    return "0";
+  } else if (va < 100e-15) {
     return tl::to_string (v * 1e15) + "f";
   } else if (va < 100e-12) {
     return tl::to_string (v * 1e12) + "p";
@@ -269,25 +271,50 @@ std::string device_parameter_string (const db::Device *device)
   }
 
   bool first = true;
+  std::string term;
+
   const std::vector<db::DeviceParameterDefinition> &pd = device->device_class ()->parameter_definitions ();
+
   for (std::vector<db::DeviceParameterDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
-    double v = device->parameter_value (p->id ());
-    if (v > 0.0) {
+    if (p->is_primary ()) {
+      double v = device->parameter_value (p->id ());
       if (first) {
         s += " [";
-        first = false;
       } else {
         s += ", ";
       }
       s += p->name ();
       s += "=";
       s += formatted_value (v);
+      term = "]";
+      first = false;
     }
   }
-  if (! first) {
-    s += "]";
+
+  bool first_sec = true;
+
+  for (std::vector<db::DeviceParameterDefinition>::const_iterator p = pd.begin (); p != pd.end (); ++p) {
+    double v = device->parameter_value (p->id ());
+    std::string vs = formatted_value (v);
+    std::string vs_def = formatted_value (p->default_value ());
+    if (! p->is_primary () && vs != vs_def) {
+      if (first) {
+        s += " [(";
+      } else if (first_sec) {
+        s += ", (";
+      } else {
+        s += ", ";
+      }
+      s += p->name ();
+      s += "=";
+      s += vs;
+      term = ")]";
+      first = false;
+      first_sec = false;
+    }
   }
-  return s;
+
+  return s + term;
 }
 
 static

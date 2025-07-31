@@ -1683,6 +1683,13 @@ class DBShapes_TestClass < TestBase
     sh.set_property("u", "42")
     assert_equal(sh.properties.inspect, "{\"k\"=>17, \"u\"=>\"42\"}")
 
+    sh.set_properties({ "a" => 17, 42 => "u" })
+    assert_equal(sh.properties, {42=>"u", "a"=>17})
+    assert_equal(sh.has_prop_id?, true)
+    sh.clear_properties
+    assert_equal(sh.properties, {})
+    assert_equal(sh.has_prop_id?, false)
+
   end
 
   # Shape objects with properties

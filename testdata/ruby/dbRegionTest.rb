@@ -1679,6 +1679,8 @@ class DBRegion_TestClass < TestBase
     iter = top.begin_shapes_rec(l1)
     iter.enable_properties()
     r = RBA::Region::new(iter, dss)
+    r.join_properties_on_merge = false
+    assert_equal(r.join_properties_on_merge, false)
 
     assert_equal(r.filtered(RBA::PolygonFilter::property_filter("one", 11)).to_s, "")
     assert_equal(r.filtered(RBA::PolygonFilter::property_filter("two", 17)).to_s, "")
@@ -1694,6 +1696,10 @@ class DBRegion_TestClass < TestBase
     rr = r.dup
     rr.filter(RBA::PolygonFilter::property_filter("one", 17))
     assert_equal(csort(rr.to_s), csort("(1,1;1,201;101,201;101,1){one=>17}"))
+
+    r.join_properties_on_merge = true
+    assert_equal(r.join_properties_on_merge, true)
+    assert_equal(csort(r.filtered(RBA::PolygonFilter::property_filter("one", 42)).to_s), csort("(0,0;0,200;1,200;1,201;2,201;2,202;102,202;102,2;101,2;101,1;100,1;100,0){one=>42}"))
 
     dss._destroy
 

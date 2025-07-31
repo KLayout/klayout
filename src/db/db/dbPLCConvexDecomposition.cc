@@ -430,12 +430,6 @@ ConvexDecomposition::decompose (const db::Polygon &poly, const ConvexDecompositi
 }
 
 void
-ConvexDecomposition::decompose (const db::Polygon &poly, const std::vector<db::Point> &vertexes, const ConvexDecompositionParameters &parameters, double dbu)
-{
-  decompose (poly, vertexes, parameters, db::CplxTrans (dbu));
-}
-
-void
 ConvexDecomposition::decompose (const db::Polygon &poly, const ConvexDecompositionParameters &parameters, const db::CplxTrans &trans)
 {
   Triangulation tri (mp_graph);
@@ -445,28 +439,10 @@ ConvexDecomposition::decompose (const db::Polygon &poly, const ConvexDecompositi
 }
 
 void
-ConvexDecomposition::decompose (const db::Polygon &poly, const std::vector<db::Point> &vertexes, const ConvexDecompositionParameters &parameters, const db::CplxTrans &trans)
-{
-  Triangulation tri (mp_graph);
-  tri.triangulate (poly, vertexes, parameters.tri_param, trans);
-
-  hertel_mehlhorn_decomposition (tri, parameters);
-}
-
-void
 ConvexDecomposition::decompose (const db::DPolygon &poly, const ConvexDecompositionParameters &parameters, const db::DCplxTrans &trans)
 {
   Triangulation tri (mp_graph);
   tri.triangulate (poly, parameters.tri_param, trans);
-
-  hertel_mehlhorn_decomposition (tri, parameters);
-}
-
-void
-ConvexDecomposition::decompose (const db::DPolygon &poly, const std::vector<db::DPoint> &vertexes, const ConvexDecompositionParameters &parameters, const db::DCplxTrans &trans)
-{
-  Triangulation tri (mp_graph);
-  tri.triangulate (poly, vertexes, parameters.tri_param, trans);
 
   hertel_mehlhorn_decomposition (tri, parameters);
 }

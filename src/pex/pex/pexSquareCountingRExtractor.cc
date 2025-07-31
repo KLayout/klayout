@@ -35,17 +35,9 @@ const double infinite_squares = 1e10;
 namespace
 {
 
-class PolygonPortInteractionReceiver
-  : public db::box_scanner_receiver2<const db::Polygon, size_t, const db::Polygon, size_t>
+class PortInteractionReceiverBase
 {
 public:
-  void add (const db::Polygon *obj1, const size_t &index1, const db::Polygon *obj2, const size_t &index2)
-  {
-    if (db::interact_pp (*obj1, *obj2)) {
-      m_interactions[index1].insert (index2);
-    }
-  }
-
   const std::set<size_t> &interactions (size_t index) const
   {
     static std::set<size_t> empty;
@@ -57,8 +49,40 @@ public:
     }
   }
 
+protected:
+  void insert (size_t index1, size_t index2)
+  {
+    m_interactions[index1].insert (index2);
+  }
+
 private:
   std::map<size_t, std::set<size_t> > m_interactions;
+};
+
+class PolygonPortInteractionReceiver
+  : public db::box_scanner_receiver2<const db::Polygon, size_t, const db::Polygon, size_t>,
+    public PortInteractionReceiverBase
+{
+public:
+  void add (const db::Polygon *obj1, const size_t &index1, const db::Polygon *obj2, const size_t &index2)
+  {
+    if (db::interact_pp (*obj1, *obj2)) {
+      insert (index1, index2);
+    }
+  }
+};
+
+class VertexPortInteractionReceiver
+  : public db::box_scanner_receiver2<const db::Polygon, size_t, const db::Point, size_t>,
+    public PortInteractionReceiverBase
+{
+public:
+  void add (const db::Polygon *obj1, const size_t &index1, const db::Point *obj2, const size_t &index2)
+  {
+    if (obj1->box ().contains (*obj2) && db::inside_poly (obj1->begin_edge (), *obj2) >= 0) {
+      insert (index1, index2);
+    }
+  }
 };
 
 struct JoinEdgeSets
@@ -188,12 +212,9 @@ SquareCountingRExtractor::extract (const db::Polygon &polygon, const std::vector
   db::plc::Graph plc;
 
   db::plc::ConvexDecomposition decomp (&plc);
-  decomp.decompose (polygon, vertex_ports, m_decomp_param, trans);
+  decomp.decompose (polygon, m_decomp_param, trans);
 
-  //  Set up a scanner to detect interactions between polygon ports
-  //  and decomposed polygons
-
-  db::box_scanner2<const db::Polygon, size_t, const db::Polygon, size_t> scanner;
+  //  create a heap for the scanners
 
   std::vector<std::pair<db::Polygon, const db::plc::Polygon *> > decomp_polygons;
   for (auto p = plc.begin (); p != plc.end (); ++p) {
@@ -201,17 +222,50 @@ SquareCountingRExtractor::extract (const db::Polygon &polygon, const std::vector
     decomp_polygons.back ().first = inv_trans * p->polygon ();
   }
 
-  for (auto i = decomp_polygons.begin (); i != decomp_polygons.end (); ++i) {
-    scanner.insert1 (&i->first, i - decomp_polygons.begin ());
+  //  Set up a scanner to detect interactions between polygon ports
+  //  and decomposed polygons
+
+  PolygonPortInteractionReceiver interactions_pp;
+
+  if (! decomp_polygons.empty () && ! polygon_ports.empty ()) {
+
+    db::box_scanner2<const db::Polygon, size_t, const db::Polygon, size_t> scanner;
+
+    for (auto i = decomp_polygons.begin (); i != decomp_polygons.end (); ++i) {
+      scanner.insert1 (&i->first, i - decomp_polygons.begin ());
+    }
+
+    for (auto i = polygon_ports.begin (); i != polygon_ports.end (); ++i) {
+      scanner.insert2 (i.operator-> (), i - polygon_ports.begin ());
+    }
+
+    db::box_convert<db::Polygon> bc;
+    scanner.process (interactions_pp, 1, bc, bc);
+
   }
 
-  for (auto i = polygon_ports.begin (); i != polygon_ports.end (); ++i) {
-    scanner.insert2 (i.operator-> (), i - polygon_ports.begin ());
-  }
+  //  Set up a scanner to detect interactions between vertex ports
+  //  and decomposed polygons
 
-  PolygonPortInteractionReceiver interactions;
-  db::box_convert<db::Polygon> bc;
-  scanner.process (interactions, 1, bc, bc);
+  VertexPortInteractionReceiver interactions_vp;
+
+  if (! decomp_polygons.empty () && ! vertex_ports.empty ()) {
+
+    db::box_scanner2<const db::Polygon, size_t, const db::Point, size_t> scanner;
+
+    for (auto i = decomp_polygons.begin (); i != decomp_polygons.end (); ++i) {
+      scanner.insert1 (&i->first, i - decomp_polygons.begin ());
+    }
+
+    for (auto i = vertex_ports.begin (); i != vertex_ports.end (); ++i) {
+      scanner.insert2 (i.operator-> (), i - vertex_ports.begin ());
+    }
+
+    db::box_convert<db::Polygon> bc1;
+    db::box_convert<db::Point> bc2;
+    scanner.process (interactions_vp, 1, bc1, bc2);
+
+  }
 
   //  Generate the internal ports: those are defined by edges connecting two polygons
 
@@ -253,8 +307,8 @@ SquareCountingRExtractor::extract (const db::Polygon &polygon, const std::vector
     ports.clear ();
 
     const db::Polygon &db_poly = p->first;
-    const db::plc::Polygon *plc_poly = p->second;
-    const std::set<size_t> &pp_indexes = interactions.interactions (p - decomp_polygons.begin ());
+    const std::set<size_t> &pp_indexes = interactions_pp.interactions (p - decomp_polygons.begin ());
+    const std::set<size_t> &vp_indexes = interactions_vp.interactions (p - decomp_polygons.begin ());
     const std::vector<size_t> &ip_indexes = internal_port_indexes [p - decomp_polygons.begin ()];
 
     //  set up the ports:
@@ -266,16 +320,12 @@ SquareCountingRExtractor::extract (const db::Polygon &polygon, const std::vector
     }
 
     //  2. vertex ports
-    for (size_t i = 0; i < plc_poly->internal_vertexes (); ++i) {
-      auto v = plc_poly->internal_vertex (i);
-      db::Point loc = inv_trans * *v;
-      for (auto pi = v->ids ().begin (); pi != v->ids ().end (); ++pi) {
-        ports.push_back (std::make_pair (PortDefinition (pex::RNode::VertexPort, loc, *pi), (pex::RNode *) 0));
-      }
+    for (auto i = vp_indexes.begin (); i != vp_indexes.end (); ++i) {
+      db::Point loc = vertex_ports [*i];
+      ports.push_back (std::make_pair (PortDefinition (pex::RNode::VertexPort, db::Box (loc, loc), (unsigned int) *i), (pex::RNode *) 0));
     }
 
     //  3. polygon ports
-    //  (NOTE: here we only take the center of the bounding box)
     for (auto i = pp_indexes.begin (); i != pp_indexes.end (); ++i) {
       db::Box loc = polygon_ports [*i].box ();
       ports.push_back (std::make_pair (PortDefinition (pex::RNode::PolygonPort, loc, (unsigned int) *i), (pex::RNode *) 0));

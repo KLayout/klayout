@@ -110,49 +110,6 @@ TEST(basic)
   db::compare_layouts (_this, *ly, tl::testdata () + "/algo/hm_decomposition_au4.gds");
 }
 
-TEST(internal_vertex)
-{
-  db::plc::Graph plc;
-  TestableConvexDecomposition decomp (&plc);
-
-  db::Point contour[] = {
-    db::Point (0, 0),
-    db::Point (0, 100),
-    db::Point (1000, 100),
-    db::Point (1000, 0)
-  };
-
-  std::vector<db::Point> vertexes;
-  vertexes.push_back (db::Point (0, 50));  // on edge
-  vertexes.push_back (db::Point (200, 70));
-  vertexes.push_back (db::Point (0, 0));  //  on vertex
-
-  db::Polygon poly;
-  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour[0]));
-
-  double dbu = 0.001;
-
-  db::plc::ConvexDecompositionParameters param;
-  decomp.decompose (poly, vertexes, param, dbu);
-
-  EXPECT_EQ (plc.begin () == plc.end (), false);
-  if (plc.begin () == plc.end ()) {
-    return;
-  }
-
-  auto p = plc.begin ();
-  EXPECT_EQ (p->polygon ().to_string (), "(0,0;0,0.05;0,0.1;1,0.1;1,0)");
-
-  std::vector<std::string> ip;
-  for (size_t i = 0; i < p->internal_vertexes (); ++i) {
-    ip.push_back (p->internal_vertex (i)->to_string () + "#" + tl::join (p->internal_vertex (i)->ids ().begin (), p->internal_vertex (i)->ids ().end (), ","));
-  }
-  std::sort (ip.begin (), ip.end ());
-  EXPECT_EQ (tl::join (ip, "/"), "(0, 0)#2/(0, 0.05)#0/(0.2, 0.07)#1");
-
-  EXPECT_EQ (++p == plc.end (), true);
-}
-
 TEST(problematic_polygon)
 {
   db::Point contour[] = {

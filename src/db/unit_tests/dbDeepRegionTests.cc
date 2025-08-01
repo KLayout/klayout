@@ -3013,3 +3013,146 @@ TEST(deep_region_and_cheats)
   CHECKPOINT();
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/cheats_au.gds");
 }
+
+TEST(deep_region_merged_with_properties)
+{
+  db::Layout ly;
+
+  db::Cell &top = ly.cell (ly.add_cell ("TOP"));
+  db::Cell &a = ly.cell (ly.add_cell ("A"));
+  db::Cell &b = ly.cell (ly.add_cell ("B"));
+
+  top.insert (db::CellInstArray (db::CellInst (a.cell_index ()), db::Trans (db::Vector ())));
+  top.insert (db::CellInstArray (db::CellInst (b.cell_index ()), db::Trans (db::Vector (0, 1000))));
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+
+  db::PropertiesSet ps1;
+  ps1.insert ("A", 17);
+  auto ps1_id = db::properties_id (ps1);
+
+  db::PropertiesSet ps2;
+  ps2.insert ("B", 42);
+  auto ps2_id = db::properties_id (ps2);
+
+  db::PropertiesSet ps3;
+  ps3.insert ("C", 18);
+  auto ps3_id = db::properties_id (ps3);
+
+  db::PropertiesSet ps4;
+  ps4.insert ("D", 42);
+  auto ps4_id = db::properties_id (ps4);
+
+  db::PropertiesSet ps5;
+  ps5.insert ("A", 18);
+  ps5.insert ("B", 41);
+  ps5.insert ("E", 43);
+  auto ps5_id = db::properties_id (ps5);
+
+  a.shapes (l1).insert (db::BoxWithProperties (db::Box (0, 0, 1000, 1000), ps1_id));
+  a.shapes (l1).insert (db::BoxWithProperties (db::Box (500, 0, 1500, 1000), ps1_id));
+  a.shapes (l1).insert (db::BoxWithProperties (db::Box (1000, 0, 2000, 1000), ps2_id));
+
+  b.shapes (l1).insert (db::BoxWithProperties (db::Box (0, 0, 1000, 1000), ps3_id));
+  b.shapes (l1).insert (db::BoxWithProperties (db::Box (1000, 0, 2000, 1000), ps4_id));
+
+  top.shapes (l1).insert (db::BoxWithProperties (db::Box (0, 2000, 1000, 3000), ps5_id));
+
+  db::DeepShapeStore dss;
+
+  db::RecursiveShapeIterator iter (ly, top, l1);
+  //  enable properties
+  iter.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
+
+  db::Region r1 (iter, dss);
+  r1.set_join_properties_on_merge (false);
+
+  db::Region rr1;
+
+  EXPECT_EQ (r1.merged ().to_string (), "(0,2000;0,3000;1000,3000;1000,2000){A=>18,B=>41,E=>43};(0,0;0,1000;1500,1000;1500,0){A=>17};(1000,0;1000,1000;2000,1000;2000,0){B=>42};(0,1000;0,2000;1000,2000;1000,1000){C=>18};(1000,1000;1000,2000;2000,2000;2000,1000){D=>42}");
+  rr1 = r1;
+  rr1.merge ();
+  EXPECT_EQ (rr1.to_string (), "(0,2000;0,3000;1000,3000;1000,2000){A=>18,B=>41,E=>43};(0,0;0,1000;1500,1000;1500,0){A=>17};(1000,0;1000,1000;2000,1000;2000,0){B=>42};(0,1000;0,2000;1000,2000;1000,1000){C=>18};(1000,1000;1000,2000;2000,2000;2000,1000){D=>42}");
+
+  r1.set_join_properties_on_merge (true);
+
+  EXPECT_EQ (r1.merged ().to_string (), "(0,0;0,3000;1000,3000;1000,2000;2000,2000;2000,0){A=>18,B=>42,C=>18,D=>42,E=>43}");
+  rr1 = r1;
+  rr1.merge ();
+  EXPECT_EQ (rr1.to_string (), "(0,0;0,3000;1000,3000;1000,2000;2000,2000;2000,0){A=>18,B=>42,C=>18,D=>42,E=>43}");
+
+  EXPECT_EQ (r1.join_properties_on_merge (), true);
+
+  //  force merge with "join_properties_on_nerge" = false
+  EXPECT_EQ (r1.merged (false, 0, false).to_string (), "(0,2000;0,3000;1000,3000;1000,2000){A=>18,B=>41,E=>43};(0,0;0,1000;1500,1000;1500,0){A=>17};(1000,0;1000,1000;2000,1000;2000,0){B=>42};(0,1000;0,2000;1000,2000;1000,1000){C=>18};(1000,1000;1000,2000;2000,2000;2000,1000){D=>42}");
+  rr1 = r1;
+  rr1.merge (false, 0, false);
+  EXPECT_EQ (rr1.to_string (), "(0,2000;0,3000;1000,3000;1000,2000){A=>18,B=>41,E=>43};(0,0;0,1000;1500,1000;1500,0){A=>17};(1000,0;1000,1000;2000,1000;2000,0){B=>42};(0,1000;0,2000;1000,2000;1000,1000){C=>18};(1000,1000;1000,2000;2000,2000;2000,1000){D=>42}");
+}
+
+TEST(deep_region_merged_with_pseudo_labels)
+{
+  db::Layout ly;
+
+  db::Cell &top = ly.cell (ly.add_cell ("TOP"));
+  db::Cell &a = ly.cell (ly.add_cell ("A"));
+
+  top.insert (db::CellInstArray (db::CellInst (a.cell_index ()), db::Trans (db::Vector ())));
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+
+  db::PropertiesSet ps1;
+  ps1.insert ("A", 17);
+  auto ps1_id = db::properties_id (ps1);
+
+  db::PropertiesSet ps2;
+  ps2.insert ("A", 18);
+  auto ps2_id = db::properties_id (ps2);
+
+  db::PropertiesSet ps3;
+  ps3.insert ("B", 42);
+  auto ps3_id = db::properties_id (ps3);
+
+  a.shapes (l1).insert (db::Text ("FAR_OUT", db::Trans (db::Vector (1000, 3000))));
+  a.shapes (l1).insert (db::TextWithProperties (db::Text ("OUT", db::Trans (db::Vector (1000, 1000))), ps2_id));
+  a.shapes (l1).insert (db::BoxWithProperties (db::Box (500, 500, 1500, 1500), ps3_id));
+
+  top.shapes (l1).insert (db::BoxWithProperties (db::Box (0, 0, 2000, 2000), ps1_id));
+
+  db::DeepShapeStore dss;
+
+  db::RecursiveShapeIterator iter (ly, top, l1);
+
+  //  enable properties
+  iter.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
+
+  db::Region r1 (iter, dss);
+  r1.set_join_properties_on_merge (false);
+
+  db::Region rr1;
+
+  EXPECT_EQ (r1.merged ().to_string (), "(0,0;0,2000;2000,2000;2000,0){A=>17};(500,500;500,1500;1500,1500;1500,500){B=>42}");
+  rr1 = r1;
+  rr1.merge ();
+  EXPECT_EQ (rr1.to_string (), "(0,0;0,2000;2000,2000;2000,0){A=>17};(500,500;500,1500;1500,1500;1500,500){B=>42}");
+
+  dss.set_text_property_name ("LABEL");
+  dss.set_text_enlargement (2);
+
+  db::Region r2 (iter, dss);
+  r2.set_join_properties_on_merge (false);
+
+  db::Region rr2;
+
+  EXPECT_EQ (r2.merged ().to_string (), "(0,0;0,2000;2000,2000;2000,0){A=>17};(500,500;500,1500;1500,1500;1500,500){B=>42};(998,2998;998,3002;1002,3002;1002,2998){LABEL=>FAR_OUT};(998,998;998,1002;1002,1002;1002,998){LABEL=>OUT}");
+  rr2 = r2;
+  rr2.merge ();
+  EXPECT_EQ (rr2.to_string (), "(0,0;0,2000;2000,2000;2000,0){A=>17};(500,500;500,1500;1500,1500;1500,500){B=>42};(998,2998;998,3002;1002,3002;1002,2998){LABEL=>FAR_OUT};(998,998;998,1002;1002,1002;1002,998){LABEL=>OUT}");
+
+  r2.set_join_properties_on_merge (true);
+
+  EXPECT_EQ (r2.merged ().to_string (), "(0,0;0,2000;2000,2000;2000,0){A=>17,B=>42};(998,2998;998,3002;1002,3002;1002,2998)");
+  rr2 = r2;
+  rr2.merge ();
+  EXPECT_EQ (rr2.to_string (), "(0,0;0,2000;2000,2000;2000,0){A=>17,B=>42};(998,2998;998,3002;1002,3002;1002,2998)");
+}

@@ -525,7 +525,7 @@ class ClusterMerger
 {
 public:
   ClusterMerger (unsigned int layer, db::Layout &layout, const db::hier_clusters<db::PolygonRef> &hc, bool min_coherence, bool report_progress, const std::string &progress_desc)
-    : m_layer (layer), mp_layout (&layout), mp_hc (&hc), m_min_coherence (min_coherence), m_ep (report_progress, progress_desc)
+    : m_layer (layer), mp_layout (&layout), mp_hc (&hc), m_min_coherence (min_coherence), m_text_name_id (0), m_ep (report_progress, progress_desc)
   {
     //  .. nothing yet ..
   }
@@ -533,6 +533,19 @@ public:
   void set_base_verbosity (int vb)
   {
     m_ep.set_base_verbosity (vb);
+  }
+
+  /**
+   *  @brief Specifies the label property name ID for pseudo-label polygons
+   *  If set to 0, the merge does not skip pseudo-labels.
+   */
+  void set_text_name (const tl::Variant &n)
+  {
+    if (n.is_nil ()) {
+      m_text_name_id = 0;
+    } else {
+      m_text_name_id = db::property_names_id (n);
+    }
   }
 
   db::Shapes &merged (size_t cid, db::cell_index_type ci, unsigned int min_wc = 0)
@@ -553,7 +566,18 @@ private:
   db::Layout *mp_layout;
   const db::hier_clusters<db::PolygonRef> *mp_hc;
   bool m_min_coherence;
+  db::property_names_id_type m_text_name_id;
   db::EdgeProcessor m_ep;
+
+  bool skip_pseudo_label (db::properties_id_type prop_id)
+  {
+    if (prop_id == 0 || m_text_name_id == 0) {
+      return false;
+    } else {
+      const db::PropertiesSet &ps = db::properties (prop_id);
+      return (ps.size () == 1 && ps.begin ()->first == m_text_name_id);
+    }
+  }
 
   db::properties_id_type property_id (size_t cid, db::cell_index_type ci, bool initial)
   {
@@ -591,7 +615,11 @@ private:
       db::PropertiesSet ps;
       for (auto a = attrs.begin (); a != attrs.end (); ++a) {
 
-        if (ps.empty ()) {
+        if (skip_pseudo_label (*a)) {
+
+          //  skip attributes for pseudo-labels
+
+        } else if (ps.empty ()) {
 
           ps = db::properties (*a);
 
@@ -616,8 +644,10 @@ private:
 
       s->second = db::properties_id (ps);
 
-    } else if (! attrs.empty ()) {
+    } else if (! attrs.empty () && ! skip_pseudo_label (*attrs.begin ())) {
+
       s->second = *attrs.begin ();
+
     }
 
     return s->second;
@@ -749,6 +779,14 @@ DeepRegion::ensure_merged_polygons_valid () const
 
       ClusterMerger cm (deep_layer ().layer (), layout, hc, min_coherence (), report_progress (), progress_desc ());
       cm.set_base_verbosity (base_verbosity () + 10);
+
+      //  Specify the property name ID for the pseudo-labels, so we can filter out those properties
+      //  (for backward compatibility only if join_properties_on_merge is true - if we don't with
+      //  join_properties_on_merge, the pseudo-label properties may get attached to other shapes which
+      //  will be taken as texts then)
+      if (join_properties_on_merge ()) {
+        cm.set_text_name (deep_layer ().store ()->text_property_name ());
+      }
 
       //  TODO: iterate only over the called cells?
       for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
@@ -1834,6 +1872,14 @@ DeepRegion::merged (bool min_coherence, unsigned int min_wc, bool join_propertie
 
   ClusterMerger cm (deep_layer ().layer (), layout, hc, min_coherence, report_progress (), progress_desc ());
   cm.set_base_verbosity (base_verbosity () + 10);
+
+  //  Specify the property name ID for the pseudo-labels, so we can filter out those properties
+  //  (for backward compatibility only if join_properties_on_merge is true - if we don't with
+  //  join_properties_on_merge, the pseudo-label properties may get attached to other shapes which
+  //  will be taken as texts then)
+  if (join_properties_on_merge) {
+    cm.set_text_name (deep_layer ().store ()->text_property_name ());
+  }
 
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
     const db::connected_clusters<db::PolygonRef> &cc = hc.clusters_per_cell (c->cell_index ());

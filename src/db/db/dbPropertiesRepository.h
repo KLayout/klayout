@@ -246,6 +246,11 @@ public:
   void merge (const db::PropertiesSet &other);
 
   /**
+   *  @brief Join another properties set with self, computing the maximum of both values in case of conflict
+   */
+  void join_max (const db::PropertiesSet &other);
+
+  /**
    *  @brief Gets the properties as a map
    */
   std::multimap<tl::Variant, tl::Variant> to_map () const;

@@ -325,7 +325,6 @@ struct ComparePolygonsWithProperties
 
 }
 
-// @@@
 void AsIfFlatRegion::merge_polygons_to (db::Shapes &output, bool min_coherence, unsigned int min_wc, bool join_properties_on_merge) const
 {
   db::EdgeProcessor ep (report_progress (), progress_desc ());
@@ -334,16 +333,101 @@ void AsIfFlatRegion::merge_polygons_to (db::Shapes &output, bool min_coherence, 
   //  count edges and reserve memory
   size_t n = 0;
   db::properties_id_type prop_id = 0;
-  bool need_split_props = false;
+  bool multiple_properties = false;
   for (RegionIterator s (begin ()); ! s.at_end (); ++s, ++n) {
     if (n == 0) {
       prop_id = s.prop_id ();
-    } else if (! need_split_props && prop_id != s.prop_id ()) {
-      need_split_props = true;
+    } else if (! multiple_properties && prop_id != s.prop_id ()) {
+      multiple_properties = true;
     }
   }
 
-  if (need_split_props) {
+  if (multiple_properties && join_properties_on_merge) {
+
+    //  this merge variant requires a two-step approach: we first and then join original properties IDs
+    //  in a separate interaction step
+
+    std::vector<db::properties_id_type> org_prop_ids;
+    org_prop_ids.reserve (n);
+
+    n = 0;
+    for (RegionIterator p (begin ()); ! p.at_end (); ++p) {
+      n += p->vertices ();
+    }
+    ep.reserve (n);
+
+    size_t org_poly_id = 0;
+    for (RegionIterator p (begin ()); ! p.at_end (); ++p, ++org_poly_id) {
+      org_prop_ids.push_back (p.prop_id ());
+      ep.insert (*p, org_poly_id);
+    }
+
+    //  and run the merge step
+    db::MergeOp op (min_wc);
+    db::PolygonContainer pc;
+    db::PolygonGenerator pg (pc, false /*don't resolve holes*/, min_coherence);
+    ep.process (pg, op);
+
+    //  reserve space for new (merged) polygons
+    for (auto p = pc.polygons ().begin (); p != pc.polygons ().end (); ++p) {
+      n += p->vertices ();
+    }
+    ep.reserve (n);
+
+    size_t merged_poly_id = org_poly_id;
+    for (auto p = pc.polygons ().begin (); p != pc.polygons ().end (); ++p, ++merged_poly_id) {
+      ep.insert (*p, merged_poly_id);
+    }
+
+    //  compute interactions between merged and original polygons
+
+    db::InteractionDetector id;
+    id.set_include_touching (false);
+    db::EdgeSink es;
+    ep.process (es, id);
+    id.finish ();
+
+    //  collect original property IDs per merged polygon
+
+    std::vector<std::set<db::properties_id_type> > prop_ids_per_merged_polygon;
+    prop_ids_per_merged_polygon.resize (merged_poly_id - org_poly_id);
+
+    for (auto ii = id.begin (); ii != id.end (); ++ii) {
+      auto first = std::min (ii->first, ii->second);
+      auto second = std::max (ii->first, ii->second);
+      if (first < org_poly_id && second >= org_poly_id) {
+        prop_ids_per_merged_polygon [second - org_poly_id].insert (org_prop_ids [first]);
+      }
+    }
+
+    //  Form new polygons with joined properties
+
+    for (auto p = pc.polygons ().begin (); p != pc.polygons ().end (); ++p) {
+
+      const std::set<db::properties_id_type> &prop_ids = prop_ids_per_merged_polygon [p - pc.polygons ().begin ()];
+
+      db::properties_id_type prop_id = 0;
+      if (prop_ids.size () == 1) {
+        prop_id = *prop_ids.begin ();
+      } else if (prop_ids.size () > 1) {
+        db::PropertiesSet ps;
+        for (auto p = prop_ids.begin (); p != prop_ids.end (); ++p) {
+          //  merge in "larger one wins" mode - the advantage of this mode is that
+          //  it is independent on the order of the attribute sets (which in fact are pointers)
+          ps.join_max (db::properties (*p));
+        }
+        prop_id = db::properties_id (ps);
+      }
+
+      if (prop_id != 0) {
+        output.insert (db::PolygonWithProperties (*p, prop_id));
+      } else {
+        output.insert (*p);
+      }
+
+    }
+
+  } else if (multiple_properties) {
 
     db::Shapes result (output.is_editable ());
 

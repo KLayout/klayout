@@ -614,32 +614,11 @@ private:
       //  join the properties
       db::PropertiesSet ps;
       for (auto a = attrs.begin (); a != attrs.end (); ++a) {
-
-        if (skip_pseudo_label (*a)) {
-
-          //  skip attributes for pseudo-labels
-
-        } else if (ps.empty ()) {
-
-          ps = db::properties (*a);
-
-        } else {
-
+        if (! skip_pseudo_label (*a)) {
           //  merge in "larger one wins" mode - the advantage of this mode is that
           //  it is independent on the order of the attribute sets (which in fact are pointers)
-          const db::PropertiesSet &ps2 = db::properties (*a);
-          for (auto i = ps2.begin (); i != ps2.end (); ++i) {
-            auto f = ps.find (i->first);
-            if (f == ps.end ()) {
-              ps.insert_by_id (i->first, i->second);
-            } else if (db::property_value (f->second) < db::property_value (i->second)) {
-              ps.erase (i->first);
-              ps.insert_by_id (i->first, i->second);
-            }
-          }
-
+          ps.join_max (db::properties (*a));
         }
-
       }
 
       s->second = db::properties_id (ps);

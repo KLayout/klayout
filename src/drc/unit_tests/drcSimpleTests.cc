@@ -2013,3 +2013,14 @@ TEST(141d_merge_properties)
 {
   run_test (_this, "141", true);
 }
+
+TEST(142_evaluate_nets)
+{
+  run_test (_this, "142", false);
+}
+
+TEST(142d_evaluate_nets)
+{
+  run_test (_this, "142", true);
+}
+

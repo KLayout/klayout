@@ -216,7 +216,7 @@ static db::Region antenna_check (db::LayoutToNetlist *l2n, const db::Region &pol
   return antenna_check3 (l2n, poly, 1, 0, metal, 1, 0, ratio, diodes, texts);
 }
 
-static db::Region measure_net (db::LayoutToNetlist *l2n, const db::Region &primary, const std::map<std::string, const db::Region *> &secondary, const std::string &expression, const tl::Variant &variables)
+static db::Region evaluate_nets (db::LayoutToNetlist *l2n, const db::Region &primary, const std::map<std::string, const db::Region *> &secondary, const std::string &expression, const tl::Variant &variables)
 {
   if (! variables.is_array ()) {
     throw tl::Exception (tl::to_string (tr ("'variables' argument needs to a hash")));
@@ -1224,7 +1224,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "\n"
     "This variant has been introduced in version 0.26.6.\n"
   ) +
-  gsi::method_ext ("measure_net", &measure_net, gsi::arg ("primary"), gsi::arg ("secondary"), gsi::arg ("expression"), gsi::arg ("variables", std::map<std::string, tl::Variant> (), "{}"),
+  gsi::method_ext ("evaluate_nets", &evaluate_nets, gsi::arg ("primary"), gsi::arg ("secondary"), gsi::arg ("expression"), gsi::arg ("variables", std::map<std::string, tl::Variant> (), "{}"),
     "@brief Runs a generic net measurement function\n"
     "\n"
     "This method accepts some primary layer, a number of secondary layers with names and an expression.\n"

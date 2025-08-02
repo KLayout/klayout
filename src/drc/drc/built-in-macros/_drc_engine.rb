@@ -2438,6 +2438,12 @@ CODE
     # See \Netter#antenna_check for a description of that function.
  
     # %DRC%
+    # @name evaluate_nets
+    # @brief Evaluates expressions on nets
+    # @synopsis evaluate_nets(primary_layer, secondary_layers, expression [, variables])
+    # See \Netter#evaluate_nets for a description of that function.
+ 
+    # %DRC%
     # @name l2n_data
     # @brief Gets the internal RBA::LayoutToNetlist object for the default \Netter
     # @synopsis l2n_data
@@ -2489,6 +2495,7 @@ CODE
  
     %w(
       antenna_check
+      evaluate_nets
       clear_connections
       connect
       connect_global

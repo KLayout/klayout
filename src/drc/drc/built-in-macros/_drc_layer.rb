@@ -5762,36 +5762,36 @@ END
       other.is_a?(DRCLayer) || raise("Argument needs to be a DRC layer")
     end
 
-    def requires_region
-      self.data.is_a?(RBA::Region) || raise("Requires a polygon layer")
+    def requires_region(name = nil)
+      self.data.is_a?(RBA::Region) || raise(name ? "#{name} requires a polygon layer" : "Requires a polygon layer")
     end
     
-    def requires_texts_or_region
-      self.data.is_a?(RBA::Region) || self.data.is_a?(RBA::Texts) || raise("Requires a polygon or text layer")
+    def requires_texts_or_region(name = nil)
+      self.data.is_a?(RBA::Region) || self.data.is_a?(RBA::Texts) || raise(name ? "#{name} requires a polygon or text layer" : "Requires a polygon or text layer")
     end
     
-    def requires_texts
-      self.data.is_a?(RBA::Texts) || raise("Requires a text layer")
+    def requires_texts(name = nil)
+      self.data.is_a?(RBA::Texts) || raise(name ? "#{name} requires a text layer" : "Requires a text layer")
     end
     
-    def requires_edge_pairs
-      self.data.is_a?(RBA::EdgePairs) || raise("Requires an edge pair layer")
+    def requires_edge_pairs(name = nil)
+      self.data.is_a?(RBA::EdgePairs) || raise(name ? "#{name} requires an edge pair layer" : "Requires an edge pair layer")
     end
     
-    def requires_edges
-      self.data.is_a?(RBA::Edges) || raise("Requires an edge layer")
+    def requires_edges(name = nil)
+      self.data.is_a?(RBA::Edges) || raise(name ? "#{name} requires an edge layer" : "Requires an edge layer")
     end
     
-    def requires_edges_or_edge_pairs
-      self.data.is_a?(RBA::Edges) || self.data.is_a?(RBA::EdgePairs) || raise("Requires an edge or edge pair layer")
+    def requires_edges_or_edge_pairs(name = nil)
+      self.data.is_a?(RBA::Edges) || self.data.is_a?(RBA::EdgePairs) || raise(name ? "#{name} requires an edge or edge pair layer" : "Requires an edge or edge pair layer")
     end
     
-    def requires_edges_or_region
-      self.data.is_a?(RBA::Edges) || self.data.is_a?(RBA::Region) || raise("Requires an edge or polygon layer")
+    def requires_edges_or_region(name = nil)
+      self.data.is_a?(RBA::Edges) || self.data.is_a?(RBA::Region) || raise(name ? "#{name} requires an edge or polygon layer" : "Requires an edge or polygon layer")
     end
     
-    def requires_edges_texts_or_region
-      self.data.is_a?(RBA::Edges) || self.data.is_a?(RBA::Region) || self.data.is_a?(RBA::Texts) || raise("Requires an edge, text or polygon layer")
+    def requires_edges_texts_or_region(name = nil)
+      self.data.is_a?(RBA::Edges) || self.data.is_a?(RBA::Region) || self.data.is_a?(RBA::Texts) || raise(name ? "#{name} requires an edge, text or polygon layer" : "Requires an edge, text or polygon layer")
     end
     
     def requires_same_type(other)

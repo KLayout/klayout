@@ -58,6 +58,7 @@ SOURCES = \
   dbLog.cc \
   dbManager.cc \
   dbMatrix.cc \
+  dbMeasureEval.cc \
   dbMemStatistics.cc \
   dbMutableEdgePairs.cc \
   dbMutableEdges.cc \
@@ -296,6 +297,7 @@ HEADERS = \
   dbLog.h \
   dbManager.h \
   dbMatrix.h \
+  dbMeasureEval.h \
   dbMemStatistics.h \
   dbMetaInfo.h \
   dbMutableEdgePairs.h \
@@ -432,6 +434,7 @@ HEADERS = \
   dbNetShape.h \
   dbShapeCollection.h \
   dbShapeCollectionUtils.h \
+  gsiDeclDbMeasureHelpers.h \
   gsiDeclDbPropertiesSupport.h
 
 RESOURCES = \

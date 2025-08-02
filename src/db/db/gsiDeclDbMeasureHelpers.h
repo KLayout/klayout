@@ -23,13 +23,9 @@
 #ifndef HDR_gsiDeclDbMeasureHelpers
 #define HDR_gsiDeclDbMeasureHelpers
 
-#include "dbRegion.h"
-#include "dbEdges.h"
-#include "dbEdgePairs.h"
-#include "dbTexts.h"
+#include "dbMeasureEval.h"
 #include "dbRegionUtils.h"
 #include "dbEdgesUtils.h"
-#include "tlExpression.h"
 #include "gsiClassBase.h"
 #include "gsiDeclDbContainerHelpers.h"
 
@@ -38,76 +34,6 @@ namespace gsi
 
 // -------------------------------------------------------------------------------------
 //  Some utilities
-
-/**
- *  @brief An evaluation context for the expressions
- *
- *  This class provides the methods, functions and variables for the expressions.
- */
-class DB_PUBLIC MeasureEval
-  : public tl::Eval
-{
-public:
-  MeasureEval (double dbu, bool with_put);
-
-  void init ();
-
-  void reset_shape () const;
-  void set_shape (const db::Polygon *poly) const;
-  void set_shape (const db::PolygonRef *poly) const;
-  void set_shape (const db::Edge *edge) const;
-  void set_shape (const db::EdgePair *edge_pair) const;
-  void set_shape (const db::Text *text) const;
-  void set_prop_id (db::properties_id_type prop_id) const;
-
-  db::PropertiesSet &prop_set_out () const
-  {
-    return m_prop_set_out;
-  }
-
-protected:
-  virtual void resolve_name (const std::string &name, const tl::EvalFunction *&function, const tl::Variant *&value, tl::Variant *&var);
-
-private:
-  friend class ShapeFunction;
-  friend class ValueFunction;
-  friend class ValuesFunction;
-  friend class PropertyFunction;
-  friend class PutFunction;
-
-  union ShapeRef
-  {
-    const db::Polygon *poly;
-    const db::PolygonRef *poly_ref;
-    const db::Edge *edge;
-    const db::EdgePair *edge_pair;
-    const db::Text *text;
-    void *any;
-  };
-
-  enum ShapeType
-  {
-    None,
-    Polygon,
-    PolygonRef,
-    Edge,
-    EdgePair,
-    Text
-  };
-
-  mutable ShapeType m_shape_type;
-  mutable ShapeRef mp_shape;
-  mutable db::properties_id_type m_prop_id;
-  mutable db::PropertiesSet m_prop_set_out;
-  double m_dbu;
-  bool m_with_put;
-
-  tl::Variant shape_func () const;
-  tl::Variant value_func (db::property_names_id_type name_id) const;
-  tl::Variant value_func (const tl::Variant &name) const;
-  tl::Variant values_func (const tl::Variant &name) const;
-  void put_func (const tl::Variant &name, const tl::Variant &value) const;
-};
 
 inline db::RecursiveShapeIterator
 begin_iter (const db::Region *region)
@@ -224,7 +150,7 @@ public:
   }
 
 public:
-  MeasureEval m_eval;
+  db::MeasureEval m_eval;
   std::vector<std::pair<db::property_names_id_type, tl::Expression> > m_expressions;
   bool m_copy_properties;
   std::map<tl::Variant, std::string> m_expression_strings;
@@ -274,7 +200,7 @@ public:
   }
 
 public:
-  MeasureEval m_eval;
+  db::MeasureEval m_eval;
   tl::Expression m_expression;
   bool m_inverse;
   std::string m_expression_string;

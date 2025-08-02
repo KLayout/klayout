@@ -34,6 +34,7 @@
 #include "dbLayoutToNetlistSoftConnections.h"
 #include "dbShapeProcessor.h"
 #include "dbNetlistDeviceClasses.h"
+#include "dbMeasureEval.h"
 #include "dbLog.h"
 #include "tlGlobPattern.h"
 
@@ -1772,20 +1773,20 @@ public:
 
 }
 
-static void
-compute_area_and_perimeter_of_net_shapes (const db::hier_clusters<db::NetShape> &clusters, db::cell_index_type ci, size_t cid, unsigned int layer_id, db::Polygon::area_type &area, db::Polygon::perimeter_type &perimeter)
+void
+LayoutToNetlist::compute_area_and_perimeter_of_net_shapes (db::cell_index_type ci, size_t cid, unsigned int layer_id, db::Polygon::area_type &area, db::Polygon::perimeter_type &perimeter) const
 {
   db::EdgeProcessor ep;
 
   //  count vertices and reserve space
   size_t n = 0;
-  for (db::recursive_cluster_shape_iterator<db::NetShape> rci (clusters, layer_id, ci, cid); !rci.at_end (); ++rci) {
+  for (db::recursive_cluster_shape_iterator<db::NetShape> rci (m_net_clusters, layer_id, ci, cid); !rci.at_end (); ++rci) {
     n += rci->polygon_ref ().vertices ();
   }
   ep.reserve (n);
 
   size_t p = 0;
-  for (db::recursive_cluster_shape_iterator<db::NetShape> rci (clusters, layer_id, ci, cid); !rci.at_end (); ++rci) {
+  for (db::recursive_cluster_shape_iterator<db::NetShape> rci (m_net_clusters, layer_id, ci, cid); !rci.at_end (); ++rci) {
     ep.insert_with_trans (rci->polygon_ref (), rci.trans (), ++p);
   }
 
@@ -1798,49 +1799,24 @@ compute_area_and_perimeter_of_net_shapes (const db::hier_clusters<db::NetShape> 
   perimeter = ap_collector.perimeter ();
 }
 
-namespace {
-
-class AntennaShapeGenerator
-  : public PolygonSink
+db::Point
+LayoutToNetlist::get_merged_shapes_of_net (db::cell_index_type ci, size_t cid, unsigned int layer_id, db::Shapes &shapes, db::properties_id_type prop_id) const
 {
-public:
-  AntennaShapeGenerator (db::Layout *layout, db::Shapes &shapes, db::properties_id_type prop_id)
-    : PolygonSink (), mp_layout (layout), mp_shapes (&shapes), m_prop_id (prop_id)
-  { }
+  const db::Layout *layout = &dss ().const_layout (m_layout_index);
 
-  virtual void put (const db::Polygon &polygon)
-  {
-    if (m_prop_id != 0) {
-      mp_shapes->insert (db::PolygonRefWithProperties (db::PolygonRef (polygon, mp_layout->shape_repository ()), m_prop_id));
-    } else {
-      mp_shapes->insert (db::PolygonRef (polygon, mp_layout->shape_repository ()));
-    }
-  }
-
-private:
-  db::Layout *mp_layout;
-  db::Shapes *mp_shapes;
-  db::properties_id_type m_prop_id;
-};
-
-}
-
-static db::Point
-get_merged_shapes_of_net (const db::hier_clusters<db::NetShape> &clusters, db::cell_index_type ci, size_t cid, unsigned int layer_id, db::Layout *layout, db::Shapes &shapes, db::properties_id_type prop_id)
-{
   db::Point ref;
   bool any_ref = false;
   db::EdgeProcessor ep;
 
   //  count vertices and reserve space
   size_t n = 0;
-  for (db::recursive_cluster_shape_iterator<db::NetShape> rci (clusters, layer_id, ci, cid); !rci.at_end (); ++rci) {
+  for (db::recursive_cluster_shape_iterator<db::NetShape> rci (m_net_clusters, layer_id, ci, cid); !rci.at_end (); ++rci) {
     n += rci->polygon_ref ().vertices ();
   }
   ep.reserve (n);
 
   size_t p = 0;
-  for (db::recursive_cluster_shape_iterator<db::NetShape> rci (clusters, layer_id, ci, cid); !rci.at_end (); ++rci) {
+  for (db::recursive_cluster_shape_iterator<db::NetShape> rci (m_net_clusters, layer_id, ci, cid); !rci.at_end (); ++rci) {
     db::PolygonRef pr = rci->polygon_ref ();
     db::PolygonRef::polygon_edge_iterator e = pr.begin_edge ();
     if (! e.at_end ()) {
@@ -1854,7 +1830,7 @@ get_merged_shapes_of_net (const db::hier_clusters<db::NetShape> &clusters, db::c
     }
   }
 
-  db::AntennaShapeGenerator sg (layout, shapes, prop_id);
+  db::PolygonRefToShapesGenerator sg (const_cast<db::Layout *> (layout), &shapes, prop_id);
   db::PolygonGenerator pg (sg, false);
   db::SimpleMerge op;
   ep.process (pg, op);
@@ -1968,7 +1944,7 @@ db::Region LayoutToNetlist::antenna_check (const db::Region &gate, double gate_a
         db::Polygon::area_type adiode_int = 0;
         db::Polygon::perimeter_type pdiode_int = 0;
 
-        compute_area_and_perimeter_of_net_shapes (m_net_clusters, *cid, *c, layer_of (*d->first), adiode_int, pdiode_int);
+        compute_area_and_perimeter_of_net_shapes (*cid, *c, layer_of (*d->first), adiode_int, pdiode_int);
 
         adiodes_int.push_back (adiode_int);
 
@@ -1987,7 +1963,7 @@ db::Region LayoutToNetlist::antenna_check (const db::Region &gate, double gate_a
         db::Polygon::area_type agate_int = 0;
         db::Polygon::perimeter_type pgate_int = 0;
 
-        compute_area_and_perimeter_of_net_shapes (m_net_clusters, *cid, *c, layer_of (gate), agate_int, pgate_int);
+        compute_area_and_perimeter_of_net_shapes (*cid, *c, layer_of (gate), agate_int, pgate_int);
 
         double agate = 0.0;
         if (fabs (gate_area_factor) > 1e-6) {
@@ -2002,7 +1978,7 @@ db::Region LayoutToNetlist::antenna_check (const db::Region &gate, double gate_a
           db::Polygon::area_type ametal_int = 0;
           db::Polygon::perimeter_type pmetal_int = 0;
 
-          compute_area_and_perimeter_of_net_shapes (m_net_clusters, *cid, *c, layer_of (metal), ametal_int, pmetal_int);
+          compute_area_and_perimeter_of_net_shapes (*cid, *c, layer_of (metal), ametal_int, pmetal_int);
 
           double ametal = 0.0;
           if (fabs (metal_area_factor) > 1e-6) {
@@ -2041,7 +2017,7 @@ db::Region LayoutToNetlist::antenna_check (const db::Region &gate, double gate_a
               prop_id = db::properties_id (ps);
             }
 
-            db::Point ref = get_merged_shapes_of_net (m_net_clusters, *cid, *c, layer_of (metal), &ly, shapes, prop_id);
+            db::Point ref = get_merged_shapes_of_net (*cid, *c, layer_of (metal), shapes, prop_id);
 
             if (values) {
 
@@ -2078,6 +2054,61 @@ db::Region LayoutToNetlist::antenna_check (const db::Region &gate, double gate_a
   return db::Region (new db::DeepRegion (dl));
 }
 
+db::Region
+LayoutToNetlist::measure_net (const db::Region &primary, const std::map<std::string, const db::Region *> &secondary, const std::string &expression)
+{
+  //  TODO: that's basically too much .. we only need the clusters
+  if (! m_netlist_extracted) {
+    throw tl::Exception (tl::to_string (tr ("The netlist has not been extracted yet")));
+  }
+
+  db::Layout &ly = dss ().layout (m_layout_index);
+  double dbu = ly.dbu ();
+
+  db::DeepLayer dl (&dss (), m_layout_index, ly.insert_layer ());
+
+  for (db::Layout::bottom_up_const_iterator cid = ly.begin_bottom_up (); cid != ly.end_bottom_up (); ++cid) {
+
+    const connected_clusters<db::NetShape> &clusters = m_net_clusters.clusters_per_cell (*cid);
+    if (clusters.empty ()) {
+      continue;
+    }
+
+    db::MeasureNetEval eval (this, dbu);
+
+    eval.set_primary_layer (layer_of (primary));
+    for (auto s = secondary.begin (); s != secondary.end (); ++s) {
+      if (s->second) {
+        eval.set_secondary_layer (s->first, layer_of (*s->second));
+      }
+    }
+
+    eval.init ();
+
+    tl::Extractor ex (expression.c_str ());
+    tl::Expression compiled_expr;
+    eval.parse (compiled_expr, ex);
+
+    for (connected_clusters<db::NetShape>::all_iterator c = clusters.begin_all (); ! c.at_end (); ++c) {
+
+      if (! clusters.is_root (*c)) {
+        continue;
+      }
+
+      eval.reset (*cid, *c);
+      compiled_expr.execute ();
+
+      if (! eval.skip ()) {
+        db::Shapes &shapes = ly.cell (*cid).shapes (dl.layer ());
+        get_merged_shapes_of_net (*cid, *c, layer_of (primary), shapes, db::properties_id (eval.prop_set_out ()));
+      }
+
+    }
+
+  }
+
+  return db::Region (new db::DeepRegion (dl));
+}
 
 void LayoutToNetlist::save (const std::string &path, bool short_format)
 {

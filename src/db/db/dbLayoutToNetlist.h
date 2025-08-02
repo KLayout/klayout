@@ -1127,6 +1127,30 @@ public:
   db::Region antenna_check (const db::Region &gate, double gate_area_factor, double gate_perimeter_factor, const db::Region &metal, double metal_area_factor, double metal_perimeter_factor, double ratio, const std::vector<std::pair<const db::Region *, double> > &diodes = std::vector<std::pair<const db::Region *, double> > (), Texts *values = 0);
 
   /**
+   *  @brief Runs a generic net measurement function
+   *
+   *  This method accepts some primary layer, a number of secondary layers with names and an expression.
+   *
+   *  It will look at nets connecting to shapes on the primary layer and execute the expression for each
+   *  of those nets. After that it will copy the primary shapes of the net to the output with the properties
+   *  placed by "put" attached to them.
+   *
+   *  It is possible to skip primary shapes of a specific net by calling the "skip" function with a "true"
+   *  value.
+   *
+   *  The formulas may use the following functions:
+   *
+   *  * "area": the area of all primary-layer shapes on the net in square um
+   *  * "area(name)": the area of all secondary-layer shapes. 'name' is a symbol with the name given in the secondary-layer map
+   *  * "perimeter": the perimeter of the primary-layer shapes on the net in um
+   *  * "perimeter(name)": the perimeter of the secondary-layer shapes. 'name' is a symbol with the name given in the secondary-layer map
+   *  * "put(name, value)": places the value as property 'name' on the output shapes
+   *  * "skip(flag)": will skip the primary shapes of that net when called with a true value
+   *  * "net_name": the name of the net
+   */
+  db::Region measure_net (const db::Region &primary, const std::map<std::string, const db::Region *> &secondary, const std::string &expression);
+
+  /**
    *  @brief Saves the database to the given path
    *
    *  Currently, the internal format will be used. If "short_format" is true, the short version
@@ -1169,6 +1193,16 @@ public:
   {
     m_make_soft_connection_diodes = f;
   }
+
+  /**
+   *  @brief Utility: computes the area and perimeter of a net's shapes
+   */
+  void compute_area_and_perimeter_of_net_shapes (db::cell_index_type ci, size_t cid, unsigned int layer_id, db::Polygon::area_type &area, db::Polygon::perimeter_type &perimeter) const;
+
+  /**
+   *  @brief Utility: computes the merged shapes of a net
+   */
+  db::Point get_merged_shapes_of_net (db::cell_index_type ci, size_t cid, unsigned int layer_id, db::Shapes &shapes, db::properties_id_type prop_id) const;
 
 private:
   //  no copying

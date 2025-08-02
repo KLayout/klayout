@@ -1774,6 +1774,16 @@ See also <a href="#select_props">select_props</a> and <a href="#remove_props">re
 Like <a href="#merged">merged</a>, but modifies the input and returns a reference to the 
 new layer.
 </p>
+<a name="merge_props"/><h2>"merge_props" - Merges the layer and joins the properties (modifies the layer)</h2>
+<keyword name="merge_props"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.merge_props([overlap_count])</tt></li>
+</ul>
+<p>
+Like <a href="#merged_props">merged_props</a>, but modifies the input and returns a reference to the 
+new layer.
+</p>
 <a name="merged"/><h2>"merged" - Returns the merged layer</h2>
 <keyword name="merged"/>
 <p>Usage:</p>
@@ -1804,6 +1814,26 @@ The following images show the effect of various forms of the "merged" method:
 <td><img src="/images/drc_merged4.png"/></td>
 </tr>
 </table>
+</p>
+<a name="merged_props"/><h2>"merged_props" - Merges and joins properties of the shapes</h2>
+<keyword name="merged_props"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.merged_props([overlap_count])</tt></li>
+</ul>
+<p>
+Returns the merged input. Unlike the plain <a href="#merged">merged</a> method, this version
+will join properties on merged shapes. Properties with the same name
+will be merged by computing the maximum value of the parts.
+</p><p>
+For example:
+Properties <tt>{ "A" =&gt; 17, "C" =&gt; 2.5 } </tt>merged with <tt>{ "A" =&gt; 1, "B" =&gt; "a text" } </tt>will give 
+<tt>{ "A" =&gt; 17, "B" =&gt; "a text", "C" =&gt; 2.5 } </tt>.
+</p><p>
+The plain <a href="#merged">merged</a> method will treat shapes with different properties as
+separate entities and will not merge them.
+</p><p>
+Currently, this method is available for polygon layers only.
 </p>
 <a name="middle"/><h2>"middle" - Returns the center points of the bounding boxes of the polygons</h2>
 <keyword name="middle"/>

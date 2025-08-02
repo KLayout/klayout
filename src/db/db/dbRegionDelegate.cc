@@ -33,7 +33,7 @@ RegionDelegate::RegionDelegate ()
   m_base_verbosity = 30;
   m_report_progress = false;
   m_merged_semantics = true;
-  m_join_properties_on_merge = true;
+  m_join_properties_on_merge = false;
   m_strict_handling = false;
   m_merge_min_coherence = false;
 }

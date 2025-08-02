@@ -2003,3 +2003,13 @@ TEST(140d_target_modification)
 {
   run_test (_this, "140", true);
 }
+
+TEST(141_merge_properties)
+{
+  run_test (_this, "141", false);
+}
+
+TEST(141d_merge_properties)
+{
+  run_test (_this, "141", true);
+}

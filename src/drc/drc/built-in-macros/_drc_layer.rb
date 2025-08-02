@@ -5103,18 +5103,66 @@ CODE
     # Like \merged, but modifies the input and returns a reference to the 
     # new layer.
     
-    def merged(*args)
+    def merged(overlap_count = 1)
       @engine._context("merged") do
         requires_edges_or_region
-        aa = args.collect { |a| @engine._prep_value(a) }
+        aa = [ @engine._prep_value(overlap_count) ]
         DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :merged, *aa))
       end
     end
     
-    def merge(*args)
+    def merge(overlap_count = 1)
       @engine._context("merge") do
         requires_edges_or_region
-        aa = args.collect { |a| @engine._prep_value(a) }
+        aa = [ @engine._prep_value(overlap_count) ]
+        if @engine.is_tiled?
+          # in tiled mode, no modifying versions are available
+          self.data = @engine._tcmd(self.data, 0, self.data.class, :merged, *aa)
+        else
+          @engine._tcmd(self.data, 0, self.data.class, :merge, *aa)
+        end
+        self
+      end
+    end
+    
+    # %DRC%
+    # @name merged_props
+    # @brief Merges and joins properties of the shapes
+    # @synopsis layer.merged_props([overlap_count])
+    #
+    # Returns the merged input. Unlike the plain \merged method, this version
+    # will join properties on merged shapes. Properties with the same name
+    # will be merged by computing the maximum value of the parts.
+    #
+    # For example:
+    # Properties @tt { "A" => 17, "C" => 2.5 } @/tt merged with @tt { "A" => 1, "B" => "a text" } @/tt will give 
+    # @tt { "A" => 17, "B" => "a text", "C" => 2.5 } @/tt.
+    #
+    # The plain \merged method will treat shapes with different properties as
+    # separate entities and will not merge them.
+    #
+    # Currently, this method is available for polygon layers only.
+    
+    # %DRC%
+    # @name merge_props
+    # @brief Merges the layer and joins the properties (modifies the layer)
+    # @synopsis layer.merge_props([overlap_count])
+    #
+    # Like \merged_props, but modifies the input and returns a reference to the 
+    # new layer.
+    
+    def merged_props(overlap_count = 1)
+      @engine._context("merged") do
+        requires_region
+        aa = [ self.data.min_coherence, @engine._prep_value(overlap_count), true ]
+        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :merged, *aa))
+      end
+    end
+    
+    def merge_props(overlap_count = 1)
+      @engine._context("merge") do
+        requires_region
+        aa = [ self.data.min_coherence, @engine._prep_value(overlap_count), true ]
         if @engine.is_tiled?
           # in tiled mode, no modifying versions are available
           self.data = @engine._tcmd(self.data, 0, self.data.class, :merged, *aa)

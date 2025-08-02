@@ -2151,6 +2151,8 @@ TEST(40_BoolWithProperties)
   db::RecursiveShapeIterator si1 (ly, top_cell, l1);
   si1.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
   db::Region r1 (si1, dss);
+  EXPECT_EQ (r1.join_properties_on_merge (), false);
+  r1.set_join_properties_on_merge (true);
   EXPECT_EQ (r1.join_properties_on_merge (), true);
   r1.set_join_properties_on_merge (false);
   EXPECT_EQ (r1.join_properties_on_merge (), false);

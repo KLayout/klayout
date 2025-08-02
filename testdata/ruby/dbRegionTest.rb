@@ -1637,12 +1637,12 @@ class DBRegion_TestClass < TestBase
     s = r.each.collect(&:to_s).join(";")
     assert_equal(s, "(10,20;10,220;110,220;110,20) props={};(0,0;0,200;100,200;100,0) props={1=>one}")
     rr = r.dup
-    rr.join_properties_on_merge = false
-    assert_equal(rr.join_properties_on_merge, false)
+    rr.join_properties_on_merge = true
+    assert_equal(rr.join_properties_on_merge, true)
     s = rr.each_merged.collect(&:to_s).join(";")
-    assert_equal(s, "(10,20;10,220;110,220;110,20) props={};(0,0;0,200;100,200;100,0) props={1=>one}")
-    s = r.each_merged.collect(&:to_s).join(";")
     assert_equal(s, "(0,0;0,200;10,200;10,220;110,220;110,20;100,20;100,0) props={1=>one}")
+    s = r.each_merged.collect(&:to_s).join(";")
+    assert_equal(s, "(10,20;10,220;110,220;110,20) props={};(0,0;0,200;100,200;100,0) props={1=>one}")
 
     r = RBA::Region::new
     r.insert(RBA::BoxWithProperties::new(RBA::Box::new(0, 0, 100, 200), { 1 => "one" }))

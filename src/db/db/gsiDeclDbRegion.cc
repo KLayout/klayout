@@ -1059,9 +1059,9 @@ static void break_polygons (db::Region *r, size_t max_vertex_count, double max_a
   r->process (db::PolygonBreaker (max_vertex_count, max_area_ratio));
 }
 
-static db::Region &merge_ext1 (db::Region *r, int min_wc, bool jpm)
+static db::Region &merge_ext1 (db::Region *r, int min_wc)
 {
-  r->merge (false, std::max (0, min_wc - 1), jpm);
+  r->merge (false, std::max (0, min_wc - 1));
   return *r;
 }
 
@@ -1071,9 +1071,9 @@ static db::Region &merge_ext2 (db::Region *r, bool min_coherence, int min_wc, bo
   return *r;
 }
 
-static db::Region merged_ext1 (db::Region *r, int min_wc, bool jpm)
+static db::Region merged_ext1 (db::Region *r, int min_wc)
 {
-  return r->merged (false, std::max (0, min_wc - 1), jpm);
+  return r->merged (false, std::max (0, min_wc - 1));
 }
 
 static db::Region merged_ext2 (db::Region *r, bool min_coherence, int min_wc, bool jpm)
@@ -1747,14 +1747,13 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   method ("join_properties_on_merge=", &db::Region::set_join_properties_on_merge, gsi::arg ("f"),
     "@brief Sets a flag indication whether to join properties on merge\n"
     "\n"
-    "When this flag is set to true (the default), properties are joined on 'merge'.\n"
+    "When this flag is set to true, properties are joined on 'merge'.\n"
     "That is: shapes merging into bigger shapes will have their properties joined.\n"
-    "With the flag set to false, 'merge' will not join properties and return merged\n"
+    "With the flag set to false (the default), 'merge' will not join properties and return merged\n"
     "shapes only if the sub-shapes have the same properties - i.e. properties form\n"
     "different classes on merge.\n"
     "\n"
-    "This attribute has been introduced in version 0.30.3. The default has changed from 'don't join properties' to "
-    "'join properties' in that version."
+    "This attribute has been introduced in version 0.30.3."
   ) +
   method ("join_properties_on_merge?", &db::Region::join_properties_on_merge,
     "@brief Gets a flag indication whether to join properties on merge\n"
@@ -2398,13 +2397,13 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@return The region after it has been merged (self).\n"
     "\n"
     "Merging removes overlaps and joins touching polygons.\n"
-    "If the region is already merged, this method does nothing\n"
+    "If the region is already merged, this method does nothing.\n"
+    "This method will behave according to the settings of the \\min_coherence and \\join_properties_on_merge attributes."
   ) +
-  method_ext ("merge", &merge_ext1, gsi::arg ("min_wc"), gsi::arg ("join_properties_on_merge", true),
+  method_ext ("merge", &merge_ext1, gsi::arg ("min_wc"),
     "@brief Merge the region with options\n"
     "\n"
     "@param min_wc Overlap selection\n"
-    "@param join_properties_on_merge See below\n"
     "@return The region after it has been merged (self).\n"
     "\n"
     "Merging removes overlaps and joins touching polygons.\n"
@@ -2412,16 +2411,9 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "polygons overlap. The value specifies the number of polygons that need to overlap. A value of 2 "
     "means that output is only produced if two or more polygons overlap.\n"
     "\n"
-    "The 'join_properties_on_merge' argument indicates how properties should be handled: if true, "
-    "the properties of the constituents are joined and attached to the merged shape. If false, "
-    "only shapes with the same properties are merged - i.e. different properties form shape classes "
-    "that are merged individually.\n"
-    "\n"
-    "This method is equivalent to \"merge(false, min_wc, join_properties_on_merge).\n"
-    "\n"
-    "'join_properties_on_merge' has been added in version 0.30.3."
+    "This method is equivalent to \"merge(false, min_wc, false).\n"
   ) +
-  method_ext ("merge", &merge_ext2, gsi::arg ("min_coherence"), gsi::arg ("min_wc"), gsi::arg ("join_properties_on_merge", true),
+  method_ext ("merge", &merge_ext2, gsi::arg ("min_coherence"), gsi::arg ("min_wc"), gsi::arg ("join_properties_on_merge", false),
     "@brief Merge the region with options\n"
     "\n"
     "@param min_coherence A flag indicating whether the resulting polygons shall have minimum coherence\n"
@@ -2449,24 +2441,24 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merging removes overlaps and joins touching polygons.\n"
     "If the region is already merged, this method does nothing.\n"
+    "This method will behave according to the settings of the \\min_coherence and \\join_properties_on_merge attributes.\n"
     "In contrast to \\merge, this method does not modify the region but returns a merged copy.\n"
   ) +
-  method_ext ("merged", &merged_ext1, gsi::arg ("min_wc"), gsi::arg ("join_properties_on_merge", true),
+  method_ext ("merged", &merged_ext1, gsi::arg ("min_wc"),
     "@brief Returns the merged region (with options)\n"
     "\n"
     "@param min_wc Overlap selection\n"
-    "@param join_properties_on_merge See below\n"
     "@return The region after it has been merged.\n"
     "\n"
     "This version provides one additional options: \"min_wc\" controls whether output is only produced if multiple "
     "polygons overlap. The value specifies the number of polygons that need to overlap. A value of 2 "
     "means that output is only produced if two or more polygons overlap.\n"
     "\n"
-    "This method is equivalent to \"merged(false, min_wc, join_properties_on_merge)\".\n"
+    "This method is equivalent to \"merged(false, min_wc, false)\".\n"
     "\n"
     "In contrast to \\merge, this method does not modify the region but returns a merged copy.\n"
   ) +
-  method_ext ("merged", &merged_ext2, gsi::arg ("min_coherence"), gsi::arg ("min_wc"), gsi::arg ("join_properties_on_merge", true),
+  method_ext ("merged", &merged_ext2, gsi::arg ("min_coherence"), gsi::arg ("min_wc"), gsi::arg ("join_properties_on_merge", false),
     "@brief Returns the merged region (with options)\n"
     "\n"
     "@param min_coherence A flag indicating whether the resulting polygons shall have minimum coherence\n"

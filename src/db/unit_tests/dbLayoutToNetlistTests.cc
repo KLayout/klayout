@@ -3388,3 +3388,75 @@ TEST(14_JoinNets)
   db::compare_layouts (_this, ly, au);
 }
 
+TEST(15_MeasureNet)
+{
+  db::Layout ly;
+  db::LayerMap lmap;
+
+  unsigned int l1 = define_layer (ly, lmap, 1);
+  unsigned int l2 = define_layer (ly, lmap, 2);
+  unsigned int l3 = define_layer (ly, lmap, 3);
+  unsigned int l4 = define_layer (ly, lmap, 4);
+  unsigned int l5 = define_layer (ly, lmap, 5);
+
+  {
+    db::LoadLayoutOptions options;
+    options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
+    options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
+
+    std::string fn (tl::testdata ());
+    fn = tl::combine_path (fn, "algo");
+    fn = tl::combine_path (fn, "measure_net.gds");
+
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly, options);
+  }
+
+  db::Cell &tc = ly.cell (*ly.begin_top_down ());
+  db::LayoutToNetlist l2n (db::RecursiveShapeIterator (ly, tc, std::set<unsigned int> ()));
+
+  std::unique_ptr<db::Region> rl1 (l2n.make_layer (l1, "l1"));
+  std::unique_ptr<db::Region> rl2 (l2n.make_layer (l2, "l2"));
+  std::unique_ptr<db::Region> rl3 (l2n.make_layer (l3, "l3"));
+  std::unique_ptr<db::Region> rl4 (l2n.make_layer (l4, "l4"));
+  std::unique_ptr<db::Region> rl5 (l2n.make_layer (l5, "l5"));
+
+  //  net extraction
+
+  //  Intra-layer
+  l2n.connect (*rl1);
+  l2n.connect (*rl2);
+  l2n.connect (*rl3);
+  l2n.connect (*rl4);
+  l2n.connect (*rl5);
+  //  Inter-layer
+  l2n.connect (*rl1, *rl2);
+  l2n.connect (*rl2, *rl3);
+  l2n.connect (*rl3, *rl4);
+  l2n.connect (*rl4, *rl5);
+
+  l2n.extract_netlist ();
+
+  //  measure area ratio
+
+  std::map<std::string, const db::Region *> secondary;
+  secondary["l2"] = rl2.get ();
+  secondary["l3"] = rl3.get ();
+  secondary["l4"] = rl4.get ();
+  secondary["l5"] = rl5.get ();
+
+  db::Region l1_measured = l2n.measure_net (*rl1, secondary, "put('AREA5', area(l5)); put('AREA', area); put('AR', area(l5)/area)", std::map<std::string, tl::Variant> ());
+
+  unsigned int l100 = ly.get_layer (db::LayerProperties (100, 0));
+  l1_measured.insert_into (&ly, tc.cell_index (), l100);
+
+  //  compare the collected test data
+
+  std::string au = tl::testdata ();
+  au = tl::combine_path (au, "algo");
+  au = tl::combine_path (au, "measure_net_au.oas");
+
+  db::compare_layouts (_this, ly, au, db::NoNormalization);
+}
+

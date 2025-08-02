@@ -385,8 +385,8 @@ public:
 
   virtual void execute (const tl::ExpressionParserContext &context, tl::Variant &out, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> * /*kwargs*/) const
   {
-    if (args.size () != 1) {
-      throw tl::EvalError (tl::to_string (tr ("'net' function does not take and argument")), context);
+    if (args.size () != 0) {
+      throw tl::EvalError (tl::to_string (tr ("'net' function does not take any argument")), context);
     }
     out = mp_eval->net_func ();
   }

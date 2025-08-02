@@ -3451,6 +3451,18 @@ TEST(15_MeasureNet)
   unsigned int l100 = ly.get_layer (db::LayerProperties (100, 0));
   l1_measured.insert_into (&ly, tc.cell_index (), l100);
 
+  std::map<std::string, tl::Variant> vars;
+  vars["athr"] = 40.0;
+  db::Region l2_skipped = l2n.measure_net (*rl1, secondary, "skip(area < athr)", vars);
+
+  unsigned int l101 = ly.get_layer (db::LayerProperties (101, 0));
+  l2_skipped.insert_into (&ly, tc.cell_index (), l101);
+
+  db::Region l3_net_func = l2n.measure_net (*rl1, secondary, "put('NAME', net.name)", std::map<std::string, tl::Variant> ());
+
+  unsigned int l102 = ly.get_layer (db::LayerProperties (102, 0));
+  l3_net_func.insert_into (&ly, tc.cell_index (), l102);
+
   //  compare the collected test data
 
   std::string au = tl::testdata ();

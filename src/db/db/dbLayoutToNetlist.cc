@@ -2085,6 +2085,7 @@ LayoutToNetlist::measure_net (const db::Region &primary, const std::map<std::str
   eval.parse (compiled_expr, ex);
 
   db::DeepLayer dl (&dss (), m_layout_index, ly.insert_layer ());
+  unsigned int primary_layer = layer_of (primary);
 
   for (db::Layout::bottom_up_const_iterator cid = ly.begin_bottom_up (); cid != ly.end_bottom_up (); ++cid) {
 
@@ -2099,12 +2100,17 @@ LayoutToNetlist::measure_net (const db::Region &primary, const std::map<std::str
         continue;
       }
 
+      //  skip nets without shapes on primary layer
+      if (db::recursive_cluster_shape_iterator<db::NetShape> (m_net_clusters, primary_layer, *cid, *c).at_end ()) {
+        continue;
+      }
+
       eval.reset (*cid, *c);
       compiled_expr.execute ();
 
       if (! eval.skip ()) {
         db::Shapes &shapes = ly.cell (*cid).shapes (dl.layer ());
-        get_merged_shapes_of_net (*cid, *c, layer_of (primary), shapes, db::properties_id (eval.prop_set_out ()));
+        get_merged_shapes_of_net (*cid, *c, primary_layer, shapes, db::properties_id (eval.prop_set_out ()));
       }
 
     }

@@ -90,7 +90,7 @@ static gsi::EdgePairFilterBase *make_pg (const tl::Variant &name, const std::str
   return new EdgePairPropertiesFilter (name, pattern, inverse);
 }
 
-static gsi::EdgePairFilterBase *make_pe (const std::string &expression, bool inverse, double dbu, const std::map<std::string, tl::Variant> &variables)
+static gsi::EdgePairFilterBase *make_pe (const std::string &expression, bool inverse, const std::map<std::string, tl::Variant> &variables, double dbu)
 {
   return new gsi::expression_filter<gsi::EdgePairFilterBase, db::EdgePairs> (expression, inverse, dbu, variables);
 }
@@ -136,7 +136,7 @@ Class<gsi::EdgePairFilterBase> decl_EdgePairFilterBase ("db", "EdgePairFilterBas
     "\n"
     "This feature has been introduced in version 0.30."
   ) +
-  gsi::constructor ("expression_filter", &make_pe, gsi::arg ("expression"), gsi::arg ("inverse", false), gsi::arg ("dbu", 0.0), gsi::arg ("variables", std::map<std::string, tl::Variant> (), "{}"),
+  gsi::constructor ("expression_filter", &make_pe, gsi::arg ("expression"), gsi::arg ("inverse", false), gsi::arg ("variables", std::map<std::string, tl::Variant> (), "{}"), gsi::arg ("dbu", 0.0),
     "@brief Creates an expression-based filter\n"
     "@param expression The expression to evaluate.\n"
     "@param inverse If true, inverts the selection - i.e. all edge pairs without a property with the given name and value range are selected.\n"
@@ -257,14 +257,14 @@ Class<shape_processor_impl<db::EdgePairProcessorBase> > decl_EdgePairProcessor (
 
 static
 property_computation_processor<db::EdgePairProcessorBase, db::EdgePairs> *
-new_pcp (const db::EdgePairs *container, const std::map<tl::Variant, std::string> &expressions, bool copy_properties, double dbu, const std::map <std::string, tl::Variant> &variables)
+new_pcp (const db::EdgePairs *container, const std::map<tl::Variant, std::string> &expressions, bool copy_properties, const std::map <std::string, tl::Variant> &variables, double dbu)
 {
   return new property_computation_processor<db::EdgePairProcessorBase, db::EdgePairs> (container, expressions, copy_properties, dbu, variables);
 }
 
 static
 property_computation_processor<db::EdgePairProcessorBase, db::EdgePairs> *
-new_pcps (const db::EdgePairs *container, const std::string &expression, bool copy_properties, double dbu, const std::map <std::string, tl::Variant> &variables)
+new_pcps (const db::EdgePairs *container, const std::string &expression, bool copy_properties, const std::map <std::string, tl::Variant> &variables, double dbu)
 {
   std::map<tl::Variant, std::string> expressions;
   expressions.insert (std::make_pair (tl::Variant (), expression));
@@ -273,7 +273,7 @@ new_pcps (const db::EdgePairs *container, const std::string &expression, bool co
 
 Class<property_computation_processor<db::EdgePairProcessorBase, db::EdgePairs> > decl_EdgePairPropertiesExpressions (decl_EdgePairProcessorBase, "db", "EdgePairPropertiesExpressions",
   property_computation_processor<db::EdgePairProcessorBase, db::EdgePairs>::method_decls (true) +
-  gsi::constructor ("new", &new_pcp, gsi::arg ("edge_pairs"), gsi::arg ("expressions"), gsi::arg ("copy_properties", false), gsi::arg ("dbu", 0.0), gsi::arg ("variables", std::map<std::string, tl::Variant> (), "{}"),
+  gsi::constructor ("new", &new_pcp, gsi::arg ("edge_pairs"), gsi::arg ("expressions"), gsi::arg ("copy_properties", false), gsi::arg ("variables", std::map<std::string, tl::Variant> (), "{}"), gsi::arg ("dbu", 0.0),
     "@brief Creates a new properties expressions operator\n"
     "\n"
     "@param edge_pairs The edge pair collection, the processor will be used on. Can be nil, but if given, allows some optimization.\n"
@@ -282,7 +282,7 @@ Class<property_computation_processor<db::EdgePairProcessorBase, db::EdgePairs> >
     "@param dbu If not zero, this value specifies the database unit to use. If given, the shapes returned by the 'shape' function will be micrometer-unit objects.\n"
     "@param variables Arbitrary values that are available as variables inside the expressions.\n"
   ) +
-  gsi::constructor ("new", &new_pcps, gsi::arg ("edge_pairs"), gsi::arg ("expression"), gsi::arg ("copy_properties", false), gsi::arg ("dbu", 0.0), gsi::arg ("variables", std::map<std::string, tl::Variant> (), "{}"),
+  gsi::constructor ("new", &new_pcps, gsi::arg ("edge_pairs"), gsi::arg ("expression"), gsi::arg ("copy_properties", false), gsi::arg ("variables", std::map<std::string, tl::Variant> (), "{}"), gsi::arg ("dbu", 0.0),
     "@brief Creates a new properties expressions operator\n"
     "\n"
     "@param edge_pairs The edge pair collection, the processor will be used on. Can be nil, but if given, allows some optimization.\n"

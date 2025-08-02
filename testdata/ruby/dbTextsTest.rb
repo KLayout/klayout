@@ -554,11 +554,11 @@ class DBTexts_TestClass < TestBase
     assert_equal(r.to_s, "('T',r0 100,200){1=>42,PropA=>17}")
 
     # replace
-    pr = RBA::TextPropertiesExpressions::new(r, { "X" => "PropA+1", "Y" => "shape.bbox.center.x", "Z" => "value(1)+1" })
+    pr = RBA::TextPropertiesExpressions::new(r, { "X" => "PropA+1", "Y" => "shape.bbox.center.x", "Z" => "value(1)+one" }, variables: { "one" => 1 })
     assert_equal(r.processed(pr).to_s, "('T',r0 100,200){X=>18,Y=>100,Z=>43}")
 
     # replace (with 'put')
-    pr = RBA::TextPropertiesExpressions::new(r, "put('X', PropA+1); put('Y', shape.bbox.center.x); put('Z', value(1)+1)")
+    pr = RBA::TextPropertiesExpressions::new(r, "put('X', PropA+1); put('Y', shape.bbox.center.x); put('Z', value(1)+one)", variables: { "one" => 1 })
     assert_equal(r.processed(pr).to_s, "('T',r0 100,200){X=>18,Y=>100,Z=>43}")
 
     # substitutions
@@ -572,7 +572,7 @@ class DBTexts_TestClass < TestBase
     ef = RBA::TextFilterBase::expression_filter("PropX==18")
     assert_equal(r.filtered(ef).to_s, "")
 
-    ef = RBA::TextFilterBase::expression_filter("PropA==17")
+    ef = RBA::TextFilterBase::expression_filter("PropA==v17", variables: { "v17" => 17 })
     assert_equal(r.filtered(ef).to_s, "('T',r0 100,200){1=>42,PropA=>17}")
 
     ef = RBA::TextFilterBase::expression_filter("value(1)>=40")

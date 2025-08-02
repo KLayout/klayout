@@ -216,9 +216,18 @@ static db::Region antenna_check (db::LayoutToNetlist *l2n, const db::Region &pol
   return antenna_check3 (l2n, poly, 1, 0, metal, 1, 0, ratio, diodes, texts);
 }
 
-static db::Region measure_net (db::LayoutToNetlist *l2n, const db::Region &primary, const std::map<std::string, const db::Region *> &secondary, const std::string &expression, const std::map<std::string, tl::Variant> &variables)
+static db::Region measure_net (db::LayoutToNetlist *l2n, const db::Region &primary, const std::map<std::string, const db::Region *> &secondary, const std::string &expression, const tl::Variant &variables)
 {
-  return l2n->measure_net (primary, secondary, expression, variables);
+  if (! variables.is_array ()) {
+    throw tl::Exception (tl::to_string (tr ("'variables' argument needs to a hash")));
+  }
+
+  std::map<std::string, tl::Variant> variables_map;
+  for (auto v = variables.begin_array (); v != variables.end_array (); ++v) {
+    variables_map [v->first.to_string ()] = v->second;
+  }
+
+  return l2n->measure_net (primary, secondary, expression, variables_map);
 }
 
 static void join_net_names (db::LayoutToNetlist *l2n, const std::string &s)

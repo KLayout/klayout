@@ -1112,11 +1112,11 @@ class DBEdges_TestClass < TestBase
     assert_equal(r.to_s, "(0,0;1000,2000){1=>42,PropA=>17}")
 
     # replace
-    pr = RBA::EdgePropertiesExpressions::new(r, { "X" => "PropA+1", "Y" => "shape.length", "Z" => "value(1)+1" })
+    pr = RBA::EdgePropertiesExpressions::new(r, { "X" => "PropA+1", "Y" => "shape.length", "Z" => "value(1)+one" }, variables: { "one" => 1 })
     assert_equal(r.processed(pr).to_s, "(0,0;1000,2000){X=>18,Y=>2236,Z=>43}")
 
     # replace (with 'put')
-    pr = RBA::EdgePropertiesExpressions::new(r, "put('X', PropA+1); put('Y', shape.length); put('Z', value(1)+1)")
+    pr = RBA::EdgePropertiesExpressions::new(r, "put('X', PropA+1); put('Y', shape.length); put('Z', value(1)+one)", variables: { "one" => 1 })
     assert_equal(r.processed(pr).to_s, "(0,0;1000,2000){X=>18,Y=>2236,Z=>43}")
 
     # substitutions
@@ -1130,7 +1130,7 @@ class DBEdges_TestClass < TestBase
     ef = RBA::EdgeFilterBase::expression_filter("PropX==18")
     assert_equal(r.filtered(ef).to_s, "")
 
-    ef = RBA::EdgeFilterBase::expression_filter("PropA==17")
+    ef = RBA::EdgeFilterBase::expression_filter("PropA==v17", variables: { "v17" => 17 })
     assert_equal(r.filtered(ef).to_s, "(0,0;1000,2000){1=>42,PropA=>17}")
 
     ef = RBA::EdgeFilterBase::expression_filter("value(1)>=40")

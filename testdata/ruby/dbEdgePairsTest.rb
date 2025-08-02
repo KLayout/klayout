@@ -704,11 +704,11 @@ class DBEdgePairs_TestClass < TestBase
     assert_equal(r.to_s, "(0,0;1000,2000)/(-100,200;900,2200){1=>42,PropA=>17}")
 
     # replace
-    pr = RBA::EdgePairPropertiesExpressions::new(r, { "X" => "PropA+1", "Y" => "shape.distance", "Z" => "value(1)+1" })
+    pr = RBA::EdgePairPropertiesExpressions::new(r, { "X" => "PropA+1", "Y" => "shape.distance", "Z" => "value(1)+one" }, variables: { "one" => 1 })
     assert_equal(r.processed(pr).to_s, "(0,0;1000,2000)/(-100,200;900,2200){X=>18,Y=>179,Z=>43}")
 
     # replace (with 'put')
-    pr = RBA::EdgePairPropertiesExpressions::new(r, "put('X', PropA+1); put('Y', shape.distance); put('Z', value(1)+1)")
+    pr = RBA::EdgePairPropertiesExpressions::new(r, "put('X', PropA+1); put('Y', shape.distance); put('Z', value(1)+one)", variables: { "one" => 1 })
     assert_equal(r.processed(pr).to_s, "(0,0;1000,2000)/(-100,200;900,2200){X=>18,Y=>179,Z=>43}")
 
     # substitutions
@@ -722,7 +722,7 @@ class DBEdgePairs_TestClass < TestBase
     ef = RBA::EdgePairFilterBase::expression_filter("PropX==18")
     assert_equal(r.filtered(ef).to_s, "")
 
-    ef = RBA::EdgePairFilterBase::expression_filter("PropA==17")
+    ef = RBA::EdgePairFilterBase::expression_filter("PropA==v17", variables: { "v17" => 17 })
     assert_equal(r.filtered(ef).to_s, "(0,0;1000,2000)/(-100,200;900,2200){1=>42,PropA=>17}")
 
     ef = RBA::EdgePairFilterBase::expression_filter("value(1)>=40")

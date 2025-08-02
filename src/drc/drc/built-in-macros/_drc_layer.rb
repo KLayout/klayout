@@ -5174,6 +5174,179 @@ CODE
     end
     
     # %DRC%
+    # @name evaluate
+    # @brief Evaluate expressions on the shapes of the layer
+    # @synopsis layer.evaluate(expression [, variables])
+    #
+    # Evaluates the given expression on the shapes of the layer.
+    # The expression needs to be written in the KLayout expressions
+    # notation.
+    #
+    # The expressions can place properties on the shapes using the 
+    # "put" function. As input, the expressions will receive the
+    # (merged) shapes in micrometer units (e.g. RBA::DPolygon type) 
+    # by calling the "shape" function.
+    #
+    # Available functions are:
+    # 
+    # @ul
+    # @li "put(name, value)": creates a property with name 'name' and 'value' value @/li
+    # @li "shape": the current shape in micrometer units @/li
+    # @li "value(name)": the value of a property with name 'name' or nil if the current shape does not have a property with this name @/li
+    # @ul
+    #
+    # Properties with well-formed names (e.g. "VALUE") are available as
+    # variables in the expressions as a shortcut.
+    #
+    # 'variables' can be a hash of arbitrary names and values. Each of these values
+    # becomes available as variables in the expression. This eliminates the need
+    # to build expression strings to pass variable values.
+    #
+    # The following example computes the area of the shapes and puts them
+    # into a property 'AREA':
+    #
+    # @code
+    # layer.evalute("put('AREA', shape.area)")
+    # @/code
+    #
+    # This version modifies the input layer. A version that returns
+    # a new layer is \evaluated.
+    
+    # %DRC%
+    # @name evaluated
+    # @brief Evaluate expressions on the shapes of the layer and returns a new layer
+    # @synopsis layer.evaluated(expression [, variables])
+    # 
+    # This method is the out-of-place version of \evaluate.
+
+    def _make_proc(expression, variables)
+
+      expression.is_a?(String) || raise("'expression' must be a string")
+      variables.is_a?(Hash) || raise("'variables' must be a hash")
+
+      if data.is_a?(RBA::Region)
+        RBA::PolygonPropertiesExpressions::new(data, expression, dbu: @engine.dbu, variables: variables)
+      elsif data.is_a?(RBA::Edges)
+        RBA::EdgePropertiesExpressions::new(data, expression, dbu: @engine.dbu, variables: variables)
+      elsif data.is_a?(RBA::EdgePairs)
+        RBA::EdgePairPropertiesExpressions::new(data, expression, dbu: @engine.dbu, variables: variables)
+      elsif data.is_a?(RBA::Texts)
+        RBA::TextPropertiesExpressions::new(data, expression, dbu: @engine.dbu, variables: variables)
+      else
+        nil
+      end
+
+    end
+
+    def evaluate(expression, variables = {})
+      @engine._context("evaluate") do
+        pr = _make_proc(expression, variables)
+        @engine._tcmd(self.data, 0, self.data.class, :process, pr)
+        self
+      end
+    end
+    
+    # %DRC%
+    # @name select_if
+    # @brief Selects shapes of a layer based on the evaluation of an expression
+    # @synopsis layer.select_if(expression [, variables])
+    #
+    # Evaluates the given expression on the shapes of the layer.
+    # If the evaluation gives a 'true' value, the shape is selected. Otherwise
+    # it is discarded.
+    #
+    # As input, the expressions will receive the
+    # (merged) shapes in micrometer units (e.g. RBA::DPolygon type) 
+    # by calling the "shape" function.
+    #
+    # Available functions are:
+    # 
+    # @ul
+    # @li "shape": the current shape in micrometer units @/li
+    # @li "value(name)": the value of a property with name 'name' or nil if the current shape does not have a property with this name @/li
+    # @ul
+    #
+    # Properties with well-formed names (e.g. "VALUE") are available as
+    # variables in the expressions as a shortcut.
+    #
+    # 'variables' can be a hash of arbitrary names and values. Each of these values
+    # becomes available as variables in the expression. This eliminates the need
+    # to build expression strings to pass variable values.
+    #
+    # The following example selects all shapes on the layer with an area 
+    # less than 10 square micrometers:
+    #
+    # @code
+    # layer.select("shape.area < 10.0")
+    # @/code
+    #
+    # This version modifies the input layer. A version that returns
+    # a new layer with the selected shapes is \selected_if.
+
+    # %DRC%
+    # @name selected_if
+    # @brief Selects shapes based on the evaluation of an expression
+    # @synopsis layer.selected_if(expression [, variables])
+    # 
+    # This method is the out-of-place version of \select_if.
+
+    # %DRC%
+    # @name split_if
+    # @brief Selects shapes based on the evaluation of an expression and returns selected and unselected shapes in different layers
+    # @synopsis layer.selected_if(expression [, variables])
+    # 
+    # This method, like the other 'split_...' methods returns two layers:
+    # one with the result of \\selected_if, and a second with all other shapes.
+    #
+    # The following example splits a layer into two: one with the shapes with an area
+    # less than 10 square micrometers and one with the shapes with a bigger area:
+    #
+    # @code
+    # (smaller, bigger) = layer.split_if("shape.area < 10.0")
+    # @/code
+
+    def _make_filter(expression, variables)
+
+      expression.is_a?(String) || raise("'expression' must be a string")
+      variables.is_a?(Hash) || raise("'variables' must be a hash")
+
+      if data.is_a?(RBA::Region)
+        RBA::PolygonFilterBase::expression_filter(expression, variables: variables)
+      elsif data.is_a?(RBA::Edges)
+        RBA::EdgeFilterBase::expression_filter(expression, variables: variables)
+      elsif data.is_a?(RBA::EdgePairs)
+        RBA::EdgeFilterBase::expression_filter(expression, variables: variables)
+      elsif data.is_a?(RBA::Texts)
+        RBA::TextFilterBase::expression_filter(expression, variables: variables)
+      else
+        nil
+      end
+
+    end
+
+    def select_if(expression, variables = {})
+      @engine._context("evaluate") do
+        f = _make_filter(expression, variables)
+        @engine._tcmd(self.data, 0, self.data.class, :filter, f)
+        self
+      end
+    end
+    
+    def selected_if(expression, variables = {})
+      @engine._context("evaluated") do
+        f = _make_filter(expression, variables)
+        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :filtered, f))
+      end
+    end
+    
+    def split_if(expression, variables = {})
+      @engine._context("evaluated") do
+        f = _make_filter(expression, variables)
+        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :split_filter, f))
+      end
+    end
+    
+    # %DRC%
     # @name select_props
     # @brief Enables or selects properties from a property-annotated layer
     # @synopsis layer.select_props(keys)

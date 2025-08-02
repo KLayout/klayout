@@ -2055,7 +2055,7 @@ db::Region LayoutToNetlist::antenna_check (const db::Region &gate, double gate_a
 }
 
 db::Region
-LayoutToNetlist::measure_net (const db::Region &primary, const std::map<std::string, const db::Region *> &secondary, const std::string &expression)
+LayoutToNetlist::measure_net (const db::Region &primary, const std::map<std::string, const db::Region *> &secondary, const std::string &expression, const std::map<std::string, tl::Variant> &variables)
 {
   //  TODO: that's basically too much .. we only need the clusters
   if (! m_netlist_extracted) {
@@ -2065,6 +2065,25 @@ LayoutToNetlist::measure_net (const db::Region &primary, const std::map<std::str
   db::Layout &ly = dss ().layout (m_layout_index);
   double dbu = ly.dbu ();
 
+  db::MeasureNetEval eval (this, dbu);
+
+  for (auto v = variables.begin (); v != variables.end (); ++v) {
+    eval.set_var (v->first, v->second);
+  }
+
+  eval.set_primary_layer (layer_of (primary));
+  for (auto s = secondary.begin (); s != secondary.end (); ++s) {
+    if (s->second) {
+      eval.set_secondary_layer (s->first, layer_of (*s->second));
+    }
+  }
+
+  eval.init ();
+
+  tl::Extractor ex (expression.c_str ());
+  tl::Expression compiled_expr;
+  eval.parse (compiled_expr, ex);
+
   db::DeepLayer dl (&dss (), m_layout_index, ly.insert_layer ());
 
   for (db::Layout::bottom_up_const_iterator cid = ly.begin_bottom_up (); cid != ly.end_bottom_up (); ++cid) {
@@ -2073,21 +2092,6 @@ LayoutToNetlist::measure_net (const db::Region &primary, const std::map<std::str
     if (clusters.empty ()) {
       continue;
     }
-
-    db::MeasureNetEval eval (this, dbu);
-
-    eval.set_primary_layer (layer_of (primary));
-    for (auto s = secondary.begin (); s != secondary.end (); ++s) {
-      if (s->second) {
-        eval.set_secondary_layer (s->first, layer_of (*s->second));
-      }
-    }
-
-    eval.init ();
-
-    tl::Extractor ex (expression.c_str ());
-    tl::Expression compiled_expr;
-    eval.parse (compiled_expr, ex);
 
     for (connected_clusters<db::NetShape>::all_iterator c = clusters.begin_all (); ! c.at_end (); ++c) {
 

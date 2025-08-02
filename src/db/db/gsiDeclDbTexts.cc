@@ -87,9 +87,9 @@ static gsi::TextFilterBase *make_pg (const tl::Variant &name, const std::string 
   return new TextPropertiesFilter (name, pattern, inverse);
 }
 
-static gsi::TextFilterBase *make_pe (const std::string &expression, bool inverse, double dbu)
+static gsi::TextFilterBase *make_pe (const std::string &expression, bool inverse, double dbu, const std::map<std::string, tl::Variant> &variables)
 {
-  return new gsi::expression_filter<gsi::TextFilterBase, db::Texts> (expression, inverse, dbu);
+  return new gsi::expression_filter<gsi::TextFilterBase, db::Texts> (expression, inverse, dbu, variables);
 }
 
 Class<gsi::TextFilterBase> decl_TextFilterBase ("db", "TextFilterBase",
@@ -133,11 +133,12 @@ Class<gsi::TextFilterBase> decl_TextFilterBase ("db", "TextFilterBase",
     "\n"
     "This feature has been introduced in version 0.30."
   ) +
-  gsi::constructor ("expression_filter", &make_pe, gsi::arg ("expression"), gsi::arg ("inverse", false), gsi::arg ("dbu", 0.0),
+  gsi::constructor ("expression_filter", &make_pe, gsi::arg ("expression"), gsi::arg ("inverse", false), gsi::arg ("dbu", 0.0), gsi::arg ("variables", std::map<std::string, tl::Variant> (), "{}"),
     "@brief Creates an expression-based filter\n"
     "@param expression The expression to evaluate.\n"
     "@param inverse If true, inverts the selection - i.e. all texts without a property with the given name and value range are selected.\n"
     "@param dbu If given and greater than zero, the shapes delivered by the 'shape' function will be in micrometer units.\n"
+    "@param variables Arbitrary values that are available as variables inside the expressions.\n"
     "\n"
     "Creates a filter that will evaluate the given expression on every shape and select the shape "
     "when the expression renders a boolean true value. "
@@ -256,36 +257,38 @@ Class<shape_processor_impl<db::TextProcessorBase> > decl_TextProcessor (decl_Tex
 
 static
 property_computation_processor<db::TextProcessorBase, db::Texts> *
-new_pcp (const db::Texts *container, const std::map<tl::Variant, std::string> &expressions, bool copy_properties, double dbu)
+new_pcp (const db::Texts *container, const std::map<tl::Variant, std::string> &expressions, bool copy_properties, double dbu, const std::map <std::string, tl::Variant> &variables)
 {
-  return new property_computation_processor<db::TextProcessorBase, db::Texts> (container, expressions, copy_properties, dbu);
+  return new property_computation_processor<db::TextProcessorBase, db::Texts> (container, expressions, copy_properties, dbu, variables);
 }
 
 property_computation_processor<db::TextProcessorBase, db::Texts> *
-new_pcps (const db::Texts *container, const std::string &expression, bool copy_properties, double dbu)
+new_pcps (const db::Texts *container, const std::string &expression, bool copy_properties, double dbu, const std::map <std::string, tl::Variant> &variables)
 {
   std::map<tl::Variant, std::string> expressions;
   expressions.insert (std::make_pair (tl::Variant (), expression));
-  return new property_computation_processor<db::TextProcessorBase, db::Texts> (container, expressions, copy_properties, dbu);
+  return new property_computation_processor<db::TextProcessorBase, db::Texts> (container, expressions, copy_properties, dbu, variables);
 }
 
 Class<property_computation_processor<db::TextProcessorBase, db::Texts> > decl_TextPropertiesExpressions (decl_TextProcessorBase, "db", "TextPropertiesExpressions",
   property_computation_processor<db::TextProcessorBase, db::Texts>::method_decls (true) +
-  gsi::constructor ("new", &new_pcp, gsi::arg ("texts"), gsi::arg ("expressions"), gsi::arg ("copy_properties", false), gsi::arg ("dbu", 0.0),
+  gsi::constructor ("new", &new_pcp, gsi::arg ("texts"), gsi::arg ("expressions"), gsi::arg ("copy_properties", false), gsi::arg ("dbu", 0.0), gsi::arg ("variables", std::map<std::string, tl::Variant> (), "{}"),
     "@brief Creates a new properties expressions operator\n"
     "\n"
     "@param texts The text collection, the processor will be used on. Can be nil, but if given, allows some optimization.\n"
     "@param expressions A map of property names and expressions used to generate the values of the properties (see class description for details).\n"
     "@param copy_properties If true, new properties will be added to existing ones.\n"
     "@param dbu If not zero, this value specifies the database unit to use. If given, the shapes returned by the 'shape' function will be micrometer-unit objects.\n"
+    "@param variables Arbitrary values that are available as variables inside the expressions.\n"
   ) +
-  gsi::constructor ("new", &new_pcps, gsi::arg ("texts"), gsi::arg ("expression"), gsi::arg ("copy_properties", false), gsi::arg ("dbu", 0.0),
+  gsi::constructor ("new", &new_pcps, gsi::arg ("texts"), gsi::arg ("expression"), gsi::arg ("copy_properties", false), gsi::arg ("dbu", 0.0), gsi::arg ("variables", std::map<std::string, tl::Variant> (), "{}"),
     "@brief Creates a new properties expressions operator\n"
     "\n"
     "@param texts The text collection, the processor will be used on. Can be nil, but if given, allows some optimization.\n"
     "@param expression A single expression evaluated for each shape (see class description for details).\n"
     "@param copy_properties If true, new properties will be added to existing ones.\n"
     "@param dbu If not zero, this value specifies the database unit to use. If given, the shapes returned by the 'shape' function will be micrometer-unit objects.\n"
+    "@param variables Arbitrary values that are available as variables inside the expressions.\n"
   ),
   "@brief An operator attaching computed properties to the edge pairs\n"
   "\n"

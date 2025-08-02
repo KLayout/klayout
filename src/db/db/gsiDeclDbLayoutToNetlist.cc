@@ -216,9 +216,9 @@ static db::Region antenna_check (db::LayoutToNetlist *l2n, const db::Region &pol
   return antenna_check3 (l2n, poly, 1, 0, metal, 1, 0, ratio, diodes, texts);
 }
 
-static db::Region measure_net (db::LayoutToNetlist *l2n, const db::Region &primary, const std::map<std::string, const db::Region *> &secondary, const std::string &expression)
+static db::Region measure_net (db::LayoutToNetlist *l2n, const db::Region &primary, const std::map<std::string, const db::Region *> &secondary, const std::string &expression, const std::map<std::string, tl::Variant> &variables)
 {
-  return l2n->measure_net (primary, secondary, expression);
+  return l2n->measure_net (primary, secondary, expression, variables);
 }
 
 static void join_net_names (db::LayoutToNetlist *l2n, const std::string &s)
@@ -1215,10 +1215,12 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "\n"
     "This variant has been introduced in version 0.26.6.\n"
   ) +
-  gsi::method_ext ("measure_net", &measure_net, gsi::arg ("primary"), gsi::arg ("secondary"), gsi::arg ("expression"),
+  gsi::method_ext ("measure_net", &measure_net, gsi::arg ("primary"), gsi::arg ("secondary"), gsi::arg ("expression"), gsi::arg ("variables", std::map<std::string, tl::Variant> (), "{}"),
     "@brief Runs a generic net measurement function\n"
     "\n"
     "This method accepts some primary layer, a number of secondary layers with names and an expression.\n"
+    "It also accepts variables which become available as variables inside the expression. This allows passing "
+    "arbitrary values without having to encode them into the expression string.\n"
     "\n"
     "It will look at nets connecting to shapes on the primary layer and execute the expression for each\n"
     "of those nets. After that it will copy the primary shapes of the net to the output with the properties\n"
@@ -1236,7 +1238,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "@li 'perimeter(name)': the perimeter of the secondary-layer shapes. 'name' is a symbol with the name given in the secondary-layer map @/li\n"
     "@li 'put(name, value)': places the value as property 'name' on the output shapes @/li\n"
     "@li 'skip(flag)': will skip the primary shapes of that net when called with a true value @/li\n"
-    "@li 'net_name': the name of the net @/li\n"
+    "@li 'net': the \\Net object of the current net @/li\n"
     "@/ul\n"
   ) +
   //  test API

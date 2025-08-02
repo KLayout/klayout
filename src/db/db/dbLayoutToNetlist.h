@@ -1146,9 +1146,9 @@ public:
    *  * "perimeter(name)": the perimeter of the secondary-layer shapes. 'name' is a symbol with the name given in the secondary-layer map
    *  * "put(name, value)": places the value as property 'name' on the output shapes
    *  * "skip(flag)": will skip the primary shapes of that net when called with a true value
-   *  * "net_name": the name of the net
+   *  * "net": the Net object of the current net
    */
-  db::Region measure_net (const db::Region &primary, const std::map<std::string, const db::Region *> &secondary, const std::string &expression);
+  db::Region measure_net (const db::Region &primary, const std::map<std::string, const db::Region *> &secondary, const std::string &expression, const std::map<std::string, tl::Variant> &variables);
 
   /**
    *  @brief Saves the database to the given path

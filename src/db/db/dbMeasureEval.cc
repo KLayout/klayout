@@ -21,6 +21,7 @@
 */
 
 #include "dbMeasureEval.h"
+#include "gsiClassBase.h"
 
 namespace db
 {
@@ -372,11 +373,11 @@ private:
   MeasureNetEval *mp_eval;
 };
 
-class NetNameFunction
+class NetFunction
   : public tl::EvalFunction
 {
 public:
-  NetNameFunction (MeasureNetEval *eval)
+  NetFunction (MeasureNetEval *eval)
     : mp_eval (eval)
   {
     //  .. nothing yet ..
@@ -385,9 +386,9 @@ public:
   virtual void execute (const tl::ExpressionParserContext &context, tl::Variant &out, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> * /*kwargs*/) const
   {
     if (args.size () != 1) {
-      throw tl::EvalError (tl::to_string (tr ("'net_name' function does not take and argument")), context);
+      throw tl::EvalError (tl::to_string (tr ("'net' function does not take and argument")), context);
     }
-    out = mp_eval->net_name_func ();
+    out = mp_eval->net_func ();
   }
 
 private:
@@ -465,7 +466,7 @@ MeasureNetEval::init ()
   define_function ("skip", new NetSkipFunction (this));
   define_function ("area", new NetAreaFunction (this));
   define_function ("perimeter", new NetPerimeterFunction (this));
-  define_function ("net_name", new NetNameFunction (this));
+  define_function ("net", new NetFunction (this));
 }
 
 void
@@ -531,7 +532,7 @@ MeasureNetEval::skip_func (bool f) const
 }
 
 tl::Variant
-MeasureNetEval::net_name_func () const
+MeasureNetEval::net_func () const
 {
   const db::Netlist *nl = mp_l2n->netlist ();
   if (! nl) {
@@ -552,7 +553,7 @@ MeasureNetEval::net_name_func () const
 
   auto n = m_nets_per_cell_and_cluster_id->find (std::make_pair (m_cell_index, m_cluster_id));
   if (n != m_nets_per_cell_and_cluster_id->end ()) {
-    return tl::Variant (n->second->name ());
+    return tl::Variant::make_variant_ref (n.operator-> ());
   } else {
     return tl::Variant ();
   }

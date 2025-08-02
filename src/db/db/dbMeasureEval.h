@@ -137,7 +137,7 @@ private:
   friend class NetPutFunction;
   friend class NetAreaFunction;
   friend class NetPerimeterFunction;
-  friend class NetNameFunction;
+  friend class NetFunction;
   friend class NetSkipFunction;
 
   struct AreaAndPerimeter
@@ -162,7 +162,7 @@ private:
   tl::Variant area_func (int layer_index) const;
   tl::Variant perimeter_func (int layer_index) const;
   void skip_func (bool f) const;
-  tl::Variant net_name_func () const;
+  tl::Variant net_func () const;
 };
 
 }

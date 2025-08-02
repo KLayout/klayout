@@ -553,7 +553,7 @@ MeasureNetEval::net_func () const
 
   auto n = m_nets_per_cell_and_cluster_id->find (std::make_pair (m_cell_index, m_cluster_id));
   if (n != m_nets_per_cell_and_cluster_id->end ()) {
-    return tl::Variant::make_variant_ref (n.operator-> ());
+    return tl::Variant::make_variant_ref (n->second);
   } else {
     return tl::Variant ();
   }

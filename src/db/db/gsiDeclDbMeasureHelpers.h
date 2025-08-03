@@ -177,7 +177,7 @@ public:
  */
 template <class FilterBase, class Container>
 class expression_filter
-  : public gsi::shape_filter_impl<FilterBase>
+  : public FilterBase
 {
 public:
   typedef typename FilterBase::shape_type shape_type;

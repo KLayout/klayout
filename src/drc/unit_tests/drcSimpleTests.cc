@@ -2034,3 +2034,13 @@ TEST(143d_evaluate_and_filter)
   run_test (_this, "143", true);
 }
 
+TEST(144_combined_antennas)
+{
+  run_test (_this, "144", false);
+}
+
+TEST(144d_combined_antennas)
+{
+  run_test (_this, "144", true);
+}
+

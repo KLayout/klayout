@@ -248,7 +248,7 @@ shape_collection_processed_impl (const db::DeepLayer &input, const shape_collect
         heap.clear ();
         filter.process (s, heap);
         for (auto i = heap.begin (); i != heap.end (); ++i) {
-          if (si->prop_id ()) {
+          if (i->properties_id ()) {
             delivery_wp.put (*i);
           } else {
             delivery.put (i->base ());

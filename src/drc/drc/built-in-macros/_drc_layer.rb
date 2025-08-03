@@ -5427,7 +5427,7 @@ CODE
       elsif data.is_a?(RBA::Edges)
         f = RBA::EdgeFilterBase::expression_filter(expression.expression, dbu: @engine.dbu, variables: variables)
       elsif data.is_a?(RBA::EdgePairs)
-        f = RBA::EdgeFilterBase::expression_filter(expression.expression, dbu: @engine.dbu, variables: variables)
+        f = RBA::EdgePairFilterBase::expression_filter(expression.expression, dbu: @engine.dbu, variables: variables)
       elsif data.is_a?(RBA::Texts)
         f = RBA::TextFilterBase::expression_filter(expression.expression, dbu: @engine.dbu, variables: variables)
       else

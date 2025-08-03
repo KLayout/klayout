@@ -8,9 +8,11 @@ end
 
 l1 = input(1, 0, enable_props)
 l2 = input(2, 0, enable_props)
+l3 = labels(3, 0, enable_props)
 
 l1.output(1, 0)
 l2.output(2, 0)
+l3.output(3, 0)
 
 l2.evaluated("put(2, to_f(value(17))*2.0)").output(10, 0)
 l2.evaluated("put(2, to_f(value(17))*factor)", { "factor" => 3.0 }, true).output(11, 0)
@@ -51,4 +53,14 @@ d.select_if(aniso_and_scales("shape.bbox.width<=5")).output(44, 0)
 
 l2.split_if("to_f(value(17))<3.0")[0].output(50, 0)
 l2.split_if("to_f(value(17))<3.0")[1].output(51, 0)
+
+# other types for evaluate
+l3.evaluated("put(1, shape.string)").output(60, 0)
+l1.edges.evaluated("put(1, shape.length)").output(61, 0)
+l1.width(3.5.um).evaluated("put(1, shape.distance)").output(62, 0)
+
+# other types for select_if
+l3.selected_if("shape.string=='TEXT1'").output(70, 0)
+l1.edges.selected_if("shape.length<3.5").output(71, 0)
+l1.width(3.5.um).selected_if("shape.distance<2.5").output(72, 0)
 

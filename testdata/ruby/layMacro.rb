@@ -150,6 +150,9 @@ END
       return
     end
     
+    # makes RBA::Value available as tl.Value
+    pya.eval_string("import klayout.tl");
+
     macro_file = File.join($ut_testtmp, "test.lym")
     File.open(macro_file, "w") do |file|
       file.write(<<"END")

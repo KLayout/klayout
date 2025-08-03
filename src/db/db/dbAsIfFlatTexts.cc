@@ -179,9 +179,17 @@ AsIfFlatTexts::filtered_pair (const TextFilterBase &filter) const
 
   for (TextsIterator p (begin ()); ! p.at_end (); ++p) {
     if (filter.selected (*p, p.prop_id ())) {
-      new_texts_true->insert (*p);
+      if (p.prop_id () != 0) {
+        new_texts_true->insert (db::TextWithProperties (*p, p.prop_id ()));
+      } else {
+        new_texts_true->insert (*p);
+      }
     } else {
-      new_texts_false->insert (*p);
+      if (p.prop_id () != 0) {
+        new_texts_false->insert (db::TextWithProperties (*p, p.prop_id ()));
+      } else {
+        new_texts_false->insert (*p);
+      }
     }
   }
 

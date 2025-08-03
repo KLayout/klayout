@@ -51,6 +51,28 @@ private:
   MeasureEval *mp_eval;
 };
 
+class SkipFunction
+  : public tl::EvalFunction
+{
+public:
+  SkipFunction (MeasureEval *eval)
+    : mp_eval (eval)
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual void execute (const tl::ExpressionParserContext &context, tl::Variant & /*out*/, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> * /*kwargs*/) const
+  {
+    if (args.size () != 1) {
+      throw tl::EvalError (tl::to_string (tr ("'skip' function takes one argument (flag)")), context);
+    }
+    mp_eval->skip_func (args [0].to_bool ());
+  }
+
+private:
+  MeasureEval *mp_eval;
+};
+
 class ValueFunction
   : public tl::EvalFunction
 {
@@ -144,7 +166,7 @@ private:
 //  MeasureEval implementation
 
 MeasureEval::MeasureEval (double dbu, bool with_put)
-  : m_shape_type (None), m_prop_id (0), m_dbu (dbu), m_with_put (with_put)
+  : m_shape_type (None), m_prop_id (0), m_skip (false), m_dbu (dbu), m_with_put (with_put)
 {
   mp_shape.any = 0;
 }
@@ -154,19 +176,12 @@ MeasureEval::init ()
 {
   if (m_with_put) {
     define_function ("put", new PutFunction (this));
+    define_function ("skip", new SkipFunction (this));
   }
 
   define_function ("shape", new ShapeFunction (this));
   define_function ("value", new ValueFunction (this));
   define_function ("values", new ValuesFunction (this));
-}
-
-void
-MeasureEval::reset_shape () const
-{
-  m_shape_type = None;
-  mp_shape.any = 0;
-  m_prop_id = 0;
 }
 
 void
@@ -205,9 +220,10 @@ MeasureEval::set_shape (const db::Text *text) const
 }
 
 void
-MeasureEval::set_prop_id (db::properties_id_type prop_id) const
+MeasureEval::reset (db::properties_id_type prop_id) const
 {
   m_prop_id = prop_id;
+  m_skip = false;
 }
 
 void
@@ -221,6 +237,12 @@ MeasureEval::resolve_name (const std::string &name, const tl::EvalFunction *&fun
     define_function (name, f);
     function = f;
   }
+}
+
+void
+MeasureEval::skip_func (bool f) const
+{
+  m_skip = f;
 }
 
 tl::Variant

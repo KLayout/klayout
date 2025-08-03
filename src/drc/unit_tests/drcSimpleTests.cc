@@ -2024,3 +2024,13 @@ TEST(142d_evaluate_nets)
   run_test (_this, "142", true);
 }
 
+TEST(143_evaluate_and_filter)
+{
+  run_test (_this, "143", false);
+}
+
+TEST(143d_evaluate_and_filter)
+{
+  run_test (_this, "143", true);
+}
+

@@ -121,36 +121,44 @@ public:
 
   virtual void process (const db::object_with_properties<shape_type> &shape, std::vector<db::object_with_properties<shape_type> > &res) const
   {
-    res.push_back (shape);
+    try {
 
-    m_eval.set_prop_id (shape.properties_id ());
-    m_eval.set_shape (&shape);
+      m_eval.reset (shape.properties_id ());
+      m_eval.set_shape (&shape);
 
-    db::PropertiesSet &ps_out = m_eval.prop_set_out ();
-    if (m_copy_properties) {
-      ps_out = db::properties (shape.properties_id ());
+      db::PropertiesSet &ps_out = m_eval.prop_set_out ();
+      if (m_copy_properties) {
+        ps_out = db::properties (shape.properties_id ());
+        for (auto e = m_expressions.begin (); e != m_expressions.end (); ++e) {
+          if (e->first != db::property_names_id_type (0)) {
+            ps_out.erase (e->first);
+          }
+        }
+      } else {
+        ps_out.clear ();
+      }
+
       for (auto e = m_expressions.begin (); e != m_expressions.end (); ++e) {
         if (e->first != db::property_names_id_type (0)) {
-          ps_out.erase (e->first);
+          ps_out.insert (e->first, e->second.execute ());
         }
       }
-    } else {
-      ps_out.clear ();
-    }
 
-    for (auto e = m_expressions.begin (); e != m_expressions.end (); ++e) {
-      if (e->first != db::property_names_id_type (0)) {
-        ps_out.insert (e->first, e->second.execute ());
+      for (auto e = m_expressions.begin (); e != m_expressions.end (); ++e) {
+        if (e->first == db::property_names_id_type (0)) {
+          e->second.execute ();
+        }
       }
-    }
 
-    for (auto e = m_expressions.begin (); e != m_expressions.end (); ++e) {
-      if (e->first == db::property_names_id_type (0)) {
-        e->second.execute ();
+      if (! m_eval.skip ()) {
+        res.push_back (shape);
+        res.back ().properties_id (db::properties_id (ps_out));
       }
-    }
 
-    res.back ().properties_id (db::properties_id (ps_out));
+    } catch (tl::Exception &ex) {
+      tl::warn << ex.msg ();
+      res.clear ();
+    }
   }
 
 public:
@@ -190,21 +198,35 @@ public:
 
   virtual bool selected (const shape_type &shape, db::properties_id_type prop_id) const
   {
-    m_eval.set_prop_id (prop_id);
-    m_eval.set_shape (&shape);
+    try {
 
-    bool res = m_expression.execute ().to_bool ();
-    return m_inverse ? !res : res;
+      m_eval.reset (prop_id);
+      m_eval.set_shape (&shape);
+
+      bool res = m_expression.execute ().to_bool ();
+      return m_inverse ? !res : res;
+
+    } catch (tl::Exception &ex) {
+      tl::warn << ex.msg ();
+      return false;
+    }
   }
 
   //  only needed for PolygonFilterBase
   virtual bool selected (const db::PolygonRef &shape, db::properties_id_type prop_id) const
   {
-    m_eval.set_prop_id (prop_id);
-    m_eval.set_shape (&shape);
+    try {
 
-    bool res = m_expression.execute ().to_bool ();
-    return m_inverse ? !res : res;
+      m_eval.reset (prop_id);
+      m_eval.set_shape (&shape);
+
+      bool res = m_expression.execute ().to_bool ();
+      return m_inverse ? !res : res;
+
+    } catch (tl::Exception &ex) {
+      tl::warn << ex.msg ();
+      return false;
+    }
   }
 
 public:

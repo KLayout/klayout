@@ -2105,12 +2105,18 @@ LayoutToNetlist::measure_net (const db::Region &primary, const std::map<std::str
         continue;
       }
 
-      eval.reset (*cid, *c);
-      compiled_expr.execute ();
+      try {
 
-      if (! eval.skip ()) {
-        db::Shapes &shapes = ly.cell (*cid).shapes (dl.layer ());
-        get_merged_shapes_of_net (*cid, *c, primary_layer, shapes, db::properties_id (eval.prop_set_out ()));
+        eval.reset (*cid, *c);
+        compiled_expr.execute ();
+
+        if (! eval.skip ()) {
+          db::Shapes &shapes = ly.cell (*cid).shapes (dl.layer ());
+          get_merged_shapes_of_net (*cid, *c, primary_layer, shapes, db::properties_id (eval.prop_set_out ()));
+        }
+
+      } catch (tl::Exception &ex) {
+        tl::warn << ex.msg ();
       }
 
     }

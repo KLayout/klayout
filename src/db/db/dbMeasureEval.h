@@ -49,13 +49,17 @@ public:
 
   void init ();
 
-  void reset_shape () const;
+  void reset (db::properties_id_type prop_id) const;
   void set_shape (const db::Polygon *poly) const;
   void set_shape (const db::PolygonRef *poly) const;
   void set_shape (const db::Edge *edge) const;
   void set_shape (const db::EdgePair *edge_pair) const;
   void set_shape (const db::Text *text) const;
-  void set_prop_id (db::properties_id_type prop_id) const;
+
+  bool skip () const
+  {
+    return m_skip;
+  }
 
   db::PropertiesSet &prop_set_out () const
   {
@@ -67,6 +71,7 @@ protected:
 
 private:
   friend class ShapeFunction;
+  friend class SkipFunction;
   friend class ValueFunction;
   friend class ValuesFunction;
   friend class PropertyFunction;
@@ -95,6 +100,7 @@ private:
   mutable ShapeType m_shape_type;
   mutable ShapeRef mp_shape;
   mutable db::properties_id_type m_prop_id;
+  mutable bool m_skip;
   mutable db::PropertiesSet m_prop_set_out;
   double m_dbu;
   bool m_with_put;
@@ -104,6 +110,7 @@ private:
   tl::Variant value_func (const tl::Variant &name) const;
   tl::Variant values_func (const tl::Variant &name) const;
   void put_func (const tl::Variant &name, const tl::Variant &value) const;
+  void skip_func (bool f) const;
 };
 
 /**

@@ -575,5 +575,20 @@ module DRC
     end
   end
 
+  class DRCTransformationVariantHint
+    def initialize(expression, mode = :is_isotropic_and_scale_invariant)
+      @expression = expression
+      @mode = mode
+    end
+    def expression
+      @expression
+    end
+    def apply(pr)
+      if @mode
+        pr.send(@mode)
+      end
+    end
+  end
+
 end
 

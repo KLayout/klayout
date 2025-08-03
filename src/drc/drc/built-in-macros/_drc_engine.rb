@@ -453,6 +453,19 @@ module DRC
         DRCPropertyName::new(k)
       end
     end
+
+    def aniso(expression)
+      DRCTransformationVariantHint::new(expression, :is_scale_invariant)
+    end
+
+    def scales(expression)
+      DRCTransformationVariantHint::new(expression, :is_isotropic)
+    end
+
+    def aniso_and_scales(expression)
+      DRCTransformationVariantHint::new(expression, nil)
+    end
+
     
     # %DRC%
     # @brief Specifies "same properties" for operations supporting user properties constraints

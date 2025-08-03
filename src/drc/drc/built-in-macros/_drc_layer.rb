@@ -5176,7 +5176,7 @@ CODE
     # %DRC%
     # @name evaluate
     # @brief Evaluate expressions on the shapes of the layer
-    # @synopsis layer.evaluate(expression [, variables])
+    # @synopsis layer.evaluate(expression [, variables [, keep_properties ]])
     #
     # Evaluates the given expression on the shapes of the layer.
     # The expression needs to be written in the KLayout expressions
@@ -5185,12 +5185,14 @@ CODE
     # The expressions can place properties on the shapes using the 
     # "put" function. As input, the expressions will receive the
     # (merged) shapes in micrometer units (e.g. RBA::DPolygon type) 
-    # by calling the "shape" function.
+    # by calling the "shape" function. You can also call 'skip' with
+    # a 'true' value to drop the shape from the output entirely.
     #
     # Available functions are:
     # 
     # @ul
-    # @li "put(name, value)": creates a property with name 'name' and 'value' value @/li
+    # @li "put(name, value)": creates a property with the given name and value @/li
+    # @li "skip(flag)": if called with a 'true' value, the shape will be dropped from the output @/li
     # @li "shape": the current shape in micrometer units @/li
     # @li "value(name)": the value of a property with name 'name' or nil if the current shape does not have a property with this name @/li
     # @ul
@@ -5202,12 +5204,52 @@ CODE
     # becomes available as variables in the expression. This eliminates the need
     # to build expression strings to pass variable values.
     #
-    # The following example computes the area of the shapes and puts them
-    # into a property 'AREA':
+    # If 'keep_properties' is true, the existing properties of the shape will be kept.
+    # Otherwise (the default), existing properties will be removed before adding new
+    # ones with 'put'.
+    #
+    # The expressions require a hint
+    # whether the they make use of anisotropic or scale-dependent properties.
+    # For example, the height of a box is an anisotropic property. If a check is made
+    # inside a rotated cell, the height transforms to a width and the check renders 
+    # different results for the same cell if the cell is placed rotated and non-rotated.
+    # The solution is cell variant formation.
+    # 
+    # Similarly, if a check is made against physical dimensions, the check will have
+    # different results for cells placed with different magnifications. Such a check
+    # is not scale-invariant.
+    #
+    # By default it is assumed that the expressions are isotropic and scale invariant.
+    # You can mark an expression as anisotropic and/or scale dependent using the following
+    # expression modifiers:
     #
     # @code
-    # layer.evalute("put('AREA', shape.area)")
+    # # isotropic and scale invariant
+    # layer.evaluate("put('holes', shape.holes)")
+    #
+    # # anisotropic, but scale invariant
+    # layer.evaluate(aniso("put('aspect_ratio', shape.bbox.height/shape.bbox.width)"))
+    #
+    # # isotropic, but not scale invariant
+    # layer.evaluate(scales("put('area', shape.area)"))
+    #
+    # # anisotropic and not scale invariant
+    # layer.evaluate(aniso_and_scales("put('width', shape.bbox.width)"))
     # @/code
+    #
+    # If you forget to specify this hint, the expression will use the local 
+    # shape properties and fail to correctly produce the results in the presence
+    # of deep mode and rotated or magnified cell instances.
+    #
+    # The following example computes the area of the shapes and puts them
+    # into a property 'area':
+    #
+    # @code
+    # layer.evaluate(scales("put('area', shape.area)"))
+    # @/code
+    #
+    # NOTE: GDS does not support properties with string names, so 
+    # either save to OASIS or use integer numbers for the property names.
     #
     # This version modifies the input layer. A version that returns
     # a new layer is \evaluated.
@@ -5215,34 +5257,50 @@ CODE
     # %DRC%
     # @name evaluated
     # @brief Evaluate expressions on the shapes of the layer and returns a new layer
-    # @synopsis layer.evaluated(expression [, variables])
+    # @synopsis layer.evaluated(expression [, variables [, keep_properties]])
     # 
     # This method is the out-of-place version of \evaluate.
 
-    def _make_proc(expression, variables)
+    def _make_proc(expression, variables, keep_properties)
 
-      expression.is_a?(String) || raise("'expression' must be a string")
+      if expression.is_a?(String)
+        expression = DRCTransformationVariantHint::new(expression)
+      elsif expression.is_a?(DRCTransformationVariantHint)
+        expression.expression.is_a?(String) || raise("'expression' must be a string")
+      else
+        raise("'expression' must be a string or a string decorated with a transformation variant hint")
+      end
       variables.is_a?(Hash) || raise("'variables' must be a hash")
 
       if data.is_a?(RBA::Region)
-        RBA::PolygonPropertiesExpressions::new(data, expression, dbu: @engine.dbu, variables: variables)
+        pr = RBA::PolygonPropertiesExpressions::new(data, expression.expression, copy_properties: keep_properties, dbu: @engine.dbu, variables: variables)
       elsif data.is_a?(RBA::Edges)
-        RBA::EdgePropertiesExpressions::new(data, expression, dbu: @engine.dbu, variables: variables)
+        pr = RBA::EdgePropertiesExpressions::new(data, expression.expression, copy_properties: keep_properties, dbu: @engine.dbu, variables: variables)
       elsif data.is_a?(RBA::EdgePairs)
-        RBA::EdgePairPropertiesExpressions::new(data, expression, dbu: @engine.dbu, variables: variables)
+        pr = RBA::EdgePairPropertiesExpressions::new(data, expression.expression, copy_properties: keep_properties, dbu: @engine.dbu, variables: variables)
       elsif data.is_a?(RBA::Texts)
-        RBA::TextPropertiesExpressions::new(data, expression, dbu: @engine.dbu, variables: variables)
+        pr = RBA::TextPropertiesExpressions::new(data, expression.expression, copy_properties: keep_properties, dbu: @engine.dbu, variables: variables)
       else
-        nil
+        pr = nil
       end
+
+      pr && expression.apply(pr)
+      pr
 
     end
 
-    def evaluate(expression, variables = {})
+    def evaluate(expression, variables = {}, keep_properties = false)
       @engine._context("evaluate") do
-        pr = _make_proc(expression, variables)
+        pr = _make_proc(expression, variables, keep_properties)
         @engine._tcmd(self.data, 0, self.data.class, :process, pr)
         self
+      end
+    end
+    
+    def evaluated(expression, variables = {}, keep_properties = false)
+      @engine._context("evaluated") do
+        pr = _make_proc(expression, variables, keep_properties)
+        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :processed, pr))
       end
     end
     
@@ -5254,6 +5312,8 @@ CODE
     # Evaluates the given expression on the shapes of the layer.
     # If the evaluation gives a 'true' value, the shape is selected. Otherwise
     # it is discarded.
+    #
+    # The expression is written in KLayout expression notation. 
     #
     # As input, the expressions will receive the
     # (merged) shapes in micrometer units (e.g. RBA::DPolygon type) 
@@ -5269,6 +5329,39 @@ CODE
     # Properties with well-formed names (e.g. "VALUE") are available as
     # variables in the expressions as a shortcut.
     #
+    # The expressions require a hint
+    # whether the they make use of anisotropic or scale-dependent properties.
+    # For example, the height of a box is an anisotropic property. If a check is made
+    # inside a rotated cell, the height transforms to a width and the check renders 
+    # different results for the same cell if the cell is placed rotated and non-rotated.
+    # The solution is cell variant formation.
+    # 
+    # Similarly, if a check is made against physical dimensions, the check will have
+    # different results for cells placed with different magnifications. Such a check
+    # is not scale-invariant.
+    #
+    # By default it is assumed that the expressions are isotropic and scale invariant.
+    # You can mark an expression as anisotropic and/or scale dependent using the following
+    # expression modifiers:
+    #
+    # @code
+    # # isotropic and scale invariant
+    # layer.select_if("shape.holes > 0")
+    #
+    # # anisotropic, but scale invariant
+    # layer.select_if(aniso("shape.bbox.height/shape.bbox.width > 2"))
+    #
+    # # isotropic, but not scale invariant
+    # layer.select_if(scales("shape.area > 10.0"))
+    #
+    # # anisotropic and not scale invariant
+    # layer.select_if(aniso_and_scales("shape.bbox.width > 10.0"))
+    # @/code
+    #
+    # If you forget to specify this hint, the expression will use the local 
+    # shape properties and fail to correctly produce the results in the presence
+    # of deep mode and rotated or magnified cell instances.
+    #
     # 'variables' can be a hash of arbitrary names and values. Each of these values
     # becomes available as variables in the expression. This eliminates the need
     # to build expression strings to pass variable values.
@@ -5277,7 +5370,7 @@ CODE
     # less than 10 square micrometers:
     #
     # @code
-    # layer.select("shape.area < 10.0")
+    # layer.select(scales("shape.area < 10.0"))
     # @/code
     #
     # This version modifies the input layer. A version that returns
@@ -5302,30 +5395,39 @@ CODE
     # less than 10 square micrometers and one with the shapes with a bigger area:
     #
     # @code
-    # (smaller, bigger) = layer.split_if("shape.area < 10.0")
+    # (smaller, bigger) = layer.split_if(scales("shape.area < 10.0"))
     # @/code
 
     def _make_filter(expression, variables)
 
-      expression.is_a?(String) || raise("'expression' must be a string")
+      if expression.is_a?(String)
+        expression = DRCTransformationVariantHint::new(expression)
+      elsif expression.is_a?(DRCTransformationVariantHint)
+        expression.expression.is_a?(String) || raise("'expression' must be a string")
+      else
+        raise("'expression' must be a string or a string decorated with a transformation variant hint")
+      end
       variables.is_a?(Hash) || raise("'variables' must be a hash")
 
       if data.is_a?(RBA::Region)
-        RBA::PolygonFilterBase::expression_filter(expression, variables: variables)
+        f = RBA::PolygonFilterBase::expression_filter(expression.expression, dbu: @engine.dbu, variables: variables)
       elsif data.is_a?(RBA::Edges)
-        RBA::EdgeFilterBase::expression_filter(expression, variables: variables)
+        f = RBA::EdgeFilterBase::expression_filter(expression.expression, dbu: @engine.dbu, variables: variables)
       elsif data.is_a?(RBA::EdgePairs)
-        RBA::EdgeFilterBase::expression_filter(expression, variables: variables)
+        f = RBA::EdgeFilterBase::expression_filter(expression.expression, dbu: @engine.dbu, variables: variables)
       elsif data.is_a?(RBA::Texts)
-        RBA::TextFilterBase::expression_filter(expression, variables: variables)
+        f = RBA::TextFilterBase::expression_filter(expression.expression, dbu: @engine.dbu, variables: variables)
       else
-        nil
+        f = nil
       end
+
+      f && expression.apply(f)
+      f
 
     end
 
     def select_if(expression, variables = {})
-      @engine._context("evaluate") do
+      @engine._context("select_if") do
         f = _make_filter(expression, variables)
         @engine._tcmd(self.data, 0, self.data.class, :filter, f)
         self
@@ -5333,16 +5435,17 @@ CODE
     end
     
     def selected_if(expression, variables = {})
-      @engine._context("evaluated") do
+      @engine._context("selected_if") do
         f = _make_filter(expression, variables)
         DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :filtered, f))
       end
     end
     
     def split_if(expression, variables = {})
-      @engine._context("evaluated") do
+      @engine._context("split_if") do
         f = _make_filter(expression, variables)
-        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :split_filter, f))
+        res = @engine._tcmd(self.data, 0, self.data.class, :split_filter, f)
+        [ DRCLayer::new(@engine, res[0]), DRCLayer::new(@engine, res[1]) ]
       end
     end
     

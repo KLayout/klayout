@@ -833,6 +833,9 @@ module DRC
     #
     # antenna_errors = evaluate_nets(gate, { "MET" => metal }, expression, variables)
     # @/code
+    #
+    # NOTE: GDS does not support properties with string names, so 
+    # either save to OASIS or use integer numbers for the property names.
 
     def evaluate_nets(primary, secondary, expression, variables = {})
 

@@ -526,9 +526,17 @@ AsIfFlatRegion::filtered_pair (const PolygonFilterBase &filter) const
 
   for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
     if (filter.selected (*p, p.prop_id ())) {
-      new_region_true->insert (*p);
+      if (p.prop_id () != 0) {
+        new_region_true->insert (db::PolygonWithProperties (*p, p.prop_id ()));
+      } else {
+        new_region_true->insert (*p);
+      }
     } else {
-      new_region_false->insert (*p);
+      if (p.prop_id () != 0) {
+        new_region_false->insert (db::PolygonWithProperties (*p, p.prop_id ()));
+      } else {
+        new_region_false->insert (*p);
+      }
     }
   }
 

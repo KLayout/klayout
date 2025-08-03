@@ -17,6 +17,7 @@ l2.evaluated("put(2, to_f(value(17))*factor)", { "factor" => 3.0 }, true).output
 l1.evaluated(aniso("put(2, shape.bbox.height/shape.bbox.width)")).output(12, 0)
 l1.evaluated(scales("put(2, shape.area)")).output(13, 0)
 l1.evaluated(aniso_and_scales("put(2, shape.bbox.width)")).output(14, 0)
+l1.evaluated(scales("skip(shape.area<20.0)")).output(15, 0)
 
 d = l2.dup
 d.evaluate("put(2, to_f(value(17))*2.0)").output(20, 0)
@@ -28,6 +29,8 @@ d = l1.dup
 d.evaluate(scales("put(2, shape.area)")).output(23, 0)
 d = l1.dup
 d.evaluate(aniso_and_scales("put(2, shape.bbox.width)")).output(24, 0)
+d = l1.dup
+d.evaluate(scales("skip(shape.area<20.0)")).output(25, 0)
 
 l2.selected_if("to_f(value(17))<3.0").output(30, 0)
 l2.selected_if("to_f(value(17))<thr)", { "thr" => 3.0 }).output(31, 0)

@@ -48,7 +48,10 @@ inline QString tr (const char *s)
 //  by using "tr" and falling back here, even if Qt is enabled
 
 #define __KLAYOUT_TL_HAVE_TR_FALLBACK
-std::string TL_PUBLIC tr_fallback (const char *s);
+namespace tl
+{
+  std::string TL_PUBLIC tr_fallback (const char *s);
+}
 
 inline std::string tr (const char *s)
 {

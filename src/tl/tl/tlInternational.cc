@@ -117,8 +117,6 @@ std::string tr (const char *s)
 
 #endif
 
-}
-
 std::string tr_fallback (const char *s)
 {
 #if defined(HAVE_QT)
@@ -128,3 +126,6 @@ std::string tr_fallback (const char *s)
   return std::string (s);
 #endif
 }
+
+}
+

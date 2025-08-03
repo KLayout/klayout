@@ -858,7 +858,7 @@ module DRC
 
       expression.is_a?(String) || raise("'expression' argument must be a string")
 
-      DRC::DRCLayer::new(@engine, @engine._cmd(l2n_data, :evaluate_nets, primary.data, secondary_data, expression, variables))
+      DRC::DRCLayer::new(@engine, @engine._cmd(l2n_data, :evaluate_nets, primary.data, secondary_data, expression, variables, nil))
 
     end
 

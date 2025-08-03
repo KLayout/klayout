@@ -2055,7 +2055,7 @@ db::Region LayoutToNetlist::antenna_check (const db::Region &gate, double gate_a
 }
 
 db::Region
-LayoutToNetlist::measure_net (const db::Region &primary, const std::map<std::string, const db::Region *> &secondary, const std::string &expression, const std::map<std::string, tl::Variant> &variables)
+LayoutToNetlist::measure_net (const db::Region &primary, const std::map<std::string, const db::Region *> &secondary, const std::string &expression, const std::map<std::string, tl::Variant> &variables, double dbu)
 {
   //  TODO: that's basically too much .. we only need the clusters
   if (! m_netlist_extracted) {
@@ -2063,7 +2063,10 @@ LayoutToNetlist::measure_net (const db::Region &primary, const std::map<std::str
   }
 
   db::Layout &ly = dss ().layout (m_layout_index);
-  double dbu = ly.dbu ();
+
+  if (dbu < 0.0) {
+    dbu = ly.dbu ();
+  }
 
   db::MeasureNetEval eval (this, dbu);
 

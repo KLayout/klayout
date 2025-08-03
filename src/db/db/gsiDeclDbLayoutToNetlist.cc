@@ -216,7 +216,7 @@ static db::Region antenna_check (db::LayoutToNetlist *l2n, const db::Region &pol
   return antenna_check3 (l2n, poly, 1, 0, metal, 1, 0, ratio, diodes, texts);
 }
 
-static db::Region evaluate_nets (db::LayoutToNetlist *l2n, const db::Region &primary, const std::map<std::string, const db::Region *> &secondary, const std::string &expression, const tl::Variant &variables)
+static db::Region evaluate_nets (db::LayoutToNetlist *l2n, const db::Region &primary, const std::map<std::string, const db::Region *> &secondary, const std::string &expression, const tl::Variant &variables, const tl::Variant &dbu)
 {
   if (! variables.is_array ()) {
     throw tl::Exception (tl::to_string (tr ("'variables' argument needs to a hash")));
@@ -227,7 +227,7 @@ static db::Region evaluate_nets (db::LayoutToNetlist *l2n, const db::Region &pri
     variables_map [v->first.to_string ()] = v->second;
   }
 
-  return l2n->measure_net (primary, secondary, expression, variables_map);
+  return l2n->measure_net (primary, secondary, expression, variables_map, dbu.is_nil () ? -1.0 : dbu.to_float ());
 }
 
 static void join_net_names (db::LayoutToNetlist *l2n, const std::string &s)
@@ -1224,7 +1224,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "\n"
     "This variant has been introduced in version 0.26.6.\n"
   ) +
-  gsi::method_ext ("evaluate_nets", &evaluate_nets, gsi::arg ("primary"), gsi::arg ("secondary"), gsi::arg ("expression"), gsi::arg ("variables", std::map<std::string, tl::Variant> (), "{}"),
+  gsi::method_ext ("evaluate_nets", &evaluate_nets, gsi::arg ("primary"), gsi::arg ("secondary"), gsi::arg ("expression"), gsi::arg ("variables", std::map<std::string, tl::Variant> (), "{}"), gsi::arg ("dbu", tl::Variant (), "auto"),
     "@brief Runs a generic net measurement function\n"
     "\n"
     "This method accepts some primary layer, a number of secondary layers with names and an expression.\n"
@@ -1249,6 +1249,9 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "@li 'skip(flag)': will skip the primary shapes of that net when called with a true value @/li\n"
     "@li 'net': the \\Net object of the current net @/li\n"
     "@/ul\n"
+    "\n"
+    "If given, the 'dbu' argument gives the database unit to use for converting shape dimensions into micrometer units. "
+    "If this value is 0, the area and perimeters are calculated in database units. If no DBU is specified, the value is determined automatically."
   ) +
   //  test API
   gsi::method ("make_soft_connection_diodes=", &db::LayoutToNetlist::set_make_soft_connection_diodes, gsi::arg ("flag"), "@hide") +

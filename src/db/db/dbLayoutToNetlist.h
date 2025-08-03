@@ -1148,7 +1148,7 @@ public:
    *  * "skip(flag)": will skip the primary shapes of that net when called with a true value
    *  * "net": the Net object of the current net
    */
-  db::Region measure_net (const db::Region &primary, const std::map<std::string, const db::Region *> &secondary, const std::string &expression, const std::map<std::string, tl::Variant> &variables);
+  db::Region measure_net (const db::Region &primary, const std::map<std::string, const db::Region *> &secondary, const std::string &expression, const std::map<std::string, tl::Variant> &variables, double dbu = -1.0);
 
   /**
    *  @brief Saves the database to the given path

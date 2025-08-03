@@ -521,8 +521,13 @@ MeasureNetEval::compute_area_and_perimeter (int layer_index) const
   mp_l2n->compute_area_and_perimeter_of_net_shapes (m_cell_index, m_cluster_id, layer, area, perimeter);
 
   AreaAndPerimeter ap;
-  ap.area = m_dbu * m_dbu * area;
-  ap.perimeter = m_dbu * perimeter;
+  if (m_dbu > 0.0) {
+    ap.area = m_dbu * m_dbu * area;
+    ap.perimeter = m_dbu * perimeter;
+  } else {
+    ap.area = area;
+    ap.perimeter = perimeter;
+  }
 
   return ap;
 }

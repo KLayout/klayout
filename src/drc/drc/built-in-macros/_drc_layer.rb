@@ -5152,7 +5152,7 @@ CODE
     # new layer.
     
     def merged_props(overlap_count = 1)
-      @engine._context("merged") do
+      @engine._context("merged_props") do
         requires_region
         aa = [ self.data.min_coherence, @engine._prep_value(overlap_count), true ]
         DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :merged, *aa))
@@ -5160,7 +5160,7 @@ CODE
     end
     
     def merge_props(overlap_count = 1)
-      @engine._context("merge") do
+      @engine._context("merge_props") do
         requires_region
         aa = [ self.data.min_coherence, @engine._prep_value(overlap_count), true ]
         if @engine.is_tiled?

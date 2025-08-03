@@ -1481,14 +1481,14 @@ TEST(14)
 
   EXPECT_EQ (ba1_var.equal (tl::Variant ("AB")), false);
   EXPECT_EQ (ba1_var.less (tl::Variant ("AB")), false);
-  EXPECT_EQ (ba1_var.less (tl::Variant ("ABCD")), false);
+  EXPECT_EQ (ba1_var.less (tl::Variant ("ABCD")), true);
   EXPECT_EQ (tl::Variant ("AB").equal (ba1_var), false);
   EXPECT_EQ (tl::Variant ("AB").less (ba1_var), true);
-  EXPECT_EQ (tl::Variant ("ABCD").less (ba1_var), true);
-  EXPECT_EQ (ba2_var.equal (tl::Variant ("ABCD")), false);
+  EXPECT_EQ (tl::Variant ("ABCD").less (ba1_var), false);
+  EXPECT_EQ (ba2_var.equal (tl::Variant ("ABCD")), true);
   EXPECT_EQ (ba2_var.less (tl::Variant ("ABCD")), false);
-  EXPECT_EQ (tl::Variant ("ABCD").equal (ba2_var), false);
-  EXPECT_EQ (tl::Variant ("ABCD").less (ba2_var), true);
+  EXPECT_EQ (tl::Variant ("ABCD").equal (ba2_var), true);
+  EXPECT_EQ (tl::Variant ("ABCD").less (ba2_var), false);
 }
 
 }

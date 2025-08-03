@@ -1144,11 +1144,11 @@ class DBLayoutTest(unittest.TestCase):
       shape = s
     self.assertEqual(shape.property(2), "hello, world")
     self.assertEqual(shape.property("2"), None)
-    self.assertEqual(shape.property(2.0), "hello, world")
+    self.assertEqual(shape.property(2.0), None)
     self.assertEqual(shape.property(22), None)
     self.assertEqual(shape.property(42), "the answer")
     self.assertEqual(shape.property("42"), None)
-    self.assertEqual(shape.property(42.0), "the answer")
+    self.assertEqual(shape.property(42.0), None)
 
     ly2 = pya.Layout()
     ly2.read(file_oas)
@@ -1158,7 +1158,7 @@ class DBLayoutTest(unittest.TestCase):
       shape = s
     self.assertEqual(shape.property(2), "hello, world")
     self.assertEqual(shape.property("2"), None)
-    self.assertEqual(shape.property(2.0), "hello, world")
+    self.assertEqual(shape.property(2.0), None)
     self.assertEqual(shape.property(22), None)
     self.assertEqual(shape.property("42"), "the answer")
     self.assertEqual(shape.property(42), None)

@@ -1151,6 +1151,8 @@ normalized_types (Variant::type type1, Variant::type type2)
     type2 = Variant::t_double;
   }
 
+  //  Ruby sometimes produces byte arrays instead of strings, so use those
+  //  as common type for strings and byte arrays
   if (is_string_type (type1) && type2 == Variant::t_bytearray) {
     type1 = Variant::t_bytearray;
   } else if (is_string_type (type2) && type1 == Variant::t_bytearray) {
@@ -1173,6 +1175,14 @@ normalized_type_rigid (Variant::type type1, Variant::type type2)
 {
   type1 = normalized_type (type1);
   type2 = normalized_type (type2);
+
+  //  Ruby sometimes produces byte arrays instead of strings, so use those
+  //  as common type for strings and byte arrays
+  if (is_string_type (type1) && type2 == Variant::t_bytearray) {
+    type1 = Variant::t_bytearray;
+  } else if (is_string_type (type2) && type1 == Variant::t_bytearray) {
+    type2 = Variant::t_bytearray;
+  }
 
   return std::make_pair (type1 == type2, type1);
 }

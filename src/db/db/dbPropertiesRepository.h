@@ -462,21 +462,13 @@ public:
   }
 
 private:
-  struct CompareNamePtrByValueForValues
+  struct CompareVariantPtrByValue
   {
     bool operator() (const tl::Variant *a, const tl::Variant *b) const
     {
-      //  NOTE: for values, the type should matter, so 2.0 is different from 2 (integer).
+      //  NOTE: for values and names, the type should matter, so 2.0 is different from 2 (integer).
       //  Hence we use "less" here.
       return a->less (*b);
-    }
-  };
-
-  struct CompareNamePtrByValueForNames
-  {
-    bool operator() (const tl::Variant *a, const tl::Variant *b) const
-    {
-      return *a < *b;
     }
   };
 
@@ -488,9 +480,9 @@ private:
     }
   };
 
-  std::set <const tl::Variant *, CompareNamePtrByValueForNames> m_propnames;
+  std::set <const tl::Variant *, CompareVariantPtrByValue> m_propnames;
   std::list <tl::Variant> m_property_names_heap;
-  std::set <const tl::Variant *, CompareNamePtrByValueForValues> m_propvalues;
+  std::set <const tl::Variant *, CompareVariantPtrByValue> m_propvalues;
   std::list <tl::Variant> m_property_values_heap;
   std::set <const PropertiesSet *, ComparePropertiesPtrByValue> m_properties;
   std::list <PropertiesSet> m_properties_heap;

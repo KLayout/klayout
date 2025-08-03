@@ -118,15 +118,12 @@ public:
   //  more versions
   void decompose (const db::Region &region, const ConvexDecompositionParameters &parameters, const db::CplxTrans &trans = db::CplxTrans ());
   void decompose (const db::Polygon &poly, const ConvexDecompositionParameters &parameters, double dbu = 1.0);
-  void decompose (const db::Polygon &poly, const std::vector<db::Point> &vertexes, const ConvexDecompositionParameters &parameters, double dbu = 1.0);
   void decompose (const db::Polygon &poly, const ConvexDecompositionParameters &parameters, const db::CplxTrans &trans = db::CplxTrans ());
-  void decompose (const db::Polygon &poly, const std::vector<db::Point> &vertexes, const ConvexDecompositionParameters &parameters, const db::CplxTrans &trans = db::CplxTrans ());
 
   /**
    *  @brief Decomposes a floating-point polygon
    */
   void decompose (const db::DPolygon &poly, const ConvexDecompositionParameters &parameters, const db::DCplxTrans &trans = db::DCplxTrans ());
-  void decompose (const db::DPolygon &poly, const std::vector<db::DPoint> &vertexes, const ConvexDecompositionParameters &parameters, const db::DCplxTrans &trans = db::DCplxTrans ());
 
 private:
   Graph *mp_graph;

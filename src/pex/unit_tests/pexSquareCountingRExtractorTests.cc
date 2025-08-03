@@ -213,3 +213,35 @@ TEST(extraction_meander)
     "R V0(0.3,0;0.3,0) V1(4.3,1;4.3,1) 10.0543767445"          //  that is pretty much the length of the center line / width :)
   )
 }
+
+TEST(issue_2102)
+{
+  db::Point contour[] = {
+    db::Point (-85, -610),
+    db::Point (-85, 610),
+    db::Point (85, 610),
+    db::Point (85, 440),
+    db::Point (65, 440),
+    db::Point (65, -610)
+  };
+
+  db::Polygon poly;
+  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour[0]));
+
+  double dbu = 0.001;
+
+  pex::RNetwork rn;
+  pex::SquareCountingRExtractor rex (dbu);
+
+  std::vector<db::Point> vertex_ports;
+  vertex_ports.push_back (db::Point (0, 525));
+  vertex_ports.push_back (db::Point (-85, -610));
+
+  std::vector<db::Polygon> polygon_ports;
+
+  rex.extract (poly, vertex_ports, polygon_ports, rn);
+
+  EXPECT_EQ (network2s (rn),
+    "R V0(0,0.525;0,0.525) V1(-0.085,-0.61;-0.085,-0.61) 7.89600487195"          //  was crashing before
+  )
+}

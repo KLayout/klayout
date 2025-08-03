@@ -5175,7 +5175,7 @@ CODE
     
     # %DRC%
     # @name evaluate
-    # @brief Evaluate expressions on the shapes of the layer
+    # @brief Evaluates expressions on the shapes of the layer
     # @synopsis layer.evaluate(expression [, variables [, keep_properties ]])
     #
     # Evaluates the given expression on the shapes of the layer.
@@ -5185,39 +5185,54 @@ CODE
     # The expressions can place properties on the shapes using the 
     # "put" function. As input, the expressions will receive the
     # (merged) shapes in micrometer units (e.g. RBA::DPolygon type) 
-    # by calling the "shape" function. You can also call 'skip' with
-    # a 'true' value to drop the shape from the output entirely.
+    # by calling the "shape" function. 
+    # 
+    # By default, input shapes are copied to the output with the properties
+    # attached to them by "put". You can skip shapes by calling "skip" with
+    # a 'true' value. In that case, the shape is not copied. This allows 
+    # implementing filters.
     #
-    # Available functions are:
+    # Available functions for the expressions are:
     # 
     # @ul
     # @li "put(name, value)": creates a property with the given name and value @/li
     # @li "skip(flag)": if called with a 'true' value, the shape will be dropped from the output @/li
     # @li "shape": the current shape in micrometer units @/li
     # @li "value(name)": the value of a property with name 'name' or nil if the current shape does not have a property with this name @/li
-    # @ul
+    # @/ul
     #
     # Properties with well-formed names (e.g. "VALUE") are available as
     # variables in the expressions as a shortcut.
     #
-    # 'variables' can be a hash of arbitrary names and values. Each of these values
-    # becomes available as variables in the expression. This eliminates the need
-    # to build expression strings to pass variable values.
+    # 'variables' is a hash of arbitrary names and values. Each of these values
+    # becomes available as a variable in the expression. This eliminates the need
+    # to build expression strings with pasted value strings for passing external values.
     #
     # If 'keep_properties' is true, the existing properties of the shape will be kept.
     # Otherwise (the default), existing properties will be removed before adding new
     # ones with 'put'.
     #
+    # The following example computes the area of the shapes and puts them
+    # into a property 'area':
+    #
+    # @code
+    # layer.evaluate(scales("put('area', shape.area)"))
+    # @/code
+    #
+    # NOTE: GDS does not support properties with string names, so 
+    # either save to OASIS or use integer numbers for the property names.
+    #
     # The expressions require a hint
-    # whether the they make use of anisotropic or scale-dependent properties.
+    # whether they make use of anisotropic or scale-dependent properties.
     # For example, the height of a box is an anisotropic property. If a check is made
     # inside a rotated cell, the height transforms to a width and the check renders 
-    # different results for the same cell if the cell is placed rotated and non-rotated.
-    # The solution is cell variant formation.
+    # different results for the same cell, if the cell is placed rotated and non-rotated.
+    # The solution is cell variant formation which happens automatically when the
+    # "aniso" hint is present.
     # 
     # Similarly, if a check is made against physical dimensions, the check will have
     # different results for cells placed with different magnifications. Such a check
-    # is not scale-invariant.
+    # is not scale-invariant and needs to get a "scaled" hint.
     #
     # By default it is assumed that the expressions are isotropic and scale invariant.
     # You can mark an expression as anisotropic and/or scale dependent using the following
@@ -5241,25 +5256,16 @@ CODE
     # shape properties and fail to correctly produce the results in the presence
     # of deep mode and rotated or magnified cell instances.
     #
-    # The following example computes the area of the shapes and puts them
-    # into a property 'area':
-    #
-    # @code
-    # layer.evaluate(scales("put('area', shape.area)"))
-    # @/code
-    #
-    # NOTE: GDS does not support properties with string names, so 
-    # either save to OASIS or use integer numbers for the property names.
-    #
-    # This version modifies the input layer. A version that returns
-    # a new layer is \evaluated.
+    # The "evaluate" method modifies the input layer. A version that returns
+    # a new layer without modifying the input is \evaluated.
     
     # %DRC%
     # @name evaluated
-    # @brief Evaluate expressions on the shapes of the layer and returns a new layer
+    # @brief Evaluates expressions on the shapes of the layer and returns a new layer
     # @synopsis layer.evaluated(expression [, variables [, keep_properties]])
     # 
-    # This method is the out-of-place version of \evaluate.
+    # This method is the out-of-place version of \evaluate. It takes the same 
+    # arguments.
 
     def _make_proc(expression, variables, keep_properties)
 
@@ -5324,21 +5330,22 @@ CODE
     # @ul
     # @li "shape": the current shape in micrometer units @/li
     # @li "value(name)": the value of a property with name 'name' or nil if the current shape does not have a property with this name @/li
-    # @ul
+    # @/ul
     #
     # Properties with well-formed names (e.g. "VALUE") are available as
     # variables in the expressions as a shortcut.
     #
     # The expressions require a hint
-    # whether the they make use of anisotropic or scale-dependent properties.
+    # whether they make use of anisotropic or scale-dependent properties.
     # For example, the height of a box is an anisotropic property. If a check is made
     # inside a rotated cell, the height transforms to a width and the check renders 
-    # different results for the same cell if the cell is placed rotated and non-rotated.
-    # The solution is cell variant formation.
+    # different results for the same cell, if the cell is placed rotated and non-rotated.
+    # The solution is cell variant formation which happens automatically when the
+    # "aniso" hint is present.
     # 
     # Similarly, if a check is made against physical dimensions, the check will have
     # different results for cells placed with different magnifications. Such a check
-    # is not scale-invariant.
+    # is not scale-invariant and needs to get a "scaled" hint.
     #
     # By default it is assumed that the expressions are isotropic and scale invariant.
     # You can mark an expression as anisotropic and/or scale dependent using the following
@@ -5362,15 +5369,21 @@ CODE
     # shape properties and fail to correctly produce the results in the presence
     # of deep mode and rotated or magnified cell instances.
     #
-    # 'variables' can be a hash of arbitrary names and values. Each of these values
-    # becomes available as variables in the expression. This eliminates the need
-    # to build expression strings to pass variable values.
+    # 'variables' is a hash of arbitrary names and values. Each of these values
+    # becomes available as a variable in the expression. This eliminates the need
+    # to build expression strings with pasted value strings for passing external values.
     #
     # The following example selects all shapes on the layer with an area 
     # less than 10 square micrometers:
     #
     # @code
     # layer.select(scales("shape.area < 10.0"))
+    # @/code
+    #
+    # Written with a variable as a threshold this becomes:
+    #
+    # @code
+    # layer.select(scales("shape.area < thr"), { "thr" => 10.0 })
     # @/code
     #
     # This version modifies the input layer. A version that returns
@@ -5381,7 +5394,7 @@ CODE
     # @brief Selects shapes based on the evaluation of an expression
     # @synopsis layer.selected_if(expression [, variables])
     # 
-    # This method is the out-of-place version of \select_if.
+    # This method is the out-of-place version of \select_if. It takes the same arguments.
 
     # %DRC%
     # @name split_if
@@ -5389,10 +5402,10 @@ CODE
     # @synopsis layer.selected_if(expression [, variables])
     # 
     # This method, like the other 'split_...' methods returns two layers:
-    # one with the result of \\selected_if, and a second with all other shapes.
+    # one with the result of \selected_if, and a second with all other shapes.
     #
-    # The following example splits a layer into two: one with the shapes with an area
-    # less than 10 square micrometers and one with the shapes with a bigger area:
+    # The following example splits a layer into two: one with the shapes that have an area
+    # less than 10 square micrometers and another one with the shapes that have a bigger area:
     #
     # @code
     # (smaller, bigger) = layer.split_if(scales("shape.area < 10.0"))

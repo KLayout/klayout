@@ -779,38 +779,44 @@ module DRC
     # It visits each net and evaluates the given expression on the net.
     # The expression needs to be written in KLayout expression notations.
     #
-    # By default, the shapes of the primary layer are copied to the output.
+    # The default action is to copy the shapes of the primary layer to the
+    # output. This action can be modified in some ways: skip shapes of
+    # certain nets or attach properties to the shapes during the evaluation.
     #
     # Using the "put" function inside the expression, properties can be 
     # attached to the output shapes. The properties can be computed using
-    # a number of net attributes - area and perimeter, but also the RBA::Net
-    # object representing the net. This allows implementing a more elaborate
+    # a number of net attributes - area and perimeter for example.
+    #
+    # Also the RBA::Net object representing the net is available through the
+    # 'net' function. This allows implementing a more elaborate
     # antenna check for example.
     #
-    # Also, the expression can choose to drop shapes and not copy then to 
+    # Also, the expression can choose to drop shapes and not copy them to 
     # the output by calling the "skip" function with a "true" argument.
     #
     # Arbitrary values can be passed as variables, which removes the need
-    # to encode variable values into the expression.
+    # to encode variable values into the expression. For this, use the 
+    # 'variables' argument and pass a hash with names and values. Each of
+    # those values becomes available as a variable with the given name
+    # inside the expression.
     # 
-    # The following functions are available
+    # The following functions are available inside the expressions:
     #
     # @ul
-    # @li "net" - the RBA::Net object of the current net
-    # @li "skip(flag)" - if called with a 'true' argument, the primary layer's shapes are not copied for this net
-    # @li "put(name, value)" - places the value as a property with name 'name' (this must be a string) on the output shapes
-    # @li "area" - the combined area of the primary layer's shapes on the net in square micrometer units
-    # @li "area(symbol)" - the combined area of the secondary layer's shapes on the net in square micrometer units
-    # @li "perimeter" - the perimeter of the primary layer's shapes on the net in micrometer units
-    # @li "perimeter(symbol)" - the perimeter of the secondary layer's shapes on the net in micrometer units
+    # @li "net" - the RBA::Net object of the current net @/li
+    # @li "skip(flag)" - if called with a 'true' argument, the primary layer's shapes are not copied for this net @/li
+    # @li "put(name, value)" - places the value as a property with name 'name' (this must be a string) on the output shapes @/li
+    # @li "area" - the combined area of the primary layer's shapes on the net in square micrometer units @/li
+    # @li "area(symbol)" - the combined area of the secondary layer's shapes on the net in square micrometer units @/li
+    # @li "perimeter" - the perimeter of the primary layer's shapes on the net in micrometer units @/li
+    # @li "perimeter(symbol)" - the perimeter of the secondary layer's shapes on the net in micrometer units @/li
     # @/ul
     #
     # Here, 'symbol' is the name given to the secondary layer in the secondary layer
     # dictionary.
     #
-    # The following example computes the area ratio of metal vs. gate area and 
-    # attaches the value on a property with name 'AR' to the shapes of a copy of the
-    # 'gate' layer:
+    # The following example emulates an antenna check. It computes the area ratio of metal vs. gate area and 
+    # attaches the value as a property with name 'AR' to the shapes, copied from the 'gate' layer:
     #
     # @code
     # gate = ...   # a layer with the gate shapes
@@ -820,7 +826,7 @@ module DRC
     # antenna_errors = evaluate_nets(gate, { "MET" => metal }, "put('AR',area(MET)/area)")
     # @/code
     #
-    # The following example computes the area ratio of metal vs. gate area and 
+    # This other example also computes the area ratio of metal vs. gate area, and 
     # outputs the gate shapes of all nets whose metal to gate area ratio is bigger than
     # 500. The area ratio is output to a property with name 'AR':
     #
@@ -835,7 +841,7 @@ module DRC
     # @/code
     #
     # NOTE: GDS does not support properties with string names, so 
-    # either save to OASIS or use integer numbers for the property names.
+    # either save to OASIS, or use integer numbers for the property names.
 
     def evaluate_nets(primary, secondary, expression, variables = {})
 

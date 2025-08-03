@@ -722,6 +722,15 @@ actual edges from the first input (see <a href="#separation">separation</a> for 
 <p>
 Similar to <a href="#log">log</a>, but the message is printed formatted as an error
 </p>
+<a name="evaluate_nets"/><h2>"evaluate_nets" - Evaluates expressions on nets</h2>
+<keyword name="evaluate_nets"/>
+<p>Usage:</p>
+<ul>
+<li><tt>evaluate_nets(primary_layer, secondary_layers, expression [, variables])</tt></li>
+</ul>
+<p>
+See <a href="/about/drc_ref_netter.xml#evaluate_nets">Netter#evaluate_nets</a> for a description of that function.
+</p>
 <a name="extent"/><h2>"extent" - Creates a new layer with the bounding box of the default source or cell bounding boxes</h2>
 <keyword name="extent"/>
 <p>Usage:</p>

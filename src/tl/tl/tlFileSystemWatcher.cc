@@ -23,6 +23,7 @@
 #include "tlFileSystemWatcher.h"
 #include "tlString.h"
 #include "tlTimer.h"
+#include "tlLog.h"
 
 #include <QFileInfo>
 #include <QTimer>
@@ -74,6 +75,7 @@ void
 FileSystemWatcher::clear ()
 {
   m_files.clear ();
+  m_files_removed.clear ();
   m_iter = m_files.begin ();
   m_index = 0;
 }
@@ -90,6 +92,8 @@ FileSystemWatcher::add_file (const std::string &path)
   if (path.empty ()) {
     return;
   }
+
+  m_files_removed.erase (path);
 
   size_t size = 0;
   QDateTime time;
@@ -109,6 +113,9 @@ FileSystemWatcher::add_file (const std::string &path)
     i->second.time = time;
   } else {
     m_files.insert (std::make_pair (path, FileEntry (1, size, time)));
+    if (tl::verbosity () >= 30) {
+      tl::info << tl::to_string (tr ("Start watching file: ")) << path;
+    }
   }
 
   m_iter = m_files.begin ();
@@ -122,11 +129,16 @@ FileSystemWatcher::remove_file (const std::string &path)
     return;
   }
 
+  m_files_removed.erase (path);
+
   std::map<std::string, FileEntry>::iterator i = m_files.find (path);
   if (i != m_files.end () && --(i->second.refcount) <= 0) {
     m_files.erase (i);
     m_iter = m_files.begin ();
     m_index = 0;
+    if (tl::verbosity () >= 30) {
+      tl::info << tl::to_string (tr ("Stop watching file: ")) << path;
+    }
   }
 }
 
@@ -153,13 +165,25 @@ FileSystemWatcher::timeout ()
     QFileInfo fi (tl::to_qstring (m_iter->first));
     if (! fi.exists ()) {
 
-      files_removed.push_back (m_iter->first);
+      if (m_files_removed.find (m_iter->first) == m_files_removed.end ()) {
+        files_removed.push_back (m_iter->first);
+        m_files_removed.insert (m_iter->first);
+      }
 
+      // don't drop files that temporarily does not exist - keep them monitored.
+      // This way, programs that delete and write the file will not mess with the 
+      // file watcher.
+#if 0 
       std::map<std::string, FileEntry>::iterator i = m_iter;
       ++m_iter;
       m_files.erase (i);
+#else
+      ++m_iter;
+#endif
 
     } else {
+
+      m_files_removed.erase (m_iter->first);
 
       size_t size = size_t (fi.size ());
       QDateTime time = fi.lastModified ();
@@ -180,10 +204,17 @@ FileSystemWatcher::timeout ()
   }
 
   for (std::list<std::string>::const_iterator i = files_removed.begin (); i != files_removed.end (); ++i) {
+    if (tl::verbosity () >= 40) {
+      tl::info << tl::to_string (tr ("File removed: ")) << *i;
+    }
     file_removed (*i);
     emit fileRemoved (tl::to_qstring (*i));
   }
+
   for (std::list<std::string>::const_iterator i = files_changed.begin (); i != files_changed.end (); ++i) {
+    if (tl::verbosity () >= 40) {
+      tl::info << tl::to_string (tr ("File changed: ")) << *i;
+    }
     file_changed (*i);
     emit fileChanged (tl::to_qstring (*i));
   }

@@ -2741,6 +2741,15 @@ MacroEditorDialog::file_changed (const QString &path)
 {
   m_changed_files.push_back (path);
 
+  //  files that have changed are available again
+  auto rw = m_removed_files.begin ();
+  for (auto i = m_removed_files.begin (); i != m_removed_files.end (); ++i) {
+    if (*i != path) {
+      *rw++ = *i;
+    }
+  }
+  m_removed_files.erase (rw, m_removed_files.end ());
+
   //  Wait a little to allow for more reload requests to collect
   m_file_changed_timer->setInterval (300);
   m_file_changed_timer->start ();
@@ -2750,6 +2759,15 @@ void
 MacroEditorDialog::file_removed (const QString &path)
 {
   m_removed_files.push_back (path);
+
+  //  files that are removed are not changed
+  auto rw = m_changed_files.begin ();
+  for (auto i = m_changed_files.begin (); i != m_changed_files.end (); ++i) {
+    if (*i != path) {
+      *rw++ = *i;
+    }
+  }
+  m_changed_files.erase (rw, m_changed_files.end ());
 
   //  Wait a little to let more to allow for more reload requests to collect
   m_file_changed_timer->setInterval (300);

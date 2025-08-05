@@ -8958,6 +8958,31 @@ class Macro:
     This method has been introduced in version 0.27.5.
     """
     @classmethod
+    def current(cls) -> Macro:
+        r"""
+        @brief Gets the macro currently executed
+
+        This method can be used inside scripts running in that macro to identify the currently running macro. It returns nil outside the 'run' context. The Macro object can be used to pass information in and out of the script using macro attributes (see \set_attribute and related methods).
+
+        @code
+        macro = RBA::Macro::new
+        macro.interpreter = RBA::Macro::Ruby
+
+        macro.text = <<"END"
+          macro = RBA::Macro::current
+          x = macro.get_attribute("x")
+          macro.set_attribute("y", x + 1)
+        END
+
+        macro.set_attribute("x", 17)
+        macro.run
+        macro.get_attribute("y")  # -> 18
+        @/code
+
+        This method has been introduced in version 0.30.3.
+        """
+        ...
+    @classmethod
     def macro_by_path(cls, path: str) -> Macro:
         r"""
         @brief Finds the macro by installation path
@@ -9095,6 +9120,15 @@ class Macro:
         Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
         """
         ...
+    def delete_attribute(self, name: str) -> None:
+        r"""
+        @brief Deletes the attribute with the given name
+
+        See \set_attribute for a description of Macro attributes.
+
+        This method has been introduced in version 0.30.3.
+        """
+        ...
     def destroy(self) -> None:
         r"""
         @brief Explicitly destroys the object
@@ -9107,6 +9141,25 @@ class Macro:
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def get_attribute(self, name: str) -> Any:
+        r"""
+        @brief Gets the value of the attribute with the given name
+
+        See \set_attribute for a description of Macro attributes.
+        If no attribute is present with the given name, nil is returned.
+
+        This method has been introduced in version 0.30.3.
+        """
+        ...
+    def has_attribute(self, name: str) -> bool:
+        r"""
+        @brief Gets a value indicating whether the Macro has an attribute with the given name
+
+        See \set_attribute for a description of Macro attributes.
+
+        This method has been introduced in version 0.30.3.
         """
         ...
     def interpreter_name(self) -> str:
@@ -9150,6 +9203,16 @@ class Macro:
         @brief Saves the macro to the given file
 
         This method has been introduced in version 0.27.5.
+        """
+        ...
+    def set_attribute(self, name: str, value: Any) -> None:
+        r"""
+        @brief Gets the attribute with the given name
+
+        Attributes are generic key/value pairs that can be added to the Macro object.
+        This allows passing information in and out of the macro run (see \current).
+
+        This method has been introduced in version 0.30.3.
         """
         ...
     def sync_properties_with_text(self) -> None:
@@ -10192,6 +10255,15 @@ class ObjectInstPath:
     def assign(self, other: ObjectInstPath) -> None:
         r"""
         @brief Assigns another object to self
+        """
+        ...
+    def cell(self) -> db.Cell:
+        r"""
+        @brief Gets the cell object that the selection applies to.
+
+        This is a convenience method that returns a \Cell objeact instead of a cell index (see \cell_index).
+
+        This method has been introduced in version 0.30.3.
         """
         ...
     def cell_index(self) -> int:

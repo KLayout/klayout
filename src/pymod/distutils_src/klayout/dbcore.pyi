@@ -1525,6 +1525,15 @@ class Cell:
         This method has been introduced in version 0.28.8.
         """
         ...
+    def clear_properties(self) -> None:
+        r"""
+        @brief Clears all user properties
+        This method will remove all user properties. After it has been called, \has_prop_id? will return false.
+        It is equivalent to setting the properties ID to zero.
+
+        This method has been introduced in version 0.30.3.
+        """
+        ...
     def clear_shapes(self) -> None:
         r"""
         @brief Clears all shapes in the cell
@@ -2756,6 +2765,14 @@ class Cell:
         This method has been introduced in version 0.16. It can only be used in editable mode.
         Changes the properties Id of the given instance or install a properties Id on that instance if it does not have one yet.
         The property Id must be obtained from the \Layout object's property_id method which associates a property set with a property Id.
+        """
+        ...
+    def set_properties(self, dict: Dict[Any, Any]) -> None:
+        r"""
+        @brief Sets all user properties from the given dict
+        This method is a convenience method that replaces all user properties of the cell. Using that method is more convenient than creating a new property set with a new ID and assigning that properties ID.
+        This method may change the properties ID. Note: GDS only supports integer keys. OASIS supports numeric and string keys. 
+        This method has been introduced in version 0.30.3.
         """
         ...
     def set_property(self, key: Any, value: Any) -> None:
@@ -15648,8 +15665,7 @@ class DText:
     Setter:
     @brief Sets the horizontal alignment
 
-    This property specifies how the text is aligned relative to the anchor point. 
-    This property has been introduced in version 0.22 and extended to enums in 0.28.
+    This is the version accepting integer values. It's provided for backward compatibility.
     """
     size: float
     r"""
@@ -22892,6 +22908,27 @@ class EdgeFilterBase:
     Typically, cell variant formation is less expensive, but the hierarchy will be modified.
     """
     @classmethod
+    def expression_filter(cls, expression: str, inverse: Optional[bool] = ..., variables: Optional[Dict[str, Any]] = ..., dbu: Optional[float] = ...) -> EdgeFilterBase:
+        r"""
+        @brief Creates an expression-based filter
+        @param expression The expression to evaluate.
+        @param inverse If true, inverts the selection - i.e. all edges without a property with the given name and value range are selected.
+        @param dbu If given and greater than zero, the shapes delivered by the 'shape' function will be in micrometer units.
+        @param variables Arbitrary values that are available as variables inside the expressions.
+
+        Creates a filter that will evaluate the given expression on every shape and select the shape when the expression renders a boolean true value. The expression may use the following variables and functions:
+
+        @ul
+        @li @b shape @/b: The current shape (i.e. 'Edge' without DBU specified or 'DEdge' otherwise) @/li
+        @li @b value(<name>) @/b: The value of the property with the given name (the first one if there are multiple properties with the same name) @/li
+        @li @b values(<name>) @/b: All values of the properties with the given name (returns a list) @/li
+        @li @b <name> @/b: A shortcut for 'value(<name>)' (<name> is used as a symbol) @/li
+        @/ul
+
+        This feature has been introduced in version 0.30.3.
+        """
+        ...
+    @classmethod
     def new(cls) -> EdgeFilterBase:
         r"""
         @brief Creates a new object of this class
@@ -23551,7 +23588,7 @@ class EdgeNeighborhoodVisitorBase:
         ...
     ...
 
-class EdgeOperator:
+class EdgeOperator(EdgeProcessorBase):
     r"""
     @brief A generic edge-to-polygon operator
 
@@ -23645,17 +23682,6 @@ class EdgeOperator:
     need to be differentiated. Cell variant formation is one way, shape propagation the other way.
     Typically, cell variant formation is less expensive, but the hierarchy will be modified.
     """
-    @classmethod
-    def new(cls) -> EdgeOperator:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
-    def __init__(self) -> None:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
     def _const_cast(self) -> EdgeOperator:
         r"""
         @brief Returns a non-const reference to self.
@@ -23710,33 +23736,6 @@ class EdgeOperator:
         Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
-        """
-        ...
-    def create(self) -> None:
-        r"""
-        @brief Ensures the C++ object is created
-        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
-        """
-        ...
-    def destroy(self) -> None:
-        r"""
-        @brief Explicitly destroys the object
-        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
-        If the object is not owned by the script, this method will do nothing.
-        """
-        ...
-    def destroyed(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the object was already destroyed
-        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
-        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
-        """
-        ...
-    def is_const_object(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the reference is a const reference
-        This method returns true, if self is a const reference.
-        In that case, only const methods may be called on self.
         """
         ...
     def is_isotropic(self) -> None:
@@ -24286,6 +24285,27 @@ class EdgePairFilterBase:
     Typically, cell variant formation is less expensive, but the hierarchy will be modified.
     """
     @classmethod
+    def expression_filter(cls, expression: str, inverse: Optional[bool] = ..., variables: Optional[Dict[str, Any]] = ..., dbu: Optional[float] = ...) -> EdgePairFilterBase:
+        r"""
+        @brief Creates an expression-based filter
+        @param expression The expression to evaluate.
+        @param inverse If true, inverts the selection - i.e. all edge pairs without a property with the given name and value range are selected.
+        @param dbu If given and greater than zero, the shapes delivered by the 'shape' function will be in micrometer units.
+        @param variables Arbitrary values that are available as variables inside the expressions.
+
+        Creates a filter that will evaluate the given expression on every shape and select the shape when the expression renders a boolean true value. The expression may use the following variables and functions:
+
+        @ul
+        @li @b shape @/b: The current shape (i.e. 'EdgePair' without DBU specified or 'DEdgePair' otherwise) @/li
+        @li @b value(<name>) @/b: The value of the property with the given name (the first one if there are multiple properties with the same name) @/li
+        @li @b values(<name>) @/b: All values of the properties with the given name (returns a list) @/li
+        @li @b <name> @/b: A shortcut for 'value(<name>)' (<name> is used as a symbol) @/li
+        @/ul
+
+        This feature has been introduced in version 0.30.3.
+        """
+        ...
+    @classmethod
     def new(cls) -> EdgePairFilterBase:
         r"""
         @brief Creates a new object of this class
@@ -24453,7 +24473,7 @@ class EdgePairFilterBase:
         ...
     ...
 
-class EdgePairOperator:
+class EdgePairOperator(EdgePairProcessorBase):
     r"""
     @brief A generic edge-pair operator
 
@@ -24505,17 +24525,6 @@ class EdgePairOperator:
     need to be differentiated. Cell variant formation is one way, shape propagation the other way.
     Typically, cell variant formation is less expensive, but the hierarchy will be modified.
     """
-    @classmethod
-    def new(cls) -> EdgePairOperator:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
-    def __init__(self) -> None:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
     def _const_cast(self) -> EdgePairOperator:
         r"""
         @brief Returns a non-const reference to self.
@@ -24572,6 +24581,103 @@ class EdgePairOperator:
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
         ...
+    def is_isotropic(self) -> None:
+        r"""
+        @brief Indicates that the filter has isotropic properties
+        Call this method before using the filter to indicate that the selection is independent of the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        Examples for isotropic (polygon) processors are size or shrink operators. Size or shrink is not dependent on orientation unless size or shrink needs to be different in x and y direction.
+        """
+        ...
+    def is_isotropic_and_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is isotropic and scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for such a (polygon) processor is the convex decomposition operator. The decomposition of a polygon into convex parts is an operation that is not depending on scale nor orientation.
+        """
+        ...
+    def is_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for a scale invariant (polygon) processor is the rotation operator. Rotation is not depending on scale, but on the original orientation as mirrored versions need to be rotated differently.
+        """
+        ...
+    ...
+
+class EdgePairProcessorBase:
+    r"""
+    @hide
+    """
+    @classmethod
+    def new(cls) -> EdgePairProcessorBase:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def _const_cast(self) -> EdgePairProcessorBase:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> EdgePairProcessorBase:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -24597,6 +24703,193 @@ class EdgePairOperator:
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
+        """
+        ...
+    ...
+
+class EdgePairPropertiesExpressions(EdgePairProcessorBase):
+    r"""
+    @brief An operator attaching computed properties to the edge pairs
+
+    This operator will execute a number of expressions and attach the results as new properties. The expression inputs can be taken either from the edge pairs themselves or from existing properties.
+
+    A number of expressions can be supplied with a name. The expressions will be evaluated and the result is attached to the output edge pairs as user properties with the given names.
+
+    Alternatively, a single expression can be given. In that case, 'put' needs to be used to attach properties to the output shape. You can also use 'skip' to drop shapes in that case.
+
+    The expression may use the following variables and functions:
+
+    @ul
+    @li @b shape @/b: The current shape (i.e. 'EdgePair' without DBU specified or 'DEdgePair' otherwise) @/li
+    @li @b put(<name>, <value>) @/b: Attaches the given value as a property with name 'name' to the output shape @/li
+    @li @b skip(<flag>) @/b: If called with a 'true' value, the shape is dropped from the output @/li
+    @li @b value(<name>) @/b: The value of the property with the given name (the first one if there are multiple properties with the same name) @/li
+    @li @b values(<name>) @/b: All values of the properties with the given name (returns a list) @/li
+    @li @b <name> @/b: A shortcut for 'value(<name>)' (<name> is used as a symbol) @/li
+    @/ul
+
+    This class has been introduced in version 0.30.3.
+    """
+    requires_raw_input: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the processor needs raw (unmerged) input
+    See \requires_raw_input= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the processor needs raw (unmerged) input
+    This flag must be set before using this processor. It tells the processor implementation whether the processor wants to have raw input (unmerged). The default value is 'false', meaning that
+    the processor will receive merged polygons ('merged semantics').
+
+    Setting this value to false potentially saves some CPU time needed for merging the polygons.
+    Also, raw input means that strange shapes such as dot-like edges, self-overlapping polygons, empty or degenerated polygons are preserved.
+    """
+    result_is_merged: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the processor delivers merged output
+    See \result_is_merged= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the processor delivers merged output
+    This flag must be set before using this processor. If the processor maintains the merged condition
+    by design (output is merged if input is), it is a good idea to set this predicate to 'true'.
+    This will avoid additional merge steps when the resulting collection is used in further operations
+    that need merged input
+    .
+    """
+    result_must_not_be_merged: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the processor's output must not be merged
+    See \result_must_not_be_merged= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the processor's output must not be merged
+    This flag must be set before using this processor. The processor can set this flag if it wants to
+    deliver shapes that must not be merged - e.g. point-like edges or strange or degenerated polygons.
+    .
+    """
+    wants_variants: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the filter prefers cell variants
+    See \wants_variants= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the filter prefers cell variants
+    This flag must be set before using this filter for hierarchical applications (deep mode). It tells the filter implementation whether cell variants should be created (true, the default) or shape propagation will be applied (false).
+
+    This decision needs to be made, if the filter indicates that it will deliver different results
+    for scaled or rotated versions of the shape (see \is_isotropic and the other hints). If a cell
+    is present with different qualities - as seen from the top cell - the respective instances
+    need to be differentiated. Cell variant formation is one way, shape propagation the other way.
+    Typically, cell variant formation is less expensive, but the hierarchy will be modified.
+    """
+    @overload
+    @classmethod
+    def new(cls, edge_pairs: EdgePairs, expression: str, copy_properties: Optional[bool] = ..., variables: Optional[Dict[str, Any]] = ..., dbu: Optional[float] = ...) -> EdgePairPropertiesExpressions:
+        r"""
+        @brief Creates a new properties expressions operator
+
+        @param edge_pairs The edge pair collection, the processor will be used on. Can be nil, but if given, allows some optimization.
+        @param expression A single expression evaluated for each shape (see class description for details).
+        @param copy_properties If true, new properties will be added to existing ones.
+        @param dbu If not zero, this value specifies the database unit to use. If given, the shapes returned by the 'shape' function will be micrometer-unit objects.
+        @param variables Arbitrary values that are available as variables inside the expressions.
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, edge_pairs: EdgePairs, expressions: Dict[Any, str], copy_properties: Optional[bool] = ..., variables: Optional[Dict[str, Any]] = ..., dbu: Optional[float] = ...) -> EdgePairPropertiesExpressions:
+        r"""
+        @brief Creates a new properties expressions operator
+
+        @param edge_pairs The edge pair collection, the processor will be used on. Can be nil, but if given, allows some optimization.
+        @param expressions A map of property names and expressions used to generate the values of the properties (see class description for details).
+        @param copy_properties If true, new properties will be added to existing ones.
+        @param dbu If not zero, this value specifies the database unit to use. If given, the shapes returned by the 'shape' function will be micrometer-unit objects.
+        @param variables Arbitrary values that are available as variables inside the expressions.
+        """
+        ...
+    @overload
+    def __init__(self, edge_pairs: EdgePairs, expression: str, copy_properties: Optional[bool] = ..., variables: Optional[Dict[str, Any]] = ..., dbu: Optional[float] = ...) -> None:
+        r"""
+        @brief Creates a new properties expressions operator
+
+        @param edge_pairs The edge pair collection, the processor will be used on. Can be nil, but if given, allows some optimization.
+        @param expression A single expression evaluated for each shape (see class description for details).
+        @param copy_properties If true, new properties will be added to existing ones.
+        @param dbu If not zero, this value specifies the database unit to use. If given, the shapes returned by the 'shape' function will be micrometer-unit objects.
+        @param variables Arbitrary values that are available as variables inside the expressions.
+        """
+        ...
+    @overload
+    def __init__(self, edge_pairs: EdgePairs, expressions: Dict[Any, str], copy_properties: Optional[bool] = ..., variables: Optional[Dict[str, Any]] = ..., dbu: Optional[float] = ...) -> None:
+        r"""
+        @brief Creates a new properties expressions operator
+
+        @param edge_pairs The edge pair collection, the processor will be used on. Can be nil, but if given, allows some optimization.
+        @param expressions A map of property names and expressions used to generate the values of the properties (see class description for details).
+        @param copy_properties If true, new properties will be added to existing ones.
+        @param dbu If not zero, this value specifies the database unit to use. If given, the shapes returned by the 'shape' function will be micrometer-unit objects.
+        @param variables Arbitrary values that are available as variables inside the expressions.
+        """
+        ...
+    def _const_cast(self) -> EdgePairPropertiesExpressions:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> EdgePairPropertiesExpressions:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
         """
         ...
     def is_isotropic(self) -> None:
@@ -24625,7 +24918,7 @@ class EdgePairOperator:
         ...
     ...
 
-class EdgePairToEdgeOperator:
+class EdgePairToEdgeOperator(EdgePairToEdgeProcessorBase):
     r"""
     @brief A generic edge-pair-to-edge operator
 
@@ -24659,17 +24952,6 @@ class EdgePairToEdgeOperator:
     need to be differentiated. Cell variant formation is one way, shape propagation the other way.
     Typically, cell variant formation is less expensive, but the hierarchy will be modified.
     """
-    @classmethod
-    def new(cls) -> EdgePairToEdgeOperator:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
-    def __init__(self) -> None:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
     def _const_cast(self) -> EdgePairToEdgeOperator:
         r"""
         @brief Returns a non-const reference to self.
@@ -24726,6 +25008,103 @@ class EdgePairToEdgeOperator:
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
         ...
+    def is_isotropic(self) -> None:
+        r"""
+        @brief Indicates that the filter has isotropic properties
+        Call this method before using the filter to indicate that the selection is independent of the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        Examples for isotropic (polygon) processors are size or shrink operators. Size or shrink is not dependent on orientation unless size or shrink needs to be different in x and y direction.
+        """
+        ...
+    def is_isotropic_and_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is isotropic and scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for such a (polygon) processor is the convex decomposition operator. The decomposition of a polygon into convex parts is an operation that is not depending on scale nor orientation.
+        """
+        ...
+    def is_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for a scale invariant (polygon) processor is the rotation operator. Rotation is not depending on scale, but on the original orientation as mirrored versions need to be rotated differently.
+        """
+        ...
+    ...
+
+class EdgePairToEdgeProcessorBase:
+    r"""
+    @hide
+    """
+    @classmethod
+    def new(cls) -> EdgePairToEdgeProcessorBase:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def _const_cast(self) -> EdgePairToEdgeProcessorBase:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> EdgePairToEdgeProcessorBase:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -24753,33 +25132,9 @@ class EdgePairToEdgeOperator:
         In that case, only const methods may be called on self.
         """
         ...
-    def is_isotropic(self) -> None:
-        r"""
-        @brief Indicates that the filter has isotropic properties
-        Call this method before using the filter to indicate that the selection is independent of the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
-
-        Examples for isotropic (polygon) processors are size or shrink operators. Size or shrink is not dependent on orientation unless size or shrink needs to be different in x and y direction.
-        """
-        ...
-    def is_isotropic_and_scale_invariant(self) -> None:
-        r"""
-        @brief Indicates that the filter is isotropic and scale invariant
-        Call this method before using the filter to indicate that the selection is independent of the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
-
-        An example for such a (polygon) processor is the convex decomposition operator. The decomposition of a polygon into convex parts is an operation that is not depending on scale nor orientation.
-        """
-        ...
-    def is_scale_invariant(self) -> None:
-        r"""
-        @brief Indicates that the filter is scale invariant
-        Call this method before using the filter to indicate that the selection is independent of the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
-
-        An example for a scale invariant (polygon) processor is the rotation operator. Rotation is not depending on scale, but on the original orientation as mirrored versions need to be rotated differently.
-        """
-        ...
     ...
 
-class EdgePairToPolygonOperator:
+class EdgePairToPolygonOperator(EdgePairToPolygonProcessorBase):
     r"""
     @brief A generic edge-pair-to-polygon operator
 
@@ -24813,17 +25168,6 @@ class EdgePairToPolygonOperator:
     need to be differentiated. Cell variant formation is one way, shape propagation the other way.
     Typically, cell variant formation is less expensive, but the hierarchy will be modified.
     """
-    @classmethod
-    def new(cls) -> EdgePairToPolygonOperator:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
-    def __init__(self) -> None:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
     def _const_cast(self) -> EdgePairToPolygonOperator:
         r"""
         @brief Returns a non-const reference to self.
@@ -24880,6 +25224,103 @@ class EdgePairToPolygonOperator:
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
         ...
+    def is_isotropic(self) -> None:
+        r"""
+        @brief Indicates that the filter has isotropic properties
+        Call this method before using the filter to indicate that the selection is independent of the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        Examples for isotropic (polygon) processors are size or shrink operators. Size or shrink is not dependent on orientation unless size or shrink needs to be different in x and y direction.
+        """
+        ...
+    def is_isotropic_and_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is isotropic and scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for such a (polygon) processor is the convex decomposition operator. The decomposition of a polygon into convex parts is an operation that is not depending on scale nor orientation.
+        """
+        ...
+    def is_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for a scale invariant (polygon) processor is the rotation operator. Rotation is not depending on scale, but on the original orientation as mirrored versions need to be rotated differently.
+        """
+        ...
+    ...
+
+class EdgePairToPolygonProcessorBase:
+    r"""
+    @hide
+    """
+    @classmethod
+    def new(cls) -> EdgePairToPolygonProcessorBase:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def _const_cast(self) -> EdgePairToPolygonProcessorBase:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> EdgePairToPolygonProcessorBase:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -24905,30 +25346,6 @@ class EdgePairToPolygonOperator:
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
-        """
-        ...
-    def is_isotropic(self) -> None:
-        r"""
-        @brief Indicates that the filter has isotropic properties
-        Call this method before using the filter to indicate that the selection is independent of the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
-
-        Examples for isotropic (polygon) processors are size or shrink operators. Size or shrink is not dependent on orientation unless size or shrink needs to be different in x and y direction.
-        """
-        ...
-    def is_isotropic_and_scale_invariant(self) -> None:
-        r"""
-        @brief Indicates that the filter is isotropic and scale invariant
-        Call this method before using the filter to indicate that the selection is independent of the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
-
-        An example for such a (polygon) processor is the convex decomposition operator. The decomposition of a polygon into convex parts is an operation that is not depending on scale nor orientation.
-        """
-        ...
-    def is_scale_invariant(self) -> None:
-        r"""
-        @brief Indicates that the filter is scale invariant
-        Call this method before using the filter to indicate that the selection is independent of the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
-
-        An example for a scale invariant (polygon) processor is the rotation operator. Rotation is not depending on scale, but on the original orientation as mirrored versions need to be rotated differently.
         """
         ...
     ...
@@ -26066,7 +26483,7 @@ class EdgePairs(ShapeCollection):
         This method creates polygons from the edge pairs. Each polygon will be a triangle or quadrangle which connects the start and end points of the edges forming the edge pair. This version allows one to specify an enlargement which is applied to the edges. The length of the edges is modified by applying the enlargement and the edges are shifted by the enlargement. By specifying an enlargement it is possible to give edge pairs an area which otherwise would not have one (coincident edges, two point-like edges).
         """
         ...
-    def process(self, process: EdgePairOperator) -> None:
+    def process(self, process: EdgePairProcessorBase) -> None:
         r"""
         @brief Applies a generic edge pair processor in place (replacing the edge pairs from the EdgePairs collection)
         See \EdgePairProcessor for a description of this feature.
@@ -26075,7 +26492,7 @@ class EdgePairs(ShapeCollection):
         """
         ...
     @overload
-    def processed(self, processed: EdgePairOperator) -> EdgePairs:
+    def processed(self, processed: EdgePairProcessorBase) -> EdgePairs:
         r"""
         @brief Applies a generic edge pair processor and returns a processed copy
         See \EdgePairProcessor for a description of this feature.
@@ -26084,7 +26501,7 @@ class EdgePairs(ShapeCollection):
         """
         ...
     @overload
-    def processed(self, processed: EdgePairToEdgeOperator) -> Edges:
+    def processed(self, processed: EdgePairToEdgeProcessorBase) -> Edges:
         r"""
         @brief Applies a generic edge-pair-to-edge processor and returns an edge collection with the results
         See \EdgePairToEdgeProcessor for a description of this feature.
@@ -26093,7 +26510,7 @@ class EdgePairs(ShapeCollection):
         """
         ...
     @overload
-    def processed(self, processed: EdgePairToPolygonOperator) -> Region:
+    def processed(self, processed: EdgePairToPolygonProcessorBase) -> Region:
         r"""
         @brief Applies a generic edge-pair-to-polygon processor and returns an Region with the results
         See \EdgePairToPolygonProcessor for a description of this feature.
@@ -27899,7 +28316,318 @@ class EdgeProcessor:
         ...
     ...
 
-class EdgeToEdgePairOperator:
+class EdgeProcessorBase:
+    r"""
+    @hide
+    """
+    @classmethod
+    def new(cls) -> EdgeProcessorBase:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def _const_cast(self) -> EdgeProcessorBase:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> EdgeProcessorBase:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    ...
+
+class EdgePropertiesExpressions(EdgeProcessorBase):
+    r"""
+    @brief An operator attaching computed properties to the edge pairs
+
+    This operator will execute a number of expressions and attach the results as new properties. The expression inputs can be taken either from the edges themselves or from existing properties.
+
+    A number of expressions can be supplied with a name. The expressions will be evaluated and the result is attached to the output edge pairs as user properties with the given names.
+
+    Alternatively, a single expression can be given. In that case, 'put' needs to be used to attach properties to the output shape. You can also use 'skip' to drop shapes in that case.
+
+    The expression may use the following variables and functions:
+
+    @ul
+    @li @b shape @/b: The current shape (i.e. 'Edge' without DBU specified or 'DEdge' otherwise) @/li
+    @li @b put(<name>, <value>) @/b: Attaches the given value as a property with name 'name' to the output shape @/li
+    @li @b skip(<flag>) @/b: If called with a 'true' value, the shape is dropped from the output @/li
+    @li @b value(<name>) @/b: The value of the property with the given name (the first one if there are multiple properties with the same name) @/li
+    @li @b values(<name>) @/b: All values of the properties with the given name (returns a list) @/li
+    @li @b <name> @/b: A shortcut for 'value(<name>)' (<name> is used as a symbol) @/li
+    @/ul
+
+    This class has been introduced in version 0.30.3.
+    """
+    requires_raw_input: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the processor needs raw (unmerged) input
+    See \requires_raw_input= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the processor needs raw (unmerged) input
+    This flag must be set before using this processor. It tells the processor implementation whether the processor wants to have raw input (unmerged). The default value is 'false', meaning that
+    the processor will receive merged polygons ('merged semantics').
+
+    Setting this value to false potentially saves some CPU time needed for merging the polygons.
+    Also, raw input means that strange shapes such as dot-like edges, self-overlapping polygons, empty or degenerated polygons are preserved.
+    """
+    result_is_merged: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the processor delivers merged output
+    See \result_is_merged= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the processor delivers merged output
+    This flag must be set before using this processor. If the processor maintains the merged condition
+    by design (output is merged if input is), it is a good idea to set this predicate to 'true'.
+    This will avoid additional merge steps when the resulting collection is used in further operations
+    that need merged input
+    .
+    """
+    result_must_not_be_merged: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the processor's output must not be merged
+    See \result_must_not_be_merged= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the processor's output must not be merged
+    This flag must be set before using this processor. The processor can set this flag if it wants to
+    deliver shapes that must not be merged - e.g. point-like edges or strange or degenerated polygons.
+    .
+    """
+    wants_variants: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the filter prefers cell variants
+    See \wants_variants= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the filter prefers cell variants
+    This flag must be set before using this filter for hierarchical applications (deep mode). It tells the filter implementation whether cell variants should be created (true, the default) or shape propagation will be applied (false).
+
+    This decision needs to be made, if the filter indicates that it will deliver different results
+    for scaled or rotated versions of the shape (see \is_isotropic and the other hints). If a cell
+    is present with different qualities - as seen from the top cell - the respective instances
+    need to be differentiated. Cell variant formation is one way, shape propagation the other way.
+    Typically, cell variant formation is less expensive, but the hierarchy will be modified.
+    """
+    @overload
+    @classmethod
+    def new(cls, edges: Edges, expression: str, copy_properties: Optional[bool] = ..., variables: Optional[Dict[str, Any]] = ..., dbu: Optional[float] = ...) -> EdgePropertiesExpressions:
+        r"""
+        @brief Creates a new properties expressions operator
+
+        @param edges The edge collection, the processor will be used on. Can be nil, but if given, allows some optimization.
+        @param expression A single expression evaluated for each shape (see class description for details).
+        @param copy_properties If true, new properties will be added to existing ones.
+        @param dbu If not zero, this value specifies the database unit to use. If given, the shapes returned by the 'shape' function will be micrometer-unit objects.
+        @param variables Arbitrary values that are available as variables inside the expressions.
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, edges: Edges, expressions: Dict[Any, str], copy_properties: Optional[bool] = ..., variables: Optional[Dict[str, Any]] = ..., dbu: Optional[float] = ...) -> EdgePropertiesExpressions:
+        r"""
+        @brief Creates a new properties expressions operator
+
+        @param edges The edge collection, the processor will be used on. Can be nil, but if given, allows some optimization.
+        @param expressions A map of property names and expressions used to generate the values of the properties (see class description for details).
+        @param copy_properties If true, new properties will be added to existing ones.
+        @param dbu If not zero, this value specifies the database unit to use. If given, the shapes returned by the 'shape' function will be micrometer-unit objects.
+        @param variables Arbitrary values that are available as variables inside the expressions.
+        """
+        ...
+    @overload
+    def __init__(self, edges: Edges, expression: str, copy_properties: Optional[bool] = ..., variables: Optional[Dict[str, Any]] = ..., dbu: Optional[float] = ...) -> None:
+        r"""
+        @brief Creates a new properties expressions operator
+
+        @param edges The edge collection, the processor will be used on. Can be nil, but if given, allows some optimization.
+        @param expression A single expression evaluated for each shape (see class description for details).
+        @param copy_properties If true, new properties will be added to existing ones.
+        @param dbu If not zero, this value specifies the database unit to use. If given, the shapes returned by the 'shape' function will be micrometer-unit objects.
+        @param variables Arbitrary values that are available as variables inside the expressions.
+        """
+        ...
+    @overload
+    def __init__(self, edges: Edges, expressions: Dict[Any, str], copy_properties: Optional[bool] = ..., variables: Optional[Dict[str, Any]] = ..., dbu: Optional[float] = ...) -> None:
+        r"""
+        @brief Creates a new properties expressions operator
+
+        @param edges The edge collection, the processor will be used on. Can be nil, but if given, allows some optimization.
+        @param expressions A map of property names and expressions used to generate the values of the properties (see class description for details).
+        @param copy_properties If true, new properties will be added to existing ones.
+        @param dbu If not zero, this value specifies the database unit to use. If given, the shapes returned by the 'shape' function will be micrometer-unit objects.
+        @param variables Arbitrary values that are available as variables inside the expressions.
+        """
+        ...
+    def _const_cast(self) -> EdgePropertiesExpressions:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> EdgePropertiesExpressions:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def is_isotropic(self) -> None:
+        r"""
+        @brief Indicates that the filter has isotropic properties
+        Call this method before using the filter to indicate that the selection is independent of the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        Examples for isotropic (polygon) processors are size or shrink operators. Size or shrink is not dependent on orientation unless size or shrink needs to be different in x and y direction.
+        """
+        ...
+    def is_isotropic_and_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is isotropic and scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for such a (polygon) processor is the convex decomposition operator. The decomposition of a polygon into convex parts is an operation that is not depending on scale nor orientation.
+        """
+        ...
+    def is_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for a scale invariant (polygon) processor is the rotation operator. Rotation is not depending on scale, but on the original orientation as mirrored versions need to be rotated differently.
+        """
+        ...
+    ...
+
+class EdgeToEdgePairOperator(EdgeToEdgePairProcessorBase):
     r"""
     @brief A generic edge-to-edge-pair operator
 
@@ -27973,17 +28701,6 @@ class EdgeToEdgePairOperator:
     need to be differentiated. Cell variant formation is one way, shape propagation the other way.
     Typically, cell variant formation is less expensive, but the hierarchy will be modified.
     """
-    @classmethod
-    def new(cls) -> EdgeToEdgePairOperator:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
-    def __init__(self) -> None:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
     def _const_cast(self) -> EdgeToEdgePairOperator:
         r"""
         @brief Returns a non-const reference to self.
@@ -28040,6 +28757,103 @@ class EdgeToEdgePairOperator:
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
         ...
+    def is_isotropic(self) -> None:
+        r"""
+        @brief Indicates that the filter has isotropic properties
+        Call this method before using the filter to indicate that the selection is independent of the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        Examples for isotropic (polygon) processors are size or shrink operators. Size or shrink is not dependent on orientation unless size or shrink needs to be different in x and y direction.
+        """
+        ...
+    def is_isotropic_and_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is isotropic and scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for such a (polygon) processor is the convex decomposition operator. The decomposition of a polygon into convex parts is an operation that is not depending on scale nor orientation.
+        """
+        ...
+    def is_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for a scale invariant (polygon) processor is the rotation operator. Rotation is not depending on scale, but on the original orientation as mirrored versions need to be rotated differently.
+        """
+        ...
+    ...
+
+class EdgeToEdgePairProcessorBase:
+    r"""
+    @hide
+    """
+    @classmethod
+    def new(cls) -> EdgeToEdgePairProcessorBase:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def _const_cast(self) -> EdgeToEdgePairProcessorBase:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> EdgeToEdgePairProcessorBase:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -28067,33 +28881,9 @@ class EdgeToEdgePairOperator:
         In that case, only const methods may be called on self.
         """
         ...
-    def is_isotropic(self) -> None:
-        r"""
-        @brief Indicates that the filter has isotropic properties
-        Call this method before using the filter to indicate that the selection is independent of the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
-
-        Examples for isotropic (polygon) processors are size or shrink operators. Size or shrink is not dependent on orientation unless size or shrink needs to be different in x and y direction.
-        """
-        ...
-    def is_isotropic_and_scale_invariant(self) -> None:
-        r"""
-        @brief Indicates that the filter is isotropic and scale invariant
-        Call this method before using the filter to indicate that the selection is independent of the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
-
-        An example for such a (polygon) processor is the convex decomposition operator. The decomposition of a polygon into convex parts is an operation that is not depending on scale nor orientation.
-        """
-        ...
-    def is_scale_invariant(self) -> None:
-        r"""
-        @brief Indicates that the filter is scale invariant
-        Call this method before using the filter to indicate that the selection is independent of the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
-
-        An example for a scale invariant (polygon) processor is the rotation operator. Rotation is not depending on scale, but on the original orientation as mirrored versions need to be rotated differently.
-        """
-        ...
     ...
 
-class EdgeToPolygonOperator:
+class EdgeToPolygonOperator(EdgeToPolygonProcessorBase):
     r"""
     @brief A generic edge-to-polygon operator
 
@@ -28167,17 +28957,6 @@ class EdgeToPolygonOperator:
     need to be differentiated. Cell variant formation is one way, shape propagation the other way.
     Typically, cell variant formation is less expensive, but the hierarchy will be modified.
     """
-    @classmethod
-    def new(cls) -> EdgeToPolygonOperator:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
-    def __init__(self) -> None:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
     def _const_cast(self) -> EdgeToPolygonOperator:
         r"""
         @brief Returns a non-const reference to self.
@@ -28234,6 +29013,103 @@ class EdgeToPolygonOperator:
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
         ...
+    def is_isotropic(self) -> None:
+        r"""
+        @brief Indicates that the filter has isotropic properties
+        Call this method before using the filter to indicate that the selection is independent of the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        Examples for isotropic (polygon) processors are size or shrink operators. Size or shrink is not dependent on orientation unless size or shrink needs to be different in x and y direction.
+        """
+        ...
+    def is_isotropic_and_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is isotropic and scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for such a (polygon) processor is the convex decomposition operator. The decomposition of a polygon into convex parts is an operation that is not depending on scale nor orientation.
+        """
+        ...
+    def is_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for a scale invariant (polygon) processor is the rotation operator. Rotation is not depending on scale, but on the original orientation as mirrored versions need to be rotated differently.
+        """
+        ...
+    ...
+
+class EdgeToPolygonProcessorBase:
+    r"""
+    @hide
+    """
+    @classmethod
+    def new(cls) -> EdgeToPolygonProcessorBase:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def _const_cast(self) -> EdgeToPolygonProcessorBase:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> EdgeToPolygonProcessorBase:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -28259,30 +29135,6 @@ class EdgeToPolygonOperator:
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
-        """
-        ...
-    def is_isotropic(self) -> None:
-        r"""
-        @brief Indicates that the filter has isotropic properties
-        Call this method before using the filter to indicate that the selection is independent of the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
-
-        Examples for isotropic (polygon) processors are size or shrink operators. Size or shrink is not dependent on orientation unless size or shrink needs to be different in x and y direction.
-        """
-        ...
-    def is_isotropic_and_scale_invariant(self) -> None:
-        r"""
-        @brief Indicates that the filter is isotropic and scale invariant
-        Call this method before using the filter to indicate that the selection is independent of the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
-
-        An example for such a (polygon) processor is the convex decomposition operator. The decomposition of a polygon into convex parts is an operation that is not depending on scale nor orientation.
-        """
-        ...
-    def is_scale_invariant(self) -> None:
-        r"""
-        @brief Indicates that the filter is scale invariant
-        Call this method before using the filter to indicate that the selection is independent of the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
-
-        An example for a scale invariant (polygon) processor is the rotation operator. Rotation is not depending on scale, but on the original orientation as mirrored versions need to be rotated differently.
         """
         ...
     ...
@@ -30720,7 +31572,7 @@ class Edges(ShapeCollection):
         'zero_distance_mode' has been added in version 0.29.
         """
         ...
-    def process(self, process: EdgeOperator) -> None:
+    def process(self, process: EdgeProcessorBase) -> None:
         r"""
         @brief Applies a generic edge processor in place (replacing the edges from the Edges collection)
         See \EdgeProcessor for a description of this feature.
@@ -30729,7 +31581,7 @@ class Edges(ShapeCollection):
         """
         ...
     @overload
-    def processed(self, processed: EdgeOperator) -> Edges:
+    def processed(self, processed: EdgeProcessorBase) -> Edges:
         r"""
         @brief Applies a generic edge processor and returns a processed copy
         See \EdgeProcessor for a description of this feature.
@@ -30738,7 +31590,7 @@ class Edges(ShapeCollection):
         """
         ...
     @overload
-    def processed(self, processed: EdgeToEdgePairOperator) -> EdgePairs:
+    def processed(self, processed: EdgeToEdgePairProcessorBase) -> EdgePairs:
         r"""
         @brief Applies a generic edge-to-edge-pair processor and returns an edge pair collection with the results
         See \EdgeToEdgePairProcessor for a description of this feature.
@@ -30747,7 +31599,7 @@ class Edges(ShapeCollection):
         """
         ...
     @overload
-    def processed(self, processed: EdgeToPolygonOperator) -> Region:
+    def processed(self, processed: EdgeToPolygonProcessorBase) -> Region:
         r"""
         @brief Applies a generic edge-to-polygon processor and returns an edge collection with the results
         See \EdgeToPolygonProcessor for a description of this feature.
@@ -34950,11 +35802,11 @@ class Instance:
 
     Starting with version 0.25 the displacement is of vector type.
     Setter:
-    @brief Sets the displacement vector for the 'a' axis
+    @brief Sets the displacement vector for the 'a' axis in micrometer units
 
-    If the instance was not an array instance before it is made one.
+    Like \a= with an integer displacement, this method will set the displacement vector but it accepts a vector in micrometer units that is of \DVector type. The vector will be translated to database units internally.
 
-    This method has been introduced in version 0.23. Starting with version 0.25 the displacement is of vector type.
+    This method has been introduced in version 0.25.
     """
     b: Vector
     r"""
@@ -34999,10 +35851,10 @@ class Instance:
     Getter:
     @brief Gets the basic \CellInstArray object associated with this instance reference.
     Setter:
-    @brief Returns the basic cell instance array object by giving a micrometer unit object.
-    This method replaces the instance by the given CellInstArray object and it internally transformed into database units.
+    @brief Changes the \CellInstArray object to the given one.
+    This method replaces the instance by the given CellInstArray object.
 
-    This method has been introduced in version 0.25
+    This method has been introduced in version 0.22
     """
     cplx_trans: ICplxTrans
     r"""
@@ -35010,10 +35862,9 @@ class Instance:
     @brief Gets the complex transformation of the instance or the first instance in the array
     This method is always valid compared to \trans, since simple transformations can be expressed as complex transformations as well.
     Setter:
-    @brief Sets the complex transformation of the instance or the first instance in the array (in micrometer units)
-    This method sets the transformation the same way as \cplx_trans=, but the displacement of this transformation is given in micrometer units. It is internally translated into database units.
+    @brief Sets the complex transformation of the instance or the first instance in the array
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.23.
     """
     da: DVector
     r"""
@@ -35336,6 +36187,15 @@ class Instance:
         This method has been introduced in version 0.24.
         """
         ...
+    def clear_properties(self) -> None:
+        r"""
+        @brief Clears all user properties
+        This method will remove all user properties. After it has been called, \has_prop_id? will return false.
+        Calling this method may invalidate any iterators. It should not be called inside a loop iterating over instances.
+
+        This method has been introduced in version 0.30.3.
+        """
+        ...
     def convert_to_static(self) -> None:
         r"""
         @brief Converts a PCell instance to a static cell
@@ -35498,7 +36358,7 @@ class Instance:
         r"""
         @brief Gets the layout this instance is contained in
 
-        This const version of the method has been introduced in version 0.25.
+        This method has been introduced in version 0.22.
         """
         ...
     @overload
@@ -35506,7 +36366,7 @@ class Instance:
         r"""
         @brief Gets the layout this instance is contained in
 
-        This method has been introduced in version 0.22.
+        This const version of the method has been introduced in version 0.25.
         """
         ...
     def pcell_declaration(self) -> PCellDeclaration_Native:
@@ -35559,6 +36419,15 @@ class Instance:
         @brief Gets the user property with the given key
         This method is a convenience method that gets the property with the given key. If no property with that key exists, it will return nil. Using that method is more convenient than using the layout object and the properties ID to retrieve the property value. 
         This method has been introduced in version 0.22.
+        """
+        ...
+    def set_properties(self, dict: Dict[Any, Any]) -> None:
+        r"""
+        @brief Sets all user properties from the given dict
+        This method is a convenience method that replaces all user properties of the instance. Using that method is more convenient than creating a new property set with a new ID and assigning that properties ID.
+        This method may change the properties ID. Note: GDS only supports integer keys. OASIS supports numeric and string keys. Calling this method may invalidate any iterators. It should not be called inside a loop iterating over instances.
+
+        This method has been introduced in version 0.30.3.
         """
         ...
     def set_property(self, key: Any, value: Any) -> None:
@@ -38598,6 +39467,15 @@ class Layout:
         This method has been introduced in version 0.28.8.
         """
         ...
+    def clear_properties(self) -> None:
+        r"""
+        @brief Clears all user properties
+        This method will remove all user properties. After it has been called, \has_prop_id? will return false.
+        It is equivalent to setting the properties ID to zero.
+
+        This method has been introduced in version 0.30.3.
+        """
+        ...
     @overload
     def clip(self, cell: Cell, box: Box) -> Cell:
         r"""
@@ -39742,6 +40620,14 @@ class Layout:
     def set_info(self, index: int, props: LayerInfo) -> None:
         r"""
         @brief Sets the info structure for a specified layer
+        """
+        ...
+    def set_properties(self, dict: Dict[Any, Any]) -> None:
+        r"""
+        @brief Sets all user properties from the given dict
+        This method is a convenience method that replaces all user properties of the layout object. Using that method is more convenient than creating a new property set with a new ID and assigning that properties ID.
+        This method may change the properties ID. Note: GDS only supports integer keys. OASIS supports numeric and string keys. 
+        This method has been introduced in version 0.30.3.
         """
         ...
     def set_property(self, key: Any, value: Any) -> None:
@@ -42042,6 +42928,35 @@ class LayoutToNetlist:
         r"""
         @brief Iterates over all log entries collected during device and netlist extraction.
         This method has been introduced in version 0.28.13.
+        """
+        ...
+    def evaluate_nets(self, primary: Region, secondary: Dict[str, Region], expression: str, variables: Optional[Any] = ..., dbu: Optional[Any] = ...) -> Region:
+        r"""
+        @brief Runs a generic net measurement function
+
+        This method accepts some primary layer, a number of secondary layers with names and an expression.
+        It also accepts variables which become available as variables inside the expression. This allows passing arbitrary values without having to encode them into the expression string.
+
+        It will look at nets connecting to shapes on the primary layer and execute the expression for each
+        of those nets. After that it will copy the primary shapes of the net to the output with the properties
+        placed by 'put' attached to them.
+
+        It is possible to skip primary shapes of a specific net by calling the 'skip' function with a 'true'
+        value.
+
+        The expression may use the following functions:
+
+        @ul
+        @li 'area': the area of all primary-layer shapes on the net in square um @/li
+        @li 'area(name)': the area of all secondary-layer shapes. 'name' is a symbol with the name given in the secondary-layer map @/li
+        @li 'perimeter': the perimeter of the primary-layer shapes on the net in um @/li
+        @li 'perimeter(name)': the perimeter of the secondary-layer shapes. 'name' is a symbol with the name given in the secondary-layer map @/li
+        @li 'put(name, value)': places the value as property 'name' on the output shapes @/li
+        @li 'skip(flag)': will skip the primary shapes of that net when called with a true value @/li
+        @li 'net': the \Net object of the current net @/li
+        @/ul
+
+        If given, the 'dbu' argument gives the database unit to use for converting shape dimensions into micrometer units. If this value is 0, the area and perimeters are calculated in database units. If no DBU is specified, the value is determined automatically.
         """
         ...
     def extract_devices(self, extractor: DeviceExtractorBase, layers: Dict[str, ShapeCollection]) -> None:
@@ -46841,17 +47756,17 @@ class NetTerminalRef:
     @overload
     def device(self) -> Device:
         r"""
-        @brief Gets the device reference (non-const version).
+        @brief Gets the device reference.
         Gets the device object that this connection is made to.
-
-        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def device(self) -> Device:
         r"""
-        @brief Gets the device reference.
+        @brief Gets the device reference (non-const version).
         Gets the device object that this connection is made to.
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     def device_class(self) -> DeviceClass:
@@ -46874,15 +47789,15 @@ class NetTerminalRef:
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this terminal reference is attached to (non-const version).
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the net this terminal reference is attached to.
         """
         ...
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this terminal reference is attached to.
+        @brief Gets the net this terminal reference is attached to (non-const version).
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     def terminal_def(self) -> DeviceTerminalDefinition:
@@ -47879,22 +48794,22 @@ class Netlist:
     @overload
     def circuits_by_name(self, name_pattern: str, case_sensitive: Optional[Any] = ...) -> List[Circuit]:
         r"""
-        @brief Gets the circuit objects for a given name filter (const version).
-        The name filter is a glob pattern. This method will return all \Circuit objects matching the glob pattern.
-        The 'case_sensitive' argument will control whether the name is looked up in a case sensitive way or not. Note that with case insensitive search on a netlist that is case sensitive, the same name may render more than one hit. By default, case sensitivity is taken from the netlist.
-
-        This constness variant has been introduced in version 0.26.8.The 'case_sensitive' argument has been added in version 0.30.2.
-        """
-        ...
-    @overload
-    def circuits_by_name(self, name_pattern: str, case_sensitive: Optional[Any] = ...) -> List[Circuit]:
-        r"""
         @brief Gets the circuit objects for a given name filter.
         The name filter is a glob pattern. This method will return all \Circuit objects matching the glob pattern.
         The 'case_sensitive' argument will control whether the name is looked up in a case sensitive way or not. Note that with case insensitive search on a netlist that is case sensitive, the same name may render more than one hit. By default, case sensitivity is taken from the netlist.
 
         This method has been introduced in version 0.26.4.
         The 'case_sensitive' argument has been added in version 0.30.2.
+        """
+        ...
+    @overload
+    def circuits_by_name(self, name_pattern: str, case_sensitive: Optional[Any] = ...) -> List[Circuit]:
+        r"""
+        @brief Gets the circuit objects for a given name filter (const version).
+        The name filter is a glob pattern. This method will return all \Circuit objects matching the glob pattern.
+        The 'case_sensitive' argument will control whether the name is looked up in a case sensitive way or not. Note that with case insensitive search on a netlist that is case sensitive, the same name may render more than one hit. By default, case sensitivity is taken from the netlist.
+
+        This constness variant has been introduced in version 0.26.8.The 'case_sensitive' argument has been added in version 0.30.2.
         """
         ...
     def combine_devices(self) -> None:
@@ -48108,7 +49023,7 @@ class Netlist:
         ...
     def read(self, file: str, reader: NetlistReader) -> None:
         r"""
-        @brief Writes the netlist to the given file using the given reader object to parse the file
+        @brief Reads the netlist from the given file using the given reader object to parse the file
         See \NetlistSpiceReader for an example for a parser. 
         """
         ...
@@ -54636,6 +55551,27 @@ class PolygonFilterBase:
     Typically, cell variant formation is less expensive, but the hierarchy will be modified.
     """
     @classmethod
+    def expression_filter(cls, expression: str, inverse: Optional[bool] = ..., variables: Optional[Dict[str, Any]] = ..., dbu: Optional[float] = ...) -> PolygonFilterBase:
+        r"""
+        @brief Creates an expression-based filter
+        @param expression The expression to evaluate.
+        @param inverse If true, inverts the selection - i.e. all polygons without a property with the given name and value range are selected.
+        @param dbu If given and greater than zero, the shapes delivered by the 'shape' function will be in micrometer units.
+        @param variables Arbitrary values that are available as variables inside the expressions.
+
+        Creates a filter that will evaluate the given expression on every shape and select the shape when the expression renders a boolean true value. The expression may use the following variables and functions:
+
+        @ul
+        @li @b shape @/b: The current shape (i.e. 'Polygon' without DBU specified or 'DPolygon' otherwise) @/li
+        @li @b value(<name>) @/b: The value of the property with the given name (the first one if there are multiple properties with the same name) @/li
+        @li @b values(<name>) @/b: All values of the properties with the given name (returns a list) @/li
+        @li @b <name> @/b: A shortcut for 'value(<name>)' (<name> is used as a symbol) @/li
+        @/ul
+
+        This feature has been introduced in version 0.30.3.
+        """
+        ...
+    @classmethod
     def new(cls) -> PolygonFilterBase:
         r"""
         @brief Creates a new object of this class
@@ -55037,7 +55973,7 @@ class PolygonNeighborhoodVisitorBase:
         ...
     ...
 
-class PolygonOperator:
+class PolygonOperator(PolygonProcessorBase):
     r"""
     @brief A generic polygon operator
 
@@ -55131,17 +56067,6 @@ class PolygonOperator:
     need to be differentiated. Cell variant formation is one way, shape propagation the other way.
     Typically, cell variant formation is less expensive, but the hierarchy will be modified.
     """
-    @classmethod
-    def new(cls) -> PolygonOperator:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
-    def __init__(self) -> None:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
     def _const_cast(self) -> PolygonOperator:
         r"""
         @brief Returns a non-const reference to self.
@@ -55198,6 +56123,103 @@ class PolygonOperator:
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
         ...
+    def is_isotropic(self) -> None:
+        r"""
+        @brief Indicates that the filter has isotropic properties
+        Call this method before using the filter to indicate that the selection is independent of the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        Examples for isotropic (polygon) processors are size or shrink operators. Size or shrink is not dependent on orientation unless size or shrink needs to be different in x and y direction.
+        """
+        ...
+    def is_isotropic_and_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is isotropic and scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for such a (polygon) processor is the convex decomposition operator. The decomposition of a polygon into convex parts is an operation that is not depending on scale nor orientation.
+        """
+        ...
+    def is_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for a scale invariant (polygon) processor is the rotation operator. Rotation is not depending on scale, but on the original orientation as mirrored versions need to be rotated differently.
+        """
+        ...
+    ...
+
+class PolygonProcessorBase:
+    r"""
+    @hide
+    """
+    @classmethod
+    def new(cls) -> PolygonProcessorBase:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def _const_cast(self) -> PolygonProcessorBase:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> PolygonProcessorBase:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -55223,6 +56245,193 @@ class PolygonOperator:
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
+        """
+        ...
+    ...
+
+class PolygonPropertiesExpressions(PolygonProcessorBase):
+    r"""
+    @brief An operator attaching computed properties to the edge pairs
+
+    This operator will execute a number of expressions and attach the results as new properties. The expression inputs can be taken either from the edges themselves or from existing properties.
+
+    A number of expressions can be supplied with a name. The expressions will be evaluated and the result is attached to the output edge pairs as user properties with the given names.
+
+    Alternatively, a single expression can be given. In that case, 'put' needs to be used to attach properties to the output shape. You can also use 'skip' to drop shapes in that case.
+
+    The expression may use the following variables and functions:
+
+    @ul
+    @li @b shape @/b: The current shape (i.e. 'Polygon' without DBU specified or 'DPolygon' otherwise) @/li
+    @li @b put(<name>, <value>) @/b: Attaches the given value as a property with name 'name' to the output shape @/li
+    @li @b skip(<flag>) @/b: If called with a 'true' value, the shape is dropped from the output @/li
+    @li @b value(<name>) @/b: The value of the property with the given name (the first one if there are multiple properties with the same name) @/li
+    @li @b values(<name>) @/b: All values of the properties with the given name (returns a list) @/li
+    @li @b <name> @/b: A shortcut for 'value(<name>)' (<name> is used as a symbol) @/li
+    @/ul
+
+    This class has been introduced in version 0.30.3.
+    """
+    requires_raw_input: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the processor needs raw (unmerged) input
+    See \requires_raw_input= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the processor needs raw (unmerged) input
+    This flag must be set before using this processor. It tells the processor implementation whether the processor wants to have raw input (unmerged). The default value is 'false', meaning that
+    the processor will receive merged polygons ('merged semantics').
+
+    Setting this value to false potentially saves some CPU time needed for merging the polygons.
+    Also, raw input means that strange shapes such as dot-like edges, self-overlapping polygons, empty or degenerated polygons are preserved.
+    """
+    result_is_merged: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the processor delivers merged output
+    See \result_is_merged= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the processor delivers merged output
+    This flag must be set before using this processor. If the processor maintains the merged condition
+    by design (output is merged if input is), it is a good idea to set this predicate to 'true'.
+    This will avoid additional merge steps when the resulting collection is used in further operations
+    that need merged input
+    .
+    """
+    result_must_not_be_merged: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the processor's output must not be merged
+    See \result_must_not_be_merged= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the processor's output must not be merged
+    This flag must be set before using this processor. The processor can set this flag if it wants to
+    deliver shapes that must not be merged - e.g. point-like edges or strange or degenerated polygons.
+    .
+    """
+    wants_variants: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the filter prefers cell variants
+    See \wants_variants= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the filter prefers cell variants
+    This flag must be set before using this filter for hierarchical applications (deep mode). It tells the filter implementation whether cell variants should be created (true, the default) or shape propagation will be applied (false).
+
+    This decision needs to be made, if the filter indicates that it will deliver different results
+    for scaled or rotated versions of the shape (see \is_isotropic and the other hints). If a cell
+    is present with different qualities - as seen from the top cell - the respective instances
+    need to be differentiated. Cell variant formation is one way, shape propagation the other way.
+    Typically, cell variant formation is less expensive, but the hierarchy will be modified.
+    """
+    @overload
+    @classmethod
+    def new(cls, region: Region, expression: str, copy_properties: Optional[bool] = ..., variables: Optional[Dict[str, Any]] = ..., dbu: Optional[float] = ...) -> PolygonPropertiesExpressions:
+        r"""
+        @brief Creates a new properties expressions operator
+
+        @param region The region, the processor will be used on. Can be nil, but if given, allows some optimization.
+        @param expression A single expression evaluated for each shape (see class description for details).
+        @param copy_properties If true, new properties will be added to existing ones.
+        @param dbu If not zero, this value specifies the database unit to use. If given, the shapes returned by the 'shape' function will be micrometer-unit objects.
+        @param variables Arbitrary values that are available as variables inside the expressions.
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, region: Region, expressions: Dict[Any, str], copy_properties: Optional[bool] = ..., variables: Optional[Dict[str, Any]] = ..., dbu: Optional[float] = ...) -> PolygonPropertiesExpressions:
+        r"""
+        @brief Creates a new properties expressions operator
+
+        @param region The region, the processor will be used on. Can be nil, but if given, allows some optimization.
+        @param expressions A map of property names and expressions used to generate the values of the properties (see class description for details).
+        @param copy_properties If true, new properties will be added to existing ones.
+        @param dbu If not zero, this value specifies the database unit to use. If given, the shapes returned by the 'shape' function will be micrometer-unit objects.
+        @param variables Arbitrary values that are available as variables inside the expressions.
+        """
+        ...
+    @overload
+    def __init__(self, region: Region, expression: str, copy_properties: Optional[bool] = ..., variables: Optional[Dict[str, Any]] = ..., dbu: Optional[float] = ...) -> None:
+        r"""
+        @brief Creates a new properties expressions operator
+
+        @param region The region, the processor will be used on. Can be nil, but if given, allows some optimization.
+        @param expression A single expression evaluated for each shape (see class description for details).
+        @param copy_properties If true, new properties will be added to existing ones.
+        @param dbu If not zero, this value specifies the database unit to use. If given, the shapes returned by the 'shape' function will be micrometer-unit objects.
+        @param variables Arbitrary values that are available as variables inside the expressions.
+        """
+        ...
+    @overload
+    def __init__(self, region: Region, expressions: Dict[Any, str], copy_properties: Optional[bool] = ..., variables: Optional[Dict[str, Any]] = ..., dbu: Optional[float] = ...) -> None:
+        r"""
+        @brief Creates a new properties expressions operator
+
+        @param region The region, the processor will be used on. Can be nil, but if given, allows some optimization.
+        @param expressions A map of property names and expressions used to generate the values of the properties (see class description for details).
+        @param copy_properties If true, new properties will be added to existing ones.
+        @param dbu If not zero, this value specifies the database unit to use. If given, the shapes returned by the 'shape' function will be micrometer-unit objects.
+        @param variables Arbitrary values that are available as variables inside the expressions.
+        """
+        ...
+    def _const_cast(self) -> PolygonPropertiesExpressions:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> PolygonPropertiesExpressions:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
         """
         ...
     def is_isotropic(self) -> None:
@@ -55251,7 +56460,7 @@ class PolygonOperator:
         ...
     ...
 
-class PolygonToEdgeOperator:
+class PolygonToEdgeOperator(PolygonToEdgeProcessorBase):
     r"""
     @brief A generic polygon-to-edge operator
 
@@ -55325,17 +56534,6 @@ class PolygonToEdgeOperator:
     need to be differentiated. Cell variant formation is one way, shape propagation the other way.
     Typically, cell variant formation is less expensive, but the hierarchy will be modified.
     """
-    @classmethod
-    def new(cls) -> PolygonToEdgeOperator:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
-    def __init__(self) -> None:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
     def _const_cast(self) -> PolygonToEdgeOperator:
         r"""
         @brief Returns a non-const reference to self.
@@ -55392,33 +56590,6 @@ class PolygonToEdgeOperator:
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
         ...
-    def create(self) -> None:
-        r"""
-        @brief Ensures the C++ object is created
-        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
-        """
-        ...
-    def destroy(self) -> None:
-        r"""
-        @brief Explicitly destroys the object
-        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
-        If the object is not owned by the script, this method will do nothing.
-        """
-        ...
-    def destroyed(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the object was already destroyed
-        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
-        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
-        """
-        ...
-    def is_const_object(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the reference is a const reference
-        This method returns true, if self is a const reference.
-        In that case, only const methods may be called on self.
-        """
-        ...
     def is_isotropic(self) -> None:
         r"""
         @brief Indicates that the filter has isotropic properties
@@ -55445,7 +56616,7 @@ class PolygonToEdgeOperator:
         ...
     ...
 
-class PolygonToEdgePairOperator:
+class PolygonToEdgePairOperator(PolygonToEdgePairProcessorBase):
     r"""
     @brief A generic polygon-to-edge-pair operator
 
@@ -55519,17 +56690,6 @@ class PolygonToEdgePairOperator:
     need to be differentiated. Cell variant formation is one way, shape propagation the other way.
     Typically, cell variant formation is less expensive, but the hierarchy will be modified.
     """
-    @classmethod
-    def new(cls) -> PolygonToEdgePairOperator:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
-    def __init__(self) -> None:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
     def _const_cast(self) -> PolygonToEdgePairOperator:
         r"""
         @brief Returns a non-const reference to self.
@@ -55586,6 +56746,103 @@ class PolygonToEdgePairOperator:
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
         ...
+    def is_isotropic(self) -> None:
+        r"""
+        @brief Indicates that the filter has isotropic properties
+        Call this method before using the filter to indicate that the selection is independent of the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        Examples for isotropic (polygon) processors are size or shrink operators. Size or shrink is not dependent on orientation unless size or shrink needs to be different in x and y direction.
+        """
+        ...
+    def is_isotropic_and_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is isotropic and scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for such a (polygon) processor is the convex decomposition operator. The decomposition of a polygon into convex parts is an operation that is not depending on scale nor orientation.
+        """
+        ...
+    def is_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for a scale invariant (polygon) processor is the rotation operator. Rotation is not depending on scale, but on the original orientation as mirrored versions need to be rotated differently.
+        """
+        ...
+    ...
+
+class PolygonToEdgePairProcessorBase:
+    r"""
+    @hide
+    """
+    @classmethod
+    def new(cls) -> PolygonToEdgePairProcessorBase:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def _const_cast(self) -> PolygonToEdgePairProcessorBase:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> PolygonToEdgePairProcessorBase:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -55613,28 +56870,104 @@ class PolygonToEdgePairOperator:
         In that case, only const methods may be called on self.
         """
         ...
-    def is_isotropic(self) -> None:
-        r"""
-        @brief Indicates that the filter has isotropic properties
-        Call this method before using the filter to indicate that the selection is independent of the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+    ...
 
-        Examples for isotropic (polygon) processors are size or shrink operators. Size or shrink is not dependent on orientation unless size or shrink needs to be different in x and y direction.
+class PolygonToEdgeProcessorBase:
+    r"""
+    @hide
+    """
+    @classmethod
+    def new(cls) -> PolygonToEdgeProcessorBase:
+        r"""
+        @brief Creates a new object of this class
         """
         ...
-    def is_isotropic_and_scale_invariant(self) -> None:
+    def __init__(self) -> None:
         r"""
-        @brief Indicates that the filter is isotropic and scale invariant
-        Call this method before using the filter to indicate that the selection is independent of the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
-
-        An example for such a (polygon) processor is the convex decomposition operator. The decomposition of a polygon into convex parts is an operation that is not depending on scale nor orientation.
+        @brief Creates a new object of this class
         """
         ...
-    def is_scale_invariant(self) -> None:
+    def _const_cast(self) -> PolygonToEdgeProcessorBase:
         r"""
-        @brief Indicates that the filter is scale invariant
-        Call this method before using the filter to indicate that the selection is independent of the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
 
-        An example for a scale invariant (polygon) processor is the rotation operator. Rotation is not depending on scale, but on the original orientation as mirrored versions need to be rotated differently.
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> PolygonToEdgeProcessorBase:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
         """
         ...
     ...
@@ -58299,6 +59632,24 @@ class Region(ShapeCollection):
 
     This method has been introduced in version 0.26.
     """
+    join_properties_on_merge: bool
+    r"""
+    Getter:
+    @brief Gets a flag indicating whether to join properties on merge
+    See \join_properties_on_merge= for a description of this attribute.
+
+    This attribute has been introduced in version 0.30.3.
+    Setter:
+    @brief Sets a flag indicating whether to join properties on merge
+
+    When this flag is set to true, properties are joined on 'merge'.
+    That is: shapes merging into bigger shapes will have their properties joined.
+    With the flag set to false (the default), 'merge' will not join properties and return merged
+    shapes only if the sub-shapes have the same properties - i.e. properties form
+    separate shape classes on merge.
+
+    This attribute has been introduced in version 0.30.3.
+    """
     merged_semantics: bool
     r"""
     Getter:
@@ -60008,23 +61359,29 @@ class Region(ShapeCollection):
         r"""
         @brief Merge the region
 
-        @return The region after is has been merged (self).
+        @return The region after it has been merged (self).
 
         Merging removes overlaps and joins touching polygons.
-        If the region is already merged, this method does nothing
+        If the region is already merged, this method does nothing.
+        This method will behave according to the settings of the \min_coherence and \join_properties_on_merge attributes.
         """
         ...
     @overload
-    def merge(self, min_coherence: bool, min_wc: int) -> Region:
+    def merge(self, min_coherence: bool, min_wc: int, join_properties_on_merge: Optional[bool] = ...) -> Region:
         r"""
         @brief Merge the region with options
 
         @param min_coherence A flag indicating whether the resulting polygons shall have minimum coherence
         @param min_wc Overlap selection
-        @return The region after is has been merged (self).
+        @param join_properties_on_merge See below
+        @return The region after it has been merged (self).
 
         Merging removes overlaps and joins touching polygons.
         This version provides two additional options: if "min_coherence" is set to true, "kissing corners" are resolved by producing separate polygons. "min_wc" controls whether output is only produced if multiple polygons overlap. The value specifies the number of polygons that need to overlap. A value of 2 means that output is only produced if two or more polygons overlap.
+
+        The 'join_properties_on_merge' argument indicates how properties should be handled: if true, the properties of the parts are joined and attached to the merged shape. If false, only shapes with the same properties are merged - i.e. different properties form shape classes that are merged individually.
+
+        'join_properties_on_merge' has been added in version 0.30.3.
         """
         ...
     @overload
@@ -60033,12 +61390,12 @@ class Region(ShapeCollection):
         @brief Merge the region with options
 
         @param min_wc Overlap selection
-        @return The region after is has been merged (self).
+        @return The region after it has been merged (self).
 
         Merging removes overlaps and joins touching polygons.
         This version provides one additional option: "min_wc" controls whether output is only produced if multiple polygons overlap. The value specifies the number of polygons that need to overlap. A value of 2 means that output is only produced if two or more polygons overlap.
 
-        This method is equivalent to "merge(false, min_wc).
+        This method is equivalent to "merge(false, min_wc, false).
         """
         ...
     @overload
@@ -60046,26 +61403,33 @@ class Region(ShapeCollection):
         r"""
         @brief Returns the merged region
 
-        @return The region after is has been merged.
+        @return The region after it has been merged.
 
         Merging removes overlaps and joins touching polygons.
         If the region is already merged, this method does nothing.
+        This method will behave according to the settings of the \min_coherence and \join_properties_on_merge attributes.
         In contrast to \merge, this method does not modify the region but returns a merged copy.
         """
         ...
     @overload
-    def merged(self, min_coherence: bool, min_wc: int) -> Region:
+    def merged(self, min_coherence: bool, min_wc: int, join_properties_on_merge: Optional[bool] = ...) -> Region:
         r"""
         @brief Returns the merged region (with options)
 
         @param min_coherence A flag indicating whether the resulting polygons shall have minimum coherence
         @param min_wc Overlap selection
-        @return The region after is has been merged (self).
+        @param join_properties_on_merge See below
+        @return The region after it has been merged (self).
 
         Merging removes overlaps and joins touching polygons.
         This version provides two additional options: if "min_coherence" is set to true, "kissing corners" are resolved by producing separate polygons. "min_wc" controls whether output is only produced if multiple polygons overlap. The value specifies the number of polygons that need to overlap. A value of 2 means that output is only produced if two or more polygons overlap.
 
+
+        The 'join_properties_on_merge' argument indicates how properties should be handled: if true, the properties of the parts are joined and attached to the merged shape. If false, only shapes with the same properties are merged - i.e. different properties form shape classes that are merged individually.
+
         In contrast to \merge, this method does not modify the region but returns a merged copy.
+
+        'join_properties_on_merge' has been added in version 0.30.3.
         """
         ...
     @overload
@@ -60073,11 +61437,12 @@ class Region(ShapeCollection):
         r"""
         @brief Returns the merged region (with options)
 
-        @return The region after is has been merged.
+        @param min_wc Overlap selection
+        @return The region after it has been merged.
 
         This version provides one additional options: "min_wc" controls whether output is only produced if multiple polygons overlap. The value specifies the number of polygons that need to overlap. A value of 2 means that output is only produced if two or more polygons overlap.
 
-        This method is equivalent to "merged(false, min_wc)".
+        This method is equivalent to "merged(false, min_wc, false)".
 
         In contrast to \merge, this method does not modify the region but returns a merged copy.
         """
@@ -60549,7 +61914,7 @@ class Region(ShapeCollection):
         If merged semantics is not enabled, internal edges are counted as well.
         """
         ...
-    def process(self, process: PolygonOperator) -> None:
+    def process(self, process: PolygonProcessorBase) -> None:
         r"""
         @brief Applies a generic polygon processor in place (replacing the polygons from the Region)
         See \PolygonProcessor for a description of this feature.
@@ -60558,7 +61923,7 @@ class Region(ShapeCollection):
         """
         ...
     @overload
-    def processed(self, processed: PolygonOperator) -> Region:
+    def processed(self, processed: PolygonProcessorBase) -> Region:
         r"""
         @brief Applies a generic polygon processor and returns a processed copy
         See \PolygonProcessor for a description of this feature.
@@ -60567,19 +61932,19 @@ class Region(ShapeCollection):
         """
         ...
     @overload
-    def processed(self, processed: PolygonToEdgeOperator) -> Edges:
+    def processed(self, processed: PolygonToEdgePairProcessorBase) -> EdgePairs:
         r"""
-        @brief Applies a generic polygon-to-edge processor and returns an edge collection with the results
-        See \PolygonToEdgeProcessor for a description of this feature.
+        @brief Applies a generic polygon-to-edge-pair processor and returns an edge pair collection with the results
+        See \PolygonToEdgePairProcessor for a description of this feature.
 
         This method has been introduced in version 0.29.
         """
         ...
     @overload
-    def processed(self, processed: PolygonToEdgePairOperator) -> EdgePairs:
+    def processed(self, processed: PolygonToEdgeProcessorBase) -> Edges:
         r"""
-        @brief Applies a generic polygon-to-edge-pair processor and returns an edge pair collection with the results
-        See \PolygonToEdgePairProcessor for a description of this feature.
+        @brief Applies a generic polygon-to-edge processor and returns an edge collection with the results
+        See \PolygonToEdgeProcessor for a description of this feature.
 
         This method has been introduced in version 0.29.
         """
@@ -63624,11 +64989,10 @@ class Shape:
     Starting with version 0.23, this method returns nil, if the shape does not represent a geometrical primitive that can be converted to a simple polygon.
 
     Setter:
-    @brief Replaces the shape by the given simple polygon object
-    This method replaces the shape by the given simple polygon object. This method can only be called for editable layouts. It does not change the user properties of the shape.
-    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
+    @brief Replaces the shape by the given simple polygon (in micrometer units)
+    This method replaces the shape by the given text, like \simple_polygon= with a \SimplePolygon argument does. This version translates the polygon from micrometer units to database units internally.
 
-    This method has been introduced in version 0.22.
+    This method has been introduced in version 0.25.
     """
     text: Any
     r"""
@@ -63637,10 +65001,11 @@ class Shape:
 
     Starting with version 0.23, this method returns nil, if the shape does not represent a text.
     Setter:
-    @brief Replaces the shape by the given text (in micrometer units)
-    This method replaces the shape by the given text, like \text= with a \Text argument does. This version translates the text from micrometer units to database units internally.
+    @brief Replaces the shape by the given text object
+    This method replaces the shape by the given text object. This method can only be called for editable layouts. It does not change the user properties of the shape.
+    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.22.
     """
     text_dpos: DVector
     r"""
@@ -64094,6 +65459,15 @@ class Shape:
         @brief Returns the bounding box of the shape
         """
         ...
+    def clear_properties(self) -> None:
+        r"""
+        @brief Clears all user properties
+        This method will remove all user properties. After it has been called, \has_prop_id? will return false.
+        Calling this method may invalidate any iterators. It should not be called inside a loop iterating over instances.
+
+        This method has been introduced in version 0.30.3.
+        """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -64428,6 +65802,15 @@ class Shape:
         If the shape represents a rectangle - i.e. a box or box polygon, a path with two points and no round ends - this method returns the box. If not, nil is returned.
 
         This method has been introduced in version 0.29.
+        """
+        ...
+    def set_properties(self, dict: Dict[Any, Any]) -> None:
+        r"""
+        @brief Sets all user properties from the given dict
+        This method is a convenience method that replaces all user properties of the shape. Using that method is more convenient than creating a new property set with a new ID and assigning that properties ID.
+        This method may change the properties ID. Note: GDS only supports integer keys. OASIS supports numeric and string keys. Calling this method may invalidate any iterators. It should not be called inside a loop iterating over instances.
+
+        This method has been introduced in version 0.30.3.
         """
         ...
     def set_property(self, key: Any, value: Any) -> None:
@@ -67822,17 +69205,23 @@ class SubCircuit(NetlistObject):
     @overload
     def circuit(self) -> Circuit:
         r"""
-        @brief Gets the circuit the subcircuit lives in.
+        @brief Gets the circuit the subcircuit lives in (non-const version).
         This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
+
+        This constness variant has been introduced in version 0.26.8
         """
         ...
     @overload
     def circuit(self) -> Circuit:
         r"""
-        @brief Gets the circuit the subcircuit lives in (non-const version).
+        @brief Gets the circuit the subcircuit lives in.
         This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
-
-        This constness variant has been introduced in version 0.26.8
+        """
+        ...
+    @overload
+    def circuit_ref(self) -> Circuit:
+        r"""
+        @brief Gets the circuit referenced by the subcircuit.
         """
         ...
     @overload
@@ -67842,12 +69231,6 @@ class SubCircuit(NetlistObject):
 
 
         This constness variant has been introduced in version 0.26.8
-        """
-        ...
-    @overload
-    def circuit_ref(self) -> Circuit:
-        r"""
-        @brief Gets the circuit referenced by the subcircuit.
         """
         ...
     @overload
@@ -69083,6 +70466,27 @@ class TextFilterBase:
     Typically, cell variant formation is less expensive, but the hierarchy will be modified.
     """
     @classmethod
+    def expression_filter(cls, expression: str, inverse: Optional[bool] = ..., variables: Optional[Dict[str, Any]] = ..., dbu: Optional[float] = ...) -> TextFilterBase:
+        r"""
+        @brief Creates an expression-based filter
+        @param expression The expression to evaluate.
+        @param inverse If true, inverts the selection - i.e. all texts without a property with the given name and value range are selected.
+        @param dbu If given and greater than zero, the shapes delivered by the 'shape' function will be in micrometer units.
+        @param variables Arbitrary values that are available as variables inside the expressions.
+
+        Creates a filter that will evaluate the given expression on every shape and select the shape when the expression renders a boolean true value. The expression may use the following variables and functions:
+
+        @ul
+        @li @b shape @/b: The current shape (i.e. 'Text' without DBU specified or 'DText' otherwise) @/li
+        @li @b value(<name>) @/b: The value of the property with the given name (the first one if there are multiple properties with the same name) @/li
+        @li @b values(<name>) @/b: All values of the properties with the given name (returns a list) @/li
+        @li @b <name> @/b: A shortcut for 'value(<name>)' (<name> is used as a symbol) @/li
+        @/ul
+
+        This feature has been introduced in version 0.30.3.
+        """
+        ...
+    @classmethod
     def new(cls) -> TextFilterBase:
         r"""
         @brief Creates a new object of this class
@@ -69563,7 +70967,7 @@ class TextGenerator:
         ...
     ...
 
-class TextOperator:
+class TextOperator(TextProcessorBase):
     r"""
     @brief A generic text operator
 
@@ -69617,17 +71021,6 @@ class TextOperator:
     need to be differentiated. Cell variant formation is one way, shape propagation the other way.
     Typically, cell variant formation is less expensive, but the hierarchy will be modified.
     """
-    @classmethod
-    def new(cls) -> TextOperator:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
-    def __init__(self) -> None:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
     def _const_cast(self) -> TextOperator:
         r"""
         @brief Returns a non-const reference to self.
@@ -69684,6 +71077,103 @@ class TextOperator:
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
         ...
+    def is_isotropic(self) -> None:
+        r"""
+        @brief Indicates that the filter has isotropic properties
+        Call this method before using the filter to indicate that the selection is independent of the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        Examples for isotropic (polygon) processors are size or shrink operators. Size or shrink is not dependent on orientation unless size or shrink needs to be different in x and y direction.
+        """
+        ...
+    def is_isotropic_and_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is isotropic and scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for such a (polygon) processor is the convex decomposition operator. The decomposition of a polygon into convex parts is an operation that is not depending on scale nor orientation.
+        """
+        ...
+    def is_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for a scale invariant (polygon) processor is the rotation operator. Rotation is not depending on scale, but on the original orientation as mirrored versions need to be rotated differently.
+        """
+        ...
+    ...
+
+class TextProcessorBase:
+    r"""
+    @hide
+    """
+    @classmethod
+    def new(cls) -> TextProcessorBase:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def _const_cast(self) -> TextProcessorBase:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> TextProcessorBase:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -69709,6 +71199,193 @@ class TextOperator:
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
+        """
+        ...
+    ...
+
+class TextPropertiesExpressions(TextProcessorBase):
+    r"""
+    @brief An operator attaching computed properties to the edge pairs
+
+    This operator will execute a number of expressions and attach the results as new properties. The expression inputs can be taken either from the edges themselves or from existing properties.
+
+    A number of expressions can be supplied with a name. The expressions will be evaluated and the result is attached to the output edge pairs as user properties with the given names.
+
+    Alternatively, a single expression can be given. In that case, 'put' needs to be used to attach properties to the output shape. You can also use 'skip' to drop shapes in that case.
+
+    The expression may use the following variables and functions:
+
+    @ul
+    @li @b shape @/b: The current shape (i.e. 'Text' without DBU specified or 'DText' otherwise) @/li
+    @li @b put(<name>, <value>) @/b: Attaches the given value as a property with name 'name' to the output shape @/li
+    @li @b skip(<flag>) @/b: If called with a 'true' value, the shape is dropped from the output @/li
+    @li @b value(<name>) @/b: The value of the property with the given name (the first one if there are multiple properties with the same name) @/li
+    @li @b values(<name>) @/b: All values of the properties with the given name (returns a list) @/li
+    @li @b <name> @/b: A shortcut for 'value(<name>)' (<name> is used as a symbol) @/li
+    @/ul
+
+    This class has been introduced in version 0.30.3.
+    """
+    requires_raw_input: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the processor needs raw (unmerged) input
+    See \requires_raw_input= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the processor needs raw (unmerged) input
+    This flag must be set before using this processor. It tells the processor implementation whether the processor wants to have raw input (unmerged). The default value is 'false', meaning that
+    the processor will receive merged polygons ('merged semantics').
+
+    Setting this value to false potentially saves some CPU time needed for merging the polygons.
+    Also, raw input means that strange shapes such as dot-like edges, self-overlapping polygons, empty or degenerated polygons are preserved.
+    """
+    result_is_merged: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the processor delivers merged output
+    See \result_is_merged= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the processor delivers merged output
+    This flag must be set before using this processor. If the processor maintains the merged condition
+    by design (output is merged if input is), it is a good idea to set this predicate to 'true'.
+    This will avoid additional merge steps when the resulting collection is used in further operations
+    that need merged input
+    .
+    """
+    result_must_not_be_merged: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the processor's output must not be merged
+    See \result_must_not_be_merged= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the processor's output must not be merged
+    This flag must be set before using this processor. The processor can set this flag if it wants to
+    deliver shapes that must not be merged - e.g. point-like edges or strange or degenerated polygons.
+    .
+    """
+    wants_variants: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the filter prefers cell variants
+    See \wants_variants= for details.
+
+    Setter:
+    @brief Sets a value indicating whether the filter prefers cell variants
+    This flag must be set before using this filter for hierarchical applications (deep mode). It tells the filter implementation whether cell variants should be created (true, the default) or shape propagation will be applied (false).
+
+    This decision needs to be made, if the filter indicates that it will deliver different results
+    for scaled or rotated versions of the shape (see \is_isotropic and the other hints). If a cell
+    is present with different qualities - as seen from the top cell - the respective instances
+    need to be differentiated. Cell variant formation is one way, shape propagation the other way.
+    Typically, cell variant formation is less expensive, but the hierarchy will be modified.
+    """
+    @overload
+    @classmethod
+    def new(cls, texts: Texts, expression: str, copy_properties: Optional[bool] = ..., variables: Optional[Dict[str, Any]] = ..., dbu: Optional[float] = ...) -> TextPropertiesExpressions:
+        r"""
+        @brief Creates a new properties expressions operator
+
+        @param texts The text collection, the processor will be used on. Can be nil, but if given, allows some optimization.
+        @param expression A single expression evaluated for each shape (see class description for details).
+        @param copy_properties If true, new properties will be added to existing ones.
+        @param dbu If not zero, this value specifies the database unit to use. If given, the shapes returned by the 'shape' function will be micrometer-unit objects.
+        @param variables Arbitrary values that are available as variables inside the expressions.
+        """
+        ...
+    @overload
+    @classmethod
+    def new(cls, texts: Texts, expressions: Dict[Any, str], copy_properties: Optional[bool] = ..., variables: Optional[Dict[str, Any]] = ..., dbu: Optional[float] = ...) -> TextPropertiesExpressions:
+        r"""
+        @brief Creates a new properties expressions operator
+
+        @param texts The text collection, the processor will be used on. Can be nil, but if given, allows some optimization.
+        @param expressions A map of property names and expressions used to generate the values of the properties (see class description for details).
+        @param copy_properties If true, new properties will be added to existing ones.
+        @param dbu If not zero, this value specifies the database unit to use. If given, the shapes returned by the 'shape' function will be micrometer-unit objects.
+        @param variables Arbitrary values that are available as variables inside the expressions.
+        """
+        ...
+    @overload
+    def __init__(self, texts: Texts, expression: str, copy_properties: Optional[bool] = ..., variables: Optional[Dict[str, Any]] = ..., dbu: Optional[float] = ...) -> None:
+        r"""
+        @brief Creates a new properties expressions operator
+
+        @param texts The text collection, the processor will be used on. Can be nil, but if given, allows some optimization.
+        @param expression A single expression evaluated for each shape (see class description for details).
+        @param copy_properties If true, new properties will be added to existing ones.
+        @param dbu If not zero, this value specifies the database unit to use. If given, the shapes returned by the 'shape' function will be micrometer-unit objects.
+        @param variables Arbitrary values that are available as variables inside the expressions.
+        """
+        ...
+    @overload
+    def __init__(self, texts: Texts, expressions: Dict[Any, str], copy_properties: Optional[bool] = ..., variables: Optional[Dict[str, Any]] = ..., dbu: Optional[float] = ...) -> None:
+        r"""
+        @brief Creates a new properties expressions operator
+
+        @param texts The text collection, the processor will be used on. Can be nil, but if given, allows some optimization.
+        @param expressions A map of property names and expressions used to generate the values of the properties (see class description for details).
+        @param copy_properties If true, new properties will be added to existing ones.
+        @param dbu If not zero, this value specifies the database unit to use. If given, the shapes returned by the 'shape' function will be micrometer-unit objects.
+        @param variables Arbitrary values that are available as variables inside the expressions.
+        """
+        ...
+    def _const_cast(self) -> TextPropertiesExpressions:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> TextPropertiesExpressions:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
         """
         ...
     def is_isotropic(self) -> None:
@@ -69737,7 +71414,7 @@ class TextOperator:
         ...
     ...
 
-class TextToPolygonOperator:
+class TextToPolygonOperator(TextToPolygonProcessorBase):
     r"""
     @brief A generic text-to-polygon operator
 
@@ -69771,17 +71448,6 @@ class TextToPolygonOperator:
     need to be differentiated. Cell variant formation is one way, shape propagation the other way.
     Typically, cell variant formation is less expensive, but the hierarchy will be modified.
     """
-    @classmethod
-    def new(cls) -> TextToPolygonOperator:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
-    def __init__(self) -> None:
-        r"""
-        @brief Creates a new object of this class
-        """
-        ...
     def _const_cast(self) -> TextToPolygonOperator:
         r"""
         @brief Returns a non-const reference to self.
@@ -69838,6 +71504,103 @@ class TextToPolygonOperator:
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
         ...
+    def is_isotropic(self) -> None:
+        r"""
+        @brief Indicates that the filter has isotropic properties
+        Call this method before using the filter to indicate that the selection is independent of the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        Examples for isotropic (polygon) processors are size or shrink operators. Size or shrink is not dependent on orientation unless size or shrink needs to be different in x and y direction.
+        """
+        ...
+    def is_isotropic_and_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is isotropic and scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for such a (polygon) processor is the convex decomposition operator. The decomposition of a polygon into convex parts is an operation that is not depending on scale nor orientation.
+        """
+        ...
+    def is_scale_invariant(self) -> None:
+        r"""
+        @brief Indicates that the filter is scale invariant
+        Call this method before using the filter to indicate that the selection is independent of the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
+
+        An example for a scale invariant (polygon) processor is the rotation operator. Rotation is not depending on scale, but on the original orientation as mirrored versions need to be rotated differently.
+        """
+        ...
+    ...
+
+class TextToPolygonProcessorBase:
+    r"""
+    @hide
+    """
+    @classmethod
+    def new(cls) -> TextToPolygonProcessorBase:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+        ...
+    def _const_cast(self) -> TextToPolygonProcessorBase:
+        r"""
+        @brief Returns a non-const reference to self.
+        Basically, this method allows turning a const object reference to a non-const one. This method is provided as last resort to remove the constness from an object. Usually there is a good reason for a const object reference, so using this method may have undesired side effects.
+
+        This method has been introduced in version 0.29.6.
+        """
+        ...
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+        ...
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+        ...
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+        ...
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+        ...
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
+    def _to_const_object(self) -> TextToPolygonProcessorBase:
+        r"""
+        @hide
+        """
+        ...
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+        ...
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -69863,30 +71626,6 @@ class TextToPolygonOperator:
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
-        """
-        ...
-    def is_isotropic(self) -> None:
-        r"""
-        @brief Indicates that the filter has isotropic properties
-        Call this method before using the filter to indicate that the selection is independent of the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
-
-        Examples for isotropic (polygon) processors are size or shrink operators. Size or shrink is not dependent on orientation unless size or shrink needs to be different in x and y direction.
-        """
-        ...
-    def is_isotropic_and_scale_invariant(self) -> None:
-        r"""
-        @brief Indicates that the filter is isotropic and scale invariant
-        Call this method before using the filter to indicate that the selection is independent of the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
-
-        An example for such a (polygon) processor is the convex decomposition operator. The decomposition of a polygon into convex parts is an operation that is not depending on scale nor orientation.
-        """
-        ...
-    def is_scale_invariant(self) -> None:
-        r"""
-        @brief Indicates that the filter is scale invariant
-        Call this method before using the filter to indicate that the selection is independent of the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in hierarchical mode.
-
-        An example for a scale invariant (polygon) processor is the rotation operator. Rotation is not depending on scale, but on the original orientation as mirrored versions need to be rotated differently.
         """
         ...
     ...
@@ -70844,7 +72583,7 @@ class Texts(ShapeCollection):
         The 'text_prop' argument has been added in version 0.30.
         """
         ...
-    def process(self, process: TextOperator) -> None:
+    def process(self, process: TextProcessorBase) -> None:
         r"""
         @brief Applies a generic text processor in place (replacing the texts from the text collection)
         See \TextProcessor for a description of this feature.
@@ -70853,7 +72592,7 @@ class Texts(ShapeCollection):
         """
         ...
     @overload
-    def processed(self, processed: TextOperator) -> Texts:
+    def processed(self, processed: TextProcessorBase) -> Texts:
         r"""
         @brief Applies a generic text processor and returns a processed copy
         See \TextProcessor for a description of this feature.
@@ -70862,7 +72601,7 @@ class Texts(ShapeCollection):
         """
         ...
     @overload
-    def processed(self, processed: TextToPolygonOperator) -> Region:
+    def processed(self, processed: TextToPolygonProcessorBase) -> Region:
         r"""
         @brief Applies a generic text-to-polygon processor and returns a region with the results
         See \TextToPolygonProcessor for a description of this feature.

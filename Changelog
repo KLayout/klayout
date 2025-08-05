@@ -1,3 +1,60 @@
+0.30.3           (2025-08-05):
+* Enhancement: %GITHUB%/issues/2044 Different combination modes on strm2xxx tools (+ and ,)
+* Bugfix: %GITHUB%/issues/2073 Klayout fails to read CELLNAME S_CELL_OFFSET property on Windows on big files
+* Bugfix: %GITHUB%/issues/2075 strm2oas ignores def net routing wire extensions
+* Bugfix: %GITHUB%/issues/2081 strm2oas a.oas,c.oas o.oas coredumps
+* Bugfix: %GITHUB%/issues/2087 DRC: Poor fill with skew step vectors (see more fill-related topics below)
+* Bugfix: %GITHUB%/issues/2088 Fixed a use case that generated duplicate OASIS cell IDs
+* Bugfix: %GITHUB%/issues/2094 Performance issue in the python code to insert Regions into Shapes
+* Bugfix: %GITHUB%/issues/2100 RNetExtractor extracts wrong RNode locations with tesselation
+* Bugfix: %GITHUB%/issues/2102 RNetExtractor internal error
+* Bugfix: Fixed automatic execution of scripts after package installation
+  Now, restarting KLayout after package installation may not be needed
+* Bugfix: File watcher dropped file after is was temporarily removed
+* Bugfix: After deleting terminals from devices, reading old L2N/LVSDB files
+  made these terminal re-appear in the netlist browser.
+* Enhancement: primary and secondary device parameters are separated in 
+  the LVS netlist view, so it is easier to see which parameters are relevant
+* Bugfix: Avoid a crash when reading OASIS files with broken code tables
+  in OASIS CBLOCKs
+* Enhancement: New Ruby/Python functions: Macro#current and Macro attributes
+  (Macro#get_attribute, Macro#has_attribute, Macro#set_attribute, Macro#delete_attribute)
+  These features allow passing values in and out from a macro in other ways
+  than defining global variables and basically allow parameterized macros.
+* Enhancement: Convenience function ObjectInstPath#cell
+* Bugfix: Some layout queries did not render the correct path_dtrans
+* Bugfix: "tap" feature 
+  - was not selecting shapes that fully overlap the view
+  - texts are not considered as detecting them requires potentially search a large area
+* Bugfix: Fixed a TODO from old issue #1470
+* Enhancement: DRC function "def_output": A simple yet useful extension to obtain 
+  the output layout and to manipulate it (within limits)
+* Bugfixes and enhancements: fill feature (see also issue #2087)
+  - tiles in tiled mode most not overlap when the origin is not global as tiles may use different origins
+  - more efficient computation of remaining fill area
+  - fill pattern "margin" feature simplifies keeping distance to other fill
+    shapes or original features in multi-fill scenarios
+  - fixed MT issues when using the fill feature in tiled mode with multiple threads
+  - better compression of fill cell instances into arrays
+* Enhancement: Ruby/Polygon methods set_properties and clear_properties for Cell, Layout, Shape and Instance
+* Enhancement: a bunch of features that utilize expressions on polygons and other shapes
+  to attach properties, filter base on properties or compute values in properties
+  (aka "measurement features")
+  - PolygonFilterBase#expression_filter (to be used in Region#filter and Region#filtered) 
+    can be used to filter polygons based on KLayout expressions, including properties
+  - PolygonPropertiesExpressions object (to be used in Region#process and Region#processed)
+    can be used to attach properties based on KLayout expressions, including other properties
+  - Same for Edges, EdgePairs and Texts
+* Enhancement: handling of properties in shape merge in Region
+  - Region#join_properties_on_merge controls how properties and handled during shape merge
+  - New respective arguments in Region#merge, Region#merged
+  - New layer methods "merge_props" and "merged_props" in DRC (allows joining properties
+    from same shapes on different layers)
+* Enhancement: net property evaluation using KLayout expressions.
+  Allows implementing more complex antenna rule checking schemes for example.
+  - Ruby/Python: LayoutToNetlist#evaluate_nets
+  - DRC: evaluate_nets
+
 0.30.2           (2025-05-29):
 * Enhancement: %GITHUB%/issues/2016 Lazy evaluation of PCell also when changing guiding shape properties
 * Enhancement: %GITHUB%/issues/2041 strm2oas should read --lefdef-lefs and --lefdef-lef-layouts only once

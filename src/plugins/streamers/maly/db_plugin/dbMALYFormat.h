@@ -94,68 +94,6 @@ public:
   }
 };
 
-#if 0 // @@@
-/**
- *  @brief Structure that holds the MALY specific options for the Writer
- *  NOTE: this structure is non-public linkage by intention. This way it's instantiated
- *  in all compile units and the shared object does not need to be linked.
- */
-class DB_PLUGIN_PUBLIC MALYWriterOptions
-  : public FormatSpecificWriterOptions
-{
-public:
-  /**
-   *  @brief The constructor
-   */
-  MALYWriterOptions ()
-    : lambda (0.0), write_timestamp (true)
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Specifies the lambda value for writing
-   *
-   *  The lambda value is the basic scaling parameter.
-   *  If this value is set to 0 or negative, the lambda value stored in the layout
-   *  is used (meta data "lambda").
-   */
-  double lambda;
-
-  /**
-   *  @brief Specifies the technology value for writing Magic files
-   *
-   *  If this value is set an empty string, the technology store in the layout's
-   *  "technology" meta data is used.
-   */
-  std::string tech;
-
-  /**
-   *  @brief A value indicating whether the real (true) or fake (false) timestamp is written
-   *
-   *  A fake, static timestamp is useful for comparing files.
-   */
-  bool write_timestamp;
-
-  /**
-   *  @brief Implementation of FormatSpecificWriterOptions
-   */
-  virtual FormatSpecificWriterOptions *clone () const
-  {
-    return new MALYWriterOptions (*this);
-  }
-
-  /**
-   *  @brief Implementation of FormatSpecificWriterOptions
-   */
-  virtual const std::string &format_name () const
-  {
-    static std::string n ("MALY");
-    return n;
-  }
-};
-#endif
-
 }
 
 #endif

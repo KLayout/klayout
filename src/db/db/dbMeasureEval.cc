@@ -21,7 +21,7 @@
 */
 
 #include "dbMeasureEval.h"
-#include "gsiClassBase.h"
+#include "gsiClass.h"
 
 namespace db
 {

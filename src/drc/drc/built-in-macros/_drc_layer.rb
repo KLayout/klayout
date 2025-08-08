@@ -5950,10 +5950,10 @@ CODE
           bx = 0.0
           by = 0.0
         else
-          bx = [ fc_box.width, row_step.x ].max
-          by = [ fc_box.height, column_step.y ].max
+          bx = [ fc_box.width, row_step.x.abs + column_step.x.abs ].max + [ -fill_margin.x, 0 ].max
+          by = [ fc_box.height, row_step.y.abs + column_step.y.abs ].max + [ -fill_margin.y, 0 ].max
         end
-        tp.tile_border(bx, by)
+        tp.tile_border(@engine.dbu * bx, @engine.dbu * by)
         tp.threads = (@engine.threads || 1)
 
         result_arg = "nil"

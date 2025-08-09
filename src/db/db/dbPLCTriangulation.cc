@@ -1661,7 +1661,8 @@ Triangulation::refine (const TriangulationParameters &parameters)
         Edge *edge = find_closest_edge (center, vstart, true /*inside only*/);
         tl_assert (edge != 0);
 
-        if (! edge->is_segment () || edge->side_of (*vstart) * edge->side_of (center) >= 0) {
+        if ((! edge->is_segment () && (edge->side_of (center) < 0 ? edge->left () : edge->right ()) != 0 /*center is inside*/)
+            || (edge->is_segment () && edge->side_of (*vstart) * edge->side_of (center) >= 0)) {
 
           if (tl::verbosity () >= parameters.base_verbosity + 20) {
             tl::info << "Inserting out-of-triangle center " << center << " of " << (*t)->to_string (true);

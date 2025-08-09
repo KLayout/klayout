@@ -79,6 +79,9 @@ const double zoom_factor = 0.7;
 //  factor by which panning is faster in "fast" (+Shift) mode
 const double fast_factor = 3.0;
 
+//  size of cross
+const int mark_size = 9;
+
 // -------------------------------------------------------------
 
 struct OpHideShowCell 
@@ -4241,7 +4244,7 @@ LayoutViewBase::set_view_ops ()
   //  cell boxes
   if (m_cell_box_visible) {
 
-    lay::ViewOp vop;
+    lay::ViewOp vop, vopv;
 
     //  context level
     if (m_ctx_color.is_valid ()) {
@@ -4249,12 +4252,15 @@ LayoutViewBase::set_view_ops ()
     } else {
       vop = lay::ViewOp (lay::LayerProperties::brighter (box_color.rgb (), brightness_for_context), lay::ViewOp::Copy, 0, 0, 0);
     }
+    vopv = vop;
+    vopv.shape (lay::ViewOp::Cross);
+    vopv.width (mark_size);
 
     //  fill, frame, text, vertex
     view_ops.push_back (lay::ViewOp (0, lay::ViewOp::Or, 0, 0, 0));
     view_ops.push_back (vop);
     view_ops.push_back (vop);
-    view_ops.push_back (lay::ViewOp (0, lay::ViewOp::Or, 0, 0, 0));
+    view_ops.push_back (vopv);
 
     //  child level
     if (m_child_ctx_color.is_valid ()) {
@@ -4262,21 +4268,27 @@ LayoutViewBase::set_view_ops ()
     } else {
       vop = lay::ViewOp (lay::LayerProperties::brighter (box_color.rgb (), brightness_for_context), lay::ViewOp::Copy, 0, 0, 0);
     }
+    vopv = vop;
+    vopv.shape (lay::ViewOp::Cross);
+    vopv.width (mark_size);
 
     //  fill, frame, text, vertex
     view_ops.push_back (lay::ViewOp (0, lay::ViewOp::Or, 0, 0, 0));
     view_ops.push_back (vop);
     view_ops.push_back (vop);
-    view_ops.push_back (lay::ViewOp (0, lay::ViewOp::Or, 0, 0, 0));
+    view_ops.push_back (vopv);
 
     //  current level
     vop = lay::ViewOp (box_color.rgb (), lay::ViewOp::Copy, 0, 0, 0);
+    vopv = vop;
+    vopv.shape (lay::ViewOp::Cross);
+    vopv.width (mark_size);
 
     //  fill, frame, text, vertex
     view_ops.push_back (lay::ViewOp (0, lay::ViewOp::Or, 0, 0, 0));
     view_ops.push_back (vop);
     view_ops.push_back (vop);
-    view_ops.push_back (lay::ViewOp (0, lay::ViewOp::Or, 0, 0, 0));
+    view_ops.push_back (vopv);
 
   } else {
     //  invisible
@@ -4487,7 +4499,7 @@ LayoutViewBase::set_view_ops ()
           view_ops.push_back (lay::ViewOp (0, lay::ViewOp::Or, 0, 0, 0));
         }
         // vertex 
-        view_ops.push_back (lay::ViewOp (frame_color, mode, 0, 0, 0, lay::ViewOp::Cross, l->marked (true /*real*/) ? 9/*mark size*/ : 0)); // vertex
+        view_ops.push_back (lay::ViewOp (frame_color, mode, 0, 0, 0, lay::ViewOp::Cross, l->marked (true /*real*/) ? mark_size : 0)); // vertex
 
       } else {
         for (unsigned int i = 0; i < (unsigned int) planes_per_layer / 3; ++i) {

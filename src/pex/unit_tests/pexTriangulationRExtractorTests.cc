@@ -361,3 +361,37 @@ TEST(extraction_meander)
   )
 }
 
+TEST(extraction_issue2111)
+{
+  db::Point contour[] = {
+    db::Point (0, 0),
+    db::Point (0, 740),
+    db::Point (435, 740),
+    db::Point (435, 100),
+    db::Point (365, 100),
+    db::Point (365, 0)
+  };
+
+  db::Polygon poly;
+  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour[0]));
+
+  double dbu = 0.001;
+
+  pex::RNetwork rn;
+  pex::TriangulationRExtractor rex (dbu);
+  // rex.triangulation_parameters ().max_area = 10000 * dbu * dbu;
+  // rex.triangulation_parameters ().min_b = 0.3;
+
+  std::vector<db::Point> vertex_ports;
+  vertex_ports.push_back (db::Point (400, 500));
+
+  std::vector<db::Polygon> polygon_ports;
+  polygon_ports.push_back (poly);
+
+  rex.extract (poly, vertex_ports, polygon_ports, rn);
+
+  EXPECT_EQ (rn.to_string (),
+    "R P0 V0 0.133103"
+  )
+}
+

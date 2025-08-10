@@ -6078,7 +6078,9 @@ LayoutViewBase::cv_transform_variants_with_empty () const
   }
 
   for (auto i = cv_present.begin (); i != cv_present.end (); ++i) {
-    box_variants.insert (std::make_pair (db::DCplxTrans (), int (i - cv_present.begin ())));
+    if (!*i) {
+      box_variants.insert (std::make_pair (db::DCplxTrans (), int (i - cv_present.begin ())));
+    }
   }
 
   return box_variants;

@@ -2282,7 +2282,7 @@ RedrawThreadWorker::iterate_variants_rec (const std::vector <db::Box> &redraw_re
       db::Coord lim = std::numeric_limits<db::Coord>::max ();
       db::DBox world (trans * db::Box (db::Point (-lim, -lim), db::Point (lim, lim)));
       db::Box vp = db::Box (trans.inverted () * (world & db::DBox (*rr)));
-      vp &= mp_layout->cell (ci).bbox (); // this avoids problems when accessing designs through very large viewports
+      vp &= mp_layout->cell (ci).bbox_with_empty (); // this avoids problems when accessing designs through very large viewports
       if (! vp.empty ()) {
         actual_regions.push_back (vp);
       }

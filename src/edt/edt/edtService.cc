@@ -627,7 +627,7 @@ Service::selection_bbox ()
 
     db::CplxTrans ctx_trans = db::CplxTrans (layout.dbu ()) * cv.context_trans () * r->trans ();
 
-    db::box_convert<db::CellInst> bc (layout);
+    db::box_convert<db::CellInst, false> bc (layout);
     if (! r->is_cell_inst ()) {
 
       const std::vector<db::DCplxTrans> *tv_list = tv.per_cv_and_layer (r->cv_index (), r->layer ());

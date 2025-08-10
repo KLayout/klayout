@@ -100,13 +100,13 @@ Finder::start (lay::LayoutViewBase *view, unsigned int cv_index, const std::vect
 
   if (layers.size () == 1) {
 
-    m_box_convert = db::box_convert <db::CellInst> (*mp_layout, (unsigned int) layers [0]);
-    m_cell_box_convert = db::box_convert <db::Cell> ((unsigned int) layers [0]);
+    m_box_convert = db::box_convert <db::CellInst, false> (*mp_layout, (unsigned int) layers [0]);
+    m_cell_box_convert = db::box_convert <db::Cell, false> ((unsigned int) layers [0]);
 
   } else {
 
-    m_box_convert = db::box_convert <db::CellInst> (*mp_layout);
-    m_cell_box_convert = db::box_convert <db::Cell> ();
+    m_box_convert = db::box_convert <db::CellInst, false> (*mp_layout);
+    m_cell_box_convert = db::box_convert <db::Cell, false> ();
 
   }
 
@@ -836,10 +836,10 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
           ++*mp_progress;
 
           db::Box ibox;
-          if (inst_cell.bbox ().empty ()) {
+          if (inst_cell.bbox_with_empty ().empty ()) {
             ibox = db::Box (db::Point (0, 0), db::Point (0, 0));
           } else if (! m_visible_layers || level == mp_view->get_max_hier_levels () - 1 || mp_view->is_cell_hidden (inst_cell.cell_index (), m_cv_index)) {
-            ibox = inst_cell.bbox ();
+            ibox = inst_cell.bbox_with_empty ();
           } else {
             for (std::vector<int>::const_iterator l = m_visible_layer_indexes.begin (); l != m_visible_layer_indexes.end (); ++l) {
               ibox += inst_cell.bbox (*l);
@@ -914,10 +914,10 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
           double d = std::numeric_limits<double>::max ();
 
           db::Box ibox;
-          if (inst_cell.bbox ().empty ()) {
+          if (inst_cell.bbox_with_empty ().empty ()) {
             ibox = db::Box (db::Point (0, 0), db::Point (0, 0));
           } else if (! m_visible_layers || level == mp_view->get_max_hier_levels () - 1 || mp_view->is_cell_hidden (inst_cell.cell_index (), m_cv_index)) {
-            ibox = inst_cell.bbox ();
+            ibox = inst_cell.bbox_with_empty ();
           } else {
             for (std::vector<int>::const_iterator l = m_visible_layer_indexes.begin (); l != m_visible_layer_indexes.end (); ++l) {
               ibox += inst_cell.bbox (*l);

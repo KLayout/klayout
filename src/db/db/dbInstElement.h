@@ -85,7 +85,8 @@ struct DB_PUBLIC InstElement
    *
    *  @param bc The bounding box converter for the cell instance (db::box_convert<db::CellInst>)
    */
-  db::Box bbox (const db::box_convert<db::CellInst> &bc) const
+  template <class BoxConvert>
+  db::Box bbox (const BoxConvert &bc) const
   {
     if (whole_array ()) {
       //  this is the whole array

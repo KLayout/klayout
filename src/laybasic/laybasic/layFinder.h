@@ -218,8 +218,8 @@ private:
   bool m_point_mode;
   bool m_catch_all;
   bool m_top_level_sel;
-  db::box_convert <db::CellInst> m_box_convert;
-  db::box_convert <db::Cell> m_cell_box_convert;
+  db::box_convert <db::CellInst, false> m_box_convert;
+  db::box_convert <db::Cell, false> m_cell_box_convert;
 };
 
 /**

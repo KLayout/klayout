@@ -200,7 +200,6 @@ private:
   bool any_text_shapes (db::cell_index_type cell_index, unsigned int levels);
   bool any_cell_box (db::cell_index_type cell_index, unsigned int levels);
   bool need_draw_box (const db::Layout *layout, const db::Cell &cell, int level);
-  db::Box empty_cell_replacement_box ();
 
   RedrawThread *mp_redraw_thread;
   std::vector <db::Box> m_redraw_region;

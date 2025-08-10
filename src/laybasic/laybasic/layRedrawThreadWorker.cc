@@ -738,12 +738,6 @@ RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, co
   }
 }
 
-db::Box
-RedrawThreadWorker::empty_cell_replacement_box ()
-{
-  return db::Box (db::Point (), db::Point ());
-}
-
 void
 RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &redraw_box, int level)
 {
@@ -751,12 +745,8 @@ RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, co
   const db::Cell &cell = mp_layout->cell (ci);
 
   //  For small bboxes, the cell outline can be reduced ..
-  db::Box bbox = cell.bbox ();
-  bool empty_cell = false;
-  if (bbox.empty ()) {
-    bbox = empty_cell_replacement_box ();
-    empty_cell = true;
-  }
+  db::Box bbox = cell.bbox_with_empty ();
+  bool empty_cell = cell.bbox ().empty ();
 
   if (m_drop_small_cells && drop_cell (cell, trans)) {
 
@@ -811,12 +801,8 @@ RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, co
             const db::CellInstArray &cell_inst = inst->cell_inst ();
 
             db::cell_index_type new_ci = cell_inst.object ().cell_index ();
-            db::Box new_cell_box = mp_layout->cell (new_ci).bbox ();
-            bool empty_inst_cell = false;
-            if (new_cell_box.empty ()) {
-              new_cell_box = empty_cell_replacement_box ();
-              empty_inst_cell = true;
-            }
+            db::Box new_cell_box = mp_layout->cell (new_ci).bbox_with_empty ();
+            bool empty_inst_cell = mp_layout->cell (new_ci).bbox ().empty ();
 
             if (last_ci != new_ci) {
               //  Hint: don't use any_cell_box on partially visible cells because that will degrade performance

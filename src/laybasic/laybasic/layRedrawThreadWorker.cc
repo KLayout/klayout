@@ -575,7 +575,7 @@ RedrawThreadWorker::setup (LayoutViewBase *view, RedrawThreadCanvas *canvas, con
 
   m_nlayers = mp_redraw_thread->num_layers (); 
 
-  m_box_variants = view->cv_transform_variants ();
+  m_box_variants = view->cv_transform_variants_with_empty ();
 }
 
 void

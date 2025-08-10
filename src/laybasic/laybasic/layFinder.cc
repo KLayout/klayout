@@ -735,7 +735,7 @@ InstFinder::find (lay::LayoutViewBase *view, const db::DBox &region_mu)
   progress.set_format ("");
   mp_progress = &progress;
 
-  std::set< std::pair<db::DCplxTrans, int> > variants = view->cv_transform_variants ();
+  std::set< std::pair<db::DCplxTrans, int> > variants = view->cv_transform_variants_with_empty ();
   for (std::set< std::pair<db::DCplxTrans, int> >::const_iterator v = variants.begin (); v != variants.end (); ++v) {
     find (view, v->second, v->first, region_mu);
   }

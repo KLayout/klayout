@@ -3864,8 +3864,13 @@ LayoutViewBase::full_box () const
 
   db::DBox bbox;
 
-  for (LayerPropertiesConstIterator l = get_properties ().begin_const_recursive (); ! l.at_end (); ++l) {
-    bbox += l->overall_bbox ();
+  auto tv = cv_transform_variants_with_empty ();
+  for (auto i = tv.begin (); i != tv.end (); ++i) {
+    const lay::CellView &cv = cellview (i->second);
+    if (cv.is_valid ()) {
+      double dbu = cv->layout ().dbu ();
+      bbox += (i->first * db::CplxTrans (dbu) * cv.context_trans ()) * cv.cell ()->bbox_with_empty ();
+    }
   }
 
   for (lay::AnnotationShapes::iterator a = annotation_shapes ().begin (); ! a.at_end (); ++a) {
@@ -5987,6 +5992,16 @@ LayoutViewBase::cv_transform_variants (int cv_index) const
 }
 
 std::vector<db::DCplxTrans>
+LayoutViewBase::cv_transform_variants_with_empty (int cv_index) const
+{
+  std::vector<db::DCplxTrans> trns_variants = cv_transform_variants (cv_index);
+  if (trns_variants.empty ()) {
+    trns_variants.push_back (db::DCplxTrans ());
+  }
+  return trns_variants;
+}
+
+std::vector<db::DCplxTrans>
 LayoutViewBase::cv_transform_variants (int cv_index, unsigned int layer) const
 {
   if (cellview (cv_index)->layout ().is_valid_layer (layer)) {
@@ -6046,7 +6061,30 @@ LayoutViewBase::cv_transform_variants () const
   return box_variants;
 }
 
-db::InstElement 
+std::set< std::pair<db::DCplxTrans, int> >
+LayoutViewBase::cv_transform_variants_with_empty () const
+{
+  std::set< std::pair<db::DCplxTrans, int> > box_variants = cv_transform_variants ();
+
+  //  add a default box variant for the CVs not present in the layer list to
+  //  draw boxes at least.
+
+  std::vector<bool> cv_present;
+  cv_present.resize (m_cellviews.size ());
+  for (auto bv = box_variants.begin (); bv != box_variants.end (); ++bv) {
+    if (bv->second >= 0 && bv->second < int (cv_present.size ())) {
+      cv_present[bv->second] = true;
+    }
+  }
+
+  for (auto i = cv_present.begin (); i != cv_present.end (); ++i) {
+    box_variants.insert (std::make_pair (db::DCplxTrans (), int (i - cv_present.begin ())));
+  }
+
+  return box_variants;
+}
+
+db::InstElement
 LayoutViewBase::ascend (int index)
 {
   tl_assert (int (m_cellviews.size ()) > index && cellview_iter (index)->is_valid ());

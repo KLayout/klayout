@@ -837,9 +837,10 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
           ++*mp_progress;
 
           db::Box ibox;
-          if (inst_cell.bbox_with_empty ().empty ()) {
-            ibox = db::Box (db::Point (0, 0), db::Point (0, 0));
-          } else if (! m_visible_layers || level == mp_view->get_max_hier_levels () - 1 || inst_cell.is_ghost_cell () || mp_view->is_cell_hidden (inst_cell.cell_index (), m_cv_index)) {
+          if (! m_visible_layers || level == mp_view->get_max_hier_levels () - 1 || inst_cell.is_ghost_cell () || mp_view->is_cell_hidden (inst_cell.cell_index (), m_cv_index)) {
+            ibox = inst_cell.bbox_with_empty ();
+          } else if (inst_cell.bbox ().empty ()) {
+            //  empty cells cannot be found by visible layers, so we always select them here
             ibox = inst_cell.bbox_with_empty ();
           } else {
             for (std::vector<int>::const_iterator l = m_visible_layer_indexes.begin (); l != m_visible_layer_indexes.end (); ++l) {
@@ -915,9 +916,10 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
           double d = std::numeric_limits<double>::max ();
 
           db::Box ibox;
-          if (inst_cell.bbox_with_empty ().empty ()) {
-            ibox = db::Box (db::Point (0, 0), db::Point (0, 0));
-          } else if (! m_visible_layers || level == mp_view->get_max_hier_levels () - 1 || inst_cell.is_ghost_cell () || mp_view->is_cell_hidden (inst_cell.cell_index (), m_cv_index)) {
+          if (! m_visible_layers || level == mp_view->get_max_hier_levels () - 1 || inst_cell.is_ghost_cell () || mp_view->is_cell_hidden (inst_cell.cell_index (), m_cv_index)) {
+            ibox = inst_cell.bbox_with_empty ();
+          } else if (inst_cell.bbox ().empty ()) {
+            //  empty cells cannot be found by visible layers, so we always select them here
             ibox = inst_cell.bbox_with_empty ();
           } else {
             for (std::vector<int>::const_iterator l = m_visible_layer_indexes.begin (); l != m_visible_layer_indexes.end (); ++l) {

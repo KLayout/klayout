@@ -631,7 +631,7 @@ RedrawThreadWorker::draw_cell (bool drawing_context, int level, const db::CplxTr
   lay::CanvasPlane *vertices = m_planes[3 + plane_group * (planes_per_layer / 3)];
 
   if (empty_cell) {
-    r.draw (dbox, 0, 0, vertices, 0);
+    r.draw (dbox, 0, contour, vertices, 0);
   } else {
     r.draw (dbox, fill, contour, 0, 0);
   }

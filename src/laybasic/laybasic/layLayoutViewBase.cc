@@ -3865,7 +3865,7 @@ LayoutViewBase::full_box () const
   db::DBox bbox;
 
   for (LayerPropertiesConstIterator l = get_properties ().begin_const_recursive (); ! l.at_end (); ++l) {
-    bbox += l->bbox ();
+    bbox += l->overall_bbox ();
   }
 
   for (lay::AnnotationShapes::iterator a = annotation_shapes ().begin (); ! a.at_end (); ++a) {

@@ -723,6 +723,7 @@ TEST(3a)
   EXPECT_EQ (inst.to_string (), "cell_index=1 r0 100,-100");
   EXPECT_EQ (inst.bbox ().to_string (), "()");
   EXPECT_EQ (inst.bbox (db::box_convert<db::CellInst, false> (g)).to_string (), "(100,-100;100,-100)");
+  EXPECT_EQ (inst.bbox_with_empty ().to_string (), "(100,-100;100,-100)");
   EXPECT_EQ (c0.bbox ().to_string (), "()");
   EXPECT_EQ (c0.bbox_with_empty ().to_string (), "(100,-100;100,-100)");
 

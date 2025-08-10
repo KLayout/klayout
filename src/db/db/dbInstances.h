@@ -339,6 +339,15 @@ public:
   cell_inst_array_type::box_type bbox () const;
 
   /**
+   *  @brief Returns the bounding box of this array, including empty instances
+   *
+   *  This method uses the pointers provided internally to identify container and cell.
+   *  In constrast to normal "bbox", this bounding box considers empty cells as
+   *  point-like with a box of (0,0;0,0).
+   */
+  cell_inst_array_type::box_type bbox_with_empty () const;
+
+  /**
    *  @brief Return the iterator for the instances of the array
    *
    *  This method is basically provided for convenience

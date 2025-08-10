@@ -867,10 +867,10 @@ RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, co
                   if (empty_inst_cell) {
                     lay::CanvasPlane *vertices  = m_planes[3 + plane_group * (planes_per_layer / 3)];
                     r.draw (cell_inst.bbox (bc), trans, 0, 0, vertices, 0);
-                  } else {
-                    lay::CanvasPlane *contour  = m_planes[1 + plane_group * (planes_per_layer / 3)];
-                    r.draw (cell_inst.bbox (bc), trans, contour, 0, 0, 0);
                   }
+
+                  lay::CanvasPlane *contour  = m_planes[1 + plane_group * (planes_per_layer / 3)];
+                  r.draw (cell_inst.bbox (bc), trans, contour, contour, 0, 0);
 
                 }
 

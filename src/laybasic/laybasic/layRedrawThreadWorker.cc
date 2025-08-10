@@ -742,6 +742,7 @@ RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, co
 {
   lay::Renderer &r = *mp_renderer;
   const db::Cell &cell = mp_layout->cell (ci);
+  tl::warn << "@@@ level=" << level << " to_level=" << m_to_level << " " << mp_layout->display_name (ci);
 
   //  For small bboxes, the cell outline can be reduced ..
   db::Box bbox = cell.bbox_with_empty ();
@@ -800,7 +801,7 @@ RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, co
             const db::CellInstArray &cell_inst = inst->cell_inst ();
 
             db::cell_index_type new_ci = cell_inst.object ().cell_index ();
-            db::Box new_cell_box = mp_layout->cell (new_ci).bbox_with_empty ();
+            db::Box new_cell_box = cell_inst.bbox (bc);
             bool empty_inst_cell = mp_layout->cell (new_ci).bbox ().empty ();
 
             if (last_ci != new_ci) {
@@ -812,6 +813,7 @@ RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, co
                 anything = true;
               }
             }
+            tl::warn << "@@@1 " << mp_layout->display_name (new_ci) << " anything=" << anything;
 
             if (anything) {
 
@@ -839,8 +841,6 @@ RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, co
 
                 //  The array can be simplified if there are levels below to draw
                 if (need_draw_box (mp_layout, mp_layout->cell (new_ci), level + 1)) {
-
-                  db::box_convert <db::CellInst, false> bc (*mp_layout);
 
                   unsigned int plane_group = 2;
                   if (drawing_context) {
@@ -997,7 +997,7 @@ RedrawThreadWorker::draw_box_properties (bool drawing_context, db::cell_index_ty
             db::properties_id_type cell_inst_prop = inst->prop_id ();
 
             db::cell_index_type new_ci = cell_inst.object ().cell_index ();
-            db::Box new_cell_box = mp_layout->cell (new_ci).bbox_with_empty ();
+            db::Box new_cell_box = cell_inst.bbox (bc);
 
             if (last_ci != new_ci) {
               //  Hint: don't use any_cell_box on partially visible cells because that will degrade performance 
@@ -1076,13 +1076,18 @@ RedrawThreadWorker::any_shapes (db::cell_index_type cell_index, unsigned int lev
     }
   }
 
+  //  Ghost cells are not drawn either
+  const db::Cell &cell = mp_layout->cell (cell_index);
+  if (cell.is_ghost_cell ()) {
+    return false;
+  }
+
   //  the cache contains all cells that are visited already
   RedrawThreadWorker::micro_instance_cache_t::const_iterator c = m_mi_cache.find (std::make_pair (cell_index, levels));
   if (c == m_mi_cache.end ()) {
 
     int ret = false;
 
-    const db::Cell &cell = mp_layout->cell (cell_index);
     if (! cell.shapes (m_layer).begin (db::ShapeIterator::Polygons | db::ShapeIterator::Edges | db::ShapeIterator::Paths | db::ShapeIterator::Boxes | db::ShapeIterator::Points, mp_prop_sel, m_inv_prop_sel).at_end ()) {
       ret = true;
     } else if (levels > 1) {
@@ -1113,13 +1118,18 @@ RedrawThreadWorker::any_cell_box (db::cell_index_type cell_index, unsigned int l
     }
   }
 
+  //  ghost cells are also drawn
+  const db::Cell &cell = mp_layout->cell (cell_index);
+  if (cell.is_ghost_cell ()) {
+    return true;
+  }
+
   //  the cache contains all cells that are visited already
   RedrawThreadWorker::micro_instance_cache_t::const_iterator c = m_mi_cell_box_cache.find (std::make_pair (cell_index, levels));
   if (c == m_mi_cell_box_cache.end ()) {
 
     int ret = false;
     if (levels > 1) {
-      const db::Cell &cell = mp_layout->cell (cell_index);
       for (db::Cell::child_cell_iterator cc = cell.begin_child_cells (); !cc.at_end () && !ret; ++cc) {
         ret = any_cell_box (*cc, levels - 1);
       }
@@ -1149,13 +1159,18 @@ RedrawThreadWorker::any_text_shapes (db::cell_index_type cell_index, unsigned in
     }
   }
 
+  //  Ghost cells are not drawn either
+  const db::Cell &cell = mp_layout->cell (cell_index);
+  if (cell.is_ghost_cell ()) {
+    return false;
+  }
+
   //  the cache contains all cells that are visited already
   RedrawThreadWorker::micro_instance_cache_t::const_iterator c = m_mi_text_cache.find (std::make_pair (cell_index, levels));
   if (c == m_mi_text_cache.end ()) {
 
     bool ret = false;
 
-    const db::Cell &cell = mp_layout->cell (cell_index);
     if (! cell.shapes (m_layer).begin (db::ShapeIterator::Texts, mp_prop_sel, m_inv_prop_sel).at_end () ||
         (m_show_properties && ! cell.shapes (m_layer).begin (db::ShapeIterator::AllWithProperties, mp_prop_sel, m_inv_prop_sel).at_end ())) {
       ret = true;
@@ -1333,7 +1348,7 @@ RedrawThreadWorker::draw_text_layer (bool drawing_context, db::cell_index_type c
 
   } else if (! bbox.empty ()) {
 
-    bool hidden = (m_cv_index < int (m_hidden_cells.size ()) && m_hidden_cells [m_cv_index].find (ci) != m_hidden_cells [m_cv_index].end ());
+    bool hidden = cell.is_ghost_cell () || ((m_cv_index < int (m_hidden_cells.size ()) && m_hidden_cells [m_cv_index].find (ci) != m_hidden_cells [m_cv_index].end ()));
     bool need_to_dive = (level + 1 < m_to_level) && ! hidden;
 
     db::Box cell_bbox = cell.bbox ();
@@ -1467,7 +1482,7 @@ RedrawThreadWorker::draw_text_layer (bool drawing_context, db::cell_index_type c
               ++inst;
 
               db::cell_index_type new_ci = cell_inst.object ().cell_index ();
-              bool hidden = (m_cv_index < int (m_hidden_cells.size ()) && m_hidden_cells [m_cv_index].find (new_ci) != m_hidden_cells [m_cv_index].end ());
+              bool hidden = mp_layout->cell (new_ci).is_ghost_cell () || ((m_cv_index < int (m_hidden_cells.size ()) && m_hidden_cells [m_cv_index].find (new_ci) != m_hidden_cells [m_cv_index].end ()));
 
               db::Box cell_box = mp_layout->cell (new_ci).bbox (m_layer);
               if (! cell_box.empty () && ! hidden) {
@@ -1769,7 +1784,7 @@ RedrawThreadWorker::draw_layer_wo_cache (int from_level, int to_level, db::cell_
           ++inst;
 
           db::cell_index_type new_ci = cell_inst.object ().cell_index ();
-          bool hidden = (m_cv_index < int (m_hidden_cells.size ()) && m_hidden_cells [m_cv_index].find (new_ci) != m_hidden_cells [m_cv_index].end ());
+          bool hidden = mp_layout->cell (new_ci).is_ghost_cell () || ((m_cv_index < int (m_hidden_cells.size ()) && m_hidden_cells [m_cv_index].find (new_ci) != m_hidden_cells [m_cv_index].end ()));
 
           db::Box new_cell_box = mp_layout->cell (new_ci).bbox (m_layer);
           if (! new_cell_box.empty () && ! hidden) {
@@ -1926,7 +1941,7 @@ RedrawThreadWorker::draw_layer (int from_level, int to_level, db::cell_index_typ
   db::Box cell_bbox = cell.bbox ();
 
   //  Nothing to draw
-  if (bbox.empty ()) {
+  if (bbox.empty () || cell.is_ghost_cell ()) {
     return;
   }
 

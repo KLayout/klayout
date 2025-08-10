@@ -613,7 +613,7 @@ RedrawThreadWorker::test_snapshot (const UpdateSnapshotCallback *update_snapshot
 }
 
 void 
-RedrawThreadWorker::draw_cell (bool drawing_context, int level, const db::CplxTrans &trans, const db::Box &box, bool empty_cell, const std::string &txt)
+RedrawThreadWorker::draw_cell (bool drawing_context, int level, const db::CplxTrans &trans, const db::Box &box, bool empty_cell)
 {
   lay::Renderer &r = *mp_renderer;
 
@@ -628,7 +628,6 @@ RedrawThreadWorker::draw_cell (bool drawing_context, int level, const db::CplxTr
 
   lay::CanvasPlane *fill     = m_planes[0 + plane_group * (planes_per_layer / 3)];
   lay::CanvasPlane *contour  = m_planes[1 + plane_group * (planes_per_layer / 3)];
-  lay::CanvasPlane *text     = m_planes[2 + plane_group * (planes_per_layer / 3)];
   lay::CanvasPlane *vertices = m_planes[3 + plane_group * (planes_per_layer / 3)];
 
   if (empty_cell) {
@@ -636,25 +635,11 @@ RedrawThreadWorker::draw_cell (bool drawing_context, int level, const db::CplxTr
   } else {
     r.draw (dbox, fill, contour, 0, 0);
   }
-
-  if (! txt.empty () && (empty_cell || (dbox.width () > m_min_size_for_label && dbox.height () > m_min_size_for_label))) {
-    //  Hint: we render to contour because the texts plane is reserved for properties
-    r.draw (dbox, txt, 
-            db::Font (m_box_font), 
-            db::HAlignCenter, 
-            db::VAlignCenter, 
-            //  TODO: apply "real" transformation?
-            db::DFTrans (m_box_text_transform ? trans.fp_trans ().rot () : db::DFTrans::r0), 0, 0, 0, text);
-  }
 }
 
 void 
-RedrawThreadWorker::draw_cell_properties (bool drawing_context, int level, const db::CplxTrans &trans, const db::Box &box, db::properties_id_type prop_id)
+RedrawThreadWorker::draw_cell_properties (bool drawing_context, int level, const db::CplxTrans &trans, const db::Box &box, bool empty_cell, db::properties_id_type prop_id, const std::string &txt)
 {
-  if (prop_id == 0 || ! m_show_properties) {
-    return;
-  }
-
   lay::Renderer &r = *mp_renderer;
 
   unsigned int plane_group = 2;
@@ -666,7 +651,21 @@ RedrawThreadWorker::draw_cell_properties (bool drawing_context, int level, const
 
   lay::CanvasPlane *texts = m_planes[2 + plane_group * (planes_per_layer / 3)];
 
-  r.draw_propstring (prop_id, (trans * box).p1 (), texts, trans);
+  db::DBox dbox = trans * box;
+
+  if (! txt.empty () && (empty_cell || (dbox.width () > m_min_size_for_label && dbox.height () > m_min_size_for_label))) {
+    //  Hint: we render to contour because the texts plane is reserved for properties
+    r.draw (dbox, txt,
+            db::Font (m_box_font),
+            db::HAlignCenter,
+            db::VAlignCenter,
+            //  TODO: apply "real" transformation?
+            db::DFTrans (m_box_text_transform ? trans.fp_trans ().rot () : db::DFTrans::r0), 0, 0, 0, texts);
+  }
+
+  if (prop_id != 0 && m_show_properties) {
+    r.draw_propstring (prop_id, (trans * box).p1 (), texts, trans);
+  }
 }
 
 static bool
@@ -755,7 +754,7 @@ RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, co
   } else if (level == m_to_level || cell.is_ghost_cell () || (m_cv_index < int (m_hidden_cells.size ()) && m_hidden_cells [m_cv_index].find (ci) != m_hidden_cells [m_cv_index].end ())) {
 
     //  paint the box on this level
-    draw_cell (drawing_context, level, trans, bbox, empty_cell, mp_layout->display_name (ci));
+    draw_cell (drawing_context, level, trans, bbox, empty_cell);
 
   } else if (level < m_to_level) {
 
@@ -766,7 +765,7 @@ RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, co
         //  the cell is a very small box and we know there must be
         //  some level at which to draw the boundary: just draw it
         //  here and stop looking further down ..
-        draw_cell (drawing_context, level, trans, bbox, empty_cell, std::string ());
+        draw_cell (drawing_context, level, trans, bbox, empty_cell);
       }
 
     } else {
@@ -946,31 +945,28 @@ RedrawThreadWorker::draw_box_properties (bool drawing_context, db::cell_index_ty
   const db::Cell &cell = mp_layout->cell (ci);
 
   //  For small bboxes, the cell outline can be reduced ..
-  db::Box bbox = cell.bbox ();
+  db::Box bbox = cell.bbox_with_empty ();
+  bool empty_cell = cell.bbox ().empty ();
 
-  if (bbox.empty ()) {
-
-    //  no shapes there and below ..
-
-  } else if (m_drop_small_cells && drop_cell (cell, trans)) {
+  if (m_drop_small_cells && drop_cell (cell, trans)) {
 
     //  small cell dropped
 
-  } else if (level == m_to_level || (m_cv_index < int (m_hidden_cells.size ()) && m_hidden_cells [m_cv_index].find (ci) != m_hidden_cells [m_cv_index].end ())) {
+  } else if (level == m_to_level || cell.is_ghost_cell () || (m_cv_index < int (m_hidden_cells.size ()) && m_hidden_cells [m_cv_index].find (ci) != m_hidden_cells [m_cv_index].end ())) {
 
     //  paint the box on this level
-    draw_cell_properties (drawing_context, level, trans, bbox, prop_id);
+    draw_cell_properties (drawing_context, level, trans, bbox, empty_cell, prop_id, mp_layout->display_name (ci));
 
   } else if (level < m_to_level) {
 
     db::DBox dbbox = trans * bbox;
-    if (dbbox.width () < 1.5 && dbbox.height () < 1.5) {
+    if (!empty_cell && (dbbox.width () < 1.5 && dbbox.height () < 1.5)) {
 
       //  ignore cells which are small 
 
     } else {
 
-      db::box_convert <db::CellInst> bc (*mp_layout);
+      db::box_convert <db::CellInst, false> bc (*mp_layout);
      
       //  create a set of boxes to look into
       db::Coord aw = db::coord_traits<db::Coord>::rounded (m_abstract_mode_width / mp_layout->dbu ());
@@ -1001,7 +997,7 @@ RedrawThreadWorker::draw_box_properties (bool drawing_context, db::cell_index_ty
             db::properties_id_type cell_inst_prop = inst->prop_id ();
 
             db::cell_index_type new_ci = cell_inst.object ().cell_index ();
-            db::Box new_cell_box = mp_layout->cell (new_ci).bbox ();
+            db::Box new_cell_box = mp_layout->cell (new_ci).bbox_with_empty ();
 
             if (last_ci != new_ci) {
               //  Hint: don't use any_cell_box on partially visible cells because that will degrade performance 
@@ -1018,7 +1014,7 @@ RedrawThreadWorker::draw_box_properties (bool drawing_context, db::cell_index_ty
               db::Vector a, b;
               unsigned long amax, bmax; 
               bool simplify = false;
-              if (cell_inst.is_regular_array (a, b, amax, bmax)) {
+              if (cell_inst.is_regular_array (a, b, amax, bmax) && (amax > 1 || bmax > 1)) {
 
                 db::DBox inst_box;
                 if (cell_inst.is_complex ()) {

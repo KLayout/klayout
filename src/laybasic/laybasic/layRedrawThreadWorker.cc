@@ -742,7 +742,6 @@ RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, co
 {
   lay::Renderer &r = *mp_renderer;
   const db::Cell &cell = mp_layout->cell (ci);
-  tl::warn << "@@@ level=" << level << " to_level=" << m_to_level << " " << mp_layout->display_name (ci);
 
   //  For small bboxes, the cell outline can be reduced ..
   db::Box bbox = cell.bbox_with_empty ();
@@ -813,7 +812,6 @@ RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, co
                 anything = true;
               }
             }
-            tl::warn << "@@@1 " << mp_layout->display_name (new_ci) << " anything=" << anything;
 
             if (anything) {
 

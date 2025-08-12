@@ -613,7 +613,7 @@ RedrawThreadWorker::test_snapshot (const UpdateSnapshotCallback *update_snapshot
 }
 
 void 
-RedrawThreadWorker::draw_cell (bool drawing_context, int level, const db::CplxTrans &trans, const db::Box &box, bool empty_cell)
+RedrawThreadWorker::draw_cell (bool drawing_context, int level, const db::CplxTrans &trans, const db::Box &box, bool empty_cell, const std::string &txt)
 {
   lay::Renderer &r = *mp_renderer;
 
@@ -635,10 +635,20 @@ RedrawThreadWorker::draw_cell (bool drawing_context, int level, const db::CplxTr
   } else {
     r.draw (dbox, fill, contour, 0, 0);
   }
+
+  if (! txt.empty () && (empty_cell || (dbox.width () > m_min_size_for_label && dbox.height () > m_min_size_for_label))) {
+    //  Hint: we render to contour because the texts plane is reserved for properties
+    r.draw (dbox, txt,
+            db::Font (m_box_font),
+            db::HAlignCenter,
+            db::VAlignCenter,
+            //  TODO: apply "real" transformation?
+            db::DFTrans (m_box_text_transform ? trans.fp_trans ().rot () : db::DFTrans::r0), 0, 0, 0, contour);
+  }
 }
 
 void 
-RedrawThreadWorker::draw_cell_properties (bool drawing_context, int level, const db::CplxTrans &trans, const db::Box &box, bool empty_cell, db::properties_id_type prop_id, const std::string &txt)
+RedrawThreadWorker::draw_cell_properties (bool drawing_context, int level, const db::CplxTrans &trans, const db::Box &box, db::properties_id_type prop_id)
 {
   lay::Renderer &r = *mp_renderer;
 
@@ -650,18 +660,6 @@ RedrawThreadWorker::draw_cell_properties (bool drawing_context, int level, const
   }
 
   lay::CanvasPlane *texts = m_planes[2 + plane_group * (planes_per_layer / 3)];
-
-  db::DBox dbox = trans * box;
-
-  if (! txt.empty () && (empty_cell || (dbox.width () > m_min_size_for_label && dbox.height () > m_min_size_for_label))) {
-    //  Hint: we render to contour because the texts plane is reserved for properties
-    r.draw (dbox, txt,
-            db::Font (m_box_font),
-            db::HAlignCenter,
-            db::VAlignCenter,
-            //  TODO: apply "real" transformation?
-            db::DFTrans (m_box_text_transform ? trans.fp_trans ().rot () : db::DFTrans::r0), 0, 0, 0, texts);
-  }
 
   if (prop_id != 0 && m_show_properties) {
     r.draw_propstring (prop_id, (trans * box).p1 (), texts, trans);
@@ -754,7 +752,7 @@ RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, co
   } else if (level == m_to_level || cell.is_ghost_cell () || (m_cv_index < int (m_hidden_cells.size ()) && m_hidden_cells [m_cv_index].find (ci) != m_hidden_cells [m_cv_index].end ())) {
 
     //  paint the box on this level
-    draw_cell (drawing_context, level, trans, bbox, empty_cell);
+    draw_cell (drawing_context, level, trans, bbox, empty_cell, mp_layout->display_name (ci));
 
   } else if (level < m_to_level) {
 
@@ -765,7 +763,7 @@ RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, co
         //  the cell is a very small box and we know there must be
         //  some level at which to draw the boundary: just draw it
         //  here and stop looking further down ..
-        draw_cell (drawing_context, level, trans, bbox, empty_cell);
+        draw_cell (drawing_context, level, trans, bbox, empty_cell, std::string ());
       }
 
     } else {
@@ -953,7 +951,7 @@ RedrawThreadWorker::draw_box_properties (bool drawing_context, db::cell_index_ty
   } else if (level == m_to_level || cell.is_ghost_cell () || (m_cv_index < int (m_hidden_cells.size ()) && m_hidden_cells [m_cv_index].find (ci) != m_hidden_cells [m_cv_index].end ())) {
 
     //  paint the box on this level
-    draw_cell_properties (drawing_context, level, trans, bbox, empty_cell, prop_id, mp_layout->display_name (ci));
+    draw_cell_properties (drawing_context, level, trans, bbox, prop_id);
 
   } else if (level < m_to_level) {
 

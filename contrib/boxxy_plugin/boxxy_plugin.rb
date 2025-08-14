@@ -4,8 +4,8 @@ module Boxxy
   class Factory < RBA::PluginFactory
     def initialize
       # Place near built-ins; choose an id larger than built-ins (>= 50000)
-      # Title string also serves as toolbar entry; include icon if available.
-      register(50010, "boxxy.edit", "Boxxy\tBoxxy\t<:box_24px.png>{Create a box (auto-layer)}")
+      # Use proper register overload: name (symbol), title, icon.
+      register(50010, "boxxy:edit_mode", "Boxxy", ":box_24px.png")
     end
 
     def create_plugin(manager, dispatcher, view)
@@ -168,4 +168,3 @@ end
 
 # Register the factory (instantiation triggers registration)
 Boxxy::Factory::new
-

@@ -3,11 +3,14 @@ module Boxxy
   # Factory registers a new mouse-mode plugin called "Boxxy".
   class Factory < RBA::PluginFactory
     def initialize
-      # Place near built-ins; choose an id larger than built-ins (>= 50000)
-      # Use proper register overload: name (symbol), title, icon.
+      # Create Edit > Boxxy submenu and actions (before register)
+      add_submenu("boxxy_menu", "edit_menu.end", "Boxxy")
+      add_menu_entry("boxxy_set_default", "boxxy_menu", "boxxy_menu.end", "Set Boxxy Default Layer From Current")
+      add_menu_entry("boxxy_clear_default", "boxxy_menu", "boxxy_menu.end", "Clear Boxxy Default Layer")
+
       register(50010, "boxxy:edit_mode", "Boxxy", ":box_24px.png")
     end
-
+  
     def create_plugin(manager, dispatcher, view)
       Boxxy::Tool.new(view)
     end
@@ -80,12 +83,63 @@ module Boxxy
       false
     end
 
+    # Handle Boxxy menu actions
+    def menu_activated(symbol)
+      case symbol
+      when "boxxy_set_default"
+        iter = @view.current_layer
+        if iter.is_null?
+          RBA::MessageBox::warning("Boxxy", "No current layer is selected.", RBA::MessageBox::Ok)
+          return true
+        end
+        n = iter.current
+        cv = n.cellview
+        li = n.layer_index
+        if cv < 0 || li < 0
+          RBA::MessageBox::warning("Boxxy", "Current layer is not a valid drawing layer.", RBA::MessageBox::Ok)
+          return true
+        end
+        Boxxy.set_default_layer(cv, li)
+        RBA::MessageBox::info("Boxxy", "Default layer set to CV=#{cv}, layer=#{li}.", RBA::MessageBox::Ok)
+        true
+      when "boxxy_clear_default"
+        Boxxy.clear_default_layer
+        RBA::MessageBox::info("Boxxy", "Default layer cleared.", RBA::MessageBox::Ok)
+        true
+      else
+        false
+      end
+    end
+
     private
 
     # Pick the current layer or first drawing layer if none selected.
     # Sets @target_cv_idx and @target_layer_idx.
     def ensure_current_layer!
       iter = @view.current_layer
+
+      # If no current layer, try Boxxy's default layer first
+      if iter.is_null? && Boxxy.default_layer?
+        cv, li = Boxxy.get_default_layer
+        # Validate the stored layer
+        if cv && li && cv >= 0 && li >= 0
+          # Try to find the iterator for this layer and set it as current
+          it = @view.begin_layers
+          while !it.at_end?
+            n = it.current
+            unless n.has_children?
+              if n.cellview == cv && n.layer_index == li
+                @view.current_layer = it
+                iter = it
+                break
+              end
+            end
+            it.next
+          end
+        end
+      end
+
+      # If still none, fall back to first drawing layer
       if iter.is_null?
         it = @view.begin_layers
         while !it.at_end?
@@ -168,3 +222,27 @@ end
 
 # Register the factory (instantiation triggers registration)
 Boxxy::Factory::new
+
+# Module-level storage for default layer (session-scoped)
+module Boxxy
+  @@default_cv = nil
+  @@default_li = nil
+
+  def self.set_default_layer(cv, li)
+    @@default_cv = cv
+    @@default_li = li
+  end
+
+  def self.clear_default_layer
+    @@default_cv = nil
+    @@default_li = nil
+  end
+
+  def self.get_default_layer
+    return @@default_cv, @@default_li
+  end
+
+  def self.default_layer?
+    !@@default_cv.nil? && !@@default_li.nil?
+  end
+end

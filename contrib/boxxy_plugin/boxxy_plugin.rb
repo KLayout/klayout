@@ -5,8 +5,8 @@ module Boxxy
     def initialize
       # Create Edit > Boxxy submenu and actions (before register)
       add_submenu("boxxy_menu", "edit_menu.end", "Boxxy")
-      add_menu_entry("boxxy_set_default", "boxxy_menu", "boxxy_menu.end", "Set Boxxy Default Layer From Current")
-      add_menu_entry("boxxy_clear_default", "boxxy_menu", "boxxy_menu.end", "Clear Boxxy Default Layer")
+      add_menu_entry("boxxy_set_default", "boxxy_menu_set", "edit_menu.boxxy_menu.end", "Set Boxxy Default Layer From Current")
+      add_menu_entry("boxxy_clear_default", "boxxy_menu_clear", "edit_menu.boxxy_menu.end", "Clear Boxxy Default Layer")
 
       register(50010, "boxxy:edit_mode", "Boxxy", ":box_24px.png")
     end
@@ -113,24 +113,34 @@ module Boxxy
 
     private
 
-    # Pick the current layer or first drawing layer if none selected.
+    # Determine target layer: prefer explicit selection; else default; else first drawing layer
     # Sets @target_cv_idx and @target_layer_idx.
-    def ensure_current_layer!
-      iter = @view.current_layer
 
-      # If no current layer, try Boxxy's default layer first
-      if iter.is_null? && Boxxy.default_layer?
+    def ensure_current_layer!
+      # Build chosen layer iterator explicitly:
+      chosen = nil
+
+      # If there is an explicit selection, use the current layer (native behavior)
+      begin
+        sel = @view.selected_layers
+      rescue
+        sel = []
+      end
+      sel = [] if sel.nil?
+      if !sel.empty?
+        chosen = @view.current_layer
+      end
+
+      # If no selection, try Boxxy's default layer first
+      if chosen.nil? && Boxxy.default_layer?
         cv, li = Boxxy.get_default_layer
-        # Validate the stored layer
         if cv && li && cv >= 0 && li >= 0
-          # Try to find the iterator for this layer and set it as current
           it = @view.begin_layers
           while !it.at_end?
             n = it.current
             unless n.has_children?
               if n.cellview == cv && n.layer_index == li
-                @view.current_layer = it
-                iter = it
+                chosen = it
                 break
               end
             end
@@ -140,7 +150,7 @@ module Boxxy
       end
 
       # If still none, fall back to first drawing layer
-      if iter.is_null?
+      if chosen.nil?
         it = @view.begin_layers
         while !it.at_end?
           n = it.current
@@ -148,8 +158,7 @@ module Boxxy
             li = n.layer_index
             cv = n.cellview
             if cv >= 0 && li >= 0
-              @view.current_layer = it
-              iter = it
+              chosen = it
               break
             end
           end
@@ -157,16 +166,14 @@ module Boxxy
         end
       end
 
-      if iter.is_null?
-        raise "Please select or define a drawing layer first"
-      end
+      raise "Please select or define a drawing layer first" if chosen.nil?
 
-      n = iter.current
+      # Apply chosen iterator and cache indices
+      @view.current_layer = chosen
+      n = chosen.current
       @target_cv_idx = n.cellview
       @target_layer_idx = n.layer_index
-      if @target_cv_idx < 0 || @target_layer_idx < 0
-        raise "Selected layer is not valid"
-      end
+      raise "Selected layer is not valid" if @target_cv_idx < 0 || @target_layer_idx < 0
     end
 
     def ensure_marker!

@@ -96,7 +96,7 @@ Cell::Cell (cell_index_type ci, db::Layout &l)
     m_bbox_needs_update (false), m_locked (false), m_ghost_cell (false),
     mp_last (0), mp_next (0)
 {
-  //  .. nothing yet 
+  m_bbox_with_empty = box_type (box_type::point_type (), box_type::point_type ());
 }
 
 Cell::Cell (const Cell &d)
@@ -128,6 +128,7 @@ Cell::operator= (const Cell &d)
     m_locked = d.m_locked;
     m_instances = d.m_instances;
     m_bbox = d.m_bbox;
+    m_bbox_with_empty = d.m_bbox_with_empty;
     m_bboxes = d.m_bboxes;
     m_hier_levels = d.m_hier_levels;
     m_prop_id = d.m_prop_id;
@@ -282,6 +283,10 @@ Cell::update_bbox (unsigned int layers)
   box_type org_bbox = m_bbox;
   m_bbox = box_type ();
 
+  //  determine the bounding box with empty cells
+  box_type org_bbox_with_empty = m_bbox_with_empty;
+  m_bbox_with_empty = box_type ();
+
   //  save the original boxes for simple compare
   box_map org_bboxes;
   org_bboxes.swap (m_bboxes);
@@ -313,15 +318,20 @@ Cell::update_bbox (unsigned int layers)
         m_bbox += lbox;
         box_map::iterator b = m_bboxes.find (l);
         if (b == m_bboxes.end ()) {
-            m_bboxes.insert (std::make_pair (l, lbox));
+          m_bboxes.insert (std::make_pair (l, lbox));
         } else {
-            b->second += lbox;
+          b->second += lbox;
         }
       }
 
     }
+
+    db::box_convert <cell_inst_type, false> bc_we (*mp_layout);
+    m_bbox_with_empty += o1_inst->bbox_from_raw_bbox (raw_box, bc_we);
     
   }
+
+  box_type sbox_all;
 
   //  update the bboxes of the shapes lists
   for (shapes_map::iterator s = m_shapes_map.begin (); s != m_shapes_map.end (); ++s) {
@@ -331,7 +341,7 @@ Cell::update_bbox (unsigned int layers)
     box_type sbox (s->second.bbox ());
 
     if (! sbox.empty ()) {
-      m_bbox += sbox;
+      sbox_all += sbox;
       box_map::iterator b = m_bboxes.find (s->first);
       if (b == m_bboxes.end ()) {
          m_bboxes.insert (std::make_pair (s->first, sbox));
@@ -342,12 +352,20 @@ Cell::update_bbox (unsigned int layers)
    
   }
 
+  //  combine shapes in all-layer boxes
+  m_bbox += sbox_all;
+  m_bbox_with_empty += sbox_all;
+
+  //  no empty box
+  if (m_bbox_with_empty.empty ()) {
+    m_bbox_with_empty = box_type (box_type::point_type (), box_type::point_type ());
+  }
+
   //  reset "dirty child instances" flag
   m_bbox_needs_update = false;
 
   //  return true, if anything has changed with the box 
-  return (org_bbox != m_bbox || org_bboxes != m_bboxes);
-
+  return (org_bbox != m_bbox || org_bbox_with_empty != m_bbox_with_empty || org_bboxes != m_bboxes);
 }
 
 void
@@ -440,6 +458,13 @@ Cell::prop_id (db::properties_id_type id)
     }
     m_prop_id = id;
   }
+}
+
+const Cell::box_type &
+Cell::bbox_with_empty () const
+{
+  mp_layout->update ();
+  return m_bbox_with_empty;
 }
 
 const Cell::box_type &

@@ -53,7 +53,7 @@ void render_cell_inst (const db::Layout &layout, const db::CellInstArray &inst, 
 
   const db::Cell &cell = layout.cell (inst.object ().cell_index ());
   std::string cell_name = layout.display_name (inst.object ().cell_index ());
-  db::Box cell_box = cell.bbox ();
+  db::Box cell_box = cell.bbox_with_empty ();
 
   db::Vector a, b;
   unsigned long amax = 0, bmax = 0;
@@ -589,7 +589,12 @@ InstanceMarker::set_max_shapes (size_t s)
 db::DBox
 InstanceMarker::item_bbox () const 
 {
-  return db::DBox (m_inst.bbox ());
+  const db::Layout *ly = layout ();
+  if (! ly) {
+    return db::DBox ();
+  }
+
+  return db::DBox (m_inst.bbox_with_empty ());
 }
 
 // ------------------------------------------------------------------------
@@ -1059,7 +1064,7 @@ Marker::item_bbox () const
   } else if (m_type == Instance) {
     const db::Layout *ly = layout ();
     if (ly) {
-      return db::DBox (m_object.inst->bbox (db::box_convert <db::CellInst> (*ly)));
+      return db::DBox (m_object.inst->bbox (db::box_convert <db::CellInst, false> (*ly)));
     }
   }
   return db::DBox ();

@@ -790,7 +790,29 @@ LayerPropertiesNode::set_parent (const LayerPropertiesNode *parent)
   mp_parent.reset (const_cast<LayerPropertiesNode *>(parent));
 }
 
-db::DBox 
+db::DBox
+LayerPropertiesNode::overall_bbox () const
+{
+  tl_assert (mp_view);
+  lay::CellView cv = mp_view->cellview (cellview_index ());
+
+  if (! cv.is_valid ()) {
+
+    return db::DBox ();
+
+  } else {
+
+    db::DBox b;
+    double dbu = cv->layout ().dbu ();
+    for (std::vector<db::DCplxTrans>::const_iterator t = trans ().begin (); t != trans ().end (); ++t) {
+      b += (*t * db::CplxTrans (dbu) * cv.context_trans ()) * cv.cell ()->bbox_with_empty ();
+    }
+    return b;
+
+  }
+}
+
+db::DBox
 LayerPropertiesNode::bbox () const
 {
   tl_assert (mp_view);
@@ -802,12 +824,7 @@ LayerPropertiesNode::bbox () const
 
   } else if (is_cell_box_layer ()) {
 
-    db::DBox b;
-    double dbu = cv->layout ().dbu ();
-    for (std::vector<db::DCplxTrans>::const_iterator t = trans ().begin (); t != trans ().end (); ++t) {
-      b += (*t * db::CplxTrans (dbu) * cv.context_trans ()) * cv.cell ()->bbox ();
-    }
-    return b;
+    return overall_bbox ();
 
   } else {
 

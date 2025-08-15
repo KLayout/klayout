@@ -907,6 +907,19 @@ Instance::bbox () const
   }
 }
 
+Instance::box_type
+Instance::bbox_with_empty () const
+{
+  const db::Instances *i = instances ();
+  const db::Cell *c = i ? i->cell () : 0;
+  const db::Layout *g = c ? c->layout () : 0;
+  if (g) {
+    return bbox (db::box_convert<cell_inst_type, false> (*g));
+  } else {
+    return db::Instance::box_type ();
+  }
+}
+
 // -------------------------------------------------------------------------------------
 //  Instances implementation
 

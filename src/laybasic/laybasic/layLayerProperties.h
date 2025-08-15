@@ -1182,7 +1182,17 @@ public:
    *  @return A bbox in micron units
    */
   db::DBox bbox () const;
-  
+
+  /**
+   *  @brief Computes the overall box of this layer
+   *
+   *  This is not a layer specific box, but an all-layer box,
+   *  including transformations (if specified).
+   *  This box is equivalent to the box delivered by
+   *  a cell frame layer.
+   */
+  db::DBox overall_bbox () const;
+
   /**
    *  @brief Attach to a view
    *

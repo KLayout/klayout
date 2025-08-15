@@ -291,7 +291,7 @@ void
 View::render (const lay::Viewport &vp, lay::ViewObjectCanvas &canvas) 
 { 
   const img::Object *image = image_object ();
-  if (! image) {
+  if (! image || ! image->is_visible ()) {
     return;
   }
 
@@ -420,12 +420,16 @@ Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
     m_move_mode (Service::move_none),
     m_moved_landmark (0),
     m_keep_selection_for_move (false),
-    m_images_visible (true)
+    m_images_visible (true),
+    m_visibility_cache_valid (false)
 { 
   // place images behind the grid
   z_order (-1);
 
   mp_view->annotations_changed_event.add (this, &Service::annotations_changed);
+  mp_view->layer_list_changed_event.add (this, &Service::layer_list_changed);
+  mp_view->active_cellview_changed_event.add (this, &Service::layer_visibilty_changed);
+  mp_view->current_layer_list_changed_event.add (this, &Service::current_layer_list_changed);
 }
 
 Service::~Service ()
@@ -438,8 +442,19 @@ Service::~Service ()
 }
 
 void
+Service::layer_visibilty_changed ()
+{
+  if (m_visibility_cache_valid && ! m_visibility_cache.empty ()) {
+    view ()->redraw_deco_layer ();
+  }
+  m_visibility_cache_valid = false;
+}
+
+void
 Service::annotations_changed ()
 {
+  m_visibility_cache_valid = false;
+
   //  NOTE: right now, we don't differentiate: every annotation change may be a change in an image too.
   //  We just forward this event as a potential image changed event
   images_changed_event ();
@@ -450,7 +465,7 @@ Service::show_images (bool f)
 {
   if (m_images_visible != f) {
     m_images_visible = f;
-    view ()->redraw ();
+    view ()->redraw_deco_layer ();
   }
 }
 
@@ -919,6 +934,61 @@ Service::end_move (const db::DPoint &, lay::angle_constraint_type)
   m_move_mode = move_none;
 }
 
+bool
+Service::image_is_visible (const img::Object *image)
+{
+  if (! image->is_visible ()) {
+    return false;
+  }
+
+  if (! m_visibility_cache_valid) {
+
+    std::vector<const img::Object *> images_with_bindings;
+
+    for (obj_iterator user_object = mp_view->annotation_shapes ().begin (); user_object != mp_view->annotation_shapes ().end (); ++user_object) {
+      const img::Object *i = dynamic_cast <const img::Object *> ((*user_object).ptr ());
+      if (i && ! i->layer_binding ().is_null ()) {
+        images_with_bindings.push_back (i);
+      }
+    }
+
+    m_visibility_cache.clear ();
+
+    if (! images_with_bindings.empty ()) {
+
+      for (auto img = images_with_bindings.begin (); img != images_with_bindings.end (); ++img) {
+        m_visibility_cache.insert (std::make_pair (*img, true));
+      }
+
+      int cv_index = view ()->active_cellview_index ();
+      if (cv_index < 0) {
+        cv_index = 0;
+      }
+
+      const lay::LayerPropertiesList &lp = view ()->get_properties ();
+      for (auto i = lp.begin_const_recursive (); ! i.at_end (); ++i) {
+        if (! i->has_children ()) {
+          const lay::ParsedLayerSource &source = i->source (true);
+          if (source.cv_index () == cv_index) {
+            for (auto img = images_with_bindings.begin (); img != images_with_bindings.end (); ++img) {
+              if (source.layer_props ().log_equal ((*img)->layer_binding ())) {
+                m_visibility_cache [*img] = i->visible (true);
+              }
+            }
+          }
+        }
+      }
+
+    }
+
+    m_visibility_cache_valid = true;
+
+  }
+
+  auto i = m_visibility_cache.find (image);
+  return i != m_visibility_cache.end () ? i->second : true;
+}
+
 const db::DUserObject *
 Service::find_image (const db::DPoint &p, const db::DBox &search_box, double l, double &dmin, const std::set<img::Service::obj_iterator> *exclude)
 {
@@ -932,7 +1002,7 @@ Service::find_image (const db::DPoint &p, const db::DBox &search_box, double l, 
   lay::AnnotationShapes::touching_iterator r = mp_view->annotation_shapes ().begin_touching (search_box);
   while (! r.at_end ()) {
     const img::Object *image = dynamic_cast<const img::Object *> ((*r).ptr ());
-    if (image && image->is_visible () && (! exclude || exclude->find (mp_view->annotation_shapes ().iterator_from_pointer (&*r)) == exclude->end ())) {
+    if (image && image_is_visible (image) && (! exclude || exclude->find (mp_view->annotation_shapes ().iterator_from_pointer (&*r)) == exclude->end ())) {
       images.push_back (&*r);
     }
     ++r;
@@ -1318,7 +1388,7 @@ Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
       lay::AnnotationShapes::touching_iterator r = mp_view->annotation_shapes ().begin_touching (search_dbox);
       while (! r.at_end ()) {
         const img::Object *iobj = dynamic_cast<const img::Object *> ((*r).ptr ());
-        if (iobj && iobj->is_visible () && (! exclude || exclude->find (mp_view->annotation_shapes ().iterator_from_pointer (&*r)) == exclude->end ())) {
+        if (iobj && image_is_visible (iobj) && (! exclude || exclude->find (mp_view->annotation_shapes ().iterator_from_pointer (&*r)) == exclude->end ())) {
           if (is_selected (*iobj, box)) {
             any_selected = true;
             if (select (mp_view->annotation_shapes ().iterator_from_pointer (&*r), mode)) {
@@ -1464,7 +1534,7 @@ Service::render_bg (const lay::Viewport &vp, lay::ViewObjectCanvas &canvas)
   lay::AnnotationShapes::touching_iterator user_object = mp_view->annotation_shapes ().begin_touching (vp.box ());
   while (! user_object.at_end ()) {
     const img::Object *image = dynamic_cast <const img::Object *> ((*user_object).ptr ());
-    if (image && image->is_visible ()) {
+    if (image && image_is_visible (image)) {
       images.push_back (image);
     }
     ++user_object;

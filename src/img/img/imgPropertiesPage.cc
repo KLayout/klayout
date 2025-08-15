@@ -156,7 +156,7 @@ PropertiesPage::attach_service (img::Service *service)
   layer_binding_cbx->set_no_layer_available (true);
 
   if (service && service->view ()) {
-    int cv_index = 0; // TODO: fixed currently
+    int cv_index = service->view ()->active_cellview_index ();
     layer_binding_cbx->set_view (service->view (), cv_index, true);
   } else {
     layer_binding_cbx->set_view (0, -1);

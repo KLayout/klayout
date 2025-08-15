@@ -609,11 +609,11 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
   } else if (mode == lay::Editable::Partial) {
   
     //  test, whether we are moving a handle of one selected object
-    for (std::map<obj_iterator, unsigned int>::const_iterator s = m_selected.begin (); s != m_selected.end (); ++s) {
+    for (auto s = m_selected.begin (); s != m_selected.end (); ++s) {
 
       MoveMode mm = move_none;
       size_t ml = 0;
-      obj_iterator si = s->first;
+      obj_iterator si = *s;
 
       const img::Object *iobj = dynamic_cast <const img::Object *> ((*si).ptr ());
       if (iobj && dragging_what (iobj, search_dbox, mm, ml, m_p1) && mm != move_all) {
@@ -624,7 +624,7 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
           
         //  found a handle of one of the selected object: make the moved image the selection
         clear_selection ();
-        m_selected.insert (std::make_pair (si, 0));
+        m_selected.insert (si);
         m_current = *iobj;
         m_initial = m_current;
         m_selected_image_views.push_back (new img::View (this, &m_current, img::View::mode_transient_move));
@@ -661,7 +661,7 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
             
           //  found anything: make the moved image the selection
           clear_selection ();
-          m_selected.insert (std::make_pair (mp_view->annotation_shapes ().iterator_from_pointer (robj), 0));
+          m_selected.insert (mp_view->annotation_shapes ().iterator_from_pointer (robj));
           m_current = *iobj;
           m_initial = m_current;
           m_selected_image_views.push_back (new img::View (this, &m_current, img::View::mode_transient_move));
@@ -865,15 +865,15 @@ Service::end_move (const db::DPoint &, lay::angle_constraint_type)
     if (m_move_mode == move_selected) {
 
       //  replace the images that were moved:
-      for (std::map<obj_iterator, unsigned int>::const_iterator s = m_selected.begin (); s != m_selected.end (); ++s) {
+      for (auto s = m_selected.begin (); s != m_selected.end (); ++s) {
 
-        const img::Object *iobj = dynamic_cast<const img::Object *> (s->first->ptr ());
+        const img::Object *iobj = dynamic_cast<const img::Object *> ((*s)->ptr ());
 
         //  compute moved object and replace
         //  KLUDGE: this creates a copy of the data!
         img::Object *inew = new img::Object (*iobj);
         inew->transform (m_trans);
-        int id = obj2id (mp_view->annotation_shapes ().replace (s->first, db::DUserObject (inew)));
+        int id = obj2id (mp_view->annotation_shapes ().replace (*s, db::DUserObject (inew)));
 
         image_changed_event (id);
 
@@ -886,7 +886,7 @@ Service::end_move (const db::DPoint &, lay::angle_constraint_type)
 
       //  replace the image that was moved
       img::Object *inew = new img::Object (m_current);
-      int id = obj2id (mp_view->annotation_shapes ().replace (m_selected.begin ()->first, db::DUserObject (inew)));
+      int id = obj2id (mp_view->annotation_shapes ().replace (*m_selected.begin (), db::DUserObject (inew)));
       image_changed_event (id);
 
       //  clear the selection (that was artificially created before)
@@ -900,7 +900,7 @@ Service::end_move (const db::DPoint &, lay::angle_constraint_type)
 
       //  replace the image that was moved
       img::Object *inew = new img::Object (m_current);
-      int id = obj2id (mp_view->annotation_shapes ().replace (m_selected.begin ()->first, db::DUserObject (inew)));
+      int id = obj2id (mp_view->annotation_shapes ().replace (*m_selected.begin (), db::DUserObject (inew)));
       image_changed_event (id);
 
       //  clear the selection (that was artificially created before)
@@ -919,7 +919,7 @@ Service::end_move (const db::DPoint &, lay::angle_constraint_type)
 }
 
 const db::DUserObject *
-Service::find_image (const db::DPoint &p, const db::DBox &search_box, double l, double &dmin, const std::map<img::Service::obj_iterator, unsigned int> *exclude)
+Service::find_image (const db::DPoint &p, const db::DBox &search_box, double l, double &dmin, const std::set<img::Service::obj_iterator> *exclude)
 {
   if (! m_images_visible) {
     return 0;
@@ -967,9 +967,8 @@ Service::selection_to_view (img::View::Mode mode)
   m_selected_image_views.clear ();
 
   m_selected_image_views.reserve (m_selected.size ());
-  for (std::map<obj_iterator, unsigned int>::iterator r = m_selected.begin (); r != m_selected.end (); ++r) {
-    r->second = (unsigned int) m_selected_image_views.size ();
-    m_selected_image_views.push_back (new img::View (this, r->first, mode));
+  for (auto r = m_selected.begin (); r != m_selected.end (); ++r) {
+    m_selected_image_views.push_back (new img::View (this, *r, mode));
   }
 }
 
@@ -977,8 +976,8 @@ db::DBox
 Service::selection_bbox ()
 {
   db::DBox box;
-  for (std::map<obj_iterator, unsigned int>::iterator r = m_selected.begin (); r != m_selected.end (); ++r) {
-    const img::Object *iobj = dynamic_cast<const img::Object *> (r->first->ptr ());
+  for (auto r = m_selected.begin (); r != m_selected.end (); ++r) {
+    const img::Object *iobj = dynamic_cast<const img::Object *> ((*r)->ptr ());
     if (iobj) {
       box += iobj->box ();
     }
@@ -990,14 +989,14 @@ void
 Service::transform (const db::DCplxTrans &trans)
 {
   //  replace the images that were transformed:
-  for (std::map<obj_iterator, unsigned int>::const_iterator s = m_selected.begin (); s != m_selected.end (); ++s) {
+  for (auto s = m_selected.begin (); s != m_selected.end (); ++s) {
 
-    const img::Object *iobj = dynamic_cast<const img::Object *> (s->first->ptr ());
+    const img::Object *iobj = dynamic_cast<const img::Object *> ((*s)->ptr ());
 
     //  compute transformed object and replace
     img::Object *inew = new img::Object (*iobj);
     inew->transform (trans);
-    int id = obj2id (mp_view->annotation_shapes ().replace (s->first, db::DUserObject (inew)));
+    int id = obj2id (mp_view->annotation_shapes ().replace (*s, db::DUserObject (inew)));
     image_changed_event (id);
 
   }
@@ -1037,9 +1036,8 @@ void
 Service::copy_selected ()
 {
   //  extract all selected images and paste in "micron" space
-  for (std::map<obj_iterator, unsigned int>::iterator r = m_selected.begin (); r != m_selected.end (); ++r) {
-    r->second = (unsigned int) m_selected_image_views.size ();
-    const img::Object *iobj = dynamic_cast<const img::Object *> (r->first->ptr ());
+  for (auto r = m_selected.begin (); r != m_selected.end (); ++r) {
+    const img::Object *iobj = dynamic_cast<const img::Object *> ((*r)->ptr ());
     db::Clipboard::instance () += new db::ClipboardValue<img::Object> (*iobj);
   }
 }
@@ -1077,8 +1075,8 @@ Service::del_selected ()
   //  positions will hold a set of iterators that are to be erased
   std::vector <lay::AnnotationShapes::iterator> positions;
   positions.reserve (m_selected.size ());
-  for (std::map<obj_iterator, unsigned int>::iterator r = m_selected.begin (); r != m_selected.end (); ++r) {
-    positions.push_back (r->first);
+  for (auto r = m_selected.begin (); r != m_selected.end (); ++r) {
+    positions.push_back (*r);
   }
 
   //  clear selection
@@ -1117,7 +1115,7 @@ void
 Service::transient_to_selection ()
 {
   if (mp_transient_view) {
-    m_selected.insert (std::make_pair (mp_transient_view->image_ref (), 0));
+    m_selected.insert (mp_transient_view->image_ref ());
     selection_to_view ();
   }
 }
@@ -1128,7 +1126,7 @@ Service::select (obj_iterator obj, lay::Editable::SelectionMode mode)
   if (mode == lay::Editable::Replace || mode == lay::Editable::Add) {
     //  select
     if (m_selected.find (obj) == m_selected.end ()) {
-      m_selected.insert (std::make_pair (obj, 0));
+      m_selected.insert (obj);
       return true;
     }
   } else if (mode == lay::Editable::Reset) {
@@ -1142,7 +1140,7 @@ Service::select (obj_iterator obj, lay::Editable::SelectionMode mode)
     if (m_selected.find (obj) != m_selected.end ()) {
       m_selected.erase (obj);
     } else {
-      m_selected.insert (std::make_pair (obj, 0));
+      m_selected.insert (obj);
     }
     return true;
   }
@@ -1179,7 +1177,7 @@ Service::click_proximity (const db::DPoint &pos, lay::Editable::SelectionMode mo
 
   //  for single-point selections either exclude the current selection or the
   //  accumulated previous selection from the search.
-  const std::map<obj_iterator, unsigned int> *exclude = 0;
+  const std::set<obj_iterator> *exclude = 0;
   if (mode == lay::Editable::Replace) {
     exclude = &m_previous_selection;
   } else if (mode == lay::Editable::Add) {
@@ -1273,7 +1271,7 @@ Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
 
   //  for single-point selections either exclude the current selection or the
   //  accumulated previous selection from the search.
-  const std::map<obj_iterator, unsigned int> *exclude = 0;
+  const std::set<obj_iterator> *exclude = 0;
   if (mode == lay::Editable::Replace) {
     exclude = &m_previous_selection;
   } else if (mode == lay::Editable::Add) {
@@ -1339,7 +1337,7 @@ Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
       //  select the one that was found
       if (robj) {
         select (mp_view->annotation_shapes ().iterator_from_pointer (robj), mode);
-        m_previous_selection.insert (std::make_pair (mp_view->annotation_shapes ().iterator_from_pointer (robj), mode));
+        m_previous_selection.insert (mp_view->annotation_shapes ().iterator_from_pointer (robj));
         needs_update = true;
       }
 
@@ -1397,8 +1395,8 @@ Service::get_selection (std::vector <obj_iterator> &sel) const
   sel.reserve (m_selected.size ());
 
   //  positions will hold a set of iterators that are to be erased
-  for (std::map<obj_iterator, unsigned int>::const_iterator r = m_selected.begin (); r != m_selected.end (); ++r) {
-    sel.push_back (r->first);
+  for (auto r = m_selected.begin (); r != m_selected.end (); ++r) {
+    sel.push_back (*r);
   }
 }
 
@@ -1407,7 +1405,7 @@ Service::set_selection (const std::vector<obj_iterator> &selection)
 {
   m_selected.clear ();
   for (auto i = selection.begin (); i != selection.end (); ++i) {
-    m_selected.insert (std::make_pair (*i, 0));
+    m_selected.insert (*i);
   }
 
   selection_to_view ();

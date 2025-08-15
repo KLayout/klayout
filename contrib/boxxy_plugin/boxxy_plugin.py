@@ -177,7 +177,7 @@ class BoxxyTool(pya.Plugin):
 
     def menu_activated(self, symbol):
         if symbol == "boxxy_set_default":
-            it = self._view.current_layer()
+            it = self._view.current_layer
             if it.is_null():
                 pya.MessageBox.warning("Boxxy", "No current layer is selected.", pya.MessageBox.Ok)
                 return True
@@ -298,7 +298,7 @@ class BoxxyTool(pya.Plugin):
         q1 = dct_inv.trans(p1)
         q2 = dct_inv.trans(p2)
         dbox = pya.DBox(q1, q2)
-        ibox = dbox.to_itype(layout.dbu())
+        ibox = dbox.to_itype(layout.dbu)
         cell.shapes(self._target_layer_idx).insert(ibox)
 
 

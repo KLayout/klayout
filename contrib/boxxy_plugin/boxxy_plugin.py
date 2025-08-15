@@ -60,6 +60,18 @@ def _suppress_viewer_warning() -> None:
     except Exception:
         pass
 
+def _exec_dialog(dlg) -> None:
+    """Exec dialog with Qt5/Qt6 compatibility without throwing UI errors."""
+    try:
+        # Qt6 style
+        return dlg.exec()
+    except AttributeError:
+        try:
+            # Qt5 style
+            return dlg.exec_()
+        except Exception:
+            return None
+
 
 class BoxxyFactory(pya.PluginFactory):
     def __init__(self):
@@ -82,12 +94,24 @@ class BoxxyFactory(pya.PluginFactory):
                     "Boxxy is available in Editor mode only.\n\n"
                     "Start KLayout in Editor mode (e.g. with -e) to use this plugin."
                 )
-                mb = pya.QMessageBox(pya.QMessageBox.Warning, "Boxxy", text, pya.QMessageBox.Ok, mw)
-                cb = pya.QCheckBox("Don't show this again")
-                mb.setCheckBox(cb)
-                mb.exec()
-                if cb.isChecked():
-                    _suppress_viewer_warning()
+                try:
+                    mb = pya.QMessageBox(pya.QMessageBox.Warning, "Boxxy", text, pya.QMessageBox.Ok, mw)
+                    cb = pya.QCheckBox("Don't show this again")
+                    mb.setCheckBox(cb)
+                    _exec_dialog(mb)
+                    if cb.isChecked():
+                        _suppress_viewer_warning()
+                except Exception:
+                    # Avoid surfacing framework errors; inform user gracefully and fall back
+                    try:
+                        pya.MessageBox.warning(
+                            "Boxxy",
+                            "Viewer-mode notice used a simplified dialog due to environment compatibility. This is expected.",
+                            pya.MessageBox.Ok,
+                        )
+                        pya.MessageBox.info("Boxxy", text, pya.MessageBox.Ok)
+                    except Exception:
+                        pass
 
     def create_plugin(self, manager, dispatcher, view):
         return BoxxyTool(view)
@@ -280,4 +304,3 @@ class BoxxyTool(pya.Plugin):
 
 # Register the factory (instantiation triggers registration)
 BoxxyFactory()
-

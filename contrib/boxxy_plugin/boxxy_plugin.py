@@ -208,7 +208,7 @@ class BoxxyTool(pya.Plugin):
         if sel is None:
             sel = []
         if len(sel) > 0:
-            chosen = self._view.current_layer()
+            chosen = self._view.current_layer
 
         # If none chosen, try Boxxy's default layer
         if chosen is None and has_default_layer():

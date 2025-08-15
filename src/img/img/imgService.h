@@ -377,9 +377,14 @@ public:
 #endif
 
   /**
-   *  @brief Get the selection for the properties page
+   *  @brief Gets the selection for the properties page
    */
   void get_selection (std::vector <obj_iterator> &selection) const;
+
+  /**
+   *  @brief Sets the selection for the properties page
+   */
+  void set_selection (const std::vector <obj_iterator> &selection);
 
   /**
    *  @brief Direct access to the selection 

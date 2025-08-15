@@ -1403,6 +1403,17 @@ Service::get_selection (std::vector <obj_iterator> &sel) const
 }
 
 void
+Service::set_selection (const std::vector<obj_iterator> &selection)
+{
+  m_selected.clear ();
+  for (auto i = selection.begin (); i != selection.end (); ++i) {
+    m_selected.insert (std::make_pair (*i, 0));
+  }
+
+  selection_to_view ();
+}
+
+void
 Service::erase_image (obj_iterator pos)
 {
   //  clear the selection

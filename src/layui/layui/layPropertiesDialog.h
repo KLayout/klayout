@@ -113,6 +113,7 @@ public slots:
   void cancel_pressed ();
   void ok_pressed ();
   void apply_to_all_pressed ();
+  void reduce_selection ();
   void current_index_changed (const QModelIndex &index, const QModelIndex &previous);
   void selection_changed ();
 

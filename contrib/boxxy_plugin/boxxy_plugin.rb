@@ -1,14 +1,66 @@
 module Boxxy
 
+  # Helper: determine if KLayout runs in editor mode.
+  def self.editor_mode?
+    begin
+      app = RBA::Application::instance
+      # Prefer application-level flag if available
+      if app && app.respond_to?(:is_editable?) && app.is_editable?
+        return true
+      end
+      # Fallback: query current view
+      mw = app && app.main_window
+      view = mw && mw.current_view
+      return !!(view && view.respond_to?(:is_editable?) && view.is_editable?)
+    rescue
+      false
+    end
+  end
+
+  # Helper: configuration get/set for viewer warning opt-out
+  def self.viewer_warning_suppressed?
+    begin
+      app = RBA::Application::instance
+      v = app && app.get_config("boxxy_plugin.viewer_warning_suppressed")
+      return v.to_s == "1"
+    rescue
+      false
+    end
+  end
+
+  def self.suppress_viewer_warning!
+    begin
+      app = RBA::Application::instance
+      app.set_config("boxxy_plugin.viewer_warning_suppressed", "1") if app
+      app.commit_config if app && app.respond_to?(:commit_config)
+    rescue
+    end
+  end
+
   # Factory registers a new mouse-mode plugin called "Boxxy".
   class Factory < RBA::PluginFactory
     def initialize
-      # Create Edit > Boxxy submenu and actions (before register)
-      add_submenu("boxxy_menu", "edit_menu.end", "Boxxy")
-      add_menu_entry("boxxy_set_default", "boxxy_menu_set", "edit_menu.boxxy_menu.end", "Set Boxxy Default Layer From Current")
-      add_menu_entry("boxxy_clear_default", "boxxy_menu_clear", "edit_menu.boxxy_menu.end", "Clear Boxxy Default Layer")
+      # Only expose menus and register the tool in editor mode
+      if Boxxy.editor_mode?
+        # Create Edit > Boxxy submenu and actions (before register)
+        add_submenu("boxxy_menu", "edit_menu.end", "Boxxy")
+        add_menu_entry("boxxy_set_default", "boxxy_menu_set", "edit_menu.boxxy_menu.end", "Set Boxxy Default Layer From Current")
+        add_menu_entry("boxxy_clear_default", "boxxy_menu_clear", "edit_menu.boxxy_menu.end", "Clear Boxxy Default Layer")
 
-      register(50010, "boxxy:edit_mode", "Boxxy", ":box_24px.png")
+        register(50010, "boxxy:edit_mode", "Boxxy", ":box_24px.png")
+      else
+        # In viewer mode: do not register; optionally show warning once
+        unless Boxxy.viewer_warning_suppressed?
+          mw = RBA::Application::instance && RBA::Application::instance.main_window
+          text = "Boxxy is available in Editor mode only.\n\n" \
+                 "Start KLayout in Editor mode (e.g. with -e) to use this plugin."
+          mb = RBA::QMessageBox::new(RBA::QMessageBox::Warning, "Boxxy", text, RBA::QMessageBox::Ok, mw)
+          cb = RBA::QCheckBox::new("Don't show this again")
+          mb.setCheckBox(cb)
+          mb.exec
+          Boxxy.suppress_viewer_warning! if cb.isChecked
+        end
+      end
     end
   
     def create_plugin(manager, dispatcher, view)

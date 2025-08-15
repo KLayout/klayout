@@ -27,6 +27,8 @@
 #include "tlLog.h"
 #include "layEditable.h"
 #include "layProperties.h"
+#include "layDispatcher.h"
+#include "laybasicConfig.h"
 #include "tlExceptions.h"
 
 #include "ui_PropertiesDialog.h"
@@ -246,6 +248,8 @@ PropertiesDialog::PropertiesDialog (QWidget * /*parent*/, db::Manager *manager, 
   mp_ui->apply_to_all_cbx->setChecked (false);
   mp_ui->relative_cbx->setChecked (true);
 
+  fetch_config ();
+
   connect (mp_ui->ok_button, SIGNAL (clicked ()), this, SLOT (ok_pressed ()));
   connect (mp_ui->cancel_button, SIGNAL (clicked ()), this, SLOT (cancel_pressed ()));
   connect (mp_ui->prev_button, SIGNAL (clicked ()), this, SLOT (prev_pressed ()));
@@ -261,6 +265,26 @@ PropertiesDialog::~PropertiesDialog ()
   mp_ui = 0;
 
   disconnect ();
+}
+
+void
+PropertiesDialog::fetch_config ()
+{
+  if (! lay::Dispatcher::instance ()) {
+    return;
+  }
+
+  bool rm = true;
+  lay::Dispatcher::instance ()->config_get (cfg_properties_dialog_relative_mode, rm);
+  mp_ui->relative_cbx->setChecked (rm);
+}
+
+void
+PropertiesDialog::store_config ()
+{
+  if (lay::Dispatcher::instance ()) {
+    lay::Dispatcher::instance ()->config_set (cfg_properties_dialog_relative_mode, mp_ui->relative_cbx->isChecked ());
+  }
 }
 
 void 
@@ -617,6 +641,7 @@ PropertiesDialog::cancel_pressed ()
 
   }
 
+  store_config ();
   //  make sure that the property pages are no longer used ..
   disconnect ();
   //  close the dialog
@@ -641,6 +666,7 @@ BEGIN_PROTECTED
 
   }
 
+  store_config ();
   //  make sure that the property pages are no longer used ..
   disconnect ();
   QDialog::accept ();
@@ -651,6 +677,7 @@ END_PROTECTED
 void 
 PropertiesDialog::reject ()
 {
+  store_config ();
   //  make sure that the property pages are no longer used ..
   disconnect ();
   QDialog::reject ();

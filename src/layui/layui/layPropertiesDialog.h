@@ -99,6 +99,8 @@ private:
 
   const std::vector<lay::PropertiesPage *> &properties_pages () { return mp_properties_pages; }
   void disconnect ();
+  void fetch_config ();
+  void store_config ();
   bool any_prev () const;
   bool any_next () const;
   void update_title ();

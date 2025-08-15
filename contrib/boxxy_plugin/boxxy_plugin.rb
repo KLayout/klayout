@@ -239,6 +239,17 @@ module Boxxy
     end
 
     def release_marker!
+      if @marker
+        begin
+          if @marker.respond_to?(:destroy)
+            @marker.destroy
+          elsif @marker.respond_to?(:_destroy)
+            @marker._destroy
+          end
+        rescue
+          # ignore
+        end
+      end
       @marker = nil
     end
 
@@ -246,6 +257,10 @@ module Boxxy
       @editing = false
       @p1 = nil
       release_marker!
+      begin
+        set_cursor(RBA::Cursor::None_)
+      rescue
+      end
     end
 
     def update_marker(p2)

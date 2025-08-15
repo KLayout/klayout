@@ -182,8 +182,8 @@ class BoxxyTool(pya.Plugin):
                 pya.MessageBox.warning("Boxxy", "No current layer is selected.", pya.MessageBox.Ok)
                 return True
             n = it.current()
-            cv = n.cellview
-            li = n.layer_index
+            cv = n.cellview()
+            li = n.layer_index()
             if cv < 0 or li < 0:
                 pya.MessageBox.warning("Boxxy", "Current layer is not a valid drawing layer.", pya.MessageBox.Ok)
                 return True
@@ -218,7 +218,7 @@ class BoxxyTool(pya.Plugin):
                 while not it.at_end():
                     n = it.current()
                     if not n.has_children():
-                        if n.cellview == cv and n.layer_index == li:
+                        if n.cellview() == cv and n.layer_index() == li:
                             chosen = it
                             break
                     it.next()
@@ -229,8 +229,8 @@ class BoxxyTool(pya.Plugin):
             while not it.at_end():
                 n = it.current()
                 if not n.has_children():
-                    li = n.layer_index
-                    cv = n.cellview
+                    li = n.layer_index()
+                    cv = n.cellview()
                     if cv >= 0 and li >= 0:
                         chosen = it
                         break
@@ -242,8 +242,8 @@ class BoxxyTool(pya.Plugin):
         # Apply chosen iterator and cache indices
         self._view.current_layer = chosen
         n = chosen.current()
-        self._target_cv_idx = n.cellview
-        self._target_layer_idx = n.layer_index
+        self._target_cv_idx = n.cellview()
+        self._target_layer_idx = n.layer_index()
         if self._target_cv_idx < 0 or self._target_layer_idx < 0:
             raise RuntimeError("Selected layer is not valid")
 

@@ -212,6 +212,14 @@ class IMG_TestClass < TestBase
     image = copy1
     assert_equal(image.to_s, "color:matrix=(0,-2.5,-2.75) (2.5,0,7.5) (0,0,1);min_value=0;max_value=1;is_visible=true;z_position=0;brightness=0;contrast=0;gamma=1;red_gain=1;green_gain=1;blue_gain=1;color_mapping=[0,'#000000';1,'#ffffff';];width=2;height=3;data=[0,1,0;0.5,1.5,0;1.5,2.5,0;2.5,3.5,0;10,0,0;20,0,0;]")
 
+    assert_equal(image.layer_binding.to_s, "")
+    image.layer_binding = RBA::LayerInfo::new(17, 42)
+    assert_equal(image.layer_binding.to_s, "17/42")
+    assert_equal(image.to_s, "color:matrix=(0,-2.5,-2.75) (2.5,0,7.5) (0,0,1);min_value=0;max_value=1;is_visible=true;z_position=0;layer_binding=17/42;brightness=0;contrast=0;gamma=1;red_gain=1;green_gain=1;blue_gain=1;color_mapping=[0,'#000000';1,'#ffffff';];width=2;height=3;data=[0,1,0;0.5,1.5,0;1.5,2.5,0;2.5,3.5,0;10,0,0;20,0,0;]")
+    assert_equal(RBA::Image::from_s(image.to_s).to_s, image.to_s)
+    image.layer_binding = RBA::LayerInfo::new
+    assert_equal(image.layer_binding.to_s, "")
+
     dm = image.data_mapping.dup
     dm.brightness=0.5
     image.data_mapping = dm

@@ -1020,6 +1020,7 @@ Object::operator= (const img::Object &d)
 
     m_visible = d.m_visible;
     m_z_position = d.m_z_position;
+    m_layer_binding = d.m_layer_binding;
 
     m_min_value = d.m_min_value;
     m_min_value_set = d.m_min_value_set;
@@ -1050,6 +1051,10 @@ Object::less (const db::DUserObjectBase *d) const
 
   if (m_z_position != img_object->m_z_position) {
     return m_z_position < img_object->m_z_position;
+  }
+
+  if (m_layer_binding != img_object->m_layer_binding) {
+    return m_layer_binding < img_object->m_layer_binding;
   }
 
   double epsilon = (std::abs (m_min_value) + std::abs (m_max_value)) * 1e-6;
@@ -1102,7 +1107,11 @@ Object::operator== (const img::Object &d) const
     return false;
   }
 
-  //  operator== is all fuzzy compare - 
+  if (m_layer_binding != d.m_layer_binding) {
+    return false;
+  }
+
+  //  operator== is all fuzzy compare -
   double epsilon = (std::abs (m_min_value) + std::abs (m_max_value)) * 1e-6;
   if (std::abs (m_min_value - d.m_min_value) > epsilon) {
     return false;
@@ -1424,6 +1433,8 @@ Object::from_string (const char *str, const char *base_dir)
         ex.read (h);
       } else if (ex.test ("is_visible=")) {
         ex.read (m_visible);
+      } else if (ex.test ("layer_binding=")) {
+        ex.read (m_layer_binding);
       } else if (ex.test ("z_position=")) {
         ex.read (m_z_position);
       } else if (ex.test ("min_value=")) {
@@ -1814,6 +1825,12 @@ Object::to_string () const
     os << tl::to_string (m_z_position);
     os << ";";
 
+    if (m_layer_binding != db::LayerProperties ()) {
+      os << "layer_binding=";
+      os << m_layer_binding.to_string ();
+      os << ";";
+    }
+
     os << "brightness=";
     os << tl::to_string (data_mapping ().brightness);
     os << ";";
@@ -1953,6 +1970,7 @@ Object::swap (Object &other)
   std::swap (mp_pixel_data, other.mp_pixel_data);
   m_landmarks.swap (other.m_landmarks);
   std::swap (m_z_position, other.m_z_position);
+  std::swap (m_layer_binding, other.m_layer_binding);
   std::swap (m_updates_enabled, other.m_updates_enabled);
 }
 

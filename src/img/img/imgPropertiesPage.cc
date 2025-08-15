@@ -109,6 +109,8 @@ PropertiesPage::init ()
   colors->setEnabled (false);
   value_le->setEnabled (false);
 
+  attach_service (mp_service);
+
   connect (browse_pb, SIGNAL (clicked ()), this, SLOT (browse ()));
   connect (colors, SIGNAL (color_changed (std::pair<QColor, QColor>)), false_color_control, SLOT (set_current_color (std::pair<QColor, QColor>)));
   connect (false_color_control, SIGNAL (selection_changed (std::pair<QColor, QColor>)), colors, SLOT (set_color (std::pair<QColor, QColor>)));
@@ -145,6 +147,20 @@ PropertiesPage::init ()
   connect (reset_pb, SIGNAL (clicked ()), this, SLOT (reset_pressed ()));
   connect (save_pb, SIGNAL (clicked ()), this, SLOT (save_pressed ()));
   connect (define_landmarks_pb, SIGNAL (clicked ()), this, SLOT (define_landmarks_pressed ()));
+}
+
+void
+PropertiesPage::attach_service (img::Service *service)
+{
+  layer_binding_cbx->set_new_layer_enabled (false);
+  layer_binding_cbx->set_no_layer_available (true);
+
+  if (service && service->view ()) {
+    int cv_index = service->view ()->active_cellview_index ();
+    layer_binding_cbx->set_view (service->view (), cv_index, true);
+  } else {
+    layer_binding_cbx->set_view (0, -1);
+  }
 }
 
 void
@@ -190,6 +206,23 @@ std::string
 PropertiesPage::description () const
 {
   return tl::to_string (tr ("Images"));
+}
+
+void
+PropertiesPage::confine_selection (const std::vector<size_t> &remaining_entries)
+{
+  if (! mp_service) {
+    return;
+  }
+
+  std::vector <img::Service::obj_iterator> org_selection;
+  m_selection.swap (org_selection);
+  for (auto i = remaining_entries.begin (); i != remaining_entries.end (); ++i) {
+    m_selection.push_back (org_selection [*i]);
+  }
+
+  mp_service->set_selection (m_selection);
+  mp_service->clear_highlights ();
 }
 
 void
@@ -445,6 +478,8 @@ PropertiesPage::update ()
 
   to_le->setText (tl::to_qstring (tl::to_string (mp_direct_image->max_value ())));
   to_le->setCursorPosition (0);
+
+  layer_binding_cbx->set_current_layer (mp_direct_image->layer_binding ());
 
   false_color_control->set_nodes (mp_direct_image->data_mapping ().false_color_nodes);
 
@@ -894,6 +929,8 @@ PropertiesPage::apply (bool /*commit*/)
 
   mp_direct_image->set_min_value (xmin);
   mp_direct_image->set_max_value (xmax);
+
+  mp_direct_image->set_layer_binding (layer_binding_cbx->current_layer_props ());
 
   img::DataMapping dm (mp_direct_image->data_mapping ());
   dm.brightness = brightness_sb->value () * 0.01;

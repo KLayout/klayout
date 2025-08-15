@@ -120,6 +120,14 @@ public:
   }
 
   /**
+   *  @brief Confines the selection to the given selection indexes
+   *
+   *  After this operation, the selection entries are renumbered with only
+   *  the remaining ones present.
+   */
+  virtual void confine_selection (const std::vector<size_t> &remaining_entries) = 0;
+
+  /**
    *  @brief Update the display
    *
    *  This method is called by the dialog to transfer data from the

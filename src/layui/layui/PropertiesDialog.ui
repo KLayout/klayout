@@ -26,6 +26,9 @@
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
+      <property name="contextMenuPolicy">
+       <enum>Qt::ActionsContextMenu</enum>
+      </property>
       <property name="selectionMode">
        <enum>QAbstractItemView::ExtendedSelection</enum>
       </property>
@@ -198,6 +201,14 @@
     </widget>
    </item>
   </layout>
+  <action name="action_reduce_selection">
+   <property name="text">
+    <string>Select highlighted rows</string>
+   </property>
+   <property name="toolTip">
+    <string>Reduce selection to highlighted rows</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>

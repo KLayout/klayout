@@ -377,14 +377,19 @@ public:
 #endif
 
   /**
-   *  @brief Get the selection for the properties page
+   *  @brief Gets the selection for the properties page
    */
   void get_selection (std::vector <obj_iterator> &selection) const;
 
   /**
+   *  @brief Sets the selection for the properties page
+   */
+  void set_selection (const std::vector <obj_iterator> &selection);
+
+  /**
    *  @brief Direct access to the selection 
    */
-  const std::map<obj_iterator, unsigned int> &selection () const
+  const std::set<obj_iterator> &selection () const
   {
     return m_selected;
   }
@@ -453,6 +458,11 @@ public:
   }
   
   /**
+   *  @brief Returns a value indicating whether the given image is visible
+   */
+  bool image_is_visible (const img::Object *image);
+
+  /**
    *  @brief Implement the menu response function
    */
   void menu_activated (const  std::string &symbol);
@@ -486,11 +496,10 @@ private:
 
   //  The view objects representing the selection and the moved images in move mode
   std::vector<View *> m_selected_image_views;
-  //  The present views - only used for issueing a proper
   //  The selection
-  std::map<obj_iterator, unsigned int> m_selected;
+  std::set<obj_iterator> m_selected;
   //  The previous selection
-  std::map<obj_iterator, unsigned int> m_previous_selection;
+  std::set<obj_iterator> m_previous_selection;
   //  The reference point in move mode
   db::DPoint m_p1;
   //  The image object representing the image being moved as it was before it was moved
@@ -509,6 +518,9 @@ private:
   bool m_keep_selection_for_move;
   //  Flag indicating whether images are visible
   bool m_images_visible;
+  //  The visibility cache for the layer bindings
+  bool m_visibility_cache_valid;
+  std::map<const img::Object *, bool> m_visibility_cache;
 
   void show_message ();
 
@@ -541,7 +553,7 @@ private:
   /**
    *  @brief Finds an image object from the given point
    */
-  const db::DUserObject *find_image (const db::DPoint &p, const db::DBox &search_box, double l, double &dmin, const std::map<img::Service::obj_iterator, unsigned int> *exclude = 0);
+  const db::DUserObject *find_image (const db::DPoint &p, const db::DBox &search_box, double l, double &dmin, const std::set<img::Service::obj_iterator> *exclude = 0);
 
   /**
    *  @brief Update m_selected_image_views to reflect the selection
@@ -574,6 +586,27 @@ private:
    *  @brief Event handler for changes in the annotations
    */
   void annotations_changed ();
+
+  /**
+   *  @brief Event handler for changes in the layer visibility
+   */
+  void layer_list_changed (int)
+  {
+    layer_visibilty_changed ();
+  }
+
+  /**
+   *  @brief Event handler for a change of the current layer list
+   */
+  void current_layer_list_changed (int)
+  {
+    layer_visibilty_changed ();
+  }
+
+  /**
+   *  @brief Common handler for a potential change in layer visibility
+   */
+  void layer_visibilty_changed ();
 };
 
 }

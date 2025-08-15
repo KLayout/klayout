@@ -58,10 +58,11 @@ class AddNewImageDialog
     public Ui::AddNewImageDialog
 {
 public:
-  AddNewImageDialog (QWidget *parent, img::Object *image_object)
+  AddNewImageDialog (QWidget *parent, img::Service *service, img::Object *image_object)
     : QDialog (parent), mp_image_object (image_object)
   {
     setupUi (this);
+    properties_frame->attach_service (service);
     properties_frame->set_direct_image (image_object);
     properties_frame->update ();
   }
@@ -290,7 +291,7 @@ void
 View::render (const lay::Viewport &vp, lay::ViewObjectCanvas &canvas) 
 { 
   const img::Object *image = image_object ();
-  if (! image) {
+  if (! image || ! image->is_visible ()) {
     return;
   }
 
@@ -419,12 +420,16 @@ Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
     m_move_mode (Service::move_none),
     m_moved_landmark (0),
     m_keep_selection_for_move (false),
-    m_images_visible (true)
+    m_images_visible (true),
+    m_visibility_cache_valid (false)
 { 
   // place images behind the grid
   z_order (-1);
 
   mp_view->annotations_changed_event.add (this, &Service::annotations_changed);
+  mp_view->layer_list_changed_event.add (this, &Service::layer_list_changed);
+  mp_view->active_cellview_changed_event.add (this, &Service::layer_visibilty_changed);
+  mp_view->current_layer_list_changed_event.add (this, &Service::current_layer_list_changed);
 }
 
 Service::~Service ()
@@ -437,8 +442,19 @@ Service::~Service ()
 }
 
 void
+Service::layer_visibilty_changed ()
+{
+  if (m_visibility_cache_valid && ! m_visibility_cache.empty ()) {
+    view ()->redraw_deco_layer ();
+  }
+  m_visibility_cache_valid = false;
+}
+
+void
 Service::annotations_changed ()
 {
+  m_visibility_cache_valid = false;
+
   //  NOTE: right now, we don't differentiate: every annotation change may be a change in an image too.
   //  We just forward this event as a potential image changed event
   images_changed_event ();
@@ -449,7 +465,7 @@ Service::show_images (bool f)
 {
   if (m_images_visible != f) {
     m_images_visible = f;
-    view ()->redraw ();
+    view ()->redraw_deco_layer ();
   }
 }
 
@@ -609,11 +625,11 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
   } else if (mode == lay::Editable::Partial) {
   
     //  test, whether we are moving a handle of one selected object
-    for (std::map<obj_iterator, unsigned int>::const_iterator s = m_selected.begin (); s != m_selected.end (); ++s) {
+    for (auto s = m_selected.begin (); s != m_selected.end (); ++s) {
 
       MoveMode mm = move_none;
       size_t ml = 0;
-      obj_iterator si = s->first;
+      obj_iterator si = *s;
 
       const img::Object *iobj = dynamic_cast <const img::Object *> ((*si).ptr ());
       if (iobj && dragging_what (iobj, search_dbox, mm, ml, m_p1) && mm != move_all) {
@@ -624,7 +640,7 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
           
         //  found a handle of one of the selected object: make the moved image the selection
         clear_selection ();
-        m_selected.insert (std::make_pair (si, 0));
+        m_selected.insert (si);
         m_current = *iobj;
         m_initial = m_current;
         m_selected_image_views.push_back (new img::View (this, &m_current, img::View::mode_transient_move));
@@ -661,7 +677,7 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
             
           //  found anything: make the moved image the selection
           clear_selection ();
-          m_selected.insert (std::make_pair (mp_view->annotation_shapes ().iterator_from_pointer (robj), 0));
+          m_selected.insert (mp_view->annotation_shapes ().iterator_from_pointer (robj));
           m_current = *iobj;
           m_initial = m_current;
           m_selected_image_views.push_back (new img::View (this, &m_current, img::View::mode_transient_move));
@@ -865,15 +881,15 @@ Service::end_move (const db::DPoint &, lay::angle_constraint_type)
     if (m_move_mode == move_selected) {
 
       //  replace the images that were moved:
-      for (std::map<obj_iterator, unsigned int>::const_iterator s = m_selected.begin (); s != m_selected.end (); ++s) {
+      for (auto s = m_selected.begin (); s != m_selected.end (); ++s) {
 
-        const img::Object *iobj = dynamic_cast<const img::Object *> (s->first->ptr ());
+        const img::Object *iobj = dynamic_cast<const img::Object *> ((*s)->ptr ());
 
         //  compute moved object and replace
         //  KLUDGE: this creates a copy of the data!
         img::Object *inew = new img::Object (*iobj);
         inew->transform (m_trans);
-        int id = obj2id (mp_view->annotation_shapes ().replace (s->first, db::DUserObject (inew)));
+        int id = obj2id (mp_view->annotation_shapes ().replace (*s, db::DUserObject (inew)));
 
         image_changed_event (id);
 
@@ -886,7 +902,7 @@ Service::end_move (const db::DPoint &, lay::angle_constraint_type)
 
       //  replace the image that was moved
       img::Object *inew = new img::Object (m_current);
-      int id = obj2id (mp_view->annotation_shapes ().replace (m_selected.begin ()->first, db::DUserObject (inew)));
+      int id = obj2id (mp_view->annotation_shapes ().replace (*m_selected.begin (), db::DUserObject (inew)));
       image_changed_event (id);
 
       //  clear the selection (that was artificially created before)
@@ -900,7 +916,7 @@ Service::end_move (const db::DPoint &, lay::angle_constraint_type)
 
       //  replace the image that was moved
       img::Object *inew = new img::Object (m_current);
-      int id = obj2id (mp_view->annotation_shapes ().replace (m_selected.begin ()->first, db::DUserObject (inew)));
+      int id = obj2id (mp_view->annotation_shapes ().replace (*m_selected.begin (), db::DUserObject (inew)));
       image_changed_event (id);
 
       //  clear the selection (that was artificially created before)
@@ -918,8 +934,63 @@ Service::end_move (const db::DPoint &, lay::angle_constraint_type)
   m_move_mode = move_none;
 }
 
+bool
+Service::image_is_visible (const img::Object *image)
+{
+  if (! image->is_visible ()) {
+    return false;
+  }
+
+  if (! m_visibility_cache_valid) {
+
+    std::vector<const img::Object *> images_with_bindings;
+
+    for (obj_iterator user_object = mp_view->annotation_shapes ().begin (); user_object != mp_view->annotation_shapes ().end (); ++user_object) {
+      const img::Object *i = dynamic_cast <const img::Object *> ((*user_object).ptr ());
+      if (i && ! i->layer_binding ().is_null ()) {
+        images_with_bindings.push_back (i);
+      }
+    }
+
+    m_visibility_cache.clear ();
+
+    if (! images_with_bindings.empty ()) {
+
+      for (auto img = images_with_bindings.begin (); img != images_with_bindings.end (); ++img) {
+        m_visibility_cache.insert (std::make_pair (*img, true));
+      }
+
+      int cv_index = view ()->active_cellview_index ();
+      if (cv_index < 0) {
+        cv_index = 0;
+      }
+
+      const lay::LayerPropertiesList &lp = view ()->get_properties ();
+      for (auto i = lp.begin_const_recursive (); ! i.at_end (); ++i) {
+        if (! i->has_children ()) {
+          const lay::ParsedLayerSource &source = i->source (true);
+          if (source.cv_index () == cv_index) {
+            for (auto img = images_with_bindings.begin (); img != images_with_bindings.end (); ++img) {
+              if (source.layer_props ().log_equal ((*img)->layer_binding ())) {
+                m_visibility_cache [*img] = i->visible (true);
+              }
+            }
+          }
+        }
+      }
+
+    }
+
+    m_visibility_cache_valid = true;
+
+  }
+
+  auto i = m_visibility_cache.find (image);
+  return i != m_visibility_cache.end () ? i->second : true;
+}
+
 const db::DUserObject *
-Service::find_image (const db::DPoint &p, const db::DBox &search_box, double l, double &dmin, const std::map<img::Service::obj_iterator, unsigned int> *exclude)
+Service::find_image (const db::DPoint &p, const db::DBox &search_box, double l, double &dmin, const std::set<img::Service::obj_iterator> *exclude)
 {
   if (! m_images_visible) {
     return 0;
@@ -931,7 +1002,7 @@ Service::find_image (const db::DPoint &p, const db::DBox &search_box, double l, 
   lay::AnnotationShapes::touching_iterator r = mp_view->annotation_shapes ().begin_touching (search_box);
   while (! r.at_end ()) {
     const img::Object *image = dynamic_cast<const img::Object *> ((*r).ptr ());
-    if (image && image->is_visible () && (! exclude || exclude->find (mp_view->annotation_shapes ().iterator_from_pointer (&*r)) == exclude->end ())) {
+    if (image && image_is_visible (image) && (! exclude || exclude->find (mp_view->annotation_shapes ().iterator_from_pointer (&*r)) == exclude->end ())) {
       images.push_back (&*r);
     }
     ++r;
@@ -967,9 +1038,8 @@ Service::selection_to_view (img::View::Mode mode)
   m_selected_image_views.clear ();
 
   m_selected_image_views.reserve (m_selected.size ());
-  for (std::map<obj_iterator, unsigned int>::iterator r = m_selected.begin (); r != m_selected.end (); ++r) {
-    r->second = (unsigned int) m_selected_image_views.size ();
-    m_selected_image_views.push_back (new img::View (this, r->first, mode));
+  for (auto r = m_selected.begin (); r != m_selected.end (); ++r) {
+    m_selected_image_views.push_back (new img::View (this, *r, mode));
   }
 }
 
@@ -977,8 +1047,8 @@ db::DBox
 Service::selection_bbox ()
 {
   db::DBox box;
-  for (std::map<obj_iterator, unsigned int>::iterator r = m_selected.begin (); r != m_selected.end (); ++r) {
-    const img::Object *iobj = dynamic_cast<const img::Object *> (r->first->ptr ());
+  for (auto r = m_selected.begin (); r != m_selected.end (); ++r) {
+    const img::Object *iobj = dynamic_cast<const img::Object *> ((*r)->ptr ());
     if (iobj) {
       box += iobj->box ();
     }
@@ -990,14 +1060,14 @@ void
 Service::transform (const db::DCplxTrans &trans)
 {
   //  replace the images that were transformed:
-  for (std::map<obj_iterator, unsigned int>::const_iterator s = m_selected.begin (); s != m_selected.end (); ++s) {
+  for (auto s = m_selected.begin (); s != m_selected.end (); ++s) {
 
-    const img::Object *iobj = dynamic_cast<const img::Object *> (s->first->ptr ());
+    const img::Object *iobj = dynamic_cast<const img::Object *> ((*s)->ptr ());
 
     //  compute transformed object and replace
     img::Object *inew = new img::Object (*iobj);
     inew->transform (trans);
-    int id = obj2id (mp_view->annotation_shapes ().replace (s->first, db::DUserObject (inew)));
+    int id = obj2id (mp_view->annotation_shapes ().replace (*s, db::DUserObject (inew)));
     image_changed_event (id);
 
   }
@@ -1037,9 +1107,8 @@ void
 Service::copy_selected ()
 {
   //  extract all selected images and paste in "micron" space
-  for (std::map<obj_iterator, unsigned int>::iterator r = m_selected.begin (); r != m_selected.end (); ++r) {
-    r->second = (unsigned int) m_selected_image_views.size ();
-    const img::Object *iobj = dynamic_cast<const img::Object *> (r->first->ptr ());
+  for (auto r = m_selected.begin (); r != m_selected.end (); ++r) {
+    const img::Object *iobj = dynamic_cast<const img::Object *> ((*r)->ptr ());
     db::Clipboard::instance () += new db::ClipboardValue<img::Object> (*iobj);
   }
 }
@@ -1077,8 +1146,8 @@ Service::del_selected ()
   //  positions will hold a set of iterators that are to be erased
   std::vector <lay::AnnotationShapes::iterator> positions;
   positions.reserve (m_selected.size ());
-  for (std::map<obj_iterator, unsigned int>::iterator r = m_selected.begin (); r != m_selected.end (); ++r) {
-    positions.push_back (r->first);
+  for (auto r = m_selected.begin (); r != m_selected.end (); ++r) {
+    positions.push_back (*r);
   }
 
   //  clear selection
@@ -1117,7 +1186,7 @@ void
 Service::transient_to_selection ()
 {
   if (mp_transient_view) {
-    m_selected.insert (std::make_pair (mp_transient_view->image_ref (), 0));
+    m_selected.insert (mp_transient_view->image_ref ());
     selection_to_view ();
   }
 }
@@ -1128,7 +1197,7 @@ Service::select (obj_iterator obj, lay::Editable::SelectionMode mode)
   if (mode == lay::Editable::Replace || mode == lay::Editable::Add) {
     //  select
     if (m_selected.find (obj) == m_selected.end ()) {
-      m_selected.insert (std::make_pair (obj, 0));
+      m_selected.insert (obj);
       return true;
     }
   } else if (mode == lay::Editable::Reset) {
@@ -1142,7 +1211,7 @@ Service::select (obj_iterator obj, lay::Editable::SelectionMode mode)
     if (m_selected.find (obj) != m_selected.end ()) {
       m_selected.erase (obj);
     } else {
-      m_selected.insert (std::make_pair (obj, 0));
+      m_selected.insert (obj);
     }
     return true;
   }
@@ -1179,7 +1248,7 @@ Service::click_proximity (const db::DPoint &pos, lay::Editable::SelectionMode mo
 
   //  for single-point selections either exclude the current selection or the
   //  accumulated previous selection from the search.
-  const std::map<obj_iterator, unsigned int> *exclude = 0;
+  const std::set<obj_iterator> *exclude = 0;
   if (mode == lay::Editable::Replace) {
     exclude = &m_previous_selection;
   } else if (mode == lay::Editable::Add) {
@@ -1273,7 +1342,7 @@ Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
 
   //  for single-point selections either exclude the current selection or the
   //  accumulated previous selection from the search.
-  const std::map<obj_iterator, unsigned int> *exclude = 0;
+  const std::set<obj_iterator> *exclude = 0;
   if (mode == lay::Editable::Replace) {
     exclude = &m_previous_selection;
   } else if (mode == lay::Editable::Add) {
@@ -1319,7 +1388,7 @@ Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
       lay::AnnotationShapes::touching_iterator r = mp_view->annotation_shapes ().begin_touching (search_dbox);
       while (! r.at_end ()) {
         const img::Object *iobj = dynamic_cast<const img::Object *> ((*r).ptr ());
-        if (iobj && iobj->is_visible () && (! exclude || exclude->find (mp_view->annotation_shapes ().iterator_from_pointer (&*r)) == exclude->end ())) {
+        if (iobj && image_is_visible (iobj) && (! exclude || exclude->find (mp_view->annotation_shapes ().iterator_from_pointer (&*r)) == exclude->end ())) {
           if (is_selected (*iobj, box)) {
             any_selected = true;
             if (select (mp_view->annotation_shapes ().iterator_from_pointer (&*r), mode)) {
@@ -1339,7 +1408,7 @@ Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
       //  select the one that was found
       if (robj) {
         select (mp_view->annotation_shapes ().iterator_from_pointer (robj), mode);
-        m_previous_selection.insert (std::make_pair (mp_view->annotation_shapes ().iterator_from_pointer (robj), mode));
+        m_previous_selection.insert (mp_view->annotation_shapes ().iterator_from_pointer (robj));
         needs_update = true;
       }
 
@@ -1397,9 +1466,20 @@ Service::get_selection (std::vector <obj_iterator> &sel) const
   sel.reserve (m_selected.size ());
 
   //  positions will hold a set of iterators that are to be erased
-  for (std::map<obj_iterator, unsigned int>::const_iterator r = m_selected.begin (); r != m_selected.end (); ++r) {
-    sel.push_back (r->first);
+  for (auto r = m_selected.begin (); r != m_selected.end (); ++r) {
+    sel.push_back (*r);
   }
+}
+
+void
+Service::set_selection (const std::vector<obj_iterator> &selection)
+{
+  m_selected.clear ();
+  for (auto i = selection.begin (); i != selection.end (); ++i) {
+    m_selected.insert (*i);
+  }
+
+  selection_to_view ();
 }
 
 void
@@ -1454,7 +1534,7 @@ Service::render_bg (const lay::Viewport &vp, lay::ViewObjectCanvas &canvas)
   lay::AnnotationShapes::touching_iterator user_object = mp_view->annotation_shapes ().begin_touching (vp.box ());
   while (! user_object.at_end ()) {
     const img::Object *image = dynamic_cast <const img::Object *> ((*user_object).ptr ());
-    if (image && image->is_visible ()) {
+    if (image && image_is_visible (image)) {
       images.push_back (image);
     }
     ++user_object;
@@ -1597,7 +1677,7 @@ Service::add_image ()
 #if defined(HAVE_QT)
   img::Object *new_image = new img::Object ();
 
-  AddNewImageDialog dialog (QApplication::activeWindow (), new_image);
+  AddNewImageDialog dialog (QApplication::activeWindow (), this, new_image);
   if (dialog.exec ()) {
 
     clear_selection ();

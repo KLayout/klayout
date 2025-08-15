@@ -85,6 +85,7 @@ public:
     options.push_back (std::pair<std::string, std::string> (cfg_reader_options_show_always, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_assistant_bookmarks, ""));
     options.push_back (std::pair<std::string, std::string> (cfg_always_exit_without_saving, "false"));
+    options.push_back (std::pair<std::string, std::string> (cfg_properties_dialog_relative_mode, "true"));
   }
 
   virtual std::vector<std::pair <std::string, ConfigPage *> > config_pages (QWidget *parent) const 

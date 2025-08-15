@@ -811,13 +811,13 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "@brief Sets the mask from a array of boolean values\n"
     "The order of the boolean values is line first, from bottom to top and left to right and is the same as the order in the data array.\n"
     "\n"
-    "This method has been introduced in version 0.27.\n"
+    "This attribute has been introduced in version 0.27.\n"
   ) +
   gsi::method_ext ("mask_data", &get_mask_data,
     "@brief Gets the mask from a array of boolean values\n"
     "See \\set_mask_data for a description of the data field.\n"
     "\n"
-    "This method has been introduced in version 0.27.\n"
+    "This attribute has been introduced in version 0.27.\n"
   ) +
   gsi::method_ext ("pixel_width=", &img_set_pixel_width, gsi::arg ("w"),
     "@brief Sets the pixel width\n"
@@ -826,7 +826,7 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "micron space with the transformation.\n"
     "\n"
     "Starting with version 0.22, this property is incorporated into the transformation matrix.\n"
-    "This property is provided for convenience only."
+    "This attribute is provided for convenience only."
   ) +
   gsi::method_ext ("pixel_width", &img_get_pixel_width,
     "@brief Gets the pixel width\n"
@@ -834,7 +834,7 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "See \\pixel_width= for a description of that property.\n"
     "\n"
     "Starting with version 0.22, this property is incorporated into the transformation matrix.\n"
-    "This property is provided for convenience only."
+    "This attribute is provided for convenience only."
   ) +
   gsi::method_ext ("pixel_height=", &img_set_pixel_height, gsi::arg ("h"),
     "@brief Sets the pixel height\n"
@@ -843,7 +843,7 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "micron space with the transformation.\n"
     "\n"
     "Starting with version 0.22, this property is incorporated into the transformation matrix.\n"
-    "This property is provided for convenience only."
+    "This attribute is provided for convenience only."
   ) +
   gsi::method_ext ("pixel_height", &img_get_pixel_height,
     "@brief Gets the pixel height\n"
@@ -851,21 +851,35 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "See \\pixel_height= for a description of that property.\n"
     "\n"
     "Starting with version 0.22, this property is incorporated into the transformation matrix.\n"
-    "This property is provided for convenience only."
+    "This attribute is provided for convenience only."
   ) +
   gsi::method ("z_position", &ImageRef::z_position,
     "@brief Gets the z position of the image\n"
     "Images with a higher z position are painted in front of images with lower z position.\n"
     "The z value is an integer that controls the position relative to other images.\n"
     "\n"
-    "This method was introduced in version 0.25."
+    "This attribute was introduced in version 0.25."
   ) +
   gsi::method ("z_position=", &ImageRef::set_z_position, gsi::arg ("z"),
     "@brief Sets the z position of the image\n"
     "\n"
     "See \\z_position for details about the z position attribute.\n"
     "\n"
-    "This method was introduced in version 0.25."
+    "This attribute was introduced in version 0.25."
+  ) +
+  gsi::method ("layer_binding", &ImageRef::layer_binding,
+    "@brief Gets the layer binding of the image\n"
+    "If this attribute is set to a non-null layer properties object, the images visibility "
+    "is associated with that of this layer. If the layer becomes invisible, the image is hidden as well.\n"
+    "\n"
+    "This attribute was introduced in version 0.30.4."
+  ) +
+  gsi::method ("layer_binding=", &ImageRef::set_layer_binding, gsi::arg ("lp"),
+    "@brief Sets the layer binding of the image\n"
+    "\n"
+    "See \\layer_binding for details about the layer_binding attribute.\n"
+    "\n"
+    "This attribute was introduced in version 0.30.4."
   ) +
   gsi::method ("matrix=", &ImageRef::set_matrix, gsi::arg ("t"),
     "@brief Sets the transformation matrix\n"
@@ -876,7 +890,7 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "The matrix is more general than the transformation used before and supports shear and perspective transformation. This property replaces the \\trans property which is "
     "still functional, but deprecated.\n"
     "\n"
-    "This method has been introduced in version 0.22."
+    "This attribute has been introduced in version 0.22."
   ) +
   gsi::method ("matrix", &ImageRef::matrix,
     "@brief Returns the pixel-to-micron transformation matrix\n"
@@ -887,7 +901,7 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "The matrix is more general than the transformation used before and supports shear and perspective transformation. This property replaces the \\trans property which is "
     "still functional, but deprecated.\n"
     "\n"
-    "This method has been introduced in version 0.22."
+    "This attribute has been introduced in version 0.22."
   ) +
   gsi::method_ext ("trans", &img_get_trans,
     "@brief Returns the pixel-to-micron transformation\n"
@@ -941,14 +955,14 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "\n"
     "See the \\is_visible? method for a description of this property.\n"
     "\n"
-    "This method has been introduced in version 0.20.\n"
+    "This attribute has been introduced in version 0.20.\n"
   ) +
   gsi::method ("is_visible?", &ImageRef::is_visible,
     "@brief Gets a flag indicating whether the image object is visible\n"
     "\n"
     "An image object can be made invisible by setting the visible property to false.\n"
     "\n"
-    "This method has been introduced in version 0.20.\n"
+    "This attribute has been introduced in version 0.20.\n"
   ) +
   gsi::method ("id", (size_t (ImageRef::*) () const) &ImageRef::id,
     "@brief Gets the Id\n"
@@ -1272,7 +1286,7 @@ class SelectionIterator
 {
 public:
   typedef ImageRef value_type;
-  typedef std::map<img::Service::obj_iterator, unsigned int>::const_iterator iterator_type;
+  typedef std::set<img::Service::obj_iterator>::const_iterator iterator_type;
   typedef void pointer; 
   typedef value_type reference;
   typedef std::forward_iterator_tag iterator_category;
@@ -1301,7 +1315,7 @@ public:
 
   value_type operator* () const
   {
-    return value_type (*(dynamic_cast<const img::Object *> (m_iter->first->ptr ())), m_services[m_service]->view ());
+    return value_type (*(dynamic_cast<const img::Object *> ((*m_iter)->ptr ())), m_services[m_service]->view ());
   }
 
 private:

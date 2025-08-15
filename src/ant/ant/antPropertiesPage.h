@@ -47,6 +47,7 @@ public:
   virtual void select_entries (const std::vector<size_t> &entries);
   virtual std::string description (size_t entry) const;
   virtual std::string description () const;
+  virtual void confine_selection (const std::vector<size_t> &remaining_entries);
   virtual void update ();
   virtual void leave ();
   virtual bool readonly ();

@@ -31,6 +31,7 @@
 #include "dbTrans.h"
 #include "dbMatrix.h"
 #include "dbPolygon.h"
+#include "dbLayerProperties.h"
 #include "tlDataMapping.h"
 #include "tlColor.h"
 #include "tlPixelBuffer.h"
@@ -925,6 +926,30 @@ public:
   }
 
   /**
+   *  @brief Sets the layer binding
+   *
+   *  If the image is bound to a layer, it becomes hidden when the layer is hidden
+   *  and visible if the layer is visible too
+   */
+  void set_layer_binding (const db::LayerProperties &lp)
+  {
+    if (m_layer_binding != lp) {
+      m_layer_binding = lp;
+      if (m_updates_enabled) {
+        property_changed ();
+      }
+    }
+  }
+
+  /**
+   *  @brief Gets the layer binding
+   */
+  const db::LayerProperties &layer_binding () const
+  {
+    return m_layer_binding;
+  }
+
+  /**
    *  @brief Get the RGB pixel data sets obtained by applying the LUT's
    */
   const tl::color_t *pixel_data () const
@@ -1021,6 +1046,7 @@ private:
   mutable const tl::color_t *mp_pixel_data;
   std::vector <db::DPoint> m_landmarks;
   int m_z_position;
+  db::LayerProperties m_layer_binding;
   bool m_updates_enabled;
 
   void release ();

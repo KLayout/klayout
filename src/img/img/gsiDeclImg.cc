@@ -1272,7 +1272,7 @@ class SelectionIterator
 {
 public:
   typedef ImageRef value_type;
-  typedef std::map<img::Service::obj_iterator, unsigned int>::const_iterator iterator_type;
+  typedef std::set<img::Service::obj_iterator>::const_iterator iterator_type;
   typedef void pointer; 
   typedef value_type reference;
   typedef std::forward_iterator_tag iterator_category;
@@ -1301,7 +1301,7 @@ public:
 
   value_type operator* () const
   {
-    return value_type (*(dynamic_cast<const img::Object *> (m_iter->first->ptr ())), m_services[m_service]->view ());
+    return value_type (*(dynamic_cast<const img::Object *> ((*m_iter)->ptr ())), m_services[m_service]->view ());
   }
 
 private:

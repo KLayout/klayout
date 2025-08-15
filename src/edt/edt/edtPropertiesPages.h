@@ -54,6 +54,7 @@ public:
   virtual void select_entries (const std::vector<size_t> &entries);
   virtual std::string description (size_t entry) const;
   virtual std::string description () const;
+  virtual void confine_selection (const std::vector<size_t> &remaining_entries);
   virtual QIcon icon (size_t entry, int w, int h) const;
   virtual QIcon icon (int w, int h) const { return lay::PropertiesPage::icon (w, h); }
   virtual void leave ();

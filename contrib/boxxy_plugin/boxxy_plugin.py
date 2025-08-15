@@ -1,5 +1,14 @@
-# Boxxy plugin (Python version)
-# Mirrors contrib/boxxy_plugin/boxxy_plugin.rb
+
+"""
+Boxxy plugin (Python)
+
+Adds a box drawing tool similar to KLayout's built-in Box tool with:
+- Editor-only activation (disabled in Viewer mode with a one-time warning).
+- Auto layer selection: current selection > saved default > first drawing layer.
+- Clean ESC abort: destroys preview marker and resets cursor.
+
+Place this file into your KLayout Python macros folder, e.g. `~/.klayout/python/`.
+"""
 
 import pya
 
@@ -10,26 +19,34 @@ _default_li = None
 
 
 def set_default_layer(cv: int, li: int) -> None:
+    """Save a session-scoped default target layer (cellview index + layer index)."""
     global _default_cv, _default_li
     _default_cv = cv
     _default_li = li
 
 
 def clear_default_layer() -> None:
+    """Clear the saved default target layer."""
     global _default_cv, _default_li
     _default_cv = None
     _default_li = None
 
 
 def get_default_layer():
+    """Return the saved default layer as a tuple (cv, li) or (None, None)."""
     return _default_cv, _default_li
 
 
 def has_default_layer() -> bool:
+    """Return True if a default target layer is saved in this session."""
     return _default_cv is not None and _default_li is not None
 
 
 def _editor_mode() -> bool:
+    """Detect whether KLayout runs in Editor mode.
+
+    Prefer the application-level flag; fall back to the current view if needed.
+    """
     try:
         app = pya.Application.instance()
         if app and hasattr(app, "is_editable") and app.is_editable():
@@ -42,6 +59,7 @@ def _editor_mode() -> bool:
 
 
 def _viewer_warning_suppressed() -> bool:
+    """Read the persisted flag to suppress the viewer-mode notice."""
     try:
         app = pya.Application.instance()
         v = app and app.get_config("boxxy_plugin.viewer_warning_suppressed")
@@ -51,6 +69,7 @@ def _viewer_warning_suppressed() -> bool:
 
 
 def _suppress_viewer_warning() -> None:
+    """Persist the viewer-mode suppression flag in the application config."""
     try:
         app = pya.Application.instance()
         if app:
@@ -61,7 +80,7 @@ def _suppress_viewer_warning() -> None:
         pass
 
 def _exec_dialog(dlg) -> None:
-    """Exec dialog with Qt5/Qt6 compatibility without throwing UI errors."""
+    """Execute a Qt dialog with Qt5/Qt6 compatibility (exec/exec_)."""
     try:
         # Qt6 style
         return dlg.exec()
@@ -74,6 +93,7 @@ def _exec_dialog(dlg) -> None:
 
 
 class BoxxyFactory(pya.PluginFactory):
+    """Registers Boxxy UI in Editor mode and shows a one-time viewer notice."""
     def __init__(self):
         super(BoxxyFactory, self).__init__()
 
@@ -118,6 +138,7 @@ class BoxxyFactory(pya.PluginFactory):
 
 
 class BoxxyTool(pya.Plugin):
+    """Interactive tool that previews and inserts boxes on a target layer."""
     def __init__(self, view):
         super(BoxxyTool, self).__init__()
         self._view = view
@@ -128,12 +149,15 @@ class BoxxyTool(pya.Plugin):
         self._target_layer_idx = None
 
     def activated(self):
+        """Ensure a clean state when the tool becomes active."""
         self._cancel_edit()
 
     def deactivated(self):
+        """Cancel any ongoing edit when leaving the tool."""
         self._cancel_edit()
 
     def mouse_click_event(self, p, buttons, prio):
+        """Start on first click; insert on second click when active."""
         if not prio:
             return False
 
@@ -159,6 +183,7 @@ class BoxxyTool(pya.Plugin):
             return True
 
     def mouse_moved_event(self, p, buttons, prio):
+        """Update the preview rectangle while editing."""
         if not prio:
             return False
         if self._editing:
@@ -169,6 +194,7 @@ class BoxxyTool(pya.Plugin):
         return False
 
     def key_event(self, key, buttons):
+        """ESC cancels the current edit and removes the preview."""
         # Qt::Key_Escape == 0x01000000
         if self._editing and key == 0x01000000:
             self._cancel_edit()
@@ -176,6 +202,7 @@ class BoxxyTool(pya.Plugin):
         return False
 
     def menu_activated(self, symbol):
+        """Handle Boxxy menu actions for default layer management."""
         if symbol == "boxxy_set_default":
             it = self._view.current_layer
             if it.is_null():
@@ -198,6 +225,7 @@ class BoxxyTool(pya.Plugin):
 
     # Internal helpers
     def _ensure_current_layer(self):
+        """Pick the target layer: current selection > default > first drawing layer."""
         chosen = None
 
         # If there is an explicit selection, use the current layer
@@ -248,6 +276,7 @@ class BoxxyTool(pya.Plugin):
             raise RuntimeError("Selected layer is not valid")
 
     def _ensure_marker(self):
+        """Create the preview marker if needed and set basic styling."""
         if self._marker is None:
             self._marker = pya.Marker(self._view)
             self._marker.dismissable = True
@@ -256,6 +285,7 @@ class BoxxyTool(pya.Plugin):
             self._marker.dither_pattern = -1
 
     def _release_marker(self):
+        """Destroy the preview marker immediately (don’t rely on GC)."""
         if self._marker is not None:
             try:
                 if hasattr(self._marker, "destroy"):
@@ -267,6 +297,7 @@ class BoxxyTool(pya.Plugin):
         self._marker = None
 
     def _cancel_edit(self):
+        """Reset edit state and cursor to default."""
         self._editing = False
         self._p1 = None
         self._release_marker()
@@ -276,12 +307,14 @@ class BoxxyTool(pya.Plugin):
             pass
 
     def _update_marker(self, p2):
+        """Update the preview rectangle to span self._p1 to p2 in view coords."""
         if not (self._marker and self._p1):
             return
         box = pya.DBox(self._p1, p2)
         self._marker.set(box)
 
     def _insert_box(self, p1, p2):
+        """Map the view points to cell coords and insert the box on target layer."""
         if self._target_cv_idx is None or self._target_layer_idx is None:
             raise RuntimeError("No target layer")
 

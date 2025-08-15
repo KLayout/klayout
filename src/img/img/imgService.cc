@@ -58,10 +58,11 @@ class AddNewImageDialog
     public Ui::AddNewImageDialog
 {
 public:
-  AddNewImageDialog (QWidget *parent, img::Object *image_object)
+  AddNewImageDialog (QWidget *parent, img::Service *service, img::Object *image_object)
     : QDialog (parent), mp_image_object (image_object)
   {
     setupUi (this);
+    properties_frame->attach_service (service);
     properties_frame->set_direct_image (image_object);
     properties_frame->update ();
   }
@@ -1606,7 +1607,7 @@ Service::add_image ()
 #if defined(HAVE_QT)
   img::Object *new_image = new img::Object ();
 
-  AddNewImageDialog dialog (QApplication::activeWindow (), new_image);
+  AddNewImageDialog dialog (QApplication::activeWindow (), this, new_image);
   if (dialog.exec ()) {
 
     clear_selection ();

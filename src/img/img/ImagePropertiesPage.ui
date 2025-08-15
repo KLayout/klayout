@@ -72,7 +72,6 @@
          <font>
           <family>Sans Serif</family>
           <pointsize>12</pointsize>
-          <weight>75</weight>
           <italic>false</italic>
           <bold>true</bold>
           <underline>false</underline>
@@ -108,98 +107,31 @@
          <property name="spacing">
           <number>6</number>
          </property>
-         <item row="1" column="4">
-          <widget class="QLabel" name="label_22">
-           <property name="text">
-            <string>h = </string>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="2">
-          <widget class="QLineEdit" name="persp_tx_le"/>
-         </item>
-         <item row="2" column="1">
-          <widget class="QLabel" name="label_25">
-           <property name="text">
-            <string>x = </string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="2">
-          <widget class="QLineEdit" name="shear_le"/>
-         </item>
-         <item row="5" column="0">
-          <widget class="QLabel" name="label_38">
-           <property name="text">
-            <string>Perspective  </string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="2">
-          <widget class="QLineEdit" name="x_offset_le"/>
-         </item>
-         <item row="1" column="5">
-          <widget class="QLineEdit" name="height_le"/>
-         </item>
-         <item row="5" column="6">
+         <item row="7" column="6">
           <widget class="QLabel" name="label_43">
            <property name="text">
             <string>degree</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="5">
-          <widget class="QLineEdit" name="y_offset_le"/>
-         </item>
-         <item row="1" column="2">
-          <widget class="QLineEdit" name="width_le"/>
-         </item>
-         <item row="4" column="0" colspan="2">
-          <widget class="QLabel" name="label_2">
+         <item row="3" column="4">
+          <widget class="QLabel" name="label_22">
            <property name="text">
-            <string>Shear angle</string>
+            <string>h = </string>
            </property>
           </widget>
          </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label_13">
-           <property name="text">
-            <string>Pixel Size    </string>
-           </property>
-          </widget>
+         <item row="3" column="5">
+          <widget class="QLineEdit" name="height_le"/>
          </item>
          <item row="5" column="3">
-          <widget class="QLabel" name="label_41">
+          <widget class="QLabel" name="label_30">
            <property name="text">
             <string>degree</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="6">
-          <widget class="QLabel" name="label_24">
-           <property name="text">
-            <string>micron</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="0" colspan="2">
-          <widget class="QLabel" name="label_29">
-           <property name="text">
-            <string>Rotation angle</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="6">
-          <widget class="QLabel" name="label_23">
-           <property name="text">
-            <string>micron</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
+         <item row="3" column="1">
           <widget class="QLabel" name="label_20">
            <property name="text">
             <string>w = </string>
@@ -209,77 +141,8 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="3">
-          <widget class="QLabel" name="label_28">
-           <property name="text">
-            <string>micron   </string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="label_27">
-           <property name="text">
-            <string>Center</string>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="1">
-          <widget class="QLabel" name="label_39">
-           <property name="text">
-            <string>x =</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="5" colspan="2">
-          <widget class="QCheckBox" name="mirror_cbx">
-           <property name="text">
-            <string>Mirrored (at X-axis)</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="3">
-          <widget class="QLabel" name="label_21">
-           <property name="text">
-            <string>micron   </string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="2">
-          <widget class="QLineEdit" name="angle_le"/>
-         </item>
-         <item row="4" column="3">
-          <widget class="QLabel" name="label_40">
-           <property name="text">
-            <string>degree</string>
-           </property>
-          </widget>
-         </item>
-         <item row="6" column="0" colspan="7">
-          <spacer>
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>5</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item row="2" column="4">
-          <widget class="QLabel" name="label_26">
-           <property name="text">
-            <string>y = </string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="3">
-          <widget class="QLabel" name="label_30">
-           <property name="text">
-            <string>degree</string>
-           </property>
-          </widget>
+         <item row="4" column="5">
+          <widget class="QLineEdit" name="y_offset_le"/>
          </item>
          <item row="0" column="0" colspan="7">
           <spacer>
@@ -292,15 +155,135 @@
            <property name="sizeHint" stdset="0">
             <size>
              <width>507</width>
-             <height>16</height>
+             <height>10</height>
             </size>
            </property>
           </spacer>
          </item>
-         <item row="5" column="5">
-          <widget class="QLineEdit" name="persp_ty_le"/>
-         </item>
          <item row="8" column="0" colspan="7">
+          <spacer>
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>5</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="9" column="3" colspan="4">
+          <widget class="QLabel" name="label_45">
+           <property name="text">
+            <string>(use them to align the image with the layout)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="2">
+          <widget class="QLineEdit" name="persp_tx_le"/>
+         </item>
+         <item row="6" column="2">
+          <widget class="QLineEdit" name="shear_le"/>
+         </item>
+         <item row="5" column="0" colspan="2">
+          <widget class="QLabel" name="label_29">
+           <property name="text">
+            <string>Rotation angle</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QLabel" name="label_25">
+           <property name="text">
+            <string>x = </string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="3">
+          <widget class="QLabel" name="label_41">
+           <property name="text">
+            <string>degree</string>
+           </property>
+          </widget>
+         </item>
+         <item row="9" column="0" colspan="2">
+          <widget class="QLabel" name="label_44">
+           <property name="text">
+            <string>Landmarks</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="3">
+          <widget class="QLabel" name="label_21">
+           <property name="text">
+            <string>micron   </string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="6">
+          <widget class="QLabel" name="label_24">
+           <property name="text">
+            <string>micron</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="0">
+          <widget class="QLabel" name="label_38">
+           <property name="text">
+            <string>Perspective  </string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="3">
+          <widget class="QLabel" name="label_28">
+           <property name="text">
+            <string>micron   </string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="2">
+          <widget class="QLineEdit" name="x_offset_le"/>
+         </item>
+         <item row="4" column="4">
+          <widget class="QLabel" name="label_26">
+           <property name="text">
+            <string>y = </string>
+           </property>
+          </widget>
+         </item>
+         <item row="9" column="2">
+          <widget class="QPushButton" name="define_landmarks_pb">
+           <property name="text">
+            <string>Define</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1">
+          <widget class="QLabel" name="label_39">
+           <property name="text">
+            <string>x =</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="6">
+          <widget class="QLabel" name="label_23">
+           <property name="text">
+            <string>micron</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0" colspan="2">
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>Shear angle</string>
+           </property>
+          </widget>
+         </item>
+         <item row="10" column="0" colspan="7">
           <spacer>
            <property name="orientation">
             <enum>Qt::Vertical</enum>
@@ -316,32 +299,130 @@
            </property>
           </spacer>
          </item>
-         <item row="5" column="4">
+         <item row="7" column="5">
+          <widget class="QLineEdit" name="persp_ty_le"/>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_13">
+           <property name="text">
+            <string>Pixel Size    </string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="5" colspan="2">
+          <widget class="QCheckBox" name="mirror_cbx">
+           <property name="text">
+            <string>Mirrored (at X-axis)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="3">
+          <widget class="QLabel" name="label_40">
+           <property name="text">
+            <string>degree</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="2">
+          <widget class="QLineEdit" name="angle_le"/>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_27">
+           <property name="text">
+            <string>Center</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="4">
           <widget class="QLabel" name="label_42">
            <property name="text">
             <string>y =</string>
            </property>
           </widget>
          </item>
-         <item row="7" column="0" colspan="2">
-          <widget class="QLabel" name="label_44">
+         <item row="3" column="2">
+          <widget class="QLineEdit" name="width_le"/>
+         </item>
+         <item row="1" column="0" colspan="2">
+          <widget class="QLabel" name="label_46">
            <property name="text">
-            <string>Landmarks</string>
+            <string>Layer binding</string>
            </property>
           </widget>
          </item>
-         <item row="7" column="2">
-          <widget class="QPushButton" name="define_landmarks_pb">
-           <property name="text">
-            <string>Define</string>
+         <item row="2" column="0" colspan="7">
+          <spacer name="verticalSpacer">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
            </property>
-          </widget>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>5</height>
+            </size>
+           </property>
+          </spacer>
          </item>
-         <item row="7" column="3" colspan="4">
-          <widget class="QLabel" name="label_45">
-           <property name="text">
-            <string>(use them to align the image with the layout)</string>
+         <item row="1" column="2" colspan="5">
+          <widget class="QFrame" name="frame_7">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
            </property>
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="lay::LayerSelectionComboBox" name="layer_binding_cbx">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip">
+               <string>Visibility of the image follows that layer's visibility</string>
+              </property>
+              <property name="sizeAdjustPolicy">
+               <enum>QComboBox::AdjustToContents</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
           </widget>
          </item>
         </layout>
@@ -1110,6 +1191,11 @@ p, li { white-space: pre-wrap; }
    <extends>QFrame</extends>
    <header>imgWidgets.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>lay::LayerSelectionComboBox</class>
+   <extends>QComboBox</extends>
+   <header>layWidgets.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

@@ -61,6 +61,7 @@ public:
   virtual void apply (bool commit);
 
   void set_direct_image (img::Object *image);
+  void attach_service (img::Service *service);
 
 private slots:
   void browse ();

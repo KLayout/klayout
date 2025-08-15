@@ -1675,9 +1675,25 @@ public:
   std::set< std::pair<db::DCplxTrans, int> > cv_transform_variants () const;
   
   /**
+   *  @brief Get a list of cellview index and transform variants including empty cellviews
+   *
+   *  This version delivers a unit-transformation variant for cell views for which
+   *  no layer is present. This version is used for instance box drawing.
+   */
+  std::set< std::pair<db::DCplxTrans, int> > cv_transform_variants_with_empty () const;
+
+  /**
    *  @brief Get the global transform variants for a given cellview index
    */
   std::vector<db::DCplxTrans> cv_transform_variants (int cv_index) const;
+
+  /**
+   *  @brief Get the global transform variants for a given cellview index including empty cellviews
+   *
+   *  This version delivers a unit-transformation variant for cell views for which
+   *  no layer is present. This version is used for instance box drawing.
+   */
+  std::vector<db::DCplxTrans> cv_transform_variants_with_empty (int cv_index) const;
 
   /**
    *  @brief Get the global transform variants for a given cellview index and layer

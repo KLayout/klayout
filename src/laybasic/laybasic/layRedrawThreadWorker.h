@@ -186,7 +186,7 @@ private:
   void draw_box_properties (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector <db::Box> &redraw_regions, int level);
   void draw_box_properties (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector <db::Box> &redraw_regions, int level, db::properties_id_type prop_id);
   void draw_box_properties (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &redraw_box, int level, db::properties_id_type prop_id);
-  void draw_cell (bool drawing_context, int level, const db::CplxTrans &trans, const db::Box &box, const std::string &txt);
+  void draw_cell (bool drawing_context, int level, const db::CplxTrans &trans, const db::Box &box, bool empty_cell, const std::string &txt);
   void draw_cell_properties (bool drawing_context, int level, const db::CplxTrans &trans, const db::Box &box, db::properties_id_type prop_id);
   void draw_cell_shapes (const db::CplxTrans &trans, const db::Cell &cell, const db::Box &vp, lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertex, lay::CanvasPlane *text);
   void test_snapshot (const UpdateSnapshotCallback *update_snapshot);
@@ -199,6 +199,7 @@ private:
   bool any_shapes (db::cell_index_type cell_index, unsigned int levels);
   bool any_text_shapes (db::cell_index_type cell_index, unsigned int levels);
   bool any_cell_box (db::cell_index_type cell_index, unsigned int levels);
+  bool need_draw_box (const db::Layout *layout, const db::Cell &cell, int level);
 
   RedrawThread *mp_redraw_thread;
   std::vector <db::Box> m_redraw_region;
@@ -232,6 +233,7 @@ private:
   unsigned int m_cache_hits, m_cache_misses;
   std::set <std::pair <db::DCplxTrans, int> > m_box_variants;
   std::vector <std::set <lay::LayoutViewBase::cell_index_type> > m_hidden_cells;
+  std::vector <std::set <lay::LayoutViewBase::cell_index_type> > m_ghost_cells;
   std::vector <lay::CellView> m_cellviews;
   const db::Layout *mp_layout;
   int m_cv_index;

@@ -1686,7 +1686,7 @@ InstService::do_begin_edit (const db::DPoint &p)
   std::pair<bool, db::cell_index_type> ci = make_cell (cv);
   if (ci.first) {
     // use the snapped lower left corner of the bbox unless the origin is inside the bbox
-    db::Box cell_bbox = cv->layout ().cell (ci.second).bbox ();
+    db::Box cell_bbox = cv->layout ().cell (ci.second).bbox_with_empty ();
     if (! m_place_origin && ! cell_bbox.contains (db::Point ())) {
       db::CplxTrans ct (1.0, m_angle, m_mirror, db::DVector ());
       m_disp = db::DPoint () + (m_disp - snap (cell_bbox.transformed (ct).lower_left () * cv->layout ().dbu ()));
@@ -1830,7 +1830,7 @@ InstService::do_mouse_move (const db::DPoint &p)
   std::pair<bool, db::cell_index_type> ci = make_cell (cv);
   if (ci.first) {
     //  use the snapped lower left corner of the bbox unless the origin is inside the bbox
-    db::Box cell_bbox = cv->layout ().cell (ci.second).bbox ();
+    db::Box cell_bbox = cv->layout ().cell (ci.second).bbox_with_empty ();
     if (! m_place_origin && ! cell_bbox.contains (db::Point ())) {
       db::CplxTrans ct (1.0, m_angle, m_mirror, db::DVector ());
       m_disp = db::DPoint () + (m_disp - snap (cell_bbox.transformed (ct).lower_left () * cv->layout ().dbu ()));

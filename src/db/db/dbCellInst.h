@@ -91,6 +91,15 @@ public:
   box_type bbox (const Layout &g) const;
 
   /**
+   *  @brief Compute the bounding box, including empty cells
+   *
+   *  This method computes the bbox of the cell instance.
+   *  As a requirement, the cell's bounding box must have been
+   *  computed before.
+   */
+  box_type bbox_with_empty (const Layout &g) const;
+
+  /**
    *  @brief Compute the bounding box
    *
    *  This method computes the bbox of the cell instance

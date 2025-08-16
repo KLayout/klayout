@@ -155,19 +155,7 @@ public:
   std::string description;
 
 private:
-  void init ()
-  {
-    wbmin = 0.0;
-    wbmax = -1.0;
-    hbmin = 0.0;
-    hbmax = -1.0;
-    wtmin = 0.0;
-    wtmax = -1.0;
-    htmin = 0.0;
-    htmax = -1.0;
-    bottom_wired = true;
-    top_wired = true;
-  }
+  void init ();
 };
 
 }

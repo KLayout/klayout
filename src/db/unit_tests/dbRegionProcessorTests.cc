@@ -48,33 +48,41 @@ TEST(1_RegionToEdgesProcessor)
     db::Point (100, 900)
   };
 
-  db::Polygon poly;
+  db::PolygonWithProperties poly;
   poly.assign_hull (hull + 0, hull + sizeof (hull) / sizeof (hull[0]));
   poly.insert_hole (hole + 0, hole + sizeof (hole) / sizeof (hole[0]));
 
-  std::vector<db::Edge> result;
+  std::vector<db::EdgeWithProperties> result;
 
   result.clear ();
   db::PolygonToEdgeProcessor ().process (poly, result);
-  EXPECT_EQ (tl::join (result.begin (), result.end (), ";"), "(0,0;0,1000);(0,1000;1000,1000);(1000,1000;1000,2000);(1000,2000;2000,2000);(2000,2000;2000,1000);(2000,1000;3000,1000);(3000,1000;3000,0);(3000,0;0,0);(100,100;2900,100);(2900,100;2900,900);(2900,900;100,900);(100,900;100,100)");
+  EXPECT_EQ (tl::join (result.begin (), result.end (), ";"), "(0,0;0,1000) props={};(0,1000;1000,1000) props={};(1000,1000;1000,2000) props={};(1000,2000;2000,2000) props={};(2000,2000;2000,1000) props={};(2000,1000;3000,1000) props={};(3000,1000;3000,0) props={};(3000,0;0,0) props={};(100,100;2900,100) props={};(2900,100;2900,900) props={};(2900,900;100,900) props={};(100,900;100,100) props={}");
 
   result.clear ();
   db::PolygonToEdgeProcessor (db::PolygonToEdgeProcessor::Concave).process (poly, result);
-  EXPECT_EQ (tl::join (result.begin (), result.end (), ";"), "(2900,100;2900,900);(2900,900;100,900);(100,900;100,100);(100,100;2900,100)");
+  EXPECT_EQ (tl::join (result.begin (), result.end (), ";"), "(2900,100;2900,900) props={};(2900,900;100,900) props={};(100,900;100,100) props={};(100,100;2900,100) props={}");
 
   result.clear ();
   db::PolygonToEdgeProcessor (db::PolygonToEdgeProcessor::Convex).process (poly, result);
-  EXPECT_EQ (tl::join (result.begin (), result.end (), ";"), "(1000,2000;2000,2000);(3000,1000;3000,0);(3000,0;0,0);(0,0;0,1000)");
+  EXPECT_EQ (tl::join (result.begin (), result.end (), ";"), "(1000,2000;2000,2000) props={};(3000,1000;3000,0) props={};(3000,0;0,0) props={};(0,0;0,1000) props={}");
 
   result.clear ();
   db::PolygonToEdgeProcessor (db::PolygonToEdgeProcessor::Step).process (poly, result);
-  EXPECT_EQ (tl::join (result.begin (), result.end (), ";"), "(0,1000;1000,1000);(1000,1000;1000,2000);(2000,2000;2000,1000);(2000,1000;3000,1000)");
+  EXPECT_EQ (tl::join (result.begin (), result.end (), ";"), "(0,1000;1000,1000) props={};(1000,1000;1000,2000) props={};(2000,2000;2000,1000) props={};(2000,1000;3000,1000) props={}");
 
   result.clear ();
   db::PolygonToEdgeProcessor (db::PolygonToEdgeProcessor::StepOut).process (poly, result);
-  EXPECT_EQ (tl::join (result.begin (), result.end (), ";"), "(1000,1000;1000,2000);(2000,1000;3000,1000)");
+  EXPECT_EQ (tl::join (result.begin (), result.end (), ";"), "(1000,1000;1000,2000) props={};(2000,1000;3000,1000) props={}");
 
   result.clear ();
   db::PolygonToEdgeProcessor (db::PolygonToEdgeProcessor::StepIn).process (poly, result);
-  EXPECT_EQ (tl::join (result.begin (), result.end (), ";"), "(0,1000;1000,1000);(2000,2000;2000,1000)");
+  EXPECT_EQ (tl::join (result.begin (), result.end (), ";"), "(0,1000;1000,1000) props={};(2000,2000;2000,1000) props={}");
+
+  db::PropertiesSet ps;
+  ps.insert ("net", 17);
+  poly.properties_id (properties_id (ps));
+
+  result.clear ();
+  db::PolygonToEdgeProcessor (db::PolygonToEdgeProcessor::StepIn).process (poly, result);
+  EXPECT_EQ (tl::join (result.begin (), result.end (), ";"), "(0,1000;1000,1000) props={net=>17};(2000,2000;2000,1000) props={net=>17}");
 }

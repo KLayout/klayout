@@ -907,6 +907,19 @@ Instance::bbox () const
   }
 }
 
+Instance::box_type
+Instance::bbox_with_empty () const
+{
+  const db::Instances *i = instances ();
+  const db::Cell *c = i ? i->cell () : 0;
+  const db::Layout *g = c ? c->layout () : 0;
+  if (g) {
+    return bbox (db::box_convert<cell_inst_type, false> (*g));
+  } else {
+    return db::Instance::box_type ();
+  }
+}
+
 // -------------------------------------------------------------------------------------
 //  Instances implementation
 
@@ -1611,10 +1624,8 @@ Instances::replace_prop_id (const instance_type &ref, db::properties_id_type pro
     throw tl::Exception (tl::to_string (tr ("Trying to replace an object in a list that it does not belong to")));
   }
 
-  if (! ref.is_null ()) {
-    if (ref.prop_id () != prop_id) {
-      invalidate_prop_ids ();
-    }
+  if (! ref.is_null () && (!ref.has_prop_id () || ref.prop_id () != prop_id)) {
+    invalidate_prop_ids ();
     cell_inst_wp_array_type new_inst (ref.cell_inst (), prop_id);
     return replace (ref, new_inst);
   } else {
@@ -1622,7 +1633,29 @@ Instances::replace_prop_id (const instance_type &ref, db::properties_id_type pro
   }
 }
 
-void 
+Instances::instance_type
+Instances::clear_properties (const instance_type &ref)
+{
+  if (ref.instances () != this) {
+    throw tl::Exception (tl::to_string (tr ("Trying to replace an object in a list that it does not belong to")));
+  }
+
+  if (! ref.is_null () && ref.has_prop_id ()) {
+
+    invalidate_prop_ids ();
+
+    cell_inst_array_type new_inst (ref.cell_inst ());
+    erase (ref);
+    return insert (new_inst);
+
+  } else {
+
+    return ref;
+
+  }
+}
+
+void
 Instances::do_clear_insts ()
 {
   if (m_generic.any) {

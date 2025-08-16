@@ -579,6 +579,21 @@ public:
     return mp_parent;
   }
 
+protected:
+  /**
+   *  @brief Resolves a name into a function, a constant value or a variable
+   *
+   *  Can be overloaded to change the resolution scheme
+   */
+  virtual void resolve_name (const std::string &name, const EvalFunction *&function, const tl::Variant *&value, tl::Variant *&var);
+
+  /**
+   *  @brief Resolves a name into a variable
+   *
+   *  Can be overloaded to change the resolution scheme
+   */
+  virtual void resolve_var_name (const std::string &name, tl::Variant *&value);
+
 private:
   friend class Expression;
 
@@ -601,8 +616,6 @@ private:
   void eval_unary (ExpressionParserContext &context, std::unique_ptr<ExpressionNode> &v);
   void eval_atomic (ExpressionParserContext &context, std::unique_ptr<ExpressionNode> &v, int am);
   void eval_suffix (ExpressionParserContext &context, std::unique_ptr<ExpressionNode> &v);
-  void resolve_name (const std::string &name, const EvalFunction *&function, const tl::Variant *&value, tl::Variant *&var);
-  void resolve_var_name (const std::string &name, tl::Variant *&value);
 
   static Eval m_global;
 };

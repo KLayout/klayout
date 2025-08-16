@@ -27,6 +27,7 @@
 #include "rdbCommon.h"
 
 #include "dbTrans.h"
+#include "dbObjectWithProperties.h"
 #include "gsi.h"
 #include "tlObject.h"
 #include "tlObjectCollection.h"
@@ -528,6 +529,15 @@ private:
  */
 template <class T>
 RDB_PUBLIC_TEMPLATE ValueBase *make_value (const T &value)
+{
+  return new Value<T> (value);
+}
+
+/**
+ *  @brief Type bindings
+ */
+template <class T>
+RDB_PUBLIC_TEMPLATE ValueBase *make_value (const db::object_with_properties<T> &value)
 {
   return new Value<T> (value);
 }

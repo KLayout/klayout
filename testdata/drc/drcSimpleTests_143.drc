@@ -1,0 +1,66 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+end
+
+l1 = input(1, 0, enable_props)
+l2 = input(2, 0, enable_props)
+l3 = labels(3, 0, enable_props)
+
+l1.output(1, 0)
+l2.output(2, 0)
+l3.output(3, 0)
+
+l2.evaluated("put(2, to_f(value(17))*2.0)").output(10, 0)
+l2.evaluated("put(2, to_f(value(17))*factor)", { "factor" => 3.0 }, true).output(11, 0)
+l1.evaluated(aniso("put(2, shape.bbox.height/shape.bbox.width)")).output(12, 0)
+l1.evaluated(scales("put(2, shape.area)")).output(13, 0)
+l1.evaluated(aniso_and_scales("put(2, shape.bbox.width)")).output(14, 0)
+l1.evaluated(scales("skip(shape.area<20.0)")).output(15, 0)
+
+d = l2.dup
+d.evaluate("put(2, to_f(value(17))*2.0)").output(20, 0)
+d = l2.dup
+d.evaluate("put(2, to_f(value(17))*factor)", { "factor" => 3.0 }, true).output(21, 0)
+d = l1.dup
+d.evaluate(aniso("put(2, shape.bbox.height/shape.bbox.width)")).output(22, 0)
+d = l1.dup
+d.evaluate(scales("put(2, shape.area)")).output(23, 0)
+d = l1.dup
+d.evaluate(aniso_and_scales("put(2, shape.bbox.width)")).output(24, 0)
+d = l1.dup
+d.evaluate(scales("skip(shape.area<20.0)")).output(25, 0)
+
+l2.selected_if("to_f(value(17))<3.0").output(30, 0)
+l2.selected_if("to_f(value(17))<thr)", { "thr" => 3.0 }).output(31, 0)
+l1.selected_if(aniso("shape.bbox.height/shape.bbox.width<1.0")).output(32, 0)
+l1.selected_if(scales("shape.area<20.0")).output(33, 0)
+l1.selected_if(aniso_and_scales("shape.bbox.width<=5")).output(34, 0)
+
+d = l2.dup
+d.select_if("to_f(value(17))<3.0").output(40, 0)
+d = l2.dup
+d.select_if("to_f(value(17))<thr)", { "thr" => 3.0 }).output(41, 0)
+d = l1.dup
+d.select_if(aniso("shape.bbox.height/shape.bbox.width<1.0")).output(42, 0)
+d = l1.dup
+d.select_if(scales("shape.area<20.0")).output(43, 0)
+d = l1.dup
+d.select_if(aniso_and_scales("shape.bbox.width<=5")).output(44, 0)
+
+l2.split_if("to_f(value(17))<3.0")[0].output(50, 0)
+l2.split_if("to_f(value(17))<3.0")[1].output(51, 0)
+
+# other types for evaluate
+l3.evaluated("put(1, shape.string)").output(60, 0)
+l1.edges.evaluated("put(1, shape.length)").output(61, 0)
+l1.width(3.5.um).evaluated("put(1, shape.distance)").output(62, 0)
+
+# other types for select_if
+l3.selected_if("shape.string=='TEXT1'").output(70, 0)
+l1.edges.selected_if("shape.length<3.5").output(71, 0)
+l1.width(3.5.um).selected_if("shape.distance<2.5").output(72, 0)
+

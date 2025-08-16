@@ -11,16 +11,18 @@ if [[ -f "/etc/centos-release" ]]; then
     [ $s -eq 0 ] || exit $s
 
     if [[ -d "/usr/lib64/ccache" ]]; then
-        ln -s /usr/bin/ccache /usr/lib64/ccache/c++
-        ln -s /usr/bin/ccache /usr/lib64/ccache/cc
-        ln -s /usr/bin/ccache /usr/lib64/ccache/gcc
-        ln -s /usr/bin/ccache /usr/lib64/ccache/g++
+        for comp in c++ cc gcc g++; do
+            if ! [ -e /usr/lib64/ccache/$comp ]; then
+                ln -s /usr/bin/ccache /usr/lib64/ccache/$comp
+            fi
+        done
         export PATH="/usr/lib64/ccache:$PATH"
     elif [[ -d "/usr/lib/ccache" ]]; then
-        ln -s /usr/bin/ccache /usr/lib/ccache/c++
-        ln -s /usr/bin/ccache /usr/lib/ccache/cc
-        ln -s /usr/bin/ccache /usr/lib/ccache/gcc
-        ln -s /usr/bin/ccache /usr/lib/ccache/g++
+        for comp in c++ cc gcc g++; do
+            if ! [ -e /usr/lib/ccache/$comp ]; then
+                ln -s /usr/bin/ccache /usr/lib/ccache/$comp
+            fi
+        done
         export PATH="/usr/lib/ccache:$PATH"
     fi
 

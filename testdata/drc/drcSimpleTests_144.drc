@@ -1,0 +1,81 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+end
+
+gate    = input(1, 0)
+contact = input(2, 0)
+metal1  = input(3, 0)
+via1    = input(4, 0)
+metal2  = input(5, 0)
+via2    = input(6, 0)
+metal3  = input(7, 0)
+via3    = input(8, 0)
+metal4  = input(9, 0)
+
+source.layers.each do |lp|
+  input(lp).output(lp)
+end
+
+# Incrementally connect the metal stack, starting
+# from gate, up to metal4.
+# On each level, compute the antenna ratio of last
+# metal area vs. gate area. Record the ratio in different
+# layers.
+# Then combine the layers and compute the cumulative 
+# ratio. Select gate shapes according to that ratio.
+
+connect(gate, contact)
+connect(contact, metal1)
+
+# place metal1/gate area ratio in property #1
+ar_m1 = evaluate_nets(gate, { "m" => metal1 }, "put(1, area(m)/area)")
+
+# Note: incremental connect
+connect(metal1, via1)
+connect(via1, metal2)
+
+# place metal2/gate area ratio in property #2
+ar_m2 = evaluate_nets(gate, { "m" => metal2 }, "put(2, area(m)/area)")
+
+# Note: incremental connect
+connect(metal2, via2)
+connect(via2, metal3)
+
+# place metal3/gate area ratio in property #3
+ar_m3 = evaluate_nets(gate, { "m" => metal3 }, "put(3, area(m)/area)")
+
+# Note: incremental connect
+connect(metal3, via3)
+connect(via3, metal4)
+
+# place metal4/gate area ratio in property #4
+ar_m4 = evaluate_nets(gate, { "m" => metal4 }, "put(4, area(m)/area)")
+
+# merge properties #1 to #4: produces a set of properties on each shape
+# Note: "merged_props" will merge the shapes and while doing so, combine
+# the properties. As the propery names are all different, we get a list
+# of area ratios on each shape.
+ar_all = (ar_m1 + ar_m2 + ar_m3 + ar_m4).merged_props
+
+# we do not need these layers anymore
+ar_m1.forget
+ar_m2.forget
+ar_m3.forget
+ar_m4.forget
+
+# compute the sum of the area ratios in property #10
+ar_all.evaluate("put(10, value(1)+value(2)+value(3)+value(4))", {}, true)
+
+# output for debugging 
+ar_all.output(1000, 0)
+
+# select based on the cumulative area ratio
+errors = ar_all.selected_if("value(10)>=ar_max", { "ar_max" => 3.0 })
+
+# output errors
+errors.output(1001, 0)
+

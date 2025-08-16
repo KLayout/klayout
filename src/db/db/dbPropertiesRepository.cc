@@ -79,6 +79,17 @@ db::properties_id_type properties_id (const PropertiesSet &ps)
   return PropertiesRepository::instance ().properties_id (ps);
 }
 
+db::properties_id_type properties_id (const std::map<tl::Variant, tl::Variant> &dict)
+{
+  db::PropertiesSet props;
+
+  for (std::map<tl::Variant, tl::Variant>::const_iterator v = dict.begin (); v != dict.end (); ++v) {
+    props.insert (v->first, v->second);
+  }
+
+  return db::properties_id (props);
+}
+
 size_t hash_for_properties_id (properties_id_type id)
 {
   return id == 0 ? 0 : db::properties (id).hash ();
@@ -248,6 +259,32 @@ PropertiesSet::merge (const db::PropertiesSet &other)
   m_map.insert (other.m_map.begin (), other.m_map.end ());
 }
 
+void
+PropertiesSet::join_max (const db::PropertiesSet &other)
+{
+  if (other.empty ()) {
+
+    //  ignore empty properties
+
+  } else if (empty ()) {
+
+    *this = other;
+
+  } else {
+
+    for (auto i = other.begin (); i != other.end (); ++i) {
+      auto f = find (i->first);
+      if (f == end ()) {
+        insert_by_id (i->first, i->second);
+      } else if (db::property_value (f->second) < db::property_value (i->second)) {
+        erase (i->first);
+        insert_by_id (i->first, i->second);
+      }
+    }
+
+  }
+}
+
 std::multimap<tl::Variant, tl::Variant>
 PropertiesSet::to_map () const
 {
@@ -296,7 +333,7 @@ PropertiesSet::hash () const
     tl::MutexLocker locker (&lock);
 
     if (! m_hash) {
-      m_hash = std::hfunc (to_map ());
+      m_hash = tl::hfunc (to_map ());
       if (! m_hash) {
         //  avoid 0 value as this is reserved for "not computed yet"
         m_hash = size_t (1);
@@ -373,7 +410,7 @@ PropertiesRepository::prop_name_id (const tl::Variant &name)
   }
 }
 
-property_names_id_type
+property_values_id_type
 PropertiesRepository::prop_value_id (const tl::Variant &value)
 {
   tl::MutexLocker locker (&m_lock);
@@ -383,9 +420,9 @@ PropertiesRepository::prop_value_id (const tl::Variant &value)
     m_property_values_heap.push_back (value);
     const tl::Variant &new_value = m_property_values_heap.back ();
     m_propvalues.insert (&new_value);
-    return property_names_id_type (&new_value);
+    return property_values_id_type (&new_value);
   } else {
-    return property_names_id_type (*pi);
+    return property_values_id_type (*pi);
   }
 }
 

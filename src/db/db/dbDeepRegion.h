@@ -125,12 +125,13 @@ public:
   virtual EdgePairsDelegate *processed_to_edge_pairs (const PolygonToEdgePairProcessorBase &filter) const;
   virtual RegionDelegate *filter_in_place (const PolygonFilterBase &filter);
   virtual RegionDelegate *filtered (const PolygonFilterBase &filter) const;
+  virtual std::pair<RegionDelegate *, RegionDelegate *> filtered_pair (const PolygonFilterBase &filter) const;
 
   virtual RegionDelegate *merged_in_place ();
-  virtual RegionDelegate *merged_in_place (bool min_coherence, unsigned int min_wc);
+  virtual RegionDelegate *merged_in_place (bool min_coherence, unsigned int min_wc, bool join_properties_on_merge);
 
   virtual RegionDelegate *merged () const;
-  virtual RegionDelegate *merged (bool min_coherence, unsigned int min_wc) const;
+  virtual RegionDelegate *merged (bool min_coherence, unsigned int min_wc, bool join_properties_on_merge) const;
 
   virtual RegionDelegate *sized (coord_type d, unsigned int mode) const;
   virtual RegionDelegate *sized (coord_type dx, coord_type dy, unsigned int mode) const;
@@ -154,6 +155,7 @@ public:
 protected:
   virtual void merged_semantics_changed ();
   virtual void min_coherence_changed ();
+  virtual void join_properties_on_merge_changed ();
 
   virtual EdgePairsDelegate *run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, const RegionCheckOptions &options) const;
   virtual EdgePairsDelegate *run_single_polygon_check (db::edge_relation_type rel, db::Coord d, const RegionCheckOptions &options) const;
@@ -181,8 +183,7 @@ private:
   DeepLayer not_with_impl (const DeepRegion *other, PropertyConstraint property_constraint) const;
   DeepLayer and_with_impl (const DeepRegion *other, PropertyConstraint property_constraint) const;
   std::pair<DeepLayer, DeepLayer> and_and_not_with (const DeepRegion *other, PropertyConstraint property_constraint) const;
-  DeepRegion *apply_filter (const PolygonFilterBase &filter) const;
-
+  std::pair<DeepRegion *, DeepRegion *> apply_filter (const PolygonFilterBase &filter, bool with_true, bool with_false) const;
   template <class Proc>
   void configure_proc (Proc &proc) const
   {

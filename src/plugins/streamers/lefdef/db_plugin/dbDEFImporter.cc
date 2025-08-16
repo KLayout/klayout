@@ -26,9 +26,12 @@
 #include "tlGlobPattern.h"
 
 #include <cmath>
+#include <cctype>
 
 namespace db
 {
+
+static const std::pair<db::Coord, db::Coord> ext_not_set = std::make_pair (std::numeric_limits<db::Coord>::min (), std::numeric_limits<db::Coord>::min ());
 
 struct DEFImporterGroup
 {
@@ -53,22 +56,9 @@ struct DEFImporterGroup
 };
 
 DEFImporter::DEFImporter (int warn_level)
-  : LEFDEFImporter (warn_level),
-    m_lef_importer (warn_level)
+  : LEFDEFImporter (warn_level)
 {
   //  .. nothing yet ..
-}
-
-void 
-DEFImporter::read_lef (tl::InputStream &stream, db::Layout &layout, LEFDEFReaderState &state)
-{
-  m_lef_importer.read (stream, layout, state);
-}
-
-void
-DEFImporter::finish_lef (db::Layout &layout)
-{
-  m_lef_importer.finish_lef (layout);
 }
 
 void
@@ -112,7 +102,7 @@ DEFImporter::read_rect (db::Polygon &poly, double scale)
 std::pair<db::Coord, db::Coord>
 DEFImporter::get_wire_width_for_rule (const std::string &rulename, const std::string &ln, double dbu)
 {
-  std::pair<double, double> wxy = m_lef_importer.layer_width (ln, rulename);
+  std::pair<double, double> wxy = reader_state ()->lef_importer ().layer_width (ln, rulename);
   db::Coord wx = db::coord_traits<db::Coord>::rounded (wxy.first / dbu);
   db::Coord wy = db::coord_traits<db::Coord>::rounded (wxy.second / dbu);
 
@@ -127,7 +117,7 @@ DEFImporter::get_wire_width_for_rule (const std::string &rulename, const std::st
     }
   }
 
-  std::pair<double, double> min_wxy = m_lef_importer.min_layer_width (ln);
+  std::pair<double, double> min_wxy = reader_state ()->lef_importer ().min_layer_width (ln);
   db::Coord min_wx = db::coord_traits<db::Coord>::rounded (min_wxy.first / dbu);
   db::Coord min_wy = db::coord_traits<db::Coord>::rounded (min_wxy.second / dbu);
 
@@ -146,7 +136,7 @@ DEFImporter::get_def_ext (const std::string & /*ln*/, const std::pair<db::Coord,
   return std::make_pair (de, de);
 #else
   //  This implementation follows the LEFDEF 5.8 spec saying the "default extension is half the wire width":
-  db::Coord de = std::min (wxy.first, wxy.second) / 2;
+  auto de = std::min (wxy.second, wxy.first) / 2;
   return std::make_pair (de, de);
 #endif
 }
@@ -368,28 +358,46 @@ DEFImporter::produce_routing_geometry (db::Cell &design, const Polygon *style, u
     bool was_path_before = false;
 
     std::vector<db::Point>::const_iterator pt = pts.begin ();
+    std::vector<std::pair<db::Coord, db::Coord> >::const_iterator ex = ext.begin ();
+
     while (pt != pts.end ()) {
 
-      std::vector<db::Point>::const_iterator pt0 = pt;
+      auto pt0 = pt;
+      auto ex0 = ex;
       ++pt;
+      ++ex;
       if (pt == pts.end ()) {
         break;
       }
 
       bool multipart = false;
       if (is_isotropic) {
-        while (pt != pts.end () && (pt[-1].x () == pt[0].x () || pt[-1].y () == pt[0].y())) {
+        while (pt != pts.end ()) {
+          if (! (pt[-1].x () == pt[0].x () || pt[-1].y () == pt[0].y())) {
+            //  non-orthogonal segments are treated otherwise, not by paths
+            break;
+          }
+          if (pt + 1 != pts.end () && ex[0] != ext_not_set) {
+            //  connection points feature non-default extensions and should not be represented by paths
+            break;
+          }
           ++pt;
+          ++ex;
           multipart = true;
         }
         if (multipart) {
           --pt;
+          --ex;
         }
       }
 
-      //  The next part is the interval [pt0..pt] (pt inclusive)
+      //  The next part is the interval [pt0..pt] (including pt)
 
-      if (multipart || (pt0->x () == pt0[1].x () || pt0->y () == pt0[1].y())) {
+      if (! multipart && (pt0->x () == pt0[1].x () && pt0->y () == pt0[1].y())) {
+
+        //  ignore single-point paths
+
+      } else if (multipart || (pt0->x () == pt0[1].x () || pt0->y () == pt0[1].y())) {
 
         db::Coord wxy, wxy_perp;
 
@@ -401,33 +409,27 @@ DEFImporter::produce_routing_geometry (db::Cell &design, const Polygon *style, u
           wxy_perp = w.second;
         }
 
-        //  compute begin extension
+        //  compute begin and end extensions
         db::Coord be = 0;
-        if (pt0 == pts.begin ()) {
-          if (pt0->x () == pt0 [1].x ()) {
-            be = ext.front ().second;
-          } else {
-            be = ext.front ().first;
-          }
+        if (*ex0 != ext_not_set) {
+          be = (pt0->x () == pt0 [1].x ()) ? ex0->second : ex0->first;
         } else if (was_path_before) {
           //  provides the overlap to the previous segment
           be = wxy_perp / 2;
         }
 
-        //  compute end extension
         db::Coord ee = 0;
-        if (pt + 1 == pts.end ()) {
-          if (pt [-1].x () == pt->x ()) {
-            ee = ext.back ().second;
-          } else {
-            ee = ext.back ().first;
-          }
+        if (*ex != ext_not_set) {
+          ee = (pt [-1].x () == pt->x ()) ? ex->second : ex->first;
         }
 
         auto pt_from = pt0;
         auto pt_to = pt + 1;
 
-        //  do not split away end segments if they are shorter than half the width
+        //  Pplit paths if "joined_paths" is off. Sorry for spending the effort before to
+        //  compute multipath chains.
+        //  But now we can keep end segments joined if they are shorter than half the width
+        //  to establish a proper path end in that case.
 
         auto pt_from_split = pt_from;
         auto pt_to_split = pt_to;
@@ -566,16 +568,15 @@ DEFImporter::read_single_net (std::string &nondefaultrule, Layout &layout, db::C
     const std::string *rulename = 0;
 
     std::pair<db::Coord, db::Coord> w (0, 0);
-    if (specialnets) {
-      db::Coord n = db::coord_traits<db::Coord>::rounded (get_double () * scale);
-      w = std::make_pair (n, n);
-    }
 
     const db::Polygon *style = 0;
 
     int sn = std::numeric_limits<int>::max ();
 
     if (specialnets) {
+
+      db::Coord n = db::coord_traits<db::Coord>::rounded (get_double () * scale);
+      w = std::make_pair (n, n);
 
       while (test ("+")) {
 
@@ -611,11 +612,17 @@ DEFImporter::read_single_net (std::string &nondefaultrule, Layout &layout, db::C
       rulename = &nondefaultrule;
     }
 
-    std::pair<db::Coord, db::Coord> def_ext (0, 0);
-
     if (! specialnets) {
       w = get_wire_width_for_rule (*rulename, ln, layout.dbu ());
-      def_ext = get_def_ext (ln, w, layout.dbu ());
+    }
+
+    //  default extension for first and last point
+    std::pair<db::Coord, db::Coord> def_ext (0, 0);
+    std::pair<db::Coord, db::Coord> def_ext_conn = get_def_ext (ln, w, layout.dbu ());
+
+    if (! specialnets) {
+      //  first and last extensions are half width by default for routed nets
+      def_ext = def_ext_conn;
     }
 
     std::map<int, db::Polygon>::const_iterator s = m_styles.find (sn);
@@ -707,7 +714,7 @@ DEFImporter::read_single_net (std::string &nondefaultrule, Layout &layout, db::C
             y = get_double ();
           }
           pts.push_back (db::Point (db::DPoint (x * scale, y * scale)));
-          std::pair<db::Coord, db::Coord> ee = def_ext;
+          std::pair<db::Coord, db::Coord> ee = ext_not_set;
           if (! peek (")")) {
             db::Coord e = db::coord_traits<db::Coord>::rounded (get_double () * scale);
             ee.first = ee.second = e;
@@ -719,10 +726,20 @@ DEFImporter::read_single_net (std::string &nondefaultrule, Layout &layout, db::C
         }
 
         if (pts.size () > 1) {
+
+          //  replace the default extensions
+          if (ext.front () == ext_not_set) {
+            ext.front () = def_ext;
+          }
+          if (ext.back () == ext_not_set) {
+            ext.back () = def_ext;
+          }
+
           std::set <unsigned int> dl = open_layer (layout, ln, specialnets ? SpecialRouting : Routing, mask);
           for (std::set<unsigned int>::const_iterator l = dl.begin (); l != dl.end (); ++l) {
             produce_routing_geometry (design, style, *l, prop_id, pts, ext, w);
           }
+
         }
 
         //  continue a segment with the current point and the new mask
@@ -762,14 +779,19 @@ DEFImporter::read_single_net (std::string &nondefaultrule, Layout &layout, db::C
         }
 
         std::map<std::string, ViaDesc>::const_iterator vd = m_via_desc.find (vn);
-        if (vd != m_via_desc.end () && ! pts.empty ()) {
+
+        if (vd == m_via_desc.end ()) {
+
+          warn (tl::to_string (tr ("Invalid via name: ")) + vn);
+
+        } else if (! pts.empty ()) {
 
           //  For the via, the masks are encoded in a three-digit number (<mask-top> <mask-cut> <mask_bottom>)
           unsigned int mask_top = (mask / 100) % 10;
           unsigned int mask_cut = (mask / 10) % 10;
           unsigned int mask_bottom = mask % 10;
 
-          db::Cell *cell = reader_state ()->via_cell (vn, nondefaultrule, layout, mask_bottom, mask_cut, mask_top, &m_lef_importer);
+          db::Cell *cell = reader_state ()->via_cell (vn, nondefaultrule, layout, mask_bottom, mask_cut, mask_top, &reader_state ()->lef_importer ());
           if (cell) {
             if (nx <= 1 && ny <= 1) {
               design.insert (db::CellInstArray (db::CellInst (cell->cell_index ()), db::Trans (ft.rot (), db::Vector (pts.back ()))));
@@ -953,7 +975,7 @@ DEFImporter::read_nets (db::Layout &layout, db::Cell &design, double scale, bool
 
             std::map<std::string, ViaDesc>::const_iterator vd = m_via_desc.find (vn);
             if (vd != m_via_desc.end ()) {
-              db::Cell *cell = reader_state ()->via_cell (vn, nondefaultrule, layout, mask_bottom, mask_cut, mask_top, &m_lef_importer);
+              db::Cell *cell = reader_state ()->via_cell (vn, nondefaultrule, layout, mask_bottom, mask_cut, mask_top, &reader_state ()->lef_importer ());
               if (cell) {
                 design.insert (db::CellInstArray (db::CellInst (cell->cell_index ()), db::Trans (ft.rot (), pt)));
               }
@@ -1130,7 +1152,7 @@ DEFImporter::read_vias (db::Layout &layout, db::Cell & /*design*/, double scale)
 
         std::string ln = get ();
 
-        if (m_lef_importer.is_routing_layer (ln)) {
+        if (reader_state ()->lef_importer ().is_routing_layer (ln)) {
 
           if (seen_layers.find (ln) == seen_layers.end ()) {
 
@@ -1145,7 +1167,7 @@ DEFImporter::read_vias (db::Layout &layout, db::Cell & /*design*/, double scale)
 
           }
 
-        } else if (m_lef_importer.is_cut_layer (ln)) {
+        } else if (reader_state ()->lef_importer ().is_cut_layer (ln)) {
 
           geo_based_vg->set_maskshift_layer (1, ln);
           has_cut_geometry = true;
@@ -1195,8 +1217,10 @@ DEFImporter::read_vias (db::Layout &layout, db::Cell & /*design*/, double scale)
     if (rule_based_vg.get () && geo_based_vg.get ()) {
       error (tl::to_string (tr ("A via can only be defined through a VIARULE or geometry, not both ways")));
     } else if (rule_based_vg.get ()) {
+      rule_based_vg->def_local = true;
       reader_state ()->register_via_cell (n, std::string (), rule_based_vg.release ());
     } else if (geo_based_vg.get ()) {
+      geo_based_vg->def_local = true;
       reader_state ()->register_via_cell (n, std::string (), geo_based_vg.release ());
     } else {
       error (tl::to_string (tr ("Too little information to generate a via")));
@@ -1210,16 +1234,23 @@ DEFImporter::read_vias (db::Layout &layout, db::Cell & /*design*/, double scale)
 //  issue #1470
 static std::string fix_pin_name (const std::string &pin_name)
 {
-  auto pos = pin_name.find (".extra");
+  const std::string extra (".extra");
+  auto pos = pin_name.find (extra);
   if (pos == std::string::npos) {
     return pin_name;
   } else {
-    //  TODO: do we need to be more specific?
     //  Formally, the allowed specs are:
     //    pinname.extraN
     //    pinname.extraN[n]
     //    pinname.extraN[n][m]...
-    return std::string (pin_name.begin (), pin_name.begin () + pos);
+    //  where N = a sequence of digits -
+    //  we only remove the ".extraN".
+    std::string result (pin_name.begin (), pin_name.begin () + pos);
+    auto i = pos + extra.size ();
+    for ( ; i != pin_name.size () && isdigit (pin_name [i]); ++i)
+      ;
+    result += std::string (pin_name.begin () + i, pin_name.end ());
+    return result;
   }
 }
 
@@ -1336,7 +1367,7 @@ DEFImporter::read_pins (db::Layout &layout, db::Cell &design, double scale)
           std::map<std::string, ViaDesc>::const_iterator vd = m_via_desc.find (vn);
           if (vd != m_via_desc.end ()) {
             std::string nondefaultrule;
-            db::Cell *cell = reader_state ()->via_cell (vn, nondefaultrule, layout, mask_bottom, mask_cut, mask_top, &m_lef_importer);
+            db::Cell *cell = reader_state ()->via_cell (vn, nondefaultrule, layout, mask_bottom, mask_cut, mask_top, &reader_state ()->lef_importer ());
             if (cell) {
               design.insert (db::CellInstArray (db::CellInst (cell->cell_index ()), db::Trans (pt)));
             }
@@ -1549,7 +1580,7 @@ DEFImporter::read_fills (db::Layout &layout, db::Cell &design, double scale)
         std::map<std::string, ViaDesc>::const_iterator vd = m_via_desc.find (vn);
         if (vd != m_via_desc.end ()) {
           std::string nondefaultrule;
-          db::Cell *cell = reader_state ()->via_cell (vn, nondefaultrule, layout, mask_bottom, mask_cut, mask_top, &m_lef_importer);
+          db::Cell *cell = reader_state ()->via_cell (vn, nondefaultrule, layout, mask_bottom, mask_cut, mask_top, &reader_state ()->lef_importer ());
           if (cell) {
             ensure_fill_cell (layout, design, fill_cell).insert (db::CellInstArray (db::CellInst (cell->cell_index ()), db::Trans (pt)));
           }
@@ -1600,6 +1631,7 @@ DEFImporter::read_styles (double scale)
   }
 }
 
+
 void
 DEFImporter::read_components (db::Layout &layout, std::list<std::pair<std::string, CellInstArray> > &instances, double scale)
 {
@@ -1613,9 +1645,26 @@ DEFImporter::read_components (db::Layout &layout, std::list<std::pair<std::strin
     bool is_placed = false;
     std::string maskshift;
 
-    std::map<std::string, MacroDesc>::const_iterator m = m_lef_importer.macros ().find (model);
-    if (m == m_lef_importer.macros ().end ()) {
-      error (tl::to_string (tr ("Macro not found in LEF file: ")) + model);
+    const MacroDesc *m = 0;
+
+    std::map<std::string, MacroDesc>::const_iterator im = reader_state ()->lef_importer ().macros ().find (model);
+    if (im == reader_state ()->lef_importer ().macros ().end ()) {
+
+      warn (tl::sprintf (tl::to_string (tr ("Macro not found in LEF file: %s - creating dummy macro")), model));
+
+      //  create a dummy macro definition (no FOREIGN, size 0x0 etc.)
+      GeometryBasedLayoutGenerator *mg = new GeometryBasedLayoutGenerator ();
+      reader_state ()->register_macro_cell (model, mg);
+
+      MacroDesc macro_desc;
+      macro_desc.bbox = db::Box (db::Point (), db::Point ());
+
+      m = reader_state ()->lef_importer ().insert_macro (model, macro_desc);
+
+    } else {
+
+      m = &im->second;
+
     }
 
     while (test ("+")) {
@@ -1627,7 +1676,7 @@ DEFImporter::read_components (db::Layout &layout, std::list<std::pair<std::strin
         test (")");
 
         ft = get_orient (false /*mandatory*/);
-        d = pt - m->second.bbox.transformed (ft).lower_left ();
+        d = pt - m->bbox.transformed (ft).lower_left ();
         is_placed = true;
 
       } else if (test ("UNPLACED")) {
@@ -1639,7 +1688,7 @@ DEFImporter::read_components (db::Layout &layout, std::list<std::pair<std::strin
           test (")");
 
           ft = get_orient (false /*mandatory*/);
-          d = pt - m->second.bbox.transformed (ft).lower_left ();
+          d = pt - m->bbox.transformed (ft).lower_left ();
           is_placed = true;
 
         }
@@ -1660,7 +1709,7 @@ DEFImporter::read_components (db::Layout &layout, std::list<std::pair<std::strin
 
     if (is_placed) {
 
-      std::pair<db::Cell *, db::Trans> ct = reader_state ()->macro_cell (model, layout, m_component_maskshift, string2masks (maskshift), m->second, &m_lef_importer);
+      std::pair<db::Cell *, db::Trans> ct = reader_state ()->macro_cell (model, layout, m_component_maskshift, string2masks (maskshift), *m, &reader_state ()->lef_importer ());
       if (ct.first) {
         db::CellInstArray inst (db::CellInst (ct.first->cell_index ()), db::Trans (ft.rot (), d) * ct.second);
         instances.push_back (std::make_pair (inst_name, inst));
@@ -1684,7 +1733,7 @@ DEFImporter::do_read (db::Layout &layout)
   std::list<DEFImporterGroup> groups;
   std::list<std::pair<std::string, db::CellInstArray> > instances;
 
-  m_via_desc = m_lef_importer.vias ();
+  m_via_desc = reader_state ()->lef_importer ().vias ();
   m_styles.clear ();
   m_design_name.clear ();
 

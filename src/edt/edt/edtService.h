@@ -398,17 +398,19 @@ public:
    *
    *  @return true, if PCells have been updated, indicating that our selection is no longer valid
    *
+   *  @param commit If true, changes are "final" (and PCells are updated also in lazy evaluation mode)
+   *
    *  This version assumes there is only one guiding shape selected and will update the selection.
    *  It will also call layout.cleanup() if required.
    */
-  bool handle_guiding_shape_changes ();
+  bool handle_guiding_shape_changes (bool commit);
 
   /**
    *  @brief Handle changes in a specific guiding shape, i.e. create new PCell variants if required
    *
    *  @return A pair of bool (indicating that the object path has changed) and the new guiding shape path
    */
-  std::pair<bool, lay::ObjectInstPath> handle_guiding_shape_changes (const lay::ObjectInstPath &obj) const;
+  std::pair<bool, lay::ObjectInstPath> handle_guiding_shape_changes (const lay::ObjectInstPath &obj, bool commit) const;
 
   /**
    *  @brief Gets a value indicating whether a move operation is ongoing
@@ -672,9 +674,12 @@ private:
   bool m_snap_to_objects;
   bool m_snap_objects_to_grid;
   db::DVector m_global_grid;
+
+  //  Other attributes
   bool m_top_level_sel;
   bool m_show_shapes_of_instances;
   unsigned int m_max_shapes_of_instances;
+  int m_pcell_lazy_evaluation;
 
   //  Hierarchical copy mode (-1: ask, 0: shallow, 1: deep)
   int m_hier_copy_mode;

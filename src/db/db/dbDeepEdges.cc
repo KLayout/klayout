@@ -438,6 +438,12 @@ DeepEdges::nth (size_t /*n*/) const
   throw tl::Exception (tl::to_string (tr ("Random access to edges is available only for flat edge collections")));
 }
 
+db::properties_id_type
+DeepEdges::nth_prop_id (size_t) const
+{
+  throw tl::Exception (tl::to_string (tr ("Random access to edges is available only for flat collections")));
+}
+
 bool
 DeepEdges::has_valid_edges () const
 {
@@ -799,18 +805,24 @@ EdgesDelegate *
 DeepEdges::filter_in_place (const EdgeFilterBase &filter)
 {
   //  TODO: implement to be really in-place
-  *this = *apply_filter (filter);
+  *this = *apply_filter (filter, true, false).first;
   return this;
 }
 
 EdgesDelegate *
 DeepEdges::filtered (const EdgeFilterBase &filter) const
 {
-  return apply_filter (filter);
+  return apply_filter (filter, true, false).first;
 }
 
-DeepEdges *
-DeepEdges::apply_filter (const EdgeFilterBase &filter) const
+std::pair<EdgesDelegate *, EdgesDelegate *>
+DeepEdges::filtered_pair (const EdgeFilterBase &filter) const
+{
+  return apply_filter (filter, true, true);
+}
+
+std::pair<DeepEdges *, DeepEdges *>
+DeepEdges::apply_filter (const EdgeFilterBase &filter, bool with_true, bool with_false) const
 {
   const db::DeepLayer &edges = filter.requires_raw_input () ? deep_layer () : merged_deep_layer ();
   db::Layout &layout = const_cast<db::Layout &> (edges.layout ());
@@ -828,9 +840,10 @@ DeepEdges::apply_filter (const EdgeFilterBase &filter) const
 
   }
 
-  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
+  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit_true, to_commit_false;
 
-  std::unique_ptr<db::DeepEdges> res (new db::DeepEdges (edges.derived ()));
+  std::unique_ptr<db::DeepEdges> res_true (with_true ? new db::DeepEdges (edges.derived ()) : 0);
+  std::unique_ptr<db::DeepEdges> res_false (with_false ? new db::DeepEdges (edges.derived ()) : 0);
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
     const db::Shapes &s = c->shapes (edges.layer ());
@@ -840,16 +853,34 @@ DeepEdges::apply_filter (const EdgeFilterBase &filter) const
       const std::set<db::ICplxTrans> &vv = vars->variants (c->cell_index ());
       for (auto v = vv.begin (); v != vv.end (); ++v) {
 
-        db::Shapes *st;
+        db::Shapes *st_true = 0, *st_false = 0;
         if (vv.size () == 1) {
-          st = & c->shapes (res->deep_layer ().layer ());
+          if (with_true) {
+            st_true = & c->shapes (res_true->deep_layer ().layer ());
+          }
+          if (with_false) {
+            st_false = & c->shapes (res_false->deep_layer ().layer ());
+          }
         } else {
-          st = & to_commit [c->cell_index ()] [*v];
+          if (with_true) {
+            st_true = & to_commit_true [c->cell_index ()] [*v];
+          }
+          if (with_false) {
+            st_false = & to_commit_false [c->cell_index ()] [*v];
+          }
         }
 
+        const db::ICplxTrans &tr = *v;
+
         for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Edges); ! si.at_end (); ++si) {
-          if (filter.selected (si->edge ().transformed (*v))) {
-            st->insert (*si);
+          if (filter.selected (si->edge ().transformed (tr), si->prop_id ())) {
+            if (st_true) {
+              st_true->insert (*si);
+            }
+          } else {
+            if (st_false) {
+              st_false->insert (*si);
+            }
           }
         }
 
@@ -857,11 +888,18 @@ DeepEdges::apply_filter (const EdgeFilterBase &filter) const
 
     } else {
 
-      db::Shapes &st = c->shapes (res->deep_layer ().layer ());
+      db::Shapes *st_true = with_true ? &c->shapes (res_true->deep_layer ().layer ()) : 0;
+      db::Shapes *st_false = with_false ? &c->shapes (res_false->deep_layer ().layer ()) : 0;
 
       for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Edges); ! si.at_end (); ++si) {
-        if (filter.selected (si->edge ())) {
-          st.insert (*si);
+        if (filter.selected (si->edge (), si->prop_id ())) {
+          if (with_true) {
+            st_true->insert (*si);
+          }
+        } else {
+          if (with_false) {
+            st_false->insert (*si);
+          }
         }
       }
 
@@ -869,14 +907,25 @@ DeepEdges::apply_filter (const EdgeFilterBase &filter) const
 
   }
 
-  if (! to_commit.empty () && vars.get ()) {
-    vars->commit_shapes (res->deep_layer ().layer (), to_commit);
+  if (! to_commit_true.empty () && vars.get ()) {
+    tl_assert (res_true.get () != 0);
+    vars->commit_shapes (res_true->deep_layer ().layer (), to_commit_true);
+  }
+  if (! to_commit_false.empty () && vars.get ()) {
+    tl_assert (res_false.get () != 0);
+    vars->commit_shapes (res_false->deep_layer ().layer (), to_commit_false);
   }
 
   if (! filter.requires_raw_input ()) {
-    res->set_is_merged (true);
+    if (res_true.get ()) {
+      res_true->set_is_merged (true);
+    }
+    if (res_false.get ()) {
+      res_false->set_is_merged (true);
+    }
   }
-  return res.release ();
+
+  return std::make_pair (res_true.release (), res_false.release ());
 }
 
 EdgesDelegate *DeepEdges::merged_in_place ()
@@ -1236,7 +1285,11 @@ DeepEdges::add_in_place (const Edges &other)
 
     db::Shapes &shapes = deep_layer ().initial_cell ().shapes (deep_layer ().layer ());
     for (db::Edges::const_iterator p = other.begin (); ! p.at_end (); ++p) {
-      shapes.insert (*p);
+      if (p.prop_id () == 0) {
+        shapes.insert (*p);
+      } else {
+        shapes.insert (db::EdgeWithProperties (*p, p.prop_id ()));
+      }
     }
 
   }

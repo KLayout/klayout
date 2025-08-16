@@ -1,0 +1,35 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+end
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+l3 = input(3, 0)
+l4 = input(4, 0)
+l5 = input(5, 0)
+
+connect(l1, l2)
+connect(l2, l3)
+connect(l3, l4)
+connect(l4, l5)
+
+l1_measured = evaluate_nets(l1, { "l2" => l2, "l3" => l3, "l4" => l4, "l5" => l5 }, "put(5, area(l5)); put(0, area); put(100, area(l5)/area)")
+l2_measured = evaluate_nets(l1, {}, "put(0, area*factor)", { "factor" => 1000.0 })
+l3_measured = evaluate_nets(l1, {}, "put(0, net.name)")
+l4_measured = evaluate_nets(l1, {}, "skip(net.name == n)", { "n" => "NET1" })
+
+l1.output(1, 0)
+l2.output(2, 0)
+l3.output(3, 0)
+l4.output(4, 0)
+l5.output(5, 0)
+
+l1_measured.output(100, 0)
+l2_measured.output(101, 0)
+l3_measured.output(102, 0)
+l4_measured.output(103, 0)
+

@@ -112,6 +112,24 @@ NetlistCrossReference::other_net_for (const db::Net *net) const
 }
 
 const NetlistCrossReference::PerNetData *
+NetlistCrossReference::per_net_data_for_net (const db::Net *net) const
+{
+  const db::Net *other_net = other_net_for (net);
+
+  std::map<std::pair<const db::Net *, const db::Net *>, PerNetData>::iterator i = m_per_net_data.find (std::make_pair (net, other_net));
+  if (i == m_per_net_data.end ()) {
+    i = m_per_net_data.find (std::make_pair (other_net, net));
+  }
+
+  if (i == m_per_net_data.end ()) {
+    static const NetlistCrossReference::PerNetData empty_net_data;
+    return &empty_net_data;
+  } else {
+    return &i->second;
+  }
+}
+
+const NetlistCrossReference::PerNetData *
 NetlistCrossReference::per_net_data_for (const std::pair<const db::Net *, const db::Net *> &nets) const
 {
   if (! nets.first && ! nets.second) {

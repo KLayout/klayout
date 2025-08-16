@@ -2364,7 +2364,12 @@ MainService::cm_tap ()
     return;
   }
 
-  lay::ShapeFinder finder (true /*point mode*/, false /*all hierarchy levels*/, db::ShapeIterator::All, 0);
+  lay::ShapeFinder finder (true,    //  point mode
+                           false,   //  all hierarchy levels
+                           db::ShapeIterator::flags_type (db::ShapeIterator::All - db::ShapeIterator::Texts),  //  do not consider texts - their bounding box may be too large
+                           0,       //  no excludes
+                           true     //  capture all shapes
+                          );
 
   //  capture all objects in point mode (default: capture one only)
   finder.set_catch_all (true);

@@ -453,7 +453,7 @@ class DB_PUBLIC CompoundRegionMultiInputOperationNode
   : public CompoundRegionOperationNode
 {
 public:
-  CompoundRegionMultiInputOperationNode (const std::vector<CompoundRegionOperationNode *> &children);
+  CompoundRegionMultiInputOperationNode (const std::vector<CompoundRegionOperationNode *> &children, bool no_init = false);
   CompoundRegionMultiInputOperationNode ();
   CompoundRegionMultiInputOperationNode (CompoundRegionOperationNode *child);
   CompoundRegionMultiInputOperationNode (CompoundRegionOperationNode *a, CompoundRegionOperationNode *b);
@@ -521,14 +521,16 @@ protected:
   CompoundRegionOperationNode *child (unsigned int index);
   const CompoundRegionOperationNode *child (unsigned int index) const;
 
+  virtual const TransformationReducer *local_vars () const { return 0; }
+
+  void init ();
+
 private:
   tl::shared_collection<CompoundRegionOperationNode> m_children;
   //  maps child#,layer# to layer# of child:
   std::map<std::pair<unsigned int, unsigned int>, unsigned int> m_map_layer_to_child;
   std::vector<db::Region *> m_inputs;
   CompoundTransformationReducer m_vars;
-
-  void init ();
 };
 
 
@@ -1015,14 +1017,12 @@ private:
     child (0)->compute_local (cache, layout, cell, interactions, one, proc);
 
     if (m_sum_of_set) {
-      std::unordered_set<T> wo_props;
-      wo_props.insert (one.front ().begin (), one.front ().end ());
-      if (mp_filter->selected_set (wo_props)) {
+      if (mp_filter->selected_set (one.front ())) {
         results.front ().insert (one.front ().begin (), one.front ().end ());
       }
     } else {
       for (typename std::unordered_set<db::object_with_properties<T> >::const_iterator p = one.front ().begin (); p != one.front ().end (); ++p) {
-        if (mp_filter->selected (*p)) {
+        if (mp_filter->selected (*p, p->properties_id ())) {
           results.front ().insert (*p);
         }
       }
@@ -1066,14 +1066,12 @@ private:
     child (0)->compute_local (cache, layout, cell, interactions, one, proc);
 
     if (m_sum_of) {
-      std::unordered_set<db::Edge> wo_props;
-      wo_props.insert (one.front ().begin (), one.front ().end ());
-      if (mp_filter->selected (wo_props)) {
+      if (mp_filter->selected_set (one.front ())) {
         results.front ().insert (one.front ().begin (), one.front ().end ());
       }
     } else {
       for (typename std::unordered_set<db::EdgeWithProperties>::const_iterator p = one.front ().begin (); p != one.front ().end (); ++p) {
-        if (mp_filter->selected (*p)) {
+        if (mp_filter->selected (*p, p->properties_id ())) {
           results.front ().insert (*p);
         }
       }
@@ -1108,6 +1106,7 @@ private:
   bool m_owns_filter;
 
   bool is_selected (const db::EdgePair &p) const;
+  bool is_selected (const db::EdgePairWithProperties &p) const;
 
   template <class T, class TR>
   void implement_compute_local (db::CompoundRegionOperationCache *cache, db::Layout *layout, db::Cell *cell, const shape_interactions<T, T> &interactions, std::vector<std::unordered_set<TR> > &results, const db::LocalProcessorBase *proc) const

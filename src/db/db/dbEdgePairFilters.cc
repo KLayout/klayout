@@ -43,12 +43,12 @@ EdgeFilterBasedEdgePairFilter::~EdgeFilterBasedEdgePairFilter ()
   //  .. nothing yet ..
 }
 
-bool EdgeFilterBasedEdgePairFilter::selected (const db::EdgePair &edge_pair) const
+bool EdgeFilterBasedEdgePairFilter::selected (const db::EdgePair &edge_pair, db::properties_id_type prop_id) const
 {
   if (m_one_must_match) {
-    return mp_edge_filter->selected (edge_pair.first ()) || mp_edge_filter->selected (edge_pair.second ());
+    return mp_edge_filter->selected (edge_pair.first (), prop_id) || mp_edge_filter->selected (edge_pair.second (), prop_id);
   } else {
-    return mp_edge_filter->selected (edge_pair.first ()) && mp_edge_filter->selected (edge_pair.second ());
+    return mp_edge_filter->selected (edge_pair.first (), prop_id) && mp_edge_filter->selected (edge_pair.second (), prop_id);
   }
 }
 
@@ -71,7 +71,7 @@ EdgePairFilterByDistance::EdgePairFilterByDistance (distance_type min_distance, 
   //  .. nothing yet ..
 }
 
-bool EdgePairFilterByDistance::selected (const db::EdgePair &edge_pair) const
+bool EdgePairFilterByDistance::selected (const db::EdgePair &edge_pair, db::properties_id_type) const
 {
   distance_type dist = edge_pair.distance ();
   bool sel = (dist >= m_min_distance && dist < m_max_distance);
@@ -87,7 +87,7 @@ EdgePairFilterByArea::EdgePairFilterByArea (area_type min_area, area_type max_ar
   //  .. nothing yet ..
 }
 
-bool EdgePairFilterByArea::selected (const db::EdgePair &edge_pair) const
+bool EdgePairFilterByArea::selected (const db::EdgePair &edge_pair, db::properties_id_type) const
 {
   area_type dist = edge_pair.to_simple_polygon (0).area ();
   bool sel = (dist >= m_min_area && dist < m_max_area);
@@ -110,7 +110,7 @@ InternalAngleEdgePairFilter::InternalAngleEdgePairFilter (double amin, bool incl
 }
 
 bool
-InternalAngleEdgePairFilter::selected (const db::EdgePair &edge_pair) const
+InternalAngleEdgePairFilter::selected (const db::EdgePair &edge_pair, db::properties_id_type) const
 {
   db::Vector d1 = edge_pair.first ().d ();
   db::Vector d2 = edge_pair.second ().d ();

@@ -26,8 +26,8 @@ load("test_prologue.rb")
 # normalizes a specification string for region, edges etc.
 # such that the order of the objects becomes irrelevant
 def csort(s)
-  # splits at ");(" without consuming the brackets
-  s.split(/(?<=\));(?=\()/).sort.join(";")
+  # splits at ");(" or "};(" without consuming the brackets
+  s.split(/(?<=[\)\}]);(?=\()/).sort.join(";")
 end
  
 class TextStringLengthFilter < RBA::TextFilter
@@ -103,7 +103,7 @@ class DBTexts_TestClass < TestBase
     assert_equal(r.is_empty?, false)
     assert_equal(r.count, 1)
     assert_equal(r.hier_count, 1)
-    assert_equal(r[0].to_s, "('uvw',r0 110,210)")
+    assert_equal(r[0].to_s, "('uvw',r0 110,210) props={}")
     assert_equal(r[1].to_s, "")
     assert_equal(r.bbox.to_s, "(110,210;110,210)")
 
@@ -179,9 +179,13 @@ class DBTexts_TestClass < TestBase
     r1 = RBA::Texts::new([ text1, text2 ])
     assert_equal(csort(r1.to_s), csort("('abc',r0 100,-200);('uvm',r0 110,210)"))
     assert_equal(r1.with_text("abc", false).to_s, "('abc',r0 100,-200)")
+    assert_equal(r1.split_with_text("abc")[0].to_s, "('abc',r0 100,-200)")
     assert_equal(r1.with_text("abc", true).to_s, "('uvm',r0 110,210)")
+    assert_equal(r1.split_with_text("abc")[1].to_s, "('uvm',r0 110,210)")
     assert_equal(r1.with_match("*b*", false).to_s, "('abc',r0 100,-200)")
+    assert_equal(r1.split_with_match("*b*")[0].to_s, "('abc',r0 100,-200)")
     assert_equal(r1.with_match("*b*", true).to_s, "('uvm',r0 110,210)")
+    assert_equal(r1.split_with_match("*b*")[1].to_s, "('uvm',r0 110,210)")
 
     r1 = RBA::Texts::new(text1)
     assert_equal(r1.to_s, "('abc',r0 100,-200)")
@@ -219,9 +223,13 @@ class DBTexts_TestClass < TestBase
 
     r.flatten
     assert_equal(r.has_valid_texts?, true)
-    assert_equal(r[1].to_s, "('abc',r0 100,-100)")
+    assert_equal(r[1].to_s, "('abc',r0 100,-100) props={}")
     assert_equal(r[100].inspect, "nil")
     assert_equal(r.bbox.to_s, "(100,-200;300,-100)")
+
+    r = RBA::Texts::new
+    r.insert(RBA::TextWithProperties::new(RBA::Text::new("string", RBA::Trans::new), { 1 => "value" }))
+    assert_equal(r[0].to_s, "('string',r0 0,0) props={1=>value}")
     
     dss = RBA::DeepShapeStore::new
     r = RBA::Texts::new(ly.begin_shapes(c1.cell_index, l1), dss)
@@ -241,6 +249,8 @@ class DBTexts_TestClass < TestBase
     assert_equal(r.bbox.to_s, "(100,-200;300,-100)")
 
     assert_equal(r.is_deep?, true)
+
+    dss._destroy
 
   end
 
@@ -342,6 +352,8 @@ class DBTexts_TestClass < TestBase
     assert_equal(RBA::Texts::new(target.cell("C2").shapes(target_li)).to_s, "('abc',r0 100,-200)")
     assert_equal(RBA::Region::new(target.cell("C2").shapes(target_li)).to_s, "")
 
+    dss._destroy
+
   end
 
   # interact
@@ -394,6 +406,8 @@ class DBTexts_TestClass < TestBase
     texts.insert(RBA::Text::new("00", [ RBA::Trans::R90, 0, 20 ]))
 
     assert_equal(texts.filtered(f).to_s, "('tla',r0 0,0)")
+    assert_equal(texts.split_filter(f)[0].to_s, "('tla',r0 0,0)")
+    assert_equal(texts.split_filter(f)[1].to_s, "('long',m45 10,0);('00',r90 0,20)")
     assert_equal(texts.to_s, "('long',m45 10,0);('tla',r0 0,0);('00',r90 0,20)")
     texts.filter(f)
     assert_equal(texts.to_s, "('tla',r0 0,0)")
@@ -440,6 +454,129 @@ class DBTexts_TestClass < TestBase
 
     assert_equal(texts.processed(p).to_s, "(-30,-30;-30,30;30,30;30,-30);(-110,-110;-110,110;110,110;110,-110)")
     assert_equal(texts.to_s, "('abc',r0 0,0);('a long text',m45 0,0)")
+
+  end
+
+  # properties
+  def test_props
+
+    r = RBA::Texts::new([ RBA::TextWithProperties::new(RBA::Text::new("abc", RBA::Trans::new), { 1 => "one" }) ])
+    assert_equal(r.to_s, "('abc',r0 0,0){1=>one}")
+
+    r = RBA::Texts::new([])
+    assert_equal(r.to_s, "")
+
+    r = RBA::Texts::new(RBA::TextWithProperties::new(RBA::Text::new("abc", RBA::Trans::new), { 1 => "one" }))
+    assert_equal(r.to_s, "('abc',r0 0,0){1=>one}")
+
+    r = RBA::Texts::new
+    r.insert(RBA::TextWithProperties::new(RBA::Text::new("abc", RBA::Trans::new), { 1 => "one" }))
+    assert_equal(r.to_s, "('abc',r0 0,0){1=>one}")
+
+    r = RBA::Texts::new
+    r.insert(RBA::TextWithProperties::new(RBA::Text::new("abc", RBA::Trans::new), { 1 => "one" }))
+    r.insert(RBA::Text::new("xuv", RBA::Trans::new))
+    s = r.each.collect(&:to_s).join(";")
+    assert_equal(s, "('xuv',r0 0,0) props={};('abc',r0 0,0) props={1=>one}")
+
+  end
+
+  # properties
+  def test_prop_filters
+
+    r = RBA::Texts::new
+    r.insert(RBA::TextWithProperties::new(RBA::Text::new("abc", RBA::Trans::R0), { "one" => -1 }))
+    r.insert(RBA::TextWithProperties::new(RBA::Text::new("uvw", RBA::Trans::R0), { "one" => 17 }))
+    r.insert(RBA::TextWithProperties::new(RBA::Text::new("xyz", RBA::Trans::R0), { "one" => 42 }))
+
+    assert_equal(r.filtered(RBA::TextFilter::property_filter("one", 11)).to_s, "")
+    assert_equal(r.filtered(RBA::TextFilter::property_filter("two", 17)).to_s, "")
+    assert_equal(csort(r.filtered(RBA::TextFilter::property_filter("one", 17)).to_s), csort("('uvw',r0 0,0){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::TextFilter::property_filter("one", 17, true)).to_s), csort("('abc',r0 0,0){one=>-1};('xyz',r0 0,0){one=>42}"))
+    assert_equal(csort(r.filtered(RBA::TextFilter::property_filter_bounded("one", 17, nil)).to_s), csort("('xyz',r0 0,0){one=>42};('uvw',r0 0,0){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::TextFilter::property_filter_bounded("one", 17, 18)).to_s), csort("('uvw',r0 0,0){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::TextFilter::property_filter_bounded("one", 17, 18, true)).to_s), csort("('xyz',r0 0,0){one=>42};('abc',r0 0,0){one=>-1}"))
+    assert_equal(csort(r.filtered(RBA::TextFilter::property_filter_bounded("one", nil, 18)).to_s), csort("('uvw',r0 0,0){one=>17};('abc',r0 0,0){one=>-1}"))
+    assert_equal(csort(r.filtered(RBA::TextFilter::property_glob("one", "1*")).to_s), csort("('uvw',r0 0,0){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::TextFilter::property_glob("one", "1*", true)).to_s), csort("('xyz',r0 0,0){one=>42};('abc',r0 0,0){one=>-1}"))
+
+    ly = RBA::Layout::new
+    top = ly.create_cell("TOP")
+    l1 = ly.layer(1, 0)
+
+    s = top.shapes(l1)
+    s.insert(RBA::TextWithProperties::new(RBA::Text::new("abc", RBA::Trans::R0), { "one" => -1 }))
+    s.insert(RBA::TextWithProperties::new(RBA::Text::new("uvw", RBA::Trans::R0), { "one" => 17 }))
+    s.insert(RBA::TextWithProperties::new(RBA::Text::new("xyz", RBA::Trans::R0), { "one" => 42 }))
+
+    dss = RBA::DeepShapeStore::new
+    iter = top.begin_shapes_rec(l1)
+    iter.enable_properties()
+    r = RBA::Texts::new(iter, dss)
+
+    assert_equal(r.filtered(RBA::TextFilter::property_filter("one", 11)).to_s, "")
+    assert_equal(r.filtered(RBA::TextFilter::property_filter("two", 17)).to_s, "")
+    assert_equal(csort(r.filtered(RBA::TextFilter::property_filter("one", 17)).to_s), csort("('uvw',r0 0,0){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::TextFilter::property_filter("one", 17, true)).to_s), csort("('abc',r0 0,0){one=>-1};('xyz',r0 0,0){one=>42}"))
+    assert_equal(csort(r.filtered(RBA::TextFilter::property_filter_bounded("one", 17, nil)).to_s), csort("('xyz',r0 0,0){one=>42};('uvw',r0 0,0){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::TextFilter::property_filter_bounded("one", 17, 18)).to_s), csort("('uvw',r0 0,0){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::TextFilter::property_filter_bounded("one", 17, 18, true)).to_s), csort("('xyz',r0 0,0){one=>42};('abc',r0 0,0){one=>-1}"))
+    assert_equal(csort(r.filtered(RBA::TextFilter::property_filter_bounded("one", nil, 18)).to_s), csort("('uvw',r0 0,0){one=>17};('abc',r0 0,0){one=>-1}"))
+    assert_equal(csort(r.filtered(RBA::TextFilter::property_glob("one", "1*")).to_s), csort("('uvw',r0 0,0){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::TextFilter::property_glob("one", "1*", true)).to_s), csort("('xyz',r0 0,0){one=>42};('abc',r0 0,0){one=>-1}"))
+
+    rr = r.dup
+    rr.filter(RBA::TextFilter::property_filter("one", 17))
+    assert_equal(csort(rr.to_s), csort("('uvw',r0 0,0){one=>17}"))
+
+    dss._destroy
+
+  end
+
+  # polygons
+  def test_polygons
+
+    r = RBA::Texts::new
+    r.insert(RBA::Text::new("abc", RBA::Trans::new(10, 20)))
+    r.insert(RBA::Text::new("uvw", RBA::Trans::new(-10, -20)))
+
+    assert_equal(r.polygons.to_s, "(9,19;9,21;11,21;11,19);(-11,-21;-11,-19;-9,-19;-9,-21)")
+    assert_equal(r.polygons(2).to_s, "(8,18;8,22;12,22;12,18);(-12,-22;-12,-18;-8,-18;-8,-22)")
+    assert_equal(r.polygons(1, 17).to_s, "(9,19;9,21;11,21;11,19){17=>abc};(-11,-21;-11,-19;-9,-19;-9,-21){17=>uvw}")
+
+  end
+
+  # properties
+  def test_prop_expressions
+
+    r = RBA::Texts::new
+    r.insert(RBA::TextWithProperties::new(RBA::Text::new("T", RBA::Trans::new(100, 200)), { "PropA" => 17.0, 1 => 42 }))
+    assert_equal(r.to_s, "('T',r0 100,200){1=>42,PropA=>17}")
+
+    # replace
+    pr = RBA::TextPropertiesExpressions::new(r, { "X" => "PropA+1", "Y" => "shape.bbox.center.x", "Z" => "value(1)+one" }, variables: { "one" => 1 })
+    assert_equal(r.processed(pr).to_s, "('T',r0 100,200){X=>18,Y=>100,Z=>43}")
+
+    # replace (with 'put')
+    pr = RBA::TextPropertiesExpressions::new(r, "put('X', PropA+1); put('Y', shape.bbox.center.x); put('Z', value(1)+one)", variables: { "one" => 1 })
+    assert_equal(r.processed(pr).to_s, "('T',r0 100,200){X=>18,Y=>100,Z=>43}")
+
+    # substitutions
+    pr = RBA::TextPropertiesExpressions::new(r, { "PropA" => "0", "X" => "PropA+1", "Y" => "shape.bbox.center.x", "Z" => "value(1)+1" }, true)
+    assert_equal(r.processed(pr).to_s, "('T',r0 100,200){1=>42,PropA=>0,X=>18,Y=>100,Z=>43}")
+
+    # substitutions
+    pr = RBA::TextPropertiesExpressions::new(r, { "PropA" => "0", "X" => "PropA+1", "Y" => "shape.bbox.center.x", "Z" => "value(1)+1" }, true, dbu: 0.001)
+    assert_equal(r.processed(pr).to_s, "('T',r0 100,200){1=>42,PropA=>0,X=>18,Y=>0.1,Z=>43}")
+
+    ef = RBA::TextFilterBase::expression_filter("PropX==18")
+    assert_equal(r.filtered(ef).to_s, "")
+
+    ef = RBA::TextFilterBase::expression_filter("PropA==v17", variables: { "v17" => 17 })
+    assert_equal(r.filtered(ef).to_s, "('T',r0 100,200){1=>42,PropA=>17}")
+
+    ef = RBA::TextFilterBase::expression_filter("value(1)>=40")
+    assert_equal(r.filtered(ef).to_s, "('T',r0 100,200){1=>42,PropA=>17}")
 
   end
 

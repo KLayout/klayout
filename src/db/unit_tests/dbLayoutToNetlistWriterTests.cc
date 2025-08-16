@@ -197,15 +197,15 @@ TEST(1_WriterBasic)
 
     db::CellMapping cm = l2n.cell_mapping_into (ly2, top2, true /*with device cells*/);
 
-    std::map<unsigned int, const db::Region *> lmap;
-    lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = &rpsd;
-    lmap [ly2.insert_layer (db::LayerProperties (11, 0))] = &rnsd;
-    lmap [ly2.insert_layer (db::LayerProperties (3, 0)) ] = rpoly.get ();
-    lmap [ly2.insert_layer (db::LayerProperties (4, 0)) ] = rdiff_cont.get ();
-    lmap [ly2.insert_layer (db::LayerProperties (5, 0)) ] = rpoly_cont.get ();
-    lmap [ly2.insert_layer (db::LayerProperties (6, 0)) ] = rmetal1.get ();
-    lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = rvia1.get ();
-    lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = rmetal2.get ();
+    std::map<unsigned int, unsigned int> lmap;
+    lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = l2n.layer_of (rpsd);
+    lmap [ly2.insert_layer (db::LayerProperties (11, 0))] = l2n.layer_of (rnsd);
+    lmap [ly2.insert_layer (db::LayerProperties (3, 0)) ] = l2n.layer_of (*rpoly);
+    lmap [ly2.insert_layer (db::LayerProperties (4, 0)) ] = l2n.layer_of (*rdiff_cont);
+    lmap [ly2.insert_layer (db::LayerProperties (5, 0)) ] = l2n.layer_of (*rpoly_cont);
+    lmap [ly2.insert_layer (db::LayerProperties (6, 0)) ] = l2n.layer_of (*rmetal1);
+    lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = l2n.layer_of (*rvia1);
+    lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = l2n.layer_of (*rmetal2);
 
     l2n.build_all_nets (cm, ly2, lmap, "NET_", db::NPM_NoProperties, tl::Variant (), db::BNH_Disconnected, 0, "DEVICE_");
 
@@ -426,19 +426,19 @@ TEST(2_WriterWithGlobalNets)
 
     db::CellMapping cm = l2n.cell_mapping_into (ly2, top2, true /*with device cells*/);
 
-    std::map<unsigned int, const db::Region *> lmap;
-    lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = &rpsd;
-    lmap [ly2.insert_layer (db::LayerProperties (11, 0))] = &rnsd;
-    lmap [ly2.insert_layer (db::LayerProperties (12, 0))] = rbulk.get ();
-    lmap [ly2.insert_layer (db::LayerProperties (13, 0))] = &rptie;
-    lmap [ly2.insert_layer (db::LayerProperties (14, 0))] = &rntie;
-    lmap [ly2.insert_layer (db::LayerProperties (1, 0)) ] = rnwell.get ();
-    lmap [ly2.insert_layer (db::LayerProperties (3, 0)) ] = rpoly.get ();
-    lmap [ly2.insert_layer (db::LayerProperties (4, 0)) ] = rdiff_cont.get ();
-    lmap [ly2.insert_layer (db::LayerProperties (5, 0)) ] = rpoly_cont.get ();
-    lmap [ly2.insert_layer (db::LayerProperties (6, 0)) ] = rmetal1.get ();
-    lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = rvia1.get ();
-    lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = rmetal2.get ();
+    std::map<unsigned int, unsigned int> lmap;
+    lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = l2n.layer_of (rpsd);
+    lmap [ly2.insert_layer (db::LayerProperties (11, 0))] = l2n.layer_of (rnsd);
+    lmap [ly2.insert_layer (db::LayerProperties (12, 0))] = l2n.layer_of (*rbulk);
+    lmap [ly2.insert_layer (db::LayerProperties (13, 0))] = l2n.layer_of (rptie);
+    lmap [ly2.insert_layer (db::LayerProperties (14, 0))] = l2n.layer_of (rntie);
+    lmap [ly2.insert_layer (db::LayerProperties (1, 0)) ] = l2n.layer_of (*rnwell);
+    lmap [ly2.insert_layer (db::LayerProperties (3, 0)) ] = l2n.layer_of (*rpoly);
+    lmap [ly2.insert_layer (db::LayerProperties (4, 0)) ] = l2n.layer_of (*rdiff_cont);
+    lmap [ly2.insert_layer (db::LayerProperties (5, 0)) ] = l2n.layer_of (*rpoly_cont);
+    lmap [ly2.insert_layer (db::LayerProperties (6, 0)) ] = l2n.layer_of (*rmetal1);
+    lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = l2n.layer_of (*rvia1);
+    lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = l2n.layer_of (*rmetal2);
 
     l2n.build_all_nets (cm, ly2, lmap, "NET_", db::NPM_NoProperties, tl::Variant (), db::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_");
 

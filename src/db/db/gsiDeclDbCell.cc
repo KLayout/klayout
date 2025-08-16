@@ -22,6 +22,7 @@
 
 #include "gsiDecl.h"
 #include "gsiDeclDbMetaInfo.h"
+#include "gsiEnums.h"
 
 #include "gsiDeclDbHelpers.h"
 #include "dbLayout.h"
@@ -448,7 +449,7 @@ struct cell_inst_array_defs
 
   static size_t hash_value (const C *i)
   {
-    return std::hfunc (*i);
+    return tl::hfunc (*i);
   }
 
   static bool less (const C *i, const C &other)
@@ -1073,6 +1074,16 @@ static void set_cell_property (db::Cell *c, const tl::Variant &key, const tl::Va
   props.erase (key);
   props.insert (key, value);
   c->prop_id (db::properties_id (props));
+}
+
+static void set_cell_properties (db::Cell *c, const std::map<tl::Variant, tl::Variant> &dict)
+{
+  c->prop_id (db::properties_id (dict));
+}
+
+static void clear_cell_properties (db::Cell *c)
+{
+  c->prop_id (0);
 }
 
 static tl::Variant get_cell_property (const db::Cell *c, const tl::Variant &key)
@@ -1830,6 +1841,22 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This method has been introduced in version 0.23."
   ) + 
+  gsi::method_ext ("set_properties", &set_cell_properties, gsi::arg ("dict"),
+    "@brief Sets all user properties from the given dict\n"
+    "This method is a convenience method that replaces all user properties of the cell. Using that method is more "
+    "convenient than creating a new property set with a new ID and assigning that properties ID.\n"
+    "This method may change the properties ID. "
+    "Note: GDS only supports integer keys. OASIS supports numeric and string keys. "
+    "\n"
+    "This method has been introduced in version 0.30.3."
+  ) +
+  gsi::method_ext ("clear_properties", &clear_cell_properties,
+    "@brief Clears all user properties\n"
+    "This method will remove all user properties. After it has been called, \\has_prop_id? will return false.\n"
+    "It is equivalent to setting the properties ID to zero.\n"
+    "\n"
+    "This method has been introduced in version 0.30.3."
+  ) +
   gsi::method_ext ("property", &get_cell_property, gsi::arg ("key"),
     "@brief Gets the user property with the given key\n"
     "This method is a convenience method that gets the property with the given key. "
@@ -3538,6 +3565,18 @@ static void set_property (db::Instance *i, const tl::Variant &key, const tl::Var
   set_prop_id (i, db::properties_id (props));
 }
 
+static void set_properties (db::Instance *inst, const std::map<tl::Variant, tl::Variant> &dict)
+{
+  set_prop_id (inst, db::properties_id (dict));
+}
+
+static void clear_properties (db::Instance *inst)
+{
+  tl_assert (inst->instances () != 0);
+  check_is_editable (inst->instances ());
+  *inst = inst->instances ()->clear_properties (*inst);
+}
+
 static tl::Variant get_property (const db::Instance *i, const tl::Variant &key)
 {
   db::properties_id_type id = i->prop_id ();
@@ -4018,6 +4057,25 @@ Class<db::Instance> decl_Instance ("db", "Instance",
     "\n"
     "This method has been introduced in version 0.22."
   ) + 
+  gsi::method_ext ("set_properties", &set_properties, gsi::arg ("dict"),
+    "@brief Sets all user properties from the given dict\n"
+    "This method is a convenience method that replaces all user properties of the instance. Using that method is more "
+    "convenient than creating a new property set with a new ID and assigning that properties ID.\n"
+    "This method may change the properties ID. "
+    "Note: GDS only supports integer keys. OASIS supports numeric and string keys. "
+    "Calling this method may invalidate any iterators. It should not be called inside a "
+    "loop iterating over instances.\n"
+    "\n"
+    "This method has been introduced in version 0.30.3."
+  ) +
+  gsi::method_ext ("clear_properties", &clear_properties,
+    "@brief Clears all user properties\n"
+    "This method will remove all user properties. After it has been called, \\has_prop_id? will return false.\n"
+    "Calling this method may invalidate any iterators. It should not be called inside a "
+    "loop iterating over instances.\n"
+    "\n"
+    "This method has been introduced in version 0.30.3."
+  ) +
   gsi::method_ext ("property", &get_property, gsi::arg ("key"),
     "@brief Gets the user property with the given key\n"
     "This method is a convenience method that gets the property with the given key. "
@@ -4653,6 +4711,40 @@ Class<db::DCellInstArray> decl_DCellInstArray ("db", "DCellInstArray",
   "This object is identical to \\CellInstArray, except that it holds coordinates in micron units instead of database units.\n"
   "\n"
   "This class has been introduced in version 0.25."
+);
+
+gsi::Enum<db::ReducerType> decl_VariantType ("db", "VariantType",
+  gsi::enum_const ("NoVariants", db::NoReducer,
+    "@brief No variants needed."
+  ) +
+  gsi::enum_const ("Orientation", db::Orientation,
+    "@brief Orientation variants needed.\n"
+    "For example, the edge orientation selection operation needs this variant type."
+  ) +
+  gsi::enum_const ("Orthogonal", db::Orthogonal,
+    "@brief Orthogonal transformations (rotations by multiples of 90 degree) need variants.\n"
+    "For example, the diagonal edge selection operation needs this variant type."
+  ) +
+  gsi::enum_const ("Magnification", db::Magnification,
+    "@brief Scaling variants needed.\n"
+    "For example, distance measurements or the isotropic sizing operations needs this variant type."
+  ) +
+  gsi::enum_const ("XYAnisotropyAndMagnification", db::XYAnisotropyAndMagnification,
+    "@brief Scaling and anisotropy variants needed.\n"
+    "For example, the anisotropic sizing operation needs this variant type."
+  ) +
+  gsi::enum_const ("MagnificationAndOrientation", db::MagnificationAndOrientation,
+    "@brief Scaling and orientation variants needed.\n"
+    "For example, the 'move' operation needs this variant type."
+  ),
+  "@brief This class represents the cell variant type for various methods.\n"
+  "\n"
+  "Cell variants are needed in hierarchical applications, when operations are to be "
+  "performed on cell level, but the operations are not transformation invariant.\n"
+  "In that case, a variant type needs to be specified in order to make the algorithm "
+  "separate the cells by their absolute orientation or by their accumulated magnification.\n"
+  "\n"
+  "This enum has been introduced in version 0.30.2."
 );
 
 }

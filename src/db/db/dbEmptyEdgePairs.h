@@ -56,6 +56,7 @@ public:
 
   virtual EdgePairsDelegate *filter_in_place (const EdgePairFilterBase &) { return this; }
   virtual EdgePairsDelegate *filtered (const EdgePairFilterBase &) const { return new EmptyEdgePairs (); }
+  virtual std::pair<EdgePairsDelegate *, EdgePairsDelegate *> filtered_pair (const EdgePairFilterBase &) const { return std::make_pair (new EmptyEdgePairs (), new EmptyEdgePairs ()); }
   virtual EdgePairsDelegate *process_in_place (const EdgePairProcessorBase &) { return this; }
   virtual EdgePairsDelegate *processed (const EdgePairProcessorBase &) const { return new EmptyEdgePairs (); }
   virtual RegionDelegate *processed_to_polygons (const EdgePairToPolygonProcessorBase &filter) const;
@@ -88,6 +89,7 @@ public:
   virtual EdgePairsDelegate *in (const EdgePairs &, bool) const { return new EmptyEdgePairs (); }
 
   virtual const db::EdgePair *nth (size_t) const { tl_assert (false); }
+  virtual db::properties_id_type nth_prop_id (size_t) const { tl_assert (false); }
   virtual bool has_valid_edge_pairs () const { return true; }
 
   virtual const db::RecursiveShapeIterator *iter () const { return 0; }

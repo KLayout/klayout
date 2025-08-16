@@ -952,9 +952,11 @@ VariantUserClassImpl::execute_gsi (const tl::ExpressionParserContext & /*context
           const tl::Variant *arg = i >= int (args.size ()) ? get_kwarg (*a, kwargs) : &args[i];
           if (! arg) {
             is_valid = a->spec ()->has_default ();
-          } else if (gsi::test_arg (*a, *arg, false /*strict*/)) {
+          } else if (gsi::test_arg (*a, *arg, false /*strict*/, false /*no object substitution*/)) {
+            sc += 100;
+          } else if (gsi::test_arg (*a, *arg, true /*loose*/, false /*no object substitution*/)) {
             ++sc;
-          } else if (test_arg (*a, *arg, true /*loose*/)) {
+          } else if (gsi::test_arg (*a, *arg, true /*loose*/, true /*with object substitution*/)) {
             //  non-scoring match
           } else {
             is_valid = false;

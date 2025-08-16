@@ -181,11 +181,17 @@ OriginalLayerEdgePairs::begin_iter () const
 bool
 OriginalLayerEdgePairs::empty () const
 {
-  return m_iter.at_end ();
+  return m_iter.at_end_no_lock ();
 }
 
 const db::EdgePair *
 OriginalLayerEdgePairs::nth (size_t) const
+{
+  throw tl::Exception (tl::to_string (tr ("Random access to edge pairs is available only for flat collections")));
+}
+
+db::properties_id_type
+OriginalLayerEdgePairs::nth_prop_id (size_t) const
 {
   throw tl::Exception (tl::to_string (tr ("Random access to edge pairs is available only for flat collections")));
 }

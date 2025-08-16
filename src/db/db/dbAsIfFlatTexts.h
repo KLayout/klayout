@@ -54,6 +54,7 @@ public:
   }
 
   virtual TextsDelegate *filtered (const TextFilterBase &) const;
+  virtual std::pair<TextsDelegate *, TextsDelegate *> filtered_pair (const TextFilterBase &filter) const;
 
   virtual TextsDelegate *process_in_place (const TextProcessorBase &proc)
   {
@@ -70,7 +71,7 @@ public:
 
   virtual TextsDelegate *add (const Texts &other) const;
 
-  virtual RegionDelegate *polygons (db::Coord e) const;
+  virtual RegionDelegate *polygons (db::Coord e, const tl::Variant &text_prop) const;
   virtual EdgesDelegate *edges () const;
 
   virtual TextsDelegate *in (const Texts &, bool) const;

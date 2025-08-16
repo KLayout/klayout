@@ -34,6 +34,12 @@
 
 // -----------------------------------------------------------------------
 // class QXmlStreamNamespaceDeclaration
+  static bool QXmlStreamNamespaceDeclaration_operator_eq(const QXmlStreamNamespaceDeclaration *a, const QXmlStreamNamespaceDeclaration &b) {
+    return *a == b;
+  }
+  static bool QXmlStreamNamespaceDeclaration_operator_ne(const QXmlStreamNamespaceDeclaration *a, const QXmlStreamNamespaceDeclaration &b) {
+    return !(*a == b);
+  }
 
 //  Constructor QXmlStreamNamespaceDeclaration::QXmlStreamNamespaceDeclaration()
 
@@ -72,44 +78,6 @@ static void _call_ctor_QXmlStreamNamespaceDeclaration_3942 (const qt_gsi::Generi
 }
 
 
-// bool QXmlStreamNamespaceDeclaration::operator!=(const QXmlStreamNamespaceDeclaration &other)
-
-
-static void _init_f_operator_excl__eq__c4354 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("other");
-  decl->add_arg<const QXmlStreamNamespaceDeclaration & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_excl__eq__c4354 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QXmlStreamNamespaceDeclaration &arg1 = gsi::arg_reader<const QXmlStreamNamespaceDeclaration & >() (args, heap);
-  ret.write<bool > ((bool)((QXmlStreamNamespaceDeclaration *)cls)->operator!= (arg1));
-}
-
-
-// bool QXmlStreamNamespaceDeclaration::operator==(const QXmlStreamNamespaceDeclaration &other)
-
-
-static void _init_f_operator_eq__eq__c4354 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("other");
-  decl->add_arg<const QXmlStreamNamespaceDeclaration & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_eq__eq__c4354 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QXmlStreamNamespaceDeclaration &arg1 = gsi::arg_reader<const QXmlStreamNamespaceDeclaration & >() (args, heap);
-  ret.write<bool > ((bool)((QXmlStreamNamespaceDeclaration *)cls)->operator== (arg1));
-}
-
-
 
 namespace gsi
 {
@@ -118,12 +86,13 @@ static gsi::Methods methods_QXmlStreamNamespaceDeclaration () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QXmlStreamNamespaceDeclaration::QXmlStreamNamespaceDeclaration()\nThis method creates an object of class QXmlStreamNamespaceDeclaration.", &_init_ctor_QXmlStreamNamespaceDeclaration_0, &_call_ctor_QXmlStreamNamespaceDeclaration_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QXmlStreamNamespaceDeclaration::QXmlStreamNamespaceDeclaration(const QString &prefix, const QString &namespaceUri)\nThis method creates an object of class QXmlStreamNamespaceDeclaration.", &_init_ctor_QXmlStreamNamespaceDeclaration_3942, &_call_ctor_QXmlStreamNamespaceDeclaration_3942);
-  methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QXmlStreamNamespaceDeclaration::operator!=(const QXmlStreamNamespaceDeclaration &other)\n", true, &_init_f_operator_excl__eq__c4354, &_call_f_operator_excl__eq__c4354);
-  methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QXmlStreamNamespaceDeclaration::operator==(const QXmlStreamNamespaceDeclaration &other)\n", true, &_init_f_operator_eq__eq__c4354, &_call_f_operator_eq__eq__c4354);
   return methods;
 }
 
 gsi::Class<QXmlStreamNamespaceDeclaration> decl_QXmlStreamNamespaceDeclaration ("QtCore", "QXmlStreamNamespaceDeclaration",
+  gsi::method_ext("==", &QXmlStreamNamespaceDeclaration_operator_eq, gsi::arg ("other"), "@brief Method bool QXmlStreamNamespaceDeclaration::operator==(const QXmlStreamNamespaceDeclaration &) const") +
+  gsi::method_ext("!=", &QXmlStreamNamespaceDeclaration_operator_ne, gsi::arg ("other"), "@brief Method bool QXmlStreamNamespaceDeclaration::operator!=(const QXmlStreamNamespaceDeclaration &) const") 
++
   methods_QXmlStreamNamespaceDeclaration (),
   "@qt\n@brief Binding of QXmlStreamNamespaceDeclaration");
 

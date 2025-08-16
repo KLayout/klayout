@@ -185,34 +185,6 @@ EdgeSegmentSelector::~EdgeSegmentSelector ()
 { }
 
 void
-EdgeSegmentSelector::process (const db::Edge &edge, std::vector<db::Edge> &res) const
-{
-  double l = std::max (edge.double_length () * m_fraction, double (m_length));
-
-  db::DVector ds;
-  if (! edge.is_degenerate ()) {
-    ds = db::DVector (edge.d ()) * (l / edge.double_length ());
-  }
-
-  if (m_mode < 0) {
-
-    res.push_back (db::Edge (edge.p1 (), db::Point (db::DPoint (edge.p1 ()) + ds)));
-
-  } else if (m_mode > 0) {
-
-    res.push_back (db::Edge (db::Point (db::DPoint (edge.p2 ()) - ds), edge.p2 ()));
-
-  } else {
-
-    db::DVector dl = ds * 0.5;
-    db::DPoint center = db::DPoint (edge.p1 ()) + db::DVector (edge.p2 () - edge.p1 ()) * 0.5;
-
-    res.push_back (db::Edge (db::Point (center - dl), db::Point (center + dl)));
-
-  }
-}
-
-void
 EdgeSegmentSelector::process (const db::EdgeWithProperties &edge, std::vector<db::EdgeWithProperties> &res) const
 {
   double l = std::max (edge.double_length () * m_fraction, double (m_length));
@@ -250,8 +222,8 @@ EdgeAngleChecker::EdgeAngleChecker (double angle_start, bool include_angle_start
     include_angle_start = true;
   }
 
-  m_t_start = db::CplxTrans(1.0, angle_start, false, db::DVector ());
-  m_t_end = db::CplxTrans(1.0, angle_end, false, db::DVector ());
+  m_t_start = db::ICplxTrans (1.0, angle_start, false, db::Vector ());
+  m_t_end = db::ICplxTrans (1.0, angle_end, false, db::Vector ());
 
   m_include_start = include_angle_start;
   m_include_end = include_angle_end;
@@ -266,10 +238,10 @@ EdgeAngleChecker::EdgeAngleChecker (double angle_start, bool include_angle_start
 bool
 EdgeAngleChecker::check (const db::Vector &a, const db::Vector &b) const
 {
-  db::DVector vout (b);
+  db::Vector vout (b);
 
-  db::DVector v1 = m_t_start * a;
-  db::DVector v2 = m_t_end * a;
+  db::Vector v1 = m_t_start * a;
+  db::Vector v2 = m_t_end * a;
 
   int vps1 = db::vprod_sign (v1, vout);
   int vps2 = db::vprod_sign (v2, vout);
@@ -304,14 +276,16 @@ EdgeOrientationFilter::EdgeOrientationFilter (double a, bool inverse, bool absol
 }
 
 bool
-EdgeOrientationFilter::selected (const db::Edge &edge) const
+EdgeOrientationFilter::selected (const db::Edge &edge, db::properties_id_type) const
 {
+  db::Vector en = db::Vector (std::max (edge.dx_abs (), edge.dy_abs ()), 0);
+
   //  NOTE: this edge normalization confines the angle to a range between (-90 .. 90] (-90 excluded).
   //  A horizontal edge has 0 degree, a vertical one has 90 degree.
   if (edge.dx () < 0 || (edge.dx () == 0 && edge.dy () < 0)) {
-    return m_checker (db::Vector (edge.ortho_length (), 0), -edge.d ());
+    return m_checker (en, -edge.d ());
   } else {
-    return m_checker (db::Vector (edge.ortho_length (), 0), edge.d ());
+    return m_checker (en, edge.d ());
   }
 }
 
@@ -342,7 +316,7 @@ static EdgeAngleChecker s_orthodiagonal_checkers [] = {
 };
 
 bool
-SpecialEdgeOrientationFilter::selected (const db::Edge &edge) const
+SpecialEdgeOrientationFilter::selected (const db::Edge &edge, properties_id_type) const
 {
   const EdgeAngleChecker *eb, *ee;
 
@@ -363,7 +337,7 @@ SpecialEdgeOrientationFilter::selected (const db::Edge &edge) const
   }
 
   db::Vector en, ev;
-  en = db::Vector (edge.ortho_length (), 0);
+  en = db::Vector (std::max (edge.dx_abs (), edge.dy_abs ()), 0);
 
   //  NOTE: this edge normalization confines the angle to a range between (-90 .. 90] (-90 excluded).
   //  A horizontal edge has 0 degree, a vertical one has 90 degree.

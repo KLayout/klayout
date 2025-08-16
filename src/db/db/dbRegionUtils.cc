@@ -48,29 +48,29 @@ bool RegionPerimeterFilter::check (perimeter_type p) const
   }
 }
 
-bool RegionPerimeterFilter::selected (const db::Polygon &poly) const
+bool RegionPerimeterFilter::selected (const db::Polygon &poly, db::properties_id_type) const
 {
   return check (poly.perimeter ());
 }
 
-bool RegionPerimeterFilter::selected (const db::PolygonRef &poly) const
+bool RegionPerimeterFilter::selected (const db::PolygonRef &poly, db::properties_id_type) const
 {
   return check (poly.perimeter ());
 }
 
-bool RegionPerimeterFilter::selected_set (const std::unordered_set<db::Polygon> &poly) const
+bool RegionPerimeterFilter::selected_set (const std::unordered_set<db::PolygonWithProperties> &poly) const
 {
   perimeter_type ps = 0;
-  for (std::unordered_set<db::Polygon>::const_iterator p = poly.begin (); p != poly.end (); ++p) {
+  for (std::unordered_set<db::PolygonWithProperties>::const_iterator p = poly.begin (); p != poly.end (); ++p) {
     ps += p->perimeter ();
   }
   return check (ps);
 }
 
-bool RegionPerimeterFilter::selected_set (const std::unordered_set<db::PolygonRef> &poly) const
+bool RegionPerimeterFilter::selected_set (const std::unordered_set<PolygonRefWithProperties> &poly) const
 {
   perimeter_type ps = 0;
-  for (std::unordered_set<db::PolygonRef>::const_iterator p = poly.begin (); p != poly.end (); ++p) {
+  for (std::unordered_set<db::PolygonRefWithProperties>::const_iterator p = poly.begin (); p != poly.end (); ++p) {
     ps += p->perimeter ();
   }
   return check (ps);
@@ -99,29 +99,29 @@ bool RegionAreaFilter::check (area_type a) const
   }
 }
 
-bool RegionAreaFilter::selected (const db::Polygon &poly) const
+bool RegionAreaFilter::selected (const db::Polygon &poly, db::properties_id_type) const
 {
   return check (poly.area ());
 }
 
-bool RegionAreaFilter::selected (const db::PolygonRef &poly) const
+bool RegionAreaFilter::selected (const db::PolygonRef &poly, properties_id_type) const
 {
   return check (poly.area ());
 }
 
-bool RegionAreaFilter::selected_set (const std::unordered_set<db::Polygon> &poly) const
+bool RegionAreaFilter::selected_set (const std::unordered_set<db::PolygonWithProperties> &poly) const
 {
   area_type as = 0;
-  for (std::unordered_set<db::Polygon>::const_iterator p = poly.begin (); p != poly.end (); ++p) {
+  for (std::unordered_set<db::PolygonWithProperties>::const_iterator p = poly.begin (); p != poly.end (); ++p) {
     as += p->area ();
   }
   return check (as);
 }
 
-bool RegionAreaFilter::selected_set (const std::unordered_set<db::PolygonRef> &poly) const
+bool RegionAreaFilter::selected_set (const std::unordered_set<db::PolygonRefWithProperties> &poly) const
 {
   area_type as = 0;
-  for (std::unordered_set<db::PolygonRef>::const_iterator p = poly.begin (); p != poly.end (); ++p) {
+  for (std::unordered_set<db::PolygonRefWithProperties>::const_iterator p = poly.begin (); p != poly.end (); ++p) {
     as += p->area ();
   }
   return check (as);
@@ -143,13 +143,13 @@ RectilinearFilter::RectilinearFilter (bool inverse)
 }
 
 bool
-RectilinearFilter::selected (const db::Polygon &poly) const
+RectilinearFilter::selected (const db::Polygon &poly, db::properties_id_type) const
 {
   return poly.is_rectilinear () != m_inverse;
 }
 
 bool
-RectilinearFilter::selected (const db::PolygonRef &poly) const
+RectilinearFilter::selected (const db::PolygonRef &poly, db::properties_id_type) const
 {
   return poly.is_rectilinear () != m_inverse;
 }
@@ -170,14 +170,14 @@ HoleCountFilter::HoleCountFilter (size_t min_count, size_t max_count, bool inver
 }
 
 bool
-HoleCountFilter::selected (const db::Polygon &poly) const
+HoleCountFilter::selected (const db::Polygon &poly, db::properties_id_type) const
 {
   bool ok = poly.holes () < m_max_count && poly.holes () >= m_min_count;
   return ok != m_inverse;
 }
 
 bool
-HoleCountFilter::selected (const db::PolygonRef &poly) const
+HoleCountFilter::selected (const db::PolygonRef &poly, properties_id_type) const
 {
   bool ok = poly.obj ().holes () < m_max_count && poly.obj ().holes () >= m_min_count;
   return ok != m_inverse;
@@ -198,7 +198,7 @@ RectangleFilter::RectangleFilter (bool is_square, bool inverse)
 }
 
 bool
-RectangleFilter::selected (const db::Polygon &poly) const
+RectangleFilter::selected (const db::Polygon &poly, properties_id_type) const
 {
   bool ok = poly.is_box ();
   if (ok && m_is_square) {
@@ -209,7 +209,7 @@ RectangleFilter::selected (const db::Polygon &poly) const
 }
 
 bool
-RectangleFilter::selected (const db::PolygonRef &poly) const
+RectangleFilter::selected (const db::PolygonRef &poly, properties_id_type) const
 {
   bool ok = poly.is_box ();
   if (ok && m_is_square) {
@@ -256,13 +256,13 @@ RegionBBoxFilter::check (const db::Box &box) const
 }
 
 bool
-RegionBBoxFilter::selected (const db::Polygon &poly) const
+RegionBBoxFilter::selected (const db::Polygon &poly, properties_id_type) const
 {
   return check (poly.box ());
 }
 
 bool
-RegionBBoxFilter::selected (const db::PolygonRef &poly) const
+RegionBBoxFilter::selected (const db::PolygonRef &poly, properties_id_type) const
 {
   return check (poly.box ());
 }
@@ -322,7 +322,7 @@ static double compute_ratio_parameter (const P &poly, RegionRatioFilter::paramet
   return v;
 }
 
-bool RegionRatioFilter::selected (const db::Polygon &poly) const
+bool RegionRatioFilter::selected (const db::Polygon &poly, properties_id_type) const
 {
   double v = compute_ratio_parameter (poly, m_parameter);
 
@@ -330,7 +330,7 @@ bool RegionRatioFilter::selected (const db::Polygon &poly) const
   return ok != m_inverse;
 }
 
-bool RegionRatioFilter::selected (const db::PolygonRef &poly) const
+bool RegionRatioFilter::selected (const db::PolygonRef &poly, properties_id_type) const
 {
   double v = compute_ratio_parameter (poly, m_parameter);
 
@@ -353,23 +353,6 @@ const TransformationReducer *RegionRatioFilter::vars () const
 SinglePolygonCheck::SinglePolygonCheck (db::edge_relation_type rel, db::Coord d, const RegionCheckOptions &options)
   : m_relation (rel), m_d (d), m_options (options)
 { }
-
-void
-SinglePolygonCheck::process (const db::Polygon &polygon, std::vector<db::EdgePair> &res) const
-{
-  std::unordered_set<db::EdgePair> result;
-
-  EdgeRelationFilter check (m_relation, m_d, m_options);
-
-  edge2edge_check_negative_or_positive <std::unordered_set<db::EdgePair> > edge_check (check, result, m_options.negative, false /*=same polygons*/, false /*=same layers*/, m_options.shielded, true /*=symmetric*/);
-  poly2poly_check<db::Polygon> poly_check (edge_check);
-
-  do {
-    poly_check.single (polygon, 0);
-  } while (edge_check.prepare_next_pass ());
-
-  res.insert (res.end (), result.begin (), result.end ());
-}
 
 void
 SinglePolygonCheck::process (const db::PolygonWithProperties &polygon, std::vector<db::EdgePairWithProperties> &res) const
@@ -413,19 +396,6 @@ StrangePolygonCheckProcessor::StrangePolygonCheckProcessor () { }
 StrangePolygonCheckProcessor::~StrangePolygonCheckProcessor () { }
 
 void
-StrangePolygonCheckProcessor::process (const db::Polygon &poly, std::vector<db::Polygon> &res) const
-{
-  EdgeProcessor ep;
-  ep.insert (poly);
-
-  StrangePolygonInsideFunc inside;
-  db::GenericMerge<StrangePolygonInsideFunc> op (inside);
-  db::PolygonContainer pc (res, false);
-  db::PolygonGenerator pg (pc, false, false);
-  ep.process (pg, op);
-}
-
-void
 StrangePolygonCheckProcessor::process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &res) const
 {
   EdgeProcessor ep;
@@ -446,12 +416,6 @@ SmoothingProcessor::SmoothingProcessor (db::Coord d, bool keep_hv) : m_d (d), m_
 SmoothingProcessor::~SmoothingProcessor () { }
 
 void
-SmoothingProcessor::process (const db::Polygon &poly, std::vector<db::Polygon> &res) const
-{
-  res.push_back (db::smooth (poly, m_d, m_keep_hv));
-}
-
-void
 SmoothingProcessor::process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &res) const
 {
   res.push_back (db::PolygonWithProperties (db::smooth (poly, m_d, m_keep_hv), poly.properties_id ()));
@@ -468,12 +432,6 @@ RoundedCornersProcessor::~RoundedCornersProcessor ()
 { }
 
 void
-RoundedCornersProcessor::process (const db::Polygon &poly, std::vector<db::Polygon> &res) const
-{
-  res.push_back (db::compute_rounded (poly, m_rinner, m_router, m_n));
-}
-
-void
 RoundedCornersProcessor::process (const db::PolygonWithProperties &poly, std::vector<db::PolygonWithProperties> &res) const
 {
   res.push_back (db::PolygonWithProperties (db::compute_rounded (poly, m_rinner, m_router, m_n), poly.properties_id ()));
@@ -488,15 +446,6 @@ HolesExtractionProcessor::HolesExtractionProcessor ()
 
 HolesExtractionProcessor::~HolesExtractionProcessor ()
 {
-}
-
-void
-HolesExtractionProcessor::process (const db::Polygon &poly, std::vector<db::Polygon> &res) const
-{
-  for (size_t i = 0; i < poly.holes (); ++i) {
-    res.push_back (db::Polygon ());
-    res.back ().assign_hull (poly.begin_hole ((unsigned int) i), poly.end_hole ((unsigned int) i));
-  }
 }
 
 void
@@ -518,13 +467,6 @@ HullExtractionProcessor::HullExtractionProcessor ()
 
 HullExtractionProcessor::~HullExtractionProcessor ()
 {
-}
-
-void
-HullExtractionProcessor::process (const db::Polygon &poly, std::vector<db::Polygon> &res) const
-{
-  res.push_back (db::Polygon ());
-  res.back ().assign_hull (poly.begin_hull (), poly.end_hull ());
 }
 
 void

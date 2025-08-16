@@ -169,7 +169,7 @@ struct text_defs
 
   static size_t hash_value (const C *box)
   {
-    return std::hfunc (*box);
+    return tl::hfunc (*box);
   }
 
   static gsi::Methods methods ()
@@ -454,10 +454,18 @@ static db::TextWithProperties *new_text_with_properties (const db::Text &text, d
   return new db::TextWithProperties (text, pid);
 }
 
+static db::TextWithProperties *new_text_with_properties2 (const db::Text &text, const std::map<tl::Variant, tl::Variant> &properties)
+{
+  return new db::TextWithProperties (text, db::properties_id (db::PropertiesSet (properties.begin (), properties.end ())));
+}
+
 Class<db::TextWithProperties> decl_TextWithProperties (decl_Text, "db", "TextWithProperties",
   gsi::properties_support_methods<db::TextWithProperties> () +
   constructor ("new", &new_text_with_properties, gsi::arg ("text"), gsi::arg ("properties_id", db::properties_id_type (0)),
     "@brief Creates a new object from a property-less object and a properties ID."
+  ) +
+  constructor ("new", &new_text_with_properties2, gsi::arg ("text"), gsi::arg ("properties"),
+    "@brief Creates a new object from a property-less object and a properties hash."
   )
   ,
   "@brief A Text object with properties attached.\n"
@@ -522,10 +530,18 @@ static db::DTextWithProperties *new_dtext_with_properties (const db::DText &text
   return new db::DTextWithProperties (text, pid);
 }
 
+static db::DTextWithProperties *new_dtext_with_properties2 (const db::DText &text, const std::map<tl::Variant, tl::Variant> &properties)
+{
+  return new db::DTextWithProperties (text, db::properties_id (db::PropertiesSet (properties.begin (), properties.end ())));
+}
+
 Class<db::DTextWithProperties> decl_DTextWithProperties (decl_DText, "db", "DTextWithProperties",
   gsi::properties_support_methods<db::DTextWithProperties> () +
   constructor ("new", &new_dtext_with_properties, gsi::arg ("text"), gsi::arg ("properties_id", db::properties_id_type (0)),
     "@brief Creates a new object from a property-less object and a properties ID."
+  ) +
+  constructor ("new", &new_dtext_with_properties2, gsi::arg ("text"), gsi::arg ("properties"),
+    "@brief Creates a new object from a property-less object and a properties hash."
   )
   ,
   "@brief A DText object with properties attached.\n"

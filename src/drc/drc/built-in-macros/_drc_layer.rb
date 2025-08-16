@@ -4624,6 +4624,8 @@ TP_SCRIPT
         res
       end
 
+      tp._destroy
+
       DRCLayer::new(@engine, res)
 
     end
@@ -5101,18 +5103,18 @@ CODE
     # Like \merged, but modifies the input and returns a reference to the 
     # new layer.
     
-    def merged(*args)
+    def merged(overlap_count = 1)
       @engine._context("merged") do
         requires_edges_or_region
-        aa = args.collect { |a| @engine._prep_value(a) }
+        aa = [ @engine._prep_value(overlap_count) ]
         DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :merged, *aa))
       end
     end
     
-    def merge(*args)
+    def merge(overlap_count = 1)
       @engine._context("merge") do
         requires_edges_or_region
-        aa = args.collect { |a| @engine._prep_value(a) }
+        aa = [ @engine._prep_value(overlap_count) ]
         if @engine.is_tiled?
           # in tiled mode, no modifying versions are available
           self.data = @engine._tcmd(self.data, 0, self.data.class, :merged, *aa)
@@ -5120,6 +5122,343 @@ CODE
           @engine._tcmd(self.data, 0, self.data.class, :merge, *aa)
         end
         self
+      end
+    end
+    
+    # %DRC%
+    # @name merged_props
+    # @brief Merges and joins properties of the shapes
+    # @synopsis layer.merged_props([overlap_count])
+    #
+    # Returns the merged input. Unlike the plain \merged method, this version
+    # will join properties on merged shapes. Properties with the same name
+    # will be merged by computing the maximum value of the parts.
+    #
+    # For example:
+    # Properties @tt { "A" => 17, "C" => 2.5 } @/tt merged with @tt { "A" => 1, "B" => "a text" } @/tt will give 
+    # @tt { "A" => 17, "B" => "a text", "C" => 2.5 } @/tt.
+    #
+    # The plain \merged method will treat shapes with different properties as
+    # separate entities and will not merge them.
+    #
+    # Currently, this method is available for polygon layers only.
+    
+    # %DRC%
+    # @name merge_props
+    # @brief Merges the layer and joins the properties (modifies the layer)
+    # @synopsis layer.merge_props([overlap_count])
+    #
+    # Like \merged_props, but modifies the input and returns a reference to the 
+    # new layer.
+    
+    def merged_props(overlap_count = 1)
+      @engine._context("merged_props") do
+        requires_region
+        aa = [ self.data.min_coherence, @engine._prep_value(overlap_count), true ]
+        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :merged, *aa))
+      end
+    end
+    
+    def merge_props(overlap_count = 1)
+      @engine._context("merge_props") do
+        requires_region
+        aa = [ self.data.min_coherence, @engine._prep_value(overlap_count), true ]
+        if @engine.is_tiled?
+          # in tiled mode, no modifying versions are available
+          self.data = @engine._tcmd(self.data, 0, self.data.class, :merged, *aa)
+        else
+          @engine._tcmd(self.data, 0, self.data.class, :merge, *aa)
+        end
+        self
+      end
+    end
+    
+    # %DRC%
+    # @name evaluate
+    # @brief Evaluates expressions on the shapes of the layer
+    # @synopsis layer.evaluate(expression [, variables [, keep_properties ]])
+    #
+    # Evaluates the given expression on the shapes of the layer.
+    # The expression needs to be written in the KLayout expressions
+    # notation.
+    #
+    # The expressions can place properties on the shapes using the 
+    # "put" function. As input, the expressions will receive the
+    # (merged) shapes in micrometer units (e.g. RBA::DPolygon type) 
+    # by calling the "shape" function. 
+    # 
+    # By default, input shapes are copied to the output with the properties
+    # attached to them by "put". You can skip shapes by calling "skip" with
+    # a 'true' value. In that case, the shape is not copied. This allows 
+    # implementing filters.
+    #
+    # Available functions for the expressions are:
+    # 
+    # @ul
+    # @li "put(name, value)": creates a property with the given name and value @/li
+    # @li "skip(flag)": if called with a 'true' value, the shape will be dropped from the output @/li
+    # @li "shape": the current shape in micrometer units @/li
+    # @li "value(name)": the value of a property with name 'name' or nil if the current shape does not have a property with this name @/li
+    # @/ul
+    #
+    # Properties with well-formed names (e.g. "VALUE") are available as
+    # variables in the expressions as a shortcut.
+    #
+    # 'variables' is a hash of arbitrary names and values. Each of these values
+    # becomes available as a variable in the expression. This eliminates the need
+    # to build expression strings with pasted value strings for passing external values.
+    #
+    # If 'keep_properties' is true, the existing properties of the shape will be kept.
+    # Otherwise (the default), existing properties will be removed before adding new
+    # ones with 'put'.
+    #
+    # The following example computes the area of the shapes and puts them
+    # into a property 'area':
+    #
+    # @code
+    # layer.evaluate(scales("put('area', shape.area)"))
+    # @/code
+    #
+    # NOTE: GDS does not support properties with string names, so 
+    # either save to OASIS or use integer numbers for the property names.
+    #
+    # The expressions require a hint
+    # whether they make use of anisotropic or scale-dependent properties.
+    # For example, the height of a box is an anisotropic property. If a check is made
+    # inside a rotated cell, the height transforms to a width and the check renders 
+    # different results for the same cell, if the cell is placed rotated and non-rotated.
+    # The solution is cell variant formation which happens automatically when the
+    # "aniso" hint is present.
+    # 
+    # Similarly, if a check is made against physical dimensions, the check will have
+    # different results for cells placed with different magnifications. Such a check
+    # is not scale-invariant and needs to get a "scaled" hint.
+    #
+    # By default it is assumed that the expressions are isotropic and scale invariant.
+    # You can mark an expression as anisotropic and/or scale dependent using the following
+    # expression modifiers:
+    #
+    # @code
+    # # isotropic and scale invariant
+    # layer.evaluate("put('holes', shape.holes)")
+    #
+    # # anisotropic, but scale invariant
+    # layer.evaluate(aniso("put('aspect_ratio', shape.bbox.height/shape.bbox.width)"))
+    #
+    # # isotropic, but not scale invariant
+    # layer.evaluate(scales("put('area', shape.area)"))
+    #
+    # # anisotropic and not scale invariant
+    # layer.evaluate(aniso_and_scales("put('width', shape.bbox.width)"))
+    # @/code
+    #
+    # If you forget to specify this hint, the expression will use the local 
+    # shape properties and fail to correctly produce the results in the presence
+    # of deep mode and rotated or magnified cell instances.
+    #
+    # The "evaluate" method modifies the input layer. A version that returns
+    # a new layer without modifying the input is \evaluated.
+    
+    # %DRC%
+    # @name evaluated
+    # @brief Evaluates expressions on the shapes of the layer and returns a new layer
+    # @synopsis layer.evaluated(expression [, variables [, keep_properties]])
+    # 
+    # This method is the out-of-place version of \evaluate. It takes the same 
+    # arguments.
+
+    def _make_proc(expression, variables, keep_properties)
+
+      if expression.is_a?(String)
+        expression = DRCTransformationVariantHint::new(expression)
+      elsif expression.is_a?(DRCTransformationVariantHint)
+        expression.expression.is_a?(String) || raise("'expression' must be a string")
+      else
+        raise("'expression' must be a string or a string decorated with a transformation variant hint")
+      end
+      variables.is_a?(Hash) || raise("'variables' must be a hash")
+
+      if data.is_a?(RBA::Region)
+        pr = RBA::PolygonPropertiesExpressions::new(data, expression.expression, copy_properties: keep_properties, dbu: @engine.dbu, variables: variables)
+      elsif data.is_a?(RBA::Edges)
+        pr = RBA::EdgePropertiesExpressions::new(data, expression.expression, copy_properties: keep_properties, dbu: @engine.dbu, variables: variables)
+      elsif data.is_a?(RBA::EdgePairs)
+        pr = RBA::EdgePairPropertiesExpressions::new(data, expression.expression, copy_properties: keep_properties, dbu: @engine.dbu, variables: variables)
+      elsif data.is_a?(RBA::Texts)
+        pr = RBA::TextPropertiesExpressions::new(data, expression.expression, copy_properties: keep_properties, dbu: @engine.dbu, variables: variables)
+      else
+        pr = nil
+      end
+
+      pr && expression.apply(pr)
+      pr
+
+    end
+
+    def evaluate(expression, variables = {}, keep_properties = false)
+      @engine._context("evaluate") do
+        pr = _make_proc(expression, variables, keep_properties)
+        @engine._tcmd(self.data, 0, self.data.class, :process, pr)
+        self
+      end
+    end
+    
+    def evaluated(expression, variables = {}, keep_properties = false)
+      @engine._context("evaluated") do
+        pr = _make_proc(expression, variables, keep_properties)
+        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :processed, pr))
+      end
+    end
+    
+    # %DRC%
+    # @name select_if
+    # @brief Selects shapes of a layer based on the evaluation of an expression
+    # @synopsis layer.select_if(expression [, variables])
+    #
+    # Evaluates the given expression on the shapes of the layer.
+    # If the evaluation gives a 'true' value, the shape is selected. Otherwise
+    # it is discarded.
+    #
+    # The expression is written in KLayout expression notation. 
+    #
+    # As input, the expressions will receive the
+    # (merged) shapes in micrometer units (e.g. RBA::DPolygon type) 
+    # by calling the "shape" function.
+    #
+    # Available functions are:
+    # 
+    # @ul
+    # @li "shape": the current shape in micrometer units @/li
+    # @li "value(name)": the value of a property with name 'name' or nil if the current shape does not have a property with this name @/li
+    # @/ul
+    #
+    # Properties with well-formed names (e.g. "VALUE") are available as
+    # variables in the expressions as a shortcut.
+    #
+    # The expressions require a hint
+    # whether they make use of anisotropic or scale-dependent properties.
+    # For example, the height of a box is an anisotropic property. If a check is made
+    # inside a rotated cell, the height transforms to a width and the check renders 
+    # different results for the same cell, if the cell is placed rotated and non-rotated.
+    # The solution is cell variant formation which happens automatically when the
+    # "aniso" hint is present.
+    # 
+    # Similarly, if a check is made against physical dimensions, the check will have
+    # different results for cells placed with different magnifications. Such a check
+    # is not scale-invariant and needs to get a "scaled" hint.
+    #
+    # By default it is assumed that the expressions are isotropic and scale invariant.
+    # You can mark an expression as anisotropic and/or scale dependent using the following
+    # expression modifiers:
+    #
+    # @code
+    # # isotropic and scale invariant
+    # layer.select_if("shape.holes > 0")
+    #
+    # # anisotropic, but scale invariant
+    # layer.select_if(aniso("shape.bbox.height/shape.bbox.width > 2"))
+    #
+    # # isotropic, but not scale invariant
+    # layer.select_if(scales("shape.area > 10.0"))
+    #
+    # # anisotropic and not scale invariant
+    # layer.select_if(aniso_and_scales("shape.bbox.width > 10.0"))
+    # @/code
+    #
+    # If you forget to specify this hint, the expression will use the local 
+    # shape properties and fail to correctly produce the results in the presence
+    # of deep mode and rotated or magnified cell instances.
+    #
+    # 'variables' is a hash of arbitrary names and values. Each of these values
+    # becomes available as a variable in the expression. This eliminates the need
+    # to build expression strings with pasted value strings for passing external values.
+    #
+    # The following example selects all shapes on the layer with an area 
+    # less than 10 square micrometers:
+    #
+    # @code
+    # layer.select(scales("shape.area < 10.0"))
+    # @/code
+    #
+    # Written with a variable as a threshold this becomes:
+    #
+    # @code
+    # layer.select(scales("shape.area < thr"), { "thr" => 10.0 })
+    # @/code
+    #
+    # This version modifies the input layer. A version that returns
+    # a new layer with the selected shapes is \selected_if.
+
+    # %DRC%
+    # @name selected_if
+    # @brief Selects shapes based on the evaluation of an expression
+    # @synopsis layer.selected_if(expression [, variables])
+    # 
+    # This method is the out-of-place version of \select_if. It takes the same arguments.
+
+    # %DRC%
+    # @name split_if
+    # @brief Selects shapes based on the evaluation of an expression and returns selected and unselected shapes in different layers
+    # @synopsis layer.selected_if(expression [, variables])
+    # 
+    # This method, like the other 'split_...' methods returns two layers:
+    # one with the result of \selected_if, and a second with all other shapes.
+    #
+    # The following example splits a layer into two: one with the shapes that have an area
+    # less than 10 square micrometers and another one with the shapes that have a bigger area:
+    #
+    # @code
+    # (smaller, bigger) = layer.split_if(scales("shape.area < 10.0"))
+    # @/code
+
+    def _make_filter(expression, variables)
+
+      if expression.is_a?(String)
+        expression = DRCTransformationVariantHint::new(expression)
+      elsif expression.is_a?(DRCTransformationVariantHint)
+        expression.expression.is_a?(String) || raise("'expression' must be a string")
+      else
+        raise("'expression' must be a string or a string decorated with a transformation variant hint")
+      end
+      variables.is_a?(Hash) || raise("'variables' must be a hash")
+
+      if data.is_a?(RBA::Region)
+        f = RBA::PolygonFilterBase::expression_filter(expression.expression, dbu: @engine.dbu, variables: variables)
+      elsif data.is_a?(RBA::Edges)
+        f = RBA::EdgeFilterBase::expression_filter(expression.expression, dbu: @engine.dbu, variables: variables)
+      elsif data.is_a?(RBA::EdgePairs)
+        f = RBA::EdgePairFilterBase::expression_filter(expression.expression, dbu: @engine.dbu, variables: variables)
+      elsif data.is_a?(RBA::Texts)
+        f = RBA::TextFilterBase::expression_filter(expression.expression, dbu: @engine.dbu, variables: variables)
+      else
+        f = nil
+      end
+
+      f && expression.apply(f)
+      f
+
+    end
+
+    def select_if(expression, variables = {})
+      @engine._context("select_if") do
+        f = _make_filter(expression, variables)
+        @engine._tcmd(self.data, 0, self.data.class, :filter, f)
+        self
+      end
+    end
+    
+    def selected_if(expression, variables = {})
+      @engine._context("selected_if") do
+        f = _make_filter(expression, variables)
+        DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :filtered, f))
+      end
+    end
+    
+    def split_if(expression, variables = {})
+      @engine._context("split_if") do
+        f = _make_filter(expression, variables)
+        res = @engine._tcmd(self.data, 0, self.data.class, :split_filter, f)
+        [ DRCLayer::new(@engine, res[0]), DRCLayer::new(@engine, res[1]) ]
       end
     end
     
@@ -5458,8 +5797,17 @@ CODE
     # as the reference point. The reference point will also defined the footprint of the fill cell - more precisely
     # the lower left corner. When step vectors are given, the fill cell's footprint is taken to be a rectangle
     # having the horizontal and vertical step pitch for width and height respectively. This way the fill cells 
-    # will be arrange seamlessly. However, the cell's dimensions can be changed, so that the fill cells
+    # will be arrange seamlessly. 
+    #
+    # However, the cell's dimensions can be changed, so that the fill cells
     # can overlap or there is a space between the cells. To change the dimensions use the "dim" method.
+    # This example will use a fill cell footprint of 1x1 micrometers, regardless of the step pitch:
+    #
+    # @code
+    # p = fill_pattern("FILL_CELL")
+    # p.shape(1, 0, box(0.0, 0.0, 1.0, 1.0))
+    # p.dim(1.0, 1.0)
+    # @/code
     #
     # The following example specifies a fill cell with an active area of -0.5 .. 1.5 in both directions
     # (2 micron width and height). With these dimensions the fill cell's footprint is independent of the
@@ -5470,6 +5818,18 @@ CODE
     # p.shape(1, 0, box(0.0, 0.0, 1.0, 1.0))
     # p.origin(-0.5, -0.5)
     # p.dim(2.0, 2.0)
+    # @/code
+    #
+    # Finally, the fill cell can be given a margin: this is a space around the fill cell which needs
+    # to be inside the fill region. Hence, the margin can be used to implement a distance, the fill
+    # cells (more precisely: their footprints) will maintain to the outside border of the fill region.
+    # The following example implements a margin of 200 nm in horizontal and 250 nm in vertical direction:
+    #
+    # @code
+    # p = fill_pattern("FILL_CELL")
+    # p.shape(1, 0, box(0.0, 0.0, 1.0, 1.0))
+    # p.dim(1.0, 1.0)
+    # p.margin(0.2, 0.25)
     # @/code
     #
     # With these ingredients will can use the fill function. The first example fills the polygons
@@ -5572,6 +5932,7 @@ CODE
       fill_cell = pattern.create_cell(@engine._output_layout, @engine)
       top_cell = @engine._output_cell
       fc_box = dbu_trans * pattern.cell_box(row_step.x, column_step.y)
+      fill_margin = dbu_trans * pattern.fill_margin
       rs = dbu_trans * row_step
       cs = dbu_trans * column_step
       origin = origin ? dbu_trans * origin : nil
@@ -5584,9 +5945,15 @@ CODE
         tp.frame = RBA::CplxTrans::new(@engine.dbu) * self.data.bbox
         tp.scale_to_dbu = false
         tp.tile_size(@engine._tx, @engine._ty)
-        bx = [ @engine._bx || 0.0, row_step.x ].max
-        by = [ @engine._by || 0.0, column_step.y ].max
-        tp.tile_border(bx, by)
+        if repeat || !origin
+          # can't use an overlap as the pattern may be shifted from tile to tile
+          bx = 0.0
+          by = 0.0
+        else
+          bx = [ fc_box.width, row_step.x.abs + column_step.x.abs ].max + [ -fill_margin.x, 0 ].max
+          by = [ fc_box.height, row_step.y.abs + column_step.y.abs ].max + [ -fill_margin.y, 0 ].max
+        end
+        tp.tile_border(@engine.dbu * bx, @engine.dbu * by)
         tp.threads = (@engine.threads || 1)
 
         result_arg = "nil"
@@ -5599,9 +5966,12 @@ CODE
         tp.input("region", self.data)
         tp.var("top_cell", top_cell)
         tp.var("fc_box", fc_box)
+        tp.var("bx", bx)
+        tp.var("by", by)
         tp.var("rs", rs)
         tp.var("cs", cs)
         tp.var("origin", origin)
+        tp.var("fill_margin", fill_margin)
         tp.var("fc_index", fc_index)
         tp.var("repeat", repeat)
         tp.var("with_left", with_left)
@@ -5610,12 +5980,12 @@ CODE
           var tc_box = _frame.bbox;
           var tile_box = _tile ? (tc_box & _tile.bbox) : tc_box;
           !tile_box.empty && (
-            tile_box = tile_box.enlarged(Vector.new(max(rs.x, fc_box.width), max(cs.y, fc_box.height)));
+            tile_box = tile_box.enlarged(Vector.new(bx, by));
             tile_box = tile_box & tc_box;
             var left = with_left ? Region.new : nil;
             repeat ? 
-              (region & tile_box).fill_multi(top_cell, fc_index, fc_box, rs, cs, Vector.new, left, _tile.bbox) :
-              (region & tile_box).fill(top_cell, fc_index, fc_box, rs, cs, origin, left, Vector.new, left, _tile.bbox);
+              (region & tile_box).fill_multi(top_cell, fc_index, fc_box, rs, cs, fill_margin, left, _tile.bbox) :
+              (region & tile_box).fill(top_cell, fc_index, fc_box, rs, cs, origin, left, fill_margin, left, _tile.bbox);
             with_left && _output(#{result_arg}, left)
           )
 END
@@ -5637,9 +6007,9 @@ END
 
         @engine.run_timed("\"#{m}\" in: #{@engine.src_line}", self.data) do
           if repeat
-            self.data.fill_multi(top_cell, fc_index, fc_box, rs, cs, RBA::Vector::new, result)
+            self.data.fill_multi(top_cell, fc_index, fc_box, rs, cs, fill_margin, result)
           else
-            self.data.fill(top_cell, fc_index, fc_box, rs, cs, origin, result, RBA::Vector::new, result)
+            self.data.fill(top_cell, fc_index, fc_box, rs, cs, origin, result, fill_margin, result)
           end
         end
 
@@ -5681,36 +6051,36 @@ END
       other.is_a?(DRCLayer) || raise("Argument needs to be a DRC layer")
     end
 
-    def requires_region
-      self.data.is_a?(RBA::Region) || raise("Requires a polygon layer")
+    def requires_region(name = nil)
+      self.data.is_a?(RBA::Region) || raise(name ? "#{name} requires a polygon layer" : "Requires a polygon layer")
     end
     
-    def requires_texts_or_region
-      self.data.is_a?(RBA::Region) || self.data.is_a?(RBA::Texts) || raise("Requires a polygon or text layer")
+    def requires_texts_or_region(name = nil)
+      self.data.is_a?(RBA::Region) || self.data.is_a?(RBA::Texts) || raise(name ? "#{name} requires a polygon or text layer" : "Requires a polygon or text layer")
     end
     
-    def requires_texts
-      self.data.is_a?(RBA::Texts) || raise("Requires a text layer")
+    def requires_texts(name = nil)
+      self.data.is_a?(RBA::Texts) || raise(name ? "#{name} requires a text layer" : "Requires a text layer")
     end
     
-    def requires_edge_pairs
-      self.data.is_a?(RBA::EdgePairs) || raise("Requires an edge pair layer")
+    def requires_edge_pairs(name = nil)
+      self.data.is_a?(RBA::EdgePairs) || raise(name ? "#{name} requires an edge pair layer" : "Requires an edge pair layer")
     end
     
-    def requires_edges
-      self.data.is_a?(RBA::Edges) || raise("Requires an edge layer")
+    def requires_edges(name = nil)
+      self.data.is_a?(RBA::Edges) || raise(name ? "#{name} requires an edge layer" : "Requires an edge layer")
     end
     
-    def requires_edges_or_edge_pairs
-      self.data.is_a?(RBA::Edges) || self.data.is_a?(RBA::EdgePairs) || raise("Requires an edge or edge pair layer")
+    def requires_edges_or_edge_pairs(name = nil)
+      self.data.is_a?(RBA::Edges) || self.data.is_a?(RBA::EdgePairs) || raise(name ? "#{name} requires an edge or edge pair layer" : "Requires an edge or edge pair layer")
     end
     
-    def requires_edges_or_region
-      self.data.is_a?(RBA::Edges) || self.data.is_a?(RBA::Region) || raise("Requires an edge or polygon layer")
+    def requires_edges_or_region(name = nil)
+      self.data.is_a?(RBA::Edges) || self.data.is_a?(RBA::Region) || raise(name ? "#{name} requires an edge or polygon layer" : "Requires an edge or polygon layer")
     end
     
-    def requires_edges_texts_or_region
-      self.data.is_a?(RBA::Edges) || self.data.is_a?(RBA::Region) || self.data.is_a?(RBA::Texts) || raise("Requires an edge, text or polygon layer")
+    def requires_edges_texts_or_region(name = nil)
+      self.data.is_a?(RBA::Edges) || self.data.is_a?(RBA::Region) || self.data.is_a?(RBA::Texts) || raise(name ? "#{name} requires an edge, text or polygon layer" : "Requires an edge, text or polygon layer")
     end
     
     def requires_same_type(other)

@@ -302,13 +302,16 @@ CompoundTransformationReducer::is_translation_invariant () const
 
 // ---------------------------------------------------------------------------------------------
 
-CompoundRegionMultiInputOperationNode::CompoundRegionMultiInputOperationNode (const std::vector<CompoundRegionOperationNode *> &children)
+CompoundRegionMultiInputOperationNode::CompoundRegionMultiInputOperationNode (const std::vector<CompoundRegionOperationNode *> &children, bool no_init)
 {
   for (std::vector<CompoundRegionOperationNode *>::const_iterator c = children.begin (); c != children.end (); ++c) {
     (*c)->keep ();
     m_children.push_back (*c);
   }
-  init ();
+
+  if (! no_init) {
+    init ();
+  }
 }
 
 CompoundRegionMultiInputOperationNode::CompoundRegionMultiInputOperationNode ()
@@ -361,6 +364,11 @@ CompoundRegionMultiInputOperationNode::init ()
   //  build the reducer
   for (tl::shared_collection<CompoundRegionOperationNode>::iterator i = m_children.begin (); i != m_children.end (); ++i) {
     m_vars.add (i->vars ());
+  }
+
+  //  add the local variant reducer
+  if (local_vars ()) {
+    m_vars.add (local_vars ());
   }
 }
 
@@ -1260,7 +1268,13 @@ CompoundRegionEdgePairFilterOperationNode::do_compute_local (CompoundRegionOpera
 bool
 CompoundRegionEdgePairFilterOperationNode::is_selected (const db::EdgePair &p) const
 {
-  return mp_filter->selected (p);
+  return mp_filter->selected (p, db::properties_id_type (0));
+}
+
+bool
+CompoundRegionEdgePairFilterOperationNode::is_selected (const db::EdgePairWithProperties &p) const
+{
+  return mp_filter->selected (p, p.properties_id ());
 }
 
 // ---------------------------------------------------------------------------------------------

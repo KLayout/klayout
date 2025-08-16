@@ -1099,18 +1099,6 @@ public:
   }
 
   /**
-   *  @brief Determine, if the shape is of "object_with_properties" type.
-   *
-   *  Usually, the properties id (see prop_id()) should be used.
-   *
-   *  @return true, if the shape is of "object_with_properties<Sh> type".
-   */
-  bool with_props () const
-  {
-    return m_with_props;
-  }
-
-  /**
    *  @brief Get the properties Id associated with the shape
    */
   db::properties_id_type prop_id () const;

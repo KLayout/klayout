@@ -76,6 +76,7 @@ public:
   virtual TextsDelegate *add (const Texts &other) const;
 
   virtual const db::Text *nth (size_t n) const;
+  virtual db::properties_id_type nth_prop_id (size_t n) const;
   virtual bool has_valid_texts () const;
 
   virtual const db::RecursiveShapeIterator *iter () const;
@@ -86,7 +87,7 @@ public:
 
   virtual void flatten () { }
 
-  void do_insert (const db::Text &text);
+  void do_insert (const db::Text &text, properties_id_type prop_id);
 
   virtual void do_transform (const db::Trans &t)
   {

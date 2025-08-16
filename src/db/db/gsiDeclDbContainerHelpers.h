@@ -237,15 +237,22 @@ private:
 // ---------------------------------------------------------------------------------
 //  Generic shape processor declarations
 
+/**
+ *  @brief A "declarative" base for shape processors
+ *
+ *  This implementation provides configuration options to tailor the behavior
+ *  of the processor base - specifically with respect to variants and various
+ *  attributes.
+ */
 template <class ProcessorBase>
-class shape_processor_impl
+class shape_processor_base
   : public ProcessorBase
 {
 public:
-  typedef typename  ProcessorBase::shape_type shape_type;
-  typedef typename  ProcessorBase::result_type result_type;
+  typedef typename ProcessorBase::shape_type shape_type;
+  typedef typename ProcessorBase::result_type result_type;
 
-  shape_processor_impl ()
+  shape_processor_base ()
   {
     mp_vars = &m_mag_and_orient;
     m_wants_variants = true;
@@ -319,79 +326,17 @@ public:
     mp_vars = 0;
   }
 
-  virtual void process (const shape_type &shape, std::vector<result_type> &res) const
-  {
-    res = do_process (shape);
-  }
-
-  virtual void process (const db::object_with_properties<shape_type> &shape, std::vector<db::object_with_properties<result_type> > &res) const
-  {
-    res = do_process (shape);
-  }
-
-  std::vector<result_type> issue_do_process (const shape_type &) const
-  {
-    return std::vector<result_type> ();
-  }
-
-  std::vector<db::object_with_properties<result_type> > issue_do_process_wp (const db::object_with_properties<shape_type> &) const
-  {
-    return std::vector<db::object_with_properties<result_type> > ();
-  }
-
-  std::vector<result_type> do_process (const shape_type &shape) const
-  {
-    if (f_process.can_issue ()) {
-      return f_process.issue<shape_processor_impl, std::vector<result_type>, const shape_type &> (&shape_processor_impl::issue_do_process, shape);
-    } else {
-      return issue_do_process (shape);
-    }
-  }
-
-  std::vector<db::object_with_properties<result_type> > do_process (const db::object_with_properties<shape_type> &shape) const
-  {
-    if (f_process_wp.can_issue ()) {
-      return f_process.issue<shape_processor_impl, std::vector<db::object_with_properties<result_type> >, const db::object_with_properties<shape_type> &> (&shape_processor_impl::issue_do_process_wp, shape);
-    } else if (f_process.can_issue ()) {
-      auto tmp_result = f_process.issue<shape_processor_impl, std::vector<result_type>, const shape_type &> (&shape_processor_impl::issue_do_process, shape);
-      std::vector<db::object_with_properties<result_type> > result;
-      for (auto i = tmp_result.begin (); i != tmp_result.end (); ++i) {
-        result.push_back (db::object_with_properties<result_type> (*i, shape.properties_id ()));
-      }
-      return result;
-    } else {
-      return issue_do_process_wp (shape);
-    }
-  }
-
-  gsi::Callback f_process;
-  gsi::Callback f_process_wp;
-
   static gsi::Methods method_decls (bool with_merged_options)
   {
-    gsi::Methods decls =
-      callback ("process", &shape_processor_impl::issue_do_process, &shape_processor_impl::f_process, gsi::arg ("shape"),
-        "@brief Processes a shape\n"
-        "This method is the actual payload. It needs to be reimplemented in a derived class.\n"
-        "If needs to process the input shape and deliver a list of output shapes.\n"
-        "The output list may be empty to entirely discard the input shape. It may also contain more than a single shape.\n"
-        "In that case, the number of total shapes may grow during application of the processor.\n"
-      ) +
-      callback ("process_with_properties", &shape_processor_impl::issue_do_process_wp, &shape_processor_impl::f_process_wp, gsi::arg ("shape"),
-        "@brief Processes a shape with properties\n"
-        "In scenarios with shapes with properties, this method is called to process the shapes. If the method is not implemented, "
-        "the property-less 'process' method is called and the properties are copied from the input to the output.\n"
-        "\n"
-        "This flavor has been introduced in version 0.30."
-      );
+    gsi::Methods decls;
 
     if (with_merged_options) {
       decls +=
-        method ("requires_raw_input?", &shape_processor_impl::requires_raw_input,
+        method ("requires_raw_input?", &shape_processor_base::requires_raw_input,
           "@brief Gets a value indicating whether the processor needs raw (unmerged) input\n"
           "See \\requires_raw_input= for details.\n"
         ) +
-        method ("requires_raw_input=", &shape_processor_impl::set_requires_raw_input, gsi::arg ("flag"),
+        method ("requires_raw_input=", &shape_processor_base::set_requires_raw_input, gsi::arg ("flag"),
           "@brief Sets a value indicating whether the processor needs raw (unmerged) input\n"
           "This flag must be set before using this processor. It tells the processor implementation whether the "
           "processor wants to have raw input (unmerged). The default value is 'false', meaning that\n"
@@ -401,22 +346,22 @@ public:
           "Also, raw input means that strange shapes such as dot-like edges, self-overlapping polygons, "
           "empty or degenerated polygons are preserved."
         ) +
-        method ("result_is_merged?", &shape_processor_impl::result_is_merged,
+        method ("result_is_merged?", &shape_processor_base::result_is_merged,
           "@brief Gets a value indicating whether the processor delivers merged output\n"
           "See \\result_is_merged= for details.\n"
         ) +
-        method ("result_is_merged=", &shape_processor_impl::set_result_is_merged, gsi::arg ("flag"),
+        method ("result_is_merged=", &shape_processor_base::set_result_is_merged, gsi::arg ("flag"),
           "@brief Sets a value indicating whether the processor delivers merged output\n"
           "This flag must be set before using this processor. If the processor maintains the merged condition\n"
           "by design (output is merged if input is), it is a good idea to set this predicate to 'true'.\n"
           "This will avoid additional merge steps when the resulting collection is used in further operations\n"
           "that need merged input\n."
         ) +
-        method ("result_must_not_be_merged?", &shape_processor_impl::result_must_not_be_merged,
+        method ("result_must_not_be_merged?", &shape_processor_base::result_must_not_be_merged,
           "@brief Gets a value indicating whether the processor's output must not be merged\n"
           "See \\result_must_not_be_merged= for details.\n"
         ) +
-        method ("result_must_not_be_merged=", &shape_processor_impl::set_result_must_not_be_merged, gsi::arg ("flag"),
+        method ("result_must_not_be_merged=", &shape_processor_base::set_result_must_not_be_merged, gsi::arg ("flag"),
           "@brief Sets a value indicating whether the processor's output must not be merged\n"
           "This flag must be set before using this processor. The processor can set this flag if it wants to\n"
           "deliver shapes that must not be merged - e.g. point-like edges or strange or degenerated polygons.\n."
@@ -424,11 +369,11 @@ public:
     }
 
     decls +=
-      method ("wants_variants?", &shape_processor_impl::wants_variants,
+      method ("wants_variants?", &shape_processor_base::wants_variants,
         "@brief Gets a value indicating whether the filter prefers cell variants\n"
         "See \\wants_variants= for details.\n"
       ) +
-      method ("wants_variants=", &shape_processor_impl::set_wants_variants, gsi::arg ("flag"),
+      method ("wants_variants=", &shape_processor_base::set_wants_variants, gsi::arg ("flag"),
         "@brief Sets a value indicating whether the filter prefers cell variants\n"
         "This flag must be set before using this filter for hierarchical applications (deep mode). "
         "It tells the filter implementation whether cell variants should be created (true, the default) "
@@ -440,7 +385,7 @@ public:
         "need to be differentiated. Cell variant formation is one way, shape propagation the other way.\n"
         "Typically, cell variant formation is less expensive, but the hierarchy will be modified."
       ) +
-      method ("is_isotropic", &shape_processor_impl::is_isotropic,
+      method ("is_isotropic", &shape_processor_base::is_isotropic,
         "@brief Indicates that the filter has isotropic properties\n"
         "Call this method before using the filter to indicate that the selection is independent of "
         "the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in "
@@ -449,7 +394,7 @@ public:
         "Examples for isotropic (polygon) processors are size or shrink operators. Size or shrink is not dependent "
         "on orientation unless size or shrink needs to be different in x and y direction."
       ) +
-      method ("is_scale_invariant", &shape_processor_impl::is_scale_invariant,
+      method ("is_scale_invariant", &shape_processor_base::is_scale_invariant,
         "@brief Indicates that the filter is scale invariant\n"
         "Call this method before using the filter to indicate that the selection is independent of "
         "the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in "
@@ -458,7 +403,7 @@ public:
         "An example for a scale invariant (polygon) processor is the rotation operator. Rotation is not depending on scale, "
         "but on the original orientation as mirrored versions need to be rotated differently."
       ) +
-      method ("is_isotropic_and_scale_invariant", &shape_processor_impl::is_isotropic_and_scale_invariant,
+      method ("is_isotropic_and_scale_invariant", &shape_processor_base::is_isotropic_and_scale_invariant,
         "@brief Indicates that the filter is isotropic and scale invariant\n"
         "Call this method before using the filter to indicate that the selection is independent of "
         "the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in "
@@ -481,6 +426,98 @@ private:
   bool m_result_is_merged;
   bool m_result_must_not_be_merged;
 
+  //  No copying
+  shape_processor_base &operator= (const shape_processor_base &);
+  shape_processor_base (const shape_processor_base &);
+};
+
+/**
+ *  @brief The implementation class for the generic shape processor
+ *
+ *  In addition to the services provided by "shape_processor_base",
+ *  this class provides an overload slot for the "process" virtual method.
+ */
+template <class ProcessorBase>
+class shape_processor_impl
+  : public shape_processor_base<ProcessorBase>
+{
+public:
+  typedef typename ProcessorBase::shape_type shape_type;
+  typedef typename ProcessorBase::result_type result_type;
+
+  shape_processor_impl ()
+    : shape_processor_base<ProcessorBase> ()
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual void process (const db::object_with_properties<shape_type> &shape, std::vector<db::object_with_properties<result_type> > &res) const
+  {
+    res = do_process_wp (shape);
+
+    auto res_no_prop = do_process (shape.base ());
+    for (auto i = res_no_prop.begin (); i != res_no_prop.end (); ++i) {
+      res.push_back (db::object_with_properties<result_type> (*i, shape.properties_id ()));
+    }
+  }
+
+  std::vector<result_type> issue_do_process (const shape_type &) const
+  {
+    return std::vector<result_type> ();
+  }
+
+  std::vector<result_type> do_process (const shape_type &shape) const
+  {
+    if (f_process.can_issue ()) {
+      return f_process.issue<shape_processor_impl, std::vector<result_type>, const shape_type &> (&shape_processor_impl::issue_do_process, shape);
+    } else {
+      return issue_do_process (shape);
+    }
+  }
+
+  gsi::Callback f_process;
+
+  std::vector<db::object_with_properties<result_type> > issue_do_process_wp (const db::object_with_properties<shape_type> &) const
+  {
+    return std::vector<db::object_with_properties<result_type> > ();
+  }
+
+  std::vector<db::object_with_properties<result_type> > do_process_wp (const db::object_with_properties<shape_type> &shape) const
+  {
+    if (f_process_wp.can_issue ()) {
+      return f_process_wp.issue<shape_processor_impl, std::vector<db::object_with_properties<result_type> >, const db::object_with_properties<shape_type> &> (&shape_processor_impl::issue_do_process_wp, shape);
+    } else {
+      return issue_do_process_wp (shape);
+    }
+  }
+
+  gsi::Callback f_process_wp;
+
+  static gsi::Methods method_decls (bool with_merged_options)
+  {
+    gsi::Methods decls =
+      callback ("process", &shape_processor_impl::issue_do_process, &shape_processor_impl::f_process, gsi::arg ("shape"),
+        "@brief Processes a shape\n"
+        "This method is the actual payload. It needs to be reimplemented in a derived class.\n"
+        "If needs to process the input shape and deliver a list of output shapes.\n"
+        "The output list may be empty to entirely discard the input shape. It may also contain more than a single shape.\n"
+        "In that case, the number of total shapes may grow during application of the processor.\n"
+        "\n"
+        "Instead of implementing 'process', you can also implement \\process_with_properties. The latter function "
+        "allows modifying the properties of an object."
+      ) +
+      callback ("process_witp_properties", &shape_processor_impl::issue_do_process_wp, &shape_processor_impl::f_process_wp, gsi::arg ("shape"),
+        "@brief Processes a shape with properties\n"
+        "This method is called in addition to \\process. If reimplemented it allows producing objects "
+        "with different properties than the input one.\n"
+        "\n"
+        "Modification of properties is supported since version 0.30.3.\n"
+      );
+
+    return decls + shape_processor_base<ProcessorBase>::method_decls (with_merged_options);
+  }
+
+private:
   //  No copying
   shape_processor_impl &operator= (const shape_processor_impl &);
   shape_processor_impl (const shape_processor_impl &);

@@ -43,7 +43,21 @@ inline QString tr (const char *s)
   return QObject::tr (s);
 }
 #else
-std::string TL_PUBLIC tr (const char *s);
+
+//  NOTE: with this definition in place, we can build plugins without Qt,
+//  by using "tr" and falling back here, even if Qt is enabled
+
+#define __KLAYOUT_TL_HAVE_TR_FALLBACK
+namespace tl
+{
+  std::string TL_PUBLIC tr_fallback (const char *s);
+}
+
+inline std::string tr (const char *s)
+{
+  return tl::tr_fallback (s);
+}
+
 #endif
 
 namespace tl

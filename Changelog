@@ -1,3 +1,166 @@
+0.30.3           (2025-08-05):
+* Enhancement: %GITHUB%/issues/2044 Different combination modes on strm2xxx tools (+ and ,)
+* Bugfix: %GITHUB%/issues/2073 Klayout fails to read CELLNAME S_CELL_OFFSET property on Windows on big files
+* Bugfix: %GITHUB%/issues/2075 strm2oas ignores def net routing wire extensions
+* Bugfix: %GITHUB%/issues/2081 strm2oas a.oas,c.oas o.oas coredumps
+* Bugfix: %GITHUB%/issues/2087 DRC: Poor fill with skew step vectors (see more fill-related topics below)
+* Bugfix: %GITHUB%/issues/2088 Fixed a use case that generated duplicate OASIS cell IDs
+* Bugfix: %GITHUB%/issues/2094 Performance issue in the python code to insert Regions into Shapes
+* Bugfix: %GITHUB%/issues/2100 RNetExtractor extracts wrong RNode locations with tesselation
+* Bugfix: %GITHUB%/issues/2102 RNetExtractor internal error
+* Bugfix: Fixed automatic execution of scripts after package installation
+  Now, restarting KLayout after package installation may not be needed
+* Bugfix: File watcher dropped file after is was temporarily removed
+* Bugfix: After deleting terminals from devices, reading old L2N/LVSDB files
+  made these terminal re-appear in the netlist browser.
+* Enhancement: primary and secondary device parameters are separated in 
+  the LVS netlist view, so it is easier to see which parameters are relevant
+* Bugfix: Avoid a crash when reading OASIS files with broken code tables
+  in OASIS CBLOCKs
+* Enhancement: New Ruby/Python functions: Macro#current and Macro attributes
+  (Macro#get_attribute, Macro#has_attribute, Macro#set_attribute, Macro#delete_attribute)
+  These features allow passing values in and out from a macro in other ways
+  than defining global variables and basically allow parameterized macros.
+* Enhancement: Convenience function ObjectInstPath#cell
+* Bugfix: Some layout queries did not render the correct path_dtrans
+* Bugfix: "tap" feature 
+  - was not selecting shapes that fully overlap the view
+  - texts are not considered as detecting them requires potentially search a large area
+* Bugfix: Fixed a TODO from old issue #1470
+* Enhancement: DRC function "def_output": A simple yet useful extension to obtain 
+  the output layout and to manipulate it (within limits)
+* Bugfixes and enhancements: fill feature (see also issue #2087)
+  - tiles in tiled mode most not overlap when the origin is not global as tiles may use different origins
+  - more efficient computation of remaining fill area
+  - fill pattern "margin" feature simplifies keeping distance to other fill
+    shapes or original features in multi-fill scenarios
+  - fixed MT issues when using the fill feature in tiled mode with multiple threads
+  - better compression of fill cell instances into arrays
+* Enhancement: Ruby/Polygon methods set_properties and clear_properties for Cell, Layout, Shape and Instance
+* Enhancement: a bunch of features that utilize expressions on polygons and other shapes
+  to attach properties, filter base on properties or compute values in properties
+  (aka "measurement features")
+  - PolygonFilterBase#expression_filter (to be used in Region#filter and Region#filtered) 
+    can be used to filter polygons based on KLayout expressions, including properties
+  - PolygonPropertiesExpressions object (to be used in Region#process and Region#processed)
+    can be used to attach properties based on KLayout expressions, including other properties
+  - Same for Edges, EdgePairs and Texts
+* Enhancement: handling of properties in shape merge in Region
+  - Region#join_properties_on_merge controls how properties and handled during shape merge
+  - New respective arguments in Region#merge, Region#merged
+  - New layer methods "merge_props" and "merged_props" in DRC (allows joining properties
+    from same shapes on different layers)
+* Enhancement: net property evaluation using KLayout expressions.
+  Allows implementing more complex antenna rule checking schemes for example.
+  - Ruby/Python: LayoutToNetlist#evaluate_nets
+  - DRC: evaluate_nets
+
+0.30.2           (2025-05-29):
+* Enhancement: %GITHUB%/issues/2016 Lazy evaluation of PCell also when changing guiding shape properties
+* Enhancement: %GITHUB%/issues/2041 strm2oas should read --lefdef-lefs and --lefdef-lef-layouts only once
+* Enhancement: %GITHUB%/issues/2055 Check ports feature for LVS
+* Enhancement: %GITHUB%/issues/2057 Feature request: nanometer scalebar
+* Bugfix: %GITHUB%/issues/2060 Edges#with_angle fails for long edges
+* Enhancement: Support for ARM Python packages (thanks, Troy!)
+* Enhancement: PolygonNeighborHood now allows specifying a variant type
+  for anisotropic applications
+* Bugfix: Lower case hex escapes in URI's were not handled correctly
+* Bugfix: internally handling "%ld" sprintf as 64bit compatible for 
+  better Linux/Windows compatibility (e.g. file position in error messages
+  was not printed correctly on Windows at positions >2G)
+* Bugfix: LVS DB internal net names now are preserved and not renumbered
+  This way, log entries are consistent with net names and the generated netlist
+  names are consistent with LVS reports.
+* Bugfix: "same_nets" net names are now case insensitive in both netlists
+  instead of schematic only. See https://github.com/IHP-GmbH/IHP-Open-PDK/issues/484
+* Feature: Ruby/Python API for adding and removing log entries in LVS DBs
+  LayoutToNetlist#clear_log_entries and LayoutToNetlist#add_log_entry
+* Feature: NetlistCrossReference#each_net_pair etc. functions take a single
+  Circuit or Net object instead of a pair (can be schematic or layout objects)
+* Feature: Support functions for parasitic extraction - experimental
+  Currently, pieces for R extraction are available in the pex Python module space.
+  These are just first bits - see https://martinjankoehler.github.io/klayout-pex-website/doc/doc.html
+  for ongoing work.                        
+* Feature: MALY jobdeck format support (reading) - experimental
+
+0.30.1           (2025-04-27):
+* Bugfix: %GITHUB%/issues/2011 Some DRC bugs fixed
+* Bug: %GITHUB%/issues/2014 Bug fixes in LEF/DEF reader
+* Enhancement: %GITHUB%/issues/2019 Support for Qt 6.9
+* Bugfix: %GITHUB%/issues/2020 Strict weak ordering issue fixed in edge processor
+* Enhancement: %GITHUB%/issues/2024 Option to configure grid density
+* Bugfix: %GITHUB%/issues/2025 Brackets get added in List type PCell parameter edit field
+* Bugfix: %GITHUB%/issues/2026 Display is dead after opening 2.5d view
+* Bugfix: %GITHUB%/issues/2038 DEdgePairWithProperties not working properly in scripts
+* Bugfix/Enhancement: some updates of "strmxor" tool
+  - strmxor was giving wrong results if cell variants are
+    present where one variant is covered entirely by a large shape
+  - Parallelization now happens on a per-layer basis (same as for 
+    XOR tool in KLayout)
+  - Shape count was not consistent in deep mode
+  - All buddy tools print total runtime with -d11
+
+0.30.0           (2025-03-25):
+* Bug: %GITHUB%/issues/1996 More robust triangulation
+* Bug: %GITHUB%/issues/2002 Path to polygon conversion issue
+* Enhancement: Better support for user properties
+  The property management has been overhauled. Properties are not globally 
+  scoped. The "Layout" class now provides class methods to convert property IDs
+  to property hashes and back. It is no longer required to know the origin of
+  a property ID.
+  Other changes are:
+  - New classes "BoxWithProperties", "EdgeWithProperties", "PolygonWithProperties",
+    "SimplePolygonWithProperties", "PathWithProperties", "EdgePairWithProperties", 
+    "TextWithProperties" and corresponding "D..." classes. 
+    Many functions accept these objects now in addition to the property-less "Box", 
+    "Edge" etc. objects. Many functions now deliver property-annotated objects 
+    instead of the plain ones.
+  - "EdgePairFilter#property_glob", "EdgePairFilter#property_filter", "EdgePairFilter#property_filter_bounded"
+    creates filters for edge pair objects, which can be used on "EdgePairs" containers to 
+    filter by properties.
+  - The same is available for "EdgeFilter" (for filtering edges in "Edges" containers), 
+    "PolygonFilter" (for filtering polygons in "Region" containers), and 
+    "TextFilter" (for filtering texts in "Texts" containers)
+  - New method "process_with_properties" for "PolygonOperator", "EdgeOperator",
+    "EdgePairOperator" and "TextOperator"
+* Enhancement: New class "PolygonNeighborhood"
+  This is a visitor to obtain all "neighboring" polygons for each polygon
+  in a Region. Currently, neighborhood is defined by the bounding box of 
+  the primary polygons.
+* Enhancement: Layout queries can use "$_" to refer to the current cell now  
+* Enhancement: New methods: 
+  - "LayoutToNetlist#build_net", "build_nets" and "build_all_nets" do not 
+  - "LayoutToNetlist#layer_index" from a name
+  - "LayoutToNetlist#texts_by_index" and "LayoutToNetlist#texts_by_name"
+  - "LayoutToNetlist#original_layout" and "LayoutToNetlist#original_top_cell"
+  - "LayoutToNetlist#polygons_of_net" and "LayoutToNetlist#texts_of_net"
+  - "Device#terminal_ref"
+  - New "text_prop" argument in Texts#polygons (texts can transfer their
+    string to the generated polygons as user properties)
+  - New methods "Polygon#delaunay", "DPolygon#delaunay", "SimplePolygon#delaunay"
+    and "DSimplePolygon#delaunay"
+
+0.29.12          (2025-03-02):
+* Bug: %GITHUB%/issues/1976 Crash on cross mode, lw > 1 and oversampling
+* Bug: %GITHUB%/issues/1987 Build failure against Qt6.8
+* Enhancement: %GITHUB%/issues/1989 API enhancements: several new split_... methods
+  on Edges, Region, EdgePairs and Texts, delivering a pair of containers with 
+  selected and unselected objects.
+* Bug: %GITHUB%/issues/1993 Tiling processor kept layout locks, causing DRC issues with "with_density"
+* Bug: %GITHUB%/issues/1997 Can not find a file in Open Recent menu (a string unescaping bug)
+* Bugfix: 'Save All' was not updating the dirty flag in the inactive tabs
+* Bugfix: Fixing a crash when editing PCell parameters while the macro editor is open
+* Bugfix: Fixed a potential Crash on "save all"
+* Bugfix: Fixed a bug when returning a Region into a layout with cells unselected
+* Bugfix: Tab title were not updated on cell rename
+* Bugfix: Fixed a crash on certain layout queries
+  - For example "instances of cell .*.* where inst.trans.rot == 2" was crashing
+* Bugfix: Fixing two problems with layer mapping
+  - Mapping "[*/*] 100/0:0/0" (for example) created 0/0 two times when the input contains 100/0 and 0/0. Now
+    it is a single layer only
+  - The mapping table generated from strings now uses layer indexes from a range that should not collide
+    with existing layer indexes.
+
 0.29.11          (2025-01-17):
 * Bug: %GITHUB%/issues/1948 Crash by instantiate a Cell in a Library-Cell 
 * Bug: %GITHUB%/issues/1953 Callback_impl & coerce_parameters_impl parameter display issue

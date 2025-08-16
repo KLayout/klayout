@@ -178,12 +178,16 @@ TextsDelegate *DeepTexts::clone () const
   return new DeepTexts (*this);
 }
 
-void DeepTexts::do_insert (const db::Text &text)
+void DeepTexts::do_insert (const db::Text &text, db::properties_id_type prop_id)
 {
   db::Layout &layout = deep_layer ().layout ();
   if (layout.begin_top_down () != layout.end_top_down ()) {
     db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
-    top_cell.shapes (deep_layer ().layer ()).insert (db::TextRef (text, layout.shape_repository ()));
+    if (prop_id == 0) {
+      top_cell.shapes (deep_layer ().layer ()).insert (db::TextRef (text, layout.shape_repository ()));
+    } else {
+      top_cell.shapes (deep_layer ().layer ()).insert (db::TextRefWithProperties (db::TextRef (text, layout.shape_repository ()), prop_id));
+    }
   }
 
   invalidate_bbox ();
@@ -328,6 +332,12 @@ const db::Text *DeepTexts::nth (size_t) const
   throw tl::Exception (tl::to_string (tr ("Random access to texts is available only for flat text collections")));
 }
 
+db::properties_id_type
+DeepTexts::nth_prop_id (size_t) const
+{
+  throw tl::Exception (tl::to_string (tr ("Random access to texts is available only for flat collections")));
+}
+
 bool DeepTexts::has_valid_texts () const
 {
   return false;
@@ -361,7 +371,11 @@ DeepTexts::add_in_place (const Texts &other)
 
     db::Shapes &shapes = deep_layer ().initial_cell ().shapes (deep_layer ().layer ());
     for (db::Texts::const_iterator p = other.begin (); ! p.at_end (); ++p) {
-      shapes.insert (*p);
+      if (p.prop_id () == 0) {
+        shapes.insert (*p);
+      } else {
+        shapes.insert (db::TextWithProperties (*p, p.prop_id ()));
+      }
     }
 
   }
@@ -385,16 +399,23 @@ TextsDelegate *DeepTexts::add (const Texts &other) const
 TextsDelegate *DeepTexts::filter_in_place (const TextFilterBase &filter)
 {
   //  TODO: implement as really in place
-  *this = *apply_filter (filter);
+  *this = *apply_filter (filter, true, false).first;
   return this;
 }
 
 TextsDelegate *DeepTexts::filtered (const TextFilterBase &filter) const
 {
-  return apply_filter (filter);
+  return apply_filter (filter, true, false).first;
 }
 
-DeepTexts *DeepTexts::apply_filter (const TextFilterBase &filter) const
+std::pair<TextsDelegate *, TextsDelegate *>
+DeepTexts::filtered_pair (const TextFilterBase &filter) const
+{
+  return apply_filter (filter, true, true);
+}
+
+std::pair<DeepTexts *, DeepTexts *>
+DeepTexts::apply_filter (const TextFilterBase &filter, bool with_true, bool with_false) const
 {
   const db::DeepLayer &texts = deep_layer ();
   db::Layout &layout = const_cast<db::Layout &> (texts.layout ());
@@ -412,9 +433,10 @@ DeepTexts *DeepTexts::apply_filter (const TextFilterBase &filter) const
 
   }
 
-  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
+  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit_true, to_commit_false;
 
-  std::unique_ptr<db::DeepTexts> res (new db::DeepTexts (texts.derived ()));
+  std::unique_ptr<db::DeepTexts> res_true (with_true ? new db::DeepTexts (texts.derived ()) : 0);
+  std::unique_ptr<db::DeepTexts> res_false (with_false ? new db::DeepTexts (texts.derived ()) : 0);
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
     const db::Shapes &s = c->shapes (texts.layer ());
@@ -424,18 +446,36 @@ DeepTexts *DeepTexts::apply_filter (const TextFilterBase &filter) const
       const std::set<db::ICplxTrans> &vv = vars->variants (c->cell_index ());
       for (auto v = vv.begin (); v != vv.end (); ++v) {
 
-        db::Shapes *st;
+        db::Shapes *st_true = 0, *st_false = 0;
         if (vv.size () == 1) {
-          st = & c->shapes (res->deep_layer ().layer ());
+          if (with_true) {
+            st_true = & c->shapes (res_true->deep_layer ().layer ());
+          }
+          if (with_false) {
+            st_false = & c->shapes (res_false->deep_layer ().layer ());
+          }
         } else {
-          st = & to_commit [c->cell_index ()] [*v];
+          if (with_true) {
+            st_true = & to_commit_true [c->cell_index ()] [*v];
+          }
+          if (with_false) {
+            st_false = & to_commit_false [c->cell_index ()] [*v];
+          }
         }
+
+        const db::ICplxTrans &tr = *v;
 
         for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Texts); ! si.at_end (); ++si) {
           db::Text text;
           si->text (text);
-          if (filter.selected (text.transformed (*v))) {
-            st->insert (*si);
+          if (filter.selected (text.transformed (tr), si->prop_id ())) {
+            if (st_true) {
+              st_true->insert (*si);
+            }
+          } else {
+            if (st_false) {
+              st_false->insert (*si);
+            }
           }
         }
 
@@ -443,13 +483,20 @@ DeepTexts *DeepTexts::apply_filter (const TextFilterBase &filter) const
 
     } else {
 
-      db::Shapes &st = c->shapes (res->deep_layer ().layer ());
+      db::Shapes *st_true = with_true ? &c->shapes (res_true->deep_layer ().layer ()) : 0;
+      db::Shapes *st_false = with_false ? &c->shapes (res_false->deep_layer ().layer ()) : 0;
 
       for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Texts); ! si.at_end (); ++si) {
         db::Text text;
         si->text (text);
-        if (filter.selected (text)) {
-          st.insert (*si);
+        if (filter.selected (text, si->prop_id ())) {
+          if (with_true) {
+            st_true->insert (*si);
+          }
+        } else {
+          if (with_false) {
+            st_false->insert (*si);
+          }
         }
       }
 
@@ -457,11 +504,16 @@ DeepTexts *DeepTexts::apply_filter (const TextFilterBase &filter) const
 
   }
 
-  if (! to_commit.empty () && vars.get ()) {
-    vars->commit_shapes (res->deep_layer ().layer (), to_commit);
+  if (! to_commit_true.empty () && vars.get ()) {
+    tl_assert (res_true.get () != 0);
+    vars->commit_shapes (res_true->deep_layer ().layer (), to_commit_true);
+  }
+  if (! to_commit_false.empty () && vars.get ()) {
+    tl_assert (res_false.get () != 0);
+    vars->commit_shapes (res_false->deep_layer ().layer (), to_commit_false);
   }
 
-  return res.release ();
+  return std::make_pair (res_true.release (), res_false.release ());
 }
 
 TextsDelegate *DeepTexts::process_in_place (const TextProcessorBase &filter)
@@ -482,8 +534,15 @@ DeepTexts::processed_to_polygons (const TextToPolygonProcessorBase &filter) cons
   return shape_collection_processed_impl<db::Text, db::Polygon, db::DeepRegion> (deep_layer (), filter);
 }
 
-RegionDelegate *DeepTexts::polygons (db::Coord e) const
+RegionDelegate *DeepTexts::polygons (db::Coord e, const tl::Variant &text_prop) const
 {
+  db::property_names_id_type key_id = 0;
+  if (! text_prop.is_nil ()) {
+    key_id = db::property_names_id (text_prop);
+  }
+
+  std::map<std::string, db::properties_id_type> value_ids;
+
   db::DeepLayer new_layer = deep_layer ().derived ();
   db::Layout &layout = const_cast<db::Layout &> (deep_layer ().layout ());
 
@@ -493,7 +552,18 @@ RegionDelegate *DeepTexts::polygons (db::Coord e) const
       db::Box box = s->bbox ();
       box.enlarge (db::Vector (e, e));
       db::Polygon poly (box);
-      output.insert (db::PolygonRef (poly, layout.shape_repository ()));
+      if (key_id == 0) {
+        output.insert (db::PolygonRef (poly, layout.shape_repository ()));
+      } else {
+        std::string value (s->text_string ());
+        auto v = value_ids.find (value);
+        if (v == value_ids.end ()) {
+          db::PropertiesSet ps;
+          ps.insert_by_id (key_id, db::property_values_id (value));
+          v = value_ids.insert (std::make_pair (value, db::properties_id (ps))).first;
+        }
+        output.insert (db::PolygonRefWithProperties (db::PolygonRef (poly, layout.shape_repository ()), v->second));
+      }
     }
   }
 

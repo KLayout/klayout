@@ -100,13 +100,13 @@ Finder::start (lay::LayoutViewBase *view, unsigned int cv_index, const std::vect
 
   if (layers.size () == 1) {
 
-    m_box_convert = db::box_convert <db::CellInst> (*mp_layout, (unsigned int) layers [0]);
-    m_cell_box_convert = db::box_convert <db::Cell> ((unsigned int) layers [0]);
+    m_box_convert = db::box_convert <db::CellInst, false> (*mp_layout, (unsigned int) layers [0]);
+    m_cell_box_convert = db::box_convert <db::Cell, false> ((unsigned int) layers [0]);
 
   } else {
 
-    m_box_convert = db::box_convert <db::CellInst> (*mp_layout);
-    m_cell_box_convert = db::box_convert <db::Cell> ();
+    m_box_convert = db::box_convert <db::CellInst, false> (*mp_layout);
+    m_cell_box_convert = db::box_convert <db::Cell, false> ();
 
   }
 
@@ -217,7 +217,8 @@ Finder::do_find (const db::Cell &cell, int level, const db::DCplxTrans &vp, cons
   } else if (level < m_max_level 
       && (t * m_cell_box_convert (cell)).touches (m_scan_region)
       && (mp_view->select_inside_pcells_mode () || !cell.is_proxy ()) 
-      && !mp_view->is_cell_hidden (cell.cell_index (), m_cv_index)) {
+      && !mp_view->is_cell_hidden (cell.cell_index (), m_cv_index)
+      && !cell.is_ghost_cell ()) {
 
     db::ICplxTrans it = t.inverted ();
     db::Box scan_box (it * m_scan_region);
@@ -256,12 +257,13 @@ Finder::do_find (const db::Cell &cell, int level, const db::DCplxTrans &vp, cons
 // -------------------------------------------------------------
 //  ShapeFinder implementation
 
-ShapeFinder::ShapeFinder (bool point_mode, bool top_level_sel, db::ShapeIterator::flags_type flags, const std::set<lay::ObjectInstPath> *excludes)
+ShapeFinder::ShapeFinder (bool point_mode, bool top_level_sel, db::ShapeIterator::flags_type flags, const std::set<lay::ObjectInstPath> *excludes, bool capture_all_shapes)
   : Finder (point_mode, top_level_sel), 
     mp_excludes ((excludes && !excludes->empty ()) ? excludes : 0),
     m_flags (flags), m_cv_index (0), m_topcell (0), 
     mp_text_info (0),
-    mp_prop_sel (0), m_inv_prop_sel (false), mp_progress (0)
+    mp_prop_sel (0), m_inv_prop_sel (false), mp_progress (0),
+    m_capture_all_shapes (capture_all_shapes)
 {
   m_tries = point_sel_tests;
 }
@@ -579,7 +581,7 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db:
           //  in point mode, test the edges and use a "closest" criterion
           if (shape->is_polygon ()) {
 
-            bool any_valid_edge = false;
+            bool any_valid_edge = m_capture_all_shapes;
             for (db::Shape::polygon_edge_iterator e = shape->begin_edge (); ! e.at_end (); ++e) {
               if ((*e).clipped (viewport_box).first) {
                 any_valid_edge = true;
@@ -595,7 +597,7 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db:
 
           } else if (shape->is_path ()) {
 
-            bool any_valid_edge = false;
+            bool any_valid_edge = m_capture_all_shapes;
 
             //  test the "spine"
             db::Shape::point_iterator pt = shape->begin_point ();
@@ -644,7 +646,7 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db:
               match = true;
             } else {
 
-              bool any_valid_edge = false;
+              bool any_valid_edge = m_capture_all_shapes;
 
               //  convert to polygon and test those edges
               db::Polygon poly (box);
@@ -733,7 +735,7 @@ InstFinder::find (lay::LayoutViewBase *view, const db::DBox &region_mu)
   progress.set_format ("");
   mp_progress = &progress;
 
-  std::set< std::pair<db::DCplxTrans, int> > variants = view->cv_transform_variants ();
+  std::set< std::pair<db::DCplxTrans, int> > variants = view->cv_transform_variants_with_empty ();
   for (std::set< std::pair<db::DCplxTrans, int> >::const_iterator v = variants.begin (); v != variants.end (); ++v) {
     find (view, v->second, v->first, region_mu);
   }
@@ -827,7 +829,7 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
       //  just consider the instances exactly at the last level of 
       //  hierarchy (this is where the boxes are drawn) or of cells that
       //  are hidden.
-      if (level == max_level () - 1 || inst_cell.is_proxy () || mp_view->is_cell_hidden (inst_cell.cell_index (), m_cv_index)) {
+      if (level == max_level () - 1 || inst_cell.is_proxy () || inst_cell.is_ghost_cell () || mp_view->is_cell_hidden (inst_cell.cell_index (), m_cv_index)) {
 
         db::box_convert <db::CellInst, false> bc (layout ());
         for (db::CellInstArray::iterator p = cell_inst.begin_touching (search_box, bc); ! p.at_end (); ++p) {
@@ -835,10 +837,11 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
           ++*mp_progress;
 
           db::Box ibox;
-          if (inst_cell.bbox ().empty ()) {
-            ibox = db::Box (db::Point (0, 0), db::Point (0, 0));
-          } else if (! m_visible_layers || level == mp_view->get_max_hier_levels () - 1 || mp_view->is_cell_hidden (inst_cell.cell_index (), m_cv_index)) {
-            ibox = inst_cell.bbox ();
+          if (! m_visible_layers || level == mp_view->get_max_hier_levels () - 1 || inst_cell.is_ghost_cell () || mp_view->is_cell_hidden (inst_cell.cell_index (), m_cv_index)) {
+            ibox = inst_cell.bbox_with_empty ();
+          } else if (inst_cell.bbox ().empty ()) {
+            //  empty cells cannot be found by visible layers, so we always select them here
+            ibox = inst_cell.bbox_with_empty ();
           } else {
             for (std::vector<int>::const_iterator l = m_visible_layer_indexes.begin (); l != m_visible_layer_indexes.end (); ++l) {
               ibox += inst_cell.bbox (*l);
@@ -902,7 +905,7 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
       //  just consider the instances exactly at the last level of 
       //  hierarchy (this is where the boxes are drawn) or if of cells that
       //  are hidden.
-      if (level == max_level () - 1 || inst_cell.is_proxy () || mp_view->is_cell_hidden (inst_cell.cell_index (), m_cv_index)) {
+      if (level == max_level () - 1 || inst_cell.is_proxy () || inst_cell.is_ghost_cell () || mp_view->is_cell_hidden (inst_cell.cell_index (), m_cv_index)) {
 
         db::box_convert <db::CellInst, false> bc (layout ());
         for (db::CellInstArray::iterator p = cell_inst.begin_touching (search_box, bc); ! p.at_end (); ++p) {
@@ -913,10 +916,11 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
           double d = std::numeric_limits<double>::max ();
 
           db::Box ibox;
-          if (inst_cell.bbox ().empty ()) {
-            ibox = db::Box (db::Point (0, 0), db::Point (0, 0));
-          } else if (! m_visible_layers || level == mp_view->get_max_hier_levels () - 1 || mp_view->is_cell_hidden (inst_cell.cell_index (), m_cv_index)) {
-            ibox = inst_cell.bbox ();
+          if (! m_visible_layers || level == mp_view->get_max_hier_levels () - 1 || inst_cell.is_ghost_cell () || mp_view->is_cell_hidden (inst_cell.cell_index (), m_cv_index)) {
+            ibox = inst_cell.bbox_with_empty ();
+          } else if (inst_cell.bbox ().empty ()) {
+            //  empty cells cannot be found by visible layers, so we always select them here
+            ibox = inst_cell.bbox_with_empty ();
           } else {
             for (std::vector<int>::const_iterator l = m_visible_layer_indexes.begin (); l != m_visible_layer_indexes.end (); ++l) {
               ibox += inst_cell.bbox (*l);

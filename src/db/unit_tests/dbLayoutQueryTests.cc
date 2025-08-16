@@ -516,6 +516,14 @@ TEST(1)
   }
 
   {
+    //  $_ is a placeholder for the current cell
+    db::LayoutQuery q ("$_.*");
+    db::LayoutQueryIterator iq (q, &g, &g.cell (g.cell_by_name ("c4").second));
+    std::string s = q2s_var (iq, "cell_name");
+    EXPECT_EQ (s, "c1,c3"); // child cells of "c4"
+  }
+
+  {
     //  Another way of saying "c2x.*"
     db::LayoutQuery q ("*.$(cell_name=='c2x'?'*':'')");
     db::LayoutQueryIterator iq (q, &g);
@@ -1576,5 +1584,53 @@ TEST(64)
     db::LayoutQueryIterator iq (q, &g);
     std::string s = q2s_var (iq, "data");
     EXPECT_EQ (s, "(0.01,-0.02),(-0.01,0.02),(-0.01,0.02),(-0.01,0.02),(0.01,-0.02),(-0.01,0.02)");
+  }
+}
+
+TEST(65)
+{
+  db::Layout g;
+  init_layout (g);
+
+  {
+    db::LayoutQuery q ("instances of cell .*.* where inst.trans.rot == 0");
+    db::LayoutQueryIterator iq (q, &g);
+    std::string s = q2s_var (iq, "data");
+    EXPECT_EQ (s, "nil,nil");
+    s = q2s_var (iq, "cell_name");
+    EXPECT_EQ (s, "c1,c5x");
+    s = q2s_var (iq, "inst_elements");
+    EXPECT_EQ (s, "(cell_index=0 r0 *1 10,-20),(cell_index=4 r0 *1 10,-20)");
+  }
+}
+
+TEST(66)
+{
+  db::Layout g;
+  init_layout (g);
+
+  {
+    db::LayoutQuery q ("instances of cell .*.* where inst.trans.rot == 0");
+    db::LayoutQueryIterator iq (q, &g);
+    std::string s = q2s_var (iq, "data");
+    EXPECT_EQ (s, "nil,nil");
+    s = q2s_var (iq, "cell_name");
+    EXPECT_EQ (s, "c1,c5x");
+    s = q2s_var (iq, "inst_elements");
+    EXPECT_EQ (s, "(cell_index=0 r0 *1 10,-20),(cell_index=4 r0 *1 10,-20)");
+  }
+}
+
+//  Bug: path_dtrans was ICplxTrans on top level
+TEST(67)
+{
+  db::Layout g;
+  init_layout (g);
+
+  {
+    db::LayoutQuery q ("select path_dtrans*shape.dbbox from shapes on layer l1 from instances of .*");
+    db::LayoutQueryIterator iq (q, &g);
+    std::string s = q2s_var (iq, "data");
+    EXPECT_EQ (s, "((0,0.001;0.002,0.003)),((0,0.001;0.002,0.003))");
   }
 }

@@ -66,6 +66,7 @@ public:
 
   virtual EdgesDelegate *filter_in_place (const EdgeFilterBase &) { return this; }
   virtual EdgesDelegate *filtered (const EdgeFilterBase &) const { return new EmptyEdges (); }
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> filtered_pair (const EdgeFilterBase &) const { return std::make_pair (new EmptyEdges (), new EmptyEdges ()); }
   virtual EdgesDelegate *process_in_place (const EdgeProcessorBase &) { return this; }
   virtual EdgesDelegate *processed (const EdgeProcessorBase &) const { return new EmptyEdges (); }
   virtual EdgePairsDelegate *processed_to_edge_pairs (const EdgeToEdgePairProcessorBase &) const;
@@ -118,6 +119,7 @@ public:
   virtual std::pair<EdgesDelegate *, EdgesDelegate *> in_and_out (const Edges &) const { return std::make_pair (new EmptyEdges (), new EmptyEdges ()); }
 
   virtual const db::Edge *nth (size_t) const { tl_assert (false); }
+  virtual db::properties_id_type nth_prop_id (size_t) const { tl_assert (false); }
   virtual bool has_valid_edges () const { return true; }
   virtual bool has_valid_merged_edges () const { return true; }
 

@@ -29,6 +29,8 @@
 
 #include "gsiDecl.h"
 
+#include <ruby/encoding.h>
+
 namespace rba
 {
 
@@ -120,9 +122,17 @@ tl::Variant ruby2c<tl::Variant> (VALUE rval)
     }
 
   } else if (TYPE (rval) == T_STRING) {
-    return tl::Variant (ruby2c<const char *> (rval));
+
+    //  UTF-8 encoded strings are taken to be string, others are byte strings
+    //  At least this ensures consistency for a full Ruby-C++ turnaround cycle.
+    if (rb_enc_from_index (rb_enc_get_index (rval)) == rb_utf8_encoding ()) {
+      return tl::Variant (ruby2c<std::string> (rval));
+    } else {
+      return tl::Variant (ruby2c<std::vector<char> > (rval));
+    }
+
   } else {
-    return tl::Variant (ruby2c<const char *> (rba_safe_obj_as_string (rval)));
+    return tl::Variant (ruby2c<std::string> (rba_safe_obj_as_string (rval)));
   }
 }
 
@@ -261,7 +271,7 @@ VALUE c2ruby<tl::Variant> (const tl::Variant &c)
   } else if (c.is_bool ()) {
     return c2ruby<bool> (c.to_bool ());
   } else if (c.is_a_string ()) {
-    return c2ruby<std::string> (c.to_string ());
+    return c2ruby<std::string> (c.to_stdstring ());
   } else if (c.is_a_bytearray ()) {
     return c2ruby<std::vector<char> > (c.to_bytearray ());
   } else if (c.is_long () || c.is_char ()) {

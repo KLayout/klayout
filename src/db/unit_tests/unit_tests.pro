@@ -11,10 +11,16 @@ SOURCES = \
   dbEdgeNeighborhoodTests.cc \
   dbFillToolTests.cc \
   dbLogTests.cc \
+  dbObjectWithPropertiesTests.cc \
+  dbPLCConvexDecompositionTests.cc \
+  dbPLCGraphTests.cc \
+  dbPLCTests.cc \
+  dbPLCTriangulationTests.cc \
+  dbPolygonNeighborhoodTests.cc \
+  dbPropertiesFilterTests.cc \
+  dbQuadTreeTests.cc \
   dbRecursiveInstanceIteratorTests.cc \
   dbRegionCheckUtilsTests.cc \
-  dbTriangleTests.cc \
-  dbTrianglesTests.cc \
   dbUtilsTests.cc \
   dbWriterTools.cc \
   dbLoadLayoutOptionsTests.cc \

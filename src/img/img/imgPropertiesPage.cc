@@ -193,6 +193,19 @@ PropertiesPage::description () const
 }
 
 void
+PropertiesPage::confine_selection (const std::vector<size_t> &remaining_entries)
+{
+  std::vector <img::Service::obj_iterator> org_selection;
+  m_selection.swap (org_selection);
+  for (auto i = remaining_entries.begin (); i != remaining_entries.end (); ++i) {
+    m_selection.push_back (org_selection [*i]);
+  }
+
+  mp_service->set_selection (m_selection);
+  mp_service->clear_highlights ();
+}
+
+void
 PropertiesPage::leave ()
 {
   mp_service->clear_highlights ();
@@ -784,7 +797,7 @@ PropertiesPage::reverse_color_order ()
 }
 
 void 
-PropertiesPage::apply ()
+PropertiesPage::apply (bool /*commit*/)
 {
   bool has_error = false;
 
@@ -915,7 +928,7 @@ PropertiesPage::browse ()
 {
 BEGIN_PROTECTED
 
-  apply ();
+  apply (true);
 
   lay::FileDialog file_dialog (this, tl::to_string (QObject::tr ("Load Image File")), tl::to_string (QObject::tr ("All files (*)")));
 
@@ -941,7 +954,7 @@ PropertiesPage::save_pressed ()
 {
 BEGIN_PROTECTED
 
-  apply ();
+  apply (true);
 
   lay::FileDialog file_dialog (this, tl::to_string (QObject::tr ("Save As KLayout Image File")), tl::to_string (QObject::tr ("KLayout image files (*.lyimg);;All files (*)")));
 

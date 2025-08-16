@@ -78,13 +78,13 @@ def SetGlobals():
     Usage  = "\n"
     Usage += "---------------------------------------------------------------------------------------------------------\n"
     Usage += "<< Usage of 'makeDMG4mac.py' >>\n"
-    Usage += "       for making a DMG file of KLayout 0.29.11 or later on different Apple macOS platforms.\n"
+    Usage += "       for making a DMG file of KLayout 0.30.2 or later on different Apple macOS platforms.\n"
     Usage += "\n"
     Usage += "$ [python] ./makeDMG4mac.py\n"
     Usage += "   option & argument    : descriptions                                               | default value\n"
     Usage += "   ----------------------------------------------------------------------------------+-----------------\n"
     Usage += "   <-p|--pkg <dir>>     : package directory created by `build4mac.py` with [-y|-Y]   | ``\n"
-    Usage += "                        : like 'LW-qt5MP.pkg.macos-Monterey-release-Rmp33Pmp311'     | \n"
+    Usage += "                        : like 'LW-qt5MP.pkg.macos-Sequoia-release-Rmp33Pmp312'      | \n"
     Usage += "   <-c|--clean>         : clean the work directory                                   | disabled\n"
     Usage += "   <-m|--make>          : make a compressed DMG file                                 | disabled\n"
     Usage += "                        :   <-c|--clean> and <-m|--make> are mutually exclusive      | \n"
@@ -218,17 +218,17 @@ def SetGlobals():
 ## To check the contents of the package directory
 #
 # The package directory name should look like:
-#     * ST-qt5MP.pkg.macos-Sonoma-release-RsysPsys
-#     * LW-qt5Ana3.pkg.macos-Sonoma-release-Rana3Pana3
-#     * LW-qt6Brew.pkg.macos-Sonoma-release-Rhb34Phb312  --- (1)
-#     * LW-qt5MP.pkg.macos-Sonoma-release-Rmp33Pmp312
-#     * HW-qt6Brew.pkg.macos-Sonoma-release-RsysPhb311
+#     * ST-qt5MP.pkg.macos-Sequoia-release-RsysPsys
+#     * LW-qt5Ana3.pkg.macos-Sequoia-release-Rana3Pana3
+#     * LW-qt6Brew.pkg.macos-Sequoia-release-Rhb34Phb312  --- (1)
+#     * LW-qt5MP.pkg.macos-Sequoia-release-Rmp33Pmp312
+#     * HW-qt6Brew.pkg.macos-Sequoia-release-RsysPhb311
 #
-#     * ST-qt6MP.pkg.macos-Sonoma-release-RsysPsys
-#     * LW-qt6MP.pkg.macos-Sonoma-release-Rmp33Pmp312
+#     * ST-qt6MP.pkg.macos-Sequoia-release-RsysPsys
+#     * LW-qt6MP.pkg.macos-Sequoia-release-Rmp33Pmp312
 #
 # Generated DMG will be, for example,
-#     (1) ---> LW-klayout-0.29.7-macOS-Sonoma-1-qt6Brew-Rhb34Phb312.dmg
+#     (1) ---> LW-klayout-0.30.2-macOS-Sequoia-1-qt6Brew-Rhb34Phb312.dmg
 #
 # @return on success, positive integer in [MB] that tells approx. occupied disc space;
 #         on failure, -1
@@ -268,15 +268,15 @@ def CheckPkgDirectory():
 
     #-----------------------------------------------------------------------------------------------
     # [2] Identify (Qt, Ruby, Python) from PkgDir
-    #     * ST-qt5MP.pkg.macos-Sonoma-release-RsysPsys
-    #     * LW-qt5Ana3.pkg.macos-Sonoma-release-Rana3Pana3
-    #     * LW-qt6Brew.pkg.macos-Sonoma-release-Rhb34Phb312
-    #     * LW-qt5MP.pkg.macos-Sonoma-release-Rmp33Pmp312
-    #     * HW-qt6Brew.pkg.macos-Sonoma-release-RsysPhb311
-    #     * EX-qt5MP.pkg.macos-Sonoma-release-Rhb34Pmp312
+    #     * ST-qt5MP.pkg.macos-Sequoia-release-RsysPsys
+    #     * LW-qt5Ana3.pkg.macos-Sequoia-release-Rana3Pana3
+    #     * LW-qt6Brew.pkg.macos-Sequoia-release-Rhb34Phb312
+    #     * LW-qt5MP.pkg.macos-Sequoia-release-Rmp33Pmp312
+    #     * HW-qt6Brew.pkg.macos-Sequoia-release-RsysPhb311
+    #     * EX-qt5MP.pkg.macos-Sequoia-release-Rhb34Pmp312
     #
-    #     * ST-qt6MP.pkg.macos-Sonoma-release-RsysPsys
-    #     * LW-qt6MP.pkg.macos-Sonoma-release-Rmp33Pmp312
+    #     * ST-qt6MP.pkg.macos-Sequoia-release-RsysPsys
+    #     * LW-qt6MP.pkg.macos-Sequoia-release-Rmp33Pmp312
     #-----------------------------------------------------------------------------------------------
     #                  0      1      2                      3                  4                    5         6        7
     patQRP = r'(ST|LW|HW|EX)([-])([qt5|qt6][0-9A-Za-z]+)([.]pkg[.])([A-Za-z]+[-][A-Za-z]+[-])(release|debug)([-])([0-9A-Za-z]+)'
@@ -424,7 +424,7 @@ def CheckPkgDirectory():
     #------------------------------------------------------
     # [5] Check the occupied disk space
     #------------------------------------------------------
-    command = "\du -sm %s" % DefaultBundleName
+    command = r"\du -sm %s" % DefaultBundleName
     sizeApp = int( os.popen(command).read().strip("\n").split("\t")[0] )
 
     #------------------------------------------------------
@@ -671,14 +671,14 @@ def MakeTargetDMGFile(msg=""):
     imageDest = "%s/.background" % MountDir
     if not os.path.isdir(imageDest):
         os.mkdir(imageDest)
-    command = "\cp -p %s %s/%s" % (imageSrc, imageDest, BackgroundPNG)
+    command = r"\cp -p %s %s/%s" % (imageSrc, imageDest, BackgroundPNG)
     os.system(command)
 
     #--------------------------------------------------------
     # (6) Create a symbolic link to /Applications
     #--------------------------------------------------------
     print( ">>> (6) Creating a symbolic link to /Applications..." )
-    command = "\ln -s %s %s/%s" % (RootApplications, MountDir, RootApplications)
+    command = r"\ln -s %s %s/%s" % (RootApplications, MountDir, RootApplications)
     os.system(command)
 
     #--------------------------------------------------------
@@ -702,7 +702,7 @@ def MakeTargetDMGFile(msg=""):
     print( ">>> (8) Copying the volume icon..." )
     iconsSrc  = "macbuild/Resources/%s" % VolumeIcons
     iconsDest = "%s/.VolumeIcon.icns" % MountDir
-    command1  = "\cp -p %s %s" % (iconsSrc, iconsDest)
+    command1  = r"\cp -p %s %s" % (iconsSrc, iconsDest)
     command2  = "SetFile -c icnC %s" % iconsDest
     os.system(command1)
     sleep(2)
@@ -713,7 +713,7 @@ def MakeTargetDMGFile(msg=""):
     # (9) Change the permission
     #--------------------------------------------------------
     print( ">>> (9) Changing permission to 755..." )
-    command = "\chmod -Rf 755 %s &> /dev/null" % MountDir
+    command = r"\chmod -Rf 755 %s &> /dev/null" % MountDir
     os.system(command)
 
     #--------------------------------------------------------

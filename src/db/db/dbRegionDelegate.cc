@@ -33,6 +33,7 @@ RegionDelegate::RegionDelegate ()
   m_base_verbosity = 30;
   m_report_progress = false;
   m_merged_semantics = true;
+  m_join_properties_on_merge = false;
   m_strict_handling = false;
   m_merge_min_coherence = false;
 }
@@ -50,6 +51,7 @@ RegionDelegate::operator= (const RegionDelegate &other)
     m_base_verbosity = other.m_base_verbosity;
     m_report_progress = other.m_report_progress;
     m_merged_semantics = other.m_merged_semantics;
+    m_join_properties_on_merge = other.m_join_properties_on_merge;
     m_strict_handling = other.m_strict_handling;
     m_merge_min_coherence = other.m_merge_min_coherence;
   }
@@ -90,6 +92,14 @@ void RegionDelegate::set_merged_semantics (bool f)
   if (f != m_merged_semantics) {
     m_merged_semantics = f;
     merged_semantics_changed ();
+  }
+}
+
+void RegionDelegate::set_join_properties_on_merge (bool f)
+{
+  if (f != m_join_properties_on_merge) {
+    m_join_properties_on_merge = f;
+    join_properties_on_merge_changed ();
   }
 }
 

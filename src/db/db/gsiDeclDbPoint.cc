@@ -95,7 +95,7 @@ struct point_defs
 
   static size_t hash_value (const C *pt)
   {
-    return std::hfunc (*pt);
+    return tl::hfunc (*pt);
   }
 
   static C move_d (C *p, const vector_type &d)

@@ -70,6 +70,7 @@ extern EDT_PUBLIC std::string cfg_edit_inst_column_y;
 extern EDT_PUBLIC std::string cfg_edit_inst_place_origin;
 extern EDT_PUBLIC std::string cfg_edit_top_level_selection;
 extern EDT_PUBLIC std::string cfg_edit_pcell_show_parameter_names;
+extern EDT_PUBLIC std::string cfg_edit_pcell_lazy_eval_mode;
 extern EDT_PUBLIC std::string cfg_edit_hier_copy_mode;
 extern EDT_PUBLIC std::string cfg_edit_combine_mode;
 

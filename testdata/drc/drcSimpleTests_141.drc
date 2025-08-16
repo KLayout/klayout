@@ -1,0 +1,24 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+end
+
+l1 = input(1, 0, enable_props)
+
+l1.output(1, 0)
+
+l1.merged_props.output(10, 0)
+
+l1d = l1.dup
+l1d.merge_props
+l1d.output(11, 0)
+
+l1.merged_props(2).output(20, 0)
+
+l1d = l1.dup
+l1d.merge_props(2)
+l1d.output(21, 0)
+

@@ -36,6 +36,12 @@
 
 // -----------------------------------------------------------------------
 // class QRegularExpression
+  static bool QRegularExpression_operator_eq(const QRegularExpression *a, const QRegularExpression &b) {
+    return *a == b;
+  }
+  static bool QRegularExpression_operator_ne(const QRegularExpression *a, const QRegularExpression &b) {
+    return !(*a == b);
+  }
 
 //  Constructor QRegularExpression::QRegularExpression()
 
@@ -209,25 +215,6 @@ static void _call_f_namedCaptureGroups_c0 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// bool QRegularExpression::operator!=(const QRegularExpression &re)
-
-
-static void _init_f_operator_excl__eq__c3188 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("re");
-  decl->add_arg<const QRegularExpression & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_excl__eq__c3188 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QRegularExpression &arg1 = gsi::arg_reader<const QRegularExpression & >() (args, heap);
-  ret.write<bool > ((bool)((QRegularExpression *)cls)->operator!= (arg1));
-}
-
-
 // QRegularExpression &QRegularExpression::operator=(const QRegularExpression &re)
 
 
@@ -244,25 +231,6 @@ static void _call_f_operator_eq__3188 (const qt_gsi::GenericMethod * /*decl*/, v
   tl::Heap heap;
   const QRegularExpression &arg1 = gsi::arg_reader<const QRegularExpression & >() (args, heap);
   ret.write<QRegularExpression & > ((QRegularExpression &)((QRegularExpression *)cls)->operator= (arg1));
-}
-
-
-// bool QRegularExpression::operator==(const QRegularExpression &re)
-
-
-static void _init_f_operator_eq__eq__c3188 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("re");
-  decl->add_arg<const QRegularExpression & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_eq__eq__c3188 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QRegularExpression &arg1 = gsi::arg_reader<const QRegularExpression & >() (args, heap);
-  ret.write<bool > ((bool)((QRegularExpression *)cls)->operator== (arg1));
 }
 
 
@@ -462,9 +430,7 @@ static gsi::Methods methods_QRegularExpression () {
   methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QRegularExpression::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
   methods += new qt_gsi::GenericMethod ("match", "@brief Method QRegularExpressionMatch QRegularExpression::match(const QString &subject, qsizetype offset, QRegularExpression::MatchType matchType, QFlags<QRegularExpression::MatchOption> matchOptions)\n", true, &_init_f_match_c10730, &_call_f_match_c10730);
   methods += new qt_gsi::GenericMethod ("namedCaptureGroups", "@brief Method QStringList QRegularExpression::namedCaptureGroups()\n", true, &_init_f_namedCaptureGroups_c0, &_call_f_namedCaptureGroups_c0);
-  methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QRegularExpression::operator!=(const QRegularExpression &re)\n", true, &_init_f_operator_excl__eq__c3188, &_call_f_operator_excl__eq__c3188);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QRegularExpression &QRegularExpression::operator=(const QRegularExpression &re)\n", false, &_init_f_operator_eq__3188, &_call_f_operator_eq__3188);
-  methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QRegularExpression::operator==(const QRegularExpression &re)\n", true, &_init_f_operator_eq__eq__c3188, &_call_f_operator_eq__eq__c3188);
   methods += new qt_gsi::GenericMethod ("optimize", "@brief Method void QRegularExpression::optimize()\n", true, &_init_f_optimize_c0, &_call_f_optimize_c0);
   methods += new qt_gsi::GenericMethod (":pattern", "@brief Method QString QRegularExpression::pattern()\n", true, &_init_f_pattern_c0, &_call_f_pattern_c0);
   methods += new qt_gsi::GenericMethod ("patternErrorOffset", "@brief Method qsizetype QRegularExpression::patternErrorOffset()\n", true, &_init_f_patternErrorOffset_c0, &_call_f_patternErrorOffset_c0);
@@ -479,6 +445,9 @@ static gsi::Methods methods_QRegularExpression () {
 }
 
 gsi::Class<QRegularExpression> decl_QRegularExpression ("QtCore", "QRegularExpression",
+  gsi::method_ext("==", &QRegularExpression_operator_eq, gsi::arg ("other"), "@brief Method bool QRegularExpression::operator==(const QRegularExpression &) const") +
+  gsi::method_ext("!=", &QRegularExpression_operator_ne, gsi::arg ("other"), "@brief Method bool QRegularExpression::operator!=(const QRegularExpression &) const") 
++
   methods_QRegularExpression (),
   "@qt\n@brief Binding of QRegularExpression");
 

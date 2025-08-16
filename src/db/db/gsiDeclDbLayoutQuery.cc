@@ -52,8 +52,8 @@ struct LayoutQueryIteratorWrapper
   typedef void difference_type;
   typedef void pointer;
 
-  LayoutQueryIteratorWrapper (const db::LayoutQuery &q, const db::Layout *layout, tl::Eval *eval)
-    : mp_iter (new db::LayoutQueryIterator (q, layout, eval))
+  LayoutQueryIteratorWrapper (const db::LayoutQuery &q, const db::Layout *layout, const db::Cell *cell, tl::Eval *eval)
+    : mp_iter (new db::LayoutQueryIterator (q, layout, cell, eval))
   {
     //  .. nothing yet ..
   }
@@ -77,9 +77,14 @@ private:
   tl::shared_ptr<db::LayoutQueryIterator> mp_iter;
 };
 
-static LayoutQueryIteratorWrapper iterate (const db::LayoutQuery *q, const db::Layout *layout, tl::Eval *eval)
+static LayoutQueryIteratorWrapper iterate1 (const db::LayoutQuery *q, const db::Layout *layout, tl::Eval *eval)
 {
-  return LayoutQueryIteratorWrapper (*q, layout, eval);
+  return LayoutQueryIteratorWrapper (*q, layout, 0, eval);
+}
+
+static LayoutQueryIteratorWrapper iterate2 (const db::LayoutQuery *q, const db::Layout *layout, const db::Cell *cell, tl::Eval *eval)
+{
+  return LayoutQueryIteratorWrapper (*q, layout, cell, eval);
 }
 
 static tl::Variant iter_get (db::LayoutQueryIterator *iter, const std::string &name)
@@ -158,6 +163,16 @@ Class<db::LayoutQueryIterator> decl_LayoutQueryIterator ("db", "LayoutQueryItera
   "The LayoutQueryIterator class has been introduced in version 0.25."
 );
 
+static void execute1 (db::LayoutQuery *q, db::Layout &layout, tl::Eval *context)
+{
+  q->execute (layout, 0, context);
+}
+
+static void execute2 (db::LayoutQuery *q, db::Layout &layout, db::Cell *cell, tl::Eval *context)
+{
+  q->execute (layout, cell, context);
+}
+
 Class<db::LayoutQuery> decl_LayoutQuery ("db", "LayoutQuery",
   gsi::constructor ("new", &new_query, gsi::arg ("query"),
     "@brief Creates a new query object from the given query string\n"
@@ -168,7 +183,7 @@ Class<db::LayoutQuery> decl_LayoutQuery ("db", "LayoutQuery",
     "This method allows detection of the properties available. Within the query, all of these "
     "properties can be obtained from the query iterator using \\LayoutQueryIterator#get.\n"
   ) +
-  gsi::method ("execute", &db::LayoutQuery::execute, gsi::arg("layout"), gsi::arg ("context", (tl::Eval *) 0, "nil"),
+  gsi::method_ext ("execute", &execute1, gsi::arg("layout"), gsi::arg ("context", (tl::Eval *) 0, "nil"),
     "@brief Executes the query\n"
     "\n"
     "This method can be used to execute \"active\" queries such\n"
@@ -179,13 +194,27 @@ Class<db::LayoutQuery> decl_LayoutQuery ("db", "LayoutQuery",
     "The context argument allows supplying an expression execution context. This context can be used for "
     "example to supply variables for the execution. It has been added in version 0.26.\n"
   ) +
-  gsi::iterator_ext ("each", &iterate, gsi::arg ("layout"), gsi::arg ("context", (tl::Eval *) 0, "nil"),
+  gsi::method_ext ("execute", &execute2, gsi::arg("layout"), gsi::arg("cell"), gsi::arg ("context", (tl::Eval *) 0, "nil"),
+    "@brief Executes the query\n"
+    "\n"
+    "This version allows specifying a context cell. This cell can be used as a default cell for cell expressions.\n"
+    "\n"
+    "This variant has been introduced in version 0.30."
+  ) +
+  gsi::iterator_ext ("each", &iterate1, gsi::arg ("layout"), gsi::arg ("context", (tl::Eval *) 0, "nil"),
     "@brief Executes the query and delivered the results iteratively.\n"
     "The argument to the block is a \\LayoutQueryIterator object which can be "
     "asked for specific results.\n"
     "\n"
     "The context argument allows supplying an expression execution context. This context can be used for "
     "example to supply variables for the execution. It has been added in version 0.26.\n"
+  ) +
+  gsi::iterator_ext ("each", &iterate2, gsi::arg ("layout"), gsi::arg("cell"), gsi::arg ("context", (tl::Eval *) 0, "nil"),
+    "@brief Executes the query and delivered the results iteratively.\n"
+    "\n"
+    "This version allows specifying a context cell. This cell can be used as a default cell for cell expressions.\n"
+    "\n"
+    "This variant has been introduced in version 0.30."
   ),
   "@brief A layout query\n"
   "Layout queries are the backbone of the \"Search & replace\" feature. Layout queries allow retrieval of "

@@ -107,6 +107,13 @@ Edges::Edges (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::I
   mp_delegate = new DeepEdges (si, dss, trans, as_edges, merged_semantics);
 }
 
+Edges::Edges (DeepShapeStore &dss)
+{
+  tl_assert (dss.is_singular ());
+  unsigned int layout_index = 0; // singular layout index
+  mp_delegate = new DeepEdges (DeepLayer (&dss, layout_index, dss.layout (layout_index).insert_layer ()));
+}
+
 const db::RecursiveShapeIterator &
 Edges::iter () const
 {

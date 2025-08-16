@@ -36,12 +36,7 @@ DB_PUBLIC db::Box cellinst_box_convert_impl (const db::CellInst &inst, const db:
   } else if (allow_empty) {
     return inst.bbox (*layout);
   } else {
-    db::Box box = inst.bbox (*layout);
-    if (box.empty ()) {
-      return db::Box (db::Point (0, 0), db::Point (0, 0));
-    } else {
-      return box;
-    }
+    return inst.bbox_with_empty (*layout);
   }
 }
 
@@ -52,11 +47,7 @@ DB_PUBLIC db::Box cell_box_convert_impl (const db::Cell &c, int layer, bool allo
   } else if (allow_empty) {
     return c.bbox ();
   } else {
-    if (c.bbox ().empty ()) {
-      return db::Box (db::Point (0, 0), db::Point (0, 0));
-    } else {
-      return c.bbox ();
-    }
+    return c.bbox_with_empty ();
   }
 }
 

@@ -6,7 +6,7 @@
 #
 # Here are dictionaries of ...
 #  different modules for building KLayout (http://www.klayout.de/index.php)
-#  version 0.29.11 or later on different Apple Mac OSX platforms.
+#  version 0.30.2 or later on different Apple Mac OSX platforms.
 #
 # This file is imported by 'build4mac.py' script.
 #===============================================================================
@@ -192,7 +192,7 @@ RubySequoia      = { 'exe':  '/System/Library/Frameworks/Ruby.framework/Versions
 #  install with 'sudo port install ruby33'
 # [Key Type Name] = 'MP33'
 Ruby33MacPorts  = { 'exe': '/opt/local/bin/ruby3.3',
-                    'inc': '/opt/local/include/ruby-3.3.6',
+                    'inc': '/opt/local/include/ruby-3.3.9',
                     'lib': '/opt/local/lib/libruby.3.3.dylib'
                   }
 

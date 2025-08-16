@@ -186,6 +186,13 @@ OriginalLayerRegion::merged_semantics_changed ()
 }
 
 void
+OriginalLayerRegion::join_properties_on_merge_changed ()
+{
+  m_merged_polygons.clear ();
+  m_merged_polygons_valid = false;
+}
+
+void
 OriginalLayerRegion::min_coherence_changed ()
 {
   m_is_merged = false;
@@ -330,11 +337,7 @@ OriginalLayerRegion::begin_merged_iter () const
 bool
 OriginalLayerRegion::empty () const
 {
-  //  NOTE: we should to make sure the iterator isn't validated as this would spoil the usability or OriginalLayerRegion upon
-  //  layout changes
-  db::RecursiveShapeIterator iter = m_iter;
-
-  return iter.at_end ();
+  return m_iter.at_end_no_lock ();
 }
 
 bool
@@ -450,7 +453,7 @@ OriginalLayerRegion::ensure_merged_polygons_valid () const
   if (! m_merged_polygons_valid) {
 
     m_merged_polygons.clear ();
-    merge_polygons_to (m_merged_polygons, min_coherence (), 0);
+    merge_polygons_to (m_merged_polygons, min_coherence (), 0, join_properties_on_merge ());
 
     m_merged_polygons_valid = true;
 

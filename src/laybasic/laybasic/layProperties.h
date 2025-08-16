@@ -120,6 +120,14 @@ public:
   }
 
   /**
+   *  @brief Confines the selection to the given selection indexes
+   *
+   *  After this operation, the selection entries are renumbered with only
+   *  the remaining ones present.
+   */
+  virtual void confine_selection (const std::vector<size_t> &remaining_entries) = 0;
+
+  /**
    *  @brief Update the display
    *
    *  This method is called by the dialog to transfer data from the
@@ -154,8 +162,10 @@ public:
    *  Apply any changes to the current objects. If nothing was
    *  changed, the object may be left untouched.
    *  The dialog will start a transaction on the manager object.
+   *
+   *  @param commit Is true for the "final" changes (i.e. not during editing)
    */
-  virtual void apply () 
+  virtual void apply (bool /*commit*/)
   {
     //  default implementation is empty.
   }
@@ -174,8 +184,11 @@ public:
    *  Apply any changes to the current object plus all other objects of the same kind. 
    *  If nothing was changed, the objects may be left untouched.
    *  The dialog will start a transaction on the manager object.
+   *
+   *  @param relative Is true if relative mode is selected
+   *  @param commit Is true for the "final" changes (i.e. not during editing)
    */
-  virtual void apply_to_all (bool /*relative*/)
+  virtual void apply_to_all (bool /*relative*/, bool /*commit*/)
   {
     //  default implementation is empty.
   }

@@ -113,11 +113,33 @@ public:
   }
 
   /**
+   *  @brief Constructor from a box with properties
+   *
+   *  Creates an edge set representing the contour of the box
+   */
+  explicit Edges (const db::BoxWithProperties &s)
+    : mp_delegate (0)
+  {
+    insert (s);
+  }
+
+  /**
    *  @brief Constructor from a simple polygon
    *
    *  Creates an edge set representing the contour of the polygon
    */
   explicit Edges (const db::SimplePolygon &s)
+    : mp_delegate (0)
+  {
+    insert (s);
+  }
+
+  /**
+   *  @brief Constructor from a simple polygon with properties
+   *
+   *  Creates an edge set representing the contour of the polygon
+   */
+  explicit Edges (const db::SimplePolygonWithProperties &s)
     : mp_delegate (0)
   {
     insert (s);
@@ -135,6 +157,17 @@ public:
   }
 
   /**
+   *  @brief Constructor from a polygon with properties
+   *
+   *  Creates an edge set representing the contour of the polygon
+   */
+  explicit Edges (const db::PolygonWithProperties &s)
+    : mp_delegate (0)
+  {
+    insert (s);
+  }
+
+  /**
    *  @brief Constructor from a path
    *
    *  Creates an edge set representing the contour of the path
@@ -146,11 +179,33 @@ public:
   }
 
   /**
+   *  @brief Constructor from a path with properties
+   *
+   *  Creates an edge set representing the contour of the path
+   */
+  explicit Edges (const db::PathWithProperties &s)
+    : mp_delegate (0)
+  {
+    insert (s);
+  }
+
+  /**
    *  @brief Constructor from an edge
    *
    *  Creates an edge set representing the single edge
    */
   explicit Edges (const db::Edge &s)
+    : mp_delegate (0)
+  {
+    insert (s);
+  }
+
+  /**
+   *  @brief Constructor from an edge with properties
+   *
+   *  Creates an edge set representing the single edge
+   */
+  explicit Edges (const db::EdgeWithProperties &s)
     : mp_delegate (0)
   {
     insert (s);
@@ -202,6 +257,12 @@ public:
    *  @brief Constructor from a RecursiveShapeIterator providing a deep representation with transformation
    */
   explicit Edges (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans, bool as_edges = true, bool merged_semantics = true);
+
+  /**
+   *  @brief Creates a new empty layer inside the dss
+   *  This method requires the DSS to be singular.
+   */
+  explicit Edges (DeepShapeStore &dss);
 
   /**
    *  @brief Implementation of the ShapeCollection interface
@@ -466,6 +527,18 @@ public:
   Edges filtered (const EdgeFilterBase &filter) const
   {
     return Edges (mp_delegate->filtered (filter));
+  }
+
+  /**
+   *  @brief Returns the filtered edges and the others
+   *
+   *  This method will return a new edge collection with only those edges which
+   *  conform to the filter criterion and another for those which don't.
+   */
+  std::pair<Edges, Edges> split_filter (const EdgeFilterBase &filter) const
+  {
+    std::pair<db::EdgesDelegate *, db::EdgesDelegate *> p = mp_delegate->filtered_pair (filter);
+    return std::make_pair (Edges (p.first), Edges (p.second));
   }
 
   /**
@@ -1367,11 +1440,22 @@ public:
   /**
    *  @brief Returns the nth edge
    *
-   *  This operation is available only for flat regions - i.e. such for which "has_valid_edges" is true.
+   *  This operation is available only for flat edge collections - i.e. such for which "has_valid_edges" is true.
    */
   const db::Edge *nth (size_t n) const
   {
     return mp_delegate->nth (n);
+  }
+
+  /**
+   *  @brief Returns the nth edge's property ID
+   *
+   *  This operation is available only for flat edge collections - i.e. such for which
+   *  "has_valid_edges" is true.
+   */
+  db::properties_id_type nth_prop_id (size_t n) const
+  {
+    return mp_delegate->nth_prop_id (n);
   }
 
   /**

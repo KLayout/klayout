@@ -1232,7 +1232,7 @@ struct test_arg_func<gsi::ObjectType>
       return;
     }
 
-    if (! (cls_decl == acls || (loose && (cls_decl->is_derived_from (atype.cls ()) || cls_decl->can_convert_to (atype.cls ()))))) {
+    if (! (cls_decl == acls || (loose && (cls_decl->is_derived_from (atype.cls ()) || (object_substitution && cls_decl->can_convert_to (atype.cls ())))))) {
       *ret = false;
       return;
     }

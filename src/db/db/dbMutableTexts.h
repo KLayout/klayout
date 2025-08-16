@@ -45,7 +45,7 @@ public:
   MutableTexts (const MutableTexts &other);
   virtual ~MutableTexts ();
 
-  virtual void do_insert (const db::Text &text) = 0;
+  virtual void do_insert (const db::Text &text, db::properties_id_type prop_id) = 0;
 
   virtual void do_transform (const db::Trans &t) = 0;
   virtual void do_transform (const db::ICplxTrans &t) = 0;
@@ -63,7 +63,8 @@ public:
   void transform (const db::IMatrix3d &t) { do_transform (t); }
   void transform (const db::IMatrix2d &t) { do_transform (t); }
 
-  void insert (const db::Text &text) { do_insert (text); }
+  void insert (const db::Text &text) { do_insert (text, 0); }
+  void insert (const db::TextWithProperties &text) { do_insert (text, text.properties_id ()); }
   void insert (const db::Shape &shape);
 
   template <class T>
@@ -72,7 +73,7 @@ public:
     if (shape.is_text ()) {
       db::Text text = shape.text ();
       text.transform (trans);
-      insert (text);
+      do_insert (text, shape.prop_id ());
     }
   }
 

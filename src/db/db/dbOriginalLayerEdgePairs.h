@@ -53,6 +53,7 @@ public:
   virtual bool empty () const;
 
   virtual const db::EdgePair *nth (size_t n) const;
+  virtual db::properties_id_type nth_prop_id (size_t n) const;
   virtual bool has_valid_edge_pairs () const;
 
   virtual const db::RecursiveShapeIterator *iter () const;

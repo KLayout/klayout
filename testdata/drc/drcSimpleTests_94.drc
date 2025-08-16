@@ -1,0 +1,26 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+end
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+
+l1.output(1, 0)
+l2.output(2, 0)
+
+x = l1 ^ l2
+
+# we detect point-like polygons here by explicitly 
+# iterating. The enlargement makes sure, we have something
+# to write to the output layout.
+boxes = x.data.each.collect do |p|
+  RBA::Box::new(p.bbox.enlarged(10, 10))
+end
+x.data = RBA::Region::new(boxes)
+
+x.output(10, 0)
+

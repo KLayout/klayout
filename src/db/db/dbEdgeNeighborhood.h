@@ -158,7 +158,7 @@ class DB_PUBLIC EdgeNeighborhoodCompoundOperationNode
   : public CompoundRegionMultiInputOperationNode
 {
 public:
-  EdgeNeighborhoodCompoundOperationNode (const std::vector<CompoundRegionOperationNode *> &children, EdgeNeighborhoodVisitor *visitor, const db::Coord bext, db::Coord eext, db::Coord din, db::Coord dout);
+  EdgeNeighborhoodCompoundOperationNode (const std::vector<CompoundRegionOperationNode *> &children, EdgeNeighborhoodVisitor *visitor, db::Coord bext, db::Coord eext, db::Coord din, db::Coord dout);
 
   virtual ResultType result_type () const
   {

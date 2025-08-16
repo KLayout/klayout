@@ -702,7 +702,8 @@ inline char unescape_char (const char * &cp)
 {
   if (safe_isdigit (*cp)) {
     int c = 0;
-    while (*cp && safe_isdigit (*cp)) {
+    unsigned int n = 0;
+    while (*cp && safe_isdigit (*cp) && n++ < 3) {
       c = c * 8 + int (*cp - '0');
       ++cp;
     }
@@ -1974,17 +1975,17 @@ sprintf (const char *f, const std::vector <tl::Variant> &vv, unsigned int a0)
           os.setf (std::ios::uppercase);
         }
         if (a < vv.size ()) {
-          os << vv [a].to_ulong ();
+          os << vv [a].to_ulonglong ();
         }
       } else if (*cp == 'u' || *cp == 'U') {
         os.setf (std::ios_base::fmtflags (0), std::ios::basefield);
         if (a < vv.size ()) {
-          os << vv [a].to_ulong ();
+          os << vv [a].to_ulonglong ();
         }
       } else if (*cp == 'd' || *cp == 'D') {
         os.setf (std::ios_base::fmtflags (0), std::ios::basefield);
         if (a < vv.size ()) {
-          os << vv [a].to_long ();
+          os << vv [a].to_longlong ();
         }
       } else if (*cp == 's' || *cp == 'S') {
         os.setf (std::ios_base::fmtflags (0), std::ios::basefield);

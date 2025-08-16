@@ -14,18 +14,22 @@ f2 = extent - l1.sized(1.0)
 p1 = fill_pattern("PAT1").shape(100, 0, box(0, 0, 1.um, 1.um)).origin(-0.5.um, -0.5.um)
 p2 = fill_pattern("PAT2").shape(100, 1, box(0, 0, 1.um, 1.um)).origin(-0.5.um, -0.5.um)
 p3 = fill_pattern("PAT3").shape(100, 2, box(0, 0, 1.um, 1.um)).shape(1000, 0, box(-0.5.um, -0.5.um, 1.5.um, 1.5.um))
+p4 = fill_pattern("PAT4").shape(100, 3, box(0, 0, 1.um, 1.um)).dim(1.um, 1.um).margin(2.um, 4.um)
 
 p11 = fill_pattern("PAT11").shape(101, 0, box(0, 0, 1.um, 1.um)).origin(-0.5.um, -0.5.um)
 p12 = fill_pattern("PAT12").shape(101, 1, box(0, 0, 1.um, 1.um)).origin(-0.5.um, -0.5.um)
 p13 = fill_pattern("PAT13").shape(101, 2, box(0, 0, 1.um, 1.um)).shape(1000, 0, box(-0.5.um, -0.5.um, 1.5.um, 1.5.um))
+p14 = fill_pattern("PAT14").shape(101, 3, box(0, 0, 1.um, 1.um)).dim(1.um, 1.um).margin(2.um, 4.um)
 
 f1.fill(p1, hstep(2.0, 1.0), vstep(-1.0, 2.0))
 f1.fill(p2, hstep(2.0, 1.0), vstep(-1.0, 2.0), auto_origin)
 f1.fill(p3)
+f1.fill(p4, hstep(2.0, 0), vstep(0, 2.0))
 
 f2.fill(p11, hstep(2.0, 1.0), vstep(-1.0, 2.0))
 f2.fill(p12, hstep(2.0, 1.0), vstep(-1.0, 2.0), auto_origin)
 f2.fill(p13)
+f2.fill(p14, hstep(2.0, 0), vstep(0, 2.0))
 
 l1.output(1, 0)
 f1.output(10, 0)

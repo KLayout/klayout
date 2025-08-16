@@ -111,9 +111,17 @@ class DBNetlist_TestClass < TestBase
 
     assert_equal(nl.circuits_by_name("X*").collect { |x| x.name }, [ "XYZ" ])
     assert_equal(nl.circuits_by_name("x*").collect { |x| x.name }, [])
+    assert_equal(nl.circuits_by_name("X*", true).collect { |x| x.name }, [ "XYZ" ])
+    assert_equal(nl.circuits_by_name("x*", true).collect { |x| x.name }, [])
+    assert_equal(nl.circuits_by_name("X*", false).collect { |x| x.name }, [ "XYZ" ])
+    assert_equal(nl.circuits_by_name("x*", false).collect { |x| x.name }, [ "XYZ" ])
     nl.case_sensitive = false
     assert_equal(nl.circuits_by_name("X*").collect { |x| x.name }, [ "XYZ" ])
     assert_equal(nl.circuits_by_name("x*").collect { |x| x.name }, [ "XYZ" ])
+    assert_equal(nl.circuits_by_name("X*", true).collect { |x| x.name }, [ "XYZ" ])
+    assert_equal(nl.circuits_by_name("x*", true).collect { |x| x.name }, [])
+    assert_equal(nl.circuits_by_name("X*", false).collect { |x| x.name }, [ "XYZ" ])
+    assert_equal(nl.circuits_by_name("x*", false).collect { |x| x.name }, [ "XYZ" ])
     nl.case_sensitive = true
     assert_equal(nl.circuits_by_name("???").collect { |x| x.name }, [ "XYZ", "UVW" ])
     assert_equal(nl.circuits_by_name("*").collect { |x| x.name }, [ "XYZ", "UVW" ])
@@ -346,6 +354,11 @@ class DBNetlist_TestClass < TestBase
     assert_equal(d1.net_for_terminal("B").name, "NET")
     assert_equal(d1.net_for_terminal("X").inspect, "nil")
     assert_equal(d1.net_for_terminal(0).inspect, "nil")
+
+    assert_equal(d1.terminal_ref(1).net.name, "NET")
+    assert_equal(d1.terminal_ref("B").net.name, "NET")
+    assert_equal(d1.terminal_ref("X").inspect, "nil")
+    assert_equal(d1.terminal_ref(0).inspect, "nil")
 
     d1.disconnect_terminal("B")
     assert_equal(net.terminal_count, 0)
@@ -714,7 +727,31 @@ class DBNetlist_TestClass < TestBase
     assert_equal(c.net_by_name("net1").inspect, "nil")
     nl.case_sensitive = false
     assert_equal(c.net_by_name("net1").name, "NET1")
+    assert_equal(c.nets_by_name("NET*").collect(&:name), ["NET1"])
+    assert_equal(c.nets_by_name("net*").collect(&:name), ["NET1"])
+    assert_equal(c.nets_by_name("NET*", true).collect(&:name), ["NET1"])
+    assert_equal(c.nets_by_name("net*", true).collect(&:name), [])
+    assert_equal(c.nets_by_name("NET*", false).collect(&:name), ["NET1"])
+    assert_equal(c.nets_by_name("net*", false).collect(&:name), ["NET1"])
+    assert_equal(nl.nets_by_name("NET*").collect(&:name), ["NET1"])
+    assert_equal(nl.nets_by_name("net*").collect(&:name), ["NET1"])
+    assert_equal(nl.nets_by_name("NET*", true).collect(&:name), ["NET1"])
+    assert_equal(nl.nets_by_name("net*", true).collect(&:name), [])
+    assert_equal(nl.nets_by_name("NET*", false).collect(&:name), ["NET1"])
+    assert_equal(nl.nets_by_name("net*", false).collect(&:name), ["NET1"])
     nl.case_sensitive = true
+    assert_equal(c.nets_by_name("NET*").collect(&:name), ["NET1"])
+    assert_equal(c.nets_by_name("net*").collect(&:name), [])
+    assert_equal(c.nets_by_name("NET*", true).collect(&:name), ["NET1"])
+    assert_equal(c.nets_by_name("net*", true).collect(&:name), [])
+    assert_equal(c.nets_by_name("NET*", false).collect(&:name), ["NET1"])
+    assert_equal(c.nets_by_name("net*", false).collect(&:name), ["NET1"])
+    assert_equal(nl.nets_by_name("NET*").collect(&:name), ["NET1"])
+    assert_equal(nl.nets_by_name("net*").collect(&:name), [])
+    assert_equal(nl.nets_by_name("NET*", true).collect(&:name), ["NET1"])
+    assert_equal(nl.nets_by_name("net*", true).collect(&:name), [])
+    assert_equal(nl.nets_by_name("NET*", false).collect(&:name), ["NET1"])
+    assert_equal(nl.nets_by_name("net*", false).collect(&:name), ["NET1"])
 
     net2 = c.create_net
     net2.name = "NET2"

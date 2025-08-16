@@ -334,6 +334,9 @@ class DBPath_TestClass < TestBase
     s = RBA::PathWithProperties::new
     assert_equal(s.to_s, "() w=0 bx=0 ex=0 r=false props={}")
 
+    s = RBA::PathWithProperties::new(RBA::Path::new([ [0,0], [100, 0] ], 100), { 1 => "one" })
+    assert_equal(s.to_s, "(0,0;100,0) w=100 bx=0 ex=0 r=false props={1=>one}")
+
     pid = RBA::Layout::properties_id({ 1 => "one" })
     s = RBA::PathWithProperties::new(RBA::Path::new([ [0,0], [100, 0] ], 100), pid)
     assert_equal(s.to_s, "(0,0;100,0) w=100 bx=0 ex=0 r=false props={1=>one}")
@@ -348,6 +351,9 @@ class DBPath_TestClass < TestBase
 
     s = RBA::DPathWithProperties::new
     assert_equal(s.to_s, "() w=0 bx=0 ex=0 r=false props={}")
+
+    s = RBA::DPathWithProperties::new(RBA::DPath::new([ [0,0], [100, 0] ], 100), { 1 => "one" })
+    assert_equal(s.to_s, "(0,0;100,0) w=100 bx=0 ex=0 r=false props={1=>one}")
 
     pid = RBA::Layout::properties_id({ 1 => "one" })
     s = RBA::DPathWithProperties::new(RBA::DPath::new([ [0,0], [100, 0] ], 100), pid)

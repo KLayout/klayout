@@ -338,6 +338,9 @@ class DBEdge_TestClass < TestBase
     s = RBA::EdgeWithProperties::new
     assert_equal(s.to_s, "(0,0;0,0) props={}")
 
+    s = RBA::EdgeWithProperties::new(RBA::Edge::new(0, 0, 100, 200), { 1 => "one" })
+    assert_equal(s.to_s, "(0,0;100,200) props={1=>one}")
+
     pid = RBA::Layout::properties_id({ 1 => "one" })
     s = RBA::EdgeWithProperties::new(RBA::Edge::new(0, 0, 100, 200), pid)
     assert_equal(s.to_s, "(0,0;100,200) props={1=>one}")
@@ -367,6 +370,9 @@ class DBEdge_TestClass < TestBase
 
     s = RBA::DEdgeWithProperties::new
     assert_equal(s.to_s, "(0,0;0,0) props={}")
+
+    s = RBA::DEdgeWithProperties::new(RBA::DEdge::new(0, 0, 100, 200), { 1 => "one" })
+    assert_equal(s.to_s, "(0,0;100,200) props={1=>one}")
 
     pid = RBA::Layout::properties_id({ 1 => "one" })
     s = RBA::DEdgeWithProperties::new(RBA::DEdge::new(0, 0, 100, 200), pid)

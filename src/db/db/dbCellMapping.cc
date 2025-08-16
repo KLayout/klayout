@@ -284,8 +284,17 @@ std::vector<db::cell_index_type> CellMapping::source_cells () const
   return s;
 }
 
+std::vector<db::cell_index_type> CellMapping::target_cells () const
+{
+  std::vector<db::cell_index_type> s;
+  s.reserve (m_b2a_mapping.size ());
+  for (iterator m = begin (); m != end (); ++m) {
+    s.push_back (m->second);
+  }
+  return s;
+}
 
-void 
+void
 CellMapping::create_single_mapping (const db::Layout & /*layout_a*/, db::cell_index_type cell_index_a, const db::Layout & /*layout_b*/, db::cell_index_type cell_index_b)
 {
   clear ();
@@ -345,6 +354,13 @@ CellMapping::do_create_missing_mapping (db::Layout &layout_a, const db::Layout &
   std::vector<db::cell_index_type> &new_cells = *(new_cells_ptr ? new_cells_ptr : &new_cells_int);
   std::vector<db::cell_index_type> new_cells_b;
 
+  std::vector<std::pair<db::cell_index_type, db::cell_index_type> > all_a2b;
+  for (std::vector<db::cell_index_type>::const_iterator b = cell_index_b.begin (); b != cell_index_b.end (); ++b) {
+    auto m = m_b2a_mapping.find (*b);
+    tl_assert (m != m_b2a_mapping.end ());
+    all_a2b.push_back (std::make_pair (m->second, *b));
+  }
+
   std::set<db::cell_index_type> called_b;
   for (std::vector<db::cell_index_type>::const_iterator i = cell_index_b.begin (); i != cell_index_b.end (); ++i) {
     layout_b.cell (*i).collect_called_cells (called_b);
@@ -359,6 +375,7 @@ CellMapping::do_create_missing_mapping (db::Layout &layout_a, const db::Layout &
       db::cell_index_type new_cell = layout_a.add_cell (layout_b, *b);
       new_cells.push_back (new_cell);
       new_cells_b.push_back (*b);
+      all_a2b.push_back (std::make_pair (new_cell, *b));
 
       if (mapped_pairs) {
         mapped_pairs->push_back (std::make_pair (*b, new_cell));
@@ -369,42 +386,39 @@ CellMapping::do_create_missing_mapping (db::Layout &layout_a, const db::Layout &
     }
   }
 
-  if (! new_cells.empty ()) {
+  if (all_a2b.empty ()) {
+    return;
+  }
 
-    //  Note: this avoids frequent cell index table rebuilds if source and target layout are identical
-    layout_a.start_changes ();
+  //  Note: this avoids frequent cell index table rebuilds if source and target layout are identical
+  db::LayoutLocker locker (&layout_a);
 
-    //  Create instances for the new cells in layout A according to their instantiation in layout B 
-    double mag = layout_b.dbu () / layout_a.dbu ();
-    for (size_t i = 0; i < new_cells.size (); ++i) {
+  //  Create instances for the new cells in layout A according to their instantiation in layout B
+  double mag = layout_b.dbu () / layout_a.dbu ();
+  for (auto i = all_a2b.begin (); i != all_a2b.end (); ++i) {
 
-      const db::Cell &b = layout_b.cell (new_cells_b [i]);
-      for (db::Cell::parent_inst_iterator pb = b.begin_parent_insts (); ! pb.at_end (); ++pb) {
+    const db::Cell &b = layout_b.cell (i->second);
+    for (db::Cell::parent_inst_iterator pb = b.begin_parent_insts (); ! pb.at_end (); ++pb) {
 
-        if (called_b.find (pb->parent_cell_index ()) != called_b.end ()) {
+      if (called_b.find (pb->parent_cell_index ()) != called_b.end ()) {
 
-          db::Cell &pa = layout_a.cell (m_b2a_mapping [pb->parent_cell_index ()]);
+        db::Cell &pa = layout_a.cell (m_b2a_mapping [pb->parent_cell_index ()]);
 
-          db::Instance bi = pb->child_inst ();
+        db::Instance bi = pb->child_inst ();
 
-          db::CellInstArray bci = bi.cell_inst ();
-          bci.object ().cell_index (new_cells [i]);
-          bci.transform_into (db::ICplxTrans (mag), &layout_a.array_repository ());
+        db::CellInstArray bci = bi.cell_inst ();
+        bci.object ().cell_index (i->first);
+        bci.transform_into (db::ICplxTrans (mag), &layout_a.array_repository ());
 
-          if (bi.has_prop_id ()) {
-            pa.insert (db::CellInstArrayWithProperties (bci, bi.prop_id ()));
-          } else {
-            pa.insert (bci);
-          }
-
+        if (bi.has_prop_id ()) {
+          pa.insert (db::CellInstArrayWithProperties (bci, bi.prop_id ()));
+        } else {
+          pa.insert (bci);
         }
 
       }
 
     }
-
-    //  Note: must be there because of start_changes
-    layout_a.end_changes ();
 
   }
 }

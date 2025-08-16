@@ -537,6 +537,17 @@ public:
   const box_type &bbox () const;
 
   /**
+   *  @brief Retrieve the bounding box of the cell, including empty cells
+   *
+   *  This method behaves like "bbox", but includes empty cells as single-point
+   *  boxes (0,0;0,0). This bounding box is used for drawing and allows
+   *  including empty cells.
+   *
+   *  @return The bounding box that was computed by update_bbox
+   */
+  const box_type &bbox_with_empty () const;
+
+  /**
    *  @brief Retrieve the per-layer bounding box of the cell
    *
    *  Before the bounding box can be retrieved, it must have
@@ -1098,7 +1109,7 @@ private:
   mutable db::Layout *mp_layout;
   shapes_map m_shapes_map;
   instances_type m_instances;
-  box_type m_bbox;
+  box_type m_bbox, m_bbox_with_empty;
   box_map m_bboxes;
   db::properties_id_type m_prop_id;
 

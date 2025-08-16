@@ -321,7 +321,7 @@ TEST (2)
 
   //  INV2, net 1 has one pin and one terminal at BULK
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, inv2Net0Index), Qt::UserRole).toString ()), "B|B|PMOS|PMOS|$1|$1");
-  EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, inv2Net0Index), Qt::DisplayRole).toString ()), "B / PMOS [L=0.25, W=3.5, AS=1.4, AD=1.4, PS=6.85, PD=6.85]");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, inv2Net0Index), Qt::DisplayRole).toString ()), "B / PMOS [L=0.25, W=3.5, (AS=1.4, AD=1.4, PS=6.85, PD=6.85)]");
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 2, inv2Net0Index), Qt::DisplayRole).toString ()), "$1");
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 3, inv2Net0Index), Qt::DisplayRole).toString ()), "$1");
 
@@ -357,8 +357,8 @@ TEST (2)
   //  first of devices in INV2 circuit
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, sn_devices), Qt::UserRole).toString ()), "$1|$1|PMOS|PMOS");
   EXPECT_EQ (tl::to_string (model->data (model->index (0, 0, sn_devices), Qt::DisplayRole).toString ()), "PMOS");
-  EXPECT_EQ (tl::to_string (model->data (model->index (0, 2, sn_devices), Qt::DisplayRole).toString ()), "$1 / PMOS [L=0.25, W=3.5, AS=1.4, AD=1.4, PS=6.85, PD=6.85]");
-  EXPECT_EQ (tl::to_string (model->data (model->index (0, 3, sn_devices), Qt::DisplayRole).toString ()), "$1 / PMOS [L=0.25, W=3.5, AS=1.4, AD=1.4, PS=6.85, PD=6.85]");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 2, sn_devices), Qt::DisplayRole).toString ()), "$1 / PMOS [L=0.25, W=3.5, (AS=1.4, AD=1.4, PS=6.85, PD=6.85)]");
+  EXPECT_EQ (tl::to_string (model->data (model->index (0, 3, sn_devices), Qt::DisplayRole).toString ()), "$1 / PMOS [L=0.25, W=3.5, (AS=1.4, AD=1.4, PS=6.85, PD=6.85)]");
 
   QModelIndex inv2PairIndex = model->index (2, 0, QModelIndex ());
   EXPECT_EQ (model->parent (inv2PairIndex).isValid (), false);

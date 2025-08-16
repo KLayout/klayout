@@ -35,6 +35,7 @@
 #include "layLayoutViewBase.h"
 #include "layCellSelectionForm.h"
 #include "layQtTools.h"
+#include "layBusy.h"
 #include "tlExceptions.h"
 #include "tlString.h"
 
@@ -327,6 +328,26 @@ std::string
 InstPropertiesPage::description () const
 {
   return tl::to_string (tr ("Instances"));
+}
+
+void
+InstPropertiesPage::confine_selection (const std::vector<size_t> &remaining_entries)
+{
+  std::vector<lay::ObjectInstPath> new_selection;
+  for (auto i = remaining_entries.begin (); i != remaining_entries.end (); ++i) {
+    new_selection.push_back (*m_selection_ptrs [*i]);
+  }
+
+  mp_service->set_selection (new_selection.begin (), new_selection.end ());
+
+  m_selection_ptrs.clear ();
+  m_selection_ptrs.reserve (mp_service->selection_size ());
+  for (edt::EditableSelectionIterator s = mp_service->begin_selection (); ! s.at_end (); ++s) {
+    m_selection_ptrs.push_back (s.operator-> ());
+  }
+
+  m_prop_id = 0;
+  mp_service->clear_highlights ();
 }
 
 void
@@ -870,19 +891,21 @@ InstPropertiesPage::do_apply (bool current_only, bool relative)
       db::Instance new_inst = pos->back ().inst_ptr;
 
       //  Don't apply the same change twice
-      std::map<db::Instance, db::Instance>::const_iterator i = insts_seen.find (pos->back ().inst_ptr);
+      std::map<db::Instance, db::Instance>::const_iterator i = insts_seen.find (new_inst);
       if (i == insts_seen.end ()) {
+
+        db::Instance org_inst = new_inst;
 
         const lay::CellView &cv = mp_service->view ()->cellview (pos->cv_index ());
 
         db::Cell &cell = cv->layout ().cell (pos->cell_index ());
         double dbu = cv->layout ().dbu ();
 
-        if (!current_only || pos->back ().inst_ptr == current) {
-          new_inst = applicator->do_apply_inst (cell, pos->back ().inst_ptr, dbu, relative_mode);
+        if (!current_only || org_inst == current) {
+          new_inst = applicator->do_apply_inst (cell, org_inst, dbu, relative_mode);
         }
 
-        insts_seen.insert (std::make_pair (pos->back ().inst_ptr, new_inst));
+        insts_seen.insert (std::make_pair (org_inst, new_inst));
 
       } else {
         new_inst = i->second;
@@ -922,7 +945,7 @@ InstPropertiesPage::do_apply (bool current_only, bool relative)
 }
 
 void 
-InstPropertiesPage::apply ()
+InstPropertiesPage::apply (bool /*commit*/)
 {
   do_apply (true, false);
 }
@@ -934,7 +957,7 @@ InstPropertiesPage::can_apply_to_all () const
 }
 
 void 
-InstPropertiesPage::apply_to_all (bool relative)
+InstPropertiesPage::apply_to_all (bool relative, bool /*commit*/)
 {
   do_apply (false, relative);
 }

@@ -440,7 +440,7 @@ object_to_python (void *obj, PYAObjectBase *self, const gsi::ClassBase *cls, boo
       obj = clsact->create_from_adapted (obj);
     }
 
-    //  we wil own the new object
+    //  we will own the new object
     pass_obj = true;
 
   }
@@ -488,6 +488,7 @@ object_to_python (void *obj, PYAObjectBase *self, const gsi::ClassBase *cls, boo
     PYAObjectBase *new_object = PYAObjectBase::from_pyobject_unsafe (new_pyobject);
     new (new_object) PYAObjectBase (clsact, new_pyobject);
     new_object->set (obj, pass_obj, is_const, can_destroy);
+
     return new_pyobject;
 
   }
@@ -501,7 +502,7 @@ PyObject *c2python_func<const tl::Variant &>::operator() (const tl::Variant &c)
   } else if (c.is_bool ()) {
     return c2python (c.to_bool ());
   } else if (c.is_a_string ()) {
-    return c2python (c.to_string ());
+    return c2python (c.to_stdstring ());
   } else if (c.is_a_bytearray ()) {
     return c2python (c.to_bytearray ());
   } else if (c.is_long ()) {

@@ -138,6 +138,33 @@ public:
    */
   int compress_warning (const std::string &msg);
 
+  /**
+   *  @brief Sets the expected database unit
+   *
+   *  With this value set, the reader can check if the present database unit is
+   *  compatible with the expected one and either take actions to scale the layouts
+   *  or to reject the file.
+   *
+   *  Setting the value to 0 resets the expected DBU and will disable all checks
+   *  or scaling.
+   */
+  void set_expected_dbu (double dbu);
+
+  /**
+   *  @brief Gets the expected database unit
+   */
+  double expected_dbu () const
+  {
+    return m_expected_dbu;
+  }
+
+  /**
+   *  @brief Checks the given DBU against the expected one
+   *
+   *  This method will raise an exception if the database units do not match.
+   */
+  void check_dbu (double dbu) const;
+
 protected:
   virtual void init (const db::LoadLayoutOptions &options);
 
@@ -147,6 +174,7 @@ private:
   std::string m_last_warning;
   int m_warn_count_for_same_message;
   bool m_first_warning;
+  double m_expected_dbu;
 };
 
 /**
@@ -229,6 +257,22 @@ public:
   bool warnings_as_errors () const
   {
     return mp_actual_reader->warnings_as_errors ();
+  }
+
+  /**
+   *  @brief Sets the expected database unit (see ReaderBase)
+   */
+  void set_expected_dbu (double dbu)
+  {
+    return mp_actual_reader->set_expected_dbu (dbu);
+  }
+
+  /**
+   *  @brief Gets the expected database unit
+   */
+  double expected_dbu () const
+  {
+    return mp_actual_reader->expected_dbu ();
   }
 
 private:

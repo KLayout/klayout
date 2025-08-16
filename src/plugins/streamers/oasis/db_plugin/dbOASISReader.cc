@@ -110,22 +110,22 @@ OASISReader::init (const db::LoadLayoutOptions &options)
   m_expect_strict_mode = oasis_options.expect_strict_mode;
 }
 
-inline long long
-OASISReader::get_long_long ()
+inline int64_t
+OASISReader::get_int64 ()
 {
-  unsigned long long u = get_ulong_long ();
+  uint64_t u = get_uint64 ();
   if ((u & 1) != 0) {
-    return -(long long) (u >> 1);
+    return -(int64_t) (u >> 1);
   } else {
-    return (long long) (u >> 1);
+    return (int64_t) (u >> 1);
   }
 }
 
-inline unsigned long long
-OASISReader::get_ulong_long ()
+inline uint64_t
+OASISReader::get_uint64 ()
 {
-  unsigned long long v = 0;
-  unsigned long long vm = 1;
+  uint64_t v = 0;
+  uint64_t vm = 1;
   char c;
 
   do {
@@ -135,79 +135,43 @@ OASISReader::get_ulong_long ()
       return 0;
     }
     c = *b;
-    if (vm > std::numeric_limits <unsigned long long>::max () / 128 &&
-        (unsigned long long) (c & 0x7f) > (std::numeric_limits <unsigned long long>::max () / vm)) {
-      error (tl::to_string (tr ("Unsigned long value overflow")));
+    if (vm > std::numeric_limits <uint64_t>::max () / 128 &&
+        (uint64_t) (c & 0x7f) > (std::numeric_limits <uint64_t>::max () / vm)) {
+      error (tl::to_string (tr ("uint64 value overflow")));
     }
-    v += (unsigned long long) (c & 0x7f) * vm;
+    v += (uint64_t) (c & 0x7f) * vm;
     vm <<= 7;
   } while ((c & 0x80) != 0);
 
   return v;
 }
 
-inline long
-OASISReader::get_long ()
+inline uint64_t
+OASISReader::get_uint64_for_divider ()
 {
-  unsigned long u = get_ulong ();
-  if ((u & 1) != 0) {
-    return -long (u >> 1);
-  } else {
-    return long (u >> 1);
-  }
-}
-
-inline unsigned long
-OASISReader::get_ulong_for_divider ()
-{
-  unsigned long l = get_ulong ();
+  uint64_t l = get_uint64 ();
   if (l == 0) {
     error (tl::to_string (tr ("Divider must not be zero")));
   }
   return l;
 }
 
-inline unsigned long
-OASISReader::get_ulong ()
+inline int32_t
+OASISReader::get_int32 ()
 {
-  unsigned long v = 0;
-  unsigned long vm = 1;
-  char c;
-
-  do {
-    unsigned char *b = (unsigned char *) m_stream.get (1);
-    if (! b) {
-      error (tl::to_string (tr ("Unexpected end-of-file")));
-      return 0;
-    }
-    c = *b;
-    if (vm > std::numeric_limits <unsigned long>::max () / 128 &&
-        (unsigned long) (c & 0x7f) > (std::numeric_limits <unsigned long>::max () / vm)) {
-      error (tl::to_string (tr ("Unsigned long value overflow")));
-    }
-    v += (unsigned long) (c & 0x7f) * vm;
-    vm <<= 7;
-  } while ((c & 0x80) != 0);
-
-  return v;
-}
-
-inline int
-OASISReader::get_int ()
-{
-  unsigned int u = get_uint ();
+  uint32_t u = get_uint32 ();
   if ((u & 1) != 0) {
-    return -int (u >> 1);
+    return -int32_t (u >> 1);
   } else {
-    return int (u >> 1);
+    return int32_t (u >> 1);
   }
 }
 
-inline unsigned int
-OASISReader::get_uint ()
+inline uint32_t
+OASISReader::get_uint32 ()
 {
-  unsigned int v = 0;
-  unsigned int vm = 1;
+  uint32_t v = 0;
+  uint32_t vm = 1;
   char c;
 
   do {
@@ -217,11 +181,11 @@ OASISReader::get_uint ()
       return 0;
     }
     c = *b;
-    if (vm > std::numeric_limits <unsigned int>::max () / 128 &&
-        (unsigned int) (c & 0x7f) > (std::numeric_limits <unsigned int>::max () / vm)) {
-      error (tl::to_string (tr ("Unsigned integer value overflow")));
+    if (vm > std::numeric_limits <uint32_t>::max () / 128 &&
+        (uint32_t) (c & 0x7f) > (std::numeric_limits <uint32_t>::max () / vm)) {
+      error (tl::to_string (tr ("uin32 value overflow")));
     }
-    v += (unsigned int) (c & 0x7f) * vm;
+    v += (uint32_t) (c & 0x7f) * vm;
     vm <<= 7;
   } while ((c & 0x80) != 0);
 
@@ -240,7 +204,7 @@ void
 OASISReader::get_str (std::string &s)
 {
   size_t l = 0;
-  get (l);
+  get_size (l);
 
   char *b = (char *) m_stream.get (l);
   if (b) {
@@ -253,33 +217,33 @@ OASISReader::get_str (std::string &s)
 double
 OASISReader::get_real ()
 {
-  unsigned int t = get_uint ();
+  unsigned int t = get_uint32 ();
 
   if (t == 0) {
 
-    return double (get_ulong ());
+    return double (get_uint64 ());
 
   } else if (t == 1) {
 
-    return -double (get_ulong ());
+    return -double (get_uint64 ());
 
   } else if (t == 2) {
 
-    return 1.0 / double (get_ulong_for_divider ());
+    return 1.0 / double (get_uint64_for_divider ());
 
   } else if (t == 3) {
 
-    return -1.0 / double (get_ulong_for_divider ());
+    return -1.0 / double (get_uint64_for_divider ());
 
   } else if (t == 4) {
 
-    double d = double (get_ulong ());
-    return d / double (get_ulong_for_divider ());
+    double d = double (get_uint64 ());
+    return d / double (get_uint64_for_divider ());
 
   } else if (t == 5) {
 
-    double d = double (get_ulong ());
-    return -d / double (get_ulong_for_divider ());
+    double d = double (get_uint64 ());
+    return -d / double (get_uint64_for_divider ());
 
   } else if (t == 6) {
 
@@ -326,51 +290,51 @@ OASISReader::get_real ()
 }
 
 db::Coord
-OASISReader::get_ucoord (unsigned long grid)
+OASISReader::get_ucoord (uint64_t grid)
 {
-  unsigned long long lx = 0;
+  uint64_t lx = 0;
   get (lx);
   lx *= grid;
-  if (lx > (unsigned long long) (std::numeric_limits <db::Coord>::max ())) {
+  if (lx > (uint64_t) (std::numeric_limits <db::Coord>::max ())) {
     error (tl::to_string (tr ("Coordinate value overflow")));
   }
   return db::Coord (lx);
 }
 
 OASISReader::distance_type
-OASISReader::get_ucoord_as_distance (unsigned long grid)
+OASISReader::get_ucoord_as_distance (uint64_t grid)
 {
-  unsigned long long lx = 0;
+  uint64_t lx = 0;
   get (lx);
   lx *= grid;
-  if (lx > (unsigned long long) (std::numeric_limits <distance_type>::max ())) {
+  if (lx > (uint64_t) (std::numeric_limits <distance_type>::max ())) {
     error (tl::to_string (tr ("Coordinate value overflow")));
   }
   return distance_type (lx);
 }
 
 db::Coord
-OASISReader::get_coord (long grid)
+OASISReader::get_coord (int64_t grid)
 {
-  long long lx = 0;
+  int64_t lx = 0;
   get (lx);
   lx *= grid;
-  if (lx < (long long) (std::numeric_limits <db::Coord>::min ()) ||
-      lx > (long long) (std::numeric_limits <db::Coord>::max ())) {
+  if (lx < (int64_t) (std::numeric_limits <db::Coord>::min ()) ||
+      lx > (int64_t) (std::numeric_limits <db::Coord>::max ())) {
     error (tl::to_string (tr ("Coordinate value overflow")));
   }
   return db::Coord (lx);
 }
 
 db::Vector
-OASISReader::get_2delta (long grid)
+OASISReader::get_2delta (int64_t grid)
 {
-  unsigned long long l1 = 0;
+  uint64_t l1 = 0;
   get (l1);
 
-  long long lx = l1 >> 2;
+  int64_t lx = l1 >> 2;
   lx *= grid;
-  if (lx > (long long) (std::numeric_limits <db::Coord>::max ())) {
+  if (lx > (int64_t) (std::numeric_limits <db::Coord>::max ())) {
     error (tl::to_string (tr ("Coordinate value overflow")));
   }
   db::Coord x = lx;
@@ -389,14 +353,14 @@ OASISReader::get_2delta (long grid)
 }
 
 db::Vector
-OASISReader::get_3delta (long grid)
+OASISReader::get_3delta (int64_t grid)
 {
-  unsigned long long l1 = 0;
+  uint64_t l1 = 0;
   get (l1);
 
-  long long lx = l1 >> 3;
+  int64_t lx = l1 >> 3;
   lx *= grid;
-  if (lx > (long long) (std::numeric_limits <db::Coord>::max ())) {
+  if (lx > (int64_t) (std::numeric_limits <db::Coord>::max ())) {
     error (tl::to_string (tr ("Coordinate value overflow")));
   }
   db::Coord x = lx;
@@ -423,25 +387,25 @@ OASISReader::get_3delta (long grid)
 }
 
 db::Vector
-OASISReader::get_gdelta (long grid)
+OASISReader::get_gdelta (int64_t grid)
 {
-  unsigned long long l1 = 0;
+  uint64_t l1 = 0;
   get (l1);
 
   if ((l1 & 1) != 0) {
 
-    long long lx = ((l1 & 2) == 0 ? (long long) (l1 >> 2) : -(long long) (l1 >> 2));
+    int64_t lx = ((l1 & 2) == 0 ? (int64_t) (l1 >> 2) : -(int64_t) (l1 >> 2));
     lx *= grid;
-    if (lx < (long long) (std::numeric_limits <db::Coord>::min ()) ||
-        lx > (long long) (std::numeric_limits <db::Coord>::max ())) {
+    if (lx < (int64_t) (std::numeric_limits <db::Coord>::min ()) ||
+        lx > (int64_t) (std::numeric_limits <db::Coord>::max ())) {
       error (tl::to_string (tr ("Coordinate value overflow")));
     }
 
-    long long ly;
+    int64_t ly;
     get (ly);
     ly *= grid;
-    if (ly < (long long) (std::numeric_limits <db::Coord>::min ()) ||
-        ly > (long long) (std::numeric_limits <db::Coord>::max ())) {
+    if (ly < (int64_t) (std::numeric_limits <db::Coord>::min ()) ||
+        ly > (int64_t) (std::numeric_limits <db::Coord>::max ())) {
       error (tl::to_string (tr ("Coordinate value overflow")));
     }
 
@@ -449,9 +413,9 @@ OASISReader::get_gdelta (long grid)
 
   } else {
 
-    long long lx = l1 >> 4;
+    int64_t lx = l1 >> 4;
     lx *= grid;
-    if (lx > (long long) (std::numeric_limits <db::Coord>::max ())) {
+    if (lx > (int64_t) (std::numeric_limits <db::Coord>::max ())) {
       error (tl::to_string (tr ("Coordinate value overflow")));
     }
     db::Coord x = lx;
@@ -568,42 +532,42 @@ OASISReader::mark_start_table ()
 void
 OASISReader::read_offset_table ()
 {
-  unsigned int of = 0;
+  uint64_t of = 0;
 
-  of = get_uint ();
-  get (m_table_cellname);
+  of = get_uint64 ();
+  get_size (m_table_cellname);
   if (m_table_cellname != 0 && m_expect_strict_mode >= 0 && ((of == 0) != (m_expect_strict_mode == 0))) {
     warn (tl::to_string (tr ("CELLNAME offset table has unexpected strict mode")));
   }
 
-  of = get_uint ();
-  get (m_table_textstring);
+  of = get_uint64 ();
+  get_size (m_table_textstring);
   if (m_table_textstring != 0 && m_expect_strict_mode >= 0 && ((of == 0) != (m_expect_strict_mode == 0))) {
     warn (tl::to_string (tr ("TEXTSTRING offset table has unexpected strict mode")));
   }
 
-  of = get_uint ();
-  get (m_table_propname);
+  of = get_uint64 ();
+  get_size (m_table_propname);
   if (m_table_propname != 0 && m_expect_strict_mode >= 0 && ((of == 0) != (m_expect_strict_mode == 0))) {
     warn (tl::to_string (tr ("PROPNAME offset table has unexpected strict mode")));
   }
 
-  of = get_uint ();
-  get (m_table_propstring);
+  of = get_uint64 ();
+  get_size (m_table_propstring);
   if (m_table_propstring != 0 && m_expect_strict_mode >= 0 && ((of == 0) != (m_expect_strict_mode == 0))) {
     warn (tl::to_string (tr ("PROPSTRING offset table has unexpected strict mode")));
   }
 
-  of = get_uint ();
-  get (m_table_layername);
+  of = get_uint64 ();
+  get_size (m_table_layername);
   if (m_table_layername != 0 && m_expect_strict_mode >= 0 && ((of == 0) != (m_expect_strict_mode == 0))) {
     warn (tl::to_string (tr ("LAYERNAME offset table has unexpected strict mode")));
   }
 
   //  XNAME table ignored currently
-  get_uint ();
+  get_uint64 ();
   size_t dummy = 0;
-  get (dummy);
+  get_size (dummy);
 }
 
 static const char magic_bytes[] = { "%SEMI-OASIS\015\012" };
@@ -659,10 +623,12 @@ OASISReader::do_read (db::Layout &layout)
   }
 
   //  compute database unit in pixel per meter
-  layout.dbu (1.0 / res);
+  double dbu = 1.0 / res;
+  check_dbu (dbu);
+  layout.dbu (dbu);
 
   //  read over table offsets if required
-  bool table_offsets_at_end = get_uint ();
+  bool table_offsets_at_end = get_uint64 () != 0;
   if (! table_offsets_at_end) {
     read_offset_table ();
   }
@@ -681,10 +647,10 @@ OASISReader::do_read (db::Layout &layout)
   m_table_layername = 0;
 
   //  define the name id counters
-  unsigned long cellname_id = 0;
-  unsigned long textstring_id = 0;
-  unsigned long propstring_id = 0;
-  unsigned long propname_id = 0;
+  uint64_t cellname_id = 0;
+  uint64_t textstring_id = 0;
+  uint64_t propstring_id = 0;
+  uint64_t propname_id = 0;
 
   //  id mode (explicit or implicit)
   enum id_mode { any, expl, impl };
@@ -744,7 +710,7 @@ OASISReader::do_read (db::Layout &layout)
       std::string name = get_str ();
 
       //  and the associated id
-      unsigned long id = cellname_id;
+      uint64_t id = cellname_id;
       if (r == 3) {
         if (cellname_id_mode == expl) {
           error (tl::to_string (tr ("Explicit and implicit CELLNAME modes cannot be mixed")));
@@ -782,7 +748,7 @@ OASISReader::do_read (db::Layout &layout)
       std::string name = get_str ();
 
       //  and the associated id
-      unsigned long id = textstring_id;
+      uint64_t id = textstring_id;
       if (r == 5) {
         if (textstring_id_mode == expl) {
           error (tl::to_string (tr ("Explicit and implicit TEXTSTRING modes cannot be mixed")));
@@ -819,7 +785,7 @@ OASISReader::do_read (db::Layout &layout)
       std::string name = get_str ();
 
       //  and the associated id
-      unsigned long id = propname_id;
+      uint64_t id = propname_id;
       if (r == 7) {
         if (propname_id_mode == expl) {
           error (tl::to_string (tr ("Explicit and implicit PROPNAME modes cannot be mixed")));
@@ -861,7 +827,7 @@ OASISReader::do_read (db::Layout &layout)
       std::string name = get_str ();
 
       //  and the associated id
-      unsigned long id = propstring_id;
+      uint64_t id = propstring_id;
       if (r == 9) {
         if (propstring_id_mode == expl) {
           error (tl::to_string (tr ("Explicit and implicit PROPSTRING modes cannot be mixed")));
@@ -880,7 +846,7 @@ OASISReader::do_read (db::Layout &layout)
         error (tl::sprintf (tl::to_string (tr ("A PROPSTRING with id %ld is present already")), id));
       }
 
-      std::map<unsigned long, std::string>::iterator fw = m_propvalue_forward_references.find (id);
+      std::map<uint64_t, std::string>::iterator fw = m_propvalue_forward_references.find (id);
       if (fw != m_propvalue_forward_references.end ()) {
         fw->second = name;
       }
@@ -904,38 +870,38 @@ OASISReader::do_read (db::Layout &layout)
 
       db::ld_type dt1 = 0, dt2 = std::numeric_limits<db::ld_type>::max () - 1;
       db::ld_type l1 = 0, l2 = std::numeric_limits<db::ld_type>::max () - 1;
-      unsigned int it;
+      uint32_t it;
 
-      it = get_uint ();
+      it = get_uint32 ();
       if (it == 0) {
         //  keep limits
       } else if (it == 1) {
-        l2 = get_uint ();
+        l2 = get_uint32 ();
       } else if (it == 2) {
-        l1 = get_uint ();
+        l1 = get_uint32 ();
       } else if (it == 3) {
-        l1 = get_uint ();
+        l1 = get_uint32 ();
         l2 = l1;
       } else if (it == 4) {
-        l1 = get_uint ();
-        l2 = get_uint ();
+        l1 = get_uint32 ();
+        l2 = get_uint32 ();
       } else {
         error (tl::to_string (tr ("Invalid LAYERNAME interval mode (layer)")));
       }
 
-      it = get_uint ();
+      it = get_uint32 ();
       if (it == 0) {
         //  keep limits
       } else if (it == 1) {
-        dt2 = get_uint ();
+        dt2 = get_uint32 ();
       } else if (it == 2) {
-        dt1 = get_uint ();
+        dt1 = get_uint32 ();
       } else if (it == 3) {
-        dt1 = get_uint ();
+        dt1 = get_uint32 ();
         dt2 = dt1;
       } else if (it == 4) {
-        dt1 = get_uint ();
-        dt2 = get_uint ();
+        dt1 = get_uint32 ();
+        dt2 = get_uint32 ();
       } else {
         error (tl::to_string (tr ("Invalid LAYERNAME interval mode (datatype)")));
       }
@@ -973,10 +939,10 @@ OASISReader::do_read (db::Layout &layout)
     } else if (r == 30 || r == 31 /*XNAME*/) {
 
       //  read a XNAME: it is simply ignored
-      get_ulong ();
+      get_uint64 ();
       get_str ();
       if (r == 31) {
-        get_ulong ();
+        get_uint64 ();
       }
 
       reset_modal_variables ();
@@ -993,7 +959,7 @@ OASISReader::do_read (db::Layout &layout)
       //  read a cell
       if (r == 13) {
 
-        unsigned long id = 0;
+        uint64_t id = 0;
         get (id);
 
         std::pair<bool, db::cell_index_type> cc = cell_by_id (id);
@@ -1034,12 +1000,12 @@ OASISReader::do_read (db::Layout &layout)
 
     } else if (r == 34 /*CBLOCK*/) {
 
-      unsigned int type = get_uint ();
+      uint32_t type = get_uint32 ();
       if (type != 0) {
         error (tl::sprintf (tl::to_string (tr ("Invalid CBLOCK compression type %d")), type));
       }
 
-      size_t dummy = 0;
+      uint64_t dummy = 0;
       get (dummy);  // uncomp-byte-count - not needed
       get (dummy);  // comp-byte-count - not needed
 
@@ -1070,7 +1036,7 @@ OASISReader::do_read (db::Layout &layout)
     error (tl::to_string (tr ("Format error (too many bytes after END record)")));
   }
 
-  for (std::map <unsigned long, const db::StringRef *>::const_iterator fw = m_text_forward_references.begin (); fw != m_text_forward_references.end (); ++fw) {
+  for (std::map <uint64_t, const db::StringRef *>::const_iterator fw = m_text_forward_references.begin (); fw != m_text_forward_references.end (); ++fw) {
     auto ts = m_textstrings.find (fw->first);
     if (ts == m_textstrings.end ()) {
       error (tl::sprintf (tl::to_string (tr ("No text string defined for text string id %ld")), fw->first));
@@ -1080,7 +1046,7 @@ OASISReader::do_read (db::Layout &layout)
   }
 
   //  all forward references to property names must be resolved
-  for (std::map <unsigned long, db::property_names_id_type>::const_iterator fw = m_propname_forward_references.begin (); fw != m_propname_forward_references.end (); ++fw) {
+  for (std::map <uint64_t, db::property_names_id_type>::const_iterator fw = m_propname_forward_references.begin (); fw != m_propname_forward_references.end (); ++fw) {
     if (fw->second == 0) {
       error (tl::sprintf (tl::to_string (tr ("No property name defined for property name id %ld")), fw->first));
     }
@@ -1181,7 +1147,7 @@ OASISReader::do_read (db::Layout &layout)
   }
 
   //  attach the properties found in CELLNAME to the cells (which may have other properties)
-  for (std::map<unsigned long, db::properties_id_type>::const_iterator p = m_cellname_properties.begin (); p != m_cellname_properties.end (); ++p) {
+  for (std::map<uint64_t, db::properties_id_type>::const_iterator p = m_cellname_properties.begin (); p != m_cellname_properties.end (); ++p) {
 
     //  The cellname properties ID may be a forward properties ID, resolve it first
 
@@ -1356,7 +1322,7 @@ OASISReader::resolve_forward_references (db::PropertiesSet &properties)
     const tl::Variant &name = db::property_name (p->first);
     if (name.is_id ()) {
 
-      std::map <unsigned long, db::property_names_id_type>::iterator pf = m_propname_forward_references.find (name.to_id ());
+      std::map <uint64_t, db::property_names_id_type>::iterator pf = m_propname_forward_references.find (name.to_id ());
       if (pf != m_propname_forward_references.end ()) {
 
         if (pf->second == m_s_gds_property_name_id) {
@@ -1388,8 +1354,8 @@ OASISReader::replace_forward_references_in_variant (tl::Variant &v)
 {
   if (v.is_id ()) {
 
-    unsigned long id = (unsigned long) v.to_id ();
-    std::map <unsigned long, std::string>::const_iterator fw = m_propvalue_forward_references.find (id);
+    uint64_t id = (uint64_t) v.to_id ();
+    std::map <uint64_t, std::string>::const_iterator fw = m_propvalue_forward_references.find (id);
     if (fw != m_propvalue_forward_references.end ()) {
       v = tl::Variant (fw->second);
     } else {
@@ -1412,8 +1378,8 @@ OASISReader::replace_forward_references_in_variant (tl::Variant &v)
       std::vector<tl::Variant> new_list (l);
       for (std::vector<tl::Variant>::iterator ll = new_list.begin (); ll != new_list.end (); ++ll) {
         if (ll->is_id ()) {
-          unsigned long id = (unsigned long) ll->to_id ();
-          std::map <unsigned long, std::string>::const_iterator fw = m_propvalue_forward_references.find (id);
+          uint64_t id = (uint64_t) ll->to_id ();
+          std::map <uint64_t, std::string>::const_iterator fw = m_propvalue_forward_references.find (id);
           if (fw != m_propvalue_forward_references.end ()) {
             *ll = tl::Variant (fw->second);
           } else {
@@ -1483,12 +1449,12 @@ OASISReader::read_element_properties (bool ignore_special)
 
     } else if (m == 34 /*CBLOCK*/) {
 
-      unsigned int type = get_uint ();
+      uint32_t type = get_uint32 ();
       if (type != 0) {
         error (tl::sprintf (tl::to_string (tr ("Invalid CBLOCK compression type %d")), type));
       }
 
-      size_t dummy = 0;
+      uint64_t dummy = 0;
       get (dummy);  // uncomp-byte-count - not needed
       get (dummy);  // comp-byte-count - not needed
 
@@ -1539,10 +1505,10 @@ OASISReader::read_properties ()
   if (m & 0x04) {
     if (m & 0x02) {
 
-      unsigned long id;
+      uint64_t id;
       get (id);
 
-      std::map <unsigned long, std::string>::const_iterator cid = m_propnames.find (id);
+      std::map <uint64_t, std::string>::const_iterator cid = m_propnames.find (id);
       if (cid == m_propnames.end ()) {
         mm_last_property_name = db::property_names_id (tl::Variant (id, true /*dummy for id type*/));
         m_propname_forward_references.insert (std::make_pair (id, db::property_names_id_type (0)));
@@ -1563,7 +1529,7 @@ OASISReader::read_properties ()
 
   if (! (m & 0x08)) {
 
-    unsigned long n = ((unsigned long) (m >> 4)) & 0x0f;
+    uint64_t n = ((uint64_t) (m >> 4)) & 0x0f;
     if (n == 15) {
       get (n);
     }
@@ -1584,15 +1550,15 @@ OASISReader::read_properties ()
 
       } else if (t == 8) {
 
-        unsigned long l;
+        uint64_t l;
         get (l);
         if (m_read_properties) {
-          mm_last_value_list.get_non_const ().push_back (tl::Variant (long (l)));
+          mm_last_value_list.get_non_const ().push_back (tl::Variant (int64_t (l)));
         }
 
       } else if (t == 9) {
 
-        long l;
+        int64_t l;
         get (l);
         if (m_read_properties) {
           mm_last_value_list.get_non_const ().push_back (tl::Variant (l));
@@ -1612,10 +1578,10 @@ OASISReader::read_properties ()
 
       } else if (t == 13 || t == 14 || t == 15) {
 
-        unsigned long id;
+        uint64_t id;
         get (id);
         if (m_read_properties) {
-          std::map <unsigned long, std::string>::const_iterator sid = m_propstrings.find (id);
+          std::map <uint64_t, std::string>::const_iterator sid = m_propstrings.find (id);
           if (sid == m_propstrings.end ()) {
             m_propvalue_forward_references.insert (std::make_pair (id, std::string ()));
             mm_last_value_list.get_non_const ().push_back (tl::Variant (id, true /*dummy for id type*/));
@@ -1642,9 +1608,9 @@ OASISReader::read_properties ()
 void
 OASISReader::read_pointlist (modal_variable <std::vector <db::Point> > &pointlist, bool for_polygon)
 {
-  unsigned int type = get_uint ();
+  uint32_t type = get_uint32 ();
 
-  unsigned long n = 0;
+  uint64_t n = 0;
   get (n);
   if (n == 0) {
     error (tl::to_string (tr ("Invalid point list: length is zero")).c_str ());
@@ -1665,7 +1631,7 @@ OASISReader::read_pointlist (modal_variable <std::vector <db::Point> > &pointlis
     bool h = (type == 0);
 
     db::Point pos;
-    for (unsigned long i = 0; i < n; ++i) {
+    for (uint64_t i = 0; i < n; ++i) {
       db::Coord d = get_coord ();
       if (h) {
         pos += db::Vector (d, 0);
@@ -1691,7 +1657,7 @@ OASISReader::read_pointlist (modal_variable <std::vector <db::Point> > &pointlis
   } else if (type == 2) {
 
     db::Point pos;
-    for (unsigned long i = 0; i < n; ++i) {
+    for (uint64_t i = 0; i < n; ++i) {
       pos += get_2delta ();
       pointlist.get_non_const ().push_back (pos);
     }
@@ -1699,7 +1665,7 @@ OASISReader::read_pointlist (modal_variable <std::vector <db::Point> > &pointlis
   } else if (type == 3) {
 
     db::Point pos;
-    for (unsigned long i = 0; i < n; ++i) {
+    for (uint64_t i = 0; i < n; ++i) {
       pos += get_3delta ();
       pointlist.get_non_const ().push_back (pos);
     }
@@ -1707,7 +1673,7 @@ OASISReader::read_pointlist (modal_variable <std::vector <db::Point> > &pointlis
   } else if (type == 4) {
 
     db::Point pos;
-    for (unsigned long i = 0; i < n; ++i) {
+    for (uint64_t i = 0; i < n; ++i) {
       pos += get_gdelta ();
       pointlist.get_non_const ().push_back (pos);
     }
@@ -1716,7 +1682,7 @@ OASISReader::read_pointlist (modal_variable <std::vector <db::Point> > &pointlis
 
     db::Point pos;
     db::Vector delta;
-    for (unsigned long i = 0; i < n; ++i) {
+    for (uint64_t i = 0; i < n; ++i) {
       delta += get_gdelta ();
       pos += delta;
       pointlist.get_non_const ().push_back (pos);
@@ -1732,14 +1698,14 @@ OASISReader::read_pointlist (modal_variable <std::vector <db::Point> > &pointlis
 bool
 OASISReader::read_repetition ()
 {
-  unsigned int type = get_uint ();
+  uint32_t type = get_uint32 ();
   if (type == 0) {
 
     //  reuse modal variable
 
   } else if (type == 1) {
 
-    unsigned long nx = 0, ny = 0;
+    uint64_t nx = 0, ny = 0;
     get (nx);
     get (ny);
 
@@ -1750,7 +1716,7 @@ OASISReader::read_repetition ()
 
   } else if (type == 2) {
 
-    unsigned long nx = 0;
+    uint64_t nx = 0;
     get (nx);
 
     db::Coord dx = get_ucoord ();
@@ -1759,7 +1725,7 @@ OASISReader::read_repetition ()
 
   } else if (type == 3) {
 
-    unsigned long ny = 0;
+    uint64_t ny = 0;
     get (ny);
 
     db::Coord dy = get_ucoord ();
@@ -1771,10 +1737,10 @@ OASISReader::read_repetition ()
     IrregularRepetition *rep = new IrregularRepetition ();
     mm_repetition = rep;
 
-    unsigned long n = 0;
+    uint64_t n = 0;
     get (n);
 
-    unsigned long lgrid = 1;
+    uint64_t lgrid = 1;
     if (type == 5) {
       get (lgrid);
     }
@@ -1782,7 +1748,7 @@ OASISReader::read_repetition ()
     rep->reserve (n + 1);
 
     db::Coord x = 0;
-    for (unsigned long i = 0; i <= n; ++i) {
+    for (uint64_t i = 0; i <= n; ++i) {
       m_progress.set (m_stream.pos ());
       db::Coord d = get_ucoord (lgrid);
       if (d != 0) {
@@ -1796,10 +1762,10 @@ OASISReader::read_repetition ()
     IrregularRepetition *rep = new IrregularRepetition ();
     mm_repetition = rep;
 
-    unsigned long n = 0;
+    uint64_t n = 0;
     get (n);
 
-    unsigned long lgrid = 1;
+    uint64_t lgrid = 1;
     if (type == 7) {
       get (lgrid);
     }
@@ -1807,7 +1773,7 @@ OASISReader::read_repetition ()
     rep->reserve (n + 1);
 
     db::Coord y = 0;
-    for (unsigned long i = 0; i <= n; ++i) {
+    for (uint64_t i = 0; i <= n; ++i) {
       m_progress.set (m_stream.pos ());
       db::Coord d = get_ucoord (lgrid);
       if (d != 0) {
@@ -1818,7 +1784,7 @@ OASISReader::read_repetition ()
 
   } else if (type == 8) {
 
-    unsigned long n = 0, m = 0;
+    uint64_t n = 0, m = 0;
 
     get (n);
     get (m);
@@ -1829,7 +1795,7 @@ OASISReader::read_repetition ()
 
   } else if (type == 9) {
 
-    unsigned long n = 0;
+    uint64_t n = 0;
     get (n);
     db::Vector dn = get_gdelta ();
 
@@ -1840,10 +1806,10 @@ OASISReader::read_repetition ()
     IrregularRepetition *rep = new IrregularRepetition ();
     mm_repetition = rep;
 
-    unsigned long n = 0;
+    uint64_t n = 0;
     get (n);
 
-    unsigned long grid = 1;
+    uint64_t grid = 1;
     if (type == 11) {
       get (grid);
     }
@@ -1851,7 +1817,7 @@ OASISReader::read_repetition ()
     rep->reserve (n + 1);
 
     db::Vector p;
-    for (unsigned long i = 0; i <= n; ++i) {
+    for (uint64_t i = 0; i <= n; ++i) {
       m_progress.set (m_stream.pos ());
       db::Vector d = get_gdelta (grid);
       if (d != db::Vector ()) {
@@ -1882,7 +1848,7 @@ OASISReader::do_read_placement (unsigned char r,
     if (m & 0x40) {
 
       //  cell by id
-      unsigned long id;
+      uint64_t id;
       get (id);
 
       mm_placement_cell = cell_for_instance (layout, id);
@@ -1974,10 +1940,10 @@ OASISReader::do_read_placement (unsigned char r,
 
       if (mag_set || angle < 0) {
         inst = db::CellInstArray (db::CellInst (mm_placement_cell.get ()),
-                                  db::ICplxTrans (mag, angle_deg, mirror, pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb);
+                                  db::ICplxTrans (mag, angle_deg, mirror, pos), layout.array_repository (), a, b, (uint64_t) na, (uint64_t) nb);
       } else {
         inst = db::CellInstArray (db::CellInst (mm_placement_cell.get ()),
-                                  db::Trans (angle, mirror, pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb);
+                                  db::Trans (angle, mirror, pos), layout.array_repository (), a, b, (uint64_t) na, (uint64_t) nb);
       }
 
       if (pp.first) {
@@ -2078,7 +2044,7 @@ OASISReader::do_read_text (bool xy_absolute,
   if (m & 0x40) {
     if (m & 0x20) {
 
-      unsigned long id;
+      uint64_t id;
       get (id);
 
       if (m_text_forward_references.find (id) != m_text_forward_references.end ()) {
@@ -2088,7 +2054,7 @@ OASISReader::do_read_text (bool xy_absolute,
 
       } else {
 
-        std::map <unsigned long, std::string>::const_iterator tid = m_textstrings.find (id);
+        std::map <uint64_t, std::string>::const_iterator tid = m_textstrings.find (id);
         if (tid == m_textstrings.end ()) {
 
           mm_text_string.reset ();
@@ -2117,11 +2083,11 @@ OASISReader::do_read_text (bool xy_absolute,
   }
 
   if (m & 0x1) {
-    mm_textlayer = get_uint ();
+    mm_textlayer = get_uint32 ();
   }
 
   if (m & 0x2) {
-    mm_texttype = get_uint ();
+    mm_texttype = get_uint32 ();
   }
 
   if (m & 0x10) {
@@ -2178,12 +2144,12 @@ OASISReader::do_read_text (bool xy_absolute,
         db::TextPtr text_ptr (text, layout.shape_repository ());
 
         if (pp.first) {
-          auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::Shape::text_ptr_array_type> (db::Shape::text_ptr_array_type (text_ptr, db::Disp (pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb), pp.second));
+          auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::Shape::text_ptr_array_type> (db::Shape::text_ptr_array_type (text_ptr, db::Disp (pos), layout.array_repository (), a, b, (uint64_t) na, (uint64_t) nb), pp.second));
           if (is_forward_properties_id (pp.second)) {
             register_forward_property_for_shape (shape);
           }
         } else {
-          cell.shapes (ll.second).insert (db::Shape::text_ptr_array_type (text_ptr, db::Disp (pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb));
+          cell.shapes (ll.second).insert (db::Shape::text_ptr_array_type (text_ptr, db::Disp (pos), layout.array_repository (), a, b, (uint64_t) na, (uint64_t) nb));
         }
 
       } else if (! layout.is_editable () && (points = mm_repetition.get ().is_iterated ()) != 0) {
@@ -2261,11 +2227,11 @@ OASISReader::do_read_rectangle (bool xy_absolute,
   unsigned char m = get_byte ();
 
   if (m & 0x1) {
-    mm_layer = get_uint ();
+    mm_layer = get_uint32 ();
   }
 
   if (m & 0x2) {
-    mm_datatype = get_uint ();
+    mm_datatype = get_uint32 ();
   }
 
   if (m & 0x40) {
@@ -2322,12 +2288,12 @@ OASISReader::do_read_rectangle (bool xy_absolute,
 
         //  Create a box array
         if (pp.first) {
-          auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::Shape::box_array_type> (db::Shape::box_array_type (box, db::UnitTrans (), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb), pp.second));
+          auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::Shape::box_array_type> (db::Shape::box_array_type (box, db::UnitTrans (), layout.array_repository (), a, b, (uint64_t) na, (uint64_t) nb), pp.second));
           if (is_forward_properties_id (pp.second)) {
             register_forward_property_for_shape (shape);
           }
         } else {
-          cell.shapes (ll.second).insert (db::Shape::box_array_type (box, db::UnitTrans (), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb));
+          cell.shapes (ll.second).insert (db::Shape::box_array_type (box, db::UnitTrans (), layout.array_repository (), a, b, (uint64_t) na, (uint64_t) nb));
         }
 
       } else if (! layout.is_editable () && (points = mm_repetition.get ().is_iterated ()) != 0) {
@@ -2395,11 +2361,11 @@ OASISReader::do_read_polygon (bool xy_absolute, db::cell_index_type cell_index, 
   unsigned char m = get_byte ();
 
   if (m & 0x1) {
-    mm_layer = get_uint ();
+    mm_layer = get_uint32 ();
   }
 
   if (m & 0x2) {
-    mm_datatype = get_uint ();
+    mm_datatype = get_uint32 ();
   }
 
   if (m & 0x20) {
@@ -2460,12 +2426,12 @@ OASISReader::do_read_polygon (bool xy_absolute, db::cell_index_type cell_index, 
           db::SimplePolygonPtr poly_ptr (poly, layout.shape_repository ());
 
           if (pp.first) {
-            auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::SimplePolygonPtr, db::Disp> > (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb), pp.second));
+            auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::SimplePolygonPtr, db::Disp> > (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (uint64_t) na, (uint64_t) nb), pp.second));
             if (is_forward_properties_id (pp.second)) {
               register_forward_property_for_shape (shape);
             }
           } else {
-            cell.shapes (ll.second).insert (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb));
+            cell.shapes (ll.second).insert (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (uint64_t) na, (uint64_t) nb));
           }
 
         } else if (! layout.is_editable () && (points = mm_repetition.get ().is_iterated ()) != 0) {
@@ -2550,11 +2516,11 @@ OASISReader::do_read_path (bool xy_absolute, db::cell_index_type cell_index, db:
   unsigned char m = get_byte ();
 
   if (m & 0x1) {
-    mm_layer = get_uint ();
+    mm_layer = get_uint32 ();
   }
 
   if (m & 0x2) {
-    mm_datatype = get_uint ();
+    mm_datatype = get_uint32 ();
   }
 
   if (m & 0x40) {
@@ -2563,7 +2529,7 @@ OASISReader::do_read_path (bool xy_absolute, db::cell_index_type cell_index, db:
 
   if (m & 0x80) {
 
-    unsigned int e = get_uint ();
+    uint32_t e = get_uint32 ();
     if ((e & 0x0c) == 0x0c) {
       mm_path_start_extension = get_coord ();
     } else if ((e & 0x0c) == 0x04) {
@@ -2641,12 +2607,12 @@ OASISReader::do_read_path (bool xy_absolute, db::cell_index_type cell_index, db:
           db::PathPtr path_ptr (path, layout.shape_repository ());
 
           if (pp.first) {
-            auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::PathPtr, db::Disp> > (db::array<db::PathPtr, db::Disp> (path_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb), pp.second));
+            auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::PathPtr, db::Disp> > (db::array<db::PathPtr, db::Disp> (path_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (uint64_t) na, (uint64_t) nb), pp.second));
             if (is_forward_properties_id (pp.second)) {
               register_forward_property_for_shape (shape);
             }
           } else {
-            cell.shapes (ll.second).insert (db::array<db::PathPtr, db::Disp> (path_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb));
+            cell.shapes (ll.second).insert (db::array<db::PathPtr, db::Disp> (path_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (uint64_t) na, (uint64_t) nb));
           }
 
         } else if (! layout.is_editable () && (points = mm_repetition.get ().is_iterated ()) != 0) {
@@ -2733,11 +2699,11 @@ OASISReader::do_read_trapezoid (unsigned char r, bool xy_absolute,db::cell_index
   unsigned char m = get_byte ();
 
   if (m & 0x1) {
-    mm_layer = get_uint ();
+    mm_layer = get_uint32 ();
   }
 
   if (m & 0x2) {
-    mm_datatype = get_uint ();
+    mm_datatype = get_uint32 ();
   }
 
   if (m & 0x40) {
@@ -2822,12 +2788,12 @@ OASISReader::do_read_trapezoid (unsigned char r, bool xy_absolute,db::cell_index
         db::SimplePolygonPtr poly_ptr (poly, layout.shape_repository ());
 
         if (pp.first) {
-          auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::SimplePolygonPtr, db::Disp> > (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb), pp.second));
+          auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::SimplePolygonPtr, db::Disp> > (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (uint64_t) na, (uint64_t) nb), pp.second));
           if (is_forward_properties_id (pp.second)) {
             register_forward_property_for_shape (shape);
           }
         } else {
-          cell.shapes (ll.second).insert (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb));
+          cell.shapes (ll.second).insert (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (uint64_t) na, (uint64_t) nb));
         }
 
       } else if (! layout.is_editable () && (points = mm_repetition.get ().is_iterated ()) != 0) {
@@ -2904,15 +2870,15 @@ OASISReader::do_read_ctrapezoid (bool xy_absolute,db::cell_index_type cell_index
   unsigned char m = get_byte ();
 
   if (m & 0x1) {
-    mm_layer = get_uint ();
+    mm_layer = get_uint32 ();
   }
 
   if (m & 0x2) {
-    mm_datatype = get_uint ();
+    mm_datatype = get_uint32 ();
   }
 
   if (m & 0x80) {
-    mm_ctrapezoid_type = get_uint ();
+    mm_ctrapezoid_type = get_uint32 ();
   }
 
   if (m & 0x40) {
@@ -3193,12 +3159,12 @@ OASISReader::do_read_ctrapezoid (bool xy_absolute,db::cell_index_type cell_index
         db::SimplePolygonPtr poly_ptr (poly, layout.shape_repository ());
 
         if (pp.first) {
-          auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::SimplePolygonPtr, db::Disp> > (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb), pp.second));
+          auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::SimplePolygonPtr, db::Disp> > (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (uint64_t) na, (uint64_t) nb), pp.second));
           if (is_forward_properties_id (pp.second)) {
             register_forward_property_for_shape (shape);
           }
         } else {
-          cell.shapes (ll.second).insert (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb));
+          cell.shapes (ll.second).insert (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (uint64_t) na, (uint64_t) nb));
         }
 
       } else if (! layout.is_editable () && (points = mm_repetition.get ().is_iterated ()) != 0) {
@@ -3275,11 +3241,11 @@ OASISReader::do_read_circle (bool xy_absolute, db::cell_index_type cell_index, d
   unsigned char m = get_byte ();
 
   if (m & 0x1) {
-    mm_layer = get_uint ();
+    mm_layer = get_uint32 ();
   }
 
   if (m & 0x2) {
-    mm_datatype = get_uint ();
+    mm_datatype = get_uint32 ();
   }
 
   if (m & 0x20) {
@@ -3343,12 +3309,12 @@ OASISReader::do_read_circle (bool xy_absolute, db::cell_index_type cell_index, d
         db::PathPtr path_ptr (path, layout.shape_repository ());
 
         if (pp.first) {
-          auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::PathPtr, db::Disp> > (db::array<db::PathPtr, db::Disp> (path_ptr, db::Disp (pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb), pp.second));
+          auto shape = cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::PathPtr, db::Disp> > (db::array<db::PathPtr, db::Disp> (path_ptr, db::Disp (pos), layout.array_repository (), a, b, (uint64_t) na, (uint64_t) nb), pp.second));
           if (is_forward_properties_id (pp.second)) {
             register_forward_property_for_shape (shape);
           }
         } else {
-          cell.shapes (ll.second).insert (db::array<db::PathPtr, db::Disp> (path_ptr, db::Disp (pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb));
+          cell.shapes (ll.second).insert (db::array<db::PathPtr, db::Disp> (path_ptr, db::Disp (pos), layout.array_repository (), a, b, (uint64_t) na, (uint64_t) nb));
         }
 
       } else if (! layout.is_editable () && (points = mm_repetition.get ().is_iterated ()) != 0) {
@@ -3537,7 +3503,7 @@ OASISReader::do_read_cell (db::cell_index_type cell_index, db::Layout &layout)
     } else if (r == 32 /*XELEMENT*/) {
 
       //  read over
-      get_ulong ();
+      get_uint64 ();
       get_str ();
 
       read_element_properties (true);
@@ -3547,14 +3513,14 @@ OASISReader::do_read_cell (db::cell_index_type cell_index, db::Layout &layout)
       //  read over.
 
       unsigned char m = get_byte ();
-      get_ulong ();
+      get_uint64 ();
 
       if (m & 0x1) {
-        mm_layer = get_uint ();
+        mm_layer = get_uint32 ();
       }
 
       if (m & 0x2) {
-        mm_datatype = get_uint ();
+        mm_datatype = get_uint32 ();
       }
 
       //  data payload:
@@ -3588,12 +3554,12 @@ OASISReader::do_read_cell (db::cell_index_type cell_index, db::Layout &layout)
 
     } else if (r == 34 /*CBLOCK*/) {
 
-      unsigned int type = get_uint ();
+      uint32_t type = get_uint32 ();
       if (type != 0) {
         error (tl::sprintf (tl::to_string (tr ("Invalid CBLOCK compression type %d")), type));
       }
 
-      size_t dummy = 0;
+      uint64_t dummy = 0;
       get (dummy);  // uncomp-byte-count - not needed
       get (dummy);  // comp-byte-count - not needed
 

@@ -899,6 +899,9 @@ class DBPolygon_TestClass < TestBase
     s = RBA::PolygonWithProperties::new
     assert_equal(s.to_s, "() props={}")
 
+    s = RBA::PolygonWithProperties::new(RBA::Polygon::new(RBA::Box::new(0, 0, 100, 200)), { 1 => "one" })
+    assert_equal(s.to_s, "(0,0;0,200;100,200;100,0) props={1=>one}")
+
     pid = RBA::Layout::properties_id({ 1 => "one" })
     s = RBA::PolygonWithProperties::new(RBA::Polygon::new(RBA::Box::new(0, 0, 100, 200)), pid)
     assert_equal(s.to_s, "(0,0;0,200;100,200;100,0) props={1=>one}")
@@ -911,8 +914,15 @@ class DBPolygon_TestClass < TestBase
     assert_equal(s.to_s, "(0,0;0,200;100,200;100,0) props={}")
     assert_equal(s.property(1), nil)
 
+    # Test downcast
+    assert_equal(s.class.to_s, "RBA::PolygonWithProperties")
+    assert_equal(s.downcast.class.to_s, "RBA::Polygon")
+
     s = RBA::DPolygonWithProperties::new
     assert_equal(s.to_s, "() props={}")
+
+    s = RBA::DPolygonWithProperties::new(RBA::DPolygon::new(RBA::DBox::new(0, 0, 100, 200)), { 1 => "one" })
+    assert_equal(s.to_s, "(0,0;0,200;100,200;100,0) props={1=>one}")
 
     pid = RBA::Layout::properties_id({ 1 => "one" })
     s = RBA::DPolygonWithProperties::new(RBA::DPolygon::new(RBA::DBox::new(0, 0, 100, 200)), pid)
@@ -926,8 +936,15 @@ class DBPolygon_TestClass < TestBase
     assert_equal(s.to_s, "(0,0;0,200;100,200;100,0) props={}")
     assert_equal(s.property(1), nil)
 
+    # Test downcast
+    assert_equal(s.class.to_s, "RBA::DPolygonWithProperties")
+    assert_equal(s.downcast.class.to_s, "RBA::DPolygon")
+
     s = RBA::SimplePolygonWithProperties::new
     assert_equal(s.to_s, "() props={}")
+
+    s = RBA::SimplePolygonWithProperties::new(RBA::SimplePolygon::new(RBA::Box::new(0, 0, 100, 200)), { 1 => "one" })
+    assert_equal(s.to_s, "(0,0;0,200;100,200;100,0) props={1=>one}")
 
     pid = RBA::Layout::properties_id({ 1 => "one" })
     s = RBA::SimplePolygonWithProperties::new(RBA::SimplePolygon::new(RBA::Box::new(0, 0, 100, 200)), pid)
@@ -941,8 +958,15 @@ class DBPolygon_TestClass < TestBase
     assert_equal(s.to_s, "(0,0;0,200;100,200;100,0) props={}")
     assert_equal(s.property(1), nil)
 
+    # Test downcast
+    assert_equal(s.class.to_s, "RBA::SimplePolygonWithProperties")
+    assert_equal(s.downcast.class.to_s, "RBA::SimplePolygon")
+
     s = RBA::DSimplePolygonWithProperties::new
     assert_equal(s.to_s, "() props={}")
+
+    s = RBA::DSimplePolygonWithProperties::new(RBA::DSimplePolygon::new(RBA::DBox::new(0, 0, 100, 200)), { 1 => "one" })
+    assert_equal(s.to_s, "(0,0;0,200;100,200;100,0) props={1=>one}")
 
     pid = RBA::Layout::properties_id({ 1 => "one" })
     s = RBA::DSimplePolygonWithProperties::new(RBA::DSimplePolygon::new(RBA::DBox::new(0, 0, 100, 200)), pid)
@@ -955,6 +979,56 @@ class DBPolygon_TestClass < TestBase
     s.delete_property(1)
     assert_equal(s.to_s, "(0,0;0,200;100,200;100,0) props={}")
     assert_equal(s.property(1), nil)
+
+    # Test downcast
+    assert_equal(s.class.to_s, "RBA::DSimplePolygonWithProperties")
+    assert_equal(s.downcast.class.to_s, "RBA::DSimplePolygon")
+
+  end
+
+  def test_triangulation
+
+    p = RBA::Polygon::new(RBA::Box::new(0, 0, 1000, 100))
+    assert_equal(p.delaunay.to_s, "(0,0;0,100;1000,100);(0,0;1000,100;1000,0)")
+
+    assert_equal(p.delaunay(0.0, 0.5).to_s, "(0,0;0,100;250,0);(250,0;500,100;500,0);(250,0;0,100;500,100);(750,0;1000,100;1000,0);(500,0;500,100;750,0);(750,0;500,100;1000,100)")
+    assert_equal(p.delaunay(20000, 0.0).to_s, "(0,0;250,50;500,0);(500,0;250,50;500,100);(250,50;0,100;500,100);(0,0;0,100;250,50);(500,0;500,100;750,50);(500,0;750,50;1000,0);(1000,0;750,50;1000,100);(750,50;500,100;1000,100)")
+
+    assert_equal(p.delaunay([ RBA::Point::new(50, 50) ]).to_s, "(0,0;0,100;50,50);(50,50;0,100;1000,100);(1000,0;50,50;1000,100);(0,0;50,50;1000,0)")
+
+    p = RBA::DPolygon::new(RBA::DBox::new(0, 0, 1000, 100))
+    assert_equal(p.delaunay.each.collect(&:to_s).join(";"), "(0,0;0,100;1000,100);(0,0;1000,100;1000,0)")
+
+    assert_equal(p.delaunay(0.0, 0.5).collect(&:to_s).join(";"), "(0,0;0,100;250,0);(250,0;500,100;500,0);(250,0;0,100;500,100);(750,0;1000,100;1000,0);(500,0;500,100;750,0);(750,0;500,100;1000,100)")
+    assert_equal(p.delaunay(20000, 0.0).collect(&:to_s).join(";"), "(0,0;250,50;500,0);(500,0;250,50;500,100);(250,50;0,100;500,100);(0,0;0,100;250,50);(500,0;500,100;750,50);(500,0;750,50;1000,0);(1000,0;750,50;1000,100);(750,50;500,100;1000,100)")
+
+    assert_equal(p.delaunay([ RBA::DPoint::new(50, 50) ]).collect(&:to_s).join(";"), "(0,0;0,100;50,50);(50,50;0,100;1000,100);(1000,0;50,50;1000,100);(0,0;50,50;1000,0)")
+
+  end
+
+  def sorted_polygons(arr)
+    arr.each.collect { |p| p.downcast.to_s }.sort.join(";")
+  end
+
+  def sorted_dpolygons(arr)
+    arr.each.collect { |p| p.to_s }.sort.join(";")
+  end
+
+  def test_hm_decomposition
+
+    p = RBA::Polygon::new([ [0, 0], [0, 100], [1000, 100], [1000, 1000], [1100, 1000], [1100, 100], [2200, 100], [2200, 0] ])
+    assert_equal(sorted_polygons(p.hm_decomposition(false, false)), "(0,0;0,100;1000,100);(0,0;1000,100;1100,100);(0,0;1100,100;2200,100;2200,0);(1000,100;1000,1000;1100,1000;1100,100)")
+    assert_equal(sorted_polygons(p.hm_decomposition(true, false)), "(0,0;0,100;1000,100;1000,0);(1000,0;1000,100;1100,100;1100,0);(1000,100;1000,1000;1100,1000;1100,100);(1100,0;1100,100;2200,100;2200,0)")
+    assert_equal(sorted_polygons(p.hm_decomposition(false, true)), "(0,0;0,100;1000,100;1100,100;2200,100;2200,0);(1000,100;1000,1000;1100,1000;1100,100)")
+    assert_equal(sorted_polygons(p.hm_decomposition(true, true)), "(0,0;0,100;1000,100;1000,0);(1000,0;1000,100;1000,1000;1100,1000;1100,100;1100,0);(1100,0;1100,100;2200,100;2200,0)")
+    assert_equal(sorted_polygons(p.hm_decomposition(false, false, 0.0, 0.5)), "(0,0;0,100;500,100;1000,100;1100,0;825,0;550,0;275,0);(1000,100;1000,550;1000,775;1000,1000;1100,1000;1100,550;1100,325;1100,100);(1100,0;1000,100;1100,100);(1100,0;1100,100;1650,100;1925,100;2200,100;2200,0;1650,0;1375,0)")
+
+    p = RBA::DPolygon::new([ [0, 0], [0, 100], [1000, 100], [1000, 1000], [1100, 1000], [1100, 100], [2200, 100], [2200, 0] ])
+    assert_equal(sorted_dpolygons(p.hm_decomposition(false, false)), "(0,0;0,100;1000,100);(0,0;1000,100;1100,100);(0,0;1100,100;2200,100;2200,0);(1000,100;1000,1000;1100,1000;1100,100)")
+    assert_equal(sorted_dpolygons(p.hm_decomposition(true, false)), "(0,0;0,100;1000,100;1000,0);(1000,0;1000,100;1100,100;1100,0);(1000,100;1000,1000;1100,1000;1100,100);(1100,0;1100,100;2200,100;2200,0)")
+    assert_equal(sorted_dpolygons(p.hm_decomposition(false, true)), "(0,0;0,100;1000,100;1100,100;2200,100;2200,0);(1000,100;1000,1000;1100,1000;1100,100)")
+    assert_equal(sorted_dpolygons(p.hm_decomposition(true, true)), "(0,0;0,100;1000,100;1000,0);(1000,0;1000,100;1000,1000;1100,1000;1100,100;1100,0);(1100,0;1100,100;2200,100;2200,0)")
+    assert_equal(sorted_dpolygons(p.hm_decomposition(false, false, 0.0, 0.5)), "(0,0;0,100;500,100;1000,100;1100,0;825,0;550,0;275,0);(1000,100;1000,550;1000,775;1000,1000;1100,1000;1100,550;1100,325;1100,100);(1100,0;1000,100;1100,100);(1100,0;1100,100;1650,100;1925,100;2200,100;2200,0;1650,0;1375,0)")
 
   end
 

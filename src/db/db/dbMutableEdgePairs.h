@@ -45,7 +45,7 @@ public:
   MutableEdgePairs (const MutableEdgePairs &other);
   virtual ~MutableEdgePairs ();
 
-  virtual void do_insert (const db::EdgePair &edge_pair) = 0;
+  virtual void do_insert (const db::EdgePair &edge_pair, db::properties_id_type prop_id) = 0;
 
   virtual void do_transform (const db::Trans &t) = 0;
   virtual void do_transform (const db::ICplxTrans &t) = 0;
@@ -63,7 +63,8 @@ public:
   void transform (const db::IMatrix2d &t) { do_transform (t); }
   void transform (const db::IMatrix3d &t) { do_transform (t); }
 
-  void insert (const db::EdgePair &edge_pair) { do_insert (edge_pair); }
+  void insert (const db::EdgePair &edge_pair) { do_insert (edge_pair, 0); }
+  void insert (const db::EdgePairWithProperties &edge_pair) { do_insert (edge_pair, edge_pair.properties_id ()); }
   void insert (const db::Shape &shape);
 
   template <class T>
@@ -72,7 +73,7 @@ public:
     if (shape.is_edge_pair ()) {
       db::EdgePair ep = shape.edge_pair ();
       ep.transform (trans);
-      insert (ep);
+      do_insert (ep, shape.prop_id ());
     }
   }
 

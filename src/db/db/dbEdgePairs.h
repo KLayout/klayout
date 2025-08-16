@@ -55,10 +55,12 @@ class EdgePairs;
 class DB_PUBLIC EdgePairFilterBase
 {
 public:
+  typedef db::EdgePair shape_type;
+
   EdgePairFilterBase () { }
   virtual ~EdgePairFilterBase () { }
 
-  virtual bool selected (const db::EdgePair &edge_pair) const = 0;
+  virtual bool selected (const db::EdgePair &edge_pair, db::properties_id_type prop_id) const = 0;
   virtual const TransformationReducer *vars () const = 0;
   virtual bool wants_variants () const = 0;
 };
@@ -129,6 +131,17 @@ public:
   }
 
   /**
+   *  @brief Constructor from an object with properties
+   *
+   *  Creates an edge pair set representing a single instance of that object
+   */
+  explicit EdgePairs (const db::EdgePairWithProperties &s)
+    : mp_delegate (0)
+  {
+    insert (s);
+  }
+
+  /**
    *  @brief Constructor from an object
    *
    *  Creates an edge pair set representing a single instance of that object
@@ -184,6 +197,12 @@ public:
    *  @brief Constructor from a RecursiveShapeIterator providing a deep representation with transformation
    */
   explicit EdgePairs (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans);
+
+  /**
+   *  @brief Creates a new empty layer inside the dss
+   *  This method requires the DSS to be singular.
+   */
+  explicit EdgePairs (DeepShapeStore &dss);
 
   /**
    *  @brief Writes the edge pair collection to a file
@@ -344,6 +363,18 @@ public:
   EdgePairs filtered (const EdgePairFilterBase &filter) const
   {
     return EdgePairs (mp_delegate->filtered (filter));
+  }
+
+  /**
+   *  @brief Returns the filtered edge pairs and the others
+   *
+   *  This method will return a new edge pair collection with only those edge pairs which
+   *  conform to the filter criterion and another for those which don't.
+   */
+  std::pair<EdgePairs, EdgePairs> split_filter (const EdgePairFilterBase &filter) const
+  {
+    std::pair<db::EdgePairsDelegate *, db::EdgePairsDelegate *> p = mp_delegate->filtered_pair (filter);
+    return std::make_pair (EdgePairs (p.first), EdgePairs (p.second));
   }
 
   /**
@@ -649,12 +680,23 @@ public:
   /**
    *  @brief Returns the nth edge pair
    *
-   *  This operation is available only for flat regions - i.e. such for which
+   *  This operation is available only for flat edge pair collections - i.e. such for which
    *  "has_valid_edge_pairs" is true.
    */
   const db::EdgePair *nth (size_t n) const
   {
     return mp_delegate->nth (n);
+  }
+
+  /**
+   *  @brief Returns the nth edge pair's property ID
+   *
+   *  This operation is available only for flat edge pair collections - i.e. such for which
+   *  "has_valid_edge_pairs" is true.
+   */
+  db::properties_id_type nth_prop_id (size_t n) const
+  {
+    return mp_delegate->nth_prop_id (n);
   }
 
   /**

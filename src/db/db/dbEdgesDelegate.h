@@ -45,6 +45,8 @@ namespace db {
 class DB_PUBLIC EdgeFilterBase
 {
 public:
+  typedef db::Edge shape_type;
+
   /**
    *  @brief Constructor
    */
@@ -56,13 +58,13 @@ public:
    *  @brief Filters the edge
    *  If this method returns true, the edge is kept. Otherwise it's discarded.
    */
-  virtual bool selected (const db::Edge &edge) const = 0;
+  virtual bool selected (const db::Edge &edge, db::properties_id_type prop_id) const = 0;
 
   /**
    *  @brief Filters the edge set
    *  If this method returns true, the edges are kept. Otherwise they are discarded.
    */
-  virtual bool selected (const std::unordered_set<db::Edge> &edge) const = 0;
+  virtual bool selected_set (const std::unordered_set<db::EdgeWithProperties> &edge) const = 0;
 
   /**
    *  @brief Returns the transformation reducer for building cell variants
@@ -228,6 +230,7 @@ public:
 
   virtual EdgesDelegate *filter_in_place (const EdgeFilterBase &filter) = 0;
   virtual EdgesDelegate *filtered (const EdgeFilterBase &filter) const = 0;
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> filtered_pair (const EdgeFilterBase &filter) const = 0;
   virtual EdgesDelegate *process_in_place (const EdgeProcessorBase &filter) = 0;
   virtual EdgesDelegate *processed (const EdgeProcessorBase &filter) const = 0;
   virtual EdgePairsDelegate *processed_to_edge_pairs (const EdgeToEdgePairProcessorBase &filter) const = 0;
@@ -279,6 +282,7 @@ public:
   virtual std::pair<EdgesDelegate *, EdgesDelegate *> in_and_out (const Edges &) const = 0;
 
   virtual const db::Edge *nth (size_t n) const = 0;
+  virtual db::properties_id_type nth_prop_id (size_t n) const = 0;
   virtual bool has_valid_edges () const = 0;
   virtual bool has_valid_merged_edges () const = 0;
 

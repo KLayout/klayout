@@ -64,15 +64,15 @@ TEST(1_ReaderBasic)
 
     db::CellMapping cm = l2n.cell_mapping_into (ly2, top2, true /*with device cells*/);
 
-    std::map<unsigned int, const db::Region *> lmap;
-    lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = l2n.layer_by_name ("psd");
-    lmap [ly2.insert_layer (db::LayerProperties (11, 0))] = l2n.layer_by_name ("nsd");
-    lmap [ly2.insert_layer (db::LayerProperties (3, 0)) ] = l2n.layer_by_name ("poly");
-    lmap [ly2.insert_layer (db::LayerProperties (4, 0)) ] = l2n.layer_by_name ("diff_cont");
-    lmap [ly2.insert_layer (db::LayerProperties (5, 0)) ] = l2n.layer_by_name ("poly_cont");
-    lmap [ly2.insert_layer (db::LayerProperties (6, 0)) ] = l2n.layer_by_name ("metal1");
-    lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = l2n.layer_by_name ("via1");
-    lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = l2n.layer_by_name ("metal2");
+    std::map<unsigned int, unsigned int> lmap;
+    lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = l2n.layer_index_by_name ("psd").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (11, 0))] = l2n.layer_index_by_name ("nsd").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (3, 0)) ] = l2n.layer_index_by_name ("poly").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (4, 0)) ] = l2n.layer_index_by_name ("diff_cont").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (5, 0)) ] = l2n.layer_index_by_name ("poly_cont").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (6, 0)) ] = l2n.layer_index_by_name ("metal1").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = l2n.layer_index_by_name ("via1").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = l2n.layer_index_by_name ("metal2").value ();
 
     l2n.build_all_nets (cm, ly2, lmap, "NET_", db::NPM_NoProperties, tl::Variant (), db::BNH_Disconnected, 0, "DEVICE_");
 
@@ -88,15 +88,15 @@ TEST(1_ReaderBasic)
     ly2.dbu (l2n.internal_layout ()->dbu ());
     db::Cell &top2 = ly2.cell (ly2.add_cell ("TOP"));
 
-    std::map<unsigned int, const db::Region *> lmap;
-    lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = l2n.layer_by_name ("psd");
-    lmap [ly2.insert_layer (db::LayerProperties (11, 0))] = l2n.layer_by_name ("nsd");
-    lmap [ly2.insert_layer (db::LayerProperties (3, 0)) ] = l2n.layer_by_name ("poly");
-    lmap [ly2.insert_layer (db::LayerProperties (4, 0)) ] = l2n.layer_by_name ("diff_cont");
-    lmap [ly2.insert_layer (db::LayerProperties (5, 0)) ] = l2n.layer_by_name ("poly_cont");
-    lmap [ly2.insert_layer (db::LayerProperties (6, 0)) ] = l2n.layer_by_name ("metal1");
-    lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = l2n.layer_by_name ("via1");
-    lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = l2n.layer_by_name ("metal2");
+    std::map<unsigned int, unsigned int> lmap;
+    lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = l2n.layer_index_by_name ("psd").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (11, 0))] = l2n.layer_index_by_name ("nsd").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (3, 0)) ] = l2n.layer_index_by_name ("poly").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (4, 0)) ] = l2n.layer_index_by_name ("diff_cont").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (5, 0)) ] = l2n.layer_index_by_name ("poly_cont").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (6, 0)) ] = l2n.layer_index_by_name ("metal1").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = l2n.layer_index_by_name ("via1").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = l2n.layer_index_by_name ("metal2").value ();
 
     std::vector<const db::Net *> nets;
     nets.push_back (l2n.netlist ()->circuit_by_name ("RINGO")->net_by_name ("VSS"));
@@ -118,15 +118,15 @@ TEST(1_ReaderBasic)
     ly2.dbu (l2n.internal_layout ()->dbu ());
     db::Cell &top2 = ly2.cell (ly2.add_cell ("TOP"));
 
-    std::map<unsigned int, const db::Region *> lmap;
-    lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = l2n.layer_by_name ("psd");
-    lmap [ly2.insert_layer (db::LayerProperties (11, 0))] = l2n.layer_by_name ("nsd");
-    lmap [ly2.insert_layer (db::LayerProperties (3, 0)) ] = l2n.layer_by_name ("poly");
-    lmap [ly2.insert_layer (db::LayerProperties (4, 0)) ] = l2n.layer_by_name ("diff_cont");
-    lmap [ly2.insert_layer (db::LayerProperties (5, 0)) ] = l2n.layer_by_name ("poly_cont");
-    lmap [ly2.insert_layer (db::LayerProperties (6, 0)) ] = l2n.layer_by_name ("metal1");
-    lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = l2n.layer_by_name ("via1");
-    lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = l2n.layer_by_name ("metal2");
+    std::map<unsigned int, unsigned int> lmap;
+    lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = l2n.layer_index_by_name ("psd").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (11, 0))] = l2n.layer_index_by_name ("nsd").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (3, 0)) ] = l2n.layer_index_by_name ("poly").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (4, 0)) ] = l2n.layer_index_by_name ("diff_cont").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (5, 0)) ] = l2n.layer_index_by_name ("poly_cont").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (6, 0)) ] = l2n.layer_index_by_name ("metal1").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = l2n.layer_index_by_name ("via1").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = l2n.layer_index_by_name ("metal2").value ();
 
     std::vector<const db::Net *> nets;
     nets.push_back (l2n.netlist ()->circuit_by_name ("RINGO")->net_by_name ("VSS"));
@@ -148,15 +148,15 @@ TEST(1_ReaderBasic)
     ly2.dbu (l2n.internal_layout ()->dbu ());
     db::Cell &top2 = ly2.cell (ly2.add_cell ("TOP"));
 
-    std::map<unsigned int, const db::Region *> lmap;
-    lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = l2n.layer_by_name ("psd");
-    lmap [ly2.insert_layer (db::LayerProperties (11, 0))] = l2n.layer_by_name ("nsd");
-    lmap [ly2.insert_layer (db::LayerProperties (3, 0)) ] = l2n.layer_by_name ("poly");
-    lmap [ly2.insert_layer (db::LayerProperties (4, 0)) ] = l2n.layer_by_name ("diff_cont");
-    lmap [ly2.insert_layer (db::LayerProperties (5, 0)) ] = l2n.layer_by_name ("poly_cont");
-    lmap [ly2.insert_layer (db::LayerProperties (6, 0)) ] = l2n.layer_by_name ("metal1");
-    lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = l2n.layer_by_name ("via1");
-    lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = l2n.layer_by_name ("metal2");
+    std::map<unsigned int, unsigned int> lmap;
+    lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = l2n.layer_index_by_name ("psd").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (11, 0))] = l2n.layer_index_by_name ("nsd").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (3, 0)) ] = l2n.layer_index_by_name ("poly").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (4, 0)) ] = l2n.layer_index_by_name ("diff_cont").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (5, 0)) ] = l2n.layer_index_by_name ("poly_cont").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (6, 0)) ] = l2n.layer_index_by_name ("metal1").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = l2n.layer_index_by_name ("via1").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = l2n.layer_index_by_name ("metal2").value ();
 
     std::vector<const db::Net *> nets;
     nets.push_back (l2n.netlist ()->circuit_by_name ("RINGO")->net_by_name ("VSS"));
@@ -178,15 +178,15 @@ TEST(1_ReaderBasic)
     ly2.dbu (l2n.internal_layout ()->dbu ());
     db::Cell &top2 = ly2.cell (ly2.add_cell ("TOP"));
 
-    std::map<unsigned int, const db::Region *> lmap;
-    lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = l2n.layer_by_name ("psd");
-    lmap [ly2.insert_layer (db::LayerProperties (11, 0))] = l2n.layer_by_name ("nsd");
-    lmap [ly2.insert_layer (db::LayerProperties (3, 0)) ] = l2n.layer_by_name ("poly");
-    lmap [ly2.insert_layer (db::LayerProperties (4, 0)) ] = l2n.layer_by_name ("diff_cont");
-    lmap [ly2.insert_layer (db::LayerProperties (5, 0)) ] = l2n.layer_by_name ("poly_cont");
-    lmap [ly2.insert_layer (db::LayerProperties (6, 0)) ] = l2n.layer_by_name ("metal1");
-    lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = l2n.layer_by_name ("via1");
-    lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = l2n.layer_by_name ("metal2");
+    std::map<unsigned int, unsigned int> lmap;
+    lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = l2n.layer_index_by_name ("psd").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (11, 0))] = l2n.layer_index_by_name ("nsd").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (3, 0)) ] = l2n.layer_index_by_name ("poly").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (4, 0)) ] = l2n.layer_index_by_name ("diff_cont").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (5, 0)) ] = l2n.layer_index_by_name ("poly_cont").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (6, 0)) ] = l2n.layer_index_by_name ("metal1").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = l2n.layer_index_by_name ("via1").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = l2n.layer_index_by_name ("metal2").value ();
 
     std::vector<const db::Net *> nets;
     nets.push_back (l2n.netlist ()->circuit_by_name ("RINGO")->net_by_name ("VSS"));
@@ -209,15 +209,15 @@ TEST(1_ReaderBasic)
     ly2.dbu (l2n.internal_layout ()->dbu ());
     db::Cell &top2 = ly2.cell (ly2.add_cell ("TOP"));
 
-    std::map<unsigned int, const db::Region *> lmap;
-    lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = l2n.layer_by_name ("psd");
-    lmap [ly2.insert_layer (db::LayerProperties (11, 0))] = l2n.layer_by_name ("nsd");
-    lmap [ly2.insert_layer (db::LayerProperties (3, 0)) ] = l2n.layer_by_name ("poly");
-    lmap [ly2.insert_layer (db::LayerProperties (4, 0)) ] = l2n.layer_by_name ("diff_cont");
-    lmap [ly2.insert_layer (db::LayerProperties (5, 0)) ] = l2n.layer_by_name ("poly_cont");
-    lmap [ly2.insert_layer (db::LayerProperties (6, 0)) ] = l2n.layer_by_name ("metal1");
-    lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = l2n.layer_by_name ("via1");
-    lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = l2n.layer_by_name ("metal2");
+    std::map<unsigned int, unsigned int> lmap;
+    lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = l2n.layer_index_by_name ("psd").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (11, 0))] = l2n.layer_index_by_name ("nsd").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (3, 0)) ] = l2n.layer_index_by_name ("poly").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (4, 0)) ] = l2n.layer_index_by_name ("diff_cont").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (5, 0)) ] = l2n.layer_index_by_name ("poly_cont").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (6, 0)) ] = l2n.layer_index_by_name ("metal1").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = l2n.layer_index_by_name ("via1").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = l2n.layer_index_by_name ("metal2").value ();
 
     std::vector<const db::Net *> nets;
     nets.push_back (l2n.netlist ()->circuit_by_name ("RINGO")->net_by_name ("VSS"));
@@ -290,18 +290,18 @@ TEST(1c_ReaderBasicShortWithProps)
     ly2.dbu (l2n.internal_layout ()->dbu ());
     db::Cell &top2 = ly2.cell (ly2.add_cell ("TOP"));
 
-    std::map<unsigned int, const db::Region *> lmap;
-    lmap [ly2.insert_layer (db::LayerProperties (3, 0))] = l2n.layer_by_name ("poly");
-    lmap [ly2.insert_layer (db::LayerProperties (3, 1))] = l2n.layer_by_name ("poly_lbl");
-    lmap [ly2.insert_layer (db::LayerProperties (4, 0))] = l2n.layer_by_name ("diff_cont");
-    lmap [ly2.insert_layer (db::LayerProperties (5, 0))] = l2n.layer_by_name ("poly_cont");
-    lmap [ly2.insert_layer (db::LayerProperties (6, 0))] = l2n.layer_by_name ("metal1");
-    lmap [ly2.insert_layer (db::LayerProperties (6, 1))] = l2n.layer_by_name ("metal1_lbl");
-    lmap [ly2.insert_layer (db::LayerProperties (7, 0))] = l2n.layer_by_name ("via1");
-    lmap [ly2.insert_layer (db::LayerProperties (8, 0))] = l2n.layer_by_name ("metal2");
-    lmap [ly2.insert_layer (db::LayerProperties (8, 1))] = l2n.layer_by_name ("metal2_lbl");
-    lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = l2n.layer_by_name ("psd");
-    lmap [ly2.insert_layer (db::LayerProperties (11, 0))] = l2n.layer_by_name ("nsd");
+    std::map<unsigned int, unsigned int> lmap;
+    lmap [ly2.insert_layer (db::LayerProperties (3, 0))] = l2n.layer_index_by_name ("poly").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (3, 1))] = l2n.layer_index_by_name ("poly_lbl").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (4, 0))] = l2n.layer_index_by_name ("diff_cont").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (5, 0))] = l2n.layer_index_by_name ("poly_cont").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (6, 0))] = l2n.layer_index_by_name ("metal1").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (6, 1))] = l2n.layer_index_by_name ("metal1_lbl").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (7, 0))] = l2n.layer_index_by_name ("via1").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (8, 0))] = l2n.layer_index_by_name ("metal2").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (8, 1))] = l2n.layer_index_by_name ("metal2_lbl").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = l2n.layer_index_by_name ("psd").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (11, 0))] = l2n.layer_index_by_name ("nsd").value ();
 
     db::CellMapping cm = l2n.cell_mapping_into (ly2, top2);
 
@@ -347,19 +347,19 @@ TEST(2_ReaderWithGlobalNets)
 
     db::CellMapping cm = l2n.cell_mapping_into (ly2, top2, true /*with device cells*/);
 
-    std::map<unsigned int, const db::Region *> lmap;
-    lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = l2n.layer_by_name ("psd");
-    lmap [ly2.insert_layer (db::LayerProperties (11, 0))] = l2n.layer_by_name ("nsd");
-    lmap [ly2.insert_layer (db::LayerProperties (12, 0))] = l2n.layer_by_name ("rbulk");
-    lmap [ly2.insert_layer (db::LayerProperties (13, 0))] = l2n.layer_by_name ("ptie");
-    lmap [ly2.insert_layer (db::LayerProperties (14, 0))] = l2n.layer_by_name ("ntie");
-    lmap [ly2.insert_layer (db::LayerProperties (1, 0)) ] = l2n.layer_by_name ("nwell");
-    lmap [ly2.insert_layer (db::LayerProperties (3, 0)) ] = l2n.layer_by_name ("poly");
-    lmap [ly2.insert_layer (db::LayerProperties (4, 0)) ] = l2n.layer_by_name ("diff_cont");
-    lmap [ly2.insert_layer (db::LayerProperties (5, 0)) ] = l2n.layer_by_name ("poly_cont");
-    lmap [ly2.insert_layer (db::LayerProperties (6, 0)) ] = l2n.layer_by_name ("metal1");
-    lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = l2n.layer_by_name ("via1");
-    lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = l2n.layer_by_name ("metal2");
+    std::map<unsigned int, unsigned int> lmap;
+    lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = l2n.layer_index_by_name ("psd").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (11, 0))] = l2n.layer_index_by_name ("nsd").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (12, 0))] = l2n.layer_index_by_name ("rbulk").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (13, 0))] = l2n.layer_index_by_name ("ptie").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (14, 0))] = l2n.layer_index_by_name ("ntie").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (1, 0)) ] = l2n.layer_index_by_name ("nwell").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (3, 0)) ] = l2n.layer_index_by_name ("poly").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (4, 0)) ] = l2n.layer_index_by_name ("diff_cont").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (5, 0)) ] = l2n.layer_index_by_name ("poly_cont").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (6, 0)) ] = l2n.layer_index_by_name ("metal1").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = l2n.layer_index_by_name ("via1").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = l2n.layer_index_by_name ("metal2").value ();
 
     l2n.build_all_nets (cm, ly2, lmap, "NET_", db::NPM_NoProperties, tl::Variant (), db::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_");
 
@@ -403,19 +403,19 @@ TEST(3_ReaderAbsoluteCoordinates)
 
     db::CellMapping cm = l2n.cell_mapping_into (ly2, top2, true /*with device cells*/);
 
-    std::map<unsigned int, const db::Region *> lmap;
-    lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = l2n.layer_by_name ("psd");
-    lmap [ly2.insert_layer (db::LayerProperties (11, 0))] = l2n.layer_by_name ("nsd");
-    lmap [ly2.insert_layer (db::LayerProperties (12, 0))] = l2n.layer_by_name ("rbulk");
-    lmap [ly2.insert_layer (db::LayerProperties (13, 0))] = l2n.layer_by_name ("ptie");
-    lmap [ly2.insert_layer (db::LayerProperties (14, 0))] = l2n.layer_by_name ("ntie");
-    lmap [ly2.insert_layer (db::LayerProperties (1, 0)) ] = l2n.layer_by_name ("nwell");
-    lmap [ly2.insert_layer (db::LayerProperties (3, 0)) ] = l2n.layer_by_name ("poly");
-    lmap [ly2.insert_layer (db::LayerProperties (4, 0)) ] = l2n.layer_by_name ("diff_cont");
-    lmap [ly2.insert_layer (db::LayerProperties (5, 0)) ] = l2n.layer_by_name ("poly_cont");
-    lmap [ly2.insert_layer (db::LayerProperties (6, 0)) ] = l2n.layer_by_name ("metal1");
-    lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = l2n.layer_by_name ("via1");
-    lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = l2n.layer_by_name ("metal2");
+    std::map<unsigned int, unsigned int> lmap;
+    lmap [ly2.insert_layer (db::LayerProperties (10, 0))] = l2n.layer_index_by_name ("psd").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (11, 0))] = l2n.layer_index_by_name ("nsd").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (12, 0))] = l2n.layer_index_by_name ("rbulk").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (13, 0))] = l2n.layer_index_by_name ("ptie").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (14, 0))] = l2n.layer_index_by_name ("ntie").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (1, 0)) ] = l2n.layer_index_by_name ("nwell").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (3, 0)) ] = l2n.layer_index_by_name ("poly").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (4, 0)) ] = l2n.layer_index_by_name ("diff_cont").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (5, 0)) ] = l2n.layer_index_by_name ("poly_cont").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (6, 0)) ] = l2n.layer_index_by_name ("metal1").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = l2n.layer_index_by_name ("via1").value ();
+    lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = l2n.layer_index_by_name ("metal2").value ();
 
     l2n.build_all_nets (cm, ly2, lmap, "NET_", db::NPM_NoProperties, tl::Variant (), db::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_");
 
@@ -461,7 +461,7 @@ TEST(4_ReaderCombinedDevices)
 
     db::CellMapping cm = l2n.cell_mapping_into (ly2, top2, true /*with device cells*/);
 
-    std::map<unsigned int, const db::Region *> lmap = l2n.create_layermap (ly2, 1000);
+    std::map<unsigned int, unsigned int> lmap = l2n.create_layermap (ly2, 1000);
 
     l2n.build_all_nets (cm, ly2, lmap, "NET_", db::NPM_NoProperties, tl::Variant (), db::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_");
 

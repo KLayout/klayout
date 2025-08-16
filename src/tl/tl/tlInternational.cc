@@ -45,12 +45,13 @@ QTextCodec *ms_system_codec = 0;
 
 QString to_qstring (const std::string &s)
 {
-  return QString::fromUtf8 (s.c_str ());
+  return QString::fromUtf8 (s.c_str (), s.size ());
 }
 
 std::string to_string (const QString &s)
 {
-  return std::string (s.toUtf8 ().constData ());
+  auto utf8 = s.toUtf8 ();
+  return std::string (utf8.constData (), utf8.size ());
 }
 
 #if !defined(_WIN32)
@@ -70,7 +71,7 @@ std::string string_to_system (const std::string &s)
     initialize_codecs ();
   }
 
-  QString qs = QString::fromUtf8 (s.c_str ());
+  QString qs = QString::fromUtf8 (s.c_str (), s.size ());
   return std::string (ms_system_codec->fromUnicode (qs).constData ());
 }
 #endif
@@ -116,14 +117,15 @@ std::string tr (const char *s)
 
 #endif
 
-}
-
-#if ! defined(HAVE_QT)
-
-std::string tr (const char *s)
+std::string tr_fallback (const char *s)
 {
+#if defined(HAVE_QT)
+  return tl::to_string (QObject::tr (s));
+#else
   //  TODO: this is a fallback implementation without translation
   return std::string (s);
+#endif
 }
 
-#endif
+}
+

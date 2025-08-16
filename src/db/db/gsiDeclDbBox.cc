@@ -124,7 +124,7 @@ struct box_defs
 
   static size_t hash_value (const C *box)
   {
-    return std::hfunc (*box);
+    return tl::hfunc (*box);
   }
 
   static const C &bbox (const C *box)
@@ -596,10 +596,18 @@ static db::BoxWithProperties *new_box_with_properties (const db::Box &box, db::p
   return new db::BoxWithProperties (box, pid);
 }
 
+static db::BoxWithProperties *new_box_with_properties2 (const db::Box &path, const std::map<tl::Variant, tl::Variant> &properties)
+{
+  return new db::BoxWithProperties (path, db::properties_id (db::PropertiesSet (properties.begin (), properties.end ())));
+}
+
 Class<db::BoxWithProperties> decl_BoxWithProperties (decl_Box, "db", "BoxWithProperties",
   gsi::properties_support_methods<db::BoxWithProperties> () +
   constructor ("new", &new_box_with_properties, gsi::arg ("box"), gsi::arg ("properties_id", db::properties_id_type (0)),
     "@brief Creates a new object from a property-less object and a properties ID."
+  ) +
+  constructor ("new", &new_box_with_properties2, gsi::arg ("box"), gsi::arg ("properties"),
+    "@brief Creates a new object from a property-less object and a properties hash."
   )
   ,
   "@brief A Box object with properties attached.\n"
@@ -670,10 +678,18 @@ static db::DBoxWithProperties *new_dbox_with_properties (const db::DBox &box, db
   return new db::DBoxWithProperties (box, pid);
 }
 
+static db::DBoxWithProperties *new_dbox_with_properties2 (const db::DBox &path, const std::map<tl::Variant, tl::Variant> &properties)
+{
+  return new db::DBoxWithProperties (path, db::properties_id (db::PropertiesSet (properties.begin (), properties.end ())));
+}
+
 Class<db::DBoxWithProperties> decl_DBoxWithProperties (decl_DBox, "db", "DBoxWithProperties",
   gsi::properties_support_methods<db::DBoxWithProperties> () +
   constructor ("new", &new_dbox_with_properties, gsi::arg ("box"), gsi::arg ("properties_id", db::properties_id_type (0)),
     "@brief Creates a new object from a property-less object and a properties ID."
+  ) +
+  constructor ("new", &new_dbox_with_properties2, gsi::arg ("box"), gsi::arg ("properties"),
+    "@brief Creates a new object from a property-less object and a properties hash."
   )
   ,
   "@brief A DBox object with properties attached.\n"

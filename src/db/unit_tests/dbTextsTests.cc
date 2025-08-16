@@ -208,3 +208,121 @@ TEST(7)
   texts.pull_interacting (region_out, region);
   EXPECT_EQ (region_out.to_string (), "(50,-300;50,-100;150,-100;150,-300)");
 }
+
+TEST(8_add_with_properties)
+{
+  db::DeepShapeStore dss ("TOP", 0.001);
+  db::Texts rd1 (dss), rd2 (dss);
+  db::Texts rf1, rf2;
+
+  db::PropertiesSet ps;
+  ps.insert ("net", 17);
+  db::properties_id_type pid = db::properties_id (ps);
+
+  rf1.insert (db::TextWithProperties (db::Text ("abc", db::Trans (db::Vector (10, 20))), pid));
+  rd1.insert (db::TextWithProperties (db::Text ("abc", db::Trans (db::Vector (10, 20))), pid));
+
+  rf2.insert (db::TextWithProperties (db::Text ("uvw", db::Trans (db::Vector (-10, 20))), pid));
+  rd2.insert (db::TextWithProperties (db::Text ("uvw", db::Trans (db::Vector (-10, 20))), pid));
+
+  db::Layout ly;
+  db::Cell &top_cell = ly.cell (ly.add_cell ("TOP"));
+  unsigned int l1 = ly.insert_layer ();
+  unsigned int l2 = ly.insert_layer ();
+
+  top_cell.shapes (l1).insert (db::TextWithProperties (db::Text ("abc", db::Trans (db::Vector (10, 20))), pid));
+  top_cell.shapes (l2).insert (db::TextWithProperties (db::Text ("uvw", db::Trans (db::Vector (-10, 20))), pid));
+
+  db::Texts ro1 (db::RecursiveShapeIterator (ly, top_cell, l1));
+  db::Texts ro2 (db::RecursiveShapeIterator (ly, top_cell, l2));
+
+  //  enable properties
+  ro1.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
+  ro2.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
+
+  db::Texts r;
+  r += rf1;
+  r += rf2;
+  EXPECT_EQ (r.to_string (), "('abc',r0 10,20){net=>17};('uvw',r0 -10,20){net=>17}");
+  EXPECT_EQ ((rf1 + rf2).to_string (), "('abc',r0 10,20){net=>17};('uvw',r0 -10,20){net=>17}");
+
+  r = db::Texts ();
+  r += rd1;
+  r += rf2;
+  EXPECT_EQ (r.to_string (), "('uvw',r0 -10,20){net=>17};('abc',r0 10,20){net=>17}");
+  EXPECT_EQ ((rd1 + rf2).to_string (), "('uvw',r0 -10,20){net=>17};('abc',r0 10,20){net=>17}");
+
+  r = db::Texts ();
+  r += rf1;
+  r += rd2;
+  EXPECT_EQ (r.to_string (), "('abc',r0 10,20){net=>17};('uvw',r0 -10,20){net=>17}");
+  EXPECT_EQ ((rf1 + rd2).to_string (), "('abc',r0 10,20){net=>17};('uvw',r0 -10,20){net=>17}");
+
+  r = db::Texts ();
+  r += rd1;
+  r += rd2;
+  EXPECT_EQ (r.to_string (), "('abc',r0 10,20){net=>17};('uvw',r0 -10,20){net=>17}");
+  EXPECT_EQ ((rd1 + rd2).to_string (), "('abc',r0 10,20){net=>17};('uvw',r0 -10,20){net=>17}");
+
+  r = db::Texts ();
+  r += ro1;
+  r += ro2;
+  EXPECT_EQ (r.to_string (), "('abc',r0 10,20){net=>17};('uvw',r0 -10,20){net=>17}");
+  EXPECT_EQ ((ro1 + ro2).to_string (), "('abc',r0 10,20){net=>17};('uvw',r0 -10,20){net=>17}");
+
+  r = db::Texts ();
+  r += ro1;
+  r += rf2;
+  EXPECT_EQ (r.to_string (), "('uvw',r0 -10,20){net=>17};('abc',r0 10,20){net=>17}");
+  EXPECT_EQ ((ro1 + rf2).to_string (), "('uvw',r0 -10,20){net=>17};('abc',r0 10,20){net=>17}");
+}
+
+TEST(9_polygons)
+{
+  db::DeepShapeStore dss ("TOP", 0.001);
+  db::Texts rf;
+  db::Texts rd (dss);
+
+  rf.insert (db::Text ("ABC", db::Trans (db::Vector (10, 20))));
+  rf.insert (db::Text ("XZY", db::Trans (db::Vector (-10, -20))));
+
+  rd.insert (db::Text ("ABC", db::Trans (db::Vector (10, 20))));
+  rd.insert (db::Text ("XZY", db::Trans (db::Vector (-10, -20))));
+
+  db::Region r;
+
+  rf.polygons (r, 1);
+  EXPECT_EQ (r.to_string (), "(9,19;9,21;11,21;11,19);(-11,-21;-11,-19;-9,-19;-9,-21)");
+
+  rf.polygons (r, 2);
+  EXPECT_EQ (r.to_string (), "(8,18;8,22;12,22;12,18);(-12,-22;-12,-18;-8,-18;-8,-22)");
+
+  rd.polygons (r, 1);
+  EXPECT_EQ (r.to_string (), "(9,19;9,21;11,21;11,19);(-11,-21;-11,-19;-9,-19;-9,-21)");
+
+  rf.polygons (r, 1, tl::Variant (17));
+  EXPECT_EQ (r.to_string (), "(9,19;9,21;11,21;11,19){17=>ABC};(-11,-21;-11,-19;-9,-19;-9,-21){17=>XZY}");
+
+  rd.polygons (r, 1, tl::Variant (17));
+  EXPECT_EQ (r.to_string (), "(9,19;9,21;11,21;11,19){17=>ABC};(-11,-21;-11,-19;-9,-19;-9,-21){17=>XZY}");
+}
+
+TEST(10_properties)
+{
+  db::PropertiesSet ps;
+
+  ps.insert (tl::Variant ("id"), 1);
+  db::properties_id_type pid1 = db::properties_id (ps);
+
+  db::Texts texts;
+  texts.insert (db::TextWithProperties (db::Text ("string", db::Trans ()), pid1));
+  texts.insert (db::Text ("abc", db::Trans ()));
+
+  EXPECT_EQ (texts.nth (0)->to_string (), "('abc',r0 0,0)");
+  EXPECT_EQ (texts.nth (1)->to_string (), "('string',r0 0,0)");
+  EXPECT_EQ (texts.nth (2) == 0, true);
+
+  EXPECT_EQ (texts.nth_prop_id (0), db::properties_id_type (0));
+  EXPECT_EQ (texts.nth_prop_id (1), pid1);
+}
+

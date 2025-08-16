@@ -89,6 +89,9 @@ AsIfFlatEdges::to_string (size_t nmax) const
     }
     first = false;
     os << p->to_string ();
+    if (p.prop_id () != 0) {
+      os << db::properties (p.prop_id ()).to_dict_var ().to_string ();
+    }
   }
   if (! p.at_end ()) {
     os << "...";
@@ -645,13 +648,17 @@ AsIfFlatEdges::processed (const EdgeProcessorBase &filter) const
     edges->set_merged_semantics (false);
   }
 
-  std::vector<db::Edge> res_edges;
+  std::vector<db::EdgeWithProperties> res_edges;
 
   for (EdgesIterator e (filter.requires_raw_input () ? begin () : begin_merged ()); ! e.at_end (); ++e) {
     res_edges.clear ();
-    filter.process (*e, res_edges);
-    for (std::vector<db::Edge>::const_iterator er = res_edges.begin (); er != res_edges.end (); ++er) {
-      edges->insert (*er);
+    filter.process (e.wp (), res_edges);
+    for (auto er = res_edges.begin (); er != res_edges.end (); ++er) {
+      if (er->properties_id () != 0) {
+        edges->insert (*er);
+      } else {
+        edges->insert (er->base ());
+      }
     }
   }
 
@@ -667,13 +674,17 @@ AsIfFlatEdges::processed_to_edge_pairs (const EdgeToEdgePairProcessorBase &filte
     edge_pairs->set_merged_semantics (false);
   }
 
-  std::vector<db::EdgePair> res_edge_pairs;
+  std::vector<db::EdgePairWithProperties> res_edge_pairs;
 
   for (EdgesIterator e (filter.requires_raw_input () ? begin () : begin_merged ()); ! e.at_end (); ++e) {
     res_edge_pairs.clear ();
-    filter.process (*e, res_edge_pairs);
-    for (std::vector<db::EdgePair>::const_iterator epr = res_edge_pairs.begin (); epr != res_edge_pairs.end (); ++epr) {
-      edge_pairs->insert (*epr);
+    filter.process (e.wp (), res_edge_pairs);
+    for (auto epr = res_edge_pairs.begin (); epr != res_edge_pairs.end (); ++epr) {
+      if (epr->properties_id () != 0) {
+        edge_pairs->insert (*epr);
+      } else {
+        edge_pairs->insert (epr->base ());
+      }
     }
   }
 
@@ -689,13 +700,17 @@ AsIfFlatEdges::processed_to_polygons (const EdgeToPolygonProcessorBase &filter) 
     region->set_merged_semantics (false);
   }
 
-  std::vector<db::Polygon> res_polygons;
+  std::vector<db::PolygonWithProperties> res_polygons;
 
   for (EdgesIterator e (filter.requires_raw_input () ? begin () : begin_merged ()); ! e.at_end (); ++e) {
     res_polygons.clear ();
-    filter.process (*e, res_polygons);
-    for (std::vector<db::Polygon>::const_iterator pr = res_polygons.begin (); pr != res_polygons.end (); ++pr) {
-      region->insert (*pr);
+    filter.process (e.wp (), res_polygons);
+    for (auto pr = res_polygons.begin (); pr != res_polygons.end (); ++pr) {
+      if (pr->properties_id () != 0) {
+        region->insert (*pr);
+      } else {
+        region->insert (pr->base ());
+      }
     }
   }
 
@@ -708,12 +723,41 @@ AsIfFlatEdges::filtered (const EdgeFilterBase &filter) const
   std::unique_ptr<FlatEdges> new_region (new FlatEdges ());
 
   for (EdgesIterator p (begin_merged ()); ! p.at_end (); ++p) {
-    if (filter.selected (*p)) {
-      new_region->insert (*p);
+    if (filter.selected (*p, p.prop_id ())) {
+      if (p.prop_id () != 0) {
+        new_region->insert (db::EdgeWithProperties (*p, p.prop_id ()));
+      } else {
+        new_region->insert (*p);
+      }
     }
   }
 
   return new_region.release ();
+}
+
+std::pair<EdgesDelegate *, EdgesDelegate *>
+AsIfFlatEdges::filtered_pair (const EdgeFilterBase &filter) const
+{
+  std::unique_ptr<FlatEdges> new_region_true (new FlatEdges ());
+  std::unique_ptr<FlatEdges> new_region_false (new FlatEdges ());
+
+  for (EdgesIterator p (begin_merged ()); ! p.at_end (); ++p) {
+    if (filter.selected (*p, p.prop_id ())) {
+      if (p.prop_id () != 0) {
+        new_region_true->insert (db::EdgeWithProperties (*p, p.prop_id ()));
+      } else {
+        new_region_true->insert (*p);
+      }
+    } else {
+      if (p.prop_id () != 0) {
+        new_region_false->insert (db::EdgeWithProperties (*p, p.prop_id ()));
+      } else {
+        new_region_false->insert (*p);
+      }
+    }
+  }
+
+  return std::make_pair (new_region_true.release (), new_region_false.release ());
 }
 
 EdgePairsDelegate *
@@ -1009,12 +1053,12 @@ AsIfFlatEdges::add (const Edges &other) const
     new_edges->set_is_merged (false);
     new_edges->invalidate_cache ();
 
-    size_t n = new_edges->raw_edges ().size () + count ();
-
-    new_edges->reserve (n);
-
     for (EdgesIterator p (begin ()); ! p.at_end (); ++p) {
-      new_edges->raw_edges ().insert (*p);
+      if (p.prop_id () == 0) {
+        new_edges->raw_edges ().insert (*p);
+      } else {
+        new_edges->raw_edges ().insert (db::EdgeWithProperties (*p, p.prop_id ()));
+      }
     }
 
     return new_edges.release ();
@@ -1023,15 +1067,19 @@ AsIfFlatEdges::add (const Edges &other) const
 
     std::unique_ptr<FlatEdges> new_edges (new FlatEdges (false /*not merged*/));
 
-    size_t n = count () + other.count ();
-
-    new_edges->reserve (n);
-
     for (EdgesIterator p (begin ()); ! p.at_end (); ++p) {
-      new_edges->raw_edges ().insert (*p);
+      if (p.prop_id () == 0) {
+        new_edges->raw_edges ().insert (*p);
+      } else {
+        new_edges->raw_edges ().insert (db::EdgeWithProperties (*p, p.prop_id ()));
+      }
     }
     for (EdgesIterator p (other.begin ()); ! p.at_end (); ++p) {
-      new_edges->raw_edges ().insert (*p);
+      if (p.prop_id () == 0) {
+        new_edges->raw_edges ().insert (*p);
+      } else {
+        new_edges->raw_edges ().insert (db::EdgeWithProperties (*p, p.prop_id ()));
+      }
     }
 
     return new_edges.release ();

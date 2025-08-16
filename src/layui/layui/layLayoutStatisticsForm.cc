@@ -340,7 +340,7 @@ StatisticsTemplateProcessor::process (const QDomElement &element, tl::Eval &eval
 
       db::LayoutQuery q (tl::to_string (element.attribute (template_name_expr, template_value_empty_query)));
 
-      db::LayoutQueryIterator qi (q, mp_layout, &eval);
+      db::LayoutQueryIterator qi (q, mp_layout, 0, &eval);
 
       process_child_nodes (begin_node, qi.eval (), writer);
 

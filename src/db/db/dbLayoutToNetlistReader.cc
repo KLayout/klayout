@@ -391,6 +391,9 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
       read_word_or_quoted (class_name);
       read_word_or_quoted (templ_name);
 
+      int full_specs = 0;
+      try_read_int (full_specs);
+
       if (netlist->device_class_by_name (class_name) != 0) {
         throw tl::Exception (tl::to_string (tr ("Duplicate definition of device class: ")) + class_name);
       }
@@ -405,6 +408,13 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
           throw tl::Exception (tl::to_string (tr ("Invalid device class template: ")) + templ_name);
         }
         dc = dct->create ();
+      }
+
+      //  start with tabula rasa on "full specs"
+      if (full_specs != 0) {
+        dc->clear_equivalent_terminal_ids ();
+        dc->clear_parameter_definitions ();
+        dc->clear_terminal_definitions ();
       }
 
       dc->set_name (class_name);

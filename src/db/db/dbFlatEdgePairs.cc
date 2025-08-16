@@ -103,7 +103,7 @@ FlatEdgePairs::filter_in_place (const EdgePairFilterBase &filter)
 
   edge_pair_iterator_type pw = ep.get_layer<db::EdgePair, db::unstable_layer_tag> ().begin ();
   for (EdgePairsIterator p (begin ()); ! p.at_end (); ++p) {
-    if (filter.selected (*p)) {
+    if (filter.selected (*p, p.prop_id ())) {
       if (pw == ep.get_layer<db::EdgePair, db::unstable_layer_tag> ().end ()) {
         ep.get_layer<db::EdgePair, db::unstable_layer_tag> ().insert (*p);
         pw = ep.get_layer<db::EdgePair, db::unstable_layer_tag> ().end ();
@@ -173,7 +173,46 @@ EdgePairsDelegate *FlatEdgePairs::add_in_place (const EdgePairs &other)
 
 const db::EdgePair *FlatEdgePairs::nth (size_t n) const
 {
-  return n < mp_edge_pairs->size () ? &mp_edge_pairs->get_layer<db::EdgePair, db::unstable_layer_tag> ().begin () [n] : 0;
+  //  NOTE: this assumes that we iterate over non-property edge pairs first and then over edges with properties
+
+  if (n >= mp_edge_pairs->size ()) {
+    return 0;
+  }
+
+  const db::layer<db::EdgePair, db::unstable_layer_tag> &l = mp_edge_pairs->get_layer<db::EdgePair, db::unstable_layer_tag> ();
+  if (n < l.size ()) {
+    return &l.begin () [n];
+  }
+  n -= l.size ();
+
+  const db::layer<db::EdgePairWithProperties, db::unstable_layer_tag> &lp = mp_edge_pairs->get_layer<db::EdgePairWithProperties, db::unstable_layer_tag> ();
+  if (n < lp.size ()) {
+    return &lp.begin () [n];
+  }
+
+  return 0;
+}
+
+db::properties_id_type FlatEdgePairs::nth_prop_id (size_t n) const
+{
+  //  NOTE: this assumes that we iterate over non-property edge pairs first and then over edges with properties
+
+  if (n >= mp_edge_pairs->size ()) {
+    return 0;
+  }
+
+  const db::layer<db::EdgePair, db::unstable_layer_tag> &l = mp_edge_pairs->get_layer<db::EdgePair, db::unstable_layer_tag> ();
+  if (n < l.size ()) {
+    return 0;
+  }
+  n -= l.size ();
+
+  const db::layer<db::EdgePairWithProperties, db::unstable_layer_tag> &lp = mp_edge_pairs->get_layer<db::EdgePairWithProperties, db::unstable_layer_tag> ();
+  if (n < lp.size ()) {
+    return lp.begin () [n].properties_id ();
+  }
+
+  return 0;
 }
 
 bool FlatEdgePairs::has_valid_edge_pairs () const
@@ -221,9 +260,13 @@ FlatEdgePairs::insert_into (Layout *layout, db::cell_index_type into_cell, unsig
 }
 
 void
-FlatEdgePairs::do_insert (const db::EdgePair &ep)
+FlatEdgePairs::do_insert (const db::EdgePair &ep, db::properties_id_type prop_id)
 {
-  mp_edge_pairs->insert (ep);
+  if (prop_id != 0) {
+    mp_edge_pairs->insert (db::EdgePairWithProperties (ep, prop_id));
+  } else {
+    mp_edge_pairs->insert (ep);
+  }
   invalidate_cache ();
 }
 

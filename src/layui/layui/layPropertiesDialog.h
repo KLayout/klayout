@@ -99,18 +99,21 @@ private:
 
   const std::vector<lay::PropertiesPage *> &properties_pages () { return mp_properties_pages; }
   void disconnect ();
+  void fetch_config ();
+  void store_config ();
   bool any_prev () const;
   bool any_next () const;
   void update_title ();
   void update_controls ();
 
 public slots:
-  void apply ();
+  void properties_edited ();
   void next_pressed ();
   void prev_pressed ();
   void cancel_pressed ();
   void ok_pressed ();
   void apply_to_all_pressed ();
+  void reduce_selection ();
   void current_index_changed (const QModelIndex &index, const QModelIndex &previous);
   void selection_changed ();
 

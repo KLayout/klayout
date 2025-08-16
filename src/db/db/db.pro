@@ -58,6 +58,7 @@ SOURCES = \
   dbLog.cc \
   dbManager.cc \
   dbMatrix.cc \
+  dbMeasureEval.cc \
   dbMemStatistics.cc \
   dbMutableEdgePairs.cc \
   dbMutableEdges.cc \
@@ -70,15 +71,21 @@ SOURCES = \
   dbNetlistSpiceReaderExpressionParser.cc \
   dbObject.cc \
   dbObjectWithProperties.cc \
+  dbPLC.cc \
+  dbPLCConvexDecomposition.cc \
+  dbPLCTriangulation.cc \
   dbPath.cc \
   dbPCellDeclaration.cc \
   dbPCellHeader.cc \
   dbPCellVariant.cc \
   dbPoint.cc \
   dbPolygon.cc \
+  dbPolygonNeighborhood.cc \
   dbPolygonTools.cc \
   dbPolygonGenerators.cc \
+  dbPropertiesFilter.cc \
   dbPropertiesRepository.cc \
+  dbQuadTree.cc \
   dbReader.cc \
   dbRecursiveInstanceIterator.cc \
   dbRecursiveShapeIterator.cc \
@@ -102,8 +109,6 @@ SOURCES = \
   dbTextWriter.cc \
   dbTilingProcessor.cc \
   dbTrans.cc \
-  dbTriangle.cc \
-  dbTriangles.cc \
   dbUserObject.cc \
   dbUtils.cc \
   dbVector.cc \
@@ -136,10 +141,12 @@ SOURCES = \
   gsiDeclDbLog.cc \
   gsiDeclDbManager.cc \
   gsiDeclDbMatrix.cc \
+  gsiDeclDbMeasureHelpers.cc \
   gsiDeclDbMetaInfo.cc \
   gsiDeclDbPath.cc \
   gsiDeclDbPoint.cc \
   gsiDeclDbPolygon.cc \
+  gsiDeclDbPolygonNeighborhood.cc \
   gsiDeclDbReader.cc \
   gsiDeclDbRecursiveInstanceIterator.cc \
   gsiDeclDbRecursiveShapeIterator.cc \
@@ -292,6 +299,7 @@ HEADERS = \
   dbLog.h \
   dbManager.h \
   dbMatrix.h \
+  dbMeasureEval.h \
   dbMemStatistics.h \
   dbMetaInfo.h \
   dbMutableEdgePairs.h \
@@ -306,16 +314,22 @@ HEADERS = \
   dbObject.h \
   dbObjectTag.h \
   dbObjectWithProperties.h \
+  dbPLC.h \
+  dbPLCConvexDecomposition.h \
+  dbPLCTriangulation.h \
   dbPath.h \
   dbPCellDeclaration.h \
   dbPCellHeader.h \
   dbPCellVariant.h \
   dbPoint.h \
   dbPolygon.h \
+  dbPolygonNeighborhood.h \
   dbPolygonTools.h \
   dbPolygonGenerators.h \
+  dbPropertiesFilter.h \
   dbPropertiesRepository.h \
   dbPropertyConstraint.h \
+  dbQuadTree.h \
   dbReader.h \
   dbRecursiveInstanceIterator.h \
   dbRecursiveShapeIterator.h \
@@ -338,8 +352,6 @@ HEADERS = \
   dbTextWriter.h \
   dbTilingProcessor.h \
   dbTrans.h \
-  dbTriangle.h \
-  dbTriangles.h \
   dbTypes.h \
   dbUserObject.h \
   dbUtils.h \
@@ -425,6 +437,7 @@ HEADERS = \
   dbNetShape.h \
   dbShapeCollection.h \
   dbShapeCollectionUtils.h \
+  gsiDeclDbMeasureHelpers.h \
   gsiDeclDbPropertiesSupport.h
 
 RESOURCES = \

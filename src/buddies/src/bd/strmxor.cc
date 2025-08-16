@@ -32,6 +32,8 @@
 #include "gsiExpression.h"
 #include "tlCommandLineParser.h"
 #include "tlThreads.h"
+#include "tlThreadedWorkers.h"
+#include "tlTimer.h"
 
 namespace {
 
@@ -319,7 +321,8 @@ struct XORData
       dont_summarize_missing_layers (false), silent (false), no_summary (false),
       threads (0),
       tile_size (0.0), heal_results (false),
-      output_layout (0), output_cell (0)
+      output_layout (0), output_cell (0),
+      layers_missing (0)
   { }
 
   db::Layout *layout_a, *layout_b;
@@ -336,6 +339,8 @@ struct XORData
   db::cell_index_type output_cell;
   std::map<db::LayerProperties, std::pair<int, int>, db::LPLogicalLessFunc> l2l_map;
   std::map<std::pair<int, db::LayerProperties>, ResultDescriptor> *results;
+  mutable int layers_missing;
+  mutable tl::Mutex lock;
 };
 
 }
@@ -455,6 +460,8 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
     }
   }
 
+  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Total")));
+
   db::Layout layout_a;
   db::Layout layout_b;
 
@@ -572,14 +579,22 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
   if (! silent && ! no_summary) {
 
     if (result) {
-      tl::info << "No differences found";
+      tl::info << tl::to_string (tr ("No differences found"));
     } else {
 
       const char *line_format = "  %-10s %-12s %s";
-      const char *sep = "  -------------------------------------------------------";
 
-      tl::info << "Result summary (layers without differences are not shown):" << tl::endl;
-      tl::info << tl::sprintf (line_format, "Layer", "Output", "Differences (shape count)") << tl::endl << sep;
+      std::string headline;
+      if (deep) {
+        headline = tl::sprintf (line_format, tl::to_string (tr ("Layer")), tl::to_string (tr ("Output")), tl::to_string (tr ("Differences (hierarchical shape count)")));
+      } else {
+        headline = tl::sprintf (line_format, tl::to_string (tr ("Layer")), tl::to_string (tr ("Output")), tl::to_string (tr ("Differences (shape count)")));
+      }
+
+      const char *sep = "  ----------------------------------------------------------------";
+
+      tl::info << tl::to_string (tr ("Result summary (layers without differences are not shown):")) << tl::endl;
+      tl::info << headline << tl::endl << sep;
 
       int ti = -1;
       for (std::map<std::pair<int, db::LayerProperties>, ResultDescriptor>::const_iterator r = results.begin (); r != results.end (); ++r) {
@@ -587,17 +602,17 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
         if (r->first.first != ti) {
           ti = r->first.first;
           if (tolerances[ti] > db::epsilon) {
-            tl::info << tl::endl << "Tolerance " << tl::micron_to_string (tolerances[ti]) << ":" << tl::endl;
-            tl::info << tl::sprintf (line_format, "Layer", "Output", "Differences (shape count)") << tl::endl << sep;
+            tl::info << tl::endl << tl::to_string (tr ("Tolerance ")) << tl::micron_to_string (tolerances[ti]) << ":" << tl::endl;
+            tl::info << headline << tl::endl << sep;
           }
         }
 
         std::string out ("-");
         std::string value;
         if (r->second.layer_a < 0 && ! dont_summarize_missing_layers) {
-          value = "(no such layer in first layout)";
+          value = tl::to_string (tr ("(no such layer in first layout)"));
         } else if (r->second.layer_b < 0 && ! dont_summarize_missing_layers) {
-          value = "(no such layer in second layout)";
+          value = tl::to_string (tr ("(no such layer in second layout)"));
         } else if (! r->second.is_empty ()) {
           if (r->second.layer_output >= 0 && r->second.layout) {
             out = r->second.layout->get_properties (r->second.layer_output).to_string ();
@@ -758,15 +773,174 @@ bool run_tiled_xor (const XORData &xor_data)
   return result;
 }
 
-bool run_deep_xor (const XORData &xor_data)
-{
-  db::DeepShapeStore dss;
-  dss.set_threads (xor_data.threads);
 
+class XORJob
+  : public tl::JobBase
+{
+public:
+  XORJob (int nworkers)
+    : tl::JobBase (nworkers)
+  {
+  }
+
+  virtual tl::Worker *create_worker ();
+};
+
+class XORWorker
+  : public tl::Worker
+{
+public:
+  XORWorker (XORJob *job);
+  void perform_task (tl::Task *task);
+
+  db::DeepShapeStore &dss ()
+  {
+    return m_dss;
+  }
+
+private:
+  XORJob *mp_job;
+  db::DeepShapeStore m_dss;
+};
+
+class XORTask
+  : public tl::Task
+{
+public:
+  XORTask (const XORData *xor_data, const db::LayerProperties &layer_props, int la, int lb, double dbu)
+    : mp_xor_data (xor_data), m_layer_props (layer_props), m_la (la), m_lb (lb), m_dbu (dbu)
+  {
+    //  .. nothing yet ..
+  }
+
+  void run (XORWorker *worker) const
+  {
+    if ((m_la < 0 || m_lb < 0) && ! mp_xor_data->dont_summarize_missing_layers) {
+
+      if (m_la < 0) {
+        (mp_xor_data->silent ? tl::log : tl::warn) << "Layer " << m_layer_props.to_string () << " is not present in first layout, but in second";
+      } else {
+        (mp_xor_data->silent ? tl::log : tl::warn) << "Layer " << m_layer_props.to_string () << " is not present in second layout, but in first";
+      }
+
+      tl::MutexLocker locker (&mp_xor_data->lock);
+
+      mp_xor_data->layers_missing += 1;
+
+      int tol_index = 0;
+      for (std::vector<double>::const_iterator t = mp_xor_data->tolerances.begin (); t != mp_xor_data->tolerances.end (); ++t) {
+
+        ResultDescriptor &result = mp_xor_data->results->insert (std::make_pair (std::make_pair (tol_index, m_layer_props), ResultDescriptor ())).first->second;
+        result.layer_a = m_la;
+        result.layer_b = m_lb;
+        result.layout = mp_xor_data->output_layout;
+        result.top_cell = mp_xor_data->output_cell;
+
+        ++tol_index;
+
+      }
+
+    } else {
+
+      tl::SelfTimer timer (tl::verbosity () >= 11, "XOR on layer " + m_layer_props.to_string ());
+
+      db::RecursiveShapeIterator ri_a, ri_b;
+
+      if (m_la >= 0) {
+        ri_a = db::RecursiveShapeIterator (*mp_xor_data->layout_a, mp_xor_data->layout_a->cell (mp_xor_data->cell_a), m_la);
+      } else {
+        ri_a = db::RecursiveShapeIterator (*mp_xor_data->layout_a, mp_xor_data->layout_a->cell (mp_xor_data->cell_a), std::vector<unsigned int> ());
+      }
+      ri_a.set_for_merged_input (true);
+
+      if (m_lb >= 0) {
+        ri_b = db::RecursiveShapeIterator (*mp_xor_data->layout_b, mp_xor_data->layout_b->cell (mp_xor_data->cell_b), m_lb);
+      } else {
+        ri_b = db::RecursiveShapeIterator (*mp_xor_data->layout_b, mp_xor_data->layout_b->cell (mp_xor_data->cell_b), std::vector<unsigned int> ());
+      }
+      ri_b.set_for_merged_input (true);
+
+      db::Region in_a (ri_a, worker->dss (), db::ICplxTrans (mp_xor_data->layout_a->dbu () / m_dbu));
+      db::Region in_b (ri_b, worker->dss (), db::ICplxTrans (mp_xor_data->layout_b->dbu () / m_dbu));
+
+      db::Region xor_res;
+      {
+        tl::SelfTimer timer (tl::verbosity () >= 21, "Basic XOR on layer " + m_layer_props.to_string ());
+        xor_res = in_a ^ in_b;
+      }
+
+      int tol_index = 0;
+      for (std::vector<double>::const_iterator t = mp_xor_data->tolerances.begin (); t != mp_xor_data->tolerances.end (); ++t) {
+
+        db::LayerProperties lp = m_layer_props;
+        if (lp.layer >= 0) {
+          lp.layer += tol_index * mp_xor_data->tolerance_bump;
+        }
+
+        if (*t > db::epsilon) {
+          tl::SelfTimer timer (tl::verbosity () >= 21, "Tolerance " + tl::to_string (*t) + " on layer " + m_layer_props.to_string ());
+          xor_res.size (-db::coord_traits<db::Coord>::rounded (0.5 * *t / m_dbu));
+          xor_res.size (db::coord_traits<db::Coord>::rounded (0.5 * *t / m_dbu));
+        }
+
+        {
+          tl::MutexLocker locker (&mp_xor_data->lock);
+
+          ResultDescriptor &result = mp_xor_data->results->insert (std::make_pair (std::make_pair (tol_index, m_layer_props), ResultDescriptor ())).first->second;
+          result.layer_a = m_la;
+          result.layer_b = m_lb;
+          result.layout = mp_xor_data->output_layout;
+          result.top_cell = mp_xor_data->output_cell;
+
+          if (mp_xor_data->output_layout) {
+            result.layer_output = result.layout->insert_layer (lp);
+            xor_res.insert_into (mp_xor_data->output_layout, mp_xor_data->output_cell, result.layer_output);
+          } else {
+            result.shape_count = xor_res.hier_count ();
+          }
+        }
+
+        ++tol_index;
+
+      }
+
+    }
+  }
+
+private:
+  const XORData *mp_xor_data;
+  const db::LayerProperties &m_layer_props;
+  int m_la;
+  int m_lb;
+  double m_dbu;
+};
+
+XORWorker::XORWorker (XORJob *job)
+  : tl::Worker (), mp_job (job)
+{
   //  TODO: this conflicts with the "set_for_merged_input" optimization below.
   //  It seems not to be very effective then. Why?
-  dss.set_wants_all_cells (true);  //  saves time for less cell mapping operations
+  m_dss.set_wants_all_cells (true);  //  saves time for less cell mapping operations
+}
 
+void
+XORWorker::perform_task (tl::Task *task)
+{
+  XORTask *xor_task = dynamic_cast <XORTask *> (task);
+  if (xor_task) {
+    xor_task->run (this);
+  }
+}
+
+tl::Worker *
+XORJob::create_worker ()
+{
+  return new XORWorker (this);
+}
+
+
+bool run_deep_xor (const XORData &xor_data)
+{
   double dbu = std::min (xor_data.layout_a->dbu (), xor_data.layout_b->dbu ());
 
   if (tl::verbosity () >= 20) {
@@ -779,98 +953,18 @@ bool run_deep_xor (const XORData &xor_data)
     xor_data.output_layout->dbu (dbu);
   }
 
-  bool result = true;
-
-  int index = 1;
+  XORJob job (xor_data.threads);
 
   for (std::map<db::LayerProperties, std::pair<int, int> >::const_iterator ll = xor_data.l2l_map.begin (); ll != xor_data.l2l_map.end (); ++ll) {
-
-    if ((ll->second.first < 0 || ll->second.second < 0) && ! xor_data.dont_summarize_missing_layers) {
-
-      if (ll->second.first < 0) {
-        (xor_data.silent ? tl::log : tl::warn) << "Layer " << ll->first.to_string () << " is not present in first layout, but in second";
-      } else {
-        (xor_data.silent ? tl::log : tl::warn) << "Layer " << ll->first.to_string () << " is not present in second layout, but in first";
-      }
-
-      result = false;
-
-      int tol_index = 0;
-      for (std::vector<double>::const_iterator t = xor_data.tolerances.begin (); t != xor_data.tolerances.end (); ++t) {
-
-        ResultDescriptor &result = xor_data.results->insert (std::make_pair (std::make_pair (tol_index, ll->first), ResultDescriptor ())).first->second;
-        result.layer_a = ll->second.first;
-        result.layer_b = ll->second.second;
-        result.layout = xor_data.output_layout;
-        result.top_cell = xor_data.output_cell;
-
-        ++tol_index;
-
-      }
-
-    } else {
-
-      tl::SelfTimer timer (tl::verbosity () >= 11, "XOR on layer " + ll->first.to_string ());
-
-      db::RecursiveShapeIterator ri_a, ri_b;
-
-      if (ll->second.first >= 0) {
-        ri_a = db::RecursiveShapeIterator (*xor_data.layout_a, xor_data.layout_a->cell (xor_data.cell_a), ll->second.first);
-        ri_a.set_for_merged_input (true);
-      }
-
-      if (ll->second.second >= 0) {
-        ri_b = db::RecursiveShapeIterator (*xor_data.layout_b, xor_data.layout_b->cell (xor_data.cell_b), ll->second.second);
-        ri_b.set_for_merged_input (true);
-      }
-
-      db::Region in_a (ri_a, dss, db::ICplxTrans (xor_data.layout_a->dbu () / dbu));
-      db::Region in_b (ri_b, dss, db::ICplxTrans (xor_data.layout_b->dbu () / dbu));
-
-      db::Region xor_res;
-      {
-        tl::SelfTimer timer (tl::verbosity () >= 21, "Basic XOR on layer " + ll->first.to_string ());
-        xor_res = in_a ^ in_b;
-      }
-
-      int tol_index = 0;
-      for (std::vector<double>::const_iterator t = xor_data.tolerances.begin (); t != xor_data.tolerances.end (); ++t) {
-
-        db::LayerProperties lp = ll->first;
-        if (lp.layer >= 0) {
-          lp.layer += tol_index * xor_data.tolerance_bump;
-        }
-
-        ResultDescriptor &result = xor_data.results->insert (std::make_pair (std::make_pair (tol_index, ll->first), ResultDescriptor ())).first->second;
-        result.layer_a = ll->second.first;
-        result.layer_b = ll->second.second;
-        result.layout = xor_data.output_layout;
-        result.top_cell = xor_data.output_cell;
-
-        if (*t > db::epsilon) {
-          tl::SelfTimer timer (tl::verbosity () >= 21, "Tolerance " + tl::to_string (*t) + " on layer " + ll->first.to_string ());
-          xor_res.size (-db::coord_traits<db::Coord>::rounded (0.5 * *t / dbu));
-          xor_res.size (db::coord_traits<db::Coord>::rounded (0.5 * *t / dbu));
-        }
-
-        if (xor_data.output_layout) {
-          result.layer_output = result.layout->insert_layer (lp);
-          xor_res.insert_into (xor_data.output_layout, xor_data.output_cell, result.layer_output);
-        } else {
-          result.shape_count = xor_res.count ();
-        }
-
-        ++tol_index;
-
-      }
-
-    }
-
-    ++index;
-
+    job.schedule (new XORTask (&xor_data, ll->first, ll->second.first, ll->second.second, dbu));
   }
 
-  //  Determines the output status
+  job.start ();
+  job.wait ();
+
+  //  Determine the output status
+
+  bool result = (xor_data.layers_missing == 0);
   for (std::map<std::pair<int, db::LayerProperties>, ResultDescriptor>::const_iterator r = xor_data.results->begin (); r != xor_data.results->end () && result; ++r) {
     result = r->second.is_empty ();
   }

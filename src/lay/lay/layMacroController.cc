@@ -383,6 +383,12 @@ MacroController::sync_package_paths ()
 void
 MacroController::sync_implicit_macros (bool ask_before_autorun)
 {
+  //  determine the paths currently in use
+  std::map<std::string, ExternalPathDescriptor> prev_folders_by_path;
+  for (std::vector<ExternalPathDescriptor>::const_iterator p = m_external_paths.begin (); p != m_external_paths.end (); ++p) {
+    prev_folders_by_path.insert (std::make_pair (p->path, *p));
+  }
+
   //  gets the external paths (tech, packages) into m_external_paths
   sync_macro_sources ();
 
@@ -391,12 +397,6 @@ MacroController::sync_implicit_macros (bool ask_before_autorun)
     sync_package_paths ();
 
   } else {
-
-    //  determine the paths currently in use
-    std::map<std::string, ExternalPathDescriptor> prev_folders_by_path;
-    for (std::vector<ExternalPathDescriptor>::const_iterator p = m_external_paths.begin (); p != m_external_paths.end (); ++p) {
-      prev_folders_by_path.insert (std::make_pair (p->path, *p));
-    }
 
     //  delete macro collections which are no longer required or update description
 

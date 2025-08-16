@@ -26,8 +26,8 @@ load("test_prologue.rb")
 # normalizes a specification string for region, edges etc.
 # such that the order of the objects becomes irrelevant
 def csort(s)
-  # splits at ");(" without consuming the brackets
-  s.split(/(?<=\));(?=\()/).sort.join(";")
+  # splits at ");(" or "};(" without consuming the brackets
+  s.split(/(?<=[\)\}]);(?=\()/).sort.join(";")
 end
 
 class PerpendicularEdgesFilter < RBA::EdgePairFilter
@@ -111,7 +111,7 @@ class DBEdgePairs_TestClass < TestBase
     assert_equal(csort(r.edges.to_s), csort("(0,0;0,100);(-10,0;-20,50)"))
     assert_equal(r.is_empty?, false)
     assert_equal(r.size, 1)
-    assert_equal(r[0].to_s, "(0,0;0,100)/(-10,0;-20,50)")
+    assert_equal(r[0].to_s, "(0,0;0,100)/(-10,0;-20,50) props={}")
     assert_equal(r[1].to_s, "")
     assert_equal(r.bbox.to_s, "(-20,0;0,100)")
 
@@ -221,7 +221,7 @@ class DBEdgePairs_TestClass < TestBase
 
     r.flatten
     assert_equal(r.has_valid_edge_pairs?, true)
-    assert_equal(r[1].to_s, "(0,101;2,103)/(10,111;12,113)")
+    assert_equal(r[1].to_s, "(0,101;2,103)/(10,111;12,113) props={}")
     assert_equal(r[100].inspect, "nil")
     assert_equal(r.bbox.to_s, "(0,1;212,113)")
     
@@ -244,6 +244,8 @@ class DBEdgePairs_TestClass < TestBase
 
     assert_equal(r.is_deep?, true)
 
+    dss._destroy
+    
   end
 
   def test_4
@@ -282,6 +284,8 @@ class DBEdgePairs_TestClass < TestBase
     assert_equal(RBA::Region::new(target.cell("TOP").shapes(target_li)).to_s, "")
     assert_equal(RBA::Region::new(target.cell("C2").shapes(target_li)).to_s, "(-1,-1;-1,11;11,11;11,-1)")
 
+    dss._destroy
+
   end
 
   def test_5
@@ -294,53 +298,90 @@ class DBEdgePairs_TestClass < TestBase
     ep4 = RBA::EdgePair::new(RBA::Edge::new(0, 0, 0, 10), RBA::Edge::new(10, 0, 10, 10))
 
     r1 = RBA::EdgePairs::new([ ep1, ep2, ep3, ep4 ])
-    assert_equal(r1.with_angle(0, 90, false).to_s, "") # @@@
+    assert_equal(r1.with_angle(0, 90, false).to_s, "")
 
     assert_equal(r1.with_distance(10, false).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
+    assert_equal(r1.split_with_distance(10)[0].to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
     assert_equal(r1.with_distance(5, 20, false).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
+    assert_equal(r1.split_with_distance(5, 20)[0].to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
     assert_equal(r1.with_distance(15, 20, false).to_s, "")
+    assert_equal(r1.split_with_distance(15, 20)[0].to_s, "")
     assert_equal(r1.with_distance(15, 20, true).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
+    assert_equal(r1.split_with_distance(15, 20)[1].to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
 
     assert_equal(r1.with_length(10, false).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,10)/(10,0;10,10)")
+    assert_equal(r1.split_with_length(10, false)[0].to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,10)/(10,0;10,10)")
     assert_equal(r1.with_length(10, 20, false).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,10)/(10,0;10,10)")
+    assert_equal(r1.split_with_length(10, 20, false)[0].to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,10)/(10,0;10,10)")
     assert_equal(r1.with_length(10, 21, false).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
+    assert_equal(r1.split_with_length(10, 21, false)[0].to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
     assert_equal(r1.with_length(10, true).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0)")
+    assert_equal(r1.split_with_length(10, false)[1].to_s, "(0,0;0,20)/(10,20;10,0)")
     assert_equal(r1.with_length_both(10, false).to_s, "(0,0;0,10)/(10,0;10,10)")
+    assert_equal(r1.split_with_length_both(10, false)[0].to_s, "(0,0;0,10)/(10,0;10,10)")
     assert_equal(r1.with_length_both(10, 20, false).to_s, "(0,0;0,10)/(10,0;10,10)")
+    assert_equal(r1.split_with_length_both(10, 20, false)[0].to_s, "(0,0;0,10)/(10,0;10,10)")
     assert_equal(r1.with_length_both(10, 21, false).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
+    assert_equal(r1.split_with_length_both(10, 21, false)[0].to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
     assert_equal(r1.with_length_both(10, true).to_s, "(0,0;0,20)/(10,20;10,0)")
+    assert_equal(r1.split_with_length_both(10, false)[1].to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0)")
 
     assert_equal(r1.with_angle(0, false).to_s, "")
+    assert_equal(r1.split_with_angle(0, false)[0].to_s, "")
     assert_equal(r1.with_abs_angle(0, false).to_s, "")
+    assert_equal(r1.split_with_abs_angle(0, false)[0].to_s, "")
     assert_equal(r1.with_angle(0, true).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
+    assert_equal(r1.split_with_angle(0, false)[1].to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
     assert_equal(r1.with_abs_angle(0, true).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
+    assert_equal(r1.split_with_abs_angle(0, false)[1].to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
     assert_equal(r1.with_angle(90, false).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
+    assert_equal(r1.split_with_angle(90, false)[0].to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
     assert_equal(r1.with_abs_angle(90, false).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
+    assert_equal(r1.split_with_abs_angle(90, false)[0].to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
     assert_equal(r1.with_angle(0, 90, false).to_s, "")
+    assert_equal(r1.split_with_angle(0, 90, false)[0].to_s, "")
     assert_equal(r1.with_abs_angle(0, 90, false).to_s, "")
+    assert_equal(r1.split_with_abs_angle(0, 90, false)[0].to_s, "")
     assert_equal(r1.with_angle(0, 90, false, true, true).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
+    assert_equal(r1.split_with_angle(0, 90, false, true, true)[0].to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
     assert_equal(r1.with_abs_angle(0, 90, false, true, true).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
+    assert_equal(r1.split_with_abs_angle(0, 90, false, true, true)[0].to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
     assert_equal(r1.with_angle_both(0, false).to_s, "")
+    assert_equal(r1.split_with_angle_both(0, false)[0].to_s, "")
     assert_equal(r1.with_abs_angle_both(0, false).to_s, "")
+    assert_equal(r1.split_with_abs_angle_both(0, false)[0].to_s, "")
     assert_equal(r1.with_angle_both(0, true).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
+    assert_equal(r1.split_with_angle_both(0, false)[1].to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
     assert_equal(r1.with_abs_angle_both(0, true).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
+    assert_equal(r1.split_with_abs_angle_both(0, false)[1].to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
     assert_equal(r1.with_angle_both(90, false).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
+    assert_equal(r1.split_with_angle_both(90, false)[0].to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
     assert_equal(r1.with_abs_angle_both(90, false).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
+    assert_equal(r1.split_with_abs_angle_both(90, false)[0].to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
     assert_equal(r1.with_angle_both(0, 90, false).to_s, "")
     assert_equal(r1.with_abs_angle_both(0, 90, false).to_s, "")
     assert_equal(r1.with_angle_both(0, 90, false, true, true).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
     assert_equal(r1.with_abs_angle_both(0, 90, false, true, true).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
 
     assert_equal(r1.with_area(0, false).to_s, "(0,0;0,10)/(10,0;10,10)")
+    assert_equal(r1.split_with_area(0)[0].to_s, "(0,0;0,10)/(10,0;10,10)")
     assert_equal(r1.with_area(150, false).to_s, "(0,0;0,10)/(10,20;10,0)")
+    assert_equal(r1.split_with_area(150)[0].to_s, "(0,0;0,10)/(10,20;10,0)")
     assert_equal(r1.with_area(0, true).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0)")
+    assert_equal(r1.split_with_area(0)[1].to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0)")
     assert_equal(r1.with_area(150, 151, false).to_s, "(0,0;0,10)/(10,20;10,0)")
+    assert_equal(r1.split_with_area(150, 151)[0].to_s, "(0,0;0,10)/(10,20;10,0)")
     assert_equal(r1.with_area(150, 150, false).to_s, "")
+    assert_equal(r1.split_with_area(150, 150)[0].to_s, "")
     assert_equal(r1.with_area(150, 151, true).to_s, "(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
+    assert_equal(r1.split_with_area(150, 151)[1].to_s, "(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
 
     assert_equal(r1.with_internal_angle(0, false).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
+    assert_equal(r1.split_with_internal_angle(0)[0].to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(10,0;10,20);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;10,10)")
     assert_equal(r1.with_internal_angle(0, 0, false).to_s, "")
+    assert_equal(r1.split_with_internal_angle(0, 0)[0].to_s, "")
     assert_equal(r1.with_internal_angle(0, true).to_s, "")
+    assert_equal(r1.split_with_internal_angle(0)[1].to_s, "")
 
     ep1 = RBA::EdgePair::new(RBA::Edge::new(0, 0, 0, 10), RBA::Edge::new(10, 20, 10, 0))
     ep2 = RBA::EdgePair::new(RBA::Edge::new(0, 0, 0, 10), RBA::Edge::new(20, 0, 30, 0))
@@ -419,6 +460,8 @@ class DBEdgePairs_TestClass < TestBase
     edge_pairs.insert(RBA::EdgePair::new([200, 0, 300, 0], [200, 100, 220, 300 ]))
 
     assert_equal(edge_pairs.filtered(f).to_s, "(0,0;100,0)/(0,100;0,300)")
+    assert_equal(edge_pairs.split_filter(f)[0].to_s, "(0,0;100,0)/(0,100;0,300)")
+    assert_equal(edge_pairs.split_filter(f)[1].to_s, "(200,0;300,0)/(200,100;220,300)")
     assert_equal(edge_pairs.to_s, "(0,0;100,0)/(0,100;0,300);(200,0;300,0)/(200,100;220,300)")
     edge_pairs.filter(f)
     assert_equal(edge_pairs.to_s, "(0,0;100,0)/(0,100;0,300)")
@@ -571,6 +614,119 @@ class DBEdgePairs_TestClass < TestBase
     assert_equal(ep.to_s, "(0,0;100,100)/(200,300;200,500)")
     assert_equal(edge_pairs.split_outside(r)[0].to_s, "(0,1000;100,1000)/(100,1000;0,1000)")
     assert_equal(edge_pairs.split_outside(r)[1].to_s, "(0,0;100,100)/(200,300;200,500)")
+
+  end
+
+  # properties
+  def test_props
+
+    r = RBA::EdgePairs::new([ RBA::EdgePairWithProperties::new(RBA::EdgePair::new(RBA::Edge::new(0, 0, 100, 100), RBA::Edge::new(200, 300, 200, 500)), { 1 => "one" }) ])
+    assert_equal(r.to_s, "(0,0;100,100)/(200,300;200,500){1=>one}")
+    assert_equal(r[0].to_s, "(0,0;100,100)/(200,300;200,500) props={1=>one}")
+
+    r = RBA::EdgePairs::new([])
+    assert_equal(r.to_s, "")
+
+    r = RBA::EdgePairs::new(RBA::EdgePairWithProperties::new(RBA::EdgePair::new(RBA::Edge::new(0, 0, 100, 100), RBA::Edge::new(200, 300, 200, 500)), { 1 => "one" }))
+    assert_equal(r.to_s, "(0,0;100,100)/(200,300;200,500){1=>one}")
+
+    r = RBA::EdgePairs::new
+    r.insert(RBA::EdgePairWithProperties::new(RBA::EdgePair::new(RBA::Edge::new(0, 0, 100, 100), RBA::Edge::new(200, 300, 200, 500)), { 1 => "one" }))
+    assert_equal(r.to_s, "(0,0;100,100)/(200,300;200,500){1=>one}")
+
+    r = RBA::EdgePairs::new
+    r.insert(RBA::EdgePairWithProperties::new(RBA::EdgePair::new(RBA::Edge::new(0, 0, 100, 100), RBA::Edge::new(200, 300, 200, 500)), { 1 => "one" }))
+    r.insert(RBA::EdgePair::new(RBA::Edge::new(0, 10, 100, 110), RBA::Edge::new(220, 300, 220, 500)))
+    s = r.each.collect(&:to_s).join(";")
+    assert_equal(s, "(0,10;100,110)/(220,300;220,500) props={};(0,0;100,100)/(200,300;200,500) props={1=>one}")
+
+  end
+
+  # properties
+  def test_prop_filters
+
+    r = RBA::EdgePairs::new
+    r.insert(RBA::EdgePairWithProperties::new(RBA::EdgePair::new(RBA::Edge::new(0, 0, 100, 200), RBA::Edge::new(0, 10, 100, 210)), { "one" => -1 }))
+    r.insert(RBA::EdgePairWithProperties::new(RBA::EdgePair::new(RBA::Edge::new(1, 1, 101, 201), RBA::Edge::new(1, 11, 101, 211)), { "one" => 17 }))
+    r.insert(RBA::EdgePairWithProperties::new(RBA::EdgePair::new(RBA::Edge::new(2, 2, 102, 202), RBA::Edge::new(2, 12, 102, 212)), { "one" => 42 }))
+
+    assert_equal(r.filtered(RBA::EdgePairFilter::property_filter("one", 11)).to_s, "")
+    assert_equal(r.filtered(RBA::EdgePairFilter::property_filter("two", 17)).to_s, "")
+    assert_equal(csort(r.filtered(RBA::EdgePairFilter::property_filter("one", 17)).to_s), csort("(1,1;101,201)/(1,11;101,211){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::EdgePairFilter::property_filter("one", 17, true)).to_s), csort("(0,0;100,200)/(0,10;100,210){one=>-1};(2,2;102,202)/(2,12;102,212){one=>42}"))
+    assert_equal(csort(r.filtered(RBA::EdgePairFilter::property_filter_bounded("one", 17, nil)).to_s), csort("(2,2;102,202)/(2,12;102,212){one=>42};(1,1;101,201)/(1,11;101,211){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::EdgePairFilter::property_filter_bounded("one", 17, 18)).to_s), csort("(1,1;101,201)/(1,11;101,211){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::EdgePairFilter::property_filter_bounded("one", 17, 18, true)).to_s), csort("(2,2;102,202)/(2,12;102,212){one=>42};(0,0;100,200)/(0,10;100,210){one=>-1}"))
+    assert_equal(csort(r.filtered(RBA::EdgePairFilter::property_filter_bounded("one", nil, 18)).to_s), csort("(1,1;101,201)/(1,11;101,211){one=>17};(0,0;100,200)/(0,10;100,210){one=>-1}"))
+    assert_equal(csort(r.filtered(RBA::EdgePairFilter::property_glob("one", "1*")).to_s), csort("(1,1;101,201)/(1,11;101,211){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::EdgePairFilter::property_glob("one", "1*", true)).to_s), csort("(2,2;102,202)/(2,12;102,212){one=>42};(0,0;100,200)/(0,10;100,210){one=>-1}"))
+
+    ly = RBA::Layout::new
+    top = ly.create_cell("TOP")
+    l1 = ly.layer(1, 0)
+
+    s = top.shapes(l1)
+    s.insert(RBA::EdgePairWithProperties::new(RBA::EdgePair::new(RBA::Edge::new(0, 0, 100, 200), RBA::Edge::new(0, 10, 100, 210)), { "one" => -1 }))
+    s.insert(RBA::EdgePairWithProperties::new(RBA::EdgePair::new(RBA::Edge::new(1, 1, 101, 201), RBA::Edge::new(1, 11, 101, 211)), { "one" => 17 }))
+    s.insert(RBA::EdgePairWithProperties::new(RBA::EdgePair::new(RBA::Edge::new(2, 2, 102, 202), RBA::Edge::new(2, 12, 102, 212)), { "one" => 42 }))
+
+    dss = RBA::DeepShapeStore::new
+    iter = top.begin_shapes_rec(l1)
+    iter.enable_properties()
+    r = RBA::EdgePairs::new(iter, dss)
+
+    assert_equal(r.filtered(RBA::EdgePairFilter::property_filter("one", 11)).to_s, "")
+    assert_equal(r.filtered(RBA::EdgePairFilter::property_filter("two", 17)).to_s, "")
+    assert_equal(csort(r.filtered(RBA::EdgePairFilter::property_filter("one", 17)).to_s), csort("(1,1;101,201)/(1,11;101,211){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::EdgePairFilter::property_filter("one", 17, true)).to_s), csort("(0,0;100,200)/(0,10;100,210){one=>-1};(2,2;102,202)/(2,12;102,212){one=>42}"))
+    assert_equal(csort(r.filtered(RBA::EdgePairFilter::property_filter_bounded("one", 17, nil)).to_s), csort("(2,2;102,202)/(2,12;102,212){one=>42};(1,1;101,201)/(1,11;101,211){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::EdgePairFilter::property_filter_bounded("one", 17, 18)).to_s), csort("(1,1;101,201)/(1,11;101,211){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::EdgePairFilter::property_filter_bounded("one", 17, 18, true)).to_s), csort("(2,2;102,202)/(2,12;102,212){one=>42};(0,0;100,200)/(0,10;100,210){one=>-1}"))
+    assert_equal(csort(r.filtered(RBA::EdgePairFilter::property_filter_bounded("one", nil, 18)).to_s), csort("(1,1;101,201)/(1,11;101,211){one=>17};(0,0;100,200)/(0,10;100,210){one=>-1}"))
+    assert_equal(csort(r.filtered(RBA::EdgePairFilter::property_glob("one", "1*")).to_s), csort("(1,1;101,201)/(1,11;101,211){one=>17}"))
+    assert_equal(csort(r.filtered(RBA::EdgePairFilter::property_glob("one", "1*", true)).to_s), csort("(2,2;102,202)/(2,12;102,212){one=>42};(0,0;100,200)/(0,10;100,210){one=>-1}"))
+
+    rr = r.dup
+    rr.filter(RBA::EdgePairFilter::property_filter("one", 17))
+    assert_equal(csort(rr.to_s), csort("(1,1;101,201)/(1,11;101,211){one=>17}"))
+
+    dss._destroy
+
+  end
+
+  # properties
+  def test_prop_expressions
+
+    r = RBA::EdgePairs::new
+    e1 = RBA::Edge::new(0, 0, 1000, 2000)
+    e2 = RBA::Edge::new(-100, 200, 900, 2200)
+    r.insert(RBA::EdgePairWithProperties::new(RBA::EdgePair::new(e1, e2), { "PropA" => 17.0, 1 => 42 }))
+    assert_equal(r.to_s, "(0,0;1000,2000)/(-100,200;900,2200){1=>42,PropA=>17}")
+
+    # replace
+    pr = RBA::EdgePairPropertiesExpressions::new(r, { "X" => "PropA+1", "Y" => "shape.distance", "Z" => "value(1)+one" }, variables: { "one" => 1 })
+    assert_equal(r.processed(pr).to_s, "(0,0;1000,2000)/(-100,200;900,2200){X=>18,Y=>179,Z=>43}")
+
+    # replace (with 'put')
+    pr = RBA::EdgePairPropertiesExpressions::new(r, "put('X', PropA+1); put('Y', shape.distance); put('Z', value(1)+one)", variables: { "one" => 1 })
+    assert_equal(r.processed(pr).to_s, "(0,0;1000,2000)/(-100,200;900,2200){X=>18,Y=>179,Z=>43}")
+
+    # substitutions
+    pr = RBA::EdgePairPropertiesExpressions::new(r, { "PropA" => "0", "X" => "PropA+1", "Y" => "shape.distance", "Z" => "value(1)+1" }, true)
+    assert_equal(r.processed(pr).to_s, "(0,0;1000,2000)/(-100,200;900,2200){1=>42,PropA=>0,X=>18,Y=>179,Z=>43}")
+
+    # substitutions
+    pr = RBA::EdgePairPropertiesExpressions::new(r, { "PropA" => "0", "X" => "PropA+1", "Y" => "shape.distance", "Z" => "value(1)+1" }, true, dbu: 0.001)
+    assert_equal(r.processed(pr).to_s, "(0,0;1000,2000)/(-100,200;900,2200){1=>42,PropA=>0,X=>18,Y=>0.178885438199983,Z=>43}")
+
+    ef = RBA::EdgePairFilterBase::expression_filter("PropX==18")
+    assert_equal(r.filtered(ef).to_s, "")
+
+    ef = RBA::EdgePairFilterBase::expression_filter("PropA==v17", variables: { "v17" => 17 })
+    assert_equal(r.filtered(ef).to_s, "(0,0;1000,2000)/(-100,200;900,2200){1=>42,PropA=>17}")
+
+    ef = RBA::EdgePairFilterBase::expression_filter("value(1)>=40")
+    assert_equal(r.filtered(ef).to_s, "(0,0;1000,2000)/(-100,200;900,2200){1=>42,PropA=>17}")
 
   end
 

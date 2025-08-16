@@ -170,7 +170,7 @@ struct edge_defs
 
   static size_t hash_value (const C *e)
   {
-    return std::hfunc (*e);
+    return tl::hfunc (*e);
   }
 
   static gsi::Methods methods ()
@@ -700,10 +700,18 @@ static db::EdgeWithProperties *new_edge_with_properties (const db::Edge &edge, d
   return new db::EdgeWithProperties (edge, pid);
 }
 
+static db::EdgeWithProperties *new_edge_with_properties2 (const db::Edge &edge, const std::map<tl::Variant, tl::Variant> &properties)
+{
+  return new db::EdgeWithProperties (edge, db::properties_id (db::PropertiesSet (properties.begin (), properties.end ())));
+}
+
 Class<db::EdgeWithProperties> decl_EdgeWithProperties (decl_Edge, "db", "EdgeWithProperties",
   gsi::properties_support_methods<db::EdgeWithProperties> () +
   constructor ("new", &new_edge_with_properties, gsi::arg ("edge"), gsi::arg ("properties_id", db::properties_id_type (0)),
     "@brief Creates a new object from a property-less object and a properties ID."
+  ) +
+  constructor ("new", &new_edge_with_properties2, gsi::arg ("edge"), gsi::arg ("properties"),
+    "@brief Creates a new object from a property-less object and a properties hash."
   )
   ,
   "@brief A Edge object with properties attached.\n"
@@ -765,10 +773,18 @@ static db::DEdgeWithProperties *new_dedge_with_properties (const db::DEdge &edge
   return new db::DEdgeWithProperties (edge, pid);
 }
 
+static db::DEdgeWithProperties *new_dedge_with_properties2 (const db::DEdge &edge, const std::map<tl::Variant, tl::Variant> &properties)
+{
+  return new db::DEdgeWithProperties (edge, db::properties_id (db::PropertiesSet (properties.begin (), properties.end ())));
+}
+
 Class<db::DEdgeWithProperties> decl_DEdgeWithProperties (decl_DEdge, "db", "DEdgeWithProperties",
   gsi::properties_support_methods<db::DEdgeWithProperties> () +
   constructor ("new", &new_dedge_with_properties, gsi::arg ("edge"), gsi::arg ("properties_id", db::properties_id_type (0)),
     "@brief Creates a new object from a property-less object and a properties ID."
+  ) +
+  constructor ("new", &new_dedge_with_properties2, gsi::arg ("edge"), gsi::arg ("properties"),
+    "@brief Creates a new object from a property-less object and a properties hash."
   )
   ,
   "@brief A DEdge object with properties attached.\n"

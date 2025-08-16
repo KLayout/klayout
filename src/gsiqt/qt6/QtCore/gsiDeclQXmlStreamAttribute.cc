@@ -34,6 +34,12 @@
 
 // -----------------------------------------------------------------------
 // class QXmlStreamAttribute
+  static bool QXmlStreamAttribute_operator_eq(const QXmlStreamAttribute *a, const QXmlStreamAttribute &b) {
+    return *a == b;
+  }
+  static bool QXmlStreamAttribute_operator_ne(const QXmlStreamAttribute *a, const QXmlStreamAttribute &b) {
+    return !(*a == b);
+  }
 
 //  Constructor QXmlStreamAttribute::QXmlStreamAttribute()
 
@@ -112,44 +118,6 @@ static void _call_f_isDefault_c0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// bool QXmlStreamAttribute::operator!=(const QXmlStreamAttribute &other)
-
-
-static void _init_f_operator_excl__eq__c3267 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("other");
-  decl->add_arg<const QXmlStreamAttribute & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_excl__eq__c3267 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QXmlStreamAttribute &arg1 = gsi::arg_reader<const QXmlStreamAttribute & >() (args, heap);
-  ret.write<bool > ((bool)((QXmlStreamAttribute *)cls)->operator!= (arg1));
-}
-
-
-// bool QXmlStreamAttribute::operator==(const QXmlStreamAttribute &other)
-
-
-static void _init_f_operator_eq__eq__c3267 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("other");
-  decl->add_arg<const QXmlStreamAttribute & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_eq__eq__c3267 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QXmlStreamAttribute &arg1 = gsi::arg_reader<const QXmlStreamAttribute & >() (args, heap);
-  ret.write<bool > ((bool)((QXmlStreamAttribute *)cls)->operator== (arg1));
-}
-
-
 
 namespace gsi
 {
@@ -160,12 +128,13 @@ static gsi::Methods methods_QXmlStreamAttribute () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QXmlStreamAttribute::QXmlStreamAttribute(const QString &qualifiedName, const QString &value)\nThis method creates an object of class QXmlStreamAttribute.", &_init_ctor_QXmlStreamAttribute_3942, &_call_ctor_QXmlStreamAttribute_3942);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QXmlStreamAttribute::QXmlStreamAttribute(const QString &namespaceUri, const QString &name, const QString &value)\nThis method creates an object of class QXmlStreamAttribute.", &_init_ctor_QXmlStreamAttribute_5859, &_call_ctor_QXmlStreamAttribute_5859);
   methods += new qt_gsi::GenericMethod ("isDefault?", "@brief Method bool QXmlStreamAttribute::isDefault()\n", true, &_init_f_isDefault_c0, &_call_f_isDefault_c0);
-  methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QXmlStreamAttribute::operator!=(const QXmlStreamAttribute &other)\n", true, &_init_f_operator_excl__eq__c3267, &_call_f_operator_excl__eq__c3267);
-  methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QXmlStreamAttribute::operator==(const QXmlStreamAttribute &other)\n", true, &_init_f_operator_eq__eq__c3267, &_call_f_operator_eq__eq__c3267);
   return methods;
 }
 
 gsi::Class<QXmlStreamAttribute> decl_QXmlStreamAttribute ("QtCore", "QXmlStreamAttribute",
+  gsi::method_ext("==", &QXmlStreamAttribute_operator_eq, gsi::arg ("other"), "@brief Method bool QXmlStreamAttribute::operator==(const QXmlStreamAttribute &) const") +
+  gsi::method_ext("!=", &QXmlStreamAttribute_operator_ne, gsi::arg ("other"), "@brief Method bool QXmlStreamAttribute::operator!=(const QXmlStreamAttribute &) const") 
++
   methods_QXmlStreamAttribute (),
   "@qt\n@brief Binding of QXmlStreamAttribute");
 

@@ -127,7 +127,7 @@ FlatEdges::ensure_merged_edges_valid () const
 
     if (! need_split_props) {
 
-      EdgeBooleanClusterCollectorToShapes cluster_collector (&tmp, EdgeOr);
+      EdgeBooleanClusterCollectorToShapes cluster_collector (&tmp, EdgeOr, prop_id);
 
       scanner.reserve (mp_edges->size ());
 
@@ -226,7 +226,7 @@ Box FlatEdges::compute_bbox () const
 EdgesDelegate *
 FlatEdges::processed_in_place (const EdgeProcessorBase &filter)
 {
-  std::vector<db::Edge> edge_res;
+  std::vector<db::EdgeWithProperties> edge_res;
 
   db::Shapes &e = *mp_edges;
 
@@ -236,22 +236,22 @@ FlatEdges::processed_in_place (const EdgeProcessorBase &filter)
   for (EdgesIterator p (filter.requires_raw_input () ? begin () : begin_merged ()); ! p.at_end (); ++p) {
 
     edge_res.clear ();
-    filter.process (*p, edge_res);
+    filter.process (p.wp (), edge_res);
 
-    for (std::vector<db::Edge>::const_iterator pr = edge_res.begin (); pr != edge_res.end (); ++pr) {
-      if (p.prop_id () != 0) {
+    for (auto pr = edge_res.begin (); pr != edge_res.end (); ++pr) {
+      if (pr->properties_id () != 0) {
         if (pw_wp == e.get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().end ()) {
-          e.get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().insert (db::EdgeWithProperties (*pr, p.prop_id ()));
+          e.get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().insert (*pr);
           pw_wp = e.get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().end ();
         } else {
-          e.get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().replace (pw_wp++, db::EdgeWithProperties (*pr, p.prop_id ()));
+          e.get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().replace (pw_wp++, *pr);
         }
       } else {
         if (pw == e.get_layer<db::Edge, db::unstable_layer_tag> ().end ()) {
-          e.get_layer<db::Edge, db::unstable_layer_tag> ().insert (*pr);
+          e.get_layer<db::Edge, db::unstable_layer_tag> ().insert (pr->base ());
           pw = e.get_layer<db::Edge, db::unstable_layer_tag> ().end ();
         } else {
-          e.get_layer<db::Edge, db::unstable_layer_tag> ().replace (pw++, *pr);
+          e.get_layer<db::Edge, db::unstable_layer_tag> ().replace (pw++, pr->base ());
         }
       }
     }
@@ -276,7 +276,7 @@ FlatEdges::filter_in_place (const EdgeFilterBase &filter)
   edge_iterator_wp_type pw_wp = e.get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().begin ();
 
   for (EdgesIterator p (begin_merged ()); ! p.at_end (); ++p) {
-    if (filter.selected (*p)) {
+    if (filter.selected (*p, p.prop_id ())) {
       if (p.prop_id () != 0) {
         if (pw_wp == e.get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().end ()) {
           e.get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().insert (db::EdgeWithProperties (*p, p.prop_id ()));
@@ -314,18 +314,16 @@ EdgesDelegate *FlatEdges::add (const Edges &other) const
   if (other_flat) {
 
     new_region->raw_edges ().insert (other_flat->raw_edges ().get_layer<db::Edge, db::unstable_layer_tag> ().begin (), other_flat->raw_edges ().get_layer<db::Edge, db::unstable_layer_tag> ().end ());
+    new_region->raw_edges ().insert (other_flat->raw_edges ().get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().begin (), other_flat->raw_edges ().get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().end ());
 
   } else {
 
-    size_t n = new_region->raw_edges ().size ();
     for (EdgesIterator p (other.begin ()); ! p.at_end (); ++p) {
-      ++n;
-    }
-
-    new_region->raw_edges ().reserve (db::Edge::tag (), n);
-
-    for (EdgesIterator p (other.begin ()); ! p.at_end (); ++p) {
-      new_region->raw_edges ().insert (*p);
+      if (p.prop_id () == 0) {
+        new_region->raw_edges ().insert (*p);
+      } else {
+        new_region->raw_edges ().insert (db::EdgeWithProperties (*p, p.prop_id ()));
+      }
     }
 
   }
@@ -344,18 +342,16 @@ EdgesDelegate *FlatEdges::add_in_place (const Edges &other)
   if (other_flat) {
 
     e.insert (other_flat->raw_edges ().get_layer<db::Edge, db::unstable_layer_tag> ().begin (), other_flat->raw_edges ().get_layer<db::Edge, db::unstable_layer_tag> ().end ());
+    e.insert (other_flat->raw_edges ().get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().begin (), other_flat->raw_edges ().get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().end ());
 
   } else {
 
-    size_t n = e.size ();
     for (EdgesIterator p (other.begin ()); ! p.at_end (); ++p) {
-      ++n;
-    }
-
-    e.reserve (db::Edge::tag (), n);
-
-    for (EdgesIterator p (other.begin ()); ! p.at_end (); ++p) {
-      e.insert (*p);
+      if (p.prop_id () == 0) {
+        e.insert (*p);
+      } else {
+        e.insert (db::EdgeWithProperties (*p, p.prop_id ()));
+      }
     }
 
   }
@@ -365,7 +361,46 @@ EdgesDelegate *FlatEdges::add_in_place (const Edges &other)
 
 const db::Edge *FlatEdges::nth (size_t n) const
 {
-  return n < mp_edges->size () ? &mp_edges->get_layer<db::Edge, db::unstable_layer_tag> ().begin () [n] : 0;
+  //  NOTE: this assumes that we iterate over non-property edges first and then over edges with properties
+
+  if (n >= mp_edges->size ()) {
+    return 0;
+  }
+
+  const db::layer<db::Edge, db::unstable_layer_tag> &l = mp_edges->get_layer<db::Edge, db::unstable_layer_tag> ();
+  if (n < l.size ()) {
+    return &l.begin () [n];
+  }
+  n -= l.size ();
+
+  const db::layer<db::EdgeWithProperties, db::unstable_layer_tag> &lp = mp_edges->get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ();
+  if (n < lp.size ()) {
+    return &lp.begin () [n];
+  }
+
+  return 0;
+}
+
+db::properties_id_type FlatEdges::nth_prop_id (size_t n) const
+{
+  //  NOTE: this assumes that we iterate over non-property polygons first and then over polygons with properties
+
+  if (n >= mp_edges->size ()) {
+    return 0;
+  }
+
+  const db::layer<db::Edge, db::unstable_layer_tag> &l = mp_edges->get_layer<db::Edge, db::unstable_layer_tag> ();
+  if (n < l.size ()) {
+    return 0;
+  }
+  n -= l.size ();
+
+  const db::layer<db::EdgeWithProperties, db::unstable_layer_tag> &lp = mp_edges->get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ();
+  if (n < lp.size ()) {
+    return lp.begin () [n].properties_id ();
+  }
+
+  return 0;
 }
 
 bool FlatEdges::has_valid_edges () const

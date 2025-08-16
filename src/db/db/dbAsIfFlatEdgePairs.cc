@@ -81,6 +81,9 @@ AsIfFlatEdgePairs::to_string (size_t nmax) const
     }
     first = false;
     os << p->to_string ();
+    if (p.prop_id () != 0) {
+      os << db::properties (p.prop_id ()).to_dict_var ().to_string ();
+    }
   }
   if (! p.at_end ()) {
     os << "...";
@@ -157,13 +160,17 @@ AsIfFlatEdgePairs::processed (const EdgePairProcessorBase &filter) const
 {
   std::unique_ptr<FlatEdgePairs> edge_pairs (new FlatEdgePairs ());
 
-  std::vector<db::EdgePair> res_edge_pairs;
+  std::vector<db::EdgePairWithProperties> res_edge_pairs;
 
   for (EdgePairsIterator e = begin (); ! e.at_end (); ++e) {
     res_edge_pairs.clear ();
-    filter.process (*e, res_edge_pairs);
-    for (std::vector<db::EdgePair>::const_iterator er = res_edge_pairs.begin (); er != res_edge_pairs.end (); ++er) {
-      edge_pairs->insert (*er);
+    filter.process (e.wp (), res_edge_pairs);
+    for (auto er = res_edge_pairs.begin (); er != res_edge_pairs.end (); ++er) {
+      if (er->properties_id () != 0) {
+        edge_pairs->insert (*er);
+      } else {
+        edge_pairs->insert (er->base ());
+      }
     }
   }
 
@@ -179,17 +186,16 @@ AsIfFlatEdgePairs::processed_to_polygons (const EdgePairToPolygonProcessorBase &
     region->set_merged_semantics (false);
   }
 
-  std::vector<db::Polygon> res_polygons;
+  std::vector<db::PolygonWithProperties> res_polygons;
 
   for (EdgePairsIterator e (begin ()); ! e.at_end (); ++e) {
     res_polygons.clear ();
-    filter.process (*e, res_polygons);
-    for (std::vector<db::Polygon>::const_iterator pr = res_polygons.begin (); pr != res_polygons.end (); ++pr) {
-      db::properties_id_type prop_id = e.prop_id ();
-      if (prop_id != 0) {
-        region->insert (db::PolygonWithProperties (*pr, prop_id));
-      } else {
+    filter.process (e.wp (), res_polygons);
+    for (auto pr = res_polygons.begin (); pr != res_polygons.end (); ++pr) {
+      if (pr->properties_id () != 0) {
         region->insert (*pr);
+      } else {
+        region->insert (pr->base ());
       }
     }
   }
@@ -206,22 +212,31 @@ AsIfFlatEdgePairs::processed_to_edges (const EdgePairToEdgeProcessorBase &filter
     edges->set_merged_semantics (false);
   }
 
-  std::vector<db::Edge> res_edges;
+  std::vector<db::EdgeWithProperties> res_edges;
 
   for (EdgePairsIterator e (begin ()); ! e.at_end (); ++e) {
     res_edges.clear ();
-    filter.process (*e, res_edges);
-    for (std::vector<db::Edge>::const_iterator pr = res_edges.begin (); pr != res_edges.end (); ++pr) {
-      db::properties_id_type prop_id = e.prop_id ();
-      if (prop_id != 0) {
-        edges->insert (db::EdgeWithProperties (*pr, prop_id));
-      } else {
+    filter.process (e.wp (), res_edges);
+    for (auto pr = res_edges.begin (); pr != res_edges.end (); ++pr) {
+      if (pr->properties_id () != 0) {
         edges->insert (*pr);
+      } else {
+        edges->insert (pr->base ());
       }
     }
   }
 
   return edges.release ();
+}
+
+static void
+insert_ep (FlatEdgePairs *dest, const db::EdgePair &ep, db::properties_id_type prop_id)
+{
+  if (prop_id != 0) {
+    dest->insert (db::EdgePairWithProperties (ep, prop_id));
+  } else {
+    dest->insert (ep);
+  }
 }
 
 EdgePairsDelegate *
@@ -230,17 +245,26 @@ AsIfFlatEdgePairs::filtered (const EdgePairFilterBase &filter) const
   std::unique_ptr<FlatEdgePairs> new_edge_pairs (new FlatEdgePairs ());
 
   for (EdgePairsIterator p (begin ()); ! p.at_end (); ++p) {
-    if (filter.selected (*p)) {
-      db::properties_id_type prop_id = p.prop_id ();
-      if (prop_id != 0) {
-        new_edge_pairs->insert (db::EdgePairWithProperties (*p, prop_id));
-      } else {
-        new_edge_pairs->insert (*p);
-      }
+    if (filter.selected (*p, p.prop_id ())) {
+      insert_ep (new_edge_pairs.get (), *p, p.prop_id ());
     }
   }
 
   return new_edge_pairs.release ();
+}
+
+std::pair <EdgePairsDelegate *, EdgePairsDelegate *>
+AsIfFlatEdgePairs::filtered_pair (const EdgePairFilterBase &filter) const
+{
+  std::unique_ptr<FlatEdgePairs> new_edge_pairs_true (new FlatEdgePairs ());
+  std::unique_ptr<FlatEdgePairs> new_edge_pairs_false (new FlatEdgePairs ());
+
+  for (EdgePairsIterator p (begin ()); ! p.at_end (); ++p) {
+    FlatEdgePairs *dest = filter.selected (*p, p.prop_id ()) ? new_edge_pairs_true.get () : new_edge_pairs_false.get ();
+    insert_ep (dest, *p, p.prop_id ());
+  }
+
+  return std::make_pair (new_edge_pairs_true.release (), new_edge_pairs_false.release ());
 }
 
 RegionDelegate *
@@ -627,10 +651,6 @@ AsIfFlatEdgePairs::add (const EdgePairs &other) const
     std::unique_ptr<FlatEdgePairs> new_edge_pairs (new FlatEdgePairs (*other_flat));
     new_edge_pairs->invalidate_cache ();
 
-    size_t n = new_edge_pairs->raw_edge_pairs ().size () + count ();
-
-    new_edge_pairs->reserve (n);
-
     for (EdgePairsIterator p (begin ()); ! p.at_end (); ++p) {
       db::properties_id_type prop_id = p.prop_id ();
       if (prop_id) {
@@ -645,10 +665,6 @@ AsIfFlatEdgePairs::add (const EdgePairs &other) const
   } else {
 
     std::unique_ptr<FlatEdgePairs> new_edge_pairs (new FlatEdgePairs ());
-
-    size_t n = count () + other.count ();
-
-    new_edge_pairs->reserve (n);
 
     for (EdgePairsIterator p (begin ()); ! p.at_end (); ++p) {
       db::properties_id_type prop_id = p.prop_id ();

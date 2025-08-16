@@ -33,6 +33,7 @@
 #  include <mach/mach.h>
 #  include <sys/times.h>
 #  include <unistd.h>
+#  include <libproc.h>
 #else
 #  include <sys/times.h>
 #  include <unistd.h>
@@ -206,8 +207,19 @@ Timer::memory_size ()
 
   return mem;
 
-#else
+#elif defined(__APPLE__)
 
+  pid_t pid = getpid();
+  struct proc_taskinfo taskinfo;
+  if (proc_pidinfo(pid, PROC_PIDTASKINFO, 0, &taskinfo, sizeof(taskinfo)) <= 0) {
+    perror("proc_pidinfo failed");
+    return 0;
+  }
+  
+  return taskinfo.pti_resident_size;
+  
+#elif defined(__linux__)
+    
   unsigned long memsize = 0;
   FILE *procfile = fopen ("/proc/self/stat", "r");
   if (procfile != NULL) {
@@ -233,8 +245,8 @@ Timer::memory_size ()
                               "%*d " // 0
                               "%*d " // itrealvalue
                               "%*u " // starttime
-                              "%lu " // vsize
-                              "%*d " // rss
+                              "%*u " // vsize
+                              "%lu " // rss
                               "%*u " // rlim
                               "%*u " // startcode
                               "%*u " // endcode
@@ -259,8 +271,10 @@ Timer::memory_size ()
     }
   }
 
-  return size_t (memsize);
+  return size_t (memsize) * size_t (getpagesize ());
 
+#else
+#  error Unsupported platform
 #endif
 }
 

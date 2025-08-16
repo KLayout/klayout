@@ -136,6 +136,7 @@ private:
   QTimer *m_timer;
   size_t m_batch_size;
   std::map<std::string, FileEntry> m_files;
+  std::set<std::string> m_files_removed;
   size_t m_index;
   std::map<std::string, FileEntry>::iterator m_iter;
 };

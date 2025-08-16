@@ -85,15 +85,16 @@ public:
   virtual EdgesDelegate *edges (const EdgeFilterBase *, const PolygonToEdgeProcessorBase *) const;
   virtual RegionDelegate *filter_in_place (const PolygonFilterBase &) { return this; }
   virtual RegionDelegate *filtered (const PolygonFilterBase &) const { return new EmptyRegion (); }
+  virtual std::pair<RegionDelegate *, RegionDelegate *> filtered_pair (const PolygonFilterBase &) const { return std::make_pair (new EmptyRegion (), new EmptyRegion ()); }
   virtual RegionDelegate *process_in_place (const PolygonProcessorBase &) { return this; }
   virtual RegionDelegate *processed (const PolygonProcessorBase &) const { return new EmptyRegion (); }
   virtual EdgesDelegate *processed_to_edges (const PolygonToEdgeProcessorBase &) const;
   virtual EdgePairsDelegate *processed_to_edge_pairs (const PolygonToEdgePairProcessorBase &) const;
 
   virtual RegionDelegate *merged_in_place () { return this; }
-  virtual RegionDelegate *merged_in_place (bool, unsigned int) { return this; }
+  virtual RegionDelegate *merged_in_place (bool, unsigned int, bool) { return this; }
   virtual RegionDelegate *merged () const { return new EmptyRegion (); }
-  virtual RegionDelegate *merged (bool, unsigned int) const { return new EmptyRegion (); }
+  virtual RegionDelegate *merged (bool, unsigned int, bool) const { return new EmptyRegion (); }
 
   virtual RegionDelegate *sized (coord_type, unsigned int) const { return new EmptyRegion (); }
   virtual RegionDelegate *sized (coord_type, coord_type, unsigned int) const { return new EmptyRegion (); }

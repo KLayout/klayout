@@ -35,6 +35,12 @@
 
 // -----------------------------------------------------------------------
 // class QEasingCurve
+  static bool QEasingCurve_operator_eq(const QEasingCurve *a, const QEasingCurve &b) {
+    return *a == b;
+  }
+  static bool QEasingCurve_operator_ne(const QEasingCurve *a, const QEasingCurve &b) {
+    return !(*a == b);
+  }
 
 //  Constructor QEasingCurve::QEasingCurve(QEasingCurve::Type type)
 
@@ -144,25 +150,6 @@ static void _call_f_amplitude_c0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// bool QEasingCurve::operator!=(const QEasingCurve &other)
-
-
-static void _init_f_operator_excl__eq__c2510 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("other");
-  decl->add_arg<const QEasingCurve & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_excl__eq__c2510 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QEasingCurve &arg1 = gsi::arg_reader<const QEasingCurve & >() (args, heap);
-  ret.write<bool > ((bool)((QEasingCurve *)cls)->operator!= (arg1));
-}
-
-
 // QEasingCurve &QEasingCurve::operator=(const QEasingCurve &other)
 
 
@@ -179,25 +166,6 @@ static void _call_f_operator_eq__2510 (const qt_gsi::GenericMethod * /*decl*/, v
   tl::Heap heap;
   const QEasingCurve &arg1 = gsi::arg_reader<const QEasingCurve & >() (args, heap);
   ret.write<QEasingCurve & > ((QEasingCurve &)((QEasingCurve *)cls)->operator= (arg1));
-}
-
-
-// bool QEasingCurve::operator==(const QEasingCurve &other)
-
-
-static void _init_f_operator_eq__eq__c2510 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("other");
-  decl->add_arg<const QEasingCurve & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_eq__eq__c2510 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QEasingCurve &arg1 = gsi::arg_reader<const QEasingCurve & >() (args, heap);
-  ret.write<bool > ((bool)((QEasingCurve *)cls)->operator== (arg1));
 }
 
 
@@ -391,9 +359,7 @@ static gsi::Methods methods_QEasingCurve () {
   methods += new qt_gsi::GenericMethod ("addCubicBezierSegment", "@brief Method void QEasingCurve::addCubicBezierSegment(const QPointF &c1, const QPointF &c2, const QPointF &endPoint)\n", false, &_init_f_addCubicBezierSegment_5742, &_call_f_addCubicBezierSegment_5742);
   methods += new qt_gsi::GenericMethod ("addTCBSegment", "@brief Method void QEasingCurve::addTCBSegment(const QPointF &nextPoint, double t, double c, double b)\n", false, &_init_f_addTCBSegment_4875, &_call_f_addTCBSegment_4875);
   methods += new qt_gsi::GenericMethod (":amplitude", "@brief Method double QEasingCurve::amplitude()\n", true, &_init_f_amplitude_c0, &_call_f_amplitude_c0);
-  methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QEasingCurve::operator!=(const QEasingCurve &other)\n", true, &_init_f_operator_excl__eq__c2510, &_call_f_operator_excl__eq__c2510);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QEasingCurve &QEasingCurve::operator=(const QEasingCurve &other)\n", false, &_init_f_operator_eq__2510, &_call_f_operator_eq__2510);
-  methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QEasingCurve::operator==(const QEasingCurve &other)\n", true, &_init_f_operator_eq__eq__c2510, &_call_f_operator_eq__eq__c2510);
   methods += new qt_gsi::GenericMethod (":overshoot", "@brief Method double QEasingCurve::overshoot()\n", true, &_init_f_overshoot_c0, &_call_f_overshoot_c0);
   methods += new qt_gsi::GenericMethod (":period", "@brief Method double QEasingCurve::period()\n", true, &_init_f_period_c0, &_call_f_period_c0);
   methods += new qt_gsi::GenericMethod ("setAmplitude|amplitude=", "@brief Method void QEasingCurve::setAmplitude(double amplitude)\n", false, &_init_f_setAmplitude_1071, &_call_f_setAmplitude_1071);
@@ -408,6 +374,9 @@ static gsi::Methods methods_QEasingCurve () {
 }
 
 gsi::Class<QEasingCurve> decl_QEasingCurve ("QtCore", "QEasingCurve",
+  gsi::method_ext("==", &QEasingCurve_operator_eq, gsi::arg ("other"), "@brief Method bool QEasingCurve::operator==(const QEasingCurve &) const") +
+  gsi::method_ext("!=", &QEasingCurve_operator_ne, gsi::arg ("other"), "@brief Method bool QEasingCurve::operator!=(const QEasingCurve &) const") 
++
   methods_QEasingCurve (),
   "@qt\n@brief Binding of QEasingCurve");
 

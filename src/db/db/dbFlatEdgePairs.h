@@ -75,6 +75,7 @@ public:
   virtual EdgePairsDelegate *add (const EdgePairs &other) const;
 
   virtual const db::EdgePair *nth (size_t n) const;
+  virtual db::properties_id_type nth_prop_id (size_t n) const;
   virtual bool has_valid_edge_pairs () const;
 
   virtual const db::RecursiveShapeIterator *iter () const;
@@ -83,7 +84,7 @@ public:
   virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const;
   virtual void insert_into_as_polygons (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer, db::Coord enl) const;
 
-  virtual void do_insert (const db::EdgePair &edge_pair);
+  virtual void do_insert (const db::EdgePair &edge_pair, db::properties_id_type prop_id);
 
   virtual void do_transform (const db::Trans &t)
   {

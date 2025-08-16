@@ -76,6 +76,7 @@ Service::Service (db::Manager *manager, lay::LayoutViewBase *view, db::ShapeIter
     m_snap_to_objects (true),
     m_snap_objects_to_grid (true),
     m_top_level_sel (false), m_show_shapes_of_instances (true), m_max_shapes_of_instances (1000),
+    m_pcell_lazy_evaluation (0),
     m_hier_copy_mode (-1),
     m_indicate_secondary_selection (false),
     m_seq (0),
@@ -391,6 +392,10 @@ Service::configure (const std::string &name, const std::string &value)
     tl::from_string (value, m_hier_copy_mode);
     service_configuration_changed ();
 
+  } else if (name == cfg_edit_pcell_lazy_eval_mode) {
+
+    tl::from_string (value, m_pcell_lazy_evaluation);
+
   } else {
     lay::EditorServiceBase::configure (name, value);
   }
@@ -462,7 +467,7 @@ Service::copy_selected ()
     for (EditableSelectionIterator r = begin_selection (); ! r.at_end () && ! need_to_ask_for_copy_mode; ++r) {
       if (r->is_cell_inst ()) {
         const db::Cell &cell = view ()->cellview (r->cv_index ())->layout ().cell (r->back ().inst_ptr.cell_index ());
-        if (! cell.is_proxy () && ! cell.is_leaf ()) {
+        if (! cell.is_proxy ()) {
           need_to_ask_for_copy_mode = true;
         }
       }
@@ -598,7 +603,7 @@ Service::end_move (const db::DPoint & /*p*/, lay::angle_constraint_type ac)
     transform (db::DCplxTrans (m_move_trans));
     move_cancel (); // formally this functionality fits here
     //  accept changes to guiding shapes
-    handle_guiding_shape_changes ();
+    handle_guiding_shape_changes (true);
   }
   m_alt_ac = lay::AC_Global;
 }
@@ -622,7 +627,7 @@ Service::selection_bbox ()
 
     db::CplxTrans ctx_trans = db::CplxTrans (layout.dbu ()) * cv.context_trans () * r->trans ();
 
-    db::box_convert<db::CellInst> bc (layout);
+    db::box_convert<db::CellInst, false> bc (layout);
     if (! r->is_cell_inst ()) {
 
       const std::vector<db::DCplxTrans> *tv_list = tv.per_cv_and_layer (r->cv_index (), r->layer ());
@@ -846,7 +851,7 @@ Service::transform (const db::DCplxTrans &trans, const std::vector<db::DCplxTran
 
   }
 
-  handle_guiding_shape_changes ();
+  handle_guiding_shape_changes (true);
   selection_to_view ();
 }
 
@@ -1110,7 +1115,7 @@ Service::click_proximity (const db::DPoint &pos, lay::Editable::SelectionMode mo
     lay::InstFinder finder (true, view ()->is_editable () && m_top_level_sel, view ()->is_editable () /*full arrays in editable mode*/, true /*enclose_inst*/, exclude, true /*visible layers*/);
 
     //  go through all cell views
-    std::set< std::pair<db::DCplxTrans, int> > variants = view ()->cv_transform_variants ();
+    std::set< std::pair<db::DCplxTrans, int> > variants = view ()->cv_transform_variants_with_empty();
     for (std::set< std::pair<db::DCplxTrans, int> >::const_iterator v = variants.begin (); v != variants.end (); ++v) {
       finder.find (view (), v->second, v->first, search_box);
     }
@@ -1159,7 +1164,7 @@ Service::transient_select (const db::DPoint &pos)
     lay::InstFinder finder (true, view ()->is_editable () && m_top_level_sel, view ()->is_editable () /*full arrays in editable mode*/, true /*enclose instances*/, &m_previous_selection, true /*visible layers only*/);
 
     //  go through all transform variants
-    std::set< std::pair<db::DCplxTrans, int> > variants = view ()->cv_transform_variants ();
+    std::set< std::pair<db::DCplxTrans, int> > variants = view ()->cv_transform_variants_with_empty ();
     for (std::set< std::pair<db::DCplxTrans, int> >::const_iterator v = variants.begin (); v != variants.end (); ++v) {
       finder.find (view (), v->second, v->first, search_box);
     }
@@ -1180,7 +1185,7 @@ Service::transient_select (const db::DPoint &pos)
 
       db::Instance inst = r->back ().inst_ptr;
 
-      std::vector<db::DCplxTrans> tv = mp_view->cv_transform_variants (r->cv_index ());
+      std::vector<db::DCplxTrans> tv = mp_view->cv_transform_variants_with_empty (r->cv_index ());
       if (view ()->is_editable ()) {
 
 #if 0
@@ -1493,7 +1498,7 @@ Service::select (const db::DBox &box, lay::Editable::SelectionMode mode)
     lay::InstFinder finder (box.is_point (), view ()->is_editable () && m_top_level_sel, view ()->is_editable () /*full arrays in editable mode*/, true /*enclose_inst*/, exclude, true /*only visible layers*/);
 
     //  go through all cell views
-    std::set< std::pair<db::DCplxTrans, int> > variants = view ()->cv_transform_variants ();
+    std::set< std::pair<db::DCplxTrans, int> > variants = view ()->cv_transform_variants_with_empty ();
     for (std::set< std::pair<db::DCplxTrans, int> >::const_iterator v = variants.begin (); v != variants.end (); ++v) {
       finder.find (view (), v->second, v->first, search_box);
     }
@@ -1749,6 +1754,10 @@ Service::do_selection_to_view ()
   //  build the transformation variants cache
   TransformationVariants tv (view ());
 
+  //  prepare a default transformation for empty variants
+  std::vector<db::DCplxTrans> empty_tv;
+  empty_tv.push_back (db::DCplxTrans ());
+
   //  Build markers
 
   for (EditableSelectionIterator r = begin_selection (); ! r.at_end (); ++r) {
@@ -1764,39 +1773,39 @@ Service::do_selection_to_view ()
     if (m_cell_inst_service) {
 
       const std::vector<db::DCplxTrans> *tv_list = tv.per_cv (r->cv_index ());
-      if (tv_list != 0) {
+      if (tv_list == 0) {
+        tv_list = &empty_tv;
+      }
       
-        if (view ()->is_editable ()) {
+      if (view ()->is_editable ()) {
 
 #if 0
-          //  to show the content of the cell when the instance is selected:
-          lay::InstanceMarker *marker = new lay::InstanceMarker (view (), r->cv_index (), ! show_shapes_of_instances (), show_shapes_of_instances () ? max_shapes_of_instances () : 0);
+        //  to show the content of the cell when the instance is selected:
+        lay::InstanceMarker *marker = new lay::InstanceMarker (view (), r->cv_index (), ! show_shapes_of_instances (), show_shapes_of_instances () ? max_shapes_of_instances () : 0);
 #else
-          lay::InstanceMarker *marker = new lay::InstanceMarker (view (), r->cv_index ());
+        lay::InstanceMarker *marker = new lay::InstanceMarker (view (), r->cv_index ());
 #endif
-          marker->set_vertex_shape (lay::ViewOp::Cross);
-          marker->set_vertex_size (9 /*cross vertex size*/);
+        marker->set_vertex_shape (lay::ViewOp::Cross);
+        marker->set_vertex_size (9 /*cross vertex size*/);
 
-          if (r->seq () > 0 && m_indicate_secondary_selection) { 
-            marker->set_dither_pattern (3); 
-          } 
-          marker->set (r->back ().inst_ptr, gt, *tv_list);
-          m_markers.push_back (std::make_pair (r.operator-> (), marker));
-
-        } else {
-
-          lay::Marker *marker = new lay::Marker (view (), r->cv_index ());
-          marker->set_vertex_shape (lay::ViewOp::Cross);
-          marker->set_vertex_size (9 /*cross vertex size*/);
-
-          if (r->seq () > 0 && m_indicate_secondary_selection) { 
-            marker->set_dither_pattern (3); 
-          } 
-          db::box_convert<db::CellInst> bc (cv->layout ());
-          marker->set (bc (r->back ().inst_ptr.cell_inst ().object ()), gt * r->back ().inst_ptr.cell_inst ().complex_trans (*r->back ().array_inst), *tv_list);
-          m_markers.push_back (std::make_pair (r.operator-> (), marker));
-
+        if (r->seq () > 0 && m_indicate_secondary_selection) {
+          marker->set_dither_pattern (3);
         }
+        marker->set (r->back ().inst_ptr, gt, *tv_list);
+        m_markers.push_back (std::make_pair (r.operator-> (), marker));
+
+      } else {
+
+        lay::Marker *marker = new lay::Marker (view (), r->cv_index ());
+        marker->set_vertex_shape (lay::ViewOp::Cross);
+        marker->set_vertex_size (9 /*cross vertex size*/);
+
+        if (r->seq () > 0 && m_indicate_secondary_selection) {
+          marker->set_dither_pattern (3);
+        }
+        db::box_convert<db::CellInst> bc (cv->layout ());
+        marker->set (bc (r->back ().inst_ptr.cell_inst ().object ()), gt * r->back ().inst_ptr.cell_inst ().complex_trans (*r->back ().array_inst), *tv_list);
+        m_markers.push_back (std::make_pair (r.operator-> (), marker));
 
       }
 
@@ -1860,7 +1869,7 @@ Service::add_selection (const lay::ObjectInstPath &sel)
 }
 
 std::pair<bool, lay::ObjectInstPath>
-Service::handle_guiding_shape_changes (const lay::ObjectInstPath &obj) const
+Service::handle_guiding_shape_changes (const lay::ObjectInstPath &obj, bool commit) const
 {
   unsigned int cv_index = obj.cv_index ();
   lay::CellView cv = view ()->cellview (cv_index);
@@ -1874,8 +1883,20 @@ Service::handle_guiding_shape_changes (const lay::ObjectInstPath &obj) const
     return std::make_pair (false, lay::ObjectInstPath ());
   }
 
-  if (! layout->is_pcell_instance (obj.cell_index ()).first) {
+  auto pcell_decl = layout->pcell_declaration_for_pcell_variant (obj.cell_index ());
+  if (! pcell_decl) {
     return std::make_pair (false, lay::ObjectInstPath ());
+  }
+
+  //  Don't update unless we're committing or not in lazy PCell update mode
+  if (! commit) {
+    if (m_pcell_lazy_evaluation < 0) {
+      if (pcell_decl->wants_lazy_evaluation ()) {
+        return std::make_pair (false, lay::ObjectInstPath ());
+      }
+    } else if (m_pcell_lazy_evaluation > 0) {
+      return std::make_pair (false, lay::ObjectInstPath ());
+    }
   }
 
   db::cell_index_type top_cell = std::numeric_limits<db::cell_index_type>::max ();
@@ -1944,7 +1965,7 @@ Service::handle_guiding_shape_changes (const lay::ObjectInstPath &obj) const
 }
 
 bool 
-Service::handle_guiding_shape_changes ()
+Service::handle_guiding_shape_changes (bool commit)
 {
   EditableSelectionIterator s = begin_selection ();
 
@@ -1953,7 +1974,7 @@ Service::handle_guiding_shape_changes ()
     return false;
   }
 
-  std::pair<bool, lay::ObjectInstPath> gs = handle_guiding_shape_changes (*s);
+  std::pair<bool, lay::ObjectInstPath> gs = handle_guiding_shape_changes (*s, commit);
   if (gs.first) {
 
     //  remove superfluous proxies

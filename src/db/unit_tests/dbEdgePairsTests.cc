@@ -115,7 +115,7 @@ TEST(2)
 struct EPTestFilter
   : public db::EdgePairFilterBase
 {
-  bool selected (const db::EdgePair &ep) const
+  bool selected (const db::EdgePair &ep, db::properties_id_type) const
   {
     return ep.first ().double_length () < 50;
   }
@@ -171,42 +171,132 @@ TEST(5_InternalAngleFilter)
   db::EdgePair ep90 (db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 0), db::Point (0, 100)));
   db::EdgePair epm90 (db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 100), db::Point (0, 0)));
 
-  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, false).selected (ep0), true);
-  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, false).selected (ep180), true);
-  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, false).selected (ep90), false);
-  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, false).selected (epm90), false);
-  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, false).selected (ep45), false);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, false).selected (ep0, 0), true);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, false).selected (ep180, 0), true);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, false).selected (ep90, 0), false);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, false).selected (epm90, 0), false);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, false).selected (ep45, 0), false);
 
-  EXPECT_EQ (db::InternalAngleEdgePairFilter (90.0, false).selected (ep0), false);
-  EXPECT_EQ (db::InternalAngleEdgePairFilter (90.0, false).selected (ep180), false);
-  EXPECT_EQ (db::InternalAngleEdgePairFilter (90.0, false).selected (ep90), true);
-  EXPECT_EQ (db::InternalAngleEdgePairFilter (90.0, false).selected (epm90), true);
-  EXPECT_EQ (db::InternalAngleEdgePairFilter (90.0, false).selected (ep45), false);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (90.0, false).selected (ep0, 0), false);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (90.0, false).selected (ep180, 0), false);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (90.0, false).selected (ep90, 0), true);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (90.0, false).selected (epm90, 0), true);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (90.0, false).selected (ep45, 0), false);
 
-  EXPECT_EQ (db::InternalAngleEdgePairFilter (45.0, false).selected (ep0), false);
-  EXPECT_EQ (db::InternalAngleEdgePairFilter (45.0, false).selected (ep180), false);
-  EXPECT_EQ (db::InternalAngleEdgePairFilter (45.0, false).selected (ep90), false);
-  EXPECT_EQ (db::InternalAngleEdgePairFilter (45.0, false).selected (epm90), false);
-  EXPECT_EQ (db::InternalAngleEdgePairFilter (45.0, false).selected (ep45), true);
-  EXPECT_EQ (db::InternalAngleEdgePairFilter (45.0, false).selected (ep45inv), true);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (45.0, false).selected (ep0, 0), false);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (45.0, false).selected (ep180, 0), false);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (45.0, false).selected (ep90, 0), false);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (45.0, false).selected (epm90, 0), false);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (45.0, false).selected (ep45, 0), true);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (45.0, false).selected (ep45inv, 0), true);
 
-  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true).selected (ep0), false);
-  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true).selected (ep180), false);
-  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true).selected (ep90), true);
-  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true).selected (epm90), true);
-  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true).selected (ep45), true);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true).selected (ep0, 0), false);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true).selected (ep180, 0), false);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true).selected (ep90, 0), true);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true).selected (epm90, 0), true);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true).selected (ep45, 0), true);
 
-  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, false).selected (ep0), true);
-  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, false).selected (ep180), true);
-  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, false).selected (ep90), false);
-  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, false).selected (epm90), false);
-  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, false).selected (ep45), true);
-  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, false).selected (ep45inv), true);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, false).selected (ep0, 0), true);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, false).selected (ep180, 0), true);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, false).selected (ep90, 0), false);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, false).selected (epm90, 0), false);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, false).selected (ep45, 0), true);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, false).selected (ep45inv, 0), true);
 
-  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, true).selected (ep0), false);
-  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, true).selected (ep180), false);
-  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, true).selected (ep90), true);
-  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, true).selected (epm90), true);
-  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, true).selected (ep45), false);
-  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, true).selected (ep45inv), false);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, true).selected (ep0, 0), false);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, true).selected (ep180, 0), false);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, true).selected (ep90, 0), true);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, true).selected (epm90, 0), true);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, true).selected (ep45, 0), false);
+  EXPECT_EQ (db::InternalAngleEdgePairFilter (0.0, true, 45.0, true, true).selected (ep45inv, 0), false);
 }
+
+TEST(6_add_with_properties)
+{
+  db::DeepShapeStore dss ("TOP", 0.001);
+  db::EdgePairs rd1 (dss), rd2 (dss);
+  db::EdgePairs rf1, rf2;
+
+  db::PropertiesSet ps;
+  ps.insert ("net", 17);
+  db::properties_id_type pid = db::properties_id (ps);
+
+  rf1.insert (db::EdgePairWithProperties (db::EdgePair (db::Edge (-10, 20, 20, 60), db::Edge (-10, 30, 20, 70)), pid));
+  rd1.insert (db::EdgePairWithProperties (db::EdgePair (db::Edge (-10, 20, 20, 60), db::Edge (-10, 30, 20, 70)), pid));
+
+  rf2.insert (db::EdgePairWithProperties (db::EdgePair (db::Edge (10, 20, -20, 60), db::Edge (10, 30, -20, 70)), pid));
+  rd2.insert (db::EdgePairWithProperties (db::EdgePair (db::Edge (10, 20, -20, 60), db::Edge (10, 30, -20, 70)), pid));
+
+  db::Layout ly;
+  db::Cell &top_cell = ly.cell (ly.add_cell ("TOP"));
+  unsigned int l1 = ly.insert_layer ();
+  unsigned int l2 = ly.insert_layer ();
+
+  top_cell.shapes (l1).insert (db::EdgePairWithProperties (db::EdgePair (db::Edge (-10, 20, 20, 60), db::Edge (-10, 30, 20, 70)), pid));
+  top_cell.shapes (l2).insert (db::EdgePairWithProperties (db::EdgePair (db::Edge (10, 20, -20, 60), db::Edge (10, 30, -20, 70)), pid));
+
+  db::EdgePairs ro1 (db::RecursiveShapeIterator (ly, top_cell, l1));
+  db::EdgePairs ro2 (db::RecursiveShapeIterator (ly, top_cell, l2));
+
+  //  enable properties
+  ro1.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
+  ro2.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
+
+  db::EdgePairs r;
+  r += rf1;
+  r += rf2;
+  EXPECT_EQ (r.to_string (), "(-10,20;20,60)/(-10,30;20,70){net=>17};(10,20;-20,60)/(10,30;-20,70){net=>17}");
+  EXPECT_EQ ((rf1 + rf2).to_string (), "(-10,20;20,60)/(-10,30;20,70){net=>17};(10,20;-20,60)/(10,30;-20,70){net=>17}");
+
+  r = db::EdgePairs ();
+  r += rd1;
+  r += rf2;
+  EXPECT_EQ (r.to_string (), "(-10,20;20,60)/(-10,30;20,70){net=>17};(10,20;-20,60)/(10,30;-20,70){net=>17}");
+  EXPECT_EQ ((rd1 + rf2).to_string (), "(-10,20;20,60)/(-10,30;20,70){net=>17};(10,20;-20,60)/(10,30;-20,70){net=>17}");
+
+  r = db::EdgePairs ();
+  r += rf1;
+  r += rd2;
+  EXPECT_EQ (r.to_string (), "(-10,20;20,60)/(-10,30;20,70){net=>17};(10,20;-20,60)/(10,30;-20,70){net=>17}");
+  EXPECT_EQ ((rf1 + rd2).to_string (), "(-10,20;20,60)/(-10,30;20,70){net=>17};(10,20;-20,60)/(10,30;-20,70){net=>17}");
+
+  r = db::EdgePairs ();
+  r += rd1;
+  r += rd2;
+  EXPECT_EQ (r.to_string (), "(-10,20;20,60)/(-10,30;20,70){net=>17};(10,20;-20,60)/(10,30;-20,70){net=>17}");
+  EXPECT_EQ ((rd1 + rd2).to_string (), "(-10,20;20,60)/(-10,30;20,70){net=>17};(10,20;-20,60)/(10,30;-20,70){net=>17}");
+
+  r = db::EdgePairs ();
+  r += ro1;
+  r += ro2;
+  EXPECT_EQ (r.to_string (), "(-10,20;20,60)/(-10,30;20,70){net=>17};(10,20;-20,60)/(10,30;-20,70){net=>17}");
+  EXPECT_EQ ((ro1 + ro2).to_string (), "(-10,20;20,60)/(-10,30;20,70){net=>17};(10,20;-20,60)/(10,30;-20,70){net=>17}");
+
+  r = db::EdgePairs ();
+  r += ro1;
+  r += rf2;
+  EXPECT_EQ (r.to_string (), "(10,20;-20,60)/(10,30;-20,70){net=>17};(-10,20;20,60)/(-10,30;20,70){net=>17}");
+  EXPECT_EQ ((ro1 + rf2).to_string (), "(10,20;-20,60)/(10,30;-20,70){net=>17};(-10,20;20,60)/(-10,30;20,70){net=>17}");
+}
+
+TEST(7_properties)
+{
+  db::PropertiesSet ps;
+
+  ps.insert (tl::Variant ("id"), 1);
+  db::properties_id_type pid1 = db::properties_id (ps);
+
+  db::EdgePairs edge_pairs;
+  db::Edge e1 (db::Point (0, 0), db::Point (10, 20));
+  db::Edge e2 (db::Point (1, 2), db::Point (11, 22));
+  edge_pairs.insert (db::EdgePairWithProperties (db::EdgePair (e1, e2), pid1));
+  edge_pairs.insert (db::EdgePair (e1, e2));
+
+  EXPECT_EQ (edge_pairs.nth (0)->to_string (), "(0,0;10,20)/(1,2;11,22)");
+  EXPECT_EQ (edge_pairs.nth (1)->to_string (), "(0,0;10,20)/(1,2;11,22)");
+  EXPECT_EQ (edge_pairs.nth (2) == 0, true);
+
+  EXPECT_EQ (edge_pairs.nth_prop_id (0), db::properties_id_type (0));
+  EXPECT_EQ (edge_pairs.nth_prop_id (1), pid1);
+}
+

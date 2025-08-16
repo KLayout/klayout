@@ -25,6 +25,7 @@
 #include "tlLog.h"
 #include "tlInternational.h"
 #include "tlEnv.h"
+#include "tlGlobPattern.h"
 
 #include <cctype>
 #include <fstream>
@@ -428,6 +429,63 @@ std::vector<std::string> dir_entries (const std::string &s, bool with_files, boo
 #endif
 
   return ee;
+}
+
+static void glob_partial (const std::string &where, std::vector<std::string>::const_iterator pfrom, std::vector<std::string>::const_iterator pto, std::vector<std::string> &res)
+{
+  if (pfrom == pto) {
+    if (! is_dir (where)) {
+      res.push_back (where);
+    }
+    return;
+  }
+
+  auto p = where + *pfrom;
+  if (file_exists (p)) {
+    glob_partial (p, pfrom + 1, pto, res);
+    return;
+  }
+
+  if (tl::trimmed_part (*pfrom) == "**") {
+    if (pfrom + 1 == pto) {
+      //  a glob pattern can't be "**" without anything after that
+      return;
+    }
+    auto subdirs = dir_entries (where, false, true, true);
+    for (auto s = subdirs.begin (); s != subdirs.end (); ++s) {
+      glob_partial (combine_path (where, *s), pfrom, pto, res);
+    }
+    ++pfrom;
+  }
+
+#if defined(_WIN32)
+  if (where.empty ()) {
+    //  On Windows, we cannot iterate the drives
+    std::string root = *pfrom;
+    ++pfrom;
+    glob_partial (root, pfrom, pto, res);
+    return;
+  }
+#endif  
+
+  tl::GlobPattern glob (tl::trimmed_part (*pfrom));
+  ++pfrom;
+  auto entries = dir_entries (where, true, true, true);
+  for (auto e = entries.begin (); e != entries.end (); ++e) {
+    if (glob.match (*e)) {
+      glob_partial (combine_path (where, *e), pfrom, pto, res);
+    }
+  }
+}
+
+std::vector<std::string> glob_expand (const std::string &path)
+{
+  auto apath = absolute_file_path (path);
+  auto parts = split_path (apath);
+
+  std::vector<std::string> res;
+  glob_partial (std::string (), parts.begin (), parts.end (), res);
+  return res;
 }
 
 bool mkdir (const std::string &path)

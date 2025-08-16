@@ -770,6 +770,99 @@ module DRC
     end
 
     # %DRC%
+    # @name evaluate_nets
+    # @brief Evaluates net properties and annotates shapes from a given layer on the nets
+    # @synopsis evaluate_nets(primary_layer, secondary_layers, expression [, variables])
+    #
+    # The function takes a primary layer and a number of secondary layers, each of
+    # them given a variable name.
+    # It visits each net and evaluates the given expression on the net.
+    # The expression needs to be written in KLayout expression notations.
+    #
+    # The default action is to copy the shapes of the primary layer to the
+    # output. This action can be modified in some ways: skip shapes of
+    # certain nets or attach properties to the shapes during the evaluation.
+    #
+    # Using the "put" function inside the expression, properties can be 
+    # attached to the output shapes. The properties can be computed using
+    # a number of net attributes - area and perimeter for example.
+    #
+    # Also the RBA::Net object representing the net is available through the
+    # 'net' function. This allows implementing a more elaborate
+    # antenna check for example.
+    #
+    # Also, the expression can choose to drop shapes and not copy them to 
+    # the output by calling the "skip" function with a "true" argument.
+    #
+    # Arbitrary values can be passed as variables, which removes the need
+    # to encode variable values into the expression. For this, use the 
+    # 'variables' argument and pass a hash with names and values. Each of
+    # those values becomes available as a variable with the given name
+    # inside the expression.
+    # 
+    # The following functions are available inside the expressions:
+    #
+    # @ul
+    # @li "net" - the RBA::Net object of the current net @/li
+    # @li "skip(flag)" - if called with a 'true' argument, the primary layer's shapes are not copied for this net @/li
+    # @li "put(name, value)" - places the value as a property with name 'name' (this must be a string) on the output shapes @/li
+    # @li "area" - the combined area of the primary layer's shapes on the net in square micrometer units @/li
+    # @li "area(symbol)" - the combined area of the secondary layer's shapes on the net in square micrometer units @/li
+    # @li "perimeter" - the perimeter of the primary layer's shapes on the net in micrometer units @/li
+    # @li "perimeter(symbol)" - the perimeter of the secondary layer's shapes on the net in micrometer units @/li
+    # @/ul
+    #
+    # Here, 'symbol' is the name given to the secondary layer in the secondary layer
+    # dictionary.
+    #
+    # The following example emulates an antenna check. It computes the area ratio of metal vs. gate area and 
+    # attaches the value as a property with name 'AR' to the shapes, copied from the 'gate' layer:
+    #
+    # @code
+    # gate = ...   # a layer with the gate shapes
+    # metal = ...  # a layer with metal shapes
+    # 
+    # # NOTE: 'MET' is the name we are going to use in the expression
+    # antenna_errors = evaluate_nets(gate, { "MET" => metal }, "put('AR',area(MET)/area)")
+    # @/code
+    #
+    # This other example also computes the area ratio of metal vs. gate area, and 
+    # outputs the gate shapes of all nets whose metal to gate area ratio is bigger than
+    # 500. The area ratio is output to a property with name 'AR':
+    #
+    # @code
+    # gate = ...   # a layer with the gate shapes
+    # metal = ...  # a layer with metal shapes
+    # 
+    # variables = { "thr" => 500.0 }
+    # expression = "var ar=area(MET)/area; put('AR',ar); skip(ar<thr)"
+    #
+    # antenna_errors = evaluate_nets(gate, { "MET" => metal }, expression, variables)
+    # @/code
+    #
+    # NOTE: GDS does not support properties with string names, so 
+    # either save to OASIS, or use integer numbers for the property names.
+
+    def evaluate_nets(primary, secondary, expression, variables = {})
+
+      primary.is_a?(DRC::DRCLayer) || raise("First argument must be a layer")
+      primary.requires_region("'primary'")
+
+      secondary_data = {}
+      secondary.is_a?(Hash) || raise("Second argument must be a hash of names and layers")
+      secondary.each do |k,v|
+        v.is_a?(DRC::DRCLayer) || raise("Second argument must be a hash of names and polygon")
+        v.requires_region("Secondary '#{k}'")
+        secondary_data[k.to_s] = v.data
+      end
+
+      expression.is_a?(String) || raise("'expression' argument must be a string")
+
+      DRC::DRCLayer::new(@engine, @engine._cmd(l2n_data, :evaluate_nets, primary.data, secondary_data, expression, variables, nil))
+
+    end
+
+    # %DRC%
     # @name l2n_data
     # @brief Gets the internal RBA::LayoutToNetlist object
     # @synopsis l2n_data

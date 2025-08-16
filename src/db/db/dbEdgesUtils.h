@@ -71,7 +71,7 @@ struct DB_PUBLIC EdgeLengthFilter
   /**
    *  @brief Returns true if the edge length matches the criterion
    */
-  virtual bool selected (const db::Edge &edge) const
+  virtual bool selected (const db::Edge &edge, db::properties_id_type) const
   {
     return check (edge.length ());
   }
@@ -79,10 +79,10 @@ struct DB_PUBLIC EdgeLengthFilter
   /**
    *  @brief Returns true if the total edge length matches the criterion
    */
-  bool selected (const std::unordered_set<db::Edge> &edges) const
+  bool selected_set (const std::unordered_set<db::EdgeWithProperties> &edges) const
   {
     length_type l = 0;
-    for (std::unordered_set<db::Edge>::const_iterator e = edges.begin (); e != edges.end (); ++e) {
+    for (std::unordered_set<db::EdgeWithProperties>::const_iterator e = edges.begin (); e != edges.end (); ++e) {
       l += e->length ();
     }
     return check (l);
@@ -155,7 +155,7 @@ public:
   }
 
 private:
-  db::CplxTrans m_t_start, m_t_end;
+  db::ICplxTrans m_t_start, m_t_end;
   bool m_include_start, m_include_end;
   bool m_big_angle, m_all;
   bool m_inverse, m_absolute;
@@ -204,15 +204,15 @@ struct DB_PUBLIC EdgeOrientationFilter
   /**
    *  @brief Returns true if the edge orientation matches the criterion
    */
-  virtual bool selected (const db::Edge &edge) const;
+  virtual bool selected (const db::Edge &edge, properties_id_type) const;
 
   /**
    *  @brief Returns true if all edge orientations match the criterion
    */
-  virtual bool selected (const std::unordered_set<db::Edge> &edges) const
+  virtual bool selected_set (const std::unordered_set<db::EdgeWithProperties> &edges) const
   {
-    for (std::unordered_set<db::Edge>::const_iterator e = edges.begin (); e != edges.end (); ++e) {
-      if (! selected (*e)) {
+    for (std::unordered_set<db::EdgeWithProperties>::const_iterator e = edges.begin (); e != edges.end (); ++e) {
+      if (! selected (*e, e->properties_id ())) {
         return false;
       }
     }
@@ -274,15 +274,15 @@ struct DB_PUBLIC SpecialEdgeOrientationFilter
   /**
    *  @brief Returns true if the edge orientation matches the criterion
    */
-  virtual bool selected (const db::Edge &edge) const;
+  virtual bool selected (const db::Edge &edge, db::properties_id_type) const;
 
   /**
    *  @brief Returns true if all edge orientations match the criterion
    */
-  virtual bool selected (const std::unordered_set<db::Edge> &edges) const
+  virtual bool selected_set (const std::unordered_set<db::EdgeWithProperties> &edges) const
   {
-    for (std::unordered_set<db::Edge>::const_iterator e = edges.begin (); e != edges.end (); ++e) {
-      if (! selected (*e)) {
+    for (std::unordered_set<db::EdgeWithProperties>::const_iterator e = edges.begin (); e != edges.end (); ++e) {
+      if (! selected (*e, e->properties_id ())) {
         return false;
       }
     }
@@ -317,6 +317,29 @@ private:
   FilterType m_type;
   bool m_inverse;
   db::OrthogonalTransformationReducer m_vars;
+};
+
+/**
+ *  @brief A filter implementation which implements the set filters through "all must match"
+ */
+
+struct DB_PUBLIC AllEdgesMustMatchFilter
+  : public EdgeFilterBase
+{
+  /**
+   *  @brief Constructor
+   */
+  AllEdgesMustMatchFilter () { }
+
+  virtual bool selected_set (const std::unordered_set<db::EdgeWithProperties> &edges) const
+  {
+    for (std::unordered_set<db::EdgeWithProperties>::const_iterator p = edges.begin (); p != edges.end (); ++p) {
+      if (! selected (*p, p->properties_id ())) {
+        return false;
+      }
+    }
+    return true;
+  }
 };
 
 /**
@@ -621,11 +644,6 @@ public:
     : m_ext_b (ext_b), m_ext_e (ext_e), m_ext_o (ext_o), m_ext_i (ext_i)
   { }
 
-  virtual void process (const Edge &edge, std::vector<db::Polygon> &res) const
-  {
-    res.push_back (extended_edge (edge, m_ext_b, m_ext_e, m_ext_o, m_ext_i));
-  }
-
   virtual void process (const EdgeWithProperties &edge, std::vector<db::PolygonWithProperties> &res) const
   {
     res.push_back (db::PolygonWithProperties (extended_edge (edge, m_ext_b, m_ext_e, m_ext_o, m_ext_i), edge.properties_id ()));
@@ -645,7 +663,6 @@ public:
   EdgeSegmentSelector (int mode, Edge::distance_type length, double fraction);
   ~EdgeSegmentSelector ();
 
-  virtual void process (const db::Edge &edge, std::vector<db::Edge> &res) const;
   virtual void process (const db::EdgeWithProperties &edge, std::vector<db::EdgeWithProperties> &res) const;
 
   virtual const TransformationReducer *vars () const { return &m_vars; }

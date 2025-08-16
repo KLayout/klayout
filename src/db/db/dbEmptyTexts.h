@@ -56,12 +56,13 @@ public:
 
   virtual TextsDelegate *filter_in_place (const TextFilterBase &) { return this; }
   virtual TextsDelegate *filtered (const TextFilterBase &) const { return new EmptyTexts (); }
+  virtual std::pair<TextsDelegate *, TextsDelegate *> filtered_pair (const TextFilterBase &) const { return std::make_pair (new EmptyTexts (), new EmptyTexts ()); }
 
   virtual TextsDelegate *process_in_place (const TextProcessorBase &) { return this; }
   virtual TextsDelegate *processed (const TextProcessorBase &) const { return new EmptyTexts (); }
   virtual RegionDelegate *processed_to_polygons (const TextToPolygonProcessorBase &) const;
 
-  virtual RegionDelegate *polygons (db::Coord e) const;
+  virtual RegionDelegate *polygons (db::Coord e, const tl::Variant &text_prop) const;
   virtual EdgesDelegate *edges () const;
 
   virtual TextsDelegate *add_in_place (const Texts &other);
@@ -70,6 +71,7 @@ public:
   virtual TextsDelegate *in (const Texts &, bool) const { return new EmptyTexts (); }
 
   virtual const db::Text *nth (size_t) const { tl_assert (false); }
+  virtual db::properties_id_type nth_prop_id (size_t) const { tl_assert (false); }
   virtual bool has_valid_texts () const { return true; }
 
   virtual const db::RecursiveShapeIterator *iter () const { return 0; }

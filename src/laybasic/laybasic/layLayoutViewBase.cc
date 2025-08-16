@@ -79,6 +79,9 @@ const double zoom_factor = 0.7;
 //  factor by which panning is faster in "fast" (+Shift) mode
 const double fast_factor = 3.0;
 
+//  size of cross
+const int mark_size = 9;
+
 // -------------------------------------------------------------
 
 struct OpHideShowCell 
@@ -542,7 +545,7 @@ void LayoutViewBase::update_event_handlers ()
     ly.dbu_changed_event.add (this, &LayoutViewBase::signal_bboxes_changed);
     ly.prop_ids_changed_event.add (this, &LayoutViewBase::signal_prop_ids_changed);
     ly.layer_properties_changed_event.add (this, &LayoutViewBase::signal_layer_properties_changed);
-    ly.cell_name_changed_event.add (this, &LayoutViewBase::signal_cell_name_changed);
+    ly.cell_name_changed_event.add (this, &LayoutViewBase::signal_cell_name_changed, i);
     cellview (i)->apply_technology_with_sender_event.add (this, &LayoutViewBase::signal_apply_technology);
   }
 
@@ -688,13 +691,30 @@ LayoutViewBase::is_dirty () const
   return m_dirty;
 }
 
-std::string
+const std::string &
 LayoutViewBase::title () const
 {
+  return m_current_title;
+}
+
+void
+LayoutViewBase::update_title ()
+{
   if (! m_title.empty ()) {
-    return m_title;
+
+    if (m_title != m_current_title) {
+      m_current_title = m_title;
+      emit_title_changed ();
+    }
+
   } else if (cellviews () == 0) {
-    return tl::to_string (tr ("<empty>"));
+
+    static std::string empty_title = tl::to_string (tr ("<empty>"));
+    if (m_current_title != empty_title) {
+      m_current_title = empty_title;
+      emit_title_changed ();
+    }
+
   } else {
 
     int cv_index = active_cellview_index ();
@@ -717,27 +737,25 @@ LayoutViewBase::title () const
       t += " ...";
     }
 
-    return t;
-
+    if (t != m_current_title) {
+      m_current_title = t;
+      emit_title_changed ();
+    }
   }
 }
 
 void
 LayoutViewBase::set_title (const std::string &t)
 {
-  if (m_title != t) {
-    m_title = t;
-    emit_title_changed ();
-  }
+  m_title = t;
+  update_title ();
 }
 
 void
 LayoutViewBase::reset_title ()
 {
-  if (! m_title.empty ()) {
-    m_title = "";
-    emit_title_changed ();
-  }
+  m_title.clear ();
+  update_title ();
 }
 
 bool 
@@ -1980,9 +1998,9 @@ LayoutViewBase::replace_layer_node (unsigned int index, const LayerPropertiesCon
       manager ()->clear ();
     }
 
-  if (index == current_layer_list ()) {
-    begin_layer_updates ();
-  }
+    if (index == current_layer_list ()) {
+      begin_layer_updates ();
+    }
 
     LayerPropertiesIterator non_const_iter (get_properties (index), iter.uint ());
     *non_const_iter = node;
@@ -2345,9 +2363,13 @@ LayoutViewBase::signal_bboxes_changed ()
 }
 
 void
-LayoutViewBase::signal_cell_name_changed ()
+LayoutViewBase::signal_cell_name_changed (unsigned int cv_index)
 {
-  cell_visibility_changed_event (); // HINT: that is not what actually is intended, but it serves the function ...
+  cellview_changed_event (int (cv_index));
+
+  //  Because the title reflects the active cell, emit a title changed event
+  update_title ();
+
   redraw_later ();  //  needs redraw
 }
 
@@ -2494,10 +2516,7 @@ LayoutViewBase::erase_cellview (unsigned int index)
   finish_cellviews_changed ();
 
   update_content ();
-
-  if (m_title.empty ()) {
-    emit_title_changed ();
-  }
+  update_title ();
 }
 
 void
@@ -2527,9 +2546,7 @@ LayoutViewBase::clear_cellviews ()
 
   finish_cellviews_changed ();
 
-  if (m_title.empty ()) {
-    emit_title_changed ();
-  }
+  update_title ();
 }
 
 const CellView &
@@ -2597,9 +2614,7 @@ LayoutViewBase::set_layout (const lay::CellView &cv, unsigned int cvindex)
   //  the layouts are released as far as possible. This is important for reload () for example.
   update_content_for_cv (cvindex);
 
-  if (m_title.empty ()) {
-    emit_title_changed ();
-  }
+  update_title ();
 }
 
 void
@@ -2627,7 +2642,9 @@ LayoutViewBase::signal_apply_technology (lay::LayoutHandle *layout_handle)
 
         //  remove all references to the cellview in the layer properties
         for (unsigned int lindex = 0; lindex < layer_lists (); ++lindex) {
-          m_layer_properties_lists [lindex]->remove_cv_references (i);
+          lay::LayerPropertiesList props = *m_layer_properties_lists [lindex];
+          props.remove_cv_references (i);
+          set_properties (lindex, props);
         }
 
         //  if a layer properties file is set, create the layer properties now
@@ -3781,21 +3798,25 @@ LayoutViewBase::timer ()
     emit_dirty_changed ();
   }
 
-  if (m_prop_changed) {
-    do_prop_changed ();
-    m_prop_changed = false;
-  }
+  if (is_activated ()) {
 
-  tl::Clock current_time = tl::Clock::current ();
-  if ((current_time - m_last_checked).seconds () > animation_interval) {
-    m_last_checked = current_time;
-    if (m_animated) {
-      set_view_ops ();
-      do_set_phase (int (m_phase));
+    if (m_prop_changed) {
+      do_prop_changed ();
+      m_prop_changed = false;
+    }
+
+    tl::Clock current_time = tl::Clock::current ();
+    if ((current_time - m_last_checked).seconds () > animation_interval) {
+      m_last_checked = current_time;
       if (m_animated) {
-        ++m_phase;
+        set_view_ops ();
+        do_set_phase (int (m_phase));
+        if (m_animated) {
+          ++m_phase;
+        }
       }
     }
+
   }
 }
 
@@ -3845,8 +3866,13 @@ LayoutViewBase::full_box () const
 
   db::DBox bbox;
 
-  for (LayerPropertiesConstIterator l = get_properties ().begin_const_recursive (); ! l.at_end (); ++l) {
-    bbox += l->bbox ();
+  auto tv = cv_transform_variants_with_empty ();
+  for (auto i = tv.begin (); i != tv.end (); ++i) {
+    const lay::CellView &cv = cellview (i->second);
+    if (cv.is_valid ()) {
+      double dbu = cv->layout ().dbu ();
+      bbox += (i->first * db::CplxTrans (dbu) * cv.context_trans ()) * cv.cell ()->bbox_with_empty ();
+    }
   }
 
   for (lay::AnnotationShapes::iterator a = annotation_shapes ().begin (); ! a.at_end (); ++a) {
@@ -4225,7 +4251,7 @@ LayoutViewBase::set_view_ops ()
   //  cell boxes
   if (m_cell_box_visible) {
 
-    lay::ViewOp vop;
+    lay::ViewOp vop, vopv;
 
     //  context level
     if (m_ctx_color.is_valid ()) {
@@ -4233,12 +4259,15 @@ LayoutViewBase::set_view_ops ()
     } else {
       vop = lay::ViewOp (lay::LayerProperties::brighter (box_color.rgb (), brightness_for_context), lay::ViewOp::Copy, 0, 0, 0);
     }
+    vopv = vop;
+    vopv.shape (lay::ViewOp::Cross);
+    vopv.width (mark_size);
 
     //  fill, frame, text, vertex
     view_ops.push_back (lay::ViewOp (0, lay::ViewOp::Or, 0, 0, 0));
     view_ops.push_back (vop);
     view_ops.push_back (vop);
-    view_ops.push_back (lay::ViewOp (0, lay::ViewOp::Or, 0, 0, 0));
+    view_ops.push_back (vopv);
 
     //  child level
     if (m_child_ctx_color.is_valid ()) {
@@ -4246,21 +4275,27 @@ LayoutViewBase::set_view_ops ()
     } else {
       vop = lay::ViewOp (lay::LayerProperties::brighter (box_color.rgb (), brightness_for_context), lay::ViewOp::Copy, 0, 0, 0);
     }
+    vopv = vop;
+    vopv.shape (lay::ViewOp::Cross);
+    vopv.width (mark_size);
 
     //  fill, frame, text, vertex
     view_ops.push_back (lay::ViewOp (0, lay::ViewOp::Or, 0, 0, 0));
     view_ops.push_back (vop);
     view_ops.push_back (vop);
-    view_ops.push_back (lay::ViewOp (0, lay::ViewOp::Or, 0, 0, 0));
+    view_ops.push_back (vopv);
 
     //  current level
     vop = lay::ViewOp (box_color.rgb (), lay::ViewOp::Copy, 0, 0, 0);
+    vopv = vop;
+    vopv.shape (lay::ViewOp::Cross);
+    vopv.width (mark_size);
 
     //  fill, frame, text, vertex
     view_ops.push_back (lay::ViewOp (0, lay::ViewOp::Or, 0, 0, 0));
     view_ops.push_back (vop);
     view_ops.push_back (vop);
-    view_ops.push_back (lay::ViewOp (0, lay::ViewOp::Or, 0, 0, 0));
+    view_ops.push_back (vopv);
 
   } else {
     //  invisible
@@ -4471,7 +4506,7 @@ LayoutViewBase::set_view_ops ()
           view_ops.push_back (lay::ViewOp (0, lay::ViewOp::Or, 0, 0, 0));
         }
         // vertex 
-        view_ops.push_back (lay::ViewOp (frame_color, mode, 0, 0, 0, lay::ViewOp::Cross, l->marked (true /*real*/) ? 9/*mark size*/ : 0)); // vertex
+        view_ops.push_back (lay::ViewOp (frame_color, mode, 0, 0, 0, lay::ViewOp::Cross, l->marked (true /*real*/) ? mark_size : 0)); // vertex
 
       } else {
         for (unsigned int i = 0; i < (unsigned int) planes_per_layer / 3; ++i) {
@@ -4871,9 +4906,7 @@ LayoutViewBase::cellview_changed (unsigned int index)
 
   cellview_changed_event (index);
 
-  if (m_title.empty ()) {
-    emit_title_changed ();
-  }
+  update_title ();
 }
 
 const lay::CellView &
@@ -4966,10 +4999,8 @@ LayoutViewBase::enable_active_cellview_changed_event (bool enable, bool silent)
         active_cellview_changed_with_index_event (*i);
       }
 
-      //  Because the title reflects the active one, emit a title changed event
-      if (title_string ().empty ()) {
-        emit_title_changed ();
-      }
+      //  Because the title reflects the active cell, emit a title changed event
+      update_title ();
 
     }
 
@@ -4992,10 +5023,8 @@ LayoutViewBase::active_cellview_changed (int index)
     active_cellview_changed_event ();
     active_cellview_changed_with_index_event (index);
 
-    //  Because the title reflects the active one, emit a title changed event
-    if (title_string ().empty ()) {
-      emit_title_changed ();
-    }
+    //  Because the title reflects the active cell, emit a title changed event
+    update_title ();
 
   } else {
     m_active_cellview_changed_events.insert (index);
@@ -5941,14 +5970,11 @@ LayoutViewBase::update_content_for_cv (int /*cellview_index*/)
 void
 LayoutViewBase::rename_cellview (const std::string &name, int cellview_index)
 {
-  if (cellview_index >= 0 && cellview_index < int (m_cellviews.size ())) {
-    if ((*cellview_iter (cellview_index))->name () != name) {
-      (*cellview_iter (cellview_index))->rename (name);
-      update_content_for_cv (cellview_index);
-      if (m_title.empty ()) {
-        emit_title_changed ();
-      }
-    }
+  if (cellview_index >= 0 && cellview_index < int (m_cellviews.size ()) &&
+    (*cellview_iter (cellview_index))->name () != name) {
+    (*cellview_iter (cellview_index))->rename (name);
+    update_content_for_cv (cellview_index);
+    update_title ();
   }
 }
 
@@ -5965,6 +5991,16 @@ LayoutViewBase::cv_transform_variants (int cv_index) const
     }
   }
   return std::vector<db::DCplxTrans> (trns_variants.begin (), trns_variants.end ());
+}
+
+std::vector<db::DCplxTrans>
+LayoutViewBase::cv_transform_variants_with_empty (int cv_index) const
+{
+  std::vector<db::DCplxTrans> trns_variants = cv_transform_variants (cv_index);
+  if (trns_variants.empty ()) {
+    trns_variants.push_back (db::DCplxTrans ());
+  }
+  return trns_variants;
 }
 
 std::vector<db::DCplxTrans>
@@ -6027,7 +6063,32 @@ LayoutViewBase::cv_transform_variants () const
   return box_variants;
 }
 
-db::InstElement 
+std::set< std::pair<db::DCplxTrans, int> >
+LayoutViewBase::cv_transform_variants_with_empty () const
+{
+  std::set< std::pair<db::DCplxTrans, int> > box_variants = cv_transform_variants ();
+
+  //  add a default box variant for the CVs not present in the layer list to
+  //  draw boxes at least.
+
+  std::vector<bool> cv_present;
+  cv_present.resize (m_cellviews.size ());
+  for (auto bv = box_variants.begin (); bv != box_variants.end (); ++bv) {
+    if (bv->second >= 0 && bv->second < int (cv_present.size ())) {
+      cv_present[bv->second] = true;
+    }
+  }
+
+  for (auto i = cv_present.begin (); i != cv_present.end (); ++i) {
+    if (!*i) {
+      box_variants.insert (std::make_pair (db::DCplxTrans (), int (i - cv_present.begin ())));
+    }
+  }
+
+  return box_variants;
+}
+
+db::InstElement
 LayoutViewBase::ascend (int index)
 {
   tl_assert (int (m_cellviews.size ()) > index && cellview_iter (index)->is_valid ());

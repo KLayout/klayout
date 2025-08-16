@@ -348,6 +348,29 @@ class DBCellTests_TestClass < TestBase
 
   end
 
+  # variant enums
+  def test_VariantType
+
+    vt = RBA::VariantType::NoVariants
+    assert_equal(vt.to_s, "NoVariants")
+
+    vt = RBA::VariantType::Orientation
+    assert_equal(vt.to_s, "Orientation")
+
+    vt = RBA::VariantType::Orthogonal
+    assert_equal(vt.to_s, "Orthogonal")
+
+    vt = RBA::VariantType::Magnification
+    assert_equal(vt.to_s, "Magnification")
+
+    vt = RBA::VariantType::XYAnisotropyAndMagnification
+    assert_equal(vt.to_s, "XYAnisotropyAndMagnification")
+
+    vt = RBA::VariantType::MagnificationAndOrientation
+    assert_equal(vt.to_s, "MagnificationAndOrientation")
+
+  end
+
 end
 
 load("test_epilogue.rb")

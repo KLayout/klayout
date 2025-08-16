@@ -43,6 +43,7 @@
 #  include "layLayoutView.h"
 #  include "layTipDialog.h"
 #  include "layDragDropData.h"
+#  include "layBusy.h"
 #endif
 
 #if defined(HAVE_QT)
@@ -1685,7 +1686,7 @@ InstService::do_begin_edit (const db::DPoint &p)
   std::pair<bool, db::cell_index_type> ci = make_cell (cv);
   if (ci.first) {
     // use the snapped lower left corner of the bbox unless the origin is inside the bbox
-    db::Box cell_bbox = cv->layout ().cell (ci.second).bbox ();
+    db::Box cell_bbox = cv->layout ().cell (ci.second).bbox_with_empty ();
     if (! m_place_origin && ! cell_bbox.contains (db::Point ())) {
       db::CplxTrans ct (1.0, m_angle, m_mirror, db::DVector ());
       m_disp = db::DPoint () + (m_disp - snap (cell_bbox.transformed (ct).lower_left () * cv->layout ().dbu ()));
@@ -1721,6 +1722,11 @@ InstService::make_cell (const lay::CellView &cv)
   if (m_has_valid_cell) {
     return std::make_pair (true, m_current_cell);
   }
+
+#if defined(HAVE_QT)
+  //  prevents recursion
+  lay::BusySection busy;
+#endif
 
   //  NOTE: do this at the beginning: creating a transaction might delete transactions behind the
   //  head transaction, hence releasing (thus: deleting) cells. To prevert interference, create
@@ -1824,7 +1830,7 @@ InstService::do_mouse_move (const db::DPoint &p)
   std::pair<bool, db::cell_index_type> ci = make_cell (cv);
   if (ci.first) {
     //  use the snapped lower left corner of the bbox unless the origin is inside the bbox
-    db::Box cell_bbox = cv->layout ().cell (ci.second).bbox ();
+    db::Box cell_bbox = cv->layout ().cell (ci.second).bbox_with_empty ();
     if (! m_place_origin && ! cell_bbox.contains (db::Point ())) {
       db::CplxTrans ct (1.0, m_angle, m_mirror, db::DVector ());
       m_disp = db::DPoint () + (m_disp - snap (cell_bbox.transformed (ct).lower_left () * cv->layout ().dbu ()));

@@ -3692,10 +3692,41 @@ scan_angle_bracket (tl::Extractor &ex, const char *term, std::string &s)
   ex.expect (term);
 }
 
+static bool
+get_match_group (tl::Extractor &ex, int &group)
+{
+  tl::Extractor ex1 = ex;
+  group = 0;
+  if (ex1.test ("$") && isdigit (*ex1)) {
+    ex1.read (group);
+    ex = ex1;
+    return true;
+  } else {
+    return false;
+  }
+}
+
+static bool
+get_variable_name (tl::Extractor &ex, std::string &name)
+{
+  tl::Extractor ex1 = ex;
+  if (ex1.try_read_word (name, "_")) {
+    ex = ex1;
+    return true;
+  } else if (ex1.test ("$")) {
+    name = "$";
+    ex = ex1;
+    return true;
+  } else {
+    return false;
+  }
+}
+
 void
 Eval::eval_atomic (ExpressionParserContext &ex, std::unique_ptr<ExpressionNode> &n, int am)
 {
   double g = 0.0;
+  int match_group = 0;
   std::string t;
 
   ExpressionParserContext ex1 = ex;
@@ -3792,12 +3823,10 @@ Eval::eval_atomic (ExpressionParserContext &ex, std::unique_ptr<ExpressionNode> 
 
     }
 
-  } else if (ex.test ("$")) {
+  } else if (get_match_group (ex, match_group)) {
 
     //  match substring
-    int i = 0;
-    ex.read (i);
-    n.reset (new MatchSubstringReferenceNode (ex1, this, i - 1));
+    n.reset (new MatchSubstringReferenceNode (ex1, this, match_group - 1));
 
   } else if (ex.test ("{")) {
 
@@ -3934,12 +3963,7 @@ Eval::eval_atomic (ExpressionParserContext &ex, std::unique_ptr<ExpressionNode> 
 
     n.reset (new ConstantExpressionNode (ex1, tl::Variant (t)));
 
-  } else if (ex.try_read_word (t, "_")) {
-
-    ExpressionParserContext ex2 = ex;
-
-    //  for a function: collect the parameter or check if it's an assignment
-    std::vector <tl::Variant> vv;
+  } else if (get_variable_name (ex, t)) {
 
     const EvalFunction *function = 0;
     const tl::Variant *value = 0;

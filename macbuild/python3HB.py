@@ -33,8 +33,7 @@ def SetGlobals():
     Usage += "\n"
     Usage += "   option & argument      : descriptions                              | default value\n"
     Usage += "   -------------------------------------------------------------------+---------------\n"
-    Usage += "   <-v|--version <number>>: in ['3.8', '3.9', '3.10', '3.11', '3.12', | ''\n"
-    Usage += "                                '3.13']                               |\n"
+    Usage += "   <-v|--version <number>>: in ['3.11', '3.12','3.13']                | ''\n"
     Usage += "   [-u|-unlink]           : unlink only                               | disabled\n"
     Usage += "   [-?|--?]               : print this usage and exit                 | disabled\n"
     Usage += "----------------------------------------------------------------------+-----------------\n"
@@ -50,7 +49,7 @@ def Parse_CLI_Args():
 
     p.add_option( '-v', '--version',
                   dest='version',
-                  help="python3 version=['3.8', '3.9', '3.10', '3.11', '3.12', '3.13']" )
+                  help="python3 version=['3.11', '3.12', '3.13']" )
 
     p.add_option( '-u', '--unlink',
                   action='store_true',
@@ -75,7 +74,7 @@ def Parse_CLI_Args():
 
     Version    = opt.version
     UnlinkOnly = opt.unlink
-    if not Version in [ '3.8', '3.9', '3.10', '3.11', '3.12', '3.13' ]:
+    if not Version in [ '3.11', '3.12', '3.13' ]:
         print( "! Unsupported Python 3 version <%s>" % Version )
         print(Usage)
         sys.exit(0)

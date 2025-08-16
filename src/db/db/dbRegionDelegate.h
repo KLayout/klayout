@@ -57,6 +57,8 @@ class Net;
 class DB_PUBLIC PolygonFilterBase
 {
 public:
+  typedef db::Polygon shape_type;
+
   /**
    *  @brief Constructor
    */
@@ -68,25 +70,25 @@ public:
    *  @brief Filters the polygon
    *  If this method returns true, the polygon is kept. Otherwise it's discarded.
    */
-  virtual bool selected (const db::Polygon &polygon) const = 0;
+  virtual bool selected (const db::Polygon &polygon, db::properties_id_type prop_id) const = 0;
 
   /**
    *  @brief Filters the polygon reference
    *  If this method returns true, the polygon is kept. Otherwise it's discarded.
    */
-  virtual bool selected (const db::PolygonRef &polygon) const = 0;
+  virtual bool selected (const db::PolygonRef &polygon, db::properties_id_type prop_id) const = 0;
 
   /**
    *  @brief Filters the set of polygons (taking the overall properties)
    *  If this method returns true, the polygon is kept. Otherwise it's discarded.
    */
-  virtual bool selected_set (const std::unordered_set<db::Polygon> &polygons) const = 0;
+  virtual bool selected_set (const std::unordered_set<db::PolygonWithProperties> &polygons) const = 0;
 
   /**
    *  @brief Filters the set of polygon references (taking the overall properties)
    *  If this method returns true, the polygon is kept. Otherwise it's discarded.
    */
-  virtual bool selected_set (const std::unordered_set<db::PolygonRef> &polygons) const = 0;
+  virtual bool selected_set (const std::unordered_set<db::PolygonRefWithProperties> &polygons) const = 0;
 
   /**
    *  @brief Returns the transformation reducer for building cell variants
@@ -167,6 +169,12 @@ public:
     return m_merged_semantics;
   }
 
+  void set_join_properties_on_merge (bool f);
+  bool join_properties_on_merge () const
+  {
+    return m_join_properties_on_merge;
+  }
+
   void set_strict_handling (bool f);
   bool strict_handling () const
   {
@@ -214,15 +222,16 @@ public:
   virtual EdgesDelegate *edges (const EdgeFilterBase *filter, const db::PolygonToEdgeProcessorBase *proc) const = 0;
   virtual RegionDelegate *filter_in_place (const PolygonFilterBase &filter) = 0;
   virtual RegionDelegate *filtered (const PolygonFilterBase &filter) const = 0;
+  virtual std::pair<RegionDelegate *, RegionDelegate *> filtered_pair (const PolygonFilterBase &filter) const = 0;
   virtual RegionDelegate *process_in_place (const PolygonProcessorBase &filter) = 0;
   virtual RegionDelegate *processed (const PolygonProcessorBase &filter) const = 0;
   virtual EdgesDelegate *processed_to_edges (const PolygonToEdgeProcessorBase &filter) const = 0;
   virtual EdgePairsDelegate *processed_to_edge_pairs (const PolygonToEdgePairProcessorBase &filter) const = 0;
 
   virtual RegionDelegate *merged_in_place () = 0;
-  virtual RegionDelegate *merged_in_place (bool min_coherence, unsigned int min_wc) = 0;
+  virtual RegionDelegate *merged_in_place (bool min_coherence, unsigned int min_wc, bool join_properties_on_merge) = 0;
   virtual RegionDelegate *merged () const = 0;
-  virtual RegionDelegate *merged (bool min_coherence, unsigned int min_wc) const = 0;
+  virtual RegionDelegate *merged (bool min_coherence, unsigned int min_wc, bool join_properties_on_merge) const = 0;
 
   virtual RegionDelegate *sized (coord_type d, unsigned int mode) const = 0;
   virtual RegionDelegate *sized (coord_type dx, coord_type dy, unsigned int mode) const = 0;
@@ -295,9 +304,11 @@ public:
 protected:
   virtual void merged_semantics_changed () { }
   virtual void min_coherence_changed () { }
+  virtual void join_properties_on_merge_changed () { }
 
 private:
   bool m_merged_semantics;
+  bool m_join_properties_on_merge;
   bool m_strict_handling;
   bool m_merge_min_coherence;
   bool m_report_progress;

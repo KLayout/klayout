@@ -261,6 +261,37 @@ TEST(4)
     db::EdgeOrientationFilter f1 (89.0, true, 90.0, false, false, false);
     EXPECT_EQ (r.filtered (f1).to_string (), "");
   }
+
+  //  issue-2060
+  {
+    db::EdgeOrientationFilter f1 (90.0, true, false);
+    db::EdgeOrientationFilter f2 (90.0, false, false);
+    db::EdgeOrientationFilter f45 (45.0, false, false);
+    db::SpecialEdgeOrientationFilter fs (db::SpecialEdgeOrientationFilter::Diagonal, false);
+
+    db::Edges rr;
+    rr.insert (db::Box (db::Point (0, 0), db::Point (1000, 4000000)));
+    EXPECT_EQ (db::compare (rr.filtered (f1), "(1000,0;0,0);(0,4000000;1000,4000000)"), true);
+
+    rr.clear ();
+    rr.insert (db::Box (db::Point (0, 0), db::Point (1000, 400000)));
+    EXPECT_EQ (db::compare (rr.filtered (f1), "(1000,0;0,0);(0,400000;1000,400000)"), true);
+
+    rr.clear ();
+    rr.insert (db::Box (db::Point (0, -1000000000), db::Point (1000, 1000000000)));
+    EXPECT_EQ (db::compare (rr.filtered (f1), "(1000,-1000000000;0,-1000000000);(0,1000000000;1000,1000000000)"), true);
+
+    rr.clear ();
+    rr.insert (db::Box (db::Point (0, -1000000000), db::Point (1000, 1000000000)));
+    EXPECT_EQ (db::compare (rr.filtered (f2), "(0,-1000000000;0,1000000000);(1000,1000000000;1000,-1000000000)"), true);
+
+    EXPECT_EQ (f2.selected (db::Edge (db::Point (0, -1000000000), db::Point (0, 1000000000)), size_t (0)), true);
+    EXPECT_EQ (f2.selected (db::Edge (db::Point (0, -1000000000), db::Point (1, 1000000000)), size_t (0)), false);
+    EXPECT_EQ (f45.selected (db::Edge (db::Point (-1000000000, -1000000000), db::Point (1000000000, 1000000000)), size_t (0)), true);
+    EXPECT_EQ (f45.selected (db::Edge (db::Point (-1000000000, -1000000000), db::Point (1000000000, 1000000001)), size_t (0)), false);
+    EXPECT_EQ (fs.selected (db::Edge (db::Point (-1000000000, -1000000000), db::Point (1000000000, 1000000000)), size_t (0)), true);
+    EXPECT_EQ (fs.selected (db::Edge (db::Point (-1000000000, -1000000000), db::Point (1000000000, 1000000001)), size_t (0)), false);
+  }
 }
 
 TEST(5) 
@@ -1373,6 +1404,93 @@ TEST(31)
 
   CHECKPOINT();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_edges_au3_flat.gds");
+}
+
+TEST(32_add_with_properties)
+{
+  db::DeepShapeStore dss ("TOP", 0.001);
+  db::Edges rd1 (dss), rd2 (dss);
+  db::Edges rf1, rf2;
+
+  db::PropertiesSet ps;
+  ps.insert ("net", 17);
+  db::properties_id_type pid = db::properties_id (ps);
+
+  rf1.insert (db::EdgeWithProperties (db::Edge (-10, 20, 20, 60), pid));
+  rd1.insert (db::EdgeWithProperties (db::Edge (-10, 20, 20, 60), pid));
+
+  rf2.insert (db::EdgeWithProperties (db::Edge (10, 20, 40, 60), pid));
+  rd2.insert (db::EdgeWithProperties (db::Edge (10, 20, 40, 60), pid));
+
+  db::Layout ly;
+  db::Cell &top_cell = ly.cell (ly.add_cell ("TOP"));
+  unsigned int l1 = ly.insert_layer ();
+  unsigned int l2 = ly.insert_layer ();
+
+  top_cell.shapes (l1).insert (db::EdgeWithProperties (db::Edge (-10, 20, 20, 60), pid));
+  top_cell.shapes (l2).insert (db::EdgeWithProperties (db::Edge (10, 20, 40, 60), pid));
+
+  db::Edges ro1 (db::RecursiveShapeIterator (ly, top_cell, l1), false);
+  db::Edges ro2 (db::RecursiveShapeIterator (ly, top_cell, l2), false);
+
+  //  enable properties
+  ro1.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
+  ro2.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
+
+  db::Edges r;
+  r += rf1;
+  r += rf2;
+  EXPECT_EQ (r.to_string (), "(-10,20;20,60){net=>17};(10,20;40,60){net=>17}");
+  EXPECT_EQ ((rf1 + rf2).to_string (), "(-10,20;20,60){net=>17};(10,20;40,60){net=>17}");
+
+  r = db::Edges ();
+  r += rd1;
+  r += rf2;
+  EXPECT_EQ (r.to_string (), "(-10,20;20,60){net=>17};(10,20;40,60){net=>17}");
+  EXPECT_EQ ((rd1 + rf2).to_string (), "(-10,20;20,60){net=>17};(10,20;40,60){net=>17}");
+
+  r = db::Edges ();
+  r += rf1;
+  r += rd2;
+  EXPECT_EQ (r.to_string (), "(-10,20;20,60){net=>17};(10,20;40,60){net=>17}");
+  EXPECT_EQ ((rf1 + rd2).to_string (), "(-10,20;20,60){net=>17};(10,20;40,60){net=>17}");
+
+  r = db::Edges ();
+  r += rd1;
+  r += rd2;
+  EXPECT_EQ (r.to_string (), "(-10,20;20,60){net=>17};(10,20;40,60){net=>17}");
+  EXPECT_EQ ((rd1 + rd2).to_string (), "(-10,20;20,60){net=>17};(10,20;40,60){net=>17}");
+
+  r = db::Edges ();
+  r += ro1;
+  r += ro2;
+  EXPECT_EQ (r.to_string (), "(-10,20;20,60){net=>17};(10,20;40,60){net=>17}");
+  EXPECT_EQ ((ro1 + ro2).to_string (), "(-10,20;20,60){net=>17};(10,20;40,60){net=>17}");
+
+  r = db::Edges ();
+  r += ro1;
+  r += rf2;
+  EXPECT_EQ (r.to_string (), "(10,20;40,60){net=>17};(-10,20;20,60){net=>17}");
+  EXPECT_EQ ((ro1 + rf2).to_string (), "(10,20;40,60){net=>17};(-10,20;20,60){net=>17}");
+}
+
+TEST(33_properties)
+{
+  db::PropertiesSet ps;
+
+  ps.insert (tl::Variant ("id"), 1);
+  db::properties_id_type pid1 = db::properties_id (ps);
+
+  db::Edges edges;
+  edges.insert (db::EdgeWithProperties (db::Edge (db::Point (0, 0), db::Point (10, 20)), pid1));
+  edges.insert (db::Edge (db::Point (0, 0), db::Point (10, 20)));
+
+  EXPECT_EQ (edges.nth (0)->to_string (), "(0,0;10,20)");
+  EXPECT_EQ (edges.nth (1)->to_string (), "(0,0;10,20)");
+  EXPECT_EQ (edges.nth (2) == 0, true);
+
+  EXPECT_EQ (edges.nth_prop_id (0), db::properties_id_type (0));
+  EXPECT_EQ (edges.nth_prop_id (1), pid1);
 }
 
 //  GitHub issue #72 (Edges/Region NOT issue)

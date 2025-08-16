@@ -1136,7 +1136,7 @@ BEGIN_PROTECTED
   progress.set_unit (100000);
   progress.set_format ("Processing ..");
 
-  db::LayoutQueryIterator iq (lq, &cv->layout (), 0, &progress);
+  db::LayoutQueryIterator iq (lq, &cv->layout (), cv.cell (), 0, &progress);
 
   if (tl::verbosity () >= 10) {
     tl::log << tl::to_string (QObject::tr ("Running query: ")) << m_last_query;
@@ -1198,7 +1198,7 @@ BEGIN_PROTECTED
   progress.set_unit (100000);
   progress.set_format ("Processing ..");
 
-  db::LayoutQueryIterator iq (lq, &cv->layout (), 0, &progress);
+  db::LayoutQueryIterator iq (lq, &cv->layout (), cv.cell (), 0, &progress);
 
   if (tl::verbosity () >= 10) {
     tl::log << tl::to_string (QObject::tr ("Running query: ")) << m_last_query;
@@ -1246,7 +1246,7 @@ BEGIN_PROTECTED
   progress.set_unit (100000);
   progress.set_format ("Processing ..");
 
-  db::LayoutQueryIterator iq (lq, &cv->layout (), 0, &progress);
+  db::LayoutQueryIterator iq (lq, &cv->layout (), cv.cell (), 0, &progress);
 
   if (tl::verbosity () >= 10) {
     tl::log << tl::to_string (QObject::tr ("Running query: ")) << m_last_query;
@@ -1317,7 +1317,7 @@ BEGIN_PROTECTED
   progress.set_unit (100000);
   progress.set_format ("Processing ..");
 
-  db::LayoutQueryIterator iq (lq, &cv->layout (), 0, &progress);
+  db::LayoutQueryIterator iq (lq, &cv->layout (), cv.cell (), 0, &progress);
 
   if (tl::verbosity () >= 10) {
     tl::log << tl::to_string (QObject::tr ("Running query: ")) << m_last_query;
@@ -1371,7 +1371,7 @@ BEGIN_PROTECTED
   progress.set_unit (100000);
   progress.set_format ("Processing ..");
 
-  db::LayoutQueryIterator iq (lq, &cv->layout (), 0, &progress);
+  db::LayoutQueryIterator iq (lq, &cv->layout (), cv.cell (), 0, &progress);
 
   if (tl::verbosity () >= 10) {
     tl::log << tl::to_string (QObject::tr ("Running query: ")) << m_last_query;
@@ -1668,7 +1668,7 @@ SearchReplaceDialog::issue_query (const std::string &q, const std::set<size_t> *
     progress.set_unit (100000);
     progress.set_format ("Processing ..");
 
-    db::LayoutQueryIterator iq (lq, &cv->layout (), 0, &progress);
+    db::LayoutQueryIterator iq (lq, &cv->layout (), cv.cell (), 0, &progress);
     while (! iq.at_end ()) {
       ++iq;
     }
@@ -1690,7 +1690,7 @@ SearchReplaceDialog::issue_query (const std::string &q, const std::set<size_t> *
     progress.set_format ("Processing ..");
 
     size_t n = 0;
-    for (db::LayoutQueryIterator iq (lq, &cv->layout (), 0, &progress); ! iq.at_end (); ++n) {
+    for (db::LayoutQueryIterator iq (lq, &cv->layout (), cv.cell (), 0, &progress); ! iq.at_end (); ++n) {
       iq.next (selected_items->find (n) == selected_items->end ());
     }
 
@@ -1767,7 +1767,7 @@ SearchReplaceDialog::update_results (const std::string &q)
     progress.set_unit (100000);
     progress.set_format ("Processing ..");
 
-    db::LayoutQueryIterator iq (lq, &cv->layout (), 0, &progress);
+    db::LayoutQueryIterator iq (lq, &cv->layout (), cv.cell (), 0, &progress);
 
     if (tl::verbosity () >= 10) {
       tl::log << tl::to_string (QObject::tr ("Running query: ")) << q;

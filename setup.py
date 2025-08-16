@@ -593,6 +593,25 @@ _db = Library(
 config.add_extension(_db)
 
 # ------------------------------------------------------------------
+# _pex dependency library
+
+_pex_path = os.path.join("src", "pex", "pex")
+_pex_sources = set(glob.glob(os.path.join(_pex_path, "*.cc")))
+
+_pex = Library(
+    config.root + "._pex",
+    define_macros=config.macros() + [("MAKE_PEX_LIBRARY", 1)],
+    include_dirs=[_tl_path, _gsi_path, _db_path, _pex_path],
+    extra_objects=[config.path_of("_tl", _tl_path), config.path_of("_gsi", _gsi_path), config.path_of("_db", _db_path)],
+    language="c++",
+    libraries=config.libraries('_pex'),
+    extra_link_args=config.link_args("_pex"),
+    extra_compile_args=config.compile_args("_pex"),
+    sources=list(_pex_sources),
+)
+config.add_extension(_pex)
+
+# ------------------------------------------------------------------
 # _lib dependency library
 
 _lib_path = os.path.join("src", "lib", "lib")
@@ -870,6 +889,28 @@ db = Extension(
 )
 
 # ------------------------------------------------------------------
+# pex extension library
+
+pex_path = os.path.join("src", "pymod", "pex")
+pex_sources = set(glob.glob(os.path.join(pex_path, "*.cc")))
+
+pex = Extension(
+    config.root + ".pexcore",
+    define_macros=config.macros(),
+    include_dirs=[_db_path, _tl_path, _gsi_path, _pya_path, _pex_path],
+    extra_objects=[
+        config.path_of("_db", _db_path),
+        config.path_of("_pex", _pex_path),
+        config.path_of("_tl", _tl_path),
+        config.path_of("_gsi", _gsi_path),
+        config.path_of("_pya", _pya_path),
+    ],
+    extra_link_args=config.link_args("pexcore"),
+    extra_compile_args=config.compile_args("pexcore"),
+    sources=list(pex_sources),
+)
+
+# ------------------------------------------------------------------
 # lib extension library
 
 lib_path = os.path.join("src", "pymod", "lib")
@@ -987,7 +1028,7 @@ if __name__ == "__main__":
     setup(
         name=config.root,
         version=config.version(),
-        license="GNU GPLv3",
+        license="GPL-3.0-or-later",
         description="KLayout standalone Python package",
         long_description="This package is a standalone distribution of KLayout's Python API.\n\nFor more details see here: https://www.klayout.org/klayout-pypi",
         author="Matthias Koefferlein",
@@ -996,7 +1037,6 @@ if __name__ == "__main__":
             # Recommended classifiers
             "Programming Language :: Python :: 2",
             "Programming Language :: Python :: 3",
-            "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
             "Operating System :: MacOS :: MacOS X",
             "Operating System :: Microsoft :: Windows",
             "Operating System :: POSIX :: Linux",
@@ -1011,8 +1051,8 @@ if __name__ == "__main__":
         package_data={config.root: ["src/pymod/distutils_src/klayout/*.pyi"]},
         data_files=[(config.root, ["src/pymod/distutils_src/klayout/py.typed"])],
         include_package_data=True,
-        ext_modules=[_tl, _gsi, _pya, _rba, _db, _lib, _rdb, _lym, _laybasic, _layview, _ant, _edt, _img]
+        ext_modules=[_tl, _gsi, _pya, _rba, _db, _pex, _lib, _rdb, _lym, _laybasic, _layview, _ant, _edt, _img]
             + db_plugins
-            + [tl, db, lib, rdb, lay, pya],
+            + [tl, db, pex, lib, rdb, lay, pya],
         cmdclass={'build_ext': klayout_build_ext}
     )

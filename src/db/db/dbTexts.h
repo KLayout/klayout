@@ -54,10 +54,12 @@ class Texts;
 class DB_PUBLIC TextFilterBase
 {
 public:
+  typedef db::Text shape_type;
+
   TextFilterBase () { }
   virtual ~TextFilterBase () { }
 
-  virtual bool selected (const db::Text &text) const = 0;
+  virtual bool selected (const db::Text &text, db::properties_id_type prop_id) const = 0;
   virtual const TransformationReducer *vars () const = 0;
   virtual bool wants_variants () const = 0;
 };
@@ -125,6 +127,17 @@ public:
   }
 
   /**
+   *  @brief Constructor from an object with properties
+   *
+   *  Creates an text set representing a single instance of that object
+   */
+  explicit Texts (const db::TextWithProperties &s)
+    : mp_delegate (0)
+  {
+    insert (s);
+  }
+
+  /**
    *  @brief Constructor from an object
    *
    *  Creates an text set representing a single instance of that object
@@ -182,6 +195,12 @@ public:
   explicit Texts (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans);
 
   /**
+   *  @brief Creates a new empty layer inside the dss
+   *  This method requires the DSS to be singular.
+   */
+  explicit Texts (DeepShapeStore &dss);
+
+  /**
    *  @brief Writes the text collection to a file
    *
    *  This method is provided for debugging purposes. A flat image of the
@@ -211,6 +230,16 @@ public:
   TextsDelegate *delegate ()
   {
     return mp_delegate;
+  }
+
+  /**
+   *  @brief Takes the underlying delegate object
+   */
+  TextsDelegate *take_delegate ()
+  {
+    TextsDelegate *delegate = mp_delegate;
+    mp_delegate = 0;
+    return delegate;
   }
 
   /**
@@ -321,6 +350,18 @@ public:
   Texts filtered (const TextFilterBase &filter) const
   {
     return Texts (mp_delegate->filtered (filter));
+  }
+
+  /**
+   *  @brief Returns the filtered texts and the others
+   *
+   *  This method will return a new text collection with only those texts which
+   *  conform to the filter criterion and another for those which don't.
+   */
+  std::pair<Texts, Texts> split_filter (const TextFilterBase &filter) const
+  {
+    std::pair<db::TextsDelegate *, db::TextsDelegate *> p = mp_delegate->filtered_pair (filter);
+    return std::make_pair (Texts (p.first), Texts (p.second));
   }
 
   /**
@@ -456,12 +497,23 @@ public:
   /**
    *  @brief Returns the nth text
    *
-   *  This operation is available only for flat regions - i.e. such for which
+   *  This operation is available only for flat text collections - i.e. such for which
    *  "has_valid_texts" is true.
    */
   const db::Text *nth (size_t n) const
   {
     return mp_delegate->nth (n);
+  }
+
+  /**
+   *  @brief Returns the nth text's property ID
+   *
+   *  This operation is available only for flat text collections - i.e. such for which
+   *  "has_valid_texts" is true.
+   */
+  db::properties_id_type nth_prop_id (size_t n) const
+  {
+    return mp_delegate->nth_prop_id (n);
   }
 
   /**
@@ -551,7 +603,7 @@ public:
    *  The given extension is applied in all directions rendering a square of 2*e
    *  width and height. The center of the boxes will be the position of the texts.
    */
-  void polygons (Region &output, db::Coord e = 1) const;
+  void polygons (Region &output, db::Coord e = 1, const tl::Variant &text_prop = tl::Variant ()) const;
 
   /**
    *  @brief Returns individual, dot-like edges

@@ -101,7 +101,7 @@ FlatTexts::filter_in_place (const TextFilterBase &filter)
 
   text_iterator_type pw = texts.get_layer<db::Text, db::unstable_layer_tag> ().begin ();
   for (TextsIterator p (begin ()); ! p.at_end (); ++p) {
-    if (filter.selected (*p)) {
+    if (filter.selected (*p, p.prop_id ())) {
       if (pw == texts.get_layer<db::Text, db::unstable_layer_tag> ().end ()) {
         texts.get_layer<db::Text, db::unstable_layer_tag> ().insert (*p);
         pw = texts.get_layer<db::Text, db::unstable_layer_tag> ().end ();
@@ -125,18 +125,16 @@ TextsDelegate *FlatTexts::add (const Texts &other) const
   if (other_flat) {
 
     new_texts->raw_texts ().insert (other_flat->raw_texts ().get_layer<db::Text, db::unstable_layer_tag> ().begin (), other_flat->raw_texts ().get_layer<db::Text, db::unstable_layer_tag> ().end ());
+    new_texts->raw_texts ().insert (other_flat->raw_texts ().get_layer<db::TextWithProperties, db::unstable_layer_tag> ().begin (), other_flat->raw_texts ().get_layer<db::TextWithProperties, db::unstable_layer_tag> ().end ());
 
   } else {
 
-    size_t n = new_texts->raw_texts ().size ();
     for (TextsIterator p (other.begin ()); ! p.at_end (); ++p) {
-      ++n;
-    }
-
-    new_texts->raw_texts ().reserve (db::Text::tag (), n);
-
-    for (TextsIterator p (other.begin ()); ! p.at_end (); ++p) {
-      new_texts->raw_texts ().insert (*p);
+      if (p.prop_id () == 0) {
+        new_texts->raw_texts ().insert (*p);
+      } else {
+        new_texts->raw_texts ().insert (db::TextWithProperties (*p, p.prop_id ()));
+      }
     }
 
   }
@@ -154,18 +152,16 @@ TextsDelegate *FlatTexts::add_in_place (const Texts &other)
   if (other_flat) {
 
     texts.insert (other_flat->raw_texts ().get_layer<db::Text, db::unstable_layer_tag> ().begin (), other_flat->raw_texts ().get_layer<db::Text, db::unstable_layer_tag> ().end ());
+    texts.insert (other_flat->raw_texts ().get_layer<db::TextWithProperties, db::unstable_layer_tag> ().begin (), other_flat->raw_texts ().get_layer<db::TextWithProperties, db::unstable_layer_tag> ().end ());
 
   } else {
 
-    size_t n = texts.size ();
     for (TextsIterator p (other.begin ()); ! p.at_end (); ++p) {
-      ++n;
-    }
-
-    texts.reserve (db::Text::tag (), n);
-
-    for (TextsIterator p (other.begin ()); ! p.at_end (); ++p) {
-      texts.insert (*p);
+      if (p.prop_id () == 0) {
+        texts.insert (*p);
+      } else {
+        texts.insert (db::TextWithProperties (*p, p.prop_id ()));
+      }
     }
 
   }
@@ -175,7 +171,46 @@ TextsDelegate *FlatTexts::add_in_place (const Texts &other)
 
 const db::Text *FlatTexts::nth (size_t n) const
 {
-  return n < mp_texts->size () ? &mp_texts->get_layer<db::Text, db::unstable_layer_tag> ().begin () [n] : 0;
+  //  NOTE: this assumes that we iterate over non-property texts first and then over texts with properties
+
+  if (n >= mp_texts->size ()) {
+    return 0;
+  }
+
+  const db::layer<db::Text, db::unstable_layer_tag> &l = mp_texts->get_layer<db::Text, db::unstable_layer_tag> ();
+  if (n < l.size ()) {
+    return &l.begin () [n];
+  }
+  n -= l.size ();
+
+  const db::layer<db::TextWithProperties, db::unstable_layer_tag> &lp = mp_texts->get_layer<db::TextWithProperties, db::unstable_layer_tag> ();
+  if (n < lp.size ()) {
+    return &lp.begin () [n];
+  }
+
+  return 0;
+}
+
+db::properties_id_type FlatTexts::nth_prop_id (size_t n) const
+{
+  //  NOTE: this assumes that we iterate over non-property polygons first and then over polygons with properties
+
+  if (n >= mp_texts->size ()) {
+    return 0;
+  }
+
+  const db::layer<db::Text, db::unstable_layer_tag> &l = mp_texts->get_layer<db::Text, db::unstable_layer_tag> ();
+  if (n < l.size ()) {
+    return 0;
+  }
+  n -= l.size ();
+
+  const db::layer<db::TextWithProperties, db::unstable_layer_tag> &lp = mp_texts->get_layer<db::TextWithProperties, db::unstable_layer_tag> ();
+  if (n < lp.size ()) {
+    return lp.begin () [n].properties_id ();
+  }
+
+  return 0;
 }
 
 bool FlatTexts::has_valid_texts () const
@@ -219,9 +254,13 @@ FlatTexts::insert_into (Layout *layout, db::cell_index_type into_cell, unsigned 
 }
 
 void
-FlatTexts::do_insert (const db::Text &t)
+FlatTexts::do_insert (const db::Text &t, db::properties_id_type prop_id)
 {
-  mp_texts->insert (t);
+  if (prop_id != 0) {
+    mp_texts->insert (db::TextWithProperties (t, prop_id));
+  } else {
+    mp_texts->insert (t);
+  }
   invalidate_cache ();
 }
 

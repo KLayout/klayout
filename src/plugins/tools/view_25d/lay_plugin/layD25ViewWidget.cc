@@ -661,14 +661,14 @@ D25ViewWidget::enter (const db::RecursiveShapeIterator *iter, double zstart, dou
 void
 D25ViewWidget::entry (const db::Region &data, double dbu, double zstart, double zstop)
 {
-  //  try to establish a default color from the region's origin if required
-  const db::RecursiveShapeIterator *iter = 0;
   const db::OriginalLayerRegion *original = dynamic_cast<const db::OriginalLayerRegion *> (data.delegate ());
   if (original) {
-    iter = original->iter ();
+    //  try to establish a default color from the region's origin if required
+    auto it = original->begin_iter ();
+    enter (&it.first, zstart, zstop);
+  } else {
+    enter (0, zstart, zstop);
   }
-
-  enter (iter, zstart, zstop);
 
   tl::AbsoluteProgress progress (tl::to_string (tr ("Rendering ...")));
   render_region (progress, *m_layers.back ().vertex_chunk, *m_layers.back ().normals_chunk, *m_layers.back ().line_chunk, data, dbu, db::CplxTrans (dbu).inverted () * m_bbox, zstart, zstop);
@@ -677,14 +677,14 @@ D25ViewWidget::entry (const db::Region &data, double dbu, double zstart, double 
 void
 D25ViewWidget::entry (const db::Edges &data, double dbu, double zstart, double zstop)
 {
-  //  try to establish a default color from the region's origin if required
-  const db::RecursiveShapeIterator *iter = 0;
   const db::OriginalLayerEdges *original = dynamic_cast<const  db::OriginalLayerEdges *> (data.delegate ());
   if (original) {
-    iter = original->iter ();
+    //  try to establish a default color from the region's origin if required
+    auto it = original->begin_iter ();
+    enter (&it.first, zstart, zstop);
+  } else {
+    enter (0, zstart, zstop);
   }
-
-  enter (iter, zstart, zstop);
 
   tl::AbsoluteProgress progress (tl::to_string (tr ("Rendering ...")));
   render_edges (progress, *m_layers.back ().vertex_chunk, *m_layers.back ().normals_chunk, *m_layers.back ().line_chunk, data, dbu, db::CplxTrans (dbu).inverted () * m_bbox, zstart, zstop);
@@ -693,14 +693,14 @@ D25ViewWidget::entry (const db::Edges &data, double dbu, double zstart, double z
 void
 D25ViewWidget::entry (const db::EdgePairs &data, double dbu, double zstart, double zstop)
 {
-  //  try to establish a default color from the region's origin if required
-  const db::RecursiveShapeIterator *iter = 0;
   const db::OriginalLayerEdgePairs *original = dynamic_cast<const  db::OriginalLayerEdgePairs *> (data.delegate ());
   if (original) {
-    iter = original->iter ();
+    //  try to establish a default color from the region's origin if required
+    auto it = original->begin_iter ();
+    enter (&it.first, zstart, zstop);
+  } else {
+    enter (0, zstart, zstop);
   }
-
-  enter (iter, zstart, zstop);
 
   tl::AbsoluteProgress progress (tl::to_string (tr ("Rendering ...")));
   render_edge_pairs (progress, *m_layers.back ().vertex_chunk, *m_layers.back ().normals_chunk, *m_layers.back ().line_chunk, data, dbu, db::CplxTrans (dbu).inverted () * m_bbox, zstart, zstop);

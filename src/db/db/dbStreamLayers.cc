@@ -236,7 +236,19 @@ LayerMap::substitute_placeholder (const db::LayerProperties &p, const std::set<u
       lp_new.layer = db::ld_combine (p.layer, lp_ph.layer);
       lp_new.datatype = db::ld_combine (p.datatype, lp_ph.datatype);
 
-      unsigned int l_new = layout.insert_layer (lp_new);
+      //  if the placeholder-extrapolated layer is a target layer, go to that one
+      unsigned int l_new = std::numeric_limits<unsigned int>::max ();
+      for (std::map<unsigned int, db::LayerProperties>::const_iterator t = m_target_layers.begin (); t != m_target_layers.end (); ++t) {
+        if (t->second.log_equal (lp_new) && layout.is_valid_layer (t->first)) {
+          l_new = t->first;
+          break;
+        }
+      }
+
+      if (l_new == std::numeric_limits<unsigned int>::max ()) {
+        l_new = layout.insert_layer (lp_new);
+      }
+
       map (p, l_new, lp_new);
       res.insert (l_new);
 
@@ -929,7 +941,10 @@ db::LayerMap
 LayerMap::from_string_file_format (const std::string &s)
 {
   db::LayerMap lm;
-  unsigned int l = 0;
+  //  NOTE: this should be outside the normal layer index range of a Layout and below
+  //  the space reserved for placeholders. With numbers like this we don't get messed
+  //  up with existing layers.
+  unsigned int l = std::numeric_limits<unsigned int>::max () / 2;
 
   int lnr = 0;
 

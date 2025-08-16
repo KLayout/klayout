@@ -50,7 +50,7 @@ public:
 
   EdgePairsDelegate *clone () const;
 
-  virtual void do_insert (const db::EdgePair &edge_pair);
+  virtual void do_insert (const db::EdgePair &edge_pair, db::properties_id_type prop_id);
 
   virtual void do_transform (const db::Trans &t);
   virtual void do_transform (const db::ICplxTrans &t);
@@ -70,12 +70,14 @@ public:
   virtual Box bbox () const;
   virtual bool empty () const;
   virtual const db::EdgePair *nth (size_t n) const;
+  virtual db::properties_id_type nth_prop_id (size_t n) const;
   virtual bool has_valid_edge_pairs () const;
   virtual const db::RecursiveShapeIterator *iter () const;
   virtual void apply_property_translator (const db::PropertiesTranslator &pt);
 
   virtual EdgePairsDelegate *filter_in_place (const EdgePairFilterBase &filter);
   virtual EdgePairsDelegate *filtered (const EdgePairFilterBase &) const;
+  virtual std::pair<EdgePairsDelegate *, EdgePairsDelegate *> filtered_pair (const EdgePairFilterBase &filter) const;
   virtual EdgePairsDelegate *process_in_place (const EdgePairProcessorBase &);
   virtual EdgePairsDelegate *processed (const EdgePairProcessorBase &) const;
   virtual RegionDelegate *processed_to_polygons (const EdgePairToPolygonProcessorBase &filter) const;
@@ -115,7 +117,7 @@ private:
 
   void init ();
   EdgesDelegate *generic_edges (bool first, bool second) const;
-  DeepEdgePairs *apply_filter (const EdgePairFilterBase &filter) const;
+  std::pair<DeepEdgePairs *, DeepEdgePairs *> apply_filter (const EdgePairFilterBase &filter, bool with_true, bool with_false) const;
 };
 
 }

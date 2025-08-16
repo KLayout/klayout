@@ -1694,6 +1694,16 @@ TEST(93d_withAngle)
   run_test (_this, "93", true);
 }
 
+TEST(94_texts_in_region_xor)
+{
+  run_test (_this, "94", false);
+}
+
+TEST(94d_texts_in_region_xor)
+{
+  run_test (_this, "94", true);
+}
+
 TEST(100_edge_interaction_with_count)
 {
   run_test (_this, "100", false);
@@ -1983,3 +1993,54 @@ TEST(132d_sensitive_breaking)
 {
   run_test (_this, "132", true);
 }
+
+TEST(140_target_modification)
+{
+  run_test (_this, "140", false);
+}
+
+TEST(140d_target_modification)
+{
+  run_test (_this, "140", true);
+}
+
+TEST(141_merge_properties)
+{
+  run_test (_this, "141", false);
+}
+
+TEST(141d_merge_properties)
+{
+  run_test (_this, "141", true);
+}
+
+TEST(142_evaluate_nets)
+{
+  run_test (_this, "142", false);
+}
+
+TEST(142d_evaluate_nets)
+{
+  run_test (_this, "142", true);
+}
+
+TEST(143_evaluate_and_filter)
+{
+  run_test (_this, "143", false);
+}
+
+TEST(143d_evaluate_and_filter)
+{
+  run_test (_this, "143", true);
+}
+
+TEST(144_combined_antennas)
+{
+  run_test (_this, "144", false);
+}
+
+TEST(144d_combined_antennas)
+{
+  run_test (_this, "144", true);
+}
+

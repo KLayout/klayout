@@ -1040,7 +1040,7 @@ TEST(5)
   EXPECT_EQ (m [1.0], 17);
   //  non-members of that category
   EXPECT_EQ (m [1.25], 0);
-  EXPECT_EQ (m [(unsigned int) 1], 0);
+  EXPECT_EQ (m [(unsigned int) 1], 17);
   EXPECT_EQ (m ["1"], 0);
 
   //  unsigned int category
@@ -1051,7 +1051,7 @@ TEST(5)
   EXPECT_EQ (m [2.0], 42);
   //  non-members of that category
   EXPECT_EQ (m [2.25], 0);
-  EXPECT_EQ (m [2], 0);
+  EXPECT_EQ (m [2], 42);
   EXPECT_EQ (m ["2"], 0);
 
   //  float category
@@ -1333,7 +1333,7 @@ TEST(11)
   //  compare without type
   EXPECT_EQ (tl::Variant (1l) == tl::Variant (1.0), true);
   EXPECT_EQ (tl::Variant (1l) == tl::Variant (1), true);
-  EXPECT_EQ (tl::Variant (1l) == tl::Variant (1u), false);
+  EXPECT_EQ (tl::Variant (1l) == tl::Variant (1u), true);
   EXPECT_EQ (tl::Variant (1l) == tl::Variant (1.5), false);
   EXPECT_EQ (tl::Variant (1l) < tl::Variant (1.0), false);
   EXPECT_EQ (tl::Variant (1.0) < tl::Variant (1l), false);
@@ -1375,6 +1375,120 @@ TEST(12)
   ex.read (v);
   ex.expect ("a");
   EXPECT_EQ (std::string (v.to_parsable_string ()), "('Aber_',##2.5,(#5,'x'),())");
+}
+
+//  tl::Variant sorting with different numericals
+TEST(13)
+{
+  tl::Variant v1 ((long) 2);
+  tl::Variant v2 ((int) 2);
+  tl::Variant v3 ((unsigned int) 2);
+  tl::Variant v4 (2.0);
+  tl::Variant v5 ("2");
+  tl::Variant v6 (2, true); // ID
+
+  EXPECT_EQ (v1 == v2, true);
+  EXPECT_EQ (v2 == v1, true);
+  EXPECT_EQ (v1 < v2, false);
+  EXPECT_EQ (v2 < v1, false);
+
+  EXPECT_EQ (v1 == v3, true);  //  signed compares to unsigned
+  EXPECT_EQ (v3 == v1, true);
+  EXPECT_EQ (v3 < v1, false);
+  EXPECT_EQ (v1 < v3, false);
+
+  EXPECT_EQ (v1 == v4, true);
+  EXPECT_EQ (v2 == v1, true);
+  EXPECT_EQ (v1 < v2, false);
+  EXPECT_EQ (v2 < v1, false);
+
+  EXPECT_EQ (v1 == v5, false);  //  string != value
+  EXPECT_EQ (v5 == v1, false);
+  EXPECT_EQ (v1 < v5, true);
+  EXPECT_EQ (v5 < v1, false);
+
+  //  IDs are treated differently
+  EXPECT_EQ (v1 == v6, false);
+  EXPECT_EQ (v6 == v1, false);
+  EXPECT_EQ (v1 < v6, false);
+  EXPECT_EQ (v6 < v1, true);
+
+  //  Use of tl::Variant as map keys
+  std::map<tl::Variant, int> vm;
+
+  vm.insert (std::make_pair (tl::Variant (2), 1));
+  EXPECT_EQ (vm[tl::Variant (2)], 1);
+
+  vm.insert (std::make_pair (tl::Variant (2.0), 2));
+  EXPECT_EQ (vm[tl::Variant (2)], 1);
+  EXPECT_EQ (vm[tl::Variant (2.0)], 1);
+
+  vm.insert (std::make_pair (tl::Variant (2, true), 3));
+  EXPECT_EQ (vm[tl::Variant (2)], 1);
+  EXPECT_EQ (vm[tl::Variant (2.0)], 1);
+  EXPECT_EQ (vm[tl::Variant (2, true)], 3);
+
+  vm.insert (std::make_pair (tl::Variant ("2"), 4));
+  EXPECT_EQ (vm[tl::Variant (2)], 1);
+  EXPECT_EQ (vm[tl::Variant (2.0)], 1);
+  EXPECT_EQ (vm[tl::Variant (2, true)], 3);
+  EXPECT_EQ (vm[tl::Variant ("2")], 4);
+}
+
+//  tl::Variant byte arrays vs. strings
+TEST(14)
+{
+  std::vector<char> ba1;
+  const char ba1_str[] = { 'A', 'B', 0, 'D' };
+  ba1.insert (ba1.end (), ba1_str, ba1_str + sizeof (ba1_str) / sizeof (ba1_str [0]));
+
+  std::vector<char> ba2;
+  const char ba2_str[] = { 'A', 'B', 'C', 'D' };
+  ba2.insert (ba2.end (), ba2_str, ba2_str + sizeof (ba2_str) / sizeof (ba2_str [0]));
+
+  tl::Variant ba1_var (ba1), ba2_var (ba2);
+
+  EXPECT_EQ (ba1_var.is_a_bytearray (), true);
+  EXPECT_EQ (ba1_var.to_string (), std::string ("AB"));
+  EXPECT_EQ (ba1_var.to_bytearray ().size (), size_t (4));
+
+  EXPECT_EQ (ba2_var.is_a_bytearray (), true);
+  EXPECT_EQ (ba2_var.to_string (), std::string ("ABCD"));
+  EXPECT_EQ (ba2_var.to_bytearray ().size (), size_t (4));
+
+  EXPECT_EQ (ba1_var == ba2_var, false);
+  EXPECT_EQ (ba1_var == ba1_var, true);
+  EXPECT_EQ (ba1_var < ba2_var, true);
+  EXPECT_EQ (ba2_var < ba1_var, false);
+  EXPECT_EQ (ba1_var != ba2_var, true);
+  EXPECT_EQ (ba1_var != ba1_var, false);
+
+  EXPECT_EQ (ba1_var == tl::Variant ("AB"), false);
+  EXPECT_EQ (ba1_var < tl::Variant ("AB"), false);
+  EXPECT_EQ (ba1_var < tl::Variant ("ABCD"), true);
+  EXPECT_EQ (tl::Variant ("AB") == ba1_var, false);
+  EXPECT_EQ (tl::Variant ("AB") < ba1_var, true);
+  EXPECT_EQ (tl::Variant ("ABCD") < ba1_var, false);
+  EXPECT_EQ (ba2_var == tl::Variant ("ABCD"), true);
+  EXPECT_EQ (ba2_var < tl::Variant ("ABCD"), false);
+  EXPECT_EQ (tl::Variant ("ABCD") == ba2_var, true);
+  EXPECT_EQ (tl::Variant ("ABCD") < ba2_var, false);
+
+  EXPECT_EQ (ba1_var.equal (ba2_var), false);
+  EXPECT_EQ (ba1_var.equal (ba1_var), true);
+  EXPECT_EQ (ba1_var.less (ba2_var), true);
+  EXPECT_EQ (ba2_var.less (ba1_var), false);
+
+  EXPECT_EQ (ba1_var.equal (tl::Variant ("AB")), false);
+  EXPECT_EQ (ba1_var.less (tl::Variant ("AB")), false);
+  EXPECT_EQ (ba1_var.less (tl::Variant ("ABCD")), true);
+  EXPECT_EQ (tl::Variant ("AB").equal (ba1_var), false);
+  EXPECT_EQ (tl::Variant ("AB").less (ba1_var), true);
+  EXPECT_EQ (tl::Variant ("ABCD").less (ba1_var), false);
+  EXPECT_EQ (ba2_var.equal (tl::Variant ("ABCD")), true);
+  EXPECT_EQ (ba2_var.less (tl::Variant ("ABCD")), false);
+  EXPECT_EQ (tl::Variant ("ABCD").equal (ba2_var), true);
+  EXPECT_EQ (tl::Variant ("ABCD").less (ba2_var), false);
 }
 
 }

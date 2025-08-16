@@ -208,14 +208,15 @@ private:
   tl::OutputMemoryStream m_cblock_buffer;
   tl::OutputMemoryStream m_cblock_compressed;
   bool m_in_cblock;
-  unsigned long m_propname_id;
-  unsigned long m_propstring_id;
-  unsigned long m_textstring_id;
+  uint64_t m_propname_id;
+  uint64_t m_propstring_id;
+  uint64_t m_textstring_id;
   bool m_proptables_written;
 
-  std::map <std::string, unsigned long> m_textstrings;
-  std::map <std::string, unsigned long> m_propnames;
-  std::map <std::string, unsigned long> m_propstrings;
+  std::map <std::string, uint64_t> m_textstrings;
+  std::map <std::string, uint64_t> m_propnames;
+  std::map <std::string, uint64_t> m_propstrings;
+  std::map <db::cell_index_type, std::string> m_cell_nstrings;
 
   typedef std::vector<tl::Variant> property_value_list;
 
@@ -223,23 +224,23 @@ private:
   modal_variable<db::cell_index_type> mm_placement_cell;
   modal_variable<db::Coord> mm_placement_x;
   modal_variable<db::Coord> mm_placement_y;
-  modal_variable<unsigned int> mm_layer;
-  modal_variable<unsigned int> mm_datatype;
-  modal_variable<unsigned int> mm_textlayer;
-  modal_variable<unsigned int> mm_texttype;
+  modal_variable<uint32_t> mm_layer;
+  modal_variable<uint32_t> mm_datatype;
+  modal_variable<uint32_t> mm_textlayer;
+  modal_variable<uint32_t> mm_texttype;
   modal_variable<db::Coord> mm_text_x;
   modal_variable<db::Coord> mm_text_y;
   modal_variable<std::string> mm_text_string;
   modal_variable<db::Coord> mm_geometry_x;
   modal_variable<db::Coord> mm_geometry_y;
-  modal_variable<db::Coord> mm_geometry_w;
-  modal_variable<db::Coord> mm_geometry_h;
+  modal_variable<db::coord_traits<db::Coord>::distance_type> mm_geometry_w;
+  modal_variable<db::coord_traits<db::Coord>::distance_type> mm_geometry_h;
   modal_variable< std::vector<db::Vector> > mm_polygon_point_list;
   modal_variable<db::Coord> mm_path_halfwidth;
   modal_variable<db::Coord> mm_path_start_extension;
   modal_variable<db::Coord> mm_path_end_extension;
   modal_variable< std::vector<db::Vector> > mm_path_point_list;
-  modal_variable<unsigned int> mm_ctrapezoid_type;
+  modal_variable<uint32_t> mm_ctrapezoid_type;
   modal_variable<db::Coord> mm_circle_radius;
   modal_variable<std::string> mm_last_property_name;
   modal_variable<bool> mm_last_property_is_sprop;
@@ -247,6 +248,9 @@ private:
 
   OASISWriterOptions m_options;
   tl::AbsoluteProgress m_progress;
+
+  void create_cell_nstrings (const db::Layout &layout, const std::set <db::cell_index_type> &cell_set);
+  const char *cell_nstring(db::cell_index_type cell_index);
 
   void write_record_id (char b);
   void write_byte (char b);
@@ -273,19 +277,17 @@ private:
 
   void write (double d);
   void write (float d);
-  void write (long n);
-  void write (unsigned long n);
-  void write (long long n);
-  void write (unsigned long long n);
+  void write (int64_t n);
+  void write (uint64_t n);
 
-  void write (int n)
+  void write (int32_t n)
   {
-    write (long (n));
+    write (int64_t (n));
   }
 
-  void write (unsigned int n)
+  void write (uint32_t n)
   {
-    write ((unsigned long) (n));
+    write ((uint64_t) (n));
   }
 
   void write (const Repetition &rep);

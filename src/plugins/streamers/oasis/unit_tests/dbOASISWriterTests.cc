@@ -2072,3 +2072,31 @@ TEST(130d)
   run_test130 (_this, true, true);
 }
 
+//  Issue #2088 (name duplication)
+TEST(140)
+{
+  db::Layout layout_org;
+
+  layout_org.add_cell ("X X");
+  layout_org.add_cell ("X*X");
+
+  std::string tmp_file = tl::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter140.oas"));
+
+  {
+    tl::OutputStream out (tmp_file);
+    db::SaveLayoutOptions options;
+    options.set_format ("OASIS");
+    db::Writer writer (options);
+    writer.write (layout_org, out);
+  }
+
+  {
+    tl::InputStream in (tmp_file);
+    db::Reader reader (in);
+    db::Layout gg;
+    reader.set_warnings_as_errors (true);
+    reader.read (gg);
+
+    db::compare_layouts (_this, gg, tl::testdata () + "/oasis/dbOASISWriter40_au.gds", db::NoNormalization);
+  }
+}

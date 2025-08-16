@@ -111,6 +111,18 @@ public:
   PropertiesSet (const PropertiesSet &&other);
 
   /**
+   *  @brief Constructor from tl::Variant pair iterator
+   */
+  template <class Iter>
+  PropertiesSet (const Iter &from, const Iter &to)
+    : m_map (), m_hash (0)
+  {
+    for (auto i = from; i != to; ++i) {
+      insert (i->first, i->second);
+    }
+  }
+
+  /**
    *  @brief Assignment
    */
   PropertiesSet &operator= (const PropertiesSet &other);
@@ -234,6 +246,11 @@ public:
   void merge (const db::PropertiesSet &other);
 
   /**
+   *  @brief Join another properties set with self, computing the maximum of both values in case of conflict
+   */
+  void join_max (const db::PropertiesSet &other);
+
+  /**
    *  @brief Gets the properties as a map
    */
   std::multimap<tl::Variant, tl::Variant> to_map () const;
@@ -299,6 +316,11 @@ DB_PUBLIC const PropertiesSet &properties (db::properties_id_type id);
 DB_PUBLIC db::properties_id_type properties_id (const PropertiesSet &ps);
 
 /**
+ *  @brief Gets the properties ID from a raw properties set
+ */
+DB_PUBLIC db::properties_id_type properties_id (const std::map<tl::Variant, tl::Variant> &dict);
+
+/**
  *  @brief The properties repository
  *
  *  This repository associates a set of property name/value pairs with 
@@ -346,7 +368,7 @@ public:
    *  This method will assign a new ID to the given value if required and
    *  return the ID associated with it.
    */
-  property_names_id_type prop_value_id (const tl::Variant &name);
+  property_values_id_type prop_value_id (const tl::Variant &name);
 
   /**
    *  @brief Get the ID for a name
@@ -440,21 +462,13 @@ public:
   }
 
 private:
-  struct CompareNamePtrByValueForValues
+  struct CompareVariantPtrByValue
   {
     bool operator() (const tl::Variant *a, const tl::Variant *b) const
     {
-      //  NOTE: for values, the type should matter, so 2.0 is different from 2 (integer).
+      //  NOTE: for values and names, the type should matter, so 2.0 is different from 2 (integer).
       //  Hence we use "less" here.
       return a->less (*b);
-    }
-  };
-
-  struct CompareNamePtrByValueForNames
-  {
-    bool operator() (const tl::Variant *a, const tl::Variant *b) const
-    {
-      return *a < *b;
     }
   };
 
@@ -466,9 +480,9 @@ private:
     }
   };
 
-  std::set <const tl::Variant *, CompareNamePtrByValueForNames> m_propnames;
+  std::set <const tl::Variant *, CompareVariantPtrByValue> m_propnames;
   std::list <tl::Variant> m_property_names_heap;
-  std::set <const tl::Variant *, CompareNamePtrByValueForValues> m_propvalues;
+  std::set <const tl::Variant *, CompareVariantPtrByValue> m_propvalues;
   std::list <tl::Variant> m_property_values_heap;
   std::set <const PropertiesSet *, ComparePropertiesPtrByValue> m_properties;
   std::list <PropertiesSet> m_properties_heap;

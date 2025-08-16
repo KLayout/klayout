@@ -34,6 +34,12 @@ CellInst::bbox (const db::Layout &g) const
 }
 
 CellInst::box_type
+CellInst::bbox_with_empty (const db::Layout &g) const
+{
+  return g.cell (m_cell_index).bbox_with_empty ();
+}
+
+CellInst::box_type
 CellInst::bbox (const db::Layout &g, unsigned int l) const
 {
   return g.cell (m_cell_index).bbox (l);

@@ -12,6 +12,7 @@ recursive-include src/pymod *.cc *.h
 recursive-include src/rbastub *.cc *.h
 recursive-include src/rdb/rdb *.cc *.h
 recursive-include src/tl/tl *.cc *.h
+recursive-include src/pex/pex *.cc *.h
 recursive-include src/version *.cc *.h
 recursive-include src/pymod *.pyi
 recursive-include src/plugins/*/db_plugin *.cc *.h

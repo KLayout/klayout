@@ -146,7 +146,7 @@ public:
     m_cell_stack.pop_back ();
   }
 
-  virtual new_inst_mode new_inst (const db::RecursiveShapeIterator * /*iter*/, const db::CellInstArray &inst, const db::ICplxTrans & /*always_apply*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool /*all*/)
+  virtual new_inst_mode new_inst (const db::RecursiveShapeIterator * /*iter*/, const db::CellInstArray &inst, const db::ICplxTrans & /*always_apply*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool /*all*/, bool /*skip_shapes*/)
   {
     db::cell_index_type ci = inst.object ().cell_index ();
     if (m_id_to_cell.find (ci) != m_id_to_cell.end ()) {
@@ -162,7 +162,7 @@ public:
     create_item_from_shape (mp_rdb, m_cell_stack.back ()->id (), mp_cat->id (), m_trans, shape, m_with_properties);
   }
 
-public:
+private:
   rdb::Category *mp_cat;
   rdb::Database *mp_rdb;
   std::vector<const rdb::Cell *> m_cell_stack;
@@ -290,6 +290,19 @@ void create_items_from_shapes (rdb::Database *db, rdb::id_type cell_id, rdb::id_
   }
 }
 
+void add_properties_to_item (rdb::Item *item, db::properties_id_type prop_id)
+{
+  if (! item->database ()) {
+    return;
+  }
+
+  auto ps = db::properties (prop_id);
+  for (auto i = ps.begin (); i != ps.end (); ++i) {
+    id_type tag_id = item->database ()->tags ().tag (db::property_name (i->first).to_string (), true /*user tag*/).id ();
+    add_item_value (item, db::property_value (i->second), db::CplxTrans (), tag_id);
+  }
+}
+
 void create_item_from_shape (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id, const db::CplxTrans &trans, const db::Shape &shape, bool with_properties)
 {
   std::unique_ptr<rdb::ValueBase> value (rdb::ValueBase::create_from_shape (shape, trans));
@@ -301,19 +314,8 @@ void create_item_from_shape (rdb::Database *db, rdb::id_type cell_id, rdb::id_ty
   item->values ().add (value.release ());
 
   //  translate properties
-  if (with_properties && shape.has_prop_id () && shape.shapes () && shape.shapes ()->cell ()) {
-
-    const db::Layout *layout = shape.shapes ()->cell ()->layout ();
-    if (layout) {
-
-      auto ps = db::properties (shape.prop_id ());
-      for (auto i = ps.begin (); i != ps.end (); ++i) {
-        id_type tag_id = db->tags ().tag (db::property_name (i->first).to_string (), true /*user tag*/).id ();
-        add_item_value (item, db::property_value (i->second), trans, tag_id);
-      }
-
-    }
-
+  if (with_properties && shape.has_prop_id ()) {
+    add_properties_to_item (item, shape.prop_id ());
   }
 }
 

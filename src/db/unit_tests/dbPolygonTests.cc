@@ -69,6 +69,7 @@ TEST(1)
 
   EXPECT_EQ (empty == p, true);
   EXPECT_EQ (p.is_box (), false);
+  EXPECT_EQ (p.is_empty (), true);
 
   std::vector <db::Point> c1, c2, c3;
   c1.push_back (db::Point (0, 0));
@@ -76,6 +77,7 @@ TEST(1)
   c1.push_back (db::Point (100, 1000));
   c1.push_back (db::Point (100, 0));
   p.assign_hull (c1.begin (), c1.end ());
+  EXPECT_EQ (p.is_empty (), false);
   b = p.box ();
   EXPECT_EQ (p.holes (), size_t (0));
   EXPECT_EQ (p.area (), 1000*100);
@@ -1403,4 +1405,31 @@ TEST(28)
   //  32bit overflow for perimeter
   db::Polygon b (db::Box (-1000000000, -1000000000, 1000000000, 1000000000));
   EXPECT_EQ (b.perimeter (), 8000000000.0);
+}
+
+TEST(29)
+{
+  //  Degenerated boxes and compress
+
+  db::Polygon b (db::Box (10, 20, 10, 20));
+  EXPECT_EQ (b.is_empty (), false);
+  EXPECT_EQ (b == db::Polygon (), false);
+  EXPECT_EQ (b.to_string (), "(10,20;10,20;10,20;10,20)");
+  EXPECT_EQ (double (b.area ()), 0.0);
+
+  b.compress (true);
+
+  EXPECT_EQ (b.is_empty (), true);
+  EXPECT_EQ (b == db::Polygon (), true);
+
+  db::SimplePolygon sb (db::Box (10, 20, 10, 20));
+  EXPECT_EQ (sb.is_empty (), false);
+  EXPECT_EQ (sb == db::SimplePolygon (), false);
+  EXPECT_EQ (sb.to_string (), "(10,20;10,20;10,20;10,20)");
+  EXPECT_EQ (double (sb.area ()), 0.0);
+
+  sb.compress (true);
+
+  EXPECT_EQ (sb.is_empty (), true);
+  EXPECT_EQ (sb == db::SimplePolygon (), true);
 }

@@ -167,6 +167,51 @@ private:
 };
 
 /**
+ *  @brief An enum describing a reducer type
+ *
+ *  This enum is used to create a generic reducer (parameterless) from the code.
+ */
+enum ReducerType
+{
+  /**
+   *  @brief No specific reducer
+   */
+  NoReducer = 0,
+
+  /**
+   *  @brief Rotation/mirror variants
+   */
+  Orientation = 1,
+
+  /**
+   *  @brief Orthogonal transformations (rotations of multiple of 90 degree) variants
+   */
+  Orthogonal = 2,
+
+  /**
+   *  @brief Scaling variants
+   */
+  Magnification = 3,
+
+  /**
+   *  @brief Scaling and x/y assymmetry variants (i.e. anisotropic size)
+   */
+  XYAnisotropyAndMagnification = 4,
+
+  /**
+   *  @brief Scaling and orientation variants
+   */
+  MagnificationAndOrientation = 5
+};
+
+/**
+ *  @brief Creates a TransformationReducer from the type enum
+ *
+ *  This function returns 0 if the type is NoReducer or invalid.
+ */
+DB_PUBLIC TransformationReducer *make_reducer (ReducerType type);
+
+/**
  *  @brief A class computing variants for cells according to a given criterion
  *
  *  The cell variants are build from the cell instances and are accumulated over

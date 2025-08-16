@@ -577,3 +577,33 @@ TEST(8)
   EXPECT_EQ (db::LayerMap::from_string_file_format (lm.to_string_file_format ()).to_string (), lm.to_string ());
 }
 
+//  mapping of relative target to real target
+TEST(9)
+{
+  db::Layout ly;
+  db::LayerMap lm;
+
+  EXPECT_EQ (layers_to_string (ly), "");
+  unsigned int l0 = ly.insert_layer (db::LayerProperties (0, 0));
+  unsigned int l101 = ly.insert_layer (db::LayerProperties (101, 0));
+
+  unsigned int n = std::numeric_limits<unsigned int>::max () / 2;
+  lm.map_expr ("*/* : */*", n++);
+  lm.map_expr ("100/0 : 0/0", n++);
+
+  lm.prepare (ly);
+
+  std::pair<bool, unsigned int> p;
+  p = lm.first_logical (db::LayerProperties (100, 0), ly);
+  EXPECT_EQ (p.first, true);
+  EXPECT_EQ (p.second, l0);
+
+  p = lm.first_logical (db::LayerProperties (101, 0), ly);
+  EXPECT_EQ (p.first, true);
+  EXPECT_EQ (p.second, l101);
+
+  //  maps to the target 0/0
+  p = lm.first_logical (db::LayerProperties (0, 0), ly);
+  EXPECT_EQ (p.first, true);
+  EXPECT_EQ (p.second, l0);
+}

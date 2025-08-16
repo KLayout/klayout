@@ -62,16 +62,9 @@ public:
   virtual ~shape_collection_processor () { }
 
   /**
-   *  @brief Performs the actual processing
-   *  This method will take the input edge from "edge" and puts the results into "res".
-   *  "res" can be empty - in this case, the edge will be skipped.
-   */
-  virtual void process (const Shape &shape, std::vector<Result> &res) const = 0;
-
-  /**
    *  @brief Performs the actual processing with properties
-   *  This method will take the input edge from "edge" and puts the results into "res".
-   *  "res" can be empty - in this case, the edge will be skipped.
+   *  This method will take the input edge from "shape" and puts the results into "res".
+   *  "res" can be empty - in this case, the shape will be skipped.
    */
   virtual void process (const db::object_with_properties<Shape> &shape, std::vector<db::object_with_properties<Result> > &res) const = 0;
 
@@ -194,7 +187,7 @@ shape_collection_processed_impl (const db::DeepLayer &input, const shape_collect
 
   }
 
-  std::vector<Result> heap;
+  std::vector<db::object_with_properties<Result> > heap;
   std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
 
   std::unique_ptr<OutputContainer> res (new OutputContainer (input.derived ()));
@@ -225,16 +218,17 @@ shape_collection_processed_impl (const db::DeepLayer &input, const shape_collect
         db::ICplxTrans trinv = tr.inverted ();
 
         for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
-          Shape s;
+          db::object_with_properties<Shape> s;
           si->instantiate (s);
+          s.properties_id (si->prop_id ());
           s.transform (tr);
           heap.clear ();
           filter.process (s, heap);
-          for (typename std::vector<Result>::const_iterator i = heap.begin (); i != heap.end (); ++i) {
-            if (si->prop_id ()) {
-              delivery_wp.put (db::object_with_properties<Result> (i->transformed (trinv), si->prop_id ()));
+          for (auto i = heap.begin (); i != heap.end (); ++i) {
+            if (i->properties_id ()) {
+              delivery_wp.put (db::object_with_properties<Result> (i->transformed (trinv), i->properties_id ()));
             } else {
-              delivery.put (i->transformed (trinv));
+              delivery.put (i->base ().transformed (trinv));
             }
           }
         }
@@ -248,15 +242,16 @@ shape_collection_processed_impl (const db::DeepLayer &input, const shape_collect
       shape_collection_processor_delivery<db::object_with_properties<Result> > delivery_wp (&layout, &st);
 
       for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
-        Shape s;
+        db::object_with_properties<Shape> s;
         si->instantiate (s);
+        s.properties_id (si->prop_id ());
         heap.clear ();
         filter.process (s, heap);
-        for (typename std::vector<Result>::const_iterator i = heap.begin (); i != heap.end (); ++i) {
-          if (si->prop_id ()) {
-            delivery_wp.put (db::object_with_properties<Result> (*i, si->prop_id ()));
+        for (auto i = heap.begin (); i != heap.end (); ++i) {
+          if (i->properties_id ()) {
+            delivery_wp.put (*i);
           } else {
-            delivery.put (*i);
+            delivery.put (i->base ());
           }
         }
       }
@@ -286,15 +281,6 @@ public:
   extents_processor (db::Coord dx, db::Coord dy)
     : m_dx (dx), m_dy (dy)
   { }
-
-  virtual void process (const Shape &s, std::vector<db::Polygon> &res) const
-  {
-    db::box_convert<Shape> bc;
-    db::Box box = bc (s).enlarged (db::Vector (m_dx, m_dy));
-    if (! box.empty ()) {
-      res.push_back (db::Polygon (box));
-    }
-  }
 
   virtual void process (const db::object_with_properties<Shape> &s, std::vector<db::PolygonWithProperties> &res) const
   {

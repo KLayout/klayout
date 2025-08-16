@@ -1663,14 +1663,17 @@ TEST(40_BoolWithProperties)
   db::RecursiveShapeIterator si1 (ly, top_cell, l1);
   si1.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
   db::Region r1 (si1);
+  r1.set_join_properties_on_merge (false);
 
   db::RecursiveShapeIterator si2 (ly, top_cell, l2);
   si2.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
   db::Region r2 (si2);
+  r2.set_join_properties_on_merge (false);
 
   db::RecursiveShapeIterator si3 (ly, top_cell, l3);
   si3.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
   db::Region r3 (si3);
+  r3.set_join_properties_on_merge (false);
 
   db::Layout target;
   unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
@@ -1802,6 +1805,7 @@ TEST(41_EdgesWithProperties)
   db::RecursiveShapeIterator si2 (ly, top_cell, l2);
   si2.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
   db::Region r2wp (si2);
+  r2wp.set_join_properties_on_merge (false);
   db::Region r2wp_nomerge = r2wp;
   r2wp_nomerge.set_merged_semantics (false);
 
@@ -1846,12 +1850,14 @@ TEST(42_DRCWithProperties)
   db::RecursiveShapeIterator si1 (ly, top_cell, l1);
   si1.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
   db::Region r1 (si1);
+  r1.set_join_properties_on_merge (false);
   db::Region r1_nomerge (r1);
   r1_nomerge.set_merged_semantics (false);
 
   db::RecursiveShapeIterator si2 (ly, top_cell, l2);
   si2.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
   db::Region r2 (si2);
+  r2.set_join_properties_on_merge (false);
   db::Region r2_nomerge (r2);
   r2_nomerge.set_merged_semantics (false);
 
@@ -2000,10 +2006,12 @@ TEST(44_SizeWithProperties)
   db::RecursiveShapeIterator si1 (ly, top_cell, l1);
   si1.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
   db::Region r1 (si1);
+  r1.set_join_properties_on_merge (false);
 
   db::RecursiveShapeIterator si2 (ly, top_cell, l2);
   si2.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
   db::Region r2 (si2);
+  r2.set_join_properties_on_merge (false);
 
   db::Layout target;
   unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
@@ -2016,6 +2024,10 @@ TEST(44_SizeWithProperties)
 
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), r2.sized (200));
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (21, 0)), r2.sized (250, 50, 2));
+
+  r2.set_join_properties_on_merge (true);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (30, 0)), r2.sized (200));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (31, 0)), r2.sized (250, 50, 2));
 
   CHECKPOINT();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au44.gds");

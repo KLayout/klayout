@@ -54,6 +54,7 @@ public:
   virtual void select_entries (const std::vector<size_t> &entries);
   virtual std::string description (size_t entry) const;
   virtual std::string description () const;
+  virtual void confine_selection (const std::vector<size_t> &remaining_entries);
   virtual QIcon icon (size_t entry, int w, int h) const;
   virtual QIcon icon (int w, int h) const { return lay::PropertiesPage::icon (w, h); }
   virtual void leave ();
@@ -63,10 +64,10 @@ protected:
 
 private:
   virtual void update ();
-  virtual void apply ();
-  virtual void apply_to_all (bool relative);
+  virtual void apply (bool commit);
+  virtual void apply_to_all (bool relative, bool commit);
   virtual bool can_apply_to_all () const;
-  virtual void do_apply (bool current_only, bool relative);
+  virtual void do_apply (bool current_only, bool relative, bool commit);
   void recompute_selection_ptrs (const std::vector<lay::ObjectInstPath> &new_sel);
 
 protected:

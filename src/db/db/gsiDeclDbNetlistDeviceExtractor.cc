@@ -263,6 +263,26 @@ define_terminal_by_names (GenericDeviceExtractor *extractor, db::Device *device,
   extractor->define_terminal (device, terminal_id, layer_id, shape);
 }
 
+static void error1 (GenericDeviceExtractor *ext, const std::string &message, const db::DPolygonWithProperties &poly)
+{
+  ext->error (message, poly);
+}
+
+static void error2 (GenericDeviceExtractor *ext, const std::string &message, const db::PolygonWithProperties &poly)
+{
+  ext->error (message, poly);
+}
+
+static void warn1 (GenericDeviceExtractor *ext, const std::string &message, const db::DPolygonWithProperties &poly)
+{
+  ext->warn (message, poly);
+}
+
+static void warn2 (GenericDeviceExtractor *ext, const std::string &message, const db::PolygonWithProperties &poly)
+{
+  ext->warn (message, poly);
+}
+
 Class<GenericDeviceExtractor> decl_GenericDeviceExtractor (decl_dbNetlistDeviceExtractor, "db", "GenericDeviceExtractor",
   gsi::callback ("setup", &GenericDeviceExtractor::setup, &GenericDeviceExtractor::cb_setup,
     "@brief Sets up the extractor.\n"
@@ -397,9 +417,19 @@ Class<GenericDeviceExtractor> decl_GenericDeviceExtractor (decl_dbNetlistDeviceE
     gsi::arg ("message"), gsi::arg ("geometry"),
    "@brief Issues an error with the given message and micrometer-units polygon geometry\n"
   ) +
+  gsi::method_ext ("error", &error1,
+    gsi::arg ("message"), gsi::arg ("geometry"),
+    "@brief Issues an error with the given message and micrometer-units polygon geometry with properties\n"
+    "This flavor has been introduced in version 0.30."
+  ) +
   gsi::method ("error", (void (GenericDeviceExtractor::*) (const std::string &, const db::Polygon &)) &GenericDeviceExtractor::error,
     gsi::arg ("message"), gsi::arg ("geometry"),
    "@brief Issues an error with the given message and database-unit polygon geometry\n"
+  ) +
+  gsi::method_ext ("error", &error2,
+    gsi::arg ("message"), gsi::arg ("geometry"),
+    "@brief Issues an error with the given message and database-units polygon geometry with properties\n"
+    "This flavor has been introduced in version 0.30."
   ) +
   gsi::method ("error", (void (GenericDeviceExtractor::*) (const std::string &, const std::string &, const std::string &)) &GenericDeviceExtractor::error,
     gsi::arg ("category_name"), gsi::arg ("category_description"), gsi::arg ("message"),
@@ -423,10 +453,20 @@ Class<GenericDeviceExtractor> decl_GenericDeviceExtractor (decl_dbNetlistDeviceE
     "@brief Issues a warning with the given message and micrometer-units polygon geometry\n"
     "Warnings have been introduced in version 0.28.13."
   ) +
+  gsi::method_ext ("warn", &warn1,
+    gsi::arg ("message"), gsi::arg ("geometry"),
+    "@brief Issues a warning with the given message and micrometer-units polygon geometry with properties\n"
+    "This flavor has been introduced in version 0.30."
+  ) +
   gsi::method ("warn", (void (GenericDeviceExtractor::*) (const std::string &, const db::Polygon &)) &GenericDeviceExtractor::warn,
     gsi::arg ("message"), gsi::arg ("geometry"),
     "@brief Issues a warning with the given message and database-unit polygon geometry\n"
     "Warnings have been introduced in version 0.28.13."
+  ) +
+  gsi::method_ext ("warn", &warn2,
+    gsi::arg ("message"), gsi::arg ("geometry"),
+    "@brief Issues a warning with the given message and database-unit polygon geometry\n"
+    "This flavor has been introduced in version 0.30."
   ) +
   gsi::method ("warn", (void (GenericDeviceExtractor::*) (const std::string &, const std::string &, const std::string &)) &GenericDeviceExtractor::warn,
     gsi::arg ("category_name"), gsi::arg ("category_description"), gsi::arg ("message"),

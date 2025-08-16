@@ -39,7 +39,9 @@ PolygonRefToShapesGenerator::PolygonRefToShapesGenerator (db::Layout *layout, db
 void PolygonRefToShapesGenerator::put (const db::Polygon &polygon)
 {
   tl::MutexLocker locker (&mp_layout->lock ());
-  if (m_prop_id != 0) {
+  if (polygon.is_empty ()) {
+    //  ignore empty polygons
+  } else if (m_prop_id != 0) {
     mp_shapes->insert (db::PolygonRefWithProperties (db::PolygonRef (polygon, mp_layout->shape_repository ()), m_prop_id));
   } else {
     mp_shapes->insert (db::PolygonRef (polygon, mp_layout->shape_repository ()));
@@ -58,7 +60,9 @@ PolygonSplitter::PolygonSplitter (PolygonSink &sink, double max_area_ratio, size
 void
 PolygonSplitter::put (const db::Polygon &poly)
 {
-  if (db::suggest_split_polygon (poly, m_max_vertex_count, m_max_area_ratio)) {
+  if (poly.is_empty ()) {
+    //  ignore empty polygons
+  } else if (db::suggest_split_polygon (poly, m_max_vertex_count, m_max_area_ratio)) {
 
     std::vector <db::Polygon> split_polygons;
     db::split_polygon (poly, split_polygons);

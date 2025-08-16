@@ -231,6 +231,11 @@ void DeepRegion::min_coherence_changed ()
   set_is_merged (false);
 }
 
+void DeepRegion::join_properties_on_merge_changed ()
+{
+  set_is_merged (false);
+}
+
 void DeepRegion::do_insert (const db::Polygon &polygon, db::properties_id_type prop_id)
 {
   db::Layout &layout = deep_layer ().layout ();
@@ -520,7 +525,7 @@ class ClusterMerger
 {
 public:
   ClusterMerger (unsigned int layer, db::Layout &layout, const db::hier_clusters<db::PolygonRef> &hc, bool min_coherence, bool report_progress, const std::string &progress_desc)
-    : m_layer (layer), mp_layout (&layout), mp_hc (&hc), m_min_coherence (min_coherence), m_ep (report_progress, progress_desc)
+    : m_layer (layer), mp_layout (&layout), mp_hc (&hc), m_min_coherence (min_coherence), m_text_name_id (0), m_ep (report_progress, progress_desc)
   {
     //  .. nothing yet ..
   }
@@ -528,6 +533,19 @@ public:
   void set_base_verbosity (int vb)
   {
     m_ep.set_base_verbosity (vb);
+  }
+
+  /**
+   *  @brief Specifies the label property name ID for pseudo-label polygons
+   *  If set to 0, the merge does not skip pseudo-labels.
+   */
+  void set_text_name (const tl::Variant &n)
+  {
+    if (n.is_nil ()) {
+      m_text_name_id = 0;
+    } else {
+      m_text_name_id = db::property_names_id (n);
+    }
   }
 
   db::Shapes &merged (size_t cid, db::cell_index_type ci, unsigned int min_wc = 0)
@@ -548,7 +566,18 @@ private:
   db::Layout *mp_layout;
   const db::hier_clusters<db::PolygonRef> *mp_hc;
   bool m_min_coherence;
+  db::property_names_id_type m_text_name_id;
   db::EdgeProcessor m_ep;
+
+  bool skip_pseudo_label (db::properties_id_type prop_id)
+  {
+    if (prop_id == 0 || m_text_name_id == 0) {
+      return false;
+    } else {
+      const db::PropertiesSet &ps = db::properties (prop_id);
+      return (ps.size () == 1 && ps.begin ()->first == m_text_name_id);
+    }
+  }
 
   db::properties_id_type property_id (size_t cid, db::cell_index_type ci, bool initial)
   {
@@ -563,21 +592,40 @@ private:
       return s->second;
     }
 
-    s = m_property_id_per_cluster.insert (std::make_pair (std::make_pair (cid, ci), db::properties_id_type (0))).first;
-
     const db::connected_clusters<db::PolygonRef> &cc = mp_hc->clusters_per_cell (ci);
     const db::local_cluster<db::PolygonRef> &c = cc.cluster_by_id (cid);
 
-    if (c.begin_attr () != c.end_attr ()) {
+    //  collect attributes (aka properties) of the root and the child clusters and join them
 
-      s->second = *c.begin_attr ();
+    s = m_property_id_per_cluster.insert (std::make_pair (std::make_pair (cid, ci), db::properties_id_type (0))).first;
 
-    } else {
+    std::set<db::properties_id_type> attrs (c.begin_attr (), c.end_attr ());
 
-      const db::connected_clusters<db::PolygonRef>::connections_type &conn = cc.connections_for_cluster (cid);
-      for (db::connected_clusters<db::PolygonRef>::connections_type::const_iterator i = conn.begin (); i != conn.end () && s->second == db::properties_id_type (0); ++i) {
-        s->second = property_id (i->id (), i->inst_cell_index (), false);
+    const db::connected_clusters<db::PolygonRef>::connections_type &conn = cc.connections_for_cluster (cid);
+    for (db::connected_clusters<db::PolygonRef>::connections_type::const_iterator i = conn.begin (); i != conn.end (); ++i) {
+      auto prop_id = property_id (i->id (), i->inst_cell_index (), false);
+      if (prop_id != 0) {
+        attrs.insert (prop_id);
       }
+    }
+
+    if (attrs.size () > 1) {
+
+      //  join the properties
+      db::PropertiesSet ps;
+      for (auto a = attrs.begin (); a != attrs.end (); ++a) {
+        if (! skip_pseudo_label (*a)) {
+          //  merge in "larger one wins" mode - the advantage of this mode is that
+          //  it is independent on the order of the attribute sets (which in fact are pointers)
+          ps.join_max (db::properties (*a));
+        }
+      }
+
+      s->second = db::properties_id (ps);
+
+    } else if (! attrs.empty () && ! skip_pseudo_label (*attrs.begin ())) {
+
+      s->second = *attrs.begin ();
 
     }
 
@@ -702,7 +750,7 @@ DeepRegion::ensure_merged_polygons_valid () const
       db::Connectivity conn;
       conn.connect (deep_layer ());
       hc.set_base_verbosity (base_verbosity () + 10);
-      hc.build (layout, deep_layer ().initial_cell (), conn, 0, deep_layer ().breakout_cells (), true /*separate_attributes*/);
+      hc.build (layout, deep_layer ().initial_cell (), conn, 0, deep_layer ().breakout_cells (), ! join_properties_on_merge ());
 
       //  collect the clusters and merge them into big polygons
       //  NOTE: using the ClusterMerger we merge bottom-up forming bigger and bigger polygons. This is
@@ -710,6 +758,14 @@ DeepRegion::ensure_merged_polygons_valid () const
 
       ClusterMerger cm (deep_layer ().layer (), layout, hc, min_coherence (), report_progress (), progress_desc ());
       cm.set_base_verbosity (base_verbosity () + 10);
+
+      //  Specify the property name ID for the pseudo-labels, so we can filter out those properties
+      //  (for backward compatibility only if join_properties_on_merge is true - if we don't with
+      //  join_properties_on_merge, the pseudo-label properties may get attached to other shapes which
+      //  will be taken as texts then)
+      if (join_properties_on_merge ()) {
+        cm.set_text_name (deep_layer ().store ()->text_property_name ());
+      }
 
       //  TODO: iterate only over the called cells?
       for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
@@ -757,13 +813,13 @@ DeepRegion::nets (LayoutToNetlist *l2n, NetPropertyMode prop_mode, const tl::Var
 
   DeepLayer result = deep_layer ().derived ();
 
-  std::unique_ptr<db::Region> region_for_layer (l2n->layer_by_original (this));
-  if (! region_for_layer) {
+  tl::optional<unsigned int> li = l2n->layer_by_original (this);
+  if (! li.has_value ()) {
     throw tl::Exception (tl::to_string (tr ("The given layer is not an original layer used in netlist extraction")));
   }
 
-  std::map<unsigned int, const db::Region *> lmap;
-  lmap.insert (std::make_pair (result.layer (), region_for_layer.get ()));
+  std::map<unsigned int, unsigned int> lmap;
+  lmap.insert (std::make_pair (result.layer (), li.value ()));
 
   net_builder.build_nets (nets, lmap, prop_mode, net_prop_name);
 
@@ -1054,12 +1110,7 @@ DeepRegion::xor_with (const Region &other, db::PropertyConstraint property_const
 {
   const DeepRegion *other_deep = dynamic_cast <const DeepRegion *> (other.delegate ());
 
-  if (empty ()) {
-
-    //  Nothing to do
-    return other.delegate ()->clone ();
-
-  } else if (other.empty ()) {
+  if (other.empty ()) {
 
     //  Nothing to do
     return clone ();
@@ -1067,6 +1118,18 @@ DeepRegion::xor_with (const Region &other, db::PropertyConstraint property_const
   } else if (! other_deep) {
 
     return AsIfFlatRegion::xor_with (other, property_constraint);
+
+  } else if (empty ()) {
+
+    //  Nothing to do, but to maintain the normal behavior, we have to map the other
+    //  input to our layout if neccessary
+    if (&other_deep->deep_layer ().layout () == &deep_layer ().layout ()) {
+      return other.delegate ()->clone ();
+    } else {
+      std::unique_ptr<DeepRegion> other_deep_mapped (dynamic_cast<DeepRegion *> (clone ()));
+      other_deep_mapped->deep_layer ().add_from (other_deep->deep_layer ());
+      return other_deep_mapped.release ();
+    }
 
   } else if (other_deep->deep_layer () == deep_layer () && pc_skip (property_constraint)) {
 
@@ -1125,6 +1188,7 @@ DeepRegion::add_in_place (const Region &other)
     db::Shapes &shapes = deep_layer ().initial_cell ().shapes (deep_layer ().layer ());
     db::PolygonRefToShapesGenerator pr (const_cast<db::Layout *> (& deep_layer ().layout ()), &shapes);
     for (db::Region::const_iterator p = other.begin (); ! p.at_end (); ++p) {
+      pr.set_prop_id (p.prop_id ());
       pr.put (*p);
     }
 
@@ -1497,12 +1561,13 @@ DeepRegion::edges (const EdgeFilterBase *filter, const PolygonToEdgeProcessorBas
       const db::Shapes &s = c->shapes (polygons.layer ());
       db::Shapes &st = c->shapes (res->deep_layer ().layer ());
 
-      std::vector<db::Edge> heap;
+      std::vector<db::EdgeWithProperties> heap;
 
       for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
 
-        db::Polygon poly;
+        db::PolygonWithProperties poly;
         si->polygon (poly);
+        poly.properties_id (si->prop_id ());
 
         if (proc) {
 
@@ -1510,16 +1575,16 @@ DeepRegion::edges (const EdgeFilterBase *filter, const PolygonToEdgeProcessorBas
           proc->process (poly, heap);
 
           for (auto e = heap.begin (); e != heap.end (); ++e) {
-            if (! filter || filter->selected ((*e).transformed (tr))) {
-              st.insert (db::EdgeWithProperties (*e, si->prop_id ()));
+            if (! filter || filter->selected ((*e).transformed (tr), e->properties_id ())) {
+              st.insert (*e);
             }
           }
 
         } else {
 
           for (db::Polygon::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end (); ++e) {
-            if (! filter || filter->selected ((*e).transformed (tr))) {
-              st.insert (db::EdgeWithProperties (*e, si->prop_id ()));
+            if (! filter || filter->selected ((*e).transformed (tr), poly.properties_id ())) {
+              st.insert (db::EdgeWithProperties (*e, poly.properties_id ()));
             }
           }
 
@@ -1585,7 +1650,7 @@ DeepRegion::filter_in_place (const PolygonFilterBase &filter)
   }
 
   //  TODO: implement to be really in-place
-  *this = *apply_filter (filter);
+  *this = *apply_filter (filter, true, false).first;
   return this;
 }
 
@@ -1596,11 +1661,17 @@ DeepRegion::filtered (const PolygonFilterBase &filter) const
     return clone ();
   }
 
-  return apply_filter (filter);
+  return apply_filter (filter, true, false).first;
 }
 
-DeepRegion *
-DeepRegion::apply_filter (const PolygonFilterBase &filter) const
+std::pair<RegionDelegate *, RegionDelegate *>
+DeepRegion::filtered_pair (const PolygonFilterBase &filter) const
+{
+  return apply_filter (filter, true, true);
+}
+
+std::pair<DeepRegion *, DeepRegion *>
+DeepRegion::apply_filter (const PolygonFilterBase &filter, bool with_true, bool with_false) const
 {
   const db::DeepLayer &polygons = filter.requires_raw_input () ? deep_layer () : merged_deep_layer ();
   db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
@@ -1618,9 +1689,10 @@ DeepRegion::apply_filter (const PolygonFilterBase &filter) const
 
   }
 
-  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
+  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit_true, to_commit_false;
 
-  std::unique_ptr<db::DeepRegion> res (new db::DeepRegion (polygons.derived ()));
+  std::unique_ptr<db::DeepRegion> res_true (with_true ? new db::DeepRegion (polygons.derived ()) : 0);
+  std::unique_ptr<db::DeepRegion> res_false (with_false ? new db::DeepRegion (polygons.derived ()) : 0);
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
     const db::Shapes &s = c->shapes (polygons.layer ());
@@ -1630,18 +1702,36 @@ DeepRegion::apply_filter (const PolygonFilterBase &filter) const
       const std::set<db::ICplxTrans> &vv = vars->variants (c->cell_index ());
       for (auto v = vv.begin (); v != vv.end (); ++v) {
 
-        db::Shapes *st;
+        db::Shapes *st_true = 0, *st_false = 0;
         if (vv.size () == 1) {
-          st = & c->shapes (res->deep_layer ().layer ());
+          if (with_true) {
+            st_true = & c->shapes (res_true->deep_layer ().layer ());
+          }
+          if (with_false) {
+            st_false = & c->shapes (res_false->deep_layer ().layer ());
+          }
         } else {
-          st = & to_commit [c->cell_index ()] [*v];
+          if (with_true) {
+            st_true = & to_commit_true [c->cell_index ()] [*v];
+          }
+          if (with_false) {
+            st_false = & to_commit_false [c->cell_index ()] [*v];
+          }
         }
+
+        const db::ICplxTrans &tr = *v;
 
         for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
           db::Polygon poly;
           si->polygon (poly);
-          if (filter.selected (poly.transformed (*v))) {
-            st->insert (*si);
+          if (filter.selected (poly.transformed (tr), si->prop_id ())) {
+            if (st_true) {
+              st_true->insert (*si);
+            }
+          } else {
+            if (st_false) {
+              st_false->insert (*si);
+            }
           }
         }
 
@@ -1649,13 +1739,20 @@ DeepRegion::apply_filter (const PolygonFilterBase &filter) const
 
     } else {
 
-      db::Shapes &st = c->shapes (res->deep_layer ().layer ());
+      db::Shapes *st_true = with_true ? &c->shapes (res_true->deep_layer ().layer ()) : 0;
+      db::Shapes *st_false = with_false ? &c->shapes (res_false->deep_layer ().layer ()) : 0;
 
       for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
         db::Polygon poly;
         si->polygon (poly);
-        if (filter.selected (poly)) {
-          st.insert (*si);
+        if (filter.selected (poly, si->prop_id ())) {
+          if (with_true) {
+            st_true->insert (*si);
+          }
+        } else {
+          if (with_false) {
+            st_false->insert (*si);
+          }
         }
       }
 
@@ -1663,14 +1760,25 @@ DeepRegion::apply_filter (const PolygonFilterBase &filter) const
 
   }
 
-  if (! to_commit.empty () && vars.get ()) {
-    vars->commit_shapes (res->deep_layer ().layer (), to_commit);
+  if (! to_commit_true.empty () && vars.get ()) {
+    tl_assert (res_true.get () != 0);
+    vars->commit_shapes (res_true->deep_layer ().layer (), to_commit_true);
+  }
+  if (! to_commit_false.empty () && vars.get ()) {
+    tl_assert (res_false.get () != 0);
+    vars->commit_shapes (res_false->deep_layer ().layer (), to_commit_false);
   }
 
   if (! filter.requires_raw_input ()) {
-    res->set_is_merged (true);
+    if (res_true.get ()) {
+      res_true->set_is_merged (true);
+    }
+    if (res_false.get ()) {
+      res_false->set_is_merged (true);
+    }
   }
-  return res.release ();
+
+  return std::make_pair (res_true.release (), res_false.release ());
 }
 
 RegionDelegate *
@@ -1690,10 +1798,10 @@ DeepRegion::merged_in_place ()
 }
 
 RegionDelegate *
-DeepRegion::merged_in_place (bool min_coherence, unsigned int min_wc)
+DeepRegion::merged_in_place (bool min_coherence, unsigned int min_wc, bool join_properties_on_merge)
 {
   //  TODO: implement to be really in-place
-  return merged (min_coherence, min_wc);
+  return merged (min_coherence, min_wc, join_properties_on_merge);
 }
 
 RegionDelegate *
@@ -1719,7 +1827,7 @@ DeepRegion::merged () const
 }
 
 RegionDelegate *
-DeepRegion::merged (bool min_coherence, unsigned int min_wc) const
+DeepRegion::merged (bool min_coherence, unsigned int min_wc, bool join_properties_on_merge) const
 {
   if (empty ()) {
     return clone ();
@@ -1733,7 +1841,7 @@ DeepRegion::merged (bool min_coherence, unsigned int min_wc) const
   db::Connectivity conn;
   conn.connect (deep_layer ());
   hc.set_base_verbosity (base_verbosity () + 10);
-  hc.build (layout, deep_layer ().initial_cell (), conn);
+  hc.build (layout, deep_layer ().initial_cell (), conn, 0, 0, ! join_properties_on_merge);
 
   //  collect the clusters and merge them into big polygons
   //  NOTE: using the ClusterMerger we merge bottom-up forming bigger and bigger polygons. This is
@@ -1743,6 +1851,14 @@ DeepRegion::merged (bool min_coherence, unsigned int min_wc) const
 
   ClusterMerger cm (deep_layer ().layer (), layout, hc, min_coherence, report_progress (), progress_desc ());
   cm.set_base_verbosity (base_verbosity () + 10);
+
+  //  Specify the property name ID for the pseudo-labels, so we can filter out those properties
+  //  (for backward compatibility only if join_properties_on_merge is true - if we don't with
+  //  join_properties_on_merge, the pseudo-label properties may get attached to other shapes which
+  //  will be taken as texts then)
+  if (join_properties_on_merge) {
+    cm.set_text_name (deep_layer ().store ()->text_property_name ());
+  }
 
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
     const db::connected_clusters<db::PolygonRef> &cc = hc.clusters_per_cell (c->cell_index ());

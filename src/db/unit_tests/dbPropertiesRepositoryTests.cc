@@ -472,3 +472,34 @@ TEST(PropertiesSetHash)
   EXPECT_EQ (ps2.hash (), h1);
   EXPECT_EQ (db::hash_for_properties_id (rp.properties_id (ps2)), h1);
 }
+
+TEST(SameValueDifferentTypes)
+{
+  {
+    db::PropertiesRepository rp;
+
+    EXPECT_EQ (db::property_value (rp.prop_value_id ((int) 5)).to_parsable_string (), "#5");
+    EXPECT_EQ (db::property_value (rp.prop_value_id ((double) 5)).to_parsable_string (), "##5");
+    EXPECT_EQ (db::property_value (rp.prop_value_id ((int) 5)).to_parsable_string (), "#5");
+    EXPECT_EQ (db::property_value (rp.prop_value_id ((double) 5)).to_parsable_string (), "##5");
+
+    EXPECT_EQ (db::property_name (rp.prop_name_id ((int) 5)).to_parsable_string (), "#5");
+    EXPECT_EQ (db::property_name (rp.prop_name_id ((double) 5)).to_parsable_string (), "##5");
+    EXPECT_EQ (db::property_name (rp.prop_name_id ((int) 5)).to_parsable_string (), "#5");
+    EXPECT_EQ (db::property_name (rp.prop_name_id ((double) 5)).to_parsable_string (), "##5");
+  }
+
+  {
+    db::PropertiesRepository rp;
+
+    EXPECT_EQ (db::property_value (rp.prop_value_id ((double) 5)).to_parsable_string (), "##5");
+    EXPECT_EQ (db::property_value (rp.prop_value_id ((int) 5)).to_parsable_string (), "#5");
+    EXPECT_EQ (db::property_value (rp.prop_value_id ((double) 5)).to_parsable_string (), "##5");
+    EXPECT_EQ (db::property_value (rp.prop_value_id ((int) 5)).to_parsable_string (), "#5");
+
+    EXPECT_EQ (db::property_name (rp.prop_name_id ((double) 5)).to_parsable_string (), "##5");
+    EXPECT_EQ (db::property_name (rp.prop_name_id ((int) 5)).to_parsable_string (), "#5");
+    EXPECT_EQ (db::property_name (rp.prop_name_id ((double) 5)).to_parsable_string (), "##5");
+    EXPECT_EQ (db::property_name (rp.prop_name_id ((int) 5)).to_parsable_string (), "#5");
+  }
+}

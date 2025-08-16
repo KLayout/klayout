@@ -51,7 +51,7 @@ public:
 
   TextsDelegate *clone () const;
 
-  virtual void do_insert (const db::Text &text);
+  virtual void do_insert (const db::Text &text, properties_id_type prop_id);
 
   virtual void do_transform (const db::Trans &t);
   virtual void do_transform (const db::ICplxTrans &t);
@@ -71,12 +71,14 @@ public:
   virtual Box bbox () const;
   virtual bool empty () const;
   virtual const db::Text *nth (size_t n) const;
+  virtual db::properties_id_type nth_prop_id (size_t n) const;
   virtual bool has_valid_texts () const;
   virtual const db::RecursiveShapeIterator *iter () const;
   virtual void apply_property_translator (const db::PropertiesTranslator &pt);
 
   virtual TextsDelegate *filter_in_place (const TextFilterBase &filter);
   virtual TextsDelegate *filtered (const TextFilterBase &) const;
+  virtual std::pair<TextsDelegate *, TextsDelegate *> filtered_pair (const TextFilterBase &filter) const;
 
   virtual TextsDelegate *process_in_place (const TextProcessorBase &);
   virtual TextsDelegate *processed (const TextProcessorBase &) const;
@@ -85,7 +87,7 @@ public:
   virtual TextsDelegate *add_in_place (const Texts &other);
   virtual TextsDelegate *add (const Texts &other) const;
 
-  virtual RegionDelegate *polygons (db::Coord e) const;
+  virtual RegionDelegate *polygons (db::Coord e, const tl::Variant &text_prop) const;
   virtual EdgesDelegate *edges () const;
 
   virtual TextsDelegate *in (const Texts &, bool) const;
@@ -105,7 +107,7 @@ private:
   DeepTexts &operator= (const DeepTexts &other);
 
   void init ();
-  DeepTexts *apply_filter (const TextFilterBase &filter) const;
+  std::pair<DeepTexts *, DeepTexts *> apply_filter (const TextFilterBase &filter, bool with_true, bool with_false) const;
 
   virtual TextsDelegate *selected_interacting_generic (const Region &other, bool inverse) const;
   virtual RegionDelegate *pull_generic (const Region &other) const;

@@ -150,6 +150,9 @@ END
       return
     end
     
+    # makes RBA::Value available as tl.Value
+    pya.eval_string("import klayout.tl");
+
     macro_file = File.join($ut_testtmp, "test.lym")
     File.open(macro_file, "w") do |file|
       file.write(<<"END")
@@ -190,6 +193,45 @@ END
 
   end
 
+  # attributes
+  def test_4
+
+    macro = RBA::Macro::new
+
+    assert_equal(macro.has_attribute("x"), false)
+    macro.set_attribute("x", 17)
+    assert_equal(macro.has_attribute("x"), true)
+    assert_equal(macro.get_attribute("x"), 17)
+    macro.delete_attribute("x")
+    assert_equal(macro.has_attribute("x"), false)
+    assert_equal(macro.get_attribute("x"), nil)
+
+  end
+    
+  # passing and returning values
+  def test_5
+    
+    macro = RBA::Macro::new
+    macro.interpreter = RBA::Macro::Ruby
+    macro.text = <<"END"
+macro = RBA::Macro::current
+x = macro.get_attribute("x")
+macro.set_attribute("y", x + 1)
+END
+
+    macro.set_attribute("x", 17)
+    assert_equal(macro.has_attribute("x"), true)
+    assert_equal(macro.has_attribute("y"), false)
+
+    macro.run
+
+    assert_equal(macro.has_attribute("x"), true)
+    assert_equal(macro.get_attribute("x"), 17)
+    assert_equal(macro.has_attribute("y"), true)
+    assert_equal(macro.get_attribute("y"), 18)
+
+  end
+    
 end
 
 load("test_epilogue.rb")

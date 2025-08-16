@@ -36,9 +36,12 @@
 #include "dbRegionProcessors.h"
 #include "dbCompoundOperation.h"
 #include "dbLayoutToNetlist.h"
+#include "dbPropertiesRepository.h"
+#include "dbPropertiesFilter.h"
 #include "tlGlobPattern.h"
 
 #include "gsiDeclDbContainerHelpers.h"
+#include "gsiDeclDbMeasureHelpers.h"
 
 #include <memory>
 #include <vector>
@@ -50,31 +53,33 @@ namespace gsi
 // ---------------------------------------------------------------------------------
 //  PolygonFilter binding
 
+typedef shape_filter_impl<db::AllMustMatchFilter> PolygonFilterBase;
+
 class PolygonFilterImpl
-  : public shape_filter_impl<db::AllMustMatchFilter>
+  : public PolygonFilterBase
 {
 public:
   PolygonFilterImpl () { }
 
-  bool issue_selected (const db::Polygon &) const
+  bool issue_selected (const db::PolygonWithProperties &) const
   {
     return false;
   }
 
-  virtual bool selected (const db::Polygon &polygon) const
+  virtual bool selected (const db::Polygon &polygon, db::properties_id_type prop_id) const
   {
     if (f_selected.can_issue ()) {
-      return f_selected.issue<PolygonFilterImpl, bool, const db::Polygon &> (&PolygonFilterImpl::issue_selected, polygon);
+      return f_selected.issue<PolygonFilterImpl, bool, const db::PolygonWithProperties &> (&PolygonFilterImpl::issue_selected, db::PolygonWithProperties (polygon, prop_id));
     } else {
       return issue_selected (polygon);
     }
   }
 
-  virtual bool selected (const db::PolygonRef &polygon) const
+  virtual bool selected (const db::PolygonRef &polygon, db::properties_id_type prop_id) const
   {
     db::Polygon p;
     polygon.instantiate (p);
-    return selected (p);
+    return selected (p, prop_id);
   }
 
   gsi::Callback f_selected;
@@ -85,12 +90,101 @@ private:
   PolygonFilterImpl (const PolygonFilterImpl &);
 };
 
-Class<gsi::PolygonFilterImpl> decl_PolygonFilterImpl ("db", "PolygonFilter",
-  PolygonFilterImpl::method_decls (true) +
+typedef db::polygon_properties_filter<gsi::PolygonFilterBase> PolygonPropertiesFilter;
+
+static gsi::PolygonFilterBase *make_ppf1 (const tl::Variant &name, const tl::Variant &value, bool inverse)
+{
+  return new PolygonPropertiesFilter (name, value, inverse);
+}
+
+static gsi::PolygonFilterBase *make_ppf2 (const tl::Variant &name, const tl::Variant &from, const tl::Variant &to, bool inverse)
+{
+  return new PolygonPropertiesFilter (name, from, to, inverse);
+}
+
+static gsi::PolygonFilterBase *make_pg (const tl::Variant &name, const std::string &glob, bool inverse, bool case_sensitive)
+{
+  tl::GlobPattern pattern (glob);
+  pattern.set_case_sensitive (case_sensitive);
+  return new PolygonPropertiesFilter (name, pattern, inverse);
+}
+
+static gsi::PolygonFilterBase *make_pe (const std::string &expression, bool inverse, const std::map<std::string, tl::Variant> &variables, double dbu)
+{
+  return new gsi::expression_filter<gsi::PolygonFilterBase, db::Region> (expression, inverse, dbu, variables);
+}
+
+Class<gsi::PolygonFilterBase> decl_PolygonFilterBase ("db", "PolygonFilterBase",
+  gsi::PolygonFilterBase::method_decls (true) +
+  gsi::constructor ("property_glob", &make_pg, gsi::arg ("name"), gsi::arg ("pattern"), gsi::arg ("inverse", false), gsi::arg ("case_sensitive", true),
+    "@brief Creates a single-valued property filter\n"
+    "@param name The name of the property to use.\n"
+    "@param value The glob pattern to match the property value against.\n"
+    "@param inverse If true, inverts the selection - i.e. all polygons without a matching property are selected.\n"
+    "@param case_sensitive If true, the match is case sensitive (the default), if false, the match is not case sensitive.\n"
+    "\n"
+    "Apply this filter with \\Region#filtered:\n"
+    "\n"
+    "@code\n"
+    "# region is a Region object\n"
+    "# filtered_region contains all polygons where the 'net' property starts with 'C':\n"
+    "filtered_region = region.filtered(RBA::PolygonFilterBase::property_glob('net', 'C*'))\n"
+    "@/code\n"
+    "\n"
+    "This feature has been introduced in version 0.30."
+  ) +
+  gsi::constructor ("property_filter", &make_ppf1, gsi::arg ("name"), gsi::arg ("value"), gsi::arg ("inverse", false),
+    "@brief Creates a single-valued property filter\n"
+    "@param name The name of the property to use.\n"
+    "@param value The value against which the property is checked (exact match).\n"
+    "@param inverse If true, inverts the selection - i.e. all polygons without a property with the given name and value are selected.\n"
+    "\n"
+    "Apply this filter with \\Region#filtered. See \\property_glob for an example.\n"
+    "\n"
+    "This feature has been introduced in version 0.30."
+  ) +
+  gsi::constructor ("property_filter_bounded", &make_ppf2, gsi::arg ("name"), gsi::arg ("from"), gsi::arg ("to"), gsi::arg ("inverse", false),
+    "@brief Creates a single-valued property filter\n"
+    "@param name The name of the property to use.\n"
+    "@param from The lower value against which the property is checked or 'nil' if no lower bound shall be used.\n"
+    "@param to The upper value against which the property is checked or 'nil' if no upper bound shall be used.\n"
+    "@param inverse If true, inverts the selection - i.e. all polygons without a property with the given name and value range are selected.\n"
+    "\n"
+    "This version does a bounded match. The value of the propery needs to be larger or equal to 'from' and less than 'to'.\n"
+    "Apply this filter with \\Region#filtered. See \\property_glob for an example.\n"
+    "\n"
+    "This feature has been introduced in version 0.30."
+  ) +
+  gsi::constructor ("expression_filter", &make_pe, gsi::arg ("expression"), gsi::arg ("inverse", false), gsi::arg ("variables", std::map<std::string, tl::Variant> (), "{}"), gsi::arg ("dbu", 0.0),
+    "@brief Creates an expression-based filter\n"
+    "@param expression The expression to evaluate.\n"
+    "@param inverse If true, inverts the selection - i.e. all polygons without a property with the given name and value range are selected.\n"
+    "@param dbu If given and greater than zero, the shapes delivered by the 'shape' function will be in micrometer units.\n"
+    "@param variables Arbitrary values that are available as variables inside the expressions.\n"
+    "\n"
+    "Creates a filter that will evaluate the given expression on every shape and select the shape "
+    "when the expression renders a boolean true value. "
+    "The expression may use the following variables and functions:\n"
+    "\n"
+    "@ul\n"
+    "@li @b shape @/b: The current shape (i.e. 'Polygon' without DBU specified or 'DPolygon' otherwise) @/li\n"
+    "@li @b value(<name>) @/b: The value of the property with the given name (the first one if there are multiple properties with the same name) @/li\n"
+    "@li @b values(<name>) @/b: All values of the properties with the given name (returns a list) @/li\n"
+    "@li @b <name> @/b: A shortcut for 'value(<name>)' (<name> is used as a symbol) @/li\n"
+    "@/ul\n"
+    "\n"
+    "This feature has been introduced in version 0.30.3."
+  ),
+  "@hide"
+);
+
+Class<gsi::PolygonFilterImpl> decl_PolygonFilterImpl (decl_PolygonFilterBase, "db", "PolygonFilter",
   callback ("selected", &PolygonFilterImpl::issue_selected, &PolygonFilterImpl::f_selected, gsi::arg ("polygon"),
     "@brief Selects a polygon\n"
     "This method is the actual payload. It needs to be reimplemented in a derived class.\n"
-    "It needs to analyze the polygon and return 'true' if it should be kept and 'false' if it should be discarded."
+    "It needs to analyze the polygon and return 'true' if it should be kept and 'false' if it should be discarded.\n"
+    "\n"
+    "Since version 0.30, the polygon carries properties."
   ),
   "@brief A generic polygon filter adaptor\n"
   "\n"
@@ -135,7 +229,9 @@ Class<gsi::PolygonFilterImpl> decl_PolygonFilterImpl ("db", "PolygonFilter",
 // ---------------------------------------------------------------------------------
 //  PolygonProcessor binding
 
-Class<shape_processor_impl<db::PolygonProcessorBase> > decl_PolygonOperator ("db", "PolygonOperator",
+Class<db::PolygonProcessorBase> decl_PolygonProcessorBase ("db", "PolygonProcessorBase", "@hide");
+
+Class<shape_processor_impl<db::PolygonProcessorBase> > decl_PolygonOperator (decl_PolygonProcessorBase, "db", "PolygonOperator",
   shape_processor_impl<db::PolygonProcessorBase>::method_decls (true),
   "@brief A generic polygon operator\n"
   "\n"
@@ -180,7 +276,69 @@ Class<shape_processor_impl<db::PolygonProcessorBase> > decl_PolygonOperator ("db
   "This class has been introduced in version 0.29.\n"
 );
 
-Class<shape_processor_impl<db::PolygonToEdgeProcessorBase> > decl_PolygonToEdgeProcessor ("db", "PolygonToEdgeOperator",
+static
+property_computation_processor<db::PolygonProcessorBase, db::Region> *
+new_pcp (const db::Region *container, const std::map<tl::Variant, std::string> &expressions, bool copy_properties, const std::map <std::string, tl::Variant> &variables, double dbu)
+{
+  return new property_computation_processor<db::PolygonProcessorBase, db::Region> (container, expressions, copy_properties, dbu, variables);
+}
+
+property_computation_processor<db::PolygonProcessorBase, db::Region> *
+new_pcps (const db::Region *container, const std::string &expression, bool copy_properties, const std::map <std::string, tl::Variant> &variables, double dbu)
+{
+  std::map<tl::Variant, std::string> expressions;
+  expressions.insert (std::make_pair (tl::Variant (), expression));
+  return new property_computation_processor<db::PolygonProcessorBase, db::Region> (container, expressions, copy_properties, dbu, variables);
+}
+
+Class<property_computation_processor<db::PolygonProcessorBase, db::Region> > decl_PolygonPropertiesExpressions (decl_PolygonProcessorBase, "db", "PolygonPropertiesExpressions",
+  property_computation_processor<db::PolygonProcessorBase, db::Region>::method_decls (true) +
+  gsi::constructor ("new", &new_pcp, gsi::arg ("region"), gsi::arg ("expressions"), gsi::arg ("copy_properties", false), gsi::arg ("variables", std::map<std::string, tl::Variant> (), "{}"), gsi::arg ("dbu", 0.0),
+    "@brief Creates a new properties expressions operator\n"
+    "\n"
+    "@param region The region, the processor will be used on. Can be nil, but if given, allows some optimization.\n"
+    "@param expressions A map of property names and expressions used to generate the values of the properties (see class description for details).\n"
+    "@param copy_properties If true, new properties will be added to existing ones.\n"
+    "@param dbu If not zero, this value specifies the database unit to use. If given, the shapes returned by the 'shape' function will be micrometer-unit objects.\n"
+    "@param variables Arbitrary values that are available as variables inside the expressions.\n"
+  ) +
+  gsi::constructor ("new", &new_pcps, gsi::arg ("region"), gsi::arg ("expression"), gsi::arg ("copy_properties", false), gsi::arg ("variables", std::map<std::string, tl::Variant> (), "{}"), gsi::arg ("dbu", 0.0),
+    "@brief Creates a new properties expressions operator\n"
+    "\n"
+    "@param region The region, the processor will be used on. Can be nil, but if given, allows some optimization.\n"
+    "@param expression A single expression evaluated for each shape (see class description for details).\n"
+    "@param copy_properties If true, new properties will be added to existing ones.\n"
+    "@param dbu If not zero, this value specifies the database unit to use. If given, the shapes returned by the 'shape' function will be micrometer-unit objects.\n"
+    "@param variables Arbitrary values that are available as variables inside the expressions.\n"
+  ),
+  "@brief An operator attaching computed properties to the edge pairs\n"
+  "\n"
+  "This operator will execute a number of expressions and attach the results as new properties. "
+  "The expression inputs can be taken either from the edges themselves or from existing properties.\n"
+  "\n"
+  "A number of expressions can be supplied with a name. The expressions will be evaluated and the result "
+  "is attached to the output edge pairs as user properties with the given names.\n"
+  "\n"
+  "Alternatively, a single expression can be given. In that case, 'put' needs to be used to attach properties "
+  "to the output shape. You can also use 'skip' to drop shapes in that case.\n"
+  "\n"
+  "The expression may use the following variables and functions:\n"
+  "\n"
+  "@ul\n"
+  "@li @b shape @/b: The current shape (i.e. 'Polygon' without DBU specified or 'DPolygon' otherwise) @/li\n"
+  "@li @b put(<name>, <value>) @/b: Attaches the given value as a property with name 'name' to the output shape @/li\n"
+  "@li @b skip(<flag>) @/b: If called with a 'true' value, the shape is dropped from the output @/li\n"
+  "@li @b value(<name>) @/b: The value of the property with the given name (the first one if there are multiple properties with the same name) @/li\n"
+  "@li @b values(<name>) @/b: All values of the properties with the given name (returns a list) @/li\n"
+  "@li @b <name> @/b: A shortcut for 'value(<name>)' (<name> is used as a symbol) @/li\n"
+  "@/ul\n"
+  "\n"
+  "This class has been introduced in version 0.30.3.\n"
+);
+
+Class<db::PolygonToEdgeProcessorBase> decl_PolygonToEdgeProcessorBase ("db", "PolygonToEdgeProcessorBase", "@hide");
+
+Class<shape_processor_impl<db::PolygonToEdgeProcessorBase> > decl_PolygonToEdgeProcessor (decl_PolygonToEdgeProcessorBase, "db", "PolygonToEdgeOperator",
   shape_processor_impl<db::PolygonToEdgeProcessorBase>::method_decls (true),
   "@brief A generic polygon-to-edge operator\n"
   "\n"
@@ -204,7 +362,9 @@ Class<shape_processor_impl<db::PolygonToEdgeProcessorBase> > decl_PolygonToEdgeP
   "This class has been introduced in version 0.29.\n"
 );
 
-Class<shape_processor_impl<db::PolygonToEdgePairProcessorBase> > decl_PolygonToEdgePairProcessor ("db", "PolygonToEdgePairOperator",
+Class<db::PolygonToEdgePairProcessorBase> decl_PolygonToEdgePairProcessorBase ("db", "PolygonToEdgePairProcessorBase", "@hide");
+
+Class<shape_processor_impl<db::PolygonToEdgePairProcessorBase> > decl_PolygonToEdgePairProcessor (decl_PolygonToEdgePairProcessorBase, "db", "PolygonToEdgePairOperator",
   shape_processor_impl<db::PolygonToEdgePairProcessorBase>::method_decls (true),
   "@brief A generic polygon-to-edge-pair operator\n"
   "\n"
@@ -250,7 +410,17 @@ static db::Region *new_a (const std::vector <db::Polygon> &a)
   return new db::Region (a.begin (), a.end ());
 }
 
+static db::Region *new_ap (const std::vector <db::PolygonWithProperties> &a, bool)
+{
+  return new db::Region (a.begin (), a.end ());
+}
+
 static db::Region *new_b (const db::Box &o)
+{
+  return new db::Region (o);
+}
+
+static db::Region *new_bp (const db::BoxWithProperties &o)
 {
   return new db::Region (o);
 }
@@ -260,12 +430,27 @@ static db::Region *new_p (const db::Polygon &o)
   return new db::Region (o);
 }
 
+static db::Region *new_pp (const db::PolygonWithProperties &o)
+{
+  return new db::Region (o);
+}
+
 static db::Region *new_ps (const db::SimplePolygon &o)
 {
   return new db::Region (o);
 }
 
+static db::Region *new_psp (const db::SimplePolygonWithProperties &o)
+{
+  return new db::Region (o);
+}
+
 static db::Region *new_path (const db::Path &o)
+{
+  return new db::Region (o);
+}
+
+static db::Region *new_pathp (const db::PathWithProperties &o)
 {
   return new db::Region (o);
 }
@@ -382,6 +567,13 @@ static void insert_a (db::Region *r, const std::vector <db::Polygon> &a)
   }
 }
 
+static void insert_ap (db::Region *r, const std::vector <db::PolygonWithProperties> &a)
+{
+  for (std::vector <db::PolygonWithProperties>::const_iterator p = a.begin (); p != a.end (); ++p) {
+    r->insert (*p);
+  }
+}
+
 static void insert_r (db::Region *r, const db::Region &a)
 {
   for (db::Region::const_iterator p = a.begin (); ! p.at_end (); ++p) {
@@ -395,7 +587,11 @@ static void insert_st (db::Region *r, const db::Shapes &a, const Trans &t)
   for (db::Shapes::shape_iterator p = a.begin (db::ShapeIterator::Polygons | db::ShapeIterator::Boxes | db::ShapeIterator::Paths); !p.at_end (); ++p) {
     db::Polygon poly;
     p->polygon (poly);
-    r->insert (poly.transformed (t));
+    if (p->prop_id () != 0) {
+      r->insert (db::PolygonWithProperties (poly.transformed (t), p->prop_id ()));
+    } else {
+      r->insert (poly.transformed (t));
+    }
   }
 }
 
@@ -508,32 +704,37 @@ static db::Edges extent_refs_edges (const db::Region *r, double fx1, double fy1,
   return r->processed (db::RelativeExtentsAsEdges (fx1, fy1, fx2, fy2));
 }
 
-static db::Region filtered (const db::Region *r, const PolygonFilterImpl *f)
+static db::Region filtered (const db::Region *r, const PolygonFilterBase *f)
 {
   return r->filtered (*f);
 }
 
-static void filter (db::Region *r, const PolygonFilterImpl *f)
+static void filter (db::Region *r, const PolygonFilterBase *f)
 {
   r->filter (*f);
 }
 
-static db::Region processed_pp (const db::Region *r, const shape_processor_impl<db::PolygonProcessorBase> *f)
+static std::vector<db::Region> split_filter (const db::Region *r, const PolygonFilterBase *f)
+{
+  return as_2region_vector (r->split_filter (*f));
+}
+
+static db::Region processed_pp (const db::Region *r, const db::PolygonProcessorBase *f)
 {
   return r->processed (*f);
 }
 
-static void process_pp (db::Region *r, const shape_processor_impl<db::PolygonProcessorBase> *f)
+static void process_pp (db::Region *r, const db::PolygonProcessorBase *f)
 {
   r->process (*f);
 }
 
-static db::EdgePairs processed_pep (const db::Region *r, const shape_processor_impl<db::PolygonToEdgePairProcessorBase> *f)
+static db::EdgePairs processed_pep (const db::Region *r, const db::PolygonToEdgePairProcessorBase *f)
 {
   return r->processed (*f);
 }
 
-static db::Edges processed_pe (const db::Region *r, const shape_processor_impl<db::PolygonToEdgeProcessorBase> *f)
+static db::Edges processed_pe (const db::Region *r, const db::PolygonToEdgeProcessorBase *f)
 {
   return r->processed (*f);
 }
@@ -544,10 +745,22 @@ static db::Region with_perimeter1 (const db::Region *r, db::Region::perimeter_ty
   return r->filtered (f);
 }
 
+static std::vector<db::Region> split_with_perimeter1 (const db::Region *r, db::Region::perimeter_type perimeter)
+{
+  db::RegionPerimeterFilter f (perimeter, perimeter + 1, false);
+  return as_2region_vector (r->split_filter (f));
+}
+
 static db::Region with_perimeter2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool inverse)
 {
   db::RegionPerimeterFilter f (min.is_nil () ? db::Region::perimeter_type (0) : min.to<db::Region::perimeter_type> (), max.is_nil () ? std::numeric_limits <db::Region::distance_type>::max () : max.to<db::Region::distance_type> (), inverse);
   return r->filtered (f);
+}
+
+static std::vector<db::Region> split_with_perimeter2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max)
+{
+  db::RegionPerimeterFilter f (min.is_nil () ? db::Region::perimeter_type (0) : min.to<db::Region::perimeter_type> (), max.is_nil () ? std::numeric_limits <db::Region::distance_type>::max () : max.to<db::Region::distance_type> (), false);
+  return as_2region_vector (r->split_filter (f));
 }
 
 static db::Region with_area1 (const db::Region *r, db::Region::area_type area, bool inverse)
@@ -556,10 +769,22 @@ static db::Region with_area1 (const db::Region *r, db::Region::area_type area, b
   return r->filtered (f);
 }
 
+static std::vector<db::Region> split_with_area1 (const db::Region *r, db::Region::area_type area)
+{
+  db::RegionAreaFilter f (area, area + 1, false);
+  return as_2region_vector (r->split_filter (f));
+}
+
 static db::Region with_area2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool inverse)
 {
   db::RegionAreaFilter f (min.is_nil () ? db::Region::area_type (0) : min.to<db::Region::area_type> (), max.is_nil () ? std::numeric_limits <db::Region::area_type>::max () : max.to<db::Region::area_type> (), inverse);
   return r->filtered (f);
+}
+
+static std::vector<db::Region> split_with_area2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max)
+{
+  db::RegionAreaFilter f (min.is_nil () ? db::Region::area_type (0) : min.to<db::Region::area_type> (), max.is_nil () ? std::numeric_limits <db::Region::area_type>::max () : max.to<db::Region::area_type> (), false);
+  return as_2region_vector (r->split_filter (f));
 }
 
 static db::Region with_holes1 (const db::Region *r, size_t n, bool inverse)
@@ -568,10 +793,22 @@ static db::Region with_holes1 (const db::Region *r, size_t n, bool inverse)
   return r->filtered (f);
 }
 
+static std::vector<db::Region> split_with_holes1 (const db::Region *r, size_t n)
+{
+  db::HoleCountFilter f (n, n + 1, false);
+  return as_2region_vector (r->split_filter (f));
+}
+
 static db::Region with_holes2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool inverse)
 {
   db::HoleCountFilter f (min.is_nil () ? size_t (0) : min.to<size_t> (), max.is_nil () ? std::numeric_limits <size_t>::max () : max.to<size_t> (), inverse);
   return r->filtered (f);
+}
+
+static std::vector<db::Region> split_with_holes2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max)
+{
+  db::HoleCountFilter f (min.is_nil () ? size_t (0) : min.to<size_t> (), max.is_nil () ? std::numeric_limits <size_t>::max () : max.to<size_t> (), false);
+  return as_2region_vector (r->split_filter (f));
 }
 
 static db::Region with_bbox_width1 (const db::Region *r, db::Region::distance_type bbox_width, bool inverse)
@@ -580,10 +817,22 @@ static db::Region with_bbox_width1 (const db::Region *r, db::Region::distance_ty
   return r->filtered (f);
 }
 
+static std::vector<db::Region> split_with_bbox_width1 (const db::Region *r, db::Region::distance_type bbox_width)
+{
+  db::RegionBBoxFilter f (bbox_width, bbox_width + 1, false, db::RegionBBoxFilter::BoxWidth);
+  return as_2region_vector (r->split_filter (f));
+}
+
 static db::Region with_bbox_width2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool inverse)
 {
   db::RegionBBoxFilter f (min.is_nil () ? db::Region::distance_type (0) : min.to<db::Region::distance_type> (), max.is_nil () ? std::numeric_limits <db::Region::distance_type>::max () : max.to<db::Region::distance_type> (), inverse, db::RegionBBoxFilter::BoxWidth);
   return r->filtered (f);
+}
+
+static std::vector<db::Region> split_with_bbox_width2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max)
+{
+  db::RegionBBoxFilter f (min.is_nil () ? db::Region::distance_type (0) : min.to<db::Region::distance_type> (), max.is_nil () ? std::numeric_limits <db::Region::distance_type>::max () : max.to<db::Region::distance_type> (), false, db::RegionBBoxFilter::BoxWidth);
+  return as_2region_vector (r->split_filter (f));
 }
 
 static db::Region with_bbox_height1 (const db::Region *r, db::Region::distance_type bbox_height, bool inverse)
@@ -592,10 +841,22 @@ static db::Region with_bbox_height1 (const db::Region *r, db::Region::distance_t
   return r->filtered (f);
 }
 
+static std::vector<db::Region> split_with_bbox_height1 (const db::Region *r, db::Region::distance_type bbox_height)
+{
+  db::RegionBBoxFilter f (bbox_height, bbox_height + 1, false, db::RegionBBoxFilter::BoxHeight);
+  return as_2region_vector (r->split_filter (f));
+}
+
 static db::Region with_bbox_height2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool inverse)
 {
   db::RegionBBoxFilter f (min.is_nil () ? db::Region::distance_type (0) : min.to<db::Region::distance_type> (), max.is_nil () ? std::numeric_limits <db::Region::distance_type>::max () : max.to<db::Region::distance_type> (), inverse, db::RegionBBoxFilter::BoxHeight);
   return r->filtered (f);
+}
+
+static std::vector<db::Region> split_with_bbox_height2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max)
+{
+  db::RegionBBoxFilter f (min.is_nil () ? db::Region::distance_type (0) : min.to<db::Region::distance_type> (), max.is_nil () ? std::numeric_limits <db::Region::distance_type>::max () : max.to<db::Region::distance_type> (), false, db::RegionBBoxFilter::BoxHeight);
+  return as_2region_vector (r->split_filter (f));
 }
 
 static db::Region with_bbox_min1 (const db::Region *r, db::Region::distance_type bbox_min, bool inverse)
@@ -604,10 +865,22 @@ static db::Region with_bbox_min1 (const db::Region *r, db::Region::distance_type
   return r->filtered (f);
 }
 
+static std::vector<db::Region> split_with_bbox_min1 (const db::Region *r, db::Region::distance_type bbox_min)
+{
+  db::RegionBBoxFilter f (bbox_min, bbox_min + 1, false, db::RegionBBoxFilter::BoxMinDim);
+  return as_2region_vector (r->split_filter (f));
+}
+
 static db::Region with_bbox_min2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool inverse)
 {
   db::RegionBBoxFilter f (min.is_nil () ? db::Region::distance_type (0) : min.to<db::Region::distance_type> (), max.is_nil () ? std::numeric_limits <db::Region::distance_type>::max () : max.to<db::Region::distance_type> (), inverse, db::RegionBBoxFilter::BoxMinDim);
   return r->filtered (f);
+}
+
+static std::vector<db::Region> split_with_bbox_min2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max)
+{
+  db::RegionBBoxFilter f (min.is_nil () ? db::Region::distance_type (0) : min.to<db::Region::distance_type> (), max.is_nil () ? std::numeric_limits <db::Region::distance_type>::max () : max.to<db::Region::distance_type> (), false, db::RegionBBoxFilter::BoxMinDim);
+  return as_2region_vector (r->split_filter (f));
 }
 
 static db::Region with_bbox_max1 (const db::Region *r, db::Region::distance_type bbox_max, bool inverse)
@@ -616,10 +889,94 @@ static db::Region with_bbox_max1 (const db::Region *r, db::Region::distance_type
   return r->filtered (f);
 }
 
+static std::vector<db::Region> split_with_bbox_max1 (const db::Region *r, db::Region::distance_type bbox_max)
+{
+  db::RegionBBoxFilter f (bbox_max, bbox_max + 1, false, db::RegionBBoxFilter::BoxMaxDim);
+  return as_2region_vector (r->split_filter (f));
+}
+
 static db::Region with_bbox_max2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool inverse)
 {
   db::RegionBBoxFilter f (min.is_nil () ? db::Region::distance_type (0) : min.to<db::Region::distance_type> (), max.is_nil () ? std::numeric_limits <db::Region::distance_type>::max () : max.to<db::Region::distance_type> (), inverse, db::RegionBBoxFilter::BoxMaxDim);
   return r->filtered (f);
+}
+
+static std::vector<db::Region> split_with_bbox_max2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max)
+{
+  db::RegionBBoxFilter f (min.is_nil () ? db::Region::distance_type (0) : min.to<db::Region::distance_type> (), max.is_nil () ? std::numeric_limits <db::Region::distance_type>::max () : max.to<db::Region::distance_type> (), false, db::RegionBBoxFilter::BoxMaxDim);
+  return as_2region_vector (r->split_filter (f));
+}
+
+static db::Region with_bbox_aspect_ratio1 (const db::Region *r, double v, bool inverse)
+{
+  db::RegionRatioFilter f (v, true, v, true, inverse, db::RegionRatioFilter::AspectRatio);
+  return r->filtered (f);
+}
+
+static std::vector<db::Region> split_with_bbox_aspect_ratio1 (const db::Region *r, double v)
+{
+  db::RegionRatioFilter f (v, true, v, true, false, db::RegionRatioFilter::AspectRatio);
+  return as_2region_vector (r->split_filter (f));
+}
+
+static db::Region with_bbox_aspect_ratio2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool inverse, bool min_included, bool max_included)
+{
+  db::RegionRatioFilter f (min.is_nil () ? 0.0 : min.to<double> (), min_included, max.is_nil () ? std::numeric_limits <double>::max () : max.to<double> (), max_included, inverse, db::RegionRatioFilter::AspectRatio);
+  return r->filtered (f);
+}
+
+static std::vector<db::Region> split_with_bbox_aspect_ratio2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool min_included, bool max_included)
+{
+  db::RegionRatioFilter f (min.is_nil () ? 0.0 : min.to<double> (), min_included, max.is_nil () ? std::numeric_limits <double>::max () : max.to<double> (), max_included, false, db::RegionRatioFilter::AspectRatio);
+  return as_2region_vector (r->split_filter (f));
+}
+
+static db::Region with_area_ratio1 (const db::Region *r, double v, bool inverse)
+{
+  db::RegionRatioFilter f (v, true, v, true, inverse, db::RegionRatioFilter::AreaRatio);
+  return r->filtered (f);
+}
+
+static std::vector<db::Region> split_with_area_ratio1 (const db::Region *r, double v)
+{
+  db::RegionRatioFilter f (v, true, v, true, false, db::RegionRatioFilter::AreaRatio);
+  return as_2region_vector (r->split_filter (f));
+}
+
+static db::Region with_area_ratio2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool inverse, bool min_included, bool max_included)
+{
+  db::RegionRatioFilter f (min.is_nil () ? 0.0 : min.to<double> (), min_included, max.is_nil () ? std::numeric_limits <double>::max () : max.to<double> (), max_included, inverse, db::RegionRatioFilter::AreaRatio);
+  return r->filtered (f);
+}
+
+static std::vector<db::Region> split_with_area_ratio2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool min_included, bool max_included)
+{
+  db::RegionRatioFilter f (min.is_nil () ? 0.0 : min.to<double> (), min_included, max.is_nil () ? std::numeric_limits <double>::max () : max.to<double> (), max_included, false, db::RegionRatioFilter::AreaRatio);
+  return as_2region_vector (r->split_filter (f));
+}
+
+static db::Region with_relative_height1 (const db::Region *r, double v, bool inverse)
+{
+  db::RegionRatioFilter f (v, true, v, true, inverse, db::RegionRatioFilter::RelativeHeight);
+  return r->filtered (f);
+}
+
+static std::vector<db::Region> split_with_relative_height1 (const db::Region *r, double v)
+{
+  db::RegionRatioFilter f (v, true, v, true, false, db::RegionRatioFilter::RelativeHeight);
+  return as_2region_vector (r->split_filter (f));
+}
+
+static db::Region with_relative_height2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool inverse, bool min_included, bool max_included)
+{
+  db::RegionRatioFilter f (min.is_nil () ? 0.0 : min.to<double> (), min_included, max.is_nil () ? std::numeric_limits <double>::max () : max.to<double> (), max_included, inverse, db::RegionRatioFilter::RelativeHeight);
+  return r->filtered (f);
+}
+
+static std::vector<db::Region> split_with_relative_height2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool min_included, bool max_included)
+{
+  db::RegionRatioFilter f (min.is_nil () ? 0.0 : min.to<double> (), min_included, max.is_nil () ? std::numeric_limits <double>::max () : max.to<double> (), max_included, false, db::RegionRatioFilter::RelativeHeight);
+  return as_2region_vector (r->split_filter (f));
 }
 
 static db::EdgePairs angle_check1 (const db::Region *r, double angle, bool inverse)
@@ -630,42 +987,6 @@ static db::EdgePairs angle_check1 (const db::Region *r, double angle, bool inver
 static db::EdgePairs angle_check2 (const db::Region *r, double amin, double amax, bool inverse)
 {
   return r->angle_check (amin, amax, inverse);
-}
-
-static db::Region with_bbox_aspect_ratio1 (const db::Region *r, double v, bool inverse)
-{
-  db::RegionRatioFilter f (v, true, v, true, inverse, db::RegionRatioFilter::AspectRatio);
-  return r->filtered (f);
-}
-
-static db::Region with_bbox_aspect_ratio2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool inverse, bool min_included, bool max_included)
-{
-  db::RegionRatioFilter f (min.is_nil () ? 0.0 : min.to<double> (), min_included, max.is_nil () ? std::numeric_limits <double>::max () : max.to<double> (), max_included, inverse, db::RegionRatioFilter::AspectRatio);
-  return r->filtered (f);
-}
-
-static db::Region with_area_ratio1 (const db::Region *r, double v, bool inverse)
-{
-  db::RegionRatioFilter f (v, true, v, true, inverse, db::RegionRatioFilter::AreaRatio);
-  return r->filtered (f);
-}
-
-static db::Region with_area_ratio2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool inverse, bool min_included, bool max_included)
-{
-  db::RegionRatioFilter f (min.is_nil () ? 0.0 : min.to<double> (), min_included, max.is_nil () ? std::numeric_limits <double>::max () : max.to<double> (), max_included, inverse, db::RegionRatioFilter::AreaRatio);
-  return r->filtered (f);
-}
-
-static db::Region with_relative_height1 (const db::Region *r, double v, bool inverse)
-{
-  db::RegionRatioFilter f (v, true, v, true, inverse, db::RegionRatioFilter::RelativeHeight);
-  return r->filtered (f);
-}
-
-static db::Region with_relative_height2 (const db::Region *r, const tl::Variant &min, const tl::Variant &max, bool inverse, bool min_included, bool max_included)
-{
-  db::RegionRatioFilter f (min.is_nil () ? 0.0 : min.to<double> (), min_included, max.is_nil () ? std::numeric_limits <double>::max () : max.to<double> (), max_included, inverse, db::RegionRatioFilter::RelativeHeight);
-  return r->filtered (f);
 }
 
 static db::Region in (const db::Region *r, const db::Region &other)
@@ -695,6 +1016,12 @@ static db::Region non_rectangles (const db::Region *r)
   return r->filtered (f);
 }
 
+static std::vector<db::Region> split_rectangles (const db::Region *r)
+{
+  db::RectangleFilter f (false, false);
+  return as_2region_vector (r->split_filter (f));
+}
+
 static db::Region squares (const db::Region *r)
 {
   db::RectangleFilter f (true, false);
@@ -705,6 +1032,12 @@ static db::Region non_squares (const db::Region *r)
 {
   db::RectangleFilter f (true, true);
   return r->filtered (f);
+}
+
+static std::vector<db::Region> split_squares (const db::Region *r)
+{
+  db::RectangleFilter f (true, false);
+  return as_2region_vector (r->split_filter (f));
 }
 
 static db::Region rectilinear (const db::Region *r)
@@ -719,6 +1052,12 @@ static db::Region non_rectilinear (const db::Region *r)
   return r->filtered (f);
 }
 
+static std::vector<db::Region> split_rectilinear (const db::Region *r)
+{
+  db::RectilinearFilter f (false);
+  return as_2region_vector (r->split_filter (f));
+}
+
 static void break_polygons (db::Region *r, size_t max_vertex_count, double max_area_ratio)
 {
   r->process (db::PolygonBreaker (max_vertex_count, max_area_ratio));
@@ -730,9 +1069,9 @@ static db::Region &merge_ext1 (db::Region *r, int min_wc)
   return *r;
 }
 
-static db::Region &merge_ext2 (db::Region *r, bool min_coherence, int min_wc)
+static db::Region &merge_ext2 (db::Region *r, bool min_coherence, int min_wc, bool jpm)
 {
-  r->merge (min_coherence, std::max (0, min_wc - 1));
+  r->merge (min_coherence, std::max (0, min_wc - 1), jpm);
   return *r;
 }
 
@@ -741,9 +1080,9 @@ static db::Region merged_ext1 (db::Region *r, int min_wc)
   return r->merged (false, std::max (0, min_wc - 1));
 }
 
-static db::Region merged_ext2 (db::Region *r, bool min_coherence, int min_wc)
+static db::Region merged_ext2 (db::Region *r, bool min_coherence, int min_wc, bool jpm)
 {
-  return r->merged (min_coherence, std::max (0, min_wc - 1));
+  return r->merged (min_coherence, std::max (0, min_wc - 1), jpm);
 }
 
 static db::EdgePairs width2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, bool negative, db::PropertyConstraint prop_constraint, db::zero_distance_mode zero_distance_mode)
@@ -1132,6 +1471,26 @@ rasterize1 (const db::Region *region, const db::Point &origin, const db::Vector 
   return rasterize2 (region, origin, pixel_size, pixel_size, nx, ny);
 }
 
+static tl::Variant nth (const db::Region *region, size_t n)
+{
+  const db::Polygon *poly = region->nth (n);
+  if (! poly) {
+    return tl::Variant ();
+  } else {
+    return tl::Variant (db::PolygonWithProperties (*poly, region->nth_prop_id (n)));
+  }
+}
+
+static db::generic_shape_iterator<db::PolygonWithProperties> begin_region (const db::Region *region)
+{
+  return db::generic_shape_iterator<db::PolygonWithProperties> (db::make_wp_iter (region->delegate ()->begin ()));
+}
+
+static db::generic_shape_iterator<db::PolygonWithProperties> begin_region_merged (const db::Region *region)
+{
+  return db::generic_shape_iterator<db::PolygonWithProperties> (db::make_wp_iter (region->delegate ()->begin_merged ()));
+}
+
 static tl::Variant begin_shapes_rec (const db::Region *region)
 {
   auto res = region->begin_iter ();
@@ -1170,25 +1529,59 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This constructor creates a region from an array of polygons.\n"
   ) +
+  //  This is a dummy constructor that allows creating a Region from an array
+  //  of PolygonWithProperties objects too. GSI needs the dummy argument to
+  //  differentiate between the cases when an empty array is passed.
+  constructor ("new", &new_ap, gsi::arg ("array"), gsi::arg ("dummy", true),
+    "@hide"
+  ) +
   constructor ("new", &new_b, gsi::arg ("box"),
     "@brief Box constructor\n"
     "\n"
     "This constructor creates a region from a box.\n"
+  ) +
+  constructor ("new", &new_bp, gsi::arg ("box"),
+    "@brief Box constructor\n"
+    "\n"
+    "This constructor creates a region from a box with properties.\n"
+    "\n"
+    "This variant has been introduced in version 0.30."
   ) +
   constructor ("new", &new_p, gsi::arg ("polygon"),
     "@brief Polygon constructor\n"
     "\n"
     "This constructor creates a region from a polygon.\n"
   ) +
+  constructor ("new", &new_pp, gsi::arg ("polygon"),
+    "@brief Polygon constructor\n"
+    "\n"
+    "This constructor creates a region from a polygon with properties.\n"
+    "\n"
+    "This variant has been introduced in version 0.30."
+  ) +
   constructor ("new", &new_ps, gsi::arg ("polygon"),
     "@brief Simple polygon constructor\n"
     "\n"
     "This constructor creates a region from a simple polygon.\n"
   ) +
+  constructor ("new", &new_psp, gsi::arg ("polygon"),
+    "@brief Simple polygon constructor\n"
+    "\n"
+    "This constructor creates a region from a simple polygon with properties.\n"
+    "\n"
+    "This variant has been introduced in version 0.30."
+  ) +
   constructor ("new", &new_path, gsi::arg ("path"),
     "@brief Path constructor\n"
     "\n"
     "This constructor creates a region from a path.\n"
+  ) +
+  constructor ("new", &new_pathp, gsi::arg ("path"),
+    "@brief Path constructor\n"
+    "\n"
+    "This constructor creates a region from a path with properties.\n"
+    "\n"
+    "This variant has been introduced in version 0.30."
   ) +
   constructor ("new", &new_si, gsi::arg ("shape_iterator"),
     "@brief Constructor from a hierarchical shape set\n"
@@ -1355,6 +1748,23 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@brief Gets a flag indicating whether merged semantics is enabled\n"
     "See \\merged_semantics= for a description of this attribute.\n"
   ) +
+  method ("join_properties_on_merge=", &db::Region::set_join_properties_on_merge, gsi::arg ("f"),
+    "@brief Sets a flag indicating whether to join properties on merge\n"
+    "\n"
+    "When this flag is set to true, properties are joined on 'merge'.\n"
+    "That is: shapes merging into bigger shapes will have their properties joined.\n"
+    "With the flag set to false (the default), 'merge' will not join properties and return merged\n"
+    "shapes only if the sub-shapes have the same properties - i.e. properties form\n"
+    "separate shape classes on merge.\n"
+    "\n"
+    "This attribute has been introduced in version 0.30.3."
+  ) +
+  method ("join_properties_on_merge?", &db::Region::join_properties_on_merge,
+    "@brief Gets a flag indicating whether to join properties on merge\n"
+    "See \\join_properties_on_merge= for a description of this attribute.\n"
+    "\n"
+    "This attribute has been introduced in version 0.30.3."
+  ) +
   method ("strict_handling=", &db::Region::set_strict_handling, gsi::arg ("f"),
     "@brief Enables or disables strict handling\n"
     "\n"
@@ -1416,6 +1826,18 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
+  method_ext ("split_with_perimeter", split_with_perimeter1, gsi::arg ("perimeter"),
+    "@brief Like \\with_perimeter, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
+  method_ext ("split_with_perimeter", split_with_perimeter2, gsi::arg ("min_perimeter"), gsi::arg ("max_perimeter"),
+    "@brief Like \\with_perimeter, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
   method_ext ("with_area", with_area1, gsi::arg ("area"), gsi::arg ("inverse"),
     "@brief Filter the polygons by area\n"
     "Filters the polygons of the region by area. If \"inverse\" is false, only "
@@ -1436,6 +1858,18 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
+  method_ext ("split_with_area", split_with_area1, gsi::arg ("area"),
+    "@brief Like \\with_area, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
+  method_ext ("split_with_area", split_with_area2, gsi::arg ("min_area"), gsi::arg ("max_area"),
+    "@brief Like \\with_area, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
   method_ext ("with_holes", with_holes1, gsi::arg ("nholes"), gsi::arg ("inverse"),
     "@brief Filters the polygons by their number of holes\n"
     "Filters the polygons of the region by number of holes. If \"inverse\" is false, only "
@@ -1446,7 +1880,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method has been introduced in version 0.27.\n"
   ) +
-  method_ext ("with_holes", with_holes2, gsi::arg ("min_bholes"), gsi::arg ("max_nholes"), gsi::arg ("inverse"),
+  method_ext ("with_holes", with_holes2, gsi::arg ("min_nholes"), gsi::arg ("max_nholes"), gsi::arg ("inverse"),
     "@brief Filter the polygons by their number of holes\n"
     "Filters the polygons of the region by number of holes. If \"inverse\" is false, only "
     "polygons which have a hole count larger or equal to \"min_nholes\" and less than \"max_nholes\" are "
@@ -1459,6 +1893,18 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "This method has been introduced in version 0.27.\n"
+  ) +
+  method_ext ("split_with_holes", split_with_holes1, gsi::arg ("nholes"),
+    "@brief Like \\with_holes, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
+  method_ext ("split_with_holes", split_with_holes2, gsi::arg ("min_nholes"), gsi::arg ("max_nholes"),
+    "@brief Like \\with_holes, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
   ) +
   method_ext ("with_bbox_width", with_bbox_width1, gsi::arg ("width"), gsi::arg ("inverse"),
     "@brief Filter the polygons by bounding box width\n"
@@ -1478,6 +1924,18 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
+  method_ext ("split_with_bbox_width", split_with_bbox_width1, gsi::arg ("width"),
+    "@brief Like \\with_bbox_width, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
+  method_ext ("split_with_bbox_width", split_with_bbox_width2, gsi::arg ("min_width"), gsi::arg ("max_width"),
+    "@brief Like \\with_bbox_width, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
   method_ext ("with_bbox_height", with_bbox_height1, gsi::arg ("height"), gsi::arg ("inverse"),
     "@brief Filter the polygons by bounding box height\n"
     "Filters the polygons of the region by the height of their bounding box. If \"inverse\" is false, only "
@@ -1495,6 +1953,18 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "If you don't want to specify a lower or upper limit, pass nil to that parameter.\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
+  ) +
+  method_ext ("split_with_bbox_height", split_with_bbox_height1, gsi::arg ("height"),
+    "@brief Like \\with_bbox_height, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
+  method_ext ("split_with_bbox_height", split_with_bbox_height2, gsi::arg ("min_height"), gsi::arg ("max_height"),
+    "@brief Like \\with_bbox_height, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
   ) +
   method_ext ("with_bbox_min", with_bbox_min1, gsi::arg ("dim"), gsi::arg ("inverse"),
     "@brief Filter the polygons by bounding box width or height, whichever is smaller\n"
@@ -1516,6 +1986,18 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
+  method_ext ("split_with_bbox_min", split_with_bbox_min1, gsi::arg ("dim"),
+    "@brief Like \\with_bbox_min, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
+  method_ext ("split_with_bbox_min", split_with_bbox_min2, gsi::arg ("min_dim"), gsi::arg ("max_dim"),
+    "@brief Like \\with_bbox_min, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
   method_ext ("with_bbox_max", with_bbox_max1, gsi::arg ("dim"), gsi::arg ("inverse"),
     "@brief Filter the polygons by bounding box width or height, whichever is larger\n"
     "Filters the polygons of the region by the maximum dimension of their bounding box. "
@@ -1535,6 +2017,18 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "If you don't want to specify a lower or upper limit, pass nil to that parameter.\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
+  ) +
+  method_ext ("split_with_bbox_max", split_with_bbox_max1, gsi::arg ("dim"),
+    "@brief Like \\with_bbox_max, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
+  method_ext ("split_with_bbox_max", split_with_bbox_max2, gsi::arg ("min_dim"), gsi::arg ("max_dim"),
+    "@brief Like \\with_bbox_max, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
   ) +
   method_ext ("with_bbox_aspect_ratio", with_bbox_aspect_ratio1, gsi::arg ("ratio"), gsi::arg ("inverse"),
     "@brief Filters the polygons by the aspect ratio of their bounding boxes\n"
@@ -1565,6 +2059,18 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method has been introduced in version 0.27.\n"
   ) +
+  method_ext ("split_with_bbox_aspect_ratio", split_with_bbox_aspect_ratio1, gsi::arg ("ratio"),
+    "@brief Like \\with_bbox_aspect_ratio, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
+  method_ext ("split_with_bbox_aspect_ratio", split_with_bbox_aspect_ratio2, gsi::arg ("min_ratio"), gsi::arg ("max_ratio"), gsi::arg ("min_included", true), gsi::arg ("max_included", true),
+    "@brief Like \\with_bbox_aspect_ratio, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
   method_ext ("with_area_ratio", with_area_ratio1, gsi::arg ("ratio"), gsi::arg ("inverse"),
     "@brief Filters the polygons by the bounding box area to polygon area ratio\n"
     "The area ratio is defined by the ratio of bounding box area to polygon area. It's a measure "
@@ -1593,6 +2099,18 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "This method has been introduced in version 0.27.\n"
+  ) +
+  method_ext ("split_with_area_ratio", split_with_area_ratio1, gsi::arg ("ratio"),
+    "@brief Like \\with_area_ratio, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
+  method_ext ("split_with_area_ratio", split_with_area_ratio2, gsi::arg ("min_ratio"), gsi::arg ("max_ratio"), gsi::arg ("min_included", true), gsi::arg ("max_included", true),
+    "@brief Like \\with_area_ratio, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
   ) +
   method_ext ("with_relative_height", with_relative_height1, gsi::arg ("ratio"), gsi::arg ("inverse"),
     "@brief Filters the polygons by the ratio of height to width\n"
@@ -1624,6 +2142,18 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "This method has been introduced in version 0.27.\n"
+  ) +
+  method_ext ("split_with_relative_height", split_with_relative_height1, gsi::arg ("ratio"),
+    "@brief Like \\with_relative_height, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
+  method_ext ("split_with_relative_height", split_with_relative_height2, gsi::arg ("min_ratio"), gsi::arg ("max_ratio"), gsi::arg ("min_included", true), gsi::arg ("max_included", true),
+    "@brief Like \\with_relative_height, but returning two regions\n"
+    "The first region will contain all matching shapes, the other the non-matching ones.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
   ) +
   method ("strange_polygon_check", &db::Region::strange_polygon_check,
     "@brief Returns a region containing those parts of polygons which are \"strange\"\n"
@@ -1697,20 +2227,48 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Inserts a box into the region.\n"
   ) +
+  method ("insert", (void (db::Region::*)(const db::BoxWithProperties &)) &db::Region::insert, gsi::arg ("box"),
+    "@brief Inserts a box\n"
+    "\n"
+    "Inserts a box with properties into the region.\n"
+    "\n"
+    "This variant has been introduced in version 0.30."
+  ) +
   method ("insert", (void (db::Region::*)(const db::Polygon &)) &db::Region::insert, gsi::arg ("polygon"),
     "@brief Inserts a polygon\n"
     "\n"
     "Inserts a polygon into the region.\n"
+  ) +
+  method ("insert", (void (db::Region::*)(const db::PolygonWithProperties &)) &db::Region::insert, gsi::arg ("polygon"),
+    "@brief Inserts a polygon\n"
+    "\n"
+    "Inserts a polygon with properties into the region.\n"
+    "\n"
+    "This variant has been introduced in version 0.30."
   ) +
   method ("insert", (void (db::Region::*)(const db::SimplePolygon &)) &db::Region::insert, gsi::arg ("polygon"),
     "@brief Inserts a simple polygon\n"
     "\n"
     "Inserts a simple polygon into the region.\n"
   ) +
+  method ("insert", (void (db::Region::*)(const db::SimplePolygonWithProperties &)) &db::Region::insert, gsi::arg ("polygon"),
+    "@brief Inserts a simple polygon\n"
+    "\n"
+    "Inserts a simple polygon with properties into the region.\n"
+    "\n"
+    "This variant has been introduced in version 0.30."
+  ) +
   method ("insert", (void (db::Region::*)(const db::Path &)) &db::Region::insert, gsi::arg ("path"),
     "@brief Inserts a path\n"
     "\n"
     "Inserts a path into the region.\n"
+  ) +
+  method ("insert", (void (db::Region::*)(const db::PathWithProperties &)) &db::Region::insert, gsi::arg ("path"),
+    "@brief Inserts a path\n"
+    "\n"
+    "Inserts a path with properties into the region.\n"
+    "\n"
+    "This variant has been introduced in version 0.30."
   ) +
   method_ext ("insert", &insert_si, gsi::arg ("shape_iterator"),
     "@brief Inserts all shapes delivered by the recursive shape iterator into this region\n"
@@ -1728,6 +2286,11 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   ) +
   method_ext ("insert", &insert_a, gsi::arg ("array"),
     "@brief Inserts all polygons from the array into this region\n"
+  ) +
+  method_ext ("insert", &insert_ap, gsi::arg ("array"),
+    "@brief Inserts all polygons with properties from the array into this region\n"
+    "\n"
+    "This variant has been introduced in version 0.30."
   ) +
   method_ext ("insert", &insert_r, gsi::arg ("region"),
     "@brief Inserts all polygons from the other region into this region\n"
@@ -1835,65 +2398,77 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   method ("merge", (db::Region &(db::Region::*) ()) &db::Region::merge,
     "@brief Merge the region\n"
     "\n"
-    "@return The region after is has been merged (self).\n"
+    "@return The region after it has been merged (self).\n"
     "\n"
     "Merging removes overlaps and joins touching polygons.\n"
-    "If the region is already merged, this method does nothing\n"
+    "If the region is already merged, this method does nothing.\n"
+    "This method will behave according to the settings of the \\min_coherence and \\join_properties_on_merge attributes."
   ) +
   method_ext ("merge", &merge_ext1, gsi::arg ("min_wc"),
     "@brief Merge the region with options\n"
     "\n"
     "@param min_wc Overlap selection\n"
-    "@return The region after is has been merged (self).\n"
+    "@return The region after it has been merged (self).\n"
     "\n"
     "Merging removes overlaps and joins touching polygons.\n"
     "This version provides one additional option: \"min_wc\" controls whether output is only produced if multiple "
     "polygons overlap. The value specifies the number of polygons that need to overlap. A value of 2 "
     "means that output is only produced if two or more polygons overlap.\n"
     "\n"
-    "This method is equivalent to \"merge(false, min_wc).\n"
+    "This method is equivalent to \"merge(false, min_wc, false).\n"
   ) +
-  method_ext ("merge", &merge_ext2, gsi::arg ("min_coherence"), gsi::arg ("min_wc"),
+  method_ext ("merge", &merge_ext2, gsi::arg ("min_coherence"), gsi::arg ("min_wc"), gsi::arg ("join_properties_on_merge", false),
     "@brief Merge the region with options\n"
     "\n"
     "@param min_coherence A flag indicating whether the resulting polygons shall have minimum coherence\n"
     "@param min_wc Overlap selection\n"
-    "@return The region after is has been merged (self).\n"
+    "@param join_properties_on_merge See below\n"
+    "@return The region after it has been merged (self).\n"
     "\n"
     "Merging removes overlaps and joins touching polygons.\n"
     "This version provides two additional options: if \"min_coherence\" is set to true, \"kissing corners\" are "
     "resolved by producing separate polygons. \"min_wc\" controls whether output is only produced if multiple "
     "polygons overlap. The value specifies the number of polygons that need to overlap. A value of 2 "
     "means that output is only produced if two or more polygons overlap.\n"
+    "\n"
+    "The 'join_properties_on_merge' argument indicates how properties should be handled: if true, "
+    "the properties of the parts are joined and attached to the merged shape. If false, "
+    "only shapes with the same properties are merged - i.e. different properties form shape classes "
+    "that are merged individually.\n"
+    "\n"
+    "'join_properties_on_merge' has been added in version 0.30.3."
   ) +
   method ("merged", (db::Region (db::Region::*) () const) &db::Region::merged,
     "@brief Returns the merged region\n"
     "\n"
-    "@return The region after is has been merged.\n"
+    "@return The region after it has been merged.\n"
     "\n"
     "Merging removes overlaps and joins touching polygons.\n"
     "If the region is already merged, this method does nothing.\n"
+    "This method will behave according to the settings of the \\min_coherence and \\join_properties_on_merge attributes.\n"
     "In contrast to \\merge, this method does not modify the region but returns a merged copy.\n"
   ) +
   method_ext ("merged", &merged_ext1, gsi::arg ("min_wc"),
     "@brief Returns the merged region (with options)\n"
     "\n"
-    "@return The region after is has been merged.\n"
+    "@param min_wc Overlap selection\n"
+    "@return The region after it has been merged.\n"
     "\n"
     "This version provides one additional options: \"min_wc\" controls whether output is only produced if multiple "
     "polygons overlap. The value specifies the number of polygons that need to overlap. A value of 2 "
     "means that output is only produced if two or more polygons overlap.\n"
     "\n"
-    "This method is equivalent to \"merged(false, min_wc)\".\n"
+    "This method is equivalent to \"merged(false, min_wc, false)\".\n"
     "\n"
     "In contrast to \\merge, this method does not modify the region but returns a merged copy.\n"
   ) +
-  method_ext ("merged", &merged_ext2, gsi::arg ("min_coherence"), gsi::arg ("min_wc"),
+  method_ext ("merged", &merged_ext2, gsi::arg ("min_coherence"), gsi::arg ("min_wc"), gsi::arg ("join_properties_on_merge", false),
     "@brief Returns the merged region (with options)\n"
     "\n"
     "@param min_coherence A flag indicating whether the resulting polygons shall have minimum coherence\n"
     "@param min_wc Overlap selection\n"
-    "@return The region after is has been merged (self).\n"
+    "@param join_properties_on_merge See below\n"
+    "@return The region after it has been merged (self).\n"
     "\n"
     "Merging removes overlaps and joins touching polygons.\n"
     "This version provides two additional options: if \"min_coherence\" is set to true, \"kissing corners\" are "
@@ -1901,7 +2476,15 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "polygons overlap. The value specifies the number of polygons that need to overlap. A value of 2 "
     "means that output is only produced if two or more polygons overlap.\n"
     "\n"
+    "\n"
+    "The 'join_properties_on_merge' argument indicates how properties should be handled: if true, "
+    "the properties of the parts are joined and attached to the merged shape. If false, "
+    "only shapes with the same properties are merged - i.e. different properties form shape classes "
+    "that are merged individually.\n"
+    "\n"
     "In contrast to \\merge, this method does not modify the region but returns a merged copy.\n"
+    "\n"
+    "'join_properties_on_merge' has been added in version 0.30.3."
   ) +
   method ("round_corners", &db::Region::round_corners, gsi::arg ("r_inner"), gsi::arg ("r_outer"), gsi::arg ("n"),
     "@brief Corner rounding\n"
@@ -2849,11 +3432,17 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method has been introduced in version 0.29.\n"
   ) +
-  method_ext ("filtered", &filtered, gsi::arg ("filtered"),
+  method_ext ("filtered", &filtered, gsi::arg ("filter"),
     "@brief Applies a generic filter and returns a filtered copy\n"
     "See \\PolygonFilter for a description of this feature.\n"
     "\n"
     "This method has been introduced in version 0.29.\n"
+  ) +
+  method_ext ("split_filter", &split_filter, gsi::arg ("filter"),
+    "@brief Applies a generic filter and returns a copy with all matching shapes and one with the non-matching ones\n"
+    "See \\PolygonFilter for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.12.\n"
   ) +
   method_ext ("process", &process_pp, gsi::arg ("process"),
     "@brief Applies a generic polygon processor in place (replacing the polygons from the Region)\n"
@@ -2889,6 +3478,12 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "This method returns all polygons in self which are not rectangles."
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
+  method_ext ("split_rectangles", &split_rectangles,
+    "@brief Combined results of \\rectangles and \\non_rectangles\n"
+    "This method returns a list with two Regions, the first is the result of \\rectangles, the second the result of \\non_rectangles. "
+    "Using this method is faster when you need both.\n\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
   method_ext ("squares", &squares,
     "@brief Returns all polygons which are squares\n"
     "This method returns all polygons in self which are squares."
@@ -2903,6 +3498,12 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method has been introduced in version 0.27.\n"
   ) +
+  method_ext ("split_squares", &split_squares,
+    "@brief Combined results of \\squares and \\non_squares\n"
+    "This method returns a list with two Regions, the first is the result of \\squares, the second the result of \\non_squares. "
+    "Using this method is faster when you need both.\n\n"
+    "This method has been introduced in version 0.29.12.\n"
+  ) +
   method_ext ("rectilinear", &rectilinear,
     "@brief Returns all polygons which are rectilinear\n"
     "This method returns all polygons in self which are rectilinear."
@@ -2912,6 +3513,12 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@brief Returns all polygons which are not rectilinear\n"
     "This method returns all polygons in self which are not rectilinear."
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
+  ) +
+  method_ext ("split_rectilinear", &split_rectilinear,
+    "@brief Combined results of \\rectilinear and \\non_rectilinear\n"
+    "This method returns a list with two Regions, the first is the result of \\rectilinear, the second the result of \\non_rectilinear. "
+    "Using this method is faster when you need both.\n\n"
+    "This method has been introduced in version 0.29.12.\n"
   ) +
   method_ext ("break_polygons|#break", &break_polygons, gsi::arg ("max_vertex_count"), gsi::arg ("max_area_ratio", 0.0),
     "@brief Breaks the polygons of the region into smaller ones\n"
@@ -3622,24 +4229,29 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method has been introduced in version 0.27."
   ) +
-  iterator ("each", &db::Region::begin,
+  iterator_ext ("each", &begin_region,
     "@brief Returns each polygon of the region\n"
     "\n"
     "This returns the raw polygons (not merged polygons if merged semantics is enabled).\n"
+    "\n"
+    "Starting with version 0.30, the iterator delivers a RegionWithProperties object."
   ) +
-  iterator ("each_merged", &db::Region::begin_merged,
+  iterator_ext ("each_merged", &begin_region_merged,
     "@brief Returns each merged polygon of the region\n"
     "\n"
     "This returns the raw polygons if merged semantics is disabled or the merged ones if merged semantics is enabled.\n"
+    "Starting with version 0.30, the iterator delivers a RegionWithProperties object."
   ) +
-  method ("[]", &db::Region::nth, gsi::arg ("n"),
+  method_ext ("[]", &nth, gsi::arg ("n"),
     "@brief Returns the nth polygon of the region\n"
     "\n"
     "This method returns nil if the index is out of range. It is available for flat regions only - i.e. "
     "those for which \\has_valid_polygons? is true. Use \\flatten to explicitly flatten a region.\n"
     "This method returns the raw polygon (not merged polygons, even if merged semantics is enabled).\n"
     "\n"
-    "The \\each iterator is the more general approach to access the polygons."
+    "The \\each iterator is the more general approach to access the polygons.\n"
+    "\n"
+    "Since version 0.30.1, this method returns a \\PolygonWithProperties object."
   ) +
   method ("flatten", &db::Region::flatten,
     "@brief Explicitly flattens a region\n"

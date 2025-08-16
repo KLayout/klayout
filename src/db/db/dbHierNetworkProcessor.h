@@ -404,6 +404,14 @@ public:
   }
 
   /**
+   *  @brief Gets the number of attributes
+   */
+  size_t attr_count () const
+  {
+    return m_attrs.size ();
+  }
+
+  /**
    *  @brief Gets the attribute iterator (begin)
    */
   attr_iterator begin_attr () const

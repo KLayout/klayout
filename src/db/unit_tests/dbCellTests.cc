@@ -33,13 +33,18 @@ TEST(1)
   db::Cell &c1 (g.cell (g.add_cell ()));
   db::Cell &c2 (g.cell (g.add_cell ()));
 
+  EXPECT_EQ (c1.bbox (), db::Box ());
+  EXPECT_EQ (c1.bbox_with_empty (), db::Box (db::Point(), db::Point ()));
+
   db::Box b (0, 100, 1000, 1200);
   c1.shapes (0).insert (b);
   EXPECT_EQ (c1.bbox (), b);
+  EXPECT_EQ (c1.bbox_with_empty (), b);
 
   db::Box bb (0, -100, 2000, 2200);
   c1.shapes (1).insert (bb);
   EXPECT_EQ (c1.bbox (), b + bb);
+  EXPECT_EQ (c1.bbox_with_empty (), b + bb);
   EXPECT_EQ (c1.bbox (0), b);
   EXPECT_EQ (c1.bbox (1), bb);
 
@@ -52,6 +57,7 @@ TEST(1)
   EXPECT_EQ (c2.bbox (0), t * b);
   EXPECT_EQ (c2.bbox (1), t * bb);
   EXPECT_EQ (c1.bbox (), (b + bb));
+  EXPECT_EQ (c1.bbox_with_empty (), (b + bb));
 
   //  some basic testing of the instance trees
   int n;
@@ -715,6 +721,11 @@ TEST(3a)
   db::Trans t (db::Vector (100, -100));
   db::Instance inst = c0.insert (db::CellInstArray (db::CellInst (c1.cell_index ()), t));
   EXPECT_EQ (inst.to_string (), "cell_index=1 r0 100,-100");
+  EXPECT_EQ (inst.bbox ().to_string (), "()");
+  EXPECT_EQ (inst.bbox (db::box_convert<db::CellInst, false> (g)).to_string (), "(100,-100;100,-100)");
+  EXPECT_EQ (inst.bbox_with_empty ().to_string (), "(100,-100;100,-100)");
+  EXPECT_EQ (c0.bbox ().to_string (), "()");
+  EXPECT_EQ (c0.bbox_with_empty ().to_string (), "(100,-100;100,-100)");
 
   inst = c0.transform (inst, db::Trans (5));
   EXPECT_EQ (inst.to_string (), "cell_index=1 m45 -100,100");

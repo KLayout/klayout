@@ -995,3 +995,94 @@ TEST (24)
   EXPECT_EQ (tl::file_exists (p), false);
 }
 
+//  glob_expand
+TEST (25)
+{
+  tl::TemporaryDirectory tmpdir ("tl_tests");
+  auto p = tmpdir.path ();
+
+  auto ad = tl::combine_path (p, "a");
+  tl::mkpath (ad);
+  auto aad = tl::combine_path (ad, "a");
+  tl::mkpath (aad);
+  auto aaad = tl::combine_path (aad, "a");
+  tl::mkpath (aaad);
+  auto bd = tl::combine_path (p, "b");
+  tl::mkpath (bd);
+
+  {
+    std::ofstream os (tl::combine_path (ad, "test.txt"));
+    os << "A test";
+    os.close ();
+  }
+
+  {
+    std::ofstream os (tl::combine_path (aad, "test.txt"));
+    os << "A test";
+    os.close ();
+  }
+
+  {
+    std::ofstream os (tl::combine_path (aaad, "test.txt"));
+    os << "A test";
+    os.close ();
+  }
+
+  {
+    std::ofstream os (tl::combine_path (aaad, "test2.txt"));
+    os << "A test";
+    os.close ();
+  }
+
+  {
+    std::ofstream os (tl::combine_path (bd, "test.txt"));
+    os << "A test";
+    os.close ();
+  }
+
+  {
+    std::ofstream os (tl::combine_path (p, "test2.txt"));
+    os << "A test";
+    os.close ();
+  }
+
+  std::vector<std::string> au;
+
+  auto res = tl::glob_expand (tl::combine_path (p, "*.txt"));
+  au.push_back (tl::combine_path (p, "test2.txt"));
+
+  std::sort (res.begin (), res.end ());
+  std::sort (au.begin (), au.end ());
+  EXPECT_EQ (tl::join (res, "\n"), tl::join (au, "\n"));
+
+  res = tl::glob_expand (tl::combine_path (tl::combine_path (p, "**"), "*.txt"));
+  au.clear ();
+  au.push_back (tl::combine_path (p, "test2.txt"));
+  au.push_back (tl::combine_path (ad, "test.txt"));
+  au.push_back (tl::combine_path (aad, "test.txt"));
+  au.push_back (tl::combine_path (aaad, "test.txt"));
+  au.push_back (tl::combine_path (aaad, "test2.txt"));
+  au.push_back (tl::combine_path (bd, "test.txt"));
+
+  std::sort (res.begin (), res.end ());
+  std::sort (au.begin (), au.end ());
+  EXPECT_EQ (tl::join (res, "\n"), tl::join (au, "\n"));
+
+  res = tl::glob_expand (tl::combine_path (tl::combine_path (p, "**"), "*2.txt"));
+  au.clear ();
+  au.push_back (tl::combine_path (p, "test2.txt"));
+  au.push_back (tl::combine_path (aaad, "test2.txt"));
+
+  std::sort (res.begin (), res.end ());
+  std::sort (au.begin (), au.end ());
+  EXPECT_EQ (tl::join (res, "\n"), tl::join (au, "\n"));
+
+  res = tl::glob_expand (tl::combine_path (tl::combine_path (tl::combine_path (p, "**"), "a"), "*2.txt"));
+  au.clear ();
+  au.push_back (tl::combine_path (aaad, "test2.txt"));
+
+  std::sort (res.begin (), res.end ());
+  std::sort (au.begin (), au.end ());
+  EXPECT_EQ (tl::join (res, "\n"), tl::join (au, "\n"));
+}
+

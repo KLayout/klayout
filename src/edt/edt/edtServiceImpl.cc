@@ -1450,7 +1450,18 @@ PathService::via ()
   tl_assert (false); // see TODO
 #endif
 
-  // @@@
+  //  not enough points to form a path
+  if (m_points.size () < 2) {
+    return;
+  }
+
+  /* @@@
+  if (m_combine_mode != CM_Add) {
+    //  @@@ an error?
+    return;
+  }
+  */
+
   db::LayerProperties lp = layout ().get_properties (layer ());
 
   //  definitions of vias found
@@ -1460,12 +1471,12 @@ PathService::via ()
       : lib (0), pcell (0)
     { }
 
-    SelectedViaDefinition (const db::Library *_lib, const db::PCellDeclaration *_pcell, const db::ViaType &_via_type)
+    SelectedViaDefinition (db::Library *_lib, db::pcell_id_type _pcell, const db::ViaType &_via_type)
       : lib (_lib), pcell (_pcell), via_type (_via_type)
     { }
 
-    const db::Library *lib;
-    const db::PCellDeclaration *pcell;
+    db::Library *lib;
+    db::pcell_id_type pcell;
     db::ViaType via_type;
   };
 
@@ -1474,13 +1485,13 @@ PathService::via ()
   //  Find vias with corresponding top an bottom layers
   //  @@@ TODO: move elsewhere
   for (auto l = db::LibraryManager::instance ().begin (); l != db::LibraryManager::instance ().end (); ++l) {
-    const db::Library *lib = db::LibraryManager::instance ().lib (l->second);
+    db::Library *lib = db::LibraryManager::instance ().lib (l->second);
     for (auto pc = lib->layout ().begin_pcells (); pc != lib->layout ().end_pcells (); ++pc) {
       const db::PCellDeclaration *pcell = lib->layout ().pcell_declaration (pc->second);
       auto via_types = pcell->via_types ();
       for (auto vt = via_types.begin (); vt != via_types.end (); ++vt) {
         if ((vt->bottom.log_equal (lp) && vt->bottom_wired) || (vt->top.log_equal (lp) && vt->top_wired)) {
-          via_defs.push_back (SelectedViaDefinition (lib, pcell, *vt));
+          via_defs.push_back (SelectedViaDefinition (lib, pc->second, *vt));
         }
       }
     }
@@ -1527,7 +1538,46 @@ PathService::via ()
 
   }
 
+  //  produce the path up to the current point
+  db::DPoint via_pos = m_points.back ();
+  cell ().shapes (layer ()).insert (get_path ());
+
+  bool is_bottom = via_def.via_type.bottom.log_equal (lp);
+  db::LayerProperties lp_new = is_bottom ? via_def.via_type.top : via_def.via_type.bottom;
+
+  //  compute the via parameters
+
+  double w_bottom = 0.0, h_bottom = 0.0, w_top = 0.0, h_top = 0.0;
+  db::DVector dwire = m_points.back () - m_points [m_points.size () - 2];
+  if (std::abs (dwire.y ()) > db::epsilon) {
+    (is_bottom ? w_bottom : w_top) = m_width;
+  }
+  if (std::abs (dwire.x ()) > db::epsilon) {
+    (is_bottom ? h_bottom : h_top) = m_width;
+  }
+
+  //  create the via cell
+
+  std::map<std::string, tl::Variant> params;
+  params.insert (std::make_pair ("via", tl::Variant (via_def.via_type.name)));
+  params.insert (std::make_pair ("w_bottom", tl::Variant (w_bottom)));
+  params.insert (std::make_pair ("w_top", tl::Variant (w_top)));
+  params.insert (std::make_pair ("h_bottom", tl::Variant (h_bottom)));
+  params.insert (std::make_pair ("h_top", tl::Variant (h_top)));
+
+  auto via_lib_cell = via_def.lib->layout ().get_pcell_variant_dict (via_def.pcell, params);
+  auto via_cell = layout ().get_lib_proxy (via_def.lib, via_lib_cell);
+
+  cell ().insert (db::CellInstArray (db::CellInst (via_cell), db::Trans (trans () * via_pos - db::Point ())));
+
   tl::warn << "@@@1 " << via_def.via_type.name;
+  //  @@@ switch layer ..
+
+  m_points.clear ();
+  m_points.push_back (via_pos);
+  m_points.push_back (via_pos);
+  m_last = m_points.back ();
+  update_marker ();
 }
 
 bool 

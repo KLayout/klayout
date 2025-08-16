@@ -735,10 +735,12 @@ public:
    *  If this list is non-empty, the PCell will be used to implement
    *  vias of one of the given type.
    *
-   *  Such a PCell needs to support the following parameters
+   *  Such a PCell needs to support the following (maybe hidden) parameters
    *  * "via" (string): the name of the via type
-   *  * "w" (float): the via width (top or bottom layer) in um
-   *  * "h" (float): the via height (top or bottom layer) in um
+   *  * "w_bottom" (float): the bottom wire width in um or 0 if not specified
+   *  * "h_bottom" (float): the bottom wire height in um or 0 if not specified
+   *  * "w_top" (float): the top wire width in um or 0 if not specified
+   *  * "h_top" (float): the top wire height in um or 0 if not specified
    */
   virtual std::vector<ViaType> via_types () const
   {

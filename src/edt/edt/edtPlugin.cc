@@ -379,6 +379,9 @@ public:
     menu_entries.push_back (lay::menu_item ("edt::sel_area_perimeter", "area_perimeter", "edit_menu.selection_menu.end", tl::to_string (tr ("Area and Perimeter"))));
 
     menu_entries.push_back (lay::menu_item ("edt::combine_mode", "combine_mode:edit_mode", "@toolbar.end_modes", tl::to_string (tr ("Combine{Select background combination mode}"))));
+
+    //  Key binding only
+    menu_entries.push_back (lay::menu_item ("edt::via", "via:edit_mode", "@secrets.end", tl::to_string (tr ("Via")) + "(V)"));
   }
 
   bool configure (const std::string &name, const std::string &value)

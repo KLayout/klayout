@@ -211,6 +211,8 @@ MainService::menu_activated (const std::string &symbol)
     cm_make_array ();
   } else if (symbol == "edt::sel_make_cell_variants") {
     cm_make_cell_variants ();
+  } else if (symbol == "edt::via") {
+    cm_via ();
   }
 }
 
@@ -2439,7 +2441,45 @@ MainService::cm_tap ()
 #endif
 }
 
-void 
+void
+MainService::cm_via ()
+{
+#if ! defined(HAVE_QT)
+  tl_assert (false); // see TODO
+#endif
+
+#if defined(HAVE_QT)
+  QWidget *view_widget = lay::widget_from_view (view ());
+  if (! view_widget) {
+    return;
+  }
+#endif
+
+  if (! view ()->canvas ()->mouse_in_window ()) {
+    return;
+  }
+
+  edt::Service *es = dynamic_cast<edt::Service *> (view ()->canvas ()->active_service ());
+  if (es) {
+    es->via ();
+  } else {
+
+#if 0 // @@@
+  db::ShapeIterator::flags_type (db::ShapeIterator::All - db::ShapeIterator::Texts),  //  do not consider texts - their bounding box may be too large
+  lay::ShapeFinder finder (true, view ()->is_editable () && m_top_level_sel, m_flags, &m_previous_selection);
+
+  //  go through all visible layers of all cellviews
+  finder.find (view (), search_box);
+
+  //  collect the founds from the finder
+  lay::ShapeFinder::iterator r = finder.begin ();
+  if (r != finder.end ()) {
+#endif
+
+  }
+}
+
+void
 MainService::cm_change_layer ()
 {
   tl_assert (view ()->is_editable ());

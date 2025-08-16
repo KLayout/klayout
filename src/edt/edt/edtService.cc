@@ -1718,6 +1718,12 @@ Service::tap (const db::DPoint & /*initial*/)
 }
 
 void
+Service::via ()
+{
+  //  .. nothing here ..
+}
+
+void
 Service::geometry_changing ()
 {
   //  selection may become invalid (issue-1145)

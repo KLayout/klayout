@@ -1443,6 +1443,93 @@ PathService::selection_applies (const lay::ObjectInstPath &sel) const
   return !sel.is_cell_inst () && sel.shape ().is_path ();
 }
 
+void
+PathService::via ()
+{
+#if ! defined(HAVE_QT)
+  tl_assert (false); // see TODO
+#endif
+
+  // @@@
+  db::LayerProperties lp = layout ().get_properties (layer ());
+
+  //  definitions of vias found
+  struct SelectedViaDefinition
+  {
+    SelectedViaDefinition ()
+      : lib (0), pcell (0)
+    { }
+
+    SelectedViaDefinition (const db::Library *_lib, const db::PCellDeclaration *_pcell, const db::ViaType &_via_type)
+      : lib (_lib), pcell (_pcell), via_type (_via_type)
+    { }
+
+    const db::Library *lib;
+    const db::PCellDeclaration *pcell;
+    db::ViaType via_type;
+  };
+
+  std::vector<SelectedViaDefinition> via_defs;
+
+  //  Find vias with corresponding top an bottom layers
+  //  @@@ TODO: move elsewhere
+  for (auto l = db::LibraryManager::instance ().begin (); l != db::LibraryManager::instance ().end (); ++l) {
+    const db::Library *lib = db::LibraryManager::instance ().lib (l->second);
+    for (auto pc = lib->layout ().begin_pcells (); pc != lib->layout ().end_pcells (); ++pc) {
+      const db::PCellDeclaration *pcell = lib->layout ().pcell_declaration (pc->second);
+      auto via_types = pcell->via_types ();
+      for (auto vt = via_types.begin (); vt != via_types.end (); ++vt) {
+        if ((vt->bottom.log_equal (lp) && vt->bottom_wired) || (vt->top.log_equal (lp) && vt->top_wired)) {
+          via_defs.push_back (SelectedViaDefinition (lib, pcell, *vt));
+        }
+      }
+    }
+  }
+
+  SelectedViaDefinition via_def;
+
+  if (via_defs.size () == 0) {
+
+    return;
+
+  } else if (via_defs.size () == 1) {
+
+    via_def = via_defs.front ();
+
+  } else if (via_defs.size () > 1) {
+
+#if defined(HAVE_QT)
+    //  TODO: what to do here in Qt-less case? Store results in configuration so they can be retrieved externally?
+
+    QWidget *view_widget = lay::widget_from_view (view ());
+    if (! view_widget) {
+      return;
+    }
+
+    std::unique_ptr<QMenu> menu (new QMenu (view_widget));
+    menu->show ();
+
+    db::DPoint mp_local = view ()->canvas ()->mouse_position ();
+    QPoint mp = view ()->canvas ()->widget ()->mapToGlobal (QPoint (mp_local.x (), mp_local.y ()));
+
+    for (auto i = via_defs.begin (); i != via_defs.end (); ++i) {
+      QAction *a = menu->addAction (tl::to_qstring (i->via_type.description.empty () ? i->via_type.name : i->via_type.description));
+      a->setData (int (i - via_defs.begin ()));
+    }
+
+    QAction *action = menu->exec (mp);
+    if (! action) {
+      return;
+    }
+
+    via_def = via_defs [action->data ().toInt ()];
+#endif
+
+  }
+
+  tl::warn << "@@@1 " << via_def.via_type.name;
+}
+
 bool 
 PathService::configure (const std::string &name, const std::string &value)
 {

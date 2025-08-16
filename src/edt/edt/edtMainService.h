@@ -200,7 +200,12 @@ public:
    */
   void cm_tap ();
 
-  /** 
+  /**
+   *  @brief Via operation
+   */
+  void cm_via ();
+
+  /**
    *  @brief "paste" operation
    */
   virtual void paste ();

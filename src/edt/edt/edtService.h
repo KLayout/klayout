@@ -378,6 +378,11 @@ public:
   virtual void tap (const db::DPoint &initial);
 
   /**
+   *  @brief Implements the via feature
+   */
+  virtual void via ();
+
+  /**
    *  @brief Delete the selected rulers
    *
    *  Used as implementation for "del" and "cut"

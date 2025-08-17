@@ -140,15 +140,19 @@ ShapeEditService::get_edit_layer ()
     }
   }
 
+  if (cv.cell ()->is_proxy ()) {
+    throw tl::Exception (tl::to_string (tr ("Cannot put a shape into a PCell or library cell")));
+  }
+
   m_layer = (unsigned int) layer;
   m_cv_index = (unsigned int) cv_index;
   m_trans = (cl->trans ().front () * db::CplxTrans (cv->layout ().dbu ()) * cv.context_trans ()).inverted ();
   mp_layout = &(cv->layout ());
   mp_cell = cv.cell ();
 
-  if (mp_cell->is_proxy ()) {
-    throw tl::Exception (tl::to_string (tr ("Cannot put a shape into a PCell or library cell")));
-  }
+  //  fetches the last configuration for the given layer
+  view ()->set_active_cellview_index (cv_index);
+  edt::config_recent_for_layer (view (), cv->layout ().get_properties ((unsigned int) layer), cv_index);
 }
 
 void
@@ -212,6 +216,10 @@ ShapeEditService::update_edit_layer (const lay::LayerPropertiesConstIterator &cl
   m_trans = (cl->trans ().front () * db::CplxTrans (cv->layout ().dbu ()) * cv.context_trans ()).inverted ();
   mp_layout = &(cv->layout ());
   mp_cell = cv.cell ();
+
+  //  fetches the last configuration for the given layer
+  view ()->set_active_cellview_index (cv_index);
+  edt::config_recent_for_layer (view (), cv->layout ().get_properties ((unsigned int) layer), cv_index);
 
   current_layer_changed ();
 }

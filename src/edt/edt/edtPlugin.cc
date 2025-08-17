@@ -523,6 +523,23 @@ commit_recent (lay::LayoutViewBase *view)
 #endif
 }
 
+void
+config_recent_for_layer (lay::LayoutViewBase *view, const db::LayerProperties &lp, int cv_index)
+{
+#if defined(HAVE_QT)
+  lay::EditorOptionsPages *eo_pages = view->editor_options_pages ();
+  if (!eo_pages) {
+    return;
+  }
+
+  for (std::vector<lay::EditorOptionsPage *>::const_iterator op = eo_pages->pages ().begin (); op != eo_pages->pages ().end (); ++op) {
+    if ((*op)->active ()) {
+      (*op)->config_recent_for_layer (view, lp, cv_index);
+    }
+  }
+#endif
+}
+
 class PartialPluginDeclaration
   : public PluginDeclarationBase
 {

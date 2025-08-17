@@ -62,6 +62,11 @@ namespace edt
    *  @brief Commits the current configuration for the recently used configuration list
    */
   void commit_recent (lay::LayoutViewBase *view);
+
+  /**
+   *  @brief Configure attributes for the most-recent entry with the given layer
+   */
+  void config_recent_for_layer (lay::LayoutViewBase *view, const db::LayerProperties &lp, int cv_index);
 }
 
 #endif

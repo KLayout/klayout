@@ -37,6 +37,11 @@ namespace lay
   class LayoutViewBase;
 }
 
+namespace db
+{
+  class LayerProperties;
+}
+
 namespace edt
 {
 
@@ -92,6 +97,7 @@ public:
   virtual void apply (lay::Dispatcher * /*root*/) { }
   virtual void setup (lay::Dispatcher * /*root*/) { }
   virtual void commit_recent (lay::Dispatcher *root);
+  virtual void config_recent_for_layer (lay::Dispatcher *root, const db::LayerProperties &lp, int cv_index);
 
 private slots:
   void item_clicked (QTreeWidgetItem *item);

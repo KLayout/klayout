@@ -141,7 +141,7 @@ lp_iter_from_string (lay::LayoutViewBase *view, const std::string &s)
   db::LayerProperties lp;
   tl::Extractor ex (s.c_str ());
   lp.read (ex);
-  int cv_index = 0;
+  int cv_index = view->active_cellview_index ();
   if (ex.test ("@")) {
     ex.read (cv_index);
   }
@@ -413,7 +413,7 @@ RecentConfigurationPage::item_clicked (QTreeWidgetItem *item)
       db::LayerProperties lp;
       tl::Extractor ex (v.c_str ());
       lp.read (ex);
-      int cv_index = 0;
+      int cv_index = view ()->active_cellview_index ();
       if (ex.test ("@")) {
         ex.read (cv_index);
       }
@@ -447,7 +447,7 @@ RecentConfigurationPage::commit_recent (lay::Dispatcher *root)
         int li = view ()->current_layer ()->layer_index ();
         if (cv.is_valid () && cv->layout ().is_valid_layer (li)) {
           s = cv->layout ().get_properties (li).to_string ();
-          if (cv_index > 0) {
+          if (cv_index != view ()->active_cellview_index ()) {
              s += "@" + tl::to_string (cv_index);
           }
         }
@@ -480,6 +480,55 @@ RecentConfigurationPage::commit_recent (lay::Dispatcher *root)
   set_stored_values (stored_values);
 
   update_list (stored_values);
+}
+
+void
+RecentConfigurationPage::config_recent_for_layer (lay::Dispatcher *root, const db::LayerProperties &lp, int cv_index)
+{
+  std::list<std::vector<std::string> > stored_values = get_stored_values ();
+
+  auto v = stored_values.begin ();
+  for ( ; v != stored_values.end (); ++v) {
+
+    bool match = false;
+    auto vv = v->begin ();
+    for (std::list<ConfigurationDescriptor>::const_iterator c = m_cfg.begin (); c != m_cfg.end () && ! match && vv != v->end (); ++c, ++vv) {
+
+      if (c->rendering == Layer) {
+
+        //  "getting" a layer means making it current
+        db::LayerProperties lp_stored;
+        tl::Extractor ex (vv->c_str ());
+        lp_stored.read (ex);
+        int cv_index_stored = view ()->active_cellview_index ();
+        if (ex.test ("@")) {
+          ex.read (cv_index_stored);
+        }
+
+        match = (lp.log_equal (lp_stored) && (cv_index < 0 || cv_index_stored == cv_index));
+
+      }
+
+    }
+
+    if (match) {
+      break;
+    }
+
+  }
+
+  if (v != stored_values.end ()) {
+
+    auto vv = v->begin ();
+    for (std::list<ConfigurationDescriptor>::const_iterator c = m_cfg.begin (); c != m_cfg.end () && vv != v->end (); ++c, ++vv) {
+      if (c->rendering != Layer) {
+        root->config_set (c->cfg_name, *vv);
+      }
+    }
+
+    root->config_end ();
+
+  }
 }
 
 }

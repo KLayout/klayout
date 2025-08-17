@@ -254,6 +254,7 @@ private:
     std::list<std::pair<std::string, std::string> > config;
     db::Shape path_shape;
     db::Instance via_instance;
+    db::ViaType via_type;
   };
 
   std::vector <db::DPoint> m_points;
@@ -266,7 +267,8 @@ private:
   void update_marker ();
   db::Path get_path () const;
   void set_last_point (const db::DPoint &p);
-  void push_segment (const db::Shape &shape, const db::Instance &instance);
+  void update_via ();
+  void push_segment (const db::Shape &shape, const db::Instance &instance, const db::ViaType &via_type);
   void pop_segment ();
 };
 

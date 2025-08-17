@@ -1300,6 +1300,8 @@ PathService::do_begin_edit (const db::DPoint &p)
 {
   get_edit_layer ();
 
+  m_previous_segments.clear ();
+
   db::DPoint pp = snap2 (p);
   m_last = pp;
 
@@ -1357,7 +1359,9 @@ PathService::do_mouse_move (const db::DPoint &p)
   if (m_points.size () >= 2) {
     set_last_point (p);
   }
+
   update_marker ();
+  update_via ();
 }
 
 bool 
@@ -1375,9 +1379,13 @@ void
 PathService::do_delete ()
 {
   if (m_points.size () > 2) {
+
     m_points.erase (m_points.end () - 2);
     m_last = m_points.end()[-2];
+
     update_marker ();
+    update_via ();
+
   }
 }
 
@@ -1535,7 +1543,7 @@ PathService::via ()
 
   //  produce the path up to the current point
   db::DPoint via_pos = m_points.back ();
-  cell ().shapes (layer ()).insert (get_path ());
+  db::Shape path_shape = cell ().shapes (layer ()).insert (get_path ());
 
   bool is_bottom = via_def.via_type.bottom.log_equal (lp);
   db::LayerProperties lp_new = is_bottom ? via_def.via_type.top : via_def.via_type.bottom;
@@ -1563,7 +1571,8 @@ PathService::via ()
   auto via_lib_cell = via_def.lib->layout ().get_pcell_variant_dict (via_def.pcell, params);
   auto via_cell = layout ().get_lib_proxy (via_def.lib, via_lib_cell);
 
-  cell ().insert (db::CellInstArray (db::CellInst (via_cell), db::Trans (trans () * via_pos - db::Point ())));
+  db::Instance via_instance = cell ().insert (db::CellInstArray (db::CellInst (via_cell), db::Trans (trans () * via_pos - db::Point ())));
+  push_segment (path_shape, via_instance, via_def.via_type);
 
   change_edit_layer (lp_new);
 
@@ -1571,13 +1580,80 @@ PathService::via ()
   m_points.push_back (via_pos);
   m_points.push_back (via_pos);
   m_last = m_points.back ();
+
   update_marker ();
+  update_via ();
 }
 
 void
-PathService::push_segment (const db::Shape &shape, const db::Instance &instance)
+PathService::update_via ()
 {
-  // @@@
+  if (! editing () || m_points.size () < 2) {
+    return;
+  }
+
+  if (m_previous_segments.empty () || m_previous_segments.back ().via_instance.is_null ()) {
+    return;
+  }
+
+  if (! m_previous_segments.back ().via_instance.instances ()) {
+    return;
+  }
+
+  db::Cell *via_parent_cell = m_previous_segments.back ().via_instance.instances ()->cell ();
+
+  //  Compute the parameters to change
+
+  db::LayerProperties lp = layout ().get_properties (layer ());
+  bool is_bottom = m_previous_segments.back ().via_type.bottom.log_equal (lp);
+
+  double w = 0.0, h = 0.0;
+  db::DVector dwire = m_points [1] - m_points.front ();
+  if (std::abs (dwire.y ()) > db::epsilon) {
+    w = m_width;
+  }
+  if (std::abs (dwire.x ()) > db::epsilon) {
+    h = m_width;
+  }
+
+  std::map<std::string, tl::Variant> params;
+
+  if (is_bottom) {
+    params.insert (std::make_pair ("w_bottom", tl::Variant (w)));
+    params.insert (std::make_pair ("h_bottom", tl::Variant (h)));
+  } else {
+    params.insert (std::make_pair ("w_top", tl::Variant (w)));
+    params.insert (std::make_pair ("h_top", tl::Variant (h)));
+  }
+
+  //  change the via PCell
+
+  m_previous_segments.back ().via_instance = via_parent_cell->change_pcell_parameters (m_previous_segments.back ().via_instance, params);
+}
+
+void
+PathService::push_segment (const db::Shape &shape, const db::Instance &instance, const db::ViaType &via_type)
+{
+  m_previous_segments.push_back (PathSegment ());
+
+  PathSegment &ps = m_previous_segments.back ();
+  ps.path_shape = shape;
+  ps.via_instance = instance;
+  ps.via_type = via_type;
+  ps.layer = layer ();
+  ps.cv_index = cv_index ();
+
+  std::string cfg [] = {
+    cfg_edit_path_width,
+    cfg_edit_path_ext_var_begin,
+    cfg_edit_path_ext_var_end,
+    cfg_edit_path_ext_type
+  };
+
+  for (unsigned int i = 0; i < sizeof (cfg) / sizeof (cfg[0]); ++i) {
+    ps.config.push_back (std::make_pair (cfg [i], std::string ()));
+    view ()->config_get (ps.config.back ().first, ps.config.back ().second);
+  }
 }
 
 void
@@ -1607,12 +1683,6 @@ PathService::configure (const std::string &name, const std::string &value)
     return true; // taken
   }
 
-  if (name == cfg_edit_path_width) {
-    tl::from_string (value, m_width);
-    m_needs_update = true;
-    return true; // taken
-  }
-
   if (name == cfg_edit_path_ext_type) {
     m_type = Flush;
     if (value == "square") {
@@ -1634,6 +1704,7 @@ PathService::config_finalize ()
 {
   if (m_needs_update) {
     update_marker ();
+    update_via ();
     m_needs_update = false;
   }
 

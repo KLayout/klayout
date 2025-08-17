@@ -26,6 +26,7 @@
 
 #include "dbCommon.h"
 #include "dbLayerProperties.h"
+#include "dbLibrary.h"
 
 #include <string>
 
@@ -157,6 +158,38 @@ public:
 private:
   void init ();
 };
+
+/**
+ *  @brief Provides a via definition that is selected by "find_via_definitions_for"
+ */
+struct SelectedViaDefinition
+{
+  SelectedViaDefinition ()
+    : lib (0), pcell (0)
+  { }
+
+  SelectedViaDefinition (db::Library *_lib, db::pcell_id_type _pcell, const db::ViaType &_via_type)
+    : lib (_lib), pcell (_pcell), via_type (_via_type)
+  { }
+
+  /**
+   *  @brief The library from which the via is taken
+   */
+  db::Library *lib;
+
+  /**
+   *  @brief The PCell from which the via is taken
+   */
+  db::pcell_id_type pcell;
+
+  /**
+   *  @brief The selected via type
+   */
+  db::ViaType via_type;
+};
+
+DB_PUBLIC std::vector<SelectedViaDefinition>
+find_via_definitions_for (const std::string &technology, const db::LayerProperties &layer);
 
 }
 

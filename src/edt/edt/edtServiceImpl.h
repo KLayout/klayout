@@ -51,6 +51,7 @@ public:
   
 protected:
   void get_edit_layer ();
+  void change_edit_layer (const db::LayerProperties &lp);
 
   const db::VCplxTrans &trans () const { return m_trans; }
   unsigned int layer () const          { return m_layer; }
@@ -244,15 +245,29 @@ protected:
   void config_finalize ();
 
 private:
+  struct PathSegment
+  {
+    PathSegment () : layer (0), cv_index (0) { }
+
+    unsigned int layer;
+    int cv_index;
+    std::list<std::pair<std::string, std::string> > config;
+    db::Shape path_shape;
+    db::Instance via_instance;
+  };
+
   std::vector <db::DPoint> m_points;
   double m_width, m_bgnext, m_endext;
   enum { Flush = 0, Square, Variable, Round } m_type;
   bool m_needs_update;
   db::DPoint m_last;
+  std::list<PathSegment> m_previous_segments;
 
   void update_marker ();
   db::Path get_path () const;
   void set_last_point (const db::DPoint &p);
+  void push_segment (const db::Shape &shape, const db::Instance &instance);
+  void pop_segment ();
 };
 
 /**

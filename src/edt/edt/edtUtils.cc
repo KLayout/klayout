@@ -31,7 +31,12 @@
 #include "layCellView.h"
 #include "layLayoutViewBase.h"
 #include "layEditable.h"
+#include "layEditorOptionsPages.h"
 #include "tlException.h"
+
+#if defined(HAVE_QT)
+#  include <QMessageBox>
+#endif
 
 namespace edt {
 
@@ -72,6 +77,80 @@ std::map<std::string, tl::Variant> pcell_parameters_from_string (const std::stri
   }
 
   return pm;
+}
+
+void
+commit_recent (lay::LayoutViewBase *view)
+{
+#if defined(HAVE_QT)
+  lay::EditorOptionsPages *eo_pages = view->editor_options_pages ();
+  if (!eo_pages) {
+    return;
+  }
+
+  for (std::vector<lay::EditorOptionsPage *>::const_iterator op = eo_pages->pages ().begin (); op != eo_pages->pages ().end (); ++op) {
+    if ((*op)->active ()) {
+      (*op)->commit_recent (view);
+    }
+  }
+#endif
+}
+
+void
+config_recent_for_layer (lay::LayoutViewBase *view, const db::LayerProperties &lp, int cv_index)
+{
+#if defined(HAVE_QT)
+  lay::EditorOptionsPages *eo_pages = view->editor_options_pages ();
+  if (!eo_pages) {
+    return;
+  }
+
+  for (std::vector<lay::EditorOptionsPage *>::const_iterator op = eo_pages->pages ().begin (); op != eo_pages->pages ().end (); ++op) {
+    if ((*op)->active ()) {
+      (*op)->config_recent_for_layer (view, lp, cv_index);
+    }
+  }
+#endif
+}
+
+bool
+set_or_request_current_layer (lay::LayoutViewBase *view, const db::LayerProperties &lp, unsigned int cv_index)
+{
+#if defined(HAVE_QT)
+  bool ok = view->set_current_layer (cv_index, lp);
+  if (ok) {
+    return true;
+  }
+
+  if (! view->control_panel ()) {
+    return false;
+  }
+
+  const lay::CellView &cv = view->cellview (cv_index);
+  if (! cv.is_valid ()) {
+    return false;
+  }
+
+  if (QMessageBox::question (view->widget (), tr ("Create Layer"), tr ("Layer %1 does not exist yet. Create it now?").arg (tl::to_qstring (lp.to_string ()))) == QMessageBox::Yes) {
+
+    lay::LayerPropertiesNode lpn;
+    lpn.set_source (lay::ParsedLayerSource (lp, cv_index));
+    view->init_layer_properties (lpn);
+
+    view->transaction (tl::to_string (QObject::tr ("Create new layer")));
+    lay::LayerPropertiesConstIterator lpi = lay::LayerPropertiesConstIterator (& view->insert_layer (view->end_layers (), lpn));
+    view->set_current_layer (lpi);
+    lpi->realize_source ();
+    view->commit ();
+
+    return true;
+
+  }
+
+  return false;
+#else
+  return true;
+#endif
 }
 
 // -------------------------------------------------------------

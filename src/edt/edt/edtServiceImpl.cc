@@ -30,11 +30,10 @@
 #include "edtService.h"
 #include "edtPlugin.h"
 #include "dbEdge.h"
-#include "dbLibrary.h"
-#include "dbLibraryManager.h"
-#include "dbPCellDeclaration.h"
+#include "dbVia.h"
 #include "dbPolygonTools.h"
 #include "dbEdgeProcessor.h"
+#include "dbLibraryManager.h"
 #include "layMarker.h"
 #include "layLayerProperties.h"
 #include "layLayoutViewBase.h"
@@ -153,6 +152,26 @@ ShapeEditService::get_edit_layer ()
   //  fetches the last configuration for the given layer
   view ()->set_active_cellview_index (cv_index);
   edt::config_recent_for_layer (view (), cv->layout ().get_properties ((unsigned int) layer), cv_index);
+}
+
+void
+ShapeEditService::change_edit_layer (const db::LayerProperties &lp)
+{
+  if (! mp_layout) {
+    return;
+  }
+
+  int layer = mp_layout->get_layer_maybe (lp);
+  if (layer < 0) {
+    layer = mp_layout->insert_layer (lp);
+  }
+  m_layer = (unsigned int) layer;
+
+  edt::set_or_request_current_layer (view (), lp, m_cv_index);
+
+  //  fetches the last configuration for the given layer
+  view ()->set_active_cellview_index (m_cv_index);
+  edt::config_recent_for_layer (view (), lp, m_cv_index);
 }
 
 void
@@ -1471,41 +1490,9 @@ PathService::via ()
   */
 
   db::LayerProperties lp = layout ().get_properties (layer ());
+  std::vector<db::SelectedViaDefinition> via_defs = db::find_via_definitions_for (layout ().technology_name (), lp);
 
-  //  definitions of vias found
-  struct SelectedViaDefinition
-  {
-    SelectedViaDefinition ()
-      : lib (0), pcell (0)
-    { }
-
-    SelectedViaDefinition (db::Library *_lib, db::pcell_id_type _pcell, const db::ViaType &_via_type)
-      : lib (_lib), pcell (_pcell), via_type (_via_type)
-    { }
-
-    db::Library *lib;
-    db::pcell_id_type pcell;
-    db::ViaType via_type;
-  };
-
-  std::vector<SelectedViaDefinition> via_defs;
-
-  //  Find vias with corresponding top an bottom layers
-  //  @@@ TODO: move elsewhere
-  for (auto l = db::LibraryManager::instance ().begin (); l != db::LibraryManager::instance ().end (); ++l) {
-    db::Library *lib = db::LibraryManager::instance ().lib (l->second);
-    for (auto pc = lib->layout ().begin_pcells (); pc != lib->layout ().end_pcells (); ++pc) {
-      const db::PCellDeclaration *pcell = lib->layout ().pcell_declaration (pc->second);
-      auto via_types = pcell->via_types ();
-      for (auto vt = via_types.begin (); vt != via_types.end (); ++vt) {
-        if ((vt->bottom.log_equal (lp) && vt->bottom_wired) || (vt->top.log_equal (lp) && vt->top_wired)) {
-          via_defs.push_back (SelectedViaDefinition (lib, pc->second, *vt));
-        }
-      }
-    }
-  }
-
-  SelectedViaDefinition via_def;
+  db::SelectedViaDefinition via_def;
 
   if (via_defs.size () == 0) {
 
@@ -1578,14 +1565,25 @@ PathService::via ()
 
   cell ().insert (db::CellInstArray (db::CellInst (via_cell), db::Trans (trans () * via_pos - db::Point ())));
 
-  tl::warn << "@@@1 " << via_def.via_type.name;
-  //  @@@ switch layer ..
+  change_edit_layer (lp_new);
 
   m_points.clear ();
   m_points.push_back (via_pos);
   m_points.push_back (via_pos);
   m_last = m_points.back ();
   update_marker ();
+}
+
+void
+PathService::push_segment (const db::Shape &shape, const db::Instance &instance)
+{
+  // @@@
+}
+
+void
+PathService::pop_segment ()
+{
+  // @@@
 }
 
 bool 

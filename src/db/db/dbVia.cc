@@ -21,6 +21,8 @@
 */
 
 #include "dbVia.h"
+#include "dbLibraryManager.h"
+#include "dbPCellDeclaration.h"
 
 namespace db
 {
@@ -38,6 +40,39 @@ ViaType::init ()
   htmax = -1.0;
   bottom_wired = true;
   top_wired = true;
+}
+
+// ---------------------------------------------------------------------------------------
+
+std::vector<SelectedViaDefinition>
+find_via_definitions_for (const std::string &technology, const db::LayerProperties &layer)
+{
+  std::vector<SelectedViaDefinition> via_defs;
+
+  //  Find vias with corresponding top an bottom layers
+  for (auto l = db::LibraryManager::instance ().begin (); l != db::LibraryManager::instance ().end (); ++l) {
+
+    db::Library *lib = db::LibraryManager::instance ().lib (l->second);
+    if (lib->for_technologies () && ! lib->is_for_technology (technology)) {
+      continue;
+    }
+
+    for (auto pc = lib->layout ().begin_pcells (); pc != lib->layout ().end_pcells (); ++pc) {
+
+      const db::PCellDeclaration *pcell = lib->layout ().pcell_declaration (pc->second);
+
+      auto via_types = pcell->via_types ();
+      for (auto vt = via_types.begin (); vt != via_types.end (); ++vt) {
+        if ((vt->bottom.log_equal (layer) && vt->bottom_wired) || (vt->top.log_equal (layer) && vt->top_wired)) {
+          via_defs.push_back (SelectedViaDefinition (lib, pc->second, *vt));
+        }
+      }
+
+    }
+
+  }
+
+  return via_defs;
 }
 
 }

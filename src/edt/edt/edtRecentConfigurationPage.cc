@@ -365,40 +365,6 @@ RecentConfigurationPage::update_list (const std::list<std::vector<std::string> >
   mp_tree_widget->header ()->resizeSections (QHeaderView::ResizeToContents);
 }
 
-static bool
-set_or_request_current_layer (QWidget *parent, lay::LayoutViewBase *view, unsigned int cv_index, const db::LayerProperties &lp)
-{
-  bool ok = view->set_current_layer (cv_index, lp);
-  if (ok) {
-    return true;
-  }
-
-  if (! view->control_panel ()) {
-    return false;
-  }
-
-  const lay::CellView &cv = view->cellview (cv_index);
-  if (! cv.is_valid ()) {
-    return false;
-  }
-
-  if (QMessageBox::question (parent, tr ("Create Layer"), tr ("Layer %1 does not exist yet. Create it now?").arg (tl::to_qstring (lp.to_string ()))) == QMessageBox::Yes) {
-
-    lay::LayerPropertiesNode lpn;
-    lpn.set_source (lay::ParsedLayerSource (lp, cv_index));
-    view->init_layer_properties (lpn);
-
-    view->transaction (tl::to_string (QObject::tr ("Create new layer")));
-    view->set_current_layer (lay::LayerPropertiesConstIterator (& view->insert_layer (view->end_layers (), lpn)));
-    view->commit ();
-
-    return true;
-
-  }
-
-  return false;
-}
-
 void
 RecentConfigurationPage::item_clicked (QTreeWidgetItem *item)
 {
@@ -418,7 +384,7 @@ RecentConfigurationPage::item_clicked (QTreeWidgetItem *item)
         ex.read (cv_index);
       }
 
-      set_or_request_current_layer (item->treeWidget (), view (), cv_index, lp);
+      edt::set_or_request_current_layer (view (), lp, cv_index);
 
     } else {
       dispatcher ()->config_set (c->cfg_name, v);

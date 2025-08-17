@@ -206,7 +206,7 @@ MacroController::uninitialize (lay::Dispatcher * /*root*/)
 }
 
 bool
-MacroController::configure (const std::string &key, const std::string &value)
+MacroController::configure (const std::string & /*key*/, const std::string & /*value*/)
 {
   return false;
 }

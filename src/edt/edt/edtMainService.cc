@@ -213,6 +213,10 @@ MainService::menu_activated (const std::string &symbol)
     cm_make_cell_variants ();
   } else if (symbol == "edt::via") {
     cm_via ();
+  } else if (symbol == "edt::via_up") {
+    cm_via_up ();
+  } else if (symbol == "edt::via_down") {
+    cm_via_down ();
   }
 }
 
@@ -2444,6 +2448,24 @@ MainService::cm_tap ()
 void
 MainService::cm_via ()
 {
+  via_impl (0);
+}
+
+void
+MainService::cm_via_up ()
+{
+  via_impl (1);
+}
+
+void
+MainService::cm_via_down ()
+{
+  via_impl (-1);
+}
+
+void
+MainService::via_impl (int dir)
+{
 #if ! defined(HAVE_QT)
   tl_assert (false); // see TODO
 #endif
@@ -2461,7 +2483,7 @@ MainService::cm_via ()
 
   edt::Service *es = dynamic_cast<edt::Service *> (view ()->canvas ()->active_service ());
   if (es) {
-    es->via ();
+    es->via (dir);
   } else {
 
 #if 0 // @@@

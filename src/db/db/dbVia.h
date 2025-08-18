@@ -194,7 +194,7 @@ struct SelectedViaDefinition
 };
 
 DB_PUBLIC std::vector<SelectedViaDefinition>
-find_via_definitions_for (const std::string &technology, const db::LayerProperties &layer);
+find_via_definitions_for (const std::string &technology, const db::LayerProperties &layer, int dir);
 
 }
 

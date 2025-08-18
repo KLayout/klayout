@@ -45,7 +45,7 @@ ViaType::init ()
 // ---------------------------------------------------------------------------------------
 
 std::vector<SelectedViaDefinition>
-find_via_definitions_for (const std::string &technology, const db::LayerProperties &layer)
+find_via_definitions_for (const std::string &technology, const db::LayerProperties &layer, int dir)
 {
   std::vector<SelectedViaDefinition> via_defs;
 
@@ -63,7 +63,8 @@ find_via_definitions_for (const std::string &technology, const db::LayerProperti
 
       auto via_types = pcell->via_types ();
       for (auto vt = via_types.begin (); vt != via_types.end (); ++vt) {
-        if ((vt->bottom.log_equal (layer) && vt->bottom_wired) || (vt->top.log_equal (layer) && vt->top_wired)) {
+        if ((dir >= 0 && vt->bottom.log_equal (layer) && vt->bottom_wired) ||
+            (dir <= 0 && vt->top.log_equal (layer) && vt->top_wired)) {
           via_defs.push_back (SelectedViaDefinition (lib, pc->second, *vt));
         }
       }

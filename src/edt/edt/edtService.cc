@@ -1718,7 +1718,7 @@ Service::tap (const db::DPoint & /*initial*/)
 }
 
 void
-Service::via ()
+Service::via (int)
 {
   //  .. nothing here ..
 }

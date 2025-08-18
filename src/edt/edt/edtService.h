@@ -379,8 +379,10 @@ public:
 
   /**
    *  @brief Implements the via feature
+   *
+   *  "dir" is 0 for up or down, -1 for down and +1 for up.
    */
-  virtual void via ();
+  virtual void via (int dir);
 
   /**
    *  @brief Delete the selected rulers

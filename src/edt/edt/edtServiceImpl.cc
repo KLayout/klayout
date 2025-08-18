@@ -1453,7 +1453,7 @@ PathService::selection_applies (const lay::ObjectInstPath &sel) const
 }
 
 void
-PathService::via ()
+PathService::via (int dir)
 {
 #if ! defined(HAVE_QT)
   tl_assert (false); // see TODO
@@ -1469,7 +1469,7 @@ PathService::via ()
   }
 
   db::LayerProperties lp = layout ().get_properties (layer ());
-  std::vector<db::SelectedViaDefinition> via_defs = db::find_via_definitions_for (layout ().technology_name (), lp);
+  std::vector<db::SelectedViaDefinition> via_defs = db::find_via_definitions_for (layout ().technology_name (), lp, dir);
 
   db::SelectedViaDefinition via_def;
 

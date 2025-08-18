@@ -238,7 +238,7 @@ public:
   virtual void do_finish_edit ();
   virtual void do_cancel_edit ();
   virtual bool do_activated ();
-  virtual void via ();
+  virtual void via (int dir);
   virtual bool selection_applies (const lay::ObjectInstPath &sel) const;
 
 protected:

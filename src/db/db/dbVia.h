@@ -129,6 +129,11 @@ public:
   bool bottom_wired;
 
   /**
+   *  @brief The cut layer
+   */
+  db::LayerProperties cut;
+
+  /**
    *  @brief The top layer
    */
   db::LayerProperties top;

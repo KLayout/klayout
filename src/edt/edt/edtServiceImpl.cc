@@ -1574,6 +1574,10 @@ PathService::via ()
   db::Instance via_instance = cell ().insert (db::CellInstArray (db::CellInst (via_cell), db::Trans (trans () * via_pos - db::Point ())));
   push_segment (path_shape, via_instance, via_def.via_type);
 
+  if (! via_def.via_type.cut.is_null ()) {
+    edt::set_or_request_current_layer (view (), via_def.via_type.cut, cv_index (), false /*don't make current*/);
+  }
+
   change_edit_layer (lp_new);
 
   m_points.clear ();

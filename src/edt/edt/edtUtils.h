@@ -83,7 +83,7 @@ config_recent_for_layer (lay::LayoutViewBase *view, const db::LayerProperties &l
  *  @brief Request to make the given layer the current one (asks whether to create the layer if needed)
  */
 bool
-set_or_request_current_layer (lay::LayoutViewBase *view, const db::LayerProperties &lp, unsigned int cv_index);
+set_or_request_current_layer (lay::LayoutViewBase *view, const db::LayerProperties &lp, unsigned int cv_index, bool make_current = true);
 
 /**
  *  @brief A helper class that identifies clipboard data for edt::

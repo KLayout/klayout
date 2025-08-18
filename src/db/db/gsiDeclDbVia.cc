@@ -119,6 +119,9 @@ Class<db::ViaType> decl_dbViaType ("db", "ViaType",
   make_getter_setter<db::ViaType, db::LayerProperties, &db::ViaType::bottom> ("bottom",
     "@brief The bottom layer of the via.\n"
   ) +
+  make_getter_setter<db::ViaType, db::LayerProperties, &db::ViaType::cut> ("cut",
+    "@brief The cut layer of the via.\n"
+  ) +
   make_getter_setter<db::ViaType, db::LayerProperties, &db::ViaType::top> ("top",
     "@brief The top layer of the via.\n"
   ) +

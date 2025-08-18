@@ -114,12 +114,18 @@ config_recent_for_layer (lay::LayoutViewBase *view, const db::LayerProperties &l
 }
 
 bool
-set_or_request_current_layer (lay::LayoutViewBase *view, const db::LayerProperties &lp, unsigned int cv_index)
+set_or_request_current_layer (lay::LayoutViewBase *view, const db::LayerProperties &lp, unsigned int cv_index, bool make_current)
 {
 #if defined(HAVE_QT)
-  bool ok = view->set_current_layer (cv_index, lp);
-  if (ok) {
-    return true;
+  //  try to find an existing layer
+  if (make_current) {
+    if (view->set_current_layer (cv_index, lp)) {
+      return true;
+    }
+  } else {
+    if (! view->find_layer (cv_index, lp).is_null ()) {
+      return true;
+    }
   }
 
   if (! view->control_panel ()) {
@@ -137,11 +143,15 @@ set_or_request_current_layer (lay::LayoutViewBase *view, const db::LayerProperti
     lpn.set_source (lay::ParsedLayerSource (lp, cv_index));
     view->init_layer_properties (lpn);
 
-    view->transaction (tl::to_string (QObject::tr ("Create new layer")));
-    lay::LayerPropertiesConstIterator lpi = lay::LayerPropertiesConstIterator (& view->insert_layer (view->end_layers (), lpn));
-    view->set_current_layer (lpi);
-    lpi->realize_source ();
-    view->commit ();
+    {
+      db::Transaction transaction (! view->manager ()->transacting () ? view->manager () : 0, tl::to_string (QObject::tr ("Create new layer")));
+
+      lay::LayerPropertiesConstIterator lpi = lay::LayerPropertiesConstIterator (& view->insert_layer (view->end_layers (), lpn));
+      if (make_current) {
+        view->set_current_layer (lpi);
+      }
+      lpi->realize_source ();
+    }
 
     return true;
 

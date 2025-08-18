@@ -75,6 +75,7 @@ protected:
   template <class Shape>
   void deliver_shape_to_hooks (const Shape &shape);
   void close_editor_hooks (bool with_commit);
+  combine_mode_type combine_mode () const { return m_combine_mode; }
 
   const tl::weak_collection<edt::EditorHooks> &editor_hooks ()
   {
@@ -247,13 +248,14 @@ protected:
 private:
   struct PathSegment
   {
-    PathSegment () : layer (0), cv_index (0) { }
+    PathSegment () : layer (0), cv_index (0), via_transaction_id (0) { }
 
     unsigned int layer;
     int cv_index;
     std::list<std::pair<std::string, std::string> > config;
     db::Shape path_shape;
     db::Instance via_instance;
+    db::Manager::transaction_id_t via_transaction_id;
     db::ViaType via_type;
   };
 
@@ -268,7 +270,7 @@ private:
   db::Path get_path () const;
   void set_last_point (const db::DPoint &p);
   void update_via ();
-  void push_segment (const db::Shape &shape, const db::Instance &instance, const db::ViaType &via_type);
+  void push_segment (const db::Shape &shape, const db::Instance &instance, const db::ViaType &via_type, db::Manager::transaction_id_t via_transaction_id);
   void pop_segment ();
 };
 

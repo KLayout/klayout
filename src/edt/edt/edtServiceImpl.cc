@@ -306,13 +306,8 @@ ShapeEditService::deliver_shape (const db::Polygon &poly)
 {
   if (m_combine_mode == CM_Add) {
 
-    if (manager ()) {
-      manager ()->transaction (tl::to_string (tr ("Create polygon")));
-    }
+    db::Transaction transaction (manager (), tl::to_string (tr ("Create polygon")));
     cell ().shapes (layer ()).insert (poly);
-    if (manager ()) {
-      manager ()->commit ();
-    }
 
   } else {
 
@@ -370,9 +365,7 @@ ShapeEditService::deliver_shape (const db::Polygon &poly)
       result = input;
     }
 
-    if (manager ()) {
-      manager ()->transaction (tl::to_string (tr ("Combine shape with background")));
-    }
+    db::Transaction transaction (manager (), tl::to_string (tr ("Combine shape with background")));
 
     //  Erase existing shapes
     for (std::vector<db::Shape>::const_iterator s = shapes.begin (); s != shapes.end (); ++s) {
@@ -387,10 +380,6 @@ ShapeEditService::deliver_shape (const db::Polygon &poly)
       cell ().shapes (layer ()).insert (*p);
     }
 
-    if (manager ()) {
-      manager ()->commit ();
-    }
-
   }
 }
 
@@ -398,13 +387,8 @@ void
 ShapeEditService::deliver_shape (const db::Path &path)
 {
   if (m_combine_mode == CM_Add) {
-    if (manager ()) {
-      manager ()->transaction (tl::to_string (tr ("Create path")));
-    }
+    db::Transaction transaction (manager (), tl::to_string (tr ("Create path")));
     cell ().shapes (layer ()).insert (path);
-    if (manager ()) {
-      manager ()->commit ();
-    }
   } else {
     deliver_shape (path.polygon ());
   }
@@ -414,13 +398,8 @@ void
 ShapeEditService::deliver_shape (const db::Box &box)
 {
   if (m_combine_mode == CM_Add) {
-    if (manager ()) {
-      manager ()->transaction (tl::to_string (tr ("Create box")));
-    }
+    db::Transaction transaction (manager (), tl::to_string (tr ("Create box")));
     cell ().shapes (layer ()).insert (box);
-    if (manager ()) {
-      manager ()->commit ();
-    }
   } else {
     deliver_shape (db::Polygon (box));
   }
@@ -430,13 +409,8 @@ void
 ShapeEditService::deliver_shape (const db::Point &point)
 {
   if (m_combine_mode == CM_Add) {
-    if (manager ()) {
-      manager ()->transaction (tl::to_string (tr ("Create point")));
-    }
+    db::Transaction transaction (manager (), tl::to_string (tr ("Create point")));
     cell ().shapes (layer ()).insert (point);
-    if (manager ()) {
-      manager ()->commit ();
-    }
   }
 }
 
@@ -1490,12 +1464,9 @@ PathService::via ()
     return;
   }
 
-  /* @@@
-  if (m_combine_mode != CM_Add) {
-    //  @@@ an error?
-    return;
+  if (combine_mode () != CM_Add) {
+    throw tl::Exception (tl::to_string (tr ("Vias are only available in 'Add' combination mode")));
   }
-  */
 
   db::LayerProperties lp = layout ().get_properties (layer ());
   std::vector<db::SelectedViaDefinition> via_defs = db::find_via_definitions_for (layout ().technology_name (), lp);
@@ -1543,7 +1514,12 @@ PathService::via ()
 
   //  produce the path up to the current point
   db::DPoint via_pos = m_points.back ();
-  db::Shape path_shape = cell ().shapes (layer ()).insert (get_path ());
+
+  db::Shape path_shape;
+  {
+    db::Transaction transaction (manager (), tl::to_string (tr ("Create path")));
+    path_shape = cell ().shapes (layer ()).insert (get_path ());
+  }
 
   bool is_bottom = via_def.via_type.bottom.log_equal (lp);
   db::LayerProperties lp_new = is_bottom ? via_def.via_type.top : via_def.via_type.bottom;
@@ -1568,25 +1544,29 @@ PathService::via ()
   params.insert (std::make_pair ("h_bottom", tl::Variant (h_bottom)));
   params.insert (std::make_pair ("h_top", tl::Variant (h_top)));
 
-  auto via_lib_cell = via_def.lib->layout ().get_pcell_variant_dict (via_def.pcell, params);
-  auto via_cell = layout ().get_lib_proxy (via_def.lib, via_lib_cell);
+  {
+    db::Transaction transaction (manager (), tl::to_string (tr ("Create via")));
 
-  db::Instance via_instance = cell ().insert (db::CellInstArray (db::CellInst (via_cell), db::Trans (trans () * via_pos - db::Point ())));
-  push_segment (path_shape, via_instance, via_def.via_type);
+    auto via_lib_cell = via_def.lib->layout ().get_pcell_variant_dict (via_def.pcell, params);
+    auto via_cell = layout ().get_lib_proxy (via_def.lib, via_lib_cell);
 
-  if (! via_def.via_type.cut.is_null ()) {
-    edt::set_or_request_current_layer (view (), via_def.via_type.cut, cv_index (), false /*don't make current*/);
+    db::Instance via_instance = cell ().insert (db::CellInstArray (db::CellInst (via_cell), db::Trans (trans () * via_pos - db::Point ())));
+    push_segment (path_shape, via_instance, via_def.via_type, transaction.id ());
+
+    if (! via_def.via_type.cut.is_null ()) {
+      edt::set_or_request_current_layer (view (), via_def.via_type.cut, cv_index (), false /*don't make current*/);
+    }
+
+    change_edit_layer (lp_new);
+
+    m_points.clear ();
+    m_points.push_back (via_pos);
+    m_points.push_back (via_pos);
+    m_last = m_points.back ();
+
+    update_marker ();
+    update_via ();
   }
-
-  change_edit_layer (lp_new);
-
-  m_points.clear ();
-  m_points.push_back (via_pos);
-  m_points.push_back (via_pos);
-  m_last = m_points.back ();
-
-  update_marker ();
-  update_via ();
 }
 
 void
@@ -1600,16 +1580,18 @@ PathService::update_via ()
     return;
   }
 
-  if (! m_previous_segments.back ().via_instance.instances ()) {
+  PathSegment &ps = m_previous_segments.back ();
+
+  if (! ps.via_instance.instances ()) {
     return;
   }
 
-  db::Cell *via_parent_cell = m_previous_segments.back ().via_instance.instances ()->cell ();
+  db::Cell *via_parent_cell = ps.via_instance.instances ()->cell ();
 
   //  Compute the parameters to change
 
   db::LayerProperties lp = layout ().get_properties (layer ());
-  bool is_bottom = m_previous_segments.back ().via_type.bottom.log_equal (lp);
+  bool is_bottom = ps.via_type.bottom.log_equal (lp);
 
   double w = 0.0, h = 0.0;
   db::DVector dwire = m_points [1] - m_points.front ();
@@ -1632,17 +1614,23 @@ PathService::update_via ()
 
   //  change the via PCell
 
-  m_previous_segments.back ().via_instance = via_parent_cell->change_pcell_parameters (m_previous_segments.back ().via_instance, params);
+  {
+    db::Transaction transaction (manager (), tl::to_string (tr ("Create via")), ps.via_transaction_id);
+    ps.via_instance = via_parent_cell->change_pcell_parameters (ps.via_instance, params);
+
+    layout ().cleanup ();
+  }
 }
 
 void
-PathService::push_segment (const db::Shape &shape, const db::Instance &instance, const db::ViaType &via_type)
+PathService::push_segment (const db::Shape &shape, const db::Instance &instance, const db::ViaType &via_type, db::Manager::transaction_id_t via_transaction_id)
 {
   m_previous_segments.push_back (PathSegment ());
 
   PathSegment &ps = m_previous_segments.back ();
   ps.path_shape = shape;
   ps.via_instance = instance;
+  ps.via_transaction_id = via_transaction_id;
   ps.via_type = via_type;
   ps.layer = layer ();
   ps.cv_index = cv_index ();

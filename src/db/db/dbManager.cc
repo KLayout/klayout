@@ -122,7 +122,9 @@ Manager::transaction (const std::string &description, transaction_id_t join_with
     tl_assert (! m_replay);
 
     if (! m_transactions.empty () && reinterpret_cast<transaction_id_t> (& m_transactions.back ()) == join_with) {
-      m_transactions.back ().second = description;
+      if (! description.empty ()) {
+        m_transactions.back ().second = description;
+      }
     } else {
       //  delete all following transactions and add a new one
       erase_transactions (m_current, m_transactions.end ());

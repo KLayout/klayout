@@ -39,6 +39,7 @@
 namespace lay
 {
   class LayoutViewBase;
+  class Dispatcher;
 }
 
 namespace edt {
@@ -77,7 +78,7 @@ commit_recent (lay::LayoutViewBase *view);
  *  @brief Configure attributes for the most-recent entry with the given layer
  */
 void
-config_recent_for_layer (lay::LayoutViewBase *view, const db::LayerProperties &lp, int cv_index);
+config_recent_for_layer (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher, const db::LayerProperties &lp, int cv_index);
 
 /**
  *  @brief Request to make the given layer the current one (asks whether to create the layer if needed)

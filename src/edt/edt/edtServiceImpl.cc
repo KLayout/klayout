@@ -57,7 +57,7 @@ namespace edt
 
 ShapeEditService::ShapeEditService (db::Manager *manager, lay::LayoutViewBase *view, db::ShapeIterator::flags_type shape_types)
   : edt::Service (manager, view, shape_types), 
-    m_layer (0), m_cv_index (0), mp_cell (0), mp_layout (0), m_combine_mode (CM_Add)
+    m_layer (0), m_cv_index (0), mp_cell (0), mp_layout (0), m_combine_mode (CM_Add), m_update_edit_layer_enabled (true)
 {
   view->current_layer_changed_event.add (this, &ShapeEditService::update_edit_layer);
 }
@@ -151,7 +151,7 @@ ShapeEditService::get_edit_layer ()
 
   //  fetches the last configuration for the given layer
   view ()->set_active_cellview_index (cv_index);
-  edt::config_recent_for_layer (view (), cv->layout ().get_properties ((unsigned int) layer), cv_index);
+  edt::config_recent_for_layer (view (), dispatcher (), cv->layout ().get_properties ((unsigned int) layer), cv_index);
 }
 
 void
@@ -171,12 +171,41 @@ ShapeEditService::change_edit_layer (const db::LayerProperties &lp)
 
   //  fetches the last configuration for the given layer
   view ()->set_active_cellview_index (m_cv_index);
-  edt::config_recent_for_layer (view (), lp, m_cv_index);
+  edt::config_recent_for_layer (view (), dispatcher (), lp, m_cv_index);
+}
+
+void
+ShapeEditService::set_layer (const db::LayerProperties &lp, unsigned int cv_index)
+{
+  if (! mp_layout) {
+    return;
+  }
+
+  int layer = mp_layout->get_layer_maybe (lp);
+  if (layer < 0) {
+    layer = mp_layout->insert_layer (lp);
+  }
+
+  m_layer = (unsigned int) layer;
+  m_cv_index = cv_index;
+
+  m_update_edit_layer_enabled = false;
+  try {
+    view ()->set_current_layer (cv_index, lp);
+    m_update_edit_layer_enabled = true;
+  } catch (...) {
+    m_update_edit_layer_enabled = true;
+    throw;
+  }
 }
 
 void
 ShapeEditService::update_edit_layer (const lay::LayerPropertiesConstIterator &cl)
 {
+  if (! m_update_edit_layer_enabled) {
+    return;
+  }
+
   if (! editing ()) {
     return;
   }
@@ -238,7 +267,7 @@ ShapeEditService::update_edit_layer (const lay::LayerPropertiesConstIterator &cl
 
   //  fetches the last configuration for the given layer
   view ()->set_active_cellview_index (cv_index);
-  edt::config_recent_for_layer (view (), cv->layout ().get_properties ((unsigned int) layer), cv_index);
+  edt::config_recent_for_layer (view (), dispatcher (), cv->layout ().get_properties ((unsigned int) layer), cv_index);
 
   current_layer_changed ();
 }
@@ -1360,7 +1389,12 @@ PathService::do_delete ()
     update_marker ();
     update_via ();
 
+  } else if (! m_previous_segments.empty ()) {
+
+    pop_segment ();
+
   }
+
 }
 
 void
@@ -1459,6 +1493,10 @@ PathService::via (int dir)
   tl_assert (false); // see TODO
 #endif
 
+  if (! editing ()) {
+    return;
+  }
+
   //  not enough points to form a path
   if (m_points.size () < 2) {
     return;
@@ -1512,14 +1550,10 @@ PathService::via (int dir)
 
   }
 
+  commit_recent (view ());
+
   //  produce the path up to the current point
   db::DPoint via_pos = m_points.back ();
-
-  db::Shape path_shape;
-  {
-    db::Transaction transaction (manager (), tl::to_string (tr ("Create path")));
-    path_shape = cell ().shapes (layer ()).insert (get_path ());
-  }
 
   bool is_bottom = via_def.via_type.bottom.log_equal (lp);
   db::LayerProperties lp_new = is_bottom ? via_def.via_type.top : via_def.via_type.bottom;
@@ -1545,7 +1579,9 @@ PathService::via (int dir)
   params.insert (std::make_pair ("h_top", tl::Variant (h_top)));
 
   {
-    db::Transaction transaction (manager (), tl::to_string (tr ("Create via")));
+    db::Transaction transaction (manager (), tl::to_string (tr ("Create path segment")));
+
+    db::Shape path_shape = cell ().shapes (layer ()).insert (get_path ());
 
     auto via_lib_cell = via_def.lib->layout ().get_pcell_variant_dict (via_def.pcell, params);
     auto via_cell = layout ().get_lib_proxy (via_def.lib, via_lib_cell);
@@ -1558,15 +1594,15 @@ PathService::via (int dir)
     }
 
     change_edit_layer (lp_new);
-
-    m_points.clear ();
-    m_points.push_back (via_pos);
-    m_points.push_back (via_pos);
-    m_last = m_points.back ();
-
-    update_marker ();
-    update_via ();
   }
+
+  m_points.clear ();
+  m_points.push_back (via_pos);
+  m_points.push_back (via_pos);
+  m_last = m_points.back ();
+
+  update_marker ();
+  update_via ();
 }
 
 void
@@ -1615,35 +1651,37 @@ PathService::update_via ()
   //  change the via PCell
 
   {
-    db::Transaction transaction (manager (), tl::to_string (tr ("Create via")), ps.via_transaction_id);
+    db::Transaction transaction (manager () && ! manager ()->transacting () ? manager () : 0, std::string (), ps.transaction_id);
     ps.via_instance = via_parent_cell->change_pcell_parameters (ps.via_instance, params);
 
     layout ().cleanup ();
   }
 }
 
+static std::string path_config_keys [] = {
+  cfg_edit_path_width,
+  cfg_edit_path_ext_var_begin,
+  cfg_edit_path_ext_var_end,
+  cfg_edit_path_ext_type
+};
+
 void
-PathService::push_segment (const db::Shape &shape, const db::Instance &instance, const db::ViaType &via_type, db::Manager::transaction_id_t via_transaction_id)
+PathService::push_segment (const db::Shape &shape, const db::Instance &instance, const db::ViaType &via_type, db::Manager::transaction_id_t transaction_id)
 {
   m_previous_segments.push_back (PathSegment ());
 
   PathSegment &ps = m_previous_segments.back ();
+  ps.points = m_points;
+  ps.last_point = m_last;
   ps.path_shape = shape;
   ps.via_instance = instance;
-  ps.via_transaction_id = via_transaction_id;
   ps.via_type = via_type;
-  ps.layer = layer ();
+  ps.layer = layout ().get_properties (layer ());
   ps.cv_index = cv_index ();
+  ps.transaction_id = transaction_id;
 
-  std::string cfg [] = {
-    cfg_edit_path_width,
-    cfg_edit_path_ext_var_begin,
-    cfg_edit_path_ext_var_end,
-    cfg_edit_path_ext_type
-  };
-
-  for (unsigned int i = 0; i < sizeof (cfg) / sizeof (cfg[0]); ++i) {
-    ps.config.push_back (std::make_pair (cfg [i], std::string ()));
+  for (unsigned int i = 0; i < sizeof (path_config_keys) / sizeof (path_config_keys[0]); ++i) {
+    ps.config.push_back (std::make_pair (path_config_keys [i], std::string ()));
     view ()->config_get (ps.config.back ().first, ps.config.back ().second);
   }
 }
@@ -1651,7 +1689,48 @@ PathService::push_segment (const db::Shape &shape, const db::Instance &instance,
 void
 PathService::pop_segment ()
 {
-  // @@@
+  PathSegment ps = m_previous_segments.back ();
+  m_previous_segments.pop_back ();
+
+  if (manager () && manager ()->transaction_id_for_undo () == ps.transaction_id) {
+
+    //  should remove shape and via instance
+    manager ()->undo ();
+
+    //  empties the undo queue, so we don't keep objects there and spoil subsequent "update_via" actions
+    //  TODO: is there a better way to do this?
+    manager ()->transaction (std::string ());
+    manager ()->cancel ();
+
+  } else {
+
+    //  fallback without using undo
+    db::Transaction transaction (manager (), tl::to_string (tr ("Undo path segment")));
+
+    if (! ps.path_shape.is_null () && ps.path_shape.shapes ()) {
+      ps.path_shape.shapes ()->erase_shape (ps.path_shape);
+    }
+
+    if (! ps.via_instance.is_null () && ps.via_instance.instances ()) {
+      ps.via_instance.instances ()->erase (ps.via_instance);
+    }
+
+  }
+
+  set_layer (ps.layer, ps.cv_index);
+
+  m_points = ps.points;
+  m_last = ps.last_point;
+
+  for (auto i = ps.config.begin (); i != ps.config.end (); ++i) {
+    dispatcher ()->config_set (i->first, i->second);
+  }
+
+  //  avoids update_via() which might spoil the via we just recovered
+  m_needs_update = false;
+  dispatcher ()->config_end ();
+
+  update_marker ();
 }
 
 bool 

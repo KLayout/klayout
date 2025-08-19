@@ -71,6 +71,7 @@ protected:
   void deliver_shape (const db::Path &path);
   void deliver_shape (const db::Box &box);
   void deliver_shape (const db::Point &point);
+  void set_layer (const db::LayerProperties &lp, unsigned int cv_index);
   void open_editor_hooks ();
   template <class Shape>
   void deliver_shape_to_hooks (const Shape &shape);
@@ -92,6 +93,7 @@ private:
   db::Layout *mp_layout;
   combine_mode_type m_combine_mode;
   tl::weak_collection<edt::EditorHooks> m_editor_hooks;
+  bool m_update_edit_layer_enabled;
 
   void update_edit_layer (const lay::LayerPropertiesConstIterator &iter);
 };
@@ -248,18 +250,20 @@ protected:
 private:
   struct PathSegment
   {
-    PathSegment () : layer (0), cv_index (0), via_transaction_id (0) { }
+    PathSegment () : cv_index (0), transaction_id (0) { }
 
-    unsigned int layer;
+    db::LayerProperties layer;
     int cv_index;
     std::list<std::pair<std::string, std::string> > config;
+    std::vector<db::DPoint> points;
+    db::DPoint last_point;
     db::Shape path_shape;
     db::Instance via_instance;
-    db::Manager::transaction_id_t via_transaction_id;
     db::ViaType via_type;
+    db::Manager::transaction_id_t transaction_id;
   };
 
-  std::vector <db::DPoint> m_points;
+  std::vector<db::DPoint> m_points;
   double m_width, m_bgnext, m_endext;
   enum { Flush = 0, Square, Variable, Round } m_type;
   bool m_needs_update;
@@ -270,7 +274,7 @@ private:
   db::Path get_path () const;
   void set_last_point (const db::DPoint &p);
   void update_via ();
-  void push_segment (const db::Shape &shape, const db::Instance &instance, const db::ViaType &via_type, db::Manager::transaction_id_t via_transaction_id);
+  void push_segment (const db::Shape &shape, const db::Instance &instance, const db::ViaType &via_type, db::Manager::transaction_id_t transaction_id);
   void pop_segment ();
 };
 

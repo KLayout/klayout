@@ -67,7 +67,7 @@ Service::Service (db::Manager *manager, lay::LayoutViewBase *view, db::ShapeIter
     db::Object (manager),
     mp_view (view),
     mp_transient_marker (0), 
-    m_editing (false), m_immediate (false), 
+    m_mouse_in_view (false), m_editing (false), m_immediate (false),
     m_selection_maybe_invalid (false),
     m_cell_inst_service (false),
     m_flags (flags),
@@ -91,7 +91,7 @@ Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
     db::Object (manager),
     mp_view (view),
     mp_transient_marker (0), 
-    m_editing (false), m_immediate (false), 
+    m_mouse_in_view (false), m_editing (false), m_immediate (false),
     m_selection_maybe_invalid (false),
     m_cell_inst_service (true),
     m_flags (db::ShapeIterator::Nothing),
@@ -882,6 +882,8 @@ Service::move_cancel ()
 bool   
 Service::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
+  m_mouse_pos = p;
+
   if (view ()->is_editable () && prio) {
 
     if (m_editing || m_immediate) {
@@ -945,6 +947,20 @@ Service::mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio
 
   } 
 
+  return false;
+}
+
+bool
+Service::leave_event (bool /*prio*/)
+{
+  m_mouse_in_view = false;
+  return false;
+}
+
+bool
+Service::enter_event (bool /*prio*/)
+{
+  m_mouse_in_view = true;
   return false;
 }
 

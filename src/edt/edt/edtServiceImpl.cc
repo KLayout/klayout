@@ -37,6 +37,7 @@
 #include "layMarker.h"
 #include "layLayerProperties.h"
 #include "layLayoutViewBase.h"
+#include "layFinder.h"
 
 #if defined(HAVE_QT)
 #  include "layLayoutView.h"
@@ -177,22 +178,31 @@ ShapeEditService::change_edit_layer (const db::LayerProperties &lp)
 void
 ShapeEditService::set_layer (const db::LayerProperties &lp, unsigned int cv_index)
 {
-  if (! mp_layout) {
+  const lay::CellView &cv = view ()->cellview (cv_index);
+  if (! cv.is_valid ()) {
     return;
   }
 
-  int layer = mp_layout->get_layer_maybe (lp);
+  int layer = cv->layout ().get_layer_maybe (lp);
   if (layer < 0) {
-    layer = mp_layout->insert_layer (lp);
+    layer = cv->layout ().insert_layer (lp);
   }
 
   m_layer = (unsigned int) layer;
   m_cv_index = cv_index;
+  mp_layout = &(cv->layout ());
+  mp_cell = cv.cell ();
 
   m_update_edit_layer_enabled = false;
+
   try {
+
     view ()->set_current_layer (cv_index, lp);
+    auto cl = view ()->current_layer ();
+    m_trans = (cl->trans ().front () * db::CplxTrans (cv->layout ().dbu ()) * cv.context_trans ()).inverted ();
+
     m_update_edit_layer_enabled = true;
+
   } catch (...) {
     m_update_edit_layer_enabled = true;
     throw;
@@ -1489,31 +1499,33 @@ PathService::selection_applies (const lay::ObjectInstPath &sel) const
 void
 PathService::via (int dir)
 {
-#if ! defined(HAVE_QT)
-  tl_assert (false); // see TODO
-#endif
-
-  if (! editing ()) {
-    return;
-  }
-
-  //  not enough points to form a path
-  if (m_points.size () < 2) {
-    return;
-  }
-
+//  see TODO below
+#if defined(HAVE_QT)
   if (combine_mode () != CM_Add) {
     throw tl::Exception (tl::to_string (tr ("Vias are only available in 'Add' combination mode")));
   }
 
-  db::LayerProperties lp = layout ().get_properties (layer ());
-  std::vector<db::SelectedViaDefinition> via_defs = db::find_via_definitions_for (layout ().technology_name (), lp, dir);
+  if (editing ()) {
+    via_editing (dir);
+  } else {
+    via_initial (dir);
+  }
+#endif
+}
 
-  db::SelectedViaDefinition via_def;
+bool
+PathService::get_via_for (const db::LayerProperties &lp, unsigned int cv_index, int dir, db::SelectedViaDefinition &via_def)
+{
+  const lay::CellView &cv = view ()->cellview (cv_index);
+  if (! cv.is_valid ()) {
+    return false;
+  }
+
+  std::vector<db::SelectedViaDefinition> via_defs = db::find_via_definitions_for (cv->layout ().technology_name (), lp, dir);
 
   if (via_defs.size () == 0) {
 
-    return;
+    return false;
 
   } else if (via_defs.size () == 1) {
 
@@ -1522,11 +1534,12 @@ PathService::via (int dir)
   } else if (via_defs.size () > 1) {
 
 #if defined(HAVE_QT)
-    //  TODO: what to do here in Qt-less case? Store results in configuration so they can be retrieved externally?
+    //  present a menu with the available vias.
+    //  TODO: what to do here in Qt-less case?
 
     QWidget *view_widget = lay::widget_from_view (view ());
     if (! view_widget) {
-      return;
+      return false;
     }
 
     std::unique_ptr<QMenu> menu (new QMenu (view_widget));
@@ -1542,12 +1555,103 @@ PathService::via (int dir)
 
     QAction *action = menu->exec (mp);
     if (! action) {
-      return;
+      return false;
     }
 
     via_def = via_defs [action->data ().toInt ()];
 #endif
 
+  }
+
+  return true;
+}
+
+void
+PathService::via_initial (int dir)
+{
+  if (! mouse_in_view ()) {
+    return;
+  }
+
+  //  compute search box
+  double l = catch_distance ();
+  db::DPoint pos = mouse_pos ();
+  db::DBox search_box = db::DBox (pos, pos).enlarged (db::DVector (l, l));
+
+  lay::ShapeFinder finder (true, false, db::ShapeIterator::Regions);
+
+  //  go through all visible layers of all cellviews
+  finder.find (view (), search_box);
+
+  //  collect the founds from the finder
+  lay::ShapeFinder::iterator r = finder.begin ();
+  if (r == finder.end ()) {
+    return;
+  }
+
+  const lay::CellView &cv = view ()->cellview (r->cv_index ());
+  if (! cv.is_valid ()) {
+    return;
+  }
+
+  db::LayerProperties lp = cv->layout ().get_properties (r->layer ());
+
+  db::SelectedViaDefinition via_def;
+  if (! get_via_for (lp, r->cv_index (), dir, via_def)) {
+    return;
+  }
+
+  set_layer (lp, r->cv_index ());
+
+  bool is_bottom = via_def.via_type.bottom.log_equal (lp);
+  db::LayerProperties lp_new = is_bottom ? via_def.via_type.top : via_def.via_type.bottom;
+
+  {
+    db::Transaction transaction (manager (), tl::to_string (tr ("Create path segment")));
+
+    change_edit_layer (lp_new);
+    begin_edit (pos);
+
+    db::DPoint via_pos = m_last;
+
+    //  create the via cell
+    //  (using 0.0 for all dimensions to indicate "place here")
+
+    double w_bottom = 0.0, h_bottom = 0.0, w_top = 0.0, h_top = 0.0;
+
+    std::map<std::string, tl::Variant> params;
+    params.insert (std::make_pair ("via", tl::Variant (via_def.via_type.name)));
+    params.insert (std::make_pair ("w_bottom", tl::Variant (w_bottom)));
+    params.insert (std::make_pair ("w_top", tl::Variant (w_top)));
+    params.insert (std::make_pair ("h_bottom", tl::Variant (h_bottom)));
+    params.insert (std::make_pair ("h_top", tl::Variant (h_top)));
+
+    auto via_lib_cell = via_def.lib->layout ().get_pcell_variant_dict (via_def.pcell, params);
+    auto via_cell = layout ().get_lib_proxy (via_def.lib, via_lib_cell);
+
+    db::Instance via_instance = cell ().insert (db::CellInstArray (db::CellInst (via_cell), db::Trans (trans () * via_pos - db::Point ())));
+    push_segment (db::Shape (), via_instance, via_def.via_type, transaction.id ());
+
+    if (! via_def.via_type.cut.is_null ()) {
+      edt::set_or_request_current_layer (view (), via_def.via_type.cut, cv_index (), false /*don't make current*/);
+    }
+
+  }
+}
+
+void
+PathService::via_editing (int dir)
+{
+  //  not enough points to form a path
+  if (m_points.size () < 2) {
+    return;
+  }
+
+  db::LayerProperties lp = layout ().get_properties (layer ());
+
+  db::SelectedViaDefinition via_def;
+  if (! get_via_for (lp, cv_index (), dir, via_def)) {
+    return;
   }
 
   commit_recent (view ());

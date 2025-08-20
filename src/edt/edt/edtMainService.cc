@@ -2484,20 +2484,6 @@ MainService::via_impl (int dir)
   edt::Service *es = dynamic_cast<edt::Service *> (view ()->canvas ()->active_service ());
   if (es) {
     es->via (dir);
-  } else {
-
-#if 0 // @@@
-  db::ShapeIterator::flags_type (db::ShapeIterator::All - db::ShapeIterator::Texts),  //  do not consider texts - their bounding box may be too large
-  lay::ShapeFinder finder (true, view ()->is_editable () && m_top_level_sel, m_flags, &m_previous_selection);
-
-  //  go through all visible layers of all cellviews
-  finder.find (view (), search_box);
-
-  //  collect the founds from the finder
-  lay::ShapeFinder::iterator r = finder.begin ();
-  if (r != finder.end ()) {
-#endif
-
   }
 }
 

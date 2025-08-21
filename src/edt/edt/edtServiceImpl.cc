@@ -215,9 +215,13 @@ ShapeEditService::set_layer (const db::LayerProperties &lp, unsigned int cv_inde
 
   try {
 
-    view ()->set_current_layer (cv_index, lp);
-    auto cl = view ()->current_layer ();
-    m_trans = (cl->trans ().front () * db::CplxTrans (cv->layout ().dbu ()) * cv.context_trans ()).inverted ();
+    auto cl = view ()->find_layer (cv_index, lp);
+    if (! cl.is_null ()) {
+      view ()->set_current_layer (cl);
+      m_trans = (cl->trans ().front () * db::CplxTrans (cv->layout ().dbu ()) * cv.context_trans ()).inverted ();
+    } else {
+      m_trans = (db::CplxTrans (cv->layout ().dbu ()) * cv.context_trans ()).inverted ();
+    }
 
     m_update_edit_layer_enabled = true;
 

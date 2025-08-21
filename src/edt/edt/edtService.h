@@ -649,6 +649,11 @@ protected:
   }
 
   /**
+   *  @brief Commits the current configuration to the recent attributes list
+   */
+  void commit_recent ();
+
+  /**
    *  @brief Point snapping with detailed return value
    */
   lay::PointSnapToObjectResult snap2_details (const db::DPoint &p) const;

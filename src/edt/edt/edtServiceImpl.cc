@@ -44,6 +44,7 @@
 #  include "layTipDialog.h"
 #  include "layDragDropData.h"
 #  include "layBusy.h"
+#  include "layEditorOptionsPages.h"
 #endif
 
 #if defined(HAVE_QT)
@@ -79,23 +80,47 @@ ShapeEditService::activated ()
 {
   edt::Service::activated ();
 
-#if defined(HAVE_QT)
   if (view () == lay::LayoutView::current ()) {
     lay::LayerPropertiesConstIterator cl = view ()->current_layer ();
-    if (! cl.is_null () && ! cl->visible (true)) {
-      lay::TipDialog td (QApplication::activeWindow (),
-                         tl::to_string (tr ("You are about to draw on a hidden layer. The result won't be visible.")),
-                         "drawing-on-invisible-layer");
-      td.exec_dialog ();
+    update_edit_layer (cl);
+  }
+}
+
+void
+ShapeEditService::config_recent_for_layer (const db::LayerProperties &lp, int cv_index)
+{
+  if (lp.is_null ()) {
+    return;
+  }
+
+#if defined(HAVE_QT)
+  lay::EditorOptionsPages *eo_pages = view ()->editor_options_pages ();
+  if (!eo_pages) {
+    return;
+  }
+
+  for (std::vector<lay::EditorOptionsPage *>::const_iterator op = eo_pages->pages ().begin (); op != eo_pages->pages ().end (); ++op) {
+    if ((*op)->plugin_declaration () == plugin_declaration ()) {
+      (*op)->config_recent_for_layer (dispatcher (), lp, cv_index);
     }
   }
 #endif
 }
 
+
 void
 ShapeEditService::get_edit_layer ()
 {
   lay::LayerPropertiesConstIterator cl = view ()->current_layer ();
+
+#if defined(HAVE_QT)
+  if (! cl->visible (true)) {
+    lay::TipDialog td (QApplication::activeWindow (),
+                       tl::to_string (tr ("You are now drawing on a hidden layer. The result won't be visible.")),
+                       "drawing-on-invisible-layer");
+    td.exec_dialog ();
+  }
+#endif
 
   if (cl.is_null ()) {
     throw tl::Exception (tl::to_string (tr ("Please select a layer first")));
@@ -105,12 +130,12 @@ ShapeEditService::get_edit_layer ()
 
   int cv_index = cl->cellview_index ();
   const lay::CellView &cv = view ()->cellview (cv_index);
-  int layer = cl->layer_index ();
 
   if (cv_index < 0 || ! cv.is_valid ()) {
     throw tl::Exception (tl::to_string (tr ("Please select a cell first")));
   }
 
+  int layer = cl->layer_index ();
   if (layer < 0 || ! cv->layout ().is_valid_layer ((unsigned int) layer)) {
 
     if (cl->has_children ()) {
@@ -120,13 +145,7 @@ ShapeEditService::get_edit_layer ()
       //  create this layer now
       const lay::ParsedLayerSource &source = cl->source (true /*real*/);
 
-      db::LayerProperties db_lp;
-      if (source.has_name ()) {
-        db_lp.name = source.name ();
-      }
-      db_lp.layer = source.layer ();
-      db_lp.datatype = source.datatype ();
-
+      db::LayerProperties db_lp = source.layer_props ();
       cv->layout ().insert_layer (db_lp);
 
       //  update the layer index inside the layer view
@@ -152,7 +171,6 @@ ShapeEditService::get_edit_layer ()
 
   //  fetches the last configuration for the given layer
   view ()->set_active_cellview_index (cv_index);
-  edt::config_recent_for_layer (view (), dispatcher (), cv->layout ().get_properties ((unsigned int) layer), cv_index);
 }
 
 void
@@ -172,7 +190,7 @@ ShapeEditService::change_edit_layer (const db::LayerProperties &lp)
 
   //  fetches the last configuration for the given layer
   view ()->set_active_cellview_index (m_cv_index);
-  edt::config_recent_for_layer (view (), dispatcher (), lp, m_cv_index);
+  config_recent_for_layer (lp, m_cv_index);
 }
 
 void
@@ -216,70 +234,59 @@ ShapeEditService::update_edit_layer (const lay::LayerPropertiesConstIterator &cl
     return;
   }
 
-  if (! editing ()) {
-    return;
-  }
-
   if (cl.is_null () || cl->has_children ()) {
     return;
   }
 
   int cv_index = cl->cellview_index ();
   const lay::CellView &cv = view ()->cellview (cv_index);
-  int layer = cl->layer_index ();
-
   if (cv_index < 0 || ! cv.is_valid ()) {
     return;
   }
 
-  if (cv.cell ()->is_proxy ()) {
-    return;
-  }
-
-#if defined(HAVE_QT)
-  if (! cl->visible (true)) {
-    lay::TipDialog td (QApplication::activeWindow (),
-                       tl::to_string (tr ("You are now drawing on a hidden layer. The result won't be visible.")),
-                       "drawing-on-invisible-layer");
-    td.exec_dialog ();
-  }
-#endif
-
-  if (layer < 0 || ! cv->layout ().is_valid_layer ((unsigned int) layer)) {
-
-    //  create this layer now
-    const lay::ParsedLayerSource &source = cl->source (true /*real*/);
-
-    db::LayerProperties db_lp;
-    if (source.has_name ()) {
-      db_lp.name = source.name ();
-    }
-    db_lp.layer = source.layer ();
-    db_lp.datatype = source.datatype ();
-
-    cv->layout ().insert_layer (db_lp);
-
-    //  update the layer index inside the layer view
-    cl->realize_source ();
-
-    //  Hint: we could have taken the new index from insert_layer, but this
-    //  is a nice test:
-    layer = cl->layer_index ();
-    tl_assert (layer >= 0);
-
-  }
-
-  m_layer = (unsigned int) layer;
-  m_cv_index = (unsigned int) cv_index;
-  m_trans = (cl->trans ().front () * db::CplxTrans (cv->layout ().dbu ()) * cv.context_trans ()).inverted ();
-  mp_layout = &(cv->layout ());
-  mp_cell = cv.cell ();
-
-  //  fetches the last configuration for the given layer
   view ()->set_active_cellview_index (cv_index);
-  edt::config_recent_for_layer (view (), dispatcher (), cv->layout ().get_properties ((unsigned int) layer), cv_index);
 
-  current_layer_changed ();
+  const lay::ParsedLayerSource &source = cl->source (true /*real*/);
+  int layer = cl->layer_index ();
+  db::LayerProperties db_lp = source.layer_props ();
+
+  if (! editing ()) {
+
+    if (layer < 0 || ! cv->layout ().is_valid_layer ((unsigned int) layer)) {
+      config_recent_for_layer (db_lp, cv_index);
+    } else {
+      config_recent_for_layer (cv->layout ().get_properties ((unsigned int) layer), cv_index);
+    }
+
+  } else {
+
+    if (layer < 0 || ! cv->layout ().is_valid_layer ((unsigned int) layer)) {
+
+      //  create this layer now
+      cv->layout ().insert_layer (db_lp);
+
+      //  update the layer index inside the layer view
+      cl->realize_source ();
+
+      //  Hint: we could have taken the new index from insert_layer, but this
+      //  is a nice test:
+      layer = cl->layer_index ();
+      tl_assert (layer >= 0);
+
+    }
+
+    m_layer = (unsigned int) layer;
+    m_cv_index = (unsigned int) cv_index;
+    m_trans = (cl->trans ().front () * db::CplxTrans (cv->layout ().dbu ()) * cv.context_trans ()).inverted ();
+    mp_layout = &(cv->layout ());
+    mp_cell = cv.cell ();
+
+    //  fetches the last configuration for the given layer
+    config_recent_for_layer (cv->layout ().get_properties ((unsigned int) layer), cv_index);
+
+    current_layer_changed ();
+
+  }
 }
 
 void
@@ -600,7 +607,7 @@ void
 PolygonService::do_finish_edit ()
 {
   deliver_shape (get_polygon (false));
-  commit_recent (view ());
+  commit_recent ();
   close_editor_hooks (true);
 }
 
@@ -939,7 +946,7 @@ void
 BoxService::do_finish_edit ()
 {
   deliver_shape (get_box ());
-  commit_recent (view ());
+  commit_recent ();
   close_editor_hooks (true);
 }
 
@@ -1050,7 +1057,7 @@ void
 PointService::do_finish_edit ()
 {
   deliver_shape (get_point ());
-  commit_recent (view ());
+  commit_recent ();
   close_editor_hooks (true);
 }
 
@@ -1199,7 +1206,7 @@ TextService::do_finish_edit ()
     manager ()->commit ();
   }
 
-  commit_recent (view ());
+  commit_recent ();
 
 #if defined(HAVE_QT)
   if (! view ()->text_visible ()) {
@@ -1418,7 +1425,7 @@ PathService::do_finish_edit ()
 
   deliver_shape (get_path ());
 
-  commit_recent (view ());
+  commit_recent ();
 
   close_editor_hooks (true);
 }
@@ -1566,6 +1573,26 @@ PathService::get_via_for (const db::LayerProperties &lp, unsigned int cv_index, 
   return true;
 }
 
+db::Instance
+PathService::make_via (const db::SelectedViaDefinition &via_def, double w_bottom, double h_bottom, double w_top, double h_top, const db::DPoint &via_pos)
+{
+  if (! via_def.via_type.cut.is_null ()) {
+    edt::set_or_request_current_layer (view (), via_def.via_type.cut, cv_index (), false /*don't make current*/);
+  }
+
+  std::map<std::string, tl::Variant> params;
+  params.insert (std::make_pair ("via", tl::Variant (via_def.via_type.name)));
+  params.insert (std::make_pair ("w_bottom", tl::Variant (w_bottom)));
+  params.insert (std::make_pair ("w_top", tl::Variant (w_top)));
+  params.insert (std::make_pair ("h_bottom", tl::Variant (h_bottom)));
+  params.insert (std::make_pair ("h_top", tl::Variant (h_top)));
+
+  auto via_lib_cell = via_def.lib->layout ().get_pcell_variant_dict (via_def.pcell, params);
+  auto via_cell = layout ().get_lib_proxy (via_def.lib, via_lib_cell);
+
+  return cell ().insert (db::CellInstArray (db::CellInst (via_cell), db::Trans (trans () * via_pos - db::Point ())));
+}
+
 void
 PathService::via_initial (int dir)
 {
@@ -1612,30 +1639,11 @@ PathService::via_initial (int dir)
     change_edit_layer (lp_new);
     begin_edit (pos);
 
-    db::DPoint via_pos = m_last;
-
     //  create the via cell
     //  (using 0.0 for all dimensions to indicate "place here")
+    db::Instance via_instance = make_via (via_def, 0.0, 0.0, 0.0, 0.0, m_last);
 
-    double w_bottom = 0.0, h_bottom = 0.0, w_top = 0.0, h_top = 0.0;
-
-    std::map<std::string, tl::Variant> params;
-    params.insert (std::make_pair ("via", tl::Variant (via_def.via_type.name)));
-    params.insert (std::make_pair ("w_bottom", tl::Variant (w_bottom)));
-    params.insert (std::make_pair ("w_top", tl::Variant (w_top)));
-    params.insert (std::make_pair ("h_bottom", tl::Variant (h_bottom)));
-    params.insert (std::make_pair ("h_top", tl::Variant (h_top)));
-
-    auto via_lib_cell = via_def.lib->layout ().get_pcell_variant_dict (via_def.pcell, params);
-    auto via_cell = layout ().get_lib_proxy (via_def.lib, via_lib_cell);
-
-    db::Instance via_instance = cell ().insert (db::CellInstArray (db::CellInst (via_cell), db::Trans (trans () * via_pos - db::Point ())));
     push_segment (db::Shape (), via_instance, via_def.via_type, transaction.id ());
-
-    if (! via_def.via_type.cut.is_null ()) {
-      edt::set_or_request_current_layer (view (), via_def.via_type.cut, cv_index (), false /*don't make current*/);
-    }
-
   }
 }
 
@@ -1654,10 +1662,7 @@ PathService::via_editing (int dir)
     return;
   }
 
-  commit_recent (view ());
-
-  //  produce the path up to the current point
-  db::DPoint via_pos = m_points.back ();
+  commit_recent ();
 
   bool is_bottom = via_def.via_type.bottom.log_equal (lp);
   db::LayerProperties lp_new = is_bottom ? via_def.via_type.top : via_def.via_type.bottom;
@@ -1673,29 +1678,17 @@ PathService::via_editing (int dir)
     (is_bottom ? h_bottom : h_top) = m_width;
   }
 
-  //  create the via cell
+  //  create the path and via
 
-  std::map<std::string, tl::Variant> params;
-  params.insert (std::make_pair ("via", tl::Variant (via_def.via_type.name)));
-  params.insert (std::make_pair ("w_bottom", tl::Variant (w_bottom)));
-  params.insert (std::make_pair ("w_top", tl::Variant (w_top)));
-  params.insert (std::make_pair ("h_bottom", tl::Variant (h_bottom)));
-  params.insert (std::make_pair ("h_top", tl::Variant (h_top)));
+  db::DPoint via_pos = m_points.back ();
 
   {
     db::Transaction transaction (manager (), tl::to_string (tr ("Create path segment")));
 
     db::Shape path_shape = cell ().shapes (layer ()).insert (get_path ());
+    db::Instance via_instance = make_via (via_def, w_bottom, h_bottom, w_top, h_top, via_pos);
 
-    auto via_lib_cell = via_def.lib->layout ().get_pcell_variant_dict (via_def.pcell, params);
-    auto via_cell = layout ().get_lib_proxy (via_def.lib, via_lib_cell);
-
-    db::Instance via_instance = cell ().insert (db::CellInstArray (db::CellInst (via_cell), db::Trans (trans () * via_pos - db::Point ())));
     push_segment (path_shape, via_instance, via_def.via_type, transaction.id ());
-
-    if (! via_def.via_type.cut.is_null ()) {
-      edt::set_or_request_current_layer (view (), via_def.via_type.cut, cv_index (), false /*don't make current*/);
-    }
 
     change_edit_layer (lp_new);
   }
@@ -2300,7 +2293,7 @@ InstService::do_finish_edit ()
         manager ()->commit ();
       }
 
-      commit_recent (view ());
+      commit_recent ();
 
       if (m_in_drag_drop) {
 

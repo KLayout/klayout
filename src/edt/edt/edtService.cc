@@ -33,6 +33,9 @@
 #include "layFinder.h"
 #include "layLayoutView.h"
 #include "laySnap.h"
+#if defined(HAVE_QT)
+#  include "layEditorOptionsPages.h"
+#endif
 #include "tlProgress.h"
 #include "tlTimer.h"
 
@@ -2012,6 +2015,23 @@ Service::handle_guiding_shape_changes (bool commit)
   } else {
     return false;
   }
+}
+
+void
+Service::commit_recent ()
+{
+#if defined(HAVE_QT)
+  lay::EditorOptionsPages *eo_pages = view ()->editor_options_pages ();
+  if (!eo_pages) {
+    return;
+  }
+
+  for (std::vector<lay::EditorOptionsPage *>::const_iterator op = eo_pages->pages ().begin (); op != eo_pages->pages ().end (); ++op) {
+    if ((*op)->plugin_declaration () == plugin_declaration ()) {
+      (*op)->commit_recent (view ());
+    }
+  }
+#endif
 }
 
 // -------------------------------------------------------------

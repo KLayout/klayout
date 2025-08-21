@@ -77,6 +77,7 @@ protected:
   void deliver_shape_to_hooks (const Shape &shape);
   void close_editor_hooks (bool with_commit);
   combine_mode_type combine_mode () const { return m_combine_mode; }
+  void config_recent_for_layer (const db::LayerProperties &lp, int cv_index);
 
   const tl::weak_collection<edt::EditorHooks> &editor_hooks ()
   {
@@ -274,6 +275,7 @@ private:
   db::Path get_path () const;
   void set_last_point (const db::DPoint &p);
   void update_via ();
+  db::Instance make_via (const db::SelectedViaDefinition &via_def, double w_bottom, double h_bottom, double w_top, double h_top, const db::DPoint &via_pos);
   void via_initial (int dir);
   void via_editing (int dir);
   bool get_via_for (const db::LayerProperties &lp, unsigned int cv_index, int dir, db::SelectedViaDefinition &via_def);

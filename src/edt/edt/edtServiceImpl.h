@@ -275,6 +275,7 @@ private:
   db::Path get_path () const;
   void set_last_point (const db::DPoint &p);
   void update_via ();
+  void compute_via_wh (double &w, double &h, const db::DVector &dwire, double var_ext);
   db::Instance make_via (const db::SelectedViaDefinition &via_def, double w_bottom, double h_bottom, double w_top, double h_top, const db::DPoint &via_pos);
   void via_initial (int dir);
   void via_editing (int dir);

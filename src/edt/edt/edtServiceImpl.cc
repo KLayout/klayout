@@ -113,6 +113,12 @@ ShapeEditService::get_edit_layer ()
 {
   lay::LayerPropertiesConstIterator cl = view ()->current_layer ();
 
+  if (cl.is_null ()) {
+    throw tl::Exception (tl::to_string (tr ("Please select a layer first")));
+  } else if (! cl->valid (true)) {
+    throw tl::Exception (tl::to_string (tr ("The selected layer is not valid")));
+  }
+
 #if defined(HAVE_QT)
   if (! cl->visible (true)) {
     lay::TipDialog td (QApplication::activeWindow (),
@@ -121,12 +127,6 @@ ShapeEditService::get_edit_layer ()
     td.exec_dialog ();
   }
 #endif
-
-  if (cl.is_null ()) {
-    throw tl::Exception (tl::to_string (tr ("Please select a layer first")));
-  } else if (! cl->valid (true)) {
-    throw tl::Exception (tl::to_string (tr ("The selected layer is not valid")));
-  }
 
   int cv_index = cl->cellview_index ();
   const lay::CellView &cv = view ()->cellview (cv_index);
@@ -1652,6 +1652,95 @@ PathService::via_initial (int dir)
 }
 
 void
+PathService::compute_via_wh (double &w, double &h, const db::DVector &dwire, double var_ext)
+{
+  w = 0.0, h = 0.0;
+
+  if (m_type == Round) {
+
+    //  a square sitting in the circle at the end
+    w = h = sqrt (0.5) * m_width;
+
+  } else {
+
+    double ext = 0.0;
+    if (m_type == Square) {
+      ext = m_width * 0.5;
+    } else if (m_type == Variable) {
+      ext = var_ext;
+    }
+
+    double vl = dwire.length ();
+
+    if (vl < db::epsilon || ext < -db::epsilon) {
+
+      //  no specific dimension
+
+    } else if (ext < db::epsilon) {
+
+      //  a rectangle enclosing the flush end edge
+      db::DVector l = dwire * (m_width / vl);
+      w = std::abs (l.y ());
+      h = std::abs (l.x ());
+
+    } else if (std::fabs (dwire.x ()) < db::epsilon) {
+
+      //  vertical path
+      w = m_width;
+      h = ext * 2.0;
+
+    } else if (std::fabs (dwire.y ()) < db::epsilon) {
+
+      //  horizontal path
+      h = m_width;
+      w = ext * 2.0;
+
+    } else {
+
+      //  compute dimension of max. inscribed box
+
+      db::DVector v = db::DVector (std::abs (dwire.x ()) / vl, std::abs (dwire.y ()) / vl);
+
+      double e = ext, en = m_width * 0.5;
+
+      bool swap_xy = false;
+      if (e > en) {
+        std::swap (e, en);
+        v = db::DVector (v.y (), v.x ());
+        swap_xy = true;
+      }
+
+      double vd = v.y () * v.y () - v.x () * v.x ();
+      double vp = v.x () * v.y ();
+
+      double l = e * 0.5 * vd / vp;
+
+      if (std::abs (vd) > db::epsilon) {
+        double l1 = (en - 2 * e * vp) / vd;
+        double l2 = (-en - 2 * e * vp) / vd;
+        l = std::max (l, std::min (l1, l2));
+        l = std::min (l, std::max (l1, l2));
+      }
+
+      db::DVector a = v * e + db::DVector (v.y (), -v.x ()) * l;
+      w = a.x () * 2.0;
+      h = a.y () * 2.0;
+
+      if (swap_xy) {
+        std::swap (w, h);
+      }
+
+    }
+
+  }
+
+  //  round down to DBU @@@ (grid)
+  double dbu = layout ().dbu ();
+  w = floor (w / dbu + db::epsilon) * dbu;
+  h = floor (h / dbu + db::epsilon) * dbu;
+}
+
+void
 PathService::via_editing (int dir)
 {
   //  not enough points to form a path
@@ -1673,14 +1762,14 @@ PathService::via_editing (int dir)
 
   //  compute the via parameters
 
-  double w_bottom = 0.0, h_bottom = 0.0, w_top = 0.0, h_top = 0.0;
   db::DVector dwire = m_points.back () - m_points [m_points.size () - 2];
-  if (std::abs (dwire.y ()) > db::epsilon) {
-    (is_bottom ? w_bottom : w_top) = m_width;
-  }
-  if (std::abs (dwire.x ()) > db::epsilon) {
-    (is_bottom ? h_bottom : h_top) = m_width;
-  }
+
+  double w = 0.0, h = 0.0;
+  compute_via_wh (w, h, dwire, m_endext);
+
+  double w_bottom = 0.0, h_bottom = 0.0, w_top = 0.0, h_top = 0.0;
+  (is_bottom ? w_bottom : w_top) = w;
+  (is_bottom ? h_bottom : h_top) = h;
 
   //  create the path and via
 
@@ -1731,13 +1820,7 @@ PathService::update_via ()
   bool is_bottom = ps.via_type.bottom.log_equal (lp);
 
   double w = 0.0, h = 0.0;
-  db::DVector dwire = m_points [1] - m_points.front ();
-  if (std::abs (dwire.y ()) > db::epsilon) {
-    w = m_width;
-  }
-  if (std::abs (dwire.x ()) > db::epsilon) {
-    h = m_width;
-  }
+  compute_via_wh (w, h, m_points [1] - m_points [0], m_bgnext);
 
   std::map<std::string, tl::Variant> params;
 

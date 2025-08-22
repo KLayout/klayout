@@ -36,7 +36,12 @@
 #include "edtPlugin.h"
 #include "edtMainService.h"
 #include "edtService.h"
-#include "edtServiceImpl.h"
+#include "edtInstService.h"
+#include "edtPolygonService.h"
+#include "edtPathService.h"
+#include "edtTextService.h"
+#include "edtBoxService.h"
+#include "edtPointService.h"
 #include "edtConfig.h"
 #include "edtDistribute.h"
 

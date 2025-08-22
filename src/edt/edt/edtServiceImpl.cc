@@ -1652,7 +1652,7 @@ PathService::via_initial (int dir)
 }
 
 void
-PathService::compute_via_wh (double &w, double &h, const db::DVector &dwire, double var_ext)
+PathService::compute_via_wh (double &w, double &h, const db::DVector &dwire, double var_ext, double grid)
 {
   w = 0.0, h = 0.0;
 
@@ -1734,10 +1734,14 @@ PathService::compute_via_wh (double &w, double &h, const db::DVector &dwire, dou
 
   }
 
-  //  round down to DBU @@@ (grid)
-  double dbu = layout ().dbu ();
-  w = floor (w / dbu + db::epsilon) * dbu;
-  h = floor (h / dbu + db::epsilon) * dbu;
+  //  round to grid or DBU
+
+  if (grid < db::epsilon) {
+    grid = layout ().dbu ();
+  }
+
+  w = floor (w / grid + db::epsilon) * grid;
+  h = floor (h / grid + db::epsilon) * grid;
 }
 
 void
@@ -1765,7 +1769,7 @@ PathService::via_editing (int dir)
   db::DVector dwire = m_points.back () - m_points [m_points.size () - 2];
 
   double w = 0.0, h = 0.0;
-  compute_via_wh (w, h, dwire, m_endext);
+  compute_via_wh (w, h, dwire, m_endext, is_bottom ? via_def.via_type.bottom_grid : via_def.via_type.top_grid);
 
   double w_bottom = 0.0, h_bottom = 0.0, w_top = 0.0, h_top = 0.0;
   (is_bottom ? w_bottom : w_top) = w;
@@ -1820,7 +1824,7 @@ PathService::update_via ()
   bool is_bottom = ps.via_type.bottom.log_equal (lp);
 
   double w = 0.0, h = 0.0;
-  compute_via_wh (w, h, m_points [1] - m_points [0], m_bgnext);
+  compute_via_wh (w, h, m_points [1] - m_points [0], m_bgnext, is_bottom ? ps.via_type.bottom_grid : ps.via_type.top_grid);
 
   std::map<std::string, tl::Variant> params;
 

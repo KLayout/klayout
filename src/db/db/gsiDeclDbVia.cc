@@ -136,6 +136,12 @@ Class<db::ViaType> decl_dbViaType ("db", "ViaType",
     "If false, the bottom layer is assume to be a sheet layer, such as diffusion. "
     "In this case, changing the routing layer will not continue drawing a path. "
     "If true (the default), drawing will continue on the bottom layer as a path."
+  ) +
+  make_getter_setter<db::ViaType, double, &db::ViaType::bottom_grid> ("bottom_grid",
+    "@brief If non-zero, the bottom layer's dimensions will be rounded to this grid.\n"
+  ) +
+  make_getter_setter<db::ViaType, double, &db::ViaType::top_grid> ("top_grid",
+    "@brief If non-zero, the top layer's dimensions will be rounded to this grid.\n"
   ),
   "@brief Describes a via type\n"
   "These objects are used by PCellDeclaration#via_types to specify the via types a "

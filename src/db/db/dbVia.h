@@ -129,6 +129,13 @@ public:
   bool bottom_wired;
 
   /**
+   *  @brief The grid of the bottom layer
+   *
+   *  Via dimensions are rounded to this grid on the bottom layer, if non-zero.
+   */
+  double bottom_grid;
+
+  /**
    *  @brief The cut layer
    */
   db::LayerProperties cut;
@@ -145,6 +152,13 @@ public:
    *  By default, layers are wired.
    */
   bool top_wired;
+
+  /**
+   *  @brief The grid of the top layer
+   *
+   *  Via dimensions are rounded to this grid on the top layer, if non-zero.
+   */
+  double top_grid;
 
   /**
    *  @brief The name of the via

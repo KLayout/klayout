@@ -39,7 +39,9 @@ ViaType::init ()
   htmin = 0.0;
   htmax = -1.0;
   bottom_wired = true;
+  bottom_grid = 0.0;
   top_wired = true;
+  top_grid = 0.0;
 }
 
 // ---------------------------------------------------------------------------------------

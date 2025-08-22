@@ -387,6 +387,7 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
     delete mp_parameters_area;
   }
 
+  mp_groups.clear ();
   m_widgets.clear ();
   m_icon_widgets.clear ();
   m_all_widgets.clear ();

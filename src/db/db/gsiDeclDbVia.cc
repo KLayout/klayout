@@ -77,45 +77,53 @@ Class<db::ViaType> decl_dbViaType ("db", "ViaType",
     "This values specifies the minimum width of the bottom layer in micrometers. "
     "The default is zero."
   ) +
+#if 0 // TODO: not used currently
   make_getter_setter<db::ViaType, double, &db::ViaType::wbmax> ("wbmax",
     "@brief The maximum bottom-layer width of the via.\n"
     "This values specifies the maximum width of the bottom layer in micrometers. "
     "A negative value indicates that no specific upper limit is given. "
     "The default is 'unspecified'."
   ) +
+#endif
   make_getter_setter<db::ViaType, double, &db::ViaType::wtmin> ("wtmin",
     "@brief The minimum top-layer width of the via.\n"
     "This values specifies the minimum width of the top layer in micrometers. "
     "The default is zero."
   ) +
+#if 0 // TODO: not used currently
   make_getter_setter<db::ViaType, double, &db::ViaType::wtmax> ("wtmax",
     "@brief The maximum top-layer width of the via.\n"
     "This values specifies the maximum width of the top layer in micrometers. "
     "A negative value indicates that no specific upper limit is given. "
     "The default is 'unspecified'."
   ) +
+#endif
   make_getter_setter<db::ViaType, double, &db::ViaType::hbmin> ("hbmin",
     "@brief The minimum bottom-layer height of the via.\n"
     "This values specifies the minimum height of the bottom layer in micrometers. "
     "The default is zero."
   ) +
+#if 0 // TODO: not used currently
   make_getter_setter<db::ViaType, double, &db::ViaType::hbmax> ("hbmax",
     "@brief The maximum bottom-layer height of the via.\n"
     "This values specifies the maximum height of the bottom layer in micrometers. "
     "A negative value indicates that no specific upper limit is given. "
     "The default is 'unspecified'."
   ) +
+#endif
   make_getter_setter<db::ViaType, double, &db::ViaType::htmin> ("htmin",
     "@brief The minimum top-layer height of the via.\n"
     "This values specifies the minimum height of the top layer in micrometers. "
     "The default is zero."
   ) +
+#if 0 // TODO: not used currently
   make_getter_setter<db::ViaType, double, &db::ViaType::htmax> ("htmax",
     "@brief The maximum top-layer height of the via.\n"
     "This values specifies the maximum height of the top layer in micrometers. "
     "A negative value indicates that no specific upper limit is given. "
     "The default is 'unspecified'."
   ) +
+#endif
   make_getter_setter<db::ViaType, db::LayerProperties, &db::ViaType::bottom> ("bottom",
     "@brief The bottom layer of the via.\n"
   ) +
@@ -125,18 +133,22 @@ Class<db::ViaType> decl_dbViaType ("db", "ViaType",
   make_getter_setter<db::ViaType, db::LayerProperties, &db::ViaType::top> ("top",
     "@brief The top layer of the via.\n"
   ) +
+#if 0 // TODO: not used currently
   make_getter_setter<db::ViaType, bool, &db::ViaType::bottom_wired> ("bottom_wired",
     "@brief A flag indicating that the bottom layer is a wiring layer.\n"
     "If false, the bottom layer is assume to be a sheet layer, such as diffusion. "
     "In this case, changing the routing layer will not continue drawing a path. "
     "If true (the default), drawing will continue on the bottom layer as a path."
   ) +
+#endif
+#if 0 // TODO: not used currently
   make_getter_setter<db::ViaType, bool, &db::ViaType::top_wired> ("top_wired",
     "@brief A flag indicating that the top layer is a wiring layer.\n"
     "If false, the bottom layer is assume to be a sheet layer, such as diffusion. "
     "In this case, changing the routing layer will not continue drawing a path. "
     "If true (the default), drawing will continue on the bottom layer as a path."
   ) +
+#endif
   make_getter_setter<db::ViaType, double, &db::ViaType::bottom_grid> ("bottom_grid",
     "@brief If non-zero, the bottom layer's dimensions will be rounded to this grid.\n"
   ) +

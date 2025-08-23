@@ -170,9 +170,17 @@ ShapeEditService::change_edit_layer (const db::LayerProperties &lp)
 
   edt::set_or_request_current_layer (view (), lp, m_cv_index);
 
+  if (editing ()) {
+    close_editor_hooks (false);
+  }
+
   //  fetches the last configuration for the given layer
   view ()->set_active_cellview_index (m_cv_index);
   config_recent_for_layer (lp, m_cv_index);
+
+  if (editing ()) {
+    open_editor_hooks ();
+  }
 }
 
 void
@@ -267,10 +275,12 @@ ShapeEditService::update_edit_layer (const lay::LayerPropertiesConstIterator &cl
     mp_layout = &(cv->layout ());
     mp_cell = cv.cell ();
 
+    close_editor_hooks (false);
+
     //  fetches the last configuration for the given layer
     config_recent_for_layer (cv->layout ().get_properties ((unsigned int) layer), cv_index);
 
-    current_layer_changed ();
+    open_editor_hooks ();
 
   }
 }

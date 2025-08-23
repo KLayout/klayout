@@ -74,8 +74,6 @@ protected:
     return m_editor_hooks;
   }
 
-  virtual void current_layer_changed () { }
-
 private:
   db::VCplxTrans m_trans;
   unsigned int m_layer;

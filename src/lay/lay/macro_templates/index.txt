@@ -20,6 +20,7 @@ pcell.lym
 # Samples
 :Samples;;
 pcell_sample.lym
+via_pcell_sample.lym
 qt_designer.lym
 qt_dialog.lym
 qt_server.lym

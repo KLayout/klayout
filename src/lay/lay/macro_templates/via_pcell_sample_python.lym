@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description>Via PCell sample (Python)\nThis sample provides a via PCell with two via types</description>
+ <format>general</format>
+ <autorun>true</autorun>
+ <autorun-early>false</autorun-early>
+ <show-in-menu>false</show-in-menu>
+ <category>pymacros</category>
+ <interpreter>python</interpreter>
+ <text>import pya
+import math
+
+"""
+Sample via PCell
+
+This sample PCell implements a library called "MyViaLib" with a single PCell that
+provides two vias for a hypothetical technology with these layers:
+
+  1/0  Metal1
+  2/0  Via1
+  3/0  Metal2
+  4/0  Via2
+  5/0  Metal3
+
+The sample demonstrates how to equip a PCell with the necessary declarations,
+so it can supply vias for the wire (path) tool.
+
+It implements simple rectangular via arrays made from squares with a fixed size,
+pitch and enclosure.
+
+NOTE: after changing the code, the macro needs to be rerun to install the new
+implementation. The macro is also set to "auto run" to install the PCell 
+when KLayout is run.
+"""    
+
+class ViaPCell(pya.PCellDeclarationHelper):
+
+  def __init__(self):
+  
+    """
+    Constructor: provides the PCell parameter definitions
+    """
+
+    super(ViaPCell, self).__init__()
+
+    # Every via PCell should declare these parameters:
+    #
+    #   via: the name of the via as declared in the via types
+    #   w_bottom: the width of the bottom box in micrometers
+    #   h_bottom: the height of the bottom box in micrometers
+    #   w_top: the width of the top box in micrometers
+    #   h_top: the width of the top box in micrometers
+    #
+    # w_bottom etc. can be zero, indicating that the via
+    # does not have a specific extension in this layer.
+    # The PCell may chose a dimension in that case.
+     
+    self.param("via", self.TypeString, "Via type", hidden = False)
+    self.param("w_bottom", self.TypeDouble, "Bottom width", hidden = False, default = 0.0)
+    self.param("h_bottom", self.TypeDouble, "Bottom height", hidden = False, default = 0.0)
+    self.param("w_top", self.TypeDouble, "Top width", hidden = False, default = 0.0)
+    self.param("h_top", self.TypeDouble, "Top height", hidden = False, default = 0.0)
+    
+    # Optional additional parameters: here we allow to override
+    # the computed array dimension by setting these parameters
+    # to non-zero.
+    
+    self.param("nx", self.TypeInt, "nx", default = 0)
+    self.param("ny", self.TypeInt, "ny", default = 0)
+
+    # Build a list of supported vias
+    
+    self.via_type_list = []
+
+    # Via1     
+    vt = pya.ViaType("V1", "Via1 (0.2x0.2)")
+    vt.wbmin = 0.4
+    vt.hbmin = 0.4
+    vt.wtmin = 0.5
+    vt.htmin = 0.5
+    vt.bottom = pya.LayerInfo(1, 0)
+    vt.cut = pya.LayerInfo(2, 0)
+    vt.top = pya.LayerInfo(3, 0)
+    vt.bottom_grid = 0.01
+    vt.top_grid = 0.01
+    
+    # foreign attributes (not used by pya, but handy for 
+    # internal use):
+    vt.enc_bottom = 0.1
+    vt.enc_top = 0.15
+    vt.vwidth = 0.2
+    vt.vspace = 0.2
+    
+    self.via_type_list.append(vt)
+    
+    # Via2
+    vt = pya.ViaType("V2", "Via2 (0.3x0.3)")
+    vt.wbmin = 0.5
+    vt.hbmin = 0.5
+    vt.wtmin = 0.5
+    vt.htmin = 0.5
+    vt.bottom = pya.LayerInfo(3, 0)
+    vt.cut = pya.LayerInfo(4, 0)
+    vt.top = pya.LayerInfo(5, 0)
+    vt.bottom_grid = 0.01
+    vt.top_grid = 0.01
+    
+    # foreign attributes (not used by pya, but handy for 
+    # internal use):
+    vt.enc_bottom = 0.1
+    vt.enc_top = 0.1
+    vt.vwidth = 0.3
+    vt.vspace = 0.2
+    
+    self.via_type_list.append(vt)
+    
+  def via_types(self):
+    """
+    Implements the "via_types" method from the PCellDeclaration
+    interface: delivers the vias supported by this PCell.
+    """
+    return self.via_type_list
+    
+  def via_type(self):
+    """
+    Returns the via with the name given by the "via"
+    PCell argument
+    """
+    for vt in self.via_type_list:
+      if vt.name == self.via:
+        return vt
+    return None
+    
+  def display_text_impl(self):
+    """
+    PCell interface implementation
+    """
+    return "Via(" + self.via + ")"
+  
+  def coerce_parameters_impl(self):
+    """
+    PCell interface implementation
+    """
+    pass  
+  
+  def can_create_from_shape_impl(self):
+    """
+    PCell interface implementation
+    """
+    return False
+  
+  def parameters_from_shape_impl(self):
+    """
+    PCell interface implementation
+    """
+    pass
+  
+  def transformation_from_shape_impl(self):
+    """
+    PCell interface implementation
+    """
+    return pya.Trans()
+    
+  def min_dim(self, a, b, da, db):
+    """
+    A helper function to compute the minimum
+    width or height less the enclosure 
+    (a = w/h_bottom, b = w/h_top, 
+    da/b = enclosure for a/b)
+    """
+    if a &lt; 1e-10 and b &lt; 1e-10:
+      return 0.0
+    elif a &lt; 1e-10:
+      return b - 2.0 * max(da, db)
+    elif b &lt; 1e-10:
+      return a - 2.0 * max(da, db)
+    else:
+      return min(a - 2.0 * da, b - 2.0 * db)
+    
+  def getnxy(self, vt):
+  
+    """
+    Computes the nx and ny as mandated by the widths and
+    heights
+    
+    w/h_top/bottom can be zero, indicating no specific
+    dimension is requested. The implementation can choose
+    what to do in this case. It can also decide to provide
+    largher vias than given by w_ or h_ or favor square vias
+    over rectangular ones.
+    """
+
+    mode = 2  # 1: maximum, 2: minimum
+    
+    if mode == 1:    
+    
+      # This implementation uses the maximum size requested
+      # by either top or bottom:
+        
+      w = max(max(self.w_bottom, vt.wbmin) - 2 * vt.enc_bottom,
+              max(self.w_top, vt.wtmin) - 2 * vt.enc_top)
+  
+      h = max(max(self.h_bottom, vt.hbmin) - 2 * vt.enc_bottom,
+              max(self.h_top, vt.htmin) - 2 * vt.enc_top)
+
+    elif mode == 2:
+                
+      # This implementation delivers the minimum via, ignoring
+      # zero dimensions:
+      
+      w = self.min_dim(self.w_bottom, self.w_top, vt.enc_bottom, vt.enc_top)
+      h = self.min_dim(self.h_bottom, self.h_top, vt.enc_bottom, vt.enc_top)
+
+    # parameter nx or ny override computed value if &gt; 0
+    
+    if self.nx &gt; 0:
+      nx = self.nx
+    else:
+      nx = max(1, int(math.floor((w + vt.vspace) / (vt.vwidth + vt.vspace) + 1e-10)))
+
+    if self.ny &gt; 0:
+      ny = self.ny  
+    else:
+      ny = max(1, int(math.floor((h + vt.vspace) / (vt.vwidth + vt.vspace) + 1e-10)))
+
+    return (nx, ny)
+  
+  def produce_impl(self):
+  
+    """
+    Implementation of the PCell interface: generates the layouts
+    """
+  
+    vt = self.via_type()
+    if vt is None:
+      return
+      
+    (nx, ny) = self.getnxy(vt)
+    
+    wcut = nx * vt.vwidth + (nx - 1) * vt.vspace
+    hcut = ny * vt.vwidth + (ny - 1) * vt.vspace
+    wbottom = max(max(self.w_bottom, vt.wbmin), vt.enc_bottom * 2.0 + wcut)
+    hbottom = max(max(self.h_bottom, vt.hbmin), vt.enc_bottom * 2.0 + hcut)
+    wtop = max(max(self.w_top, vt.wtmin), vt.enc_top * 2.0 + wcut)
+    htop = max(max(self.h_top, vt.htmin), vt.enc_top * 2.0 + hcut)
+    
+    lbottom = self.layout.layer(vt.bottom)
+    ltop = self.layout.layer(vt.top)
+    lcut = self.layout.layer(vt.cut)
+    
+    self.cell.shapes(lbottom).insert(pya.DBox(wbottom, hbottom))
+    self.cell.shapes(ltop).insert(pya.DBox(wtop, htop))
+    
+    scut = self.cell.shapes(lcut)
+    
+    for ix in range(0, nx):
+      x = (ix - 0.5 * (nx - 1)) * (vt.vwidth + vt.vspace)
+      for iy in range(0, ny):
+        y = (iy - 0.5 * (ny - 1)) * (vt.vwidth + vt.vspace)
+        scut.insert(pya.DBox(vt.vwidth, vt.vwidth).moved(x, y))
+
+
+class MyViaLib(pya.Library):
+
+  """ 
+  A declaration for a test library
+  """
+
+  def __init__(self):
+    self.description = "Via Test Library"
+    self.layout().register_pcell("Via", ViaPCell())
+    self.register("MyViaLib")
+
+# instantiates the test library
+MyViaLib()
+</text>
+</klayout-macro>

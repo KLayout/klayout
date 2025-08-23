@@ -6,6 +6,7 @@
  <autorun-early>false</autorun-early>
  <show-in-menu>false</show-in-menu>
  <shortcut></shortcut>
+ <category>pymacros</category>
  <interpreter>python</interpreter>
  <text>import pya
 import math

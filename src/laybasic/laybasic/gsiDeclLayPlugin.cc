@@ -48,7 +48,8 @@ class PluginBase
 {
 public:
   PluginBase ()
-    : lay::Plugin (sp_dispatcher), lay::ViewService (sp_view ? sp_view->canvas () : 0)
+    : lay::Plugin (sp_dispatcher), lay::ViewService (sp_view ? sp_view->canvas () : 0),
+      mp_view (sp_view), mp_dispatcher (sp_dispatcher)
   {
     if (! s_in_create_plugin) {
       throw tl::Exception (tl::to_string (tr ("A PluginBase object can only be created in the PluginFactory's create_plugin method")));
@@ -271,6 +272,16 @@ public:
     }
   }
 
+  lay::LayoutViewBase *view ()
+  {
+    return mp_view.get ();
+  }
+
+  lay::Dispatcher *dispatcher ()
+  {
+    return mp_dispatcher.get ();
+  }
+
   gsi::Callback f_menu_activated;
   gsi::Callback f_configure;
   gsi::Callback f_config_finalize;
@@ -289,6 +300,10 @@ public:
   gsi::Callback f_update;
   gsi::Callback f_has_tracking_position;
   gsi::Callback f_tracking_position;
+
+private:
+  tl::weak_ptr<lay::LayoutViewBase> mp_view;
+  tl::weak_ptr<lay::Dispatcher> mp_dispatcher;
 };
 
 static std::map <std::string, PluginFactoryBase *> s_factories;
@@ -837,6 +852,22 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
     "See \\has_tracking_position for details.\n"
     "\n"
     "This method has been added in version 0.27.6."
+  ) +
+  gsi::method ("view", &gsi::PluginBase::view,
+    "@brief Gets the view object the plugin is associated with\n"
+    "This method returns the view object that the plugin is associated with.\n"
+    "\n"
+    "This convenience method has been added in version 0.30.4."
+  ) +
+  gsi::method ("dispatcher", &gsi::PluginBase::dispatcher,
+    "@brief Gets the dispatcher object the plugin is associated with\n"
+    "This method returns the dispatcher object that the plugin is associated with.\n"
+    "The dispatcher object manages the configuration parameters. 'set_config', 'get_config' and 'commit_config' "
+    "can be used on this object to get or set configuration parameters. "
+    "Configuration parameters are a way to persist information and the preferred way of communicating with "
+    "editor option pages and configuration pages.\n"
+    "\n"
+    "This convenience method has been added in version 0.30.4."
   ),
   "@brief The plugin object\n"
   "\n"

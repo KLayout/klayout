@@ -40,7 +40,7 @@ namespace lay
 
 namespace db
 {
-  class LayerProperties;
+  struct LayerProperties;
 }
 
 namespace edt

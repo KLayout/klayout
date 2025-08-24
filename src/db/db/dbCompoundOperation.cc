@@ -308,7 +308,10 @@ CompoundRegionMultiInputOperationNode::CompoundRegionMultiInputOperationNode (co
     (*c)->keep ();
     m_children.push_back (*c);
   }
-  init ();
+
+  if (! no_init) {
+    init ();
+  }
 }
 
 CompoundRegionMultiInputOperationNode::CompoundRegionMultiInputOperationNode ()

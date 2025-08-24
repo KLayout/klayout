@@ -420,6 +420,19 @@ PropertiesPage::description () const
 }
 
 void
+PropertiesPage::confine_selection (const std::vector<size_t> &remaining_entries)
+{
+  std::vector <ant::Service::obj_iterator> org_selection;
+  m_selection.swap (org_selection);
+  for (auto i = remaining_entries.begin (); i != remaining_entries.end (); ++i) {
+    m_selection.push_back (org_selection [*i]);
+  }
+
+  mp_rulers->set_selection (m_selection);
+  mp_rulers->clear_highlights ();
+}
+
+void
 PropertiesPage::leave ()
 {
   mp_rulers->clear_highlights ();

@@ -137,10 +137,31 @@ ShapePropertiesPage::icon (size_t entry, int w, int h) const
 
   return QIcon ();
 }
+
 std::string
 ShapePropertiesPage::description () const
 {
   return m_description;
+}
+
+void
+ShapePropertiesPage::confine_selection (const std::vector<size_t> &remaining_entries)
+{
+  std::vector<lay::ObjectInstPath> new_selection;
+  for (auto i = remaining_entries.begin (); i != remaining_entries.end (); ++i) {
+    new_selection.push_back (*m_selection_ptrs [*i]);
+  }
+
+  mp_service->set_selection (new_selection.begin (), new_selection.end ());
+
+  m_selection_ptrs.clear ();
+  m_selection_ptrs.reserve (mp_service->selection_size ());
+  for (edt::EditableSelectionIterator s = mp_service->begin_selection (); ! s.at_end (); ++s) {
+    m_selection_ptrs.push_back (s.operator-> ());
+  }
+
+  m_prop_id = 0;
+  mp_service->clear_highlights ();
 }
 
 void
@@ -661,7 +682,7 @@ BoxPropertiesPage::description (size_t entry) const
   return ShapePropertiesPage::description (entry) + " - " + tl::sprintf (tl::to_string (tr ("Box%s")), (dbu_trans * sh.box ()).to_string ());
 }
 
-void 
+void
 BoxPropertiesPage::do_update (const db::Shape &shape, double dbu, const std::string &lname)
 {
   m_dbu = dbu;

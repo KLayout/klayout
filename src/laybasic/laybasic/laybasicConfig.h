@@ -158,6 +158,8 @@ static const std::string cfg_guiding_shape_color ("guiding-shape-color");
 static const std::string cfg_guiding_shape_line_width ("guiding-shape-line-width");
 static const std::string cfg_guiding_shape_vertex_size ("guiding-shape-vertex-size");
 
+static const std::string cfg_properties_dialog_relative_mode ("properties-dialog-relative-mode");
+
 }
 
 #endif

@@ -2642,7 +2642,9 @@ LayoutViewBase::signal_apply_technology (lay::LayoutHandle *layout_handle)
 
         //  remove all references to the cellview in the layer properties
         for (unsigned int lindex = 0; lindex < layer_lists (); ++lindex) {
-          m_layer_properties_lists [lindex]->remove_cv_references (i);
+          lay::LayerPropertiesList props = *m_layer_properties_lists [lindex];
+          props.remove_cv_references (i);
+          set_properties (lindex, props);
         }
 
         //  if a layer properties file is set, create the layer properties now

@@ -381,14 +381,19 @@ public:
 #endif
 
   /**
-   *  @brief Get the selection for the properties page
+   *  @brief Gets the selection for the properties page
    */
   void get_selection (std::vector <obj_iterator> &selection) const;
 
   /**
+   *  @brief Sets the selection for the properties page
+   */
+  void set_selection (const std::vector <obj_iterator> &selection);
+
+  /**
    *  @brief Direct access to the selection 
    */
-  const std::map<obj_iterator, unsigned int> &selection () const
+  const std::set<obj_iterator> &selection () const
   {
     return m_selected;
   }
@@ -558,9 +563,9 @@ private:
   //  and the moved rules in move mode
   std::vector<ant::View *> m_rulers;
   //  The selection
-  std::map<obj_iterator, unsigned int> m_selected;
+  std::set<obj_iterator> m_selected;
   //  The previous selection
-  std::map<obj_iterator, unsigned int> m_previous_selection;
+  std::set<obj_iterator> m_previous_selection;
   //  The reference point in move mode
   db::DPoint m_p1;
   //  The transformation in MoveSelection mode

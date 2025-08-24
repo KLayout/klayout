@@ -27,6 +27,8 @@
 #include "tlLog.h"
 #include "layEditable.h"
 #include "layProperties.h"
+#include "layDispatcher.h"
+#include "laybasicConfig.h"
 #include "tlExceptions.h"
 
 #include "ui_PropertiesDialog.h"
@@ -158,6 +160,16 @@ public:
     emit dataChanged (index (0, 0, QModelIndex ()), index (rowCount (QModelIndex ()) - 1, columnCount (QModelIndex ()) - 1, QModelIndex ()));
   }
 
+  void begin_reset_model ()
+  {
+    beginResetModel ();
+  }
+
+  void end_reset_model ()
+  {
+    endResetModel ();
+  }
+
 private:
   PropertiesDialog *mp_dialog;
   int m_icon_width, m_icon_height;
@@ -200,9 +212,6 @@ PropertiesDialog::PropertiesDialog (QWidget * /*parent*/, db::Manager *manager, 
     connect (mp_properties_pages [i], SIGNAL (edited ()), this, SLOT (properties_edited ()));
   }
 
-  //  Necessary to maintain the page order for UI regression testing of 0.18 vs. 0.19 (because tl::Collection has changed to order) ..
-  std::reverse (mp_properties_pages.begin (), mp_properties_pages.end ());
-
   //  Add a label as a dummy 
   mp_none = new QLabel (QObject::tr ("No object with properties to display"), mp_ui->content_frame);
   mp_none->setAlignment (Qt::AlignHCenter | Qt::AlignVCenter);
@@ -223,7 +232,6 @@ PropertiesDialog::PropertiesDialog (QWidget * /*parent*/, db::Manager *manager, 
 
   update_title ();
 
-  //  if at end disable the "Next" button and return (this may only happen at the first call)
   mp_tree_model = new PropertiesTreeModel (this, mp_ui->tree->iconSize ().width (), mp_ui->tree->iconSize ().height ());
   mp_ui->tree->setModel (mp_tree_model);
 #if QT_VERSION >= 0x50000
@@ -232,6 +240,8 @@ PropertiesDialog::PropertiesDialog (QWidget * /*parent*/, db::Manager *manager, 
   mp_ui->tree->header()->setResizeMode (QHeaderView::ResizeToContents);
 #endif
   mp_ui->tree->expandAll ();
+
+  mp_ui->tree->addAction (mp_ui->action_reduce_selection);
 
   if (mp_properties_pages.empty ()) {
     mp_ui->tree->hide ();
@@ -246,11 +256,14 @@ PropertiesDialog::PropertiesDialog (QWidget * /*parent*/, db::Manager *manager, 
   mp_ui->apply_to_all_cbx->setChecked (false);
   mp_ui->relative_cbx->setChecked (true);
 
+  fetch_config ();
+
   connect (mp_ui->ok_button, SIGNAL (clicked ()), this, SLOT (ok_pressed ()));
   connect (mp_ui->cancel_button, SIGNAL (clicked ()), this, SLOT (cancel_pressed ()));
   connect (mp_ui->prev_button, SIGNAL (clicked ()), this, SLOT (prev_pressed ()));
   connect (mp_ui->next_button, SIGNAL (clicked ()), this, SLOT (next_pressed ()));
   connect (mp_ui->apply_to_all_cbx, SIGNAL (clicked ()), this, SLOT (apply_to_all_pressed ()));
+  connect (mp_ui->action_reduce_selection, SIGNAL (triggered ()), this, SLOT (reduce_selection ()));
   connect (mp_ui->tree->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (current_index_changed (const QModelIndex &, const QModelIndex &)));
   connect (mp_ui->tree->selectionModel (), SIGNAL (selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT (selection_changed ()));
 }
@@ -261,6 +274,26 @@ PropertiesDialog::~PropertiesDialog ()
   mp_ui = 0;
 
   disconnect ();
+}
+
+void
+PropertiesDialog::fetch_config ()
+{
+  if (! lay::Dispatcher::instance ()) {
+    return;
+  }
+
+  bool rm = true;
+  lay::Dispatcher::instance ()->config_get (cfg_properties_dialog_relative_mode, rm);
+  mp_ui->relative_cbx->setChecked (rm);
+}
+
+void
+PropertiesDialog::store_config ()
+{
+  if (lay::Dispatcher::instance ()) {
+    lay::Dispatcher::instance ()->config_set (cfg_properties_dialog_relative_mode, mp_ui->relative_cbx->isChecked ());
+  }
 }
 
 void 
@@ -285,6 +318,98 @@ PropertiesDialog::apply_to_all_pressed ()
     mp_ui->tree->setCurrentIndex (mp_tree_model->index_for (m_index, int (m_object_indexes.front ())));
   }
   m_signals_enabled = true;
+}
+
+void
+PropertiesDialog::reduce_selection ()
+{
+BEGIN_PROTECTED
+
+  //  apply pending changes
+  if (m_index >= 0 && m_index < int (mp_properties_pages.size ()) && ! mp_properties_pages [m_index]->readonly ()) {
+
+    db::Transaction t (mp_manager, tl::to_string (QObject::tr ("Apply changes")), m_transaction_id);
+
+    mp_properties_pages [m_index]->apply (true);
+    mp_properties_pages [m_index]->update ();
+
+    if (! t.is_empty ()) {
+      m_transaction_id = t.id ();
+    }
+
+  }
+
+  //  confine the selection
+
+  mp_tree_model->begin_reset_model ();
+
+  auto selection = mp_ui->tree->selectionModel ()->selectedIndexes ();
+
+  for (std::vector <lay::PropertiesPage *>::iterator p = mp_properties_pages.begin (); p != mp_properties_pages.end (); ++p) {
+
+    int page_index = int (p - mp_properties_pages.begin ());
+    std::vector<size_t> object_indexes;
+
+    for (auto i = selection.begin (); i != selection.end (); ++i) {
+      if (mp_tree_model->parent (*i).isValid () && mp_tree_model->page_index (*i) == page_index) {
+        object_indexes.push_back (size_t (mp_tree_model->object_index (*i)));
+      }
+    }
+
+    (*p)->confine_selection (object_indexes);
+
+  }
+
+  m_signals_enabled = false;
+
+  //  rebuild the properties pages as only the ones with remaining selection are shown
+
+  for (std::vector <lay::PropertiesPage *>::iterator p = mp_properties_pages.begin (); p != mp_properties_pages.end (); ++p) {
+    delete *p;
+  }
+  mp_properties_pages.clear ();
+  m_index = -1;
+
+  for (lay::Editables::iterator e = mp_editables->begin (); e != mp_editables->end (); ++e) {
+    auto pp = e->properties_pages (mp_manager, mp_ui->content_frame);
+    for (auto p = pp.begin (); p != pp.end (); ++p) {
+      if ((*p)->count () == 0) {
+        delete *p;
+      } else {
+        mp_properties_pages.push_back (*p);
+      }
+    }
+  }
+  for (size_t i = 0; i < mp_properties_pages.size (); ++i) {
+    mp_stack->addWidget (mp_properties_pages [i]);
+    connect (mp_properties_pages [i], SIGNAL (edited ()), this, SLOT (properties_edited ()));
+  }
+
+  //  count the total number of objects
+  m_objects = mp_editables->selection_size ();
+  m_current_object = 0;
+
+  //  look for next usable editable
+  m_index = 0;
+  m_object_indexes.clear ();
+  if (m_index >= int (mp_properties_pages.size ())) {
+    m_index = -1;
+  } else {
+    m_object_indexes.push_back (0);
+  }
+
+  mp_tree_model->end_reset_model ();
+
+  update_title ();
+
+  mp_ui->tree->expandAll ();
+  mp_ui->tree->setCurrentIndex (mp_tree_model->index_for (m_index, 0));
+
+  m_signals_enabled = true;
+
+  update_controls ();
+
+END_PROTECTED
 }
 
 void
@@ -617,6 +742,7 @@ PropertiesDialog::cancel_pressed ()
 
   }
 
+  store_config ();
   //  make sure that the property pages are no longer used ..
   disconnect ();
   //  close the dialog
@@ -641,6 +767,7 @@ BEGIN_PROTECTED
 
   }
 
+  store_config ();
   //  make sure that the property pages are no longer used ..
   disconnect ();
   QDialog::accept ();
@@ -651,6 +778,7 @@ END_PROTECTED
 void 
 PropertiesDialog::reject ()
 {
+  store_config ();
   //  make sure that the property pages are no longer used ..
   disconnect ();
   QDialog::reject ();

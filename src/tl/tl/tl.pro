@@ -11,6 +11,9 @@ FORMS =
 SOURCES = \
     tlAssert.cc \
     tlBase64.cc \
+    tlBitSet.cc \
+    tlBitSetMap.cc \
+    tlBitSetMask.cc \
     tlColor.cc \
     tlClassRegistry.cc \
     tlCopyOnWrite.cc \
@@ -62,6 +65,9 @@ HEADERS = \
     tlAlgorithm.h \
     tlAssert.h \
     tlBase64.h \
+    tlBitSet.h \
+    tlBitSetMap.h \
+    tlBitSetMask.h \
     tlColor.h \
     tlClassRegistry.h \
     tlCopyOnWrite.h \

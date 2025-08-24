@@ -505,6 +505,18 @@ public:
   Plugin (Plugin *parent, bool standalone = false);
 
   /**
+   *  @brief The default constructor
+   *
+   *  This constructor needs to be followed by init()
+   */
+  Plugin ();
+
+  /**
+   *  @brief Initialization, following the default constructor
+   */
+  void init (Plugin *parent, bool standalone = false);
+
+  /**
    *  @brief The destructor
    */
   virtual ~Plugin ();

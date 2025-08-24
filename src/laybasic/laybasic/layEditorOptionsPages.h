@@ -25,7 +25,7 @@
 #ifndef HDR_layEditorOptionsPages
 #define HDR_layEditorOptionsPages
 
-#include "layuiCommon.h"
+#include "laybasicCommon.h"
 #include "layEditorOptionsPage.h"
 
 #include <tlVariant.h>
@@ -47,7 +47,7 @@ class Plugin;
 /**
  *  @brief The object properties dialog
  */
-class LAYUI_PUBLIC EditorOptionsPages
+class LAYBASIC_PUBLIC EditorOptionsPages
   : public QFrame
 {
 Q_OBJECT

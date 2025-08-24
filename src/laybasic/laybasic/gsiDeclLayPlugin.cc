@@ -24,36 +24,178 @@
 #include "gsiDecl.h"
 #include "gsiDeclBasic.h"
 #include "layPlugin.h"
+#include "layPluginConfigPage.h"
+#include "layEditorOptionsPage.h"
+#include "layEditorOptionsPages.h"
 #include "layViewObject.h"
 #include "layLayoutViewBase.h"
 #include "layCursor.h"
 
 namespace gsi
 {
-  class PluginFactoryBase;
-  class PluginBase;
 
-//  TODO: these static variables are a bad hack!
-//  However it's not easy to pass parameters to a C++ classes constructor in Ruby without
-//  compromising the capability to derive from that class (at least I have not learned how
-//  to create a "new" in the super class *and* allow a "new" of the derived class). Anyway,
-//  since PluginBase object are only allowed to be created inside the create_plugin method
-//  of the factory, this hack is a quick but dirty workaround.
+class PluginFactoryBase;
+class PluginBase;
+
+#if defined(HAVE_QTBINDINGS)
+class EditorOptionsPageImpl
+  : public lay::EditorOptionsPage
+{
+public:
+  EditorOptionsPageImpl (const std::string &title, int index)
+    : lay::EditorOptionsPage (), m_title (title), m_index (index)
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual std::string title () const
+  {
+    return m_title;
+  }
+
+  virtual int order () const
+  {
+    return m_index;
+  }
+
+  void apply_impl (lay::Dispatcher *root)
+  {
+    lay::EditorOptionsPage::apply (root);
+  }
+
+  virtual void apply (lay::Dispatcher *root)
+  {
+    if (f_apply.can_issue ()) {
+      f_apply.issue<EditorOptionsPageImpl, lay::Dispatcher *> (&EditorOptionsPageImpl::apply_impl, root);
+    } else {
+      EditorOptionsPageImpl::apply_impl (root);
+    }
+  }
+
+  void setup_impl (lay::Dispatcher *root)
+  {
+    lay::EditorOptionsPage::setup (root);
+  }
+
+  virtual void setup (lay::Dispatcher *root)
+  {
+    if (f_setup.can_issue ()) {
+      f_setup.issue<EditorOptionsPageImpl, lay::Dispatcher *> (&EditorOptionsPageImpl::setup_impl, root);
+    } else {
+      EditorOptionsPageImpl::setup_impl (root);
+    }
+  }
+
+  gsi::Callback f_apply;
+  gsi::Callback f_setup;
+
+private:
+  tl::weak_ptr<lay::LayoutViewBase> mp_view;
+  tl::weak_ptr<lay::Dispatcher> mp_dispatcher;
+  std::string m_title;
+  int m_index;
+};
+
+EditorOptionsPageImpl *new_editor_options_page (const std::string &title, int index)
+{
+  return new EditorOptionsPageImpl (title, index);
+}
+
+// @@@ methods:
+//   constructor new_editor_options_page
+//   view()
+//   edited()
+//   callback apply(dispatcher)
+//   callback setup(dispatcher)
+// base: QWidget
+
+class ConfigPageImpl
+  : public lay::ConfigPage
+{
+public:
+  ConfigPageImpl (const std::string &title)
+    : lay::ConfigPage (0), m_title (title)
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual std::string title () const
+  {
+    return m_title;
+  }
+
+  void commit_impl (lay::Dispatcher *root)
+  {
+    lay::ConfigPage::commit (root);
+  }
+
+  virtual void commit (lay::Dispatcher *root)
+  {
+    if (f_commit.can_issue ()) {
+      f_commit.issue<ConfigPageImpl, lay::Dispatcher *> (&ConfigPageImpl::commit_impl, root);
+    } else {
+      ConfigPageImpl::commit_impl (root);
+    }
+  }
+
+  void setup_impl (lay::Dispatcher *root)
+  {
+    lay::ConfigPage::setup (root);
+  }
+
+  virtual void setup (lay::Dispatcher *root)
+  {
+    if (f_setup.can_issue ()) {
+      f_setup.issue<ConfigPageImpl, lay::Dispatcher *> (&ConfigPageImpl::setup_impl, root);
+    } else {
+      ConfigPageImpl::setup_impl (root);
+    }
+  }
+
+  gsi::Callback f_commit;
+  gsi::Callback f_setup;
+
+private:
+  tl::weak_ptr<lay::LayoutViewBase> mp_view;
+  tl::weak_ptr<lay::Dispatcher> mp_dispatcher;
+  std::string m_title;
+  std::string m_index;
+};
+
+ConfigPageImpl *new_config_page (const std::string &title)
+{
+  return new ConfigPageImpl (title);
+}
+
+// @@@ methods:
+//   constructor new_config_page
+//   callback apply(dispatcher) = commit
+//   callback setup(dispatcher)
+// base: QFrame
+#endif
+
+//  HACK: used to track if we're inside a create_plugin method and can be sure that "init" is called
 static bool s_in_create_plugin = false;
-static lay::LayoutViewBase *sp_view = 0;
-static lay::Dispatcher *sp_dispatcher = 0;
 
 class PluginBase
   : public lay::Plugin, public lay::ViewService
 {
 public:
   PluginBase ()
-    : lay::Plugin (sp_dispatcher), lay::ViewService (sp_view ? sp_view->canvas () : 0),
-      mp_view (sp_view), mp_dispatcher (sp_dispatcher)
+    : lay::Plugin (), lay::ViewService (),
+      mp_view (0), mp_dispatcher (0)
   {
     if (! s_in_create_plugin) {
       throw tl::Exception (tl::to_string (tr ("A PluginBase object can only be created in the PluginFactory's create_plugin method")));
     }
+  }
+
+  void init (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
+  {
+    mp_view = view;
+    mp_dispatcher = dispatcher;
+    lay::Plugin::init (dispatcher);
+    lay::ViewService::init (view ? view->canvas () : 0);
   }
 
   void grab_mouse ()
@@ -282,6 +424,18 @@ public:
     return mp_dispatcher.get ();
   }
 
+#if defined(HAVE_QTBINDINGS)
+  std::vector<lay::EditorOptionsPage *> editor_option_pages ()
+  {
+    lay::EditorOptionsPages *eo_pages = view ()->editor_options_pages ();
+    if (!eo_pages) {
+      return std::vector<lay::EditorOptionsPage *> ();
+    } else {
+      return eo_pages->pages ();
+    }
+  }
+#endif
+
   gsi::Callback f_menu_activated;
   gsi::Callback f_configure;
   gsi::Callback f_config_finalize;
@@ -416,8 +570,79 @@ public:
     }
   }
 
+#if defined(HAVE_QTBINDINGS)
+  std::vector<EditorOptionsPageImpl *> get_editor_options_pages_impl () const
+  {
+    return std::vector<EditorOptionsPageImpl *> ();
+  }
+
+  virtual void get_editor_options_pages (std::vector<lay::EditorOptionsPage *> &pages_out, lay::LayoutViewBase *view, lay::Dispatcher *dispatcher) const
+  {
+    try {
+
+      std::vector<EditorOptionsPageImpl *> pages;
+      if (f_get_editor_options_pages.can_issue ()) {
+        pages = f_get_editor_options_pages.issue<PluginFactoryBase, std::vector<EditorOptionsPageImpl *> > (&PluginFactoryBase::get_editor_options_pages_impl);
+      } else {
+        pages = get_editor_options_pages_impl ();
+      }
+
+      pages_out.clear ();
+      for (auto i = pages.begin (); i != pages.end (); ++i) {
+        if (*i) {
+          (*i)->init (view, dispatcher);
+          pages_out.push_back (*i);
+        }
+      }
+
+    } catch (tl::Exception &ex) {
+      tl::error << ex.msg ();
+    } catch (std::exception &ex) {
+      tl::error << ex.what ();
+    } catch (...) {
+    }
+  }
+
+  std::vector<ConfigPageImpl *> get_config_pages_impl () const
+  {
+    return std::vector<ConfigPageImpl *> ();
+  }
+
+  virtual std::vector<std::pair <std::string, lay::ConfigPage *> > config_pages (QWidget *parent) const
+  {
+    std::vector<std::pair <std::string, lay::ConfigPage *> > pages_out;
+
+    try {
+
+      std::vector<ConfigPageImpl *> pages;
+
+      if (f_config_pages.can_issue ()) {
+        pages = f_config_pages.issue<PluginFactoryBase, std::vector<ConfigPageImpl *> > (&PluginFactoryBase::get_config_pages_impl);
+      } else {
+        pages = get_config_pages_impl ();
+      }
+
+      pages_out.clear ();
+      for (auto i = pages.begin (); i != pages.end (); ++i) {
+        if (*i) {
+          (*i)->setParent (parent);
+          pages_out.push_back (std::make_pair ((*i)->title (), *i));
+        }
+      }
+
+    } catch (tl::Exception &ex) {
+      tl::error << ex.msg ();
+    } catch (std::exception &ex) {
+      tl::error << ex.what ();
+    } catch (...) {
+    }
+
+    return pages_out;
+  }
+#endif
+
   virtual lay::Plugin *create_plugin (db::Manager *manager, lay::Dispatcher *root, lay::LayoutViewBase *view) const
-  { 
+  {
     if (f_create_plugin.can_issue ()) {
       return create_plugin_gsi (manager, root, view);
     } else {
@@ -427,21 +652,24 @@ public:
 
   virtual gsi::PluginBase *create_plugin_gsi (db::Manager *manager, lay::Dispatcher *root, lay::LayoutViewBase *view) const
   { 
-    //  TODO: this is a hack. See notes above at s_in_create_plugin
     s_in_create_plugin = true;
-    sp_view = view;
-    sp_dispatcher = root;
+
     gsi::PluginBase *ret = 0;
     try {
+
       ret = f_create_plugin.issue<PluginFactoryBase, gsi::PluginBase *, db::Manager *, lay::Dispatcher *, lay::LayoutViewBase *> (&PluginFactoryBase::create_plugin_gsi, manager, root, view);
-      s_in_create_plugin = false;
-      sp_view = 0;
-      sp_dispatcher = 0;
+      if (ret) {
+        ret->init (view, root);
+      }
+
+    } catch (tl::Exception &ex) {
+      tl::error << ex.msg ();
+    } catch (std::exception &ex) {
+      tl::error << ex.what ();
     } catch (...) {
-      s_in_create_plugin = false;
-      sp_view = 0;
-      sp_dispatcher = 0;
     }
+
+    s_in_create_plugin = false;
 
     return ret;
   }
@@ -512,6 +740,8 @@ public:
   gsi::Callback f_configure;
   gsi::Callback f_config_finalize;
   gsi::Callback f_menu_activated;
+  gsi::Callback f_get_editor_options_pages;
+  gsi::Callback f_config_pages;
 
 private:
   std::vector<std::pair<std::string, std::string> > m_options;
@@ -520,6 +750,12 @@ private:
   std::string m_mouse_mode_title;
   tl::RegisteredClass <lay::PluginDeclaration> *mp_registration;
 };
+
+// @@@
+#if defined(HAVE_QTBINDINGS)
+// get_editor_options_pages -> "create_editor_option_pages"
+// config_pages -> "create_config_pages"
+#endif
 
 Class<gsi::PluginFactoryBase> decl_PluginFactory ("lay", "PluginFactory",
   method ("register", &PluginFactoryBase::register_gsi, gsi::arg ("position"), gsi::arg ("name"), gsi::arg ("title"),

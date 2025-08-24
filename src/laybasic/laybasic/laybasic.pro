@@ -35,6 +35,8 @@ SOURCES += \
   gsiDeclLayTlAdded.cc \
   gsiDeclLayRdbAdded.cc \
   layAbstractMenu.cc \
+  layEditorOptionsPage.cc \
+  layEditorOptionsPages.cc \
   layLayoutViewConfig.cc \
   layMargin.cc \
   laybasicForceLink.cc \
@@ -87,6 +89,8 @@ SOURCES += \
   layUtils.cc \
 
 HEADERS += \
+  layEditorOptionsPage.h \
+  layEditorOptionsPages.h \
   layMargin.h \
   laybasicConfig.h \
   laybasicForceLink.h \

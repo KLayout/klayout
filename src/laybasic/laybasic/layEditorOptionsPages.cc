@@ -27,7 +27,6 @@
 #include "tlExceptions.h"
 #include "layPlugin.h"
 #include "layLayoutViewBase.h"
-#include "layQtTools.h"
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -195,22 +194,6 @@ EditorOptionsPages::apply ()
 BEGIN_PROTECTED
   do_apply ();
 END_PROTECTED_W (this)
-}
-
-// ------------------------------------------------------------------
-//  Indicates an error on a line edit
-
-template <class Value>
-static void configure_from_line_edit (lay::Dispatcher *dispatcher, QLineEdit *le, const std::string &cfg_name)
-{
-  try {
-    Value value = Value (0);
-    tl::from_string_ext (tl::to_string (le->text ()), value);
-    dispatcher->config_set (cfg_name, tl::to_string (value));
-    lay::indicate_error (le, (tl::Exception *) 0);
-  } catch (tl::Exception &ex) {
-    lay::indicate_error (le, &ex);
-  }
 }
 
 }

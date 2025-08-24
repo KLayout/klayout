@@ -25,7 +25,7 @@
 #ifndef HDR_layEditorOptionsPage
 #define HDR_layEditorOptionsPage
 
-#include "layuiCommon.h"
+#include "laybasicCommon.h"
 
 #include "tlObject.h"
 
@@ -44,13 +44,14 @@ class EditorOptionsPages;
 /**
  *  @brief The base class for a object properties page
  */
-class LAYUI_PUBLIC EditorOptionsPage
+class LAYBASIC_PUBLIC EditorOptionsPage
   : public QWidget, public tl::Object
 {
 Q_OBJECT
 
 public:
   EditorOptionsPage (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);
+  EditorOptionsPage ();
   virtual ~EditorOptionsPage ();
 
   virtual std::string title () const = 0;
@@ -66,13 +67,8 @@ public:
   const lay::PluginDeclaration *plugin_declaration () const { return mp_plugin_declaration; }
   void set_plugin_declaration (const lay::PluginDeclaration *pd) { mp_plugin_declaration = pd; }
 
-protected slots:
-  void edited ()
-  {
-    apply (dispatcher ());
-  }
+  void init (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);
 
-protected:
   lay::Dispatcher *dispatcher () const
   {
     return mp_dispatcher;
@@ -83,6 +79,13 @@ protected:
     return mp_view;
   }
 
+protected slots:
+  void edited ()
+  {
+    apply (dispatcher ());
+  }
+
+protected:
   virtual void active_cellview_changed () { }
   virtual void technology_changed (const std::string & /*tech*/) { }
 

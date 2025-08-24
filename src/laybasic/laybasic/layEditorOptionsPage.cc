@@ -39,6 +39,20 @@ EditorOptionsPage::EditorOptionsPage (lay::LayoutViewBase *view, lay::Dispatcher
   attach_events ();
 }
 
+EditorOptionsPage::EditorOptionsPage ()
+  : QWidget (0), mp_owner (0), m_active (true), mp_plugin_declaration (0), mp_dispatcher (0), mp_view (0)
+{
+  //  .. nothing here -> call init to set view and dispatcher
+}
+
+void
+EditorOptionsPage::init (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
+{
+  mp_view = view;
+  mp_dispatcher = dispatcher;
+  attach_events ();
+}
+
 EditorOptionsPage::~EditorOptionsPage ()
 {
   set_owner (0);

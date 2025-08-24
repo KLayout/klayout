@@ -36,7 +36,7 @@
 namespace db
 {
   class Layout;
-  struct LayerProperties;
+  class LayerProperties;
 }
 
 namespace lay 

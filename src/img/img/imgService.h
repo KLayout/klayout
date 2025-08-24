@@ -458,6 +458,11 @@ public:
   }
   
   /**
+   *  @brief Returns a value indicating whether the given image is visible
+   */
+  bool image_is_visible (const img::Object *image);
+
+  /**
    *  @brief Implement the menu response function
    */
   void menu_activated (const  std::string &symbol);
@@ -513,6 +518,9 @@ private:
   bool m_keep_selection_for_move;
   //  Flag indicating whether images are visible
   bool m_images_visible;
+  //  The visibility cache for the layer bindings
+  bool m_visibility_cache_valid;
+  std::map<const img::Object *, bool> m_visibility_cache;
 
   void show_message ();
 
@@ -578,6 +586,27 @@ private:
    *  @brief Event handler for changes in the annotations
    */
   void annotations_changed ();
+
+  /**
+   *  @brief Event handler for changes in the layer visibility
+   */
+  void layer_list_changed (int)
+  {
+    layer_visibilty_changed ();
+  }
+
+  /**
+   *  @brief Event handler for a change of the current layer list
+   */
+  void current_layer_list_changed (int)
+  {
+    layer_visibilty_changed ();
+  }
+
+  /**
+   *  @brief Common handler for a potential change in layer visibility
+   */
+  void layer_visibilty_changed ();
 };
 
 }

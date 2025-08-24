@@ -25,6 +25,7 @@
 #ifndef HDR_edtRecentConfigurationPage
 #define HDR_edtRecentConfigurationPage
 
+#include "edtCommon.h"
 #include "layEditorOptionsPage.h"
 #include "tlObject.h"
 #include "tlDeferredExecution.h"
@@ -52,7 +53,7 @@ class EditorOptionsPages;
 /**
  *  @brief The base class for a object properties page
  */
-class RecentConfigurationPage
+class EDT_PUBLIC RecentConfigurationPage
   : public lay::EditorOptionsPage
 {
 Q_OBJECT

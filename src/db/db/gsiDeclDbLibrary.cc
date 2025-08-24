@@ -287,6 +287,8 @@ Class<db::PCellDeclaration> decl_PCellDeclaration_Native ("db", "PCellDeclaratio
   gsi::method ("parameters_from_shape", &db::PCellDeclaration::parameters_from_shape, gsi::arg ("layout"), gsi::arg ("shape"), gsi::arg ("layer")) +
   gsi::method ("transformation_from_shape", &db::PCellDeclaration::transformation_from_shape, gsi::arg ("layout"), gsi::arg ("shape"), gsi::arg ("layer")) +
   gsi::method ("wants_lazy_evaluation", &db::PCellDeclaration::wants_lazy_evaluation) +
+  gsi::method ("via_types", &db::PCellDeclaration::via_types) +
+  gsi::method ("description", &db::PCellDeclaration::get_description) +
   gsi::method ("display_text", &db::PCellDeclaration::get_display_name, gsi::arg ("parameters")) +
   gsi::method ("layout", &db::PCellDeclaration::layout,
     "@brief Gets the Layout object the PCell is registered in or nil if it is not registered yet.\n"
@@ -537,6 +539,34 @@ public:
     }
   }
 
+  std::string get_description_fb () const
+  {
+    return db::PCellDeclaration::get_description ();
+  }
+
+  virtual std::string get_description () const
+  {
+    if (cb_get_description.can_issue ()) {
+      return cb_get_description.issue<db::PCellDeclaration, std::string> (&db::PCellDeclaration::get_description);
+    } else {
+      return db::PCellDeclaration::get_description ();
+    }
+  }
+
+  std::vector<db::ViaType> via_types_fb () const
+  {
+    return db::PCellDeclaration::via_types ();
+  }
+
+  virtual std::vector<db::ViaType> via_types () const
+  {
+    if (cb_via_types.can_issue ()) {
+      return cb_via_types.issue<db::PCellDeclaration, std::vector<db::ViaType>> (&db::PCellDeclaration::via_types);
+    } else {
+      return db::PCellDeclaration::via_types ();
+    }
+  }
+
   std::string get_display_name_fb (const db::pcell_parameters_type &parameters) const
   {
     return db::PCellDeclaration::get_display_name (parameters);
@@ -561,6 +591,8 @@ public:
   gsi::Callback cb_coerce_parameters;
   gsi::Callback cb_callback;
   gsi::Callback cb_get_display_name;
+  gsi::Callback cb_get_description;
+  gsi::Callback cb_via_types;
 };
 
 Class<PCellDeclarationImpl> decl_PCellDeclaration (decl_PCellDeclaration_Native, "db", "PCellDeclaration",
@@ -573,6 +605,8 @@ Class<PCellDeclarationImpl> decl_PCellDeclaration (decl_PCellDeclaration_Native,
   gsi::method ("transformation_from_shape", &PCellDeclarationImpl::transformation_from_shape_fb, "@hide") +
   gsi::method ("display_text", &PCellDeclarationImpl::get_display_name_fb, "@hide") +
   gsi::method ("wants_lazy_evaluation", &PCellDeclarationImpl::wants_lazy_evaluation_fb, "@hide") +
+  gsi::method ("description", &PCellDeclarationImpl::get_description_fb, "@hide") +
+  gsi::method ("via_types", &PCellDeclarationImpl::via_types_fb, "@hide") +
   gsi::callback ("get_layers", &PCellDeclarationImpl::get_layer_declarations_impl, &PCellDeclarationImpl::cb_get_layer_declarations, gsi::arg ("parameters"),
     "@brief Returns a list of layer declarations\n"
     "Reimplement this method to return a list of layers this PCell wants to create.\n"
@@ -669,6 +703,29 @@ Class<PCellDeclarationImpl> decl_PCellDeclaration (decl_PCellDeclaration_Native,
     "The default implementation will return 'false' indicating immediate updates.\n"
     "\n"
     "This method has been added in version 0.27.6.\n"
+  ) +
+  gsi::callback ("description", &PCellDeclarationImpl::get_description, &PCellDeclarationImpl::cb_get_description,
+    "@brief Gets the PCell description\n"
+    "The description string is a text that gives a human-readable description of the PCell. By default, the "
+    "PCell name is used for the description.\n"
+    "\n"
+    "This method has been added in version 0.30.4.\n"
+  ) +
+  gsi::callback ("via_types", &PCellDeclarationImpl::via_types, &PCellDeclarationImpl::cb_via_types,
+    "@brief Gets the via types the PCell supports - if it is a via PCell\n"
+    "If the returned list is non-empty, the PCell may be used as a via PCell. This method is supposed "
+    "to deliver a list of via types the PCell supports. If the PCell supports vias, it is expected to "
+    "accept the following parameters:\n"
+    "\n"
+    "@ul\n"
+    "@li 'via' (string): the name of the via type requested @/li\n"
+    "@li 'w_bottom' (float): the bottom wire width in um or 0 if not specified @/li\n"
+    "@li 'h_bottom' (float): the bottom wire height in um or 0 if not specified @/li\n"
+    "@li 'w_top' (float): the top wire width in um or 0 if not specified @/li\n"
+    "@li 'h_top' (float): the top wire height in um or 0 if not specified @/li\n"
+    "@/ul\n"
+    "\n"
+    "This method has been added in version 0.30.4.\n"
   ) +
   gsi::callback ("display_text", &PCellDeclarationImpl::get_display_name, &PCellDeclarationImpl::cb_get_display_name, gsi::arg ("parameters"),
     "@brief Returns the display text for this PCell given a certain parameter set\n"

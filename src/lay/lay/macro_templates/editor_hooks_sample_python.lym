@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description>Editor hooks sample (Python)\nThis sample shows how to implement editor hooks</description>
+ <format>general</format>
+ <autorun>true</autorun>
+ <autorun-early>false</autorun-early>
+ <show-in-menu>false</show-in-menu>
+ <category>pymacros</category>
+ <interpreter>python</interpreter>
+ <text>import pya
+
+"""
+This demo installs editor hooks to indicate the forbidding regions around a shape
+
+It follows some hypothetical technology that defines three layers:
+
+1/0: min space 0.2, euclidian
+2/0: min space 0.5, projection
+3/0: min space 1.0, projection
+
+The forbidding region is highlighted while the shapes 
+are drawn.
+
+Space between instances: 0.4
+"""
+
+class MyEditorHooks(pya.EditorHooks):
+
+  def __init__(self):
+  
+    self.register("MyEditorHooks")
+    
+    self.markers = []
+    self.view = None
+    self.layout = None
+    self.space = 0.0
+    
+    self.spaces = {
+      pya.LayerInfo(1, 0): ( 0.2, pya.Region.Euclidian ),
+      pya.LayerInfo(2, 0): ( 0.5, pya.Region.Projection ),
+      pya.LayerInfo(3, 0): ( 1.0, pya.Region.Projection )
+    }
+    
+    self.instance_space = 0.4
+
+  def set_space_from_layer(self, layer_index):
+  
+    # pick the space value
+    lp = self.layout.get_info(layer_index)
+    if lp in self.spaces:
+      (s, m) = self.spaces[lp]
+      self.space = s / self.layout.dbu
+      self.metrics = m
+    else:
+      self.space = None
+      
+  def add_marker_from_shape(self, shape, trans):
+  
+    if self.space is None:
+      return
+  
+    p = shape.polygon
+    if p is not None and p.num_points() &lt; 100:
+      r = pya.Region()
+      r.merged_semantics = (p.num_points() != 2)
+      r.insert(p)
+      r = r.drc_hull(self.metrics, self.space)
+      for pp in r.each():
+        m = pya.Marker(self.view)
+        m.line_style = 2
+        m.vertex_size = 0
+        m.set_polygon(trans * pp)
+        self.markers.append(m)
+        
+    t = shape.text
+    if t is not None:
+      m = pya.Marker(self.view)
+      m.set_box(trans * t.bbox().enlarged(self.space))
+      self.markers.append(m)
+
+  # Shape creation protocol
+  
+  def begin_create_shapes(self, cv, layer):
+  
+    # setup session
+    self.view = cv.view()
+    self.layout = cv.layout()
+    self.markers = []
+    
+    # pick the space value
+    self.set_space_from_layer(layer.layer_index())
+
+  def begin_new_shapes(self):
+    # create new markers
+    self.markers = []
+
+  def create_shape(self, shape, trans):
+    # create a marker with space halo
+    self.add_marker_from_shape(shape, trans)
+      
+  def end_create_shapes(self):
+    # cleanup
+    self.markers = []
+    self.view = None
+    self.layout = None
+    
+  # Instance creation protocol
+
+  def begin_create_instances(self, cv):
+    # setup session
+    self.view = cv.view()
+    self.layout = cv.layout()
+    self.markers = []
+
+  def begin_new_instances(self):
+    # create new markers
+    self.markers = []
+
+  def create_instance(self, instance, trans):
+    m = pya.Marker(self.view)
+    m.set_box(trans * instance.bbox().enlarged(self.instance_space / self.layout.dbu))
+    self.markers.append(m)
+      
+  def end_create_instances(self):
+    # cleanup
+    self.markers = []
+    self.view = None
+    self.layout = None
+
+  # Modification protocol
+  
+  def begin_edit(self, cv):
+    # setup session
+    self.view = cv.view()
+    self.layout = cv.layout()
+    self.markers = []
+
+  def begin_edits(self):
+    # create new markers
+    self.markers = []
+
+  def transformed(self, path, applied, trans):
+  
+    if path.shape is None:
+    
+      m = pya.Marker(self.view)
+      m.set_box(trans * (applied * path.inst().bbox()).enlarged(self.instance_space / self.layout.dbu))
+      self.markers.append(m)
+    
+    else:
+      
+      self.set_space_from_layer(path.layer)
+      self.add_marker_from_shape(path.shape, trans * applied)
+
+  def modified(self, path, shape, trans):
+  
+    self.set_space_from_layer(path.layer)
+    self.add_marker_from_shape(shape, trans)
+
+  def commit_edit(self):
+
+    pass
+    
+  def end_edit(self):
+
+    # cleanup
+
+    self.markers = []
+    self.view = None
+    self.layout = None
+
+MyEditorHooks()
+</text>
+</klayout-macro>

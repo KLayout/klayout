@@ -31,6 +31,11 @@
 
 #include <QWidget>
 
+namespace db
+{
+  struct LayerProperties;
+}
+
 namespace lay
 {
 
@@ -58,6 +63,7 @@ public:
   virtual void apply (lay::Dispatcher * /*root*/) { }
   virtual void setup (lay::Dispatcher * /*root*/) { }
   virtual void commit_recent (lay::Dispatcher * /*root*/) { }
+  virtual void config_recent_for_layer (lay::Dispatcher * /*root*/, const db::LayerProperties & /*lp*/, int /*cv_index*/) { }
 
   bool active () const { return m_active; }
   void activate (bool active);

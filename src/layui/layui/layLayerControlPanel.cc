@@ -209,6 +209,7 @@ LayerControlPanel::LayerControlPanel (lay::LayoutViewBase *view, db::Manager *ma
     m_tabs_need_update (true), 
     m_hidden_flags_need_update (true),
     m_in_update (false),
+    m_current_layer (0),
     m_phase (0), 
     m_do_update_content_dm (this, &LayerControlPanel::do_update_content),
     m_do_update_visibility_dm (this, &LayerControlPanel::do_update_visibility),
@@ -1747,6 +1748,7 @@ LayerControlPanel::begin_updates ()
     //  we force a clear_selection in this case, since we cannot make sure the
     //  selecting remains valid
     clear_selection ();
+    m_current_layer = 0;
 
   }
 }
@@ -1987,49 +1989,70 @@ LayerControlPanel::set_current_layer (const lay::LayerPropertiesConstIterator &l
 
   end_updates ();
 
-  mp_layer_list->set_current (l);
+  if (m_in_update) {
+    //  while in update, the layer list does not follow the selection, so keep a temporary one
+    m_current_layer = l.uint ();
+  } else {
+    mp_layer_list->set_current (l);
+  }
 }
 
 lay::LayerPropertiesConstIterator 
 LayerControlPanel::current_layer () const
 {
-  return mp_model->iterator (mp_layer_list->currentIndex ());
+  if (m_in_update) {
+    return lay::LayerPropertiesConstIterator (mp_view->get_properties (), m_current_layer);
+  } else {
+    return mp_model->iterator (mp_layer_list->currentIndex ());
+  }
 }
 
 std::vector <lay::LayerPropertiesConstIterator>
 LayerControlPanel::selected_layers () const
 {
-  QModelIndexList selected = mp_layer_list->selectionModel ()->selectedIndexes ();
+  if (m_in_update) {
 
-  std::vector <lay::LayerPropertiesConstIterator> llist;
-  llist.reserve (selected.size ());
-  for (QModelIndexList::const_iterator i = selected.begin (); i != selected.end (); ++i) {
-    if (i->column () == 0) {
-      lay::LayerPropertiesConstIterator iter (mp_model->iterator (*i));
-      if (! iter.is_null () && ! iter.at_end ()) {
-        llist.push_back (iter);
+    std::vector <lay::LayerPropertiesConstIterator> new_sel;
+    for (std::vector<size_t>::const_iterator s = m_new_sel.begin (); s != m_new_sel.end (); ++s) {
+      new_sel.push_back (lay::LayerPropertiesConstIterator (mp_view->get_properties (), *s));
+    }
+
+    return new_sel;
+
+  } else {
+
+    QModelIndexList selected = mp_layer_list->selectionModel ()->selectedIndexes ();
+
+    std::vector <lay::LayerPropertiesConstIterator> llist;
+    llist.reserve (selected.size ());
+    for (QModelIndexList::const_iterator i = selected.begin (); i != selected.end (); ++i) {
+      if (i->column () == 0) {
+        lay::LayerPropertiesConstIterator iter (mp_model->iterator (*i));
+        if (! iter.is_null () && ! iter.at_end ()) {
+          llist.push_back (iter);
+        }
       }
     }
+
+    //  filter out the children:
+    //  we employ the fact, that the LayerPropertiesConstIterator's are ordered
+    //  parents first and children before siblings.
+    std::sort (llist.begin (), llist.end ());
+
+    std::vector<lay::LayerPropertiesConstIterator>::iterator write = llist.begin ();
+    for (std::vector<lay::LayerPropertiesConstIterator>::iterator read = llist.begin (); read != llist.end (); ) {
+
+      lay::LayerPropertiesConstIterator n = *read;
+      *write++ = n;
+      n.next_sibling ();
+
+      read = std::lower_bound (read + 1, llist.end (), n);
+
+    }
+
+    llist.erase (write, llist.end ());
+    return llist;
   }
-
-  //  filter out the children:
-  //  we employ the fact, that the LayerPropertiesConstIterator's are ordered
-  //  parents first and children before siblings.
-  std::sort (llist.begin (), llist.end ());
-
-  std::vector<lay::LayerPropertiesConstIterator>::iterator write = llist.begin ();
-  for (std::vector<lay::LayerPropertiesConstIterator>::iterator read = llist.begin (); read != llist.end (); ) {
-
-    lay::LayerPropertiesConstIterator n = *read;
-    *write++ = n;
-    n.next_sibling (); 
-
-    read = std::lower_bound (read + 1, llist.end (), n);
-
-  }
-
-  llist.erase (write, llist.end ());
-  return llist;
 }
 
 void 

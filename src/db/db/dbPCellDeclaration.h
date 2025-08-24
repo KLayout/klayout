@@ -28,6 +28,7 @@
 
 #include "gsiObject.h"
 #include "dbLayout.h"
+#include "dbVia.h"
 #include "tlVariant.h"
 #include "tlObject.h"
 #include "tlOptional.h"
@@ -673,6 +674,16 @@ public:
   }
 
   /**
+   *  @brief Returns the description text of the PCell
+   *
+   *  The description text is a for human interpretation only. By default, the name will be returned.
+   */
+  virtual std::string get_description () const
+  {
+    return m_name;
+  }
+
+  /**
    *  @brief Returns true, if the PCell can be created from the given shape on the given layer
    *
    *  If this method returns true, KLayout allows this PCell to be created from the given shape.
@@ -715,6 +726,25 @@ public:
   virtual bool wants_lazy_evaluation () const
   {
     return false;
+  }
+
+  /**
+   *  @brief Returns the via types the PCell can provide
+   *
+   *  This method returns a list of via types the PCell can support.
+   *  If this list is non-empty, the PCell will be used to implement
+   *  vias of one of the given type.
+   *
+   *  Such a PCell needs to support the following (maybe hidden) parameters
+   *  * "via" (string): the name of the via type
+   *  * "w_bottom" (float): the bottom wire width in um or 0 if not specified
+   *  * "h_bottom" (float): the bottom wire height in um or 0 if not specified
+   *  * "w_top" (float): the top wire width in um or 0 if not specified
+   *  * "h_top" (float): the top wire height in um or 0 if not specified
+   */
+  virtual std::vector<ViaType> via_types () const
+  {
+    return std::vector<ViaType> ();
   }
 
   /**

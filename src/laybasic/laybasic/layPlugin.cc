@@ -301,6 +301,7 @@ PluginDeclaration::register_plugin ()
   if (Dispatcher::instance ()) {
     Dispatcher::instance ()->plugin_registered (this);
     initialize (Dispatcher::instance ());
+    Dispatcher::instance ()->config_setup ();
   }
 }
 

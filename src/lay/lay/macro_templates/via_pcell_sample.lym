@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description>Via PCell sample (Ruby)\nThis sample provides a via PCell with two via types</description>
+ <format>general</format>
+ <autorun>true</autorun>
+ <autorun-early>false</autorun-early>
+ <show-in-menu>false</show-in-menu>
+ <category>macros</category>
+ <interpreter>ruby</interpreter>
+ <text># Sample via PCell
+# 
+# This sample PCell implements a library called "MyViaLib" with a single PCell that
+# provides two vias for a hypothetical technology with these layers:
+# 
+#   1/0  Metal1
+#   2/0  Via1
+#   3/0  Metal2
+#   4/0  Via2
+#   5/0  Metal3
+# 
+# The sample demonstrates how to equip a PCell with the necessary declarations,
+# so it can supply vias for the wire (path) tool.
+# 
+# It implements simple rectangular via arrays made from squares with a fixed size,
+# pitch and enclosure.
+# 
+# NOTE: after changing the code, the macro needs to be rerun to install the new
+# implementation. The macro is also set to "auto run" to install the PCell 
+# when KLayout is run.
+
+module MyViaLib
+
+  include RBA
+  
+  # Extend the ViaType class with some custom attributes
+  class ViaTypeEx &lt; RBA::ViaType
+  
+    def initialize(*args)
+      super(*args)
+    end
+    
+    attr_accessor :enc_bottom
+    attr_accessor :enc_top
+    attr_accessor :vwidth
+    attr_accessor :vspace
+    
+  end
+
+  class ViaPCell &lt; PCellDeclarationHelper
+  
+    # Constructor: provides the PCell parameter definitions
+  
+    def initialize
+    
+      # Important: initialize the super class
+      super
+
+      # Every via PCell should declare these parameters:
+      #
+      #   via: the name of the via as declared in the via types
+      #   w_bottom: the width of the bottom box in micrometers
+      #   h_bottom: the height of the bottom box in micrometers
+      #   w_top: the width of the top box in micrometers
+      #   h_top: the width of the top box in micrometers
+      #
+      # w_bottom etc. can be zero, indicating that the via
+      # does not have a specific extension in this layer.
+      # The PCell may chose a dimension in that case.
+       
+      param(:via, TypeString, "Via type", :hidden =&gt; false)
+      param(:w_bottom, TypeDouble, "Bottom width", :hidden =&gt; false, :default =&gt; 0.0)
+      param(:h_bottom, TypeDouble, "Bottom height", :hidden =&gt; false, :default =&gt; 0.0)
+      param(:w_top, TypeDouble, "Top width", :hidden =&gt; false, :default =&gt; 0.0)
+      param(:h_top, TypeDouble, "Top height", :hidden =&gt; false, :default =&gt; 0.0)
+      
+      # Optional additional parameters: here we allow to override
+      # the computed array dimension by setting these parameters
+      # to non-zero.
+      
+      param(:nx, TypeInt, "nx", :default =&gt; 0)
+      param(:ny, TypeInt, "ny", :default =&gt; 0)
+  
+      # Build a list of supported vias
+      
+      @via_type_list = []
+  
+      # Via1     
+      vt = ViaTypeEx::new("V1", "Via1 (0.2x0.2)")
+      vt.wbmin = 0.4
+      vt.hbmin = 0.4
+      vt.wtmin = 0.5
+      vt.htmin = 0.5
+      vt.bottom = RBA::LayerInfo::new(1, 0)
+      vt.cut = RBA::LayerInfo::new(2, 0)
+      vt.top = RBA::LayerInfo::new(3, 0)
+      vt.bottom_grid = 0.01
+      vt.top_grid = 0.01
+      
+      # foreign attributes (not used by RBA, but handy for 
+      # internal use):
+      vt.enc_bottom = 0.1
+      vt.enc_top = 0.15
+      vt.vwidth = 0.2
+      vt.vspace = 0.2
+      
+      @via_type_list.append(vt)
+      
+      # Via2
+      vt = ViaTypeEx::new("V2", "Via2 (0.3x0.3)")
+      vt.wbmin = 0.5
+      vt.hbmin = 0.5
+      vt.wtmin = 0.5
+      vt.htmin = 0.5
+      vt.bottom = RBA::LayerInfo::new(3, 0)
+      vt.cut = RBA::LayerInfo::new(4, 0)
+      vt.top = RBA::LayerInfo::new(5, 0)
+      vt.bottom_grid = 0.01
+      vt.top_grid = 0.01
+      
+      # foreign attributes (not used by pya, but handy for 
+      # internal use):
+      vt.enc_bottom = 0.1
+      vt.enc_top = 0.1
+      vt.vwidth = 0.3
+      vt.vspace = 0.2
+      
+      @via_type_list.append(vt)
+      
+    end
+      
+    # Implements the "via_types" method from the PCellDeclaration
+    # interface: delivers the vias supported by this PCell.
+    
+    def via_types
+      return @via_type_list
+    end
+      
+    # Returns the via with the name given by the "via"
+    # PCell argument
+    def via_type
+      @via_type_list.each do |vt|
+        if vt.name == self.via
+          return vt
+        end
+      end
+      return nil
+    end
+      
+    # PCell interface implementation
+    def display_text_impl
+      return "Via(" + self.via + ")"
+    end
+    
+    # PCell interface implementation
+    def coerce_parameters_impl
+    end
+    
+    # PCell interface implementation
+    def can_create_from_shape_impl
+      return false
+    end
+    
+    # PCell interface implementation
+    def parameters_from_shape_impl
+    end
+    
+    # PCell interface implementation
+    def transformation_from_shape_impl
+      return RBA::Trans::new
+    end
+      
+    # A helper function to compute the minimum
+    # width or height less the enclosure 
+    # (a = w/h_bottom, b = w/h_top, 
+    # da/b = enclosure for a/b)
+    
+    def min_dim(a, b, da, db)
+      if a &lt; 1e-10 &amp;&amp; b &lt; 1e-10
+        return 0.0
+      elsif a &lt; 1e-10
+        return b - 2.0 * [da, db].max
+      elsif b &lt; 1e-10
+        return a - 2.0 * [da, db].max
+      else
+        return [a - 2.0 * da, b - 2.0 * db].min
+      end
+    end
+      
+    # Computes the nx and ny as mandated by the widths and
+    # heights
+    # 
+    # w/h_top/bottom can be zero, indicating no specific
+    # dimension is requested. The implementation can choose
+    # what to do in this case. It can also decide to provide
+    # largher vias than given by w_ or h_ or favor square vias
+    # over rectangular ones.
+    
+    def getnxy(vt)
+  
+      mode = 2  # 1: maximum, 2: minimum
+      
+      if mode == 1
+      
+        # This implementation uses the maximum size requested
+        # by either top or bottom:
+          
+        w = [[self.w_bottom, vt.wbmin].max - 2 * vt.enc_bottom,
+             [self.w_top, vt.wtmin].max - 2 * vt.enc_top].max
+    
+        h = [[self.h_bottom, vt.hbmin].max - 2 * vt.enc_bottom,
+             [self.h_top, vt.htmin].max - 2 * vt.enc_top].max
+  
+      elsif mode == 2
+                  
+        # This implementation delivers the minimum via, ignoring
+        # zero dimensions:
+        
+        w = self.min_dim(self.w_bottom, self.w_top, vt.enc_bottom, vt.enc_top)
+        h = self.min_dim(self.h_bottom, self.h_top, vt.enc_bottom, vt.enc_top)
+
+      end
+        
+      # parameter nx or ny override computed value if &gt; 0
+      
+      if self.nx &gt; 0
+        nx = self.nx
+      else
+        nx = [1, ((w + vt.vspace) / (vt.vwidth + vt.vspace) + 1e-10).floor.to_i].max
+      end
+  
+      if self.ny &gt; 0
+        ny = self.ny  
+      else
+        ny = [1, ((h + vt.vspace) / (vt.vwidth + vt.vspace) + 1e-10).floor.to_i].max
+      end
+  
+      return [nx, ny]
+      
+    end
+    
+    # Implementation of the PCell interface: generates the layouts
+    
+    def produce_impl
+    
+      vt = self.via_type
+      if !vt
+        return
+      end
+        
+      (nx, ny) = self.getnxy(vt)
+      
+      wcut = nx * vt.vwidth + (nx - 1) * vt.vspace
+      hcut = ny * vt.vwidth + (ny - 1) * vt.vspace
+      wbottom = [[self.w_bottom, vt.wbmin].max, vt.enc_bottom * 2.0 + wcut].max
+      hbottom = [[self.h_bottom, vt.hbmin].max, vt.enc_bottom * 2.0 + hcut].max
+      wtop = [[self.w_top, vt.wtmin].max, vt.enc_top * 2.0 + wcut].max
+      htop = [[self.h_top, vt.htmin].max, vt.enc_top * 2.0 + hcut].max
+      
+      lbottom = self.layout.layer(vt.bottom)
+      ltop = self.layout.layer(vt.top)
+      lcut = self.layout.layer(vt.cut)
+      
+      self.cell.shapes(lbottom).insert(RBA::DBox::new(wbottom, hbottom))
+      self.cell.shapes(ltop).insert(RBA::DBox::new(wtop, htop))
+      
+      scut = self.cell.shapes(lcut)
+      
+      nx.times do |ix|
+        x = (ix - 0.5 * (nx - 1)) * (vt.vwidth + vt.vspace)
+        ny.times do |iy|
+          y = (iy - 0.5 * (ny - 1)) * (vt.vwidth + vt.vspace)
+          scut.insert(RBA::DBox::new(vt.vwidth, vt.vwidth).moved(x, y))
+        end
+      end
+      
+    end
+    
+  end
+  
+  # A declaration for a test library
+  
+  class MyViaLib &lt; RBA::Library
+  
+    def initialize
+      self.description = "Via Test Library"
+      self.layout().register_pcell("Via", ViaPCell::new)
+      self.register("MyViaLib")
+    end
+    
+  end
+  
+  # instantiates the test library
+  MyViaLib::new
+
+end
+</text>
+</klayout-macro>

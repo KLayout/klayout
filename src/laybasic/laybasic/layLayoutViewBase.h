@@ -603,6 +603,13 @@ public:
   virtual lay::LayerPropertiesConstIterator current_layer () const;
 
   /**
+   *  @brief Finds the first layer by layer properties and cell view index
+   *
+   *  Returns a null iterator if the layer is not found in the list.
+   */
+  virtual lay::LayerPropertiesConstIterator find_layer (unsigned int cv_index, const db::LayerProperties &properties) const;
+
+  /**
    *  @brief Return the layers that are selected in the layer browser
    *
    *  Returns an empty list if no layer is selected.

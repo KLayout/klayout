@@ -24,6 +24,7 @@
 #ifndef HDR_edtPlugin
 #define HDR_edtPlugin
 
+#include "edtCommon.h"
 #include "layPlugin.h"
 
 #include <vector>
@@ -57,11 +58,6 @@ namespace edt
   bool points_enabled ();
   bool texts_enabled ();
   bool instances_enabled ();
-
-  /**
-   *  @brief Commits the current configuration for the recently used configuration list
-   */
-  void commit_recent (lay::LayoutViewBase *view);
 }
 
 #endif

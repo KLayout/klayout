@@ -20,6 +20,8 @@ pcell.lym
 # Samples
 :Samples;;
 pcell_sample.lym
+via_pcell_sample.lym
+editor_hooks_sample.lym
 qt_designer.lym
 qt_dialog.lym
 qt_server.lym
@@ -38,6 +40,8 @@ pcell_python.lym
 # Samples
 :Samples;;
 pcell_sample_python.lym
+via_pcell_sample_python.lym
+editor_hooks_sample_python.lym
 qt_designer_python.lym
 qt_dialog_python.lym
 qt_server_python.lym

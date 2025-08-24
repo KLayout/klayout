@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description>Editor hooks sample (Ruby)\nThis sample shows how to implement editor hooks</description>
+ <format>general</format>
+ <autorun>true</autorun>
+ <autorun-early>false</autorun-early>
+ <show-in-menu>false</show-in-menu>
+ <category>macros</category>
+ <interpreter>ruby</interpreter>
+ <text>module MyEditorHooks
+
+  # This demo installs editor hooks to indicate the forbidding regions around a shape
+  # 
+  # It follows some hypothetical technology that defines three layers:
+  # 
+  # 1/0: min space 0.2, euclidian
+  # 2/0: min space 0.5, projection
+  # 3/0: min space 1.0, projection
+  # 
+  # The forbidding region is highlighted while the shapes 
+  # are drawn.
+  # 
+  # Space between instances: 0.4
+
+  class MyEditorHooks &lt; RBA::EditorHooks
+
+    def initialize
+    
+      self.register("MyEditorHooks")
+      
+      @markers = []
+      @view = nil
+      @layout = nil
+      @space = 0.0
+      
+      @spaces = {
+        RBA::LayerInfo::new(1, 0) => [ 0.2, RBA::Region::Euclidian ],
+        RBA::LayerInfo::new(2, 0) => [ 0.5, RBA::Region::Projection ],
+        RBA::LayerInfo::new(3, 0) => [ 1.0, RBA::Region::Projection ]
+      }
+      
+      @instance_space = 0.4
+
+    end
+
+    def set_space_from_layer(layer_index)
+    
+      # pick the space value
+      lp = @layout.get_info(layer_index)
+      if @spaces[lp]
+        (s, m) = @spaces[lp]
+        @space = s / @layout.dbu
+        @metrics = m
+      else
+        @space = nil
+      end
+        
+    end
+
+    def add_marker_from_shape(shape, trans)
+    
+      if !@space
+        return
+      end
+    
+      p = shape.polygon
+      if p &amp;&amp; p.num_points &lt; 100
+        r = RBA::Region::new
+        r.merged_semantics = (p.num_points != 2)
+        r.insert(p)
+        r = r.drc_hull(@metrics, @space)
+        r.each do |pp|
+          m = RBA::Marker::new(@view)
+          m.line_style = 2
+          m.vertex_size = 0
+          m.set_polygon(trans * pp)
+          @markers.append(m)
+        end
+      end
+          
+      t = shape.text
+      if t
+        m = RBA::Marker::new(@view)
+        m.set_box(trans * t.bbox.enlarged(@space))
+        @markers.append(m)
+      end
+
+    end
+
+    def clear_markers
+      @markers.each { |m| m._destroy }
+      @markers = []
+    end
+      
+    def cleanup
+      self.clear_markers
+      @view = nil
+      @layout = nil
+    end
+
+    def setup(cv)
+      @view = cv.view
+      @layout = cv.layout
+      self.clear_markers
+    end
+
+    # Shape creation protocol
+    
+    def begin_create_shapes(cv, layer)
+      self.setup(cv)
+      # pick the space value
+      self.set_space_from_layer(layer.layer_index)
+    end
+
+    def begin_new_shapes
+      self.clear_markers
+    end
+
+    def create_shape(shape, trans)
+      # create a marker with space halo
+      self.add_marker_from_shape(shape, trans)
+    end
+
+    def end_create_shapes
+      self.cleanup
+    end
+
+    # Instance creation protocol
+
+    def begin_create_instances(cv)
+      self.setup(cv)
+    end
+
+    def begin_new_instances
+      self.clear_markers
+    end
+
+    def create_instance(instance, trans)
+      m = RBA::Marker::new(@view)
+      m.set_box(trans * instance.bbox.enlarged(@instance_space / @layout.dbu))
+      @markers.append(m)
+    end
+
+    def end_create_instances
+      self.cleanup
+    end
+
+    # Modification protocol
+    
+    def begin_edit(cv)
+      self.setup(cv)
+    end
+
+    def begin_edits
+      self.clear_markers
+    end
+
+    def transformed(path, applied, trans)
+      if !path.shape
+        m = RBA::Marker::new(@view)
+        m.set_box(trans * (applied * path.inst.bbox).enlarged(@instance_space / @layout.dbu))
+        @markers.append(m)
+      else
+        self.set_space_from_layer(path.layer)
+        self.add_marker_from_shape(path.shape, trans * applied)
+      end
+    end
+
+    def modified(path, shape, trans)
+      self.set_space_from_layer(path.layer)
+      self.add_marker_from_shape(shape, trans)
+    end
+
+    def commit_edit
+      # nothing here.
+    end
+
+    def end_edit
+      self.cleanup
+    end
+
+  end
+
+  MyEditorHooks::new
+
+end
+</text>
+</klayout-macro>

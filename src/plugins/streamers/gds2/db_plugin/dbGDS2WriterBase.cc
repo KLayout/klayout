@@ -1088,7 +1088,7 @@ GDS2WriterBase::write_polygon (int layer, int datatype, double sf, const db::Sha
 }
 
 void 
-GDS2WriterBase::write_properties (const db::Layout &layout, db::properties_id_type prop_id)
+GDS2WriterBase::write_properties (const db::Layout & /*layout*/, db::properties_id_type prop_id)
 {
   auto props = db::properties (prop_id).to_map ();
   for (auto p = props.begin (); p != props.end (); ++p) {

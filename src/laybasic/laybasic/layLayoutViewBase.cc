@@ -1604,19 +1604,30 @@ LayoutViewBase::rename_properties (unsigned int index, const std::string &new_na
   layer_list_changed_event (4);
 }
 
-bool
-LayoutViewBase::set_current_layer (unsigned int cv_index, const db::LayerProperties &lp)
+lay::LayerPropertiesConstIterator
+LayoutViewBase::find_layer (unsigned int cv_index, const db::LayerProperties &lp) const
 {
-  //  rename the ones that got shifted.
   lay::LayerPropertiesConstIterator l = begin_layers ();
   while (! l.at_end ()) {
     if (l->source (true).cv_index () == int (cv_index) && l->source (true).layer_props ().log_equal (lp)) {
-      set_current_layer (l);
-      return true;
+      return l;
     }
     ++l;
   }
-  return false;
+
+  return lay::LayerPropertiesConstIterator ();
+}
+
+bool
+LayoutViewBase::set_current_layer (unsigned int cv_index, const db::LayerProperties &lp)
+{
+  lay::LayerPropertiesConstIterator l = find_layer (cv_index, lp);
+  if (! l.is_null ()) {
+    set_current_layer (l);
+    return true;
+  } else {
+    return false;
+  }
 }
 
 void

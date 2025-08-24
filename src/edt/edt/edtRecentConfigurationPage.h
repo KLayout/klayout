@@ -25,6 +25,7 @@
 #ifndef HDR_edtRecentConfigurationPage
 #define HDR_edtRecentConfigurationPage
 
+#include "edtCommon.h"
 #include "layEditorOptionsPage.h"
 #include "tlObject.h"
 #include "tlDeferredExecution.h"
@@ -37,6 +38,11 @@ namespace lay
   class LayoutViewBase;
 }
 
+namespace db
+{
+  struct LayerProperties;
+}
+
 namespace edt
 {
 
@@ -47,7 +53,7 @@ class EditorOptionsPages;
 /**
  *  @brief The base class for a object properties page
  */
-class RecentConfigurationPage
+class EDT_PUBLIC RecentConfigurationPage
   : public lay::EditorOptionsPage
 {
 Q_OBJECT
@@ -92,6 +98,7 @@ public:
   virtual void apply (lay::Dispatcher * /*root*/) { }
   virtual void setup (lay::Dispatcher * /*root*/) { }
   virtual void commit_recent (lay::Dispatcher *root);
+  virtual void config_recent_for_layer (lay::Dispatcher *root, const db::LayerProperties &lp, int cv_index);
 
 private slots:
   void item_clicked (QTreeWidgetItem *item);

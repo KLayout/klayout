@@ -36,7 +36,12 @@
 #include "edtPlugin.h"
 #include "edtMainService.h"
 #include "edtService.h"
-#include "edtServiceImpl.h"
+#include "edtInstService.h"
+#include "edtPolygonService.h"
+#include "edtPathService.h"
+#include "edtTextService.h"
+#include "edtBoxService.h"
+#include "edtPointService.h"
 #include "edtConfig.h"
 #include "edtDistribute.h"
 
@@ -211,6 +216,12 @@ MainService::menu_activated (const std::string &symbol)
     cm_make_array ();
   } else if (symbol == "edt::sel_make_cell_variants") {
     cm_make_cell_variants ();
+  } else if (symbol == "edt::via") {
+    cm_via ();
+  } else if (symbol == "edt::via_up") {
+    cm_via_up ();
+  } else if (symbol == "edt::via_down") {
+    cm_via_down ();
   }
 }
 
@@ -2439,7 +2450,49 @@ MainService::cm_tap ()
 #endif
 }
 
-void 
+void
+MainService::cm_via ()
+{
+  via_impl (0);
+}
+
+void
+MainService::cm_via_up ()
+{
+  via_impl (1);
+}
+
+void
+MainService::cm_via_down ()
+{
+  via_impl (-1);
+}
+
+void
+MainService::via_impl (int dir)
+{
+#if ! defined(HAVE_QT)
+  tl_assert (false); // see TODO
+#endif
+
+#if defined(HAVE_QT)
+  QWidget *view_widget = lay::widget_from_view (view ());
+  if (! view_widget) {
+    return;
+  }
+#endif
+
+  if (! view ()->canvas ()->mouse_in_window ()) {
+    return;
+  }
+
+  edt::Service *es = dynamic_cast<edt::Service *> (view ()->canvas ()->active_service ());
+  if (es) {
+    es->via (dir);
+  }
+}
+
+void
 MainService::cm_change_layer ()
 {
   tl_assert (view ()->is_editable ());

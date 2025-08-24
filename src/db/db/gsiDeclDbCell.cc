@@ -3321,7 +3321,8 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This method has been introduced in version 0.24.\n"
   ) + 
-  gsi::method ("change_pcell_parameters", &db::Cell::change_pcell_parameters, gsi::arg ("instance"), gsi::arg ("parameters"),
+  gsi::method ("change_pcell_parameters", static_cast<db::Cell::instance_type (db::Cell::*) (const db::Cell::instance_type &ref, const std::vector<tl::Variant> &new_parameters)> (&db::Cell::change_pcell_parameters),
+               gsi::arg ("instance"), gsi::arg ("parameters"),
     "@brief Changes the parameters for an individual PCell instance\n"
     "@return The new instance (the old may be invalid)\n"
     "If necessary, this method creates a new variant and replaces the given instance\n"

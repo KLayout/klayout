@@ -200,7 +200,22 @@ public:
    */
   void cm_tap ();
 
-  /** 
+  /**
+   *  @brief Via operation (up or down)
+   */
+  void cm_via ();
+
+  /**
+   *  @brief Via operation (down)
+   */
+  void cm_via_down ();
+
+  /**
+   *  @brief Via operation (up)
+   */
+  void cm_via_up ();
+
+  /**
    *  @brief "paste" operation
    */
   virtual void paste ();
@@ -242,6 +257,7 @@ private:
   edt::MakeArrayOptionsDialog *mp_make_array_options_dialog;
 #endif
 
+  void via_impl (int dir);
   void boolean_op (int mode);
   void check_no_guiding_shapes ();
   void descend (bool make_new_top);

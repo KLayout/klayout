@@ -31,6 +31,11 @@
 #include "layLayoutViewBase.h"
 #include "layCursor.h"
 
+#if defined(HAVE_QTBINDINGS)
+#  include "gsiQtGuiExternals.h"
+#  include "gsiQtWidgetsExternals.h"  //  for Qt5
+#endif
+
 namespace gsi
 {
 
@@ -56,6 +61,11 @@ public:
   virtual int order () const
   {
     return m_index;
+  }
+
+  void call_edited ()
+  {
+    lay::EditorOptionsPage::edited ();
   }
 
   void apply_impl (lay::Dispatcher *root)
@@ -101,13 +111,46 @@ EditorOptionsPageImpl *new_editor_options_page (const std::string &title, int in
   return new EditorOptionsPageImpl (title, index);
 }
 
-// @@@ methods:
-//   constructor new_editor_options_page
-//   view()
-//   edited()
-//   callback apply(dispatcher)
-//   callback setup(dispatcher)
-// base: QWidget
+Class<EditorOptionsPageImpl> decl_EditorOptionsPage (QT_EXTERNAL_BASE (QWidget) "lay", "EditorOptionsPage",
+  constructor ("new", &new_editor_options_page, gsi::arg ("title"), gsi::arg ("index"),
+    "@brief Creates a new EditorOptionsPage object\n"
+    "@param title The title of the page\n"
+    "@param index The position of the page in the tab bar\n"
+  ) +
+  method ("view", &EditorOptionsPageImpl::view,
+    "@brief Gets the view object this page is associated with\n"
+  ) +
+  method ("edited", &EditorOptionsPageImpl::call_edited,
+    "@brief Call this method when some entry widget has changed\n"
+    "When some entry widget (for example 'editingFinished' slot of a QLineEdit), "
+    "call this method to initiate a transfer of information from the page to the plugin.\n"
+  ) +
+  callback ("apply", &EditorOptionsPageImpl::apply, &EditorOptionsPageImpl::f_apply, gsi::arg ("dispatcher"),
+    "@brief Reimplement this method to transfer data from the page to the configuration\n"
+    "In this method, you should transfer all widget data into corresponding configuration updates.\n"
+    "Use \\Dispatcher#set_config on the dispatcher object ('dispatcher' argument) to set a configuration parameter.\n"
+  ) +
+  callback ("setup", &EditorOptionsPageImpl::setup, &EditorOptionsPageImpl::f_setup, gsi::arg ("dispatcher"),
+    "@brief Reimplement this method to transfer data from the configuration to the page\n"
+    "In this method, you should transfer all configuration data to the widgets.\n"
+    "Use \\Dispatcher#get_config on the dispatcher object ('dispatcher' argument) to get a configuration parameter "
+    "and set the editing widget's state accordingly.\n"
+  ),
+  "@brief The plugin framework's editor options page\n"
+  "\n"
+  "This object provides a way to establish plugin-specific editor options pages.\n"
+  "\n"
+  "The preferred way of communication between the page and the plugin is through "
+  "configuration parameters. One advantage of this approach is that the current state is "
+  "automatically persisted.\n"
+  "\n"
+  "For this purpose, the editor options page has two methods: 'apply' which is supposed to transfer "
+  "the editor widget's state into configuration parameters. 'setup' does the inverse and transfer "
+  "configuration parameters into editor widget states. Both methods are called by the system when "
+  "some transfer is needed.\n"
+  "\n"
+  "This class has been introduced in version 0.30.4.\n"
+);
 
 class ConfigPageImpl
   : public lay::ConfigPage
@@ -166,6 +209,42 @@ ConfigPageImpl *new_config_page (const std::string &title)
 {
   return new ConfigPageImpl (title);
 }
+
+Class<ConfigPageImpl> decl_ConfigPage (QT_EXTERNAL_BASE (QFrame) "lay", "ConfigPage",
+  constructor ("new", &new_config_page, gsi::arg ("title"),
+    "@brief Creates a new ConfigPage object\n"
+    "@param title The title of the page and also the position in the configuration page tree\n"
+    "\n"
+    "The title has the form 'Group|Page' - e.g. 'Application|Macro Development IDE' will place "
+    "the configuration page in the 'Application' group and into the 'Macro Development IDE' page."
+  ) +
+  callback ("apply", &ConfigPageImpl::commit, &ConfigPageImpl::f_commit, gsi::arg ("dispatcher"),
+    "@brief Reimplement this method to transfer data from the page to the configuration\n"
+    "In this method, you should transfer all widget data into corresponding configuration updates.\n"
+    "Use \\Dispatcher#set_config on the dispatcher object ('dispatcher' argument) to set a configuration parameter.\n"
+  ) +
+  callback ("setup", &ConfigPageImpl::setup, &ConfigPageImpl::f_setup, gsi::arg ("dispatcher"),
+    "@brief Reimplement this method to transfer data from the configuration to the page\n"
+    "In this method, you should transfer all configuration data to the widgets.\n"
+    "Use \\Dispatcher#get_config on the dispatcher object ('dispatcher' argument) to get a configuration parameter "
+    "and set the editing widget's state accordingly.\n"
+  ),
+  "@brief The plugin framework's configuration page\n"
+  "\n"
+  "This object provides a way to establish plugin-specific configuration pages.\n"
+  "\n"
+  "The only way of communication between the page and the plugin is through "
+  "configuration parameters. One advantage of this approach is that the current state is "
+  "automatically persisted. Configuration parameters can be obtained by the plugin "
+  "directly from the \\Dispatcher object) or by listening to 'configure' calls.\n"
+  "\n"
+  "For the purpose of data transfer, the configuration page has two methods: 'apply' which is supposed to transfer "
+  "the editor widget's state into configuration parameters. 'setup' does the inverse and transfer "
+  "configuration parameters into editor widget states. Both methods are called by the system when "
+  "some transfer is needed.\n"
+  "\n"
+  "This class has been introduced in version 0.30.4.\n"
+);
 
 // @@@ methods:
 //   constructor new_config_page
@@ -425,7 +504,7 @@ public:
   }
 
 #if defined(HAVE_QTBINDINGS)
-  std::vector<lay::EditorOptionsPage *> editor_option_pages ()
+  std::vector<lay::EditorOptionsPage *> editor_options_pages ()
   {
     lay::EditorOptionsPages *eo_pages = view ()->editor_options_pages ();
     if (!eo_pages) {
@@ -751,12 +830,6 @@ private:
   tl::RegisteredClass <lay::PluginDeclaration> *mp_registration;
 };
 
-// @@@
-#if defined(HAVE_QTBINDINGS)
-// get_editor_options_pages -> "create_editor_option_pages"
-// config_pages -> "create_config_pages"
-#endif
-
 Class<gsi::PluginFactoryBase> decl_PluginFactory ("lay", "PluginFactory",
   method ("register", &PluginFactoryBase::register_gsi, gsi::arg ("position"), gsi::arg ("name"), gsi::arg ("title"),
     "@brief Registers the plugin factory\n"
@@ -885,6 +958,34 @@ Class<gsi::PluginFactoryBase> decl_PluginFactory ("lay", "PluginFactory",
     "doing so has the advantage that it is guaranteed that a variable with this keys exists and has the given default value initially."
     "\n\n"
   ) +
+#if defined(HAVE_QTBINDINGS)
+  method ("create_editor_option_pages", &PluginFactoryBase::get_editor_options_pages,
+    "@brief Creates the editor option pages\n"
+    "The editor option pages are widgets of type \\EditorOptionsPage. These QFrame-type widgets "
+    "are displayed in a seperate dock (the 'editor options') and become visible when the plugin is active - i.e. "
+    "its mode is selected. Use this method to provide customized pages that will be displayed in the "
+    "editor options dock.\n"
+    "\n"
+    "This method is a factory. This means it will create objects and the ownership is taken "
+    "by the receiver.\n"
+    "\n"
+    "This method has been introduced in version 0.30.4."
+  ) +
+  method ("create_config_pages", &PluginFactoryBase::config_pages,
+    "@brief Creates the configuration widgets\n"
+    "The configuration pages are widgets that are displayed in the "
+    "configuration dialog ('File/Setup'). Every plugin can create multiple such "
+    "widgets and specify, where these widgets are displayed. The widgets are of type \\ConfigPage.\n"
+    "\n"
+    "The title string also specifies the location of the widget in the "
+    "configuration page hierarchy. See \\ConfigPage for more details.\n"
+    "\n"
+    "This method is a factory. This means it will create objects and the ownership is taken "
+    "by the receiver.\n"
+    "\n"
+    "This method has been introduced in version 0.30.4."
+  ) +
+#endif
   method ("has_tool_entry=", &gsi::PluginFactoryBase::has_tool_entry, gsi::arg ("f"),
     "@brief Enables or disables the tool bar entry\n"
     "Initially this property is set to true. This means that the plugin will have a visible entry in the toolbar. "
@@ -1089,6 +1190,15 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
     "\n"
     "This method has been added in version 0.27.6."
   ) +
+#if defined(HAVE_QTBINDINGS)
+  gsi::method ("editor_options_pages", &gsi::PluginBase::editor_options_pages,
+    "@brief Gets the editor options pages which are associated with the view\n"
+    "The editor options pages are created by the plugin factory class and are associated with this plugin.\n"
+    "This method allows locating them and using them for plugin-specific purposes.\n"
+    "\n"
+    "This method has been added in version 0.30.4."
+  ) +
+#endif
   gsi::method ("view", &gsi::PluginBase::view,
     "@brief Gets the view object the plugin is associated with\n"
     "This method returns the view object that the plugin is associated with.\n"

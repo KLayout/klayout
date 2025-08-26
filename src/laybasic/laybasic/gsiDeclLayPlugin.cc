@@ -44,7 +44,7 @@ class PluginBase;
 
 #if defined(HAVE_QTBINDINGS)
 class EditorOptionsPageImpl
-  : public lay::EditorOptionsPage
+  : public lay::EditorOptionsPage, public gsi::ObjectBase
 {
 public:
   EditorOptionsPageImpl (const std::string &title, int index)
@@ -267,7 +267,7 @@ public:
   {
     mp_view = view;
     mp_dispatcher = dispatcher;
-    lay::Plugin::init (dispatcher);
+    lay::Plugin::init (view);
     lay::ViewService::init (view ? view->canvas () : 0);
   }
 
@@ -643,29 +643,38 @@ public:
   }
 
 #if defined(HAVE_QTBINDINGS)
-  std::vector<EditorOptionsPageImpl *> get_editor_options_pages_impl () const
+  void add_editor_options_page (EditorOptionsPageImpl *page) const
   {
-    return std::vector<EditorOptionsPageImpl *> ();
+    page->keep ();
+    m_editor_options_pages.push_back (page);
+  }
+
+  void get_editor_options_pages_impl () const
+  {
+    //  .. nothing here ..
   }
 
   virtual void get_editor_options_pages (std::vector<lay::EditorOptionsPage *> &pages_out, lay::LayoutViewBase *view, lay::Dispatcher *dispatcher) const
   {
     try {
 
-      std::vector<EditorOptionsPageImpl *> pages;
+      m_editor_options_pages.clear ();
+
       if (f_get_editor_options_pages.can_issue ()) {
-        pages = f_get_editor_options_pages.issue<PluginFactoryBase, std::vector<EditorOptionsPageImpl *> > (&PluginFactoryBase::get_editor_options_pages_impl);
+        f_get_editor_options_pages.issue<PluginFactoryBase> (&PluginFactoryBase::get_editor_options_pages_impl);
       } else {
-        pages = get_editor_options_pages_impl ();
+        get_editor_options_pages_impl ();
       }
 
-      pages_out.clear ();
-      for (auto i = pages.begin (); i != pages.end (); ++i) {
+      for (auto i = m_editor_options_pages.begin (); i != m_editor_options_pages.end (); ++i) {
         if (*i) {
           (*i)->init (view, dispatcher);
+          (*i)->set_plugin_declaration (this);
           pages_out.push_back (*i);
         }
       }
+
+      m_editor_options_pages.clear ();
 
     } catch (tl::Exception &ex) {
       tl::error << ex.msg ();
@@ -830,6 +839,7 @@ private:
   std::string m_mouse_mode_title;
   tl::RegisteredClass <lay::PluginDeclaration> *mp_registration;
   mutable std::vector<ConfigPageImpl *> m_config_pages;
+  mutable std::vector<EditorOptionsPageImpl *> m_editor_options_pages;
 };
 
 Class<gsi::PluginFactoryBase> decl_PluginFactory ("lay", "PluginFactory",
@@ -961,15 +971,22 @@ Class<gsi::PluginFactoryBase> decl_PluginFactory ("lay", "PluginFactory",
     "\n\n"
   ) +
 #if defined(HAVE_QTBINDINGS)
-  callback ("create_editor_option_pages", &PluginFactoryBase::get_editor_options_pages, &PluginFactoryBase::f_get_editor_options_pages,
+  method ("add_editor_options_page", &PluginFactoryBase::add_editor_options_page, gsi::arg ("page"),
+    "@brief Adds the given editor options page\n"
+    "See \\create_editor_options_pages how to use this function. The method is effective only in "
+    "the reimplementation context of this function.\n"
+    "\n"
+    "This method has been introduced in version 0.30.4."
+  ) +
+  callback ("create_editor_options_pages", &PluginFactoryBase::get_editor_options_pages_impl, &PluginFactoryBase::f_get_editor_options_pages,
     "@brief Creates the editor option pages\n"
     "The editor option pages are widgets of type \\EditorOptionsPage. These QFrame-type widgets "
     "are displayed in a seperate dock (the 'editor options') and become visible when the plugin is active - i.e. "
     "its mode is selected. Use this method to provide customized pages that will be displayed in the "
     "editor options dock.\n"
     "\n"
-    "This method is a factory. This means it will create objects and the ownership is taken "
-    "by the receiver.\n"
+    "In order to create config pages, instantiate a \\EditorOptionsPage object and "
+    "call \\add_editor_options_page to register it.\n"
     "\n"
     "This method has been introduced in version 0.30.4."
   ) +

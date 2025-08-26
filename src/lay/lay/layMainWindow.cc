@@ -4381,6 +4381,11 @@ MainWindow::plugin_registered (lay::PluginDeclaration *cls)
   for (std::vector <lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
     (*vp)->view ()->create_plugins ();
   }
+
+  //  regenerate the setup form
+  delete mp_setup_form;
+  mp_setup_form = new SettingsForm (0, dispatcher (), "setup_form"),
+  mp_setup_form->setup ();
 }
 
 void

@@ -153,7 +153,7 @@ Class<EditorOptionsPageImpl> decl_EditorOptionsPage (QT_EXTERNAL_BASE (QWidget) 
 );
 
 class ConfigPageImpl
-  : public lay::ConfigPage
+  : public lay::ConfigPage, public gsi::ObjectBase
 {
 public:
   ConfigPageImpl (const std::string &title)
@@ -245,12 +245,6 @@ Class<ConfigPageImpl> decl_ConfigPage (QT_EXTERNAL_BASE (QFrame) "lay", "ConfigP
   "\n"
   "This class has been introduced in version 0.30.4.\n"
 );
-
-// @@@ methods:
-//   constructor new_config_page
-//   callback apply(dispatcher) = commit
-//   callback setup(dispatcher)
-// base: QFrame
 #endif
 
 //  HACK: used to track if we're inside a create_plugin method and can be sure that "init" is called
@@ -577,12 +571,11 @@ public:
 
     //  remove an existing factory with the same name
     std::map <std::string, PluginFactoryBase *>::iterator f = s_factories.find (name);
-    if (f != s_factories.end ()) {
+    if (f != s_factories.end () && f->second != this) {
+      //  NOTE: this also removes the plugin from the s_factories list
       delete f->second;
-      f->second = this;
-    } else {
-      s_factories.insert (std::make_pair (std::string (name), this));
     }
+    s_factories[name] = this;
 
     //  cancel any previous registration and register (again)
     delete mp_registration;
@@ -682,9 +675,15 @@ public:
     }
   }
 
-  std::vector<ConfigPageImpl *> get_config_pages_impl () const
+  void add_config_page (ConfigPageImpl *page) const
   {
-    return std::vector<ConfigPageImpl *> ();
+    page->keep ();
+    m_config_pages.push_back (page);
+  }
+
+  void get_config_pages_impl () const
+  {
+    //  .. nothing here ..
   }
 
   virtual std::vector<std::pair <std::string, lay::ConfigPage *> > config_pages (QWidget *parent) const
@@ -693,21 +692,23 @@ public:
 
     try {
 
-      std::vector<ConfigPageImpl *> pages;
+      m_config_pages.clear ();
 
       if (f_config_pages.can_issue ()) {
-        pages = f_config_pages.issue<PluginFactoryBase, std::vector<ConfigPageImpl *> > (&PluginFactoryBase::get_config_pages_impl);
+        f_config_pages.issue<PluginFactoryBase> (&PluginFactoryBase::get_config_pages_impl);
       } else {
-        pages = get_config_pages_impl ();
+        get_config_pages_impl ();
       }
 
       pages_out.clear ();
-      for (auto i = pages.begin (); i != pages.end (); ++i) {
+      for (auto i = m_config_pages.begin (); i != m_config_pages.end (); ++i) {
         if (*i) {
           (*i)->setParent (parent);
           pages_out.push_back (std::make_pair ((*i)->title (), *i));
         }
       }
+
+      m_config_pages.clear ();
 
     } catch (tl::Exception &ex) {
       tl::error << ex.msg ();
@@ -828,6 +829,7 @@ private:
   bool m_implements_mouse_mode;
   std::string m_mouse_mode_title;
   tl::RegisteredClass <lay::PluginDeclaration> *mp_registration;
+  mutable std::vector<ConfigPageImpl *> m_config_pages;
 };
 
 Class<gsi::PluginFactoryBase> decl_PluginFactory ("lay", "PluginFactory",
@@ -959,7 +961,7 @@ Class<gsi::PluginFactoryBase> decl_PluginFactory ("lay", "PluginFactory",
     "\n\n"
   ) +
 #if defined(HAVE_QTBINDINGS)
-  method ("create_editor_option_pages", &PluginFactoryBase::get_editor_options_pages,
+  callback ("create_editor_option_pages", &PluginFactoryBase::get_editor_options_pages, &PluginFactoryBase::f_get_editor_options_pages,
     "@brief Creates the editor option pages\n"
     "The editor option pages are widgets of type \\EditorOptionsPage. These QFrame-type widgets "
     "are displayed in a seperate dock (the 'editor options') and become visible when the plugin is active - i.e. "
@@ -971,7 +973,14 @@ Class<gsi::PluginFactoryBase> decl_PluginFactory ("lay", "PluginFactory",
     "\n"
     "This method has been introduced in version 0.30.4."
   ) +
-  method ("create_config_pages", &PluginFactoryBase::config_pages,
+  method ("add_config_page", &PluginFactoryBase::add_config_page, gsi::arg ("page"),
+    "@brief Adds the given configuration page\n"
+    "See \\create_config_pages how to use this function. The method is effective only in "
+    "the reimplementation context of this function.\n"
+    "\n"
+    "This method has been introduced in version 0.30.4."
+  ) +
+  callback ("create_config_pages", &PluginFactoryBase::get_config_pages_impl, &PluginFactoryBase::f_config_pages,
     "@brief Creates the configuration widgets\n"
     "The configuration pages are widgets that are displayed in the "
     "configuration dialog ('File/Setup'). Every plugin can create multiple such "
@@ -980,8 +989,8 @@ Class<gsi::PluginFactoryBase> decl_PluginFactory ("lay", "PluginFactory",
     "The title string also specifies the location of the widget in the "
     "configuration page hierarchy. See \\ConfigPage for more details.\n"
     "\n"
-    "This method is a factory. This means it will create objects and the ownership is taken "
-    "by the receiver.\n"
+    "In order to create config pages, instantiate a \\ConfigPage object and "
+    "call \\add_config_page to register it.\n"
     "\n"
     "This method has been introduced in version 0.30.4."
   ) +

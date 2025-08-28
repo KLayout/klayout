@@ -31,7 +31,6 @@ SOURCES += \
   gsiDeclLayLayoutViewBase.cc \
   gsiDeclLayMarker.cc \
   gsiDeclLayMenu.cc \
-  gsiDeclLayPlugin.cc \
   gsiDeclLayTlAdded.cc \
   gsiDeclLayRdbAdded.cc \
   layAbstractMenu.cc \

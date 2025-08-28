@@ -207,7 +207,7 @@ private:
 // --------------------------------------------------------------------------------------
 
 EditorServiceBase::EditorServiceBase (LayoutViewBase *view)
-  : lay::ViewService (view->canvas ()),
+  : lay::ViewService (view ? view->canvas () : 0),
     lay::Editable (view),
     lay::Plugin (view),
     mp_view (view),
@@ -215,6 +215,15 @@ EditorServiceBase::EditorServiceBase (LayoutViewBase *view)
     m_has_tracking_position (false)
 {
   //  .. nothing yet ..
+}
+
+void
+EditorServiceBase::init (LayoutViewBase *view)
+{
+  mp_view = view;
+  lay::Plugin::init (view);
+  lay::ViewService::init (view ? view->canvas () : 0);
+  lay::Editable::init (view);
 }
 
 EditorServiceBase::~EditorServiceBase ()

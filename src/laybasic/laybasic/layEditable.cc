@@ -54,6 +54,15 @@ Editable::Editable (lay::Editables *editables)
   }
 }
 
+void
+Editable::init (lay::Editables *editables)
+{
+  mp_editables = editables;
+  if (editables) {
+    editables->m_editables.push_back (this);
+  }
+}
+
 Editable::~Editable ()
 {
   //  Reasoning for reset (): on MSVC, virtual functions must not be called inside

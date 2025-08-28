@@ -23,13 +23,16 @@
 
 #include "gsiDecl.h"
 #include "gsiDeclBasic.h"
+#include "gsiEnums.h"
 #include "layPlugin.h"
 #include "layPluginConfigPage.h"
 #include "layEditorOptionsPage.h"
 #include "layEditorOptionsPages.h"
+#include "layEditorServiceBase.h"
 #include "layViewObject.h"
 #include "layLayoutViewBase.h"
 #include "layCursor.h"
+#include "edtConfig.h"
 
 #if defined(HAVE_QTBINDINGS)
 #  include "gsiQtGuiExternals.h"
@@ -251,12 +254,15 @@ Class<ConfigPageImpl> decl_ConfigPage (QT_EXTERNAL_BASE (QFrame) "lay", "ConfigP
 static bool s_in_create_plugin = false;
 
 class PluginBase
-  : public lay::Plugin, public lay::ViewService
+  : public lay::EditorServiceBase
 {
 public:
   PluginBase ()
-    : lay::Plugin (), lay::ViewService (),
-      mp_view (0), mp_dispatcher (0)
+    : lay::EditorServiceBase (),
+      mp_view (0), mp_dispatcher (0),
+      m_connect_ac (lay::AC_Any), m_move_ac (lay::AC_Any),
+      m_snap_to_objects (true),
+      m_snap_objects_to_grid (true)
   {
     if (! s_in_create_plugin) {
       throw tl::Exception (tl::to_string (tr ("A PluginBase object can only be created in the PluginFactory's create_plugin method")));
@@ -267,8 +273,7 @@ public:
   {
     mp_view = view;
     mp_dispatcher = dispatcher;
-    lay::Plugin::init (view);
-    lay::ViewService::init (view ? view->canvas () : 0);
+    lay::EditorServiceBase::init (view);
   }
 
   void grab_mouse ()
@@ -306,14 +311,116 @@ public:
     }
   }
 
-  virtual bool configure (const std::string &name, const std::string &value)
+  db::DPoint snap (db::DPoint p) const
+  {
+    //  snap according to the grid
+    if (m_edit_grid == db::DVector ()) {
+      p = lay::snap_xy (p, m_global_grid);
+    } else if (m_edit_grid.x () < 1e-6) {
+      ; //  nothing
+    } else {
+      p = lay::snap_xy (p, m_edit_grid);
+    }
+
+    return p;
+  }
+
+  db::DVector snap_vector (db::DVector v) const
+  {
+    //  snap according to the grid
+    if (m_edit_grid == db::DVector ()) {
+      v = lay::snap_xy (db::DPoint () + v, m_global_grid) - db::DPoint ();
+    } else if (m_edit_grid.x () < 1e-6) {
+      ; //  nothing
+    } else {
+      v = lay::snap_xy (db::DPoint () + v, m_edit_grid) - db::DPoint ();
+    }
+
+    return v;
+  }
+
+  db::DPoint snap_from_to (const db::DPoint &p, const db::DPoint &plast, bool connect, lay::angle_constraint_type ac) const
+  {
+    db::DPoint ps = plast + lay::snap_angle (db::DVector (p - plast), connect ? connect_ac (ac) : move_ac (ac));
+    return snap (ps);
+  }
+
+  db::DVector snap_delta (const db::DVector &v, bool connect, lay::angle_constraint_type ac) const
+  {
+    return snap_vector (lay::snap_angle (v, connect ? connect_ac (ac) : move_ac (ac)));
+  }
+
+  db::DPoint snap2 (const db::DPoint &p, bool visualize)
+  {
+    double snap_range = ui ()->mouse_event_trans ().inverted ().ctrans (edt::snap_range_pixels ());
+    auto details = lay::obj_snap (m_snap_to_objects ? view () : 0, p, m_edit_grid == db::DVector () ? m_global_grid : m_edit_grid, snap_range);
+    if (visualize) {
+      mouse_cursor_from_snap_details (details);
+    }
+    return details.snapped_point;
+  }
+
+  db::DPoint snap2_from_to (const db::DPoint &p, const db::DPoint &plast, bool connect, lay::angle_constraint_type ac, bool visualize)
+  {
+    double snap_range = ui ()->mouse_event_trans ().inverted ().ctrans (edt::snap_range_pixels ());
+    auto details = lay::obj_snap (m_snap_to_objects ? view () : 0, plast, p, m_edit_grid == db::DVector () ? m_global_grid : m_edit_grid, connect ? connect_ac (ac) : move_ac (ac), snap_range);
+    if (visualize) {
+      mouse_cursor_from_snap_details (details);
+    }
+    return details.snapped_point;
+  }
+
+  /**
+   *  @brief Captures some edt space configuration events for convencience
+   */
+  void configure_edt (const std::string &name, const std::string &value)
+  {
+    edt::EditGridConverter egc;
+    edt::ACConverter acc;
+
+    if (name == edt::cfg_edit_global_grid) {
+      egc.from_string (value, m_global_grid);
+    } else if (name == edt::cfg_edit_grid) {
+      egc.from_string (value, m_edit_grid);
+    } else if (name == edt::cfg_edit_snap_to_objects) {
+      tl::from_string (value, m_snap_to_objects);
+    } else if (name == edt::cfg_edit_snap_objects_to_grid) {
+      tl::from_string (value, m_snap_objects_to_grid);
+    } else if (name == edt::cfg_edit_move_angle_mode) {
+      acc.from_string (value, m_move_ac);
+    } else if (name == edt::cfg_edit_connect_angle_mode) {
+      acc.from_string (value, m_connect_ac);
+    } else {
+      lay::EditorServiceBase::configure (name, value);
+    }
+  }
+
+  /**
+   *  @brief The implementation does not allow to bypass the base class configuration call
+   */
+  bool configure_impl (const std::string &name, const std::string &value)
   {
     return f_configure.can_issue () ? f_configure.issue<PluginBase, bool, const std::string &, const std::string &> (&PluginBase::configure, name, value) : lay::Plugin::configure (name, value);
   }
 
-  virtual void config_finalize ()
+  virtual bool configure (const std::string &name, const std::string &value)
+  {
+    configure_edt (name, value);
+    return configure_impl (name, value);
+  }
+
+  /**
+   *  @brief The implementation does not allow to bypass the base class configuration call
+   */
+  virtual void config_finalize_impl ()
   {
     f_config_finalize.can_issue () ? f_config_finalize.issue<PluginBase> (&PluginBase::config_finalize) : lay::Plugin::config_finalize ();
+  }
+
+  virtual void config_finalize ()
+  {
+    lay::EditorServiceBase::config_finalize ();
+    config_finalize_impl ();
   }
 
   virtual bool key_event (unsigned int key, unsigned int buttons) 
@@ -487,14 +594,14 @@ public:
     }
   }
 
-  lay::LayoutViewBase *view ()
+  lay::LayoutViewBase *view () const
   {
-    return mp_view.get ();
+    return const_cast<lay::LayoutViewBase *> (mp_view.get ());
   }
 
-  lay::Dispatcher *dispatcher ()
+  lay::Dispatcher *dispatcher () const
   {
-    return mp_dispatcher.get ();
+    return const_cast<lay::Dispatcher *> (mp_dispatcher.get ());
   }
 
 #if defined(HAVE_QTBINDINGS)
@@ -531,6 +638,25 @@ public:
 private:
   tl::weak_ptr<lay::LayoutViewBase> mp_view;
   tl::weak_ptr<lay::Dispatcher> mp_dispatcher;
+
+  //  Angle constraints and grids
+  lay::angle_constraint_type m_connect_ac, m_move_ac;
+  db::DVector m_edit_grid;
+  bool m_snap_to_objects;
+  bool m_snap_objects_to_grid;
+  db::DVector m_global_grid;
+
+  lay::angle_constraint_type connect_ac (lay::angle_constraint_type ac) const
+  {
+    //  m_alt_ac (which is set from mouse buttons) can override the specified connect angle constraint
+    return ac != lay::AC_Global ? ac : m_connect_ac;
+  }
+
+  lay::angle_constraint_type move_ac (lay::angle_constraint_type ac) const
+  {
+    //  m_alt_ac (which is set from mouse buttons) can override the specified move angle constraint
+    return ac != lay::AC_Global ? ac : m_move_ac;
+  }
 };
 
 static std::map <std::string, PluginFactoryBase *> s_factories;
@@ -968,7 +1094,6 @@ Class<gsi::PluginFactoryBase> decl_PluginFactory ("lay", "PluginFactory",
     "\\MainWindow or listening to \\configure callbacks (either in the factory or the plugin instance). Configuration variables can "
     "be set using \"set_config\" from \\MainWindow. This scheme also works without registering the configuration options, but "
     "doing so has the advantage that it is guaranteed that a variable with this keys exists and has the given default value initially."
-    "\n\n"
   ) +
 #if defined(HAVE_QTBINDINGS)
   method ("add_editor_options_page", &PluginFactoryBase::add_editor_options_page, gsi::arg ("page"),
@@ -1093,19 +1218,28 @@ Class<gsi::PluginFactoryBase> decl_PluginFactory ("lay", "PluginFactory",
   "This class has been introduced in version 0.22.\n"
 );
 
+/*@@@ to add:
+void add_mouse_cursor (const db::DPoint &pt, bool emphasize = false);
+void add_mouse_cursor (const db::Point &pt, unsigned int cv_index, const db::ICplxTrans &gt, const std::vector<db::DCplxTrans> &tv, bool emphasize = false);
+void add_edge_marker (const db::DEdge &e, bool emphasize = false);
+void add_edge_marker (const db::Edge &e, unsigned int cv_index, const db::ICplxTrans &gt, const std::vector<db::DCplxTrans> &tv, bool emphasize = false);
+void clear_mouse_cursors ();
+void mouse_cursor_from_snap_details (const lay::PointSnapToObjectResult &snap_details);
+@@@*/
+
 Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
   callback ("menu_activated", &gsi::PluginBase::menu_activated, &gsi::PluginBase::f_menu_activated, gsi::arg ("symbol"),
     "@brief Gets called when a custom menu item is selected\n"
     "When a menu item is clicked which was registered with the plugin factory, the plugin's 'menu_activated' method is "
     "called for the current view. The symbol registered for the menu item is passed in the 'symbol' argument."
   ) +
-  callback ("configure", &gsi::PluginBase::configure, &gsi::PluginBase::f_configure, gsi::arg ("name"), gsi::arg ("value"),
+  callback ("configure", &gsi::PluginBase::configure_impl, &gsi::PluginBase::f_configure, gsi::arg ("name"), gsi::arg ("value"),
     "@brief Sends configuration requests to the plugin\n"
     "@param name The name of the configuration variable as registered in the plugin factory\n"
     "@param value The value of the configuration variable\n"
     "When a configuration variable is changed, the new value is reported to the plugin by calling the 'configure' method."
   ) +
-  callback ("config_finalize", &gsi::PluginBase::config_finalize, &gsi::PluginBase::f_config_finalize,
+  callback ("config_finalize", &gsi::PluginBase::config_finalize_impl, &gsi::PluginBase::f_config_finalize,
     "@brief Sends the post-configuration request to the plugin\n"
     "After all configuration parameters have been sent, 'config_finalize' is called to given the plugin a chance to "
     "update its internal state according to the new configuration.\n"
@@ -1216,6 +1350,100 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
     "\n"
     "This method has been added in version 0.27.6."
   ) +
+  method ("snap", &gsi::PluginBase::snap, gsi::arg ("p"),
+    "@brief Snaps a point to the edit grid\n"
+    "\n"
+    "@param p The point to snap\n"
+    "\n"
+    "If the edit grid is given, the point's x and y components\n"
+    "are snapped to the edit grid. Otherwise the global grid is used.\n"
+    "Edit and global grid are set by configuration options.\n"
+    "\n"
+    "This method has been added in version 0.30.4."
+  ) +
+  method ("snap", &gsi::PluginBase::snap_vector, gsi::arg ("v"),
+    "@brief Snaps a vector to the edit grid\n"
+    "\n"
+    "@param v The vector to snap\n"
+    "\n"
+    "If the edit grid is given, the vector's x and y components\n"
+    "are snapped to the edit grid. Otherwise the global grid is used.\n"
+    "Edit and global grid are set by configuration options.\n"
+    "\n"
+    "This method has been added in version 0.30.4."
+  ) +
+  method ("snap", &gsi::PluginBase::snap_from_to, gsi::arg ("p"), gsi::arg ("plast"), gsi::arg ("connect", false), gsi::arg ("ac", lay::AC_Global, "AC_Global"),
+    "@brief Snaps a point to the edit grid with an angle constraint\n"
+    "\n"
+    "@param p The point to snap\n"
+    "@param plast The last point of the connection/move vector\n"
+    "@param connect true, if the point is an connection vertex, false if it is a move target point\n"
+    "@param ac Overrides the connect or move angle constraint unless it is \\Plugin#AC_Global\n"
+    "\n"
+    "This method snaps point \"p\" relative to the initial point \"plast\". This method\n"
+    "tries to snap \"p\" to the edit or global grid (edit grid with higher priority), while\n"
+    "trying to observe the angle constraint that imposes a constraint on the way \"p\"\n"
+    "can move relative to \"plast\".\n"
+    "\n"
+    "The \"connect\" parameter will decide which angle constraint to use, unless \"ac\" specifies\n"
+    "an angle constraint already. If \"connect\" is true, the line between \"p\" and \"plast\" is regarded a connection\n"
+    "between points (e.g. a polygon edge) and the connection angle constraint applies. Otherwise\n"
+    "the move constraint applies.\n"
+    "\n"
+    "The angle constraint determines how \"p\" can move in relation to \"plast\" - for example,\n"
+    "if the angle constraint is \\Plugin#AC_Ortho, \"p\" can only move away from \"plast\" in horizontal or vertical direction.\n"
+    "\n"
+    "This method has been added in version 0.30.4."
+  ) +
+  method ("snap", &gsi::PluginBase::snap_delta, gsi::arg ("v"), gsi::arg ("connect", false), gsi::arg ("ac", lay::AC_Global, "AC_Global"),
+    "@brief Snaps a move vector to the edit grid with and implies an angle constraint\n"
+    "\n"
+    "@param v The vector to snap\n"
+    "@param connect true, if the vector is an connection vector, false if it is a move vector\n"
+    "@param ac Overrides the connect or move angle constraint unless it is AC_Global\n"
+    "\n"
+    "The \"connect\" parameter will decide which angle constraint to use, unless \"ac\" specifies\n"
+    "an angle constraint already. If \"connect\" is true, the vector is regarded a connection line\n"
+    "between points (e.g. a polygon edge) and the connection angle constraint applies. Otherwise\n"
+    "the move constraint applies.\n"
+    "\n"
+    "The angle constraint determines how \"p\" can move in relation to \"plast\" - for example,\n"
+    "if the angle constraint is \\Plugin#AC_Ortho, \"p\" can only move away from \"plast\" in horizontal or vertical direction.\n"
+    "\n"
+    "This method has been added in version 0.30.4."
+  ) +
+  method ("snap2", &gsi::PluginBase::snap2, gsi::arg ("p"), gsi::arg ("visualize", false),
+    "@brief Snaps a point to the edit grid with advanced snapping (including object snapping)\n"
+    "\n"
+    "@param p The point to snap\n"
+    "@param visualize If true, a cursor shape is added to the scene indicating the snap details\n"
+    "\n"
+    "This method behaves like the other \"snap2\" variant, but does not allow to specify an\n"
+    "angle constraint. Only grid constraints and snapping to objects is supported.\n"
+    "\n"
+    "This method has been added in version 0.30.4."
+  ) +
+  method ("snap2", &gsi::PluginBase::snap2_from_to, gsi::arg ("p"), gsi::arg ("plast"), gsi::arg ("connect", false), gsi::arg ("ac", lay::AC_Global, "AC_Global"), gsi::arg ("visualize", false),
+    "@brief Snaps a point to the edit grid with an angle constraint with advanced snapping (including object snapping)\n"
+    "\n"
+    "@param p The point to snap\n"
+    "@param plast The last point of the connection or move start point\n"
+    "@param connect true, if the point is an connection, false if it is a move target point\n"
+    "@param ac Overrides the connect or move angle constraint unless it is AC_Global\n"
+    "@param visualize If true, a cursor shape is added to the scene indicating the snap details\n"
+    "\n"
+    "This method will snap the point p, given an initial point \"plast\". This includes an angle constraint.\n"
+    "If \"connect\" is true, the line between \"plast\" and \"p\" is regarded a connection (e.g. a polygon edge).\n"
+    "If not, the line is regarded a move vector. If \"ac\" is \\Plugin#AC_Global, the angle constraint is \n"
+    "taken from the connect or move angle constraint, depending on the value of \"connect\". The angle constraint\n"
+    "determines how \"p\" can move in relation to \"plast\" - for example, if the angle constraint is \\Plugin#AC_Ortho, \n"
+    "\"p\" can only move away from \"plast\" in horizontal or vertical direction.\n"
+    "\n"
+    "This method considers options like global or editing grid or whether the target point\n"
+    "will snap to another object. The behavior is given by the respective configuration.\n"
+    "\n"
+    "This method has been added in version 0.30.4."
+  ) +
 #if defined(HAVE_QTBINDINGS)
   gsi::method ("editor_options_pages", &gsi::PluginBase::editor_options_pages,
     "@brief Gets the editor options pages which are associated with the view\n"
@@ -1249,6 +1477,32 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
   "\n"
   "This class has been introduced in version 0.22.\n"
 );
+
+gsi::Enum<lay::angle_constraint_type> decl_AngleConstraintType ("lay", "AngleConstraintType",
+  gsi::enum_const ("AC_Global", lay::AC_Global,
+    "@brief Specifies to use the global angle constraint.\n"
+  ) +
+  gsi::enum_const ("AC_Any", lay::AC_Any,
+    "@brief Specifies to use any angle and not snap to a specific direction.\n"
+  ) +
+  gsi::enum_const ("AC_Diagonal", lay::AC_Diagonal,
+    "@brief Specifies to use multiples of 45 degree.\n"
+  ) +
+  gsi::enum_const ("AC_Ortho", lay::AC_Ortho,
+    "@brief Specifies to use multiples of 90 degree.\n"
+  ) +
+  gsi::enum_const ("AC_Horizontal", lay::AC_Horizontal,
+    "@brief Specifies to use horizontal direction only.\n"
+  ) +
+  gsi::enum_const ("AC_Vertical", lay::AC_Vertical,
+    "@brief Specifies to use vertical direction only.\n"
+  ),
+  "@brief Specifies angle constraints during snapping.\n"
+  "\n"
+  "This enum has been introduced in version 0.30.4."
+);
+
+gsi::ClassExt<gsi::PluginBase> inject_AngleConstraintType_in_parent (decl_AngleConstraintType.defs ());
 
 class CursorNamespace { };
 

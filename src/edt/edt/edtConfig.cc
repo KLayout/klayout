@@ -28,6 +28,11 @@
 namespace edt
 {
 
+int snap_range_pixels ()
+{
+  return 8; // TODO: make variable
+}
+
 // -----------------------------------------------------------------------------
 
 std::string cfg_edit_grid ("edit-grid");

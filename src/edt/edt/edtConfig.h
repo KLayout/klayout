@@ -118,6 +118,8 @@ struct EDT_PUBLIC VAlignConverter
   void from_string (const std::string &s, db::VAlign &a);
 };
 
+int EDT_PUBLIC snap_range_pixels ();
+
 }
 
 #endif

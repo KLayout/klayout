@@ -119,6 +119,7 @@ SOURCES = \
     gsiDeclLayApplication.cc \
     gsiDeclLayHelpDialog.cc \
     gsiDeclLayMainWindow.cc \
+    gsiDeclLayPlugin.cc \
     layApplication.cc \
     layClipDialog.cc \
     layControlWidgetStack.cc \

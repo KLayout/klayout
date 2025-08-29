@@ -55,22 +55,6 @@ class PluginDeclarationBase;
 
 // -------------------------------------------------------------
 
-extern lay::angle_constraint_type ac_from_buttons (unsigned int buttons);
-
-// -------------------------------------------------------------
-
-/**
- *  @brief Utility function: serialize PCell parameters into a string
- */
-std::string pcell_parameters_to_string (const std::map<std::string, tl::Variant> &parameters);
-
-/**
- *  @brief Utility: deserialize PCell parameters from a string
- */
-std::map<std::string, tl::Variant> pcell_parameters_from_string (const std::string &s);
-
-// -------------------------------------------------------------
-
 /**
  *  @brief A utility class to implement a selection iterator across all editor services
  */

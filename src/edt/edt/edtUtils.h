@@ -30,6 +30,7 @@
 #include <vector>
 
 #include "layObjectInstPath.h"
+#include "laySnap.h"
 
 #include "dbInstElement.h"
 #include "dbClipboardData.h"
@@ -44,6 +45,16 @@ namespace lay
 namespace edt {
 
 class Service;
+
+// -------------------------------------------------------------
+
+/**
+ *  @brief Convert a button flag set to an angle constraint
+ *
+ *  This implements the standard modifiers for angle constraints - i.e.
+ *  ortho for "Shift".
+ */
+extern lay::angle_constraint_type ac_from_buttons (unsigned int buttons);
 
 /**
  *  @brief Serializes PCell parameters to a string

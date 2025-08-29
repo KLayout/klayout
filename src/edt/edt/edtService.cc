@@ -40,27 +40,6 @@ namespace edt
 {
 
 // -------------------------------------------------------------
-//  Convert buttons to an angle constraint
-
-lay::angle_constraint_type 
-ac_from_buttons (unsigned int buttons)
-{
-  if ((buttons & lay::ShiftButton) != 0) {
-    if ((buttons & lay::ControlButton) != 0) {
-      return lay::AC_Any;
-    } else {
-      return lay::AC_Ortho;
-    }
-  } else {
-    if ((buttons & lay::ControlButton) != 0) {
-      return lay::AC_Diagonal;
-    } else {
-      return lay::AC_Global;
-    }
-  }
-}
-
-// -------------------------------------------------------------
 
 Service::Service (db::Manager *manager, lay::LayoutViewBase *view, db::ShapeIterator::flags_type flags)
   : lay::EditorServiceBase (view),

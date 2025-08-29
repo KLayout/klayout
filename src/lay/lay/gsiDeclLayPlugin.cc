@@ -33,6 +33,7 @@
 #include "layLayoutViewBase.h"
 #include "layCursor.h"
 #include "edtConfig.h"
+#include "edtUtils.h"
 
 #if defined(HAVE_QTBINDINGS)
 #  include "gsiQtGuiExternals.h"
@@ -428,7 +429,7 @@ public:
     if (f_key_event.can_issue ()) {
       return f_key_event.issue<lay::ViewService, bool, unsigned int, unsigned int> (&lay::ViewService::key_event, key, buttons);
     } else {
-      return lay::ViewService::key_event (key, buttons);
+      return lay::EditorServiceBase::key_event (key, buttons);
     }
   }
 
@@ -437,7 +438,7 @@ public:
     if (f_mouse_press_event.can_issue ()) {
       return f_mouse_press_event.issue (&PluginBase::mouse_press_event_noref, p, buttons, prio);
     } else {
-      return lay::ViewService::mouse_press_event (p, buttons, prio);
+      return lay::EditorServiceBase::mouse_press_event (p, buttons, prio);
     }
   }
 
@@ -452,7 +453,7 @@ public:
     if (f_mouse_click_event.can_issue ()) {
       return f_mouse_click_event.issue (&PluginBase::mouse_click_event_noref, p, buttons, prio);
     } else {
-      return lay::ViewService::mouse_click_event (p, buttons, prio);
+      return lay::EditorServiceBase::mouse_click_event (p, buttons, prio);
     }
   }
 
@@ -467,7 +468,7 @@ public:
     if (f_mouse_double_click_event.can_issue ()) {
       return f_mouse_double_click_event.issue (&PluginBase::mouse_double_click_event_noref, p, buttons, prio);
     } else {
-      return lay::ViewService::mouse_double_click_event (p, buttons, prio);
+      return lay::EditorServiceBase::mouse_double_click_event (p, buttons, prio);
     }
   }
 
@@ -480,18 +481,18 @@ public:
   virtual bool leave_event (bool prio)
   {
     if (f_leave_event.can_issue ()) {
-      return f_leave_event.issue<lay::ViewService, bool, bool> (&lay::ViewService::leave_event, prio);
+      return f_leave_event.issue<lay::EditorServiceBase, bool, bool> (&lay::ViewService::leave_event, prio);
     } else {
-      return lay::ViewService::leave_event (prio);
+      return lay::EditorServiceBase::leave_event (prio);
     }
   }
 
   virtual bool enter_event (bool prio)
   {
     if (f_enter_event.can_issue ()) {
-      return f_enter_event.issue<lay::ViewService, bool, bool> (&lay::ViewService::enter_event, prio);
+      return f_enter_event.issue<lay::EditorServiceBase, bool, bool> (&lay::ViewService::enter_event, prio);
     } else {
-      return lay::ViewService::enter_event (prio);
+      return lay::EditorServiceBase::enter_event (prio);
     }
   }
 
@@ -500,7 +501,7 @@ public:
     if (f_mouse_move_event.can_issue ()) {
       return f_mouse_move_event.issue (&PluginBase::mouse_move_event_noref, p, buttons, prio);
     } else {
-      return lay::ViewService::mouse_move_event (p, buttons, prio);
+      return lay::EditorServiceBase::mouse_move_event (p, buttons, prio);
     }
   }
 
@@ -543,54 +544,110 @@ public:
   virtual void activated ()
   {
     if (f_activated.can_issue ()) {
-      f_activated.issue<lay::ViewService> (&lay::ViewService::activated);
+      f_activated.issue<lay::EditorServiceBase> (&lay::EditorServiceBase::activated);
     } else {
-      lay::ViewService::activated ();
+      lay::EditorServiceBase::activated ();
+    }
+  }
+
+  void deactivated_impl ()
+  {
+    if (f_deactivated.can_issue ()) {
+      f_deactivated.issue<PluginBase> (&PluginBase::deactivated_impl);
     }
   }
 
   virtual void deactivated ()
   {
-    if (f_deactivated.can_issue ()) {
-      f_deactivated.issue<lay::ViewService> (&lay::ViewService::deactivated);
-    } else {
-      lay::ViewService::deactivated ();
-    }
+    lay::EditorServiceBase::deactivated ();
+    deactivated_impl ();
   }
 
   virtual void drag_cancel ()
   {
     if (f_drag_cancel.can_issue ()) {
-      f_drag_cancel.issue<lay::ViewService> (&lay::ViewService::drag_cancel);
+      f_drag_cancel.issue<lay::EditorServiceBase> (&lay::EditorServiceBase::drag_cancel);
     } else {
-      lay::ViewService::drag_cancel ();
+      lay::EditorServiceBase::drag_cancel ();
     }
   }
 
   virtual void update ()
   {
     if (f_update.can_issue ()) {
-      f_update.issue<lay::ViewService> (&lay::ViewService::update);
+      f_update.issue<lay::EditorServiceBase> (&lay::EditorServiceBase::update);
     } else {
-      lay::ViewService::update ();
+      lay::EditorServiceBase::update ();
     }
+  }
+
+  void add_mouse_cursor_dpoint (const db::DPoint &p, bool emphasize)
+  {
+    lay::EditorServiceBase::add_mouse_cursor (p, emphasize);
+  }
+
+  void add_mouse_cursor_point (const db::Point &p, int cv_index, const db::LayerProperties &lp, bool emphasize)
+  {
+    const lay::CellView &cv = view ()->cellview (cv_index);
+    if (! cv.is_valid ()) {
+      return;
+    }
+
+    int layer = cv->layout ().get_layer_maybe (lp);
+    if (layer < 0) {
+      return;
+    }
+
+    edt::TransformationVariants tv (view ());
+    const std::vector<db::DCplxTrans> *tv_list = tv.per_cv_and_layer (cv_index, (unsigned int) layer);
+    if (! tv_list || tv_list->empty ()) {
+      return;
+    }
+
+    lay::EditorServiceBase::add_mouse_cursor (p, cv_index, cv.context_trans (), *tv_list, emphasize);
+  }
+
+  void add_edge_marker_dedge (const db::DEdge &p, bool emphasize)
+  {
+    lay::EditorServiceBase::add_edge_marker (p, emphasize);
+  }
+
+  void add_edge_marker_edge (const db::Edge &p, int cv_index, const db::LayerProperties &lp, bool emphasize)
+  {
+    const lay::CellView &cv = view ()->cellview (cv_index);
+    if (! cv.is_valid ()) {
+      return;
+    }
+
+    int layer = cv->layout ().get_layer_maybe (lp);
+    if (layer < 0) {
+      return;
+    }
+
+    edt::TransformationVariants tv (view ());
+    const std::vector<db::DCplxTrans> *tv_list = tv.per_cv_and_layer (cv_index, (unsigned int) layer);
+    if (! tv_list || tv_list->empty ()) {
+      return;
+    }
+
+    lay::EditorServiceBase::add_edge_marker (p, cv_index, cv.context_trans (), *tv_list, emphasize);
   }
 
   virtual bool has_tracking_position () const
   {
     if (f_has_tracking_position.can_issue ()) {
-      return f_has_tracking_position.issue<lay::ViewService, bool> (&lay::ViewService::has_tracking_position);
+      return f_has_tracking_position.issue<lay::EditorServiceBase, bool> (&lay::EditorServiceBase::has_tracking_position);
     } else {
-      return lay::ViewService::has_tracking_position ();
+      return lay::EditorServiceBase::has_tracking_position ();
     }
   }
 
   virtual db::DPoint tracking_position () const
   {
     if (f_tracking_position.can_issue ()) {
-      return f_tracking_position.issue<lay::ViewService, db::DPoint> (&lay::ViewService::tracking_position);
+      return f_tracking_position.issue<lay::EditorServiceBase, db::DPoint> (&lay::EditorServiceBase::tracking_position);
     } else {
-      return lay::ViewService::tracking_position ();
+      return lay::EditorServiceBase::tracking_position ();
     }
   }
 
@@ -1218,15 +1275,6 @@ Class<gsi::PluginFactoryBase> decl_PluginFactory ("lay", "PluginFactory",
   "This class has been introduced in version 0.22.\n"
 );
 
-/*@@@ to add:
-void add_mouse_cursor (const db::DPoint &pt, bool emphasize = false);
-void add_mouse_cursor (const db::Point &pt, unsigned int cv_index, const db::ICplxTrans &gt, const std::vector<db::DCplxTrans> &tv, bool emphasize = false);
-void add_edge_marker (const db::DEdge &e, bool emphasize = false);
-void add_edge_marker (const db::Edge &e, unsigned int cv_index, const db::ICplxTrans &gt, const std::vector<db::DCplxTrans> &tv, bool emphasize = false);
-void clear_mouse_cursors ();
-void mouse_cursor_from_snap_details (const lay::PointSnapToObjectResult &snap_details);
-@@@*/
-
 Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
   callback ("menu_activated", &gsi::PluginBase::menu_activated, &gsi::PluginBase::f_menu_activated, gsi::arg ("symbol"),
     "@brief Gets called when a custom menu item is selected\n"
@@ -1350,6 +1398,62 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
     "\n"
     "This method has been added in version 0.27.6."
   ) +
+  method ("clear_mouse_cursors", &gsi::PluginBase::clear_mouse_cursors,
+    "@brief Clears all existing mouse cursors\n"
+    "Use this function to remove exisiting mouse cursors (see \\add_mouse_cursor and \\add_edge_marker).\n"
+    "This method is automatically called when the plugin becomes deactivated.\n"
+    "\n"
+    "This method has been added in version 0.30.4."
+  ) +
+  method ("add_mouse_cursor", &gsi::PluginBase::add_mouse_cursor_dpoint, gsi::arg ("p"), gsi::arg ("emphasize", false),
+    "@brief Creates a cursor to indicate the mouse position\n"
+    "This function will create a marker that indicates the (for example snapped) mouse position. "
+    "In addition to this, it will establish the position for the tracking cursor, if mouse "
+    "tracking is enabled in the application. Multiple cursors can be created. In that case, the "
+    "tracking position is given by the last cursor.\n"
+    "\n"
+    "If 'emphasize' is true, the cursor is displayed in a 'stronger' style - i.e. with a double circle instead of a single one.\n"
+    "\n"
+    "Before you use this method, clear existing cursors with \\clear_mouse_cursors.\n"
+    "\n"
+    "This method has been added in version 0.30.4."
+  ) +
+  method ("add_mouse_cursor", &gsi::PluginBase::add_mouse_cursor_point, gsi::arg ("p"), gsi::arg ("cv_index"), gsi::arg ("layer"), gsi::arg ("emphasize", false),
+    "@brief Creates a cursor to indicate the mouse position\n"
+    "This version of this method creates a mouse cursor based on the integer-unit point and\n"
+    "a source cellview index plus a layer info.\n"
+    "The cellview index and layer info is used to derive the transformation rules to apply to the "
+    "point and to compute the final position.\n"
+    "\n"
+    "This method has been added in version 0.30.4."
+  ) +
+  method ("add_edge_marker", &gsi::PluginBase::add_edge_marker_dedge, gsi::arg ("e"), gsi::arg ("emphasize", false),
+    "@brief Creates a cursor to indicate an edge\n"
+    "This function will create a marker that indicates an edge - for example the edge that a point is snapping to. "
+    "\n"
+    "If 'emphasize' is true, the cursor is displayed in a 'stronger' style.\n"
+    "\n"
+    "Before you use this method, clear existing edge markers and cursors with \\clear_mouse_cursors.\n"
+    "\n"
+    "This method has been added in version 0.30.4."
+  ) +
+  method ("add_edge_marker", &gsi::PluginBase::add_edge_marker_edge, gsi::arg ("e"), gsi::arg ("cv_index"), gsi::arg ("layer"), gsi::arg ("emphasize", false),
+    "@brief Creates a cursor to indicate an edge\n"
+    "This version of this method creates an edge marker based on the integer-unit edge and\n"
+    "a source cellview index plus a layer info.\n"
+    "The cellview index and layer info is used to derive the transformation rules to apply to the "
+    "edge and to compute the final position.\n"
+    "\n"
+    "This method has been added in version 0.30.4."
+  ) +
+  method ("ac_from_buttons", &edt::ac_from_buttons, gsi::arg ("buttons"),
+    "@brief Creates an angle constraint from a button combination\n"
+    "This method provides the angle constraints implied by a specific modifier combination, i.e. "
+    "'Shift' will render ortho snapping. Use this function to generate angle constraints following "
+    "the established conventions.\n"
+    "\n"
+    "This method has been added in version 0.30.4."
+  ) +
   method ("snap", &gsi::PluginBase::snap, gsi::arg ("p"),
     "@brief Snaps a point to the edit grid\n"
     "\n"
@@ -1421,6 +1525,10 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
     "This method behaves like the other \"snap2\" variant, but does not allow to specify an\n"
     "angle constraint. Only grid constraints and snapping to objects is supported.\n"
     "\n"
+    "If \"visualize\" is true, the function will generate calls to \\add_mouse_cursor or \\add_edge_marker to "
+    "provide a visualization of the edges or vertexes that the point is snapping to. If you use this feature, "
+    "make sure you call \\clear_mouse_cursors before to remove existing cursors.\n"
+    "\n"
     "This method has been added in version 0.30.4."
   ) +
   method ("snap2", &gsi::PluginBase::snap2_from_to, gsi::arg ("p"), gsi::arg ("plast"), gsi::arg ("connect", false), gsi::arg ("ac", lay::AC_Global, "AC_Global"), gsi::arg ("visualize", false),
@@ -1441,6 +1549,10 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
     "\n"
     "This method considers options like global or editing grid or whether the target point\n"
     "will snap to another object. The behavior is given by the respective configuration.\n"
+    "\n"
+    "If \"visualize\" is true, the function will generate calls to \\add_mouse_cursor or \\add_edge_marker to "
+    "provide a visualization of the edges or vertexes that the point is snapping to. If you use this feature, "
+    "make sure you call \\clear_mouse_cursors before to remove existing cursors.\n"
     "\n"
     "This method has been added in version 0.30.4."
   ) +

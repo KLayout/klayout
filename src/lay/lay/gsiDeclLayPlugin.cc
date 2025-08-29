@@ -404,6 +404,12 @@ public:
     return f_configure.can_issue () ? f_configure.issue<PluginBase, bool, const std::string &, const std::string &> (&PluginBase::configure, name, value) : lay::Plugin::configure (name, value);
   }
 
+  //  for testing
+  void configure_test (const std::string &name, const std::string &value)
+  {
+    configure_edt (name, value);
+  }
+
   virtual bool configure (const std::string &name, const std::string &value)
   {
     configure_edt (name, value);
@@ -633,13 +639,35 @@ public:
     lay::EditorServiceBase::add_edge_marker (p, cv_index, cv.context_trans (), *tv_list, emphasize);
   }
 
+  //  for testing
+  bool has_tracking_position_test () const
+  {
+    return has_tracking_position ();
+  }
+
+  bool has_tracking_position_base () const
+  {
+    return lay::EditorServiceBase::has_tracking_position ();
+  }
+
   virtual bool has_tracking_position () const
   {
     if (f_has_tracking_position.can_issue ()) {
       return f_has_tracking_position.issue<lay::EditorServiceBase, bool> (&lay::EditorServiceBase::has_tracking_position);
     } else {
-      return lay::EditorServiceBase::has_tracking_position ();
+      return has_tracking_position_base ();
     }
+  }
+
+  //  for testing
+  db::DPoint tracking_position_test () const
+  {
+    return tracking_position ();
+  }
+
+  db::DPoint tracking_position_base () const
+  {
+    return lay::EditorServiceBase::tracking_position ();
   }
 
   virtual db::DPoint tracking_position () const
@@ -647,7 +675,7 @@ public:
     if (f_tracking_position.can_issue ()) {
       return f_tracking_position.issue<lay::EditorServiceBase, db::DPoint> (&lay::EditorServiceBase::tracking_position);
     } else {
-      return lay::EditorServiceBase::tracking_position ();
+      return tracking_position_base ();
     }
   }
 
@@ -662,13 +690,17 @@ public:
   }
 
 #if defined(HAVE_QTBINDINGS)
-  std::vector<lay::EditorOptionsPage *> editor_options_pages ()
+  std::vector<QWidget *> editor_options_pages ()
   {
     lay::EditorOptionsPages *eo_pages = view ()->editor_options_pages ();
     if (!eo_pages) {
-      return std::vector<lay::EditorOptionsPage *> ();
+      return std::vector<QWidget *> ();
     } else {
-      return eo_pages->pages ();
+      std::vector<QWidget *> pages;
+      for (auto p = eo_pages->pages ().begin (); p != eo_pages->pages ().end (); ++p) {
+        pages.push_back (*p);
+      }
+      return pages;
     }
   }
 #endif
@@ -1281,6 +1313,7 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
     "When a menu item is clicked which was registered with the plugin factory, the plugin's 'menu_activated' method is "
     "called for the current view. The symbol registered for the menu item is passed in the 'symbol' argument."
   ) +
+  method ("configure_test", &gsi::PluginBase::configure_test, gsi::arg ("name"), gsi::arg ("value"), "@hide") +
   callback ("configure", &gsi::PluginBase::configure_impl, &gsi::PluginBase::f_configure, gsi::arg ("name"), gsi::arg ("value"),
     "@brief Sends configuration requests to the plugin\n"
     "@param name The name of the configuration variable as registered in the plugin factory\n"
@@ -1384,6 +1417,8 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
     "\n"
     "The cursor type is one of the cursor constants in the \\Cursor class, i.e. 'CursorArrow' for the normal cursor."
   ) +
+  method ("has_tracking_position_test", &gsi::PluginBase::has_tracking_position_test, "@hide") +
+  method ("has_tracking_position", &gsi::PluginBase::has_tracking_position_base, "@hide") +
   callback ("has_tracking_position", &gsi::PluginBase::has_tracking_position, &gsi::PluginBase::f_has_tracking_position,
     "@brief Gets a value indicating whether the plugin provides a tracking position\n"
     "The tracking position is shown in the lower-left corner of the layout window to indicate the current position.\n"
@@ -1392,6 +1427,8 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
     "\n"
     "This method has been added in version 0.27.6."
   ) +
+  method ("tracking_position_test", &gsi::PluginBase::tracking_position_test, "@hide") +
+  method ("tracking_position", &gsi::PluginBase::tracking_position_base, "@hide") +
   callback ("tracking_position", &gsi::PluginBase::tracking_position, &gsi::PluginBase::f_tracking_position,
     "@brief Gets the tracking position\n"
     "See \\has_tracking_position for details.\n"

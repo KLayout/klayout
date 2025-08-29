@@ -602,20 +602,25 @@ void LayoutViewBase::create_plugins (const lay::PluginDeclaration *except_this)
   clear_plugins ();
 
   //  create the plugins
-  for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
+  for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ) {
 
-    if (&*cls != except_this) {
+    //  NOTE: during "create_plugin" a plugin may be unregistered, so don't increment the iterator after
+    auto current = cls.operator-> ();
+    std::string current_name = cls.current_name ();
+    ++cls;
+
+    if (current != except_this) {
 
       //  TODO: clean solution. The following is a HACK:
-      if (cls.current_name () == "ant::Plugin" || cls.current_name () == "img::Plugin") {
+      if (current_name == "ant::Plugin" || current_name == "img::Plugin") {
         //  ant and img are created always
-        create_plugin (&*cls);
+        create_plugin (current);
       } else if ((options () & LV_NoPlugins) == 0) {
         //  others: only create unless LV_NoPlugins is set
-        create_plugin (&*cls);
-      } else if ((options () & LV_NoGrid) == 0 && cls.current_name () == "GridNetPlugin") {
+        create_plugin (current);
+      } else if ((options () & LV_NoGrid) == 0 && current_name == "GridNetPlugin") {
         //  except grid net plugin which is created on request
-        create_plugin (&*cls);
+        create_plugin (current);
       }
 
     }

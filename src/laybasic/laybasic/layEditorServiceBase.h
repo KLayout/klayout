@@ -141,8 +141,14 @@ public:
    */
   void show_error (tl::Exception &ex);
 
-protected:
+  /**
+   *  @brief Sets a configuration option
+   */
   virtual bool configure (const std::string &name, const std::string &value);
+
+  /**
+   *  @brief Called when the plugin is deactivated
+   */
   virtual void deactivated ();
 
 private:

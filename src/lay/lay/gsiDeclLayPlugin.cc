@@ -698,7 +698,9 @@ public:
     } else {
       std::vector<QWidget *> pages;
       for (auto p = eo_pages->pages ().begin (); p != eo_pages->pages ().end (); ++p) {
-        pages.push_back (*p);
+        if ((*p)->plugin_declaration () == plugin_declaration ()) {
+          pages.push_back (*p);
+        }
       }
       return pages;
     }

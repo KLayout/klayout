@@ -37,6 +37,18 @@ class PluginFactory < RBA::PluginFactory
   end
 end
 
+class Plugin2EditorOptionsPage < RBA::EditorOptionsPage
+  def initialize
+    super("title", 1)
+  end
+end
+
+class Plugin2ConfigPage < RBA::ConfigPage
+  def initialize
+    super("title")
+  end
+end
+
 class Plugin2 < RBA::Plugin
   def set_tp(tp)
     @tp = tp
@@ -51,15 +63,31 @@ end
 
 class PluginFactory2 < RBA::PluginFactory
   def initialize()
-    register(1001, "plugin_for_test2", "Plugin2")
+    @ep = 0
+    @cp = 0
     @pi = nil
+    register(1001, "plugin_for_test2", "Plugin2")
   end
   def create_plugin(manager, unused, view)
     @pi = Plugin2::new
     @pi
   end
+  def create_editor_options_pages
+    add_editor_options_page(Plugin2EditorOptionsPage::new)
+    @ep += 1
+  end
+  def create_config_pages
+    add_config_page(Plugin2ConfigPage::new)
+    @cp += 1
+  end
   def pi
     @pi
+  end
+  def ep
+    @ep
+  end
+  def cp
+    @cp
   end
 end
 
@@ -113,6 +141,11 @@ class LayPlugin_TestClass < TestBase
       assert_equal(pi2.tracking_position_test.to_s, "2,3")
       pi2.set_tp(nil)
       assert_equal(pi2.has_tracking_position_test, false)
+
+      assert_equal(dpi2.ep, 1)
+      assert_equal(dpi2.cp, 1)
+      assert_equal(pi2.editor_options_pages.size, 1)
+      assert_equal(pi2.editor_options_pages[0].class.to_s, "Plugin2EditorOptionsPage")
 
       pi.configure_test("edit-grid", "0.0")
       assert_equal(pi.snap(RBA::DPoint::new(0.01, 0.02)).to_s, "0.01,0.02")

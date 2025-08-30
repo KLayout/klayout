@@ -1584,8 +1584,8 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
     "angle constraint. Only grid constraints and snapping to objects is supported.\n"
     "\n"
     "If \"visualize\" is true, the function will generate calls to \\add_mouse_cursor or \\add_edge_marker to "
-    "provide a visualization of the edges or vertexes that the point is snapping to. If you use this feature, "
-    "make sure you call \\clear_mouse_cursors before to remove existing cursors.\n"
+    "provide a visualization of the edges or vertexes that the point is snapping to. \\clear_mouse_cursors will "
+    "be called before.\n"
     "\n"
     "This method has been added in version 0.30.4."
   ) +
@@ -1609,8 +1609,8 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
     "will snap to another object. The behavior is given by the respective configuration.\n"
     "\n"
     "If \"visualize\" is true, the function will generate calls to \\add_mouse_cursor or \\add_edge_marker to "
-    "provide a visualization of the edges or vertexes that the point is snapping to. If you use this feature, "
-    "make sure you call \\clear_mouse_cursors before to remove existing cursors.\n"
+    "provide a visualization of the edges or vertexes that the point is snapping to. \\clear_mouse_cursors will "
+    "be called before.\n"
     "\n"
     "This method has been added in version 0.30.4."
   ) +

@@ -208,10 +208,9 @@ public:
    *    MoveP2X - dragging P2.x (if box-like)
    *    MoveP1Y - dragging P1.y (if box-like)
    *    MoveP2Y - dragging P2.y (if box-like)
-   *    MoveRuler - dragging a whole ruler (one)
    *    MoveSelection - dragging a whole ruler (many)
    */
-  enum MoveMode { MoveNone, MoveP1, MoveP2, MoveP12, MoveP21, MoveP1X, MoveP2X, MoveP1Y, MoveP2Y, MoveRuler, MoveSelected };
+  enum MoveMode { MoveNone, MoveP1, MoveP2, MoveP12, MoveP21, MoveP1X, MoveP2X, MoveP1Y, MoveP2Y, MoveSelected };
 
   Service (db::Manager *manager, lay::LayoutViewBase *view);
 
@@ -601,7 +600,7 @@ private:
 
   std::pair<bool, db::DPoint> snap1 (const db::DPoint &p, bool obj_snap);
   lay::PointSnapToObjectResult snap1_details (const db::DPoint &p, bool obj_snap);
-  std::pair<bool, db::DPoint> snap2 (const db::DPoint &p1, const db::DPoint &p2, const ant::Object *obj, lay::angle_constraint_type ac);
+  db::DPoint snap2_visual (const db::DPoint &p1, const db::DPoint &p2, const ant::Object *obj, lay::angle_constraint_type ac);
   lay::PointSnapToObjectResult snap2_details (const db::DPoint &p1, const db::DPoint &p2, const ant::Object *obj, lay::angle_constraint_type ac);
   lay::TwoPointSnapToObjectResult auto_measure (const db::DPoint &p, lay::angle_constraint_type ac, const ant::Template &tpl);
 
@@ -619,6 +618,8 @@ private:
   virtual bool mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio);
   virtual bool mouse_double_click_event (const db::DPoint &p, unsigned int buttons, bool prio);
   virtual void deactivated ();
+
+  void snap_rulers (lay::angle_constraint_type ac);
 
   /**
    *  @brief Select a certain ruler

@@ -1194,7 +1194,7 @@ Class<gsi::PluginFactoryBase> decl_PluginFactory ("lay", "PluginFactory",
   ) +
   callback ("create_editor_options_pages", &PluginFactoryBase::get_editor_options_pages_impl, &PluginFactoryBase::f_get_editor_options_pages,
     "@brief Creates the editor option pages\n"
-    "The editor option pages are widgets of type \\EditorOptionsPage. These QFrame-type widgets "
+    "The editor option pages are widgets of type \\EditorOptionsPage. These Qt widgets "
     "are displayed in a seperate dock (the 'editor options') and become visible when the plugin is active - i.e. "
     "its mode is selected. Use this method to provide customized pages that will be displayed in the "
     "editor options dock.\n"
@@ -1378,6 +1378,9 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
   callback ("mouse_moved_event", &gsi::PluginBase::mouse_move_event_noref, &gsi::PluginBase::f_mouse_move_event, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
     "@brief Handles the mouse move event\n"
     "The behaviour of this callback is the same than for \\mouse_press_event, except that it is called when the mouse is moved in the canvas area.\n"
+    "\n"
+    "The mouse move event is important for a number of background jobs, such as coordinate display in the status bar.\n"
+    "Hence, you should not consume the event - i.e. you should return 'false' from this method.\n"
   ) +
   callback ("mouse_button_released_event", &gsi::PluginBase::mouse_release_event_noref, &gsi::PluginBase::f_mouse_release_event, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
     "@brief Handles the mouse button release event\n"
@@ -1412,8 +1415,8 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
   ) + 
   method ("set_cursor", &gsi::PluginBase::set_cursor, gsi::arg ("cursor_type"),
     "@brief Sets the cursor in the view area to the given type\n"
-    "Setting the cursor has an effect only inside event handlers, i.e. mouse_press_event. The cursor is not set permanently. Is is reset "
-    "in the mouse move handler unless a button is pressed or the cursor is explicitly set again in the mouse_move_event.\n"
+    "Setting the cursor has an effect only inside event handlers, i.e. \\mouse_button_pressed_event. The cursor is not set permanently. Is is reset "
+    "in the mouse move handler unless a button is pressed or the cursor is explicitly set again in \\mouse_moved_event.\n"
     "\n"
     "The cursor type is one of the cursor constants in the \\Cursor class, i.e. 'CursorArrow' for the normal cursor."
   ) +
@@ -1425,6 +1428,10 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
     "If this method returns true for the active service, the application will fetch the position by calling \\tracking_position "
     "rather than displaying the original mouse position.\n"
     "\n"
+    "The default implementation enables tracking if a mouse cursor has been set using \\add_mouse_cursor.\n"
+    "When enabling tracking, make sure a reimplementation of \\mouse_moved_event does not consume the\n"
+    "event and returns 'false'.\n"
+    "\n"
     "This method has been added in version 0.27.6."
   ) +
   method ("tracking_position_test", &gsi::PluginBase::tracking_position_test, "@hide") +
@@ -1432,6 +1439,11 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
   callback ("tracking_position", &gsi::PluginBase::tracking_position, &gsi::PluginBase::f_tracking_position,
     "@brief Gets the tracking position\n"
     "See \\has_tracking_position for details.\n"
+    "\n"
+    "The default implementation takes the tracking position from a mouse cursor, if you have created one using "
+    "\\add_mouse_cursor.\n"
+    "When enabling tracking, make sure a reimplementation of \\mouse_moved_event does not consume the\n"
+    "event and returns 'false'.\n"
     "\n"
     "This method has been added in version 0.27.6."
   ) +
@@ -1444,10 +1456,15 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
   ) +
   method ("add_mouse_cursor", &gsi::PluginBase::add_mouse_cursor_dpoint, gsi::arg ("p"), gsi::arg ("emphasize", false),
     "@brief Creates a cursor to indicate the mouse position\n"
-    "This function will create a marker that indicates the (for example snapped) mouse position. "
-    "In addition to this, it will establish the position for the tracking cursor, if mouse "
-    "tracking is enabled in the application. Multiple cursors can be created. In that case, the "
-    "tracking position is given by the last cursor.\n"
+    "This function will create a marker that indicates the (for example snapped) mouse position.\n"
+    "In addition to this, it will establish the position for the tracking cursor, if mouse\n"
+    "tracking is enabled in the application. You can override the tracking position by reimplementing\n"
+    "\\tracking_position and \\has_tracking_position.\n"
+    "\n"
+    "To enable tracking, make sure a reimplementation of \\mouse_moved_event does not consume the\n"
+    "event and returns 'false'.\n"
+    "\n"
+    "Multiple cursors can be created. In that case, the tracking position is given by the last cursor.\n"
     "\n"
     "If 'emphasize' is true, the cursor is displayed in a 'stronger' style - i.e. with a double circle instead of a single one.\n"
     "\n"

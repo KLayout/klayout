@@ -5,6 +5,8 @@
         <file alias="new_macro.lym">macro_templates/new_macro.lym</file>
         <file alias="new_text_file.txt">macro_templates/new_text_file.txt</file>
         <file alias="new_ruby_file.rb">macro_templates/new_ruby_file.rb</file>
+        <file alias="drag_box_sample.lym">macro_templates/drag_box_sample.lym</file>
+        <file alias="drag_box_sample_python.lym">macro_templates/drag_box_sample_python.lym</file>
         <file alias="pcell.lym">macro_templates/pcell.lym</file>
         <file alias="pcell_sample.lym">macro_templates/pcell_sample.lym</file>
         <file alias="qt_designer.lym">macro_templates/qt_designer.lym</file>

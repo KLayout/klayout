@@ -2404,6 +2404,10 @@ TEST(12A)
 
     db::Cell &topcell = layout.cell (*layout.begin_top_down ());
 
+    //  standalone copy
+    db::Shapes copy (true);
+    copy = topcell.shapes (lindex);
+
     db::Shapes::shape_iterator shape = topcell.shapes (lindex).begin (db::Shapes::shape_iterator::All);
     while (! shape.at_end ()) {
       topcell.shapes (lindex).replace (*shape, db::Box (shape->box ().transformed (db::Trans (1))));
@@ -2434,6 +2438,70 @@ TEST(12A)
       "box (-1000,0;-100,2000) #110\n"
       "box (-1100,100;-200,2100) #111\n"
       "box (-1050,150;-150,2150) #112\n"
+    );
+
+    shape = topcell.shapes (lindex).begin (db::Shapes::shape_iterator::All);
+    while (! shape.at_end ()) {
+      topcell.shapes (lindex).replace (*shape, db::Box (shape->box ().transformed (db::Trans (1))));
+      ++shape;
+    }
+
+    EXPECT_EQ (shapes_to_string (_this, topcell.shapes (lindex)),
+      "box (-2000,-1000;0,-100) #0\n"
+      "box (-2100,-1100;-100,-200) #0\n"
+      "box (-2150,-1050;-150,-150) #0\n"
+      "box (-2000,-1000;0,-100) #110\n"
+      "box (-2100,-1100;-100,-200) #111\n"
+      "box (-2150,-1050;-150,-150) #112\n"
+    );
+
+    //  on standalone shapes
+
+    shape = copy.begin (db::Shapes::shape_iterator::All);
+    while (! shape.at_end ()) {
+      copy.replace (*shape, db::Box (shape->box ().transformed (db::Trans (1))));
+      ++shape;
+    }
+
+    EXPECT_EQ (shapes_to_string (_this, copy),
+      "box (-1000,0;-100,2000) #0\n"
+      "box (-1100,100;-200,2100) #0\n"
+      "box (-1050,150;-150,2150) #0\n"
+      "box (-1000,0;-100,2000) #10\n"
+      "box (-1100,100;-200,2100) #11\n"
+      "box (-1050,150;-150,2150) #12\n"
+    );
+
+    shape = copy.begin (db::Shapes::shape_iterator::All);
+    while (! shape.at_end ()) {
+      if (shape->has_prop_id ()) {
+        copy.replace_prop_id (*shape, shape->prop_id () + 100);
+      }
+      ++shape;
+    }
+
+    EXPECT_EQ (shapes_to_string (_this, copy),
+      "box (-1000,0;-100,2000) #0\n"
+      "box (-1100,100;-200,2100) #0\n"
+      "box (-1050,150;-150,2150) #0\n"
+      "box (-1000,0;-100,2000) #110\n"
+      "box (-1100,100;-200,2100) #111\n"
+      "box (-1050,150;-150,2150) #112\n"
+    );
+
+    shape = copy.begin (db::Shapes::shape_iterator::All);
+    while (! shape.at_end ()) {
+      copy.replace (*shape, db::Box (shape->box ().transformed (db::Trans (1))));
+      ++shape;
+    }
+
+    EXPECT_EQ (shapes_to_string (_this, copy),
+      "box (-2000,-1000;0,-100) #0\n"
+      "box (-2100,-1100;-100,-200) #0\n"
+      "box (-2150,-1050;-150,-150) #0\n"
+      "box (-2000,-1000;0,-100) #110\n"
+      "box (-2100,-1100;-100,-200) #111\n"
+      "box (-2150,-1050;-150,-150) #112\n"
     );
 
   }

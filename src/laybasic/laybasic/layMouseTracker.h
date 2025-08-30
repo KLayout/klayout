@@ -46,6 +46,11 @@ public:
   bool leave_event (bool prio);
   bool configure (const std::string &name, const std::string &value);
 
+  lay::ViewService *view_service_interface ()
+  {
+    return this;
+  }
+
 private:
   lay::LayoutViewBase *mp_view;
   tl::shared_collection<lay::DMarker> mp_markers;

@@ -769,14 +769,6 @@ LayoutViewBase::configure (const std::string &name, const std::string &value)
 {
   lay::Dispatcher::configure (name, value);
 
-  if (mp_move_service && mp_move_service->configure (name, value)) {
-    return true;
-  }
-
-  if (mp_tracker && mp_tracker->configure (name, value)) {
-    return true;
-  }
-
   if (name == cfg_default_lyp_file) {
 
     m_def_lyp_file = value;
@@ -1425,14 +1417,6 @@ LayoutViewBase::config_finalize ()
 void 
 LayoutViewBase::enable_edits (bool enable)
 {
-  //  enable or disable these services:
-  if (mp_selection_service) {
-    mp_selection_service->enable (enable);
-  }
-  if (mp_move_service) {
-    mp_move_service->enable (enable);
-  }
-
   //  enable or disable the services that implement "lay::ViewService"
   for (std::vector<lay::Plugin *>::iterator p = mp_plugins.begin (); p != mp_plugins.end (); ++p) {
     lay::ViewService *svc = (*p)->view_service_interface ();
@@ -4842,13 +4826,6 @@ LayoutViewBase::background_color (tl::Color c)
   }
 
   do_set_background_color (c, contrast);
-
-  if (mp_selection_service) {
-    mp_selection_service->set_colors (c, contrast);
-  }
-  if (mp_zoom_service) {
-    mp_zoom_service->set_colors (c, contrast);
-  }
 
   //  Set the color for all ViewService interfaces
   for (std::vector<lay::Plugin *>::iterator p = mp_plugins.begin (); p != mp_plugins.end (); ++p) {

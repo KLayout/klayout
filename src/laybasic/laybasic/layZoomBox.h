@@ -46,6 +46,11 @@ public:
   void begin (const db::DPoint &pos);
   void begin_pan (const db::DPoint &pos);
 
+  lay::ViewService *view_service_interface ()
+  {
+    return this;
+  }
+
 private:
   virtual bool mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio);
   virtual bool mouse_release_event (const db::DPoint &p, unsigned int buttons, bool prio);

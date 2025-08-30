@@ -57,6 +57,11 @@ public:
   SelectionService (lay::LayoutViewBase *view);
   ~SelectionService ();
 
+  lay::ViewService *view_service_interface ()
+  {
+    return this;
+  }
+
   void set_colors (tl::Color background, tl::Color color);
   void begin (const db::DPoint &pos);
 

@@ -47,6 +47,11 @@ public:
   void finish ();
   void cancel ();
 
+  lay::ViewService *view_service_interface ()
+  {
+    return this;
+  }
+
 private:
   virtual bool mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio);
   virtual bool mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio);

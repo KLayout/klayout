@@ -1766,6 +1766,7 @@ Service::edit_cancel ()
   if (m_move_mode != MoveNone) {
 
     m_move_mode = MoveNone;
+    m_selected.clear ();
     selection_to_view ();
 
   }

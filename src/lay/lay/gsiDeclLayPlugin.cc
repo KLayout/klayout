@@ -1173,6 +1173,8 @@ Class<gsi::PluginFactoryBase> decl_PluginFactory ("lay", "PluginFactory",
     "\n"
     "Menu items created this way will send a configuration request with 'cname' as the configuration parameter name "
     "and 'cvalue' as the configuration parameter value.\n"
+    "If 'cvalue' is a string with a single question mark (\"?\"), the item is a check box that reflects the boolean "
+    "value of the configuration item.\n"
     "\n"
     "This method has been introduced in version 0.27."
   ) +

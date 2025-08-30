@@ -81,18 +81,30 @@ EditorOptionsPages::focusInEvent (QFocusEvent * /*event*/)
   //  Sends the focus to the current page's last focus owner
   if (mp_pages->currentWidget () && mp_pages->currentWidget ()->focusWidget ()) {
     mp_pages->currentWidget ()->focusWidget ()->setFocus ();
-    }
+  }
 }
 
 bool EditorOptionsPages::has_content () const
 {
   for (std::vector <lay::EditorOptionsPage *>::const_iterator p = m_pages.begin (); p != m_pages.end (); ++p) {
-    //  NOTE: we ignore unspecific pages because they are always visible and don't contribute specific content
-    if ((*p)->active () && (*p)->plugin_declaration () != 0) {
+    if ((*p)->active ()) {
       return true;
     }
   }
   return false;
+}
+
+void EditorOptionsPages::activate (const lay::Plugin *plugin)
+{
+  for (auto op = m_pages.begin (); op != m_pages.end (); ++op) {
+    bool is_active = false;
+    if ((*op)->plugin_declaration () == 0) {
+      is_active = (plugin && plugin->plugin_declaration ()->enable_catchall_editor_options_pages ());
+    } else if (plugin && plugin->plugin_declaration () == (*op)->plugin_declaration ()) {
+      is_active = true;
+    }
+    (*op)->activate (is_active);
+  }
 }
 
 void  

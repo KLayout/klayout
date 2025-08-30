@@ -24,8 +24,9 @@
 #define HDR_layMove
 
 #include "laybasicCommon.h"
-#include "dbManager.h"
 #include "layViewObject.h"
+#include "layPlugin.h"
+#include "dbManager.h"
 
 #include <memory>
 
@@ -35,7 +36,7 @@ class Editables;
 class LayoutViewBase;
 
 class LAYBASIC_PUBLIC MoveService :
-    public lay::ViewService
+    public lay::ViewService, public lay::Plugin
 {
 public: 
   MoveService (lay::LayoutViewBase *view);

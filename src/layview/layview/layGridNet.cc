@@ -129,7 +129,7 @@ GridNetPluginDeclaration::create_plugin (db::Manager *, Dispatcher *, lay::Layou
   return new lay::GridNet (view);
 }
 
-static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new GridNetPluginDeclaration (), 2010, "GridNetPlugin");
+static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new GridNetPluginDeclaration (), 2010, "lay::GridNetPlugin");
 
 // ------------------------------------------------------------
 //  Implementation of the GridNet object

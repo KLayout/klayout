@@ -58,6 +58,7 @@ public:
 
   void unregister_page (lay::EditorOptionsPage *page);
   void activate_page (lay::EditorOptionsPage *page);
+  void activate (const lay::Plugin *plugin);
   void focusInEvent (QFocusEvent *event);
 
   const std::vector <lay::EditorOptionsPage *> &pages () const

@@ -398,21 +398,6 @@ LayoutViewBase::init (db::Manager *mgr)
 
   mp_canvas = new lay::LayoutCanvas (this);
 
-  //  occupy services and editables:
-  //  these services get deleted by the canvas destructor automatically:
-  if ((m_options & LV_NoTracker) == 0) {
-    mp_tracker = new lay::MouseTracker (this);
-  }
-  if ((m_options & LV_NoZoom) == 0) {
-    mp_zoom_service = new lay::ZoomService (this);
-  }
-  if ((m_options & LV_NoSelection) == 0) {
-    mp_selection_service = new lay::SelectionService (this);
-  }
-  if ((m_options & LV_NoMove) == 0) {
-    mp_move_service = new lay::MoveService (this);
-  }
-
   create_plugins ();
 }
 
@@ -615,10 +600,26 @@ void LayoutViewBase::create_plugins (const lay::PluginDeclaration *except_this)
       if (current_name == "ant::Plugin" || current_name == "img::Plugin") {
         //  ant and img are created always
         create_plugin (current);
+      } else if (current_name == "laybasic::MouseTrackerPlugin") {
+        if ((m_options & LV_NoTracker) == 0) {
+          mp_tracker = dynamic_cast<lay::MouseTracker *> (create_plugin (current));
+        }
+      } else if (current_name == "laybasic::MoveServicePlugin") {
+        if ((m_options & LV_NoMove) == 0) {
+          mp_move_service = dynamic_cast<lay::MoveService *> (create_plugin (current));
+        }
+      } else if (current_name == "laybasic::SelectionServicePlugin") {
+        if ((m_options & LV_NoSelection) == 0) {
+          mp_selection_service = dynamic_cast<lay::SelectionService *> (create_plugin (current));
+        }
+      } else if (current_name == "laybasic::ZoomServicePlugin") {
+        if ((m_options & LV_NoZoom) == 0) {
+          mp_zoom_service = dynamic_cast<lay::ZoomService *> (create_plugin (current));
+        }
       } else if ((options () & LV_NoPlugins) == 0) {
         //  others: only create unless LV_NoPlugins is set
         create_plugin (current);
-      } else if ((options () & LV_NoGrid) == 0 && current_name == "GridNetPlugin") {
+      } else if ((options () & LV_NoGrid) == 0 && current_name == "lay::GridNetPlugin") {
         //  except grid net plugin which is created on request
         create_plugin (current);
       }
@@ -5790,20 +5791,12 @@ LayoutViewBase::mode (int m)
     m_mode = m;
     mp_active_plugin = 0;
 
-    if (m > 0) {
-
-      for (std::vector<lay::Plugin *>::iterator p = mp_plugins.begin (); p != mp_plugins.end (); ++p) {
-        if ((*p)->plugin_declaration ()->id () == m) {
-          mp_active_plugin = *p;
-          mp_canvas->activate ((*p)->view_service_interface ());
-          break;
-        }
+    for (std::vector<lay::Plugin *>::iterator p = mp_plugins.begin (); p != mp_plugins.end (); ++p) {
+      if ((*p)->plugin_declaration ()->id () == m) {
+        mp_active_plugin = *p;
+        mp_canvas->activate ((*p)->view_service_interface ());
+        break;
       }
-
-    } else if (m == 0 && mp_selection_service) {
-      mp_canvas->activate (mp_selection_service);
-    } else if (m == -1 && mp_move_service) {
-      mp_canvas->activate (mp_move_service);
     }
 
   }

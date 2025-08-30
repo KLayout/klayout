@@ -43,6 +43,7 @@ SelectionService::SelectionService (lay::LayoutViewBase *view) :
     QObject (),
 #endif
     lay::ViewService (view->canvas ()), 
+    lay::Plugin (view),
     mp_view (view),
     mp_box (0),
     m_color (0),
@@ -316,5 +317,30 @@ SelectionService::begin (const db::DPoint &pos)
 
   ui ()->grab_mouse (this, true);
 }
+
+// ----------------------------------------------------------------------------
+
+class SelectionServiceDeclaration
+  : public lay::PluginDeclaration
+{
+public:
+  SelectionServiceDeclaration ()
+    : lay::PluginDeclaration (0)
+  {
+    // .. nothing yet ..
+  }
+
+  virtual lay::Plugin *create_plugin (db::Manager * /*manager*/, lay::Dispatcher * /*dispatcher*/, lay::LayoutViewBase *view) const
+  {
+    return new SelectionService (view);
+  }
+
+  virtual bool enable_catchall_editor_options_pages () const
+  {
+    return false;
+  }
+};
+
+static tl::RegisteredClass<lay::PluginDeclaration> selection_service_decl (new SelectionServiceDeclaration (), -980, "laybasic::SelectionServicePlugin");
 
 }

@@ -29,6 +29,7 @@
 
 #include "layViewObject.h"
 #include "layEditable.h"
+#include "layPlugin.h"
 
 #if defined (HAVE_QT)
 #  include <QTimer>
@@ -45,7 +46,8 @@ class LAYBASIC_PUBLIC SelectionService :
 #if defined (HAVE_QT)
     public QObject,
 #endif
-    public lay::ViewService
+    public lay::ViewService,
+    public lay::Plugin
 {
 #if defined (HAVE_QT)
 Q_OBJECT

@@ -55,6 +55,12 @@ PluginDeclaration::PluginDeclaration ()
     // .. nothing yet ..
 }
 
+PluginDeclaration::PluginDeclaration (int id)
+  : m_id (id), m_editable_enabled (true)
+{
+    // .. nothing yet ..
+}
+
 PluginDeclaration::~PluginDeclaration ()
 {
   if (Dispatcher::instance ()) {

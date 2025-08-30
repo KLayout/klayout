@@ -26,6 +26,7 @@
 
 #include "layViewObject.h"
 #include "layMarker.h"
+#include "layPlugin.h"
 #include "tlObject.h"
 
 class QMouseEvent;
@@ -36,7 +37,7 @@ class LayoutCanvas;
 class LayoutViewBase;
 
 class MouseTracker
-  : public lay::ViewService
+  : public lay::ViewService, public lay::Plugin
 {
 public: 
   MouseTracker (lay::LayoutViewBase *view);

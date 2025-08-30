@@ -36,6 +36,7 @@ namespace lay
 
 MoveService::MoveService (lay::LayoutViewBase *view)
   : lay::ViewService (view->canvas ()),
+    lay::Plugin (view),
     m_dragging (false),
     m_dragging_transient (false),
     mp_editables (view),
@@ -366,5 +367,24 @@ MoveService::finish ()
   }
 }
 
-}
+// ----------------------------------------------------------------------------
 
+class MoveServiceDeclaration
+  : public lay::PluginDeclaration
+{
+public:
+  MoveServiceDeclaration ()
+    : lay::PluginDeclaration (-1)
+  {
+    // .. nothing yet ..
+  }
+
+  virtual lay::Plugin *create_plugin (db::Manager * /*manager*/, lay::Dispatcher * /*dispatcher*/, lay::LayoutViewBase *view) const
+  {
+    return new MoveService (view);
+  }
+};
+
+static tl::RegisteredClass<lay::PluginDeclaration> move_service_decl (new MoveServiceDeclaration (), -970, "laybasic::MoveServicePlugin");
+
+}

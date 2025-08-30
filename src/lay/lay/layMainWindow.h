@@ -857,6 +857,7 @@ private:
   void interactive_close_view (int from, int to, bool invert_range, bool all_cellviews);
   void call_on_current_view (void (lay::LayoutView::*func) (), const std::string &op_desc);
   void current_view_changed ();
+  void update_editor_options_dock ();
   void update_window_title ();
   void update_tab_title (int i);
   void add_view (LayoutViewWidget *view);

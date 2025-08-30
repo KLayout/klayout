@@ -26,6 +26,7 @@
 #define HDR_layZoomBox
 
 #include "layViewObject.h"
+#include "layPlugin.h"
 
 namespace lay
 {
@@ -35,7 +36,7 @@ class LayoutCanvas;
 class RubberBox;
 
 class LAYBASIC_PUBLIC ZoomService
-  : public lay::ViewService
+  : public lay::ViewService, public lay::Plugin
 {
 public: 
   ZoomService (lay::LayoutViewBase *view);

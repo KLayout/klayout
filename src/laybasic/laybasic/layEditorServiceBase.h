@@ -75,6 +75,14 @@ public:
   }
 
   /**
+   *  @brief Gets a value indicating whether the plugin is active
+   */
+  bool is_active () const
+  {
+    return m_active;
+  }
+
+  /**
    *  @brief Adds a mouse cursor to the given point
    */
   void add_mouse_cursor (const db::DPoint &pt, bool emphasize = false);
@@ -170,18 +178,12 @@ public:
   /**
    *  @brief Called when the plugin is activated
    */
-  virtual void activated ()
-  {
-    // .. this implementation does nothing ..
-  }
+  virtual void activated ();
 
   /**
    *  @brief Key event handler
    */
-  virtual bool key_event (unsigned int /*key*/, unsigned int /*buttons*/)
-  {
-    return false;
-  }
+  virtual bool key_event (unsigned int /*key*/, unsigned int /*buttons*/);
 
   /**
    *  @brief Mouse press event handler
@@ -263,6 +265,13 @@ public:
     //  The default implementation does nothing
   }
 
+#if defined(HAVE_QT)
+  /**
+   *  @brief Gets the editor options pages associated with this plugin
+   */
+  std::vector<lay::EditorOptionsPage *> editor_options_pages ();
+#endif
+
 private:
   //  The marker representing the mouse cursor
   lay::LayoutViewBase *mp_view;
@@ -271,6 +280,7 @@ private:
   bool m_cursor_enabled;
   bool m_has_tracking_position;
   db::DPoint m_tracking_position;
+  bool m_active;
 };
 
 }

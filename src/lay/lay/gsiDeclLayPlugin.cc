@@ -507,13 +507,18 @@ PluginImpl::wheel_event_noref (int delta, bool horizontal, db::DPoint p, unsigne
 }
 
 void
-PluginImpl::activated ()
+PluginImpl::activated_impl ()
 {
   if (f_activated.can_issue ()) {
-    f_activated.issue<lay::EditorServiceBase> (&lay::EditorServiceBase::activated);
-  } else {
-    lay::EditorServiceBase::activated ();
+    f_activated.issue<PluginImpl> (&PluginImpl::activated_impl);
   }
+}
+
+void
+PluginImpl::activated ()
+{
+  lay::EditorServiceBase::activated ();
+  activated_impl ();
 }
 
 void
@@ -640,25 +645,6 @@ PluginImpl::tracking_position () const
     return lay::EditorServiceBase::tracking_position ();
   }
 }
-
-#if defined(HAVE_QTBINDINGS)
-std::vector<QWidget *>
-PluginImpl::editor_options_pages ()
-{
-  lay::EditorOptionsPages *eo_pages = view ()->editor_options_pages ();
-  if (!eo_pages) {
-    return std::vector<QWidget *> ();
-  } else {
-    std::vector<QWidget *> pages;
-    for (auto p = eo_pages->pages ().begin (); p != eo_pages->pages ().end (); ++p) {
-      if ((*p)->plugin_declaration () == plugin_declaration ()) {
-        pages.push_back (*p);
-      }
-    }
-    return pages;
-  }
-}
-#endif
 
 lay::angle_constraint_type
 PluginImpl::connect_ac (lay::angle_constraint_type ac) const

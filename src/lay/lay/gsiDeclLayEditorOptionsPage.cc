@@ -30,6 +30,51 @@
 namespace gsi
 {
 
+Class<lay::EditorOptionsPage> decl_EditorOptionsPageBase (QT_EXTERNAL_BASE (QWidget) "lay", "EditorOptionsPageBase",
+  method ("view", &lay::EditorOptionsPage::view,
+    "@brief Gets the view object this page is associated with\n"
+  ) +
+  method ("title", &lay::EditorOptionsPage::title,
+    "@brief Gets the title string of the page\n"
+  ) +
+  method ("order", &lay::EditorOptionsPage::order,
+    "@brief Gets the order index of the page\n"
+  ) +
+  method ("is_focus_page?", &lay::EditorOptionsPage::is_focus_page,
+    "@brief Gets a flag indicating whether the page is a focus page\n"
+    "See \\focus_page= for a description is this attribute.\n"
+  ) +
+  method ("focus_page=", &lay::EditorOptionsPage::set_focus_page, gsi::arg ("flag"),
+    "@brief Sets a flag indicating whether the page is a focus page\n"
+    "The focus page is the page that is selected when the tab key is pressed during some plugin action.\n"
+  ) +
+  method ("make_current", &lay::EditorOptionsPage::make_current,
+    "@brief Brings the page to the front of the tab stack\n"
+    "Calling this method will make this page the current one in the tab stack, provided "
+    "the page is visible."
+  ) +
+  method ("do_apply", &lay::EditorOptionsPage::apply, gsi::arg ("dispatcher"),
+    "@brief Transfers data from the page to the configuration\n"
+    "Calling this method will call the actual 'apply' implementation which is "
+    "provided by a reimplementation - either on C++ or script side."
+  ) +
+  method ("do_setup", &lay::EditorOptionsPage::setup, gsi::arg ("dispatcher"),
+    "@brief Transfers data from the configuration to the page\n"
+    "Calling this method will call the actual 'setup' implementation which is "
+    "provided by a reimplementation - either on C++ or script side."
+  ),
+  "@brief The plugin framework's editor options page base class\n"
+  "\n"
+  "This class is provided as an interface to the base class implementation for various functions.\n"
+  "You can use these methods in order to pass down events to the original implementation or access\n"
+  "objects not created in script space.\n"
+  "\n"
+  "It features some useful methods such as 'view' and provides a slot to call for triggering a data "
+  "transfer ('edited').\n"
+  "\n"
+  "This class has been introduced in version 0.30.4.\n"
+);
+
 EditorOptionsPageImpl::EditorOptionsPageImpl (const std::string &title, int index)
   : lay::EditorOptionsPage (), m_title (title), m_index (index)
 {
@@ -79,14 +124,11 @@ EditorOptionsPageImpl *new_editor_options_page (const std::string &title, int in
   return new EditorOptionsPageImpl (title, index);
 }
 
-Class<EditorOptionsPageImpl> decl_EditorOptionsPage (QT_EXTERNAL_BASE (QWidget) "lay", "EditorOptionsPage",
+Class<EditorOptionsPageImpl> decl_EditorOptionsPage (decl_EditorOptionsPageBase, "lay", "EditorOptionsPage",
   constructor ("new", &new_editor_options_page, gsi::arg ("title"), gsi::arg ("index"),
     "@brief Creates a new EditorOptionsPage object\n"
     "@param title The title of the page\n"
     "@param index The position of the page in the tab bar\n"
-  ) +
-  method ("view", &EditorOptionsPageImpl::view,
-    "@brief Gets the view object this page is associated with\n"
   ) +
   method ("edited", &EditorOptionsPageImpl::call_edited,
     "@brief Call this method when some entry widget has changed\n"
@@ -116,6 +158,9 @@ Class<EditorOptionsPageImpl> decl_EditorOptionsPage (QT_EXTERNAL_BASE (QWidget) 
   "the editor widget's state into configuration parameters. 'setup' does the inverse and transfer "
   "configuration parameters into editor widget states. Both methods are called by the system when "
   "some transfer is needed.\n"
+  "\n"
+  "When you want to respond to widget signals and transfer information, call \\edited "
+  "in the signal slot. This will trigger a transfer (aka 'apply').\n"
   "\n"
   "This class has been introduced in version 0.30.4.\n"
 );

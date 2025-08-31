@@ -120,7 +120,18 @@ EditorOptionsPages::unregister_page (lay::EditorOptionsPage *page)
   update (0);
 }
 
-void  
+void
+EditorOptionsPages::make_page_current (lay::EditorOptionsPage *page)
+{
+  for (int i = 0; i < mp_pages->count (); ++i) {
+    if (mp_pages->widget (i) == page) {
+      mp_pages->setCurrentIndex (i);
+      break;
+    }
+  }
+}
+
+void
 EditorOptionsPages::activate_page (lay::EditorOptionsPage *page)
 {
   try {

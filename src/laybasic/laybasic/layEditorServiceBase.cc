@@ -21,6 +21,8 @@
 */
 
 #include "layEditorServiceBase.h"
+#include "layEditorOptionsPage.h"
+#include "layEditorOptionsPages.h"
 #include "layViewport.h"
 #include "layLayoutViewBase.h"
 #include "laybasicConfig.h"
@@ -212,7 +214,8 @@ EditorServiceBase::EditorServiceBase (LayoutViewBase *view)
     lay::Plugin (view),
     mp_view (view),
     m_cursor_enabled (true),
-    m_has_tracking_position (false)
+    m_has_tracking_position (false),
+    m_active (false)
 {
   //  .. nothing yet ..
 }
@@ -328,6 +331,51 @@ void
 EditorServiceBase::deactivated ()
 {
   clear_mouse_cursors ();
+  m_active = false;
+}
+
+void
+EditorServiceBase::activated ()
+{
+  m_active = true;
+}
+
+#if defined(HAVE_QT)
+std::vector<lay::EditorOptionsPage *>
+EditorServiceBase::editor_options_pages ()
+{
+  lay::EditorOptionsPages *eo_pages = mp_view->editor_options_pages ();
+  if (!eo_pages) {
+    return std::vector<lay::EditorOptionsPage *> ();
+  } else {
+    std::vector<lay::EditorOptionsPage *> pages;
+    for (auto p = eo_pages->pages ().begin (); p != eo_pages->pages ().end (); ++p) {
+      if ((*p)->plugin_declaration () == plugin_declaration ()) {
+        pages.push_back (*p);
+      }
+    }
+    return pages;
+  }
+}
+#endif
+
+bool
+EditorServiceBase::key_event (unsigned int key, unsigned int buttons)
+{
+#if defined(HAVE_QT)
+  if (is_active () && key == Qt::Key_Tab && buttons == 0) {
+    auto pages = editor_options_pages ();
+    for (auto p = pages.begin (); p != pages.end (); ++p) {
+      if ((*p)->is_focus_page ()) {
+        (*p)->make_current ();
+        (*p)->setFocus (Qt::TabFocusReason);
+        return true;
+      }
+    }
+  }
+#endif
+
+  return false;
 }
 
 void

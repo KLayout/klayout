@@ -34,13 +34,13 @@ namespace lay
 //  EditorOptionsPage implementation
 
 EditorOptionsPage::EditorOptionsPage (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
-  : QWidget (0), mp_owner (0), m_active (true), mp_plugin_declaration (0), mp_dispatcher (dispatcher), mp_view (view)
+  : QWidget (0), mp_owner (0), m_active (true), m_focus_page (false), mp_plugin_declaration (0), mp_dispatcher (dispatcher), mp_view (view)
 {
   attach_events ();
 }
 
 EditorOptionsPage::EditorOptionsPage ()
-  : QWidget (0), mp_owner (0), m_active (true), mp_plugin_declaration (0), mp_dispatcher (0), mp_view (0)
+  : QWidget (0), mp_owner (0), m_active (true), m_focus_page (false), mp_plugin_declaration (0), mp_dispatcher (0), mp_view (0)
 {
   //  .. nothing here -> call init to set view and dispatcher
 }
@@ -56,6 +56,14 @@ EditorOptionsPage::init (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
 EditorOptionsPage::~EditorOptionsPage ()
 {
   set_owner (0);
+}
+
+void
+EditorOptionsPage::make_current ()
+{
+  if (mp_owner && m_active) {
+    mp_owner->make_page_current (this);
+  }
 }
 
 void

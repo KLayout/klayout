@@ -76,6 +76,7 @@ public:
   bool mouse_release_event_noref (db::DPoint p, unsigned int buttons, bool prio);
   virtual bool wheel_event (int delta, bool horizontal, const db::DPoint &p, unsigned int buttons, bool prio);
   bool wheel_event_noref (int delta, bool horizontal, db::DPoint p, unsigned int buttons, bool prio);
+  void activated_impl ();
   virtual void activated ();
   void deactivated_impl ();
   virtual void deactivated ();
@@ -108,10 +109,6 @@ public:
   {
     return const_cast<lay::Dispatcher *> (mp_dispatcher.get ());
   }
-
-#if defined(HAVE_QTBINDINGS)
-  std::vector<QWidget *> editor_options_pages ();
-#endif
 
   gsi::Callback f_menu_activated;
   gsi::Callback f_configure;

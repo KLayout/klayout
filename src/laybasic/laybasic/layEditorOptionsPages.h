@@ -60,6 +60,7 @@ public:
   void activate_page (lay::EditorOptionsPage *page);
   void activate (const lay::Plugin *plugin);
   void focusInEvent (QFocusEvent *event);
+  void make_page_current (lay::EditorOptionsPage *page);
 
   const std::vector <lay::EditorOptionsPage *> &pages () const
   {

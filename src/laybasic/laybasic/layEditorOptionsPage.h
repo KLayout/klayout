@@ -60,9 +60,13 @@ public:
   virtual void setup (lay::Dispatcher * /*root*/) { }
   virtual void commit_recent (lay::Dispatcher * /*root*/) { }
 
+  bool is_focus_page () const { return m_focus_page; }
+  void set_focus_page (bool f) { m_focus_page = f; }
   bool active () const { return m_active; }
   void activate (bool active);
   void set_owner (EditorOptionsPages *owner);
+
+  void make_current ();
 
   const lay::PluginDeclaration *plugin_declaration () const { return mp_plugin_declaration; }
   void set_plugin_declaration (const lay::PluginDeclaration *pd) { mp_plugin_declaration = pd; }
@@ -92,6 +96,7 @@ protected:
 private:
   EditorOptionsPages *mp_owner;
   bool m_active;
+  bool m_focus_page;
   const lay::PluginDeclaration *mp_plugin_declaration;
   lay::Dispatcher *mp_dispatcher;
   lay::LayoutViewBase *mp_view;

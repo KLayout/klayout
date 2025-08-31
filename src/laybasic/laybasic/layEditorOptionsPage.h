@@ -31,6 +31,11 @@
 
 #include <QWidget>
 
+namespace db
+{
+  struct LayerProperties;
+}
+
 namespace lay
 {
 
@@ -59,6 +64,7 @@ public:
   virtual void apply (lay::Dispatcher * /*root*/) { }
   virtual void setup (lay::Dispatcher * /*root*/) { }
   virtual void commit_recent (lay::Dispatcher * /*root*/) { }
+  virtual void config_recent_for_layer (lay::Dispatcher * /*root*/, const db::LayerProperties & /*lp*/, int /*cv_index*/) { }
 
   bool is_focus_page () const { return m_focus_page; }
   void set_focus_page (bool f) { m_focus_page = f; }

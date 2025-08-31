@@ -361,6 +361,7 @@ private:
   bool m_tabs_need_update;
   bool m_hidden_flags_need_update;
   bool m_in_update;
+  size_t m_current_layer;
   std::vector<size_t> m_new_sel;
   int m_phase;
   tl::DeferredMethod<LayerControlPanel> m_do_update_content_dm;

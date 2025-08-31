@@ -35,26 +35,40 @@ DEFINES += MAKE_EDT_LIBRARY
 # Disabled without Qt:
 
 HEADERS = \
+    edtBoxService.h \
     edtDialogs.h \
     edtEditorHooks.h \
     edtEditorOptionsPages.h \
     edtInstPropertiesPage.h \
+    edtInstService.h \
     edtMoveTrackerService.h \
     edtPCellParametersPage.h \
+    edtPathService.h \
+    edtPointService.h \
+    edtPolygonService.h \
     edtPropertiesPages.h \
     edtPropertiesPageUtils.h \
-    edtRecentConfigurationPage.h
+    edtRecentConfigurationPage.h \
+    edtShapeService.h \
+    edtTextService.h
 
 SOURCES = \
+    edtBoxService.cc \
     edtDialogs.cc \
     edtEditorHooks.cc \
     edtEditorOptionsPages.cc \
     edtInstPropertiesPage.cc \
+    edtInstService.cc \
     edtMoveTrackerService.cc \
     edtPCellParametersPage.cc \
+    edtPathService.cc \
+    edtPointService.cc \
+    edtPolygonService.cc \
     edtPropertiesPages.cc \
     edtPropertiesPageUtils.cc \
     edtRecentConfigurationPage.cc \
+    edtShapeService.cc \
+    edtTextService.cc \
     gsiDeclEdtEditorHooks.cc
 
 # Enabled without Qt:
@@ -66,7 +80,6 @@ HEADERS += \
   edtPartialService.h \
   edtPlugin.h \
   edtService.h \
-  edtServiceImpl.h \
   edtUtils.h \
   edtCommon.h \
   edtDistribute.h \
@@ -78,7 +91,6 @@ SOURCES += \
   edtPartialService.cc \
   edtPlugin.cc \
   edtService.cc \
-  edtServiceImpl.cc \
   edtUtils.cc \
   gsiDeclEdt.cc \
   edtDistribute.cc \

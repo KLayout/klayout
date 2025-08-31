@@ -1557,6 +1557,9 @@ Object::from_string (const char *str, const char *base_dir)
 
         ex.test ("]");
 
+      } else {
+        //  otherwise stop
+        break;
       }
 
       ex.test (";");

@@ -25,11 +25,11 @@
 
 #include "layLayoutViewBase.h"
 #include "layDragDropData.h"
-#include "layBusy.h"
 #include "dbLibraryManager.h"
 
 #if defined(HAVE_QT)
 #  include "edtInstPropertiesPage.h"
+#  include "layBusy.h"
 #endif
 
 namespace edt

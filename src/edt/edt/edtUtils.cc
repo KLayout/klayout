@@ -32,6 +32,7 @@
 #include "layLayoutViewBase.h"
 #include "layEditable.h"
 #include "tlException.h"
+#include "tlInternational.h"
 
 #if defined(HAVE_QT)
 #  include <QMessageBox>
@@ -102,7 +103,7 @@ set_or_request_current_layer (lay::LayoutViewBase *view, const db::LayerProperti
   view->init_layer_properties (lpn);
 
   {
-    db::Transaction transaction (! view->manager ()->transacting () ? view->manager () : 0, tl::to_string (QObject::tr ("Create new layer")));
+    db::Transaction transaction (! view->manager ()->transacting () ? view->manager () : 0, tl::to_string (tr ("Create new layer")));
 
     lay::LayerPropertiesConstIterator lpi = lay::LayerPropertiesConstIterator (& view->insert_layer (view->end_layers (), lpn));
     if (make_current) {

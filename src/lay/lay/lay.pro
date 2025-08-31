@@ -7,6 +7,9 @@ include($$PWD/../../lib.pri)
 DEFINES += MAKE_LAY_LIBRARY
 
 HEADERS = \
+    gsiDeclLayConfigPage.h \
+    gsiDeclLayEditorOptionsPage.h \
+    gsiDeclLayPlugin.h \
     layApplication.h \
     layClipDialog.h \
     layControlWidgetStack.h \
@@ -117,9 +120,13 @@ FORMS = \
 
 SOURCES = \
     gsiDeclLayApplication.cc \
+    gsiDeclLayConfigPage.cc \
+    gsiDeclLayDispatcher.cc \
+    gsiDeclLayEditorOptionsPage.cc \
     gsiDeclLayHelpDialog.cc \
     gsiDeclLayMainWindow.cc \
     gsiDeclLayPlugin.cc \
+    gsiDeclLayPluginFactory.cc \
     layApplication.cc \
     layClipDialog.cc \
     layControlWidgetStack.cc \

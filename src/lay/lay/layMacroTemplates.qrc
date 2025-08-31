@@ -18,5 +18,9 @@
         <file alias="qt_dialog_python.lym">macro_templates/qt_dialog_python.lym</file>
         <file alias="pcell_python.lym">macro_templates/pcell_python.lym</file>
         <file alias="pcell_sample_python.lym">macro_templates/pcell_sample_python.lym</file>
+        <file alias="via_pcell_sample_python.lym">macro_templates/via_pcell_sample_python.lym</file>
+        <file alias="via_pcell_sample.lym">macro_templates/via_pcell_sample.lym</file>
+        <file alias="editor_hooks_sample_python.lym">macro_templates/editor_hooks_sample_python.lym</file>
+        <file alias="editor_hooks_sample.lym">macro_templates/editor_hooks_sample.lym</file>
     </qresource>
 </RCC>

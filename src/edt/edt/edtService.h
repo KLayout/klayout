@@ -353,6 +353,16 @@ public:
   virtual bool mouse_double_click_event (const db::DPoint &p, unsigned int buttons, bool prio);
 
   /**
+   *  @brief Mouse leave event handler
+   */
+  virtual bool leave_event (bool prio);
+
+  /**
+   *  @brief Mouse enter event handler
+   */
+  virtual bool enter_event (bool prio);
+
+  /**
    *  @brief Implements the key handler
    */
   virtual bool key_event (unsigned int /*key*/, unsigned int /*buttons*/);
@@ -376,6 +386,13 @@ public:
    *  @brief Triggered by tap - gives the new layer and if required the initial point
    */
   virtual void tap (const db::DPoint &initial);
+
+  /**
+   *  @brief Implements the via feature
+   *
+   *  "dir" is 0 for up or down, -1 for down and +1 for up.
+   */
+  virtual void via (int dir);
 
   /**
    *  @brief Delete the selected rulers
@@ -616,6 +633,26 @@ protected:
     return m_editing;
   }
 
+  bool top_level_sel () const
+  {
+    return m_top_level_sel;
+  }
+
+  bool mouse_in_view () const
+  {
+    return m_mouse_in_view;
+  }
+
+  const db::DPoint &mouse_pos () const
+  {
+    return m_mouse_pos;
+  }
+
+  /**
+   *  @brief Commits the current configuration to the recent attributes list
+   */
+  void commit_recent ();
+
   /**
    *  @brief Point snapping with detailed return value
    */
@@ -635,6 +672,12 @@ private:
 
   //  The marker representing the object to be edited
   std::vector<lay::ViewObject *> m_edit_markers;
+
+  //  The last mouse position
+  db::DPoint m_mouse_pos;
+
+  //  A flag indicating whether the mouse is inside the view
+  bool m_mouse_in_view;
 
   //  True, if editing is in progress.
   bool m_editing;

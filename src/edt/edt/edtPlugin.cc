@@ -31,7 +31,12 @@
 #include "edtPlugin.h"
 #include "edtConfig.h"
 #include "edtService.h"
-#include "edtServiceImpl.h"
+#include "edtPolygonService.h"
+#include "edtPathService.h"
+#include "edtTextService.h"
+#include "edtBoxService.h"
+#include "edtPointService.h"
+#include "edtInstService.h"
 #include "edtMainService.h"
 #include "edtPartialService.h"
 #include "edtMoveTrackerService.h"
@@ -43,6 +48,7 @@
 #if defined(HAVE_QT)
 #  include <QApplication>
 #  include <QLayout>
+#  include <QMessageBox>
 #endif
 
 namespace edt
@@ -379,6 +385,11 @@ public:
     menu_entries.push_back (lay::menu_item ("edt::sel_area_perimeter", "area_perimeter", "edit_menu.selection_menu.end", tl::to_string (tr ("Area and Perimeter"))));
 
     menu_entries.push_back (lay::menu_item ("edt::combine_mode", "combine_mode:edit_mode", "@toolbar.end_modes", tl::to_string (tr ("Combine{Select background combination mode}"))));
+
+    //  Key binding only
+    menu_entries.push_back (lay::menu_item ("edt::via", "via:edit_mode", "@secrets.end", tl::to_string (tr ("Via")) + "(V)"));
+    menu_entries.push_back (lay::menu_item ("edt::via_up", "via_up:edit_mode", "@secrets.end", tl::to_string (tr ("Via up"))));
+    menu_entries.push_back (lay::menu_item ("edt::via_down", "via_down:edit_mode", "@secrets.end", tl::to_string (tr ("Via down"))));
   }
 
   bool configure (const std::string &name, const std::string &value)
@@ -502,23 +513,6 @@ private:
 };
 
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl_main (new edt::MainPluginDeclaration (tl::to_string (tr ("Instances and shapes"))), 4000, "edt::MainService");
-
-void
-commit_recent (lay::LayoutViewBase *view)
-{
-#if defined(HAVE_QT)
-  lay::EditorOptionsPages *eo_pages = view->editor_options_pages ();
-  if (!eo_pages) {
-    return;
-  }
-
-  for (std::vector<lay::EditorOptionsPage *>::const_iterator op = eo_pages->pages ().begin (); op != eo_pages->pages ().end (); ++op) {
-    if ((*op)->active ()) {
-      (*op)->commit_recent (view);
-    }
-  }
-#endif
-}
 
 class PartialPluginDeclaration
   : public PluginDeclarationBase

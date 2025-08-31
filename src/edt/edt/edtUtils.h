@@ -39,6 +39,7 @@
 namespace lay
 {
   class LayoutViewBase;
+  class Dispatcher;
 }
 
 namespace edt {
@@ -65,6 +66,13 @@ std::map<std::string, tl::Variant> pcell_parameters_from_string (const std::stri
  */
 bool
 get_parameters_from_pcell_and_guiding_shapes (db::Layout *layout, db::cell_index_type cell_index, db::pcell_parameters_type &parameters_for_pcell);
+
+
+/**
+ *  @brief Request to make the given layer the current one (asks whether to create the layer if needed)
+ */
+bool
+set_or_request_current_layer (lay::LayoutViewBase *view, const db::LayerProperties &lp, unsigned int cv_index, bool make_current = true);
 
 /**
  *  @brief A helper class that identifies clipboard data for edt::

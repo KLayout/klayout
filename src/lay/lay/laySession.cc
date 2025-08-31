@@ -265,7 +265,11 @@ Session::restore (lay::MainWindow &mw)
     as.reserve (vd.annotation_shapes.annotation_shapes.size ());
     for (std::vector<SessionAnnotationDescriptor>::const_iterator ad = vd.annotation_shapes.annotation_shapes.begin (); ad != vd.annotation_shapes.annotation_shapes.end (); ++ad) {
       db::DUserObjectBase *obj = db::DUserObjectFactory::create (ad->class_name.c_str (), ad->value_string.c_str (), ! m_base_dir.empty () ? m_base_dir.c_str () : 0);
-      as.insert (db::DUserObject (obj));
+      if (obj) {
+        as.insert (db::DUserObject (obj));
+      } else {
+        tl::warn << tl::to_string (tr ("Unable to restore session user object with unknown class: ")) << ad->class_name;
+      }
     }
 
     view->update_content ();

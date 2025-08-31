@@ -57,6 +57,7 @@ class Library;
 class ImportLayerMapping;
 class CellMapping;
 class LayerMapping;
+class PCellDeclaration;
 
 /**
  *  @brief The cell object
@@ -472,6 +473,27 @@ public:
    *  @return A reference to the new instance. The original reference may be invalid.
    */
   instance_type change_pcell_parameters (const instance_type &ref, const std::vector<tl::Variant> &new_parameters);
+
+  /**
+   *  @brief Changes the PCell parameters of a PCell instance using a dict
+   *
+   *  @return A reference to the new instance. The original reference may be invalid.
+   */
+  instance_type change_pcell_parameters (const instance_type &ref, const std::map<std::string, tl::Variant> &new_parameters);
+
+  /**
+   *  @brief Gets the PCellDeclaration object of the instance if the instance is a PCell instance
+   *
+   *  If the instance is not a PCell instance, 0 is returned.
+   */
+  const db::PCellDeclaration *pcell_declaration_of_inst (const db::Cell::instance_type &ref) const;
+
+  /**
+   *  @brief Gets the PCellDeclaration object of the cell is the cell is a PCell variant
+   *
+   *  If the cell is not a PCell variant, 0 is returned.
+   */
+  const db::PCellDeclaration *pcell_declaration () const;
 
   /**
    *  @brief The cell index accessor method

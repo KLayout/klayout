@@ -777,6 +777,7 @@ Cell::get_pcell_parameters (const instance_type &ref) const
 Cell::instance_type 
 Cell::change_pcell_parameters (const instance_type &ref, const std::vector<tl::Variant> &new_parameters)
 {
+  tl_assert (mp_layout != 0);
   cell_index_type new_cell_index = mp_layout->get_pcell_variant_cell (ref.cell_index (), new_parameters);
   if (new_cell_index != ref.cell_index ()) {
 
@@ -787,6 +788,61 @@ Cell::change_pcell_parameters (const instance_type &ref, const std::vector<tl::V
 
   } else {
     return ref;
+  }
+}
+
+Cell::instance_type
+Cell::change_pcell_parameters (const instance_type &ref, const std::map<std::string, tl::Variant> &map)
+{
+  tl_assert (mp_layout != 0);
+
+  const db::PCellDeclaration *pcd = pcell_declaration_of_inst (ref);
+  if (! pcd) {
+    return Cell::instance_type ();
+  }
+
+  const std::vector<db::PCellParameterDeclaration> &pcp = pcd->parameter_declarations ();
+
+  std::vector<tl::Variant> p = get_pcell_parameters (ref);
+  bool needs_update = false;
+
+  for (size_t i = 0; i < pcp.size () && i < p.size (); ++i) {
+    std::map<std::string, tl::Variant>::const_iterator pm = map.find (pcp [i].get_name ());
+    if (pm != map.end () && p [i] != pm->second) {
+      p [i] = pm->second;
+      needs_update = true;
+    }
+  }
+
+  if (needs_update) {
+    return change_pcell_parameters (ref, p);
+  } else {
+    return ref;
+  }
+
+}
+
+const db::PCellDeclaration *
+Cell::pcell_declaration_of_inst (const db::Cell::instance_type &ref) const
+{
+  tl_assert (mp_layout != 0);
+  return mp_layout->cell (ref.cell_index ()).pcell_declaration ();
+}
+
+const db::PCellDeclaration *
+Cell::pcell_declaration () const
+{
+  tl_assert (mp_layout != 0);
+  std::pair<bool, db::pcell_id_type> pc = mp_layout->is_pcell_instance (cell_index ());
+  if (pc.first) {
+    db::Library *lib = mp_layout->defining_library (cell_index ()).first;
+    if (lib) {
+      return lib->layout ().pcell_declaration (pc.second);
+    } else {
+      return mp_layout->pcell_declaration (pc.second);
+    }
+  } else {
+    return 0;
   }
 }
 

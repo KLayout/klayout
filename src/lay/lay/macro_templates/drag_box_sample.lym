@@ -72,7 +72,7 @@ class DragBoxConfigPage &lt; RBA::ConfigPage
     # and "Configure" page
     super("Drag Box|Configure")
     
-    # Qt user interfact setup
+    # Qt user interface setup
     layout = RBA::QHBoxLayout::new(self)
     label = RBA::QLabel::new("Color (hex, rrggbb)", self)
     layout.addWidget(label)

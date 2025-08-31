@@ -142,14 +142,126 @@ public:
   void show_error (tl::Exception &ex);
 
   /**
+   *  @brief Menu command handler
+   */
+  virtual void menu_activated (const std::string & /*symbol*/)
+  {
+    // .. this implementation does nothing ..
+  }
+
+  /**
    *  @brief Sets a configuration option
    */
   virtual bool configure (const std::string &name, const std::string &value);
 
   /**
+   *  @brief Configuration finalization
+   */
+  virtual void config_finalize ()
+  {
+    lay::Plugin::config_finalize ();
+  }
+
+  /**
    *  @brief Called when the plugin is deactivated
    */
   virtual void deactivated ();
+
+  /**
+   *  @brief Called when the plugin is activated
+   */
+  virtual void activated ()
+  {
+    // .. this implementation does nothing ..
+  }
+
+  /**
+   *  @brief Key event handler
+   */
+  virtual bool key_event (unsigned int /*key*/, unsigned int /*buttons*/)
+  {
+    return false;
+  }
+
+  /**
+   *  @brief Mouse press event handler
+   */
+  virtual bool mouse_press_event (const db::DPoint & /*p*/, unsigned int /*buttons*/, bool /*prio*/)
+  {
+    return false;
+  }
+
+  /**
+   *  @brief Mouse single-click event handler
+   */
+  virtual bool mouse_click_event (const db::DPoint & /*p*/, unsigned int /*buttons*/, bool /*prio*/)
+  {
+    return false;
+  }
+
+  /**
+   *  @brief Mouse double-click event handler
+   */
+  virtual bool mouse_double_click_event (const db::DPoint & /*p*/, unsigned int /*buttons*/, bool /*prio*/)
+  {
+    return false;
+  }
+
+  /**
+   *  @brief Mouse leave event handler
+   */
+  virtual bool leave_event (bool /*prio*/)
+  {
+    return false;
+  }
+
+  /**
+   *  @brief Mouse enter event handler
+   */
+  virtual bool enter_event (bool /*prio*/)
+  {
+    return false;
+  }
+
+  /**
+   *  @brief Mouse move event handler
+   */
+  virtual bool mouse_move_event (const db::DPoint & /*p*/, unsigned int /*buttons*/, bool /*prio*/)
+  {
+    return false;
+  }
+
+  /**
+   *  @brief Mouse release event handler
+   */
+  virtual bool mouse_release_event (const db::DPoint & /*p*/, unsigned int /*buttons*/, bool /*prio*/)
+  {
+    return false;
+  }
+
+  /**
+   *  @brief Wheel event handler
+   */
+  virtual bool wheel_event (int /*delta*/, bool /*horizontal*/, const db::DPoint & /*p*/, unsigned int /*buttons*/, bool /*prio*/)
+  {
+    return false;
+  }
+
+  /**
+   *  @brief Updates the internal data after a coordinate system change for example
+   */
+  virtual void update ()
+  {
+    //  The default implementation does nothing
+  }
+
+  /**
+   *  @brief This method is called when some mouse dragging operation should be cancelled
+   */
+  virtual void drag_cancel ()
+  {
+    //  The default implementation does nothing
+  }
 
 private:
   //  The marker representing the mouse cursor

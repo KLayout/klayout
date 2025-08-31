@@ -242,14 +242,14 @@ public:
     }
   }
 
-  virtual gsi::PluginBase *create_plugin_gsi (db::Manager *manager, lay::Dispatcher *root, lay::LayoutViewBase *view) const
+  virtual gsi::PluginImpl *create_plugin_gsi (db::Manager *manager, lay::Dispatcher *root, lay::LayoutViewBase *view) const
   { 
     s_in_create_plugin = true;
 
-    gsi::PluginBase *ret = 0;
+    gsi::PluginImpl *ret = 0;
     try {
 
-      ret = f_create_plugin.issue<PluginFactoryBase, gsi::PluginBase *, db::Manager *, lay::Dispatcher *, lay::LayoutViewBase *> (&PluginFactoryBase::create_plugin_gsi, manager, root, view);
+      ret = f_create_plugin.issue<PluginFactoryBase, gsi::PluginImpl *, db::Manager *, lay::Dispatcher *, lay::LayoutViewBase *> (&PluginFactoryBase::create_plugin_gsi, manager, root, view);
       if (ret) {
         ret->init (view, root);
       }

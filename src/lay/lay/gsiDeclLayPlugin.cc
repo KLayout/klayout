@@ -33,10 +33,164 @@
 namespace gsi
 {
 
+static bool has_tracking_position_impl (const lay::EditorServiceBase *p)
+{
+  return p->lay::EditorServiceBase::has_tracking_position ();
+}
+
+static db::DPoint tracking_position_impl (const lay::EditorServiceBase *p)
+{
+  return p->lay::EditorServiceBase::tracking_position ();
+}
+
+static void menu_activated_impl (lay::EditorServiceBase *p, const std::string &symbol)
+{
+  return p->lay::EditorServiceBase::menu_activated (symbol);
+}
+
+static bool configure_impl (lay::EditorServiceBase *p, const std::string &name, const std::string &value)
+{
+  return p->lay::EditorServiceBase::configure (name, value);
+}
+
+static void config_finalize_impl (lay::EditorServiceBase *p)
+{
+  p->lay::EditorServiceBase::config_finalize ();
+}
+
+static void deactivated_impl (lay::EditorServiceBase *p)
+{
+  p->lay::EditorServiceBase::deactivated ();
+}
+
+static void activated_impl (lay::EditorServiceBase *p)
+{
+  p->lay::EditorServiceBase::activated ();
+}
+
+static bool key_event_impl (lay::EditorServiceBase *p, unsigned int key, unsigned int buttons)
+{
+  return p->lay::EditorServiceBase::key_event (key, buttons);
+}
+
+static bool mouse_press_event_impl (lay::EditorServiceBase *p, const db::DPoint &pt, unsigned int buttons, bool prio)
+{
+  return p->lay::EditorServiceBase::mouse_press_event (pt, buttons, prio);
+}
+
+static bool mouse_click_event_impl (lay::EditorServiceBase *p, const db::DPoint &pt, unsigned int buttons, bool prio)
+{
+  return p->lay::EditorServiceBase::mouse_click_event (pt, buttons, prio);
+}
+
+static bool mouse_double_click_event_impl (lay::EditorServiceBase *p, const db::DPoint &pt, unsigned int buttons, bool prio)
+{
+  return p->lay::EditorServiceBase::mouse_double_click_event (pt, buttons, prio);
+}
+
+static bool leave_event_impl (lay::EditorServiceBase *p, bool prio)
+{
+  return p->lay::EditorServiceBase::leave_event (prio);
+}
+
+static bool enter_event_impl (lay::EditorServiceBase *p, bool prio)
+{
+  return p->lay::EditorServiceBase::enter_event (prio);
+}
+
+static bool mouse_move_event_impl (lay::EditorServiceBase *p, const db::DPoint &pt, unsigned int buttons, bool prio)
+{
+  return p->lay::EditorServiceBase::mouse_move_event (pt, buttons, prio);
+}
+
+static bool mouse_release_event_impl (lay::EditorServiceBase *p, const db::DPoint &pt, unsigned int buttons, bool prio)
+{
+  return p->lay::EditorServiceBase::mouse_release_event (pt, buttons, prio);
+}
+
+static bool wheel_event_impl (lay::EditorServiceBase *p, int delta, bool horizontal, const db::DPoint &pt, unsigned int buttons, bool prio)
+{
+  return p->lay::EditorServiceBase::wheel_event (delta, horizontal, pt, buttons, prio);
+}
+
+static void update_impl (lay::EditorServiceBase *p)
+{
+  p->lay::EditorServiceBase::update ();
+}
+
+static void drag_cancel_impl (lay::EditorServiceBase *p)
+{
+  p->lay::EditorServiceBase::drag_cancel ();
+}
+
+Class<lay::EditorServiceBase> decl_PluginBase ("lay", "PluginBase",
+  gsi::method_ext ("tracking_position", &tracking_position_impl,
+    "@brief Gets the tracking position (base class implementation)"
+  ) +
+  gsi::method_ext ("has_tracking_position", &has_tracking_position_impl,
+    "@brief Gets a value indicating whether the plugin provides a tracking position (base class implementation)"
+  ) +
+  gsi::method_ext ("menu_activated", &menu_activated_impl, gsi::arg ("symbol"),
+    "@brief Gets called when a custom menu item is selected (base class implementation)"
+  ) +
+  gsi::method_ext ("configure", &configure_impl, gsi::arg ("name"), gsi::arg ("value"),
+    "@brief Sends configuration requests to the plugin (base class implementation)"
+  ) +
+  gsi::method_ext ("config_finalize", &config_finalize_impl,
+    "@brief Sends the post-configuration request to the plugin (base class implementation)"
+  ) +
+  gsi::method_ext ("key_event", &key_event_impl, gsi::arg ("key"), gsi::arg ("buttons"),
+    "@brief Handles the key pressed event (base class implementation)"
+  ) +
+  gsi::method_ext ("mouse_button_pressed_event", &mouse_press_event_impl, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
+    "@brief Handles the mouse button pressed event (base class implementation)"
+  ) +
+  gsi::method_ext ("mouse_click_event", &mouse_click_event_impl, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
+    "@brief Handles the mouse button click event after the button has been released (base class implementation)"
+  ) +
+  gsi::method_ext ("mouse_double_click_event", &mouse_double_click_event_impl, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
+    "@brief Handles the mouse button double-click event (base class implementation)"
+  ) +
+  gsi::method_ext ("leave_event", &leave_event_impl, gsi::arg ("prio"),
+    "@brief Handles the leave event (base class implementation)"
+  ) +
+  gsi::method_ext ("enter_event", &enter_event_impl, gsi::arg ("prio"),
+    "@brief Handles the enter event (base class implementation)"
+  ) +
+  gsi::method_ext ("mouse_moved_event", &mouse_move_event_impl, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
+    "@brief Handles the mouse move event (base class implementation)"
+  ) +
+  gsi::method_ext ("mouse_button_released_event", &mouse_release_event_impl, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
+    "@brief Handles the mouse button release event (base class implementation)"
+  ) +
+  gsi::method_ext ("wheel_event", &wheel_event_impl, gsi::arg ("delta"), gsi::arg ("horizontal"), gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
+    "@brief Handles the mouse wheel event (base class implementation)"
+  ) +
+  gsi::method_ext ("activated", &activated_impl,
+    "@brief Gets called when the plugin is activated (base class implementation)"
+  ) +
+  gsi::method_ext ("deactivated", &deactivated_impl,
+    "@brief Gets called when the plugin is deactivated and another plugin is activated (base class implementation)"
+  ) +
+  gsi::method_ext ("drag_cancel", &drag_cancel_impl,
+    "@brief This method is called when some mouse dragging operation should be cancelled (base class implementation)"
+  ) +
+  gsi::method_ext ("update", &update_impl,
+    "@brief Gets called when the view has changed (base class implementation)"
+  ),
+  "@brief The plugin base class\n"
+  "\n"
+  "This class is provided as an interface to the base class implementation for various functions.\n"
+  "You can use these methods in order to pass down events to the original implementation.\n"
+  "\n"
+  "This class has been introduced in version 0.30.4.\n"
+);
+
+
 //  HACK: used to track if we're inside a create_plugin method and can be sure that "init" is called
 bool s_in_create_plugin = false;
 
-PluginBase::PluginBase ()
+PluginImpl::PluginImpl ()
   : lay::EditorServiceBase (),
     mp_view (0), mp_dispatcher (0),
     m_connect_ac (lay::AC_Any), m_move_ac (lay::AC_Any),
@@ -49,7 +203,7 @@ PluginBase::PluginBase ()
 }
 
 void
-PluginBase::init (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
+PluginImpl::init (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
 {
   mp_view = view;
   mp_dispatcher = dispatcher;
@@ -57,7 +211,7 @@ PluginBase::init (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher)
 }
 
 void
-PluginBase::grab_mouse ()
+PluginImpl::grab_mouse ()
 {
   if (ui ()) {
     ui ()->grab_mouse (this, false);
@@ -65,7 +219,7 @@ PluginBase::grab_mouse ()
 }
 
 void
-PluginBase::ungrab_mouse ()
+PluginImpl::ungrab_mouse ()
 {
   if (ui ()) {
     ui ()->ungrab_mouse (this);
@@ -73,7 +227,7 @@ PluginBase::ungrab_mouse ()
 }
 
 void
-PluginBase::set_cursor (int c)
+PluginImpl::set_cursor (int c)
 {
   if (ui ()) {
     lay::ViewService::set_cursor ((enum lay::Cursor::cursor_shape) c);
@@ -81,17 +235,17 @@ PluginBase::set_cursor (int c)
 }
 
 void
-PluginBase::menu_activated (const std::string &symbol)
+PluginImpl::menu_activated (const std::string &symbol)
 {
   if (f_menu_activated.can_issue ()) {
-    f_menu_activated.issue<lay::Plugin, const std::string &> (&lay::Plugin::menu_activated, symbol);
+    f_menu_activated.issue<lay::EditorServiceBase, const std::string &> (&lay::EditorServiceBase::menu_activated, symbol);
   } else {
-    lay::Plugin::menu_activated (symbol);
+    lay::EditorServiceBase::menu_activated (symbol);
   }
 }
 
 db::DPoint
-PluginBase::snap (db::DPoint p) const
+PluginImpl::snap (db::DPoint p) const
 {
   //  snap according to the grid
   if (m_edit_grid == db::DVector ()) {
@@ -106,7 +260,7 @@ PluginBase::snap (db::DPoint p) const
 }
 
 db::DVector
-PluginBase::snap_vector (db::DVector v) const
+PluginImpl::snap_vector (db::DVector v) const
 {
   //  snap according to the grid
   if (m_edit_grid == db::DVector ()) {
@@ -121,20 +275,20 @@ PluginBase::snap_vector (db::DVector v) const
 }
 
 db::DPoint
-PluginBase::snap_from_to (const db::DPoint &p, const db::DPoint &plast, bool connect, lay::angle_constraint_type ac) const
+PluginImpl::snap_from_to (const db::DPoint &p, const db::DPoint &plast, bool connect, lay::angle_constraint_type ac) const
 {
   db::DPoint ps = plast + lay::snap_angle (db::DVector (p - plast), connect ? connect_ac (ac) : move_ac (ac));
   return snap (ps);
 }
 
 db::DVector
-PluginBase::snap_delta (const db::DVector &v, bool connect, lay::angle_constraint_type ac) const
+PluginImpl::snap_delta (const db::DVector &v, bool connect, lay::angle_constraint_type ac) const
 {
   return snap_vector (lay::snap_angle (v, connect ? connect_ac (ac) : move_ac (ac)));
 }
 
 db::DPoint
-PluginBase::snap2 (const db::DPoint &p, bool visualize)
+PluginImpl::snap2 (const db::DPoint &p, bool visualize)
 {
   double snap_range = ui ()->mouse_event_trans ().inverted ().ctrans (edt::snap_range_pixels ());
   auto details = lay::obj_snap (m_snap_to_objects ? view () : 0, p, m_edit_grid == db::DVector () ? m_global_grid : m_edit_grid, snap_range);
@@ -145,7 +299,7 @@ PluginBase::snap2 (const db::DPoint &p, bool visualize)
 }
 
 db::DPoint
-PluginBase::snap2_from_to (const db::DPoint &p, const db::DPoint &plast, bool connect, lay::angle_constraint_type ac, bool visualize)
+PluginImpl::snap2_from_to (const db::DPoint &p, const db::DPoint &plast, bool connect, lay::angle_constraint_type ac, bool visualize)
 {
   double snap_range = ui ()->mouse_event_trans ().inverted ().ctrans (edt::snap_range_pixels ());
   auto details = lay::obj_snap (m_snap_to_objects ? view () : 0, plast, p, m_edit_grid == db::DVector () ? m_global_grid : m_edit_grid, connect ? connect_ac (ac) : move_ac (ac), snap_range);
@@ -159,7 +313,7 @@ PluginBase::snap2_from_to (const db::DPoint &p, const db::DPoint &plast, bool co
  *  @brief Captures some edt space configuration events for convencience
  */
 void
-PluginBase::configure_edt (const std::string &name, const std::string &value)
+PluginImpl::configure_edt (const std::string &name, const std::string &value)
 {
   edt::EditGridConverter egc;
   edt::ACConverter acc;
@@ -185,20 +339,20 @@ PluginBase::configure_edt (const std::string &name, const std::string &value)
  *  @brief The implementation does not allow to bypass the base class configuration call
  */
 bool
-PluginBase::configure_impl (const std::string &name, const std::string &value)
+PluginImpl::configure_impl (const std::string &name, const std::string &value)
 {
-  return f_configure.can_issue () ? f_configure.issue<PluginBase, bool, const std::string &, const std::string &> (&PluginBase::configure, name, value) : lay::Plugin::configure (name, value);
+  return f_configure.can_issue () ? f_configure.issue<PluginImpl, bool, const std::string &, const std::string &> (&PluginImpl::configure, name, value) : lay::EditorServiceBase::configure (name, value);
 }
 
 //  for testing
 void
-  PluginBase::configure_test (const std::string &name, const std::string &value)
+PluginImpl::configure_test (const std::string &name, const std::string &value)
 {
   configure_edt (name, value);
 }
 
 bool
-PluginBase::configure (const std::string &name, const std::string &value)
+PluginImpl::configure (const std::string &name, const std::string &value)
 {
   configure_edt (name, value);
   return configure_impl (name, value);
@@ -208,20 +362,20 @@ PluginBase::configure (const std::string &name, const std::string &value)
  *  @brief The implementation does not allow to bypass the base class configuration call
  */
 void
-PluginBase::config_finalize_impl ()
+PluginImpl::config_finalize_impl ()
 {
-  f_config_finalize.can_issue () ? f_config_finalize.issue<PluginBase> (&PluginBase::config_finalize) : lay::Plugin::config_finalize ();
+  f_config_finalize.can_issue () ? f_config_finalize.issue<PluginImpl> (&PluginImpl::config_finalize) : lay::EditorServiceBase::config_finalize ();
 }
 
 void
-PluginBase::config_finalize ()
+PluginImpl::config_finalize ()
 {
   lay::EditorServiceBase::config_finalize ();
   config_finalize_impl ();
 }
 
 bool
-PluginBase::key_event (unsigned int key, unsigned int buttons)
+PluginImpl::key_event (unsigned int key, unsigned int buttons)
 {
   if (f_key_event.can_issue ()) {
     return f_key_event.issue<lay::ViewService, bool, unsigned int, unsigned int> (&lay::ViewService::key_event, key, buttons);
@@ -231,58 +385,58 @@ PluginBase::key_event (unsigned int key, unsigned int buttons)
 }
 
 bool
-PluginBase::mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio)
+PluginImpl::mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
   if (f_mouse_press_event.can_issue ()) {
-    return f_mouse_press_event.issue (&PluginBase::mouse_press_event_noref, p, buttons, prio);
+    return f_mouse_press_event.issue (&PluginImpl::mouse_press_event_noref, p, buttons, prio);
   } else {
     return lay::EditorServiceBase::mouse_press_event (p, buttons, prio);
   }
 }
 
-//  NOTE: this version doesn't take a point reference which allows up to store the point
+//  NOTE: this version doesn't take a point reference which allows us to store the point in script code without generating a reference
 bool
-PluginBase::mouse_press_event_noref (db::DPoint p, unsigned int buttons, bool prio)
+PluginImpl::mouse_press_event_noref (db::DPoint p, unsigned int buttons, bool prio)
 {
   return mouse_press_event (p, buttons, prio);
 }
 
 bool
-PluginBase::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio)
+PluginImpl::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
   if (f_mouse_click_event.can_issue ()) {
-    return f_mouse_click_event.issue (&PluginBase::mouse_click_event_noref, p, buttons, prio);
+    return f_mouse_click_event.issue (&PluginImpl::mouse_click_event_noref, p, buttons, prio);
   } else {
     return lay::EditorServiceBase::mouse_click_event (p, buttons, prio);
   }
 }
 
-//  NOTE: this version doesn't take a point reference which allows up to store the point
+//  NOTE: this version doesn't take a point reference which allows us to store the point in script code without generating a reference
 bool
-PluginBase::mouse_click_event_noref (db::DPoint p, unsigned int buttons, bool prio)
+PluginImpl::mouse_click_event_noref (db::DPoint p, unsigned int buttons, bool prio)
 {
   return mouse_click_event (p, buttons, prio);
 }
 
 bool
-PluginBase::mouse_double_click_event (const db::DPoint &p, unsigned int buttons, bool prio)
+PluginImpl::mouse_double_click_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
   if (f_mouse_double_click_event.can_issue ()) {
-    return f_mouse_double_click_event.issue (&PluginBase::mouse_double_click_event_noref, p, buttons, prio);
+    return f_mouse_double_click_event.issue (&PluginImpl::mouse_double_click_event_noref, p, buttons, prio);
   } else {
     return lay::EditorServiceBase::mouse_double_click_event (p, buttons, prio);
   }
 }
 
-//  NOTE: this version doesn't take a point reference which allows up to store the point
+//  NOTE: this version doesn't take a point reference which allows us to store the point in script code without generating a reference
 bool
-PluginBase::mouse_double_click_event_noref (db::DPoint p, unsigned int buttons, bool prio)
+PluginImpl::mouse_double_click_event_noref (db::DPoint p, unsigned int buttons, bool prio)
 {
   return mouse_double_click_event (p, buttons, prio);
 }
 
 bool
-PluginBase::leave_event (bool prio)
+PluginImpl::leave_event (bool prio)
 {
   if (f_leave_event.can_issue ()) {
     return f_leave_event.issue<lay::EditorServiceBase, bool, bool> (&lay::ViewService::leave_event, prio);
@@ -292,7 +446,7 @@ PluginBase::leave_event (bool prio)
 }
 
 bool
-PluginBase::enter_event (bool prio)
+PluginImpl::enter_event (bool prio)
 {
   if (f_enter_event.can_issue ()) {
     return f_enter_event.issue<lay::EditorServiceBase, bool, bool> (&lay::ViewService::enter_event, prio);
@@ -302,58 +456,58 @@ PluginBase::enter_event (bool prio)
 }
 
 bool
-PluginBase::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
+PluginImpl::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
   if (f_mouse_move_event.can_issue ()) {
-    return f_mouse_move_event.issue (&PluginBase::mouse_move_event_noref, p, buttons, prio);
+    return f_mouse_move_event.issue (&PluginImpl::mouse_move_event_noref, p, buttons, prio);
   } else {
     return lay::EditorServiceBase::mouse_move_event (p, buttons, prio);
   }
 }
 
-//  NOTE: this version doesn't take a point reference which allows up to store the point
+//  NOTE: this version doesn't take a point reference which allows us to store the point in script code without generating a reference
 bool
-PluginBase::mouse_move_event_noref (db::DPoint p, unsigned int buttons, bool prio)
+PluginImpl::mouse_move_event_noref (db::DPoint p, unsigned int buttons, bool prio)
 {
   return mouse_move_event (p, buttons, prio);
 }
 
 bool
-PluginBase::mouse_release_event (const db::DPoint &p, unsigned int buttons, bool prio)
+PluginImpl::mouse_release_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
   if (f_mouse_release_event.can_issue ()) {
-    return f_mouse_release_event.issue (&PluginBase::mouse_release_event_noref, p, buttons, prio);
+    return f_mouse_release_event.issue (&PluginImpl::mouse_release_event_noref, p, buttons, prio);
   } else {
     return lay::ViewService::mouse_release_event (p, buttons, prio);
   }
 }
 
-//  NOTE: this version doesn't take a point reference which allows up to store the point
+//  NOTE: this version doesn't take a point reference which allows us to store the point in script code without generating a reference
 bool
-PluginBase::mouse_release_event_noref (db::DPoint p, unsigned int buttons, bool prio)
+PluginImpl::mouse_release_event_noref (db::DPoint p, unsigned int buttons, bool prio)
 {
   return mouse_release_event (p, buttons, prio);
 }
 
 bool
-PluginBase::wheel_event (int delta, bool horizontal, const db::DPoint &p, unsigned int buttons, bool prio)
+PluginImpl::wheel_event (int delta, bool horizontal, const db::DPoint &p, unsigned int buttons, bool prio)
 {
   if (f_wheel_event.can_issue ()) {
-    return f_wheel_event.issue (&PluginBase::wheel_event_noref, delta, horizontal, p, buttons, prio);
+    return f_wheel_event.issue (&PluginImpl::wheel_event_noref, delta, horizontal, p, buttons, prio);
   } else {
     return lay::ViewService::wheel_event (delta, horizontal, p, buttons, prio);
   }
 }
 
-//  NOTE: this version doesn't take a point reference which allows up to store the point
+//  NOTE: this version doesn't take a point reference which allows us to store the point in script code without generating a reference
 bool
-PluginBase::wheel_event_noref (int delta, bool horizontal, db::DPoint p, unsigned int buttons, bool prio)
+PluginImpl::wheel_event_noref (int delta, bool horizontal, db::DPoint p, unsigned int buttons, bool prio)
 {
   return wheel_event (delta, horizontal, p, buttons, prio);
 }
 
 void
-PluginBase::activated ()
+PluginImpl::activated ()
 {
   if (f_activated.can_issue ()) {
     f_activated.issue<lay::EditorServiceBase> (&lay::EditorServiceBase::activated);
@@ -363,22 +517,22 @@ PluginBase::activated ()
 }
 
 void
-PluginBase::deactivated_impl ()
+PluginImpl::deactivated_impl ()
 {
   if (f_deactivated.can_issue ()) {
-    f_deactivated.issue<PluginBase> (&PluginBase::deactivated_impl);
+    f_deactivated.issue<PluginImpl> (&PluginImpl::deactivated_impl);
   }
 }
 
 void
-PluginBase::deactivated ()
+PluginImpl::deactivated ()
 {
   lay::EditorServiceBase::deactivated ();
   deactivated_impl ();
 }
 
 void
-PluginBase::drag_cancel ()
+PluginImpl::drag_cancel ()
 {
   if (f_drag_cancel.can_issue ()) {
     f_drag_cancel.issue<lay::EditorServiceBase> (&lay::EditorServiceBase::drag_cancel);
@@ -388,7 +542,7 @@ PluginBase::drag_cancel ()
 }
 
 void
-PluginBase::update ()
+PluginImpl::update ()
 {
   if (f_update.can_issue ()) {
     f_update.issue<lay::EditorServiceBase> (&lay::EditorServiceBase::update);
@@ -398,13 +552,13 @@ PluginBase::update ()
 }
 
 void
-PluginBase::add_mouse_cursor_dpoint (const db::DPoint &p, bool emphasize)
+PluginImpl::add_mouse_cursor_dpoint (const db::DPoint &p, bool emphasize)
 {
   lay::EditorServiceBase::add_mouse_cursor (p, emphasize);
 }
 
 void
-PluginBase::add_mouse_cursor_point (const db::Point &p, int cv_index, const db::LayerProperties &lp, bool emphasize)
+PluginImpl::add_mouse_cursor_point (const db::Point &p, int cv_index, const db::LayerProperties &lp, bool emphasize)
 {
   const lay::CellView &cv = view ()->cellview (cv_index);
   if (! cv.is_valid ()) {
@@ -426,13 +580,13 @@ PluginBase::add_mouse_cursor_point (const db::Point &p, int cv_index, const db::
 }
 
 void
-PluginBase::add_edge_marker_dedge (const db::DEdge &p, bool emphasize)
+PluginImpl::add_edge_marker_dedge (const db::DEdge &p, bool emphasize)
 {
   lay::EditorServiceBase::add_edge_marker (p, emphasize);
 }
 
 void
-PluginBase::add_edge_marker_edge (const db::Edge &p, int cv_index, const db::LayerProperties &lp, bool emphasize)
+PluginImpl::add_edge_marker_edge (const db::Edge &p, int cv_index, const db::LayerProperties &lp, bool emphasize)
 {
   const lay::CellView &cv = view ()->cellview (cv_index);
   if (! cv.is_valid ()) {
@@ -455,53 +609,41 @@ PluginBase::add_edge_marker_edge (const db::Edge &p, int cv_index, const db::Lay
 
 //  for testing
 bool
-PluginBase::has_tracking_position_test () const
+PluginImpl::has_tracking_position_test () const
 {
   return has_tracking_position ();
 }
 
 bool
-PluginBase::has_tracking_position_base () const
-{
-  return lay::EditorServiceBase::has_tracking_position ();
-}
-
-bool
-PluginBase::has_tracking_position () const
+PluginImpl::has_tracking_position () const
 {
   if (f_has_tracking_position.can_issue ()) {
     return f_has_tracking_position.issue<lay::EditorServiceBase, bool> (&lay::EditorServiceBase::has_tracking_position);
   } else {
-    return has_tracking_position_base ();
+    return lay::EditorServiceBase::has_tracking_position ();
   }
 }
 
 //  for testing
 db::DPoint
-PluginBase::tracking_position_test () const
+PluginImpl::tracking_position_test () const
 {
   return tracking_position ();
 }
 
 db::DPoint
-PluginBase::tracking_position_base () const
-{
-  return lay::EditorServiceBase::tracking_position ();
-}
-
-db::DPoint
-PluginBase::tracking_position () const
+PluginImpl::tracking_position () const
 {
   if (f_tracking_position.can_issue ()) {
     return f_tracking_position.issue<lay::EditorServiceBase, db::DPoint> (&lay::EditorServiceBase::tracking_position);
   } else {
-    return tracking_position_base ();
+    return lay::EditorServiceBase::tracking_position ();
   }
 }
 
 #if defined(HAVE_QTBINDINGS)
 std::vector<QWidget *>
-PluginBase::editor_options_pages ()
+PluginImpl::editor_options_pages ()
 {
   lay::EditorOptionsPages *eo_pages = view ()->editor_options_pages ();
   if (!eo_pages) {
@@ -519,38 +661,38 @@ PluginBase::editor_options_pages ()
 #endif
 
 lay::angle_constraint_type
-PluginBase::connect_ac (lay::angle_constraint_type ac) const
+PluginImpl::connect_ac (lay::angle_constraint_type ac) const
 {
   //  m_alt_ac (which is set from mouse buttons) can override the specified connect angle constraint
   return ac != lay::AC_Global ? ac : m_connect_ac;
 }
 
 lay::angle_constraint_type
-PluginBase::move_ac (lay::angle_constraint_type ac) const
+PluginImpl::move_ac (lay::angle_constraint_type ac) const
 {
   //  m_alt_ac (which is set from mouse buttons) can override the specified move angle constraint
   return ac != lay::AC_Global ? ac : m_move_ac;
 }
 
-Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
-  callback ("menu_activated", &gsi::PluginBase::menu_activated, &gsi::PluginBase::f_menu_activated, gsi::arg ("symbol"),
+Class<gsi::PluginImpl> decl_Plugin (decl_PluginBase, "lay", "Plugin",
+  callback ("menu_activated", &gsi::PluginImpl::menu_activated, &gsi::PluginImpl::f_menu_activated, gsi::arg ("symbol"),
     "@brief Gets called when a custom menu item is selected\n"
     "When a menu item is clicked which was registered with the plugin factory, the plugin's 'menu_activated' method is "
     "called for the current view. The symbol registered for the menu item is passed in the 'symbol' argument."
   ) +
-  method ("configure_test", &gsi::PluginBase::configure_test, gsi::arg ("name"), gsi::arg ("value"), "@hide") +
-  callback ("configure", &gsi::PluginBase::configure_impl, &gsi::PluginBase::f_configure, gsi::arg ("name"), gsi::arg ("value"),
+  method ("configure_test", &gsi::PluginImpl::configure_test, gsi::arg ("name"), gsi::arg ("value"), "@hide") +
+  callback ("configure", &gsi::PluginImpl::configure_impl, &gsi::PluginImpl::f_configure, gsi::arg ("name"), gsi::arg ("value"),
     "@brief Sends configuration requests to the plugin\n"
     "@param name The name of the configuration variable as registered in the plugin factory\n"
     "@param value The value of the configuration variable\n"
     "When a configuration variable is changed, the new value is reported to the plugin by calling the 'configure' method."
   ) +
-  callback ("config_finalize", &gsi::PluginBase::config_finalize_impl, &gsi::PluginBase::f_config_finalize,
+  callback ("config_finalize", &gsi::PluginImpl::config_finalize_impl, &gsi::PluginImpl::f_config_finalize,
     "@brief Sends the post-configuration request to the plugin\n"
     "After all configuration parameters have been sent, 'config_finalize' is called to given the plugin a chance to "
     "update its internal state according to the new configuration.\n"
   ) +
-  callback ("key_event", &gsi::PluginBase::key_event, &gsi::PluginBase::f_key_event, gsi::arg ("key"), gsi::arg ("buttons"),
+  callback ("key_event", &gsi::PluginImpl::key_event, &gsi::PluginImpl::f_key_event, gsi::arg ("key"), gsi::arg ("buttons"),
     "@brief Handles the key pressed event\n"
     "This method will called by the view on the active plugin when a button is pressed on the mouse.\n"
     "\n"
@@ -560,7 +702,7 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
     "@param buttons A combination of the constants in the \\ButtonState class which codes both the mouse buttons and the key modifiers (.e. ShiftButton etc).\n"
     "@return True to terminate dispatcher\n"
   ) +
-  callback ("mouse_button_pressed_event", &gsi::PluginBase::mouse_press_event_noref, &gsi::PluginBase::f_mouse_press_event, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
+  callback ("mouse_button_pressed_event", &gsi::PluginImpl::mouse_press_event_noref, &gsi::PluginImpl::f_mouse_press_event, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
     "@brief Handles the mouse button pressed event\n"
     "This method will called by the view when a button is pressed on the mouse.\n"
     "\n"
@@ -582,72 +724,72 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
     "@param buttons A combination of the constants in the \\ButtonState class which codes both the mouse buttons and the key modifiers (.e. LeftButton, ShiftButton etc).\n"
     "@return True to terminate dispatcher\n"
   ) +
-  callback ("mouse_click_event", &gsi::PluginBase::mouse_click_event_noref, &gsi::PluginBase::f_mouse_click_event, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
+  callback ("mouse_click_event", &gsi::PluginImpl::mouse_click_event_noref, &gsi::PluginImpl::f_mouse_click_event, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
     "@brief Handles the mouse button click event (after the button has been released)\n"
     "The behaviour of this callback is the same than for \\mouse_press_event, except that it is called when the mouse button has been released without moving it.\n"
   ) +
-  callback ("mouse_double_click_event", &gsi::PluginBase::mouse_double_click_event_noref, &gsi::PluginBase::f_mouse_double_click_event, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
+  callback ("mouse_double_click_event", &gsi::PluginImpl::mouse_double_click_event_noref, &gsi::PluginImpl::f_mouse_double_click_event, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
     "@brief Handles the mouse button double-click event\n"
     "The behaviour of this callback is the same than for \\mouse_press_event, except that it is called when the mouse button has been double-clicked.\n"
   ) +
-  callback ("leave_event", &gsi::PluginBase::leave_event, &gsi::PluginBase::f_leave_event, gsi::arg ("prio"),
+  callback ("leave_event", &gsi::PluginImpl::leave_event, &gsi::PluginImpl::f_leave_event, gsi::arg ("prio"),
     "@brief Handles the leave event (mouse leaves canvas area of view)\n"
     "The behaviour of this callback is the same than for \\mouse_press_event, except that it is called when the mouse leaves the canvas area.\n"
     "This method does not have a position nor button flags.\n"
   ) +
-  callback ("enter_event", &gsi::PluginBase::enter_event, &gsi::PluginBase::f_enter_event, gsi::arg ("prio"),
+  callback ("enter_event", &gsi::PluginImpl::enter_event, &gsi::PluginImpl::f_enter_event, gsi::arg ("prio"),
     "@brief Handles the enter event (mouse enters canvas area of view)\n"
     "The behaviour of this callback is the same than for \\mouse_press_event, except that it is called when the mouse enters the canvas area.\n"
     "This method does not have a position nor button flags.\n"
   ) +
-  callback ("mouse_moved_event", &gsi::PluginBase::mouse_move_event_noref, &gsi::PluginBase::f_mouse_move_event, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
+  callback ("mouse_moved_event", &gsi::PluginImpl::mouse_move_event_noref, &gsi::PluginImpl::f_mouse_move_event, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
     "@brief Handles the mouse move event\n"
     "The behaviour of this callback is the same than for \\mouse_press_event, except that it is called when the mouse is moved in the canvas area.\n"
     "\n"
     "The mouse move event is important for a number of background jobs, such as coordinate display in the status bar.\n"
     "Hence, you should not consume the event - i.e. you should return 'false' from this method.\n"
   ) +
-  callback ("mouse_button_released_event", &gsi::PluginBase::mouse_release_event_noref, &gsi::PluginBase::f_mouse_release_event, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
+  callback ("mouse_button_released_event", &gsi::PluginImpl::mouse_release_event_noref, &gsi::PluginImpl::f_mouse_release_event, gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
     "@brief Handles the mouse button release event\n"
     "The behaviour of this callback is the same than for \\mouse_press_event, except that it is called when the mouse button is released.\n"
   ) +
-  callback ("wheel_event", &gsi::PluginBase::wheel_event_noref, &gsi::PluginBase::f_wheel_event, gsi::arg ("delta"), gsi::arg ("horizontal"), gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
+  callback ("wheel_event", &gsi::PluginImpl::wheel_event_noref, &gsi::PluginImpl::f_wheel_event, gsi::arg ("delta"), gsi::arg ("horizontal"), gsi::arg ("p"), gsi::arg ("buttons"), gsi::arg ("prio"),
+    "@brief Handles the mouse wheel event\n"
     "The behaviour of this callback is the same than for \\mouse_press_event, except that it is called when the mouse wheel is rotated.\n"
     "Additional parameters for this event are 'delta' (the rotation angle in units of 1/8th degree) and 'horizontal' which is true when the horizontal wheel was rotated and "
     "false if the vertical wheel was rotated.\n"
   ) +
-  callback ("activated", &gsi::PluginBase::activated, &gsi::PluginBase::f_activated,
+  callback ("activated", &gsi::PluginImpl::activated, &gsi::PluginImpl::f_activated,
     "@brief Gets called when the plugin is activated (selected in the tool bar)\n"
   ) +
-  callback ("deactivated", &gsi::PluginBase::deactivated, &gsi::PluginBase::f_deactivated,
+  callback ("deactivated", &gsi::PluginImpl::deactivated, &gsi::PluginImpl::f_deactivated,
     "@brief Gets called when the plugin is deactivated and another plugin is activated\n"
   ) +
-  callback ("drag_cancel", &gsi::PluginBase::drag_cancel, &gsi::PluginBase::f_drag_cancel,
-    "@brief Gets called on various occasions when a drag operation should be canceled\n"
+  callback ("drag_cancel", &gsi::PluginImpl::drag_cancel, &gsi::PluginImpl::f_drag_cancel,
+    "@brief Gets called on various occasions when some mouse drag operation should be canceled\n"
     "If the plugin implements some press-and-drag or a click-and-drag operation, this callback should "
-    "cancel this operation and return in some state waiting for a new mouse event."
+    "cancel this operation and return to some state waiting for a new mouse event."
   ) +
-  callback ("update", &gsi::PluginBase::update, &gsi::PluginBase::f_update,
+  callback ("update", &gsi::PluginImpl::update, &gsi::PluginImpl::f_update,
     "@brief Gets called when the view has changed\n"
     "This method is called in particular if the view has changed the visible rectangle, i.e. after zooming in or out or panning. "
     "This callback can be used to update any internal states that depend on the view's state."
   ) + 
-  method ("grab_mouse", &gsi::PluginBase::grab_mouse,
+  method ("grab_mouse", &gsi::PluginImpl::grab_mouse,
     "@brief Redirects mouse events to this plugin, even if the plugin is not active.\n"
   ) + 
-  method ("ungrab_mouse", &gsi::PluginBase::ungrab_mouse,
+  method ("ungrab_mouse", &gsi::PluginImpl::ungrab_mouse,
     "@brief Removes a mouse grab registered with \\grab_mouse.\n"
   ) + 
-  method ("set_cursor", &gsi::PluginBase::set_cursor, gsi::arg ("cursor_type"),
+  method ("set_cursor", &gsi::PluginImpl::set_cursor, gsi::arg ("cursor_type"),
     "@brief Sets the cursor in the view area to the given type\n"
     "Setting the cursor has an effect only inside event handlers, i.e. \\mouse_button_pressed_event. The cursor is not set permanently. Is is reset "
     "in the mouse move handler unless a button is pressed or the cursor is explicitly set again in \\mouse_moved_event.\n"
     "\n"
     "The cursor type is one of the cursor constants in the \\Cursor class, i.e. 'CursorArrow' for the normal cursor."
   ) +
-  method ("has_tracking_position_test", &gsi::PluginBase::has_tracking_position_test, "@hide") +
-  method ("has_tracking_position", &gsi::PluginBase::has_tracking_position_base, "@hide") +
-  callback ("has_tracking_position", &gsi::PluginBase::has_tracking_position, &gsi::PluginBase::f_has_tracking_position,
+  method ("has_tracking_position_test", &gsi::PluginImpl::has_tracking_position_test, "@hide") +
+  callback ("has_tracking_position", &gsi::PluginImpl::has_tracking_position, &gsi::PluginImpl::f_has_tracking_position,
     "@brief Gets a value indicating whether the plugin provides a tracking position\n"
     "The tracking position is shown in the lower-left corner of the layout window to indicate the current position.\n"
     "If this method returns true for the active service, the application will fetch the position by calling \\tracking_position "
@@ -659,9 +801,8 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
     "\n"
     "This method has been added in version 0.27.6."
   ) +
-  method ("tracking_position_test", &gsi::PluginBase::tracking_position_test, "@hide") +
-  method ("tracking_position", &gsi::PluginBase::tracking_position_base, "@hide") +
-  callback ("tracking_position", &gsi::PluginBase::tracking_position, &gsi::PluginBase::f_tracking_position,
+  method ("tracking_position_test", &gsi::PluginImpl::tracking_position_test, "@hide") +
+  callback ("tracking_position", &gsi::PluginImpl::tracking_position, &gsi::PluginImpl::f_tracking_position,
     "@brief Gets the tracking position\n"
     "See \\has_tracking_position for details.\n"
     "\n"
@@ -672,14 +813,14 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
     "\n"
     "This method has been added in version 0.27.6."
   ) +
-  method ("clear_mouse_cursors", &gsi::PluginBase::clear_mouse_cursors,
+  method ("clear_mouse_cursors", &gsi::PluginImpl::clear_mouse_cursors,
     "@brief Clears all existing mouse cursors\n"
     "Use this function to remove exisiting mouse cursors (see \\add_mouse_cursor and \\add_edge_marker).\n"
     "This method is automatically called when the plugin becomes deactivated.\n"
     "\n"
     "This method has been added in version 0.30.4."
   ) +
-  method ("add_mouse_cursor", &gsi::PluginBase::add_mouse_cursor_dpoint, gsi::arg ("p"), gsi::arg ("emphasize", false),
+  method ("add_mouse_cursor", &gsi::PluginImpl::add_mouse_cursor_dpoint, gsi::arg ("p"), gsi::arg ("emphasize", false),
     "@brief Creates a cursor to indicate the mouse position\n"
     "This function will create a marker that indicates the (for example snapped) mouse position.\n"
     "In addition to this, it will establish the position for the tracking cursor, if mouse\n"
@@ -697,7 +838,7 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
     "\n"
     "This method has been added in version 0.30.4."
   ) +
-  method ("add_mouse_cursor", &gsi::PluginBase::add_mouse_cursor_point, gsi::arg ("p"), gsi::arg ("cv_index"), gsi::arg ("layer"), gsi::arg ("emphasize", false),
+  method ("add_mouse_cursor", &gsi::PluginImpl::add_mouse_cursor_point, gsi::arg ("p"), gsi::arg ("cv_index"), gsi::arg ("layer"), gsi::arg ("emphasize", false),
     "@brief Creates a cursor to indicate the mouse position\n"
     "This version of this method creates a mouse cursor based on the integer-unit point and\n"
     "a source cellview index plus a layer info.\n"
@@ -706,7 +847,7 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
     "\n"
     "This method has been added in version 0.30.4."
   ) +
-  method ("add_edge_marker", &gsi::PluginBase::add_edge_marker_dedge, gsi::arg ("e"), gsi::arg ("emphasize", false),
+  method ("add_edge_marker", &gsi::PluginImpl::add_edge_marker_dedge, gsi::arg ("e"), gsi::arg ("emphasize", false),
     "@brief Creates a cursor to indicate an edge\n"
     "This function will create a marker that indicates an edge - for example the edge that a point is snapping to. "
     "\n"
@@ -716,7 +857,7 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
     "\n"
     "This method has been added in version 0.30.4."
   ) +
-  method ("add_edge_marker", &gsi::PluginBase::add_edge_marker_edge, gsi::arg ("e"), gsi::arg ("cv_index"), gsi::arg ("layer"), gsi::arg ("emphasize", false),
+  method ("add_edge_marker", &gsi::PluginImpl::add_edge_marker_edge, gsi::arg ("e"), gsi::arg ("cv_index"), gsi::arg ("layer"), gsi::arg ("emphasize", false),
     "@brief Creates a cursor to indicate an edge\n"
     "This version of this method creates an edge marker based on the integer-unit edge and\n"
     "a source cellview index plus a layer info.\n"
@@ -733,7 +874,7 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
     "\n"
     "This method has been added in version 0.30.4."
   ) +
-  method ("snap", &gsi::PluginBase::snap, gsi::arg ("p"),
+  method ("snap", &gsi::PluginImpl::snap, gsi::arg ("p"),
     "@brief Snaps a point to the edit grid\n"
     "\n"
     "@param p The point to snap\n"
@@ -744,7 +885,7 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
     "\n"
     "This method has been added in version 0.30.4."
   ) +
-  method ("snap", &gsi::PluginBase::snap_vector, gsi::arg ("v"),
+  method ("snap", &gsi::PluginImpl::snap_vector, gsi::arg ("v"),
     "@brief Snaps a vector to the edit grid\n"
     "\n"
     "@param v The vector to snap\n"
@@ -755,7 +896,7 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
     "\n"
     "This method has been added in version 0.30.4."
   ) +
-  method ("snap", &gsi::PluginBase::snap_from_to, gsi::arg ("p"), gsi::arg ("plast"), gsi::arg ("connect", false), gsi::arg ("ac", lay::AC_Global, "AC_Global"),
+  method ("snap", &gsi::PluginImpl::snap_from_to, gsi::arg ("p"), gsi::arg ("plast"), gsi::arg ("connect", false), gsi::arg ("ac", lay::AC_Global, "AC_Global"),
     "@brief Snaps a point to the edit grid with an angle constraint\n"
     "\n"
     "@param p The point to snap\n"
@@ -778,7 +919,7 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
     "\n"
     "This method has been added in version 0.30.4."
   ) +
-  method ("snap", &gsi::PluginBase::snap_delta, gsi::arg ("v"), gsi::arg ("connect", false), gsi::arg ("ac", lay::AC_Global, "AC_Global"),
+  method ("snap", &gsi::PluginImpl::snap_delta, gsi::arg ("v"), gsi::arg ("connect", false), gsi::arg ("ac", lay::AC_Global, "AC_Global"),
     "@brief Snaps a move vector to the edit grid with and implies an angle constraint\n"
     "\n"
     "@param v The vector to snap\n"
@@ -795,7 +936,7 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
     "\n"
     "This method has been added in version 0.30.4."
   ) +
-  method ("snap2", &gsi::PluginBase::snap2, gsi::arg ("p"), gsi::arg ("visualize", false),
+  method ("snap2", &gsi::PluginImpl::snap2, gsi::arg ("p"), gsi::arg ("visualize", false),
     "@brief Snaps a point to the edit grid with advanced snapping (including object snapping)\n"
     "\n"
     "@param p The point to snap\n"
@@ -810,7 +951,7 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
     "\n"
     "This method has been added in version 0.30.4."
   ) +
-  method ("snap2", &gsi::PluginBase::snap2_from_to, gsi::arg ("p"), gsi::arg ("plast"), gsi::arg ("connect", false), gsi::arg ("ac", lay::AC_Global, "AC_Global"), gsi::arg ("visualize", false),
+  method ("snap2", &gsi::PluginImpl::snap2_from_to, gsi::arg ("p"), gsi::arg ("plast"), gsi::arg ("connect", false), gsi::arg ("ac", lay::AC_Global, "AC_Global"), gsi::arg ("visualize", false),
     "@brief Snaps a point to the edit grid with an angle constraint with advanced snapping (including object snapping)\n"
     "\n"
     "@param p The point to snap\n"
@@ -836,7 +977,7 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
     "This method has been added in version 0.30.4."
   ) +
 #if defined(HAVE_QTBINDINGS)
-  gsi::method ("editor_options_pages", &gsi::PluginBase::editor_options_pages,
+  gsi::method ("editor_options_pages", &gsi::PluginImpl::editor_options_pages,
     "@brief Gets the editor options pages which are associated with the view\n"
     "The editor options pages are created by the plugin factory class and are associated with this plugin.\n"
     "This method allows locating them and using them for plugin-specific purposes.\n"
@@ -844,13 +985,13 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
     "This method has been added in version 0.30.4."
   ) +
 #endif
-  gsi::method ("view", &gsi::PluginBase::view,
+  gsi::method ("view", &gsi::PluginImpl::view,
     "@brief Gets the view object the plugin is associated with\n"
     "This method returns the view object that the plugin is associated with.\n"
     "\n"
     "This convenience method has been added in version 0.30.4."
   ) +
-  gsi::method ("dispatcher", &gsi::PluginBase::dispatcher,
+  gsi::method ("dispatcher", &gsi::PluginImpl::dispatcher,
     "@brief Gets the dispatcher object the plugin is associated with\n"
     "This method returns the dispatcher object that the plugin is associated with.\n"
     "The dispatcher object manages the configuration parameters. 'set_config', 'get_config' and 'commit_config' "
@@ -893,7 +1034,7 @@ gsi::Enum<lay::angle_constraint_type> decl_AngleConstraintType ("lay", "AngleCon
   "This enum has been introduced in version 0.30.4."
 );
 
-gsi::ClassExt<gsi::PluginBase> inject_AngleConstraintType_in_parent (decl_AngleConstraintType.defs ());
+gsi::ClassExt<gsi::PluginImpl> inject_AngleConstraintType_in_parent (decl_AngleConstraintType.defs ());
 
 class CursorNamespace { };
 

@@ -32,11 +32,11 @@
 namespace gsi
 {
 
-class PluginBase
+class PluginImpl
   : public lay::EditorServiceBase
 {
 public:
-  PluginBase ();
+  PluginImpl ();
 
   void init (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);
   void grab_mouse ();
@@ -63,24 +63,18 @@ public:
   virtual void config_finalize ();
   virtual bool key_event (unsigned int key, unsigned int buttons);
   virtual bool mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio) ;
-  //  NOTE: this version doesn't take a point reference which allows up to store the point
   bool mouse_press_event_noref (db::DPoint p, unsigned int buttons, bool prio);
   virtual bool mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio);
-  //  NOTE: this version doesn't take a point reference which allows up to store the point
   bool mouse_click_event_noref (db::DPoint p, unsigned int buttons, bool prio);
   virtual bool mouse_double_click_event (const db::DPoint &p, unsigned int buttons, bool prio);
-  //  NOTE: this version doesn't take a point reference which allows up to store the point
   bool mouse_double_click_event_noref (db::DPoint p, unsigned int buttons, bool prio);
   virtual bool leave_event (bool prio);
   virtual bool enter_event (bool prio);
   virtual bool mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio);
-  //  NOTE: this version doesn't take a point reference which allows up to store the point
   bool mouse_move_event_noref (db::DPoint p, unsigned int buttons, bool prio);
   virtual bool mouse_release_event (const db::DPoint &p, unsigned int buttons, bool prio);
-  //  NOTE: this version doesn't take a point reference which allows up to store the point
   bool mouse_release_event_noref (db::DPoint p, unsigned int buttons, bool prio);
   virtual bool wheel_event (int delta, bool horizontal, const db::DPoint &p, unsigned int buttons, bool prio);
-  //  NOTE: this version doesn't take a point reference which allows up to store the point
   bool wheel_event_noref (int delta, bool horizontal, db::DPoint p, unsigned int buttons, bool prio);
   virtual void activated ();
   void deactivated_impl ();
@@ -94,12 +88,10 @@ public:
 
   //  for testing
   bool has_tracking_position_test () const;
-  bool has_tracking_position_base () const;
   virtual bool has_tracking_position () const;
 
   //  for testing
   db::DPoint tracking_position_test () const;
-  db::DPoint tracking_position_base () const;
   virtual db::DPoint tracking_position () const;
 
   virtual lay::ViewService *view_service_interface ()

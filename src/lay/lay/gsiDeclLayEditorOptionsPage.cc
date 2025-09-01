@@ -48,10 +48,20 @@ Class<lay::EditorOptionsPage> decl_EditorOptionsPageBase (QT_EXTERNAL_BASE (QWid
     "@brief Sets a flag indicating whether the page is a focus page\n"
     "The focus page is the page that is selected when the tab key is pressed during some plugin action.\n"
   ) +
-  method ("make_current", &lay::EditorOptionsPage::make_current,
-    "@brief Brings the page to the front of the tab stack\n"
-    "Calling this method will make this page the current one in the tab stack, provided "
-    "the page is visible."
+  method ("is_modal_page?", &lay::EditorOptionsPage::is_modal_page,
+    "@brief Gets a flag indicating whether the page is a modal page\n"
+    "See \\modal_page= for a description is this attribute.\n"
+  ) +
+  method ("modal_page=", &lay::EditorOptionsPage::set_modal_page, gsi::arg ("flag"),
+    "@brief Sets a flag indicating whether the page is a modal page\n"
+    "A modal page is shown in a modal dialog upon \\show. Non-modal pages are shown in the "
+    "editor options dock.\n"
+  ) +
+  method ("show", &lay::EditorOptionsPage::show,
+    "@brief Shows the page\n"
+    "Provided the page is selected because the plugin is active, this method will "
+    "open a dialog to show the page if it is modal, or locate the page in the editor options "
+    "dock and bring it to the front if it is non-modal."
   ) +
   method ("do_apply", &lay::EditorOptionsPage::apply, gsi::arg ("dispatcher"),
     "@brief Transfers data from the page to the configuration\n"
@@ -71,6 +81,9 @@ Class<lay::EditorOptionsPage> decl_EditorOptionsPageBase (QT_EXTERNAL_BASE (QWid
   "\n"
   "It features some useful methods such as 'view' and provides a slot to call for triggering a data "
   "transfer ('edited').\n"
+  "\n"
+  "Note that even though the page class is derived from QWidget, you can call QWidget methods "
+  "but not overload virtual methods from QWidget.\n"
   "\n"
   "This class has been introduced in version 0.30.4.\n"
 );

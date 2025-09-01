@@ -367,8 +367,7 @@ EditorServiceBase::key_event (unsigned int key, unsigned int buttons)
     auto pages = editor_options_pages ();
     for (auto p = pages.begin (); p != pages.end (); ++p) {
       if ((*p)->is_focus_page ()) {
-        (*p)->make_current ();
-        (*p)->setFocus (Qt::TabFocusReason);
+        (*p)->show ();
         return true;
       }
     }

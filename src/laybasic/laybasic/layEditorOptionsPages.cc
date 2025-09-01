@@ -34,6 +34,8 @@
 #include <QToolButton>
 #include <QCompleter>
 #include <QLineEdit>
+#include <QDialogButtonBox>
+#include <QPushButton>
 
 namespace lay
 {
@@ -52,6 +54,8 @@ struct EOPCompareOp
 EditorOptionsPages::EditorOptionsPages (QWidget *parent, const std::vector<lay::EditorOptionsPage *> &pages, lay::Dispatcher *dispatcher)
   : QFrame (parent), mp_dispatcher (dispatcher)
 {
+  mp_modal_pages = new EditorOptionsModalPages (this);
+
   QVBoxLayout *ly1 = new QVBoxLayout (this);
   ly1->setContentsMargins (0, 0, 0, 0);
 
@@ -73,6 +77,9 @@ EditorOptionsPages::~EditorOptionsPages ()
   while (m_pages.size () > 0) {
     delete m_pages.front ();
   }
+
+  delete mp_modal_pages;
+  mp_modal_pages = 0;
 }
 
 void
@@ -84,17 +91,51 @@ EditorOptionsPages::focusInEvent (QFocusEvent * /*event*/)
   }
 }
 
-bool EditorOptionsPages::has_content () const
+bool
+EditorOptionsPages::has_content () const
 {
   for (std::vector <lay::EditorOptionsPage *>::const_iterator p = m_pages.begin (); p != m_pages.end (); ++p) {
-    if ((*p)->active ()) {
+    if ((*p)->active () && ! (*p)->is_modal_page ()) {
       return true;
     }
   }
   return false;
 }
 
-void EditorOptionsPages::activate (const lay::Plugin *plugin)
+bool
+EditorOptionsPages::has_modal_content () const
+{
+  for (std::vector <lay::EditorOptionsPage *>::const_iterator p = m_pages.begin (); p != m_pages.end (); ++p) {
+    if ((*p)->active () && (*p)->is_modal_page ()) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool
+EditorOptionsPages::exec_modal (EditorOptionsPage *page)
+{
+  QTabWidget *modal_pages = mp_modal_pages->pages_widget ();
+
+  for (int i = 0; i < modal_pages->count (); ++i) {
+
+    if (modal_pages->widget (i) == page) {
+
+      //  found the page - make it current and show the dialog
+      modal_pages->setCurrentIndex (i);
+      page->set_focus ();
+      return mp_modal_pages->exec () != 0;
+
+    }
+
+  }
+
+  return false;
+}
+
+void
+EditorOptionsPages::activate (const lay::Plugin *plugin)
 {
   for (auto op = m_pages.begin (); op != m_pages.end (); ++op) {
     bool is_active = false;
@@ -126,6 +167,7 @@ EditorOptionsPages::make_page_current (lay::EditorOptionsPage *page)
   for (int i = 0; i < mp_pages->count (); ++i) {
     if (mp_pages->widget (i) == page) {
       mp_pages->setCurrentIndex (i);
+      page->set_focus ();
       break;
     }
   }
@@ -151,6 +193,8 @@ EditorOptionsPages::update (lay::EditorOptionsPage *page)
   std::vector <lay::EditorOptionsPage *> sorted_pages = m_pages;
   std::sort (sorted_pages.begin (), sorted_pages.end (), EOPCompareOp ());
 
+  QTabWidget *modal_pages = mp_modal_pages->pages_widget ();
+
   if (! page && m_pages.size () > 0) {
     page = m_pages.back ();
   }
@@ -158,17 +202,39 @@ EditorOptionsPages::update (lay::EditorOptionsPage *page)
   while (mp_pages->count () > 0) {
     mp_pages->removeTab (0);
   }
+
+  while (modal_pages->count () > 0) {
+    modal_pages->removeTab (0);
+  }
+
   int index = -1;
+  int modal_index = -1;
+
   for (std::vector <lay::EditorOptionsPage *>::iterator p = sorted_pages.begin (); p != sorted_pages.end (); ++p) {
     if ((*p)->active ()) {
-      if ((*p) == page) {
-        index = mp_pages->count ();
+      if (! (*p)->is_modal_page ()) {
+        if ((*p) == page) {
+          index = mp_pages->count ();
+        }
+        mp_pages->addTab (*p, tl::to_qstring ((*p)->title ()));
+      } else {
+        if ((*p) == page) {
+          modal_index = modal_pages->count ();
+        }
+        modal_pages->addTab (*p, tl::to_qstring ((*p)->title ()));
       }
-      mp_pages->addTab (*p, tl::to_qstring ((*p)->title ()));
     } else {
       (*p)->setParent (0);
     }
   }
+
+  lay::EditorOptionsPage *single_modal_page = modal_pages->count () == 1 ? dynamic_cast<lay::EditorOptionsPage *> (modal_pages->widget (0)) : 0;
+  if (single_modal_page) {
+    mp_modal_pages->setWindowTitle (tl::to_qstring (single_modal_page->title ()));
+  } else {
+    mp_modal_pages->setWindowTitle (tr ("Editor Options"));
+  }
+
   if (index < 0) {
     index = mp_pages->currentIndex ();
   }
@@ -177,27 +243,33 @@ EditorOptionsPages::update (lay::EditorOptionsPage *page)
   }
   mp_pages->setCurrentIndex (index);
 
+  if (modal_index < 0) {
+    modal_index = modal_pages->currentIndex ();
+  }
+  if (modal_index >= int (modal_pages->count ())) {
+    modal_index = modal_pages->count () - 1;
+  }
+  modal_pages->setCurrentIndex (modal_index);
+
   setVisible (mp_pages->count () > 0);
 }
 
 void 
 EditorOptionsPages::setup ()
 {
-  try {
+BEGIN_PROTECTED
 
-    for (std::vector <lay::EditorOptionsPage *>::iterator p = m_pages.begin (); p != m_pages.end (); ++p) {
-      if ((*p)->active ()) {
-        (*p)->setup (mp_dispatcher);
-      }
+  for (std::vector <lay::EditorOptionsPage *>::iterator p = m_pages.begin (); p != m_pages.end (); ++p) {
+    if ((*p)->active ()) {
+      (*p)->setup (mp_dispatcher);
     }
-
-    //  make the display consistent with the status (this is important for 
-    //  PCell parameters where the PCell may be asked to modify the parameters)
-    do_apply ();
-
-  } catch (...) {
-    //  catch any errors related to configuration file errors etc.
   }
+
+  //  make the display consistent with the status (this is important for
+  //  PCell parameters where the PCell may be asked to modify the parameters)
+  do_apply ();
+
+END_PROTECTED_W (this)
 }
 
 void 
@@ -217,6 +289,54 @@ EditorOptionsPages::apply ()
 BEGIN_PROTECTED
   do_apply ();
 END_PROTECTED_W (this)
+}
+
+// ------------------------------------------------------------------
+//  EditorOptionsModalPages implementation
+
+EditorOptionsModalPages::EditorOptionsModalPages (EditorOptionsPages *parent)
+  : QDialog (parent), mp_parent (parent)
+{
+  QVBoxLayout *ly = new QVBoxLayout (this);
+
+  mp_pages = new QTabWidget (this);
+  ly->addWidget (mp_pages, 1);
+  mp_pages->setTabBarAutoHide (true);
+
+  mp_button_box = new QDialogButtonBox (this);
+  ly->addWidget (mp_button_box);
+  mp_button_box->setOrientation (Qt::Horizontal);
+  mp_button_box->setStandardButtons (QDialogButtonBox::Cancel | QDialogButtonBox::Apply | QDialogButtonBox::Ok);
+
+  connect (mp_button_box, SIGNAL (clicked(QAbstractButton *)), this, SLOT (clicked(QAbstractButton *)));
+  connect (mp_button_box, SIGNAL (accepted()), this, SLOT (accept()));
+  connect (mp_button_box, SIGNAL (rejected()), this, SLOT (reject()));
+}
+
+EditorOptionsModalPages::~EditorOptionsModalPages ()
+{
+  //  .. nothing yet ..
+}
+
+void
+EditorOptionsModalPages::accept ()
+{
+  mp_parent->apply ();
+  QDialog::accept ();
+}
+
+void
+EditorOptionsModalPages::reject ()
+{
+  QDialog::reject ();
+}
+
+void
+EditorOptionsModalPages::clicked (QAbstractButton *button)
+{
+  if (button == mp_button_box->button (QDialogButtonBox::Apply)) {
+    mp_parent->apply ();
+  }
 }
 
 }

@@ -28,14 +28,16 @@
 #include "laybasicCommon.h"
 #include "layEditorOptionsPage.h"
 
-#include <tlVariant.h>
-
 #include <QFrame>
+#include <QDialog>
+
 #include <vector>
 #include <string>
 
 class QTabWidget;
 class QLabel;
+class QDialogButtonBox;
+class QAbstractButton;
 
 namespace lay
 {
@@ -43,9 +45,10 @@ namespace lay
 class PluginDeclaration;
 class Dispatcher;
 class Plugin;
+class EditorOptionsModalPages;
 
 /**
- *  @brief The object properties dialog
+ *  @brief The object properties tab widget
  */
 class LAYBASIC_PUBLIC EditorOptionsPages
   : public QFrame
@@ -61,6 +64,7 @@ public:
   void activate (const lay::Plugin *plugin);
   void focusInEvent (QFocusEvent *event);
   void make_page_current (lay::EditorOptionsPage *page);
+  bool exec_modal (lay::EditorOptionsPage *page);
 
   const std::vector <lay::EditorOptionsPage *> &pages () const
   {
@@ -68,6 +72,7 @@ public:
   }
 
   bool has_content () const;
+  bool has_modal_content () const;
 
 public slots:
   void apply ();
@@ -77,9 +82,38 @@ private:
   std::vector <lay::EditorOptionsPage *> m_pages;
   lay::Dispatcher *mp_dispatcher;
   QTabWidget *mp_pages;
+  EditorOptionsModalPages *mp_modal_pages;
 
   void update (lay::EditorOptionsPage *page);
   void do_apply ();
+};
+
+/**
+ *  @brief The object properties modal page dialog
+ */
+class LAYBASIC_PUBLIC EditorOptionsModalPages
+  : public QDialog
+{
+Q_OBJECT
+
+public:
+  EditorOptionsModalPages (EditorOptionsPages *parent);
+  ~EditorOptionsModalPages ();
+
+  QTabWidget *pages_widget ()
+  {
+    return mp_pages;
+  }
+
+private slots:
+  void accept ();
+  void reject ();
+  void clicked (QAbstractButton *button);
+
+private:
+  EditorOptionsPages *mp_parent;
+  QTabWidget *mp_pages;
+  QDialogButtonBox *mp_button_box;
 };
 
 }

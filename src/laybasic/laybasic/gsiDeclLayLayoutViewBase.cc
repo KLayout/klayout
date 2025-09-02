@@ -497,7 +497,9 @@ static bool view_is_dirty (lay::LayoutViewBase *view)
   return view->is_dirty ();
 }
 
-LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase ("lay", "LayoutViewBase",
+extern Class<lay::Dispatcher> decl_Dispatcher;
+
+LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase (decl_Dispatcher, "lay", "LayoutViewBase",
   gsi::constant ("LV_NoLayers", (unsigned int) lay::LayoutViewBase::LV_NoLayers,
     "@brief With this option, no layers view will be provided (see \\layer_control_frame)\n"
     "Use this value with the constructor's 'options' argument.\n"

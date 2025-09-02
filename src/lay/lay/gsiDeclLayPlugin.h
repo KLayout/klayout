@@ -95,6 +95,8 @@ public:
   db::DPoint tracking_position_test () const;
   virtual db::DPoint tracking_position () const;
 
+  virtual int focus_page_open (lay::EditorOptionsPage *fp);
+
   virtual lay::ViewService *view_service_interface ()
   {
     return this;
@@ -128,6 +130,7 @@ public:
   gsi::Callback f_update;
   gsi::Callback f_has_tracking_position;
   gsi::Callback f_tracking_position;
+  gsi::Callback f_focus_page_open;
 
 private:
   tl::weak_ptr<lay::LayoutViewBase> mp_view;

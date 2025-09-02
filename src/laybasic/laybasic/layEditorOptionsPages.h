@@ -73,6 +73,7 @@ public:
 
   bool has_content () const;
   bool has_modal_content () const;
+  void do_apply (bool modal);
 
 public slots:
   void apply ();
@@ -85,7 +86,6 @@ private:
   EditorOptionsModalPages *mp_modal_pages;
 
   void update (lay::EditorOptionsPage *page);
-  void do_apply ();
 };
 
 /**

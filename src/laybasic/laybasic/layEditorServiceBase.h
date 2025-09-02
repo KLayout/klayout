@@ -270,6 +270,18 @@ public:
    *  @brief Gets the editor options pages associated with this plugin
    */
   std::vector<lay::EditorOptionsPage *> editor_options_pages ();
+
+  /**
+   *  @brief Gets the focus page or 0 if there is none
+   */
+  lay::EditorOptionsPage *focus_page ();
+
+  /**
+   *  @brief Gets called when the focus page opens
+   *
+   *  The default implementation will call fp->show() and return its return value.
+   */
+  virtual int focus_page_open (EditorOptionsPage *fp);
 #endif
 
 private:

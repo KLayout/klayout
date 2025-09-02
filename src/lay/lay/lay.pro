@@ -121,7 +121,6 @@ FORMS = \
 SOURCES = \
     gsiDeclLayApplication.cc \
     gsiDeclLayConfigPage.cc \
-    gsiDeclLayDispatcher.cc \
     gsiDeclLayEditorOptionsPage.cc \
     gsiDeclLayHelpDialog.cc \
     gsiDeclLayMainWindow.cc \

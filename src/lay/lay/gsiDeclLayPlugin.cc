@@ -646,6 +646,15 @@ PluginImpl::tracking_position () const
   }
 }
 
+int PluginImpl::focus_page_open(lay::EditorOptionsPage *fp)
+{
+  if (f_focus_page_open.can_issue ()) {
+    return f_focus_page_open.issue<lay::EditorServiceBase, int, lay::EditorOptionsPage *> (&lay::EditorServiceBase::focus_page_open, fp);
+  } else {
+    return lay::EditorServiceBase::focus_page_open (fp);
+  }
+}
+
 lay::angle_constraint_type
 PluginImpl::connect_ac (lay::angle_constraint_type ac) const
 {
@@ -967,6 +976,22 @@ Class<gsi::PluginImpl> decl_Plugin (decl_PluginBase, "lay", "Plugin",
     "@brief Gets the editor options pages which are associated with the view\n"
     "The editor options pages are created by the plugin factory class and are associated with this plugin.\n"
     "This method allows locating them and using them for plugin-specific purposes.\n"
+    "\n"
+    "This method has been added in version 0.30.4."
+  ) +
+  gsi::method ("focus_page", &gsi::PluginImpl::focus_page,
+    "@brief Gets the (first) focus page\n"
+    "Focus pages are editor options pages that have a true value for \\EditorOptionsPage#is_focus_page.\n"
+    "The pages can be navigated to quickly or can be shown in a modal dialog from the editor function.\n"
+    "This method returns the first focus page present in the editor options pages stack.\n"
+    "\n"
+    "This method has been added in version 0.30.4."
+  ) +
+  callback ("focus_page_open", &gsi::PluginImpl::focus_page_open, &gsi::PluginImpl::f_focus_page_open, gsi::arg ("focus_page"),
+    "@brief Gets called when the focus page wants to be opened - i.e. if 'Tab' is pressed during editing\n"
+    "The default implementation calls \\EditorOptionsPage#show. This method can be overloaded to provide certain actions before "
+    "or after the page is shown, specifically if the page is a modal one. For example, it can update the page with current "
+    "dimensions of a shape that is created and after committing the page, adjust the shape accordingly.\n"
     "\n"
     "This method has been added in version 0.30.4."
   ) +

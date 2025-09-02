@@ -157,8 +157,8 @@ struct LAYBASIC_PUBLIC LayerDisplayProperties
  *  It manages the layer display list, bookmark list etc.
  */
 class LAYBASIC_PUBLIC LayoutViewBase :
-    public lay::Editables,
-    public lay::Dispatcher
+    public lay::Dispatcher,   //  needs to be first as it is the GSI base class
+    public lay::Editables
 {
 public:
   typedef lay::CellView::unspecific_cell_path_type cell_path_type;

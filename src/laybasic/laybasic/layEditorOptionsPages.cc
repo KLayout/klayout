@@ -122,6 +122,7 @@ EditorOptionsPages::exec_modal (EditorOptionsPage *page)
 
       //  found the page - make it current and show the dialog
       mp_modal_pages->set_current_index (i);
+      page->setup (mp_dispatcher);
       page->set_focus ();
       return mp_modal_pages->exec () != 0;
 
@@ -165,6 +166,7 @@ EditorOptionsPages::make_page_current (lay::EditorOptionsPage *page)
   for (int i = 0; i < mp_pages->count (); ++i) {
     if (mp_pages->widget (i) == page) {
       mp_pages->setCurrentIndex (i);
+      page->setup (mp_dispatcher);
       page->set_focus ();
       break;
     }
@@ -256,16 +258,17 @@ BEGIN_PROTECTED
 
   //  make the display consistent with the status (this is important for
   //  PCell parameters where the PCell may be asked to modify the parameters)
-  do_apply ();
+  do_apply (false);
+  do_apply (true);
 
 END_PROTECTED_W (this)
 }
 
 void 
-EditorOptionsPages::do_apply ()
+EditorOptionsPages::do_apply (bool modal)
 {
   for (std::vector <lay::EditorOptionsPage *>::iterator p = m_pages.begin (); p != m_pages.end (); ++p) {
-    if ((*p)->active ()) {
+    if ((*p)->active () && modal == (*p)->is_modal_page ()) {
       //  NOTE: we apply to the root dispatcher, so other dispatchers (views) get informed too.
       (*p)->apply (mp_dispatcher->dispatcher ());
     }
@@ -276,7 +279,7 @@ void
 EditorOptionsPages::apply ()
 {
 BEGIN_PROTECTED
-  do_apply ();
+  do_apply (false);
 END_PROTECTED_W (this)
 }
 
@@ -417,8 +420,10 @@ EditorOptionsModalPages::widget (int index)
 void
 EditorOptionsModalPages::accept ()
 {
-  mp_parent->apply ();
+BEGIN_PROTECTED
+  mp_parent->do_apply (true);
   QDialog::accept ();
+END_PROTECTED
 }
 
 void
@@ -430,9 +435,11 @@ EditorOptionsModalPages::reject ()
 void
 EditorOptionsModalPages::clicked (QAbstractButton *button)
 {
+BEGIN_PROTECTED
   if (button == mp_button_box->button (QDialogButtonBox::Apply)) {
-    mp_parent->apply ();
+    mp_parent->do_apply (true);
   }
+END_PROTECTED
 }
 
 }

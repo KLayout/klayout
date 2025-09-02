@@ -28,6 +28,7 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
 
 SOURCES += \
   gsiDeclLayLayers.cc \
+  gsiDeclLayDispatcher.cc \
   gsiDeclLayLayoutViewBase.cc \
   gsiDeclLayMarker.cc \
   gsiDeclLayMenu.cc \

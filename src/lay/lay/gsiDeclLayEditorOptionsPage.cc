@@ -59,19 +59,16 @@ Class<lay::EditorOptionsPage> decl_EditorOptionsPageBase (QT_EXTERNAL_BASE (QWid
   ) +
   method ("show", &lay::EditorOptionsPage::show,
     "@brief Shows the page\n"
+    "@return A value indicating whether the page was opened non-modal (-1), accepted (1) or rejected (0)\n"
     "Provided the page is selected because the plugin is active, this method will "
     "open a dialog to show the page if it is modal, or locate the page in the editor options "
     "dock and bring it to the front if it is non-modal."
   ) +
-  method ("do_apply", &lay::EditorOptionsPage::apply, gsi::arg ("dispatcher"),
+  method ("apply", &lay::EditorOptionsPage::apply, gsi::arg ("dispatcher"),
     "@brief Transfers data from the page to the configuration\n"
-    "Calling this method will call the actual 'apply' implementation which is "
-    "provided by a reimplementation - either on C++ or script side."
   ) +
-  method ("do_setup", &lay::EditorOptionsPage::setup, gsi::arg ("dispatcher"),
+  method ("setup", &lay::EditorOptionsPage::setup, gsi::arg ("dispatcher"),
     "@brief Transfers data from the configuration to the page\n"
-    "Calling this method will call the actual 'setup' implementation which is "
-    "provided by a reimplementation - either on C++ or script side."
   ),
   "@brief The plugin framework's editor options page base class\n"
   "\n"
@@ -98,6 +95,16 @@ void
 EditorOptionsPageImpl::call_edited ()
 {
   lay::EditorOptionsPage::edited ();
+}
+
+static void apply_fb (EditorOptionsPageImpl *ep, lay::Dispatcher *root)
+{
+  ep->lay::EditorOptionsPage::apply (root);
+}
+
+static void setup_fb (EditorOptionsPageImpl *ep, lay::Dispatcher *root)
+{
+  ep->lay::EditorOptionsPage::setup (root);
 }
 
 void
@@ -148,11 +155,15 @@ Class<EditorOptionsPageImpl> decl_EditorOptionsPage (decl_EditorOptionsPageBase,
     "When some entry widget (for example 'editingFinished' slot of a QLineEdit), "
     "call this method to initiate a transfer of information from the page to the plugin.\n"
   ) +
+  //  prevents infinite recursion
+  method_ext ("apply", &apply_fb, gsi::arg ("dispatcher"), "@hide") +
   callback ("apply", &EditorOptionsPageImpl::apply, &EditorOptionsPageImpl::f_apply, gsi::arg ("dispatcher"),
     "@brief Reimplement this method to transfer data from the page to the configuration\n"
     "In this method, you should transfer all widget data into corresponding configuration updates.\n"
     "Use \\Dispatcher#set_config on the dispatcher object ('dispatcher' argument) to set a configuration parameter.\n"
   ) +
+  //  prevents infinite recursion
+  method_ext ("setup", &setup_fb, gsi::arg ("dispatcher"), "@hide") +
   callback ("setup", &EditorOptionsPageImpl::setup, &EditorOptionsPageImpl::f_setup, gsi::arg ("dispatcher"),
     "@brief Reimplement this method to transfer data from the configuration to the page\n"
     "In this method, you should transfer all configuration data to the widgets.\n"

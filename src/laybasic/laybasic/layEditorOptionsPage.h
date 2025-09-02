@@ -77,7 +77,11 @@ public:
   void activate (bool active);
   void set_owner (EditorOptionsPages *owner);
 
-  void show ();
+  /**
+   *  @brief Shows the editor page
+   *  @return -1, if the page is shown non-modal, otherwise 1 or 0 if the dialog was accepted (1) or rejected (0)
+   */
+  int show ();
 
   const lay::PluginDeclaration *plugin_declaration () const { return mp_plugin_declaration; }
   void set_plugin_declaration (const lay::PluginDeclaration *pd) { mp_plugin_declaration = pd; }

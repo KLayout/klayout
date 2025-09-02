@@ -344,6 +344,7 @@ EditorServiceBase::activated ()
 }
 
 #if defined(HAVE_QT)
+
 std::vector<lay::EditorOptionsPage *>
 EditorServiceBase::editor_options_pages ()
 {
@@ -360,23 +361,52 @@ EditorServiceBase::editor_options_pages ()
     return pages;
   }
 }
-#endif
+
+lay::EditorOptionsPage *
+EditorServiceBase::focus_page ()
+{
+  auto pages = editor_options_pages ();
+  for (auto p = pages.begin (); p != pages.end (); ++p) {
+    if ((*p)->is_focus_page ()) {
+      return *p;
+    }
+  }
+
+  return 0;
+}
 
 bool
 EditorServiceBase::key_event (unsigned int key, unsigned int buttons)
 {
-#if defined(HAVE_QT)
   if (is_active () && key == Qt::Key_Tab && buttons == 0) {
-    auto pages = editor_options_pages ();
-    for (auto p = pages.begin (); p != pages.end (); ++p) {
-      if ((*p)->is_focus_page ()) {
-        (*p)->show ();
-        return true;
-      }
+    EditorOptionsPage *fp = focus_page ();
+    if (fp) {
+      focus_page_open (fp);
     }
+    return true;
+  } else {
+    return false;
   }
-#endif
+}
 
+int
+EditorServiceBase::focus_page_open (EditorOptionsPage *fp)
+{
+  return fp->show ();
+}
+
+void
+EditorServiceBase::show_error (tl::Exception &ex)
+{
+  tl::error << ex.msg ();
+  QMessageBox::critical (ui ()->widget (), tr ("Error"), tl::to_qstring (ex.msg ()));
+}
+
+#else
+
+bool
+EditorServiceBase::key_event (unsigned int key, unsigned int buttons)
+{
   return false;
 }
 
@@ -384,9 +414,14 @@ void
 EditorServiceBase::show_error (tl::Exception &ex)
 {
   tl::error << ex.msg ();
-#if defined(HAVE_QT)
-  QMessageBox::critical (ui ()->widget (), tr ("Error"), tl::to_qstring (ex.msg ()));
-#endif
 }
+
+void
+EditorServiceBase::focus_page_enter ()
+{
+  //  .. nothing yet ..
+}
+
+#endif
 
 }

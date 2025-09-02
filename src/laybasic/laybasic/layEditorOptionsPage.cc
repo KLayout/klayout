@@ -26,6 +26,7 @@
 #include "layEditorOptionsPage.h"
 #include "layEditorOptionsPages.h"
 #include "layLayoutViewBase.h"
+#include "tlExceptions.h"
 
 #include <QApplication>
 #include <QKeyEvent>
@@ -92,20 +93,19 @@ EditorOptionsPage::focusNextPrevChild (bool next)
 void
 EditorOptionsPage::keyPressEvent (QKeyEvent *event)
 {
+BEGIN_PROTECTED
   if (! is_modal_page () && event->modifiers () == Qt::NoModifier && event->key () == Qt::Key_Return) {
-
     //  The Return key on a non-modal page commits the values and gives back the focus
     //  to the view
-    edited ();
+    apply (dispatcher ());
     if (view ()->canvas ()->widget ()) {
       view ()->canvas ()->widget ()->setFocus (Qt::TabFocusReason);
     }
-
     event->accept ();
-
   } else {
     QWidget::keyPressEvent (event);
   }
+END_PROTECTED
 }
 
 void
@@ -115,14 +115,15 @@ EditorOptionsPage::set_focus ()
   QWidget::focusNextPrevChild (true);
 }
 
-void
+int
 EditorOptionsPage::show ()
 {
   if (mp_owner && m_active) {
     if (! is_modal_page ()) {
       mp_owner->make_page_current (this);
+      return -1;
     } else {
-      mp_owner->exec_modal (this);
+      return mp_owner->exec_modal (this) ? 1 : 0;
     }
   }
 }

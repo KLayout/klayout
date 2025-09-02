@@ -51,9 +51,7 @@ public:
   }
 
   void call_edited ();
-  void apply_impl (lay::Dispatcher *root);
   virtual void apply (lay::Dispatcher *root);
-  void setup_impl (lay::Dispatcher *root);
   virtual void setup (lay::Dispatcher *root);
 
   gsi::Callback f_apply;
@@ -64,6 +62,9 @@ private:
   tl::weak_ptr<lay::Dispatcher> mp_dispatcher;
   std::string m_title;
   int m_index;
+
+  void apply_impl (lay::Dispatcher *root);
+  void setup_impl (lay::Dispatcher *root);
 };
 
 }

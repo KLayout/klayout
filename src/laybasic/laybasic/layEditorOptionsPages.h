@@ -100,10 +100,12 @@ public:
   EditorOptionsModalPages (EditorOptionsPages *parent);
   ~EditorOptionsModalPages ();
 
-  QTabWidget *pages_widget ()
-  {
-    return mp_pages;
-  }
+  int count ();
+  int current_index ();
+  void set_current_index (int index);
+  void add_page (EditorOptionsPage *page);
+  void remove_page (int index);
+  EditorOptionsPage *widget (int index);
 
 private slots:
   void accept ();
@@ -113,7 +115,11 @@ private slots:
 private:
   EditorOptionsPages *mp_parent;
   QTabWidget *mp_pages;
+  QFrame *mp_single_page_frame;
+  EditorOptionsPage *mp_single_page;
   QDialogButtonBox *mp_button_box;
+
+  void update_title ();
 };
 
 }

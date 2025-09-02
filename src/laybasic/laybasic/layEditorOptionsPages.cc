@@ -116,14 +116,12 @@ EditorOptionsPages::has_modal_content () const
 bool
 EditorOptionsPages::exec_modal (EditorOptionsPage *page)
 {
-  QTabWidget *modal_pages = mp_modal_pages->pages_widget ();
+  for (int i = 0; i < mp_modal_pages->count (); ++i) {
 
-  for (int i = 0; i < modal_pages->count (); ++i) {
-
-    if (modal_pages->widget (i) == page) {
+    if (mp_modal_pages->widget (i) == page) {
 
       //  found the page - make it current and show the dialog
-      modal_pages->setCurrentIndex (i);
+      mp_modal_pages->set_current_index (i);
       page->set_focus ();
       return mp_modal_pages->exec () != 0;
 
@@ -193,8 +191,6 @@ EditorOptionsPages::update (lay::EditorOptionsPage *page)
   std::vector <lay::EditorOptionsPage *> sorted_pages = m_pages;
   std::sort (sorted_pages.begin (), sorted_pages.end (), EOPCompareOp ());
 
-  QTabWidget *modal_pages = mp_modal_pages->pages_widget ();
-
   if (! page && m_pages.size () > 0) {
     page = m_pages.back ();
   }
@@ -203,8 +199,8 @@ EditorOptionsPages::update (lay::EditorOptionsPage *page)
     mp_pages->removeTab (0);
   }
 
-  while (modal_pages->count () > 0) {
-    modal_pages->removeTab (0);
+  while (mp_modal_pages->count () > 0) {
+    mp_modal_pages->remove_page (0);
   }
 
   int index = -1;
@@ -219,20 +215,13 @@ EditorOptionsPages::update (lay::EditorOptionsPage *page)
         mp_pages->addTab (*p, tl::to_qstring ((*p)->title ()));
       } else {
         if ((*p) == page) {
-          modal_index = modal_pages->count ();
+          modal_index = mp_modal_pages->count ();
         }
-        modal_pages->addTab (*p, tl::to_qstring ((*p)->title ()));
+        mp_modal_pages->add_page (*p);
       }
     } else {
       (*p)->setParent (0);
     }
-  }
-
-  lay::EditorOptionsPage *single_modal_page = modal_pages->count () == 1 ? dynamic_cast<lay::EditorOptionsPage *> (modal_pages->widget (0)) : 0;
-  if (single_modal_page) {
-    mp_modal_pages->setWindowTitle (tl::to_qstring (single_modal_page->title ()));
-  } else {
-    mp_modal_pages->setWindowTitle (tr ("Editor Options"));
   }
 
   if (index < 0) {
@@ -244,12 +233,12 @@ EditorOptionsPages::update (lay::EditorOptionsPage *page)
   mp_pages->setCurrentIndex (index);
 
   if (modal_index < 0) {
-    modal_index = modal_pages->currentIndex ();
+    modal_index = mp_modal_pages->current_index ();
   }
-  if (modal_index >= int (modal_pages->count ())) {
-    modal_index = modal_pages->count () - 1;
+  if (modal_index >= int (mp_modal_pages->count ())) {
+    modal_index = mp_modal_pages->count () - 1;
   }
-  modal_pages->setCurrentIndex (modal_index);
+  mp_modal_pages->set_current_index (modal_index);
 
   setVisible (mp_pages->count () > 0);
 }
@@ -295,27 +284,134 @@ END_PROTECTED_W (this)
 //  EditorOptionsModalPages implementation
 
 EditorOptionsModalPages::EditorOptionsModalPages (EditorOptionsPages *parent)
-  : QDialog (parent), mp_parent (parent)
+  : QDialog (parent), mp_parent (parent), mp_single_page (0)
 {
   QVBoxLayout *ly = new QVBoxLayout (this);
+  ly->setContentsMargins (0, 0, 0, 0);
 
+  QVBoxLayout *ly4 = new QVBoxLayout (this);
+  ly4->setContentsMargins (6, 6, 6, 0);
+  ly->addLayout (ly4);
   mp_pages = new QTabWidget (this);
-  ly->addWidget (mp_pages, 1);
+  ly4->addWidget (mp_pages, 1);
   mp_pages->setTabBarAutoHide (true);
+  mp_pages->hide ();
 
+  mp_single_page_frame = new QFrame (this);
+  QVBoxLayout *ly2 = new QVBoxLayout (mp_single_page_frame);
+  ly2->setContentsMargins (0, 0, 0, 0);
+  ly->addWidget (mp_single_page_frame, 1);
+  mp_single_page_frame->hide ();
+
+  QVBoxLayout *ly3 = new QVBoxLayout (this);
+  ly->addLayout (ly3);
+  ly3->setContentsMargins (6, 6, 6, 6);
   mp_button_box = new QDialogButtonBox (this);
-  ly->addWidget (mp_button_box);
+  ly3->addWidget (mp_button_box);
   mp_button_box->setOrientation (Qt::Horizontal);
   mp_button_box->setStandardButtons (QDialogButtonBox::Cancel | QDialogButtonBox::Apply | QDialogButtonBox::Ok);
 
   connect (mp_button_box, SIGNAL (clicked(QAbstractButton *)), this, SLOT (clicked(QAbstractButton *)));
   connect (mp_button_box, SIGNAL (accepted()), this, SLOT (accept()));
   connect (mp_button_box, SIGNAL (rejected()), this, SLOT (reject()));
+
+  update_title ();
 }
 
 EditorOptionsModalPages::~EditorOptionsModalPages ()
 {
   //  .. nothing yet ..
+}
+
+int
+EditorOptionsModalPages::count ()
+{
+  return mp_single_page ? 1 : mp_pages->count ();
+}
+
+int
+EditorOptionsModalPages::current_index ()
+{
+  return mp_single_page ? 0 : mp_pages->currentIndex ();
+}
+
+void
+EditorOptionsModalPages::set_current_index (int index)
+{
+  if (! mp_single_page) {
+    mp_pages->setCurrentIndex (index);
+  }
+}
+
+void
+EditorOptionsModalPages::add_page (EditorOptionsPage *page)
+{
+  if (! mp_single_page) {
+    if (mp_pages->count () == 0) {
+      mp_single_page = page;
+      mp_single_page->setParent (mp_single_page_frame);
+      mp_single_page_frame->layout ()->addWidget (mp_single_page);
+      mp_single_page_frame->show ();
+      mp_pages->hide ();
+    } else {
+      mp_pages->addTab (page, tl::to_qstring (page->title ()));
+    }
+  } else {
+    mp_pages->clear ();
+    mp_single_page_frame->layout ()->removeWidget (mp_single_page);
+    mp_single_page_frame->hide ();
+    mp_pages->addTab (mp_single_page, tl::to_qstring (mp_single_page->title ()));
+    mp_single_page = 0;
+    mp_pages->addTab (page, tl::to_qstring (page->title ()));
+    mp_pages->show ();
+  }
+
+  update_title ();
+}
+
+void
+EditorOptionsModalPages::remove_page (int index)
+{
+  if (mp_single_page) {
+    if (index == 0) {
+      mp_single_page->setParent (0);
+      mp_single_page = 0;
+      mp_single_page_frame->hide ();
+      mp_single_page_frame->layout ()->removeWidget (mp_single_page);
+    }
+  } else {
+    mp_pages->removeTab (index);
+    if (mp_pages->count () == 1) {
+      mp_pages->hide ();
+      mp_single_page = dynamic_cast<EditorOptionsPage *> (mp_pages->widget (0));
+      mp_pages->removeTab (0);
+      mp_single_page->setParent (mp_single_page_frame);
+      mp_single_page_frame->layout ()->addWidget (mp_single_page);
+      mp_single_page_frame->show ();
+    }
+  }
+
+  update_title ();
+}
+
+void
+EditorOptionsModalPages::update_title ()
+{
+  if (mp_single_page) {
+    setWindowTitle (tl::to_qstring (mp_single_page->title ()));
+  } else {
+    setWindowTitle (tr ("Editor Options"));
+  }
+}
+
+EditorOptionsPage *
+EditorOptionsModalPages::widget (int index)
+{
+  if (mp_single_page) {
+    return index == 0 ? mp_single_page : 0;
+  } else {
+    return dynamic_cast<EditorOptionsPage *> (mp_pages->widget (index));
+  }
 }
 
 void

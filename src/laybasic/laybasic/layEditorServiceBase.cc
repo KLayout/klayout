@@ -331,6 +331,9 @@ void
 EditorServiceBase::deactivated ()
 {
   clear_mouse_cursors ();
+  if (ui ()) {
+    ui ()->ungrab_mouse (this);
+  }
   m_active = false;
 }
 

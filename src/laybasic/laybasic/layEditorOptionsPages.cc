@@ -292,7 +292,7 @@ EditorOptionsModalPages::EditorOptionsModalPages (EditorOptionsPages *parent)
   QVBoxLayout *ly = new QVBoxLayout (this);
   ly->setContentsMargins (0, 0, 0, 0);
 
-  QVBoxLayout *ly4 = new QVBoxLayout (this);
+  QVBoxLayout *ly4 = new QVBoxLayout (0);
   ly4->setContentsMargins (6, 6, 6, 0);
   ly->addLayout (ly4);
   mp_pages = new QTabWidget (this);
@@ -306,9 +306,9 @@ EditorOptionsModalPages::EditorOptionsModalPages (EditorOptionsPages *parent)
   ly->addWidget (mp_single_page_frame, 1);
   mp_single_page_frame->hide ();
 
-  QVBoxLayout *ly3 = new QVBoxLayout (this);
-  ly->addLayout (ly3);
+  QVBoxLayout *ly3 = new QVBoxLayout (0);
   ly3->setContentsMargins (6, 6, 6, 6);
+  ly->addLayout (ly3);
   mp_button_box = new QDialogButtonBox (this);
   ly3->addWidget (mp_button_box);
   mp_button_box->setOrientation (Qt::Horizontal);

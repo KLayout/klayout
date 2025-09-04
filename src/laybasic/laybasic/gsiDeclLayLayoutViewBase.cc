@@ -1942,68 +1942,6 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase (decl_Dispatcher,
     "\n"
     "This method has been added in version 0.26."
   ) +
-  //  HINT: the cast is important to direct GSI to the LayoutView method rather than the
-  //  Plugin method (in which case we get a segmentation violation ..)
-  //  TODO: this method belongs to the Plugin interface and should be located there.
-  //  Change this once there is a mixin concept available and the Plugin interface can 
-  //  be mixed into LayoutView.
-  gsi::method ("clear_config", (void (lay::LayoutViewBase::*)()) &lay::LayoutViewBase::clear_config,
-    "@brief Clears the local configuration parameters\n"
-    "\n"
-    "See \\set_config for a description of the local configuration parameters."
-  ) +
-  //  TODO: this method belongs to the Plugin interface and should be located there.
-  //  Change this once there is a mixin concept available and the Plugin interface can 
-  //  be mixed into LayoutView.
-  gsi::method_ext ("get_config_names", &get_config_names,
-    "@brief Gets the configuration parameter names\n"
-    "\n"
-    "@return A list of configuration parameter names\n"
-    "\n"
-    "This method returns the names of all known configuration parameters. These names can be used to "
-    "get and set configuration parameter values.\n"
-    "\n"
-    "This method was introduced in version 0.25.\n"
-  ) +
-  //  TODO: this method belongs to the Plugin interface and should be located there.
-  //  Change this once there is a mixin concept available and the Plugin interface can 
-  //  be mixed into LayoutView.
-  gsi::method ("get_config", (std::string (lay::LayoutViewBase::*)(const std::string &name) const) &lay::LayoutViewBase::config_get, gsi::arg ("name"),
-    "@brief Gets the value of a local configuration parameter\n"
-    "\n"
-    "@param name The name of the configuration parameter whose value shall be obtained (a string)\n"
-    "\n"
-    "@return The value of the parameter\n"
-    "\n"
-    "See \\set_config for a description of the local configuration parameters."
-  ) +
-  //  TODO: this method belongs to the Plugin interface and should be located there.
-  //  Change this once there is a mixin concept available and the Plugin interface can 
-  //  be mixed into LayoutView.
-  gsi::method ("set_config", (void (lay::LayoutViewBase::*)(const std::string &name, const std::string &value)) &lay::LayoutViewBase::config_set, gsi::arg ("name"), gsi::arg ("value"),
-    "@brief Sets a local configuration parameter with the given name to the given value\n"
-    "\n"
-    "@param name The name of the configuration parameter to set\n"
-    "@param value The value to which to set the configuration parameter\n"
-    "\n"
-    "This method sets a local configuration parameter with the given name to the given value. "
-    "Values can only be strings. Numerical values have to be converted into strings first. "
-    "Local configuration parameters override global configurations for this specific view. "
-    "This allows for example to override global settings of background colors. "
-    "Any local settings are not written to the configuration file. "
-  ) +
-  //  TODO: this method belongs to the Plugin interface and should be located there.
-  //  Change this once there is a mixin concept available and the Plugin interface can 
-  //  be mixed into LayoutView.
-  gsi::method ("commit_config", (void (lay::LayoutViewBase::*)()) &lay::LayoutViewBase::config_end,
-    "@brief Commits the configuration settings\n"
-    "\n"
-    "Some configuration options are queued for performance reasons and become active only after 'commit_config' has been called. "
-    "After a sequence of \\set_config calls, this method should be called to activate the "
-    "settings made by these calls.\n"
-    "\n"
-    "This method has been introduced in version 0.25.\n"
-  ) + 
   gsi::method_ext ("transaction", &gsi::transaction, gsi::arg ("description"),
     "@brief Begins a transaction\n"
     "\n"

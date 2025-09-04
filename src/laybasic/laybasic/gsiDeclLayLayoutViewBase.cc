@@ -144,6 +144,11 @@ static std::string get_line_style (lay::LayoutViewBase *view, unsigned int index
   return view->line_styles ().style (index).to_string ();
 }
 
+static std::string layer_list_name (lay::LayoutViewBase *view, unsigned int index)
+{
+  return view->get_properties (index).name ();
+}
+
 static void transaction (lay::LayoutViewBase *view, const std::string &desc)
 {
   view->manager ()->transaction (desc);
@@ -357,14 +362,6 @@ static QWidget *widget (lay::LayoutViewBase *view)
 }
 
 #endif
-
-static std::vector<std::string> 
-get_config_names (lay::LayoutViewBase *view)
-{
-  std::vector<std::string> names;
-  view->get_config_names (names);
-  return names;
-}
 
 static void
 send_key_press_event (lay::LayoutViewBase *view, unsigned int key, unsigned int buttons)
@@ -1573,6 +1570,10 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase (decl_Dispatcher,
   gsi::method ("rename_layer_list", static_cast<void (lay::LayoutViewBase::*) (unsigned int, const std::string &)> (&lay::LayoutViewBase::rename_properties), gsi::arg ("index"), gsi::arg ("name"),
     "@brief Sets the title of the given layer properties tab\n"
     "This method has been introduced in version 0.21.\n"
+  ) +
+  gsi::method_ext ("layer_list_name", &layer_list_name, gsi::arg ("index"),
+    "@brief Gets the title of the given layer properties tab\n"
+    "This method has been introduced in version 0.30.4.\n"
   ) +
   gsi::method_ext ("remove_stipple", &remove_stipple, gsi::arg ("index"),
     "@brief Removes the stipple pattern with the given index\n"

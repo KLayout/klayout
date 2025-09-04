@@ -234,6 +234,8 @@ class LAYLayers_TestClass < TestBase
 
     cv.insert_layer_list(1)
     cv.rename_layer_list(1, "x")
+    assert_equal(cv.layer_list_name(1), "x")
+    assert_equal(cv.layer_list_name(10000), "")  # must not crash
     assert_equal(cv.current_layer_list, 1)
     cv.set_current_layer_list(0)
     assert_equal(cv.current_layer_list, 0)

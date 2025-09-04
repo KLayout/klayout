@@ -1401,9 +1401,9 @@ MacroEditorPage::replace_in_selection (const QString &replace, bool first)
     //  restore selection which might have changed due to insert
     c.setPosition (anchor_at_end ? be.position () + pe : bs.position () + ps);
     c.setPosition (!anchor_at_end ? be.position () + pe : bs.position () + ps, QTextCursor::KeepAnchor);
+    mp_text->setTextCursor (c);
   }
 
-  mp_text->setTextCursor (c);
   c.endEditBlock ();
 }
 

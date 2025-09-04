@@ -8,15 +8,23 @@
  <shortcut></shortcut>
  <interpreter>python</interpreter>
  <text># Sample plugin
-#
+
 # This plugin implements a box that can be drawn by
 # clicking at the first and then at the second point.
 # There is one box which is replacing the previous one.
 # Line color and line width of the box can be configured
 # by editor options (line width) or configuration pages
-# (color).
-
+# (color). These settings are managed through configuration
+# options and their current state is persisted.
+# 
+# The dimension of the box can be entered numerically
+# while dragging the box. This feature is implemented
+# through a modal "focus page", which opens when you
+# press the Tab key during editing and when the keyboard
+# focus is on the canvas.
+#
 # Register this macro as "autorun" to enable the plugin
+# on startup.
 
 cfg_color = "drag-box-color"
 cfg_width = "drag-box-width"
@@ -24,11 +32,19 @@ cfg_width = "drag-box-width"
 # The widget placed into the editor options dock
 
 class DragBoxEditorOptionsPage(pya.EditorOptionsPage):
+
+  """
+  An option page providing a single entry box for configuring the line width
+  This page communicates via configuration options. One advantage of this
+  approach is that the values are persisted
+  """
   
   def __init__(self):
   
-    # Creates a new page with title "Options" and at
-    # position 1 (second from left)
+    """
+    Creates a new page with title "Options" and at position 1 (second from left)
+    """
+    
     super(DragBoxEditorOptionsPage, self).__init__("Options", 1)
     
     layout2 = pya.QVBoxLayout(self)
@@ -43,25 +59,142 @@ class DragBoxEditorOptionsPage(pya.EditorOptionsPage):
     layout.addStretch(1)
     layout2.addStretch(1)
     
+    # connect the spin box value change with the "edited" slot
+    # which will result in a call of "apply".
     self.spin_box.valueChanged = lambda x: self.edited()
   
   def setup(self, dispatcher):
+  
+    """
+    "setup" is called when the page needs to be populated with information -
+    i.e. on first show.
+    """
+    
     try:
       self.spin_box.setValue(int(dispatcher.get_config(cfg_width)))
     except:
       self.spin_box.setValue(1)
     
   def apply(self, dispatcher):
+  
+    """
+    "apply" is called when the page is requested to submit the entered
+    values to the plugin. Usually this should be done via configuration
+    events.
+    """
+    
     dispatcher.set_config(cfg_width, str(self.spin_box.value))
+
+# The modal dialog page that appears when "Tab" is pressed
+
+class DragBoxFocusPage(pya.EditorOptionsPage):
+  
+  """
+  A (modal) option page, also called a "focus page". This page is 
+  registered like an editor options page. It is brought to front
+  when the user hits the "Tab" key during editing.
+  In this case, this page uses "setup" and "apply" callbacks to 
+  set and fetch information. It also employs a handler named
+  "update_box" to communicate changes between the client (the 
+  plugin) and the page.
+  
+  Attributes that the client needs to take care of are
+  "self.box" (the current box), "self.pfix" (the start point)
+  and "self.update_box".
+  """
+  
+  def __init__(self):
+  
+    """
+    Creates a new page with title "Options" and at
+    position 1 (second from left)
+    """
+    
+    super(DragBoxFocusPage, self).__init__("Geometry", 2)
+    
+    self.focus_page = True
+    self.modal_page = True
+    
+    self.box = pya.DBox()
+    self.pfix = pya.DPoint()
+    self.update_box = None
+    
+    layout = pya.QGridLayout(self)
+    layout.setColumnStretch(1, 1)
+    
+    label = pya.QLabel("Width", self)
+    layout.addWidget(label, 0, 0, 1, 1)
+    self.le_width = pya.QLineEdit(self)
+    layout.addWidget(self.le_width, 0, 1, 1, 1)
+    
+    label = pya.QLabel("Height", self)
+    layout.addWidget(label, 1, 0, 1, 1)
+    self.le_height = pya.QLineEdit(self)
+    layout.addWidget(self.le_height, 1, 1, 1, 1)
+    
+    layout.setRowStretch(2, 1)
+
+  def setup(self, dispatcher):
+  
+    """
+    Is called when the page needs to be set up.
+    We assume that the client has properly set up self.box
+    """
+  
+    self.le_width.text = "%.12g" % self.box.width()
+    self.le_height.text = "%.12g" % self.box.height()
+    
+  def apply(self, dispatcher):
+  
+    """
+    Apply is called when the dialog is accepted or the "Apply" button is pressed
+    Usually this method is intended to submit configuration parameter changes, 
+    but we can use it for any other purpose as well.
+    """
+    
+    # fetches the coordinates from the entry boxes
+    # throws an exception in case of an error
+    x = float(self.le_width.text)
+    y = float(self.le_height.text)
+    
+    # prepares a new box with the given dimensions
+    # using the initial point ("pfix") and considering
+    # the drag direction
+    t = b = self.pfix.y
+    l = r = self.pfix.x
+    
+    if self.box.bottom &lt; t - 1e-10:
+      b = t - y
+    else:
+      t = b + y
+    
+    if self.box.left &lt; l - 1e-10:
+      l = r - x
+    else:
+      r = l + x
+    
+    # issue the event (call the handler) to inform the plugin of this change
+    if self.update_box is not None:
+      self.update_box(pya.DBox(l, b, r, t))
 
 # The widget placed into the configuration page
 
 class DragBoxConfigPage(pya.ConfigPage):
+
+  """
+  A configuration page with a single entry box to change
+  the box color in RGB hex style.
+  Configuration pages appear in the Setup dialog and can
+  communicate only through configuration parameter updates.
+  """
   
   def __init__(self):
 
-    # places the widget on a new section ("Drag Box")
-    # and "Configure" page
+    """
+    Initializes the page. Places it on a new section ("Drag Box") and "Configure" page
+    and creates a single entry field.
+    """
+    
     super(DragBoxConfigPage, self).__init__("Drag Box|Configure")
     
     layout = pya.QHBoxLayout(self)
@@ -72,17 +205,28 @@ class DragBoxConfigPage(pya.ConfigPage):
     layout.addStretch(1)
   
   def setup(self, dispatcher):
+    """
+    This method is called to request an update of the entry fields
+    """
     self.line_edit.setText(dispatcher.get_config(cfg_color))
     
   def apply(self, dispatcher):
+    """
+    This method is called to request a transfer of the edited values
+    to the configuration space.
+    """
     dispatcher.set_config(cfg_color, self.line_edit.text)
 
 class DragBoxPlugin(pya.Plugin):
 
+  """
+  The custom plugin implementation.
+  """
+
   def __init__(self, view):
     super(DragBoxPlugin, self).__init__()
     self.marker = None
-    self.last_box = None
+    self.last_marker = None
     self.box = None
     self.start_point = None
     self.view = view
@@ -90,8 +234,9 @@ class DragBoxPlugin(pya.Plugin):
     self.width = 1
 
   def configure(self, name, value):
-    # receives configuration callbacks
-    needs_update = False
+    """
+    This method receives configuration callbacks
+    """
     if name == cfg_color:
       # configure marker color
       try:
@@ -111,29 +256,40 @@ class DragBoxPlugin(pya.Plugin):
       self._configure_marker()
     
   def _clear_marker(self):
-    # clears all markers
-    for marker in [ self.marker, self.last_box ]:
+    """
+    clears all markers
+    """
+    for marker in [ self.marker, self.last_marker ]:
       if marker is not None:
         marker._destroy()
     self.marker = None
-    self.last_box = None
+    self.last_marker = None
       
+  def _finish(self):
+    """
+    stops dragging the marker and copy to a static one
+    """
+    if self.last_marker is not None:
+      self.last_marker._destroy()
+    self.last_marker = self.marker
+    self.marker = None
+    # reset to idle
+    self.ungrab_mouse()
+    pya.MainWindow.instance().message("Box finished: " + str(self.box), 10000)
+
   def _update_marker(self):
-    # updates the marker with the current box
+    """
+    updates the marker with the current box
+    """
     if self.marker is None:
       self.marker = pya.Marker(self.view)
       self._configure_marker()
     self.marker.set(self.box)
     
-  def freeze_marker(self):
-    # stop dragging the marker and copy to a static one
-    if self.last_box is not None:
-      self.last_box._destroy()
-    self.last_box = self.marker
-    self.marker = None
-    
   def _configure_marker(self):
-    # change the marker's appearance
+    """
+    changes the marker's appearance
+    """
     if self.marker is not None:
       self.marker.line_style = 2   # short-dashed
       self.marker.vertex_size = 0  # no vertexes
@@ -142,17 +298,64 @@ class DragBoxPlugin(pya.Plugin):
         self.marker.color = self.color | 0xff000000
       else:
         self.marker.color = 0  # auto
+  
+  def _update_box(self, box):
+    """
+    Updates the box with the given value and updates the marker.
+    This method is bound to the focus page handler when needed.
+    """
+    self.box = box
+    self._update_marker()
+    
+  def focus_page_open(self, fp):
+  
+    """
+    overloaded callback: the focus page is requested
+    """
+
+    # stop unless dragging
+    if self.marker is None:
+      return    
+
+    # configure the focus page and show it:
+    # the page will call the handler of "update_box" to commit
+    # changes to the box
+    fp.box = self.box
+    fp.pfix = self.start_point
+    fp.update_box = self._update_box
+    ret = fp.show()
+    fp.update_box = None
+    if ret == 1:
+      # accepted: stop dragging now, we are done.
+      self._finish()
+    return ret
     
   def activated(self):
-    # plugin is activated - i.e. the mode is selected
+  
+    """
+    overloaded callback:
+    plugin is activated - i.e. the mode is selected
+    """
+    
     pya.MainWindow.instance().message("Click on point to start dragging a box", 10000)
 
   def deactivated(self):
-    # plugin is deactivated - i.e. the mode is unselected
+  
+    """
+    overloaded callback:
+    plugin is deactivated - i.e. the mode is unselected
+    """
+    
     self._clear_marker()
     pya.MainWindow.instance().message("", 0)
     
   def mouse_click_event(self, p, buttons, prio):
+  
+    """
+    overloaded callback:
+    a mouse button was clicked
+    """
+    
     if prio:
       # first-level event: start a new box or 
       # stop dragging it and freeze the box
@@ -166,13 +369,18 @@ class DragBoxPlugin(pya.Plugin):
         pya.MainWindow.instance().message("Drag the box and click again", 10000)
       else:
         p = self.snap2(p, self.start_point, True, self.ac_from_buttons(buttons))
-        self.freeze_marker()
-        self.ungrab_mouse()
-        pya.MainWindow.instance().message("Box finished: " + str(self.box), 10000)
+        self._update_box(pya.DBox(self.start_point, p))
+        self._finish()
       return True
     return False
     
   def mouse_moved_event(self, p, buttons, prio):
+  
+    """
+    overloaded callback:
+    the mouse was moved
+    """
+    
     if prio:
       # first-level event: if not dragging, provide a 
       # mouse cursor for tracking. If dragging, update
@@ -191,12 +399,13 @@ class DragBoxPlugin(pya.Plugin):
       # to allow the mouse tracker to receive the events as well
     return False
 
-
-# Implements a "plugin factory". 
-# Purpose of this object is to create a plugin object
-# and corresponding UI objects.
-
 class DragBoxPluginFactory(pya.PluginFactory):
+
+  """
+  Implements a "plugin factory". 
+  The purpose of this object is to create a plugin object
+  and corresponding UI objects.
+  """
 
   def __init__(self):
     super(DragBoxPluginFactory, self).__init__()
@@ -207,15 +416,25 @@ class DragBoxPluginFactory(pya.PluginFactory):
     self.register(-1000, "drag_box", "Drag Box")
     
   def create_config_pages(self):
+    """
+    Called to create the configuration pages
+    """
     self.add_config_page(DragBoxConfigPage())
     
   def create_editor_options_pages(self):
+    """
+    Called to create the editor options pages
+    """
     self.add_editor_options_page(DragBoxEditorOptionsPage())
+    self.add_editor_options_page(DragBoxFocusPage())
     
   def create_plugin(self, manager, root, view):
+    """
+    Creates the plugin
+    """
     return DragBoxPlugin(view)
   
-# Create the singleton instance - as we register it,
+# Creates the singleton instance - as we register it,
 # it is not garbage collected
 DragBoxPluginFactory()
 </text>

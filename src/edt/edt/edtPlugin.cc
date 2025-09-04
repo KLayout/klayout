@@ -387,7 +387,7 @@ public:
     menu_entries.push_back (lay::menu_item ("edt::combine_mode", "combine_mode:edit_mode", "@toolbar.end_modes", tl::to_string (tr ("Combine{Select background combination mode}"))));
 
     //  Key binding only
-    menu_entries.push_back (lay::menu_item ("edt::via", "via:edit_mode", "@secrets.end", tl::to_string (tr ("Via")) + "(V)"));
+    menu_entries.push_back (lay::menu_item ("edt::via", "via:edit_mode", "@secrets.end", tl::to_string (tr ("Via")) + "(O)"));
     menu_entries.push_back (lay::menu_item ("edt::via_up", "via_up:edit_mode", "@secrets.end", tl::to_string (tr ("Via up"))));
     menu_entries.push_back (lay::menu_item ("edt::via_down", "via_down:edit_mode", "@secrets.end", tl::to_string (tr ("Via down"))));
   }

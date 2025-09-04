@@ -62,7 +62,11 @@ Class<lay::EditorOptionsPage> decl_EditorOptionsPageBase (QT_EXTERNAL_BASE (QWid
     "@return A value indicating whether the page was opened non-modal (-1), accepted (1) or rejected (0)\n"
     "Provided the page is selected because the plugin is active, this method will "
     "open a dialog to show the page if it is modal, or locate the page in the editor options "
-    "dock and bring it to the front if it is non-modal."
+    "dock and bring it to the front if it is non-modal.\n"
+    "\n"
+    "Before the page is shown, \\setup is called. When the page is dismissed (accepted), \\apply is called. "
+    "You can overload these methods to transfer data to and from the configuration space or to perform other "
+    "actions, not related to configuration parameters."
   ) +
   method ("apply", &lay::EditorOptionsPage::apply, gsi::arg ("dispatcher"),
     "@brief Transfers data from the page to the configuration\n"

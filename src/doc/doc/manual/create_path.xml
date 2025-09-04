@@ -10,16 +10,16 @@
   <p>
   Select "Path" mode from the toolbar. The editor options dialog will open that additionally prompts for 
   basic path parameters, such as width and extension scheme. When a path is being drawn, it will receive
-  the settings entered into this dialog. The path properties can even be changed, while the path is 
-  being drawn. Don't forget to click "Apply" to take over the current entries. If the dialog has been
-  closed unintentionally, it can be reopened with the F3 shortcut.
+  the settings entered into this dialog. The path properties can be changed, while the path is 
+  being drawn. If the option page has been closed unintentionally, it can be reopened with the F3 shortcut.
   </p>
 
   <p>
   To actually draw a path, 
-  choose a layer from the layer panel in which to create a new box. 
+  choose a layer from the layer panel in which to create a new path. 
   Left click at the first vertex, move the mouse to the second vertex, click to place this one and continue 
   to the last vertex. Double-click at the last vertex to finish the path. Press the ESC key to cancel the operation.
+  Use the backspace key to remove the current segment and go back to the previous segment.
   </p>
 
   <p>
@@ -28,6 +28,22 @@
   See <link href="/manual/editor_options.xml"/> 
   for a detailed description of the modes. Use the "editor options" dialog (F3 shortcut) to change the mode,
   also during editing.
+  </p>
+
+  <p>
+  <keyword name="Via"/>
+  <keyword name="Vias"/>
+  Paths are often used for wires. KLayout can be configured to provide 
+  vias that allow switching from one layer to another and place a via 
+  between the layers where the paths overlap. Before you can use the via feature,
+  KLayout has to be equipped with via definitions. Vias are basically PCells which
+  need to support a specific set of parameters. Via PCells need to expose a number
+  of descriptors to define the options supported by a particular PCell (e.g. the
+  layers which are connected or the type of via if multiple flavors are available).
+  This scheme allows for a lot of flexibility, but needs some coding skills.
+  In the macro IDE, a code sample is provided which implements two simple vias
+  for a three-layer metal stack. For more details see <class_doc href="PCellDeclaration"/>,
+  method "via_types" and <class_doc href="ViaType"/>.
   </p>
 
 </doc>

@@ -15,6 +15,7 @@
     <topic href="/manual/create_cells.xml"/>
     <topic href="/manual/create_polygon.xml"/>
     <topic href="/manual/create_box.xml"/>
+    <topic href="/manual/create_path.xml"/>
     <topic href="/manual/create_text.xml"/>
     <topic href="/manual/create_instance.xml"/>
     <topic href="/manual/move_sel.xml"/>

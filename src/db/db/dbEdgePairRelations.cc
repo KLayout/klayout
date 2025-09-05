@@ -353,6 +353,8 @@ static bool var_near_part_of_edge (zero_distance_mode zd_mode, db::coord_traits<
 
   }
 
+  bool allow_zero_projection = false;
+
   if (db::sprod_sign (e, g) == 0) {
 
     if (! g.is_degenerate ()) {
@@ -366,6 +368,8 @@ static bool var_near_part_of_edge (zero_distance_mode zd_mode, db::coord_traits<
       double dl = double (dd) / g.double_length ();
       l1 = l - dl;
       l2 = l + dl;
+
+      allow_zero_projection = true;
 
     }
 
@@ -388,7 +392,7 @@ static bool var_near_part_of_edge (zero_distance_mode zd_mode, db::coord_traits<
   l1 = std::max (0.0, l1);
   l2 = std::min (1.0, l2);
 
-  if (l1 > l2 + db::epsilon) {
+  if (allow_zero_projection ? l1 > l2 + db::epsilon : l1 > l2 - db::epsilon) {
     return false;
   } else {
     if (output) {
@@ -469,7 +473,12 @@ EdgeRelationFilter::check (const db::Edge &a, const db::Edge &b, db::EdgePair *o
   //  Check whether the edges have an angle less than the ignore_angle parameter
 
   if (a.is_degenerate () || b.is_degenerate ()) {
-    //  accept dots as "always good"
+    //  accept dots as "always good", expect if they are identical and the zero distance mode does not include this case
+    if (a == b && (m_zero_distance_mode == NeverIncludeZeroDistance ||
+                   m_zero_distance_mode == IncludeZeroDistanceWhenCollinearAndTouching ||
+                   m_zero_distance_mode == IncludeZeroDistanceWhenOverlapping)) {
+      return false;
+    }
   } else if (m_ignore_angle == 90.0) {
     if (db::sprod_sign (aa, b) >= 0) {
       return false;

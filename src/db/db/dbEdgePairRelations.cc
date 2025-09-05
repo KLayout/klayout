@@ -330,6 +330,7 @@ static bool var_near_part_of_edge (zero_distance_mode zd_mode, db::coord_traits<
   }
 
   //  handle the parallel case
+  //  NOTE: a point is "parallel" to an edge
   if (e.parallel (g)) {
 
     if (std::abs (double (e.distance (g.p1 ()))) >= double (d)) {
@@ -387,7 +388,7 @@ static bool var_near_part_of_edge (zero_distance_mode zd_mode, db::coord_traits<
   l1 = std::max (0.0, l1);
   l2 = std::min (1.0, l2);
 
-  if (l1 >= l2) {
+  if (l1 > l2 + db::epsilon) {
     return false;
   } else {
     if (output) {

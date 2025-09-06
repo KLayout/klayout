@@ -1,0 +1,51 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+end
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+
+l1.output(1, 0)
+l2.output(2, 0)
+l1e = l1.edges
+l2e = l2.edges
+l1c = l1.corners(as_dots)
+l2c = l2.corners(as_dots)
+
+l1e.sep(l2c, 0.6).output(100, 0)
+l1c.sep(l2e, 0.6).output(101, 0)
+l1c.sep(l2c, 0.6).output(102, 0)
+l1e.enc(l2c, 0.6).output(103, 0)
+l1c.enc(l2e, 0.6).output(104, 0)
+l1c.enc(l2c, 0.6).output(105, 0)
+l2e.width(1.0).output(106, 0)
+l2c.width(1.0).output(107, 0)
+l2e.space(2.0).output(108, 0)
+l2c.space(2.0).output(109, 0)
+
+l1e.sep(l2c, 0.6, square).output(110, 0)
+l1c.sep(l2e, 0.6, square).output(111, 0)
+l1c.sep(l2c, 0.6, square).output(112, 0)
+l1e.enc(l2c, 0.6, square).output(113, 0)
+l1c.enc(l2e, 0.6, square).output(114, 0)
+l1c.enc(l2c, 0.6, square).output(115, 0)
+l2e.width(1.0, square).output(116, 0)
+l2c.width(1.0, square).output(117, 0)
+l2e.space(2.0, square).output(118, 0)
+l2c.space(2.0, square).output(119, 0)
+
+l1e.sep(l2c, 0.6, projection).output(120, 0)
+l1c.sep(l2e, 0.6, projection).output(121, 0)
+l1c.sep(l2c, 0.6, projection).output(122, 0)
+l1e.enc(l2c, 0.6, projection).output(123, 0)
+l1c.enc(l2e, 0.6, projection).output(124, 0)
+l1c.enc(l2c, 0.6, projection).output(125, 0)
+l2e.width(1.0, projection).output(126, 0)
+l2c.width(1.0, projection).output(127, 0)
+l2e.space(2.0, projection).output(128, 0)
+l2c.space(2.0, projection).output(129, 0)
+

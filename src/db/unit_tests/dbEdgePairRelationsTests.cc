@@ -135,7 +135,8 @@ TEST(3)
   EXPECT_EQ (output.to_string (), "(80,0;-60,-100)");
   EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-100, 200), db::Point (-100, -200)), &output), true);
   EXPECT_EQ (output.to_string (), "(-100,0;-100,-100)");
-  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (), db::Edge (db::Point (-100, 200), db::Point (-100, -200)), &output), false);
+  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (), db::Edge (db::Point (-100, 200), db::Point (-100, -200)), &output), true);
+  EXPECT_EQ (output.to_string (), "(-100,100;-100,-100)");   //  dot vs. line (issue #2141)
   EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, 50), db::Point (100, 50)), &output), false);
   EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, -50), db::Point (100, -50)), &output), true);
   EXPECT_EQ (output.to_string (), "(100,-50;100,-50)");
@@ -170,14 +171,15 @@ TEST(4)
   EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 200), db::Point (200, -200)), &output), false);
   EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (120, 200), db::Point (120, -200)), &output), false);
   EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, 200), db::Point (100, -200)), &output), true);
-  EXPECT_EQ (output.to_string (), "(100,0;100,-100)");
+  EXPECT_EQ (output.to_string (), "(100,0;100,0)");
   EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (80, 200), db::Point (80, -200)), &output), true);
-  EXPECT_EQ (output.to_string (), "(80,0;80,-100)");
+  EXPECT_EQ (output.to_string (), "(80,0;80,0)");
   EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-80, 200), db::Point (-80, -200)), &output), false);
   EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (80, 0), db::Point (-200, -200)), &output), true);
   EXPECT_EQ (output.to_string (), "(80,0;0,-57)");
   EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-100, 200), db::Point (-100, -200)), &output), false);
-  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (), db::Edge (db::Point (-100, 200), db::Point (-100, -200)), &output), false);
+  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (), db::Edge (db::Point (-100, 200), db::Point (-100, -200)), &output), true);
+  EXPECT_EQ (output.to_string (), "(-100,0;-100,0)");  //  dot vs. line (issue #2141)
   EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, 50), db::Point (100, 50)), &output), false);
   EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, -50), db::Point (100, -50)), &output), true);
   EXPECT_EQ (output.to_string (), "(100,-50;100,-50)");

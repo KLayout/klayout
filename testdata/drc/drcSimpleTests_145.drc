@@ -1,0 +1,22 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+end
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+l3 = input(3, 0)
+
+l1.output(1, 0)
+l2.output(2, 0)
+l3.output(3, 0)
+
+l1.raw.edges.merged.output(100, 0)
+l2.raw.edges.merged.output(101, 0)
+l3e = l3.raw.edges
+l3e.merge
+l3e.output(102, 0)
+

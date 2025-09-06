@@ -42,10 +42,18 @@ public:
     // .. nothing yet ..
   }
 
-  GenericRasterizer (const db::Polygon &fp, const db::Vector &row_step, const db::Vector &column_step, const db::Point &origin, const db::Vector &dim)
+  GenericRasterizer (const std::vector<db::Polygon> &fr, const db::Box &rasterized_area, const db::Vector &row_step, const db::Vector &column_step, const db::Point &origin, const db::Vector &dim)
     : m_row_step (row_step), m_column_step (column_step), m_row_steps (0), m_column_steps (0), m_origin (origin), m_dim (dim)
   {
-    rasterize (fp);
+    rasterize (rasterized_area, fr);
+  }
+
+  GenericRasterizer (const db::Polygon &fp, const db::Box &rasterized_area, const db::Vector &row_step, const db::Vector &column_step, const db::Point &origin, const db::Vector &dim)
+    : m_row_step (row_step), m_column_step (column_step), m_row_steps (0), m_column_steps (0), m_origin (origin), m_dim (dim)
+  {
+    std::vector<db::Polygon> fr;
+    fr.push_back (fp);
+    rasterize (rasterized_area, fr);
   }
 
   void move (const db::Vector &d)
@@ -57,101 +65,6 @@ public:
   void clear ()
   {
     m_area_maps.clear ();
-  }
-
-  void rasterize (const db::Polygon &fp)
-  {
-    db::Coord dx = m_row_step.x ();
-    db::Coord dy = m_column_step.y ();
-
-    if (m_row_step.y () == 0) {
-      m_row_steps = 1;
-    } else {
-      m_row_steps = tl::lcm (dy, std::abs (m_row_step.y ())) / std::abs (m_row_step.y ());
-    }
-
-    if (m_column_step.x () == 0) {
-      m_column_steps = 1;
-    } else {
-      m_column_steps = tl::lcm (dx, std::abs (m_column_step.x ())) / std::abs (m_column_step.x ());
-    }
-
-    //  because the rasterizer can't handle overlapping cells we need to multiply the row and columns steps
-    //  with an integer until the effective rasterizer pitch gets big enough.
-    m_row_steps *= (m_dim.x () - 1) / (m_row_steps * m_row_step.x ()) + 1;
-    m_column_steps *= (m_dim.y () - 1) / (m_column_steps * m_column_step.y ()) + 1;
-
-    db::Box fp_bbox = fp.box ();
-
-    //  compensate for distortion by sheared kernel
-    db::Coord ex = std::max (std::abs (db::Coord (m_column_step.x () * m_column_steps)), std::abs (db::Coord (m_row_step.x () * m_row_steps)));
-    db::Coord ey = std::max (std::abs (db::Coord (m_column_step.y () * m_column_steps)), std::abs (db::Coord (m_row_step.y () * m_row_steps)));
-    fp_bbox.enlarge (db::Vector (ex, ey));
-
-    int columns_per_rows = (int (m_row_steps) * m_row_step.y ()) / dy;
-    int rows_per_columns = (int (m_column_steps) * m_column_step.x ()) / dx;
-
-    db::Coord ddx = dx * db::Coord (m_row_steps) - m_column_step.x () * columns_per_rows;
-    db::Coord ddy = dy * db::Coord (m_column_steps) - m_row_step.y () * rows_per_columns;
-
-    //  round polygon bbox
-    db::Coord fp_left = db::Coord (tl::round_down (fp_bbox.left () - m_origin.x (), ddx)) + m_origin.x ();
-    db::Coord fp_bottom = db::Coord (tl::round_down (fp_bbox.bottom () - m_origin.y (), ddy)) + m_origin.y ();
-    db::Coord fp_right = db::Coord (tl::round_up (fp_bbox.right () - m_origin.x (), ddx)) + m_origin.x ();
-    db::Coord fp_top = db::Coord (tl::round_up (fp_bbox.top () - m_origin.y (), ddy)) + m_origin.y ();
-    fp_bbox = db::Box (fp_left, fp_bottom, fp_right, fp_top);
-
-    size_t nx = fp_bbox.width () / ddx;
-    size_t ny = fp_bbox.height () / ddy;
-
-    tl_assert (fp.box ().inside (fp_bbox));
-
-    if (nx == 0 || ny == 0) {
-      //  nothing to rasterize:
-      return;
-    }
-
-    m_area_maps.reserve (m_row_steps * m_column_steps + std::abs (columns_per_rows) * std::abs (rows_per_columns));
-
-    db::AreaMap am;
-
-    for (unsigned int ic = 0; ic < m_column_steps; ++ic) {
-
-      for (unsigned int ir = 0; ir < m_row_steps; ++ir) {
-
-        db::Vector dr = m_row_step * long (ir);
-        db::Vector dc = m_column_step * long (ic);
-
-        am.reinitialize (db::Point (fp_left, fp_bottom) + dr + dc, db::Vector (ddx, ddy), m_dim, nx, ny);
-
-        if (db::rasterize (fp, am)) {
-          m_area_maps.push_back (db::AreaMap ());
-          m_area_maps.back ().swap (am);
-        }
-
-      }
-
-    }
-
-    //  adds the "dead corner" piece
-
-    for (unsigned int ic = 0; ic < (unsigned int) std::abs (columns_per_rows); ++ic) {
-
-      for (unsigned int ir = 0; ir < (unsigned int) std::abs (rows_per_columns); ++ir) {
-
-        db::Vector dr = m_row_step * long ((rows_per_columns > 0 ? -int (ir + 1) : ir) + m_row_steps);
-        db::Vector dc = m_column_step * long ((columns_per_rows > 0 ? -int (ic + 1) : ic) + m_column_steps);
-
-        am.reinitialize (db::Point (fp_left, fp_bottom) + dr + dc, db::Vector (ddx, ddy), m_dim, nx, ny);
-
-        if (db::rasterize (fp, am)) {
-          m_area_maps.push_back (db::AreaMap ());
-          m_area_maps.back ().swap (am);
-        }
-
-      }
-
-    }
   }
 
   const db::Point &p0 () const { return m_origin; }
@@ -180,12 +93,212 @@ private:
   unsigned int m_row_steps, m_column_steps;
   db::Point m_origin;
   db::Vector m_dim;
+
+  void rasterize (const db::Box &rasterized_area, const std::vector<db::Polygon> &fr)
+  {
+    db::Coord dx = m_row_step.x ();
+    db::Coord dy = m_column_step.y ();
+
+    if (m_row_step.y () == 0) {
+      m_row_steps = 1;
+    } else {
+      m_row_steps = tl::lcm (dy, std::abs (m_row_step.y ())) / std::abs (m_row_step.y ());
+    }
+
+    if (m_column_step.x () == 0) {
+      m_column_steps = 1;
+    } else {
+      m_column_steps = tl::lcm (dx, std::abs (m_column_step.x ())) / std::abs (m_column_step.x ());
+    }
+
+    //  because the rasterizer can't handle overlapping cells we need to multiply the row and columns steps
+    //  with an integer until the effective rasterizer pitch gets big enough.
+    m_row_steps *= (m_dim.x () - 1) / (m_row_steps * m_row_step.x ()) + 1;
+    m_column_steps *= (m_dim.y () - 1) / (m_column_steps * m_column_step.y ()) + 1;
+
+    db::Box ra_org = rasterized_area;
+
+    //  compensate for distortion by sheared kernel
+    db::Coord ex = std::max (std::abs (db::Coord (m_column_step.x () * m_column_steps)), std::abs (db::Coord (m_row_step.x () * m_row_steps)));
+    db::Coord ey = std::max (std::abs (db::Coord (m_column_step.y () * m_column_steps)), std::abs (db::Coord (m_row_step.y () * m_row_steps)));
+    ra_org.enlarge (db::Vector (ex, ey));
+
+    int columns_per_rows = (int (m_row_steps) * m_row_step.y ()) / dy;
+    int rows_per_columns = (int (m_column_steps) * m_column_step.x ()) / dx;
+
+    db::Coord ddx = dx * db::Coord (m_row_steps) - m_column_step.x () * columns_per_rows;
+    db::Coord ddy = dy * db::Coord (m_column_steps) - m_row_step.y () * rows_per_columns;
+
+    //  round polygon bbox
+    db::Coord ra_left = db::Coord (tl::round_down (ra_org.left () - m_origin.x (), ddx)) + m_origin.x ();
+    db::Coord ra_bottom = db::Coord (tl::round_down (ra_org.bottom () - m_origin.y (), ddy)) + m_origin.y ();
+    db::Coord ra_right = db::Coord (tl::round_up (ra_org.right () - m_origin.x (), ddx)) + m_origin.x ();
+    db::Coord ra_top = db::Coord (tl::round_up (ra_org.top () - m_origin.y (), ddy)) + m_origin.y ();
+    db::Box ra = db::Box (ra_left, ra_bottom, ra_right, ra_top);
+
+    size_t nx = ra.width () / ddx;
+    size_t ny = ra.height () / ddy;
+
+    tl_assert (ra_org.inside (ra));
+
+    if (nx == 0 || ny == 0) {
+      //  nothing to rasterize:
+      return;
+    }
+
+    m_area_maps.reserve (m_row_steps * m_column_steps + std::abs (columns_per_rows) * std::abs (rows_per_columns));
+
+    db::AreaMap am;
+
+    for (unsigned int ic = 0; ic < m_column_steps; ++ic) {
+
+      for (unsigned int ir = 0; ir < m_row_steps; ++ir) {
+
+        db::Vector dr = m_row_step * long (ir);
+        db::Vector dc = m_column_step * long (ic);
+
+        am.reinitialize (db::Point (ra_left, ra_bottom) + dr + dc, db::Vector (ddx, ddy), m_dim, nx, ny);
+
+        bool any = false;
+        for (auto i = fr.begin (); i != fr.end (); ++i) {
+          if (db::rasterize (*i, am)) {
+            any = true;
+          }
+        }
+        if (any) {
+          m_area_maps.push_back (db::AreaMap ());
+          m_area_maps.back ().swap (am);
+        }
+
+      }
+
+    }
+
+    //  adds the "dead corner" piece
+
+    for (unsigned int ic = 0; ic < (unsigned int) std::abs (columns_per_rows); ++ic) {
+
+      for (unsigned int ir = 0; ir < (unsigned int) std::abs (rows_per_columns); ++ir) {
+
+        db::Vector dr = m_row_step * long ((rows_per_columns > 0 ? -int (ir + 1) : ir) + m_row_steps);
+        db::Vector dc = m_column_step * long ((columns_per_rows > 0 ? -int (ic + 1) : ic) + m_column_steps);
+
+        am.reinitialize (db::Point (ra_left, ra_bottom) + dr + dc, db::Vector (ddx, ddy), m_dim, nx, ny);
+
+        bool any = false;
+        for (auto i = fr.begin (); i != fr.end (); ++i) {
+          if (db::rasterize (*i, am)) {
+            any = true;
+          }
+        }
+        if (any) {
+          m_area_maps.push_back (db::AreaMap ());
+          m_area_maps.back ().swap (am);
+        }
+
+      }
+
+    }
+  }
 };
 
+static size_t
+create_instances (GenericRasterizer &am, db::Cell *cell, db::cell_index_type fill_cell_index, const db::Vector &kernel_origin, const db::Vector &fill_margin, const GenericRasterizer *exclude_rasterized, std::vector<db::Polygon> *filled_regions)
+{
+  size_t ninsts = 0;
+
+  for (unsigned int i = 0; i < am.area_maps (); ++i) {
+
+    db::AreaMap &am1 = am.area_map (i);
+    const db::AreaMap *am1_excl = 0;
+    if (exclude_rasterized) {
+      tl_assert (i < exclude_rasterized->area_maps ());
+      am1_excl = &exclude_rasterized->area_map (i);
+    }
+
+    size_t nx = am1.nx ();
+    size_t ny = am1.ny ();
+
+    //  Create the fill cell instances
+    for (size_t i = 0; i < nx; ++i) {
+
+      for (size_t j = 0; j < ny; ) {
+
+        size_t jj = j + 1;
+        if (am1.get (i, j) == am1.pixel_area () && (!am1_excl || am1_excl->get (i, j) == 0)) {
+
+          while (jj != ny && am1.get (i, jj) == am1.pixel_area () && (!am1_excl || am1_excl->get (i, jj) == 0)) {
+            ++jj;
+          }
+
+          db::Vector p0 = (am1.p0 () - db::Point ()) - kernel_origin;
+          p0 += db::Vector (i * am1.d ().x (), j * am1.d ().y ());
+
+          db::CellInstArray array;
+
+          //  try to expand the array in x direction
+          size_t ii = i + 1;
+          for ( ; ii < nx; ++ii) {
+            bool all = true;
+            for (size_t k = j; k < jj && all; ++k) {
+              all = (am1.get (ii, k) == am1.pixel_area () && (!am1_excl || am1_excl->get (ii, k) == 0));
+            }
+            if (all) {
+              for (size_t k = j; k < jj; ++k) {
+                //  disable pixel, so we do not see it again in the following columns
+                am1.get (ii, k) = 0;
+              }
+            } else {
+              break;
+            }
+          }
+
+          ninsts += (jj - j) * (ii - i);
+
+          if (jj > j + 1 || ii > i + 1) {
+            array = db::CellInstArray (db::CellInst (fill_cell_index), db::Trans (p0), db::Vector (0, am1.d ().y ()), db::Vector (am1.d ().x (), 0), (unsigned long) (jj - j), (unsigned long) (ii - i));
+          } else {
+            array = db::CellInstArray (db::CellInst (fill_cell_index), db::Trans (p0));
+          }
+
+          {
+            //  In case we run this from a tiling processor we need to lock against multithread races
+            tl_assert (cell->layout () != 0);
+            tl::MutexLocker locker (&cell->layout ()->lock ());
+            cell->insert (array);
+          }
+
+          if (filled_regions) {
+            if (am1.d ().y () == am1.p ().y () && am1.d ().x () == am1.p ().x ()) {
+              db::Box fill_box (db::Point (), db::Point (am1.p ().x () * db::Coord (ii - i), am1.p ().y () * db::Coord (jj - j)));
+              filled_regions->push_back (db::Polygon (fill_box.enlarged (fill_margin).moved (kernel_origin + p0)));
+            } else {
+              db::Box fill_box (db::Point (), db::Point () + am1.p ());
+              fill_box.enlarge (fill_margin);
+              for (size_t k = 0; k < jj - j; ++k) {
+                for (size_t l = 0; l < ii - i; ++l) {
+                  filled_regions->push_back (db::Polygon (fill_box.moved (kernel_origin + p0 + db::Vector (am1.d ().x () * db::Coord (l), am1.d ().y () * db::Coord (k)))));
+                }
+              }
+            }
+          }
+
+        }
+
+        j = jj;
+
+      }
+
+    }
+
+  }
+
+  return ninsts;
+}
 
 static bool
 fill_polygon_impl (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type fill_cell_index, const db::Box &fc_bbox, const db::Vector &row_step, const db::Vector &column_step, const db::Point &origin, bool enhanced_fill,
-                   std::vector <db::Polygon> *remaining_parts, const db::Vector &fill_margin, const db::Box &glue_box)
+                   std::vector <db::Polygon> *remaining_parts, const db::Vector &fill_margin, const db::Box &glue_box, const db::Region &exclude_area)
 {
   if (row_step.x () <= 0 || column_step.y () <= 0) {
     throw tl::Exception (tl::to_string (tr ("Invalid row or column step vectors in fill_region: row step must have a positive x component while column step must have a positive y component")));
@@ -197,146 +310,125 @@ fill_polygon_impl (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type f
 
   db::Vector kernel_origin (fc_bbox.left (), fc_bbox.bottom ());
 
-  std::vector <db::Polygon> filled_regions;
-  db::EdgeProcessor ep;
-
-  //  under- and oversize the polygon to remove slivers that cannot be filled.
   db::Coord dx = fc_bbox.width () / 2 - 1, dy = fc_bbox.height () / 2 - 1;
 
-  std::vector <db::Polygon> fpa;
-  std::vector <db::Polygon> fpb;
-  fpa.push_back (fp0);
+  db::Region fr (fp0);
+  db::Box rasterized_area = fp0.box ();
 
-  ep.size (fpa, -dx, 0, fpb, 3 /*mode*/, false /*=don't resolve holes*/);
-  fpa.swap (fpb);
-  fpb.clear ();
+  std::unique_ptr<GenericRasterizer> exclude_rasterized;
 
-  ep.size (fpa, dx, 0, fpb, 3 /*mode*/, false /*=don't resolve holes*/);
-  fpa.swap (fpb);
-  fpb.clear ();
+  if (! exclude_area.empty ()) {
 
-  ep.size (fpa, 0, -dy, fpb, 3 /*mode*/, false /*=don't resolve holes*/);
-  fpa.swap (fpb);
-  fpb.clear ();
+    auto iter = exclude_area.iter ();
+    iter.confine_region (fp0.box ());
 
-  ep.size (fpa, 0, dy, fpb, 3 /*mode*/, false /*=don't resolve holes*/);
-  fpa.swap (fpb);
-  fpb.clear ();
+    //  over- and undersize the polygons to fill gaps that cannot be filled.
+    db::Region excluded (iter);
+    excluded.size (dx, 0);
+    excluded.size (-dx, 0);
+    excluded.size (dy, 0);
+    excluded.size (-dy, 0);
+    excluded.merge ();
 
-  ep.simple_merge (fpa, fpb, false /*=don't resolve holes*/);
+    if (enhanced_fill || remaining_parts != 0) {
 
-  filled_regions.clear ();
+      tl::warn << "@@@ using booleans for exclude";
+
+      //  In enhanced fill or if the remaining parts are requested, it is better to implement the
+      //  exclude area by a boolean NOT
+      fr -= excluded;
+
+    } else {
+
+      tl::warn << "@@@ using exclude area rasterizer";
+
+      //  Otherwise use a second rasterizer for the exclude polygons that must have a zero pixel coverage for the
+      //  pixel to be filled.
+
+      std::vector<db::Polygon> excluded_poly;
+      excluded_poly.reserve (excluded.count ());
+      for (auto i = excluded.begin (); ! i.at_end (); ++i) {
+        excluded_poly.push_back (*i);
+      }
+      excluded.clear ();
+
+      exclude_rasterized.reset (new GenericRasterizer (excluded_poly, rasterized_area, row_step, column_step, origin, fc_bbox.p2 () - fc_bbox.p1 ()));
+
+    }
+
+  }
+
+  std::vector <db::Polygon> filled_poly;
+
+  //  under- and oversize the polygon to remove slivers that cannot be filled.
+  fr.size (-dx, 0);
+  fr.size (dx, 0);
+  fr.size (0, -dy);
+  fr.size (0, dy);
+  fr.merge ();
+
+  filled_poly.reserve (fr.count ());
+  for (auto i = fr.begin (); ! i.at_end (); ++i) {
+    filled_poly.push_back (*i);
+  }
+
+  fr.clear ();
+
+  if (filled_poly.empty ()) {
+    return false;
+  }
+
+  std::vector <db::Polygon> filled_regions;
   bool any_fill = false;
 
-  for (std::vector <db::Polygon>::const_iterator fp = fpb.begin (); fp != fpb.end (); ++fp) {
+  if (exclude_rasterized.get ()) {
 
-    if (fp->hull ().size () == 0) {
-      continue;
-    }
+    tl_assert (remaining_parts == 0);
+    GenericRasterizer am (filled_poly, rasterized_area, row_step, column_step, origin, fc_bbox.p2 () - fc_bbox.p1 ());
 
-    //  disable enhanced mode an obey the origin if the polygon is not entirely inside and not at the boundary of the glue box
-    bool ef = enhanced_fill;
-    if (ef && ! glue_box.empty () && ! fp->box ().enlarged (db::Vector (1, 1)).inside (glue_box)) {
-      ef = false;
-    }
-
-    //  pick a heuristic "good" starting point in enhanced mode
-    //  TODO: this is a pretty weak optimization.
-    db::Point o = origin;
-    if (ef) {
-      o = fp->hull () [0];
-    }
-
-    size_t ninsts = 0;
-
-    GenericRasterizer am (*fp, row_step, column_step, o, fc_bbox.p2 () - fc_bbox.p1 ());
-
-    for (unsigned int i = 0; i < am.area_maps (); ++i) {
-
-      db::AreaMap &am1 = am.area_map (i);
-
-      size_t nx = am1.nx ();
-      size_t ny = am1.ny ();
-
-      //  Create the fill cell instances
-      for (size_t i = 0; i < nx; ++i) {
-
-        for (size_t j = 0; j < ny; ) {
-
-          size_t jj = j + 1;
-          if (am1.get (i, j) == am1.pixel_area ()) {
-
-            while (jj != ny && am1.get (i, jj) == am1.pixel_area ()) {
-              ++jj;
-            }
-
-            db::Vector p0 = (am1.p0 () - db::Point ()) - kernel_origin;
-            p0 += db::Vector (i * am1.d ().x (), j * am1.d ().y ());
-
-            db::CellInstArray array;
-
-            //  try to expand the array in x direction
-            size_t ii = i + 1;
-            for ( ; ii < nx; ++ii) {
-              bool all = true;
-              for (size_t k = j; k < jj && all; ++k) {
-                all = am1.get (ii, k) == am1.pixel_area ();
-              }
-              if (all) {
-                for (size_t k = j; k < jj; ++k) {
-                  //  disable pixel, so we do not see it again in the following columns
-                  am1.get (ii, k) = 0;
-                }
-              } else {
-                break;
-              }
-            }
-
-            ninsts += (jj - j) * (ii - i);
-
-            if (jj > j + 1 || ii > i + 1) {
-              array = db::CellInstArray (db::CellInst (fill_cell_index), db::Trans (p0), db::Vector (0, am1.d ().y ()), db::Vector (am1.d ().x (), 0), (unsigned long) (jj - j), (unsigned long) (ii - i));
-            } else {
-              array = db::CellInstArray (db::CellInst (fill_cell_index), db::Trans (p0));
-            }
-
-            {
-              //  In case we run this from a tiling processor we need to lock against multithread races
-              tl_assert (cell->layout () != 0);
-              tl::MutexLocker locker (&cell->layout ()->lock ());
-              cell->insert (array);
-            }
-
-            if (remaining_parts) {
-              if (am1.d ().y () == am1.p ().y () && am1.d ().x () == am1.p ().x ()) {
-                db::Box fill_box (db::Point (), db::Point (am1.p ().x () * db::Coord (ii - i), am1.p ().y () * db::Coord (jj - j)));
-                filled_regions.push_back (db::Polygon (fill_box.enlarged (fill_margin).moved (kernel_origin + p0)));
-              } else {
-                db::Box fill_box (db::Point (), db::Point () + am1.p ());
-                fill_box.enlarge (fill_margin);
-                for (size_t k = 0; k < jj - j; ++k) {
-                  for (size_t l = 0; l < ii - i; ++l) {
-                    filled_regions.push_back (db::Polygon (fill_box.moved (kernel_origin + p0 + db::Vector (am1.d ().x () * db::Coord (l), am1.d ().y () * db::Coord (k)))));
-                  }
-                }
-              }
-            }
-
-            any_fill = true;
-
-          }
-
-          j = jj;
-
-        }
-
-      }
-
+    size_t ninsts = create_instances (am, cell, fill_cell_index, kernel_origin, fill_margin, exclude_rasterized.get (), 0);
+    if (ninsts > 0) {
+      any_fill = true;
     }
 
     if (tl::verbosity () >= 30 && ninsts > 0) {
-      tl::info << "Part " << fp->to_string ();
+      tl::info << "Part " << fp0.to_string ();
       tl::info << "Created " << ninsts << " instances";
+    }
+
+  } else {
+
+    for (auto fp = filled_poly.begin (); fp != filled_poly.end (); ++fp) {
+
+      if (fp->is_empty ()) {
+        continue;
+      }
+
+      //  disable enhanced mode an obey the origin if the polygon is not entirely inside and not at the boundary of the glue box
+      bool ef = enhanced_fill;
+      if (ef && ! glue_box.empty () && ! fp->box ().enlarged (db::Vector (1, 1)).inside (glue_box)) {
+        ef = false;
+      }
+
+      //  pick a heuristic "good" starting point in enhanced mode
+      //  TODO: this is a pretty weak optimization.
+      db::Point o = origin;
+      if (ef) {
+        o = fp->hull () [0];
+      }
+
+      GenericRasterizer am (*fp, rasterized_area, row_step, column_step, o, fc_bbox.p2 () - fc_bbox.p1 ());
+
+      size_t ninsts = create_instances (am, cell, fill_cell_index, kernel_origin, fill_margin, 0, remaining_parts ? &filled_regions : 0);
+      if (ninsts > 0) {
+        any_fill = true;
+      }
+
+      if (tl::verbosity () >= 30 && ninsts > 0) {
+        tl::info << "Part " << fp->to_string ();
+        tl::info << "Created " << ninsts << " instances";
+      }
+
     }
 
   }
@@ -344,6 +436,7 @@ fill_polygon_impl (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type f
   if (any_fill) {
 
     if (remaining_parts) {
+      db::EdgeProcessor ep;
       std::vector <db::Polygon> fp1;
       fp1.push_back (fp0);
       ep.boolean (fp1, filled_regions, *remaining_parts, db::BooleanOp::ANotB, false /*=don't resolve holes*/);
@@ -358,25 +451,25 @@ fill_polygon_impl (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type f
 
 DB_PUBLIC bool
 fill_region (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type fill_cell_index, const Box &fc_box, const db::Vector &row_step, const db::Vector &column_step, const db::Point &origin, bool enhanced_fill,
-             std::vector <db::Polygon> *remaining_parts, const db::Vector &fill_margin, const db::Box &glue_box)
+             std::vector <db::Polygon> *remaining_parts, const db::Vector &fill_margin, const db::Box &glue_box, const db::Region &exclude_area)
 {
-  return fill_polygon_impl (cell, fp0, fill_cell_index, fc_box, row_step, column_step, origin, enhanced_fill, remaining_parts, fill_margin, glue_box);
+  return fill_polygon_impl (cell, fp0, fill_cell_index, fc_box, row_step, column_step, origin, enhanced_fill, remaining_parts, fill_margin, glue_box, exclude_area);
 }
 
 DB_PUBLIC bool
 fill_region (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type fill_cell_index, const db::Box &fc_bbox, const db::Point &origin, bool enhanced_fill,
-             std::vector <db::Polygon> *remaining_parts, const db::Vector &fill_margin, const db::Box &glue_box)
+             std::vector <db::Polygon> *remaining_parts, const db::Vector &fill_margin, const db::Box &glue_box, const db::Region &exclude_area)
 {
   if (fc_bbox.empty () || fc_bbox.width () == 0 || fc_bbox.height () == 0) {
     throw tl::Exception (tl::to_string (tr ("Invalid fill cell footprint (empty or zero width/height)")));
   }
 
-  return fill_polygon_impl (cell, fp0, fill_cell_index, fc_bbox, db::Vector (fc_bbox.width (), 0), db::Vector (0, fc_bbox.height ()), origin, enhanced_fill, remaining_parts, fill_margin, glue_box);
+  return fill_polygon_impl (cell, fp0, fill_cell_index, fc_bbox, db::Vector (fc_bbox.width (), 0), db::Vector (0, fc_bbox.height ()), origin, enhanced_fill, remaining_parts, fill_margin, glue_box, exclude_area);
 }
 
 static void
 fill_region_impl (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index, const db::Box &fc_bbox, const db::Vector &row_step, const db::Vector &column_step, const db::Point &origin, bool enhanced_fill,
-                  db::Region *remaining_parts, const db::Vector &fill_margin, db::Region *remaining_polygons, int iteration, const db::Box &glue_box)
+                  db::Region *remaining_parts, const db::Vector &fill_margin, db::Region *remaining_polygons, int iteration, const db::Box &glue_box, const db::Region &exclude_area)
 {
   if (row_step.x () <= 0 || column_step.y () <= 0) {
     throw tl::Exception (tl::to_string (tr ("Invalid row or column step vectors in fill_region: row step must have a positive x component while column step must have a positive y component")));
@@ -403,7 +496,7 @@ fill_region_impl (db::Cell *cell, const db::Region &fr, db::cell_index_type fill
     tl::RelativeProgress progress (progress_title, n);
 
     for (db::Region::const_iterator p = fr.begin_merged (); !p.at_end (); ++p) {
-      if (! fill_polygon_impl (cell, *p, fill_cell_index, fc_bbox, row_step, column_step, origin, enhanced_fill, remaining_parts ? &rem_pp : 0, fill_margin, glue_box)) {
+      if (! fill_polygon_impl (cell, *p, fill_cell_index, fc_bbox, row_step, column_step, origin, enhanced_fill, remaining_parts ? &rem_pp : 0, fill_margin, glue_box, exclude_area)) {
         if (remaining_polygons) {
           rem_poly.push_back (*p);
         }
@@ -433,27 +526,27 @@ fill_region_impl (db::Cell *cell, const db::Region &fr, db::cell_index_type fill
 
 DB_PUBLIC void
 fill_region (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index, const db::Box &fc_bbox, const db::Vector &row_step, const db::Vector &column_step, const db::Point &origin, bool enhanced_fill,
-             db::Region *remaining_parts, const db::Vector &fill_margin, db::Region *remaining_polygons, const db::Box &glue_box)
+             db::Region *remaining_parts, const db::Vector &fill_margin, db::Region *remaining_polygons, const db::Box &glue_box, const db::Region &exclude_area)
 {
-  fill_region_impl (cell, fr, fill_cell_index, fc_bbox, row_step, column_step, origin, enhanced_fill, remaining_parts, fill_margin, remaining_polygons, 0, glue_box);
+  fill_region_impl (cell, fr, fill_cell_index, fc_bbox, row_step, column_step, origin, enhanced_fill, remaining_parts, fill_margin, remaining_polygons, 0, glue_box, exclude_area);
 }
 
 DB_PUBLIC void
 fill_region (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index, const db::Box &fc_bbox, const db::Point &origin, bool enhanced_fill,
-             db::Region *remaining_parts, const db::Vector &fill_margin, db::Region *remaining_polygons, const db::Box &glue_box)
+             db::Region *remaining_parts, const db::Vector &fill_margin, db::Region *remaining_polygons, const db::Box &glue_box, const db::Region &exclude_area)
 {
   if (fc_bbox.empty () || fc_bbox.width () == 0 || fc_bbox.height () == 0) {
     throw tl::Exception (tl::to_string (tr ("Invalid fill cell footprint (empty or zero width/height)")));
   }
 
   fill_region_impl (cell, fr, fill_cell_index, fc_bbox, db::Vector (fc_bbox.width (), 0), db::Vector (0, fc_bbox.height ()),
-                    origin, enhanced_fill, remaining_parts, fill_margin, remaining_polygons, 0, glue_box);
+                    origin, enhanced_fill, remaining_parts, fill_margin, remaining_polygons, 0, glue_box, exclude_area);
 }
 
 DB_PUBLIC void
 fill_region_repeat (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index,
                     const db::Box &fc_box, const db::Vector &row_step, const db::Vector &column_step,
-                    const db::Vector &fill_margin, db::Region *remaining_polygons, const db::Box &glue_box)
+                    const db::Vector &fill_margin, db::Region *remaining_polygons, const db::Box &glue_box, const db::Region &exclude_area)
 {
   const db::Region *fill_region = &fr;
 
@@ -467,7 +560,7 @@ fill_region_repeat (db::Cell *cell, const db::Region &fr, db::cell_index_type fi
     ++iteration;
 
     remaining.clear ();
-    fill_region_impl (cell, *fill_region, fill_cell_index, fc_box, row_step, column_step, db::Point (), true, &remaining, fill_margin, remaining_polygons, iteration, glue_box);
+    fill_region_impl (cell, *fill_region, fill_cell_index, fc_box, row_step, column_step, db::Point (), true, &remaining, fill_margin, remaining_polygons, iteration, glue_box, exclude_area);
 
     new_fill_region.swap (remaining);
     fill_region = &new_fill_region;

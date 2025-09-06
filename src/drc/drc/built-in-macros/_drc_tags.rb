@@ -476,6 +476,18 @@ module DRC
   end
  
   # A wrapper for the fill step definition
+  class DRCFillExclude
+    def initialize(excl)
+      excl.is_a?(DRCLayer) || raise("Exclude layer argument needs to be a DRC layer")
+      excl.requires_region("Exclude layer")
+      @excl = excl.data
+    end
+    def excl
+      @excl
+    end
+  end
+      
+  # A wrapper for the fill step definition
   class DRCFillStep
     def initialize(for_row, x, y = nil)
       @for_row = for_row

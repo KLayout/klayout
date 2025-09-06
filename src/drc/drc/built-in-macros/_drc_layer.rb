@@ -5079,6 +5079,7 @@ CODE
     #
     # This method works both on edge or polygon layers. Edge merging forms
     # single, continuous edges from coincident and connected individual edges.
+    # The overlap count is only available on polygon layers.
     #
     # A version that modifies the input layer is \merge.
     #
@@ -5106,7 +5107,13 @@ CODE
     def merged(overlap_count = 1)
       @engine._context("merged") do
         requires_edges_or_region
-        aa = [ @engine._prep_value(overlap_count) ]
+        oc = @engine._prep_value(overlap_count)
+        if self.data.is_a?(RBA::Edges)
+          oc == 1 || raise("'overlap_count' (merged) is only available on polygon layers")
+          aa = []
+        else
+          aa = [ oc ]
+        end
         DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :merged, *aa))
       end
     end
@@ -5114,7 +5121,13 @@ CODE
     def merge(overlap_count = 1)
       @engine._context("merge") do
         requires_edges_or_region
-        aa = [ @engine._prep_value(overlap_count) ]
+        oc = @engine._prep_value(overlap_count)
+        if self.data.is_a?(RBA::Edges)
+          oc == 1 || raise("'overlap_count' (merged) is only available on polygon layers")
+          aa = []
+        else
+          aa = [ oc ]
+        end
         if @engine.is_tiled?
           # in tiled mode, no modifying versions are available
           self.data = @engine._tcmd(self.data, 0, self.data.class, :merged, *aa)

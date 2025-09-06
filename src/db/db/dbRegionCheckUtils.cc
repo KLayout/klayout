@@ -463,8 +463,10 @@ void
 poly2poly_check<PolygonType>::enter (const PolygonType &o, size_t p)
 {
   for (typename PolygonType::polygon_edge_iterator e = o.begin_edge (); ! e.at_end (); ++e) {
-    m_edge_heap.push_back (*e);
-    m_scanner.insert (& m_edge_heap.back (), p);
+    if (! (*e).is_degenerate ()) {
+      m_edge_heap.push_back (*e);
+      m_scanner.insert (& m_edge_heap.back (), p);
+    }
   }
 }
 
@@ -497,7 +499,7 @@ poly2poly_check<PolygonType>::enter (const PolygonType &o, size_t p, const poly2
   }
 
   for (typename PolygonType::polygon_edge_iterator e = o.begin_edge (); ! e.at_end (); ++e) {
-    if (interact (box, *e)) {
+    if (! (*e).is_degenerate () && interact (box, *e)) {
       m_edge_heap.push_back (*e);
       m_scanner.insert (& m_edge_heap.back (), p);
     }

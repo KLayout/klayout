@@ -2044,3 +2044,25 @@ TEST(144d_combined_antennas)
   run_test (_this, "144", true);
 }
 
+//  issue 2134
+TEST(145_edges_merge)
+{
+  run_test (_this, "145", false);
+}
+
+TEST(145d_edges_merge)
+{
+  run_test (_this, "145", true);
+}
+
+//  issue 2141
+TEST(146_edges_and_corners)
+{
+  run_test (_this, "146", false);
+}
+
+TEST(146d_edges_and_corners)
+{
+  run_test (_this, "146", true);
+}
+

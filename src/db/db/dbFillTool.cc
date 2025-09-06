@@ -324,9 +324,13 @@ fill_polygon_impl (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type f
 
     //  over- and undersize the polygons to fill gaps that cannot be filled.
     db::Region excluded (it.first, it.second);
+    excluded.set_merged_semantics (false);
     excluded.size (dx, 0);
+    excluded.set_merged_semantics (true);
     excluded.size (-dx, 0);
+    excluded.set_merged_semantics (false);
     excluded.size (dy, 0);
+    excluded.set_merged_semantics (true);
     excluded.size (-dy, 0);
     excluded.merge ();
 
@@ -354,13 +358,27 @@ fill_polygon_impl (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type f
 
   }
 
-  std::vector <db::Polygon> filled_poly;
+  std::vector <db::Polygon> filled_poly, filled_poly_uncleaned;
+
+  //  save the uncleaned polygons, so we subtract the filled parts to
+  //  form the remaining parts
+  if (remaining_parts) {
+    filled_poly_uncleaned.reserve (fr.count ());
+    for (auto i = fr.begin (); ! i.at_end (); ++i) {
+      filled_poly_uncleaned.push_back (*i);
+    }
+  }
 
   //  under- and oversize the polygon to remove slivers that cannot be filled.
+  fr.set_merged_semantics (true);
   fr.size (-dx, 0);
+  fr.set_merged_semantics (false);
   fr.size (dx, 0);
+  fr.set_merged_semantics (true);
   fr.size (0, -dy);
+  fr.set_merged_semantics (false);
   fr.size (0, dy);
+  fr.set_merged_semantics (true);
   fr.merge ();
 
   filled_poly.reserve (fr.count ());
@@ -433,7 +451,7 @@ fill_polygon_impl (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type f
 
     if (remaining_parts) {
       db::EdgeProcessor ep;
-      ep.boolean (filled_poly, filled_regions, *remaining_parts, db::BooleanOp::ANotB, false /*=don't resolve holes*/);
+      ep.boolean (filled_poly_uncleaned, filled_regions, *remaining_parts, db::BooleanOp::ANotB, false /*=don't resolve holes*/);
     }
 
     return true;

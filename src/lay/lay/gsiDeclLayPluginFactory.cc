@@ -341,8 +341,10 @@ private:
   bool m_implements_mouse_mode;
   std::string m_mouse_mode_title;
   tl::RegisteredClass <lay::PluginDeclaration> *mp_registration;
+#if defined(HAVE_QTBINDINGS)
   mutable std::vector<ConfigPageImpl *> m_config_pages;
   mutable std::vector<EditorOptionsPageImpl *> m_editor_options_pages;
+#endif
 };
 
 Class<gsi::PluginFactoryBase> decl_PluginFactory ("lay", "PluginFactory",

@@ -1,0 +1,21 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+end
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+
+p = fill_pattern("PAT1").shape(100, 0, box(0, 0, 5.um, 5.um)).origin(-2.5.um, -2.5.um)
+l1.fill(p, hstep(10.0, 5.0), vstep(-5.0, 10.0), fill_exclude(l2))
+
+p = fill_pattern("PAT1").shape(110, 0, box(0, 0, 5.um, 5.um)).origin(-2.5.um, -2.5.um)
+left = l1.fill_with_left(p, hstep(10.0, 5.0), vstep(-5.0, 10.0), fill_exclude(l2))
+
+l1.output(1, 0)
+l2.output(2, 0)
+left.output(111, 0)
+

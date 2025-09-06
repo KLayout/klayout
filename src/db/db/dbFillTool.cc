@@ -77,6 +77,16 @@ public:
     return (unsigned int) m_area_maps.size ();
   }
 
+  int index_for_p0 (const db::Point &p0) const
+  {
+    for (auto i = m_area_maps.begin (); i != m_area_maps.end (); ++i) {
+      if (i->p0 () == p0) {
+        return int (i - m_area_maps.begin ());
+      }
+    }
+    return -1;
+  }
+
   const db::AreaMap &area_map (unsigned int i) const
   {
     return m_area_maps [i];
@@ -212,8 +222,10 @@ create_instances (GenericRasterizer &am, db::Cell *cell, db::cell_index_type fil
     db::AreaMap &am1 = am.area_map (i);
     const db::AreaMap *am1_excl = 0;
     if (exclude_rasterized) {
-      tl_assert (i < exclude_rasterized->area_maps ());
-      am1_excl = &exclude_rasterized->area_map (i);
+      int ie = exclude_rasterized->index_for_p0 (am1.p0 ());
+      if (ie >= 0) {
+        am1_excl = &exclude_rasterized->area_map (ie);
+      }
     }
 
     size_t nx = am1.nx ();
@@ -316,6 +328,7 @@ fill_polygon_impl (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type f
   db::Box rasterized_area = fp0.box ();
 
   std::unique_ptr<GenericRasterizer> exclude_rasterized;
+  bool has_exclude_area = false;
 
   if (! exclude_area.empty ()) {
 
@@ -334,25 +347,31 @@ fill_polygon_impl (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type f
     excluded.size (-dy, 0);
     excluded.merge ();
 
-    if (enhanced_fill || remaining_parts != 0) {
+    if (! excluded.empty ()) {
 
-      //  In enhanced fill or if the remaining parts are requested, it is better to implement the
-      //  exclude area by a boolean NOT
-      fr -= excluded;
+      has_exclude_area = true;
 
-    } else {
+      if (enhanced_fill || remaining_parts != 0) {
 
-      //  Otherwise use a second rasterizer for the exclude polygons that must have a zero pixel coverage for the
-      //  pixel to be filled.
+        //  In enhanced fill or if the remaining parts are requested, it is better to implement the
+        //  exclude area by a boolean NOT
+        fr -= excluded;
 
-      std::vector<db::Polygon> excluded_poly;
-      excluded_poly.reserve (excluded.count ());
-      for (auto i = excluded.begin (); ! i.at_end (); ++i) {
-        excluded_poly.push_back (*i);
+      } else {
+
+        //  Otherwise use a second rasterizer for the exclude polygons that must have a zero pixel coverage for the
+        //  pixel to be filled.
+
+        std::vector<db::Polygon> excluded_poly;
+        excluded_poly.reserve (excluded.count ());
+        for (auto i = excluded.begin (); ! i.at_end (); ++i) {
+          excluded_poly.push_back (*i);
+        }
+        excluded.clear ();
+
+        exclude_rasterized.reset (new GenericRasterizer (excluded_poly, rasterized_area, row_step, column_step, origin, fc_bbox.p2 () - fc_bbox.p1 ()));
+
       }
-      excluded.clear ();
-
-      exclude_rasterized.reset (new GenericRasterizer (excluded_poly, rasterized_area, row_step, column_step, origin, fc_bbox.p2 () - fc_bbox.p1 ()));
 
     }
 
@@ -388,14 +407,14 @@ fill_polygon_impl (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type f
 
   fr.clear ();
 
-  if (filled_poly.empty ()) {
-    return false;
-  }
-
   std::vector <db::Polygon> filled_regions;
   bool any_fill = false;
 
-  if (exclude_rasterized.get ()) {
+  if (filled_poly.empty ()) {
+
+    //  not need to do anything
+
+  } else if (exclude_rasterized.get ()) {
 
     tl_assert (remaining_parts == 0);
     GenericRasterizer am (filled_poly, rasterized_area, row_step, column_step, origin, fc_bbox.p2 () - fc_bbox.p1 ());
@@ -447,7 +466,7 @@ fill_polygon_impl (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type f
 
   }
 
-  if (any_fill) {
+  if (any_fill || has_exclude_area) {
 
     if (remaining_parts) {
       db::EdgeProcessor ep;

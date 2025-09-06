@@ -5897,7 +5897,7 @@ CODE
       pattern = nil
       origin = RBA::DPoint::new
       repeat = false
-      excl = RBA::Region::new
+      excl = nil
 
       args.each_with_index do |a,ai|
         if a.is_a?(DRCSource)
@@ -5944,6 +5944,10 @@ CODE
       end
       if !column_step
         column_step = RBA::DVector::new(0, pattern.default_ypitch)
+      end
+
+      if !excl
+        excl = RBA::Region::new
       end
 
       dbu_trans = RBA::VCplxTrans::new(1.0 / @engine.dbu)

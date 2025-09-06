@@ -4345,7 +4345,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method is equivalent to \\Cell#fill_region, but is based on Region (with the cell being the first parameter).\n"
     "\n"
-    "This method has been introduced in version 0.27.\n"
+    "This method has been introduced in version 0.27. The 'exclude_area' argument has been added in version 0.30.4.\n"
   ) +
   gsi::method_ext ("fill", &fill_region_skew, gsi::arg ("in_cell"),
                                               gsi::arg ("fill_cell_index"),
@@ -4362,7 +4362,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method is equivalent to \\Cell#fill_region, but is based on Region (with the cell being the first parameter).\n"
     "\n"
-    "This method has been introduced in version 0.27.\n"
+    "This method has been introduced in version 0.27. The 'exclude_area' argument has been added in version 0.30.4.\n"
   ) +
   gsi::method_ext ("fill_multi", &fill_region_multi, gsi::arg ("in_cell"),
                                                      gsi::arg ("fill_cell_index"),
@@ -4377,7 +4377,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method is equivalent to \\Cell#fill_region, but is based on Region (with the cell being the first parameter).\n"
     "\n"
-    "This method has been introduced in version 0.27.\n"
+    "This method has been introduced in version 0.27. The 'exclude_area' argument has been added in version 0.30.4.\n"
   ) +
   gsi::method_ext ("nets", &nets, gsi::arg ("extracted"), gsi::arg ("net_prop_name", tl::Variant (), "nil"), gsi::arg ("net_filter", (const std::vector<const db::Net *> *) (0), "nil"),
     "@brief Pulls the net shapes from a LayoutToNetlist database\n"

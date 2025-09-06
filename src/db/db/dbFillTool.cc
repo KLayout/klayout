@@ -319,11 +319,11 @@ fill_polygon_impl (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type f
 
   if (! exclude_area.empty ()) {
 
-    auto iter = exclude_area.iter ();
-    iter.confine_region (fp0.box ());
+    auto it = exclude_area.begin_iter ();
+    it.first.confine_region (fp0.box ());
 
     //  over- and undersize the polygons to fill gaps that cannot be filled.
-    db::Region excluded (iter);
+    db::Region excluded (it.first, it.second);
     excluded.size (dx, 0);
     excluded.size (-dx, 0);
     excluded.size (dy, 0);
@@ -332,15 +332,11 @@ fill_polygon_impl (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type f
 
     if (enhanced_fill || remaining_parts != 0) {
 
-      tl::warn << "@@@ using booleans for exclude";
-
       //  In enhanced fill or if the remaining parts are requested, it is better to implement the
       //  exclude area by a boolean NOT
       fr -= excluded;
 
     } else {
-
-      tl::warn << "@@@ using exclude area rasterizer";
 
       //  Otherwise use a second rasterizer for the exclude polygons that must have a zero pixel coverage for the
       //  pixel to be filled.
@@ -437,9 +433,7 @@ fill_polygon_impl (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type f
 
     if (remaining_parts) {
       db::EdgeProcessor ep;
-      std::vector <db::Polygon> fp1;
-      fp1.push_back (fp0);
-      ep.boolean (fp1, filled_regions, *remaining_parts, db::BooleanOp::ANotB, false /*=don't resolve holes*/);
+      ep.boolean (filled_poly, filled_regions, *remaining_parts, db::BooleanOp::ANotB, false /*=don't resolve holes*/);
     }
 
     return true;

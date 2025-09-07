@@ -297,7 +297,9 @@ EditorOptionsModalPages::EditorOptionsModalPages (EditorOptionsPages *parent)
   ly->addLayout (ly4);
   mp_pages = new QTabWidget (this);
   ly4->addWidget (mp_pages, 1);
+#if QT_VERSION >= 0x50400
   mp_pages->setTabBarAutoHide (true);
+#endif
   mp_pages->hide ();
 
   mp_single_page_frame = new QFrame (this);

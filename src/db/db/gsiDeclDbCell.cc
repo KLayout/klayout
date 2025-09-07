@@ -2249,7 +2249,7 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "If the 'remaining_polygons' argument is non-nil, the corresponding region will receive all polygons from the input region "
     "which could not be filled and where there is no chance of filling because not a single tile will fit into them.\n"
     "\n"
-    "'remaining_parts' and 'remaining_polygons' can point to the same Region object.\n""
+    "'remaining_parts' and 'remaining_polygons' can point to the same Region object.\n"
     "They can also be identical with the input. In that case the input will be overwritten with "
     "the respective output. Otherwise, the respective polygons are added to these regions.\n"
     "'remaining_polygons' is not used if 'exclude_area' is present and non-empty. In that case, the\n"

@@ -1358,6 +1358,9 @@ Object::from_string (const char *str, const char *base_dir)
       color = true;
     } else if (ex.test ("mono:")) {
       color = false;
+    } else {
+      //  unrecognized token
+      return;
     }
 
     size_t w = 0;
@@ -2499,13 +2502,19 @@ Object::mem_stat (db::MemStatistics *stat, db::MemStatistics::purpose_t purpose,
 const char *
 Object::class_name () const
 {
-  return "img::Object";
+  if (m_layer_binding != db::LayerProperties ()) {
+    //  This makes old KLayout versions ignore these images and not crash
+    return "img::ObjectV2";
+  } else {
+    return "img::Object";
+  }
 }
 
 /**
  *  @brief Registration of the img::Object class in the DUserObject space
  */
 static db::DUserObjectDeclaration class_registrar (new db::user_object_factory_impl<img::Object, db::DCoord> ("img::Object"));
+static db::DUserObjectDeclaration class_registrar_v2 (new db::user_object_factory_impl<img::Object, db::DCoord> ("img::ObjectV2"));
 
 } // namespace img
 

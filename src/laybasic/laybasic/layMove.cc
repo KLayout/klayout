@@ -39,6 +39,7 @@ MoveService::MoveService (lay::LayoutViewBase *view)
     lay::Plugin (view),
     m_dragging (false),
     m_dragging_transient (false),
+    m_active (false),
     mp_editables (view),
     mp_view (view),
     m_global_grid (0.001)
@@ -51,10 +52,17 @@ MoveService::~MoveService ()
   drag_cancel ();
 }
 
-void  
+void
+MoveService::activated ()
+{
+  m_active = true;
+}
+
+void
 MoveService::deactivated ()
 {
   m_shift = db::DPoint ();
+  m_active = false;
   mp_view->clear_transient_selection ();
   drag_cancel ();
 }
@@ -87,8 +95,15 @@ MoveService::configure (const std::string &name, const std::string &value)
 }
 
 bool
-MoveService::key_event (unsigned int key, unsigned int /*buttons*/)
+MoveService::key_event (unsigned int key, unsigned int buttons)
 {
+  if (m_active && key == Qt::Key_Tab && buttons == 0) {
+    if (dispatcher ()) {
+      dispatcher ()->menu_activated ("cm_sel_move");
+    }
+    return true;
+  }
+
   double dx = 0.0, dy = 0.0;
   if (int (key) == lay::KeyDown) {
     dy = -1.0;

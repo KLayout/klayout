@@ -61,12 +61,14 @@ private:
   virtual bool wheel_event (int delta, bool horizontal, const db::DPoint &p, unsigned int buttons, bool prio);
   virtual bool key_event (unsigned int key, unsigned int buttons);
   virtual void drag_cancel ();
+  virtual void activated ();
   virtual void deactivated ();
 
   bool handle_click (const db::DPoint &p, unsigned int buttons, bool drag_transient, db::Transaction *transaction);
 
   bool m_dragging;
   bool m_dragging_transient;
+  bool m_active;
   lay::Editables *mp_editables;
   lay::LayoutViewBase *mp_view;
   double m_global_grid;

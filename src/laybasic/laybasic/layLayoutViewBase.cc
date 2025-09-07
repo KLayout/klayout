@@ -691,6 +691,12 @@ LayoutViewBase::message (const std::string & /*s*/, int /*timeout*/)
   //  .. nothing yet ..
 }
 
+void
+LayoutViewBase::set_focus ()
+{
+  //  .. nothing yet ..
+}
+
 bool
 LayoutViewBase::is_dirty () const
 {

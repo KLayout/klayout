@@ -1578,11 +1578,20 @@ LayoutView::message (const std::string &s, int timeout)
 }
 
 void
+LayoutView::set_focus ()
+{
+  if (canvas () && canvas ()->widget ()) {
+    canvas ()->widget ()->setFocus (Qt::TabFocusReason);
+  }
+}
+
+void
 LayoutView::mode (int m)
 {
   if (mode () != m) {
     LayoutViewBase::mode (m);
     activate_editor_option_pages ();
+    set_focus ();
   }
 }
 
@@ -1599,10 +1608,12 @@ void
 LayoutView::switch_mode (int m)
 {
   if (mode () != m) {
-    mode (m);
+    LayoutViewBase::mode (m);
+    activate_editor_option_pages ();
     if (mp_widget) {
       mp_widget->emit_mode_change (m);
     }
+    set_focus ();
   }
 }
 

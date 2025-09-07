@@ -296,6 +296,11 @@ public:
   virtual void message (const std::string &s = "", int timeout = 10);
 
   /**
+   *  @brief Sets the keyboard focus to the view
+   */
+  virtual void set_focus ();
+
+  /**
    *  @brief The "dirty" flag indicates that one of the layout has been modified
    *
    *  A signal is provided on a change of this flag (dirty_changed).

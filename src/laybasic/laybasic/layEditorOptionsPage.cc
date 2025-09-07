@@ -98,9 +98,7 @@ BEGIN_PROTECTED
     //  The Return key on a non-modal page commits the values and gives back the focus
     //  to the view
     apply (dispatcher ());
-    if (view ()->canvas ()->widget ()) {
-      view ()->canvas ()->widget ()->setFocus (Qt::TabFocusReason);
-    }
+    view ()->set_focus ();
     event->accept ();
   } else {
     QWidget::keyPressEvent (event);

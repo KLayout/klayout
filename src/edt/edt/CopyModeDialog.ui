@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>164</height>
+    <width>464</width>
+    <height>180</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -99,6 +99,11 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>shallow_rb</tabstop>
+  <tabstop>deep_rb</tabstop>
+  <tabstop>dont_ask_cbx</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

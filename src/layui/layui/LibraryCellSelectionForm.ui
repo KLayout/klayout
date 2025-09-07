@@ -240,6 +240,15 @@ p, li { white-space: pre-wrap; }
    <header>layWidgets.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>lib_cb</tabstop>
+  <tabstop>le_cell_name</tabstop>
+  <tabstop>find_next</tabstop>
+  <tabstop>lv_cells</tabstop>
+  <tabstop>cb_show_all_cells</tabstop>
+  <tabstop>ok_button</tabstop>
+  <tabstop>cancel_button</tabstop>
+ </tabstops>
  <resources>
   <include location="../../icons/icons.qrc"/>
  </resources>

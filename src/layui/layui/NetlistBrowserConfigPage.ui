@@ -138,6 +138,11 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>cbx_window</tabstop>
+  <tabstop>le_window</tabstop>
+  <tabstop>le_max_markers</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

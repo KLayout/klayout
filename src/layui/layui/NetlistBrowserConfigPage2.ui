@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>649</width>
+    <width>667</width>
     <height>351</height>
    </rect>
   </property>
@@ -529,6 +529,24 @@ Non-net objects are drawn using the highlight color.</string>
    <header>layWidgets.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>stipple_pb</tabstop>
+  <tabstop>lw_le</tabstop>
+  <tabstop>halo_cb</tabstop>
+  <tabstop>vs_le</tabstop>
+  <tabstop>color_pb</tabstop>
+  <tabstop>brightness_cb</tabstop>
+  <tabstop>brightness_sb</tabstop>
+  <tabstop>cycle_colors_cb</tabstop>
+  <tabstop>cc0</tabstop>
+  <tabstop>cc1</tabstop>
+  <tabstop>cc5</tabstop>
+  <tabstop>cc6</tabstop>
+  <tabstop>cc3</tabstop>
+  <tabstop>cc7</tabstop>
+  <tabstop>cc4</tabstop>
+  <tabstop>cc2</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

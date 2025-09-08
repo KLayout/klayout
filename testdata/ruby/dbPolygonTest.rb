@@ -1038,18 +1038,18 @@ class DBPolygon_TestClass < TestBase
     # the sized() result, so they are useful for this application
 
     p = RBA::DPolygon::new(RBA::DBox::new(0, 0, 0.4, 0.5))
-    res = RBA::EdgeProcessor::new.simple_merge_p2p([ p.sized(-0.12, -0.22).to_itype(0.001) ], false, false, 1)
+    res = RBA::EdgeProcessor::new.simple_merge_p2p([ p.sized(-0.12, -0.22, 2).to_itype(0.001) ], false, false, 1)
     res = res.collect { |p| p.to_s }
-    assert_equal(res, ["(120,120;120,380;280,380;280,120)"])
-    res = RBA::EdgeProcessor::new.simple_merge_p2p([ p.sized(-0.22, -0.22).to_itype(0.001) ], false, false, 1)
+    assert_equal(res, ["(120,220;120,280;280,280;280,220)"])
+    res = RBA::EdgeProcessor::new.simple_merge_p2p([ p.sized(-0.22, -0.22, 2).to_itype(0.001) ], false, false, 1)
     res = res.collect { |p| p.to_s }
     assert_equal(res, [])
 
     p = RBA::Polygon::new(RBA::Box::new(0, 0, 400, 500))
-    res = RBA::EdgeProcessor::new.simple_merge_p2p([ p.sized(-120, -220).to_dtype(0.001).to_itype(0.001) ], false, false, 1)
+    res = RBA::EdgeProcessor::new.simple_merge_p2p([ p.sized(-120, -220, 2).to_dtype(0.001).to_itype(0.001) ], false, false, 1)
     res = res.collect { |p| p.to_s }
-    assert_equal(res, ["(120,120;120,380;280,380;280,120)"])
-    res = RBA::EdgeProcessor::new.simple_merge_p2p([ p.sized(-220, -220).to_dtype(0.001).to_itype(0.001) ], false, false, 1)
+    assert_equal(res, ["(120,220;120,280;280,280;280,220)"])
+    res = RBA::EdgeProcessor::new.simple_merge_p2p([ p.sized(-220, -220, 2).to_dtype(0.001).to_itype(0.001) ], false, false, 1)
     res = res.collect { |p| p.to_s }
     assert_equal(res, [])
 

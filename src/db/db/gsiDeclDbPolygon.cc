@@ -868,12 +868,12 @@ static db::SimplePolygon transformed_icplx_sp (const db::SimplePolygon *p, const
 
 static db::SimplePolygon *spolygon_from_dspolygon (const db::DSimplePolygon &p)
 {
-  return new db::SimplePolygon (p, false);
+  return new db::SimplePolygon (p, false, false /*don't remove reflected*/, false /*no normalize*/);
 }
 
 static db::DSimplePolygon spolygon_to_dspolygon (const db::SimplePolygon *p, double dbu)
 {
-  return db::DSimplePolygon (*p * dbu, false);
+  return db::DSimplePolygon (*p, db::CplxTrans (dbu), false, false /*don't remove reflected*/, false /*no normalize*/);
 }
 
 Class<db::SimplePolygon> decl_SimplePolygon ("db", "SimplePolygon",
@@ -1031,12 +1031,12 @@ Class<db::SimplePolygonWithProperties> decl_SimplePolygonWithProperties (decl_Si
 
 static db::DSimplePolygon *dspolygon_from_ispolygon (const db::SimplePolygon &p)
 {
-  return new db::DSimplePolygon (p, false);
+  return new db::DSimplePolygon (p, false, false /*don't remove reflected*/, false /*no normalize*/);
 }
 
 static db::SimplePolygon dspolygon_to_spolygon (const db::DSimplePolygon *p, double dbu)
 {
-  return db::SimplePolygon (*p * (1.0 / dbu), false);
+  return db::SimplePolygon (*p, db::VCplxTrans (1.0 / dbu), false, false /*don't remove reflected*/, false /*no normalize*/);
 }
 
 static db::SimplePolygon transformed_vplx_sp (const db::DSimplePolygon *p, const db::VCplxTrans &t)
@@ -2036,12 +2036,12 @@ static db::Polygon minkowski_sum_pc (const db::Polygon *p, const std::vector<db:
 
 static db::Polygon *polygon_from_dpolygon (const db::DPolygon &p)
 {
-  return new db::Polygon (p, false);
+  return new db::Polygon (p, false, false /*don't remove reflected*/, false /*no normalize*/);
 }
 
 static db::DPolygon polygon_to_dpolygon (const db::Polygon *p, double dbu)
 {
-  return db::DPolygon (*p * dbu, false);
+  return db::DPolygon (*p, db::CplxTrans (dbu), false, false /*don't remove reflected*/, false /*no normalize*/);
 }
 
 static bool is_convex (const db::Polygon *p)
@@ -2380,12 +2380,12 @@ Class<db::PolygonWithProperties> decl_PolygonWithProperties (decl_Polygon, "db",
 
 static db::DPolygon *dpolygon_from_ipolygon (const db::Polygon &p)
 {
-  return new db::DPolygon (p, false);
+  return new db::DPolygon (p, false, false /*don't remove reflected*/, false /*no normalize*/);
 }
 
 static db::Polygon dpolygon_to_polygon (const db::DPolygon *p, double dbu)
 {
-  return db::Polygon (*p * (1.0 / dbu), false);
+  return db::Polygon (*p, db::VCplxTrans (1.0 / dbu), false, false /*don't remove reflected*/, false /*no normalize*/);
 }
 
 static db::Polygon transformed_vcplx_dp (const db::DPolygon *p, const db::VCplxTrans &t)

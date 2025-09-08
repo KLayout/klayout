@@ -291,8 +291,8 @@ class DragBoxPlugin &lt; RBA::Plugin
   end
     
   # overloaded callback: the focus page is requested
-  def focus_page_open(fp)
-  
+  def focus_page_open
+
     # stop unless dragging
     if !@marker
       return
@@ -301,6 +301,7 @@ class DragBoxPlugin &lt; RBA::Plugin
     # configure the focus page and show it:
     # the page will call the handler of "update_box" to commit
     # changes to the box
+    fp = self.focus_page
     fp.box = @box
     fp.pfix = @start_point
     fp.update_box = lambda { |box| self._update_box(box) }
@@ -310,7 +311,9 @@ class DragBoxPlugin &lt; RBA::Plugin
       # accepted: stop dragging now, we are done.
       self._finish
     end
+
     return ret
+
   end
     
   # overloaded callback:

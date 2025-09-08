@@ -121,7 +121,7 @@ MoveService::key_event (unsigned int key, unsigned int buttons)
 }
 
 int
-MoveService::focus_page_open (EditorOptionsPage * /*fp*/)
+MoveService::focus_page_open ()
 {
   //  This method is called on "Tab" by "key_event". "fp" is null as we don't have a focus page registered.
   if (is_active () && dispatcher ()) {

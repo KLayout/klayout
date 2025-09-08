@@ -95,7 +95,7 @@ public:
   db::DPoint tracking_position_test () const;
   virtual db::DPoint tracking_position () const;
 
-  virtual int focus_page_open (lay::EditorOptionsPage *fp);
+  virtual int focus_page_open ();
 
   virtual lay::ViewService *view_service_interface ()
   {

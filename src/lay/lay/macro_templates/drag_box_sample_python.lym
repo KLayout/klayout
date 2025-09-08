@@ -307,7 +307,7 @@ class DragBoxPlugin(pya.Plugin):
     self.box = box
     self._update_marker()
     
-  def focus_page_open(self, fp):
+  def focus_page_open(self):
   
     """
     overloaded callback: the focus page is requested
@@ -320,6 +320,7 @@ class DragBoxPlugin(pya.Plugin):
     # configure the focus page and show it:
     # the page will call the handler of "update_box" to commit
     # changes to the box
+    fp = self.focus_page()
     fp.box = self.box
     fp.pfix = self.start_point
     fp.update_box = self._update_box
@@ -328,6 +329,7 @@ class DragBoxPlugin(pya.Plugin):
     if ret == 1:
       # accepted: stop dragging now, we are done.
       self._finish()
+
     return ret
     
   def activated(self):

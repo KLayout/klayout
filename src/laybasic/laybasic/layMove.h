@@ -56,7 +56,7 @@ private:
   virtual bool key_event (unsigned int key, unsigned int buttons);
   virtual void drag_cancel ();
   virtual void deactivated ();
-  int focus_page_open (EditorOptionsPage *fp);
+  int focus_page_open ();
 
   bool handle_click (const db::DPoint &p, unsigned int buttons, bool drag_transient, db::Transaction *transaction);
 

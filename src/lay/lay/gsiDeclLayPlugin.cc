@@ -646,12 +646,12 @@ PluginImpl::tracking_position () const
   }
 }
 
-int PluginImpl::focus_page_open(lay::EditorOptionsPage *fp)
+int PluginImpl::focus_page_open ()
 {
   if (f_focus_page_open.can_issue ()) {
-    return f_focus_page_open.issue<lay::EditorServiceBase, int, lay::EditorOptionsPage *> (&lay::EditorServiceBase::focus_page_open, fp);
+    return f_focus_page_open.issue<lay::EditorServiceBase, int> (&lay::EditorServiceBase::focus_page_open);
   } else {
-    return lay::EditorServiceBase::focus_page_open (fp);
+    return lay::EditorServiceBase::focus_page_open ();
   }
 }
 
@@ -987,9 +987,10 @@ Class<gsi::PluginImpl> decl_Plugin (decl_PluginBase, "lay", "Plugin",
     "\n"
     "This method has been added in version 0.30.4."
   ) +
-  callback ("focus_page_open", &gsi::PluginImpl::focus_page_open, &gsi::PluginImpl::f_focus_page_open, gsi::arg ("focus_page"),
+  callback ("focus_page_open", &gsi::PluginImpl::focus_page_open, &gsi::PluginImpl::f_focus_page_open,
     "@brief Gets called when the focus page wants to be opened - i.e. if 'Tab' is pressed during editing\n"
-    "The default implementation calls \\EditorOptionsPage#show. This method can be overloaded to provide certain actions before "
+    "The default implementation calls \\EditorOptionsPage#show on the focus page.\n"
+    "This method can be overloaded to provide certain actions before "
     "or after the page is shown, specifically if the page is a modal one. For example, it can update the page with current "
     "dimensions of a shape that is created and after committing the page, adjust the shape accordingly.\n"
     "\n"

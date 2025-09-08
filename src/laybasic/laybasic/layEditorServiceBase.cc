@@ -379,7 +379,7 @@ bool
 EditorServiceBase::key_event (unsigned int key, unsigned int buttons)
 {
   if (is_active () && key == Qt::Key_Tab && buttons == 0) {
-    focus_page_open (focus_page ());
+    focus_page_open ();
     return true;
   } else {
     return false;
@@ -387,8 +387,9 @@ EditorServiceBase::key_event (unsigned int key, unsigned int buttons)
 }
 
 int
-EditorServiceBase::focus_page_open (EditorOptionsPage *fp)
+EditorServiceBase::focus_page_open ()
 {
+  auto fp = focus_page ();
   return fp ? fp->show () : 0;
 }
 
@@ -414,7 +415,7 @@ EditorServiceBase::show_error (tl::Exception &ex)
 }
 
 void
-EditorServiceBase::focus_page_enter ()
+EditorServiceBase::focus_page_open ()
 {
   //  .. nothing yet ..
 }

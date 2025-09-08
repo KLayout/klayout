@@ -265,6 +265,13 @@ public:
     //  The default implementation does nothing
   }
 
+  /**
+   *  @brief Gets called when the focus page opens
+   *
+   *  The default implementation will call fp->show() and return its return value.
+   */
+  virtual int focus_page_open ();
+
 #if defined(HAVE_QT)
   /**
    *  @brief Gets the editor options pages associated with this plugin
@@ -275,13 +282,6 @@ public:
    *  @brief Gets the focus page or 0 if there is none
    */
   lay::EditorOptionsPage *focus_page ();
-
-  /**
-   *  @brief Gets called when the focus page opens
-   *
-   *  The default implementation will call fp->show() and return its return value.
-   */
-  virtual int focus_page_open (EditorOptionsPage *fp);
 #endif
 
 private:

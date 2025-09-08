@@ -27,8 +27,8 @@
 #include "gsiEnums.h"
 #include "layEditorOptionsPages.h"
 #include "layCursor.h"
+#include "layEditorUtils.h"
 #include "edtConfig.h"
-#include "edtUtils.h"
 
 namespace gsi
 {
@@ -290,7 +290,7 @@ PluginImpl::snap_delta (const db::DVector &v, bool connect, lay::angle_constrain
 db::DPoint
 PluginImpl::snap2 (const db::DPoint &p, bool visualize)
 {
-  double snap_range = ui ()->mouse_event_trans ().inverted ().ctrans (edt::snap_range_pixels ());
+  double snap_range = ui ()->mouse_event_trans ().inverted ().ctrans (lay::snap_range_pixels ());
   auto details = lay::obj_snap (m_snap_to_objects ? view () : 0, p, m_edit_grid == db::DVector () ? m_global_grid : m_edit_grid, snap_range);
   if (visualize) {
     mouse_cursor_from_snap_details (details);
@@ -301,7 +301,7 @@ PluginImpl::snap2 (const db::DPoint &p, bool visualize)
 db::DPoint
 PluginImpl::snap2_from_to (const db::DPoint &p, const db::DPoint &plast, bool connect, lay::angle_constraint_type ac, bool visualize)
 {
-  double snap_range = ui ()->mouse_event_trans ().inverted ().ctrans (edt::snap_range_pixels ());
+  double snap_range = ui ()->mouse_event_trans ().inverted ().ctrans (lay::snap_range_pixels ());
   auto details = lay::obj_snap (m_snap_to_objects ? view () : 0, plast, p, m_edit_grid == db::DVector () ? m_global_grid : m_edit_grid, connect ? connect_ac (ac) : move_ac (ac), snap_range);
   if (visualize) {
     mouse_cursor_from_snap_details (details);
@@ -575,7 +575,7 @@ PluginImpl::add_mouse_cursor_point (const db::Point &p, int cv_index, const db::
     return;
   }
 
-  edt::TransformationVariants tv (view ());
+  lay::TransformationVariants tv (view ());
   const std::vector<db::DCplxTrans> *tv_list = tv.per_cv_and_layer (cv_index, (unsigned int) layer);
   if (! tv_list || tv_list->empty ()) {
     return;
@@ -603,7 +603,7 @@ PluginImpl::add_edge_marker_edge (const db::Edge &p, int cv_index, const db::Lay
     return;
   }
 
-  edt::TransformationVariants tv (view ());
+  lay::TransformationVariants tv (view ());
   const std::vector<db::DCplxTrans> *tv_list = tv.per_cv_and_layer (cv_index, (unsigned int) layer);
   if (! tv_list || tv_list->empty ()) {
     return;
@@ -861,7 +861,7 @@ Class<gsi::PluginImpl> decl_Plugin (decl_PluginBase, "lay", "Plugin",
     "\n"
     "This method has been added in version 0.30.4."
   ) +
-  method ("ac_from_buttons", &edt::ac_from_buttons, gsi::arg ("buttons"),
+  method ("ac_from_buttons", &lay::ac_from_buttons, gsi::arg ("buttons"),
     "@brief Creates an angle constraint from a button combination\n"
     "This method provides the angle constraints implied by a specific modifier combination, i.e. "
     "'Shift' will render ortho snapping. Use this function to generate angle constraints following "

@@ -37,6 +37,7 @@ SOURCES += \
   layAbstractMenu.cc \
   layEditorOptionsPage.cc \
   layEditorOptionsPages.cc \
+  layEditorUtils.cc \
   layLayoutViewConfig.cc \
   layMargin.cc \
   laybasicForceLink.cc \
@@ -91,6 +92,7 @@ SOURCES += \
 HEADERS += \
   layEditorOptionsPage.h \
   layEditorOptionsPages.h \
+  layEditorUtils.h \
   layMargin.h \
   laybasicConfig.h \
   laybasicForceLink.h \

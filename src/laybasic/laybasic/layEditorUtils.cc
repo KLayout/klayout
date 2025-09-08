@@ -25,8 +25,7 @@
 #include "dbLayout.h"
 #include "dbLibrary.h"
 
-#include "edtUtils.h"
-#include "edtService.h"
+#include "layEditorUtils.h"
 
 #include "layCellView.h"
 #include "layLayoutViewBase.h"
@@ -38,9 +37,15 @@
 #  include <QMessageBox>
 #endif
 
-namespace edt {
+namespace lay
+{
 
 // -------------------------------------------------------------
+
+int snap_range_pixels ()
+{
+  return 8; // TODO: make variable
+}
 
 //  Convert buttons to an angle constraint
 lay::angle_constraint_type

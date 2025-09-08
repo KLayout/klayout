@@ -33,10 +33,10 @@
 #include "laySnap.h"
 #include "layObjectInstPath.h"
 #include "layTextInfo.h"
+#include "layEditorUtils.h"
 #include "tlColor.h"
 #include "dbLayout.h"
 #include "dbShape.h"
-#include "edtUtils.h"
 #include "edtConfig.h"
 #include "tlAssert.h"
 #include "tlException.h"
@@ -52,6 +52,18 @@ namespace edt {
 
 class Service;
 class PluginDeclarationBase;
+
+// -------------------------------------------------------------
+
+/**
+ *  @brief A helper class that identifies clipboard data for edt::
+ */
+class EDT_PUBLIC ClipboardData
+  : public db::ClipboardData
+{
+public:
+  ClipboardData () { }
+};
 
 // -------------------------------------------------------------
 

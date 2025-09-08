@@ -123,6 +123,8 @@ EditorOptionsPage::show ()
     } else {
       return mp_owner->exec_modal (this) ? 1 : 0;
     }
+  } else {
+    return -1;
   }
 }
 

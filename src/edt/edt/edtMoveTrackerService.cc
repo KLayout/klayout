@@ -61,7 +61,7 @@ MoveTrackerService::issue_edit_events ()
   call_editor_hooks (m_editor_hooks, &edt::EditorHooks::begin_edits);
 
   //  build the transformation variants cache
-  TransformationVariants tv (view ());
+  lay::TransformationVariants tv (view ());
 
   std::vector<edt::Service *> services = view ()->get_plugins<edt::Service> ();
   std::vector<lay::ObjectInstPath> sel;

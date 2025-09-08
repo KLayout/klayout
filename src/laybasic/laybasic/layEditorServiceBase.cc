@@ -379,10 +379,7 @@ bool
 EditorServiceBase::key_event (unsigned int key, unsigned int buttons)
 {
   if (is_active () && key == Qt::Key_Tab && buttons == 0) {
-    EditorOptionsPage *fp = focus_page ();
-    if (fp) {
-      focus_page_open (fp);
-    }
+    focus_page_open (focus_page ());
     return true;
   } else {
     return false;
@@ -392,7 +389,7 @@ EditorServiceBase::key_event (unsigned int key, unsigned int buttons)
 int
 EditorServiceBase::focus_page_open (EditorOptionsPage *fp)
 {
-  return fp->show ();
+  return fp ? fp->show () : 0;
 }
 
 void

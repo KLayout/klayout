@@ -5506,7 +5506,7 @@ LayoutViewBase::paste_interactive (bool transient_mode)
   //  operations.
   trans->close ();
 
-  if (mp_move_service && mp_move_service->begin_move (trans.release (), transient_mode)) {
+  if (mp_move_service && mp_move_service->start_move (trans.release (), transient_mode)) {
     switch_mode (-1);  //  move mode
   }
 }

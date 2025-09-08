@@ -1543,7 +1543,7 @@ void
 LayoutViewFunctions::cm_sel_move_interactive ()
 {
   view ()->cancel_edits ();
-  if (view ()->move_service ()->begin_move ()) {
+  if (view ()->move_service ()->start_move ()) {
     view ()->switch_mode (-1);  //  move mode
   }
 }

@@ -65,6 +65,7 @@ GDS2WriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const db:
     mp_ui->max_vertex_le->setEnabled (! options->multi_xy_records);
     mp_ui->max_vertex_le->setText (tl::to_qstring (tl::to_string (options->max_vertex_count)));
     mp_ui->cell_name_length_le->setText (tl::to_qstring (tl::to_string (options->max_cellname_length)));
+    mp_ui->default_text_size_le->setText (tl::to_qstring (options->default_text_size >= 0.0 ? tl::to_string (options->default_text_size) : std::string ()));
     mp_ui->libname_le->setText (tl::to_qstring (tl::to_string (options->libname)));
   }
 }
@@ -82,6 +83,19 @@ GDS2WriterOptionPage::commit (db::FormatSpecificWriterOptions *o, const db::Tech
     options->write_cell_properties = mp_ui->write_cell_properties->isChecked ();
     options->write_file_properties = mp_ui->write_file_properties->isChecked ();
     options->no_zero_length_paths = mp_ui->no_zero_length_paths->isChecked ();
+
+    std::string ts_str = tl::to_string (mp_ui->default_text_size_le->text ());
+    {
+      double ts = -1;
+      tl::Extractor ex (ts_str.c_str ());
+      if (! ex.at_end ()) {
+        tl::from_string_ext (ts_str, ts);
+        if (ts < 0.0) {
+          throw tl::Exception (tl::to_string (QObject::tr ("Default text size cannot be negative")));
+        }
+      }
+      options->default_text_size = ts;
+    }
 
     tl::from_string_ext (tl::to_string (mp_ui->max_vertex_le->text ()), n);
     if (! options->multi_xy_records) {

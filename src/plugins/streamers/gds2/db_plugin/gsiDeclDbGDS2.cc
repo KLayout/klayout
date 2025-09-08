@@ -115,6 +115,17 @@ static bool get_gds2_write_timestamps (const db::SaveLayoutOptions *options)
   return options->get_options<db::GDS2WriterOptions> ().write_timestamps;
 }
 
+static void set_gds2_default_text_size (db::SaveLayoutOptions *options, const tl::Variant &v)
+{
+  options->get_options<db::GDS2WriterOptions> ().default_text_size = v.is_nil () ? -1.0 : v.to_double ();
+}
+
+static tl::Variant get_gds2_default_text_size (const db::SaveLayoutOptions *options)
+{
+  double ts = options->get_options<db::GDS2WriterOptions> ().default_text_size;
+  return ts < 0.0 ? tl::Variant () : tl::Variant (ts);
+}
+
 static void set_gds2_libname (db::SaveLayoutOptions *options, const std::string &n)
 {
   options->get_options<db::GDS2WriterOptions> ().libname = n;
@@ -188,6 +199,22 @@ gsi::ClassExt<db::SaveLayoutOptions> gds2_writer_options (
   gsi::method_ext ("gds2_write_timestamps?", &get_gds2_write_timestamps,
     "@brief Gets a value indicating whether the current time is written into the GDS2 timestamp fields\n"
     "\nThis property has been added in version 0.21.16.\n"
+  ) +
+  gsi::method_ext ("gds2_default_text_size=", &set_gds2_default_text_size, gsi::arg ("size"),
+    "@brief Specifies the default text size to use when a text does not have a size\n"
+    "\n"
+    "Text object can have no size, e.g. when they are read from OASIS files. Technically such texts\n"
+    "are represented by text object with a zero size. You can configure the GDS writer to use a specific\n"
+    "text size in this case. This property specifies the default text size in micrometer units. This\n"
+    "size can be set to 0 to preserve a zero size in GDS files read.\n"
+    "\n"
+    "Set this attribute to nil to disable writing of a text size if none is specified.\n"
+    "\n"
+    "\nThis property has been added in version 0.30.4.\n"
+  ) +
+  gsi::method_ext ("gds2_default_text_size", &get_gds2_default_text_size,
+    "@brief Gets the default text size to use when a text does not have a size\n"
+    "\nThis property has been added in version 0.30.4.\n"
   ) +
   gsi::method_ext ("gds2_no_zero_length_paths=", &set_gds2_no_zero_length_paths, gsi::arg ("flag"),
     "@brief Eliminates zero-length paths if true\n"

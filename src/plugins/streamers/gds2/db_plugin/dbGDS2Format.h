@@ -115,7 +115,8 @@ public:
       user_units (1.0),
       write_timestamps (true),
       write_cell_properties (false),
-      write_file_properties (false)
+      write_file_properties (false),
+      default_text_size (-1.0)
   {
     //  .. nothing yet ..
   }
@@ -190,6 +191,14 @@ public:
    *  @brief Write layout properties (non-standard PROPATTR/PROPVALUE records)
    */
   bool write_file_properties;
+
+  /**
+   *  @brief The default text size if none is given (in fact, if the text size is zero)
+   *
+   *  You can set to option to 0 to preserve the zero text size on writing.
+   *  A negative value means the text size is not set if missing.
+   */
+  double default_text_size;
 
   /**
    *  @brief Implementation of FormatSpecificWriterOptions

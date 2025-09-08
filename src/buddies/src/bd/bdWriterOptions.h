@@ -123,6 +123,7 @@ private:
   bool m_gds2_write_timestamps;
   bool m_gds2_write_cell_properties;
   bool m_gds2_write_file_properties;
+  double m_gds2_default_text_size;
 
   int m_oasis_compression_level;
   bool m_oasis_write_cblocks;

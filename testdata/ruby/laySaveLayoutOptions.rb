@@ -113,6 +113,14 @@ class SaveLayoutOptions_TestClass < TestBase
     opt.gds2_write_file_properties = false
     assert_equal(opt.gds2_write_file_properties?, false)
 
+    assert_equal(opt.gds2_default_text_size.inspect, "nil")
+    opt.gds2_default_text_size = nil
+    assert_equal(opt.gds2_default_text_size.inspect, "nil")
+    opt.gds2_default_text_size = -1.0
+    assert_equal(opt.gds2_default_text_size.inspect, "nil")
+    opt.gds2_default_text_size = 1.0
+    assert_equal(opt.gds2_default_text_size, 1.0)
+
     opt.gds2_write_timestamps = true
     assert_equal(opt.gds2_write_timestamps?, true)
     opt.gds2_write_timestamps = false

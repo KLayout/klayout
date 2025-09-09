@@ -174,6 +174,7 @@ private:
   size_t m_max_vertex_count;
   bool m_write_cell_properties;
   bool m_keep_instances;
+  double m_default_text_size;
 
   void write_properties (const db::Layout &layout, db::properties_id_type prop_id);
   void write_context_cell (db::Layout &layout, const short *time_data, const std::vector<cell_index_type> &cells);

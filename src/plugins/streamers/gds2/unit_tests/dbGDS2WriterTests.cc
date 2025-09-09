@@ -1509,6 +1509,66 @@ TEST(143)
   EXPECT_EQ (run_test_with_error (23.0, layout), "Scaling failed: coordinate underflow, writing layer 1/0, writing cell 'TOP'");
 }
 
+void run_text_size_test (tl::TestBase *_this, db::Coord size, double def_size, db::Coord exp_size)
+{
+  db::Layout layout;
+  db::cell_index_type top_index = layout.add_cell ("TOP");
+  db::Cell &top = layout.cell (top_index);
+  unsigned int l1 = layout.insert_layer (db::LayerProperties (1, 0));
+  db::Text text ("TEXT", db::Trans ());
+  text.size (size);
+  top.shapes (l1).insert (text);
+
+  db::GDS2WriterOptions opt;
+  opt.default_text_size = def_size;
+
+  std::string tmp_file = _this->tmp_file ("tmp.gds");
+
+  {
+    tl::OutputStream stream (tmp_file);
+    db::SaveLayoutOptions options;
+    options.set_format ("GDS2");
+    options.set_options (new db::GDS2WriterOptions (opt));
+    db::Writer writer (options);
+    writer.write (layout, stream);
+  }
+
+  db::Layout layout_read;
+  {
+    tl::InputStream file (tmp_file);
+    db::Reader reader (file);
+    reader.read (layout_read);
+  }
+
+  l1 = layout_read.get_layer (db::LayerProperties (1, 0));
+  const db::Cell &top_read = layout_read.cell (*layout_read.begin_top_down ());
+  db::Shape text_read = *top_read.shapes (l1).begin (db::ShapeIterator::All);
+
+  EXPECT_EQ (text_read.text_string (), "TEXT");
+  EXPECT_EQ (text_read.text_size (), exp_size);
+}
+
+//  default text size
+TEST(144a)
+{
+  run_text_size_test (_this, 0, 1.25, 1250);
+}
+
+TEST(144b)
+{
+  run_text_size_test (_this, 500, 1.25, 500);
+}
+
+TEST(144c)
+{
+  run_text_size_test (_this, 0, 0.0, 0);
+}
+
+TEST(144d)
+{
+  run_text_size_test (_this, 0, -1.0, 0);
+}
+
 //  Extreme fracturing by max. points
 TEST(166)
 {
@@ -1516,6 +1576,5 @@ TEST(166)
   opt.max_vertex_count = 4;
   run_test (_this, "t166.oas.gz", "t166_au.gds.gz", false, opt);
 }
-
 
 

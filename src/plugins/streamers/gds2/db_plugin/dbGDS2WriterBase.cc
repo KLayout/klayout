@@ -155,7 +155,7 @@ static uint16_t safe_convert_to_uint16 (uint64_t value)
 
 GDS2WriterBase::GDS2WriterBase ()
   : m_dbu (0.0), m_resolve_skew_arrays (false), m_multi_xy (false), m_no_zero_length_paths (false),
-    m_max_vertex_count (0), m_write_cell_properties (false), m_keep_instances (false)
+    m_max_vertex_count (0), m_write_cell_properties (false), m_keep_instances (false), m_default_text_size (-1.0)
 {
   //  .. nothing yet ..
 }
@@ -481,6 +481,7 @@ GDS2WriterBase::write (db::Layout &layout, tl::OutputStream &stream, const db::S
   m_no_zero_length_paths = gds2_options.no_zero_length_paths;
   m_resolve_skew_arrays = gds2_options.resolve_skew_arrays;
   m_write_cell_properties = gds2_options.write_cell_properties;
+  m_default_text_size = gds2_options.default_text_size;
 
   size_t max_cellname_length = std::max (gds2_options.max_cellname_length, (unsigned int)8);
 
@@ -902,7 +903,7 @@ GDS2WriterBase::write_text (int layer, int datatype, double sf, double dbu, cons
     write_short (ha + va * 4 + f * 16);
   }
 
-  if (trans.rot () != 0 || shape.text_size () != 0) {
+  if (trans.rot () != 0 || shape.text_size () != 0 || m_default_text_size >= 0.0) {
 
     write_record_size (6);
     write_record (sSTRANS);
@@ -912,6 +913,10 @@ GDS2WriterBase::write_text (int layer, int datatype, double sf, double dbu, cons
       write_record_size (4 + 8);
       write_record (sMAG);
       write_double (shape.text_size () * sf * dbu);
+    } else if (m_default_text_size >= 0.0) {
+      write_record_size (4 + 8);
+      write_record (sMAG);
+      write_double (m_default_text_size * sf);
     }
 
     if ((trans.rot () % 4) != 0) {

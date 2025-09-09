@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>656</width>
-    <height>315</height>
+    <width>673</width>
+    <height>360</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -50,17 +50,23 @@
       <property name="spacing">
        <number>6</number>
       </property>
-      <item row="7" column="0" colspan="3">
-       <widget class="QCheckBox" name="write_timestamps">
-        <property name="text">
-         <string>Write current time to time stamps (BGNLIB, BGNSTR)</string>
-        </property>
-       </widget>
+      <item row="0" column="1" colspan="2">
+       <widget class="QLineEdit" name="libname_le"/>
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="label">
         <property name="text">
          <string>Max. cell name length</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="cell_name_length_le"/>
+      </item>
+      <item row="7" column="0" colspan="3">
+       <widget class="QCheckBox" name="no_zero_length_paths">
+        <property name="text">
+         <string>Eliminate zero-length paths (convert to BOUNDARY)</string>
         </property>
        </widget>
       </item>
@@ -71,10 +77,53 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QLineEdit" name="cell_name_length_le"/>
+      <item row="6" column="0" colspan="3">
+       <widget class="QCheckBox" name="resolve_skew_arrays_cbx">
+        <property name="text">
+         <string>Resolve skew (non-orthogonal) arrays into single instances</string>
+        </property>
+       </widget>
       </item>
-      <item row="4" column="0" colspan="3">
+      <item row="8" column="0" colspan="3">
+       <widget class="QCheckBox" name="write_timestamps">
+        <property name="text">
+         <string>Write current time to time stamps (BGNLIB, BGNSTR)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Library name</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1" colspan="3">
+       <widget class="QCheckBox" name="multi_xy_cbx">
+        <property name="text">
+         <string>Multi-XY record mode for boundaries
+(enables infinitely large polygons/paths at the cost of compatibility)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>(keep empty for unspecified limit)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Max. vertices</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="max_vertex_le"/>
+      </item>
+      <item row="5" column="0" colspan="3">
        <widget class="QFrame" name="frame">
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
@@ -139,52 +188,20 @@
         </layout>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="QLineEdit" name="max_vertex_le"/>
+      <item row="4" column="1">
+       <widget class="QLineEdit" name="default_text_size_le"/>
       </item>
-      <item row="1" column="2">
-       <widget class="QLabel" name="label_3">
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_9">
         <property name="text">
-         <string>(keep empty for unspecified limit)</string>
+         <string>Default text size</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="1" colspan="3">
-       <widget class="QCheckBox" name="multi_xy_cbx">
+      <item row="4" column="2">
+       <widget class="QLabel" name="label_10">
         <property name="text">
-         <string>Multi-XY record mode for boundaries
-(enables infinitely large polygons/paths at the cost of compatibility)</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_5">
-        <property name="text">
-         <string>Library name</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Max. vertices</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1" colspan="2">
-       <widget class="QLineEdit" name="libname_le"/>
-      </item>
-      <item row="6" column="0" colspan="3">
-       <widget class="QCheckBox" name="no_zero_length_paths">
-        <property name="text">
-         <string>Eliminate zero-length paths (convert to BOUNDARY)</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="0" colspan="3">
-       <widget class="QCheckBox" name="resolve_skew_arrays_cbx">
-        <property name="text">
-         <string>Resolve skew (non-orthogonal) arrays into single instances</string>
+         <string>µm (empty for no size)</string>
         </property>
        </widget>
       </item>

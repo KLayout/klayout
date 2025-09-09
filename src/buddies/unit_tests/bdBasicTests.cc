@@ -82,9 +82,10 @@ TEST(1)
   EXPECT_EQ (stream_opt.get_option_by_name ("gds2_multi_xy_records").to_bool (), false);
   EXPECT_EQ (stream_opt.get_option_by_name ("gds2_write_timestamps").to_bool (), true);
   EXPECT_EQ (stream_opt.get_option_by_name ("gds2_no_zero_length_paths").to_bool (), false);
-  EXPECT_EQ (tl::to_string (stream_opt.get_option_by_name ("gds2_user_units").to_double ()), "1");
+  EXPECT_EQ (stream_opt.get_option_by_name ("gds2_user_units").to_double (), 1.0);
   EXPECT_EQ (stream_opt.get_option_by_name ("gds2_write_cell_properties").to_bool (), false);
   EXPECT_EQ (stream_opt.get_option_by_name ("gds2_write_file_properties").to_bool (), false);
+  EXPECT_EQ (stream_opt.get_option_by_name ("gds2_default_text_size").to_string (), "nil");
   EXPECT_EQ (stream_opt.get_option_by_name ("oasis_write_cblocks").to_bool (), true);
   EXPECT_EQ (stream_opt.get_option_by_name ("oasis_compression_level").to_int (), 2);
   EXPECT_EQ (stream_opt.get_option_by_name ("oasis_strict_mode").to_bool (), true);
@@ -107,15 +108,62 @@ TEST(1)
   EXPECT_EQ (stream_opt.get_option_by_name ("gds2_multi_xy_records").to_bool (), true);
   EXPECT_EQ (stream_opt.get_option_by_name ("gds2_write_timestamps").to_bool (), false);
   EXPECT_EQ (stream_opt.get_option_by_name ("gds2_no_zero_length_paths").to_bool (), true);
-  EXPECT_EQ (tl::to_string (stream_opt.get_option_by_name ("gds2_user_units").to_double ()), "2.5");
+  EXPECT_EQ (stream_opt.get_option_by_name ("gds2_user_units").to_double (), 2.5);
   EXPECT_EQ (stream_opt.get_option_by_name ("gds2_write_cell_properties").to_bool (), true);
   EXPECT_EQ (stream_opt.get_option_by_name ("gds2_write_file_properties").to_bool (), true);
+  EXPECT_EQ (stream_opt.get_option_by_name ("gds2_default_text_size").to_string (), "nil");
   EXPECT_EQ (stream_opt.get_option_by_name ("oasis_write_cblocks").to_bool (), false);
   EXPECT_EQ (stream_opt.get_option_by_name ("oasis_compression_level").to_int (), 9);
   EXPECT_EQ (stream_opt.get_option_by_name ("oasis_strict_mode").to_bool (), false);
   EXPECT_EQ (stream_opt.get_option_by_name ("oasis_recompress").to_bool (), true);
   EXPECT_EQ (stream_opt.get_option_by_name ("oasis_substitution_char").to_string (), "X");
   EXPECT_EQ (stream_opt.get_option_by_name ("oasis_write_std_properties_ext").to_int (), 2);
+}
+
+//  Testing writer options (default_text_size)
+TEST(2)
+{
+  bd::GenericWriterOptions opt;
+  tl::CommandLineOptions cmd;
+
+  opt.add_options (cmd);
+
+  const char *argv[] = {
+                   "x",
+                   "--default-text-size=1.25",
+                 };
+
+  cmd.parse (sizeof (argv) / sizeof (argv[0]), const_cast<char **> (argv));
+
+  db::Layout layout;
+
+  db::SaveLayoutOptions stream_opt;
+  EXPECT_EQ (stream_opt.get_option_by_name ("gds2_default_text_size").to_string (), "nil");
+  opt.configure (stream_opt, layout);
+  EXPECT_EQ (stream_opt.get_option_by_name ("gds2_default_text_size").to_string (), "1.25");
+}
+
+//  Testing writer options (default_text_size)
+TEST(3)
+{
+  bd::GenericWriterOptions opt;
+  tl::CommandLineOptions cmd;
+
+  opt.add_options (cmd);
+
+  const char *argv[] = {
+                   "x",
+                   "--default-text-size=-1",
+                 };
+
+  cmd.parse (sizeof (argv) / sizeof (argv[0]), const_cast<char **> (argv));
+
+  db::Layout layout;
+
+  db::SaveLayoutOptions stream_opt;
+  EXPECT_EQ (stream_opt.get_option_by_name ("gds2_default_text_size").to_string (), "nil");
+  opt.configure (stream_opt, layout);
+  EXPECT_EQ (stream_opt.get_option_by_name ("gds2_default_text_size").to_string (), "nil");
 }
 
 static std::string cells2string (const db::Layout &layout, const std::set<db::cell_index_type> &cells)
@@ -131,7 +179,7 @@ static std::string cells2string (const db::Layout &layout, const std::set<db::ce
 }
 
 //  Testing writer options: cell resolution
-TEST(2)
+TEST(4)
 {
   //  Build a layout with the hierarchy
   //    TOP -> A, B

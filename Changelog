@@ -1,3 +1,48 @@
+0.30.4           (2025-09-09):
+* Bugfix: %GITHUB%/issues/2110 Feature request: make unresolved references visible and editable in the layout view
+* Bugfix: %GITHUB%/issues/2111 Internal error on R extraction
+* Bugfix: %GITHUB%/issues/2112 Incorrect computation of tile border in tiled fill
+* Enhancement: %GITHUB%/issues/2116 Associate each image to a layer
+* Bugfix: %GITHUB%/issues/2133 Crash in Macro Development: when using find and replace
+* Bugfix: %GITHUB%/issues/2134 DRC: edge layer - merged method gives an error 
+* Enhancement: %GITHUB%/issues/2141 Allow corner dots to participate in edge DRC functions
+* Enhancement: %GITHUB%/issues/2145 "default_text_size" Option for GDS writer
+* Bugfix: Undo was not properly handled on "apply technology" - layer properties were cleared
+* Enhancement: "Relative" option of properties dialog is persisted now
+* Enhancement: "Select highlighted objects" from context menu in properties dialog's object list.
+  This feature will reduce the selection to the highlighted objects.
+* Enhancement: Support for via placement during path drawing
+  Vias can switch to a new layer and are automatically placed. To configure vias, 
+  PCells have to be supplied which are declared as vias. See PCellDeclaration#via_types.
+  There is also a new sample (Python or Ruby) that demonstrates a simple via type.
+  The default key binding to trigger via placement is "O".
+* Bugfix: Fixing a crash on 'show parameter names' in PCell dialog
+* Bugfix: Bugfix on Plugin registration
+  One effect was that on dynamic re-registration of a plugin the grid plane disappeared.
+* Enhancement: Added a sample for editor hooks (allow painting a DRC halo during editing)
+* Enhancement: Adding a number of features to the plugin API, specifically:
+  - Allowing to register new pages for the editor options and configuration dialog
+  - Support for snapping and object snap indicators
+  - "Tab" key is handled to generate an event which can be used to show a modal dialog or
+    a pre-defined page.
+  A sample is provided for Python and Ruby which demonstrates these features
+* Bugfix: Internal error when trying to replace a shape in a standalone Shapes collection while preserving properties
+* Bugfix: Internal error when copying while move/copy operation of images and rulers
+* Bugfix: Avoid a warning on writing cells/files in 'under_construction' mode when there is nothing to update
+* Enhancement: Rulers now snap to objects while moving
+* Enhancement: Added LayoutView#layer_list_name as read access for LayoutView#rename_layer_list
+* Enhancement: DRC and Region fill functions now take an exclude area as a separate argument
+  This will sometimes remove the need for doing expensive "NOT" computations before
+  passing an "to fill" area to the fill functions. Now, this computation is done internally
+  and more efficiently in most cases.
+* Bugfix: MainWindow now is a managed object. This removes the need to keep an instance
+  in scripts in most cases - for example when registering event callbacks on MainWindow
+* Bugfix: Polygon's "to_itype" and "to_dtype" do not attempt orientation normalization now.
+  This helps preserving non-orientable polygons, specifically those which are created
+  by Polygon#sized and related functions.
+* Bugfix: LayoutView#clear_layer_list now preserves the layer list name (it was cleared as well)
+* Enhancement: While drawing a box, the other corners also snap to objects as second priority now
+
 0.30.3           (2025-08-05):
 * Enhancement: %GITHUB%/issues/2044 Different combination modes on strm2xxx tools (+ and ,)
 * Bugfix: %GITHUB%/issues/2073 Klayout fails to read CELLNAME S_CELL_OFFSET property on Windows on big files

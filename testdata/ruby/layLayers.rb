@@ -1038,6 +1038,45 @@ class LAYLayers_TestClass < TestBase
 
   end
 
+  # clear_layers with index and layer list with name
+  def test_8
+
+    if !RBA.constants.member?(:Application)
+      return
+    end
+
+    app = RBA::Application.instance
+    mw = app.main_window
+    mw.close_all
+
+    mw.load_layout( ENV["TESTSRC"] + "/testdata/gds/t11.gds", 1 ) 
+
+    cv = mw.current_view
+
+    cv.clear_layers
+    assert_equal(lnodes_str("", cv.begin_layers(0)), "")
+
+    cv.rename_layer_list(0, "x")
+    assert_equal(cv.layer_list_name(0), "x")
+
+    cv.insert_layer(0, cv.end_layers(0), RBA::LayerProperties::new)
+    assert_equal(lnodes_str("", cv.begin_layers(0)), "*/*@*\n")
+
+    cv.clear_layers(0)
+    assert_equal(lnodes_str("", cv.begin_layers(0)), "")
+    assert_equal(cv.layer_list_name(0), "x")
+
+    cv.rename_layer_list(cv.current_layer_list, "y")
+    assert_equal(cv.layer_list_name(0), "y")
+    cv.insert_layer(cv.end_layers, RBA::LayerProperties::new)
+    assert_equal(lnodes_str("", cv.begin_layers), "*/*@*\n")
+
+    cv.clear_layers
+    assert_equal(lnodes_str("", cv.begin_layers), "")
+    assert_equal(cv.layer_list_name(cv.current_layer_list), "y")
+
+  end
+
 end
 
 load("test_epilogue.rb")

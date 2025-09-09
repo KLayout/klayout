@@ -515,18 +515,12 @@ public:
   /**
    *  @brief Clear the given layer view list
    */
-  void clear_layers (unsigned int index)
-  {
-    set_properties (index, LayerPropertiesList ());
-  }
+  void clear_layers (unsigned int index);
 
   /**
    *  @brief Clear the current layer view list
    */
-  void clear_layers ()
-  {
-    set_properties (LayerPropertiesList ());
-  }
+  void clear_layers ();
 
   /**
    *  @brief Access the current layer properties list

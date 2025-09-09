@@ -1961,6 +1961,22 @@ LayoutViewBase::set_properties (unsigned int index, const LayerPropertiesList &p
   }
 }
 
+void
+LayoutViewBase::clear_layers (unsigned int index)
+{
+  LayerPropertiesList ll;
+  ll.set_name (get_properties (index).name ());
+  set_properties (index, ll);
+}
+
+void
+LayoutViewBase::clear_layers ()
+{
+  LayerPropertiesList ll;
+  ll.set_name (get_properties ().name ());
+  set_properties (ll);
+}
+
 void 
 LayoutViewBase::expand_properties ()
 {

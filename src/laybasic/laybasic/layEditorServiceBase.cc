@@ -416,10 +416,10 @@ EditorServiceBase::show_error (tl::Exception &ex)
   tl::error << ex.msg ();
 }
 
-void
+int
 EditorServiceBase::focus_page_open ()
 {
-  //  .. nothing yet ..
+  return 0;
 }
 
 #endif

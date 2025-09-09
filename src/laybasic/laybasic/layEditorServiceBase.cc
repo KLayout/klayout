@@ -277,9 +277,11 @@ EditorServiceBase::clear_mouse_cursors ()
 }
 
 void
-EditorServiceBase::mouse_cursor_from_snap_details (const lay::PointSnapToObjectResult &snap_details)
+EditorServiceBase::mouse_cursor_from_snap_details (const lay::PointSnapToObjectResult &snap_details, bool noclear)
 {
-  clear_mouse_cursors ();
+  if (! noclear) {
+    clear_mouse_cursors ();
+  }
 
   add_mouse_cursor (snap_details.snapped_point,
                     snap_details.object_snap == lay::PointSnapToObjectResult::ObjectVertex ||

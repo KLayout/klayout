@@ -110,7 +110,7 @@ public:
   /**
    *  @brief Provides a nice mouse tracking cursor from the given snap details
    */
-  void mouse_cursor_from_snap_details (const lay::PointSnapToObjectResult &snap_details);
+  void mouse_cursor_from_snap_details (const lay::PointSnapToObjectResult &snap_details, bool noclear = false);
 
   /**
    *  @brief Gets the tracking cursor color

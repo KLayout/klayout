@@ -644,6 +644,10 @@ module DRC
       DRCFillStep::new(false, x, y)
     end
 
+    def fill_exclude(excl)
+      DRCFillExclude::new(excl)
+    end
+
     def auto_origin
       DRCFillOrigin::new
     end

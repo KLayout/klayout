@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>396</width>
-    <height>345</height>
+    <height>357</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -355,6 +355,13 @@
     </widget>
    </item>
    <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QFrame" name="frame">
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
@@ -369,44 +376,14 @@
       <property name="margin" stdset="0">
        <number>0</number>
       </property>
-      <item>
-       <spacer>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>209</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QPushButton" name="pushButton">
-        <property name="text">
-         <string>Ok</string>
-        </property>
-        <property name="default">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="pushButton_2">
-        <property name="text">
-         <string>Cancel</string>
-        </property>
-       </widget>
-      </item>
      </layout>
     </widget>
    </item>
   </layout>
  </widget>
  <tabstops>
-  <tabstop>pushButton</tabstop>
-  <tabstop>pushButton_2</tabstop>
+  <tabstop>x_le</tabstop>
+  <tabstop>y_le</tabstop>
   <tabstop>lt</tabstop>
   <tabstop>ct</tabstop>
   <tabstop>rt</tabstop>
@@ -422,34 +399,34 @@
  </resources>
  <connections>
   <connection>
-   <sender>pushButton</sender>
-   <signal>clicked()</signal>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
    <receiver>MoveToOptionsDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>237</x>
-     <y>203</y>
+     <x>197</x>
+     <y>323</y>
     </hint>
     <hint type="destinationlabel">
-     <x>147</x>
-     <y>81</y>
+     <x>197</x>
+     <y>175</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>pushButton_2</sender>
-   <signal>clicked()</signal>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
    <receiver>MoveToOptionsDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>325</x>
-     <y>202</y>
+     <x>197</x>
+     <y>323</y>
     </hint>
     <hint type="destinationlabel">
-     <x>325</x>
-     <y>57</y>
+     <x>197</x>
+     <y>175</y>
     </hint>
    </hints>
   </connection>

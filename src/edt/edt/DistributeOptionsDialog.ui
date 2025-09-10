@@ -671,9 +671,22 @@
   </layout>
  </widget>
  <tabstops>
+  <tabstop>h_distribute</tabstop>
+  <tabstop>h_pitch</tabstop>
+  <tabstop>h_space</tabstop>
+  <tabstop>v_distribute</tabstop>
+  <tabstop>v_pitch</tabstop>
+  <tabstop>v_space</tabstop>
+  <tabstop>h_none_rb</tabstop>
+  <tabstop>h_left_rb</tabstop>
+  <tabstop>h_center_rb</tabstop>
+  <tabstop>h_right_rb</tabstop>
+  <tabstop>v_none_rb</tabstop>
+  <tabstop>v_top_rb</tabstop>
+  <tabstop>v_center_rb</tabstop>
+  <tabstop>v_bottom_rb</tabstop>
   <tabstop>all_layers_rb</tabstop>
   <tabstop>visible_layers_rb</tabstop>
-  <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources>
   <include location="../../icons/icons.qrc"/>

@@ -31,7 +31,7 @@ namespace lay
 {
 
 MouseTracker::MouseTracker (lay::LayoutViewBase *view)
-  : lay::ViewService (view->canvas ()), mp_view (view),
+  : lay::ViewService (view->canvas ()), lay::Plugin (view), mp_view (view),
     m_cursor_color (tl::Color ()), m_cursor_line_style (0), m_cursor_enabled (false)
 {
   ui ()->grab_mouse (this, false);
@@ -129,5 +129,31 @@ MouseTracker::mouse_move_event (const db::DPoint &p, unsigned int /*buttons*/, b
   return false;
 }
 
-} // namespace lay
+// ----------------------------------------------------------------------------
 
+//  NOTE: configuration currently is not declared here.
+//  Same for the configuration pages.
+
+class MouseTrackerDeclaration
+  : public lay::PluginDeclaration
+{
+public:
+  MouseTrackerDeclaration ()
+  {
+    // .. nothing yet ..
+  }
+
+  virtual lay::Plugin *create_plugin (db::Manager * /*manager*/, lay::Dispatcher * /*dispatcher*/, lay::LayoutViewBase *view) const
+  {
+    return new MouseTracker (view);
+  }
+
+  virtual bool enable_catchall_editor_options_pages () const
+  {
+    return false;
+  }
+};
+
+static tl::RegisteredClass<lay::PluginDeclaration> tracker_decl (new MouseTrackerDeclaration (), -1000, "laybasic::MouseTrackerPlugin");
+
+} // namespace lay

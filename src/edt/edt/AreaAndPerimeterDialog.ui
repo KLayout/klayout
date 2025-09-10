@@ -108,6 +108,10 @@ The perimeter calculation only takes true outside edges into account. Internal e
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>area_le</tabstop>
+  <tabstop>perimeter_le</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

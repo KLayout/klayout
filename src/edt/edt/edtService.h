@@ -33,10 +33,10 @@
 #include "laySnap.h"
 #include "layObjectInstPath.h"
 #include "layTextInfo.h"
+#include "layEditorUtils.h"
 #include "tlColor.h"
 #include "dbLayout.h"
 #include "dbShape.h"
-#include "edtUtils.h"
 #include "edtConfig.h"
 #include "tlAssert.h"
 #include "tlException.h"
@@ -55,19 +55,15 @@ class PluginDeclarationBase;
 
 // -------------------------------------------------------------
 
-extern lay::angle_constraint_type ac_from_buttons (unsigned int buttons);
-
-// -------------------------------------------------------------
-
 /**
- *  @brief Utility function: serialize PCell parameters into a string
+ *  @brief A helper class that identifies clipboard data for edt::
  */
-std::string pcell_parameters_to_string (const std::map<std::string, tl::Variant> &parameters);
-
-/**
- *  @brief Utility: deserialize PCell parameters from a string
- */
-std::map<std::string, tl::Variant> pcell_parameters_from_string (const std::string &s);
+class EDT_PUBLIC ClipboardData
+  : public db::ClipboardData
+{
+public:
+  ClipboardData () { }
+};
 
 // -------------------------------------------------------------
 

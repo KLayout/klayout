@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description>A plugin sample\nThis sample provides a box drawing feature and demonstrates UI components and snapping</description>
+ <format>general</format>
+ <autorun>true</autorun>
+ <autorun-early>false</autorun-early>
+ <show-in-menu>false</show-in-menu>
+ <shortcut></shortcut>
+ <interpreter>ruby</interpreter>
+ <text># Sample plugin
+
+# This plugin implements a box that can be drawn by
+# clicking at the first and then at the second point.
+# There is one box which is replacing the previous one.
+# Line color and line width of the box can be configured
+# by editor options (line width) or configuration pages
+# (color). These settings are managed through configuration
+# options and their current state is persisted.
+# 
+# The dimension of the box can be entered numerically
+# while dragging the box. This feature is implemented
+# through a modal "focus page", which opens when you
+# press the Tab key during editing and when the keyboard
+# focus is on the canvas.
+#
+# Register this macro as "autorun" to enable the plugin
+# on startup.
+
+module DragBox
+
+CFG_COLOR = "drag-box-color"
+CFG_WIDTH = "drag-box-width"
+
+# An option page providing a single entry box for configuring the line width
+# This page communicates via configuration options. One advantage of this
+# approach is that the values are persisted
+
+class DragBoxEditorOptionsPage &lt; RBA::EditorOptionsPage
+
+  # Creates a new page with title "Options" and at position 1 (second from left)
+  
+  def initialize
+    
+    super("Options", 1)
+    
+    layout2 = RBA::QVBoxLayout::new(self)
+    layout = RBA::QHBoxLayout::new(self)
+    layout2.addLayout(layout)
+    label = RBA::QLabel::new("Line width", self)
+    layout.addWidget(label)
+    @spin_box = RBA::QSpinBox::new(self)
+    @spin_box.setMinimum(1)
+    @spin_box.setMaximum(16)
+    layout.addWidget(@spin_box)
+    layout.addStretch(1)
+    layout2.addStretch(1)
+    
+    # connect the spin box value change with the "edited" slot
+    # which will result in a call of "apply".
+    @spin_box.valueChanged = lambda { |x| self.edited }
+    
+  end
+  
+  # "setup" is called when the page needs to be populated with information -
+  # i.e. on first show.
+  def setup(dispatcher)
+    begin
+      @spin_box.setValue(dispatcher.get_config(CFG_WIDTH).to_i)
+    rescue
+      @spin_box.setValue(1)
+    end
+  end
+    
+  # "apply" is called when the page is requested to submit the entered
+  # values to the plugin. Usually this should be done via configuration
+  # events.
+  def apply(dispatcher)
+    dispatcher.set_config(CFG_WIDTH, @spin_box.value.to_s)
+  end
+  
+end
+
+# A (modal) option page, also called a "focus page". This page is 
+# registered like an editor options page. It is brought to front
+# when the user hits the "Tab" key during editing.
+# In this case, this page uses "setup" and "apply" callbacks to 
+# set and fetch information. It also employs a handler named
+# "update_box" to communicate changes between the client (the 
+# plugin) and the page.
+# 
+# Attributes that the client needs to take care of are
+# "self.box" (the current box), "self.pfix" (the start point)
+# and "self.update_box".
+  
+class DragBoxFocusPage &lt; RBA::EditorOptionsPage
+  
+  # Creates a new page with title "Options" and at
+  # position 1 (second from left)
+  
+  attr_accessor :box
+  attr_accessor :pfix
+  attr_accessor :update_box
+  
+  def initialize
+    
+    super("Geometry", 2)
+    
+    self.focus_page = true
+    self.modal_page = true
+    
+    @box = RBA::DBox::new
+    @pfix = RBA::DPoint::new
+    
+    layout = RBA::QGridLayout::new(self)
+    layout.setColumnStretch(1, 1)
+    
+    label = RBA::QLabel::new("Width", self)
+    layout.addWidget(label, 0, 0, 1, 1)
+    @le_width = RBA::QLineEdit::new(self)
+    layout.addWidget(@le_width, 0, 1, 1, 1)
+    
+    label = RBA::QLabel::new("Height", self)
+    layout.addWidget(label, 1, 0, 1, 1)
+    @le_height = RBA::QLineEdit::new(self)
+    layout.addWidget(@le_height, 1, 1, 1, 1)
+    
+    layout.setRowStretch(2, 1)
+    
+  end
+
+  # Is called when the page needs to be set up.
+  # We assume that the client has properly set up self.box
+  def setup(dispatcher)
+    @le_width.text = "%.12g" % @box.width
+    @le_height.text = "%.12g" % @box.height
+  end
+    
+  # Apply is called when the dialog is accepted or the "Apply" button is pressed
+  # Usually this method is intended to submit configuration parameter changes, 
+  # but we can use it for any other purpose as well.
+  
+  def apply(dispatcher)
+  
+    # fetches the coordinates from the entry boxes
+    # throws an exception in case of an error
+    x = @le_width.text.to_f
+    y = @le_height.text.to_f
+    
+    # prepares a new box with the given dimensions
+    # using the initial point ("pfix") and considering
+    # the drag direction
+    t = b = @pfix.y
+    l = r = @pfix.x
+    
+    if @box.bottom &lt; t - 1e-10
+      b = t - y
+    else
+      t = b + y
+    end
+    
+    if @box.left &lt; l - 1e-10
+      l = r - x
+    else
+      r = l + x
+    end
+    
+    # issue the event (call the handler) to inform the plugin of this change
+    if @update_box
+      @update_box.call(RBA::DBox::new(l, b, r, t))
+    end
+    
+  end
+  
+end
+
+# The widget placed into the configuration page
+
+# A configuration page with a single entry box to change
+# the box color in RGB hex style.
+# Configuration pages appear in the Setup dialog and can
+# communicate only through configuration parameter updates.
+
+class DragBoxConfigPage &lt; RBA::ConfigPage
+
+  # Initializes the page. Places it on a new section ("Drag Box") and "Configure" page
+  # and creates a single entry field.
+  def initialize
+
+    super("Drag Box|Configure")
+    
+    layout = RBA::QHBoxLayout::new(self)
+    label = RBA::QLabel::new("Color (hex, rrggbb)", self)
+    layout.addWidget(label)
+    @line_edit = RBA::QLineEdit::new(self)
+    layout.addWidget(@line_edit)
+    layout.addStretch(1)
+    
+  end
+  
+  # This method is called to request an update of the entry fields
+  def setup(dispatcher)
+    @line_edit.setText(dispatcher.get_config(CFG_COLOR))
+  end
+    
+  # This method is called to request a transfer of the edited values
+  # to the configuration space.
+  def apply(dispatcher)
+    dispatcher.set_config(CFG_COLOR, @line_edit.text)
+  end
+end
+
+# The custom plugin implementation.
+
+class DragBoxPlugin &lt; RBA::Plugin
+
+  def initialize(view)
+    super()
+    @marker = nil
+    @last_marker = nil
+    @box = nil
+    @start_point = nil
+    @view = view
+    @color = nil
+    @width = 1
+  end
+
+  # This method receives configuration callbacks
+  def configure(name, value)
+    if name == CFG_COLOR
+      # configure marker color
+      begin
+        @color = value != "" ? value.to_i(16) : nil
+      rescue
+        @color = nil
+      end
+      self._configure_marker
+    elsif name == CFG_WIDTH
+      # configure marker line width
+      begin
+        @width = value.to_i
+      rescue
+        @width = nil
+      end
+      self._configure_marker
+    end
+  end
+    
+  # clears all markers
+  def _clear_marker
+    [ @marker, @last_marker ].each { |marker| marker &amp;&amp; marker._destroy }
+    @marker = nil
+    @last_marker = nil
+  end
+      
+  # stops dragging the marker and copy to a static one
+  def _finish
+    if @last_marker
+      @last_marker._destroy
+    end
+    @last_marker = @marker
+    @marker = nil
+    # reset to idle
+    self.ungrab_mouse
+    RBA::MainWindow.instance.message("Box finished: " + @box.to_s, 10000)
+  end
+
+  # updates the marker with the current box
+  def _update_marker
+    if ! @marker
+      @marker = RBA::Marker::new(@view)
+      self._configure_marker
+    end
+    @marker.set(@box)
+  end
+    
+  # changes the marker's appearance
+  def _configure_marker
+    if @marker
+      @marker.line_style = 2   # short-dashed
+      @marker.vertex_size = 0  # no vertexes
+      @marker.line_width = @width
+      @marker.color = @color ? (@color | 0xff000000) : 0 # auto
+    end
+  end
+  
+  # Updates the box with the given value and updates the marker.
+  # This method is bound to the focus page handler when needed.
+  def _update_box(box)
+    @box = box
+    self._update_marker
+  end
+    
+  # overloaded callback: the focus page is requested
+  def focus_page_open
+
+    # stop unless dragging
+    if !@marker
+      return
+    end
+
+    # configure the focus page and show it:
+    # the page will call the handler of "update_box" to commit
+    # changes to the box
+    fp = self.focus_page
+    fp.box = @box
+    fp.pfix = @start_point
+    fp.update_box = lambda { |box| self._update_box(box) }
+    ret = fp.show
+    fp.update_box = nil
+    if ret == 1
+      # accepted: stop dragging now, we are done.
+      self._finish
+    end
+
+    return ret
+
+  end
+    
+  # overloaded callback:
+  # plugin is activated - i.e. the mode is selected
+  def activated
+    RBA::MainWindow.instance.message("Click on point to start dragging a box", 10000)
+  end
+
+  # overloaded callback:
+  # plugin is deactivated - i.e. the mode is unselected
+  def deactivated
+    self._clear_marker
+    RBA::MainWindow.instance.message("", 0)
+  end
+    
+  # overloaded callback:
+  # a mouse button was clicked
+  
+  def mouse_click_event(p, buttons, prio)
+  
+    if prio
+    
+      # first-level event: start a new box or 
+      # stop dragging it and freeze the box
+      if ! @marker
+        p = self.snap2(p)
+        @box = RBA::DBox::new(p, p)
+        @start_point = p
+        self._clear_marker
+        self._update_marker
+        self.grab_mouse
+        RBA::MainWindow.instance.message("Drag the box and click again", 10000)
+      else
+        p = self.snap2(p, @start_point, true, self.ac_from_buttons(buttons))
+        self._update_box(RBA::DBox::new(@start_point, p))
+        self._finish
+      end
+      
+      return true
+      
+    end
+    
+    return false
+    
+  end
+    
+  # overloaded callback:
+  # the mouse was moved
+  def mouse_moved_event(p, buttons, prio)
+  
+    if prio
+      # first-level event: if not dragging, provide a 
+      # mouse cursor for tracking. If dragging, update
+      # the box and provide a mouse cursor.
+      if !@marker
+        self.clear_mouse_cursors
+        p = self.snap2(p, :visualize =&gt; true)
+        self.add_mouse_cursor(p)
+      else
+        self.clear_mouse_cursors
+        p = self.snap2(p, @start_point, true, self.ac_from_buttons(buttons), :visualize =&gt; true)
+        self.add_mouse_cursor(p)
+        @box = RBA::DBox::new(@start_point, p)
+        self._update_marker
+      end
+    end
+    
+    # NOTE: we must not digest this event (i.e. return true)
+    # to allow the mouse tracker to receive the events as well
+    return false
+    
+  end
+  
+end
+
+# Implements a "plugin factory". 
+# The purpose of this object is to create a plugin object
+# and corresponding UI objects.
+
+class DragBoxPluginFactory &lt; RBA::PluginFactory
+
+  def initialize
+    super
+    self.has_tool_entry = true
+    # NOTE: it's a good practice to register configuration options
+    self.add_option(CFG_WIDTH, "1")
+    self.add_option(CFG_COLOR, "")
+    self.register(-1000, "drag_box", "Drag Box")
+  end
+    
+  # Called to create the configuration pages
+  def create_config_pages
+    self.add_config_page(DragBoxConfigPage::new)
+  end
+    
+  # Called to create the editor options pages
+  def create_editor_options_pages
+    self.add_editor_options_page(DragBoxEditorOptionsPage::new)
+    self.add_editor_options_page(DragBoxFocusPage::new)
+  end
+    
+  # Creates the plugin
+  def create_plugin(manager, root, view)
+    return DragBoxPlugin::new(view)
+  end
+
+end
+  
+# Creates the singleton instance - as we register it,
+# it is not garbage collected
+DragBoxPluginFactory::new
+
+end
+</text>
+</klayout-macro>

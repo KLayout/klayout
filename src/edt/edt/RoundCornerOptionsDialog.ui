@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>469</width>
+    <width>472</width>
     <height>271</height>
    </rect>
   </property>
@@ -138,6 +138,12 @@ Leave empty to get the same radius than for outer corners)</string>
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>amend_cb</tabstop>
+  <tabstop>router_le</tabstop>
+  <tabstop>rinner_le</tabstop>
+  <tabstop>points_le</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

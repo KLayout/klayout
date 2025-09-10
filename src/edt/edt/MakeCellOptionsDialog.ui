@@ -365,6 +365,19 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>cell_name_le</tabstop>
+  <tabstop>origin_groupbox</tabstop>
+  <tabstop>lt</tabstop>
+  <tabstop>ct</tabstop>
+  <tabstop>rt</tabstop>
+  <tabstop>lc</tabstop>
+  <tabstop>cc</tabstop>
+  <tabstop>rc</tabstop>
+  <tabstop>lb</tabstop>
+  <tabstop>cb</tabstop>
+  <tabstop>rb</tabstop>
+ </tabstops>
  <resources>
   <include location="../../icons/icons.qrc"/>
  </resources>

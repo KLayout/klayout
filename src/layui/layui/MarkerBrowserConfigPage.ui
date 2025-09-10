@@ -144,6 +144,11 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>cbx_context</tabstop>
+  <tabstop>cbx_window</tabstop>
+  <tabstop>le_max_markers</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

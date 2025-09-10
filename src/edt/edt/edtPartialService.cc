@@ -1213,7 +1213,7 @@ PartialService::timeout ()
     partial_objects::const_iterator r = transient_selection.begin (); 
 
     //  build the transformation variants cache
-    TransformationVariants tv (view ());
+    lay::TransformationVariants tv (view ());
 
     const lay::CellView &cv = view ()->cellview (r->first.cv_index ());
 
@@ -1468,7 +1468,7 @@ PartialService::issue_editor_hook_calls (const tl::weak_collection<edt::EditorHo
   db::DTrans move_trans = db::DTrans (m_current - m_start);
 
   //  build the transformation variants cache
-  TransformationVariants tv (view ());
+  lay::TransformationVariants tv (view ());
 
   //  Issue editor hook calls for the shape modification events
 
@@ -1559,7 +1559,7 @@ PartialService::issue_editor_hook_calls (const tl::weak_collection<edt::EditorHo
 }
 
 db::Shape
-PartialService::modify_shape (TransformationVariants &tv, const db::Shape &shape_in, const lay::ObjectInstPath &path, const std::set <EdgeWithIndex> &sel, const db::DTrans &move_trans, std::map <EdgeWithIndex, db::Edge> &new_edges, std::map <PointWithIndex, db::Point> &new_points)
+PartialService::modify_shape (lay::TransformationVariants &tv, const db::Shape &shape_in, const lay::ObjectInstPath &path, const std::set <EdgeWithIndex> &sel, const db::DTrans &move_trans, std::map <EdgeWithIndex, db::Edge> &new_edges, std::map <PointWithIndex, db::Point> &new_points)
 {
   tl_assert (shape_in.shapes () != 0);
   db::Shape shape = shape_in;
@@ -1642,7 +1642,7 @@ void
 PartialService::transform_selection (const db::DTrans &move_trans)
 {
   //  build the transformation variants cache
-  TransformationVariants tv (view ());
+  lay::TransformationVariants tv (view ());
 
   //  since a shape reference may become invalid while moving it and
   //  because it creates ambiguities, we treat each shape separately:
@@ -1798,7 +1798,7 @@ PartialService::mouse_move_event (const db::DPoint &p, unsigned int buttons, boo
 
     set_cursor (lay::Cursor::size_all);
 
-    m_alt_ac = ac_from_buttons (buttons);
+    m_alt_ac = lay::ac_from_buttons (buttons);
 
     //  drag the vertex or edge/segment
     if (is_single_point_selection () || is_single_edge_selection ()) {
@@ -1862,7 +1862,7 @@ PartialService::mouse_move_event (const db::DPoint &p, unsigned int buttons, boo
     
     if (mp_box) {
 
-      m_alt_ac = ac_from_buttons (buttons);
+      m_alt_ac = lay::ac_from_buttons (buttons);
 
       m_p2 = p;
       mp_box->set_points (m_p1, m_p2);
@@ -1922,7 +1922,7 @@ PartialService::mouse_press_event (const db::DPoint &p, unsigned int buttons, bo
 
   } else if (! mp_box) {
 
-    m_alt_ac = ac_from_buttons (buttons);
+    m_alt_ac = lay::ac_from_buttons (buttons);
 
     if (m_selection.empty ()) {
 
@@ -2015,7 +2015,7 @@ PartialService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bo
 
   if (m_dragging) {
 
-    m_alt_ac = ac_from_buttons (buttons);
+    m_alt_ac = lay::ac_from_buttons (buttons);
 
     if (m_current != m_start) {
 
@@ -2059,7 +2059,7 @@ PartialService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bo
     view ()->clear_selection ();
     m_selection = selection;
 
-    m_alt_ac = ac_from_buttons (buttons);
+    m_alt_ac = lay::ac_from_buttons (buttons);
 
     lay::Editable::SelectionMode mode = lay::Editable::Replace;
     bool shift = ((buttons & lay::ShiftButton) != 0);
@@ -2192,7 +2192,7 @@ PartialService::mouse_double_click_event (const db::DPoint &p, unsigned int butt
 
   if ((buttons & lay::LeftButton) != 0 && prio) {
 
-    m_alt_ac = ac_from_buttons (buttons);
+    m_alt_ac = lay::ac_from_buttons (buttons);
 
     close_editor_hooks (false);
 
@@ -2215,7 +2215,7 @@ PartialService::mouse_double_click_event (const db::DPoint &p, unsigned int butt
         db::DPoint new_point_d = snap (p);
 
         //  build the transformation variants cache
-        TransformationVariants tv (view (), true /*per cv and layer*/, false /*per cv*/); 
+        lay::TransformationVariants tv (view (), true /*per cv and layer*/, false /*per cv*/);
 
         const std::vector<db::DCplxTrans> *tv_list = tv.per_cv_and_layer (r->first.cv_index (), r->first.layer ());
         if (tv_list && ! tv_list->empty ()) {
@@ -2304,7 +2304,7 @@ PartialService::mouse_release_event (const db::DPoint &p, unsigned int buttons, 
 
   if (prio && mp_box) {
 
-    m_alt_ac = ac_from_buttons (buttons);
+    m_alt_ac = lay::ac_from_buttons (buttons);
 
     ui ()->ungrab_mouse (this);
 
@@ -2402,7 +2402,7 @@ PartialService::snap_marker_to_grid (const db::DVector &v, bool &snapped) const
   db::DVector snapped_to (1.0, 1.0);
   db::DVector vv = lay::snap_angle (v, move_ac (), &snapped_to);
 
-  TransformationVariants tv (view ());
+  lay::TransformationVariants tv (view ());
 
   for (auto r = m_selection.begin (); r != m_selection.end (); ++r) {
 
@@ -2548,7 +2548,7 @@ PartialService::selection_bbox ()
 {
   //  build the transformation variants cache
   //  TODO: this is done multiple times - once for each service!
-  TransformationVariants tv (view ());
+  lay::TransformationVariants tv (view ());
   const db::DCplxTrans &vp = view ()->viewport ().trans ();
 
   lay::TextInfo text_info (view ());
@@ -2938,7 +2938,7 @@ PartialService::single_selected_point () const
   //  build the transformation variants cache and 
   //  use only the first one of the explicit transformations 
   //  TODO: clarify how this can be implemented in a more generic form or leave it thus.
-  TransformationVariants tv (view ());
+  lay::TransformationVariants tv (view ());
   const std::vector<db::DCplxTrans> *tv_list = tv.per_cv_and_layer (m_selection.begin ()->first.cv_index (), m_selection.begin ()->first.layer ());
 
   const lay::CellView &cv = view ()->cellview (m_selection.begin ()->first.cv_index ());
@@ -2960,7 +2960,7 @@ PartialService::single_selected_edge () const
   //  build the transformation variants cache and
   //  use only the first one of the explicit transformations
   //  TODO: clarify how this can be implemented in a more generic form or leave it thus.
-  TransformationVariants tv (view ());
+  lay::TransformationVariants tv (view ());
   const std::vector<db::DCplxTrans> *tv_list = tv.per_cv_and_layer (m_selection.begin ()->first.cv_index (), m_selection.begin ()->first.layer ());
 
   const lay::CellView &cv = view ()->cellview (m_selection.begin ()->first.cv_index ());
@@ -3042,7 +3042,7 @@ PartialService::do_selection_to_view ()
   if (! m_selection.empty ()) {
 
     //  build the transformation variants cache
-    TransformationVariants tv (view ());
+    lay::TransformationVariants tv (view ());
 
     for (partial_objects::const_iterator r = m_selection.begin (); r != m_selection.end (); ++r) {
 
@@ -3418,7 +3418,7 @@ PartialService::handle_guiding_shape_changes ()
 
   //  Hint: get_parameters_from_pcell_and_guiding_shapes invalidates the shapes because it resets the changed
   //  guiding shapes. We must not access s->shape after that.
-  if (! get_parameters_from_pcell_and_guiding_shapes (layout, s->first.cell_index (), parameters_for_pcell)) {
+  if (! lay::get_parameters_from_pcell_and_guiding_shapes (layout, s->first.cell_index (), parameters_for_pcell)) {
     return false;
   }
 

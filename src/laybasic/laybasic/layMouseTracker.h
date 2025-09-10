@@ -26,6 +26,7 @@
 
 #include "layViewObject.h"
 #include "layMarker.h"
+#include "layPlugin.h"
 #include "tlObject.h"
 
 class QMouseEvent;
@@ -36,7 +37,7 @@ class LayoutCanvas;
 class LayoutViewBase;
 
 class MouseTracker
-  : public lay::ViewService
+  : public lay::ViewService, public lay::Plugin
 {
 public: 
   MouseTracker (lay::LayoutViewBase *view);
@@ -44,6 +45,11 @@ public:
   virtual bool mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio);
   bool leave_event (bool prio);
   bool configure (const std::string &name, const std::string &value);
+
+  lay::ViewService *view_service_interface ()
+  {
+    return this;
+  }
 
 private:
   lay::LayoutViewBase *mp_view;

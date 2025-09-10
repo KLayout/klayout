@@ -104,8 +104,6 @@ SOURCES = \
   layEditStippleWidget.cc \
   layEditStipplesForm.cc \
   layEditorOptionsFrame.cc \
-  layEditorOptionsPage.cc \
-  layEditorOptionsPages.cc \
   layFileDialog.cc \
   layGenericSyntaxHighlighter.cc \
   layHierarchyControlPanel.cc \
@@ -164,8 +162,6 @@ HEADERS = \
   layEditStippleWidget.h \
   layEditStipplesForm.h \
   layEditorOptionsFrame.h \
-  layEditorOptionsPage.h \
-  layEditorOptionsPages.h \
   layFileDialog.h \
   layGenericSyntaxHighlighter.h \
   layHierarchyControlPanel.h \

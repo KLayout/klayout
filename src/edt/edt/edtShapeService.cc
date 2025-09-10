@@ -167,7 +167,7 @@ ShapeEditService::change_edit_layer (const db::LayerProperties &lp)
   }
   m_layer = (unsigned int) layer;
 
-  edt::set_or_request_current_layer (view (), lp, m_cv_index);
+  lay::set_or_request_current_layer (view (), lp, m_cv_index);
 
   if (editing ()) {
     close_editor_hooks (false);

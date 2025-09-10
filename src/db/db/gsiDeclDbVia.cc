@@ -156,7 +156,7 @@ Class<db::ViaType> decl_dbViaType ("db", "ViaType",
     "@brief If non-zero, the top layer's dimensions will be rounded to this grid.\n"
   ),
   "@brief Describes a via type\n"
-  "These objects are used by PCellDeclaration#via_types to specify the via types a "
+  "These objects are used by \\PCellDeclaration#via_types to specify the via types a "
   "via PCell is able to provide.\n"
   "\n"
   "The basic parameters of a via type are bottom and top layers (the layers that are "

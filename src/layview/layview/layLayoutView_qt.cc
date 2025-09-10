@@ -1578,11 +1578,20 @@ LayoutView::message (const std::string &s, int timeout)
 }
 
 void
+LayoutView::set_focus ()
+{
+  if (canvas () && canvas ()->widget ()) {
+    canvas ()->widget ()->setFocus (Qt::TabFocusReason);
+  }
+}
+
+void
 LayoutView::mode (int m)
 {
   if (mode () != m) {
     LayoutViewBase::mode (m);
     activate_editor_option_pages ();
+    set_focus ();
   }
 }
 
@@ -1591,18 +1600,7 @@ LayoutView::activate_editor_option_pages ()
 {
   lay::EditorOptionsPages *eo_pages = editor_options_pages ();
   if (eo_pages) {
-
-    //  TODO: this is very inefficient as each "activate" will regenerate the tabs
-    for (std::vector<lay::EditorOptionsPage *>::const_iterator op = eo_pages->pages ().begin (); op != eo_pages->pages ().end (); ++op) {
-      bool is_active = false;
-      if ((*op)->plugin_declaration () == 0) {
-        is_active = true;
-      } else if (active_plugin () && active_plugin ()->plugin_declaration () == (*op)->plugin_declaration ()) {
-        is_active = true;
-      }
-      (*op)->activate (is_active);
-    }
-
+    eo_pages->activate (active_plugin ());
   }
 }
 
@@ -1610,10 +1608,12 @@ void
 LayoutView::switch_mode (int m)
 {
   if (mode () != m) {
-    mode (m);
+    LayoutViewBase::mode (m);
+    activate_editor_option_pages ();
     if (mp_widget) {
       mp_widget->emit_mode_change (m);
     }
+    set_focus ();
   }
 }
 

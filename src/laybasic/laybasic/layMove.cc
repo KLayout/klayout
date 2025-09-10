@@ -20,11 +20,10 @@
 
 */
 
-
-
 #include "layMove.h"
 #include "layEditable.h"
 #include "layLayoutViewBase.h"
+#include "layEditorUtils.h"
 #include "laySelector.h"
 #include "laybasicConfig.h"
 
@@ -35,7 +34,7 @@ namespace lay
 //  MoveService implementation
 
 MoveService::MoveService (lay::LayoutViewBase *view)
-  : lay::ViewService (view->canvas ()),
+  : lay::EditorServiceBase (view),
     m_dragging (false),
     m_dragging_transient (false),
     mp_editables (view),
@@ -50,44 +49,36 @@ MoveService::~MoveService ()
   drag_cancel ();
 }
 
-void  
+void
 MoveService::deactivated ()
 {
+  EditorServiceBase::deactivated ();
   m_shift = db::DPoint ();
-  mp_view->clear_transient_selection ();
+  mp_editables->clear_transient_selection ();
   drag_cancel ();
-}
-
-lay::angle_constraint_type 
-ac_from_buttons (unsigned int buttons)
-{
-  if ((buttons & lay::ShiftButton) != 0) {
-    if ((buttons & lay::ControlButton) != 0) {
-      return lay::AC_Any;
-    } else {
-      return lay::AC_Ortho;
-    }
-  } else {
-    if ((buttons & lay::ControlButton) != 0) {
-      return lay::AC_Diagonal;
-    } else {
-      return lay::AC_Global;
-    }
-  }
 }
 
 bool
 MoveService::configure (const std::string &name, const std::string &value)
 {
+  if (lay::EditorServiceBase::configure (name, value)) {
+    return true;
+  }
+
   if (name == cfg_grid) {
     tl::from_string (value, m_global_grid);
   }
+
   return false;  //  not taken
 }
 
 bool
-MoveService::key_event (unsigned int key, unsigned int /*buttons*/)
+MoveService::key_event (unsigned int key, unsigned int buttons)
 {
+  if (lay::EditorServiceBase::key_event (key, buttons)) {
+    return true;
+  }
+
   double dx = 0.0, dy = 0.0;
   if (int (key) == lay::KeyDown) {
     dy = -1.0;
@@ -127,6 +118,16 @@ MoveService::key_event (unsigned int key, unsigned int /*buttons*/)
   } else {
     return false;
   }
+}
+
+int
+MoveService::focus_page_open ()
+{
+  //  This method is called on "Tab" by "key_event". "fp" is null as we don't have a focus page registered.
+  if (is_active () && dispatcher ()) {
+    dispatcher ()->menu_activated ("cm_sel_move");
+  }
+  return 0;
 }
 
 bool 
@@ -240,7 +241,7 @@ MoveService::mouse_press_event (const db::DPoint &p, unsigned int buttons, bool 
 }
 
 bool
-MoveService::begin_move (db::Transaction *transaction, bool transient_selection)
+MoveService::start_move (db::Transaction *transaction, bool transient_selection)
 {
   if (m_dragging) {
     return false;
@@ -308,7 +309,7 @@ MoveService::handle_click (const db::DPoint &p, unsigned int buttons, bool drag_
 
       ui ()->hover_reset ();
         
-      mp_view->clear_transient_selection ();
+      mp_editables->clear_transient_selection ();
 
       m_dragging = true;
       m_dragging_transient = drag_transient;
@@ -366,5 +367,24 @@ MoveService::finish ()
   }
 }
 
-}
+// ----------------------------------------------------------------------------
 
+class MoveServiceDeclaration
+  : public lay::PluginDeclaration
+{
+public:
+  MoveServiceDeclaration ()
+    : lay::PluginDeclaration (-1)
+  {
+    // .. nothing yet ..
+  }
+
+  virtual lay::Plugin *create_plugin (db::Manager * /*manager*/, lay::Dispatcher * /*dispatcher*/, lay::LayoutViewBase *view) const
+  {
+    return new MoveService (view);
+  }
+};
+
+static tl::RegisteredClass<lay::PluginDeclaration> move_service_decl (new MoveServiceDeclaration (), -970, "laybasic::MoveServicePlugin");
+
+}

@@ -80,7 +80,6 @@ HEADERS += \
   edtPartialService.h \
   edtPlugin.h \
   edtService.h \
-  edtUtils.h \
   edtCommon.h \
   edtDistribute.h \
 
@@ -91,7 +90,6 @@ SOURCES += \
   edtPartialService.cc \
   edtPlugin.cc \
   edtService.cc \
-  edtUtils.cc \
   gsiDeclEdt.cc \
   edtDistribute.cc \
 

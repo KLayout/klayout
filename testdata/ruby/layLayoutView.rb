@@ -506,9 +506,8 @@ class LAYLayoutView_TestClass < TestBase
   end
 
   class DummyPlugin < RBA::Plugin
-    def initialize(manager, view)
-      self.manager = manager
-      self.view = view
+    def initialize
+      super
     end
   end
 
@@ -516,8 +515,8 @@ class LAYLayoutView_TestClass < TestBase
     def initialize()
       register(1000, "dummy_plugin", "Dummy Plugin")
     end
-    def create_plugin(manager, unused, view)
-      DummyPlugin::new(manager, view)
+    def create_plugin(manager, dispatcher, view)
+      DummyPlugin::new
     end
   end
 
@@ -599,6 +598,28 @@ class LAYLayoutView_TestClass < TestBase
       assert_equal(true, mw.current_view.is_dirty?)
     end
     
+  end
+
+  # private config
+  def test_10
+
+    lv = RBA::LayoutView::new(true)
+
+    assert_equal(lv.get_config_names.member?("edit-grid"), true)
+    lv.set_config("edit-grid", "0.01")
+    # smoke test
+    lv.commit_config
+    assert_equal(lv.get_config("edit-grid"), "0.01")
+    lv.clear_config
+    assert_equal(lv.get_config("edit-grid"), "")
+    
+    # unknown config names can be used, but are not initialized
+    lv.set_config("does-not-exist", "aaa")
+    assert_equal(lv.get_config_names.member?("does-not-exist"), true)
+    assert_equal(lv.get_config("does-not-exist"), "aaa")
+    lv.clear_config
+    assert_equal(lv.get_config_names.member?("does-not-exist"), false)
+
   end
 
 end

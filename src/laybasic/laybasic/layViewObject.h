@@ -105,6 +105,11 @@ public:
   ViewService (ViewObjectUI *widget = 0);
 
   /**
+   *  @brief Initialization, can follow default constructor
+   */
+  void init (ViewObjectUI *widget);
+
+  /**
    *  @brief Destructor
    */
   virtual ~ViewService ();

@@ -191,8 +191,15 @@ ViewObject::freeze ()
 //  ViewService implementation
 
 ViewService::ViewService (ViewObjectUI *widget)
-  : mp_widget (widget), m_abs_grab (false), m_enabled (true)
+  : mp_widget (0), m_abs_grab (false), m_enabled (true)
 {
+  init (widget);
+}
+
+void
+ViewService::init (ViewObjectUI *widget)
+{
+  mp_widget = widget;
   if (widget) {
     widget->register_service (this);
   }

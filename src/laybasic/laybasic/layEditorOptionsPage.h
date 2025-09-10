@@ -25,7 +25,7 @@
 #ifndef HDR_layEditorOptionsPage
 #define HDR_layEditorOptionsPage
 
-#include "layuiCommon.h"
+#include "laybasicCommon.h"
 
 #include "tlObject.h"
 
@@ -49,13 +49,14 @@ class EditorOptionsPages;
 /**
  *  @brief The base class for a object properties page
  */
-class LAYUI_PUBLIC EditorOptionsPage
+class LAYBASIC_PUBLIC EditorOptionsPage
   : public QWidget, public tl::Object
 {
 Q_OBJECT
 
 public:
   EditorOptionsPage (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);
+  EditorOptionsPage ();
   virtual ~EditorOptionsPage ();
 
   virtual std::string title () const = 0;
@@ -65,20 +66,28 @@ public:
   virtual void commit_recent (lay::Dispatcher * /*root*/) { }
   virtual void config_recent_for_layer (lay::Dispatcher * /*root*/, const db::LayerProperties & /*lp*/, int /*cv_index*/) { }
 
+  bool is_focus_page () const { return m_focus_page; }
+  void set_focus_page (bool f) { m_focus_page = f; }
+  void set_focus ();
+
+  bool is_modal_page () const { return m_modal_page; }
+  void set_modal_page (bool f) { m_modal_page = f; }
+
   bool active () const { return m_active; }
   void activate (bool active);
   void set_owner (EditorOptionsPages *owner);
 
+  /**
+   *  @brief Shows the editor page
+   *  @return -1, if the page is shown non-modal, otherwise 1 or 0 if the dialog was accepted (1) or rejected (0)
+   */
+  int show ();
+
   const lay::PluginDeclaration *plugin_declaration () const { return mp_plugin_declaration; }
   void set_plugin_declaration (const lay::PluginDeclaration *pd) { mp_plugin_declaration = pd; }
 
-protected slots:
-  void edited ()
-  {
-    apply (dispatcher ());
-  }
+  void init (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher);
 
-protected:
   lay::Dispatcher *dispatcher () const
   {
     return mp_dispatcher;
@@ -89,12 +98,21 @@ protected:
     return mp_view;
   }
 
+protected slots:
+  void edited ();
+
+protected:
   virtual void active_cellview_changed () { }
   virtual void technology_changed (const std::string & /*tech*/) { }
+
+  virtual bool focusNextPrevChild (bool next);
+  virtual void keyPressEvent (QKeyEvent *event);
 
 private:
   EditorOptionsPages *mp_owner;
   bool m_active;
+  bool m_focus_page;
+  bool m_modal_page;
   const lay::PluginDeclaration *mp_plugin_declaration;
   lay::Dispatcher *mp_dispatcher;
   lay::LayoutViewBase *mp_view;

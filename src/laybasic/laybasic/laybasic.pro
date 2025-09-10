@@ -28,13 +28,16 @@ DEFINES += MAKE_LAYBASIC_LIBRARY
 
 SOURCES += \
   gsiDeclLayLayers.cc \
+  gsiDeclLayDispatcher.cc \
   gsiDeclLayLayoutViewBase.cc \
   gsiDeclLayMarker.cc \
   gsiDeclLayMenu.cc \
-  gsiDeclLayPlugin.cc \
   gsiDeclLayTlAdded.cc \
   gsiDeclLayRdbAdded.cc \
   layAbstractMenu.cc \
+  layEditorOptionsPage.cc \
+  layEditorOptionsPages.cc \
+  layEditorUtils.cc \
   layLayoutViewConfig.cc \
   layMargin.cc \
   laybasicForceLink.cc \
@@ -87,6 +90,9 @@ SOURCES += \
   layUtils.cc \
 
 HEADERS += \
+  layEditorOptionsPage.h \
+  layEditorOptionsPages.h \
+  layEditorUtils.h \
   layMargin.h \
   laybasicConfig.h \
   laybasicForceLink.h \

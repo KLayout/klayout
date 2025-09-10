@@ -32,7 +32,7 @@ namespace lay
 //  ZoomService implementation
 
 ZoomService::ZoomService (lay::LayoutViewBase *view)
-  : lay::ViewService (view->canvas ()), 
+  : lay::ViewService (view->canvas ()), lay::Plugin (view),
     mp_view (view),
     mp_box (0),
     m_color (0)
@@ -282,5 +282,28 @@ ZoomService::begin (const db::DPoint &pos)
   ui ()->grab_mouse (this, true);
 }
 
-}
+// ----------------------------------------------------------------------------
 
+class ZoomServiceDeclaration
+  : public lay::PluginDeclaration
+{
+public:
+  ZoomServiceDeclaration ()
+  {
+    // .. nothing yet ..
+  }
+
+  virtual lay::Plugin *create_plugin (db::Manager * /*manager*/, lay::Dispatcher * /*dispatcher*/, lay::LayoutViewBase *view) const
+  {
+    return new ZoomService (view);
+  }
+
+  virtual bool enable_catchall_editor_options_pages () const
+  {
+    return false;
+  }
+};
+
+static tl::RegisteredClass<lay::PluginDeclaration> zoom_service_decl (new ZoomServiceDeclaration (), -990, "laybasic::ZoomServicePlugin");
+
+}

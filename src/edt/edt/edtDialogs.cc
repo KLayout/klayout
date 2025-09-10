@@ -26,7 +26,7 @@
 #include "dbLayout.h"
 
 #include "edtDialogs.h"
-#include "edtUtils.h"
+#include "layEditorUtils.h"
 #include "layObjectInstPath.h"
 #include "layCellView.h"
 #include "layLayoutViewBase.h"

@@ -338,13 +338,13 @@ fill_polygon_impl (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type f
     //  over- and undersize the polygons to fill gaps that cannot be filled.
     db::Region excluded (it.first, it.second);
     excluded.set_merged_semantics (false);
-    excluded.size (dx, 0);
+    excluded.size (dx, 0, 3 /*mode*/);
     excluded.set_merged_semantics (true);
-    excluded.size (-dx, 0);
+    excluded.size (-dx, 0, 3 /*mode*/);
     excluded.set_merged_semantics (false);
-    excluded.size (dy, 0);
+    excluded.size (0, dy, 3 /*mode*/);
     excluded.set_merged_semantics (true);
-    excluded.size (-dy, 0);
+    excluded.size (0, -dy, 3 /*mode*/);
     excluded.merge ();
 
     if (! excluded.empty ()) {
@@ -390,13 +390,13 @@ fill_polygon_impl (db::Cell *cell, const db::Polygon &fp0, db::cell_index_type f
 
   //  under- and oversize the polygon to remove slivers that cannot be filled.
   fr.set_merged_semantics (true);
-  fr.size (-dx, 0);
+  fr.size (-dx, 0, 3 /*mode*/);
   fr.set_merged_semantics (false);
-  fr.size (dx, 0);
+  fr.size (dx, 0, 3 /*mode*/);
   fr.set_merged_semantics (true);
-  fr.size (0, -dy);
+  fr.size (0, -dy, 3 /*mode*/);
   fr.set_merged_semantics (false);
-  fr.size (0, dy);
+  fr.size (0, dy, 3 /*mode*/);
   fr.set_merged_semantics (true);
   fr.merge ();
 

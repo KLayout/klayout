@@ -279,7 +279,11 @@ class DragBoxPlugin &lt; RBA::Plugin
       @marker.line_style = 2   # short-dashed
       @marker.vertex_size = 0  # no vertexes
       @marker.line_width = @width
-      @marker.color = @color ? (@color | 0xff000000) : 0 # auto
+      if @color
+        @marker.color = @color | 0xff000000
+      else
+        @marker.reset_color
+      end
     end
   end
   

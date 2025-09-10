@@ -297,7 +297,7 @@ class DragBoxPlugin(pya.Plugin):
       if self.color is not None:
         self.marker.color = self.color | 0xff000000
       else:
-        self.marker.color = 0  # auto
+        self.marker.reset_color()
   
   def _update_box(self, box):
     """

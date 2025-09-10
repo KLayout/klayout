@@ -1309,23 +1309,23 @@ tl::Variant complex_op (db::Region *region, db::CompoundRegionOperationNode *nod
 
 static void
 fill_region (const db::Region *fr, db::Cell *cell, db::cell_index_type fill_cell_index, const db::Box &fc_box, const db::Point *origin,
-             db::Region *remaining_parts, const db::Vector &fill_margin, db::Region *remaining_polygons, const db::Box &glue_box)
+             db::Region *remaining_parts, const db::Vector &fill_margin, db::Region *remaining_polygons, const db::Box &glue_box, const db::Region &exclude_area)
 {
-  db::fill_region (cell, *fr, fill_cell_index, fc_box, origin ? *origin : db::Point (), origin == 0, remaining_parts, fill_margin, remaining_polygons, glue_box);
+  db::fill_region (cell, *fr, fill_cell_index, fc_box, origin ? *origin : db::Point (), origin == 0, remaining_parts, fill_margin, remaining_polygons, glue_box, exclude_area);
 }
 
 static void
 fill_region_skew (const db::Region *fr, db::Cell *cell, db::cell_index_type fill_cell_index, const db::Box &fc_box, const db::Vector &row_step, const db::Vector &column_step, const db::Point *origin,
-                  db::Region *remaining_parts, const db::Vector &fill_margin, db::Region *remaining_polygons, const db::Box &glue_box)
+                  db::Region *remaining_parts, const db::Vector &fill_margin, db::Region *remaining_polygons, const db::Box &glue_box, const db::Region &exclude_area)
 {
-  db::fill_region (cell, *fr, fill_cell_index, fc_box, row_step, column_step, origin ? *origin : db::Point (), origin == 0, remaining_parts, fill_margin, remaining_polygons, glue_box);
+  db::fill_region (cell, *fr, fill_cell_index, fc_box, row_step, column_step, origin ? *origin : db::Point (), origin == 0, remaining_parts, fill_margin, remaining_polygons, glue_box, exclude_area);
 }
 
 static void
 fill_region_multi (const db::Region *fr, db::Cell *cell, db::cell_index_type fill_cell_index, const db::Box &fc_box, const db::Vector &row_step, const db::Vector &column_step,
-                   const db::Vector &fill_margin, db::Region *remaining_polygons, const db::Box &glue_box)
+                   const db::Vector &fill_margin, db::Region *remaining_polygons, const db::Box &glue_box, const db::Region &exclude_area)
 {
-  db::fill_region_repeat (cell, *fr, fill_cell_index, fc_box, row_step, column_step, fill_margin, remaining_polygons, glue_box);
+  db::fill_region_repeat (cell, *fr, fill_cell_index, fc_box, row_step, column_step, fill_margin, remaining_polygons, glue_box, exclude_area);
 }
 
 static db::Region
@@ -4340,41 +4340,44 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
                                          gsi::arg ("fill_margin", db::Vector ()),
                                          gsi::arg ("remaining_polygons", (db::Region *)0, "nil"),
                                          gsi::arg ("glue_box", db::Box ()),
+                                         gsi::arg ("exclude_area", db::Region (), "empty"),
     "@brief A mapping of \\Cell#fill_region to the Region class\n"
     "\n"
     "This method is equivalent to \\Cell#fill_region, but is based on Region (with the cell being the first parameter).\n"
     "\n"
-    "This method has been introduced in version 0.27.\n"
+    "This method has been introduced in version 0.27. The 'exclude_area' argument has been added in version 0.30.4.\n"
   ) +
   gsi::method_ext ("fill", &fill_region_skew, gsi::arg ("in_cell"),
                                               gsi::arg ("fill_cell_index"),
-                                              gsi::arg ("fc_origin"),
+                                              gsi::arg ("fc_bbox"),
                                               gsi::arg ("row_step"),
                                               gsi::arg ("column_step"),
                                               gsi::arg ("origin", &default_origin, "(0, 0)"),
                                               gsi::arg ("remaining_parts", (db::Region *)0, "nil"),
                                               gsi::arg ("fill_margin", db::Vector ()),
                                               gsi::arg ("remaining_polygons", (db::Region *)0, "nil"),
-                                                   gsi::arg ("glue_box", db::Box ()),
+                                              gsi::arg ("glue_box", db::Box ()),
+                                              gsi::arg ("exclude_area", db::Region (), "empty"),
     "@brief A mapping of \\Cell#fill_region to the Region class\n"
     "\n"
     "This method is equivalent to \\Cell#fill_region, but is based on Region (with the cell being the first parameter).\n"
     "\n"
-    "This method has been introduced in version 0.27.\n"
+    "This method has been introduced in version 0.27. The 'exclude_area' argument has been added in version 0.30.4.\n"
   ) +
   gsi::method_ext ("fill_multi", &fill_region_multi, gsi::arg ("in_cell"),
                                                      gsi::arg ("fill_cell_index"),
-                                                     gsi::arg ("fc_origin"),
+                                                     gsi::arg ("fc_bbox"),
                                                      gsi::arg ("row_step"),
                                                      gsi::arg ("column_step"),
                                                      gsi::arg ("fill_margin", db::Vector ()),
                                                      gsi::arg ("remaining_polygons", (db::Region *)0, "nil"),
                                                      gsi::arg ("glue_box", db::Box ()),
+                                                     gsi::arg ("exclude_area", db::Region (), "empty"),
     "@brief A mapping of \\Cell#fill_region to the Region class\n"
     "\n"
     "This method is equivalent to \\Cell#fill_region, but is based on Region (with the cell being the first parameter).\n"
     "\n"
-    "This method has been introduced in version 0.27.\n"
+    "This method has been introduced in version 0.27. The 'exclude_area' argument has been added in version 0.30.4.\n"
   ) +
   gsi::method_ext ("nets", &nets, gsi::arg ("extracted"), gsi::arg ("net_prop_name", tl::Variant (), "nil"), gsi::arg ("net_filter", (const std::vector<const db::Net *> *) (0), "nil"),
     "@brief Pulls the net shapes from a LayoutToNetlist database\n"

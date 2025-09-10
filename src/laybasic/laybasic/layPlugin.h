@@ -161,6 +161,11 @@ public:
   PluginDeclaration ();
   
   /**
+   *  @brief Constructor with a fixed ID
+   */
+  PluginDeclaration (int id);
+
+  /**
    *  @brief Destructor
    */
   virtual ~PluginDeclaration ();
@@ -330,6 +335,18 @@ public:
   virtual void get_editor_options_pages (std::vector<lay::EditorOptionsPage *> & /*pages*/, lay::LayoutViewBase * /*view*/, lay::Dispatcher * /*dispatcher*/) const
   {
     //  .. no pages in the default implementation ..
+  }
+
+  /**
+   *  @brief Gets a value indicating whether "catchall" editor options pages shall be included
+   *
+   *  "catchall" editor options pages are ones that are unspecific and render a null "plugin_declaration".
+   *  A plugin can choose to include these pages if it listens to global configuration events.
+   *  Otherwise it should return false here to suppress these pages.
+   */
+  virtual bool enable_catchall_editor_options_pages () const
+  {
+    return true;
   }
 #endif
 
@@ -503,6 +520,18 @@ public:
    *  See above for a explanation of the parent-child relationship.
    */
   Plugin (Plugin *parent, bool standalone = false);
+
+  /**
+   *  @brief The default constructor
+   *
+   *  This constructor needs to be followed by init()
+   */
+  Plugin ();
+
+  /**
+   *  @brief Initialization, following the default constructor
+   */
+  void init (Plugin *parent, bool standalone = false);
 
   /**
    *  @brief The destructor

@@ -1441,8 +1441,10 @@ Shapes::replace_member_with_props (typename db::object_tag<Sh> tag, const shape_
   if (! layout ()) {
 
     if (needs_translate (tag)) {
+
       return reinsert_member_with_props (tag, ref, sh);
-    } else {
+
+    } else if (! ref.has_prop_id ()) {
 
       //  simple replace case
 
@@ -1459,7 +1461,21 @@ Shapes::replace_member_with_props (typename db::object_tag<Sh> tag, const shape_
         db::layer_op<Sh, db::stable_layer_tag>::queue_or_append (manager (), this, true /*insert*/, sh);
       }
 
-      return ref;
+    } else {
+
+      if (manager () && manager ()->transacting ()) {
+        check_is_editable_for_undo_redo ();
+        db::layer_op<db::object_with_properties<Sh>, db::stable_layer_tag>::queue_or_append (manager (), this, false /*not insert*/, *ref.basic_ptr (typename db::object_with_properties<Sh>::tag ()));
+      }
+
+      invalidate_state ();  //  HINT: must come before the change is done!
+
+      db::object_with_properties<Sh> swp (sh, ref.prop_id ());
+      get_layer<db::object_with_properties<Sh>, db::stable_layer_tag> ().replace (ref.basic_iter (typename db::object_with_properties<Sh>::tag ()), swp);
+
+      if (manager () && manager ()->transacting ()) {
+        db::layer_op<db::object_with_properties<Sh>, db::stable_layer_tag>::queue_or_append (manager (), this, true /*insert*/, swp);
+      }
 
     }
 
@@ -1514,9 +1530,9 @@ Shapes::replace_member_with_props (typename db::object_tag<Sh> tag, const shape_
 
     }
 
-    return ref;
-
   }
+
+  return ref;
 }
 
 //  explicit instantiations

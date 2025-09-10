@@ -197,7 +197,7 @@ InstService::sync_to_config ()
   dispatcher ()->config_set (cfg_edit_inst_lib_name, m_lib_name);
   dispatcher ()->config_set (cfg_edit_inst_cell_name, m_cell_or_pcell_name);
   if (m_is_pcell) {
-    dispatcher ()->config_set (cfg_edit_inst_pcell_parameters, pcell_parameters_to_string (m_pcell_parameters));
+    dispatcher ()->config_set (cfg_edit_inst_pcell_parameters, lay::pcell_parameters_to_string (m_pcell_parameters));
   } else {
     dispatcher ()->config_set (cfg_edit_inst_pcell_parameters, std::string ());
   }
@@ -531,7 +531,7 @@ InstService::configure (const std::string &name, const std::string &value)
 
   if (name == cfg_edit_inst_pcell_parameters) {
 
-    std::map<std::string, tl::Variant> pcp = pcell_parameters_from_string (value);
+    std::map<std::string, tl::Variant> pcp = lay::pcell_parameters_from_string (value);
     if (pcp != m_pcell_parameters) {
 
       m_pcell_parameters = pcp;
@@ -772,7 +772,7 @@ InstService::config_finalize ()
       //  TODO: it's somewhat questionable to do this inside "config_finalize" as this method is supposed
       //  to reflect changes rather than induce some.
       if (m_is_pcell) {
-        dispatcher ()->config_set (cfg_edit_inst_pcell_parameters, pcell_parameters_to_string (m_pcell_parameters));
+        dispatcher ()->config_set (cfg_edit_inst_pcell_parameters, lay::pcell_parameters_to_string (m_pcell_parameters));
       } else {
         dispatcher ()->config_set (cfg_edit_inst_pcell_parameters, std::string ());
       }

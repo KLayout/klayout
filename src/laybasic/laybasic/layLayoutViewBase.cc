@@ -398,21 +398,6 @@ LayoutViewBase::init (db::Manager *mgr)
 
   mp_canvas = new lay::LayoutCanvas (this);
 
-  //  occupy services and editables:
-  //  these services get deleted by the canvas destructor automatically:
-  if ((m_options & LV_NoTracker) == 0) {
-    mp_tracker = new lay::MouseTracker (this);
-  }
-  if ((m_options & LV_NoZoom) == 0) {
-    mp_zoom_service = new lay::ZoomService (this);
-  }
-  if ((m_options & LV_NoSelection) == 0) {
-    mp_selection_service = new lay::SelectionService (this);
-  }
-  if ((m_options & LV_NoMove) == 0) {
-    mp_move_service = new lay::MoveService (this);
-  }
-
   create_plugins ();
 }
 
@@ -602,20 +587,41 @@ void LayoutViewBase::create_plugins (const lay::PluginDeclaration *except_this)
   clear_plugins ();
 
   //  create the plugins
-  for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
+  for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ) {
 
-    if (&*cls != except_this) {
+    //  NOTE: during "create_plugin" a plugin may be unregistered, so don't increment the iterator after
+    auto current = cls.operator-> ();
+    std::string current_name = cls.current_name ();
+    ++cls;
+
+    if (current != except_this) {
 
       //  TODO: clean solution. The following is a HACK:
-      if (cls.current_name () == "ant::Plugin" || cls.current_name () == "img::Plugin") {
+      if (current_name == "ant::Plugin" || current_name == "img::Plugin") {
         //  ant and img are created always
-        create_plugin (&*cls);
+        create_plugin (current);
+      } else if (current_name == "laybasic::MouseTrackerPlugin") {
+        if ((m_options & LV_NoTracker) == 0) {
+          mp_tracker = dynamic_cast<lay::MouseTracker *> (create_plugin (current));
+        }
+      } else if (current_name == "laybasic::MoveServicePlugin") {
+        if ((m_options & LV_NoMove) == 0) {
+          mp_move_service = dynamic_cast<lay::MoveService *> (create_plugin (current));
+        }
+      } else if (current_name == "laybasic::SelectionServicePlugin") {
+        if ((m_options & LV_NoSelection) == 0) {
+          mp_selection_service = dynamic_cast<lay::SelectionService *> (create_plugin (current));
+        }
+      } else if (current_name == "laybasic::ZoomServicePlugin") {
+        if ((m_options & LV_NoZoom) == 0) {
+          mp_zoom_service = dynamic_cast<lay::ZoomService *> (create_plugin (current));
+        }
       } else if ((options () & LV_NoPlugins) == 0) {
         //  others: only create unless LV_NoPlugins is set
-        create_plugin (&*cls);
-      } else if ((options () & LV_NoGrid) == 0 && cls.current_name () == "GridNetPlugin") {
+        create_plugin (current);
+      } else if ((options () & LV_NoGrid) == 0 && current_name == "lay::GridNetPlugin") {
         //  except grid net plugin which is created on request
-        create_plugin (&*cls);
+        create_plugin (current);
       }
 
     }
@@ -681,6 +687,12 @@ LayoutViewBase::set_synchronous (bool s)
 
 void
 LayoutViewBase::message (const std::string & /*s*/, int /*timeout*/)
+{
+  //  .. nothing yet ..
+}
+
+void
+LayoutViewBase::set_focus ()
 {
   //  .. nothing yet ..
 }
@@ -762,14 +774,6 @@ bool
 LayoutViewBase::configure (const std::string &name, const std::string &value)
 {
   lay::Dispatcher::configure (name, value);
-
-  if (mp_move_service && mp_move_service->configure (name, value)) {
-    return true;
-  }
-
-  if (mp_tracker && mp_tracker->configure (name, value)) {
-    return true;
-  }
 
   if (name == cfg_default_lyp_file) {
 
@@ -1419,14 +1423,6 @@ LayoutViewBase::config_finalize ()
 void 
 LayoutViewBase::enable_edits (bool enable)
 {
-  //  enable or disable these services:
-  if (mp_selection_service) {
-    mp_selection_service->enable (enable);
-  }
-  if (mp_move_service) {
-    mp_move_service->enable (enable);
-  }
-
   //  enable or disable the services that implement "lay::ViewService"
   for (std::vector<lay::Plugin *>::iterator p = mp_plugins.begin (); p != mp_plugins.end (); ++p) {
     lay::ViewService *svc = (*p)->view_service_interface ();
@@ -1963,6 +1959,22 @@ LayoutViewBase::set_properties (unsigned int index, const LayerPropertiesList &p
     redraw_later ();
     m_prop_changed = true;
   }
+}
+
+void
+LayoutViewBase::clear_layers (unsigned int index)
+{
+  LayerPropertiesList ll;
+  ll.set_name (get_properties (index).name ());
+  set_properties (index, ll);
+}
+
+void
+LayoutViewBase::clear_layers ()
+{
+  LayerPropertiesList ll;
+  ll.set_name (get_properties ().name ());
+  set_properties (ll);
 }
 
 void 
@@ -4848,13 +4860,6 @@ LayoutViewBase::background_color (tl::Color c)
 
   do_set_background_color (c, contrast);
 
-  if (mp_selection_service) {
-    mp_selection_service->set_colors (c, contrast);
-  }
-  if (mp_zoom_service) {
-    mp_zoom_service->set_colors (c, contrast);
-  }
-
   //  Set the color for all ViewService interfaces
   for (std::vector<lay::Plugin *>::iterator p = mp_plugins.begin (); p != mp_plugins.end (); ++p) {
     lay::ViewService *svc = (*p)->view_service_interface ();
@@ -5517,7 +5522,7 @@ LayoutViewBase::paste_interactive (bool transient_mode)
   //  operations.
   trans->close ();
 
-  if (mp_move_service && mp_move_service->begin_move (trans.release (), transient_mode)) {
+  if (mp_move_service && mp_move_service->start_move (trans.release (), transient_mode)) {
     switch_mode (-1);  //  move mode
   }
 }
@@ -5796,20 +5801,12 @@ LayoutViewBase::mode (int m)
     m_mode = m;
     mp_active_plugin = 0;
 
-    if (m > 0) {
-
-      for (std::vector<lay::Plugin *>::iterator p = mp_plugins.begin (); p != mp_plugins.end (); ++p) {
-        if ((*p)->plugin_declaration ()->id () == m) {
-          mp_active_plugin = *p;
-          mp_canvas->activate ((*p)->view_service_interface ());
-          break;
-        }
+    for (std::vector<lay::Plugin *>::iterator p = mp_plugins.begin (); p != mp_plugins.end (); ++p) {
+      if ((*p)->plugin_declaration ()->id () == m) {
+        mp_active_plugin = *p;
+        mp_canvas->activate ((*p)->view_service_interface ());
+        break;
       }
-
-    } else if (m == 0 && mp_selection_service) {
-      mp_canvas->activate (mp_selection_service);
-    } else if (m == -1 && mp_move_service) {
-      mp_canvas->activate (mp_move_service);
     }
 
   }

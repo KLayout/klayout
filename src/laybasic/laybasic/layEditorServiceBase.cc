@@ -21,6 +21,8 @@
 */
 
 #include "layEditorServiceBase.h"
+#include "layEditorOptionsPage.h"
+#include "layEditorOptionsPages.h"
 #include "layViewport.h"
 #include "layLayoutViewBase.h"
 #include "laybasicConfig.h"
@@ -207,14 +209,24 @@ private:
 // --------------------------------------------------------------------------------------
 
 EditorServiceBase::EditorServiceBase (LayoutViewBase *view)
-  : lay::ViewService (view->canvas ()),
+  : lay::ViewService (view ? view->canvas () : 0),
     lay::Editable (view),
     lay::Plugin (view),
     mp_view (view),
     m_cursor_enabled (true),
-    m_has_tracking_position (false)
+    m_has_tracking_position (false),
+    m_active (false)
 {
   //  .. nothing yet ..
+}
+
+void
+EditorServiceBase::init (LayoutViewBase *view)
+{
+  mp_view = view;
+  lay::Plugin::init (view);
+  lay::ViewService::init (view ? view->canvas () : 0);
+  lay::Editable::init (view);
 }
 
 EditorServiceBase::~EditorServiceBase ()
@@ -265,9 +277,11 @@ EditorServiceBase::clear_mouse_cursors ()
 }
 
 void
-EditorServiceBase::mouse_cursor_from_snap_details (const lay::PointSnapToObjectResult &snap_details)
+EditorServiceBase::mouse_cursor_from_snap_details (const lay::PointSnapToObjectResult &snap_details, bool noclear)
 {
-  clear_mouse_cursors ();
+  if (! noclear) {
+    clear_mouse_cursors ();
+  }
 
   add_mouse_cursor (snap_details.snapped_point,
                     snap_details.object_snap == lay::PointSnapToObjectResult::ObjectVertex ||
@@ -319,15 +333,95 @@ void
 EditorServiceBase::deactivated ()
 {
   clear_mouse_cursors ();
+  if (ui ()) {
+    ui ()->ungrab_mouse (this);
+  }
+  m_active = false;
+}
+
+void
+EditorServiceBase::activated ()
+{
+  m_active = true;
+}
+
+#if defined(HAVE_QT)
+
+std::vector<lay::EditorOptionsPage *>
+EditorServiceBase::editor_options_pages ()
+{
+  lay::EditorOptionsPages *eo_pages = mp_view->editor_options_pages ();
+  if (!eo_pages) {
+    return std::vector<lay::EditorOptionsPage *> ();
+  } else {
+    std::vector<lay::EditorOptionsPage *> pages;
+    for (auto p = eo_pages->pages ().begin (); p != eo_pages->pages ().end (); ++p) {
+      if ((*p)->plugin_declaration () == plugin_declaration ()) {
+        pages.push_back (*p);
+      }
+    }
+    return pages;
+  }
+}
+
+lay::EditorOptionsPage *
+EditorServiceBase::focus_page ()
+{
+  auto pages = editor_options_pages ();
+  for (auto p = pages.begin (); p != pages.end (); ++p) {
+    if ((*p)->is_focus_page ()) {
+      return *p;
+    }
+  }
+
+  return 0;
+}
+
+bool
+EditorServiceBase::key_event (unsigned int key, unsigned int buttons)
+{
+  if (is_active () && key == Qt::Key_Tab && buttons == 0) {
+    focus_page_open ();
+    return true;
+  } else {
+    return false;
+  }
+}
+
+int
+EditorServiceBase::focus_page_open ()
+{
+  auto fp = focus_page ();
+  return fp ? fp->show () : 0;
 }
 
 void
 EditorServiceBase::show_error (tl::Exception &ex)
 {
   tl::error << ex.msg ();
-#if defined(HAVE_QT)
   QMessageBox::critical (ui ()->widget (), tr ("Error"), tl::to_qstring (ex.msg ()));
-#endif
 }
+
+#else
+
+bool
+EditorServiceBase::key_event (unsigned int key, unsigned int buttons)
+{
+  return false;
+}
+
+void
+EditorServiceBase::show_error (tl::Exception &ex)
+{
+  tl::error << ex.msg ();
+}
+
+int
+EditorServiceBase::focus_page_open ()
+{
+  return 0;
+}
+
+#endif
 
 }

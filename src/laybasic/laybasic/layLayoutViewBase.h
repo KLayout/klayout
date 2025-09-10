@@ -157,8 +157,8 @@ struct LAYBASIC_PUBLIC LayerDisplayProperties
  *  It manages the layer display list, bookmark list etc.
  */
 class LAYBASIC_PUBLIC LayoutViewBase :
-    public lay::Editables,
-    public lay::Dispatcher
+    public lay::Dispatcher,   //  needs to be first as it is the GSI base class
+    public lay::Editables
 {
 public:
   typedef lay::CellView::unspecific_cell_path_type cell_path_type;
@@ -294,6 +294,11 @@ public:
    *  @brief Display a status message
    */
   virtual void message (const std::string &s = "", int timeout = 10);
+
+  /**
+   *  @brief Sets the keyboard focus to the view
+   */
+  virtual void set_focus ();
 
   /**
    *  @brief The "dirty" flag indicates that one of the layout has been modified
@@ -510,18 +515,12 @@ public:
   /**
    *  @brief Clear the given layer view list
    */
-  void clear_layers (unsigned int index)
-  {
-    set_properties (index, LayerPropertiesList ());
-  }
+  void clear_layers (unsigned int index);
 
   /**
    *  @brief Clear the current layer view list
    */
-  void clear_layers ()
-  {
-    set_properties (LayerPropertiesList ());
-  }
+  void clear_layers ();
 
   /**
    *  @brief Access the current layer properties list

@@ -108,10 +108,37 @@ BoxService::do_mouse_move_inactive (const db::DPoint &p)
 void
 BoxService::do_mouse_move (const db::DPoint &p)
 {
-  do_mouse_move_inactive (p);
+  lay::PointSnapToObjectResult snap_details = snap2_details (p);
+  db::DPoint ps = snap_details.snapped_point;
+
+  if (snap_details.object_snap == lay::PointSnapToObjectResult::NoObject) {
+
+    clear_mouse_cursors ();
+
+    db::DPoint px (p.x (), m_p1.y ());
+    lay::PointSnapToObjectResult snap_details_x = snap2_details (px);
+
+    db::DPoint py (m_p1.x (), p.y ());
+    lay::PointSnapToObjectResult snap_details_y = snap2_details (py);
+
+    if (snap_details_x.object_snap != lay::PointSnapToObjectResult::NoObject) {
+      ps = db::DPoint (snap_details_x.snapped_point.x (), ps.y ());
+      mouse_cursor_from_snap_details (snap_details_x, true /*add*/);
+    }
+
+    if (snap_details_y.object_snap != lay::PointSnapToObjectResult::NoObject) {
+      ps = db::DPoint (ps.x (), snap_details_y.snapped_point.y ());
+      mouse_cursor_from_snap_details (snap_details_y, true /*add*/);
+    }
+
+    add_mouse_cursor (ps);
+
+  } else {
+    mouse_cursor_from_snap_details (snap_details);
+  }
 
   set_cursor (lay::Cursor::cross);
-  m_p2 = snap2 (p);
+  m_p2 = ps;
   update_marker ();
 }
 

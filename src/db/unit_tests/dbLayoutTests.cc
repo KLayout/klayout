@@ -294,7 +294,9 @@ TEST(2)
   EXPECT_EQ (g.hier_generation_id (), size_t (3));
 
   g.clear ();
+  EXPECT_EQ (g.update_needed (), true);
   g.update ();
+  EXPECT_EQ (g.update_needed (), false);
   el.reset ();
   EXPECT_EQ (g.hier_generation_id (), size_t (4));
 
@@ -387,7 +389,9 @@ TEST(3)
   EXPECT_EQ (el.hier_dirty, true);
 
   el.reset ();
+  EXPECT_EQ (g.update_needed (), true);
   g.update ();
+  EXPECT_EQ (g.update_needed (), false);
 
   top->shapes (0).insert (db::Box (0, 0, 10, 20));
   top->shapes (1).insert (db::Box (0, 0, 10, 20));

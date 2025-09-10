@@ -29,10 +29,10 @@
 #include "layPlugin.h"
 #include "layViewObject.h"
 #include "layMarker.h"
+#include "layEditorUtils.h"
 #include "dbLayout.h"
 #include "dbShape.h"
 #include "dbClipboard.h"
-#include "edtUtils.h"
 
 #include <set>
 #include <vector>

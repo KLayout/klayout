@@ -42,8 +42,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>542</width>
-        <height>243</height>
+        <width>528</width>
+        <height>248</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout">
@@ -292,6 +292,13 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>scrollArea</tabstop>
+  <tabstop>text_le</tabstop>
+  <tabstop>halign_cbx</tabstop>
+  <tabstop>valign_cbx</tabstop>
+  <tabstop>size_le</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

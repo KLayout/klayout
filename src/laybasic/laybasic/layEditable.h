@@ -72,6 +72,11 @@ public:
   Editable (Editables *editables = 0);
 
   /**
+   *  @brief Initializes after constructor with a null pointer was called
+   */
+  void init (Editables *editables);
+
+  /**
    *  @brief The constructor
    */
   virtual ~Editable ();

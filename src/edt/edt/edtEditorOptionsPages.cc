@@ -725,7 +725,7 @@ EditorOptionsInstPCellParam::apply (lay::Dispatcher *root)
     if (pc.first) {
       const db::PCellDeclaration *pc_decl = layout->pcell_declaration (pc.second);
       if (pc_decl) {
-        param = pcell_parameters_to_string (pc_decl->named_parameters (mp_pcell_parameters->get_parameters (&ok)));
+        param = lay::pcell_parameters_to_string (pc_decl->named_parameters (mp_pcell_parameters->get_parameters (&ok)));
       }
     }
   }

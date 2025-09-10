@@ -511,7 +511,7 @@ MeasureNetEval::put_func (const tl::Variant &name, const tl::Variant &value) con
 MeasureNetEval::AreaAndPerimeter
 MeasureNetEval::compute_area_and_perimeter (int layer_index) const
 {
-  if (layer_index < 0 || layer_index >= (unsigned int) m_layers.size ()) {
+  if (layer_index < 0 || layer_index >= (int) m_layers.size ()) {
     return AreaAndPerimeter ();
   }
 

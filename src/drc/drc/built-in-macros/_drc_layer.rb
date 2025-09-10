@@ -5755,6 +5755,8 @@ CODE
     # @li @b multi_origin @/b: lets the algorithm choose the origin and repeats the fill with different origins
     #     until no further fill cell can be fitted. @/li
     # @li @b fill_pattern(..) @/b: specifies the fill pattern. @/li
+    # @li @b fill_exclude(excl) @/b: specifies a fill exclude region ('excl' is a polygon layer). This is conceptually 
+    #     equivalent to subtracting that layer from the fill region, but usually more efficient. @/li
     # @/ul
     #
     # "fill_pattern" generates a fill pattern object. This object is used for configuring the fill pattern
@@ -5895,6 +5897,7 @@ CODE
       pattern = nil
       origin = RBA::DPoint::new
       repeat = false
+      excl = nil
 
       args.each_with_index do |a,ai|
         if a.is_a?(DRCSource)
@@ -5907,6 +5910,11 @@ CODE
             raise("Duplicate fill pattern specification for '#{m}' at argument ##{ai+1}")
           end
           pattern = a
+        elsif a.is_a?(DRCFillExclude)
+          if excl
+            raise("Duplicate exclude region specification for '#{m}' at argument ##{ai+1}")
+          end
+          excl = a.excl
         elsif a.is_a?(DRCFillStep)
           if a.for_row
             if row_step
@@ -5936,6 +5944,10 @@ CODE
       end
       if !column_step
         column_step = RBA::DVector::new(0, pattern.default_ypitch)
+      end
+
+      if !excl
+        excl = RBA::Region::new
       end
 
       dbu_trans = RBA::VCplxTrans::new(1.0 / @engine.dbu)
@@ -5988,6 +6000,7 @@ CODE
         tp.var("fc_index", fc_index)
         tp.var("repeat", repeat)
         tp.var("with_left", with_left)
+        tp.var("excl", excl)
 
         tp.queue(<<"END")
           var tc_box = _frame.bbox;
@@ -5997,8 +6010,8 @@ CODE
             tile_box = tile_box & tc_box;
             var left = with_left ? Region.new : nil;
             repeat ? 
-              (region & tile_box).fill_multi(top_cell, fc_index, fc_box, rs, cs, fill_margin, left, _tile.bbox) :
-              (region & tile_box).fill(top_cell, fc_index, fc_box, rs, cs, origin, left, fill_margin, left, _tile.bbox);
+              (region & tile_box).fill_multi(top_cell, fc_index, fc_box, rs, cs, fill_margin, left, _tile.bbox, excl) :
+              (region & tile_box).fill(top_cell, fc_index, fc_box, rs, cs, origin, left, fill_margin, left, _tile.bbox, excl);
             with_left && _output(#{result_arg}, left)
           )
 END
@@ -6020,9 +6033,9 @@ END
 
         @engine.run_timed("\"#{m}\" in: #{@engine.src_line}", self.data) do
           if repeat
-            self.data.fill_multi(top_cell, fc_index, fc_box, rs, cs, fill_margin, result)
+            self.data.fill_multi(top_cell, fc_index, fc_box, rs, cs, fill_margin, result, RBA::Box::new, excl)
           else
-            self.data.fill(top_cell, fc_index, fc_box, rs, cs, origin, result, fill_margin, result)
+            self.data.fill(top_cell, fc_index, fc_box, rs, cs, origin, result, fill_margin, result, RBA::Box::new, excl)
           end
         end
 

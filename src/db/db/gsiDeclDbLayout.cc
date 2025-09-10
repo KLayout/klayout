@@ -1758,6 +1758,13 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "is ongoing or the layout is brought into invalid state by\n"
     "\"start_changes\".\n"
   ) +
+  gsi::method ("update_needed", &db::Layout::update_needed,
+    "@brief Gets a value indicating whether the Layout object needs an update\n"
+    "If this method returns false, \\update will not do anything. This is useful to force an update at "
+    "specific times during 'under_construction' conditions.\n"
+    "\n"
+    "This method has been introduced in version 0.30.4."
+  ) +
   gsi::method ("update", (void (db::Layout::*) ()) &db::Layout::force_update,
     "@brief Updates the internals of the layout\n"
     "This method updates the internal state of the layout. Usually this is done automatically\n"

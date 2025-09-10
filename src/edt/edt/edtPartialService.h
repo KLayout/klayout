@@ -30,9 +30,9 @@
 #include "layViewObject.h"
 #include "layRubberBox.h"
 #include "laySnap.h"
+#include "layEditorUtils.h"
 #include "tlAssert.h"
 #include "tlDeferredExecution.h"
-#include "edtUtils.h"
 #include "edtConfig.h"
 #include "edtEditorHooks.h"
 
@@ -400,7 +400,7 @@ private:
   db::DEdge single_selected_edge () const;
   bool handle_guiding_shape_changes ();
   void transform_selection (const db::DTrans &move_trans);
-  db::Shape modify_shape (TransformationVariants &tv, const db::Shape &shape_in, const lay::ObjectInstPath &path, const std::set<EdgeWithIndex> &sel, const db::DTrans &move_trans, std::map <EdgeWithIndex, db::Edge> &new_edges, std::map <PointWithIndex, db::Point> &new_points);
+  db::Shape modify_shape (lay::TransformationVariants &tv, const db::Shape &shape_in, const lay::ObjectInstPath &path, const std::set<EdgeWithIndex> &sel, const db::DTrans &move_trans, std::map <EdgeWithIndex, db::Edge> &new_edges, std::map <PointWithIndex, db::Point> &new_points);
 
   void open_editor_hooks ();
   void close_editor_hooks (bool commit);

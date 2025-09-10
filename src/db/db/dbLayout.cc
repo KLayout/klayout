@@ -1780,7 +1780,7 @@ Layout::force_update ()
   //  NOTE: the assumption is that either one thread is writing or
   //  multiple threads are reading. Hence, we do not need to lock hier_dirty() or bboxes_dirty().
   //  We still do double checking as another thread might do the update as well.
-  if (! hier_dirty () && ! bboxes_dirty ()) {
+  if (! update_needed ()) {
     return;
   }
 
@@ -1829,10 +1829,16 @@ Layout::update () const
   }
 }
 
+bool
+Layout::update_needed () const
+{
+  return hier_dirty () || bboxes_dirty ();
+}
+
 void 
 Layout::do_update ()
 {
-  if (! hier_dirty () && ! bboxes_dirty ()) {
+  if (! update_needed ()) {
     return;
   }
 

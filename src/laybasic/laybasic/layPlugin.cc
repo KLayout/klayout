@@ -55,6 +55,12 @@ PluginDeclaration::PluginDeclaration ()
     // .. nothing yet ..
 }
 
+PluginDeclaration::PluginDeclaration (int id)
+  : m_id (id), m_editable_enabled (true)
+{
+    // .. nothing yet ..
+}
+
 PluginDeclaration::~PluginDeclaration ()
 {
   if (Dispatcher::instance ()) {
@@ -309,8 +315,23 @@ PluginDeclaration::register_plugin ()
 //  Plugin implementation
 
 Plugin::Plugin (Plugin *parent, bool standalone)
-  : mp_parent (parent), mp_plugin_declaration (0), dm_finalize_config (this, &lay::Plugin::config_end), m_standalone (standalone)
+  : mp_parent (0), mp_plugin_declaration (0), dm_finalize_config (this, &lay::Plugin::config_end), m_standalone (false)
 {
+  init (parent, standalone);
+}
+
+Plugin::Plugin ()
+  : mp_parent (0), mp_plugin_declaration (0), dm_finalize_config (this, &lay::Plugin::config_end), m_standalone (false)
+{
+  //  .. nothing yet (waiting for init) ..
+}
+
+void
+Plugin::init (Plugin *parent, bool standalone)
+{
+  mp_parent = parent;
+  m_standalone = standalone;
+
   if (! parent) {
     if (! standalone) {
       //  load the root with the default configuration
@@ -324,6 +345,7 @@ Plugin::Plugin (Plugin *parent, bool standalone)
     mp_parent->m_children.push_back (this);
   }
 }
+
 
 Plugin::~Plugin ()
 {

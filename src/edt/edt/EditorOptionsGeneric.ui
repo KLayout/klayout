@@ -470,6 +470,7 @@
   <tabstop>grid_cb</tabstop>
   <tabstop>edit_grid_le</tabstop>
   <tabstop>snap_objects_cbx</tabstop>
+  <tabstop>snap_objects_to_grid_cbx</tabstop>
   <tabstop>conn_angle_cb</tabstop>
   <tabstop>move_angle_cb</tabstop>
   <tabstop>hier_sel_cbx</tabstop>

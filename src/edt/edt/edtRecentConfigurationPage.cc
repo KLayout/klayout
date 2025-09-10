@@ -23,11 +23,11 @@
 #if defined(HAVE_QT)
 
 #include "edtRecentConfigurationPage.h"
-#include "edtUtils.h"
 #include "layDispatcher.h"
 #include "layLayoutViewBase.h"
 #include "layLayerTreeModel.h"
 #include "layBusy.h"
+#include "layEditorUtils.h"
 #include "dbLibraryManager.h"
 #include "dbLibrary.h"
 #include "tlLog.h"
@@ -267,7 +267,7 @@ RecentConfigurationPage::render_to (QTreeWidgetItem *item, int column, const std
         std::map<std::string, tl::Variant> pcp;
         for (std::list<ConfigurationDescriptor>::const_iterator c = m_cfg.begin (); c != m_cfg.end (); ++c, ++pcp_column) {
           if (c->rendering == RecentConfigurationPage::PCellParameters) {
-            pcp = pcell_parameters_from_string (values [pcp_column]);
+            pcp = lay::pcell_parameters_from_string (values [pcp_column]);
             break;
           }
         }
@@ -296,7 +296,7 @@ RecentConfigurationPage::render_to (QTreeWidgetItem *item, int column, const std
     {
       std::map<std::string, tl::Variant> pcp;
       try {
-        pcp = pcell_parameters_from_string (values [column]);
+        pcp = lay::pcell_parameters_from_string (values [column]);
       } catch (tl::Exception &ex) {
         tl::error << tl::to_string (tr ("Configuration error (PCellParameters): ")) << ex.msg ();
       }
@@ -384,7 +384,7 @@ RecentConfigurationPage::item_clicked (QTreeWidgetItem *item)
         ex.read (cv_index);
       }
 
-      edt::set_or_request_current_layer (view (), lp, cv_index);
+      lay::set_or_request_current_layer (view (), lp, cv_index);
 
     } else {
       dispatcher ()->config_set (c->cfg_name, v);

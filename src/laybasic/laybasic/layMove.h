@@ -24,25 +24,25 @@
 #define HDR_layMove
 
 #include "laybasicCommon.h"
+#include "layEditorServiceBase.h"
 #include "dbManager.h"
-#include "layViewObject.h"
 
 #include <memory>
 
 namespace lay {
 
-class Editables;
 class LayoutViewBase;
 
 class LAYBASIC_PUBLIC MoveService :
-    public lay::ViewService
+    public lay::EditorServiceBase
 {
 public: 
   MoveService (lay::LayoutViewBase *view);
   ~MoveService ();
 
+  bool start_move (db::Transaction *transaction = 0, bool transient_selection = false);
+
   bool configure (const std::string &name, const std::string &value);
-  bool begin_move (db::Transaction *transaction = 0, bool transient_selection = false);
   void finish ();
   void cancel ();
 
@@ -56,6 +56,7 @@ private:
   virtual bool key_event (unsigned int key, unsigned int buttons);
   virtual void drag_cancel ();
   virtual void deactivated ();
+  int focus_page_open ();
 
   bool handle_click (const db::DPoint &p, unsigned int buttons, bool drag_transient, db::Transaction *transaction);
 

@@ -976,7 +976,7 @@ marker.destroy</pre>
   <p>
   The PluginFactory itself acts as a singleton per plugin class and provides not only the ability to create
   Plugin objects but also a couple of configuration options and a global handler for configuration and menu
-  events. The configuration includes: 
+  events. The PluginFactory provides:
   </p>
 
   <ul>
@@ -990,6 +990,10 @@ marker.destroy</pre>
     convenient to register configuration keys in the PluginFactory's constructor using the <class_doc href="PluginFactory#add_option"/> method.
     After an option is configured, the individual Plugin objects and the PluginFactory receives "configure" calls 
     when a configuration option changes or for the initial configuration.
+    </li>
+    <li>Widgets: The plugin factory can provide widgets for the configuration dialog ('File/Setup') and the
+    editor options dock. Respective callbacks are <class_doc href="PluginFactory#create_config_pages"/>
+    and <class_doc href="PluginFactory#create_editor_options_pages"/>.
     </li>
   </ul>
 
@@ -1046,6 +1050,30 @@ marker.destroy</pre>
   plugin can set the mouse cursor to a specific shape for example. A plugin should consider implementing "drag_cancel" 
   in order to terminate any pending dragging operations. <class_doc href="Plugin#drag_cancel"/> is called by KLayout to regain control 
   over the mouse in certain circumstances and is supposed to put the plugin into a "watching" instead of "dragging" state.
+  </p>
+
+  <p>
+  A plugin may also create markers for visual feedback and highlights. This can be done explicitly
+  using marker objects (<class_doc href="Marker"/>) or in a application-defined fashion by generating
+  mouse cursors. The API functions for this purpose are <class_doc href="Plugin#clear_mouse_cursors"/>,
+  <class_doc href="Plugin#add_mouse_cursor"/> and <class_doc href="Plugin#add_edge_marker"/>. These
+  functions provide cursors and highlights that match the visual effects of other plugins and
+  interface with the mouse tracking feature of the application.
+  </p>
+
+  <p>
+  Another service the Plugin class provides is snapping: 
+  there exist a number of global configuration options which control snapping (grids, snapping to
+  objects, angle constraints). The plugin offers a number of snap functions that follow the
+  application's current configuration and implement snapping accordingly. These methods are
+  <class_doc href="Plugin#snap"/> and <class_doc href="Plugin#snap2"/>. While the first
+  method provides grid and angle snapping, the second also implements snapping to layout objects.
+  </p>
+
+  <p>
+  The "drag box" sample macro demonstrates many of these features.
+  The sample is available from the macro templates when you create a new 
+  macro in the macro IDE.
   </p>
 
 </doc>

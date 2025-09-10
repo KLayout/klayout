@@ -21,15 +21,18 @@
 */
 
 
-#ifndef HDR_edtUtils
-#define HDR_edtUtils
+#ifndef HDR_layEditorUtils
+#define HDR_layEditorUtils
 
 #include <limits>
 #include <list>
 #include <utility>
 #include <vector>
 
+#include "laybasicCommon.h"
+
 #include "layObjectInstPath.h"
+#include "laySnap.h"
 
 #include "dbInstElement.h"
 #include "dbClipboardData.h"
@@ -38,23 +41,34 @@
 
 namespace lay
 {
-  class LayoutViewBase;
-  class Dispatcher;
-}
 
-namespace edt {
+class LayoutViewBase;
+class Dispatcher;
 
-class Service;
+// -------------------------------------------------------------
+
+/**
+ *  @brief Gets the snap range in pixels
+ */
+LAYBASIC_PUBLIC int snap_range_pixels ();
+
+/**
+ *  @brief Convert a button flag set to an angle constraint
+ *
+ *  This implements the standard modifiers for angle constraints - i.e.
+ *  ortho for "Shift".
+ */
+LAYBASIC_PUBLIC lay::angle_constraint_type ac_from_buttons (unsigned int buttons);
 
 /**
  *  @brief Serializes PCell parameters to a string
  */
-std::string pcell_parameters_to_string (const std::map<std::string, tl::Variant> &parameters);
+LAYBASIC_PUBLIC std::string pcell_parameters_to_string (const std::map<std::string, tl::Variant> &parameters);
 
 /**
  *  @brief Deserializes PCell parameters from a string
  */
-std::map<std::string, tl::Variant> pcell_parameters_from_string (const std::string &s);
+LAYBASIC_PUBLIC std::map<std::string, tl::Variant> pcell_parameters_from_string (const std::string &s);
 
 /**
  *  @brief Fetch PCell parameters from a cell and merge the guiding shapes into them
@@ -64,6 +78,7 @@ std::map<std::string, tl::Variant> pcell_parameters_from_string (const std::stri
  *  @param parameters_for_pcell Will receive the parameters
  *  @return true, if the cell is a PCell and parameters have been fetched 
  */
+LAYBASIC_PUBLIC
 bool
 get_parameters_from_pcell_and_guiding_shapes (db::Layout *layout, db::cell_index_type cell_index, db::pcell_parameters_type &parameters_for_pcell);
 
@@ -71,23 +86,14 @@ get_parameters_from_pcell_and_guiding_shapes (db::Layout *layout, db::cell_index
 /**
  *  @brief Request to make the given layer the current one (asks whether to create the layer if needed)
  */
+LAYBASIC_PUBLIC
 bool
 set_or_request_current_layer (lay::LayoutViewBase *view, const db::LayerProperties &lp, unsigned int cv_index, bool make_current = true);
 
 /**
- *  @brief A helper class that identifies clipboard data for edt::
- */
-class ClipboardData
-  : public db::ClipboardData
-{
-public:
-  ClipboardData () { }
-};
-
-/**
  *  @brief A cache for the transformation variants for a certain layer and cell view index for a lay::LayoutView
  */
-class TransformationVariants
+class LAYBASIC_PUBLIC TransformationVariants
 {
 public:
   TransformationVariants (const lay::LayoutViewBase *view, bool per_cv_and_layer = true, bool per_cv = true);

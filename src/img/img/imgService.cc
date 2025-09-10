@@ -1080,6 +1080,7 @@ Service::edit_cancel ()
 {
   if (m_move_mode != move_none) {
     m_move_mode = move_none;
+    m_selected.clear ();
     selection_to_view ();
   }
 }
@@ -1118,14 +1119,27 @@ Service::paste ()
 {
   if (db::Clipboard::instance ().begin () != db::Clipboard::instance ().end ()) {
 
+    std::vector<const db::DUserObject *> new_objects;
+
     for (db::Clipboard::iterator c = db::Clipboard::instance ().begin (); c != db::Clipboard::instance ().end (); ++c) {
       const db::ClipboardValue<img::Object> *value = dynamic_cast<const db::ClipboardValue<img::Object> *> (*c);
       if (value) {
         img::Object *image = new img::Object (value->get ());
-        mp_view->annotation_shapes ().insert (db::DUserObject (image));
+        new_objects.push_back (&mp_view->annotation_shapes ().insert (db::DUserObject (image)));
       }
     }
 
+    //  make new objects selected
+
+    if (! new_objects.empty ()) {
+
+      for (auto r = new_objects.begin (); r != new_objects.end (); ++r) {
+        m_selected.insert (mp_view->annotation_shapes ().iterator_from_pointer (*r));
+      }
+
+      selection_to_view ();
+
+    }
   }
 }
 

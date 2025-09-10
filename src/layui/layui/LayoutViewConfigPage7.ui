@@ -390,6 +390,14 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>oversampling</tabstop>
+  <tabstop>subres_mode</tabstop>
+  <tabstop>highres_mode</tabstop>
+  <tabstop>default_font_size</tabstop>
+  <tabstop>global_trans</tabstop>
+  <tabstop>def_depth</tabstop>
+ </tabstops>
  <resources>
   <include location="../../icons/icons.qrc"/>
  </resources>

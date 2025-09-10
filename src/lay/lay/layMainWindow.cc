@@ -1664,32 +1664,38 @@ MainWindow::select_mode (int m)
       }
     }
 
-    //  if the current mode supports editing, show the editor options panel
+    update_editor_options_dock ();
 
-    const lay::PluginDeclaration *pd_sel = 0;
-    for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
-      const lay::PluginDeclaration *pd = cls.operator-> ();
-      if (pd->id () == m_mode) {
-        pd_sel = pd;
-      }
-    }
+  }
+}
 
-    bool eo_visible = false;
-    if (mp_eo_stack && pd_sel) {
-      eo_visible = pd_sel->editable_enabled ();
-    }
-    if (current_view () && eo_visible) {
-      lay::EditorOptionsPages *eo_pages = current_view ()->editor_options_pages ();
-      if (! eo_pages || ! eo_pages->has_content ()) {
-        eo_visible = false;
-      }
-    }
+void
+MainWindow::update_editor_options_dock ()
+{
+  //  if the current mode supports editing, show the editor options panel
 
-    if (eo_visible != m_eo_visible) {
-      m_eo_visible = eo_visible;
-      show_dock_widget (mp_eo_dock_widget, m_eo_visible);
+  const lay::PluginDeclaration *pd_sel = 0;
+  for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
+    const lay::PluginDeclaration *pd = cls.operator-> ();
+    if (pd->id () == m_mode) {
+      pd_sel = pd;
     }
+  }
 
+  bool eo_visible = false;
+  if (mp_eo_stack && pd_sel) {
+    eo_visible = pd_sel->editable_enabled ();
+  }
+  if (current_view () && eo_visible) {
+    lay::EditorOptionsPages *eo_pages = current_view ()->editor_options_pages ();
+    if (! eo_pages || ! eo_pages->has_content ()) {
+      eo_visible = false;
+    }
+  }
+
+  if (eo_visible != m_eo_visible) {
+    m_eo_visible = eo_visible;
+    show_dock_widget (mp_eo_dock_widget, m_eo_visible);
   }
 }
 
@@ -2439,6 +2445,7 @@ MainWindow::select_view (int index)
 
     current_view_changed ();
 
+    update_editor_options_dock ();
     clear_current_pos ();
     edits_enabled_changed ();
     clear_message ();
@@ -4381,6 +4388,11 @@ MainWindow::plugin_registered (lay::PluginDeclaration *cls)
   for (std::vector <lay::LayoutViewWidget *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
     (*vp)->view ()->create_plugins ();
   }
+
+  //  regenerate the setup form
+  delete mp_setup_form;
+  mp_setup_form = new SettingsForm (0, dispatcher (), "setup_form"),
+  mp_setup_form->setup ();
 }
 
 void

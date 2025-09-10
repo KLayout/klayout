@@ -26,6 +26,7 @@
 #define HDR_layZoomBox
 
 #include "layViewObject.h"
+#include "layPlugin.h"
 
 namespace lay
 {
@@ -35,7 +36,7 @@ class LayoutCanvas;
 class RubberBox;
 
 class LAYBASIC_PUBLIC ZoomService
-  : public lay::ViewService
+  : public lay::ViewService, public lay::Plugin
 {
 public: 
   ZoomService (lay::LayoutViewBase *view);
@@ -44,6 +45,11 @@ public:
   void set_colors (tl::Color background, tl::Color text);
   void begin (const db::DPoint &pos);
   void begin_pan (const db::DPoint &pos);
+
+  lay::ViewService *view_service_interface ()
+  {
+    return this;
+  }
 
 private:
   virtual bool mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio);

@@ -43,27 +43,6 @@ namespace edt
 {
 
 // -------------------------------------------------------------
-//  Convert buttons to an angle constraint
-
-lay::angle_constraint_type 
-ac_from_buttons (unsigned int buttons)
-{
-  if ((buttons & lay::ShiftButton) != 0) {
-    if ((buttons & lay::ControlButton) != 0) {
-      return lay::AC_Any;
-    } else {
-      return lay::AC_Ortho;
-    }
-  } else {
-    if ((buttons & lay::ControlButton) != 0) {
-      return lay::AC_Diagonal;
-    } else {
-      return lay::AC_Global;
-    }
-  }
-}
-
-// -------------------------------------------------------------
 
 Service::Service (db::Manager *manager, lay::LayoutViewBase *view, db::ShapeIterator::flags_type flags)
   : lay::EditorServiceBase (view),
@@ -301,12 +280,10 @@ Service::snap (const db::DPoint &p, const db::DPoint &plast, bool connect) const
   return snap (ps);
 }
 
-const int sr_pixels = 8; // TODO: make variable
-
 lay::PointSnapToObjectResult
 Service::snap2_details (const db::DPoint &p) const
 {
-  double snap_range = ui ()->mouse_event_trans ().inverted ().ctrans (sr_pixels);
+  double snap_range = ui ()->mouse_event_trans ().inverted ().ctrans (lay::snap_range_pixels ());
   return lay::obj_snap (m_snap_to_objects ? view () : 0, p, m_edit_grid == db::DVector () ? m_global_grid : m_edit_grid, snap_range);
 }
 
@@ -319,7 +296,7 @@ Service::snap2 (const db::DPoint &p) const
 db::DPoint 
 Service::snap2 (const db::DPoint &p, const db::DPoint &plast, bool connect) const
 {
-  double snap_range = ui ()->mouse_event_trans ().inverted ().ctrans (sr_pixels);
+  double snap_range = ui ()->mouse_event_trans ().inverted ().ctrans (lay::snap_range_pixels ());
   return lay::obj_snap (m_snap_to_objects ? view () : 0, plast, p, m_edit_grid == db::DVector () ? m_global_grid : m_edit_grid, connect ? connect_ac () : move_ac (), snap_range).snapped_point;
 }
 
@@ -616,7 +593,7 @@ Service::selection_bbox ()
 {
   //  build the transformation variants cache 
   //  TODO: this is done multiple times - once for each service!
-  TransformationVariants tv (view ());
+  lay::TransformationVariants tv (view ());
   const db::DCplxTrans &vp = view ()->viewport ().trans ();
 
   lay::TextInfo text_info (view ());
@@ -710,7 +687,7 @@ Service::transform (const db::DCplxTrans &trans, const std::vector<db::DCplxTran
   }
 
   //  build the transformation variants cache
-  TransformationVariants tv (view ());
+  lay::TransformationVariants tv (view ());
 
   //  1.) first transform all shapes
 
@@ -891,7 +868,7 @@ Service::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
 
     if (m_editing || m_immediate) {
 
-      m_alt_ac = ac_from_buttons (buttons);
+      m_alt_ac = lay::ac_from_buttons (buttons);
 
       if (! m_editing) {
         //  in this mode, ignore exceptions here since it is rather annoying to have messages popping
@@ -926,7 +903,7 @@ Service::mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio
     
     if ((buttons & lay::LeftButton) != 0) {
 
-      m_alt_ac = ac_from_buttons (buttons);
+      m_alt_ac = lay::ac_from_buttons (buttons);
 
       if (! m_editing) {
 
@@ -971,7 +948,7 @@ bool
 Service::mouse_double_click_event (const db::DPoint & /*p*/, unsigned int buttons, bool prio)
 {
   if (m_editing && prio && (buttons & lay::LeftButton) != 0) {
-    m_alt_ac = ac_from_buttons (buttons);
+    m_alt_ac = lay::ac_from_buttons (buttons);
     do_finish_edit ();
     m_editing = false;
     set_edit_marker (0);
@@ -986,7 +963,7 @@ bool
 Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio)
 {
   if (view ()->is_editable () && prio && (buttons & lay::RightButton) != 0 && m_editing) {
-    m_alt_ac = ac_from_buttons (buttons);
+    m_alt_ac = lay::ac_from_buttons (buttons);
     do_mouse_transform (p, db::DFTrans (db::DFTrans::r90));
     m_alt_ac = lay::AC_Global;
     return true;
@@ -1777,7 +1754,7 @@ Service::do_selection_to_view ()
   m_markers.reserve (selection_size ());
 
   //  build the transformation variants cache
-  TransformationVariants tv (view ());
+  lay::TransformationVariants tv (view ());
 
   //  prepare a default transformation for empty variants
   std::vector<db::DCplxTrans> empty_tv;
@@ -1955,7 +1932,7 @@ Service::handle_guiding_shape_changes (const lay::ObjectInstPath &obj, bool comm
 
   //  Hint: get_parameters_from_pcell_and_guiding_shapes invalidates the shapes because it resets the changed
   //  guiding shapes. We must not access s->shape after that.
-  if (! get_parameters_from_pcell_and_guiding_shapes (layout, obj.cell_index (), parameters_for_pcell)) {
+  if (! lay::get_parameters_from_pcell_and_guiding_shapes (layout, obj.cell_index (), parameters_for_pcell)) {
     return std::make_pair (false, lay::ObjectInstPath ());
   }
 

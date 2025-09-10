@@ -25,6 +25,7 @@ editor_hooks_sample.lym
 qt_designer.lym
 qt_dialog.lym
 qt_server.lym
+drag_box_sample.lym
 
 [pymacros]
 # General group
@@ -45,4 +46,5 @@ editor_hooks_sample_python.lym
 qt_designer_python.lym
 qt_dialog_python.lym
 qt_server_python.lym
+drag_box_sample_python.lym
 

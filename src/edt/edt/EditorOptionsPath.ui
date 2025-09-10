@@ -268,6 +268,13 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>scrollArea</tabstop>
+  <tabstop>width_le</tabstop>
+  <tabstop>type_cb</tabstop>
+  <tabstop>start_ext_le</tabstop>
+  <tabstop>end_ext_le</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

@@ -184,6 +184,11 @@ public:
   void message (const std::string &s = "", int timeout = 10);
 
   /**
+   *  @brief Sets the keyboard focus to the view
+   */
+  virtual void set_focus ();
+
+  /**
    *  @brief Select a certain mode (by index)
    */
   virtual void mode (int m);

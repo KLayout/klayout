@@ -25,8 +25,7 @@
 #include "dbLayout.h"
 #include "dbLibrary.h"
 
-#include "edtUtils.h"
-#include "edtService.h"
+#include "layEditorUtils.h"
 
 #include "layCellView.h"
 #include "layLayoutViewBase.h"
@@ -38,9 +37,34 @@
 #  include <QMessageBox>
 #endif
 
-namespace edt {
+namespace lay
+{
 
 // -------------------------------------------------------------
+
+int snap_range_pixels ()
+{
+  return 8; // TODO: make variable
+}
+
+//  Convert buttons to an angle constraint
+lay::angle_constraint_type
+ac_from_buttons (unsigned int buttons)
+{
+  if ((buttons & lay::ShiftButton) != 0) {
+    if ((buttons & lay::ControlButton) != 0) {
+      return lay::AC_Any;
+    } else {
+      return lay::AC_Ortho;
+    }
+  } else {
+    if ((buttons & lay::ControlButton) != 0) {
+      return lay::AC_Diagonal;
+    } else {
+      return lay::AC_Global;
+    }
+  }
+}
 
 std::string pcell_parameters_to_string (const std::map<std::string, tl::Variant> &parameters)
 {

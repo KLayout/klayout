@@ -1,52 +1,51 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>TextPropertiesPage</class>
- <widget class="QWidget" name="TextPropertiesPage" >
-  <property name="geometry" >
+ <widget class="QWidget" name="TextPropertiesPage">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>555</width>
-    <height>366</height>
+    <width>568</width>
+    <height>375</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" >
-   <property name="margin" >
+  <layout class="QGridLayout">
+   <property name="margin" stdset="0">
     <number>9</number>
    </property>
-   <property name="spacing" >
+   <property name="spacing">
     <number>6</number>
    </property>
-   <item row="2" column="3" >
-    <widget class="QLabel" name="label_7" >
-     <property name="text" >
+   <item row="2" column="3">
+    <widget class="QLabel" name="label_7">
+     <property name="text">
       <string>y = </string>
      </property>
     </widget>
    </item>
-   <item row="2" column="2" >
-    <widget class="QLineEdit" name="x_le" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>7</hsizetype>
-       <vsizetype>0</vsizetype>
+   <item row="2" column="2">
+    <widget class="QLineEdit" name="x_le">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
        <horstretch>1</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
     </widget>
    </item>
-   <item row="3" column="0" colspan="5" >
+   <item row="3" column="0" colspan="5">
     <spacer>
-     <property name="orientation" >
+     <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <property name="sizeType" >
+     <property name="sizeType">
       <enum>QSizePolicy::Fixed</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
        <height>8</height>
@@ -54,19 +53,19 @@
      </property>
     </spacer>
    </item>
-   <item row="6" column="0" >
-    <widget class="QLabel" name="Text size" >
-     <property name="text" >
+   <item row="6" column="0">
+    <widget class="QLabel" name="Text size">
+     <property name="text">
       <string>Text size</string>
      </property>
     </widget>
    </item>
-   <item row="11" column="0" colspan="5" >
+   <item row="11" column="0" colspan="5">
     <spacer>
-     <property name="orientation" >
+     <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>457</width>
        <height>51</height>
@@ -74,22 +73,22 @@
      </property>
     </spacer>
    </item>
-   <item row="1" column="0" >
-    <widget class="QLabel" name="label_2" >
-     <property name="text" >
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
       <string>Text</string>
      </property>
     </widget>
    </item>
-   <item row="8" column="0" colspan="5" >
+   <item row="8" column="0" colspan="5">
     <spacer>
-     <property name="orientation" >
+     <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <property name="sizeType" >
+     <property name="sizeType">
       <enum>QSizePolicy::Fixed</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>431</width>
        <height>8</height>
@@ -97,34 +96,34 @@
      </property>
     </spacer>
    </item>
-   <item row="2" column="1" >
-    <widget class="QLabel" name="label_5" >
-     <property name="text" >
+   <item row="2" column="1">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
       <string>x = </string>
      </property>
     </widget>
    </item>
-   <item row="12" column="0" colspan="5" >
-    <widget class="QFrame" name="button_frame" >
-     <property name="frameShape" >
+   <item row="12" column="0" colspan="5">
+    <widget class="QFrame" name="button_frame">
+     <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
-     <property name="frameShadow" >
+     <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QHBoxLayout" >
-      <property name="margin" >
-       <number>0</number>
-      </property>
-      <property name="spacing" >
+     <layout class="QHBoxLayout">
+      <property name="spacing">
        <number>6</number>
+      </property>
+      <property name="margin" stdset="0">
+       <number>0</number>
       </property>
       <item>
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>211</width>
           <height>20</height>
@@ -133,15 +132,15 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="prop_pb" >
-        <property name="text" >
+       <widget class="QPushButton" name="prop_pb">
+        <property name="text">
          <string>User Properties</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="inst_pb" >
-        <property name="text" >
+       <widget class="QPushButton" name="inst_pb">
+        <property name="text">
          <string>Instantiation</string>
         </property>
        </widget>
@@ -149,121 +148,114 @@
      </layout>
     </widget>
    </item>
-   <item row="7" column="1" colspan="4" >
-    <widget class="QLabel" name="label_3" >
-     <property name="text" >
+   <item row="7" column="1" colspan="4">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
       <string>Hint: orientation, alignments and size cannot be saved to OASIS files
 Enable a vector font and text scaling in the setup dialog 
 to show text objects scaled and rotated</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="0" >
-    <widget class="QLabel" name="Orientation" >
-     <property name="text" >
+   <item row="4" column="0">
+    <widget class="QLabel" name="Orientation">
+     <property name="text">
       <string>Orientation</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="0" >
-    <widget class="QLabel" name="label" >
-     <property name="text" >
+   <item row="2" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
       <string>Position (x/y)</string>
      </property>
     </widget>
    </item>
-   <item row="6" column="3" colspan="2" >
-    <widget class="QLabel" name="label_6" >
-     <property name="text" >
+   <item row="6" column="3" colspan="2">
+    <widget class="QLabel" name="label_6">
+     <property name="text">
       <string>(Leave empty for default)</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="1" colspan="4" >
-    <widget class="QLineEdit" name="text_le" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>7</hsizetype>
-       <vsizetype>0</vsizetype>
+   <item row="1" column="1" colspan="4">
+    <widget class="QLineEdit" name="text_le">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
     </widget>
    </item>
-   <item row="10" column="2" colspan="3" >
-    <widget class="QCheckBox" name="abs_cb" >
-     <property name="text" >
+   <item row="10" column="2" colspan="3">
+    <widget class="QCheckBox" name="abs_cb">
+     <property name="text">
       <string>Absolute (accumulated) transformations</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="4" >
-    <widget class="QLineEdit" name="y_le" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>7</hsizetype>
-       <vsizetype>0</vsizetype>
+   <item row="2" column="4">
+    <widget class="QLineEdit" name="y_le">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
        <horstretch>1</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
     </widget>
    </item>
-   <item row="9" column="2" colspan="3" >
-    <widget class="QCheckBox" name="dbu_cb" >
-     <property name="text" >
+   <item row="9" column="2" colspan="3">
+    <widget class="QCheckBox" name="dbu_cb">
+     <property name="text">
       <string>Coordinates in database units</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="0" colspan="5" >
-    <widget class="QFrame" name="frame" >
-     <property name="frameShape" >
+   <item row="0" column="0" colspan="5">
+    <widget class="QFrame" name="frame">
+     <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
-     <property name="frameShadow" >
+     <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QHBoxLayout" >
-      <property name="margin" >
-       <number>0</number>
-      </property>
-      <property name="spacing" >
+     <layout class="QHBoxLayout">
+      <property name="spacing">
        <number>6</number>
       </property>
+      <property name="margin" stdset="0">
+       <number>0</number>
+      </property>
       <item>
-       <widget class="QLabel" name="label_12" >
-        <property name="font" >
+       <widget class="QLabel" name="label_12">
+        <property name="font">
          <font>
           <family>Sans Serif</family>
           <pointsize>12</pointsize>
-          <weight>75</weight>
           <italic>false</italic>
           <bold>true</bold>
           <underline>false</underline>
           <strikeout>false</strikeout>
          </font>
         </property>
-        <property name="text" >
+        <property name="text">
          <string>Text Properties</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="layer_lbl" >
-        <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>7</hsizetype>
-          <vsizetype>5</vsizetype>
+       <widget class="QLabel" name="layer_lbl">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="text" >
+        <property name="text">
          <string/>
         </property>
-        <property name="alignment" >
+        <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
        </widget>
@@ -271,141 +263,149 @@ to show text objects scaled and rotated</string>
      </layout>
     </widget>
    </item>
-   <item row="4" column="1" colspan="2" >
-    <widget class="QComboBox" name="orient_cbx" >
+   <item row="4" column="1" colspan="2">
+    <widget class="QComboBox" name="orient_cbx">
      <item>
-      <property name="text" >
+      <property name="text">
        <string>(r0)</string>
       </property>
-      <property name="icon" >
-       <iconset resource="layResources.qrc" >:/r0_24px.png</iconset>
+      <property name="icon">
+       <iconset resource="../../icons/icons.qrc">
+        <normaloff>:/r0_24px.png</normaloff>:/r0_24px.png</iconset>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>(r90)</string>
       </property>
-      <property name="icon" >
-       <iconset resource="layResources.qrc" >:/r90_24px.png</iconset>
+      <property name="icon">
+       <iconset resource="../../icons/icons.qrc">
+        <normaloff>:/r90_24px.png</normaloff>:/r90_24px.png</iconset>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>(r180)</string>
       </property>
-      <property name="icon" >
-       <iconset resource="layResources.qrc" >:/r180_24px.png</iconset>
+      <property name="icon">
+       <iconset resource="../../icons/icons.qrc">
+        <normaloff>:/r180_24px.png</normaloff>:/r180_24px.png</iconset>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>(r270)</string>
       </property>
-      <property name="icon" >
-       <iconset resource="layResources.qrc" >:/r270_24px.png</iconset>
+      <property name="icon">
+       <iconset resource="../../icons/icons.qrc">
+        <normaloff>:/r270_24px.png</normaloff>:/r270_24px.png</iconset>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>(m0)</string>
       </property>
-      <property name="icon" >
-       <iconset resource="layResources.qrc" >:/m0_24px.png</iconset>
+      <property name="icon">
+       <iconset resource="../../icons/icons.qrc">
+        <normaloff>:/m0_24px.png</normaloff>:/m0_24px.png</iconset>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>(m45)</string>
       </property>
-      <property name="icon" >
-       <iconset resource="layResources.qrc" >:/m45_24px.png</iconset>
+      <property name="icon">
+       <iconset resource="../../icons/icons.qrc">
+        <normaloff>:/m45_24px.png</normaloff>:/m45_24px.png</iconset>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>(m90)</string>
       </property>
-      <property name="icon" >
-       <iconset resource="layResources.qrc" >:/m90_24px.png</iconset>
+      <property name="icon">
+       <iconset resource="../../icons/icons.qrc">
+        <normaloff>:/m90_24px.png</normaloff>:/m90_24px.png</iconset>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>(m135)</string>
       </property>
-      <property name="icon" >
-       <iconset resource="layResources.qrc" >:/m135_24px.png</iconset>
+      <property name="icon">
+       <iconset resource="../../icons/icons.qrc">
+        <normaloff>:/m135_24px.png</normaloff>:/m135_24px.png</iconset>
       </property>
      </item>
     </widget>
    </item>
-   <item row="6" column="1" colspan="2" >
-    <widget class="QLineEdit" name="size_le" />
+   <item row="6" column="1" colspan="2">
+    <widget class="QLineEdit" name="size_le"/>
    </item>
-   <item row="5" column="2" >
-    <widget class="QComboBox" name="halign_cbx" >
+   <item row="5" column="2">
+    <widget class="QComboBox" name="halign_cbx">
      <item>
-      <property name="text" >
+      <property name="text">
        <string>(Default)</string>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>Left</string>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>Center</string>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>Right</string>
       </property>
      </item>
     </widget>
    </item>
-   <item row="5" column="0" >
-    <widget class="QLabel" name="label_4" >
-     <property name="text" >
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
       <string>Alignment</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="1" >
-    <widget class="QLabel" name="label_8" >
-     <property name="text" >
+   <item row="5" column="1">
+    <widget class="QLabel" name="label_8">
+     <property name="text">
       <string>h =</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="3" >
-    <widget class="QLabel" name="label_9" >
-     <property name="text" >
+   <item row="5" column="3">
+    <widget class="QLabel" name="label_9">
+     <property name="text">
       <string>v =</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="4" >
-    <widget class="QComboBox" name="valign_cbx" >
+   <item row="5" column="4">
+    <widget class="QComboBox" name="valign_cbx">
      <item>
-      <property name="text" >
+      <property name="text">
        <string>(Default)</string>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>Top</string>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>Center</string>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>Bottom</string>
       </property>
      </item>
@@ -427,7 +427,7 @@ to show text objects scaled and rotated</string>
   <tabstop>inst_pb</tabstop>
  </tabstops>
  <resources>
-  <include location="layResources.qrc" />
+  <include location="../../icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

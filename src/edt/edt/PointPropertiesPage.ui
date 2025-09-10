@@ -272,6 +272,8 @@
   </layout>
  </widget>
  <tabstops>
+  <tabstop>x_le</tabstop>
+  <tabstop>y_le</tabstop>
   <tabstop>dbu_cb</tabstop>
   <tabstop>abs_cb</tabstop>
   <tabstop>prop_pb</tabstop>

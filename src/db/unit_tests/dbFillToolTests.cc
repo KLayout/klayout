@@ -377,3 +377,98 @@ TEST(6)
   CHECKPOINT();
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/fill_tool_au6.oas", db::WriteOAS);
 }
+
+//  exclude_area
+TEST(7)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testdata ());
+    fn += "/algo/fill_tool7.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type fill_cell = ly.cell_by_name ("FILL_CELL").second;
+  db::cell_index_type top_cell = ly.cell_by_name ("TOP").second;
+
+  unsigned int fill_layer = ly.get_layer (db::LayerProperties (1, 0));
+  db::Region fill_region (db::RecursiveShapeIterator (ly, ly.cell (top_cell), fill_layer));
+
+  unsigned int excl_layer = ly.get_layer (db::LayerProperties (2, 0));
+  db::Region excl_region (db::RecursiveShapeIterator (ly, ly.cell (top_cell), excl_layer));
+
+  db::Region remaining_polygons;
+
+  db::Vector rs (2500, 0);
+  db::Vector cs (650, 2500);
+  db::Box fc_box = ly.cell (fill_cell).bbox ();
+  db::fill_region (&ly.cell (top_cell), fill_region, fill_cell, fc_box, rs, cs, db::Point (), false, &remaining_polygons, db::Vector (), 0, db::Box (), excl_region);
+
+  unsigned int l100 = ly.insert_layer (db::LayerProperties (100, 0));
+  remaining_polygons.insert_into (&ly, top_cell, l100);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/fill_tool_au7.oas", db::WriteOAS);
+}
+
+//  exclude_area
+TEST(8)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testdata ());
+    fn += "/algo/fill_tool8.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type fill_cell = ly.cell_by_name ("FILL_CELL").second;
+  db::cell_index_type top_cell = ly.cell_by_name ("TOP").second;
+
+  unsigned int fill_layer = ly.get_layer (db::LayerProperties (1, 0));
+  db::Region fill_region (db::RecursiveShapeIterator (ly, ly.cell (top_cell), fill_layer));
+
+  unsigned int excl_layer = ly.get_layer (db::LayerProperties (2, 0));
+  db::Region excl_region (db::RecursiveShapeIterator (ly, ly.cell (top_cell), excl_layer));
+
+  db::Vector rs (2500, 0);
+  db::Vector cs (650, 2500);
+  db::Box fc_box = ly.cell (fill_cell).bbox ();
+  db::fill_region (&ly.cell (top_cell), fill_region, fill_cell, fc_box, rs, cs, db::Point (), false, 0, db::Vector (), 0, db::Box (), excl_region);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/fill_tool_au8.oas", db::WriteOAS);
+}
+
+//  exclude_area
+TEST(9)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testdata ());
+    fn += "/algo/fill_tool9.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type fill_cell = ly.cell_by_name ("FILL_CELL").second;
+  db::cell_index_type top_cell = ly.cell_by_name ("TOP").second;
+
+  unsigned int fill_layer = ly.get_layer (db::LayerProperties (1, 0));
+  db::Region fill_region (db::RecursiveShapeIterator (ly, ly.cell (top_cell), fill_layer));
+
+  unsigned int excl_layer = ly.get_layer (db::LayerProperties (2, 0));
+  db::Region excl_region (db::RecursiveShapeIterator (ly, ly.cell (top_cell), excl_layer));
+
+  db::Vector rs (2500, 0);
+  db::Vector cs (650, 2500);
+  db::Box fc_box = ly.cell (fill_cell).bbox ();
+  db::fill_region (&ly.cell (top_cell), fill_region, fill_cell, fc_box, rs, cs, db::Point (), true, 0, db::Vector (), 0, db::Box (), excl_region);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/fill_tool_au9.oas", db::WriteOAS);
+}

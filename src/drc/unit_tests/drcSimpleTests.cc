@@ -1453,6 +1453,16 @@ TEST(47bd_fillWithUsingOutputDeep)
   run_test (_this, "47b", true);
 }
 
+TEST(47c_fillWithExcludeArea)
+{
+  run_test (_this, "47c", false);
+}
+
+TEST(47cd_fillWithExcludeAreaDeep)
+{
+  run_test (_this, "47c", true);
+}
+
 TEST(48_drcWithFragments)
 {
   run_test (_this, "48", false);

@@ -1620,6 +1620,14 @@ public:
   top_down_const_iterator end_top_cells () const;
   
   /**
+   *  @brief Gets a value indicating whether an update is needed
+   *
+   *  If this value is false, update or force_update will not
+   *  do anything.
+   */
+  bool update_needed () const;
+
+  /**
    *  @brief Provide a const version of the update method
    *
    *  This pseudo-const version is required in order to automatically call

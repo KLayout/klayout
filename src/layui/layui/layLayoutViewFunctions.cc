@@ -1191,6 +1191,8 @@ LayoutViewFunctions::cm_remove_unused ()
 void
 LayoutViewFunctions::do_cm_duplicate (bool interactive)
 {
+  view ()->cancel_edits ();
+
   //  Do duplicate simply by concatenating copy & paste currently.
   //  Save the clipboard state before in order to preserve the current content
   db::Clipboard saved_clipboard;
@@ -1199,7 +1201,6 @@ LayoutViewFunctions::do_cm_duplicate (bool interactive)
   try {
     bool transient_mode = ! view ()->has_selection ();
     view ()->copy_view_objects ();
-    view ()->cancel_edits ();
     if (interactive) {
       view ()->paste_interactive (transient_mode);
     } else {
@@ -1542,7 +1543,7 @@ void
 LayoutViewFunctions::cm_sel_move_interactive ()
 {
   view ()->cancel_edits ();
-  if (view ()->move_service ()->begin_move ()) {
+  if (view ()->move_service ()->start_move ()) {
     view ()->switch_mode (-1);  //  move mode
   }
 }

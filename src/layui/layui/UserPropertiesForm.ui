@@ -49,7 +49,7 @@
    <item row="1" column="0">
     <widget class="QTabWidget" name="mode_tab">
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -234,7 +234,13 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <tabstops>
-  <tabstop>buttonBox</tabstop>
+  <tabstop>mode_tab</tabstop>
+  <tabstop>prop_list</tabstop>
+  <tabstop>add_pb</tabstop>
+  <tabstop>remove_pb</tabstop>
+  <tabstop>edit_pb</tabstop>
+  <tabstop>text_edit</tabstop>
+  <tabstop>meta_info_list</tabstop>
  </tabstops>
  <resources>
   <include location="../../icons/icons.qrc"/>

@@ -325,7 +325,7 @@ db::Instance
 PathService::make_via (const db::SelectedViaDefinition &via_def, double w_bottom, double h_bottom, double w_top, double h_top, const db::DPoint &via_pos)
 {
   if (! via_def.via_type.cut.is_null ()) {
-    edt::set_or_request_current_layer (view (), via_def.via_type.cut, cv_index (), false /*don't make current*/);
+    lay::set_or_request_current_layer (view (), via_def.via_type.cut, cv_index (), false /*don't make current*/);
   }
 
   std::map<std::string, tl::Variant> params;

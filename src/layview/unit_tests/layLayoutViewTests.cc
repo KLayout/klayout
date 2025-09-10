@@ -173,6 +173,42 @@ TEST(4)
   EXPECT_EQ ((int) img.height (), 217);
 }
 
+//  options
+TEST(5)
+{
+  std::unique_ptr<lay::LayoutView> lv;
+
+  lv.reset (new lay::LayoutView (0, false, 0));
+  EXPECT_EQ (lv->mouse_tracker () == 0, false);
+  EXPECT_EQ (lv->zoom_service () == 0, false);
+  EXPECT_EQ (lv->move_service () == 0, false);
+  EXPECT_EQ (lv->selection_service () == 0, false);
+
+  lv.reset (new lay::LayoutView (0, false, 0, lay::LayoutView::LV_NoMove));
+  EXPECT_EQ (lv->mouse_tracker () == 0, false);
+  EXPECT_EQ (lv->zoom_service () == 0, false);
+  EXPECT_EQ (lv->move_service () == 0, true);
+  EXPECT_EQ (lv->selection_service () == 0, false);
+
+  lv.reset (new lay::LayoutView (0, false, 0, lay::LayoutView::LV_NoTracker));
+  EXPECT_EQ (lv->mouse_tracker () == 0, true);
+  EXPECT_EQ (lv->zoom_service () == 0, false);
+  EXPECT_EQ (lv->move_service () == 0, false);
+  EXPECT_EQ (lv->selection_service () == 0, false);
+
+  lv.reset (new lay::LayoutView (0, false, 0, lay::LayoutView::LV_NoZoom));
+  EXPECT_EQ (lv->mouse_tracker () == 0, false);
+  EXPECT_EQ (lv->zoom_service () == 0, true);
+  EXPECT_EQ (lv->move_service () == 0, false);
+  EXPECT_EQ (lv->selection_service () == 0, false);
+
+  lv.reset (new lay::LayoutView (0, false, 0, lay::LayoutView::LV_NoSelection));
+  EXPECT_EQ (lv->mouse_tracker () == 0, false);
+  EXPECT_EQ (lv->zoom_service () == 0, false);
+  EXPECT_EQ (lv->move_service () == 0, false);
+  EXPECT_EQ (lv->selection_service () == 0, true);
+}
+
 #if defined(HAVE_PNG)
 TEST(11)
 {

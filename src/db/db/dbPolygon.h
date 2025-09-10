@@ -1512,16 +1512,17 @@ public:
    *  @param tr The transformation to apply on assignment
    *  @param compress True, if the contours shall be compressed
    *  @param remove_reflected True, if reflecting spikes shall be removed on compression
+   *  @param normalize If true, the orientation is normalized
    */
   template <class D, class T>
-  polygon (const db::polygon<D> &p, const T &tr, bool compress = default_compression<C> (), bool remove_reflected = false)
+  polygon (const db::polygon<D> &p, const T &tr, bool compress = default_compression<C> (), bool remove_reflected = false, bool normalize = true)
   {
     //  create an entry for the hull contour
     m_bbox = box_type (tr (p.box ().p1 ()), tr (p.box ().p2 ()));
     m_ctrs.resize (p.holes () + 1);
-    m_ctrs [0].assign (p.begin_hull (), p.end_hull (), tr, false, compress, true /*normalize*/, remove_reflected);
+    m_ctrs [0].assign (p.begin_hull (), p.end_hull (), tr, false, compress, normalize, remove_reflected);
     for (unsigned int i = 0; i < m_ctrs.size () - 1; ++i) {
-      m_ctrs [i + 1].assign (p.begin_hole (i), p.end_hole (i), tr, true, compress, true /*normalize*/, remove_reflected);
+      m_ctrs [i + 1].assign (p.begin_hole (i), p.end_hole (i), tr, true, compress, normalize, remove_reflected);
     }
   }
 
@@ -1533,16 +1534,16 @@ public:
    *  @param remove_reflected True, if reflecting spikes shall be removed on compression
    */
   template <class D>
-  explicit polygon (const db::polygon<D> &p, bool compress = default_compression<C> (), bool remove_reflected = false)
+  explicit polygon (const db::polygon<D> &p, bool compress = default_compression<C> (), bool remove_reflected = false, bool normalize = true)
   {
     db::point_coord_converter<C, D> tr;
 
     //  create an entry for the hull contour
     m_bbox = box_type (tr (p.box ().p1 ()), tr (p.box ().p2 ()));
     m_ctrs.resize (p.holes () + 1);
-    m_ctrs [0].assign (p.begin_hull (), p.end_hull (), tr, false, compress, true /*normalize*/, remove_reflected);
+    m_ctrs [0].assign (p.begin_hull (), p.end_hull (), tr, false, compress, normalize, remove_reflected);
     for (unsigned int i = 0; i < m_ctrs.size () - 1; ++i) {
-      m_ctrs [i + 1].assign (p.begin_hole (i), p.end_hole (i), tr, true, compress, true /*normalize*/, remove_reflected);
+      m_ctrs [i + 1].assign (p.begin_hole (i), p.end_hole (i), tr, true, compress, normalize, remove_reflected);
     }
   }
 
@@ -2072,11 +2073,12 @@ public:
    *  @param end The end of the sequence of points for the contour
    *  @param compress true, if the sequence shall be compressed (colinear points removed)
    *  @param remove_reflected True, if reflecting spikes shall be removed on compression
+   *  @param normalize If true, the orientation is normalized
    */
   template <class I> 
-  void assign_hull (I start, I end, bool compress = default_compression<C> (), bool remove_reflected = false) 
+  void assign_hull (I start, I end, bool compress = default_compression<C> (), bool remove_reflected = false, bool normalize = true)
   {
-    m_ctrs [0].assign (start, end, false, compress, true /*normalize*/, remove_reflected);
+    m_ctrs [0].assign (start, end, false, compress, normalize, remove_reflected);
     m_bbox = m_ctrs [0].bbox ();
   }
 
@@ -2089,14 +2091,15 @@ public:
    *  so it is oriented properly.
    *  @param compress true, if the sequence shall be compressed (colinear points removed)
    *  @param remove_reflected True, if reflecting spikes shall be removed on compression
+   *  @param normalize If true, the orientation is normalized
    *
    *  @param start The start of the sequence of points for the contour
    *  @param end The end of the sequence of points for the contour
    */
   template <class I, class T> 
-  void assign_hull (I start, I end, T op, bool compress = default_compression<C> (), bool remove_reflected = false) 
+  void assign_hull (I start, I end, T op, bool compress = default_compression<C> (), bool remove_reflected = false, bool normalize = true)
   {
-    m_ctrs [0].assign (start, end, op, false, compress, true /*normalize*/, remove_reflected);
+    m_ctrs [0].assign (start, end, op, false, compress, normalize, remove_reflected);
     m_bbox = m_ctrs [0].bbox ();
   }
 
@@ -2128,11 +2131,12 @@ public:
    *  @param end The end of the sequence of points for the contour
    *  @param compress true, if the sequence shall be compressed (colinear points removed)
    *  @param remove_reflected True, if reflecting spikes shall be removed on compression
+   *  @param normalize If true, the orientation is normalized
    */
   template <class I> 
-  void assign_hole (unsigned int h, I start, I end, bool compress = default_compression<C> (), bool remove_reflected = false) 
+  void assign_hole (unsigned int h, I start, I end, bool compress = default_compression<C> (), bool remove_reflected = false, bool normalize = true)
   {
-    m_ctrs [h + 1].assign (start, end, true, compress, true /*normalize*/, remove_reflected);
+    m_ctrs [h + 1].assign (start, end, true, compress, normalize, remove_reflected);
   }
 
   /** 
@@ -2144,14 +2148,15 @@ public:
    *  so it is oriented properly.
    *  @param compress true, if the sequence shall be compressed (colinear points removed)
    *  @param remove_reflected True, if reflecting spikes shall be removed on compression
+   *  @param normalize If true, the orientation is normalized
    *
    *  @param start The start of the sequence of points for the contour
    *  @param end The end of the sequence of points for the contour
    */
   template <class I, class T> 
-  void assign_hole (unsigned int h, I start, I end, T op, bool compress = default_compression<C> (), bool remove_reflected = false) 
+  void assign_hole (unsigned int h, I start, I end, T op, bool compress = default_compression<C> (), bool remove_reflected = false, bool normalize = true)
   {
-    m_ctrs [h + 1].assign (start, end, op, true, compress, true /*normalize*/, remove_reflected);
+    m_ctrs [h + 1].assign (start, end, op, true, compress, normalize, remove_reflected);
   }
 
   /** 
@@ -2183,11 +2188,12 @@ public:
    *  @param end The end of the sequence of points for the contour
    *  @param compress true, if the sequence shall be compressed (colinear points removed)
    *  @param remove_reflected True, if reflecting spikes shall be removed on compression
+   *  @param normalize If true, the orientation is normalized
    */
   template <class I> 
-  void insert_hole (I start, I end, bool compress = default_compression<C> (), bool remove_reflected = false)
+  void insert_hole (I start, I end, bool compress = default_compression<C> (), bool remove_reflected = false, bool normalize = true)
   {
-    insert_hole (start, end, db::unit_trans<C> (), compress, remove_reflected);
+    insert_hole (start, end, db::unit_trans<C> (), compress, remove_reflected, normalize);
   }
 
   /** 
@@ -2204,13 +2210,14 @@ public:
    *  @param end The end of the sequence of points for the contour
    *  @param compress true, if the sequence shall be compressed (colinear points removed)
    *  @param remove_reflected True, if reflecting spikes shall be removed on compression
+   *  @param normalize If true, the orientation is normalized
    */
   template <class I, class T> 
-  void insert_hole (I start, I end, T op, bool compress = default_compression<C> (), bool remove_reflected = false) 
+  void insert_hole (I start, I end, T op, bool compress = default_compression<C> (), bool remove_reflected = false, bool normalize = true)
   {
     //  add the hole
     contour_type &h = add_hole ();
-    h.assign (start, end, op, true, compress, true /*normalize*/, remove_reflected);
+    h.assign (start, end, op, true, compress, normalize, remove_reflected);
   }
 
   /**
@@ -2637,13 +2644,14 @@ public:
    *  @param tr The transformation to apply
    *  @param compress true, if the sequence shall be compressed (colinear points removed)
    *  @param remove_reflected True, if reflecting spikes shall be removed on compression
+   *  @param normalize If true, the orientation is normalized
    */
   template <class D, class T>
-  simple_polygon (const db::simple_polygon<D> &p, const T &tr, bool compress = default_compression<C> (), bool remove_reflected = false)
+  simple_polygon (const db::simple_polygon<D> &p, const T &tr, bool compress = default_compression<C> (), bool remove_reflected = false, bool normalize = true)
   {
     //  create an entry for the hull contour
     m_bbox = box_type (tr (p.box ().p1 ()), tr (p.box ().p2 ()));
-    m_hull.assign (p.begin_hull (), p.end_hull (), tr, false, compress, true /*normalize*/, remove_reflected);
+    m_hull.assign (p.begin_hull (), p.end_hull (), tr, false, compress, normalize, remove_reflected);
   }
 
   /**
@@ -2652,15 +2660,16 @@ public:
    *  @param p The source polygon
    *  @param compress true, if the sequence shall be compressed (colinear points removed)
    *  @param remove_reflected True, if reflecting spikes shall be removed on compression
+   *  @param normalize If true, the orientation is normalized
    */
   template <class D>
-  explicit simple_polygon (const db::simple_polygon<D> &p, bool compress = default_compression<C> (), bool remove_reflected = false)
+  explicit simple_polygon (const db::simple_polygon<D> &p, bool compress = default_compression<C> (), bool remove_reflected = false, bool normalize = true)
   {
     db::point_coord_converter<C, D> tr;
 
     //  create an entry for the hull contour
     m_bbox = box_type (tr (p.box ().p1 ()), tr (p.box ().p2 ()));
-    m_hull.assign (p.begin_hull (), p.end_hull (), tr, false, compress, true /*normalize*/, remove_reflected);
+    m_hull.assign (p.begin_hull (), p.end_hull (), tr, false, compress, normalize, remove_reflected);
   }
 
   /**
@@ -2992,11 +3001,12 @@ public:
    *  @param end The end of the sequence of points for the contour
    *  @param compress true, if the sequence shall be compressed (colinear segments joined)
    *  @param remove_reflected True, if reflecting spikes shall be removed on compression
+   *  @param normalize If true, the orientation is normalized
    */
   template <class I, class T> 
-  void assign_hull (I start, I end, T op, bool compress = default_compression<C> (), bool remove_reflected = false) 
+  void assign_hull (I start, I end, T op, bool compress = default_compression<C> (), bool remove_reflected = false, bool normalize = true)
   {
-    m_hull.assign (start, end, op, false, compress, true /*normalize*/, remove_reflected);
+    m_hull.assign (start, end, op, false, compress, normalize, remove_reflected);
     m_bbox = m_hull.bbox ();
   }
 
